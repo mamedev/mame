@@ -32,12 +32,12 @@ DEFINE_DEVICE_TYPE(E0C6S46, e0c6s46_device, "e0c6s46", "Seiko Epson E0C6S46")
 
 
 // internal memory maps
-static ADDRESS_MAP_START(e0c6s46_program, AS_PROGRAM, 16, e0c6s46_device)
+ADDRESS_MAP_START(e0c6s46_device::e0c6s46_program)
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(e0c6s46_data, AS_DATA, 8, e0c6s46_device)
+ADDRESS_MAP_START(e0c6s46_device::e0c6s46_data)
 	AM_RANGE(0x0000, 0x027f) AM_RAM
 	AM_RANGE(0x0e00, 0x0e4f) AM_RAM AM_SHARE("vram1")
 	AM_RANGE(0x0e80, 0x0ecf) AM_RAM AM_SHARE("vram2")
@@ -47,7 +47,7 @@ ADDRESS_MAP_END
 
 // device definitions
 e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: e0c6200_cpu_device(mconfig, E0C6S46, tag, owner, clock, ADDRESS_MAP_NAME(e0c6s46_program), ADDRESS_MAP_NAME(e0c6s46_data))
+	: e0c6200_cpu_device(mconfig, E0C6S46, tag, owner, clock, address_map_constructor(FUNC(e0c6s46_device::e0c6s46_program), this), address_map_constructor(FUNC(e0c6s46_device::e0c6s46_data), this))
 	, m_vram1(*this, "vram1")
 	, m_vram2(*this, "vram2"), m_osc(0), m_svd(0), m_lcd_control(0), m_lcd_contrast(0)
 	, m_write_r0(*this), m_write_r1(*this), m_write_r2(*this), m_write_r3(*this), m_write_r4(*this)
@@ -629,7 +629,7 @@ READ8_MEMBER(e0c6s46_device::io_r)
 		{
 			// irq flags are reset(acked) when read
 			u8 flag = m_irqflag[offset];
-			if (!machine().side_effect_disabled())
+			if (!machine().side_effects_disabled())
 				m_irqflag[offset] = 0;
 			return flag;
 		}
@@ -706,7 +706,7 @@ READ8_MEMBER(e0c6s46_device::io_r)
 			break;
 
 		default:
-			if (!machine().side_effect_disabled())
+			if (!machine().side_effects_disabled())
 				logerror("%s unknown io_r from $0F%02X at $%04X\n", tag(), offset, m_prev_pc);
 			break;
 	}

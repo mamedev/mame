@@ -45,7 +45,8 @@ public:
 		FLAG_DISABLE        = (1 << 5),
 		FLAG_UI_DATS        = (1 << 6),
 		FLAG_UI_FAVORITE    = (1 << 7),
-		FLAG_UI_HEADING     = (1 << 8)
+		FLAG_UI_HEADING     = (1 << 8),
+		FLAG_COLOR_BOX      = (1 << 9)
 	};
 
 	virtual ~menu();

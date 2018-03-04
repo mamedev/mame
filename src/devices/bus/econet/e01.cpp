@@ -219,7 +219,7 @@ WRITE_LINE_MEMBER( econet_e01_device::scsi_req_w )
 //  ADDRESS_MAP( e01_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( e01_mem, AS_PROGRAM, 8, econet_e01_device )
+ADDRESS_MAP_START(econet_e01_device::e01_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_MIRROR(0x00c3) AM_READWRITE(rtc_address_r, rtc_address_w)
 	AM_RANGE(0xfc04, 0xfc04) AM_MIRROR(0x00c3) AM_READWRITE(rtc_data_r, rtc_data_w)
@@ -241,23 +241,23 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( econet_e01_device::device_add_mconfig )
+MACHINE_CONFIG_START(econet_e01_device::device_add_mconfig)
 	// basic machine hardware
-	MCFG_CPU_ADD(R65C102_TAG, M65C02, XTAL_8MHz/4) // Rockwell R65C102P3
+	MCFG_CPU_ADD(R65C102_TAG, M65C02, XTAL(8'000'000)/4) // Rockwell R65C102P3
 	MCFG_CPU_PROGRAM_MAP(e01_mem)
 
-	MCFG_MC146818_ADD(HD146818_TAG, XTAL_32_768kHz)
+	MCFG_MC146818_ADD(HD146818_TAG, XTAL(32'768))
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(econet_e01_device, rtc_irq_w))
 
 	// devices
-	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, XTAL_8MHz / 4)
+	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, XTAL(8'000'000) / 4)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(econet_e01_device, via_irq_w))
 
 	MCFG_DEVICE_ADD(MC6854_TAG, MC6854, 0)
 	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(econet_e01_device, adlc_irq_w))
 	MCFG_MC6854_OUT_TXD_CB(WRITELINE(econet_e01_device, econet_data_w))
-	MCFG_WD2793_ADD(WD2793_TAG, XTAL_8MHz/4)
+	MCFG_WD2793_ADD(WD2793_TAG, XTAL(8'000'000)/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(econet_e01_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(econet_e01_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", e01_floppies, "35dd", floppy_formats_afs)

@@ -23,10 +23,10 @@
 
 
 #define MCFG_CCPU_EXTERNAL_FUNC(_devcb) \
-	ccpu_cpu_device::set_external_func(*device, DEVCB_##_devcb);
+	downcast<ccpu_cpu_device &>(*device).set_external_func(DEVCB_##_devcb);
 
 #define MCFG_CCPU_VECTOR_FUNC(d) \
-	ccpu_cpu_device::set_vector_func(*device, d);
+	downcast<ccpu_cpu_device &>(*device).set_vector_func(d);
 
 
 class ccpu_cpu_device : public cpu_device
@@ -53,9 +53,9 @@ public:
 	// construction/destruction
 	ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_external_func(device_t &device, Object &&cb) { return downcast<ccpu_cpu_device &>(device).m_external_input.set_callback(std::forward<Object>(cb)); }
-	static void set_vector_func(device_t &device, vector_delegate callback) { downcast<ccpu_cpu_device &>(device).m_vector_callback = callback; }
+	// configuration helpers
+	template <class Object> devcb_base &set_external_func(Object &&cb) { return m_external_input.set_callback(std::forward<Object>(cb)); }
+	template <typename Object> void set_vector_func(Object &&cb) { m_vector_callback = std::forward<Object>(cb); }
 
 	DECLARE_READ8_MEMBER( read_jmi );
 	void wdt_timer_trigger();
@@ -78,9 +78,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 3; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -111,7 +109,7 @@ protected:
 	int                 m_icount;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_data;
 	address_space *m_io;
 

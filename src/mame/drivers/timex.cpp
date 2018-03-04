@@ -55,7 +55,7 @@ Changes:
 27/2/2000   KT -    Added disk image support to Spectrum +3 driver.
 27/2/2000   KT -    Added joystick I/O code to the Spectrum +3 I/O handler.
 14/3/2000   DJR -   Tape handling dipswitch.
-26/3/2000   DJR -   Snapshot files are now classifed as snapshots not
+26/3/2000   DJR -   Snapshot files are now classified as snapshots not
             cartridges.
 04/4/2000   DJR -   Spectrum 128 / +2 Support.
 13/4/2000   DJR -   +4 Support (unofficial 48K hack).
@@ -96,17 +96,17 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
                 interrupt routine is put. Due to unideal
                 bankswitching in MAME this JP were to 0001 what
                 causes Spectrum to reset. Fixing this problem
-                made much more software runing (i.e. Paperboy).
+                made much more software running (i.e. Paperboy).
             Corrected frames per second value for 48k and 128k
-            Sincalir machines.
+            Sinclair machines.
                 There are 50.08 frames per second for Spectrum
                 48k what gives 69888 cycles for each frame and
                 50.021 for Spectrum 128/+2/+2A/+3 what gives
                 70908 cycles for each frame.
-            Remaped some Spectrum+ keys.
-                Presing F3 to reset was seting 0xf7 on keyboard
+            Remapped some Spectrum+ keys.
+                Pressing F3 to reset was setting 0xf7 on keyboard
                 input port. Problem occurred for snapshots of
-                some programms where it was readed as pressing
+                some programs where it was read as pressing
                 key 4 (which is exit in Tapecopy by R. Dannhoefer
                 for example).
             Added support to load .SP snapshots.
@@ -115,7 +115,7 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
                 is an only difference.
 08/03/2002  KS -    #FF port emulation added.
                 Arkanoid works now, but is not playable due to
-                completly messed timings.
+                completely messed timings.
 
 Initialisation values used when determining which model is being emulated:
  48K        Spectrum doesn't use either port.
@@ -208,7 +208,7 @@ WRITE8_MEMBER( spectrum_state::ts2068_port_ff_w )
  *      etc. If the bit is 0 then the chunk is controlled by the HOME
  *      bank. If the bit is 1 then the chunk is controlled by either
  *      the DOCK or EXROM depending on bit 7 of port #ff. Note this
- *      means that that the Z80 can't see chunks of the EXROM and DOCK
+ *      means that the Z80 can't see chunks of the EXROM and DOCK
  *      at the same time.
  *
  *******************************************************************/
@@ -525,10 +525,7 @@ void spectrum_state::ts2068_update_memory()
 	}
 }
 
-static ADDRESS_MAP_START(ts2068_io, AS_IO, 8, spectrum_state )
-	AM_RANGE(0x1f, 0x1f) AM_READ(spectrum_port_1f_r ) AM_MIRROR(0xff00)
-	AM_RANGE(0x7f, 0x7f) AM_READ(spectrum_port_7f_r ) AM_MIRROR(0xff00)
-	AM_RANGE(0xdf, 0xdf) AM_READ(spectrum_port_df_r ) AM_MIRROR(0xff00)
+ADDRESS_MAP_START(spectrum_state::ts2068_io)
 	AM_RANGE(0xf4, 0xf4) AM_READWRITE(ts2068_port_f4_r,ts2068_port_f4_w ) AM_MIRROR(0xff00)
 	AM_RANGE(0xf5, 0xf5) AM_DEVWRITE("ay8912", ay8910_device, address_w ) AM_MIRROR(0xff00)
 	AM_RANGE(0xf6, 0xf6) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, data_w ) AM_MIRROR(0xff00)
@@ -536,7 +533,7 @@ static ADDRESS_MAP_START(ts2068_io, AS_IO, 8, spectrum_state )
 	AM_RANGE(0xff, 0xff) AM_READWRITE(ts2068_port_ff_r,ts2068_port_ff_w ) AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ts2068_mem, AS_PROGRAM, 8, spectrum_state )
+ADDRESS_MAP_START(spectrum_state::ts2068_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank9")
 	AM_RANGE(0x2000, 0x3fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank10")
 	AM_RANGE(0x4000, 0x5fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank11")
@@ -572,15 +569,12 @@ WRITE8_MEMBER( spectrum_state::tc2048_port_ff_w )
 	logerror("Port %04x write %02x\n", offset, data);
 }
 
-static ADDRESS_MAP_START(tc2048_io, AS_IO, 8, spectrum_state )
+ADDRESS_MAP_START(spectrum_state::tc2048_io)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xfffe)
-	AM_RANGE(0x1f, 0x1f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
-	AM_RANGE(0x7f, 0x7f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
-	AM_RANGE(0xdf, 0xdf) AM_READ(spectrum_port_df_r) AM_MIRROR(0xff00)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(ts2068_port_ff_r,tc2048_port_ff_w)  AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tc2048_mem, AS_PROGRAM, 8, spectrum_state )
+ADDRESS_MAP_START(spectrum_state::tc2048_mem)
 	AM_RANGE( 0x0000, 0x3fff) AM_ROM
 	AM_RANGE( 0x4000, 0xffff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 ADDRESS_MAP_END
@@ -688,8 +682,9 @@ static GFXDECODE_START( ts2068 )
 	GFXDECODE_ENTRY( "maincpu", 0x13d00, ts2068_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_14_112MHz/4)        /* From Schematic; 3.528 MHz */
+MACHINE_CONFIG_START(spectrum_state::ts2068)
+	spectrum_128(config);
+	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(14'112'000)/4)        /* From Schematic; 3.528 MHz */
 	MCFG_CPU_PROGRAM_MAP(ts2068_mem)
 	MCFG_CPU_IO_MAP(ts2068_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spectrum_state,  spec_interrupt)
@@ -710,17 +705,15 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, ts2068 )
 
 	/* sound */
-	MCFG_SOUND_REPLACE("ay8912", AY8912, XTAL_14_112MHz/8)        /* From Schematic; 1.764 MHz */
+	MCFG_SOUND_REPLACE("ay8912", AY8912, XTAL(14'112'000)/8)        /* From Schematic; 1.764 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cartridge */
-	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_GENERIC_CARTSLOT_ADD("dockslot", generic_plain_slot, "timex_cart")
 	MCFG_GENERIC_EXTENSIONS("dck,bin")
 	MCFG_GENERIC_LOAD(spectrum_state, timex_cart)
 
 	/* Software lists */
-	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "timex_dock")
 
 	/* internal ram */
@@ -729,13 +722,15 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( uk2086, ts2068 )
+MACHINE_CONFIG_START(spectrum_state::uk2086)
+	ts2068(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tc2048, spectrum )
+MACHINE_CONFIG_START(spectrum_state::tc2048)
+	spectrum(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tc2048_mem)
 	MCFG_CPU_IO_MAP(tc2048_io)

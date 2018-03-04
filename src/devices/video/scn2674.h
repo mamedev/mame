@@ -6,18 +6,17 @@
 #pragma once
 
 
-#define MCFG_SCN2674_VIDEO_ADD(_tag, _clock, _irq) \
-	MCFG_DEVICE_ADD(_tag, SCN2674_VIDEO, _clock) \
-	devcb = &scn2674_device::set_irq_callback(*device, DEVCB_##_irq);
+#define MCFG_SCN2674_INTR_CALLBACK(_intr) \
+	devcb = &downcast<scn2674_device &>(*device).set_intr_callback(DEVCB_##_intr);
 
 #define MCFG_SCN2674_TEXT_CHARACTER_WIDTH(_value) \
-	scn2674_device::static_set_character_width(*device, _value);
+	downcast<scn2674_device &>(*device).set_character_width(_value);
 
 #define MCFG_SCN2674_GFX_CHARACTER_WIDTH(_value) \
-	scn2674_device::static_set_gfx_character_width(*device, _value);
+	downcast<scn2674_device &>(*device).set_gfx_character_width(_value);
 
 #define MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	scn2674_device::static_set_display_callback(*device, scn2674_device::draw_character_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	downcast<scn2674_device &>(*device).set_display_callback(scn2674_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define SCN2674_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint16_t address, uint8_t cursor, uint8_t dw, uint8_t lg, uint8_t ul, uint8_t blink)
 
@@ -31,10 +30,10 @@ public:
 	typedef device_delegate<void (bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint16_t address, uint8_t cursor, uint8_t dw, uint8_t lg, uint8_t ul, uint8_t blink)> draw_character_delegate;
 
 	// static configuration
-	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<scn2674_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	static void static_set_character_width(device_t &device, int value) { downcast<scn2674_device &>(device).m_text_hpixels_per_column = value; }
-	static void static_set_gfx_character_width(device_t &device, int value) { downcast<scn2674_device &>(device).m_gfx_hpixels_per_column = value; }
-	static void static_set_display_callback(device_t &device, draw_character_delegate &&cb) { downcast<scn2674_device &>(device).m_display_cb = std::move(cb); }
+	template <class Object> devcb_base &set_intr_callback(Object &&cb) { return m_intr_cb.set_callback(std::forward<Object>(cb)); }
+	void set_character_width(int value) { m_text_hpixels_per_column = value; }
+	void set_gfx_character_width(int value) { m_gfx_hpixels_per_column = value; }
+	template <typename Object> void set_display_callback(Object &&cb) { m_display_cb = std::forward<Object>(cb); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -42,16 +41,17 @@ public:
 	DECLARE_WRITE8_MEMBER( buffer_w ) { m_buffer = data; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual space_config_vector memory_space_config() const override;
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	virtual space_config_vector memory_space_config() const override;
+
 private:
 	bitmap_rgb32 m_bitmap;
-	devcb_write_line m_irq_cb;
+	devcb_write_line m_intr_cb;
 
 	uint8_t m_IR_pointer;
 	uint8_t m_screen1_l;
@@ -119,6 +119,8 @@ private:
 	void write_command(uint8_t data);
 	void recompute_parameters();
 
+	void scn2674_vram(address_map &map);
+
 	draw_character_delegate m_display_cb;
 	emu_timer *m_scanline_timer;
 	const address_space_config m_space_config;
@@ -129,6 +131,6 @@ private:
 };
 
 
-DECLARE_DEVICE_TYPE(SCN2674_VIDEO, scn2674_device)
+DECLARE_DEVICE_TYPE(SCN2674, scn2674_device)
 
 #endif // MAME_VIDEO_SCN2674_H

@@ -10,6 +10,7 @@
 #include "emu.h"
 
 #include "cpu/melps4/m58846.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 #include "rendlay.h"
@@ -228,14 +229,15 @@ public:
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_READ16_MEMBER(input_r);
+	void cfrogger(machine_config &config);
 };
 
 // handlers
 
 void cfrogger_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,0,1,2,3,4,5,6,7,8,9,10,11);
-	u16 plate = BITSWAP16(m_plate,12,4,13,5,14,6,15,7,3,11,2,10,1,9,0,8);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,0,1,2,3,4,5,6,7,8,9,10,11);
+	u16 plate = bitswap<16>(m_plate,12,4,13,5,14,6,15,7,3,11,2,10,1,9,0,8);
 	display_matrix(16, 12, plate, grid);
 }
 
@@ -245,7 +247,7 @@ WRITE8_MEMBER(cfrogger_state::plate_w)
 	if (offset == MELPS4_PORTF)
 		m_inp_mux = data & 3;
 
-	// Sx,Fx,Gx: vfd matrix plate
+	// Sx,Fx,Gx: vfd plate
 	int mask = (offset == MELPS4_PORTS) ? 0xff : 0xf; // port S is 8-bit
 	int shift = (offset == MELPS4_PORTS) ? 0 : (offset + 1) * 4;
 	m_plate = (m_plate & ~(mask << shift)) | (data << shift);
@@ -254,7 +256,7 @@ WRITE8_MEMBER(cfrogger_state::plate_w)
 
 WRITE16_MEMBER(cfrogger_state::grid_w)
 {
-	// D0-D11: vfd matrix grid
+	// D0-D11: vfd grid
 	m_grid = data;
 	prepare_display();
 }
@@ -272,7 +274,6 @@ READ16_MEMBER(cfrogger_state::input_r)
 	// K3: fixed input
 	return (m_inp_matrix[2]->read() & 8) | (read_inputs(2) & 3);
 }
-
 
 // config
 
@@ -294,10 +295,10 @@ static INPUT_PORTS_START( cfrogger )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cfrogger )
+MACHINE_CONFIG_START(cfrogger_state::cfrogger)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M58846, XTAL_600kHz)
+	MCFG_CPU_ADD("maincpu", M58846, 600_kHz_XTAL)
 	MCFG_MELPS4_READ_K_CB(READ16(cfrogger_state, input_r))
 	MCFG_MELPS4_WRITE_S_CB(WRITE8(cfrogger_state, plate_w))
 	MCFG_MELPS4_WRITE_F_CB(WRITE8(cfrogger_state, plate_w))
@@ -344,14 +345,15 @@ public:
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_READ16_MEMBER(input_r);
+	void gjungler(machine_config &config);
 };
 
 // handlers
 
 void gjungler_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,1);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,8,9,10,11,13,16,15,14,13,12,7,0,6,1,5,2,4,3) | 0x2000;
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,1);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,8,9,10,11,13,16,15,14,13,12,7,0,6,1,5,2,4,3) | 0x2000;
 	display_matrix(18, 12, plate, grid);
 }
 
@@ -361,7 +363,7 @@ WRITE8_MEMBER(gjungler_state::plate_w)
 	if (offset == MELPS4_PORTG)
 		m_inp_mux = data & 3;
 
-	// Sx,Fx,Gx,U: vfd matrix plate
+	// Sx,Fx,Gx,U: vfd plate
 	int mask = (offset == MELPS4_PORTS) ? 0xff : 0xf; // port S is 8-bit
 	int shift = (offset == MELPS4_PORTS) ? 0 : (offset + 1) * 4;
 	m_plate = (m_plate & ~(mask << shift)) | (data << shift);
@@ -370,7 +372,7 @@ WRITE8_MEMBER(gjungler_state::plate_w)
 
 WRITE16_MEMBER(gjungler_state::grid_w)
 {
-	// D0-D11: vfd matrix grid
+	// D0-D11: vfd grid
 	m_grid = data;
 	prepare_display();
 }
@@ -387,7 +389,6 @@ READ16_MEMBER(gjungler_state::input_r)
 	// K2,K3: fixed inputs
 	return (m_inp_matrix[2]->read() & 0xc) | (read_inputs(2) & 3);
 }
-
 
 // config
 
@@ -410,10 +411,10 @@ static INPUT_PORTS_START( gjungler )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gjungler )
+MACHINE_CONFIG_START(gjungler_state::gjungler)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M58846, XTAL_600kHz)
+	MCFG_CPU_ADD("maincpu", M58846, 600_kHz_XTAL)
 	MCFG_MELPS4_READ_K_CB(READ16(gjungler_state, input_r))
 	MCFG_MELPS4_WRITE_S_CB(WRITE8(gjungler_state, plate_w))
 	MCFG_MELPS4_WRITE_F_CB(WRITE8(gjungler_state, plate_w))

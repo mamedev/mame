@@ -72,7 +72,7 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_cd )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( luxor_4105_device::device_add_mconfig )
+MACHINE_CONFIG_START(luxor_4105_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
 	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
 	MCFG_SCSI_BSY_HANDLER(WRITELINE(luxor_4105_device, write_sasi_bsy))

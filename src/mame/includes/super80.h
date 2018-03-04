@@ -11,6 +11,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/buffer.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
@@ -92,6 +93,19 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_h);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	void super80m(machine_config &config);
+	void super80(machine_config &config);
+	void super80r(machine_config &config);
+	void super80e(machine_config &config);
+	void super80d(machine_config &config);
+	void super80v(machine_config &config);
+	void super80_io(address_map &map);
+	void super80_map(address_map &map);
+	void super80e_io(address_map &map);
+	void super80m_map(address_map &map);
+	void super80r_io(address_map &map);
+	void super80v_io(address_map &map);
+	void super80v_map(address_map &map);
 private:
 	uint8_t m_s_options;
 	uint8_t m_portf0;

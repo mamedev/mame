@@ -960,7 +960,7 @@ void segas16a_state::sjryuko_lamp_changed_w(uint8_t changed, uint8_t newval)
 //  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( system16a_map, AS_PROGRAM, 16, segas16a_state )
+ADDRESS_MAP_START(segas16a_state::system16a_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x380000) AM_ROM
 	AM_RANGE(0x400000, 0x407fff) AM_MIRROR(0xb88000) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
@@ -972,7 +972,7 @@ static ADDRESS_MAP_START( system16a_map, AS_PROGRAM, 16, segas16a_state )
 	AM_RANGE(0xc70000, 0xc73fff) AM_MIRROR(0x38c000) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segas16a_state )
+ADDRESS_MAP_START(segas16a_state::decrypted_opcodes_map)
 	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -980,18 +980,18 @@ ADDRESS_MAP_END
 //  SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas16a_state )
+ADDRESS_MAP_START(segas16a_state::sound_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe800, 0xe800) AM_READ(sound_data_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_OPCODES, 8, segas16a_state )
+ADDRESS_MAP_START(segas16a_state::sound_decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("sound_decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas16a_state )
+ADDRESS_MAP_START(segas16a_state::sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -999,7 +999,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas16a_state )
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_no7751_portmap, AS_IO, 8, segas16a_state )
+ADDRESS_MAP_START(segas16a_state::sound_no7751_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -1013,11 +1013,8 @@ ADDRESS_MAP_END
 //  I8751 MCU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, segas16a_state )
-	ADDRESS_MAP_UNMAP_HIGH
+ADDRESS_MAP_START(segas16a_state::mcu_io_map)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP AM_WRITE(mcu_control_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READNOP   // read during jb int0
 ADDRESS_MAP_END
 
 
@@ -1185,6 +1182,83 @@ static INPUT_PORTS_START( afighter )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+
+CUSTOM_INPUT_MEMBER(afighter_16a_analog_state::afighter_accel_r)
+{
+	int accel = m_accel->read();
+
+	switch ((accel & 0xc0) >> 4)
+	{
+	case 0x00: return 0;
+	case 0x04: return (1 << 0);
+	case 0x08: return (1 << 1);
+	case 0x0c: return (1 << 2);
+	}
+
+	return 0;
+}
+
+CUSTOM_INPUT_MEMBER(afighter_16a_analog_state::afighter_handl_left_r)
+{
+	int steer = m_steer->read();
+
+	switch ((steer & 0xf0) >> 4)
+	{
+	case 0x00: return (1<<7);
+	case 0x01: return (1<<6);
+	case 0x02: return (1<<5);
+	case 0x03: return (1<<4);
+	case 0x04: return (1<<3);
+	case 0x05: return (1<<2);
+	case 0x06: return (1<<1);
+	case 0x07: return (1<<0);
+	}
+	return 0x00;
+}
+
+CUSTOM_INPUT_MEMBER(afighter_16a_analog_state::afighter_handl_right_r)
+{
+	int steer = m_steer->read();
+
+	switch ((steer & 0xf0)>>4)
+	{
+	case 0x0f: return (1<<7);
+	case 0x0e: return (1<<6);
+	case 0x0d: return (1<<5);
+	case 0x0c: return (1<<4);
+	case 0x0b: return (1<<3);
+	case 0x0a: return (1<<2);
+	case 0x09: return (1<<1);
+	case 0x08: return (1<<0);
+	}
+
+	return 0x00;
+}
+
+static INPUT_PORTS_START( afighter_analog )
+	PORT_INCLUDE( afighter )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16a_analog_state, afighter_accel_r, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // SHOT
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // WEAPON1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) // WEAPON2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) // WEAPON3
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16a_analog_state, afighter_handl_left_r, nullptr)
+
+	PORT_MODIFY("UNUSED")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16a_analog_state, afighter_handl_right_r, nullptr)
+
+	PORT_START("STEER")  // steering
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+
+	PORT_START("ACCEL")  // gas pedal
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
 
@@ -1888,7 +1962,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( system16a )
+MACHINE_CONFIG_START(segas16a_state::system16a)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -1948,41 +2022,48 @@ static MACHINE_CONFIG_START( system16a )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1089a, system16a )
+MACHINE_CONFIG_START(segas16a_state::system16a_fd1089a)
+	system16a(config);
 	MCFG_CPU_REPLACE("maincpu", FD1089A, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1089b, system16a )
+MACHINE_CONFIG_START(segas16a_state::system16a_fd1089b)
+	system16a(config);
 	MCFG_CPU_REPLACE("maincpu", FD1089B, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1094, system16a )
+MACHINE_CONFIG_START(segas16a_state::system16a_fd1094)
+	system16a(config);
 	MCFG_CPU_REPLACE("maincpu", FD1094, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aceattaca_fd1094, system16a_fd1094 )
+MACHINE_CONFIG_START(segas16a_state::aceattaca_fd1094)
+	system16a_fd1094(config);
 	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system16a_i8751, system16a )
+MACHINE_CONFIG_START(segas16a_state::system16a_i8751)
+	system16a(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, i8751_main_cpu_vblank)
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
 	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(segas16a_state, mcu_control_w))
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, mcu_irq_assert)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system16a_no7751, system16a )
+MACHINE_CONFIG_START(segas16a_state::system16a_no7751)
+	system16a(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
@@ -1994,16 +2075,18 @@ static MACHINE_CONFIG_DERIVED( system16a_no7751, system16a )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_no7751p, system16a_no7751 )
+MACHINE_CONFIG_START(segas16a_state::system16a_no7751p)
+	system16a_no7751(config);
 	MCFG_CPU_REPLACE("soundcpu", SEGA_315_5177, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":sound_decrypted_opcodes")
 MACHINE_CONFIG_END
 
 /*
-static MACHINE_CONFIG_DERIVED( system16a_i8751_no7751, system16a_i8751 )
+static MACHINE_CONFIG_START( system16a_i8751_no7751 )
+    system16a_i8751(config);
     MCFG_DEVICE_REMOVE("n7751")
     MCFG_DEVICE_REMOVE("dac")
     MCFG_DEVICE_REMOVE("vref")
@@ -2013,7 +2096,8 @@ static MACHINE_CONFIG_DERIVED( system16a_i8751_no7751, system16a_i8751 )
 MACHINE_CONFIG_END
 */
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1089a_no7751, system16a_fd1089a )
+MACHINE_CONFIG_START(segas16a_state::system16a_fd1089a_no7751)
+	system16a_fd1089a(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
@@ -2025,7 +2109,8 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1089a_no7751, system16a_fd1089a )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1089b_no7751, system16a_fd1089b )
+MACHINE_CONFIG_START(segas16a_state::system16a_fd1089b_no7751)
+	system16a_fd1089b(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
@@ -2037,7 +2122,8 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1089b_no7751, system16a_fd1089b )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1094_no7751, system16a_fd1094 )
+MACHINE_CONFIG_START(segas16a_state::system16a_fd1094_no7751)
+	system16a_fd1094(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
@@ -2115,6 +2201,7 @@ ROM_END
 //  Action Fighter, Sega System 16A
 //  CPU: FD1089A 317-0018?@(dedicated cabinet version uses 317-0014)
 //
+
 ROM_START( afighter )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-10350", 0x00001, 0x08000, CRC(f2cd6b3f) SHA1(380f75b8c1696b388179641866cd1d23f78664e7) )
@@ -2146,6 +2233,123 @@ ROM_START( afighter )
 	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
 ROM_END
 
+ROM_START( afightera )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr10315.bin", 0x00001, 0x08000, CRC(2ea55eae) SHA1(91d582eaa0483d547d1a37dedb8f029a0fccb526) ) // decrypted version of 10350
+	ROM_LOAD16_BYTE( "epr10318.bin", 0x00000, 0x08000, CRC(d05b240d) SHA1(aa4aa7b18b53ac7b533855a44f9a4a0c14e1da2a) )
+	ROM_LOAD16_BYTE( "epr10316.bin", 0x10001, 0x08000, CRC(07522474) SHA1(1a4bce4c04defab3516a90b9fa62fad1945a1176) ) // == epr10294.bin
+	ROM_LOAD16_BYTE( "epr10319.bin", 0x10000, 0x08000, CRC(e48c4d80) SHA1(9c40972f81e004de84db4199e7dc0ceb6a998e76) ) // == epr10297.bin
+	ROM_LOAD16_BYTE( "epr10317.bin", 0x20001, 0x08000, CRC(6e00db36) SHA1(5e3d03f7441515ad7dac411f492f2e159330a90a) )
+	ROM_LOAD16_BYTE( "epr10320.bin", 0x20000, 0x08000, CRC(5f97c2fa) SHA1(5fef94bc275d9132dde8b72bfb661f10efdc91b1) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-10281.95", 0x00000, 0x10000, CRC(30e92cda) SHA1(36293a2a8a22dca5350571f19f3d5d04e1b27458) )
+	ROM_LOAD( "epr-10282.94", 0x10000, 0x10000, CRC(b67b8910) SHA1(f3f029a3e6547114cec28e5cf8fda65ef434c353) )
+	ROM_LOAD( "epr-10283.93", 0x20000, 0x10000, CRC(e7dbfd2d) SHA1(91bae3fbc4a3c612dc507eecfa8de1c2e1e7afee) )
+
+	ROM_REGION16_BE( 0x40000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-10285", 0x00001, 0x08000, CRC(98aa3d04) SHA1(1d26d17a72e55281e3444fee9c5af69ffb9e3c69) )
+	ROM_LOAD16_BYTE( "epr-10286", 0x10001, 0x08000, CRC(8da050cf) SHA1(c28e8968dbd9c110672581f4486f70d5f45df7f5) )
+	ROM_LOAD16_BYTE( "epr-10287", 0x20001, 0x08000, CRC(7989b74a) SHA1(a87acafe82b37a11d8f8b1f2ee4c9b2e1bb8161c) )
+	ROM_LOAD16_BYTE( "epr-10288", 0x30001, 0x08000, CRC(d3ce551a) SHA1(0ff2170d9ef89058273025dd8d5e1021094adef1) )
+	ROM_LOAD16_BYTE( "epr-10289", 0x00000, 0x08000, CRC(c59d1b98) SHA1(e232f2519234981c0e4ffecdd25c48083d9f93a8) )
+	ROM_LOAD16_BYTE( "epr-10290", 0x10000, 0x08000, CRC(39354223) SHA1(d8a73d3f7fc2d83d23bb7434f43bc8804f35cc16) )
+	ROM_LOAD16_BYTE( "epr-10291", 0x20000, 0x08000, CRC(6e4b245c) SHA1(1f8cecf7ea2d2dfa5ce18d7ee34b0da2cc40221e) )
+	ROM_LOAD16_BYTE( "epr-10292", 0x30000, 0x08000, CRC(cef289a3) SHA1(7ab817b6348c168f79be325fb3cc2cca14ee0f8e) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-10284.12", 0x00000, 0x8000, CRC(8ff09116) SHA1(8b99b6d2499897cfbd037a7e7cf5bc53bce8a63a) )
+ROM_END
+
+ROM_START( afighterb )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr10293.bin", 0x00001, 0x08000, CRC(186ae21a) SHA1(65bff753b7ed7b3b03cc70634df9f2ff0d233323) ) // == decrypted 10275
+	ROM_LOAD16_BYTE( "epr10296.bin", 0x00000, 0x08000, CRC(7370e889) SHA1(d240defae86e97467002e549d213359c3e23ec54) )
+	ROM_LOAD16_BYTE( "epr10294.bin", 0x10001, 0x08000, CRC(07522474) SHA1(1a4bce4c04defab3516a90b9fa62fad1945a1176) )
+	ROM_LOAD16_BYTE( "epr10297.bin", 0x10000, 0x08000, CRC(e48c4d80) SHA1(9c40972f81e004de84db4199e7dc0ceb6a998e76) )
+	ROM_LOAD16_BYTE( "epr10295.bin", 0x20001, 0x08000, CRC(a940fde6) SHA1(7b7c2b904ae83dfb9e9ac0855e30408234fe371f) )
+	ROM_LOAD16_BYTE( "epr10298.bin", 0x20000, 0x08000, CRC(f6bab36e) SHA1(1e7a0403de5ede8055507274bd43ea7ab1219f27) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-10281.95", 0x00000, 0x10000, CRC(30e92cda) SHA1(36293a2a8a22dca5350571f19f3d5d04e1b27458) )
+	ROM_LOAD( "epr-10282.94", 0x10000, 0x10000, CRC(b67b8910) SHA1(f3f029a3e6547114cec28e5cf8fda65ef434c353) )
+	ROM_LOAD( "epr-10283.93", 0x20000, 0x10000, CRC(e7dbfd2d) SHA1(91bae3fbc4a3c612dc507eecfa8de1c2e1e7afee) )
+
+	ROM_REGION16_BE( 0x40000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-10285", 0x00001, 0x08000, CRC(98aa3d04) SHA1(1d26d17a72e55281e3444fee9c5af69ffb9e3c69) )
+	ROM_LOAD16_BYTE( "epr-10286", 0x10001, 0x08000, CRC(8da050cf) SHA1(c28e8968dbd9c110672581f4486f70d5f45df7f5) )
+	ROM_LOAD16_BYTE( "epr-10287", 0x20001, 0x08000, CRC(7989b74a) SHA1(a87acafe82b37a11d8f8b1f2ee4c9b2e1bb8161c) )
+	ROM_LOAD16_BYTE( "epr-10288", 0x30001, 0x08000, CRC(d3ce551a) SHA1(0ff2170d9ef89058273025dd8d5e1021094adef1) )
+	ROM_LOAD16_BYTE( "epr-10289", 0x00000, 0x08000, CRC(c59d1b98) SHA1(e232f2519234981c0e4ffecdd25c48083d9f93a8) )
+	ROM_LOAD16_BYTE( "epr-10290", 0x10000, 0x08000, CRC(39354223) SHA1(d8a73d3f7fc2d83d23bb7434f43bc8804f35cc16) )
+	ROM_LOAD16_BYTE( "epr-10291", 0x20000, 0x08000, CRC(6e4b245c) SHA1(1f8cecf7ea2d2dfa5ce18d7ee34b0da2cc40221e) )
+	ROM_LOAD16_BYTE( "epr-10292", 0x30000, 0x08000, CRC(cef289a3) SHA1(7ab817b6348c168f79be325fb3cc2cca14ee0f8e) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-10284.12", 0x00000, 0x8000, CRC(8ff09116) SHA1(8b99b6d2499897cfbd037a7e7cf5bc53bce8a63a) )
+ROM_END
+
+ROM_START( afighterc )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr10299.bin", 0x00001, 0x08000, CRC(d57b0955) SHA1(ce3bf962313cad25a4bff1348b52da12414c9182) ) // = encrypted 10315
+	ROM_LOAD16_BYTE( "epr10302.bin", 0x00000, 0x08000, CRC(e4ccefa2) SHA1(f8ec34fad2c290cc977b49326b3e27552718ddc2) )
+	ROM_LOAD16_BYTE( "epr10300.bin", 0x10001, 0x08000, CRC(1c91baa1) SHA1(338a7e56f47623c577dd77e2da56ca2f3e12027e) ) // missing (but probably == epr10276 as encryption seems the same and in the unencrypted sets they match)
+	ROM_LOAD16_BYTE( "epr10303.bin", 0x10000, 0x08000, CRC(fb67bdce) SHA1(29aba3eeee61a6aa8b695f3be211f5797479566d) ) // missing (but probably == epr10279 as encryption seems the same and in the unencrypted sets they match)
+	ROM_LOAD16_BYTE( "epr10301.bin", 0x20001, 0x08000, CRC(6b4ef29b) SHA1(3383a25f67b7a153637d0f81cf61d330f8236951) )
+	ROM_LOAD16_BYTE( "epr10304.bin", 0x20000, 0x08000, CRC(756f5472) SHA1(44e23fa4e17d4d7573adaaf3f1a14547359e2d06) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-10281.95", 0x00000, 0x10000, CRC(30e92cda) SHA1(36293a2a8a22dca5350571f19f3d5d04e1b27458) )
+	ROM_LOAD( "epr-10282.94", 0x10000, 0x10000, CRC(b67b8910) SHA1(f3f029a3e6547114cec28e5cf8fda65ef434c353) )
+	ROM_LOAD( "epr-10283.93", 0x20000, 0x10000, CRC(e7dbfd2d) SHA1(91bae3fbc4a3c612dc507eecfa8de1c2e1e7afee) )
+
+	ROM_REGION16_BE( 0x40000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-10285", 0x00001, 0x08000, CRC(98aa3d04) SHA1(1d26d17a72e55281e3444fee9c5af69ffb9e3c69) )
+	ROM_LOAD16_BYTE( "epr-10286", 0x10001, 0x08000, CRC(8da050cf) SHA1(c28e8968dbd9c110672581f4486f70d5f45df7f5) )
+	ROM_LOAD16_BYTE( "epr-10287", 0x20001, 0x08000, CRC(7989b74a) SHA1(a87acafe82b37a11d8f8b1f2ee4c9b2e1bb8161c) )
+	ROM_LOAD16_BYTE( "epr-10288", 0x30001, 0x08000, CRC(d3ce551a) SHA1(0ff2170d9ef89058273025dd8d5e1021094adef1) )
+	ROM_LOAD16_BYTE( "epr-10289", 0x00000, 0x08000, CRC(c59d1b98) SHA1(e232f2519234981c0e4ffecdd25c48083d9f93a8) )
+	ROM_LOAD16_BYTE( "epr-10290", 0x10000, 0x08000, CRC(39354223) SHA1(d8a73d3f7fc2d83d23bb7434f43bc8804f35cc16) )
+	ROM_LOAD16_BYTE( "epr-10291", 0x20000, 0x08000, CRC(6e4b245c) SHA1(1f8cecf7ea2d2dfa5ce18d7ee34b0da2cc40221e) )
+	ROM_LOAD16_BYTE( "epr-10292", 0x30000, 0x08000, CRC(cef289a3) SHA1(7ab817b6348c168f79be325fb3cc2cca14ee0f8e) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-10284.12", 0x00000, 0x8000, CRC(8ff09116) SHA1(8b99b6d2499897cfbd037a7e7cf5bc53bce8a63a) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
+	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+ROM_END
+
+ROM_START( afighterd )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr10275.bin", 0x00001, 0x08000, CRC(964c1985) SHA1(cf3d15e6f6611bb5a5ef230a0b25828af776ca33) ) // = encrypted 10293
+	ROM_LOAD16_BYTE( "epr10278.bin", 0x00000, 0x08000, CRC(13c6bbad) SHA1(889ad10e27b1638372dbefdab4111488a7ef873c) )
+	ROM_LOAD16_BYTE( "epr10276.bin", 0x10001, 0x08000, CRC(1c91baa1) SHA1(338a7e56f47623c577dd77e2da56ca2f3e12027e) )
+	ROM_LOAD16_BYTE( "epr10279.bin", 0x10000, 0x08000, CRC(fb67bdce) SHA1(29aba3eeee61a6aa8b695f3be211f5797479566d) )
+	ROM_LOAD16_BYTE( "epr10277.bin", 0x20001, 0x08000, CRC(a1534a1b) SHA1(7d3423b2e74624b2ce2b4ad5077653dfcc0226ec) )
+	ROM_LOAD16_BYTE( "epr10280.bin", 0x20000, 0x08000, CRC(9bc5496c) SHA1(e7f529feaa4fe4c1d6bcec2cd447cba4b3267d62) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-10281.95", 0x00000, 0x10000, CRC(30e92cda) SHA1(36293a2a8a22dca5350571f19f3d5d04e1b27458) )
+	ROM_LOAD( "epr-10282.94", 0x10000, 0x10000, CRC(b67b8910) SHA1(f3f029a3e6547114cec28e5cf8fda65ef434c353) )
+	ROM_LOAD( "epr-10283.93", 0x20000, 0x10000, CRC(e7dbfd2d) SHA1(91bae3fbc4a3c612dc507eecfa8de1c2e1e7afee) )
+
+	ROM_REGION16_BE( 0x40000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-10285", 0x00001, 0x08000, CRC(98aa3d04) SHA1(1d26d17a72e55281e3444fee9c5af69ffb9e3c69) )
+	ROM_LOAD16_BYTE( "epr-10286", 0x10001, 0x08000, CRC(8da050cf) SHA1(c28e8968dbd9c110672581f4486f70d5f45df7f5) )
+	ROM_LOAD16_BYTE( "epr-10287", 0x20001, 0x08000, CRC(7989b74a) SHA1(a87acafe82b37a11d8f8b1f2ee4c9b2e1bb8161c) )
+	ROM_LOAD16_BYTE( "epr-10288", 0x30001, 0x08000, CRC(d3ce551a) SHA1(0ff2170d9ef89058273025dd8d5e1021094adef1) )
+	ROM_LOAD16_BYTE( "epr-10289", 0x00000, 0x08000, CRC(c59d1b98) SHA1(e232f2519234981c0e4ffecdd25c48083d9f93a8) )
+	ROM_LOAD16_BYTE( "epr-10290", 0x10000, 0x08000, CRC(39354223) SHA1(d8a73d3f7fc2d83d23bb7434f43bc8804f35cc16) )
+	ROM_LOAD16_BYTE( "epr-10291", 0x20000, 0x08000, CRC(6e4b245c) SHA1(1f8cecf7ea2d2dfa5ce18d7ee34b0da2cc40221e) )
+	ROM_LOAD16_BYTE( "epr-10292", 0x30000, 0x08000, CRC(cef289a3) SHA1(7ab817b6348c168f79be325fb3cc2cca14ee0f8e) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-10284.12", 0x00000, 0x8000, CRC(8ff09116) SHA1(8b99b6d2499897cfbd037a7e7cf5bc53bce8a63a) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
+	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+ROM_END
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -3735,7 +3939,11 @@ GAME( 1987, aliensynjo, aliensyn, system16a_fd1089a,        aliensynj,  segas16a
 
 GAME( 1988, aceattaca,  aceattac, aceattaca_fd1094,         aceattaca,  segas16a_state,aceattaca,   ROT270, "Sega", "Ace Attacker (Japan, System 16A, FD1094 317-0060)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, afighter,   0,        system16a_fd1089a_no7751, afighter,   segas16a_state,generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-0018)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, afighter,    0,        system16a_fd1089a_no7751, afighter,          segas16a_state,           generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-0018)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, afightera,   afighter, system16a_no7751,         afighter,          segas16a_state,           generic,     ROT270, "Sega", "Action Fighter (unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, afighterb,   afighter, system16a_no7751,         afighter_analog,   afighter_16a_analog_state,generic,     ROT270, "Sega", "Action Fighter (unprotected, analog controls)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, afighterc,   afighter, system16a_fd1089b_no7751, afighter,          segas16a_state,           generic,     ROT270, "Sega", "Action Fighter (FD1089B 317-unknown)", MACHINE_SUPPORTS_SAVE ) // encrypted version of afightera (maybe 317-0017)
+GAME( 1986, afighterd,   afighter, system16a_fd1089b_no7751, afighter_analog,   afighter_16a_analog_state,generic,     ROT270, "Sega", "Action Fighter (FD1089B 317-unknown, analog controls)", MACHINE_SUPPORTS_SAVE ) // encrypted version of afighterb
 
 GAME( 1986, alexkidd,   0,        system16a,                alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 2, unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", MACHINE_SUPPORTS_SAVE )

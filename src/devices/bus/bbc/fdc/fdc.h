@@ -22,10 +22,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
 
 #define MCFG_BBC_FDC_SLOT_INTRQ_HANDLER(_devcb) \
-	devcb = &bbc_fdc_slot_device::set_intrq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<bbc_fdc_slot_device &>(*device).set_intrq_handler(DEVCB_##_devcb);
 
 #define MCFG_BBC_FDC_SLOT_DRQ_HANDLER(_devcb) \
-	devcb = &bbc_fdc_slot_device::set_drq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<bbc_fdc_slot_device &>(*device).set_drq_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -44,16 +44,15 @@ public:
 	virtual ~bbc_fdc_slot_device();
 
 	// callbacks
-	template <class Object> static devcb_base &set_intrq_handler(device_t &device, Object &&cb)
-	{ return downcast<bbc_fdc_slot_device &>(device).m_intrq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_drq_handler(device_t &device, Object &&cb)
-	{ return downcast<bbc_fdc_slot_device &>(device).m_drq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_intrq_handler(Object &&cb) { return m_intrq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( intrq_w ) { m_intrq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( drq_w) { m_drq_handler(state); }
 
 protected:
 	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

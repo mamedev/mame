@@ -38,7 +38,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ay2_port_a_w);
 	DECLARE_WRITE8_MEMBER(ay2_port_b_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(port_r);
+	void marywu(machine_config &config);
+	void io_map(address_map &map);
+	void program_map(address_map &map);
 private:
 	uint8_t m_selected_7seg_module;
 };
@@ -135,17 +137,6 @@ WRITE8_MEMBER( marywu_state::multiplex_7seg_w )
 	m_selected_7seg_module = data;
 }
 
-READ8_MEMBER( marywu_state::port_r )
-{
-//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
-	switch(offset){
-		//case 1:
-	//  return (1 << 6);
-	default:
-		return 0x00;
-	}
-}
-
 READ8_MEMBER( marywu_state::keyboard_r )
 {
 	switch(m_selected_7seg_module % 8){
@@ -166,11 +157,11 @@ WRITE8_MEMBER( marywu_state::display_7seg_data_w )
 	output().set_digit_value(2 * m_selected_7seg_module + 1, patterns[(data >> 4) & 0x0F]);
 }
 
-static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, marywu_state )
+ADDRESS_MAP_START(marywu_state::program_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, marywu_state )
+ADDRESS_MAP_START(marywu_state::io_map)
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_RAM /* HM6116: 2kbytes of Static RAM */
 	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x9001, 0x9001) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
@@ -178,17 +169,17 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, marywu_state )
 	AM_RANGE(0x9003, 0x9003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
 	AM_RANGE(0xb000, 0xb001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("i8279", i8279_device, read, write)
 	AM_RANGE(0xf000, 0xf000) AM_NOP /* TODO: Investigate this. There's something going on at this address range. */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(port_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( marywu )
+MACHINE_CONFIG_START(marywu_state::marywu)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL_10_738635MHz) //actual CPU is a Winbond w78c31b-24
+	MCFG_CPU_ADD("maincpu", I80C31, XTAL(10'738'635)) //actual CPU is a Winbond w78c31b-24
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
+	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
 
 	/* Keyboard & display interface */
-	MCFG_DEVICE_ADD("i8279", I8279, XTAL_10_738635MHz) /* should it be perhaps a fraction of the XTAL clock ? */
+	MCFG_DEVICE_ADD("i8279", I8279, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
 	MCFG_I8279_OUT_SL_CB(WRITE8(marywu_state, multiplex_7seg_w))          // select  block of 7seg modules by multiplexing the SL scan lines
 	MCFG_I8279_IN_RL_CB(READ8(marywu_state, keyboard_r))                  // keyboard Return Lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(marywu_state, display_7seg_data_w))
@@ -198,12 +189,12 @@ static MACHINE_CONFIG_START( marywu )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_10_738635MHz) /* should it be perhaps a fraction of the XTAL clock ? */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(marywu_state, ay1_port_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(marywu_state, ay1_port_b_w))
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_10_738635MHz) /* should it be perhaps a fraction of the XTAL clock ? */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(marywu_state, ay2_port_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(marywu_state, ay2_port_b_w))

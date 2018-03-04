@@ -43,7 +43,6 @@ public:
 	DECLARE_WRITE8_MEMBER(gng_bgscrollx_w);
 	DECLARE_WRITE8_MEMBER(gng_bgscrolly_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_DRIVER_INIT(diamond);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
@@ -55,4 +54,9 @@ public:
 	required_device_array<ym2203_device, 2> m_ym;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void gng(machine_config &config);
+	void diamond(machine_config &config);
+	void diamond_map(address_map &map);
+	void gng_map(address_map &map);
+	void sound_map(address_map &map);
 };

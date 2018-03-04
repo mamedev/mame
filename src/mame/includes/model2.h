@@ -11,11 +11,13 @@
 #include "machine/315-5881_crypt.h"
 #include "machine/315-5838_317-0229_comp.h"
 #include "machine/m2comm.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class model2_renderer;
 struct raster_state;
 struct geo_state;
+struct triangle;
 
 class model2_state : public driver_device
 {
@@ -24,16 +26,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
 		m_bufferram(*this, "bufferram"),
-		m_colorxlat(*this, "colorxlat"),
 		m_textureram0(*this, "textureram0"),
 		m_textureram1(*this, "textureram1"),
-		m_lumaram(*this, "lumaram"),
+		m_fbvram1(*this, "fbvram1"),
+		m_fbvram2(*this, "fbvram2"),
 		m_soundram(*this, "soundram"),
 		m_tgp_program(*this, "tgp_program"),
 		m_tgpx4_program(*this, "tgpx4_program"),
 		m_maincpu(*this,"maincpu"),
 		m_dsbz80(*this, DSBZ80_TAG),
-		m_m1audio(*this, "m1audio"),
+		m_m1audio(*this, M1AUDIO_TAG),
 		m_uart(*this, "uart"),
 		m_m2comm(*this, "m2comm"),
 		m_audiocpu(*this, "audiocpu"),
@@ -47,19 +49,24 @@ public:
 		m_scsp(*this, "scsp"),
 		m_cryptdevice(*this, "315_5881"),
 		m_0229crypt(*this, "317_0229"),
-		m_in0(*this, "IN0"),
+		m_in(*this, "IN%u", 0),
+		m_steer(*this, "STEER"),
+		m_accel(*this, "ACCEL"),
+		m_brake(*this, "BRAKE"),
 		m_gears(*this, "GEARS"),
-		m_analog_ports(*this, {"ANA0", "ANA1", "ANA2", "ANA3"}),
+		m_analog_ports(*this, "ANA%u", 0),
 		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"})
 	{ }
 
 	required_shared_ptr<uint32_t> m_workram;
 	required_shared_ptr<uint32_t> m_bufferram;
 	std::unique_ptr<uint16_t[]> m_palram;
-	required_shared_ptr<uint32_t> m_colorxlat;
+	std::unique_ptr<uint16_t[]> m_colorxlat;
 	required_shared_ptr<uint32_t> m_textureram0;
 	required_shared_ptr<uint32_t> m_textureram1;
-	required_shared_ptr<uint32_t> m_lumaram;
+	std::unique_ptr<uint16_t[]> m_lumaram;
+	required_shared_ptr<uint32_t> m_fbvram1;
+	required_shared_ptr<uint32_t> m_fbvram2;
 	optional_shared_ptr<uint16_t> m_soundram;
 	optional_shared_ptr<uint32_t> m_tgp_program;
 	optional_shared_ptr<uint64_t> m_tgpx4_program;
@@ -81,10 +88,19 @@ public:
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
 
-	required_ioport m_in0;
+	optional_ioport_array<5> m_in;
+	optional_ioport m_steer;
+	optional_ioport m_accel;
+	optional_ioport m_brake;
 	optional_ioport m_gears;
 	optional_ioport_array<4> m_analog_ports;
 	optional_ioport_array<4> m_lightgun_ports;
+
+	int m_port_1c00004;
+	int m_port_1c00006;
+	int m_port_1c00010;
+	int m_port_1c00012;
+	int m_port_1c00014;
 
 	uint32_t m_intreq;
 	uint32_t m_intena;
@@ -115,7 +131,6 @@ public:
 	uint32_t m_geo_iop_data;
 	int m_to_68k;
 
-	int m_maxxstate;
 	uint32_t m_geo_read_start_address;
 	uint32_t m_geo_write_start_address;
 	model2_renderer *m_poly;
@@ -129,18 +144,18 @@ public:
 	uint8_t m_gearsel;
 	uint8_t m_lightgun_mux;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(_1c00000_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(_1c0001c_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(srallyc_gearbox_r);
+	DECLARE_READ8_MEMBER(model2_crx_in_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(daytona_gearbox_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(rchase2_devices_r);
 	DECLARE_READ32_MEMBER(timers_r);
 	DECLARE_WRITE32_MEMBER(timers_w);
-	DECLARE_READ16_MEMBER(model2_palette_r);
-	DECLARE_WRITE16_MEMBER(model2_palette_w);
+	DECLARE_READ16_MEMBER(palette_r);
+	DECLARE_WRITE16_MEMBER(palette_w);
+	DECLARE_READ16_MEMBER(colorxlat_r);
+	DECLARE_WRITE16_MEMBER(colorxlat_w);
 	DECLARE_WRITE32_MEMBER(ctrl0_w);
 	DECLARE_WRITE32_MEMBER(analog_2b_w);
 	DECLARE_READ32_MEMBER(fifoctl_r);
-	DECLARE_READ32_MEMBER(model2o_fifoctrl_r);
 	DECLARE_READ32_MEMBER(videoctl_r);
 	DECLARE_WRITE32_MEMBER(videoctl_w);
 	DECLARE_WRITE32_MEMBER(rchase2_devices_w);
@@ -158,25 +173,24 @@ public:
 	DECLARE_WRITE32_MEMBER(geo_prg_w);
 	DECLARE_READ32_MEMBER(geo_r);
 	DECLARE_WRITE32_MEMBER(geo_w);
-	DECLARE_READ32_MEMBER(hotd_lightgun_r);
+	DECLARE_READ8_MEMBER(hotd_lightgun_r);
 	DECLARE_WRITE32_MEMBER(hotd_lightgun_w);
-	DECLARE_READ32_MEMBER(daytona_unk_r);
 	DECLARE_READ32_MEMBER(model2_irq_r);
 	DECLARE_WRITE32_MEMBER(model2_irq_w);
 	DECLARE_READ32_MEMBER(model2_serial_r);
 	DECLARE_WRITE32_MEMBER(model2o_serial_w);
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
-	DECLARE_READ32_MEMBER(model2_5881prot_r);
-	DECLARE_WRITE32_MEMBER(model2_5881prot_w);
-	int first_read;
-
-	void model2_3d_init(uint16_t *texture_rom);
-	void geo_init(uint32_t *polygon_rom);
-	DECLARE_READ32_MEMBER(maxx_r);
-	DECLARE_WRITE32_MEMBER(mode_w);
+	DECLARE_WRITE16_MEMBER(horizontal_sync_w);
+	DECLARE_WRITE16_MEMBER(vertical_sync_w);
+	
+	void raster_init(memory_region *texture_rom);
+	void geo_init(memory_region *polygon_rom);
+	DECLARE_READ32_MEMBER(render_mode_r);
+	DECLARE_WRITE32_MEMBER(render_mode_w);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w0);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w1);
-	DECLARE_WRITE32_MEMBER(model2o_luma_w);
+	DECLARE_READ16_MEMBER(lumaram_r);
+	DECLARE_WRITE16_MEMBER(lumaram_w);
 	DECLARE_WRITE32_MEMBER(model2_3d_zclip_w);
 	DECLARE_WRITE16_MEMBER(model2snd_ctrl);
 	DECLARE_READ32_MEMBER(copro_sharc_input_fifo_r);
@@ -196,14 +210,13 @@ public:
 	DECLARE_DRIVER_INIT(overrev);
 	DECLARE_DRIVER_INIT(pltkids);
 	DECLARE_DRIVER_INIT(rchase2);
-	DECLARE_DRIVER_INIT(genprot);
-	DECLARE_DRIVER_INIT(daytonam);
 	DECLARE_DRIVER_INIT(manxttdx);
 	DECLARE_DRIVER_INIT(srallyc);
 	DECLARE_DRIVER_INIT(doa);
 	DECLARE_DRIVER_INIT(zerogun);
 	DECLARE_DRIVER_INIT(sgt24h);
 	DECLARE_MACHINE_START(model2);
+	DECLARE_MACHINE_START(srallyc);
 	DECLARE_MACHINE_RESET(model2o);
 	DECLARE_VIDEO_START(model2);
 	DECLARE_MACHINE_RESET(model2);
@@ -212,6 +225,7 @@ public:
 	DECLARE_MACHINE_RESET(model2_common);
 	DECLARE_MACHINE_RESET(model2_scsp);
 	uint32_t screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
@@ -229,9 +243,196 @@ public:
 	uint32_t copro_fifoout_pop(address_space &space, uint32_t offset, uint32_t mem_mask);
 	void copro_fifoout_push(device_t *device, uint32_t data,uint32_t offset,uint32_t mem_mask);
 
+	void model2_3d_frame_start( void );
+	void geo_parse( void );
+	
 	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
+
+	void model2_timers(machine_config &config);
+	void model2_screen(machine_config &config);
+
+	void sj25_0207_01(machine_config &config);
+	void copro_sharc_map(address_map &map);
+	void copro_tgp_map(address_map &map);
+	void copro_tgpx4_map(address_map &map);
+	void drive_io_map(address_map &map);
+	void drive_map(address_map &map);
+	void geo_sharc_map(address_map &map);
+	void model2_base_mem(address_map &map);
+	void model2_5881_mem(address_map &map);
+	void model2_snd(address_map &map);
+
+	uint8_t m_gamma_table[256];
+
+	void debug_init();
+	void debug_commands( int ref, const std::vector<std::string> &params );
+	void debug_geo_dasm_command(int ref, const std::vector<std::string> &params);
+	void debug_tri_dump_command(int ref, const std::vector<std::string> &params);
+	void debug_help_command(int ref, const std::vector<std::string> &params);
+	
+protected:
+	virtual void video_start() override;
+
+private:
+	void tri_list_dump(FILE *dst);
+
+	bool m_render_unk;
+	bool m_render_mode;
+	int16 m_crtc_xoffset, m_crtc_yoffset;
+
+	uint32_t *geo_process_command( geo_state *geo, uint32_t opcode, uint32_t *input, bool *end_code );
+	// geo commands
+	uint32_t *geo_nop( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_object_data( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_direct_data( geo_state *geo, uint32_t opcode, uint32_t *input );           
+	uint32_t *geo_window_data( geo_state *geo, uint32_t opcode, uint32_t *input );           
+	uint32_t *geo_texture_data( geo_state *geo, uint32_t opcode, uint32_t *input );          
+	uint32_t *geo_polygon_data( geo_state *geo, uint32_t opcode, uint32_t *input );          
+	uint32_t *geo_texture_parameters( geo_state *geo, uint32_t opcode, uint32_t *input );    
+	uint32_t *geo_mode( geo_state *geo, uint32_t opcode, uint32_t *input );                  
+	uint32_t *geo_zsort_mode( geo_state *geo, uint32_t opcode, uint32_t *input );            
+	uint32_t *geo_focal_distance( geo_state *geo, uint32_t opcode, uint32_t *input );        
+	uint32_t *geo_light_source( geo_state *geo, uint32_t opcode, uint32_t *input );          
+	uint32_t *geo_matrix_write( geo_state *geo, uint32_t opcode, uint32_t *input );          
+	uint32_t *geo_translate_write( geo_state *geo, uint32_t opcode, uint32_t *input );       
+	uint32_t *geo_data_mem_push( geo_state *geo, uint32_t opcode, uint32_t *input );         
+	uint32_t *geo_test( geo_state *geo, uint32_t opcode, uint32_t *input );                  
+	uint32_t *geo_end( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_dummy( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_log_data( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_lod( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_code_upload( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_code_jump( geo_state *geo, uint32_t opcode, uint32_t *input );
+	// geo code drawing paths
+	void geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t count );
+	void geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t count );
+	void geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t count );
+	void geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t count );
+	
+	// raster functions
+	// main data input port
+	void model2_3d_push( raster_state *raster, uint32_t input );
+	// quad & triangle push paths
+	void model2_3d_process_quad( raster_state *raster, uint32_t attr );
+	void model2_3d_process_triangle( raster_state *raster, uint32_t attr );
+
+	// inliners
+	inline void model2_3d_project( triangle *tri );
+	inline uint16_t float_to_zval( float floatval );
+
 };
 
+/*****************************
+ *
+ * Model 2
+ *
+ *****************************/
+
+class model2o_state : public model2_state
+{
+public:
+	model2o_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2_state(mconfig, type, tag)
+	{}
+
+	DECLARE_READ32_MEMBER(daytona_unk_r);
+	DECLARE_READ8_MEMBER(model2o_in_r);
+	DECLARE_READ32_MEMBER(fifoctrl_r);
+
+	void daytona(machine_config &config);
+	void model2o(machine_config &config);
+	void model2o_mem(address_map &map);
+};
+
+/*****************************
+ *
+ * Daytona To The Maxx
+ *
+ *****************************/
+
+class model2o_maxx_state : public model2o_state
+{
+public:
+	model2o_maxx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2o_state(mconfig, type, tag)
+	{}
+
+	DECLARE_READ32_MEMBER(maxx_r);
+	void daytona_maxx(machine_config &config);
+	void model2o_maxx_mem(address_map &map);
+
+private:
+	int m_maxxstate;
+};
+
+/*****************************
+ *
+ * Model 2A
+ *
+ *****************************/
+
+class model2a_state : public model2_state
+{
+public:
+	model2a_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2_state(mconfig, type, tag)
+	{}
+
+	void manxtt(machine_config &config);
+	void manxttdx(machine_config &config);
+	void model2a(machine_config &config);
+	void model2a_0229(machine_config &config);
+	void model2a_5881(machine_config &config);
+	void srallyc(machine_config &config);
+	void model2a_crx_mem(address_map &map);
+	void model2a_5881_mem(address_map &map);
+};
+
+/*****************************
+ *
+ * Model 2B
+ *
+ *****************************/
+
+class model2b_state : public model2_state
+{
+public:
+	model2b_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2_state(mconfig, type, tag)
+	{}
+
+	void model2b(machine_config &config);
+	void model2b_0229(machine_config &config);
+	void model2b_5881(machine_config &config);
+	void indy500(machine_config &config);
+	void rchase2(machine_config &config);
+	void model2b_crx_mem(address_map &map);
+	void model2b_5881_mem(address_map &map);
+	// TODO: split into own class
+	void rchase2_iocpu_map(address_map &map);
+	void rchase2_ioport_map(address_map &map);
+};
+
+/*****************************
+ *
+ * Model 2C
+ *
+ *****************************/
+
+class model2c_state : public model2_state
+{
+public:
+	model2c_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2_state(mconfig, type, tag)
+	{}
+
+	void model2c(machine_config &config);
+	void model2c_5881(machine_config &config);
+	void overrev2c(machine_config &config);
+	void stcc(machine_config &config);
+	void model2c_crx_mem(address_map &map);
+	void model2c_5881_mem(address_map &map);
+};
 
 /*****************************
  *
@@ -272,18 +473,17 @@ static inline uint16_t get_texel( uint32_t base_x, uint32_t base_y, int x, int y
 	return (texel & 0x0f);
 }
 
-struct triangle;
-
-class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4, 4000>
+// 0x10000 = size of the tri_sorted_list array
+class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4, 0x10000>
 {
 public:
 	typedef void (model2_renderer::*scanline_render_func)(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
 public:
 	model2_renderer(model2_state& state)
-		: poly_manager<float, m2_poly_extra_data, 4, 4000>(state.machine())
+		: poly_manager<float, m2_poly_extra_data, 4, 0x10000>(state.machine())
 		, m_state(state)
-		, m_destmap(state.m_screen->width(), state.m_screen->height())
+		, m_destmap(512, 512)
 	{
 		m_renderfuncs[0] = &model2_renderer::model2_3d_render_0;
 		m_renderfuncs[1] = &model2_renderer::model2_3d_render_1;
@@ -293,12 +493,16 @@ public:
 		m_renderfuncs[5] = &model2_renderer::model2_3d_render_5;
 		m_renderfuncs[6] = &model2_renderer::model2_3d_render_6;
 		m_renderfuncs[7] = &model2_renderer::model2_3d_render_7;
+		m_xoffs = 90;
+		m_yoffs = -8;
 	}
 
 	bitmap_rgb32& destmap() { return m_destmap; }
 
 	void model2_3d_render(triangle *tri, const rectangle &cliprect);
-
+	void set_xoffset(int16 xoffs) { m_xoffs = xoffs; }
+	void set_yoffset(int16 yoffs) { m_yoffs = yoffs; }
+	
 	/* checker = 0, textured = 0, transparent = 0 */
 	#define MODEL2_FUNC 0
 	#define MODEL2_FUNC_NAME    model2_3d_render_0
@@ -360,6 +564,7 @@ public:
 private:
 	model2_state& m_state;
 	bitmap_rgb32 m_destmap;
+	int16_t m_xoffs,m_yoffs;
 };
 
 typedef model2_renderer::vertex_t poly_vertex;

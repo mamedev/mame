@@ -61,12 +61,12 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_floppy_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_floppy_device::device_add_mconfig)
 	MCFG_APPLEFDC_ADD(FDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( a2bus_iwmflop_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_iwmflop_device::device_add_mconfig)
 	MCFG_IWM_ADD(FDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 MACHINE_CONFIG_END
@@ -117,9 +117,6 @@ a2bus_agat7flop_device::a2bus_agat7flop_device(const machine_config &mconfig, co
 
 void a2bus_floppy_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(DISKII_ROM_REGION).c_str())->base();
 }
 
@@ -132,7 +129,7 @@ void a2bus_floppy_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_floppy_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_floppy_device::read_c0nx(uint8_t offset)
 {
 	return m_fdc->read(offset);
 }
@@ -142,7 +139,7 @@ uint8_t a2bus_floppy_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_floppy_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_floppy_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data);
 }
@@ -151,7 +148,7 @@ void a2bus_floppy_device::write_c0nx(address_space &space, uint8_t offset, uint8
     read_cnxx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_floppy_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_floppy_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset];
 }

@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(DECOCPU2,  decocpu_type2_device,  "decocpu2",  "Data East Pin
 DEFINE_DEVICE_TYPE(DECOCPU3,  decocpu_type3_device,  "decocpu3",  "Data East Pinball CPU Board Type 3")
 DEFINE_DEVICE_TYPE(DECOCPU3B, decocpu_type3b_device, "decocpu3b", "Data East Pinball CPU Board Type 3B")
 
-static ADDRESS_MAP_START( decocpu1_map, AS_PROGRAM, 8, decocpu_type1_device )
+ADDRESS_MAP_START(decocpu_type1_device::decocpu1_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
 	AM_RANGE(0x2200, 0x2200) AM_WRITE(solenoid2_w) // solenoids
@@ -33,7 +33,7 @@ static ADDRESS_MAP_START( decocpu1_map, AS_PROGRAM, 8, decocpu_type1_device )
 	//AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decocpu2_map, AS_PROGRAM, 8, decocpu_type2_device )
+ADDRESS_MAP_START(decocpu_type2_device::decocpu2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
 	AM_RANGE(0x2200, 0x2200) AM_WRITE(solenoid2_w) // solenoids
@@ -197,9 +197,9 @@ WRITE8_MEMBER( decocpu_type1_device::solenoid2_w )
 	// todo
 }
 
-MACHINE_CONFIG_MEMBER( decocpu_type1_device::device_add_mconfig )
+MACHINE_CONFIG_START(decocpu_type1_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M6808, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(decocpu1_map)
 
 	/* Devices */
@@ -294,12 +294,6 @@ void decocpu_type1_device::device_start()
 	m_cpu->space(AS_PROGRAM).install_rom(0x4000,0xffff,ROM+0x4000);
 }
 
-void decocpu_type1_device::static_set_cpuregion(device_t &device, const char *tag)
-{
-	decocpu_type1_device &cpuboard = downcast<decocpu_type1_device &>(device);
-	cpuboard.m_cputag = tag;
-}
-
 decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: decocpu_type2_device(mconfig, DECOCPU2, tag, owner, clock)
 {}
@@ -308,7 +302,7 @@ decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, device
 	: decocpu_type1_device(mconfig, type, tag, owner, clock)
 {}
 
-MACHINE_CONFIG_MEMBER( decocpu_type2_device::device_add_mconfig )
+MACHINE_CONFIG_START(decocpu_type2_device::device_add_mconfig)
 	decocpu_type1_device::device_add_mconfig(config);
 
 	/* basic machine hardware */

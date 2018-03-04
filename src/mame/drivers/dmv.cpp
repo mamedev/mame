@@ -176,6 +176,10 @@ public:
 	int         m_floppy_motor;
 	int         m_busint[8];
 	int         m_irqs[8];
+	void dmv(machine_config &config);
+	void dmv_io(address_map &map);
+	void dmv_mem(address_map &map);
+	void upd7220_map(address_map &map);
 };
 
 WRITE8_MEMBER(dmv_state::tc_set_w)
@@ -507,12 +511,12 @@ uint8_t dmv_state::program_read(address_space &space, int cas, offs_t offset)
 	return data;
 }
 
-static ADDRESS_MAP_START(dmv_mem, AS_PROGRAM, 8, dmv_state)
+ADDRESS_MAP_START(dmv_state::dmv_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(program_r, program_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dmv_io , AS_IO, 8, dmv_state)
+ADDRESS_MAP_START(dmv_state::dmv_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(leds_w)
@@ -554,7 +558,7 @@ WRITE8_MEMBER(dmv_state::kb_mcu_port2_w)
 	m_slot7->keyint_w(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START( upd7220_map, 0, 16, dmv_state )
+ADDRESS_MAP_START(dmv_state::upd7220_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM  AM_SHARE("video_ram")
 ADDRESS_MAP_END
@@ -712,13 +716,13 @@ static SLOT_INTERFACE_START(dmv_slot7a)
 	SLOT_INTERFACE("k235", DMV_K235)            // K235 Internal 8088 module with interrupt controller
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( dmv )
+MACHINE_CONFIG_START(dmv_state::dmv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_24MHz / 6)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(24'000'000) / 6)
 	MCFG_CPU_PROGRAM_MAP(dmv_mem)
 	MCFG_CPU_IO_MAP(dmv_io)
 
-	MCFG_CPU_ADD("kb_ctrl_mcu", I8741, XTAL_6MHz)
+	MCFG_CPU_ADD("kb_ctrl_mcu", I8741, XTAL(6'000'000))
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(dmv_state, kb_mcu_port1_r)) // bit 0 data from kb
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(dmv_state, kb_mcu_port1_w)) // bit 1 data to kb
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dmv_state, kb_mcu_port2_w))
@@ -739,12 +743,12 @@ static MACHINE_CONFIG_START( dmv )
 	MCFG_DEFAULT_LAYOUT(layout_dmv)
 
 	// devices
-	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_5MHz/2) // unk clock
+	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(5'000'000)/2) // unk clock
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(dmv_state, hgdc_display_pixels)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(dmv_state, hgdc_draw_text)
 
-	MCFG_DEVICE_ADD( "dma8237", AM9517A, XTAL_4MHz )
+	MCFG_DEVICE_ADD( "dma8237", AM9517A, XTAL(4'000'000) )
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(dmv_state, dma_hrq_changed))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(dmv_state, dmac_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(dmv_state, program_r))
@@ -768,7 +772,7 @@ static MACHINE_CONFIG_START( dmv )
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(50)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(dmv_state, pit_out0))
-	MCFG_PIT8253_CLK2(XTAL_24MHz / 3 / 16)
+	MCFG_PIT8253_CLK2(XTAL(24'000'000) / 3 / 16)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(dmv_state, timint_w))
 
 	/* sound hardware */

@@ -10,6 +10,9 @@
 #include "emu.h"
 #include "roc10937.h"
 
+#include <algorithm>
+
+
 /*
    Rockwell 10937 16 segment charset lookup table
      0     1
@@ -126,37 +129,30 @@ static const int roc10937poslut[]=
 };
 
 rocvfd_device::rocvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock)
+	device_t(mconfig, type, tag, owner, clock),
+	m_outputs(),
+	m_port_val(0)
 {
-	m_port_val=0;
 }
 
-
-void rocvfd_device::static_set_value(device_t &device, int val)
-{
-	rocvfd_device &roc = downcast<rocvfd_device &>(device);
-	roc.m_port_val = val;
-}
 
 void rocvfd_device::device_start()
 {
-	save_item(NAME(m_port_val));
+	m_outputs = std::make_unique<output_finder<16> >(*this, "vfd%u", unsigned(m_port_val * 16));
+	m_outputs->resolve();
+
 	save_item(NAME(m_cursor_pos));
 	save_item(NAME(m_window_size));
 	save_item(NAME(m_shift_count));
 	save_item(NAME(m_shift_data));
 	save_item(NAME(m_pcursor_pos));
 	save_item(NAME(m_chars));
-	save_item(NAME(m_outputs));
 	save_item(NAME(m_brightness));
 	save_item(NAME(m_count));
 	save_item(NAME(m_sclk));
 	save_item(NAME(m_data));
 	save_item(NAME(m_duty));
 	save_item(NAME(m_disp));
-
-
-	device_reset();
 }
 
 void rocvfd_device::device_reset()
@@ -173,14 +169,14 @@ void rocvfd_device::device_reset()
 	m_sclk = 0;
 	m_data = 0;
 
-	memset(m_chars, 0, sizeof(m_chars));
-	memset(m_outputs, 0, sizeof(m_outputs));
+	std::fill(std::begin(m_chars), std::end(m_chars), 0);
+	std::fill(std::begin(*m_outputs), std::end(*m_outputs), 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 uint32_t rocvfd_device::set_display(uint32_t segin)
 {
-	return BITSWAP32(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
+	return bitswap<32>(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
 
 }
 
@@ -192,11 +188,7 @@ void rocvfd_device::device_post_load()
 
 void rocvfd_device::update_display()
 {
-	for (int i =0; i<16; i++)
-	{
-		m_outputs[i] = set_display(m_chars[i]);
-		machine().output().set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
-	}
+	std::transform(std::begin(m_chars), std::end(m_chars), std::begin(*m_outputs), set_display);
 }
 
 WRITE_LINE_MEMBER( rocvfd_device::sclk )
@@ -253,25 +245,21 @@ DEFINE_DEVICE_TYPE(S16LF01,  s16lf01_device,  "s16lf01",  "Samsung 16LF01 Series
 roc10937_device::roc10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rocvfd_device(mconfig, ROC10937, tag, owner, clock)
 {
-	m_port_val=0;
 }
 
 msc1937_device::msc1937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rocvfd_device(mconfig, MSC1937, tag, owner, clock)
 {
-	m_port_val=0;
 }
 
 mic10937_device::mic10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rocvfd_device(mconfig, MIC10937, tag, owner, clock)
 {
-	m_port_val=0;
 }
 
 s16lf01_device::s16lf01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rocvfd_device(mconfig, S16LF01, tag, owner, clock)
 {
-	m_port_val=0;
 }
 
 void rocvfd_device::write_char(int data)
@@ -328,7 +316,6 @@ void rocvfd_device::write_char(int data)
 roc10957_device::roc10957_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rocvfd_device(mconfig, ROC10957, tag, owner, clock)
 {
-	m_port_val=0;
 }
 
 void roc10957_device::write_char(int data)

@@ -91,7 +91,7 @@ WRITE32_MEMBER(hng64_state::hng64_soundram_w)
 			logerror("dumping sound program in m_soundram\n");
 			FILE *fp;
 			char filename[256];
-			sprintf(filename,"soundram_%s", space.machine().system().name);
+			sprintf(filename,"soundram_%s", machine().system().name);
 			fp=fopen(filename, "w+b");
 			if (fp)
 			{
@@ -175,7 +175,7 @@ void hng64_state::reset_sound()
 // ----------------------------------------------
 
 
-static ADDRESS_MAP_START( hng_sound_map, AS_PROGRAM, 16, hng64_state )
+ADDRESS_MAP_START(hng64_state::hng_sound_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("bank0")
 	AM_RANGE(0x10000, 0x1ffff) AM_RAMBANK("bank1")
 	AM_RANGE(0x20000, 0x2ffff) AM_RAMBANK("bank2")
@@ -210,7 +210,7 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 READ16_MEMBER(hng64_state::hng64_sound_port_0008_r)
 {
 	// read in irq5
-	//printf("%08x: hng64_sound_port_0008_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
+	//logerror("%s: hng64_sound_port_0008_r mask (%04x)\n", machine().describe_context(), mem_mask);
 	return 0;
 }
 
@@ -301,7 +301,7 @@ READ16_MEMBER(hng64_state::sound_comms_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( hng_sound_io, AS_IO, 16, hng64_state )
+ADDRESS_MAP_START(hng64_state::hng_sound_io)
 	AM_RANGE(0x0000, 0x0007) AM_DEVREADWRITE("l7a1045", l7a1045_sound_device, l7a1045_sound_r, l7a1045_sound_w )
 
 	AM_RANGE(0x0008, 0x0009) AM_READWRITE( hng64_sound_port_0008_r, hng64_sound_port_0008_w )
@@ -386,7 +386,7 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 
 
 
-MACHINE_CONFIG_START( hng64_audio )
+MACHINE_CONFIG_START(hng64_state::hng64_audio)
 	MCFG_CPU_ADD("audiocpu", V53A, 32000000/2)              // V53A, 16? mhz!
 	MCFG_CPU_PROGRAM_MAP(hng_sound_map)
 	MCFG_CPU_IO_MAP(hng_sound_io)

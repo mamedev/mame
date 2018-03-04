@@ -94,13 +94,13 @@ WRITE8_MEMBER( coleco_state::paddle_on_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( coleco_map, AS_PROGRAM, 8, coleco_state )
+ADDRESS_MAP_START(coleco_state::coleco_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00) AM_SHARE("ram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( coleco_io_map, AS_IO, 8, coleco_state )
+ADDRESS_MAP_START(coleco_state::coleco_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_off_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( coleco_io_map, AS_IO, 8, coleco_state )
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x1d) AM_READ(paddle_2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( czz50_map, AS_PROGRAM, 8, coleco_state )
+ADDRESS_MAP_START(coleco_state::czz50_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00) AM_SHARE("ram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -371,15 +371,15 @@ void coleco_state::machine_reset()
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( coleco )
+MACHINE_CONFIG_START(coleco_state::coleco)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2) // 3.579545 MHz
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(7'159'090)/2) // 3.579545 MHz
 	MCFG_CPU_PROGRAM_MAP(coleco_map)
 	MCFG_CPU_IO_MAP(coleco_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(coleco_state, coleco_vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
@@ -387,8 +387,9 @@ static MACHINE_CONFIG_START( coleco )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2) // 3.579545 MHz
+	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) // 3.579545 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SN76496_READY_HANDLER(INPUTLINE("maincpu", Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
 
 	/* cartridge */
 	MCFG_COLECOVISION_CARTRIDGE_SLOT_ADD(COLECOVISION_CARTRIDGE_SLOT_TAG, colecovision_cartridges, nullptr)
@@ -399,33 +400,36 @@ static MACHINE_CONFIG_START( coleco )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddle_timer", coleco_state, paddle_update_callback, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( colecop, coleco )
+MACHINE_CONFIG_START(coleco_state::colecop)
+	coleco(config);
 
 	/* video hardware */
 	MCFG_DEVICE_REMOVE("tms9928a")
 	MCFG_DEVICE_REMOVE("screen")
 
-	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(coleco_state, coleco_vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( czz50, coleco )
+MACHINE_CONFIG_START(coleco_state::czz50)
+	coleco(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") // note: cpu speed unverified, assume it's the same as ColecoVision
 	MCFG_CPU_PROGRAM_MAP(czz50_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dina, czz50 )
+MACHINE_CONFIG_START(coleco_state::dina)
+	czz50(config);
 
 	/* video hardware */
 	MCFG_DEVICE_REMOVE("tms9928a")
 	MCFG_DEVICE_REMOVE("screen")
 
-	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(coleco_state, coleco_vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )

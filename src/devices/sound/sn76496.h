@@ -19,13 +19,13 @@ DECLARE_DEVICE_TYPE(SEGAPSG,  segapsg_device)
 
 
 #define MCFG_SN76496_READY_HANDLER(cb) \
-		devcb = &sn76496_base_device::set_ready_handler(*device, (DEVCB_##cb));
+	devcb = &downcast<sn76496_base_device &>(*device).set_ready_handler((DEVCB_##cb));
 
 class sn76496_base_device : public device_t, public device_sound_interface
 {
 public:
-	// static configuration helpers
-	template <class Object> static devcb_base &set_ready_handler(device_t &device, Object &&cb) { return downcast<sn76496_base_device &>(device).m_ready_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_ready_handler(Object &&cb) { return m_ready_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( stereo_w );
 	void write(uint8_t data);

@@ -37,10 +37,12 @@ public:
 	virtual void video_start() override;
 
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
+	void potgold(machine_config &config);
+	void potgold_map(address_map &map);
 };
 
 
-#define CPU_CLOCK           XTAL_40MHz
+#define CPU_CLOCK           XTAL(40'000'000)
 #define VIDEO_CLOCK         (22118400) // ?
 #define SOUND_CLOCK         (3579645)
 
@@ -62,7 +64,7 @@ void potgold_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( potgold_map, AS_PROGRAM, 16, potgold_state )
+ADDRESS_MAP_START(potgold_state::potgold_map)
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -71,10 +73,10 @@ static INPUT_PORTS_START( potgold )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( potgold )
+MACHINE_CONFIG_START(potgold_state::potgold)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
+	MCFG_CPU_ADD("maincpu", TMS34010, XTAL(40'000'000))
 	MCFG_CPU_PROGRAM_MAP(potgold_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */

@@ -14,13 +14,13 @@ Sound: M6295 + [YM2413]
 -------------------------------------------------------------------------------------------------------------
 Year + Game                     PCB        CPU    Sound         Custom                Other
 -------------------------------------------------------------------------------------------------------------
-96  Shu Zi Le Yuan              NO-0131-4  Z180   M6295 YM2413  IGS017 8255           Battery
+96  Shuzi Leyuan                NO-0131-4  Z180   M6295 YM2413  IGS017 8255           Battery
 97  Mj Super Da Man Guan II     NO-0147-6  68000  M6295         IGS031 8255           Battery
 97  Mj Tian Jiang Shen Bing     NO-0157-2  Z180   M6295 YM2413  IGS017 IGS025         Battery
-97  Mj Man Guan Da Heng         NO-0252    68000  M6295         IGS031 IGS025 IGS???* Battery
-98  Mj Long Hu Zheng Ba 2       NO-0206    68000  M6295         IGS031 IGS025 IGS022* Battery
+97  Mj Man Guan Daheng          NO-0252    68000  M6295         IGS031 IGS025 IGS???* Battery
+98  Mj Long Hu Zhengba 2        NO-0206    68000  M6295         IGS031 IGS025 IGS022* Battery
 98  Mj Shuang Long Qiang Zhu 2  NO-0207    68000  M6295         IGS031 IGS025 IGS022  Battery
-98  Mj Man Guan Cai Shen        NO-0192-1  68000  M6295         IGS017 IGS025 IGS029  Battery
+98  Mj Man Guan Caishen         NO-0192-1  68000  M6295         IGS017 IGS025 IGS029  Battery
 99  Tarzan (V107)               NO-0228?   Z180   M6295         IGS031 IGS025 IGS029  Battery
 99  Tarzan (V109C)              NO-0248-1  Z180   M6295         IGS031 IGS025         Battery
 00? Super Tarzan (V100I)        NO-0230-1  Z180   M6295         IGS031 IGS025         Battery
@@ -54,6 +54,7 @@ Notes:
 #include "machine/igs025.h"
 #include "machine/igs022.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "video/igs017_igs031.h"
 
 #include "screen.h"
@@ -196,6 +197,29 @@ public:
 	void slqz2_patch_rom();
 	void slqz2_decrypt_tiles();
 	void spkrform_decrypt_sprites();
+	void mgcs(machine_config &config);
+	void mgdha(machine_config &config);
+	void tjsb(machine_config &config);
+	void lhzb2a(machine_config &config);
+	void slqz2(machine_config &config);
+	void iqblocka(machine_config &config);
+	void lhzb2(machine_config &config);
+	void starzan(machine_config &config);
+	void spkrform(machine_config &config);
+	void sdmg2(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void iqblocka_io(address_map &map);
+	void iqblocka_map(address_map &map);
+	void lhzb2(address_map &map);
+	void lhzb2a(address_map &map);
+	void mgcs(address_map &map);
+	void mgdha_map(address_map &map);
+	void sdmg2(address_map &map);
+	void slqz2(address_map &map);
+	void spkrform_io(address_map &map);
+	void spkrform_map(address_map &map);
+	void tjsb_io(address_map &map);
+	void tjsb_map(address_map &map);
 };
 
 void igs017_state::machine_reset()
@@ -224,24 +248,24 @@ uint16_t igs017_state::mgcs_palette_bitswap(uint16_t bgr)
 {
 	bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 
-	return BITSWAP16(bgr, 7, 8, 9, 2, 14, 3, 13, 15, 12, 11, 10, 0, 1, 4, 5, 6);
+	return bitswap<16>(bgr, 7, 8, 9, 2, 14, 3, 13, 15, 12, 11, 10, 0, 1, 4, 5, 6);
 }
 
 uint16_t igs017_state::lhzb2a_palette_bitswap(uint16_t bgr)
 {
 //  bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
-	return BITSWAP16(bgr, 15,9,13,12,11,5,4,8,7,6,0,14,3,2,1,10);
+	return bitswap<16>(bgr, 15,9,13,12,11,5,4,8,7,6,0,14,3,2,1,10);
 }
 
 uint16_t igs017_state::tjsb_palette_bitswap(uint16_t bgr)
 {
 	// bitswap
-	return BITSWAP16(bgr, 15,12,3,6,10,5,4,2,9,13,8,7,11,1,0,14);
+	return bitswap<16>(bgr, 15,12,3,6,10,5,4,2,9,13,8,7,11,1,0,14);
 }
 
 uint16_t igs017_state::slqz2_palette_bitswap(uint16_t bgr)
 {
-	return BITSWAP16(bgr, 15,14,9,4,11,10,12,3,7,6,5,8,13,2,1,0);
+	return bitswap<16>(bgr, 15,14,9,4,11,10,12,3,7,6,5,8,13,2,1,0);
 }
 
 
@@ -296,7 +320,7 @@ void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4,
 	// address lines swap
 	for (i = 0;i < length;i++)
 	{
-		int addr = (i & ~0xff) | BITSWAP8(i,a7,a6,a5,a4,a3,a2,a1,a0);
+		int addr = (i & ~0xff) | bitswap<8>(i,a7,a6,a5,a4,a3,a2,a1,a0);
 		rom[i] = tmp[addr];
 	}
 
@@ -362,7 +386,7 @@ void igs017_state::tjsb_decrypt_sprites()
 	memcpy(tmp.get(), rom, length);
 	for (i = 0; i < length; i++)
 	{
-		addr = (i & ~0xff) | BITSWAP8(i,7,6,5,2,1,4,3,0);
+		addr = (i & ~0xff) | bitswap<8>(i,7,6,5,2,1,4,3,0);
 		rom[i] = tmp[addr];
 	}
 
@@ -370,7 +394,7 @@ void igs017_state::tjsb_decrypt_sprites()
 	for (i = 0; i < length; i += 2)
 	{
 		uint16_t data = (rom[i+1] << 8) | rom[i+0];   // x-22222-11111-00000
-		data = BITSWAP16(data, 15, 14,13,12,11,10, 9,1,7,6,5, 4,3,2,8,0);
+		data = bitswap<16>(data, 15, 14,13,12,11,10, 9,1,7,6,5, 4,3,2,8,0);
 		rom[i+0] = data;
 		rom[i+1] = data >> 8;
 	}
@@ -446,8 +470,8 @@ void igs017_state::mgcs_decrypt_tiles()
 	memcpy(&tmp[0],rom,length);
 	for (i = 0;i < length;i++)
 	{
-		int addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,12,11,10,6,7,8,9,5,4,3,2,1,0);
-		rom[i^1] = BITSWAP8(tmp[addr],0,1,2,3,4,5,6,7);
+		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,10,6,7,8,9,5,4,3,2,1,0);
+		rom[i^1] = bitswap<8>(tmp[addr],0,1,2,3,4,5,6,7);
 	}
 }
 
@@ -462,10 +486,10 @@ void igs017_state::mgcs_flip_sprites()
 		uint16_t pixels = (rom[i+1] << 8) | rom[i+0];
 
 		// flip bits
-		pixels = BITSWAP16(pixels,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+		pixels = bitswap<16>(pixels,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
 
 		// flip pixels
-		pixels = BITSWAP16(pixels,15, 0,1,2,3,4, 5,6,7,8,9, 10,11,12,13,14);
+		pixels = bitswap<16>(pixels,15, 0,1,2,3,4, 5,6,7,8,9, 10,11,12,13,14);
 
 		rom[i+0] = pixels;
 		rom[i+1] = pixels >> 8;
@@ -506,8 +530,8 @@ void igs017_state::tarzan_decrypt_tiles()
 	memcpy(&tmp[0],rom,length);
 	for (i = 0;i < length;i++)
 	{
-		int addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,12,11,7,8,6,10,9,5,4,3,2,1,0);
-		rom[i] = BITSWAP8(tmp[addr],0,1,2,3,4,5,6,7);
+		int addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,7,8,6,10,9,5,4,3,2,1,0);
+		rom[i] = bitswap<8>(tmp[addr],0,1,2,3,4,5,6,7);
 	}
 }
 
@@ -764,7 +788,7 @@ void igs017_state::lhzb2_decrypt_tiles()
 	memcpy(&tmp[0], rom, length);
 	for (i = 0; i < length; i++)
 	{
-		addr = (i & ~0xffffff) | BITSWAP24(i,23,22,21,20,19,18,17,1,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
+		addr = (i & ~0xffffff) | bitswap<24>(i,23,22,21,20,19,18,17,1,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
 		rom[i] = tmp[addr];
 	}
 }
@@ -780,7 +804,7 @@ void igs017_state::lhzb2_decrypt_sprites()
 	memcpy(tmp.get(), rom, length);
 	for (i = 0; i < length; i++)
 	{
-		addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,6,7,10,9,8,11,12,5,4,3,2,1,0);
+		addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,6,7,10,9,8,11,12,5,4,3,2,1,0);
 		rom[i] = tmp[addr];
 	}
 
@@ -788,7 +812,7 @@ void igs017_state::lhzb2_decrypt_sprites()
 	for (i = 0;i < length;i+=2)
 	{
 		uint16_t data = (rom[i+1] << 8) | rom[i+0];   // x-22222-11111-00000
-		data = BITSWAP16(data, 15, 7,6,5,4,3, 2,1,0,14,13, 12,11,10,9,8);
+		data = bitswap<16>(data, 15, 7,6,5,4,3, 2,1,0,14,13, 12,11,10,9,8);
 		rom[i+0] = data;
 		rom[i+1] = data >> 8;
 	}
@@ -988,7 +1012,7 @@ void igs017_state::slqz2_decrypt_tiles()
 	memcpy(&tmp[0],rom,length);
 	for (i = 0;i < length;i++)
 	{
-		int addr = (i & ~0xff) | BITSWAP8(i,7,4,5,6,3,2,1,0);
+		int addr = (i & ~0xff) | bitswap<8>(i,7,4,5,6,3,2,1,0);
 		rom[i] = tmp[addr];
 	}
 }
@@ -1095,9 +1119,9 @@ void igs017_state::spkrform_decrypt_sprites()
 	for (i = 0; i < length; i++)
 	{
 		if (i & 0x80000)
-			addr = (i & ~0xff) | BITSWAP8(i,7,6,3,4,5,2,1,0);
+			addr = (i & ~0xff) | bitswap<8>(i,7,6,3,4,5,2,1,0);
 		else
-			addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,12,11,10, 4, 8,7,6,5, 9,3,2,1,0);
+			addr = (i & ~0xffff) | bitswap<16>(i,15,14,13,12,11,10, 4, 8,7,6,5, 9,3,2,1,0);
 
 		rom[i] = tmp[addr];
 	}
@@ -1118,14 +1142,14 @@ DRIVER_INIT_MEMBER(igs017_state,spkrform)
 // iqblocka
 
 
-static ADDRESS_MAP_START( iqblocka_map, AS_PROGRAM, 8, igs017_state )
+ADDRESS_MAP_START(igs017_state::iqblocka_map)
 	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
 	AM_RANGE( 0x0e000, 0x0efff ) AM_RAM
 	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, igs017_state )
+ADDRESS_MAP_START(igs017_state::decrypted_opcodes_map)
 	AM_RANGE( 0x00000, 0x3ffff ) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -1174,10 +1198,10 @@ READ8_MEMBER(igs017_state::input_r)
 	}
 }
 
-static ADDRESS_MAP_START( iqblocka_io, AS_IO, 8, igs017_state )
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
-
+ADDRESS_MAP_START(igs017_state::iqblocka_io)
 	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
+
+	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
 	AM_RANGE( 0x8000, 0x8000 ) AM_WRITE(input_select_w )
 	AM_RANGE( 0x8001, 0x8001 ) AM_READ(input_r )
@@ -1336,7 +1360,7 @@ WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 				// ---- ---0 Hopper Motor
 				m_input_select = data & 0xff;
 
-				m_hopperdev->write(space, 0, (data & 0x0001) ? 0x80 : 0x00);
+				m_hopperdev->motor_w(BIT(data, 0));
 
 				if (igs029_irq)
 				{
@@ -1411,7 +1435,7 @@ READ16_MEMBER(igs017_state::mgcs_magic_r)
 
 		case 0x01:
 		{
-			uint16_t ret = BITSWAP8( (BITSWAP8(m_scramble_data, 0,1,2,3,4,5,6,7) + 1) & 3, 4,5,6,7, 0,1,2,3);
+			uint16_t ret = bitswap<8>( (bitswap<8>(m_scramble_data, 0,1,2,3,4,5,6,7) + 1) & 3, 4,5,6,7, 0,1,2,3);
 			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic[0]);
 			return ret;
 		}
@@ -1447,7 +1471,7 @@ READ8_MEMBER(igs017_state::mgcs_keys_r)
 
 
 
-static ADDRESS_MAP_START( mgcs, AS_PROGRAM, 16, igs017_state )
+ADDRESS_MAP_START(igs017_state::mgcs)
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x300000, 0x303fff ) AM_RAM
 	AM_RANGE( 0x49c000, 0x49c003 ) AM_WRITE(mgcs_magic_w ) AM_READ(mgcs_magic_r )
@@ -1529,7 +1553,7 @@ READ16_MEMBER(igs017_state::sdmg2_magic_r)
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( sdmg2, AS_PROGRAM, 16, igs017_state )
+ADDRESS_MAP_START(igs017_state::sdmg2)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 
@@ -1626,7 +1650,7 @@ READ16_MEMBER(igs017_state::mgdha_magic_r)
 			return ioport("BUTTONS")->read();
 
 		case 0x02:
-			return BITSWAP8(ioport("DSW2")->read(), 0,1,2,3,4,5,6,7);
+			return bitswap<8>(ioport("DSW2")->read(), 0,1,2,3,4,5,6,7);
 
 		case 0x03:
 		{
@@ -1642,7 +1666,7 @@ READ16_MEMBER(igs017_state::mgdha_magic_r)
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( mgdha_map, AS_PROGRAM, 16, igs017_state )
+ADDRESS_MAP_START(igs017_state::mgdha_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x876000, 0x876003) AM_WRITE(mgdha_magic_w )
@@ -1707,7 +1731,7 @@ READ8_MEMBER(igs017_state::tjsb_input_r)
 	}
 }
 
-static ADDRESS_MAP_START( tjsb_map, AS_PROGRAM, 8, igs017_state )
+ADDRESS_MAP_START(igs017_state::tjsb_map)
 	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
 	AM_RANGE( 0x0e000, 0x0e000 ) AM_WRITE(input_select_w )
 	AM_RANGE( 0x0e001, 0x0e001 ) AM_READWRITE(tjsb_input_r, tjsb_output_w )
@@ -1716,11 +1740,10 @@ static ADDRESS_MAP_START( tjsb_map, AS_PROGRAM, 8, igs017_state )
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tjsb_io, AS_IO, 8, igs017_state )
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
-
+ADDRESS_MAP_START(igs017_state::tjsb_io)
 	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
 
+	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
 	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
@@ -1731,10 +1754,10 @@ ADDRESS_MAP_END
 // spkrform
 
 
-static ADDRESS_MAP_START( spkrform_map, AS_PROGRAM, 8, igs017_state )
+ADDRESS_MAP_START(igs017_state::spkrform_map)
 	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
-	AM_RANGE( 0x0e9bf, 0x0e9bf ) AM_NOP // hack: uncomment to switch to Formosa
 	AM_RANGE( 0x0e000, 0x0efff ) AM_RAM
+	AM_RANGE( 0x0e9bf, 0x0e9bf ) AM_NOP // hack: uncomment to switch to Formosa
 	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
 ADDRESS_MAP_END
@@ -1757,10 +1780,10 @@ READ8_MEMBER(igs017_state::spkrform_input_r)
 	}
 }
 
-static ADDRESS_MAP_START( spkrform_io, AS_IO, 8, igs017_state )
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
-
+ADDRESS_MAP_START(igs017_state::spkrform_io)
 	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
+
+	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
 	AM_RANGE( 0x8000, 0x8000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
@@ -1835,13 +1858,13 @@ READ16_MEMBER(igs017_state::lhzb2_magic_r)
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( lhzb2, AS_PROGRAM, 16, igs017_state )
+ADDRESS_MAP_START(igs017_state::lhzb2)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
 	AM_RANGE(0x910000, 0x910003) AM_WRITE( lhzb2_magic_w )
 	AM_RANGE(0x910002, 0x910003) AM_READ( lhzb2_magic_r )
 
-	AM_RANGE( 0xb00000, 0xb0ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
 
 	AM_RANGE(0xb10000, 0xb10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 ADDRESS_MAP_END
@@ -2147,18 +2170,19 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 	}
 }
 
-static ADDRESS_MAP_START( lhzb2a, AS_PROGRAM, 16, igs017_state )
+ADDRESS_MAP_START(igs017_state::lhzb2a)
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+
 	// prot2
 	AM_RANGE(0x003200, 0x003201) AM_WRITE( lhzb2a_prot2_reset_w )
 	AM_RANGE(0x003202, 0x003203) AM_WRITE( lhzb2a_prot2_dec_w )
 	AM_RANGE(0x003206, 0x003207) AM_WRITE( lhzb2a_prot2_inc_w )
 	AM_RANGE(0x00320a, 0x00320b) AM_READ( lhzb2a_prot2_r )
 
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
 //  AM_RANGE(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
 
-	AM_RANGE( 0xb00000, 0xb0ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
 
 	AM_RANGE(0xb10000, 0xb10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE(0xb12000, 0xb12001) AM_WRITE( lhzb2a_input_select_w )
@@ -2216,7 +2240,7 @@ READ16_MEMBER(igs017_state::slqz2_magic_r)
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( slqz2, AS_PROGRAM, 16, igs017_state )
+ADDRESS_MAP_START(igs017_state::slqz2)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x602000, 0x602003) AM_WRITE( slqz2_magic_w )
@@ -3249,8 +3273,8 @@ MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 	m_input_select = 0;
 }
 
-static MACHINE_CONFIG_START( iqblocka )
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
+MACHINE_CONFIG_START(igs017_state::iqblocka)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(iqblocka_map)
 	MCFG_CPU_IO_MAP(iqblocka_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
@@ -3280,16 +3304,17 @@ static MACHINE_CONFIG_START( iqblocka )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000) / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( starzan, iqblocka )
+MACHINE_CONFIG_START(igs017_state::starzan)
+	iqblocka(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -3314,8 +3339,8 @@ MACHINE_RESET_MEMBER(igs017_state,mgcs)
 	memset(m_igs_magic, 0, sizeof(m_igs_magic));
 }
 
-static MACHINE_CONFIG_START( mgcs )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
+MACHINE_CONFIG_START(igs017_state::mgcs)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mgcs)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3345,7 +3370,7 @@ static MACHINE_CONFIG_START( mgcs )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000) / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3353,8 +3378,8 @@ MACHINE_CONFIG_END
 
 // lhzb2
 
-static MACHINE_CONFIG_START( lhzb2 )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
+MACHINE_CONFIG_START(igs017_state::lhzb2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(lhzb2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3391,7 +3416,7 @@ static MACHINE_CONFIG_START( lhzb2 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000) / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3405,8 +3430,8 @@ MACHINE_RESET_MEMBER(igs017_state,lhzb2a)
 	lhzb2a_input_addr_w(m_maincpu->space(AS_PROGRAM), 0, 0xf0);
 }
 
-static MACHINE_CONFIG_START( lhzb2a )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
+MACHINE_CONFIG_START(igs017_state::lhzb2a)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(lhzb2a)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3434,7 +3459,7 @@ static MACHINE_CONFIG_START( lhzb2a )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(22'000'000) / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3442,8 +3467,8 @@ MACHINE_CONFIG_END
 
 // slqz2
 
-static MACHINE_CONFIG_START( slqz2 )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
+MACHINE_CONFIG_START(igs017_state::slqz2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(slqz2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3478,7 +3503,7 @@ static MACHINE_CONFIG_START( slqz2 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000) / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3486,8 +3511,8 @@ MACHINE_CONFIG_END
 
 // sdmg2
 
-static MACHINE_CONFIG_START( sdmg2 )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
+MACHINE_CONFIG_START(igs017_state::sdmg2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(sdmg2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3516,7 +3541,7 @@ static MACHINE_CONFIG_START( sdmg2 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(22'000'000) / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3534,8 +3559,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgdh_interrupt)
 		m_maincpu->set_input_line(3, HOLD_LINE); // lev 3 instead of 2
 }
 
-static MACHINE_CONFIG_START( mgdha )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
+MACHINE_CONFIG_START(igs017_state::mgdha)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mgdha_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgdh_interrupt, "screen", 0, 1)
 
@@ -3563,15 +3588,15 @@ static MACHINE_CONFIG_START( mgdha )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(22'000'000) / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
 // tjsb
 
-static MACHINE_CONFIG_START( tjsb )
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
+MACHINE_CONFIG_START(igs017_state::tjsb)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(tjsb_map)
 	MCFG_CPU_IO_MAP(tjsb_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
@@ -3603,18 +3628,18 @@ static MACHINE_CONFIG_START( tjsb )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000) / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
 // spkrform
 
-static MACHINE_CONFIG_START( spkrform )
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
+MACHINE_CONFIG_START(igs017_state::spkrform)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(spkrform_map)
 	MCFG_CPU_IO_MAP(spkrform_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
@@ -3644,10 +3669,10 @@ static MACHINE_CONFIG_START( spkrform )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000) / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3659,6 +3684,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
 IQ Block (alt hardware)
+數字樂園 (Shùzì Lèyuán)
 IGS, 1996
 
 PCB Layout
@@ -3731,6 +3757,7 @@ ROM_END
 /***************************************************************************
 
 Mahjong Tian Jiang Shen Bing
+天將神兵 (Tiān Jiāng Shén Bīng)
 IGS, 1997
 
 This PCB is almost the same as IQBlock (IGS, 1996)
@@ -3792,7 +3819,8 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Man Guan Cai Shen
+Mahjong Man Guan Caishen
+满贯财神 (Mǎn Guàn Cáishén)
 IGS, 1998
 
 
@@ -3909,7 +3937,8 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Long Hu Zheng Ba 2
+Mahjong Long Hu Zhengba 2
+龙虎争霸 (Lóng Hǔ Zhēngbà)
 IGS, 1998
 
 PCB Layout
@@ -3986,6 +4015,7 @@ ROM_END
 /***************************************************************************
 
 Mahjong Shuang Long Qiang Zhu 2
+双龙抢珠 (Shuāng Lóng Qiǎng Zhū)
 IGS, 1998
 
 PCB Layout
@@ -4039,12 +4069,13 @@ ROM_START( slqz2 )
 	ROM_LOAD( "text.u6", 0x00000, 0x80000, CRC(40d21adf) SHA1(18b202d6330ac89026bec2c9c8224b52540dd48d) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "s1102.u20", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) ) // = s1102.u23 Mahjong Long Hu Zheng Ba 2
+	ROM_LOAD( "s1102.u20", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) ) // = s1102.u23 Mahjong Long Hu Zhengba 2
 ROM_END
 
 /***************************************************************************
 
-Mahjong Man Guan Da Heng (V123T1)
+Mahjong Man Guan Daheng (V123T1)
+滿貫大亨 (Mǎn Guàn Dàhēng)
 (c) 1997 IGS
 
 PCB Layout
@@ -4099,6 +4130,7 @@ ROM_END
 /***************************************************************************
 
 Mahjong Man Guan Da Heng (V125T1)
+滿貫大亨 (Mǎn Guàn Dàhēng)
 (c) 1997 IGS
 
 No hardware info, no sprites rom for this set.
@@ -4324,15 +4356,15 @@ ROM_START( spkrform )
 ROM_END
 
 
-GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, iqblocka, ROT0, "IGS",                      "Shu Zi Le Yuan (V127M)",                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996,  iqblockf, iqblock,  iqblocka, iqblocka, igs017_state, iqblockf, ROT0, "IGS",                      "Shu Zi Le Yuan (V113FR)",                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1997,  mgdh,     0,        mgdha,    mgdh,     igs017_state, mgdh,     ROT0, "IGS",                      "Mahjong Man Guan Da Heng (Taiwan, V125T1)",   0 )
-GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, mgdha,    ROT0, "IGS",                      "Mahjong Man Guan Da Heng (Taiwan, V123T1)",   0 )
+GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, iqblocka, ROT0, "IGS",                      "Shuzi Leyuan (V127M)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996,  iqblockf, iqblock,  iqblocka, iqblocka, igs017_state, iqblockf, ROT0, "IGS",                      "Shuzi Leyuan (V113FR)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1997,  mgdh,     0,        mgdha,    mgdh,     igs017_state, mgdh,     ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V125T1)",    0 )
+GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, mgdha,    ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V123T1)",    0 )
 GAME( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, sdmg2,    ROT0, "IGS",                      "Mahjong Super Da Man Guan II (China, V754C)", 0 )
 GAME( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, tjsb,     ROT0, "IGS",                      "Mahjong Tian Jiang Shen Bing (V137C)",        MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, mgcs,     ROT0, "IGS",                      "Mahjong Man Guan Cai Shen (V103CS)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND )
-GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zheng Ba 2 (set 1)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zheng Ba 2 (VS221M)",         0 )
+GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, mgcs,     ROT0, "IGS",                      "Mahjong Man Guan Caishen (V103CS)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND )
+GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (set 1)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (VS221M)",          0 )
 GAME( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, slqz2,    ROT0, "IGS",                      "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1999,  tarzanc,  0,        iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 1)",      MACHINE_NOT_WORKING )
 GAME( 1999,  tarzan,   tarzanc,  iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING )

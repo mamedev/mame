@@ -66,6 +66,12 @@ public:
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_DRIVER_INIT(chinsan);
 
+	void chinsan(machine_config &config);
+	void mayumi(machine_config &config);
+	void chinsan_io_map(address_map &map);
+	void chinsan_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void mayumi_io_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -99,7 +105,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( chinsan_map, AS_PROGRAM, 8, chinsan_state )
+ADDRESS_MAP_START(chinsan_state::chinsan_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
@@ -107,12 +113,12 @@ static ADDRESS_MAP_START( chinsan_map, AS_PROGRAM, 8, chinsan_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("color_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, chinsan_state )
+ADDRESS_MAP_START(chinsan_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chinsan_io_map, AS_IO, 8, chinsan_state )
+ADDRESS_MAP_START(chinsan_state::chinsan_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
@@ -120,7 +126,7 @@ static ADDRESS_MAP_START( chinsan_io_map, AS_IO, 8, chinsan_state )
 	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mayumi_io_map, AS_IO, 8, chinsan_state )
+ADDRESS_MAP_START(chinsan_state::mayumi_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("extra") AM_WRITE(ctrl_w)
 	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi", i8255_device, read, write)
@@ -495,11 +501,11 @@ DRIVER_INIT_MEMBER( chinsan_state, chinsan )
 //**************************************************************************
 
 // C1-00114-B
-static MACHINE_CONFIG_START( chinsan )
-	MCFG_CPU_ADD("maincpu", MC8123, XTAL_10MHz/2) // 317-5012
+MACHINE_CONFIG_START(chinsan_state::chinsan)
+	MCFG_CPU_ADD("maincpu", MC8123, XTAL(10'000'000)/2) // 317-5012
 	MCFG_CPU_PROGRAM_MAP(chinsan_map)
 	MCFG_CPU_IO_MAP(chinsan_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -524,7 +530,7 @@ static MACHINE_CONFIG_START( chinsan )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_10MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(10'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
@@ -532,16 +538,17 @@ static MACHINE_CONFIG_START( chinsan )
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(chinsan_state, adpcm_int_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B) // 8kHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mayumi, chinsan )
+MACHINE_CONFIG_START(chinsan_state::mayumi)
+	chinsan(config);
 	// standard Z80 instead of MC-8123
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(chinsan_map)
 	MCFG_CPU_IO_MAP(mayumi_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)

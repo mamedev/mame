@@ -126,11 +126,14 @@ public:
 
 
 	int puzzli2_take_leveldata_value(uint8_t datvalue);
+	void pgm_arm_type1_sim(machine_config &config);
+	void pgm_arm_type1_cave(machine_config &config);
+	void pgm_arm_type1(machine_config &config);
+	void _55857E_arm7_map(address_map &map);
+	void cavepgm_mem(address_map &map);
+	void kov_map(address_map &map);
+	void kov_sim_map(address_map &map);
 };
-
-MACHINE_CONFIG_EXTERN( pgm_arm_type1 );
-MACHINE_CONFIG_EXTERN( pgm_arm_type1_sim );
-MACHINE_CONFIG_EXTERN( pgm_arm_type1_cave );
 
 INPUT_PORTS_EXTERN( sango );
 INPUT_PORTS_EXTERN( sango_ch );

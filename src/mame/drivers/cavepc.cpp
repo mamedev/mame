@@ -70,6 +70,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cavepc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cavepc(machine_config &config);
+	void cavepc_io(address_map &map);
+	void cavepc_map(address_map &map);
 };
 
 void cavepc_state::video_start()
@@ -83,12 +86,12 @@ uint32_t cavepc_state::screen_update_cavepc(screen_device &screen, bitmap_ind16 
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( cavepc_map, AS_PROGRAM, 32, cavepc_state )
+ADDRESS_MAP_START(cavepc_state::cavepc_map)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cavepc_io, AS_IO, 32, cavepc_state )
+ADDRESS_MAP_START(cavepc_state::cavepc_io)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -106,7 +109,7 @@ void cavepc_state::machine_reset()
 	membank("bank1")->set_base(memregion("bios")->base() + 0x30000);
 }
 
-static MACHINE_CONFIG_START( cavepc )
+MACHINE_CONFIG_START(cavepc_state::cavepc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 200000000) /*  AMD Athlon 64 X2 5050e Brisbane 2.60GHz, 1024KB L2 Cache ! */
 	MCFG_CPU_PROGRAM_MAP(cavepc_map)

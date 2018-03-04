@@ -470,14 +470,14 @@ WRITE16_MEMBER(pc9801_state::tvram_w)
 /* +0x8000 is trusted (bank 0 is actually used by 16 colors mode) */
 READ8_MEMBER(pc9801_state::gvram_r)
 {
-	return BITSWAP8(m_video_ram_2[(offset>>1)+0x04000+m_vram_bank*0x10000] >> ((offset & 1) << 3),0,1,2,3,4,5,6,7);
+	return bitswap<8>(m_video_ram_2[(offset>>1)+0x04000+m_vram_bank*0x10000] >> ((offset & 1) << 3),0,1,2,3,4,5,6,7);
 }
 
 WRITE8_MEMBER(pc9801_state::gvram_w)
 {
 	uint16_t ram = m_video_ram_2[(offset>>1)+0x04000+m_vram_bank*0x10000];
 	int mask = (offset & 1) << 3;
-	data = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	m_video_ram_2[(offset>>1)+0x04000+m_vram_bank*0x10000] = (ram & (0xff00 >> mask)) | (data << mask);
 }
 
@@ -491,7 +491,7 @@ READ16_MEMBER(pc9801_state::upd7220_grcg_r)
 {
 	uint16_t res = 0;
 
-	if(!(m_grcg.mode & 0x80) || machine().side_effect_disabled())
+	if(!(m_grcg.mode & 0x80) || machine().side_effects_disabled())
 		res = m_video_ram_2[offset];
 	else if(m_ex_video_ff[2])
 		res = egc_blit_r(offset, mem_mask);

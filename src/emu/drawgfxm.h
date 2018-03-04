@@ -95,6 +95,21 @@ do                                                                              
 while (0)
 
 /*-------------------------------------------------
+    PIXEL_OP_COPY_TRANSALPHA - render all pixels
+    except those with an alpha of zero, copying
+    directly
+-------------------------------------------------*/
+
+#define PIXEL_OP_COPY_TRANSALPHA(DEST, PRIORITY, SOURCE)                              \
+do                                                                                  \
+{                                                                                   \
+	u32 srcdata = (SOURCE);                                                         \
+	if ((srcdata & 0xff000000) != 0)                                            \
+		(DEST) = SOURCE;                                                            \
+}                                                                                   \
+while (0)
+
+/*-------------------------------------------------
     PIXEL_OP_REMAP_OPAQUE - render all pixels
     regardless of pen, mapping the pen via the
     'paldata' array

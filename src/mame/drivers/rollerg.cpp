@@ -26,7 +26,7 @@
 
 WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 {
-	logerror("%04x: write %02x to 0010\n",space.device().safe_pc(), data);
+	logerror("%04x: write %02x to 0010\n",m_maincpu->pc(), data);
 
 	/* bits 0/1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -77,7 +77,7 @@ READ8_MEMBER(rollerg_state::pip_r)
 	return 0x7f;
 }
 
-static ADDRESS_MAP_START( rollerg_map, AS_PROGRAM, 8, rollerg_state )
+ADDRESS_MAP_START(rollerg_state::rollerg_map)
 	AM_RANGE(0x0010, 0x0010) AM_WRITE(rollerg_0010_w)
 	AM_RANGE(0x0020, 0x0020) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)
 	AM_RANGE(0x0030, 0x0031) AM_DEVREADWRITE("k053260", k053260_device, main_read, main_write)
@@ -93,13 +93,13 @@ static ADDRESS_MAP_START( rollerg_map, AS_PROGRAM, 8, rollerg_state )
 	AM_RANGE(0x0300, 0x030f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_r, k053244_w)
 	AM_RANGE(0x0800, 0x0fff) AM_READ(rollerg_k051316_r) AM_DEVWRITE("k051316", k051316_device, write)
 	AM_RANGE(0x1000, 0x17ff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_r, k053245_w)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2000, 0x3aff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rollerg_sound_map, AS_PROGRAM, 8, rollerg_state )
+ADDRESS_MAP_START(rollerg_state::rollerg_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa02f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
@@ -242,7 +242,7 @@ WRITE8_MEMBER( rollerg_state::banking_callback )
 }
 
 
-static MACHINE_CONFIG_START( rollerg )
+MACHINE_CONFIG_START(rollerg_state::rollerg)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* ? */

@@ -6,7 +6,7 @@
 DEFINE_DEVICE_TYPE(H83002, h83002_device, "h83002", "H8/3002")
 
 h83002_device::h83002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8h_device(mconfig, H83002, tag, owner, clock, address_map_delegate(FUNC(h83002_device::map), this)),
+	h8h_device(mconfig, H83002, tag, owner, clock, address_map_constructor(FUNC(h83002_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	dma(*this, "dma"),
@@ -34,7 +34,7 @@ h83002_device::h83002_device(const machine_config &mconfig, const char *tag, dev
 	syscr = 0;
 }
 
-DEVICE_ADDRESS_MAP_START(map, 16, h83002_device)
+ADDRESS_MAP_START(h83002_device::map)
 	AM_RANGE(0xfffd10, 0xffff0f) AM_RAM
 
 	// DMA: only full address mode supported
@@ -136,7 +136,7 @@ DEVICE_ADDRESS_MAP_START(map, 16, h83002_device)
 	AM_RANGE(0xfffff8, 0xfffff9) AM_DEVREADWRITE8("intc",      h8h_intc_device,           icr_r,   icr_w,   0xffff)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(h83002_device::device_add_mconfig)
+MACHINE_CONFIG_START(h83002_device::device_add_mconfig)
 	MCFG_H8H_INTC_ADD("intc")
 	MCFG_H8_ADC_3337_ADD("adc", "intc", 60)
 	MCFG_H8_DMA_ADD("dma")

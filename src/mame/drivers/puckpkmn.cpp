@@ -51,7 +51,7 @@ Notes:
 #include "sound/2612intf.h"
 
 #include "includes/megadriv.h"
-#include "includes/megadrvb.h"
+#include "includes/megadriv_acbl.h"
 
 /* Puckman Pockimon Input Ports */
 static INPUT_PORTS_START( puckpkmn )
@@ -213,7 +213,7 @@ static INPUT_PORTS_START( jzth )
 INPUT_PORTS_END
 
 
-static ADDRESS_MAP_START( puckpkmn_map, AS_PROGRAM, 16, md_boot_state )
+ADDRESS_MAP_START(md_boot_state::puckpkmn_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM                             /* Main 68k Program Roms */
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("P2")
 	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
@@ -237,7 +237,7 @@ static ADDRESS_MAP_START( puckpkmn_map, AS_PROGRAM, 16, md_boot_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jzth_map, AS_PROGRAM, 16, md_boot_state )
+ADDRESS_MAP_START(md_boot_state::jzth_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("P2")
 	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
@@ -269,14 +269,14 @@ READ16_MEMBER(md_boot_state::puckpkmna_4b2476_r)
 	return 0x3400;
 }
 
-static ADDRESS_MAP_START( puckpkmna_map, AS_PROGRAM, 16, md_boot_state )
+ADDRESS_MAP_START(md_boot_state::puckpkmna_map)
 	AM_IMPORT_FROM( puckpkmn_map )
 	AM_RANGE(0x4b2476, 0x4b2477) AM_READ(puckpkmna_4b2476_r)
 	AM_RANGE(0x70001c, 0x70001d) AM_READ(puckpkmna_70001c_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( puckpkmn )
-	MCFG_FRAGMENT_ADD(md_ntsc)
+MACHINE_CONFIG_START(md_boot_state::puckpkmn)
+	md_ntsc(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(puckpkmn_map)
@@ -285,19 +285,21 @@ static MACHINE_CONFIG_START( puckpkmn )
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000) / 4, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( puckpkmna, puckpkmn )
+MACHINE_CONFIG_START(md_boot_state::puckpkmna)
+	puckpkmn(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(puckpkmna_map)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jzth, puckpkmn )
+MACHINE_CONFIG_START(md_boot_state::jzth)
+	puckpkmn(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jzth_map)
@@ -382,7 +384,7 @@ DRIVER_INIT_MEMBER(md_boot_state,puckpkmn)
 	int i;
 
 	for (i = 0; i < len; i++)
-		rom[i] = BITSWAP8(rom[i],1,4,2,0,7,5,3,6);
+		rom[i] = bitswap<8>(rom[i],1,4,2,0,7,5,3,6);
 
 	DRIVER_INIT_CALL(megadriv);
 }

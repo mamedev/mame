@@ -12,6 +12,7 @@
 /* Devices */
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 
 // Components
 #include "cpu/z80/z80.h"
@@ -152,6 +153,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kc_scanline);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( kc );
+	void kc85_3(machine_config &config);
+	void kc85_3_io(address_map &map);
+	void kc85_3_mem(address_map &map);
 };
 
 
@@ -183,6 +187,10 @@ public:
 	uint8_t               m_port_84_data;
 	uint8_t               m_port_86_data;
 	uint8_t *             m_display_video_ram;
+	void kc85_4(machine_config &config);
+	void kc85_5(machine_config &config);
+	void kc85_4_io(address_map &map);
+	void kc85_4_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_KC_H

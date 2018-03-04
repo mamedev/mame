@@ -6,12 +6,13 @@
 
 *************************************************************************/
 
+#include "machine/timer.h"
 #include "sound/samples.h"
 #include "sound/dac.h"
 #include "screen.h"
 
-#define COSMICG_MASTER_CLOCK     XTAL_9_828MHz
-#define Z80_MASTER_CLOCK         XTAL_10_816MHz
+#define COSMICG_MASTER_CLOCK     XTAL(9'828'000)
+#define Z80_MASTER_CLOCK         XTAL(10'816'000)
 
 
 class cosmic_state : public driver_device
@@ -107,4 +108,16 @@ public:
 	pen_t cosmica_map_color(uint8_t x, uint8_t y);
 	pen_t cosmicg_map_color(uint8_t x, uint8_t y);
 	pen_t magspot_map_color(uint8_t x, uint8_t y);
+	void cosmic(machine_config &config);
+	void cosmica(machine_config &config);
+	void cosmicg(machine_config &config);
+	void nomnlnd(machine_config &config);
+	void devzone(machine_config &config);
+	void panic(machine_config &config);
+	void magspot(machine_config &config);
+	void cosmica_map(address_map &map);
+	void cosmicg_io_map(address_map &map);
+	void cosmicg_map(address_map &map);
+	void magspot_map(address_map &map);
+	void panic_map(address_map &map);
 };

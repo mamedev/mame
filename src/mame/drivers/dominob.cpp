@@ -96,6 +96,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void dominob(machine_config &config);
+	void memmap(address_map &map);
+	void portmap(address_map &map);
 };
 
 void dominob_state::video_start()
@@ -176,7 +179,7 @@ WRITE8_MEMBER(dominob_state::dominob_d008_w)
 	/* is there a purpose on this ? always set to 0x00 (read from 0xc47b in RAM) */
 }
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dominob_state )
+ADDRESS_MAP_START(dominob_state::memmap)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_WRITENOP // there are some garbage writes to ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 
@@ -192,7 +195,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dominob_state )
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_SHARE("bgram")
 	AM_RANGE(0xf080, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -202,7 +205,7 @@ READ8_MEMBER(dominob_state::dominob_unk_port02_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( portmap, AS_IO, 8, dominob_state )
+ADDRESS_MAP_START(dominob_state::portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READ(dominob_unk_port02_r)
 ADDRESS_MAP_END
@@ -289,10 +292,10 @@ static GFXDECODE_START( dominob )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( dominob )
+MACHINE_CONFIG_START(dominob_state::dominob)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80,XTAL(12'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	MCFG_CPU_IO_MAP(portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dominob_state,  irq0_line_hold)
@@ -313,7 +316,7 @@ static MACHINE_CONFIG_START( dominob )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_12MHz/4)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(12'000'000)/4)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END

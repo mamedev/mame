@@ -84,7 +84,6 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
 	//const uint16_t stop_values[4] = { 0xc00, 0, 0, 0 };
-	address_space &space = machine().dummy_space();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
 	int ysize;
@@ -102,16 +101,16 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		 @todo reported sequence for DMA pause flag is 0x0c** 0x0000 0x0000 0x0000.
 		       Verify how exactly via HW test. Continuing may be determined by a DMA bit write.
 		 */
-		if(m_tc0080vco->sprram_r(space, offs + 0, 0xffff) == 0xc00 ||
-			m_tc0080vco->sprram_r(space, offs + 0, 0xffff) == 0xcff) // Air Inferno
+		if(m_tc0080vco->sprram_r(offs + 0) == 0xc00 ||
+			m_tc0080vco->sprram_r(offs + 0) == 0xcff) // Air Inferno
 			return offs - 8/2;
 
-		x0        =  m_tc0080vco->sprram_r(space, offs + 1, 0xffff) & 0x3ff;
-		y0        =  m_tc0080vco->sprram_r(space, offs + 0, 0xffff) & 0x3ff;
-		zoomx     = (m_tc0080vco->sprram_r(space, offs + 2, 0xffff) & 0x7f00) >> 8;
-		zoomy     = (m_tc0080vco->sprram_r(space, offs + 2, 0xffff) & 0x007f);
-		tile_offs = (m_tc0080vco->sprram_r(space, offs + 3, 0xffff) & 0x1fff) << 2;
-		ysize     = size[(m_tc0080vco->sprram_r(space, offs, 0xffff) & 0x0c00) >> 10];
+		x0        =  m_tc0080vco->sprram_r(offs + 1) & 0x3ff;
+		y0        =  m_tc0080vco->sprram_r(offs + 0) & 0x3ff;
+		zoomx     = (m_tc0080vco->sprram_r(offs + 2) & 0x7f00) >> 8;
+		zoomy     = (m_tc0080vco->sprram_r(offs + 2) & 0x007f);
+		tile_offs = (m_tc0080vco->sprram_r(offs + 3) & 0x1fff) << 2;
+		ysize     = size[(m_tc0080vco->sprram_r(offs) & 0x0c00) >> 10];
 
 
 		if (tile_offs)
@@ -171,10 +170,10 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 					{
 						int tile, color, flipx, flipy;
 
-						tile  = m_tc0080vco->cram_0_r(space, tile_offs, 0xffff) & 0x7fff;
-						color = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x001f;
-						flipx = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x0040;
-						flipy = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x0080;
+						tile  = m_tc0080vco->cram_0_r(tile_offs) & 0x7fff;
+						color = m_tc0080vco->cram_1_r(tile_offs) & 0x001f;
+						flipx = m_tc0080vco->cram_1_r(tile_offs) & 0x0040;
+						flipy = m_tc0080vco->cram_1_r(tile_offs) & 0x0080;
 
 						if (m_tc0080vco->flipscreen_r())
 						{

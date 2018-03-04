@@ -14,7 +14,7 @@
 #include "dai_snd.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(DAI_SOUND, dai_sound_device, "dai_sound", "DAI Audio Custom")
+DEFINE_DEVICE_TYPE(DAI_SOUND, dai_sound_device, "dai_sound", "DAI Custom Sound")
 
 
 //-------------------------------------------------

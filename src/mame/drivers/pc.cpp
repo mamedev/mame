@@ -280,12 +280,75 @@ Mass storage: 2x 5.25" 360K or 1x 5.25" 360K and 1x 3.5" 720K, additional harddi
 On board ports: speaker
 Options: 8087 FPU
 
+Ericsson PC
+===========
+Links: https://youtu.be/6uilOdMJc24
+Form Factor: Desktop
+CPU: 8088 @ 4.77MHz
+RAM: 256K
+Bus: 6x ISA
+Video: Monchrome or Color 80x25 character mode. 320x200 and 640x400 (CGA?) grahics modes
+Display: Orange Gas Plasma (GP) display
+Mass storage: 2 x 5.25" 360K or 1 20Mb HDD
+On board ports: Beeper,
+Ports: serial, parallel
+Internal Options: Up to 640K RAM through add-on RAM card
+Misc: The hardware was not 100% PC compatible so non BIOS based software would not run. 50.000+ units sold
+
+Ericsson Portable PC - EPPC
+===========================
+Links: https://youtu.be/Qmke4L4Jls8 , https://youtu.be/yXK01gBQE6Q
+Form Factor: Laptop
+CPU: 8088 @ 4.77MHz
+RAM: 256K
+Bus: No internal slots
+Video: Monochrome 80x25 character mode. 320x200 and 640x400 (CGA?) grahics modes
+Display: Orange Gas Plasma (GP) display
+Mass storage: half height 5.25" 360K
+On board ports: Beeper,
+Ports: serial, parallel, ext. floppy
+Internal Options: 256K RAM, thermal printer
+External Options: A disk cabinet with networking, 1200/300 accoustic modem, 256K Ergo disk electronic disk drive
+Misc: No battery due to the power hungry GP display. 10-15.000 units sold
+
+AEG Olympia Olytext 30
+=======================
+Form Factor: Desktop
+CPU: NEC V20 @ 4.77MHz
+RAM: 768K, not sure how to address the area above 640K
+Bus: 8x ISA:    1) NEC V20 Slot CPU with 786K RAM, TI TACT80181FT chip
+                2) Z180 CP/M emulation card, needed to run the proprietary Olytext 30 word processor)
+                3) Monochrome graphics/color graphics card (possibly EGA capable) ICs: Chips P82C441 and P82A442A
+                4) MFM hard disk controller HDC-770, ICs: HDC9224, HDC92C26, HDC9223,
+                5) Floppy, serial and RTC DIO-770, ICs: 2x UM8250B, UM8272A, OKI M5832
+Video: MDA/Hercules/CGA, possibly EGA
+Mass storage: 1x 3.5" 720K, 20MB Miniscribe harddisk
+On board ports: speaker
+Options: 8087 FPU
+
+Kaypro 16
+=======================
+Links: http://www.mofeel.net/679-comp-sys-ibm-pc-classic/309.aspx, https://groups.google.com/forum/#!topic/comp.os.cpm/HYQnpUOyQXg, https://amaus.org/static/S100/kaypro/systems/kaypro%2016/Kaypro%2016.pdf , http://ajordan.dpease.com/kaypro16/index.htm
+Form Factor: Luggable
+CPU: 8088 @ 4.77MHz
+RAM: 256K, expandable to 512K and 640K
+Mainboard with 4 ISA slots, video decoder circuitry to show 16 levels of grayscale on the internal monitor, interface to WD1002-HD0 harddisk controller
+Bus: 4x ISA:    1) 8088 slot CPU, keyboard connector, reset switch,
+                2) Floppy disk controller, serial, parallel, RAM expansion
+                3) Kaypro CGA card with composite and colour TTL outputs, ROM 81-820 needs to be dumped
+                4) empty
+Video: CGA
+Mass storage: 1x 5.25" 360K, 10MB harddisk (Seagate ST212)
+Options: 8087 FPU
+Misc: A Kaypro 16/2 is a configuration without harddisk but with two floppy disk drives (interface ics on mainboard were not populated)
 ***************************************************************************/
 
 
 #include "emu.h"
 #include "machine/genpc.h"
+#include "machine/i8251.h"
 #include "cpu/i86/i86.h"
+#include "cpu/nec/nec.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
@@ -308,33 +371,64 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(pc_turbo_callback);
 
 	double m_turbo_off_speed;
+
+	static void cfg_dual_720K(device_t *device);
+	static void cfg_single_360K(device_t *device);
+	static void cfg_single_720K(device_t *device);
+
+	void ataripc1(machine_config &config);
+	void ncrpc4i(machine_config &config);
+	void kaypro16(machine_config &config);
+	void epc(machine_config &config);
+	void m15(machine_config &config);
+	void bondwell(machine_config &config);
+	void siemens(machine_config &config);
+	void iskr3104(machine_config &config);
+	void poisk2(machine_config &config);
+	void dgone(machine_config &config);
+	void pccga(machine_config &config);
+	void mk88(machine_config &config);
+	void eppc(machine_config &config);
+	void olytext30(machine_config &config);
+	void laser_xt3(machine_config &config);
+	void zenith(machine_config &config);
+	void eagle1600(machine_config &config);
+	void laser_turbo_xt(machine_config &config);
+	void ibm5550(machine_config &config);
+	void epc_io(address_map &map);
+	void ibm5550_io(address_map &map);
+	void pc16_io(address_map &map);
+	void pc16_map(address_map &map);
+	void pc8_io(address_map &map);
+	void pc8_map(address_map &map);
+	void zenith_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8, pc_state )
+ADDRESS_MAP_START(pc_state::pc8_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zenith_map, AS_PROGRAM, 8, pc_state )
+ADDRESS_MAP_START(pc_state::zenith_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xf7fff) AM_RAM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("bios", 0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc16_map, AS_PROGRAM, 16, pc_state )
+ADDRESS_MAP_START(pc_state::pc16_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc8_io, AS_IO, 8, pc_state )
+ADDRESS_MAP_START(pc_state::pc8_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc16_io, AS_IO, 16, pc_state )
+ADDRESS_MAP_START(pc_state::pc16_io)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
+	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
 ADDRESS_MAP_END
 
 READ8_MEMBER(pc_state::unk_r)
@@ -342,10 +436,17 @@ READ8_MEMBER(pc_state::unk_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16, pc_state )
+ADDRESS_MAP_START(pc_state::ibm5550_io)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00a0, 0x00a1) AM_READ8(unk_r, 0x00ff )
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
+	AM_RANGE(0x00a0, 0x00a1) AM_READ8(unk_r, 0x00ff )
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(pc_state::epc_io)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
+	AM_RANGE(0x0070, 0x0070) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
+	AM_RANGE(0x0071, 0x0071) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
 ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(pc_state::pc_turbo_callback)
@@ -409,7 +510,7 @@ DEVICE_INPUT_DEFAULTS_END
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 
-static MACHINE_CONFIG_START( pccga )
+MACHINE_CONFIG_START(pc_state::pccga)
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc8, pc8, I8088, 4772720)   /* 4,77 MHz */
 
@@ -433,27 +534,46 @@ static MACHINE_CONFIG_START( pccga )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
 MACHINE_CONFIG_END
 
+void pc_state::cfg_dual_720K(device_t *device)
+{
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("35dd");
+}
 
-static MACHINE_CONFIG_START( cfg_dual_720K )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	MCFG_SLOT_DEFAULT_OPTION("35dd")
-	MCFG_DEVICE_MODIFY("fdc:1")
-	MCFG_SLOT_DEFAULT_OPTION("35dd")
-MACHINE_CONFIG_END
+void pc_state::cfg_single_360K(device_t *device)
+{
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("525dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+}
 
-static MACHINE_CONFIG_START( cfg_single_360K )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	MCFG_SLOT_DEFAULT_OPTION("525dd")
-	MCFG_SLOT_FIXED(true)
-	MCFG_DEVICE_REMOVE("fdc:1")
-MACHINE_CONFIG_END
+void pc_state::cfg_single_720K(device_t *device)
+{
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+}
 
 //Data General One
-static MACHINE_CONFIG_DERIVED( dgone, pccga )
+MACHINE_CONFIG_START(pc_state::dgone)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_dual_720K)
 MACHINE_CONFIG_END
 
+// Ericsson Information System
+MACHINE_CONFIG_START(pc_state::epc)
+	pccga(config);
+	MCFG_DEVICE_REMOVE("maincpu")
+	MCFG_CPU_PC(pc8, epc, I8088, 4772720)
+	MCFG_DEVICE_MODIFY("isa1")
+	MCFG_SLOT_DEFAULT_OPTION("ega")
+	MCFG_DEVICE_ADD("i8251", I8251, 0) // clock?
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(pc_state::eppc)
+	pccga(config);
+MACHINE_CONFIG_END
 
 // Bondwell BW230
 static INPUT_PORTS_START( bondwell )
@@ -465,7 +585,8 @@ static INPUT_PORTS_START( bondwell )
 	PORT_DIPSETTING(    0x02, "On (12 MHz)" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED(bondwell, pccga)
+MACHINE_CONFIG_START(pc_state::bondwell)
+	pccga(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_PC(pc8, pc8, I8088, 4772720) // turbo?
 MACHINE_CONFIG_END
@@ -476,7 +597,7 @@ static DEVICE_INPUT_DEFAULTS_START( iskr3104 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x00)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( iskr3104 )
+MACHINE_CONFIG_START(pc_state::iskr3104)
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, pc16, I8086, 4772720)
 
@@ -500,7 +621,7 @@ MACHINE_CONFIG_END
 
 
 //Poisk-2
-static MACHINE_CONFIG_START( poisk2 )
+MACHINE_CONFIG_START(pc_state::poisk2)
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, pc16, I8086, 4772720)
 
@@ -522,16 +643,17 @@ MACHINE_CONFIG_END
 
 
 //MK-88
-static MACHINE_CONFIG_DERIVED(mk88, poisk2)
+MACHINE_CONFIG_START(pc_state::mk88)
+	poisk2(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_SLOT_DEFAULT_OPTION("cga_ec1841")
 MACHINE_CONFIG_END
 
 
 // Zenith SuperSport
-static MACHINE_CONFIG_START( zenith )
+MACHINE_CONFIG_START(pc_state::zenith)
 	/* basic machine hardware */
-	MCFG_CPU_PC(zenith, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
+	MCFG_CPU_PC(zenith, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
 	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
@@ -555,7 +677,8 @@ MACHINE_CONFIG_END
 
 
 //NCR PC4i
-static MACHINE_CONFIG_DERIVED ( ncrpc4i, pccga )
+MACHINE_CONFIG_START(pc_state::ncrpc4i)
+	pccga(config);
 	//MCFG_DEVICE_MODIFY("mb:isa")
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa7", pc_isa8_cards, nullptr, false)
@@ -571,9 +694,9 @@ static DEVICE_INPUT_DEFAULTS_START( siemens )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x30)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( siemens )
+MACHINE_CONFIG_START(pc_state::siemens)
 	/* basic machine hardware */
-	MCFG_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
+	MCFG_CPU_PC(pc8, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
 	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(siemens)
@@ -596,7 +719,7 @@ MACHINE_CONFIG_END
 
 
 // IBM 5550
-static MACHINE_CONFIG_START( ibm5550 )
+MACHINE_CONFIG_START(pc_state::ibm5550)
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, ibm5550, I8086, 8000000)
 
@@ -623,7 +746,8 @@ static DEVICE_INPUT_DEFAULTS_START( m15 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x01, 0x00)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_DERIVED(m15, pccga)
+MACHINE_CONFIG_START(pc_state::m15)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("mb")
 	MCFG_DEVICE_INPUT_DEFAULTS(m15)
 	MCFG_DEVICE_MODIFY("isa2")
@@ -635,24 +759,25 @@ MACHINE_CONFIG_END
 
 
 // Atari PC1
-static MACHINE_CONFIG_DERIVED(ataripc1, pccga)
+MACHINE_CONFIG_START(pc_state::ataripc1)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_SLOT_DEFAULT_OPTION("ega")
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_single_360K)
 MACHINE_CONFIG_END
 
-
 //Eagle 1600
-static MACHINE_CONFIG_DERIVED(eagle1600, pccga)
+MACHINE_CONFIG_START(pc_state::eagle1600)
+	pccga(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_PC(pc16, pc16, I8086, 8000000)
 MACHINE_CONFIG_END
 
 
 //Laser XT/3
-static MACHINE_CONFIG_START( laser_xt3 )
-	MCFG_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
+MACHINE_CONFIG_START(pc_state::laser_xt3)
+	MCFG_CPU_PC(pc8, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
@@ -680,8 +805,8 @@ MACHINE_CONFIG_END
 
 
 //Laser Turbo XT
-static MACHINE_CONFIG_START( laser_turbo_xt )
-	MCFG_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
+MACHINE_CONFIG_START(pc_state::laser_turbo_xt)
+	MCFG_CPU_PC(pc8, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
@@ -707,6 +832,39 @@ static MACHINE_CONFIG_START( laser_turbo_xt )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
 MACHINE_CONFIG_END
 
+//Olytext 30
+MACHINE_CONFIG_START(pc_state::olytext30)
+	pccga(config);
+	MCFG_DEVICE_REMOVE("maincpu")
+	MCFG_CPU_PC(pc8, pc8, V20, XTAL(14'318'181)/3) /* 4,77 MHz */
+	MCFG_DEVICE_MODIFY("isa2")
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_single_720K)
+	MCFG_DEVICE_MODIFY("isa3")
+	MCFG_SLOT_DEFAULT_OPTION("")
+	MCFG_DEVICE_MODIFY("isa5")
+	MCFG_SLOT_DEFAULT_OPTION("hdc")
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("768K")
+MACHINE_CONFIG_END
+
+// Kaypro 16
+MACHINE_CONFIG_START(pc_state::kaypro16)
+	pccga(config);
+	MCFG_DEVICE_MODIFY("isa1")
+	MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_MODIFY("isa2")
+	MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_MODIFY("isa3")
+	MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_MODIFY("isa4")
+	MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_MODIFY("isa5")
+	MCFG_SLOT_DEFAULT_OPTION(nullptr)
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_EXTRA_OPTIONS("512K, 640K")
+MACHINE_CONFIG_END
+
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
@@ -714,6 +872,22 @@ MACHINE_CONFIG_END
 ROM_START( dgone )
 	ROM_REGION(0x10000,"bios", 0)
 	ROM_LOAD( "dgone.bin",  0x8000, 0x08000, CRC(2c38c86e) SHA1(c0f85a000d1d13cd354965689e925d677822549e))
+ROM_END
+
+ROM_START( epc )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_DEFAULT_BIOS("p860110")
+	ROM_SYSTEM_BIOS(0, "p840705", "P840705")
+	ROMX_LOAD("ericsson_8088.bin", 0xe000, 0x2000, CRC(3953c38d) SHA1(2bfc1f1d11d0da5664c3114994fc7aa3d6dd010d), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "p860110", "P860110")
+	ROMX_LOAD( "epcbios1.bin",  0xe000, 0x02000, CRC(79a83706) SHA1(33528c46a24d7f65ef5a860fbed05afcf797fc55), ROM_BIOS(2))
+	ROMX_LOAD( "epcbios2.bin",  0xa000, 0x02000, CRC(3ca764ca) SHA1(02232fedef22d31a641f4b65933b9e269afce19e), ROM_BIOS(2))
+	ROMX_LOAD( "epcbios3.bin",  0xc000, 0x02000, CRC(70483280) SHA1(b44b09da94d77b0269fc48f07d130b2d74c4bb8f), ROM_BIOS(2))
+ROM_END
+
+ROM_START( eppc )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD( "eppcbios60605.bin",  0xc000, 0x04000, CRC(fe82e11b) SHA1(97ed48dc30f1ed0acce0a14b8085f13b84d4444b))
 ROM_END
 
 ROM_START( bw230 )
@@ -870,6 +1044,16 @@ ROM_START( laser_xt3 )
 	ROM_LOAD("laser_xt3.bin", 0x0e000, 0x02000, CRC(b45a7dd3) SHA1(62f17c408be0036d00a182e94c5c88b83d46b625)) // version 1.26 - 27c64
 ROM_END
 
+ROM_START( olytext30 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("o45995.bin", 0xe000, 0x2000, CRC(fdc05b4f) SHA1(abb94e75e7394be1e85ff706d4d8f3b9cdfea09f))
+ROM_END
+
+ROM_START( kaypro16 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("pc102782.bin", 0xe000, 0x2000, CRC(ade4ed14) SHA1(de6d87ae83a71728d60df6a5964e680487ea8400))
+ROM_END
+
 
 /***************************************************************************
 
@@ -879,6 +1063,8 @@ ROM_END
 
 //    YEAR    NAME              PARENT      COMPAT      MACHINE         INPUT     STATE     INIT      COMPANY                            FULLNAME                FLAGS
 COMP( 1984,   dgone,            ibm5150,    0,          dgone,          pccga,    pc_state, 0,        "Data General",                    "Data General/One" ,    MACHINE_NOT_WORKING ) // CGA, 2x 3.5" disk drives
+COMP( 1985,   epc,              ibm5150,    0,          epc,            pccga,    pc_state, 0,        "Ericsson Information System",     "Ericsson PC" ,         MACHINE_NOT_WORKING )
+COMP( 1985,   eppc,             ibm5150,    0,          eppc,           pccga,    pc_state, 0,        "Ericsson Information System",     "Ericsson Portable PC", MACHINE_NOT_WORKING )
 COMP( 1985,   bw230,            ibm5150,    0,          bondwell,       bondwell, pc_state, bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)", 0 )
 COMP( 1984,   compc1,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Commodore Business Machines",     "Commodore PC-1" ,      MACHINE_NOT_WORKING )
 COMP( 1992,   iskr3104,         ibm5150,    0,          iskr3104,       pccga,    pc_state, 0,        "Schetmash",                       "Iskra 3104",           MACHINE_NOT_WORKING )
@@ -899,3 +1085,5 @@ COMP( 1989,   ssam88s,          ibm5150,    0,          pccga,          pccga,  
 COMP( 1983,   eagle1600,        ibm5150,    0,          eagle1600,      pccga,    pc_state, 0,        "Eagle",                           "1600" ,                MACHINE_NOT_WORKING )
 COMP( 1988,   laser_turbo_xt,   ibm5150,    0,          laser_turbo_xt, 0,        pc_state, 0,        "VTech",                           "Laser Turbo XT",       0 )
 COMP( 1989,   laser_xt3,        ibm5150,    0,          laser_xt3,      0,        pc_state, 0,        "VTech",                           "Laser XT/3",           0 )
+COMP( 198?,   olytext30,        ibm5150,    0,          olytext30,      pccga,    pc_state, 0,        "AEG Olympia",                     "Olytext 30",            MACHINE_NOT_WORKING )
+COMP( 1985,   kaypro16,         ibm5150,    0,          kaypro16,       pccga,    pc_state, 0,        "Kaypro Corporation",              "Kaypro 16",            0 )

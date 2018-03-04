@@ -27,6 +27,7 @@ ToDo:
 #include "cpu/i8085/i8085.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "speaker.h"
 
@@ -56,6 +57,11 @@ public:
 	DECLARE_WRITE8_MEMBER(p51a_w);
 	DECLARE_DRIVER_INIT(micropin);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	void pentacup2(machine_config &config);
+	void micropin(machine_config &config);
+	void micropin_map(address_map &map);
+	void pentacup2_io(address_map &map);
+	void pentacup2_map(address_map &map);
 private:
 	uint8_t m_row;
 	uint8_t m_counter;
@@ -69,7 +75,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( micropin_map, AS_PROGRAM, 8, micropin_state )
+ADDRESS_MAP_START(micropin_state::micropin_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("nvram") // 4x 6561 RAM
 	AM_RANGE(0x4000, 0x4005) AM_WRITE(sw_w)
@@ -86,12 +92,12 @@ static ADDRESS_MAP_START( micropin_map, AS_PROGRAM, 8, micropin_state )
 	AM_RANGE(0x6400, 0x7fff) AM_ROM AM_REGION("v1cpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pentacup2_map, AS_PROGRAM, 8, micropin_state )
+ADDRESS_MAP_START(micropin_state::pentacup2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pentacup2_io, AS_IO, 8, micropin_state )
+ADDRESS_MAP_START(micropin_state::pentacup2_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0e) AM_WRITE(sw_w)
 	AM_RANGE(0x0f, 0x0f) AM_WRITE(lamp_w)
@@ -283,9 +289,9 @@ DRIVER_INIT_MEMBER( micropin_state, micropin )
 {
 }
 
-static MACHINE_CONFIG_START( micropin )
+MACHINE_CONFIG_START(micropin_state::micropin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("v1cpu", M6800, XTAL_2MHz / 2)
+	MCFG_CPU_ADD("v1cpu", M6800, XTAL(2'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(micropin_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(micropin_state, irq0_line_hold, 500)
 
@@ -295,7 +301,7 @@ static MACHINE_CONFIG_START( micropin )
 	MCFG_DEFAULT_LAYOUT(layout_micropin)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 387)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -320,7 +326,7 @@ static MACHINE_CONFIG_START( micropin )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", micropin_state, timer_a, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pentacup2 )
+MACHINE_CONFIG_START(micropin_state::pentacup2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("v2cpu", I8085A, 2000000)
 	MCFG_CPU_PROGRAM_MAP(pentacup2_map)
@@ -330,7 +336,7 @@ static MACHINE_CONFIG_START( pentacup2 )
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

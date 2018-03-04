@@ -49,6 +49,9 @@ private:
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 
+	void upd7220_0_map(address_map &map);
+	void upd7220_1_map(address_map &map);
+
 	// internal state
 	required_device<upd7220_device> m_hgdc0;
 	required_device<upd7220_device> m_hgdc1;

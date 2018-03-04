@@ -6,14 +6,15 @@
 
 ***************************************************************************/
 
-#ifndef _CPS1_H_
-#define _CPS1_H_
+#ifndef MAME_INCLUDES_CPS1_H
+#define MAME_INCLUDES_CPS1_H
 
 #include "sound/msm5205.h"
 #include "sound/qsound.h"
 #include "sound/okim6295.h"
 #include "machine/gen_latch.h"
 #include "machine/timekpr.h"
+#include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
 #include "screen.h"
 
@@ -29,7 +30,7 @@
     Frame size: 262 scanlines
     Refresh rate: 59.63 MHz.
 */
-#define CPS_PIXEL_CLOCK  (XTAL_16MHz/2)
+#define CPS_PIXEL_CLOCK  (XTAL(16'000'000)/2)
 
 #define CPS_HTOTAL       (512)
 #define CPS_HBEND        (64)
@@ -343,6 +344,7 @@ public:
 	DECLARE_DRIVER_INIT(sf2mdtb);
 	DECLARE_DRIVER_INIT(sf2b);
 	DECLARE_DRIVER_INIT(slampic);
+	DECLARE_DRIVER_INIT(wofabl);
 	DECLARE_MACHINE_START(fcrash);
 	DECLARE_MACHINE_RESET(fcrash);
 	DECLARE_MACHINE_START(cawingbl);
@@ -409,13 +411,61 @@ public:
 	DECLARE_READ16_MEMBER(joy_or_paddle_ecofghtr_r);
 	DECLARE_WRITE_LINE_MEMBER(m5205_int1);
 	DECLARE_WRITE_LINE_MEMBER(m5205_int2);
+	void cps2(machine_config &config);
+	void gigaman2(machine_config &config);
+	void dead_cps2(machine_config &config);
+	void cawingbl(machine_config &config);
+	void sf2mdt(machine_config &config);
+	void sf2m1(machine_config &config);
+	void kodb(machine_config &config);
+	void varthb(machine_config &config);
+	void sgyxz(machine_config &config);
+	void wofabl(machine_config &config);
+	void punipic(machine_config &config);
+	void dinopic(machine_config &config);
+	void slampic(machine_config &config);
+	void sf2b(machine_config &config);
+	void knightsb(machine_config &config);
+	void fcrash(machine_config &config);
+	void sf2m10(machine_config &config);
+	void sf2m3(machine_config &config);
+	void forgottn(machine_config &config);
+	void ganbare(machine_config &config);
+	void qsound(machine_config &config);
+	void cps1_12MHz(machine_config &config);
+	void wofhfh(machine_config &config);
+	void cps1_10MHz(machine_config &config);
+	void pang3(machine_config &config);
+	void cps2_map(address_map &map);
+	void dead_cps2_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void dinopic_map(address_map &map);
+	void fcrash_map(address_map &map);
+	void forgottn_map(address_map &map);
+	void knightsb_map(address_map &map);
+	void knightsb_z80map(address_map &map);
+	void kodb_sound_map(address_map &map);
+	void main_map(address_map &map);
+	void punipic_map(address_map &map);
+	void qsound_decrypted_opcodes_map(address_map &map);
+	void qsound_main_map(address_map &map);
+	void qsound_sub_map(address_map &map);
+	void sf2b_map(address_map &map);
+	void sf2m10_map(address_map &map);
+	void sf2m1_map(address_map &map);
+	void sf2m3_map(address_map &map);
+	void sf2mdt_map(address_map &map);
+	void sf2mdt_z80map(address_map &map);
+	void sgyxz_map(address_map &map);
+	void sgyxz_sound_map(address_map &map);
+	void wofabl_map(address_map &map);
+	void slampic_map(address_map &map);
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
+	void varthb_map(address_map &map);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/
-
-MACHINE_CONFIG_EXTERN(cps1_12MHz);
-
-ADDRESS_MAP_EXTERN( qsound_sub_map, 8 );
 
 GFXDECODE_EXTERN( cps1 );
 

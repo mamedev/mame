@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
+
 #include "audio/seibu.h"
+#include "machine/timer.h"
 
 class deadang_state : public driver_device
 {
@@ -60,4 +62,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(main_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(sub_scanline);
+	void deadang(machine_config &config);
+	void main_map(address_map &map);
+	void sound_decrypted_opcodes_map(address_map &map);
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
 };

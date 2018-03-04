@@ -37,17 +37,19 @@ public:
 
 	virtual void machine_start() override { }
 	virtual void machine_reset() override { }
+	void digijet(machine_config &config);
+	void io_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, digijet_state )
+ADDRESS_MAP_START(digijet_state::io_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( digijet )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( digijet )
+MACHINE_CONFIG_START(digijet_state::digijet)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8049_TAG, I8049, XTAL_11MHz)
+	MCFG_CPU_ADD(I8049_TAG, I8049, XTAL(11'000'000))
 	MCFG_CPU_IO_MAP(io_map)
 MACHINE_CONFIG_END
 

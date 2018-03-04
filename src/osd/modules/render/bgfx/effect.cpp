@@ -36,7 +36,7 @@ bgfx_effect::~bgfx_effect()
 		delete uniform.second;
 	}
 	m_uniforms.clear();
-	bgfx::destroyProgram(m_program_handle);
+	bgfx::destroy(m_program_handle);
 }
 
 void bgfx_effect::submit(int view, uint64_t blend)

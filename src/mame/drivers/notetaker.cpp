@@ -3,14 +3,30 @@
 /* Xerox NoteTaker, 1978
  * Driver by Jonathan Gevaryahu
 
- *  Notetaker Team At Xerox PARC 1976-1980:
+ *  Notetaker Team At Xerox PARC 1976-1981:
      Alan Kay - Team Lead
-     Bruce Horn - BIOS code and more
+     Bruce Horn - BIOS code and NoteTaker Hardware/Electronics Design (Ethernet, others)
      Ted Kaehler - SmallTalk-76 code porting[2] and more ( http://tedkaehler.weather-dimensions.com/us/ted/index.html )
-     Dan Ingalls - BitBlt engine and SmallTalk kernel and more[3]
-     Doug Fairbairn - NoteTaker Hardware/Electronics Design ( http://www.computerhistory.org/atchm/author/dfairbairn/ )
-     James Leung - NoteTaker Hardware/Electronics Design
-     Ron Freeman - NoteTaker Hardware/Electronics Design
+     Dan Ingalls - Later BitBlt engine and SmallTalk-76 kernel and more[3]
+     Doug Fairbairn - NoteTaker Hardware/Electronics Design (EmulatorP, IOP, ADC, Alto Debug/Test Interface)
+         ( http://www.computerhistory.org/atchm/author/dfairbairn/ )
+     Ed Wakida - NoteTaker Hardware/Electronics Design (Tablet/Touch interface)
+     Bob Nishimura - NoteTaker Hardware/Electronics Design (PSU/Cabling/Machining/Battery)
+     James "Jim" Leung - NoteTaker Hardware/Electronics Design (Alto Debug/Test Interface)
+     Ron Freeman - NoteTaker Hardware/Electronics Design (Keyboard, Disk/Display)
+     Ben Sato - NoteTaker Hardware/Electronics Design (Memory/Timing, ECC)
+     B. Wang - NoteTaker Hardware/Electronics Design (Keyboard)
+     Larry Tesler - NoteTaker Hardware/Electronics Design (Ethernet, others)
+     Dale Mann - NoteTaker Hardware/Electronics Design (Ethernet, Circuit Assembly)
+     Lawrence "Larry" D. Stewart - NoteTaker Hardware/Electronics Design (Mouse)
+     Jim Althoff - Smalltalk-78 and Smalltalk-80
+     Adele Goldberg - Smalltalk team
+     Diana Merry-Shapiro - Original BitBlt from Smalltalk-72
+     Dave Robson - Smalltalk team
+     Ted Strollo - IC/VLSI design (MPC580 cell library)
+     Bert Sutherland - Manager of Systems Science Laboratory (SSL)
+     Terri Doughty - Administration, Editing
+     Chris Jeffers - Smalltalk music
      <there are probably others I've missed>
 
  * History of the machine can be found at http://freudenbergs.de/bert/publications/Ingalls-2014-Smalltalk78.pdf
@@ -22,12 +38,17 @@
    * Memory Control Module \_ (bus control, buffering, refresh, Parity/ECC/Syndrome logic lives on these boards)
    * Memory Data Module    /
    * Memory Storage Module x2 (the 4116 DRAMs live on these boards)
-   * Battery Module *OR* debugger module type A or B (debugger module has an i8255 on it for alto<->notetaker comms, and allows alto to halt the cpus [type A and B can debug either the emulator cpu or the iocpu respectively] and dump registers to alto screen, etc)
+   * Battery Module *OR* debugger module type A or B (debugger module has an i8255 on it for alto<->notetaker comms,\
+     and allows alto to halt the cpus [type A and B can debug either the emulator cpu or the iocpu respectively]
+     and dump registers to alto screen, etc)
+
+   * In 1980-1981 an Ethernet card with another 8086 on it was developed, but unclear if this ever fully worked.
 
  * Prototypes only, 10 units[2] manufactured 1978-1980
    Known surviving units:
-   * One at CHM (missing? mouse, no media)
-   * One at Xerox Museum at PARC (with mouse and 2 floppies, floppies were not imaged to the best of my knowledge)
+   * One at CHM (missing? mouse, no media, has BIOP-2.0 roms)
+   * One at Xerox Museum at PARC (with mouse and 2? floppies, floppies were not imaged to the best of my knowledge, unknown roms)
+   * Rumor has it at least a few of the remaining units survived beyond these two.
 
  * The NoteTaker used the BitBlt graphical operation (from SmallTalk-76) to do most graphical functions, in order to fit the SmallTalk code and programs within 256K of RAM[2]. The actual BitBlt code lives in ROM[3].
 
@@ -48,14 +69,13 @@
 
 TODO: everything below.
 * Get smalltalk-78 loaded as a rom and forced into ram on startup, since no boot disks have survived (or if any survived, they are not dumped)
-
+* Hack together a functional boot disk using the recovered EP bootloader and smalltalk engine code from the alto disks.
 * Harris 6402 keyboard UART (within keyboard, next to MCU)
 * The harris 6402 UART is pin compatible with WD TR1865 UART, as well as the AY-3-1015A/D
    (These are 5v-only versions of the older WD TR1602 and AY-5-1013 parts which used 5v and 12v)
 * HLE for the missing i8748[5] MCU in the keyboard which reads the mouse quadratures and buttons and talks serially to the Keyboard UART
 * floppy controller wd1791 and its interrupt
   According to [3] and [5] the format is double density/MFM, 128 bytes per sector, 16 sectors per track, 1 or 2 sided, for 170K or 340K per disk. Drive spins at 300RPM.
-* According to the schematics, we're missing an 82s147 DISKSEP.PROM used as a data separator
 * hook up the DiskInt from the wd1791 either using m_fdc->intrq_r() polling or using device lines (latter is a much better idea)
 
 WIP:
@@ -63,7 +83,6 @@ WIP:
 * pic8259 interrupt controller - this is attached as a device, but only the vblank interrupt is hooked to it yet.
 * Harris 6402 serial/EIA UART - connected to iocpu, other end isn't connected anywhere, interrupt is not connected
 * Harris 6402 keyboard UART (within notetaker) - connected to iocpu, other end isn't connected anywhere, interrupt is not connected
-* we're missing a dump of the 82s126 SETMEMRQ PROM used to handle memory arbitration between the crtc and the rest of the system, but the equations are on the schematic and I'm planning to regenerate the prom contents from that, see ROM_LOAD section
 * The DAC, its FIFO and its timer are hooked up and the v2.0 bios beeps, but the stereo latches are not hooked up at all, DAC is treated as mono for now
 
 DONE:
@@ -73,6 +92,9 @@ DONE:
   - framebuffer, at least for bios 1.5, lives from 0x4000-0xd5ff, exactly 640x480 pixels 1bpp, interlaced (even? plane is at 4000-8aff, odd? plane is at 8b00-d5ff); however the starting address of the framebuffer is configurable to any address within the 0x0000-0x1ffff range? (this exact range is unclear)
 * figure out how the emulation-cpu boots and where its 8k of local ram maps to - done
   - both cpus boot, reset and system int controls are accessed at fffea from either cpu; emulatorcpu's 8k of ram lives at the beginning of its address space, but can be disabled in favor of mainram at the same addresses
+* 82s147 DISKSEP PROM regenerated from original BCPL code
+* SETMEMREQ PROM retyped from binary listing
+* TIMING PROM retyped from binary listing
 */
 
 #include "emu.h"
@@ -201,6 +223,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void notetakr(machine_config &config);
+	void notetaker_iocpu_io(address_map &map);
+	void notetaker_iocpu_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -233,7 +258,7 @@ TIMER_CALLBACK_MEMBER(notetaker_state::timer_fifoclk)
 	}
 	m_outfifo_tail_ptr&=0xF;
 	m_dac->write(data);
-	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL(960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 }
 
 uint32_t notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -294,8 +319,8 @@ READ16_MEMBER( notetaker_state::ReadOPStatus_r ) // 74ls368 hex inverter at #l7 
 	data |= (m_outfifo_count >= 1) ? 0 : 0x08; // m_FIFOOutRdy is true if the fifo has at least 1 word in it, false otherwise
 	data |= (m_outfifo_count < 16) ? 0 : 0x04; // m_FIFOInRdy is true if the fifo has less than 16 words in it, false otherwise
 	// note /SWE is permanently enabled, so we don't enable it here for HD6402 reading
-	data |= m_kbduart->get_output_pin(AY31015_DAV ) ? 0 : 0x02; // DR - pin 19
-	data |= m_kbduart->get_output_pin(AY31015_TBMT) ? 0 : 0x01; // TBRE - pin 22
+	data |= m_kbduart->dav_r( ) ? 0 : 0x02; // DR - pin 19
+	data |= m_kbduart->tbmt_r() ? 0 : 0x01; // TBRE - pin 22
 #ifdef DEBUG_READOPSTATUS
 	logerror("ReadOPStatus read, returning %04x\n", data);
 #endif
@@ -309,25 +334,25 @@ WRITE16_MEMBER( notetaker_state::LoadKeyData_w )
 
 WRITE16_MEMBER( notetaker_state::LoadKeyCtlReg_w )
 {
-	m_kbduart->set_input_pin(AY31015_CS, 0);
-	m_kbduart->set_input_pin(AY31015_NP,  BIT(data, 4)); // PI - pin 35
-	m_kbduart->set_input_pin(AY31015_TSB, BIT(data, 3)); // SBS - pin 36
-	m_kbduart->set_input_pin(AY31015_NB2, BIT(data, 2)); // CLS2 - pin 37
-	m_kbduart->set_input_pin(AY31015_NB1, BIT(data, 1)); // CLS1 - pin 38
-	m_kbduart->set_input_pin(AY31015_EPS, BIT(data, 0)); // EPE - pin 39
-	m_kbduart->set_input_pin(AY31015_CS, 1);
+	m_kbduart->write_cs(0);
+	m_kbduart->write_np(BIT(data, 4)); // PI - pin 35
+	m_kbduart->write_tsb(BIT(data, 3)); // SBS - pin 36
+	m_kbduart->write_nb2(BIT(data, 2)); // CLS2 - pin 37
+	m_kbduart->write_nb1(BIT(data, 1)); // CLS1 - pin 38
+	m_kbduart->write_eps(BIT(data, 0)); // EPE - pin 39
+	m_kbduart->write_cs(1);
 }
 
 WRITE16_MEMBER( notetaker_state::KeyDataReset_w )
 {
-	m_kbduart->set_input_pin(AY31015_RDAV, 0); // DDR - pin 18
-	m_kbduart->set_input_pin(AY31015_RDAV, 1); // ''
+	m_kbduart->write_rdav(0); // DDR - pin 18
+	m_kbduart->write_rdav(1); // ''
 }
 
 WRITE16_MEMBER( notetaker_state::KeyChipReset_w )
 {
-	m_kbduart->set_input_pin(AY31015_XR, 0); // MR - pin 21
-	m_kbduart->set_input_pin(AY31015_XR, 1); // ''
+	m_kbduart->write_xr(0); // MR - pin 21
+	m_kbduart->write_xr(1); // ''
 }
 
 /* FIFO (DAC) Stuff and ADC stuff */
@@ -341,8 +366,8 @@ WRITE16_MEMBER(notetaker_state::FIFOReg_w)
 	m_FrSel2 = (data&0x0400)?1:0;
 	m_TabletXOn = (data&0x0200)?1:0;
 	m_TabletYOn = (data&0x0100)?1:0;
-	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
-	logerror("Write to 0x60 FIFOReg_w of %04x; fifo timer set to %d hz\n", data, (((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL(960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	logerror("Write to 0x60 FIFOReg_w of %04x; fifo timer set to %d hz\n", data, (((XTAL(960'000)/10)/4).value()/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 }
 
 WRITE16_MEMBER(notetaker_state::FIFOBus_w)
@@ -432,8 +457,8 @@ READ16_MEMBER( notetaker_state::ReadEIAStatus_r ) // 74ls368 hex inverter at #f1
 {
 	uint16_t data = 0xFFFC;
 	// note /SWE is permanently enabled, so we don't enable it here for HD6402 reading
-	data |= m_eiauart->get_output_pin(AY31015_DAV ) ? 0 : 0x02; // DR - pin 19
-	data |= m_eiauart->get_output_pin(AY31015_TBMT) ? 0 : 0x01; // TBRE - pin 22
+	data |= m_eiauart->dav_r( ) ? 0 : 0x02; // DR - pin 19
+	data |= m_eiauart->tbmt_r() ? 0 : 0x01; // TBRE - pin 22
 	return data;
 }
 
@@ -444,25 +469,25 @@ WRITE16_MEMBER( notetaker_state::LoadEIAData_w )
 
 WRITE16_MEMBER( notetaker_state::LoadEIACtlReg_w )
 {
-	m_eiauart->set_input_pin(AY31015_CS, 0);
-	m_eiauart->set_input_pin(AY31015_NP,  BIT(data, 4)); // PI - pin 35
-	m_eiauart->set_input_pin(AY31015_TSB, BIT(data, 3)); // SBS - pin 36
-	m_eiauart->set_input_pin(AY31015_NB2, BIT(data, 2)); // CLS2 - pin 37
-	m_eiauart->set_input_pin(AY31015_NB1, BIT(data, 1)); // CLS1 - pin 38
-	m_eiauart->set_input_pin(AY31015_EPS, BIT(data, 0)); // EPE - pin 39
-	m_eiauart->set_input_pin(AY31015_CS, 1);
+	m_eiauart->write_cs(0);
+	m_eiauart->write_np(BIT(data, 4)); // PI - pin 35
+	m_eiauart->write_tsb(BIT(data, 3)); // SBS - pin 36
+	m_eiauart->write_nb2(BIT(data, 2)); // CLS2 - pin 37
+	m_eiauart->write_nb1(BIT(data, 1)); // CLS1 - pin 38
+	m_eiauart->write_eps(BIT(data, 0)); // EPE - pin 39
+	m_eiauart->write_cs(1);
 }
 
 WRITE16_MEMBER( notetaker_state::EIADataReset_w )
 {
-	m_eiauart->set_input_pin(AY31015_RDAV, 0); // DDR - pin 18
-	m_eiauart->set_input_pin(AY31015_RDAV, 1); // ''
+	m_eiauart->write_rdav(0); // DDR - pin 18
+	m_eiauart->write_rdav(1); // ''
 }
 
 WRITE16_MEMBER( notetaker_state::EIAChipReset_w )
 {
-	m_eiauart->set_input_pin(AY31015_XR, 0); // MR - pin 21
-	m_eiauart->set_input_pin(AY31015_XR, 1); // ''
+	m_eiauart->write_xr(0); // MR - pin 21
+	m_eiauart->write_xr(1); // ''
 }
 
 
@@ -522,23 +547,9 @@ More or less:
 BootSeqDone is 0, DisableROM is ignored, mem map is 0x00000-0xfffff reading is the 0x1000-long ROM, repeated every 0x1000 bytes. writing goes nowhere.
 BootSeqDone is 1, DisableROM is 0,       mem map is 0x00000-0x00fff reading is the 0x1000-long ROM, remainder of memory map goes to RAM or open bus. writing the ROM area goes nowhere, writing RAM goes to RAM.
 BootSeqDone is 1, DisableROM is 1,       mem map is entirely RAM or open bus for both reading and writing.
-
-
-Emulator cpu mem map:
-a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0   4KPage0'
-x   x   0   0    0   0   0   0    *   *   *   *    *   *   *   *    *   *   *   *    0                       RW  Local (fast) RAM
-x   x   0   0    0   0   0   0    *   *   *   *    *   *   *   *    *   *   *   *    1                       RW  System/Shared RAM
-x   x   *   *    *   *   *   *    *   *   *   *    *   *   *   *    *   *   *   *    x                       RW  System/Shared RAM
-   EXCEPT for the following, decoded by the EP board and superseding above:
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   0   x    x   x   x   x    x                       RW  FFFC0-FFFDF (trigger ILLINST interrupt on EP, data ignored?)
-   And the following, decoded by the memory address logic board:
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   0   x    x                       .   Open Bus
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   1   x    x                       W   FFFEA (Multiprocessor Control (reset(bit 6)/int(bit 5)/boot(bit 4) for each processor; data bits 3,2,1,0 are 'processor address'; 0010 means IP, 0111 means EP; all others ignored.))
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   0   x    x                       R   FFFEC (Syndrome bits (gnd bit 15, parity bit 14, exp(syndrome) bits 13-8, bits 7-0 are the highest address bits)
-1   1   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   x    x                       R   FFFEE (Parity Error Address: row bits 15-8, column bits 7-0; reading this also acknowledges a parity interrupt)
 */
 
-static ADDRESS_MAP_START(notetaker_iocpu_mem, AS_PROGRAM, 16, notetaker_state)
+ADDRESS_MAP_START(notetaker_state::notetaker_iocpu_mem)
 	/*
 	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("iocpu", 0xff000) // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code and the schematics implies writes here are ignored while rom is enabled; if disablerom is 1 this goes to mainram
 	AM_RANGE(0x01000, 0x3ffff) AM_RAM AM_REGION("mainram", 0) // 256k of ram (less 4k), shared between both processors. rom goes here if bootseqdone is 0
@@ -586,7 +597,7 @@ x   x   x   x    0   x   x   x    x   x   x   1    1   0   1   x    1   1   1   
 x   x   x   x    0   x   x   x    x   x   x   1    1   1   0   x    x   x   x   .       R   SelADCHi
 x   x   x   x    0   x   x   x    x   x   x   1    1   1   1   x    x   x   x   .       W   CRTSwitch
 */
-static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
+ADDRESS_MAP_START(notetaker_state::notetaker_iocpu_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7E1C) AM_DEVREADWRITE8("iopic8259", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x20, 0x21) AM_MIRROR(0x7E1E) AM_WRITE(IPConReg_w) // I/O processor (rom mapping, etc) control register
@@ -663,13 +674,47 @@ read from 0x44 (byte wide) to check input fifo status
 
 */
 
+
+
 /* Emulator CPU */
+
+/* WRITE16_MEMBER(notetaker_state::EPConReg_w)
+{
+    m_EP_LED1 = m_EP_ParityError; // if parity checking is enabled AND the last access was to the low 4k AND there was a parity error, the parity error latch is latched here. It triggers an interrupt.
+    m_EP_LED2 = (data&0x40)?1:0;
+    m_EP_LED3 = (data&0x20)?1:0;
+    m_EP_LED4 = (data&0x10)?1:0;
+    m_EP_SelROM_q = (data&0x08)?1:0; // this doesn't appear to be hooked anywhere, and may just drive an LED
+    // originally, SelROM_q enabled two 2716 EPROMS, later 82s137 PROMS to map code to the FFC00-FFFFF area but this was dropped in the 1979 design revision
+    m_EP_ProcLock = (data&0x04)?1:0; // bus lock for this processor (hold other processor in wait state)
+    m_EP_SetParity_q = (data&0x02)?1:0; // enable parity checking on local ram if low
+    m_EP_DisLMem_q = (data&0x01)?1:0; // if low, the low 4k of local memory is disabled and accesses the shared memory instead.
+    popmessage("EP LEDS: CR1: %d, CR2: %d, CR3: %d, CR4: %d", (data&0x80)>>2, (data&0x40)>>3, (data&0x20)>>1, (data&0x10));
+}
+*/
+
+/*
+Emulator cpu mem map:
+(The top two address bits are disconnected, to allow the ram board, which maps itself only at 00000-3ffff, to appear at "ffff0" to the processor when /reset is de-asserted by the iocpu)
+a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0   DisLMem_q
+x   x   0   0    0   0   0   *    *   *   *   *    *   *   *   *    *   *   *   *    0                       RW  Local (fast) RAM
+x   x   0   0    0   0   0   *    *   *   *   *    *   *   *   *    *   *   *   *    1                       RW  System/Shared RAM
+<anything not all zeroes >   *    *   *   *   *    *   *   *   *    *   *   *   *    x                       RW  System/Shared RAM
+   EXCEPT for the following, decoded by the EP board and superseding above:
+x   x   1   1    1   1   1   1    1   1   1   1    1   1   0   x    x   x   x   x    x                       RW  FFFC0-FFFDF (trigger ILLINST interrupt on EP, data ignored?)
+   And the following, decoded by the memory address logic board:
+x   x   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   0   x    x                       .   Open Bus
+x   x   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   0   1   x    x                       W   FFFEA (Multiprocessor Control (reset(bit 6)/int(bit 5)/boot(bit 4) for each processor; data bits 3,2,1,0 are 'processor address'; 0010 means IP, 0111 means EP; all others ignored.))
+x   x   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   0   x    x                       R   FFFEC (Syndrome bits (gnd bit 15, parity bit 14, exp(syndrome) bits 13-8, bits 7-0 are the highest address bits)
+x   x   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   x    x                       R   FFFEE (Parity Error Address: row bits 15-8, column bits 7-0; reading this also acknowledges a parity interrupt)
+*/
+
 /*
 static ADDRESS_MAP_START(notetaker_emulatorcpu_mem, AS_PROGRAM, 16, notetaker_state)
     AM_RANGE(0x00000, 0x01fff) AM_MIRROR(0xC0000) AM_RAM // actually a banked block of ram, 8k (4k words)
     AM_RANGE(0x02000, 0x3ffff) AM_MIRROR(0xC0000) AM_RAM AM_BASE("mainram") // 256k of ram (less 8k), shared between both processors, mirrored 4 times
-    AM_RANGE(0xFFFC0, 0xFFFDF) AM_READWRITE(proc_illinst_r, proc_illinst_w)
-    AM_RANGE(0xFFFE0, 0xFFFEF) AM_READWRITE(proc_control_r, proc_control_w)
+    AM_RANGE(0xFFFC0, 0xFFFDF) AM_MIRROR(0xC0000) AM_READWRITE(proc_illinst_r, proc_illinst_w)
+    AM_RANGE(0xFFFE0, 0xFFFEF) AM_MIRROR(0xC0000) AM_READWRITE(proc_control_r, proc_control_w)
 ADDRESS_MAP_END
 */
 
@@ -677,6 +722,14 @@ ADDRESS_MAP_END
    0x1800 is accessed it will write to both the debug 8255 AND the pic8259!
    I'm not sure the code abuses this or not, but it might do so to both write
    registers and clear parity at once, or something similar. */
+/*
+Emulator cpu i/o map:
+a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0   4KPage0'
+x   x   x   x    x   x   x   x    1   x   x   x    x   x   x   x    x   x   *   x    x                       RW  8259
+x   x   x   x    x   x   x   1    x   x   x   x    x   x   x   x    x   *   *   x    x                       RW  EP debugger 8255, same exact interface on both cpu and alto side as the IOP debugger 8255
+x   x   x   x    x   x   1   x    x   x   x   x    x   x   x   x    x   x   x   x    x                       W   EPConReg
+x   x   x   x    x   1   x   x    x   x   x   x    x   x   x   x    x   x   x   x    x                       W   Writing anything here clears the parity error latch
+*/
 
 /*
 static ADDRESS_MAP_START(notetaker_emulatorcpu_io, AS_IO, 16, notetaker_state)
@@ -704,9 +757,9 @@ void notetaker_state::machine_start()
 	// FDC: /DDEN is tied permanently LOW so MFM mode is ALWAYS ON
 	m_fdc->dden_w(0);
 	// Keyboard UART: /SWE is tied permanently LOW
-	m_kbduart->set_input_pin(AY31015_SWE, 0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
+	m_kbduart->write_swe(0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
 	// EIA UART: /SWE is tied permanently LOW
-	m_eiauart->set_input_pin(AY31015_SWE, 0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
+	m_eiauart->write_swe(0); // status word outputs are permanently enabled (pin 16 SFD(SWE) tied low, active)
 	// savestate stuff
 	// TODO: add me!
 }
@@ -722,11 +775,11 @@ void notetaker_state::machine_reset()
 void notetaker_state::ip_reset()
 {
 	// reset the Keyboard UART
-	m_kbduart->set_input_pin(AY31015_XR, 0); // MR - pin 21
-	m_kbduart->set_input_pin(AY31015_XR, 1); // ''
+	m_kbduart->write_xr(0); // MR - pin 21
+	m_kbduart->write_xr(1); // ''
 	// reset the EIA UART
-	m_eiauart->set_input_pin(AY31015_XR, 0); // MR - pin 21
-	m_eiauart->set_input_pin(AY31015_XR, 1); // ''
+	m_eiauart->write_xr(0); // MR - pin 21
+	m_eiauart->write_xr(1); // ''
 	// reset the IPConReg latch at #f1
 	m_BootSeqDone = 0;
 	m_ProcLock = 0;
@@ -749,7 +802,7 @@ void notetaker_state::ip_reset()
 	m_SHConA = 0;
 	m_SetSH = 0;
 	// handle consequences of above
-	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // See below
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL(960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // See below
 	/* FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter),
 	   divided by 4 (mc14568B with divider 1 pins set to 4), divided by
 	   1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?) */
@@ -793,10 +846,10 @@ void notetaker_state::ep_reset()
 static INPUT_PORTS_START( notetakr )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( notetakr )
+MACHINE_CONFIG_START(notetaker_state::notetakr)
 	/* basic machine hardware */
 	/* IO CPU: 8086@8MHz */
-	MCFG_CPU_ADD("iocpu", I8086, XTAL_24MHz/3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
+	MCFG_CPU_ADD("iocpu", I8086, XTAL(24'000'000)/3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
 	MCFG_CPU_PROGRAM_MAP(notetaker_iocpu_mem)
 	MCFG_CPU_IO_MAP(notetaker_iocpu_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("iopic8259", pic8259_device, inta_cb)
@@ -805,7 +858,7 @@ static MACHINE_CONFIG_START( notetakr )
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("iocpu", 0))
 
 	/* Emulator CPU: 8086@5MHz */
-	/*MCFG_CPU_ADD("emulatorcpu", I8086, XTAL_15MHz/3)
+	/*MCFG_CPU_ADD("emulatorcpu", I8086, XTAL(15'000'000)/3)
 	MCFG_CPU_PROGRAM_MAP(notetaker_emulatorcpu_mem)
 	MCFG_CPU_IO_MAP(notetaker_emulatorcpu_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("emulatorpic8259", pic8259_device, inta_cb)
@@ -826,7 +879,7 @@ static MACHINE_CONFIG_START( notetakr )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL_36MHz/4)/8) // See below
+	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL(36'000'000)/4)/8) // See below
 	/* the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*,
 	   2, 3, 4, 5, 6, 7, or 8 (* because this is a 74s163 this setting probably
 	   means divide by 1; documentation at
@@ -842,15 +895,15 @@ static MACHINE_CONFIG_START( notetakr )
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 ) // HD6402, == AY-3-1015D
-	MCFG_AY31015_RX_CLOCK(XTAL_960kHz) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK(XTAL_960kHz) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	MCFG_AY31015_RX_CLOCK(XTAL(960'000)) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	MCFG_AY31015_TX_CLOCK(XTAL(960'000)) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
 
 	MCFG_DEVICE_ADD( "eiauart", AY31015, 0 ) // HD6402, == AY-3-1015D
-	MCFG_AY31015_RX_CLOCK(((XTAL_960kHz/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK(((XTAL_960kHz/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	MCFG_AY31015_RX_CLOCK(((XTAL(960'000)/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	MCFG_AY31015_TX_CLOCK(((XTAL(960'000)/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
 
 	/* Floppy */
-	MCFG_FD1791_ADD("wd1791", (((XTAL_24MHz/3)/2)/2)) // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
+	MCFG_FD1791_ADD("wd1791", (((XTAL(24'000'000)/3)/2)/2)) // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", notetaker_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	/* sound hardware */
@@ -872,50 +925,71 @@ DRIVER_INIT_MEMBER(notetaker_state,notetakr)
 	uint16_t *temppointer;
 	uint16_t wordtemp;
 	uint16_t addrtemp;
-		// leave the src pointer alone, since we've only used a 0x1000 long address space
-		romdst += 0x7f800; // set the dest pointer to 0xff000 (>>1 because 16 bits data)
-		for (int i = 0; i < 0x800; i++)
-		{
-			wordtemp = BITSWAP16(*romsrc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); // data bus is completely reversed
-			addrtemp = BITSWAP16(i, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10); // address bus is completely reversed; 11-15 should always be zero
-			temppointer = romdst+(addrtemp&0x7FF);
-			*temppointer = wordtemp;
-			romsrc++;
-		}
+	// leave the src pointer alone, since we've only used a 0x1000 long address space
+	romdst += 0x7f800; // set the dest pointer to 0xff000 (>>1 because 16 bits data)
+	for (int i = 0; i < 0x800; i++)
+	{
+		wordtemp = bitswap<16>(*romsrc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); // data bus is completely reversed
+		addrtemp = bitswap<11>(i, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10); // address bus is completely reversed; 11-15 should always be zero
+		temppointer = romdst+(addrtemp&0x7FF);
+		*temppointer = wordtemp;
+		romsrc++;
+	}
 }
 
 /* ROM definition */
+/*
+The notetaker, over its lifetime from 1978 to 1981, had three different classes of IOP roms, with multiple versions of each one.
+These were:
+BIOP - "Bootable", standalone "user" unit, running smalltalk-78 off of a boot disk, either single or double density; early notetakers used an fd1791 while later ones used a wd1791.
+XIOP - "eXercizer" intended for initial testing of each NoteTaker system as assembled; only usable running tethered to a Xerox Alto running notex (notex.cm) as a hardware scripting language for system testing
+MIOP - only bootable tethered to a Xerox Alto via a debug card, running smalltalk on the NoteTaker, but not booted off of the floppy disk.
+The 'Z-iop' firmware 1.5 below seems to be a BIOP firmware.
+*/
+
 ROM_START( notetakr )
 	ROM_REGION( 0x1000, "iocpuload", ROMREGION_ERASEFF ) // load roms here before descrambling
-	ROM_SYSTEM_BIOS( 0, "v2.00", "IO Monitor v2.00" ) // dumped from Notetaker
+	ROM_SYSTEM_BIOS( 0, "v2.00", "Bootable IO Monitor v2.00" ) // dumped from Notetaker
 	ROMX_LOAD( "biop__2.00_hi.b2716.h1", 0x0000, 0x0800, CRC(1119691d) SHA1(4c20b595b554e6f5489ab2c3fb364b4a052f05e3), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "biop__2.00_lo.b2716.g1", 0x0001, 0x0800, CRC(b72aa4c7) SHA1(85dab2399f906c7695dc92e7c18f32e2303c5892), ROM_SKIP(1) | ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "v1.50", "IO Monitor v1.50" ) // typed from the source listing at http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf and scrambled
+	ROM_SYSTEM_BIOS( 1, "v1.50", "Bootable IO Monitor v1.50" ) // typed from the source listing at http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf and scrambled
 	ROMX_LOAD( "z-iop_1.50_hi.h1", 0x0000, 0x0800, CRC(122ffb5b) SHA1(b957fe24620e1aa98b3158dbcf459937dbd54bac), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD( "z-iop_1.50_lo.g1", 0x0001, 0x0800, CRC(2cb79a67) SHA1(692aafd2aeea27533f6288dbb1cb8678ea08fade), ROM_SKIP(1) | ROM_BIOS(2))
 	ROM_REGION( 0x100000, "iocpu", ROMREGION_ERASEFF ) // area for descrambled roms
 	ROM_REGION( 0x100000, "mainram", ROMREGION_ERASEFF ) // main ram, on 2 cards with parity/ecc/syndrome/timing/bus arbitration on another 2 cards
-	ROM_REGION( 0x1000, "proms", ROMREGION_ERASEFF )
-	ROM_LOAD( "disksep.prom.82s147.a4", 0x000, 0x200, NO_DUMP ) // disk data separator prom from the disk/display module board
-	ROM_LOAD( "memcasraswrite.prom.82s147.b1", 0x200, 0x200, NO_DUMP ) // memory cas/ras/write state machine prom from the memory address logic board; the equations for this are listed in one of the documents on bitsavers
-	ROM_LOAD( "setmemrq.prom.82s126.d9", 0x400, 0x100, NO_DUMP ) // SETMEMRQ memory timing prom from the disk/display module board; The equations for this one are actually listed on the schematic and the prom dump can be generated from these:
+	ROM_REGION( 0x400, "kbmcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "keyboard.i8748.a10a", 0x000, 0x400, NO_DUMP ) // keyboard mcu which handles key scanning as well as reading the mouse quadratures, and issues state responses if requested by the iocpu
+	ROM_REGION( 0x500, "proms", ROMREGION_ERASEFF )
+	/* disk data separator prom from the disk/display module board:
+	   there are two different versions of this prom, both generated by BCPL programs,
+	   one from mid 1978 (Single density only? seems very buggy and might not even work)
+	   and one from 1979 (which should work and appears here).
+	   Note that the bit order for the state counter (data bits 6,5,4,3) may be
+	   reversed vs the real machine, but since the prom address bus is the only
+	   thing that ever sees the prom data bus, this prom will work even if the
+	   bit order for those bits is backwards.
+	*/
+	ROM_LOAD( "disksep.82s147.a4", 0x000, 0x200, CRC(38363714) SHA1(c995d2702573f5afb5fc919150d3a5661013f999) ) // 1979 version
+	ROM_LOAD( "timingprom.82s147.b1", 0x200, 0x200, CRC(3003b50a) SHA1(77d9ffe4716c2297708b8e5ebce7f930619c3cc3) ) // memory cas/ras/write state machine prom from the memory address logic board; the contents of this are listed in http://www.bitsavers.org/pdf/xerox/notetaker/schematics/19781027_Memory_Address_Timing.pdf
+	ROM_LOAD( "memreqprom.82s126.d9", 0x400, 0x100, CRC(56b2be8b) SHA1(5df0579ed8afeb59113700be6f2982ef85f64b44) ) // SETMEMRQ memory timing prom from the disk/display module board; The equations for this one are actually listed on the schematic and the prom dump can be generated from these:
 	/*
 	SetMemRq:
 	Address:
-	01234567
-	|||||||\- RCtr.3 (LSB)
-	||||||\-- RCtr.2
-	|||||\--- RCtr.1
-	||||\---- RCtr.0 (MSB)
-	|||\----- WCtr.3 (LSB)
-	||\------ WCtr.2
-	|\------- WCtr.1
-	\-------- WCtr.0 (MSB)
+	76543210
+	|||||||\- WCtr.0 (MSB)
+	||||||\-- WCtr.1
+	|||||\--- WCtr.2
+	||||\---- WCtr.3 (LSB)
+	|||\----- RCtr.0 (MSB)
+	||\------ RCtr.1
+	|\------- RCtr.2
+	\-------- RCtr.3 (LSB)
 
+	The schematic has an error here, showing the SetMemRq_q output coming from data bit 0, in reality based on the listing it comes from data bit 3
 	Data:
-	0123
-	|\\\- N/C (zero?)
-	\---- SetMemRq
+	3210
+	|\\\- N/C (always zero)
+	\---- SetMemRq_q
 
 	Equation: SETMEMRQ == (
 	  ((Rctr == 0) && ((Wctr == 0)||(Wctr == 4)||(Wctr == 8)))
@@ -923,7 +997,7 @@ ROM_START( notetakr )
 	||((Rctr == 8) && ((Wctr == 8)||(Wctr == 12)||(Wctr == 0)))
 	||((Rctr == 12) && ((Wctr == 12)||(Wctr == 0)||(Wctr == 4)))
 	)
-	(the setmemrq output might be inverted, as well)
+	The PROM output is SetMemRq_q and is inverted compared to the equation above.
 	*/
 ROM_END
 

@@ -15,7 +15,7 @@
 
 
 #define MCFG_MIDIIN_INPUT_CB(_devcb) \
-	devcb = &midiin_device::set_input_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<midiin_device &>(*device).set_input_callback(DEVCB_##_devcb);
 
 
 /***************************************************************************
@@ -30,7 +30,7 @@ public:
 	// construction/destruction
 	midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_input_callback(device_t &device, _Object object) { return downcast<midiin_device &>(device).m_input_cb.set_callback(object); }
+	template<class _Object> devcb_base &set_input_callback(_Object object) { return m_input_cb.set_callback(object); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;

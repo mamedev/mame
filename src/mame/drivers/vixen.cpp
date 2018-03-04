@@ -79,14 +79,14 @@ void vixen_state::update_interrupt()
 
 READ8_MEMBER( vixen_state::opram_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		membank("bank3")->set_entry(0); // read videoram
 	return m_program->read_byte(offset);
 }
 
 READ8_MEMBER( vixen_state::oprom_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		membank("bank3")->set_entry(1); // read rom
 	return m_rom[offset];
 }
@@ -260,14 +260,14 @@ READ8_MEMBER( vixen_state::port3_r )
 //-------------------------------------------------
 
 // when M1 is inactive: read and write of data
-static ADDRESS_MAP_START( vixen_mem, AS_PROGRAM, 8, vixen_state )
+ADDRESS_MAP_START(vixen_state::vixen_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4") AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 // when M1 is active: read opcodes
-static ADDRESS_MAP_START( bios_mem, AS_OPCODES, 8, vixen_state )
+ADDRESS_MAP_START(vixen_state::bios_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_READ(opram_r)
 	AM_RANGE(0xf000, 0xffff) AM_READ(oprom_r)
@@ -278,7 +278,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vixen_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vixen_io, AS_IO, 8, vixen_state )
+ADDRESS_MAP_START(vixen_state::vixen_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(FDC1797_TAG, fd1797_device, read, write)
@@ -485,7 +485,7 @@ uint32_t vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 static DISCRETE_SOUND_START( vixen )
 	DISCRETE_INPUT_LOGIC(NODE_01)
-	DISCRETE_SQUAREWAVE(NODE_02, NODE_01, XTAL_23_9616MHz/15360, 100, 50, 0, 90)
+	DISCRETE_SQUAREWAVE(NODE_02, NODE_01, (XTAL(23'961'600)/15360).dvalue(), 100, 50, 0, 90)
 	DISCRETE_OUTPUT(NODE_02, 2000)
 DISCRETE_SOUND_END
 
@@ -737,18 +737,18 @@ void vixen_state::machine_reset()
 //  MACHINE_CONFIG( vixen )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vixen )
+MACHINE_CONFIG_START(vixen_state::vixen)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL_23_9616MHz/6)
+	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL(23'961'600)/6)
 	MCFG_CPU_PROGRAM_MAP(vixen_mem)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(bios_mem)
+	MCFG_CPU_OPCODES_MAP(bios_mem)
 	MCFG_CPU_IO_MAP(vixen_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vixen_state,vixen_int_ack)
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DRIVER(vixen_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_23_9616MHz/2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(23'961'600)/2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vsync", vixen_state, vsync_tick, SCREEN_TAG, 26*10, 27*10)
 
@@ -761,12 +761,12 @@ static MACHINE_CONFIG_START( vixen )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	// devices
-	MCFG_DEVICE_ADD(P8155H_TAG, I8155, XTAL_23_9616MHz/6)
+	MCFG_DEVICE_ADD(P8155H_TAG, I8155, XTAL(23'961'600)/6)
 	MCFG_I8155_IN_PORTA_CB(READ8(vixen_state, i8155_pa_r))
 	MCFG_I8155_OUT_PORTB_CB(WRITE8(vixen_state, i8155_pb_w))
 	MCFG_I8155_OUT_PORTC_CB(WRITE8(vixen_state, i8155_pc_w))
 
-	MCFG_DEVICE_ADD(P8155H_IO_TAG, I8155, XTAL_23_9616MHz/6)
+	MCFG_DEVICE_ADD(P8155H_IO_TAG, I8155, XTAL(23'961'600)/6)
 	MCFG_I8155_OUT_PORTA_CB(DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
 	MCFG_I8155_OUT_PORTB_CB(WRITE8(vixen_state, io_i8155_pb_w))
 	MCFG_I8155_OUT_PORTC_CB(WRITE8(vixen_state, io_i8155_pc_w))
@@ -783,7 +783,7 @@ static MACHINE_CONFIG_START( vixen )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_dsr))
 
-	MCFG_FD1797_ADD(FDC1797_TAG, XTAL_23_9616MHz/24)
+	MCFG_FD1797_ADD(FDC1797_TAG, XTAL(23'961'600)/24)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(vixen_state, fdc_intrq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":0", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

@@ -281,6 +281,24 @@ public:
 
 	uint32_t screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void fm16beta(machine_config &config);
+	void fm8(machine_config &config);
+	void fm7(machine_config &config);
+	void fm77av(machine_config &config);
+	void fm11(machine_config &config);
+	void fm11_mem(address_map &map);
+	void fm11_sub_mem(address_map &map);
+	void fm11_x86_io(address_map &map);
+	void fm11_x86_mem(address_map &map);
+	void fm16_io(address_map &map);
+	void fm16_mem(address_map &map);
+	void fm16_sub_mem(address_map &map);
+	void fm77av_mem(address_map &map);
+	void fm77av_sub_mem(address_map &map);
+	void fm7_banked_mem(address_map &map);
+	void fm7_mem(address_map &map);
+	void fm7_sub_mem(address_map &map);
+	void fm8_mem(address_map &map);
 protected:
 	optional_shared_ptr<uint8_t> m_shared_ram;
 	optional_shared_ptr<uint8_t> m_boot_ram;

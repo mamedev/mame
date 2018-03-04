@@ -119,4 +119,8 @@ public:
 	void tilemap_copy_to_compose(uint16_t pri);
 	void do_final_mix(bitmap_rgb32 &bitmap);
 	void descramble();
+	void deroon(machine_config &config);
+	void io_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

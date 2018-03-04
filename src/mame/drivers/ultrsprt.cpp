@@ -52,6 +52,9 @@ public:
 
 	uint32_t screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ultrsprt(machine_config &config);
+	void sound_map(address_map &map);
+	void ultrsprt_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -145,7 +148,7 @@ READ16_MEMBER(ultrsprt_state::upd2_r)
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( ultrsprt_map, AS_PROGRAM, 32, ultrsprt_state )
+ADDRESS_MAP_START(ultrsprt_state::ultrsprt_map)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAMBANK("vram")
 	AM_RANGE(0x70000000, 0x70000003) AM_READWRITE8(eeprom_r, eeprom_w, 0xff000000)
 	AM_RANGE(0x70000020, 0x70000023) AM_READ16(upd1_r, 0xffffffff)
@@ -154,14 +157,14 @@ static ADDRESS_MAP_START( ultrsprt_map, AS_PROGRAM, 32, ultrsprt_state )
 	AM_RANGE(0x700000c0, 0x700000cf) AM_WRITENOP // Written following DMA interrupt - unused int ack?
 	AM_RANGE(0x700000e0, 0x700000e3) AM_WRITE(int_ack_w)
 	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_DEVWRITE("palette",  palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_DEVWRITE("palette",  palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x00600000) AM_ROM AM_REGION("program", 0)
 ADDRESS_MAP_END
 
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, ultrsprt_state )
+ADDRESS_MAP_START(ultrsprt_state::sound_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 	AM_RANGE(0x00100000, 0x00101fff) AM_RAM
 	AM_RANGE(0x00200000, 0x0020000f) AM_DEVREADWRITE8("k056800", k056800_device, sound_r, sound_w, 0xffff)
@@ -229,7 +232,7 @@ void ultrsprt_state::machine_reset()
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( ultrsprt )
+MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 25000000)
 	MCFG_CPU_PROGRAM_MAP(ultrsprt_map)
@@ -260,12 +263,12 @@ static MACHINE_CONFIG_START( ultrsprt )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_K056800_ADD("k056800", XTAL_18_432MHz)
+	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_6))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_5))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

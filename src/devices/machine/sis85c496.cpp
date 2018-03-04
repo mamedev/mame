@@ -19,18 +19,18 @@
 
 DEFINE_DEVICE_TYPE(SIS85C496, sis85c496_host_device, "sis85c496", "SiS 85C496/497 chipset")
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, sis85c496_host_device)
+ADDRESS_MAP_START(sis85c496_host_device::config_map)
+	AM_IMPORT_FROM(pci_host_device::config_map)
 	AM_RANGE(0x40, 0x43) AM_READWRITE8(dram_config_r, dram_config_w, 0x000000ff)
 	AM_RANGE(0x44, 0x47) AM_READWRITE16(shadow_config_r, shadow_config_w, 0x0000ffff)
 	AM_RANGE(0x58, 0x5b) AM_READWRITE8(smram_ctrl_r, smram_ctrl_w, 0x00ff0000)
 	AM_RANGE(0xc8, 0xcb) AM_READWRITE(mailbox_r, mailbox_w)
 	AM_RANGE(0xd0, 0xd3) AM_READWRITE8(bios_config_r, bios_config_w, 0x000000ff)
 	AM_RANGE(0xd0, 0xd3) AM_READWRITE8(isa_decoder_r, isa_decoder_w, 0x0000ff00)
-
-	AM_INHERIT_FROM(pci_host_device::config_map)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(internal_io_map, 32, sis85c496_host_device)
+ADDRESS_MAP_START(sis85c496_host_device::internal_io_map)
+	AM_IMPORT_FROM(pci_host_device::io_configuration_access_map)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254",   pit8254_device, read, write, 0xffffffff)
@@ -41,11 +41,9 @@ DEVICE_ADDRESS_MAP_START(internal_io_map, 32, sis85c496_host_device)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff);
 	AM_RANGE(0x00e0, 0x00ef) AM_NOP
-
-	AM_INHERIT_FROM(pci_host_device::io_configuration_access_map)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(sis85c496_host_device::device_add_mconfig)
+MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(sis85c496_host_device, at_pit8254_out0_changed))
@@ -54,7 +52,7 @@ MACHINE_CONFIG_MEMBER(sis85c496_host_device::device_add_mconfig)
 	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(sis85c496_host_device, at_pit8254_out2_changed))
 
-	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL(14'318'181)/3 )
 	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq0_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(sis85c496_host_device, at_dma8237_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(sis85c496_host_device, pc_dma_read_byte))
@@ -72,7 +70,7 @@ MACHINE_CONFIG_MEMBER(sis85c496_host_device::device_add_mconfig)
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(sis85c496_host_device, pc_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(sis85c496_host_device, pc_dack3_w))
 
-	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL(14'318'181)/3 )
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(sis85c496_host_device, pc_dma_hrq_changed))
 	MCFG_I8237_IN_MEMR_CB(READ8(sis85c496_host_device, pc_dma_read_word))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(sis85c496_host_device, pc_dma_write_word))
@@ -96,7 +94,7 @@ MACHINE_CONFIG_MEMBER(sis85c496_host_device::device_add_mconfig)
 	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir2_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL_12MHz)
+	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
 	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
 	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
 	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir1_w))

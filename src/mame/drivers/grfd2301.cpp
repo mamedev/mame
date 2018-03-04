@@ -47,6 +47,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void grfd2301(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -54,13 +57,13 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START( grfd2301_mem, AS_PROGRAM, 8, grfd2301_state )
+ADDRESS_MAP_START(grfd2301_state::mem_map)
 	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( grfd2301_io, AS_IO, 8, grfd2301_state )
+ADDRESS_MAP_START(grfd2301_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -108,11 +111,11 @@ uint32_t grfd2301_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static MACHINE_CONFIG_START( grfd2301 )
+MACHINE_CONFIG_START(grfd2301_state::grfd2301)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(grfd2301_mem)
-	MCFG_CPU_IO_MAP(grfd2301_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

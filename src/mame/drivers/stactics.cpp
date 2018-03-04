@@ -178,7 +178,7 @@ INTERRUPT_GEN_MEMBER(stactics_state::interrupt)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, stactics_state )
+ADDRESS_MAP_START(stactics_state::main_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x40ff) AM_MIRROR(0x0700) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_READ_PORT("IN0")
@@ -308,7 +308,7 @@ void stactics_state::machine_start()
  *
  *************************************/
 
-static MACHINE_CONFIG_START( stactics )
+MACHINE_CONFIG_START(stactics_state::stactics)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 1933560)
@@ -332,16 +332,16 @@ static MACHINE_CONFIG_START( stactics )
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // SOUND ON
 
 	MCFG_DEVICE_ADD("lamplatch", LS259, 0) // 96
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(stactics_state, base_5_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(stactics_state, base_4_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(stactics_state, base_3_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(stactics_state, base_2_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(stactics_state, base_1_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(stactics_state, base_lamp_w<4>))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(stactics_state, base_lamp_w<3>))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(stactics_state, base_lamp_w<2>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(stactics_state, base_lamp_w<1>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(stactics_state, base_lamp_w<0>))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(stactics_state, start_lamp_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(stactics_state, barrier_lamp_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(stactics_video)
+	stactics_video(config);
 
 	/* audio hardware */
 MACHINE_CONFIG_END

@@ -28,6 +28,9 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void ace_sp(machine_config &config);
+	void ace_sp_map(address_map &map);
+	void ace_sp_portmap(address_map &map);
 protected:
 
 	// devices
@@ -41,7 +44,7 @@ public:
 
 
 
-static ADDRESS_MAP_START( ace_sp_map, AS_PROGRAM, 8, ace_sp_state )
+ADDRESS_MAP_START(ace_sp_state::ace_sp_map)
 	/**** 6303Y internal area ****/
 	//----- 0x0000 - 0x0027 is internal registers -----
 	AM_RANGE(0x0000, 0x0027) AM_RAM
@@ -69,7 +72,7 @@ static ADDRESS_MAP_START( ace_sp_map, AS_PROGRAM, 8, ace_sp_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ace_sp_portmap, AS_IO, 8, ace_sp_state )
+ADDRESS_MAP_START(ace_sp_state::ace_sp_portmap)
 	//AM_RANGE(0x02, 0x02) // misc
 	//AM_RANGE(0x05, 0x06) // AYs
 ADDRESS_MAP_END
@@ -79,7 +82,7 @@ static INPUT_PORTS_START( ace_sp )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ace_sp )
+MACHINE_CONFIG_START(ace_sp_state::ace_sp)
 	MCFG_CPU_ADD("maincpu", HD6303Y, 1000000)
 	MCFG_CPU_PROGRAM_MAP(ace_sp_map)
 	MCFG_CPU_IO_MAP(ace_sp_portmap)
@@ -3856,13 +3859,13 @@ static void descramble_crystal( uint8_t* region, int start, int end, uint8_t ext
 		switch (i & 0x58)
 		{
 		case 0x00: // same as 0x08
-		case 0x08: x = BITSWAP8( x^0xca , 3,2,1,0,7,4,6,5 ); break;
-		case 0x10: x = BITSWAP8( x^0x30 , 3,0,4,6,1,5,7,2 ); break;
-		case 0x18: x = BITSWAP8( x^0x89 , 4,1,2,5,7,0,6,3 ); break;
-		case 0x40: x = BITSWAP8( x^0x14 , 6,1,4,3,2,5,0,7 ); break;
-		case 0x48: x = BITSWAP8( x^0x40 , 1,0,3,2,5,4,7,6 ); break;
-		case 0x50: x = BITSWAP8( x^0xcb , 3,2,1,0,7,6,5,4 ); break;
-		case 0x58: x = BITSWAP8( x^0xc0 , 2,3,6,0,5,1,7,4 ); break;
+		case 0x08: x = bitswap<8>( x^0xca , 3,2,1,0,7,4,6,5 ); break;
+		case 0x10: x = bitswap<8>( x^0x30 , 3,0,4,6,1,5,7,2 ); break;
+		case 0x18: x = bitswap<8>( x^0x89 , 4,1,2,5,7,0,6,3 ); break;
+		case 0x40: x = bitswap<8>( x^0x14 , 6,1,4,3,2,5,0,7 ); break;
+		case 0x48: x = bitswap<8>( x^0x40 , 1,0,3,2,5,4,7,6 ); break;
+		case 0x50: x = bitswap<8>( x^0xcb , 3,2,1,0,7,6,5,4 ); break;
+		case 0x58: x = bitswap<8>( x^0xc0 , 2,3,6,0,5,1,7,4 ); break;
 		}
 		region[i] = x ^ extra_xor;
 	}

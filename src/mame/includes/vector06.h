@@ -13,19 +13,17 @@
 #include "bus/generic/slot.h"
 
 #include "cpu/i8085/i8085.h"
-#include "cpu/z80/z80.h"
 
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+#include "machine/i8255.h"
+#include "machine/pit8253.h"
 
 #include "sound/ay8910.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 
 
 class vector06_state : public driver_device
@@ -40,12 +38,12 @@ public:
 		m_fdc(*this, "wd1793"),
 		m_floppy0(*this, "wd1793:0"),
 		m_floppy1(*this, "wd1793:1"),
-		m_ppi(*this, "ppi8255"),
-		m_ppi2(*this, "ppi8255_2"),
-		m_pit8253(*this, "pit8253"),
 		m_ay(*this, "aysnd"),
 		m_ram(*this, RAM_TAG),
 		m_palette(*this, "palette"),
+		m_ppi8255(*this, "ppi8255"),
+		m_ppi8255_2(*this, "ppi8255_2"),
+		m_pit8253(*this, "pit8253"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
@@ -65,15 +63,9 @@ public:
 	DECLARE_WRITE8_MEMBER(vector06_romdisk_portb_w);
 	DECLARE_WRITE8_MEMBER(vector06_romdisk_porta_w);
 	DECLARE_WRITE8_MEMBER(vector06_romdisk_portc_w);
-	DECLARE_READ8_MEMBER(vector06_8255_1_r);
-	DECLARE_WRITE8_MEMBER(vector06_8255_1_w);
-	DECLARE_READ8_MEMBER(vector06_8255_2_r);
-	DECLARE_WRITE8_MEMBER(vector06_8255_2_w);
 	DECLARE_WRITE8_MEMBER(vector06_disc_w);
 	DECLARE_WRITE8_MEMBER(vector06_status_callback);
 	DECLARE_WRITE8_MEMBER(vector06_ramdisk_w);
-	DECLARE_WRITE8_MEMBER(pit8253_w);
-	DECLARE_READ8_MEMBER(pit8253_r);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	void vector06_set_video_mode(int width);
 	virtual void machine_start() override;
@@ -85,6 +77,9 @@ public:
 	TIMER_CALLBACK_MEMBER(reset_check_callback);
 	IRQ_CALLBACK_MEMBER(vector06_irq_callback);
 
+	void vector06(machine_config &config);
+	void vector06_io(address_map &map);
+	void vector06_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -93,12 +88,11 @@ private:
 	required_device<kr1818vg93_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-	required_device<i8255_device> m_ppi;
-	required_device<i8255_device> m_ppi2;
-	required_device<pit8253_device> m_pit8253;
 	required_device<ay8910_device> m_ay;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
+	required_device<i8255_device> m_ppi8255, m_ppi8255_2;
+	required_device<pit8253_device> m_pit8253;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;

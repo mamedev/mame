@@ -22,7 +22,7 @@
 
 void media_identifier::file_info::match(
 		device_t const &device,
-		rom_entry const &rom,
+		romload::file const &rom,
 		util::hash_collection const &hashes)
 {
 	if (hashes == m_hashes)
@@ -30,7 +30,7 @@ void media_identifier::file_info::match(
 		m_matches.emplace_back(
 				device.shortname(),
 				device.name(),
-				ROM_GETNAME(&rom),
+				rom.get_name(),
 				hashes.flag(util::hash_collection::FLAG_BAD_DUMP),
 				device.owner());
 	}
@@ -340,21 +340,21 @@ void media_identifier::match_hashes(std::vector<file_info> &info)
 	{
 		// iterate over regions and files within the region
 		device_t &device = m_drivlist.config()->root_device();
-		for (rom_entry const *region = rom_first_region(device); region; region = rom_next_region(region))
+		for (romload::region const &region : romload::entries(device.rom_region()).get_regions())
 		{
-			for (rom_entry const *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+			for (romload::file const &rom : region.get_files())
 			{
-				util::hash_collection romhashes(ROM_GETHASHDATA(rom));
+				util::hash_collection const romhashes(rom.get_hashdata());
 				if (!romhashes.flag(util::hash_collection::FLAG_NO_DUMP))
 				{
 					for (file_info &file : info)
-						file.match(device, *rom, romhashes);
+						file.match(device, rom, romhashes);
 				}
 			}
 		}
 
 		// next iterate over softlists
-		for (software_list_device &swlistdev : software_list_device_iterator(m_drivlist.config()->root_device()))
+		for (software_list_device &swlistdev : software_list_device_iterator(device))
 		{
 			if (listnames.insert(swlistdev.list_name()).second)
 			{
@@ -386,15 +386,15 @@ void media_identifier::match_hashes(std::vector<file_info> &info)
 	{
 		// iterate over regions and files within the region
 		device_t *const device = config.device_add(&config.root_device(), "_tmp", type, 0);
-		for (rom_entry const *region = rom_first_region(*device); region; region = rom_next_region(region))
+		for (romload::region const &region : romload::entries(device->rom_region()).get_regions())
 		{
-			for (rom_entry const *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+			for (romload::file const &rom : region.get_files())
 			{
-				util::hash_collection romhashes(ROM_GETHASHDATA(rom));
+				util::hash_collection const romhashes(rom.get_hashdata());
 				if (!romhashes.flag(util::hash_collection::FLAG_NO_DUMP))
 				{
 					for (file_info &file : info)
-						file.match(*device, *rom, romhashes);
+						file.match(*device, rom, romhashes);
 				}
 			}
 		}

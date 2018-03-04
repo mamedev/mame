@@ -105,6 +105,15 @@ public:
 	INTERRUPT_GEN_MEMBER(sound_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void itaten(machine_config &config);
+	void dacholer(machine_config &config);
+	void itaten_main_map(address_map &map);
+	void itaten_snd_io_map(address_map &map);
+	void itaten_snd_map(address_map &map);
+	void main_io_map(address_map &map);
+	void main_map(address_map &map);
+	void snd_io_map(address_map &map);
+	void snd_map(address_map &map);
 };
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
@@ -224,7 +233,7 @@ WRITE8_MEMBER(dacholer_state::main_irq_ack_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dacholer_state )
+ADDRESS_MAP_START(dacholer_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8800, 0x97ff) AM_RAM
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x400) AM_RAM_WRITE(background_w) AM_SHARE("bgvideoram")
@@ -232,13 +241,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dacholer_state )
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( itaten_main_map, AS_PROGRAM, 8, dacholer_state )
+ADDRESS_MAP_START(dacholer_state::itaten_main_map)
+	AM_IMPORT_FROM( main_map )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xb7ff) AM_RAM
-	AM_IMPORT_FROM( main_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8, dacholer_state )
+ADDRESS_MAP_START(dacholer_state::main_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
@@ -255,13 +264,13 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, dacholer_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( snd_map, AS_PROGRAM, 8, dacholer_state )
+ADDRESS_MAP_START(dacholer_state::snd_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xd000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( itaten_snd_map, AS_PROGRAM, 8, dacholer_state )
+ADDRESS_MAP_START(dacholer_state::itaten_snd_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
@@ -293,7 +302,7 @@ WRITE8_MEMBER(dacholer_state::music_irq_w)
 	m_music_interrupt_enable = data;
 }
 
-static ADDRESS_MAP_START( snd_io_map, AS_IO, 8, dacholer_state )
+ADDRESS_MAP_START(dacholer_state::snd_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(music_irq_w)
@@ -305,7 +314,7 @@ static ADDRESS_MAP_START( snd_io_map, AS_IO, 8, dacholer_state )
 	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( itaten_snd_io_map, AS_IO, 8, dacholer_state )
+ADDRESS_MAP_START(dacholer_state::itaten_snd_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
@@ -641,15 +650,15 @@ PALETTE_INIT_MEMBER(dacholer_state, dacholer)
 }
 
 /* note: clocks are taken from itaten sound reference recording */
-static MACHINE_CONFIG_START( dacholer )
+MACHINE_CONFIG_START(dacholer_state::dacholer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)  /* ? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/4)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dacholer_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_19_968MHz/8) /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(19'968'000)/8) /* ? */
 	MCFG_CPU_PROGRAM_MAP(snd_map)
 	MCFG_CPU_IO_MAP(snd_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dacholer_state, sound_irq)
@@ -675,22 +684,23 @@ static MACHINE_CONFIG_START( dacholer )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_19_968MHz/16)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(19'968'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_19_968MHz/16)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(19'968'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL_19_968MHz/16)
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL(19'968'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dacholer_state, adpcm_int))          /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 = 3906.25Hz playback  - guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( itaten, dacholer )
+MACHINE_CONFIG_START(dacholer_state::itaten)
+	dacholer(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(itaten_main_map)
 

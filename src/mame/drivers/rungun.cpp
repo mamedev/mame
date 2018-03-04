@@ -176,7 +176,7 @@ WRITE16_MEMBER(rungun_state::palette_write)
 	cur_paldevice.set_pen_color(offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
-static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
+ADDRESS_MAP_START(rungun_state::rungun_map)
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM                                         // main program + data
 	AM_RANGE(0x300000, 0x3007ff) AM_READWRITE(palette_read,palette_write)
 	AM_RANGE(0x380000, 0x39ffff) AM_RAM                                         // work RAM
@@ -236,7 +236,7 @@ WRITE_LINE_MEMBER(rungun_state::k054539_nmi_gen)
 
 /* sound (this should be split into audio/xexex.c or pregx.c or so someday) */
 
-static ADDRESS_MAP_START( rungun_sound_map, AS_PROGRAM, 8, rungun_state )
+ADDRESS_MAP_START(rungun_state::rungun_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -247,6 +247,11 @@ static ADDRESS_MAP_START( rungun_sound_map, AS_PROGRAM, 8, rungun_state )
 	AM_RANGE(0xf000, 0xf003) AM_DEVICE("k054321", k054321_device, sound_map)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_ctrl_w)
 	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP
+ADDRESS_MAP_END
+
+
+ADDRESS_MAP_START(rungun_state::rungun_k054539_map)
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("k054539", 0)
 ADDRESS_MAP_END
 
 
@@ -384,7 +389,7 @@ void rungun_state::machine_reset()
 	m_sound_status = 0;
 }
 
-static MACHINE_CONFIG_START( rng )
+MACHINE_CONFIG_START(rungun_state::rng)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
@@ -439,14 +444,14 @@ static MACHINE_CONFIG_START( rng )
 
 	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
-	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
-	MCFG_K054539_REGION_OVERRRIDE("shared")
+	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADDRESS_MAP(0, rungun_k054539_map)
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(rungun_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL_18_432MHz)
-	MCFG_K054539_REGION_OVERRRIDE("shared")
+	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADDRESS_MAP(0, rungun_k054539_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -454,7 +459,8 @@ MACHINE_CONFIG_END
 // for dual-screen output Run and Gun requires the video de-multiplexer board connected to the Jamma output, this gives you 2 Jamma connectors, one for each screen.
 // this means when operated as a single dedicated cabinet the game runs at 60fps, and has smoother animations than when operated as a twin setup where each
 // screen only gets an update every other frame.
-static MACHINE_CONFIG_DERIVED( rng_dual, rng )
+MACHINE_CONFIG_START(rungun_state::rng_dual)
+	rng(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_left)
 
@@ -510,7 +516,7 @@ ROM_START( rungun )
 	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
 
 	/* sound data */
-	ROM_REGION( 0x400000, "shared", 0)
+	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
 	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
 
@@ -552,7 +558,7 @@ ROM_START( rungund ) // same as above set, but with demux adapter connected
 	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
 
 	/* sound data */
-	ROM_REGION( 0x400000, "shared", 0)
+	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
 	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
 
@@ -594,7 +600,7 @@ ROM_START( runguna )
 	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
 
 	/* sound data */
-	ROM_REGION( 0x400000, "shared", 0)
+	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
 	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
 
@@ -637,7 +643,7 @@ ROM_START( rungunad ) // same as above set, but with demux adapter connected
 	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
 
 	/* sound data */
-	ROM_REGION( 0x400000, "shared", 0)
+	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
 	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
 
@@ -684,7 +690,7 @@ ROM_START( rungunb )
 	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
 
 	/* sound data */
-	ROM_REGION( 0x400000, "shared", 0)
+	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
 	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
 
@@ -727,7 +733,7 @@ ROM_START( rungunbd ) // same as above set, but with demux adapter connected
 	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
 
 	/* sound data */
-	ROM_REGION( 0x400000, "shared", 0)
+	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
 	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
 
@@ -768,7 +774,7 @@ ROM_START( rungunua )
 	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
 
 	/* sound data */
-	ROM_REGION( 0x400000, "shared", 0)
+	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
 	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
 
@@ -810,7 +816,7 @@ ROM_START( rungunuad )  // same as above set, but with demux adapter connected
 	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
 
 	/* sound data */
-	ROM_REGION( 0x400000, "shared", 0)
+	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
 	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
 
@@ -852,7 +858,7 @@ ROM_START( slmdunkj )
 	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
 
 	/* sound data */
-	ROM_REGION( 0x400000, "shared", 0)
+	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
 	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
 
@@ -894,7 +900,7 @@ ROM_START( slmdunkjd ) // same as above set, but with demux adapter connected
 	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
 
 	/* sound data */
-	ROM_REGION( 0x400000, "shared", 0)
+	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
 	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
 
@@ -935,7 +941,7 @@ ROM_START( rungunud ) // dual cabinet setup ONLY
 	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
 
 	/* sound data */
-	ROM_REGION( 0x400000, "shared", 0)
+	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
 	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
 

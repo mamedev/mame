@@ -238,13 +238,13 @@ struct compiler_state
 #define MIPS3_MAX_TLB_ENTRIES       48
 
 #define MCFG_MIPS3_ICACHE_SIZE(_size) \
-	mips3_device::set_icache_size(*device, _size);
+	downcast<mips3_device &>(*device).set_icache_size(_size);
 
 #define MCFG_MIPS3_DCACHE_SIZE(_size) \
-	mips3_device::set_dcache_size(*device, _size);
+	downcast<mips3_device &>(*device).set_dcache_size(_size);
 
 #define MCFG_MIPS3_SYSTEM_CLOCK(_clock) \
-	mips3_device::set_system_clock(*device, _clock);
+	downcast<mips3_device &>(*device).set_system_clock(_clock);
 
 
 class mips3_frontend;
@@ -277,9 +277,9 @@ public:
 	// construction/destruction
 	mips3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mips3_flavor flavor, endianness_t endiannes);
 
-	static void set_icache_size(device_t &device, size_t icache_size) { downcast<mips3_device &>(device).c_icache_size = icache_size; }
-	static void set_dcache_size(device_t &device, size_t dcache_size) { downcast<mips3_device &>(device).c_dcache_size = dcache_size; }
-	static void set_system_clock(device_t &device, uint32_t system_clock) { downcast<mips3_device &>(device).c_system_clock = system_clock; }
+	void set_icache_size(size_t icache_size) { c_icache_size = icache_size; }
+	void set_dcache_size(size_t dcache_size) { c_dcache_size = dcache_size; }
+	void set_system_clock(uint32_t system_clock) { c_system_clock = system_clock; }
 
 	TIMER_CALLBACK_MEMBER(compare_int_callback);
 
@@ -312,9 +312,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 
 private:
@@ -374,7 +372,7 @@ private:
 	loadstore_func m_sdr;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	uint32_t          c_system_clock;
 	uint32_t          m_cpu_clock;
 	emu_timer *     m_compare_int_timer;
@@ -800,13 +798,6 @@ private:
 
 #define MIPS3DRC_COMPATIBLE_OPTIONS (MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP1 | MIPS3DRC_STRICT_COP0 | MIPS3DRC_STRICT_COP2 | MIPS3DRC_FLUSH_PC)
 #define MIPS3DRC_FASTEST_OPTIONS    (0)
-
-
-/***************************************************************************
-    DISASSEMBLING
-***************************************************************************/
-
-unsigned dasmmips3(std::ostream &stream, unsigned pc, uint32_t op);
 
 
 #endif // MAME_CPU_MIPS_MIPS3_H

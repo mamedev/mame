@@ -1,6 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller
+
 #include "cpu/s2650/s2650.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 
 #define HORZ_RES        32
@@ -75,4 +77,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bbonk_timer);
 	int vert_scale(int data);
 	void plot_pattern( bitmap_ind16 &bitmap, int x, int y );
+	void bbonk(machine_config &config);
+	void medlanes(machine_config &config);
+	void lazercmd(machine_config &config);
+	void bbonk_map(address_map &map);
+	void lazercmd_map(address_map &map);
+	void lazercmd_portmap(address_map &map);
+	void medlanes_map(address_map &map);
 };

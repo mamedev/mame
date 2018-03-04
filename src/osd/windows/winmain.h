@@ -210,21 +210,8 @@ public:
 	bool global_inputs() const { return bool_value(WINOPTION_GLOBAL_INPUTS); }
 	bool dual_lightgun() const { return bool_value(WINOPTION_DUAL_LIGHTGUN); }
 
-private:
 	static const options_entry s_option_entries[];
 };
-
-//============================================================
-//  MACROS
-//============================================================
-
-#ifdef __cplusplus
-#define WRAP_REFIID(x)      x
-#else
-#define WRAP_REFIID(x)      &x
-#endif
-
-
 
 //============================================================
 //  TYPE DEFINITIONS

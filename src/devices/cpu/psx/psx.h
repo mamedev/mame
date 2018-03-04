@@ -3,7 +3,7 @@
 /*
  * PlayStation CPU emulator
  *
- * Copyright 2003-2013 smf
+ * Copyright 2003-2017 smf
  *
  */
 
@@ -17,6 +17,7 @@
 #include "gte.h"
 #include "irq.h"
 #include "sio.h"
+#include "psxdasm.h"
 
 //**************************************************************************
 //  CONSTANTS
@@ -24,12 +25,15 @@
 
 // interrupts
 
-#define PSXCPU_IRQ0 ( 0 )
-#define PSXCPU_IRQ1 ( 1 )
-#define PSXCPU_IRQ2 ( 2 )
-#define PSXCPU_IRQ3 ( 3 )
-#define PSXCPU_IRQ4 ( 4 )
-#define PSXCPU_IRQ5 ( 5 )
+enum
+{
+	PSXCPU_IRQ0 = 0,
+	PSXCPU_IRQ1,
+	PSXCPU_IRQ2,
+	PSXCPU_IRQ3,
+	PSXCPU_IRQ4,
+	PSXCPU_IRQ5,
+};
 
 // register enumeration
 
@@ -97,31 +101,39 @@ enum
 	PSXCPU_CP2CR30, PSXCPU_CP2CR31
 };
 
+// delay slot sentinels
+
+enum
+{
+	PSXCPU_DELAYR_PC = 32,
+	PSXCPU_DELAYR_NOTPC = 33
+};
+
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
 #define MCFG_PSX_DMA_CHANNEL_READ( cputag, channel, handler ) \
-	psxcpu_device::getcpu( *owner, cputag )->subdevice<psxdma_device>("dma")->install_read_handler( channel, handler );
+	psxcpu_device::getcpu( *this, cputag )->subdevice<psxdma_device>("dma")->install_read_handler( channel, handler );
 
 #define MCFG_PSX_DMA_CHANNEL_WRITE( cputag, channel, handler ) \
-	psxcpu_device::getcpu( *owner, cputag )->subdevice<psxdma_device>("dma")->install_write_handler( channel, handler );
+	psxcpu_device::getcpu( *this, cputag )->subdevice<psxdma_device>("dma")->install_write_handler( channel, handler );
 
 #define MCFG_PSX_GPU_READ_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_gpu_read_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxcpu_device &>(*device).set_gpu_read_handler(DEVCB_##_devcb);
 #define MCFG_PSX_GPU_WRITE_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_gpu_write_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxcpu_device &>(*device).set_gpu_write_handler(DEVCB_##_devcb);
 
 #define MCFG_PSX_SPU_READ_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_spu_read_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxcpu_device &>(*device).set_spu_read_handler(DEVCB_##_devcb);
 #define MCFG_PSX_SPU_WRITE_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_spu_write_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxcpu_device &>(*device).set_spu_write_handler(DEVCB_##_devcb);
 
 #define MCFG_PSX_CD_READ_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_cd_read_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxcpu_device &>(*device).set_cd_read_handler(DEVCB_##_devcb);
 #define MCFG_PSX_CD_WRITE_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_cd_write_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxcpu_device &>(*device).set_cd_write_handler(DEVCB_##_devcb);
 #define MCFG_PSX_DISABLE_ROM_BERR \
 	downcast<psxcpu_device *>(device)->set_disable_rom_berr(true);
 
@@ -129,29 +141,18 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class psxcpu_state
-{
-public:
-	virtual ~psxcpu_state() { }
-
-	virtual uint32_t pc() = 0;
-	virtual uint32_t delayr() = 0;
-	virtual uint32_t delayv() = 0;
-	virtual uint32_t r(int i) = 0;
-};
-
 // ======================> psxcpu_device
 
-class psxcpu_device : public cpu_device, psxcpu_state
+class psxcpu_device : public cpu_device, psxcpu_disassembler::config
 {
 public:
-	// static configuration helpers
-	template <class Object> static devcb_base &set_gpu_read_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_gpu_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_gpu_write_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_gpu_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_spu_read_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_spu_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_spu_write_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_spu_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cd_read_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_cd_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cd_write_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_cd_write_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_gpu_read_handler(Object &&cb) { return m_gpu_read_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_gpu_write_handler(Object &&cb) { return m_gpu_write_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_spu_read_handler(Object &&cb) { return m_spu_read_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_spu_write_handler(Object &&cb) { return m_spu_write_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cd_read_handler(Object &&cb) { return m_cd_read_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cd_write_handler(Object &&cb) { return m_cd_write_handler.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	DECLARE_WRITE32_MEMBER( berr_w );
@@ -186,9 +187,10 @@ public:
 	DECLARE_WRITE32_MEMBER( com_delay_w );
 	DECLARE_READ32_MEMBER( com_delay_r );
 
-	static psxcpu_device *getcpu( device_t &device, const char *cputag );
+	static psxcpu_device *getcpu( device_t &device, const char *cputag ) { return downcast<psxcpu_device *>( device.subdevice( cputag ) ); }
 	void set_disable_rom_berr(bool mode);
 
+	void psxcpu_internal_map(address_map &map);
 protected:
 	static constexpr unsigned ICACHE_ENTRIES = 0x400;
 	static constexpr unsigned DCACHE_ENTRIES = 0x100;
@@ -218,9 +220,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// CPU registers
 	uint32_t m_pc;
@@ -235,7 +235,7 @@ protected:
 	// address spaces
 	const address_space_config m_program_config;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 
 	// other internal states
 	int m_icount;
@@ -293,7 +293,7 @@ protected:
 	void commit_delayed_load();
 	void set_pc( unsigned pc );
 	void fetch_next_op();
-	int advance_pc();
+	void advance_pc();
 	void load( uint32_t reg, uint32_t value );
 	void delayed_load( uint32_t reg, uint32_t value );
 	void branch( uint32_t address );
@@ -307,6 +307,7 @@ protected:
 	void store_bus_error_exception();
 	void load_bad_address( uint32_t address );
 	void store_bad_address( uint32_t address );
+	int program_counter_breakpoint();
 	int data_address_breakpoint( int dcic_rw, int dcic_status, uint32_t address );
 	int load_data_address_breakpoint( uint32_t address );
 	int store_data_address_breakpoint( uint32_t address );
@@ -396,7 +397,5 @@ DECLARE_DEVICE_TYPE(CXD8661R,  cxd8661r_device)
 DECLARE_DEVICE_TYPE(CXD8606BQ, cxd8606bq_device)
 DECLARE_DEVICE_TYPE(CXD8606CQ, cxd8606cq_device)
 
-
-extern unsigned DasmPSXCPU(psxcpu_state *state, std::ostream &stream, uint32_t pc, const uint8_t *opram);
 
 #endif // MAME_CPU_PSX_PSX_H

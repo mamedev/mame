@@ -98,6 +98,10 @@ public:
 	int m_cia_irq;
 	int m_vic_irq;
 	int m_exp_irq;
+	void vic10(machine_config &config);
+	void vic10_mem(address_map &map);
+	void vic_colorram_map(address_map &map);
+	void vic_videoram_map(address_map &map);
 };
 
 
@@ -241,7 +245,7 @@ READ8_MEMBER( vic10_state::vic_colorram_r )
 //  ADDRESS_MAP( vic10_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic10_mem, AS_PROGRAM, 8, vic10_state )
+ADDRESS_MAP_START(vic10_state::vic10_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -250,7 +254,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_videoram_map, 0, 8, vic10_state )
+ADDRESS_MAP_START(vic10_state::vic_videoram_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
@@ -259,7 +263,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_colorram_map, 1, 8, vic10_state )
+ADDRESS_MAP_START(vic10_state::vic_colorram_map)
 	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 
@@ -688,9 +692,9 @@ void vic10_state::machine_reset()
 //  MACHINE_CONFIG( vic10 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vic10 )
+MACHINE_CONFIG_START(vic10_state::vic10)
 	// basic hardware
-	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL_8MHz/8)
+	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL(8'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(vic10_mem)
 	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_M6510_PORT_CALLBACKS(READ8(vic10_state, cpu_r), WRITE8(vic10_state, cpu_w))
@@ -698,7 +702,7 @@ static MACHINE_CONFIG_START( vic10 )
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(MOS6566_TAG, MOS6566, XTAL_8MHz/8)
+	MCFG_DEVICE_ADD(MOS6566_TAG, MOS6566, XTAL(8'000'000)/8)
 	MCFG_MOS6566_CPU(M6510_TAG)
 	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(vic10_state, vic_irq_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
@@ -712,13 +716,13 @@ static MACHINE_CONFIG_START( vic10 )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL_8MHz/8)
+	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL(8'000'000)/8)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(vic10_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(vic10_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
-	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526, XTAL_8MHz/8)
+	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526, XTAL(8'000'000)/8)
 	MCFG_MOS6526_TOD(60)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(vic10_state, cia_irq_w))
 	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, cnt_w))
@@ -730,7 +734,7 @@ static MACHINE_CONFIG_START( vic10 )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(DEVWRITELINE(MOS6566_TAG, mos6566_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
-	MCFG_VIC10_EXPANSION_SLOT_ADD(VIC10_EXPANSION_SLOT_TAG, XTAL_8MHz/8, vic10_expansion_cards, nullptr)
+	MCFG_VIC10_EXPANSION_SLOT_ADD(VIC10_EXPANSION_SLOT_TAG, XTAL(8'000'000)/8, vic10_expansion_cards, nullptr)
 	MCFG_VIC10_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(vic10_state, exp_irq_w))
 	MCFG_VIC10_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(vic10_state, exp_reset_w))
 	MCFG_VIC10_EXPANSION_SLOT_CNT_CALLBACK(DEVWRITELINE(MOS6526_TAG, mos6526_device, cnt_w))

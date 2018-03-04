@@ -118,6 +118,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_DRIVER_INIT(jrpacman);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void jrpacman(machine_config &config);
+	void main_map(address_map &map);
+	void port_map(address_map &map);
 };
 
 
@@ -139,7 +142,7 @@ WRITE_LINE_MEMBER(jrpacman_state::irq_mask_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, jrpacman_state )
+ADDRESS_MAP_START(jrpacman_state::main_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4800, 0x4fef) AM_RAM
@@ -157,7 +160,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, jrpacman_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8, jrpacman_state )
+ADDRESS_MAP_START(jrpacman_state::port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0, 0) AM_WRITE(jrpacman_interrupt_vector_w)
 ADDRESS_MAP_END
@@ -270,7 +273,7 @@ INTERRUPT_GEN_MEMBER(jrpacman_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( jrpacman )
+MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */

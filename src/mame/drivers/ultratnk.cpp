@@ -13,7 +13,7 @@ Atari Ultra Tank driver
 #include "machine/74259.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK    XTAL_12_096MHz
+#define MASTER_CLOCK    XTAL(12'096'000)
 
 #define HTOTAL 384
 #define VTOTAL 262
@@ -161,7 +161,7 @@ WRITE8_MEMBER(ultratnk_state::explosion_w)
 }
 
 
-static ADDRESS_MAP_START( ultratnk_cpu_map, AS_PROGRAM, 8, ultratnk_state )
+ADDRESS_MAP_START(ultratnk_state::ultratnk_cpu_map)
 
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
@@ -298,7 +298,7 @@ static GFXDECODE_START( ultratnk )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( ultratnk )
+MACHINE_CONFIG_START(ultratnk_state::ultratnk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)

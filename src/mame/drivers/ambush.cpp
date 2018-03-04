@@ -95,6 +95,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE8_MEMBER(output_latches_w);
 
+	void mariobl(machine_config &config);
+	void ambush(machine_config &config);
+	void dkong3abl(machine_config &config);
+	void bootleg_map(address_map &map);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
 private:
 	void register_save_states();
 
@@ -114,7 +120,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ambush_state )
+ADDRESS_MAP_START(ambush_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
@@ -128,7 +134,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ambush_state )
 	AM_RANGE(0xcc00, 0xcc07) AM_WRITE(output_latches_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, ambush_state )
+ADDRESS_MAP_START(ambush_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_w)
@@ -136,7 +142,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, ambush_state )
 	AM_RANGE(0x81, 0x81) AM_DEVWRITE("ay2", ay8910_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, ambush_state )
+ADDRESS_MAP_START(ambush_state::bootleg_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
@@ -678,8 +684,8 @@ WRITE8_MEMBER(ambush_state::output_latches_w)
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( ambush )
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
+MACHINE_CONFIG_START(ambush_state::ambush)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ambush_state, irq0_line_hold)
@@ -699,7 +705,7 @@ static MACHINE_CONFIG_START( ambush )
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/3, 384, 0, 256, 264, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/3, 384, 0, 256, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -710,16 +716,17 @@ static MACHINE_CONFIG_START( ambush )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay1", AY8912, XTAL_18_432MHz/6/2)
+	MCFG_SOUND_ADD("ay1", AY8912, XTAL(18'432'000)/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("buttons"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_ADD("ay2", AY8912, XTAL_18_432MHz/6/2)
+	MCFG_SOUND_ADD("ay2", AY8912, XTAL(18'432'000)/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("joystick"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mariobl, ambush )
+MACHINE_CONFIG_START(ambush_state::mariobl)
+	ambush(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 
@@ -740,16 +747,17 @@ static MACHINE_CONFIG_DERIVED( mariobl, ambush )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(ambush_state, mario)
 
-	MCFG_SOUND_REPLACE("ay1", AY8910, XTAL_18_432MHz/6/2)
+	MCFG_SOUND_REPLACE("ay1", AY8910, XTAL(18'432'000)/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("buttons"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_REPLACE("ay2", AY8910, XTAL_18_432MHz/6/2)
+	MCFG_SOUND_REPLACE("ay2", AY8910, XTAL(18'432'000)/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("joystick"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dkong3abl, mariobl )
+MACHINE_CONFIG_START(ambush_state::dkong3abl)
+	mariobl(config);
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, dkong3abl)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", dkong3abl)

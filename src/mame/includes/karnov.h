@@ -79,6 +79,15 @@ public:
 	void karnov_i8751_w( int data );
 	void wndrplnt_i8751_w( int data );
 	void chelnov_i8751_w( int data );
+	void chelnovjbl(machine_config &config);
+	void karnov(machine_config &config);
+	void wndrplnt(machine_config &config);
+	void karnovjbl(machine_config &config);
+	void base_sound_map(address_map &map);
+	void chelnovjbl_mcu_map(address_map &map);
+	void karnov_map(address_map &map);
+	void karnov_sound_map(address_map &map);
+	void karnovjbl_sound_map(address_map &map);
 };
 
 enum {

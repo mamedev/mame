@@ -22,7 +22,7 @@
  *
  *************************************/
 
-#define MAC_CLK             XTAL_10MHz
+#define MAC_CLK             XTAL(10'000'000)
 #define VTXROM_FMT(x)       (((x) << 14) | ((x) & (1 << 15) ? 0xc0000000 : 0))
 
 
@@ -34,7 +34,7 @@
 
 WRITE_LINE_MEMBER(micro3d_state::duart_irq_handler)
 {
-	m_maincpu->set_input_line_and_vector(3, state, m_duart68681->get_irq_vector());
+	m_maincpu->set_input_line_and_vector(3, state, m_duart->get_irq_vector());
 }
 
 WRITE_LINE_MEMBER(micro3d_state::duart_txb)
@@ -52,7 +52,7 @@ READ8_MEMBER(micro3d_state::data_to_i8031)
 
 WRITE8_MEMBER(micro3d_state::data_from_i8031)
 {
-	m_duart68681->rx_b_w(data);
+	m_duart->rx_b_w(data);
 }
 
 /*
@@ -84,130 +84,23 @@ WRITE8_MEMBER(micro3d_state::duart_output_w)
  *
  *************************************/
 
-enum
+READ8_MEMBER( micro3d_state::vgb_uart_r )
 {
-	RX, TX, STATUS, SYN1, SYN2, DLE, MODE1, MODE2, COMMAND
-};
+	// the mode and sync registers switched places?
+	if (offset == 1 || offset == 2)
+		offset ^= 3;
 
-
-WRITE16_MEMBER(micro3d_state::micro3d_ti_uart_w)
-{
-	switch (offset)
-	{
-		case 0x0:
-		{
-			m_ti_uart[TX] = data;
-#if VGB_MONITOR_DISPLAY
-			mame_debug_printf("%c",data);
-#endif
-			m_ti_uart[STATUS] |= 1;
-			break;
-		}
-		case 0x1:
-		{
-			if (m_ti_uart_mode_cycle == 0)
-			{
-				m_ti_uart[MODE1] = data;
-				m_ti_uart_mode_cycle = 1;
-			}
-			else
-			{
-				m_ti_uart[MODE2] = data;
-				m_ti_uart_mode_cycle = 0;
-			}
-			break;
-		}
-		case 0x2:
-		{
-			if (m_ti_uart_sync_cycle == 0)
-			{
-				m_ti_uart[SYN1] = data;
-				m_ti_uart_mode_cycle = 1;
-			}
-			else if (m_ti_uart_sync_cycle == 1)
-			{
-				m_ti_uart[SYN2] = data;
-				m_ti_uart_mode_cycle = 2;
-			}
-			else
-			{
-				m_ti_uart[DLE] = data;
-				m_ti_uart_mode_cycle = 0;
-			}
-			break;
-		}
-		case 0x3:
-		{
-			m_ti_uart[COMMAND] = data;
-			m_ti_uart_mode_cycle = 0;
-			m_ti_uart_sync_cycle = 0;
-			break;
-		}
-	}
+	return m_vgb_uart->read(space, offset);
 }
 
-READ16_MEMBER(micro3d_state::micro3d_ti_uart_r)
+WRITE8_MEMBER( micro3d_state::vgb_uart_w )
 {
-	switch (offset)
-	{
-		case 0x0:
-		{
-			m_ti_uart[STATUS] ^= 2;
-			return m_ti_uart[RX];
-		}
-		case 0x1:
-		{
-			if (m_ti_uart_mode_cycle == 0)
-			{
-				m_ti_uart_mode_cycle = 1;
-				return m_ti_uart[MODE1];
-			}
-			else
-			{
-				m_ti_uart_mode_cycle = 0;
-				return m_ti_uart[MODE2];
-			}
-		}
-		case 0x2:
-		{
-			return m_ti_uart[STATUS];
-		}
-		case 0x3:
-		{
-			m_ti_uart_mode_cycle = m_ti_uart_sync_cycle = 0;
-			return m_ti_uart[COMMAND];
-		}
-		default:
-		{
-			logerror("Unknown TI UART access.\n");
-			return 0;
-		}
-	}
+	// the mode and sync registers switched places?
+	if (offset == 1 || offset == 2)
+		offset ^= 3;
+
+	m_vgb_uart->write(space, offset, data);
 }
-
-
-/*************************************
- *
- *  Z8530 SCC (Am29000)
- *
- *************************************/
-
-WRITE32_MEMBER(micro3d_state::micro3d_scc_w)
-{
-#if DRMATH_MONITOR_DISPLAY
-	if (offset == 1)
-		osd_printf_debug("%c", data);
-#endif
-}
-
-READ32_MEMBER(micro3d_state::micro3d_scc_r)
-{
-	if (offset == 1)
-		return 0xd;
-	else
-		return 5;
-}
-
 
 
 /*************************************
@@ -238,9 +131,6 @@ void micro3d_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_MAC_DONE:
 		mac_done_callback(ptr, param);
-		break;
-	case TIMER_ADC_DONE:
-		adc_done_callback(ptr, param);
 		break;
 	default:
 		assert_always(false, "Unknown id in micro3d_state::device_timer");
@@ -483,36 +373,9 @@ READ16_MEMBER(micro3d_state::micro3d_encoder_l_r)
 	return ((y_encoder & 0xff) << 8) | (x_encoder & 0xff);
 }
 
-TIMER_CALLBACK_MEMBER(micro3d_state::adc_done_callback)
+READ8_MEMBER( micro3d_state::adc_volume_r )
 {
-	switch (param)
-	{
-		case 0: m_adc_val = m_throttle.read_safe(0);
-				break;
-		case 1: m_adc_val = (uint8_t)((255.0/100.0) * m_volume->read() + 0.5);
-				break;
-		case 2: break;
-		case 3: break;
-	}
-
-//  mc68901_int_gen(machine(), GPIP3);
-}
-
-READ16_MEMBER(micro3d_state::micro3d_adc_r)
-{
-	return m_adc_val;
-}
-
-WRITE16_MEMBER(micro3d_state::micro3d_adc_w)
-{
-	/* Only handle single-ended mode */
-	if (data < 4 || data > 7)
-	{
-		logerror("ADC0844 unhandled MUX mode: %x\n", data);
-		return;
-	}
-
-	timer_set(attotime::from_usec(40), TIMER_ADC_DONE, data & ~4);
+	return (uint8_t)((255.0/100.0) * m_volume->read() + 0.5);
 }
 
 CUSTOM_INPUT_MEMBER(micro3d_state::botss_hwchk_r)
@@ -610,35 +473,30 @@ WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_b)
 	/* TODO: This controls upd7759 volume */
 }
 
-WRITE8_MEMBER(micro3d_state::micro3d_sound_io_w)
+WRITE8_MEMBER(micro3d_state::micro3d_sound_p1_w)
 {
-	m_sound_port_latch[offset] = data;
+	m_sound_port_latch[1] = data;
 
-	switch (offset)
-	{
-		case 0x01:
-		{
-			micro3d_sound_device *noise = (data & 4) ? m_noise_2 : m_noise_1;
-			noise->noise_sh_w(data);
-			break;
-		}
-		case 0x03:
-		{
-			m_upd7759->set_bank_base((data & 0x4) ? 0x20000 : 0);
-			m_upd7759->reset_w((data & 0x10) ? 0 : 1);
-			break;
-		}
-	}
+	micro3d_sound_device *noise = (data & 4) ? m_noise_2 : m_noise_1;
+	noise->noise_sh_w(data);
 }
 
-READ8_MEMBER(micro3d_state::micro3d_sound_io_r)
+WRITE8_MEMBER(micro3d_state::micro3d_sound_p3_w)
 {
-	switch (offset)
-	{
-		case 0x01:  return (m_sound_port_latch[offset] & 0x7f) | m_sound_sw->read();
-		case 0x03:  return (m_sound_port_latch[offset] & 0xf7) | (m_upd7759->busy_r() ? 0x08 : 0);
-		default:    return 0;
-	}
+	m_sound_port_latch[3] = data;
+
+	m_upd7759->set_bank_base((data & 0x4) ? 0x20000 : 0);
+	m_upd7759->reset_w((data & 0x10) ? 0 : 1);
+}
+
+READ8_MEMBER(micro3d_state::micro3d_sound_p1_r)
+{
+	return (m_sound_port_latch[1] & 0x7f) | m_sound_sw->read();
+}
+
+READ8_MEMBER(micro3d_state::micro3d_sound_p3_r)
+{
+	return (m_sound_port_latch[3] & 0xf7) | (m_upd7759->busy_r() ? 0x08 : 0);
 }
 
 WRITE8_MEMBER(micro3d_state::micro3d_upd7759_w)
@@ -682,8 +540,6 @@ DRIVER_INIT_MEMBER(micro3d_state,botss)
 
 void micro3d_state::machine_reset()
 {
-	m_ti_uart[STATUS] = 1;
-
 	m_vgb->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_drmath->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

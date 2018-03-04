@@ -50,6 +50,7 @@ Note that left-most digit is not wired up, and therefore will always be blank.
 #include "cpu/m6502/m6502.h"
 #include "machine/ins8154.h"
 #include "machine/74145.h"
+#include "machine/timer.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "speaker.h"
@@ -65,24 +66,43 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ttl74145(*this, "ic8_7445"),
 		m_cass(*this, "cassette"),
+		m_display(*this, "digit%u", 0U),
 		m_digit(0)
 	{ }
 
+	void acrnsys1(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 	DECLARE_READ8_MEMBER(ins8154_b1_port_a_r);
 	DECLARE_WRITE8_MEMBER(ins8154_b1_port_a_w);
 	DECLARE_WRITE8_MEMBER(acrnsys1_led_segment_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_p);
+	void acrnsys1_map(address_map &map);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_ttl74145;
 	required_device<cassette_image_device> m_cass;
+	output_finder<9> m_display;
 	uint8_t m_digit;
 	uint8_t m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
 };
 
+
+
+void acrnsys1_state::machine_start()
+{
+	m_display.resolve();
+
+	save_item(NAME(m_digit));
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cass_state));
+	save_item(NAME(m_cassold));
+}
 
 
 /***************************************************************************
@@ -151,9 +171,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::acrnsys1_p)
 
 WRITE8_MEMBER( acrnsys1_state::acrnsys1_led_segment_w )
 {
-	uint8_t key_line = m_ttl74145->read();
+	uint16_t const key_line = m_ttl74145->read();
 
-	output().set_digit_value(key_line, data);
+	for (unsigned i = 0U; 9U > i; ++i)
+		if (BIT(key_line, i))
+			m_display[i] = data;
 }
 
 
@@ -161,7 +183,7 @@ WRITE8_MEMBER( acrnsys1_state::acrnsys1_led_segment_w )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( acrnsys1_map, AS_PROGRAM, 8, acrnsys1_state )
+ADDRESS_MAP_START(acrnsys1_state::acrnsys1_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0e00, 0x0e7f) AM_MIRROR(0x100) AM_DEVREADWRITE("b1", ins8154_device, ins8154_r, ins8154_w)
 	AM_RANGE(0x0e80, 0x0eff) AM_MIRROR(0x100) AM_RAM
@@ -242,7 +264,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( acrnsys1 )
+MACHINE_CONFIG_START(acrnsys1_state::acrnsys1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1008000)  /* 1.008 MHz */
 	MCFG_CPU_PROGRAM_MAP(acrnsys1_map)
@@ -280,5 +302,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     STATE           INIT  COMPANY  FULLNAME          FLAGS */
-COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, acrnsys1_state, 0,    "Acorn", "Acorn System 1", 0 )
+//    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     STATE           INIT  COMPANY  FULLNAME          FLAGS
+COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, acrnsys1_state, 0,    "Acorn", "Acorn System 1", MACHINE_SUPPORTS_SAVE )

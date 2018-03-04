@@ -24,12 +24,6 @@ namespace bx
 		void add(const void* _data, int _len);
 
 		///
-		void addAligned(const void* _data, int _len);
-
-		///
-		void addUnaligned(const void* _data, int _len);
-
-		///
 		template<typename Ty>
 		void add(Ty _value);
 
@@ -37,6 +31,12 @@ namespace bx
 		uint32_t end();
 
 	private:
+		///
+		void addAligned(const void* _data, int _len);
+
+		///
+		void addUnaligned(const void* _data, int _len);
+
 		///
 		static void readUnaligned(const void* _data, uint32_t& _out);
 
@@ -50,17 +50,73 @@ namespace bx
 	};
 
 	///
-	uint32_t hashMurmur2A(const void* _data, uint32_t _size);
+	class HashAdler32
+	{
+	public:
+		///
+		void begin();
+
+		///
+		void add(const void* _data, int _len);
+
+		///
+		template<typename Ty>
+		void add(Ty _value);
+
+		///
+		uint32_t end();
+
+	private:
+		uint32_t m_a;
+		uint32_t m_b;
+	};
 
 	///
-	template <typename Ty>
-	uint32_t hashMurmur2A(const Ty& _data);
+	class HashCrc32
+	{
+	public:
+		enum Enum
+		{
+			Ieee,       //!< 0xedb88320
+			Castagnoli, //!< 0x82f63b78
+			Koopman,    //!< 0xeb31d82e
+
+			Count
+		};
+
+		///
+		void begin(Enum _type = Ieee);
+
+		///
+		void add(const void* _data, int _len);
+
+		///
+		template<typename Ty>
+		void add(Ty _value);
+
+		///
+		uint32_t end();
+
+	private:
+		const uint32_t* m_table;
+		uint32_t m_hash;
+	};
 
 	///
-	uint32_t hashMurmur2A(const StringView& _data);
+	template<typename HashT>
+	uint32_t hash(const void* _data, uint32_t _size);
 
 	///
-	uint32_t hashMurmur2A(const char* _data);
+	template<typename HashT, typename Ty>
+	uint32_t hash(const Ty& _data);
+
+	///
+	template<typename HashT>
+	uint32_t hash(const StringView& _data);
+
+	///
+	template<typename HashT>
+	uint32_t hash(const char* _data);
 
 } // namespace bx
 

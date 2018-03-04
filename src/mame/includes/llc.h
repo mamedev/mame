@@ -51,6 +51,12 @@ public:
 	uint32_t screen_update_llc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_llc2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void llc1(machine_config &config);
+	void llc2(machine_config &config);
+	void llc1_io(address_map &map);
+	void llc1_mem(address_map &map);
+	void llc2_io(address_map &map);
+	void llc2_mem(address_map &map);
 private:
 	bool m_rv;
 	uint8_t m_term_status;

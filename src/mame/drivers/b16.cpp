@@ -55,6 +55,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void b16(machine_config &config);
+	void b16_io(address_map &map);
+	void b16_map(address_map &map);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -119,7 +122,7 @@ WRITE8_MEMBER( b16_state::b16_pcg_w )
 	m_gfxdecode->gfx(0)->mark_dirty(offset >> 4);
 }
 
-static ADDRESS_MAP_START( b16_map, AS_PROGRAM, 16, b16_state)
+ADDRESS_MAP_START(b16_state::b16_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00000, 0x9ffff ) AM_RAM // probably not all of it.
 	AM_RANGE( 0xa0000, 0xaffff ) AM_RAM // bitmap?
@@ -212,7 +215,7 @@ WRITE8_MEMBER( b16_state::unk_dev_w )
 
 }
 
-static ADDRESS_MAP_START( b16_io, AS_IO, 16, b16_state)
+ADDRESS_MAP_START(b16_state::b16_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x0f) AM_READWRITE8(unk_dev_r,unk_dev_w,0x00ff) // DMA device?
 	AM_RANGE(0x20, 0x21) AM_WRITE8(b16_6845_address_w,0x00ff)
@@ -269,9 +272,9 @@ WRITE8_MEMBER(b16_state::memory_write_byte)
 }
 
 
-static MACHINE_CONFIG_START( b16 )
+MACHINE_CONFIG_START(b16_state::b16)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8086, XTAL_14_31818MHz/2) //unknown xtal
+	MCFG_CPU_ADD("maincpu",I8086, XTAL(14'318'181)/2) //unknown xtal
 	MCFG_CPU_PROGRAM_MAP(b16_map)
 	MCFG_CPU_IO_MAP(b16_io)
 
@@ -285,11 +288,11 @@ static MACHINE_CONFIG_START( b16 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz/5)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(14'318'181)/5)    /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_DEVICE_ADD("8237dma", AM9517A, XTAL_14_31818MHz/2)
+	MCFG_DEVICE_ADD("8237dma", AM9517A, XTAL(14'318'181)/2)
 	MCFG_I8237_IN_MEMR_CB(READ8(b16_state, memory_read_byte))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(b16_state, memory_write_byte))
 

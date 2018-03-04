@@ -38,6 +38,9 @@ public:
 	DECLARE_READ8_MEMBER(ff_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
 	DECLARE_WRITE8_MEMBER(oe_w);
+	void nsm(machine_config &config);
+	void nsm_io_map(address_map &map);
+	void nsm_map(address_map &map);
 protected:
 
 	// devices
@@ -50,14 +53,14 @@ private:
 	uint8_t m_cru_count;
 };
 
-static ADDRESS_MAP_START( nsm_map, AS_PROGRAM, 8, nsm_state )
+ADDRESS_MAP_START(nsm_state::nsm_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xffec, 0xffed) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0xffee, 0xffef) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nsm_io_map, AS_IO, 8, nsm_state )
+ADDRESS_MAP_START(nsm_state::nsm_io_map)
 	// 00-71 selected by IC600 (74LS151)
 	AM_RANGE(0x0000, 0x0001) AM_READ(ff_r) // 5v supply
 	AM_RANGE(0x0010, 0x0011) AM_READNOP // antenna
@@ -106,7 +109,7 @@ WRITE8_MEMBER( nsm_state::cru_w )
 				for (j = 0; j < 5; j++)
 				{
 					segments = m_cru_data[8-j]^0xff;
-					output().set_digit_value(j * 10 + i, BITSWAP16(segments, 8, 8, 8, 8, 8, 8, 0, 0, 1, 1, 2, 3, 4, 5, 6, 7));
+					output().set_digit_value(j * 10 + i, bitswap<16>(segments, 8, 8, 8, 8, 8, 8, 0, 0, 1, 1, 2, 3, 4, 5, 6, 7));
 				}
 			}
 		}
@@ -116,10 +119,12 @@ WRITE8_MEMBER( nsm_state::cru_w )
 void nsm_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
+	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
+	cpu->ready_line(ASSERT_LINE);
+	cpu->reset_line(ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( nsm )
+MACHINE_CONFIG_START(nsm_state::nsm)
 	// CPU TMS9995, standard variant; no line connection
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 11052000, nsm_map, nsm_io_map)
 

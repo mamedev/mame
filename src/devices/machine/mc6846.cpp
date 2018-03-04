@@ -290,7 +290,7 @@ READ8_MEMBER(mc6846_device::read)
 	case 0:
 	case 4:
 		LOG( "%s %f: mc6846 CSR read $%02X intr=%i (timer=%i, cp1=%i, cp2=%i)\n",
-				machine().describe_context(), space.machine().time().as_double(),
+				machine().describe_context(), machine().time().as_double(),
 				m_csr, (m_csr >> 7) & 1,
 				m_csr & 1, (m_csr >> 1) & 1, (m_csr >> 2) & 1 );
 		m_csr0_to_be_cleared = m_csr & 1;
@@ -299,15 +299,15 @@ READ8_MEMBER(mc6846_device::read)
 		return m_csr;
 
 	case 1:
-		LOG( "%s %f: mc6846 PCR read $%02X\n", machine().describe_context(), space.machine().time().as_double(), m_pcr );
+		LOG( "%s %f: mc6846 PCR read $%02X\n", machine().describe_context(), machine().time().as_double(), m_pcr );
 		return m_pcr;
 
 	case 2:
-		LOG( "%s %f: mc6846 DDR read $%02X\n", machine().describe_context(), space.machine().time().as_double(), m_ddr );
+		LOG( "%s %f: mc6846 DDR read $%02X\n", machine().describe_context(), machine().time().as_double(), m_ddr );
 		return m_ddr;
 
 	case 3:
-		LOG( "%s %f: mc6846 PORT read $%02X\n", machine().describe_context(), space.machine().time().as_double(), PORT );
+		LOG( "%s %f: mc6846 PORT read $%02X\n", machine().describe_context(), machine().time().as_double(), PORT );
 		if ( ! (m_pcr & 0x80) )
 		{
 			if ( m_csr1_to_be_cleared )
@@ -321,11 +321,11 @@ READ8_MEMBER(mc6846_device::read)
 		return PORT;
 
 	case 5:
-		LOG( "%s %f: mc6846 TCR read $%02X\n",machine().describe_context(), space.machine().time().as_double(), m_tcr );
+		LOG( "%s %f: mc6846 TCR read $%02X\n",machine().describe_context(), machine().time().as_double(), m_tcr );
 		return m_tcr;
 
 	case 6:
-		LOG( "%s %f: mc6846 COUNTER hi read $%02X\n", machine().describe_context(), space.machine().time().as_double(), counter() >> 8 );
+		LOG( "%s %f: mc6846 COUNTER hi read $%02X\n", machine().describe_context(), machine().time().as_double(), counter() >> 8 );
 		if ( m_csr0_to_be_cleared )
 		{
 			m_csr &= ~1;
@@ -335,7 +335,7 @@ READ8_MEMBER(mc6846_device::read)
 		return counter() >> 8;
 
 	case 7:
-		LOG( "%s %f: mc6846 COUNTER low read $%02X\n", machine().describe_context(), space.machine().time().as_double(), counter() & 0xff );
+		LOG( "%s %f: mc6846 COUNTER low read $%02X\n", machine().describe_context(), machine().time().as_double(), counter() & 0xff );
 		if ( m_csr0_to_be_cleared )
 		{
 			m_csr &= ~1;
@@ -375,7 +375,7 @@ WRITE8_MEMBER(mc6846_device::write)
 			"latcged,pos-edge", "latcged,pos-edge,intr"
 		};
 		LOG( "%s %f: mc6846 PCR write $%02X reset=%i cp2=%s cp1=%s\n",
-				machine().describe_context(), space.machine().time().as_double(), data,
+				machine().describe_context(), machine().time().as_double(), data,
 				(data >> 7) & 1, cp2[ (data >> 3) & 7 ], cp1[ data & 7 ] );
 
 	}
@@ -403,7 +403,7 @@ WRITE8_MEMBER(mc6846_device::write)
 	break;
 
 	case 2:
-		LOG( "%s %f: mc6846 DDR write $%02X\n", machine().describe_context(), space.machine().time().as_double(), data );
+		LOG( "%s %f: mc6846 DDR write $%02X\n", machine().describe_context(), machine().time().as_double(), data );
 		if ( ! (m_pcr & 0x80) )
 		{
 			m_ddr = data;
@@ -413,7 +413,7 @@ WRITE8_MEMBER(mc6846_device::write)
 		break;
 
 	case 3:
-		LOG( "%s %f: mc6846 PORT write $%02X (mask=$%02X)\n", machine().describe_context(), space.machine().time().as_double(), data,m_ddr );
+		LOG( "%s %f: mc6846 PORT write $%02X (mask=$%02X)\n", machine().describe_context(), machine().time().as_double(), data,m_ddr );
 		if ( ! (m_pcr & 0x80) )
 		{
 			m_pdr = data;
@@ -422,12 +422,12 @@ WRITE8_MEMBER(mc6846_device::write)
 			if ( m_csr1_to_be_cleared && (m_csr & 2) )
 			{
 				m_csr &= ~2;
-				LOG( "%s %f: mc6846 CP1 intr reset\n", machine().describe_context(), space.machine().time().as_double() );
+				LOG( "%s %f: mc6846 CP1 intr reset\n", machine().describe_context(), machine().time().as_double() );
 			}
 			if ( m_csr2_to_be_cleared && (m_csr & 4) )
 			{
 				m_csr &= ~4;
-				LOG( "%s %f: mc6846 CP2 intr reset\n", machine().describe_context(), space.machine().time().as_double() );
+				LOG( "%s %f: mc6846 CP2 intr reset\n", machine().describe_context(), machine().time().as_double() );
 			}
 			m_csr1_to_be_cleared = 0;
 			m_csr2_to_be_cleared = 0;
@@ -443,7 +443,7 @@ WRITE8_MEMBER(mc6846_device::write)
 				"freq-cmp", "freq-cmp", "pulse-cmp", "pulse-cmp"
 			};
 		LOG( "%s %f: mc6846 TCR write $%02X reset=%i clock=%s scale=%i mode=%s out=%s\n",
-				machine().describe_context(), space.machine().time().as_double(), data,
+				machine().describe_context(), machine().time().as_double(), data,
 				(data >> 7) & 1, (data & 0x40) ? "extern" : "sys",
 				(data & 0x40) ? 1 : 8, mode[ (data >> 1) & 7 ],
 				(data & 1) ? "enabled" : "0" );
@@ -477,7 +477,7 @@ WRITE8_MEMBER(mc6846_device::write)
 
 	case 7:
 		m_latch = ( ((uint16_t) m_time_MSB) << 8 ) + data;
-		LOG( "%s %f: mc6846 COUNT write %i\n", machine().describe_context(), space.machine().time().as_double(), m_latch  );
+		LOG( "%s %f: mc6846 COUNT write %i\n", machine().describe_context(), machine().time().as_double(), m_latch  );
 		if (!(m_tcr & 0x38))
 		{
 			/* timer initialization */

@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef AIM65_H_
-#define AIM65_H_
+#ifndef MAME_INCLUDES_AIM65_H
+#define MAME_INCLUDES_AIM65_H
 
 #include "cpu/m6502/m6502.h"
 #include "video/dl1416.h"
@@ -29,7 +29,7 @@
  * crystal controlled oscillator. Dual D-type flip-flop Z10 divides the 4 MHz
  * signal by four to drive the R6502 phase 0 (O0) input with a 1 MHz clock.
  */
-#define AIM65_CLOCK  XTAL_4MHz/4
+#define AIM65_CLOCK  XTAL(4'000'000)/4
 
 
 class aim65_state : public driver_device
@@ -69,6 +69,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z14_load) { return load_cart(image, m_z14, "z14"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z15_load) { return load_cart(image, m_z15, "z15"); }
 
+	void aim65(machine_config &config);
+	void aim65_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -92,4 +94,4 @@ protected:
 };
 
 
-#endif /* AIM65_H_ */
+#endif // MAME_INCLUDES_AIM65_H

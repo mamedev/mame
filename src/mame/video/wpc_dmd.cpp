@@ -7,7 +7,7 @@
 
 DEFINE_DEVICE_TYPE(WPC_DMD, wpc_dmd_device, "wpc_dmd", "Williams Pinball Controller Dot Matrix Display")
 
-DEVICE_ADDRESS_MAP_START( registers, 8, wpc_dmd_device )
+ADDRESS_MAP_START(wpc_dmd_device::registers)
 	AM_RANGE(0, 0) AM_WRITE(bank2_w)
 	AM_RANGE(1, 1) AM_WRITE(bank0_w)
 	AM_RANGE(2, 2) AM_WRITE(bank6_w)
@@ -35,7 +35,7 @@ wpc_dmd_device::~wpc_dmd_device()
 {
 }
 
-MACHINE_CONFIG_MEMBER( wpc_dmd_device::device_add_mconfig )
+MACHINE_CONFIG_START(wpc_dmd_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))

@@ -25,32 +25,28 @@ std::size_t strlen_mem(const T *s)
 template<typename F>
 int pstring_t<F>::compare(const pstring_t &right) const
 {
-	std::size_t l = std::min(mem_t_size(), right.mem_t_size());
-	if (l == 0)
-	{
-		if (mem_t_size() == 0 && right.mem_t_size() == 0)
-			return 0;
-		else if (right.mem_t_size() == 0)
-			return 1;
-		else
-			return -1;
-	}
+	if (mem_t_size() == 0 && right.mem_t_size() == 0)
+		return 0;
+	else if (right.mem_t_size() == 0)
+		return 1;
+	else if (mem_t_size() == 0)
+		return -1;
+
 	auto si = this->begin();
 	auto ri = right.begin();
-	while (si != this->end() && *si == *ri)
+	while (si != this->end() && ri != right.end() && *si == *ri)
 	{
 		ri++;
 		si++;
 	}
-	int ret = (si == this->end() ? 0 : static_cast<int>(*si) - static_cast<int>(*ri));
-	if (ret == 0)
-	{
-		if (this->mem_t_size() > right.mem_t_size())
-			ret = 1;
-		else if (this->mem_t_size() < right.mem_t_size())
-			ret = -1;
-	}
-	return ret;
+
+	if (si != this->end() && ri != right.end())
+		return static_cast<int>(*si) - static_cast<int>(*ri);
+	else if (this->mem_t_size() > right.mem_t_size())
+		return 1;
+	else if (this->mem_t_size() < right.mem_t_size())
+		return -1;
+	return 0;
 }
 
 template<typename F>

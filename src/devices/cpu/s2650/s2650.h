@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "2650dasm.h"
 
 #define S2650_SENSE_LINE INPUT_LINE_IRQ1
 
@@ -27,24 +28,24 @@ DECLARE_DEVICE_TYPE(S2650, s2650_device)
 
 
 #define MCFG_S2650_SENSE_INPUT(_devcb) \
-	devcb = &s2650_device::set_sense_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<s2650_device &>(*device).set_sense_handler(DEVCB_##_devcb);
 
 #define MCFG_S2650_FLAG_OUTPUT(_devcb) \
-	devcb = &s2650_device::set_flag_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<s2650_device &>(*device).set_flag_handler(DEVCB_##_devcb);
 
 #define MCFG_S2650_INTACK_HANDLER(_devcb) \
-	devcb = &s2650_device::set_intack_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<s2650_device &>(*device).set_intack_handler(DEVCB_##_devcb);
 
-class s2650_device : public cpu_device
+	class s2650_device : public cpu_device, public s2650_disassembler::config
 {
 public:
 	// construction/destruction
 	s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_sense_handler(device_t &device, Object &&cb) { return downcast<s2650_device &>(device).m_sense_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_flag_handler(device_t &device, Object &&cb) { return downcast<s2650_device &>(device).m_flag_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_intack_handler(device_t &device, Object &&cb) { return downcast<s2650_device &>(device).m_intack_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_sense_handler(Object &&cb) { return m_sense_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_flag_handler(Object &&cb) { return m_flag_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_intack_handler(Object &&cb) { return m_intack_handler.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides
@@ -68,9 +69,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 3; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
+	virtual bool get_z80_mnemonics_mode() const override;
 
 private:
 	address_space_config m_program_config;
@@ -95,7 +95,7 @@ private:
 	uint8_t   m_irq_state;
 
 	int     m_icount;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 
 	// For debugger
 	uint16_t  m_debugger_temp;

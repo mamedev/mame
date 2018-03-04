@@ -79,6 +79,10 @@ public:
 	inline void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _N_);
 	void draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
 
+	void fuuki16(machine_config &config);
+	void fuuki16_map(address_map &map);
+	void fuuki16_sound_io_map(address_map &map);
+	void fuuki16_sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

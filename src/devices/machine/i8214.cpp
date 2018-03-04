@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Intel 8214 Priority Interrupt Controller emulation
+    Intel 8214/3214 Priority Interrupt Control Unit
 
 **********************************************************************/
 
@@ -14,7 +14,7 @@
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(I8214, i8214_device, "i8214", "Intel 8214 PIC")
+DEFINE_DEVICE_TYPE(I8214, i8214_device, "i8214", "Intel 8214 PICU")
 
 
 
@@ -39,8 +39,8 @@ void i8214_device::trigger_interrupt(int level)
 	m_write_enlg(0);
 
 	// set interrupt line
-	m_write_irq(ASSERT_LINE);
-	m_write_irq(CLEAR_LINE);
+	m_write_int(ASSERT_LINE);
+	m_write_int(CLEAR_LINE);
 }
 
 
@@ -83,7 +83,7 @@ void i8214_device::check_interrupt()
 
 i8214_device::i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, I8214, tag, owner, clock)
-	, m_write_irq(*this)
+	, m_write_int(*this)
 	, m_write_enlg(*this)
 	, m_inte(0)
 	, m_int_dis(0)
@@ -103,7 +103,7 @@ i8214_device::i8214_device(const machine_config &mconfig, const char *tag, devic
 void i8214_device::device_start()
 {
 	// resolve callbacks
-	m_write_irq.resolve_safe();
+	m_write_int.resolve_safe();
 	m_write_enlg.resolve_safe();
 
 	m_int_dis = 0;
@@ -131,6 +131,17 @@ uint8_t i8214_device::a_r()
 	LOG("I8214 A: %01x\n", a);
 
 	return a;
+}
+
+
+//-------------------------------------------------
+//  vector_r - read A outputs to be latched as an
+//  8080-compatible interrupt vector
+//-------------------------------------------------
+
+READ8_MEMBER(i8214_device::vector_r)
+{
+	return 0xc7 | (m_a << 3);
 }
 
 

@@ -21,6 +21,7 @@ ZPU-2000 - main cpu board (Zentral (sic) Processor Unit)
  - 32 dipswitches in 4 banks of 8
  - four 'test button' style switches
  - one 4Mhz xtal @A1
+ - one PAL16R8? @7D (UNDUMPED, if present)
  - this same board is shared with cliff hanger (cliffhgr.c)
 
 CFB-1000 - video/subcpu board (Color Frame Board)
@@ -32,7 +33,7 @@ CFB-1000 - video/subcpu board (Color Frame Board)
  - DIP64 custom framebuffer controller "Video Controller"@E11
  - "Parameter ram" ?6116? SRAM @K13
  - "Frame buffer" 16x ?4116? DRAM @ right edge of pcb
- - "Erase PROM" @A16 (UNDUMPED)
+ - "Erase PROM" 82S137 or MMI6353-1 @A16 (UNDUMPED)
  - 22.1164Mhz xtal @K14
  - 8 dipswitches in 2 banks of 4, @B5 and @B7
  - LED @B7
@@ -59,33 +60,19 @@ It is currently unknown what versions the two sets in MAME correspond to.
 The other roms are likely always version RA1, as the RA3-zpu-2000 board has RA1
 roms for all roms except the zpu-2000 board.
 
-Issues:
-======
-Sprites leave trails in both games
-Sprites should be transparent (color 0x0f)
-Screen flickers heavily in Great Guns (double buffer issue?).
-
-
 TO DO:
 =====
-- handle page flipping
-
-- figure out the VCU modes used in "clr_r":
-  0x13 -? sprites related
-  0x03 -? could be collision detection (if there is such a thing)
-
-- figure out how the palette is handled (partially done)
-
-- find out if there are any CLUTs (might be the other unknown cases in mode 7)
+- fix remaining issues in mb_vcu device.
 
 - figure out what really should happen during VCU test in Great Guns (patched
   out at the moment) (btw. Mazer Blazer doesn't test VCU)
 
-- add sound to Mazer Blazer - Speech processor is unknown chip
+- add sound interface to Mazer Blazer - Speech processor is Digitalker chip, sample ROMs are currently
+  undumped;
 
-====
+============================================================================
 
-Mazer Blazer DASM notes:
+Mazer Blazer DASM notes (reference only):
 master z80
 [0x0000]: clear 0x4c-0x4f i/o ports (ls670)
 [0x0792]: z80 regs check
@@ -128,8 +115,8 @@ video z80
 #include "speaker.h"
 
 
-#define MASTER_CLOCK XTAL_4MHz
-#define SOUND_CLOCK XTAL_14_31818MHz
+#define MASTER_CLOCK XTAL(4'000'000)
+#define SOUND_CLOCK XTAL(14'318'181)
 
 
 class mazerbla_state : public driver_device
@@ -196,6 +183,17 @@ public:
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	void greatgun(machine_config &config);
+	void mazerbla(machine_config &config);
+	void greatgun_cpu3_io_map(address_map &map);
+	void greatgun_io_map(address_map &map);
+	void greatgun_sound_map(address_map &map);
+	void mazerbla_cpu2_io_map(address_map &map);
+	void mazerbla_cpu2_map(address_map &map);
+	void mazerbla_cpu3_io_map(address_map &map);
+	void mazerbla_cpu3_map(address_map &map);
+	void mazerbla_io_map(address_map &map);
+	void mazerbla_map(address_map &map);
 };
 
 
@@ -455,38 +453,41 @@ WRITE8_MEMBER(mazerbla_state::sound_int_clear_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mazerbla_map, AS_PROGRAM, 8, mazerbla_state )
+ADDRESS_MAP_START(mazerbla_state::mazerbla_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd800, 0xd800) AM_READ(cfb_zpu_int_req_clr)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mazerbla_io_map, AS_IO, 8, mazerbla_state )
+ADDRESS_MAP_START(mazerbla_state::mazerbla_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x4c, 0x4f) AM_READWRITE(ls670_1_r, ls670_0_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w) // AM_READ from protection pal, if populated
 	AM_RANGE(0x62, 0x62) AM_READ(zpu_inputs_r)
+	// 64 is some sort of output latch, unpopulated?
+	// 66 is some sort of output latch, unpopulated?
 	AM_RANGE(0x68, 0x68) AM_WRITE(zpu_coin_counter_w)
 	AM_RANGE(0x6a, 0x6a) AM_WRITE(zpu_lamps_w)
+	// 6c RW is a 6850 acia for communication with another cabinet or debug console? unpopulated?
 	AM_RANGE(0x6e, 0x6f) AM_WRITE(zpu_led_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mazerbla_cpu2_map, AS_PROGRAM, 8, mazerbla_state )
+ADDRESS_MAP_START(mazerbla_state::mazerbla_cpu2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM /* main RAM (stack) */
 	AM_RANGE(0x8000, 0x83ff) AM_RAM /* waveform ???*/
 	AM_RANGE(0xc000, 0xc003) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mazerbla_cpu2_io_map, AS_IO, 8, mazerbla_state )
+ADDRESS_MAP_START(mazerbla_state::mazerbla_cpu2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(vsb_ls273_audio_control_w)
 	AM_RANGE(0x40, 0x41) AM_WRITENOP
 	AM_RANGE(0x80, 0x83) AM_READWRITE(ls670_0_r, ls670_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mazerbla_cpu3_map, AS_PROGRAM, 8, mazerbla_state )
+ADDRESS_MAP_START(mazerbla_state::mazerbla_cpu3_map)
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")                    /* GFX roms */
@@ -497,7 +498,7 @@ static ADDRESS_MAP_START( mazerbla_cpu3_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0xe000, 0xffff) AM_DEVREAD("vcu", mb_vcu_device, load_set_clr)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mazerbla_cpu3_io_map, AS_IO, 8, mazerbla_state )
+ADDRESS_MAP_START(mazerbla_state::mazerbla_cpu3_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("vcu", mb_vcu_device, background_color_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("vcu", mb_vcu_device, status_r) AM_WRITE(cfb_led_w)
@@ -513,7 +514,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( greatgun_io_map, AS_IO, 8, mazerbla_state )
+ADDRESS_MAP_START(mazerbla_state::greatgun_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x4c, 0x4c) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
@@ -523,7 +524,7 @@ static ADDRESS_MAP_START( greatgun_io_map, AS_IO, 8, mazerbla_state )
 	AM_RANGE(0x6e, 0x6f) AM_WRITE(zpu_led_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( greatgun_sound_map, AS_PROGRAM, 8, mazerbla_state )
+ADDRESS_MAP_START(mazerbla_state::greatgun_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -533,10 +534,10 @@ static ADDRESS_MAP_START( greatgun_sound_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( greatgun_cpu3_io_map, AS_IO, 8, mazerbla_state )
+ADDRESS_MAP_START(mazerbla_state::greatgun_cpu3_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE("vcu", mb_vcu_device, vbank_clear_w)
 	AM_IMPORT_FROM( mazerbla_cpu3_io_map )
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("vcu", mb_vcu_device, vbank_clear_w)
 ADDRESS_MAP_END
 
 
@@ -678,13 +679,13 @@ static INPUT_PORTS_START( mazerbla )
 
 	PORT_START("STICK0_X")  /* Strobe 6: horizontal movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(1)
-	
+
 	PORT_START("STICK0_Y")  /* Strobe 7: vertical movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(1)
 
 	PORT_START("STICK1_X")  /* Strobe 8: horizontal movement of gun */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("STICK1_Y")  /* Strobe 9: vertical movement of gun */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -694,7 +695,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mazerblaa )
 	PORT_INCLUDE( mazerbla )
-	
+
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -715,7 +716,7 @@ static INPUT_PORTS_START( mazerblaa )
 	PORT_DIPSETTING(    0xc0, "40000" )
 	PORT_DIPSETTING(    0x80, "50000" )
 	PORT_DIPSETTING(    0x40, "60000" )
-	PORT_DIPSETTING(    0x00, "70000" )	
+	PORT_DIPSETTING(    0x00, "70000" )
 INPUT_PORTS_END
 
 // TODO: defaults, not listed in manual
@@ -951,7 +952,7 @@ void mazerbla_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( mazerbla )
+MACHINE_CONFIG_START(mazerbla_state::mazerbla)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
@@ -979,7 +980,7 @@ static MACHINE_CONFIG_START( mazerbla )
 	MCFG_MB_VCU_PALETTE("palette")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -991,12 +992,12 @@ static MACHINE_CONFIG_START( mazerbla )
 
 	MCFG_PALETTE_ADD("palette", 256+1)
 	MCFG_PALETTE_INIT_OWNER(mazerbla_state, mazerbla)
-	
+
 	/* sound hardware */
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( greatgun )
+MACHINE_CONFIG_START(mazerbla_state::greatgun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
@@ -1022,7 +1023,7 @@ static MACHINE_CONFIG_START( greatgun )
 	MCFG_MB_VCU_PALETTE("palette")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1165,14 +1166,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(mazerbla_state,mazerbla)
 {
-//	m_game_id = MAZERBLA;
+//  m_game_id = MAZERBLA;
 }
 
 DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
 {
 	uint8_t *rom = memregion("sub2")->base();
 
-//	m_game_id = GREATGUN;
+//  m_game_id = GREATGUN;
 
 	//  patch VCU test
 	//  VCU test starts at PC=0x56f
@@ -1183,6 +1184,6 @@ DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
 	rom[0x0380] = 0;
 }
 
-GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerblaa,mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // newer?
+GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerblaa,mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // newer?
 GAME( 1983, greatgun,  0,        greatgun,  greatgun, mazerbla_state, greatgun, ROT0, "Stern Electronics", "Great Guns",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

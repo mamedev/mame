@@ -49,6 +49,8 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "sound/samples.h"
+#include "speaker.h"
 #include "screen.h"
 
 
@@ -71,12 +73,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_samples(*this,"samples"),
 		m_vram(*this, "vram"),
 		m_tiles(*this, "tiles"),
 		m_colors(*this, "colors"),
 		m_ball_x(0x00),
 		m_ball_y(0x00),
-		m_color(0x00)
+		m_color(0x00),
+		m_audio(0x00)
 	{}
 
 	DECLARE_READ8_MEMBER(vblank_r);
@@ -87,6 +91,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void mmagic(machine_config &config);
+	void mmagic_io(address_map &map);
+	void mmagic_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -94,6 +101,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<samples_device> m_samples;
 	required_shared_ptr<uint8_t> m_vram;
 	required_region_ptr<uint8_t> m_tiles;
 	required_region_ptr<uint8_t> m_colors;
@@ -101,6 +109,7 @@ private:
 	uint8_t m_ball_x;
 	uint8_t m_ball_y;
 	uint8_t m_color;
+	uint8_t m_audio;
 };
 
 
@@ -108,7 +117,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( mmagic_mem, AS_PROGRAM, 8, mmagic_state )
+ADDRESS_MAP_START(mmagic_state::mmagic_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x2000, 0x21ff) AM_RAM
@@ -118,7 +127,7 @@ static ADDRESS_MAP_START( mmagic_mem, AS_PROGRAM, 8, mmagic_state )
 	AM_RANGE(0x8004, 0x8004) AM_READ(vblank_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mmagic_io, AS_IO, 8, mmagic_state )
+ADDRESS_MAP_START(mmagic_state::mmagic_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_WRITE(color_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(audio_w)
@@ -245,10 +254,33 @@ uint32_t mmagic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 //  AUDIO EMULATION
 //**************************************************************************
 
+static const char *const mmagic_sample_names[] =
+{
+	"*mmagic",
+	"4",
+	"3",
+	"5",
+	"2",
+	"2-2",
+	"6",
+	"6-2",
+	"1",
+	nullptr
+};
+
 WRITE8_MEMBER( mmagic_state::audio_w )
 {
 	if (LOG_AUDIO)
 		logerror("audio_w: %02x\n", data);
+
+	data ^= 0xff;
+	if (data != m_audio)
+	{
+		if (BIT(data, 7))
+			m_samples->start(0, m_audio & 7);
+
+		m_audio = data;
+	}
 }
 
 
@@ -262,6 +294,7 @@ void mmagic_state::machine_start()
 	save_item(NAME(m_ball_x));
 	save_item(NAME(m_ball_y));
 	save_item(NAME(m_color));
+	save_item(NAME(m_audio));
 }
 
 
@@ -269,21 +302,26 @@ void mmagic_state::machine_start()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( mmagic )
+MACHINE_CONFIG_START(mmagic_state::mmagic)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz)  // NEC D8085A
+	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL) // NEC D8085A
 	MCFG_CPU_PROGRAM_MAP(mmagic_mem)
 	MCFG_CPU_IO_MAP(mmagic_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_6_144MHz, 384, 0, 256, 264, 0, 192)
+	MCFG_SCREEN_RAW_PARAMS(6.144_MHz_XTAL, 384, 0, 256, 264, 0, 192)
 	MCFG_SCREEN_UPDATE_DRIVER(mmagic_state, screen_update)
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	// sound hardware
-	// TODO: SN76477 + discrete sound
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(mmagic_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	// TODO: replace samples with SN76477 + discrete sound
 MACHINE_CONFIG_END
 
 
@@ -315,4 +353,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  MACHINE INPUT   CLASS         INIT  ROT     COMPANY     FULLNAME        FLAGS
-GAME( 1979, mmagic, 0,      mmagic, mmagic, mmagic_state, 0,    ROT270, "Nintendo", "Monkey Magic", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+GAME( 1979, mmagic, 0,      mmagic, mmagic, mmagic_state, 0,    ROT270, "Nintendo", "Monkey Magic", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

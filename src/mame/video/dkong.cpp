@@ -678,7 +678,7 @@ inline double dkong_state::CD4049(double x)
 #define RC32    ((18e3 + 68e3) * 33e-6)
 #define RC4     (90e3 * 0.47e-6)
 #define dt      (1./60./(double) VTOTAL)
-#define period2 (((int64_t)(PIXEL_CLOCK) * ( 33L * 68L )) / (int32_t)10000000L / 3)  /*  period/2 in pixel ... */
+#define period2 (((int64_t)(PIXEL_CLOCK.value()) * ( 33L * 68L )) / (int32_t)10000000L / 3)  /*  period/2 in pixel ... */
 
 void dkong_state::radarscp_step(int line_cnt)
 {

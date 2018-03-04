@@ -3,9 +3,9 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#include <bx/simd_t.h>
+#include <bx/allocator.h>
 #include <bx/rng.h>
-#include <bx/crtimpl.h>
+#include <bx/simd_t.h>
 #include <bx/timer.h>
 
 #include <stdio.h>
@@ -98,7 +98,7 @@ void simd_bench_pass(bx::simd128_t* _dst, bx::simd128_t* _src, uint32_t _numVert
 
 void simd_bench()
 {
-	bx::CrtAllocator allocator;
+	bx::DefaultAllocator allocator;
 	bx::RngMwc rng;
 
 	const uint32_t numVertices = 1024*1024;
@@ -121,10 +121,10 @@ void simd_bench()
 	for (uint32_t ii = 0; ii < numVertices; ++ii)
 	{
 		float* ptr = (float*)&src[ii];
-		ptr[0] = bx::fabsolute(ptr[0]);
-		ptr[1] = bx::fabsolute(ptr[1]);
-		ptr[2] = bx::fabsolute(ptr[2]);
-		ptr[3] = bx::fabsolute(ptr[3]);
+		ptr[0] = bx::fabs(ptr[0]);
+		ptr[1] = bx::fabs(ptr[1]);
+		ptr[2] = bx::fabs(ptr[2]);
+		ptr[3] = bx::fabs(ptr[3]);
 	}
 
 	simd_bench_pass(dst, src, numVertices);

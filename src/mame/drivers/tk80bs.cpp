@@ -48,6 +48,8 @@ public:
 	DECLARE_READ8_MEMBER(port_b_r);
 	uint32_t screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
+	void tk80bs(machine_config &config);
+	void tk80bs_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -106,7 +108,7 @@ WRITE8_MEMBER( tk80bs_state::ppi_custom_w )
 	}
 }
 
-static ADDRESS_MAP_START(tk80bs_mem, AS_PROGRAM, 8, tk80bs_state)
+ADDRESS_MAP_START(tk80bs_state::tk80bs_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 //  AM_RANGE(0x0c00, 0x7bff) AM_ROM // ext
@@ -166,9 +168,9 @@ static GFXDECODE_START( tk80bs )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tk80bs )
+MACHINE_CONFIG_START(tk80bs_state::tk80bs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz) //unknown clock
+	MCFG_CPU_ADD("maincpu",I8080, XTAL(1'000'000)) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(tk80bs_mem)
 
 	/* video hardware */

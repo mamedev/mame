@@ -170,7 +170,7 @@ DEFINE_DEVICE_TYPE(MOS7360, mos7360_device, "mos7360", "MOS 7360 TED")
 
 
 // default address maps
-static ADDRESS_MAP_START( mos7360_videoram_map, 0, 8, mos7360_device )
+ADDRESS_MAP_START(mos7360_device::mos7360_videoram_map)
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -264,7 +264,7 @@ mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, d
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos7360_videoram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(mos7360_device::mos7360_videoram_map), this)),
 		m_write_irq(*this),
 		m_read_k(*this),
 		m_stream(nullptr)
@@ -291,12 +291,12 @@ void mos7360_device::device_start()
 	m_timer2 = timer_alloc(TIMER_ID_2);
 	m_timer3 = timer_alloc(TIMER_ID_3);
 	m_line_timer = timer_alloc(TIMER_LINE);
-	m_line_timer->adjust(m_screen->scan_period(), 0, m_screen->scan_period());
+	m_line_timer->adjust(screen().scan_period(), 0, screen().scan_period());
 	m_frame_timer = timer_alloc(TIMER_FRAME);
-	m_frame_timer->adjust(m_screen->frame_period(), 0, m_screen->frame_period());
+	m_frame_timer->adjust(screen().frame_period(), 0, screen().frame_period());
 
 	// allocate screen bitmap
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	// create sound stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());

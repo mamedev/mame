@@ -25,32 +25,35 @@ TODO:
 
 #include "emu.h"
 #include "includes/vector06.h"
+
 #include "formats/vector06_dsk.h"
+#include "sound/wave.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
 /* Address maps */
-static ADDRESS_MAP_START(vector06_mem, AS_PROGRAM, 8, vector06_state)
-	AM_RANGE( 0x0000, 0x7fff ) AM_READ_BANK("bank2")
-	AM_RANGE( 0xa000, 0xdfff ) AM_READWRITE_BANK("bank3")
-	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE_BANK("bank1")
+ADDRESS_MAP_START(vector06_state::vector06_mem)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE_BANK("bank1")
+	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank2")
+	AM_RANGE(0xa000, 0xdfff) AM_READWRITE_BANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vector06_io, AS_IO, 8, vector06_state)
+ADDRESS_MAP_START(vector06_state::vector06_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0x03) AM_READWRITE(vector06_8255_1_r, vector06_8255_1_w )
-	AM_RANGE( 0x04, 0x07) AM_READWRITE(vector06_8255_2_r, vector06_8255_2_w )
-	AM_RANGE( 0x08, 0x0B) AM_READWRITE(pit8253_r, pit8253_w)
-	AM_RANGE( 0x0C, 0x0C) AM_WRITE(vector06_color_set)
-	AM_RANGE( 0x10, 0x10) AM_WRITE(vector06_ramdisk_w)
-	AM_RANGE( 0x14, 0x15) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_address_w)
-	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", kr1818vg93_device, data_r, data_w)
-	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", kr1818vg93_device, sector_r, sector_w)
-	AM_RANGE( 0x1a, 0x1a) AM_DEVREADWRITE("wd1793", kr1818vg93_device, track_r, track_w)
-	AM_RANGE( 0x1b, 0x1b) AM_DEVREADWRITE("wd1793", kr1818vg93_device, status_r, cmd_w)
-	AM_RANGE( 0x1C, 0x1C) AM_WRITE(vector06_disc_w)
+	;
+	map(0x00, 0x03).lrw8("ppi8255_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_ppi8255->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ppi8255->write(space, offset^3, data, mem_mask); });
+	map(0x04, 0x07).lrw8("ppi8255_2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_ppi8255_2->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ppi8255_2->write(space, offset^3, data, mem_mask); });
+	map(0x08, 0x0b).lrw8("pit8253_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_pit8253->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pit8253->write(space, offset^3, data, mem_mask); });
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(vector06_color_set)
+	AM_RANGE(0x10, 0x10) AM_WRITE(vector06_ramdisk_w)
+	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_address_w)
+	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("wd1793", kr1818vg93_device, data_r, data_w)
+	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("wd1793", kr1818vg93_device, sector_r, sector_w)
+	AM_RANGE(0x1a, 0x1a) AM_DEVREADWRITE("wd1793", kr1818vg93_device, track_r, track_w)
+	AM_RANGE(0x1b, 0x1b) AM_DEVREADWRITE("wd1793", kr1818vg93_device, status_r, cmd_w)
+	AM_RANGE(0x1c, 0x1c) AM_WRITE(vector06_disc_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -153,10 +156,9 @@ SLOT_INTERFACE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( vector06 )
+MACHINE_CONFIG_START(vector06_state::vector06)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 3000000)     // actual speed is wrong due to unemulated latency
-//  MCFG_CPU_ADD("maincpu", Z80, 3000000)
 	MCFG_CPU_PROGRAM_MAP(vector06_mem)
 	MCFG_CPU_IO_MAP(vector06_io)
 	MCFG_I8085A_STATUS(WRITE8(vector06_state, vector06_status_callback))
@@ -195,7 +197,7 @@ static MACHINE_CONFIG_START( vector06 )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_KR1818VG93_ADD("wd1793", XTAL_1MHz)
+	MCFG_KR1818VG93_ADD("wd1793", XTAL(1'000'000))
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", vector06_floppies, "qd", vector06_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", vector06_floppies, "qd", vector06_state::floppy_formats)

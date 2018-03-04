@@ -50,20 +50,20 @@
 
 #define MCFG_IM6402_ADD(_tag, _rrc, _trc) \
 	MCFG_DEVICE_ADD(_tag, IM6402, 0) \
-	im6402_device::set_rrc(*device, _rrc); \
-	im6402_device::set_trc(*device, _trc);
+	downcast<im6402_device &>(*device).set_rrc(_rrc); \
+	downcast<im6402_device &>(*device).set_trc(_trc);
 
 #define MCFG_IM6402_TRO_CALLBACK(_write) \
-	devcb = &im6402_device::set_tro_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<im6402_device &>(*device).set_tro_wr_callback(DEVCB_##_write);
 
 #define MCFG_IM6402_DR_CALLBACK(_write) \
-	devcb = &im6402_device::set_dr_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<im6402_device &>(*device).set_dr_wr_callback(DEVCB_##_write);
 
 #define MCFG_IM6402_TBRE_CALLBACK(_write) \
-	devcb = &im6402_device::set_tbre_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<im6402_device &>(*device).set_tbre_wr_callback(DEVCB_##_write);
 
 #define MCFG_IM6402_TRE_CALLBACK(_write) \
-	devcb = &im6402_device::set_tre_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<im6402_device &>(*device).set_tre_wr_callback(DEVCB_##_write);
 
 
 
@@ -79,12 +79,12 @@ public:
 	// construction/destruction
 	im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_rrc(device_t &device, int rrc) { downcast<im6402_device &>(device).m_rrc = rrc; }
-	static void set_trc(device_t &device, int trc) { downcast<im6402_device &>(device).m_trc = trc; }
-	template <class Object> static devcb_base &set_tro_wr_callback(device_t &device, Object &&cb) { return downcast<im6402_device &>(device).m_write_tro.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dr_wr_callback(device_t &device, Object &&cb) { return downcast<im6402_device &>(device).m_write_dr.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_tbre_wr_callback(device_t &device, Object &&cb) { return downcast<im6402_device &>(device).m_write_tbre.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_tre_wr_callback(device_t &device, Object &&cb) { return downcast<im6402_device &>(device).m_write_tre.set_callback(std::forward<Object>(cb)); }
+	void set_rrc(int rrc) { m_rrc = rrc; }
+	void set_trc(int trc) { m_trc = trc; }
+	template <class Object> devcb_base &set_tro_wr_callback(Object &&cb) { return m_write_tro.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dr_wr_callback(Object &&cb) { return m_write_dr.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_tbre_wr_callback(Object &&cb) { return m_write_tbre.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_tre_wr_callback(Object &&cb) { return m_write_tre.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read ) { return m_rbr; }
 	DECLARE_WRITE8_MEMBER( write );

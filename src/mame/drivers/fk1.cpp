@@ -14,6 +14,7 @@
 #include "machine/pit8253.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 
@@ -61,6 +62,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_callback);
 	IRQ_CALLBACK_MEMBER(fk1_irq_callback);
+	void fk1(machine_config &config);
+	void fk1_io(address_map &map);
+	void fk1_mem(address_map &map);
 };
 
 
@@ -305,14 +309,14 @@ WRITE8_MEMBER( fk1_state::fk1_reset_int_w )
 	logerror("fk1_reset_int_w\n");
 }
 
-static ADDRESS_MAP_START(fk1_mem, AS_PROGRAM, 8, fk1_state)
+ADDRESS_MAP_START(fk1_state::fk1_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(fk1_io, AS_IO, 8, fk1_state)
+ADDRESS_MAP_START(fk1_state::fk1_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
@@ -404,9 +408,9 @@ uint32_t fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-static MACHINE_CONFIG_START( fk1 )
+MACHINE_CONFIG_START(fk1_state::fk1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(fk1_mem)
 	MCFG_CPU_IO_MAP(fk1_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fk1_state,fk1_irq_callback)

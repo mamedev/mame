@@ -6,6 +6,7 @@
 
 #include "namcos2.h"
 #include "machine/namcoio_gearbox.h"
+#include "machine/timer.h"
 
 #define NAMCOS21_POLY_FRAME_WIDTH 496
 #define NAMCOS21_POLY_FRAME_HEIGHT 480
@@ -101,7 +102,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dspcuskey_w);
 	DECLARE_READ16_MEMBER(dspcuskey_r);
 	DECLARE_READ16_MEMBER(dspram16_r);
-	DECLARE_WRITE16_MEMBER(dspram16_w);
+	template<bool maincpu> DECLARE_WRITE16_MEMBER(dspram16_w);
 	DECLARE_READ16_MEMBER(dsp_port0_r);
 	DECLARE_WRITE16_MEMBER(dsp_port0_w);
 	DECLARE_READ16_MEMBER(dsp_port1_r);
@@ -191,4 +192,28 @@ public:
 	void render_slave_output(uint16_t data);
 	void winrun_flush_poly();
 	void init(int game_type);
+	void configure_c148_standard(machine_config &config);
+	void driveyes(machine_config &config);
+	void winrun(machine_config &config);
+	void namcos21(machine_config &config);
+	void common_map(address_map &map);
+	void driveyes_common_map(address_map &map);
+	void driveyes_master_map(address_map &map);
+	void driveyes_slave_map(address_map &map);
+	void master_dsp_data(address_map &map);
+	void master_dsp_io(address_map &map);
+	void master_dsp_program(address_map &map);
+	void master_map(address_map &map);
+	void mcu_map(address_map &map);
+	void slave_dsp_data(address_map &map);
+	void slave_dsp_io(address_map &map);
+	void slave_dsp_program(address_map &map);
+	void slave_map(address_map &map);
+	void sound_map(address_map &map);
+	void winrun_dsp_data(address_map &map);
+	void winrun_dsp_io(address_map &map);
+	void winrun_dsp_program(address_map &map);
+	void winrun_gpu_map(address_map &map);
+	void winrun_master_map(address_map &map);
+	void winrun_slave_map(address_map &map);
 };

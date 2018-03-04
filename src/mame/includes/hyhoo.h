@@ -47,6 +47,10 @@ public:
 	uint32_t screen_update_hyhoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void hyhoo_gfxdraw();
 
+	void hyhoo(machine_config &config);
+	void hyhoo2(machine_config &config);
+	void hyhoo_io_map(address_map &map);
+	void hyhoo_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

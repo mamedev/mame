@@ -44,13 +44,6 @@ hp_hil_slot_device::hp_hil_slot_device(const machine_config &mconfig, const char
 }
 
 
-void hp_hil_slot_device::static_set_hp_hil_slot(device_t &device, device_t *owner, const char *mlc_tag)
-{
-	hp_hil_slot_device &hp_hil = dynamic_cast<hp_hil_slot_device &>(device);
-	hp_hil.m_owner = owner;
-	hp_hil.m_mlc_tag = mlc_tag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -59,7 +52,7 @@ void hp_hil_slot_device::device_start()
 {
 	device_hp_hil_interface *dev = dynamic_cast<device_hp_hil_interface *>(get_card_device());
 
-	if (dev) device_hp_hil_interface::static_set_hp_hil_mlc(*dev,m_owner->subdevice(m_mlc_tag));
+	if (dev) dev->set_hp_hil_mlc(m_owner->subdevice(m_mlc_tag));
 }
 
 
@@ -262,13 +255,6 @@ device_hp_hil_interface::device_hp_hil_interface(const machine_config &mconfig, 
 
 device_hp_hil_interface::~device_hp_hil_interface()
 {
-}
-
-
-void device_hp_hil_interface::static_set_hp_hil_mlc(device_t &device, device_t *mlc_device)
-{
-	device_hp_hil_interface &hp_hil = dynamic_cast<device_hp_hil_interface &>(device);
-	hp_hil.m_hp_hil_mlc_dev = mlc_device;
 }
 
 

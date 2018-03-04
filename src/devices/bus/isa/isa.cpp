@@ -35,13 +35,6 @@ isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type ty
 {
 }
 
-void isa8_slot_device::static_set_isa8_slot(device_t &device, device_t *owner, const char *isa_tag)
-{
-	isa8_slot_device &isa_card = dynamic_cast<isa8_slot_device &>(device);
-	isa_card.m_owner = owner;
-	isa_card.m_isa_tag = isa_tag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -53,7 +46,7 @@ void isa8_slot_device::device_start()
 	if (get_card_device() && get_card_device()->interface(intf))
 		fatalerror("ISA16 device in ISA8 slot\n");
 
-	if (dev) device_isa8_card_interface::static_set_isabus(*dev,m_owner->subdevice(m_isa_tag));
+	if (dev) dev->set_isabus(m_owner->subdevice(m_isa_tag));
 }
 
 
@@ -76,13 +69,6 @@ isa16_slot_device::isa16_slot_device(const machine_config &mconfig, const char *
 {
 }
 
-void isa16_slot_device::static_set_isa16_slot(device_t &device, device_t *owner, const char *isa_tag)
-{
-	isa16_slot_device &isa_card = dynamic_cast<isa16_slot_device &>(device);
-	isa_card.m_owner = owner;
-	isa_card.m_isa_tag = isa_tag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -90,7 +76,7 @@ void isa16_slot_device::static_set_isa16_slot(device_t &device, device_t *owner,
 void isa16_slot_device::device_start()
 {
 	device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
-	if (dev) device_isa8_card_interface::static_set_isabus(*dev,m_owner->subdevice(m_isa_tag));
+	if (dev) dev->set_isabus(m_owner->subdevice(m_isa_tag));
 }
 
 
@@ -99,19 +85,6 @@ void isa16_slot_device::device_start()
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(ISA8, isa8_device, "isa8", "8-bit ISA bus")
-
-void isa8_device::static_set_cputag(device_t &device, const char *tag)
-{
-	isa8_device &isa = downcast<isa8_device &>(device);
-	isa.m_cputag = tag;
-}
-
-void isa8_device::static_set_custom_spaces(device_t &device)
-{
-	isa8_device &isa = downcast<isa8_device &>(device);
-
-	isa.m_allocspaces = true;
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -129,11 +102,11 @@ isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_
 isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_mem_config("ISA 8-bit mem", ENDIANNESS_LITTLE, 8, 24, 0, nullptr),
-	m_io_config("ISA 8-bit I/O", ENDIANNESS_LITTLE, 8, 16, 0, nullptr),
-	m_mem16_config("ISA 16-bit mem", ENDIANNESS_LITTLE, 16, 24, 0, nullptr),
-	m_io16_config("ISA 16-bit I/O", ENDIANNESS_LITTLE, 16, 16, 0, nullptr),
-	m_maincpu(nullptr),
+	m_mem_config("ISA 8-bit mem", ENDIANNESS_LITTLE, 8, 24, 0, address_map_constructor()),
+	m_io_config("ISA 8-bit I/O", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor()),
+	m_mem16_config("ISA 16-bit mem", ENDIANNESS_LITTLE, 16, 24, 0, address_map_constructor()),
+	m_io16_config("ISA 16-bit I/O", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor()),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_iospace(nullptr),
 	m_memspace(nullptr),
 	m_out_irq2_cb(*this),
@@ -144,7 +117,7 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 	m_out_irq7_cb(*this),
 	m_out_drq1_cb(*this),
 	m_out_drq2_cb(*this),
-	m_out_drq3_cb(*this), m_cputag(nullptr),
+	m_out_drq3_cb(*this),
 	m_write_iochck(*this)
 {
 	for(int i=0;i<8;i++)
@@ -222,8 +195,6 @@ void isa8_device::device_start()
 	m_out_drq2_cb.resolve_safe();
 	m_out_drq3_cb.resolve_safe();
 
-	m_maincpu = subdevice<cpu_device>(m_cputag);
-
 	if (m_allocspaces)
 	{
 		m_iospace = &space(AS_ISA_IO);
@@ -234,9 +205,9 @@ void isa8_device::device_start()
 	else    // use host CPU's program and I/O spaces directly
 	{
 		m_iospace = &m_maincpu->space(AS_IO);
-		m_iowidth = m_maincpu->space_config(AS_IO)->m_databus_width;
+		m_iowidth = m_maincpu->space_config(AS_IO)->m_data_width;
 		m_memspace = &m_maincpu->space(AS_PROGRAM);
-		m_memwidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
+		m_memwidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
 	}
 }
 
@@ -337,7 +308,6 @@ void isa8_device::unmap_rom(offs_t start, offs_t end)
 
 bool isa8_device::is_option_rom_space_available(offs_t start, int size)
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
 	for(int i = 0; i < size; i += 4096) // 4KB granularity should be enough
 		if(m_memspace->get_read_ptr(start + i)) return false;
 	return true;
@@ -428,12 +398,6 @@ void device_isa8_card_interface::dack_w(int line,uint8_t data)
 }
 void device_isa8_card_interface::eop_w(int state)
 {
-}
-
-void device_isa8_card_interface::static_set_isabus(device_t &device, device_t *isa_device)
-{
-	device_isa8_card_interface &isa_card = dynamic_cast<device_isa8_card_interface &>(device);
-	isa_card.m_isa_dev = isa_device;
 }
 
 void device_isa8_card_interface::set_isa_device()

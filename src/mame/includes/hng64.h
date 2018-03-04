@@ -1,6 +1,8 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner
+
 #include "machine/msm6242.h"
+#include "machine/timer.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/nec/v53.h"
 #include "sound/l7a1045_l6028_dsp_a.h"
@@ -391,4 +393,12 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_comms_w);
 	uint16_t main_latch[2];
 	uint16_t sound_latch[2];
+	void hng64(machine_config &config);
+	void hng64_audio(machine_config &config);
+	void hng64_network(machine_config &config);
+	void hng_comm_io_map(address_map &map);
+	void hng_comm_map(address_map &map);
+	void hng_map(address_map &map);
+	void hng_sound_io(address_map &map);
+	void hng_sound_map(address_map &map);
 };

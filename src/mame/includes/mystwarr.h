@@ -9,25 +9,18 @@
 #include "video/k055555.h"
 #include "video/k054000.h"
 #include "machine/k054321.h"
+#include "machine/timer.h"
 
 class mystwarr_state : public konamigx_state
 {
 public:
 	mystwarr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: konamigx_state(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_k053252(*this, "k053252"),
-		m_k056832(*this, "k056832"),
-		m_k055673(*this, "k055673"),
 		m_k054321(*this, "k054321"),
 		m_gx_workram(*this,"gx_workram"),
 		m_spriteram(*this,"spriteram")
 		{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<k053252_device> m_k053252;
-	required_device<k056832_device> m_k056832;
-	required_device<k055673_device> m_k055673;
 	required_device<k054321_device> m_k054321;
 	required_shared_ptr<uint16_t> m_gx_workram;
 	optional_shared_ptr<uint16_t> m_spriteram;
@@ -60,6 +53,7 @@ public:
 	DECLARE_WRITE16_MEMBER(k053247_scattered_word_w);
 	DECLARE_READ16_MEMBER(k053247_martchmp_word_r);
 	DECLARE_WRITE16_MEMBER(k053247_martchmp_word_w);
+	DECLARE_WRITE16_MEMBER(mceeprom_w);
 	DECLARE_READ16_MEMBER(mccontrol_r);
 	DECLARE_WRITE16_MEMBER(mccontrol_w);
 	DECLARE_WRITE8_MEMBER(sound_ctrl_w);
@@ -103,4 +97,19 @@ public:
 	K055673_CB_MEMBER(gaiapols_sprite_callback);
 	K055673_CB_MEMBER(martchmp_sprite_callback);
 	void decode_tiles();
+	void martchmp(machine_config &config);
+	void mystwarr(machine_config &config);
+	void dadandrn(machine_config &config);
+	void viostorm(machine_config &config);
+	void gaiapols(machine_config &config);
+	void metamrph(machine_config &config);
+	void dadandrn_map(address_map &map);
+	void gaiapols_map(address_map &map);
+	void martchmp_map(address_map &map);
+	void martchmp_sound_map(address_map &map);
+	void metamrph_map(address_map &map);
+	void mystwarr_k054539_map(address_map &map);
+	void mystwarr_map(address_map &map);
+	void mystwarr_sound_map(address_map &map);
+	void viostorm_map(address_map &map);
 };

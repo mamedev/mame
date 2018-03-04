@@ -62,6 +62,11 @@ public:
 	void pastelg_vramflip();
 	void pastelg_gfxdraw();
 
+	void threeds(machine_config &config);
+	void pastelg(machine_config &config);
+	void pastelg_io_map(address_map &map);
+	void pastelg_map(address_map &map);
+	void threeds_io_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

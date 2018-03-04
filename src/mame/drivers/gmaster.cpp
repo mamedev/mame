@@ -43,6 +43,8 @@ public:
 	DECLARE_DRIVER_INIT(gmaster) { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
 	uint32_t screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void gmaster(machine_config &config);
+	void gmaster_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 
@@ -235,7 +237,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_portf_w)
 }
 
 
-static ADDRESS_MAP_START( gmaster_mem, AS_PROGRAM, 8, gmaster_state )
+ADDRESS_MAP_START(gmaster_state::gmaster_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(gmaster_io_r, gmaster_io_w)
 	//AM_RANGE(0x8000, 0xfeff)      // mapped by the cartslot
@@ -328,8 +330,8 @@ void gmaster_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( gmaster )
-	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_12MHz/2/*?*/)  // upd78c11 in the unit
+MACHINE_CONFIG_START(gmaster_state::gmaster)
+	MCFG_CPU_ADD("maincpu", UPD7810, XTAL(12'000'000)/2/*?*/)  // upd78c11 in the unit
 	MCFG_CPU_PROGRAM_MAP(gmaster_mem)
 	MCFG_UPD7810_PORTA_READ_CB(IOPORT("JOY"))
 	MCFG_UPD7810_PORTB_READ_CB(READ8(gmaster_state, gmaster_portb_r))

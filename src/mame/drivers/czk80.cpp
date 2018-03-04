@@ -55,12 +55,11 @@ class czk80_state : public driver_device
 {
 public:
 	czk80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG),
-		m_fdc(*this, "fdc")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+		, m_fdc(*this, "fdc")
+	{ }
 
 	DECLARE_DRIVER_INIT(czk80);
 	DECLARE_MACHINE_RESET(czk80);
@@ -73,6 +72,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	void czk80(machine_config &config);
+	void czk80_io(address_map &map);
+	void czk80_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -103,19 +105,19 @@ READ8_MEMBER( czk80_state::port81_r )
 	return (m_term_data) ? 3 : 1;
 }
 
-static ADDRESS_MAP_START(czk80_mem, AS_PROGRAM, 8, czk80_state)
+ADDRESS_MAP_START(czk80_state::czk80_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x2000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(czk80_io, AS_IO, 8, czk80_state)
+ADDRESS_MAP_START(czk80_state::czk80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)
-	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80dart", z80dart_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x54, 0x57) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(port80_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("pio", z80pio_device, read, write)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("dart", z80dart_device, cd_ba_r, cd_ba_w)
+	AM_RANGE(0x54, 0x57) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+	AM_RANGE(0x80, 0x80) AM_READ(port80_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0x81, 0x81) AM_READ(port81_r)
 	/* Select one of the below */
 	//AM_RANGE(0xc0, 0xc0) AM_READ(portc0_r)
@@ -130,9 +132,9 @@ INPUT_PORTS_END
 
 static const z80_daisy_config daisy_chain[] =
 {
-	{ "z80pio" },
-	{ "z80dart" },
-	{ "z80ctc" },
+	{ "pio" },
+	{ "dart" },
+	{ "ctc" },
 	{ nullptr }
 };
 
@@ -188,32 +190,32 @@ void czk80_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( czk80 )
+MACHINE_CONFIG_START(czk80_state::czk80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(czk80_mem)
 	MCFG_CPU_IO_MAP(czk80_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_MACHINE_RESET_OVERRIDE(czk80_state, czk80)
 
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(czk80_state, kbd_put))
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(czk80_state, ctc_z0_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(czk80_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(czk80_state, ctc_z2_w))
 
-	MCFG_Z80DART_ADD("z80dart",  XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(16'000'000) / 4)
 	//MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	//MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	//MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000)/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 

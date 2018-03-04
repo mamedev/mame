@@ -111,7 +111,7 @@ CUSTOM_INPUT_MEMBER(inufuku_state::soundflag_r)
 
 ******************************************************************************/
 
-static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
+ADDRESS_MAP_START(inufuku_state::inufuku_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM         // main rom
 
 //  AM_RANGE(0x100000, 0x100007) AM_WRITENOP    // ?
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
 	AM_RANGE(0x200000, 0x200001) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)   // sound command
 
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")                        // palette ram
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")                        // palette ram
 	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_SHARE("bg_rasterram")                                  // bg raster ram
 	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_SHARE("bg_videoram")     // bg ram
 	AM_RANGE(0x402000, 0x403fff) AM_READWRITE(inufuku_tx_videoram_r, inufuku_tx_videoram_w) AM_SHARE("tx_videoram")     // text ram
@@ -149,13 +149,13 @@ ADDRESS_MAP_END
 
 ******************************************************************************/
 
-static ADDRESS_MAP_START( inufuku_sound_map, AS_PROGRAM, 8, inufuku_state )
+ADDRESS_MAP_START(inufuku_state::inufuku_sound_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( inufuku_sound_io_map, AS_IO, 8, inufuku_state )
+ADDRESS_MAP_START(inufuku_state::inufuku_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(inufuku_soundrombank_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
@@ -330,7 +330,7 @@ void inufuku_state::machine_reset()
 	m_tx_palettebank = 0;
 }
 
-static MACHINE_CONFIG_START( inufuku )
+MACHINE_CONFIG_START(inufuku_state::inufuku)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2) /* 16.00 MHz */
@@ -356,8 +356,8 @@ static MACHINE_CONFIG_START( inufuku )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
-	vsystem_spr_device::set_offsets(*device, 0,1); // reference videos confirm at least the +1 against tilemaps in 3on3dunk (the highscore header text and black box are meant to be 1 pixel misaligned, although there is currently a priority bug there too)
-	vsystem_spr_device::set_pdraw(*device, true);
+	MCFG_VSYSTEM_SPR_SET_OFFSETS(0,1) // reference videos confirm at least the +1 against tilemaps in 3on3dunk (the highscore header text and black box are meant to be 1 pixel misaligned, although there is currently a priority bug there too)
+	MCFG_VSYSTEM_SPR_SET_PDRAW(true)
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( inufuku_state, inufuku_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
@@ -381,7 +381,8 @@ static MACHINE_CONFIG_START( inufuku )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( _3on3dunk, inufuku )
+MACHINE_CONFIG_START(inufuku_state::_3on3dunk)
+	inufuku(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", _3on3dunk)
 MACHINE_CONFIG_END
 

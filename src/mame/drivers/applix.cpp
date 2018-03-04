@@ -42,6 +42,7 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/6522via.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -142,6 +143,12 @@ public:
 	DECLARE_PALETTE_INIT(applix);
 	uint8_t m_palette_latch[4];
 	required_shared_ptr<uint16_t> m_base;
+	void applix(machine_config &config);
+	void applix_mem(address_map &map);
+	void keytronic_pc3270_io(address_map &map);
+	void keytronic_pc3270_program(address_map &map);
+	void subcpu_io(address_map &map);
+	void subcpu_mem(address_map &map);
 private:
 	uint8_t m_pb;
 	uint8_t m_analog_latch;
@@ -437,7 +444,7 @@ WRITE16_MEMBER( applix_state::fdc_cmd_w )
 	m_data_or_cmd = 1;
 }
 
-static ADDRESS_MAP_START(applix_mem, AS_PROGRAM, 16, applix_state)
+ADDRESS_MAP_START(applix_state::applix_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x3fffff) AM_RAM AM_SHARE("expansion") // Expansion
@@ -462,13 +469,13 @@ static ADDRESS_MAP_START(applix_mem, AS_PROGRAM, 16, applix_state)
 	//FFFFC0, FFFFFF  disk controller board
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( subcpu_mem, AS_PROGRAM, 8, applix_state )
+ADDRESS_MAP_START(applix_state::subcpu_mem)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( subcpu_io, AS_IO, 8, applix_state )
+ADDRESS_MAP_START(applix_state::subcpu_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_READ(port00_r) //PORTR
 	AM_RANGE(0x08, 0x0f) AM_READWRITE(port08_r,port08_w) //Disk select
@@ -479,15 +486,12 @@ static ADDRESS_MAP_START( subcpu_io, AS_IO, 8, applix_state )
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_READWRITE(port60_r,port60_w) //anotherZ80SCC
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( keytronic_pc3270_program, AS_PROGRAM, 8, applix_state )
+ADDRESS_MAP_START(applix_state::keytronic_pc3270_program)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("kbdcpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( keytronic_pc3270_io, AS_IO, 8, applix_state )
+ADDRESS_MAP_START(applix_state::keytronic_pc3270_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(internal_data_read, internal_data_write)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(p1_read, p1_write)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(p2_read, p2_write)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_read, p3_write)
 ADDRESS_MAP_END
 
 // io priorities:
@@ -832,16 +836,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
 	}
 }
 
-static MACHINE_CONFIG_START( applix )
+MACHINE_CONFIG_START(applix_state::applix)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 7500000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(30'000'000) / 4) // MC68000-P10 @ 7.5 MHz
 	MCFG_CPU_PROGRAM_MAP(applix_mem)
-	MCFG_CPU_ADD("subcpu", Z80, XTAL_16MHz / 2) // Z80H
+	MCFG_CPU_ADD("subcpu", Z80, XTAL(16'000'000) / 2) // Z80H
 	MCFG_CPU_PROGRAM_MAP(subcpu_mem)
 	MCFG_CPU_IO_MAP(subcpu_io)
 	MCFG_CPU_ADD("kbdcpu", I8051, 11060250)
 	MCFG_CPU_PROGRAM_MAP(keytronic_pc3270_program)
 	MCFG_CPU_IO_MAP(keytronic_pc3270_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(applix_state, p1_read))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(applix_state, p1_write))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(applix_state, p2_read))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(applix_state, p2_write))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(applix_state, p3_read))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(applix_state, p3_write))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -865,13 +875,13 @@ static MACHINE_CONFIG_START( applix )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1875000) // 6545
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(30'000'000) / 16) // MC6545 @ 1.875 MHz
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(applix_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(applix_state, vsync_w))
 
-	MCFG_DEVICE_ADD("via6522", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL(30'000'000) / 4 / 10) // VIA uses 68000 E clock
 	MCFG_VIA6522_READPB_HANDLER(READ8(applix_state, applix_pb_r))
 	// in CB1 kbd clk
 	// in CA2 vsync
@@ -889,7 +899,7 @@ static MACHINE_CONFIG_START( applix )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_WD1772_ADD("fdc", XTAL_16MHz / 2) //connected to Z80H clock pin
+	MCFG_WD1772_ADD("fdc", XTAL(16'000'000) / 2) //connected to Z80H clock pin
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", applix_floppies, "35dd", applix_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", applix_floppies, "35dd", applix_state::floppy_formats)

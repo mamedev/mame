@@ -138,7 +138,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::soundbank_msm_w)
 }
 
 
-static ADDRESS_MAP_START( shinobib_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::shinobib_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM // tilemap ram on the original, used as a buffer on the bootlegs
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_SHARE("textram")
@@ -147,22 +147,21 @@ static ADDRESS_MAP_START( shinobib_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 //  AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_irq_w)
-	AM_RANGE(0xC42006, 0xC42007) AM_WRITE(sound_command_irq_w)
 
-	AM_RANGE(0xC44000, 0xC44001) AM_READNOP
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
 	AM_RANGE(0xc41006, 0xc41007) AM_READ_PORT("P2")
 	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW2")
-	AM_RANGE(0xC43000, 0xC43001) AM_WRITENOP
-	AM_RANGE(0xC44000, 0xC44001) AM_WRITENOP
+	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_irq_w)
+	AM_RANGE(0xc43000, 0xc43001) AM_WRITENOP
+	AM_RANGE(0xc44000, 0xc44001) AM_NOP
 	AM_RANGE(0xc46000, 0xc46001) AM_WRITE(s16a_bootleg_bgscrolly_w)
 	AM_RANGE(0xc46002, 0xc46003) AM_WRITE(s16a_bootleg_bgscrollx_w)
 	AM_RANGE(0xc46004, 0xc46005) AM_WRITE(s16a_bootleg_fgscrolly_w)
 	AM_RANGE(0xc46006, 0xc46007) AM_WRITE(s16a_bootleg_fgscrollx_w)
 	AM_RANGE(0xc46008, 0xc46009) AM_WRITE(s16a_bootleg_tilemapselect_w)
-	AM_RANGE(0xC60000, 0xC60001) AM_READNOP
+	AM_RANGE(0xc60000, 0xc60001) AM_READNOP
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
@@ -184,7 +183,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_coinctrl_w)
 	}
 }
 
-static ADDRESS_MAP_START( passshtb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::passshtb_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on original, buffer on bootleg
@@ -264,11 +263,11 @@ READ16_MEMBER(segas1x_bootleg_state::passht4b_io3_r)
 	return m_passht4b_io3_val;
 }
 
-static ADDRESS_MAP_START( passht4b_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::passht4b_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on original, buffer on bootleg
-	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_SHARE("bg0_tileram")
-	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_SHARE("bg1_tileram")
+	AM_RANGE(0x409000, 0x409fff) AM_RAM AM_SHARE("bg0_tileram")
+	AM_RANGE(0x40a000, 0x40afff) AM_RAM AM_SHARE("bg1_tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_SHARE("textram")
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
@@ -311,12 +310,12 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_tilebank_w)
 	}
 }
 
-static ADDRESS_MAP_START( wb3bbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::wb3bbl_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(sys16_tilebank_w)
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on the original, used as a buffer on the bootlegs
-	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_SHARE("bg0_tileram")
-	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_SHARE("bg1_tileram")
+	AM_RANGE(0x409000, 0x409fff) AM_RAM AM_SHARE("bg0_tileram")
+	AM_RANGE(0x40a000, 0x40afff) AM_RAM AM_SHARE("bg1_tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_SHARE("textram")
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
@@ -327,7 +326,7 @@ static ADDRESS_MAP_START( wb3bbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_irq_w)
-	AM_RANGE(0xC44000, 0xC44001) AM_WRITENOP
+	AM_RANGE(0xc44000, 0xc44001) AM_WRITENOP
 	AM_RANGE(0xc46000, 0xc46001) AM_WRITE(s16a_bootleg_bgscrolly_w)
 	AM_RANGE(0xc46002, 0xc46003) AM_WRITE(s16a_bootleg_bgscrollx_w)
 	AM_RANGE(0xc46004, 0xc46005) AM_WRITE(s16a_bootleg_fgscrolly_w)
@@ -414,12 +413,12 @@ WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_w)
 			break;
 		default:
 			m_soundbank_ptr = nullptr;
-			logerror("Invalid bank setting %02X (%04X)\n", data, space.device().safe_pc());
+			logerror("Invalid bank setting %02X (%04X)\n", data, m_soundcpu->pc());
 			break;
 	}
 }
 
-static ADDRESS_MAP_START(tturfbl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::tturfbl_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READ(tturfbl_soundbank_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(tturfbl_soundbank_w)
@@ -428,7 +427,7 @@ static ADDRESS_MAP_START(tturfbl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tturfbl_sound_io_map, AS_IO, 8, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::tturfbl_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_WRITENOP
@@ -437,7 +436,7 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START(shinobi_datsu_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::shinobi_datsu_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
@@ -460,13 +459,13 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::datsu_msm5205_callback)
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe800, 0xe800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -474,7 +473,7 @@ ADDRESS_MAP_END
 
 
 // 7759
-static ADDRESS_MAP_START( sound_7759_map, AS_PROGRAM, 8, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::sound_7759_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe800, 0xe800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -492,7 +491,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::upd7759_bank_w)//*
 }
 
 
-static ADDRESS_MAP_START( sound_7759_io_map, AS_IO, 8, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::sound_7759_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_WRITE(upd7759_bank_w)
@@ -524,27 +523,6 @@ void segas1x_bootleg_state::set_bg_page( int data )
 	m_bg_page[2] = (data >> 4) & 0x0f;
 	m_bg_page[3] = data & 0x0f;
 }
-
-#ifdef UNUSED_CODE
-static ADDRESS_MAP_START( bayroute_map, AS_PROGRAM, 16, segas1x_bootleg_state )
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x100000, 0x100003) AM_WRITENOP // tilebank control?
-	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
-	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(sys16_coinctrl_w)
-	AM_RANGE(0x901002, 0x901003) AM_READ_PORT("P1")
-	AM_RANGE(0x901006, 0x901007) AM_READ_PORT("P2")
-	AM_RANGE(0x901000, 0x901001) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x902002, 0x902003) AM_READ_PORT("DSW1")
-	AM_RANGE(0x902000, 0x902001) AM_READ_PORT("DSW2")
-	AM_RANGE(0xff0006, 0xff0007) AM_WRITE(sound_command_irq_w)
-	AM_RANGE(0xff0020, 0xff003f) AM_WRITENOP // config regs
-ADDRESS_MAP_END
-#endif
-
 
 
 /***************************************************************************/
@@ -606,7 +584,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::s16bl_bgscrolly_w)
 }
 
 
-static ADDRESS_MAP_START( goldnaxeb1_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::goldnaxeb1_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
@@ -631,7 +609,7 @@ static ADDRESS_MAP_START( goldnaxeb1_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::bayrouteb1_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
 	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_SHARE("sprites")
@@ -652,7 +630,7 @@ static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0x902006, 0x902007) AM_WRITE(sound_command_irq_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::decrypted_opcodes_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -700,7 +678,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::datsu_page3_w)
 	datsu_set_pages();
 }
 
-static ADDRESS_MAP_START( bayrouteb2_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::bayrouteb2_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
 	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_SHARE("sprites")
@@ -724,7 +702,7 @@ static ADDRESS_MAP_START( bayrouteb2_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0x901006, 0x901007) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dduxbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::dduxbl_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(sys16_tilebank_w)
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
@@ -817,7 +795,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_bgpage_w)
 	set_bg_page(page ^ 0xffff);
 }
 
-static ADDRESS_MAP_START( goldnaxeb2_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::goldnaxeb2_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
@@ -853,7 +831,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::eswat_tilebank0_w)
 	}
 }
 
-static ADDRESS_MAP_START( eswatbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::eswatbl_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x3e2000, 0x3e2001) AM_WRITE(eswat_tilebank0_w) // external tile bank ( > 0x4000 tiles )
@@ -880,7 +858,7 @@ static ADDRESS_MAP_START( eswatbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eswatbl2_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::eswatbl2_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x123420, 0x12343f) AM_WRITENOP // written on boot only
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("sprites")
@@ -910,7 +888,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( tetrisbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::tetrisbl_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
@@ -944,12 +922,14 @@ READ16_MEMBER(segas1x_bootleg_state::beautyb_unkx_r)
 	return m_beautyb_unkx;
 }
 
-static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::beautyb_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x010000, 0x03ffff) AM_WRITENOP
 
 	AM_RANGE(0x0280D6, 0x0280D7) AM_READ(beautyb_unkx_r)
 	AM_RANGE(0x0280D8, 0x0280D9) AM_READ(beautyb_unkx_r)
+
+	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(sys16_tilebank_w)
 
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x413fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
@@ -961,7 +941,6 @@ static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x418020, 0x418021) AM_WRITE(s16bl_bgpage_w)
 	AM_RANGE(0x418028, 0x418029) AM_WRITE(s16bl_fgpage_w)
 
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
@@ -970,14 +949,14 @@ static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_irq_w)
 
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITENOP
-	AM_RANGE(0xc80000, 0xc80001) AM_WRITENOP // vblank irq ack
+	AM_RANGE(0xc80000, 0xc80001) AM_NOP // vblank irq ack
 
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( tturfbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::tturfbl_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM // work ram
 	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_SHARE("sprites")
@@ -1032,7 +1011,7 @@ READ8_MEMBER(segas1x_bootleg_state::system18_bank_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( sound_18_map, AS_PROGRAM, 8, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::sound_18_map)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_READ(system18_bank_r)
 	/**** D/A register ****/
@@ -1056,7 +1035,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::sys18_soundbank_w)
 		m_sound_bank = nullptr;
 }
 
-static ADDRESS_MAP_START( sound_18_io_map, AS_IO, 8, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::sound_18_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("3438.0", ym3438_device, read, write)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("3438.1", ym3438_device, read, write)
@@ -1108,7 +1087,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( shdancbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::shdancbl_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
@@ -1123,14 +1102,12 @@ static ADDRESS_MAP_START( shdancbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
 	AM_RANGE(0xc44000, 0xc44001) AM_WRITENOP // only used via clr.w after tilebank set
 
-
-	AM_RANGE(0xe4001c, 0xe4001d) AM_WRITENOP // to prevent access to screen blanking control below
 	AM_RANGE(0xe40000, 0xe4ffff) AM_NOP
 	AM_RANGE(0xfe0020, 0xfe003f) AM_WRITENOP // config regs
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shdancbla_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::shdancbla_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
@@ -1226,12 +1203,12 @@ WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_bankctrl_w)
 			break;
 		default:
 			m_soundbank_ptr = nullptr;
-			logerror("Invalid bank setting %02X (%04X)\n", data, space.device().safe_pc());
+			logerror("Invalid bank setting %02X (%04X)\n", data, m_soundcpu->pc());
 			break;
 	}
 }
 
-static ADDRESS_MAP_START(shdancbl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::shdancbl_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READ(shdancbl_soundbank_r)
 	AM_RANGE(0xc000, 0xc00f) AM_WRITENOP
@@ -1245,19 +1222,19 @@ static ADDRESS_MAP_START(shdancbl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_stat
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( shdancbl_sound_io_map, AS_IO, 8, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::shdancbl_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xa0, 0xbf) AM_WRITENOP
 	AM_RANGE(0xc0, 0xdf) AM_READNOP
 ADDRESS_MAP_END
 
 // shdancbla
-static ADDRESS_MAP_START(shdancbla_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::shdancbla_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READ(shdancbl_soundbank_r)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 
 	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("3438.0", ym3438_device, read, write)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc400, 0xc403) AM_DEVREADWRITE("3438.1", ym3438_device, read, write)
 
 	AM_RANGE(0xd400, 0xd400) AM_WRITENOP
@@ -1275,7 +1252,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mwalkbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::mwalkbl_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
@@ -1323,7 +1300,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::sys18bl_okibank_w) // TODO: verify correctn
 }
 
 /* bootleg doesn't have real vdp or i/o */
-static ADDRESS_MAP_START( astormbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::astormbl_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
@@ -1357,7 +1334,7 @@ static ADDRESS_MAP_START( astormbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sys18bl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::sys18bl_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sys18bl_okibank_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -1365,14 +1342,14 @@ static ADDRESS_MAP_START(sys18bl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sys18bl_oki_map, 0, 8, segas1x_bootleg_state )
+ADDRESS_MAP_START(segas1x_bootleg_state::sys18bl_oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
 WRITE16_MEMBER(segas1x_bootleg_state::ddcrewbl_spritebank_w)
 {
-//  printf("banking write %08x: %04x (%04x %04x)\n", space.device().safe_pc(), offset*2, data&mem_mask, mem_mask);
+//  printf("banking write %08x: %04x (%04x %04x)\n", m_maincpu->pc(), offset*2, data&mem_mask, mem_mask);
 
 	data &= mem_mask;
 //  offset &= 0x7;
@@ -1387,7 +1364,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::ddcrewbl_spritebank_w)
 
 
 // todo: this
-static ADDRESS_MAP_START(ddcrewbl_map, AS_PROGRAM, 16, segas1x_bootleg_state)
+ADDRESS_MAP_START(segas1x_bootleg_state::ddcrewbl_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM // ok
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM // ok
 
@@ -2067,7 +2044,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( z80_ym2151 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -2087,7 +2064,7 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( z80_ym2151_upd7759 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_7759_map)
@@ -2106,7 +2083,7 @@ static MACHINE_CONFIG_START( z80_ym2151_upd7759 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( datsu_ym2151_msm5205 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::datsu_ym2151_msm5205)
 	/* TODO:
 	- other games might use this sound configuration
 	- speaker is likely to be mono for the bootlegs, not stereo.
@@ -2129,7 +2106,7 @@ static MACHINE_CONFIG_START( datsu_ym2151_msm5205 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( datsu_2x_ym2203_msm5205 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::datsu_2x_ym2203_msm5205)
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(shinobi_datsu_sound_map)
 
@@ -2166,7 +2143,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 /* System 16A/B Bootlegs */
-static MACHINE_CONFIG_START( system16_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::system16_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -2189,7 +2166,8 @@ static MACHINE_CONFIG_START( system16_base )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shinobi_datsu, system16_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::shinobi_datsu)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2202,11 +2180,12 @@ static MACHINE_CONFIG_DERIVED( shinobi_datsu, system16_base )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg)
 
-	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
+	datsu_2x_ym2203_msm5205(config);
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( passshtb, system16_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::passshtb)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2220,11 +2199,12 @@ static MACHINE_CONFIG_DERIVED( passshtb, system16_base )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg)
 
-	MCFG_FRAGMENT_ADD(z80_ym2151_upd7759)
+	z80_ym2151_upd7759(config);
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( passsht4b, system16_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::passsht4b)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2239,12 +2219,13 @@ static MACHINE_CONFIG_DERIVED( passsht4b, system16_base )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg_passht4b)
 
-	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
+	datsu_2x_ym2203_msm5205(config);
 	MCFG_DEVICE_MODIFY("5205")
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wb3bb, system16_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::wb3bb)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2259,16 +2240,16 @@ static MACHINE_CONFIG_DERIVED( wb3bb, system16_base )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg)
 
-	MCFG_FRAGMENT_ADD(z80_ym2151)
+	z80_ym2151(config);
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( goldnaxeb_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(goldnaxeb1_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  irq4_line_hold)
 
 
@@ -2293,56 +2274,62 @@ static MACHINE_CONFIG_START( goldnaxeb_base )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( goldnaxeb1, goldnaxeb_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb1)
+	goldnaxeb_base(config);
 
-	MCFG_FRAGMENT_ADD(z80_ym2151_upd7759)
+	z80_ym2151_upd7759(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( goldnaxeb2, goldnaxeb_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb2)
+	goldnaxeb_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(goldnaxeb2_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
-	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
+	datsu_2x_ym2203_msm5205(config);
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bayrouteb1, goldnaxeb1 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::bayrouteb1)
+	goldnaxeb1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bayrouteb1_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bayrouteb2, goldnaxeb_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::bayrouteb2)
+	goldnaxeb_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bayrouteb2_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
-	MCFG_FRAGMENT_ADD(datsu_ym2151_msm5205)
+	datsu_ym2151_msm5205(config);
 
 	MCFG_DEVICE_MODIFY("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tturfbl, system16_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::tturfbl)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tturfbl_map)
 
-	MCFG_FRAGMENT_ADD(datsu_ym2151_msm5205)
+	datsu_ym2151_msm5205(config);
 
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dduxbl, system16_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::dduxbl)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2351,10 +2338,11 @@ static MACHINE_CONFIG_DERIVED( dduxbl, system16_base )
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
 
-	MCFG_FRAGMENT_ADD(z80_ym2151)
+	z80_ym2151(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eswatbl, system16_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::eswatbl)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2363,10 +2351,11 @@ static MACHINE_CONFIG_DERIVED( eswatbl, system16_base )
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-124)
 
-	MCFG_FRAGMENT_ADD(z80_ym2151_upd7759)
+	z80_ym2151_upd7759(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eswatbl2, system16_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::eswatbl2)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2375,10 +2364,11 @@ static MACHINE_CONFIG_DERIVED( eswatbl2, system16_base )
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-121)
 
-	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
+	datsu_2x_ym2203_msm5205(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tetrisbl, system16_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::tetrisbl)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2387,10 +2377,11 @@ static MACHINE_CONFIG_DERIVED( tetrisbl, system16_base )
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
 
-	MCFG_FRAGMENT_ADD(z80_ym2151)
+	z80_ym2151(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( altbeastbl, system16_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::altbeastbl)
+	system16_base(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tetrisbl_map)
@@ -2398,26 +2389,26 @@ static MACHINE_CONFIG_DERIVED( altbeastbl, system16_base )
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
 
-	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
+	datsu_2x_ym2203_msm5205(config);
 	MCFG_DEVICE_MODIFY("5205")
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( beautyb, system16_base )
+MACHINE_CONFIG_START(segas1x_bootleg_state::beautyb)
+	system16_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(beautyb_map)
 
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
+	// no sprites
 
-	MCFG_FRAGMENT_ADD(z80_ym2151)
+	z80_ym2151(config);
 MACHINE_CONFIG_END
 
 
 /* System 18 Bootlegs */
-static MACHINE_CONFIG_START( system18 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::system18)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -2467,21 +2458,22 @@ static MACHINE_CONFIG_START( system18 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( astormbl, system18 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::astormbl)
+	system18(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(astormbl_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( astormb2 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::astormb2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) /* 12MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(astormbl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_8MHz/2) /* 4MHz */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(8'000'000)/2) /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(sys18bl_sound_map)
 
 	/* video hardware */
@@ -2507,12 +2499,13 @@ static MACHINE_CONFIG_START( astormb2 )
 	// 1 OKI M6295 instead of original sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz/8, PIN7_HIGH) // 1MHz clock and pin verified
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000)/8, PIN7_HIGH) // 1MHz clock and pin verified
 	MCFG_DEVICE_ADDRESS_MAP(0, sys18bl_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mwalkbl, astormb2 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::mwalkbl)
+	astormb2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2520,7 +2513,8 @@ static MACHINE_CONFIG_DERIVED( mwalkbl, astormb2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( shdancbl, system18 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::shdancbl)
+	system18(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2538,7 +2532,8 @@ static MACHINE_CONFIG_DERIVED( shdancbl, system18 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shdancbla, system18 )
+MACHINE_CONFIG_START(segas1x_bootleg_state::shdancbla)
+	system18(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2569,7 +2564,7 @@ MACHINE_RESET_MEMBER(segas1x_bootleg_state,ddcrewbl)
 }
 
 
-static MACHINE_CONFIG_START( ddcrewbl )
+MACHINE_CONFIG_START(segas1x_bootleg_state::ddcrewbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -3333,11 +3328,11 @@ ROM_START( beautyb )
 	ROM_LOAD( "b53.bin", 0x10000, 0x10000, CRC(aca8e330) SHA1(912e636e3c1e238682ea29620e8e2c6089c77209) )
 	ROM_LOAD( "b63.bin", 0x00000, 0x10000, CRC(f2af2fd5) SHA1(0a95ebb5eae7cdc6535533d73d06419c23d01ac3) )
 
-	ROM_REGION16_BE( 0x020000, "sprites", ROMREGION_ERASEFF ) /* sprites */
 	/* no sprites on this */
 
 	ROM_REGION( 0x40000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "1.bin", 0x0000, 0x8000, CRC(bd9ba01b) SHA1(fafa7dc36cc057a50ae4cdf7a35f3594292336f4) )
+	// ROM above 0x8000 would have 5205 ADPCM data, but this is unpopulated
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.2",  0x0000, 0x0020, CRC(58bcf8bd) SHA1(e4d3d179b08c0f3424a6bec0f15058fb1b56f8d8) )
@@ -3360,7 +3355,6 @@ ROM_START( iqpipe )
 	ROM_LOAD( "iqpipe.5", 0x10000, 0x10000, CRC(dfaedd39) SHA1(498f1c34fecd8de497fdce41bb683d00047a868a) )
 	ROM_LOAD( "iqpipe.6", 0x00000, 0x10000, CRC(8e554f8d) SHA1(4b3b0e47c36f37947422f1c31063f11975108cd0) )
 
-	ROM_REGION16_BE( 0x020000, "sprites", ROMREGION_ERASEFF ) /* sprites */
 	/* no sprites on this */
 
 	ROM_REGION( 0x40000, "soundcpu", 0 ) /* sound CPU */
@@ -3947,7 +3941,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,beautyb)
 	{
 		rom[x] = rom[x] ^ 0x2400;
 
-		if (x & 8) rom[x] = BITSWAP16(rom[x],15,14,10,12,  11,13,9,8,
+		if (x & 8) rom[x] = bitswap<16>(rom[x],15,14,10,12,  11,13,9,8,
 									7,6,5,4,   3,2,1,0 );
 	}
 

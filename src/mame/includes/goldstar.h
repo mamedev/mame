@@ -52,6 +52,34 @@ public:
 	uint32_t screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ladylinr(machine_config &config);
+	void wcherry(machine_config &config);
+	void pkrmast(machine_config &config);
+	void moonlght(machine_config &config);
+	void kkotnoli(machine_config &config);
+	void cmast91(machine_config &config);
+	void super9(machine_config &config);
+	void goldfrui(machine_config &config);
+	void goldstar(machine_config &config);
+	void goldstbl(machine_config &config);
+	void bonusch_portmap(address_map &map);
+	void cm_map(address_map &map);
+	void cmast91_portmap(address_map &map);
+	void flaming7_map(address_map &map);
+	void goldstar_map(address_map &map);
+	void goldstar_readport(address_map &map);
+	void kkotnoli_map(address_map &map);
+	void ladylinr_map(address_map &map);
+	void lucky8_map(address_map &map);
+	void mbstar_map(address_map &map);
+	void megaline_portmap(address_map &map);
+	void ncb3_readwriteport(address_map &map);
+	void nfm_map(address_map &map);
+	void pkrmast_portmap(address_map &map);
+	void ramdac_map(address_map &map);
+	void wcat3_map(address_map &map);
+	void wcherry_map(address_map &map);
+	void wcherry_readwriteport(address_map &map);
 protected:
 	TILE_GET_INFO_MEMBER(get_goldstar_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_cherrym_fg_tile_info);
@@ -126,6 +154,15 @@ public:
 
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void cm(machine_config &config);
+	void cmasterc(machine_config &config);
+	void amcoe1a(machine_config &config);
+	void nfm(machine_config &config);
+	void amcoe2(machine_config &config);
+	void amcoe1(machine_config &config);
+	void amcoe1_portmap(address_map &map);
+	void amcoe2_portmap(address_map &map);
+	void cm_portmap(address_map &map);
 protected:
 	// installed by various driver init handlers to get stuff to work
 	READ8_MEMBER(fixedval09_r) { return 0x09; }
@@ -180,6 +217,16 @@ public:
 
 	INTERRUPT_GEN_MEMBER(masked_irq);
 
+	void bingowng(machine_config &config);
+	void flaming7(machine_config &config);
+	void lucky8(machine_config &config);
+	void wcat3(machine_config &config);
+	void magodds(machine_config &config);
+	void flam7_w4(machine_config &config);
+	void bingownga(machine_config &config);
+	void mbstar(machine_config &config);
+	void flam7_tw(machine_config &config);
+	void magodds_map(address_map &map);
 protected:
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
 
@@ -207,6 +254,13 @@ public:
 	DECLARE_DRIVER_INIT(chrygld);
 	DECLARE_DRIVER_INIT(chry10);
 
+	void cherrys(machine_config &config);
+	void chrygld(machine_config &config);
+	void cb3c(machine_config &config);
+	void cb3e(machine_config &config);
+	void ncb3(machine_config &config);
+	void cm97(machine_config &config);
+	void ncb3_map(address_map &map);
 protected:
 	void do_blockswaps(uint8_t* ROM);
 	void dump_to_file(uint8_t* ROM);
@@ -241,6 +295,9 @@ public:
 	DECLARE_VIDEO_START(sangho);
 	uint32_t screen_update_sangho(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void star100(machine_config &config);
+	void star100_map(address_map &map);
+	void star100_readport(address_map &map);
 protected:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -286,6 +343,13 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
+	void megaline(machine_config &config);
+	void unkch(machine_config &config);
+	void bonusch(machine_config &config);
+	void bonusch_map(address_map &map);
+	void megaline_map(address_map &map);
+	void unkch_map(address_map &map);
+	void unkch_portmap(address_map &map);
 protected:
 	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel2_tile_info);

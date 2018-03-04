@@ -193,20 +193,15 @@ void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 // LED timer callback
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_led_callback)
 {
-	int drive;
-	if(m_led_state == 0)
-		m_led_state = 1;
-	else
-		m_led_state = 0;
-	if(m_led_state == 1)
+	m_led_state = !m_led_state ? 1 : 0;
+	if(m_led_state)
 	{
-		for(drive=0;drive<4;drive++)
-			output().set_indexed_value("ctrl_drv",drive,m_fdc.led_ctrl[drive] ? 0 : 1);
+		for(int drive=0; drive<4; drive++)
+			m_ctrl_drv_out[drive] = m_fdc.led_ctrl[drive] ? 0 : 1;
 	}
 	else
 	{
-		for(drive=0;drive<4;drive++)
-			output().set_indexed_value("ctrl_drv",drive,1);
+		std::fill(std::begin(m_ctrl_drv_out), std::end(m_ctrl_drv_out), 1);
 	}
 
 }
@@ -639,7 +634,7 @@ WRITE16_MEMBER(x68k_state::x68k_fdc_w)
 				{
 					m_fdc.led_ctrl[drive] = data & 0x80;  // blinking drive LED if no disk inserted
 					m_fdc.led_eject[drive] = data & 0x40;  // eject button LED (on when set to 0)
-					output().set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
+					m_eject_drv_out[drive] = BIT(data, 6);
 					if((data & 0x60) == 0x20)  // ejects disk
 						m_fdc.floppy[drive]->unload();
 				}
@@ -658,9 +653,9 @@ WRITE16_MEMBER(x68k_state::x68k_fdc_w)
 			if(m_fdc.floppy[i]->exists())
 				m_fdc.floppy[i]->mon_w(!BIT(data, 7));
 
-		output().set_indexed_value("access_drv",x,0);
+		m_access_drv_out[x] = 0;
 		if(x != m_fdc.select_drive)
-			output().set_indexed_value("access_drv",m_fdc.select_drive,1);
+			m_access_drv_out[m_fdc.select_drive] = 1;
 		m_fdc.select_drive = x;
 		logerror("FDC: Drive #%i: Drive selection set to %02x\n",x,data);
 		break;
@@ -829,7 +824,7 @@ WRITE16_MEMBER(x68k_state::x68k_sysport_w)
 		COMBINE_DATA(&m_sysport.sram_writeprotect);
 		break;
 	default:
-//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",space.device().safe_pc(),data,offset);
+//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",m_maincpu->pc(),data,offset);
 		break;
 	}
 }
@@ -968,7 +963,6 @@ void x68k_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
 		address++;
 	m_bus_error = true;
 	m_maincpu->set_buserror_details(address, write, m_maincpu->get_fc());
-	m_maincpu->mmu_tmp_buserror_address = address; // Hack for x68030
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
@@ -979,7 +973,7 @@ READ16_MEMBER(x68k_state::x68k_rom0_r)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1) + 0xbffffc, 0, mem_mask);
 	return 0xff;
 }
@@ -988,7 +982,7 @@ WRITE16_MEMBER(x68k_state::x68k_rom0_w)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1) + 0xbffffc, 1, mem_mask);
 }
 
@@ -996,7 +990,7 @@ READ16_MEMBER(x68k_state::x68k_emptyram_r)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1), 0, mem_mask);
 	return 0xff;
 }
@@ -1005,14 +999,14 @@ WRITE16_MEMBER(x68k_state::x68k_emptyram_w)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1), 1, mem_mask);
 }
 
 READ16_MEMBER(x68k_state::x68k_exp_r)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1) + 0xeafa00, 0, mem_mask);
 	return 0xff;
 }
@@ -1020,7 +1014,7 @@ READ16_MEMBER(x68k_state::x68k_exp_r)
 WRITE16_MEMBER(x68k_state::x68k_exp_w)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	if((m_options->read() & 0x02) && !machine().side_effect_disabled())
+	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
 		set_bus_error((offset << 1) + 0xeafa00, 1, mem_mask);
 }
 
@@ -1135,14 +1129,14 @@ WRITE_LINE_MEMBER(x68k_state::x68k_scsi_drq)
 	// TODO
 }
 
-static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
+ADDRESS_MAP_START(x68k_state::x68k_map)
 	AM_RANGE(0x000000, 0xbffffb) AM_READWRITE(x68k_emptyram_r, x68k_emptyram_w)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w)
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
-	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read, write) AM_SHARE("gfxpalette")
-	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read, write) AM_SHARE("pcgpalette")
+	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read16, write16) AM_SHARE("gfxpalette")
+	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read16, write16) AM_SHARE("pcgpalette")
 	AM_RANGE(0xe82400, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
 	AM_RANGE(0xe84000, 0xe85fff) AM_DEVREADWRITE("hd63450", hd63450_device, read, write)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
@@ -1173,14 +1167,14 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
+ADDRESS_MAP_START(x68k_state::x68kxvi_map)
 	AM_RANGE(0x000000, 0xbffffb) AM_READWRITE(x68k_emptyram_r, x68k_emptyram_w)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w)
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
-	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read, write) AM_SHARE("gfxpalette")
-	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read, write) AM_SHARE("pcgpalette")
+	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read16, write16) AM_SHARE("gfxpalette")
+	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read16, write16) AM_SHARE("pcgpalette")
 	AM_RANGE(0xe82400, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
 	AM_RANGE(0xe84000, 0xe85fff) AM_DEVREADWRITE("hd63450", hd63450_device, read, write)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
@@ -1212,15 +1206,15 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
+ADDRESS_MAP_START(x68k_state::x68030_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)  // Still only has 24-bit address space
 	AM_RANGE(0x000000, 0xbffffb) AM_READWRITE16(x68k_emptyram_r, x68k_emptyram_w,0xffffffff)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(x68k_gvram_r, x68k_gvram_w, 0xffffffff)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE16(x68k_tvram_r, x68k_tvram_w, 0xffffffff)
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE16(x68k_crtc_r, x68k_crtc_w,0xffffffff)
-	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read, write) AM_SHARE("gfxpalette")
-	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read, write) AM_SHARE("pcgpalette")
+	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read32, write32) AM_SHARE("gfxpalette")
+	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read32, write32) AM_SHARE("pcgpalette")
 	AM_RANGE(0xe82400, 0xe83fff) AM_READWRITE16(x68k_vid_r, x68k_vid_w,0xffffffff)
 	AM_RANGE(0xe84000, 0xe85fff) AM_DEVREADWRITE16("hd63450", hd63450_device, read, write, 0xffffffff)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE16(x68k_areaset_r, x68k_areaset_w,0xffffffff)
@@ -1487,15 +1481,13 @@ static SLOT_INTERFACE_START(x68000_exp_cards)
 	SLOT_INTERFACE("x68k_midi",X68K_MIDI)  // X68000 MIDI interface
 SLOT_INTERFACE_END
 
-MACHINE_RESET_MEMBER(x68k_state,x68000)
+void x68k_state::machine_reset()
 {
 	/* The last half of the IPLROM is mapped to 0x000000 on reset only
 	   Just copying the initial stack pointer and program counter should
 	   more or less do the same job */
 
-	int drive;
-	uint8_t* romdata = memregion("user2")->base();
-	attotime irq_time;
+	uint8_t *const romdata = memregion("user2")->base();
 
 	memset(m_ram->pointer(),0,m_ram->size());
 	memcpy(m_ram->pointer(),romdata,8);
@@ -1511,11 +1503,11 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	m_crtc.reg[7] = 552;  // Vertical end
 	m_crtc.reg[8] = 27;   // Horizontal adjust
 
-	m_scanline = machine().first_screen()->vpos();// = m_crtc.reg[6];  // Vertical start
+	m_scanline = m_screen->vpos();// = m_crtc.reg[6];  // Vertical start
 
 	// start VBlank timer
 	m_crtc.vblank = 1;
-	irq_time = m_screen->time_until_pos(m_crtc.reg[6],2);
+	attotime const irq_time = m_screen->time_until_pos(m_crtc.reg[6],2);
 	m_vblank_irq->adjust(irq_time);
 
 	// start HBlank timer
@@ -1539,22 +1531,24 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	output().set_value("key_led_insert",1);
 	output().set_value("key_led_hiragana",1);
 	output().set_value("key_led_fullsize",1);
-	for(drive=0;drive<4;drive++)
-	{
-		output().set_indexed_value("eject_drv",drive,1);
-		output().set_indexed_value("ctrl_drv",drive,1);
-		output().set_indexed_value("access_drv",drive,1);
-	}
+	std::fill(std::begin(m_eject_drv_out), std::end(m_eject_drv_out), 1);
+	std::fill(std::begin(m_ctrl_drv_out), std::end(m_ctrl_drv_out), 1);
+	std::fill(std::begin(m_access_drv_out), std::end(m_access_drv_out), 1);
 	m_fdc.select_drive = 0;
 
 	// reset CPU
 	m_maincpu->reset();
 }
 
-MACHINE_START_MEMBER(x68k_state,x68000)
+void x68k_state::machine_start()
 {
+	// resolve outputs
+	m_eject_drv_out.resolve();
+	m_ctrl_drv_out.resolve();
+	m_access_drv_out.resolve();
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	/*  Install RAM handlers  */
+	// install RAM handlers
 	m_spriteram = (uint16_t*)(memregion("user1")->base());
 	space.install_readwrite_bank(0x000000,m_ram->size()-1,"bank1");
 	membank("bank1")->set_base(m_ram->pointer());
@@ -1645,16 +1639,13 @@ static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("x68k", X68K_KEYBOARD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( x68000 )
+MACHINE_CONFIG_START(x68k_state::x68000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(x68k_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(x68k_state,x68k_int_ack)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-	MCFG_MACHINE_START_OVERRIDE(x68k_state, x68000 )
-	MCFG_MACHINE_RESET_OVERRIDE(x68k_state, x68000 )
 
 	/* device hardware */
 	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, 4000000)
@@ -1685,7 +1676,7 @@ static MACHINE_CONFIG_START( x68000 )
 
 	MCFG_DEVICE_ADD("scc", SCC8530, 5000000)
 
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
 	MCFG_RP5C15_OUT_ALARM_CB(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	/* video hardware */
@@ -1747,7 +1738,8 @@ static MACHINE_CONFIG_START( x68000 )
 	MCFG_X68KHDC_ADD( "x68k_hdc" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x68ksupr, x68000 )
+MACHINE_CONFIG_START(x68k_state::x68ksupr)
+	x68000(config);
 	MCFG_DEVICE_REMOVE("x68k_hdc")
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -1768,12 +1760,14 @@ static MACHINE_CONFIG_DERIVED( x68ksupr, x68000 )
 	MCFG_MB89352A_DRQ_CB(WRITELINE(x68k_state, x68k_scsi_drq))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x68kxvi, x68ksupr )
+MACHINE_CONFIG_START(x68k_state::x68kxvi)
+	x68ksupr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(16000000)  /* 16 MHz */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x68030, x68ksupr )
+MACHINE_CONFIG_START(x68k_state::x68030)
+	x68ksupr(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
 	MCFG_CPU_PROGRAM_MAP(x68030_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(x68k_state,x68k_int_ack)

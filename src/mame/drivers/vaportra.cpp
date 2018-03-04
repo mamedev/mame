@@ -30,51 +30,27 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(vaportra_state::vaportra_sound_w)
+READ8_MEMBER(vaportra_state::irq6_ack_r)
 {
-	/* Force synchronisation between CPUs with fake timer */
-	machine().scheduler().synchronize();
-	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(0, ASSERT_LINE);
-}
-
-READ16_MEMBER(vaportra_state::irq6_ack_r)
-{
-	if (ACCESSING_BITS_0_7)
-		m_maincpu->set_input_line (6, CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 
 	return (0);
 }
 
-WRITE16_MEMBER(vaportra_state::irq6_ack_w)
+WRITE8_MEMBER(vaportra_state::irq6_ack_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_maincpu->set_input_line (6, CLEAR_LINE);
-}
-
-READ16_MEMBER(vaportra_state::vaportra_control_r)
-{
-	switch (offset << 1)
-	{
-		case 4:
-			return ioport("DSW")->read();
-		case 2:
-			return ioport("COINS")->read();
-		case 0:
-			return ioport("PLAYERS")->read();
-	}
-
-	logerror("Unknown control read at %d\n",offset);
-	return ~0;
+	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 }
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vaportra_state )
+ADDRESS_MAP_START(vaportra_state::main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("PLAYERS")
+	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("COINS")
+	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("DSW")
 	AM_RANGE(0x100000, 0x100003) AM_WRITE(vaportra_priority_w)
-	AM_RANGE(0x100006, 0x100007) AM_WRITE(vaportra_sound_w)
-	AM_RANGE(0x100000, 0x10000f) AM_READ(vaportra_control_r)
+	AM_RANGE(0x100006, 0x100007) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_r, pf1_data_w)
 	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_r, pf2_data_w)
 	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("tilegen2", deco16ic_device, pf_control_w)
@@ -83,7 +59,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vaportra_state )
 	AM_RANGE(0x2c0000, 0x2c000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x300000, 0x3009ff) AM_RAM_WRITE(vaportra_palette_24bit_rg_w) AM_SHARE("paletteram")
 	AM_RANGE(0x304000, 0x3049ff) AM_RAM_WRITE(vaportra_palette_24bit_b_w) AM_SHARE("paletteram2")
-	AM_RANGE(0x308000, 0x308001) AM_READWRITE(irq6_ack_r, irq6_ack_w)
+	AM_RANGE(0x308000, 0x308001) AM_READWRITE8(irq6_ack_r, irq6_ack_w, 0x00ff)
 	AM_RANGE(0x30c000, 0x30c001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
 	AM_RANGE(0x318000, 0x3187ff) AM_MIRROR(0xce0000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
@@ -92,19 +68,13 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-READ8_MEMBER(vaportra_state::vaportra_soundlatch_r)
-{
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(space, offset);
-}
-
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vaportra_state )
+ADDRESS_MAP_START(vaportra_state::sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_READ(vaportra_soundlatch_r)
+	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")  /* ??? LOOKUP ??? */
 	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
@@ -238,14 +208,14 @@ void vaportra_state::machine_reset()
 	m_priority[1] = 0;
 }
 
-static MACHINE_CONFIG_START( vaportra )
+MACHINE_CONFIG_START(vaportra_state::vaportra)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2) /* Custom chip 59 */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL(24'000'000)/2) /* Custom chip 59 */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vaportra_state, irq6_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_24MHz/4) /* Custom chip 45; Audio section crystal is 32.220 MHz but CPU clock is confirmed as coming from the 24MHz crystal (6Mhz exactly on the CPU) */
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL(24'000'000)/4) /* Custom chip 45; Audio section crystal is 32.220 MHz but CPU clock is confirmed as coming from the 24MHz crystal (6Mhz exactly on the CPU) */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -266,7 +236,8 @@ static MACHINE_CONFIG_START( vaportra )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -281,7 +252,8 @@ static MACHINE_CONFIG_START( vaportra )
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x30)
@@ -302,19 +274,20 @@ static MACHINE_CONFIG_START( vaportra )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/8)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_YM2151_ADD("ym2", XTAL_32_22MHz/9) // uses a preset LS163 to force the odd speed
+	MCFG_YM2151_ADD("ym2", XTAL(32'220'000)/9) // uses a preset LS163 to force the odd speed
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", XTAL(32'220'000)/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", XTAL(32'220'000)/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -864,7 +837,7 @@ DRIVER_INIT_MEMBER(vaportra_state,vaportra)
 	uint8_t *RAM = memregion("maincpu")->base();
 
 	for (int i = 0x00000; i < 0x80000; i++)
-		RAM[i] = BITSWAP8(RAM[i],0,6,5,4,3,2,1,7);
+		RAM[i] = bitswap<8>(RAM[i],0,6,5,4,3,2,1,7);
 }
 
 /******************************************************************************/

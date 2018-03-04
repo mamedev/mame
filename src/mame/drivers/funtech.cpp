@@ -94,6 +94,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void funtech(machine_config &config);
+	void funtech_io_map(address_map &map);
+	void funtech_map(address_map &map);
 };
 
 
@@ -239,11 +242,11 @@ INTERRUPT_GEN_MEMBER(fun_tech_corp_state::funtech_vblank_interrupt)
 
 
 
-static ADDRESS_MAP_START( funtech_map, AS_PROGRAM, 8, fun_tech_corp_state )
+ADDRESS_MAP_START(fun_tech_corp_state::funtech_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE(0xd000, 0xd7ff) AM_ROM // maybe
 
@@ -280,7 +283,7 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_coins_w)
 	if (data & 0x01) printf("funtech_coins_w %02x\n", data);
 
 	// 80 = hopper motor?
-	m_hopper->write(space, 0, data & 0x80);
+	m_hopper->motor_w(BIT(data, 7));
 
 	// 40 = ? sometimes
 
@@ -315,7 +318,7 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_vreg_w)
 
 
 
-static ADDRESS_MAP_START( funtech_io_map, AS_IO, 8, fun_tech_corp_state )
+ADDRESS_MAP_START(fun_tech_corp_state::funtech_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// lamps?
 	AM_RANGE(0x00, 0x00) AM_WRITE(funtech_lamps_w)
@@ -484,7 +487,7 @@ void fun_tech_corp_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( funtech )
+MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */

@@ -114,7 +114,7 @@ protected:
 	};
 
 	// construction/destruction
-	symbol_entry(symbol_table &table, symbol_type type, const char *name, const std::string &format, void *ref);
+	symbol_entry(symbol_table &table, symbol_type type, const char *name, const std::string &format);
 public:
 	virtual ~symbol_entry();
 
@@ -138,7 +138,6 @@ protected:
 	symbol_type     m_type;                     // type of symbol
 	std::string     m_name;                     // name of the symbol
 	std::string     m_format;                   // format of symbol (or empty if unspecified)
-	void *          m_ref;                      // internal reference
 };
 
 
@@ -150,11 +149,11 @@ class symbol_table
 {
 public:
 	// callback functions for getting/setting a symbol value
-	typedef std::function<u64(symbol_table &table, void *symref)> getter_func;
-	typedef std::function<void(symbol_table &table, void *symref, u64 value)> setter_func;
+	typedef std::function<u64(symbol_table &table)> getter_func;
+	typedef std::function<void(symbol_table &table, u64 value)> setter_func;
 
 	// callback functions for function execution
-	typedef std::function<u64(symbol_table &table, void *symref, int numparams, const u64 *paramlist)> execute_func;
+	typedef std::function<u64(symbol_table &table, int numparams, const u64 *paramlist)> execute_func;
 
 	// callback functions for memory reads/writes
 	typedef std::function<expression_error::error_code(void *cbparam, const char *name, expression_space space)> valid_func;
@@ -181,8 +180,8 @@ public:
 	// symbol access
 	void add(const char *name, read_write rw, u64 *ptr = nullptr);
 	void add(const char *name, u64 constvalue);
-	void add(const char *name, void *ref, getter_func getter, setter_func setter = nullptr, const std::string &format_string = "");
-	void add(const char *name, void *ref, int minparams, int maxparams, execute_func execute);
+	void add(const char *name, getter_func getter, setter_func setter = nullptr, const std::string &format_string = "");
+	void add(const char *name, int minparams, int maxparams, execute_func execute);
 	symbol_entry *find(const char *name) const { if (name) { auto search = m_symlist.find(name); if (search != m_symlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	symbol_entry *find_deep(const char *name);
 
@@ -294,7 +293,7 @@ private:
 		bool right_to_left() const { assert(m_type == OPERATOR); return ((m_flags & TIN_RIGHT_TO_LEFT_MASK) != 0); }
 		expression_space memory_space() const { assert(m_type == OPERATOR || m_type == MEMORY); return expression_space((m_flags & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT); }
 		int memory_size() const { assert(m_type == OPERATOR || m_type == MEMORY); return (m_flags & TIN_MEMORY_SIZE_MASK) >> TIN_MEMORY_SIZE_SHIFT; }
-		bool memory_side_effect() const { assert(m_type == OPERATOR || m_type == MEMORY); return (m_flags & TIN_SIDE_EFFECT_MASK) >> TIN_SIDE_EFFECT_SHIFT; }
+		bool memory_side_effects() const { assert(m_type == OPERATOR || m_type == MEMORY); return (m_flags & TIN_SIDE_EFFECT_MASK) >> TIN_SIDE_EFFECT_SHIFT; }
 
 		// setters
 		parse_token &set_offset(int offset) { m_offset = offset; return *this; }
@@ -311,7 +310,7 @@ private:
 		parse_token &set_right_to_left() { assert(m_type == OPERATOR); m_flags |= TIN_RIGHT_TO_LEFT_MASK; return *this; }
 		parse_token &set_memory_space(expression_space space) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = (m_flags & ~TIN_MEMORY_SPACE_MASK) | ((space << TIN_MEMORY_SPACE_SHIFT) & TIN_MEMORY_SPACE_MASK); return *this; }
 		parse_token &set_memory_size(int log2ofbits) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = (m_flags & ~TIN_MEMORY_SIZE_MASK) | ((log2ofbits << TIN_MEMORY_SIZE_SHIFT) & TIN_MEMORY_SIZE_MASK); return *this; }
-		parse_token &set_memory_side_effect(bool disable_se) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = disable_se ? m_flags | TIN_SIDE_EFFECT_MASK : m_flags & ~TIN_SIDE_EFFECT_MASK; return *this; }
+		parse_token &set_memory_side_effects(bool disable_se) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = disable_se ? m_flags | TIN_SIDE_EFFECT_MASK : m_flags & ~TIN_SIDE_EFFECT_MASK; return *this; }
 		parse_token &set_memory_source(const char *string) { assert(m_type == OPERATOR || m_type == MEMORY); m_string = string; return *this; }
 
 		// access

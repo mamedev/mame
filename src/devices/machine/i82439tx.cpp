@@ -5,13 +5,14 @@
 
 DEFINE_DEVICE_TYPE(I82439TX_NEW, i82439tx_host_device, "i82439tx_new", "Intel 82439TX northbridge")
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, i82439tx_host_device)
+ADDRESS_MAP_START(i82439tx_host_device::config_map)
+	AM_IMPORT_FROM(pci_host_device::config_map)
 	AM_RANGE(0x50, 0x53) AM_READWRITE8(pcon_r,   pcon_w,   0x000000ff)
 	AM_RANGE(0x50, 0x53) AM_READWRITE8(cc_r,     cc_w,     0x00ff0000)
 	AM_RANGE(0x54, 0x57) AM_READWRITE8(dramec_r, dramec_w, 0x00ff0000)
 	AM_RANGE(0x54, 0x57) AM_READWRITE8(dramc_r,  dramc_w,  0xff000000)
-	AM_RANGE(0x58, 0x5b) AM_READWRITE8(dramt_r,  dramt_w,  0x000000ff)
 	AM_RANGE(0x58, 0x5f) AM_READWRITE8(pam_r,    pam_w,    0xffffffff)
+	AM_RANGE(0x58, 0x5b) AM_READWRITE8(dramt_r,  dramt_w,  0x000000ff)
 	AM_RANGE(0x60, 0x67) AM_READWRITE8(drb_r,    drb_w,    0xffffffff)
 	AM_RANGE(0x68, 0x6b) AM_READWRITE8(drt_r,    drt_w,    0x000000ff)
 	AM_RANGE(0x68, 0x6b) AM_READWRITE8(drat_r,   drat_w,   0x0000ff00)
@@ -19,9 +20,6 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i82439tx_host_device)
 	AM_RANGE(0x90, 0x93) AM_READWRITE8(errcmd_r, errcmd_w, 0x000000ff)
 	AM_RANGE(0x90, 0x93) AM_READWRITE8(errsts_r, errsts_w, 0x0000ff00)
 	AM_RANGE(0x90, 0x93) AM_READ8     (errsyn_r,           0x00ff0000)
-
-
-	AM_INHERIT_FROM(pci_host_device::config_map)
 ADDRESS_MAP_END
 
 i82439tx_host_device::i82439tx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

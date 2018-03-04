@@ -4,6 +4,8 @@
 #include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
+#include "sound/ay8910.h"
+#include "sound/ta7630.h"
 
 class fortyl_state : public driver_device
 {
@@ -20,9 +22,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm"),
+		m_ay(*this,"aysnd"),
+		m_ta7630(*this,"ta7630"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch2(*this, "soundlatch2") { }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -47,16 +51,10 @@ public:
 	bool        m_color_bank;
 	bool        m_screen_disable;
 
-	/* sound-related */
-	int         m_sound_nmi_enable;
-	int         m_pending_nmi;
-
 	/* misc */
 	int         m_pix_color[4];
 	uint8_t       m_pix1;
 	uint8_t       m_pix2[2];
-	uint8_t       m_snd_data;
-	uint8_t       m_snd_flag;
 	int         m_vol_ctrl[16];
 	uint8_t       m_snd_ctrl0;
 	uint8_t       m_snd_ctrl1;
@@ -68,20 +66,17 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
+	required_device<ay8910_device> m_ay;
+	required_device<ta7630_device> m_ta7630;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(nmi_disable_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(bank_select_w);
 	DECLARE_WRITE8_MEMBER(pix1_w);
 	DECLARE_WRITE8_MEMBER(pix2_w);
 	DECLARE_READ8_MEMBER(pix2_r);
-	DECLARE_READ8_MEMBER(from_snd_r);
 	DECLARE_READ8_MEMBER(snd_flag_r);
-	DECLARE_WRITE8_MEMBER(to_main_w);
 	DECLARE_READ8_MEMBER(fortyl_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(fortyl_pixram_sel_w);
 	DECLARE_READ8_MEMBER(fortyl_pixram_r);
@@ -102,7 +97,6 @@ public:
 	DECLARE_MACHINE_START(40love);
 	DECLARE_MACHINE_RESET(40love);
 	DECLARE_MACHINE_RESET(common);
-	DECLARE_MACHINE_RESET(ta7630);
 	uint32_t screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void redraw_pixels();
 	void fortyl_set_scroll_x( int offset );
@@ -110,11 +104,9 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	enum
-	{
-		TIMER_NMI_CALLBACK
-	};
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void undoukai(machine_config &config);
+	void _40love(machine_config &config);
+	void _40love_map(address_map &map);
+	void sound_map(address_map &map);
+	void undoukai_map(address_map &map);
 };

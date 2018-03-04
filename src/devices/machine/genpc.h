@@ -25,7 +25,9 @@
 
 #define MCFG_IBM5160_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, IBM5160_MOTHERBOARD, 0) \
-	ibm5160_mb_device::static_set_cputag(*device, _cputag);
+	downcast<ibm5160_mb_device &>(*device).set_cputag("^" _cputag); \
+	(*device->subdevice<isa8_device>("isa")).set_cputag("^^" _cputag);
+
 // ======================> ibm5160_mb_device
 class ibm5160_mb_device : public device_t
 {
@@ -34,9 +36,9 @@ public:
 	ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
+	void set_cputag(const char *tag) { m_maincpu.set_tag(tag); }
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	uint8_t m_pit_out2;
 
@@ -47,6 +49,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out1_changed );
 	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
+
+	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
 
 protected:
 	ibm5160_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -116,8 +120,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
 
-	const char *m_cputag;
-
 	void pc_select_dma_channel(int channel, bool state);
 };
 
@@ -128,7 +130,8 @@ DECLARE_DEVICE_TYPE(IBM5160_MOTHERBOARD, ibm5160_mb_device)
 
 #define MCFG_IBM5150_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, IBM5150_MOTHERBOARD, 0) \
-	ibm5150_mb_device::static_set_cputag(*device, _cputag);
+	downcast<ibm5150_mb_device &>(*device).set_cputag("^" _cputag); \
+	(*device->subdevice<isa8_device>("isa")).set_cputag("^^" _cputag);
 
 // ======================> ibm5150_mb_device
 class ibm5150_mb_device : public ibm5160_mb_device
@@ -160,7 +163,8 @@ DECLARE_DEVICE_TYPE(IBM5150_MOTHERBOARD, ibm5150_mb_device)
 
 #define MCFG_EC1841_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, EC1841_MOTHERBOARD, 0) \
-	ec1841_mb_device::static_set_cputag(*device, _cputag);
+	downcast<ec1841_mb_device &>(*device).set_cputag("^" _cputag); \
+	(*device->subdevice<isa8_device>("isa")).set_cputag("^^" _cputag);
 
 class ec1841_mb_device : public ibm5160_mb_device
 {
@@ -185,7 +189,8 @@ DECLARE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device)
 
 #define MCFG_PCNOPPI_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, PCNOPPI_MOTHERBOARD, 0) \
-	pc_noppi_mb_device::static_set_cputag(*device, _cputag);
+	downcast<pc_noppi_mb_device &>(*device).set_cputag("^" _cputag); \
+	(*device->subdevice<isa8_device>("isa")).set_cputag("^^" _cputag);
 
 class pc_noppi_mb_device : public ibm5160_mb_device
 {
@@ -194,7 +199,7 @@ public:
 	pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	uint8_t pit_out2() { return m_pit_out2; } // helper for near-clones with multifunction ics instead of 8255s
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 protected:
 	pc_noppi_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

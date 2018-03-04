@@ -52,25 +52,32 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	DECLARE_DRIVER_INIT(pesadelo);
+	void pesadelo(machine_config &config);
 
-	uint8_t m_input_mask;
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	void io_mem(address_map &map);
+	void program_mem(address_map &map);
 
 	DECLARE_READ8_MEMBER(forte2_ay8910_read_input);
 	DECLARE_WRITE8_MEMBER(forte2_ay8910_set_input_mask);
-	DECLARE_DRIVER_INIT(pesadelo);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+
+	uint8_t m_input_mask;
 };
 
 
 
-static ADDRESS_MAP_START( program_mem, AS_PROGRAM, 8, forte2_state )
+ADDRESS_MAP_START(forte2_state::program_mem)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_mem, AS_IO, 8, forte2_state )
+ADDRESS_MAP_START(forte2_state::io_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x98, 0x98) AM_DEVREADWRITE( "tms9928a", tms9928a_device, vram_read, vram_write )
@@ -117,15 +124,15 @@ void forte2_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( pesadelo )
+MACHINE_CONFIG_START(forte2_state::pesadelo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(program_mem)
 	MCFG_CPU_IO_MAP(io_mem)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tms9928a", TMS9928A, XTAL_10_738635MHz/2)
+	MCFG_DEVICE_ADD("tms9928a", TMS9928A, XTAL(10'738'635)/2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC("screen")
@@ -133,7 +140,7 @@ static MACHINE_CONFIG_START( pesadelo )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_3_579545MHz/2)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(3'579'545)/2)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(forte2_state, forte2_ay8910_read_input))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(forte2_state, forte2_ay8910_set_input_mask))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -147,7 +154,7 @@ DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 	// data swap
 	for (int i = 0; i < memsize; i++)
 	{
-		mem[i] = BITSWAP8(mem[i],3,5,6,7,0,4,2,1);
+		mem[i] = bitswap<8>(mem[i],3,5,6,7,0,4,2,1);
 	}
 
 	// address line swap
@@ -155,7 +162,7 @@ DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 	memcpy(&buf[0], mem, memsize);
 	for (int i = 0; i < memsize; i++)
 	{
-		mem[BITSWAP16(i,11,9,8,13,14,15,12,7,6,5,4,3,2,1,0,10)] = buf[i];
+		mem[bitswap<16>(i,11,9,8,13,14,15,12,7,6,5,4,3,2,1,0,10)] = buf[i];
 	}
 }
 

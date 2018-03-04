@@ -43,6 +43,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void rgum(machine_config &config);
+	void rgum_map(address_map &map);
 };
 
 
@@ -72,7 +74,7 @@ uint32_t rgum_state::screen_update_royalgum(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static ADDRESS_MAP_START( rgum_map, AS_PROGRAM, 8, rgum_state )
+ADDRESS_MAP_START(rgum_state::rgum_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM //not all of it?
 
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -238,7 +240,7 @@ static GFXDECODE_START( rgum )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( rgum )
+MACHINE_CONFIG_START(rgum_state::rgum)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(rgum_map)

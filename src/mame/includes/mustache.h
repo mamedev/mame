@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
+
 #include "audio/seibu.h"    // for seibu_sound_decrypt on the MAIN cpu (not sound)
+#include "machine/timer.h"
 #include "screen.h"
 
 class mustache_state : public driver_device
@@ -42,4 +44,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void mustache(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void memmap(address_map &map);
 };

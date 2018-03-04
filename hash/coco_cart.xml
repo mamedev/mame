@@ -77,7 +77,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="ZCT Systems" />
 		<info name="author" value="Greg L. Zumwalt &amp; Mark W. Easter" />
 		<info name="serial" value="26-3160" />
-		<info name="usage" value="CoCo 3 Only" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="a mazing world of malcom mortar (1987)(26-3160)(zct systems).rom" size="16384" crc="93ddfc53" sha1="bdd56931325648d5ecc860ff77c59d27637687de" status="baddump" offset="0" />
@@ -92,7 +92,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="ZCT Systems" />
 		<info name="author" value="Greg Zumwalt &amp; Mark Easter" />
 		<info name="serial" value="26-3160" />
-		<info name="usage" value="CoCo 3 Only" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="a mazing world of malcom mortar (1987)(26-3160)(zct systems)[a].rom" size="16384" crc="d4bbe731" sha1="d2a70452a120d3164ae52e16062fb2a4539fd377" status="baddump" offset="0" />
@@ -212,7 +212,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="Computerware" />
 		<info name="author" value="Scott A. Cabit" />
 		<info name="serial" value="26-3159" />
-		<info name="usage" value="CoCo 3 Only" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="castle of tharoggad (1988)(26-3159)(tandy)[!].rom" size="16384" crc="82929650" sha1="485477577db4751da4c0db3a402bb9b45fa65667" offset="0" />
@@ -732,7 +732,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="ZCT Systems" />
 		<info name="author" value="Greg Zumwalt &amp; Mark Easter" />
 		<info name="serial" value="26-3172" />
-		<info name="usage" value="CoCo 3 Only" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="gfl championship football ii (1988)(26-3172)(zct systems)[!].rom" size="32768" crc="899978e7" sha1="b575b379a7cf41fadfa5c1b525d5f0103544eafa" offset="0" />
@@ -937,6 +937,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="Epyx" />
 		<info name="serial" value="26-3100" />
 		<part name="cart" interface="coco_cart">
+			<feature name="slot" value="banked_16k" />
 			<dataarea name="rom" size="32768">
 				<rom name="mind-roll (1988)(26-3100)(epyx)[!].rom" size="32768" crc="83bd6056" sha1="f7b505383ca5739a98a5130549d534c38cb1bd2f" offset="0" />
 			</dataarea>
@@ -1075,7 +1076,9 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>Tandy</publisher>
 		<info name="developer" value="Activision" />
 		<info name="serial" value="26-3165" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
+			<feature name="slot" value="banked_16k" />
 			<dataarea name="rom" size="65536">
 				<rom name="predator (1989) (26-3165) (activision).rom" size="65536" crc="a9680ede" sha1="551d8d95fd310b2d72b1e22028a517c325fe9ab4" offset="0" />
 			</dataarea>
@@ -1115,7 +1118,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="Epyx" />
 		<info name="author" value="Jesse Taylor" />
 		<info name="serial" value="26-3162" />
-		<info name="usage" value="CoCo 3 Only" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="rad warrior (1987)(26-3162)(tandy).rom" size="32768" crc="c8b64049" sha1="5e3d4d57cd19a71ecd668ff7ce0d05d0adf30e93" offset="0" />
@@ -1130,7 +1133,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="Activision" />
 		<info name="author" value="Steve Bjork" />
 		<info name="serial" value="26-3174" />
-		<info name="usage" value="CoCo 3 Only" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="rampage! (1989)(26-3174)(activision).rom" size="32768" crc="09c2e97d" sha1="02c6a560ede8b3b87fb8420ee05ba9ac6704f101" offset="0" />
@@ -1158,8 +1161,9 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="Data East" />
 		<info name="author" value="Greg Zumwalt" />
 		<info name="serial" value="26-3164" />
-		<info name="usage" value="CoCo 3 Only" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
+			<feature name="slot" value="banked_16k" />
 			<dataarea name="rom" size="131072">
 				<rom name="robocop (1988)(26-3164)(data east).rom" size="131072" crc="dd94dd06" sha1="82ad8a207a446d99455926bd27d4490578de2b41" offset="0" />
 			</dataarea>
@@ -1198,7 +1202,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="Activision" />
 		<info name="author" value="Rick Adams" />
 		<info name="serial" value="26-3084" />
-		<info name="usage" value="CoCo 3 Only" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="shanghai (1987)(26-3084)(activision)[!].rom" size="16384" crc="5a54973c" sha1="0c500d34b4fd1170093cdf3209a201d14b86160a" offset="0" />
@@ -1212,7 +1216,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>Tandy</publisher>
 		<info name="developer" value="Sierra On-Line" />
 		<info name="serial" value="26-3054" />
-		<info name="usage" value="CoCo 3 Only" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="silpheed (1988)(26-3054)(sierra)(coco 3 version).rom" size="32768" crc="ccfd0a0c" sha1="bd0e2bd1fd57b9512bb01414c15ce07afbe298f2" offset="0" />
@@ -1239,7 +1243,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>Tandy</publisher>
 		<info name="developer" value="Spectral Assosciates" />
 		<info name="serial" value="26-3078" />
-		<info name="usage" value="CoCo 3 Only" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="springster (1987)(26-3078)(spectral associates).rom" size="16384" crc="f47d3880" sha1="31b54b74e8c1ee018b905d4f76cd5a6341954301" offset="0" />
@@ -1267,7 +1271,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="Activision" />
 		<info name="author" value="Steve Bjork" />
 		<info name="serial" value="26-3171" />
-		<info name="usage" value="CoCo 3 Only" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="super pitfall (1988)(26-3171)(activision).rom" size="32768" crc="e8e54cbe" sha1="10f4e78255d61dce2c882f9a136a94cbb7860fc1" offset="0" />
@@ -1281,7 +1285,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>Tandy</publisher>
 		<info name="developer" value="Sierra On-Line" />
 		<info name="serial" value="26-3072" />
-		<info name="usage" value="CoCo 3 Only" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="thexder (1987)(26-3072)(sierra).rom" size="16384" crc="0ef0df20" sha1="36919b37f858ecf71c77ee7a766370fd6d4a6b7e" offset="0" />
@@ -1296,7 +1300,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="ZCT Systems" />
 		<info name="author" value="Greg Zumwalt &amp; Mark Easter" />
 		<info name="serial" value="26-3155" />
-		<info name="usage" value="CoCo 3 Only" />
+		<sharedfeat name="compatibility" value="COCO3" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16368">
 				<rom name="typemate (1988)(26-3155)(zct systems).rom" size="16368" crc="54f38ab8" sha1="8249b036ed2add30c864ee167ebfe940ea7e29aa" status="baddump" offset="0" />

@@ -14,6 +14,7 @@
 #include "includes/mw8080bw.h"
 
 #include "machine/eepromser.h"
+#include "machine/timer.h"
 #include "sound/sn76477.h"
 #include "sound/spkrdev.h"
 
@@ -31,11 +32,8 @@ public:
 		: mw8080bw_state(mconfig, type, tag),
 		m_schaser_effect_555_timer(*this, "schaser_sh_555"),
 		m_claybust_gun_on(*this, "claybust_gun"),
-		m_discrete(*this, "discrete"),
 		m_speaker(*this, "speaker"),
 		m_eeprom(*this, "eeprom"),
-		m_sn(*this, "snsnd"),
-		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_gunx(*this, "GUNX"),
 		m_guny(*this, "GUNY")
@@ -44,11 +42,8 @@ public:
 	/* devices/memory pointers */
 	optional_device<timer_device> m_schaser_effect_555_timer;
 	optional_device<timer_device> m_claybust_gun_on;
-	optional_device<discrete_device> m_discrete;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<sn76477_device> m_sn;
-	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 
 	/* misc game specific */
@@ -174,6 +169,73 @@ public:
 	inline void set_pixel( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, int color );
 	inline void set_8_pixels( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, int fore_color, int back_color );
 	void clear_extra_columns( bitmap_rgb32 &bitmap, int color );
+	void indianbtbr(machine_config &config);
+	void claybust(machine_config &config);
+	void shuttlei(machine_config &config);
+	void spcewarla(machine_config &config);
+	void escmars(machine_config &config);
+	void lrescue(machine_config &config);
+	void invmulti(machine_config &config);
+	void yosakdon(machine_config &config);
+	void polaris(machine_config &config);
+	void attackfc(machine_config &config);
+	void astropal(machine_config &config);
+	void rollingc(machine_config &config);
+	void vortex(machine_config &config);
+	void invrvnge(machine_config &config);
+	void sflush(machine_config &config);
+	void invadpt2(machine_config &config);
+	void lupin3a(machine_config &config);
+	void indianbt(machine_config &config);
+	void starw1(machine_config &config);
+	void cosmo(machine_config &config);
+	void spcewars(machine_config &config);
+	void cosmicmo(machine_config &config);
+	void darthvdr(machine_config &config);
+	void ballbomb(machine_config &config);
+	void spacecom(machine_config &config);
+	void schasercv(machine_config &config);
+	void lupin3(machine_config &config);
+	void spacerng(machine_config &config);
+	void steelwkr(machine_config &config);
+	void schaser(machine_config &config);
+	void astropal_io_map(address_map &map);
+	void attackfc_io_map(address_map &map);
+	void ballbomb_io_map(address_map &map);
+	void claybust_io_map(address_map &map);
+	void cosmicmo_io_map(address_map &map);
+	void cosmo_io_map(address_map &map);
+	void cosmo_map(address_map &map);
+	void darthvdr_io_map(address_map &map);
+	void darthvdr_map(address_map &map);
+	void escmars_map(address_map &map);
+	void indianbt_io_map(address_map &map);
+	void indianbtbr_io_map(address_map &map);
+	void invadpt2_io_map(address_map &map);
+	void invmulti_map(address_map &map);
+	void invrvnge_io_map(address_map &map);
+	void invrvnge_sound_map(address_map &map);
+	void lrescue_io_map(address_map &map);
+	void lupin3_io_map(address_map &map);
+	void polaris_io_map(address_map &map);
+	void rollingc_io_map(address_map &map);
+	void rollingc_map(address_map &map);
+	void schaser_io_map(address_map &map);
+	void schaser_map(address_map &map);
+	void schasercv_io_map(address_map &map);
+	void sflush_map(address_map &map);
+	void shuttlei_io_map(address_map &map);
+	void shuttlei_map(address_map &map);
+	void spacecom_io_map(address_map &map);
+	void spacecom_map(address_map &map);
+	void spacerng_io_map(address_map &map);
+	void spcewarla_io_map(address_map &map);
+	void spcewars_io_map(address_map &map);
+	void starw1_io_map(address_map &map);
+	void steelwkr_io_map(address_map &map);
+	void vortex_io_map(address_map &map);
+	void yosakdon_io_map(address_map &map);
+	void yosakdon_map(address_map &map);
 };
 
 

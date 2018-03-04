@@ -188,10 +188,18 @@ public:
 	void turbo_update_samples();
 	inline void subroc3d_update_volume(int leftchan, uint8_t dis, uint8_t dir);
 	void buckrog_update_samples();
+	void turbo(machine_config &config);
+	void buckrog(machine_config &config);
+	void buckroge(machine_config &config);
+	void buckrogu(machine_config &config);
+	void subroc3d(machine_config &config);
+	void turbo_samples(machine_config &config);
+	void subroc3d_samples(machine_config &config);
+	void buckrog_samples(machine_config &config);
+	void buckrog_cpu2_map(address_map &map);
+	void buckrog_cpu2_portmap(address_map &map);
+	void buckrog_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void subroc3d_map(address_map &map);
+	void turbo_map(address_map &map);
 };
-
-
-/*----------- defined in audio/turbo.c -----------*/
-MACHINE_CONFIG_EXTERN( turbo_samples );
-MACHINE_CONFIG_EXTERN( subroc3d_samples );
-MACHINE_CONFIG_EXTERN( buckrog_samples );

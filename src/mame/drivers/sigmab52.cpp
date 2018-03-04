@@ -23,7 +23,7 @@
 
   CPU:
 
-  - 2x MC68B09CP         ; 6809 CPU @ 2 MHz, from Motorola.
+  - 2x MC68B09P          ; 6809 CPU @ 2 MHz, from Motorola.
   - 1x HD63484P8 @ 8MHz  ; Advanced CRT controller (ACRTC), from Hitachi Semiconductor.
 
   RAM devices:
@@ -110,6 +110,7 @@
 
   TODO:
 
+  - Verify clocks.
   - Improve memory map.
   - Layout.
   - Bill validator.
@@ -132,24 +133,27 @@
 #include "sigmab52.lh"
 
 
-#define MAIN_CLOCK  XTAL_18MHz
-#define SEC_CLOCK   XTAL_8MHz
-#define AUX_CLOCK   XTAL_3_579545MHz
-
 class sigmab52_state : public driver_device
 {
 public:
-	sigmab52_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sigmab52_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_6840ptm_2(*this, "6840ptm_2"),
 		m_palette(*this, "palette"),
 		m_bank1(*this, "bank1"),
 		m_prom(*this, "proms"),
-		m_in0(*this, "IN0")
+		m_in0(*this, "IN0"),
+		m_lamps(*this, "lamp%u", 0U),
+		m_towerlamps(*this, "towerlamp%u", 0U)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
+	DECLARE_DRIVER_INIT(jwildb52);
+	void jwildb52(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(unk_f700_r);
 	DECLARE_READ8_MEMBER(unk_f760_r);
 	DECLARE_READ8_MEMBER(in0_r);
@@ -162,23 +166,29 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(tower_lamps_w);
 	DECLARE_WRITE8_MEMBER(coin_enable_w);
-	DECLARE_DRIVER_INIT(jwildb52);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_WRITE_LINE_MEMBER(ptm2_irq);
 	void audiocpu_irq_update();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	void jwildb52_hd63484_map(address_map &map);
+	void jwildb52_map(address_map &map);
+	void sound_prog_map(address_map &map);
+
+private:
+	required_device<cpu_device>     m_maincpu;
+	required_device<cpu_device>     m_audiocpu;
 	required_device<ptm6840_device> m_6840ptm_2;
 	required_device<palette_device> m_palette;
-	required_memory_bank m_bank1;
-	required_region_ptr<uint8_t> m_prom;
-	required_ioport m_in0;
+	required_memory_bank            m_bank1;
+	required_region_ptr<uint8_t>    m_prom;
+	required_ioport                 m_in0;
+	output_finder<10>               m_lamps;
+	output_finder<2>                m_towerlamps;
 
-	uint64_t      m_coin_start_cycles;
-	uint64_t      m_hopper_start_cycles;
+	uint64_t    m_coin_start_cycles;
+	uint64_t    m_hopper_start_cycles;
 	int         m_audiocpu_cmd_irq;
 };
 
@@ -260,17 +270,17 @@ WRITE8_MEMBER(sigmab52_state::hopper_w)
 
 WRITE8_MEMBER(sigmab52_state::lamps1_w)
 {
-	output().set_lamp_value(offset, data & 1);
+	m_lamps[offset] = data & 1;
 }
 
 WRITE8_MEMBER(sigmab52_state::lamps2_w)
 {
-	output().set_lamp_value(6 + offset, data & 1);
+	m_lamps[6 + offset] = data & 1;
 }
 
 WRITE8_MEMBER(sigmab52_state::tower_lamps_w)
 {
-	output().set_indexed_value("towerlamp", offset, data & 1);
+	m_towerlamps[offset] = data & 1;
 }
 
 WRITE8_MEMBER(sigmab52_state::coin_enable_w)
@@ -308,7 +318,7 @@ WRITE8_MEMBER(sigmab52_state::palette_bank_w)
 *      Memory Maps       *
 *************************/
 
-static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
+ADDRESS_MAP_START(sigmab52_state::jwildb52_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 
@@ -319,8 +329,8 @@ static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
 
 	AM_RANGE(0xf720, 0xf727) AM_DEVREADWRITE("6840ptm_1", ptm6840_device, read, write)
 
-	AM_RANGE(0xf730, 0xf730) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
-	AM_RANGE(0xf731, 0xf731) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
+	AM_RANGE(0xf730, 0xf730) AM_DEVREADWRITE("hd63484", hd63484_device, status8_r, address8_w)
+	AM_RANGE(0xf731, 0xf731) AM_DEVREADWRITE("hd63484", hd63484_device, data8_r, data8_w)
 
 	AM_RANGE(0xf740, 0xf740) AM_READ(in0_r)
 	AM_RANGE(0xf741, 0xf741) AM_READ_PORT("IN1")
@@ -359,7 +369,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( sound_prog_map, AS_PROGRAM, 8, sigmab52_state )
+ADDRESS_MAP_START(sigmab52_state::sound_prog_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x6020, 0x6027) AM_DEVREADWRITE("6840ptm_2", ptm6840_device, read, write)
 	AM_RANGE(0x6030, 0x6030) AM_WRITE(audiocpu_irq_ack_w)
@@ -373,7 +383,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( jwildb52_hd63484_map, 0, 16, sigmab52_state )
+ADDRESS_MAP_START(sigmab52_state::jwildb52_hd63484_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
@@ -561,6 +571,8 @@ INPUT_PORTS_END
 void sigmab52_state::machine_start()
 {
 	m_bank1->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
+	m_lamps.resolve();
+	m_towerlamps.resolve();
 }
 
 void sigmab52_state::machine_reset()
@@ -575,19 +587,19 @@ void sigmab52_state::machine_reset()
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( jwildb52 )
+MACHINE_CONFIG_START(sigmab52_state::jwildb52)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/9)    /* 2 MHz */
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(jwildb52_map)
 
-	MCFG_CPU_ADD("audiocpu", M6809, MAIN_CLOCK/9)   /* 2 MHz */
+	MCFG_CPU_ADD("audiocpu", MC6809, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(sound_prog_map)
 
-	MCFG_DEVICE_ADD("6840ptm_1", PTM6840, MAIN_CLOCK/9) // FIXME
+	MCFG_DEVICE_ADD("6840ptm_1", PTM6840, XTAL(8'000'000)/4) // FIXME
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("6840ptm_2", PTM6840, MAIN_CLOCK/18) // FIXME
+	MCFG_DEVICE_ADD("6840ptm_2", PTM6840, XTAL(8'000'000)/8) // FIXME
 	MCFG_PTM6840_IRQ_CB(WRITELINE(sigmab52_state, ptm2_irq))
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
@@ -600,7 +612,7 @@ static MACHINE_CONFIG_START( jwildb52 )
 	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_HD63484_ADD("hd63484", SEC_CLOCK, jwildb52_hd63484_map)
+	MCFG_HD63484_ADD("hd63484", XTAL(8'000'000), jwildb52_hd63484_map)
 
 	MCFG_PALETTE_ADD("palette", 16)
 
@@ -609,7 +621,7 @@ static MACHINE_CONFIG_START( jwildb52 )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, AUX_CLOCK)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

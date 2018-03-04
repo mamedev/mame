@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/flt_rc.h"
 #include "sound/upd7759.h"
 #include "video/k007342.h"
@@ -67,4 +68,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bladestl_scanline);
 	K007342_CALLBACK_MEMBER(bladestl_tile_callback);
 	K007420_CALLBACK_MEMBER(bladestl_sprite_callback);
+	void bladestl(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

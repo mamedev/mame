@@ -45,7 +45,7 @@ WRITE8_MEMBER(kncljoe_state::sound_cmd_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, kncljoe_state )
+ADDRESS_MAP_START(kncljoe_state::main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(kncljoe_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd000, 0xd001) AM_WRITE(kncljoe_scroll_w) AM_SHARE("scrollregs")
@@ -103,14 +103,14 @@ WRITE8_MEMBER(kncljoe_state::unused_w)
 	//unused - no MSM on the pcb
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, kncljoe_state )
+ADDRESS_MAP_START(kncljoe_state::sound_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0fff) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(sound_irq_ack_w)
 	AM_RANGE(0x2000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, kncljoe_state )
+ADDRESS_MAP_START(kncljoe_state::sound_portmap)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(m6803_port1_r, m6803_port1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w)
 ADDRESS_MAP_END
@@ -252,14 +252,14 @@ void kncljoe_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( kncljoe )
+MACHINE_CONFIG_START(kncljoe_state::kncljoe)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)  /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(6'000'000))  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kncljoe_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", M6803, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("soundcpu", M6803, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(kncljoe_state, sound_nmi,  (double)3970) //measured 3.970 kHz
@@ -285,15 +285,15 @@ static MACHINE_CONFIG_START( kncljoe )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kncljoe_state, unused_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("sn1", SN76489, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("sn1", SN76489, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("sn2", SN76489, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("sn2", SN76489, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

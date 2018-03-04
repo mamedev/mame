@@ -91,6 +91,8 @@ public:
 	void kbd_put(u8 data);
 	uint8_t m_term_data;
 	uint16_t m_term_status;
+	void vax11(machine_config &config);
+	void vax11_mem(address_map &map);
 };
 
 WRITE16_MEMBER(vax11_state::term_w)
@@ -114,7 +116,7 @@ READ16_MEMBER(vax11_state::term_rx_status_r)
 	return m_term_status;
 }
 
-static ADDRESS_MAP_START(vax11_mem, AS_PROGRAM, 16, vax11_state)
+ADDRESS_MAP_START(vax11_state::vax11_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xbfff ) AM_RAM  // RAM
 	AM_RANGE( 0xc000, 0xd7ff ) AM_ROM
@@ -137,9 +139,9 @@ void vax11_state::kbd_put(u8 data)
 	m_term_status = 0xffff;
 }
 
-static MACHINE_CONFIG_START( vax11 )
+MACHINE_CONFIG_START(vax11_state::vax11)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
+	MCFG_CPU_ADD("maincpu",T11, XTAL(4'000'000)) // Need proper CPU here
 	MCFG_T11_INITIAL_MODE(0 << 13)
 	MCFG_CPU_PROGRAM_MAP(vax11_mem)
 

@@ -86,7 +86,7 @@ WRITE8_MEMBER(m107_state::bankswitch_w)
 {
 	membank("bank1")->set_entry((data & 0x06) >> 1);
 	if (data & 0xf9)
-		logerror("%05x: bankswitch %04x\n", space.device().safe_pc(), data);
+		logerror("%05x: bankswitch %04x\n", m_maincpu->pc(), data);
 }
 
 WRITE16_MEMBER(m107_state::sound_reset_w)
@@ -96,17 +96,17 @@ WRITE16_MEMBER(m107_state::sound_reset_w)
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, m107_state )
+ADDRESS_MAP_START(m107_state::main_map)
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(vram_w) AM_SHARE("vram_data")
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
+ADDRESS_MAP_START(m107_state::main_portmap)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -123,9 +123,9 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 	AM_RANGE(0xc0, 0xc1) AM_WRITE(sound_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsoccr94_io_map, AS_IO, 16, m107_state )
-	AM_RANGE(0x06, 0x07) AM_WRITE8(bankswitch_w, 0x00ff)
+ADDRESS_MAP_START(m107_state::dsoccr94_io_map)
 	AM_IMPORT_FROM(main_portmap)
+	AM_RANGE(0x06, 0x07) AM_WRITE8(bankswitch_w, 0x00ff)
 ADDRESS_MAP_END
 
 /* same as M107 but with an extra i/o board */
@@ -139,23 +139,23 @@ WRITE16_MEMBER(m107_state::wpksoc_output_w)
 		popmessage("%04x",data);
 }
 
-static ADDRESS_MAP_START( wpksoc_map, AS_PROGRAM, 16, m107_state )
+ADDRESS_MAP_START(m107_state::wpksoc_map)
+	AM_IMPORT_FROM(main_map)
 	AM_RANGE(0xf0000, 0xf0001) AM_READ_PORT("WPK_DSW0")
 	AM_RANGE(0xf0002, 0xf0003) AM_READ_PORT("WPK_DSW1")
 	AM_RANGE(0xf0004, 0xf0005) AM_READ_PORT("WPK_DSW2")
-	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wpksoc_io_map, AS_IO, 16, m107_state )
+ADDRESS_MAP_START(m107_state::wpksoc_io_map)
+	AM_IMPORT_FROM(main_portmap)
 	AM_RANGE(0x22, 0x23) AM_WRITE(wpksoc_output_w)
 	AM_RANGE(0xc0, 0xc1) AM_READ_PORT("WPK_IN0")
 	AM_RANGE(0xc2, 0xc3) AM_READ_PORT("WPK_IN1")
-	AM_IMPORT_FROM(main_portmap)
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, m107_state )
+ADDRESS_MAP_START(m107_state::sound_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", iremga20_device, irem_ga20_r, irem_ga20_w, 0x00ff)
@@ -711,15 +711,15 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static MACHINE_CONFIG_START( firebarr )
+MACHINE_CONFIG_START(m107_state::firebarr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V33, XTAL_28MHz/2)    /* NEC V33, 28MHz clock */
+	MCFG_CPU_ADD("maincpu", V33, XTAL(28'000'000)/2)    /* NEC V33, 28MHz clock */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
 
-	MCFG_CPU_ADD("soundcpu", V35, XTAL_14_31818MHz)
+	MCFG_CPU_ADD("soundcpu", V35, XTAL(14'318'181))
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 
@@ -752,17 +752,18 @@ static MACHINE_CONFIG_START( firebarr )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("upd71059c", pic8259_device, ir3_w))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_IREMGA20_ADD("irem", XTAL_14_31818MHz/4)
+	MCFG_IREMGA20_ADD("irem", XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dsoccr94, firebarr )
+MACHINE_CONFIG_START(m107_state::dsoccr94)
+	firebarr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -777,7 +778,8 @@ static MACHINE_CONFIG_DERIVED( dsoccr94, firebarr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wpksoc, firebarr )
+MACHINE_CONFIG_START(m107_state::wpksoc)
+	firebarr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wpksoc_map)
 	MCFG_CPU_IO_MAP(wpksoc_io_map)
@@ -786,7 +788,8 @@ static MACHINE_CONFIG_DERIVED( wpksoc, firebarr )
 	MCFG_V25_CONFIG(leagueman_decryption_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( airass, firebarr )
+MACHINE_CONFIG_START(m107_state::airass)
+	firebarr(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", m107)
 
 	MCFG_CPU_MODIFY("soundcpu")

@@ -97,6 +97,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s6);
 	DECLARE_DRIVER_INIT(s6);
+	void s6(machine_config &config);
+	void s6_audio_map(address_map &map);
+	void s6_main_map(address_map &map);
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -115,7 +118,7 @@ private:
 	required_device<pia6821_device> m_pia30;
 };
 
-static ADDRESS_MAP_START( s6_main_map, AS_PROGRAM, 8, s6_state )
+ADDRESS_MAP_START(s6_state::s6_main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
@@ -126,7 +129,7 @@ static ADDRESS_MAP_START( s6_main_map, AS_PROGRAM, 8, s6_state )
 	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s6_audio_map, AS_PROGRAM, 8, s6_state )
+ADDRESS_MAP_START(s6_state::s6_audio_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x0403) AM_DEVREADWRITE("pias", pia6821_device, read, write)
@@ -396,7 +399,7 @@ DRIVER_INIT_MEMBER( s6_state, s6 )
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
 }
 
-static MACHINE_CONFIG_START( s6 )
+MACHINE_CONFIG_START(s6_state::s6)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6808, 3580000) // 6802 or 6808 could be used here
 	MCFG_CPU_PROGRAM_MAP(s6_main_map)
@@ -406,7 +409,7 @@ static MACHINE_CONFIG_START( s6 )
 	MCFG_DEFAULT_LAYOUT(layout_s6)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia22", PIA6821, 0)

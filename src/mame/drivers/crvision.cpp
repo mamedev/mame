@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Curt Coder
 /*
-    This 1980s computer was manufactured by Vtech of Hong Kong.
+    This 1980s computer was manufactured by VTech of Hong Kong.
     known as: CreatiVision, Dick Smith Wizzard, Funvision, Rameses, VZ 2000 and possibly others.
 
     There is also a CreatiVision Mk 2, possibly also known as the Laser 500. This was a hardware variant,
@@ -142,7 +142,7 @@ CN1     - main board connector (17x2 pin header)
     ADDRESS_MAP( crvision_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( crvision_map, AS_PROGRAM, 8, crvision_state )
+ADDRESS_MAP_START(crvision_state::crvision_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD(TMS9929_TAG, tms9928a_device, vram_read)
@@ -163,7 +163,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( lasr2001_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( lasr2001_map, AS_PROGRAM, 8, laser2001_state )
+ADDRESS_MAP_START(laser2001_state::lasr2001_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD(TMS9929_TAG, tms9928a_device, vram_read)
@@ -734,9 +734,9 @@ SLOT_INTERFACE_END
     MACHINE_CONFIG_START( creativision )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( creativision )
+MACHINE_CONFIG_START(crvision_state::creativision)
 	// basic machine hardware
-	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_2MHz)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(crvision_map)
 
 	// devices
@@ -761,7 +761,7 @@ static MACHINE_CONFIG_START( creativision )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489_TAG, SN76489A, XTAL_2MHz)
+	MCFG_SOUND_ADD(SN76489_TAG, SN76489A, XTAL(2'000'000))
 	MCFG_SN76496_READY_HANDLER(DEVWRITELINE(PIA6821_TAG, pia6821_device, cb1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -781,12 +781,13 @@ static MACHINE_CONFIG_START( creativision )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_DERIVED( ntsc, creativision )
+    MACHINE_CONFIG_START( ntsc )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_DERIVED( ntsc, creativision )
+MACHINE_CONFIG_START(crvision_state::ntsc)
+	creativision(config);
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9918, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9918, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
@@ -794,12 +795,13 @@ static MACHINE_CONFIG_DERIVED( ntsc, creativision )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_DERIVED( pal, creativision )
+    MACHINE_CONFIG_START( pal )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_DERIVED( pal, creativision )
+MACHINE_CONFIG_START(crvision_pal_state::pal)
+	creativision(config);
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9929, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9929, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )
@@ -810,9 +812,9 @@ MACHINE_CONFIG_END
     MACHINE_CONFIG_START( lasr2001 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( lasr2001 )
+MACHINE_CONFIG_START(laser2001_state::lasr2001)
 	// basic machine hardware
-	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_17_73447MHz/9)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL(17'734'470)/9)
 	MCFG_CPU_PROGRAM_MAP(lasr2001_map)
 
 	// devices
@@ -834,7 +836,7 @@ static MACHINE_CONFIG_START( lasr2001 )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9929A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )
@@ -842,7 +844,7 @@ static MACHINE_CONFIG_START( lasr2001 )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489_TAG, SN76489A, XTAL_17_73447MHz/9)
+	MCFG_SOUND_ADD(SN76489_TAG, SN76489A, XTAL(17'734'470)/9)
 	MCFG_SN76496_READY_HANDLER(WRITELINE(laser2001_state, write_psg_ready))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

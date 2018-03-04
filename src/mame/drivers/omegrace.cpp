@@ -250,6 +250,11 @@ public:
 	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
 	DECLARE_DRIVER_INIT(omegrace);
 	virtual void machine_reset() override;
+	void omegrace(machine_config &config);
+	void main_map(address_map &map);
+	void port_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_port(address_map &map);
 };
 
 
@@ -355,7 +360,7 @@ WRITE8_MEMBER(omegrace_state::omegrace_soundlatch_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, omegrace_state )
+ADDRESS_MAP_START(omegrace_state::main_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4bff) AM_RAM
 	AM_RANGE(0x5c00, 0x5cff) AM_RAM AM_SHARE("nvram") /* NVRAM */
@@ -364,7 +369,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, omegrace_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8, omegrace_state )
+ADDRESS_MAP_START(omegrace_state::port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_READ(omegrace_vg_go_r)
 	AM_RANGE(0x09, 0x09) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
@@ -387,13 +392,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, omegrace_state )
+ADDRESS_MAP_START(omegrace_state::sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_MIRROR(0x800)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_port, AS_IO, 8, omegrace_state )
+ADDRESS_MAP_START(omegrace_state::sound_port)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // the game reads from ay1 port b, but ay8912 only has port a
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
@@ -496,14 +501,14 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( omegrace )
+MACHINE_CONFIG_START(omegrace_state::omegrace)
 
 	/* basic machine hardware */
 
 	/* main CPU */
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 13 = divide by 4 */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(omegrace_state, irq0_line_hold, 250)
@@ -512,7 +517,7 @@ static MACHINE_CONFIG_START( omegrace )
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 12 = divide by 8 */
 	/* Fed to CPU as 1.5mhz though line J4-D */
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_port)
 	MCFG_CPU_PERIODIC_INT_DRIVER(omegrace_state, nmi_line_pulse, 250)
@@ -539,10 +544,10 @@ static MACHINE_CONFIG_START( omegrace )
 
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS92, Pin 8 = divide by 12 */
-	MCFG_SOUND_ADD("ay1", AY8912, XTAL_12MHz/12)
+	MCFG_SOUND_ADD("ay1", AY8912, XTAL(12'000'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8912, XTAL_12MHz/12)
+	MCFG_SOUND_ADD("ay2", AY8912, XTAL(12'000'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -620,7 +625,7 @@ DRIVER_INIT_MEMBER(omegrace_state,omegrace)
 	 * in a consistent way to the decoder, we swap the bits
 	 * here. */
 	for (i=0; i<len; i++)
-		prom[i] = BITSWAP8(prom[i],7,6,5,4,1,0,3,2);
+		prom[i] = bitswap<8>(prom[i],7,6,5,4,1,0,3,2);
 }
 
 

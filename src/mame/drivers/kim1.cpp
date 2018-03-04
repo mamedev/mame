@@ -66,7 +66,7 @@ TODO:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START(kim1_map, AS_PROGRAM, 8, kim1_state)
+ADDRESS_MAP_START(kim1_state::kim1_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u3", mos6530_device, read, write )
 	AM_RANGE(0x1740, 0x177f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u2", mos6530_device, read, write )
@@ -140,18 +140,10 @@ READ8_MEMBER( kim1_state::kim1_u2_read_a )
 {
 	uint8_t data = 0xff;
 
-	switch( ( m_u2_port_b >> 1 ) & 0x0f )
-	{
-	case 0:
-		data = m_row0->read();
-		break;
-	case 1:
-		data = m_row1->read();
-		break;
-	case 2:
-		data = m_row2->read();
-		break;
-	}
+	offs_t const sel = ( m_u2_port_b >> 1 ) & 0x0f;
+	if ( 3U > sel )
+		data = m_row[sel]->read();
+
 	return data;
 }
 
@@ -164,7 +156,7 @@ WRITE8_MEMBER( kim1_state::kim1_u2_write_a )
 	{
 		if ( data & 0x80 )
 		{
-			output().set_digit_value( idx-4, data & 0x7f );
+			m_digit[idx - 4] = data & 0x7f;
 			m_led_time[idx - 4] = 15;
 		}
 	}
@@ -218,13 +210,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_update_leds)
 		if ( m_led_time[i] )
 			m_led_time[i]--;
 		else
-			output().set_digit_value( i, 0 );
+			m_digit[i] = 0;
 	}
 }
 
 // Register for save states
 void kim1_state::machine_start()
 {
+	m_digit.resolve();
+
 	save_item(NAME(m_u2_port_b));
 	save_item(NAME(m_311_output));
 	save_item(NAME(m_cassette_high_count));
@@ -245,7 +239,7 @@ void kim1_state::machine_reset()
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( kim1 )
+MACHINE_CONFIG_START(kim1_state::kim1)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
 	MCFG_CPU_PROGRAM_MAP(kim1_map)

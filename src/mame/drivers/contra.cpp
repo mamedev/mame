@@ -31,8 +31,7 @@ Dip locations and factory settings verified with manual
 
 INTERRUPT_GEN_MEMBER(contra_state::contra_interrupt)
 {
-	address_space &space = generic_space();
-	if (m_k007121_1->ctrlram_r(space, 7) & 0x02)
+	if (m_k007121_1->ctrlram_r(7) & 0x02)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
@@ -56,7 +55,7 @@ WRITE8_MEMBER(contra_state::contra_coin_counter_w)
 }
 
 
-static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8, contra_state )
+ADDRESS_MAP_START(contra_state::contra_map)
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(contra_K007121_ctrl_0_w)
 	AM_RANGE(0x0010, 0x0010) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0011, 0x0011) AM_READ_PORT("P1")
@@ -93,7 +92,7 @@ static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8, contra_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, contra_state )
+ADDRESS_MAP_START(contra_state::sound_map)
 	AM_RANGE(0x0000, 0x0000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x4000, 0x4000) AM_WRITENOP /* read triggers irq reset and latch read (in the hardware only). */
@@ -195,14 +194,14 @@ void contra_state::machine_start()
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
 }
 
-static MACHINE_CONFIG_START( contra )
+MACHINE_CONFIG_START(contra_state::contra)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, XTAL_24MHz / 2 /* 3000000*4? */)
+	MCFG_CPU_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) /* 3000000? (HD63C09EP) */
 	MCFG_CPU_PROGRAM_MAP(contra_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", contra_state,  contra_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_24MHz/8) /* 3000000? */
+	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(24'000'000)/8) /* 3000000? (HD68B09EP) */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* enough for the sound CPU to read all commands */
@@ -235,7 +234,7 @@ static MACHINE_CONFIG_START( contra )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END

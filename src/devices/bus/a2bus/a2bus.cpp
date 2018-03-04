@@ -100,13 +100,6 @@ a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type 
 {
 }
 
-void a2bus_slot_device::static_set_a2bus_slot(device_t &device, const char *tag, const char *slottag)
-{
-	a2bus_slot_device &a2bus_card = dynamic_cast<a2bus_slot_device &>(device);
-	a2bus_card.m_a2bus_tag = tag;
-	a2bus_card.m_a2bus_slottag = slottag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -115,7 +108,7 @@ void a2bus_slot_device::device_start()
 {
 	device_a2bus_card_interface *dev = dynamic_cast<device_a2bus_card_interface *>(get_card_device());
 
-	if (dev) device_a2bus_card_interface::static_set_a2bus_tag(*dev, m_a2bus_tag, m_a2bus_slottag);
+	if (dev) dev->set_a2bus_tag(m_a2bus_tag, m_a2bus_slottag);
 }
 
 //**************************************************************************
@@ -123,12 +116,6 @@ void a2bus_slot_device::device_start()
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(A2BUS, a2bus_device, "a2bus", "Apple II Bus")
-
-void a2bus_device::static_set_cputag(device_t &device, const char *tag)
-{
-	a2bus_device &a2bus = downcast<a2bus_device &>(device);
-	a2bus.m_cputag = tag;
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -304,25 +291,25 @@ device_a2bus_card_interface::~device_a2bus_card_interface()
 {
 }
 
-void device_a2bus_card_interface::static_set_a2bus_tag(device_t &device, const char *tag, const char *slottag)
+void device_a2bus_card_interface::interface_pre_start()
 {
-	device_a2bus_card_interface &a2bus_card = dynamic_cast<device_a2bus_card_interface &>(device);
-	a2bus_card.m_a2bus_tag = tag;
-	a2bus_card.m_a2bus_slottag = slottag;
-}
-
-void device_a2bus_card_interface::set_a2bus_device()
-{
-	// extract the slot number from the last digit of the slot tag
-	int tlen = strlen(m_a2bus_slottag);
-
-	m_slot = (m_a2bus_slottag[tlen-1] - '0');
-
-	if (m_slot < 0 || m_slot > 7)
+	if (!m_a2bus)
 	{
-		fatalerror("Slot %x out of range for Apple II Bus\n", m_slot);
-	}
+		// extract the slot number from the last digit of the slot tag
+		size_t const tlen = strlen(m_a2bus_slottag);
 
-	m_a2bus = dynamic_cast<a2bus_device *>(device().machine().device(m_a2bus_tag));
-	m_a2bus->add_a2bus_card(m_slot, this);
+		m_slot = (m_a2bus_slottag[tlen-1] - '0');
+		if (m_slot < 0 || m_slot > 7)
+			fatalerror("Slot %x out of range for Apple II Bus\n", m_slot);
+
+		device_t *const bus = device().machine().device(m_a2bus_tag);
+		if (!bus)
+			fatalerror("Can't find Apple II Bus device %s\n", m_a2bus_tag);
+
+		m_a2bus = dynamic_cast<a2bus_device *>(bus);
+		if (!m_a2bus)
+			fatalerror("Device %s (%s) is not an instance of a2bus_device\n", bus->tag(), bus->name());
+
+		m_a2bus->add_a2bus_card(m_slot, this);
+	}
 }

@@ -43,8 +43,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SAMCOUPE_XTAL_X1  XTAL_24MHz
-#define SAMCOUPE_XTAL_X2  XTAL_4_433619MHz
+#define SAMCOUPE_XTAL_X1  XTAL(24'000'000)
+#define SAMCOUPE_XTAL_X2  XTAL(4'433'619)
 
 
 /***************************************************************************
@@ -117,12 +117,11 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 
 READ8_MEMBER(samcoupe_state::samcoupe_pen_r)
 {
-	screen_device *scr = machine().first_screen();
 	uint8_t data;
 
 	if (offset & 0x100)
 	{
-		int vpos = scr->vpos();
+		int vpos = m_screen->vpos();
 
 		/* return the current screen line or 192 for the border area */
 		if (vpos < SAM_BORDER_TOP || vpos >= SAM_BORDER_TOP + SAM_SCREEN_HEIGHT)
@@ -133,7 +132,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_pen_r)
 	else
 	{
 		/* horizontal position is encoded into bits 3 to 8 */
-		data = scr->hpos() & 0xfc;
+		data = m_screen->hpos() & 0xfc;
 	}
 
 	return data;
@@ -304,14 +303,14 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_lpt2_strobe_w)
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( samcoupe_mem, AS_PROGRAM, 8, samcoupe_state )
+ADDRESS_MAP_START(samcoupe_state::samcoupe_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_READWRITE(sam_bank1_r, sam_bank1_w) // AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_READWRITE(sam_bank2_r, sam_bank2_w) // AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_READWRITE(sam_bank3_r, sam_bank3_w) // AM_RAMBANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_READWRITE(sam_bank4_r, sam_bank4_w) // AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( samcoupe_io, AS_IO, 8, samcoupe_state )
+ADDRESS_MAP_START(samcoupe_state::samcoupe_io)
 	AM_RANGE(0x0080, 0x0081) AM_SELECT(0xff00) AM_WRITE(samcoupe_ext_mem_w)
 	AM_RANGE(0x00e0, 0x00e7) AM_SELECT(0xff10) AM_READWRITE(samcoupe_disk_r, samcoupe_disk_w)
 	AM_RANGE(0x00e8, 0x00e8) AM_SELECT(0xff00) AM_DEVWRITE("lpt1_data_out", output_latch_device, write)
@@ -517,7 +516,7 @@ static SLOT_INTERFACE_START( samcoupe_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( samcoupe )
+MACHINE_CONFIG_START(samcoupe_state::samcoupe)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(samcoupe_mem)
@@ -545,7 +544,7 @@ static MACHINE_CONFIG_START( samcoupe )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt2_data_out", "lpt2")
 
-	MCFG_DEVICE_ADD("sambus_clock", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("sambus_clock", MSM6242, XTAL(32'768))
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)

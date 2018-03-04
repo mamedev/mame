@@ -110,6 +110,22 @@ public:
 	required_device<screen_device> m_screen;
 
 
+	void tubepb(machine_config &config);
+	void tubep(machine_config &config);
+	void rjammer(machine_config &config);
+	void nsc_map(address_map &map);
+	void rjammer_main_map(address_map &map);
+	void rjammer_main_portmap(address_map &map);
+	void rjammer_second_map(address_map &map);
+	void rjammer_second_portmap(address_map &map);
+	void rjammer_sound_map(address_map &map);
+	void rjammer_sound_portmap(address_map &map);
+	void tubep_main_map(address_map &map);
+	void tubep_main_portmap(address_map &map);
+	void tubep_second_map(address_map &map);
+	void tubep_second_portmap(address_map &map);
+	void tubep_sound_map(address_map &map);
+	void tubep_sound_portmap(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

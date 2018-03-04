@@ -34,13 +34,16 @@ Credits:
 
 
 
-INTERRUPT_GEN_MEMBER(thief_state::thief_interrupt)
+WRITE_LINE_MEMBER(thief_state::slam_w)
 {
 	/* SLAM switch causes an NMI if it's pressed */
-	if( (ioport("P2")->read() & 0x10) == 0 )
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	else
-		device.execute().set_input_line(0, HOLD_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(thief_state::iack)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return 0xff;
 }
 
 /**********************************************************/
@@ -130,13 +133,13 @@ READ8_MEMBER( thief_state::thief_io_r )
 	return data;
 }
 
-static ADDRESS_MAP_START( sharkatt_main_map, AS_PROGRAM, 8, thief_state )
+ADDRESS_MAP_START(thief_state::sharkatt_main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM     /* 2114 */
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(thief_videoram_r, thief_videoram_w)   /* 4116 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thief_main_map, AS_PROGRAM, 8, thief_state )
+ADDRESS_MAP_START(thief_state::thief_main_map)
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(thief_blit_w)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM     /* 2114 */
@@ -149,7 +152,7 @@ static ADDRESS_MAP_START( thief_main_map, AS_PROGRAM, 8, thief_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, thief_state )
+ADDRESS_MAP_START(thief_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x10, 0x10) AM_WRITE(thief_video_control_w)
@@ -213,7 +216,7 @@ static INPUT_PORTS_START( sharkatt )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, thief_state, slam_w)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
@@ -282,7 +285,7 @@ static INPUT_PORTS_START( thief )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, thief_state, slam_w)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -349,7 +352,7 @@ static INPUT_PORTS_START( natodef )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, thief_state, slam_w)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -387,11 +390,11 @@ static const char *const natodef_sample_names[] =
 };
 
 
-static MACHINE_CONFIG_START( thief )
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
+MACHINE_CONFIG_START(thief_state::thief)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(thief_main_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thief_state,  thief_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(thief_state, iack)
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(thief_state, thief_input_select_w))
@@ -400,25 +403,22 @@ static MACHINE_CONFIG_START( thief )
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/4, 320, 0, 256, 272, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(thief_state, screen_update_thief)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("tms", TMS9927, XTAL_20MHz/4)
+	MCFG_DEVICE_ADD("tms", TMS9927, XTAL(20'000'000)/4/8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
-
+	MCFG_TMS9927_VSYN_CALLBACK(ASSERTLINE("maincpu", 0))
 	MCFG_PALETTE_ADD("palette", 16)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_8MHz/2/4)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(8'000'000)/2/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_8MHz/2/4)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(8'000'000)/2/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -427,7 +427,8 @@ static MACHINE_CONFIG_START( thief )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sharkatt, thief )
+MACHINE_CONFIG_START(thief_state::sharkatt)
+	thief(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sharkatt_main_map)
 
@@ -438,7 +439,8 @@ static MACHINE_CONFIG_DERIVED( sharkatt, thief )
 	MCFG_SAMPLES_NAMES(sharkatt_sample_names)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( natodef, thief )
+MACHINE_CONFIG_START(thief_state::natodef)
+	thief(config);
 	MCFG_DEVICE_MODIFY("samples")
 	MCFG_SAMPLES_NAMES(natodef_sample_names)
 MACHINE_CONFIG_END

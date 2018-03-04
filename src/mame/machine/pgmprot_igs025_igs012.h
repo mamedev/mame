@@ -23,6 +23,6 @@ public:
 	DECLARE_DRIVER_INIT(drgw2hk);
 
 	DECLARE_MACHINE_RESET(drgw2);
+	void pgm_012_025_drgw2(machine_config &config);
+	void drgw2_mem(address_map &map);
 };
-
-MACHINE_CONFIG_EXTERN( pgm_012_025_drgw2 );

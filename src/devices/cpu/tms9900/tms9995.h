@@ -28,19 +28,19 @@ enum
 };
 
 #define MCFG_TMS9995_EXTOP_HANDLER( _extop) \
-	devcb = &tms9995_device::static_set_extop_callback( *device, DEVCB_##_extop );
+	devcb = &downcast<tms9995_device &>(*device).set_extop_callback(DEVCB_##_extop);
 
 #define MCFG_TMS9995_IAQ_HANDLER( _iaq )    \
-	devcb = &tms9995_device::static_set_iaq_callback( *device, DEVCB_##_iaq );
+	devcb = &downcast<tms9995_device &>(*device).set_iaq_callback(DEVCB_##_iaq);
 
 #define MCFG_TMS9995_CLKOUT_HANDLER( _clkout ) \
-	devcb = &tms9995_device::static_set_clkout_callback( *device, DEVCB_##_clkout );
+	devcb = &downcast<tms9995_device &>(*device).set_clkout_callback(DEVCB_##_clkout);
 
 #define MCFG_TMS9995_HOLDA_HANDLER( _holda ) \
-	devcb = &tms9995_device::static_set_holda_callback( *device, DEVCB_##_holda );
+	devcb = &downcast<tms9995_device &>(*device).set_holda_callback(DEVCB_##_holda);
 
 #define MCFG_TMS9995_DBIN_HANDLER( _dbin ) \
-	devcb = &tms9995_device::static_set_dbin_callback( *device, DEVCB_##_dbin );
+	devcb = &downcast<tms9995_device &>(*device).set_dbin_callback(DEVCB_##_dbin);
 
 #define MCFG_TMS9995_ENABLE_OVINT( _ovint ) \
 	downcast<tms9995_device*>(device)->set_overflow_interrupt( _ovint );
@@ -66,11 +66,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( reset_line );
 
 	// Callbacks
-	template<class _Object> static devcb_base &static_set_extop_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_external_operation.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_iaq_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_iaq_line.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_clkout_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_clock_out_line.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_holda_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_holda_line.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_dbin_callback(device_t &device, _Object object) { return downcast<tms9995_device &>(device).m_dbin_line.set_callback(object); }
+	template<class Object> devcb_base &set_extop_callback(Object &&cb) { return m_external_operation.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_iaq_callback(Object &&cb) { return m_iaq_line.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_clkout_callback(Object &&cb) { return m_clock_out_line.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_holda_callback(Object &&cb) { return m_holda_line.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_dbin_callback(Object &&cb) { return m_dbin_line.set_callback(std::forward<Object>(cb)); }
 
 	// For debugger access
 	uint8_t debug_read_onchip_memory(offs_t addr) { return m_onchip_memory[addr & 0xff]; };
@@ -83,8 +83,6 @@ protected:
 
 	// device-level overrides
 	virtual void        device_start() override;
-	virtual void        device_stop() override;
-	virtual void        device_reset() override;
 
 	// device_execute_interface overrides
 	virtual uint32_t      execute_min_cycles() const override;
@@ -94,9 +92,7 @@ protected:
 	virtual void        execute_run() override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t      disasm_min_opcode_bytes() const override;
-	virtual uint32_t      disasm_max_opcode_bytes() const override;
-	virtual offs_t      disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -188,7 +184,7 @@ private:
 	bool    m_mid_active;
 
 	int     m_decrementer_clkdiv;
-	bool    m_servicing_interrupt;
+	bool    m_log_interrupt;
 
 	// Flag field
 	int     m_int_pending;

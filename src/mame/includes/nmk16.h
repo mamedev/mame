@@ -4,10 +4,12 @@
 
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
+#include "audio/seibu.h"
 #include "machine/nmk004.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 
-class nmk16_state : public driver_device
+class nmk16_state : public driver_device, protected seibu_sound_common
 {
 public:
 	nmk16_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -20,18 +22,17 @@ public:
 		m_palette(*this, "palette"),
 		m_nmk004(*this, "nmk004"),
 		m_soundlatch(*this, "soundlatch"),
-		m_nmk_bgvideoram0(*this, "nmk_bgvideoram0"),
+		m_nmk_bgvideoram(*this, "nmk_bgvideoram%u", 0),
 		m_nmk_txvideoram(*this, "nmk_txvideoram"),
 		m_mainram(*this, "mainram"),
 		m_gunnail_scrollram(*this, "scrollram"),
 		m_spriteram(*this, "spriteram"),
 		m_nmk_fgvideoram(*this, "nmk_fgvideoram"),
 		m_gunnail_scrollramy(*this, "scrollramy"),
-		m_nmk_bgvideoram1(*this, "nmk_bgvideoram1"),
-		m_nmk_bgvideoram2(*this, "nmk_bgvideoram2"),
-		m_nmk_bgvideoram3(*this, "nmk_bgvideoram3"),
-		m_afega_scroll_0(*this, "afega_scroll_0"),
-		m_afega_scroll_1(*this, "afega_scroll_1"),
+		m_afega_scroll(*this, "afega_scroll_%u", 0),
+		m_tilemap_rom(*this, "tilerom"),
+		m_audiobank(*this, "audiobank"),
+		m_okibank(*this, "okibank%u", 1),
 		m_sprdma_base(0x8000)
 	{}
 
@@ -44,19 +45,18 @@ public:
 	optional_device<nmk004_device> m_nmk004;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<uint16_t> m_nmk_bgvideoram0;
+	optional_shared_ptr_array<uint16_t, 4> m_nmk_bgvideoram;
 	optional_shared_ptr<uint16_t> m_nmk_txvideoram;
 	required_shared_ptr<uint16_t> m_mainram;
 	optional_shared_ptr<uint16_t> m_gunnail_scrollram;
 	optional_shared_ptr<uint8_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_nmk_fgvideoram;
 	optional_shared_ptr<uint16_t> m_gunnail_scrollramy;
-	optional_shared_ptr<uint16_t> m_nmk_bgvideoram1;
-	optional_shared_ptr<uint16_t> m_nmk_bgvideoram2;
-	optional_shared_ptr<uint16_t> m_nmk_bgvideoram3;
-	optional_shared_ptr<uint16_t> m_afega_scroll_0;
-	optional_shared_ptr<uint16_t> m_afega_scroll_1;
+	optional_shared_ptr_array<uint16_t, 2> m_afega_scroll;
 
+	optional_region_ptr<uint16_t> m_tilemap_rom;
+	optional_memory_bank m_audiobank;
+	optional_memory_bank_array<2> m_okibank;
 
 	int m_sprdma_base;
 	int mask[4*2];
@@ -68,10 +68,7 @@ public:
 	int m_videoshift;
 	int m_bioship_background_bank;
 	uint8_t m_bioship_scroll[4];
-	tilemap_t *m_bg_tilemap0;
-	tilemap_t *m_bg_tilemap1;
-	tilemap_t *m_bg_tilemap2;
-	tilemap_t *m_bg_tilemap3;
+	tilemap_t *m_bg_tilemap[4];
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;
 	std::unique_ptr<bitmap_ind16> m_background_bitmap;
@@ -85,27 +82,19 @@ public:
 	uint8_t m_coin_count[2];
 	uint8_t m_coin_count_frac[2];
 	DECLARE_WRITE16_MEMBER(nmk16_mainram_strange_w);
-	DECLARE_WRITE16_MEMBER(ssmissin_sound_w);
 	DECLARE_WRITE8_MEMBER(ssmissin_soundbank_w);
 	DECLARE_WRITE16_MEMBER(tharrier_mcu_control_w);
 	DECLARE_READ16_MEMBER(tharrier_mcu_r);
 	DECLARE_WRITE16_MEMBER(macross2_sound_reset_w);
-	DECLARE_WRITE16_MEMBER(macross2_sound_command_w);
 	DECLARE_WRITE8_MEMBER(macross2_sound_bank_w);
-	DECLARE_WRITE8_MEMBER(tharrier_oki6295_bankswitch_0_w);
-	DECLARE_WRITE8_MEMBER(tharrier_oki6295_bankswitch_1_w);
-	DECLARE_WRITE16_MEMBER(afega_soundlatch_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(tharrier_oki6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(hachamf_mainram_w);
 	DECLARE_WRITE16_MEMBER(tdragon_mainram_w);
 	DECLARE_READ16_MEMBER(vandykeb_r);
 	DECLARE_READ16_MEMBER(tdragonb_prot_r);
 	DECLARE_READ16_MEMBER(afega_unknown_r);
-	DECLARE_WRITE16_MEMBER(afega_scroll0_w);
-	DECLARE_WRITE16_MEMBER(afega_scroll1_w);
-	DECLARE_WRITE16_MEMBER(nmk_bgvideoram0_w);
-	DECLARE_WRITE16_MEMBER(nmk_bgvideoram1_w);
-	DECLARE_WRITE16_MEMBER(nmk_bgvideoram2_w);
-	DECLARE_WRITE16_MEMBER(nmk_bgvideoram3_w);
+	template<int Scroll> DECLARE_WRITE16_MEMBER(afega_scroll_w);
+	template<int Bank> DECLARE_WRITE16_MEMBER(nmk_bgvideoram_w);
 	DECLARE_WRITE16_MEMBER(nmk_fgvideoram_w);
 	DECLARE_WRITE16_MEMBER(nmk_txvideoram_w);
 	DECLARE_WRITE16_MEMBER(mustang_scroll_w);
@@ -121,7 +110,6 @@ public:
 	DECLARE_WRITE16_MEMBER(bioship_bank_w);
 	DECLARE_WRITE8_MEMBER(spec2k_oki1_banking_w);
 	DECLARE_WRITE8_MEMBER(twinactn_oki_bank_w);
-	DECLARE_READ16_MEMBER(atombjt_unkr_r) {return 0x0000;}
 	DECLARE_WRITE16_MEMBER(nmk16_x0016_w);
 	DECLARE_WRITE16_MEMBER(nmk16_bioship_x0016_w);
 	DECLARE_DRIVER_INIT(nmk);
@@ -139,13 +127,11 @@ public:
 	DECLARE_DRIVER_INIT(redfoxwp2a);
 	DECLARE_DRIVER_INIT(grdnstrmg);
 	DECLARE_DRIVER_INIT(bjtwin);
-	TILEMAP_MAPPER_MEMBER(afega_tilemap_scan_pages);
-	TILE_GET_INFO_MEMBER(macross_get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(macross_get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(macross_get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(macross_get_bg3_tile_info);
+	DECLARE_DRIVER_INIT(atombjt);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);
+	template<int Bank> TILE_GET_INFO_MEMBER(common_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(strahl_get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(macross_get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(common_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(bjtwin_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info_0_8bit);
 	DECLARE_VIDEO_START(macross);
@@ -200,4 +186,71 @@ public:
 	void decode_gfx();
 	void decode_tdragonb();
 	void decode_ssmissin();
+	void vandyke(machine_config &config);
+	void redhawkb(machine_config &config);
+	void grdnstrm(machine_config &config);
+	void tdragon_prot(machine_config &config);
+	void tdragon2(machine_config &config);
+	void tharrier(machine_config &config);
+	void raphero(machine_config &config);
+	void tdragon(machine_config &config);
+	void tdragonb(machine_config &config);
+	void twinactn(machine_config &config);
+	void firehawk(machine_config &config);
+	void gunnail(machine_config &config);
+	void hachamf(machine_config &config);
+	void redhawki(machine_config &config);
+	void bjtwin(machine_config &config);
+	void ssmissin(machine_config &config);
+	void bioship(machine_config &config);
+	void spec2k(machine_config &config);
+	void macross2(machine_config &config);
+	void blkheart(machine_config &config);
+	void stagger1(machine_config &config);
+	void manybloc(machine_config &config);
+	void acrobatm(machine_config &config);
+	void strahl(machine_config &config);
+	void tdragon3h(machine_config &config);
+	void atombjt(machine_config &config);
+	void hachamf_prot(machine_config &config);
+	void popspops(machine_config &config);
+	void grdnstrmk(machine_config &config);
+	void macross(machine_config &config);
+	void mustangb(machine_config &config);
+	void mustang(machine_config &config);
+	void vandykeb(machine_config &config);
+	void acrobatm_map(address_map &map);
+	void afega_map(address_map &map);
+	void afega_sound_cpu(address_map &map);
+	void atombjt_map(address_map &map);
+	void bioship_map(address_map &map);
+	void bjtwin_map(address_map &map);
+	void firehawk_map(address_map &map);
+	void firehawk_sound_cpu(address_map &map);
+	void gunnail_map(address_map &map);
+	void hachamf_map(address_map &map);
+	void macross2_map(address_map &map);
+	void macross2_sound_io_map(address_map &map);
+	void macross2_sound_map(address_map &map);
+	void macross_map(address_map &map);
+	void manybloc_map(address_map &map);
+	void mustang_map(address_map &map);
+	void mustangb_map(address_map &map);
+	void oki1_map(address_map &map);
+	void oki2_map(address_map &map);
+	void raphero_map(address_map &map);
+	void raphero_sound_mem_map(address_map &map);
+	void ssmissin_map(address_map &map);
+	void ssmissin_sound_map(address_map &map);
+	void strahl_map(address_map &map);
+	void tdragon3h_map(address_map &map);
+	void tdragon_map(address_map &map);
+	void tdragonb_map(address_map &map);
+	void tharrier_map(address_map &map);
+	void tharrier_sound_io_map(address_map &map);
+	void tharrier_sound_map(address_map &map);
+	void twinactn_map(address_map &map);
+	void twinactn_sound_cpu(address_map &map);
+	void vandyke_map(address_map &map);
+	void vandykeb_map(address_map &map);
 };

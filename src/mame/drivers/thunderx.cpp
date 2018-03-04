@@ -70,12 +70,12 @@ READ8_MEMBER(thunderx_state::pmc_r)
 {
 	if (PMC_BK)
 	{
-//      logerror("%04x read pmcram %04x\n",space.device().safe_pc(),offset);
+//      logerror("%04x read pmcram %04x\n",m_audiocpu->pc(),offset);
 		return m_pmcram[offset];
 	}
 	else
 	{
-		LOG(("%04x read pmc internal ram %04x\n",space.device().safe_pc(),offset));
+		LOG(("%04x read pmc internal ram %04x\n",m_audiocpu->pc(),offset));
 		return 0;
 	}
 }
@@ -84,12 +84,12 @@ WRITE8_MEMBER(thunderx_state::pmc_w)
 {
 	if (PMC_BK)
 	{
-		LOG(("%04x pmcram %04x = %02x\n",space.device().safe_pc(),offset,data));
+		LOG(("%04x pmcram %04x = %02x\n",m_audiocpu->pc(),offset,data));
 		m_pmcram[offset] = data;
 	}
 	else
 	{
-		LOG(("%04x pmc internal ram %04x = %02x\n",space.device().safe_pc(),offset,data));
+		LOG(("%04x pmc internal ram %04x = %02x\n",m_audiocpu->pc(),offset,data));
 	}
 }
 
@@ -299,7 +299,7 @@ READ8_MEMBER(thunderx_state::_1f98_r)
 
 WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
 {
-	// logerror("%04x: 1f98_w %02x\n", space.device().safe_pc(),data);
+	// logerror("%04x: 1f98_w %02x\n", m_maincpu->pc(),data);
 
 	// bit 0 = enable char ROM reading through the video RAM
 	m_k052109->set_rmrd_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
@@ -402,7 +402,9 @@ WRITE8_MEMBER(thunderx_state::k052109_051960_w)
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( scontra_map, AS_PROGRAM, 8, thunderx_state )
+ADDRESS_MAP_START(thunderx_state::scontra_map)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)       /* video RAM + sprite RAM */
+
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(scontra_bankswitch_w) /* bankswitch control + coin counters */
 	AM_RANGE(0x1f84, 0x1f84) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(sh_irqtrigger_w)     /* cause interrupt on audio CPU */
@@ -414,7 +416,6 @@ static ADDRESS_MAP_START( scontra_map, AS_PROGRAM, 8, thunderx_state )
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1f98, 0x1f98) AM_READWRITE(_1f98_r, scontra_1f98_w)
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)       /* video RAM + sprite RAM */
 
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
 	AM_RANGE(0x5800, 0x5fff) AM_DEVICE("bank5800", address_map_bank_device, amap8)  /* palette + work RAM + PMC */
@@ -422,41 +423,41 @@ static ADDRESS_MAP_START( scontra_map, AS_PROGRAM, 8, thunderx_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thunderx_map, AS_PROGRAM, 8, thunderx_state )
+ADDRESS_MAP_START(thunderx_state::thunderx_map)
+	AM_IMPORT_FROM(scontra_map)
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(thunderx_videobank_w)
 	AM_RANGE(0x1f98, 0x1f98) AM_READWRITE(_1f98_r, thunderx_1f98_w) /* registers */
-	AM_IMPORT_FROM(scontra_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gbusters_map, AS_PROGRAM, 8, thunderx_state )
+ADDRESS_MAP_START(thunderx_state::gbusters_map)
+	AM_IMPORT_FROM(scontra_map)
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(gbusters_videobank_w)
-	AM_IMPORT_FROM(scontra_map)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( scontra_bank5800_map, AS_PROGRAM, 8, thunderx_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+ADDRESS_MAP_START(thunderx_state::scontra_bank5800_map)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thunderx_bank5800_map, AS_PROGRAM, 8, thunderx_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+ADDRESS_MAP_START(thunderx_state::thunderx_bank5800_map)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(pmc_r, pmc_w) AM_SHARE("pmcram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( thunderx_sound_map, AS_PROGRAM, 8, thunderx_state )
+ADDRESS_MAP_START(thunderx_state::thunderx_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scontra_sound_map, AS_PROGRAM, 8, thunderx_state )
+ADDRESS_MAP_START(thunderx_state::scontra_sound_map)
+	AM_IMPORT_FROM(thunderx_sound_map)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(k007232_bankswitch_w)
-	AM_IMPORT_FROM(thunderx_sound_map)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -630,21 +631,21 @@ void thunderx_state::machine_reset()
 	m_priority = 0;
 }
 
-static MACHINE_CONFIG_START( scontra )
+MACHINE_CONFIG_START(thunderx_state::scontra)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)     /* 052001 (verified on pcb) */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)     /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(scontra_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thunderx_state,  vblank_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(scontra_sound_map)
 
 	MCFG_DEVICE_ADD("bank5800", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(scontra_bank5800_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(12)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -676,11 +677,11 @@ static MACHINE_CONFIG_START( scontra )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)  /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)    /* verified on pcb */
+	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(thunderx_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
@@ -693,7 +694,8 @@ WRITE8_MEMBER( thunderx_state::banking_callback )
 	m_rombank->set_entry(data & 0x0f);
 }
 
-static MACHINE_CONFIG_DERIVED( thunderx, scontra )
+MACHINE_CONFIG_START(thunderx_state::thunderx)
+	scontra(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")     /* 052001 (verified on pcb) */
@@ -705,12 +707,13 @@ static MACHINE_CONFIG_DERIVED( thunderx, scontra )
 
 	MCFG_DEVICE_MODIFY("bank5800")
 	MCFG_DEVICE_PROGRAM_MAP(thunderx_bank5800_map)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(13)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
 
 	MCFG_DEVICE_REMOVE("k007232")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gbusters, scontra )
+MACHINE_CONFIG_START(thunderx_state::gbusters)
+	scontra(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")     /* 052526 */

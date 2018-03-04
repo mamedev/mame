@@ -79,17 +79,16 @@ void menu_bios_selection::populate(float &customtop, float &custombottom)
 	/* cycle through all devices for this system */
 	for (device_t &device : device_iterator(machine().root_device()))
 	{
-		if (device.rom_region() != nullptr && !ROMENTRY_ISEND(device.rom_region()))
+		tiny_rom_entry const *rom(device.rom_region());
+		if (rom && !ROMENTRY_ISEND(rom))
 		{
 			const char *val = "default";
-			for (const rom_entry *rom = device.rom_region(); !ROMENTRY_ISEND(rom); rom++)
+			for ( ; !ROMENTRY_ISEND(rom); rom++)
 			{
 				if (ROMENTRY_ISSYSTEM_BIOS(rom) && ROM_GETBIOSFLAGS(rom) == device.system_bios())
-				{
-					val = ROM_GETHASHDATA(rom);
-				}
+					val = rom->hashdata;
 			}
-			item_append(device.owner() == nullptr ? "driver" : device.tag()+1, val, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&device);
+			item_append(!device.owner() ? "driver" : (device.tag() + 1), val, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&device);
 		}
 	}
 
@@ -117,14 +116,12 @@ void menu_bios_selection::handle()
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
 			device_t *dev = (device_t *)menu_event->itemref;
-			int cnt = 0;
-			for (const rom_entry &rom : dev->rom_region_vector())
-			{
-				if (ROMENTRY_ISSYSTEM_BIOS(&rom)) cnt ++;
-			}
+			int const cnt = ([bioses = romload::entries(dev->rom_region()).get_system_bioses()] () { return std::distance(bioses.begin(), bioses.end()); })();
 			int val = dev->system_bios() + ((menu_event->iptkey == IPT_UI_LEFT) ? -1 : +1);
-			if (val<1) val=cnt;
-			if (val>cnt) val=1;
+			if (val < 1)
+				val = cnt;
+			if (val > cnt)
+				val = 1;
 			dev->set_system_bios(val);
 			if (strcmp(dev->tag(),":")==0) {
 				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE);
@@ -167,7 +164,7 @@ void menu_network_devices::populate(float &customtop, float &custombottom)
 			}
 		}
 
-		item_append(network.device().tag(),  (title) ? title : "------", FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)network);
+		item_append(network.device().tag(),  (title) ? title : "------", FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&network);
 	}
 }
 
@@ -675,6 +672,7 @@ menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_cont
 {
 	// parse the INI file
 	std::ostringstream error;
+	osd_setup_osd_specific_emu_options(m_opts);
 	mame_options::parse_standard_inis(m_opts, error, m_drv);
 	setup_bios();
 }
@@ -804,40 +802,35 @@ void menu_machine_configure::setup_bios()
 	if (m_drv->rom == nullptr)
 		return;
 
-	auto entries = rom_build_entries(m_drv->rom);
-
 	std::string specbios(m_opts.bios());
-	std::string default_name;
-	for (const rom_entry &rom : entries)
-		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
-			default_name = ROM_GETNAME(&rom);
-
-	std::size_t bios_count = 0;
-	for (const rom_entry &rom : entries)
+	char const *default_name(nullptr);
+	for (tiny_rom_entry const *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
 	{
-		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
-		{
-			std::string name(ROM_GETHASHDATA(&rom));
-			std::string biosname(ROM_GETNAME(&rom));
-			int bios_flags = ROM_GETBIOSFLAGS(&rom);
-			std::string bios_number = std::to_string(bios_flags - 1);
-
-			// check biosnumber and name
-			if (bios_number == specbios || biosname == specbios)
-				m_curbios = bios_count;
-
-			if (biosname == default_name)
-			{
-				name.append(_(" (default)"));
-				if (specbios == "default")
-					m_curbios = bios_count;
-			}
-
-			m_bios.emplace_back(name, bios_flags - 1);
-			bios_count++;
-		}
+		if (ROMENTRY_ISDEFAULT_BIOS(rom))
+			default_name = rom->name;
 	}
 
+	std::size_t bios_count = 0;
+	for (romload::system_bios const &bios : romload::entries(m_drv->rom).get_system_bioses())
+	{
+		std::string name(bios.get_description());
+		u32 const bios_flags(bios.get_value());
+		std::string const bios_number(std::to_string(bios_flags - 1));
+
+		// check biosnumber and name
+		if ((bios_number == specbios) || (specbios == bios.get_name()))
+			m_curbios = bios_count;
+
+		if (default_name && !std::strcmp(bios.get_name(), default_name))
+		{
+			name.append(_(" (default)"));
+			if (specbios == "default")
+				m_curbios = bios_count;
+		}
+
+		m_bios.emplace_back(std::move(name), bios_flags - 1);
+		bios_count++;
+	}
 }
 
 //-------------------------------------------------

@@ -1142,7 +1142,7 @@ inline uint16_t reorder(uint16_t input, uint8_t const *weights)
 
 void deco_146_base_device::write_data(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask, uint8_t &csflags)
 {
-	address = BITSWAP16(address>>1, 15,14,13,12,11,10, m_external_addrswap[9],m_external_addrswap[8] ,m_external_addrswap[7],m_external_addrswap[6],m_external_addrswap[5],m_external_addrswap[4],m_external_addrswap[3],m_external_addrswap[2],m_external_addrswap[1],m_external_addrswap[0]) << 1;
+	address = bitswap<16>(address>>1, 15,14,13,12,11,10, m_external_addrswap[9],m_external_addrswap[8] ,m_external_addrswap[7],m_external_addrswap[6],m_external_addrswap[5],m_external_addrswap[4],m_external_addrswap[3],m_external_addrswap[2],m_external_addrswap[1],m_external_addrswap[0]) << 1;
 
 	csflags = 0;
 	int upper_addr_bits = (address & 0x7800) >> 11;
@@ -1233,6 +1233,12 @@ uint16_t deco_146_base_device::read_protport(uint16_t address, uint16_t mem_mask
 	return realret;
 }
 
+TIMER_CALLBACK_MEMBER(deco_146_base_device::write_soundlatch)
+{
+	m_soundlatch = param;
+	m_soundlatch_irq_cb(ASSERT_LINE);
+}
+
 void deco_146_base_device::write_protport(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask)
 {
 	m_latchaddr = address;
@@ -1241,18 +1247,18 @@ void deco_146_base_device::write_protport(address_space &space, uint16_t address
 
 	if ((address&0xff) == m_xor_port)
 	{
-			logerror("LOAD XOR REGISTER %04x %04x\n", data, mem_mask);
-			COMBINE_DATA(&m_xor);
+		logerror("LOAD XOR REGISTER %04x %04x\n", data, mem_mask);
+		COMBINE_DATA(&m_xor);
 	}
 	else if ((address&0xff) == m_mask_port)
 	{
 //          logerror("LOAD NAND REGISTER %04x %04x\n", data, mem_mask);
-			COMBINE_DATA(&m_nand);
+		COMBINE_DATA(&m_nand);
 	}
 	else if ((address&0xff) == m_soundlatch_port)
 	{
-			logerror("LOAD SOUND LATCH %04x %04x\n", data, mem_mask);
-			m_soundlatch_w(space, data, mem_mask);
+		logerror("LOAD SOUND LATCH: %04x\n", data);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(deco_146_base_device::write_soundlatch), this), data & 0xff);
 	}
 
 	// always store
@@ -1267,7 +1273,7 @@ void deco_146_base_device::write_protport(address_space &space, uint16_t address
 
 uint16_t deco_146_base_device::read_data(uint16_t address, uint16_t mem_mask, uint8_t &csflags)
 {
-	address = BITSWAP16(address>>1, 15,14,13,12,11,10, m_external_addrswap[9],m_external_addrswap[8] ,m_external_addrswap[7],m_external_addrswap[6],m_external_addrswap[5],m_external_addrswap[4],m_external_addrswap[3],m_external_addrswap[2],m_external_addrswap[1],m_external_addrswap[0]) << 1;
+	address = bitswap<16>(address>>1, 15,14,13,12,11,10, m_external_addrswap[9],m_external_addrswap[8] ,m_external_addrswap[7],m_external_addrswap[6],m_external_addrswap[5],m_external_addrswap[4],m_external_addrswap[3],m_external_addrswap[2],m_external_addrswap[1],m_external_addrswap[0]) << 1;
 
 	uint16_t retdata = 0;
 	csflags = 0;
@@ -1310,17 +1316,19 @@ uint16_t deco_146_base_device::read_data(uint16_t address, uint16_t mem_mask, ui
 	return retdata;
 }
 
-
+READ8_MEMBER( deco_146_base_device::soundlatch_r )
+{
+	m_soundlatch_irq_cb(CLEAR_LINE);
+	return m_soundlatch;
+}
 
 deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	m_port_a_r(*this),
 	m_port_b_r(*this),
 	m_port_c_r(*this),
-	m_sound_latch(*this, ":soundlatch")
+	m_soundlatch_irq_cb(*this)
 {
-	m_soundlatch_w =  deco146_port_write_cb(FUNC(deco_146_base_device::soundlatch_default), this);
-
 	m_external_addrswap[0] = 0;
 	m_external_addrswap[1] = 1;
 	m_external_addrswap[2] = 2;
@@ -1333,40 +1341,6 @@ deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device
 	m_external_addrswap[9] = 9;
 }
 
-
-
-void deco_146_base_device::soundlatch_default(address_space &space, uint16_t data, uint16_t mem_mask)
-{
-	if (m_sound_latch != nullptr)
-		m_sound_latch->write(space, 0, data & 0xff);
-	cpu_device* cpudev = (cpu_device*)machine().device(":audiocpu");
-	if (cpudev) cpudev->set_input_line(0, HOLD_LINE);
-}
-
-
-
-
-void deco_146_base_device::set_soundlatch_cb(device_t &device,deco146_port_write_cb port_cb) { deco_146_base_device &dev = downcast<deco_146_base_device &>(device); dev.m_soundlatch_w = port_cb; }
-void deco_146_base_device::set_interface_scramble(device_t &device,uint8_t a9, uint8_t a8, uint8_t a7, uint8_t a6, uint8_t a5, uint8_t a4, uint8_t a3,uint8_t a2,uint8_t a1,uint8_t a0)
-{
-	deco_146_base_device &dev = downcast<deco_146_base_device &>(device);
-	dev.m_external_addrswap[9] = a9;
-	dev.m_external_addrswap[8] = a8;
-	dev.m_external_addrswap[7] = a7;
-	dev.m_external_addrswap[6] = a6;
-	dev.m_external_addrswap[5] = a5;
-	dev.m_external_addrswap[4] = a4;
-	dev.m_external_addrswap[3] = a3;
-	dev.m_external_addrswap[2] = a2;
-	dev.m_external_addrswap[1] = a1;
-	dev.m_external_addrswap[0] = a0;
-}
-void deco_146_base_device::set_use_magic_read_address_xor(device_t &device, int use_xor)
-{
-	deco_146_base_device &dev = downcast<deco_146_base_device &>(device);
-	dev.m_magic_read_address_xor_enabled = use_xor;
-}
-
 void deco_146_base_device::device_start()
 {
 	for (int i=0;i<0x80;i++)
@@ -1376,13 +1350,11 @@ void deco_146_base_device::device_start()
 		m_rambank1[i] = 0xffff;
 	}
 
-
 	// bind our handler
 	m_port_a_r.resolve_safe(0xffff);
 	m_port_b_r.resolve_safe(0xffff);
 	m_port_c_r.resolve_safe(0xffff);
-	m_soundlatch_w.bind_relative_to(*owner());
-
+	m_soundlatch_irq_cb.resolve_safe();
 
 	save_item(NAME(m_xor));
 	save_item(NAME(m_nand));
@@ -1396,6 +1368,7 @@ void deco_146_base_device::device_start()
 	save_item(NAME(m_latchaddr));
 	save_item(NAME(m_latchdata));
 	save_item(NAME(m_latchflag));
+	save_item(NAME(m_soundlatch));
 }
 
 void deco_146_base_device::device_reset()
@@ -1407,13 +1380,14 @@ void deco_146_base_device::device_reset()
 	region_selects[4] = 0;
 	region_selects[5] = 0;
 
-
-
 	m_current_rambank = 0;
 
 	m_latchaddr = 0xffff;
 	m_latchdata = 0x0000;
 	m_latchflag = 0;
+
+	m_soundlatch = 0x00;
+	m_soundlatch_irq_cb(CLEAR_LINE);
 
 	m_xor=0;
 //  m_nand=0xffff;

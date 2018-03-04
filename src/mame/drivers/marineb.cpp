@@ -46,7 +46,7 @@ write
 #include "screen.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK (XTAL_12MHz)
+#define MASTER_CLOCK (XTAL(12'000'000))
 #define CPU_CLOCK (MASTER_CLOCK/4)
 #define SOUND_CLOCK (MASTER_CLOCK/8)
 
@@ -65,7 +65,7 @@ WRITE_LINE_MEMBER(marineb_state::irq_mask_w)
 	m_irq_mask = state;
 }
 
-static ADDRESS_MAP_START( marineb_map, AS_PROGRAM, 8, marineb_state )
+ADDRESS_MAP_START(marineb_state::marineb_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(marineb_videoram_w) AM_SHARE("videoram")
@@ -82,12 +82,12 @@ static ADDRESS_MAP_START( marineb_map, AS_PROGRAM, 8, marineb_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( marineb_io_map, AS_IO, 8, marineb_state )
+ADDRESS_MAP_START(marineb_state::marineb_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wanted_io_map, AS_IO, 8, marineb_state )
+ADDRESS_MAP_START(marineb_state::wanted_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8912_device, address_data_w)
@@ -526,7 +526,7 @@ INTERRUPT_GEN_MEMBER(marineb_state::wanted_vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( marineb )
+MACHINE_CONFIG_START(marineb_state::marineb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)   /* 3 MHz? */
@@ -559,7 +559,8 @@ static MACHINE_CONFIG_START( marineb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( changes, marineb )
+MACHINE_CONFIG_START(marineb_state::changes)
+	marineb(config);
 
 	/* basic machine hardware */
 
@@ -570,7 +571,8 @@ static MACHINE_CONFIG_DERIVED( changes, marineb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( springer, marineb )
+MACHINE_CONFIG_START(marineb_state::springer)
+	marineb(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("outlatch")
@@ -583,7 +585,8 @@ static MACHINE_CONFIG_DERIVED( springer, marineb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hoccer, marineb )
+MACHINE_CONFIG_START(marineb_state::hoccer)
+	marineb(config);
 
 	/* basic machine hardware */
 
@@ -594,7 +597,8 @@ static MACHINE_CONFIG_DERIVED( hoccer, marineb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wanted, marineb )
+MACHINE_CONFIG_START(marineb_state::wanted)
+	marineb(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -615,7 +619,8 @@ static MACHINE_CONFIG_DERIVED( wanted, marineb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hopprobo, marineb )
+MACHINE_CONFIG_START(marineb_state::hopprobo)
+	marineb(config);
 
 	/* basic machine hardware */
 
@@ -626,7 +631,8 @@ static MACHINE_CONFIG_DERIVED( hopprobo, marineb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bcruzm12, wanted )
+MACHINE_CONFIG_START(marineb_state::bcruzm12)
+	wanted(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("outlatch")

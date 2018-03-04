@@ -16,14 +16,14 @@
 
 
 #define MCFG_PSX_GPU_VBLANK_HANDLER(_devcb) \
-	devcb = &psxgpu_device::set_vblank_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxgpu_device &>(*device).set_vblank_handler(DEVCB_##_devcb);
 
 #define MCFG_PSXGPU_ADD( cputag, tag, type, _vramSize, clock ) \
 	MCFG_DEVICE_MODIFY( cputag ) \
 	MCFG_PSX_GPU_READ_HANDLER(DEVREAD32(tag, psxgpu_device, read)) \
 	MCFG_PSX_GPU_WRITE_HANDLER(DEVWRITE32(tag, psxgpu_device, write)) \
 	MCFG_DEVICE_ADD( tag, type, clock ) \
-	psxgpu_device::set_vram_size(*device, _vramSize); \
+	downcast<psxgpu_device &>(*device).set_vram_size(_vramSize); \
 	MCFG_PSX_GPU_VBLANK_HANDLER(DEVWRITELINE(cputag ":irq", psxirq_device, intin0)) \
 	MCFG_PSX_DMA_CHANNEL_READ( cputag, 2, psxdma_device::write_delegate(&psxgpu_device::dma_read, (psxgpu_device *) device ) ) \
 	MCFG_PSX_DMA_CHANNEL_WRITE( cputag, 2, psxdma_device::read_delegate(&psxgpu_device::dma_write, (psxgpu_device *) device ) )
@@ -33,7 +33,7 @@
 	MCFG_PSX_GPU_READ_HANDLER(DEVREAD32(tag, psxgpu_device, read)) \
 	MCFG_PSX_GPU_WRITE_HANDLER(DEVWRITE32(tag, psxgpu_device, write)) \
 	MCFG_DEVICE_REPLACE( tag, type, clock ) \
-	psxgpu_device::set_vram_size(*device, _vramSize); \
+	downcast<psxgpu_device &>(*device).set_vram_size(_vramSize); \
 	MCFG_PSX_GPU_VBLANK_HANDLER(DEVWRITELINE(cputag ":irq", psxirq_device, intin0)) \
 	MCFG_PSX_DMA_CHANNEL_READ( cputag, 2, psxdma_device::write_delegate(&psxgpu_device::dma_read, (psxgpu_device *) device ) ) \
 	MCFG_PSX_DMA_CHANNEL_WRITE( cputag, 2, psxdma_device::read_delegate(&psxgpu_device::dma_write, (psxgpu_device *) device ) )
@@ -48,12 +48,12 @@ DECLARE_DEVICE_TYPE(CXD8561BQ, cxd8561bq_device)
 DECLARE_DEVICE_TYPE(CXD8561CQ, cxd8561cq_device)
 DECLARE_DEVICE_TYPE(CXD8654Q,  cxd8654q_device)
 
-class psxgpu_device : public device_t
+class psxgpu_device : public device_t, public device_video_interface
 {
 public:
-	// static configuration helpers
-	template <class Object> static devcb_base &set_vblank_handler(device_t &device, Object &&cb) { return downcast<psxgpu_device &>(device).m_vblank_handler.set_callback(std::forward<Object>(cb)); }
-	static void set_vram_size(device_t &device, int size) { downcast<psxgpu_device &>(device).vramSize = size; }
+	// configuration helpers
+	template <class Object> devcb_base &set_vblank_handler(Object &&cb) { return m_vblank_handler.set_callback(std::forward<Object>(cb)); }
+	void set_vram_size(int size) { vramSize = size; }
 
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
@@ -306,7 +306,6 @@ private:
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 #if defined(PSXGPU_DEBUG_VIEWER) && PSXGPU_DEBUG_VIEWER
-	required_device<screen_device> m_screen;
 	void DebugMeshInit();
 	void DebugMesh( int n_coordx, int n_coordy );
 	void DebugMeshEnd();

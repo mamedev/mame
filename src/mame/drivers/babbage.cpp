@@ -4,7 +4,7 @@
 
     Babbage-2nd skeleton driver (19/OCT/2011)
 
-    http://homepage3.nifty.com/takeda-toshiya/babbage/index.html
+    http://takeda-toshiya.my.coocan.jp/babbage/index.html
 
     Pasting:
         0-F : as is
@@ -24,6 +24,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "cpu/z80/z80daisy.h"
@@ -35,47 +36,39 @@ class babbage_state : public driver_device
 {
 public:
 	babbage_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pio_1(*this, "z80pio_1"),
-	m_pio_2(*this, "z80pio_2"),
-	m_ctc(*this, "z80ctc")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pio_1(*this, "z80pio_1")
+		, m_pio_2(*this, "z80pio_2")
+		, m_ctc(*this, "z80ctc")
+		, m_keyboard(*this, "X%u", 0)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<z80pio_device> m_pio_1;
-	required_device<z80pio_device> m_pio_2;
-	required_device<z80ctc_device> m_ctc;
+	void babbage(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(pio2_a_r);
 	DECLARE_WRITE8_MEMBER(pio1_b_w);
 	DECLARE_WRITE8_MEMBER(pio2_b_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+
+	void babbage_io(address_map &map);
+	void babbage_map(address_map &map);
+
+private:
 	uint8_t m_segment;
 	uint8_t m_key;
 	uint8_t m_prev_key;
 	bool m_step;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	required_device<cpu_device> m_maincpu;
+	required_device<z80pio_device> m_pio_1;
+	required_device<z80pio_device> m_pio_2;
+	required_device<z80ctc_device> m_ctc;
+	required_ioport_array<4> m_keyboard;
 };
-
-
-
-/***************************************************************************
-
-    Machine
-
-***************************************************************************/
-
-void babbage_state::machine_start()
-{
-}
-
-void babbage_state::machine_reset()
-{
-}
 
 
 
@@ -85,13 +78,13 @@ void babbage_state::machine_reset()
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( babbage_map, AS_PROGRAM, 8, babbage_state )
+ADDRESS_MAP_START(babbage_state::babbage_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1000, 0x17ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( babbage_io, AS_IO, 8, babbage_state )
+ADDRESS_MAP_START(babbage_state::babbage_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
@@ -174,15 +167,18 @@ READ8_MEMBER( babbage_state::pio2_a_r )
 WRITE8_MEMBER( babbage_state::pio2_b_w )
 {
 	if (BIT(data, 7))
+	{
 		m_step = false;
-	else
-	if (!m_step)
+	}
+	else if (!m_step)
 	{
 		m_segment = data;
 		m_step = true;
 	}
 	else
+	{
 		output().set_digit_value(data, m_segment);
+	}
 }
 
 static const z80_daisy_config babbage_daisy_chain[] =
@@ -195,16 +191,13 @@ static const z80_daisy_config babbage_daisy_chain[] =
 
 TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 {
-	uint8_t i, j, inp;
-	char kbdrow[6];
-	uint8_t data = 0xff;
+	u8 inp, data = 0xff;
 
-	for (i = 0; i < 4; i++)
+	for (u8 i = 0; i < 4; i++)
 	{
-		sprintf(kbdrow,"X%X",i);
-		inp = ioport(kbdrow)->read();
+		inp = m_keyboard[i]->read();
 
-		for (j = 0; j < 5; j++)
+		for (u8 j = 0; j < 5; j++)
 			if (BIT(inp, j))
 				data = (j << 2) | i;
 	}
@@ -232,7 +225,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( babbage )
+MACHINE_CONFIG_START(babbage_state::babbage)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK) //2.5MHz
 	MCFG_CPU_PROGRAM_MAP(babbage_map)

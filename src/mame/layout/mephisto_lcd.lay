@@ -50,10 +50,62 @@
 	<element name="text_f"> <rect><color red="0.64" green="0.08" blue="0.11" /></rect>    <text string="F"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
 	<element name="text_g"> <rect><color red="0.64" green="0.08" blue="0.11" /></rect>    <text string="G"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
 	<element name="text_h"> <rect><color red="0.64" green="0.08" blue="0.11" /></rect>    <text string="H"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
+	<element name="text_trn">       <rect><color red="0" green="0" blue="0" /></rect>             <text string="TRN">                    <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_info">      <rect><color red="0" green="0" blue="0" /></rect>             <text string="INFO">                   <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_mem">       <rect><color red="0" green="0" blue="0" /></rect>             <text string="MEM">                    <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_pos">       <rect><color red="0" green="0" blue="0" /></rect>             <text string="POS">                    <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_lev">       <rect><color red="0" green="0" blue="0" /></rect>             <text string="LEV">                    <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_fct">       <rect><color red="0" green="0" blue="0" /></rect>             <text string="FCT">                    <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_ent">       <rect><color red="0" green="0" blue="0" /></rect>             <text string="ENT">                    <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_cl">        <rect><color red="0" green="0" blue="0" /></rect>             <text string="CL">                     <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_p1">        <rect><color red="0" green="0" blue="0" /></rect>             <text string="&#x265a;">               <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_p2">        <rect><color red="0" green="0" blue="0" /></rect>             <text string="&#x265b;">               <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_p3">        <rect><color red="0" green="0" blue="0" /></rect>             <text string="&#x265c;">               <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_p4">        <rect><color red="0" green="0" blue="0" /></rect>             <text string="&#x265d;">               <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_p5">        <rect><color red="0" green="0" blue="0" /></rect>             <text string="&#x265e;">               <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_p6">        <rect><color red="0" green="0" blue="0" /></rect>             <text string="&#x265f;">               <color red="0.76" green="0.74" blue="0.41" /></text> </element>
+	<element name="text_lcd">       <rect><color red="0" green="0" blue="0" /></rect>             <text string="16/32 BIT DISPLAY MODUL"><color red="0.76" green="0.74" blue="0.41" /></text> </element>
 
 <!-- build screen -->
+	<group name="panel">
+		<screen index="0"><bounds x="0" y="3" width="24" height="4.5" /></screen>
+		<bezel element="text_lcd">          <bounds x="0" y="0.5" width="24" height="1.5" />    </bezel>
+
+		<bezel name="led100" element="led">     <bounds x="27.1" y="0.1" width="1.3" height="1.3" />    </bezel>
+		<bezel name="led101" element="led">     <bounds x="32.1" y="0.1" width="1.3" height="1.3" />    </bezel>
+		<bezel name="led102" element="led">     <bounds x="37.1" y="0.1" width="1.3" height="1.3" />    </bezel>
+		<bezel name="led103" element="led">     <bounds x="42.1" y="0.1" width="1.3" height="1.3" />    </bezel>
+		<bezel name="led104" element="led">     <bounds x="47.1" y="0.1" width="1.3" height="1.3" />    </bezel>
+		<bezel name="led105" element="led">     <bounds x="52.1" y="0.1" width="1.3" height="1.3" />    </bezel>
+
+		<bezel element="text_trn">          <bounds x="28.5" y="0" width="2.5" height="1.2" />  </bezel>
+		<bezel element="text_info">         <bounds x="33.5" y="0" width="2.5" height="1.2" />  </bezel>
+		<bezel element="text_mem">          <bounds x="38.5" y="0" width="2.5" height="1.2" />  </bezel>
+		<bezel element="text_pos">          <bounds x="43.5" y="0" width="2.5" height="1.2" />  </bezel>
+		<bezel element="text_lev">          <bounds x="48.5" y="0" width="2.5" height="1.2" />  </bezel>
+		<bezel element="text_fct">          <bounds x="53.5" y="0" width="2.5" height="1.2" />  </bezel>
+		<bezel element="text_ent">          <bounds x="47.5" y="7" width="3.5" height="1.2" />  </bezel>
+		<bezel element="text_cl">           <bounds x="52.5" y="7" width="3.5" height="1.3" />  </bezel>
+
+		<bezel element="text_p6">           <bounds x="27.5" y="4.5" width="3.5" height="2" />  </bezel>
+		<bezel element="text_p5">           <bounds x="32.5" y="4.5" width="3.5" height="2" />  </bezel>
+		<bezel element="text_p4">           <bounds x="37.5" y="4.5" width="3.5" height="2" />  </bezel>
+		<bezel element="text_p3">           <bounds x="42.5" y="4.5" width="3.5" height="2" />  </bezel>
+		<bezel element="text_p2">           <bounds x="47.5" y="4.5" width="3.5" height="2" />  </bezel>
+		<bezel element="text_p1">           <bounds x="52.5" y="4.5" width="3.5" height="2" />  </bezel>
+
+		<bezel element="hlb" inputtag="KEY" inputmask="0x01">       <bounds x="27.5" y="2" width="3.5" height="2.5" />  </bezel>
+		<bezel element="hlb" inputtag="KEY" inputmask="0x02">       <bounds x="32.5" y="2" width="3.5" height="2.5" />  </bezel>
+		<bezel element="hlb" inputtag="KEY" inputmask="0x04">       <bounds x="37.5" y="2" width="3.5" height="2.5" />  </bezel>
+		<bezel element="hlb" inputtag="KEY" inputmask="0x08">       <bounds x="42.5" y="2" width="3.5" height="2.5" />  </bezel>
+		<bezel element="hlb" inputtag="KEY" inputmask="0x10">       <bounds x="47.5" y="2" width="3.5" height="2.5" />  </bezel>
+		<bezel element="hlb" inputtag="KEY" inputmask="0x20">       <bounds x="52.5" y="2" width="3.5" height="2.5" />  </bezel>
+		<bezel element="hlb" inputtag="KEY" inputmask="0x40">       <bounds x="47.5" y="9" width="3.5" height="2.5" />  </bezel>
+		<bezel element="hlb" inputtag="KEY" inputmask="0x80">       <bounds x="52.5" y="9" width="3.5" height="2.5" />  </bezel>
+	</group>
 
 	<view name="Chessboard + Display Modul">
+		<bounds left="-1" right="86" top="0" bottom="100.5" />
 		<bezel element="background"><bounds x="-1" y="0" width="87" height="87" /></bezel>
 
 	<!-- chessboard coords -->
@@ -270,48 +322,10 @@
 		<bezel element="hl" inputtag="board:IN.0" inputmask="0x80"><bounds x="73" y="73" width="10" height="10" /><color alpha="0.4" /></bezel>
 
 	<!-- LCD panel -->
-		<screen index="0"><bounds x="30" y="88" width="24" height="4.5" /></screen>
-
-		<bezel name="led100" element="led">
-			<bounds x="33" y="95" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="led101" element="led">
-			<bounds x="36" y="95" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="led102" element="led">
-			<bounds x="39" y="95" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="led103" element="led">
-			<bounds x="42" y="95" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="led104" element="led">
-			<bounds x="45" y="95" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="led105" element="led">
-			<bounds x="48" y="95" width="1.5" height="1.5" />
-		</bezel>
+		<group ref="panel"><bounds x="28" y="88" width="56" height="11.5" /></group>
 	</view>
 
 	<view name="Display Modul">
-		<screen index="0"><bounds x="0" y="0" width="24" height="4.5" /></screen>
-
-		<bezel name="led100" element="led">
-			<bounds x="3" y="7" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="led101" element="led">
-			<bounds x="6" y="7" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="led102" element="led">
-			<bounds x="9" y="7" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="led103" element="led">
-			<bounds x="12" y="7" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="led104" element="led">
-			<bounds x="15" y="7" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="led105" element="led">
-			<bounds x="18" y="7" width="1.5" height="1.5" />
-		</bezel>
+		<group ref="panel"><bounds x="0" y="0" width="56" height="11.5" /></group>
 	</view>
 </mamelayout>

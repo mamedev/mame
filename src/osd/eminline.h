@@ -295,6 +295,77 @@ inline uint8_t count_leading_ones(uint32_t val)
 #endif
 
 
+/*-------------------------------------------------
+    population_count_32 - return the number of
+    one bits in a 32-bit value
+-------------------------------------------------*/
+
+#ifndef population_count_32
+#if defined(__NetBSD__)
+#define population_count_32 popcount32
+#else
+inline unsigned population_count_32(uint32_t val)
+{
+#if defined(__GNUC__)
+	// uses CPU feature if available, otherwise falls back to implementation similar to what follows
+	static_assert(sizeof(val) == sizeof(unsigned), "expected 32-bit unsigned int");
+	return unsigned(__builtin_popcount(static_cast<unsigned>(val)));
+#else
+	// optimal Hamming weight assuing fast 32*32->32
+	constexpr uint32_t m1(0x55555555);
+	constexpr uint32_t m2(0x33333333);
+	constexpr uint32_t m4(0x0f0f0f0f);
+	constexpr uint32_t h01(0x01010101);
+	val -= (val >> 1) & m1;
+	val = (val & m2) + ((val >> 2) & m2);
+	val = (val + (val >> 4)) & m4;
+	return unsigned((val * h01) >> 24);
+#endif
+}
+#endif
+#endif
+
+
+/*-------------------------------------------------
+    population_count_64 - return the number of
+    one bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef population_count_64
+#if defined(__NetBSD__)
+#define population_count_64 popcount64
+#else
+inline unsigned population_count_64(uint64_t val)
+{
+#if defined(__GNUC__)
+	// uses CPU feature if available, otherwise falls back to implementation similar to what follows
+	static_assert(sizeof(val) == sizeof(unsigned long long), "expected 64-bit unsigned long long int");
+	return unsigned(__builtin_popcountll(static_cast<unsigned long long>(val)));
+#else
+	// guess that architectures with 64-bit pointers have 64-bit multiplier
+	if (sizeof(void *) >= sizeof(uint64_t))
+	{
+		// optimal Hamming weight assuming fast 64*64->64
+		constexpr uint64_t m1(0x5555555555555555);
+		constexpr uint64_t m2(0x3333333333333333);
+		constexpr uint64_t m4(0x0f0f0f0f0f0f0f0f);
+		constexpr uint64_t h01(0x0101010101010101);
+		val -= (val >> 1) & m1;
+		val = (val & m2) + ((val >> 2) & m2);
+		val = (val + (val >> 4)) & m4;
+		return unsigned((val * h01) >> 56);
+	}
+	else
+	{
+		// fall back to two 32-bit operations to avoid slow multiply
+		return population_count_32(uint32_t(val)) + population_count_32(uint32_t(val >> 32));
+	}
+#endif
+}
+#endif
+#endif
+
+
 /***************************************************************************
     INLINE TIMING FUNCTIONS
 ***************************************************************************/

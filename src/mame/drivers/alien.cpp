@@ -24,11 +24,11 @@
 
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 #include "screen.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK    XTAL_200MHz
+#define MASTER_CLOCK    XTAL(200'000'000)
 
 class alien_state : public driver_device
 {
@@ -42,6 +42,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void alien(machine_config &config);
+	void alien_map(address_map &map);
 protected:
 
 	// devices
@@ -66,7 +68,7 @@ READ64_MEMBER( alien_state::test_r )
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( alien_map, AS_PROGRAM, 64, alien_state )
+ADDRESS_MAP_START(alien_state::alien_map)
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
 	AM_RANGE(0x08000000, 0x08000007) AM_READ(test_r) //hangs if zero
 	AM_RANGE(0x0cfe0000, 0x0cffffff) AM_RAM
@@ -87,10 +89,11 @@ void alien_state::machine_reset()
 	//m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( alien )
+MACHINE_CONFIG_START(alien_state::alien)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, MASTER_CLOCK)    /* 200MHz */
 	MCFG_CPU_PROGRAM_MAP(alien_map)
+	MCFG_CPU_FORCE_NO_DRC()
 
 	/* video hardware */
 

@@ -8,6 +8,7 @@
 #include "machine/meters.h"
 #include "machine/roc10937.h"
 #include "machine/steppers.h"
+#include "machine/timer.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/upd7759.h"
 
@@ -148,4 +149,9 @@ public:
 	optional_device<stepper_device> m_reel4;
 	optional_device<stepper_device> m_reel5;
 	required_device<meters_device> m_meters;
+	void impctawp(machine_config &config);
+	void jpmimpct(machine_config &config);
+	void awp68k_program_map(address_map &map);
+	void m68k_program_map(address_map &map);
+	void tms_program_map(address_map &map);
 };

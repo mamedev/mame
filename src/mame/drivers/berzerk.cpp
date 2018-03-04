@@ -93,10 +93,15 @@ public:
 	void create_nmi_timer();
 	void start_nmi_timer();
 	void get_pens(rgb_t *pens);
+	void berzerk(machine_config &config);
+	void frenzy(machine_config &config);
+	void berzerk_io_map(address_map &map);
+	void berzerk_map(address_map &map);
+	void frenzy_map(address_map &map);
 };
 
 
-#define MASTER_CLOCK                (XTAL_10MHz)
+#define MASTER_CLOCK                (XTAL(10'000'000))
 #define MAIN_CPU_CLOCK              (MASTER_CLOCK / 4)
 #define PIXEL_CLOCK                 (MASTER_CLOCK / 2)
 #define S14001_CLOCK                (MASTER_CLOCK / 4)
@@ -392,7 +397,7 @@ WRITE8_MEMBER(berzerk_state::magicram_w)
 	uint8_t shift_flop_output = (((uint16_t)m_last_shift_data << 8) | data) >> (m_magicram_control & 0x07);
 
 	if (m_magicram_control & 0x08)
-		shift_flop_output = BITSWAP8(shift_flop_output, 0, 1, 2, 3, 4, 5, 6, 7);
+		shift_flop_output = bitswap<8>(shift_flop_output, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	/* collision detection - AND gate output goes to the K pin of the flip-flop,
 	   while J is LO, therefore, it only resets, never sets */
@@ -599,7 +604,7 @@ void berzerk_state::sound_reset()
  *
  *************************************/
 
-static ADDRESS_MAP_START( berzerk_map, AS_PROGRAM, 8, berzerk_state )
+ADDRESS_MAP_START(berzerk_state::berzerk_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x3fff) AM_ROM
@@ -610,7 +615,7 @@ static ADDRESS_MAP_START( berzerk_map, AS_PROGRAM, 8, berzerk_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( frenzy_map, AS_PROGRAM, 8, berzerk_state )
+ADDRESS_MAP_START(berzerk_state::frenzy_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(magicram_w) AM_SHARE("videoram")
@@ -627,7 +632,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( berzerk_io_map, AS_IO, 8, berzerk_state )
+ADDRESS_MAP_START(berzerk_state::berzerk_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_NOP
 	AM_RANGE(0x40, 0x47) AM_READWRITE(audio_r, audio_w)
@@ -1103,7 +1108,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( berzerk )
+MACHINE_CONFIG_START(berzerk_state::berzerk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
@@ -1130,7 +1135,8 @@ static MACHINE_CONFIG_START( berzerk )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( frenzy, berzerk )
+MACHINE_CONFIG_START(berzerk_state::frenzy)
+	berzerk(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

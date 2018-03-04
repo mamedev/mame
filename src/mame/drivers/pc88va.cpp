@@ -187,6 +187,11 @@ DECLARE_WRITE8_MEMBER(dma_memw_cb);
 	void execute_spron_cmd();
 	void execute_sprsw_cmd();
 
+	void pc88va(machine_config &config);
+	void pc88va_io_map(address_map &map);
+	void pc88va_map(address_map &map);
+	void pc88va_z80_io_map(address_map &map);
+	void pc88va_z80_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -254,7 +259,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				{
 					for(x_s=0;x_s<16;x_s++)
 					{
-						pen = (BITSWAP16(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-x_s)) & 1;
+						pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-x_s)) & 1;
 
 						pen = pen & 1 ? fg_col : (bc) ? 8 : -1;
 
@@ -281,7 +286,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				{
 					for(x_s=0;x_s<2;x_s++)
 					{
-						pen = (BITSWAP16(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (16-(x_s*8)) & 0xf;
+						pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (16-(x_s*8)) & 0xf;
 
 						//if(bc != -1) //transparent pen
 						bitmap.pix32(yp+y_i, xp+x_i+(x_s)) = m_palette->pen(pen);
@@ -666,7 +671,7 @@ WRITE16_MEMBER(pc88va_state::sys_mem_w)
 	}
 }
 
-static ADDRESS_MAP_START( pc88va_map, AS_PROGRAM, 16, pc88va_state )
+ADDRESS_MAP_START(pc88va_state::pc88va_map)
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM
 //  AM_RANGE(0x80000, 0x9ffff) AM_RAM // EMM
 	AM_RANGE(0xa0000, 0xdffff) AM_READWRITE(sys_mem_r,sys_mem_w)
@@ -755,7 +760,7 @@ WRITE8_MEMBER(pc88va_state::idp_command_w)
 
 		/* TODO: 0x89 shouldn't trigger, should be one of the above commands */
 		/* Update: actually 0x89 is mask command */
-		default:   m_cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",space.device().safe_pc(),data); break;
+		default:   m_cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",m_maincpu->pc(),data); break;
 	}
 }
 
@@ -1241,7 +1246,7 @@ READ8_MEMBER(pc88va_state::no_subfdc_r)
 }
 #endif
 
-static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16, pc88va_state )
+ADDRESS_MAP_START(pc88va_state::pc88va_io_map)
 	AM_RANGE(0x0000, 0x000f) AM_READ8(key_r,0xffff) // Keyboard ROW reading
 //  AM_RANGE(0x0010, 0x0010) Printer / Calendar Clock Interface
 	AM_RANGE(0x0020, 0x0021) AM_NOP // RS-232C
@@ -1325,7 +1330,7 @@ TIMER_CALLBACK_MEMBER(pc88va_state::pc8801fd_upd765_tc_to_zero)
 
 /* FDC subsytem CPU */
 #if TEST_SUBFDC
-static ADDRESS_MAP_START( pc88va_z80_map, AS_PROGRAM, 8, pc88va_state )
+ADDRESS_MAP_START(pc88va_state::pc88va_z80_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
@@ -1348,7 +1353,7 @@ WRITE8_MEMBER(pc88va_state::upd765_mc_w)
 	machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(!(data & 2));
 }
 
-static ADDRESS_MAP_START( pc88va_z80_io_map, AS_IO, 8, pc88va_state )
+ADDRESS_MAP_START(pc88va_state::pc88va_z80_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(fdc_irq_vector_w) // Interrupt Opcode Port
 //  AM_RANGE(0xf4, 0xf4) // Drive Control Port
@@ -1779,7 +1784,7 @@ printf("%08x %02x\n",offset,data);
 }
 
 
-static MACHINE_CONFIG_START( pc88va )
+MACHINE_CONFIG_START(pc88va_state::pc88va)
 
 	MCFG_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc88va_map)

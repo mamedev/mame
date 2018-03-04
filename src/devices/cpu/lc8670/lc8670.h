@@ -45,14 +45,14 @@ enum
 //**************************************************************************
 
 #define MCFG_LC8670_SET_CLOCK_SOURCES(_sub_clock, _rc_clock, _cf_clock) \
-	lc8670_cpu_device::static_set_cpu_clock(*device, lc8670_cpu_device::clock_source::SUB, _sub_clock); \
-	lc8670_cpu_device::static_set_cpu_clock(*device, lc8670_cpu_device::clock_source::RC, _rc_clock); \
-	lc8670_cpu_device::static_set_cpu_clock(*device, lc8670_cpu_device::clock_source::CF, _cf_clock);
+	downcast<lc8670_cpu_device &>(*device).set_cpu_clock(lc8670_cpu_device::clock_source::SUB, _sub_clock); \
+	downcast<lc8670_cpu_device &>(*device).set_cpu_clock(lc8670_cpu_device::clock_source::RC, _rc_clock); \
+	downcast<lc8670_cpu_device &>(*device).set_cpu_clock(lc8670_cpu_device::clock_source::CF, _cf_clock);
 #define MCFG_LC8670_BANKSWITCH_CB(_devcb) \
-	devcb = &lc8670_cpu_device::static_set_bankswitch_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<lc8670_cpu_device &>(*device).set_bankswitch_cb(DEVCB_##_devcb);
 
 #define MCFG_LC8670_LCD_UPDATE_CB(_cb) \
-	lc8670_cpu_device::static_set_lcd_update_cb(*device, _cb);
+	downcast<lc8670_cpu_device &>(*device).set_lcd_update_cb(_cb);
 
 
 // ======================> lc8670_cpu_device
@@ -83,11 +83,13 @@ public:
 	DECLARE_READ8_MEMBER(xram_r);
 	DECLARE_WRITE8_MEMBER(xram_w);
 
-	// static configuration helpers
-	static void static_set_cpu_clock(device_t &device, clock_source source, uint32_t clock) { downcast<lc8670_cpu_device &>(device).m_clocks[unsigned(source)] = clock; }
-	static void static_set_lcd_update_cb(device_t &device, lcd_update cb) { downcast<lc8670_cpu_device &>(device).m_lcd_update_func = cb; }
-	template <class Object> static devcb_base & static_set_bankswitch_cb(device_t &device, Object &&cb) { return downcast<lc8670_cpu_device &>(device).m_bankswitch_func.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	void set_cpu_clock(clock_source source, uint32_t clock) { m_clocks[unsigned(source)] = clock; }
+	void set_cpu_clock(clock_source source, const XTAL &clock) { set_cpu_clock(source, clock.value()); }
+	template <typename Object> void set_lcd_update_cb(Object &&cb) { m_lcd_update_func = std::forward<Object>(cb); }
+	template <class Object> devcb_base &set_bankswitch_cb(Object &&cb) { return m_bankswitch_func.set_callback(std::forward<Object>(cb)); }
 
+	void lc8670_internal_map(address_map &map);
 protected:
 	enum
 	{
@@ -115,9 +117,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	// helpers
@@ -142,7 +142,6 @@ private:
 	void timer0_tick(bool ext_line = false);
 	void timer1_tick();
 	void base_timer_tick();
-	static void dasm_arg(uint8_t op, char *buffer, offs_t pc, int arg, const uint8_t *oprom, int &pos);
 
 	// opcodes handlers
 	int op_nop();
@@ -200,7 +199,7 @@ private:
 	address_space *     m_program;              // program space (ROM or flash)
 	address_space *     m_data;                 // internal RAM/register
 	address_space *     m_io;                   // I/O ports
-	direct_read_data *  m_direct;
+	direct_read_data<0> *m_direct;
 
 	// timers
 	static const device_timer_id BASE_TIMER = 1;
@@ -240,33 +239,6 @@ private:
 	// opcodes table
 	typedef int (lc8670_cpu_device::*op_handler)();
 	static const op_handler s_opcode_table[80];
-
-	// disassembler
-	enum
-	{
-		OP_NULL,
-		OP_R8,
-		OP_R8RI,
-		OP_R16,
-		OP_RI,
-		OP_A12,
-		OP_A16,
-		OP_I8,
-		OP_B3,
-		OP_D9,
-		OP_D9B3,
-		OP_RII8
-	};
-
-	// disasm table
-	struct dasm_entry
-	{
-		const char *str;
-		uint8_t       arg1;
-		uint8_t       arg2;
-		bool        inv;
-	};
-	static const dasm_entry s_dasm_table[80];
 };
 
 DECLARE_DEVICE_TYPE(LC8670, lc8670_cpu_device)

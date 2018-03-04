@@ -69,4 +69,11 @@ public:
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void filter_w(address_space &space, int chip, int data );
+	void gyruss(machine_config &config);
+	void audio_cpu1_io_map(address_map &map);
+	void audio_cpu1_map(address_map &map);
+	void audio_cpu2_io_map(address_map &map);
+	void audio_cpu2_map(address_map &map);
+	void main_cpu1_map(address_map &map);
+	void main_cpu2_map(address_map &map);
 };

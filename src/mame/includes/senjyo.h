@@ -107,6 +107,16 @@ public:
 	void draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_radar(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,int priority);
+	void senjyox_e(machine_config &config);
+	void senjyo(machine_config &config);
+	void starforb(machine_config &config);
+	void senjyox_a(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void senjyo_map(address_map &map);
+	void senjyo_sound_io_map(address_map &map);
+	void senjyo_sound_map(address_map &map);
+	void starforb_map(address_map &map);
+	void starforb_sound_map(address_map &map);
 };
 
 /*----------- defined in audio/senjyo.c -----------*/

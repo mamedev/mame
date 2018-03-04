@@ -6,12 +6,6 @@
 #include "emu.h"
 #include "deckarn.h"
 
-void deco_karnovsprites_device::set_gfx_region(device_t &device, int region)
-{
-	deco_karnovsprites_device &dev = downcast<deco_karnovsprites_device &>(device);
-	dev.m_gfxregion = region;
-}
-
 DEFINE_DEVICE_TYPE(DECO_KARNOVSPRITES, deco_karnovsprites_device, "deco_karnovsprites", "DECO Karnov Sprites")
 
 deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -21,18 +15,11 @@ deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconf
 {
 }
 
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void deco_karnovsprites_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<deco_karnovsprites_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
 void deco_karnovsprites_device::device_start()
 {
+	m_flip_screen = false;
+
+	save_item(NAME(m_flip_screen));
 }
 
 void deco_karnovsprites_device::device_reset()
@@ -82,7 +69,7 @@ void deco_karnovsprites_device::draw_sprites( bitmap_ind16 &bitmap, const rectan
 		y = (y + 16) % 0x200;
 		x = 256 - x;
 		y = 256 - y;
-		if (machine().driver_data()->flip_screen())
+		if (m_flip_screen)
 		{
 			y = 240 - y;
 			x = 240 - x;

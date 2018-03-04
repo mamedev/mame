@@ -84,9 +84,9 @@
 #include "emu.h"
 #include "vme_mzr8300.h"
 
+#include "machine/am9513.h"
 #include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
-#include "machine/clock.h"
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
@@ -124,21 +124,27 @@ DEFINE_DEVICE_TYPE(VME_MZR8300, vme_mzr8300_card_device, "mzr8300", "Mizar 8300 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-#define BAUDGEN_CLOCK XTAL_19_6608MHz /* fake */
-#define SIO_CLOCK (BAUDGEN_CLOCK / 128) /* This will give prompt */
-
-MACHINE_CONFIG_MEMBER( vme_mzr8300_card_device::device_add_mconfig )
-	MCFG_UPD7201_ADD("sio0", XTAL_4MHz, SIO_CLOCK, SIO_CLOCK, SIO_CLOCK, SIO_CLOCK )
-
+MACHINE_CONFIG_START(vme_mzr8300_card_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("sio0", UPD7201_NEW, XTAL(4'000'000))
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD ("rs232p1", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("sio0", upd7201_new_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("sio0", upd7201_new_device, ctsb_w))
+	MCFG_DEVICE_ADD("sio1", UPD7201_NEW, XTAL(4'000'000))
 
-	MCFG_Z80SIO_ADD("sio1", XTAL_4MHz, 0, 0, 0, 0 )
+	MCFG_RS232_PORT_ADD("rs232p1", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio0", upd7201_new_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio0", upd7201_new_device, ctsb_w))
+
+	MCFG_DEVICE_ADD("stc", AM9513, XTAL(4'000'000))
+	MCFG_AM9513_OUT1_CALLBACK(DEVWRITELINE("sio0", upd7201_new_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio0", upd7201_new_device, txca_w))
+	MCFG_AM9513_OUT2_CALLBACK(DEVWRITELINE("sio0", upd7201_new_device, rxcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio0", upd7201_new_device, txcb_w))
+	MCFG_AM9513_OUT3_CALLBACK(DEVWRITELINE("sio1", upd7201_new_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1", upd7201_new_device, txca_w))
+	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("sio1", upd7201_new_device, rxcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1", upd7201_new_device, txcb_w))
 MACHINE_CONFIG_END
 
 
@@ -179,6 +185,9 @@ void vme_mzr8300_card_device::device_start()
 	m_vme->install_device(vme_device::A16_SC, base + 6, base + 7, // Channel A - Control
 						  read8_delegate(FUNC(z80sio_device::ca_r),  subdevice<z80sio_device>("sio0")),
 						  write8_delegate(FUNC(z80sio_device::ca_w), subdevice<z80sio_device>("sio0")), 0x00ff);
+	m_vme->install_device(vme_device::A16_SC, base + 0x10, base + 0x13, // Am9513
+						  read8_delegate(FUNC(am9513_device::read8),   subdevice<am9513_device>("stc")),
+						  write8_delegate(FUNC(am9513_device::write8), subdevice<am9513_device>("stc")), 0x00ff);
 }
 
 void vme_mzr8300_card_device::device_reset()

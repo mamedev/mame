@@ -309,7 +309,7 @@ They can run the same software and accept the same devices and extensions.
 
 /* ------------ address maps ------------ */
 
-static ADDRESS_MAP_START ( to7, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to7)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE(to7_cartridge_w ) /* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to7_vram_w )
@@ -617,14 +617,20 @@ SLOT_INTERFACE_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_START( to7 )
+MACHINE_CONFIG_START(thomson_state::to7)
 
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to7 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to7 )
 
 /* cpu */
-	MCFG_CPU_ADD ( "maincpu", M6809, 1000000 )
-	MCFG_CPU_PROGRAM_MAP ( to7)
+	MCFG_CPU_ADD("maincpu", MC6809E, 1000000)
+	MCFG_CPU_PROGRAM_MAP(to7)
+
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("mainfirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 
 /* video */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -664,7 +670,7 @@ static MACHINE_CONFIG_START( to7 )
 	MCFG_MC6846_OUT_CP2_CB(DEVWRITELINE("buzzer", dac_bit_interface, write))
 	MCFG_MC6846_IN_PORT_CB(READ8(thomson_state, to7_timer_port_in))
 	MCFG_MC6846_OUT_CTO_CB(WRITELINE(thomson_state, to7_set_cassette))
-	MCFG_MC6846_IRQ_CB(WRITELINE(thomson_state, thom_dev_irq_0))
+	MCFG_MC6846_IRQ_CB(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
 
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
@@ -682,7 +688,7 @@ static MACHINE_CONFIG_START( to7 )
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(thomson_state, fdc_index_3_w))
 
-		MCFG_WD2793_ADD("wd2793", XTAL_1MHz)
+		MCFG_WD2793_ADD("wd2793", XTAL(1'000'000))
 		MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
 		MCFG_FLOPPY_DRIVE_ADD("wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
 
@@ -699,20 +705,20 @@ static MACHINE_CONFIG_START( to7 )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to7_sys_portb_out))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, to7_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, to7_sys_cb2_out))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(thomson_state, thom_firq_1))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_firq_1))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("mainfirq", input_merger_device, in_w<1>))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainfirq", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD(THOM_PIA_GAME, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to7_game_porta_in))
 	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, to7_game_portb_in))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to7_game_portb_out))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, to7_game_cb2_out))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(thomson_state, thom_irq_1))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (RF 57-932) */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
 	/// 2400 7N2
@@ -755,7 +761,8 @@ static MACHINE_CONFIG_START( to7 )
 	MCFG_SOFTWARE_LIST_ADD("to7_qd_list","to7_qd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( t9000, to7 )
+MACHINE_CONFIG_START(thomson_state::t9000)
+	to7(config);
 MACHINE_CONFIG_END
 
 
@@ -813,7 +820,7 @@ In arabic mode, Ctrl+E / Ctrl+X to start / stop typing in-line latin.
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( to770, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to770)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to7_cartridge_w ) /* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
@@ -917,7 +924,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_DERIVED( to770, to7 )
+MACHINE_CONFIG_START(thomson_state::to770)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to770 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to770 )
 
@@ -943,7 +951,8 @@ static MACHINE_CONFIG_DERIVED( to770, to7 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_cart_list","to7_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( to770a, to770 )
+MACHINE_CONFIG_START(thomson_state::to770a)
+	to770(config);
 	MCFG_DEVICE_REMOVE("t770_cart_list")
 	MCFG_SOFTWARE_LIST_ADD("t770a_cart_list","to770a_cart")
 MACHINE_CONFIG_END
@@ -1012,7 +1021,7 @@ Differences include:
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( mo5, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::mo5)
 
 	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to770_vram_w )
 	AM_RANGE ( 0x2000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK )
@@ -1107,7 +1116,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_DERIVED( mo5, to7 )
+MACHINE_CONFIG_START(thomson_state::mo5)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5 )
 
@@ -1130,7 +1140,7 @@ static MACHINE_CONFIG_DERIVED( mo5, to7 )
 	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(NOOP)
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* WARNING: differs from TO7 ! */
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>)) // WARNING: differs from TO7 !
 
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
@@ -1152,7 +1162,8 @@ static MACHINE_CONFIG_DERIVED( mo5, to7 )
 	MCFG_RAM_DEFAULT_SIZE("112K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mo5e, mo5 )
+MACHINE_CONFIG_START(thomson_state::mo5e)
+	mo5(config);
 MACHINE_CONFIG_END
 
 
@@ -1233,7 +1244,7 @@ It was replaced quickly with the improved TO9+.
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( to9, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to9)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE(to9_cartridge_w )/* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to770_vram_w )
@@ -1467,7 +1478,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_DERIVED( to9, to7 )
+MACHINE_CONFIG_START(thomson_state::to9)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9 )
 
@@ -1561,7 +1573,7 @@ The TO8D is simply a TO8 with an integrated 3"1/2 floppy drive.
 **********************************************************************/
 
 
-static ADDRESS_MAP_START ( to8, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to8)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to8_cartridge_w ) /* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
@@ -1689,7 +1701,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_DERIVED( to8, to7 )
+MACHINE_CONFIG_START(thomson_state::to8)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to8 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to8 )
 
@@ -1726,7 +1739,8 @@ static MACHINE_CONFIG_DERIVED( to8, to7 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_qd_list", "to7_qd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( to8d, to8 )
+MACHINE_CONFIG_START(thomson_state::to8d)
+	to8(config);
 MACHINE_CONFIG_END
 
 
@@ -1772,7 +1786,7 @@ The differences with the TO8 are:
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( to9p, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to9p)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to8_cartridge_w ) /* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
@@ -1852,7 +1866,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_DERIVED( to9p, to7 )
+MACHINE_CONFIG_START(thomson_state::to9p)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9p )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9p )
 
@@ -1866,7 +1881,7 @@ static MACHINE_CONFIG_DERIVED( to9p, to7 )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to8_sys_portb_out))
 	MCFG_PIA_CB2_HANDLER(NOOP)
 	MCFG_PIA_IRQA_HANDLER(NOOP)
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_firq_1))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainfirq", input_merger_device, in_w<1>))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
@@ -1951,7 +1966,7 @@ a PC XT.
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( mo6, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::mo6)
 
 	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
 	AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE(to8_sys_lo_w )
@@ -2201,7 +2216,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_DERIVED( mo6, to7 )
+MACHINE_CONFIG_START(thomson_state::mo6)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo6 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo6 )
 
@@ -2221,7 +2237,7 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_sys_cb2_out))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* differs from TO */
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>)) // differs from TO
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_game_porta_out))
@@ -2255,7 +2271,8 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_qd_list","mo5_qd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pro128, mo6 )
+MACHINE_CONFIG_START(thomson_state::pro128)
+	mo6(config);
 	MCFG_DEVICE_REMOVE("mo6_cass_list")
 	MCFG_DEVICE_REMOVE("mo6_flop_list")
 
@@ -2304,7 +2321,7 @@ Here are the differences between the MO6 and MO5NR:
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( mo5nr, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::mo5nr)
 
 	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
 	AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE(to8_sys_lo_w )
@@ -2470,7 +2487,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
+MACHINE_CONFIG_START(thomson_state::mo5nr)
+	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5nr )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5nr )
 
@@ -2490,7 +2508,7 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_sys_cb2_out))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* differs from TO */
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>)) // differs from TO
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_game_porta_out))

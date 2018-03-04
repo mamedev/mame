@@ -35,7 +35,7 @@ Wiz-A-Tron or Little Professor. But the popularity of this product was much
 above expectations. TI continued to manufacture many products for this line.
 
     Speak & Spell (US), 1978
-    - MCU: TMC0271*, label TMC0271NL (die label unknown)
+    - MCU: TMC0271, label TMC0271NL DBS (die label 0271B T0270B)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB TMC0351NL
     - VSM(2/2): 16KB TMC0352NL
@@ -43,7 +43,7 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: keyboard has buttons instead of cheap membrane
 
     Speak & Spell (US), 1979
-    - MCU: TMC0271, label TMC0271H-N2L (die label 0271H T0270D)
+    - MCU: TMC0271, label TMC0271H-N2L FDS (die label 0271H T0270D)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB TMC0351N2L
     - VSM(2/2): 16KB TMC0352N2L
@@ -64,7 +64,7 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: no local name for the product, words are in English but very low difficulty
 
     Speak & Spell (UK), 1978
-    - MCU: TMC0271* (assume same as US 1978 version)
+    - MCU: TMC0271 (assume same as US 1978 version)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB CD2303
     - VSM(2/2): 16KB CD2304
@@ -139,9 +139,9 @@ Note that they are interchangeable, eg. you can use a French module on a US Spea
 
     French:
     - No.1: Les Mots de Base: VSM: 16KB CD2353 (1st release was called "Module No. 1 de Jacques Capelovici")
-    - No.2: Les Mots Difficilies: VSM: 16KB? CD62177*
+    - No.2: Les Mots Difficiles (aka Les Mots de Base): VSM: 16KB CD62177A
     - No.3: Les Animaux Familiers: VSM: 16KB? CD62047*
-    - No.4: Les Magasins De La Rue: VSM: 16KB CD62048
+    - No.4: Les Magasins de la Rue: VSM: 16KB CD62048
     - No.5: Les Extra-Terrestres: VSM: 16KB? CD62178*
 
     Italian:
@@ -191,9 +191,9 @@ Speak & Read modules:
     - Who's Who at the Zoo: VSM: 16KB CD2397
     - A Dog on a Log: VSM: 16KB CD3534(rev.A)
     - The Seal That Could Fly: VSM: 16KB CD3535
-    - A Ghost in the House: VSM: 16KB CD3536*
+    - A Ghost in the House: VSM: 16KB CD3536
     - On the Track: VSM: 16KB CD3538
-    - The Third Circle: VSM: 16KB CD3539*
+    - The Third Circle: VSM: 16KB CD3539
     - The Millionth Knight: VSM: 16KB CD3540
 
 
@@ -423,25 +423,43 @@ K28 modules:
 // The typical osc freq curve for TMS5100 is unknown. Let's assume it is set to the default frequency,
 // which is 640kHz for 8KHz according to the TMS5100 documentation.
 
-#define MASTER_CLOCK (XTAL_640kHz)
+#define MASTER_CLOCK 640_kHz_XTAL
 
 
 class tispeak_state : public hh_tms1k_state
 {
 public:
-	tispeak_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag),
+	tispeak_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
 		m_tms5100(*this, "tms5100"),
 		m_tms6100(*this, "tms6100"),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_ol_out(*this, "ol%u", 1U)
 	{ }
 
-	// devices
-	required_device<tms5110_device> m_tms5100;
-	required_device<tms6100_device> m_tms6100;
-	optional_device<generic_slot_device> m_cart;
-
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
+
+	DECLARE_DRIVER_INIT(snspell);
+	DECLARE_DRIVER_INIT(tntell);
+	DECLARE_DRIVER_INIT(lantutor);
+
+	// machine configs
+	void tms5110_route(machine_config &config);
+	void sns_tmc0281(machine_config &config);
+	void sns_tmc0281d(machine_config &config);
+	void sns_cd2801(machine_config &config);
+	void snspellit(machine_config &config);
+	void snspellsp(machine_config &config);
+	void snspellc(machine_config &config);
+	void snspellcuk(machine_config &config);
+	void snmath(machine_config &config);
+	void snread(machine_config &config);
+	void tntell(machine_config &config);
+	void vocaid(machine_config &config);
+	void lantutor(machine_config &config);
+	void k28m2(machine_config &config);
+
+protected:
 	virtual void power_off() override;
 	void prepare_display();
 	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
@@ -462,26 +480,35 @@ public:
 	DECLARE_WRITE16_MEMBER(k28_write_o);
 	DECLARE_WRITE16_MEMBER(k28_write_r);
 
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tispeak_cartridge);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
+
+	void init_cartridge();
+
+	virtual void machine_start() override;
+
+private:
+	// devices
+	required_device<tms5110_device> m_tms5100;
+	required_device<tms6100_device> m_tms6100;
+	optional_device<generic_slot_device> m_cart;
+
+	output_finder<5> m_ol_out;
+
 	// cartridge
 	u32 m_cart_max_size;
 	u8* m_cart_base;
-	void init_cartridge();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tispeak_cartridge);
-	DECLARE_DRIVER_INIT(snspell);
-	DECLARE_DRIVER_INIT(tntell);
-	DECLARE_DRIVER_INIT(lantutor);
 
 	u8 m_overlay;
-	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
-
-protected:
-	virtual void machine_start() override;
 };
 
 
 void tispeak_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
+
+	m_ol_out.resolve();
 
 	init_cartridge();
 }
@@ -584,7 +611,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_o)
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
 	// note: lantutor and snread VFD has an accent triangle instead of DP, and no AP
 	// E,D,C,G,B,A,I,M,L,K,N,J,[AP],H,F,[DP] (sidenote: TI KLMN = MAME MLNK)
-	m_plate = BITSWAP16(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
+	m_plate = bitswap<16>(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
 	prepare_display();
 }
 
@@ -601,7 +628,7 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 {
 	// reorder opla to led14seg, plus DP as d14 and CT as d15:
 	// [DP],D,C,H,F,B,I,M,L,K,N,J,[CT],E,G,A (sidenote: TI KLMN = MAME MLNK)
-	m_plate = BITSWAP16(data,12,0,10,7,8,9,11,6,3,14,4,13,1,2,5,15);
+	m_plate = bitswap<16>(data,12,0,10,7,8,9,11,6,3,14,4,13,1,2,5,15);
 	prepare_display();
 }
 
@@ -635,8 +662,7 @@ WRITE16_MEMBER(tispeak_state::snspellc_write_r)
 WRITE16_MEMBER(tispeak_state::snspellc_write_o)
 {
 	// O3210: TMS5100 CTL8124
-	m_o = BITSWAP8(data,7,6,5,4,3,0,1,2);
-	m_tms5100->ctl_w(space, 0, m_o & 0xf);
+	m_tms5100->ctl_w(space, 0, bitswap<4>(data,3,0,1,2));
 }
 
 READ8_MEMBER(tispeak_state::snspellc_read_k)
@@ -674,7 +700,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 		m_overlay = m_inp_matrix[10]->read();
 
 	for (int i = 0; i < 5; i++)
-		output().set_indexed_value("ol", i+1, m_overlay >> i & 1);
+		m_ol_out[i] = BIT(m_overlay, i);
 }
 
 
@@ -688,7 +714,7 @@ void tispeak_state::k28_prepare_display(u8 old, u8 data)
 WRITE16_MEMBER(tispeak_state::k28_write_r)
 {
 	// R1234: TMS5100 CTL8421
-	m_tms5100->ctl_w(space, 0, BITSWAP8(data,0,0,0,0,1,2,3,4) & 0xf);
+	m_tms5100->ctl_w(space, 0, bitswap<4>(data,1,2,3,4));
 
 	// R0: TMS5100 PDC pin
 	m_tms5100->pdc_w(data & 1);
@@ -1243,9 +1269,10 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tms5110_route )
+MACHINE_CONFIG_START(tispeak_state::tms5110_route)
 
 	/* sound hardware */
+	MCFG_DEVICE_MODIFY("tms5100")
 	MCFG_TMS5110_M0_CB(DEVWRITELINE("tms6100", tms6100_device, m0_w))
 	MCFG_TMS5110_M1_CB(DEVWRITELINE("tms6100", tms6100_device, m1_w))
 	MCFG_TMS5110_ADDR_CB(DEVWRITE8("tms6100", tms6100_device, add_w))
@@ -1254,7 +1281,7 @@ static MACHINE_CONFIG_START( tms5110_route )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( snmath )
+MACHINE_CONFIG_START(tispeak_state::snmath)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0270, MASTER_CLOCK/2)
@@ -1274,11 +1301,12 @@ static MACHINE_CONFIG_START( snmath )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5100", CD2801, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sns_cd2801, snmath )
+MACHINE_CONFIG_START(tispeak_state::sns_cd2801)
+	snmath(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1294,34 +1322,39 @@ static MACHINE_CONFIG_DERIVED( sns_cd2801, snmath )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snspell")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( snspellit, sns_cd2801 )
+MACHINE_CONFIG_START(tispeak_state::snspellit)
+	sns_cd2801(config);
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_snmath)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sns_tmc0281, sns_cd2801 )
+MACHINE_CONFIG_START(tispeak_state::sns_tmc0281)
+	sns_cd2801(config);
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("tms5100", TMC0281, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( snspellsp, sns_tmc0281 )
+MACHINE_CONFIG_START(tispeak_state::snspellsp)
+	sns_tmc0281(config);
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_snspellsp)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sns_tmc0281d, sns_cd2801 )
+MACHINE_CONFIG_START(tispeak_state::sns_tmc0281d)
+	sns_cd2801(config);
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("tms5100", TMC0281D, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( snread, snmath )
+MACHINE_CONFIG_START(tispeak_state::snread)
+	snmath(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1338,7 +1371,8 @@ static MACHINE_CONFIG_DERIVED( snread, snmath )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lantutor, snmath )
+MACHINE_CONFIG_START(tispeak_state::lantutor)
+	snmath(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1357,7 +1391,7 @@ static MACHINE_CONFIG_DERIVED( lantutor, snmath )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( snspellc )
+MACHINE_CONFIG_START(tispeak_state::snspellc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK/2)
@@ -1372,7 +1406,7 @@ static MACHINE_CONFIG_START( snspellc )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5100", TMC0281D, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "snspell")
@@ -1382,15 +1416,16 @@ static MACHINE_CONFIG_START( snspellc )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snspell")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( snspellcuk, snspellc )
+MACHINE_CONFIG_START(tispeak_state::snspellcuk)
+	snspellc(config);
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("tms5100", CD2801, MASTER_CLOCK) // CD2801A!
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vocaid )
+MACHINE_CONFIG_START(tispeak_state::vocaid)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK/2)
@@ -1407,10 +1442,11 @@ static MACHINE_CONFIG_START( vocaid )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5100", CD2802, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tntell, vocaid )
+MACHINE_CONFIG_START(tispeak_state::tntell)
+	vocaid(config);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tntell")
@@ -1421,7 +1457,7 @@ static MACHINE_CONFIG_DERIVED( tntell, vocaid )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( k28m2 )
+MACHINE_CONFIG_START(tispeak_state::k28m2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1400, MASTER_CLOCK/2)
@@ -1437,7 +1473,7 @@ static MACHINE_CONFIG_START( k28m2 )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5100", TMS5110A, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "k28m2")
@@ -1457,14 +1493,14 @@ MACHINE_CONFIG_END
 
 ROM_START( snspell )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tmc0271h-n2l", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
+	ROM_LOAD( "tmc0271h-n2l_fds", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271h_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
+	ROM_LOAD( "tms0270_t0270d_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "tmc0351n2l.vsm", 0x0000, 0x4000, CRC(2d03b292) SHA1(a3e9a365307ae936c7472f720a7a8240741531d6) )
@@ -1480,7 +1516,7 @@ ROM_START( snspellp )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271_output.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) ) // using the one from 1st version
+	ROM_LOAD( "tms0270_t0270b_output.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) ) // using the one from 1st version
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "tmc0351nl.vsm", 0x0000, 0x4000, CRC(beea3373) SHA1(8b0f7586d2f12c3d4a885fdb528cf23feffa1a3b) ) // using the one from 1st version
@@ -1489,14 +1525,14 @@ ROM_END
 
 ROM_START( snspellua )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tmc0271h-n2l", 0x0000, 0x1000, BAD_DUMP CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) ) // placeholder, use the one we have
+	ROM_LOAD( "tmc0271nl_dbs", 0x0000, 0x1000, CRC(c2a7b747) SHA1(05f3716cd3cc33b8dc897e75301efdd531932ec5) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271_output.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
+	ROM_LOAD( "tms0270_t0270b_output.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "tmc0351nl.vsm", 0x0000, 0x4000, CRC(beea3373) SHA1(8b0f7586d2f12c3d4a885fdb528cf23feffa1a3b) )
@@ -1505,14 +1541,14 @@ ROM_END
 
 ROM_START( snspellub )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tmc0271h-n2l", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
+	ROM_LOAD( "tmc0271h-n2l_fds", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271h_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
+	ROM_LOAD( "tms0270_t0270d_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // uses only 1 rom, 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "cd2350a.vsm", 0x0000, 0x4000, CRC(2adda742) SHA1(3f868ed8284b723c815a30343057e03467c043b5) )
@@ -1520,14 +1556,14 @@ ROM_END
 
 ROM_START( snspelluk )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tmc0271h-n2l", 0x0000, 0x1000, BAD_DUMP CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) ) // placeholder, use the one we have
+	ROM_LOAD( "tmc0271nl_dbs", 0x0000, 0x1000, CRC(c2a7b747) SHA1(05f3716cd3cc33b8dc897e75301efdd531932ec5) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271_output.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
+	ROM_LOAD( "tms0270_t0270b_output.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "cd2303.vsm", 0x0000, 0x4000, CRC(0fae755c) SHA1(b68c3120a63a61db474feb5d71a6e5dd67910d80) )
@@ -1536,14 +1572,14 @@ ROM_END
 
 ROM_START( snspelluka )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tmc0271h-n2l", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
+	ROM_LOAD( "tmc0271h-n2l_fds", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271h_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
+	ROM_LOAD( "tms0270_t0270d_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // uses only 1 rom, 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "cd62175.vsm", 0x0000, 0x4000, CRC(6e1063d4) SHA1(b5c66c51148c5921ecb8ffccd7a460ae639cdb68) )
@@ -1551,14 +1587,14 @@ ROM_END
 
 ROM_START( snspelljp )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tmc0271h-n2l", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
+	ROM_LOAD( "tmc0271h-n2l_fds", 0x0000, 0x1000, CRC(f83b5d2d) SHA1(10155b0b7f7f1583c7def8a693553cd35944ea6f) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271h_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
+	ROM_LOAD( "tms0270_t0270d_output.pla", 0, 1246, CRC(2478c595) SHA1(9a8ac690902731e1e01533279a1c9223011e1537) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "cd2321.vsm", 0x0000, 0x4000, CRC(ac010cce) SHA1(c0200d857b62be696248ac2d684a390c66ab0c31) )
@@ -1732,7 +1768,7 @@ ROM_START( lantutor )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common1_micro.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_tmc0271_output.pla", 0, 1246, BAD_DUMP CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) ) // taken from snspell, mostly looks correct
+	ROM_LOAD( "tms0270_t0270b_output.pla", 0, 1246, BAD_DUMP CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) ) // taken from snspell, mostly looks correct
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // cartridge area
 ROM_END
@@ -1824,8 +1860,8 @@ ROM_END
 COMP( 1979, snspell,    0,        0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1978, snspellp,   snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1980, snspellub,  snspell,  0, sns_tmc0281d, snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1978, snspellua,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // incomplete dump, using 1979 MCU ROM instead
-COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // "
+COMP( 1978, snspellua,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1981, snspelluka, snspell,  0, sns_cd2801,   snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1979, snspelljp,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1981, snspellsp,  snspell,  0, snspellsp,    snspellsp,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Spanish, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

@@ -109,6 +109,12 @@ public:
 	inline int vysnc_chain_counter_to_vpos( uint16_t counter );
 	void create_interrupt_timers(  );
 	void start_interrupt_timers(  );
+	void enigma2(machine_config &config);
+	void enigma2a(machine_config &config);
+	void engima2_audio_cpu_map(address_map &map);
+	void engima2_main_cpu_map(address_map &map);
+	void engima2a_main_cpu_io_map(address_map &map);
+	void engima2a_main_cpu_map(address_map &map);
 };
 
 
@@ -359,7 +365,7 @@ READ8_MEMBER(enigma2_state::dip_switch_r)
 {
 	uint8_t ret = 0x00;
 
-	if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, space.device().safe_pc(), m_protection_data);
+	if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, m_maincpu->pc(), m_protection_data);
 	switch (offset)
 	{
 	case 0x01:
@@ -372,7 +378,7 @@ READ8_MEMBER(enigma2_state::dip_switch_r)
 		break;
 
 	case 0x02:
-		if (space.device().safe_pc() == 0x07e5)
+		if (m_maincpu->pc() == 0x07e5)
 			ret = 0xaa;
 		else
 			ret = 0xf4;
@@ -401,7 +407,7 @@ WRITE8_MEMBER(enigma2_state::sound_data_w)
 
 READ8_MEMBER(enigma2_state::sound_latch_r)
 {
-	return BITSWAP8(m_sound_latch,0,1,2,3,4,5,6,7);
+	return bitswap<8>(m_sound_latch,0,1,2,3,4,5,6,7);
 }
 
 
@@ -432,7 +438,7 @@ CUSTOM_INPUT_MEMBER(enigma2_state::p2_controls_r)
 		return ioport("P1CONTROLS")->read();
 }
 
-static ADDRESS_MAP_START( engima2_main_cpu_map, AS_PROGRAM, 8, enigma2_state )
+ADDRESS_MAP_START(enigma2_state::engima2_main_cpu_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_SHARE("videoram")
@@ -448,7 +454,7 @@ static ADDRESS_MAP_START( engima2_main_cpu_map, AS_PROGRAM, 8, enigma2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( engima2a_main_cpu_map, AS_PROGRAM, 8, enigma2_state )
+ADDRESS_MAP_START(enigma2_state::engima2a_main_cpu_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x4fff) AM_ROM AM_WRITENOP
@@ -457,7 +463,7 @@ static ADDRESS_MAP_START( engima2a_main_cpu_map, AS_PROGRAM, 8, enigma2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( engima2a_main_cpu_io_map, AS_IO, 8, enigma2_state )
+ADDRESS_MAP_START(enigma2_state::engima2a_main_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_NOP
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITENOP
@@ -469,7 +475,7 @@ static ADDRESS_MAP_START( engima2a_main_cpu_io_map, AS_IO, 8, enigma2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( engima2_audio_cpu_map, AS_PROGRAM, 8, enigma2_state )
+ADDRESS_MAP_START(enigma2_state::engima2_audio_cpu_map)
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM AM_WRITENOP
 	AM_RANGE(0x2000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM
@@ -589,7 +595,7 @@ static INPUT_PORTS_START( enigma2a )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( enigma2 )
+MACHINE_CONFIG_START(enigma2_state::enigma2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -617,7 +623,7 @@ static MACHINE_CONFIG_START( enigma2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( enigma2a )
+MACHINE_CONFIG_START(enigma2_state::enigma2a)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, CPU_CLOCK)
@@ -700,7 +706,7 @@ DRIVER_INIT_MEMBER(enigma2_state,enigma2)
 
 	for(i = 0; i < 0x2000; i++)
 	{
-		rom[i] = BITSWAP8(rom[i],4,5,6,0,7,1,3,2);
+		rom[i] = bitswap<8>(rom[i],4,5,6,0,7,1,3,2);
 	}
 }
 

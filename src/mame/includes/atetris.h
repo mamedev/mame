@@ -51,4 +51,10 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_gen);
 	void reset_bank();
+	void atetrisb2(machine_config &config);
+	void atetrisb3(machine_config &config);
+	void atetris(machine_config &config);
+	void atetrisb2_map(address_map &map);
+	void atetrisb3_map(address_map &map);
+	void main_map(address_map &map);
 };

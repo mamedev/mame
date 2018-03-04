@@ -92,7 +92,7 @@ Notes:
 
 WRITE8_MEMBER(hexion_state::coincntr_w)
 {
-//logerror("%04x: coincntr_w %02x\n",space.device().safe_pc(),data);
+//logerror("%04x: coincntr_w %02x\n",m_maincpu->pc(),data);
 
 	/* bits 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
@@ -115,7 +115,13 @@ WRITE_LINE_MEMBER(hexion_state::nmi_ack_w)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
+WRITE8_MEMBER(hexion_state::ccu_int_time_w)
+{
+	logerror("ccu_int_time rewritten with value of %02x\n", data);
+	m_ccu_int_time = data;
+}
+
+ADDRESS_MAP_START(hexion_state::hexion_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
@@ -141,7 +147,7 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0xf540, 0xf540) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hexionb_map, AS_PROGRAM, 8, hexion_state )
+ADDRESS_MAP_START(hexion_state::hexionb_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
@@ -232,24 +238,34 @@ TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::scanline)
 {
 	int scanline = param;
 
+	// z80 /IRQ is connected to the IRQ1(vblank) pin of k053252 CCU
 	if(scanline == 256)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-	else if ((scanline == 85) || (scanline == 170)) //TODO
+
+	// z80 /NMI is connected to the IRQ2 pin of k053252 CCU
+	// the following code is emulating INT_TIME of the k053252, this code will go away
+	// when the new konami branch is merged.
+	m_ccu_int_time_count--;
+	if (m_ccu_int_time_count <= 0)
+	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_ccu_int_time_count = m_ccu_int_time;
+	}
 }
 
 
-static MACHINE_CONFIG_START( hexion )
+MACHINE_CONFIG_START(hexion_state::hexion)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
 	MCFG_CPU_PROGRAM_MAP(hexion_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, scanline, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_24MHz/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL(24'000'000)/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
 	MCFG_K053252_INT1_ACK_CB(WRITELINE(hexion_state, irq_ack_w))
 	MCFG_K053252_INT2_ACK_CB(WRITELINE(hexion_state, nmi_ack_w))
+	MCFG_K053252_INT_TIME_CB(WRITE8(hexion_state, ccu_int_time_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -269,17 +285,18 @@ static MACHINE_CONFIG_START( hexion )
 	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) /* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_K051649_ADD("k051649", XTAL_24MHz/16) /* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
+	MCFG_K051649_ADD("k051649", XTAL(24'000'000)/16) /* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hexionb, hexion )
+MACHINE_CONFIG_START(hexion_state::hexionb)
+	hexion(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hexionb_map)
 
 	MCFG_DEVICE_REMOVE("k051649")
 
-	MCFG_OKIM6295_ADD("oki2", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", 1056000, PIN7_LOW) // clock frequency & pin 7 not verified; this clock and pin 7 being low makes the pitch match the non-bootleg version, so is probably correct
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 

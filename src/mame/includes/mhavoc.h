@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "machine/timer.h"
+
 #define MHAVOC_CLOCK        10000000
 #define MHAVOC_CLOCK_5M     (MHAVOC_CLOCK/2)
 #define MHAVOC_CLOCK_2_5M   (MHAVOC_CLOCK/4)
@@ -72,4 +74,10 @@ public:
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(delayed_gamma_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mhavoc_cpu_irq_clock);
+	void alphaone(machine_config &config);
+	void mhavoc(machine_config &config);
+	void mhavocrv(machine_config &config);
+	void alpha_map(address_map &map);
+	void alphaone_map(address_map &map);
+	void gamma_map(address_map &map);
 };

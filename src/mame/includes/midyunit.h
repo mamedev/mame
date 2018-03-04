@@ -10,7 +10,7 @@
 #include "audio/williams.h"
 
 #include "cpu/tms34010/tms34010.h"
-#include "machine/gen_latch.h"
+#include "machine/adc0844.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
@@ -54,6 +54,7 @@ public:
 		, m_cvsd_sound(*this, "cvsd")
 		, m_adpcm_sound(*this, "adpcm")
 		, m_soundlatch(*this, "soundlatch")
+		, m_term2_adc(*this, "adc")
 		, m_generic_paletteram_16(*this, "paletteram")
 		, m_gfx_rom(*this, "gfx_rom", 16)
 		, m_mainram(*this, "mainram")
@@ -70,6 +71,7 @@ public:
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
 	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<adc0844_device> m_term2_adc;
 
 	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 	optional_shared_ptr<uint8_t> m_gfx_rom;
@@ -81,7 +83,6 @@ public:
 	uint16_t m_prot_result;
 	uint16_t m_prot_sequence[3];
 	uint8_t m_prot_index;
-	uint8_t m_term2_analog_select;
 	const struct protection_data *m_prot_data;
 	uint8_t m_cmos_w_enable;
 	uint8_t m_chip_type;
@@ -148,6 +149,17 @@ public:
 	TIMER_CALLBACK_MEMBER(dma_callback);
 	TIMER_CALLBACK_MEMBER(autoerase_line);
 
+	void term2(machine_config &config);
+	void yunit_cvsd_4bit_fast(machine_config &config);
+	void yunit_adpcm_6bit_fast(machine_config &config);
+	void yunit_cvsd_6bit_slow(machine_config &config);
+	void yunit_cvsd_4bit_slow(machine_config &config);
+	void mkyawdim(machine_config &config);
+	void yunit_core(machine_config &config);
+	void zunit(machine_config &config);
+	void yunit_adpcm_6bit_faster(machine_config &config);
+	void main_map(address_map &map);
+	void yawdim_sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void dma_draw(uint16_t command);

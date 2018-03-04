@@ -99,16 +99,9 @@ public:
 		m_videoram(*this, "videoram")
 	{ }
 
-	// devices/pointers
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<alpha_8201_device> m_alpha_8201;
+	void shougi(machine_config &config);
 
-	required_shared_ptr<uint8_t> m_videoram;
-
-	uint8_t m_nmi_enabled;
-	int m_r;
-
+protected:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(semaphore_r);
 
@@ -118,6 +111,20 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
 	virtual void machine_start() override;
+	void main_map(address_map &map);
+	void readport_sub(address_map &map);
+	void sub_map(address_map &map);
+
+private:
+	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<alpha_8201_device> m_alpha_8201;
+
+	required_shared_ptr<uint8_t> m_videoram;
+
+	uint8_t m_nmi_enabled;
+	int m_r;
 };
 
 
@@ -240,7 +247,7 @@ WRITE_LINE_MEMBER(shougi_state::nmi_enable_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, shougi_state )
+ADDRESS_MAP_START(shougi_state::main_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM /* 2114 x 2 (0x400 x 4bit each) */
 	AM_RANGE(0x4800, 0x480f) AM_DEVWRITE("mainlatch", ls259_device, write_a3)
@@ -266,12 +273,12 @@ READ8_MEMBER(shougi_state::semaphore_r)
 }
 
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, shougi_state )
+ADDRESS_MAP_START(shougi_state::sub_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("sharedram") /* 2114 x 2 (0x400 x 4bit each) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport_sub, AS_IO, 8, shougi_state )
+ADDRESS_MAP_START(shougi_state::readport_sub)
 	ADDRESS_MAP_GLOBAL_MASK(0x00ff)
 	AM_RANGE(0x00, 0x00) AM_READ(semaphore_r)
 ADDRESS_MAP_END
@@ -360,18 +367,18 @@ INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
 }
 
 
-static MACHINE_CONFIG_START( shougi )
+MACHINE_CONFIG_START(shougi_state::shougi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shougi_state, vblank_nmi)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_10MHz/4)
+	MCFG_CPU_ADD("sub", Z80, XTAL(10'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(readport_sub)
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_10MHz/4/8)
+	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(10'000'000)/4/8)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // 0: sharedram = sub, 1: sharedram = main (TODO!)
@@ -401,7 +408,7 @@ static MACHINE_CONFIG_START( shougi )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_10MHz/8)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(10'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

@@ -34,13 +34,13 @@
 ///*************************************************************************
 
 #define MCFG_COM8116_FX4_HANDLER(_devcb) \
-	devcb = &com8116_device::set_fx4_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<com8116_device &>(*device).set_fx4_handler(DEVCB_##_devcb);
 
 #define MCFG_COM8116_FR_HANDLER(_devcb) \
-	devcb = &com8116_device::set_fr_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<com8116_device &>(*device).set_fr_handler(DEVCB_##_devcb);
 
 #define MCFG_COM8116_FT_HANDLER(_devcb) \
-	devcb = &com8116_device::set_ft_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<com8116_device &>(*device).set_ft_handler(DEVCB_##_devcb);
 
 
 ///*************************************************************************
@@ -55,9 +55,9 @@ public:
 	// construction/destruction
 	com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_fx4_handler(device_t &device, Object &&cb) { return downcast<com8116_device &>(device).m_fx4_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_fr_handler(device_t &device, Object &&cb) { return downcast<com8116_device &>(device).m_fr_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ft_handler(device_t &device, Object &&cb) { return downcast<com8116_device &>(device).m_ft_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_fx4_handler(Object &&cb) { return m_fx4_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_fr_handler(Object &&cb) { return m_fr_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ft_handler(Object &&cb) { return m_ft_handler.set_callback(std::forward<Object>(cb)); }
 
 	void str_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER( str_w );
@@ -65,15 +65,17 @@ public:
 	DECLARE_WRITE8_MEMBER( stt_w );
 
 protected:
-	static const int divisors_16X_5_0688MHz[];
-	static const int divisors_16X_6_01835MHz[];
-	static const int divisors_16X_4_9152MHz[];
-	static const int divisors_32X_5_0688MHz[];
-	static const int divisors_16X_2_7648MHz[];
-	static const int divisors_16X_5_0688MHz_030[];
-	static const int divisors_16X_4_6080MHz[];
-	static const int divisors_16X_4_9152MHz_SY2661_1[];
-	static const int divisors_16X_4_9152MHz_SY2661_2[];
+	com8116_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const int *divisors);
+
+	static const int divisors_16X_5_0688MHz[16];
+	static const int divisors_16X_6_01835MHz[16];
+	static const int divisors_16X_4_9152MHz[16];
+	static const int divisors_32X_5_0688MHz[16];
+	static const int divisors_16X_2_7648MHz[16];
+	static const int divisors_16X_5_0688MHz_030[16];
+	static const int divisors_16X_4_6080MHz[16];
+	static const int divisors_16X_4_9152MHz_SY2661_1[16];
+	static const int divisors_16X_4_9152MHz_SY2661_2[16];
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -96,8 +98,7 @@ private:
 	int m_fr;
 	int m_ft;
 
-	const int *m_fr_divisors;
-	const int *m_ft_divisors;
+	const int *const m_divisors;
 
 	// timers
 	emu_timer *m_fx4_timer;
@@ -106,7 +107,40 @@ private:
 };
 
 
+// ======================> com8116_003_device
+
+class com8116_003_device : public com8116_device
+{
+public:
+	// construction/destruction
+	com8116_003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// ======================> com5016_5_device
+
+class com5016_5_device : public com8116_device
+{
+public:
+	// construction/destruction
+	com5016_5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// ======================> com5016_013_device
+
+class com5016_013_device : public com8116_device
+{
+public:
+	// construction/destruction
+	com5016_013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(COM8116, com8116_device)
+DECLARE_DEVICE_TYPE(COM8116_003, com8116_003_device)
+DECLARE_DEVICE_TYPE(COM5016_5, com5016_5_device)
+DECLARE_DEVICE_TYPE(COM5016_013, com5016_013_device)
 
 #endif // MAME_MACHINE_COM8116_H

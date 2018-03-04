@@ -23,11 +23,6 @@ DECLARE_DEVICE_TYPE(VME_FCCPU21YB, vme_fccpu21yb_card_device)
 //**************************************************************************
 class vme_fccpu20_device :  public device_t, public device_vme_card_interface
 {
-public:
-	// Below are duplicated declarations from src/mame/drivers/fccpu20.cpp
-	DECLARE_READ32_MEMBER (bootvect_r);
-	DECLARE_WRITE32_MEMBER (bootvect_w);
-
 protected:
 	// PIT port C Board ID bits
 	static constexpr unsigned CPU20 = 0x40;
@@ -66,6 +61,12 @@ private:
 	DECLARE_READ8_MEMBER (pita_r);
 	DECLARE_READ8_MEMBER (pitb_r);
 	DECLARE_READ8_MEMBER (pitc_r);
+
+	// Below are duplicated declarations from src/mame/drivers/fccpu20.cpp
+	DECLARE_READ32_MEMBER (bootvect_r);
+	DECLARE_WRITE32_MEMBER (bootvect_w);
+
+	void cpu20_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit68230_device> m_pit;

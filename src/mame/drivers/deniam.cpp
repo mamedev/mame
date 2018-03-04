@@ -73,7 +73,7 @@ WRITE16_MEMBER(deniam_state::deniam_irq_ack_w)
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( deniam16b_map, AS_PROGRAM, 16, deniam_state )
+ADDRESS_MAP_START(deniam_state::deniam16b_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_SHARE("textram")
@@ -90,12 +90,12 @@ static ADDRESS_MAP_START( deniam16b_map, AS_PROGRAM, 16, deniam_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, deniam_state )
+ADDRESS_MAP_START(deniam_state::sound_map)
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, deniam_state )
+ADDRESS_MAP_START(deniam_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ymsnd", ym3812_device, write)
@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, deniam_state )
 ADDRESS_MAP_END
 
 /* identical to 16b, but handles sound directly */
-static ADDRESS_MAP_START( deniam16c_map, AS_PROGRAM, 16, deniam_state )
+ADDRESS_MAP_START(deniam_state::deniam16c_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_SHARE("textram")
@@ -246,14 +246,14 @@ void deniam_state::machine_reset()
 	m_oki->set_rom_bank(0);
 }
 
-static MACHINE_CONFIG_START( deniam16b )
+MACHINE_CONFIG_START(deniam_state::deniam16b)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)    /* 12.5Mhz verified */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
 	MCFG_CPU_PROGRAM_MAP(deniam16b_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_25MHz/4)  /* 6.25Mhz verified */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(25'000'000)/4)  /* 6.25Mhz verified */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
@@ -278,18 +278,18 @@ static MACHINE_CONFIG_START( deniam16b )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_25MHz/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_25MHz/24, PIN7_HIGH) /* 1.041620 measured, = 1.0416666Mhz verified */
+	MCFG_OKIM6295_ADD("oki", XTAL(25'000'000)/24, PIN7_HIGH) /* 1.041620 measured, = 1.0416666Mhz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( deniam16c )
+MACHINE_CONFIG_START(deniam_state::deniam16c)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)    /* 12.5Mhz verified */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
 	MCFG_CPU_PROGRAM_MAP(deniam16c_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
 
@@ -311,10 +311,10 @@ static MACHINE_CONFIG_START( deniam16c )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_25MHz/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_25MHz/24, PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */
+	MCFG_OKIM6295_ADD("oki", XTAL(25'000'000)/24, PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

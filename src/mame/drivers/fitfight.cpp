@@ -96,7 +96,7 @@ Stephh's notes :
 READ16_MEMBER( fitfight_state::hotmindff_unk_r )
 {
 	// won't boot unless things in here change, this is p1/p2 inputs in fitfight
-	return space.machine().rand();
+	return machine().rand();
 }
 
 READ16_MEMBER(fitfight_state::fitfight_700000_r)
@@ -130,7 +130,7 @@ WRITE16_MEMBER(fitfight_state::fitfight_700000_w)
 		m_fof_700000_data = data;
 }
 
-static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
+ADDRESS_MAP_START(fitfight_state::fitfight_main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_SHARE("fof_100000")
@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0xb14000, 0xb17fff) AM_RAM //used by histryma @0x0000b25a,b270
 	AM_RANGE(0xb18000, 0xb1bfff) AM_RAM //used by histryma @0x0000b25a,b270,b286
 
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_SHARE("spriteram")
 
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM // hot mind uses RAM here (mirror?)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bbprot_main_map, AS_PROGRAM, 16, fitfight_state )
+ADDRESS_MAP_START(fitfight_state::bbprot_main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_SHARE("fof_100000")
@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( bbprot_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE(fof_txt_tileram_w) AM_SHARE("fof_txt_tileram")
 
 	AM_RANGE(0xc00000, 0xc00fff) AM_READONLY
-	AM_RANGE(0xc00000, 0xc03fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_SHARE("spriteram")
 
@@ -217,7 +217,7 @@ ADDRESS_MAP_END
 
 /* 7810 (?) sound cpu */
 
-static ADDRESS_MAP_START( snd_mem, AS_PROGRAM, 8, fitfight_state )
+ADDRESS_MAP_START(fitfight_state::snd_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")    /* ??? External ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -225,40 +225,40 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(fitfight_state::snd_porta_r)
 {
-	//osd_printf_debug("PA R @%x\n",space.device().safe_pc());
+	//logerror("PA R %s\n",machine().describe_context());
 	return machine().rand();
 }
 
 READ8_MEMBER(fitfight_state::snd_portb_r)
 {
-	//osd_printf_debug("PB R @%x\n",space.device().safe_pc());
+	//logerror("PB R %s\n",machine().describe_context());
 	return machine().rand();
 }
 
 READ8_MEMBER(fitfight_state::snd_portc_r)
 {
-	//osd_printf_debug("PC R @%x\n",space.device().safe_pc());
+	//logerror("PC R %s\n",machine().describe_context());
 	return machine().rand();
 }
 
 WRITE8_MEMBER(fitfight_state::snd_porta_w)
 {
-	//osd_printf_debug("PA W %x @%x\n",data,space.device().safe_pc());
+	//logerror("PA W %x %s\n",data,machine().describe_context());
 }
 
 WRITE8_MEMBER(fitfight_state::snd_portb_w)
 {
-	//osd_printf_debug("PB W %x @%x\n",data,space.device().safe_pc());
+	//logerror("PB W %x %s\n",data,machine().describe_context());
 }
 
 WRITE8_MEMBER(fitfight_state::snd_portc_w)
 {
-	//osd_printf_debug("PC W %x @%x\n",data,space.device().safe_pc());
+	//logerror("PC W %x %s\n",data,machine().describe_context());
 }
 
 INTERRUPT_GEN_MEMBER(fitfight_state::snd_irq)
 {
-	generic_pulse_irq_line(device.execute(), UPD7810_INTF2, 1);
+	device.execute().pulse_input_line(UPD7810_INTF2, device.execute().minimum_quantum_time());
 }
 
 
@@ -722,7 +722,7 @@ void fitfight_state::machine_reset()
 	m_fof_700000_data = 0;
 }
 
-static MACHINE_CONFIG_START( fitfight )
+MACHINE_CONFIG_START(fitfight_state::fitfight)
 
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(fitfight_main_map)
@@ -758,7 +758,7 @@ static MACHINE_CONFIG_START( fitfight )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bbprot )
+MACHINE_CONFIG_START(fitfight_state::bbprot)
 
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(bbprot_main_map)

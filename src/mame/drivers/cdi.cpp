@@ -43,8 +43,8 @@ TODO:
 
 #include "cdi.lh"
 
-#define CLOCK_A XTAL_30MHz
-#define CLOCK_B XTAL_19_6608MHz
+#define CLOCK_A XTAL(30'000'000)
+#define CLOCK_B XTAL(19'660'800)
 
 #if ENABLE_VERBOSE_LOG
 static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
@@ -67,13 +67,13 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, co
 *      Memory maps       *
 *************************/
 
-static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16, cdi_state )
+ADDRESS_MAP_START(cdi_state::cdimono1_mem)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
 	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_SHARE("planeb")
+	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
 #if ENABLE_UART_PRINTING
 	AM_RANGE(0x00301400, 0x00301403) AM_DEVREAD("scc68070", cdi68070_device, uart_loopback_enable)
 #endif
-	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
 	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)
 	AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave_hle", cdislave_device, slave_r, slave_w)
 	AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
@@ -81,12 +81,12 @@ static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16, cdi_state )
 	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x004fffe0, 0x004fffff) AM_DEVREADWRITE("mcd212", mcd212_device, regs_r, regs_w)
 	AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
-	AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
+	AM_RANGE(0x00580000, 0x00ffffff) AM_NOP
 	AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
 	AM_RANGE(0x80000000, 0x8000807f) AM_DEVREADWRITE("scc68070", cdi68070_device, periphs_r, periphs_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cdimono2_mem, AS_PROGRAM, 16, cdi_state )
+ADDRESS_MAP_START(cdi_state::cdimono2_mem)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
 	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_SHARE("planeb")
 #if ENABLE_UART_PRINTING
@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( cdimono2_mem, AS_PROGRAM, 16, cdi_state )
 	AM_RANGE(0x80000000, 0x8000807f) AM_DEVREADWRITE("scc68070", cdi68070_device, periphs_r, periphs_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cdi910_mem, AS_PROGRAM, 16, cdi_state )
+ADDRESS_MAP_START(cdi_state::cdi910_mem)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
 	AM_RANGE(0x00180000, 0x001fffff) AM_ROM AM_REGION("maincpu", 0) // boot vectors point here
 
@@ -126,13 +126,13 @@ static ADDRESS_MAP_START( cdi910_mem, AS_PROGRAM, 16, cdi_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cdimono2_servo_mem, AS_PROGRAM, 8, cdi_state )
+ADDRESS_MAP_START(cdi_state::cdimono2_servo_mem)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(servo_io_r, servo_io_w)
 	AM_RANGE(0x0050, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x1fff) AM_ROM AM_REGION("servo", 0x100)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cdimono2_slave_mem, AS_PROGRAM, 8, cdi_state )
+ADDRESS_MAP_START(cdi_state::cdimono2_slave_mem)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(slave_io_r, slave_io_w)
 	AM_RANGE(0x0050, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x1fff) AM_ROM AM_REGION("slave", 0x100)
@@ -370,7 +370,7 @@ MACHINE_RESET_MEMBER( cdi_state, quizard4 )
 
 READ8_MEMBER( cdi_state::servo_io_r )
 {
-	if (space.machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		return 0;
 	}
@@ -570,7 +570,7 @@ WRITE8_MEMBER( cdi_state::servo_io_w )
 
 READ8_MEMBER( cdi_state::slave_io_r )
 {
-	if (space.machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		return 0;
 	}
@@ -770,7 +770,7 @@ WRITE8_MEMBER( cdi_state::slave_io_w )
 *************************/
 
 // CD-i Mono-I system base
-static MACHINE_CONFIG_START( cdimono1_base )
+MACHINE_CONFIG_START(cdi_state::cdimono1_base)
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
 
@@ -816,7 +816,7 @@ static MACHINE_CONFIG_START( cdimono1_base )
 MACHINE_CONFIG_END
 
 // CD-i model 220 (Mono-II, NTSC)
-static MACHINE_CONFIG_START( cdimono2 )
+MACHINE_CONFIG_START(cdi_state::cdimono2)
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_CPU_PROGRAM_MAP(cdimono2_mem)
 
@@ -870,7 +870,7 @@ static MACHINE_CONFIG_START( cdimono2 )
 	MCFG_MK48T08_ADD( "mk48t08" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cdi910 )
+MACHINE_CONFIG_START(cdi_state::cdi910)
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_CPU_PROGRAM_MAP(cdi910_mem)
 
@@ -925,7 +925,8 @@ static MACHINE_CONFIG_START( cdi910 )
 MACHINE_CONFIG_END
 
 // CD-i Mono-I, with CD-ROM image device (MESS) and Software List (MESS)
-static MACHINE_CONFIG_DERIVED( cdimono1, cdimono1_base )
+MACHINE_CONFIG_START(cdi_state::cdimono1)
+	cdimono1_base(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdimono1)
 
 	MCFG_CDROM_ADD( "cdrom" )
@@ -934,7 +935,8 @@ static MACHINE_CONFIG_DERIVED( cdimono1, cdimono1_base )
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizard, cdimono1_base )
+MACHINE_CONFIG_START(cdi_state::quizard)
+	cdimono1_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cdi_state, mcu_frame)
@@ -946,33 +948,32 @@ READ8_MEMBER( cdi_state::quizard_mcu_p1_r )
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, cdi_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(quizard_mcu_p1_r)
-ADDRESS_MAP_END
-
-static MACHINE_CONFIG_DERIVED( quizard1, quizard )
+MACHINE_CONFIG_START(cdi_state::quizard1)
+	quizard(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1 )
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(cdi_state, quizard_mcu_p1_r))
 //  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizard2, quizard )
+MACHINE_CONFIG_START(cdi_state::quizard2)
+	quizard(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard2 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizard3, quizard )
+MACHINE_CONFIG_START(cdi_state::quizard3)
+	quizard(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard3 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizard4, quizard )
+MACHINE_CONFIG_START(cdi_state::quizard4)
+	quizard(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4 )
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(cdi_state, quizard_mcu_p1_r))
 //  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
 
 MACHINE_CONFIG_END
@@ -1200,8 +1201,8 @@ ROM_START( quizard3 ) /* CD-ROM printed ??/?? */
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard34", 0, BAD_DUMP SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard3_d8751.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION(0x1000, "mcu", 0) // d8751h
+	ROM_LOAD( "DE132D3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // confirmed good on original hardware
 ROM_END
 
 ROM_START( quizard3_32 )
@@ -1217,8 +1218,8 @@ ROM_START( quizard3_32 )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard32", 0, BAD_DUMP SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard3_d8751.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION(0x1000, "mcu", 0) // d8751h
+	ROM_LOAD( "DE132D3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // confirmed good on original hardware
 ROM_END
 
 

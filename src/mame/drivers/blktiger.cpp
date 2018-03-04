@@ -74,18 +74,18 @@ WRITE8_MEMBER(blktiger_state::blktiger_coinlockout_w)
 }
 
 
-static ADDRESS_MAP_START( blktiger_map, AS_PROGRAM, 8, blktiger_state )
+ADDRESS_MAP_START(blktiger_state::blktiger_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(blktiger_bgvideoram_r, blktiger_bgvideoram_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(blktiger_txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blktiger_io_map, AS_IO, 8, blktiger_state )
+ADDRESS_MAP_START(blktiger_state::blktiger_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(blktiger_bankswitch_w)
@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( blktiger_io_map, AS_IO, 8, blktiger_state )
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(blktiger_screen_layout_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blktigerbl_io_map, AS_IO, 8, blktiger_state )
+ADDRESS_MAP_START(blktiger_state::blktigerbl_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(blktiger_bankswitch_w)
@@ -119,21 +119,12 @@ static ADDRESS_MAP_START( blktigerbl_io_map, AS_IO, 8, blktiger_state )
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(blktiger_screen_layout_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blktiger_sound_map, AS_PROGRAM, 8, blktiger_state )
+ADDRESS_MAP_START(blktiger_state::blktiger_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xe002, 0xe003) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( blktiger_mcu_map, AS_PROGRAM, 8, blktiger_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( blktiger_mcu_io_map, AS_IO, 8, blktiger_state )
-	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0) AM_READWRITE(blktiger_from_main_r,blktiger_to_main_w)
-	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P3) AM_WRITENOP   /* other ports unknown */
 ADDRESS_MAP_END
 
 
@@ -295,20 +286,21 @@ void blktiger_state::machine_reset()
 	m_i8751_latch = 0;
 }
 
-static MACHINE_CONFIG_START( blktiger )
+MACHINE_CONFIG_START(blktiger_state::blktiger)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)  /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(blktiger_map)
 	MCFG_CPU_IO_MAP(blktiger_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(blktiger_sound_map)
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_24MHz/4) /* ??? */
-	MCFG_CPU_PROGRAM_MAP(blktiger_mcu_map)
-	MCFG_CPU_IO_MAP(blktiger_mcu_io_map)
+	MCFG_CPU_ADD("mcu", I8751, XTAL(24'000'000)/4) /* ??? */
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(blktiger_state, blktiger_from_main_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(blktiger_state, blktiger_to_main_w))
+	// other ports unknown
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -335,15 +327,16 @@ static MACHINE_CONFIG_START( blktiger )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( blktigerbl, blktiger )
+MACHINE_CONFIG_START(blktiger_state::blktigerbl)
+	blktiger(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(blktigerbl_io_map)
 
@@ -608,7 +601,7 @@ DRIVER_INIT_MEMBER(blktiger_state,blktigerb3)
 	{
 		int addr;
 
-		addr = BITSWAP16(i, 15,14,13,12,11,10,9,8, 3,4,5,6, 7,2,1,0);
+		addr = bitswap<16>(i, 15,14,13,12,11,10,9,8, 3,4,5,6, 7,2,1,0);
 		buffer[i] = src[addr];
 
 	}

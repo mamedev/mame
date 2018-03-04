@@ -479,32 +479,29 @@ TGP_FUNCTION( model1_state::matrix_rotz )
 
 TGP_FUNCTION( model1_state::track_read_quad )
 {
-	const uint32_t *tgp_data = (const uint32_t *)memregion("user2")->base();
 	uint32_t a = fifoin_pop();
 	int offd;
 
 	logerror("TGP track_read_quad %d (%x)\n", a, m_pushpc);
 
-	offd = tgp_data[0x20+m_tgp_vr_select] + 16*a;
-	fifoout_push(tgp_data[offd]);
-	fifoout_push(tgp_data[offd+1]);
-	fifoout_push(tgp_data[offd+2]);
-	fifoout_push(tgp_data[offd+3]);
-	fifoout_push(tgp_data[offd+4]);
-	fifoout_push(tgp_data[offd+5]);
-	fifoout_push(tgp_data[offd+6]);
-	fifoout_push(tgp_data[offd+7]);
-	fifoout_push(tgp_data[offd+8]);
-	fifoout_push(tgp_data[offd+9]);
-	fifoout_push(tgp_data[offd+10]);
-	fifoout_push(tgp_data[offd+11]);
+	offd = m_tgp_data[0x20+m_tgp_vr_select] + 16*a;
+	fifoout_push(m_tgp_data[offd]);
+	fifoout_push(m_tgp_data[offd+1]);
+	fifoout_push(m_tgp_data[offd+2]);
+	fifoout_push(m_tgp_data[offd+3]);
+	fifoout_push(m_tgp_data[offd+4]);
+	fifoout_push(m_tgp_data[offd+5]);
+	fifoout_push(m_tgp_data[offd+6]);
+	fifoout_push(m_tgp_data[offd+7]);
+	fifoout_push(m_tgp_data[offd+8]);
+	fifoout_push(m_tgp_data[offd+9]);
+	fifoout_push(m_tgp_data[offd+10]);
+	fifoout_push(m_tgp_data[offd+11]);
 	next_fn();
 }
 
 TGP_FUNCTION( model1_state::intercept )
 {
-	const uint32_t *tgp_data = (const uint32_t *)memregion("user2")->base();
-
 	float x1 = fifoin_pop_f();
 	float y1 = fifoin_pop_f();
 	float z1 = fifoin_pop_f();
@@ -519,19 +516,19 @@ TGP_FUNCTION( model1_state::intercept )
 	float dy = y2-y1;
 	float dz = z2-z1;
 
-	idx = tgp_data[0x10] + 2*idx;
-	uint32_t count = tgp_data[idx];
-	uint32_t adr = tgp_data[idx+1];
+	idx = m_tgp_data[0x10] + 2*idx;
+	uint32_t count = m_tgp_data[idx];
+	uint32_t adr = m_tgp_data[idx+1];
 	uint32_t ret = 1;
 
 	for(unsigned int j=0; j<count; j++) {
 		float point[4][3];
 		for(int pt=0; pt<4; pt++)
 			for(int dim=0; dim<3; dim++)
-				point[pt][dim] = u2f(tgp_data[adr++]);
+				point[pt][dim] = u2f(m_tgp_data[adr++]);
 		float plane[4];
 		for(int dim=0; dim<4; dim++)
-			plane[dim] = u2f(tgp_data[adr++]);
+			plane[dim] = u2f(m_tgp_data[adr++]);
 		adr++; // 0, 1 or 2...
 
 		float den = dx * plane[0] + dy * plane[1] + dz * plane[2];
@@ -794,16 +791,15 @@ TGP_FUNCTION( model1_state::f43_swa )
 
 TGP_FUNCTION( model1_state::track_read_tri )
 {
-	const uint32_t *tgp_data = (const uint32_t *)memregion("user2")->base();
 	uint32_t a = fifoin_pop();
 	int offd;
 
 	logerror("TGP track_read_tri %d (%x)\n", a, m_pushpc);
 
-	offd = tgp_data[0x20+m_tgp_vr_select] + 16*a;
-	fifoout_push(tgp_data[offd+12]);
-	fifoout_push(tgp_data[offd+13]);
-	fifoout_push(tgp_data[offd+14]);
+	offd = m_tgp_data[0x20+m_tgp_vr_select] + 16*a;
+	fifoout_push(m_tgp_data[offd+12]);
+	fifoout_push(m_tgp_data[offd+13]);
+	fifoout_push(m_tgp_data[offd+14]);
 	next_fn();
 }
 
@@ -892,14 +888,13 @@ TGP_FUNCTION( model1_state::f47 )
 
 TGP_FUNCTION( model1_state::track_read_info )
 {
-	const uint32_t *tgp_data = (const uint32_t *)memregion("user2")->base();
 	uint16_t a = fifoin_pop();
 	int offd;
 
 	logerror("TGP track_read_info %d (%x)\n", a, m_pushpc);
 
-	offd = tgp_data[0x20+m_tgp_vr_select] + 16*a;
-	fifoout_push(tgp_data[offd+15]);
+	offd = m_tgp_data[0x20+m_tgp_vr_select] + 16*a;
+	fifoout_push(m_tgp_data[offd+15]);
 	next_fn();
 }
 
@@ -1039,7 +1034,6 @@ static void tri_calc_pq(float ax, float ay, float bx, float by, float cx, float 
 
 TGP_FUNCTION( model1_state::track_lookup )
 {
-	const uint32_t *tgp_data = (const uint32_t *)memregion("user2")->base();
 	float a = fifoin_pop_f();
 	uint32_t b = fifoin_pop();
 	float c = fifoin_pop_f();
@@ -1052,10 +1046,10 @@ TGP_FUNCTION( model1_state::track_lookup )
 
 	logerror("TGP track_lookup %f, 0x%x, %f, %f (%x)\n", a, b, c, d, m_pushpc);
 
-	offi = tgp_data[0x10+m_tgp_vr_select] + b;
-	offd = tgp_data[0x20+m_tgp_vr_select];
+	offi = m_tgp_data[0x10+m_tgp_vr_select] + b;
+	offd = m_tgp_data[0x20+m_tgp_vr_select];
 
-	len = tgp_data[offi++];
+	len = m_tgp_data[offi++];
 
 	dist = -1;
 
@@ -1065,9 +1059,9 @@ TGP_FUNCTION( model1_state::track_lookup )
 
 	for(i=0; i<len; i++) {
 		int j;
-		int bpos = tgp_data[offi++];
+		int bpos = m_tgp_data[offi++];
 		int posd = offd + bpos*0x10;
-		const float *pts = (const float *)(tgp_data+posd);
+		const float *pts = (const float *)&m_tgp_data[posd];
 		float ax = pts[12];
 		float ay = pts[14];
 		float az = pts[13];
@@ -1080,7 +1074,7 @@ TGP_FUNCTION( model1_state::track_lookup )
 				float d = (a-z)*(a-z);
 				if(dist == -1 || d<dist) {
 					dist = d;
-//                  behaviour = tgp_data[posd+15];
+//                  behaviour = m_tgp_data[posd+15];
 					height = z;
 					entry = bpos+i;
 				}
@@ -1119,11 +1113,10 @@ TGP_FUNCTION( model1_state::f56 )
 
 TGP_FUNCTION( model1_state::int_normal )
 {
-	const uint32_t *tgp_data = (const uint32_t *)memregion("user2")->base();
 	logerror("TGP int_normal (%x)\n", m_pushpc);
-	fifoout_push_f(u2f(tgp_data[m_tgp_int_adr+12]));
-	fifoout_push_f(u2f(tgp_data[m_tgp_int_adr+13]));
-	fifoout_push_f(u2f(tgp_data[m_tgp_int_adr+14]));
+	fifoout_push_f(u2f(m_tgp_data[m_tgp_int_adr+12]));
+	fifoout_push_f(u2f(m_tgp_data[m_tgp_int_adr+13]));
+	fifoout_push_f(u2f(m_tgp_data[m_tgp_int_adr+14]));
 	next_fn();
 }
 
@@ -1903,7 +1896,7 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_w)
 {
 	if(offset) {
 		m_copro_w = (m_copro_w & 0x0000ffff) | (data << 16);
-		m_pushpc = space.device().safe_pc();
+		m_pushpc = m_maincpu->pc();
 		fifoin_push(m_copro_w);
 	} else
 		m_copro_w = (m_copro_w & 0xffff0000) | data;
@@ -1922,7 +1915,7 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_adr_w)
 READ16_MEMBER(model1_state::model1_tgp_copro_ram_r)
 {
 	if(!offset) {
-		logerror("TGP f0 ram read %04x, %08x (%f) (%x)\n", m_ram_adr, m_ram_data[m_ram_adr], u2f(m_ram_data[m_ram_adr]), space.device().safe_pc());
+		logerror("TGP f0 ram read %04x, %08x (%f) (%x)\n", m_ram_adr, m_ram_data[m_ram_adr], u2f(m_ram_data[m_ram_adr]), m_maincpu->pc());
 		return m_ram_data[m_ram_adr];
 	} else
 		return m_ram_data[m_ram_adr++] >> 16;
@@ -1933,7 +1926,7 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_ram_w)
 	COMBINE_DATA(m_ram_latch+offset);
 	if(offset) {
 		uint32_t v = m_ram_latch[0]|(m_ram_latch[1]<<16);
-		logerror("TGP f0 ram write %04x, %08x (%f) (%x)\n", m_ram_adr, v, u2f(v), space.device().safe_pc());
+		logerror("TGP f0 ram write %04x, %08x (%f) (%x)\n", m_ram_adr, v, u2f(v), m_maincpu->pc());
 		m_ram_data[m_ram_adr] = v;
 		m_ram_adr++;
 	}
@@ -2100,7 +2093,7 @@ READ16_MEMBER(model1_state::model1_tgp_vr_adr_r)
 	if ( m_ram_adr == 0 && m_copro_fifoin_num != 0 )
 	{
 		/* spin the main cpu and let the TGP catch up */
-		space.device().execute().spin_until_time(attotime::from_usec(100));
+		m_maincpu->spin_until_time(attotime::from_usec(100));
 	}
 
 	return m_ram_adr;
@@ -2126,7 +2119,7 @@ READ16_MEMBER(model1_state::model1_vr_tgp_ram_r)
 		if ( m_ram_adr == 0 && r == 0xffff )
 		{
 			/* if the TGP is busy, spin some more */
-			space.device().execute().spin_until_time(attotime::from_usec(100));
+			m_maincpu->spin_until_time(attotime::from_usec(100));
 		}
 
 		if ( m_ram_adr & 0x8000 )
@@ -2172,8 +2165,8 @@ WRITE16_MEMBER(model1_state::model1_vr_tgp_w)
 }
 
 /* TGP memory map */
-ADDRESS_MAP_START( model1_vr_tgp_map, AS_PROGRAM, 32, model1_state )
+ADDRESS_MAP_START(model1_state::model1_vr_tgp_map)
 	AM_RANGE(0x00000000, 0x000007ff) AM_RAM AM_REGION("tgp", 0)
 	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE(copro_ram_r, copro_ram_w)
-	AM_RANGE(0xff800000, 0xff87ffff) AM_ROM AM_REGION("user2", 0)
+	AM_RANGE(0xff800000, 0xff87ffff) AM_ROM AM_REGION("tgp_data", 0)
 ADDRESS_MAP_END

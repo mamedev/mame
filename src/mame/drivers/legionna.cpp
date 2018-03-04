@@ -104,7 +104,7 @@ READ8_MEMBER(legionna_state::denjinmk_sound_comms_r)
 	return m_seibu_sound->main_r(space, (offset >> 1) & 7);
 }
 
-static ADDRESS_MAP_START( legionna_cop_mem, AS_PROGRAM, 16, legionna_state )
+ADDRESS_MAP_START(legionna_state::legionna_cop_mem)
 	AM_RANGE(0x100400, 0x100401) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sprite_dma_param_lo_w) // grainbow
 	AM_RANGE(0x100402, 0x100403) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sprite_dma_param_hi_w) // grainbow
 	AM_RANGE(0x10040c, 0x10040d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sprite_dma_size_w) // grainbow
@@ -180,14 +180,14 @@ static ADDRESS_MAP_START( legionna_cop_mem, AS_PROGRAM, 16, legionna_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( legionna_map, AS_PROGRAM, 16, legionna_state )
+ADDRESS_MAP_START(legionna_state::legionna_map)
 	AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100470, 0x100471) AM_WRITENOP // toggles 0x2000 / 0x0000, tile bank on some games
 	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	AM_RANGE(0x100700, 0x10071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
+	;map(0x100700, 0x10071f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( legionna_map, AS_PROGRAM, 16, legionna_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( heatbrl_map, AS_PROGRAM, 16, legionna_state )
+ADDRESS_MAP_START(legionna_state::heatbrl_map)
 	AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
@@ -214,7 +214,7 @@ static ADDRESS_MAP_START( heatbrl_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
 	AM_RANGE(0x10074c, 0x10074d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1007c0, 0x1007df) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
+	;map(0x1007c0, 0x1007df).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x100800, 0x100fff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
 	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
 	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
@@ -224,14 +224,14 @@ static ADDRESS_MAP_START( heatbrl_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x108000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( godzilla_map, AS_PROGRAM, 16, legionna_state )
+ADDRESS_MAP_START(legionna_state::godzilla_map)
 	AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100470, 0x100471) AM_WRITE(denjinmk_setgfxbank)
 	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	AM_RANGE(0x100700, 0x10071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
+	;map(0x100700, 0x10071f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
@@ -251,14 +251,14 @@ static ADDRESS_MAP_START( godzilla_map, AS_PROGRAM, 16, legionna_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( denjinmk_map, AS_PROGRAM, 16, legionna_state )
+ADDRESS_MAP_START(legionna_state::denjinmk_map)
 	AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100470, 0x100471) AM_WRITE(denjinmk_setgfxbank)
 	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	AM_RANGE(0x100700, 0x10071f) AM_READ8(denjinmk_sound_comms_r, 0xff) AM_DEVWRITE8_MOD("seibu_sound", seibu_sound_device, main_w, rshift<1>, 0x00ff)
+	;map(0x100700, 0x10071f).r(this, FUNC(legionna_state::denjinmk_sound_comms_r)).lw8("seibu_sound_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
@@ -277,14 +277,14 @@ static ADDRESS_MAP_START( denjinmk_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x11f000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( grainbow_map, AS_PROGRAM, 16, legionna_state )
+ADDRESS_MAP_START(legionna_state::grainbow_map)
 	AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100480, 0x100487) AM_WRITE(grainbow_layer_config_w) // probably a COP feature
 	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	AM_RANGE(0x100700, 0x10071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
+	;map(0x100700, 0x10071f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
@@ -302,13 +302,13 @@ static ADDRESS_MAP_START( grainbow_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x108000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cupsoc_mem, AS_PROGRAM, 16, legionna_state )
+ADDRESS_MAP_START(legionna_state::cupsoc_mem)
 	AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	AM_RANGE(0x100700, 0x10071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
+	;map(0x100700, 0x10071f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
@@ -329,18 +329,18 @@ static ADDRESS_MAP_START( cupsoc_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x11e000, 0x11ffff) AM_RAM /*Stack Ram*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cupsocs_mem, AS_PROGRAM, 16, legionna_state )
+ADDRESS_MAP_START(legionna_state::cupsocs_mem)
 	AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100600, 0x10067f) AM_DEVREADWRITE_MOD("crtc", seibu_crtc_device, read, write, xor<0x20>)
+	;map(0x100600, 0x10067f).lrw16("crtc_rw", [this](address_space &space, offs_t offset, u16 mem_mask){ return m_crtc->read(space, offset ^ 0x20, mem_mask); }, [this](address_space &space, offs_t offset, u16 data, u16 mem_mask){ m_crtc->write(space, offset ^ 0x20, data, mem_mask); });
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x100701) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100704, 0x100705) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100708, 0x100709) AM_READ_PORT("PLAYERS34")
 	AM_RANGE(0x10070c, 0x10070d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x10071c, 0x10071d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100740, 0x10075f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
+	;map(0x100740, 0x10075f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x100800, 0x100fff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
 	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
 	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
@@ -429,7 +429,7 @@ static INPUT_PORTS_START( legionna )
 	PORT_DIPSETTING(      0x0200, "1" )
 	PORT_DIPSETTING(      0x0300, "2" )
 	PORT_DIPSETTING(      0x0100, "3" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Infinite ) )
+	PORT_DIPSETTING(      0x0000, "4" )
 	PORT_DIPNAME( 0x0400, 0x0400, "Extend" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
@@ -1054,7 +1054,7 @@ void legionna_state::descramble_legionnaire_gfx(uint8_t* src)
 		int i;
 		for (i = 0;i < len; i++)
 		{
-			buffer[i] = src[BITSWAP24(i,
+			buffer[i] = src[bitswap<24>(i,
 			23,22,21,20,
 			19,18,17,16,
 			6,5,15,14,13,12,
@@ -1146,7 +1146,7 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( legionna )
+MACHINE_CONFIG_START(legionna_state::legionna)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)  /* ??? */
@@ -1197,7 +1197,7 @@ static MACHINE_CONFIG_START( legionna )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( heatbrl )
+MACHINE_CONFIG_START(legionna_state::heatbrl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)  /* ??? */
@@ -1249,7 +1249,7 @@ static MACHINE_CONFIG_START( heatbrl )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( godzilla )
+MACHINE_CONFIG_START(legionna_state::godzilla)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1303,7 +1303,7 @@ static MACHINE_CONFIG_START( godzilla )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( denjinmk )
+MACHINE_CONFIG_START(legionna_state::denjinmk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1356,7 +1356,7 @@ static MACHINE_CONFIG_START( denjinmk )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( grainbow )
+MACHINE_CONFIG_START(legionna_state::grainbow)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1410,7 +1410,7 @@ static MACHINE_CONFIG_START( grainbow )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cupsoc )
+MACHINE_CONFIG_START(legionna_state::cupsoc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)
@@ -1462,7 +1462,8 @@ static MACHINE_CONFIG_START( cupsoc )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cupsocs, cupsoc )
+MACHINE_CONFIG_START(legionna_state::cupsocs)
+	cupsoc(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cupsocs_mem)
 MACHINE_CONFIG_END
@@ -2140,6 +2141,45 @@ ROM_START( grainbow )
 ROM_END
 
 
+ROM_START( grainbowk )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD32_BYTE( "Rom1.U025",     0x000000, 0x040000, CRC(686c25ea) SHA1(e4f68b0455eefacf783c9e56f542085d0027009c) )
+	ROM_LOAD32_BYTE( "Rom2.U024",     0x000001, 0x040000, CRC(2400662e) SHA1(251fc779c2f3f56137f07f4865483e919a101845) )
+	ROM_LOAD32_BYTE( "Rom3.U026",     0x000002, 0x040000, CRC(22857489) SHA1(b23d983057925b86f2a8a7ca80dbfc7464a0075f) )
+	ROM_LOAD32_BYTE( "Rom4.U023",     0x000003, 0x040000, CRC(ad8de15b) SHA1(0af56fc17c9b2c5e13fea67e08792577453d678a) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_LOAD( "rb-s.016",     0x000000, 0x08000, CRC(8439bf5b) SHA1(089009b91768d64edef6639e7694723d2d1c46ff) )
+	ROM_CONTINUE(             0x010000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "char", 0 )
+	ROM_LOAD16_BYTE( "rb-f1.620",    0x000000, 0x010000, CRC(792c403d) SHA1(3c606af696fe8f3d6edefdab3940bd5eb341bca9) )
+	ROM_LOAD16_BYTE( "rb-f2.615",    0x000001, 0x010000, CRC(a30e0903) SHA1(b9e7646da1ccab6dadaca6beda08125b34946653) )
+
+	ROM_REGION( 0x200000, "sprite", 0 )
+	ROM_LOAD( "rb-spr01.748", 0x000000, 0x100000, CRC(11a3479d) SHA1(4d2d06d62da02c6e9884735de8c319f37ca1715c) )
+	ROM_LOAD( "rb-spr23.756", 0x100000, 0x100000, CRC(fd08a761) SHA1(3297a2bfaabef17ed9320e24e9a4ffa2f3eb3a44) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_LOAD( "rb-bg-01.618", 0x000000, 0x100000, CRC(6a4ca7e7) SHA1(13612d29f8f04cf62b4357b69b81240dd1eceae4) )
+
+	ROM_REGION( 0x040000, "gfx4", ROMREGION_ERASEFF )   /* not used */
+
+	ROM_REGION( 0x100000, "gfx5", 0 )
+	ROM_LOAD( "rb-bg-2.619",  0x000000, 0x100000, CRC(a9b5c85e) SHA1(0ae044e05730e8080d94f1f6758f8dd051b03c41) )
+
+	ROM_REGION( 0x100000, "gfx6", 0 )
+//#define ROM_COPY(rgn,srcoffset,offset,length)
+	ROM_COPY( "gfx3", 0x80000, 0x00000, 0x80000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_LOAD( "rb-ad.922",    0x000000, 0x020000, CRC(a364cb42) SHA1(c527b39a1627ecee20a2c4df4cf2b5f2ba729081) )
+
+	ROM_REGION( 0x040000, "user1", 0 )
+	ROM_LOAD( "copx-d2.313",  0x0000, 0x040000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+ROM_END
+
 ROM_START( cupsoc )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD32_BYTE( "scc_01.bin", 0x000000, 0x040000, CRC(c122203c) SHA1(93c0ae90c0ed3889b9159774ba89536108c9b259) )
@@ -2534,8 +2574,9 @@ GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         R
 GAME( 1992, heatbrle, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation (Electronic Devices license)", "Heated Barrel (Electronic Devices license)", 0 )
 
 GAME( 1993, godzilla, 0,        godzilla, godzilla, legionna_state, 0,         ROT0, "Banpresto", "Godzilla (Japan)", 0 )
-GAME( 1993, grainbow, 0,        grainbow, grainbow, legionna_state, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state, 0,         ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", MACHINE_IMPERFECT_COLORS )
+GAME( 1993, grainbow, 0,        grainbow, grainbow, legionna_state, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, grainbowk,grainbow, grainbow, grainbow, legionna_state, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state, 0,         ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", 0 )
 
 GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc,   legionna_state, cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, cupsoca,  cupsoc,   cupsoc,   cupsoc,   legionna_state, cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

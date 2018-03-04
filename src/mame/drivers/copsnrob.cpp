@@ -90,7 +90,7 @@ WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, copsnrob_state )
+ADDRESS_MAP_START(copsnrob_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0500, 0x0507) AM_DEVWRITE("latch", f9334_device, write_d0)
@@ -246,7 +246,7 @@ void copsnrob_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( copsnrob )
+MACHINE_CONFIG_START(copsnrob_state::copsnrob)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,14318180/16)      /* 894886.25 kHz */
@@ -264,7 +264,7 @@ static MACHINE_CONFIG_START( copsnrob )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", copsnrob)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_FRAGMENT_ADD(copsnrob_audio)
+	copsnrob_audio(config);
 MACHINE_CONFIG_END
 
 

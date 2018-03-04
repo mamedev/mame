@@ -100,6 +100,11 @@ public:
 	void sexyboom_map_bank(int bank);
 	DECLARE_READ8_MEMBER(sec_slot_r);
 	DECLARE_WRITE8_MEMBER(sec_slot_w);
+	void pzlestar(machine_config &config);
+	void sexyboom(machine_config &config);
+	void pzlestar_io_map(address_map &map);
+	void sangho_map(address_map &map);
+	void sexyboom_io_map(address_map &map);
 };
 
 /*
@@ -280,7 +285,7 @@ WRITE8_MEMBER(sangho_state::sec_slot_w)
 }
 
 
-static ADDRESS_MAP_START( sangho_map, AS_PROGRAM, 8, sangho_state )
+ADDRESS_MAP_START(sangho_state::sangho_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
@@ -289,7 +294,7 @@ ADDRESS_MAP_END
 
 /* Puzzle Star Ports */
 
-static ADDRESS_MAP_START( pzlestar_io_map, AS_IO, 8, sangho_state )
+ADDRESS_MAP_START(sangho_state::pzlestar_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE("ymsnd", ym2413_device, write)
 	AM_RANGE( 0x91, 0x91) AM_WRITE(pzlestar_bank_w )
@@ -302,7 +307,7 @@ ADDRESS_MAP_END
 
 /* Sexy Boom Ports */
 
-static ADDRESS_MAP_START( sexyboom_io_map, AS_IO, 8, sangho_state )
+ADDRESS_MAP_START(sangho_state::sexyboom_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE("ymsnd", ym2413_device, write)
 	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
@@ -452,41 +457,41 @@ MACHINE_RESET_MEMBER(sangho_state,sexyboom)
 }
 
 
-static MACHINE_CONFIG_START( pzlestar )
+MACHINE_CONFIG_START(sangho_state::pzlestar)
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6) // ?
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272)/6) // ?
 	MCFG_CPU_PROGRAM_MAP(sangho_map)
 	MCFG_CPU_IO_MAP(pzlestar_io_map)
 
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
 
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,pzlestar)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413,  XTAL_21_4772MHz/6)
+	MCFG_SOUND_ADD("ymsnd", YM2413,  XTAL(21'477'272)/6)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sexyboom )
+MACHINE_CONFIG_START(sangho_state::sexyboom)
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272)/6)
 	MCFG_CPU_PROGRAM_MAP(sangho_map)
 	MCFG_CPU_IO_MAP(sexyboom_io_map)
 
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz)
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272))
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
 
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,sexyboom)
 
 	MCFG_PALETTE_ADD("palette", 19780)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_21_4772MHz/6)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(21'477'272)/6)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

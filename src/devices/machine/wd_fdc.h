@@ -121,31 +121,31 @@
 	downcast<wd_fdc_device_base *>(device)->set_disable_motor_control(true);
 
 #define MCFG_WD_FDC_INTRQ_CALLBACK(_write) \
-	devcb = &wd_fdc_device_base::set_intrq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<wd_fdc_device_base &>(*device).set_intrq_wr_callback(DEVCB_##_write);
 
 #define MCFG_WD_FDC_DRQ_CALLBACK(_write) \
-	devcb = &wd_fdc_device_base::set_drq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<wd_fdc_device_base &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 #define MCFG_WD_FDC_HLD_CALLBACK(_write) \
-	devcb = &wd_fdc_device_base::set_hld_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<wd_fdc_device_base &>(*device).set_hld_wr_callback(DEVCB_##_write);
 
 #define MCFG_WD_FDC_ENP_CALLBACK(_write) \
-	devcb = &wd_fdc_device_base::set_enp_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<wd_fdc_device_base &>(*device).set_enp_wr_callback(DEVCB_##_write);
 
 #define MCFG_WD_FDC_ENMF_CALLBACK(_read) \
-	devcb = &wd_fdc_device_base::set_enmf_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<wd_fdc_device_base &>(*device).set_enmf_rd_callback(DEVCB_##_read);
 
 class wd_fdc_device_base : public device_t {
 public:
-	template <class Object> static devcb_base &set_intrq_wr_callback(device_t &device, Object &&cb) { return downcast<wd_fdc_device_base &>(device).intrq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<wd_fdc_device_base &>(device).drq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_hld_wr_callback(device_t &device, Object &&cb) { return downcast<wd_fdc_device_base &>(device).hld_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_enp_wr_callback(device_t &device, Object &&cb) { return downcast<wd_fdc_device_base &>(device).enp_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_enmf_rd_callback(device_t &device, Object &&cb) { return downcast<wd_fdc_device_base &>(device).enmf_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_intrq_wr_callback(Object &&cb) { return intrq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return drq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_hld_wr_callback(Object &&cb) { return hld_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_enp_wr_callback(Object &&cb) { return enp_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_enmf_rd_callback(Object &&cb) { return enmf_cb.set_callback(std::forward<Object>(cb)); }
 
 	void soft_reset();
 
-	void dden_w(bool dden);
+	DECLARE_WRITE_LINE_MEMBER(dden_w);
 	void set_floppy(floppy_image_device *floppy);
 	void set_force_ready(bool force_ready);
 	void set_disable_motor_control(bool _disable_motor_control);
@@ -175,13 +175,13 @@ public:
 	DECLARE_READ8_MEMBER( read ) { return gen_r(offset); }
 	DECLARE_WRITE8_MEMBER( write ) { gen_w(offset,data); }
 
-	bool intrq_r();
-	bool drq_r();
+	DECLARE_READ_LINE_MEMBER(intrq_r);
+	DECLARE_READ_LINE_MEMBER(drq_r);
 
-	bool hld_r();
-	void hlt_w(bool state);
+	DECLARE_READ_LINE_MEMBER(hld_r);
+	DECLARE_WRITE_LINE_MEMBER(hlt_w);
 
-	bool enp_r();
+	DECLARE_READ_LINE_MEMBER(enp_r);
 
 	void index_callback(floppy_image_device *floppy, int state);
 

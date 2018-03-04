@@ -7,7 +7,7 @@ DEFINE_DEVICE_TYPE(PCI_ROOT,   pci_root_device,   "pci_root",   "PCI virtual roo
 DEFINE_DEVICE_TYPE(PCI_BRIDGE, pci_bridge_device, "pci_bridge", "PCI-PCI Bridge")
 
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, pci_device)
+ADDRESS_MAP_START(pci_device::config_map)
 	AM_RANGE(0x00, 0x03) AM_READ16     (vendor_r,                                 0x0000ffff)
 	AM_RANGE(0x00, 0x03) AM_READ16     (device_r,                                 0xffff0000)
 	AM_RANGE(0x04, 0x07) AM_READWRITE16(command_r,           command_w,           0x0000ffff)
@@ -29,7 +29,7 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, pci_device)
 	AM_RANGE(0x3c, 0x3f) AM_READWRITE8(interrupt_pin_r,      interrupt_pin_w,     0x0000ff00)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, pci_bridge_device)
+ADDRESS_MAP_START(pci_bridge_device::config_map)
 	AM_RANGE(0x00, 0x03) AM_READ16     (vendor_r,                                 0x0000ffff)
 	AM_RANGE(0x00, 0x03) AM_READ16     (device_r,                                 0xffff0000)
 	AM_RANGE(0x04, 0x07) AM_READWRITE16(command_r,           command_w,           0x0000ffff)
@@ -356,7 +356,7 @@ void pci_device::skip_map_regs(int count)
 	assert(bank_reg_count <= 6);
 }
 
-void pci_device::add_map(uint64_t size, int flags, address_map_delegate &map, device_t *relative_to)
+void pci_device::add_map(uint64_t size, int flags, const address_map_constructor &map, device_t *relative_to)
 {
 	assert(bank_count < 6);
 	int bid = bank_count++;
@@ -817,7 +817,7 @@ void agp_bridge_device::device_reset()
 
 
 
-DEVICE_ADDRESS_MAP_START(io_configuration_access_map, 32, pci_host_device)
+ADDRESS_MAP_START(pci_host_device::io_configuration_access_map)
 	AM_RANGE(0xcf8, 0xcfb) AM_READWRITE(config_address_r, config_address_w)
 	AM_RANGE(0xcfc, 0xcff) AM_READWRITE(config_data_r,    config_data_w)
 ADDRESS_MAP_END

@@ -122,7 +122,7 @@ WRITE8_MEMBER(portrait_state::negative_scroll_w)
 	m_scroll = - (data ^ 0xff);
 }
 
-static ADDRESS_MAP_START( portrait_map, AS_PROGRAM, 8, portrait_state )
+ADDRESS_MAP_START(portrait_state::portrait_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(bgvideo_write) AM_SHARE("bgvideoram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(fgvideo_write) AM_SHARE("fgvideoram")
@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( portrait_map, AS_PROGRAM, 8, portrait_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( portrait_sound_map, AS_PROGRAM, 8, portrait_state )
+ADDRESS_MAP_START(portrait_state::portrait_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -247,7 +247,7 @@ static GFXDECODE_START( portrait )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( portrait )
+MACHINE_CONFIG_START(portrait_state::portrait)
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(portrait_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", portrait_state,  irq0_line_hold)

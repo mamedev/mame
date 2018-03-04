@@ -225,10 +225,10 @@
 #include "speaker.h"
 
 
-#define CPU_CLOCK   XTAL_14_7456MHz
-#define MACH_CLOCK  XTAL_50MHz      // 50.35
-#define COM_CLOCK   XTAL_20MHz
-#define SND_CLOCK   XTAL_16_9344MHz
+#define CPU_CLOCK   XTAL(14'745'600)
+#define MACH_CLOCK  XTAL(50'000'000)      // 50.35
+#define COM_CLOCK   XTAL(20'000'000)
+#define SND_CLOCK   XTAL(16'934'400)
 
 
 class coinmvga_state : public driver_device
@@ -253,6 +253,11 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_palette2;
 
+	void coinmvga(machine_config &config);
+	void coinmvga_io_map(address_map &map);
+	void coinmvga_map(address_map &map);
+	void ramdac2_map(address_map &map);
+	void ramdac_map(address_map &map);
 };
 
 
@@ -310,7 +315,7 @@ READ16_MEMBER(coinmvga_state::test_r)
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( coinmvga_map, AS_PROGRAM, 16, coinmvga_state )
+ADDRESS_MAP_START(coinmvga_state::coinmvga_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0) //maybe not
 
@@ -337,7 +342,7 @@ static ADDRESS_MAP_START( coinmvga_map, AS_PROGRAM, 16, coinmvga_state )
 	//0x800008 "arrow" w?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( coinmvga_io_map, AS_IO, 16, coinmvga_state )
+ADDRESS_MAP_START(coinmvga_state::coinmvga_io_map)
 /*  Digital I/O ports (ports 4-B are valid on 16-bit H8/3xx) */
 //  AM_RANGE(h8_device::PORT_4, h8_device::PORT_4)
 //  AM_RANGE(h8_device::PORT_5, h8_device::PORT_5)
@@ -617,16 +622,16 @@ INTERRUPT_GEN_MEMBER(coinmvga_state::vblank_irq)
 *    Machine Drivers     *
 *************************/
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, coinmvga_state )
+ADDRESS_MAP_START(coinmvga_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac2_map, 0, 8, coinmvga_state )
+ADDRESS_MAP_START(coinmvga_state::ramdac2_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac2",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( coinmvga )
+MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83007, CPU_CLOCK)  /* xtal */

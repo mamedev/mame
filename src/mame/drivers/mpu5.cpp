@@ -202,10 +202,29 @@
 class mpu5_state : public driver_device
 {
 public:
-	mpu5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+	mpu5_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
+
+	void mpu5(machine_config &config);
+
+protected:
+	DECLARE_READ32_MEMBER(mpu5_mem_r);
+	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
+
+	DECLARE_READ32_MEMBER(asic_r32);
+	DECLARE_READ8_MEMBER(asic_r8);
+	DECLARE_WRITE32_MEMBER(asic_w32);
+	DECLARE_WRITE8_MEMBER(asic_w8);
+
+	DECLARE_READ32_MEMBER(pic_r);
+	DECLARE_WRITE32_MEMBER(pic_w);
+
+	virtual void machine_start() override;
+	void mpu5_map(address_map &map);
+
+private:
 	uint32_t* m_cpuregion;
 	std::unique_ptr<uint32_t[]> m_mainram;
 	SEC sec;
@@ -221,22 +240,8 @@ public:
 	uint8_t m_pic_output_bit;
 	uint8_t m_input_strobe;
 
-	DECLARE_READ32_MEMBER(mpu5_mem_r);
-	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
-
-	DECLARE_READ32_MEMBER(asic_r32);
-	DECLARE_READ8_MEMBER(asic_r8);
-	DECLARE_WRITE32_MEMBER(asic_w32);
-	DECLARE_WRITE8_MEMBER(asic_w8);
-
-	DECLARE_READ32_MEMBER(pic_r);
-	DECLARE_WRITE32_MEMBER(pic_w);
-
-protected:
-
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
-	virtual void machine_start() override;
 };
 
 READ8_MEMBER(mpu5_state::asic_r8)
@@ -260,7 +265,7 @@ READ8_MEMBER(mpu5_state::asic_r8)
 		}
 		default:
 		{
-			int pc = space.device().safe_pc();
+			int pc = m_maincpu->pc();
 			logerror("%08x maincpu read from ASIC - offset %01x\n", pc, offset);
 			return 0;
 		}
@@ -280,7 +285,7 @@ READ32_MEMBER(mpu5_state::asic_r32)
 
 READ32_MEMBER(mpu5_state::mpu5_mem_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int addr = offset *4;
 	int cs = m_maincpu->get_cs(addr);
 
@@ -396,7 +401,7 @@ WRITE8_MEMBER(mpu5_state::asic_w8)
 		break;
 		default:
 		{
-			int pc = space.device().safe_pc();
+			int pc = m_maincpu->pc();
 			logerror("%08x maincpu write to ASIC - offset %01x data %02x\n", pc, offset, data);
 		}
 	}
@@ -414,7 +419,7 @@ WRITE32_MEMBER(mpu5_state::asic_w32)
 
 READ32_MEMBER(mpu5_state::pic_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	logerror("%08x maincpu read from PIC - offset %01x\n", pc, offset);
 	return m_pic_output_bit;
 }
@@ -466,7 +471,7 @@ WRITE32_MEMBER(mpu5_state::pic_w)
 		}
 		default:
 		{
-			int pc = space.device().safe_pc();
+			int pc = m_maincpu->pc();
 			logerror("%08x maincpu write to PIC - offset %01x data %02x\n", pc, offset, data);
 			break;
 		}
@@ -476,7 +481,7 @@ WRITE32_MEMBER(mpu5_state::pic_w)
 
 WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int addr = offset *4;
 	int cs = m_maincpu->get_cs(addr);
 
@@ -525,7 +530,7 @@ WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 
 }
 
-static ADDRESS_MAP_START( mpu5_map, AS_PROGRAM, 32, mpu5_state )
+ADDRESS_MAP_START(mpu5_state::mpu5_map)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(mpu5_mem_r, mpu5_mem_w)
 ADDRESS_MAP_END
 
@@ -541,7 +546,7 @@ void mpu5_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START( mpu5 )
+MACHINE_CONFIG_START(mpu5_state::mpu5)
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)    // ?
 	MCFG_CPU_PROGRAM_MAP(mpu5_map)
 

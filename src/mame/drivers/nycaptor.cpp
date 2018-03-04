@@ -255,22 +255,6 @@ READ8_MEMBER(nycaptor_state::sound_status_r)
 }
 
 
-MACHINE_RESET_MEMBER(nycaptor_state,ta7630)
-{
-	int i;
-	double db           = 0.0;
-	double db_step      = 0.50; /* 0.50 dB step (at least, maybe more) */
-	double db_step_inc  = 0.275;
-
-	for (i = 0; i < 16; i++)
-	{
-		double max = 100.0 / pow(10.0, db/20.0 );
-		m_vol_ctrl[15 - i] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n", 15 - i, m_vol_ctrl[15 - i], db);*/
-		db += db_step;
-		db_step += db_step_inc;
-	}
-}
 
 WRITE8_MEMBER(nycaptor_state::nmi_disable_w)
 {
@@ -297,7 +281,7 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_generic_control_w)
 	membank("bank1")->set_entry((data&0x08)>>3);
 }
 
-static ADDRESS_MAP_START( nycaptor_master_map, AS_PROGRAM, 8, nycaptor_state )
+ADDRESS_MAP_START(nycaptor_state::nycaptor_master_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nycaptor_videoram_w) AM_SHARE("videoram")
@@ -323,7 +307,7 @@ static ADDRESS_MAP_START( nycaptor_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nycaptor_slave_map, AS_PROGRAM, 8, nycaptor_state )
+ADDRESS_MAP_START(nycaptor_state::nycaptor_slave_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nycaptor_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
@@ -342,7 +326,7 @@ static ADDRESS_MAP_START( nycaptor_slave_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nycaptor_sound_map, AS_PROGRAM, 8, nycaptor_state )
+ADDRESS_MAP_START(nycaptor_state::sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
@@ -354,7 +338,7 @@ static ADDRESS_MAP_START( nycaptor_sound_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0xd200, 0xd200) AM_READNOP AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xd600, 0xd600) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
+	AM_RANGE(0xd600, 0xd600) AM_DEVWRITE("dac", dac_byte_interface, write) //otherwise no girl's scream in cycle shooting, see MT03975
 	AM_RANGE(0xe000, 0xefff) AM_NOP
 ADDRESS_MAP_END
 
@@ -392,7 +376,7 @@ WRITE8_MEMBER(nycaptor_state::cyclshtg_generic_control_w)
 }
 
 
-static ADDRESS_MAP_START( cyclshtg_master_map, AS_PROGRAM, 8, nycaptor_state )
+ADDRESS_MAP_START(nycaptor_state::cyclshtg_master_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(nycaptor_videoram_w) AM_SHARE("videoram")
@@ -417,7 +401,7 @@ static ADDRESS_MAP_START( cyclshtg_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cyclshtg_slave_map, AS_PROGRAM, 8, nycaptor_state )
+ADDRESS_MAP_START(nycaptor_state::cyclshtg_slave_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(nycaptor_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
@@ -436,17 +420,12 @@ static ADDRESS_MAP_START( cyclshtg_slave_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cyclshtg_sound_map, AS_PROGRAM, 8, nycaptor_state )
-	AM_RANGE(0xd600, 0xd600) AM_DEVWRITE("dac", dac_byte_interface, write) //otherwise no girl's scream, see MT03975
-	AM_IMPORT_FROM( nycaptor_sound_map )
-ADDRESS_MAP_END
-
 READ8_MEMBER(nycaptor_state::unk_r)
 {
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( bronx_master_map, AS_PROGRAM, 8, nycaptor_state )
+ADDRESS_MAP_START(nycaptor_state::bronx_master_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(nycaptor_videoram_w) AM_SHARE("videoram")
@@ -471,7 +450,7 @@ static ADDRESS_MAP_START( bronx_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bronx_slave_map, AS_PROGRAM, 8, nycaptor_state )
+ADDRESS_MAP_START(nycaptor_state::bronx_slave_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(nycaptor_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
@@ -491,7 +470,7 @@ static ADDRESS_MAP_START( bronx_slave_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bronx_slave_io_map, AS_IO, 8, nycaptor_state )
+ADDRESS_MAP_START(nycaptor_state::bronx_slave_io_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -728,7 +707,6 @@ void nycaptor_state::machine_start()
 		membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_generic_control_reg));
-	save_item(NAME(m_vol_ctrl));
 
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_palette_bank));
@@ -737,18 +715,16 @@ void nycaptor_state::machine_start()
 
 void nycaptor_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(ta7630);
+//  MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	m_generic_control_reg = 0;
 
 	m_char_bank = 0;
 	m_palette_bank = 0;
 	m_gfxctrl = 0;
-
-	memset(m_vol_ctrl, 0, sizeof(m_vol_ctrl));
 }
 
-static MACHINE_CONFIG_START( nycaptor )
+MACHINE_CONFIG_START(nycaptor_state::nycaptor)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)      /* ??? */
@@ -760,7 +736,7 @@ static MACHINE_CONFIG_START( nycaptor )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)   /* IRQ generated by ??? */
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(nycaptor_sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nycaptor_state, irq0_line_hold, 2*60)  /* IRQ generated by ??? */
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU,2000000)
@@ -818,9 +794,13 @@ static MACHINE_CONFIG_START( nycaptor )
 	// pin 22 Noise Output  not mapped
 
 	// Does the DAC also exist on this board? nycaptor writes 0x80 to 0xd600
+	// Update: of course it exists, sound board seems common Taito design.
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cyclshtg )
+MACHINE_CONFIG_START(nycaptor_state::cyclshtg)
 
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(cyclshtg_master_map)
@@ -831,7 +811,7 @@ static MACHINE_CONFIG_START( cyclshtg )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(cyclshtg_sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nycaptor_state, irq0_line_hold, 2*60)
 
 #ifdef USE_MCU
@@ -893,7 +873,7 @@ static MACHINE_CONFIG_START( cyclshtg )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bronx )
+MACHINE_CONFIG_START(nycaptor_state::bronx)
 
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(bronx_master_map)
@@ -905,7 +885,7 @@ static MACHINE_CONFIG_START( bronx )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(cyclshtg_sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nycaptor_state, irq0_line_hold, 2*60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120))
@@ -1307,7 +1287,7 @@ DRIVER_INIT_MEMBER(nycaptor_state,bronx)
 	uint8_t *rom = memregion("maincpu")->base();
 
 	for (i = 0; i < 0x20000; i++)
-		rom[i] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
+		rom[i] = bitswap<8>(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
 
 	m_gametype = 1;
 }
@@ -1318,7 +1298,7 @@ DRIVER_INIT_MEMBER(nycaptor_state,colt)
 	uint8_t *rom = memregion("maincpu")->base();
 
 	for (i = 0; i < 0x20000; i++)
-		rom[i] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
+		rom[i] = bitswap<8>(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
 
 	m_gametype = 2;
 }

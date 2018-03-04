@@ -73,8 +73,8 @@ and 1 SFX channel controlled by an 8039:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_18_432MHz
-#define SOUND_CLOCK     XTAL_14_31818MHz
+#define MASTER_CLOCK    XTAL(18'432'000)
+#define SOUND_CLOCK     XTAL(14'318'181)
 
 // Video timing
 // PCB measured: H = 15.50khz V = 60.56hz, +/- 0.01hz
@@ -186,7 +186,7 @@ WRITE_LINE_MEMBER(gyruss_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8, gyruss_state )
+ADDRESS_MAP_START(gyruss_state::main_cpu1_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("videoram")
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0xc180, 0xc187) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_cpu2_map, AS_PROGRAM, 8, gyruss_state )
+ADDRESS_MAP_START(gyruss_state::main_cpu2_map)
 	AM_RANGE(0x0000, 0x0000) AM_READ(gyruss_scanline_r)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(slave_irq_mask_w) AM_READNOP
 	AM_RANGE(0x4000, 0x403f) AM_RAM
@@ -211,13 +211,13 @@ static ADDRESS_MAP_START( main_cpu2_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_cpu1_map, AS_PROGRAM, 8, gyruss_state )
+ADDRESS_MAP_START(gyruss_state::audio_cpu1_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_cpu1_io_map, AS_IO, 8, gyruss_state )
+ADDRESS_MAP_START(gyruss_state::audio_cpu1_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -238,11 +238,11 @@ static ADDRESS_MAP_START( audio_cpu1_io_map, AS_IO, 8, gyruss_state )
 	AM_RANGE(0x18, 0x18) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_cpu2_map, AS_PROGRAM, 8, gyruss_state )
+ADDRESS_MAP_START(gyruss_state::audio_cpu2_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_cpu2_io_map, AS_IO, 8, gyruss_state )
+ADDRESS_MAP_START(gyruss_state::audio_cpu2_io_map)
 	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
@@ -471,7 +471,7 @@ INTERRUPT_GEN_MEMBER(gyruss_state::slave_vblank_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( gyruss )
+MACHINE_CONFIG_START(gyruss_state::gyruss)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
@@ -486,7 +486,7 @@ static MACHINE_CONFIG_START( gyruss )
 	MCFG_CPU_PROGRAM_MAP(audio_cpu1_map)
 	MCFG_CPU_IO_MAP(audio_cpu1_io_map)
 
-	MCFG_CPU_ADD("audio2", I8039, XTAL_8MHz)
+	MCFG_CPU_ADD("audio2", I8039, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(audio_cpu2_map)
 	MCFG_CPU_IO_MAP(audio_cpu2_io_map)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(gyruss_state, gyruss_dac_w))

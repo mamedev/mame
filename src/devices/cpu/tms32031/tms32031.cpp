@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "tms32031.h"
+#include "dis32031.h"
 #include "debugger.h"
 
 
@@ -92,11 +93,11 @@ DEFINE_DEVICE_TYPE(TMS32032, tms32032_device, "tms32032", "TMS32032")
 
 
 // internal memory maps
-static ADDRESS_MAP_START( internal_32031, AS_PROGRAM, 32, tms32031_device )
+ADDRESS_MAP_START(tms32031_device::internal_32031)
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( internal_32032, AS_PROGRAM, 32, tms32032_device )
+ADDRESS_MAP_START(tms32032_device::internal_32032)
 	AM_RANGE(0x87fe00, 0x87ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -281,12 +282,12 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 }
 
 tms32031_device::tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms3203x_device(mconfig, TMS32031, tag, owner, clock, CHIP_TYPE_TMS32031, ADDRESS_MAP_NAME(internal_32031))
+	: tms3203x_device(mconfig, TMS32031, tag, owner, clock, CHIP_TYPE_TMS32031, address_map_constructor(FUNC(tms32031_device::internal_32031), this))
 {
 }
 
 tms32032_device::tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms3203x_device(mconfig, TMS32032, tag, owner, clock, CHIP_TYPE_TMS32032, ADDRESS_MAP_NAME(internal_32032))
+	: tms3203x_device(mconfig, TMS32032, tag, owner, clock, CHIP_TYPE_TMS32032, address_map_constructor(FUNC(tms32032_device::internal_32032), this))
 {
 }
 
@@ -328,7 +329,7 @@ inline uint32_t tms3203x_device::ROPCODE(offs_t pc)
 	if (m_mcbl_mode && pc < 0x1000)
 		return m_bootrom[pc];
 
-	return m_direct->read_dword(pc << 2);
+	return m_direct->read_dword(pc);
 }
 
 
@@ -341,7 +342,7 @@ inline uint32_t tms3203x_device::RMEM(offs_t addr)
 	if (m_mcbl_mode && addr < 0x1000)
 		return m_bootrom[addr];
 
-	return m_program->read_dword(addr << 2);
+	return m_program->read_dword(addr);
 }
 
 
@@ -351,7 +352,7 @@ inline uint32_t tms3203x_device::RMEM(offs_t addr)
 
 inline void tms3203x_device::WMEM(offs_t addr, uint32_t data)
 {
-	m_program->write_dword(addr << 2, data);
+	m_program->write_dword(addr, data);
 }
 
 
@@ -363,7 +364,7 @@ void tms3203x_device::device_start()
 {
 	// find address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-2>();
 
 	// resolve devcb handlers
 	m_xf0_cb.resolve_safe();
@@ -553,36 +554,13 @@ void tms3203x_device::state_string_export(const device_state_entry &entry, std::
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t tms3203x_device::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t tms3203x_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t tms3203x_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tms3203x_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tms3203x );
-	return CPU_DISASSEMBLE_NAME(tms3203x)(this, stream, pc, oprom, opram, options);
+	return new tms32031_disassembler;
 }
 
 

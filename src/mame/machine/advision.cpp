@@ -109,6 +109,11 @@ WRITE8_MEMBER( advision_state::ext_ram_w )
 
 /* Sound */
 
+TIMER_CALLBACK_MEMBER( advision_state::sound_cmd_sync )
+{
+	m_sound_cmd = param;
+}
+
 READ8_MEMBER( advision_state::sound_cmd_r )
 {
 	return m_sound_cmd;
@@ -138,7 +143,7 @@ WRITE8_MEMBER( advision_state::sound_d_w )
 
 WRITE8_MEMBER( advision_state::av_control_w )
 {
-	m_sound_cmd = data >> 4;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(advision_state::sound_cmd_sync), this), data >> 4);
 
 	if ((m_video_enable == 0x00) && (data & 0x10))
 	{

@@ -56,7 +56,7 @@ void s3virge_vga_device::device_start()
 	int x;
 	int i;
 	for (i = 0; i < 0x100; i++)
-		m_palette->set_pen_color(i, 0, 0, 0);
+		set_pen_color(i, 0, 0, 0);
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
 	vga.crtc.maximum_scan_line = 1;
@@ -260,15 +260,15 @@ uint8_t s3virge_vga_device::s3_crtc_reg_read(uint8_t index)
 void s3virge_vga_device::s3_define_video_mode()
 {
 	int divisor = 1;
-	int xtal = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
-	double freq;
+	const XTAL base_xtal = XTAL(14'318'181);
+	XTAL xtal = (vga.miscellaneous_output & 0xc) ? base_xtal*2 : base_xtal*1.75;
 
 	if((vga.miscellaneous_output & 0xc) == 0x0c)
 	{
 		// Dot clock is set via SR12 and SR13
 		// DCLK calculation
-		freq = ((double)(s3.clk_pll_m+2) / (double)((s3.clk_pll_n+2)*(pow(2.0,s3.clk_pll_r)))) * 14.318; // clock between XIN and XOUT
-		xtal = freq * 1000000;
+		double ratio = (double)(s3.clk_pll_m+2) / (double)((s3.clk_pll_n+2)*(pow(2.0,s3.clk_pll_r))); // clock between XIN and XOUT
+		xtal = base_xtal * ratio;
 		//printf("DCLK set to %dHz M=%i N=%i R=%i\n",xtal,s3.clk_pll_m,s3.clk_pll_n,s3.clk_pll_r);
 	}
 
@@ -296,7 +296,7 @@ void s3virge_vga_device::s3_define_video_mode()
 	}
 	if(s3.cr43 & 0x80)  // Horizontal clock doubling (techincally, doubles horizontal CRT parameters)
 		divisor *= 2;
-	recompute_params_clock(divisor, xtal);
+	recompute_params_clock(divisor, xtal.value());
 }
 
 void s3virge_vga_device::s3_crtc_reg_write(uint8_t index, uint8_t data)

@@ -30,13 +30,13 @@
 //**************************************************************************
 
 #define MCFG_74157_A_IN_CB(_devcb) \
-	devcb = &ls157_device::set_a_in_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<ls157_device &>(*device).set_a_in_callback(DEVCB_##_devcb);
 
 #define MCFG_74157_B_IN_CB(_devcb) \
-	devcb = &ls157_device::set_b_in_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<ls157_device &>(*device).set_b_in_callback(DEVCB_##_devcb);
 
 #define MCFG_74157_OUT_CB(_devcb) \
-	devcb = &ls157_device::set_out_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<ls157_device &>(*device).set_out_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -52,9 +52,9 @@ public:
 	ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// static configuration
-	template <class Object> static devcb_base &set_a_in_callback(device_t &device, Object &&cb) { return downcast<ls157_device &>(device).m_a_in_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_b_in_callback(device_t &device, Object &&cb) { return downcast<ls157_device &>(device).m_b_in_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_callback(device_t &device, Object &&cb) { return downcast<ls157_device &>(device).m_out_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_a_in_callback(Object &&cb) { return m_a_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_b_in_callback(Object &&cb) { return m_b_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_callback(Object &&cb) { return m_out_cb.set_callback(std::forward<Object>(cb)); }
 
 	// data writes
 	DECLARE_WRITE8_MEMBER(a_w);
@@ -86,7 +86,7 @@ public:
 	DECLARE_READ8_MEMBER(output_r);
 
 protected:
-	ls157_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	ls157_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mask);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -97,10 +97,11 @@ private:
 	void write_b_bit(int bit, bool state);
 	void update_output();
 
-	// callbacks
+	// callbacks & configuration
 	devcb_read8     m_a_in_cb;
 	devcb_read8     m_b_in_cb;
 	devcb_write8    m_out_cb;
+	u8              m_data_mask;
 
 	// internal state
 	u8              m_a;
@@ -109,12 +110,25 @@ private:
 	bool            m_strobe;
 };
 
+// ======================> ls157_x2_device
+
+class ls157_x2_device : public ls157_device
+{
+public:
+	// construction/destruction
+	ls157_x2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+// ======================> hc157_device
+
 class hc157_device : public ls157_device
 {
 public:
 	// construction/destruction
 	hc157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
+
+// ======================> hct157_device
 
 class hct157_device : public ls157_device
 {
@@ -128,9 +142,10 @@ public:
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-// device type definition
-DECLARE_DEVICE_TYPE(LS157,  ls157_device)
-DECLARE_DEVICE_TYPE(HC157,  hc157_device)
-DECLARE_DEVICE_TYPE(HCT157, hct157_device)
+// device type definitions
+DECLARE_DEVICE_TYPE(LS157,    ls157_device)
+DECLARE_DEVICE_TYPE(LS157_X2, ls157_x2_device)
+DECLARE_DEVICE_TYPE(HC157,    hc157_device)
+DECLARE_DEVICE_TYPE(HCT157,   hct157_device)
 
 #endif // MAME_MACHINE_74157_H

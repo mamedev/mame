@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "machine/eeprompar.h"
+#include "machine/timer.h"
 #include "video/rgbutil.h"
 #include "video/poly.h"
 #include "screen.h"
@@ -501,4 +502,34 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(dsp_master_serial_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(dsp_slave_serial_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq);
+	void namcos22s(machine_config &config);
+	void propcycl(machine_config &config);
+	void dirtdash(machine_config &config);
+	void airco22b(machine_config &config);
+	void cybrcycc(machine_config &config);
+	void tokyowar(machine_config &config);
+	void cybrcomm(machine_config &config);
+	void alpine(machine_config &config);
+	void alpinesa(machine_config &config);
+	void adillor(machine_config &config);
+	void timecris(machine_config &config);
+	void namcos22(machine_config &config);
+	void alpine_io_map(address_map &map);
+	void alpinesa_am(address_map &map);
+	void iomcu_s22_io(address_map &map);
+	void iomcu_s22_program(address_map &map);
+	void master_dsp_data(address_map &map);
+	void master_dsp_io(address_map &map);
+	void master_dsp_program(address_map &map);
+	void mcu_io(address_map &map);
+	void mcu_program(address_map &map);
+	void mcu_s22_io(address_map &map);
+	void mcu_s22_program(address_map &map);
+	void namcos22_am(address_map &map);
+	void namcos22s_am(address_map &map);
+	void propcycl_io_map(address_map &map);
+	void slave_dsp_data(address_map &map);
+	void slave_dsp_io(address_map &map);
+	void slave_dsp_program(address_map &map);
+	void timecris_am(address_map &map);
 };

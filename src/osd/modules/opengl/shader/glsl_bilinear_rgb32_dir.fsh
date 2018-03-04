@@ -13,8 +13,6 @@ uniform vec4          vid_attributes;        // gamma, contrast, brightness
 
 void main()
 {
-	vec2 xy = gl_TexCoord[0].st;
-
 	// mix(x,y,a): x*(1-a) + y*a
 	//
 	// bilinear filtering includes 2 mix:
@@ -25,9 +23,11 @@ void main()
 	//
 	// so we can use the build in mix function for these 2 computations ;-)
 	//
-	vec2 uv_ratio     = fract(xy*color_texture_pow2_sz); // xy*color_texture_pow2_sz - floor(xy*color_texture_pow2_sz);
-	vec2 one          = 1.0/color_texture_pow2_sz;
-
+	vec2 pixel    = gl_TexCoord[0].st * color_texture_pow2_sz - 0.5;
+    vec2 uv_ratio = fract(pixel);
+    vec2 one      = 1.0 / color_texture_pow2_sz;
+    vec2 xy       = (floor(pixel) + 0.5) * one;
+    
 #if 1
 	vec4 col, col2;
 

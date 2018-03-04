@@ -2,7 +2,7 @@
 // copyright-holders:Raphael Nabet
 /****************************************************************************
 
-    fat.c
+    fat.cpp
 
     PC FAT disk images
 
@@ -184,8 +184,8 @@ struct fat_dirent
 	uint32_t first_cluster;
 	uint32_t dirent_sector_index;
 	uint32_t dirent_sector_offset;
-	time_t creation_time;
-	time_t lastmodified_time;
+	imgtool::datetime creation_time;
+	imgtool::datetime lastmodified_time;
 };
 
 struct fat_freeentry_info
@@ -1241,33 +1241,25 @@ static void fat_cannonicalize_sfn(char *sfn, const uint8_t *sfn_bytes)
 
 
 
-static time_t fat_crack_time(uint32_t fat_time)
+static imgtool::datetime fat_crack_time(uint32_t fat_time)
 {
-	struct tm t;
-	time_t now;
-
-	time(&now);
-	t = *localtime(&now);
-
-	t.tm_sec    = ((fat_time >>  0) & 0x001F) * 2;
-	t.tm_min    = ((fat_time >>  5) & 0x003F);
-	t.tm_hour   = ((fat_time >> 11) & 0x001F);
-	t.tm_mday   = ((fat_time >> 16) & 0x001F);
-	t.tm_mon    = ((fat_time >> 21) & 0x000F);
-	t.tm_year   = ((fat_time >> 25) & 0x007F) + 1980 - 1900;
-
-	return mktime(&t);
+	util::arbitrary_datetime dt;
+	dt.second       = ((fat_time >>  0) & 0x001F) * 2;
+	dt.minute       = ((fat_time >>  5) & 0x003F);
+	dt.hour         = ((fat_time >> 11) & 0x001F);
+	dt.day_of_month = ((fat_time >> 16) & 0x001F);
+	dt.month        = ((fat_time >> 21) & 0x000F);
+	dt.year         = ((fat_time >> 25) & 0x007F) + 1980;
+	return imgtool::datetime(imgtool::datetime::LOCAL, dt);
 }
 
 
 
 static uint32_t fat_setup_time(time_t ansi_time)
 {
-	struct tm t;
+	std::tm t = *localtime(&ansi_time);
+
 	uint32_t result = 0;
-
-	t = *localtime(&ansi_time);
-
 	result |= (((uint32_t) (t.tm_sec / 2))            & 0x001F) <<  0;
 	result |= (((uint32_t) t.tm_min)                  & 0x003F) <<  5;
 	result |= (((uint32_t) t.tm_hour)                 & 0x001F) << 11;
@@ -1565,6 +1557,7 @@ static imgtoolerr_t fat_construct_dirent(const char *filename, creation_policy_t
 		memcpy(created_entry, created_entry + created_entry_len - FAT_DIRENT_SIZE, FAT_DIRENT_SIZE);
 		created_entry_len = FAT_DIRENT_SIZE;
 		free(created_entry);
+		created_entry = NULL;
 		new_created_entry = (uint8_t *) malloc(created_entry_len);
 		if (!new_created_entry)
 		{

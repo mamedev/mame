@@ -13,7 +13,6 @@
 
 
 ToDo:
-- Fix hang when it should scroll
 - Cassette Load (bit 7 of port 91)
 
 
@@ -42,31 +41,21 @@ class a5105_state : public driver_device
 {
 public:
 	a5105_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_hgdc(*this, "upd7220"),
-			m_cass(*this, "cassette"),
-			m_beep(*this, "beeper"),
-			m_fdc(*this, "upd765a"),
-			m_floppy0(*this, "upd765a:0"),
-			m_floppy1(*this, "upd765a:1"),
-			m_floppy2(*this, "upd765a:2"),
-			m_floppy3(*this, "upd765a:3"),
-			m_video_ram(*this, "video_ram"),
-			m_ram(*this, RAM_TAG),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_hgdc(*this, "upd7220")
+		, m_cass(*this, "cassette")
+		, m_beep(*this, "beeper")
+		, m_fdc(*this, "upd765a")
+		, m_floppy0(*this, "upd765a:0")
+		, m_floppy1(*this, "upd765a:1")
+		, m_floppy2(*this, "upd765a:2")
+		, m_floppy3(*this, "upd765a:3")
+		, m_video_ram(*this, "video_ram")
+		, m_ram(*this, RAM_TAG)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 		{ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<upd7220_device> m_hgdc;
-	required_device<cassette_image_device> m_cass;
-	required_device<beep_device> m_beep;
-	required_device<upd765a_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
 
 	DECLARE_READ8_MEMBER(a5105_memsel_r);
 	DECLARE_READ8_MEMBER(key_r);
@@ -77,7 +66,16 @@ public:
 	DECLARE_WRITE8_MEMBER( a5105_upd765_w );
 	DECLARE_WRITE8_MEMBER(pcg_addr_w);
 	DECLARE_WRITE8_MEMBER(pcg_val_w);
-	required_shared_ptr<uint16_t> m_video_ram;
+	DECLARE_PALETTE_INIT(a5105);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
+
+	void a5105(machine_config &config);
+	void a5105_io(address_map &map);
+	void a5105_mem(address_map &map);
+	void upd7220_map(address_map &map);
+private:
 	uint8_t *m_ram_base;
 	uint8_t *m_rom_base;
 	uint8_t *m_char_ram;
@@ -87,13 +85,19 @@ public:
 	uint8_t m_memsel[4];
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(a5105);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	required_device<cpu_device> m_maincpu;
+	required_device<upd7220_device> m_hgdc;
+	required_device<cassette_image_device> m_cass;
+	required_device<beep_device> m_beep;
+	required_device<upd765a_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	required_shared_ptr<uint16_t> m_video_ram;
 	required_device<ram_device> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 };
 
 /* TODO */
@@ -153,7 +157,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( a5105_state::hgdc_draw_text )
 	}
 }
 
-static ADDRESS_MAP_START(a5105_mem, AS_PROGRAM, 8, a5105_state)
+ADDRESS_MAP_START(a5105_state::a5105_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2")
@@ -346,7 +350,7 @@ WRITE8_MEMBER( a5105_state::a5105_upd765_w )
 	m_fdc->tc_w(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START(a5105_io, AS_IO, 8, a5105_state)
+ADDRESS_MAP_START(a5105_state::a5105_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x41) AM_DEVICE("upd765a", upd765a_device, map)
@@ -536,7 +540,7 @@ void a5105_state::video_start()
 	m_char_ram = memregion("pcg")->base();
 }
 
-static ADDRESS_MAP_START( upd7220_map, 0, 16, a5105_state)
+ADDRESS_MAP_START(a5105_state::upd7220_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
@@ -556,9 +560,9 @@ static const z80_daisy_config a5105_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( a5105 )
+MACHINE_CONFIG_START(a5105_state::a5105)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_15MHz / 4)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(15'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(a5105_mem)
 	MCFG_CPU_IO_MAP(a5105_io)
 	MCFG_Z80_DAISY_CHAIN(a5105_daisy_chain)
@@ -582,17 +586,17 @@ static MACHINE_CONFIG_START( a5105 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_15MHz / 16) // unk clock
+	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(15'000'000) / 16) // unk clock
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(a5105_state, hgdc_display_pixels)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(a5105_state, hgdc_draw_text)
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_15MHz / 4)
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(15'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_15MHz / 4)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(15'000'000) / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_CASSETTE_ADD( "cassette" )

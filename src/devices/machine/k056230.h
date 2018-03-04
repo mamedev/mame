@@ -19,10 +19,10 @@
 ***************************************************************************/
 
 #define MCFG_K056230_CPU(_tag) \
-	k056230_device::set_cpu_tag(*device, "^" _tag);
+	downcast<k056230_device &>(*device).set_cpu_tag("^" _tag);
 
 #define MCFG_K056230_HACK(_region) \
-	k056230_device::set_thunderh_hack(*device, _region);
+	downcast<k056230_device &>(*device).set_thunderh_hack(_region);
 
 
 /***************************************************************************
@@ -37,8 +37,8 @@ public:
 	// construction/destruction
 	k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_cpu_tag(device_t &device, const char *tag) { downcast<k056230_device &>(device).m_cpu.set_tag(tag); }
-	static void set_thunderh_hack(device_t &device, int thunderh) { downcast<k056230_device &>(device).m_is_thunderh = thunderh; }
+	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
+	void set_thunderh_hack(int thunderh) { m_is_thunderh = thunderh; }
 
 	DECLARE_READ32_MEMBER(lanc_ram_r);
 	DECLARE_WRITE32_MEMBER(lanc_ram_w);

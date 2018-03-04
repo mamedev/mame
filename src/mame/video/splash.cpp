@@ -78,9 +78,8 @@ WRITE16_MEMBER(splash_state::vram_w)
 
 void splash_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int sx,sy,color,count,colxor,bitswap;
-	colxor = 0; /* splash and some bitmap modes in roldfrog */
-	bitswap = 0;
+	int colxor = 0; /* splash and some bitmap modes in roldfrog */
+	int swaps = 0;
 
 	if (m_bitmap_type == 1) /* roldfrog */
 	{
@@ -90,7 +89,7 @@ void splash_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		}
 		else if (m_bitmap_mode[0] == 0x0100)
 		{
-			bitswap = 1;
+			swaps = 1;
 		}
 		else if (m_bitmap_mode[0] == 0x0200)
 		{
@@ -98,56 +97,56 @@ void splash_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		}
 		else if (m_bitmap_mode[0] == 0x0300)
 		{
-			bitswap = 2;
+			swaps = 2;
 			colxor = 0x7f;
 		}
 		else if (m_bitmap_mode[0] == 0x0400)
 		{
-			bitswap = 3;
+			swaps = 3;
 		}
 		else if (m_bitmap_mode[0] == 0x0500)
 		{
-			bitswap = 4;
+			swaps = 4;
 		}
 		else if (m_bitmap_mode[0] == 0x0600)
 		{
-			bitswap = 5;
+			swaps = 5;
 			colxor = 0x7f;
 		}
 		else if (m_bitmap_mode[0] == 0x0700)
 		{
-			bitswap = 6;
+			swaps = 6;
 			colxor = 0x55;
 		}
 	}
 
-	count = 0;
-	for (sy=0;sy<256;sy++)
+	int count = 0;
+	for (int sy=0;sy<256;sy++)
 	{
-		for (sx=0;sx<512;sx++)
+		for (int sx=0;sx<512;sx++)
 		{
-			color = m_pixelram[count]&0xff;
+			int color = m_pixelram[count]&0xff;
 			count++;
 
-			switch( bitswap )
+			switch (swaps)
 			{
 			case 1:
-				color = BITSWAP8(color,7,0,1,2,3,4,5,6);
+				color = bitswap<8>(color,7,0,1,2,3,4,5,6);
 				break;
 			case 2:
-				color = BITSWAP8(color,7,4,6,5,1,0,3,2);
+				color = bitswap<8>(color,7,4,6,5,1,0,3,2);
 				break;
 			case 3:
-				color = BITSWAP8(color,7,3,2,1,0,6,5,4);
+				color = bitswap<8>(color,7,3,2,1,0,6,5,4);
 				break;
 			case 4:
-				color = BITSWAP8(color,7,6,4,2,0,5,3,1);
+				color = bitswap<8>(color,7,6,4,2,0,5,3,1);
 				break;
 			case 5:
-				color = BITSWAP8(color,7,0,6,5,4,3,2,1);
+				color = bitswap<8>(color,7,0,6,5,4,3,2,1);
 				break;
 			case 6:
-				color = BITSWAP8(color,7,4,3,2,1,0,6,5);
+				color = bitswap<8>(color,7,4,3,2,1,0,6,5);
 				break;
 			}
 
@@ -208,7 +207,8 @@ void splash_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 	int i;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 
-	for (i = 0; i < 0x400; i += 4){
+	for (i = 0x400-4; i >= 0; i -= 4)
+	{
 		int sx = m_spriteram[i+2] & 0xff;
 		int sy = (240 - (m_spriteram[i+1] & 0xff)) & 0xff;
 		int attr = m_spriteram[i+3] & 0xff;
@@ -228,7 +228,8 @@ void funystrp_state::funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle 
 	int i;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 
-	for (i = 0; i < 0x400; i += 4){
+	for (i = 0x400-4; i >= 0; i -= 4)
+	{
 		int sx = m_spriteram[i+2] & 0xff;
 		int sy = (240 - (m_spriteram[i+1] & 0xff)) & 0xff;
 		int attr = m_spriteram[i+3] & 0xff;

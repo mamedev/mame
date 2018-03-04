@@ -53,8 +53,7 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 	}
 	if ((offset & 0xA00) == 0xA00) // Serial
 	{
-		if (offset & 0x01) data &= m_acia->data_r(space, 0);
-		else data &= m_acia->status_r(space, 0);
+		data &= m_acia->read(space, offset & 0x01);
 	}
 	if ((offset & 0xC00) == 0x400) // SCREEN-PAC
 	{
@@ -80,8 +79,7 @@ WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
 			m_pia0->write(space, offset & 0x03, data);
 		if ((offset & 0xA00) == 0xA00) // Serial
 		{
-			if (offset & 0x01) m_acia->data_w(space, 0, data);
-			else m_acia->control_w(space, 0, data);
+			m_acia->write(space, offset & 0x01, data);
 		}
 		if ((offset & 0xC00) == 0x400) // SCREEN-PAC
 		{
@@ -105,7 +103,7 @@ WRITE8_MEMBER( osborne1_state::videoram_w )
 
 READ8_MEMBER( osborne1_state::opcode_r )
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		// Update the flipflops that control bank selection and NMI
 		uint8_t const new_ub6a_q = (m_btn_reset->read() & 0x80) ? 1 : 0;

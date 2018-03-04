@@ -9,7 +9,7 @@ DEFINE_DEVICE_TYPE(H83047, h83047_device, "h83047", "H8/3047")
 DEFINE_DEVICE_TYPE(H83048, h83048_device, "h83048", "H8/3048")
 
 h83048_device::h83048_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
-	h8h_device(mconfig, type, tag, owner, clock, address_map_delegate(FUNC(h83048_device::map), this)),
+	h8h_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h83048_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	port1(*this, "port1"),
@@ -57,7 +57,7 @@ h83047_device::h83047_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-DEVICE_ADDRESS_MAP_START(map, 16, h83048_device)
+ADDRESS_MAP_START(h83048_device::map)
 	AM_RANGE(ram_start, 0xffff0f) AM_RAM
 
 	AM_RANGE(0xffff60, 0xffff61) AM_DEVREADWRITE8("timer16",   h8_timer16_device,         tstr_r,  tstr_w,  0xff00)
@@ -151,7 +151,7 @@ DEVICE_ADDRESS_MAP_START(map, 16, h83048_device)
 	AM_RANGE(0xfffff8, 0xfffff9) AM_DEVREADWRITE8("intc",      h8h_intc_device,           icr_r,   icr_w,   0xffff)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER(h83048_device::device_add_mconfig)
+MACHINE_CONFIG_START(h83048_device::device_add_mconfig)
 	MCFG_H8H_INTC_ADD("intc")
 	MCFG_H8_ADC_3337_ADD("adc", "intc", 60)
 	MCFG_H8_PORT_ADD("port1", h8_device::PORT_1, 0x00, 0x00)

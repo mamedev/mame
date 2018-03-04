@@ -103,6 +103,13 @@ public:
 		auto &operator[](unsigned n) { return m_proxies[n]; }
 		auto &operator[](unsigned n) const { return m_proxies[n]; }
 
+		auto begin() { return std::begin(m_proxies); }
+		auto end() { return std::end(m_proxies); }
+		auto begin() const { return std::begin(m_proxies); }
+		auto end() const { return std::end(m_proxies); }
+		auto cbegin() const { return std::begin(m_proxies); }
+		auto cend() const { return std::end(m_proxies); }
+
 		void resolve() { resolve<0U>(m_proxies); }
 
 	private:
@@ -161,9 +168,6 @@ public:
 	// return the current value for a given output
 	s32 get_value(const char *outname);
 
-	// return the current value for a given indexed output
-	s32 get_indexed_value(const char *outname, int index);
-
 	// set a notifier on a particular output, or globally if nullptr
 	void set_notifier(const char *outname, output_notifier_func callback, void *param);
 
@@ -176,17 +180,14 @@ public:
 	// map a unique ID back to a name
 	const char *id_to_name(u32 id);
 
-
 	// helpers
 	void set_led_value(int index, int value) { set_indexed_value("led", index, value ? 1 : 0); }
 	void set_lamp_value(int index, int value) { set_indexed_value("lamp", index, value); }
-	void set_digit_value(int index, int value) { set_indexed_value("digit", index, value); }
-	s32 get_led_value(int index) { return get_indexed_value("led", index); }
-	s32 get_lamp_value(int index) { return get_indexed_value("lamp", index); }
-	s32 get_digit_value(int index) { return get_indexed_value("digit", index); }
+	[[deprecated("string format and hash in critical path")]] void set_digit_value(int index, int value) { set_indexed_value("digit", index, value); }
 
 	void pause();
 	void resume();
+
 private:
 	output_item *find_item(const char *string);
 	output_item &create_new_item(const char *outname, s32 value);

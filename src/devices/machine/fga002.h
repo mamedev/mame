@@ -9,19 +9,19 @@
 
 // LOCAL IRQ callbacks
 #define MCFG_FGA002_OUT_INT_CB(_devcb)                              \
-	devcb = &fga002_device::set_out_int_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<fga002_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
 
 #define MCFG_FGA002_OUT_LIACK4_CB(_devcb)                               \
-	devcb = &fga002_device::set_liack4_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<fga002_device &>(*device).set_liack4_callback(DEVCB_##_devcb);
 
 #define MCFG_FGA002_OUT_LIACK5_CB(_devcb)                               \
-	devcb = &fga002_device::set_liack5_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<fga002_device &>(*device).set_liack5_callback(DEVCB_##_devcb);
 
 #define MCFG_FGA002_OUT_LIACK6_CB(_devcb)                               \
-	devcb = &fga002_device::set_liack6_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<fga002_device &>(*device).set_liack6_callback(DEVCB_##_devcb);
 
 #define MCFG_FGA002_OUT_LIACK7_CB(_devcb)                               \
-	devcb = &fga002_device::set_liack7_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<fga002_device &>(*device).set_liack7_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -53,11 +53,11 @@ class fga002_device :  public device_t
 	int acknowledge();
 	int get_irq_level();
 
-	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<fga002_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_liack4_callback(device_t &device, Object &&cb) { return downcast<fga002_device &>(device).m_liack4_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_liack5_callback(device_t &device, Object &&cb) { return downcast<fga002_device &>(device).m_liack5_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_liack6_callback(device_t &device, Object &&cb) { return downcast<fga002_device &>(device).m_liack6_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_liack7_callback(device_t &device, Object &&cb) { return downcast<fga002_device &>(device).m_liack7_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_liack4_callback(Object &&cb) { return m_liack4_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_liack5_callback(Object &&cb) { return m_liack5_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_liack6_callback(Object &&cb) { return m_liack6_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_liack7_callback(Object &&cb) { return m_liack7_cb.set_callback(std::forward<Object>(cb)); }
 
  protected:
 	// type for array of mapping of FGA registers that assembles an IRQ source

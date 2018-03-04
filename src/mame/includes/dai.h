@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef DAI_H_
-#define DAI_H_
+#ifndef MAME_INCLUDES_DAI_H
+#define MAME_INCLUDES_DAI_H
 
 #include "cpu/i8085/i8085.h"
 #include "audio/dai_snd.h"
@@ -68,6 +68,9 @@ public:
 	void dai_update_memory(int dai_rom_bank);
 	IRQ_CALLBACK_MEMBER(int_ack);
 
+	void dai(machine_config &config);
+	void dai_io(address_map &map);
+	void dai_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -78,4 +81,4 @@ protected:
 extern const unsigned char dai_palette[16*3];
 
 
-#endif /* DAI_H_ */
+#endif // MAME_INCLUDES_DAI_H

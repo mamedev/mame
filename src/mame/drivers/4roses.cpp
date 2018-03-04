@@ -184,7 +184,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_16MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
 
 class _4roses_state : public funworld_state
 {
@@ -193,6 +193,8 @@ public:
 		: funworld_state(mconfig, type, tag) { }
 
 	DECLARE_DRIVER_INIT(4roses);
+	void _4roses(machine_config &config);
+	void _4roses_map(address_map &map);
 };
 
 
@@ -206,7 +208,7 @@ public:
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( 4roses_map, AS_PROGRAM, 8, _4roses_state )
+ADDRESS_MAP_START(_4roses_state::_4roses_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM // AM_SHARE("nvram")
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
@@ -353,10 +355,10 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( 4roses )
+MACHINE_CONFIG_START(_4roses_state::_4roses)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8) /* 2MHz, guess */
-	MCFG_CPU_PROGRAM_MAP(4roses_map)
+	MCFG_CPU_PROGRAM_MAP(_4roses_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _4roses_state,  nmi_line_pulse)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
@@ -466,6 +468,6 @@ DRIVER_INIT_MEMBER(_4roses_state,4roses)
 *************************/
 
 /*    YEAR  NAME     PARENT  MACHINE  INPUT   STATE          INIT    ROT   COMPANY      FULLNAME                         FLAGS  */
-GAME( 1999, 4roses,  0,      4roses,  4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, 4rosesa, 4roses, 4roses,  4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, rugby,   0,      4roses,  4roses, _4roses_state, 4roses, ROT0, "C.M.C.",    "Rugby? (four roses hardware)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, 4roses,  0,      _4roses, 4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, 4rosesa, 4roses, _4roses, 4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, rugby,   0,      _4roses, 4roses, _4roses_state, 4roses, ROT0, "C.M.C.",    "Rugby? (four roses hardware)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

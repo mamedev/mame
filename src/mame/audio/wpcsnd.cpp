@@ -29,7 +29,7 @@ wpcsnd_device::wpcsnd_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-static ADDRESS_MAP_START( wpcsnd_map, AS_PROGRAM, 8, wpcsnd_device )
+ADDRESS_MAP_START(wpcsnd_device::wpcsnd_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(rombank_w)
 	AM_RANGE(0x2400, 0x2401) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
@@ -66,8 +66,8 @@ uint8_t wpcsnd_device::data_r()
 	return m_reply;
 }
 
-MACHINE_CONFIG_MEMBER( wpcsnd_device::device_add_mconfig )
-	MCFG_CPU_ADD("bgcpu", M6809E, XTAL_8MHz) // MC68B09E
+MACHINE_CONFIG_START(wpcsnd_device::device_add_mconfig)
+	MCFG_CPU_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
 	MCFG_CPU_PROGRAM_MAP(wpcsnd_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
@@ -102,12 +102,6 @@ void wpcsnd_device::device_reset()
 	m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
 
 	m_reply_available = false;
-}
-
-void wpcsnd_device::static_set_romregion(device_t &device, const char *tag)
-{
-	wpcsnd_device &cpuboard = downcast<wpcsnd_device &>(device);
-	cpuboard.m_rom.set_tag(tag);
 }
 
 WRITE_LINE_MEMBER( wpcsnd_device::ym2151_irq_w)

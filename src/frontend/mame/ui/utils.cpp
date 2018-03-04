@@ -700,10 +700,9 @@ public:
 
 	virtual bool apply(ui_system_info const &system) const override
 	{
-		for (tiny_rom_entry const *rom = system.driver->rom; ((rom->flags & ROMENTRY_TYPEMASK) != ROMENTRYTYPE_END) && rom->name; ++rom)
+		for (tiny_rom_entry const *rom = system.driver->rom; !ROMENTRY_ISEND(rom); ++rom)
 		{
-			// FIXME: can't use the convenience macros tiny ROM entries
-			if ((ROMENTRYTYPE_REGION == (rom->flags & ROMENTRY_TYPEMASK)) && (ROMREGION_DATATYPEDISK == (rom->flags & ROMREGION_DATATYPEMASK)))
+			if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))
 				return true;
 		}
 		return false;

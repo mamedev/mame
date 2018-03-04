@@ -274,7 +274,7 @@ WRITE32_MEMBER( beathead_state::coin_count_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, beathead_state)
+ADDRESS_MAP_START(beathead_state::main_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("ram_base")
 	AM_RANGE(0x01800000, 0x01bfffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rom_base")
 	AM_RANGE(0x40000000, 0x400007ff) AM_RAM_WRITE(eeprom_data_w) AM_SHARE("nvram")
@@ -291,7 +291,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, beathead_state)
 	AM_RANGE(0x41000500, 0x41000503) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x41000600, 0x41000603) AM_WRITE(finescroll_w)
 	AM_RANGE(0x41000700, 0x41000703) AM_DEVWRITE("watchdog", watchdog_timer_device, reset32_w)
-	AM_RANGE(0x42000000, 0x4201ffff) AM_DEVREADWRITE16("palette", palette_device, read, write, 0x0000ffff) AM_SHARE("palette")
+	AM_RANGE(0x42000000, 0x4201ffff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0x43000000, 0x43000007) AM_READWRITE(hsync_ram_r, hsync_ram_w)
 	AM_RANGE(0x8df80000, 0x8df80003) AM_READNOP /* noisy x4 during scanline int */
 	AM_RANGE(0x8f380000, 0x8f3fffff) AM_WRITE(vram_latch_w)
@@ -360,7 +360,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( beathead )
+MACHINE_CONFIG_START(beathead_state::beathead)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
@@ -388,7 +388,7 @@ static MACHINE_CONFIG_START( beathead )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(beathead_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

@@ -37,13 +37,15 @@ public:
 	DECLARE_WRITE8_MEMBER(out1_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
+	void zac_proto(machine_config &config);
+	void zac_proto_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START( zac_proto_map, AS_PROGRAM, 8, zac_proto_state )
+ADDRESS_MAP_START(zac_proto_state::zac_proto_map)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0d00, 0x0dff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0e00, 0x0e00) AM_READ_PORT("PL0")
@@ -233,9 +235,9 @@ void zac_proto_state::machine_reset()
 	output().set_digit_value(10, 0x3f); // units shows zero all the time
 }
 
-static MACHINE_CONFIG_START( zac_proto )
+MACHINE_CONFIG_START(zac_proto_state::zac_proto)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", INS8060, XTAL_4MHz / 2) // Using SC/MP II chip which has an internal /2 circuit.
+	MCFG_CPU_ADD("maincpu", INS8060, XTAL(4'000'000) / 2) // Using SC/MP II chip which has an internal /2 circuit.
 	MCFG_CPU_PROGRAM_MAP(zac_proto_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -243,7 +245,7 @@ static MACHINE_CONFIG_START( zac_proto )
 	MCFG_DEFAULT_LAYOUT(layout_zac_proto)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 /*--------------------------------

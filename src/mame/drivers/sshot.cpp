@@ -188,6 +188,8 @@ public:
 	uint32_t screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void supershot(machine_config &config);
+	void supershot_map(address_map &map);
 };
 
 
@@ -266,7 +268,7 @@ WRITE8_MEMBER(supershot_state::supershot_output1_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( supershot_map, AS_PROGRAM, 8, supershot_state )
+ADDRESS_MAP_START(supershot_state::supershot_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(supershot_vidram_w ) AM_SHARE("videoram")
 	AM_RANGE(0x4100, 0x41ff) AM_RAM
@@ -337,10 +339,10 @@ static GFXDECODE_START( supershot )
 	GFXDECODE_ENTRY( "gfx", 0, supershot_charlayout,   0, 1  )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( supershot )
+MACHINE_CONFIG_START(supershot_state::supershot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SCMP, XTAL_11_289MHz/4)
+	MCFG_CPU_ADD("maincpu", SCMP, XTAL(11'289'000)/4)
 	MCFG_CPU_PROGRAM_MAP(supershot_map)
 
 	/* video hardware */

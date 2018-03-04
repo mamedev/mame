@@ -160,7 +160,7 @@ PALETTE_INIT_MEMBER(sega315_5378_device, sega315_5378)
 
 
 // default address map
-static ADDRESS_MAP_START( sega315_5124, 0, 8, sega315_5124_device )
+ADDRESS_MAP_START(sega315_5124_device::sega315_5124)
 	AM_RANGE(0x0000, VRAM_SIZE-1) AM_RAM
 ADDRESS_MAP_END
 
@@ -182,7 +182,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_int_cb(*this)
 	, m_csync_cb(*this)
 	, m_pause_cb(*this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(sega315_5124))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(), address_map_constructor(FUNC(sega315_5124_device::sega315_5124), this))
 	, m_palette(*this, "palette")
 {
 }
@@ -294,13 +294,13 @@ void sega315_5124_device::set_frame_timing()
 READ8_MEMBER( sega315_5124_device::vcount_read )
 {
 	const int active_scr_start = m_frame_timing[VERTICAL_SYNC] + m_frame_timing[TOP_BLANKING] + m_frame_timing[TOP_BORDER];
-	int vpos = m_screen->vpos();
+	int vpos = screen().vpos();
 
-	if (m_screen->hpos() < VCOUNT_CHANGE_HPOS)
+	if (screen().hpos() < VCOUNT_CHANGE_HPOS)
 	{
 		vpos--;
 		if (vpos < 0)
-			vpos += m_screen->height();
+			vpos += screen().height();
 	}
 
 	return (vpos - active_scr_start) & 0xff;
@@ -349,7 +349,7 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 	case TIMER_DRAW:
 		update_palette();
-		draw_scanline( LBORDER_START + LBORDER_WIDTH, param, m_screen->vpos() - param );
+		draw_scanline( LBORDER_START + LBORDER_WIDTH, param, screen().vpos() - param );
 		break;
 
 	case TIMER_LBORDER:
@@ -418,7 +418,7 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 void sega315_5124_device::process_line_timer()
 {
-	const int vpos = m_screen->vpos();
+	const int vpos = screen().vpos();
 	int vpos_limit = m_frame_timing[VERTICAL_SYNC] + m_frame_timing[TOP_BLANKING]
 					+ m_frame_timing[TOP_BORDER] + m_frame_timing[ACTIVE_DISPLAY_V]
 					+ m_frame_timing[BOTTOM_BORDER] + m_frame_timing[BOTTOM_BLANKING];
@@ -462,7 +462,7 @@ void sega315_5124_device::process_line_timer()
 			if (m_line_counter == 0x00)
 			{
 				m_line_counter = m_reg[0x0a];
-				m_hint_timer->adjust( m_screen->time_until_pos( vpos, HINT_HPOS ) );
+				m_hint_timer->adjust( screen().time_until_pos( vpos, HINT_HPOS ) );
 				m_pending_status |= STATUS_HINT;
 			}
 			else
@@ -477,19 +477,19 @@ void sega315_5124_device::process_line_timer()
 
 		if (vpos == vpos_limit + 1)
 		{
-			m_vint_timer->adjust( m_screen->time_until_pos( vpos, VINT_HPOS ) );
+			m_vint_timer->adjust( screen().time_until_pos( vpos, VINT_HPOS ) );
 			m_pending_status |= STATUS_VINT;
 		}
 
 		/* Draw borders */
-		m_lborder_timer->adjust( m_screen->time_until_pos( vpos, LBORDER_START ), vpos );
-		m_rborder_timer->adjust( m_screen->time_until_pos( vpos, LBORDER_START + LBORDER_WIDTH + 256 ), vpos );
+		m_lborder_timer->adjust( screen().time_until_pos( vpos, LBORDER_START ), vpos );
+		m_rborder_timer->adjust( screen().time_until_pos( vpos, LBORDER_START + LBORDER_WIDTH + 256 ), vpos );
 
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function */
 		/* so sprite collisions can occur on the border. */
 		select_sprites( vpos - (vpos_limit - m_frame_timing[ACTIVE_DISPLAY_V]) );
-		m_draw_timer->adjust( m_screen->time_until_pos( vpos, m_draw_time ), vpos_limit - m_frame_timing[ACTIVE_DISPLAY_V] );
+		m_draw_timer->adjust( screen().time_until_pos( vpos, m_draw_time ), vpos_limit - m_frame_timing[ACTIVE_DISPLAY_V] );
 		return;
 	}
 
@@ -506,7 +506,7 @@ void sega315_5124_device::process_line_timer()
 		if (m_line_counter == 0x00)
 		{
 			m_line_counter = m_reg[0x0a];
-			m_hint_timer->adjust( m_screen->time_until_pos( vpos, HINT_HPOS ) );
+			m_hint_timer->adjust( screen().time_until_pos( vpos, HINT_HPOS ) );
 			m_pending_status |= STATUS_HINT;
 		}
 		else
@@ -515,12 +515,12 @@ void sega315_5124_device::process_line_timer()
 		}
 
 		/* Draw borders */
-		m_lborder_timer->adjust( m_screen->time_until_pos( vpos, LBORDER_START ), vpos );
-		m_rborder_timer->adjust( m_screen->time_until_pos( vpos, LBORDER_START + LBORDER_WIDTH + 256 ), vpos );
+		m_lborder_timer->adjust( screen().time_until_pos( vpos, LBORDER_START ), vpos );
+		m_rborder_timer->adjust( screen().time_until_pos( vpos, LBORDER_START + LBORDER_WIDTH + 256 ), vpos );
 
 		/* Draw active display */
 		select_sprites( vpos - vpos_limit );
-		m_draw_timer->adjust( m_screen->time_until_pos( vpos, m_draw_time ), vpos_limit );
+		m_draw_timer->adjust( screen().time_until_pos( vpos, m_draw_time ), vpos_limit );
 		return;
 	}
 
@@ -534,18 +534,18 @@ void sega315_5124_device::process_line_timer()
 		/* Check if we're on the last line of the top border */
 		if (vpos == vpos_limit + m_frame_timing[TOP_BORDER] - 1)
 		{
-			m_nmi_timer->adjust( m_screen->time_until_pos( vpos, NMI_HPOS ) );
+			m_nmi_timer->adjust( screen().time_until_pos( vpos, NMI_HPOS ) );
 		}
 
 		/* Draw borders */
-		m_lborder_timer->adjust( m_screen->time_until_pos( vpos, LBORDER_START ), vpos );
-		m_rborder_timer->adjust( m_screen->time_until_pos( vpos, LBORDER_START + LBORDER_WIDTH + 256 ), vpos );
+		m_lborder_timer->adjust( screen().time_until_pos( vpos, LBORDER_START ), vpos );
+		m_rborder_timer->adjust( screen().time_until_pos( vpos, LBORDER_START + LBORDER_WIDTH + 256 ), vpos );
 
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function */
 		/* so sprite collisions can occur on the border. */
 		select_sprites( vpos - (vpos_limit + m_frame_timing[TOP_BORDER]) );
-		m_draw_timer->adjust( m_screen->time_until_pos( vpos, m_draw_time ), vpos_limit + m_frame_timing[TOP_BORDER] );
+		m_draw_timer->adjust( screen().time_until_pos( vpos, m_draw_time ), vpos_limit + m_frame_timing[TOP_BORDER] );
 		return;
 	}
 
@@ -567,7 +567,7 @@ READ8_MEMBER( sega315_5124_device::vram_read )
 	/* Return read buffer contents */
 	temp = m_buffer;
 
-	if ( !machine().side_effect_disabled() )
+	if ( !machine().side_effects_disabled() )
 	{
 		/* Load read buffer */
 		m_buffer = this->space().read_byte(m_addr & 0x3fff);
@@ -600,7 +600,7 @@ void sega315_5124_device::check_pending_flags()
 	}
 	else
 	{
-		hpos = m_screen->hpos();
+		hpos = screen().hpos();
 	}
 
 	if ((m_pending_status & STATUS_HINT) && hpos >= HINT_HPOS)
@@ -634,7 +634,7 @@ READ8_MEMBER( sega315_5124_device::register_read )
 	check_pending_flags();
 	temp = m_status;
 
-	if ( !machine().side_effect_disabled() )
+	if ( !machine().side_effects_disabled() )
 	{
 		/* Clear pending write flag */
 		m_pending_reg_write = 0;
@@ -721,11 +721,11 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 				break;
 			case 1:
 				set_display_settings();
-				if (m_screen->hpos() <= DISPLAY_DISABLED_HPOS)
+				if (screen().hpos() <= DISPLAY_DISABLED_HPOS)
 					m_display_disabled = !(m_reg[0x01] & 0x40);
 				break;
 			case 8:
-				if (m_screen->hpos() <= XSCROLL_HPOS)
+				if (screen().hpos() <= XSCROLL_HPOS)
 					m_reg8copy = m_reg[0x08];
 			}
 
@@ -1602,13 +1602,13 @@ void sega315_5124_device::device_start()
 	m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;
 
 	/* Make temp bitmap for rendering */
-	m_screen->register_screen_bitmap(m_tmpbitmap);
-	m_screen->register_screen_bitmap(m_y1_bitmap);
+	screen().register_screen_bitmap(m_tmpbitmap);
+	screen().register_screen_bitmap(m_y1_bitmap);
 
 	m_display_timer = timer_alloc(TIMER_LINE);
-	m_display_timer->adjust(m_screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, m_screen->scan_period());
+	m_display_timer->adjust(screen().time_until_pos(0, DISPLAY_CB_HPOS), 0, screen().scan_period());
 	m_pending_flags_timer = timer_alloc(TIMER_FLAGS);
-	m_pending_flags_timer->adjust(m_screen->time_until_pos(0, WIDTH - 1), 0, m_screen->scan_period());
+	m_pending_flags_timer->adjust(screen().time_until_pos(0, WIDTH - 1), 0, screen().scan_period());
 	m_draw_timer = timer_alloc(TIMER_DRAW);
 	m_lborder_timer = timer_alloc(TIMER_LBORDER);
 	m_rborder_timer = timer_alloc(TIMER_RBORDER);
@@ -1698,7 +1698,7 @@ void sega315_5124_device::device_reset()
 //  device_add_mconfig - add machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( sega315_5124_device::device_add_mconfig )
+MACHINE_CONFIG_START(sega315_5124_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", SEGA315_5124_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
 MACHINE_CONFIG_END
@@ -1713,7 +1713,7 @@ void sega315_5378_device::device_reset()
 //  device_add_mconfig - add machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( sega315_5378_device::device_add_mconfig )
+MACHINE_CONFIG_START(sega315_5378_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", SEGA315_5378_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(sega315_5378_device, sega315_5378)
 MACHINE_CONFIG_END

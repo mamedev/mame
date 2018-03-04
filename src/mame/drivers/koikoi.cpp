@@ -82,6 +82,9 @@ public:
 	uint32_t screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void koikoi(machine_config &config);
+	void koikoi_io_map(address_map &map);
+	void koikoi_map(address_map &map);
 };
 
 
@@ -229,7 +232,7 @@ WRITE8_MEMBER(koikoi_state::io_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( koikoi_map, AS_PROGRAM, 8, koikoi_state )
+ADDRESS_MAP_START(koikoi_state::koikoi_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")
@@ -237,7 +240,7 @@ static ADDRESS_MAP_START( koikoi_map, AS_PROGRAM, 8, koikoi_state )
 	AM_RANGE(0x9000, 0x9007) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( koikoi_io_map, AS_IO, 8, koikoi_state )
+ADDRESS_MAP_START(koikoi_state::koikoi_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_WRITENOP //watchdog
 	AM_RANGE(0x03, 0x03) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -347,7 +350,7 @@ void koikoi_state::machine_reset()
 		m_ioram[i] = 0;
 }
 
-static MACHINE_CONFIG_START( koikoi )
+MACHINE_CONFIG_START(koikoi_state::koikoi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)   /* ?? */

@@ -4,258 +4,774 @@
 
 <!--
 
- Known undumped discs (possibly more exist), based on Blitzkrieg's researches
+Missing list based on http://fmtowns.a.la9.jp/db/sdb.html
 
+Some titles / company names are quite obscure and may be badly romanized. Also, different versions of some software (TownsOS, etc.) may exist.
 
- ? 0 Hoshi Uranai Jutsu Dai Rei Gen             Feb-90  Victor  (CDx1)
- ? Airwave Adventure                            Dec-89  Toshiba EMI (CDx1)
- ? Debut Shimasu                                Jun-94  Iris Plan   (CDx1)
- ? Debut Shimasu 3                              Feb-95  Iris Plan   (CDx1)
- ? Doda Mega Mix                                Nov-89  FNC (CDx1)
- ? Dragon Shock                                 Nov-89      (CDx1)
- ? Game Nihonshi: Tenkajin Hideyoshi to Ieyasu  Jun-96  Koei    (CDx1)
- ? Hyper Koto no tabi Kyoto                     Feb-93  Workshop    (CDx1)
- ? Hyper Touhoku Kikou                          Dec-91  Workshop    (CDx1)
- ? Monster Planet 2255                          Dec-90  Japan Media Programming (CDx1)
- ? Nazo Nazo Meiro Daibouken Pyokotan Nochieasobi Ehon  Sep-91  Workshop    (CDx1)
- ? Pyokotan no Niji no Shima Nanashoku no Ninjin o Sagase   Mar-94  Workshop    (CDx1)
- ? Tree Club                                    Jul-95  Fujitsu (CDx1)
- ? Uemura Kei no Sexy Resort                    Sep-92  Pink Elephant   (CDx1)
- ? Uemura Kei no Sexy Telephone                 Sep-92  Pink Elephant   (CDx1)
- ? Uji-bushi no Chiiku Game                     Apr-94  Japan Measuring Equipment   (CDx1)
- ? Woman's Memory                               Apr-91  Human Interface (CDx1)
- ? Yawahada Bishoujo                            Mar-95      (CDx1)
- ? Yu Ji Puchikora                              Mar-94  Panther Software    (CDx1)
- ? Zadeito Kore de Kanojo wa Boku no Mono!      Feb-90  Japan Media Programming (CDx1)
- AD&D: Heroes of Lance                          Jun-90  Pony Canyon (CDx1)
- Aesop's World Vol.1                            Dec-93  Fujitsu (CDx1)
- Aesop's World Vol.2                            Dec-93  Fujitsu (CDx1)
- Air Warrior                                    Mar-92  Fujitsu (CDx1)
- Air Warrior v1.2                               Nov-93  Fujitsu (CDx1)
- Air Warrior v2.1                               Apr-95  Fujitsu (CDx1)
- Akiko Gold: The Queen of Adult                 Jan-95  Fairytale - Red Zone    (CDx1)
- Akiko Premium                                  Mar-93  Fairytale - Red Zone    (CDx1)
- Arcadia                                        Feb-91  Workshop    (CDx1)
- Arquelphos                                     Jul-93  D.O.    (CDx1)
- Battle                                         Oct-92  GAM (CDx1)
- Battle Chess                                   Sep-91  Fujitsu (CDx1)
- Bell's Avenue Vol.1                            Aug-93  Wendy Magazine  (CDx1)
- Bell's Avenue Vol.2                            Jan-94  Wendy Magazine  (CDx1)
- Bell's Avenue Vol.3                            Apr-95  Wendy Magazine  (CDx1)
- Bible Master 2                                 Jan-95  Glodia  (CDx1)
- Big Honor                                      Sep-92  Artdink (CDx1)
- Biochemistry Cyber Alpha                       Apr-96  D.O.    (CDx1)
- Birdy Soft Top Characters                      Apr-95  Birdy Soft  (CDx1)
- Bomber Quest                                   XXX-95  Mink    (CDx1)
- Bunretsu Shugoshin Twinkle-Star                Jul-93  Studio Twinkle  (CDx1)
- Cal 3                                          Jul-93  Birdy Soft  (CDx1)
- California X Party                             Sep-94  HOP (CDx1)
- Can Can Bunny Premiere                         Sep-92  Cocktail Soft   (CDx1)
- Castles 2                                      Oct-93  Victor  (CDx1)
- Cat's Part 1                                   Apr-93  Cats Pro    (CDx1)
- Cat's Vol.2: Special Hospital                  ===     Cats Pro    (CDx1)
- Chiemi & Naomi                                 Dec-93  Fairytale - Red Zone    (CDx1)
- Chinmoku no Kantai                             Apr-92  GAM (CDx1)
- Chiri Jigsaw World 2                           Dec-94  Fujitsu (CDx1)
- Collector D                                    Aug-93  D.O.    (CDx1)
- Collector D (Extra Edition)                    Sep-93  D.O.    (CDx1)
- Crescent Moon Girl                             XXX-89  Alice Soft  (CDx1)
- Curse                                          Feb-95  Queen Soft  (CDx1)
- Custom Mate                                    Dec-94  Cocktail Soft   (CDx1)
- Cutie Queen                                    Feb-95  Crystal Video   (CDx1)
- Demon City                                     Mar-94  Cocktail Soft   (CDx1)
- Dengeki Nurse 2: More Sexy                     Dec-94  Cocktail Soft   (CDx1)
- Diamond Players                                Jun-93  Wolf Team   (CDx1)
- Doki Doki Vacation                             Mar-95  Cocktail Soft   (CDx1)
- DOR Best Collection Chapter 2                  May-93  D.O.    (CDx2)
- Dracula Hakushaku                              Mar-93  Fairytale   (CDx1)
- Eight Lakes G.C.                               Aug-90  T & E Soft  (CDx1)
- Eikan wa Kimini 2                              Aug-91  Artdink (CDx1)
- Eikan wa Kimini 3                              Aug-93  Artdink (CDx1)
- Emit Vol.1                                     Mar-94  Koei    (CDx1)
- Emit Vol.2                                     Jul-94  Koei    (CDx1)
- Emit Vol.3                                     Sep-94  Koei    (CDx1)
- Engage Errands                                 Apr-95  Ponytail Soft   (CDx1)
- Engage Errands 2                               May-95  Ponytail Soft   (CDx1)
- Eye of the Beholder 3                          Nov-94  Ving    (CDx1)
- Fujitsu Habitat                                Jan-90  Fujitsu (CDx1)
- Fujitsu Habitat 2                              May-94  Fujitsu (CDx1)
- Gadget                                         Dec-93  Toshiba EMI (CDx1)
- Gakuen Bakuretsu Tenkousei                     Mar-96  ZyX (CDx1)
- Gakuen Bomber                                  Jun-94  Active  (CDx1)
- Gambler: Queen's Cup                           Sep-94  Queen Soft  (CDx1)
- Game Nihonshi: Kakumeiko Oda Nobunaga          Mar-96  Koei    (CDx1)
- Garou Densetsu Special                         Sep-96  JHV (CDx1)
- Gei Yumejan +                                  May-93  GAM (CDx1)
- Ginga Eiyuu Densetsu 2DX +                     May-92  Bothtec (CDx1)
- Ginga Eiyuu Densetsu 3 SP                      Dec-93  Bothtec (CDx1)
- Ginga Yuukyou Densetsu RC Tobacker             Nov-95  Ponytail Soft   (CDx1)
- Gokko Vol.1: Doctor                            Nov-94  Mink    (CDx1)
- Gokko Vol.2: School Gals                       Dec-94  Mink    (CDx1)
- Gokko Vol.3: Etcetera                          Dec-94  Mink    (CDx1)
- Gokuraku Mandala                               Feb-94  Fairytale   (CDx1)
- Grimm's Fairy Tales 1: Little Red Riding Hood  Nov-89  Gyosei  (CDx1)
- Grimm's Fairy Tales 2: Musicians of Bremen     Dec-89  Gyosei  (CDx1)
- Grimm's Fairy Tales 3: The Wolf and the Seven Little Kids  Nov-90  Gyosei  (CDx1)
- Grimm's Fairy Tales 4: Sleeping Beauty         Nov-90  Gyosei  (CDx1)
- Gulf War: Soukouden                            Dec-93  Telenet Japan   (CDx1)
- Half-Moon in Kawaru Made                       Apr-95  Cocktail Soft   (CDx1)
- Hana no Kioku 2                                Dec-96  Foster Japan    (CDx1)
- Hana Yori Dango 2                              Apr-93  Active  (CDx1)
- Harukanaru Augusta                             Jan-90  T & E Soft  (CDx1)
- Hello Kitty: Asobi no Mochabako                Sep-95  Fujitsu (CDx1)
- Hello Kitty: Kitty Town no Naka Matachi Tanoshii Seikatsu  XXX-95  Fujitsu (CDx1)
- High School War                                Sep-94  I.S.C.  (CDx1)
- If                                             Jun-93  Active  (CDx1)
- If 2                                           Nov-93  Active  (CDx1)
- If 3                                           Apr-95  Active  (CDx1)
- Igo Doujou Shodan Kaigan! Kyuu Karadane no Chousen May-91  Fujitsu (CDx1)
- Igo Doujou Yaburi Menkyokaiden!! Mezase 7-Kyuu Oct-90  Fujitsu (CDx1)
- Introduction to Go Dojo                        Jun-91  GAM (CDx1)
- Intruder: Sakura Yashiki no Tansaku            XXX-89 Alice Soft  (CDx1)
- Irisu-tei Sayokyoku                            Nov-92  Agumix  (CDx1)
- Ishin no Arashi                                Mar-90  Koei    (CDx1)
- J-League Professional Soccer 1994              Sep-94  Victor  (CDx1)
- Jinmon Yuugi                                   Aug-95  Fairytale - Red Zone    (CDx1)
- Joker Towns                                    Jul-92  Birdy Soft  (CDx1)
- Joshikou Seifuku Monogatari                    Apr-95  KSS (CDx1)
- Joshikousei Shoujo Densetsu                    Apr-94  Byakuya Shobou  (CDx1)
- JYB                                            Apr-93  Cocktail Soft   (CDx1)
- Kamigami No Daichi: Kojiki Gaiden              Oct-93  Koei    (CDx1)
- Kero Kero Keroppi to Origami no Tabibito       Jul-95  Fujitsu (CDx1)
- Kikou Shidan 2                                 Mar-93  Artdink (CDx1)
- Kouryuuki                                      Oct-93  Koei    (CDx1)
- Kousoku Choujin                                Aug-96  Foster Japan    (CDx1)
- KU2++                                          Nov-93  Panther Software    (CDx1)
- Kusuriyubi no Kyoukasho                        Apr-96  Active  (CDx1)
- Kyouko no Ijiwaru!                             Oct-94  Ponytail Soft   (CDx1)
- L'Empereur                                     Jan-91  Koei    (CDx1)
- Leading Company                                Apr-92  Koei    (CDx1)
- Lemon Cocktail Collection                      Mar-93  Cocktail Soft   (CDx1)
- Lipstick Adventure 3                           May-93  Fairytale   (CDx1)
- Little Big Adventure                           Dec-95  Electronic Arts (CDx1)
- Lord of the Rings 2: The Two Towers            Apr-93  Star Craft  (CDx1)
- Lord of the Rings: The Fellowship of the Ring  Mar-92  Star Craft  (CDx1)
- Lua                                            Jun-93  Inter Heart (CDx1)
- Mahjong Bishoujo Den Rippuru                   Feb-95  Foresight   (CDx1)
- Mahjong Fantasia 2                             Sep-93  Active  (CDx1)
- Mahjong Fantasia 3                             Nov-95  Active  (CDx1)
- Mahjong Goku                                   Apr-89  ASCII   (CDx1)
- Mahjong Musashi                                XXX-89 Computer Cosmos (CDx1)
- Manami no Doko made Iku no                     May-95  Wendy Magazine  (CDx1)
- Manami no Doko made Iku no 2: Return of the Kuro Pack  May-95  Wendy Magazine  (CDx1)
- Manami: Ai to Koukan no Hibi                   XXX-95 Fairytale - Red Zone    (CDx1)
- Marionette Mind                                Mar-94  Studio Milk (CDx1)
- Mega Lo Mania                                  Mar-93  Imagineer   (CDx1)
- Meisou Toshi                                   Dec-95  Tiare   (CDx1)
- Might & Magic: World of Xeen                   Oct-92  Star Craft  (CDx1)
- Mirage 2                                       Dec-94  Discovery   (CDx1)
- Misato-chan no Yume Nikki                      Apr-97  Active  (CDx1)
- Moeru Asoko no Pai Pai Yuugi                   Dec-93  Illusion    (CDx1)
- Mokkori Man RPG                                Jun-94  Illusion    (CDx1)
- Monoshiri ji Yuugaku Hyakunin Ichishuhen       Oct-94  Shinko Human Request    (CDx1)
- Moonlight Energy                               Dec-92  Inter Heart (CDx1)
- Murder Club DX                                 May-92  Riverhill Soft  (CDx1)
- Naru Mahjong                                   Apr-95  Libido  (CDx1)
- Nemurenu Yoru no Chisana Ohanashi              Dec-93  Amuse   (CDx1)
- Never Land                                     Mar-96  Tips    (CDx1)
- NHK Hitori de Dekiru Mon!                      Mar-95  Rei (CDx1)
- Nijiiro Denshoku Musume                        Aug-94  I.S.C.  (CDx1)
- Niko 2                                         Nov-91  Telenet Japan   (CDx1)
- Nippon Mukashibanashi 2                        Jul-91  Gyosei  (CDx1)
- Nippon Mukashibanashi 3                        Dec-93  Gyosei  (CDx1)
- Nippon Mukashibanashi 4                        Dec-93  Gyosei  (CDx1)
- Nippon Mukashibanashi 5                        Mar-94  Gyosei  (CDx1)
- Nobunaga no Yabou: Sengoku Gunyuu Den          Dec-89  Koei    (CDx1)
- Nostalgia 1907                                 May-92  Sur de Wave (CDx1)
- Noushuku Angel 120%                            Apr-95  Cocktail Soft   (CDx1)
- Obachan no Chiebukuro                          Nov-91  Gyosei  (CDx1)
- Oku man Choja 2                                Jul-91  Computer Cosmos (CDx1)
- Only You: Juliet of the Century                Jan-96  Alice Soft  (CDx1)
- Orient Express                                 Dec-94  Gyosei  (CDx1)
- Palamedes                                      XXX-91 Ving    (CDx1)
- Para Para Paradise                             Dec-95  Family Soft (CDx2)
- Phobos                                         Aug-95  Himeya Soft, Inc    (CDx1)
- Pocky & Ponyon                                 Jun-94  Ponytail Soft   (CDx1)
- Populous 2                                     Feb-93  Imagineer   (CDx1)
- Presence                                       Dec-92  Sur de Wave (CDx1)
- Private Slave                                  Aug-93  Raccoon (CDx1)
- ProYakyuu Family Stadium '90                   Sep-90  Game Arts   (CDx1)
- Record of Lodoss War 2                         Jun-94  MAC (CDx1)
- Reijou Monogatari                              Apr-95  Inter Heart (CDx1)
- Rinkan Gakkou                                  Feb-96  Foster Japan    (CDx1)
- Royal Blood                                    May-92  Koei    (CDx1)
- Ryuutatakaden                                  Jun-94  Fujitsu (CDx1)
- Sakura no Mori                                 XXX-95 Active  (CDx1)
- Sangokushi 2                                   Jun-90  Koei    (CDx1)
- Sangokushi 3                                   Jun-92  Koei    (CDx1)
- Sangokushi 4                                   Jun-94  Koei    (CDx1)
- Sargon 5                                       Nov-92  GAM (CDx1)
- Sayonara no Mukougawa                          Aug-97  Foster Japan    (CDx1)
- Seikatsu Simulation Watashi no Machi           May-95  Cocktail Soft   (CDx1)
- Sekai no o Hanashi                             May-92  Gyosei  (CDx1)
- Sekigahara                                     Apr-92  Artdink (CDx1)
- Sensual Angels                                 Jan-94  JHV (CDx1)
- Sexy P/K Part 2: World Cup Hen                 May-95  Birdy Soft  (CDx1)
- Sexy P/K Part Nihon                            Apr-95  Birdy Soft  (CDx1)
- Shamhat: The Holy Circlet                      Apr-93  Data West   (CDx1)
- Shanghai                                       Dec-90  ASCII   (CDx1)
- Shanghai: Great Wall                           Sep-95  Electronic Arts (CDx1)
- Shinjuku Labyrinth                             ====    Tokuma Shoten   (CDx1)
- Shooting Towns                                 Mar-90  Amorphous   (CDx1)
- SL o mitai! Uruwashi no Joki Kikan-sha         Jul-95  Gyosei  (CDx1)
- Soft de Hard na Monogatari                     Apr-89  System Sacom    (CDx1)
- Soft de Hard na Monogatari 2                   Jul-89  System Sacom    (CDx1)
- Sokoban Perfect                                Jul-90  Thinking Rabbit (CDx1)
- Space Odyssey Galaxy                           Mar-91  Fujitsu (CDx1)
- Space Odyssey Galaxy 2                         Apr-92  Fujitsu (CDx1)
- Steepia                                        Jun-93  Fujitsu (CDx1)
- Steepia Lite                                   Mar-93  Fujitsu (CDx1)
- Suikoden: Tenmei no Chikai                     Feb-90  Koei    (CDx1)
- Super Real Mahjong P2 & P3 +                   Mar-93  Ving    (CDx1)
- Suzaku                                         Oct-92  Wolf Team   (CDx1)
- Tactical Tank Corps DX                         Feb-95  GAM (CDx1)
- Tamashi no Mon: Dante Shinkyoku Yori           Jun-93  Koei    (CDx1)
- Tania                                          Nov-96  Tips    (CDx1)
- Teito Taisen                                   Dec-89  Supersonic  (CDx1)
- Teitoku no Ketsudan                            Apr-90  Koei    (CDx1)
- Teitoku no Ketsudan 2                          Jun-94  Koei    (CDx1)
- Tenshi-Tachi no Gogo Collection 2              Nov-95  Jast    (CDx1)
- Tenshin Ranma                                  May-92  Elf (CDx1)
- Teo: Another Earth                             Sep-95  Fujitsu (CDx1)
- Teo: Another Earth 2                           Jul-96  Fujitsu (CDx1)
- The Playroom                                   Feb-95  Fujitsu (CDx1)
- The Queen of Duellist Alpha                    Mar-94  Agumix  (CDx1)
- The Queen of Duellist Alpha Light              Apr-94  Agumix  (CDx1)
- Theme Park                                     Sep-95  Electronic Arts (CDx1)
- Time Stripper Mako-chan                        Jan-96  Foster Japan    (CDx1)
- Tokyo Labyrinth                                Dec-94  Tokuma Shoten   (CDx1)
- Tokyo Sexy Ave.                                Jul-94  HOP (CDx1)
- Tokyo-to Dai 24-Ku                             Dec-92  Artdink (CDx1)
- Tom Snyder's Puppy Love                        Jul-89  Fujitsu (CDx1)
- Tom Snyder's Puppy Love 2                      Mar-93  Fujitsu (CDx1)
- Toushin Toshi                                  Apr-95  Alice Soft  (CDx1)
- Trigger                                        Jun-94  ZyX (CDx1)
- Trigger 2                                      Sep-95  ZyX (CDx1)
- True Heart                                     Feb-95  Cocktail Soft   (CDx1)
- Two Shot Diary                                 Oct-94  Mink    1
- URM                                            Dec-94  JHV (CDx1)
- Vampire High School                            Jun-93  Inter Heart (CDx1)
- Vanishing Point                                XXX-95 Tiare   (CDx1)
- Viper GTS                                      Nov-95  Sogna   (CDx1)
- Viper V12                                      Dec-95  Sogna   (CDx1)
- Viper V8 Turbo RS                              Jun-95  Sogna   (CDx1)
- Virtuacall 2                                   Dec-95  Fairytale   (CDx1)
- Winning Post                                   May-93  Koei    (CDx1)
- Wonpara Wars                                   Feb-95  Mink    (CDx1)
- Wonpara Wars 2                                 Apr-95  Mink    (CDx1)
- Yayo 1-2-3                                     Jul-93  Hado    (CDx1)
- Yayo 4                                         Feb-93  Hado    (CDx1)
- Yes! HG                                        Dec-95  Himeya Soft, Inc    (CDx1)
- Youjuu Senki 2 Reimei no Senshi                Feb-94  D.O.    (CDx1)
- Youjuu Senki: Sajin no Mokushiroku             Feb-94  D.O.    (CDx1)
- Yume Utsutsu: Dreamy                           May-92  Megami  (CDx1)
- Zan 3                                          Apr-94  Telenet Japan   (CDx1)
+Items with * are in the list, but are bad dumps or incomplete.
+
+TODO:
+
+- Confirm if the "Car Marty Exciting CD" is the same thing as the "Exciting CD" alredy in the list.
+- Is "Ms. Detective File #1" the Marty-compatible edition or not? Keeping both for now.
+
+                            Title                                         Publisher             Release date  Media
+4D Boxing (Marty compatible)                                  Electronic Arts Victor            1993/7     CD
+4D Driving (Marty compatible)                                 Electronic Arts Victor            1993/7     CD
+A Christmas Carol                                             DynEd Japan                       1993/3     SET(CD+FD)
+A Jack in the Box                                             Raison                            1989/11    CD
+A Night in Tunisia                                            Raison                            1991/9     CD
+Ablemax Eigo                                                  Able Serve                        1995/6     SET(CD+FD)
+Ablemax Kokugo                                                Able Serve                        1995/6     SET(CD+FD)
+Ablemax Suugaku                                               Able Serve                        1995/6     SET(CD+FD)
+AD&D Heroes of the Lance                                      Pony Canyon                       1990/6     CD
+Aesop World Dai-1-shuu (Denshi Ehon)                          Fujitsu                           1993/12    CD
+Aesop World Dai-2-shuu (Denshi Ehon)                          Fujitsu                           1993/12    CD
+Airwave Adventure                                             Toshiba EMI                       1989/12    CD
+Aishuu to Netsujou no Chouwa                                  Fujitsu                           1995/4     CD
+Akiko Gold                                                    Fairytale (Red Zone)              1995/1     SET(CD+FD)
+Akiko Premium Version                                         Fairytale (Red Zone)              1993/3     CD
+Alice in Wonderland                                           DynEd Japan                       1993/3     SET(CD+FD)
+* Alice no Yakata 3 CD                                        Alice Soft                        1995/6     CD
+Amour Ver. 1.0                                                Kozu System                       1989/11    SET(CD+FD)
+AniVox Eiken 3-4-kyuu Hatsuon-Accent Ban                      Unity                             1992/6     SET(CD+FD)
+Anne no Tea Party                                             Dennou Shoukai                    1993/6     CD
+Anne no Yume no Kuni                                          Dennou Shoukai                    1993/3     CD
+Arquelphos                                                    D.O.                              1993/7     CD
+Aska Base                                                     Algo                              1989/5     SET(CD+FD)
+Aska Word                                                     Algo                              1991/1     SET(CD+FD)
+Band-kun                                                      Koei                              1991/1     SET(CD+FD)
+Battle                                                        GAM                               1992/10    CD
+Bell's Avenue Vol. 3                                          Wendy Magazine                    1995/4     CD
+Bible Master 2: Aglia no Jashin                               Glodia                            1995/1     SET(CD+FD)
+Big Honour                                                    Artdink                           1992/9     CD
+Bird Land no Komoriuta                                        Inter Limited Logic               1994/12    CD
+Birdy Soft Best Characters                                    Birdy Soft                        1995/4     CD
+Bohemia no Inori                                              Fujitsu                           1993/5     CD
+Bomber Quest                                                  Mink                              1995/6     CD
+Brain Builder                                                 Ritex                             1993/8     CD×05
+* Branmarker 2                                                D.O.                              1995/10    CD×02
+Business Houritsu Yougo no Kiso Chishiki                      Fujitsu                           1993/8     CD
+Butoukai no Yoru                                              Fujitsu                           ?          CD
+ByHAND V1.1                                                   Fujitsu                           1992/1     CD
+ByHAND V2.1                                                   Fujitsu                           1993/3     CD
+ByHAND V3.1                                                   Fujitsu                           1994/3     CD
+CAL Towns 3                                                   Birdy Soft                        1993/7     CD
+California X Party: Joshi Daisei Himitsu Club                 HOP                               1994/9     SET(CD+FD)
+Can Can Bunny Premiere                                        Cocktail Soft                     1992/9     CD
+Car Marty Exciting CD                                         Fujitsu Ten                       1994/3     CD×2
+Car Marty Exciting CD                                         Fujitsu Ten                       1994/3     CD×2
+Car Marty Exciting CD                                         Fujitsu Ten                       1994/6     CD×2
+Castles 2: Bretagne Touitsu Senki                             Victor Entertainment              1993/10    SET(CD+FD)
+Cat's Part-1                                                  Cat's Pro                         1993/4     CD
+CB Trainer Data Library V1.1 L10                              Fujitsu                           1993/5     CD
+CB Trainer Jikkou System V2.1                                 Fujitsu                           1994/9     ?
+CB Trainer V1.1                                               Fujitsu                           1993/5     CD
+CB Trainer V2.1                                               Fujitsu                           1994/9     ?
+CD E-chat Personal + Nifty                                    Lits Compute                      1994/3     SET(CD+FD)
+CD Eigo Gakushuu System 1-nen Kairyuudou: Sunshine            Uchida Youkou                     1991/4     SET(CD+FD)
+CD Eigo Gakushuu System 1-nen Sanseidou: New Crown            Uchida Youkou                     1991/4     SET(CD+FD)
+CD Eigo Gakushuu System 2-nen Kairyuudou: Sunshine            Uchida Youkou                     1991/4     SET(CD+FD)
+CD Eigo Gakushuu System 2-nen Sanseidou: New Crown            Uchida Youkou                     1991/4     SET(CD+FD)
+CD-ROM-ban Katei Igaku Daizenka                               Houken                            1992/10    SET(CD+FD)
+CDWord                                                        Sanshusha                         1989/3     SET(CD+FD)
+CG Syndicate Vol. 1: Lisa Northpoint                          R Key                             1991/12    CD
+Chiemi & Naomi                                                Fairytale (Red Zone)              1993/12    CD
+Chiisana Ensouka                                              Fujitsu Social Science Laboratory 1993/9     CD
+Chikyuu no Himitsu (Kankyou Kyouiku Kyouzai)                  Fujitsu                           1994/7     CD
+Chinmoku no Kantai                                            GAM                               1992/4     SET(CD+FD)
+Chinsei                                                       Toshiba EMI                       1989/11    CD
+Chiri Jigsaw World 2                                          Fujitsu Ooita Software Laboratory 1994/12    SET(CD+FD)
+Chotto Shita Ohanashi                                         Fujitsu                           1995/11    CD
+Chuugokugo de Ajiwau: Kanshi no Sekai                         CSK Research Institute (CRI)      1991/4     CD
+City Lights                                                   Raison                            1992/8     CD
+ClearMind: Shimoguchi Yuuzan no Shuuchuuryoku Kaihatsu        CSK Research Institute (CRI)      1989/8     CD
+Collector D                                                   D.O.                              1993/8     CD
+Collector D Bangai-hen                                        D.O.                              1993/9     CD
+Computer Zukan: Shokubutsu-hen CD-ROM-ban                     Ratio International               1991/12    CD
+Config Rom                                                    Glams                             1995/12    CD
+Cover Girls Vol. 1                                            Janis                             1994/2     CD
+Crayonnage                                                    CSK Research Institute (CRI)      1991/8     SET(CD+FD)
+CRI 5-kan Pack                                                CSK Research Institute (CRI)      1994/11    CD
+CRI Postman                                                   CSK Research Institute (CRI)      1990/3     CD
+CRI StacCard                                                  CSK Research Institute (CRI)      1991/5     SET(CD+FD)
+Criss                                                         CSK Research Institute (CRI)      1989/7     CD
+C-Trace Towns                                                 Cast                              1989/6     CD
+CubicSketch V1.1                                              Fujitsu                           1994/5     CD
+Curse                                                         Queen Soft                        1995/2     CD
+Custom Mate & Denwa no Bell ga…                               Cocktail Soft                     1994/12    SET(CD+FD)
+Cutie Queen                                                   Crystal Eizou                     1995/2     CD
+Cybernoid Alpha                                               D.O.                              1996/4     CD
+CyberSculpt                                                   Fujitsu                           1991/11    CD
+Cyclone Express Alpha Towns                                   Ans                               1990/5     CD
+Dai-i-ku                                                      Sanshusha                         1990/11    CD
+Daijirin CD-ROM                                               Fujitsu                           1993/2     CD
+Daisenkai CD-ROM                                              Fujitsu                           1993/11    CD
+Debut Shimasu…                                                Ilis Plan                         1994/6     CD
+Debut Shimasu… 3                                              Ilis Plan                         1995/2     CD
+Demon City                                                    Cocktail Soft                     1994/3     CD
+Demonstration CD-ROM '90 Fuyu-gou                             Fujitsu                           1990/11    SET(CD+FD)
+Demonstration CD-ROM '90 Haru-gou                             Fujitsu                           1990/3     CD
+Demonstration CD-ROM '90 Natsu-gou                            Fujitsu                           1990/7     CD
+Demonstration CD-ROM '91 Fuyu-gou                             Fujitsu                           1991/11    CD×01
+Demonstration CD-ROM '91 Haru-gou                             Fujitsu                           1991/2     SET(CD+FD)
+Demonstration CD-ROM '92 Fuyu-gou                             Fujitsu                           1992/11    SET(CD+FD)
+Demonstration CD-ROM '92 Haru-gou                             Fujitsu                           1992/2     SET(CD+FD)
+Demonstration CD-ROM '93 Fuyu-gou                             Fujitsu                           1993/11    CD
+Demonstration CD-ROM '93 Natsu-gou                            Fujitsu                           1993/2     CD
+Demonstration CD-ROM '94 Fuyu-gou                             Fujitsu                           1994/11    CD
+Demonstration CD-ROM '94 Haru-gou                             Fujitsu                           1994/2     CD
+Demonstration CD-ROM '94 Natsu-gou                            Fujitsu                           1994/7     CD
+Demonstration CD-ROM '95 Fuyu-gou                             Fujitsu                           1995/11    CD
+Demonstration CD-ROM '95 Haru-gou                             Fujitsu                           1995/2     CD
+Demonstration CD-ROM '95 Natsu-gou                            Fujitsu                           1995/6     CD
+Demonstration Program                                         Fujitsu                           1989/3     CD
+Den V1.0                                                      Fujitsu                           1991/7     CD
+Den V2                                                        Fujitsu                           1993/1     CD
+Den V3.0                                                      Fujitsu                           1994/8     SET(CD+FD)
+Dengeki Nurse 2: More Sexy                                    Cocktail Soft                     1994/12    SET(CD+FD)
+Diamond Players                                               Wolf Team                         1993/6     SET(CD+FD)
+Dick                                                          Amorphous                         1996/1     CD
+Digital Pinup Girls Vol. 2                                    Transpegasus Limited              1993/6     CD
+Doki Doki Vacation                                            Cocktail Soft                     1995/3     SET(CD+FD)
+Dor Best Selection Gekan                                      D.O.                              1993/5     CD×02
+Do-Re-Mi Canvas                                               Tokyo Shoseki                     1994/12    CD
+Dracula Hakushaku                                             Fairytale                         1993/3     CD
+Dragon Souseiki                                               Basho House                       1993/12    CD
+Drive Simulator Home Navi                                     Fujitsu Ten                       1994/8     SET(CD+FD)
+Dynamic Business English 1                                    DynEd Japan                       1994/11    SET(CD+FD)
+Dynamic Business English 2                                    DynEd Japan                       1994/11    SET(CD+FD)
+Dynamic Business English 3                                    DynEd Japan                       1994/11    SET(CD+FD)
+Dynamic Business English 4                                    DynEd Japan                       1994/11    SET(CD+FD)
+Dynamic Business English 5                                    DynEd Japan                       1994/11    SET(CD+FD)
+Dynamic Business English 6                                    DynEd Japan                       1994/11    SET(CD+FD)
+Dynamic English 1A Pack                                       DynEd Japan                       1991/5     SET(CD+FD)
+Dynamic English 1A Pack                                       DynEd Japan                       1994/4     SET(CD+FD)
+Dynamic English 1B Pack                                       DynEd Japan                       1991/5     SET(CD+FD)
+Dynamic English 1B Pack                                       DynEd Japan                       1994/4     SET(CD+FD)
+Dynamic English 1C Pack                                       DynEd Japan                       1991/6     SET(CD+FD)
+Dynamic English 2A Pack                                       DynEd Japan                       1991/7     SET(CD+FD)
+Dynamic English 2A Pack                                       DynEd Japan                       1994/4     SET(CD+FD)
+Dynamic English 2B Pack                                       DynEd Japan                       1991/7     SET(CD+FD)
+Dynamic English 2B Pack                                       DynEd Japan                       1994/4     SET(CD+FD)
+Dynamic English 2C Pack                                       DynEd Japan                       1991/7     SET(CD+FD)
+Dynamic English 3A Pack                                       DynEd Japan                       1991/10    SET(CD+FD)
+Dynamic English 3A Pack                                       DynEd Japan                       1994/4     SET(CD+FD)
+Dynamic English 3B Pack                                       DynEd Japan                       1991/10    SET(CD+FD)
+Dynamic English 3B Pack                                       DynEd Japan                       1994/4     SET(CD+FD)
+Dynamic English 3C Pack                                       DynEd Japan                       1992/2     SET(CD+FD)
+E to Oto ga Deru Ongaku Yougo Jiten                           Rittor Music                      1992/4     SET(CD+FD)
+Ed Bogas' Music Machine                                       Fujitsu                           1993/11    CD
+Ed Bogas' Music Machine (Marty-compatible)                    Fujitsu                           1994/4     CD
+Ehon Writer Pro                                               Fujitsu                           1995/5     CD
+Ehon Writer V1.1                                              Fujitsu                           1993/12    CD
+Ei-Doku-Nichi Saishin Kagaku Gijutsu Yougo Jiten              Sanshusha                         1990/2     CD
+Ei-Futsu-Doku-Nichi 4-kagokugo Jiten                          Sanshusha                         1990/2     CD
+Eight Lakes Golf Club                                         T&E Soft                          1990/8     CD
+Eigo de Eigo ni Tsuyoku Naru 1                                Infortech                         1990/4     CD
+Eigo de Eigo ni Tsuyoku Naru 10                               Infortech                         1990/4     CD
+Eigo de Eigo ni Tsuyoku Naru 2                                Infortech                         1990/4     CD
+Eigo de Eigo ni Tsuyoku Naru 3                                Infortech                         1990/4     CD
+Eigo de Eigo ni Tsuyoku Naru 4                                Infortech                         1990/4     CD
+Eigo de Eigo ni Tsuyoku Naru 5                                Infortech                         1990/4     CD
+Eigo de Eigo ni Tsuyoku Naru 6                                Infortech                         1990/4     CD
+Eigo de Eigo ni Tsuyoku Naru 7                                Infortech                         1990/4     CD
+Eigo de Eigo ni Tsuyoku Naru 8                                Infortech                         1990/4     CD
+Eigo de Eigo ni Tsuyoku Naru 9                                Infortech                         1990/4     CD
+Eikan wa Kimi ni 2: Koukou Yakyuu Zenkoku Taikai              Artdink                           1991/8     CD
+Eikan wa Kimi ni 3: Koukou Yakyuu Zenkoku Taikai              Artdink                           1993/8     SET(CD+FD)
+Ei-wa-doku-ro Denki Jutsugo Daijiten                          Ohmsha                            1990/4     CD
+Emit Vol. 3: Watashi ni Sayonara wo                           Koei                              1994/9     SET(CD+FD)
+Engage Errands 2: Kouki wo Niau Mono                          Ponytail Soft                     1995/5     CD
+Engage Errands: Miwaku no Shito-tachi                         Ponytail Soft                     1995/4     CD
+English in Dream                                              SofMedia                          1990/6     CD
+Enkaiou                                                       Dennou Shoukai                    1989/10    CD
+Enkaiou Ver. 3: Chikyuu Saidai no Kessen                      Dennou Shoukai                    1993/12    CD
+Euphony 2 / MTR V1.1                                          Fujitsu                           1992/11    CD
+Euphony 2 / SCORE V1.1                                        Fujitsu                           1993/4     CD
+Eye of the Beholder 3                                         Ving                              1994/11    CD
+Fancy Illust: Hattori Yuki no Wakuwaku Cut-shuu               CSK Research Institute (CRI)      1990/3     CD
+F-BASIC Compiler V1.1                                         Fujitsu                           1990/12    CD
+F-BASIC386 Compiler V2.1                                      Fujitsu                           1994/9     CD
+FIRSTHAND ACCESS(Disc1)                                       DynEd Japan                       1994/11    SET(CD+FD)
+FIRSTHAND ACCESS(Disc2)                                       DynEd Japan                       1994/11    SET(CD+FD)
+FlexData Collection Vol. 1                                    Fujitsu                           1993/11    CD
+FM Towns Appli Jikkou Set                                     Fujitsu                           1993/6     CD
+FM Towns de Manabu School-Ace Alpha                           Fujitsu                           1993/4     CD
+FM Towns Free Ware Collection (EYE COM-ban)                   Fujitsu                           1989/11    CD
+FM Towns Paso-Rika Ver. 3                                     Maris                             1993/11    CD
+FM Towns Shougaku Ongaku (5-6-nensei You)                     Kyouiku Shuppan                   1991/5     SET(CD+FD)
+FM Towns World                                                Fujitsu                           1989/5     CD
+FM Towns-ban Dyna-pers                                        Dynaware                          1989/12    CD
+FreeColle Marty 1                                             Fujitsu                           1993/12    CD
+Fujitsu Air Warrior V1.2                                      Fujitsu                           1993/11    SET(CD+FD)
+* Fujitsu Air Warrior V1.1                                    Fujitsu                           1992/3     SET(CD+FD)
+Fujitsu Air Warrior V2.1                                      Fujitsu                           1995/4     SET(CD+FD)
+Fujitsu Habitat V1.1                                          Fujitsu                           1990/1     SET(CD+FD)
+Fujitsu Habitat V2.1                                          Fujitsu                           1994/5     SET(CD+FD)
+Fukui Toshio no Otenki Map                                    Inter Limited Logic               1991/2     CD
+Functioning in Business Part 1                                DynEd Japan                       1992/7     SET(CD+FD)
+Functioning in Business Part 2                                DynEd Japan                       1992/7     SET(CD+FD)
+Fuzzy Kakeibo                                                 GAM                               1993/4     SET(CD+FD)
+Fuzzy Kakeibo 3                                               GAM                               1995/11    CD
+G5                                                            AMR                               1989/7     CD
+Gadget                                                        Toshiba EMI                       1993/12    CD
+Gakuen Bakuretsu Tenkousei!                                   ZyX                               1996/3     CD
+Gakuen Bomber                                                 Active                            1994/6     CD
+Gambler - Queen's Cup                                         Queen Soft                        1994/9     CD
+Game Nihonshi: Kakumeiji Oda Nobunaga                         Koei                              1996/3     SET(CD+FD)
+Game Nihonshi: Tenkabito Hideyoshi to Ieyasu                  Koei                              1996/6     SET(CD+FD)
+Garou Densetsu Special                                        Mahou (Nihon Home Data)           1996/9     SET(CD+FD)
+GearPOWER V1.1                                                Fujitsu                           1995/1     CD
+Gedit Towns                                                   Data West                         1989/3     CD
+Geimu Jan+                                                    GAM                               1993/5     CD
+Geitassha Towns                                               Shoubi Gakuen                     1989/7     CD
+Gendai Yougo no Kiso Chishiki (1989)                          Fujitsu                           1989/12    CD
+Gendai Yougo no Kiso Chishiki (1991)                          Fujitsu                           1991/1     CD
+Gendai Yougo no Kiso Chishiki (1992)                          Fujitsu                           1992/1     CD
+Gendai Yougo no Kiso Chishiki (1993)                          Fujitsu                           1993/9     CD
+Gendai Yougo no Kiso Chishiki (1994)                          Fujitsu                           1994/9     CD
+Ge-Ten 2                                                      Hokusho                           1993/?     ?
+Ginga Eiyuu Densetsu 2 DX+ Towns Special                      Bothtec Soft                      1992/5     CD
+Ginga Uchuu Odyssey 1                                         Fujitsu                           1991/3     CD
+Ginga Uchuu Odyssey 2                                         Fujitsu                           1992/4     CD
+Ginga Uchuu Odyssey 2                                         Fujitsu                           1991/3     CD
+Ginga Yuukyou Densetsu Tobakker                               Ponytail Soft                     1995/11    CD
+Gokko Vol. 1: Doctor                                          Mink                              1994/11    CD
+Gokko Vol. 2: School Gal's                                    Mink                              1994/12    CD
+Gokuraku Mandala                                              Fairytale                         1994/2     CD
+Gomen ne Angel: Yokohama Monogatari                           JAST                              1992/1     ?
+Gram Cats 2                                                   Dot Kikaku                        ?          ?
+Grand Prix Densetsu                                           Soft Studio Wing                  1993/9     CD
+Green Box Chihi Shokubutsu Database                           On                                1993/4     ?
+Green Box Flower Database                                     On                                1991/10    ?
+Grimm Douwa 2: Bremen no Ongakutai                            Gyousei                           1989/11    CD
+Grimm Douwa 3: Ookami to Nana-hiki Komagi                     Gyousei                           1990/11    CD
+Grimm Douwa 4: Ibarahime (Nemurihime)                         Gyousei                           1990/11    CD
+Gyoukai Arijigoku                                             TAC                               1994/6     CD
+Hacchake Ayayo-san 4: Sexy Olympic                            Hard                              1993/2     CD
+Hajimete no Ryokou Deutsch-go Kaiwa                           Misawa Home Sougou Kenkyuusho     1990/12    CD
+Hajimete no Ryokou Eikaiwa                                    Misawa Home Sougou Kenkyuusho     1990/11    CD
+Hajimete no Ryokou Eikaiwa (Marty Taiou-ban)                  Misawa Home Sougou Kenkyuusho     1993/3     CD
+Hajimete no Ryokou France-go Kaiwa                            Misawa Home Sougou Kenkyuusho     1991/2     CD
+Hajimete Ryokou Spain-go Kaiwa                                Misawa Home Sougou Kenkyuusho     1991/3     CD
+Half Moon ni Kawaru made                                      Cocktail Soft                     1995/4     SET(CD+FD)
+Hamlet                                                        Panther Software                  1993/9     CD
+Hana no Kioku Dai-2-shou                                      Foster                            1996/12    CD
+Happy Mama                                                    Datt Japan                        1995/9     CD
+Harmony Menu                                                  Uchida Youkou                     1994/3     CD
+Hashiri Onna II                                               Alice Soft                        1995/12    CD
+Healthy Life                                                  Top Business System               1989/6     CD
+Healthy Life 2: Kenkouteki na Shokuseikatsu to Diet           Top Business System               1993/6     CD
+Heike Monogatari (Ge)                                         CSK Research Institute (CRI)      1992/4     CD
+Heike Monogatari (Jou)                                        CSK Research Institute (CRI)      1992/2     CD
+Heisei 6-nendo-ban Keizai Hakusho                             Fujitsu                           1994/12    CD
+Hello Kitty: Asobi no Omochabako                              Fujitsu Parex                     1995/9     CD
+High C Compiler Multimedia Kaihatsu Kit V3.2                  Fujitsu                           ?          CD
+High School War                                               ISC                               1994/9     CD
+* Hiouden 2                                                   Nihon Telenet                     1994/3     SET(CD+FD)
+Hiragana no Ehon                                              Fujitsu Ooita Software Laboratory 1993/8     CD
+Hirou                                                         Toshiba EMI                       1989/11    CD
+HomeSTUDIO V1.1                                               Fujitsu                           1992/12    SET(CD+FD)
+HomeSTUDIO V1.2                                               Fujitsu                           1994/2     SET(CD+FD)
+Hot de Art na Barcelona                                       Media Art                         1991/9     CD
+Hyoutan Shima Kouryaku-ki                                     Nihon Dennou Koubou               1994/?     ?
+Hyper Address Ver. 2.0                                        Datt Japan                        1991/4     SET(CD+FD)
+Hyper Aquarium Kaisui-hen                                     Inter Limited Logic               1992/4     CD
+Hyper Aquarium Tansui-hen                                     Inter Limited Logic               1992/1     CD
+Hyper Asobi Meijin                                            Corpus                            1989/11    SET(CD+FD)
+Hyper Asobi Meijin 2                                          Corpus                            1991/11    SET(CD+FD)
+Hyper Channel / Towns-TV                                      Dennou Shoukai                    1990/1     CD
+Hyper Chuugokugo Nyuumon-hen (Ge) Pekingo Gengakuin-hen       SofMedia                          1991/3     CD
+Hyper Chuugokugo Nyuumon-hen (Jou) Pekingo Gengakuin-hen      SofMedia                          1991/3     CD
+Hyper Drill Series Shougakkou Kokugo 3-nen                    Uchida Youkou                     1996/3     CD
+Hyper Drill Series Shougakkou Kokugo 4-nen                    Uchida Youkou                     1996/3     CD
+Hyper Drill Series Shougakkou Kokugo 5-nen                    Uchida Youkou                     1996/3     CD
+Hyper Drill Series Shougakkou Kokugo 6-nen                    Uchida Youkou                     1996/3     CD
+Hyper Drill Series Shougakkou Rika 3-nen                      Uchida Youkou                     1995/9     CD
+Hyper Drill Series Shougakkou Rika 4-nen                      Uchida Youkou                     1995/10    CD
+Hyper Drill Series Shougakkou Rika 5-nen                      Uchida Youkou                     1995/5     CD
+Hyper Drill Series Shougakkou Rika 6-nen                      Uchida Youkou                     1995/5     CD
+Hyper Drill Series Shougakkou Sansuu 3-nen                    Uchida Youkou                     1995/1     CD
+Hyper Drill Series Shougakkou Sansuu 4-nen                    Uchida Youkou                     1994/10    CD
+Hyper Drill Series Shougakkou Sansuu 5-nen                    Uchida Youkou                     1994/6     CD
+Hyper Drill Series Shougakkou Sansuu 6-nen                    Uchida Youkou                     1994/12    CD
+Hyper Drill Series Shougakkou Shakai 4-nen                    Uchida Youkou                     1995/3     CD
+Hyper Drill Series Shougakkou Shakai 5-nen                    Uchida Youkou                     1994/4     CD
+Hyper Drill Series Shougakkou Shakai 6-nen                    Uchida Youkou                     1994/8     CD
+Hyper DX                                                      Datt Japan                        1989/10    SET(CD+FD)
+Hyper Fetishism                                               Extend                            1993/12    CD
+Hyper Ikuji Guide: Babubabu Tenshi                            Dennou Shoukai                    1996/4     CD
+Hyper Koto no Tabi: Kyoto                                     Nanken Koubou                     1993/2     CD
+Hyper Land: Doubutsu no Sekai                                 Datt Japan                        1993/3     CD
+Hyper Media NHK Zoku Kiso Eigo: Dai-1-kan                     CSK Research Institute (CRI)      1991/6     SET(CD+FD)
+Hyper Media NHK Zoku Kiso Eigo: Dai-2-kan                     CSK Research Institute (CRI)      1991/7     SET(CD+FD)
+Hyper Media NHK Zoku Kiso Eigo: Dai-3-kan                     CSK Research Institute (CRI)      1991/9     SET(CD+FD)
+Hyper Note                                                    Datt Japan                        1991/12    SET(CD+FD)
+Hyper Photo DB                                                Fujitsu                           1993/9     CD
+Hyper Planet                                                  Datt Japan                        1990/9     SET(CD+FD)
+Hyper Planet for Marty                                        Datt Japan                        1993/6     SET(CD+FD)
+Hyper Planet Shiki Vol. 1                                     Datt Japan                        1992/7     CD
+Hyper Planet Shiki Vol. 2: Utsukushii Fuyu no Seiza Hen       Datt Japan                        1993/12    CD
+Hyper Planet Shiki Vol. 3: Uraraka na Haru no Seiza Hen       Datt Japan                        1994/4     CD
+Hyper Planet Shiki Vol. 4: Fukamari Yuku Aki no Seiza Hen     Datt Japan                        1994/11    CD
+Hyper Touhouku Kikou                                          Nanken Koubou                     1991/12    SET(CD+FD)
+Hyper Wide Ban Rekishi Shiryoushuu                            Shingakusha                       1993/7     CD
+If                                                            Active                            1993/6     CD
+If 1-2-3 CD Collection                                        Active                            1996/4     CD
+If 3                                                          Active                            1995/4     CD
+Igo Doujou Shodan Kaigan! Kyuu kara Dan e no Chousen          Fujitsu OA                        1991/5     CD
+Igo Doujou Yaburi: Menkyo Kaiden!! Mezase 7-kyuu              Fujitsu OA                        1990/10    CD
+Igo Nyuumon Doujou                                            GAM                               1991/6     CD
+Illust Hyakka: Yamashita Hideki no Ikiiki Cut-shuu            CSK Research Institute (CRI)      1990/8     CD
+Image Art System                                              Raison                            1990/6     CD
+Image Art System Pro                                          Raison                            1990/8     CD
+Image Power                                                   Raison                            1990/3     CD
+Interactive Business English 1                                DynEd Japan                       1992/7     SET(CD+FD)
+Interactive Business English 2                                DynEd Japan                       1992/7     SET(CD+FD)
+Interactive Business English 3                                DynEd Japan                       1992/7     SET(CD+FD)
+Interactive Business English 4                                DynEd Japan                       1992/7     SET(CD+FD)
+Interactive Business English 5                                DynEd Japan                       1992/7     SET(CD+FD)
+Interactive Business English 6                                DynEd Japan                       1992/7     SET(CD+FD)
+Iris-tei Sayokyoku                                            Agumix                            1992/11    CD
+Iwanami Bungakukan: Natsume Souseki                           Iwanami Shoten                    1994/2     CD
+Iwanami Denshi Nihon Sougou Nendo CD-ROM                      Fujitsu                           1993/10    CD
+J.League Professional Soccer 1994                             Victor Entertainment              1994/9     CD
+JAF Drive Guide                                               JAF Shuppansha                    1990/8     SET(CD+FD)
+JAF Drive Guide - Best Ski 150 (Resort-hen)                   JAF Shuppansha                    1990/12    SET(CD+FD)
+JAF Drive Guide (Ver. 2)                                      JAF Shuppansha                    1992/2     SET(CD+FD)
+Jinmon Yuugi                                                  Fairytale (Red Zone)              1995/8     SET(CD+FD)
+Jintaizu System Skeleton                                      Medical System                    1995/8     CD
+Joker Towns                                                   Birdy Soft                        1992/7     CD
+Joshikou Seifuku Monogatari                                   Nihon Soft System                 1995/4     SET(CD+FD)
+Joshikousei Shoujo Densetsu                                   Byakuya Shobou                    1994/4     CD
+Jouhou Club                                                   Fujitsu Social Science Laboratory 1989/11    CD
+Jouhou Gijutsu Yougo Shuu CD-ROM                              Fujitsu                           1991/12    CD
+JYB                                                           Cocktail Soft                     1993/4     CD
+Kadokawa Ruigo Shin Jiten CD-ROM                              Fujitsu                           1989/12    CD
+Kamigami no Daichi: Kojiki Gaiden                             Koei                              1993/10    SET(CD+FD)
+Kamiya Recliet Towns                                          Raison                            1990/10    CD
+Kanade V1.1                                                   Fujitsu                           1995/4     CD
+Kanji Hitsujun Soft Nazoraa 2                                 Infortech                         1994/5     CD
+Kanji Land 3-nen                                              Fujitsu Ooita Software Laboratory 1995/7     CD
+Kanji Land 4-nen                                              Fujitsu Ooita Software Laboratory 1995/11    CD
+Kanji Land 5-nen                                              Fujitsu Ooita Software Laboratory 1995/12    CD
+Kanji Land 6-nen                                              Fujitsu Ooita Software Laboratory 1996/2     CD
+Kanji no Ehon                                                 Fujitsu Ooita Software Laboratory 1992/7     CD
+Kanji no Ehon 2                                               Fujitsu Ooita Software Laboratory 1994/8     CD
+Kanjigen CD-ROM                                               Fujitsu                           1994/1     CD
+Karyuugai                                                     Raison                            1991/1     CD
+Katakana no Ehon                                              Fujitsu Ooita Software Laboratory 1995/4     CD
+Katsuyaku Suru Computer (CD Town)                             Fujitsu Ooita Software Laboratory 1992/12    CD
+Kazadama Vol. 1: Maeda Shinzo no Sekai Ki - Japan             Fujitsu                           1993/9     CD
+Kazadama Vol. 2: Ikeda Masuo Hanga-shuu                       Fujitsu                           1995/4     CD
+Kazu ya Kimi Tashizan / Hikizan Hen                           Media Art                         1995/1     CD
+Kenkyuusha Readers Eiwa CD-ROM                                Fujitsu                           1993/2     CD
+Kerokero Keroppi to Origami no Tabibito                       Fujitsu Parex                     1995/7     CD
+Kid Pix Companion                                             Fujitsu Parex                     1995/3     CD
+Kid Pix Jr.                                                   Fujitsu                           1993/3     CD
+Kikai Jikake no Marian                                        Janis                             1994/8     CD
+Kikou Shidan 2                                                Artdink                           1993/3     SET(CD+FD)
+Kitty Town no Nakama-tachi: Tanoshii Seikatsuka               Fujitsu Parex                     1995/10    CD
+Komaki Naomi                                                  Janis                             1994/2     CD
+Kotoba Asobi CDVIEW Hip catch                                 CRC Sougou Kenkyuusho             1992/3     CD
+Koujien Daisanban CD-ROM                                      Fujitsu                           1989/12    CD
+Koujien Daiyonban CD-ROM                                      Fujitsu                           1993/3     CD
+Kouryuuki                                                     Koei                              1993/10    SET(CD+FD)
+Kousoku Choujin                                               Foster                            1996/8     CD
+Kusuriyubi no Kyoukasho                                       Active                            1996/4     CD
+Kyouko no Ijiwaru!! Hachamecha Daishingeki                    Ponytail Soft                     1994/10    CD
+Leading Company                                               Koei                              1992/4     SET(CD+FD)
+Lemon Cocktail Collection                                     Cocktail Soft                     1993/3     CD
+L'Empereur                                                    Koei                              1991/1     SET(CD+FD)
+Let's go 1-1                                                  DynEd Japan                       1995/7     SET(CD+FD)
+Let's go 1-2                                                  DynEd Japan                       1995/7     SET(CD+FD)
+Let's go 2-1                                                  DynEd Japan                       1995/7     SET(CD+FD)
+Let's go 2-2                                                  DynEd Japan                       1995/7     SET(CD+FD)
+Lettuce Cooking 2: Tanoshiku Tsukureru Obentou                SS Communications                 1990/8     SET(CD+FD)
+Lipstick Adventure 3                                          Fairytale                         1993/5     CD
+Little Big Adventure                                          Electronic Arts Victor            1995/12    CD
+LiveAnimation V1.1                                            Fujitsu                           1992/12    CD
+LiveAnimation V2.1                                            Fujitsu                           1994/5     CD
+LiveMorph V1.1                                                Fujitsu                           1994/2     CD
+LiveMovie V1.1                                                Fujitsu                           1992/12    CD
+LiveMovie V2.1                                                Fujitsu                           1994/3     CD
+Lodoss-tou Senki 2: Goshiki no Maryuu                         MAC                               1994/6     SET(CD+FD)
+Lua                                                           Interheart                        1993/6     CD
+M Talk                                                        Fujitsu Office Kiki               1993/6     CD
+Mahjong Bishoujoden Ripple                                    Foresight                         1995/2     CD
+Mahjong Gensoukyoku 2                                         Active                            1993/9     CD
+Mahjong Gensoukyoku III                                       Active                            1995/11    CD
+Mahjong Gokuu                                                 ASCII                             1989/4     CD
+Mahjong Musashi                                               Cosmos Computer                   1989/10    CD
+Manami no Dokomade Iku no?                                    Wendy Magazine                    1995/5     CD
+Manami no Dokomade Iku no? 2: Return of the Kuro Pack         Wendy Magazine                    1995/5     CD
+Manami: Ai to Koukan no Hibi                                  Fairytale (Red Zone)              1995/10    SET(CD+FD)
+Many Colors 2                                                 Amorphous                         1995/6     CD
+Manyoushuu                                                    Uchida Youkou                     1993/2     CD
+Marionette Mind                                               Studio Milk                       1994/3     CD
+Maruanki Eitango: Chuugaku 1-nensei                           CSK Research Institute (CRI)      1989/12    SET(CD+FD)
+Maruanki Eitango: Chuugaku 2-nensei                           CSK Research Institute (CRI)      1989/12    SET(CD+FD)
+Maruanki Eitango: Chuugaku 3-nensei                           CSK Research Institute (CRI)      1990/2     SET(CD+FD)
+Masuo per Masuo: Ikeda Masuo Hanga-shuu Kazadama Vol. 2       Fujitsu                           1994/7     CD
+Megalomania                                                   Imagineer                         1993/3     CD
+Meisou Toshi                                                  Tiara                             1995/12    CD
+Microsoft Windows 95 (Upgrade Package)                        Fujitsu                           1996/6     CD
+Mietarou V2.0                                                 Uchida Youkou                     1992/12    SET(CD+FD)
+Migenerator V1.1                                              Fujitsu                           1992/7     SET(CD+FD)
+Mimi no Daibouken Hyper Land 2: Konchuu no Sekai              Datt Japan                        1995/2     SET(CD+FD)
+Minna de Sansuu 1-nen                                         Tokyo Shoseki                     1995/9     CD
+Mirage 2: Torry x Neat x Roan no Daibouken                    Discovery                         1994/12    CD
+Misato-san no Yume Nikki                                      Active                            1997/4     CD
+Mizube no Ninkimono                                           Fujitsu Social Science Laboratory 1994/7     CD
+Moeru Asoko no Paipai Yuugi                                   Illusion                          1993/12    CD
+Mohan Roppou CD-ROM-ban                                       Sanshusha                         1990/7     SET(CD+FD)
+Mohan Roppou Heisei 5-nendo-ban                               Fujitsu                           1993/8     CD
+Mohan Roppou Heisei 6-nendo-ban                               Fujitsu                           1994/9     CD
+Mokkoriman RPG                                                Illusion                          1994/6     CD
+Moko                                                          Fujitsu Social Science Laboratory 1995/3     CD×03
+Monoshiri Jiyuugaku Bannin Isshu-hen                          Shinkou Human Create              1994/10    CD
+Monster Planet 2255                                           Nihon Media Programming           1990/12    CD
+Moon Crystal                                                  Orange House                      1992/6     ?
+Moonlight Energy                                              Interheart                        1992/12    CD
+Mori no Ninkimono                                             Fujitsu Social Science Laboratory 1993/12    CD
+Ms. Detective File #1: Iwami Ginzan Satsujin Jiken            Data West                         1992/9     CD×02
+Ms. Detective File #1: Iwami Ginzan Satsujin Jiken (Marty compatible)   Data West                         1992/9     CD×02
+* Ms. Detective File #2: Sugata-naki Irainin                  Data West                         1993/10    SET(CD+FD)
+Multimedia Nihon no Rekishi Dai-1-Shou: Kariya-ryou no Kurashi  Tokyo Shoseki                     ?          CD
+Multimedia Nihon no Rekishi Dai-2-Shou: Kome-zukuri no Mura kara Kofun no Kuni e    Tokyo Shoseki                     1995/4     CD
+Multimedia Seikatsuka: Ikimono to Otomodachi Dai-2-shuu       Tokyo Shoseki                     1995/4     CD
+Muscle Bomber Tentou Demo                                     Capcom                            1993/11    CD
+Museum Etude Towns                                            Victor Entertainment              1994/3     CD
+Museum of Museums                                             Fujitsu                           1994/3     CD
+Mushi no Mahou Tsukai                                         Fujitsu Social Science Laboratory 1995/11    CD
+Music Drill Ongaku Q&A                                        Kawai                             1992/2     CD
+Music Pro V1.3 (MIDI)                                         Musical Plan                      1995/2     CD
+Music Pro V1.3 (Naizou)                                       Musical Plan                      1995/2     CD
+Music Pro V2 (MIDI)                                           Musical Plan                      1996/3     CD
+Music Pro V2 (Naizou)                                         Musical Plan                      1996/3     CD
+MusicPress Vol. 1: Cinema Scene                               Fujitsu                           1993/11    CD
+My Fair Lady                                                  CSK Research Institute (CRI)      1989/6     CD
+My Fair Lady CAN.1: Introductory                              CSK Research Institute (CRI)      1990/9     SET(CD+FD)
+My Fair Lady CAN.3: Intermediate                              CSK Research Institute (CRI)      1990/12    SET(CD+FD)
+My Fair Lady CAN.4: Advanced                                  CSK Research Institute (CRI)      1990/12    SET(CD+FD)
+My Fair Lady MATE: Chuugaku Eigo Kanzen Master!               CSK Research Institute (CRI)      1991/3     SET(CD+FD)
+MyTown for FM Towns 2-nensei-you                              Fujitsu                           1995/11    CD
+MyTown for FM Towns 3-nensei-you                              Fujitsu                           1995/11    CD
+MyTown for FM Towns 4-nensei-you                              Fujitsu                           1995/11    CD
+Nandemo Illust Eigo Jiten                                     SofMedia                          1990/6     CD
+Nandemo Illust Eigo Jiten 2                                   SofMedia                          1990/7     CD
+Naru Mahjong                                                  Libido                            1995/4     CD
+Nazonazo Meiro Daibouken: Pyoko-tan no Chie Asobi Ehon        Nanken Koubou                     1991/9     CD
+Nazoraa 1-nen                                                 Infortech                         1993/4     SET(CD+FD)
+Nazoraa 2-nen                                                 Infortech                         1993/4     SET(CD+FD)
+Nazoraa 3-nen                                                 Infortech                         1993/4     SET(CD+FD)
+Nazoraa 4-nen                                                 Infortech                         1993/4     SET(CD+FD)
+Nazoraa 5-nen                                                 Infortech                         1993/4     SET(CD+FD)
+Nazoraa 6-nen                                                 Infortech                         1993/4     SET(CD+FD)
+Nemurenu Yoru no Chiisana Hanashi                             Amuse                             1993/12    CD
+Neverland                                                     Chips                             1996/3     CD
+New Century Eiwa                                              Fujitsu                           1990/5     CD
+New Century Eiwa / Shin Crown Waei Jiten                      Fujitsu                           1993/11    CD
+New Crown 1-nen                                               Uchida Youkou                     1993/8     CD
+New Crown 2-nen                                               Uchida Youkou                     1993/8     CD
+New Horizon CD Learning System 2 1-nen                        Tokyo Shoseki                     1993/5     CD
+New Horizon CD Learning System 2 2-nen                        Tokyo Shoseki                     1993/5     CD
+New Horizon CD Learning System 2 3-nen                        Tokyo Shoseki                     1993/5     CD
+New Horizon CD Running System 1-nen                           Tokyo Shoseki                     1990/7     SET(CD+FD)
+New Horizon CD Running System 2-nen                           Tokyo Shoseki                     1990/7     SET(CD+FD)
+New Horizon CD Running System 2-nen                           Tokyo Shoseki                     1991/1     SET(CD+FD)
+NHK Eigo de Asobo 1                                           Fujitsu                           1993/7     CD
+NHK Eigo de Asobo 2                                           Fujitsu                           1993/12    CD
+NHK Eigo de Asobo 3                                           Fujitsu                           1994/7     CD
+NHK Hitori de Dekiru Mon!                                     Ray                               1995/3     CD
+NHK Jissen Eikaiwa (Marty compatible)                         CRC Sougou Kenkyuusho             1993/3     CD
+NHK Jissen Eikaiwa Part 2                                     CRC Sougou Kenkyuusho             1993/12    CD
+Nihon Kiin no Jouseki Daijiten                                Misawa Home Sougou Kenkyuusho     1992/7     CD
+Nihon Mukashibanashi 2                                        Gyousei                           1991/7     CD
+Nihon Mukashibanashi Vol. 3                                   Gyousei                           1993/12    CD
+Nihon Mukashibanashi Vol. 4                                   Gyousei                           1993/12    CD
+Nihon Mukashibanashi Vol. 5                                   Gyousei                           1994/3     CD
+Nihon no Chou                                                 Fujitsu Social Science Laboratory 1991/7     CD
+Nihon no Chou (Marty-compatible)                              Fujitsu Social Science Laboratory 1993/3     CD
+Nihon no Kaisuigyo                                            Inter Limited Logic               1995/10    CD
+Nihon no Kusabana                                             Fujitsu Social Science Laboratory 1997/10    CD
+Nihon no Rekishi 4-hen Set                                    Uchida Youkou                     1993/8     CD×04
+Nihon no Rekishi: Ishin-hen                                   CSK Research Institute (CRI)      1990/8     CD
+Nihon no Rekishi: Sengoku-hen                                 CSK Research Institute (CRI)      1990/6     CD
+Nihon no Tansuigyo                                            Inter Limited Logic               1995/12    CD
+Nihon no Tenki                                                Uchida Youkou                     1992/9     CD
+Nihon no Tori 1994                                            Inter Limited Logic               1995/6     CD
+Nihon no Yachou (Marty-compatible)                            Fujitsu Social Science Laboratory 1993/3     CD
+Nihon Rettou Kumitate Daizukan                                Digital Media                     1993/8     CD
+Nihongo MS Windows V3.0 with Multimedia Extensions V1.0       Fujitsu                           1992/11    SET(CD+FD)
+Nihongo Nyuumon Dai-1-kan                                     Infortech                         1991/4     CD
+Nihongo Nyuumon Dai-2-kan                                     Infortech                         1991/4     CD
+Nihongo Nyuumon Dai-3-kan                                     Infortech                         1991/4     CD
+Nihongo Nyuumon Dai-4-kan                                     Infortech                         1991/4     CD
+Nihongo Nyuumon Dai-5-kan                                     Infortech                         1991/4     CD
+Nijiiro Denshoku Musume                                       ISC                               1994/8     CD
+Niko^2                                                        Wolf Team                         1991/11    CD
+Nobunaga no Yabou: Sengoku Gun'yuuden                         Koei                              1989/12    SET(CD+FD)
+* Nobunaga no Yabou: Tenshouki                                Koei                              1995/3     SET(CD+FD)
+Nooch: Abakareta Inbou                                        Bombee Bonbon                     1992/11    ?
+Nostalgia 1907                                                Sur de Wave                       1992/5     CD
+Noushuku Angel 120%                                           Cocktail Soft                     1995/4     SET(CD+FD)
+Noyama no Kensakuka                                           Fujitsu Social Science Laboratory 1995/3     CD
+O Hoshi Senjutsu Daireigen                                    Victor Entertainment              1990/2     CD
+Obaachan no Chiebukuro                                        Gyousei                           1991/11    CD
+Only You: Seikimatsu Juliet-tachi                             Alice Soft                        1996/1     CD
+Orient Express                                                Gyousei                           1994/12    CD
+Oryx Blue Wave: Eikou e no Kiseki                             Data West                         1995/10    SET(CD+FD)
+Oshiete, Nouveau                                              TDK Core                          1994/3     CD
+Otto Anime-kun                                                Nihon Micom Hanbai                1990/3     CD
+Palamedes                                                     Ving                              1991/10    CD
+Para Para Paradise                                            Family Soft                       1995/12    CD×02
+Pasocon de Tanoshimu Yama to Chizu                            Inter Limited Logic               1995/10    CD
+Petit Collage                                                 Pandora Box                       1994/3     CD
+Phobos                                                        Himeya Soft                       1995/8     CD
+Pi's Solitaire Royale                                         Fujitsu                           1989/7     CD
+Planet Harmony                                                Datt Japan                        1993/9     SET(CD+FD)
+Pocky 1-2 & Ponyon                                            Ponytail Soft                     1994/6     CD
+Populous 2 Expert                                             Imagineer                         1993/2     CD
+Powers of Ten                                                 Datt Japan                        1995/10    CD
+Preasure                                                      Janis                             1994/2     CD
+Presence                                                      Orange House                      1992/12    ?
+Presence                                                      Sur de Wave                       1992/12    CD
+Present                                                       Orange House                      1991/6     ?
+Primary Health Care System                                    Raison                            1990/9     CD
+Princess Danger                                               Janis                             1996/4     CD
+Private Slave                                                 Raccoon                           1993/8     SET(CD+FD)
+Pro Student G Renkaban                                        Alice Soft                        1995/4     CD
+Pro Yakyuu Family Stadium '90                                 Game Arts                         1990/9     CD
+Psychic Detective Series Vol. 1: Invitation: Kage kara no Shoutaijou (Remake)   Data West                         1993/11    SET(CD+FD)
+Psychic Detective Series Vol. 2: Memories (Remake)            Data West                         1994/4     SET(CD+FD)
+Psychic Detective Series Vol. 3: Aya (Remake)                 Data West                         1994/7     SET(CD+FD)
+Psychic Detective Series Vol. 4: Orgel (Remake)               Data West                         1994/12    SET(CD+FD)
+Psychic Detective Series Vol. 5: Nightmare (Remake)           Data West                         1995/4     SET(CD+FD)
+Pyoko-tan no Niji no Shima: Nanairo no Ninjin wo Sagase       Nanken Koubou                     1994/3     CD
+Q2 ROM Magazine - Soukangou                                   Disinfectant                      1993/5     CD
+Queen of Duellist Gaiden + Gaiden Alpha                       Agumix                            1994/3     CD
+Quiz de Let's Go!                                             Great                             1993/3     ?
+* Railroad Tycoon                                             MicroProse Japan                  1993/12    SET(CD+FD)
+* Rainbow Islands Extra                                       Ving                              1992/4     CD
+Rakuraku Sozai Vol. 1                                         Fujitsu                           1995/3     CD
+Reijou Monogatari                                             Interheart                        1995/4     CD
+Rekishi Shiryoukan                                            Uchida Youkou                     1990/12    CD
+Remember Beatles No.1 Yesterday                               SofMedia                          1989/9     CD
+Remember Beatles No.2 Michelle                                SofMedia                          1989/12    CD
+Remember Beatles No.3 Lady Maddonna                           SofMedia                          1990/6     CD
+Remember Beatles No.4 Let It Be                               SofMedia                          1990/7     CD
+Remember Beatles No.5 The Long and Winding Road               SofMedia                          1990/8     CD
+Remember Beatles No.6 Imagine                                 SofMedia                          1990/8     CD
+Rika Nenpyou CD-ROM                                           Maruzen                           1996/1     CD
+Robin Hood                                                    DynEd Japan                       1993/12    SET(CD+FD)
+Rockpaedia Vol. 2: 1961-1970                                  Toshiba EMI                       ?          CD
+Round the World in 80 Days                                    DynEd Japan                       1993/12    SET(CD+FD)
+Royal Blood                                                   Koei                              1992/5     SET(CD+FD)
+Saishin American Idiom Jiten                                  Sanshusha                         1990/2     CD
+Saishin Igaku Daijiten CD-ROM                                 Fujitsu                           1990/5     CD
+Saishin Igaku Daijiten Standard-ban CD-ROM                    Fujitsu                           1993/2     CD
+* Samurai Spirits                                             Japan Home Video (JHV)            1995/9     SET(CD+FD)
+Sangokushi 4                                                  Koei                              1994/6     SET(CD+FD)
+Sanseido Word Hunter Multi CD-ROM Jiten                       Fujitsu                           1991/10    CD
+Sargon 5                                                      GAM                               1992/11    CD
+Sayonara no Mukougawa                                         Foster                            1997/8     CD
+School Accessory Illust-hen V1.0                              Fujitsu                           1993/2     CD
+School Navi Nihon no Rekishi CD: Heian, Kamakura             Unitybell                         1995/8     CD
+School Navi Nihon no Rekishi CD: Kodai, Asuka-Nara           Unitybell                         1995/7     CD
+School Navi Nihon no Rekishi CD: Azuchi-Momoyama, Edo         Unitybell                         1995/9     CD
+School Navi Nihon no Rekishi CD: Meiji, Gendai                Unitybell                         1995/9     CD
+School-Ace Alpha HG Sensei-you                                Fujitsu                           1994/7     SET(CD+FD)
+Secre Volume 1: Iijima Naoko                                  Glams                             1993/8     CD
+Secre Volume 3: Hosokawa Fumie                                Glams                             1993/9     CD
+Secre Volume 4: Fujisaki Hitomi                               Glams                             1993/9     CD
+Secre Volume 5: Gushiken Tina                                 Glams                             1993/10    CD
+Secre Volume 6: Katou Reiko                                   Glams                             1993/10    CD
+Secre Volume 7: Chiba Reiko                                   Glams                             1993/11    CD
+Seikatsu Simulation: Watashi no Machi                         Gakushuu Kenkyuusha (Gakken)      1995/5     CD
+Seikatsuka 1-nen: Asobou Mitsukeyou                           Uchida Youkou                     1994/4     CD
+Seikatsuka 2-nen: Wakuwaku Tanken                             Uchida Youkou                     1994/5     CD
+Sekai no Ohanashi                                             Gyousei                           1992/5     CD
+Sekigahara                                                    Artdink                           1992/4     CD
+Sensual Angels                                                Japan Home Video (JHV)            1994/1     SET(CD+FD)
+Sexy in the Hawaii: Nice Gal Hawaii Ban                       Birdy Soft                        1994/12    CD
+Sexy PK 2 World Cup Ban                                       Birdy Soft                        1995/6     CD
+Sexy PK World Cup Ban                                         Birdy Soft                        1995/6     CD
+Shakaika Database: Nihon no Bunka / Sangyou / Shizen          Nihon Kyouiku System              1991/12    CD
+Shamhat: The Holy Circlet                                     Data West                         1993/4     SET(CD+FD)
+Shamhat: The Holy Circlet (Marty-ban)                         Data West                         1993/4     SET(CD+FD)
+Shanghai                                                      ASCII                             1990/12    CD
+Shanghai: Banri no Choujou                                    Electronic Arts Victor            1995/9     CD
+Shijou Saikyou no Video Bible                                 System Sacom                      1989/12    CD
+Shiki wo Irodoru Nihon no Shouka: Aki-hen                     Toshiba EMI                       1991/10    CD
+Shiki wo Irodoru Nihon no Shouka: Fuyu-hen                    Toshiba EMI                       1991/10    CD
+Shiki wo Irodoru Nihon no Shouka: Haru-hen                    Toshiba EMI                       1991/4     CD
+Shiki wo Irodoru Nihon no Shouka: Natsu-hen                   Toshiba EMI                       1991/4     CD
+Shin Eiwa / Waei Chuujiten                                    Fujitsu                           1993/11    CD
+Shinjuku Labyrinth                                            Tokuma Shoten Intermedia          1994/12    CD
+Shooting Towns                                                Amorphous                         1990/3     CD
+Shoubunsha Area Guide: 74 Zenkoku Pension Guide               Com Staff                         1989/12    CD
+Shougakkou 4-nen Kyouzai Set                                  Uchida Youkou                     1993/5     CD
+Shougakkou 5-nen Kyouzai Set                                  Uchida Youkou                     1993/5     CD
+Shougakkou 6-nen Kyouzai Set                                  Uchida Youkou                     1993/5     CD
+Shougakkou Learning Box                                       TDK Core                          1994/11    CD
+Shougakkou Mondai Sakusei Database                            Uchida Youkou                     1994/3     SET(CD+FD)
+Shougakkou Taiiku - Hoken                                     Uchida Youkou                     1994/3     CD
+Shougi Nenkan Zenshuu                                         Pony Canyon                       1994/1     CD
+Shounen Magazine History                                      Datt Japan                        1992/11    CD
+Silver Tango                                                  Raison                            1992/12    CD
+SL wo Mitai! Uruwashi no Jouki Kikansha                       Gyousei                           1995/7     CD
+Soft de Hard na Monogatari                                    System Sacom                      1989/4     SET(CD+FD)
+Soft de Hard na Monogatari 2                                  System Sacom                      1989/7     SET(CD+FD)
+Software Contest Nyuusen Sakuhinshuu Vol. 1                   Fujitsu                           1991/10    CD
+Software Contest Nyuusen Sakuhinshuu Vol. 3                   Fujitsu                           1994/3     CD
+Software Contest Nyuusen Sakuhinshuu Vol. 4                   Fujitsu                           1994/7     CD
+Soreike! Anpanman: Tanoshii Eigo Asobi                        Fujitsu                           1993/12    CD
+Soreyuke! Diving                                              Dennou Shoukai                    1990/7     CD
+Soudai Naru Jokyoku no Doyomeki                               Fujitsu                           1994/2     CD
+Space Museum                                                  Fujitsu                           1993/11    CD
+Speed Eiyou Check                                             Top Business System               1992/4     CD
+Speed Eiyou Check (?)                                         Top Business System               1992/4     SET(CD+FD)
+Star Wars: Rebel Assault                                      Victor Entertainment              1994/9     CD
+Start with Words                                              SofMedia                          1989/8     CD
+Steepia                                                       Fujitsu                           1993/6     CD
+Steepia Lite                                                  Fujitsu                           1993/3     CD
+Stingo Monogatari ST-1: Stingo to Gohoubi no Ki               Technos Yashima                   1995/1     CD
+Stingo Monogatari ST-2: Stingo no Atarashii Otomodachi        Technos Yashima                   1995/1     CD
+Stingo Monogatari ST-3: Stingo Umi ni Iku                     Technos Yashima                   1995/1     CD
+Stingo Monogatari ST-4: Stingo Yuuenchi ni Iku                Technos Yashima                   1995/1     CD
+Stingo Monogatari ST-5: Stingo no Christmas                   Technos Yashima                   1995/1     CD
+Stress                                                        Toshiba EMI                       1989/11    CD
+* Suikoden: Tenmei no Chikai                                  Koei                              1990/2     SET(CD+FD)
+Suisai Graphic Art Software                                   NTT Data Tsuushin                 1993/8     CD
+Sunshine 1-nen                                                Uchida Youkou                     1993/7     CD
+Sunshine 2-nen                                                Uchida Youkou                     1993/7     CD
+Super Kakitaoshi                                              Nikkonren Kikaku                  1993/?     SET(CD+FD)
+Super Real Mahjong PII & PIII +                               Ving                              1993/3     CD
+Super Zurukamashi                                             Nikkonren Kikaku                  1993/?     SET(CD+FD)
+Suzaku                                                        Wolf Team                         1992/10    SET(CD+FD)
+Tactical Tank Corps DX                                        GAM                               1995/2     SET(CD+FD)
+Taiken Shiyou! Marty Channel                                  Fujitsu                           1993/2     SET(CD+FD)
+Taiken Shiyou! Marty Channel 2                                Fujitsu                           1993/6     CD×02
+Takken Ou                                                     Techno Business                   1994/10    CD
+Tamashii no Mon: Dante "Shinkyoku" yori                       Koei                              1993/6     SET(CD+FD)
+Tania                                                         Tips                              1996/11    CD
+Tankyuu-kun                                                   Fujitsu                           1996/11    CD
+Tanoshii Sansuu Set 1-2-nen                                   Dainippon Tosho                   1994/3     SET(CD+FD)
+Teata -vision- (V1.0-1.3)                                     Nanken Koubou                     1995/6     SET(CD+FD)
+Teito Taisen                                                  Chouonsoku                        1989/12    CD
+Teitoku no Ketsudan                                           Koei                              1990/4     SET(CD+FD)
+Teitoku no Ketsudan 2                                         Koei                              1994/6     SET(CD+FD)
+Tender Light Vol. 1                                           Fujitsu                           1994/3     CD
+Tenjin Ranma                                                  Elf                               1992/5     SET(CD+FD)
+Tensai Kyuutei Ongaku no Kanade                               Fujitsu                           1992/12    CD
+Tensen Nyannyan                                               Ponytail Soft                     1994/9     CD
+Tenshi-tachi no Gogo 3: Bangai-hen Hanseiban                  JAST                              1993/3     ?
+Tenshi-tachi no Gogo Collection 2                             JAST                              1995/11    CD
+Tenshi-tachi no Gogo V: Nerawareta Tenshi                     JAST                              1992/12    ?
+Tenshi-tachi no Gogo: Tenkousei                               JAST                              1995/7     CD
+Teo: Mou Hitotsu no Chikyuu                                   Fujitsu Parex                     1995/9     SET(CD+FD)
+Teo: Mou Hitotsu no Chikyuu Ver. 2                            Fujitsu Parex                     1996/7     CD
+Tera Towns                                                    Nihon Micom Hanbai                1989/5     CD
+Tera Towns 2                                                  Nihon Micom Hanbai                1993/4     CD
+That's Toukou                                                 Birdy Soft                        1993/12    CD
+The Book of MIDI                                              Fujitsu                           1992/9     CD
+The Lost Secret                                               DynEd Japan                       1993/7     SET(CD+FD)
+The Manhole 2                                                 Sun Denshi                        1993/5     ?
+The Playroom                                                  Fujitsu                           1995/2     CD
+The Sea in Your Eyes: Umi wo Mitsumete                        Inter Limited Logic               1995/4     CD
+The Visitor                                                   Fujitsu                           1989/9     CD
+The Yachtman                                                  Raison                            1989/11    CD
+Theme Park                                                    Electronic Arts Victor            1995/9     CD
+Think Read: Chuugaku Series                                   Catena                            ?          SET(CD+FD)
+Think Read: Shougaku Series                                   Catena                            ?          SET(CD+FD)
+Time Stripper Mako-chan                                       Foster                            1996/1     CD
+Tom Snyder's Puppy Love                                       Fujitsu                           1989/7     CD
+Total English 1-nen                                           Uchida Youkou                     1993/9     CD
+Total English 2-nen                                           Uchida Youkou                     1993/9     CD
+Touch the Music by Casiopea                                   Fujitsu                           1994/3     SET(CD+FD)
+Tougenkyou (Shichuusuimeigaku Nyuumon)                        Nanken Koubou                     1991/2     CD
+Toukyou Genshikai - Tokyo Sexy Ave.                           HOP                               1994/7     SET(CD+FD)
+Towns Amone                                                   Kozu System                       1990/4     SET(CD+FD)
+Towns Chiri Jigsaw World                                      Fujitsu Ooita Software Laboratory 1991/3     CD
+Towns Chiri Shizen no Naritachi                               Fujitsu Ooita Software Laboratory 1991/9     CD
+Towns Cruising Chart                                          Raison                            1991/4     SET(CD+FD)
+Towns E to Oto de Manabu Suugaku                              Rand Computer                     1993/3     CD
+Towns Family Genki Yohou                                      Kozu System                       1990/12    CD
+Towns Magazine Vol. 3                                         Fujitsu                           1995/4     CD×02
+Towns Meikyoku Master                                         Fujitsu Ooita Software Laboratory 1991/9     CD
+Towns Meikyoku Master (Marty-compatible)                      Fujitsu Ooita Software Laboratory 1993/3     CD
+Towns Spirit                                                  Uchida Youkou                     1993/4     CD
+Towns Spirit                                                  Uchida Youkou                     1993/4     CD
+Towns Telop                                                   Lambda System                     1989/5     SET(CD+FD)
+TownsFullcolor V1.1                                           Fujitsu                           1993/3     CD
+TownsFullcolor V2.1                                           Fujitsu                           1994/12    CD
+TownsGraph V1.1                                               Fujitsu                           1993/4     CD
+TownsGraph V2.1                                               Fujitsu                           1994/10    CD
+TownsPAINT 2 V1.1                                             Fujitsu                           1993/10    CD
+TownsPAINT 2 V2.1                                             Fujitsu                           1994/11    CD
+TownsSOUND V1.1                                               Fujitsu                           1990/4     CD
+TownsSOUND V2.1                                               Fujitsu                           1993/5     CD
+Towns-Telop 2 Type A                                          Lambda System                     1995/10    SET(CD+FD)
+Towns-Telop 2 Type B                                          Lambda System                     1995/10    SET(CD+FD)
+Towns-Telop 2 Type C                                          Lambda System                     1995/10    SET(CD+FD)
+TownsVNET V1.1                                                Fujitsu                           1989/5     CD
+TownsVNET V1.1 (Reprint?)                                     Fujitsu                           1992/1     CD
+Towns-you Chuugakkou Gijutsu Kateika Kyouzai                  Uchida Youkou                     1994/3     CD
+Treeclub                                                      Fujitsu Parex                     1995/7     CD
+Trigger 2                                                     ZyX                               1995/9     CD
+True Heart                                                    Cocktail Soft                     1995/2     SET(CD+FD)
+Tsubo Relaxation                                              Fujitsu Personal Computer Systems 1994/9     CD
+Twinkle Star                                                  Studio Twinkle                    1993/7     CD
+Two Shot Diary                                                Mink                              1994/10    CD
+Uemura Kei no Sexy Resort                                     Pink Elephant                     1992/9     CD
+Uemura Kei no Sexy Telephone                                  Pink Elephant                     1992/9     CD
+Ujibushi no Chiiku Game                                       Nihon Keisoku Souchi              1994/4     CD
+Unmei no Tobira                                               Fujitsu                           1992/9     CD
+URM: 15 Wakusei ni Umarete                                    Japan Home Video (JHV)            1994/12    CD
+Ushiro no Shoumen                                             Raison                            1991/9     CD
+Utaimasenka                                                   GAM                               1995/11    SET(CD+FD)
+Vampire High School                                           Interheart                        1993/6     CD
+Vanishing Point: Tenshi no Kieta Machi                        Tiara                             1995/10    CD
+Vector Moji Pattern 2                                         Fujitsu                           1992/12    IC
+Video Koubou V1.1                                             Fujitsu                           1992/6     SET(CD+FD)
+Video Koubou V1.2                                             Fujitsu                           1993/4     CD
+* Video Koubou V1.3                                             Fujitsu                           1994/2     CD
+Video Koubou V1.4                                             Fujitsu                           1995/11    SET(CD+FD)
+VIP Ball                                                      CSK Research Institute (CRI)      1991/8     CD
+VIP Tone                                                      CSK Research Institute (CRI)      1991/9     CD
+VIPER GTS                                                     Sogna                             1995/11    CD
+VIPER V12                                                     Sogna                             1995/12    CD
+VIPER V8 Turbo RS                                             Sogna                             1995/6     CD
+Virtuacall 2                                                  Fairytale                         1995/12    SET(CD+FD)
+Virtual Tours V1.0                                            Fujitsu                           1995/1     SET(CD+FD)
+Watashi no Tsukue                                             GAM                               1994/9     SET(CD+FD)
+Watashi no Tsukue 2                                           GAM                               1995/11    SET(CD+FD)
+Watashi-tachi no Iseikatsu                                    Uchida Youkou                     1994/3     CD
+Watashi-tachi no Shokuji Shindan                              Uchida Youkou                     1994/3     CD
+Wedding Plan                                                  Computer System                   1990/4     CD
+Wellness Yoga                                                 Fujitsu Personal Computer Systems 1995/4     CD
+Wetpaint Towns                                                Wave Train                        1990/9     CD
+What's a Computer? V1.2 Nyuumon Computer Yougo Kaisetsu       Fujitsu                           1993/7     SET(CD+FD)
+Winning Post                                                  Koei                              1993/5     SET(CD+FD)
+Winter Wonderland                                             Raison                            1990/12    CD
+Woman's Memory                                                Human Interface                   1991/4     CD
+Wonpara Wars                                                  Mink                              1995/2     CD
+Wonpara Wars II                                               Mink                              1995/4     CD
+Yacht & Cruiser System                                        Raison                            1989/11    CD
+Yasashii Chuugokugo                                           SofMedia                          1990/12    CD
+Yawahada Bishoujo                                             Illusion                          1995/3     CD
+Yellows                                                       Digital Rogue                     1994/12    CD
+Yes! HG                                                       Himeya Soft                       1995/12    CD
+Yoshioka Mayumi: Last Nude                                    Janis                             1993/12    CD
+Youki de Cool na LA Towns                                     Media Art                         1990/12    CD
+Yubiwa Monogatari Daiikkan: Tabi no Nakama                    Starcraft                         1992/3     CD
+Yubiwa Monogatari Dainikan: Futatsu no Tou                    Starcraft                         1993/4     SET(CD+FD)
+Yumeutsutsu                                                   Megami                            1992/5     CD
+Zoku Youjuu Senki: Suna no Mokushiroku                        D.O.                              1994/2     CD
+Z's Staff Pro Towns                                           Zeit                              1991/7     CD
+Z's Triphony DigitalCraft Towns                               Zeit                              1990/12    CD
 
 -->
 
@@ -357,7 +873,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="linuxje3">
+	<!-- Fails to boot -->
+	<software name="linuxje3" supported="no">
 		<!--
 		 Origin: Neo Kobe Collection
 		 <rom name="[OS] Linux + JE3.mdf" size="760707360" crc="2c93db2b" sha1="992b0e991a6bde293edf059e529ee2321ab6469b"/>
@@ -377,7 +894,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="linuxje4">
+	<!-- Fails to boot -->
+	<software name="linuxje4" supported="no">
 		<!--
 		 Origin: Neo Kobe Collection
 		 <rom name="[OS] Linux + JE4 1995-12 (Disc 1).ccd" size="772" crc="e683c1d6" sha1="ee1ee6058d7142db90e8cd589ea0e99c2fea5008"/>
@@ -544,7 +1062,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- Missing a floppy disk -->
-	<software name="win31l11">
+	<software name="win31l11" supported="no">
 		<!--
 		 Origin: Neo Kobe Collection
 		 <rom name="[OS] Windows 3.1 L11 (Track 1).bin" size="210974400" crc="f1c0baee" sha1="b6b3a75c06dda9f2c7df10703b2640871db84d34"/>
@@ -741,7 +1259,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="dualtarg">
+	<!-- Runs too fast -->
+	<software name="dualtarg" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="The 4th Unit 3 - Dual Targets.ccd" size="2660" crc="c418053d" sha1="e05dad8651923707c27da766604627e31ddd250c"/>
@@ -942,7 +1461,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="abel">
+	<!-- Runs too fast -->
+	<software name="abel" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Abel.ccd" size="4674" crc="d29bcd2e" sha1="1198a235c5463ca6ab1ef72bc89e2f307c9bc48f"/>
@@ -980,7 +1500,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="aeternam">
+	<!-- Runs too fast -->
+	<software name="aeternam" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Aeternam.ccd" size="3451" crc="1a58a6d3" sha1="634ca1536a8a2af4da514eb49c9a1bdcbe3bdf9c"/>
@@ -999,7 +1520,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="aburner">
+	<!-- Runs too fast -->
+	<software name="aburner" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="After Burner.ccd" size="2145" crc="c88c38a9" sha1="88f2a8ff8f7c8f27b43e7b2ac2e92e856e97def2"/>
@@ -1082,7 +1604,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- Seems to be missing a floppy disk -->
-	<software name="airwar">
+	<software name="airwar" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Fujitsu Air Warrior v1.1.ccd" size="903" crc="a5a83861" sha1="d8ded0b27ee1dfa2eada1f60433a8018d55fea36"/>
@@ -1141,7 +1663,7 @@ User/save disks that can be created from the game itself are not included.
 	<!-- probably a bad dump: the image seems to have been created from the game files instead of being an actual dump of
 	 the original disc (it has a Joliet filesystem and the directories have creation dates in 2003) so it probably needs
 	 to be replaced with a proper dump. -->
-	<software name="alice3">
+	<software name="alice3" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Alice no Yakata III.iso" size="20756480" crc="d594012b" sha1="001f86551065e146be22d0d81d7063e1873360c6"/>
@@ -1276,7 +1798,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="angel">
+	<!-- Asks for a save disk, but doesn't accept a blank one -->
+	<software name="angel" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Angel.ccd" size="2812" crc="5269b2c9" sha1="4fff4210e42536faa001b659721aeaaffe1f5d5c"/>
@@ -1323,6 +1846,22 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="angel halo" sha1="9d79b87bdfa4a3c3308c15a7e7c2927686f79c68" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="anotowns">
+		<!--
+		Origin: P2P
+		<rom name="[FM-TOWNS] AnotherTOWNSあなた～One to Sevenフリーソフトウェアコレクション.iso" size="655826944" crc="28e553ac" sha1="4b5ca2bc9ae2b3b6fe9da0b2a9378123d99e5206"/>
+		-->
+		<description>AnotherTOWNS - Anata~ Free Software Collection</description>
+		<year>1999?</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="usage" value="Requires 32 MB of RAM" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="anotowns" sha1="f6b1a56808d9abd79b50a830b409c1b87659ab01" />
 			</diskarea>
 		</part>
 	</software>
@@ -1423,7 +1962,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="asu120ex">
+	<!-- Some graphics issues -->
+	<software name="asu120ex" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Asuka 120% Burning Fest. Excellent.bin" size="317884560" crc="2f0a5f53" sha1="3e28df9c09aa9cc814c936864b1ca79166fa00f4"/>
@@ -1508,7 +2048,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="ayayo123">
+	<!-- Some graphics issues -->
+	<software name="ayayo123" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Hatchake Ayayo-san 1-2-3.mdf" size="21664800" crc="db34463b" sha1="bd9465fa4853c8c69311a4dab6a16765100a3d15"/>
@@ -1572,7 +2113,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="azure">
+	<!-- Runs too fast? -->
+	<software name="azure" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Azure.ccd" size="2720" crc="abba1a9c" sha1="dfc2b8b4e7f907b7f03314df3ce7e5b8e4fb5d79"/>
@@ -1645,6 +2187,45 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ballade for maria" sha1="1f9e39ca63a8a896c5487b4a21100dd67e6a1ffd" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="batchess">
+		<!--
+		Origin: redump.org
+		<rom name="Battle Chess (Japan) (En,Ja).cue" size="2711" crc="990dafd7" sha1="870b4574afeef42b0a0c4b58021c27ec75e72f1f"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 01).bin" size="52038000" crc="f120a9a5" sha1="789d19facee66da91a619799bd4ea902af12050a"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 02).bin" size="160702752" crc="2a8c7147" sha1="27aad576f603d55ea8e762aab44e896fbec2b2c0"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 03).bin" size="22160544" crc="253f669b" sha1="ec097ad141d8be24c24f46e3528a3d80f10ecd1c"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 04).bin" size="28320432" crc="730800a6" sha1="42fe6d8f6e40e9c50da33dbf98fea32e5ec659ea"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 05).bin" size="29785728" crc="f96c9d0f" sha1="d7e904620d731d1f361db8546beeab8d9b9a5729"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 06).bin" size="29277696" crc="4f0e4085" sha1="41615b562a3238f7971c5a63790b6f4f0365a170"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 07).bin" size="29748096" crc="171b2ba5" sha1="b0f1ab7a99be2a459dc5cac517f729cee10049cb"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 08).bin" size="29291808" crc="5bf64bb6" sha1="7c9a5a7a8e30da487a8549a0654dae417168f999"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 09).bin" size="3789072" crc="3edc18fa" sha1="2c5e747a22160b26b8e25be50962b3ae9e4c73f7"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 10).bin" size="3916080" crc="2dbd4230" sha1="751bb51c36ef95d53e24908c2c541e9734b22671"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 11).bin" size="4038384" crc="8d77e34f" sha1="d134ca6a91a492ad6a8d2cac1771013289a2838f"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 12).bin" size="3711456" crc="bb5593a2" sha1="a4b1d84a33b3e5b68bd29db9b243994dbd91302b"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 13).bin" size="3796128" crc="77c50f28" sha1="0c0e8d3b10f69eb02a67bff10eb57b8b632d2887"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 14).bin" size="3845520" crc="06055f6c" sha1="6a016acb05d3c940a6f7958370bd647d865cb336"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 15).bin" size="3847872" crc="b1e83660" sha1="f456d11fab38743561722191452d8f4bb5d18cd2"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 16).bin" size="3911376" crc="64d85973" sha1="d06fbc8a5ff7bd70f371d9e18af9a207959c0780"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 17).bin" size="3337488" crc="43f387c9" sha1="8e49bb1f30f16f9d2ada8327dfcff6ffcf54c421"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 18).bin" size="4377072" crc="ed4aed97" sha1="559f10457b31bdf206bca84ea0a38e57211bd7fa"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 19).bin" size="3669120" crc="4c19f9d9" sha1="dabcc461eafb13fbc78edd0fd9b49c1d8bc18d05"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 20).bin" size="4353552" crc="a57e29c9" sha1="8a82b620cdce3d28eb300cc04dbebfd668f70ecc"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 21).bin" size="18841872" crc="15fc36b7" sha1="9e26abdfb6423bc8d245d233ae4872300169ecfb"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 22).bin" size="284326224" crc="62d2dd00" sha1="4f70592502f9a3f6af48dee67f38f86d60bbfebf"/>
+		-->
+		<description>Battle Chess</description>
+		<year>1991</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="alt_title" value="バトル・チェス" />
+		<info name="release" value="199109xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="battle chess (japan) (en,ja)" sha1="0697976fd0d3c5a8a1282d3bf3a319d50d525036" />
 			</diskarea>
 		</part>
 	</software>
@@ -1731,7 +2312,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="blandia">
+	<!-- Visible area is cut off -->
+	<software name="blandia" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Blandia Plus.bin" size="494609136" crc="5aa2c330" sha1="e9b4f2785bb05f0ded19734851faac39f97594c8"/>
@@ -2050,7 +2632,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="condor">
+	<!-- Mouse input issues -->
+	<software name="condor" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="The Case of the Cautious Condor.ccd" size="785" crc="97871285" sha1="c727c4224df1e672fc85c63dd6d3015bfd66e45d"/>
@@ -2135,7 +2718,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="cyberia">
+	<!-- Hangs at name entry -->
+	<software name="cyberia" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Cyberia.ccd" size="772" crc="a4dc53ce" sha1="bf2f85696f9485834d782b6360a2824d9a2f30c3"/>
@@ -2567,6 +3151,25 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="dodamega">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="1823" crc="6569150c" sha1="09802a94fad080d4464fce17ba161c137dc5b0a0"/>
+		<rom name="Image.cue" size="299" crc="b5d5ad42" sha1="ae01659fda3d965a3bbf242bcc69267e9dc6ca0e"/>
+		<rom name="Image.img" size="210720384" crc="d2f023c4" sha1="f9e43906de2e78275eb05d571d404da8654da671"/>
+		<rom name="Image.sub" size="8600832" crc="51fc181b" sha1="5552f73174a7ecd821d5a758b3d378ca3d996235"/>
+		-->
+		<description>Doda Mega-Mix!!!</description>
+		<year>1989</year>
+		<publisher>FNC</publisher>
+		<info name="release" value="198911xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dodamega" sha1="876ebe9db24ad2206e2bb4795284d828fa264442" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="dokidok1">
 		<!--
 		Origin: Neo Kobe Collection
@@ -2782,6 +3385,23 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="drgshock">
+		<!--
+		Origin: P2P
+		<rom name="Image.cue" size="381" crc="5bf84c71" sha1="a16d98615fb735b3e2f54e78c98159c6d7a137cd"/>
+		<rom name="Image.img" size="235011840" crc="c0c9d26f" sha1="6acfa1aa858f9cbbd1afea603af8af9b03236cda"/>
+		-->
+		<description>Dragon Shock</description>
+		<year>1989</year>
+		<publisher>ログ (Log)</publisher>
+		<info name="release" value="198911xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="drgshock" sha1="3cce3b9b985d523593d26ac7cf3040160df57aec" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="drakkhen">
 		<!--
 		Origin: Neo Kobe Collection
@@ -2885,7 +3505,7 @@ User/save disks that can be created from the game itself are not included.
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="release" value="199407xx" />
-		<info name="usage" value="Requires HDD installation"/>
+		<info name="usage" value="Requires HDD installation and an FPU"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="elfish" sha1="c0dd2d0c0caaea9098de8a550aac7b5005030f8f" />
@@ -2952,6 +3572,69 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="emerald dragon" sha1="87147a20f1a7422e8ced81c664180538be39f9ae" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- The spoken dialogue (CDDA) seems to start playing at the wrong point and doesn't match what's being said on each scene -->
+	<software name="emit1" supported="partial">
+		<!--
+		Origin: redump.org
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja).cue" size="1078" crc="4ed341d2" sha1="7d5c07157bd438cab5d0d84dd1024b369cfd9db6"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 1).bin" size="20281296" crc="4b15bc51" sha1="02433dd33ba55bf686349d1332a5d72914f418c2"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 2).bin" size="42766416" crc="cddb61dc" sha1="f40ae55a596258434672d7975388b2bdbfc08125"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 3).bin" size="151908624" crc="0480ad92" sha1="e62722a8e8c0e54b11a8a293950a55410d1e7086"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 4).bin" size="159395040" crc="3e561925" sha1="c0f4058a6678439d128648e8d48e8344e828bca8"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 5).bin" size="72077040" crc="0c366937" sha1="77f71ca8d795a8c2e6ed0e286750fea7becc1abb"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 6).bin" size="114714096" crc="3422fc41" sha1="57197a1ccb5c7d2a02a84ee6929fcd2d958e7eb7"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 7).bin" size="6837264" crc="a8bb630c" sha1="34c54fa85a566a00e3c9ba4572a347a15d718170"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 8).bin" size="70376544" crc="a9597842" sha1="07b706406105d4f4d99038aad84a2c9408692ee6"/>
+		-->
+		<description>Emit Vol. 1 - Toki no Maigo</description>
+		<year>1994</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="release" value="199403xx" />
+		<info name="alt_title" value="エミット Vol. 1 時の迷子" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="emit1.hdm" size="1261568" crc="660198bd" sha1="f84e0ede2de479d61de72c59e64a5c6829ae9cb7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 1 - toki no maigo (japan) (en,ja)" sha1="038ddc530689da76a82b225a8deefd713b0b059e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- The spoken dialogue (CDDA) seems to start playing at the wrong point and doesn't match what's being said on each scene -->
+	<software name="emit2" supported="partial">
+		<!--
+		Origin: redump.org
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja).cue" size="1260" crc="92e3280f" sha1="f86c316920455ad3be2769edee7a33cdc890fb65"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 1).bin" size="20815200" crc="0ae40089" sha1="6b7c70f4c14602f9866e2c125491d39ae80dfdfe"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 2).bin" size="69595680" crc="346a3abd" sha1="ee7325fea4ecd2bb5a63356f511566284669efd0"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 3).bin" size="147070560" crc="67ca5cca" sha1="74ffd1b5a5401f03aa388a50259e748f3fdd8241"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 4).bin" size="156419760" crc="68fe96cd" sha1="8c388642e46f5743e8dc565f61367ccc78679c82"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 5).bin" size="47256384" crc="2a47da59" sha1="0347296eb5d4bf61c297088c5b906bb5cd3f5f54"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 6).bin" size="117936336" crc="38c90df5" sha1="b3012938f2992be2645d6b8bb1b67f7caa89742a"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 7).bin" size="6738480" crc="1f2dbaa5" sha1="2e1b29fb2597477ac45e471c14865f13614263c4"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 8).bin" size="43175664" crc="3134c4b6" sha1="39899d98d01020a589e67674300a7fbae74b2f5d"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 9).bin" size="2598960" crc="c08c050d" sha1="5464a05ade770fe4fbc211b1789b8d13d1444301"/>
+		-->
+		<description>Emit Vol. 2 - Inochigake no Tabi</description>
+		<year>1994</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="release" value="199407xx" />
+		<info name="alt_title" value="エミット Vol. 2 命がけの旅" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="emit2.hdm" size="1261568" crc="b0e599e6" sha1="a7ba288dd17aa136e3fad5d5d070d5c87c61d5b6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 2 - inochigake no tabi (japan) (en,ja)" sha1="ae0de13b275b8f7ce5082008002aa4c275d011db" />
 			</diskarea>
 		</part>
 	</software>
@@ -3039,7 +3722,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="excel10">
+	<!-- Runs too fast -->
+	<software name="excel10" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Excellent 10.bin" size="714718704" crc="d3db47a4" sha1="1fa667afbf0eddabaf79cd6e307acae352ecbec4"/>
@@ -3223,7 +3907,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="fractal">
+	<!-- Hangs while playing FMV -->
+	<software name="fractal" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Fractal Engine Demo.ccd" size="751" crc="0dec1ac7" sha1="b0777df3b73b305181bcf3544104ebcb4dcd23d6"/>
@@ -3260,7 +3945,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="frogfstd">
+	<!-- Severe graphics issues -->
+	<software name="frogfstd" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Frog Feast Demo.iso" size="952320" crc="ed3e8b42" sha1="82b60aefb5061bc7d1761183fe77548d1a23b4a3"/>
@@ -3713,6 +4399,29 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="ginga3sp">
+		<!--
+		Origin: Private dump (r09)
+		<rom name="gingaed3sp.cue" size="99" crc="0a99439a" sha1="299c921e39ccc248ae8ca7f73b1e34ef6832d157"/>
+		<rom name="gingaed3sp.bin" size="11830560" crc="c48bb3ab" sha1="afb6dd9762aa849f13393f0f488a61198b71bf7b"/>
+		-->
+		<description>Ginga Eiyuu Densetsu III SP</description>
+		<year>1993</year>
+		<publisher>ボーステック (Bothtec)</publisher>
+		<info name="release" value="199312xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Game Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="gingaed3sp_gamedisk.hdm" size="1261568" crc="44a6fe22" sha1="f85fe21a0ffb344f8cb24abb87ab6bd853267aca" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gingaed3sp" sha1="a490e0279fbb11f6e0b3d97e1cceb74c0cc09c09" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="goh2">
 		<!--
 		Origin: Neo Kobe Collection
@@ -3774,6 +4483,29 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="gulfwar">
+		<!--
+		Origin: Private dump (r09)
+		<rom name="gulfwar.cue" size="73" crc="b26630b6" sha1="e30f87162664eb70b085517809b7dcddde4d4ea6"/>
+		<rom name="gulfwar.bin" size="10231200" crc="d93096ec" sha1="f570fce35e8f5beafa3e373cbae67b58aadce3db"/>
+		-->
+		<description>Gulf War Soukouden</description>
+		<year>1993</year>
+		<publisher>ウルフチーム (WolfTeam)</publisher>
+		<info name="release" value="199312xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="gulfwar_systemdisk.hdm" size="1261568" crc="00f642ac" sha1="27f9c0e58446d1f026f8e2eba514d8f871aa37e2" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gulfwar" sha1="cddf2d940887c637abc2990616eaaf39926b74f8" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="gunblaze">
 		<!--
 		Origin: Neo Kobe Collection
@@ -3831,7 +4563,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="gunship">
+	<!-- Some graphics issues -->
+	<software name="gunship" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Gunship - The Helicopter Simulation.cue" size="370" crc="258b11b0" sha1="146fb88fc218b94c5b04c8eb08fd04d4523dde44"/>
@@ -4367,6 +5100,44 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="ishin">
+		<!--
+		Origin: Private dump (Reuental)
+		<rom name="ISHIN_NO_ARASHI.mdf" size="502741200" crc="33a4b201" sha1="4666a1c55405acefd13f17608645df0bac1583fc"/>
+		<rom name="ISHIN_NO_ARASHI.mds" size="1024" crc="cfb06454" sha1="05e023f2567feca6c984aeba9385cbfaac878cab"/>
+
+		*after conversion with IsoBuster+EAC *
+		<rom name="ishin.cue" size="1123" crc="ab69674c" sha1="6ac864e1572e04e6382fe4bac453bc14ba8ef461"/>
+		<rom name="ishin_track01.bin" size="20462400" crc="be4b061a" sha1="99fca8c1ef5dedb879d82eb932b6cf1f70a8659a"/>
+		<rom name="ishin_track02.bin" size="53409216" crc="62115ac9" sha1="6ab76f1d439cb0a2fe4a0c8922031aa04b183ed9"/>
+		<rom name="ishin_track03.bin" size="48004320" crc="426ee287" sha1="43ff60a150b80802f988235e561e9e175c4e7413"/>
+		<rom name="ishin_track04.bin" size="37008720" crc="281c033b" sha1="254d876a746b23673c4f8123e767e23eb5082c7e"/>
+		<rom name="ishin_track05.bin" size="35456400" crc="3e8f4123" sha1="246cd999e86dd536f3be6d3676577bcb5d71d8e5"/>
+		<rom name="ishin_track06.bin" size="30822960" crc="ccf11e55" sha1="bf4710e6bba7e030db428d95cbde4975573597b7"/>
+		<rom name="ishin_track07.bin" size="39160800" crc="40ec9d8f" sha1="d20cc12e917c12207467a27439dd14bed9da0f45"/>
+		<rom name="ishin_track08.bin" size="54731040" crc="c35f12a6" sha1="6aa8fc2f8aadb2c8f55157aa24a6c8de3ec78970"/>
+		<rom name="ishin_track09.bin" size="24507840" crc="bb01cf0d" sha1="4a0435f05e7c17c1b024e69fbd77122bee765ca3"/>
+		<rom name="ishin_track10.bin" size="43542576" crc="b1d9a332" sha1="0da9c7fc70a0d6ee46e67ce4daa0066a152f55db"/>
+		<rom name="ishin_track11.bin" size="35886816" crc="c5998c45" sha1="161fd150ae83c1670621a1aec326ef9191050a25"/>
+		<rom name="ishin_track12.bin" size="85920912" crc="8e65d944" sha1="bc24be3f270455e879218ba842f6a18133b76e40"/>
+		-->
+		<description>Ishin no Arashi</description>
+		<year>1990</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="維新の嵐" />
+		<info name="release" value="199003xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1281968">
+				<rom name="ishin.d88" size="1281968" crc="5885c76c" sha1="29b0773c95d1f69d943c1ee47e957f7b7eb6cb55" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ishin" sha1="e5aaf3d9e6fb44aec09b6586adfe72e872c9b85d" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="janjaka">
 		<!--
 		Origin: Neo Kobe Collection
@@ -4386,7 +5157,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="jangou4">
+	<!-- Hangs during the intro -->
+	<software name="jangou4" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Jango 4.ccd" size="4391" crc="b3b19065" sha1="979d0ce4e7efbf691433a7b275ba60710d339793"/>
@@ -4554,7 +5326,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="kingqst5">
+	<!-- Mouse input issues -->
+	<software name="kingqst5" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="King&apos;s Quest V.mdf" size="287461440" crc="0171b747" sha1="b1b7a2dfbe361cc2b5c71ddfaca2b1790d77532d"/>
@@ -4688,7 +5461,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="kyrandia">
+	<!-- Fails to boot, doesn't seem to recognize the CD -->
+	<software name="kyrandia" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="The Legend of Kyrandia.ccd" size="4894" crc="3a8bbbfb" sha1="132f7535d204a731423b497729d3b7e01f35eefd"/>
@@ -4729,7 +5503,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="ktiger">
+	<!-- Doesn't boot -->
+	<software name="ktiger" supported="no">
 		<!--
 		Origin: Tokugawa Corporate Forums (wushu)
 		<rom name="Tiger.bin" size="757692096" crc="131e7221" sha1="e300709315d53e06fdc64eed31159da25d68e357"/>
@@ -4742,6 +5517,25 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="kyuukyoku tiger" sha1="7c0f1c42dba49fe71114d21ad2f604dabe729196" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ku2pp">
+		<!--
+		Origin: Tokugawa Corporate Forums (DamienD)
+		<rom name="KU²++.ccd" size="5176" crc="1e5aa465" sha1="9569466d627ebb8f004d3ffd44cd48096829ff63"/>
+		<rom name="KU²++.cue" size="981" crc="02e50d19" sha1="97a5444839919629278980b9df44196e505af7da"/>
+		<rom name="KU²++.img" size="600514992" crc="50a05b7f" sha1="08ac4b3cb8755b25a93ac20a3a0b5364bb127b4f"/>
+		<rom name="KU²++.sub" size="24510816" crc="2eeb7669" sha1="2dba78cc9b1c8a7961109fcdd31ca7f5f68f2f73"/>
+		-->
+		<description>Ku²++</description>
+		<year>1993</year>
+		<publisher>パンサーソフトウェア (Panther Software)</publisher>
+		<info name="release" value="199311xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ku2++" sha1="89f36240314f15dcb45526b03beb84e417296a97" />
 			</diskarea>
 		</part>
 	</software>
@@ -4767,7 +5561,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="lastarmg">
+	<!-- Runs too fast -->
+	<software name="lastarmg" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Last Armageddon CD Special (Disc A).ccd" size="11707" crc="b17278f6" sha1="e086fc5d958b79b9c67bac10cd16c6e47d15f61c"/>
@@ -4806,7 +5601,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="lastsurv">
+	<!-- Runs too fast? -->
+	<software name="lastsurv" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Last Survivor.ccd" size="2083" crc="dd87d31e" sha1="8453a35a485de1b0343da937e5a2236e799032fe"/>
@@ -4869,7 +5665,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="lemming2">
+	<!-- Some graphics issues -->
+	<software name="lemming2" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Lemmings 2 - The Tribes.ccd" size="3624" crc="3f79d6d8" sha1="b074947b2f522f1e1c1b3f8208eb616f68e42beb"/>
@@ -4907,7 +5704,6 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- The floppy image seems to have 19712 extra bytes filled with 0xE5 - bad dump? -->
 	<software name="lettuce">
 		<!--
 		Origin: Neo Kobe Collection
@@ -4920,8 +5716,8 @@ User/save disks that can be created from the game itself are not included.
 		<year>1989</year>
 		<publisher>Seibu Time</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1281280">
-				<rom name="lettuce cooking.bin" size="1281280" crc="0644e504" sha1="808144356f94b03a495a5824ecd47255a5475b47" offset="000000" />
+			<dataarea name="flop" size="1261568">
+				<rom name="lettuce cooking.bin" size="1261568" crc="76845bb0" sha1="9d7227621f94375c105e3ee8f2cc7d5ebdd60147" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -4950,7 +5746,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="lifendth">
+	<!-- Restarts TownsOS -->
+	<software name="lifendth" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Life &amp; Death.ccd" size="1514" crc="998ab894" sha1="f8671fe509d7efac0e3d15c914ae636146258cdc"/>
@@ -5125,7 +5922,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="lvalour">
+	<!-- No sound -->
+	<software name="lvalour" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Legends of Valour.mdf" size="100943136" crc="1e0de6c4" sha1="be3a4399d64f704584da0728d2ac4cc20dc50bff"/>
@@ -5167,7 +5965,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="madstalk">
+	<!-- Black screen on boot -->
+	<software name="madstalk" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Mad Stalker.ccd" size="3432" crc="d59dff39" sha1="876ab6b804a0f3da6fd1cbeb1a7d2230e2adfcc3"/>
@@ -5186,7 +5985,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="madogakr">
+	<!-- Black screen on boot -->
+	<software name="madogakr" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Madou Gakuin R.ccd" size="769" crc="f0c13e0c" sha1="47128d65376f140f43de7d1890709d41104c2bc8"/>
@@ -5592,7 +6392,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="mmorph">
+	<!-- Hangs while playing FMV -->
+	<software name="mmorph" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Megamorph.ccd" size="784" crc="b10bc2c6" sha1="8760ed5e880d3466fdbd2c538d62959e7f581f92"/>
@@ -5761,7 +6562,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- Missing a floppy disk that seems to be necessary to boot the game -->
-	<software name="msdet2">
+	<software name="msdet2" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ms. Detective File #2.ccd" size="1206" crc="f516d92c" sha1="54cdebd7e17ee8861affd996bdb8857b2bff3cc7"/>
@@ -5780,7 +6581,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="mspectre">
+	<!-- Fails to play the intro, otherwise works -->
+	<software name="mspectre" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Megaspectre.ccd" size="1707" crc="9921c076" sha1="a6b491d6fdafec7f868b2d61dc05c959f6eda2b3"/>
@@ -5838,7 +6640,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="mumgoose">
+	<!-- Mouse input issues -->
+	<software name="mumgoose" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Mixed-Up Mother Goose.ccd" size="770" crc="fff2375f" sha1="aed6dfb7d9cbd5a744a72e1045151a6de6ce2f5c"/>
@@ -5970,6 +6773,53 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="necronomicon" sha1="82672ceafa32c0e9975aeda8f3f578c1c204ff52" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="3dgolfha">
+		<!--
+		Origin: Private dump (r09)
+		<rom name="new 3d golf simulation - harukanaru augusta (japan) (track 1).bin" size="10235904" crc="3737fb6f" sha1="938a1e5f7af506bdbf40620ad75f6bc411e2efff"/>
+		<rom name="new 3d golf simulation - harukanaru augusta (japan) (track 2).bin" size="121993536" crc="0fa88600" sha1="73cb9fcb7f00fc31f3ec6b2f07ef978521da19fa"/>
+		<rom name="new 3d golf simulation - harukanaru augusta (japan) (track 3).bin" size="7754544" crc="734d3a67" sha1="74e5be92e562284827b8aa9258681bb392ff6510"/>
+		<rom name="new 3d golf simulation - harukanaru augusta (japan) (track 4).bin" size="21057456" crc="d9d8b7e7" sha1="1bd9233e6d24d165d3ce2991794cdf542f9c9b6f"/>
+		<rom name="new 3d golf simulation - harukanaru augusta (japan) (track 5).bin" size="25589760" crc="c1cccc35" sha1="d20dd4e4d5b2db0586f8b71bba59108cb444228b"/>
+		<rom name="new 3d golf simulation - harukanaru augusta (japan) (track 6).bin" size="14986944" crc="4d61c786" sha1="b8f92f54d5e064fcb0ea268dfa6f86ba742629da"/>
+		<rom name="new 3d golf simulation - harukanaru augusta (japan) (track 7).bin" size="123663456" crc="de8371bb" sha1="e68e91cbb6bd5a08d54090207f1a38885b58ee74"/>
+		<rom name="new 3d golf simulation - harukanaru augusta (japan).cue" size="997" crc="4cbe5466" sha1="e23e22ef3b4029ede40b48958cf23f1301014ea7"/>
+		-->
+		<description>New 3D Golf Simulation - Harukanaru Augusta</description>
+		<year>1990</year>
+		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
+		<info name="release" value="199001xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="3577399">
+				<rom name="harukanaru_systemdisk.mfm" size="3577399" crc="02c52d10" sha1="97091496c01bb68ac44a7090e85de08dbc82389f" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<feature name="part_id" value="Course Disc" />
+			<diskarea name="cdrom">
+				<disk name="new 3d golf simulation - harukanaru augusta (japan)" sha1="7fea48e34903ae09c89f5fda5470b9b5edbe2975" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nhkeikai">
+		<!--
+		Origin: P2P
+		<rom name="Image.cue" size="135" crc="25b78af5" sha1="59f27e03d61c1a8bc9b9b268a5ec903353df4abd"/>
+		<rom name="Image.img" size="487040400" crc="0afe5df8" sha1="bae8c46b1c27b75e5afe2ebe7c94d987725baaaa"/>
+		-->
+		<description>NHK Jissen Eikaiwa</description>
+		<year>1991</year>
+		<publisher>CRC総合研究所 (CRC Sougou Kenkyuusho)</publisher>
+		<info name="release" value="199108xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="nhkeikai" sha1="aa3f3c0a48bde7032fb8357f446ce4f2736dee53" />
 			</diskarea>
 		</part>
 	</software>
@@ -6170,7 +7020,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="okuhoso">
+	<!-- Some sound issues -->
+	<software name="okuhoso" supported="partial">
 		<!--
 		Origin: P2P
 		<rom name="okuhoso.ccd" size="11116" crc="26688b0b" sha1="1071eaacf599a5f5fbb1d1bad7d975497288a4f0"/>
@@ -6186,6 +7037,23 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="okuhoso" sha1="7d30d096899dc10b2a88cf132e9a478464b0fa3a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="okuman2">
+		<!--
+		Origin: P2P
+		<rom name="image.cue" size="2800" crc="602de601"/>
+		<rom name="image.img" size="544546800" crc="b7cb448c"/>
+		-->
+		<description>Okumanchouja II</description>
+		<year>1991</year>
+		<publisher>コスモス・コンピュータ (Cosmos Computer)</publisher>
+		<info name="release" value="199107xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="okuman2" sha1="0b646c69dc9a4e8c0e9343885c188d6b9456f513" />
 			</diskarea>
 		</part>
 	</software>
@@ -6209,6 +7077,27 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<!-- Wrong colors on the title screen and some menus -->
+	<software name="oshaclub" supported="partial">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="6862" crc="b5a55841" sha1="fe809a2eaf60f268d9ff862a8412327110250029"/>
+		<rom name="Image.cue" size="1365" crc="dc16b4d5" sha1="e13c05e2832fb1864e6917c9134ac67045cc834c"/>
+		<rom name="Image.img" size="565573680" crc="5d094d0e" sha1="0a4286a0014debf4b99fb07df439ffaaa21cfe9c"/>
+		<rom name="Image.sub" size="23084640" crc="400992c2" sha1="36572b953f879ff713c058ea8d13734150795c29"/>
+		-->
+		<description>Oshare Club</description>
+		<year>1991</year>
+		<publisher>ミサワホーム総合研究所 (Misawa Home Sougou Kenkyuusho)</publisher>
+		<info name="alt_title" value="おしゃれ倶楽部" />
+		<info name="release" value="199103xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="oshaclub" sha1="16bff0197bb8fbb97667004205bb02b093376cb2" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="oshacook">
 		<!--
 		Origin: Neo Kobe Collection
@@ -6219,7 +7108,7 @@ User/save disks that can be created from the game itself are not included.
 		-->
 		<description>Oshare Cooking</description>
 		<year>1989</year>
-		<publisher>Misawa Home</publisher>
+		<publisher>ミサワホーム総合研究所 (Misawa Home Sougou Kenkyuusho)</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="oshare cooking" sha1="d6175d9a81760fbd9e497e6a396dbaf2aad6d57c" />
@@ -6227,6 +7116,24 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="oshacoo2">
+		<!--
+		Origin: P2P
+		<rom name="Image.cue" size="1160" crc="885a0d6d" sha1="77a34d0a15c9361a934ace3dec67f651777d6a2c"/>
+		<rom name="Image.img" size="361137840" crc="1bef4781" sha1="3de4e86c6f63e3c7c2bacda7982277059def3536"/>
+		-->
+		<description>Oshare Cooking II</description>
+		<year>1990</year>
+		<publisher>ミサワホーム総合研究所 (Misawa Home Sougou Kenkyuusho)</publisher>
+		<info name="release" value="199011xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="oshacoo2" sha1="dfcd058c69ec2a8cd1a29978b0f1cc772a1fe51c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Requires mouse on port 1 -->
 	<software name="ougonras">
 		<!--
 		Origin: Neo Kobe Collection
@@ -6244,7 +7151,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="kikoshid">
+	<!-- It doesn't seem to be possible to get past the intro -->
+	<software name="kikoshid" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Panzer Division [Kikou Shidan].ccd" size="9806" crc="44bd3c10" sha1="59f646b254cbddb62ca62f5da94486c5b3c7a6d7"/>
@@ -6534,7 +7442,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="provvdnz">
+	<!-- Runs too fast -->
+	<software name="provvdnz" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Provvidenza.ccd" size="1179" crc="f0a1a16b" sha1="a7ef5529bf6c6532223ed683d41c4207833d8d56"/>
@@ -6782,6 +7691,23 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="puplove2">
+		<!--
+		Origin: P2P
+		<rom name="image.cue" size="1611" crc="e66faddb"/>
+		<rom name="image.img" size="513676800" crc="ba0073f5"/>
+		-->
+		<description>Tom Snyder's Puppy Love 2</description>
+		<year>1993</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="release" value="199303xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="puplove2" sha1="35c86cc71dfbdc0d4351892f1270b6b8772e1b67" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="puyopuyo">
 		<!--
 		Origin: Neo Kobe Collection
@@ -6903,7 +7829,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- Missing a floppy disk -->
-	<software name="railtycn">
+	<software name="railtycn" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Railroad Tycoon.ccd" size="2223" crc="0d66b2f2" sha1="07a4e276d83d808f21f86b32a5b0dfafa26efdb9"/>
@@ -7045,8 +7971,8 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!--
-	This image is missing the IPL data in sector 0. It's possible to run AUTOEXEC.BAT
-	manually from TownsOS, but it should be considered a bad dump.
+	The orginal img file is missing the IPL data in sector 0. This one has it injected
+	from a working image.  To recreate the img, fill the first two sectors with 'U'.
 	-->
 	<software name="rbisland">
 		<!--
@@ -7062,7 +7988,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199204xx" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="rainbow islands extra" sha1="2c480a769d0f0340ab2c26988b5d37404606dc7e" status="baddump" />
+				<disk name="rainbow islands extra" sha1="5dc2afbffca0ccdeba87d036ddcf5e53ad9df8f2" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -7148,6 +8074,26 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="rinkan">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="2046" crc="54f0ec1f" sha1="686a7ecc6a53e9b2ede8ff3396ad0c6e38b87e3c"/>
+		<rom name="Image.cue" size="340" crc="c0ad3f7d" sha1="6d39c08ccbd98363f1cc7bbc79038baacae268f4"/>
+		<rom name="Image.img" size="379859760" crc="fef77566" sha1="fd7569f8c41405fd2898577ffc1806d57e47bd7d"/>
+		<rom name="Image.sub" size="15504480" crc="1d0cc31c" sha1="8f56ddae02360a9f22821ba35ae1c7def1462c13"/>
+		-->
+		<description>Rinkan Gakkou</description>
+		<year>1996</year>
+		<publisher>フォスター (Foster)</publisher>
+		<info name="alt_title" value="林間学校" />
+		<info name="release" value="199602xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rinkan" sha1="2574f07d8495ea197b5a04136f860b5466fa1ad5" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="rockrang">
 		<!--
 		Origin: Neo Kobe Collection
@@ -7183,7 +8129,52 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="sangoku3">
+	<software name="sakumori">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="868" crc="8bab4d7b" sha1="dec4dc62f9c5446d07c280c5563bedff37e9f4f4"/>
+		<rom name="Image.cue" size="71" crc="b496048a" sha1="8590392ca153b7559d50bef2f83defc45e315624"/>
+		<rom name="Image.img" size="23317728" crc="ec413202" sha1="1f368669d90cca79982c174970ca2ca942fcb291"/>
+		<rom name="Image.sub" size="951744" crc="955d3498" sha1="e8acdd0fb86ee2217fdeed8cd13e1ac96422afc0"/>
+		-->
+		<description>Sakura no Mori</description>
+		<year>1995</year>
+		<publisher>アクティブ (Active)</publisher>
+		<info name="alt_title" value="櫻の杜" />
+		<info name="release" value="19951027" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sakumori" sha1="36bfe8686bb2eadb962852e5e1e44de94e654c23" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sangoku2">
+		<!--
+		Origin: Private dump (Reuental)
+		<rom name="SANGOKUSHI_2.ccd" size="3832" crc="6bbbdec6" sha1="1ad024f2e10d5ba0d5eb95281e1e94879a741a25"/>
+		<rom name="SANGOKUSHI_2.cue" size="920" crc="8dd872dc" sha1="540efad426d2a82dfe547f8424115db6465cf093"/>
+		<rom name="SANGOKUSHI_2.img" size="445635792" crc="a82468d9" sha1="68064b8a3cfbfe1e5c7e0c38d7e9c3b24e51fa45"/>
+		<rom name="SANGOKUSHI_2.sub" size="18189216" crc="4042bd7b" sha1="9df79c40b18cbaf2c8e3ab89e444a2f0e6b8932f"/>
+		-->
+		<description>Sangokushi II</description>
+		<year>1990</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="三国志II" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1281968">
+				<rom name="sango2.d88" size="1281968" crc="40a7015d" sha1="79ae6709d7ee2c7f35c07f967e032f790565278b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sangokushi_2" sha1="f4ecb67518eb27c0ba5d6d01b945f89aa056535d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Hangs after the intro -->
+	<software name="sangoku3" supported="no">
 		<!--
 		Origin: P2P
 		<rom name="三国志III.cue" size="1286" crc="9f5389d1" sha1="61f888904698ec3a83f66b109c91420d0d1f1e93"/>
@@ -7238,7 +8229,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="scav4d" cloneof="scav4">
+	<!-- Hangs while playing FMV -->
+	<software name="scav4d" cloneof="scav4" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Scavenger 4 (Demo Disc).bin" size="57859200" crc="aad41023" sha1="f716dea73a68170b495cdae4d82a4690bbf3d7ba"/>
@@ -7254,7 +8246,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="scav4">
+	<!-- Hangs while playing FMV -->
+	<software name="scav4" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Scavenger 4.ccd" size="752" crc="c591ef5f" sha1="2a1ad6e3dc43411c861457e88302642dd23fbb90"/>
@@ -7670,7 +8663,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="beast">
+	<!-- Some graphics issues -->
+	<software name="beast" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Shadow of the Beast.bin" size="496152048" crc="c641b3e1" sha1="2d89c60f9890bad31de4fa7b99a9717ef50700d9"/>
@@ -7687,7 +8681,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="beast2">
+	<!-- Some graphics issues -->
+	<software name="beast2" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="shadow of the beast ii - juushin no jubaku (japan) (track 01).bin" size="73735200" crc="153631da" sha1="f3f3109f0c5e95d549de3c63efe9e21baff638cb"/>
@@ -7849,7 +8844,6 @@ User/save disks that can be created from the game itself are not included.
 
 	<!--
 	Originally labeled as "mp3 source". It probably needs a redump.
-	Also, the floppy disk seems to be an overdump.
 	-->
 	<software name="sspirits">
 		<!--
@@ -7863,8 +8857,8 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199509xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
-			<dataarea name="flop" size="1281280">
-				<rom name="samurai spirits (boot disk).bin" size="1281280" crc="2f1793ac" sha1="bd0f7f5f3fc4b0bd58d04812449cae853b58b5a8" offset="000000" />
+			<dataarea name="flop" size="1261568">
+				<rom name="samurai spirits (boot disk).bin" size="1261568" crc="7d10e903" sha1="5893035421003ce336e7516863c3c17a3ed86c0b" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -7971,6 +8965,24 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="stronghold" sha1="dfebcbaaa112dfd262945e20bb881fc6f54e7f07" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Missing a floppy disk, the game doesn't work without it -->
+	<software name="suikoden" supported="no">
+		<!--
+		Origin: P2P
+		<rom name="SUIKODEN.BIN" size="451226496" crc="ea330a93" sha1="8c56e2b77b58ac136f80cb19e6dffdef4adb0d2c"/>
+		<rom name="SUIKODEN.CUE" size="584" crc="46e415ae" sha1="e1169e4b277d495c1b90cf20b97ba6071186e1d3"/>
+		-->
+		<description>Suikoden - Tenmei no Chikai</description>
+		<year>1990</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="release" value="199002xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="suikoden" sha1="e0276dafedb588a7d2b455f72d94a0c9039fe990" />
 			</diskarea>
 		</part>
 	</software>
@@ -8158,7 +9170,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="horde">
+	<!-- Sound issues with FMV playback -->
+	<software name="horde" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="The Horde.ccd" size="3063" crc="72d2dad6" sha1="4cce603c4e734e24bdf1c92c69e77e4d9e67f869"/>
@@ -8178,7 +9191,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="titan">
+	<!-- Hangs after the title screen -->
+	<software name="titan" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Titan.mdf" size="219824976" crc="2ade491f" sha1="cd0bf80ccaa1ba8956b4da84266c6769a2abeeb7"/>
@@ -8225,7 +9239,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="tokio">
+	<!-- Mouse doesn't work, but can be played with a controller -->
+	<software name="tokio" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Tokio.ccd" size="3068" crc="ee1b902c" sha1="49352ac299c92a2011884b5cc2978b414c0da49d"/>
@@ -8250,7 +9265,28 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="toshint2">
+	<!-- Black screen on boot -->
+	<software name="toshin2">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="7055" crc="878fdc3f" sha1="d0a1af456f758de8a3aae8ca5aae4407a29a21ee"/>
+		<rom name="Image.cue" size="1406" crc="ab5112e6" sha1="caddbfdaa9002bd2cbd9d44a0320de0ba83188e4"/>
+		<rom name="Image.img" size="604240560" crc="3a4479b0" sha1="59fa6c2e95b8e2a79d25ec3b70b9c7902642faf5"/>
+		<rom name="Image.sub" size="24662880" crc="20f890dc" sha1="4fe043a928835600b7cdddc517aac410323384bd"/>
+		-->
+		<description>Toushin Toshi II</description>
+		<year>1995</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="release" value="199504xx" />
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="toshin2" sha1="4316f227a3809c089f086cf216d76d7c09466407" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="toshin2s">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Toushin Toshi II - Soshite Sorekara....ccd" size="3809" crc="9c8e2336" sha1="02d5cc4f6c53bf8119209973cc8997e0419baa2c"/>
@@ -8270,7 +9306,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="tqod">
+	<!-- Graphics/sound issues; hangs when starting a fight -->
+	<software name="tqod" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="The Queen Of Duellist.cue" size="479" crc="d249b1cd" sha1="56ff832f3bcdf066f3022fae3b40a7d66deddd72"/>
@@ -8411,6 +9448,22 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom2" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="towns magazine vol. 2 (disc 2)" sha1="241a9f4717ed95fa5c6689665c3330f796a28561" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="townspnt">
+		<!--
+		Origin: Private dump (r09)
+		<rom name="townspaint.bin" size="39337200" crc="a384a685" sha1="d1ba91cffb50916c04d2cce54b5622a0181df451"/>
+		<rom name="townspaint.cue" size="99" crc="1805e758" sha1="542e6bc81f6321e8981eff94f55c3dc644ef769f"/>
+		-->
+		<description>TownsPAINT V1.1 L20</description>
+		<year>1990</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="townspaint" sha1="ac943aca97da28d24c07ed0c7118b15bc237befb" />
 			</diskarea>
 		</part>
 	</software>
@@ -8606,7 +9659,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="vaindrem">
+	<!-- Screen shaking, CDDA desync -->
+	<software name="vaindrem" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Vain Dream.ccd" size="5336" crc="6ca23780" sha1="efd21c5faccd975ccb17de97704a062caab45dc6"/>
@@ -8631,7 +9685,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="vaindrm2">
+	<!-- Screen shaking, CDDA desync -->
+	<software name="vaindrm2" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Vain Dream II.ccd" size="3637" crc="faca527c" sha1="f4823c89008482c16534f18fb7de43b84e0200bd"/>
@@ -8656,7 +9711,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="vastness">
+	<!-- CDDA desync -->
+	<software name="vastness" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Vastness.ccd" size="1525" crc="41bb06da" sha1="764c09836fc45e09f6efe47ed2b9da4c49a97e7f"/>
@@ -8692,6 +9748,36 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="veil of darkness" sha1="bf61510fbd3893f086297ad0c3e27655a08bde1c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="vkoubou" supported="partial">
+		<!--
+		Origin: Private dump (r09)
+		<rom name="video koubou v1.3l10 (japan).bin" size="53272800" crc="e8aceb55" sha1="36c76b398063e20985ae317e913332cdc2228e58"/>
+		<rom name="video koubou v1.3l10 (japan).cue" size="94" crc="2a5f7fb5" sha1="471da389ee189ef880a365c9bfa84d557c301b36"/>
+		-->
+		<description>Video Koubou V1.3 L10</description>
+		<year>1993</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+		<!--
+		Note from the dumper:
+
+		The floppy disk was extremely damaged and I only managed to salvage the bare minimum of data to
+		let the software install and run (the installer needs the floppy disk, it won't run without it).
+		I'm not sure but think the floppy contains drivers for some kind of video capture device, so if that's correct
+		any functionality that interacts with it is probably broken. A redump from a better source is definitely needed.
+		-->
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="videokoubou_systemdisk.hdm" size="1261568" crc="19b8d70a" sha1="a025b5f0ac23fda0509605efc81294855f7cb158" offset="000000" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="video koubou v1.3l10 (japan)" sha1="2a4da5f58bd6c661eb64b9886a30bfaa3acc3961" />
 			</diskarea>
 		</part>
 	</software>
@@ -8848,7 +9934,7 @@ User/save disks that can be created from the game itself are not included.
 		<year>1995</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
 		<info name="release" value="199507xx" />
-		<info name="usage" value="Requires HDD installation"/>
+		<info name="usage" value="Requires HDD installation and 8 MB of RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="wing commander armada" sha1="fa9ff6997c774c59bf3a97b710049a22b3348e32" />
@@ -8856,7 +9942,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="wingcomm">
+	<!-- No CDDA sound -->
+	<software name="wingcomm" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Wing Commander.ccd" size="8792" crc="7d3209e5" sha1="23441501ac6bcd70520b904987c05dc72dd0d2e2"/>
@@ -8875,7 +9962,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="wingscrt">
+	<!-- Requires the original Wing Commander CD to install, but doesn't recognize it -->
+	<software name="wingscrt" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Wing Commander - Secret Missions.mdf" size="10231200" crc="f75ba7a5" sha1="63b8d24b3f376edef3ca0363aa9cfec0d0908d6a"/>
@@ -8893,7 +9981,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="wingcom2">
+	<!-- Restarts TownsOS; apparently it's complaining about not having enough memory, but according to the back cover it should only require 4 MB -->
+	<software name="wingcom2" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Wing Commander II and Special Operations.mdf" size="549478944" crc="34dc8d03" sha1="d2b2df03e86db28bd0e9c3be20824a4d97a9a5f4"/>
@@ -8958,7 +10047,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="wizardr7">
+	<!-- CD not recognized after install -->
+	<software name="wizardr7" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Wizardry VII - Crusaders of the Dark Savant.mdf" size="45689952" crc="5146397e" sha1="cf1d06bbdf340de84ae3dd41af7f6ebf0919e4f4"/>
@@ -9298,6 +10388,33 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="zan 2 towns special" sha1="e1a85e9691abb531bdef1cdf9373630ffa2338d7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="zan3">
+		<!--
+		Origin: Private dump (Reuental)
+		<rom name="ZAN3.mdf" size="8908800" crc="df3ca4de" sha1="21479d715e7a32ed3f93a6eb1d3d3690fd2ee0ec"/>
+		<rom name="ZAN3.mds" size="688" crc="beb71eb0" sha1="a82d8b7783e9087b0b32241208ceed2db2d1e9d8"/>
+
+		The MDF file is a single track, so a CUE file was created for conversion:
+		<rom name="zan3.cue" size="65" crc="09d4a494" sha1="65cb0a7c4333779fb2f13c60ad2cb69749e1ea0c"/>
+		-->
+		<description>Zan III - Ten'un Ware ni Ari</description>
+		<year>1994</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="alt_title" value="斬III　～天運我にあり～" />
+		<info name="release" value="199404xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1281968">
+				<rom name="zan3 system disk.d88" size="1281968" crc="cbe7152b" sha1="eed29400e2d84788871027d3fc88c2297aa6a8b7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="zan3" sha1="375d3a88e0c6990137cb7b054ffc4785e6475584" />
 			</diskarea>
 		</part>
 	</software>

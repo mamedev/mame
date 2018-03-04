@@ -30,14 +30,14 @@
 address_space_config::address_space_config()
 	: m_name("unknown"),
 		m_endianness(ENDIANNESS_NATIVE),
-		m_databus_width(0),
-		m_addrbus_width(0),
-		m_addrbus_shift(0),
+		m_data_width(0),
+		m_addr_width(0),
+		m_addr_shift(0),
 		m_logaddr_width(0),
 		m_page_shift(0),
 		m_is_octal(false),
-		m_internal_map(nullptr),
-		m_default_map(nullptr)
+		m_internal_map(address_map_constructor()),
+		m_default_map(address_map_constructor())
 {
 }
 
@@ -53,9 +53,9 @@ address_space_config::address_space_config()
 address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_constructor internal, address_map_constructor defmap)
 	: m_name(name),
 		m_endianness(endian),
-		m_databus_width(datawidth),
-		m_addrbus_width(addrwidth),
-		m_addrbus_shift(addrshift),
+		m_data_width(datawidth),
+		m_addr_width(addrwidth),
+		m_addr_shift(addrshift),
 		m_logaddr_width(addrwidth),
 		m_page_shift(0),
 		m_is_octal(false),
@@ -67,46 +67,14 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal, address_map_constructor defmap)
 	: m_name(name),
 		m_endianness(endian),
-		m_databus_width(datawidth),
-		m_addrbus_width(addrwidth),
-		m_addrbus_shift(addrshift),
+		m_data_width(datawidth),
+		m_addr_width(addrwidth),
+		m_addr_shift(addrshift),
 		m_logaddr_width(logwidth),
 		m_page_shift(pageshift),
 		m_is_octal(false),
 		m_internal_map(internal),
 		m_default_map(defmap)
-{
-}
-
-address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_delegate internal, address_map_delegate defmap)
-	: m_name(name),
-		m_endianness(endian),
-		m_databus_width(datawidth),
-		m_addrbus_width(addrwidth),
-		m_addrbus_shift(addrshift),
-		m_logaddr_width(addrwidth),
-		m_page_shift(0),
-		m_is_octal(false),
-		m_internal_map(nullptr),
-		m_default_map(nullptr),
-		m_internal_map_delegate(std::move(internal)),
-		m_default_map_delegate(std::move(defmap))
-{
-}
-
-address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_delegate internal, address_map_delegate defmap)
-	: m_name(name),
-		m_endianness(endian),
-		m_databus_width(datawidth),
-		m_addrbus_width(addrwidth),
-		m_addrbus_shift(addrshift),
-		m_logaddr_width(logwidth),
-		m_page_shift(pageshift),
-		m_is_octal(false),
-		m_internal_map(nullptr),
-		m_default_map(nullptr),
-		m_internal_map_delegate(std::move(internal)),
-		m_default_map_delegate(std::move(defmap))
 {
 }
 
@@ -137,27 +105,13 @@ device_memory_interface::~device_memory_interface()
 
 
 //-------------------------------------------------
-//  static_set_addrmap - configuration helper
-//  to connect an address map to a device
-//-------------------------------------------------
-
-void device_memory_interface::static_set_addrmap(device_t &device, int spacenum, address_map_constructor map)
-{
-	device_memory_interface *memory;
-	if (!device.interface(memory))
-		throw emu_fatalerror("MCFG_DEVICE_ADDRESS_MAP called on device '%s' with no memory interface", device.tag());
-	memory->set_addrmap(spacenum, map);
-}
-
-
-//-------------------------------------------------
 //  set_addrmap - connect an address map to a device
 //-------------------------------------------------
 
 void device_memory_interface::set_addrmap(int spacenum, address_map_constructor map)
 {
 	if (spacenum >= int(m_address_map.size()))
-		m_address_map.resize(spacenum+1, nullptr);
+		m_address_map.resize(spacenum+1);
 	m_address_map[spacenum] = map;
 }
 

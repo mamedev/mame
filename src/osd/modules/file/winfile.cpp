@@ -185,6 +185,7 @@ osd_file::error osd_file::open(std::string const &orig_path, uint32_t openflags,
 	{
 		disposition = (!is_path_to_physical_drive(path.c_str()) && (openflags & OPEN_FLAG_CREATE)) ? CREATE_ALWAYS : OPEN_EXISTING;
 		access = (openflags & OPEN_FLAG_READ) ? (GENERIC_READ | GENERIC_WRITE) : GENERIC_WRITE;
+		if (is_path_to_physical_drive(path.c_str())) access |= GENERIC_READ;
 		sharemode = FILE_SHARE_READ;
 	}
 	else if (openflags & OPEN_FLAG_READ)
@@ -230,7 +231,25 @@ osd_file::error osd_file::open(std::string const &orig_path, uint32_t openflags,
 
 	// get the file size
 	DWORD upper, lower;
-	lower = GetFileSize(h, &upper);
+	if (is_path_to_physical_drive(path.c_str()))
+	{
+		GET_LENGTH_INFORMATION gli;
+		DWORD ret;
+		if (!DeviceIoControl(h, IOCTL_DISK_GET_LENGTH_INFO, nullptr, 0, &gli, sizeof(gli), &ret, nullptr))
+		{
+			upper = 0;
+			lower = INVALID_FILE_SIZE;
+		}
+		else
+		{
+			lower = gli.Length.LowPart;
+			upper = gli.Length.HighPart;
+		}
+	}
+	else
+	{
+		lower = GetFileSize(h, &upper);
+	}
 	if (INVALID_FILE_SIZE == lower)
 	{
 		DWORD const err = GetLastError();

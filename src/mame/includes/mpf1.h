@@ -11,6 +11,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "sound/spkrdev.h"
@@ -74,6 +75,16 @@ public:
 	DECLARE_DRIVER_INIT(mpf1);
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	TIMER_DEVICE_CALLBACK_MEMBER(check_halt_callback);
+	void mpf1p(machine_config &config);
+	void mpf1b(machine_config &config);
+	void mpf1(machine_config &config);
+	void mpf1_io_map(address_map &map);
+	void mpf1_map(address_map &map);
+	void mpf1_step(address_map &map);
+	void mpf1b_io_map(address_map &map);
+	void mpf1b_map(address_map &map);
+	void mpf1p_io_map(address_map &map);
+	void mpf1p_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_MPF1_H

@@ -13,6 +13,7 @@
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/upd7759.h"
+#include "machine/mc2661.h"
 #include "machine/mc68681.h"
 
 
@@ -43,8 +44,7 @@ class micro3d_state : public driver_device
 public:
 	enum
 	{
-		TIMER_MAC_DONE,
-		TIMER_ADC_DONE
+		TIMER_MAC_DONE
 	};
 
 	micro3d_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -55,7 +55,7 @@ public:
 		m_drmath(*this, "drmath"),
 		m_vgb(*this, "vgb"),
 		m_palette(*this, "palette"),
-		m_duart68681(*this, "duart68681"),
+		m_duart(*this, "duart"),
 		m_noise_1(*this, "noise_1"),
 		m_noise_2(*this, "noise_2"),
 		m_vertex(*this, "vertex"),
@@ -63,10 +63,11 @@ public:
 		m_volume(*this, "VOLUME"),
 		m_joystick_x(*this, "JOYSTICK_X"),
 		m_joystick_y(*this, "JOYSTICK_Y"),
-		m_throttle(*this, "THROTTLE"),
 		m_shared_ram(*this, "shared_ram"),
 		m_mac_sram(*this, "mac_sram"),
-		m_sprite_vram(*this, "sprite_vram") { }
+		m_sprite_vram(*this, "sprite_vram"),
+		m_vgb_uart(*this, "uart")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8051_device> m_audiocpu;
@@ -74,7 +75,7 @@ public:
 	required_device<cpu_device> m_drmath;
 	required_device<tms34010_device> m_vgb;
 	required_device<palette_device> m_palette;
-	required_device<mc68681_device> m_duart68681;
+	required_device<mc68681_device> m_duart;
 	required_device<micro3d_sound_device> m_noise_1;
 	required_device<micro3d_sound_device> m_noise_2;
 	required_memory_region m_vertex;
@@ -83,21 +84,12 @@ public:
 	required_ioport m_volume;
 	optional_ioport m_joystick_x;
 	optional_ioport m_joystick_y;
-	optional_ioport m_throttle;
 
 	required_shared_ptr<uint16_t> m_shared_ram;
 	uint8_t               m_m68681_tx0;
 
 	/* Sound */
 	uint8_t               m_sound_port_latch[4];
-
-	/* TI UART */
-	uint8_t               m_ti_uart[9];
-	int                 m_ti_uart_mode_cycle;
-	int                 m_ti_uart_sync_cycle;
-
-	/* ADC */
-	uint8_t               m_adc_val;
 
 	/* Hardware version-check latch for BOTSS 1.1a */
 	uint8_t               m_botss_latch;
@@ -138,17 +130,14 @@ public:
 	int                 m_drawing_buffer;
 	int                 m_display_buffer;
 
-	DECLARE_WRITE16_MEMBER(micro3d_ti_uart_w);
-	DECLARE_READ16_MEMBER(micro3d_ti_uart_r);
-	DECLARE_WRITE32_MEMBER(micro3d_scc_w);
-	DECLARE_READ32_MEMBER(micro3d_scc_r);
+	DECLARE_WRITE8_MEMBER(vgb_uart_w);
+	DECLARE_READ8_MEMBER(vgb_uart_r);
 	DECLARE_WRITE32_MEMBER(micro3d_mac1_w);
 	DECLARE_READ32_MEMBER(micro3d_mac2_r);
 	DECLARE_WRITE32_MEMBER(micro3d_mac2_w);
 	DECLARE_READ16_MEMBER(micro3d_encoder_h_r);
 	DECLARE_READ16_MEMBER(micro3d_encoder_l_r);
-	DECLARE_READ16_MEMBER(micro3d_adc_r);
-	DECLARE_WRITE16_MEMBER(micro3d_adc_w);
+	DECLARE_READ8_MEMBER(adc_volume_r);
 	DECLARE_READ16_MEMBER(botss_140000_r);
 	DECLARE_READ16_MEMBER(botss_180000_r);
 	DECLARE_WRITE16_MEMBER(micro3d_reset_w);
@@ -165,8 +154,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(botss_hwchk_r);
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_a);
 	DECLARE_WRITE8_MEMBER(micro3d_snd_dac_b);
-	DECLARE_WRITE8_MEMBER(micro3d_sound_io_w);
-	DECLARE_READ8_MEMBER(micro3d_sound_io_r);
+	DECLARE_WRITE8_MEMBER(micro3d_sound_p1_w);
+	DECLARE_WRITE8_MEMBER(micro3d_sound_p3_w);
+	DECLARE_READ8_MEMBER(micro3d_sound_p1_r);
+	DECLARE_READ8_MEMBER(micro3d_sound_p3_r);
 	DECLARE_DRIVER_INIT(micro3d);
 	DECLARE_DRIVER_INIT(botss);
 	virtual void machine_reset() override;
@@ -174,7 +165,6 @@ public:
 	virtual void video_reset() override;
 	INTERRUPT_GEN_MEMBER(micro3d_vblank);
 	TIMER_CALLBACK_MEMBER(mac_done_callback);
-	TIMER_CALLBACK_MEMBER(adc_done_callback);
 	DECLARE_WRITE8_MEMBER(micro3d_upd7759_w);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
 	DECLARE_READ8_MEMBER(data_to_i8031);
@@ -195,8 +185,19 @@ public:
 	void draw_triangles(uint32_t attr);
 
 
+	void micro3d(machine_config &config);
+	void botss11(machine_config &config);
+	void drmath_data(address_map &map);
+	void drmath_prg(address_map &map);
+	void hostmem(address_map &map);
+	void soundmem_io(address_map &map);
+	void soundmem_prg(address_map &map);
+	void vgbmem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	required_device<mc2661_device> m_vgb_uart;
 };
 
 #endif // MAME_INCLUDES_MICRO3D_H

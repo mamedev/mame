@@ -654,7 +654,7 @@ void amstrad_state::amstrad_update_video()
 
 	if ( m_gate_array.draw_p )
 	{
-		uint32_t cycles_passed = (now - m_gate_array.last_draw_time ).as_ticks(XTAL_16MHz);
+		uint32_t cycles_passed = (now - m_gate_array.last_draw_time ).as_ticks(XTAL(16'000'000));
 
 		while( cycles_passed )
 		{
@@ -729,7 +729,7 @@ void amstrad_state::amstrad_plus_update_video()
 
 	if ( m_gate_array.draw_p )
 	{
-		uint32_t cycles_passed = (now - m_gate_array.last_draw_time ).as_ticks(XTAL_16MHz);
+		uint32_t cycles_passed = (now - m_gate_array.last_draw_time ).as_ticks(XTAL(16'000'000));
 
 		while( cycles_passed )
 		{
@@ -2208,7 +2208,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 	{
 		m_aleste_mode = data;
 		logerror("EXTEND: Port &FABF write 0x%02x\n",data);
-		m_crtc->set_clock( ( m_aleste_mode & 0x02 ) ? ( XTAL_16MHz / 8 ) : ( XTAL_16MHz / 16 ) );
+		m_crtc->set_clock( ( m_aleste_mode & 0x02 ) ? ( XTAL(16'000'000) / 8 ) : ( XTAL(16'000'000) / 16 ) );
 	}
 
 	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine(),"multiface2"));
@@ -2550,8 +2550,12 @@ void amstrad_state::update_psg()
 		break;
 	case 3:
 		{/* b6 and b7 = 1 ? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
-			m_ay->address_w(space, 0, m_ppi_port_outputs[amstrad_ppi_PortA]);
-			m_prev_reg = m_ppi_port_outputs[amstrad_ppi_PortA];
+			/* ignore if an invalid PSG register is selected, usually when the PPI port directions are changed after selecting the PSG register */
+			if(m_ppi_port_outputs[amstrad_ppi_PortA] <= 15)
+			{
+				m_ay->address_w(space, 0, m_ppi_port_outputs[amstrad_ppi_PortA]);
+				m_prev_reg = m_ppi_port_outputs[amstrad_ppi_PortA];
+			}
 		}
 		break;
 	default:
@@ -3100,7 +3104,7 @@ TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)
 		visarea.set(0, 64 + 640 + 64 - 1, 16, 16 + 15 + 200 + 15 - 1);
 		height = 262;
 	}
-	refresh = HZ_TO_ATTOSECONDS( XTAL_16MHz ) * 1024 * height;
+	refresh = HZ_TO_ATTOSECONDS( XTAL(16'000'000) ) * 1024 * height;
 	m_screen->configure( 1024, height, visarea, refresh );
 }
 

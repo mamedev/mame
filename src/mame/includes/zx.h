@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller, Krzysztof Strzecha, Robbbert
 /*****************************************************************************
  *
- * includes/zx.h
+ * ZX-80/ZX-81 and derivatives
  *
  ****************************************************************************/
 
@@ -43,13 +43,14 @@ public:
 		m_io_row6(*this, "ROW6"),
 		m_io_row7(*this, "ROW7"),
 		m_io_config(*this, "CONFIG"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen")
+	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ula_high_r);
 	DECLARE_READ8_MEMBER(ula_low_r);
-	DECLARE_WRITE16_MEMBER(refresh_w);
+	DECLARE_WRITE8_MEMBER(refresh_w);
 	DECLARE_READ8_MEMBER(zx80_io_r);
 	DECLARE_READ8_MEMBER(zx81_io_r);
 	DECLARE_READ8_MEMBER(pc8300_io_r);
@@ -60,10 +61,23 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(zx);
-	DECLARE_PALETTE_INIT(ts1000);
 	void zx_tape_input();
 	void zx_ula_hsync();
 
+	void zx81(machine_config &config);
+	void zx81_spk(machine_config &config);
+	void ts1000(machine_config &config);
+	void pc8300(machine_config &config);
+	void pow3000(machine_config &config);
+	void ts1500(machine_config &config);
+	void zx80(machine_config &config);
+	void pc8300_io_map(address_map &map);
+	void pow3000_io_map(address_map &map);
+	void ula_map(address_map &map);
+	void zx80_io_map(address_map &map);
+	void zx80_map(address_map &map);
+	void zx81_io_map(address_map &map);
+	void zx81_map(address_map &map);
 protected:
 	enum
 	{

@@ -8,6 +8,7 @@
 **************************************************************************/
 
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "video/tlc34076.h"
 #include "video/tms34061.h"
 #include "screen.h"
@@ -107,9 +108,6 @@ public:
 	DECLARE_WRITE8_MEMBER(gtg2_sound_data_w);
 	DECLARE_READ8_MEMBER(sound_data_r);
 	DECLARE_WRITE8_MEMBER(grom_bank_w);
-	DECLARE_WRITE16_MEMBER(grom_bank16_w);
-	DECLARE_WRITE16_MEMBER(display_page16_w);
-	DECLARE_WRITE16_MEMBER(palette16_w);
 	DECLARE_WRITE8_MEMBER(palette_w);
 	DECLARE_WRITE8_MEMBER(page_w);
 	DECLARE_READ8_MEMBER(blitter_r);
@@ -179,6 +177,42 @@ public:
 	void compute_sensors();
 	TIMER_CALLBACK_MEMBER( delayed_z80_control_w );
 
+	// ninja clowns
+	DECLARE_READ16_MEMBER(rom_constant_r);
+	DECLARE_READ8_MEMBER(ninclown_palette_r);
+	DECLARE_WRITE8_MEMBER(ninclown_palette_w);
+	DECLARE_WRITE16_MEMBER(grom_bank16_w);
+	DECLARE_WRITE16_MEMBER(display_page16_w);
+
+	void itech8_sound_ym2203(machine_config &config);
+	void itech8_sound_ym2608b(machine_config &config);
+	void itech8_sound_ym3812(machine_config &config);
+	void itech8_sound_ym3812_external(machine_config &config);
+	void itech8_core_lo(machine_config &config);
+	void itech8_core_hi(machine_config &config);
+	void grmatch(machine_config &config);
+	void rimrockn(machine_config &config);
+	void gtg2(machine_config &config);
+	void slikshot_lo(machine_config &config);
+	void slikshot_lo_noz80(machine_config &config);
+	void ninclown(machine_config &config);
+	void sstrike(machine_config &config);
+	void stratab_hi(machine_config &config);
+	void hstennis_lo(machine_config &config);
+	void wfortune(machine_config &config);
+	void stratab_lo(machine_config &config);
+	void slikshot_hi(machine_config &config);
+	void hstennis_hi(machine_config &config);
+	void gtg2_map(address_map &map);
+	void ninclown_map(address_map &map);
+	void slikz80_io_map(address_map &map);
+	void slikz80_mem_map(address_map &map);
+	void sound2203_map(address_map &map);
+	void sound2608b_map(address_map &map);
+	void sound3812_external_map(address_map &map);
+	void sound3812_map(address_map &map);
+	void tmshi_map(address_map &map);
+	void tmslo_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

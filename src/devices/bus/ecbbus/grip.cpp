@@ -124,7 +124,7 @@ const tiny_rom_entry *ecb_grip21_device::device_rom_region() const
 //  ADDRESS_MAP( grip_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( grip_mem, AS_PROGRAM, 8, ecb_grip21_device )
+ADDRESS_MAP_START(ecb_grip21_device::grip_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("videoram")
@@ -135,7 +135,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( grip_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( grip_io, AS_IO, 8, ecb_grip21_device )
+ADDRESS_MAP_START(ecb_grip21_device::grip_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
 //  AM_RANGE(0x10, 0x10) AM_WRITE(ccon_w)
@@ -457,9 +457,9 @@ void ecb_grip21_device::kb_w(uint8_t data)
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_MEMBER( ecb_grip21_device::device_add_mconfig )
+MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
 	MCFG_Z80_DAISY_CHAIN(grip_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(grip_mem)
 	MCFG_CPU_IO_MAP(grip_io)
@@ -481,14 +481,14 @@ MACHINE_CONFIG_MEMBER( ecb_grip21_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/4)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL(16'000'000)/4)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(ecb_grip21_device, crtc_update_row)
 	MCFG_MC6845_OUT_DE_CB(DEVWRITELINE(Z80STI_TAG, z80sti_device, i1_w))
 	MCFG_MC6845_OUT_CUR_CB(DEVWRITELINE(Z80STI_TAG, z80sti_device, i1_w))
 
-//  MCFG_MC6845_ADD(HD6345_TAG, HD6345, SCREEN_TAG, XTAL_16MHz/4)
+//  MCFG_MC6845_ADD(HD6345_TAG, HD6345, SCREEN_TAG, XTAL(16'000'000)/4)
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(ecb_grip21_device, ppi_pa_r))
@@ -496,7 +496,7 @@ MACHINE_CONFIG_MEMBER( ecb_grip21_device::device_add_mconfig )
 	MCFG_I8255_IN_PORTB_CB(READ8(ecb_grip21_device, ppi_pb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecb_grip21_device, ppi_pc_w))
 
-	MCFG_DEVICE_ADD(Z80STI_TAG, Z80STI, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD(Z80STI_TAG, Z80STI, XTAL(16'000'000)/4)
 	MCFG_Z80STI_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80STI_IN_GPIO_CB(READ8(ecb_grip21_device, sti_gpio_r))
 	MCFG_Z80STI_OUT_TBO_CB(WRITELINE(ecb_grip21_device, speaker_w))

@@ -59,6 +59,7 @@
 
 #include "emu.h"
 #include "avr8.h"
+#include "avr8dasm.h"
 #include "debugger.h"
 
 #define VERBOSE_LEVEL   (0)
@@ -572,19 +573,19 @@ DEFINE_DEVICE_TYPE(ATMEGA2560, atmega2560_device, "atmega2560", "ATmega2560")
 //  INTERNAL ADDRESS MAP
 //**************************************************************************
 
-static ADDRESS_MAP_START( atmega88_internal_map, AS_DATA, 8, atmega88_device )
+ADDRESS_MAP_START(atmega88_device::atmega88_internal_map)
 	AM_RANGE(0x0000, 0x00ff) AM_READWRITE( regs_r, regs_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( atmega644_internal_map, AS_DATA, 8, atmega644_device )
+ADDRESS_MAP_START(atmega644_device::atmega644_internal_map)
 	AM_RANGE(0x0000, 0x00ff) AM_READWRITE( regs_r, regs_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( atmega1280_internal_map, AS_DATA, 8, atmega1280_device )
+ADDRESS_MAP_START(atmega1280_device::atmega1280_internal_map)
 	AM_RANGE(0x0000, 0x01ff) AM_READWRITE( regs_r, regs_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( atmega2560_internal_map, AS_DATA, 8, atmega2560_device )
+ADDRESS_MAP_START(atmega2560_device::atmega2560_internal_map)
 	AM_RANGE(0x0000, 0x01ff) AM_READWRITE( regs_r, regs_w )
 ADDRESS_MAP_END
 
@@ -593,7 +594,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, ADDRESS_MAP_NAME(atmega88_internal_map), CPU_TYPE_ATMEGA88)
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, address_map_constructor(FUNC(atmega88_device::atmega88_internal_map), this), CPU_TYPE_ATMEGA88)
 {
 }
 
@@ -602,7 +603,7 @@ atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 atmega644_device::atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, tag, owner, clock, ATMEGA644, 0xffff, ADDRESS_MAP_NAME(atmega644_internal_map), CPU_TYPE_ATMEGA644)
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA644, 0xffff, address_map_constructor(FUNC(atmega644_device::atmega644_internal_map), this), CPU_TYPE_ATMEGA644)
 {
 }
 
@@ -611,7 +612,7 @@ atmega644_device::atmega644_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, tag, owner, clock, ATMEGA1280, 0x1ffff, ADDRESS_MAP_NAME(atmega1280_internal_map), CPU_TYPE_ATMEGA1280)
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA1280, 0x1ffff, address_map_constructor(FUNC(atmega1280_device::atmega1280_internal_map), this), CPU_TYPE_ATMEGA1280)
 {
 }
 
@@ -620,7 +621,7 @@ atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, tag, owner, clock, ATMEGA2560, 0x1ffff, ADDRESS_MAP_NAME(atmega2560_internal_map), CPU_TYPE_ATMEGA2560)
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA2560, 0x1ffff, address_map_constructor(FUNC(atmega2560_device::atmega2560_internal_map), this), CPU_TYPE_ATMEGA2560)
 {
 }
 
@@ -911,36 +912,13 @@ void avr8_device::state_string_export(const device_state_entry &entry, std::stri
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t avr8_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t avr8_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t avr8_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *avr8_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( avr8 );
-	return CPU_DISASSEMBLE_NAME(avr8)(this, stream, pc, oprom, opram, options);
+	return new avr8_disassembler;
 }
 
 

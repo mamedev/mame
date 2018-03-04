@@ -12,6 +12,8 @@
 #include "sound/spkrdev.h"
 #include "video/upd7227.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "bus/epson_sio/epson_sio.h"
 #include "bus/rs232/rs232.h"
 
@@ -49,6 +51,7 @@ public:
 			m_cassette(*this, CASSETTE_TAG),
 			m_rs232(*this, RS232_TAG),
 			m_sio(*this, "sio"),
+			m_optrom(*this, "optrom"),
 			m_ksc0(*this, "KSC0"),
 			m_ksc1(*this, "KSC1"),
 			m_ksc2(*this, "KSC2"),
@@ -78,6 +81,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<rs232_port_device> m_rs232;
 	required_device<epson_sio_device> m_sio;
+	optional_device<generic_slot_device> m_optrom;
 	required_ioport m_ksc0;
 	required_ioport m_ksc1;
 	required_ioport m_ksc2;
@@ -117,6 +121,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( sio_rx_w ) { m_sio_rx = state; }
 	DECLARE_WRITE_LINE_MEMBER( sio_pin_w ) { m_sio_pin = state; }
 
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( optrom_load );
+	DECLARE_READ8_MEMBER( optrom_r );
+
 	void update_interrupt();
 
 	// CPU state
@@ -136,6 +143,13 @@ public:
 	// sio state
 	int m_sio_rx;
 	int m_sio_pin;
+	void cm6000(machine_config &config);
+	void hx20(machine_config &config);
+	void cm6000_mem(address_map &map);
+	void hx20_io(address_map &map);
+	void hx20_mem(address_map &map);
+	void hx20_sub_io(address_map &map);
+	void hx20_sub_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_HX20_H

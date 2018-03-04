@@ -14,7 +14,8 @@
 
 DEFINE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device, "i82371sb_isa", "Intel 82371 southbridge ISA bridge")
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, i82371sb_isa_device)
+ADDRESS_MAP_START(i82371sb_isa_device::config_map)
+	AM_IMPORT_FROM(pci_device::config_map)
 	AM_RANGE(0x4c, 0x4f) AM_READWRITE8 (iort_r,    iort_w,    0x000000ff)
 	AM_RANGE(0x4c, 0x4f) AM_READWRITE16(xbcs_r,    xbcs_w,    0xffff0000)
 	AM_RANGE(0x60, 0x63) AM_READWRITE8 (pirqrc_r,  pirqrc_w,  0xffffffff)
@@ -30,11 +31,9 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i82371sb_isa_device)
 	AM_RANGE(0xa8, 0xab) AM_READWRITE16(smireq_r,  smireq_w,  0xffff0000)
 	AM_RANGE(0xac, 0xaf) AM_READWRITE8 (ctltmr_r,  ctltmr_w,  0x000000ff)
 	AM_RANGE(0xac, 0xaf) AM_READWRITE8 (cthtmr_r,  cthtmr_w,  0x00ff0000)
-
-	AM_INHERIT_FROM(pci_device::config_map)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i82371sb_isa_device)
+ADDRESS_MAP_START(i82371sb_isa_device::internal_io_map)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254",   pit8254_device, read, write, 0xffffffff)
@@ -57,7 +56,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( i82371sb_isa_device::device_add_mconfig )
+MACHINE_CONFIG_START(i82371sb_isa_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(i82371sb_isa_device, at_pit8254_out0_changed))
@@ -66,7 +65,7 @@ MACHINE_CONFIG_MEMBER( i82371sb_isa_device::device_add_mconfig )
 	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(i82371sb_isa_device, at_pit8254_out2_changed))
 
-	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL(14'318'181)/3 )
 	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq0_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(i82371sb_isa_device, at_dma8237_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(i82371sb_isa_device, pc_dma_read_byte))
@@ -84,7 +83,7 @@ MACHINE_CONFIG_MEMBER( i82371sb_isa_device::device_add_mconfig )
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(i82371sb_isa_device, pc_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(i82371sb_isa_device, pc_dack3_w))
 
-	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL(14'318'181)/3 )
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(i82371sb_isa_device, pc_dma_hrq_changed))
 	MCFG_I8237_IN_MEMR_CB(READ8(i82371sb_isa_device, pc_dma_read_word))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(i82371sb_isa_device, pc_dma_write_word))
@@ -108,7 +107,7 @@ MACHINE_CONFIG_MEMBER( i82371sb_isa_device::device_add_mconfig )
 	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir2_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL_12MHz)
+	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
 	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
 	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
 	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir1_w))
@@ -161,7 +160,12 @@ MACHINE_CONFIG_MEMBER( i82371sb_isa_device::device_add_mconfig )
 //  MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa_onboard, "comat", true)
 //  MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa_onboard, "lpt", true)
 	// VGA-HACK
-	MCFG_FRAGMENT_ADD( pcvideo_vga );
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
+
+	MCFG_DEVICE_ADD("vga", VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 	// end-VGA-HACK
 MACHINE_CONFIG_END
 

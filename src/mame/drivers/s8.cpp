@@ -91,6 +91,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s8);
 	DECLARE_DRIVER_INIT(s8);
+	void s8(machine_config &config);
+	void s8_audio_map(address_map &map);
+	void s8_main_map(address_map &map);
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -108,7 +111,7 @@ private:
 	required_device<pia6821_device> m_pia30;
 };
 
-static ADDRESS_MAP_START( s8_main_map, AS_PROGRAM, 8, s8_state )
+ADDRESS_MAP_START(s8_state::s8_main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
@@ -119,7 +122,7 @@ static ADDRESS_MAP_START( s8_main_map, AS_PROGRAM, 8, s8_state )
 	AM_RANGE(0x5000, 0x7fff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s8_audio_map, AS_PROGRAM, 8, s8_state )
+ADDRESS_MAP_START(s8_state::s8_audio_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("pias", pia6821_device, read, write)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("audioroms", 0)
@@ -304,9 +307,9 @@ DRIVER_INIT_MEMBER( s8_state, s8 )
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
 }
 
-static MACHINE_CONFIG_START( s8 )
+MACHINE_CONFIG_START(s8_state::s8)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M6802, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(s8_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s8_state, s8)
 
@@ -314,7 +317,7 @@ static MACHINE_CONFIG_START( s8 )
 	MCFG_DEFAULT_LAYOUT(layout_s8)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)
@@ -351,7 +354,7 @@ static MACHINE_CONFIG_START( s8 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6808, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu", M6808, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(s8_audio_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")

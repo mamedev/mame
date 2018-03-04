@@ -67,4 +67,20 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cabalt(machine_config &config);
+	void cabalbl2(machine_config &config);
+	void cabal(machine_config &config);
+	void cabalbl(machine_config &config);
+	void cabalbl2_predecrypted_opcodes_map(address_map &map);
+	void cabalbl2_sound_map(address_map &map);
+	void cabalbl_main_map(address_map &map);
+	void cabalbl_sound_map(address_map &map);
+	void cabalbl_talk1_map(address_map &map);
+	void cabalbl_talk1_portmap(address_map &map);
+	void cabalbl_talk2_map(address_map &map);
+	void cabalbl_talk2_portmap(address_map &map);
+	void main_map(address_map &map);
+	void sound_decrypted_opcodes_map(address_map &map);
+	void sound_map(address_map &map);
+	void trackball_main_map(address_map &map);
 };

@@ -80,9 +80,13 @@ public:
 	DECLARE_PALETTE_INIT(cb2001);
 	uint32_t screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_READ8_MEMBER(irq_ack_r);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void cb2001(machine_config &config);
+	void cb2001_io(address_map &map);
+	void cb2001_map(address_map &map);
 };
 
 
@@ -565,19 +569,20 @@ WRITE16_MEMBER(cb2001_state::cb2001_bg_w)
 
 }
 
-static ADDRESS_MAP_START( cb2001_map, AS_PROGRAM, 16, cb2001_state )
+ADDRESS_MAP_START(cb2001_state::cb2001_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0x20000, 0x20fff) AM_RAM AM_SHARE("vrafg")
 	AM_RANGE(0x21000, 0x21fff) AM_RAM_WRITE(cb2001_bg_w) AM_SHARE("vrabg")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cb2001_io, AS_IO, 16, cb2001_state )
+ADDRESS_MAP_START(cb2001_state::cb2001_io)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0xffff)   /* Input Ports */
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0xffff)   /* DIP switches */
 	AM_RANGE(0x20, 0x21) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0xff00)
 	AM_RANGE(0x22, 0x23) AM_DEVWRITE8("aysnd", ay8910_device, data_address_w, 0xffff)
 
+	AM_RANGE(0x30, 0x31) AM_READ8(irq_ack_r, 0x00ff)
 	AM_RANGE(0x30, 0x31) AM_WRITE(cb2001_vidctrl_w)
 	AM_RANGE(0x32, 0x33) AM_WRITE(cb2001_vidctrl2_w)
 ADDRESS_MAP_END
@@ -747,7 +752,13 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(cb2001_state::vblank_irq)
 {
-	generic_pulse_irq_line(device.execute(), NEC_INPUT_LINE_INTP0, 1);
+	m_maincpu->set_input_line(NEC_INPUT_LINE_INTP0, ASSERT_LINE);
+}
+
+READ8_MEMBER(cb2001_state::irq_ack_r)
+{
+	m_maincpu->set_input_line(NEC_INPUT_LINE_INTP0, CLEAR_LINE);
+	return 0xff;
 }
 
 static const gfx_layout cb2001_layout =
@@ -807,7 +818,7 @@ PALETTE_INIT_MEMBER(cb2001_state, cb2001)
 	}
 }
 
-static MACHINE_CONFIG_START( cb2001 )
+MACHINE_CONFIG_START(cb2001_state::cb2001)
 	MCFG_CPU_ADD("maincpu", V35, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
 	MCFG_V25_CONFIG(cb2001_decryption_table)
 	MCFG_CPU_PROGRAM_MAP(cb2001_map)

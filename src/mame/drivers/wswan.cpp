@@ -42,20 +42,20 @@
 
 #include "wswan.lh"
 
-static ADDRESS_MAP_START (wswan_mem, AS_PROGRAM, 8, wswan_state)
+ADDRESS_MAP_START(wswan_state::wswan_mem)
 	AM_RANGE(0x00000, 0x03fff) AM_DEVREADWRITE("vdp", wswan_video_device, vram_r, vram_w)       // 16kb RAM / 4 colour tiles
 	AM_RANGE(0x04000, 0x0ffff) AM_NOP       // nothing
 	//AM_RANGE(0x10000, 0xeffff)    // cart range, setup at machine_start
 	AM_RANGE(0xf0000, 0xfffff) AM_READ(bios_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (wscolor_mem, AS_PROGRAM, 8, wswan_state)
+ADDRESS_MAP_START(wscolor_state::wscolor_mem)
 	AM_RANGE(0x00000, 0x0ffff) AM_DEVREADWRITE("vdp", wswan_video_device, vram_r, vram_w)       // 16kb RAM / 4 colour tiles, 16 colour tiles + palettes
 	//AM_RANGE(0x10000, 0xeffff)    // cart range, setup at machine_start
 	AM_RANGE(0xf0000, 0xfffff) AM_READ(bios_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (wswan_io, AS_IO, 8, wswan_state)
+ADDRESS_MAP_START(wswan_state::wswan_io)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(port_r, port_w)   // I/O ports
 ADDRESS_MAP_END
 
@@ -91,7 +91,7 @@ PALETTE_INIT_MEMBER(wswan_state, wswan)
 	}
 }
 
-PALETTE_INIT_MEMBER(wswan_state, wscolor)
+PALETTE_INIT_MEMBER(wscolor_state, wscolor)
 {
 	for (int i = 0; i < 4096; i++)
 	{
@@ -108,9 +108,9 @@ static SLOT_INTERFACE_START(wswan_cart)
 	SLOT_INTERFACE_INTERNAL("ws_eeprom",  WS_ROM_EEPROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( wswan )
+MACHINE_CONFIG_START(wswan_state::wswan)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30MZ, 3072000)
+	MCFG_CPU_ADD("maincpu", V30MZ, XTAL(3'072'000))
 	MCFG_CPU_PROGRAM_MAP(wswan_mem)
 	MCFG_CPU_IO_MAP(wswan_io)
 
@@ -120,11 +120,12 @@ static MACHINE_CONFIG_START( wswan )
 	MCFG_WSWAN_VIDEO_DMASND_CB(wswan_state, dma_sound_cb)
 
 	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(75)
-	MCFG_SCREEN_VBLANK_TIME(0)
+//  MCFG_SCREEN_REFRESH_RATE(75)
+//  MCFG_SCREEN_VBLANK_TIME(0)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", wswan_video_device, screen_update)
-	MCFG_SCREEN_SIZE(WSWAN_X_PIXELS, WSWAN_Y_PIXELS)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, WSWAN_X_PIXELS - 1, 0, WSWAN_Y_PIXELS - 1)
+//  MCFG_SCREEN_SIZE(WSWAN_X_PIXELS, WSWAN_Y_PIXELS)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, WSWAN_X_PIXELS - 1, 0, WSWAN_Y_PIXELS - 1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(3'072'000),256,0,WSWAN_X_PIXELS,159,0,WSWAN_Y_PIXELS)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_wswan)
@@ -151,28 +152,26 @@ static MACHINE_CONFIG_START( wswan )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("wsc_list","wscolor")
 
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc2_list","pockchalv2")
-
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wscolor, wswan )
+MACHINE_CONFIG_START(wscolor_state::wscolor)
+	wswan(config);
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wscolor_mem)
-	MCFG_MACHINE_START_OVERRIDE(wswan_state, wscolor)
 
 	MCFG_DEVICE_MODIFY("vdp")
 	MCFG_WSWAN_VIDEO_TYPE(VDP_TYPE_WSC)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
-	MCFG_PALETTE_INIT_OWNER(wswan_state, wscolor)
+	MCFG_PALETTE_INIT_OWNER(wscolor_state, wscolor)
 
 	/* software lists */
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_DEVICE_REMOVE("wsc_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list","wscolor")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ws_list","wswan")
-
-
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -191,6 +190,6 @@ ROM_START( wscolor )
 //  ROM_LOAD_OPTIONAL( "wsc_bios.bin", 0x0000, 0x0001, NO_DUMP )
 ROM_END
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY   FULLNAME*/
-CONS( 1999, wswan,   0,      0,      wswan,   wswan, wswan_state, 0,    "Bandai",  "WonderSwan",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, wswan_state, 0,    "Bandai",  "WonderSwan Color", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE          INIT   COMPANY   FULLNAME
+CONS( 1999, wswan,   0,      0,      wswan,   wswan, wswan_state,   0,    "Bandai",  "WonderSwan",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, wscolor_state, 0,    "Bandai",  "WonderSwan Color", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

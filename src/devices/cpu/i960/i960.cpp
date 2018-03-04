@@ -2,9 +2,8 @@
 // copyright-holders:Farfetch'd, R. Belmont
 #include "emu.h"
 #include "i960.h"
+#include "i960dis.h"
 #include "debugger.h"
-
-CPU_DISASSEMBLE( i960  );
 
 #ifdef _MSC_VER
 /* logb prototype is different for MS Visual C */
@@ -598,6 +597,45 @@ void i960_cpu_device::do_ret()
 	default:
 		fatalerror("I960: %x: Unsupported return mode %d\n", m_PIP, m_r[I960_PFP] & 7);
 	}
+}
+
+// if last opcode was a multi dword burst read opcode save the data here
+// i.e. Model 2 FIFO reads with ldl, ldt, ldq
+void i960_cpu_device::burst_stall_save(uint32_t t1, uint32_t t2, int index, int size)
+{
+	m_stall_state.t1 = t1;
+	m_stall_state.t2 = t2;
+	m_stall_state.index = index;
+	m_stall_state.size = size;
+	m_stall_state.burst_mode = true;
+}
+
+// resume from a burst stall opcode
+void i960_cpu_device::execute_burst_stall_op(uint32_t opcode)
+{
+	int i;
+	// in case opcode uses an operand call effective address function to fix IP register
+	(void)get_ea(opcode);
+
+	// check if our data is ready
+	for(i=m_stall_state.index ; i<m_stall_state.size ;i++)
+	{
+		// count down 1 icount for every read
+		m_icount--;
+		m_r[m_stall_state.t2+i] = i960_read_dword_unaligned(m_stall_state.t1);
+
+		// if the host returned stall just save the index and try again on a later moment
+		if(m_stalled == true)
+		{
+			m_stall_state.index = i;
+			return;
+		}
+	}
+
+	// clear stall burst mode
+	m_stall_state.burst_mode = false;
+	// now that we are done we might as well check if there's a pending irq too
+	check_irqs();
 }
 
 void i960_cpu_device::execute_op(uint32_t opcode)
@@ -1912,6 +1950,11 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			m_bursting = 1;
 			for(i=0; i<2; i++) {
 				m_r[t2+i] = i960_read_dword_unaligned(t1);
+				if(m_stalled)
+				{
+					burst_stall_save(t1,t2,i,2);
+					return;
+				}
 				if(m_bursting)
 					t1 += 4;
 			}
@@ -1940,6 +1983,11 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			m_bursting = 1;
 			for(i=0; i<3; i++) {
 				m_r[t2+i] = i960_read_dword_unaligned(t1);
+				if(m_stalled)
+				{
+					burst_stall_save(t1,t2,i,3);
+					return;
+				}
 				if(m_bursting)
 					t1 += 4;
 			}
@@ -1968,6 +2016,11 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			m_bursting = 1;
 			for(i=0; i<4; i++) {
 				m_r[t2+i] = i960_read_dword_unaligned(t1);
+				if(m_stalled)
+				{
+					burst_stall_save(t1,t2,i,4);
+					return;
+				}
 				if(m_bursting)
 					t1 += 4;
 			}
@@ -2018,7 +2071,10 @@ void i960_cpu_device::execute_run()
 {
 	uint32_t opcode;
 
-	check_irqs();
+	// delay checking irqs if we are in burst stall mode
+	if(m_stall_state.burst_mode == false)
+		check_irqs();
+
 	while(m_icount > 0) {
 		m_PIP = m_IP;
 		debugger_instruction_hook(this, m_IP);
@@ -2028,7 +2084,12 @@ void i960_cpu_device::execute_run()
 		opcode = m_direct->read_dword(m_IP);
 		m_IP += 4;
 
-		execute_op(opcode);
+		m_stalled = false;
+
+		if(m_stall_state.burst_mode == true)
+			execute_burst_stall_op(opcode);
+		else
+			execute_op(opcode);
 	}
 }
 
@@ -2104,7 +2165,7 @@ void i960_cpu_device::execute_set_input(int irqline, int state)
 void i960_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	save_item(NAME(m_IP));
 	save_item(NAME(m_PIP));
@@ -2122,6 +2183,13 @@ void i960_cpu_device::device_start()
 	save_item(NAME(m_immediate_vector));
 	save_item(NAME(m_immediate_pri));
 	save_item(NAME(m_bursting));
+	save_item(NAME(m_stalled));
+	save_item(NAME(m_stall_state.index));
+	save_item(NAME(m_stall_state.size));
+	save_item(NAME(m_stall_state.t1));
+	save_item(NAME(m_stall_state.t2));
+	save_item(NAME(m_stall_state.burst_mode));
+
 
 	state_add( I960_SAT,  "sat", m_SAT).formatstr("%08X");
 	state_add( I960_PRCB, "prcb", m_PRCB).formatstr("%08X");
@@ -2209,9 +2277,7 @@ void i960_cpu_device::device_reset()
 	m_rcache_pos = 0;
 }
 
-
-offs_t i960_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i960_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i960 );
-	return CPU_DISASSEMBLE_NAME(i960)(this, stream, pc, oprom, opram, options);
+	return new i960_disassembler;
 }

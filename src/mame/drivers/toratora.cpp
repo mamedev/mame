@@ -93,6 +93,8 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(toratora_timer);
+	void toratora(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -314,7 +316,7 @@ WRITE_LINE_MEMBER(toratora_state::sn2_ca2_u2_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, toratora_state )
+ADDRESS_MAP_START(toratora_state::main_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x7fff) AM_ROM  /* not fully populated */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("videoram")
@@ -322,7 +324,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, toratora_state )
 	AM_RANGE(0xf048, 0xf049) AM_NOP
 	AM_RANGE(0xf04a, 0xf04a) AM_WRITE(clear_tv_w)   /* the read is mark *LEDEN, but not used */
 	AM_RANGE(0xf04b, 0xf04b) AM_READWRITE(timer_r, clear_timer_w)
-	AM_RANGE(0xa04c, 0xf09f) AM_NOP
+	AM_RANGE(0xf04c, 0xf09f) AM_NOP
 	AM_RANGE(0xf0a0, 0xf0a3) AM_DEVREADWRITE("pia_u1", pia6821_device, read, write)
 	AM_RANGE(0xf0a4, 0xf0a7) AM_DEVREADWRITE("pia_u2", pia6821_device, read, write)
 	AM_RANGE(0xf0a8, 0xf0ab) AM_DEVREADWRITE("pia_u3", pia6821_device, read, write)
@@ -350,22 +352,22 @@ static INPUT_PORTS_START( toratora )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "1" )
-	PORT_DIPSETTING(    0x02, "0" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x04, "1" )
-	PORT_DIPSETTING(    0x02, "0" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )     PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )     PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )     PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x20, "3" )
-	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )      PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x00, "3" )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
@@ -390,7 +392,7 @@ void toratora_state::machine_reset()
 	m_clear_tv = 0;
 }
 
-static MACHINE_CONFIG_START( toratora )
+MACHINE_CONFIG_START(toratora_state::toratora)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 5185000 / 8) /* 5.185 MHz XTAL divided by 8 (@ U94.12) */

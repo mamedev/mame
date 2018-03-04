@@ -136,6 +136,9 @@ public:
 	DECLARE_WRITE8_MEMBER(p1_ppi2_portb_w);
 	DECLARE_READ8_MEMBER(p1_ppi2_portc_r);
 	const char *m_cputag;
+	void poisk1(machine_config &config);
+	void poisk1_io(address_map &map);
+	void poisk1_map(address_map &map);
 };
 
 /*
@@ -612,12 +615,12 @@ MACHINE_RESET_MEMBER(p1_state, poisk1)
  * macros
  */
 
-static ADDRESS_MAP_START( poisk1_map, AS_PROGRAM, 8, p1_state )
+ADDRESS_MAP_START(p1_state::poisk1_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0xc000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poisk1_io, AS_IO, 8, p1_state )
+ADDRESS_MAP_START(p1_state::poisk1_io)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0028, 0x002B) AM_READWRITE(p1_trap_r, p1_trap_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
@@ -631,7 +634,7 @@ static INPUT_PORTS_START( poisk1 )
 	PORT_INCLUDE( poisk1_keyboard_v91 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( poisk1 )
+MACHINE_CONFIG_START(p1_state::poisk1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 5000000)
 	MCFG_CPU_PROGRAM_MAP(poisk1_map)
@@ -642,11 +645,11 @@ static MACHINE_CONFIG_START( poisk1 )
 	MCFG_MACHINE_RESET_OVERRIDE( p1_state, poisk1 )
 
 	MCFG_DEVICE_ADD( "pit8253", PIT8253 ,0)
-	MCFG_PIT8253_CLK0(XTAL_15MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_CLK0(XTAL(15'000'000)/12) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL_15MHz/12) /* keyboard poll -- XXX edge or level triggered? */
+	MCFG_PIT8253_CLK1(XTAL(15'000'000)/12) /* keyboard poll -- XXX edge or level triggered? */
 	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir6_w))
-	MCFG_PIT8253_CLK2(XTAL_15MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_CLK2(XTAL(15'000'000)/12) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(p1_state, p1_pit8253_out2_changed))
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
@@ -687,7 +690,7 @@ static MACHINE_CONFIG_START( poisk1 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL_15MHz, 912,0,640, 262,0,200 )
+	MCFG_SCREEN_RAW_PARAMS( XTAL(15'000'000), 912,0,640, 262,0,200 )
 	MCFG_SCREEN_UPDATE_DRIVER( p1_state, screen_update )
 
 	/* XXX verify palette */

@@ -70,4 +70,8 @@ public:
 	DECLARE_PALETTE_INIT(zodiack);
 	INTERRUPT_GEN_MEMBER(zodiack_sound_nmi_gen);
 	INTERRUPT_GEN_MEMBER(zodiack_main_nmi_gen);
+	void zodiack(machine_config &config);
+	void io_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

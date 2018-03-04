@@ -26,7 +26,7 @@
 
 DEFINE_DEVICE_TYPE(PCI9050, pci9050_device, "pci9050", "PLX PCI9050 PCI to Local Bus Bridge")
 
-DEVICE_ADDRESS_MAP_START(map, 32, pci9050_device)
+ADDRESS_MAP_START(pci9050_device::map)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(lasrr_r,   lasrr_w  )
 	AM_RANGE(0x10, 0x13) AM_READWRITE(eromrr_r,  eromrr_w )
 	AM_RANGE(0x14, 0x23) AM_READWRITE(lasba_r,   lasba_w  )
@@ -36,9 +36,6 @@ DEVICE_ADDRESS_MAP_START(map, 32, pci9050_device)
 	AM_RANGE(0x3c, 0x4b) AM_READWRITE(csbase_r,  csbase_w )
 	AM_RANGE(0x4c, 0x4f) AM_READWRITE(intcsr_r,  intcsr_w )
 	AM_RANGE(0x50, 0x53) AM_READWRITE(cntrl_r,   cntrl_w  )
-ADDRESS_MAP_END
-
-DEVICE_ADDRESS_MAP_START(empty, 32, pci9050_device)
 ADDRESS_MAP_END
 
 pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -51,7 +48,7 @@ pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, d
 	}
 }
 
-void pci9050_device::set_map(int id, const address_map_delegate &map, device_t *device)
+void pci9050_device::set_map(int id, const address_map_constructor &map, device_t *device)
 {
 	m_maps[id] = map;
 	m_devices[id] = device;
@@ -68,7 +65,7 @@ void pci9050_device::device_start()
 		if(!m_maps[i].isnull())
 			add_map(0, M_MEM | M_DISABLED, m_maps[i], m_devices[i]);
 		else
-			add_map(0, M_MEM | M_DISABLED, FUNC(pci9050_device::empty));
+			add_map(0, M_MEM | M_DISABLED, address_map_constructor(), nullptr);
 
 	m_user_input_handler.resolve();
 	m_user_output_handler.resolve();

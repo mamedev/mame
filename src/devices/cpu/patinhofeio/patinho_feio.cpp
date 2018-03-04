@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "patinhofeio_cpu.h"
+#include "patinho_feio_dasm.h"
 #include "debugger.h"
 #include "includes/patinhofeio.h" // FIXME: this is a dependency from devices on MAME
 
@@ -52,13 +53,13 @@ void patinho_feio_cpu_device::compute_effective_address(unsigned int addr){
 DEFINE_DEVICE_TYPE(PATO_FEIO_CPU, patinho_feio_cpu_device, "pato_feio_cpu", "Patinho Feio CPU")
 
 //Internal 4kbytes of RAM
-static ADDRESS_MAP_START(prog_8bit, AS_PROGRAM, 8, patinho_feio_cpu_device)
+ADDRESS_MAP_START(patinho_feio_cpu_device::prog_8bit)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("internalram")
 ADDRESS_MAP_END
 
 patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, PATO_FEIO_CPU, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(prog_8bit))
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(FUNC(patinho_feio_cpu_device::prog_8bit), this))
 	, m_icount(0)
 	, m_rc_read_cb(*this)
 	, m_buttons_read_cb(*this)
@@ -782,8 +783,7 @@ void patinho_feio_cpu_device::execute_instruction()
 	printf("unimplemented opcode: 0x%02X\n", m_opcode);
 }
 
-offs_t patinho_feio_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *patinho_feio_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( patinho_feio );
-	return CPU_DISASSEMBLE_NAME(patinho_feio)(this, stream, pc, oprom, opram, options);
+	return new patinho_feio_disassembler;
 }

@@ -113,7 +113,7 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 #define SL_DISPLAY    0x02  // displayed Adder screen,  1=screen1 0=screen0
 #define SL_ACCESS     0x01  // accessable Adder screen, 1=screen1 0=screen0
 
-#define ADDER_CLOCK     (XTAL_8MHz)
+#define ADDER_CLOCK     (XTAL(8'000'000))
 
 
 
@@ -519,7 +519,7 @@ void bfm_adder2_device::adder2_decode_char_roms()
 // adder2 board memorymap /////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( adder2_memmap, AS_PROGRAM, 8, bfm_adder2_device )
+ADDRESS_MAP_START(bfm_adder2_device::adder2_memmap)
 
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(adder2_screen_page_w)      // screen access/display select
 	AM_RANGE(0x0000, 0x7FFF) AM_ROMBANK("bank2")                // 8k  paged ROM (4 pages)
@@ -545,7 +545,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( bfm_adder2_device::device_add_mconfig )
+MACHINE_CONFIG_START(bfm_adder2_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE( 400, 280)
 	MCFG_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)

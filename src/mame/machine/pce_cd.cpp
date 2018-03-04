@@ -6,10 +6,10 @@ PC Engine CD HW notes:
 
 TODO:
 - Dragon Ball Z: ADPCM dies after the first upload;
-- Dragon Slayer - The Legend of Heroes: black screen;
-- Mirai Shonen Conan: dies at new game selection;
+- Dragon Slayer - The Legend of Heroes: black screen; (actually timing/raster irq)
+- Mirai Shonen Conan: dies at new game selection; (actually timing/raster irq)
 - Snatcher: black screen after Konami logo, tries set up CD-DA
-            while transferring data?
+            while transferring data? (fixed)
 - Steam Heart's: needs transfer ready irq to get past the
                  gameplay hang, don't know exactly when it should fire
 - Steam Heart's: bad ADPCM irq, dialogue is cutted due of it;
@@ -241,7 +241,7 @@ void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
 }
 
 // TODO: left and right speaker tags should be passed from the parent config, instead of using the hard-coded ones below!?!
- MACHINE_CONFIG_MEMBER( pce_cd_device::device_add_mconfig )
+ MACHINE_CONFIG_START(pce_cd_device::device_add_mconfig)
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("bram", pce_cd_device, nvram_init)
 
 	MCFG_CDROM_ADD("cdrom")
@@ -439,18 +439,21 @@ void pce_cd_device::nec_set_audio_start_position()
 
 	m_current_frame = frame;
 
-	if (m_cdda_status == PCE_CD_CDDA_PAUSED)
-	{
-		m_cdda_status = PCE_CD_CDDA_OFF;
-		m_cdda->stop_audio();
-		m_end_frame = m_last_frame;
-		m_end_mark = 0;
-	}
-	else
+	m_cdda_status = PCE_CD_CDDA_PAUSED;
+
+	// old code for reference, seems unlikely that this puts status in standby (and breaks Snatcher at the title screen)
+//  if (m_cdda_status == PCE_CD_CDDA_PAUSED)
+//  {
+//      m_cdda_status = PCE_CD_CDDA_OFF;
+//      m_cdda->stop_audio();
+//      m_end_frame = m_last_frame;
+//      m_end_mark = 0;
+//  }
+//  else
 	{
 		if (m_command_buffer[1] & 0x03)
 		{
-			m_cdda_status = PCE_CD_CDDA_PLAYING;
+			//m_cdda_status = PCE_CD_CDDA_PLAYING;
 			m_end_frame = m_last_frame; //get the end of the CD
 			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 			m_cdda_play_mode = (m_command_buffer[1] & 0x02) ? 2 : 3; // mode 2 sets IRQ at end
@@ -458,7 +461,7 @@ void pce_cd_device::nec_set_audio_start_position()
 		}
 		else
 		{
-			m_cdda_status = PCE_CD_CDDA_PLAYING;
+			//m_cdda_status = PCE_CD_CDDA_PLAYING;
 			m_end_frame = m_toc->tracks[ cdrom_get_track(m_cd_file, m_current_frame) + 1 ].logframeofs; //get the end of THIS track
 			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 			m_end_mark = 0;
@@ -960,6 +963,8 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::data_timer_callback)
 			/* We are done, disable the timer */
 			logerror("Last frame read from CD\n");
 			m_data_transferred = 1;
+			// data transfer is done, issue a pause
+			m_cdda_status = PCE_CD_CDDA_PAUSED;
 			m_data_timer->adjust(attotime::never);
 		}
 		else
@@ -1067,7 +1072,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadein_callback)
 
 WRITE8_MEMBER(pce_cd_device::intf_w)
 {
-	logerror("%04X: write to CD interface offset %02X, data %02X\n", space.device().safe_pc(), offset, data);
+	logerror("%s write to CD interface offset %02X, data %02X\n", machine().describe_context(), offset, data);
 
 	switch (offset & 0xf)
 	{
@@ -1302,7 +1307,7 @@ READ8_MEMBER(pce_cd_device::intf_r)
 {
 	uint8_t data = m_regs[offset & 0x0F];
 
-	logerror("%04X: read from CD interface offset %02X\n", space.device().safe_pc(), offset );
+	logerror("%s: read from CD interface offset %02X\n", machine().describe_context(), offset );
 
 	switch (offset & 0xf)
 	{

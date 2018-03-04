@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef KRAMERMC_H_
-#define KRAMERMC_H_
+#ifndef MAME_INCLUDES_KRAMERMC_H
+#define MAME_INCLUDES_KRAMERMC_H
 
 #include "machine/z80pio.h"
 
@@ -31,6 +31,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void kramermc(machine_config &config);
+	void kramermc_io(address_map &map);
+	void kramermc_mem(address_map &map);
 };
 
 /*----------- defined in video/kramermc.c -----------*/
@@ -38,4 +41,4 @@ public:
 extern const gfx_layout kramermc_charlayout;
 
 
-#endif /* KRAMERMC_h_ */
+#endif // MAME_INCLUDES_KRAMERMC_H

@@ -29,14 +29,6 @@ void igs025_device::no_callback_setup()
 
 
 
-void igs025_device::set_external_cb(device_t &device,igs025_execute_external newcb)
-{
-	//printf("set_external_cb\n");
-	igs025_device &dev = downcast<igs025_device &>(device);
-	dev.m_execute_external = newcb;
-}
-
-
 void igs025_device::device_start()
 {
 	// Reset IGS025 stuff
@@ -146,7 +138,7 @@ WRITE16_MEMBER(igs025_device::killbld_igs025_prot_w )
 			break;
 
 		//  default:
-		//      logerror("%06X: ASIC25 W CMD %X  VAL %X\n", space.device().safe_pc(), m_kb_cmd, data);
+		//      logerror("%s: ASIC25 W CMD %X  VAL %X\n", machine().describe_context(), m_kb_cmd, data);
 		}
 	}
 }
@@ -239,7 +231,7 @@ WRITE16_MEMBER(igs025_device::drgw2_d80000_protection_w )
 	//  break;
 
 	//  default:
-	//      logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_kb_cmd, data);
+	//      logerror("%s: warning, writing to igs003_reg %02x = %02x\n", machine().describe_context(), m_kb_cmd, data);
 	}
 }
 
@@ -254,7 +246,7 @@ READ16_MEMBER(igs025_device::killbld_igs025_prot_r)
 		switch (m_kb_cmd)
 		{
 		case 0x00:
-			return BITSWAP8((m_kb_swap + 1) & 0x7f, 0, 1, 2, 3, 4, 5, 6, 7); // drgw3
+			return bitswap<8>((m_kb_swap + 1) & 0x7f, 0, 1, 2, 3, 4, 5, 6, 7); // drgw3
 
 		case 0x01:
 			return m_kb_reg & 0x7f;
@@ -282,7 +274,7 @@ READ16_MEMBER(igs025_device::killbld_igs025_prot_r)
 							return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
 
 						default: // >= 5
-							return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);
+							return 0x3f00 | bitswap<8>(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);
 						}
 		}
 
@@ -291,7 +283,7 @@ READ16_MEMBER(igs025_device::killbld_igs025_prot_r)
 			return 0; // Read and then discarded
 
 			//  default:
-			//      logerror("%06X: ASIC25 R CMD %X\n", space.device().safe_pc(), m_kb_cmd);
+			//      logerror("%s: ASIC25 R CMD %X\n", machine().describe_context(), m_kb_cmd);
 
 			// drgw2 notes
 			//  case 0x13: // Read to $80eeb8
@@ -302,7 +294,7 @@ READ16_MEMBER(igs025_device::killbld_igs025_prot_r)
 			//      return 0;
 
 			//  default:
-			//      logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_kb_cmd);
+			//      logerror("%s: warning, reading with igs003_reg = %02x\n", machine().describe_context(), m_kb_cmd);
 
 
 		}

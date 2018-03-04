@@ -101,7 +101,7 @@ WRITE8_MEMBER(mystston_state::mystston_ay8910_select_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mystston_state )
+ADDRESS_MAP_START(mystston_state::main_map)
 	AM_RANGE(0x0000, 0x077f) AM_RAM
 	AM_RANGE(0x0780, 0x07df) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x07e0, 0x0fff) AM_RAM
@@ -191,14 +191,14 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mystston )
+MACHINE_CONFIG_START(mystston_state::mystston)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(mystston_video)
+	mystston_video(config);
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

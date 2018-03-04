@@ -82,10 +82,13 @@ SEGA 1998
 #include "emuopts.h"
 #include "machine/m3comm.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 #define M68K_TAG     "m3commcpu"
 
 //////// Model 3 (main CPU @ C00xxxxx) and Hikaru (MMctrl bank 0E) interface
-DEVICE_ADDRESS_MAP_START(m3_map, 32, m3comm_device)
+ADDRESS_MAP_START(m3comm_device::m3_map)
 	AM_RANGE(0x0000000, 0x000ffff) AM_READWRITE8(m3_comm_ram_r, m3_comm_ram_w, 0xffffffff)
 	AM_RANGE(0x0010000, 0x00101ff) AM_READWRITE16(m3_ioregs_r, m3_ioregs_w, 0xffff0000)
 	AM_RANGE(0x0020000, 0x003ffff) AM_READWRITE16(m3_m68k_ram_r, m3_m68k_ram_w, 0xffff0000)
@@ -95,7 +98,7 @@ ADDRESS_MAP_END
 /*************************************
  *  M3COMM Memory Map
  *************************************/
-static ADDRESS_MAP_START( m3comm_mem, AS_PROGRAM, 16, m3comm_device )
+ADDRESS_MAP_START(m3comm_device::m3comm_mem)
 	AM_RANGE(0x0000000, 0x000ffff) AM_RAM AM_SHARE("m68k_ram")
 	AM_RANGE(0x0040000, 0x00400ff) AM_READWRITE(ctrl_r, ctrl_w)
 	AM_RANGE(0x0080000, 0x008ffff) AM_RAMBANK("comm_ram")
@@ -113,7 +116,7 @@ DEFINE_DEVICE_TYPE(M3COMM, m3comm_device, "m3comm", "Model 3 Communication Board
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( m3comm_device::device_add_mconfig )
+MACHINE_CONFIG_START(m3comm_device::device_add_mconfig)
 	MCFG_CPU_ADD(M68K_TAG, M68000, 10000000) // random
 	MCFG_CPU_PROGRAM_MAP(m3comm_mem)
 
@@ -206,7 +209,7 @@ READ16_MEMBER(m3comm_device::ctrl_r)
 	case 0x00 / 2:
 		return m_commbank;
 	default:
-		logerror("M3COMM CtrlRead from %04x mask %04x unimplemented!\n", offset * 2, mem_mask);
+		LOG("M3COMM CtrlRead from %04x mask %04x unimplemented!\n", offset * 2, mem_mask);
 		return 0;
 	}
 }
@@ -228,7 +231,7 @@ WRITE16_MEMBER(m3comm_device::ctrl_w)
 	case 0xE0 / 2:      // unknown, conditionally cleared in IRQ6 (receive complete) handler
 		break;
 	default:
-		logerror("M3COMM CtrlWrite to %04x %04x mask %04x\n", offset * 2, data, mem_mask);
+		LOG("M3COMM CtrlWrite to %04x %04x mask %04x\n", offset * 2, data, mem_mask);
 	}
 }
 
@@ -249,7 +252,7 @@ READ16_MEMBER(m3comm_device::ioregs_r)
 	case 0x8A / 2:
 		return m_status1;
 	default:
-		logerror("M3COMM IOread from %02x mask %04x\n", offset * 2, mem_mask);
+		LOG("M3COMM IOread from %02x mask %04x\n", offset * 2, mem_mask);
 		return 0;
 	}
 }
@@ -262,11 +265,11 @@ WRITE16_MEMBER(m3comm_device::ioregs_w)
 		break;      // it seems one of these ^v is IRQ6 ON/ACK, another is data transfer enable
 	case 0x16 / 2:  // written 8C at data receive enable, 0 at IRQ6 handler
 		if ((data & 0xFF) == 0x8C) {
-			logerror("M3COMM Receive offs %04x size %04x\n", recv_offset, recv_size);
+			LOG("M3COMM Receive offs %04x size %04x\n", recv_offset, recv_size);
 /*
             if (!m_line_rx.is_open())
             {
-                logerror("M3COMM: listen on %s\n", m_localhost);
+                LOG("M3COMM: listen on %s\n", m_localhost);
                 m_line_rx.open(m_localhost);
             }
             if (m_line_rx.is_open())
@@ -282,11 +285,11 @@ WRITE16_MEMBER(m3comm_device::ioregs_w)
 		break;      // it seems one of these ^v is IRQ4 ON/ACK, another is data transfer enable
 	case 0x1C / 2:  // written 8C at data transmit enable, 0 at IRQ4 handler
 		if ((data & 0xFF) == 0x8C) {
-			logerror("M3COMM Send offs %04x size %04x\n", send_offset, send_size);
+			LOG("M3COMM Send offs %04x size %04x\n", send_offset, send_size);
 /*
             if (!m_line_tx.is_open())
             {
-                logerror("M3COMM: connect to %s\n", m_remotehost);
+                LOG("M3COMM: connect to %s\n", m_remotehost);
                 m_line_tx.open(m_remotehost);
             }
             if (m_line_tx.is_open())
@@ -320,7 +323,7 @@ WRITE16_MEMBER(m3comm_device::ioregs_w)
 		m_commcpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 		break;
 	default:
-		logerror("M3COMM IOwrite to %02x %04x mask %04x\n", offset * 2, data, mem_mask);
+		LOG("M3COMM IOwrite to %02x %04x mask %04x\n", offset * 2, data, mem_mask);
 		return;
 	}
 }
@@ -373,7 +376,7 @@ READ16_MEMBER(m3comm_device::naomi_r)
 		return naomi_offset;
 	case 2:         // 5F7020
 	{
-//      logerror("M3COMM read @ %08x\n", (naomi_control << 16) | naomi_offset);
+//      LOG("M3COMM read @ %08x\n", (naomi_control << 16) | naomi_offset);
 		uint16_t value;
 		if (naomi_control & 1)
 			value = m68k_ram[naomi_offset / 2];     // FIXME endian
@@ -405,7 +408,7 @@ WRITE16_MEMBER(m3comm_device::naomi_w)
 					// bit 7: ???
 					// bit 14: G1 DMA bus master 0 - active / 1 - disabled
 					// bit 15: 0 - enable / 1 - disable this device ???
-//      logerror("M3COMM control write %04x\n", data);
+//      LOG("M3COMM control write %04x\n", data);
 		naomi_control = data;
 		m_commcpu->set_input_line(INPUT_LINE_RESET, (naomi_control & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 		break;
@@ -413,7 +416,7 @@ WRITE16_MEMBER(m3comm_device::naomi_w)
 		naomi_offset = data;
 		break;
 	case 2:         // 5F7020
-//      logerror("M3COMM write @ %08x %04x\n", (naomi_control << 16) | naomi_offset, data);
+//      LOG("M3COMM write @ %08x %04x\n", (naomi_control << 16) | naomi_offset, data);
 		if (naomi_control & 1)
 			m68k_ram[naomi_offset / 2] = data;      // FIXME endian
 		else {

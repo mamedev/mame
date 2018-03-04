@@ -30,6 +30,8 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 
+#include "machine/clock.h"
+
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
 
@@ -51,7 +53,7 @@ READ8_MEMBER(f1gp_state::command_pending_r)
 }
 
 
-static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16, f1gp_state )
+ADDRESS_MAP_START(f1gp_state::f1gp_cpu1_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x2fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user2", 0)
@@ -67,7 +69,7 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                                                         // WORK RAM-1
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")       // DUAL RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")         // CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // PALETTE
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // PALETTE
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(f1gp_gfxctrl_w)
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
@@ -80,7 +82,7 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( f1gp2_cpu1_map, AS_PROGRAM, 16, f1gp_state )
+ADDRESS_MAP_START(f1gp_state::f1gp2_cpu1_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x2fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_SHARE("sprcgram")                                    // SPR-1 CG RAM + SPR-2 CG RAM
@@ -89,7 +91,7 @@ static ADDRESS_MAP_START( f1gp2_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                                                             // WORK RAM-1
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")           // DUAL RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")             // CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")            // PALETTE
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")            // PALETTE
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(f1gp2_gfxctrl_w)
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
@@ -100,21 +102,20 @@ static ADDRESS_MAP_START( f1gp2_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xfff044, 0xfff047) AM_WRITE(f1gp_fgscroll_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( f1gp_cpu2_map, AS_PROGRAM, 16, f1gp_state )
+ADDRESS_MAP_START(f1gp_state::f1gp_cpu2_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM  AM_SHARE("sharedram")
-	AM_RANGE(0xfff030, 0xfff031) AM_DEVREADWRITE8("acia", acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xfff032, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xfff030, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, f1gp_state )
+ADDRESS_MAP_START(f1gp_state::sound_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, f1gp_state )
+ADDRESS_MAP_START(f1gp_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(f1gp_sh_bankswitch_w) // f1gp
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(f1gp_sh_bankswitch_w) // f1gp2
@@ -147,7 +148,7 @@ WRITE16_MEMBER(f1gp_state::f1gpb_misc_w)
 	*/
 }
 
-static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16, f1gp_state )
+ADDRESS_MAP_START(f1gp_state::f1gpb_cpu1_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x2fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user2", 0)
@@ -164,7 +165,7 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
@@ -179,12 +180,11 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xfff800, 0xfff809) AM_RAM AM_SHARE("rozregs")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( f1gpb_cpu2_map, AS_PROGRAM, 16, f1gp_state )
+ADDRESS_MAP_START(f1gp_state::f1gpb_cpu2_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xfff030, 0xfff031) AM_DEVREADWRITE8("acia", acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xfff032, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xfff030, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( f1gp )
@@ -384,18 +384,18 @@ MACHINE_RESET_MEMBER(f1gp_state,f1gp)
 	m_scroll[1] = 0;
 }
 
-static MACHINE_CONFIG_START( f1gp )
+MACHINE_CONFIG_START(f1gp_state::f1gp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(f1gp_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000,XTAL_20MHz/2)    /* verified on pcb */
+	MCFG_CPU_ADD("sub", M68000,XTAL(20'000'000)/2)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(f1gp_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_20MHz/4)  /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(20'000'000)/4)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
@@ -406,8 +406,11 @@ static MACHINE_CONFIG_START( f1gp )
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
-	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("link", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1000000) // guessed
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -421,7 +424,7 @@ static MACHINE_CONFIG_START( f1gp )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( f1gp_state, f1gp_old_tile_callback )
@@ -448,7 +451,7 @@ static MACHINE_CONFIG_START( f1gp )
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -457,7 +460,7 @@ static MACHINE_CONFIG_START( f1gp )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( f1gpb )
+MACHINE_CONFIG_START(f1gp_state::f1gpb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,10000000) /* 10 MHz ??? */
@@ -476,8 +479,11 @@ static MACHINE_CONFIG_START( f1gpb )
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
-	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("link", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1000000) // guessed
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -504,7 +510,8 @@ static MACHINE_CONFIG_START( f1gpb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( f1gp2, f1gp )
+MACHINE_CONFIG_START(f1gp_state::f1gp2)
+	f1gp(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -518,6 +525,7 @@ static MACHINE_CONFIG_DERIVED( f1gp2, f1gp )
 
 	MCFG_DEVICE_REMOVE("gga")
 	MCFG_DEVICE_REMOVE("vsystem_spr_old")
+	MCFG_DEVICE_REMOVE("vsystem_spr_ol2")
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( f1gp_state, f1gp2_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(1)

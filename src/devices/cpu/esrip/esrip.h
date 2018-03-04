@@ -20,19 +20,19 @@
 #define ESRIP_DRAW(name) int name(int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank)
 
 #define MCFG_ESRIP_FDT_R_CALLBACK(_read) \
-	devcb = &esrip_device::static_set_fdt_r_callback(*device, DEVCB_##_read);
+	devcb = &downcast<esrip_device &>(*device).set_fdt_r_callback(DEVCB_##_read);
 
 #define MCFG_ESRIP_FDT_W_CALLBACK(_write) \
-	devcb = &esrip_device::static_set_fdt_w_callback(*device, DEVCB_##_write);
+	devcb = &downcast<esrip_device &>(*device).set_fdt_w_callback(DEVCB_##_write);
 
 #define MCFG_ESRIP_STATUS_IN_CALLBACK(_read) \
-	devcb = &esrip_device::static_set_status_in_callback(*device, DEVCB_##_read);
+	devcb = &downcast<esrip_device &>(*device).set_status_in_callback(DEVCB_##_read);
 
 #define MCFG_ESRIP_DRAW_CALLBACK_OWNER(_class, _method) \
-	esrip_device::static_set_draw_callback(*device, esrip_device::draw_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	downcast<esrip_device &>(*device).set_draw_callback(esrip_device::draw_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ESRIP_LBRM_PROM(_tag) \
-	esrip_device::static_lbrm_prom(*device, _tag);
+	downcast<esrip_device &>(*device).lbrm_prom(_tag);
 
 
 //**************************************************************************
@@ -54,11 +54,11 @@ public:
 	esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	template <class Object> static devcb_base &static_set_fdt_r_callback(device_t &device, Object &&cb) { return downcast<esrip_device &>(device).m_fdt_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_fdt_w_callback(device_t &device, Object &&cb) { return downcast<esrip_device &>(device).m_fdt_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_status_in_callback(device_t &device, Object &&cb) { return downcast<esrip_device &>(device).m_status_in.set_callback(std::forward<Object>(cb)); }
-	static void static_set_draw_callback(device_t &device, draw_delegate func) { downcast<esrip_device &>(device).m_draw = func; }
-	static void static_lbrm_prom(device_t &device, const char *name) { downcast<esrip_device &>(device).m_lbrm_prom = name; }
+	template <class Object> devcb_base &set_fdt_r_callback(Object &&cb) { return m_fdt_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_fdt_w_callback(Object &&cb) { return m_fdt_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_status_in_callback(Object &&cb) { return m_status_in.set_callback(std::forward<Object>(cb)); }
+	template <typename Object> void set_draw_callback(Object &&cb) { m_draw = std::forward<Object>(cb); }
+	void lbrm_prom(const char *name) { m_lbrm_prom = name; }
 
 	// public interfaces
 	uint8_t get_rip_status();
@@ -136,9 +136,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -195,7 +193,7 @@ protected:
 	uint8_t   *m_lbrm;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<-3> *m_direct;
 
 	int     m_icount;
 
@@ -265,8 +263,5 @@ private:
 
 	void am29116_execute(uint16_t inst, int _sre);
 };
-
-
-CPU_DISASSEMBLE( esrip );
 
 #endif // MAME_CPU_ESRIP_ESRIP_H

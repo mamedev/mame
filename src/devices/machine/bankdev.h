@@ -7,16 +7,16 @@
 
 
 #define MCFG_ADDRESS_MAP_BANK_ENDIANNESS(_endianness) \
-	address_map_bank_device::set_endianness(*device, _endianness);
+	downcast<address_map_bank_device &>(*device).set_endianness(_endianness);
 
-#define MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(_databus_width) \
-	address_map_bank_device::set_databus_width(*device, _databus_width);
+#define MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(_data_width) \
+	downcast<address_map_bank_device &>(*device).set_data_width(_data_width);
 
-#define MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(_addrbus_width) \
-	address_map_bank_device::set_addrbus_width(*device, _addrbus_width);
+#define MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(_addr_width) \
+	downcast<address_map_bank_device &>(*device).set_addr_width(_addr_width);
 
 #define MCFG_ADDRESS_MAP_BANK_STRIDE(_stride) \
-	address_map_bank_device::set_stride(*device, _stride);
+	downcast<address_map_bank_device &>(*device).set_stride(_stride);
 
 class address_map_bank_device :
 	public device_t,
@@ -26,16 +26,16 @@ public:
 	// construction/destruction
 	address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void set_endianness(device_t &device, endianness_t endianness) { downcast<address_map_bank_device &>(device).m_endianness = endianness; }
-	static void set_databus_width(device_t &device, uint8_t databus_width) { downcast<address_map_bank_device &>(device).m_databus_width = databus_width; }
-	static void set_addrbus_width(device_t &device, uint8_t addrbus_width) { downcast<address_map_bank_device &>(device).m_addrbus_width = addrbus_width; }
-	static void set_stride(device_t &device, uint32_t stride) { downcast<address_map_bank_device &>(device).m_stride = stride; }
+	// configuration helpers
+	void set_endianness(endianness_t endianness) { m_endianness = endianness; }
+	void set_data_width(uint8_t data_width) { m_data_width = data_width; }
+	void set_addr_width(uint8_t addr_width) { m_addr_width = addr_width; }
+	void set_stride(uint32_t stride) { m_stride = stride; }
 
-	DECLARE_ADDRESS_MAP(amap8, 8);
-	DECLARE_ADDRESS_MAP(amap16, 16);
-	DECLARE_ADDRESS_MAP(amap32, 32);
-	DECLARE_ADDRESS_MAP(amap64, 64);
+	void amap8(address_map &map);
+	void amap16(address_map &map);
+	void amap32(address_map &map);
+	void amap64(address_map &map);
 
 	DECLARE_WRITE8_MEMBER(write8);
 	DECLARE_WRITE16_MEMBER(write16);
@@ -59,8 +59,8 @@ protected:
 private:
 	// internal state
 	endianness_t m_endianness;
-	uint8_t m_databus_width;
-	uint8_t m_addrbus_width;
+	uint8_t m_data_width;
+	uint8_t m_addr_width;
 	uint32_t m_stride;
 	address_space_config m_program_config;
 	address_space *m_program;

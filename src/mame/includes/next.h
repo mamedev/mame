@@ -2,8 +2,8 @@
 // copyright-holders:Olivier Galibert
 #pragma once
 
-#ifndef __NEXT__
-#define __NEXT__
+#ifndef MAME_INCLUDES_NEXT_H
+#define MAME_INCLUDES_NEXT_H
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nscsi_bus.h"
@@ -31,8 +31,7 @@ public:
 			net(*this, "net"),
 			mo(*this, "mo"),
 			fdc(*this, "fdc"),
-			vram(*this, "vram"),
-		m_maincpu(*this, "maincpu") { }
+			vram(*this, "vram") { }
 
 	required_device<cpu_device> maincpu;
 	required_device<mccs1850_device> rtc;
@@ -115,6 +114,24 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
+	static void ncr5390(device_t *device);
+	void next_base(machine_config &config);
+	void next_fdc_base(machine_config &config);
+	void nextst(machine_config &config);
+	void nextsc(machine_config &config);
+	void nextct(machine_config &config);
+	void nexts2(machine_config &config);
+	void nextctc(machine_config &config);
+	void next(machine_config &config);
+	void nextstc(machine_config &config);
+	void nexts(machine_config &config);
+	void next_0b_m_mem(address_map &map);
+	void next_0b_m_nofdc_mem(address_map &map);
+	void next_0c_c_mem(address_map &map);
+	void next_0c_m_mem(address_map &map);
+	void next_2c_c_mem(address_map &map);
+	void next_fdc_mem(address_map &map);
+	void next_mem(address_map &map);
 protected:
 	struct dma_slot {
 		uint32_t start, limit, chain_start, chain_limit, current;
@@ -179,7 +196,6 @@ public:
 	DECLARE_DRIVER_INIT(nextstc);
 	DECLARE_DRIVER_INIT(nextctc);
 	DECLARE_DRIVER_INIT(nexts);
-	required_device<cpu_device> m_maincpu;
 };
 
 #endif

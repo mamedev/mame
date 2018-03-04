@@ -48,9 +48,9 @@
  *************************************/
 
 #define I486_CLOCK          33000000
-#define MC68000_CLOCK       XTAL_10MHz
-#define TMS320C1_CLOCK      XTAL_33_833MHz
-#define MC88110_CLOCK       XTAL_40MHz
+#define MC68000_CLOCK       XTAL(10'000'000)
+#define TMS320C1_CLOCK      XTAL(33'833'000)
+#define MC88110_CLOCK       XTAL(40'000'000)
 
 
 /*************************************
@@ -65,6 +65,9 @@ public:
 	su2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag){ }
 
+		void su2000(machine_config &config);
+		void pcat_io(address_map &map);
+		void pcat_map(address_map &map);
 };
 
 
@@ -74,7 +77,7 @@ public:
  *
  *************************************/
 
-static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, su2000_state )
+ADDRESS_MAP_START(su2000_state::pcat_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM
@@ -83,7 +86,7 @@ static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, su2000_state )
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcat_io, AS_IO, 32, su2000_state )
+ADDRESS_MAP_START(su2000_state::pcat_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
@@ -119,7 +122,7 @@ static void ide_interrupt(device_t *device, int state)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( su2000 )
+MACHINE_CONFIG_START(su2000_state::su2000)
 	/* Basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I486, I486_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
@@ -136,14 +139,14 @@ static MACHINE_CONFIG_START( su2000 )
 	MCFG_CPU_ADD("pix_cpu2", MC88110, MC88110_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pix_cpu_b)
 
-	MCFG_CPU_ADD("format_c", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("format_c", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(formatc_map)
 #endif
 
 	/* Video hardware */
-	MCFG_FRAGMENT_ADD(pcvideo_vga)
+	pcvideo_vga(config);
 
-	MCFG_FRAGMENT_ADD(pcat_common)
+	pcat_common(config);
 
 	MCFG_DEVICE_REMOVE("rtc")
 	MCFG_DS12885_ADD("rtc")

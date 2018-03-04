@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef APPLE2GS_H_
-#define APPLE2GS_H_
+#ifndef MAME_INCLUDES_APPLE2GS_H
+#define MAME_INCLUDES_APPLE2GS_H
 
 #define RUN_ADB_MICRO (0)
 
@@ -26,7 +26,7 @@
 #define RS232B_TAG  "modem"
 
 // IIgs clocks as marked on the schematics
-#define APPLE2GS_28M  (XTAL_28_63636MHz) // IIGS master clock
+#define APPLE2GS_28M  (XTAL(28'636'363)) // IIGS master clock
 #define APPLE2GS_14M  (APPLE2GS_28M/2)
 #define APPLE2GS_7M   (APPLE2GS_28M/4)
 
@@ -268,6 +268,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( apple2gs_doc_irq);
 	DECLARE_READ8_MEMBER(apple2gs_adc_read);
 
+	void apple2gs(machine_config &config);
+	void apple2gsr1(machine_config &config);
+	void apple2gs_map(address_map &map);
 };
 
-#endif /* APPLE2GS_H_ */
+#endif // MAME_INCLUDES_APPLE2GS_H

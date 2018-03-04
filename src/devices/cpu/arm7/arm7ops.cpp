@@ -66,18 +66,12 @@ uint32_t arm7_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 			if ((insn & 0x80) == 0x80)
 				LOG(("%08x:  RegShift ERROR (p36)\n", R15));
 #endif
-
-		// see p35 for check on this
-		//k = GetRegister(k >> 1) & 0x1f;
-
 		// Keep only the bottom 8 bits for a Register Shift
 		k = GetRegister(k >> 1) & 0xff;
 
 		if (k == 0) /* Register shift by 0 is a no-op */
 		{
 //          LOG(("%08x:  NO-OP Regshift\n", R15));
-			/* TODO this is wrong for at least ROR by reg with lower
-			 *      5 bits 0 but lower 8 bits non zero */
 			if (pCarry)
 				*pCarry = GET_CPSR & C_MASK;
 			return rm;
@@ -145,11 +139,19 @@ uint32_t arm7_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 	case 3:                     /* ROR and RRX */
 		if (k)
 		{
-			while (k > 32)
-				k -= 32;
-			if (pCarry)
-				*pCarry = rm & (1 << (k - 1));
-			return ROR(rm, k);
+			k &= 31;
+			if (k)
+			{
+				if (pCarry)
+					*pCarry = rm & (1 << (k - 1));
+				return ROR(rm, k);
+			}
+			else
+			{
+				if (pCarry)
+					*pCarry = rm & SIGN_BIT;
+				return rm;
+			}
 		}
 		else
 		{
@@ -262,22 +264,13 @@ int arm7_cpu_device::storeInc(uint32_t pat, uint32_t rbv, int mode)
 
 int arm7_cpu_device::storeDec(uint32_t pat, uint32_t rbv, int mode)
 {
-	int i, result = 0, cnt;
-
 	// pre-count the # of registers being stored
-	for (i = 15; i >= 0; i--)
-	{
-		if ((pat >> i) & 1)
-		{
-			result++;
+	int const result = population_count_32(pat & 0x0000ffff);
 
-			// starting address
-			rbv -= 4;
-		}
-	}
+	// adjust starting address
+	rbv -= (result << 2);
 
-	cnt = 0;
-	for (i = 0; i <= 15; i++)
+	for (int i = 0; i <= 15; i++)
 	{
 		if ((pat >> i) & 1)
 		{
@@ -285,8 +278,8 @@ int arm7_cpu_device::storeDec(uint32_t pat, uint32_t rbv, int mode)
 			if (i == 15) /* R15 is plus 12 from address of STM */
 				LOG(("%08x: StoreDec on R15\n", R15));
 #endif
-			WRITE32(rbv + (cnt * 4), GetModeRegister(mode, i));
-			cnt++;
+			WRITE32(rbv, GetModeRegister(mode, i));
+			rbv += 4;
 		}
 	}
 	return result;
@@ -387,8 +380,8 @@ void arm7_cpu_device::HandleBranch(uint32_t insn, bool h_bit)
 		off |= (insn & 0x01000000) >> 23;
 	}
 
-	/* Save PC into LR if this is a branch with link */
-	if (insn & INSN_BL)
+	/* Save PC into LR if this is a branch with link or a BLX */
+	if ((insn & INSN_BL) || ((m_archRev >= 5) && ((insn & 0xfe000000) == 0xfa000000)))
 	{
 		SetRegister(14, R15 + 4);
 	}
@@ -499,8 +492,13 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 						R15 = data - 4;
 					else
 						R15 = (R15 & ~0x03FFFFFC) /* N Z C V I F M1 M0 */ | ((data - 4) & 0x03FFFFFC);
-				// LDR, PC takes 2S + 2N + 1I (5 total cycles)
+					// LDR, PC takes 2S + 2N + 1I (5 total cycles)
 					ARM7_ICOUNT -= 2;
+					if ((data & 1) && m_archRev >= 5)
+					{
+						set_cpsr(GET_CPSR | T_MASK);
+						R15--;
+					}
 				}
 				else
 				{
@@ -650,10 +648,10 @@ void arm7_cpu_device::HandleHalfWordDT(uint32_t insn)
 
 			// Signed Half Word?
 			if (insn & 0x20) {
-				uint16_t signbyte, databyte;
-				databyte = READ16(rnv) & 0xFFFF;
-				signbyte = (databyte & 0x8000) ? 0xffff : 0;
-				newval = (uint32_t)(signbyte << 16)|databyte;
+				int32_t data = (int32_t)(int16_t)(uint16_t)READ16(rnv & ~1);
+				if ((rnv & 1) && m_archRev < 5)
+					data >>= 8;
+				newval = (uint32_t)data;
 			}
 			// Signed Byte
 			else {
@@ -1380,6 +1378,12 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 						SwitchMode(temp & 3);
 					}
 				}
+				else
+					if ((R15 & 1) && m_archRev >= 5)
+					{
+						set_cpsr(GET_CPSR | T_MASK);
+						R15--;
+					}
 				// LDM PC - takes 2 extra cycles
 				ARM7_ICOUNT -= 2;
 			}
@@ -1437,6 +1441,12 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 						SwitchMode(temp & 3);
 					}
 				}
+				else
+					if ((R15 & 1) && m_archRev >= 5)
+					{
+						set_cpsr(GET_CPSR | T_MASK);
+						R15--;
+					}
 				// LDM PC - takes 2 extra cycles
 				ARM7_ICOUNT -= 2;
 			}
@@ -1643,6 +1653,18 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 	/* Branch and Exchange (BX) */
 	if ((insn & 0x0ffffff0) == 0x012fff10)     // bits 27-4 == 000100101111111111110001
 	{
+		R15 = GetRegister(insn & 0x0f);
+		// If new PC address has A0 set, switch to Thumb mode
+		if (R15 & 1) {
+			set_cpsr(GET_CPSR|T_MASK);
+			R15--;
+		}
+	}
+	else if ((insn & 0x0ff000f0) == 0x01200030) // BLX Rn - v5
+	{
+		// save link address
+		SetRegister(14, R15 + 4);
+
 		R15 = GetRegister(insn & 0x0f);
 		// If new PC address has A0 set, switch to Thumb mode
 		if (R15 & 1) {

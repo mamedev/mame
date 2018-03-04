@@ -114,6 +114,8 @@ i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, device_type ty
 	, m_extra_config("extra", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, data_bus_size, 16, 0)
 	, m_out_if_func(*this)
+	, m_esc_opcode_handler(*this)
+	, m_esc_data_handler(*this)
 {
 }
 
@@ -134,20 +136,47 @@ device_memory_interface::space_config_vector i8086_cpu_device::memory_space_conf
 	return spaces;
 }
 
-uint8_t i8086_cpu_device::fetch_op()
+uint8_t i8086_cpu_device::fetch()
 {
 	uint8_t data;
-	data = m_direct_opcodes->read_byte(pc(), m_fetch_xor);
+	data = m_direct_opcodes->read_byte(update_pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
 
-uint8_t i8086_cpu_device::fetch()
+address_space *i8086_cpu_device::sreg_to_space(int sreg) const
 {
-	uint8_t data;
-	data = m_direct_opcodes->read_byte(pc(), m_fetch_xor);
-	m_ip++;
-	return data;
+	switch(sreg)
+	{
+		default:
+			return m_program;
+		case CS:
+			return m_code;
+		case SS:
+			return m_stack;
+		case ES:
+			return m_extra;
+	}
+}
+
+uint8_t i8086_cpu_device::read_byte(uint32_t addr)
+{
+	return sreg_to_space(m_easeg)->read_byte(addr);
+}
+
+uint16_t i8086_cpu_device::read_word(uint32_t addr)
+{
+	return sreg_to_space(m_easeg)->read_word_unaligned(addr);
+}
+
+void i8086_cpu_device::write_byte(uint32_t addr, uint8_t data)
+{
+	sreg_to_space(m_easeg)->write_byte(addr, data);
+}
+
+void i8086_cpu_device::write_word(uint32_t addr, uint16_t data)
+{
+	sreg_to_space(m_easeg)->write_word_unaligned(addr, data);
 }
 
 void i8086_cpu_device::execute_run()
@@ -208,7 +237,7 @@ void i8086_cpu_device::execute_run()
 
 		if (!m_seg_prefix)
 		{
-			debugger_instruction_hook( this, pc() );
+			debugger_instruction_hook( this, update_pc() );
 		}
 
 		uint8_t op = fetch_op();
@@ -274,11 +303,28 @@ void i8086_cpu_device::execute_run()
 				}
 				break;
 
+			case 0xd8: // i_esc
+			case 0xd9:
+			case 0xda:
+			case 0xdb:
+			case 0xdc:
+			case 0xdd:
+			case 0xde:
+			case 0xdf:
+				m_esc_opcode_handler(m_pc - 1);
+				m_modrm = fetch();
+				if(m_modrm < 0xc0)
+					m_esc_data_handler(get_ea(1, I8086_READ));
+				else
+					m_esc_data_handler(0);
+				CLK(NOP);
+				break;
+
 			default:
 				if(!common_op(op))
 				{
 					m_icount -= 10;
-					logerror("%06x: Invalid Opcode %02x\n", pc(), op);
+					logerror("%06x: Invalid Opcode %02x\n", m_pc, op);
 					break;
 				}
 				break;
@@ -295,6 +341,8 @@ void i8086_cpu_device::device_start()
 {
 	i8086_common_cpu_device::device_start();
 	m_out_if_func.resolve_safe();
+	m_esc_opcode_handler.resolve_safe();
+	m_esc_data_handler.resolve_safe();
 	m_stack = has_space(AS_STACK) ? &space(AS_STACK) : m_program;
 	m_code = has_space(AS_CODE) ? &space(AS_CODE) : m_program;
 	m_extra = has_space(AS_EXTRA) ? &space(AS_EXTRA) : m_program;
@@ -414,11 +462,8 @@ void i8086_common_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_stack = m_program;
-	m_code = m_program;
-	m_extra = m_program;
-	m_direct = &m_program->direct();
-	m_direct_opcodes = &m_opcodes->direct();
+	m_direct = m_program->direct<0>();
+	m_direct_opcodes = m_opcodes->direct<0>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_regs.w));
@@ -504,7 +549,6 @@ void i8086_common_cpu_device::device_reset()
 	m_seg_prefix_next = false;
 	m_ea = 0;
 	m_eo = 0;
-	m_e16 = 0;
 	m_modrm = 0;
 	m_dst = 0;
 	m_src = 0;
@@ -528,8 +572,9 @@ void i8086_common_cpu_device::interrupt(int int_num, int trap)
 		m_pending_irq &= ~INT_IRQ;
 	}
 
-	uint16_t dest_off = read_word( int_num * 4 + 0, CS );
-	uint16_t dest_seg = read_word( int_num * 4 + 2, CS );
+	m_easeg = CS;
+	uint16_t dest_off = read_word(int_num * 4 + 0);
+	uint16_t dest_seg = read_word(int_num * 4 + 2);
 
 	PUSH(m_sregs[CS]);
 	PUSH(m_ip);
@@ -570,9 +615,34 @@ void i8086_common_cpu_device::execute_set_input( int inptnum, int state )
 	}
 }
 
-offs_t i8086_common_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i8086_common_cpu_device::create_disassembler()
 {
-	return i386_dasm_one(stream, pc, oprom, 1);
+	return new i386_disassembler(this);
+}
+
+int i8086_common_cpu_device::get_mode() const
+{
+	return 1;
+}
+
+uint8_t i8086_common_cpu_device::read_byte(uint32_t addr)
+{
+	return m_program->read_byte(addr);
+}
+
+uint16_t i8086_common_cpu_device::read_word(uint32_t addr)
+{
+	return m_program->read_word_unaligned(addr);
+}
+
+void i8086_common_cpu_device::write_byte(uint32_t addr, uint8_t data)
+{
+	m_program->write_byte(addr, data);
+}
+
+void i8086_common_cpu_device::write_word(uint32_t addr, uint16_t data)
+{
+	m_program->write_word_unaligned(addr, data);
 }
 
 uint8_t i8086_common_cpu_device::read_port_byte(uint16_t port)
@@ -1911,21 +1981,6 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 			CLK(XLAT);
 			break;
 
-		case 0xd8: // i_esc
-		case 0xd9:
-		case 0xda:
-		case 0xdb:
-		case 0xdc:
-		case 0xdd:
-		case 0xde:
-		case 0xdf:
-			m_modrm = fetch();
-			GetRMByte();
-			CLK(NOP);
-			logerror("%06x: Unimplemented floating point escape %02x%02x\n", pc(), op, m_modrm);
-			break;
-
-
 		case 0xe0: // i_loopne
 			{
 				int8_t disp = (int8_t)fetch();
@@ -2089,7 +2144,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 
 		case 0xf0: // i_lock
 		case 0xf1: // 0xf1 is 0xf0; verified on real CPU
-			logerror("%06x: Warning - BUSLOCK\n", pc());
+			logerror("%06x: Warning - BUSLOCK\n", m_pc);
 			m_lock = true;
 			m_no_interrupt = 1;
 			CLK(NOP);
@@ -2114,7 +2169,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 				case 0xae:  CLK(OVERRIDE); if (c) do { i_scasb(); c--; } while (c>0 && !ZF && m_icount>0);   m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				case 0xaf:  CLK(OVERRIDE); if (c) do { i_scasw(); c--; } while (c>0 && !ZF && m_icount>0);   m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				default:
-					logerror("%06x: REPNE invalid\n", pc());
+					logerror("%06x: REPNE invalid\n", m_pc);
 					// Decrement IP so the normal instruction will be executed next
 					m_ip--;
 					invalid = true;
@@ -2147,7 +2202,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 				case 0xae:  CLK(OVERRIDE); if (c) do { i_scasb(); c--; } while (c>0 && ZF && m_icount>0);    m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				case 0xaf:  CLK(OVERRIDE); if (c) do { i_scasw(); c--; } while (c>0 && ZF && m_icount>0);    m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				default:
-					logerror("%06x: REPE invalid\n", pc());
+					logerror("%06x: REPE invalid\n", m_pc);
 					// Decrement IP so the normal instruction will be executed next
 					m_ip--;
 					invalid = true;
@@ -2162,7 +2217,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 			break;
 
 		case 0xf4: // i_hlt
-			//logerror("%s: %06x: HALT\n", tag(), pc());
+			//logerror("%s: %06x: HALT\n", tag(), m_pc);
 			m_icount = 0;
 			m_halt = true;
 			break;
@@ -2407,7 +2462,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					CLKM(INCDEC_R8,INCDEC_M8);
 					break;
 				default:
-					logerror("%06x: FE Pre with unimplemented mod\n", pc());
+					logerror("%06x: FE Pre with unimplemented mod\n", m_pc);
 					break;
 				}
 			}
@@ -2463,7 +2518,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					CLKM(PUSH_R16,PUSH_M16);
 					break;
 				default:
-					logerror("%06x: FF Pre with unimplemented mod\n", pc());
+					logerror("%06x: FF Pre with unimplemented mod\n", m_pc);
 					break;
 				}
 			}

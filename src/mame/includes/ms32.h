@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood,Paul Priest
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class ms32_state : public driver_device
@@ -9,6 +10,12 @@ class ms32_state : public driver_device
 public:
 	ms32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_mainram(*this, "mainram"),
 		m_roz_ctrl(*this, "roz_ctrl"),
 		m_tx_scroll(*this, "tx_scroll"),
@@ -22,12 +29,14 @@ public:
 		m_txram(*this, "txram", 32),
 		m_bgram(*this, "bgram", 32),
 		m_f1superb_extraram(*this, "f1sb_extraram", 32),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_z80bank(*this, "z80bank%u", 1) { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	optional_shared_ptr<uint32_t> m_mainram;
 	optional_shared_ptr<uint32_t> m_roz_ctrl;
@@ -42,6 +51,8 @@ public:
 	optional_shared_ptr<uint16_t> m_txram;
 	optional_shared_ptr<uint16_t> m_bgram;
 	optional_shared_ptr<uint16_t> m_f1superb_extraram;
+
+	optional_memory_bank_array<2> m_z80bank;
 	std::unique_ptr<uint8_t[]> m_nvram_8;
 	uint32_t m_to_main;
 	uint16_t m_irqreq;
@@ -90,12 +101,13 @@ public:
 	DECLARE_WRITE8_MEMBER(to_main_w);
 	DECLARE_WRITE32_MEMBER(ms32_brightness_w);
 	DECLARE_WRITE32_MEMBER(ms32_gfxctrl_w);
+	DECLARE_WRITE32_MEMBER(coin_counter_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
 	DECLARE_DRIVER_INIT(ms32_common);
 	DECLARE_DRIVER_INIT(ss92047_01);
 	DECLARE_DRIVER_INIT(ss91022_10);
 	DECLARE_DRIVER_INIT(kirarast);
-	DECLARE_DRIVER_INIT(47pie2);
+	DECLARE_DRIVER_INIT(suchie2);
 	DECLARE_DRIVER_INIT(ss92048_01);
 	DECLARE_DRIVER_INIT(bnstars);
 	DECLARE_DRIVER_INIT(f1superb);
@@ -116,10 +128,9 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, uint16_t *sprram_top, size_t sprram_size, int gfxnum, int reverseorder);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
 	void configure_banks();
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	optional_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	optional_device<generic_latch_8_device> m_soundlatch; //not for bnstars.cpp
+	void ms32(machine_config &config);
+	void f1superb(machine_config &config);
+	void f1superb_map(address_map &map);
+	void ms32_map(address_map &map);
+	void ms32_sound_map(address_map &map);
 };

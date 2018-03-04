@@ -58,6 +58,11 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
 
+	void parodius(machine_config &config);
+	void bank0000_map(address_map &map);
+	void bank2000_map(address_map &map);
+	void parodius_map(address_map &map);
+	void parodius_sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

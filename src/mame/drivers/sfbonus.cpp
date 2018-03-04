@@ -471,6 +471,10 @@ public:
 	virtual void video_start() override;
 	void draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int category);
 	uint32_t screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sfbonus(machine_config &config);
+	void ramdac_map(address_map &map);
+	void sfbonus_io(address_map &map);
+	void sfbonus_map(address_map &map);
 };
 
 
@@ -1208,7 +1212,7 @@ uint32_t sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind1
 
 
 
-static ADDRESS_MAP_START( sfbonus_map, AS_PROGRAM, 8, sfbonus_state )
+ADDRESS_MAP_START(sfbonus_state::sfbonus_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROMBANK("bank1") AM_WRITE(sfbonus_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
@@ -1278,7 +1282,7 @@ WRITE8_MEMBER(sfbonus_state::sfbonus_2c01_w)
 }
 
 
-static ADDRESS_MAP_START( sfbonus_io, AS_IO, 8, sfbonus_state )
+ADDRESS_MAP_START(sfbonus_state::sfbonus_io)
 	AM_RANGE(0x0400, 0x0400) AM_READ_PORT("KEY1")
 	AM_RANGE(0x0408, 0x0408) AM_READ_PORT("KEY2")
 	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("KEY3")
@@ -1355,12 +1359,12 @@ void sfbonus_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, sfbonus_state )
+ADDRESS_MAP_START(sfbonus_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( sfbonus )
+MACHINE_CONFIG_START(sfbonus_state::sfbonus)
 	MCFG_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
 	MCFG_CPU_PROGRAM_MAP(sfbonus_map)
 	MCFG_CPU_IO_MAP(sfbonus_io)
@@ -5896,14 +5900,14 @@ void sfbonus_state::sfbonus_bitswap(
 
 		switch(i & 7)
 		{
-			case 0: x = BITSWAP8(x^xor0, b00,b01,b02,b03,b04,b05,b06,b07); break;
-			case 1: x = BITSWAP8(x^xor1, b10,b11,b12,b13,b14,b15,b16,b17); break;
-			case 2: x = BITSWAP8(x^xor2, b20,b21,b22,b23,b24,b25,b26,b27); break;
-			case 3: x = BITSWAP8(x^xor3, b30,b31,b32,b33,b34,b35,b36,b37); break;
-			case 4: x = BITSWAP8(x^xor4, b40,b41,b42,b43,b44,b45,b46,b47); break;
-			case 5: x = BITSWAP8(x^xor5, b50,b51,b52,b53,b54,b55,b56,b57); break;
-			case 6: x = BITSWAP8(x^xor6, b60,b61,b62,b63,b64,b65,b66,b67); break;
-			case 7: x = BITSWAP8(x^xor7, b70,b71,b72,b73,b74,b75,b76,b77); break;
+			case 0: x = bitswap<8>(x^xor0, b00,b01,b02,b03,b04,b05,b06,b07); break;
+			case 1: x = bitswap<8>(x^xor1, b10,b11,b12,b13,b14,b15,b16,b17); break;
+			case 2: x = bitswap<8>(x^xor2, b20,b21,b22,b23,b24,b25,b26,b27); break;
+			case 3: x = bitswap<8>(x^xor3, b30,b31,b32,b33,b34,b35,b36,b37); break;
+			case 4: x = bitswap<8>(x^xor4, b40,b41,b42,b43,b44,b45,b46,b47); break;
+			case 5: x = bitswap<8>(x^xor5, b50,b51,b52,b53,b54,b55,b56,b57); break;
+			case 6: x = bitswap<8>(x^xor6, b60,b61,b62,b63,b64,b65,b66,b67); break;
+			case 7: x = bitswap<8>(x^xor7, b70,b71,b72,b73,b74,b75,b76,b77); break;
 		}
 
 		ROM[i] = x;

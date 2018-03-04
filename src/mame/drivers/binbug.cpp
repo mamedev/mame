@@ -57,6 +57,7 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "sound/wave.h"
@@ -87,6 +88,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 
+	void binbug(machine_config &config);
+	void binbug_data(address_map &map);
+	void binbug_mem(address_map &map);
 private:
 	uint8_t m_framecnt;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -109,7 +113,7 @@ WRITE_LINE_MEMBER( binbug_state::binbug_serial_w )
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-static ADDRESS_MAP_START(binbug_mem, AS_PROGRAM, 8, binbug_state)
+ADDRESS_MAP_START(binbug_state::binbug_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff) AM_ROM
 	AM_RANGE( 0x0400, 0x77ff) AM_RAM
@@ -117,7 +121,7 @@ static ADDRESS_MAP_START(binbug_mem, AS_PROGRAM, 8, binbug_state)
 	AM_RANGE( 0x7c00, 0x7fff) AM_RAM AM_SHARE("attribram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(binbug_data, AS_DATA, 8, binbug_state)
+ADDRESS_MAP_START(binbug_state::binbug_data)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(binbug_ctrl_w)
 ADDRESS_MAP_END
@@ -292,9 +296,9 @@ static DEVICE_INPUT_DEFAULTS_START( keyboard )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( binbug )
+MACHINE_CONFIG_START(binbug_state::binbug)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(binbug_mem)
 	MCFG_CPU_DATA_MAP(binbug_data)
 	MCFG_S2650_SENSE_INPUT(READLINE(binbug_state, binbug_serial_r))
@@ -421,6 +425,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(time_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(uart_tick);
 
+	void dg680(machine_config &config);
+	void dg680_io(address_map &map);
+	void dg680_mem(address_map &map);
 private:
 	uint8_t m_pio_b;
 	uint8_t m_term_data;
@@ -430,7 +437,7 @@ private:
 	required_device<z80pio_device> m_pio;
 };
 
-static ADDRESS_MAP_START(dg680_mem, AS_PROGRAM, 8, dg680_state)
+ADDRESS_MAP_START(dg680_state::dg680_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xcfff) AM_RAM
 	AM_RANGE( 0xd000, 0xd7ff) AM_ROM
@@ -439,7 +446,7 @@ static ADDRESS_MAP_START(dg680_mem, AS_PROGRAM, 8, dg680_state)
 	AM_RANGE( 0xf400, 0xf7ff) AM_RAM AM_SHARE("attribram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(dg680_io, AS_IO, 8, dg680_state)
+ADDRESS_MAP_START(dg680_state::dg680_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
@@ -524,9 +531,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
 	m_ctc->trg3(0);
 }
 
-static MACHINE_CONFIG_START( dg680 )
+MACHINE_CONFIG_START(dg680_state::dg680)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 4)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(dg680_mem)
 	MCFG_CPU_IO_MAP(dg680_io)
 	MCFG_Z80_DAISY_CHAIN(dg680_daisy_chain)
@@ -554,11 +561,11 @@ static MACHINE_CONFIG_START( dg680 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_8MHz / 4)
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(8'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_8MHz / 4)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(8'000'000) / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(dg680_state, porta_r))
 	// OUT_ARDY - this activates to ask for kbd data but not known if actually used

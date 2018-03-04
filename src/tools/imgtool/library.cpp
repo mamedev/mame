@@ -18,6 +18,126 @@
 
 namespace imgtool {
 
+datetime::imgtool_clock::duration datetime::s_gmt_offset = datetime::calculate_gmt_offset();
+
+//-------------------------------------------------
+//  datetime ctor
+//-------------------------------------------------
+
+datetime::datetime(datetime_type type, std::chrono::time_point<std::chrono::system_clock> tp)
+	: m_type(type)
+	, m_time_point(imgtool_clock::from_system_clock(tp))
+{
+}
+
+
+//-------------------------------------------------
+//  datetime ctor
+//-------------------------------------------------
+
+datetime::datetime(datetime_type type, time_t t)
+	: datetime(type, std::chrono::system_clock::from_time_t(t))
+{
+}
+
+
+//-------------------------------------------------
+//  datetime ctor
+//-------------------------------------------------
+
+datetime::datetime(datetime_type type, const util::arbitrary_datetime &dt, bool clamp)
+	: m_type(type)
+	, m_time_point(imgtool_clock::from_arbitrary_datetime(dt, clamp))
+{
+}
+
+
+//-------------------------------------------------
+//  datetime::now
+//-------------------------------------------------
+
+datetime datetime::now(datetime_type type)
+{
+	return imgtool::datetime(
+		type,
+		std::chrono::system_clock::now());
+}
+
+
+//-------------------------------------------------
+//  datetime::localtime
+//-------------------------------------------------
+
+std::tm datetime::localtime() const
+{
+	imgtool_clock::time_point tp;
+
+	switch (type())
+	{
+	case datetime_type::LOCAL:
+		tp = time_point();
+		break;
+	case datetime_type::GMT:
+		tp = time_point() + s_gmt_offset;
+		break;
+	default:
+		tp = imgtool_clock::time_point();
+		break;
+	}
+	return imgtool_clock::to_tm(tp);
+}
+
+
+//-------------------------------------------------
+//  datetime::gmtime
+//-------------------------------------------------
+
+std::tm datetime::gmtime() const
+{
+	imgtool_clock::time_point tp;
+
+	switch (type())
+	{
+	case datetime_type::GMT:
+		tp = time_point();
+		break;
+	case datetime_type::LOCAL:
+		tp = time_point() - s_gmt_offset;
+		break;
+	default:
+		tp = imgtool_clock::time_point();
+		break;
+	}
+	return imgtool_clock::to_tm(tp);
+}
+
+
+//-------------------------------------------------
+//  datetime::calculate_gmt_offset
+//-------------------------------------------------
+
+datetime::imgtool_clock::duration datetime::calculate_gmt_offset()
+{
+	time_t t = time(nullptr);
+	std::tm utc_tm = *std::gmtime(&t);
+	time_t utc = mktime(&utc_tm);
+	std::tm local_tm = *std::localtime(&t);
+	time_t local = mktime(&local_tm);
+	double d =  difftime(local, utc) * imgtool_clock::period::den / imgtool_clock::period::num;
+	return imgtool_clock::duration((std::int64_t) d);
+}
+
+
+//-------------------------------------------------
+//  datetime::to_time_t
+//-------------------------------------------------
+
+time_t datetime::to_time_t() const
+{
+	auto system_clock_tp = imgtool_clock::to_system_clock(time_point());
+	return std::chrono::system_clock::to_time_t(system_clock_tp);
+}
+
 
 //-------------------------------------------------
 //  ctor
@@ -182,7 +302,7 @@ library::modulelist::iterator library::find(const std::string &module_name)
 	return std::find_if(
 		m_modules.begin(),
 		m_modules.end(),
-		[this, module_name](std::unique_ptr<imgtool_module> &module) { return !module_name.compare(module->name); });
+		[module_name](std::unique_ptr<imgtool_module> &module) { return !module_name.compare(module->name); });
 }
 
 

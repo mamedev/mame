@@ -9,9 +9,10 @@
 
 #pragma once
 
-#ifndef DRIVERS_NOVAGBASE_H
-#define DRIVERS_NOVAGBASE_H
+#ifndef MAME_INCLUDES_NOVAGBASE_H
+#define MAME_INCLUDES_NOVAGBASE_H
 
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/beep.h"
 #include "video/hd44780.h"
@@ -79,4 +80,4 @@ protected:
 INPUT_PORTS_EXTERN( novag_cb_buttons );
 INPUT_PORTS_EXTERN( novag_cb_magnets );
 
-#endif // DRIVERS_NOVAGBASE_H
+#endif // MAME_INCLUDES_NOVAGBASE_H

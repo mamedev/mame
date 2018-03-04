@@ -8,6 +8,7 @@
 #include "machine/ram.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "softlist_dev.h"
 
 class ps2_state : public driver_device
 {
@@ -22,30 +23,44 @@ public:
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
 
+	void ps2m30286(machine_config &config);
+	void ps2386(machine_config &config);
+	void at_softlists(machine_config &config);
+	void ps2_16_io(address_map &map);
+	void ps2_16_map(address_map &map);
+	void ps2_32_io(address_map &map);
+	void ps2_32_map(address_map &map);
 protected:
 	void machine_start() override;
 };
 
-static ADDRESS_MAP_START( ps2_16_map, AS_PROGRAM, 16, ps2_state )
+MACHINE_CONFIG_START(ps2_state::at_softlists)
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
+	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
+	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
+MACHINE_CONFIG_END
+
+ADDRESS_MAP_START(ps2_state::ps2_16_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ps2_32_map, AS_PROGRAM, 32, ps2_state )
+ADDRESS_MAP_START(ps2_state::ps2_32_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ps2_16_io, AS_IO, 16, ps2_state )
+ADDRESS_MAP_START(ps2_state::ps2_16_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ps2_32_io, AS_IO, 32, ps2_state )
+ADDRESS_MAP_START(ps2_state::ps2_32_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xffffffff)
 ADDRESS_MAP_END
@@ -66,7 +81,7 @@ void ps2_state::machine_start()
 	}
 }
 
-static MACHINE_CONFIG_START( ps2m30286 )
+MACHINE_CONFIG_START(ps2_state::ps2m30286)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, 10000000)
 	MCFG_CPU_PROGRAM_MAP(ps2_16_map)
@@ -76,7 +91,7 @@ static MACHINE_CONFIG_START( ps2m30286 )
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_FRAGMENT_ADD( at_softlists )
+	at_softlists(config);
 
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "vga", true)
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, "fdc", false)
@@ -90,7 +105,7 @@ static MACHINE_CONFIG_START( ps2m30286 )
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ps2386 )
+MACHINE_CONFIG_START(ps2_state::ps2386)
 	MCFG_CPU_ADD("maincpu", I386, 12000000)
 	MCFG_CPU_PROGRAM_MAP(ps2_32_map)
 	MCFG_CPU_IO_MAP(ps2_32_io)
@@ -98,7 +113,7 @@ static MACHINE_CONFIG_START( ps2386 )
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_FRAGMENT_ADD( at_softlists )
+	at_softlists(config);
 
 	// on board devices
 	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "fdcsmc", true)

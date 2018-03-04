@@ -19,7 +19,7 @@ konami1_device::konami1_device(const machine_config &mconfig, const char *tag, d
 
 void konami1_device::device_start()
 {
-	m_mintf = new mi_konami1(m_boundary);
+	m_mintf = std::make_unique<mi_konami1>(m_boundary);
 	m6809_base_device::device_start();
 }
 
@@ -27,7 +27,7 @@ void konami1_device::set_encryption_boundary(uint16_t adr)
 {
 	m_boundary = adr;
 	if(m_mintf)
-		static_cast<mi_konami1 *>(m_mintf)->m_boundary = adr;
+		downcast<mi_konami1 *>(m_mintf.get())->m_boundary = adr;
 }
 
 konami1_device::mi_konami1::mi_konami1(uint16_t adr)

@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(VIC1010, vic1010_device, "vic1010", "VIC-1010 Expansion Modul
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( vic1010_device::device_add_mconfig )
+MACHINE_CONFIG_START(vic1010_device::device_add_mconfig)
 	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot1")
 	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot2")
 	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot3")

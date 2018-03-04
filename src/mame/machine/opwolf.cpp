@@ -649,7 +649,7 @@ WRITE16_MEMBER(opwolf_state::opwolf_cchip_data_w)
 	//if (offset==0x50 && offset==0x51 && offset==0x52 && offset==0x53) // Coins
 	//  logValue=0;
 	//if (logValue)
-	//  logerror("%08x:  opwolf 68K writes c-chip %02x at %04x/%04x (bank %04x)\n", space.device().safe_pc(), data & 0xff, offset*2, offset, m_current_bank);
+	//  logerror("%s:  opwolf 68K writes c-chip %02x at %04x/%04x (bank %04x)\n", machine().describe_context(), data & 0xff, offset*2, offset, m_current_bank);
 
 	m_cchip_ram[(m_current_bank * 0x400) + offset] = data & 0xff;
 
@@ -751,18 +751,18 @@ READ16_MEMBER(opwolf_state::opwolf_cchip_status_r)
 
 READ16_MEMBER(opwolf_state::opwolf_cchip_data_r)
 {
-//  if (offset!=0x7f && && space.device().safe_pc()!=0xc18 && space.device().safe_pc()!=0xc2e && space.device().safe_pc()!=0xc9e && offset!=0x50 && offset!=0x51 && offset!=0x52 && offset!=0x53 && offset!=0x5 && offset!=0x13 && offset!=0x79 && offset!=0x12 && offset!=0x34)
-//      logerror("%08x:  opwolf c read %04x (bank %04x)\n", space.device().safe_pc(), offset, m_current_bank);
+//  if (offset!=0x7f && && m_maincpu->pc()!=0xc18 && m_maincpu->pc()!=0xc2e && m_maincpu->pc()!=0xc9e && offset!=0x50 && offset!=0x51 && offset!=0x52 && offset!=0x53 && offset!=0x5 && offset!=0x13 && offset!=0x79 && offset!=0x12 && offset!=0x34)
+//      logerror("%08x:  opwolf c read %04x (bank %04x)\n", m_maincpu->pc(), offset, m_current_bank);
 
 	//int logValue=1;
 	//if (offset==0x1c || offset==0x1d || offset==0x1e || offset==0x1f || offset==0x20) // Enemies, tanks, choppers, boats
 	//  logValue=0;
 	//if (offset==0x50 || offset==0x51 || offset==0x52 || offset==0x53) // Coins
 	//  logValue=0;
-	//if (space.device().safe_pc()==0xc18 && space.device().safe_pc()!=0xc2e && space.device().safe_pc()!=0xc9e)
+	//if (m_maincpu->pc()==0xc18 && m_maincpu->pc()!=0xc2e && m_maincpu->pc()!=0xc9e)
 	//  logValue=0;
 	//if (logValue)
-	//  logerror("%08x:  opwolf 68K reads c-chip at %04x/%04x (bank %04x)\n", space.device().safe_pc(), offset*2, offset, m_current_bank);
+	//  logerror("%08x:  opwolf 68K reads c-chip at %04x/%04x (bank %04x)\n", m_maincpu->pc(), offset*2, offset, m_current_bank);
 
 	return m_cchip_ram[(m_current_bank * 0x400) + offset];
 }

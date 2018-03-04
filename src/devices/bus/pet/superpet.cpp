@@ -60,7 +60,7 @@ const tiny_rom_entry *superpet_device::device_rom_region() const
 //  ADDRESS_MAP( superpet_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( superpet_mem, AS_PROGRAM, 8, superpet_device )
+ADDRESS_MAP_START(superpet_device::superpet_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -69,14 +69,14 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( superpet_device::device_add_mconfig )
-	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL_16MHz/16)
+MACHINE_CONFIG_START(superpet_device::device_add_mconfig)
+	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL(16'000'000)/16)
 	MCFG_CPU_PROGRAM_MAP(superpet_mem)
 
-	MCFG_MOS6702_ADD(MOS6702_TAG, XTAL_16MHz/16)
+	MCFG_MOS6702_ADD(MOS6702_TAG, XTAL(16'000'000)/16)
 
 	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(superpet_device, acia_irq_w))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 

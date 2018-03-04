@@ -41,7 +41,7 @@ WRITE8_MEMBER( comx35_state::cdp1869_w )
 
 /* CDP1869 */
 
-static ADDRESS_MAP_START( cdp1869_page_ram, 0, 8, comx35_state )
+ADDRESS_MAP_START(comx35_state::cdp1869_page_ram)
 	AM_RANGE(0x000, 0x7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -88,7 +88,7 @@ void comx35_state::video_start()
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START( comx35_pal_video )
+MACHINE_CONFIG_START(comx35_state::comx35_pal_video)
 	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
 
 	/* sound hardware */
@@ -108,7 +108,7 @@ MACHINE_CONFIG_START( comx35_pal_video )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( comx35_ntsc_video )
+MACHINE_CONFIG_START(comx35_state::comx35_ntsc_video)
 	MCFG_CDP1869_SCREEN_NTSC_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_NTSC)
 
 	/* sound hardware */

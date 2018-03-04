@@ -86,8 +86,8 @@
 #include "amusco.lh"
 
 
-#define MASTER_CLOCK        XTAL_22_1184MHz     /* confirmed */
-#define SECOND_CLOCK        XTAL_15MHz          /* confirmed */
+#define MASTER_CLOCK        XTAL(22'118'400)     /* confirmed */
+#define SECOND_CLOCK        XTAL(15'000'000)          /* confirmed */
 
 #define CPU_CLOCK           MASTER_CLOCK / 4    /* guess */
 #define CRTC_CLOCK          SECOND_CLOCK / 8    /* guess */
@@ -103,7 +103,6 @@ class amusco_state : public driver_device
 public:
 	amusco_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_pit(*this, "pit8253"),
@@ -114,11 +113,7 @@ public:
 		m_hopper(*this, "hopper")
 		{ }
 
-	required_shared_ptr<uint8_t> m_videoram;
-	tilemap_t *m_bg_tilemap;
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
-	virtual void machine_start() override;
 	DECLARE_WRITE_LINE_MEMBER(coin_irq);
 	DECLARE_READ8_MEMBER(mc6845_r);
 	DECLARE_WRITE8_MEMBER(mc6845_w);
@@ -131,6 +126,17 @@ public:
 	DECLARE_WRITE8_MEMBER(rtc_control_w);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(update_row);
+	DECLARE_PALETTE_INIT(amusco);
+	void amusco(machine_config &config);
+	void draw88pkr(machine_config &config);
+	void amusco_io_map(address_map &map);
+	void amusco_mem_map(address_map &map);
+protected:
+	virtual void video_start() override;
+	virtual void machine_start() override;
+private:
+	std::unique_ptr<uint8_t []> m_videoram;
+	tilemap_t *m_bg_tilemap;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -143,6 +149,7 @@ public:
 	uint8_t m_mc6845_address;
 	uint16_t m_video_update_address;
 	bool m_blink_state;
+	static constexpr uint32_t videoram_size = 0x10000;
 };
 
 
@@ -176,6 +183,11 @@ void amusco_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(amusco_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 10, 74, 24);
 	m_blink_state = false;
+
+	m_videoram = std::make_unique<uint8_t []>(videoram_size);
+	std::fill_n(m_videoram.get(), videoram_size, 0);
+
+	save_pointer(NAME(m_videoram.get()), videoram_size);
 }
 
 void amusco_state::machine_start()
@@ -187,9 +199,8 @@ void amusco_state::machine_start()
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( amusco_mem_map, AS_PROGRAM, 8, amusco_state )
+ADDRESS_MAP_START(amusco_state::amusco_mem_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0xec000, 0xecfff) AM_RAM AM_SHARE("videoram")  // placeholder
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -347,7 +358,7 @@ WRITE8_MEMBER(amusco_state::rtc_control_w)
 	m_rtc->read_w(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START( amusco_io_map, AS_IO, 8, amusco_state )
+ADDRESS_MAP_START(amusco_state::amusco_io_map)
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(mc6845_r, mc6845_w)
 	AM_RANGE(0x0010, 0x0011) AM_DEVWRITE("pic8259", pic8259_device, write)
 	AM_RANGE(0x0020, 0x0023) AM_DEVWRITE("pit8253", pit8253_device, write)
@@ -439,7 +450,7 @@ static const gfx_layout charlayout =
 ******************************/
 
 static GFXDECODE_START( amusco )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, /*8*/ 1 ) // current palette has only 8 colors...
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 ) // current palette has only 8 colors...
 GFXDECODE_END
 
 
@@ -465,11 +476,55 @@ MC6845_UPDATE_ROW(amusco_state::update_row)
 	m_bg_tilemap->draw(*m_screen, bitmap, rowrect, 0, 0);
 }
 
+PALETTE_INIT_MEMBER(amusco_state,amusco)
+{
+	// add some templates first
+	for (int i = 0; i < 8; i++)
+	{
+		for(int j=0;j<8;j++)
+			palette.set_pen_color(i*8+j, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+	}
+
+	// override colors
+/**/palette.set_pen_color(0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(1, pal1bit(1), pal1bit(1), pal1bit(1));
+
+/**/palette.set_pen_color(1*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(1*8+1, pal1bit(1), pal1bit(0), pal1bit(0));
+
+/**/palette.set_pen_color(2*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(2*8+1, pal1bit(0), pal1bit(0), pal1bit(1));
+
+/**/palette.set_pen_color(3*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(3*8+1, pal1bit(0), pal1bit(1), pal1bit(0));
+
+
+	palette.set_pen_color(5*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(5*8+1, pal2bit(0), pal2bit(0), pal2bit(1));
+/**/palette.set_pen_color(5*8+2, pal1bit(1), pal1bit(1), pal1bit(0));
+	palette.set_pen_color(5*8+3, pal1bit(0), pal1bit(0), pal1bit(0));
+	palette.set_pen_color(5*8+4, pal1bit(1), pal1bit(1), pal1bit(1));
+	palette.set_pen_color(5*8+5, pal2bit(2), pal2bit(1), pal2bit(0));
+/**/palette.set_pen_color(5*8+6, pal1bit(0), pal1bit(0), pal1bit(1));
+/**/palette.set_pen_color(5*8+7, pal1bit(1), pal1bit(1), pal1bit(1));
+
+	palette.set_pen_color(6*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(6*8+1, pal2bit(1), pal2bit(0), pal2bit(0));
+/**/palette.set_pen_color(6*8+2, pal1bit(1), pal1bit(1), pal1bit(0));
+	palette.set_pen_color(6*8+3, pal1bit(0), pal1bit(0), pal1bit(0));
+	palette.set_pen_color(6*8+4, pal1bit(1), pal1bit(1), pal1bit(1));
+	palette.set_pen_color(6*8+5, pal2bit(2), pal2bit(1), pal2bit(0));
+/**/palette.set_pen_color(6*8+6, pal1bit(0), pal1bit(0), pal1bit(1));
+/**/palette.set_pen_color(6*8+7, pal1bit(1), pal1bit(1), pal1bit(1));
+
+
+}
+
 /*************************
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( amusco )
+MACHINE_CONFIG_START(amusco_state::amusco)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, CPU_CLOCK)        // 5 MHz ?
@@ -501,7 +556,7 @@ static MACHINE_CONFIG_START( amusco )
 	MCFG_I8155_IN_PORTB_CB(READ8(amusco_state, lpt_status_r))
 	// Port C uses ALT 3 mode, which MAME does not currently emulate
 
-	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
+	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
 
 	MCFG_DEVICE_ADD("rtc_interface", I8155, 0)
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(amusco_state, rtc_control_w))
@@ -520,7 +575,8 @@ static MACHINE_CONFIG_START( amusco )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amusco)
 
-	MCFG_PALETTE_ADD_3BIT_GBR("palette")
+	MCFG_PALETTE_ADD("palette",8*8)
+	MCFG_PALETTE_INIT_OWNER(amusco_state, amusco)
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", CRTC_CLOCK) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -535,7 +591,8 @@ static MACHINE_CONFIG_START( amusco )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( draw88pkr, amusco )
+MACHINE_CONFIG_START(amusco_state::draw88pkr)
+	amusco(config);
 	//MCFG_DEVICE_MODIFY("ppi_outputs") // Some bits are definitely different
 MACHINE_CONFIG_END
 

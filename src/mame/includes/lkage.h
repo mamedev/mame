@@ -70,4 +70,11 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_lkage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void lkageb(machine_config &config);
+	void lkage(machine_config &config);
+	void lkage_io_map(address_map &map);
+	void lkage_map(address_map &map);
+	void lkage_map_boot(address_map &map);
+	void lkage_map_mcu(address_map &map);
+	void lkage_sound_map(address_map &map);
 };

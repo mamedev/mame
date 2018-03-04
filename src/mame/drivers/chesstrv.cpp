@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/f8/f8.h"
+#include "machine/timer.h"
 #include "chesstrv.lh"
 #include "borisdpl.lh"
 
@@ -39,6 +40,11 @@ public:
 	uint8_t m_matrix;
 	//TIMER_DEVICE_CALLBACK_MEMBER(borisdpl_timer_interrupt);
 	required_device<cpu_device> m_maincpu;
+	void chesstrv(machine_config &config);
+	void borisdpl(machine_config &config);
+	void borisdpl_io(address_map &map);
+	void chesstrv_io(address_map &map);
+	void chesstrv_mem(address_map &map);
 };
 
 WRITE8_MEMBER( chesstrv_state::ram_addr_w )
@@ -63,7 +69,7 @@ WRITE8_MEMBER( chesstrv_state::ram_w )
 
 WRITE8_MEMBER( chesstrv_state::display_w )
 {
-	uint8_t seg_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	uint8_t seg_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 
 	if(!(m_matrix & 0x01))
 		output().set_digit_value( 3, seg_data );
@@ -117,20 +123,20 @@ READ8_MEMBER( chesstrv_state::diplomat_keypad_r )
 }
 
 
-static ADDRESS_MAP_START( chesstrv_mem, AS_PROGRAM, 8, chesstrv_state )
+ADDRESS_MAP_START(chesstrv_state::chesstrv_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( chesstrv_io, AS_IO, 8, chesstrv_state )
+ADDRESS_MAP_START(chesstrv_state::chesstrv_io)
 	AM_RANGE( 0x00, 0x00 ) AM_READWRITE( ram_addr_r, ram_addr_w )
 	AM_RANGE( 0x01, 0x01 ) AM_WRITE( display_w )
 	AM_RANGE( 0x04, 0x04 ) AM_READWRITE( ram_r, ram_w )
 	AM_RANGE( 0x05, 0x05 ) AM_READWRITE( keypad_r, matrix_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( borisdpl_io, AS_IO, 8, chesstrv_state )
+ADDRESS_MAP_START(chesstrv_state::borisdpl_io)
 	AM_RANGE( 0x00, 0x00 ) AM_READWRITE( diplomat_keypad_r, matrix_w )
 	AM_RANGE( 0x01, 0x01 ) AM_WRITE( diplomat_display_w )
 	AM_RANGE( 0x04, 0x04 ) AM_READWRITE( ram_r, ram_w )
@@ -213,7 +219,7 @@ void chesstrv_state::machine_start()
 	save_item(NAME(m_matrix));
 }
 
-static MACHINE_CONFIG_START( chesstrv )
+MACHINE_CONFIG_START(chesstrv_state::chesstrv)
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", F8, 3000000 )      // Fairchild 3870
 	MCFG_CPU_PROGRAM_MAP( chesstrv_mem )
@@ -223,7 +229,7 @@ static MACHINE_CONFIG_START( chesstrv )
 	MCFG_DEFAULT_LAYOUT( layout_chesstrv )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( borisdpl )
+MACHINE_CONFIG_START(chesstrv_state::borisdpl)
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", F8, 30000000 )     // Motorola SC80265P
 	MCFG_CPU_PROGRAM_MAP( chesstrv_mem )

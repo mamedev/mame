@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau
+
 #include "machine/ataintf.h"
+#include "machine/timer.h"
 #include "sound/k054539.h"
 #include "machine/k053252.h"
 #include "video/konami_helper.h"
@@ -20,10 +22,20 @@ public:
 		m_ata(*this, "ata"),
 		m_inputs_port(*this, "INPUTS"),
 		m_dsw_port(*this, "DSW"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_sndram(*this, "sndram")
 	{
 	}
 
+	void qdrmfgp(machine_config &config);
+	void qdrmfgp2(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(battery_sensor_r);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_nvram;
 	required_shared_ptr<uint16_t> m_workram;
@@ -34,8 +46,8 @@ public:
 	required_ioport m_inputs_port;
 	required_ioport m_dsw_port;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_sndram;
 
-	uint8_t *m_sndram;
 	uint16_t m_control;
 	int32_t m_gp2_irq_control;
 	int32_t m_pal;
@@ -52,14 +64,12 @@ public:
 	DECLARE_WRITE16_MEMBER(sndram_w);
 	DECLARE_READ16_MEMBER(gp2_ide_std_r);
 	DECLARE_READ16_MEMBER(inputs_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(battery_sensor_r);
-
-	virtual void machine_reset() override;
 
 	DECLARE_MACHINE_START(qdrmfgp);
 	DECLARE_VIDEO_START(qdrmfgp);
 	DECLARE_MACHINE_START(qdrmfgp2);
 	DECLARE_VIDEO_START(qdrmfgp2);
+
 	uint32_t screen_update_qdrmfgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(qdrmfgp2_interrupt);
 	TIMER_CALLBACK_MEMBER(gp2_timer_callback);
@@ -69,4 +79,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq1_gen);
 	K056832_CB_MEMBER(qdrmfgp_tile_callback);
 	K056832_CB_MEMBER(qdrmfgp2_tile_callback);
+
+	void qdrmfgp2_map(address_map &map);
+	void qdrmfgp_k054539_map(address_map &map);
+	void qdrmfgp_map(address_map &map);
 };

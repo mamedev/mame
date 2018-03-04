@@ -929,7 +929,7 @@ READ8_MEMBER(nes_waixing_sh2_device::chr_r)
 void nes_waixing_sec_device::prg_cb(int start, int bank)
 {
 	if (m_reg)
-		bank = BITSWAP8(bank & 0x1f,7,6,5,2,1,3,4,0);
+		bank = bitswap<8>(bank & 0x1f,7,6,5,2,1,3,4,0);
 
 	prg8_x(start, bank);
 }
@@ -937,7 +937,7 @@ void nes_waixing_sec_device::prg_cb(int start, int bank)
 void nes_waixing_sec_device::chr_cb(int start, int bank, int source)
 {
 	if (m_reg)
-		bank = BITSWAP8(bank, 5,4,2,6,7,3,1,0);
+		bank = bitswap<8>(bank, 5,4,2,6,7,3,1,0);
 
 	chr1_x(start, bank, source);
 }

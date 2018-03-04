@@ -5,16 +5,23 @@
 
 #pragma once
 
+#include "cpu/m68000/m68000.h"
+
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
 /* TODO: serial ports, frequency & hook it up with m68k */
+
+// FIXME: M68000 ought to be a parent class, not an external object
+#define MCFG_TMP68301_CPU(_tag) \
+	downcast<tmp68301_device &>(*device).set_cpu_tag("^" _tag);
+
 #define MCFG_TMP68301_IN_PARALLEL_CB(cb) \
-		devcb = &tmp68301_device::set_in_parallel_callback(*device, (DEVCB_##cb));
+	devcb = &downcast<tmp68301_device &>(*device).set_in_parallel_callback((DEVCB_##cb));
 
 #define MCFG_TMP68301_OUT_PARALLEL_CB(cb) \
-		devcb = &tmp68301_device::set_out_parallel_callback(*device, (DEVCB_##cb));
+	devcb = &downcast<tmp68301_device &>(*device).set_out_parallel_callback((DEVCB_##cb));
 
 
 //**************************************************************************
@@ -29,8 +36,9 @@ class tmp68301_device : public device_t,
 public:
 	tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_in_parallel_callback(device_t &device, Object &&cb) { return downcast<tmp68301_device &>(device).m_in_parallel_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_parallel_callback(device_t &device, Object &&cb) { return downcast<tmp68301_device &>(device).m_out_parallel_cb.set_callback(std::forward<Object>(cb)); }
+	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
+	template <class Object> devcb_base &set_in_parallel_callback(Object &&cb) { return m_in_parallel_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_parallel_callback(Object &&cb) { return m_out_parallel_cb.set_callback(std::forward<Object>(cb)); }
 
 	// Hardware Registers
 	DECLARE_READ16_MEMBER( regs_r );
@@ -41,6 +49,9 @@ public:
 	void external_interrupt_1();
 	void external_interrupt_2();
 
+	IRQ_CALLBACK_MEMBER(irq_callback);
+
+private:
 	DECLARE_READ16_MEMBER(imr_r);
 	DECLARE_WRITE16_MEMBER(imr_w);
 	DECLARE_READ16_MEMBER(iisr_r);
@@ -54,7 +65,7 @@ public:
 	DECLARE_READ8_MEMBER(icr_r);
 	DECLARE_WRITE8_MEMBER(icr_w);
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	void tmp68301_regs(address_map &map);
 
 protected:
 	// device-level overrides
@@ -81,6 +92,8 @@ private:
 
 	inline uint16_t read_word(offs_t address);
 	inline void write_word(offs_t address, uint16_t data);
+
+	required_device<m68000_base_device> m_cpu;
 
 	devcb_read16         m_in_parallel_cb;
 	devcb_write16        m_out_parallel_cb;

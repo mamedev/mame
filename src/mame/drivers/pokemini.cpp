@@ -77,6 +77,8 @@ public:
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
 
+	void pokemini(machine_config &config);
+	void pokemini_mem_map(address_map &map);
 protected:
 	enum
 	{
@@ -121,7 +123,7 @@ READ8_MEMBER( pokemini_state::rom_r )
 	return m_cart->read_rom(space, offset & 0x1fffff);
 }
 
-static ADDRESS_MAP_START( pokemini_mem_map, AS_PROGRAM, 8, pokemini_state )
+ADDRESS_MAP_START(pokemini_state::pokemini_mem_map)
 	AM_RANGE( 0x000000, 0x000fff )  AM_ROM                            /* bios */
 	AM_RANGE( 0x001000, 0x001fff )  AM_RAM AM_SHARE("p_ram")          /* VRAM/RAM */
 	AM_RANGE( 0x002000, 0x0020ff )  AM_READWRITE(hwreg_r, hwreg_w)    /* hardware registers */
@@ -524,7 +526,7 @@ WRITE8_MEMBER(pokemini_state::hwreg_w)
 	static const int timer_to_cycles_fast[8] = { 2, 8, 32, 64, 128, 256, 1024, 4096 };
 	static const int timer_to_cycles_slow[8] = { 128, 256, 512, 1024, 2048, 4096, 8192, 16384 };
 
-	//logerror( "%0X: Write to hardware address: %02X, %02X\n", space.device() .safe_pc( ), offset, data );
+	//logerror( "%0X: Write to hardware address: %02X, %02X\n", m_maincpu->pc(), offset, data );
 
 	switch( offset )
 	{
@@ -1753,7 +1755,7 @@ uint32_t pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-static MACHINE_CONFIG_START( pokemini )
+MACHINE_CONFIG_START(pokemini_state::pokemini)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MINX, 4000000)
 	MCFG_CPU_PROGRAM_MAP(pokemini_mem_map)

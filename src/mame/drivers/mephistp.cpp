@@ -27,10 +27,10 @@ class mephisto_pinball_state : public driver_device
 {
 public:
 	mephisto_pinball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_aysnd(*this, "aysnd"),
-			m_soundbank(*this, "soundbank")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_aysnd(*this, "aysnd")
+		, m_soundbank(*this, "soundbank")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(shift_load_w);
@@ -41,24 +41,21 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_inputs_r);
 	DECLARE_WRITE8_MEMBER(sound_rombank_w);
 
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<ay8910_device> m_aysnd;
-	required_memory_bank m_soundbank;
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	// internal data
+	void mephisto(machine_config &config);
+	void mephisto_8051_io(address_map &map);
+	void mephisto_8051_map(address_map &map);
+	void mephisto_map(address_map &map);
+	void sport2k_8051_io(address_map &map);
+private:
 	u8 m_ay8910_data;
 	bool m_ay8910_bdir;
 	bool m_ay8910_bc1;
-
-private:
 	void ay8910_update();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
+	required_device<ay8910_device> m_aysnd;
+	required_memory_bank m_soundbank;
 };
 
 
@@ -106,7 +103,7 @@ WRITE8_MEMBER(mephisto_pinball_state::sound_rombank_w)
 	m_soundbank->set_entry(data & 0xf);
 }
 
-static ADDRESS_MAP_START( mephisto_map, AS_PROGRAM, 8, mephisto_pinball_state )
+ADDRESS_MAP_START(mephisto_pinball_state::mephisto_map)
 	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_MIRROR(0x08000) AM_REGION("maincpu", 0)
 	AM_RANGE(0x10000, 0x107ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x12000, 0x1201f) AM_NOP //AM_DEVREADWRITE("muart", i8256_device, read, write)
@@ -119,24 +116,19 @@ static ADDRESS_MAP_START( mephisto_map, AS_PROGRAM, 8, mephisto_pinball_state )
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mephisto_8051_map, AS_PROGRAM, 8, mephisto_pinball_state )
+ADDRESS_MAP_START(mephisto_pinball_state::mephisto_8051_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mephisto_8051_io, AS_IO, 8, mephisto_pinball_state )
+ADDRESS_MAP_START(mephisto_pinball_state::mephisto_8051_io)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(sound_rombank_w)
 	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("dac", dac08_device, write)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_NOP // AD0-AD7
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(ay8910_read, ay8910_write)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITENOP // A8-A15
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE(t0_t1_w)
-	AM_RANGE(MCS51_PORT_TX, MCS51_PORT_TX) AM_READNOP // from MUART
 ADDRESS_MAP_END
 
 #ifdef UNUSED_DEFINITION
-static ADDRESS_MAP_START( sport2k_8051_io, AS_IO, 8, mephisto_pinball_state )
+ADDRESS_MAP_START(mephisto_pinball_state::sport2k_8051_io)
 	AM_IMPORT_FROM(mephisto_8051_data)
 	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 ADDRESS_MAP_END
@@ -162,31 +154,35 @@ void mephisto_pinball_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( mephisto )
+MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_18MHz/3)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(18'000'000)/3)
 	MCFG_CPU_PROGRAM_MAP(mephisto_map)
 	//MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("muart", i8256_device, inta_cb)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	//MCFG_DEVICE_ADD("muart", I8256, XTAL_18MHz/3)
+	//MCFG_DEVICE_ADD("muart", I8256, XTAL(18'000'000)/3)
 	//MCFG_I8256_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	//MCFG_I8256_TXD_HANDLER(INPUTLINE("audiocpu", MCS51_RX_LINE))
 
-	MCFG_DEVICE_ADD("ic20", I8155, XTAL_18MHz/6)
+	MCFG_DEVICE_ADD("ic20", I8155, XTAL(18'000'000)/6)
 	//MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("muart", i8256_device, write_txc))
 
-	MCFG_DEVICE_ADD("ic9", I8155, XTAL_18MHz/6)
+	MCFG_DEVICE_ADD("ic9", I8155, XTAL(18'000'000)/6)
 	//MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(mephisto_pinball_state, clk_shift_w))
 
-	MCFG_CPU_ADD("soundcpu", I8051, XTAL_12MHz)
-	MCFG_CPU_PROGRAM_MAP(mephisto_8051_map)
+	MCFG_CPU_ADD("soundcpu", I8051, XTAL(12'000'000))
+	MCFG_CPU_PROGRAM_MAP(mephisto_8051_map) // EA tied high for external program ROM
 	MCFG_CPU_IO_MAP(mephisto_8051_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(mephisto_pinball_state, ay8910_read))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(mephisto_pinball_state, ay8910_write))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(mephisto_pinball_state, t0_t1_w))
+	MCFG_MCS51_SERIAL_RX_CB(NOOP) // from MUART
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(12'000'000)/8)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(mephisto_pinball_state, ay8910_columns_w))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(mephisto_pinball_state, ay8910_inputs_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
@@ -198,11 +194,12 @@ static MACHINE_CONFIG_START( mephisto )
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_DEFINITION
-static MACHINE_CONFIG_DERIVED(sport2k, mephisto)
+static MACHINE_CONFIG_START(sport2k)
+	mephisto(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sport2k_8051_io)
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_14_31818MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 #endif

@@ -4,6 +4,7 @@
 #include "machine/taito68705interface.h"
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/msm5205.h"
 
 class renegade_state : public driver_device
@@ -73,4 +74,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void renegade(machine_config &config);
+	void kuniokunb(machine_config &config);
+	void renegade_map(address_map &map);
+	void renegade_nomcu_map(address_map &map);
+	void renegade_sound_map(address_map &map);
 };

@@ -132,9 +132,9 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_20MHz
-#define SOUND_CLOCK         XTAL_14_31818MHz
-#define VIDEO_CLOCK         XTAL_32MHz
+#define MASTER_CLOCK        XTAL(20'000'000)
+#define SOUND_CLOCK         XTAL(14'318'181)
+#define VIDEO_CLOCK         XTAL(32'000'000)
 
 
 
@@ -296,7 +296,7 @@ WRITE16_MEMBER(atarisy2_state::bankselect_w)
 	};*/
 
 	int banknumber = ((data >> 10) & 0x3f) ^ 0x03;
-	banknumber = BITSWAP16(banknumber, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 1, 0, 3, 2);
+	banknumber = bitswap<16>(banknumber, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 1, 0, 3, 2);
 
 	if (offset)
 		m_rombank2->set_entry(banknumber);
@@ -753,9 +753,9 @@ WRITE8_MEMBER(atarisy2_state::coincount_w)
  *************************************/
 
 /* full memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy2_state )
+ADDRESS_MAP_START(atarisy2_state::main_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x11ff) AM_MIRROR(0x0200) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1000, 0x11ff) AM_MIRROR(0x0200) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x1400, 0x1403) AM_MIRROR(0x007c) AM_READWRITE(adc_r, bankselect_w)
 	AM_RANGE(0x1480, 0x1487) AM_MIRROR(0x0078) AM_WRITE(adc_strobe_w)
 	AM_RANGE(0x1580, 0x1581) AM_MIRROR(0x001e) AM_WRITE(int0_ack_w)
@@ -771,8 +771,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy2_state )
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(videoram_r, videoram_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("rombank1")
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank2")
-	AM_RANGE(0x8000, 0x81ff) AM_READWRITE(slapstic_r, slapstic_w) AM_SHARE("slapstic_base")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x8000, 0x81ff) AM_READWRITE(slapstic_r, slapstic_w) AM_SHARE("slapstic_base")
 ADDRESS_MAP_END
 
 
@@ -784,7 +784,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* full memory map derived from schematics */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, atarisy2_state )
+ADDRESS_MAP_START(atarisy2_state::sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0x2000) AM_DEVREADWRITE("eeprom", eeprom_parallel_28xx_device, read, write)
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x2780) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
@@ -1185,7 +1185,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarisy2 )
+MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", T11, MASTER_CLOCK/2)
@@ -1195,7 +1195,7 @@ static MACHINE_CONFIG_START( atarisy2 )
 
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)MASTER_CLOCK/2/16/16/16/10)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, MASTER_CLOCK/2/16/16/16/10)
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
@@ -1224,7 +1224,7 @@ static MACHINE_CONFIG_START( atarisy2 )
 	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarisy2_state, sound_int_write_line))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
@@ -1244,12 +1244,14 @@ static MACHINE_CONFIG_START( atarisy2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( paperboy, atarisy2 )
+MACHINE_CONFIG_START(atarisy2_state::paperboy)
+	atarisy2(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 105)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( 720, atarisy2 )
+MACHINE_CONFIG_START(atarisy2_state::_720)
+	atarisy2(config);
 	/* without the default EEPROM, 720 hangs at startup due to communication
 	   issues with the sound CPU; temporarily increasing the sound CPU frequency
 	   to ~2.2MHz "fixes" the problem */
@@ -1258,7 +1260,8 @@ static MACHINE_CONFIG_DERIVED( 720, atarisy2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ssprint, atarisy2 )
+MACHINE_CONFIG_START(atarisy2_state::ssprint)
+	atarisy2(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 108)
 
 	/* sound hardware */
@@ -1266,7 +1269,8 @@ static MACHINE_CONFIG_DERIVED( ssprint, atarisy2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( csprint, atarisy2 )
+MACHINE_CONFIG_START(atarisy2_state::csprint)
+	atarisy2(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 109)
 
 	/* sound hardware */
@@ -1274,7 +1278,8 @@ static MACHINE_CONFIG_DERIVED( csprint, atarisy2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( apb, atarisy2 )
+MACHINE_CONFIG_START(atarisy2_state::apb)
+	atarisy2(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 110)
 MACHINE_CONFIG_END
 
@@ -3236,12 +3241,12 @@ GAME( 1984, paperboy, 0,         paperboy, paperboy, atarisy2_state, paperboy,  
 GAME( 1984, paperboyr2,paperboy, paperboy, paperboy, atarisy2_state, paperboy,  ROT0,   "Atari Games", "Paperboy (rev 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, paperboyr1,paperboy, paperboy, paperboy, atarisy2_state, paperboy,  ROT0,   "Atari Games", "Paperboy (rev 1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, 720,      0,        720,      720,       atarisy2_state,  720,      ROT0,   "Atari Games", "720 Degrees (rev 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, 720r3,    720,      720,      720,       atarisy2_state,  720,      ROT0,   "Atari Games", "720 Degrees (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, 720r2,    720,      720,      720,       atarisy2_state,  720,      ROT0,   "Atari Games", "720 Degrees (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, 720r1,    720,      720,      720,       atarisy2_state,  720,      ROT0,   "Atari Games", "720 Degrees (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, 720g,     720,      720,      720,       atarisy2_state,  720,      ROT0,   "Atari Games", "720 Degrees (German, rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, 720gr1,   720,      720,      720,       atarisy2_state,  720,      ROT0,   "Atari Games", "720 Degrees (German, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, 720,      0,        _720,     720,       atarisy2_state,  720,      ROT0,   "Atari Games", "720 Degrees (rev 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, 720r3,    720,      _720,     720,       atarisy2_state,  720,      ROT0,   "Atari Games", "720 Degrees (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, 720r2,    720,      _720,     720,       atarisy2_state,  720,      ROT0,   "Atari Games", "720 Degrees (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, 720r1,    720,      _720,     720,       atarisy2_state,  720,      ROT0,   "Atari Games", "720 Degrees (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, 720g,     720,      _720,     720,       atarisy2_state,  720,      ROT0,   "Atari Games", "720 Degrees (German, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, 720gr1,   720,      _720,     720,       atarisy2_state,  720,      ROT0,   "Atari Games", "720 Degrees (German, rev 1)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, ssprint,  0,        ssprint,  ssprint,   atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (rev 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ssprint3, ssprint,  ssprint,  ssprint,   atarisy2_state,  ssprint,  ROT0,   "Atari Games", "Super Sprint (rev 3)", MACHINE_SUPPORTS_SAVE )

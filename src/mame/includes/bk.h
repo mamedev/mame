@@ -6,8 +6,9 @@
  *
  ****************************************************************************/
 
-#ifndef BK_H_
-#define BK_H_
+#ifndef MAME_INCLUDES_BK_H
+#define MAME_INCLUDES_BK_H
+
 #include "imagedev/cassette.h"
 
 class bk_state : public driver_device
@@ -46,6 +47,10 @@ public:
 	IRQ_CALLBACK_MEMBER(bk0010_irq_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	void bk0010(machine_config &config);
+	void bk0010fd(machine_config &config);
+	void bk0010_mem(address_map &map);
+	void bk0010fd_mem(address_map &map);
 };
 
-#endif /* BK_H_ */
+#endif // MAME_INCLUDES_BK_H

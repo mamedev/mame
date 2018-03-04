@@ -304,6 +304,8 @@ Notes & Todo:
 #include "screen.h"
 #include "speaker.h"
 
+#include "playch10.lh"
+
 
 /******************************************************************************/
 
@@ -339,19 +341,16 @@ WRITE8_MEMBER(playch10_state::sprite_dma_w)
 
 WRITE8_MEMBER(playch10_state::time_w)
 {
-	if(data == 0xf)
-		data = 0;
+	constexpr static uint8_t DIGIT_MAP[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-	m_timedata[offset] = data;
-
-	popmessage("Time: %d%d%d%d",m_timedata[3],m_timedata[2],m_timedata[1],m_timedata[0]);
+	m_timedigits[offset] = DIGIT_MAP[data & 0x0f];
 }
 
 
 /******************************************************************************/
 
 /* BIOS */
-static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, playch10_state )
+ADDRESS_MAP_START(playch10_state::bios_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM // 8V
 	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(ram_8w_r, ram_8w_w) AM_SHARE("ram_8w")    // 8W
@@ -360,7 +359,7 @@ static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, playch10_state )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(pc10_prot_r, pc10_prot_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, playch10_state )
+ADDRESS_MAP_START(playch10_state::bios_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("BIOS")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SW1")
@@ -368,10 +367,10 @@ static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, playch10_state )
 	AM_RANGE(0x03, 0x03) AM_READ(pc10_detectclr_r)
 	AM_RANGE(0x00, 0x07) AM_DEVWRITE("outlatch1", ls259_device, write_d0)
 	AM_RANGE(0x08, 0x0f) AM_DEVWRITE("outlatch2", ls259_device, write_d0)
-	AM_RANGE(0x10, 0x13) AM_WRITE(time_w) AM_SHARE("timedata")
+	AM_RANGE(0x10, 0x13) AM_WRITE(time_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8, playch10_state )
+ADDRESS_MAP_START(playch10_state::cart_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_SHARE("work_ram")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
@@ -640,7 +639,7 @@ INTERRUPT_GEN_MEMBER(playch10_state::playch10_interrupt){
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( playch10 )
+MACHINE_CONFIG_START(playch10_state::playch10)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 8000000/2) // 4 MHz
 	MCFG_CPU_PROGRAM_MAP(bios_map)
@@ -669,7 +668,7 @@ static MACHINE_CONFIG_START( playch10 )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", playch10)
 	MCFG_PALETTE_ADD("palette", 256+8*4*16)
 	MCFG_PALETTE_INIT_OWNER(playch10_state, playch10)
-	MCFG_DEFAULT_LAYOUT(layout_dualhuov)
+	MCFG_DEFAULT_LAYOUT(layout_playch10)
 
 	MCFG_SCREEN_ADD("top", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -696,11 +695,13 @@ static MACHINE_CONFIG_START( playch10 )
 	MCFG_RP5H01_ADD("rp5h01")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( playchnv, playch10 )
+MACHINE_CONFIG_START(playch10_state::playchnv)
+	playch10(config);
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( playch10_hboard, playch10 )
+MACHINE_CONFIG_START(playch10_state::playch10_hboard)
+	playch10(config);
 	MCFG_VIDEO_START_OVERRIDE(playch10_state,playch10_hboard)
 	MCFG_MACHINE_START_OVERRIDE(playch10_state,playch10_hboard)
 MACHINE_CONFIG_END
@@ -1677,7 +1678,7 @@ DRIVER_INIT_MEMBER(playch10_state,virus)
 	uint32_t len = memregion("rp5h01")->bytes();
 	for (int i = 0; i < len; i++)
 	{
-		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 		ROM[i] ^= 0xff;
 	}
 
@@ -1691,7 +1692,7 @@ DRIVER_INIT_MEMBER(playch10_state,ttoon)
 	uint32_t len = memregion("rp5h01")->bytes();
 	for (int i = 0; i < len; i++)
 	{
-		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 		ROM[i] ^= 0xff;
 	}
 

@@ -79,7 +79,7 @@ WRITE_LINE_MEMBER(sbasketb_state::irq_mask_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( sbasketb_map, AS_PROGRAM, 8, sbasketb_state )
+ADDRESS_MAP_START(sbasketb_state::sbasketb_map)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(sbasketb_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(sbasketb_videoram_w) AM_SHARE("videoram")
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( sbasketb_map, AS_PROGRAM, 8, sbasketb_state )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sbasketb_sound_map, AS_PROGRAM, 8, sbasketb_state )
+ADDRESS_MAP_START(sbasketb_state::sbasketb_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -192,14 +192,14 @@ INTERRUPT_GEN_MEMBER(sbasketb_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( sbasketb )
+MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 1400000)        /* 1.400 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sbasketb_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4) /* 3.5795 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181) / 4) /* 3.5795 MHz */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_sound_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3
@@ -238,16 +238,17 @@ static MACHINE_CONFIG_START( sbasketb )
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("snsnd", SN76489, XTAL_14_31818MHz / 8)
+	MCFG_SOUND_ADD("snsnd", SN76489, XTAL(14'318'181) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* Schematics say 3.58MHz, but board uses 3.579545MHz xtal */
+	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545)) /* Schematics say 3.58MHz, but board uses 3.579545MHz xtal */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sbasketbu, sbasketb)
+MACHINE_CONFIG_START(sbasketb_state::sbasketbu)
+	sbasketb(config);
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", M6809, 1400000)        /* 1.400 MHz ??? */
+	MCFG_CPU_ADD("maincpu", MC6809E, 1400000)        /* 6809E at 1.400 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sbasketb_state,  vblank_irq)
 MACHINE_CONFIG_END

@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(ZACCARIA_1B11142, zac1b11142_audio_device, "zac1b11142", "Zac
     base melody/SFX generator CPU map
     1B11107 and 1B11142 both have a 6802 with internal RAM and a PIA accessed at 0x500c
 */
-static ADDRESS_MAP_START(zac1b111xx_melody_base_map, AS_PROGRAM, 8, zac1b111xx_melody_base)
+ADDRESS_MAP_START(zac1b111xx_melody_base::zac1b111xx_melody_base_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM // 6802 internal RAM
 	AM_RANGE(0x400c, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("melodypia", pia6821_device, read, write)
@@ -60,7 +60,7 @@ ADDRESS_MAP_END
     * PB0 and PB1 connect to the BC1 and BDIR pins of the AY chip at 1H
     * PB2 and PB3 connect to the BC1 and BDIR pins of the AY chip at 1I
 */
-static ADDRESS_MAP_START(zac1b11107_melody_map, AS_PROGRAM, 8, zac1b11107_audio_device)
+ADDRESS_MAP_START(zac1b11107_audio_device::zac1b11107_melody_map)
 	AM_IMPORT_FROM(zac1b111xx_melody_base_map)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM // ROM @ 1F
 	AM_RANGE(0xe000, 0xffff) AM_ROM // ROM @ 1D, 1E
@@ -95,7 +95,7 @@ ADDRESS_MAP_END
     * PB0 and PB1 connect to the BC1 and BDIR pins of the AY chip at 4G
     * PB2 and PB3 connect to the BC1 and BDIR pins of the AY chip at 4H
 */
-static ADDRESS_MAP_START(zac1b11142_melody_map, AS_PROGRAM, 8, zac1b11142_audio_device)
+ADDRESS_MAP_START(zac1b11142_audio_device::zac1b11142_melody_map)
 	AM_IMPORT_FROM(zac1b111xx_melody_base_map)
 	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x2000) AM_ROM // ROM 13
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM // ROM 9
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
    CA1 and CB2 are not connected, though the test mode assumes there's something connected to CB2 (possibly another LED like the one connected to PB4)
    PB3 connects to 'ACS' which goes to the Z80
 */
-static ADDRESS_MAP_START(zac1b11142_audio_map, AS_PROGRAM, 8, zac1b11142_audio_device)
+ADDRESS_MAP_START(zac1b11142_audio_device::zac1b11142_audio_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM // 6802 internal RAM
 	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x8f6c) AM_DEVREADWRITE("pia_1i", pia6821_device, read, write)
@@ -218,11 +218,11 @@ READ8_MEMBER(zac1b111xx_melody_base::melodypsg1_portb_r)
 	return m_melody_command;
 }
 
-MACHINE_CONFIG_MEMBER(zac1b111xx_melody_base::device_add_mconfig)
-	MCFG_CPU_ADD("melodycpu", M6802, XTAL_3_579545MHz) // verified on pcb
+MACHINE_CONFIG_START(zac1b111xx_melody_base::device_add_mconfig)
+	MCFG_CPU_ADD("melodycpu", M6802, XTAL(3'579'545)) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(zac1b111xx_melody_base_map)
 
-	MCFG_DEVICE_ADD("timebase", CLOCK, XTAL_3_579545MHz/4096/2) // CPU clock divided using 4040 and half of 74LS74
+	MCFG_DEVICE_ADD("timebase", CLOCK, XTAL(3'579'545)/4096/2) // CPU clock divided using 4040 and half of 74LS74
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("melodypia", pia6821_device, cb1_w))
 
 	MCFG_DEVICE_ADD("melodypia", PIA6821, 0)
@@ -232,10 +232,10 @@ MACHINE_CONFIG_MEMBER(zac1b111xx_melody_base::device_add_mconfig)
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("melodycpu", INPUT_LINE_NMI))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("melodycpu", M6802_IRQ_LINE))
 
-	MCFG_SOUND_ADD("melodypsg1", AY8910, XTAL_3_579545MHz/2) // CPU clock divided using 4040
+	MCFG_SOUND_ADD("melodypsg1", AY8910, XTAL(3'579'545)/2) // CPU clock divided using 4040
 	MCFG_AY8910_PORT_B_READ_CB(READ8(zac1b111xx_melody_base, melodypsg1_portb_r))
 
-	MCFG_SOUND_ADD("melodypsg2", AY8910, XTAL_3_579545MHz/2) // CPU clock divided using 4040
+	MCFG_SOUND_ADD("melodypsg2", AY8910, XTAL(3'579'545)/2) // CPU clock divided using 4040
 MACHINE_CONFIG_END
 
 void zac1b111xx_melody_base::device_start()
@@ -297,7 +297,7 @@ WRITE8_MEMBER(zac1b11107_audio_device::melodypsg2_porta_w)
 	// TODO: assume LEVELT is controlled here as is the case for 1B11142?
 }
 
-MACHINE_CONFIG_MEMBER(zac1b11107_audio_device::device_add_mconfig)
+MACHINE_CONFIG_START(zac1b11107_audio_device::device_add_mconfig)
 	zac1b111xx_melody_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY("melodycpu")
@@ -400,7 +400,7 @@ WRITE8_MEMBER(zac1b11142_audio_device::pia_1i_portb_w)
 	// TODO: a LED output().set_led_value(0, BIT(data, 4));
 }
 
-MACHINE_CONFIG_MEMBER(zac1b11142_audio_device::device_add_mconfig)
+MACHINE_CONFIG_START(zac1b11142_audio_device::device_add_mconfig)
 	zac1b111xx_melody_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY("melodycpu")
@@ -419,7 +419,7 @@ MACHINE_CONFIG_MEMBER(zac1b11142_audio_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE_EX(1, "sound_nl", 1.0, 4)
 	MCFG_SOUND_ROUTE_EX(2, "sound_nl", 1.0, 5)
 
-	MCFG_CPU_ADD("audiocpu", M6802, XTAL_3_579545MHz) // verified on pcb
+	MCFG_CPU_ADD("audiocpu", M6802, XTAL(3'579'545)) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(zac1b11142_audio_map)
 
 	MCFG_DEVICE_ADD("pia_1i", PIA6821, 0)

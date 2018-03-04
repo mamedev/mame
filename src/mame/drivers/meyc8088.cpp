@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Roberto Fresca
+// thanks-to:Darrell Hal Smith, Kevin Mullins
 /****************************************************************
 
   Meyco 8088 based hardware
@@ -8,10 +9,6 @@
   3 x 8KB EPROM (max 4), 3 x 8KB RAM (max 4), 2KB battery RAM,
   2 x i8155, optional i8251A + RS232 for factory debug
 
-  driver by MAME team
-  also thanks to Darrell Hal Smith, Kevin Mullins
-
-
   To initialize battery RAM, go into Meter Read mode (F1 -> 9),
   and then press the Meter Read + Reset buttons (9 + 0).
 
@@ -19,9 +16,9 @@
   in mid-game, it may run faulty on the next boot.
   Enable the Night Switch to prevent this.
 
-
   TODO:
   - coincounters/hopper
+  - correct CPU speed (currently underclocked)
 
 ****************************************************************/
 
@@ -29,6 +26,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/i8155.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/resnet.h"
@@ -73,6 +71,8 @@ public:
 	uint32_t screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_meyc8088);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
+	void meyc8088(machine_config &config);
+	void meyc8088_map(address_map &map);
 };
 
 
@@ -162,8 +162,9 @@ uint32_t meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_in
 
 WRITE_LINE_MEMBER(meyc8088_state::screen_vblank_meyc8088)
 {
-	// INTR on LC255 (pulses at start and end of vblank), INTA hardwired to $20
-	generic_pulse_irq_line_and_vector(*m_maincpu, 0, 0x20, 1);
+	// LC255(200ns pulse) rising edge asserts INTR at start and end of vblank
+	// INTA wired back to INTR to clear it, vector is hardwired to $20
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x20);
 }
 
 
@@ -213,7 +214,7 @@ WRITE8_MEMBER(meyc8088_state::video5_flip_w)
 }
 
 
-static ADDRESS_MAP_START( meyc8088_map, AS_PROGRAM, 8, meyc8088_state )
+ADDRESS_MAP_START(meyc8088_state::meyc8088_map)
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xb0000, 0xb00ff) AM_DEVREADWRITE("i8155_2", i8155_device, memory_r, memory_w)
@@ -345,20 +346,20 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( meyc8088 )
+MACHINE_CONFIG_START(meyc8088_state::meyc8088)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, (XTAL_15MHz / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
+	MCFG_CPU_ADD("maincpu", I8088, (XTAL(15'000'000) / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
 	MCFG_CPU_PROGRAM_MAP(meyc8088_map)
 
-	MCFG_DEVICE_ADD("i8155_1", I8155, XTAL_15MHz / (3*1))
+	MCFG_DEVICE_ADD("i8155_1", I8155, XTAL(15'000'000) / (3*1))
 	// all ports set to input
 	MCFG_I8155_IN_PORTA_CB(READ8(meyc8088_state, meyc8088_input_r))
 	MCFG_I8155_IN_PORTB_CB(IOPORT("SW"))
 	MCFG_I8155_IN_PORTC_CB(READ8(meyc8088_state, meyc8088_status_r))
 	// i8251A trigger txc/rxc (debug related, unpopulated on sold boards)
 
-	MCFG_DEVICE_ADD("i8155_2", I8155, XTAL_15MHz / (3*32))
+	MCFG_DEVICE_ADD("i8155_2", I8155, XTAL(15'000'000) / (3*32))
 	// all ports set to output
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(meyc8088_state, meyc8088_lights2_w))
 	MCFG_I8155_OUT_PORTB_CB(WRITE8(meyc8088_state, meyc8088_lights1_w))
@@ -371,7 +372,7 @@ static MACHINE_CONFIG_START( meyc8088 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_15MHz/3, 320, 0, 256, 261, 0, 224)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000)/3, 320, 0, 256, 261, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(meyc8088_state, screen_update_meyc8088)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meyc8088_state, screen_vblank_meyc8088))
 	MCFG_SCREEN_PALETTE("palette")

@@ -121,11 +121,15 @@ enum
 
 struct tiny_rom_entry
 {
-	const char *name;
-	const char *hashdata;
-	u32 offset;
-	u32 length;
-	u32 flags;
+	char const *name;
+	char const *hashdata;
+	u32         offset;
+	u32         length;
+	u32         flags;
+
+	constexpr u32 get_offset() const { return offset; }
+	constexpr u32 get_length() const { return length; }
+	constexpr u32 get_flags() const { return flags; }
 };
 
 
@@ -142,11 +146,11 @@ public:
 	rom_entry &operator=(rom_entry &&) = default;
 
 	// accessors
-	const std::string &name() const { return m_name; }
-	const std::string &hashdata() const { return m_hashdata; }
-	u32 offset() const { return m_offset; }
-	u32 length() const { return m_length; }
-	u32 flags() const { return m_flags; }
+	std::string const &name() const { return m_name; }
+	std::string const &hashdata() const { return m_hashdata; }
+	u32 get_offset() const { return m_offset; }
+	u32 get_length() const { return m_length; }
+	u32 get_flags() const { return m_flags; }
 	void set_flags(u32 flags) { m_flags = flags; }
 
 private:

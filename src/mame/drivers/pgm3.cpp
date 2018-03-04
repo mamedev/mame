@@ -67,9 +67,11 @@ public:
 	uint32_t screen_update_pgm3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm3);
 	required_device<cpu_device> m_maincpu;
+	void pgm3(machine_config &config);
+	void pgm3_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( pgm3_map, AS_PROGRAM, 32, pgm3_state )
+ADDRESS_MAP_START(pgm3_state::pgm3_map)
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -97,7 +99,7 @@ void pgm3_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( pgm3 )
+MACHINE_CONFIG_START(pgm3_state::pgm3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM9, 800000000) // wrong, see notes at top of driver

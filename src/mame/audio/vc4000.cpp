@@ -11,7 +11,7 @@
 #include "vc4000.h"
 
 
-DEFINE_DEVICE_TYPE(VC4000_SND, vc4000_sound_device, "vc4000_sound", "Interton Electronic VC 4000 Audio Custom")
+DEFINE_DEVICE_TYPE(VC4000_SND, vc4000_sound_device, "vc4000_sound", "Interton Electronic VC 4000 Custom Sound")
 
 vc4000_sound_device::vc4000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VC4000_SND, tag, owner, clock)

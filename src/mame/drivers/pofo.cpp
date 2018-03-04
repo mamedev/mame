@@ -39,6 +39,7 @@
 #include "bus/pofo/exp.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/pcd3311.h"
 #include "video/hd61830.h"
 
@@ -89,21 +90,15 @@ public:
 		m_keylatch(0xff)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<hd61830_device> m_lcdc;
-	required_device<pcd3311_device> m_dtmf;
-	required_device<portfolio_memory_card_slot_device> m_ccm;
-	required_device<portfolio_expansion_slot_device> m_exp;
-	required_device<timer_device> m_timer_tick;
-	required_device<nvram_device> m_nvram;
-	required_device<ram_device> m_ram;
-	required_region_ptr<uint8_t> m_rom;
-	required_region_ptr<uint8_t> m_char_rom;
-	required_ioport_array<8> m_y;
-	required_ioport m_battery;
+	void portfolio(machine_config &config);
 
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	void portfolio_io(address_map &map);
+	void portfolio_lcdc(address_map &map);
+	void portfolio_mem(address_map &map);
 
 	void check_interrupt();
 	void trigger_interrupt(int level);
@@ -146,18 +141,32 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( eint_w );
 	DECLARE_WRITE_LINE_MEMBER( wake_w );
 
-	uint8_t m_ip;
-	uint8_t m_ie;
-	uint16_t m_counter;
-	uint8_t m_keylatch;
-	int m_rom_b;
-
 	DECLARE_PALETTE_INIT(portfolio);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);
 	DECLARE_READ8_MEMBER(hd61830_rd_r);
 	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<hd61830_device> m_lcdc;
+	required_device<pcd3311_device> m_dtmf;
+	required_device<portfolio_memory_card_slot_device> m_ccm;
+	required_device<portfolio_expansion_slot_device> m_exp;
+	required_device<timer_device> m_timer_tick;
+	required_device<nvram_device> m_nvram;
+	required_device<ram_device> m_ram;
+	required_region_ptr<uint8_t> m_rom;
+	required_region_ptr<uint8_t> m_char_rom;
+	required_ioport_array<8> m_y;
+	required_ioport m_battery;
+
+	uint8_t m_ip;
+	uint8_t m_ie;
+	uint16_t m_counter;
+	uint8_t m_keylatch;
+	int m_rom_b;
 };
 
 
@@ -772,7 +781,7 @@ WRITE8_MEMBER( portfolio_state::io_w )
 //  ADDRESS_MAP( portfolio_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( portfolio_mem, AS_PROGRAM, 8, portfolio_state )
+ADDRESS_MAP_START(portfolio_state::portfolio_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mem_r, mem_w)
 ADDRESS_MAP_END
 
@@ -781,7 +790,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( portfolio_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( portfolio_io, AS_IO, 8, portfolio_state )
+ADDRESS_MAP_START(portfolio_state::portfolio_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
 
@@ -790,7 +799,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( portfolio_lcdc )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( portfolio_lcdc, 0, 8, portfolio_state )
+ADDRESS_MAP_START(portfolio_state::portfolio_lcdc)
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 ADDRESS_MAP_END
@@ -1004,9 +1013,9 @@ void portfolio_state::machine_reset()
 //  MACHINE_CONFIG( portfolio )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( portfolio )
+MACHINE_CONFIG_START(portfolio_state::portfolio)
 	// basic machine hardware
-	MCFG_CPU_ADD(M80C88A_TAG, I8088, XTAL_4_9152MHz)
+	MCFG_CPU_ADD(M80C88A_TAG, I8088, XTAL(4'915'200))
 	MCFG_CPU_PROGRAM_MAP(portfolio_mem)
 	MCFG_CPU_IO_MAP(portfolio_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(portfolio_state,portfolio_int_ack)
@@ -1026,26 +1035,26 @@ static MACHINE_CONFIG_START( portfolio )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", portfolio)
 
-	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL_4_9152MHz/2/2)
+	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL(4'915'200)/2/2)
 	MCFG_DEVICE_ADDRESS_MAP(0, portfolio_lcdc)
 	MCFG_HD61830_RD_CALLBACK(READ8(portfolio_state, hd61830_rd_r))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(PCD3311T_TAG, PCD3311, XTAL_3_57864MHz)
+	MCFG_SOUND_ADD(PCD3311T_TAG, PCD3311, XTAL(3'578'640))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_PORTFOLIO_MEMORY_CARD_SLOT_ADD(PORTFOLIO_MEMORY_CARD_SLOT_A_TAG, portfolio_memory_cards, nullptr)
 
-	MCFG_PORTFOLIO_EXPANSION_SLOT_ADD(PORTFOLIO_EXPANSION_SLOT_TAG, XTAL_4_9152MHz, portfolio_expansion_cards, nullptr)
+	MCFG_PORTFOLIO_EXPANSION_SLOT_ADD(PORTFOLIO_EXPANSION_SLOT_TAG, XTAL(4'915'200), portfolio_expansion_cards, nullptr)
 	MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(WRITELINE(portfolio_state, eint_w))
 	MCFG_PORTFOLIO_EXPANSION_SLOT_NMIO_CALLBACK(INPUTLINE(M80C88A_TAG, INPUT_LINE_NMI))
 	MCFG_PORTFOLIO_EXPANSION_SLOT_WAKE_CALLBACK(WRITELINE(portfolio_state, wake_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("counter", portfolio_state, counter_tick, attotime::from_hz(XTAL_32_768kHz/16384))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_TICK_TAG, portfolio_state, system_tick, attotime::from_hz(XTAL_32_768kHz/32768))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("counter", portfolio_state, counter_tick, attotime::from_hz(XTAL(32'768)/16384))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_TICK_TAG, portfolio_state, system_tick, attotime::from_hz(XTAL(32'768)/32768))
 
 	// fake keyboard
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", portfolio_state, keyboard_tick, attotime::from_usec(2500))

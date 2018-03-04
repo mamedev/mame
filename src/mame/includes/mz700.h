@@ -16,6 +16,7 @@
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "sound/spkrdev.h"
 
@@ -79,6 +80,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 
+	void mz800(machine_config &config);
+	void mz700(machine_config &config);
+	void mz700_banke(address_map &map);
+	void mz700_io(address_map &map);
+	void mz700_mem(address_map &map);
+	void mz800_bankf(address_map &map);
+	void mz800_io(address_map &map);
+	void mz800_mem(address_map &map);
 private:
 	int m_mz700;                /* 1 if running on an mz700 */
 

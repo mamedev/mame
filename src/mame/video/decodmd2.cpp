@@ -4,7 +4,7 @@
  *   Data East Pinball Dot Matrix Display
  *
  *    Type 2: 128x32
- *    68B09E @ 8MHz
+ *    68B09E @ 2MHz
  *    68B45 CRTC
  */
 
@@ -118,7 +118,7 @@ MC6845_UPDATE_ROW( decodmd_type2_device::crtc_update_row )
 	}
 }
 
-static ADDRESS_MAP_START( decodmd2_map, AS_PROGRAM, 8, decodmd_type2_device )
+ADDRESS_MAP_START(decodmd_type2_device::decodmd2_map)
 	AM_RANGE(0x0000, 0x2fff) AM_RAMBANK("dmdram")
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(crtc_status_r,crtc_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(crtc_register_w)
@@ -128,16 +128,16 @@ static ADDRESS_MAP_START( decodmd2_map, AS_PROGRAM, 8, decodmd_type2_device )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("dmdbank2") // last 32k of ROM
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER( decodmd_type2_device::device_add_mconfig )
+MACHINE_CONFIG_START(decodmd_type2_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dmdcpu", M6809E, XTAL_8MHz)
+	MCFG_CPU_ADD("dmdcpu", MC6809E, XTAL(8'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(decodmd2_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq_timer", decodmd_type2_device, dmd_firq, attotime::from_hz(80))
 
-	MCFG_MC6845_ADD("dmd6845", MC6845, nullptr, XTAL_8MHz / 8)  // TODO: confirm clock speed
+	MCFG_MC6845_ADD("dmd6845", MC6845, nullptr, XTAL(8'000'000) / 8)  // TODO: confirm clock speed
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(decodmd_type2_device, crtc_update_row)
@@ -186,10 +186,4 @@ void decodmd_type2_device::device_reset()
 	m_rombank2->set_entry(0);
 	m_rambank->set_entry(0);
 	m_busy = false;
-}
-
-void decodmd_type2_device::static_set_gfxregion(device_t &device, const char *tag)
-{
-	decodmd_type2_device &cpuboard = downcast<decodmd_type2_device &>(device);
-	cpuboard.m_gfxtag = tag;
 }

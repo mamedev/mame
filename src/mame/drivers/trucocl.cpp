@@ -92,7 +92,7 @@ WRITE8_MEMBER(trucocl_state::audio_dac_w)
 	m_dac_irq_timer->adjust(attotime::from_hz( 16000 ));
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trucocl_state )
+ADDRESS_MAP_START(trucocl_state::main_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(trucocl_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(trucocl_colorram_w) AM_SHARE("colorram")
@@ -142,7 +142,7 @@ INTERRUPT_GEN_MEMBER(trucocl_state::trucocl_interrupt)
 
 }
 
-static MACHINE_CONFIG_START( trucocl )
+MACHINE_CONFIG_START(trucocl_state::trucocl)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)

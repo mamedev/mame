@@ -6,9 +6,6 @@
 #pragma once
 
 
-#define PSXCPU_DELAYR_PC ( 32 )
-#define PSXCPU_DELAYR_NOTPC ( 33 )
-
 #define PSXCPU_BYTE_EXTEND( a ) ( (int32_t)(int8_t)a )
 #define PSXCPU_WORD_EXTEND( a ) ( (int32_t)(int16_t)a )
 

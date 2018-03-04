@@ -115,6 +115,10 @@ public:
 
 	uint8_t m_gfx_rom_large;
 
+	void tunit_core(machine_config &config);
+	void tunit_adpcm(machine_config &config);
+	void tunit_dcs(machine_config &config);
+	void main_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

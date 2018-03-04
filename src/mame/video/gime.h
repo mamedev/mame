@@ -28,22 +28,22 @@
 #define MCFG_GIME_FSYNC_CALLBACK    MCFG_MC6847_FSYNC_CALLBACK
 
 #define MCFG_GIME_IRQ_CALLBACK(_write) \
-	devcb = &gime_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<gime_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_GIME_FIRQ_CALLBACK(_write) \
-	devcb = &gime_device::set_firq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<gime_device &>(*device).set_firq_wr_callback(DEVCB_##_write);
 
 #define MCFG_GIME_FLOATING_BUS_CALLBACK(_read) \
-	devcb = &gime_device::set_floating_bus_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<gime_device &>(*device).set_floating_bus_rd_callback(DEVCB_##_read);
 
 #define MCFG_GIME_MAINCPU(_tag) \
-	gime_device::set_maincpu_tag(*device, _tag);
+	downcast<gime_device &>(*device).set_maincpu_tag(_tag);
 
 #define MCFG_GIME_RAM(_tag) \
-	gime_device::set_ram_tag(*device, _tag);
+	downcast<gime_device &>(*device).set_ram_tag(_tag);
 
 #define MCFG_GIME_EXT(_tag) \
-	gime_device::set_ext_tag(*device, _tag);
+	downcast<gime_device &>(*device).set_ext_tag(_tag);
 
 
 //**************************************************************************
@@ -52,15 +52,15 @@
 
 class cococart_slot_device;
 
-class gime_device : public mc6847_friend_device, public sam6883_friend_device
+class gime_device : public mc6847_friend_device, public sam6883_friend_device_interface
 {
 public:
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<gime_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_firq_wr_callback(device_t &device, Object &&cb) { return downcast<gime_device &>(device).m_write_firq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_floating_bus_rd_callback(device_t &device, Object &&cb) { return downcast<gime_device &>(device).m_read_floating_bus.set_callback(std::forward<Object>(cb)); }
-	static void set_maincpu_tag(device_t &device, const char *tag) { downcast<gime_device &>(device).m_maincpu_tag = tag; }
-	static void set_ram_tag(device_t &device, const char *tag) { downcast<gime_device &>(device).m_ram_tag = tag; }
-	static void set_ext_tag(device_t &device, const char *tag) { downcast<gime_device &>(device).m_ext_tag = tag; }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_firq_wr_callback(Object &&cb) { return m_write_firq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_floating_bus_rd_callback(Object &&cb) { return m_read_floating_bus.set_callback(std::forward<Object>(cb)); }
+	void set_maincpu_tag(const char *tag) { m_maincpu_tag = tag; }
+	void set_ram_tag(const char *tag) { m_ram_tag = tag; }
+	void set_ext_tag(const char *tag) { m_ext_tag = tag; }
 
 	// read/write
 	DECLARE_READ8_MEMBER( read ) { return read(offset); }
@@ -196,12 +196,13 @@ private:
 	cococart_slot_device *      m_cart_device;
 	memory_bank *               m_read_banks[9];
 	memory_bank *               m_write_banks[9];
-	uint8_t *                     m_rom;
-	uint8_t *                     m_cart_rom;
+	uint8_t *                   m_rom;
+	uint8_t *                   m_cart_rom;
+	uint32_t                    m_cart_size;
 	pixel_t                     m_composite_palette[64];
 	pixel_t                     m_composite_bw_palette[64];
 	pixel_t                     m_rgb_palette[64];
-	uint8_t                       m_dummy_bank[0x2000];
+	uint8_t                     m_dummy_bank[0x2000];
 
 	const char *m_maincpu_tag;  /* tag of main CPU */
 	const char *m_ram_tag;      /* tag of RAM device */

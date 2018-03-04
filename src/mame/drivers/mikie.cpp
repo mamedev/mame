@@ -105,7 +105,7 @@ WRITE_LINE_MEMBER(mikie_state::irq_mask_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8, mikie_state )
+ADDRESS_MAP_START(mikie_state::mikie_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x2000, 0x2007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x2100, 0x2100) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8, mikie_state )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, mikie_state )
+ADDRESS_MAP_START(mikie_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITENOP    // sound command latch
@@ -256,10 +256,10 @@ INTERRUPT_GEN_MEMBER(mikie_state::vblank_irq)
 		device.execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( mikie )
+MACHINE_CONFIG_START(mikie_state::mikie)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, OSC/12) // 9A (surface scratched)
+	MCFG_CPU_ADD("maincpu", MC6809E, OSC/12) // 9A (surface scratched)
 	MCFG_CPU_PROGRAM_MAP(mikie_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mikie_state,  vblank_irq)
 

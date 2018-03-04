@@ -19,12 +19,12 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(primary_command_map, 32);
-	DECLARE_ADDRESS_MAP(primary_control_map, 32);
-	DECLARE_ADDRESS_MAP(secondary_command_map, 32);
-	DECLARE_ADDRESS_MAP(secondary_control_map, 32);
-	DECLARE_ADDRESS_MAP(bus_master_map, 32);
-	DECLARE_ADDRESS_MAP(ide_command_posting_map, 32);
+	void primary_command_map(address_map &map);
+	void primary_control_map(address_map &map);
+	void secondary_command_map(address_map &map);
+	void secondary_control_map(address_map &map);
+	void bus_master_map(address_map &map);
+	void ide_command_posting_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(SATA, sata_device)

@@ -43,11 +43,14 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	void sc2(machine_config &config);
+	void sc2_io(address_map &map);
+	void sc2_mem(address_map &map);
 };
 
 READ8_MEMBER( sc2_state::sc2_beep )
 {
-	//if (!machine().side_effect_disabled())
+	//if (!machine().side_effects_disabled())
 	{
 		m_beep_state = ~m_beep_state;
 
@@ -57,7 +60,7 @@ READ8_MEMBER( sc2_state::sc2_beep )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START(sc2_mem, AS_PROGRAM, 8, sc2_state)
+ADDRESS_MAP_START(sc2_state::sc2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
 	AM_RANGE( 0x1000, 0x13ff ) AM_RAM
@@ -65,7 +68,7 @@ static ADDRESS_MAP_START(sc2_mem, AS_PROGRAM, 8, sc2_state)
 	AM_RANGE( 0x3c00, 0x3c00 ) AM_READ(sc2_beep)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sc2_io, AS_IO, 8, sc2_state)
+ADDRESS_MAP_START(sc2_state::sc2_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0xfc) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
@@ -118,7 +121,7 @@ void sc2_state::machine_reset()
 
 void sc2_state::sc2_update_display()
 {
-	uint8_t digit_data = BITSWAP8( m_digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
+	uint8_t digit_data = bitswap<8>( m_digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
 
 	if (!BIT(m_led_selected, 0))
 	{
@@ -197,9 +200,9 @@ WRITE8_MEMBER( sc2_state::pio_port_b_w )
 		m_kp_matrix = data;
 }
 
-static MACHINE_CONFIG_START( sc2 )
+MACHINE_CONFIG_START(sc2_state::sc2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(sc2_mem)
 	MCFG_CPU_IO_MAP(sc2_io)
 
@@ -208,7 +211,7 @@ static MACHINE_CONFIG_START( sc2 )
 	MCFG_DEFAULT_LAYOUT(layout_sc2)
 
 	/* devices */
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_IN_PA_CB(READ8(sc2_state, pio_port_a_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(sc2_state, pio_port_a_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(sc2_state, pio_port_b_r))

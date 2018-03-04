@@ -78,7 +78,7 @@ WRITE_LINE_MEMBER(wiping_state::sound_irq_mask_w)
 	m_sound_irq_mask = state;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiping_state )
+ADDRESS_MAP_START(wiping_state::main_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_SHARE("colorram")
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiping_state )
 	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wiping_state )
+ADDRESS_MAP_START(wiping_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE("wiping", wiping_sound_device, sound_w)
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share1")
@@ -283,7 +283,7 @@ INTERRUPT_GEN_MEMBER(wiping_state::sound_timer_irq)
 
 
 
-static MACHINE_CONFIG_START( wiping )
+MACHINE_CONFIG_START(wiping_state::wiping)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz */
@@ -319,7 +319,7 @@ static MACHINE_CONFIG_START( wiping )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("wiping", WIPING, 0)
+	MCFG_SOUND_ADD("wiping", WIPING_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

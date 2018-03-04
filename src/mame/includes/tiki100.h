@@ -13,6 +13,7 @@
 #include "formats/tiki100_dsk.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/z80pio.h"
@@ -95,6 +96,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( busrq_w );
 
+	void tiki100(machine_config &config);
+	void tiki100_io(address_map &map);
+	void tiki100_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -123,7 +127,7 @@ protected:
 		ROM0 = 0x01,
 		ROM1 = 0x02,
 		VIR  = 0x04,
-		RAM  = 0x08
+		RAM0 = 0x08
 	};
 
 	// memory state

@@ -19,10 +19,10 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(native_audio_mixer_map, 32);
-	DECLARE_ADDRESS_MAP(native_audio_bus_mastering_map, 32);
-	DECLARE_ADDRESS_MAP(mixer_map, 32);
-	DECLARE_ADDRESS_MAP(bus_mastering_map, 32);
+	void native_audio_mixer_map(address_map &map);
+	void native_audio_bus_mastering_map(address_map &map);
+	void mixer_map(address_map &map);
+	void bus_mastering_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(AC97, ac97_device)

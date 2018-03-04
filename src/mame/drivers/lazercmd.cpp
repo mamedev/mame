@@ -243,7 +243,7 @@
 #include "lazercmd.lh"
 #include "medlanes.lh"
 
-#define MASTER_CLOCK XTAL_8MHz
+#define MASTER_CLOCK XTAL(8'000'000)
 
 /*************************************************************
  * Interrupt for the cpu
@@ -410,7 +410,7 @@ READ8_MEMBER(lazercmd_state::lazercmd_hardware_r)
  *
  *************************************************************/
 
-static ADDRESS_MAP_START( lazercmd_map, AS_PROGRAM, 8, lazercmd_state )
+ADDRESS_MAP_START(lazercmd_state::lazercmd_map)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1c1f) AM_RAM
 	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_SHARE("videoram")
@@ -419,7 +419,7 @@ static ADDRESS_MAP_START( lazercmd_map, AS_PROGRAM, 8, lazercmd_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( medlanes_map, AS_PROGRAM, 8, lazercmd_state )
+ADDRESS_MAP_START(lazercmd_state::medlanes_map)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1000, 0x17ff) AM_ROM
 	AM_RANGE(0x1c00, 0x1c1f) AM_RAM
@@ -429,7 +429,7 @@ static ADDRESS_MAP_START( medlanes_map, AS_PROGRAM, 8, lazercmd_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbonk_map, AS_PROGRAM, 8, lazercmd_state )
+ADDRESS_MAP_START(lazercmd_state::bbonk_map)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1c1f) AM_RAM
 	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_SHARE("videoram")
@@ -438,7 +438,7 @@ static ADDRESS_MAP_START( bbonk_map, AS_PROGRAM, 8, lazercmd_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( lazercmd_portmap, AS_DATA, 8, lazercmd_state )
+ADDRESS_MAP_START(lazercmd_state::lazercmd_portmap)
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(lazercmd_ctrl_port_r, lazercmd_ctrl_port_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(lazercmd_data_port_r, lazercmd_data_port_w)
 ADDRESS_MAP_END
@@ -622,7 +622,7 @@ void lazercmd_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( lazercmd )
+MACHINE_CONFIG_START(lazercmd_state::lazercmd)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz? */
@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( lazercmd )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( medlanes )
+MACHINE_CONFIG_START(lazercmd_state::medlanes)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz */
@@ -696,7 +696,7 @@ static MACHINE_CONFIG_START( medlanes )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bbonk )
+MACHINE_CONFIG_START(lazercmd_state::bbonk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz */

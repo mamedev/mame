@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __TMC1800__
-#define __TMC1800__
+#ifndef MAME_INCLUDES_TMC1800_H
+#define MAME_INCLUDES_TMC1800_H
 
 
 #include "cpu/cosmac/cosmac.h"
@@ -76,6 +76,10 @@ public:
 	int m_keylatch;         /* key latch */
 	DECLARE_DRIVER_INIT(tmc1800);
 
+	void tmc1800(machine_config &config);
+	void tmc1800_video(machine_config &config);
+	void tmc1800_io_map(address_map &map);
+	void tmc1800_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -101,6 +105,10 @@ public:
 
 	/* keyboard state */
 	int m_keylatch;
+	void osc1000b(machine_config &config);
+	void osc1000b_video(machine_config &config);
+	void osc1000b_io_map(address_map &map);
+	void osc1000b_map(address_map &map);
 };
 
 class tmc2000_state : public tmc1800_base_state
@@ -143,6 +151,10 @@ public:
 
 	/* keyboard state */
 	int m_keylatch;
+	void tmc2000(machine_config &config);
+	void tmc2000_video(machine_config &config);
+	void tmc2000_io_map(address_map &map);
+	void tmc2000_map(address_map &map);
 };
 
 class nano_state : public tmc1800_base_state
@@ -181,13 +193,10 @@ public:
 
 	/* keyboard state */
 	int m_keylatch;         /* key latch */
+	void nano(machine_config &config);
+	void nano_video(machine_config &config);
+	void nano_io_map(address_map &map);
+	void nano_map(address_map &map);
 };
-
-/* ---------- defined in video/tmc1800.c ---------- */
-
-MACHINE_CONFIG_EXTERN( tmc1800_video );
-MACHINE_CONFIG_EXTERN( osc1000b_video );
-MACHINE_CONFIG_EXTERN( tmc2000_video );
-MACHINE_CONFIG_EXTERN( nano_video );
 
 #endif

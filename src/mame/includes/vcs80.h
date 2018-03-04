@@ -2,8 +2,8 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 #pragma once
 
-#ifndef __VCS80__
-#define __VCS80__
+#ifndef MAME_INCLUDES_VCS80_H
+#define MAME_INCLUDES_VCS80_H
 
 
 #include "cpu/z80/z80.h"
@@ -11,6 +11,7 @@
 #include "machine/z80pio.h"
 #include "machine/ram.h"
 #include "machine/bankdev.h"
+#include "machine/timer.h"
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "z80"
@@ -79,6 +80,10 @@ public:
 	int m_keyclk;
 	DECLARE_DRIVER_INIT(vcs80);
 	TIMER_DEVICE_CALLBACK_MEMBER(vcs80_keyboard_tick);
+	void vcs80(machine_config &config);
+	void vcs80_bd_mem(address_map &map);
+	void vcs80_io(address_map &map);
+	void vcs80_mem(address_map &map);
 };
 
 #endif

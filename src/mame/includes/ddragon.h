@@ -8,6 +8,7 @@
 
 #include "cpu/m6805/m68705.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/msm5205.h"
 #include "screen.h"
 
@@ -125,6 +126,19 @@ public:
 	DECLARE_DRIVER_INIT(ddragon2);
 	DECLARE_DRIVER_INIT(ddragon);
 	DECLARE_DRIVER_INIT(ddragon6809);
+	void ddragon(machine_config &config);
+	void ddragon6809(machine_config &config);
+	void ddragonb(machine_config &config);
+	void ddragonba(machine_config &config);
+	void ddragon2(machine_config &config);
+	void dd2_map(address_map &map);
+	void dd2_sound_map(address_map &map);
+	void dd2_sub_map(address_map &map);
+	void ddragon_map(address_map &map);
+	void ddragonba_sub_map(address_map &map);
+	void ddragonba_sub_portmap(address_map &map);
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
 };
 
 
@@ -145,6 +159,7 @@ public:
 
 	DECLARE_DRIVER_INIT(darktowr);
 
+	void darktowr(machine_config &config);
 protected:
 	required_device<m68705p_device> m_mcu;
 
@@ -163,4 +178,5 @@ public:
 	DECLARE_WRITE8_MEMBER(toffy_bankswitch_w);
 
 	DECLARE_DRIVER_INIT(toffy);
+	void toffy(machine_config &config);
 };

@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Uki
+
+#include "machine/timer.h"
+
 class strnskil_state : public driver_device
 {
 public:
@@ -45,4 +48,8 @@ public:
 	DECLARE_PALETTE_INIT(strnskil);
 	uint32_t screen_update_strnskil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void strnskil(machine_config &config);
+	void banbam(machine_config &config);
+	void strnskil_map1(address_map &map);
+	void strnskil_map2(address_map &map);
 };

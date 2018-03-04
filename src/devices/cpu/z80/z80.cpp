@@ -110,6 +110,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "z80.h"
+#include "z80dasm.h"
 
 #define VERBOSE             0
 
@@ -208,7 +209,7 @@ static const uint8_t cc_op[0x100] = {
 	5,10,10,10,10,11, 7,11, 5,10,10, 0,10,17, 7,11, /* cb -> cc_cb */
 	5,10,10,11,10,11, 7,11, 5, 4,10,11,10, 0, 7,11, /* dd -> cc_xy */
 	5,10,10,19,10,11, 7,11, 5, 4,10, 4,10, 0, 7,11, /* ed -> cc_ed */
-	5,10,10, 4,10,11, 7,11, 5, 6,10, 4,10, 0, 7,11      /* fd -> cc_xy */
+	5,10,10, 4,10,11, 7,11, 5, 6,10, 4,10, 0, 7,11  /* fd -> cc_xy */
 };
 
 static const uint8_t cc_cb[0x100] = {
@@ -235,14 +236,14 @@ static const uint8_t cc_ed[0x100] = {
 	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
 	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
 	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-12,12,15,20, 8,14, 8, 9,12,12,15,20, 8,14, 8, 9,
-12,12,15,20, 8,14, 8, 9,12,12,15,20, 8,14, 8, 9,
-12,12,15,20, 8,14, 8,18,12,12,15,20, 8,14, 8,18,
-12,12,15,20, 8,14, 8, 8,12,12,15,20, 8,14, 8, 8,
+	12,12,15,20,8,14, 8, 9,12,12,15,20, 8,14, 8, 9,
+	12,12,15,20,8,14, 8, 9,12,12,15,20, 8,14, 8, 9,
+	12,12,15,20,8,14, 8,18,12,12,15,20, 8,14, 8,18,
+	12,12,15,20,8,14, 8, 8,12,12,15,20, 8,14, 8, 8,
 	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
 	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-16,16,16,16, 8, 8, 8, 8,16,16,16,16, 8, 8, 8, 8,
-16,16,16,16, 8, 8, 8, 8,16,16,16,16, 8, 8, 8, 8,
+	16,16,16,16,8, 8, 8, 8,16,16,16,16, 8, 8, 8, 8,
+	16,16,16,16,8, 8, 8, 8,16,16,16,16, 8, 8, 8, 8,
 	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
 	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
 	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
@@ -258,7 +259,7 @@ static const uint8_t cc_xy[0x100] = {
 	4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4, 4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4,
 	4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4, 4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4,
 	4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4, 4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4,
-19  ,19  ,19  ,19  ,19  ,19  , 4+4,19  , 4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4,
+	19 ,19  ,19  ,19  ,19  ,19  , 4+4,19  , 4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4,
 	4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4, 4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4,
 	4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4, 4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4,
 	4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4, 4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4,
@@ -266,26 +267,26 @@ static const uint8_t cc_xy[0x100] = {
 	5+4,10+4,10+4,10+4,10+4,11+4, 7+4,11+4, 5+4,10+4,10+4, 0  ,10+4,17+4, 7+4,11+4, /* cb -> cc_xycb */
 	5+4,10+4,10+4,11+4,10+4,11+4, 7+4,11+4, 5+4, 4+4,10+4,11+4,10+4, 4  , 7+4,11+4, /* dd -> cc_xy again */
 	5+4,10+4,10+4,19+4,10+4,11+4, 7+4,11+4, 5+4, 4+4,10+4, 4+4,10+4, 4  , 7+4,11+4, /* ed -> cc_ed */
-	5+4,10+4,10+4, 4+4,10+4,11+4, 7+4,11+4, 5+4, 6+4,10+4, 4+4,10+4, 4  , 7+4,11+4      /* fd -> cc_xy again */
+	5+4,10+4,10+4, 4+4,10+4,11+4, 7+4,11+4, 5+4, 6+4,10+4, 4+4,10+4, 4  , 7+4,11+4  /* fd -> cc_xy again */
 };
 
 static const uint8_t cc_xycb[0x100] = {
-23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
-23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
-23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23
+	23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
+	23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
+	23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
+	23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
+	20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
+	20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
+	20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
+	20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
+	23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
+	23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
+	23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
+	23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
+	23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
+	23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
+	23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,
+	23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23
 };
 
 /* extra cycles if jr/jp/call taken and 'interrupt latency' on rst 0-7 */
@@ -394,22 +395,27 @@ static const uint8_t cc_ex[0x100] = {
 } while (0)
 
 /***************************************************************
- * Enter halt state; write 1 to fake port on first execution
+ * Enter halt state; write 1 to callback on first execution
  ***************************************************************/
 inline void z80_device::halt()
 {
 	PC--;
-	m_halt = 1;
+	if (!m_halt)
+	{
+		m_halt = 1;
+		m_halt_cb(1);
+	}
 }
 
 /***************************************************************
- * Leave halt state; write 0 to fake port
+ * Leave halt state; write 0 to callback
  ***************************************************************/
 inline void z80_device::leave_halt()
 {
 	if( m_halt )
 	{
 		m_halt = 0;
+		m_halt_cb(0);
 		PC++;
 	}
 }
@@ -475,7 +481,7 @@ inline uint8_t z80_device::rop()
 	PC++;
 	uint8_t res = m_decrypted_opcodes_direct->read_byte(pc);
 	m_icount -= 2;
-	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | ((m_r-1) & 0x7f));
+	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | ((m_r-1) & 0x7f), 0x00, 0xff);
 	m_icount += 2;
 	return res;
 }
@@ -564,8 +570,8 @@ inline void z80_device::jp_cond(bool cond)
  ***************************************************************/
 inline void z80_device::jr()
 {
-	int8_t a = (int8_t)arg();    /* arg() also increments PC */
-	PC += a;             /* so don't do PC += arg() */
+	int8_t a = (int8_t)arg(); /* arg() also increments PC */
+	PC += a;                  /* so don't do PC += arg() */
 	WZ = PC;
 }
 
@@ -609,7 +615,7 @@ inline void z80_device::call_cond(bool cond, uint8_t opcode)
 	}
 	else
 	{
-		WZ = arg16();  /* implicit call PC+=2;   */
+		WZ = arg16(); /* implicit call PC+=2; */
 	}
 }
 
@@ -655,7 +661,7 @@ inline void z80_device::reti()
 inline void z80_device::ld_r_a()
 {
 	m_r = A;
-	m_r2 = A & 0x80;            /* keep bit 7 of r */
+	m_r2 = A & 0x80; /* keep bit 7 of r */
 }
 
 /***************************************************************
@@ -3126,8 +3132,6 @@ OP(op,ff) { rst(0x38);                                                          
 
 void z80_device::take_nmi()
 {
-	PRVPC = 0xffff; // HACK: segag80r protection kludge
-
 	/* Check if processor was halted */
 	leave_halt();
 
@@ -3146,8 +3150,6 @@ void z80_device::take_nmi()
 
 void z80_device::take_interrupt()
 {
-	PRVPC = 0xffff; // HACK: segag80r protection kludge
-
 	// check if processor was halted
 	leave_halt();
 
@@ -3230,8 +3232,6 @@ void z80_device::take_interrupt()
 
 void nsc800_device::take_interrupt_nsc800()
 {
-	PRVPC = 0xffff; // HACK: segag80r protection kludge
-
 	/* Check if processor was halted */
 	leave_halt();
 
@@ -3407,12 +3407,12 @@ void z80_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 	m_decrypted_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_direct = &m_program->direct();
-	m_decrypted_opcodes_direct = &m_decrypted_opcodes->direct();
+	m_direct = m_program->direct<0>();
+	m_decrypted_opcodes_direct = m_decrypted_opcodes->direct<0>();
 	m_io = &space(AS_IO);
 
 	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
-	F = ZF;            /* Zero flag is set */
+	F = ZF;           /* Zero flag is set */
 
 	/* set up the state table */
 	state_add(STATE_GENPC,     "PC",        m_pc.w.l).callimport();
@@ -3458,6 +3458,7 @@ void z80_device::device_start()
 
 	m_irqack_cb.resolve_safe();
 	m_refresh_cb.resolve_safe();
+	m_halt_cb.resolve_safe();
 }
 
 void nsc800_device::device_start()
@@ -3471,6 +3472,8 @@ void nsc800_device::device_start()
  ****************************************************************************/
 void z80_device::device_reset()
 {
+	leave_halt();
+
 	PC = 0x0000;
 	m_i = 0;
 	m_r = 0;
@@ -3665,14 +3668,13 @@ void z80_device::state_string_export(const device_state_entry &entry, std::strin
 }
 
 //-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t z80_device::disasm_disassemble( std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options )
+util::disasm_interface *z80_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( z80 );
-	return CPU_DISASSEMBLE_NAME(z80)(this, stream, pc, oprom, opram, options);
+	return new z80_disassembler;
 }
 
 
@@ -3703,7 +3705,8 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_decrypted_opcodes_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_irqack_cb(*this),
-	m_refresh_cb(*this)
+	m_refresh_cb(*this),
+	m_halt_cb(*this)
 {
 }
 

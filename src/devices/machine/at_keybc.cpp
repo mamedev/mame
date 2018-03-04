@@ -78,7 +78,7 @@ ioport_constructor at_keyboard_controller_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( at_keyboard_controller_device::device_add_mconfig )
+MACHINE_CONFIG_START(at_keyboard_controller_device::device_add_mconfig)
 	MCFG_CPU_ADD("at_keybc", I8042, DERIVED_CLOCK(1,1))
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(at_keyboard_controller_device, t0_r))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(at_keyboard_controller_device, t1_r))

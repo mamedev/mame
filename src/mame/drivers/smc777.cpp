@@ -22,6 +22,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/flopdrv.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
 #include "sound/sn76496.h"
@@ -31,7 +32,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK XTAL_4_028MHz
+#define MASTER_CLOCK XTAL(4'028'000)
 
 #define mc6845_h_char_total     (m_crtc_vreg[0]+1)
 #define mc6845_h_display        (m_crtc_vreg[1])
@@ -99,6 +100,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
+	void smc777(machine_config &config);
+	void smc777_io(address_map &map);
+	void smc777_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -515,7 +519,7 @@ WRITE8_MEMBER(smc777_state::system_output_w)
 	{
 		case 0x00:
 			m_raminh_pending_change = ((data & 0x10) >> 4) ^ 1;
-			m_raminh_prefetch = (uint8_t)(space.device().state().state_int(Z80_R)) & 0x7f;
+			m_raminh_prefetch = (uint8_t)(m_maincpu->state_int(Z80_R)) & 0x7f;
 			break;
 		case 0x02: printf("Interlace %s\n",data & 0x10 ? "on" : "off"); break;
 		case 0x05: m_beeper->set_state(data & 0x10); break;
@@ -571,7 +575,7 @@ READ8_MEMBER(smc777_state::smc777_mem_r)
 
 	if(m_raminh_prefetch != 0xff) //do the bankswitch AFTER that the prefetch instruction is executed (FIXME: this is an hackish implementation)
 	{
-		z80_r = (uint8_t)space.device().state().state_int(Z80_R);
+		z80_r = (uint8_t)m_maincpu->state_int(Z80_R);
 
 		if(z80_r == ((m_raminh_prefetch+2) & 0x7f))
 		{
@@ -604,12 +608,12 @@ WRITE8_MEMBER(smc777_state::irq_mask_w)
 	m_irq_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( smc777_mem, AS_PROGRAM, 8, smc777_state )
+ADDRESS_MAP_START(smc777_state::smc777_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(smc777_mem_r, smc777_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( smc777_io, AS_IO, 8, smc777_state )
+ADDRESS_MAP_START(smc777_state::smc777_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x07) AM_SELECT(0xff00) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0x08, 0x0f) AM_SELECT(0xff00) AM_READWRITE(attr_r, attr_w)
@@ -963,7 +967,7 @@ static SLOT_INTERFACE_START( smc777_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( smc777 )
+MACHINE_CONFIG_START(smc777_state::smc777)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(smc777_mem)
@@ -989,7 +993,7 @@ static MACHINE_CONFIG_START( smc777 )
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	// floppy controller
-	MCFG_MB8876_ADD("fdc", XTAL_1MHz)
+	MCFG_MB8876_ADD("fdc", XTAL(1'000'000))
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(smc777_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(smc777_state, fdc_drq_w))
 

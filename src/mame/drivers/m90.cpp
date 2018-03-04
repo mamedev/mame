@@ -25,7 +25,9 @@
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/irem_cpu.h"
+#include "machine/rstbuf.h"
 #include "sound/dac.h"
 #include "sound/ym2151.h"
 #include "sound/volt_reg.h"
@@ -67,35 +69,35 @@ WRITE16_MEMBER(m90_state::unknown_w)
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( m90_main_cpu_map, AS_PROGRAM, 16, m90_state )
+ADDRESS_MAP_START(m90_state::m90_main_cpu_map)
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK("bank1")  /* Quiz F1 only */
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_SHARE("video_data")
-	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynablsb_main_cpu_map, AS_PROGRAM, 16, m90_state )
+ADDRESS_MAP_START(m90_state::dynablsb_main_cpu_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x6000e, 0x60fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_SHARE("video_data")
-	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bomblord_main_cpu_map, AS_PROGRAM, 16, m90_state )
+ADDRESS_MAP_START(m90_state::bomblord_main_cpu_map)
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xc000e, 0xc0fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_SHARE("video_data")
-	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m90_main_cpu_io_map, AS_IO, 16, m90_state )
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("m72", m72_audio_device, sound_command_w, 0x00ff)
+ADDRESS_MAP_START(m90_state::m90_main_cpu_io_map)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("SYSTEM")
@@ -104,7 +106,7 @@ static ADDRESS_MAP_START( m90_main_cpu_io_map, AS_IO, 16, m90_state )
 	AM_RANGE(0x80, 0x8f) AM_WRITE(m90_video_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynablsb_main_cpu_io_map, AS_IO, 16, m90_state )
+ADDRESS_MAP_START(m90_state::dynablsb_main_cpu_io_map)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
@@ -118,34 +120,33 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( m90_sound_cpu_map, AS_PROGRAM, 8, m90_state )
+ADDRESS_MAP_START(m90_state::m90_sound_cpu_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m90_sound_cpu_io_map, AS_IO, 8, m90_state )
+ADDRESS_MAP_START(m90_state::m90_sound_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, rtype2_sample_addr_w)
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
+	AM_RANGE(0x83, 0x83) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynablsb_sound_cpu_io_map, AS_IO, 8, m90_state )
+ADDRESS_MAP_START(m90_state::dynablsb_sound_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", dac_byte_interface, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m99_sound_cpu_io_map, AS_IO, 8, m90_state )
+ADDRESS_MAP_START(m90_state::m99_sound_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, poundfor_sample_addr_w)
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x42, 0x42) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x42, 0x42) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
+	AM_RANGE(0x42, 0x42) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -697,36 +698,32 @@ INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
 		m_audio->sample_w(space,0,sample);
 }
 
-INTERRUPT_GEN_MEMBER(m90_state::m90_interrupt)
+WRITE_LINE_MEMBER(m90_state::dynablsb_vblank_int_w)
 {
-	generic_pulse_irq_line(device.execute(), NEC_INPUT_LINE_INTP0, 1);
+	if (state)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x60/4);
 }
 
-INTERRUPT_GEN_MEMBER(m90_state::dynablsb_interrupt)
+WRITE_LINE_MEMBER(m90_state::bomblord_vblank_int_w)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x60/4);
-}
-
-INTERRUPT_GEN_MEMBER(m90_state::bomblord_interrupt)
-{
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x50/4);
+	if (state)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x50/4);
 }
 
 
 /* Basic hardware -- no decryption table is setup for CPU */
-static MACHINE_CONFIG_START( m90 )
+MACHINE_CONFIG_START(m90_state::m90)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V35, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", V35, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(m90_main_cpu_map)
 	MCFG_CPU_IO_MAP(m90_main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m90_state,  m90_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(m90_sound_cpu_map)
 	MCFG_CPU_IO_MAP(m90_sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(m90_state, nmi_line_pulse,  128*60)    /* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -736,6 +733,7 @@ static MACHINE_CONFIG_START( m90 )
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8, 47*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m90_state, screen_update_m90)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", NEC_INPUT_LINE_INTP0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m90)
 	MCFG_PALETTE_ADD("palette", 512)
@@ -745,11 +743,16 @@ static MACHINE_CONFIG_START( m90 )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+
+	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
 
 	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
 	MCFG_SOUND_ROUTE(0, "speaker", 0.15)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.15)
 
@@ -759,58 +762,65 @@ static MACHINE_CONFIG_START( m90 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hasamu, m90 )
+MACHINE_CONFIG_START(m90_state::hasamu)
+	m90(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizf1, m90 )
+MACHINE_CONFIG_START(m90_state::quizf1)
+	m90(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(lethalth_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( matchit2, m90 )
+MACHINE_CONFIG_START(m90_state::matchit2)
+	m90(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(matchit2_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( riskchal, m90 )
+MACHINE_CONFIG_START(m90_state::riskchal)
+	m90(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(gussun_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bombrman, m90 )
+MACHINE_CONFIG_START(m90_state::bombrman)
+	m90(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(bomberman_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bbmanwj, m90 )
+MACHINE_CONFIG_START(m90_state::bbmanwj)
+	m90(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(dynablaster_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bbmanw, bbmanwj )
+MACHINE_CONFIG_START(m90_state::bbmanw)
+	bbmanwj(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(m99_sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(m90_state, fake_nmi,  128*60)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bomblord, m90 )
+MACHINE_CONFIG_START(m90_state::bomblord)
+	m90(config);
 	MCFG_CPU_REPLACE("maincpu", V30, 32000000/4)
 	MCFG_CPU_PROGRAM_MAP(bomblord_main_cpu_map)
 	MCFG_CPU_IO_MAP(m90_main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m90_state,  bomblord_interrupt)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(m99_sound_cpu_io_map)
@@ -819,32 +829,37 @@ static MACHINE_CONFIG_DERIVED( bomblord, m90 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m90_state, screen_update_bomblord)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m90_state, bomblord_vblank_int_w))
 
 	MCFG_VIDEO_START_OVERRIDE(m90_state,bomblord)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dynablsb, m90 )
+MACHINE_CONFIG_START(m90_state::dynablsb)
+	m90(config);
 	MCFG_CPU_REPLACE("maincpu", V30, 32000000/4)
 	MCFG_CPU_PROGRAM_MAP(dynablsb_main_cpu_map)
 	MCFG_CPU_IO_MAP(dynablsb_main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m90_state,  dynablsb_interrupt)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(dynablsb_sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(m90_state, irq0_line_hold,  64*60) /* half the sample rate of the original */
+	MCFG_CPU_IRQ_ACKNOWLEDGE_REMOVE()
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(m90_state, screen_update_dynablsb)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m90_state, dynablsb_vblank_int_w))
 
 	MCFG_VIDEO_START_OVERRIDE(m90_state,dynablsb)
 
 	MCFG_DEVICE_REMOVE("m72")
+	MCFG_DEVICE_REMOVE("soundirq")
 
 	MCFG_DEVICE_MODIFY("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(false)
 
 	MCFG_SOUND_MODIFY("ymsnd")
 	MCFG_YM2151_IRQ_HANDLER(NOOP) /* this bootleg polls the YM2151 instead of taking interrupts from it */
@@ -1248,10 +1263,10 @@ DRIVER_INIT_MEMBER(m90_state,bomblord)
 
 	for (int i = 0; i < 0x100000 / 2; i += 4)
 	{
-		ROM[i+0]=BITSWAP16(ROM[i+0],0xc,0x8,0xd,0xe,0xf,0xb,0xa,0x9,0x6,0x4,0x7,0x3,0x1,0x2,0x0,0x5);
-		ROM[i+1]=BITSWAP16(ROM[i+1],0xc,0xb,0xd,0xa,0xe,0x9,0xf,0x8,0x0,0x6,0x1,0x5,0x3,0x4,0x2,0x7);
-		ROM[i+2]=BITSWAP16(ROM[i+2],0xd,0x9,0xc,0x8,0xe,0xf,0xa,0xb,0x4,0x7,0x3,0x2,0x5,0x6,0x1,0x0);
-		ROM[i+3]=BITSWAP16(ROM[i+3],0xe,0xd,0xf,0x8,0xb,0xa,0x9,0xc,0x6,0x3,0x7,0x5,0x0,0x1,0x4,0x2);
+		ROM[i+0]=bitswap<16>(ROM[i+0],0xc,0x8,0xd,0xe,0xf,0xb,0xa,0x9,0x6,0x4,0x7,0x3,0x1,0x2,0x0,0x5);
+		ROM[i+1]=bitswap<16>(ROM[i+1],0xc,0xb,0xd,0xa,0xe,0x9,0xf,0x8,0x0,0x6,0x1,0x5,0x3,0x4,0x2,0x7);
+		ROM[i+2]=bitswap<16>(ROM[i+2],0xd,0x9,0xc,0x8,0xe,0xf,0xa,0xb,0x4,0x7,0x3,0x2,0x5,0x6,0x1,0x0);
+		ROM[i+3]=bitswap<16>(ROM[i+3],0xe,0xd,0xf,0x8,0xb,0xa,0x9,0xc,0x6,0x3,0x7,0x5,0x0,0x1,0x4,0x2);
 	}
 }
 

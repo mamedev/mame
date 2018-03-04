@@ -232,7 +232,7 @@ INPUT_CHANGED_MEMBER(polyplay_state::input_changed)
 }
 
 /* memory mapping */
-static ADDRESS_MAP_START( polyplay_mem_zre, AS_PROGRAM, 8, polyplay_state )
+ADDRESS_MAP_START(polyplay_state::polyplay_mem_zre)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x8fff) AM_ROM
@@ -241,7 +241,7 @@ static ADDRESS_MAP_START( polyplay_mem_zre, AS_PROGRAM, 8, polyplay_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( polyplay_mem_zrepp, AS_PROGRAM, 8, polyplay_state )
+ADDRESS_MAP_START(polyplay_state::polyplay_mem_zrepp)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -255,13 +255,13 @@ static ADDRESS_MAP_START( polyplay_mem_zrepp, AS_PROGRAM, 8, polyplay_state )
 ADDRESS_MAP_END
 
 /* port mapping */
-static ADDRESS_MAP_START( polyplay_io_zre, AS_IO, 8, polyplay_state )
+ADDRESS_MAP_START(polyplay_state::polyplay_io_zre)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( polyplay_io_zrepp, AS_IO, 8, polyplay_state )
+ADDRESS_MAP_START(polyplay_state::polyplay_io_zrepp)
 	AM_IMPORT_FROM(polyplay_io_zre)
 	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_device, cd_ba_r, cd_ba_w)
 ADDRESS_MAP_END
@@ -308,7 +308,7 @@ GFXDECODE_END
 
 
 /* the machine driver */
-static MACHINE_CONFIG_START( polyplay_zre )
+MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80CPU_TAG, Z80, POLYPLAY_MAIN_CLOCK / 4) /* UB880D */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_zre)
@@ -350,8 +350,8 @@ static MACHINE_CONFIG_START( polyplay_zre )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( polyplay_zrepp )
-	MCFG_FRAGMENT_ADD( polyplay_zre )
+MACHINE_CONFIG_START(polyplay_state::polyplay_zrepp)
+	polyplay_zre(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(Z80CPU_TAG) /* UB880D */
@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( polyplay_zrepp )
 	MCFG_CPU_IO_MAP(polyplay_io_zrepp)
 
 	/* devices */
-	MCFG_Z80SIO_ADD(Z80SIO_TAG, POLYPLAY_MAIN_CLOCK / 4, 0, 0, 0, 0) /* UB8560D */
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, POLYPLAY_MAIN_CLOCK / 4) /* UB8560D */
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE(Z80CPU_TAG, INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 

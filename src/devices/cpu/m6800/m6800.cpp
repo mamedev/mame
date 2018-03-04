@@ -26,7 +26,7 @@ History
 
 990319  HJB
     Fixed wrong LSB/MSB order for push/pull word.
-    Subtract .extra_cycles at the beginning/end of the exectuion loops.
+    Subtract .extra_cycles at the beginning/end of the exectution loops.
 
 990316  HJB
     Renamed to 6800, since that's the basic CPU.
@@ -329,7 +329,7 @@ DEFINE_DEVICE_TYPE(NSC8105, nsc8105_cpu_device, "nsc8105", "NSC8105")
 
 
 m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6800_cpu_device(mconfig, M6800, tag, owner, clock, m6800_insn, cycles_6800, nullptr)
+	: m6800_cpu_device(mconfig, M6800, tag, owner, clock, m6800_insn, cycles_6800, address_map_constructor())
 {
 }
 
@@ -348,7 +348,7 @@ m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, const char *ta
 }
 
 m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles)
-	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, nullptr)
+	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, address_map_constructor())
 {
 }
 
@@ -390,7 +390,7 @@ void m6800_cpu_device::WM16(uint32_t Addr, PAIR *p )
 /* IRQ enter */
 void m6800_cpu_device::enter_interrupt(const char *message,uint16_t irq_vector)
 {
-	LOG((message, tag()));
+	LOG((message));
 	if( m_wai_state & (M6800_WAI|M6800_SLP) )
 	{
 		if( m_wai_state & M6800_WAI )
@@ -423,7 +423,7 @@ void m6800_cpu_device::CHECK_IRQ_LINES()
 			m_wai_state &= ~M6800_SLP;
 
 		m_nmi_pending = false;
-		enter_interrupt("M6800 '%s' take NMI\n",0xfffc);
+		enter_interrupt("take NMI\n", 0xfffc);
 	}
 	else
 	{
@@ -434,7 +434,7 @@ void m6800_cpu_device::CHECK_IRQ_LINES()
 
 			if( !(CC & 0x10) )
 			{
-				enter_interrupt("M6800 '%s' take IRQ1\n",0xfff8);
+				enter_interrupt("take IRQ1\n", 0xfff8);
 				standard_irq_callback(M6800_IRQ_LINE);
 			}
 		}
@@ -464,9 +464,9 @@ void m6800_cpu_device::EAT_CYCLES()
 void m6800_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_decrypted_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_decrypted_opcodes_direct = &m_decrypted_opcodes->direct();
+	m_decrypted_opcodes_direct = m_decrypted_opcodes->direct<0>();
 
 	m_pc.d = 0;
 	m_s.d = 0;
@@ -544,7 +544,7 @@ void m6800_cpu_device::execute_set_input(int irqline, int state)
 		break;
 
 	default:
-		LOG(("M6800 '%s' set_irq_line %d,%d\n", tag(), irqline, state));
+		LOG(("set_irq_line %d,%d\n", irqline, state));
 		m_irq_state[irqline] = state;
 		break;
 	}
@@ -579,30 +579,22 @@ void m6800_cpu_device::execute_run()
 	} while( m_icount>0 );
 }
 
-
-offs_t m6800_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *m6800_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( m6800 );
-	return CPU_DISASSEMBLE_NAME(m6800)(this, stream, pc, oprom, opram, options);
+	return new m680x_disassembler(6800);
 }
 
-
-offs_t m6802_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *m6802_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( m6802 );
-	return CPU_DISASSEMBLE_NAME(m6802)(this, stream, pc, oprom, opram, options);
+	return new m680x_disassembler(6802);
 }
 
-
-offs_t m6808_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *m6808_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( m6808 );
-	return CPU_DISASSEMBLE_NAME(m6808)(this, stream, pc, oprom, opram, options);
+	return new m680x_disassembler(6808);
 }
 
-
-offs_t nsc8105_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *nsc8105_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( nsc8105 );
-	return CPU_DISASSEMBLE_NAME(nsc8105)(this, stream, pc, oprom, opram, options);
+	return new m680x_disassembler(8105);
 }

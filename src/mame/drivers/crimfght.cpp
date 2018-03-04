@@ -81,9 +81,10 @@ WRITE8_MEMBER(crimfght_state::ym2151_ct_w)
 	m_k007232->set_bank(bank_a, bank_b);
 }
 
-static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8, crimfght_state )
+ADDRESS_MAP_START(crimfght_state::crimfght_map)
 	AM_RANGE(0x0000, 0x03ff) AM_DEVICE("bank0000", address_map_bank_device, amap8)
 	AM_RANGE(0x0400, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)   /* video RAM + sprite RAM */
 	AM_RANGE(0x3f80, 0x3f80) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3f81, 0x3f81) AM_READ_PORT("P1")
 	AM_RANGE(0x3f82, 0x3f82) AM_READ_PORT("P2")
@@ -94,18 +95,17 @@ static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8, crimfght_state )
 	AM_RANGE(0x3f87, 0x3f87) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3f88, 0x3f88) AM_MIRROR(0x03) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(crimfght_coin_w) // 051550
 	AM_RANGE(0x3f8c, 0x3f8c) AM_MIRROR(0x03) AM_WRITE(sound_w)
-	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)   /* video RAM + sprite RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")                        /* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x18000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank0000_map, AS_PROGRAM, 8, crimfght_state )
+ADDRESS_MAP_START(crimfght_state::bank0000_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 // full memory map derived from schematics
-static ADDRESS_MAP_START( crimfght_sound_map, AS_PROGRAM, 8, crimfght_state )
+ADDRESS_MAP_START(crimfght_state::crimfght_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -297,31 +297,31 @@ CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
 	return data >> 4;
 }
 
-static MACHINE_CONFIG_START( crimfght )
+MACHINE_CONFIG_START(crimfght_state::crimfght)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)       /* 052001 (verified on pcb) */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)       /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(crimfght_map)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(crimfght_state, banking_callback))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(crimfght_sound_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, crimfght_state, audiocpu_irq_ack)
 
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(11)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(11)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 96, 416, 256, 16, 240) // measured 59.17
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 96, 416, 256, 16, 240) // measured 59.17
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
+//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(crimfght_state, screen_update_crimfght)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -344,12 +344,12 @@ static MACHINE_CONFIG_START( crimfght )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)  /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* verified on pcb */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(crimfght_state, ym2151_ct_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)    /* verified on pcb */
+	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(crimfght_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)

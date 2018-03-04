@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(NUBUS_CB264, nubus_cb264_device, "nb_c264", "RasterOps ColorB
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nubus_cb264_device::device_add_mconfig )
+MACHINE_CONFIG_START(nubus_cb264_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( CB264_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_cb264_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
@@ -85,8 +85,6 @@ void nubus_cb264_device::device_start()
 {
 	uint32_t slotspace;
 
-	// set_nubus_device makes m_slot valid
-	set_nubus_device();
 	install_declaration_rom(this, CB264_ROM_REGION);
 
 	slotspace = get_slotspace();
@@ -96,8 +94,8 @@ void nubus_cb264_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, "bank_cb264", &m_vram[0]);
 
-	m_nubus->install_device(slotspace+0xff6000, slotspace+0xff60ff, read32_delegate(FUNC(nubus_cb264_device::cb264_r), this), write32_delegate(FUNC(nubus_cb264_device::cb264_w), this));
-	m_nubus->install_device(slotspace+0xff7000, slotspace+0xff70ff, read32_delegate(FUNC(nubus_cb264_device::cb264_ramdac_r), this), write32_delegate(FUNC(nubus_cb264_device::cb264_ramdac_w), this));
+	nubus().install_device(slotspace+0xff6000, slotspace+0xff60ff, read32_delegate(FUNC(nubus_cb264_device::cb264_r), this), write32_delegate(FUNC(nubus_cb264_device::cb264_w), this));
+	nubus().install_device(slotspace+0xff7000, slotspace+0xff70ff, read32_delegate(FUNC(nubus_cb264_device::cb264_ramdac_r), this), write32_delegate(FUNC(nubus_cb264_device::cb264_ramdac_w), this));
 }
 
 //-------------------------------------------------
@@ -239,7 +237,7 @@ WRITE32_MEMBER( nubus_cb264_device::cb264_w )
 			break;
 
 		default:
-//          printf("cb264_w: %x to reg %x (mask %x PC %x)\n", data, offset*4, mem_mask, space.device().safe_pc());
+//          printf("cb264_w: %x to reg %x (mask %x %s)\n", data, offset*4, mem_mask, machine().describe_context());
 			break;
 	}
 }
@@ -257,7 +255,7 @@ READ32_MEMBER( nubus_cb264_device::cb264_r )
 			return m_cb264_toggle;  // bit 0 is vblank?
 
 		default:
-			logerror("cb264_r: reg %x (mask %x PC %x)\n", offset*4, mem_mask, space.device().safe_pc());
+			logerror("cb264_r: reg %x (mask %x %s)\n", offset*4, mem_mask, machine().describe_context());
 			break;
 	}
 

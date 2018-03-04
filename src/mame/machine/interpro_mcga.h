@@ -11,7 +11,7 @@ class interpro_mcga_device : public device_t
 public:
 	interpro_mcga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 32);
+	virtual void map(address_map &map);
 
 	DECLARE_READ16_MEMBER(reg00_r) { return m_reg[0]; }
 	DECLARE_WRITE16_MEMBER(reg00_w) { m_reg[0] = data; }
@@ -78,7 +78,7 @@ class interpro_fmcc_device : public interpro_mcga_device
 public:
 	interpro_fmcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 32) override;
+	virtual void map(address_map &map) override;
 
 	enum control_mask
 	{

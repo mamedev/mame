@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski
+
+#include "machine/timer.h"
+
 class pingpong_state : public driver_device
 {
 public:
@@ -36,4 +39,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(pingpong_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(merlinmm_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void merlinmm(machine_config &config);
+	void pingpong(machine_config &config);
+	void merlinmm_map(address_map &map);
+	void pingpong_map(address_map &map);
 };

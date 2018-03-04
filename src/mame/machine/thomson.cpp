@@ -226,98 +226,11 @@ WRITE_LINE_MEMBER( thomson_state::mo5_set_cassette_motor )
 /* ------------ IRQs ------------ */
 
 
-void thomson_state::thom_set_irq( int line, int state )
-{
-	int old = m_thom_irq;
-
-	if ( state )
-		m_thom_irq |= 1 << line;
-	else
-		m_thom_irq &= ~(1 << line);
-
-	if ( !old && m_thom_irq )
-		LOG_IRQ(( "%f thom_set_irq: irq line up %i\n", machine().time().as_double(), line ));
-	if ( old && !m_thom_irq )
-		LOG_IRQ(( "%f thom_set_irq: irq line down %i\n", machine().time().as_double(), line ));
-
-	m_maincpu->set_input_line(M6809_IRQ_LINE, m_thom_irq ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
-void thomson_state::thom_set_firq ( int line, int state )
-{
-	int old = m_thom_firq;
-
-	if ( state )
-		m_thom_firq |= 1 << line;
-	else
-		m_thom_firq &= ~(1 << line);
-
-	if ( !old && m_thom_firq )
-		LOG_IRQ(( "%f thom_set_firq: firq line up %i\n", machine().time().as_double(), line ));
-	if ( old && !m_thom_firq )
-		LOG_IRQ(( "%f thom_set_firq: firq line down %i\n", machine().time().as_double(), line ));
-
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, m_thom_firq ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
 void thomson_state::thom_irq_reset()
 {
-	m_thom_irq = 0;
-	m_thom_firq = 0;
-	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE );
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE );
+	m_mainfirq->in_w<2>(0);
 }
 
-
-
-void thomson_state::thom_irq_init()
-{
-	save_item(NAME(m_thom_irq));
-	save_item(NAME(m_thom_firq));
-}
-
-
-
-void thomson_state::thom_irq_0( int state )
-{
-	thom_set_irq( 0, state );
-}
-
-WRITE_LINE_MEMBER( thomson_state::thom_dev_irq_0 )
-{
-	thom_irq_0( state );
-}
-
-
-
-WRITE_LINE_MEMBER( thomson_state::thom_irq_1 )
-{
-	thom_set_irq  ( 1, state );
-}
-
-void thomson_state::thom_irq_3( int state )
-{
-	thom_set_irq  ( 3, state );
-}
-
-WRITE_LINE_MEMBER( thomson_state::thom_firq_1 )
-{
-	thom_set_firq ( 1, state );
-}
-
-void thomson_state::thom_firq_2( int state )
-{
-	thom_set_firq ( 2, state );
-}
-
-void thomson_state::thom_irq_4( int state )
-{
-	thom_set_irq  ( 4, state );
-}
 
 
 /*
@@ -462,7 +375,7 @@ READ8_MEMBER( thomson_state::to7_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !machine().side_effect_disabled() )
+	if ( !machine().side_effects_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		to7_update_cart_bank();
@@ -607,15 +520,15 @@ to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char
 {
 }
 
-MACHINE_CONFIG_MEMBER( to7_io_line_device::device_add_mconfig )
+MACHINE_CONFIG_START(to7_io_line_device::device_add_mconfig)
 	/// THIS PIO is part of CC 90-232 expansion
 	MCFG_DEVICE_ADD(THOM_PIA_IO, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(to7_io_line_device, porta_in))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(to7_io_line_device, porta_out))
 	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("^", thomson_state, thom_firq_1))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("^", thomson_state, thom_firq_1))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("^mainfirq", input_merger_device, in_w<1>))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("^mainfirq", input_merger_device, in_w<1>))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(to7_io_line_device, write_rxd))
@@ -728,8 +641,8 @@ WRITE_LINE_MEMBER( thomson_state::to7_modem_tx_w )
 
 WRITE_LINE_MEMBER( thomson_state::write_acia_clock )
 {
-	m_acia6850->write_txc(state);
-	m_acia6850->write_rxc(state);
+	m_acia->write_txc(state);
+	m_acia->write_rxc(state);
 }
 
 void thomson_state::to7_modem_reset()
@@ -755,7 +668,7 @@ void thomson_state::to7_modem_init()
 
 READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
 {
-	if ( machine().side_effect_disabled() )
+	if ( machine().side_effects_disabled() )
 	{
 		return 0;
 	}
@@ -769,10 +682,8 @@ READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
 		switch (offset)
 		{
 		case 0:
-			return m_acia->status_r(space, offset );
-
 		case 1:
-			return m_acia->data_r(space, offset );
+			return m_acia->read(space, offset & 1);
 
 		default:
 			return 0;
@@ -793,11 +704,8 @@ WRITE8_MEMBER( thomson_state::to7_modem_mea8000_w )
 		switch (offset)
 		{
 		case 0:
-			m_acia->control_w( space, offset, data );
-			break;
-
 		case 1:
-			m_acia->data_w( space, offset, data );
+			m_acia->write(space, offset & 1, data);
 			break;
 		}
 	}
@@ -1087,7 +995,6 @@ MACHINE_START_MEMBER( thomson_state, to7 )
 	LOG (( "to7: machine start called\n" ));
 
 	/* subsystems */
-	thom_irq_init();
 	to7_game_init();
 	to7_floppy_init(mem + 0x20000);
 	to7_modem_init();
@@ -1311,7 +1218,6 @@ MACHINE_START_MEMBER( thomson_state, to770 )
 	LOG (( "to770: machine start called\n" ));
 
 	/* subsystems */
-	thom_irq_init();
 	to7_game_init();
 	to7_floppy_init( mem + 0x20000 );
 	to7_modem_init();
@@ -1628,7 +1534,7 @@ READ8_MEMBER( thomson_state::mo5_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + 0xbffc + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !machine().side_effect_disabled() )
+	if ( !machine().side_effects_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		mo5_update_cart_bank();
@@ -1692,7 +1598,6 @@ MACHINE_START_MEMBER( thomson_state, mo5 )
 	LOG (( "mo5: machine start called\n" ));
 
 	/* subsystems */
-	thom_irq_init();
 	to7_game_init();
 	to7_floppy_init( mem + 0x20000 );
 	to7_modem_init();
@@ -1852,7 +1757,7 @@ READ8_MEMBER( thomson_state::to9_vreg_r )
 	case 0: /* palette data */
 	{
 		uint8_t c =  m_to9_palette_data[ m_to9_palette_idx ];
-		if ( !machine().side_effect_disabled() )
+		if ( !machine().side_effects_disabled() )
 		{
 			m_to9_palette_idx = ( m_to9_palette_idx + 1 ) & 31;
 		}
@@ -2032,7 +1937,7 @@ READ8_MEMBER( thomson_state::to9_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !machine().side_effect_disabled() )
+	if ( !machine().side_effects_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		to9_update_cart_bank();
@@ -2155,7 +2060,7 @@ void thomson_state::to9_kbd_update_irq()
 	if ( (m_to9_kbd_intr & 3) == 1 && (m_to9_kbd_status & ACIA_6850_TDRE) )
 		m_to9_kbd_status |= ACIA_6850_irq; /* ready to transmit interrupt */
 
-	thom_irq_3( m_to9_kbd_status & ACIA_6850_irq );
+	m_mainirq->in_w<3>( m_to9_kbd_status & ACIA_6850_irq );
 }
 
 
@@ -2186,7 +2091,7 @@ READ8_MEMBER( thomson_state::to9_kbd_r )
 		return m_to9_kbd_status;
 
 	case 1: /* get input data */
-		if ( !machine().side_effect_disabled() )
+		if ( !machine().side_effects_disabled() )
 		{
 			m_to9_kbd_status &= ~(ACIA_6850_irq | ACIA_6850_PE);
 			if ( m_to9_kbd_overrun )
@@ -2635,7 +2540,6 @@ MACHINE_START_MEMBER( thomson_state, to9 )
 	LOG (( "to9: machine start called\n" ));
 
 	/* subsystems */
-	thom_irq_init();
 	to7_game_init();
 	to9_floppy_init( mem + 0xe000, mem + 0x40000 );
 	to9_kbd_init();
@@ -3237,7 +3141,7 @@ READ8_MEMBER( thomson_state::to8_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !machine().side_effect_disabled() )
+	if ( !machine().side_effects_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		to8_update_cart_bank();
@@ -3271,7 +3175,7 @@ void thomson_state::to8_floppy_reset()
 
 READ8_MEMBER( thomson_state::to8_floppy_r )
 {
-	if ( machine().side_effect_disabled() )
+	if ( machine().side_effects_disabled() )
 		return 0;
 
 	if ( (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_EXT )
@@ -3330,9 +3234,9 @@ READ8_MEMBER( thomson_state::to8_gatearray_r )
 	case 1: /* ram register / lightpen register 2 */
 		if ( m_to7_lightpen )
 		{
-			if ( !machine().side_effect_disabled() )
+			if ( !machine().side_effects_disabled() )
 			{
-				thom_firq_2( 0 );
+				m_mainfirq->in_w<2>(0);
 				m_to8_lightpen_intr = 0;
 			}
 			res = count & 0xff;
@@ -3415,7 +3319,7 @@ READ8_MEMBER( thomson_state::to8_vreg_r )
 	/* 0xe7dc from external floppy drive aliases the video gate-array */
 	if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) && ( m_to8_reg_sys1 & 0x80 ) )
 	{
-		if ( machine().side_effect_disabled() )
+		if ( machine().side_effects_disabled() )
 			return 0;
 
 		if ( THOM_FLOPPY_EXT )
@@ -3429,7 +3333,7 @@ READ8_MEMBER( thomson_state::to8_vreg_r )
 	case 0: /* palette data */
 	{
 		uint8_t c =  m_to9_palette_data[ m_to9_palette_idx ];
-		if ( !machine().side_effect_disabled() )
+		if ( !machine().side_effects_disabled() )
 		{
 			m_to9_palette_idx = ( m_to9_palette_idx + 1 ) & 31;
 		}
@@ -3579,7 +3483,7 @@ void thomson_state::to8_lightpen_cb( int step )
 	if ( ! m_to7_lightpen )
 		return;
 
-	thom_firq_2( 1 );
+	m_mainfirq->in_w<2>(1);
 	m_to7_lightpen_step = step;
 	m_to8_lightpen_intr = 1;
 }
@@ -3646,7 +3550,6 @@ MACHINE_START_MEMBER( thomson_state, to8 )
 	LOG (( "to8: machine start called\n" ));
 
 	/* subsystems */
-	thom_irq_init();
 	to7_game_init();
 	to8_floppy_init();
 	to8_kbd_init();
@@ -3797,7 +3700,6 @@ MACHINE_START_MEMBER( thomson_state, to9p )
 	LOG (( "to9p: machine start called\n" ));
 
 	/* subsystems */
-	thom_irq_init();
 	to7_game_init();
 	to8_floppy_init();
 	to9_kbd_init();
@@ -4111,7 +4013,7 @@ READ8_MEMBER( thomson_state::mo6_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + 0xbffc + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !machine().side_effect_disabled() )
+	if ( !machine().side_effects_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		mo6_update_cart_bank();
@@ -4285,9 +4187,9 @@ READ8_MEMBER( thomson_state::mo6_gatearray_r )
 	case 1: /* ram register / lightpen register 2 */
 		if ( m_to7_lightpen )
 		{
-			if ( !machine().side_effect_disabled() )
+			if ( !machine().side_effects_disabled() )
 			{
-				thom_firq_2( 0 );
+				m_mainfirq->in_w<2>(0);
 				m_to8_lightpen_intr = 0;
 			}
 			res =  count & 0xff;
@@ -4367,7 +4269,7 @@ READ8_MEMBER( thomson_state::mo6_vreg_r )
 	/* 0xa7dc from external floppy drive aliases the video gate-array */
 	if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) )
 		{
-		if ( !machine().side_effect_disabled() )
+		if ( !machine().side_effects_disabled() )
 			return to7_floppy_r( space, 0xc );
 		}
 
@@ -4483,7 +4385,6 @@ MACHINE_START_MEMBER( thomson_state, mo6 )
 	LOG (( "mo6: machine start called\n" ));
 
 	/* subsystems */
-	thom_irq_init();
 	mo6_game_init();
 	to7_floppy_init( mem + 0x30000 );
 	to9_palette_init();
@@ -4548,7 +4449,7 @@ MACHINE_START_MEMBER( thomson_state, mo6 )
 
 READ8_MEMBER( thomson_state::mo5nr_net_r )
 {
-	if ( machine().side_effect_disabled() )
+	if ( machine().side_effects_disabled() )
 		return 0;
 
 	if ( to7_controller_type )
@@ -4707,7 +4608,6 @@ MACHINE_START_MEMBER( thomson_state, mo5nr )
 	LOG (( "mo5nr: machine start called\n" ));
 
 	/* subsystems */
-	thom_irq_init();
 	mo5nr_game_init();
 	to7_floppy_init( mem + 0x30000 );
 	to9_palette_init();

@@ -12,7 +12,7 @@ jvc_xvd701_device::jvc_xvd701_device(const machine_config &mconfig, const char *
 {
 }
 
-MACHINE_CONFIG_MEMBER(jvc_xvd701_device::device_add_mconfig)
+MACHINE_CONFIG_START(jvc_xvd701_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START(xvd701)

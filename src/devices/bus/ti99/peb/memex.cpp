@@ -147,7 +147,7 @@ INPUT_PORTS_START( memex )
 		PORT_DIPSETTING( MDIP8, "Lock out pages FC-FF")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_MEMBER( geneve_memex_device::device_add_mconfig )
+MACHINE_CONFIG_START(geneve_memex_device::device_add_mconfig)
 	MCFG_RAM_ADD(RAMREGION)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_DEFAULT_VALUE(0)

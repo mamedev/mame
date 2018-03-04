@@ -264,7 +264,7 @@ WRITE8_MEMBER( bfm_dm01_device::unknown_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-ADDRESS_MAP_START( bfm_dm01_memmap, AS_PROGRAM, 8, bfm_dm01_device )
+ADDRESS_MAP_START(bfm_dm01_device::bfm_dm01_memmap)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM                             // 8k RAM
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(control_r, control_w)  // control reg
 	AM_RANGE(0x2800, 0x2800) AM_READWRITE(mux_r, mux_w)           // mux
@@ -287,7 +287,7 @@ INTERRUPT_GEN_MEMBER( bfm_dm01_device::nmi_line_assert )
 	m_matrixcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_MEMBER( bfm_dm01_device::device_add_mconfig )
+MACHINE_CONFIG_START(bfm_dm01_device::device_add_mconfig)
 	MCFG_CPU_ADD("matrix", M6809, 2000000 )        /* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
 	MCFG_CPU_PROGRAM_MAP(bfm_dm01_memmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_dm01_device, nmi_line_assert, 1500 )          /* generate 1500 NMI's per second ?? what is the exact freq?? */

@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "machine/intelfsh.h"
-#include "cpu/sh2/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "audio/cps3.h"
 
 
@@ -150,4 +150,20 @@ public:
 		unsigned int code, unsigned int color, int flipx, int flipy, int sx, int sy,
 		int transparency, int transparent_color,
 		int scalex, int scaley, bitmap_ind8 *pri_buffer, uint32_t pri_mask);
+	void cps3(machine_config &config);
+	void jojo(machine_config &config);
+	void redearth(machine_config &config);
+	void sfiii2(machine_config &config);
+	void sfiii3(machine_config &config);
+	void sfiii(machine_config &config);
+	void jojoba(machine_config &config);
+	void simm1_64mbit(machine_config &config);
+	void simm2_64mbit(machine_config &config);
+	void simm3_128mbit(machine_config &config);
+	void simm4_128mbit(machine_config &config);
+	void simm5_128mbit(machine_config &config);
+	void simm5_32mbit(machine_config &config);
+	void simm6_128mbit(machine_config &config);
+	void cps3_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
 };

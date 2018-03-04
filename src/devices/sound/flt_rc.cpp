@@ -116,24 +116,3 @@ void filter_rc_device::recalc()
 	/* k = (1-(EXP(-TIMEDELTA/RC)))    */
 	m_k = 0x10000 - 0x10000 * (exp(-1 / (Req * m_C) / machine().sample_rate()));
 }
-
-
-void filter_rc_device::filter_rc_set_RC(int type, double R1, double R2, double R3, double C)
-{
-	m_stream->update();
-	m_type = type;
-	m_R1 = R1;
-	m_R2 = R2;
-	m_R3 = R3;
-	m_C = C;
-	recalc();
-}
-
-void filter_rc_device::static_set_rc(device_t &device, int type, double R1, double R2, double R3, double C)
-{
-	downcast<filter_rc_device &>(device).m_type = type;
-	downcast<filter_rc_device &>(device).m_R1 = R1;
-	downcast<filter_rc_device &>(device).m_R2 = R2;
-	downcast<filter_rc_device &>(device).m_R3 = R3;
-	downcast<filter_rc_device &>(device).m_C = C;
-}

@@ -346,17 +346,17 @@ WRITE16_MEMBER(rbisland_state::jumping_sound_w)
                             MEMORY STRUCTURES
 ***************************************************************************/
 
-static ADDRESS_MAP_START( rbisland_map, AS_PROGRAM, 16, rbisland_state )
+ADDRESS_MAP_START(rbisland_state::rbisland_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM             /* main RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x201000, 0x203fff) AM_RAM             /* r/w in initial checks */
 	AM_RANGE(0x390000, 0x390003) AM_READ_PORT("DSWA")
 	AM_RANGE(0x3a0000, 0x3a0001) AM_WRITE(rbisland_spritectrl_w)
 	AM_RANGE(0x3b0000, 0x3b0003) AM_READ_PORT("DSWB")
 	AM_RANGE(0x3c0000, 0x3c0003) AM_WRITENOP        /* written very often, watchdog? */
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x8007ff) AM_READWRITE(rbisland_cchip_ram_r,rbisland_cchip_ram_w)
 	AM_RANGE(0x800802, 0x800803) AM_READWRITE(rbisland_cchip_ctrl_r,rbisland_cchip_ctrl_w)
 	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(rbisland_cchip_bank_w)
@@ -367,10 +367,10 @@ static ADDRESS_MAP_START( rbisland_map, AS_PROGRAM, 16, rbisland_state )
 	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)  /* sprite ram + other stuff */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jumping_map, AS_PROGRAM, 16, rbisland_state )
+ADDRESS_MAP_START(rbisland_state::jumping_map)
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM             /* main RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x201000, 0x203fff) AM_RAM             /* r/w in initial checks */
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("DSWB")
@@ -408,17 +408,17 @@ READ8_MEMBER(rbisland_state::jumping_latch_r)
 }
 
 
-static ADDRESS_MAP_START( rbisland_sound_map, AS_PROGRAM, 8, rbisland_state )
+ADDRESS_MAP_START(rbisland_state::rbisland_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x9002, 0x9100) AM_READNOP
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jumping_sound_map, AS_PROGRAM, 8, rbisland_state )
+ADDRESS_MAP_START(rbisland_state::jumping_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
@@ -627,17 +627,17 @@ void rbisland_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( rbisland )
+MACHINE_CONFIG_START(rbisland_state::rbisland)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rbisland_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rbisland_sound_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)/2) /* ? MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -666,27 +666,27 @@ static MACHINE_CONFIG_START( rbisland )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4) /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(rbisland_state,bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("maincpu")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
 /* Jumping: The PCB has 2 Xtals, 18.432MHz and 24MHz */
-static MACHINE_CONFIG_START( jumping )
+MACHINE_CONFIG_START(rbisland_state::jumping)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)  /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'432'000)/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(jumping_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(jumping_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough unless otherwise */
@@ -715,16 +715,17 @@ static MACHINE_CONFIG_START( jumping )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_24MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(24'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_24MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(24'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 /* Imnoe PCB uses 16MHz CPU crystal instead of 18.432 for CPU */
-static MACHINE_CONFIG_DERIVED( jumpingi, jumping )
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_16MHz/2)  /* verified on pcb */
+MACHINE_CONFIG_START(rbisland_state::jumpingi)
+	jumping(config);
+	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(16'000'000)/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(jumping_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
 MACHINE_CONFIG_END

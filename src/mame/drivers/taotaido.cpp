@@ -96,13 +96,13 @@ WRITE8_MEMBER(taotaido_state::unknown_output_w)
 	// Bits 5, 4 also used?
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, taotaido_state )
+ADDRESS_MAP_START(taotaido_state::main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgram")  // bg ram?
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM AM_SHARE("spriteram")       // sprite ram
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("spriteram2")      // sprite tile lookup ram
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                     // main ram
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // palette ram
+	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // palette ram
 	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_SHARE("scrollram")       // rowscroll / rowselect / scroll ram
 	AM_RANGE(0xffff80, 0xffff9f) AM_DEVREADWRITE8("io1", vs9209_device, read, write, 0x00ff)
 	AM_RANGE(0xffffa0, 0xffffbf) AM_DEVREADWRITE8("io2", vs9209_device, read, write, 0x00ff)
@@ -122,13 +122,13 @@ WRITE8_MEMBER(taotaido_state::sh_bankswitch_w)
 	membank("soundbank")->set_entry(data & 0x03);
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taotaido_state )
+ADDRESS_MAP_START(taotaido_state::sound_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, taotaido_state )
+ADDRESS_MAP_START(taotaido_state::sound_port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sh_bankswitch_w)
@@ -344,7 +344,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( taotaido )
+MACHINE_CONFIG_START(taotaido_state::taotaido)
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taotaido_state,  irq1_line_hold)

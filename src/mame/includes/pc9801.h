@@ -3,8 +3,8 @@
 
 #pragma once
 
-#ifndef __PC9801__
-#define __PC9801__
+#ifndef MAME_INCLUDES_PC9801_H
+#define MAME_INCLUDES_PC9801_H
 
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i286.h"
@@ -20,6 +20,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
 
@@ -289,10 +290,36 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t a20_286(bool state);
 
+	void pc9801_keyboard(machine_config &config);
+	void pc9801_mouse(machine_config &config);
+	void pc9801_cbus(machine_config &config);
+	void pc9801_sasi(machine_config &config);
+	void pc9801_ide(machine_config &config);
+	void pc9801_common(machine_config &config);
+	void pc9821v20(machine_config &config);
+	void pc9801ux(machine_config &config);
+	void pc9801vm(machine_config &config);
+	void pc9801(machine_config &config);
+	void pc9801bx2(machine_config &config);
+	void pc9821ap2(machine_config &config);
+	void pc9821(machine_config &config);
+	void pc9801rs(machine_config &config);
+	void ipl_bank(address_map &map);
+	void pc9801_common_io(address_map &map);
+	void pc9801_io(address_map &map);
+	void pc9801_map(address_map &map);
+	void pc9801rs_io(address_map &map);
+	void pc9801rs_map(address_map &map);
+	void pc9801ux_io(address_map &map);
+	void pc9801ux_map(address_map &map);
+	void pc9821_io(address_map &map);
+	void pc9821_map(address_map &map);
+	void upd7220_1_map(address_map &map);
+	void upd7220_2_map(address_map &map);
+	void upd7220_grcg_2_map(address_map &map);
 protected:
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void device_reset_after_children() override;
 
 
 private:

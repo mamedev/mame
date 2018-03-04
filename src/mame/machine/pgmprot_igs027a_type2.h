@@ -40,10 +40,10 @@ public:
 	DECLARE_WRITE32_MEMBER( kov2p_arm_region_w );
 	DECLARE_READ32_MEMBER( ddp2_speedup_r );
 	DECLARE_READ16_MEMBER( ddp2_main_speedup_r );
+	void pgm_arm_type2(machine_config &config);
+	void _55857F_arm7_map(address_map &map);
+	void kov2_mem(address_map &map);
 };
-
-/* emulations */
-MACHINE_CONFIG_EXTERN( pgm_arm_type2 );
 
 /* simulations (or missing) */
 INPUT_PORTS_EXTERN( ddp2 );

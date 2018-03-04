@@ -22,16 +22,16 @@
 
 
 
-#define REDALERT_AUDIO_PCB_CLOCK    (XTAL_12_5MHz)
+#define REDALERT_AUDIO_PCB_CLOCK    (XTAL(12'500'000))
 #define REDALERT_AUDIO_CPU_CLOCK    (REDALERT_AUDIO_PCB_CLOCK / 12)
 #define REDALERT_AY8910_CLOCK       (REDALERT_AUDIO_PCB_CLOCK / 6)
-#define REDALERT_AUDIO_CPU_IRQ_FREQ (1000000000 / PERIOD_OF_555_ASTABLE_NSEC(RES_K(120), RES_K(2.7), CAP_U(0.01)))
+#define REDALERT_AUDIO_CPU_IRQ_FREQ (1000000000.0 / PERIOD_OF_555_ASTABLE_NSEC(RES_K(120), RES_K(2.7), CAP_U(0.01)))
 
-#define REDALERT_VOICE_PCB_CLOCK    (XTAL_6MHz)
+#define REDALERT_VOICE_PCB_CLOCK    (XTAL(6'000'000))
 #define REDALERT_VOICE_CPU_CLOCK    (REDALERT_VOICE_PCB_CLOCK)
 #define REDALERT_HC55516_CLOCK      (REDALERT_VOICE_PCB_CLOCK / 256)
 
-#define DEMONEYE_AUDIO_PCB_CLOCK    (XTAL_3_579545MHz)
+#define DEMONEYE_AUDIO_PCB_CLOCK    (XTAL(3'579'545))
 #define DEMONEYE_AUDIO_CPU_CLOCK    (DEMONEYE_AUDIO_PCB_CLOCK / 4)  /* what's the real divisor? */
 #define DEMONEYE_AY8910_CLOCK       (DEMONEYE_AUDIO_PCB_CLOCK / 2)  /* what's the real divisor? */
 
@@ -114,7 +114,7 @@ WRITE8_MEMBER(redalert_state::redalert_ay8910_latch_2_w)
 	m_ay8910_latch_2 = data;
 }
 
-static ADDRESS_MAP_START( redalert_audio_map, AS_PROGRAM, 8, redalert_state )
+ADDRESS_MAP_START(redalert_state::redalert_audio_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0ffe) AM_READNOP AM_WRITE(redalert_AY8910_w)
@@ -161,7 +161,7 @@ READ_LINE_MEMBER(redalert_state::sid_callback)
 }
 
 
-static ADDRESS_MAP_START( redalert_voice_map, AS_PROGRAM, 8, redalert_state )
+ADDRESS_MAP_START(redalert_state::redalert_voice_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x3c00) AM_RAM
@@ -176,7 +176,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( redalert_audio_m37b )
+MACHINE_CONFIG_START(redalert_state::redalert_audio_m37b)
 
 	MCFG_CPU_ADD("audiocpu", M6502, REDALERT_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(redalert_audio_map)
@@ -199,7 +199,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( redalert_audio_voice )
+MACHINE_CONFIG_START(redalert_state::redalert_audio_voice)
 
 	MCFG_CPU_ADD("voice", I8085A, REDALERT_VOICE_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(redalert_voice_map)
@@ -218,12 +218,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( redalert_audio )
+MACHINE_CONFIG_START(redalert_state::redalert_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_FRAGMENT_ADD( redalert_audio_m37b )
-	MCFG_FRAGMENT_ADD( redalert_audio_voice )
+	redalert_audio_m37b(config);
+	redalert_audio_voice(config);
 
 	MCFG_SOUND_START_OVERRIDE( redalert_state, redalert )
 
@@ -235,11 +235,11 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( ww3_audio )
+MACHINE_CONFIG_START(redalert_state::ww3_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_FRAGMENT_ADD( redalert_audio_m37b )
+	redalert_audio_m37b(config);
 
 	MCFG_SOUND_START_OVERRIDE( redalert_state, redalert )
 
@@ -313,7 +313,7 @@ WRITE8_MEMBER(redalert_state::demoneye_ay8910_data_w)
 }
 
 
-static ADDRESS_MAP_START( demoneye_audio_map, AS_PROGRAM, 8, redalert_state )
+ADDRESS_MAP_START(redalert_state::demoneye_audio_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE("sndpia", pia6821_device, read, write)
@@ -341,7 +341,7 @@ SOUND_START_MEMBER( redalert_state, demoneye )
  *
  *************************************/
 
-MACHINE_CONFIG_START( demoneye_audio )
+MACHINE_CONFIG_START(redalert_state::demoneye_audio)
 
 	MCFG_CPU_ADD("audiocpu", M6802, DEMONEYE_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(demoneye_audio_map)

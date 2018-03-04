@@ -21,7 +21,7 @@ char srcpath[250],dstfilename[250];
 
 #define BIT(x,n) (((x)>>(n))&1)
 
-#define BITSWAP16(val,B15,B14,B13,B12,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
+#define bitswap<16>(val,B15,B14,B13,B12,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
 		((BIT(val,B15) << 15) | \
 			(BIT(val,B14) << 14) | \
 			(BIT(val,B13) << 13) | \
@@ -265,7 +265,7 @@ static int parametric_decode(int val,int mainkey,int key_F,int gkey1,int gkey2,i
 
 
 	if ((val & 0xe000) == 0x0000)
-		val = BITSWAP16(val, 12,15,14,13,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+		val = bitswap<16>(val, 12,15,14,13,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 	else
 	{
 		if (val & 0x8000)
@@ -274,9 +274,9 @@ static int parametric_decode(int val,int mainkey,int key_F,int gkey1,int gkey2,i
 								if (~val & 0x0004)  val ^= 0x0022;                                      // 5,1
 			if (!key_1b)        if (~val & 0x1000)  val ^= 0x0848;                                      // 11,6,3
 			if (!global_swap2)  if (!key_0c)        val ^= 0x4101;                                      // 14,8,0
-			if (!key_2b)        val = BITSWAP16(val, 15,14,13, 9,11,10,12, 8, 2, 6, 5, 4, 3, 7, 1, 0);  // 12,9,7,2
+			if (!key_2b)        val = bitswap<16>(val, 15,14,13, 9,11,10,12, 8, 2, 6, 5, 4, 3, 7, 1, 0);  // 12,9,7,2
 
-			val = 0x6561 ^ BITSWAP16(val, 15, 9,10,13, 3,12, 0,14, 6, 5, 2,11, 8, 1, 4, 7);
+			val = 0x6561 ^ bitswap<16>(val, 15, 9,10,13, 3,12, 0,14, 6, 5, 2,11, 8, 1, 4, 7);
 		}
 		if (val & 0x4000)
 		{
@@ -284,9 +284,9 @@ static int parametric_decode(int val,int mainkey,int key_F,int gkey1,int gkey2,i
 			if (!key_3a)        if (val & 0x0004)   val ^= 0x0202;                                      // 9,1
 			if (!key_6a)        if (val & 0x0400)   val ^= 0x0004;                                      // 2
 			if (!key_5b)        if (!key_0b)        val ^= 0x08a1;                                      // 11,7,5,0
-			if (!global_swap0b) val = BITSWAP16(val, 15,14,10,12,11,13, 9, 4, 7, 6, 5, 8, 3, 2, 1, 0);  // 13,10,8,4
+			if (!global_swap0b) val = bitswap<16>(val, 15,14,10,12,11,13, 9, 4, 7, 6, 5, 8, 3, 2, 1, 0);  // 13,10,8,4
 
-			val = 0x3523 ^ BITSWAP16(val, 13,14, 7, 0, 8, 6, 4, 2, 1,15, 3,11,12,10, 5, 9);
+			val = 0x3523 ^ bitswap<16>(val, 13,14, 7, 0, 8, 6, 4, 2, 1,15, 3,11,12,10, 5, 9);
 		}
 		if (val & 0x2000)
 		{
@@ -295,22 +295,22 @@ static int parametric_decode(int val,int mainkey,int key_F,int gkey1,int gkey2,i
 			if (!key_7a)        if (val & 0x0001)   val ^= 0x110a;                                      // 12,8,3,1
 			if (!key_4b)        if (!key_0a)        val ^= 0x0040;                                      // 6
 			if (!global_swap0a) if (!key_6b)        val ^= 0x0404;                                      // 10,2
-			if (!key_5b)        val = BITSWAP16(val,  0,14,13,12,15,10, 9, 8, 7, 6,11, 4, 3, 2, 1, 5);  // 15,11,5,0
+			if (!key_5b)        val = bitswap<16>(val,  0,14,13,12,15,10, 9, 8, 7, 6,11, 4, 3, 2, 1, 5);  // 15,11,5,0
 
-			val = 0x99a5 ^ BITSWAP16(val, 10, 2,13, 7, 8, 0, 3,14, 6,15, 1,11, 9, 4, 5,12);
+			val = 0x99a5 ^ bitswap<16>(val, 10, 2,13, 7, 8, 0, 3,14, 6,15, 1,11, 9, 4, 5,12);
 		}
 
-		val = 0x87ff ^ BITSWAP16(val,  5,15,13,14, 6, 0, 9,10, 4,11, 1, 2,12, 3, 7, 8);
+		val = 0x87ff ^ bitswap<16>(val,  5,15,13,14, 6, 0, 9,10, 4,11, 1, 2,12, 3, 7, 8);
 
-		if (!global_swap4)  val = BITSWAP16(val,  6,14,13,12,11,10, 9, 5, 7,15, 8, 4, 3, 2, 1, 0);  // 15-6, 8-5
-		if (!global_swap3)  val = BITSWAP16(val, 15,12,14,13,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 12-13-14
-		if (!global_swap2)  val = BITSWAP16(val, 15,14,13,12,11, 2, 9, 8,10, 6, 5, 4, 3, 0, 1, 7);  // 10-2-0-7
-		if (!key_3b)        val = BITSWAP16(val, 15,14,13,12,11,10, 4, 8, 7, 6, 5, 9, 1, 2, 3, 0);  // 9-4, 3-1
+		if (!global_swap4)  val = bitswap<16>(val,  6,14,13,12,11,10, 9, 5, 7,15, 8, 4, 3, 2, 1, 0);  // 15-6, 8-5
+		if (!global_swap3)  val = bitswap<16>(val, 15,12,14,13,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 12-13-14
+		if (!global_swap2)  val = bitswap<16>(val, 15,14,13,12,11, 2, 9, 8,10, 6, 5, 4, 3, 0, 1, 7);  // 10-2-0-7
+		if (!key_3b)        val = bitswap<16>(val, 15,14,13,12,11,10, 4, 8, 7, 6, 5, 9, 1, 2, 3, 0);  // 9-4, 3-1
 
-		if (!key_2a)        val = BITSWAP16(val, 15,12,13,14,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 14-12
-		if (!global_swap1)  val = BITSWAP16(val, 15,14,13,12, 9, 8,11,10, 7, 6, 5, 4, 3, 2, 1, 0);  // 11...8
-		if (!key_5a)        val = BITSWAP16(val, 15,14,13,12,11,10, 9, 8, 4, 5, 7, 6, 3, 2, 1, 0);  // 7...4
-		if (!global_swap0a) val = BITSWAP16(val, 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 0, 3, 2, 1);  // 3...0
+		if (!key_2a)        val = bitswap<16>(val, 15,12,13,14,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 14-12
+		if (!global_swap1)  val = bitswap<16>(val, 15,14,13,12, 9, 8,11,10, 7, 6, 5, 4, 3, 2, 1, 0);  // 11...8
+		if (!key_5a)        val = bitswap<16>(val, 15,14,13,12,11,10, 9, 8, 4, 5, 7, 6, 3, 2, 1, 0);  // 7...4
+		if (!global_swap0a) val = bitswap<16>(val, 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 0, 3, 2, 1);  // 3...0
 	}
 
 	return final_decrypt(val,key_F);

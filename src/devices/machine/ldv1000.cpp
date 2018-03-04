@@ -60,7 +60,7 @@ DEFINE_DEVICE_TYPE(PIONEER_LDV1000, pioneer_ldv1000_device, "ldv1000", "Pioneer 
 //  LD-V1000 ROM AND MACHINE INTERFACES
 //**************************************************************************
 
-static ADDRESS_MAP_START( ldv1000_map, AS_PROGRAM, 8, pioneer_ldv1000_device )
+ADDRESS_MAP_START(pioneer_ldv1000_device::ldv1000_map)
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("ldvppi0", i8255_device, read, write)
@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( ldv1000_map, AS_PROGRAM, 8, pioneer_ldv1000_device )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ldv1000_portmap, AS_IO, 8, pioneer_ldv1000_device )
+ADDRESS_MAP_START(pioneer_ldv1000_device::ldv1000_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_MIRROR(0x38) AM_READWRITE(z80_decoder_display_port_r, z80_decoder_display_port_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(z80_controller_r)
@@ -270,13 +270,13 @@ const tiny_rom_entry *pioneer_ldv1000_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( pioneer_ldv1000_device::device_add_mconfig )
-	MCFG_CPU_ADD("ldv1000", Z80, XTAL_5MHz/2)
+MACHINE_CONFIG_START(pioneer_ldv1000_device::device_add_mconfig)
+	MCFG_CPU_ADD("ldv1000", Z80, XTAL(5'000'000)/2)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(ldv1000_map)
 	MCFG_CPU_IO_MAP(ldv1000_portmap)
 
-	MCFG_DEVICE_ADD("ldvctc", Z80CTC, XTAL_5MHz/2)
+	MCFG_DEVICE_ADD("ldvctc", Z80CTC, XTAL(5'000'000)/2)
 	MCFG_Z80CTC_INTR_CB(WRITELINE(pioneer_ldv1000_device, ctc_interrupt))
 
 	MCFG_DEVICE_ADD("ldvppi0", I8255, 0)
@@ -417,7 +417,7 @@ READ8_MEMBER( pioneer_ldv1000_device::z80_controller_r )
 WRITE8_MEMBER( pioneer_ldv1000_device::z80_controller_w )
 {
 	if (LOG_STATUS_CHANGES && data != m_status)
-		logerror("%04X:CONTROLLER.W=%02X\n", space.device().safe_pc(), data);
+		logerror("%s:CONTROLLER.W=%02X\n", machine().describe_context(), data);
 	m_status = data;
 }
 

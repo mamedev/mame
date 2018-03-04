@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Ernesto Corvi
+
+#include "machine/timer.h"
+
 class iqblock_state : public driver_device
 {
 public:
@@ -41,4 +44,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void iqblock(machine_config &config);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
 };

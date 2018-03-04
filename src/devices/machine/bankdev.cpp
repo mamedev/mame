@@ -10,8 +10,8 @@ address_map_bank_device::address_map_bank_device( const machine_config &mconfig,
 	: device_t(mconfig, ADDRESS_MAP_BANK, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_endianness(ENDIANNESS_NATIVE),
-		m_databus_width(0),
-		m_addrbus_width(32),
+		m_data_width(0),
+		m_addr_width(32),
 		m_stride(1),
 		m_program(nullptr),
 		m_offset(0)
@@ -25,19 +25,19 @@ device_memory_interface::space_config_vector address_map_bank_device::memory_spa
 	};
 }
 
-DEVICE_ADDRESS_MAP_START(amap8, 8, address_map_bank_device)
+ADDRESS_MAP_START(address_map_bank_device::amap8)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read8, write8)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(amap16, 16, address_map_bank_device)
+ADDRESS_MAP_START(address_map_bank_device::amap16)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read16, write16)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(amap32, 32, address_map_bank_device)
+ADDRESS_MAP_START(address_map_bank_device::amap32)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read32, write32)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(amap64, 64, address_map_bank_device)
+ADDRESS_MAP_START(address_map_bank_device::amap64)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read64, write64)
 ADDRESS_MAP_END
 
@@ -83,7 +83,7 @@ READ64_MEMBER(address_map_bank_device::read64)
 
 void address_map_bank_device::device_config_complete()
 {
-	m_program_config = address_space_config( "program", m_endianness, m_databus_width, m_addrbus_width );
+	m_program_config = address_space_config( "program", m_endianness, m_data_width, m_addr_width );
 }
 
 void address_map_bank_device::device_start()

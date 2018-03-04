@@ -26,7 +26,7 @@ WRITE8_MEMBER(nes_state::nes_vh_sprite_dma_w)
 	m_ppu->spriteram_dma(space, data);
 }
 
-static ADDRESS_MAP_START( nes_map, AS_PROGRAM, 8, nes_state )
+ADDRESS_MAP_START(nes_state::nes_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)                   /* RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(nes_vh_sprite_dma_w)              /* stupid address space hole */
@@ -54,7 +54,7 @@ void nes_state::ppu_nmi(int *ppu_regs)
 }
 
 
-static MACHINE_CONFIG_START( nes )
+MACHINE_CONFIG_START(nes_state::nes)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(nes_map)
@@ -65,7 +65,7 @@ static MACHINE_CONFIG_START( nes )
 	// the number of cycles in each scanline for the PPU scanline timer. Since the PPU has 20 vblank scanlines + 2
 	// non-rendering scanlines, we compensate. This ends up being 2500 cycles for the non-rendering portion, 2273
 	// cycles for the actual vblank period.
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nes_state, screen_update_nes)
@@ -96,7 +96,8 @@ static MACHINE_CONFIG_START( nes )
 	MCFG_SOFTWARE_LIST_ADD("datach_list", "nes_datach")   // Bandai Datach Joint ROM System mini-carts
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nespal, nes )
+MACHINE_CONFIG_START(nes_state::nespal)
+	nes(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(PAL_APU_CLOCK)
@@ -110,12 +111,13 @@ static MACHINE_CONFIG_DERIVED( nespal, nes )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50.0070)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
 	MCFG_SCREEN_SIZE(32*8, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( famicom, nes )
+MACHINE_CONFIG_START(nes_state::famicom)
+	nes(config);
 	MCFG_DEVICE_REMOVE("ctrl1")
 	MCFG_DEVICE_REMOVE("ctrl2")
 	MCFG_NES_CONTROL_PORT_ADD("ctrl1", fc_control_port1_devices, "joypad")
@@ -127,7 +129,8 @@ static MACHINE_CONFIG_DERIVED( famicom, nes )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "famicom_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nespalc, nespal )
+MACHINE_CONFIG_START(nes_state::nespalc)
+	nespal(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK(PALC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(nes_map)
@@ -141,10 +144,11 @@ static MACHINE_CONFIG_DERIVED( nespalc, nespal )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50.0070)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(PALC_APU_CLOCK/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC+1+2)))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(PALC_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC+1+2)))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( famipalc, nespalc )
+MACHINE_CONFIG_START(nes_state::famipalc)
+	nespalc(config);
 	MCFG_DEVICE_REMOVE("ctrl1")
 	MCFG_DEVICE_REMOVE("ctrl2")
 	MCFG_NES_CONTROL_PORT_ADD("ctrl1", fc_control_port1_devices, "joypad")
@@ -155,7 +159,8 @@ static MACHINE_CONFIG_DERIVED( famipalc, nespalc )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "famicom_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( suborkbd, famipalc )
+MACHINE_CONFIG_START(nes_state::suborkbd)
+	famipalc(config);
 	/* TODO: emulate the parallel port bus! */
 	MCFG_DEVICE_MODIFY("exp")
 	MCFG_SLOT_DEFAULT_OPTION("subor_keyboard")
@@ -211,7 +216,8 @@ MACHINE_RESET_MEMBER( nes_state, fds )
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_DERIVED( fds, famicom )
+MACHINE_CONFIG_START(nes_state::fds)
+	famicom(config);
 	MCFG_MACHINE_START_OVERRIDE( nes_state, fds )
 	MCFG_MACHINE_RESET_OVERRIDE( nes_state, fds )
 
@@ -255,7 +261,8 @@ MACHINE_RESET_MEMBER( nes_state, famitwin )
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_DERIVED( famitwin, famicom )
+MACHINE_CONFIG_START(nes_state::famitwin)
+	famicom(config);
 
 	MCFG_MACHINE_START_OVERRIDE( nes_state, famitwin )
 	MCFG_MACHINE_RESET_OVERRIDE( nes_state, famitwin )

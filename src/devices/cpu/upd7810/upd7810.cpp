@@ -374,6 +374,7 @@ STOP            01001000  10111011          12  stop
 #include "debugger.h"
 
 #include "upd7810_macros.h"
+#include "upd7810_dasm.h"
 
 
 DEFINE_DEVICE_TYPE(UPD7810,  upd7810_device,  "upd7810",  "uPD7810")
@@ -383,11 +384,11 @@ DEFINE_DEVICE_TYPE(UPD78C05, upd78c05_device, "upd78c05", "uPD78C05")
 DEFINE_DEVICE_TYPE(UPD78C06, upd78c06_device, "upd78c06", "uPD78C06")
 
 
-static ADDRESS_MAP_START( upd_internal_128_ram_map, AS_PROGRAM, 8, upd7810_device )
+ADDRESS_MAP_START(upd7810_device::upd_internal_128_ram_map)
 	AM_RANGE(0xff80, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd_internal_256_ram_map, AS_PROGRAM, 8, upd7810_device )
+ADDRESS_MAP_START(upd7810_device::upd_internal_256_ram_map)
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -434,7 +435,7 @@ void upd7810_device::configure_ops()
 }
 
 upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD7810, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_256_ram_map))
+	: upd7810_device(mconfig, UPD7810, tag, owner, clock, address_map_constructor(FUNC(upd7810_device::upd_internal_256_ram_map), this))
 {
 }
 
@@ -452,7 +453,7 @@ void upd7807_device::configure_ops()
 
 
 upd7807_device::upd7807_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD7807, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_256_ram_map))
+	: upd7810_device(mconfig, UPD7807, tag, owner, clock, address_map_constructor(FUNC(upd7807_device::upd_internal_256_ram_map), this))
 {
 }
 
@@ -469,7 +470,7 @@ void upd7801_device::configure_ops()
 }
 
 upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD7801, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_128_ram_map))
+	: upd7810_device(mconfig, UPD7801, tag, owner, clock, address_map_constructor(FUNC(upd7801_device::upd_internal_128_ram_map), this))
 {
 }
 
@@ -491,7 +492,7 @@ upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag,
 }
 
 upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, type, tag, owner, clock, ADDRESS_MAP_NAME(upd_internal_128_ram_map))
+	: upd7810_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(upd78c05_device::upd_internal_128_ram_map), this))
 {
 }
 
@@ -519,28 +520,24 @@ device_memory_interface::space_config_vector upd7810_device::memory_space_config
 	};
 }
 
-offs_t upd7810_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *upd7810_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( upd7810 );
-	return CPU_DISASSEMBLE_NAME(upd7810)(this, stream, pc, oprom, opram, options);
+	return new upd7810_disassembler;
 }
 
-offs_t upd7807_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *upd7807_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( upd7807 );
-	return CPU_DISASSEMBLE_NAME(upd7807)(this, stream, pc, oprom, opram, options);
+	return new upd7807_disassembler;
 }
 
-offs_t upd7801_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *upd7801_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( upd7801 );
-	return CPU_DISASSEMBLE_NAME(upd7801)(this, stream, pc, oprom, opram, options);
+	return new upd7801_disassembler;
 }
 
-offs_t upd78c05_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *upd78c05_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( upd78c05 );
-	return CPU_DISASSEMBLE_NAME(upd78c05)(this, stream, pc, oprom, opram, options);
+	return new upd78c05_disassembler;
 }
 
 WRITE8_MEMBER(upd7810_device::pa_w)
@@ -1571,7 +1568,7 @@ void upd78c05_device::handle_timers(int cycles)
 void upd7810_device::base_device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	m_to_func.resolve_safe();
 	m_co0_func.resolve_safe();

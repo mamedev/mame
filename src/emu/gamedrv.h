@@ -101,31 +101,8 @@ constexpr u64 MACHINE_IS_SKELETON_MECHANICAL    = MACHINE_IS_SKELETON | MACHINE_
 class game_driver
 {
 public:
-	class driver_init_helper
-	{
-	public:
-		void operator()(running_machine &machine) const { m_function(*this, machine); }
-	protected:
-		constexpr driver_init_helper(void (*function)(driver_init_helper const &, running_machine &)) : m_function(function) { }
-		constexpr driver_init_helper(driver_init_helper const &) = default;
-	private:
-		void (* const m_function)(driver_init_helper const &, running_machine &);
-	};
-
-	template <class DriverClass> class driver_init_helper_impl : public driver_init_helper
-	{
-	public:
-		constexpr driver_init_helper_impl(void (DriverClass::*method)()) : driver_init_helper(&driver_init_helper_impl<DriverClass>::invoke), m_method(method) { }
-		constexpr driver_init_helper_impl(driver_init_helper_impl<DriverClass> const &) = default;
-	private:
-		static void invoke(driver_init_helper const &helper, running_machine &machine);
-		void (DriverClass::*const m_method)();
-	};
-
-	template <class DriverClass> static constexpr auto make_driver_init(void (DriverClass::*method)())
-	{
-		return driver_init_helper_impl<DriverClass>(method);
-	}
+	typedef void (*machine_creator_wrapper)(machine_config &, device_t &);
+	typedef void (*driver_init_wrapper)(device_t &);
 
 	static constexpr device_t::feature_type unemulated_features(u64 flags)
 	{
@@ -152,9 +129,9 @@ public:
 	const char *                parent;             // if this is a clone, the name of the parent
 	const char *                year;               // year the game was released
 	const char *                manufacturer;       // manufacturer of the game
-	machine_config_constructor  machine_config;     // machine driver tokens
+	machine_creator_wrapper     machine_creator;    // machine driver tokens
 	ioport_constructor          ipt;                // pointer to constructor for input ports
-	driver_init_helper const &  driver_init;        // DRIVER_INIT callback
+	driver_init_wrapper         driver_init;        // DRIVER_INIT callback
 	const tiny_rom_entry *      rom;                // pointer to list of ROMs for the game
 	const char *                compatible_with;
 	const internal_layout *     default_layout;     // default internally defined layout
@@ -202,9 +179,9 @@ extern game_driver const GAME_NAME(NAME)                                \
 	#PARENT,                                                            \
 	#YEAR,                                                              \
 	COMPANY,                                                            \
-	MACHINE_CONFIG_NAME(MACHINE),                                       \
+	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	game_driver::make_driver_init(&CLASS::init_##INIT),                 \
+	[] (device_t &owner) { downcast<CLASS &>(owner).init_##INIT(); },   \
 	ROM_NAME(NAME),                                                     \
 	nullptr,                                                            \
 	nullptr,                                                            \
@@ -221,9 +198,9 @@ extern game_driver const GAME_NAME(NAME)                                \
 	#PARENT,                                                            \
 	#YEAR,                                                              \
 	COMPANY,                                                            \
-	MACHINE_CONFIG_NAME(MACHINE),                                       \
+	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	game_driver::make_driver_init(&CLASS::init_##INIT),                 \
+	[] (device_t &owner) { downcast<CLASS &>(owner).init_##INIT(); },   \
 	ROM_NAME(NAME),                                                     \
 	nullptr,                                                            \
 	&LAYOUT,                                                            \
@@ -241,9 +218,9 @@ extern game_driver const GAME_NAME(NAME)                                \
 	#PARENT,                                                            \
 	#YEAR,                                                              \
 	COMPANY,                                                            \
-	MACHINE_CONFIG_NAME(MACHINE),                                       \
+	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	game_driver::make_driver_init(&CLASS::init_##INIT),                 \
+	[] (device_t &owner) { downcast<CLASS &>(owner).init_##INIT(); },   \
 	ROM_NAME(NAME),                                                     \
 	#COMPAT,                                                            \
 	nullptr,                                                            \
@@ -260,9 +237,9 @@ extern game_driver const GAME_NAME(NAME)                                \
 	#PARENT,                                                            \
 	#YEAR,                                                              \
 	COMPANY,                                                            \
-	MACHINE_CONFIG_NAME(MACHINE),                                       \
+	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	game_driver::make_driver_init(&CLASS::init_##INIT),                 \
+	[] (device_t &owner) { downcast<CLASS &>(owner).init_##INIT(); },   \
 	ROM_NAME(NAME),                                                     \
 	#COMPAT,                                                            \
 	nullptr,                                                            \
@@ -279,9 +256,9 @@ extern game_driver const GAME_NAME(NAME)                                \
 	#PARENT,                                                            \
 	#YEAR,                                                              \
 	COMPANY,                                                            \
-	MACHINE_CONFIG_NAME(MACHINE),                                       \
+	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	game_driver::make_driver_init(&CLASS::init_##INIT),                 \
+	[] (device_t &owner) { downcast<CLASS &>(owner).init_##INIT(); },   \
 	ROM_NAME(NAME),                                                     \
 	#COMPAT,                                                            \
 	nullptr,                                                            \

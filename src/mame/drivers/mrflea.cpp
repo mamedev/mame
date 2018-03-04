@@ -97,15 +97,15 @@ WRITE8_MEMBER(mrflea_state::mrflea_data1_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mrflea_master_map, AS_PROGRAM, 8, mrflea_state )
+ADDRESS_MAP_START(mrflea_state::mrflea_master_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(mrflea_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe800, 0xe83f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe800, 0xe83f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xec00, 0xecff) AM_RAM_WRITE(mrflea_spriteram_w) AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrflea_master_io_map, AS_IO, 8, mrflea_state )
+ADDRESS_MAP_START(mrflea_state::mrflea_master_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog? */
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("mainppi", i8255_device, read, write)
@@ -113,14 +113,14 @@ static ADDRESS_MAP_START( mrflea_master_io_map, AS_IO, 8, mrflea_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mrflea_slave_map, AS_PROGRAM, 8, mrflea_state )
+ADDRESS_MAP_START(mrflea_state::mrflea_slave_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x80ff) AM_RAM
 	AM_RANGE(0x9000, 0x905a) AM_RAM /* ? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrflea_slave_io_map, AS_IO, 8, mrflea_state )
+ADDRESS_MAP_START(mrflea_state::mrflea_slave_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("pic", pic8259_device, read, write)
@@ -251,7 +251,7 @@ void mrflea_state::machine_reset()
 	m_gfx_bank = 0;
 }
 
-static MACHINE_CONFIG_START( mrflea )
+MACHINE_CONFIG_START(mrflea_state::mrflea)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */

@@ -21,10 +21,10 @@
 #define MCFG_ATARI_MOTION_OBJECTS_ADD(_tag, _screen, _config) \
 	MCFG_DEVICE_ADD(_tag, ATARI_MOTION_OBJECTS, 0) \
 	MCFG_VIDEO_SET_SCREEN(_screen) \
-	atari_motion_objects_device::static_set_config(*device, _config);
+	downcast<atari_motion_objects_device &>(*device).set_config(_config);
 
 #define MCFG_ATARI_MOTION_OBJECTS_GFXDECODE(_gfxtag) \
-	atari_motion_objects_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+	downcast<atari_motion_objects_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
 
 
 //**************************************************************************
@@ -85,15 +85,15 @@ public:
 	// construction/destruction
 	atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_config(device_t &device, const atari_motion_objects_config &config);
+	// configuration
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	void set_config(const atari_motion_objects_config &config) { static_cast<atari_motion_objects_config &>(*this) = config; }
 
 	// getters
 	int bank() const { return m_bank; }
 	int xscroll() const { return m_xscroll; }
 	int yscroll() const { return m_yscroll; }
-	std::vector<uint16_t> &code_lookup() { return m_codelookup; }
+	std::vector<uint32_t> &code_lookup() { return m_codelookup; }
 	std::vector<uint8_t> &color_lookup() { return m_colorlookup; }
 	std::vector<uint8_t> &gfx_lookup() { return m_gfxlookup; }
 
@@ -158,8 +158,8 @@ private:
 	public:
 		dual_sprite_parameter();
 		bool set(const atari_motion_objects_config::dual_entry &input);
-		uint16_t extract(const uint16_t *data) const { return m_lower.extract(data) | (m_upper.extract(data) << m_uppershift); }
-		uint16_t mask() const { return m_lower.mask() | (m_upper.mask() << m_uppershift); }
+		uint32_t extract(const uint16_t *data) const { return m_lower.extract(data) | (m_upper.extract(data) << m_uppershift); }
+		uint32_t mask() const { return m_lower.mask() | (m_upper.mask() << m_uppershift); }
 
 	private:
 		sprite_parameter    m_lower;            // lower parameter
@@ -212,7 +212,7 @@ private:
 
 	// arrays
 	optional_shared_ptr<uint16_t> m_slipram;    // pointer to the SLIP RAM
-	std::vector<uint16_t>   m_codelookup;       // lookup table for codes
+	std::vector<uint32_t>   m_codelookup;       // lookup table for codes
 	std::vector<uint8_t>    m_colorlookup;       // lookup table for colors
 	std::vector<uint8_t>    m_gfxlookup;         // lookup table for graphics
 

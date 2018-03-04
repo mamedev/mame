@@ -297,7 +297,7 @@ WRITE8_MEMBER(mitchell_state::input_w)
 	{
 		case 0:
 		default:
-			logerror("PC %04x: write %02x to port 01\n", space.device().safe_pc(), data);
+			logerror("PC %04x: write %02x to port 01\n", m_maincpu->pc(), data);
 			break;
 		case 1:
 			mahjong_input_select_w(space, offset, data);
@@ -315,17 +315,17 @@ WRITE8_MEMBER(mitchell_state::input_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mgakuen_map, AS_PROGRAM, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::mgakuen_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write)   /* palette RAM */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8)   /* palette RAM */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w) AM_SHARE("colorram") /* Attribute RAM */
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(mgakuen_videoram_r, mgakuen_videoram_w) AM_SHARE("videoram") /* char RAM */
 	AM_RANGE(0xe000, 0xefff) AM_RAM /* Work RAM */
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(mgakuen_objram_r, mgakuen_objram_w)   /* OBJ RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mitchell_map, AS_PROGRAM, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::mitchell_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r,pang_paletteram_w) /* Banked palette RAM */
@@ -334,13 +334,13 @@ static ADDRESS_MAP_START( mitchell_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram") /* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram") /* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::mitchell_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)   /* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)           /* The Mahjong games and Block Block need special input treatment */
@@ -357,7 +357,7 @@ static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8, mitchell_state )
 ADDRESS_MAP_END
 
 /* spangbl */
-static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::spangbl_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r, pang_paletteram_w) /* Banked palette RAM */
@@ -366,7 +366,7 @@ static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")     /* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::spangbl_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pangbl_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
@@ -387,7 +387,7 @@ WRITE8_MEMBER(mitchell_state::sound_bankswitch_w)
 	m_soundbank->set_entry(data & 7);
 }
 
-static ADDRESS_MAP_START( spangbl_sound_map, AS_PROGRAM, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::spangbl_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w)
@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( spangbl_sound_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pangba_sound_map, AS_PROGRAM, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::pangba_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w)
@@ -414,7 +414,7 @@ WRITE8_MEMBER(mitchell_state::oki_banking_w)
 	m_oki->set_rom_bank(data & 3);
 }
 
-static ADDRESS_MAP_START( mstworld_sound_map, AS_PROGRAM, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::mstworld_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(oki_banking_w)
@@ -428,7 +428,7 @@ WRITE8_MEMBER(mitchell_state::mstworld_sound_w)
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( mstworld_io_map, AS_IO, 8, mitchell_state )
+ADDRESS_MAP_START(mitchell_state::mstworld_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mstworld_gfxctrl_w)   /* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -1151,10 +1151,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(mitchell_state::mitchell_irq)
 	}
 }
 
-static MACHINE_CONFIG_START( mgakuen )
+MACHINE_CONFIG_START(mitchell_state::mgakuen)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2) /* probably same clock as the other mitchell hardware games */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* probably same clock as the other mitchell hardware games */
 	MCFG_CPU_PROGRAM_MAP(mgakuen_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
@@ -1183,21 +1183,21 @@ static MACHINE_CONFIG_START( mgakuen )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* probably same clock as the other mitchell hardware games */
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* probably same clock as the other mitchell hardware games */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_16MHz/4) /* probably same clock as the other mitchell hardware games */
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* probably same clock as the other mitchell hardware games */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pang )
+MACHINE_CONFIG_START(mitchell_state::pang)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
@@ -1224,14 +1224,15 @@ static MACHINE_CONFIG_START( pang )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ymsnd",YM2413, XTAL_16MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd",YM2413, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pangnv, pang )
+MACHINE_CONFIG_START(mitchell_state::pangnv)
+	pang(config);
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
@@ -1266,12 +1267,13 @@ WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
 }
 
 
-static MACHINE_CONFIG_DERIVED( spangbl, pangnv )
+MACHINE_CONFIG_START(mitchell_state::spangbl)
+	pangnv(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spangbl_map)
 	MCFG_CPU_IO_MAP(spangbl_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
 
 	MCFG_DEVICE_REMOVE("scantimer")
@@ -1294,7 +1296,8 @@ static MACHINE_CONFIG_DERIVED( spangbl, pangnv )
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pangba, spangbl )
+MACHINE_CONFIG_START(mitchell_state::pangba)
+	spangbl(config);
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(pangba_sound_map)
 
@@ -1302,7 +1305,7 @@ static MACHINE_CONFIG_DERIVED( pangba, spangbl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mstworld )
+MACHINE_CONFIG_START(mitchell_state::mstworld)
 
 	/* basic machine hardware */
 	/* it doesn't glitch with the clock speed set to 4x normal, however this is incorrect..
@@ -1311,7 +1314,7 @@ static MACHINE_CONFIG_START( mstworld )
 	MCFG_CPU_ADD("maincpu", Z80, 6000000*4)
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mstworld_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,6000000)        /* 6 MHz? */
@@ -1346,13 +1349,13 @@ static MACHINE_CONFIG_START( mstworld )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( marukin )
+MACHINE_CONFIG_START(mitchell_state::marukin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -1376,10 +1379,10 @@ static MACHINE_CONFIG_START( marukin )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_16MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1401,13 +1404,13 @@ Vsync is 59.09hz
 
 */
 
-static MACHINE_CONFIG_START( pkladiesbl )
+MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -1431,7 +1434,7 @@ static MACHINE_CONFIG_START( pkladiesbl )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* It should be a OKIM5205 with a 384khz resonator */
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* It should be a OKIM5205 with a 384khz resonator */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3750000) /* verified on pcb, read the comments */
@@ -1573,35 +1576,68 @@ ROM_START( pkladiesbl )
 	ROM_REGION( 0x50000*2, "maincpu", 0 )
 	// you would expect one half of this to be decrypted code, and the other half to be decrypted data
 	// however, only parts of it are??
-	ROM_LOAD( "1.bin", 0x50000, 0x08000, CRC(ca4cfaf9) SHA1(97ad3c526e4494f347db45c986ba23aff07e6321) )
+	ROM_LOAD( "1.ic112", 0x50000, 0x08000, CRC(ca4cfaf9) SHA1(97ad3c526e4494f347db45c986ba23aff07e6321) )
 	ROM_CONTINUE(0x00000,0x08000)
-	ROM_LOAD( "2.bin", 0x10000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
+	ROM_LOAD( "2.ic126", 0x10000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
 	ROM_CONTINUE(0x60000,0x10000)
 
 	ROM_REGION( 0x240000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD32_BYTE("20.bin", 0x000000, 0x20000, CRC(ea72f6b5) SHA1(f38e4c8c9acec754f34b3ac442c96919c321a277) )
-	ROM_LOAD32_BYTE("14.bin", 0x000001, 0x20000, CRC(d6fe4f36) SHA1(aa6250d4291ca67165898cec57b96ec830b89d8f) )
-	ROM_LOAD32_BYTE("10.bin", 0x000002, 0x20000, CRC(a2eff7a9) SHA1(290930ff93b20409cb99cbf12a7de493dce7baa2) )
-	ROM_LOAD32_BYTE("6.bin",  0x000003, 0x20000, CRC(0be240fc) SHA1(8c783ad87018fcbb03f98a4810372c5c6eb315c9) )
-	ROM_LOAD32_BYTE("21.bin", 0x080000, 0x20000, CRC(45bb438c) SHA1(2ba9a64d332e019f5eaa71ecb9f60681afd4930a) )
-	ROM_LOAD32_BYTE("15.bin", 0x080001, 0x20000, CRC(afb0fa4a) SHA1(f86df12bece344c29ff65cf2b00a64880f89c4bb) )
-	ROM_LOAD32_BYTE("11.bin", 0x080002, 0x20000, CRC(5d87135d) SHA1(b356edee8bec986446f6c91b5f9394a83bc1c094) )
-	ROM_LOAD32_BYTE("7.bin",  0x080003, 0x20000, CRC(ee822998) SHA1(1753a669a24f4152094489d073f87a18d5f36556) )
-	ROM_LOAD32_BYTE("18.bin", 0x100000, 0x20000, CRC(e088b5e2) SHA1(50950f6f94d6a6f646f5baf3faaceba95b837162) )
-	ROM_LOAD32_BYTE("12.bin", 0x100001, 0x20000, CRC(5339daa7) SHA1(66910bc1b6cfd51239b8c40d9ca34540fd73231b) )
-	ROM_LOAD32_BYTE("8.bin",  0x100002, 0x20000, CRC(fa117809) SHA1(4fffecdbf5adc4735d9680849e33556728c11997) )
-	ROM_LOAD32_BYTE("4.bin",  0x100003, 0x20000, CRC(09ba3171) SHA1(362be89c7b29de2f20ed1e28e73ed7a361f9f647) )
-	ROM_LOAD32_BYTE("19.bin", 0x180000, 0x20000, CRC(48540300) SHA1(cd25c1b7ddcf3883a5f77779d06c8b966acb0a99) )
-	ROM_LOAD32_BYTE("13.bin", 0x180001, 0x20000, CRC(5bcf710e) SHA1(3acf3b41b2002ee56a3452217dc99cbd36bd0273) )
-	ROM_LOAD32_BYTE("9.bin",  0x180002, 0x20000, CRC(edf4c0f4) SHA1(e1689bfaa1547fe8da5635808833cfe91b9d98bc) )
-	ROM_LOAD32_BYTE("5.bin",  0x180003, 0x20000, CRC(93422182) SHA1(72847f073ffaffb7ed34a0972598a3df929c25a3) )
+	ROM_LOAD32_BYTE("20.ic97",  0x000000, 0x20000, CRC(ea72f6b5) SHA1(f38e4c8c9acec754f34b3ac442c96919c321a277) )
+	ROM_LOAD32_BYTE("14.ic96",  0x000001, 0x20000, CRC(d6fe4f36) SHA1(aa6250d4291ca67165898cec57b96ec830b89d8f) )
+	ROM_LOAD32_BYTE("10.ic95",  0x000002, 0x20000, CRC(a2eff7a9) SHA1(290930ff93b20409cb99cbf12a7de493dce7baa2) )
+	ROM_LOAD32_BYTE("6.ic110",  0x000003, 0x20000, CRC(0be240fc) SHA1(8c783ad87018fcbb03f98a4810372c5c6eb315c9) )
+	ROM_LOAD32_BYTE("21.ic98",  0x080000, 0x20000, CRC(45bb438c) SHA1(2ba9a64d332e019f5eaa71ecb9f60681afd4930a) )
+	ROM_LOAD32_BYTE("15.ic99",  0x080001, 0x20000, CRC(afb0fa4a) SHA1(f86df12bece344c29ff65cf2b00a64880f89c4bb) )
+	ROM_LOAD32_BYTE("11.ic100", 0x080002, 0x20000, CRC(5d87135d) SHA1(b356edee8bec986446f6c91b5f9394a83bc1c094) )
+	ROM_LOAD32_BYTE("7.ic101",  0x080003, 0x20000, CRC(ee822998) SHA1(1753a669a24f4152094489d073f87a18d5f36556) )
+	ROM_LOAD32_BYTE("18.ic105", 0x100000, 0x20000, CRC(e088b5e2) SHA1(50950f6f94d6a6f646f5baf3faaceba95b837162) )
+	ROM_LOAD32_BYTE("12.ic104", 0x100001, 0x20000, CRC(5339daa7) SHA1(66910bc1b6cfd51239b8c40d9ca34540fd73231b) )
+	ROM_LOAD32_BYTE("8.ic103",  0x100002, 0x20000, CRC(fa117809) SHA1(4fffecdbf5adc4735d9680849e33556728c11997) )
+	ROM_LOAD32_BYTE("4.ic102",  0x100003, 0x20000, CRC(09ba3171) SHA1(362be89c7b29de2f20ed1e28e73ed7a361f9f647) )
+	ROM_LOAD32_BYTE("19.ic106", 0x180000, 0x20000, CRC(48540300) SHA1(cd25c1b7ddcf3883a5f77779d06c8b966acb0a99) )
+	ROM_LOAD32_BYTE("13.ic107", 0x180001, 0x20000, CRC(5bcf710e) SHA1(3acf3b41b2002ee56a3452217dc99cbd36bd0273) )
+	ROM_LOAD32_BYTE("9.ic108",  0x180002, 0x20000, CRC(edf4c0f4) SHA1(e1689bfaa1547fe8da5635808833cfe91b9d98bc) )
+	ROM_LOAD32_BYTE("5.ic109",  0x180003, 0x20000, CRC(93422182) SHA1(72847f073ffaffb7ed34a0972598a3df929c25a3) )
 
 	ROM_REGION( 0x040000, "gfx2", ROMREGION_INVERT )
-	ROM_LOAD("16.bin", 0x020000, 0x20000, CRC(c6decb5e) SHA1(3d35cef348deb16a62a066acdfbabebcf11fa997) )
-	ROM_LOAD("17.bin", 0x000000, 0x20000, CRC(5a6efdcc) SHA1(04120dd4da0ff8df514f98a44d7eee7100e4c033) )
+	ROM_LOAD("16.ic42", 0x020000, 0x20000, CRC(c6decb5e) SHA1(3d35cef348deb16a62a066acdfbabebcf11fa997) )
+	ROM_LOAD("17.ic41", 0x000000, 0x20000, CRC(5a6efdcc) SHA1(04120dd4da0ff8df514f98a44d7eee7100e4c033) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* OKIM */
-	ROM_LOAD("3.bin", 0x000000, 0x20000, CRC(16b79788) SHA1(6b796119d3c57229ba3d613ce8832c94e9616f76) )
+	ROM_LOAD("3.ic127", 0x000000, 0x20000, CRC(16b79788) SHA1(6b796119d3c57229ba3d613ce8832c94e9616f76) )
+ROM_END
+
+ROM_START( pkladiesbl2 ) // same as the above but without the z80 block, only 1.ic112 differs
+	ROM_REGION( 0x50000*2, "maincpu", 0 )
+	ROM_LOAD( "1.ic112", 0x50000, 0x08000, CRC(cadb9925) SHA1(d88353501a29ff855335f9c8822e095ef5196246) ) //sldh
+	ROM_CONTINUE(0x00000,0x08000)
+	ROM_LOAD( "2.ic126", 0x10000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
+	ROM_CONTINUE(0x60000,0x10000)
+
+	ROM_REGION( 0x240000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD32_BYTE("20.ic97",  0x000000, 0x20000, CRC(ea72f6b5) SHA1(f38e4c8c9acec754f34b3ac442c96919c321a277) )
+	ROM_LOAD32_BYTE("14.ic96",  0x000001, 0x20000, CRC(d6fe4f36) SHA1(aa6250d4291ca67165898cec57b96ec830b89d8f) )
+	ROM_LOAD32_BYTE("10.ic95",  0x000002, 0x20000, CRC(a2eff7a9) SHA1(290930ff93b20409cb99cbf12a7de493dce7baa2) )
+	ROM_LOAD32_BYTE("6.ic110",  0x000003, 0x20000, CRC(0be240fc) SHA1(8c783ad87018fcbb03f98a4810372c5c6eb315c9) )
+	ROM_LOAD32_BYTE("21.ic98",  0x080000, 0x20000, CRC(45bb438c) SHA1(2ba9a64d332e019f5eaa71ecb9f60681afd4930a) )
+	ROM_LOAD32_BYTE("15.ic99",  0x080001, 0x20000, CRC(afb0fa4a) SHA1(f86df12bece344c29ff65cf2b00a64880f89c4bb) )
+	ROM_LOAD32_BYTE("11.ic100", 0x080002, 0x20000, CRC(5d87135d) SHA1(b356edee8bec986446f6c91b5f9394a83bc1c094) )
+	ROM_LOAD32_BYTE("7.ic101",  0x080003, 0x20000, CRC(ee822998) SHA1(1753a669a24f4152094489d073f87a18d5f36556) )
+	ROM_LOAD32_BYTE("18.ic105", 0x100000, 0x20000, CRC(e088b5e2) SHA1(50950f6f94d6a6f646f5baf3faaceba95b837162) )
+	ROM_LOAD32_BYTE("12.ic104", 0x100001, 0x20000, CRC(5339daa7) SHA1(66910bc1b6cfd51239b8c40d9ca34540fd73231b) )
+	ROM_LOAD32_BYTE("8.ic103",  0x100002, 0x20000, CRC(fa117809) SHA1(4fffecdbf5adc4735d9680849e33556728c11997) )
+	ROM_LOAD32_BYTE("4.ic102",  0x100003, 0x20000, CRC(09ba3171) SHA1(362be89c7b29de2f20ed1e28e73ed7a361f9f647) )
+	ROM_LOAD32_BYTE("19.ic106", 0x180000, 0x20000, CRC(48540300) SHA1(cd25c1b7ddcf3883a5f77779d06c8b966acb0a99) )
+	ROM_LOAD32_BYTE("13.ic107", 0x180001, 0x20000, CRC(5bcf710e) SHA1(3acf3b41b2002ee56a3452217dc99cbd36bd0273) )
+	ROM_LOAD32_BYTE("9.ic108",  0x180002, 0x20000, CRC(edf4c0f4) SHA1(e1689bfaa1547fe8da5635808833cfe91b9d98bc) )
+	ROM_LOAD32_BYTE("5.ic109",  0x180003, 0x20000, CRC(93422182) SHA1(72847f073ffaffb7ed34a0972598a3df929c25a3) )
+
+	ROM_REGION( 0x040000, "gfx2", ROMREGION_INVERT )
+	ROM_LOAD("16.ic42", 0x020000, 0x20000, CRC(c6decb5e) SHA1(3d35cef348deb16a62a066acdfbabebcf11fa997) )
+	ROM_LOAD("17.ic41", 0x000000, 0x20000, CRC(5a6efdcc) SHA1(04120dd4da0ff8df514f98a44d7eee7100e4c033) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* OKIM */
+	ROM_LOAD("3.ic127", 0x000000, 0x20000, CRC(16b79788) SHA1(6b796119d3c57229ba3d613ce8832c94e9616f76) )
 ROM_END
 
 ROM_START( dokaben )
@@ -2417,34 +2453,35 @@ DRIVER_INIT_MEMBER(mitchell_state,mstworld)
  *
  *************************************/
 
-GAME( 1988, mgakuen,   0,        mgakuen,   mgakuen,  mitchell_state, mgakuen,   ROT0,   "Yuga",                      "Mahjong Gakuen", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, 7toitsu,   mgakuen,  mgakuen,   mgakuen,  mitchell_state, mgakuen,   ROT0,   "Yuga",                      "Chi-Toitsu", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mgakuen2,  0,        marukin,   marukin,  mitchell_state, mgakuen2,  ROT0,   "Face",                      "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladies,  0,        marukin,   pkladies, mitchell_state, pkladies,  ROT0,   "Mitchell",                  "Poker Ladies", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesl, pkladies, marukin,   pkladies, mitchell_state, pkladies,  ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesla,pkladies, marukin,   pkladies, mitchell_state, pkladies,  ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesbl,pkladies, pkladiesbl,pkladies, mitchell_state, pkladiesbl,ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg)", MACHINE_NOT_WORKING ) // by Playmark? need to figure out CPU 'decryption' / ordering
-GAME( 1989, dokaben,   0,        pang,      pang,     mitchell_state, dokaben,   ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pang,      0,        pang,      pang,     mitchell_state, pang,      ROT0,   "Mitchell",                  "Pang (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbros,     pang,     pang,      pang,     mitchell_state, pang,      ROT0,   "Mitchell (Capcom license)", "Buster Bros. (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pompingw,  pang,     pang,      pang,     mitchell_state, pang,      ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangb,     pang,     pang,      pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangbold,  pang,     pang,      pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangba,    pang,     pangba,    pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangb2,    pang,     pang,      pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangbb,    pang,     spangbl,   pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cworld,    0,        pang,      qtono1,   mitchell_state, cworld,    ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hatena,    0,        pang,      qtono1,   mitchell_state, hatena,    ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spang,     0,        pangnv,    pang,     mitchell_state, spang,     ROT0,   "Mitchell",                  "Super Pang (World 900914)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, sbbros,    spang,    pangnv,    pang,     mitchell_state, sbbros,    ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spangj,    spang,    pangnv,    pang,     mitchell_state, spangj,    ROT0,   "Mitchell",                  "Super Pang (Japan 901023)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spangbl,   spang,    spangbl,   spangbl,  mitchell_state, spangbl,   ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different sound hardware
-GAME( 1994, mstworld,  0,        mstworld,  mstworld, mitchell_state, mstworld,  ROT0,   "bootleg (TCH)",             "Monsters World (bootleg of Super Pang)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, marukin,   0,        marukin,   marukin,  mitchell_state, marukin,   ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, qtono1,    0,        pang,      qtono1,   mitchell_state, qtono1,    ROT0,   "Capcom",                    "Quiz Tonosama no Yabou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, qsangoku,  0,        pang,      qtono1,   mitchell_state, qsangoku,  ROT0,   "Capcom",                    "Quiz Sangokushi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, block,     0,        pangnv,    blockjoy, mitchell_state, block,     ROT270, "Capcom",                    "Block Block (World 911219 Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockr1,   block,    pangnv,    blockjoy, mitchell_state, block,     ROT270, "Capcom",                    "Block Block (World 911106 Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockr2,   block,    pangnv,    block,    mitchell_state, block,     ROT270, "Capcom",                    "Block Block (World 910910)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockj,    block,    pangnv,    block,    mitchell_state, block,     ROT270, "Capcom",                    "Block Block (Japan 910910)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockbl,   block,    pangnv,    block,    mitchell_state, blockbl,   ROT270, "bootleg",                   "Block Block (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mgakuen,     0,        mgakuen,    mgakuen,  mitchell_state, mgakuen,    ROT0,   "Yuga",                      "Mahjong Gakuen", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, 7toitsu,     mgakuen,  mgakuen,    mgakuen,  mitchell_state, mgakuen,    ROT0,   "Yuga",                      "Chi-Toitsu", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mgakuen2,    0,        marukin,    marukin,  mitchell_state, mgakuen2,   ROT0,   "Face",                      "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladies,    0,        marukin,    pkladies, mitchell_state, pkladies,   ROT0,   "Mitchell",                  "Poker Ladies", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies, mitchell_state, pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies, mitchell_state, pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladies, mitchell_state, pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 1)", MACHINE_NOT_WORKING ) // by Playmark? need to figure out CPU 'decryption' / ordering
+GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladies, mitchell_state, pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 2)", MACHINE_NOT_WORKING ) // by Playmark? gets further than the above
+GAME( 1989, dokaben,     0,        pang,       pang,     mitchell_state, dokaben,    ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pang,        0,        pang,       pang,     mitchell_state, pang,       ROT0,   "Mitchell",                  "Pang (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbros,       pang,     pang,       pang,     mitchell_state, pang,       ROT0,   "Mitchell (Capcom license)", "Buster Bros. (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pompingw,    pang,     pang,       pang,     mitchell_state, pang,       ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangb,       pang,     pang,       pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbold,    pang,     pang,       pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangba,      pang,     pangba,     pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangb2,      pang,     pang,       pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbb,      pang,     spangbl,    pang,     mitchell_state, pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cworld,      0,        pang,       qtono1,   mitchell_state, cworld,     ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatena,      0,        pang,       qtono1,   mitchell_state, hatena,     ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spang,       0,        pangnv,     pang,     mitchell_state, spang,      ROT0,   "Mitchell",                  "Super Pang (World 900914)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, sbbros,      spang,    pangnv,     pang,     mitchell_state, sbbros,     ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spangj,      spang,    pangnv,     pang,     mitchell_state, spangj,     ROT0,   "Mitchell",                  "Super Pang (Japan 901023)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spangbl,     spang,    spangbl,    spangbl,  mitchell_state, spangbl,    ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different sound hardware
+GAME( 1994, mstworld,    0,        mstworld,   mstworld, mitchell_state, mstworld,   ROT0,   "bootleg (TCH)",             "Monsters World (bootleg of Super Pang)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, marukin,     0,        marukin,    marukin,  mitchell_state, marukin,    ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, qtono1,      0,        pang,       qtono1,   mitchell_state, qtono1,     ROT0,   "Capcom",                    "Quiz Tonosama no Yabou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, qsangoku,    0,        pang,       qtono1,   mitchell_state, qsangoku,   ROT0,   "Capcom",                    "Quiz Sangokushi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, block,       0,        pangnv,     blockjoy, mitchell_state, block,      ROT270, "Capcom",                    "Block Block (World 911219 Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockr1,     block,    pangnv,     blockjoy, mitchell_state, block,      ROT270, "Capcom",                    "Block Block (World 911106 Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockr2,     block,    pangnv,     block,    mitchell_state, block,      ROT270, "Capcom",                    "Block Block (World 910910)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockj,      block,    pangnv,     block,    mitchell_state, block,      ROT270, "Capcom",                    "Block Block (Japan 910910)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockbl,     block,    pangnv,     block,    mitchell_state, blockbl,    ROT270, "bootleg",                   "Block Block (bootleg)", MACHINE_SUPPORTS_SAVE )

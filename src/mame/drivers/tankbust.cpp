@@ -190,7 +190,7 @@ READ8_MEMBER(tankbust_state::some_changing_input)
 	return m_variable_data;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbust_state )
+ADDRESS_MAP_START(tankbust_state::main_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank2")
@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbust_state )
 	//AM_RANGE(0xf800, 0xffff) AM_READ(read_from_unmapped_memory)   /* a bug in game code ? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( port_map_cpu2, AS_IO, 8, tankbust_state )
+ADDRESS_MAP_START(tankbust_state::port_map_cpu2)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_w)
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( port_map_cpu2, AS_IO, 8, tankbust_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( map_cpu2, AS_PROGRAM, 8, tankbust_state )
+ADDRESS_MAP_START(tankbust_state::map_cpu2)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_WRITENOP    /* garbage, written in initialization loop */
 	//0x4000 and 0x4040-0x4045 seem to be used (referenced in the code)
@@ -330,15 +330,15 @@ INTERRUPT_GEN_MEMBER(tankbust_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( tankbust )
+MACHINE_CONFIG_START(tankbust_state::tankbust)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2)    /* Verified on PCB */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(14'318'181)/2)    /* Verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tankbust_state,  vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_14_31818MHz/4)        /* Verified on PCB */
-//  MCFG_CPU_ADD("sub", Z80, XTAL_14_31818MHz/3)        /* Accurate to audio recording, but apparently incorrect clock */
+	MCFG_CPU_ADD("sub", Z80, XTAL(14'318'181)/4)        /* Verified on PCB */
+//  MCFG_CPU_ADD("sub", Z80, XTAL(14'318'181)/3)        /* Accurate to audio recording, but apparently incorrect clock */
 	MCFG_CPU_PROGRAM_MAP(map_cpu2)
 	MCFG_CPU_IO_MAP(port_map_cpu2)
 
@@ -363,12 +363,12 @@ static MACHINE_CONFIG_START( tankbust )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_14_31818MHz/16)  /* Verified on PCB */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(14'318'181)/16)  /* Verified on PCB */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(tankbust_state, soundlatch_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(tankbust_state, soundtimer_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_14_31818MHz/16)  /* Verified on PCB */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(14'318'181)/16)  /* Verified on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 

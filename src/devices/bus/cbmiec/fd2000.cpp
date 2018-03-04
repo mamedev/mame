@@ -89,7 +89,7 @@ const tiny_rom_entry *fd4000_device::device_rom_region() const
 //  ADDRESS_MAP( fd2000_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( fd2000_mem, AS_PROGRAM, 8, fd2000_device )
+ADDRESS_MAP_START(fd2000_device::fd2000_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0xbf0) AM_DEVREADWRITE(G65SC22P2_TAG, via6522_device, read, write)
 	AM_RANGE(0x4e00, 0x4e07) AM_MIRROR(0x1f8) AM_DEVICE(DP8473V_TAG, dp8473_device, map)
@@ -102,7 +102,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( fd4000_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( fd4000_mem, AS_PROGRAM, 8, fd4000_device )
+ADDRESS_MAP_START(fd4000_device::fd4000_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0xbf0) AM_DEVREADWRITE(G65SC22P2_TAG, via6522_device, read, write)
 	AM_RANGE(0x4e00, 0x4e07) AM_MIRROR(0x1f8) AM_DEVICE(PC8477AV1_TAG, pc8477a_device, map)
@@ -211,11 +211,11 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( fd2000_device::device_add_mconfig )
-	MCFG_CPU_ADD(G65SC02PI2_TAG, M65C02, XTAL_24MHz/12)
+MACHINE_CONFIG_START(fd2000_device::device_add_mconfig)
+	MCFG_CPU_ADD(G65SC02PI2_TAG, M65C02, XTAL(24'000'000)/12)
 	MCFG_CPU_PROGRAM_MAP(fd2000_mem)
 
-	MCFG_DEVICE_ADD(G65SC22P2_TAG, VIA6522, XTAL_24MHz/12)
+	MCFG_DEVICE_ADD(G65SC22P2_TAG, VIA6522, XTAL(24'000'000)/12)
 	MCFG_VIA6522_READPA_HANDLER(READ8(fd2000_device, via_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(fd2000_device, via_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(fd2000_device, via_pa_w))
@@ -227,11 +227,11 @@ MACHINE_CONFIG_MEMBER( fd2000_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_MEMBER( fd4000_device::device_add_mconfig )
-	MCFG_CPU_ADD(R65C02P4_TAG, M65C02, XTAL_24MHz/6)
+MACHINE_CONFIG_START(fd4000_device::device_add_mconfig)
+	MCFG_CPU_ADD(R65C02P4_TAG, M65C02, XTAL(24'000'000)/6)
 	MCFG_CPU_PROGRAM_MAP(fd4000_mem)
 
-	MCFG_DEVICE_ADD(G65SC22P2_TAG, VIA6522, XTAL_24MHz/12)
+	MCFG_DEVICE_ADD(G65SC22P2_TAG, VIA6522, XTAL(24'000'000)/12)
 	MCFG_VIA6522_READPA_HANDLER(READ8(fd2000_device, via_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(fd2000_device, via_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(fd2000_device, via_pa_w))

@@ -67,7 +67,7 @@
 #include "speaker.h"
 //#include "sound/ay8910.h"
 
-#define MAIN_CLOCK XTAL_5MHz
+#define MAIN_CLOCK XTAL(5'000'000)
 
 class apc_state : public driver_device
 {
@@ -153,6 +153,11 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
+	void apc(machine_config &config);
+	void apc_io(address_map &map);
+	void apc_map(address_map &map);
+	void upd7220_1_map(address_map &map);
+	void upd7220_2_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -394,12 +399,12 @@ CH3_EXA ==      0X3E                      ; CH-3 extended address (W)
 
 READ8_MEMBER(apc_state::apc_dma_r)
 {
-	return m_dmac->read(space, BITSWAP8(offset,7,6,5,4,2,1,0,3), 0xff);
+	return m_dmac->read(space, bitswap<8>(offset,7,6,5,4,2,1,0,3), 0xff);
 }
 
 WRITE8_MEMBER(apc_state::apc_dma_w)
 {
-	m_dmac->write(space, BITSWAP8(offset,7,6,5,4,2,1,0,3), data, 0xff);
+	m_dmac->write(space, bitswap<8>(offset,7,6,5,4,2,1,0,3), data, 0xff);
 }
 
 WRITE8_MEMBER(apc_state::apc_irq_ack_w)
@@ -463,7 +468,7 @@ RTC write bits: 76543210
 	m_rtc->oe_w(1);
 }
 
-static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
+ADDRESS_MAP_START(apc_state::apc_map)
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0fff) AM_RAM AM_SHARE("cmos")
 //  AM_RANGE(0xa1000, 0xbffff) mirror CMOS
@@ -473,7 +478,7 @@ static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
+ADDRESS_MAP_START(apc_state::apc_io)
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_READWRITE8(apc_dma_r, apc_dma_w,0xff00)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff) // i8259
@@ -785,11 +790,11 @@ GFXDECODE_END
 
 
 
-static ADDRESS_MAP_START( upd7220_1_map, 0, 16, apc_state)
+ADDRESS_MAP_START(apc_state::upd7220_1_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_2_map, 0, 16, apc_state )
+ADDRESS_MAP_START(apc_state::upd7220_2_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
@@ -909,7 +914,7 @@ static SLOT_INTERFACE_START( apc_floppies )
 	SLOT_INTERFACE( "8", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apc )
+MACHINE_CONFIG_START(apc_state::apc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8086,MAIN_CLOCK)
@@ -945,7 +950,7 @@ static MACHINE_CONFIG_START( apc )
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(apc_state, apc_dack3_w))
 
 	MCFG_NVRAM_ADD_1FILL("cmos")
-	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NOOP, NOOP)
+	MCFG_UPD1990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259_slave", pic8259_device, ir4_w))

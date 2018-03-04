@@ -177,7 +177,7 @@ READ8_MEMBER(retofinv_state::mcu_status_r)
    empty socket at IC73 from 6000-7fff) and if it finds a particular
    string there, it jumps to that area, presumably for diagnostic use */
 
-static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, retofinv_state )
+ADDRESS_MAP_START(retofinv_state::bootleg_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(coincounter_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
@@ -197,14 +197,14 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0xf800, 0xf800) AM_READ(cpu0_mf800_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
+ADDRESS_MAP_START(retofinv_state::main_map)
 	AM_IMPORT_FROM(bootleg_map)
 	AM_RANGE(0xc003, 0xc003) AM_READ(mcu_status_r)
 	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("68705", taito68705_mcu_device, data_r)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("68705", taito68705_mcu_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, retofinv_state )
+ADDRESS_MAP_START(retofinv_state::sub_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("sharedram")
@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0xc800, 0xc807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, retofinv_state )
+ADDRESS_MAP_START(retofinv_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM /* 6116 sram at IC28 */
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -409,22 +409,22 @@ INTERRUPT_GEN_MEMBER(retofinv_state::sub_vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( retofinv )
+MACHINE_CONFIG_START(retofinv_state::retofinv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)    /* XTAL and divider verified, 3.072 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", retofinv_state,  main_vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)    /* XTAL and divider verified, 3.072 MHz */
+	MCFG_CPU_ADD("sub", Z80, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", retofinv_state,  sub_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)   /* XTAL and divider verified, 3.072 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6)   /* XTAL and divider verified, 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(retofinv_state, nmi_line_pulse, 2*60) // wrong, should be ~128-132 per frame, not 120.
 
-	MCFG_CPU_ADD("68705", TAITO68705_MCU, XTAL_18_432MHz/6)    /* XTAL and divider verified, 3.072 MHz */
+	MCFG_CPU_ADD("68705", TAITO68705_MCU, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -457,21 +457,35 @@ static MACHINE_CONFIG_START( retofinv )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_18_432MHz/6)   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(18'432'000)/6)   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, XTAL_18_432MHz/6)   /* @IC6?; XTAL, chip type, and divider verified, 3.072 MHz */
+	MCFG_SOUND_ADD("sn2", SN76489A, XTAL(18'432'000)/6)   /* @IC6?; XTAL, chip type, and divider verified, 3.072 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-/* bootleg has different palette clut */
-static MACHINE_CONFIG_DERIVED( retofinvb, retofinv )
+/* bootleg which has different palette clut */
+MACHINE_CONFIG_START(retofinv_state::retofinvb1)
+	retofinv(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv_bl)
 MACHINE_CONFIG_END
 
-/* bootleg which also has no mcu */
-static MACHINE_CONFIG_DERIVED( retofinvb_nomcu, retofinvb )
+/* bootleg which has no mcu */
+MACHINE_CONFIG_START(retofinv_state::retofinvb_nomcu)
+	retofinv(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bootleg_map)
+
+	MCFG_DEVICE_MODIFY("mainlatch")
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
+
+	MCFG_DEVICE_REMOVE("68705")
+MACHINE_CONFIG_END
+
+/* bootleg which has different pallete clut and also has no mcu */
+MACHINE_CONFIG_START(retofinv_state::retofinvb1_nomcu)
+	retofinvb1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 
@@ -575,6 +589,7 @@ ROM_START( retofinvb ) // bootleg with black-box reverse-engineered mcu. Unclear
 	ROM_LOAD( "a37-07.4",  0x0100, 0x0100, CRC(e8f34e11) SHA1(8f438561b8d46ffff00747ed8baf0ebb6a081615) )   /* palette green bits */
 	ROM_LOAD( "a37-08.3",  0x0200, 0x0100, CRC(50030af0) SHA1(e748ae0b8702b7d20fb65c254dceee23246b3d13) )   /* palette blue bits   */
 
+	// below may be incorrect; this bootleg may be supposed to use the same 4 proms as the main set above does.
 	ROM_REGION( 0x0800, "clut", 0 ) // bootleg uses a single 82s191 2kx8 TS prom for the tile color lookup tables; data is scrambled slightly.
 	ROM_LOAD( "82s191n",   0x0000, 0x0800, CRC(93c891e3) SHA1(643a0107717b6a434432dda73a0102e6e8adbca7) )
 ROM_END
@@ -684,8 +699,8 @@ ROM_START( retofinvb3 ) // Italian bootleg PCB. Only maincpu ROMs differ from pa
 	ROM_LOAD_NIB_LOW ( "6353-1.c",  0x0400, 0x0400, CRC(77a7aaf6) SHA1(61a474f1ad09b89ff8302f2d903b86a90823116c) )
 ROM_END
 
-GAME( 1985, retofinv,   0,        retofinv,        retofinv, retofinv_state, 0, ROT90, "Taito Corporation", "Return of the Invaders",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb,  retofinv, retofinvb,       retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg w/MCU)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb1, retofinv, retofinvb_nomcu, retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb2, retofinv, retofinvb_nomcu, retofin2, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb3, retofinv, retofinvb_nomcu, retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinv,   0,        retofinv,         retofinv, retofinv_state, 0, ROT90, "Taito Corporation", "Return of the Invaders",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb,  retofinv, retofinvb1,       retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg w/MCU)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb1, retofinv, retofinvb1_nomcu, retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb2, retofinv, retofinvb1_nomcu, retofin2, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb3, retofinv, retofinvb_nomcu,  retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 3)", MACHINE_SUPPORTS_SAVE )

@@ -28,6 +28,7 @@ public:
 	DECLARE_READ16_MEMBER( d104_move_r );
 	DECLARE_WRITE16_MEMBER( d104_move_w );
 
+	void seibucopbl_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -48,7 +49,6 @@ private:
 	//required_device<raiden2cop_device> m_raiden2cop;
 };
 
-extern const device_type SEIBU_COP_BOOTLEG;
 DECLARE_DEVICE_TYPE(SEIBU_COP_BOOTLEG, seibu_cop_bootleg_device)
 
 #define MCFG_DEVICE_SEIBUCOP_BOOTLEG_ADD(_tag) \

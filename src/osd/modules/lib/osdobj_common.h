@@ -144,7 +144,7 @@ public:
 	bool gl_vbo() const { return bool_value(OSDOPTION_GL_VBO); }
 	bool gl_pbo() const { return bool_value(OSDOPTION_GL_PBO); }
 	bool gl_glsl() const { return bool_value(OSDOPTION_GL_GLSL); }
-	bool glsl_filter() const { return bool_value(OSDOPTION_GLSL_FILTER); }
+	int glsl_filter() const { return int_value(OSDOPTION_GLSL_FILTER); }
 	const char *shader_mame(int index) const { return value(string_format("%s%d", OSDOPTION_SHADER_MAME, index).c_str()); }
 	const char *shader_screen(int index) const { return value(string_format("%s%d", OSDOPTION_SHADER_SCREEN, index).c_str()); }
 
@@ -169,7 +169,6 @@ public:
 	const char *pa_device() const { return value(OSDOPTION_PA_DEVICE); }
 	const float pa_latency() const { return float_value(OSDOPTION_PA_LATENCY); }
 
-private:
 	static const options_entry s_option_entries[];
 };
 
@@ -266,7 +265,7 @@ private:
 	osd_module_manager m_mod_man;
 	font_module *m_font_module;
 
-	void update_option(const char * key, std::vector<const char *> &values) const;
+	void update_option(const std::string &key, std::vector<const char *> &values);
 	// FIXME: should be elsewhere
 	osd_module *select_module_options(const core_options &opts, const std::string &opt_name)
 	{
@@ -302,6 +301,7 @@ protected:
 
 private:
 	std::vector<const char *> m_video_names;
+	std::unordered_map<std::string, std::string> m_option_descs;
 };
 
 

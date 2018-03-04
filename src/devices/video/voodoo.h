@@ -1019,15 +1019,39 @@ static const uint8_t dither_matrix_4x4[16] =
 	15,  7, 13,  5
 };
 
+//static const uint8_t dither_matrix_2x2[16] =
+//{
+//      2, 10,  2, 10,
+//  14,  6, 14,  6,
+//      2, 10,  2, 10,
+//  14,  6, 14,  6
+//};
+// Using this matrix allows iteagle video memory tests to pass
 static const uint8_t dither_matrix_2x2[16] =
 {
-		2, 10,  2, 10,
-	14,  6, 14,  6,
-		2, 10,  2, 10,
-	14,  6, 14,  6
+	8, 10, 8, 10,
+	11, 9, 11, 9,
+	8, 10, 8, 10,
+	11, 9, 11, 9
 };
 
+// Dither 4x4 subtraction matrix used in alpha blending
+static const uint8_t dither_subtract_4x4[16] =
+{
+	(15 - 0) >> 1,  (15 - 8) >> 1,  (15 - 2) >> 1, (15 - 10) >> 1,
+	(15 - 12) >> 1,  (15 - 4) >> 1, (15 - 14) >> 1,  (15 - 6) >> 1,
+	(15 - 3) >> 1, (15 - 11) >> 1,  (15 - 1) >> 1,  (15 - 9) >> 1,
+	(15 - 15) >> 1,  (15 - 7) >> 1, (15 - 13) >> 1,  (15 - 5) >> 1
+};
 
+// Dither 2x2 subtraction matrix used in alpha blending
+static const uint8_t dither_subtract_2x2[16] =
+{
+	(15 - 8) >> 1, (15 - 10) >> 1, (15 - 8) >> 1, (15 - 10) >> 1,
+	(15 - 11) >> 1, (15 - 9) >> 1, (15 - 11) >> 1, (15 - 9) >> 1,
+	(15 - 8) >> 1, (15 - 10) >> 1, (15 - 8) >> 1, (15 - 10) >> 1,
+	(15 - 11) >> 1, (15 - 9) >> 1, (15 - 11) >> 1, (15 - 9) >> 1
+};
 
 /*************************************
  *
@@ -1411,25 +1435,25 @@ enum
 ***************************************************************************/
 
 #define MCFG_VOODOO_FBMEM(_value) \
-	voodoo_device::static_set_fbmem(*device, _value);
+	downcast<voodoo_device &>(*device).set_fbmem(_value);
 
 #define MCFG_VOODOO_TMUMEM(_value1, _value2) \
-	voodoo_device::static_set_tmumem(*device, _value1, _value2);
+	downcast<voodoo_device &>(*device).set_tmumem(_value1, _value2);
 
 #define MCFG_VOODOO_SCREEN_TAG(_tag) \
-	voodoo_device::static_set_screen_tag(*device, _tag);
+	downcast<voodoo_device &>(*device).set_screen_tag(_tag);
 
 #define MCFG_VOODOO_CPU_TAG(_tag) \
-	voodoo_device::static_set_cpu_tag(*device, _tag);
+	downcast<voodoo_device &>(*device).set_cpu_tag(_tag);
 
 #define MCFG_VOODOO_VBLANK_CB(_devcb) \
-	devcb = &voodoo_device::static_set_vblank_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<voodoo_device &>(*device).set_vblank_callback(DEVCB_##_devcb);
 
 #define MCFG_VOODOO_STALL_CB(_devcb) \
-	devcb = &voodoo_device::static_set_stall_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<voodoo_device &>(*device).set_stall_callback(DEVCB_##_devcb);
 
 #define MCFG_VOODOO_PCIINT_CB(_devcb) \
-	devcb = &voodoo_device::static_set_pciint_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<voodoo_device &>(*device).set_pciint_callback(DEVCB_##_devcb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -1442,13 +1466,13 @@ class voodoo_device : public device_t
 public:
 	~voodoo_device();
 
-	static void static_set_fbmem(device_t &device, int value) { downcast<voodoo_device &>(device).m_fbmem = value; }
-	static void static_set_tmumem(device_t &device, int value1, int value2) { downcast<voodoo_device &>(device).m_tmumem0 = value1; downcast<voodoo_device &>(device).m_tmumem1 = value2; }
-	static void static_set_screen_tag(device_t &device, const char *tag) { downcast<voodoo_device &>(device).m_screen = tag; }
-	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<voodoo_device &>(device).m_cputag = tag; }
-	template <class Object> static devcb_base &static_set_vblank_callback(device_t &device, Object &&cb) { return downcast<voodoo_device &>(device).m_vblank.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_stall_callback(device_t &device, Object &&cb)  { return downcast<voodoo_device &>(device).m_stall.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_pciint_callback(device_t &device, Object &&cb) { return downcast<voodoo_device &>(device).m_pciint.set_callback(std::forward<Object>(cb)); }
+	void set_fbmem(int value) { m_fbmem = value; }
+	void set_tmumem(int value1, int value2) { m_tmumem0 = value1; m_tmumem1 = value2; }
+	void set_screen_tag(const char *tag) { m_screen = tag; }
+	void set_cpu_tag(const char *tag) { m_cputag = tag; }
+	template <class Object> devcb_base &set_vblank_callback(Object &&cb) { return m_vblank.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_stall_callback(Object &&cb)  { return m_stall.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pciint_callback(Object &&cb) { return m_pciint.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ32_MEMBER( voodoo_r );
 	DECLARE_WRITE32_MEMBER( voodoo_w );
@@ -1569,11 +1593,13 @@ protected:
 
 	struct tmu_state
 	{
+		class stw_t;
 		void recompute_texture_params();
 		void init(uint8_t vdt, tmu_shared_state &share, voodoo_reg *r, void *memory, int tmem);
 		int32_t prepare();
-		rgbaint_t genTexture(int32_t x, const uint8_t *dither4, const uint32_t TEXMODE, rgb_t *LOOKUP, int32_t LODBASE, int64_t ITERS, int64_t ITERT, int64_t ITERW, int32_t &lod);
-		rgbaint_t combineTexture(const uint32_t TEXMODE, rgbaint_t c_local, rgbaint_t c_other, int32_t lod);
+		static int32_t new_log2(double &value, const int &offset);
+		rgbaint_t genTexture(int32_t x, const uint8_t *dither4, const uint32_t TEXMODE, rgb_t *LOOKUP, int32_t LODBASE, const stw_t &iterstw, int32_t &lod);
+		rgbaint_t combineTexture(const uint32_t TEXMODE, const rgbaint_t& c_local, const rgbaint_t& c_other, int32_t lod);
 
 		struct ncc_table
 		{
@@ -1637,7 +1663,7 @@ protected:
 		rgb_t               int8[256];              /* intensity 8-bit lookup table */
 		rgb_t               ai44[256];              /* alpha, intensity 4-4 lookup table */
 
-		rgb_t               rgb565[65536];          /* RGB 5-6-5 lookup table */
+		rgb_t*              rgb565;                 /* RGB 5-6-5 lookup table */
 		rgb_t               argb1555[65536];        /* ARGB 1-5-5-5 lookup table */
 		rgb_t               argb4444[65536];        /* ARGB 4-4-4-4 lookup table */
 	};
@@ -1716,6 +1742,7 @@ protected:
 		rgb_t               pen[65536];             /* mapping from pixels to pens */
 		rgb_t               clut[512];              /* clut gamma data */
 		uint8_t               clut_dirty;             /* do we need to recompute? */
+		rgb_t               rgb565[65536];          /* RGB 5-6-5 lookup table */
 	};
 
 
@@ -1784,7 +1811,6 @@ protected:
 
 	static const raster_info predef_raster_table[];
 
-
 	// not all of these need to be static, review.
 
 	void check_stalled_cpu(attotime current_time);
@@ -1838,9 +1864,9 @@ protected:
 
 	static bool chromaKeyTest(voodoo_device *vd, stats_block *stats, uint32_t fbzModeReg, rgbaint_t rgaIntColor);
 	static bool alphaMaskTest(stats_block *stats, uint32_t fbzModeReg, uint8_t alpha);
-	static bool alphaTest(voodoo_device *vd, stats_block *stats, uint32_t alphaModeReg, uint8_t alpha);
+	static bool alphaTest(uint8_t alpharef, stats_block *stats, uint32_t alphaModeReg, uint8_t alpha);
 	static bool depthTest(uint16_t zaColorReg, stats_block *stats, int32_t destDepth, uint32_t fbzModeReg, int32_t biasdepth);
-	static bool combineColor(voodoo_device *vd, stats_block *STATS, uint32_t FBZCOLORPATH, uint32_t FBZMODE, uint32_t ALPHAMODE, rgbaint_t TEXELARGB, int32_t ITERZ, int64_t ITERW, rgbaint_t &srcColor);
+	static bool combineColor(voodoo_device *vd, stats_block *STATS, uint32_t FBZCOLORPATH, uint32_t FBZMODE, rgbaint_t TEXELARGB, int32_t ITERZ, int64_t ITERW, rgbaint_t &srcColor);
 
 // FIXME: this stuff should not be public
 public:
@@ -1933,5 +1959,87 @@ DECLARE_DEVICE_TYPE(VOODOO_1,       voodoo_1_device)
 DECLARE_DEVICE_TYPE(VOODOO_2,       voodoo_2_device)
 DECLARE_DEVICE_TYPE(VOODOO_BANSHEE, voodoo_banshee_device)
 DECLARE_DEVICE_TYPE(VOODOO_3,       voodoo_3_device)
+
+// use SSE on 64-bit implementations, where it can be assumed
+#if 1 && ((!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64))
+#include <emmintrin.h>
+#ifdef __SSE4_1__
+#include <smmintrin.h>
+#endif
+class voodoo_device::tmu_state::stw_t
+{
+public:
+	stw_t() {}
+	stw_t(const stw_t& other) = default;
+	stw_t &operator=(const stw_t& other) = default;
+
+	inline void set(s64 s, s64 t, s64 w) { m_st = _mm_set_pd(s, t); m_w = _mm_set1_pd(w); }
+	inline int is_w_neg() const { return _mm_comilt_sd(m_w, _mm_set1_pd(0.0)); }
+	inline void get_st_shiftr(s32 &s, s32 &t, const s32 &shift) const {
+		s64 tmpS = _mm_cvtsd_si64(_mm_shuffle_pd(m_st, _mm_setzero_pd(), 1));
+		s = tmpS >> shift;
+		s64 tmpT = _mm_cvtsd_si64(m_st);
+		t = tmpT >> shift;
+	}
+	inline void add(const stw_t& other)
+	{
+		m_st = _mm_add_pd(m_st, other.m_st);
+		m_w = _mm_add_pd(m_w, other.m_w);
+	}
+	inline void calc_stow(s32 &sow, s32 &tow, int32_t &oowlog) const
+	{
+		__m128d tmp = _mm_div_pd(m_st, m_w);
+		// Allow for 8 bits of decimal in integer
+		tmp = _mm_mul_pd(tmp, _mm_set1_pd(256.0));
+		__m128i tmp2 = _mm_cvttpd_epi32(tmp);
+#ifdef __SSE4_1__
+		sow = _mm_extract_epi32(tmp2, 1);
+		tow = _mm_extract_epi32(tmp2, 0);
+#else
+		sow = _mm_cvtsi128_si32(_mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 0, 1)));
+		tow = _mm_cvtsi128_si32(tmp2);
+#endif
+		double dW = _mm_cvtsd_f64(m_w);
+		oowlog = -new_log2(dW, 0);
+	}
+private:
+	__m128d m_st;
+	__m128d m_w;
+};
+#else
+class voodoo_device::tmu_state::stw_t
+{
+public:
+	stw_t() {}
+	stw_t(const stw_t& other) = default;
+	stw_t &operator=(const stw_t& other) = default;
+
+	inline void set(s64 s, s64 t, s64 w) { m_s = s; m_t = t; m_w = w; }
+	inline int is_w_neg() const { return (m_w < 0) ? 1 : 0; }
+	inline void get_st_shiftr(s32 &s, s32 &t, const s32 &shift) const {
+		s = m_s >> shift;
+		t = m_t >> shift;
+	}
+	inline void add(const stw_t& other)
+	{
+		m_s += other.m_s;
+		m_t += other.m_t;
+		m_w += other.m_w;
+	}
+	// Computes s/w and t/w and returns log2 of 1/w
+	// s, t and c are 16.32 values.  The results are 24.8.
+	inline void calc_stow(s32 &sow, s32 &tow, int32_t &oowlog) const
+	{
+		double recip = double(1ULL << (47 - 39)) / m_w;
+		double resAD = m_s * recip;
+		double resBD = m_t * recip;
+		oowlog = new_log2(recip, 56);
+		sow = resAD;
+		tow = resBD;
+	}
+private:
+	s64 m_s, m_t, m_w;
+};
+#endif
 
 #endif // MAME_VIDEO_VOODOO_H

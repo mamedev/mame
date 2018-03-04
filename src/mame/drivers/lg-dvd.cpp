@@ -14,22 +14,24 @@ class lg_dvd_state : public driver_device
 public:
 	lg_dvd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, maincpu(*this, "maincpu")
+		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void lg(machine_config &config);
+	void lg_dvd_map(address_map &map);
 protected:
-	required_device<i80c52_device> maincpu;
+	required_device<i80c52_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( lg )
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( lg_dvd_map, AS_PROGRAM, 8, lg_dvd_state )
+ADDRESS_MAP_START(lg_dvd_state::lg_dvd_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( lg )
-	MCFG_CPU_ADD( "maincpu", I80C52, XTAL_16MHz )
+MACHINE_CONFIG_START(lg_dvd_state::lg)
+	MCFG_CPU_ADD( "maincpu", I80C52, XTAL(16'000'000) )
 	MCFG_CPU_PROGRAM_MAP( lg_dvd_map )
 MACHINE_CONFIG_END
 

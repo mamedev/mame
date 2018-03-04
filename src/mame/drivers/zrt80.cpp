@@ -51,6 +51,9 @@ public:
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void zrt80(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_term_data;
@@ -97,7 +100,7 @@ WRITE8_MEMBER(zrt80_state::zrt80_38_w)
 	m_beep->set_state(1);
 }
 
-static ADDRESS_MAP_START(zrt80_mem, AS_PROGRAM, 8, zrt80_state)
+ADDRESS_MAP_START(zrt80_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM // Z25 - Main firmware
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // Z24 - Expansion
@@ -107,7 +110,7 @@ static ADDRESS_MAP_START(zrt80_mem, AS_PROGRAM, 8, zrt80_state)
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zrt80_io, AS_IO, 8, zrt80_state)
+ADDRESS_MAP_START(zrt80_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w )
@@ -267,11 +270,11 @@ static GFXDECODE_START( zrt80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, zrt80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( zrt80 )
+MACHINE_CONFIG_START(zrt80_state::zrt80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
-	MCFG_CPU_PROGRAM_MAP(zrt80_mem)
-	MCFG_CPU_IO_MAP(zrt80_io)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(2'457'600))
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -289,7 +292,7 @@ static MACHINE_CONFIG_START( zrt80 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_20MHz / 8)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(20'000'000) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
 	MCFG_MC6845_UPDATE_ROW_CB(zrt80_state, crtc_update_row)

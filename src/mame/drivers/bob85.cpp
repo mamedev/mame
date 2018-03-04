@@ -48,6 +48,9 @@ public:
 	uint8_t m_count_key;
 	virtual void machine_reset() override;
 
+	void bob85(machine_config &config);
+	void bob85_io(address_map &map);
+	void bob85_mem(address_map &map);
 protected:
 	required_ioport m_line0;
 	required_ioport m_line1;
@@ -137,16 +140,16 @@ READ8_MEMBER(bob85_state::bob85_keyboard_r)
 
 WRITE8_MEMBER(bob85_state::bob85_7seg_w)
 {
-	output().set_digit_value(offset, BITSWAP8( data,3,2,1,0,7,6,5,4 ));
+	output().set_digit_value(offset, bitswap<8>( data,3,2,1,0,7,6,5,4 ));
 }
 
-static ADDRESS_MAP_START( bob85_mem, AS_PROGRAM, 8, bob85_state )
+ADDRESS_MAP_START(bob85_state::bob85_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x02ff) AM_ROM
 	AM_RANGE(0x0600, 0x09ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bob85_io, AS_IO, 8, bob85_state )
+ADDRESS_MAP_START(bob85_state::bob85_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0a, 0x0a) AM_READ(bob85_keyboard_r)
 	AM_RANGE(0x0a, 0x0f) AM_WRITE(bob85_7seg_w)
@@ -198,9 +201,9 @@ READ_LINE_MEMBER( bob85_state::sid_r )
 	return m_cass->input() > 0.0;
 }
 
-static MACHINE_CONFIG_START( bob85 )
+MACHINE_CONFIG_START(bob85_state::bob85)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5MHz)
+	MCFG_CPU_ADD("maincpu", I8085A, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(bob85_mem)
 	MCFG_CPU_IO_MAP(bob85_io)
 	MCFG_I8085A_SID(READLINE(bob85_state, sid_r))

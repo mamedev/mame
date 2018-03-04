@@ -21,19 +21,25 @@
 class tourtabl_state : public driver_device
 {
 public:
-	tourtabl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+	tourtabl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
+	void tourtabl(machine_config &config);
 
+protected:
 	DECLARE_WRITE8_MEMBER(tourtabl_led_w);
 	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
 	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);
+	void main_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
 };
 
 
-#define MASTER_CLOCK    XTAL_3_579545MHz
+#define MASTER_CLOCK    XTAL(3'579'545)
 
 
 WRITE8_MEMBER(tourtabl_state::tourtabl_led_w)
@@ -60,7 +66,7 @@ READ8_MEMBER(tourtabl_state::tourtabl_get_databus_contents)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tourtabl_state )
+ADDRESS_MAP_START(tourtabl_state::main_map)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM
 	AM_RANGE(0x0280, 0x029f) AM_DEVREADWRITE("riot1", riot6532_device, read, write)
@@ -146,7 +152,7 @@ static INPUT_PORTS_START( tourtabl )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( tourtabl )
+MACHINE_CONFIG_START(tourtabl_state::tourtabl)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 3)    /* actually M6507 */
 	MCFG_CPU_PROGRAM_MAP(main_map)

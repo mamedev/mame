@@ -22,8 +22,8 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_serial_tc)
 	if (BIT(m_fe, 7))
 	{
 		/* connect to rs232 */
-		m_rs232->write_txd(m_uart->get_output_pin(AY31015_SO));
-		m_uart->set_input_pin(AY31015_SI, m_rs232->rxd_r());
+		m_rs232->write_txd(m_uart->so_r());
+		m_uart->write_si(m_rs232->rxd_r());
 	}
 }
 
@@ -68,7 +68,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 				m_cass_data.input.level = cass_ws;
 				m_cass_data.input.bit = ((m_cass_data.input.length < 0x6) || (m_cass_data.input.length > 0x20)) ? 1 : 0;
 				m_cass_data.input.length = 0;
-				m_uart->set_input_pin(AY31015_SI, m_cass_data.input.bit);
+				m_uart->write_si(m_cass_data.input.bit);
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 1200 and 2400 Hz frequencies.
@@ -77,7 +77,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 			m_cass_data.output.length++;
 			if (!(m_cass_data.output.length & 0x1f))
 			{
-				cass_ws = m_uart->get_output_pin(AY31015_SO);
+				cass_ws = m_uart->so_r();
 				if (cass_ws != m_cass_data.output.bit)
 				{
 					m_cass_data.output.bit = cass_ws;
@@ -109,7 +109,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 					m_cass_data.input.length = 0;
 					m_cass_data.input.level = cass_ws;
 				}
-				m_uart->set_input_pin(AY31015_SI, m_cass_data.input.bit);
+				m_uart->write_si(m_cass_data.input.bit);
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 600 and 1200 Hz frequencies. */
@@ -117,7 +117,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 			m_cass_data.output.length++;
 			if (!(m_cass_data.output.length & 7))
 			{
-				cass_ws = m_uart->get_output_pin(AY31015_SO);
+				cass_ws = m_uart->so_r();
 				if (cass_ws != m_cass_data.output.bit)
 				{
 					m_cass_data.output.bit = cass_ws;
@@ -154,13 +154,13 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fd_w)
 {
 	/* Translate data to control signals */
 
-	m_uart->set_input_pin(AY31015_CS, 0);
-	m_uart->set_input_pin(AY31015_NB1, BIT(data, 0));
-	m_uart->set_input_pin(AY31015_NB2, BIT(data, 1));
-	m_uart->set_input_pin(AY31015_TSB, BIT(data, 2));
-	m_uart->set_input_pin(AY31015_EPS, BIT(data, 3));
-	m_uart->set_input_pin(AY31015_NP,  BIT(data, 4));
-	m_uart->set_input_pin(AY31015_CS, 1);
+	m_uart->write_cs(0);
+	m_uart->write_nb1(BIT(data, 0));
+	m_uart->write_nb2(BIT(data, 1));
+	m_uart->write_tsb(BIT(data, 2));
+	m_uart->write_eps(BIT(data, 3));
+	m_uart->write_np(BIT(data, 4));
+	m_uart->write_cs(1);
 }
 
 WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
@@ -248,8 +248,8 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
 READ8_MEMBER(sorcerer_state::sorcerer_fc_r)
 {
 	uint8_t data = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV, 0);
-	m_uart->set_input_pin(AY31015_RDAV, 1);
+	m_uart->write_rdav(0);
+	m_uart->write_rdav(1);
 	return data;
 }
 
@@ -258,13 +258,13 @@ READ8_MEMBER(sorcerer_state::sorcerer_fd_r)
 	/* set unused bits high */
 	uint8_t data = 0xe0;
 
-	m_uart->set_input_pin(AY31015_SWE, 0);
-	data |= m_uart->get_output_pin(AY31015_TBMT) ? 0x01 : 0;
-	data |= m_uart->get_output_pin(AY31015_DAV ) ? 0x02 : 0;
-	data |= m_uart->get_output_pin(AY31015_OR  ) ? 0x04 : 0;
-	data |= m_uart->get_output_pin(AY31015_FE  ) ? 0x08 : 0;
-	data |= m_uart->get_output_pin(AY31015_PE  ) ? 0x10 : 0;
-	m_uart->set_input_pin(AY31015_SWE, 1);
+	m_uart->write_swe(0);
+	data |= m_uart->tbmt_r() ? 0x01 : 0;
+	data |= m_uart->dav_r( ) ? 0x02 : 0;
+	data |= m_uart->or_r(  ) ? 0x04 : 0;
+	data |= m_uart->fe_r(  ) ? 0x08 : 0;
+	data |= m_uart->pe_r(  ) ? 0x10 : 0;
+	m_uart->write_swe(1);
 
 	return data;
 }

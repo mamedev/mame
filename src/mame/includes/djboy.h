@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "video/kan_pand.h"
 
 #define PROT_OUTPUT_BUFFER_SIZE 8
@@ -92,4 +93,11 @@ public:
 	uint32_t screen_update_djboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_djboy);
 	TIMER_DEVICE_CALLBACK_MEMBER(djboy_scanline);
+	void djboy(machine_config &config);
+	void cpu0_am(address_map &map);
+	void cpu0_port_am(address_map &map);
+	void cpu1_am(address_map &map);
+	void cpu1_port_am(address_map &map);
+	void cpu2_am(address_map &map);
+	void cpu2_port_am(address_map &map);
 };

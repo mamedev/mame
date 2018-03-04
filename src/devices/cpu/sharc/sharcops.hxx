@@ -550,9 +550,20 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			break;
 		}
 
-		case 0x11: /* TODO */
-			break;
+		case 0x11:      /* Rn = Rn FDEP Rx BY <bit6>:<len6> */
+		{
+			uint32_t ext = REG(rx) & MAKE_EXTRACT_MASK(0, len);
 
+			REG(rn) = ext << bit;
+
+			SET_FLAG_SZ(REG(rn));
+			if (bit+len > 32)
+			{
+				m_core->astat |= SV;
+			}
+			break;
+		}
+			
 		case 0x12:      /* FEXT Rx BY <bit6>:<len6> (Sign Extended) */
 		{
 			uint32_t ext = (REG(rx) & MAKE_EXTRACT_MASK(bit, len)) >> bit;
@@ -2721,9 +2732,5 @@ void adsp21062_device::sharcop_idle()
 
 void adsp21062_device::sharcop_unimplemented()
 {
-	extern CPU_DISASSEMBLE(sharc);
-	std::ostringstream dasm;
-	CPU_DISASSEMBLE_NAME(sharc)(nullptr, dasm, m_core->pc, nullptr, nullptr, 0);
-	osd_printf_debug("SHARC: %08X: %s\n", m_core->pc, dasm.str().c_str());
 	fatalerror("SHARC: Unimplemented opcode %04X%08X at %08X\n", (uint16_t)(m_core->opcode >> 32), (uint32_t)(m_core->opcode), m_core->pc);
 }

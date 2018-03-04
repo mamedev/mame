@@ -18,7 +18,7 @@
 
 // ======================> i82371ab_device
 
-class i82371ab_device :  public southbridge_device,
+class i82371ab_device :  public southbridge_extended_device,
 							public pci_device_interface
 {
 public:

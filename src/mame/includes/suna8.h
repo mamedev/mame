@@ -2,6 +2,7 @@
 // copyright-holders:Luca Elia
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/samples.h"
 #include "screen.h"
 
@@ -176,4 +177,29 @@ public:
 	void draw_sprites     (screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int which);
 	void draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int ypos, bool write_mask);
 	uint8_t *brickzn_decrypt();
+	void brickzn(machine_config &config);
+	void starfigh(machine_config &config);
+	void sparkman(machine_config &config);
+	void hardhea2b(machine_config &config);
+	void brickzn11(machine_config &config);
+	void hardhead(machine_config &config);
+	void hardhea2(machine_config &config);
+	void rranger(machine_config &config);
+	void brickzn11_map(address_map &map);
+	void brickzn_io_map(address_map &map);
+	void brickzn_map(address_map &map);
+	void brickzn_pcm_io_map(address_map &map);
+	void brickzn_pcm_map(address_map &map);
+	void brickzn_sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void hardhea2_map(address_map &map);
+	void hardhead_io_map(address_map &map);
+	void hardhead_map(address_map &map);
+	void hardhead_sound_io_map(address_map &map);
+	void hardhead_sound_map(address_map &map);
+	void rranger_io_map(address_map &map);
+	void rranger_map(address_map &map);
+	void rranger_sound_map(address_map &map);
+	void sparkman_map(address_map &map);
+	void starfigh_map(address_map &map);
 };

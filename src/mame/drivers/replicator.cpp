@@ -186,6 +186,10 @@ public:
 	DECLARE_DRIVER_INIT(replicator);
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(replicator);
+	void replicator(machine_config &config);
+	void replicator_data_map(address_map &map);
+	void replicator_io_map(address_map &map);
+	void replicator_prg_map(address_map &map);
 };
 
 void replicator_state::machine_start()
@@ -528,15 +532,15 @@ WRITE8_MEMBER(replicator_state::port_w)
 * Address maps                                       *
 \****************************************************/
 
-static ADDRESS_MAP_START( replicator_prg_map, AS_PROGRAM, 8, replicator_state )
+ADDRESS_MAP_START(replicator_state::replicator_prg_map)
 	AM_RANGE(0x0000, 0x1FFFF) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( replicator_data_map, AS_DATA, 8, replicator_state )
+ADDRESS_MAP_START(replicator_state::replicator_data_map)
 	AM_RANGE(0x0200, 0x21FF) AM_RAM  /* ATMEGA1280 Internal SRAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( replicator_io_map, AS_IO, 8, replicator_state )
+ADDRESS_MAP_START(replicator_state::replicator_io_map)
 	AM_RANGE(AVR8_IO_PORTA, AVR8_IO_PORTL) AM_READWRITE( port_r, port_w )
 ADDRESS_MAP_END
 
@@ -599,7 +603,7 @@ static GFXDECODE_START( replicator )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, hd44780_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( replicator )
+MACHINE_CONFIG_START(replicator_state::replicator)
 
 	MCFG_CPU_ADD("maincpu", ATMEGA1280, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(replicator_prg_map)

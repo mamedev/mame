@@ -8,6 +8,7 @@
 
 #include "sound/discrete.h"
 #include "video/avgdvg.h"
+#include "machine/74153.h"
 
 class asteroid_state : public driver_device
 {
@@ -17,6 +18,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_dvg(*this, "dvg"),
 		m_discrete(*this, "discrete"),
+		m_dsw1(*this, "DSW1"),
+		m_dsw_sel(*this, "dsw_sel"),
 		m_ram1(*this, "ram1"),
 		m_ram2(*this, "ram2") { }
 
@@ -24,6 +27,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<dvg_device> m_dvg;
 	required_device<discrete_device> m_discrete;
+	required_ioport m_dsw1;
+	required_device<ttl153_device> m_dsw_sel;
 
 	/* memory banks */
 	optional_memory_bank m_ram1;
@@ -57,9 +62,15 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void asteroid_base(machine_config &config);
+	void asterock(machine_config &config);
+	void asteroid(machine_config &config);
+	void llander(machine_config &config);
+	void astdelux(machine_config &config);
+	void asteroid_sound(machine_config &config);
+	void astdelux_sound(machine_config &config);
+	void llander_sound(machine_config &config);
+	void astdelux_map(address_map &map);
+	void asteroid_map(address_map &map);
+	void llander_map(address_map &map);
 };
-
-/*----------- defined in audio/asteroid.cpp -----------*/
-
-MACHINE_CONFIG_EXTERN(asteroid_sound);
-MACHINE_CONFIG_EXTERN(astdelux_sound);

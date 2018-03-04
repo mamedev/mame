@@ -105,7 +105,7 @@ WRITE_LINE_MEMBER(pitnrun_state::vflip_w)
 	flip_screen_y_set(state);
 }
 
-static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
+ADDRESS_MAP_START(pitnrun_state::pitnrun_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -127,19 +127,19 @@ static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
 	AM_RANGE(0xf000, 0xf000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pitnrun_map_mcu, AS_PROGRAM, 8, pitnrun_state )
+ADDRESS_MAP_START(pitnrun_state::pitnrun_map_mcu)
 	AM_IMPORT_FROM(pitnrun_map)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(mcu_data_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ(mcu_data_r)
 	AM_RANGE(0xd800, 0xd800) AM_READ(mcu_status_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pitnrun_sound_map, AS_PROGRAM, 8, pitnrun_state )
+ADDRESS_MAP_START(pitnrun_state::pitnrun_sound_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pitnrun_sound_io_map, AS_IO, 8, pitnrun_state )
+ADDRESS_MAP_START(pitnrun_state::pitnrun_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
@@ -274,8 +274,8 @@ static GFXDECODE_START( pitnrun )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pitnrun )
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)       /* verified on pcb */
+MACHINE_CONFIG_START(pitnrun_state::pitnrun)
+	MCFG_CPU_ADD("maincpu", Z80,XTAL(18'432'000)/6)       /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  nmi_source)
 
@@ -287,7 +287,7 @@ static MACHINE_CONFIG_START( pitnrun )
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pitnrun_state, hflip_w)) // HFLIP
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pitnrun_state, vflip_w)) // VFLIP
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz/2)          /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000)/2)          /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_sound_map)
 	MCFG_CPU_IO_MAP(pitnrun_sound_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  irq0_line_hold)
@@ -314,12 +314,12 @@ static MACHINE_CONFIG_START( pitnrun )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)    /* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/12)    /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)    /* verified on pcb */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'432'000)/12)    /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -327,11 +327,12 @@ static MACHINE_CONFIG_START( pitnrun )
 	MCFG_DEVICE_ADD("noiselatch", LS259, 0) // 1J
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pitnrun_mcu, pitnrun )
+MACHINE_CONFIG_START(pitnrun_state::pitnrun_mcu)
+	pitnrun(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pitnrun_map_mcu)
 
-	MCFG_CPU_ADD("mcu", M68705P5, XTAL_18_432MHz/6)     /* verified on pcb */
+	MCFG_CPU_ADD("mcu", M68705P5, XTAL(18'432'000)/6)     /* verified on pcb */
 	MCFG_M68705_PORTA_R_CB(READ8(pitnrun_state, m68705_portA_r))
 	MCFG_M68705_PORTB_R_CB(READ8(pitnrun_state, m68705_portB_r))
 	MCFG_M68705_PORTC_R_CB(READ8(pitnrun_state, m68705_portC_r))

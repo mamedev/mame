@@ -14,7 +14,7 @@ public:
 	// construction/destruction
 	atari_maria_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_cpu_tag(device_t &device, const char *tag) { downcast<atari_maria_device &>(device).m_cpu_tag = tag; }
+	void set_cpu_tag(const char *tag) { m_cpu_tag = tag; }
 
 	void interrupt(int lines);
 	void startdma(int lines);
@@ -67,7 +67,7 @@ DECLARE_DEVICE_TYPE(ATARI_MARIA, atari_maria_device)
 
 
 #define MCFG_MARIA_DMACPU(_tag) \
-	atari_maria_device::set_cpu_tag(*device, _tag);
+	downcast<atari_maria_device &>(*device).set_cpu_tag(_tag);
 
 
 #endif // MAME_VIDEO_MARIA_H

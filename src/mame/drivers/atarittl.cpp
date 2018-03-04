@@ -117,6 +117,7 @@ public:
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
+	void atarikee(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -163,6 +164,7 @@ public:
 
 	uint32_t screen_update_stuntcyc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void stuntcyc(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -306,7 +308,7 @@ uint32_t stuntcyc_state::screen_update_stuntcyc(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-static MACHINE_CONFIG_START( atarikee )
+MACHINE_CONFIG_START(atarikee_state::atarikee)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
 	MCFG_NETLIST_SETUP(atarikee)
@@ -323,7 +325,7 @@ MACHINE_CONFIG_END
 //#define STUNTCYC_NL_CLOCK (14318181*69)
 #define STUNTCYC_NL_CLOCK (SC_HTOTAL*SC_VTOTAL*60*140)
 
-static MACHINE_CONFIG_START( stuntcyc )
+MACHINE_CONFIG_START(stuntcyc_state::stuntcyc)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, STUNTCYC_NL_CLOCK)
 	MCFG_NETLIST_SETUP(stuntcyc)
@@ -382,6 +384,32 @@ ROM_START( crashnsc )
 
 	ROM_REGION( 0x0200, "shape", ROMREGION_ERASE00 )
 	ROM_LOAD( "004247.e2",     0x0000, 0x0200, CRC(478afac2) SHA1(fb15af0d2fc9d9ed0e92a3e7610c22dadf91d012) ) // Car Shape Code
+ROM_END
+
+
+ROM_START( gtrak10 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
+	ROM_LOAD( "074186.j5",    0x0000, 0x0800, CRC(3bad3280) SHA1(b83fe1a1dc6bf20717dadf576f1d817496340f8c) ) // not actually a SN74186 but an Electronic Arrays, Inc. EA4800 16K (2048 x 8) ROM. TI TMS4800 clone (EA4800). Intentionally mislabeled by Atari.
+ROM_END
+
+
+ROM_START( gtrak10a )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
+	ROM_LOAD( "074181.j5",    0x0000, 0x0800, CRC(f564c58a) SHA1(8097419e22bd8b5fd2a9fe4ea89302046c42e583) ) // not actually a SN74181 but an Electronic Arrays, Inc. EA4800 16K (2048 x 8) ROM. TI TMS4800 clone (EA4800). Intentionally mislabeled by Atari.
+ROM_END
+
+
+ROM_START( gtrak20 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x2000, "racetrack", ROMREGION_ERASE00 )
+	ROM_LOAD( "074187.b3",    0x0000, 0x0800, CRC(d38709ca) SHA1(1ea5d174dbd0faa0c8aba6b8c845c62b18d9e60b) )
+	ROM_LOAD( "074187a.d3",   0x0800, 0x0800, CRC(3d30654f) SHA1(119bac8ba8c300c026decf3f59a7da4e5d746648) )
+	ROM_LOAD( "074187b.f3",   0x1000, 0x0800, CRC(a811cc11) SHA1(a0eb3f732268e796068d1a6c96cdddd1fd7fba21) )
 ROM_END
 
 
@@ -459,6 +487,24 @@ ROM_START( jetfighta )
 ROM_END
 
 
+ROM_START( lemans )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "005837.n5",     0x0000, 0x0800, CRC(21a0c26a) SHA1(2bfe5ff415e4f252caf123ec80a32e6b8220c73a) )
+	ROM_LOAD( "005838.n4",     0x0800, 0x0800, CRC(9b8fc4fd) SHA1(faf043922f0536e5a93fe6ed99d712503a8c4eb1) )
+	ROM_LOAD( "005839.n6",     0x1000, 0x0800, CRC(4b1139bb) SHA1(c6418466f251054cbfe889895ec9bb55272f7575) )
+ROM_END
+
+
+ROM_START( qwakttl )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0200, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "90-2002.9k",    0x0000, 0x0200, CRC(6d3b6270) SHA1(08e295efebc56ed87f56b93b74f87fc7f1df5213) ) // 37-2530n in manual
+ROM_END
+
+
 ROM_START( outlaw )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
@@ -501,8 +547,8 @@ ROM_START( tank )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	/* The "custom" 24-pin ROM used in Atari/Kee Games "Tank" is known as a MOSTEK MK28000P. */
-	ROM_REGION( 0x0801, "gfx", ROMREGION_ERASE00 ) // 2049 Byte Size?
-	ROM_LOAD( "90-2006.k10" ,0x0000, 0x0801, CRC(c25f6014) SHA1(7bd3fca5f64c928a645ca27c643b736667cef216) )
+	ROM_REGION( 0x0801, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "90-2006.k10",  0x0000, 0x0800, CRC(87f5c365) SHA1(bc518a5795ef3ed8a7c0463653d70f60780ddda1) )
 ROM_END
 
 ROM_START( tankii )
@@ -521,36 +567,6 @@ ROM_START( astrotrf )
     ROM_REGION( 0x0400, "gfx", ROMREGION_ERASE00 ) // Region Size unknown, dump size unknown
     ROM_LOAD( "003774.c8",     0x0000, 0x0100, NO_DUMP ) // Bugle
     ROM_LOAD( "003773-02.c4",  0x0100, 0x0100, NO_DUMP ) // Graphics (Astroturf - Rev.A)
-ROM_END
-
-ROM_START( gtrak10 )  // Unknown size, assumed 2K Bytes
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-
-    ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
-    ROM_LOAD( "74186.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack, not actually a SN74186 but an Electronic Arrays, Inc. EA4800 16K (2048 x 8) ROM. TI TMS4800 clone (EA4800). Intentionally mislabeled by Atari.
-ROM_END
-
-ROM_START( gtrak20 )  // Unknown size, assumed 2K Bytes
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-
-    ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
-    ROM_LOAD( "74186.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack, not actually a SN74186 but an Electronic Arrays, Inc. EA4800 16K (2048 x 8) ROM. TI TMS4800 clone (EA4800). Intentionally mislabeled by Atari.
-ROM_END
-
-ROM_START( lemans )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-
-    ROM_REGION( 0x0400, "gfx", ROMREGION_ERASE00 ) // Region Size unknown, dump size unknown
-    ROM_LOAD( "005837-01.n5",  0x0000, 0x0100, NO_DUMP ) // Rom 1
-    ROM_LOAD( "005838-01.n4",  0x0100, 0x0100, NO_DUMP ) // Rom 2
-    ROM_LOAD( "005839-01.n6",  0x0200, 0x0100, NO_DUMP ) // Rom 3
-ROM_END
-
-ROM_START( qwak )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-
-    ROM_REGION( 0x0200, "gfx", ROMREGION_ERASE00 ) // Region Size unknown, dump size unknown
-    ROM_LOAD( "37-2530n.k9",  0x0000, 0x0200, NO_DUMP ) // Custom Rom (2530 N)
 ROM_END
 
 */
@@ -632,11 +648,16 @@ ROM_END
 
 GAME(1975,  antiairc,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
 GAME(1975,  crashnsc,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)
+GAME(1974,  gtrak10,   0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K [TTL]",     MACHINE_IS_SKELETON)
+GAME(1974,  gtrak10a,  gtrak10,   atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K (older) [TTL]",     MACHINE_IS_SKELETON)
+GAME(1974,  gtrak20,   0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Gran Trak 20/Trak 20/Twin Racer [TTL]",    MACHINE_IS_SKELETON)
 GAME(1976,  indy4,     0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Indy 4 [TTL]",           MACHINE_IS_SKELETON)
 GAME(1975,  indy800,   0,         atarikee,   0,  atarikee_state, 0,  ROT90, "Atari/Kee",    "Indy 800 [TTL]",         MACHINE_IS_SKELETON)
 GAME(1975,  jetfight,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1) [TTL]",      MACHINE_IS_SKELETON)
 GAME(1975,  jetfighta, jetfight,  atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2) [TTL]",      MACHINE_IS_SKELETON)
+GAME(1976,  lemans,    0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Le Mans [TTL]",          MACHINE_IS_SKELETON)
 GAME(1976,  outlaw,    0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Outlaw [TTL]",           MACHINE_IS_SKELETON)
+GAME(1974,  qwakttl,   0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)
 GAME(1975,  sharkjaw,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Horror Games",    "Shark JAWS [TTL]",     MACHINE_IS_SKELETON)
 GAME(1975,  steeplec,  0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Steeplechase [TTL]",     MACHINE_IS_SKELETON)
 GAME(1976,  stuntcyc,  0,         stuntcyc,   0,  stuntcyc_state, 0,  ROT0,  "Atari",        "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
@@ -645,10 +666,6 @@ GAME(1975,  tankii,    0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "At
 
 // MISSING ROM DUMPS
 //GAME(1975,  astrotrf,  steeplec,  atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Astroturf [TTL]",        MACHINE_IS_SKELETON)
-//GAME(1974,  gtrak10,   0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K [TTL]",     MACHINE_IS_SKELETON) //?
-//GAME(1974,  gtrak20,   0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari/Kee",    "Gran Trak 20/Trak 20/Twin Racer [TTL]",    MACHINE_IS_SKELETON) //?
-//GAME(1976,  lemans,    0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Le Mans [TTL]",          MACHINE_IS_SKELETON)
-//GAME(1974,  qwak,      0,         atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari",        "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)
 
 // 100% TTL
 //GAME(1974,  coupfran,  worldcup,  atarikee,   0,  atarikee_state, 0,  ROT0,  "Atari Europe", "Coup Franc [TTL]",       MACHINE_IS_SKELETON)

@@ -124,6 +124,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
+	void trvmadns(machine_config &config);
+	void cpu_map(address_map &map);
+	void io_map(address_map &map);
 };
 
 
@@ -239,12 +242,12 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
 {
 	if(offset==0)
 	{
-		if(space.device().safe_pcbase()==0x29e9)// || space.device().safe_pcbase()==0x1b3f) //29f5
+		if(m_maincpu->pcbase()==0x29e9)// || m_maincpu->pcbase()==0x1b3f) //29f5
 		{
 			m_maincpu->set_input_line(0, HOLD_LINE);
 		}
 //      else
-//          logerror("%x \n", space.device().safe_pcbase());
+//          logerror("%x \n", m_maincpu->pcbase());
 
 	}
 
@@ -253,7 +256,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
 }
 
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, trvmadns_state )
+ADDRESS_MAP_START(trvmadns_state::cpu_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("bank2")
@@ -265,7 +268,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, trvmadns_state )
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(w3)//NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, trvmadns_state )
+ADDRESS_MAP_START(trvmadns_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
@@ -379,8 +382,8 @@ void trvmadns_state::machine_reset()
 	m_old_data = -1;
 }
 
-static MACHINE_CONFIG_START( trvmadns )
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4) // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
+MACHINE_CONFIG_START(trvmadns_state::trvmadns)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/4) // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", trvmadns_state,  nmi_line_pulse)
@@ -402,7 +405,7 @@ static MACHINE_CONFIG_START( trvmadns )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_10MHz/2/4) //?
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(10'000'000)/2/4) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

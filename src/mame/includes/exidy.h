@@ -10,7 +10,7 @@
 #include "sound/samples.h"
 #include "screen.h"
 
-#define EXIDY_MASTER_CLOCK              (XTAL_11_289MHz)
+#define EXIDY_MASTER_CLOCK              (XTAL(11'289'000))
 #define EXIDY_CPU_CLOCK                 (EXIDY_MASTER_CLOCK / 16)
 #define EXIDY_PIXEL_CLOCK               (EXIDY_MASTER_CLOCK / 2)
 #define EXIDY_HTOTAL                    (0x150)
@@ -126,6 +126,31 @@ public:
 	SAMPLES_START_CB_MEMBER(spectar_audio_start);
 	SAMPLES_START_CB_MEMBER(targ_audio_start);
 
+	void base(machine_config &config);
+	void mtrap(machine_config &config);
+	void mtrap_cvsd_audio(machine_config &config);
+	void venture(machine_config &config);
+	void venture_audio(machine_config &config);
+	void fax(machine_config &config);
+	void teetert(machine_config &config);
+	void sidetrac(machine_config &config);
+	void spectar(machine_config &config);
+	void spectar_audio(machine_config &config);
+	void rallys(machine_config &config);
+	void pepper2(machine_config &config);
+	void targ(machine_config &config);
+	void targ_audio(machine_config &config);
+	void exidy_map(address_map &map);
+	void fax_map(address_map &map);
+	void pepper2_map(address_map &map);
+	void rallys_map(address_map &map);
+	void sidetrac_map(address_map &map);
+	void spectar_map(address_map &map);
+	void targ_map(address_map &map);
+	void venture_map(address_map &map);
+	void venture_audio_map(address_map &map);
+	void cvsd_iomap(address_map &map);
+	void cvsd_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

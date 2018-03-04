@@ -49,4 +49,9 @@ public:
 
 	DECLARE_VIDEO_START(dodgeman);
 	TILE_GET_INFO_MEMBER(get_dodgeman_bg_tile_info);
+	void dodgeman(machine_config &config);
+	void battlex(machine_config &config);
+	void battlex_map(address_map &map);
+	void dodgeman_io_map(address_map &map);
+	void io_map(address_map &map);
 };

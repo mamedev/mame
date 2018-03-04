@@ -79,6 +79,7 @@ Component Side   A   B   Solder Side
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "screen.h"
@@ -130,6 +131,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 
 	void postload();
+	void popobear(machine_config &config);
+	void popobear_mem(address_map &map);
 };
 
 
@@ -138,7 +141,7 @@ WRITE16_MEMBER(popobear_state::vram_w)
 	COMBINE_DATA(&m_vram[offset]);
 
 	// the graphic data for the tiles is in a strange order, rearrange it so that we can use it as tiles..
-	int swapped_offset = BITSWAP32(offset, /* unused bits */ 31,30,29,28,27,26,25,24,23,22,21,20,19, /* end unused bits */
+	int swapped_offset = bitswap<32>(offset, /* unused bits */ 31,30,29,28,27,26,25,24,23,22,21,20,19, /* end unused bits */
 
 	18,17,16,15,14,13,12,
 
@@ -470,7 +473,7 @@ WRITE8_MEMBER(popobear_state::irq_ack_w)
 	}
 }
 
-static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
+ADDRESS_MAP_START(popobear_state::popobear_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM
@@ -489,7 +492,7 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 	AM_RANGE(0x480034, 0x480035) AM_RAM // coin counter or coin lockout
 	AM_RANGE(0x48003a, 0x48003b) AM_RAM //AM_READ(48003a_r) AM_WRITE(48003a_w)
 
-	AM_RANGE(0x480400, 0x4807ff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x480400, 0x4807ff) AM_RAM AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")
 	AM_RANGE(0x520000, 0x520001) AM_READ_PORT("IN1")
@@ -634,8 +637,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::irq)
 		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( popobear )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_42MHz/4)  // XTAL CORRECT, DIVISOR GUESSED
+MACHINE_CONFIG_START(popobear_state::popobear)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(42'000'000)/4)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_CPU_PROGRAM_MAP(popobear_mem)
 	// levels 2,3,5 look interesting
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", popobear_state, irq5_line_assert)
@@ -658,10 +661,10 @@ static MACHINE_CONFIG_START( popobear )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popobear)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_42MHz/16)  // XTAL CORRECT, DIVISOR GUESSED
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(42'000'000)/16)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_42MHz/32, PIN7_LOW)  // XTAL CORRECT, DIVISOR GUESSED
+	MCFG_OKIM6295_ADD("oki", XTAL(42'000'000)/32, PIN7_LOW)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -323,8 +323,8 @@ static imgtoolerr_t macbinary_writefile(imgtool::partition &partition, const cha
 			return err;
 
 		/* set up attributes */
-		attr_values[0].t = mac_crack_time(creation_time);
-		attr_values[1].t = mac_crack_time(lastmodified_time);
+		attr_values[0].t = mac_crack_time(creation_time).to_time_t();
+		attr_values[1].t = mac_crack_time(lastmodified_time).to_time_t();
 		attr_values[2].i = type_code;
 		attr_values[3].i = creator_code;
 		attr_values[4].i = finder_flags;

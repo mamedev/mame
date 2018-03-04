@@ -1,30 +1,52 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Joakim Larsson Edstrom
 #ifndef MAME_MACHINE_68340TMU_H
 #define MAME_MACHINE_68340TMU_H
 
 #pragma once
 
-class m68340_timer
-{
-public:
-	// Registers for timer 1 and timer 2
-	uint16_t m_mcr[2];
-	uint16_t m_ir[2];
-	uint16_t m_cr[2];
-	uint16_t m_sr[2];
-	uint16_t m_cntr[2];
-	uint16_t m_cntr_reg[2];
-	uint16_t m_prel1[2];
-	uint16_t m_prel2[2];
-	uint16_t m_com[2];
-	uint16_t m_timer_counter[2];
-	uint32_t m_tin[2];
-	uint32_t m_tgate[2];
-	uint32_t m_tout[2];
-	emu_timer *m_timer[2];
+class m68340_cpu_device;
 
-	void reset();
+class mc68340_timer_module_device : public device_t
+{
+	friend class m68340_cpu_device;
+
+public:
+	mc68340_timer_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+
+	READ16_MEMBER( read );
+	WRITE16_MEMBER( write );
+	DECLARE_WRITE_LINE_MEMBER( tin_w );
+	DECLARE_WRITE_LINE_MEMBER( tgate_w );
+
+ protected:
+	m68340_cpu_device *m_cpu;
+
+	uint16_t m_mcr;
+	uint16_t m_ir;
+	uint16_t m_cr;
+	uint16_t m_sr;
+	uint16_t m_cntr;
+	uint16_t m_cntr_reg;
+	uint16_t m_prel1;
+	uint16_t m_prel2;
+	uint16_t m_com;
+	uint16_t m_timer_counter;
+	uint32_t m_tin;
+	uint32_t m_tgate;
+	uint32_t m_tout;
+	emu_timer *m_timer;
+
+	devcb_write_line    m_tout_out_cb;
+	devcb_write_line    m_tin_in_cb;
+	devcb_write_line    m_tgate_in_cb;
+	void do_timer_irq();
+	void do_timer_tick();
+
+	TIMER_CALLBACK_MEMBER(timer_callback);
 
 	enum {
 			REG_MCR   = 0x00,
@@ -90,5 +112,7 @@ public:
 	};
 
 };
+
+DECLARE_DEVICE_TYPE(MC68340_TIMER_MODULE, mc68340_timer_module_device)
 
 #endif // MAME_MACHINE_68340TMU_H

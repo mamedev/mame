@@ -28,9 +28,12 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 #include "dotrikun.lh"
+
+#define MASTER_CLOCK XTAL(4'000'000)
 
 
 class dotrikun_state : public driver_device
@@ -63,16 +66,19 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void dotrikun(machine_config &config);
+	void dotrikun_map(address_map &map);
+	void io_map(address_map &map);
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::interrupt)
 {
-	generic_pulse_irq_line(*m_maincpu, 0, 1);
+	m_maincpu->pulse_input_line(0, attotime::from_hz(MASTER_CLOCK/128));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::scanline_off)
 {
-	m_maincpu->set_unscaled_clock(XTAL_4MHz);
+	m_maincpu->set_unscaled_clock(MASTER_CLOCK);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::scanline_on)
@@ -80,7 +86,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::scanline_on)
 	// on vram fetch(every 8 pixels during active display), z80 is stalled for 2 clocks
 	if (param < 192)
 	{
-		m_maincpu->set_unscaled_clock(XTAL_4MHz * 0.75);
+		m_maincpu->set_unscaled_clock(MASTER_CLOCK * 0.75);
 		m_scanline_off_timer->adjust(m_screen->time_until_pos(param, 128));
 	}
 
@@ -136,13 +142,13 @@ uint32_t dotrikun_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-static ADDRESS_MAP_START( dotrikun_map, AS_PROGRAM, 8, dotrikun_state )
+ADDRESS_MAP_START(dotrikun_state::dotrikun_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x85ff) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
 	AM_RANGE(0x8600, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, dotrikun_state )
+ADDRESS_MAP_START(dotrikun_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ_PORT("INPUTS") AM_WRITE(color_w)
 ADDRESS_MAP_END
@@ -185,10 +191,10 @@ void dotrikun_state::machine_reset()
 	m_color = 0;
 }
 
-static MACHINE_CONFIG_START( dotrikun )
+MACHINE_CONFIG_START(dotrikun_state::dotrikun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dotrikun_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scanline_on", dotrikun_state, scanline_on, "screen", 0, 1)
@@ -197,7 +203,7 @@ static MACHINE_CONFIG_START( dotrikun )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_4MHz, 128+128, 0, 128, 192+64, 0, 192)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 128+128, 0, 128, 192+64, 0, 192)
 	MCFG_SCREEN_UPDATE_DRIVER(dotrikun_state, screen_update)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_PALETTE("palette")

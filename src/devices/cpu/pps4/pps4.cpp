@@ -78,6 +78,7 @@
 
 #include "emu.h"
 #include "pps4.h"
+#include "pps4dasm.h"
 #include "debugger.h"
 
 
@@ -139,10 +140,9 @@ void pps4_device::W(u8 data)
 	m_SAG = 0;
 }
 
-offs_t pps4_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *pps4_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( pps4 );
-	return CPU_DISASSEMBLE_NAME(pps4)(this, stream, pc, oprom, opram, options);
+	return new pps4_disassembler;
 }
 
 /**
@@ -1570,7 +1570,7 @@ void pps4_device::execute_run()
 void pps4_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 

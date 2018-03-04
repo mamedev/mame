@@ -147,7 +147,7 @@ void ti_fdc_device::debug_read(offs_t offset, uint8_t* value)
 
 READ8Z_MEMBER(ti_fdc_device::readz)
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		debug_read(offset, value);
 		return;
@@ -161,7 +161,7 @@ READ8Z_MEMBER(ti_fdc_device::readz)
 
 		if (m_WDsel && ((m_address & 9)==0))
 		{
-			if (!machine().side_effect_disabled()) reply = m_fd1771->gen_r((offset >> 1)&0x03);
+			if (!machine().side_effects_disabled()) reply = m_fd1771->gen_r((offset >> 1)&0x03);
 			if (TRACE_DATA)
 			{
 				if ((m_address & 0xffff)==0x5ff6)
@@ -188,7 +188,7 @@ READ8Z_MEMBER(ti_fdc_device::readz)
 
 WRITE8_MEMBER(ti_fdc_device::write)
 {
-	if (machine().side_effect_disabled()) return;
+	if (machine().side_effects_disabled()) return;
 
 	if (m_inDsrArea && m_selected)
 	{
@@ -206,7 +206,7 @@ WRITE8_MEMBER(ti_fdc_device::write)
 		{
 			// As this is a memory-mapped access we must prevent the debugger
 			// from messing with the operation
-			if (!machine().side_effect_disabled()) m_fd1771->gen_w((offset >> 1)&0x03, data);
+			if (!machine().side_effects_disabled()) m_fd1771->gen_w((offset >> 1)&0x03, data);
 		}
 	}
 }
@@ -449,8 +449,8 @@ ROM_START( ti_fdc )
 	ROM_LOAD("fdc_dsr.u27", 0x1000, 0x1000, CRC(2c921087) SHA1(3646c3bcd2dce16b918ee01ea65312f36ae811d2)) /* TI disk DSR ROM second 4K */
 ROM_END
 
-MACHINE_CONFIG_MEMBER( ti_fdc_device::device_add_mconfig )
-	MCFG_FD1771_ADD(FDC_TAG, XTAL_1MHz)
+MACHINE_CONFIG_START(ti_fdc_device::device_add_mconfig)
+	MCFG_FD1771_ADD(FDC_TAG, XTAL(1'000'000))
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(ti_fdc_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(ti_fdc_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("0", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats)

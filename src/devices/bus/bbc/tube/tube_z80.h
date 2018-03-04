@@ -31,11 +31,6 @@ public:
 	// construction/destruction
 	bbc_tube_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( mem_r );
-	DECLARE_WRITE8_MEMBER( mem_w );
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -58,7 +53,14 @@ private:
 	required_memory_region m_rom;
 
 	bool m_rom_enabled;
-	//int m_nmiserv;
+
+	DECLARE_READ8_MEMBER( mem_r );
+	DECLARE_WRITE8_MEMBER( mem_w );
+	DECLARE_READ8_MEMBER( opcode_r );
+
+	void tube_z80_fetch(address_map &map);
+	void tube_z80_io(address_map &map);
+	void tube_z80_mem(address_map &map);
 };
 
 

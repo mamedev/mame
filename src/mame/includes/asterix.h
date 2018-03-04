@@ -58,6 +58,9 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 	void reset_spritebank();
 
+	void asterix(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

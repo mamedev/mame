@@ -5,7 +5,6 @@
 #include "emu.h"
 #include "includes/mpu4.h"
 
-MACHINE_CONFIG_EXTERN( mod4oki );
 INPUT_PORTS_EXTERN( mpu4 );
 
 ROM_START( m42punlm )

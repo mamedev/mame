@@ -133,12 +133,12 @@ WRITE16_MEMBER(galpanic_state::coin_w)
 
 
 
-static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
+ADDRESS_MAP_START(galpanic_state::galpanic_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")  /* + work RAM */
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")  /* 1024 colors, but only 512 seem to be used */
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")  /* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
 	AM_RANGE(0x702000, 0x704fff) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
@@ -151,12 +151,12 @@ static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP    /* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galpanica_map, AS_PROGRAM, 16, galpanic_state )
+ADDRESS_MAP_START(galpanic_state::galpanica_map)
 	AM_IMPORT_FROM(galpanic_map)
 	AM_RANGE(0xe00000, 0xe00015) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galpanic_oki_map, 0, 8, galpanic_state )
+ADDRESS_MAP_START(galpanic_state::galpanic_oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -229,10 +229,10 @@ static GFXDECODE_START( galpanic )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( galpanic )
+MACHINE_CONFIG_START(galpanic_state::galpanic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(galpanic_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpanic_state, scanline, "screen", 0, 1)
 
@@ -260,19 +260,20 @@ static MACHINE_CONFIG_START( galpanic )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, PIN7_LOW) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/6, PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, galpanic_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( galpanica, galpanic )
+MACHINE_CONFIG_START(galpanic_state::galpanica)
+	galpanic(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(galpanica_map)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
-	kaneko_hit_device::set_type(*device, 0);
+	MCFG_KANEKO_HIT_TYPE(0)
 
 	/* arm watchdog */
 	MCFG_WATCHDOG_MODIFY("watchdog")

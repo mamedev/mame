@@ -262,14 +262,14 @@ READ16_MEMBER(slapshot_state::msb_sound_r)
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( slapshot_map, AS_PROGRAM, 16, slapshot_state )
+ADDRESS_MAP_START(slapshot_state::slapshot_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM /* main RAM */
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("spriteram")   /* sprite ram */
 	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteext")   /* debugging */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00) /* nvram (only low bytes used) */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0xff00)  /* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
@@ -277,14 +277,14 @@ static ADDRESS_MAP_START( slapshot_map, AS_PROGRAM, 16, slapshot_state )
 	AM_RANGE(0xd00000, 0xd00003) AM_READWRITE(msb_sound_r, msb_sound_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( opwolf3_map, AS_PROGRAM, 16, slapshot_state )
+ADDRESS_MAP_START(slapshot_state::opwolf3_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM /* main RAM */
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("spriteram")   /* sprite ram */
 	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteext")   /* debugging */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00) /* nvram (only low bytes used) */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0xff00)  /* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
@@ -296,7 +296,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( opwolf3_z80_sound_map, AS_PROGRAM, 8, slapshot_state )
+ADDRESS_MAP_START(slapshot_state::opwolf3_z80_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -469,7 +469,7 @@ void slapshot_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( slapshot )
+MACHINE_CONFIG_START(slapshot_state::slapshot)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( slapshot )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( opwolf3 )
+MACHINE_CONFIG_START(slapshot_state::opwolf3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */

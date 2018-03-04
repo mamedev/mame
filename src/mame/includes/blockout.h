@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class blockout_state : public driver_device
@@ -46,6 +47,7 @@ public:
 	DECLARE_WRITE16_MEMBER(blockout_paletteram_w);
 	DECLARE_WRITE16_MEMBER(blockout_frontcolor_w);
 	DECLARE_WRITE16_MEMBER(blockout_videoram_w);
+	DECLARE_DRIVER_INIT(agress);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -53,4 +55,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(blockout_scanline);
 	void setcolor( int color, int rgb );
 	void update_pixels( int x, int y );
+	void blockout(machine_config &config);
+	void agress(machine_config &config);
+	void agress_map(address_map &map);
+	void audio_map(address_map &map);
+	void main_map(address_map &map);
 };

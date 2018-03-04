@@ -7,6 +7,7 @@
  *****************************************************************************/
 #include "emu.h"
 #include "alto2cpu.h"
+#include "alto2dsm.h"
 #include "a2roms.h"
 
 #define DEBUG_UCODE_CONST_DATA  0   //!< define to 1 to dump decoded micro code and constants
@@ -60,15 +61,15 @@ alto2_log_t logprintf;
 //  LIVE DEVICE
 //**************************************************************************
 
-DEVICE_ADDRESS_MAP_START( ucode_map, 32, alto2_cpu_device )
+ADDRESS_MAP_START(alto2_cpu_device::ucode_map)
 	AM_RANGE(0,                         4*ALTO2_UCODE_PAGE_SIZE - 1)        AM_READWRITE( crom_cram_r, crom_cram_w )
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START( const_map, 16, alto2_cpu_device )
+ADDRESS_MAP_START(alto2_cpu_device::const_map)
 	AM_RANGE(0,                          ALTO2_CONST_SIZE - 1)              AM_READ     ( const_r )
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START( iomem_map, 16, alto2_cpu_device )
+ADDRESS_MAP_START(alto2_cpu_device::iomem_map)
 	AM_RANGE(0,                          ALTO2_IO_PAGE_BASE - 1)            AM_READWRITE( ioram_r, ioram_w )
 	// page 0376
 	AM_RANGE(0177000,                    0177015)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
@@ -2979,4 +2980,9 @@ void alto2_cpu_device::soft_reset()
 	m_display_time = 0;                 // reset the display state machine timing accu
 	m_unload_time = 0;              // reset the word unload timing accu
 	m_bitclk_time = 0;              // reset the bitclk timing accu
+}
+
+util::disasm_interface *alto2_cpu_device::create_disassembler()
+{
+	return new alto2_disassembler;
 }

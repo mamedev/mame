@@ -58,8 +58,8 @@ References:
 #define VBLANK_OUT_TAG  "videobrd:vblank"
 #define TVINTERQ_OUT_TAG "videobrd:tvinterq"
 
-#define VIDEO_CLOCK     (XTAL_33_264MHz/2)
-#define VIDEOBRD_CLOCK  (XTAL_33_264MHz*30)
+#define VIDEO_CLOCK     (XTAL(33'264'000)/2)
+#define VIDEOBRD_CLOCK  (XTAL(33'264'000)*30)
 
 #define SR2_FULL_DUPLEX (0x01)
 #define SR2_UPPER_ONLY  (0x08)
@@ -165,6 +165,9 @@ public:
 	NETDEV_ANALOG_CALLBACK_MEMBER(vblank_cb);
 	NETDEV_ANALOG_CALLBACK_MEMBER(tvinterq_cb);
 
+	void hazl1500(machine_config &config);
+	void hazl1500_io(address_map &map);
+	void hazl1500_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<netlist_mame_device> m_video_board;
@@ -459,7 +462,7 @@ WRITE8_MEMBER(hazl1500_state::refresh_address_w)
 {
 	synchronize();
 	//printf("refresh: %02x, %d, %d\n", data, m_screen->hpos(), m_screen->vpos());
-	m_iowq_timer->adjust(attotime::from_hz(XTAL_18MHz/9));
+	m_iowq_timer->adjust(attotime::from_hz(XTAL(18'000'000)/9));
 	m_cpu_iowq->write(0);
 	m_cpu_ba4->write(0);
 	m_cpu_db0->write((data >> 0) & 1);
@@ -472,14 +475,14 @@ WRITE8_MEMBER(hazl1500_state::refresh_address_w)
 	m_cpu_db7->write((data >> 7) & 1);
 }
 
-static ADDRESS_MAP_START(hazl1500_mem, AS_PROGRAM, 8, hazl1500_state)
+ADDRESS_MAP_START(hazl1500_state::hazl1500_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x3000, 0x377f) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x3780, 0x37ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(hazl1500_io, AS_IO, 8, hazl1500_state)
+ADDRESS_MAP_START(hazl1500_state::hazl1500_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_READWRITE(status_reg_2_r, status_reg_3_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(uart_r, uart_w)
@@ -686,9 +689,9 @@ static GFXDECODE_START( hazl1500 )
 	GFXDECODE_ENTRY( CHAR_EPROM_TAG, 0x0000, hazl1500_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( hazl1500 )
+MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CPU_TAG, I8080, XTAL_18MHz/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
+	MCFG_CPU_ADD(CPU_TAG, I8080, XTAL(18'000'000)/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
 	MCFG_CPU_PROGRAM_MAP(hazl1500_mem)
 	MCFG_CPU_IO_MAP(hazl1500_io)
 	MCFG_QUANTUM_PERFECT_CPU(CPU_TAG)
@@ -696,17 +699,17 @@ static MACHINE_CONFIG_START( hazl1500 )
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(hazl1500_state, screen_update_hazl1500)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL_33_264MHz / 2,
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(33'264'000) / 2,
 	//    SCREEN_HTOTAL, SCREEN_HSTART, SCREEN_HSTART + SCREEN_HDISP,
 	//    SCREEN_VTOTAL, SCREEN_VSTART, SCREEN_VSTART + SCREEN_VDISP); // TODO: Figure out exact visibility
-	MCFG_SCREEN_RAW_PARAMS(XTAL_33_264MHz / 2,
+	MCFG_SCREEN_RAW_PARAMS(XTAL(33'264'000) / 2,
 		SCREEN_HTOTAL, 0, SCREEN_HTOTAL,
 		SCREEN_VTOTAL, 0, SCREEN_VTOTAL);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hazl1500)
 
-	MCFG_DEVICE_ADD(BAUDGEN_TAG, COM8116, XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD(BAUDGEN_TAG, COM8116, XTAL(5'068'800))
 	MCFG_COM8116_FR_HANDLER(WRITELINE(hazl1500_state, com5016_fr_w))
 
 	MCFG_DEVICE_ADD(UART_TAG, AY51013, 0)

@@ -43,13 +43,13 @@
 ///*************************************************************************
 
 #define MCFG_I7220_IRQ_CALLBACK(_write) \
-	devcb = &i7220_device::set_intrq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<i7220_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
 
 #define MCFG_I7220_DRQ_CALLBACK(_write) \
-	devcb = &i7220_device::set_drq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<i7220_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 #define MCFG_I7220_DATA_SIZE(data_size) \
-	i7220_device::set_data_size(*device, data_size);
+	downcast<i7220_device &>(*device).set_data_size(data_size);
 
 
 
@@ -66,10 +66,10 @@ public:
 	// construction/destruction
 	i7220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_intrq_wr_callback(device_t &device, Object &&cb) { return downcast<i7220_device &>(device).intrq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<i7220_device &>(device).drq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_intrq_wr_callback(Object &&cb) { return intrq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return drq_cb.set_callback(std::forward<Object>(cb)); }
 
-	static void set_data_size(device_t &device, int data_size) { downcast<i7220_device &>(device).m_data_size = data_size; }
+	void set_data_size(int data_size) { m_data_size = data_size; }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;

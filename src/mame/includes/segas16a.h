@@ -100,6 +100,24 @@ public:
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void system16a_no7751(machine_config &config);
+	void system16a(machine_config &config);
+	void system16a_fd1089a_no7751(machine_config &config);
+	void system16a_fd1089b_no7751(machine_config &config);
+	void system16a_fd1089a(machine_config &config);
+	void system16a_fd1094(machine_config &config);
+	void system16a_no7751p(machine_config &config);
+	void system16a_fd1094_no7751(machine_config &config);
+	void system16a_i8751(machine_config &config);
+	void system16a_fd1089b(machine_config &config);
+	void aceattaca_fd1094(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void mcu_io_map(address_map &map);
+	void sound_decrypted_opcodes_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_no7751_portmap(address_map &map);
+	void sound_portmap(address_map &map);
+	void system16a_map(address_map &map);
 protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
@@ -165,4 +183,23 @@ protected:
 	uint8_t                   m_read_port;
 	uint8_t                   m_mj_input_num;
 	optional_ioport_array<6> m_mj_inputs;
+};
+
+class afighter_16a_analog_state : public segas16a_state
+{
+public:
+	// construction/destruction
+	afighter_16a_analog_state(const machine_config &mconfig, device_type type, const char *tag)
+		: segas16a_state(mconfig, type, tag),
+			m_accel(*this, "ACCEL"),
+			m_steer(*this, "STEER")
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_accel_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_left_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_right_r);
+
+	protected:
+	required_ioport     m_accel;
+	required_ioport     m_steer;
 };

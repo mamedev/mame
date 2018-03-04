@@ -382,7 +382,7 @@ Notes:
 */
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 #include "screen.h"
 
 
@@ -397,6 +397,9 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void hikaru(machine_config &config);
+	void hikaru_map(address_map &map);
+	void hikaru_map_slave(address_map &map);
 };
 
 void hikaru_state::video_start()
@@ -442,7 +445,7 @@ INPUT_PORTS_END
 
 */
 
-static ADDRESS_MAP_START( hikaru_map, AS_PROGRAM, 64, hikaru_state )
+ADDRESS_MAP_START(hikaru_state::hikaru_map)
 //  Area 0
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1")  // boot ROM
 	AM_RANGE(0x00400000, 0x00400007) AM_NOP // unknown
@@ -460,8 +463,8 @@ static ADDRESS_MAP_START( hikaru_map, AS_PROGRAM, 64, hikaru_state )
 	AM_RANGE(0x14000000, 0x140000ff) AM_NOP // Master/Slave COMM
 	AM_RANGE(0x14000100, 0x143fffff) AM_RAM // GPU command RAM
 	AM_RANGE(0x15000000, 0x150000ff) AM_NOP // GPU Regs
-	AM_RANGE(0x16001000, 0x163fffff) AM_RAM // ? \ these two overlap [selected by 040000xx = 0x04,0x06,0x40]
 	AM_RANGE(0x16010000, 0x17ffffff) AM_RAM // Slave Work RAM
+	AM_RANGE(0x16001000, 0x163fffff) AM_RAM // ? \ these two overlap [selected by 040000xx = 0x04,0x06,0x40]
 //  Area 6
 	AM_RANGE(0x18001000, 0x1800101f) AM_NOP // unknown
 	AM_RANGE(0x1a000000, 0x1a000107) AM_NOP // GPU Regs
@@ -471,7 +474,7 @@ static ADDRESS_MAP_START( hikaru_map, AS_PROGRAM, 64, hikaru_state )
 	AM_RANGE(0x1b000000, 0x1b7fffff) AM_NOP // GPU Texture RAM and framebuffer (a 2048x2048x16-bit sheet?)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hikaru_map_slave, AS_PROGRAM, 64, hikaru_state )
+ADDRESS_MAP_START(hikaru_state::hikaru_map_slave)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x001FFFFF) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0x0C000000, 0x0DFFFFFF) AM_RAM
@@ -481,7 +484,7 @@ static ADDRESS_MAP_START( hikaru_map_slave, AS_PROGRAM, 64, hikaru_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( hikaru )
+MACHINE_CONFIG_START(hikaru_state::hikaru)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
 //  MCFG_SH4_MD0(1)
@@ -496,9 +499,13 @@ static MACHINE_CONFIG_START( hikaru )
 //  MCFG_SH4_CLOCK(CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(hikaru_map)
 //  MCFG_CPU_IO_MAP(hikaru_port)
+	MCFG_CPU_FORCE_NO_DRC()
 //  MCFG_CPU_VBLANK_INT("screen", hikaru,vblank)
+
 	MCFG_CPU_ADD("slave", SH4LE, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(hikaru_map_slave)
+	MCFG_CPU_FORCE_NO_DRC()
+
 
 //  MCFG_MACHINE_START_OVERRIDE(hikaru_state, hikaru )
 //  MCFG_MACHINE_RESET_OVERRIDE(hikaru_state, hikaru )

@@ -29,13 +29,13 @@ msx_cart_moonsound_device::msx_cart_moonsound_device(const machine_config &mconf
 }
 
 
-static ADDRESS_MAP_START( ymf278b_map, 0, 8, msx_cart_moonsound_device )
+ADDRESS_MAP_START(msx_cart_moonsound_device::ymf278b_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x3fffff) AM_RAM  // 2MB sram for testing
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_MEMBER( msx_cart_moonsound_device::device_add_mconfig )
+MACHINE_CONFIG_START(msx_cart_moonsound_device::device_add_mconfig)
 	// The moonsound cartridge has a separate stereo output.
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ymf278b", YMF278B, YMF278B_STD_CLOCK)

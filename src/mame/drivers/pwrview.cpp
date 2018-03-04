@@ -38,6 +38,8 @@ public:
 	DECLARE_WRITE8_MEMBER(unk2_w);
 	DECLARE_READ8_MEMBER(unk3_r);
 	DECLARE_WRITE8_MEMBER(unk3_w);
+	DECLARE_READ8_MEMBER(unk4_r);
+	DECLARE_WRITE8_MEMBER(unk4_w);
 	DECLARE_READ8_MEMBER(led_r);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(pitclock_r);
@@ -53,6 +55,11 @@ public:
 	DECLARE_READ8_MEMBER(err_r);
 	MC6845_UPDATE_ROW(update_row);
 
+	void pwrview(machine_config &config);
+	void bios_bank(address_map &map);
+	void pwrview_fetch_map(address_map &map);
+	void pwrview_io(address_map &map);
+	void pwrview_map(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -65,14 +72,20 @@ private:
 	required_device<address_map_bank_device> m_biosbank;
 	std::vector<u16> m_vram;
 	u8 m_leds[2];
-	u8 m_switch, m_c001, m_c009, m_c280, m_errcode, m_vramwin[2];
+	u8 m_switch, m_c001, m_c009, m_c280, m_c080, m_errcode, m_vramwin[2];
 	emu_timer *m_dmahack;
+	emu_timer *m_tmr0ext;
+	enum {
+		DMA_TIMER,
+		TMR0_TIMER
+	};
 };
 
 void pwrview_state::device_start()
 {
 	save_item(NAME(m_vram));
-	m_dmahack = timer_alloc();
+	m_dmahack = timer_alloc(DMA_TIMER);
+	m_tmr0ext = timer_alloc(TMR0_TIMER);
 	membank("vram1")->configure_entries(0, 0x400, &m_vram[0], 0x80);
 	membank("vram2")->configure_entries(0, 0x400, &m_vram[0], 0x80);
 }
@@ -81,7 +94,7 @@ void pwrview_state::device_reset()
 {
 	m_leds[0] = m_leds[1] = 0;
 	m_switch = 0xe0;
-	m_c001 = m_c009 = 0;
+	m_c001 = m_c009 = m_c080 = 0;
 	m_errcode = 0x31;
 	membank("vram1")->set_entry(0);
 	membank("vram2")->set_entry(0);
@@ -91,8 +104,17 @@ void pwrview_state::device_reset()
 
 void pwrview_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->drq0_w(1);
-	m_maincpu->drq1_w(1); // TODO: this is unfortunate
+	switch(id)
+	{
+		case DMA_TIMER:
+			m_maincpu->drq0_w(1);
+			m_maincpu->drq1_w(1); // TODO: this is unfortunate
+			break;
+		case TMR0_TIMER:
+			m_maincpu->tmrin0_w(ASSERT_LINE);
+			m_maincpu->tmrin0_w(CLEAR_LINE);
+			break;
+	}
 }
 
 MC6845_UPDATE_ROW(pwrview_state::update_row)
@@ -252,6 +274,33 @@ WRITE8_MEMBER(pwrview_state::unk3_w)
 	}
 }
 
+READ8_MEMBER(pwrview_state::unk4_r)
+{
+	return m_c080;
+}
+
+WRITE8_MEMBER(pwrview_state::unk4_w)
+{
+	m_c080 = data;
+	if(!BIT(data, 7))
+	{
+		m_tmr0ext->adjust(attotime::never);
+		return;
+	}
+	switch(data & 7) // this is all hand tuned to match the expected ratio with the pit clock
+	{
+		case 2:
+			m_tmr0ext->adjust(attotime::from_hz(31500), 0, attotime::from_hz(31500));
+			break;
+		case 3:
+			m_tmr0ext->adjust(attotime::from_hz(90), 0, attotime::from_hz(90));
+			break;
+		case 4:
+			m_tmr0ext->adjust(attotime::from_hz(500000), 0, attotime::from_hz(500000));
+			break;
+	}
+}
+
 READ8_MEMBER(pwrview_state::led_r)
 {
 	return m_leds[offset];
@@ -288,48 +337,50 @@ READ8_MEMBER(pwrview_state::pitclock_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START(bios_bank, 0, 16, pwrview_state)
+ADDRESS_MAP_START(pwrview_state::bios_bank)
 	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x00000, 0x07fff) AM_WRITE(nmimem_w)
 
+	AM_RANGE(0x08000, 0x0ffff) AM_WRITE(nmimem_w)
 	AM_RANGE(0x0be00, 0x0be7f) AM_RAMBANK("vram1")
 	AM_RANGE(0x0befe, 0x0beff) AM_READWRITE(vram1_r, vram1_w);
 	AM_RANGE(0x0bf00, 0x0bf7f) AM_RAMBANK("vram2")
 	AM_RANGE(0x0bffe, 0x0bfff) AM_READWRITE(vram2_r, vram2_w);
 	AM_RANGE(0x0c000, 0x0ffff) AM_ROM AM_REGION("bios", 0x4000)
-	AM_RANGE(0x08000, 0x0ffff) AM_WRITE(nmimem_w)
 
 	AM_RANGE(0x10000, 0x17fff) AM_RAM
+
+	AM_RANGE(0x18000, 0x1ffff) AM_WRITE(nmimem_w)
 
 	AM_RANGE(0x1be00, 0x1be7f) AM_RAMBANK("vram1")
 	AM_RANGE(0x1befe, 0x1beff) AM_READWRITE(vram1_r, vram1_w);
 	AM_RANGE(0x1bf00, 0x1bf7f) AM_RAMBANK("vram2")
 	AM_RANGE(0x1bffe, 0x1bfff) AM_READWRITE(vram2_r, vram2_w);
 	AM_RANGE(0x1c000, 0x1ffff) AM_ROM AM_REGION("bios", 0x4000)
-	AM_RANGE(0x18000, 0x1ffff) AM_WRITE(nmimem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pwrview_map, AS_PROGRAM, 16, pwrview_state)
-	AM_RANGE(0x00000, 0x003ff) AM_READWRITE(bank0_r, bank0_w)
+ADDRESS_MAP_START(pwrview_state::pwrview_map)
 	AM_RANGE(0x00000, 0xf7fff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x00000, 0x003ff) AM_READWRITE(bank0_r, bank0_w)
 	AM_RANGE(0xf8000, 0xfffff) AM_DEVICE("bios_bank", address_map_bank_device, amap16)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pwrview_fetch_map, AS_OPCODES, 16, pwrview_state)
-	AM_RANGE(0x00000, 0x003ff) AM_READ(bank0_r)
+ADDRESS_MAP_START(pwrview_state::pwrview_fetch_map)
 	AM_RANGE(0x00000, 0xf7fff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x00000, 0x003ff) AM_READ(bank0_r)
 	AM_RANGE(0xf8000, 0xfffff) AM_READ(fbios_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pwrview_io, AS_IO, 16, pwrview_state)
+ADDRESS_MAP_START(pwrview_state::pwrview_io)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmiio_r, nmiio_w)
 	AM_RANGE(0xc000, 0xc001) AM_READWRITE8(unk1_r, unk1_w, 0xff00)
 	AM_RANGE(0xc002, 0xc005) AM_READWRITE8(led_r, led_w, 0xff00)
 	AM_RANGE(0xc006, 0xc007) AM_READ8(rotary_r, 0xff00)
 	AM_RANGE(0xc008, 0xc009) AM_READWRITE8(unk2_r, unk2_w, 0xff00)
 	AM_RANGE(0xc00a, 0xc00b) AM_READ8(err_r, 0xff00)
 	AM_RANGE(0xc00c, 0xc00d) AM_RAM
-	AM_RANGE(0xc080, 0xc081) AM_RAM
+	AM_RANGE(0xc080, 0xc081) AM_READWRITE8(unk4_r, unk4_w, 0x00ff)
 	AM_RANGE(0xc088, 0xc089) AM_DEVWRITE8("crtc", hd6845_device, address_w, 0x00ff)
 	AM_RANGE(0xc08a, 0xc08b) AM_DEVREADWRITE8("crtc", hd6845_device, register_r, register_w, 0x00ff)
 	AM_RANGE(0xc280, 0xc287) AM_READWRITE8(unk3_r, unk3_w, 0x00ff)
@@ -340,27 +391,26 @@ static ADDRESS_MAP_START(pwrview_io, AS_IO, 16, pwrview_state)
 	AM_RANGE(0xc2e0, 0xc2e3) AM_DEVICE8("fdc", upd765a_device, map, 0x00ff)
 	AM_RANGE(0xc2e4, 0xc2e5) AM_RAM
 	AM_RANGE(0xc2e6, 0xc2e7) AM_READ8(pitclock_r, 0x00ff)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmiio_r, nmiio_w)
 ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START(pwrview_floppies)
 	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pwrview )
-	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
+MACHINE_CONFIG_START(pwrview_state::pwrview)
+	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(pwrview_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(pwrview_fetch_map)
+	MCFG_CPU_OPCODES_MAP(pwrview_fetch_map)
 	MCFG_CPU_IO_MAP(pwrview_io)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_64MHz/8, 480, 0, 384, 1040, 0, 960)  // clock unknown
+	MCFG_SCREEN_RAW_PARAMS(XTAL(64'000'000)/8, 480, 0, 384, 1040, 0, 960)  // clock unknown
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_16MHz/16) // clocks unknown, fix above when found
-	MCFG_PIT8253_CLK1(XTAL_16MHz/16)
-	MCFG_PIT8253_CLK2(XTAL_16MHz/16)
+	MCFG_PIT8253_CLK0(XTAL(16'000'000)/16) // clocks unknown, fix above when found
+	MCFG_PIT8253_CLK1(XTAL(16'000'000)/16)
+	MCFG_PIT8253_CLK2(XTAL(16'000'000)/16)
 
 	// floppy disk controller
 	MCFG_UPD765A_ADD("fdc", true, true) // Rockwell R7675P
@@ -370,16 +420,18 @@ static MACHINE_CONFIG_START( pwrview )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_Z80SIO2_ADD("sio", 4000000, 0, 0, 0, 0)
-	MCFG_DEVICE_ADD("crtc", HD6845, XTAL_64MHz/64) // clock unknown
+
+	MCFG_DEVICE_ADD("sio", Z80SIO2, 4000000)
+
+	MCFG_DEVICE_ADD("crtc", HD6845, XTAL(64'000'000)/64) // clock unknown
 	MCFG_MC6845_CHAR_WIDTH(32) // ??
 	MCFG_MC6845_UPDATE_ROW_CB(pwrview_state, update_row)
 
 	MCFG_DEVICE_ADD("bios_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bios_bank)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(17)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 MACHINE_CONFIG_END
 

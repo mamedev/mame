@@ -177,7 +177,7 @@ WRITE8_MEMBER(jack_state::joinem_control_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( jack_map, AS_PROGRAM, 8, jack_state )
+ADDRESS_MAP_START(jack_state::jack_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_SHARE("spriteram")
@@ -189,24 +189,24 @@ static ADDRESS_MAP_START( jack_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0xb504, 0xb504) AM_READ_PORT("IN2")
 	AM_RANGE(0xb505, 0xb505) AM_READ_PORT("IN3")
 	AM_RANGE(0xb506, 0xb507) AM_READWRITE(jack_flipscreen_r, jack_flipscreen_w)
-	AM_RANGE(0xb600, 0xb61f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb600, 0xb61f) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xb800, 0xbbff) AM_RAM_WRITE(jack_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(jack_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, jack_state )
+ADDRESS_MAP_START(jack_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( striv_map, AS_PROGRAM, 8, jack_state )
+ADDRESS_MAP_START(jack_state::striv_map)
+	AM_IMPORT_FROM( jack_map )
 	AM_RANGE(0xb000, 0xb0ff) AM_WRITENOP
 	AM_RANGE(0xc000, 0xcfff) AM_READ(striv_question_r)
-	AM_IMPORT_FROM( jack_map )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( joinem_map, AS_PROGRAM, 8, jack_state )
+ADDRESS_MAP_START(jack_state::joinem_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_SHARE("spriteram")
@@ -223,19 +223,19 @@ static ADDRESS_MAP_START( joinem_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(jack_colorram_w) AM_SHARE("colorram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( unclepoo_map, AS_PROGRAM, 8, jack_state )
-	AM_RANGE(0x9000, 0x97ff) AM_RAM
+ADDRESS_MAP_START(jack_state::unclepoo_map)
 	AM_IMPORT_FROM( joinem_map )
+	AM_RANGE(0x9000, 0x97ff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, jack_state )
+ADDRESS_MAP_START(jack_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP  /* R/C filter ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, jack_state )
+ADDRESS_MAP_START(jack_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("aysnd", ay8910_device, address_w)
@@ -903,14 +903,14 @@ MACHINE_RESET_MEMBER(jack_state,joinem)
 
 /***************************************************************/
 
-static MACHINE_CONFIG_START( jack )
+MACHINE_CONFIG_START(jack_state::jack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'000'000)/6)
 	MCFG_CPU_PROGRAM_MAP(jack_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jack_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'000'000)/6)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(jack_state, jack_sh_irq_ack)
@@ -935,19 +935,21 @@ static MACHINE_CONFIG_START( jack )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(ASSERTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18MHz/12)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(18'000'000)/12)
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device,read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(jack_state, timer_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( treahunt, jack )
+MACHINE_CONFIG_START(jack_state::treahunt)
+	jack(config);
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( striv, jack )
+MACHINE_CONFIG_START(jack_state::striv)
+	jack(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -970,7 +972,8 @@ INTERRUPT_GEN_MEMBER(jack_state::joinem_vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_DERIVED( joinem, jack )
+MACHINE_CONFIG_START(jack_state::joinem)
+	jack(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -995,7 +998,8 @@ static MACHINE_CONFIG_DERIVED( joinem, jack )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( unclepoo, joinem )
+MACHINE_CONFIG_START(jack_state::unclepoo)
+	joinem(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1590,16 +1594,16 @@ DRIVER_INIT_MEMBER(jack_state,striv)
 		if (A & 0x1000)
 		{
 			if (A & 4)
-				ROM[A] = BITSWAP8(data,7,2,5,1,3,6,4,0) ^ 1;
+				ROM[A] = bitswap<8>(data,7,2,5,1,3,6,4,0) ^ 1;
 			else
-				ROM[A] = BITSWAP8(data,0,2,5,1,3,6,4,7) ^ 0x81;
+				ROM[A] = bitswap<8>(data,0,2,5,1,3,6,4,7) ^ 0x81;
 		}
 		else
 		{
 			if (A & 4)
-				ROM[A] = BITSWAP8(data,7,2,5,1,3,6,4,0) ^ 1;
+				ROM[A] = bitswap<8>(data,7,2,5,1,3,6,4,0) ^ 1;
 			else
-				ROM[A] = BITSWAP8(data,0,2,5,1,3,6,4,7);
+				ROM[A] = bitswap<8>(data,0,2,5,1,3,6,4,7);
 		}
 	}
 

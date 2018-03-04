@@ -9,7 +9,6 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
-#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
 #include "machine/upd4701.h"
@@ -38,14 +37,12 @@ public:
 			m_sprites(*this, "sprites"),
 			m_segaic16vid(*this, "segaic16vid"),
 			m_gfxdecode(*this, "gfxdecode"),
-			m_soundlatch(*this, "soundlatch"),
 			m_upd4701(*this, {"upd1", "upd2", "upd3"}),
 			m_workram(*this, "workram"),
 			m_romboard(ROM_BOARD_INVALID),
 			m_grayscale_enable(false),
 			m_vdp_enable(false),
 			m_vdp_mixing(0),
-			m_mcu_data(0),
 			m_lghost_value(0),
 			m_lghost_select(0)
 	{
@@ -62,8 +59,6 @@ public:
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
-	uint8_t mapper_sound_r();
-	void mapper_sound_w(uint8_t data);
 
 	// read/write handlers
 	DECLARE_WRITE8_MEMBER( rom_5874_bank_w );
@@ -73,9 +68,6 @@ public:
 	DECLARE_READ16_MEMBER( misc_io_r );
 	DECLARE_WRITE16_MEMBER( misc_io_w );
 	DECLARE_WRITE8_MEMBER( soundbank_w );
-	DECLARE_WRITE8_MEMBER( mcu_data_w );
-
-	DECLARE_WRITE_LINE_MEMBER(ym3438_irq_handler);
 
 	// custom I/O
 	DECLARE_READ16_MEMBER( ddcrew_custom_io_r );
@@ -100,6 +92,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(set_grayscale);
 	DECLARE_WRITE_LINE_MEMBER(set_vdp_enable);
 
+	void wwally(machine_config &config);
+	void system18(machine_config &config);
+	void lghost_fd1094(machine_config &config);
+	void wwally_fd1094(machine_config &config);
+	void system18_fd1094(machine_config &config);
+	void system18_fd1094_i8751(machine_config &config);
+	void lghost(machine_config &config);
+	void system18_i8751(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void mcu_io_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void system18_map(address_map &map);
 protected:
 	// timer IDs
 	enum
@@ -140,7 +145,6 @@ protected:
 	required_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<generic_latch_8_device> m_soundlatch;
 	optional_device_array<upd4701_device, 3> m_upd4701;
 
 	// memory pointers
@@ -156,7 +160,6 @@ protected:
 	int                 m_vdp_enable;
 	uint8_t               m_vdp_mixing;
 	bitmap_ind16        m_temp_bitmap;
-	uint8_t               m_mcu_data;
 
 	// game-specific state
 	uint8_t               m_lghost_value;

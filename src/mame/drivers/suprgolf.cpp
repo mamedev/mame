@@ -90,6 +90,9 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void suprgolf(machine_config &config);
+	void io_map(address_map &map);
+	void suprgolf_map(address_map &map);
 };
 
 TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
@@ -299,7 +302,7 @@ WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
 	m_rom_bank = data;
 
 	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
-	//osd_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,space.device().safe_pcbase());
+	//osd_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,m_maincpu->pcbase());
 	membank("bank2")->set_entry(data & 0x3f);
 
 	m_msm_nmi_mask = data & 0x40;
@@ -308,7 +311,7 @@ WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
 
 WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
 {
-	//osd_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,space.device().safe_pcbase());
+	//osd_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,m_maincpu->pcbase());
 	membank("bank1")->set_entry(data & 0x0f);
 
 	if(data & 0xf0)
@@ -335,7 +338,7 @@ READ8_MEMBER(suprgolf_state::p2_r)
 	return (ioport("P2")->read() & 0xf0) | ((ioport("P2_ANALOG")->read() & 0xf));
 }
 
-static ADDRESS_MAP_START( suprgolf_map, AS_PROGRAM, 8, suprgolf_state )
+ADDRESS_MAP_START(suprgolf_state::suprgolf_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(rom2_bank_select_w )
@@ -346,7 +349,7 @@ static ADDRESS_MAP_START( suprgolf_map, AS_PROGRAM, 8, suprgolf_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, suprgolf_state )
+ADDRESS_MAP_START(suprgolf_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
@@ -484,9 +487,9 @@ void suprgolf_state::machine_reset()
 	m_msm_nmi_mask = 0;
 }
 
-#define MASTER_CLOCK XTAL_12MHz
+#define MASTER_CLOCK XTAL(12'000'000)
 
-static MACHINE_CONFIG_START( suprgolf )
+MACHINE_CONFIG_START(suprgolf_state::suprgolf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) /* guess */
@@ -529,7 +532,7 @@ static MACHINE_CONFIG_START( suprgolf )
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suprgolf_state, writeB))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* guess */
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) /* guess */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(suprgolf_state, adpcm_int))      /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

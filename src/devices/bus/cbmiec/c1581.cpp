@@ -89,7 +89,7 @@ const tiny_rom_entry *c1563_device::device_rom_region() const
 //  ADDRESS_MAP( c1581_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c1581_mem, AS_PROGRAM, 8, c1581_device )
+ADDRESS_MAP_START(c1581_device::c1581_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE(M8520_TAG, mos8520_device, read, write)
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1772_TAG, wd1772_device, read, write)
@@ -265,11 +265,11 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c1581_device::device_add_mconfig )
-	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
+MACHINE_CONFIG_START(c1581_device::device_add_mconfig)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL(16'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(c1581_mem)
 
-	MCFG_DEVICE_ADD(M8520_TAG, MOS8520, XTAL_16MHz/8)
+	MCFG_DEVICE_ADD(M8520_TAG, MOS8520, XTAL(16'000'000)/8)
 	MCFG_MOS6526_IRQ_CALLBACK(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
 	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(c1581_device, cnt_w))
 	MCFG_MOS6526_SP_CALLBACK(WRITELINE(c1581_device, sp_w))
@@ -278,7 +278,7 @@ MACHINE_CONFIG_MEMBER( c1581_device::device_add_mconfig )
 	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c1581_device, cia_pb_r))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c1581_device, cia_pb_w))
 
-	MCFG_WD1772_ADD(WD1772_TAG, XTAL_16MHz/2)
+	MCFG_WD1772_ADD(WD1772_TAG, XTAL(16'000'000)/2)
 	MCFG_FLOPPY_DRIVE_ADD_FIXED(WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats)
 MACHINE_CONFIG_END
 

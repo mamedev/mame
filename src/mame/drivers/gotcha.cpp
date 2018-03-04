@@ -101,13 +101,13 @@ WRITE16_MEMBER(gotcha_state::gotcha_oki_bank_w)
 }
 
 
-static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16, gotcha_state )
+ADDRESS_MAP_START(gotcha_state::gotcha_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(gotcha_lamps_w)
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(gotcha_oki_bank_w)
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1405ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1405ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("SYSTEM")
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16, gotcha_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gotcha_state )
+ADDRESS_MAP_START(gotcha_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write) AM_MIRROR(1)
@@ -262,7 +262,7 @@ void gotcha_state::machine_reset()
 	m_banksel = 0;
 }
 
-static MACHINE_CONFIG_START( gotcha )
+MACHINE_CONFIG_START(gotcha_state::gotcha)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,14318180)    /* 14.31818 MHz */

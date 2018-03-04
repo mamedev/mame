@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Yochizo
+
+#include "machine/timer.h"
 #include "video/jalblend.h"
 #include "screen.h"
 
@@ -138,4 +140,14 @@ public:
 	// valtric specific
 	void valtric_draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void valtric_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void valtric(machine_config &config);
+	void argus(machine_config &config);
+	void butasan(machine_config &config);
+	void argus_map(address_map &map);
+	void butasan_map(address_map &map);
+	void sound_map_a(address_map &map);
+	void sound_map_b(address_map &map);
+	void sound_portmap_1(address_map &map);
+	void sound_portmap_2(address_map &map);
+	void valtric_map(address_map &map);
 };

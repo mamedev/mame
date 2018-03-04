@@ -24,7 +24,7 @@ INPUT_PORTS_START( jasmin )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, jasmin_device, boot_pressed, nullptr)
 INPUT_PORTS_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, jasmin_device)
+ADDRESS_MAP_START(jasmin_device::map)
 	AM_RANGE(0x3f4, 0x3f7) AM_DEVREADWRITE("fdc", wd1770_device, read, write)
 	AM_RANGE(0x3f8, 0x3f8) AM_WRITE(side_sel_w)
 	AM_RANGE(0x3f9, 0x3f9) AM_WRITE(fdc_reset_w)
@@ -70,8 +70,8 @@ const tiny_rom_entry *jasmin_device::device_rom_region() const
 	return ROM_NAME( jasmin );
 }
 
-MACHINE_CONFIG_MEMBER( jasmin_device::device_add_mconfig )
-	MCFG_WD1770_ADD("fdc", XTAL_8MHz)
+MACHINE_CONFIG_START(jasmin_device::device_add_mconfig)
+	MCFG_WD1770_ADD("fdc", XTAL(8'000'000))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(oricext_device, irq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", jasmin_floppies, "3dsdd", jasmin_device::floppy_formats)

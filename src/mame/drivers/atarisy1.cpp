@@ -445,7 +445,7 @@ WRITE_LINE_MEMBER(atarisy1_state::coin_counter_left_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy1_state )
+ADDRESS_MAP_START(atarisy1_state::main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_ROM /* slapstic maps here */
 	AM_RANGE(0x2e0000, 0x2e0001) AM_READ(atarisy1_int3state_r)
@@ -456,12 +456,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy1_state )
 	AM_RANGE(0x860000, 0x860001) AM_WRITE(atarisy1_bankselect_w) AM_SHARE("bankselect")
 	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0x8c0000, 0x8c0001) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0x8c0000, 0x8c0001) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0x900000, 0x9fffff) AM_RAM
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
 	AM_RANGE(0xa02000, 0xa02fff) AM_RAM_WRITE(atarisy1_spriteram_w) AM_SHARE("mob")
-	AM_RANGE(0xa03000, 0xa03fff) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
-	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa03000, 0xa03fff) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xf00000, 0xf00fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0xf20000, 0xf20007) AM_READ(trakball_r)
 	AM_RANGE(0xf40000, 0xf4001f) AM_READWRITE(joystick_r, joystick_w)
@@ -479,7 +479,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, atarisy1_state )
+ADDRESS_MAP_START(atarisy1_state::sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -725,12 +725,12 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarisy1 )
+MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarisy1_state, video_int_gen)
 
 	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -778,7 +778,7 @@ static MACHINE_CONFIG_START( atarisy1 )
 	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarisy1_state, sound_int_write_line))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
@@ -795,34 +795,40 @@ static MACHINE_CONFIG_START( atarisy1 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, ATARI_CLOCK_14MHz/8)
 	MCFG_VIA6522_READPA_HANDLER(READ8(atarisy1_state, via_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(atarisy1_state, via_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(atarisy1_state, via_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(atarisy1_state, via_pb_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( marble, atarisy1 )
+MACHINE_CONFIG_START(atarisy1_state::marble)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 103)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( peterpak, atarisy1 )
+MACHINE_CONFIG_START(atarisy1_state::peterpak)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 107)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( indytemp, atarisy1 )
+MACHINE_CONFIG_START(atarisy1_state::indytemp)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 105)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( roadrunn, atarisy1 )
+MACHINE_CONFIG_START(atarisy1_state::roadrunn)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 108)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( roadb109, atarisy1 )
+MACHINE_CONFIG_START(atarisy1_state::roadb109)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 109)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( roadb110, atarisy1 )
+MACHINE_CONFIG_START(atarisy1_state::roadb110)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 110)
 MACHINE_CONFIG_END
 

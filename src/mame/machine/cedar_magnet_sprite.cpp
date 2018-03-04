@@ -23,7 +23,7 @@ cedar_magnet_sprite_device::cedar_magnet_sprite_device(const machine_config &mco
 {
 }
 
-static ADDRESS_MAP_START( cedar_magnet_sprite_sub_ram_map, AS_PROGRAM, 8, cedar_magnet_sprite_device )
+ADDRESS_MAP_START(cedar_magnet_sprite_device::cedar_magnet_sprite_sub_ram_map)
 // these are 8x SIEMENS HYB 41256-15 AA - 262,144 bit DRAM (32kbytes)
 // these are on the sprite board memory sub-board
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("ram")
@@ -48,14 +48,13 @@ READ8_MEMBER(cedar_magnet_sprite_device::exzisus_hack_r)
 }
 
 
-static ADDRESS_MAP_START( cedar_magnet_sprite_map, AS_PROGRAM, 8, cedar_magnet_sprite_device )
-	AM_RANGE(0x00400, 0x007ff) AM_READ(exzisus_hack_r)
-
+ADDRESS_MAP_START(cedar_magnet_sprite_device::cedar_magnet_sprite_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_DEVICE("sp_sub_ram", address_map_bank_device, amap8)
 
+	AM_RANGE(0x00400, 0x007ff) AM_READ(exzisus_hack_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cedar_magnet_sprite_io, AS_IO, 8, cedar_magnet_sprite_device )
+ADDRESS_MAP_START(cedar_magnet_sprite_device::cedar_magnet_sprite_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("z80pio0", z80pio_device, read_alt, write_alt)
@@ -199,7 +198,7 @@ WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port9c_w)
 //  printf("%s:sprite_port9c_w %02x\n", machine().describe_context(), data);
 }
 
-MACHINE_CONFIG_MEMBER( cedar_magnet_sprite_device::device_add_mconfig )
+MACHINE_CONFIG_START(cedar_magnet_sprite_device::device_add_mconfig)
 	MCFG_CPU_ADD("spritecpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(cedar_magnet_sprite_map)
 	MCFG_CPU_IO_MAP(cedar_magnet_sprite_io)
@@ -228,8 +227,8 @@ MACHINE_CONFIG_MEMBER( cedar_magnet_sprite_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("sp_sub_ram", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_sprite_sub_ram_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 MACHINE_CONFIG_END
 

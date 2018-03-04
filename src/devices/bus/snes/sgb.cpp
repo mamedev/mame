@@ -39,7 +39,6 @@ sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_typ
 	m_joy3(0),
 	m_joy4(0),
 	m_vram_offs(0),
-	m_mlt_req(0),
 	m_lcd_row(0),
 	m_packetsize(0),
 	m_bios_disabled(false)
@@ -130,7 +129,7 @@ WRITE8_MEMBER(sns_rom_sgb_device::gb_ie_w)
 
 
 
-static ADDRESS_MAP_START(supergb_map, AS_PROGRAM, 8, sns_rom_sgb_device )
+ADDRESS_MAP_START(sns_rom_sgb_device::supergb_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
 	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("sgb_ppu", sgb_ppu_device, vram_r, vram_w)  /* 8k VRAM */
@@ -160,7 +159,7 @@ static SLOT_INTERFACE_START(supergb_cart)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_MEMBER( sns_rom_sgb1_device::device_add_mconfig )
+MACHINE_CONFIG_START(sns_rom_sgb1_device::device_add_mconfig)
 	MCFG_CPU_ADD("sgb_cpu", LR35902, 4295454)   /* 4.295454 MHz */
 	MCFG_CPU_PROGRAM_MAP(supergb_map)
 	MCFG_LR35902_TIMER_CB(WRITE8(sns_rom_sgb_device, gb_timer_callback))
@@ -186,15 +185,15 @@ const tiny_rom_entry *sns_rom_sgb1_device::device_rom_region() const
 }
 
 
-MACHINE_CONFIG_MEMBER( sns_rom_sgb2_device::device_add_mconfig )
-	MCFG_CPU_ADD("sgb_cpu", LR35902, XTAL_4_194304Mhz)   /* 4.194MHz derived from clock on sgb2 pcb */
+MACHINE_CONFIG_START(sns_rom_sgb2_device::device_add_mconfig)
+	MCFG_CPU_ADD("sgb_cpu", LR35902, XTAL(4'194'304))   /* 4.194MHz derived from clock on sgb2 pcb */
 	MCFG_CPU_PROGRAM_MAP(supergb_map)
 	MCFG_LR35902_TIMER_CB(WRITE8(sns_rom_sgb_device, gb_timer_callback))
 	MCFG_LR35902_HALT_BUG
 
 	MCFG_SGB_PPU_ADD("sgb_ppu", "sgb_cpu")
 
-	MCFG_SOUND_ADD("sgb_apu", DMG_APU, XTAL_4_194304Mhz)
+	MCFG_SOUND_ADD("sgb_apu", DMG_APU, XTAL(4'194'304))
 
 	MCFG_GB_CARTRIDGE_ADD("gb_slot", supergb_cart, nullptr)
 MACHINE_CONFIG_END

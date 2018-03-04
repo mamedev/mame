@@ -61,6 +61,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
+	void destiny(machine_config &config);
+	void main_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -168,7 +170,7 @@ WRITE8_MEMBER(destiny_state::sound_w)
 	m_beeper->set_state(~offset & 1);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, destiny_state )
+ADDRESS_MAP_START(destiny_state::main_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(printer_status_r, firq_ack_w)
@@ -261,10 +263,10 @@ void destiny_state::machine_reset()
 	bank_select_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
-static MACHINE_CONFIG_START( destiny )
+MACHINE_CONFIG_START(destiny_state::destiny)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_4MHz/2)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL(4'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(destiny_state, irq0_line_hold, 50) // timer irq controls update speed, frequency needs to be determined yet (2MHz through three 74LS390)
 

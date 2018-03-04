@@ -15,42 +15,45 @@
 
 // 4-bit K input port (pull-down)
 #define MCFG_SM510_READ_K_CB(_devcb) \
-	devcb = &sm510_base_device::set_read_k_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sm510_base_device &>(*device).set_read_k_callback(DEVCB_##_devcb);
 // when in halt state, any K input going High can wake up the CPU,
-// driver is required to use execute_set_input(SM510_INPUT_LINE_K, state)
+// driver is required to use set_input_line(SM510_INPUT_LINE_K, state)
 #define SM510_INPUT_LINE_K 0
 
 // 1-bit BA(aka alpha) input pin (pull-up)
 #define MCFG_SM510_READ_BA_CB(_devcb) \
-	devcb = &sm510_base_device::set_read_ba_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sm510_base_device &>(*device).set_read_ba_callback(DEVCB_##_devcb);
 
 // 1-bit B(beta) input pin (pull-up)
 #define MCFG_SM510_READ_B_CB(_devcb) \
-	devcb = &sm510_base_device::set_read_b_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sm510_base_device &>(*device).set_read_b_callback(DEVCB_##_devcb);
 
 // 8-bit S strobe output port
 #define MCFG_SM510_WRITE_S_CB(_devcb) \
-	devcb = &sm510_base_device::set_write_s_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sm510_base_device &>(*device).set_write_s_callback(DEVCB_##_devcb);
 
-// 2/4-bit R (melody) output port
+// 1/2/4-bit R (buzzer/melody) output port
 #define MCFG_SM510_WRITE_R_CB(_devcb) \
-	devcb = &sm510_base_device::set_write_r_callback(*device, DEVCB_##_devcb);
-
-// R port can be set to direct control with a mask option (default false)
-#define MCFG_SM510_R_DIRECT_CONTROL(_direct) \
-	sm510_base_device::set_r_direct_control(*device, _direct);
+	devcb = &downcast<sm510_base_device &>(*device).set_write_r_callback(DEVCB_##_devcb);
+// For SM510, SM500, SM5A, R port output is selected with a mask option,
+// either from the divider or direct contol. Documented options are:
+// SM510/SM5A: control, 2(4096Hz meant for alarm sound)
+// SM500: 14, 11, 3 (divider f1, f4, f12)
+#define MCFG_SM510_R_MASK_OPTION(_bit) \
+	downcast<sm510_base_device &>(*device).set_r_mask_option(_bit);
+#define SM510_R_CONTROL_OUTPUT -1
 
 // LCD segment outputs: H1-4 as offset(low), a/b/c 1-16 as data d0-d15
 #define MCFG_SM510_WRITE_SEGA_CB(_devcb) \
-	devcb = &sm510_base_device::set_write_sega_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sm510_base_device &>(*device).set_write_sega_callback(DEVCB_##_devcb);
 #define MCFG_SM510_WRITE_SEGB_CB(_devcb) \
-	devcb = &sm510_base_device::set_write_segb_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sm510_base_device &>(*device).set_write_segb_callback(DEVCB_##_devcb);
 #define MCFG_SM510_WRITE_SEGC_CB(_devcb) \
-	devcb = &sm510_base_device::set_write_segc_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sm510_base_device &>(*device).set_write_segc_callback(DEVCB_##_devcb);
 
 // LCD bs output: same as above, but only up to 2 bits used
 #define MCFG_SM510_WRITE_SEGBS_CB(_devcb) \
-	devcb = &sm510_base_device::set_write_segbs_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sm510_base_device &>(*device).set_write_segbs_callback(DEVCB_##_devcb);
 
 // LCD output lazy combination
 #define MCFG_SM510_WRITE_SEGS_CB(_devcb) \
@@ -112,7 +115,7 @@ public:
 		, m_prgwidth(prgwidth)
 		, m_datawidth(datawidth)
 		, m_stack_levels(stack_levels)
-		, m_r_direct(false)
+		, m_r_mask_option(SM510_R_CONTROL_OUTPUT)
 		, m_lcd_ram_a(*this, "lcd_ram_a"), m_lcd_ram_b(*this, "lcd_ram_b"), m_lcd_ram_c(*this, "lcd_ram_c")
 		, m_write_sega(*this), m_write_segb(*this), m_write_segc(*this), m_write_segbs(*this)
 		, m_melody_rom(*this, "melody")
@@ -122,18 +125,18 @@ public:
 		, m_write_r(*this)
 	{ }
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_read_k_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_read_k.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_ba_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_read_ba.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_b_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_read_b.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_s_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_s.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_r_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_r.set_callback(std::forward<Object>(cb)); }
-	static void set_r_direct_control(device_t &device, bool direct) { downcast<sm510_base_device &>(device).m_r_direct = direct; }
+	// configuration helpers
+	template <class Object> devcb_base &set_read_k_callback(Object &&cb) { return m_read_k.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_ba_callback(Object &&cb) { return m_read_ba.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_b_callback(Object &&cb) { return m_read_b.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_s_callback(Object &&cb) { return m_write_s.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_r_callback(Object &&cb) { return m_write_r.set_callback(std::forward<Object>(cb)); }
+	void set_r_mask_option(int bit) { m_r_mask_option = bit; }
 
-	template <class Object> static devcb_base &set_write_sega_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_sega.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_segb_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_segb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_segc_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_segc.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_segbs_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_segbs.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_sega_callback(Object &&cb) { return m_write_sega.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_segb_callback(Object &&cb) { return m_write_segb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_segc_callback(Object &&cb) { return m_write_segc.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_segbs_callback(Object &&cb) { return m_write_segbs.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides
@@ -152,10 +155,6 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-
-	// device_disasm_interface overrides
-	virtual u32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual u32 disasm_max_opcode_bytes() const override { return 2; }
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -185,7 +184,7 @@ protected:
 	bool m_skip;
 	u8 m_w;
 	u8 m_r, m_r_out;
-	bool m_r_direct;
+	int m_r_mask_option;
 	bool m_k_active;
 	bool m_halt;
 	int m_clk_div;
@@ -321,7 +320,10 @@ public:
 	sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	void program_2_7k(address_map &map);
+	void data_96_32x4(address_map &map);
+
+	virtual util::disasm_interface *create_disassembler() override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
 
@@ -339,10 +341,13 @@ public:
 protected:
 	sm511_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
+	void program_4k(address_map &map);
+	void data_96_32x4(address_map &map);
+
 	virtual void device_post_load() override { notify_clock_changed(); }
 	virtual void device_reset() override;
 
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
 
@@ -354,6 +359,9 @@ class sm512_device : public sm511_device
 {
 public:
 	sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	void data_80_48x4(address_map &map);
 };
 
 

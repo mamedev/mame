@@ -2,11 +2,14 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        SH4 Robot
+SH4 Robot
 
-        http://perso.telecom-paristech.fr/~polti/robot/
+http://web.archive.org/web/20131127151413/perso.telecom-paristech.fr/~polti/robot/
 
-        27/11/2013 Skeleton driver.
+Original site died. None of the downloads in the above wayback page work, so fairly useless.
+
+
+2013-11-27 Skeleton driver.
 
 
       0x0000 0000 - 0x7FFF FFFF     : P0 area, cachable
@@ -28,21 +31,25 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
 
 class sh4robot_state : public driver_device
 {
 public:
 	sh4robot_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu") { }
+	: driver_device(mconfig, type, tag)
+	, m_maincpu(*this, "maincpu")
+	{ }
 
-
+	void sh4robot(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+private:
 	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START(sh4robot_mem, AS_PROGRAM, 64, sh4robot_state)
+ADDRESS_MAP_START(sh4robot_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x00000fff) AM_ROM
 	AM_RANGE(0x08000000, 0x08ffffff) AM_RAM // SDRAM 1
@@ -50,14 +57,14 @@ static ADDRESS_MAP_START(sh4robot_mem, AS_PROGRAM, 64, sh4robot_state)
 	AM_RANGE(0xa0000000, 0xa0000fff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sh4robot_io, AS_IO, 64, sh4robot_state )
+ADDRESS_MAP_START(sh4robot_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( sh4robot )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( sh4robot )
+MACHINE_CONFIG_START(sh4robot_state::sh4robot)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, 200000000) // SH7750
 	MCFG_SH4_MD0(1)
@@ -70,8 +77,9 @@ static MACHINE_CONFIG_START( sh4robot )
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
 	MCFG_SH4_CLOCK(200000000)
-	MCFG_CPU_PROGRAM_MAP(sh4robot_mem)
-	MCFG_CPU_IO_MAP(sh4robot_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
+	MCFG_CPU_FORCE_NO_DRC()
 
 MACHINE_CONFIG_END
 
@@ -90,4 +98,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY      FULLNAME  FLAGS
-COMP( 20??, sh4robot, 0,      0,      sh4robot, sh4robot, sh4robot_state, 0,    "<unknown>", "Robot",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 20??, sh4robot, 0,      0,      sh4robot, sh4robot, sh4robot_state, 0,    "<unknown>", "Robot",  MACHINE_IS_SKELETON_MECHANICAL )

@@ -16,7 +16,7 @@
 	MCFG_DEVICE_REPLACE(_tag, VRENDER0, _clock)
 
 #define MCFG_VR0_REGBASE(_base) \
-	vrender0_device::set_reg_base(*device, _base);
+	downcast<vrender0_device &>(*device).set_reg_base(_base);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -31,8 +31,8 @@ class vrender0_device : public device_t,
 public:
 	vrender0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void set_reg_base(device_t &device, int base) { downcast<vrender0_device &>(device).m_reg_base = base; }
+	// configuration
+	void set_reg_base(int base) { m_reg_base = base; }
 
 	DECLARE_READ32_MEMBER( vr0_snd_read );
 	DECLARE_WRITE32_MEMBER( vr0_snd_write );

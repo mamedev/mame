@@ -171,14 +171,14 @@ READ8_MEMBER(fgoal_state::shifter_r)
 {
 	uint8_t v = m_mb14241->shift_result_r(space, 0);
 
-	return BITSWAP8(v, 7, 6, 5, 4, 3, 2, 1, 0);
+	return bitswap<8>(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
 READ8_MEMBER(fgoal_state::shifter_reverse_r)
 {
 	uint8_t v = m_mb14241->shift_result_r(space, 0);
 
-	return BITSWAP8(v, 0, 1, 2, 3, 4, 5, 6, 7);
+	return bitswap<8>(v, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 
@@ -207,7 +207,7 @@ WRITE8_MEMBER(fgoal_state::sound2_w)
 }
 
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, fgoal_state )
+ADDRESS_MAP_START(fgoal_state::cpu_map)
 
 	AM_RANGE(0x0000, 0x00ef) AM_RAM
 
@@ -364,7 +364,7 @@ void fgoal_state::machine_reset()
 	m_prev_coin = 0;
 }
 
-static MACHINE_CONFIG_START( fgoal )
+MACHINE_CONFIG_START(fgoal_state::fgoal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 10065000 / 10) /* ? */

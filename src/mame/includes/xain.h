@@ -4,6 +4,7 @@
 #include "machine/taito68705interface.h"
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class xain_state : public driver_device
@@ -56,6 +57,12 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void xsleenab(machine_config &config);
+	void xsleena(machine_config &config);
+	void bootleg_map(address_map &map);
+	void cpu_map_B(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;

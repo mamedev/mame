@@ -96,7 +96,7 @@ const float cs4031_device::m_dma_clock_divider[] =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( cs4031_device::device_add_mconfig )
+MACHINE_CONFIG_START(cs4031_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("dma1", AM9517A, 0)
 	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma2", am9517a_device, dreq0_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(cs4031_device, dma1_eop_w))
@@ -139,11 +139,11 @@ MACHINE_CONFIG_MEMBER( cs4031_device::device_add_mconfig )
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("ctc", PIT8254, 0)
-	MCFG_PIT8253_CLK0(XTAL_14_31818MHz / 12.0)
+	MCFG_PIT8253_CLK0(XTAL(14'318'181) / 12.0)
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("intc1", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL_14_31818MHz / 12.0)
+	MCFG_PIT8253_CLK1(XTAL(14'318'181) / 12.0)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(cs4031_device, ctc_out1_w))
-	MCFG_PIT8253_CLK2(XTAL_14_31818MHz / 12.0)
+	MCFG_PIT8253_CLK2(XTAL(14'318'181) / 12.0)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(cs4031_device, ctc_out2_w))
 
 	MCFG_DS12885_ADD("rtc")
@@ -194,30 +194,6 @@ cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, dev
 	m_address(0),
 	m_address_valid(false)
 {
-}
-
-void cs4031_device::static_set_cputag(device_t &device, const char *tag)
-{
-	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
-	cs4031.m_cputag = tag;
-}
-
-void cs4031_device::static_set_isatag(device_t &device, const char *tag)
-{
-	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
-	cs4031.m_isatag = tag;
-}
-
-void cs4031_device::static_set_biostag(device_t &device, const char *tag)
-{
-	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
-	cs4031.m_biostag = tag;
-}
-
-void cs4031_device::static_set_keybctag(device_t &device, const char *tag)
-{
-	cs4031_device &cs4031 = downcast<cs4031_device &>(device);
-	cs4031.m_keybctag = tag;
 }
 
 //-------------------------------------------------

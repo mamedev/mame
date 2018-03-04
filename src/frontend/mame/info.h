@@ -54,6 +54,7 @@ private:
 	void output_chips(device_t &device, const char *root_tag);
 	void output_display(device_t &device, machine_flags::type const *flags, const char *root_tag);
 	void output_sound(device_t &device);
+	void output_ioport_condition(const ioport_condition &condition, unsigned indent);
 	void output_input(const ioport_list &portlist);
 	void output_switches(const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *loctag, const char *innertag);
 	void output_ports(const ioport_list &portlist);
@@ -78,5 +79,4 @@ private:
 	bool m_dtd;
 };
 
-
-#endif  // MAME_FRONTEND_MAME_INFO_H
+#endif // MAME_FRONTEND_MAME_INFO_H

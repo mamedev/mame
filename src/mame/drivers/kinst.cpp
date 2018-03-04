@@ -230,6 +230,8 @@ public:
 	required_device<ata_interface_device> m_ata;
 	required_device<dcs_audio_2k_device> m_dcs;
 
+	void kinst(machine_config &config);
+	void main_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -237,7 +239,7 @@ protected:
 
 
 /* constants */
-#define MASTER_CLOCK    XTAL_50MHz
+#define MASTER_CLOCK    XTAL(50'000'000)
 
 
 
@@ -342,25 +344,25 @@ INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
 
 READ32_MEMBER(kinst_state::ide_r)
 {
-	return m_ata->read_cs0(space, offset / 2, mem_mask);
+	return m_ata->read_cs0(offset / 2, mem_mask);
 }
 
 
 WRITE32_MEMBER(kinst_state::ide_w)
 {
-	m_ata->write_cs0(space, offset / 2, data, mem_mask);
+	m_ata->write_cs0(offset / 2, data, mem_mask);
 }
 
 
 READ32_MEMBER(kinst_state::ide_extra_r)
 {
-	return m_ata->read_cs1(space, 6, 0xff);
+	return m_ata->read_cs1(6, 0xff);
 }
 
 
 WRITE32_MEMBER(kinst_state::ide_extra_w)
 {
-	m_ata->write_cs1(space, 6, data, 0xff);
+	m_ata->write_cs1(6, data, 0xff);
 }
 
 
@@ -397,8 +399,8 @@ READ32_MEMBER(kinst_state::control_r)
 
 		case 4:     /* $a0 */
 			result = ioport(portnames[offset])->read();
-			if (space.device().safe_pc() == 0x802d428)
-				space.device().execute().spin_until_interrupt();
+			if (m_maincpu->pc() == 0x802d428)
+				m_maincpu->spin_until_interrupt();
 			break;
 	}
 
@@ -446,7 +448,7 @@ WRITE32_MEMBER(kinst_state::control_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, kinst_state )
+ADDRESS_MAP_START(kinst_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_SHARE("rambase2")
@@ -691,7 +693,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( kinst )
+MACHINE_CONFIG_START(kinst_state::kinst)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4600LE, MASTER_CLOCK*2)

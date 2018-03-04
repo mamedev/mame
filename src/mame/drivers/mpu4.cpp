@@ -13,12 +13,6 @@
 #include "emu.h"
 #include "includes/mpu4.h"
 
-MACHINE_CONFIG_EXTERN( mod4oki );
-MACHINE_CONFIG_EXTERN( mod4yam );
-MACHINE_CONFIG_EXTERN( mpu4crys );
-MACHINE_CONFIG_EXTERN( bwboki );
-MACHINE_CONFIG_EXTERN( mod2 );
-
 INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( mpu4_cw );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );

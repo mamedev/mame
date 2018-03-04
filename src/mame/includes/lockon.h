@@ -11,8 +11,8 @@
 #include "screen.h"
 
 /* Calculated from CRT controller writes */
-#define PIXEL_CLOCK            (XTAL_21MHz / 3)
-#define FRAMEBUFFER_CLOCK      XTAL_10MHz
+#define PIXEL_CLOCK            (XTAL(21'000'000) / 3)
+#define FRAMEBUFFER_CLOCK      XTAL(10'000'000)
 #define HBSTART                320
 #define HBEND                  0
 #define HTOTAL                 448
@@ -138,4 +138,10 @@ public:
 	void rotate_draw( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void hud_draw( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(ym2203_irq);
+	void lockon(machine_config &config);
+	void ground_v30(address_map &map);
+	void main_v30(address_map &map);
+	void object_v30(address_map &map);
+	void sound_io(address_map &map);
+	void sound_prg(address_map &map);
 };

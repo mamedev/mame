@@ -19,7 +19,7 @@ static SLOT_INTERFACE_START( microdisc_floppies )
 	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
 SLOT_INTERFACE_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, microdisc_device)
+ADDRESS_MAP_START(microdisc_device::map)
 	AM_RANGE(0x310, 0x313) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	AM_RANGE(0x314, 0x314) AM_READWRITE(port_314_r, port_314_w)
 	AM_RANGE(0x318, 0x318) AM_READ(port_318_r)
@@ -66,8 +66,8 @@ const tiny_rom_entry *microdisc_device::device_rom_region() const
 	return ROM_NAME( microdisc );
 }
 
-MACHINE_CONFIG_MEMBER( microdisc_device::device_add_mconfig )
-	MCFG_FD1793_ADD("fdc", XTAL_8MHz/8)
+MACHINE_CONFIG_START(microdisc_device::device_add_mconfig)
+	MCFG_FD1793_ADD("fdc", XTAL(8'000'000)/8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(microdisc_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(microdisc_device, fdc_drq_w))
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(microdisc_device, fdc_hld_w))

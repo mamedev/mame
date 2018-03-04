@@ -53,6 +53,7 @@ public:
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
+	void chicago(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -93,7 +94,7 @@ void chicago_state::video_start()
 {
 }
 
-static MACHINE_CONFIG_START( chicago )
+MACHINE_CONFIG_START(chicago_state::chicago)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)

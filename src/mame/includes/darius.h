@@ -6,7 +6,6 @@
 
 *************************************************************************/
 
-#include "audio/taitosnd.h"
 #include "sound/flt_vol.h"
 #include "sound/msm5205.h"
 #include "video/pc080sn.h"
@@ -26,8 +25,7 @@ public:
 		m_msm(*this, "msm"),
 		m_cpub(*this, "cpub"),
 		m_adpcm(*this, "adpcm"),
-		m_pc080sn (*this, "pc080sn"),
-		m_tc0140syt(*this, "tc0140syt"),
+		m_pc080sn(*this, "pc080sn"),
 		m_filter0_0l(*this, "filter0.0l"),
 		m_filter0_0r(*this, "filter0.0r"),
 		m_filter0_1l(*this, "filter0.1l"),
@@ -72,7 +70,6 @@ public:
 	required_device<cpu_device> m_cpub;
 	required_device<cpu_device> m_adpcm;
 	required_device<pc080sn_device> m_pc080sn;
-	required_device<tc0140syt_device> m_tc0140syt;
 
 	required_device<filter_volume_device> m_filter0_0l;
 	required_device<filter_volume_device> m_filter0_0r;
@@ -96,8 +93,8 @@ public:
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
-	DECLARE_READ16_MEMBER(darius_ioc_r);
-	DECLARE_WRITE16_MEMBER(darius_ioc_w);
+	DECLARE_READ16_MEMBER(coin_r);
+	DECLARE_WRITE16_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(adpcm_command_w);
 	DECLARE_WRITE8_MEMBER(darius_fm0_pan);
@@ -133,4 +130,10 @@ public:
 	void update_psg1( int port );
 	void update_da(  );
 	DECLARE_WRITE_LINE_MEMBER(darius_adpcm_int);
+	void darius(machine_config &config);
+	void darius_cpub_map(address_map &map);
+	void darius_map(address_map &map);
+	void darius_sound2_io_map(address_map &map);
+	void darius_sound2_map(address_map &map);
+	void darius_sound_map(address_map &map);
 };

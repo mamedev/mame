@@ -50,11 +50,11 @@ void zx_state::zx_ula_hsync()
 	recalc_hsync();
 }
 
-WRITE16_MEMBER(zx_state::refresh_w)
+WRITE8_MEMBER(zx_state::refresh_w)
 {
-	if((data ^ m_prev_refresh) & 0x40)
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
-	m_prev_refresh = data;
+	if((offset ^ m_prev_refresh) & 0x40)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, offset & 0x40 ? CLEAR_LINE : ASSERT_LINE);
+	m_prev_refresh = offset;
 	if(m_ula_char_buffer != 0xffff) {
 		uint64_t time = m_maincpu->total_cycles();
 		int x = 2*((time-m_base_vsync_clock) % 207);
@@ -63,7 +63,7 @@ WRITE16_MEMBER(zx_state::refresh_w)
 		if(m_region_gfx1)
 			pixels = m_region_gfx1->base()[((m_ula_char_buffer & 0x3f) << 3) | (m_ypos & 7)];
 		else
-			pixels = m_program->read_byte((data & 0xfe00) | ((m_ula_char_buffer & 0x3f) << 3) | (m_ypos & 7));
+			pixels = m_program->read_byte((offset & 0xfe00) | ((m_ula_char_buffer & 0x3f) << 3) | (m_ypos & 7));
 		if(m_ula_char_buffer & 0x80)
 			pixels = ~pixels;
 		if(x < 384-8 && y < 311) {
@@ -95,7 +95,7 @@ void zx_state::recalc_hsync()
 READ8_MEMBER(zx_state::ula_low_r)
 {
 	uint8_t cdata = m_program->read_byte(offset);
-	if(machine().side_effect_disabled())
+	if(machine().side_effects_disabled())
 		return cdata;
 
 	if(m_maincpu->state_int(Z80_HALT))
@@ -114,7 +114,7 @@ READ8_MEMBER(zx_state::ula_high_r)
 {
 	uint8_t cdata = m_program->read_byte(offset);
 
-	if(machine().side_effect_disabled())
+	if(machine().side_effects_disabled())
 		return cdata;
 
 	if(m_maincpu->state_int(Z80_HALT))

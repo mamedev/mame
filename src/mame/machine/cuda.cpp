@@ -67,7 +67,7 @@ ROM_END
 //  ADDRESS_MAP
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( cuda_map, AS_PROGRAM, 8, cuda_device )
+ADDRESS_MAP_START(cuda_device::cuda_map)
 	AM_RANGE(0x0000, 0x0002) AM_READWRITE(ports_r, ports_w)
 	AM_RANGE(0x0004, 0x0006) AM_READWRITE(ddr_r, ddr_w)
 	AM_RANGE(0x0007, 0x0007) AM_READWRITE(pll_r, pll_w)
@@ -84,8 +84,8 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( cuda_device::device_add_mconfig )
-	MCFG_CPU_ADD(CUDA_CPU_TAG, M68HC05EG, XTAL_32_768kHz*192)   // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
+MACHINE_CONFIG_START(cuda_device::device_add_mconfig)
+	MCFG_CPU_ADD(CUDA_CPU_TAG, M68HC05EG, XTAL(32'768)*192)   // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
 	MCFG_CPU_PROGRAM_MAP(cuda_map)
 MACHINE_CONFIG_END
 
@@ -381,17 +381,6 @@ cuda_device::cuda_device(const machine_config &mconfig, const char *tag, device_
 	write_via_data(*this),
 	m_maincpu(*this, CUDA_CPU_TAG)
 {
-}
-
-//-------------------------------------------------
-//  static_set_type - configuration helper to set
-//  the chip type
-//-------------------------------------------------
-
-void cuda_device::static_set_type(device_t &device, int type)
-{
-	cuda_device &cuda = downcast<cuda_device &>(device);
-	cuda.rom_offset = type;
 }
 
 //-------------------------------------------------

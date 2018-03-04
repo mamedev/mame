@@ -66,7 +66,7 @@ Soul Calibur II................................. 123456X  SC21 DVD0            D
 Soul Calibur III Arcade Edition................. 123456X  SC31001-NA-DVD0-A    DVD          NM00031   SC31001-NA-A           Namco 2005                    \
    "                           ................. 123456X  SC31001-NA-DVD0-B    DVD          NM00031   SC31001-NA-A           Namco 2005                    / # % @
 Sukusuku Inufuku 2 / The Dog Luck 2............. 123456X  HM-IN2               CD           NM00037   IN2 Ver.A              Hampster/Video System 2007
-Super Dragonball Z / Chou Dragonball Z.......... XXXX56X  DB1                  DVD          NM00027   DB1 Ver.B              Banpresto 2005
+Super Dragon Ball Z / Chou Dragon Ball Z........ XXXX56X  DB1                  DVD          NM00027   DB1 Ver.B              Banpresto 2005
 Taiko no Tatsujin 7............................. ------X  TK71 DVD0            DVD          NM00023   TK71 Ver.A             Namco 2005
 Taiko no Tatsujin 8............................. ------X  TK8100-1-NA-DVD0-A   DVD          NM00033   TK81001-NA-A           Namco 2006
 Taiko No Tatsujin 9............................. XXXX56X  TK9100-1-NA-DVD0-A   DVD          NM00038   TK91001-NA-A           Namco 2006
@@ -886,6 +886,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void system246(machine_config &config);
+	void system256(machine_config &config);
+	void ps2_map(address_map &map);
 protected:
 
 	// devices
@@ -905,7 +908,7 @@ uint32_t namcops2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-static ADDRESS_MAP_START(ps2_map, AS_PROGRAM, 32, namcops2_state)
+ADDRESS_MAP_START(namcops2_state::ps2_map)
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM // 32 MB RAM in consumer PS2s, do these have more?
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
@@ -913,7 +916,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( system246 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( system246 )
+MACHINE_CONFIG_START(namcops2_state::system246)
 	MCFG_CPU_ADD("maincpu", R5000LE, 294000000) // actually R5900 @ 294 MHz
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
@@ -929,7 +932,8 @@ static MACHINE_CONFIG_START( system246 )
 	MCFG_PALETTE_ADD("palette", 65536)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system256, system246 )
+MACHINE_CONFIG_START(namcops2_state::system256)
+	system246(config);
 MACHINE_CONFIG_END
 
 #define SYSTEM246_BIOS  \
@@ -1312,6 +1316,9 @@ ROM_START( timecrs3 )
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "tst1dvd0", 0, SHA1(f8a447d9a4224282516bea590f5217c751bdc4ae) )
+
+	ROM_REGION(0x40000, "iocpu", 0)   // NAMCO V291 I/O PCB, HD643334 H8/3334 MCU code
+	ROM_LOAD("tss-iopc.ic3", 0x000000, 0x040000, CRC(bb112fe0) SHA1(6fa5dc81d258137c1b1ad427d49d136d0bbf53fa) )
 ROM_END
 
 ROM_START( timecrs3e )
@@ -1324,6 +1331,9 @@ ROM_START( timecrs3e )
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "tst1dvd0", 0, SHA1(f8a447d9a4224282516bea590f5217c751bdc4ae) )
+
+	ROM_REGION(0x40000, "iocpu", 0)   // NAMCO V291 I/O PCB, HD643334 H8/3334 MCU code
+	ROM_LOAD("tss-iopc.ic3", 0x000000, 0x040000, CRC(bb112fe0) SHA1(6fa5dc81d258137c1b1ad427d49d136d0bbf53fa) )
 ROM_END
 
 ROM_START( zgundmdx )

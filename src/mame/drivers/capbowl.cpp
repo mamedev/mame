@@ -97,7 +97,7 @@
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK        XTAL_8MHz
+#define MASTER_CLOCK        XTAL(8'000'000)
 
 
 /*************************************
@@ -208,7 +208,7 @@ WRITE8_MEMBER(capbowl_state::sndcmd_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( capbowl_map, AS_PROGRAM, 8, capbowl_state )
+ADDRESS_MAP_START(capbowl_state::capbowl_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_SHARE("rowaddress")
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(capbowl_rom_select_w)
@@ -222,7 +222,7 @@ static ADDRESS_MAP_START( capbowl_map, AS_PROGRAM, 8, capbowl_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bowlrama_map, AS_PROGRAM, 8, capbowl_state )
+ADDRESS_MAP_START(capbowl_state::bowlrama_map)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(bowlrama_blitter_r, bowlrama_blitter_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_SHARE("rowaddress")
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
@@ -242,7 +242,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, capbowl_state )
+ADDRESS_MAP_START(capbowl_state::sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP /* watchdog */
@@ -313,17 +313,17 @@ void capbowl_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( capbowl )
+MACHINE_CONFIG_START(capbowl_state::capbowl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, MASTER_CLOCK)
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
 	MCFG_CPU_PROGRAM_MAP(capbowl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", capbowl_state,  interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // ~0.3s
 
-	MCFG_CPU_ADD("audiocpu", M6809E, MASTER_CLOCK)
+	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 //  MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // TODO
 
@@ -348,10 +348,10 @@ static MACHINE_CONFIG_START( capbowl )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK/2)
+	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 2)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("ticket", ticket_dispenser_device, read))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("ticket", ticket_dispenser_device, write))  /* Also a status LED. See memory map above */
+	MCFG_AY8910_PORT_A_READ_CB(DEVREADLINE("ticket", ticket_dispenser_device, line_r)) MCFG_DEVCB_BIT(7)
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITELINE("ticket", ticket_dispenser_device, motor_w)) MCFG_DEVCB_BIT(7)  /* Also a status LED. See memory map above */
 	MCFG_SOUND_ROUTE(0, "speaker", 0.07)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.07)
 	MCFG_SOUND_ROUTE(2, "speaker", 0.07)
@@ -363,7 +363,8 @@ static MACHINE_CONFIG_START( capbowl )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bowlrama, capbowl )
+MACHINE_CONFIG_START(capbowl_state::bowlrama)
+	capbowl(config);
 
 	/* basic machine hardware */
 

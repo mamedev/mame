@@ -168,6 +168,9 @@ public:
 	uint8_t m_spr_collision[2];
 	uint8_t m_spr_xy[8];
 	uint8_t m_tileram[16];
+	void istreb(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 };
 
 void istrebiteli_state::machine_start()
@@ -297,12 +300,12 @@ WRITE8_MEMBER(istrebiteli_state::spr_xy_w)
 	m_spr_xy[offset ^ 7] = data;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, istrebiteli_state)
+ADDRESS_MAP_START(istrebiteli_state::mem_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, istrebiteli_state)
+ADDRESS_MAP_START(istrebiteli_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xb0, 0xbf) AM_WRITE(tileram_w)
@@ -413,9 +416,9 @@ static GFXDECODE_START( istrebiteli )
 	GFXDECODE_ENTRY( "sprite", 0x0200, projectile_layout, 0, 2 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( istreb )
+MACHINE_CONFIG_START(istrebiteli_state::istreb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_8MHz / 4)       // KR580VM80A
+	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL(8'000'000) / 4)       // KR580VM80A
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -431,7 +434,7 @@ static MACHINE_CONFIG_START( istreb )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz / 2, 256, 64, 256, 312, 0, 256)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(8'000'000) / 2, 256, 64, 256, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(istrebiteli_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -441,7 +444,7 @@ static MACHINE_CONFIG_START( istreb )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", ISTREBITELI_SOUND, XTAL_8MHz / 2 / 256)
+	MCFG_SOUND_ADD("custom", ISTREBITELI_SOUND, XTAL(8'000'000) / 2 / 256)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

@@ -348,19 +348,77 @@ void cli_frontend::listxml(const std::vector<std::string> &args)
 
 void cli_frontend::listfull(const std::vector<std::string> &args)
 {
-	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+	bool const iswild((1U != args.size()) || core_iswildstr(args[0].c_str()));
+	std::vector<bool> matched(args.size(), false);
+	auto const included = [&args, &matched] (char const *name) -> bool
+	{
+		if (args.empty())
+			return true;
 
-	// determine which drivers to output; return an error if none found
-	driver_enumerator drivlist(m_options, gamename);
-	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
+		bool result = false;
+		auto it = matched.begin();
+		for (std::string const &pat : args)
+		{
+			if (!core_strwildcmp(pat.c_str(), name))
+			{
+				result = true;
+				*it = true;
+			}
+			++it;
+		}
+		return result;
+	};
 
-	// print the header
-	osd_printf_info("Name:             Description:\n");
+	bool first = true;
+	auto const list_system_name = [&first] (device_type const &type)
+	{
+		// print the header
+		if (first)
+			osd_printf_info("Name:             Description:\n");
+		first = false;
 
-	// iterate through drivers and output the info
+		osd_printf_info("%-17s \"%s\"\n", type.shortname(), type.fullname());
+	};
+
+	// determine which drivers to output
+	driver_enumerator drivlist(m_options);
 	while (drivlist.next())
-		osd_printf_info("%-18s\"%s\"\n", drivlist.driver().name, drivlist.driver().type.fullname());
+	{
+		if (included(drivlist.driver().name))
+		{
+			list_system_name(drivlist.driver().type);
+
+			// if it wasn't a wildcard, there can only be one
+			if (!iswild)
+				break;
+		}
+	}
+
+	// try devices as well
+	if (iswild || first)
+	{
+		for (device_type type : registered_device_types)
+		{
+			if (included(type.shortname()))
+			{
+				list_system_name(type);
+
+				// if it wasn't a wildcard, there can only be one
+				if (!iswild)
+					break;
+			}
+		}
+	}
+
+	// return an error if none found
+	auto it = matched.begin();
+	for (std::string const &pat : args)
+	{
+		if (!*it)
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", pat.c_str());
+
+		++it;
+	}
 }
 
 
@@ -498,15 +556,19 @@ void cli_frontend::listcrc(const std::vector<std::string> &args)
 	// iterate through matches, and then through ROMs
 	while (drivlist.next())
 	{
-		for (device_t &device : device_iterator(drivlist.config()->root_device()))
-			for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
-				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+		for (device_t const &device : device_iterator(drivlist.config()->root_device()))
+		{
+			for (tiny_rom_entry const *rom = device.rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
+			{
+				if (ROMENTRY_ISFILE(rom))
 				{
 					// if we have a CRC, display it
 					uint32_t crc;
-					if (util::hash_collection(ROM_GETHASHDATA(rom)).crc(crc))
-						osd_printf_info("%08x %-32s\t%-16s\t%s\n", crc, ROM_GETNAME(rom), device.shortname(), device.name());
+					if (util::hash_collection(rom->hashdata).crc(crc))
+						osd_printf_info("%08x %-32s\t%-16s\t%s\n", crc, rom->name, device.shortname(), device.name());
 				}
+			}
+		}
 	}
 }
 
@@ -549,7 +611,7 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 
 		// iterate through roms
 		bool hasroms = false;
-		for (device_t &device : device_iterator(root))
+		for (device_t const &device : device_iterator(root))
 		{
 			for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
 			{
@@ -715,7 +777,15 @@ void cli_frontend::listdevices(const std::vector<std::string> &args)
 
 		// sort them by tag
 		std::sort(device_list.begin(), device_list.end(), [](device_t *dev1, device_t *dev2) {
-			return strcmp(dev1->tag(), dev2->tag()) < 0;
+			// end of string < ':' < '0'
+			const char *tag1 = dev1->tag();
+			const char *tag2 = dev2->tag();
+			while (*tag1 == *tag2 && *tag1 != '\0' && *tag2 != '\0')
+			{
+				tag1++;
+				tag2++;
+			}
+			return (*tag1 == ':' ? ' ' : *tag1) < (*tag2 == ':' ? ' ' : *tag2);
 		});
 
 		// dump the results
@@ -1498,7 +1568,7 @@ const cli_frontend::info_command_struct *cli_frontend::find_command(const std::s
 	static const info_command_struct s_info_commands[] =
 	{
 		{ CLICOMMAND_LISTXML,           0, -1, &cli_frontend::listxml,          "[pattern] ..." },
-		{ CLICOMMAND_LISTFULL,          0,  1, &cli_frontend::listfull,         "[system name]" },
+		{ CLICOMMAND_LISTFULL,          0, -1, &cli_frontend::listfull,         "[pattern] ..." },
 		{ CLICOMMAND_LISTSOURCE,        0,  1, &cli_frontend::listsource,       "[system name]" },
 		{ CLICOMMAND_LISTCLONES,        0,  1, &cli_frontend::listclones,       "[system name]" },
 		{ CLICOMMAND_LISTBROTHERS,      0,  1, &cli_frontend::listbrothers,     "[system name]" },

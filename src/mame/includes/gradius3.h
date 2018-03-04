@@ -5,6 +5,8 @@
     Gradius 3
 
 *************************************************************************/
+
+#include "machine/timer.h"
 #include "sound/k007232.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
@@ -64,4 +66,8 @@ public:
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
+	void gradius3(machine_config &config);
+	void gradius3_map(address_map &map);
+	void gradius3_map2(address_map &map);
+	void gradius3_s_map(address_map &map);
 };

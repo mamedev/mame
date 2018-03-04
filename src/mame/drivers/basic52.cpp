@@ -37,26 +37,30 @@ to discover the special features of this Basic.
 #include "machine/i8255.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class basic52_state : public driver_device
 {
 public:
 	basic52_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_READ8_MEMBER(from_term);
+
+	void basic52(machine_config &config);
+	void basic31(machine_config &config);
+	void basic52_io(address_map &map);
+	void basic52_mem(address_map &map);
+private:
 	uint8_t m_term_data;
 	required_device<mcs51_cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER(from_term);
 };
 
 
-static ADDRESS_MAP_START(basic52_mem, AS_PROGRAM, 8, basic52_state)
+ADDRESS_MAP_START(basic52_state::basic52_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_RAM
@@ -65,14 +69,13 @@ static ADDRESS_MAP_START(basic52_mem, AS_PROGRAM, 8, basic52_state)
 	//AM_RANGE(0xe000, 0xffff) // Expansion block
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(basic52_io, AS_IO, 8, basic52_state)
+ADDRESS_MAP_START(basic52_state::basic52_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)  // PPI-8255
 	//AM_RANGE(0xc000, 0xdfff) // Expansion block
 	//AM_RANGE(0xe000, 0xffff) // Expansion block
-	AM_RANGE(0x20003, 0x20003) AM_READ(unk_r);
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -98,27 +101,30 @@ void basic52_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( basic31 )
+MACHINE_CONFIG_START(basic52_state::basic31)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
+	MCFG_CPU_ADD("maincpu", I8031, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
 	MCFG_CPU_IO_MAP(basic52_io)
-	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(basic52_state, unk_r))
+	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8("terminal", generic_terminal_device, write))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(basic52_state, from_term))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(basic52_state, kbd_put))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( basic52, basic31 )
+MACHINE_CONFIG_START(basic52_state::basic52)
+	basic31(config);
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", I8052, XTAL_11_0592MHz)
+	MCFG_CPU_REPLACE("maincpu", I8052, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
 	MCFG_CPU_IO_MAP(basic52_io)
-	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(basic52_state, unk_r))
+	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8("terminal", generic_terminal_device, write))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(basic52_state, from_term))
 MACHINE_CONFIG_END
 

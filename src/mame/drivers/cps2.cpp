@@ -926,14 +926,14 @@ READ16_MEMBER(cps_state::joy_or_paddle_ecofghtr_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( cps2_map, AS_PROGRAM, 16, cps_state )
+ADDRESS_MAP_START(cps_state::cps2_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM                                                                         /* 68000 ROM */
 	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_SHARE("output")                                                      /* CPS2 object output */
 	AM_RANGE(0x618000, 0x619fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)                         /* Q RAM */
+	AM_RANGE(0x660000, 0x663fff) AM_RAM                                                                         /* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
 	AM_RANGE(0x662000, 0x662001) AM_RAM                                                                         /* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662008, 0x662009) AM_RAM                                                                         /* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662020, 0x662021) AM_RAM                                                                         /* Network adapter related, accessed in SSF2TB */
-	AM_RANGE(0x660000, 0x663fff) AM_RAM                                                                         /* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
 	AM_RANGE(0x664000, 0x664001) AM_RAM                                                                         /* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
 	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_SHARE("objram1")                           /* Object RAM, no game seems to use it directly */
 	AM_RANGE(0x708000, 0x709fff) AM_MIRROR(0x006000) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_SHARE("objram2")           /* Object RAM */
@@ -953,18 +953,18 @@ static ADDRESS_MAP_START( cps2_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                                         /* RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, cps_state )
+ADDRESS_MAP_START(cps_state::decrypted_opcodes_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_SHARE("decrypted_opcodes")                                           /* 68000 ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dead_cps2_map, AS_PROGRAM, 16, cps_state )
+ADDRESS_MAP_START(cps_state::dead_cps2_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM                                                                         /* 68000 ROM */
 	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_SHARE("output")                                                      /* CPS2 object output */
 	AM_RANGE(0x618000, 0x619fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)                         /* Q RAM */
+	AM_RANGE(0x660000, 0x663fff) AM_RAM                                                                         /* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
 	AM_RANGE(0x662000, 0x662001) AM_RAM                                                                         /* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662008, 0x662009) AM_RAM                                                                         /* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662020, 0x662021) AM_RAM                                                                         /* Network adapter related, accessed in SSF2TB */
-	AM_RANGE(0x660000, 0x663fff) AM_RAM                                                                         /* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
 	AM_RANGE(0x664000, 0x664001) AM_RAM                                                                         /* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
 	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_SHARE("objram1")                           /* Object RAM, no game seems to use it directly */
 	AM_RANGE(0x708000, 0x709fff) AM_MIRROR(0x006000) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_SHARE("objram2")           /* Object RAM */
@@ -1301,15 +1301,15 @@ MACHINE_START_MEMBER(cps_state,cps2)
 }
 
 
-static MACHINE_CONFIG_START( cps2 )
+MACHINE_CONFIG_START(cps_state::cps2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(cps2_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cps_state, cps2_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cps_state, irq0_line_hold, 250) // measured
 
@@ -1339,13 +1339,15 @@ static MACHINE_CONFIG_START( cps2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dead_cps2, cps2 )
+MACHINE_CONFIG_START(cps_state::dead_cps2)
+	cps2(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dead_cps2_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gigaman2, cps2 )
+MACHINE_CONFIG_START(cps_state::gigaman2)
+	cps2(config);
 
 	MCFG_DEVICE_REMOVE("audiocpu")
 	// gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
@@ -1353,7 +1355,7 @@ static MACHINE_CONFIG_DERIVED( gigaman2, cps2 )
 
 	MCFG_CPU_MODIFY("maincpu")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(32'000'000)/32, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -6232,9 +6234,9 @@ ROM_END
 ROM_START( sfa )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "sfze.03d", 0x000000, 0x80000, CRC(ebf2054d) SHA1(6e7b9e4202b86ab237ea5634c98b71b82d812ef2) )
-	ROM_LOAD16_WORD_SWAP( "sfz.04b",  0x080000, 0x80000, CRC(8b73b0e5) SHA1(5318761f615c21395366b5333e75eaaa73ef2073) )
-	ROM_LOAD16_WORD_SWAP( "sfz.05a",  0x100000, 0x80000, CRC(0810544d) SHA1(5f39bda3e7b16508eb58e5a2e0cc58c09cf428ce) )
-	ROM_LOAD16_WORD_SWAP( "sfz.06",   0x180000, 0x80000, CRC(806e8f38) SHA1(b6d6912aa8f2f590335d7ff9a8214648e7131ebb) )
+	ROM_LOAD16_WORD_SWAP( "sfz.04b",  0x080000, 0x80000, CRC(8b73b0e5) SHA1(5318761f615c21395366b5333e75eaaa73ef2073) ) // also found as sfze.04c, same hash
+	ROM_LOAD16_WORD_SWAP( "sfz.05a",  0x100000, 0x80000, CRC(0810544d) SHA1(5f39bda3e7b16508eb58e5a2e0cc58c09cf428ce) ) // also found as sfze.05b, same hash
+	ROM_LOAD16_WORD_SWAP( "sfz.06",   0x180000, 0x80000, CRC(806e8f38) SHA1(b6d6912aa8f2f590335d7ff9a8214648e7131ebb) ) // also found as sfze.06, same hash
 
 	ROM_REGION( 0x1000000, "gfx", 0 )
 	ROM_FILL(              0x000000, 0x800000, 0x00 )
@@ -9258,6 +9260,40 @@ ROM_START( xmcotaar1 )
 	ROM_LOAD( "xmcotaa.key",  0x000000, 0x000014, CRC(3fdd2d42) SHA1(effcfdf03e71d386356c32c2803c8c841871e24c) )
 ROM_END
 
+ROM_START( xmcotab )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "xmnb.03c", 0x000000, 0x80000, CRC(ab48bcb0) SHA1(856168752cdd4d248eb43b2794e989a3409dc8b0) )
+	ROM_LOAD16_WORD_SWAP( "xmnb.04c", 0x080000, 0x80000, CRC(8d8fcbb1) SHA1(f98712374006d44e6121abc65ba2c78c5ebf6de5) )
+	ROM_LOAD16_WORD_SWAP( "xmne.05b", 0x100000, 0x80000, CRC(87b0ed0f) SHA1(f4d78fdd9fcf864e909d9a2bb351b49a5f8ec7a0) )
+	ROM_LOAD16_WORD_SWAP( "xmn.06a",  0x180000, 0x80000, CRC(1b86a328) SHA1(2469cd705139ee9f1142e6e379e68d0c9675b37e) )
+	ROM_LOAD16_WORD_SWAP( "xmn.07a",  0x200000, 0x80000, CRC(2c142a44) SHA1(7624875f9c39b361fc83e52e87e0fd5e96279713) )
+	ROM_LOAD16_WORD_SWAP( "xmn.08a",  0x280000, 0x80000, CRC(f712d44f) SHA1(0d18d4a4eacad94a66beca6ec509ac7f690c6882) )
+	ROM_LOAD16_WORD_SWAP( "xmn.09a",  0x300000, 0x80000, CRC(9241cae8) SHA1(bb6980abf25aaf3eb14e230ca6942f3e2ab2c660) )
+	ROM_LOAD16_WORD_SWAP( "xmne.10b", 0x380000, 0x80000, CRC(cb36b0a4) SHA1(f21e3f2da405dfe43843ad32d381ea51f5d2fdd7) )
+
+	ROM_REGION( 0x2000000, "gfx", 0 )
+	ROMX_LOAD( "xmn.13m",   0x0000000, 0x400000, CRC(bf4df073) SHA1(4d2740c3a827f0ec2cf75ad99c65e393c6a11c23) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.15m",   0x0000002, 0x400000, CRC(4d7e4cef) SHA1(50b8797b8099a8d76ad063ba1201a13dbb88ae3a) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.17m",   0x0000004, 0x400000, CRC(513eea17) SHA1(a497477ad9ac13180911d8745ef6ee1955c0b877) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.19m",   0x0000006, 0x400000, CRC(d23897fc) SHA1(1e31627999736652252164d32662779a1ac6ca29) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.14m",   0x1000000, 0x400000, CRC(778237b7) SHA1(89a759ec383518ec52f5059d10ec342f2247aa20) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.16m",   0x1000002, 0x400000, CRC(67b36948) SHA1(692fb6e4096b880aa22996d554b160f664bbd907) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.18m",   0x1000004, 0x400000, CRC(015a7c4c) SHA1(cccc95dafd076a1a9fa004710006149c42d058ba) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.20m",   0x1000006, 0x400000, CRC(9dde2758) SHA1(17ba259cad03c7b5d56c0a5eda9ab53521665729) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "xmn.01a",  0x00000, 0x08000, CRC(40f479ea) SHA1(f29e15f537675305264ae2138a0a537fb9e2008b) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "xmn.02a",  0x28000, 0x20000, CRC(39d9b5ad) SHA1(af502debfd36100d4fc971ed25fdf9d7121d6f18) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "xmn.11m",   0x000000, 0x200000, CRC(c848a6bc) SHA1(ac8ac564d3c43225822f8bc330eba9f35b24b0a4) )
+	ROM_LOAD16_WORD_SWAP( "xmn.12m",   0x200000, 0x200000, CRC(729c188f) SHA1(3279774ad8aebbcf0fc779cdfcbe21044dd192ad) )
+
+	ROM_REGION( 0x20, "key", 0 )
+	ROM_LOAD( "xmcotab.key",  0x000000, 0x000014, CRC(bb70f10f) SHA1(99f9d1eccd81c906b6adb08b5f1547636e649298) )
+ROM_END
+
 ROM_START( xmvsf )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "xvse.03f", 0x000000, 0x80000, CRC(db06413f) SHA1(c6d8aa1e43fc541e5b4e938258f27ab9ee30ca33) )
@@ -9359,8 +9395,8 @@ ROM_END
 
 ROM_START( xmvsfur1 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "xvsu.03h", 0x000000, 0x80000, CRC(5481155a) SHA1(799a2488684cbead33206498d13261b79624a46e) ) /* also found as rev I */
-	ROM_LOAD16_WORD_SWAP( "xvsu.04h", 0x080000, 0x80000, CRC(1e236388) SHA1(329c08103840fadbc4176785c4b24013a7a2b1bc) ) /* also found as rev I */
+	ROM_LOAD16_WORD_SWAP( "xvsu.03i", 0x000000, 0x80000, CRC(5481155a) SHA1(799a2488684cbead33206498d13261b79624a46e) )
+	ROM_LOAD16_WORD_SWAP( "xvsu.04i", 0x080000, 0x80000, CRC(1e236388) SHA1(329c08103840fadbc4176785c4b24013a7a2b1bc) )
 	ROM_LOAD16_WORD_SWAP( "xvs.05a",  0x100000, 0x80000, CRC(7db6025d) SHA1(2d74f48f83f45359bfaca28ab686625766af12ee) )
 	ROM_LOAD16_WORD_SWAP( "xvs.06a",  0x180000, 0x80000, CRC(e8e2c75c) SHA1(929408cb5d98e95cec75ea58e4701b0cbdbcd016) )
 	ROM_LOAD16_WORD_SWAP( "xvs.07",   0x200000, 0x80000, CRC(08f0abed) SHA1(ef16c376232dba63b0b9bc3aa0640f9001ccb68a) )
@@ -9901,12 +9937,12 @@ GAME( 1993, ssf2j,      ssf2,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   
 GAME( 1993, ssf2jr1,    ssf2,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Japan 930911)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ssf2jr2,    ssf2,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Japan 930910)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ssf2h,      ssf2,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Hispanic 930911)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ssf2tb,     ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (World 931119)", MACHINE_SUPPORTS_SAVE ) // works, but not in tournament mode
-GAME( 1993, ssf2tbr1,   ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (World 930911)", MACHINE_SUPPORTS_SAVE ) // works, but not in tournament mode
-GAME( 1993, ssf2tbj,    ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (Japan 931005)", MACHINE_SUPPORTS_SAVE ) // works, but not in tournament mode
-GAME( 1993, ssf2tbj1,   ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (Japan 930911)", MACHINE_SUPPORTS_SAVE ) // works, but not in tournament mode
-GAME( 1993, ssf2tba,    ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (Asia 931005)", MACHINE_SUPPORTS_SAVE ) // works, but not in tournament mode
-GAME( 1993, ssf2tbh,    ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (Hispanic 931005)", MACHINE_SUPPORTS_SAVE )  // works, but not in tournament mode
+GAME( 1993, ssf2tb,     ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (World 931119)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN ) // works, but not in tournament mode
+GAME( 1993, ssf2tbr1,   ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (World 930911)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN ) // works, but not in tournament mode
+GAME( 1993, ssf2tbj,    ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (Japan 931005)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN ) // works, but not in tournament mode
+GAME( 1993, ssf2tbj1,   ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (Japan 930911)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN ) // works, but not in tournament mode
+GAME( 1993, ssf2tba,    ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (Asia 931005)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN ) // works, but not in tournament mode
+GAME( 1993, ssf2tbh,    ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (Hispanic 931005)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )  // works, but not in tournament mode
 GAME( 1993, ecofghtr,   0,        cps2, ecofghtr, cps_state, ecofghtr,  ROT0,   "Capcom", "Eco Fighters (World 931203)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ecofghtru,  ecofghtr, cps2, ecofghtr, cps_state, ecofghtr,  ROT0,   "Capcom", "Eco Fighters (USA 940215)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ecofghtru1, ecofghtr, cps2, ecofghtr, cps_state, ecofghtr,  ROT0,   "Capcom", "Eco Fighters (USA 931203)", MACHINE_SUPPORTS_SAVE )
@@ -9962,6 +9998,7 @@ GAME( 1994, armwarar1,  armwar,   cps2, cps2_3p3b, cps_state, cps2,     ROT0,   
 GAME( 1994, xmcota,     0,        cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Euro 950331)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotar1,   xmcota,   cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Euro 950105)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotau,    xmcota,   cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (USA 950105)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, xmcotab,    xmcota,   cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Brazil 950331)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotah,    xmcota,   cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Hispanic 950331)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotahr1,  xmcota,   cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Hispanic 950105)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotaj,    xmcota,   cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 950105)", MACHINE_SUPPORTS_SAVE )
@@ -11651,7 +11688,7 @@ ROM_END
 GAME( 1993, ddtodd,   ddtod,    dead_cps2, cps2_4p4b, cps_state, cps2,    ROT0,   "bootleg", "Dungeons & Dragons: Tower of Doom (Euro 940412 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ecofghtrd,ecofghtr, dead_cps2, ecofghtr,  cps_state, ecofghtr,ROT0,   "bootleg", "Eco Fighters (World 931203 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ssf2ud,   ssf2,     dead_cps2, cps2_2p6b, cps_state, cps2,    ROT0,   "bootleg", "Super Street Fighter II: The New Challengers (USA 930911 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ssf2tbd,  ssf2,     dead_cps2, cps2_2p6b, cps_state, ssf2tb,  ROT0,   "bootleg", "Super Street Fighter II: The Tournament Battle (World 931119 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ssf2tbd,  ssf2,     dead_cps2, cps2_2p6b, cps_state, ssf2tb,  ROT0,   "bootleg", "Super Street Fighter II: The Tournament Battle (World 931119 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
 GAME( 1994, armwar1d, armwar,   dead_cps2, cps2_3p3b, cps_state, cps2,    ROT0,   "bootleg", "Armored Warriors (Euro 941011 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, avspd,    avsp,     dead_cps2, cps2_3p3b, cps_state, cps2,    ROT0,   "bootleg", "Alien vs. Predator (Euro 940520 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dstlku1d, dstlk,    dead_cps2, cps2_2p6b, cps_state, cps2,    ROT0,   "bootleg", "Darkstalkers: The Night Warriors (USA 940705 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )

@@ -75,6 +75,11 @@ public:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(coin_r);
+	void at486(machine_config &config);
+	static void cdrom(device_t *device);
+	void at32_io(address_map &map);
+	void at32_map(address_map &map);
+	void dbank_map(address_map &map);
 };
 
 WRITE8_MEMBER(mtxl_state::bank_w)
@@ -99,7 +104,7 @@ WRITE8_MEMBER(mtxl_state::key_w)
 	m_multikey->write_dq((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( at32_map, AS_PROGRAM, 32, mtxl_state )
+ADDRESS_MAP_START(mtxl_state::at32_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	#ifndef REAL_PCI_CHIPSET
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
@@ -110,14 +115,14 @@ static ADDRESS_MAP_START( at32_map, AS_PROGRAM, 32, mtxl_state )
 	#endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( at32_io, AS_IO, 32, mtxl_state )
+ADDRESS_MAP_START(mtxl_state::at32_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	#ifndef REAL_PCI_CHIPSET
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("mb:dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("mb:pic8259_master", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("mb:pit8254", pit8254_device, read, write, 0xffffffff)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("mb", at_mb_device, portb_r, portb_w, 0x0000ff00)
 	AM_RANGE(0x0060, 0x0067) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("mb", at_mb_device, portb_r, portb_w, 0x0000ff00)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("mb:rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_DEVREADWRITE8("mb", at_mb_device, page8_r, page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("mb:pic8259_slave", pic8259_device, read, write, 0xffffffff)
@@ -133,7 +138,7 @@ static ADDRESS_MAP_START( at32_io, AS_IO, 32, mtxl_state )
 	#endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dbank_map, AS_PROGRAM, 32, mtxl_state )
+ADDRESS_MAP_START(mtxl_state::dbank_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("ioboard", 0)
 	AM_RANGE(0x100000, 0x17ffff) AM_DEVREADWRITE8("flash", intelfsh8_device, read, write, 0xffffffff)
 ADDRESS_MAP_END
@@ -185,16 +190,21 @@ static SLOT_INTERFACE_START(mt6k_ata_devices)
 	SLOT_INTERFACE("cdrom", ATAPI_FIXED_CDROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(cdrom)
-	MCFG_DEVICE_MODIFY("ide:0")
-	MCFG_DEVICE_SLOT_INTERFACE(mt6k_ata_devices, "cdrom", true)
-	MCFG_DEVICE_MODIFY("ide:1")
-	MCFG_SLOT_DEFAULT_OPTION("")
-	MCFG_SLOT_FIXED(true)
+void mtxl_state::cdrom(device_t *device)
+{
+	auto ide0 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:0"));
+	ide0->option_reset();
+	SLOT_INTERFACE_NAME(mt6k_ata_devices)(device->subdevice("ide:0"));
+	ide0->set_default_option("cdrom");
+	ide0->set_fixed(true);
+
+	auto ide1 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:1"));
+	ide1->set_default_option("");
+	ide1->set_fixed(true);
 MACHINE_CONFIG_END
 #endif
 
-static MACHINE_CONFIG_START( at486 )
+MACHINE_CONFIG_START(mtxl_state::at486)
 	MCFG_CPU_ADD("maincpu", I486DX4, 33000000)
 	MCFG_CPU_PROGRAM_MAP(at32_map)
 	MCFG_CPU_IO_MAP(at32_io)
@@ -209,7 +219,7 @@ static MACHINE_CONFIG_START( at486 )
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("ide", cdrom)
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "svga_dm", true) // original is a gd-5440
 
-	MCFG_DEVICE_ADD("ns16550", NS16550, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("ns16550", NS16550, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir4_w))
 	MCFG_MICROTOUCH_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
@@ -242,7 +252,7 @@ static MACHINE_CONFIG_START( at486 )
 	MCFG_DEVICE_ADD("dbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(dbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	/* Flash ROM */

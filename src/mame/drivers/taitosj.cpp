@@ -202,7 +202,7 @@ CUSTOM_INPUT_MEMBER(taitosj_state::input_port_4_f0_r)
 }
 
 
-static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8, taitosj_state )
+ADDRESS_MAP_START(taitosj_state::taitosj_main_nomcu_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -243,9 +243,9 @@ ADDRESS_MAP_END
 
 
 /* only difference is taitosj_fake_ replaced with taitosj_mcu_ */
-static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8, taitosj_state )
-	AM_RANGE(0x8800, 0x8801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("bmcu", taito_sj_security_mcu_device, data_r, data_w)
+ADDRESS_MAP_START(taitosj_state::taitosj_main_mcu_map)
 	AM_IMPORT_FROM( taitosj_main_nomcu_map )
+	AM_RANGE(0x8800, 0x8801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("bmcu", taito_sj_security_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
 
 
@@ -272,7 +272,7 @@ CUSTOM_INPUT_MEMBER(taitosj_state::kikstart_gear_r)
 }
 
 // TODO: merge with above
-static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
+ADDRESS_MAP_START(taitosj_state::kikstart_main_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -341,7 +341,7 @@ TIMER_CALLBACK_MEMBER(taitosj_state::sound_semaphore2_clear_w_cb)
 // RD5000
 READ8_MEMBER(taitosj_state::soundlatch_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		m_soundlatch_flag = false;
 		m_soundnmi->in_w<1>(0);
@@ -368,7 +368,7 @@ WRITE8_MEMBER(taitosj_state::sound_semaphore2_clear_w)
 }
 
 
-static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8, taitosj_state )
+ADDRESS_MAP_START(taitosj_state::taitosj_audio_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x4801) AM_MIRROR(0x07f8) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
@@ -1752,20 +1752,20 @@ WRITE8_MEMBER(taitosj_state::taitosj_dacvol_w)
 	m_dacvol->write(space, NODE_01, data ^ 0xff); // 7416 hex inverter
 }
 
-static MACHINE_CONFIG_START( nomcu )
+MACHINE_CONFIG_START(taitosj_state::nomcu)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz/2)      /* 8 MHz / 2, on CPU board */
+	MCFG_CPU_ADD("maincpu",Z80,XTAL(8'000'000)/2)      /* 8 MHz / 2, on CPU board */
 	MCFG_CPU_PROGRAM_MAP(taitosj_main_nomcu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitosj_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_6MHz/2)    /* 6 MHz / 2, on GAME board */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(6'000'000)/2)    /* 6 MHz / 2, on GAME board */
 	MCFG_CPU_PROGRAM_MAP(taitosj_audio_map)
 			/* interrupts: */
 			/* - no interrupts synced with vblank */
 			/* - NMI triggered by the main CPU */
 			/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
-	MCFG_CPU_PERIODIC_INT_DRIVER(taitosj_state, irq0_line_hold,  (double)XTAL_6MHz/(4*16*16*10*16))
+	MCFG_CPU_PERIODIC_INT_DRIVER(taitosj_state, irq0_line_hold, XTAL(6'000'000)/(4*16*16*10*16))
 
 
 	/* video hardware */
@@ -1790,23 +1790,23 @@ static MACHINE_CONFIG_START( nomcu )
 	MCFG_INPUT_MERGER_ANY_HIGH("soundnmi2")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC51
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC51
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitosj_state, taitosj_dacvol_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC49
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC49
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitosj_state, input_port_4_f0_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("ay4", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC50
+	MCFG_SOUND_ADD("ay4", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC50
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	/* TODO: Implement ay4 Port A bits 0 and 1 which connect to a 7416 open
 	   collector inverter, to selectively tie none, either or both of two
@@ -1815,25 +1815,26 @@ static MACHINE_CONFIG_START( nomcu )
 	   Bio Attack uses this?
 	*/
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitosj_state, taitosj_sndnmi_msk_w)) /* port Bwrite */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 30k r-2r network
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // 30k r-2r network
 	MCFG_SOUND_ADD("dacvol", DISCRETE, 0) MCFG_DISCRETE_INTF(taitosj_dacvol)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 /* same as above, but with additional 68705 MCU */
-static MACHINE_CONFIG_DERIVED( mcu, nomcu )
+MACHINE_CONFIG_START(taitosj_state::mcu)
+	nomcu(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(taitosj_main_mcu_map)
 
-	MCFG_CPU_ADD("bmcu", TAITO_SJ_SECURITY_MCU, XTAL_3MHz)   /* xtal is 3MHz, divided by 4 internally */
+	MCFG_CPU_ADD("bmcu", TAITO_SJ_SECURITY_MCU, XTAL(3'000'000))   /* xtal is 3MHz, divided by 4 internally */
 	MCFG_TAITO_SJ_SECURITY_MCU_INT_MODE(LATCH)
 	MCFG_TAITO_SJ_SECURITY_MCU_68READ_CB(READ8(taitosj_state, mcu_mem_r))
 	MCFG_TAITO_SJ_SECURITY_MCU_68WRITE_CB(WRITE8(taitosj_state, mcu_mem_w))
@@ -1844,7 +1845,8 @@ static MACHINE_CONFIG_DERIVED( mcu, nomcu )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( kikstart, mcu )
+MACHINE_CONFIG_START(taitosj_state::kikstart)
+	mcu(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

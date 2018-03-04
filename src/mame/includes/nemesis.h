@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
+#include "machine/timer.h"
 #include "sound/flt_rc.h"
 #include "sound/k007232.h"
 #include "sound/k005289.h"
@@ -126,4 +128,30 @@ public:
 	void nemesis_postload();
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE8_MEMBER(volume_callback);
+	void nyanpani(machine_config &config);
+	void konamigt(machine_config &config);
+	void rf2_gx400(machine_config &config);
+	void gx400(machine_config &config);
+	void bubsys(machine_config &config);
+	void hcrash(machine_config &config);
+	void salamand(machine_config &config);
+	void citybomb(machine_config &config);
+	void nemesis(machine_config &config);
+	void blkpnthr(machine_config &config);
+	void blkpnthr_map(address_map &map);
+	void blkpnthr_sound_map(address_map &map);
+	void city_sound_map(address_map &map);
+	void citybomb_map(address_map &map);
+	void gx400_map(address_map &map);
+	void gx400_sound_map(address_map &map);
+	void gx400_vlm_map(address_map &map);
+	void hcrash_map(address_map &map);
+	void konamigt_map(address_map &map);
+	void nemesis_map(address_map &map);
+	void nyanpani_map(address_map &map);
+	void rf2_gx400_map(address_map &map);
+	void sal_sound_map(address_map &map);
+	void salamand_map(address_map &map);
+	void salamand_vlm_map(address_map &map);
+	void sound_map(address_map &map);
 };

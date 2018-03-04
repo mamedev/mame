@@ -8,21 +8,9 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
-#include "lr35902.h"
+#include "lr35902d.h"
 
-enum e_mnemonics
-{
-	zADC,  zADD,  zAND,  zBIT,  zCALL, zCCF,  zCP,
-	zCPL,  zDAA,  zDB,   zDEC,  zDI,   zEI,   zHLT,
-	zIN,   zINC,  zJP,   zJR,   zLD,   zNOP,  zOR,
-	zPOP,  zPUSH, zRES,  zRET,  zRETI, zRL,   zRLA,
-	zRLC,  zRLCA, zRR,   zRRA,  zRRC,  zRRCA, zRST,
-	zSBC,  zSCF,  zSET,  zSLA,  zSLL,  zSRA,  zSRL,
-	zSTOP, zSUB,  zXOR,  zSWAP
-};
-
-static const char *const s_mnemonic[] =
+const char *const lr35902_disassembler::s_mnemonic[] =
 {
 	"adc", "add", "and", "bit", "call","ccf", "cp",
 	"cpl", "daa", "db",  "dec", "di",  "ei",  "halt",
@@ -33,26 +21,17 @@ static const char *const s_mnemonic[] =
 	"stop","sub", "xor", "swap"
 };
 
-#define _OVER DASMFLAG_STEP_OVER
-#define _OUT  DASMFLAG_STEP_OUT
-
-static const uint32_t s_flags[] = {
-	0    ,0    ,0    ,0    ,_OVER,0    ,0    ,
-	0    ,0    ,0    ,0    ,0    ,0    ,_OVER,
-	0    ,0    ,0    ,0    ,0    ,0    ,0    ,
-	0    ,0    ,0    ,_OUT ,_OUT ,0    ,0    ,
-	0    ,0    ,0    ,0    ,0    ,0    ,_OVER,
-	0    ,0    ,0    ,0    ,0    ,0    ,0    ,
-	_OVER,0    ,0    ,0
+const uint32_t lr35902_disassembler::s_flags[] = {
+	0        ,0    ,0    ,0        ,STEP_OVER,0    ,0        ,
+	0        ,0    ,0    ,0        ,0        ,0    ,STEP_OVER,
+	0        ,0    ,0    ,0        ,0        ,0    ,0        ,
+	0        ,0    ,0    ,STEP_OUT ,STEP_OUT ,0    ,0        ,
+	0        ,0    ,0    ,0        ,0        ,0    ,STEP_OVER,
+	0        ,0    ,0    ,0        ,0        ,0    ,0        ,
+	STEP_OVER,0    ,0    ,0
 };
 
-struct lr35902dasm
-{
-	uint8_t   mnemonic;
-	const char *arguments;
-};
-
-static const lr35902dasm mnemonic_cb[256] = {
+const lr35902_disassembler::lr35902dasm lr35902_disassembler::mnemonic_cb[256] = {
 	{zRLC,"b"},     {zRLC,"c"},     {zRLC,"d"},     {zRLC,"e"},
 	{zRLC,"h"},     {zRLC,"l"},     {zRLC,"(hl)"},  {zRLC,"a"},
 	{zRRC,"b"},     {zRRC,"c"},     {zRRC,"d"},     {zRRC,"e"},
@@ -119,7 +98,7 @@ static const lr35902dasm mnemonic_cb[256] = {
 	{zSET,"7,h"},   {zSET,"7,l"},   {zSET,"7,(hl)"},{zSET,"7,a"}
 };
 
-static const lr35902dasm mnemonic_main[256]= {
+const lr35902_disassembler::lr35902dasm lr35902_disassembler::mnemonic_main[256]= {
 	{zNOP,nullptr},       {zLD,"bc,N"},   {zLD,"(bc),a"}, {zINC,"bc"},
 	{zINC,"b"},     {zDEC,"b"},     {zLD,"b,B"},    {zRLCA,nullptr},
 	{zLD,"(W),sp"}, {zADD,"hl,bc"}, {zLD,"a,(bc)"}, {zDEC,"bc"},
@@ -186,26 +165,31 @@ static const lr35902dasm mnemonic_main[256]= {
 	{zDB,"fc"},     {zDB,"fd"},     {zCP,"B"},      {zRST,"V"}
 };
 
+u32 lr35902_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
 /****************************************************************************
  * Disassemble opcode at PC and return number of bytes it takes
  ****************************************************************************/
 
-CPU_DISASSEMBLE(lr35902)
+offs_t lr35902_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	const lr35902dasm *d;
 	const char /* *symbol,*/ *src;
 	int8_t offset;
 	uint8_t op, op1;
 	uint16_t ea;
-	int pos = 0;
+	int pos = pc;
 
 	//symbol = nullptr;
 
-	op = oprom[pos++];
+	op = opcodes.r8(pos++);
 	op1 = 0; /* keep GCC happy */
 
 	if( op == 0xcb ) {
-		op = oprom[pos++];
+		op = opcodes.r8(pos++);
 		d = &mnemonic_cb[op];
 	} else {
 		d = &mnemonic_main[op];
@@ -220,12 +204,12 @@ CPU_DISASSEMBLE(lr35902)
 				util::stream_format(stream, "$%02X,$%02X", op, op1);
 				break;
 			case 'A':
-				ea = opram[pos] + (opram[pos+1] << 8);
+				ea = params.r16(pos);
 				pos += 2;
 				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'B':   /* Byte op arg */
-				ea = opram[pos++];
+				ea = params.r8(pos++);
 				util::stream_format(stream, "$%02X", ea);
 				break;
 			case '(':   /* Memory byte at (...) */
@@ -235,7 +219,7 @@ CPU_DISASSEMBLE(lr35902)
 				} else if( !strncmp( src, "(hl)", 4) ) {
 				} else if( !strncmp( src, "(sp)", 4) ) {
 				} else if( !strncmp( src, "(F)", 3) ) {
-					ea = 0xFF00 + opram[pos++];
+					ea = 0xFF00 + params.r8(pos++);
 					util::stream_format(stream, "$%02X", ea);
 					src++;
 				} else if( !strncmp( src, "(C)", 3) ) {
@@ -244,12 +228,12 @@ CPU_DISASSEMBLE(lr35902)
 				}
 				break;
 			case 'N':   /* Immediate 16 bit */
-				ea = opram[pos] + (opram[pos+1] << 8);
+				ea = params.r16(pos);
 				pos += 2;
 				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'O':   /* Offset relative to PC */
-				offset = (int8_t) opram[pos++];
+				offset = (int8_t) params.r8(pos++);
 				util::stream_format(stream, "$%04X", pc + offset + 2);
 				break;
 			case 'V':   /* Restart vector */
@@ -257,7 +241,7 @@ CPU_DISASSEMBLE(lr35902)
 				util::stream_format(stream, "$%02X", ea);
 				break;
 			case 'W':   /* Memory address word */
-				ea = opram[pos] + (opram[pos+1] << 8);
+				ea = params.r16(pos);
 				pos += 2;
 				util::stream_format(stream, "$%04X", ea);
 				break;
@@ -271,5 +255,5 @@ CPU_DISASSEMBLE(lr35902)
 		util::stream_format(stream, "%s", s_mnemonic[d->mnemonic]);
 	}
 
-	return pos | s_flags[d->mnemonic] | DASMFLAG_SUPPORTED;
+	return (pos - pc) | s_flags[d->mnemonic] | SUPPORTED;
 }

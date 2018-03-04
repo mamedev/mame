@@ -79,9 +79,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -115,7 +113,7 @@ private:
 	int     m_inst_cycles;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<-1> *m_direct;
 	address_space *m_data;
 	address_space *m_io;
 
@@ -196,6 +194,12 @@ private:
 	void pic16c62x_update_watchdog(int counts);
 	void pic16c62x_update_timer(int counts);
 
+	void pic16c620_ram(address_map &map);
+	void pic16c622_ram(address_map &map);
+	void pic16c62x_rom_10(address_map &map);
+	void pic16c62x_rom_11(address_map &map);
+	void pic16c62x_rom_9(address_map &map);
+	void pic16c62xa_ram(address_map &map);
 };
 
 

@@ -12,36 +12,56 @@
 
   Emulation by Bryan McPhail, mish@tendril.co.uk
 
+  Notes:  Playfield 3 can change size between 512x1024 and 2048x256
+
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/madmotor.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
+#include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "video/decbac06.h"
+#include "video/decmxc06.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-/******************************************************************************/
-
-WRITE16_MEMBER(madmotor_state::madmotor_sound_w)
+class madmotor_state : public driver_device
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-	}
-}
+public:
+	madmotor_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_tilegen(*this, "tilegen%u", 1),
+		m_spritegen(*this, "spritegen") { }
+
+	/* memory pointers */
+	required_shared_ptr<uint16_t> m_spriteram;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device_array<deco_bac06_device, 3> m_tilegen;
+	required_device<deco_mxc06_device> m_spritegen;
+
+	DECLARE_DRIVER_INIT(madmotor);
+	uint32_t screen_update_madmotor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void madmotor(machine_config &config);
+	void madmotor_map(address_map &map);
+	void sound_map(address_map &map);
+};
 
 
 /******************************************************************************/
 
 
-static ADDRESS_MAP_START( madmotor_map, AS_PROGRAM, 16, madmotor_state )
+ADDRESS_MAP_START(madmotor_state::madmotor_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x180000, 0x180007) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_0_w)                          /* text layer */
 	AM_RANGE(0x180010, 0x180017) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_1_w)
@@ -59,17 +79,17 @@ static ADDRESS_MAP_START( madmotor_map, AS_PROGRAM, 16, madmotor_state )
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_DEVREADWRITE("tilegen3", deco_bac06_device, pf_data_r, pf_data_w)
 	AM_RANGE(0x3e0000, 0x3e3fff) AM_RAM
 	AM_RANGE(0x3e8000, 0x3e87ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3f0000, 0x3f07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3f0000, 0x3f07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x3f8002, 0x3f8003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3f8004, 0x3f8005) AM_READ_PORT("DSW")
 	AM_RANGE(0x3f8006, 0x3f8007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3fc004, 0x3fc005) AM_WRITE(madmotor_sound_w)
+	AM_RANGE(0x3fc004, 0x3fc005) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
 /* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, madmotor_state )
+ADDRESS_MAP_START(madmotor_state::sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
@@ -222,17 +242,24 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-void madmotor_state::machine_start()
+uint32_t madmotor_state::screen_update_madmotor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	save_item(NAME(m_flipscreen));
+	bool flip = m_tilegen[0]->get_flip_state();
+	m_tilegen[0]->set_flip_screen(flip);
+	m_tilegen[1]->set_flip_screen(flip);
+	m_tilegen[2]->set_flip_screen(flip);
+	m_spritegen->set_flip_screen(flip);
+
+	m_tilegen[2]->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen[1]->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram, 0x00, 0x00, 0x0f);
+	m_tilegen[0]->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	return 0;
 }
 
-void madmotor_state::machine_reset()
-{
-	m_flipscreen = 0;
-}
+/******************************************************************************/
 
-static MACHINE_CONFIG_START( madmotor )
+MACHINE_CONFIG_START(madmotor_state::madmotor)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
@@ -277,6 +304,7 @@ static MACHINE_CONFIG_START( madmotor )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("ym1", YM2203, 21470000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

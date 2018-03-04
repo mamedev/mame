@@ -53,7 +53,7 @@ const tiny_rom_entry *adam_spi_device::device_rom_region() const
 //  ADDRESS_MAP( adam_spi_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( adam_spi_mem, AS_PROGRAM, 8, adam_spi_device )
+ADDRESS_MAP_START(adam_spi_device::adam_spi_mem)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(M6801_TAG, m6801_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_TAG, 0)
@@ -64,7 +64,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( adam_spi_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( adam_spi_io, AS_IO, 8, adam_spi_device )
+ADDRESS_MAP_START(adam_spi_device::adam_spi_io)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(p2_r, p2_w)
 ADDRESS_MAP_END
 
@@ -73,13 +73,13 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( adam_spi_device::device_add_mconfig )
-	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
+MACHINE_CONFIG_START(adam_spi_device::device_add_mconfig)
+	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(adam_spi_mem)
 	MCFG_CPU_IO_MAP(adam_spi_io)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_DEVICE_ADD(MC2661_TAG, MC2661, XTAL_4_9152MHz)
+	MCFG_DEVICE_ADD(MC2661_TAG, MC2661, XTAL(4'915'200))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 

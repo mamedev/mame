@@ -196,7 +196,7 @@ Cisco Heat.
 **************************************************************************/
 
 
-static ADDRESS_MAP_START( bigrun_map, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::bigrun_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN1") AM_WRITE(leds_out_w)       // Coins
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN2") AM_WRITE(unknown_out_w)    // Buttons
@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( bigrun_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
 	AM_RANGE(0x098000, 0x09bfff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
 
-	AM_RANGE(0x09c000, 0x09ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")            // Palettes
+	AM_RANGE(0x09c000, 0x09ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")            // Palettes
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                         // RAM
 	AM_RANGE(0x100000, 0x13ffff) AM_ROM AM_REGION("user1",0)                                                        // ROM
 ADDRESS_MAP_END
@@ -250,7 +250,7 @@ ADDRESS_MAP_END
     bec00-befff     <               text        */
 
 
-static ADDRESS_MAP_START( cischeat_map, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::cischeat_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN1") AM_WRITE(leds_out_w)       // Coins
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN2") AM_WRITE(unknown_out_w)    // Buttons
@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( cischeat_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
 	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
 	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")              // Palettes
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")              // Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                             // RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)                                                            // ROM
@@ -312,7 +312,7 @@ CPU #0 PC 002350 : Warning, vreg 0002 <- 0000
 CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 */
 
-static ADDRESS_MAP_START( f1gpstar_map, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::f1gpstar_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN1")    // DSW 1 & 2
 	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("IN2") AM_WRITE(f1gpstar_motor_w)   // Buttons
@@ -342,7 +342,7 @@ static ADDRESS_MAP_START( f1gpstar_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
 	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
 	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")              // Palettes
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")              // Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                             // RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)                                                            // ROM
@@ -386,7 +386,7 @@ WRITE16_MEMBER(cischeat_state::wildplt_mux_w)
 
 
 // Same as f1gpstar, but vregs are slightly different:
-static ADDRESS_MAP_START( wildplt_map, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::wildplt_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0") AM_WRITE(f1gpstr2_io_w)    // DSW 1 & 2
 	AM_RANGE(0x080004, 0x080005) AM_READ(wildplt_mux_r) AM_WRITE(wildplt_mux_w) // Buttons
@@ -417,7 +417,7 @@ static ADDRESS_MAP_START( wildplt_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
 	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
 	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")               // Palettes
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")               // Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                             // RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)                                                            // ROM
@@ -429,7 +429,7 @@ ADDRESS_MAP_END
 **************************************************************************/
 
 // Same as f1gpstar, but vregs are slightly different:
-static ADDRESS_MAP_START( f1gpstr2_map, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::f1gpstr2_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN1") AM_WRITE(f1gpstr2_io_w)      // DSW 1 & 2
 	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("IN2") AM_WRITE(f1gpstar_motor_w)   // Buttons
@@ -462,7 +462,7 @@ static ADDRESS_MAP_START( f1gpstr2_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
 	AM_RANGE(0x0a8000, 0x0affff) AM_RAM_DEVWRITE("scroll1", megasys1_tilemap_device, write) AM_SHARE("scroll1")     // Scroll ram 1
 	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")               // Palettes
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")               // Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                             // RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)                                                            // ROM
@@ -570,7 +570,7 @@ WRITE16_MEMBER(cischeat_state::scudhamm_oki_bank_w)
 	}
 }
 
-static ADDRESS_MAP_START( scudhamm_map, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::scudhamm_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x082000, 0x082005) AM_DEVWRITE("scroll0", megasys1_tilemap_device, scroll_w)
 	AM_RANGE(0x082008, 0x08200d) AM_WRITENOP //      UNUSED LAYER
@@ -578,7 +578,7 @@ static ADDRESS_MAP_START( scudhamm_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082208, 0x082209) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")   // Scroll RAM 0
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")   // Scroll RAM 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")          // Palette
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")          // Palette
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                         // Work RAM + Spriteram
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(scudhamm_oki_bank_w)                                          // Sound
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("IN0") AM_WRITE(scudhamm_leds_w)                          // Buttons
@@ -654,7 +654,7 @@ WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
 	}
 }
 
-static ADDRESS_MAP_START( armchmp2_map, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::armchmp2_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x082000, 0x082005) AM_DEVWRITE("scroll0", megasys1_tilemap_device, scroll_w)
 	AM_RANGE(0x082008, 0x08200d) AM_WRITENOP //      UNUSED LAYER
@@ -662,7 +662,7 @@ static ADDRESS_MAP_START( armchmp2_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x082208, 0x082209) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
 	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0")     // Scroll ram 0
 	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")     // Scroll ram 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")              // Palette
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")              // Palette
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                         // Work RAM + Spriteram
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN2") AM_WRITE(scudhamm_oki_bank_w)                      // DSW + Sound
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("IN3")                                                    // DSW
@@ -692,7 +692,7 @@ WRITE16_MEMBER(cischeat_state::captflag_leds_w)
 		output().set_led_value(1, data & 0x2000);    // select
 
 		int power = (data & 0x1000);
-		m_captflag_hopper->write(space, 0, power ? 0x80 : 0x00);    // prize motor
+		m_captflag_hopper->motor_w(power ? 1 : 0);    // prize motor
 		if (!power)
 			m_captflag_hopper->reset();
 	}
@@ -798,7 +798,7 @@ CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_busy_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( captflag_map, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::captflag_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x082000, 0x082005) AM_DEVWRITE("scroll0", megasys1_tilemap_device, scroll_w)
 	AM_RANGE(0x082008, 0x08200d) AM_WRITENOP //      UNUSED LAYER
@@ -807,7 +807,7 @@ static ADDRESS_MAP_START( captflag_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x090008, 0x090009) AM_WRITENOP                                                            // 0?
 	AM_RANGE(0x0a0000, 0x0a7fff) AM_RAM_DEVWRITE("scroll0", megasys1_tilemap_device, write) AM_SHARE("scroll0") // Scroll RAM 0
 	AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2") // Scroll RAM 2
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")  // Palette
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")  // Palette
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                                 // Work RAM + Spriteram
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SW1_2") AM_WRITE(captflag_oki_bank_w)                    // 2 x DSW + Sound
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("Buttons") AM_WRITE(captflag_leds_w)                      // Buttons + Leds
@@ -820,12 +820,12 @@ static ADDRESS_MAP_START( captflag_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x100060, 0x10007d) AM_RAM                                                                 // 7-seg? NVRAM?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( captflag_oki1_map, 0, 8, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::captflag_oki1_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki1_bank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( captflag_oki2_map, 0, 8, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::captflag_oki2_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki2_bank")
 ADDRESS_MAP_END
@@ -843,14 +843,14 @@ ADDRESS_MAP_END
                                 Big Run
 **************************************************************************/
 
-static ADDRESS_MAP_START( bigrun_map2, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::bigrun_map2)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
 	AM_RANGE(0x040000, 0x047fff) AM_RAM AM_SHARE("share1")                              // Shared RAM (with Main CPU)
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("roadram.0")   // Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM                                                 // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigrun_map3, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::bigrun_map3)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
 	AM_RANGE(0x040000, 0x047fff) AM_RAM AM_SHARE("share2")                              // Shared RAM (with Main CPU)
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("roadram.1")   // Road RAM
@@ -862,7 +862,7 @@ ADDRESS_MAP_END
                                 Cisco Heat
 **************************************************************************/
 
-static ADDRESS_MAP_START( cischeat_map2, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::cischeat_map2)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
 	AM_RANGE(0x040000, 0x047fff) AM_RAM AM_SHARE("share1")                              // Shared RAM (with Main CPU)
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("roadram.0")   // Road RAM
@@ -871,7 +871,7 @@ static ADDRESS_MAP_START( cischeat_map2, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x200000, 0x23ffff) AM_ROM AM_REGION("cpu2",0x40000)                                       // ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cischeat_map3, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::cischeat_map3)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
 	AM_RANGE(0x040000, 0x047fff) AM_RAM AM_SHARE("share2")                              // Shared RAM (with Main CPU)
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("roadram.1")   // Road RAM
@@ -886,7 +886,7 @@ ADDRESS_MAP_END
                             F1 GrandPrix Star
 **************************************************************************/
 
-static ADDRESS_MAP_START( f1gpstar_map2, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::f1gpstar_map2)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("share1")                              // Shared RAM (with Main CPU)
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("roadram.0")   // Road RAM
@@ -894,7 +894,7 @@ static ADDRESS_MAP_START( f1gpstar_map2, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP                                            // watchdog
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( f1gpstar_map3, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::f1gpstar_map3)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_SHARE("share2")                              // Shared RAM (with Main CPU)
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("roadram.1")   // Road RAM
@@ -927,7 +927,7 @@ WRITE16_MEMBER(cischeat_state::bigrun_soundbank_w)
 	}
 }
 
-static ADDRESS_MAP_START( bigrun_sound_map, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::bigrun_sound_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
 	AM_RANGE(0x040000, 0x040001) AM_DEVREAD("soundlatch", generic_latch_16_device, read) AM_WRITE(bigrun_soundbank_w)    // From Main CPU
 	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE("soundlatch2", generic_latch_16_device, write)                           // To Main CPU
@@ -952,7 +952,7 @@ WRITE16_MEMBER(cischeat_state::cischeat_soundbank_2_w)
 	if (ACCESSING_BITS_0_7) m_oki2->set_rom_bank(data & 1);
 }
 
-static ADDRESS_MAP_START( cischeat_sound_map, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::cischeat_sound_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
 	AM_RANGE(0x040002, 0x040003) AM_WRITE(cischeat_soundbank_1_w)               // Sample Banking
 	AM_RANGE(0x040004, 0x040005) AM_WRITE(cischeat_soundbank_2_w)               // Sample Banking
@@ -969,7 +969,7 @@ ADDRESS_MAP_END
                             F1 GrandPrix Star
 **************************************************************************/
 
-static ADDRESS_MAP_START( f1gpstar_sound_map, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::f1gpstar_sound_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
 	AM_RANGE(0x040004, 0x040005) AM_WRITE(cischeat_soundbank_1_w)               // Sample Banking   (cischeat: 40002)
 	AM_RANGE(0x040008, 0x040009) AM_WRITE(cischeat_soundbank_2_w)               // Sample Banking   (cischeat: 40004)
@@ -985,7 +985,7 @@ ADDRESS_MAP_END
                             F1 GrandPrix Star II
 **************************************************************************/
 
-static ADDRESS_MAP_START( f1gpstr2_sound_map, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::f1gpstr2_sound_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM // ROM
 	AM_RANGE(0x040004, 0x040005) AM_WRITE(cischeat_soundbank_1_w)                   // Sample Banking
 	AM_RANGE(0x040008, 0x040009) AM_WRITE(cischeat_soundbank_2_w)                   // Sample Banking
@@ -1006,7 +1006,7 @@ ADDRESS_MAP_END
 
 **************************************************************************/
 
-static ADDRESS_MAP_START( f1gpstr2_io_map, AS_PROGRAM, 16, cischeat_state )
+ADDRESS_MAP_START(cischeat_state::f1gpstr2_io_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                         // ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("shareio")
 	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_SHARE("ioready")   //
@@ -1909,7 +1909,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 
 
 
-static MACHINE_CONFIG_START( bigrun )
+MACHINE_CONFIG_START(cischeat_state::bigrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", M68000, 10000000)
@@ -1969,7 +1969,8 @@ static MACHINE_CONFIG_START( bigrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cischeat, bigrun )
+MACHINE_CONFIG_START(cischeat_state::cischeat)
+	bigrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -2006,7 +2007,8 @@ static MACHINE_CONFIG_DERIVED( cischeat, bigrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( f1gpstar, bigrun )
+MACHINE_CONFIG_START(cischeat_state::f1gpstar)
+	bigrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -2042,7 +2044,8 @@ static MACHINE_CONFIG_DERIVED( f1gpstar, bigrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( f1gpstr2, f1gpstar )
+MACHINE_CONFIG_START(cischeat_state::f1gpstr2)
+	f1gpstar(config);
 
 	/* basic machine hardware */
 
@@ -2059,7 +2062,8 @@ static MACHINE_CONFIG_DERIVED( f1gpstr2, f1gpstar )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wildplt, f1gpstr2 )
+MACHINE_CONFIG_START(cischeat_state::wildplt)
+	f1gpstr2(config);
 	MCFG_CPU_MODIFY("cpu1")
 	MCFG_CPU_PROGRAM_MAP(wildplt_map)
 MACHINE_CONFIG_END
@@ -2087,7 +2091,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( scudhamm )
+MACHINE_CONFIG_START(cischeat_state::scudhamm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
@@ -2142,7 +2146,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::armchamp2_scanline)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_DERIVED( armchmp2, scudhamm )
+MACHINE_CONFIG_START(cischeat_state::armchmp2)
+	scudhamm(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2174,10 +2179,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( captflag )
+MACHINE_CONFIG_START(cischeat_state::captflag)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_24MHz / 2)  // TMP68000P-12
+	MCFG_CPU_ADD("maincpu",M68000, XTAL(24'000'000) / 2)  // TMP68000P-12
 	MCFG_CPU_PROGRAM_MAP(captflag_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, captflag_scanline, "screen", 0, 1)
 
@@ -3602,13 +3607,13 @@ DRIVER_INIT_MEMBER(cischeat_state, captflag)
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,   0,        bigrun,   bigrun,   cischeat_state, bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
-GAMEL( 1990, cischeat, 0,        cischeat, cischeat, cischeat_state, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )
-GAMEL( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v3.0)",        MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
-GAMEL( 1991, f1gpstaro,f1gpstar, f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v2.0)",        MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
+GAMEL( 1989, bigrun,   0,        bigrun,   bigrun,   cischeat_state, bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
+GAMEL( 1990, cischeat, 0,        cischeat, cischeat, cischeat_state, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
+GAMEL( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v3.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAMEL( 1991, f1gpstaro,f1gpstar, f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v2.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
 GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, cischeat_state, 0,        ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
 GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, cischeat_state, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
 GAME ( 1992, wildplt,  0,        wildplt,  wildplt,  cischeat_state, f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
-GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstr2, cischeat_state, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
+GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstr2, cischeat_state, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
 GAME ( 1993, captflag, 0,        captflag, captflag, cischeat_state, captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
 GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, cischeat_state, 0,        ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )

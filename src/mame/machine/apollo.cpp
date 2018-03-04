@@ -713,9 +713,8 @@ TIMER_CALLBACK_MEMBER( apollo_state::apollo_rtc_timer )
 #define VERBOSE 0
 
 apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	mc68681_base_device(mconfig, APOLLO_SIO, tag, owner, clock),
-	m_csrb(0),
-	m_ip6(0)
+	duart_base_device(mconfig, APOLLO_SIO, tag, owner, clock),
+	m_csrb(0)
 {
 }
 
@@ -728,10 +727,7 @@ void apollo_sio::device_reset()
 	ip3_w((input_data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	ip4_w((input_data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 	ip5_w((input_data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-//  ip6_w((input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-
-	// MC2681 has IP[6] (instead of /IACK on MC68681)
-	m_ip6 = (input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE;
+	ip6_w((input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER( apollo_sio::read )
@@ -744,7 +740,7 @@ READ8_MEMBER( apollo_sio::read )
 			"1X/16X Test", "RHRB", "IVR", "Input Ports", "Start Counter",
 			"Stop Counter" };
 
-	int data = mc68681_base_device::read(space, offset/2, mem_mask);
+	int data = duart_base_device::read(space, offset/2, mem_mask);
 
 	switch (offset / 2)
 	{
@@ -760,10 +756,6 @@ READ8_MEMBER( apollo_sio::read )
 			// (to prevent that the MD selftest or SK command will hang in Service mode)
 			data = 0xff;
 		}
-		break;
-	case 0x0d: /* IP */
-		// MC2681 has IP[6] (instead of /IACK on MC68681)
-		data = (data & ~0x40) | (m_ip6 ? 0x40 : 0);
 		break;
 	}
 
@@ -804,11 +796,11 @@ WRITE8_MEMBER( apollo_sio::write )
 		break;
 #endif
 	}
-	mc68681_base_device::write(space, offset/2, data, mem_mask);
+	duart_base_device::write(space, offset/2, data, mem_mask);
 }
 
 // device type definition
-DEFINE_DEVICE_TYPE(APOLLO_SIO, apollo_sio, "apollo_sio", "DN3000/DS3500 SIO")
+DEFINE_DEVICE_TYPE(APOLLO_SIO, apollo_sio, "apollo_sio", "DN3000/DS3500 SIO (MC2681)")
 
 WRITE_LINE_MEMBER(apollo_state::sio_irq_handler)
 {
@@ -1062,11 +1054,11 @@ static SLOT_INTERFACE_START(apollo_isa_cards)
 	SLOT_INTERFACE("3c505", ISA16_3C505)   // 3Com 3C505 Ethernet card
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_START( common )
+MACHINE_CONFIG_START(apollo_state::common)
 	// configuration MUST be reset first !
 	MCFG_DEVICE_ADD(APOLLO_CONF_TAG, APOLLO_CONF, 0)
 
-	MCFG_DEVICE_ADD( APOLLO_DMA1_TAG, AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( APOLLO_DMA1_TAG, AM9517A, XTAL(14'318'181)/3 )
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(apollo_state, apollo_dma_1_hrq_changed))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(apollo_state, apollo_dma8237_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(apollo_state, apollo_dma_read_byte))
@@ -1083,7 +1075,7 @@ MACHINE_CONFIG_START( common )
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(apollo_state, pc_dack1_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(apollo_state, pc_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(apollo_state, pc_dack3_w))
-	MCFG_DEVICE_ADD( APOLLO_DMA2_TAG, AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( APOLLO_DMA2_TAG, AM9517A, XTAL(14'318'181)/3 )
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(apollo_state, apollo_dma_2_hrq_changed))
 	MCFG_I8237_IN_MEMR_CB(READ8(apollo_state, apollo_dma_read_word))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(apollo_state, apollo_dma_write_word))
@@ -1113,7 +1105,7 @@ MACHINE_CONFIG_START( common )
 	MCFG_DEVICE_ADD("ptmclock", CLOCK, 250000)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(apollo_state, apollo_ptm_timer_tick))
 
-	MCFG_MC146818_ADD( APOLLO_RTC_TAG, XTAL_32_768kHz )
+	MCFG_MC146818_ADD( APOLLO_RTC_TAG, XTAL(32'768) )
 	MCFG_MC146818_UTC( true )
 	MCFG_MC146818_BINARY( false )
 	MCFG_MC146818_24_12( false )
@@ -1121,7 +1113,7 @@ MACHINE_CONFIG_START( common )
 
 	MCFG_APOLLO_NI_ADD( APOLLO_NI_TAG, 0 )
 
-	MCFG_APOLLO_SIO_ADD( APOLLO_SIO2_TAG, XTAL_3_6864MHz )
+	MCFG_APOLLO_SIO_ADD( APOLLO_SIO2_TAG, XTAL(3'686'400) )
 	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio2_irq_handler))
 
 	MCFG_DEVICE_ADD(APOLLO_ISA_TAG, ISA16, 0)
@@ -1157,9 +1149,9 @@ MACHINE_CONFIG_START( common )
 MACHINE_CONFIG_END
 
 // for machines with the keyboard and a graphics head
-MACHINE_CONFIG_START( apollo )
-	MCFG_FRAGMENT_ADD(common)
-	MCFG_APOLLO_SIO_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
+MACHINE_CONFIG_START(apollo_state::apollo)
+	common(config);
+	MCFG_APOLLO_SIO_ADD( APOLLO_SIO_TAG, XTAL(3'686'400) )
 	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
 	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output))
 	MCFG_APOLLO_SIO_A_TX_CALLBACK(DEVWRITELINE(APOLLO_KBD_TAG, apollo_kbd_device, rx_w))
@@ -1179,9 +1171,9 @@ static DEVICE_INPUT_DEFAULTS_START( apollo_terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 // for headless machines using a serial console
-MACHINE_CONFIG_START( apollo_terminal )
-	MCFG_FRAGMENT_ADD(common)
-	MCFG_APOLLO_SIO_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
+MACHINE_CONFIG_START(apollo_state::apollo_terminal)
+	common(config);
+	MCFG_APOLLO_SIO_ADD( APOLLO_SIO_TAG, XTAL(3'686'400) )
 	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
 	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output))
 	MCFG_APOLLO_SIO_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
@@ -1324,7 +1316,8 @@ void apollo_stdio_device::device_reset()
 void apollo_stdio_device::device_timer(emu_timer &timer, device_timer_id id,
 		int param, void *ptr)
 {
-	device_serial_interface::device_timer(timer, id, param, ptr);
+//  FIXME?
+//  device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 void apollo_stdio_device::rcv_complete() // Rx completed receiving byte

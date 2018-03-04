@@ -6,6 +6,7 @@
 #include "sound/okim6295.h"
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/ms1_tmap.h"
 #include "screen.h"
@@ -156,4 +157,33 @@ public:
 
 	DECLARE_DRIVER_INIT(captflag);
 	TIMER_DEVICE_CALLBACK_MEMBER(captflag_scanline);
+	void scudhamm(machine_config &config);
+	void armchmp2(machine_config &config);
+	void cischeat(machine_config &config);
+	void f1gpstr2(machine_config &config);
+	void f1gpstar(machine_config &config);
+	void captflag(machine_config &config);
+	void bigrun(machine_config &config);
+	void wildplt(machine_config &config);
+	void armchmp2_map(address_map &map);
+	void bigrun_map(address_map &map);
+	void bigrun_map2(address_map &map);
+	void bigrun_map3(address_map &map);
+	void bigrun_sound_map(address_map &map);
+	void captflag_map(address_map &map);
+	void captflag_oki1_map(address_map &map);
+	void captflag_oki2_map(address_map &map);
+	void cischeat_map(address_map &map);
+	void cischeat_map2(address_map &map);
+	void cischeat_map3(address_map &map);
+	void cischeat_sound_map(address_map &map);
+	void f1gpstar_map(address_map &map);
+	void f1gpstar_map2(address_map &map);
+	void f1gpstar_map3(address_map &map);
+	void f1gpstar_sound_map(address_map &map);
+	void f1gpstr2_io_map(address_map &map);
+	void f1gpstr2_map(address_map &map);
+	void f1gpstr2_sound_map(address_map &map);
+	void scudhamm_map(address_map &map);
+	void wildplt_map(address_map &map);
 };

@@ -30,17 +30,14 @@
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
 
-#define TERMINAL_TAG "terminal"
-
 class ts802_state : public driver_device
 {
 public:
 	ts802_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
 	DECLARE_DRIVER_INIT(ts802);
 	DECLARE_MACHINE_RESET(ts802);
@@ -57,6 +54,9 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	void kbd_put(u8 data);
+	void ts802(machine_config &config);
+	void ts802_io(address_map &map);
+	void ts802_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	address_space *m_mem;
@@ -65,34 +65,34 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-static ADDRESS_MAP_START(ts802_mem, AS_PROGRAM, 8, ts802_state)
+ADDRESS_MAP_START(ts802_state::ts802_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x1000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ts802_io, AS_IO, 8, ts802_state)
+ADDRESS_MAP_START(ts802_state::ts802_io)
 	//ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_READ(port00_r)  // DIP switches
 	// 04 - written once after OS boot to bank in RAM from 0000-3FFF instead of ROM.  4000-FFFF is always RAM.
 	AM_RANGE(0x04, 0x07) AM_WRITE(port04_w)
 	// 08-0B: Z80 CTC
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	// 0C-0F: Z80 SIO #1
-	//AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80dart1", z80dart_device, ba_cd_r, ba_cd_w)
+	//AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("dart1", z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ(port0c_r)
-	AM_RANGE(0x0d, 0x0d) AM_READ(port0d_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0x0d, 0x0d) AM_READ(port0d_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0x0e, 0x0e) AM_READ(port0e_r)
 	AM_RANGE(0x0f, 0x0f) AM_READ(port0f_r)
 	// 10: Z80 DMA
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("z80dma", z80dma_device, read, write)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("dma", z80dma_device, read, write)
 	// 14-17: WD 1793
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	// 18: floppy misc.
 	AM_RANGE(0x18, 0x1c) AM_WRITE(port18_w)
 	// 20-23: Z80 SIO #2
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("z80dart2", z80dart_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("dart2", z80dart_device, ba_cd_r, ba_cd_w)
 	// 48-4F: WD1000 harddisk controller
 	// 80: LEDs
 	AM_RANGE(0x80, 0x80) AM_WRITE(port80_w)
@@ -162,10 +162,10 @@ void ts802_state::kbd_put(u8 data)
 // not correct
 static const z80_daisy_config daisy_chain_intf[] =
 {
-	{ "z80dart1" },
-	{ "z80dart2" },
-	{ "z80dma" },
-	{ "z80ctc" },
+	{ "dart1" },
+	{ "dart2" },
+	{ "dma" },
+	{ "ctc" },
 	{ nullptr }
 };
 #endif
@@ -182,19 +182,19 @@ DRIVER_INIT_MEMBER( ts802_state, ts802 )
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-static MACHINE_CONFIG_START( ts802 )
+MACHINE_CONFIG_START(ts802_state::ts802)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(ts802_mem)
 	MCFG_CPU_IO_MAP(ts802_io)
 	//MCFG_Z80_DAISY_CHAIN(daisy_chain_intf) // causes problems
 	MCFG_MACHINE_RESET_OVERRIDE(ts802_state, ts802)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ts802_state, kbd_put))
 
-	MCFG_DEVICE_ADD("z80dma", Z80DMA, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(16'000'000) / 4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(ts802_state, memory_read_byte))
@@ -202,16 +202,16 @@ static MACHINE_CONFIG_START( ts802 )
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(ts802_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(ts802_state, io_write_byte))
 
-	MCFG_Z80DART_ADD("z80dart1", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("dart1", Z80DART, XTAL(16'000'000) / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80DART_ADD("z80dart2", XTAL_16MHz / 4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("dart2", Z80DART, XTAL(16'000'000) / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_FD1793_ADD("fdc", XTAL_4MHz / 2)                  // unknown clock
+	MCFG_FD1793_ADD("fdc", XTAL(4'000'000) / 2)                  // unknown clock
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts802_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END

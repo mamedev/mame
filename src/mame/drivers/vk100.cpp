@@ -257,6 +257,9 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void vram_write(uint8_t data);
 
+	void vk100(machine_config &config);
+	void vk100_io(address_map &map);
+	void vk100_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -422,7 +425,7 @@ TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 		m_vgPAT_Mask >>= 1; // shift the mask
 		if (m_vgPAT_Mask == 0) m_vgPAT_Mask = 0x80; // reset mask if it hits 0
 	}
-	if (m_vgGO) timer_set(attotime::from_hz(XTAL_45_6192Mhz/3/12/2), TIMER_EXECUTE_VG); // /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
+	if (m_vgGO) timer_set(attotime::from_hz(XTAL(45'619'200)/3/12/2), TIMER_EXECUTE_VG); // /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
 }
 
 /* ports 0x40 and 0x41: load low and high bytes of vector gen X register */
@@ -684,7 +687,7 @@ READ8_MEMBER(vk100_state::vk100_keyboard_column_r)
 	return code;
 }
 
-static ADDRESS_MAP_START(vk100_mem, AS_PROGRAM, 8, vk100_state)
+ADDRESS_MAP_START(vk100_state::vk100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x700f ) AM_MIRROR(0x0ff0) AM_READ(vk100_keyboard_column_r)
@@ -732,7 +735,7 @@ ADDRESS_MAP_END
    x   1   1   1   1   0   x   x     W     unused
    x   1   1   1   1   1   x   x     W     unused
 */
-static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
+ADDRESS_MAP_START(vk100_state::vk100_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff) // guess, probably correct
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xBE) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -1032,18 +1035,18 @@ MC6845_UPDATE_ROW( vk100_state::crtc_update_row )
 }
 
 
-static MACHINE_CONFIG_START( vk100 )
+MACHINE_CONFIG_START(vk100_state::vk100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
+	MCFG_CPU_ADD("maincpu", I8085A, XTAL(5'068'800))
 	MCFG_CPU_PROGRAM_MAP(vk100_mem)
 	MCFG_CPU_IO_MAP(vk100_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_45_6192Mhz/3, 882, 0, 720, 370, 0, 350 ) // fake screen timings for startup until 6845 sets real ones
+	MCFG_SCREEN_RAW_PARAMS(XTAL(45'619'200)/3, 882, 0, 720, 370, 0, 350 ) // fake screen timings for startup until 6845 sets real ones
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD( "crtc", H46505, "screen", XTAL_45_6192Mhz/3/12)
+	MCFG_MC6845_ADD( "crtc", H46505, "screen", XTAL(45'619'200)/3/12)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(12)
 	MCFG_MC6845_UPDATE_ROW_CB(vk100_state, crtc_update_row)
@@ -1061,7 +1064,7 @@ static MACHINE_CONFIG_START( vk100 )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL(5'068'800))
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
 

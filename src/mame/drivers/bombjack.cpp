@@ -111,7 +111,7 @@ READ8_MEMBER(bombjack_state::soundlatch_read_and_clear)
 	// An extra flip-flop is used to clear the LS273 after reading it through a LS245
 	// (this flip-flop is then cleared in sync with the sound CPU clock)
 	uint8_t res = m_soundlatch->read(space, 0);
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_soundlatch->clear_w(space, 0, 0);
 	return res;
 }
@@ -128,14 +128,14 @@ WRITE8_MEMBER(bombjack_state::irq_mask_w)
 	m_nmi_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bombjack_state )
+ADDRESS_MAP_START(bombjack_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bombjack_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(bombjack_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x9820, 0x987f) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITENOP
-	AM_RANGE(0x9c00, 0x9cff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x9c00, 0x9cff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x9e00, 0x9e00) AM_WRITE(bombjack_background_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("P1")
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(irq_mask_w)
@@ -149,13 +149,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bombjack_state )
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, bombjack_state )
+ADDRESS_MAP_START(bombjack_state::audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_read_and_clear)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, bombjack_state )
+ADDRESS_MAP_START(bombjack_state::audio_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
@@ -342,14 +342,14 @@ INTERRUPT_GEN_MEMBER(bombjack_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( bombjack )
+MACHINE_CONFIG_START(bombjack_state::bombjack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)     /* Confirmed from PCB */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))     /* Confirmed from PCB */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bombjack_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4) /* Confirmed from PCB */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* Confirmed from PCB */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bombjack_state,  nmi_line_pulse)
@@ -373,13 +373,13 @@ static MACHINE_CONFIG_START( bombjack )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8) /* Confirmed from PCB */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8) /* Confirmed from PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
 MACHINE_CONFIG_END
 

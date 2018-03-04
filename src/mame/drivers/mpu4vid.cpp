@@ -297,6 +297,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
 	DECLARE_WRITE8_MEMBER( vram_w );
 	DECLARE_READ8_MEMBER( vram_r );
+	void mpu4_vid(machine_config &config);
+	void bwbvid(machine_config &config);
+	void crmaze(machine_config &config);
+	void bwbvid5(machine_config &config);
+	void mating(machine_config &config);
+	void bwbvid5_68k_map(address_map &map);
+	void bwbvid_68k_map(address_map &map);
+	void mpu4_68k_map(address_map &map);
+	void mpu4_vram(address_map &map);
+	void mpu4oki_68k_map(address_map &map);
 };
 
 /*************************************
@@ -393,7 +403,7 @@ READ8_MEMBER(mpu4vid_state::vram_r)
 	return m_vid_mainram[offset];
 }
 
-static ADDRESS_MAP_START( mpu4_vram, 0, 8, mpu4vid_state )
+ADDRESS_MAP_START(mpu4vid_state::mpu4_vram)
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
@@ -1170,7 +1180,7 @@ MACHINE_RESET_MEMBER(mpu4vid_state,mpu4_vid)
 	m_chr_value     = 0;
 }
 
-static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16, mpu4vid_state )
+ADDRESS_MAP_START(mpu4vid_state::mpu4_68k_map)
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 //  AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
@@ -1180,13 +1190,12 @@ static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xff8000, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
 	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
 	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE8(vidcharacteriser_r, vidcharacteriser_w,0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4vid_state )
+ADDRESS_MAP_START(mpu4vid_state::mpu4oki_68k_map)
 	AM_RANGE(0x000000, 0x5fffff) AM_ROM //AM_WRITENOP
 	AM_RANGE(0x600000, 0x63ffff) AM_RAM /* The Mating Game has an extra 256kB RAM on the program card */
 //  AM_RANGE(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
@@ -1196,8 +1205,7 @@ static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xff8000, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
 	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
 	AM_RANGE(0xffa040, 0xffa04f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0x00ff)  // 6840PTM on sampled sound board
 	AM_RANGE(0xffa040, 0xffa04f) AM_WRITE8(ic3ss_w,0x00ff)  // 6840PTM on sampled sound board
@@ -1206,7 +1214,7 @@ static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 //  AM_RANGE(0xfff000, 0xffffff) AM_NOP /* Possible bug, reads and writes here */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bwbvid_68k_map, AS_PROGRAM, 16, mpu4vid_state )
+ADDRESS_MAP_START(mpu4vid_state::bwbvid_68k_map)
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
@@ -1217,13 +1225,12 @@ static ADDRESS_MAP_START( bwbvid_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xe00000, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
 	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
 	//AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16, mpu4vid_state )
+ADDRESS_MAP_START(mpu4vid_state::bwbvid5_68k_map)
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
@@ -1234,8 +1241,7 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xe00000, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
 	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
 	AM_RANGE(0xe02000, 0xe02007) AM_DEVREADWRITE8("pia_ic4ss", pia6821_device, read, write, 0xff00) //Seems odd...
 	AM_RANGE(0xe03000, 0xe0300f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0xff00)  // 6840PTM on sampled sound board
@@ -1244,10 +1250,9 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 ADDRESS_MAP_END
 
 /* TODO: Fix up MPU4 map*/
-static ADDRESS_MAP_START( mpu4_6809_map, AS_PROGRAM, 8, mpu4_state )
+ADDRESS_MAP_START(mpu4_state::mpu4_6809_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("acia6850_0", acia6850_device, status_r, control_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_device, data_r, data_w)
+	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_device, read, write)
 	AM_RANGE(0x0880, 0x0881) AM_NOP //Read/write here
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_device, read, write)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)
@@ -1263,13 +1268,13 @@ ADDRESS_MAP_END
 
 
 
-static MACHINE_CONFIG_START( mpu4_vid )
+MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(mpu4_6809_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")               /* confirm */
 
-	MCFG_FRAGMENT_ADD(mpu4_common)
+	mpu4_common(config);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1281,7 +1286,8 @@ static MACHINE_CONFIG_START( mpu4_vid )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_SCN2674_VIDEO_ADD("scn2674_vid", 0, INPUTLINE("video", 3))
+	MCFG_DEVICE_ADD("scn2674_vid", SCN2674, 0)
+	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("video", M68K_IRQ_3))
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(mpu4vid_state, display_pixels)
@@ -1304,9 +1310,9 @@ static MACHINE_CONFIG_START( mpu4_vid )
 
 	MCFG_DEVICE_ADD("6840ptm_68k", PTM6840, VIDEO_MASTER_CLOCK / 10) /* 68k E clock */
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(mpu4vid_state, vid_o1_callback))
-	MCFG_PTM6840_OUT1_CB(WRITELINE(mpu4vid_state, vid_o2_callback))
-	MCFG_PTM6840_OUT2_CB(WRITELINE(mpu4vid_state, vid_o3_callback))
+	MCFG_PTM6840_O1_CB(WRITELINE(mpu4vid_state, vid_o1_callback))
+	MCFG_PTM6840_O2_CB(WRITELINE(mpu4vid_state, vid_o2_callback))
+	MCFG_PTM6840_O3_CB(WRITELINE(mpu4vid_state, vid_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(mpu4vid_state, cpu1_ptm_irq))
 	/* Present on all video cards */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1325,34 +1331,38 @@ static MACHINE_CONFIG_START( mpu4_vid )
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(mpu4vid_state, m68k_acia_irq))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( crmaze, mpu4_vid )
+MACHINE_CONFIG_START(mpu4vid_state::crmaze)
+	mpu4_vid(config);
 	MCFG_DEVICE_MODIFY("pia_ic5")
 	MCFG_PIA_READPA_HANDLER(READ8(mpu4vid_state, pia_ic5_porta_track_r))
 	MCFG_PIA_WRITEPA_HANDLER(NOOP)
 	MCFG_PIA_WRITEPB_HANDLER(NOOP)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mating, crmaze )
+MACHINE_CONFIG_START(mpu4vid_state::mating)
+	crmaze(config);
 	MCFG_CPU_MODIFY("video")
 	MCFG_CPU_PROGRAM_MAP(mpu4oki_68k_map)
 
-	MCFG_FRAGMENT_ADD(mpu4_common2)
+	mpu4_common2(config);
 
 	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000) //?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bwbvid, mpu4_vid )
+MACHINE_CONFIG_START(mpu4vid_state::bwbvid)
+	mpu4_vid(config);
 	MCFG_CPU_MODIFY("video")
 	MCFG_CPU_PROGRAM_MAP(bwbvid_68k_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bwbvid5, bwbvid )
+MACHINE_CONFIG_START(mpu4vid_state::bwbvid5)
+	bwbvid(config);
 	MCFG_CPU_MODIFY("video")
 	MCFG_CPU_PROGRAM_MAP(bwbvid5_68k_map)
 
-	MCFG_FRAGMENT_ADD(mpu4_common2)
+	mpu4_common2(config);
 
 	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000) //?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
@@ -1379,11 +1389,11 @@ WRITE8_MEMBER(mpu4vid_state::vidcharacteriser_w )
 {
 	int x;
 	int call=(data&0xff);
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", space.device().safe_pcbase(),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", m_videocpu->pcbase(),offset,data));
 
 	if (!m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
+		logerror("No Characteriser Table @ %04x\n", m_videocpu->pcbase());
 		return;
 	}
 
@@ -1408,19 +1418,19 @@ WRITE8_MEMBER(mpu4vid_state::vidcharacteriser_w )
 
 READ8_MEMBER(mpu4vid_state::vidcharacteriser_r )
 {
-	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", space.device().safe_pcbase(),offset,m_current_chr_table[m_prot_col].response));
+	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", m_videocpu->pcbase(),offset,m_current_chr_table[m_prot_col].response));
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	LOG_CHR(("Characteriser read data %02X \n",m_current_chr_table[m_prot_col].response));
 
 	if (!m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
+		logerror("No Characteriser Table @ %04x\n", m_videocpu->pcbase());
 		return 0x00;
 	}
 
 
 	/* hack for 'invalid questions' error on time machine.. I guess it wants them to decode properly for startup check? */
-	if (space.device().safe_pcbase()==0x283a)
+	if (m_videocpu->pcbase()==0x283a)
 	{
 		return 0x00;
 	}

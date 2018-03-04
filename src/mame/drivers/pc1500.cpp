@@ -53,9 +53,12 @@ public:
 
 	DECLARE_READ8_MEMBER( pc1500_kb_r );
 	DECLARE_PALETTE_INIT(pc1500);
+	void pc1500(machine_config &config);
+	void pc1500_mem(address_map &map);
+	void pc1500_mem_io(address_map &map);
 };
 
-static ADDRESS_MAP_START( pc1500_mem , AS_PROGRAM, 8, pc1500_state)
+ADDRESS_MAP_START(pc1500_state::pc1500_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff) AM_ROM    //module ROM/RAM
 	AM_RANGE( 0x4000, 0x47ff) AM_RAM    //user RAM
@@ -66,7 +69,7 @@ static ADDRESS_MAP_START( pc1500_mem , AS_PROGRAM, 8, pc1500_state)
 	AM_RANGE( 0xc000, 0xffff) AM_ROM    //system ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1500_mem_io , AS_IO, 8, pc1500_state)
+ADDRESS_MAP_START(pc1500_state::pc1500_mem_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0xf000, 0xf00f) AM_DEVREADWRITE("lh5810", lh5810_device, data_r, data_w)
 ADDRESS_MAP_END
@@ -262,7 +265,7 @@ PALETTE_INIT_MEMBER(pc1500_state, pc1500)
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-static MACHINE_CONFIG_START( pc1500 )
+MACHINE_CONFIG_START(pc1500_state::pc1500)
 	MCFG_CPU_ADD("maincpu", LH5801, 1300000)            //1.3 MHz
 	MCFG_CPU_PROGRAM_MAP( pc1500_mem )
 	MCFG_CPU_IO_MAP( pc1500_mem_io )
@@ -287,7 +290,7 @@ static MACHINE_CONFIG_START( pc1500 )
 	MCFG_LH5810_PORTC_W_CB(WRITE8(pc1500_state, port_c_w))
 	MCFG_LH5810_OUT_INT_CB(INPUTLINE("maincpu", LH5801_LINE_MI))
 
-	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NOOP, NOOP)
+	MCFG_UPD1990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
 MACHINE_CONFIG_END
 
 

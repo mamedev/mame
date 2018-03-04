@@ -9,10 +9,13 @@
 //**************************************************************************
 
 #define MCFG_TC0140SYT_MASTER_CPU(_tag) \
-	tc0140syt_device::set_master_tag(*device, "^" _tag);
+	downcast<tc0140syt_device &>(*device).set_master_tag("^" _tag);
 
 #define MCFG_TC0140SYT_SLAVE_CPU(_tag) \
-	tc0140syt_device::set_slave_tag(*device, "^" _tag);
+	downcast<tc0140syt_device &>(*device).set_slave_tag("^" _tag);
+
+#define MCFG_PC060HA_MASTER_CPU(_tag) MCFG_TC0140SYT_MASTER_CPU(_tag)
+#define MCFG_PC060HA_SLAVE_CPU(_tag) MCFG_TC0140SYT_SLAVE_CPU(_tag)
 
 
 //**************************************************************************
@@ -26,8 +29,8 @@ class tc0140syt_device : public device_t
 public:
 	tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_master_tag(device_t &device, const char *tag) { downcast<tc0140syt_device &>(device).m_mastercpu.set_tag(tag); }
-	static void set_slave_tag(device_t &device, const char *tag)  { downcast<tc0140syt_device &>(device).m_slavecpu.set_tag(tag); }
+	void set_master_tag(const char *tag) { m_mastercpu.set_tag(tag); }
+	void set_slave_tag(const char *tag)  { m_slavecpu.set_tag(tag); }
 
 	// MASTER (4-bit bus) control functions
 	DECLARE_WRITE8_MEMBER( master_port_w );
@@ -40,6 +43,8 @@ public:
 	DECLARE_WRITE8_MEMBER( slave_comm_w );
 
 protected:
+	tc0140syt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -58,7 +63,16 @@ private:
 	required_device<cpu_device> m_slavecpu;      /* this is the audiocpu */
 };
 
+// ======================> pc060ha_device
+
+class pc060ha_device : public tc0140syt_device
+{
+public:
+	pc060ha_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 DECLARE_DEVICE_TYPE(TC0140SYT, tc0140syt_device)
+DECLARE_DEVICE_TYPE(PC060HA, pc060ha_device)
 
 
 #endif // MAME_AUDIO_TAITOSND_H

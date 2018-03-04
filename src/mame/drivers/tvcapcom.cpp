@@ -25,9 +25,11 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_tvcapcom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<ppc_device> m_maincpu;
+	void tvcapcom(machine_config &config);
+	void gc_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( gc_map, AS_PROGRAM, 64, tvcapcom_state )
+ADDRESS_MAP_START(tvcapcom_state::gc_map)
 ADDRESS_MAP_END
 
 
@@ -48,7 +50,7 @@ uint32_t tvcapcom_state::screen_update_tvcapcom(screen_device &screen, bitmap_rg
 static INPUT_PORTS_START( tvcapcom )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tvcapcom )
+MACHINE_CONFIG_START(tvcapcom_state::tvcapcom)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC603, 72900000) // IBM PowerPC Broadway CPU @ 729 MHz  ?

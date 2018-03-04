@@ -40,10 +40,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(psi_keyboard_devices, _def_slot, false)
 
 #define MCFG_PSI_KEYBOARD_RX_HANDLER(_devcb) \
-	devcb = &psi_keyboard_bus_device::set_rx_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psi_keyboard_bus_device &>(*device).set_rx_handler(DEVCB_##_devcb);
 
 #define MCFG_PSI_KEYBOARD_KEY_STROBE_HANDLER(_devcb) \
-	devcb = &psi_keyboard_bus_device::set_key_strobe_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psi_keyboard_bus_device &>(*device).set_key_strobe_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -62,11 +62,8 @@ public:
 	virtual ~psi_keyboard_bus_device();
 
 	// callbacks
-	template <class Object> static devcb_base &set_rx_handler(device_t &device, Object &&cb)
-	{ return downcast<psi_keyboard_bus_device &>(device).m_rx_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_key_strobe_handler(device_t &device, Object &&cb)
-	{ return downcast<psi_keyboard_bus_device &>(device).m_key_strobe_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rx_handler(Object &&cb) { return m_rx_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_key_strobe_handler(Object &&cb) { return m_key_strobe_handler.set_callback(std::forward<Object>(cb)); }
 
 	// called from keyboard
 	DECLARE_WRITE_LINE_MEMBER( rx_w ) { m_rx_handler(state); }

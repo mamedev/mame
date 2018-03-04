@@ -19,6 +19,8 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void kissp(machine_config &config);
+	void kissp_map(address_map &map);
 protected:
 
 	// devices
@@ -31,7 +33,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( kissp_map, AS_PROGRAM, 8, kissp_state )
+ADDRESS_MAP_START(kissp_state::kissp_map)
 	AM_RANGE(0x0000, 0x0fff) AM_NOP
 ADDRESS_MAP_END
 
@@ -46,7 +48,7 @@ DRIVER_INIT_MEMBER(kissp_state,kissp)
 {
 }
 
-static MACHINE_CONFIG_START( kissp )
+MACHINE_CONFIG_START(kissp_state::kissp)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8035, 6000000/15)
 	MCFG_CPU_PROGRAM_MAP(kissp_map)

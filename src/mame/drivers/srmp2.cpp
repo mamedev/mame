@@ -30,17 +30,19 @@ System specs :
    CPU       : 68000 (8MHz)
    Sound     : AY8910 + MSM5205
    Chips     : X1-001, X1-002A, X1-003, X1-004x2, X0-005 x2
-           X1-001, X1-002A  : Sprites
-           X1-003           : Video output
-           X1-004           : ???
-           X1-005           : ???
+           X1-001, X1-002A (64 pins) : Sprites
+           X1-003          (?? pins) : Video output
+           X1-004          (52 pins) : Inputs
+           X0-005          (40 pins) : Interface
 
 
 Known issues :
 ===============
  - IOX might be either a shared component between PCBs or every game have its own configuration.
    For now I've opted for the latter solution, until an HW test will be done ...
-   Could also be that's a MCU of some sort.
+ - X0-005 is a probable MCU, most likely a 8741/8742 UPI type like the "M-Chip" in tnzs.cpp.
+   One X0-005 handles the inputs; the other drives the MSM5205 with the aid of a 8243 expander.
+   Are both of these functions really performed by the same (undumped) internal program?
  - AY-3-8910 sound may be wrong.
  - CPU clock of srmp3 does not match the real machine.
  - MSM5205 clock frequency in srmp3 is wrong.
@@ -390,7 +392,7 @@ WRITE8_MEMBER(srmp2_state::srmp2_irq4_ack_w)
 }
 
 
-static ADDRESS_MAP_START( srmp2_map, AS_PROGRAM, 16, srmp2_state )
+ADDRESS_MAP_START(srmp2_state::srmp2_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     /* Sprites Code + X + Attr */
@@ -423,7 +425,7 @@ READ8_MEMBER(srmp2_state::mjyuugi_irq4_ack_r)
 	return 0xff; // value returned doesn't matter
 }
 
-static ADDRESS_MAP_START( mjyuugi_map, AS_PROGRAM, 16, srmp2_state )
+ADDRESS_MAP_START(srmp2_state::mjyuugi_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")             /* Coinage */
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(mjyuugi_flags_w)          /* Coin Counter */
@@ -433,7 +435,7 @@ static ADDRESS_MAP_START( mjyuugi_map, AS_PROGRAM, 16, srmp2_state )
 	AM_RANGE(0x300000, 0x300001) AM_READ8(mjyuugi_irq4_ack_r,0x00ff) /* irq ack lv 4? */
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW3-1")             /* DSW 3-1 */
 	AM_RANGE(0x500010, 0x500011) AM_READ_PORT("DSW3-2")             /* DSW 3-2 */
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x800001) AM_READNOP             /* ??? */
 	AM_RANGE(0x900000, 0x900001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff) /* key matrix | I/O */
 	AM_RANGE(0x900002, 0x900003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
@@ -469,7 +471,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_irq_ack_w)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( srmp3_map, AS_PROGRAM, 8, srmp2_state )
+ADDRESS_MAP_START(srmp2_state::srmp3_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")                            /* rom bank */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("nvram")   /* work ram */
@@ -481,7 +483,7 @@ static ADDRESS_MAP_START( srmp3_map, AS_PROGRAM, 8, srmp2_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( srmp3_io_map, AS_IO, 8, srmp2_state )
+ADDRESS_MAP_START(srmp2_state::srmp3_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x20) AM_WRITE(srmp3_irq_ack_w)                              /* interrupt acknowledge */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM") AM_WRITE(srmp3_flags_w)         /* coin, service | GFX bank, counter, lockout */
@@ -494,7 +496,7 @@ static ADDRESS_MAP_START( srmp3_io_map, AS_IO, 8, srmp2_state )
 	AM_RANGE(0xe2, 0xe2) AM_DEVREAD("aysnd", ay8910_device, data_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rmgoldyh_map, AS_PROGRAM, 8, srmp2_state )
+ADDRESS_MAP_START(srmp2_state::rmgoldyh_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")                            /* rom bank */
 	AM_RANGE(0xa000, 0xafff) AM_RAM AM_SHARE("nvram")   /* work ram */
@@ -516,13 +518,13 @@ WRITE8_MEMBER(srmp2_state::rmgoldyh_rombank_w)
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-static ADDRESS_MAP_START( rmgoldyh_io_map, AS_IO, 8, srmp2_state )
+ADDRESS_MAP_START(srmp2_state::rmgoldyh_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_IMPORT_FROM(srmp3_io_map)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x60, 0x60) AM_WRITE(rmgoldyh_rombank_w)                       /* ROM bank select */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW4")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("DSW3")
-	AM_IMPORT_FROM(srmp3_io_map)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1133,7 +1135,7 @@ static GFXDECODE_START( srmp3 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( srmp2 )
+MACHINE_CONFIG_START(srmp2_state::srmp2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
@@ -1177,7 +1179,7 @@ static MACHINE_CONFIG_START( srmp2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( srmp3 )
+MACHINE_CONFIG_START(srmp2_state::srmp3)
 
 	/* basic machine hardware */
 
@@ -1223,7 +1225,8 @@ static MACHINE_CONFIG_START( srmp3 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rmgoldyh, srmp3 )
+MACHINE_CONFIG_START(srmp2_state::rmgoldyh)
+	srmp3(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rmgoldyh_map)
@@ -1232,7 +1235,7 @@ static MACHINE_CONFIG_DERIVED( rmgoldyh, srmp3 )
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,rmgoldyh)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mjyuugi )
+MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */

@@ -12,10 +12,11 @@
 
 ***************************************************************************/
 
-#ifndef __GALAXOLD_H__
-#define __GALAXOLD_H__
+#ifndef MAME_INCLUDES_GALAXOLD_H
+#define MAME_INCLUDES_GALAXOLD_H
 
 #include "machine/7474.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 /* star circuit */
@@ -266,6 +267,62 @@ public:
 	void bagmanmc_modify_charcode(uint16_t *code, uint8_t x);
 	void bagmanmc_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void machine_reset_common(int line);
+	void galaxian(machine_config &config);
+	void galaxold_base(machine_config &config);
+	void ckongg(machine_config &config);
+	void _4in1(machine_config &config);
+	void bongo(machine_config &config);
+	void racknrol(machine_config &config);
+	void hunchbkg(machine_config &config);
+	void videotron(machine_config &config);
+	void hexpoola(machine_config &config);
+	void dkongjrm(machine_config &config);
+	void tazzmang(machine_config &config);
+	void scrambler(machine_config &config);
+	void spcwarp(machine_config &config);
+	void dkongjrmc(machine_config &config);
+	void bagmanmc(machine_config &config);
+	void bullsdrtg(machine_config &config);
+	void drivfrcg(machine_config &config);
+	void rockclim(machine_config &config);
+	void scramblb(machine_config &config);
+	void porter(machine_config &config);
+	void scramb2(machine_config &config);
+	void ozon1(machine_config &config);
+	void mooncrst(machine_config &config);
+	void guttang(machine_config &config);
+	void ckongmc(machine_config &config);
+	void galaxian_audio(machine_config &config);
+	void mooncrst_audio(machine_config &config);
+	void _4in1_map(address_map &map);
+	void bagmanmc_map(address_map &map);
+	void bongo(address_map &map);
+	void bongo_io(address_map &map);
+	void bullsdrtg_data_map(address_map &map);
+	void ckongg_map(address_map &map);
+	void ckongmc_map(address_map &map);
+	void dkongjrm_map(address_map &map);
+	void dkongjrmc_map(address_map &map);
+	void drivfrcg(address_map &map);
+	void drivfrcg_io(address_map &map);
+	void galaxold_map(address_map &map);
+	void guttang_map(address_map &map);
+	void hexpoola_data(address_map &map);
+	void hexpoola_io(address_map &map);
+	void hunchbkg(address_map &map);
+	void hunchbkg_data(address_map &map);
+	void hustlerb3_map(address_map &map);
+	void mooncrst_map(address_map &map);
+	void ozon1_io_map(address_map &map);
+	void ozon1_map(address_map &map);
+	void racknrol(address_map &map);
+	void racknrol_io(address_map &map);
+	void rockclim_map(address_map &map);
+	void scramb2_map(address_map &map);
+	void scramblb_map(address_map &map);
+	void scrambler_map(address_map &map);
+	void spcwarp(address_map &map);
+	void tazzmang(address_map &map);
 };
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w

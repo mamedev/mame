@@ -36,7 +36,7 @@
 #define TI_VDP_TAG         "vdp"
 #define TI_SCREEN_TAG      "screen"
 #define TI_HEXBUS_TAG   "hexbus"
-#define TI_VDPFREQ XTAL_10_738635MHz
+#define TI_VDPFREQ XTAL(10'738'635)
 
 // v9938
 #define COLORBUS_TAG     "colorbus"

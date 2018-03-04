@@ -30,16 +30,16 @@ WRITE16_MEMBER(prehisle_state::soundcmd_w)
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( prehisle_map, AS_PROGRAM, 16, prehisle_state )
+ADDRESS_MAP_START(prehisle_state::prehisle_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x070000, 0x073fff) AM_RAM
 	AM_RANGE(0x090000, 0x0907ff) AM_RAM_WRITE(tx_vram_w) AM_SHARE("tx_vram")
 	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(fg_vram_w) AM_SHARE("fg_vram")
-	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0e0000, 0x0e00ff) AM_READ(control_r)
-	AM_RANGE(0x0f0070, 0x0ff071) AM_WRITE(soundcmd_w)
 	AM_RANGE(0x0f0000, 0x0ff0ff) AM_WRITE(control_w)
+	AM_RANGE(0x0f0070, 0x0ff071) AM_WRITE(soundcmd_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -56,14 +56,14 @@ WRITE8_MEMBER(prehisle_state::D7759_upd_reset_w)
 	m_upd7759->reset_w(data & 0x80);
 }
 
-static ADDRESS_MAP_START( prehisle_sound_map, AS_PROGRAM, 8, prehisle_state )
+ADDRESS_MAP_START(prehisle_state::prehisle_sound_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf800, 0xf800) AM_WRITENOP    // ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prehisle_sound_io_map, AS_IO, 8, prehisle_state )
+ADDRESS_MAP_START(prehisle_state::prehisle_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
@@ -196,14 +196,14 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( prehisle )
+MACHINE_CONFIG_START(prehisle_state::prehisle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_18MHz/2)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'000'000)/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(prehisle_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", prehisle_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)    /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000))    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(prehisle_sound_map)
 	MCFG_CPU_IO_MAP(prehisle_sound_io_map)
 
@@ -212,7 +212,7 @@ static MACHINE_CONFIG_START( prehisle )
 	// the screen parameters are guessed but should be accurate. They
 	// give a theoretical refresh rate of 59.1856Hz while the measured
 	// rate on a snk68.c with very similar hardware board is 59.16Hz.
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384, 0, 256, 264, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 384, 0, 256, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(prehisle_state, screen_update_prehisle)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -226,7 +226,7 @@ static MACHINE_CONFIG_START( prehisle )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz)  /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000))  /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

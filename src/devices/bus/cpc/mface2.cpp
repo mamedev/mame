@@ -108,7 +108,7 @@ void cpc_multiface2_device::multiface_rethink_memory()
 }
 
 // device machine config
-MACHINE_CONFIG_MEMBER( cpc_multiface2_device::device_add_mconfig )
+MACHINE_CONFIG_START(cpc_multiface2_device::device_add_mconfig)
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)

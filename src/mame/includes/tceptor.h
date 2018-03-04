@@ -17,7 +17,7 @@ public:
 		m_m68k_shared_ram(*this, "m68k_shared_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
 		m_c45_road(*this, "c45_road"),
-		m_2dscreen(*this, "2dscreen"),
+		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -57,15 +57,15 @@ public:
 	DECLARE_READ8_MEMBER(dsw1_r);
 	DECLARE_READ8_MEMBER(input0_r);
 	DECLARE_READ8_MEMBER(input1_r);
-	DECLARE_READ8_MEMBER(readFF);
 	DECLARE_WRITE8_MEMBER(tceptor_tile_ram_w);
 	DECLARE_WRITE8_MEMBER(tceptor_tile_attr_w);
 	DECLARE_WRITE8_MEMBER(tceptor_bg_ram_w);
 	DECLARE_WRITE8_MEMBER(tceptor_bg_scroll_w);
+	DECLARE_WRITE8_MEMBER(tceptor2_shutter_w);
 	void tile_mark_dirty(int offset);
 
 	required_device<namco_c45_road_device> m_c45_road;
-	required_device<screen_device> m_2dscreen;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -76,9 +76,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tceptor);
-	uint32_t screen_update_tceptor_2d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_tceptor_3d_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_tceptor_3d_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tceptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tceptor);
 	INTERRUPT_GEN_MEMBER(m6809_vb_interrupt);
 	INTERRUPT_GEN_MEMBER(m68k_vb_interrupt);
@@ -91,4 +89,11 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
 	inline uint8_t fix_input0(uint8_t in1, uint8_t in2);
 	inline uint8_t fix_input1(uint8_t in1, uint8_t in2);
+	void tceptor(machine_config &config);
+	void m6502_a_map(address_map &map);
+	void m6502_b_map(address_map &map);
+	void m6809_map(address_map &map);
+	void m68k_map(address_map &map);
+	void mcu_io_map(address_map &map);
+	void mcu_map(address_map &map);
 };

@@ -25,14 +25,15 @@
  *  Video timing constants
  *
  *************************************/
-
-#define PIXEL_CLOCK     (MYSTSTON_MASTER_CLOCK / 2)
-#define HTOTAL          (0x180)
-#define HBEND           (0x000)
-#define HBSTART         (0x100)
-#define VTOTAL          (0x110)  /* counts from 0x08-0xff, then from 0xe8-0xff */
-#define VBEND           (0x008)
-#define VBSTART         (0x0f8)
+// HMC20
+// MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,8,248)
+#define PIXEL_CLOCK     (XTAL(12'000'000) / 2)
+#define HTOTAL          (384)
+#define HBEND           (0)
+#define HBSTART         (256)
+#define VTOTAL          (272)  /* counts from 0x08-0xff, then from 0xe8-0xff */
+#define VBEND           (8)
+#define VBSTART         (248)
 #define FIRST_INT_VPOS  (0x008)
 #define INT_HPOS        (0x100)
 
@@ -309,7 +310,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( mystston_video )
+MACHINE_CONFIG_START(mystston_state::mystston_video)
 	MCFG_VIDEO_START_OVERRIDE(mystston_state,mystston)
 	MCFG_VIDEO_RESET_OVERRIDE(mystston_state,mystston)
 

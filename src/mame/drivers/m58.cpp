@@ -18,7 +18,7 @@
 #include "includes/iremipt.h"
 #include "includes/m58.h"
 
-#define MASTER_CLOCK        XTAL_18_432MHz
+#define MASTER_CLOCK        XTAL(18'432'000)
 
 
 /*************************************
@@ -27,7 +27,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( yard_map, AS_PROGRAM, 8, m58_state )
+ADDRESS_MAP_START(m58_state::yard_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scroll_panel_w)
@@ -191,7 +191,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( yard )
+MACHINE_CONFIG_START(m58_state::yard)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)

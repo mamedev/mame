@@ -121,7 +121,7 @@ void _3do_state::m_3do_request_fiq(uint32_t irq_req, uint8_t type)
 	if((m_clio.irq0 & m_clio.irq0_enable) || (m_clio.irq1 & m_clio.irq1_enable))
 	{
 		//printf("Go irq %08x & %08x %08x & %08x\n",m_clio.irq0, m_clio.irq0_enable, m_clio.irq1, m_clio.irq1_enable);
-		generic_pulse_irq_line(*m_maincpu, ARM7_FIRQ_LINE, 1);
+		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 }
 
@@ -657,7 +657,7 @@ WRITE32_MEMBER(_3do_state::_3do_madam_w){
 
 READ32_MEMBER(_3do_state::_3do_clio_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		if(offset != 0x200/4 && offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4 &&
 			offset != 0x118/4 && offset != 0x11c/4)
@@ -775,7 +775,7 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 		return m_clio.uncle_rom;
 
 	default:
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			logerror( "%08X: unhandled CLIO read offset = %08X\n", m_maincpu->pc(), offset * 4 );
 		break;
 	}

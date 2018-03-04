@@ -46,6 +46,7 @@ amerihok.cpp
 ampoker2.cpp
 amspdwy.cpp
 amusco.cpp
+anes.cpp
 angelkds.cpp
 appoooh.cpp
 aquarium.cpp
@@ -91,6 +92,7 @@ avt.cpp
 aztarac.cpp
 backfire.cpp
 badlands.cpp
+badlandsbl.cpp
 bagman.cpp
 bailey.cpp
 balsente.cpp
@@ -140,6 +142,7 @@ blmbycar.cpp
 blockade.cpp
 blockhl.cpp
 blockout.cpp
+blocktax.cpp
 bloodbro.cpp
 blstroid.cpp
 blueprnt.cpp
@@ -171,6 +174,7 @@ bzone.cpp
 cabal.cpp
 cabaret.cpp
 calchase.cpp
+calcune.cpp
 calomega.cpp
 calorie.cpp
 canyon.cpp
@@ -264,6 +268,7 @@ cv1k.cpp
 cvs.cpp
 cyberbal.cpp
 cybertnk.cpp
+cybstorm.cpp
 cyclemb.cpp
 d9final.cpp
 dacholer.cpp
@@ -447,6 +452,7 @@ gng.cpp
 go2000.cpp
 goal92.cpp
 goindol.cpp
+gokidetor.cpp
 goldngam.cpp
 goldnpkr.cpp
 goldstar.cpp
@@ -596,6 +602,7 @@ konamigx.cpp
 konamim2.cpp
 konendev.cpp
 konmedal.cpp
+konmedal68k.cpp
 kontest.cpp
 kopunch.cpp
 ksayakyu.cpp
@@ -634,6 +641,7 @@ looping.cpp
 lordgun.cpp
 lsasquad.cpp
 ltcasino.cpp
+luckybal.cpp
 ltd.cpp
 luckgrln.cpp
 lucky74.cpp
@@ -689,7 +697,7 @@ mcr68.cpp
 meadows.cpp
 meadwttl.cpp
 mediagx.cpp
-megadrvb.cpp
+megadriv_acbl.cpp
 megaphx.cpp
 megaplay.cpp
 megasys1.cpp
@@ -825,14 +833,18 @@ nitedrvr.cpp
 niyanpai.cpp
 nmg5.cpp
 nmk16.cpp
+nmkmedal.cpp
 norautp.cpp
+notechan.cpp
 nova2001.cpp
+nsg6809.cpp
 nsm.cpp
 nsmpoker.cpp
 nss.cpp
 nwk-tr.cpp
 nycaptor.cpp
 nyny.cpp
+odyssey.cpp
 offtwall.cpp
 ohmygod.cpp
 ojankohs.cpp
@@ -929,6 +941,7 @@ quakeat.cpp
 quantum.cpp
 quasar.cpp
 queen.cpp
+quickpick5.cpp
 quizdna.cpp
 quizo.cpp
 quizpani.cpp
@@ -1027,6 +1040,7 @@ segasp.cpp
 segaufo.cpp
 segaxbd.cpp
 segaybd.cpp
+seibucats.cpp
 seibuspi.cpp
 seicross.cpp
 seicupbl.cpp
@@ -1135,6 +1149,7 @@ statriv2.cpp
 stellafr.cpp
 stfight.cpp
 stlforce.cpp
+strkzn.cpp
 strnskil.cpp
 stuntair.cpp
 stv.cpp
@@ -1253,7 +1268,6 @@ ttchamp.cpp
 tubep.cpp
 tugboat.cpp
 tumbleb.cpp
-tumblep.cpp
 tunhunt.cpp
 turbo.cpp
 turrett.cpp
@@ -1350,6 +1364,7 @@ xyonix.cpp
 yiear.cpp
 yunsun16.cpp
 yunsung8.cpp
+yuvomz80.cpp
 zac_1.cpp
 zac_2.cpp
 zac_proto.cpp

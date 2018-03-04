@@ -4,6 +4,7 @@
 #include "sound/dac.h"
 #include "sound/namco.h"
 #include "video/namco_c116.h"
+#include "machine/74157.h"
 
 class namcos1_state : public driver_device
 {
@@ -27,7 +28,9 @@ public:
 		m_rom(*this, "user1"),
 		m_soundbank(*this, "soundbank"),
 		m_mcubank(*this, "mcubank"),
-		m_io_dipsw(*this, "DIPSW") { }
+		m_io_dipsw(*this, "DIPSW"),
+		m_dsw_sel(*this, "dsw_sel")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -50,6 +53,7 @@ public:
 	required_memory_bank m_mcubank;
 
 	required_ioport m_io_dipsw;
+	required_device<ls157_device> m_dsw_sel;
 
 	int m_key_id;
 	int m_key_reg;
@@ -74,7 +78,8 @@ public:
 	uint8_t m_drawmode_table[16];
 
 	DECLARE_WRITE_LINE_MEMBER(subres_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_WRITE8_MEMBER(audiocpu_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(mcu_irq_ack_w);
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(dac_gain_w);
@@ -135,6 +140,13 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
+	void ns1(machine_config &config);
+	void main_map(address_map &map);
+	void mcu_map(address_map &map);
+	void mcu_port_map(address_map &map);
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
+	void virtual_map(address_map &map);
 private:
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *info_vram);
 };

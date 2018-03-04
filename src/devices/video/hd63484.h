@@ -26,12 +26,15 @@
 	MCFG_DEVICE_ADDRESS_MAP(0, _map)
 
 #define MCFG_HD63484_DISPLAY_CALLBACK_OWNER(_class, _method) \
-	hd63484_device::static_set_display_callback(*device, hd63484_device::display_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	downcast<hd63484_device &>(*device).set_display_callback(hd63484_device::display_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_HD63484_AUTO_CONFIGURE_SCREEN(_val) \
-	hd63484_device::static_set_auto_configure_screen(*device, _val);
+	downcast<hd63484_device &>(*device).set_auto_configure_screen(_val);
 
 #define HD63484_DISPLAY_PIXELS_MEMBER(_name) void _name(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data)
+
+#define MCFG_HD63484_EXTERNAL_SKEW(_val) \
+	downcast<hd63484_device &>(*device).set_external_skew(_val);
 
 
 // ======================> hd63484_device
@@ -46,18 +49,19 @@ public:
 	// construction/destruction
 	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_display_callback(device_t &device, display_delegate &&cb) { downcast<hd63484_device &>(device).m_display_cb = std::move(cb); }
-	static void static_set_auto_configure_screen(device_t &device, bool auto_configure_screen) { downcast<hd63484_device &>(device).m_auto_configure_screen = auto_configure_screen; }
+	template <typename Object> void set_display_callback(Object &&cb) { m_display_cb = std::forward<Object>(cb); }
+	void set_auto_configure_screen(bool auto_configure_screen) { m_auto_configure_screen = auto_configure_screen; }
+	void set_external_skew(int skew) { m_external_skew = skew; }
 
-	DECLARE_WRITE16_MEMBER( address_w );
-	DECLARE_WRITE16_MEMBER( data_w );
-	DECLARE_READ16_MEMBER( status_r );
-	DECLARE_READ16_MEMBER( data_r );
+	DECLARE_WRITE16_MEMBER( address16_w );
+	DECLARE_WRITE16_MEMBER( data16_w );
+	DECLARE_READ16_MEMBER( status16_r );
+	DECLARE_READ16_MEMBER( data16_r );
 
-	DECLARE_WRITE8_MEMBER( address_w );
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_READ8_MEMBER( data_r );
+	DECLARE_WRITE8_MEMBER( address8_w );
+	DECLARE_WRITE8_MEMBER( data8_w );
+	DECLARE_READ8_MEMBER( status8_r );
+	DECLARE_READ8_MEMBER( data8_r );
 
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -115,6 +119,7 @@ private:
 
 	display_delegate  m_display_cb;
 	bool m_auto_configure_screen;
+	int m_external_skew;
 
 	uint8_t m_ar;
 	uint8_t m_vreg[0x100];

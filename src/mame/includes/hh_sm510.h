@@ -9,6 +9,7 @@
 #ifndef MAME_INCLUDES_HH_SM510_H
 #define MAME_INCLUDES_HH_SM510_H
 
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 
@@ -22,22 +23,24 @@ public:
 		m_out_x(*this, "%u.%u.%u", 0U, 0U, 0U),
 		m_speaker(*this, "speaker"),
 		m_inp_lines(0),
+		m_inp_fixed(-1),
 		m_display_wait(33)
 	{ }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<7> m_inp_matrix; // max 7
+	optional_ioport_array<8> m_inp_matrix; // max 8
 	output_finder<16, 16, 4> m_out_x;
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
 	u16 m_inp_mux;                  // multiplexed inputs mask
 	int m_inp_lines;                // number of input mux columns
+	int m_inp_fixed;                // input column fixed to GND/Vdd (-1 means none)
 	u8 m_s;                         // MCU S output pins
 	u8 m_r;                         // MCU R output pins
 
-	u8 read_inputs(int columns);
+	u8 read_inputs(int columns, int fixed = -1);
 
 	virtual void update_k_line();
 	virtual DECLARE_INPUT_CHANGED_MEMBER(input_changed);

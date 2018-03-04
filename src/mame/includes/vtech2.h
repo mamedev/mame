@@ -91,6 +91,11 @@ public:
 	device_t *laser_file();
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void laser350(machine_config &config);
+	void laser700(machine_config &config);
+	void laser500(machine_config &config);
+	void vtech2_io(address_map &map);
+	void vtech2_mem(address_map &map);
 };
 
 

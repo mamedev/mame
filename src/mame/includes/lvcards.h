@@ -29,4 +29,11 @@ public:
 	uint32_t screen_update_lvcards(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void lvpoker(machine_config &config);
+	void lvcards(machine_config &config);
+	void ponttehk(machine_config &config);
+	void lvcards_io_map(address_map &map);
+	void lvcards_map(address_map &map);
+	void lvpoker_map(address_map &map);
+	void ponttehk_map(address_map &map);
 };

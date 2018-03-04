@@ -18,6 +18,7 @@ certain value.
 #include "emu.h"
 #include "m68hc05.h"
 #include "m6805defs.h"
+#include "6805dasm.h"
 
 
 /****************************************************************************
@@ -105,7 +106,7 @@ m68hc05_device::m68hc05_device(
 		device_t *owner,
 		u32 clock,
 		device_type type,
-		address_map_delegate internal_map)
+		address_map_constructor internal_map)
 	: m6805_base_device(
 			mconfig,
 			tag,
@@ -167,7 +168,7 @@ void m68hc05_device::set_port_interrupt(std::array<u8, PORT_COUNT> const &interr
 READ8_MEMBER(m68hc05_device::port_r)
 {
 	offset &= PORT_COUNT - 1;
-	if (!machine().side_effect_disabled() && !m_port_cb_r[offset].isnull())
+	if (!machine().side_effects_disabled() && !m_port_cb_r[offset].isnull())
 	{
 		u8 const newval(m_port_cb_r[offset](space, 0, ~m_port_ddr[offset] & m_port_bits[offset]) & m_port_bits[offset]);
 		u8 const diff(newval ^ m_port_input[offset]);
@@ -251,7 +252,7 @@ WRITE8_MEMBER(m68hc05_device::tcr_w)
 
 READ8_MEMBER(m68hc05_device::tsr_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		u8 const events(m_tsr & ~m_tsr_seen);
 		if (events)
@@ -270,7 +271,7 @@ READ8_MEMBER(m68hc05_device::icr_r)
 	// reading ICRL after reading TCR with ICF set clears ICF
 
 	u8 const low(BIT(offset, 0));
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		if (low)
 		{
@@ -298,7 +299,7 @@ READ8_MEMBER(m68hc05_device::ocr_r)
 	// reading OCRL after reading TCR with OCF set clears OCF
 
 	u8 const low(BIT(offset, 0));
-	if (!machine().side_effect_disabled() && low && BIT(m_tsr_seen, 6))
+	if (!machine().side_effects_disabled() && low && BIT(m_tsr_seen, 6))
 	{
 		LOGTIMER("read OCRL, clear OCF\n");
 		m_tsr &= 0xbf;
@@ -314,7 +315,7 @@ WRITE8_MEMBER(m68hc05_device::ocr_w)
 	// writing OCRL after reading TCR with OCF set clears OCF
 
 	u8 const low(BIT(offset, 0));
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		if (low)
 		{
@@ -348,7 +349,7 @@ READ8_MEMBER(m68hc05_device::timer_r)
 	u8 const alt(BIT(offset, 1));
 	if (low)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			if (m_trl_latched[alt]) LOGTIMER("read %sTRL, read sequence complete\n", alt ? "A" : "");
 			m_trl_latched[alt] = false;
@@ -364,7 +365,7 @@ READ8_MEMBER(m68hc05_device::timer_r)
 	}
 	else
 	{
-		if (!machine().side_effect_disabled() && !m_trl_latched[alt])
+		if (!machine().side_effects_disabled() && !m_trl_latched[alt])
 		{
 			LOGTIMER("read %sTRH, latch %sTRL\n", alt ? "A" : "", alt ? "A" : "");
 			m_trl_latched[alt] = true;
@@ -541,15 +542,9 @@ u64 m68hc05_device::execute_cycles_to_clocks(u64 cycles) const
 	return cycles * 2;
 }
 
-
-offs_t m68hc05_device::disasm_disassemble(
-		std::ostream &stream,
-		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
-		u32 options)
+util::disasm_interface *m68hc05_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options);
+	return new m68hc05_disassembler;
 }
 
 
@@ -712,7 +707,7 @@ m68hc705_device::m68hc705_device(
 		device_t *owner,
 		u32 clock,
 		device_type type,
-		address_map_delegate internal_map)
+		address_map_constructor internal_map)
 	: m68hc05_device(mconfig, tag, owner, clock, type, internal_map)
 {
 }
@@ -723,7 +718,7 @@ m68hc705_device::m68hc705_device(
  * MC68HC05C4 device
  ****************************************************************************/
 
-DEVICE_ADDRESS_MAP_START( c4_map, 8, m68hc05c4_device )
+ADDRESS_MAP_START(m68hc05c4_device::c4_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	ADDRESS_MAP_UNMAP_HIGH
 
@@ -761,7 +756,7 @@ m68hc05c4_device::m68hc05c4_device(machine_config const &mconfig, char const *ta
 			owner,
 			clock,
 			M68HC05C4,
-			address_map_delegate(FUNC(m68hc05c4_device::c4_map), this))
+			address_map_constructor(FUNC(m68hc05c4_device::c4_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
@@ -777,14 +772,9 @@ void m68hc05c4_device::device_start()
 }
 
 
-offs_t m68hc05c4_device::disasm_disassemble(
-		std::ostream &stream,
-		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
-		u32 options)
+util::disasm_interface *m68hc05c4_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options, m68hc05c4_syms);
+	return new m68hc05_disassembler(m68hc05c4_syms);
 }
 
 
@@ -793,7 +783,7 @@ offs_t m68hc05c4_device::disasm_disassemble(
  * MC68HC05C8 device
  ****************************************************************************/
 
-DEVICE_ADDRESS_MAP_START( c8_map, 8, m68hc05c8_device )
+ADDRESS_MAP_START(m68hc05c8_device::c8_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	ADDRESS_MAP_UNMAP_HIGH
 
@@ -830,7 +820,7 @@ m68hc05c8_device::m68hc05c8_device(machine_config const &mconfig, char const *ta
 			owner,
 			clock,
 			M68HC05C8,
-			address_map_delegate(FUNC(m68hc05c8_device::c8_map), this))
+			address_map_constructor(FUNC(m68hc05c8_device::c8_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
@@ -845,15 +835,10 @@ void m68hc05c8_device::device_start()
 }
 
 
-offs_t m68hc05c8_device::disasm_disassemble(
-		std::ostream &stream,
-		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
-		u32 options)
+util::disasm_interface *m68hc05c8_device::create_disassembler()
 {
 	// same I/O registers as MC68HC05C4
-	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options, m68hc05c4_syms);
+	return new m68hc05_disassembler(m68hc05c4_syms);
 }
 
 
@@ -862,7 +847,7 @@ offs_t m68hc05c8_device::disasm_disassemble(
  * MC68HC705C8A device
  ****************************************************************************/
 
-DEVICE_ADDRESS_MAP_START( c8a_map, 8, m68hc705c8a_device )
+ADDRESS_MAP_START(m68hc705c8a_device::c8a_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	ADDRESS_MAP_UNMAP_HIGH
 
@@ -905,7 +890,7 @@ m68hc705c8a_device::m68hc705c8a_device(machine_config const &mconfig, char const
 			owner,
 			clock,
 			M68HC705C8A,
-			address_map_delegate(FUNC(m68hc705c8a_device::c8a_map), this))
+			address_map_constructor(FUNC(m68hc705c8a_device::c8a_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
@@ -937,12 +922,7 @@ void m68hc705c8a_device::device_reset()
 }
 
 
-offs_t m68hc705c8a_device::disasm_disassemble(
-		std::ostream &stream,
-		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
-		u32 options)
+util::disasm_interface *m68hc705c8a_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options, m68hc705c8a_syms);
+	return new m68hc05_disassembler(m68hc705c8a_syms);
 }

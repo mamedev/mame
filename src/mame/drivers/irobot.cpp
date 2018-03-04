@@ -86,8 +86,8 @@
 #include "machine/nvram.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK      XTAL_12_096MHz
-#define VIDEO_CLOCK     XTAL_20MHz
+#define MAIN_CLOCK      XTAL(12'096'000)
+#define VIDEO_CLOCK     XTAL(20'000'000)
 
 /*************************************
  *
@@ -149,7 +149,7 @@ WRITE8_MEMBER(irobot_state::quad_pokeyn_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( irobot_map, AS_PROGRAM, 8, irobot_state )
+ADDRESS_MAP_START(irobot_state::irobot_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x1000, 0x103f) AM_READ_PORT("IN0")
@@ -298,10 +298,10 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( irobot )
+MACHINE_CONFIG_START(irobot_state::irobot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8)
+	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(irobot_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

@@ -33,6 +33,10 @@ public:
 	DECLARE_DRIVER_INIT(alto2);
 	DECLARE_MACHINE_RESET(alto2);
 
+	void alto2(machine_config &config);
+	void alto2_const_map(address_map &map);
+	void alto2_iomem_map(address_map &map);
+	void alto2_ucode_map(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -260,30 +264,30 @@ ROM_END
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START( alto2_ucode_map, 0, 32, alto2_state )
+ADDRESS_MAP_START(alto2_state::alto2_ucode_map)
 	AM_RANGE(0, 4*ALTO2_UCODE_PAGE_SIZE-1) AM_DEVICE32( "maincpu", alto2_cpu_device, ucode_map, 0xffffffffUL )
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( alto2_const_map, 1, 16, alto2_state )
+ADDRESS_MAP_START(alto2_state::alto2_const_map)
 	AM_RANGE(0, ALTO2_CONST_SIZE-1) AM_DEVICE16( "maincpu", alto2_cpu_device, const_map, 0xffffU )
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( alto2_iomem_map, 2, 16, alto2_state )
+ADDRESS_MAP_START(alto2_state::alto2_iomem_map)
 	AM_RANGE(0, 2*ALTO2_RAM_SIZE-1) AM_DEVICE16( "maincpu", alto2_cpu_device, iomem_map, 0xffffU )
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( alto2 )
+MACHINE_CONFIG_START(alto2_state::alto2)
 	// Basic machine hardware
 	// SYSCLK is Display Control part A51 (tagged 29.4MHz) divided by 5(?)
 	// 5.8MHz according to de.wikipedia.org/wiki/Xerox_Alto
-	MCFG_CPU_ADD("maincpu", ALTO2, XTAL_29_4912MHz/5)
+	MCFG_CPU_ADD("maincpu", ALTO2, XTAL(29'491'200)/5)
 	MCFG_CPU_PROGRAM_MAP(alto2_ucode_map)
 	MCFG_CPU_DATA_MAP(alto2_const_map)
 	MCFG_CPU_IO_MAP(alto2_iomem_map)
 
 	// Video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white())
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20_16MHz,
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'160'000),
 			 A2_DISP_TOTAL_WIDTH, 0, A2_DISP_WIDTH,
 			 A2_DISP_TOTAL_HEIGHT, 0, A2_DISP_HEIGHT)
 	// Two interlaced fields at 60Hz => 30Hz frame rate

@@ -117,6 +117,17 @@ public:
 	TIMER_CALLBACK_MEMBER(intv_interrupt_complete);
 	TIMER_CALLBACK_MEMBER(intv_btb_fill);
 
+	void intvkbd(machine_config &config);
+	void intv2(machine_config &config);
+	void intvoice(machine_config &config);
+	void intvecs(machine_config &config);
+	void intv(machine_config &config);
+	void intv2_mem(address_map &map);
+	void intv_mem(address_map &map);
+	void intvecs_mem(address_map &map);
+	void intvkbd2_mem(address_map &map);
+	void intvkbd_mem(address_map &map);
+	void intvoice_mem(address_map &map);
 protected:
 	int m_is_keybd;
 

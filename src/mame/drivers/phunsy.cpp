@@ -63,6 +63,10 @@ public:
 	DECLARE_PALETTE_INIT(phunsy);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void phunsy(machine_config &config);
+	void phunsy_data(address_map &map);
+	void phunsy_io(address_map &map);
+	void phunsy_mem(address_map &map);
 private:
 	uint8_t       m_data_out;
 	uint8_t       m_keyboard_input;
@@ -85,7 +89,7 @@ READ_LINE_MEMBER(phunsy_state::cass_r)
 	return (m_cass->input() > 0.03) ? 0 : 1;
 }
 
-static ADDRESS_MAP_START( phunsy_mem, AS_PROGRAM, 8, phunsy_state )
+ADDRESS_MAP_START(phunsy_state::phunsy_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("videoram") // Video RAM
@@ -94,11 +98,11 @@ static ADDRESS_MAP_START( phunsy_mem, AS_PROGRAM, 8, phunsy_state )
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bankq") // Banked RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( phunsy_io, AS_IO, 8, phunsy_state )
+ADDRESS_MAP_START(phunsy_state::phunsy_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( phunsy_data, AS_DATA, 8, phunsy_state )
+ADDRESS_MAP_START(phunsy_state::phunsy_data)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(phunsy_ctrl_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(phunsy_data_r, phunsy_data_w)
@@ -330,9 +334,9 @@ DRIVER_INIT_MEMBER( phunsy_state, phunsy )
 	membank("bankq")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( phunsy )
+MACHINE_CONFIG_START(phunsy_state::phunsy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(phunsy_mem)
 	MCFG_CPU_IO_MAP(phunsy_io)
 	MCFG_CPU_DATA_MAP(phunsy_data)
@@ -347,7 +351,7 @@ static MACHINE_CONFIG_START( phunsy )
 	   - 16us not active, 48us active: ( 64 * 6 ) * 60 / 48 => 480 pixels wide
 	   - 313 line display of which 256 are displayed.
 	*/
-	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz, 480, 0, 64*6, 313, 0, 256)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(8'000'000), 480, 0, 64*6, 313, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(phunsy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

@@ -3,8 +3,10 @@
 // *******************************
 // Driver for HP 9845B/C/T systems
 // *******************************
-#ifndef _HP9845_H_
-#define _HP9845_H_
+#ifndef MAME_INCLUDES_HP9845_H
+#define MAME_INCLUDES_HP9845_H
+
+#pragma once
 
 #include "cpu/hphybrid/hphybrid.h"
 #include "machine/hp_taco.h"
@@ -12,12 +14,16 @@
 #include "bus/hp9845_io/hp9845_io.h"
 #include "screen.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 
 class hp9845_base_state : public driver_device
 {
 public:
 	hp9845_base_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	DECLARE_INPUT_CHANGED_MEMBER(togglekey_changed);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_reset() override;
@@ -26,13 +32,13 @@ public:
 
 	virtual DECLARE_READ16_MEMBER(graphic_r) = 0;
 	virtual DECLARE_WRITE16_MEMBER(graphic_w) = 0;
-	attotime time_to_gv_mem_availability(void) const;
+	attotime time_to_gv_mem_availability() const;
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
-	void update_irq(void);
+	void update_irq();
 	DECLARE_WRITE8_MEMBER(irq_w);
 	void irq_w(uint8_t sc , int state);
-	void update_flg_sts(void);
+	void update_flg_sts();
 	DECLARE_WRITE8_MEMBER(sts_w);
 	void sts_w(uint8_t sc , int state);
 	DECLARE_WRITE8_MEMBER(flg_w);
@@ -46,6 +52,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(pa_w);
 
+	DECLARE_WRITE_LINE_MEMBER(prt_irl_w);
+	DECLARE_WRITE_LINE_MEMBER(prt_flg_w);
+	DECLARE_WRITE_LINE_MEMBER(prt_sts_w);
 	DECLARE_WRITE_LINE_MEMBER(t14_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(t14_flg_w);
 	DECLARE_WRITE_LINE_MEMBER(t14_sts_w);
@@ -53,33 +62,30 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(t15_flg_w);
 	DECLARE_WRITE_LINE_MEMBER(t15_sts_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(togglekey_changed);
+	void hp9845_base(machine_config &config);
+	void global_mem_map(address_map &map);
+	void ppu_io_map(address_map &map);
 
-protected:
 	required_device<hp_5061_3001_cpu_device> m_lpu;
 	required_device<hp_5061_3001_cpu_device> m_ppu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<timer_device> m_gv_timer;
-	required_ioport m_io_key0;
-	required_ioport m_io_key1;
-	required_ioport m_io_key2;
-	required_ioport m_io_key3;
+	required_ioport_array<4> m_io_key;
 	required_ioport m_io_shiftlock;
 	required_device<hp_taco_device> m_t14;
 	required_device<hp_taco_device> m_t15;
 	required_device<beep_device> m_beeper;
 	required_device<timer_device> m_beep_timer;
-	required_device<hp9845_io_slot_device> m_io_slot0;
-	required_device<hp9845_io_slot_device> m_io_slot1;
-	required_device<hp9845_io_slot_device> m_io_slot2;
-	required_device<hp9845_io_slot_device> m_io_slot3;
+	required_device_array<hp9845_io_slot_device, 4> m_io_slot;
 	required_device<ram_device> m_ram;
+	output_finder<8> m_softkeys;
 
 	void setup_ram_block(unsigned block , unsigned offset);
 
 	virtual void advance_gv_fsm(bool ds , bool trigger) = 0;
-	void kb_scan_ioport(ioport_value pressed , ioport_port *port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx);
+	void kb_scan_ioport(ioport_value pressed , ioport_port &port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx);
+	void update_kb_prt_irq();
 
 	// Character generator
 	required_region_ptr<uint8_t> m_chargen;
@@ -140,6 +146,9 @@ protected:
 	ioport_value m_kb_state[ 4 ];
 	uint8_t m_kb_scancode;
 	uint16_t m_kb_status;
+
+	// Printer
+	bool m_prt_irl;
 };
 
-#endif /* _HP9845_H_ */
+#endif // MAME_INCLUDES_HP9845_H

@@ -57,4 +57,13 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_crospang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
+	void crospang(machine_config &config);
+	void bestri(machine_config &config);
+	void bestria(machine_config &config);
+	void bestri_map(address_map &map);
+	void bestria_map(address_map &map);
+	void crospang_base_map(address_map &map);
+	void crospang_map(address_map &map);
+	void crospang_sound_io_map(address_map &map);
+	void crospang_sound_map(address_map &map);
 };

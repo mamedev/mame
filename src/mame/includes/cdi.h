@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#ifndef _INCLUDES_CDI_H_
-#define _INCLUDES_CDI_H_
+
+#ifndef MAME_INCLUDES_CDI_H
+#define MAME_INCLUDES_CDI_H
 
 #include "machine/cdi070.h"
 #include "machine/cdislave.h"
@@ -12,8 +13,8 @@
 
 /*----------- driver state -----------*/
 
-#define CLOCK_A XTAL_30MHz
-#define CLOCK_B XTAL_19_6608MHz
+#define CLOCK_A XTAL(30'000'000)
+#define CLOCK_B XTAL(19'660'800)
 
 class cdi_state : public driver_device
 {
@@ -120,6 +121,20 @@ public:
 
 	uint32_t screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void cdimono1(machine_config &config);
+	void cdimono2(machine_config &config);
+	void quizard4(machine_config &config);
+	void cdimono1_base(machine_config &config);
+	void cdi910(machine_config &config);
+	void quizard2(machine_config &config);
+	void quizard3(machine_config &config);
+	void quizard1(machine_config &config);
+	void quizard(machine_config &config);
+	void cdi910_mem(address_map &map);
+	void cdimono1_mem(address_map &map);
+	void cdimono2_mem(address_map &map);
+	void cdimono2_servo_mem(address_map &map);
+	void cdimono2_slave_mem(address_map &map);
 };
 
 /*----------- debug defines -----------*/
@@ -130,4 +145,4 @@ public:
 
 #define ENABLE_UART_PRINTING (0)
 
-#endif // _INCLUDES_CDI_H_
+#endif // MAME_INCLUDES_CDI_H

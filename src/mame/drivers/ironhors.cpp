@@ -15,7 +15,6 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "sound/discrete.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -49,7 +48,6 @@ WRITE8_MEMBER(ironhors_state::sh_irqtrigger_w)
 
 WRITE8_MEMBER(ironhors_state::filter_w)
 {
-	discrete_device *m_disc_ih = machine().device<discrete_device>("disc_ih");
 	m_disc_ih->write(space, NODE_11, (data & 0x04) >> 2);
 	m_disc_ih->write(space, NODE_12, (data & 0x02) >> 1);
 	m_disc_ih->write(space, NODE_13, (data & 0x01) >> 0);
@@ -61,7 +59,7 @@ WRITE8_MEMBER(ironhors_state::filter_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, ironhors_state )
+ADDRESS_MAP_START(ironhors_state::master_map)
 	AM_RANGE(0x0000, 0x0002) AM_RAM
 	AM_RANGE(0x0003, 0x0003) AM_RAM_WRITE(charbank_w)
 	AM_RANGE(0x0004, 0x0004) AM_RAM AM_SHARE("int_enable")
@@ -89,23 +87,24 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, ironhors_state )
+ADDRESS_MAP_START(ironhors_state::slave_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_io_map, AS_IO, 8, ironhors_state )
+ADDRESS_MAP_START(ironhors_state::slave_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( farwest_master_map, AS_PROGRAM, 8, ironhors_state )
+ADDRESS_MAP_START(ironhors_state::farwest_master_map)
+	AM_RANGE(0x0000, 0x1bff) AM_ROM
+
 	AM_RANGE(0x0000, 0x0002) AM_RAM
 	//20=31db
 
 	AM_RANGE(0x0005, 0x001f) AM_RAM
-	AM_RANGE(0x31db, 0x31fa) AM_RAM AM_SHARE("scroll")
 	AM_RANGE(0x0040, 0x005f) AM_RAM
 	AM_RANGE(0x0060, 0x00ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
@@ -122,19 +121,19 @@ static ADDRESS_MAP_START( farwest_master_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x1a00, 0x1a00) AM_RAM AM_SHARE("int_enable")
 	AM_RANGE(0x1a01, 0x1a01) AM_RAM_WRITE(charbank_w)
 	AM_RANGE(0x1a02, 0x1a02) AM_WRITE(palettebank_w)
-	AM_RANGE(0x0000, 0x1bff) AM_ROM
 //  AM_RANGE(0x1c00, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM
 	AM_RANGE(0x1c00, 0x1dff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0x3000, 0x38ff) AM_RAM
+	AM_RANGE(0x31db, 0x31fa) AM_RAM AM_SHARE("scroll")
 	AM_RANGE(0x1e00, 0x1eff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3900, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( farwest_slave_map, AS_PROGRAM, 8, ironhors_state )
+ADDRESS_MAP_START(ironhors_state::farwest_slave_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
@@ -360,14 +359,29 @@ void ironhors_state::machine_reset()
 	m_spriterambank = 0;
 }
 
-static MACHINE_CONFIG_START( ironhors )
+/*
+clock measurements:
+main Xtal is 18.432mhz
+
+Z80 runs at 3.072mhz
+
+M6809E runs at 1.532mhz ( NOT 3.072mhz)
+
+Vsync is 61hz
+
+Hsync is 15,56khz
+
+These clocks make the emulation run too fast.
+*/
+
+MACHINE_CONFIG_START(ironhors_state::ironhors)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
+	MCFG_CPU_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ironhors_state, irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu",Z80,18432000/6)      /* 3.072 MHz */
+	MCFG_CPU_ADD("soundcpu", Z80, 18432000/6)      /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_IO_MAP(slave_io_map)
 
@@ -426,7 +440,8 @@ READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
 	return m_soundlatch->read(m_soundcpu->space(AS_PROGRAM), 0);
 }
 
-static MACHINE_CONFIG_DERIVED( farwest, ironhors )
+MACHINE_CONFIG_START(ironhors_state::farwest)
+	ironhors(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(farwest_master_map)
@@ -435,7 +450,7 @@ static MACHINE_CONFIG_DERIVED( farwest, ironhors )
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(farwest_slave_map)
-	MCFG_CPU_IO_MAP(0)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", farwest)
 	MCFG_VIDEO_START_OVERRIDE(ironhors_state,farwest)

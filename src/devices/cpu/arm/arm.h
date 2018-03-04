@@ -17,7 +17,7 @@
  ***************************************************************************************************/
 
 #define MCFG_ARM_COPRO(_type) \
-	arm_cpu_device::set_copro_type(*device, arm_cpu_device::copro_type::_type);
+	downcast<arm_cpu_device &>(*device).set_copro_type(arm_cpu_device::copro_type::_type);
 
 
 class arm_cpu_device : public cpu_device
@@ -32,7 +32,7 @@ public:
 	// construction/destruction
 	arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_copro_type(device_t &device, copro_type type) { downcast<arm_cpu_device &>(device).m_copro_type = type; }
+	void set_copro_type(copro_type type) { m_copro_type = type; }
 
 protected:
 	enum
@@ -64,9 +64,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	address_space_config m_program_config;
 
@@ -76,7 +74,7 @@ protected:
 	uint8_t m_pendingIrq;
 	uint8_t m_pendingFiq;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	endianness_t m_endian;
 	copro_type m_copro_type;
 
@@ -111,9 +109,6 @@ class arm_be_cpu_device : public arm_cpu_device
 public:
 	// construction/destruction
 	arm_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 };
 
 

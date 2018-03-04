@@ -130,7 +130,7 @@ WRITE32_MEMBER(superchs_state::superchs_stick_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( superchs_map, AS_PROGRAM, 32, superchs_state )
+ADDRESS_MAP_START(superchs_state::superchs_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_SHARE("spriteram")
@@ -138,13 +138,13 @@ static ADDRESS_MAP_START( superchs_map, AS_PROGRAM, 32, superchs_state )
 	AM_RANGE(0x1b0000, 0x1b002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x240000, 0x240003) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x280000, 0x287fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x287fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x2c0000, 0x2c07ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff)
 	AM_RANGE(0x300000, 0x300007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
 	AM_RANGE(0x340000, 0x340003) AM_READWRITE(superchs_stick_r, superchs_stick_w)   /* stick int request */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( superchs_cpub_map, AS_PROGRAM, 16, superchs_state )
+ADDRESS_MAP_START(superchs_state::superchs_cpub_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_device, word_w) /* Only written upon errors */
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( superchs_cpub_map, AS_PROGRAM, 16, superchs_state )
 	AM_RANGE(0xa00000, 0xa001ff) AM_RAM /* Extra road control?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chase3_cpub_map, AS_PROGRAM, 16, superchs_state )
+ADDRESS_MAP_START(superchs_state::chase3_cpub_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
@@ -237,14 +237,14 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_CONFIG_START( superchs )
+MACHINE_CONFIG_START(superchs_state::superchs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20MHz - verified */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20MHz - verified */
 	MCFG_CPU_PROGRAM_MAP(superchs_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL_32MHz/2) /* 16MHz - verified */
+	MCFG_CPU_ADD("sub", M68000, XTAL(32'000'000)/2) /* 16MHz - verified */
 	MCFG_CPU_PROGRAM_MAP(superchs_cpub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
 
@@ -286,7 +286,8 @@ static MACHINE_CONFIG_START( superchs )
 	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chase3, superchs )
+MACHINE_CONFIG_START(superchs_state::chase3)
+	superchs(config);
 
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(chase3_cpub_map)
@@ -568,16 +569,16 @@ ROM_END
 
 READ32_MEMBER(superchs_state::main_cycle_r)
 {
-	if (space.device().safe_pc()==0x702)
-		space.device().execute().spin_until_interrupt();
+	if (m_maincpu->pc()==0x702)
+		m_maincpu->spin_until_interrupt();
 
 	return m_ram[0];
 }
 
 READ16_MEMBER(superchs_state::sub_cycle_r)
 {
-	if (space.device().safe_pc()==0x454)
-		space.device().execute().spin_until_interrupt();
+	if (m_subcpu->pc()==0x454)
+		m_subcpu->spin_until_interrupt();
 
 	return m_ram[2]&0xffff;
 }

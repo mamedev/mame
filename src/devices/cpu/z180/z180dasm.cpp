@@ -8,23 +8,9 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
-#include "z180.h"
+#include "z180dasm.h"
 
-enum e_mnemonics {
-	zADC   ,zADD   ,zAND   ,zBIT   ,zCALL  ,zCCF   ,zCP    ,zCPD   ,
-	zCPDR  ,zCPI   ,zCPIR  ,zCPL   ,zDAA   ,zDB    ,zDEC   ,zDI    ,
-	zDJNZ  ,zEI    ,zEX    ,zEXX   ,zHLT   ,zIM    ,zIN    ,zIN0   ,
-	zINC   ,zIND   ,zINDR  ,zINI   ,zINIR  ,zJP    ,zJR    ,zLD    ,
-	zLDD   ,zLDDR  ,zLDI   ,zLDIR  ,zMLT   ,zNEG   ,zNOP   ,zOR    ,
-	zOTDM  ,zOTDMR ,zOTDR  ,zOTIM  ,zOTIMR ,zOTIR  ,zOUT   ,zOUT0  ,
-	zOUTD  ,zOUTI  ,zPOP   ,zPUSH  ,zRES   ,zRET   ,zRETI  ,zRETN  ,
-	zRL    ,zRLA   ,zRLC   ,zRLCA  ,zRLD   ,zRR    ,zRRA   ,zRRC   ,
-	zRRCA  ,zRRD   ,zRST   ,zSBC   ,zSCF   ,zSET   ,zSLA   ,zSLL   ,
-	zSLP   ,zSRA   ,zSRL   ,zSUB   ,zTST   ,zTSTIO ,zXOR
-};
-
-static const char *const s_mnemonic[] = {
+const char *const z180_disassembler::s_mnemonic[] = {
 	"adc"  ,"add"  ,"and"  ,"bit"  ,"call" ,"ccf"  ,"cp"   ,"cpd"  ,
 	"cpdr" ,"cpi"  ,"cpir" ,"cpl"  ,"daa"  ,"db"   ,"dec"  ,"di"   ,
 	"djnz" ,"ei"   ,"ex"   ,"exx"  ,"halt" ,"im"   ,"in"   ,"in0"  ,
@@ -37,12 +23,7 @@ static const char *const s_mnemonic[] = {
 	"slp"  ,"sra"  ,"srl"  ,"sub"  ,"tst"  ,"tstio","xor "
 };
 
-struct z80dasm {
-	uint8_t mnemonic;
-	const char *arguments;
-};
-
-static const z80dasm mnemonic_xx_cb[256]= {
+const z180_disassembler::z80dasm z180_disassembler::mnemonic_xx_cb[256]= {
 	{zRLC,"b=Y"},   {zRLC,"c=Y"},   {zRLC,"d=Y"},   {zRLC,"e=Y"},
 	{zRLC,"h=Y"},   {zRLC,"l=Y"},   {zRLC,"Y"},     {zRLC,"a=Y"},
 	{zRRC,"b=Y"},   {zRRC,"c=Y"},   {zRRC,"d=Y"},   {zRRC,"e=Y"},
@@ -109,7 +90,7 @@ static const z80dasm mnemonic_xx_cb[256]= {
 	{zSET,"h=7,Y"}, {zSET,"l=7,Y"}, {zSET,"7,Y"},   {zSET,"a=7,Y"}
 };
 
-static const z80dasm mnemonic_cb[256] = {
+const z180_disassembler::z80dasm z180_disassembler::mnemonic_cb[256] = {
 	{zRLC,"b"},     {zRLC,"c"},     {zRLC,"d"},     {zRLC,"e"},
 	{zRLC,"h"},     {zRLC,"l"},     {zRLC,"(hl)"},  {zRLC,"a"},
 	{zRRC,"b"},     {zRRC,"c"},     {zRRC,"d"},     {zRRC,"e"},
@@ -176,7 +157,7 @@ static const z80dasm mnemonic_cb[256] = {
 	{zSET,"7,h"},   {zSET,"7,l"},   {zSET,"7,(hl)"},{zSET,"7,a"}
 };
 
-static const z80dasm mnemonic_ed[256]= {
+const z180_disassembler::z80dasm z180_disassembler::mnemonic_ed[256]= {
 	{zIN0,"b,(B)"}, {zOUT0,"(B),b"},{zDB,"?"},      {zDB,"?"},
 	{zTST,"b"},     {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zIN0,"c,(B)"}, {zOUT0,"(B),c"},{zDB,"?"},      {zDB,"?"},
@@ -243,7 +224,7 @@ static const z80dasm mnemonic_ed[256]= {
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"}
 };
 
-static const z80dasm mnemonic_xx[256]= {
+const z180_disassembler::z80dasm z180_disassembler::mnemonic_xx[256]= {
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zADD,"I,bc"},  {zDB,"?"},      {zDB,"?"},
@@ -310,7 +291,7 @@ static const z80dasm mnemonic_xx[256]= {
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"}
 };
 
-static const z80dasm mnemonic_main[256]= {
+const z180_disassembler::z80dasm z180_disassembler::mnemonic_main[256]= {
 	{zNOP,nullptr},       {zLD,"bc,N"},   {zLD,"(bc),a"}, {zINC,"bc"},
 	{zINC,"b"},     {zDEC,"b"},     {zLD,"b,B"},    {zRLCA,nullptr},
 	{zEX,"af,af'"}, {zADD,"hl,bc"}, {zLD,"a,(bc)"}, {zDEC,"bc"},
@@ -377,12 +358,12 @@ static const z80dasm mnemonic_main[256]= {
 	{zCALL,"m,A"},  {zDB,"fd"},     {zCP,"B"},      {zRST,"V"}
 };
 
-static char sign(int8_t offset)
+char z180_disassembler::sign(int8_t offset)
 {
 	return (offset < 0)? '-':'+';
 }
 
-static int offs(int8_t offset)
+int z180_disassembler::offs(int8_t offset)
 {
 	if (offset < 0) return -offset;
 	return offset;
@@ -391,49 +372,48 @@ static int offs(int8_t offset)
 /****************************************************************************
  * Disassemble opcode at PC and return number of bytes it takes
  ****************************************************************************/
-CPU_DISASSEMBLE(z180)
+offs_t z180_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	const z80dasm *d;
 	const char *src, *ixy;
-	unsigned PC = pc;
 	int8_t offset = 0;
 	uint8_t op, op1 = 0;
 	uint16_t ea;
-	int pos = 0;
+	offs_t pos = pc;
 	uint32_t flags = 0;
 
 	ixy = "oops!!";
 
-	op = oprom[pos++];
+	op = opcodes.r8(pos++);
 
 	switch (op)
 	{
 	case 0xcb:
-		op = oprom[pos++];
+		op = opcodes.r8(pos++);
 		d = &mnemonic_cb[op];
 		break;
 	case 0xed:
-		op1 = oprom[pos++];
+		op1 = opcodes.r8(pos++);
 		d = &mnemonic_ed[op1];
 		break;
 	case 0xdd:
 		ixy = "ix";
-		op1 = oprom[pos++];
+		op1 = opcodes.r8(pos++);
 		if( op1 == 0xcb )
 		{
-			offset = (int8_t) opram[pos++];
-			op1 = opram[pos++]; /* fourth byte from opbase.ram! */
+			offset = (int8_t) params.r8(pos++);
+			op1 = params.r8(pos++); /* fourth byte from opbase.ram! */
 			d = &mnemonic_xx_cb[op1];
 		}
 		else d = &mnemonic_xx[op1];
 		break;
 	case 0xfd:
 		ixy = "iy";
-		op1 = oprom[pos++];
+		op1 = opcodes.r8(pos++);
 		if( op1 == 0xcb )
 		{
-			offset = (int8_t) opram[pos++];
-			op1 = opram[pos++]; /* fourth byte from opbase.ram! */
+			offset = (int8_t) params.r8(pos++);
+			op1 = params.r8(pos++); /* fourth byte from opbase.ram! */
 			d = &mnemonic_xx_cb[op1];
 		}
 		else d = &mnemonic_xx[op1];
@@ -455,25 +435,25 @@ CPU_DISASSEMBLE(z180)
 				util::stream_format(stream, "$%02x,$%02x", op, op1);
 				break;
 			case 'A':
-				ea = opram[pos] + (opram[pos+1] << 8);
+				ea = params.r16(pos);
 				pos += 2;
 				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'B':   /* Byte op arg */
-				ea = opram[pos++];
+				ea = params.r8(pos++);
 				util::stream_format(stream, "$%02X", ea);
 				break;
 			case 'N':   /* Immediate 16 bit */
-				ea = opram[pos] + ( opram[pos+1] << 8 );
+				ea = params.r16(pos);
 				pos += 2;
 				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'O':   /* Offset relative to PC */
-				offset = (int8_t) opram[pos++];
-				util::stream_format(stream, "$%05X", PC + offset + 2);
+				offset = (int8_t) params.r8(pos++);
+				util::stream_format(stream, "$%05X", pc + offset + 2);
 				break;
 			case 'P':   /* Port number */
-				ea = opram[pos++];
+				ea = params.r8(pos++);
 				util::stream_format(stream, "$%02X", ea);
 				break;
 			case 'V':   /* Restart vector */
@@ -481,12 +461,12 @@ CPU_DISASSEMBLE(z180)
 				util::stream_format(stream, "$%02X", ea);
 				break;
 			case 'W':   /* Memory address word */
-				ea = opram[pos] + (opram[pos+1] << 8);
+				ea = params.r16(pos);
 				pos += 2;
 				util::stream_format(stream, "$%05X", ea);
 				break;
 			case 'X':
-				offset = (int8_t) opram[pos++];
+				offset = (int8_t) params.r8(pos++);
 			case 'Y':
 				util::stream_format(stream,"(%s%c$%02x)", ixy, sign(offset), offs(offset));
 				break;
@@ -507,9 +487,14 @@ CPU_DISASSEMBLE(z180)
 	if (d->mnemonic == zCALL || d->mnemonic == zCPDR || d->mnemonic == zCPIR || d->mnemonic == zDJNZ ||
 		d->mnemonic == zHLT  || d->mnemonic == zINDR || d->mnemonic == zINIR || d->mnemonic == zLDDR ||
 		d->mnemonic == zLDIR || d->mnemonic == zOTDR || d->mnemonic == zOTIR || d->mnemonic == zRST)
-		flags = DASMFLAG_STEP_OVER;
+		flags = STEP_OVER;
 	else if (d->mnemonic == zRETN || d->mnemonic == zRET || d->mnemonic == zRETI)
-		flags = DASMFLAG_STEP_OUT;
+		flags = STEP_OUT;
 
-	return pos | flags | DASMFLAG_SUPPORTED;
+	return (pos - pc) | flags | SUPPORTED;
+}
+
+u32 z180_disassembler::opcode_alignment() const
+{
+	return 1;
 }

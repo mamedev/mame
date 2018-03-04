@@ -54,4 +54,9 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void superchs(machine_config &config);
+	void chase3(machine_config &config);
+	void chase3_cpub_map(address_map &map);
+	void superchs_cpub_map(address_map &map);
+	void superchs_map(address_map &map);
 };

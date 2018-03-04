@@ -2,11 +2,10 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        Elektor SC/MP
+Elektor SC/MP
 
-        22/11/2009 Skeleton driver.
-
-        10/MAY/2012 Added keyboard [Robbbert]
+2009-11-22 Skeleton driver.
+2012-05-10 Added keyboard [Robbbert]
 
 To Use:
 - Press MINUS to enter data input mode
@@ -33,35 +32,43 @@ class elekscmp_state : public driver_device
 {
 public:
 	elekscmp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_x0(*this, "X0"),
-		m_x1(*this, "X1"),
-		m_x2(*this, "X2"),
-		m_x3(*this, "X3") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_x(*this, "X%u", 0U)
+		, m_digit(*this, "digit%u", 0U)
+	{ }
+
+	void elekscmp(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(hex_display_w);
 	uint8_t convert_key(uint8_t data);
 
-protected:
+	void mem_map(address_map &map);
+
+private:
 	required_device<cpu_device> m_maincpu;
-	required_ioport m_x0;
-	required_ioport m_x1;
-	required_ioport m_x2;
-	required_ioport m_x3;
+	required_ioport_array<4> m_x;
+	output_finder<8> m_digit;
 };
 
 
+void elekscmp_state::machine_start()
+{
+	m_digit.resolve();
+}
+
 WRITE8_MEMBER(elekscmp_state::hex_display_w)
 {
-	output().set_digit_value(offset, data);
+	m_digit[offset & 0x7] = data;
 }
 
 uint8_t elekscmp_state::convert_key(uint8_t data)
 {
-	uint8_t i;
-	for (i = 0; i < 8; i++)
+	for (u8 i = 0; i < 8; i++)
 		if (BIT(data, i))
 			return i;
 
@@ -72,30 +79,26 @@ READ8_MEMBER(elekscmp_state::keyboard_r)
 {
 	uint8_t data;
 
-	data = m_x0->read();
-
+	data = m_x[0]->read();
 	if (data)
 		return 0x80 | convert_key(data);
 
-	data = m_x1->read();
-
+	data = m_x[1]->read();
 	if (data)
 		return 0x88 | convert_key(data);
 
-	data = m_x2->read();
-
+	data = m_x[2]->read();
 	if (data)
 		return 0x80 | (convert_key(data) << 4);
 
-	data = m_x3->read();
-
+	data = m_x[3]->read();
 	if (data)
 		m_maincpu->reset();
 
 	return 0;
 }
 
-static ADDRESS_MAP_START(elekscmp_mem, AS_PROGRAM, 8, elekscmp_state)
+ADDRESS_MAP_START(elekscmp_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
 	AM_RANGE(0x000, 0x5ff) AM_ROM // ROM
@@ -141,10 +144,10 @@ static INPUT_PORTS_START( elekscmp )
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( elekscmp )
+MACHINE_CONFIG_START(elekscmp_state::elekscmp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",INS8060, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(elekscmp_mem)
+	MCFG_CPU_ADD("maincpu",INS8060, XTAL(4'000'000))
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_elekscmp)

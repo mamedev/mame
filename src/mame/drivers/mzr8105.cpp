@@ -178,11 +178,13 @@ mzr8105_state(const machine_config &mconfig, device_type type, const char *tag) 
 	{
 	}
 
+	void mzr8105(machine_config &config);
+	void mzr8105_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START (mzr8105_mem, AS_PROGRAM, 16, mzr8105_state)
+ADDRESS_MAP_START(mzr8105_state::mzr8105_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 /* The ROMs contains an OS9 bootloader. It is position independent but reset vector suggests that it sits flat on adress 0 (zero) */
 	AM_RANGE (0x000000, 0x003fff) AM_ROM AM_REGION("roms", 0x000000) /* System EPROM Area 16Kb OS9 DEBUG - not verified     */
@@ -203,8 +205,8 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-MACHINE_CONFIG_START (mzr8105)
-	MCFG_CPU_ADD ("maincpu", M68000, XTAL_10MHz)
+MACHINE_CONFIG_START(mzr8105_state::mzr8105)
+	MCFG_CPU_ADD ("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP (mzr8105_mem)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_BUS_OWNER_SPACES()

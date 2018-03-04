@@ -104,7 +104,7 @@ WRITE8_MEMBER(finalizr_state::i8039_T0_w)
 	*/
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
+ADDRESS_MAP_START(finalizr_state::main_map)
 	AM_RANGE(0x0001, 0x0001) AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x0003, 0x0003) AM_WRITE(finalizr_videoctrl_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(finalizr_flipscreen_w)
@@ -132,11 +132,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, finalizr_state )
+ADDRESS_MAP_START(finalizr_state::sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, finalizr_state )
+ADDRESS_MAP_START(finalizr_state::sound_io_map)
 	AM_RANGE(0x00, 0xff)                   AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
@@ -260,14 +260,14 @@ void finalizr_state::machine_reset()
 	m_irq_enable = 0;
 }
 
-static MACHINE_CONFIG_START( finalizr )
+MACHINE_CONFIG_START(finalizr_state::finalizr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL_18_432MHz/6) /* ??? */
+	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL(18'432'000)/6) /* ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", finalizr_state, finalizr_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", I8039,XTAL_18_432MHz/2) /* 9.216MHz clkin ?? */
+	MCFG_CPU_ADD("audiocpu", I8039,XTAL(18'432'000)/2) /* 9.216MHz clkin ?? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( finalizr )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/12)
+	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL(18'432'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.325) // unknown DAC

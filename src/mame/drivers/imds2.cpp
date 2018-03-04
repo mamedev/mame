@@ -93,28 +93,28 @@
 #include "speaker.h"
 
 // CPU oscillator of IPC board: 8 MHz
-#define IPC_XTAL_Y2     XTAL_8MHz
+#define IPC_XTAL_Y2     XTAL(8'000'000)
 
 // Y1 oscillator of IPC board: 19.6608 MHz
-#define IPC_XTAL_Y1     XTAL_19_6608MHz
+#define IPC_XTAL_Y1     XTAL(19'660'800)
 
 // Main oscillator of IOC board: 22.032 MHz
 #define IOC_XTAL_Y2     22032000
 
 // FDC oscillator of IOC board: 8 MHz
-#define IOC_XTAL_Y1     XTAL_8MHz
+#define IOC_XTAL_Y1     XTAL(8'000'000)
 
 // PIO oscillator: 6 MHz
-#define IOC_XTAL_Y3     XTAL_6MHz
+#define IOC_XTAL_Y3     XTAL(6'000'000)
 
 // Frequency of beeper
 #define IOC_BEEP_FREQ   3300
 
-static ADDRESS_MAP_START(ipc_mem_map , AS_PROGRAM , 8 , imds2_state)
+ADDRESS_MAP_START(imds2_state::ipc_mem_map)
 	AM_RANGE(0x0000 , 0xffff) AM_READWRITE(ipc_mem_read, ipc_mem_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ipc_io_map , AS_IO , 8 , imds2_state)
+ADDRESS_MAP_START(imds2_state::ipc_io_map)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0xc0 , 0xc0) AM_READWRITE(imds2_ipc_dbbout_r , imds2_ipc_dbbin_data_w)
 	AM_RANGE(0xc1 , 0xc1) AM_READWRITE(imds2_ipc_status_r , imds2_ipc_dbbin_cmd_w)
@@ -129,13 +129,13 @@ static ADDRESS_MAP_START(ipc_io_map , AS_IO , 8 , imds2_state)
 	AM_RANGE(0xff , 0xff) AM_WRITE(imds2_ipc_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ioc_mem_map , AS_PROGRAM , 8 , imds2_state)
+ADDRESS_MAP_START(imds2_state::ioc_mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000 , 0x1fff) AM_ROM
 	AM_RANGE(0x4000 , 0x5fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ioc_io_map , AS_IO , 8 , imds2_state)
+ADDRESS_MAP_START(imds2_state::ioc_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00 , 0x0f) AM_WRITE(imds2_ioc_dbbout_w)
 	AM_RANGE(0x20 , 0x2f) AM_WRITE(imds2_ioc_f0_w)
@@ -753,7 +753,7 @@ static SLOT_INTERFACE_START( imds2_floppies )
 	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(imds2)
+MACHINE_CONFIG_START(imds2_state::imds2)
 		MCFG_CPU_ADD("ipccpu" , I8085A , IPC_XTAL_Y2 / 2)  // 4 MHz
 		MCFG_CPU_PROGRAM_MAP(ipc_mem_map)
 		MCFG_CPU_IO_MAP(ipc_io_map)
@@ -868,7 +868,7 @@ static MACHINE_CONFIG_START(imds2)
 		MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(imds2_state, imds2_pio_port_p2_w))
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
-		MCFG_CPU_ADD("kbcpu", I8741, XTAL_3_579545MHz)         /* 3.579545 MHz */
+		MCFG_CPU_ADD("kbcpu", I8741, XTAL(3'579'545))         /* 3.579545 MHz */
 		MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(imds2_state, imds2_kb_port_p1_w))
 		MCFG_MCS48_PORT_P2_IN_CB(READ8(imds2_state, imds2_kb_port_p2_r))
 		MCFG_MCS48_PORT_T0_IN_CB(READLINE(imds2_state, imds2_kb_port_t0_r))

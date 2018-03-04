@@ -230,13 +230,13 @@ WRITE8_MEMBER(renegade_state::coincounter_w)
 
 /********************************************************************************************/
 
-static ADDRESS_MAP_START( renegade_nomcu_map, AS_PROGRAM, 8, renegade_state )
+ADDRESS_MAP_START(renegade_state::renegade_nomcu_map)
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x3000, 0x30ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x3100, 0x31ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x3000, 0x30ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x3100, 0x31ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0") AM_WRITE(scroll_lsb_w)       /* Player#1 controls, P1,P2 start */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1") AM_WRITE(scroll_msb_w)       /* Player#2 controls, coin triggers */
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* DIP2  various IO ports */
@@ -248,13 +248,13 @@ static ADDRESS_MAP_START( renegade_nomcu_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( renegade_map, AS_PROGRAM, 8, renegade_state )
+ADDRESS_MAP_START(renegade_state::renegade_map)
+	AM_IMPORT_FROM(renegade_nomcu_map)
 	AM_RANGE(0x3804, 0x3804) AM_DEVREADWRITE("mcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0x3805, 0x3805) AM_READ(mcu_reset_r)
-	AM_IMPORT_FROM(renegade_nomcu_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( renegade_sound_map, AS_PROGRAM, 8, renegade_state )
+ADDRESS_MAP_START(renegade_state::renegade_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(adpcm_start_w)
@@ -463,14 +463,14 @@ void renegade_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( renegade )
+MACHINE_CONFIG_START(renegade_state::renegade)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12000000/8)  /* 1.5 MHz (measured) */
 	MCFG_CPU_PROGRAM_MAP(renegade_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", renegade_state, interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 12000000/8)
+	MCFG_CPU_ADD("audiocpu", MC6809, 12000000/2) // HD68A09P
 	MCFG_CPU_PROGRAM_MAP(renegade_sound_map)    /* IRQs are caused by the main CPU */
 
 	MCFG_DEVICE_ADD("mcu", TAITO68705_MCU, 12000000/4) // ?
@@ -505,7 +505,8 @@ static MACHINE_CONFIG_START( renegade )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( kuniokunb, renegade )
+MACHINE_CONFIG_START(renegade_state::kuniokunb)
+	renegade(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(renegade_nomcu_map)
 
@@ -564,7 +565,7 @@ ROM_START( kuniokun )
 	ROM_LOAD( "n0-5.bin",     0x8000, 0x8000, CRC(3587de3b) SHA1(f82e758254b21eb0c5a02469c72adb86d9577065) )
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 ) // MC68705P3
-	ROM_LOAD( "nz-0.bin",     0x0000, 0x0800, CRC(650bb5f0) SHA1(56a9679e3265de244ce2191a81b709992f012111) )
+	ROM_LOAD( "nz-0.bin",     0x0000, 0x0800, CRC(98a39880) SHA1(3bca7ba73bd9dba5d32e56a48e80b1f1e8257ed8) )
 
 	ROM_REGION( 0x08000, "chars", 0 )
 	ROM_LOAD( "ta18-25.bin",  0x0000, 0x8000, CRC(9bd2bea3) SHA1(fa79c9d4c71c1dbbf0e14cb8d6870f1f94b9af88) )

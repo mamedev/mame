@@ -318,7 +318,7 @@ INPUT_PORTS_END
 //  ADDRESS_MAP( svp_ssp_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START( md_svp_ssp_map, AS_PROGRAM, 16, md_rom_svp_device )
+ADDRESS_MAP_START(md_rom_svp_device::md_svp_ssp_map)
 //  AM_RANGE(0x0000, 0x03ff) AM_READ(rom_read1)
 //  AM_RANGE(0x0400, 0xffff) AM_READ(rom_read2)
 	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("iram_svp")
@@ -329,7 +329,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( svp_ext_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START( md_svp_ext_map, AS_IO, 16, md_rom_svp_device )
+ADDRESS_MAP_START(md_rom_svp_device::md_svp_ext_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xf)
 	AM_RANGE(0*2, 0*2+1) AM_READWRITE(read_pm0, write_pm0)
 	AM_RANGE(1*2, 1*2+1) AM_READWRITE(read_pm1, write_pm1)
@@ -345,7 +345,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( md_rom_svp_device::device_add_mconfig )
+MACHINE_CONFIG_START(md_rom_svp_device::device_add_mconfig)
 	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
 	MCFG_CPU_PROGRAM_MAP(md_svp_ssp_map)
 	MCFG_CPU_IO_MAP(md_svp_ext_map)

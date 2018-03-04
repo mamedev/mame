@@ -109,11 +109,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 	required_device<cpu_device> m_maincpu;
+	void maygayew(machine_config &config);
+	void maygayew_map(address_map &map);
 };
 
 
 
-static ADDRESS_MAP_START( maygayew_map, AS_PROGRAM, 16, maygayew_state )
+ADDRESS_MAP_START(maygayew_state::maygayew_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("mainrom",0)
 	AM_RANGE(0x100000, 0x13ffff) AM_ROM AM_REGION("mainrom",0)
 	AM_RANGE(0x200000, 0x23ffff) AM_ROM AM_REGION("mainrom",0)
@@ -125,7 +127,7 @@ static INPUT_PORTS_START( maygayew )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( maygayew )
+MACHINE_CONFIG_START(maygayew_state::maygayew)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,8000000) // MC68306FC16 - standard 68000 core + peripherals

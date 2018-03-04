@@ -375,6 +375,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void lindbergh(machine_config &config);
 };
 
 lindbergh_state::lindbergh_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag)
@@ -389,7 +390,7 @@ void lindbergh_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START(lindbergh)
+MACHINE_CONFIG_START(lindbergh_state::lindbergh)
 	MCFG_CPU_ADD("maincpu", PENTIUM4, 28000000U*5) /* Actually Celeron D at 2,8 GHz */
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
@@ -610,8 +611,8 @@ ROM_START(lbvbiosu)
 ROM_END
 
 GAME(1999, lindbios,         0, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Sega Lindbergh Bios",                      MACHINE_IS_BIOS_ROOT)
-GAME(2005, hotd4,     lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "House of the Dead 4 (Export) (Rev B)",     MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2005, hotd4a,    hotd4,    lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "House of the Dead 4 (Export) (Rev A)",     MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2005, hotd4,     lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev B)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2005, hotd4a,    hotd4,    lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev A)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2005, vf5,       lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Virtua Fighter 5 (Export)",                MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2006, abclimax,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "After Burner Climax (Export)",             MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2006, letsgoju,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Let's Go Jungle (Export)",                 MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
@@ -623,7 +624,7 @@ GAME(2007, ghostsev,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", 
 GAME(2007, initiad4,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Initial D4 (Rev D)",                       MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2007, initiad4c, initiad4, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Initial D4 (Rev C)",                       MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2007, segartv,   lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Sega Race-TV (Export)",                    MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2008, hotdex,    lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "House of the Dead EX (Japan)",             MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2008, hotdex,    lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "The House of the Dead EX (Japan)",         MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2008, primevah,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Primeval Hunt",                            MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2008, rambo,     lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Rambo (Export)",                           MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2009, hummerxt,  lindbios, lindbergh, 0, lindbergh_state, 0, ROT0, "Sega", "Hummer Extreme",                           MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)

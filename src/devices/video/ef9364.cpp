@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(EF9364, ef9364_device, "ef9364", "Thomson EF9364")
 //-------------------------------------------------
 // default address map
 //-------------------------------------------------
-static ADDRESS_MAP_START( ef9364, 0, 8, ef9364_device )
+ADDRESS_MAP_START(ef9364_device::ef9364)
 	AM_RANGE(0x00000, ( ( ef9364_device::TXTPLANE_MAX_SIZE * ef9364_device::MAX_TXTPLANES ) - 1 ) ) AM_RAM
 ADDRESS_MAP_END
 
@@ -65,33 +65,11 @@ ef9364_device::ef9364_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, EF9364, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("textram", ENDIANNESS_LITTLE, 8, 12, 0, nullptr, *ADDRESS_MAP_NAME(ef9364)),
+	m_space_config("textram", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(), address_map_constructor(FUNC(ef9364_device::ef9364), this)),
 	m_charset(*this, DEVICE_SELF),
 	m_palette(*this, finder_base::DUMMY_TAG)
 {
 	clock_freq = clock;
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void ef9364_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<ef9364_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_nb_of_pages: Set the number of hardware pages
-//-------------------------------------------------
-
-void ef9364_device::static_set_nb_of_pages(device_t &device, int nb_of_pages )
-{
-	if( nb_of_pages > 0 && nb_of_pages <= 8 )
-	{
-		downcast<ef9364_device &>(device).nb_of_pages = nb_of_pages;
-	}
 }
 
 //-------------------------------------------------
@@ -128,7 +106,7 @@ void ef9364_device::device_start()
 	palette[0] = rgb_t(0, 0, 0);
 	palette[1] = rgb_t(255, 255, 255);
 
-	m_screen_out.allocate( bitplane_xres, m_screen->height() );
+	m_screen_out.allocate( bitplane_xres, screen().height() );
 
 	cursor_cnt = 0;
 	cursor_state = 0;
@@ -171,12 +149,12 @@ void ef9364_device::set_video_mode(void)
 {
 	uint16_t new_width = bitplane_xres;
 
-	if (m_screen->width() != new_width)
+	if (screen().width() != new_width)
 	{
-		rectangle visarea = m_screen->visible_area();
+		rectangle visarea = screen().visible_area();
 		visarea.max_x = new_width - 1;
 
-		m_screen->configure(new_width, m_screen->height(), visarea, m_screen->frame_period().attoseconds());
+		screen().configure(new_width, screen().height(), visarea, screen().frame_period().attoseconds());
 	}
 
 	//border color

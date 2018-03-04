@@ -259,7 +259,7 @@ WRITE8_MEMBER(exprraid_state::exprraid_prot_data_w)
 			break;
 
 		default:
-			logerror("Unknown protection write: %x at PC:%x\n", data, space.device().safe_pc());
+			logerror("Unknown protection write: %x at %s\n", data, machine().describe_context());
 	}
 }
 
@@ -274,7 +274,7 @@ READ8_MEMBER(exprraid_state::vblank_r)
 }
 
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
+ADDRESS_MAP_START(exprraid_state::master_map)
 	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(exprraid_videoram_w) AM_SHARE("videoram")
@@ -296,11 +296,11 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_io_map, AS_IO, 8, exprraid_state )
+ADDRESS_MAP_START(exprraid_state::master_io_map)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, exprraid_state )
+ADDRESS_MAP_START(exprraid_state::slave_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ym2", ym3526_device, read, write)
@@ -487,14 +487,14 @@ void exprraid_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( exprraid )
+MACHINE_CONFIG_START(exprraid_state::exprraid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO16, XTAL_12MHz / 8)
+	MCFG_CPU_ADD("maincpu", DECO16, XTAL(12'000'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)
 
-	MCFG_CPU_ADD("slave", M6809, XTAL_12MHz / 8)
+	MCFG_CPU_ADD("slave", MC6809, XTAL(12'000'000) / 2) // MC68B09P
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	/* IRQs are caused by the YM3526 */
 
@@ -506,7 +506,7 @@ static MACHINE_CONFIG_START( exprraid )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 0, 256, 262, 8, 256-8) /* not accurate */
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 0, 256, 262, 8, 256-8) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(exprraid_state, screen_update_exprraid)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -519,15 +519,16 @@ static MACHINE_CONFIG_START( exprraid )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("slave", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ym2", YM3526, XTAL_12MHz / 4)
+	MCFG_SOUND_ADD("ym2", YM3526, XTAL(12'000'000) / 4)
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(exprraid_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( exprboot, exprraid )
+MACHINE_CONFIG_START(exprraid_state::exprboot)
+	exprraid(config);
 
 	MCFG_CPU_REPLACE("maincpu", M6502, 1500000)        /* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(master_map)

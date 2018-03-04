@@ -38,6 +38,7 @@ memory map:
 001     W  Devastators sets bit 1, function unknown.
            Ultraman sets the register to 0x0f.
            None of the other games I tested seem to set this register to other than 0.
+           Update: Chequered Flag sets bit 0 when background should be dimmed (palette control?)
 002-003 W  selects the portion of the gfx ROMs to be read.
 004     W  Aliens uses this to select the ROM bank to be read, but Punk Shot
            and TMNT don't, they use another bit of the registers above. Many
@@ -136,6 +137,7 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	, m_irq_handler(*this)
 	, m_firq_handler(*this)
 	, m_nmi_handler(*this)
+	, m_vreg_contrast_handler(*this)
 	, m_romoffset(0)
 	, m_spriteflip(0)
 	, m_readroms(0)
@@ -143,37 +145,25 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void k051960_device::set_plane_order(device_t &device, int order)
+void k051960_device::set_plane_order(int order)
 {
-	k051960_device &dev = downcast<k051960_device &>(device);
-
 	switch (order)
 	{
 		case K051960_PLANEORDER_BASE:
-			device_gfx_interface::static_set_info(dev, gfxinfo);
+			set_info(gfxinfo);
 			break;
 
 		case K051960_PLANEORDER_MIA:
-			device_gfx_interface::static_set_info(dev, gfxinfo_reverse);
+			set_info(gfxinfo_reverse);
 			break;
 
 		case K051960_PLANEORDER_GRADIUS3:
-			device_gfx_interface::static_set_info(dev, gfxinfo_gradius3);
+			set_info(gfxinfo_gradius3);
 			break;
 
 		default:
 			fatalerror("Unknown plane_order\n");
 	}
-}
-
-//-------------------------------------------------
-//  set_screen_tag - set screen we are attached to
-//-------------------------------------------------
-
-void k051960_device::set_screen_tag(device_t &device, const char *tag)
-{
-	k051960_device &dev = dynamic_cast<k051960_device &>(device);
-	dev.m_screen.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -207,6 +197,7 @@ void k051960_device::device_start()
 	m_irq_handler.resolve_safe();
 	m_firq_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
+	m_vreg_contrast_handler.resolve_safe();
 
 	// register for save states
 	save_item(NAME(m_romoffset));
@@ -301,7 +292,7 @@ READ8_MEMBER( k051960_device::k051937_r )
 	else if (offset == 0)
 		return m_screen->vblank() ? 1 : 0; // vblank?
 
-	//logerror("%04x: read unknown 051937 address %x\n", space.device().safe_pc(), offset);
+	//logerror("%s: read unknown 051937 address %x\n", m_maincpu->pc(), offset);
 	return 0;
 }
 
@@ -326,10 +317,14 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 
 		/* bit 5 = enable gfx ROM reading */
 		m_readroms = data & 0x20;
-		//logerror("%04x: write %02x to 051937 address %x\n", space.device().safe_pc(), data, offset);
+		//logerror("%s: write %02x to 051937 address %x\n", m_maincpu->pc(), data, offset);
 	}
 	else if (offset == 1)
 	{
+		//popmessage("%04x: write %02x to 051937 address %x", m_maincpu->pc(), data, offset);
+		// Chequered Flag uses this bit to enable background palette dimming
+		// TODO: use a callback here for now, pending further investigation over this bit
+		m_vreg_contrast_handler(BIT(data,0));
 		// unknown, Devastators writes 02 here in game
 		if (0)
 			logerror("%s: %02x to 051937 address %x\n", machine().describe_context(), data, offset);
@@ -340,8 +335,7 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 	}
 	else
 	{
-	//  popmessage("%04x: write %02x to 051937 address %x", space.device().safe_pc(), data, offset);
-	//logerror("%04x: write %02x to unknown 051937 address %x\n", space.device().safe_pc(), data, offset);
+	//logerror("%s: write %02x to unknown 051937 address %x\n", m_maincpu->pc(), data, offset);
 	}
 }
 

@@ -28,7 +28,7 @@
     INLINE FUNCTIONS
 ***************************************************************************/
 
-inline const atarigen_screen_timer *get_screen_timer(screen_device &screen)
+inline const atarigen_screen_timer *atarigen_state::get_screen_timer(screen_device &screen)
 {
 	atarigen_state *state = screen.machine().driver_data<atarigen_state>();
 	int i;
@@ -67,17 +67,6 @@ atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, 
 		m_timed_int(0),
 		m_ym2151_int(0)
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_sound_cpu: Set the tag of the
-//  sound CPU
-//-------------------------------------------------
-
-void atari_sound_comm_device::static_set_sound_cpu(device_t &device, const char *cputag)
-{
-	downcast<atari_sound_comm_device &>(device).m_sound_cpu_tag = cputag;
 }
 
 
@@ -396,10 +385,10 @@ READ16_MEMBER(atari_vad_device::control_read)
 	// also sets bit 0x4000 if we're in VBLANK
 	if (offset == 0)
 	{
-		int result = m_screen->vpos();
+		int result = screen().vpos();
 		if (result > 255)
 			result = 255;
-		if (result > m_screen->visible_area().max_y)
+		if (result > screen().visible_area().max_y)
 			result |= 0x4000;
 		return result;
 	}
@@ -414,7 +403,7 @@ READ16_MEMBER(atari_vad_device::control_read)
 
 WRITE16_MEMBER(atari_vad_device::alpha_w)
 {
-	m_alpha_tilemap->write(space, offset, data, mem_mask);
+	m_alpha_tilemap->write16(space, offset, data, mem_mask);
 }
 
 
@@ -425,9 +414,9 @@ WRITE16_MEMBER(atari_vad_device::alpha_w)
 
 WRITE16_MEMBER(atari_vad_device::playfield_upper_w)
 {
-	m_playfield_tilemap->write_ext(space, offset, data, mem_mask);
+	m_playfield_tilemap->write16_ext(space, offset, data, mem_mask);
 	if (m_playfield2_tilemap != nullptr)
-		m_playfield2_tilemap->write_ext(space, offset, data, mem_mask);
+		m_playfield2_tilemap->write16_ext(space, offset, data, mem_mask);
 }
 
 
@@ -439,9 +428,9 @@ WRITE16_MEMBER(atari_vad_device::playfield_upper_w)
 
 WRITE16_MEMBER(atari_vad_device::playfield_latched_lsb_w)
 {
-	m_playfield_tilemap->write(space, offset, data, mem_mask);
+	m_playfield_tilemap->write16(space, offset, data, mem_mask);
 	if ((m_control[0x0a] & 0x80) != 0)
-		m_playfield_tilemap->write_ext(space, offset, m_control[0x1d], uint16_t(0x00ff));
+		m_playfield_tilemap->write16_ext(space, offset, m_control[0x1d], uint16_t(0x00ff));
 }
 
 
@@ -453,9 +442,9 @@ WRITE16_MEMBER(atari_vad_device::playfield_latched_lsb_w)
 
 WRITE16_MEMBER(atari_vad_device::playfield_latched_msb_w)
 {
-	m_playfield_tilemap->write(space, offset, data, mem_mask);
+	m_playfield_tilemap->write16(space, offset, data, mem_mask);
 	if ((m_control[0x0a] & 0x80) != 0)
-		m_playfield_tilemap->write_ext(space, offset, m_control[0x1c], uint16_t(0xff00));
+		m_playfield_tilemap->write16_ext(space, offset, m_control[0x1c], uint16_t(0xff00));
 }
 
 
@@ -467,9 +456,9 @@ WRITE16_MEMBER(atari_vad_device::playfield_latched_msb_w)
 
 WRITE16_MEMBER(atari_vad_device::playfield2_latched_msb_w)
 {
-	m_playfield2_tilemap->write(space, offset, data, mem_mask);
+	m_playfield2_tilemap->write16(space, offset, data, mem_mask);
 	if ((m_control[0x0a] & 0x80) != 0)
-		m_playfield2_tilemap->write_ext(space, offset, m_control[0x1c], uint16_t(0xff00));
+		m_playfield2_tilemap->write16_ext(space, offset, m_control[0x1c], uint16_t(0xff00));
 }
 
 
@@ -523,8 +512,8 @@ void atari_vad_device::device_reset()
 	memset(m_control, 0, sizeof(m_control));
 
 	// start the timers
-	m_tilerow_update_timer->adjust(m_screen->time_until_pos(0));
-	m_eof_timer->adjust(m_screen->time_until_pos(0));
+	m_tilerow_update_timer->adjust(screen().time_until_pos(0));
+	m_eof_timer->adjust(screen().time_until_pos(0));
 }
 
 
@@ -643,7 +632,7 @@ void atari_vad_device::internal_control_write(offs_t offset, uint16_t newword)
 		// set the scanline interrupt here
 		case 0x03:
 			if (oldword != newword || !m_scanline_int_timer->enabled())
-				m_scanline_int_timer->adjust(m_screen->time_until_pos(newword & 0x1ff));
+				m_scanline_int_timer->adjust(screen().time_until_pos(newword & 0x1ff));
 			break;
 
 		// latch enable
@@ -651,7 +640,7 @@ void atari_vad_device::internal_control_write(offs_t offset, uint16_t newword)
 			// check for palette banking
 			if (m_palette_bank != (((newword & 0x0400) >> 10) ^ 1))
 			{
-				m_screen->update_partial(m_screen->vpos());
+				screen().update_partial(screen().vpos());
 				m_palette_bank = ((newword & 0x0400) >> 10) ^ 1;
 			}
 //if ((oldword & ~0x0080) != (newword & ~0x0080)) printf("Latch control = %04X\n", newword);
@@ -746,7 +735,7 @@ void atari_vad_device::update_parameter(uint16_t newword)
 void atari_vad_device::update_tilerow(emu_timer &timer, int scanline)
 {
 	// skip if out of bounds, or not enabled
-	if (scanline <= m_screen->visible_area().max_y && (m_control[0x0a] & 0x2000) != 0 && m_alpha_tilemap != nullptr)
+	if (scanline <= screen().visible_area().max_y && (m_control[0x0a] & 0x2000) != 0 && m_alpha_tilemap != nullptr)
 	{
 		// iterate over non-visible alpha tiles in this row
 		int offset = scanline / 8 * 64 + 48 + 2 * (scanline % 8);
@@ -755,7 +744,7 @@ void atari_vad_device::update_tilerow(emu_timer &timer, int scanline)
 
 		// force an update if we have data
 		if (scanline > 0 && ((data0 | data1) & 15) != 0)
-			m_screen->update_partial(scanline - 1);
+			screen().update_partial(scanline - 1);
 
 		// write the data
 		if ((data0 & 15) != 0)
@@ -766,9 +755,9 @@ void atari_vad_device::update_tilerow(emu_timer &timer, int scanline)
 
 	// update the timer to go off at the start of the next row
 	scanline += ((m_control[0x0a] & 0x2000) != 0) ? 1 : 8;
-	if (scanline >= m_screen->height())
+	if (scanline >= screen().height())
 		scanline = 0;
-	timer.adjust(m_screen->time_until_pos(scanline), scanline);
+	timer.adjust(screen().time_until_pos(scanline), scanline);
 }
 
 
@@ -794,7 +783,7 @@ void atari_vad_device::eof_update(emu_timer &timer)
     m_playfield_tilemap->set_scrolly(0, m_pf0_yscroll);
     if (m_playfield2_tilemap != nullptr)
         m_playfield2_tilemap->set_scrolly(0, m_pf1_yscroll);*/
-	timer.adjust(m_screen->time_until_pos(0));
+	timer.adjust(screen().time_until_pos(0));
 
 	// use this for debugging the video controller values
 #if 0

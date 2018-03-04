@@ -24,22 +24,22 @@
 
 
 #define MCFG_TMS32025_BIO_IN_CB(_devcb) \
-	devcb = &tms32025_device::set_bio_in_cb(*device, DEVCB_##_devcb); /* BIO input  */
+	devcb = &downcast<tms32025_device &>(*device).set_bio_in_cb(DEVCB_##_devcb); /* BIO input  */
 
 #define MCFG_TMS32025_HOLD_IN_CB(_devcb) \
-	devcb = &tms32025_device::set_hold_in_cb(*device, DEVCB_##_devcb); /* HOLD input */
+	devcb = &downcast<tms32025_device &>(*device).set_hold_in_cb(DEVCB_##_devcb); /* HOLD input */
 
 #define MCFG_TMS32025_HOLD_ACK_OUT_CB(_devcb) \
-	devcb = &tms32025_device::set_hold_ack_out_cb(*device, DEVCB_##_devcb); /* HOLD Acknowledge output */
+	devcb = &downcast<tms32025_device &>(*device).set_hold_ack_out_cb(DEVCB_##_devcb); /* HOLD Acknowledge output */
 
 #define MCFG_TMS32025_XF_OUT_CB(_devcb) \
-	devcb = &tms32025_device::set_xf_out_cb(*device, DEVCB_##_devcb); /* XF output  */
+	devcb = &downcast<tms32025_device &>(*device).set_xf_out_cb(DEVCB_##_devcb); /* XF output  */
 
 #define MCFG_TMS32025_DR_IN_CB(_devcb) \
-	devcb = &tms32025_device::set_dr_in_cb(*device, DEVCB_##_devcb); /* Serial Data  Receive  input  */
+	devcb = &downcast<tms32025_device &>(*device).set_dr_in_cb(DEVCB_##_devcb); /* Serial Data  Receive  input  */
 
 #define MCFG_TMS32025_DX_OUT_CB(_devcb) \
-	devcb = &tms32025_device::set_dx_out_cb(*device, DEVCB_##_devcb); /* Serial Data  Transmit output */
+	devcb = &downcast<tms32025_device &>(*device).set_dx_out_cb(DEVCB_##_devcb); /* Serial Data  Transmit output */
 
 
 /****************************************************************************
@@ -83,13 +83,13 @@ public:
 	// construction/destruction
 	tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template<class _Object> static devcb_base & set_bio_in_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_bio_in.set_callback(object); }
-	template<class _Object> static devcb_base & set_hold_in_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_hold_in.set_callback(object); }
-	template<class _Object> static devcb_base & set_hold_ack_out_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_hold_ack_out.set_callback(object); }
-	template<class _Object> static devcb_base & set_xf_out_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_xf_out.set_callback(object); }
-	template<class _Object> static devcb_base & set_dr_in_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_dr_in.set_callback(object); }
-	template<class _Object> static devcb_base & set_dx_out_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_dx_out.set_callback(object); }
+	// configuration helpers
+	template<class Object> devcb_base &set_bio_in_cb(Object &&cb) { return m_bio_in.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_hold_in_cb(Object &&cb) { return m_hold_in.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_hold_ack_out_cb(Object &&cb) { return m_hold_ack_out.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_xf_out_cb(Object &&cb) { return m_xf_out.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_dr_in_cb(Object &&cb) { return m_dr_in.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_dx_out_cb(Object &&cb) { return m_dx_out.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ16_MEMBER( drr_r);
 	DECLARE_WRITE16_MEMBER(drr_w);
@@ -104,6 +104,8 @@ public:
 	DECLARE_READ16_MEMBER( greg_r);
 	DECLARE_WRITE16_MEMBER(greg_w);
 
+	void tms32025_data(address_map &map);
+	void tms32026_data(address_map &map);
 protected:
 	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map);
 
@@ -125,9 +127,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	void common_reset();
 
@@ -141,7 +141,7 @@ protected:
 	optional_shared_ptr<uint16_t> m_b3;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<-1> *m_direct;
 	address_space *m_data;
 	address_space *m_io;
 
@@ -204,10 +204,6 @@ protected:
 	inline void MODIFY_DP(int data);
 	inline void MODIFY_PM(int data);
 	inline void MODIFY_ARP(int data);
-	inline uint16_t M_RDROM(offs_t addr);
-	inline void M_WRTROM(offs_t addr, uint16_t data);
-	inline uint16_t M_RDRAM(offs_t addr);
-	inline void M_WRTRAM(offs_t addr, uint16_t data);
 	uint16_t reverse_carry_add(uint16_t arg0, uint16_t arg1 );
 	inline void MODIFY_AR_ARP();
 	inline void CALCULATE_ADD_CARRY();

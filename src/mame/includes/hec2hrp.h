@@ -198,8 +198,22 @@ public:
 	DECLARE_WRITE8_MEMBER( hector_disc2_io50_port_w);
 
 	void hector_disc2_reset();
+	void hec2mx80(machine_config &config);
+	void hec2hrp(machine_config &config);
+	void hec2hrx(machine_config &config);
+	void hec2mx40(machine_config &config);
+	void hec2mdhrx(machine_config &config);
+	void hec2hr(machine_config &config);
+	void hector_audio(machine_config &config);
+	void hec2hrp_io(address_map &map);
+	void hec2hrp_mem(address_map &map);
+	void hec2hrx_io(address_map &map);
+	void hec2hrx_mem(address_map &map);
+	void hec2mdhrx_io(address_map &map);
+	void hec2mx40_io(address_map &map);
+	void hec2mx80_io(address_map &map);
+	void hecdisc2_io(address_map &map);
+	void hecdisc2_mem(address_map &map);
 };
-
-MACHINE_CONFIG_EXTERN( hector_audio );
 
 #endif // MAME_INCLUDES_HEC2HRP_H

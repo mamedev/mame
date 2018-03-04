@@ -3,6 +3,7 @@
 #include "video/kaneko_spr.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "machine/timer.h"
 
 class galpani2_state : public driver_device
 {
@@ -70,4 +71,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt2);
 	void galpani2_mcu_nmi1();
 	void galpani2_mcu_nmi2();
+	void galpani2(machine_config &config);
+	void galpani2_mem1(address_map &map);
+	void galpani2_mem2(address_map &map);
 };

@@ -61,7 +61,7 @@ enum
 
 
 #define MCFG_LH5801_IN(_devcb) \
-	devcb = &lh5801_cpu_device::set_in_func(*device, DEVCB_##_devcb);
+	devcb = &downcast<lh5801_cpu_device &>(*device).set_in_func(DEVCB_##_devcb);
 
 
 class lh5801_cpu_device :  public cpu_device
@@ -70,8 +70,8 @@ public:
 	// construction/destruction
 	lh5801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_in_func(device_t &device, Object &&cb) { return downcast<lh5801_cpu_device &>(device).m_in_func.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_in_func(Object &&cb) { return m_in_func.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides
@@ -93,9 +93,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 5; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -105,7 +103,7 @@ private:
 
 	address_space *m_program;         //ME0
 	address_space *m_io;              //ME1
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 
 	PAIR m_s;
 	PAIR m_p;

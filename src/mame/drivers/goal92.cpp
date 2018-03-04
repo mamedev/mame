@@ -45,20 +45,20 @@ READ16_MEMBER(goal92_state::goal92_inputs_r)
 			return ioport("DSW2")->read();
 
 		default:
-			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n", offset, mem_mask,space.device().safe_pc());
+			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n", offset, mem_mask,m_maincpu->pc());
 	}
 
 	return 0;
 }
 
-static ADDRESS_MAP_START( goal92_map, AS_PROGRAM, 16, goal92_state )
+ADDRESS_MAP_START(goal92_state::goal92_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM
 	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(goal92_background_w) AM_SHARE("bg_data")
 	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(goal92_foreground_w) AM_SHARE("fg_data")
 	AM_RANGE(0x101800, 0x101fff) AM_RAM // it has tiles for clouds, but they aren't used
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(goal92_text_w) AM_SHARE("tx_data")
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x104000, 0x13ffff) AM_RAM
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140800, 0x140801) AM_WRITENOP
@@ -84,7 +84,7 @@ WRITE8_MEMBER(goal92_state::adpcm_data_w)
 	m_msm5205next = data;
 }
 
-static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, goal92_state )
+ADDRESS_MAP_START(goal92_state::sound_cpu)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_control_w)
@@ -294,7 +294,7 @@ void goal92_state::machine_reset()
 	m_adpcm_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( goal92 )
+MACHINE_CONFIG_START(goal92_state::goal92)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)

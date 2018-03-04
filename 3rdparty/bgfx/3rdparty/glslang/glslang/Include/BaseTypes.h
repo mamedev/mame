@@ -53,6 +53,10 @@ enum TBasicType {
     EbtUint,
     EbtInt64,
     EbtUint64,
+#ifdef AMD_EXTENSIONS
+    EbtInt16,
+    EbtUint16,
+#endif
     EbtBool,
     EbtAtomicUint,
     EbtSampler,
@@ -189,10 +193,12 @@ enum TBuiltInVariable {
     EbvFragColor,
     EbvFragData,
     EbvFragDepth,
+    EbvFragStencilRef,
     EbvSampleId,
     EbvSamplePosition,
     EbvSampleMask,
     EbvHelperInvocation,
+
 #ifdef AMD_EXTENSIONS
     EbvBaryCoordNoPersp,
     EbvBaryCoordNoPerspCentroid,
@@ -218,7 +224,16 @@ enum TBuiltInVariable {
     // to one of the above.
     EbvFragDepthGreater,
     EbvFragDepthLesser,
-    EbvStencilRef,
+    EbvGsOutputStream,
+    EbvOutputPatch,
+    EbvInputPatch,
+
+    // structbuffer types
+    EbvAppendConsume, // no need to differentiate append and consume
+    EbvRWStructuredBuffer,
+    EbvStructuredBuffer,
+    EbvByteAddressBuffer,
+    EbvRWByteAddressBuffer,
 
     EbvLast
 };
@@ -315,10 +330,12 @@ __inline const char* GetBuiltInVariableString(TBuiltInVariable v)
     case EbvFragColor:            return "FragColor";
     case EbvFragData:             return "FragData";
     case EbvFragDepth:            return "FragDepth";
+    case EbvFragStencilRef:       return "FragStencilRef";
     case EbvSampleId:             return "SampleId";
     case EbvSamplePosition:       return "SamplePosition";
     case EbvSampleMask:           return "SampleMaskIn";
     case EbvHelperInvocation:     return "HelperInvocation";
+
 #ifdef AMD_EXTENSIONS
     case EbvBaryCoordNoPersp:           return "BaryCoordNoPersp";
     case EbvBaryCoordNoPerspCentroid:   return "BaryCoordNoPerspCentroid";

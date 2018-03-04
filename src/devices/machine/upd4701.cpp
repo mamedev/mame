@@ -150,7 +150,7 @@ WRITE_LINE_MEMBER(upd4701_device::resety_w)
 
 READ8_MEMBER(upd4701_device::reset_x)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		resetx_w(1);
 		resetx_w(0);
@@ -170,7 +170,7 @@ WRITE8_MEMBER(upd4701_device::reset_x)
 
 READ8_MEMBER(upd4701_device::reset_y)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		resety_w(1);
 		resety_w(0);
@@ -190,7 +190,7 @@ WRITE8_MEMBER(upd4701_device::reset_y)
 
 READ8_MEMBER(upd4701_device::reset_xy)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		resetx_w(1);
 		resety_w(1);
@@ -354,11 +354,12 @@ READ8_MEMBER(upd4701_device::read_y)
 
 READ8_MEMBER(upd4701_device::read_xy)
 {
+	bool old_cs = m_cs;
 	cs_w(0);
 	xy_w(BIT(offset, 1));
 	ul_w(BIT(offset, 0));
 	u8 result = d_r(space, 0);
-	cs_w(1);
+	cs_w(old_cs);
 	return result;
 }
 

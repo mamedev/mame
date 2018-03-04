@@ -15,7 +15,7 @@
 	downcast<m6502_device *>(device)->disable_direct();
 
 #define MCFG_M6502_SYNC_CALLBACK(_cb) \
-	devcb = &m6502_device::set_sync_callback(*device, DEVCB_##_cb);
+	devcb = &downcast<m6502_device &>(*device).set_sync_callback(DEVCB_##_cb);
 
 class m6502_device : public cpu_device {
 public:
@@ -31,7 +31,7 @@ public:
 	bool get_sync() const { return sync; }
 	void disable_direct() { direct_disabled = true; }
 
-	template<class _Object> static devcb_base &set_sync_callback(device_t &device, _Object object) { return downcast<m6502_device &>(device).sync_w.set_callback(object); }
+	template<class Object> devcb_base &set_sync_callback(Object &&cb) { return sync_w.set_callback(std::forward<Object>(cb)); }
 
 	devcb_write_line sync_w;
 
@@ -41,7 +41,7 @@ protected:
 	class memory_interface {
 	public:
 		address_space *program, *sprogram;
-		direct_read_data *direct, *sdirect;
+		direct_read_data<0> *direct, *sdirect;
 
 		virtual ~memory_interface() {}
 		virtual uint8_t read(uint16_t adr) = 0;
@@ -68,47 +68,8 @@ protected:
 		virtual uint8_t read_arg(uint16_t adr) override;
 	};
 
-	struct disasm_entry {
-		const char *opcode;
-		int mode;
-		offs_t flags;
-	};
-
 	enum {
 		STATE_RESET = 0xff00
-	};
-
-	enum {
-		DASM_non,    /* no additional arguments */
-		DASM_aba,    /* absolute */
-		DASM_abx,    /* absolute + X */
-		DASM_aby,    /* absolute + Y */
-		DASM_acc,    /* accumulator */
-		DASM_adr,    /* absolute address (jmp,jsr) */
-		DASM_bzp,    /* zero page with bit selection */
-		DASM_iax,    /* indirect + X (65c02 jmp) */
-		DASM_idx,    /* zero page pre indexed */
-		DASM_idy,    /* zero page post indexed */
-		DASM_idz,    /* zero page post indexed (65ce02) */
-		DASM_imm,    /* immediate */
-		DASM_imp,    /* implicit */
-		DASM_ind,    /* indirect (jmp) */
-		DASM_isy,    /* zero page pre indexed sp and post indexed Y (65ce02) */
-		DASM_iw2,    /* immediate word (65ce02) */
-		DASM_iw3,    /* augment (65ce02) */
-		DASM_rel,    /* relative */
-		DASM_rw2,    /* relative word (65cs02, 65ce02) */
-		DASM_zpb,    /* zero page and branch (65c02 bbr, bbs) */
-		DASM_zpg,    /* zero page */
-		DASM_zpi,    /* zero page indirect (65c02) */
-		DASM_zpx,    /* zero page + X */
-		DASM_zpy,    /* zero page + Y */
-		DASM_imz,    /* load immediate byte, store to zero page address (M740) */
-		DASM_spg,    /* "special page": implied FF00 OR immediate value (M740)*/
-		DASM_biz,    /* bit, zero page (M740) */
-		DASM_bzr,    /* bit, zero page, relative offset (M740) */
-		DASM_bar,    /* bit, accumulator, relative offset (M740) */
-		DASM_bac     /* bit, accumulator (M740) */
 	};
 
 	enum {
@@ -145,9 +106,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	address_space_config program_config, sprogram_config;
 
@@ -164,15 +123,12 @@ protected:
 	uint8_t   IR;                     /* Prefetched instruction register */
 	int     inst_state_base;        /* Current instruction bank */
 
-	memory_interface *mintf;
+	std::unique_ptr<memory_interface> mintf;
 	int inst_state, inst_substate;
 	int icount;
 	bool nmi_state, irq_state, apu_irq_state, v_state;
 	bool irq_taken, sync, direct_disabled, inhibit_interrupts;
 
-	static const disasm_entry disasm_entries[0x100];
-
-	offs_t disassemble_generic(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table);
 	uint8_t read(uint16_t adr) { return mintf->read(adr); }
 	uint8_t read_9(uint16_t adr) { return mintf->read_9(adr); }
 	void write(uint16_t adr, uint8_t val) { mintf->write(adr, val); }
@@ -184,6 +140,8 @@ protected:
 	void prefetch_noirq();
 	void set_nz(uint8_t v);
 
+	u32 XPC;
+	virtual offs_t pc_to_external(u16 pc); // For paged PCs
 	virtual void do_exec_full();
 	virtual void do_exec_partial();
 

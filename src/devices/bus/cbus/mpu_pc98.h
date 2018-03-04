@@ -19,7 +19,7 @@ class mpu_pc98_device : public device_t
 public:
 	// construction/destruction
 	mpu_pc98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_ADDRESS_MAP(map, 8);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -32,6 +32,9 @@ private:
 	// called back by the MPU401 core to set the IRQ line state
 	DECLARE_WRITE_LINE_MEMBER(mpu_irq_out);
 
+	void map(address_map &map);
+
+	required_device<pc9801_slot_device> m_bus;
 	required_device<mpu401_device> m_mpu401;
 };
 

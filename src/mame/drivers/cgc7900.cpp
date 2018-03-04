@@ -180,33 +180,33 @@ WRITE16_MEMBER( cgc7900_state::keyboard_w )
 
 static const int int_levels[16] = { 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5 };
 static const int int_vectors[16] = {
-	0x4b, 0x44, 0x4c, 0x43, 0x42, 0x4d, 0x45, 0x4a, 0x49, 0x46, 0x4e, 0x41, 0x40, 0x4f, 0x47, 0x48 
+	0x4b, 0x44, 0x4c, 0x43, 0x42, 0x4d, 0x45, 0x4a, 0x49, 0x46, 0x4e, 0x41, 0x40, 0x4f, 0x47, 0x48
 };
 
 WRITE16_MEMBER( cgc7900_state::interrupt_mask_w )
 {
 	/*
 
-	    bit     description		vec	level
+	    bit     description     vec level
 
-	     0      real time clock	4b	5
-	     1      RS-449 Tx ready	44	4
-	     2      BINT 2			4c	5
-	     3      RS-232 Tx ready	43	4
-	     4      disk			42	4
-	     5      BINT 3			4d	5
-	     6      bezel keys		45	4
-	     7      keyboard		4a	5
-	     8      RS-449 Rx ready	49	5
-	     9      light pen		46	4
-	    10      BINT 4			4e	5
-	    11      joystick		41	4
-	    12      vert. retrace	40	4
-	    13      BINT 5			4f	5
-	    14      BINT 1			47	4
-	    15      RS-232 Rx ready	48	5
+	     0      real time clock 4b  5
+	     1      RS-449 Tx ready 44  4
+	     2      BINT 2          4c  5
+	     3      RS-232 Tx ready 43  4
+	     4      disk            42  4
+	     5      BINT 3          4d  5
+	     6      bezel keys      45  4
+	     7      keyboard        4a  5
+	     8      RS-449 Rx ready 49  5
+	     9      light pen       46  4
+	    10      BINT 4          4e  5
+	    11      joystick        41  4
+	    12      vert. retrace   40  4
+	    13      BINT 5          4f  5
+	    14      BINT 1          47  4
+	    15      RS-232 Rx ready 48  5
 
-		default mask is 0x7e3f -- RS232 Rx, RS449 Rx, keyboard, bezel.
+	    default mask is 0x7e3f -- RS232 Rx, RS449 Rx, keyboard, bezel.
 	*/
 
 	if (m_int_mask != data)
@@ -334,7 +334,7 @@ WRITE_LINE_MEMBER(cgc7900_state::write_rs449_clock)
     ADDRESS_MAP( cgc7900_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16, cgc7900_state )
+ADDRESS_MAP_START(cgc7900_state::cgc7900_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("chrom_ram")
 	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)
@@ -397,7 +397,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( keyboard_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( keyboard_mem, AS_PROGRAM, 8, cgc7900_state )
+ADDRESS_MAP_START(cgc7900_state::keyboard_mem)
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -476,9 +476,9 @@ void cgc7900_state::machine_reset()
     MACHINE_DRIVER( cgc7900 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( cgc7900 )
+MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_28_48MHz/4)
+	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL(28'480'000)/4)
 	MCFG_CPU_PROGRAM_MAP(cgc7900_mem)
 
 	MCFG_CPU_ADD(I8035_TAG, I8035, 1000000)
@@ -492,25 +492,25 @@ static MACHINE_CONFIG_START( cgc7900 )
 	//MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8())
 	MCFG_DEVICE_DISABLE()
 
-/*  MCFG_CPU_ADD(AM2910_TAG, AM2910, XTAL_17_36MHz)
+/*  MCFG_CPU_ADD(AM2910_TAG, AM2910, XTAL(17'360'000))
     MCFG_CPU_PROGRAM_MAP(omti10_mem)*/
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(cgc7900_video)
+	cgc7900_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL_28_48MHz/16)
+	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL(28'480'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(cgc7900_state, kbd_put))
 
-	MCFG_DEVICE_ADD(MM58167_TAG, MM58167, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(MM58167_TAG, MM58167, XTAL(32'768))
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(cgc7900_state, irq<0x0>))
 
-	MCFG_DEVICE_ADD(K1135A_TAG, COM8116, XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD(K1135A_TAG, COM8116, XTAL(5'068'800))
 	MCFG_COM8116_FR_HANDLER(WRITELINE(cgc7900_state, write_rs232_clock))
 	MCFG_COM8116_FT_HANDLER(WRITELINE(cgc7900_state, write_rs449_clock))
 

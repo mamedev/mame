@@ -6,14 +6,15 @@
  *
  ****************************************************************************/
 
-#ifndef NC_H_
-#define NC_H_
+#ifndef MAME_INCLUDES_NC_H
+#define MAME_INCLUDES_NC_H
 
 #include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"
 #include "machine/clock.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 
 #include "bus/generic/slot.h"
@@ -93,6 +94,11 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nc_pcmcia_card );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nc_pcmcia_card );
 
+	void nc200(machine_config &config);
+	void nc100(machine_config &config);
+	void nc100_io(address_map &map);
+	void nc200_io(address_map &map);
+	void nc_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -147,5 +153,4 @@ public: // HACK FOR MC6845
 };
 
 
-
-#endif /* NC_H_ */
+#endif // MAME_INCLUDES_NC_H

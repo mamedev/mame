@@ -30,7 +30,7 @@
 
 DEFINE_DEVICE_TYPE(CGENIE_FDC, cgenie_fdc_device, "cgenie_fdc", "Colour Genie FDC")
 
-DEVICE_ADDRESS_MAP_START( mmio, 8, cgenie_fdc_device )
+ADDRESS_MAP_START(cgenie_fdc_device::mmio)
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x10) AM_READWRITE(irq_r, select_w)
 	AM_RANGE(0xec, 0xec) AM_MIRROR(0x10) AM_DEVREAD("fd1793", fd1793_device, status_r) AM_WRITE(command_w)
 	AM_RANGE(0xed, 0xed) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_device, track_r, track_w)
@@ -69,10 +69,10 @@ const tiny_rom_entry *cgenie_fdc_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( cgenie_fdc_device::device_add_mconfig )
+MACHINE_CONFIG_START(cgenie_fdc_device::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", cgenie_fdc_device, timer_callback, attotime::from_msec(25))
 
-	MCFG_FD1793_ADD("fd1793", XTAL_1MHz)
+	MCFG_FD1793_ADD("fd1793", XTAL(1'000'000))
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(cgenie_fdc_device, intrq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats)

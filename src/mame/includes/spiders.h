@@ -29,12 +29,11 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
 	DECLARE_WRITE8_MEMBER(gfx_rom_intf_w);
 	DECLARE_READ8_MEMBER(gfx_rom_r);
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(update_pia_1);
-	DECLARE_WRITE8_MEMBER(ic60_74123_output_changed);
+	DECLARE_WRITE_LINE_MEMBER(ic60_74123_output_changed);
 	DECLARE_WRITE8_MEMBER(spiders_audio_command_w);
 	DECLARE_WRITE8_MEMBER(spiders_audio_a_w);
 	DECLARE_WRITE8_MEMBER(spiders_audio_b_w);
@@ -45,7 +44,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_audiocpu;
+	void spiders(machine_config &config);
+	void spiders_audio(machine_config &config);
+	void spiders_audio_map(address_map &map);
+	void spiders_main_map(address_map &map);
 };
-
-/*----------- defined in audio/spiders.c -----------*/
-MACHINE_CONFIG_EXTERN( spiders_audio );

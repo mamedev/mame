@@ -329,6 +329,16 @@ public:
 	uint32_t screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void thunderh(machine_config &config);
+	void hangplt(machine_config &config);
+	void slrasslt(machine_config &config);
+	void gticlub(machine_config &config);
+	void gticlub_map(address_map &map);
+	void hangplt_map(address_map &map);
+	void hangplt_sharc0_map(address_map &map);
+	void hangplt_sharc1_map(address_map &map);
+	void sharc_map(address_map &map);
+	void sound_memmap(address_map &map);
 private:
 	void gticlub_led_setreg(int offset, uint8_t data);
 
@@ -501,7 +511,7 @@ MACHINE_START_MEMBER(gticlub_state,gticlub)
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gticlub_state::sound_irq), this));
 }
 
-static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32, gticlub_state )
+ADDRESS_MAP_START(gticlub_state::gticlub_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("work_ram")        /* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(gticlub_k001604_reg_r, gticlub_k001604_reg_w)
 	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
@@ -520,7 +530,7 @@ static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32, gticlub_state )
 	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")    /* Program ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hangplt_map, AS_PROGRAM, 32, gticlub_state )
+ADDRESS_MAP_START(gticlub_state::hangplt_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("work_ram")        /* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(gticlub_k001604_reg_r, gticlub_k001604_reg_w)
 	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
@@ -539,7 +549,7 @@ ADDRESS_MAP_END
 
 /**********************************************************************/
 
-static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, gticlub_state )
+ADDRESS_MAP_START(gticlub_state::sound_memmap)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("k056800", k056800_device, sound_r, sound_w, 0x00ff)
@@ -570,14 +580,14 @@ WRITE32_MEMBER(gticlub_state::dsp_dataram1_w)
 	m_sharc_dataram_1[offset] = data;
 }
 
-static ADDRESS_MAP_START( sharc_map, AS_DATA, 32, gticlub_state )
+ADDRESS_MAP_START(gticlub_state::sharc_map)
 	AM_RANGE(0x400000, 0x41ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
 	AM_RANGE(0x600000, 0x6fffff) AM_DEVREADWRITE("k001005", k001005_device, read, write)
 	AM_RANGE(0x700000, 0x7000ff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hangplt_sharc0_map, AS_DATA, 32, gticlub_state )
+ADDRESS_MAP_START(gticlub_state::hangplt_sharc0_map)
 	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
@@ -588,7 +598,7 @@ static ADDRESS_MAP_START( hangplt_sharc0_map, AS_DATA, 32, gticlub_state )
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hangplt_sharc1_map, AS_DATA, 32, gticlub_state )
+ADDRESS_MAP_START(gticlub_state::hangplt_sharc1_map)
 	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
@@ -934,17 +944,17 @@ uint32_t gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb3
 
 	return 0;
 }
-static MACHINE_CONFIG_START( gticlub )
+MACHINE_CONFIG_START(gticlub_state::gticlub)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
+	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(gticlub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gticlub_state,  gticlub_vblank)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL_64MHz/4)    /* 16MHz */
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
+	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
@@ -993,12 +1003,12 @@ static MACHINE_CONFIG_START( gticlub )
 	MCFG_K001006_GFX_REGION("gfx1")
 	MCFG_K001006_TEX_LAYOUT(1)
 
-	MCFG_K056800_ADD("k056800", XTAL_33_8688MHz/2)
+	MCFG_K056800_ADD("k056800", XTAL(33'868'800)/2)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL_33_8688MHz/2)
+	MCFG_RF5C400_ADD("rfsnd", XTAL(33'868'800)/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1007,7 +1017,8 @@ static MACHINE_CONFIG_START( gticlub )
 	MCFG_KONPPC_CGBOARD_TYPE(GTICLUB)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( thunderh, gticlub )
+MACHINE_CONFIG_START(gticlub_state::thunderh)
+	gticlub(config);
 
 	MCFG_DEVICE_REMOVE("adc1038")
 	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
@@ -1019,7 +1030,8 @@ static MACHINE_CONFIG_DERIVED( thunderh, gticlub )
 	MCFG_K056230_HACK(1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( slrasslt, gticlub )
+MACHINE_CONFIG_START(gticlub_state::slrasslt)
+	gticlub(config);
 
 	MCFG_DEVICE_REMOVE("adc1038")
 	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
@@ -1041,20 +1053,20 @@ MACHINE_RESET_MEMBER(gticlub_state,hangplt)
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( hangplt )
+MACHINE_CONFIG_START(gticlub_state::hangplt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
+	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(hangplt_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL_64MHz/4)    /* 16MHz */
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
+	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(hangplt_sharc0_map)
 
-	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL_36MHz)
+	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(hangplt_sharc1_map)
 
@@ -1120,12 +1132,12 @@ static MACHINE_CONFIG_START( hangplt )
 	MCFG_K001604_ROZ_OFFSET(16384)
 	MCFG_K001604_PALETTE("palette")
 
-	MCFG_K056800_ADD("k056800", XTAL_33_8688MHz/2)
+	MCFG_K056800_ADD("k056800", XTAL(33'868'800)/2)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL_33_8688MHz/2)
+	MCFG_RF5C400_ADD("rfsnd", XTAL(33'868'800)/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1500,8 +1512,8 @@ GAME( 1996, gticlub,    0,        gticlub,  gticlub,  gticlub_state, gticlub,  R
 GAME( 1996, gticlubu,   gticlub,  gticlub,  gticlub,  gticlub_state, gticlub,  ROT0, "Konami", "GTI Club (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, gticluba,   gticlub,  gticlub,  gticlub,  gticlub_state, gticlub,  ROT0, "Konami", "GTI Club (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, gticlubj,   gticlub,  gticlub,  gticlub,  gticlub_state, gticlub,  ROT0, "Konami", "GTI Club (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, thunderh,   0,        thunderh, thunderh, gticlub_state, gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, thunderhu,  thunderh, thunderh, thunderh, gticlub_state, gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, thunderh,   0,        thunderh, thunderh, gticlub_state, gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, thunderhu,  thunderh, thunderh, thunderh, gticlub_state, gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, slrasslt,   0,        slrasslt, slrasslt, gticlub_state, gticlub,  ROT0, "Konami", "Solar Assault (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Based on Revised code
 GAME( 1997, slrassltj,  slrasslt, slrasslt, slrasslt, gticlub_state, gticlub,  ROT0, "Konami", "Solar Assault Revised (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, slrassltj1, slrasslt, slrasslt, slrasslt, gticlub_state, gticlub,  ROT0, "Konami", "Solar Assault (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

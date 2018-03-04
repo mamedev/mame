@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "machine/timer.h"
+
 class higemaru_state : public driver_device
 {
 public:
@@ -37,4 +39,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void higemaru(machine_config &config);
+	void higemaru_map(address_map &map);
 };

@@ -6,7 +6,7 @@
 #include "mc146818.h"
 
 #define MCFG_DS12885_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DS12885, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(_tag, DS12885, XTAL(32'768))
 
 // ======================> mc146818_device
 
@@ -18,6 +18,7 @@ public:
 
 protected:
 	virtual int data_size() override { return 128; }
+	virtual int get_timer_bypass() override;
 };
 
 // device type definition

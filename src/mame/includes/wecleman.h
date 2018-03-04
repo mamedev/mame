@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_WECLEMAN_H
+#define MAME_INCLUDES_WECLEMAN_H
 
-#include "machine/gen_latch.h"
+#pragma once
+
+#include "machine/timer.h"
 #include "sound/k007232.h"
 #include "video/k051316.h"
 #include "screen.h"
@@ -9,29 +13,31 @@
 class wecleman_state : public driver_device
 {
 public:
+	enum
+	{
+		WECLEMAN_ID = 0,
+		HOTCHASE_ID
+	};
 	wecleman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_videostatus(*this, "videostatus"),
-		m_protection_ram(*this, "protection_ram"),
-		m_blitter_regs(*this, "blitter_regs"),
-		m_pageram(*this, "pageram"),
-		m_txtram(*this, "txtram"),
-		m_spriteram(*this, "spriteram"),
-		m_roadram(*this, "roadram"),
-		m_generic_paletteram_16(*this, "paletteram"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub"),
-		m_k051316_1(*this, "k051316_1"),
-		m_k051316_2(*this, "k051316_2"),
-		m_k007232(*this, "k007232"),
-		m_k007232_1(*this, "k007232_1"),
-		m_k007232_2(*this, "k007232_2"),
-		m_k007232_3(*this, "k007232_3"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch") { }
+		: driver_device(mconfig, type, tag)
+		, m_videostatus(*this, "videostatus")
+		, m_protection_ram(*this, "protection_ram")
+		, m_blitter_regs(*this, "blitter_regs")
+		, m_pageram(*this, "pageram")
+		, m_txtram(*this, "txtram")
+		, m_spriteram(*this, "spriteram")
+		, m_roadram(*this, "roadram")
+		, m_generic_paletteram_16(*this, "paletteram")
+		, m_sprite_region(*this, "sprites")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_subcpu(*this, "sub")
+		, m_k051316(*this, "k051316_%u", 1)
+		, m_k007232(*this, "k007232_%u", 1)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
+	{ }
 
 	optional_shared_ptr<uint16_t> m_videostatus;
 	optional_shared_ptr<uint16_t> m_protection_ram;
@@ -41,6 +47,8 @@ public:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_roadram;
 	required_shared_ptr<uint16_t> m_generic_paletteram_16;
+
+	required_region_ptr<uint8_t> m_sprite_region;
 
 	int m_multiply_reg[2];
 	int m_spr_color_offs;
@@ -67,8 +75,6 @@ public:
 	int m_sound_hw_type;
 	bool m_hotchase_sound_hs;
 	pen_t m_black_pen;
-	struct sprite *m_sprite_list;
-	struct sprite **m_spr_ptr_list;
 	DECLARE_READ16_MEMBER(wecleman_protection_r);
 	DECLARE_WRITE16_MEMBER(wecleman_protection_w);
 	DECLARE_WRITE16_MEMBER(irqctrl_w);
@@ -77,9 +83,7 @@ public:
 	DECLARE_WRITE16_MEMBER(blitter_w);
 	DECLARE_READ8_MEMBER(multiply_r);
 	DECLARE_WRITE8_MEMBER(multiply_w);
-	DECLARE_WRITE16_MEMBER(hotchase_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(hotchase_sound_control_w);
-	DECLARE_WRITE16_MEMBER(wecleman_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(wecleman_txtram_w);
 	DECLARE_WRITE16_MEMBER(wecleman_pageram_w);
 	DECLARE_WRITE16_MEMBER(wecleman_videostatus_w);
@@ -87,12 +91,8 @@ public:
 	DECLARE_WRITE16_MEMBER(wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w);
 	DECLARE_WRITE8_MEMBER(wecleman_K00723216_bank_w);
 	DECLARE_WRITE8_MEMBER(wecleman_volume_callback);
-	DECLARE_READ8_MEMBER(hotchase_1_k007232_r);
-	DECLARE_WRITE8_MEMBER(hotchase_1_k007232_w);
-	DECLARE_READ8_MEMBER(hotchase_2_k007232_r);
-	DECLARE_WRITE8_MEMBER(hotchase_2_k007232_w);
-	DECLARE_READ8_MEMBER(hotchase_3_k007232_r);
-	DECLARE_WRITE8_MEMBER(hotchase_3_k007232_w);
+	template<int Chip> DECLARE_READ8_MEMBER(hotchase_k007232_r);
+	template<int Chip> DECLARE_WRITE8_MEMBER(hotchase_k007232_w);
 	DECLARE_DRIVER_INIT(wecleman);
 	DECLARE_DRIVER_INIT(hotchase);
 	TILE_GET_INFO_MEMBER(wecleman_get_txt_tile_info);
@@ -113,8 +113,6 @@ public:
 	void hotchase_sprite_decode( int num16_banks, int bank_size );
 	void get_sprite_info();
 	void sortsprite(int *idx_array, int *key_array, int size);
-	template<class _BitmapClass> void do_blit_zoom32(_BitmapClass &bitmap, const rectangle &cliprect, struct sprite *sprite);
-	template<class _BitmapClass> void sprite_draw(_BitmapClass &bitmap, const rectangle &cliprect);
 	void wecleman_draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority);
 	void hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K051316_CB_MEMBER(hotchase_zoom_callback_1);
@@ -125,14 +123,43 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
-	optional_device<k051316_device> m_k051316_1;
-	optional_device<k051316_device> m_k051316_2;
-	optional_device<k007232_device> m_k007232;
-	optional_device<k007232_device> m_k007232_1;
-	optional_device<k007232_device> m_k007232_2;
-	optional_device<k007232_device> m_k007232_3;
+	optional_device_array<k051316_device, 2> m_k051316;
+	optional_device_array<k007232_device, 3> m_k007232;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	required_device<generic_latch_8_device> m_soundlatch;
+
+	void hotchase(machine_config &config);
+	void wecleman(machine_config &config);
+	void hotchase_map(address_map &map);
+	void hotchase_sound_map(address_map &map);
+	void hotchase_sub_map(address_map &map);
+	void wecleman_map(address_map &map);
+	void wecleman_sound_map(address_map &map);
+	void wecleman_sub_map(address_map &map);
+private:
+	struct sprite_t
+	{
+		sprite_t() { }
+
+		uint8_t *pen_data = nullptr;    /* points to top left corner of tile data */
+		int line_offset = 0;
+
+		const pen_t *pal_data = nullptr;
+		rgb_t pal_base;
+
+		int x_offset = 0, y_offset = 0;
+		int tile_width = 0, tile_height = 0;
+		int total_width = 0, total_height = 0;  /* in screen coordinates */
+		int x = 0, y = 0;
+		int shadow_mode = 0, flags = 0;
+	};
+
+	template<class _BitmapClass> void do_blit_zoom32(_BitmapClass &bitmap, const rectangle &cliprect, const sprite_t &sprite);
+	template<class _BitmapClass> void sprite_draw(_BitmapClass &bitmap, const rectangle &cliprect);
+
+	std::unique_ptr<sprite_t []> m_sprite_list;
+	sprite_t **m_spr_ptr_list;
 };
+
+#endif // MAME_INCLUDES_WECLEMAN_H

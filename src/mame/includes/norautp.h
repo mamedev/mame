@@ -41,6 +41,35 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void noraut_base(machine_config &config);
+	void kimble(machine_config &config);
+	void kimbldhl(machine_config &config);
+	void norautp(machine_config &config);
+	void norautx4(machine_config &config);
+	void norautpl(machine_config &config);
+	void newhilop(machine_config &config);
+	void dphltest(machine_config &config);
+	void nortest1(machine_config &config);
+	void ssjkrpkr(machine_config &config);
+	void dphl(machine_config &config);
+	void dphla(machine_config &config);
+	void drhl(machine_config &config);
+	void norautxp(machine_config &config);
+	void dphl_map(address_map &map);
+	void dphla_map(address_map &map);
+	void dphltest_map(address_map &map);
+	void drhl_map(address_map &map);
+	void kimbldhl_map(address_map &map);
+	void kimble_map(address_map &map);
+	void newhilop_map(address_map &map);
+	void norautp_map(address_map &map);
+	void norautp_portmap(address_map &map);
+	void norautx4_map(address_map &map);
+	void norautx8_map(address_map &map);
+	void norautxp_map(address_map &map);
+	void norautxp_portmap(address_map &map);
+	void nortest1_map(address_map &map);
+	void ssjkrpkr_map(address_map &map);
 };
 
 /*----------- defined in audio/norautp.c -----------*/

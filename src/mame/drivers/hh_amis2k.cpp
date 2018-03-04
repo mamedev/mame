@@ -25,6 +25,7 @@
 
 #include "emu.h"
 #include "cpu/amis2000/amis2000.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
@@ -71,6 +72,7 @@ public:
 	void sound_update();
 
 	virtual void machine_start() override;
+	void wildfire(machine_config &config);
 };
 
 
@@ -139,7 +141,7 @@ void wildfire_state::display_update()
 		if (m_display_cache[i] != active_state[i])
 		{
 			if (index_is_7segled(i))
-				output().set_digit_value(i, BITSWAP8(active_state[i],7,0,1,2,3,4,5,6) & 0x7f);
+				output().set_digit_value(i, bitswap<8>(active_state[i],7,0,1,2,3,4,5,6) & 0x7f);
 
 			for (int j = 0; j < 8; j++)
 				output().set_lamp_value(i*10 + j, active_state[i] >> j & 1);
@@ -305,7 +307,7 @@ static const u8 wildfire_7seg_table[0x10] =
 };
 
 
-static MACHINE_CONFIG_START( wildfire )
+MACHINE_CONFIG_START(wildfire_state::wildfire)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", AMI_S2152, MASTER_CLOCK)

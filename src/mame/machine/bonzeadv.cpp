@@ -380,8 +380,8 @@ WRITE16_MEMBER(asuka_state::bonzeadv_cchip_bank_w)
 
 WRITE16_MEMBER(asuka_state::bonzeadv_cchip_ram_w)
 {
-//  if (space.device().safe_pc()!=0xa028)
-//  logerror("%08x:  write %04x %04x cchip\n", space.device().safe_pc(), offset, data);
+//  if (m_maincpu->pc()!=0xa028)
+//  logerror("%08x:  write %04x %04x cchip\n", m_maincpu->pc(), offset, data);
 	data &= mem_mask;
 
 	if (m_current_bank == 0)
@@ -435,7 +435,7 @@ READ16_MEMBER(asuka_state::bonzeadv_cchip_ctrl_r)
 
 READ16_MEMBER(asuka_state::bonzeadv_cchip_ram_r)
 {
-//  logerror("%08x:  read %04x cchip\n", space.device().safe_pc(), offset);
+//  logerror("%08x:  read %04x cchip\n", m_maincpu->pc(), offset);
 
 	if (m_current_bank == 0)
 	{

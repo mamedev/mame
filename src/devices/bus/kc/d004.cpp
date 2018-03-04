@@ -22,12 +22,12 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static ADDRESS_MAP_START(kc_d004_mem, AS_PROGRAM, 8, kc_d004_device)
+ADDRESS_MAP_START(kc_d004_device::kc_d004_mem)
 	AM_RANGE(0x0000, 0xfbff) AM_RAM
 	AM_RANGE(0xfc00, 0xffff) AM_RAM     AM_SHARE("koppelram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(kc_d004_io, AS_IO, 8, kc_d004_device)
+ADDRESS_MAP_START(kc_d004_device::kc_d004_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf1) AM_DEVICE(UPD765_TAG, upd765a_device, map)
@@ -38,15 +38,15 @@ static ADDRESS_MAP_START(kc_d004_io, AS_IO, 8, kc_d004_device)
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(kc_d004_gide_io, AS_IO, 8, kc_d004_gide_device)
+ADDRESS_MAP_START(kc_d004_gide_device::kc_d004_gide_io)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(gide_r, gide_w)
 	AM_RANGE(0x00f0, 0x00f1) AM_MIRROR(0xff00)  AM_DEVICE(UPD765_TAG, upd765a_device, map)
 	AM_RANGE(0x00f2, 0x00f3) AM_MIRROR(0xff00)  AM_DEVREADWRITE(UPD765_TAG, upd765a_device, mdma_r, mdma_w)
 	AM_RANGE(0x00f4, 0x00f4) AM_MIRROR(0xff00)  AM_READ(hw_input_gate_r)
 	AM_RANGE(0x00f6, 0x00f7) AM_MIRROR(0xff00)  AM_WRITE(fdd_select_w)
 	AM_RANGE(0x00f8, 0x00f9) AM_MIRROR(0xff00)  AM_WRITE(hw_terminal_count_w)
 	AM_RANGE(0x00fc, 0x00ff) AM_MIRROR(0xff00)  AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(gide_r, gide_w)
 ADDRESS_MAP_END
 
 FLOPPY_FORMATS_MEMBER( kc_d004_device::floppy_formats )
@@ -146,13 +146,13 @@ void kc_d004_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(kc_d004_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
+MACHINE_CONFIG_START(kc_d004_device::device_add_mconfig)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(kc_d004_mem)
 	MCFG_CPU_IO_MAP(kc_d004_io)
 	MCFG_Z80_DAISY_CHAIN(kc_d004_daisy_chain)
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz/2)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(8'000'000)/2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, 0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
@@ -370,7 +370,7 @@ kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, const ch
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(kc_d004_gide_device::device_add_mconfig)
+MACHINE_CONFIG_START(kc_d004_gide_device::device_add_mconfig)
 	kc_d004_device::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY(Z80_TAG)
@@ -433,11 +433,11 @@ READ8_MEMBER(kc_d004_gide_device::gide_r)
 			{
 				if (ide_cs == 0 )
 				{
-					m_ata_data = m_ata->read_cs0(space, io_addr & 0x07, 0xffff);
+					m_ata_data = m_ata->read_cs0(io_addr & 0x07);
 				}
 				else
 				{
-					m_ata_data = m_ata->read_cs1(space, io_addr & 0x07, 0xffff);
+					m_ata_data = m_ata->read_cs1(io_addr & 0x07);
 				}
 			}
 
@@ -482,11 +482,11 @@ WRITE8_MEMBER(kc_d004_gide_device::gide_w)
 			{
 				if (ide_cs == 0)
 				{
-					m_ata->write_cs0(space, io_addr & 0x07, m_ata_data, 0xffff);
+					m_ata->write_cs0(io_addr & 0x07, m_ata_data);
 				}
 				else
 				{
-					m_ata->write_cs1(space, io_addr & 0x07, m_ata_data, 0xffff);
+					m_ata->write_cs1(io_addr & 0x07, m_ata_data);
 				}
 			}
 		}

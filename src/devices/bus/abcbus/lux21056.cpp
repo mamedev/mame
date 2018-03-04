@@ -133,7 +133,7 @@ const tiny_rom_entry *luxor_55_21056_device::device_rom_region() const
 //  ADDRESS_MAP( luxor_55_21056_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( luxor_55_21056_mem, AS_PROGRAM, 8, luxor_55_21056_device )
+ADDRESS_MAP_START(luxor_55_21056_device::luxor_55_21056_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM AM_REGION(Z80_TAG, 0)
@@ -145,7 +145,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( luxor_55_21056_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( luxor_55_21056_io, AS_IO, 8, luxor_55_21056_device )
+ADDRESS_MAP_START(luxor_55_21056_device::luxor_55_21056_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xf8)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xf0) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
@@ -245,13 +245,13 @@ WRITE_LINE_MEMBER( luxor_55_21056_device::write_sasi_msg )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( luxor_55_21056_device::device_add_mconfig )
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
+MACHINE_CONFIG_START(luxor_55_21056_device::device_add_mconfig)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(luxor_55_21056_mem)
 	MCFG_CPU_IO_MAP(luxor_55_21056_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL_8MHz/2)
+	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL(8'000'000)/2)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(luxor_55_21056_device, memory_read_byte))

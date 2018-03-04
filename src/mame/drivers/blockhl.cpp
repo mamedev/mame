@@ -58,6 +58,10 @@ public:
 
 	DECLARE_WRITE8_MEMBER(banking_callback);
 
+	void blockhl(machine_config &config);
+	void audio_map(address_map &map);
+	void bank5800_map(address_map &map);
+	void main_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -75,7 +79,8 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockhl_state )
+ADDRESS_MAP_START(blockhl_state::main_map)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x1f84, 0x1f84) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x1f8c, 0x1f8c) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
@@ -84,19 +89,18 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockhl_state )
 	AM_RANGE(0x1f96, 0x1f96) AM_READ_PORT("P2")
 	AM_RANGE(0x1f97, 0x1f97) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f98, 0x1f98) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
 	AM_RANGE(0x5800, 0x5fff) AM_DEVICE("bank5800", address_map_bank_device, amap8)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank5800_map, AS_PROGRAM, 8, blockhl_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+ADDRESS_MAP_START(blockhl_state::bank5800_map)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, blockhl_state )
+ADDRESS_MAP_START(blockhl_state::audio_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -215,20 +219,20 @@ static INPUT_PORTS_START( blockhl )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED) // joy down, can be tested in service mode
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // button 2, can be tested in service mode
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED) // button 3, can be tested in service mode
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START1)
 
 	PORT_START("P2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED) // joy down, can be tested in service mode
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // button 2, can be tested in service mode
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED) // button 3, can be tested in service mode
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START2)
 
 	PORT_START("DSW1")
@@ -270,29 +274,29 @@ INPUT_PORTS_END
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( blockhl )
+MACHINE_CONFIG_START(blockhl_state::blockhl)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)     // Konami 052526
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)     // Konami 052526
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(blockhl_state, banking_callback))
 
 	MCFG_DEVICE_ADD("bank5800", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank5800_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(12)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 112, 400, 256, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 112, 400, 256, 16, 240)
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
+//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(blockhl_state, screen_update_blockhl)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -316,7 +320,7 @@ static MACHINE_CONFIG_START( blockhl )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 MACHINE_CONFIG_END

@@ -42,6 +42,8 @@ public:
 		return -1; // or it hits an illegal opcode (sleep on the 68340?)
 	};
 
+		void cupidon(machine_config &config);
+		void cupidon_map(address_map &map);
 protected:
 
 
@@ -77,7 +79,7 @@ uint32_t cupidon_state::screen_update_cupidon(screen_device &screen, bitmap_ind1
 }
 
 // could be pumped through the get_cs function (if they use the memory protection features we might have to) but that's slow...
-static ADDRESS_MAP_START( cupidon_map, AS_PROGRAM, 32, cupidon_state )
+ADDRESS_MAP_START(cupidon_state::cupidon_map)
 	AM_RANGE(0x0000000, 0x07fffff) AM_ROM AM_MIRROR(0x1000000)
 
 	AM_RANGE(0x1000000, 0x100ffff) AM_RAM
@@ -99,7 +101,7 @@ static INPUT_PORTS_START(  cupidon )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( cupidon )
+MACHINE_CONFIG_START(cupidon_state::cupidon)
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)    // The access to 3FF00 at the start would suggest this is a 68340 so probably 16 or 25 mhz?
 	MCFG_CPU_PROGRAM_MAP(cupidon_map)
 

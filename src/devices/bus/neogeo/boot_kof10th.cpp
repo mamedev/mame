@@ -31,7 +31,6 @@ neogeo_kof10th_cart_device::neogeo_kof10th_cart_device(const machine_config &mco
 
 void neogeo_kof10th_cart_device::device_start()
 {
-	save_pointer(NAME(m_fixed), 0x40000);
 	save_item(NAME(m_special_bank));
 	save_item(NAME(m_cart_ram));
 	save_item(NAME(m_cart_ram2));
@@ -49,7 +48,7 @@ void neogeo_kof10th_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-MACHINE_CONFIG_MEMBER( neogeo_kof10th_cart_device::device_add_mconfig )
+MACHINE_CONFIG_START(neogeo_kof10th_cart_device::device_add_mconfig)
 	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
 MACHINE_CONFIG_END
 
@@ -59,6 +58,7 @@ void neogeo_kof10th_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_prot->kof10th_decrypt(cpuregion, cpuregion_size);
 	memcpy(m_cart_ram2, (uint8_t *)cpuregion + 0xe0000, 0x20000);
 	m_fixed = (get_fixed_size()) ? get_fixed_base() : get_region_fixed_base();
+	save_pointer(NAME(m_fixed), 0x40000);
 }
 
 
@@ -102,7 +102,7 @@ WRITE16_MEMBER(neogeo_kof10th_cart_device::protection_w)
 		if (!m_cart_ram[0xffe])
 			COMBINE_DATA(&m_cart_ram2[(0x00000/2) + (offset & 0xffff)]);    // Write to RAM bank A
 		else
-			m_fixed[offset] = BITSWAP8(data, 7,6,0,4,3,2,1,5);  // Write S data on-the-fly
+			m_fixed[offset] = bitswap<8>(data, 7,6,0,4,3,2,1,5);  // Write S data on-the-fly
 	}
 	else if (offset >= 0xfe000/2)
 	{

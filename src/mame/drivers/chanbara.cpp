@@ -28,7 +28,7 @@ DE-0207-0
 |MB3730  558  558  YM3014  YM2203          CP11.1C   12MHz  |
 |-----------------------------------------------------------|
 Notes:
-      6809   - clock 1.500MHz [12/8]
+      6809   - MC68B09EP, clock 1.500MHz [12/8]
       YM2203 - clock 1.500MHz [12/8]
       VSC30  - clock 3.000MHz [12/4, pin 7), custom DECO DIP40 IC
       HMC20  - DECO HMC20 custom DIP28 IC. Provides many clocks each divided by 2
@@ -104,6 +104,8 @@ public:
 	DECLARE_PALETTE_INIT(chanbara);
 	uint32_t screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void chanbara(machine_config &config);
+	void chanbara_map(address_map &map);
 };
 
 
@@ -226,7 +228,7 @@ uint32_t chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_in
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( chanbara_map, AS_PROGRAM, 8, chanbara_state )
+ADDRESS_MAP_START(chanbara_state::chanbara_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(chanbara_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(chanbara_colorram_w) AM_SHARE("colorram")
@@ -347,9 +349,9 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( chanbara )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,   0x40, 32 )
 	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout, 0x80, 16 )
-
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tile16layout, 0, 32 )
 GFXDECODE_END
+
 /***************************************************************************/
 
 
@@ -385,18 +387,20 @@ void chanbara_state::machine_reset()
 	m_scrollhi = 0;
 }
 
-static MACHINE_CONFIG_START( chanbara )
+MACHINE_CONFIG_START(chanbara_state::chanbara)
 
-	MCFG_CPU_ADD("maincpu", M6809, 12000000/8)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(12'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(chanbara_map)
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.4122)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(57.4122)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	// DECO video CRTC
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,16,240)
 	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -409,8 +413,6 @@ static MACHINE_CONFIG_START( chanbara )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(chanbara_state, chanbara_ay_out_0_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(chanbara_state, chanbara_ay_out_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

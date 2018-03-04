@@ -2,6 +2,7 @@
 // copyright-holders:Jarek Burczynski, Phil Stroffolino, Tomasz Slanina
 
 #include "cpu/m6805/m68705.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 
@@ -85,6 +86,8 @@ public:
 	void draw_river( bitmap_ind16 &bitmap, int sy );
 	void draw_tree( bitmap_ind16 &bitmap, int sy, int tree_num );
 
+	void changela(machine_config &config);
+	void changela_map(address_map &map);
 protected:
 	// memory pointers
 	required_shared_ptr<u8>         m_spriteram;

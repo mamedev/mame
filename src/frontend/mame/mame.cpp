@@ -155,7 +155,14 @@ void mame_machine_manager::start_luaengine()
 	}
 	if (options().console())
 	{
-		m_plugins->set_value("console", "1", OPTION_PRIORITY_CMDLINE);
+		if (m_plugins->exists(OPTION_CONSOLE))
+		{
+			m_plugins->set_value(OPTION_CONSOLE, "1", OPTION_PRIORITY_CMDLINE);
+		}
+		else
+		{
+			fatalerror("Console plugin not found.\n");
+		}
 	}
 
 	m_lua->initialize();
@@ -350,13 +357,13 @@ bool emulator_info::frame_hook()
 	return mame_machine_manager::instance()->lua()->frame_hook();
 }
 
-void emulator_info::layout_file_cb(util::xml::data_node &layout)
+void emulator_info::layout_file_cb(util::xml::data_node const &layout)
 {
 	util::xml::data_node const *const mamelayout = layout.get_child("mamelayout");
 	if (mamelayout)
 	{
 		util::xml::data_node const *const script = mamelayout->get_child("script");
-		if(script)
+		if (script)
 			mame_machine_manager::instance()->lua()->call_plugin_set("layout", script->get_value());
 	}
 }

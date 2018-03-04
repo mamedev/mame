@@ -12,6 +12,8 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void by68701(machine_config &config);
+	void by68701_map(address_map &map);
 protected:
 
 	// devices
@@ -24,7 +26,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( by68701_map, AS_PROGRAM, 8, by68701_state )
+ADDRESS_MAP_START(by68701_state::by68701_map)
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x04ff) AM_RAM
@@ -43,7 +45,7 @@ DRIVER_INIT_MEMBER(by68701_state,by68701)
 {
 }
 
-static MACHINE_CONFIG_START( by68701 )
+MACHINE_CONFIG_START(by68701_state::by68701)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, 3579545/4)
 	MCFG_CPU_PROGRAM_MAP(by68701_map)

@@ -16,6 +16,7 @@
 #include "video/k053251.h"
 #include "video/konami_helper.h"
 #include "machine/k054321.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class xexex_state : public driver_device
@@ -98,4 +99,7 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 	K054539_CB_MEMBER(ym_set_mixing);
+	void xexex(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

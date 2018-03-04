@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(ISA8_NUM_9_REV, isa8_number_9_rev_device, "number_9_rev", "Number Nine Revolution 512x32/1024x8")
 
-static ADDRESS_MAP_START( upd7220_map, 0, 16, isa8_number_9_rev_device )
+ADDRESS_MAP_START(isa8_number_9_rev_device::upd7220_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_NOP
 ADDRESS_MAP_END
 
@@ -52,7 +52,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( isa8_number_9_rev_device::hgdc_display_pixels )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa8_number_9_rev_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_number_9_rev_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(512, 448)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 448-1)
@@ -60,7 +60,7 @@ MACHINE_CONFIG_MEMBER( isa8_number_9_rev_device::device_add_mconfig )
 	MCFG_SCREEN_UPDATE_DRIVER(isa8_number_9_rev_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_4_433619MHz/2) // unknown clock
+	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(4'433'619)/2) // unknown clock
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(isa8_number_9_rev_device, hgdc_display_pixels)
 	MCFG_VIDEO_SET_SCREEN("screen")

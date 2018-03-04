@@ -177,7 +177,7 @@ WRITE8_MEMBER( abc80_state::csg_w )
 //  ADDRESS_MAP( abc80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc80_mem, AS_PROGRAM, 8, abc80_state )
+ADDRESS_MAP_START(abc80_state::abc80_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
@@ -187,7 +187,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc80_io, AS_IO, 8, abc80_state )
+ADDRESS_MAP_START(abc80_state::abc80_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x17)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)
@@ -483,15 +483,15 @@ QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
 //  MACHINE_CONFIG( abc80 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc80 )
+MACHINE_CONFIG_START(abc80_state::abc80)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_11_9808MHz/2/2) // 2.9952 MHz
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(11'980'800)/2/2) // 2.9952 MHz
 	MCFG_CPU_PROGRAM_MAP(abc80_mem)
 	MCFG_CPU_IO_MAP(abc80_io)
 	MCFG_Z80_DAISY_CHAIN(abc80_daisy_chain)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(abc80_video)
+	abc80_video(config);
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -511,7 +511,7 @@ static MACHINE_CONFIG_START( abc80 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_11_9808MHz/2/2)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(11'980'800)/2/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(abc80_state, pio_pa_r))
 	MCFG_Z80PIO_IN_PB_CB(READ8(abc80_state, pio_pb_r))

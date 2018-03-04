@@ -84,20 +84,17 @@ static const uint16_t BDAcharset[]=
 };
 
 bfm_bda_device::bfm_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BFM_BDA, tag, owner, clock),
-	m_port_val(0)
+	: device_t(mconfig, BFM_BDA, tag, owner, clock)
+	, m_outputs()
+	, m_port_val(0)
 {
-}
-
-void bfm_bda_device::static_set_value(device_t &device, int val)
-{
-	bfm_bda_device &BDA = downcast<bfm_bda_device &>(device);
-	BDA.m_port_val = val;
 }
 
 void bfm_bda_device::device_start()
 {
-	save_item(NAME(m_cursor));
+	m_outputs = std::make_unique<output_finder<16> >(*this, "vfd%u", unsigned(m_port_val) << 4);
+	m_outputs->resolve();
+
 	save_item(NAME(m_cursor_pos));
 	save_item(NAME(m_window_start));        // display window start pos 0-15
 	save_item(NAME(m_window_end));      // display window end   pos 0-15
@@ -111,13 +108,12 @@ void bfm_bda_device::device_start()
 	save_item(NAME(m_display_mode));
 	save_item(NAME(m_flash_rate));
 	save_item(NAME(m_flash_control));
+
+	save_item(NAME(m_cursor));
 	save_item(NAME(m_chars));
 	save_item(NAME(m_attrs));
-	save_item(NAME(m_outputs));
 	save_item(NAME(m_user_data));           // user defined character data (16 bit)
 	save_item(NAME(m_user_def));            // user defined character state
-
-	device_reset();
 }
 
 void bfm_bda_device::device_reset()
@@ -139,38 +135,24 @@ void bfm_bda_device::device_reset()
 	m_user_data = 0;
 	m_user_def = 0;
 
-	memset(m_chars, 0, sizeof(m_chars));
-	memset(m_outputs, 0, sizeof(m_outputs));
-	memset(m_attrs, 0, sizeof(m_attrs));
+	std::fill(std::begin(m_chars), std::end(m_chars), 0);
+	std::fill(std::begin(m_attrs), std::end(m_attrs), 0);
 }
 
 uint16_t bfm_bda_device::set_display(uint16_t segin)
 {
-	return BITSWAP16(segin,8,12,11,7,6,4,10,3,14,15,0,13,9,5,1,2);
+	return bitswap<16>(segin,8,12,11,7,6,4,10,3,14,15,0,13,9,5,1,2);
 }
 
 void bfm_bda_device::device_post_load()
 {
-	for (int i =0; i<16; i++)
-	{
-		machine().output().set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
-	}
+	update_display();
 }
 
 void bfm_bda_device::update_display()
 {
-	for (int i =0; i<16; i++)
-	{
-		if (m_attrs[i] != AT_BLANK)
-		{
-			m_outputs[i] = set_display(m_chars[i]);
-		}
-		else
-		{
-			m_outputs[i] = 0;
-		}
-		machine().output().set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
-	}
+	for (int i = 0; i < 16; i++)
+		(*m_outputs)[i] = (m_attrs[i] != AT_BLANK) ? set_display(m_chars[i]) : 0;
 }
 ///////////////////////////////////////////////////////////////////////////
 void bfm_bda_device::blank(int data)
@@ -185,6 +167,7 @@ void bfm_bda_device::blank(int data)
 			}
 		}
 		break;
+
 	case 0x01:  // blank inside window
 		if ( m_window_size > 0 )
 		{
@@ -194,6 +177,7 @@ void bfm_bda_device::blank(int data)
 			}
 		}
 		break;
+
 	case 0x02:  // blank outside window
 		if ( m_window_size > 0 )
 		{
@@ -311,8 +295,8 @@ int bfm_bda_device::write_char(int data)
 				case 0x01:  // clr inside window
 					if ( m_window_size > 0 )
 					{
-						memset(m_chars+m_window_start,0,m_window_size);
-						memset(m_attrs+m_window_start,0,m_window_size);
+						std::fill_n(m_chars + m_window_start, m_window_size, 0);
+						std::fill_n(m_attrs + m_window_start, m_window_size, 0);
 					}
 
 					break;
@@ -341,10 +325,8 @@ int bfm_bda_device::write_char(int data)
 					break;
 
 				case 0x03:  // clr entire display
-					{
-						memset(m_chars, 0, sizeof(m_chars));
-						memset(m_attrs, 0, sizeof(m_attrs));
-					}
+					std::fill(std::begin(m_chars), std::end(m_chars), 0);
+					std::fill(std::begin(m_attrs), std::end(m_attrs), 0);
 				}
 				break;
 
@@ -405,7 +387,6 @@ void bfm_bda_device::setdata(int segdata, int data)
 
 	case 0x2C:  // semicolon
 	case 0x2E:  // decimal point
-
 		if( m_chars[m_pcursor_pos] & (1<<12))
 		{
 			move++;
@@ -444,7 +425,6 @@ void bfm_bda_device::setdata(int segdata, int data)
 		switch ( mode )
 		{
 		case 0: // rotate left
-
 			m_cursor_pos &= 0x0F;
 
 			if ( change )
@@ -457,7 +437,6 @@ void bfm_bda_device::setdata(int segdata, int data)
 
 
 		case 1: // Rotate right
-
 			m_cursor_pos &= 0x0F;
 
 			if ( change )
@@ -469,7 +448,6 @@ void bfm_bda_device::setdata(int segdata, int data)
 			break;
 
 		case 2: // Scroll left
-
 			if ( m_cursor_pos < m_window_end )
 			{
 				m_scroll_active = 0;
@@ -507,7 +485,6 @@ void bfm_bda_device::setdata(int segdata, int data)
 			break;
 
 		case 3: // Scroll right
-
 			if ( m_cursor_pos > m_window_start )
 			{
 				if ( change )

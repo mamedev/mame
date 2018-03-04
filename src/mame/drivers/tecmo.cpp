@@ -54,10 +54,12 @@ f809      ????
 f80b      ????
 
 ***************************************************************************/
+
 #include "emu.h"
 #include "includes/tecmo.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
@@ -67,17 +69,6 @@ f80b      ????
 WRITE8_MEMBER(tecmo_state::bankswitch_w)
 {
 	membank("bank1")->set_entry(data >> 3);
-}
-
-WRITE8_MEMBER(tecmo_state::sound_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_soundcpu->set_input_line(INPUT_LINE_NMI,ASSERT_LINE);
-}
-
-WRITE8_MEMBER(tecmo_state::nmi_ack_w)
-{
-	m_soundcpu->set_input_line(INPUT_LINE_NMI,CLEAR_LINE);
 }
 
 WRITE8_MEMBER(tecmo_state::adpcm_start_w)
@@ -145,14 +136,14 @@ READ8_MEMBER(tecmo_state::dswb_h_r)
 }
 
 
-static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8, tecmo_state )
+ADDRESS_MAP_START(tecmo_state::rygar_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("JOY1")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("BUTTONS1")
@@ -167,19 +158,19 @@ static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(sound_command_w)
+	AM_RANGE(0xf806, 0xf806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf80b, 0xf80b) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8, tecmo_state )
+ADDRESS_MAP_START(tecmo_state::gemini_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("JOY1")
@@ -195,20 +186,20 @@ static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(sound_command_w)
+	AM_RANGE(0xf806, 0xf806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf80b, 0xf80b) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8, tecmo_state )
+ADDRESS_MAP_START(tecmo_state::silkworm_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("JOY1")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("BUTTONS1")
@@ -223,33 +214,33 @@ static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(sound_command_w)
+	AM_RANGE(0xf806, 0xf806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf809, 0xf809) AM_WRITENOP    /* ? */
 	AM_RANGE(0xf80b, 0xf80b) AM_WRITENOP    /* ? if mapped to watchdog like in the others, causes reset */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8, tecmo_state )
+ADDRESS_MAP_START(tecmo_state::rygar_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(adpcm_end_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_vol_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(nmi_ack_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
+ADDRESS_MAP_START(tecmo_state::tecmo_sound_map)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x2000, 0x207f) AM_RAM             /* Silkworm set #2 has a custom CPU which */
 												/* writes code to this area */
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_start_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(adpcm_end_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(adpcm_vol_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(nmi_ack_w)
+	AM_RANGE(0xcc00, 0xcc00) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
 
@@ -632,21 +623,21 @@ void tecmo_state::machine_reset()
 	m_adpcm_data = -1;
 }
 
-static MACHINE_CONFIG_START( rygar )
+MACHINE_CONFIG_START(tecmo_state::rygar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rygar_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmo_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_4MHz) /* verified on pcb */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(4'000'000)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rygar_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384,0,256,264,16,240) // 59.18 Hz
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 384,0,256,264,16,240) // 59.18 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(tecmo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -661,41 +652,46 @@ static MACHINE_CONFIG_START( rygar )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_4MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL(4'000'000)) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb, even if schematics shows a 384khz resonator */
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb, even if schematics shows a 384khz resonator */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(tecmo_state, adpcm_int))    /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gemini, rygar )
+MACHINE_CONFIG_START(tecmo_state::gemini)
+	rygar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	// xtal found on bootleg, to be confirmed on a real board
-	MCFG_CPU_CLOCK(XTAL_8MHz)
+	MCFG_CPU_CLOCK(XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(gemini_map)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(tecmo_sound_map)
 
-	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL_4MHz)
+	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL(4'000'000))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( geminib, gemini)
+MACHINE_CONFIG_START(tecmo_state::geminib)
+	gemini(config);
 	// 24.18 MHz OSC / 59.62 Hz, bootleg only?
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(24180000/4, 384,0,256,264,16,240)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( silkworm, gemini )
+MACHINE_CONFIG_START(tecmo_state::silkworm)
+	gemini(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -703,7 +699,8 @@ static MACHINE_CONFIG_DERIVED( silkworm, gemini )
 	MCFG_CPU_PROGRAM_MAP(silkworm_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( backfirt, gemini )
+MACHINE_CONFIG_START(tecmo_state::backfirt)
+	gemini(config);
 
 	/* this pcb has no MSM5205 */
 	MCFG_DEVICE_REMOVE("msm")

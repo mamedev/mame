@@ -40,9 +40,6 @@ void midvunit_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
-	case TIMER_ADC_READY:
-		m_maincpu->set_input_line(3, ASSERT_LINE);
-		break;
 	case TIMER_SCANLINE:
 		scanline_timer_cb(ptr, param);
 		break;
@@ -382,7 +379,7 @@ void midvunit_renderer::process_dma_queue()
 WRITE32_MEMBER(midvunit_state::midvunit_dma_queue_w)
 {
 	if (LOG_DMA && machine().input().code_pressed(KEYCODE_L))
-		logerror("%06X:queue(%X) = %08X\n", space.device().safe_pc(), m_dma_data_index, data);
+		logerror("%06X:queue(%X) = %08X\n", m_maincpu->pc(), m_dma_data_index, data);
 	if (m_dma_data_index < 16)
 		m_dma_data[m_dma_data_index++] = data;
 }
@@ -400,7 +397,7 @@ READ32_MEMBER(midvunit_state::midvunit_dma_trigger_r)
 	if (offset)
 	{
 		if (LOG_DMA && machine().input().code_pressed(KEYCODE_L))
-			logerror("%06X:trigger\n", space.device().safe_pc());
+			logerror("%06X:trigger\n", m_maincpu->pc());
 		m_poly->process_dma_queue();
 		m_dma_data_index = 0;
 	}

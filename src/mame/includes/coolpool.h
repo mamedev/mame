@@ -3,6 +3,7 @@
 #define NVRAM_UNLOCK_SEQ_LEN 10
 
 #include "cpu/tms34010/tms34010.h"
+#include "machine/timer.h"
 #include "video/tlc34076.h"
 
 class coolpool_state : public driver_device
@@ -76,4 +77,14 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(amerdart_audio_int_gen);
 	void register_state_save();
 	int amerdart_trackball_direction(int num, int data);
+	void _9ballsht(machine_config &config);
+	void coolpool(machine_config &config);
+	void amerdart(machine_config &config);
+	void amerdart_dsp_io_map(address_map &map);
+	void amerdart_dsp_pgm_map(address_map &map);
+	void amerdart_map(address_map &map);
+	void coolpool_dsp_io_map(address_map &map);
+	void coolpool_dsp_pgm_map(address_map &map);
+	void coolpool_map(address_map &map);
+	void nballsht_map(address_map &map);
 };

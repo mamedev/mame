@@ -47,6 +47,7 @@ ToDo:
 #include "cpu/m6502/m6504.h"
 #include "machine/mos6530.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "allied.lh"
 
 class allied_state : public genpin_class
@@ -84,6 +85,8 @@ public:
 	DECLARE_READ8_MEMBER(ic7_a_r);
 	DECLARE_WRITE_LINE_MEMBER(ic8_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	void allied(machine_config &config);
+	void allied_map(address_map &map);
 private:
 	uint32_t m_player_score[6];
 	uint8_t m_display;
@@ -107,7 +110,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( allied_map, AS_PROGRAM, 8, allied_state )
+ADDRESS_MAP_START(allied_state::allied_map)
 	AM_RANGE(0x0000, 0x003f) AM_RAM // ic6
 	AM_RANGE(0x0044, 0x0047) AM_DEVREADWRITE("ic2", pia6821_device, read, write)
 	AM_RANGE(0x0048, 0x004b) AM_DEVREADWRITE("ic1", pia6821_device, read, write)
@@ -608,7 +611,7 @@ void allied_state::machine_reset()
 	output().set_value("led0", 1);  //1=off
 }
 
-static MACHINE_CONFIG_START( allied )
+MACHINE_CONFIG_START(allied_state::allied)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6504, 3572549/4)
 	MCFG_CPU_PROGRAM_MAP(allied_map)
@@ -617,7 +620,7 @@ static MACHINE_CONFIG_START( allied )
 	MCFG_DEFAULT_LAYOUT(layout_allied)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ic1", PIA6821, 0)

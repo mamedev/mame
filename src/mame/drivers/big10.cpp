@@ -3,16 +3,13 @@
 /***************************************************************************
 
   BIG 10
-  ------
+  Success, 1985.
 
   Driver by Angelo Salese, Roberto Fresca & Tomasz Slanina.
-
 
 ****************************************************************************
 
   Dumper Notes:
-
-  Possibly some kind of gambling game.
 
   Z80A
   XTAL is 21.?727
@@ -21,7 +18,6 @@
   RAM 6264 x1
   RAM 41464 x4
   unknown SDIP64 chip with welded heatsink! Might be a video chip or MCU?
-
 
 ****************************************************************************
 
@@ -55,7 +51,7 @@
 ***************************************************************************/
 
 
-#define MASTER_CLOCK        XTAL_21_4772MHz     /* Dumper notes poorly refers to a 21.?727 Xtal. */
+#define MASTER_CLOCK        XTAL(21'477'272)     /* Dumper notes poorly refers to a 21.?727 Xtal. */
 
 
 #include "emu.h"
@@ -79,10 +75,18 @@ public:
 		, m_in(*this, "IN%u", 1)
 	{ }
 
-	required_device<v9938_device> m_v9938;
-	uint8_t m_mux_data;
+	void big10(machine_config &config);
+
+protected:
+	void main_io(address_map &map);
+	void main_map(address_map &map);
+
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
+
+private:
+	required_device<v9938_device> m_v9938;
+	uint8_t m_mux_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<6> m_in;
@@ -101,7 +105,7 @@ public:
 WRITE8_MEMBER(big10_state::mux_w)
 {
 	m_mux_data = ~data;
-	m_hopper->write(space, 0, (data & 0x40) << 1);
+	m_hopper->motor_w(BIT(data, 6));
 	machine().output().set_lamp_value(1, BIT(~data, 7)); // maybe a coin counter?
 }
 
@@ -120,13 +124,13 @@ READ8_MEMBER(big10_state::mux_r)
 *             Memory Map              *
 **************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, big10_state )
+ADDRESS_MAP_START(big10_state::main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io, AS_IO, 8, big10_state )
+ADDRESS_MAP_START(big10_state::main_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(mux_r)         /* present in test mode */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM") /* coins and service */
@@ -221,7 +225,7 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-static MACHINE_CONFIG_START( big10 )
+MACHINE_CONFIG_START(big10_state::big10)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* guess */
@@ -263,5 +267,5 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      ROT      COMPANY      FULLNAME    FLAGS  */
-GAME( 198?, big10,    0,        big10,    big10,    big10_state,   0,        ROT0,   "<unknown>",  "Big 10",   0 )
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT    ROT      COMPANY     FULLNAME   FLAGS  */
+GAME( 1985, big10,    0,        big10,    big10,    big10_state,   0,      ROT0,   "Success",  "Big 10",   0 )

@@ -20,10 +20,10 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define SSIO_CLOCK          XTAL_16MHz
-#define SOUNDSGOOD_CLOCK    XTAL_16MHz
-#define TURBOCS_CLOCK       XTAL_8MHz
-#define SQUAWKTALK_CLOCK    XTAL_3_579545MHz
+#define SSIO_CLOCK          XTAL(16'000'000)
+#define SOUNDSGOOD_CLOCK    XTAL(16'000'000)
+#define TURBOCS_CLOCK       XTAL(8'000'000)
+#define SQUAWKTALK_CLOCK    XTAL(3'579'545)
 
 
 
@@ -354,7 +354,7 @@ void midway_ssio_device::update_volumes()
 //-------------------------------------------------
 
 // address map verified from schematics
-static ADDRESS_MAP_START( ssio_map, AS_PROGRAM, 8, midway_ssio_device )
+ADDRESS_MAP_START(midway_ssio_device::ssio_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM
@@ -397,7 +397,7 @@ const tiny_rom_entry *midway_ssio_device::device_rom_region() const
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( midway_ssio_device::device_add_mconfig )
+MACHINE_CONFIG_START(midway_ssio_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", Z80, SSIO_CLOCK/2/4)
 	MCFG_CPU_PROGRAM_MAP(ssio_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, midway_ssio_device, clock_14024, SSIO_CLOCK/2/16/10)
@@ -561,7 +561,7 @@ WRITE_LINE_MEMBER(midway_sounds_good_device::irq_w)
 //-------------------------------------------------
 
 // address map determined by PAL; not verified
-static ADDRESS_MAP_START( soundsgood_map, AS_PROGRAM, 16, midway_sounds_good_device )
+ADDRESS_MAP_START(midway_sounds_good_device::soundsgood_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -574,7 +574,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(midway_sounds_good_device::device_add_mconfig)
+MACHINE_CONFIG_START(midway_sounds_good_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", M68000, SOUNDSGOOD_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(soundsgood_map)
 
@@ -716,7 +716,7 @@ WRITE_LINE_MEMBER(midway_turbo_cheap_squeak_device::irq_w)
 //-------------------------------------------------
 
 // address map verified from schematics
-static ADDRESS_MAP_START( turbocs_map, AS_PROGRAM, 8, midway_turbo_cheap_squeak_device )
+ADDRESS_MAP_START(midway_turbo_cheap_squeak_device::turbocs_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
@@ -728,8 +728,8 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(midway_turbo_cheap_squeak_device::device_add_mconfig)
-	MCFG_CPU_ADD("cpu", M6809E, TURBOCS_CLOCK)
+MACHINE_CONFIG_START(midway_turbo_cheap_squeak_device::device_add_mconfig)
+	MCFG_CPU_ADD("cpu", MC6809E, TURBOCS_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(turbocs_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -903,7 +903,7 @@ WRITE_LINE_MEMBER(midway_squawk_n_talk_device::irq_w)
 // address map verified from schematics
 // note that jumpers control the ROM sizes; if these are changed, use the alternate
 // address map below
-static ADDRESS_MAP_START( squawkntalk_map, AS_PROGRAM, 8, midway_squawk_n_talk_device )
+ADDRESS_MAP_START(midway_squawk_n_talk_device::squawkntalk_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM     // internal RAM
 	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
@@ -915,7 +915,7 @@ ADDRESS_MAP_END
 // alternate address map if the ROM jumpers are changed to support a smaller
 // ROM size of 2k
 #ifdef UNUSED_FUNCTION
-static ADDRESS_MAP_START( squawkntalk_alt_map, AS_PROGRAM, 8, midway_squawk_n_talk_device )
+ADDRESS_MAP_START(midway_squawk_n_talk_device::squawkntalk_alt_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM     // internal RAM
 	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
@@ -930,7 +930,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(midway_squawk_n_talk_device::device_add_mconfig)
+MACHINE_CONFIG_START(midway_squawk_n_talk_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", M6802, SQUAWKTALK_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(squawkntalk_map)
 

@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/pic8259.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 struct pf_layer_info
@@ -78,4 +79,14 @@ public:
 	void update_scroll_positions();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int laynum, int category,int opaque);
 	void screenrefresh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void airass(machine_config &config);
+	void wpksoc(machine_config &config);
+	void firebarr(machine_config &config);
+	void dsoccr94(machine_config &config);
+	void dsoccr94_io_map(address_map &map);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
+	void sound_map(address_map &map);
+	void wpksoc_io_map(address_map &map);
+	void wpksoc_map(address_map &map);
 };

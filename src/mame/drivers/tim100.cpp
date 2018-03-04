@@ -10,7 +10,6 @@ Mihajlo Pupin Institute
 
 Notes:
 - Serial terminals appear to need 8 bits, 2 stop bits, odd parity @ 9600
-- Unable to set these settings as default, because std::bad_cast fatal error occurs at start
 - Unable to type anything as it seems uarts want BRKDET activated all the time, which we cannot do.
 - Unable to find any technical info at all, so it's all guesswork.
 
@@ -33,15 +32,15 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_palette(*this, "palette")
 		, m_crtc(*this, "crtc")
-		, m_uart17(*this, "uart_u17")
-		, m_uart18(*this, "uart_u18")
 		{ }
 
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
+	void tim100(machine_config &config);
+	void tim100_io(address_map &map);
+	void tim100_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	uint8_t *m_charmap;
@@ -50,11 +49,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
-	required_device<i8251_device> m_uart17;
-	required_device<i8251_device> m_uart18;
 };
 
-static ADDRESS_MAP_START(tim100_mem, AS_PROGRAM, 8, tim100_state)
+ADDRESS_MAP_START(tim100_state::tim100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM // 2764 at U16
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("videoram") // 2KB static ram CDM6116A at U15
@@ -66,7 +63,7 @@ static ADDRESS_MAP_START(tim100_mem, AS_PROGRAM, 8, tim100_state)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("crtc", i8275_device, read, write) // i8276
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tim100_io, AS_IO, 8, tim100_state)
+ADDRESS_MAP_START(tim100_state::tim100_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
@@ -159,18 +156,10 @@ WRITE_LINE_MEMBER( tim100_state::irq_w )
 		m_maincpu->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( tim100_state::clock_w )
-{
-	m_uart17->write_txc(state);
-	m_uart17->write_rxc(state);
-	m_uart18->write_txc(state);
-	m_uart18->write_rxc(state);
-}
 
-
-static MACHINE_CONFIG_START( tim100 )
+MACHINE_CONFIG_START(tim100_state::tim100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4_9152MHz) // divider unknown
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(4'915'200)) // divider unknown
 	MCFG_CPU_PROGRAM_MAP(tim100_mem)
 	MCFG_CPU_IO_MAP(tim100_io)
 
@@ -184,7 +173,7 @@ static MACHINE_CONFIG_START( tim100 )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tim100 )
 
-	MCFG_DEVICE_ADD("crtc", I8275, XTAL_4_9152MHz)
+	MCFG_DEVICE_ADD("crtc", I8275, XTAL(4'915'200))
 	MCFG_I8275_CHARACTER_WIDTH(12)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(tim100_state, crtc_display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(WRITELINE(tim100_state, drq_w))
@@ -216,7 +205,10 @@ static MACHINE_CONFIG_START( tim100 )
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", tim100 )
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(tim100_state, clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart_u17", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart_u17", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart_u18", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart_u18", i8251_device, write_rxc))
 MACHINE_CONFIG_END
 
 /* ROM definition */

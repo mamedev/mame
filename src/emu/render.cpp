@@ -1574,39 +1574,83 @@ void render_target::update_layer_config()
 
 void render_target::load_layout_files(const internal_layout *layoutfile, bool singlefile)
 {
-	bool have_default = false;
+	bool have_default  = false;
+	bool have_artwork  = false;
+	bool have_override = false;
+
 	// if there's an explicit file, load that first
 	const char *basename = m_manager.machine().basename();
-	if (layoutfile != nullptr)
-		have_default |= load_layout_file(basename, layoutfile);
+	if (layoutfile)
+		have_artwork |= load_layout_file(basename, layoutfile);
 
 	// if we're only loading this file, we know our final result
 	if (singlefile)
 		return;
 
-	// try to load a file based on the driver name
-	const game_driver &system = m_manager.machine().system();
-	if (!load_layout_file(basename, system.name))
-		have_default |= load_layout_file(basename, "default");
-	else
-		have_default |= true;
-
-	// if a default view has been specified, use that as a fallback
-	if (system.default_layout != nullptr)
-		have_default |= load_layout_file(nullptr, system.default_layout);
-	if (m_manager.machine().config().m_default_layout != nullptr)
-		have_default |= load_layout_file(nullptr, m_manager.machine().config().m_default_layout);
-
-	// try to load another file based on the parent driver name
-	int cloneof = driver_list::clone(system);
-	if (cloneof != -1) {
-		if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
-			have_default |= load_layout_file(driver_list::driver(cloneof).name, "default");
-		else
-			have_default |= true;
+	// if override_artwork defined, load that and skip artwork other than default
+	if (m_manager.machine().options().override_artwork())
+	{
+		if (load_layout_file(m_manager.machine().options().override_artwork(), m_manager.machine().options().override_artwork()))
+			have_override = true;
+		else if (load_layout_file(m_manager.machine().options().override_artwork(), "default"))
+			have_override = true;
 	}
+
+	const game_driver &system = m_manager.machine().system();
+
+	// Skip if override_artwork has found artwork
+	if (!have_override)
+	{
+
+		// try to load a file based on the driver name
+		if (!load_layout_file(basename, system.name))
+			have_artwork |= load_layout_file(basename, "default");
+		else
+			have_artwork = true;
+
+		// if a default view has been specified, use that as a fallback
+		if (system.default_layout != nullptr)
+			have_default |= load_layout_file(nullptr, system.default_layout);
+		if (m_manager.machine().config().m_default_layout != nullptr)
+			have_default |= load_layout_file(nullptr, m_manager.machine().config().m_default_layout);
+
+		// try to load another file based on the parent driver name
+		int cloneof = driver_list::clone(system);
+		if (cloneof != -1)
+		{
+			if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
+				have_artwork |= load_layout_file(driver_list::driver(cloneof).name, "default");
+			else
+				have_artwork = true;
+		}
+
+		// Check the parent of the parent to cover bios based artwork
+		if (cloneof != -1) {
+			const game_driver &clone(driver_list::driver(cloneof));
+			int cloneofclone = driver_list::clone(clone);
+			if (cloneofclone != -1 && cloneofclone != cloneof)
+			{
+				if (!load_layout_file(driver_list::driver(cloneofclone).name, driver_list::driver(cloneofclone).name))
+					have_artwork |= load_layout_file(driver_list::driver(cloneofclone).name, "default");
+				else
+					have_artwork = true;
+			}
+		}
+
+		// Use fallback artwork if defined and no artwork has been found yet
+		if (!have_artwork && m_manager.machine().options().fallback_artwork())
+		{
+			if (!load_layout_file(m_manager.machine().options().fallback_artwork(), m_manager.machine().options().fallback_artwork()))
+				have_artwork |= load_layout_file(m_manager.machine().options().fallback_artwork(), "default");
+			else
+				have_artwork = true;
+		}
+
+	}
+
 	screen_device_iterator iter(m_manager.machine().root_device());
-	int screens = iter.count();
+	unsigned const screens = iter.count();
+
 	// now do the built-in layouts for single-screen games
 	if (screens == 1)
 	{
@@ -1617,7 +1661,8 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 		if (m_filelist.empty())
 			throw emu_fatalerror("Couldn't parse default layout??");
 	}
-	if (!have_default)
+
+	if (!have_default && !have_artwork)
 	{
 		if (screens == 0)
 		{
@@ -1631,18 +1676,157 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 			if (m_filelist.empty())
 				throw emu_fatalerror("Couldn't parse default layout??");
 		}
-		else if (screens == 3)
+	}
+
+	// generate default layouts for larger numbers of screens
+	if (screens >= 3)
+	{
+		util::xml::file::ptr const root(util::xml::file::create());
+		if (!root)
+			throw emu_fatalerror("Couldn't create XML document??");
+		util::xml::data_node *const layoutnode(root->add_child("mamelayout", nullptr));
+		if (!layoutnode)
+			throw emu_fatalerror("Couldn't create XML node??");
+		layoutnode->set_attribute_int("version", 2);
+
+		// get standard width/height assuming 4:3 screens
+		unsigned const stdwidth((system.flags & ORIENTATION_SWAP_XY) ? 3 : 4);
+		unsigned const stdheight((system.flags & ORIENTATION_SWAP_XY) ? 4 : 3);
+
+		// generate individual 4:3 views
+		for (unsigned i = 0; screens > i; ++i)
 		{
-			load_layout_file(nullptr, &layout_triphsxs);
-			if (m_filelist.empty())
-				throw emu_fatalerror("Couldn't parse default layout??");
+			util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
+			if (!viewnode)
+				throw emu_fatalerror("Couldn't create XML node??");
+			viewnode->set_attribute("name", util::xml::normalize_string(util::string_format("Screen %1$u Standard (%2$u:%3$u)", i, stdwidth, stdheight).c_str()));
+			util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
+			if (!screennode)
+				throw emu_fatalerror("Couldn't create XML node??");
+			screennode->set_attribute_int("index", i);
+			util::xml::data_node *const boundsnode(screennode->add_child("bounds", nullptr));
+			if (!boundsnode)
+				throw emu_fatalerror("Couldn't create XML node??");
+			boundsnode->set_attribute_int("x", 0);
+			boundsnode->set_attribute_int("y", 0);
+			boundsnode->set_attribute_int("width", stdwidth);
+			boundsnode->set_attribute_int("height", stdheight);
 		}
-		else if (screens == 4)
+
+		// generate individual pixel aspect views
+		for (unsigned i = 0; screens > i; ++i)
 		{
-			load_layout_file(nullptr, &layout_quadhsxs);
-			if (m_filelist.empty())
-				throw emu_fatalerror("Couldn't parse default layout??");
+			util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
+			if (!viewnode)
+				throw emu_fatalerror("Couldn't create XML node??");
+			viewnode->set_attribute("name", util::xml::normalize_string(util::string_format("Screen %1$u Pixel Aspect (~scr%1$unativexaspect~:~scr%1$unativeyaspect~)", i).c_str()));
+			util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
+			if (!screennode)
+				throw emu_fatalerror("Couldn't create XML node??");
+			screennode->set_attribute_int("index", i);
+			util::xml::data_node *const boundsnode(screennode->add_child("bounds", nullptr));
+			if (!boundsnode)
+				throw emu_fatalerror("Couldn't create XML node??");
+			boundsnode->set_attribute_int("x", 0);
+			boundsnode->set_attribute_int("y", 0);
+			boundsnode->set_attribute("width", util::xml::normalize_string(util::string_format("~scr%1$uwidth~", i).c_str()));
+			boundsnode->set_attribute("height", util::xml::normalize_string(util::string_format("~scr%1$uheight~", i).c_str()));
 		}
+
+		// helper for generating a view since we do this a lot
+		auto const generate_view =
+				[&layoutnode, screens, stdwidth, stdheight] (char const *title, auto &&bounds_callback)
+				{
+					util::xml::data_node *viewnode = layoutnode->add_child("view", nullptr);
+					if (!viewnode)
+						throw emu_fatalerror("Couldn't create XML node??");
+					viewnode->set_attribute("name", util::xml::normalize_string(title));
+					for (unsigned i = 0; screens > i; ++i)
+					{
+						util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
+						if (!screennode)
+							throw emu_fatalerror("Couldn't create XML node??");
+						screennode->set_attribute_int("index", i);
+						util::xml::data_node *const boundsnode(screennode->add_child("bounds", nullptr));
+						if (!boundsnode)
+							throw emu_fatalerror("Couldn't create XML node??");
+						bounds_callback(*boundsnode, i);
+						boundsnode->set_attribute_int("width", stdwidth);
+						boundsnode->set_attribute_int("height", stdheight);
+					}
+				};
+
+		// generate linear views
+		generate_view(
+				"Left-to-Right",
+				[stdwidth] (util::xml::data_node &boundsnode, unsigned i)
+				{
+					boundsnode.set_attribute_float("x", i * (stdwidth + 0.03f));
+					boundsnode.set_attribute_int("y", 0);
+				});
+		generate_view(
+				"Left-to-Right (Gapless)",
+				[stdwidth] (util::xml::data_node &boundsnode, unsigned i)
+				{
+					boundsnode.set_attribute_int("x", i * stdwidth);
+					boundsnode.set_attribute_int("y", 0);
+				});
+		generate_view(
+				"Top-to-Bottom",
+				[stdheight] (util::xml::data_node &boundsnode, unsigned i)
+				{
+					boundsnode.set_attribute_int("x", 0);
+					boundsnode.set_attribute_float("y", i * (stdheight + 0.03f));
+				});
+		generate_view(
+				"Top-to-Bottom (Gapless)",
+				[stdheight] (util::xml::data_node &boundsnode, unsigned i)
+				{
+					boundsnode.set_attribute_int("x", 0);
+					boundsnode.set_attribute_int("y", i * stdheight);
+				});
+
+		// generate tiled views
+		for (unsigned mindim = 2; ((screens + mindim - 1) / mindim) >= mindim; ++mindim)
+		{
+			unsigned const majdim((screens + mindim - 1) / mindim);
+			unsigned const remainder(screens % majdim);
+			if (!remainder || (((majdim + 1) / 2) <= remainder))
+			{
+				generate_view(
+						util::string_format("%1$u\xC3\x97%2$u Left-to-Right, Top-to-Bottom", majdim, mindim).c_str(),
+						[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
+						{
+							boundsnode.set_attribute_float("x", (i % majdim) * (stdwidth + 0.03f));
+							boundsnode.set_attribute_float("y", (i / majdim) * (stdheight + 0.03f));
+						});
+				generate_view(
+						util::string_format("%1$u\xC3\x97%2$u Left-to-Right, Top-to-Bottom (Gapless)", majdim, mindim).c_str(),
+						[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
+						{
+							boundsnode.set_attribute_int("x", (i % majdim) * stdwidth);
+							boundsnode.set_attribute_int("y", (i / majdim) * stdheight);
+						});
+				generate_view(
+						util::string_format("%1$u\xC3\x97%2$u Top-to-Bottom, Left-to-Right", mindim, majdim).c_str(),
+						[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
+						{
+							boundsnode.set_attribute_float("x", (i / majdim) * (stdwidth + 0.03f));
+							boundsnode.set_attribute_float("y", (i % majdim) * (stdheight + 0.03f));
+						});
+				generate_view(
+						util::string_format("%1$u\xC3\x97%2$u Top-to-Bottom, Left-to-Right (Gapless)", mindim, majdim).c_str(),
+						[majdim, stdwidth, stdheight] (util::xml::data_node &boundsnode, unsigned i)
+						{
+							boundsnode.set_attribute_int("x", (i / majdim) * stdwidth);
+							boundsnode.set_attribute_int("y", (i % majdim) * stdheight);
+						});
+			}
+		}
+
+		// try to parse it
+		if (!load_layout_file(nullptr, *root))
+			throw emu_fatalerror("Couldn't parse generated layout??");
 	}
 }
 
@@ -1729,7 +1913,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	}
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
-	if (rootnode == nullptr)
+	if (!load_layout_file(dirname, *rootnode))
 	{
 		if (filename[0] != '<')
 			osd_printf_warning("Improperly formatted XML file '%s', ignoring\n", filename);
@@ -1738,25 +1922,24 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 		return false;
 	}
 
+	return true;
+}
+
+bool render_target::load_layout_file(const char *dirname, util::xml::data_node const &rootnode)
+{
 	// parse and catch any errors
-	bool result = true;
 	try
 	{
-		m_filelist.emplace_back(m_manager.machine(), *rootnode, dirname);
+		m_filelist.emplace_back(m_manager.machine(), rootnode, dirname);
 	}
-	catch (emu_fatalerror &err)
+	catch (emu_fatalerror)
 	{
-		if (filename[0] != '<')
-			osd_printf_warning("Error in XML file '%s': %s\n", filename, err.string());
-		else
-			osd_printf_warning("Error in XML string: %s\n", err.string());
-		result = false;
+		return false;
 	}
 
-	emulator_info::layout_file_cb(*rootnode);
+	emulator_info::layout_file_cb(rootnode);
 
-	// free the root node
-	return result;
+	return true;
 }
 
 

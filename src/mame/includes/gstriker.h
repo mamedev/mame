@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Farfetch'd, David Haywood
 
-#ifndef __GSTRIKER_H
-#define __GSTRIKER_H
+#ifndef MAME_INCLUDES_GSTRIKER_H
+#define MAME_INCLUDES_GSTRIKER_H
 
 #include "machine/6850acia.h"
 #include "machine/gen_latch.h"
@@ -56,6 +56,7 @@ public:
 	enum {
 		TECMO_WCUP94_MCU = 1,
 		TECMO_WCUP94A_MCU,
+		TECMO_WCUP94B_MCU,
 		VGOAL_SOCCER_MCU
 	}m_mcutype;
 	int m_gametype;
@@ -73,14 +74,22 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(twcup94a);
 	DECLARE_DRIVER_INIT(vgoalsoc);
 	DECLARE_DRIVER_INIT(twcup94);
+	DECLARE_DRIVER_INIT(twcup94a);
+	DECLARE_DRIVER_INIT(twcup94b);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void mcu_init();
+	void twc94(machine_config &config);
+	void gstriker(machine_config &config);
+	void vgoal(machine_config &config);
+	void gstriker_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
+	void twcup94_map(address_map &map);
 };
 
 #endif

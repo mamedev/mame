@@ -96,16 +96,15 @@ k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void k05324x_device::set_bpp(device_t &device, int bpp)
+void k05324x_device::set_bpp(int bpp)
 {
-	k05324x_device &dev = downcast<k05324x_device &>(device);
 	switch(bpp)
 	{
 		case 4:
-			device_gfx_interface::static_set_info(dev, gfxinfo);
+			set_info(gfxinfo);
 			break;
 		case 6:
-			device_gfx_interface::static_set_info(dev, gfxinfo_6bpp);
+			set_info(gfxinfo_6bpp);
 			break;
 		default:
 			fatalerror("Unsupported bpp\n");
@@ -239,7 +238,7 @@ WRITE8_MEMBER( k05324x_device::k053244_w )
 //          popmessage("053244 reg 05 = %02x",data);
 		/* bit 2 = unknown, Parodius uses it */
 		/* bit 5 = unknown, Rollergames uses it */
-//      logerror("%s: write %02x to 053244 address 5\n", space.machine().describe_context(), data);
+//      logerror("%s: write %02x to 053244 address 5\n", machine().describe_context(), data);
 		break;
 
 	case 0x06:

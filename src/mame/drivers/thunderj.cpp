@@ -59,16 +59,10 @@ void thunderj_state::update_interrupts()
 }
 
 
-MACHINE_START_MEMBER(thunderj_state,thunderj)
+void thunderj_state::machine_start()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_alpha_tile_bank));
-}
-
-
-MACHINE_RESET_MEMBER(thunderj_state,thunderj)
-{
-	atarigen_state::machine_reset();
 }
 
 
@@ -116,11 +110,11 @@ WRITE16_MEMBER(thunderj_state::latch_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, thunderj_state )
+ADDRESS_MAP_START(thunderj_state::main_map)
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x260011) AM_READ_PORT("260010")
 	AM_RANGE(0x260012, 0x260013) AM_READ(special_port2_r)
@@ -129,7 +123,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, thunderj_state )
 	AM_RANGE(0x360010, 0x360011) AM_WRITE(latch_w)
 	AM_RANGE(0x360020, 0x360021) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0x00ff)
-	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield2_latched_msb_w) AM_SHARE("vad:playfield2")
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_lsb_w) AM_SHARE("vad:playfield")
@@ -149,7 +143,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( extra_map, AS_PROGRAM, 16, thunderj_state )
+ADDRESS_MAP_START(thunderj_state::extra_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x07ffff) AM_ROM
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
@@ -247,7 +241,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( thunderj )
+MACHINE_CONFIG_START(thunderj_state::thunderj)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -255,9 +249,6 @@ static MACHINE_CONFIG_START( thunderj )
 
 	MCFG_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(extra_map)
-
-	MCFG_MACHINE_START_OVERRIDE(thunderj_state,thunderj)
-	MCFG_MACHINE_RESET_OVERRIDE(thunderj_state,thunderj)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -272,7 +263,7 @@ static MACHINE_CONFIG_START( thunderj )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(thunderj_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(thunderj_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_PLAYFIELD2(thunderj_state, "gfxdecode", get_playfield2_tile_info)
 	MCFG_ATARI_VAD_ALPHA(thunderj_state, "gfxdecode", get_alpha_tile_info)
@@ -286,12 +277,10 @@ static MACHINE_CONFIG_START( thunderj )
 	MCFG_SCREEN_UPDATE_DRIVER(thunderj_state, screen_update_thunderj)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(thunderj_state,thunderj)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(thunderj_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("260012", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

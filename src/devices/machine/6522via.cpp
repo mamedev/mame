@@ -4,9 +4,6 @@
 
     Rockwell 6522 VIA interface and emulation
 
-    This function emulates the functionality of up to 8 6522
-    versatile interface adapters.
-
     This is based on the M6821 emulation in MAME.
 
     To do:
@@ -150,7 +147,7 @@ uint16_t via6522_device::get_counter1_value()
 // device type definition
 DEFINE_DEVICE_TYPE(VIA6522, via6522_device, "via6522", "6522 VIA")
 
-DEVICE_ADDRESS_MAP_START( map, 8, via6522_device )
+ADDRESS_MAP_START(via6522_device::map)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -210,12 +207,6 @@ void via6522_device::device_start()
 	m_ca2_timer = timer_alloc(TIMER_CA2);
 	m_shift_timer = timer_alloc(TIMER_SHIFT);
 	m_shift_irq_timer = timer_alloc(TIMER_SHIFT_IRQ);
-
-	/* Default clock is from CPU1 */
-	if (clock() == 0)
-	{
-		set_unscaled_clock(machine().firstcpu->clock());
-	}
 
 	/* save state register */
 	save_item(NAME(m_in_a));
@@ -347,11 +338,16 @@ void via6522_device::clear_int(int data)
 {
 	if (m_ifr & data)
 	{
+		LOGINT("cleared\n");
 		m_ifr &= ~data;
 
 		output_irq();
 
 		LOG("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
+	}
+	else
+	{
+		LOGINT("not cleared\n");
 	}
 }
 
@@ -541,7 +537,7 @@ void via6522_device::output_pb()
 READ8_MEMBER( via6522_device::read )
 {
 	int val = 0;
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0;
 
 	offset &= 0xf;
@@ -559,6 +555,7 @@ READ8_MEMBER( via6522_device::read )
 			val = m_latch_b;
 		}
 
+		LOGINT("PB INT ");
 		CLR_PB_INT();
 		break;
 
@@ -573,6 +570,7 @@ READ8_MEMBER( via6522_device::read )
 			val = m_latch_a;
 		}
 
+		LOGINT("PA INT ");
 		CLR_PA_INT();
 
 		if (m_out_ca2 && (CA2_PULSE_OUTPUT(m_pcr) || CA2_AUTO_HS(m_pcr)))
@@ -607,6 +605,7 @@ READ8_MEMBER( via6522_device::read )
 		break;
 
 	case VIA_T1CL:
+		LOGINT("T1CL INT ");
 		clear_int(INT_T1);
 		val = get_counter1_value() & 0xFF;
 		break;
@@ -624,6 +623,7 @@ READ8_MEMBER( via6522_device::read )
 		break;
 
 	case VIA_T2CL:
+		LOGINT("T2CL INT ");
 		clear_int(INT_T2);
 		if (m_t2_active)
 		{
@@ -666,6 +666,7 @@ READ8_MEMBER( via6522_device::read )
 		m_out_cb1 = 1;
 		m_cb1_handler(m_out_cb1);
 		m_shift_counter = 0x0f;
+		LOGINT("SR INT ");
 		clear_int(INT_SR);
 		LOGSHIFT(" - ACR: %02x ", m_acr);
 		if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
@@ -730,6 +731,7 @@ WRITE8_MEMBER( via6522_device::write )
 			output_pb();
 		}
 
+		LOGINT("PB INT ");
 		CLR_PB_INT();
 
 		if (m_out_cb2 && CB2_AUTO_HS(m_pcr))
@@ -747,6 +749,7 @@ WRITE8_MEMBER( via6522_device::write )
 			output_pa();
 		}
 
+		LOGINT("PA INT ");
 		CLR_PA_INT();
 
 		if (m_out_ca2 && (CA2_PULSE_OUTPUT(m_pcr) || CA2_AUTO_HS(m_pcr)))
@@ -795,6 +798,7 @@ WRITE8_MEMBER( via6522_device::write )
 
 	case VIA_T1LH:
 		m_t1lh = data;
+		LOGINT("T1LH INT ");
 		clear_int(INT_T1);
 		break;
 
@@ -802,6 +806,7 @@ WRITE8_MEMBER( via6522_device::write )
 		m_t1ch = m_t1lh = data;
 		m_t1cl = m_t1ll;
 
+		LOGINT("T1CH INT ");
 		clear_int(INT_T1);
 
 		m_t1_pb7 = 0;
@@ -823,6 +828,7 @@ WRITE8_MEMBER( via6522_device::write )
 		m_t2ch = m_t2lh = data;
 		m_t2cl = m_t2ll;
 
+		LOGINT("T2 INT ");
 		clear_int(INT_T2);
 
 		if (!T2_COUNT_PB6(m_acr))
@@ -851,6 +857,7 @@ WRITE8_MEMBER( via6522_device::write )
 		}
 
 		m_shift_counter = 0x0f;
+		LOGINT("SR INT ");
 		clear_int(INT_SR);
 		LOGSHIFT(" - ACR is: %02x ", m_acr);
 		if (SO_O2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
@@ -940,6 +947,7 @@ WRITE8_MEMBER( via6522_device::write )
 		{
 			data = 0x7f;
 		}
+		LOGINT("IFR INT ");
 		clear_int(data);
 		break;
 	}

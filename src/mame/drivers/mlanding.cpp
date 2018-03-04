@@ -164,6 +164,14 @@ public:
 	uint32_t exec_dma();
 	void msm5205_update(int chip);
 
+	void mlanding(machine_config &config);
+	void audio_map_io(address_map &map);
+	void audio_map_prog(address_map &map);
+	void dsp_map_data(address_map &map);
+	void dsp_map_prog(address_map &map);
+	void main_map(address_map &map);
+	void mecha_map_prog(address_map &map);
+	void sub_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -708,7 +716,7 @@ READ8_MEMBER(mlanding_state::motor_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mlanding_state )
+ADDRESS_MAP_START(mlanding_state::main_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_SHARE("g_ram")
@@ -717,7 +725,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("sub_com_ram")
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(dma_start_w)
 	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(dma_stop_w)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x240004, 0x240005) AM_READNOP // Watchdog
 	AM_RANGE(0x240006, 0x240007) AM_READ(input_r)
 	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(power_ram_r, power_ram_w)
@@ -730,8 +738,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x2b0006, 0x2b0007) AM_READ(analog2_lsb_r)
 	AM_RANGE(0x2c0000, 0x2c0001) AM_READ(analog3_msb_r)
 	AM_RANGE(0x2c0002, 0x2c0003) AM_READ(analog3_lsb_r)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
+	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
+	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -742,7 +750,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, mlanding_state )
+ADDRESS_MAP_START(mlanding_state::sub_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_SHARE("dsp_prog")
@@ -761,11 +769,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dsp_map_prog, AS_PROGRAM, 16, mlanding_state )
+ADDRESS_MAP_START(mlanding_state::dsp_map_prog)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dsp_prog")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_map_data, AS_DATA, 16, mlanding_state )
+ADDRESS_MAP_START(mlanding_state::dsp_map_data)
 	AM_RANGE(0x0400, 0x1fff) AM_RAM AM_SHARE("dot_ram")
 ADDRESS_MAP_END
 
@@ -775,12 +783,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( audio_map_prog, AS_PROGRAM, 8, mlanding_state )
+ADDRESS_MAP_START(mlanding_state::audio_map_prog)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(msm5205_2_start_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(msm5205_2_stop_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(msm5205_1_start_w)
@@ -793,7 +801,7 @@ static ADDRESS_MAP_START( audio_map_prog, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map_io, AS_IO, 8, mlanding_state )
+ADDRESS_MAP_START(mlanding_state::audio_map_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
@@ -806,11 +814,10 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mecha_map_prog, AS_PROGRAM, 8, mlanding_state )
+ADDRESS_MAP_START(mlanding_state::mecha_map_prog)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("power_ram")
-	AM_RANGE(0x9000, 0x9001) AM_WRITENOP
 	AM_RANGE(0x9000, 0x9003) AM_WRITENOP
 	AM_RANGE(0x9800, 0x9805) AM_READ(motor_r)
 ADDRESS_MAP_END
@@ -908,7 +915,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mlanding )
+MACHINE_CONFIG_START(mlanding_state::mlanding)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // Appears to be 68000P8 in PCB photo
@@ -935,9 +942,9 @@ static MACHINE_CONFIG_START( mlanding )
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000)
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(mlanding_state, z80ctc_to0))
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("maincpu")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 

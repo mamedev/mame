@@ -106,6 +106,10 @@ public:
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;
 	optional_device<sns_cart_slot_device> m_cartslot;
+	void snespal(machine_config &config);
+	void snes(machine_config &config);
+	void snes_map(address_map &map);
+	void spc_map(address_map &map);
 };
 
 
@@ -210,7 +214,7 @@ WRITE8_MEMBER( snes_console_state::snes20_hi_w )
 	{ m_cartslot->chip_write(space, offset, data); return; }
 	else if (m_cartslot->get_type() == SNES_CX4
 				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))    // hack until we emulate the real CPU
-	{ CX4_write(space.machine(), (offset & 0xffff) - 0x6000, data); return; }
+	{ CX4_write(machine(), (offset & 0xffff) - 0x6000, data); return; }
 	else if (m_type == SNES_SUFAMITURBO
 				&& address >= 0x8000 && ((offset >= 0x600000 && offset < 0x640000) || (offset >= 0x700000 && offset < 0x740000)))
 	{ m_cartslot->write_h(space, offset, data); return; }
@@ -1008,13 +1012,13 @@ WRITE8_MEMBER( snes_console_state::pfest94_lo_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, snes_console_state )
+ADDRESS_MAP_START(snes_console_state::snes_map)
 //  AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(snes20_lo_r, snes20_lo_w)
 	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                                     /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
 //  AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes20_hi_r, snes20_hi_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spc_map, AS_PROGRAM, 8, snes_console_state )
+ADDRESS_MAP_START(snes_console_state::spc_map)
 	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", snes_sound_device, spc_ram_r, spc_ram_w) /* lower 32k ram */
 	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", snes_sound_device, spc_io_r, spc_io_w)   /* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_READWRITE(spc_ram_100_r, spc_ram_100_w)
@@ -1325,13 +1329,14 @@ void snes_console_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( snes )
+MACHINE_CONFIG_START(snes_console_state::snes)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68 MHz, also 3.58 MHz */
 	MCFG_CPU_PROGRAM_MAP(snes_map)
 
-	MCFG_CPU_ADD("soundcpu", SPC700, 1024000)   /* 1.024 MHz */
+	// runs at 24.576 MHz / 12 = 2.048 MHz
+	MCFG_CPU_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
 	MCFG_CPU_PROGRAM_MAP(spc_map)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(48000))
@@ -1364,7 +1369,8 @@ static MACHINE_CONFIG_START( snes )
 	MCFG_SOFTWARE_LIST_ADD("st_list","snes_strom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( snespal, snes )
+MACHINE_CONFIG_START(snes_console_state::snespal)
+	snes(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( MCLK_PAL )
 

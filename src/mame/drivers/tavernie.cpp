@@ -80,7 +80,6 @@ public:
 		, m_floppy0(*this, "fdc:0")
 		, m_beep(*this, "beeper")
 		, m_maincpu(*this, "maincpu")
-		, m_acia(*this, "acia")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
 	{
@@ -96,9 +95,12 @@ public:
 	DECLARE_WRITE8_MEMBER(ds_w);
 	DECLARE_MACHINE_RESET(cpu09);
 	DECLARE_MACHINE_RESET(ivg09);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void ivg09(machine_config &config);
+	void cpu09(machine_config &config);
+	void cpu09_mem(address_map &map);
+	void ivg09_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	uint8_t m_pa;
@@ -109,24 +111,22 @@ private:
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<beep_device> m_beep;
 	required_device<cpu_device> m_maincpu;
-	required_device<acia6850_device> m_acia;
 	optional_device<palette_device> m_palette;
 	optional_region_ptr<u8> m_p_chargen;
 };
 
 
-static ADDRESS_MAP_START(cpu09_mem, AS_PROGRAM, 8, tavernie_state)
+ADDRESS_MAP_START(tavernie_state::cpu09_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x1fff) AM_NOP
 	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xeb04, 0xeb04) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xeb05, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xeb04, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xeb08, 0xeb0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
 	AM_RANGE(0xec00, 0xefff) AM_RAM // 1Kx8 RAM MK4118
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ivg09_mem, AS_PROGRAM, 8, tavernie_state)
+ADDRESS_MAP_START(tavernie_state::ivg09_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pia_ivg", pia6821_device, read, write)
@@ -135,8 +135,7 @@ static ADDRESS_MAP_START(ivg09_mem, AS_PROGRAM, 8, tavernie_state)
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("fdc", fd1795_device, read, write)
 	AM_RANGE(0xe080, 0xe080) AM_WRITE(ds_w)
 	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xeb04, 0xeb04) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xeb05, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xeb04, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xeb08, 0xeb0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
 	AM_RANGE(0xec00, 0xefff) AM_RAM // 1Kx8 RAM MK4118
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
@@ -291,15 +290,9 @@ void tavernie_state::kbd_put(u8 data)
 	m_pia_ivg->cb1_w(1);
 }
 
-WRITE_LINE_MEMBER( tavernie_state::write_acia_clock )
-{
-	m_acia->write_txc(state);
-	m_acia->write_rxc(state);
-}
-
-static MACHINE_CONFIG_START( cpu09 )
+MACHINE_CONFIG_START(tavernie_state::cpu09)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(cpu09_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, cpu09)
 
@@ -319,10 +312,10 @@ static MACHINE_CONFIG_START( cpu09 )
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL_4MHz / 4)
+	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(4'000'000) / 4)
 	// all i/o lines connect to the 40-pin expansion connector
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT1_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_PTM6840_O2_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
@@ -334,10 +327,12 @@ static MACHINE_CONFIG_START( cpu09 )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(tavernie_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
+MACHINE_CONFIG_START(tavernie_state::ivg09)
+	cpu09(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ivg09_mem)
@@ -371,7 +366,7 @@ static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tavernie_state, pa_ivg_w))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("beeper", beep_device, set_state))
 
-	MCFG_FD1795_ADD("fdc", XTAL_8MHz / 8)
+	MCFG_FD1795_ADD("fdc", XTAL(8'000'000) / 8)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END

@@ -164,9 +164,9 @@ protected:
     DEVICE TYPE GLOBALS
 *****************************************************************************/
 
-DEFINE_DEVICE_TYPE(DL1414T, dl1414t_device, "dl1414t", "DL1414T")
-DEFINE_DEVICE_TYPE(DL1416B, dl1416b_device, "dl1416b", "DL1416B")
-DEFINE_DEVICE_TYPE(DL1416T, dl1416t_device, "dl1416t", "DL1416T")
+DEFINE_DEVICE_TYPE(DL1414T, dl1414t_device, "dl1414t", "DL1414T Intelligent Display")
+DEFINE_DEVICE_TYPE(DL1416B, dl1416b_device, "dl1416b", "DL1416B Intelligent Display")
+DEFINE_DEVICE_TYPE(DL1416T, dl1416t_device, "dl1416t", "DL1416T Intelligent Display")
 
 
 

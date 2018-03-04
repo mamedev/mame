@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/alpha8201.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 
 
@@ -79,4 +80,24 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void champbas(machine_config &config);
+	void champbb2(machine_config &config);
+	void exctsccr(machine_config &config);
+	void talbot(machine_config &config);
+	void tbasebal(machine_config &config);
+	void champbasjb(machine_config &config);
+	void champbasj(machine_config &config);
+	void exctsccrb(machine_config &config);
+	void champbasja(machine_config &config);
+	void champbas_map(address_map &map);
+	void champbas_sound_map(address_map &map);
+	void champbasj_map(address_map &map);
+	void champbasja_map(address_map &map);
+	void champbasjb_map(address_map &map);
+	void champbb2_map(address_map &map);
+	void exctsccr_map(address_map &map);
+	void exctsccr_sound_io_map(address_map &map);
+	void exctsccr_sound_map(address_map &map);
+	void exctsccrb_map(address_map &map);
+	void tbasebal_map(address_map &map);
 };

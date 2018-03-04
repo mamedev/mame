@@ -121,6 +121,10 @@ public:
 	DECLARE_READ8_MEMBER(serial_r);
 	DECLARE_WRITE8_MEMBER(serial_w);
 
+	void apfm1000(machine_config &config);
+	void apfimag(machine_config &config);
+	void apfimag_map(address_map &map);
+	void apfm1000_map(address_map &map);
 private:
 	uint8_t m_latch;
 	uint8_t m_keyboard_data;
@@ -310,7 +314,7 @@ WRITE8_MEMBER( apf_state::serial_w)
 	logerror("serial w %04x %04x\n",offset,data);
 }
 
-static ADDRESS_MAP_START( apfm1000_map, AS_PROGRAM, 8, apf_state )
+ADDRESS_MAP_START(apf_state::apfm1000_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x1000) AM_ROM AM_REGION("roms", 0)
@@ -319,7 +323,7 @@ static ADDRESS_MAP_START( apfm1000_map, AS_PROGRAM, 8, apf_state )
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
+ADDRESS_MAP_START(apf_state::apfimag_map)
 	AM_IMPORT_FROM(apfm1000_map)
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	// These need to be confirmed, disk does not work
@@ -508,16 +512,16 @@ static SLOT_INTERFACE_START(apf_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( apfm1000 )
+MACHINE_CONFIG_START(apf_state::apfm1000)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz / 4 )  // divided by 4 in external clock circuit
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(3'579'545) / 4 )  // divided by 4 in external clock circuit
 	MCFG_CPU_PROGRAM_MAP(apfm1000_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL(3'579'545))
 	MCFG_MC6847_FSYNC_CALLBACK(DEVWRITELINE("pia0", pia6821_device, cb1_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(apf_state, videoram_r))
 	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1)
@@ -544,7 +548,8 @@ static MACHINE_CONFIG_START( apfm1000 )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "apfm1000")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apfimag, apfm1000 )
+MACHINE_CONFIG_START(apf_state::apfimag)
+	apfm1000(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( apfimag_map)
 

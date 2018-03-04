@@ -20,7 +20,7 @@
 #include "machine/msm5832.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
 
@@ -49,8 +49,6 @@ public:
 		, m_dma(*this, "dma")
 		, m_pio1(*this, "pio1")
 		, m_pio2(*this, "pio2")
-		, m_sio1(*this, "sio1")
-		, m_sio2(*this, "sio2")
 		, m_centronics(*this, "centronics")
 		, m_rs232(*this, "rs232")
 		, m_fdc(*this, "fdc")
@@ -60,8 +58,11 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_votrax(*this, "votrax")
 		, m_rtc(*this, "rtc")
-	{}
+	{ }
 
+	void aussiebyte(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
@@ -92,16 +93,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sio1_rdyb_w);
 	DECLARE_WRITE_LINE_MEMBER(sio2_rdya_w);
 	DECLARE_WRITE_LINE_MEMBER(sio2_rdyb_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_MACHINE_RESET(aussiebyte);
-	DECLARE_DRIVER_INIT(aussiebyte);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	DECLARE_WRITE8_MEMBER(address_w);
 	DECLARE_WRITE8_MEMBER(register_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	void aussiebyte_io(address_map &map);
+	void aussiebyte_map(address_map &map);
 
 private:
 	uint8_t crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr, uint16_t ac_cnt, bool ac_curs);
@@ -127,8 +128,6 @@ private:
 	required_device<z80dma_device> m_dma;
 	required_device<z80pio_device> m_pio1;
 	required_device<z80pio_device> m_pio2;
-	required_device<z80sio0_device> m_sio1;
-	required_device<z80sio0_device> m_sio2;
 	required_device<centronics_device> m_centronics;
 	required_device<rs232_port_device> m_rs232;
 	required_device<wd2797_device> m_fdc;

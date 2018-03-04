@@ -18,29 +18,7 @@
 
 #include "strconv.h"
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-
-extern int utf8_main(std::vector<std::string> &args);
-//============================================================
-//  main
-//============================================================
-
-#ifdef UNICODE
-extern "C" int _tmain(int argc, TCHAR **argv)
-{
-	int i;
-	std::vector<std::string> argv_vectors(argc);
-
-	// convert arguments to UTF-8
-	for (i = 0; i < argc; i++)
-		argv_vectors[i] = osd::text::from_tstring(argv[i]);
-
-	// run utf8_main
-	return utf8_main(argv_vectors);
-}
-#endif
-
-#else
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 #include "winmain.h"
 

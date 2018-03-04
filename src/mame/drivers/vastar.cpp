@@ -140,7 +140,7 @@ WRITE_LINE_MEMBER(vastar_state::nmi_mask_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vastar_state )
+ADDRESS_MAP_START(vastar_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(bg2videoram_w) AM_SHARE("bg2videoram") AM_MIRROR(0x2000)
 	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(bg1videoram_w) AM_SHARE("bg1videoram") AM_MIRROR(0x2000)
@@ -150,13 +150,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vastar_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_port_map, AS_IO, 8, vastar_state )
+ADDRESS_MAP_START(vastar_state::main_port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, vastar_state )
+ADDRESS_MAP_START(vastar_state::cpu2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P2")
@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, vastar_state )
 	AM_RANGE(0x8080, 0x8080) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_port_map, AS_IO, 8, vastar_state )
+ADDRESS_MAP_START(vastar_state::cpu2_port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -413,15 +413,15 @@ INTERRUPT_GEN_MEMBER(vastar_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( vastar )
+MACHINE_CONFIG_START(vastar_state::vastar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vastar_state,  vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("sub", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(cpu2_port_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(vastar_state, irq0_line_hold, 242) /* 4 * vsync_freq(60.58) measured, it is not known yet how long it is asserted so we'll use HOLD_LINE for now */
@@ -450,7 +450,7 @@ static MACHINE_CONFIG_START( vastar )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(18'432'000)/12)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

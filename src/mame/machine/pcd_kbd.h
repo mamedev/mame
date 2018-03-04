@@ -6,17 +6,18 @@
 #pragma once
 
 #define MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(_devcb) \
-	devcb = &pcd_keyboard_device::set_out_tx_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<pcd_keyboard_device &>(*device).set_out_tx_handler(DEVCB_##_devcb);
 
 class pcd_keyboard_device : public device_t
 {
 public:
 	pcd_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_tx_handler(device_t &device, Object &&cb) { return downcast<pcd_keyboard_device &>(device).m_out_tx_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_tx_handler(Object &&cb) { return m_out_tx_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( t0_w );
 
+	void pcd_keyboard_map(address_map &map);
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -36,7 +37,6 @@ private:
 	DECLARE_READ_LINE_MEMBER( t0_r );
 };
 
-extern const device_type PCD_KEYBOARD;
 DECLARE_DEVICE_TYPE(PCD_KEYBOARD, pcd_keyboard_device)
 
 #endif // MAME_INCLUDES_PCD_KBD_H

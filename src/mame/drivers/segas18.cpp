@@ -125,17 +125,6 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t i
  *
  *************************************/
 
-uint8_t segas18_state::mapper_sound_r()
-{
-	return m_mcu_data;
-}
-
-void segas18_state::mapper_sound_w(uint8_t data)
-{
-	m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, data & 0xff);
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 void segas18_state::init_generic(segas18_rom_board rom_board)
 {
 	// set the ROM board
@@ -152,7 +141,6 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
 	m_vdp->stop_timers(); // 315-5124 timers
 
 	// save state
-	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_lghost_value));
 	save_item(NAME(m_lghost_select));
 }
@@ -234,7 +222,7 @@ READ16_MEMBER( segas18_state::misc_io_r )
 
 	if (!m_custom_io_r.isnull())
 		return m_custom_io_r(space, offset, mem_mask);
-	logerror("%06X:misc_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
+	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return open_bus_r(space, 0, mem_mask);
 }
 
@@ -268,7 +256,7 @@ WRITE16_MEMBER( segas18_state::misc_io_w )
 		m_custom_io_w(space, offset, data, mem_mask);
 		return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -618,13 +606,6 @@ WRITE8_MEMBER( segas18_state::soundbank_w )
 }
 
 
-WRITE8_MEMBER( segas18_state::mcu_data_w )
-{
-	m_mcu_data = data;
-	m_mcu->set_input_line(MCS51_INT1_LINE, HOLD_LINE);
-}
-
-
 
 /*************************************
  *
@@ -632,7 +613,7 @@ WRITE8_MEMBER( segas18_state::mcu_data_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( system18_map, AS_PROGRAM, 16, segas18_state )
+ADDRESS_MAP_START(segas18_state::system18_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
 
@@ -645,7 +626,7 @@ static ADDRESS_MAP_START( system18_map, AS_PROGRAM, 16, segas18_state )
 	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segas18_state )
+ADDRESS_MAP_START(segas18_state::decrypted_opcodes_map)
 	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -655,7 +636,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas18_state )
+ADDRESS_MAP_START(segas18_state::sound_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x10000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("soundbank")
@@ -664,13 +645,13 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas18_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas18_state )
+ADDRESS_MAP_START(segas18_state::sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym1", ym3438_device, read, write)
 	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym2", ym3438_device, read, write)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1f) AM_WRITE(soundbank_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(mcu_data_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_DEVREADWRITE("mapper", sega_315_5195_mapper_device, pread, pwrite)
 ADDRESS_MAP_END
 
 
@@ -681,10 +662,10 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, segas18_state )
+ADDRESS_MAP_START(segas18_state::mcu_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
-	// port 2 not used for high order address byte
-	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0xff00) AM_DEVREADWRITE("mapper", sega_315_5195_mapper_device, read, write)
+	ADDRESS_MAP_GLOBAL_MASK(0xff) // port 2 not used for high order address byte
+	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("mapper", sega_315_5195_mapper_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -1313,13 +1294,7 @@ WRITE_LINE_MEMBER(segas18_state::vdp_lv4irqline_callback_s18)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(segas18_state::ym3438_irq_handler)
-{
-	m_soundcpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-static MACHINE_CONFIG_START( system18 )
+MACHINE_CONFIG_START(segas18_state::system18)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -1332,7 +1307,10 @@ static MACHINE_CONFIG_START( system18 )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas18_state, memory_mapper, mapper_sound_r, mapper_sound_w)
+	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, 10000000)
+	MCFG_SEGA_315_5195_CPU("maincpu")
+	MCFG_SEGA_315_5195_MAPPER_HANDLER(segas18_state, memory_mapper)
+	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("io", SEGA_315_5296, 16000000)
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
@@ -1375,11 +1353,9 @@ static MACHINE_CONFIG_START( system18 )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
 	MCFG_SOUND_ADD("ym1", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(segas18_state, ym3438_irq_handler))
+	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_IRQ0))
 
 	MCFG_SOUND_ADD("ym2", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
@@ -1389,30 +1365,34 @@ static MACHINE_CONFIG_START( system18 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system18_fd1094, system18 )
+MACHINE_CONFIG_START(segas18_state::system18_fd1094)
+	system18(config);
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1094, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system18_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas18_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lghost_fd1094, system18_fd1094 )
+MACHINE_CONFIG_START(segas18_state::lghost_fd1094)
+	system18_fd1094(config);
 
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY("io")
 	MCFG_315_5296_OUT_PORTC_CB(WRITE8(segas18_state, lghost_gun_recoil_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lghost, system18 )
+MACHINE_CONFIG_START(segas18_state::lghost)
+	system18(config);
 
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY("io")
 	MCFG_315_5296_OUT_PORTC_CB(WRITE8(segas18_state, lghost_gun_recoil_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wwally_fd1094, system18_fd1094 )
+MACHINE_CONFIG_START(segas18_state::wwally_fd1094)
+	system18_fd1094(config);
 	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("TRACKX1")
 	MCFG_UPD4701_PORTY("TRACKY1")
@@ -1426,7 +1406,8 @@ static MACHINE_CONFIG_DERIVED( wwally_fd1094, system18_fd1094 )
 	MCFG_UPD4701_PORTY("TRACKY3")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wwally, system18 )
+MACHINE_CONFIG_START(segas18_state::wwally)
+	system18(config);
 	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("TRACKX1")
 	MCFG_UPD4701_PORTY("TRACKY1")
@@ -1440,22 +1421,30 @@ static MACHINE_CONFIG_DERIVED( wwally, system18 )
 	MCFG_UPD4701_PORTY("TRACKY3")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system18_i8751, system18 )
+MACHINE_CONFIG_START(segas18_state::system18_i8751)
+	system18(config);
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_REMOVE()
+
+	MCFG_DEVICE_MODIFY("mapper")
+	MCFG_SEGA_315_5195_MCU_INT_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ1))
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq0_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system18_fd1094_i8751, system18_fd1094 )
+MACHINE_CONFIG_START(segas18_state::system18_fd1094_i8751)
+	system18_fd1094(config);
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_REMOVE()
+
+	MCFG_DEVICE_MODIFY("mapper")
+	MCFG_SEGA_315_5195_MCU_INT_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ1))
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
 	MCFG_CPU_IO_MAP(mcu_io_map)

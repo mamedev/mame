@@ -109,7 +109,7 @@ const tiny_rom_entry *d9060_device_base::device_rom_region() const
 //  ADDRESS_MAP( d9060_main_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( d9060_main_mem, AS_PROGRAM, 8, d9060_device_base )
+ADDRESS_MAP_START(d9060_device_base::d9060_main_mem)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_DEVICE(M6532_0_TAG, mos6532_new_device, ram_map)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_DEVICE(M6532_1_TAG, mos6532_new_device, ram_map)
 	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVICE(M6532_0_TAG, mos6532_new_device, io_map)
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( d9060_hdc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( d9060_hdc_mem, AS_PROGRAM, 8, d9060_device_base )
+ADDRESS_MAP_START(d9060_device_base::d9060_hdc_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x300) AM_RAM
 	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x370) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
@@ -368,16 +368,16 @@ WRITE8_MEMBER( d9060_device_base::scsi_data_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( d9060_device_base::device_add_mconfig )
+MACHINE_CONFIG_START(d9060_device_base::device_add_mconfig)
 	// DOS
-	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, XTAL_4MHz/4)
+	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, XTAL(4'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(d9060_main_mem)
 
-	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532_NEW, XTAL_4MHz/4)
+	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532_NEW, XTAL(4'000'000)/4)
 	MCFG_MOS6530n_IN_PA_CB(READ8(d9060_device_base, dio_r))
 	MCFG_MOS6530n_OUT_PB_CB(WRITE8(d9060_device_base, dio_w))
 
-	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532_NEW, XTAL_4MHz/4)
+	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532_NEW, XTAL(4'000'000)/4)
 	MCFG_MOS6530n_IN_PA_CB(READ8(d9060_device_base, riot1_pa_r))
 	MCFG_MOS6530n_OUT_PA_CB(WRITE8(d9060_device_base, riot1_pa_w))
 	MCFG_MOS6530n_IN_PB_CB(READ8(d9060_device_base, riot1_pb_r))
@@ -385,10 +385,10 @@ MACHINE_CONFIG_MEMBER( d9060_device_base::device_add_mconfig )
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_DOS_TAG, INPUT_LINE_IRQ0))
 
 	// controller
-	MCFG_CPU_ADD(M6502_HDC_TAG, M6502, XTAL_4MHz/4)
+	MCFG_CPU_ADD(M6502_HDC_TAG, M6502, XTAL(4'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(d9060_hdc_mem)
 
-	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL_4MHz/4)
+	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL(4'000'000)/4)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(d9060_device_base, scsi_data_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(d9060_device_base, via_pb_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(d9060_device_base, ack_w))

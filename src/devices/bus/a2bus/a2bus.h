@@ -28,28 +28,31 @@
 //**************************************************************************
 
 #define MCFG_A2BUS_CPU(_cputag) \
-	a2bus_device::static_set_cputag(*device, _cputag);
+	downcast<a2bus_device &>(*device).set_cputag(_cputag);
 
 #define MCFG_A2BUS_OUT_IRQ_CB(_devcb) \
-	devcb = &a2bus_device::set_out_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<a2bus_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_A2BUS_OUT_NMI_CB(_devcb) \
-	devcb = &a2bus_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<a2bus_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_A2BUS_OUT_INH_CB(_devcb) \
-	devcb = &a2bus_device::set_out_inh_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<a2bus_device &>(*device).set_out_inh_callback(DEVCB_##_devcb);
 
 #define MCFG_A2BUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, A2BUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	a2bus_slot_device::static_set_a2bus_slot(*device, _nbtag, _tag);
+	downcast<a2bus_slot_device &>(*device).set_a2bus_slot(_nbtag, _tag);
 #define MCFG_A2BUS_SLOT_REMOVE(_tag)    \
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_A2BUS_ONBOARD_ADD(_nbtag, _tag, _dev_type, _def_inp) \
 	MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
 	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
-	device_a2bus_card_interface::static_set_a2bus_tag(*device, _nbtag, _tag);
+	dynamic_cast<device_a2bus_card_interface &>(*device).set_a2bus_tag(_nbtag, _tag);
+
+// 7M = XTAL(14'318'181) / 2 or XTAL(28'636'363) / 4 (for IIgs)
+static constexpr uint32_t A2BUS_7M_CLOCK = 7159090;
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -64,13 +67,13 @@ public:
 	// construction/destruction
 	a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// inline configuration
-	static void static_set_a2bus_slot(device_t &device, const char *tag, const char *slottag);
+	void set_a2bus_slot(const char *tag, const char *slottag) { m_a2bus_tag = tag; m_a2bus_slottag = slottag; }
 protected:
 	a2bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
 
 	// configuration
 	const char *m_a2bus_tag, *m_a2bus_slottag;
@@ -81,6 +84,7 @@ DECLARE_DEVICE_TYPE(A2BUS_SLOT, a2bus_slot_device)
 
 
 class device_a2bus_card_interface;
+
 // ======================> a2bus_device
 class a2bus_device : public device_t
 {
@@ -91,10 +95,10 @@ public:
 	a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<a2bus_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_nmi_callback(device_t &device, Object &&cb) { return downcast<a2bus_device &>(device).m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_inh_callback(device_t &device, Object &&cb) { return downcast<a2bus_device &>(device).m_out_inh_cb.set_callback(std::forward<Object>(cb)); }
+	void set_cputag(const char *tag) { m_cputag = tag; }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_inh_callback(Object &&cb) { return m_out_inh_cb.set_callback(std::forward<Object>(cb)); }
 
 	void add_a2bus_card(int slot, device_a2bus_card_interface *card);
 	device_a2bus_card_interface *get_a2bus_card(int slot);
@@ -149,22 +153,20 @@ public:
 	// construction/destruction
 	virtual ~device_a2bus_card_interface();
 
-	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) { m_device.logerror("a2bus: unhandled read at C0n%x\n", offset); return 0; }       // C0nX - /DEVSEL
-	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) { m_device.logerror("a2bus: unhandled write %02x to C0n%x\n", data, offset); }
-	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) { return 0; }       // CnXX - /IOSEL
-	virtual void write_cnxx(address_space &space, uint8_t offset, uint8_t data) { m_device.logerror("a2bus: unhandled write %02x to Cn%02x\n", data, offset); }
-	virtual uint8_t read_c800(address_space &space, uint16_t offset) { return 0; }      // C800 - /IOSTB
-	virtual void write_c800(address_space &space, uint16_t offset, uint8_t data) {m_device.logerror("a2bus: unhandled write %02x to %04x\n", data, offset + 0xc800); }
+	virtual uint8_t read_c0nx(uint8_t offset) { m_device.logerror("a2bus: unhandled read at C0n%x\n", offset); return 0; }       // C0nX - /DEVSEL
+	virtual void write_c0nx(uint8_t offset, uint8_t data) { m_device.logerror("a2bus: unhandled write %02x to C0n%x\n", data, offset); }
+	virtual uint8_t read_cnxx(uint8_t offset) { return 0; }       // CnXX - /IOSEL
+	virtual void write_cnxx(uint8_t offset, uint8_t data) { m_device.logerror("a2bus: unhandled write %02x to Cn%02x\n", data, offset); }
+	virtual uint8_t read_c800(uint16_t offset) { return 0; }      // C800 - /IOSTB
+	virtual void write_c800(uint16_t offset, uint8_t data) {m_device.logerror("a2bus: unhandled write %02x to %04x\n", data, offset + 0xc800); }
 	virtual bool take_c800() { return true; }   // override and return false if your card doesn't take over the c800 space
-	virtual uint8_t read_inh_rom(address_space &space, uint16_t offset) { return 0; }
-	virtual void write_inh_rom(address_space &space, uint16_t offset, uint8_t data) { }
+	virtual uint8_t read_inh_rom(uint16_t offset) { return 0; }
+	virtual void write_inh_rom(uint16_t offset, uint8_t data) { }
 	virtual uint16_t inh_start() { return INH_START_INVALID; }
 	virtual uint16_t inh_end() { return INH_END_INVALID; }
 	virtual int inh_type() { return INH_NONE; }
 
 	device_a2bus_card_interface *next() const { return m_next; }
-
-	void set_a2bus_device();
 
 	uint32_t get_slotromspace() { return 0xc000 | (m_slot<<8); }      // return Cn00 address for this slot
 	uint32_t get_slotiospace() { return 0xc080 + (m_slot<<4); }       // return C0n0 address for this slot
@@ -186,11 +188,17 @@ public:
 	void slot_dma_write_no_space(uint16_t offset, uint8_t data) { m_a2bus->dma_nospace_w(offset, data); }
 
 	// inline configuration
-	static void static_set_a2bus_tag(device_t &device, const char *tag, const char *slottag);
+	void set_a2bus_tag(const char *tag, const char *slottag) { m_a2bus_tag = tag; m_a2bus_slottag = slottag; }
 
 protected:
 	device_a2bus_card_interface(const machine_config &mconfig, device_t &device);
 
+	virtual void interface_pre_start() override;
+
+	int slotno() const { assert(m_a2bus); return m_slot; }
+	a2bus_device &a2bus() { assert(m_a2bus); return *m_a2bus; }
+
+private:
 	a2bus_device  *m_a2bus;
 	const char *m_a2bus_tag, *m_a2bus_slottag;
 	int m_slot;

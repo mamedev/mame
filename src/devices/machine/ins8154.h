@@ -43,19 +43,19 @@
 ***************************************************************************/
 
 #define MCFG_INS8154_IN_A_CB(_devcb) \
-	devcb = &ins8154_device::set_in_a_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<ins8154_device &>(*device).set_in_a_callback(DEVCB_##_devcb);
 
 #define MCFG_INS8154_OUT_A_CB(_devcb) \
-	devcb = &ins8154_device::set_out_a_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<ins8154_device &>(*device).set_out_a_callback(DEVCB_##_devcb);
 
 #define MCFG_INS8154_IN_B_CB(_devcb) \
-	devcb = &ins8154_device::set_in_b_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<ins8154_device &>(*device).set_in_b_callback(DEVCB_##_devcb);
 
 #define MCFG_INS8154_OUT_B_CB(_devcb) \
-	devcb = &ins8154_device::set_out_b_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<ins8154_device &>(*device).set_out_b_callback(DEVCB_##_devcb);
 
 #define MCFG_INS8154_OUT_IRQ_CB(_devcb) \
-	devcb = &ins8154_device::set_out_irq_callback(*device, DEVCB_##_devcb); //currently unused
+	devcb = &downcast<ins8154_device &>(*device).set_out_irq_callback(DEVCB_##_devcb); //currently unused
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -69,11 +69,11 @@ public:
 	// construction/destruction
 	ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_in_a_callback(device_t &device, Object &&cb) { return downcast<ins8154_device &>(device).m_in_a_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_a_callback(device_t &device, Object &&cb) { return downcast<ins8154_device &>(device).m_out_a_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_b_callback(device_t &device, Object &&cb) { return downcast<ins8154_device &>(device).m_in_b_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_b_callback(device_t &device, Object &&cb) { return downcast<ins8154_device &>(device).m_out_b_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<ins8154_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_a_callback(Object &&cb) { return m_in_a_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_a_callback(Object &&cb) { return m_out_a_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_b_callback(Object &&cb) { return m_in_b_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_b_callback(Object &&cb) { return m_out_b_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( ins8154_r );
 	DECLARE_WRITE8_MEMBER( ins8154_w );

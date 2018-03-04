@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(EF9345, ef9345_device, "ef9345", "EF9345")
 DEFINE_DEVICE_TYPE(TS9347, ts9347_device, "ts9347", "TS9347")
 
 // default address map
-static ADDRESS_MAP_START( ef9345, 0, 8, ef9345_device )
+ADDRESS_MAP_START(ef9345_device::ef9345)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -112,7 +112,7 @@ ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, co
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(ef9345)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(ef9345_device::ef9345), this)),
 	m_charset(*this, DEVICE_SELF),
 	m_variant(variant),
 	m_palette(*this, finder_base::DUMMY_TAG)
@@ -122,16 +122,6 @@ ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, co
 ts9347_device::ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ef9345_device(mconfig, TS9347, tag, owner, clock, EF9345_MODE::TYPE_TS9347)
 {
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void ef9345_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<ef9345_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -145,7 +135,7 @@ void ef9345_device::device_start()
 
 	m_videoram = &space(0);
 
-	m_screen_out.allocate(496, m_screen->height());
+	m_screen_out.allocate(496, screen().height());
 
 	m_blink_timer->adjust(attotime::from_msec(500), 0, attotime::from_msec(500));
 
@@ -228,8 +218,8 @@ void ef9345_device::set_busy_flag(int period)
 void ef9345_device::draw_char_40(uint8_t *c, uint16_t x, uint16_t y)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	const int scan_xsize = std::min( m_screen->width() - (x * 8), 8);
-	const int scan_ysize = std::min( m_screen->height() - (y * 10), 10);
+	const int scan_xsize = std::min( screen().width() - (x * 8), 8);
+	const int scan_ysize = std::min( screen().height() - (y * 10), 10);
 
 	for(int i = 0; i < scan_ysize; i++)
 		for(int j = 0; j < scan_xsize; j++)
@@ -240,8 +230,8 @@ void ef9345_device::draw_char_40(uint8_t *c, uint16_t x, uint16_t y)
 void ef9345_device::draw_char_80(uint8_t *c, uint16_t x, uint16_t y)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	const int scan_xsize = std::min( m_screen->width() - (x * 6), 6);
-	const int scan_ysize = std::min( m_screen->height() - (y * 10), 10);
+	const int scan_xsize = std::min( screen().width() - (x * 6), 6);
+	const int scan_ysize = std::min( screen().height() - (y * 10), 10);
 
 	for(int i = 0; i < scan_ysize; i++)
 		for(int j = 0; j < scan_xsize; j++)
@@ -265,12 +255,12 @@ void ef9345_device::set_video_mode(void)
 
 	uint16_t new_width = (m_char_mode == MODE12x80 || m_char_mode == MODE8x80) ? 492 : 336;
 
-	if (m_screen->width() != new_width)
+	if (screen().width() != new_width)
 	{
-		rectangle visarea = m_screen->visible_area();
+		rectangle visarea = screen().visible_area();
 		visarea.max_x = new_width - 1;
 
-		m_screen->configure(new_width, m_screen->height(), visarea, m_screen->frame_period().attoseconds());
+		screen().configure(new_width, screen().height(), visarea, screen().frame_period().attoseconds());
 	}
 
 	//border color

@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(NUBUS_SPEC8S3, nubus_spec8s3_device, "nb_sp8s3", "SuperMac Sp
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nubus_spec8s3_device::device_add_mconfig )
+MACHINE_CONFIG_START(nubus_spec8s3_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( SPEC8S3_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_spec8s3_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
@@ -78,7 +78,7 @@ nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device
 	m_assembled_tag(util::string_format("%s:%s", tag, SPEC8S3_SCREEN_NAME)),
 	m_vbl_pending(false), m_parameter(0)
 {
-	m_screen_tag = m_assembled_tag.c_str();
+	set_screen(m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -89,8 +89,6 @@ void nubus_spec8s3_device::device_start()
 {
 	uint32_t slotspace;
 
-	// set_nubus_device makes m_slot valid
-	set_nubus_device();
 	install_declaration_rom(this, SPEC8S3_ROM_REGION);
 
 	slotspace = get_slotspace();
@@ -99,12 +97,12 @@ void nubus_spec8s3_device::device_start()
 
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
-	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_spec8s3_device::vram_r), this), write32_delegate(FUNC(nubus_spec8s3_device::vram_w), this));
-	m_nubus->install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_spec8s3_device::vram_r), this), write32_delegate(FUNC(nubus_spec8s3_device::vram_w), this));
-	m_nubus->install_device(slotspace+0xd0000, slotspace+0xfffff, read32_delegate(FUNC(nubus_spec8s3_device::spec8s3_r), this), write32_delegate(FUNC(nubus_spec8s3_device::spec8s3_w), this));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_spec8s3_device::vram_r), this), write32_delegate(FUNC(nubus_spec8s3_device::vram_w), this));
+	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_spec8s3_device::vram_r), this), write32_delegate(FUNC(nubus_spec8s3_device::vram_w), this));
+	nubus().install_device(slotspace+0xd0000, slotspace+0xfffff, read32_delegate(FUNC(nubus_spec8s3_device::spec8s3_r), this), write32_delegate(FUNC(nubus_spec8s3_device::spec8s3_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(m_screen->time_until_pos(767, 0), 0);
+	m_timer->adjust(screen().time_until_pos(767, 0), 0);
 }
 
 //-------------------------------------------------
@@ -135,7 +133,7 @@ void nubus_spec8s3_device::device_timer(emu_timer &timer, device_timer_id tid, i
 		m_vbl_pending = true;
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(767, 0), 0);
+	m_timer->adjust(screen().time_until_pos(767, 0), 0);
 }
 
 /***************************************************************************
@@ -257,9 +255,9 @@ WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
 
 			if (m_count == 3)
 			{
-				int actual_color = BITSWAP8(m_clutoffs, 0, 1, 2, 3, 4, 5, 6, 7);
+				int actual_color = bitswap<8>(m_clutoffs, 0, 1, 2, 3, 4, 5, 6, 7);
 
-//              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", actual_color, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
+//              logerror("RAMDAC: color %d = %02x %02x %02x %s\n", actual_color, m_colors[0], m_colors[1], m_colors[2], machine().describe_context() );
 				m_palette[actual_color] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)
@@ -274,7 +272,7 @@ WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
 			if ((m_parameter == 2) && (data != 0xffffffff))
 			{
 				data &= 0xff;
-//              printf("%x to mode\n", data);
+//              logerror("%x to mode\n", data);
 				switch (data)
 				{
 					case 0x5f:
@@ -305,7 +303,7 @@ WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
 			break;
 
 		default:
-//          if (offset >= 0x3800) printf("spec8s3_w: %08x @ %x (mask %08x  PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//          if (offset >= 0x3800) logerror("spec8s3_w: %08x @ %x (mask %08x  %s)\n", data, offset, mem_mask, machine().describe_context());
 			break;
 	}
 }
@@ -333,7 +331,7 @@ READ32_MEMBER( nubus_spec8s3_device::spec8s3_r )
 			return 0;
 
 		default:
-//          if (offset >= 0x3800) printf("spec8s3_r: @ %x (mask %08x  PC=%x)\n", offset, mem_mask, space.device().safe_pc());
+//          if (offset >= 0x3800) logerror("spec8s3_r: @ %x (mask %08x  %s)\n", offset, mem_mask, machine().describe_context());
 			break;
 	}
 	return 0;

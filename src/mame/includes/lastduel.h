@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "video/bufsprite.h"
 
 class lastduel_state : public driver_device
@@ -73,4 +74,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(lastduel_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(madgear_timer_cb);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
+	void lastduel(machine_config &config);
+	void madgear(machine_config &config);
+	void lastduel_map(address_map &map);
+	void madgear_map(address_map &map);
+	void madgear_sound_map(address_map &map);
+	void sound_map(address_map &map);
 };

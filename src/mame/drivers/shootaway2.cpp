@@ -36,6 +36,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void m74(machine_config &config);
+	void c68_map(address_map &map);
+	void sub_map(address_map &map);
 protected:
 
 	// devices
@@ -63,11 +66,11 @@ uint32_t m74_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	return 0;
 }
 
-static ADDRESS_MAP_START( c68_map, AS_PROGRAM, 8, m74_state )
+ADDRESS_MAP_START(m74_state::c68_map)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, m74_state )
+ADDRESS_MAP_START(m74_state::sub_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("subcpu", 0)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -75,11 +78,11 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( m74 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( m74 )
-	MCFG_CPU_ADD("maincpu", M37450, XTAL_8MHz) /* C68 @ 8.0MHz - main CPU */
+MACHINE_CONFIG_START(m74_state::m74)
+	MCFG_CPU_ADD("maincpu", M37450, XTAL(8'000'000)) /* C68 @ 8.0MHz - main CPU */
 	MCFG_CPU_PROGRAM_MAP(c68_map)
 
-	MCFG_CPU_ADD("subcpu", TMPZ84C011, XTAL_12MHz / 3)  /* Z84C011 @ 4 MHz - sub CPU */
+	MCFG_CPU_ADD("subcpu", TMPZ84C011, XTAL(12'000'000) / 3)  /* Z84C011 @ 4 MHz - sub CPU */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -90,7 +93,7 @@ static MACHINE_CONFIG_START( m74 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -8,8 +8,8 @@
 
 #include "video/bufsprite.h"
 #include "sound/okim6295.h"
-#include "machine/gen_latch.h"
 #include "machine/pic8259.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 struct M92_pf_layer_info
@@ -39,8 +39,7 @@ public:
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette"),
-			m_upd71059c(*this, "upd71059c"),
-			m_soundlatch(*this, "soundlatch")
+			m_upd71059c(*this, "upd71059c")
 	{ }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -53,10 +52,8 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<pic8259_device> m_upd71059c;
-	optional_device<generic_latch_8_device> m_soundlatch;
 
 	emu_timer *m_spritebuffer_timer;
-	uint16_t m_sound_status;
 	uint32_t m_raster_irq_position;
 	uint16_t m_videocontrol;
 	uint8_t m_sprite_buffer_busy;
@@ -70,11 +67,6 @@ public:
 	DECLARE_WRITE16_MEMBER(m92_eeprom_w);
 	DECLARE_WRITE16_MEMBER(m92_coincounter_w);
 	DECLARE_WRITE16_MEMBER(m92_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(m92_soundlatch_w);
-	DECLARE_READ16_MEMBER(m92_sound_status_r);
-	DECLARE_READ16_MEMBER(m92_soundlatch_r);
-	DECLARE_WRITE16_MEMBER(m92_sound_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(m92_sound_status_w);
 	DECLARE_WRITE16_MEMBER(m92_sound_reset_w);
 	DECLARE_WRITE16_MEMBER(m92_spritecontrol_w);
 	DECLARE_WRITE16_MEMBER(m92_videocontrol_w);
@@ -93,7 +85,6 @@ public:
 	DECLARE_DRIVER_INIT(m92);
 	DECLARE_DRIVER_INIT(m92_bank);
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
-	DECLARE_MACHINE_START(m92);
 	DECLARE_MACHINE_RESET(m92);
 	DECLARE_VIDEO_START(m92);
 	DECLARE_VIDEO_START(ppan);
@@ -105,6 +96,27 @@ public:
 	void m92_update_scroll_positions();
 	void m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 
+	void m92(machine_config &config);
+	void inthunt(machine_config &config);
+	void lethalth(machine_config &config);
+	void ppan(machine_config &config);
+	void hook(machine_config &config);
+	void psoldier(machine_config &config);
+	void rtypeleo(machine_config &config);
+	void gunforc2(machine_config &config);
+	void nbbatman2bl(machine_config &config);
+	void bmaster(machine_config &config);
+	void nbbatman(machine_config &config);
+	void uccops(machine_config &config);
+	void dsoccr94j(machine_config &config);
+	void gunforce(machine_config &config);
+	void majtitl2(machine_config &config);
+	void mysticri(machine_config &config);
+	void lethalth_map(address_map &map);
+	void m92_map(address_map &map);
+	void m92_portmap(address_map &map);
+	void ppan_portmap(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

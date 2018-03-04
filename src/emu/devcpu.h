@@ -30,7 +30,7 @@
 #define MCFG_CPU_PROGRAM_MAP MCFG_DEVICE_PROGRAM_MAP
 #define MCFG_CPU_DATA_MAP MCFG_DEVICE_DATA_MAP
 #define MCFG_CPU_IO_MAP MCFG_DEVICE_IO_MAP
-#define MCFG_CPU_DECRYPTED_OPCODES_MAP MCFG_DEVICE_DECRYPTED_OPCODES_MAP
+#define MCFG_CPU_OPCODES_MAP MCFG_DEVICE_OPCODES_MAP
 
 #define MCFG_CPU_VBLANK_INT_DRIVER MCFG_DEVICE_VBLANK_INT_DRIVER
 #define MCFG_CPU_PERIODIC_INT_DRIVER MCFG_DEVICE_PERIODIC_INT_DRIVER
@@ -45,17 +45,8 @@
 
 // recompilation parameters
 #define MCFG_CPU_FORCE_NO_DRC() \
-	cpu_device::static_set_force_no_drc(*device, true);
+	dynamic_cast<cpu_device &>(*device).set_force_no_drc(true);
 
-
-
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define CPU_DISASSEMBLE_NAME(name)      cpu_disassemble_##name
-#define CPU_DISASSEMBLE(name)           offs_t CPU_DISASSEMBLE_NAME(name)(cpu_device *device, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, int options)
-#define CPU_DISASSEMBLE_CALL(name)      CPU_DISASSEMBLE_NAME(name)(device, stream, pc, oprom, opram, options)
 
 
 //**************************************************************************
@@ -72,7 +63,7 @@ class cpu_device :  public device_t,
 {
 public:
 	// configuration helpers
-	static void static_set_force_no_drc(device_t &device, bool value);
+	void set_force_no_drc(bool value) { m_force_no_drc = value; }
 	bool allow_drc() const;
 
 protected:
@@ -84,9 +75,6 @@ private:
 	// configured state
 	bool                    m_force_no_drc;             // whether or not to force DRC off
 };
-
-
-typedef offs_t (*cpu_disassemble_func)(cpu_device *device, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, int options);
 
 
 #endif  /* MAME_EMU_DEVCPU_H */

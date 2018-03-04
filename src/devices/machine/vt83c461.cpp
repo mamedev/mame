@@ -37,10 +37,15 @@ void vt83c461_device::device_start()
 
 READ32_MEMBER( vt83c461_device::read_config )
 {
+	return read_config(offset);
+}
+
+uint32_t vt83c461_device::read_config(offs_t offset)
+{
 	uint32_t result = 0;
 
 	/* logit */
-	LOG("%s:IDE via config read at %X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
+	LOG("%s:IDE via config read at %X\n", machine().describe_context(), offset);
 
 	switch(offset)
 	{
@@ -61,20 +66,22 @@ READ32_MEMBER( vt83c461_device::read_config )
 		break;
 
 	default:
-		logerror("%s:unknown IDE via config read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
+		logerror("%s:unknown IDE via config read at %03X\n", machine().describe_context(), offset);
 		break;
 	}
 
-//  printf( "vt83c461 read config %04x %08x %04x\n", offset, result, mem_mask );
 	return result;
 }
 
 WRITE32_MEMBER( vt83c461_device::write_config )
 {
-//  printf( "vt83c461 write config %04x %08x %04x\n", offset, data, mem_mask );
+	write_config(offset, data);
+}
 
+void vt83c461_device::write_config(offs_t offset, uint32_t data)
+{
 	/* logit */
-	LOG("%s:IDE via config write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask);
+	LOG("%s:IDE via config write to %X = %08X\n", machine().describe_context(), offset, data);
 
 	switch (offset)
 	{
@@ -95,7 +102,7 @@ WRITE32_MEMBER( vt83c461_device::write_config )
 		break;
 
 	default:
-		logerror("%s:unknown IDE via config write at %03X = %08x, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask);
+		logerror("%s:unknown IDE via config write at %03X = %08x\n", machine().describe_context(), offset, data);
 		break;
 	}
 }

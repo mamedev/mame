@@ -13,6 +13,7 @@
     TODO:
 
     - interlaced video
+    - blinking
     - add-on ROM
     - add-on RAM
     - add-on unit
@@ -24,6 +25,7 @@
 #include "cpu/i8085/i8085.h"
 #include "bus/compucolor/floppy.h"
 #include "machine/ram.h"
+#include "machine/ripple_counter.h"
 #include "machine/tms5501.h"
 #include "video/tms9927.h"
 #include "screen.h"
@@ -76,15 +78,18 @@ public:
 	IRQ_CALLBACK_MEMBER( int_ack );
 
 	uint8_t m_xo;
+	void compucolor2(machine_config &config);
+	void compucolor2_io(address_map &map);
+	void compucolor2_mem(address_map &map);
 };
 
-static ADDRESS_MAP_START( compucolor2_mem, AS_PROGRAM, 8, compucolor2_state )
+ADDRESS_MAP_START(compucolor2_state::compucolor2_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION(I8080_TAG, 0)
 	AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x1000) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( compucolor2_io, AS_IO, 8, compucolor2_state )
+ADDRESS_MAP_START(compucolor2_state::compucolor2_io)
 	AM_RANGE(0x00, 0x0f) AM_MIRROR(0x10) AM_DEVICE(TMS5501_TAG, tms5501_device, io_map)
 	AM_RANGE(0x60, 0x6f) AM_MIRROR(0x10) AM_DEVREADWRITE(CRT5027_TAG, crt5027_device, read, write)
 	AM_RANGE(0x80, 0x9f) AM_MIRROR(0x60) AM_ROM AM_REGION("ua1", 0)
@@ -387,30 +392,31 @@ void compucolor2_state::machine_reset()
 	m_rs232->write_dtr(1);
 }
 
-static MACHINE_CONFIG_START( compucolor2 )
+MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 	// basic machine hardware
-	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_17_9712MHz/9)
+	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL(17'971'200)/9)
 	MCFG_CPU_PROGRAM_MAP(compucolor2_mem)
 	MCFG_CPU_IO_MAP(compucolor2_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(compucolor2_state,int_ack)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
+	MCFG_SCREEN_RAW_PARAMS(XTAL(17'971'200)/2, 93*6, 0, 64*6, 268, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(compucolor2_state, screen_update)
-	MCFG_SCREEN_SIZE(64*6, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
-	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL_17_9712MHz/2)
+	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL(17'971'200)/2/6)
 	MCFG_TMS9927_CHAR_WIDTH(6)
-	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w))
+	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE("blink", ripple_counter_device, clock_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
+	MCFG_DEVICE_ADD("blink", RIPPLE_COUNTER, 0) // 74LS393 at UG10
+	MCFG_RIPPLE_COUNTER_STAGES(8)
+	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w)) MCFG_DEVCB_BIT(4)
+
 	// devices
-	MCFG_DEVICE_ADD(TMS5501_TAG, TMS5501, XTAL_17_9712MHz/9)
+	MCFG_DEVICE_ADD(TMS5501_TAG, TMS5501, XTAL(17'971'200)/9)
 	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE(I8080_TAG, I8085_INTR_LINE))
 	MCFG_TMS5501_XMT_CALLBACK(WRITELINE(compucolor2_state, xmt_w))
 	MCFG_TMS5501_XI_CALLBACK(READ8(compucolor2_state, xi_r))

@@ -2565,7 +2565,7 @@ void nes_a9746_device::pcb_reset()
 
 void nes_a9746_device::update_banks(uint8_t value)
 {
-	uint8_t bank = BITSWAP8(value & 0x3c,7,6,0,1,2,3,4,5);
+	uint8_t bank = bitswap<8>(value & 0x3c,7,6,0,1,2,3,4,5);
 
 	switch (m_reg[0])
 	{

@@ -433,7 +433,7 @@ WRITE16_MEMBER( st_state::berr_w )
 
 READ16_MEMBER( st_state::berr_r )
 {
-	if(!machine().side_effect_disabled()) {
+	if(!machine().side_effects_disabled()) {
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
@@ -1203,7 +1203,7 @@ WRITE16_MEMBER( stbook_state::lcd_control_w )
 //  ADDRESS_MAP( ikbd_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ikbd_map, AS_PROGRAM, 8, st_state )
+ADDRESS_MAP_START(st_state::ikbd_map)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(HD6301V1_TAG, hd6301_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD6301V1_TAG, 0)
@@ -1214,7 +1214,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ikbd_io_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ikbd_io_map, AS_IO, 8, st_state )
+ADDRESS_MAP_START(st_state::ikbd_io_map)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ(ikbd_port1_r)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(ikbd_port2_r, ikbd_port2_w)
 	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_WRITE(ikbd_port3_w)
@@ -1226,7 +1226,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( st_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( st_map, AS_PROGRAM, 16, st_state )
+ADDRESS_MAP_START(st_state::st_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(M68000_TAG, 0) AM_WRITE(berr_w)
 	AM_RANGE(0x000008, 0x1fffff) AM_RAM
@@ -1260,10 +1260,8 @@ static ADDRESS_MAP_START( st_map, AS_PROGRAM, 16, st_state )
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
 #endif
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, status_r, control_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, data_r, data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, status_r, control_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, data_r, data_w, 0xff00)
+	AM_RANGE(0xfffc00, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, read, write, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, read, write, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -1271,7 +1269,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( megast_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( megast_map, AS_PROGRAM, 16, megast_state )
+ADDRESS_MAP_START(megast_state::megast_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(M68000_TAG, 0)
 	AM_RANGE(0x000008, 0x1fffff) AM_RAM
@@ -1304,10 +1302,8 @@ static ADDRESS_MAP_START( megast_map, AS_PROGRAM, 16, megast_state )
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
 	AM_RANGE(0xfffa40, 0xfffa57) AM_READWRITE(fpu_r, fpu_w)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, status_r, control_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, data_r, data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, status_r, control_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, data_r, data_w, 0xff00)
+	AM_RANGE(0xfffc00, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, read, write, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, read, write, 0xff00)
 	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
@@ -1316,7 +1312,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ste_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ste_map, AS_PROGRAM, 16, ste_state )
+ADDRESS_MAP_START(ste_state::ste_map)
 	AM_IMPORT_FROM(st_map)
 /*  AM_RANGE(0xe00000, 0xe3ffff) AM_ROM AM_REGION(M68000_TAG, 0)
     AM_RANGE(0xff8204, 0xff8209) AM_READWRITE8(shifter_counter_r, shifter_counter_w, 0x00ff)
@@ -1357,7 +1353,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( megaste_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( megaste_map, AS_PROGRAM, 16, megaste_state )
+ADDRESS_MAP_START(megaste_state::megaste_map)
 	AM_IMPORT_FROM(st_map)
 /*  AM_RANGE(0xff8204, 0xff8209) AM_READWRITE(shifter_counter_r, shifter_counter_w)
     AM_RANGE(0xff820c, 0xff820d) AM_READWRITE(shifter_base_low_r, shifter_base_low_w)
@@ -1394,7 +1390,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( stbook_map )
 //-------------------------------------------------
 #if 0
-static ADDRESS_MAP_START( stbook_map, AS_PROGRAM, 16, stbook_state )
+ADDRESS_MAP_START(stbook_state::stbook_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM
 	AM_RANGE(0x200000, 0x3fffff) AM_RAM
 //  AM_RANGE(0xd40000, 0xd7ffff) AM_ROM
@@ -2076,7 +2072,7 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( st )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( st )
+MACHINE_CONFIG_START(st_state::st)
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MCFG_CPU_PROGRAM_MAP(st_map)
@@ -2166,7 +2162,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( megast )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( megast )
+MACHINE_CONFIG_START(megast_state::megast)
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MCFG_CPU_PROGRAM_MAP(megast_map)
@@ -2193,7 +2189,7 @@ static MACHINE_CONFIG_START( megast )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
 
 	MCFG_WD1772_ADD(WD1772_TAG, Y2/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
@@ -2257,7 +2253,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ste )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ste )
+MACHINE_CONFIG_START(ste_state::ste)
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MCFG_CPU_PROGRAM_MAP(ste_map)
@@ -2355,10 +2351,11 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( megaste )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( megaste, ste )
+MACHINE_CONFIG_START(megaste_state::megaste)
+	ste(config);
 	MCFG_CPU_MODIFY(M68000_TAG)
 	MCFG_CPU_PROGRAM_MAP(megaste_map)
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
 	MCFG_DEVICE_ADD(Z8530_TAG, SCC8530, Y2/4)
 
 	/* internal ram */
@@ -2372,7 +2369,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( stbook )
 //-------------------------------------------------
 #if 0
-static MACHINE_CONFIG_START( stbook )
+static MACHINE_CONFIG_START(stbook_state::stbook)
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, U517/2)
 	MCFG_CPU_PROGRAM_MAP(stbook_map)
@@ -2458,7 +2455,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( tt030 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( tt030, ste )
+MACHINE_CONFIG_START(ste_state::tt030)
+	ste(config);
 MACHINE_CONFIG_END
 
 
@@ -2466,7 +2464,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( falcon )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( falcon, ste )
+MACHINE_CONFIG_START(ste_state::falcon)
+	ste(config);
 MACHINE_CONFIG_END
 
 
@@ -2474,7 +2473,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( falcon40 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( falcon40, ste )
+MACHINE_CONFIG_START(ste_state::falcon40)
+	ste(config);
 MACHINE_CONFIG_END
 
 

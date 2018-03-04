@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef __BW12__
-#define __BW12__
+
+#ifndef MAME_INCLUDES_BW12_H
+#define MAME_INCLUDES_BW12_H
 
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
@@ -12,6 +13,7 @@
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
+#include "machine/timer.h"
 #include "machine/upd765.h"
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
@@ -119,6 +121,12 @@ public:
 	int m_centronics_busy;
 	int m_centronics_fault;
 	int m_centronics_perror;
+
+	void common(machine_config &config);
+	void bw14(machine_config &config);
+	void bw12(machine_config &config);
+	void bw12_io(address_map &map);
+	void bw12_mem(address_map &map);
 };
 
 #endif

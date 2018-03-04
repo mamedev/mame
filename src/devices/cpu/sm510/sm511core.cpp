@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "sm510.h"
+#include "sm510d.h"
 #include "debugger.h"
 
 
@@ -24,17 +25,17 @@ DEFINE_DEVICE_TYPE(SM512, sm512_device, "sm512", "SM512") // 4Kx8 ROM, 128x4 RAM
 
 
 // internal memory maps
-static ADDRESS_MAP_START(program_4k, AS_PROGRAM, 8, sm510_base_device)
+ADDRESS_MAP_START(sm511_device::program_4k)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_96_32x4, AS_DATA, 8, sm510_base_device)
+ADDRESS_MAP_START(sm511_device::data_96_32x4)
 	AM_RANGE(0x00, 0x5f) AM_RAM
 	AM_RANGE(0x60, 0x6f) AM_RAM AM_SHARE("lcd_ram_a")
 	AM_RANGE(0x70, 0x7f) AM_RAM AM_SHARE("lcd_ram_b")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_80_48x4, AS_DATA, 8, sm510_base_device)
+ADDRESS_MAP_START(sm512_device::data_80_48x4)
 	AM_RANGE(0x00, 0x4f) AM_RAM
 	AM_RANGE(0x50, 0x5f) AM_RAM AM_SHARE("lcd_ram_c")
 	AM_RANGE(0x60, 0x6f) AM_RAM AM_SHARE("lcd_ram_a")
@@ -43,16 +44,15 @@ ADDRESS_MAP_END
 
 
 // disasm
-offs_t sm511_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *sm511_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(sm511);
-	return CPU_DISASSEMBLE_NAME(sm511)(this, stream, pc, oprom, opram, options);
+	return new sm511_disassembler;
 }
 
 
 // device definitions
 sm511_device::sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm511_device(mconfig, SM511, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, ADDRESS_MAP_NAME(program_4k), 7 /* data width */, ADDRESS_MAP_NAME(data_96_32x4))
+  : sm511_device(mconfig, SM511, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, address_map_constructor(FUNC(sm511_device::program_4k), this), 7 /* data width */, address_map_constructor(FUNC(sm511_device::data_96_32x4), this))
 {
 }
 
@@ -62,7 +62,7 @@ sm511_device::sm511_device(const machine_config &mconfig, device_type type, cons
 }
 
 sm512_device::sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm511_device(mconfig, SM512, tag, owner, clock, 2, 12, ADDRESS_MAP_NAME(program_4k), 7, ADDRESS_MAP_NAME(data_80_48x4))
+  : sm511_device(mconfig, SM512, tag, owner, clock, 2, 12, address_map_constructor(FUNC(sm512_device::program_4k), this), 7, address_map_constructor(FUNC(sm512_device::data_80_48x4), this))
 {
 }
 
@@ -93,20 +93,20 @@ void sm511_device::clock_melody()
 		return;
 
 	// tone cycle table (SM511/SM512 datasheet fig.5)
-	// cmd 0 = cmd, 1 = stop, > 13 = illegal(unknown)
+	// cmd 0 = rest, 1 = stop, > 13 = illegal(inactive?)
 	static const u8 lut_tone_cycles[4*16] =
 	{
-		0, 0, 7, 8, 8, 9, 9, 10,11,11,12,13,14,14, 7*2, 8*2,
-		0, 0, 8, 8, 9, 9, 10,11,11,12,13,13,14,15, 8*2, 8*2,
-		0, 0, 8, 8, 9, 9, 10,10,11,12,12,13,14,15, 8*2, 8*2,
-		0, 0, 8, 9, 9, 10,10,11,11,12,13,14,14,15, 8*2, 9*2
+		0, 0, 7, 8, 8, 9, 9, 10,11,11,12,13,14,14, 0, 0,
+		0, 0, 8, 8, 9, 9, 10,11,11,12,13,13,14,15, 0, 0,
+		0, 0, 8, 8, 9, 9, 10,10,11,12,12,13,14,15, 0, 0,
+		0, 0, 8, 9, 9, 10,10,11,11,12,13,14,14,15, 0, 0,
 	};
 
 	u8 cmd = m_melody_rom[m_melody_address] & 0x3f;
 	u8 out = 0;
 
 	// clock duty cycle if tone is active
-	if ((cmd & 0xf) > 1)
+	if ((cmd & 0xf) >= 2 && (cmd & 0xf) <= 13)
 	{
 		out = m_melody_duty_index & m_melody_rd & 1;
 		m_melody_duty_count++;
@@ -121,7 +121,7 @@ void sm511_device::clock_melody()
 	}
 	else if ((cmd & 0xf) == 1)
 	{
-		// rest tell signal
+		// set melody stop flag
 		m_melody_rd |= 2;
 	}
 

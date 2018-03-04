@@ -5,7 +5,7 @@ Panic Road
 ----------
 
 TODO:
- - are collisions 100%, need to find reference videos of game being played properly to check things look ok (I think they are..)
+ - collisions don't always work, you can hit the ball out of the playfield quite easily if you know how, hence MACHINE_NOT_WORKING
  - are priorities with sprites 100%, sprite-sprite priorities are ugly in many places, maybe the SEI0010BU are 3 sprite chips?
 
 --
@@ -65,6 +65,7 @@ D.9B         [f99cac4b] /
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -123,12 +124,14 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect );
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void panicr(machine_config &config);
+	void panicr_map(address_map &map);
 };
 
 
-#define MASTER_CLOCK    XTAL_16MHz
-#define SOUND_CLOCK     XTAL_14_31818MHz
-#define TC15_CLOCK      XTAL_12MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
+#define SOUND_CLOCK     XTAL(14'318'181)
+#define TC15_CLOCK      XTAL(12'000'000)
 
 
 /***************************************************************************
@@ -378,7 +381,7 @@ READ8_MEMBER(panicr_state::collision_r)
 	ret |= (srcline[(actual_column+2)&0xff]&3) << 2;
 	ret |= (srcline[(actual_column+3)&0xff]&3) << 0;
 
-	logerror("%06x: (scroll x upper bits is %04x (full %04x)) read %d %d\n", space.device().safe_pc(), (m_scrollx&0xff00)>>8, m_scrollx,  actual_line, actual_column);
+	logerror("%06x: (scroll x upper bits is %04x (full %04x)) read %d %d\n", m_maincpu->pc(), (m_scrollx&0xff00)>>8, m_scrollx,  actual_line, actual_column);
 
 
 	return ret;
@@ -425,7 +428,7 @@ WRITE8_MEMBER(panicr_state::t5182shared_w)
 }
 
 
-static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
+ADDRESS_MAP_START(panicr_state::panicr_map)
 	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x02000, 0x03cff) AM_RAM AM_SHARE("spriteram") // how big is sprite ram, some places definitely have sprites at 3000+
 	AM_RANGE(0x03d00, 0x03fff) AM_RAM
@@ -605,7 +608,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
 }
 
-static MACHINE_CONFIG_START( panicr )
+MACHINE_CONFIG_START(panicr_state::panicr)
 	MCFG_CPU_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
 	MCFG_CPU_PROGRAM_MAP(panicr_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", panicr_state, scanline, "screen", 0, 1)
@@ -732,7 +735,7 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 
 		w1 = (rom[i + 0*size/2] << 8) + rom[i + 1*size/2];
 
-		w1 = BITSWAP16(w1,  9,12,7,3,  8,13,6,2, 11,14,1,5, 10,15,4,0);
+		w1 = bitswap<16>(w1,  9,12,7,3,  8,13,6,2, 11,14,1,5, 10,15,4,0);
 
 		buf[i + 0*size/2] = w1 >> 8;
 		buf[i + 1*size/2] = w1 & 0xff;
@@ -741,7 +744,7 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 	// text address lines
 	for (i = 0;i < size;i++)
 	{
-		rom[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6, 2,3,1,0,5,4)];
+		rom[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6, 2,3,1,0,5,4)];
 	}
 
 
@@ -756,8 +759,8 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 		w1 = (rom[i + 0*size/4] << 8) + rom[i + 3*size/4];
 		w2 = (rom[i + 1*size/4] << 8) + rom[i + 2*size/4];
 
-		w1 = BITSWAP16(w1, 14,12,11,9,   3,2,1,0, 10,15,13,8,   7,6,5,4);
-		w2 = BITSWAP16(w2,  3,13,15,4, 12,2,5,11, 14,6,1,10,    8,7,9,0);
+		w1 = bitswap<16>(w1, 14,12,11,9,   3,2,1,0, 10,15,13,8,   7,6,5,4);
+		w2 = bitswap<16>(w2,  3,13,15,4, 12,2,5,11, 14,6,1,10,    8,7,9,0);
 
 		buf[i + 0*size/4] = w1 >> 8;
 		buf[i + 1*size/4] = w1 & 0xff;
@@ -768,7 +771,7 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 	// tiles address lines
 	for (i = 0;i < size;i++)
 	{
-		rom[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12, 5,4,3,2, 11,10,9,8,7,6, 0,1)];
+		rom[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12, 5,4,3,2, 11,10,9,8,7,6, 0,1)];
 	}
 
 
@@ -783,7 +786,7 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 		w1 = (rom[i + 0*size/2] << 8) + rom[i + 1*size/2];
 
 
-		w1 = BITSWAP16(w1, 11,5,7,12, 4,10,13,3, 6,14,9,2, 0,15,1,8);
+		w1 = bitswap<16>(w1, 11,5,7,12, 4,10,13,3, 6,14,9,2, 0,15,1,8);
 
 
 		buf[i + 0*size/2] = w1 >> 8;
@@ -830,5 +833,5 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 }
 
 
-GAME( 1986, panicr,  0,      panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Taito license)", "Panic Road (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, panicrg, panicr, panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Tuning license)", "Panic Road (Germany)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, panicr,  0,      panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Taito license)", "Panic Road (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1986, panicrg, panicr, panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Tuning license)", "Panic Road (Germany)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

@@ -153,6 +153,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "video/airraid_dev.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
 
@@ -187,6 +188,12 @@ public:
 	DECLARE_DRIVER_INIT(cshooter);
 	DECLARE_MACHINE_RESET(cshooter);
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
+	void airraid(machine_config &config);
+	void airraid_crypt(machine_config &config);
+	void airraid_map(address_map &map);
+	void airraid_sound_decrypted_opcodes_map(address_map &map);
+	void airraid_sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
 };
 
 
@@ -237,7 +244,7 @@ WRITE8_MEMBER(airraid_state::bank_w)
 
 
 
-static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, airraid_state )
+ADDRESS_MAP_START(airraid_state::airraid_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP // rld result write-back
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
@@ -250,8 +257,8 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, airraid_state )
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 //  AM_RANGE(0xc801, 0xc801) AM_WRITE(cshooter_c801_w)            // see notes
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device, txram_w) AM_SHARE("txram")
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xda00, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xda00, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xdc00, 0xdc0f) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device,  vregs_w) AM_SHARE("vregs")
 //  AM_RANGE(0xdc10, 0xdc10) AM_RAM
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)
@@ -264,11 +271,11 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, airraid_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("sprite_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, airraid_state )
+ADDRESS_MAP_START(airraid_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( airraid_sound_map, AS_PROGRAM, 8, airraid_state )
+ADDRESS_MAP_START(airraid_state::airraid_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
@@ -285,7 +292,7 @@ static ADDRESS_MAP_START( airraid_sound_map, AS_PROGRAM, 8, airraid_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( airraid_sound_decrypted_opcodes_map, AS_OPCODES, 8, airraid_state )
+ADDRESS_MAP_START(airraid_state::airraid_sound_decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x8000)
 ADDRESS_MAP_END
@@ -374,16 +381,16 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( airraid )
+MACHINE_CONFIG_START(airraid_state::airraid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)        /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80,XTAL(12'000'000)/2)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(airraid_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airraid_state, cshooter_scanline, "airraid_vid:screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)      /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(airraid_sound_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -395,7 +402,7 @@ static MACHINE_CONFIG_START( airraid )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
@@ -410,9 +417,10 @@ static MACHINE_CONFIG_START( airraid )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( airraid_crypt, airraid )
+MACHINE_CONFIG_START(airraid_state::airraid_crypt)
+	airraid(config);
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -600,14 +608,14 @@ DRIVER_INIT_MEMBER(airraid_state,cshootere)
 			m_decrypted_opcodes[A] ^= 0x02;
 
 		if (BIT(A,9) || !BIT(A,5) || BIT(A,3))
-			m_decrypted_opcodes[A] = BITSWAP8(m_decrypted_opcodes[A],7,6,1,4,3,2,5,0);
+			m_decrypted_opcodes[A] = bitswap<8>(m_decrypted_opcodes[A],7,6,1,4,3,2,5,0);
 
 		/* decode the data */
 		if (BIT(A,5))
 			rom[A] ^= 0x40;
 
 		if (BIT(A,9) || !BIT(A,5))
-			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
+			rom[A] = bitswap<8>(rom[A],7,6,1,4,3,2,5,0);
 	}
 
 	DRIVER_INIT_CALL(cshooter);

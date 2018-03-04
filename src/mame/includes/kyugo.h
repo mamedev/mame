@@ -22,6 +22,46 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(coin_counter_w);
+	DECLARE_WRITE8_MEMBER(fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(bgattribram_w);
+	DECLARE_READ8_MEMBER(spriteram_2_r);
+	DECLARE_WRITE8_MEMBER(scroll_x_lo_w);
+	DECLARE_WRITE8_MEMBER(gfxctrl_w);
+	DECLARE_WRITE8_MEMBER(scroll_y_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+
+	DECLARE_DRIVER_INIT(srdmissn);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+
+	void kyugo_base(machine_config &config);
+	void repulse(machine_config &config);
+	void flashgala(machine_config &config);
+	void srdmissn(machine_config &config);
+	void legend(machine_config &config);
+	void gyrodine(machine_config &config);
+	void flashgala_sub_map(address_map &map);
+	void flashgala_sub_portmap(address_map &map);
+	void gyrodine_main_map(address_map &map);
+	void gyrodine_sub_map(address_map &map);
+	void gyrodine_sub_portmap(address_map &map);
+	void kyugo_main_map(address_map &map);
+	void kyugo_main_portmap(address_map &map);
+	void legend_sub_map(address_map &map);
+	void repulse_sub_map(address_map &map);
+	void repulse_sub_portmap(address_map &map);
+	void srdmissn_sub_map(address_map &map);
+	void srdmissn_sub_portmap(address_map &map);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_fgvideoram;
 	required_shared_ptr<uint8_t> m_bgvideoram;
@@ -29,6 +69,8 @@ public:
 	required_shared_ptr<uint8_t> m_spriteram_1;
 	required_shared_ptr<uint8_t> m_spriteram_2;
 	required_shared_ptr<uint8_t> m_shared_ram;
+
+	uint8_t m_nmi_mask;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;
@@ -46,24 +88,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t       m_nmi_mask;
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(kyugo_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(kyugo_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(kyugo_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(kyugo_bgattribram_w);
-	DECLARE_READ8_MEMBER(kyugo_spriteram_2_r);
-	DECLARE_WRITE8_MEMBER(kyugo_scroll_x_lo_w);
-	DECLARE_WRITE8_MEMBER(kyugo_gfxctrl_w);
-	DECLARE_WRITE8_MEMBER(kyugo_scroll_y_w);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_DRIVER_INIT(srdmissn);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_kyugo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

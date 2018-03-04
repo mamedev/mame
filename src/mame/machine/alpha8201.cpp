@@ -316,7 +316,7 @@ void alpha_8201_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(alpha_8201_device::device_add_mconfig)
+MACHINE_CONFIG_START(alpha_8201_device::device_add_mconfig)
 
 	MCFG_CPU_ADD("mcu", HD44801, DERIVED_CLOCK(1,1)) // 8H
 	MCFG_HMCS40_READ_R_CB(0, READ8(alpha_8201_device, mcu_data_r))

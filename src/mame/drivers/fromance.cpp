@@ -225,7 +225,7 @@ WRITE8_MEMBER(fromance_state::fromance_coinctr_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( nekkyoku_main_map, AS_PROGRAM, 8, fromance_state )
+ADDRESS_MAP_START(fromance_state::nekkyoku_main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("SERVICE") AM_WRITE(fromance_portselect_w)
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( nekkyoku_main_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0xf005, 0xf005) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromance_main_map, AS_PROGRAM, 8, fromance_state )
+ADDRESS_MAP_START(fromance_state::fromance_main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0x9e89, 0x9e89) AM_READNOP         // unknown (idolmj)
@@ -256,7 +256,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( nekkyoku_sub_map, AS_PROGRAM, 8, fromance_state )
+ADDRESS_MAP_START(fromance_state::nekkyoku_sub_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xefff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w)
@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( nekkyoku_sub_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(fromance_paletteram_r, fromance_paletteram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromance_sub_map, AS_PROGRAM, 8, fromance_state )
+ADDRESS_MAP_START(fromance_state::fromance_sub_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -280,7 +280,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( nekkyoku_sub_io_map, AS_IO, 8, fromance_state )
+ADDRESS_MAP_START(fromance_state::nekkyoku_sub_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown
@@ -293,7 +293,7 @@ static ADDRESS_MAP_START( nekkyoku_sub_io_map, AS_IO, 8, fromance_state )
 	AM_RANGE(0xe9, 0xea) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8, fromance_state )
+ADDRESS_MAP_START(fromance_state::idolmj_sub_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown
@@ -306,7 +306,7 @@ static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8, fromance_state )
 	AM_RANGE(0x29, 0x2a) AM_DEVWRITE("aysnd", ym2149_device, data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromance_sub_io_map, AS_IO, 8, fromance_state )
+ADDRESS_MAP_START(fromance_state::fromance_sub_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown
@@ -893,7 +893,7 @@ MACHINE_RESET_MEMBER(fromance_state,fromance)
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( nekkyoku )
+MACHINE_CONFIG_START(fromance_state::nekkyoku)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 Mhz ? */
@@ -939,14 +939,14 @@ static MACHINE_CONFIG_START( nekkyoku )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( idolmj )
+MACHINE_CONFIG_START(fromance_state::idolmj)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)     /* 6.00 Mhz ? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz / 2)     /* 6.00 Mhz ? */
+	MCFG_CPU_ADD("sub", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_sub_map)
 	MCFG_CPU_IO_MAP(idolmj_sub_io_map)
 
@@ -967,7 +967,7 @@ static MACHINE_CONFIG_START( idolmj )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
@@ -975,7 +975,7 @@ static MACHINE_CONFIG_START( idolmj )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_12MHz / 6)
+	MCFG_SOUND_ADD("aysnd", YM2149, XTAL(12'000'000) / 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
@@ -985,14 +985,14 @@ static MACHINE_CONFIG_START( idolmj )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( fromance )
+MACHINE_CONFIG_START(fromance_state::fromance)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)     /* 6.00 Mhz ? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz / 2)     /* 6.00 Mhz ? */
+	MCFG_CPU_ADD("sub", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_sub_map)
 	MCFG_CPU_IO_MAP(fromance_sub_io_map)
 
@@ -1013,7 +1013,7 @@ static MACHINE_CONFIG_START( fromance )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)

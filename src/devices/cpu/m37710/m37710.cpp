@@ -72,7 +72,7 @@ DEFINE_DEVICE_TYPE(M37720S1, m37720s1_device, "m37720s1", "M37720S1")
 
 // M37702M2: 512 bytes internal RAM, 16K internal mask ROM
 // (M37702E2: same with EPROM instead of mask ROM)
-DEVICE_ADDRESS_MAP_START( map, 16, m37702m2_device )
+ADDRESS_MAP_START(m37702m2_device::map)
 	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
 	AM_RANGE(0x000080, 0x00027f) AM_RAM
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION(M37710_INTERNAL_ROM_REGION, 0)
@@ -80,20 +80,20 @@ ADDRESS_MAP_END
 
 
 // M37702S1: 512 bytes internal RAM, no internal ROM
-DEVICE_ADDRESS_MAP_START( map, 16, m37702s1_device )
+ADDRESS_MAP_START(m37702s1_device::map)
 	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
 	AM_RANGE(0x000080, 0x00027f) AM_RAM
 ADDRESS_MAP_END
 
 
 // M37710S4: 2048 bytes internal RAM, no internal ROM
-DEVICE_ADDRESS_MAP_START( map, 16, m37710s4_device )
+ADDRESS_MAP_START(m37710s4_device::map)
 	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
 	AM_RANGE(0x000080, 0x00087f) AM_RAM
 ADDRESS_MAP_END
 
 // M37720S1: 512 bytes internal RAM, no internal ROM, built-in DMA
-DEVICE_ADDRESS_MAP_START( map, 16, m37720s1_device )
+ADDRESS_MAP_START(m37720s1_device::map)
 	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
 	AM_RANGE(0x000080, 0x00027f) AM_RAM
 ADDRESS_MAP_END
@@ -101,7 +101,7 @@ ADDRESS_MAP_END
 // many other combinations of RAM and ROM size exist
 
 
-m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_delegate map_delegate)
+m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, map_delegate)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
@@ -116,24 +116,24 @@ m37702m2_device::m37702m2_device(const machine_config &mconfig, const char *tag,
 
 
 m37702m2_device::m37702m2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: m37710_cpu_device(mconfig, type, tag, owner, clock, address_map_delegate(FUNC(m37702m2_device::map), this))
+	: m37710_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(m37702m2_device::map), this))
 {
 }
 
 
 m37702s1_device::m37702s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m37710_cpu_device(mconfig, M37702S1, tag, owner, clock, address_map_delegate(FUNC(m37702s1_device::map), this))
+	: m37710_cpu_device(mconfig, M37702S1, tag, owner, clock, address_map_constructor(FUNC(m37702s1_device::map), this))
 {
 }
 
 
 m37710s4_device::m37710s4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m37710_cpu_device(mconfig, M37710S4, tag, owner, clock, address_map_delegate(FUNC(m37710s4_device::map), this))
+	: m37710_cpu_device(mconfig, M37710S4, tag, owner, clock, address_map_constructor(FUNC(m37710s4_device::map), this))
 {
 }
 
 m37720s1_device::m37720s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m37710_cpu_device(mconfig, M37720S1, tag, owner, clock, address_map_delegate(FUNC(m37720s1_device::map), this))
+	: m37710_cpu_device(mconfig, M37720S1, tag, owner, clock, address_map_constructor(FUNC(m37720s1_device::map), this))
 {
 }
 
@@ -939,21 +939,20 @@ void m37710_cpu_device::m37710_set_irq_line(int line, int state)
 	(this->*m_set_line)(line, state);
 }
 
-/* Disassemble an instruction */
-#include "m7700ds.h"
-
-
-CPU_DISASSEMBLE( m37710 )
+bool m37710_cpu_device::get_m_flag() const
 {
-	return m7700_disassemble(stream, (pc&0xffff), pc>>16, oprom, 0, 0);
+	return FLAG_M;
 }
 
-
-offs_t m37710_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+bool m37710_cpu_device::get_x_flag() const
 {
-	return m7700_disassemble(stream, (pc&0xffff), pc>>16, oprom, FLAG_M, FLAG_X);
+	return FLAG_X;
 }
 
+util::disasm_interface *m37710_cpu_device::create_disassembler()
+{
+	return new m7700_disassembler(this);
+}
 
 void m37710_cpu_device::m37710_restore_state()
 {
@@ -999,7 +998,7 @@ void m37710_cpu_device::device_start()
 	memset(m_m37710_regs, 0, sizeof(m_m37710_regs));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	m_ICount = 0;

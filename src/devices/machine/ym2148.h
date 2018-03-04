@@ -19,16 +19,16 @@
 //**************************************************************************
 
 #define MCFG_YM2148_TXD_HANDLER(_devcb) \
-	devcb = &ym2148_device::set_txd_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<ym2148_device &>(*device).set_txd_handler(DEVCB_##_devcb);
 
 #define MCFG_YM2148_PORT_WRITE_HANDLER(_devcb) \
-	devcb = &ym2148_device::set_port_write_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<ym2148_device &>(*device).set_port_write_handler(DEVCB_##_devcb);
 
 #define MCFG_YM2148_PORT_READ_HANDLER(_devcb) \
-	devcb = &ym2148_device::set_port_read_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<ym2148_device &>(*device).set_port_read_handler(DEVCB_##_devcb);
 
 #define MCFG_YM2148_IRQ_HANDLER(_devcb) \
-	devcb = &ym2148_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<ym2148_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 
 class ym2148_device : public device_t, public device_serial_interface
@@ -37,11 +37,11 @@ public:
 	// construction/destruction
 	ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<ym2148_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port_write_handler(device_t &device, Object &&cb) { return downcast<ym2148_device &>(device).m_port_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port_read_handler(device_t &device, Object &&cb) { return downcast<ym2148_device &>(device).m_port_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ym2148_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_txd_handler(Object &&cb) { return m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port_write_handler(Object &&cb) { return m_port_write_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port_read_handler(Object &&cb) { return m_port_read_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

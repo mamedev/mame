@@ -54,22 +54,32 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
+	void queen(machine_config &config);
+	void queen_io(address_map &map);
+	void queen_map(address_map &map);
+
+	uint8_t mtxc_config_r(int function, int reg);
+	void mtxc_config_w(int function, int reg, uint8_t data);
+	uint32_t intel82439tx_pci_r(int function, int reg, uint32_t mem_mask);
+	void intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+	uint8_t piix4_config_r(int function, int reg);
+	void piix4_config_w(int function, int reg, uint8_t data);
+	uint32_t intel82371ab_pci_r(int function, int reg, uint32_t mem_mask);
+	void intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
 
 // Intel 82439TX System Controller (MTXC)
 
-static uint8_t mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
+uint8_t queen_state::mtxc_config_r(int function, int reg)
 {
-	queen_state *state = busdevice->machine().driver_data<queen_state>();
 //  osd_printf_debug("MTXC: read %d, %02X\n", function, reg);
 
-	return state->m_mtxc_config_reg[reg];
+	return m_mtxc_config_reg[reg];
 }
 
-static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
+void queen_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-	queen_state *state = busdevice->machine().driver_data<queen_state>();
 	printf("MTXC: write %d, %02X, %02X\n",  function, reg, data);
 
 	/*
@@ -85,16 +95,16 @@ static void mtxc_config_w(device_t *busdevice, device_t *device, int function, i
 	if (reg == 0x63)
 	{
 		if (data & 0x20)        // enable RAM access to region 0xf0000 - 0xfffff
-			state->membank("bios_bank")->set_base(state->m_bios_ram.get());
+			membank("bios_bank")->set_base(m_bios_ram.get());
 		else                    // disable RAM access (reads go to BIOS ROM)
-			state->membank("bios_bank")->set_base(state->memregion("bios")->base() + 0x30000);
+			membank("bios_bank")->set_base(memregion("bios")->base() + 0x30000);
 		if (data & 0x80)        // enable RAM access to region 0xe0000 - 0xeffff
-			state->membank("bios_ext")->set_base(state->m_bios_ext_ram.get());
+			membank("bios_ext")->set_base(m_bios_ext_ram.get());
 		else
-			state->membank("bios_ext")->set_base(state->memregion("bios")->base() + 0x20000);
+			membank("bios_ext")->set_base(memregion("bios")->base() + 0x20000);
 	}
 
-	state->m_mtxc_config_reg[reg] = data;
+	m_mtxc_config_reg[reg] = data;
 }
 
 void queen_state::intel82439tx_init()
@@ -107,108 +117,106 @@ void queen_state::intel82439tx_init()
 	m_mtxc_config_reg[0x65] = 0x02;
 }
 
-static uint32_t intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t queen_state::intel82439tx_pci_r(int function, int reg, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 3) << 24;
+		r |= mtxc_config_r(function, reg + 3) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 2) << 16;
+		r |= mtxc_config_r(function, reg + 2) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 1) << 8;
+		r |= mtxc_config_r(function, reg + 1) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 0) << 0;
+		r |= mtxc_config_r(function, reg + 0) << 0;
 	}
 	return r;
 }
 
-static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void queen_state::intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
+		mtxc_config_w(function, reg + 3, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
+		mtxc_config_w(function, reg + 2, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
+		mtxc_config_w(function, reg + 1, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
+		mtxc_config_w(function, reg + 0, (data >> 0) & 0xff);
 	}
 }
 
 // Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
 
-static uint8_t piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
+uint8_t queen_state::piix4_config_r(int function, int reg)
 {
 	if ((function >= 4) && (function <= 7))
 	{
 		return 0; // BIOS performs a brute-force scan for devices
 	}
 
-	queen_state *state = busdevice->machine().driver_data<queen_state>();
 //  osd_printf_debug("PIIX4: read %d, %02X\n", function, reg);
-	return state->m_piix4_config_reg[function][reg];
+	return m_piix4_config_reg[function][reg];
 }
 
-static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
+void queen_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-	queen_state *state = busdevice->machine().driver_data<queen_state>();
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
-	state->m_piix4_config_reg[function][reg] = data;
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
+	m_piix4_config_reg[function][reg] = data;
 }
 
-static uint32_t intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t queen_state::intel82371ab_pci_r(int function, int reg, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 3) << 24;
+		r |= piix4_config_r(function, reg + 3) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 2) << 16;
+		r |= piix4_config_r(function, reg + 2) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 1) << 8;
+		r |= piix4_config_r(function, reg + 1) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 0) << 0;
+		r |= piix4_config_r(function, reg + 0) << 0;
 	}
 	return r;
 }
 
-static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void queen_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		piix4_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
+		piix4_config_w(function, reg + 3, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		piix4_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
+		piix4_config_w(function, reg + 2, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		piix4_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
+		piix4_config_w(function, reg + 1, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		piix4_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
+		piix4_config_w(function, reg + 0, (data >> 0) & 0xff);
 	}
 }
 
@@ -230,7 +238,7 @@ WRITE32_MEMBER(queen_state::bios_ram_w)
 	}
 }
 
-static ADDRESS_MAP_START( queen_map, AS_PROGRAM, 32, queen_state )
+ADDRESS_MAP_START(queen_state::queen_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000e0000, 0x000effff) AM_ROMBANK("bios_ext") AM_WRITE(bios_ext_ram_w)
@@ -239,7 +247,7 @@ static ADDRESS_MAP_START( queen_map, AS_PROGRAM, 32, queen_state )
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( queen_io, AS_IO, 32, queen_state )
+ADDRESS_MAP_START(queen_state::queen_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 
@@ -270,17 +278,17 @@ void queen_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( queen )
+MACHINE_CONFIG_START(queen_state::queen)
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 533000000/16) // Celeron or Pentium 3, 533 Mhz
 	MCFG_CPU_PROGRAM_MAP(queen_map)
 	MCFG_CPU_IO_MAP(queen_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, queen_state, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, queen_state, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
@@ -289,7 +297,7 @@ static MACHINE_CONFIG_START( queen )
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir7_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	pcvideo_vga(config);
 MACHINE_CONFIG_END
 
 

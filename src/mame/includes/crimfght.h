@@ -52,6 +52,10 @@ public:
 	DECLARE_WRITE8_MEMBER(banking_callback);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
 
+	void crimfght(machine_config &config);
+	void bank0000_map(address_map &map);
+	void crimfght_map(address_map &map);
+	void crimfght_sound_map(address_map &map);
 private:
 	int m_woco;
 	int m_rmrd;

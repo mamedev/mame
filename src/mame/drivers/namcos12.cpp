@@ -1168,6 +1168,38 @@ public:
 	void namcos12_rom_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
 
+	void coh700(machine_config &config);
+	void golgo13_h8iomap(address_map &map);
+	void jvsiomap(address_map &map);
+	void jvsmap(address_map &map);
+	void namcos12_map(address_map &map);
+	void plarailjvsiomap(address_map &map);
+	void plarailjvsmap(address_map &map);
+	void ptblank2_map(address_map &map);
+	void s12h8iomap(address_map &map);
+	void s12h8jvsiomap(address_map &map);
+	void s12h8railiomap(address_map &map);
+	void s12h8rwjvsmap(address_map &map);
+	void s12h8rwmap(address_map &map);
+	void tdjvsiomap(address_map &map);
+	void tdjvsmap(address_map &map);
+	void tektagt_map(address_map &map);
+protected:
+	virtual void machine_reset() override;
+};
+
+
+class namcos12_boothack_state : public namcos12_state
+{
+public:
+	using namcos12_state::namcos12_state;
+
+	void technodr(machine_config &config);
+	void golgo13(machine_config &config);
+	void aplarail(machine_config &config);
+	void truckk(machine_config &config);
+	void tektagt(machine_config &config);
+	void ptblank2(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 };
@@ -1301,7 +1333,7 @@ void namcos12_state::namcos12_sub_irq( screen_device &screen, bool vblank_state 
 	m_sub_portb = (m_sub_portb & 0x7f) | (vblank_state << 7);
 }
 
-static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::namcos12_map)
 	AM_RANGE(0x1f000000, 0x1f000003) AM_READNOP AM_WRITE16(bankoffset_w, 0x0000ffff)          /* banking */
 	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE16(sharedram_r, sharedram_w, 0xffffffff) /* shared ram?? */
 	AM_RANGE(0x1f140000, 0x1f140fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0x00ff00ff) /* eeprom */
@@ -1315,19 +1347,19 @@ static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
 	AM_RANGE(0x1fa00000, 0x1fbfffff) AM_ROMBANK("bank1") /* banked roms */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ptblank2_map, AS_PROGRAM, 32, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::ptblank2_map)
 	AM_IMPORT_FROM( namcos12_map )
 
 	AM_RANGE(0x1f780000, 0x1f78000f) AM_READ16(system11gun_r, 0xffffffff)
 	AM_RANGE(0x1f788000, 0x1f788003) AM_WRITE16(system11gun_w, 0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tektagt_map, AS_PROGRAM, 32, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::tektagt_map)
+	AM_IMPORT_FROM( namcos12_map )
+
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_READWRITE16(tektagt_protection_1_r, tektagt_protection_1_w, 0xffffffff)
 	AM_RANGE(0x1fb80000, 0x1fb80003) AM_READWRITE16(tektagt_protection_2_r, tektagt_protection_2_w, 0xffffffff)
 	AM_RANGE(0x1f700000, 0x1f700003) AM_READ16(tektagt_protection_3_r, 0xffffffff)
-
-	AM_IMPORT_FROM( namcos12_map )
 ADDRESS_MAP_END
 
 WRITE16_MEMBER(namcos12_state::system11gun_w)
@@ -1487,45 +1519,21 @@ void namcos12_state::machine_reset()
 	m_tssio_port_4 = 0;
 
 	m_has_tektagt_dma = 0;
+}
 
-	if( strcmp( machine().system().name, "tektagt" ) == 0 ||
-		strcmp( machine().system().name, "tektagtac" ) == 0 ||
-		strcmp( machine().system().name, "tektagtac1" ) == 0 ||
-		strcmp( machine().system().name, "tektagtub" ) == 0 ||
-		strcmp( machine().system().name, "tektagtjc1" ) == 0 ||
-		strcmp( machine().system().name, "tektagtjb" ) == 0 ||
-		strcmp( machine().system().name, "tektagtja" ) == 0 ||
-		strcmp( machine().system().name, "fgtlayer" ) == 0 ||
-		strcmp( machine().system().name, "golgo13" ) == 0 ||
-		strcmp( machine().system().name, "g13knd" ) == 0 ||
-		strcmp( machine().system().name, "mrdrillr" ) == 0 ||
-		strcmp( machine().system().name, "mrdrillrj" ) == 0 ||
-		strcmp( machine().system().name, "pacapp" ) == 0 ||
-		strcmp( machine().system().name, "pacappsp" ) == 0 ||
-		strcmp( machine().system().name, "pacapp2" ) == 0 ||
-		strcmp( machine().system().name, "tenkomor" ) == 0 ||
-		strcmp( machine().system().name, "tenkomorja" ) == 0 ||
-		strcmp( machine().system().name, "ptblank2" ) == 0 ||
-		strcmp( machine().system().name, "gunbarl" ) == 0 ||
-		strcmp( machine().system().name, "sws2000" ) == 0 ||
-		strcmp( machine().system().name, "sws2001" ) == 0 ||
-		strcmp( machine().system().name, "truckk" ) == 0 ||
-		strcmp( machine().system().name, "technodr" ) == 0 ||
-		strcmp( machine().system().name, "aplarail" ) == 0 ||
-		strcmp( machine().system().name, "kartduel" ) == 0 ||
-		strcmp( machine().system().name, "ohbakyuun" ) == 0 ||
-		strcmp( machine().system().name, "ghlpanic" ) == 0 )
-	{
-		/* HACK: this is based on guesswork, it might not even be keycus. */
-		uint8_t *rom = memregion( "maincpu:rom" )->base() + 0x20280;
-		uint8_t *ram = m_ram->pointer() + 0x10000;
+void namcos12_boothack_state::machine_reset()
+{
+	namcos12_state::machine_reset();
 
-		memcpy( ram, rom, 12 );
-	}
+	/* HACK: this is based on guesswork, it might not even be keycus. */
+	uint8_t *rom = memregion( "maincpu:rom" )->base() + 0x20280;
+	uint8_t *ram = m_ram->pointer() + 0x10000;
+
+	memcpy( ram, rom, 12 );
 }
 
 /* H8/3002 MCU stuff */
-static ADDRESS_MAP_START( s12h8rwmap, AS_PROGRAM, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::s12h8rwmap)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
@@ -1536,7 +1544,7 @@ static ADDRESS_MAP_START( s12h8rwmap, AS_PROGRAM, 16, namcos12_state )
 ADDRESS_MAP_END
 
 // map for JVS games w/o controls connected directly
-static ADDRESS_MAP_START( s12h8rwjvsmap, AS_PROGRAM, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::s12h8rwjvsmap)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
@@ -1590,7 +1598,7 @@ READ16_MEMBER(namcos12_state::s12_mcu_jvs_p8_r)
 	return 0x12;    // bit 4 = JVS enable.  aplarail requires it to be on, soulclbr & others will require JVS I/O if it's on
 }
 
-static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::s12h8iomap)
 	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ(s12_mcu_p6_r)
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
 	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_p8_r) AM_WRITENOP
@@ -1602,7 +1610,7 @@ static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
 	AM_RANGE(h8_device::ADC_3, h8_device::ADC_3) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s12h8jvsiomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::s12h8jvsiomap)
 	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ(s12_mcu_p6_r)
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
 	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_jvs_p8_r) AM_WRITENOP
@@ -1614,7 +1622,7 @@ static ADDRESS_MAP_START( s12h8jvsiomap, AS_IO, 16, namcos12_state )
 	AM_RANGE(h8_device::ADC_3, h8_device::ADC_3) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s12h8railiomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::s12h8railiomap)
 	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ(s12_mcu_p6_r)
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
 	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_jvs_p8_r) AM_WRITENOP
@@ -1638,11 +1646,11 @@ READ16_MEMBER(namcos12_state::s12_mcu_gun_v_r)
 	return ioport("LIGHT0_Y")->read();
 }
 
-static ADDRESS_MAP_START( golgo13_h8iomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::golgo13_h8iomap)
+	AM_IMPORT_FROM( s12h8iomap )
+
 	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_READ(s12_mcu_gun_h_r)
 	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_READ(s12_mcu_gun_v_r)
-
-	AM_IMPORT_FROM( s12h8iomap )
 ADDRESS_MAP_END
 
 
@@ -1678,16 +1686,16 @@ DRIVER_INIT_MEMBER(namcos12_state,technodr)
 	*( (uint32_t *)( memregion( "sub" )->base() + 0x14b6 ) ) = 0;
 }
 
-static MACHINE_CONFIG_START( coh700 )
+MACHINE_CONFIG_START(namcos12_state::coh700)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CXD8661R, XTAL_100MHz)
+	MCFG_CPU_ADD("maincpu", CXD8661R, XTAL(100'000'000))
 	MCFG_CPU_PROGRAM_MAP( namcos12_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, (namcos12_state *) owner ))
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this ))
 
 	MCFG_CPU_ADD("sub", H83002, 16934400) // frequency based on research (superctr)
 	MCFG_CPU_PROGRAM_MAP(s12h8rwmap)
@@ -1695,7 +1703,7 @@ static MACHINE_CONFIG_START( coh700 )
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
 	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("sub:sci1", h8_sci_device, rx_w))
 
 	MCFG_DEVICE_MODIFY("sub:sci1")
@@ -1706,8 +1714,8 @@ static MACHINE_CONFIG_START( coh700 )
 	MCFG_AT28C16_ADD("at28c16", nullptr)
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
-	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&namcos12_state::namcos12_sub_irq, (namcos12_state *) owner ) )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
+	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&namcos12_state::namcos12_sub_irq, this ) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1719,38 +1727,42 @@ static MACHINE_CONFIG_START( coh700 )
 	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ptblank2, coh700 )
+MACHINE_CONFIG_START(namcos12_boothack_state::ptblank2)
+	coh700(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( ptblank2_map )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tektagt, coh700 )
+MACHINE_CONFIG_START(namcos12_boothack_state::tektagt)
+	coh700(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( tektagt_map )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( golgo13, coh700 )
+MACHINE_CONFIG_START(namcos12_boothack_state::golgo13)
+	coh700(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_IO_MAP(golgo13_h8iomap)
 MACHINE_CONFIG_END
 
-#define JVSCLOCK    (XTAL_14_7456MHz)
-static ADDRESS_MAP_START( jvsmap, AS_PROGRAM, 16, namcos12_state )
+#define JVSCLOCK    (XTAL(14'745'600))
+ADDRESS_MAP_START(namcos12_state::jvsmap)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jvsiomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::jvsiomap)
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_DERIVED( truckk, coh700 )
+MACHINE_CONFIG_START(namcos12_boothack_state::truckk)
+	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
 	MCFG_DEVICE_MODIFY(":sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
@@ -1789,14 +1801,14 @@ READ16_MEMBER(namcos12_state::iob_p6_r)
 	return sb | 0;
 }
 
-static ADDRESS_MAP_START( tdjvsmap, AS_PROGRAM, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::tdjvsmap)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("iocpu", 0)
 	AM_RANGE(0x6000, 0x6001) AM_READ_PORT("IN01")
 	AM_RANGE(0x6002, 0x6003) AM_READ_PORT("IN23")
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tdjvsiomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::tdjvsiomap)
 	AM_RANGE(h8_device::PORT_4, h8_device::PORT_4) AM_READWRITE(iob_p4_r, iob_p4_w)
 	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ(iob_p6_r)
 	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_READ_PORT("STEER")
@@ -1804,14 +1816,14 @@ static ADDRESS_MAP_START( tdjvsiomap, AS_IO, 16, namcos12_state )
 	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_READ_PORT("GAS")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( plarailjvsmap, AS_PROGRAM, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::plarailjvsmap)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("iocpu", 0)
 	AM_RANGE(0x6000, 0x6001) AM_READ_PORT("IN01")
 	AM_RANGE(0x6002, 0x6003) AM_READ_PORT("IN23")
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( plarailjvsiomap, AS_IO, 16, namcos12_state )
+ADDRESS_MAP_START(namcos12_state::plarailjvsiomap)
 	AM_RANGE(h8_device::PORT_4, h8_device::PORT_4) AM_READWRITE(iob_p4_r, iob_p4_w)
 	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ_PORT("SERVICE")
 	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_NOP
@@ -1819,7 +1831,8 @@ static ADDRESS_MAP_START( plarailjvsiomap, AS_IO, 16, namcos12_state )
 	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( technodr, coh700 )
+MACHINE_CONFIG_START(namcos12_boothack_state::technodr)
+	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
 	MCFG_DEVICE_MODIFY(":sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
@@ -1841,7 +1854,8 @@ static MACHINE_CONFIG_DERIVED( technodr, coh700 )
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aplarail, coh700 )
+MACHINE_CONFIG_START(namcos12_boothack_state::aplarail)
+	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
 	MCFG_DEVICE_MODIFY(":sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
@@ -3153,6 +3167,9 @@ ROM_START( technodr )
 
 	ROM_REGION( 0x40000, "iocpu", 0)  /* Truck K. I/O board */
 	ROM_LOAD( "th1io-a.4f",   0x000000, 0x040000, CRC(1cbbce27) SHA1(71d61d9218543e1b0b2a6c550a8ff2b7c6267257) )
+
+	ROM_REGION( 0x800, "at28c16", 0)    /* NVRAM with printer off by default */
+	ROM_LOAD( "at28c16",      0x000000, 0x000800, CRC(01227f45) SHA1(fb4e6ebaa789e4dd2794607d149627ff17047076) )
 ROM_END
 
 ROM_START( aplarail )
@@ -3182,55 +3199,55 @@ ROM_START( aplarail )
 	ROM_LOAD( "at28c16",      0x000000, 0x000800, CRC(db1b63c5) SHA1(01fc3386a2d1cb1bed1b7fd9bd2fd59e503832d3) )
 ROM_END
 
-GAME( 1996, tekken3,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.E1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
-GAME( 1996, tekken3b,  tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.B)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
-GAME( 1996, tekken3a,  tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
-GAME( 1996, tekken3ud, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.D)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
-GAME( 1996, tekken3ua, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
-GAME( 1996, tekken3je1,tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.E1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
-GAME( 1996, tekken3ja, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC014 */
-GAME( 1997, lbgrande,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Libero Grande (World, LG2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC014 */
-GAME( 1997, lbgrandeja,lbgrande, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Libero Grande (Japan, LG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC014 */
-GAME( 1997, toukon3,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco / Tomy",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC019 */
-GAME( 1998, soulclbr,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC14/VER.C)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, soulclbrwb,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC14/VER.B)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, soulclbruc,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.C)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, soulclbrub,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.B)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
-GAME( 1998, soulclbrjc,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.C)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
-GAME( 1998, soulclbrjb,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.B)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
-GAME( 1998, soulclbrja,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
-GAME( 1998, ehrgeiz,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (World, EG2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
-GAME( 1998, ehrgeizua, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (US, EG3/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
-GAME( 1998, ehrgeizja, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (Japan, EG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
-GAME( 1998, mdhorse,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "MOSS / Namco",    "Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC035 */
-GAME( 1998, aplarail,  0,        aplarail, aplarail, namcos12_state, namcos12, ROT0, "Namco / Tomy",    "Attack Pla Rail (Japan, AP1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC032 */
-GAME( 1998, sws98,     0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium '98 (Japan, SS81/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC0?? */
-GAME( 1998, technodr,  0,        technodr, technodr, namcos12_state, technodr, ROT0, "Namco",           "Techno Drive (Japan, TD2/VER.B)", MACHINE_IMPERFECT_GRAPHICS ) /* KC056 */
-GAME( 1998, tenkomor,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (World, TKM2/VER.A1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC036 */
-GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12, namcos12_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC036 */
-GAME( 1998, fgtlayer,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC037 */
-GAME( 1999, pacapp,    0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion (Japan, PPP1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC038 */
-GAME( 1999, ptblank2,  0,        ptblank2, ptblank2, namcos12_state, ptblank2, ROT0, "Namco",           "Point Blank 2 (GNB5/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC042 */
-GAME( 1999, gunbarl,   ptblank2, ptblank2, ptblank2, namcos12_state, ptblank2, ROT0, "Namco",           "Gunbarl (Japan, GNB4/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC042 */
-GAME( 1999, sws99,     0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium '99 (Japan, SS91/VER.A3)", MACHINE_IMPERFECT_GRAPHICS ) /* KC043 */
-GAME( 1999, tektagt,   0,        tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (World, TEG2/VER.C1, set 1)", 0 ) /* KC044 */
-GAME( 1999, tektagtc1, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (World, TEG2/VER.C1, set 2)", 0 ) /* KC044 */
-GAME( 1999, tektagtuc1,tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.C1)", 0 ) /* KC044 */
-GAME( 1999, tektagtub, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.B)", 0 ) /* KC044 */
-GAME( 1999, tektagtjc1,tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.C1)", MACHINE_NOT_WORKING ) /* KC044 */
-GAME( 1999, tektagtjb, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.B)", MACHINE_NOT_WORKING ) /* KC044 */
-GAME( 1999, tektagtja, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.A3)", MACHINE_NOT_WORKING ) /* KC044 */
-GAME( 1999, ghlpanic,  0,        ptblank2, ghlpanic, namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Ghoul Panic (World, OB2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC045 */
-GAME( 1999, ohbakyuun, ghlpanic, ptblank2, ghlpanic, namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Oh! Bakyuuun (Japan, OB1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC045 */
-GAME( 1999, pacapp2,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion 2 (Japan, PKS1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC046 */
-GAME( 1999, mrdrillr,  0,        coh700,   namcos124w,namcos12_state,namcos12, ROT0, "Namco",           "Mr. Driller (US, DRI3/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC048 */
-GAME( 1999, mrdrillrj, mrdrillr, coh700,   namcos124w,namcos12_state,namcos12, ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC048 */
-GAME( 1999, kaiunqz,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kaiun Quiz (Japan, KW1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC050 */
-GAME( 1999, pacappsp,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion Special (Japan, PSP1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC052 */
-GAME( 1999, aquarush,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Aqua Rush (Japan, AQ1/VER.A1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC053 */
-GAME( 1999, golgo13,   0,        golgo13,  golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC054 */
-GAME( 1999, g13knd,    0,        golgo13,  golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC059 */
-GAME( 2000, sws2000,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC055 */
-GAME( 2000, truckk,    0,        truckk,   namcos12, namcos12_state, namcos12, ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC056 */
-GAME( 2000, kartduel,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kart Duel (Japan, KTD1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC057 */
-GAME( 2001, sws2001,   sws2000,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC061 */
+GAME( 1996, tekken3,   0,        coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.E1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
+GAME( 1996, tekken3b,  tekken3,  coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.B)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
+GAME( 1996, tekken3a,  tekken3,  coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
+GAME( 1996, tekken3ud, tekken3,  coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.D)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
+GAME( 1996, tekken3ua, tekken3,  coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
+GAME( 1996, tekken3je1,tekken3,  coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.E1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC006 */
+GAME( 1996, tekken3ja, tekken3,  coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC014 */
+GAME( 1997, lbgrande,  0,        coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Libero Grande (World, LG2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC014 */
+GAME( 1997, lbgrandeja,lbgrande, coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Libero Grande (Japan, LG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC014 */
+GAME( 1997, toukon3,   0,        coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco / Tomy",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC019 */
+GAME( 1998, soulclbr,  0,        coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC14/VER.C)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, soulclbrwb,soulclbr, coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC14/VER.B)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, soulclbruc,soulclbr, coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.C)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, soulclbrub,soulclbr, coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.B)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
+GAME( 1998, soulclbrjc,soulclbr, coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.C)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
+GAME( 1998, soulclbrjb,soulclbr, coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.B)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
+GAME( 1998, soulclbrja,soulclbr, coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
+GAME( 1998, ehrgeiz,   0,        coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Square / Namco",  "Ehrgeiz (World, EG2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
+GAME( 1998, ehrgeizua, ehrgeiz,  coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Square / Namco",  "Ehrgeiz (US, EG3/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
+GAME( 1998, ehrgeizja, ehrgeiz,  coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Square / Namco",  "Ehrgeiz (Japan, EG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
+GAME( 1998, mdhorse,   0,        coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "MOSS / Namco",    "Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC035 */
+GAME( 1998, aplarail,  0,        aplarail, aplarail,  namcos12_boothack_state, namcos12, ROT0, "Namco / Tomy",    "Attack Pla Rail (Japan, AP1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC032 */
+GAME( 1998, sws98,     0,        coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Super World Stadium '98 (Japan, SS81/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC0?? */
+GAME( 1998, technodr,  0,        technodr, technodr,  namcos12_boothack_state, technodr, ROT0, "Namco",           "Techno Drive (Japan, TD2/VER.B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_PRINTER ) /* KC056 */
+GAME( 1998, tenkomor,  0,        coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (World, TKM2/VER.A1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC036 */
+GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC036 */
+GAME( 1998, fgtlayer,  0,        coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC037 */
+GAME( 1998, pacapp,    0,        coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion (Japan, PPP1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC038 */
+GAME( 1999, ptblank2,  0,        ptblank2, ptblank2,  namcos12_boothack_state, ptblank2, ROT0, "Namco",           "Point Blank 2 (GNB5/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC042 */
+GAME( 1999, gunbarl,   ptblank2, ptblank2, ptblank2,  namcos12_boothack_state, ptblank2, ROT0, "Namco",           "Gunbarl (Japan, GNB4/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC042 */
+GAME( 1999, sws99,     0,        coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Super World Stadium '99 (Japan, SS91/VER.A3)", MACHINE_IMPERFECT_GRAPHICS ) /* KC043 */
+GAME( 1999, tektagt,   0,        tektagt,  namcos12,  namcos12_boothack_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (World, TEG2/VER.C1, set 1)", 0 ) /* KC044 */
+GAME( 1999, tektagtc1, tektagt,  tektagt,  namcos12,  namcos12_boothack_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (World, TEG2/VER.C1, set 2)", 0 ) /* KC044 */
+GAME( 1999, tektagtuc1,tektagt,  tektagt,  namcos12,  namcos12_boothack_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.C1)", 0 ) /* KC044 */
+GAME( 1999, tektagtub, tektagt,  tektagt,  namcos12,  namcos12_boothack_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.B)", 0 ) /* KC044 */
+GAME( 1999, tektagtjc1,tektagt,  tektagt,  namcos12,  namcos12_boothack_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.C1)", MACHINE_NOT_WORKING ) /* KC044 */
+GAME( 1999, tektagtjb, tektagt,  tektagt,  namcos12,  namcos12_boothack_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.B)", MACHINE_NOT_WORKING ) /* KC044 */
+GAME( 1999, tektagtja, tektagt,  tektagt,  namcos12,  namcos12_boothack_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.A3)", MACHINE_NOT_WORKING ) /* KC044 */
+GAME( 1999, ghlpanic,  0,        ptblank2, ghlpanic,  namcos12_boothack_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Ghoul Panic (World, OB2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC045 */
+GAME( 1999, ohbakyuun, ghlpanic, ptblank2, ghlpanic,  namcos12_boothack_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Oh! Bakyuuun (Japan, OB1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC045 */
+GAME( 1999, pacapp2,   0,        coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion 2 (Japan, PKS1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC046 */
+GAME( 1999, mrdrillr,  0,        coh700,   namcos124w,namcos12_boothack_state, namcos12, ROT0, "Namco",           "Mr. Driller (US, DRI3/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC048 */
+GAME( 1999, mrdrillrj, mrdrillr, coh700,   namcos124w,namcos12_boothack_state, namcos12, ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC048 */
+GAME( 1999, kaiunqz,   0,        coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Kaiun Quiz (Japan, KW1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC050 */
+GAME( 1999, pacappsp,  0,        coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion Special (Japan, PSP1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC052 */
+GAME( 1999, aquarush,  0,        coh700,   namcos12,  namcos12_state,          namcos12, ROT0, "Namco",           "Aqua Rush (Japan, AQ1/VER.A1)", MACHINE_IMPERFECT_GRAPHICS ) /* KC053 */
+GAME( 1999, golgo13,   0,        golgo13,  golgo13,   namcos12_boothack_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC054 */
+GAME( 2000, g13knd,    0,        golgo13,  golgo13,   namcos12_boothack_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC059 */
+GAME( 2000, sws2000,   0,        coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC055 */
+GAME( 2000, truckk,    0,        truckk,   namcos12,  namcos12_boothack_state, namcos12, ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC056 */
+GAME( 2000, kartduel,  0,        coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT0, "Namco",           "Kart Duel (Japan, KTD1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC057 */
+GAME( 2001, sws2001,   sws2000,  coh700,   namcos12,  namcos12_boothack_state, namcos12, ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC061 */

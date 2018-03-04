@@ -103,6 +103,7 @@
 #include "machine/nvram.h"
 #include "machine/st0016.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
@@ -116,7 +117,7 @@ class common_state : public driver_device
 public:
 	common_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_gamecpu(*this, "gamecpu"),
+		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_hopper1(*this, "hopper1"), m_hopper2(*this, "hopper2"),
 		m_palette(*this, "palette"),
@@ -136,7 +137,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_irq);
 
 protected:
-	required_device<cpu_device> m_gamecpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<ticket_dispenser_device> m_hopper1, m_hopper2;
 	required_device<palette_device> m_palette;
@@ -168,6 +169,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void jclub2(machine_config &config);
+	void jclub2_map(address_map &map);
 private:
 	required_device<st0020_device> m_st0020;
 };
@@ -177,8 +180,13 @@ class jclub2o_state : public jclub2_state
 {
 public:
 	jclub2o_state(const machine_config &mconfig, device_type type, const char *tag) :
-		jclub2_state(mconfig, type, tag)
+		jclub2_state(mconfig, type, tag),
+		m_soundcpu(*this, "soundcpu"),
+		m_soundbank(*this, "soundbank")
 	{ }
+
+	required_device<cpu_device> m_soundcpu;
+	required_memory_bank m_soundbank;
 
 	DECLARE_WRITE32_MEMBER(eeprom_s29290_w);
 
@@ -197,6 +205,12 @@ public:
 	DECLARE_WRITE32_MEMBER(cmd2_word_w);
 	DECLARE_READ32_MEMBER(cmd_stat_word_r);
 
+	DECLARE_DRIVER_INIT(jclub2o);
+
+	void jclub2o(machine_config &config);
+	void jclub2o_map(address_map &map);
+	void st0016_io(address_map &map);
+	void st0016_mem(address_map &map);
 private:
 	uint8_t m_cmd1;
 	uint8_t m_cmd2;
@@ -234,6 +248,8 @@ public:
 	DECLARE_DRIVER_INIT(darkhors);
 	DECLARE_VIDEO_START(darkhors);
 
+	void darkhors(machine_config &config);
+	void darkhors_map(address_map &map);
 private:
 	required_shared_ptr<uint32_t> m_tmapram;
 	required_shared_ptr<uint32_t> m_tmapscroll;
@@ -563,7 +579,7 @@ WRITE32_MEMBER(jclub2o_state::cmd2_word_w)
 	}
 }
 
-static ADDRESS_MAP_START( jclub2o_map, AS_PROGRAM, 32, jclub2o_state )
+ADDRESS_MAP_START(jclub2o_state::jclub2o_map)
 	AM_RANGE(0x000000, 0x27ffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram") // battery
 
@@ -602,7 +618,7 @@ static ADDRESS_MAP_START( jclub2o_map, AS_PROGRAM, 32, jclub2o_state )
 
 	// ST-0020
 	AM_RANGE(0x600000, 0x67ffff) AM_DEVREADWRITE16( "st0020", st0020_device, sprram_r, sprram_w, 0xffffffff );
-	AM_RANGE(0x680000, 0x69ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x680000, 0x69ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x6a0000, 0x6bffff) AM_RAM
 	AM_RANGE(0x6c0000, 0x6c00ff) AM_DEVREADWRITE16( "st0020", st0020_device, regs_r,   regs_w,   0xffffffff );
 	AM_RANGE(0x700000, 0x7fffff) AM_DEVREADWRITE16( "st0020", st0020_device, gfxram_r, gfxram_w, 0xffffffff );
@@ -614,7 +630,7 @@ ADDRESS_MAP_END
 // common rombank? should go in machine/st0016 with larger address space exposed?
 WRITE8_MEMBER(jclub2o_state::st0016_rom_bank_w)
 {
-	membank("bank1")->set_base(memregion("maincpu")->base() + (data* 0x4000));
+	m_soundbank->set_entry(data & 0x1f);
 }
 
 READ8_MEMBER(jclub2o_state::cmd1_r)
@@ -645,16 +661,16 @@ WRITE8_MEMBER(jclub2o_state::cmd2_w)
 	logerror("%s: cmd2_w %02x\n", machine().describe_context(), m_cmd2);
 }
 
-static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, jclub2o_state )
+ADDRESS_MAP_START(jclub2o_state::st0016_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xe800, 0xe8ff) AM_RAM
 	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
 	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( st0016_io, AS_IO, 8, jclub2o_state )
+ADDRESS_MAP_START(jclub2o_state::st0016_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE(cmd1_r, cmd1_w)
@@ -686,7 +702,7 @@ WRITE32_MEMBER(common_state::eeprom_93c46_w)
 	}
 }
 
-static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, jclub2_state )
+ADDRESS_MAP_START(jclub2_state::jclub2_map)
 	AM_RANGE(0x000000, 0x27ffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram") // battery
 
@@ -717,7 +733,7 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, jclub2_state )
 
 	// ST-0032
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE16( "st0020", st0020_device, sprram_r, sprram_w, 0xffffffff );
-	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x8a0000, 0x8bffff) AM_RAM   // this should still be palette ram!
 	AM_RANGE(0x8c0000, 0x8c00ff) AM_DEVREADWRITE16( "st0020", st0020_device, regs_r,   regs_w,   0xffffffff );
 	AM_RANGE(0x8e0000, 0x8e01ff) AM_RAM // sound?
@@ -775,7 +791,7 @@ WRITE32_MEMBER(darkhors_state::out1_w)
 	}
 }
 
-static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
+ADDRESS_MAP_START(darkhors_state::darkhors_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram") // battery
 
@@ -801,7 +817,7 @@ static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(tmapram2_w) AM_SHARE("tmapram2")
 	AM_RANGE(0x874000, 0x87dfff) AM_RAM
 	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x8a0000, 0x8bffff) AM_RAM   // this should still be palette ram!
 	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITEONLY AM_SHARE("tmapscroll")
 	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITEONLY AM_SHARE("tmapscroll2")
@@ -1099,22 +1115,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(common_state::scanline_irq)
 	int scanline = param;
 
 	if (scanline == 248)
-		m_gamecpu->set_input_line(5, HOLD_LINE);
+		m_maincpu->set_input_line(5, HOLD_LINE);
 
 	if (scanline == 0)
-		m_gamecpu->set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
 
 	if (scanline == 128)
-		m_gamecpu->set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 // Older hardware (ST-0020 + ST-0016)
-static MACHINE_CONFIG_START( jclub2o )
-	MCFG_CPU_ADD("gamecpu", M68EC020, 12000000)
+MACHINE_CONFIG_START(jclub2o_state::jclub2o)
+	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
 	MCFG_CPU_PROGRAM_MAP(jclub2o_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("maincpu",ST0016_CPU, 8000000)
+	MCFG_CPU_ADD("soundcpu",ST0016_CPU, 8000000)
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)
 	MCFG_CPU_IO_MAP(st0016_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jclub2o_state, irq0_line_hold)
@@ -1139,7 +1155,7 @@ static MACHINE_CONFIG_START( jclub2o )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("st0020", ST0020_SPRITES, 0)
-	st0020_device::static_set_is_jclub2(*device, 1);
+	MCFG_ST0020_IS_JCLUB2(1)
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	// layout
@@ -1148,8 +1164,8 @@ MACHINE_CONFIG_END
 
 
 // Newer hardware (ST-0032)
-static MACHINE_CONFIG_START( jclub2 )
-	MCFG_CPU_ADD("gamecpu", M68EC020, 12000000)
+MACHINE_CONFIG_START(jclub2_state::jclub2)
+	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
 	MCFG_CPU_PROGRAM_MAP(jclub2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
 
@@ -1174,8 +1190,8 @@ static MACHINE_CONFIG_START( jclub2 )
 
 	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
 	MCFG_DEVICE_ADD("st0020", ST0020_SPRITES, 0)
-	st0020_device::static_set_is_st0032(*device, 1);
-	st0020_device::static_set_is_jclub2(*device, 1); // offsets
+	MCFG_ST0020_IS_ST0032(1)
+	MCFG_ST0020_IS_JCLUB2(1) // offsets
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	// layout
@@ -1183,8 +1199,8 @@ static MACHINE_CONFIG_START( jclub2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( darkhors )
-	MCFG_CPU_ADD("gamecpu", M68EC020, 12000000) // 36MHz/3 ??
+MACHINE_CONFIG_START(darkhors_state::darkhors)
+	MCFG_CPU_ADD("maincpu", M68EC020, 12000000) // 36MHz/3 ??
 	MCFG_CPU_PROGRAM_MAP(darkhors_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
 
@@ -1261,14 +1277,13 @@ Provided to you by Belgium Dump Team Gerald (COY) on 18/01/2007.
 
 ***************************************************************************/
 
-// Not the main cpu, but "maincpu" is hardcoded in machine/st0016.cpp
 #define JCLUB2O_SOUND_ROMS \
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* z80 core (used for sound) */ \
+	ROM_REGION( 0x80000, "soundcpu", 0 ) /* z80 core (used for sound) */ \
 	ROM_LOAD( "sx006-04.u87", 0x00000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )  /* SoundDriverV1.26 */
 
 ROM_START( jclub2v100 )
 	JCLUB2O_SOUND_ROMS
-	ROM_REGION( 0x280000, "gamecpu", 0 )
+	ROM_REGION( 0x280000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "sx006a-01.u26", 0x000000, 0x200000, CRC(55e249bc) SHA1(ed0f066ed17f047760b712cbbfba1a62d4b452ba) ) // v1.00 (1994 ' ' 100,  5 OCT. 1994)
 	ROM_FILL(                              0x200000, 0x080000, 0xff) // no upgrade rom
 
@@ -1279,7 +1294,7 @@ ROM_END
 
 ROM_START( jclub2v101 )
 	JCLUB2O_SOUND_ROMS
-	ROM_REGION( 0x280000, "gamecpu", 0 )
+	ROM_REGION( 0x280000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "sx006b-01.u26", 0x000000, 0x200000, CRC(f730dded) SHA1(efb966dcb98440a072d4825ef2788c85acdfd103) ) // v1.01 (1995 A 101, 20 FEB. 1995)
 	ROM_FILL(                              0x200000, 0x080000, 0xff) // no upgrade rom
 
@@ -1290,7 +1305,7 @@ ROM_END
 
 ROM_START( jclub2v110 )
 	JCLUB2O_SOUND_ROMS
-	ROM_REGION( 0x280000, "gamecpu", 0 )
+	ROM_REGION( 0x280000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "sx006b-01.u26", 0x000000, 0x200000, CRC(f730dded) SHA1(efb966dcb98440a072d4825ef2788c85acdfd103) ) // v1.01  (1995 A   101, 20 FEB. 1995)
 	ROM_LOAD16_WORD_SWAP( "jc2-110x.u27",  0x200000, 0x080000, CRC(03aa6882) SHA1(e0343bc77a19994ddafa614891663b40e1476332) ) // v1.10X (1996 2/3 110,  5 MAY. 1996)
 
@@ -1301,7 +1316,7 @@ ROM_END
 
 ROM_START( jclub2v112 )
 	JCLUB2O_SOUND_ROMS
-	ROM_REGION( 0x280000, "gamecpu", 0 )
+	ROM_REGION( 0x280000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "sx006b-01.u26", 0x000000, 0x200000, CRC(f730dded) SHA1(efb966dcb98440a072d4825ef2788c85acdfd103) ) // v1.01  (1995 A   101, 20 FEB. 1995)
 	ROM_LOAD16_WORD_SWAP( "jc2-112x.u27",  0x200000, 0x080000, CRC(e1ab93bd) SHA1(78b618b3f7819bd5351ebf949f328fec7795cec9) ) // v1.12X (1996 4/5 112,  3 JUN. 1996)
 
@@ -1312,7 +1327,7 @@ ROM_END
 
 ROM_START( jclub2v203 )
 	JCLUB2O_SOUND_ROMS
-	ROM_REGION( 0x280000, "gamecpu", 0 )
+	ROM_REGION( 0x280000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "sx006b-01.u26", 0x000000, 0x200000, CRC(f730dded) SHA1(efb966dcb98440a072d4825ef2788c85acdfd103) ) // v1.01  (1995 A 101, 20 FEB. 1995)
 	ROM_LOAD16_WORD_SWAP( "203x-rom1.u27", 0x200000, 0x080000, CRC(7446ed3e) SHA1(b0936e42549280e2965159270429c4fdacba114a) ) // v2.03X (1997 6 203, 26 MAR. 1997) Release Candidate
 
@@ -1367,7 +1382,7 @@ Provided to you by Belgium Dump Team Gerald (COY) on 18/01/2007.
 
 ROM_START( jclub2v200 )
 	JCLUB2_OTHER_ROMS
-	ROM_REGION( 0x280000, "gamecpu", 0 )
+	ROM_REGION( 0x280000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "m88-01.u38", 0x000000, 0x200000, CRC(84476b68) SHA1(1014d23d3cebbfa9aa3bfb90505529989a8eedfa) ) // v2.00 (1996 Z 200 , 27 SEP. 1996)
 	ROM_FILL(                           0x200000, 0x080000, 0xff) // no upgrade rom
 
@@ -1378,7 +1393,7 @@ ROM_END
 
 ROM_START( jclub2v201 )
 	JCLUB2_OTHER_ROMS
-	ROM_REGION( 0x280000, "gamecpu", 0 )
+	ROM_REGION( 0x280000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "m88-01.u38", 0x000000, 0x200000, CRC(84476b68) SHA1(1014d23d3cebbfa9aa3bfb90505529989a8eedfa) ) // v2.00  (1996 Z 200 , 27 SEP. 1996)
 	ROM_LOAD16_WORD_SWAP( "z201x.u39",  0x200000, 0x080000, CRC(1fb79c16) SHA1(c8914f7dfc17c412f6ca756f8eb6d6a35e3b6214) ) // v2.01X (1996 Z 201 , 20 NOV. 1996)
 
@@ -1389,7 +1404,7 @@ ROM_END
 
 ROM_START( jclub2v204 )
 	JCLUB2_OTHER_ROMS
-	ROM_REGION( 0x280000, "gamecpu", 0 )
+	ROM_REGION( 0x280000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "m88-01a.u38", 0x000000, 0x200000, CRC(c1243e1c) SHA1(2a5857738b8950daf77ddaa8304b765f809f8241) ) // v2.04 (1997 Z 2040, 30 APR. 1997)
 	ROM_FILL(                            0x200000, 0x080000, 0xff) // no upgrade rom
 
@@ -1400,7 +1415,7 @@ ROM_END
 
 ROM_START( jclub2v205 )
 	JCLUB2_OTHER_ROMS
-	ROM_REGION( 0x280000, "gamecpu", 0 )
+	ROM_REGION( 0x280000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "m88-01b.u38", 0x000000, 0x200000, CRC(f1054c69) SHA1(be6d92653f0d3cc0a36a2ff0798043f4a95439bc) ) // v2.05 (1997 Z 2050, 21 JUL. 1997)
 	ROM_FILL(                            0x200000, 0x080000, 0xff) // no upgrade rom
 
@@ -1411,7 +1426,7 @@ ROM_END
 
 ROM_START( jclub2v220 )
 	JCLUB2_OTHER_ROMS
-	ROM_REGION( 0x280000, "gamecpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x280000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "m88-01b.u38", 0x000000, 0x200000, CRC(f1054c69) SHA1(be6d92653f0d3cc0a36a2ff0798043f4a95439bc) ) // v2.05  (1997 Z 2050, 21 JUL. 1997)
 	ROM_LOAD16_WORD_SWAP( "m88-03d.u39", 0x200000, 0x080000, CRC(723dd22b) SHA1(0ca622e0dd315f29e72dd9b82fb419d306ec5df8) ) // v2.20X (1997 Z 2201, 14 APR. 1998)
 
@@ -1457,7 +1472,7 @@ A bootleg of Jockey Club II on inferior hardware
 ***************************************************************************/
 
 ROM_START( darkhors )
-	ROM_REGION( 0x100000, "gamecpu", 0 ) // 68EC020 code
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68EC020 code
 	ROM_LOAD32_WORD_SWAP( "prg2", 0x00000, 0x80000, CRC(f2ec5818) SHA1(326937a331496880f517f41b0b8ab54e55fd7af7) ) // 27 JUN. 1997
 	ROM_LOAD32_WORD_SWAP( "prg1", 0x00002, 0x80000, CRC(b80f8f59) SHA1(abc26dd8b36da0d510978364febe385f69fb317f) )
 
@@ -1486,6 +1501,11 @@ ROM_END
 
 ***************************************************************************/
 
+DRIVER_INIT_MEMBER(jclub2o_state,jclub2o)
+{
+	m_soundbank->configure_entries(0, 32, memregion("soundcpu")->base(), 0x4000);
+}
+
 DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 {
 	// the dumped eeprom bytes are in a different order to how MAME expects them to be!?
@@ -1498,7 +1518,7 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 		std::vector<uint8_t> temp(len);
 
 		for (int i = 0; i < len; i++)
-			temp[i] = eeprom[BITSWAP8(i,7,5,4,3,2,1,0,6)];
+			temp[i] = eeprom[bitswap<8>(i,7,5,4,3,2,1,0,6)];
 
 		memcpy(eeprom, &temp[0], len);
 	}
@@ -1506,11 +1526,11 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 
 
 // Older hardware (ST-0020 + ST-0016)
-GAME( 1994, jclub2v100, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  0,        ROT0, "Seta",    "Jockey Club II (v1.00, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, jclub2v101, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  0,        ROT0, "Seta",    "Jockey Club II (v1.01, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jclub2v110, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  0,        ROT0, "Seta",    "Jockey Club II (v1.10X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jclub2v112, 0,          jclub2o,  jclub2v112, jclub2o_state,  0,        ROT0, "Seta",    "Jockey Club II (v1.12X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, jclub2v203, jclub2v112, jclub2o,  jclub2v112, jclub2o_state,  0,        ROT0, "Seta",    "Jockey Club II (v2.03X RC, older hardware, prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, jclub2v100, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.00, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, jclub2v101, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.01, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, jclub2v110, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.10X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, jclub2v112, 0,          jclub2o,  jclub2v112, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.12X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, jclub2v203, jclub2v112, jclub2o,  jclub2v112, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v2.03X RC, older hardware, prototype)", MACHINE_IMPERFECT_GRAPHICS )
 // Newer hardware (ST-0032)
 GAME( 1996, jclub2v200, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.00, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 GAME( 1996, jclub2v201, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.01X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

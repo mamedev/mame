@@ -51,7 +51,7 @@
 #include "includes/m52.h"
 
 
-#define MASTER_CLOCK        XTAL_18_432MHz
+#define MASTER_CLOCK        XTAL(18'432'000)
 
 
 /*************************************
@@ -60,7 +60,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, m52_state )
+ADDRESS_MAP_START(m52_state::main_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(m52_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(m52_colorram_w) AM_SHARE("colorram")
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, m52_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( alpha1v_map, AS_PROGRAM, 8, m52_state )
+ADDRESS_MAP_START(m52_state::alpha1v_map)
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(m52_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(m52_colorram_w) AM_SHARE("colorram")
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( alpha1v_map, AS_PROGRAM, 8, m52_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, m52_state )
+ADDRESS_MAP_START(m52_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x1f) AM_WRITE(m52_scroll_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x1f) AM_WRITE(m52_bg1xpos_w)
@@ -392,7 +392,7 @@ void m52_state::machine_reset()
 	m_bgcontrol = 0;
 }
 
-static MACHINE_CONFIG_START( m52 )
+MACHINE_CONFIG_START(m52_state::m52)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
@@ -412,13 +412,14 @@ static MACHINE_CONFIG_START( m52 )
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	//MCFG_FRAGMENT_ADD(m52_sound_c_audio)
+	//m52_sound_c_audio(config);
 	MCFG_DEVICE_ADD("irem_audio", IREM_M52_SOUNDC_AUDIO, 0)
 
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( alpha1v, m52 )
+MACHINE_CONFIG_START(m52_state::alpha1v)
+	m52(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

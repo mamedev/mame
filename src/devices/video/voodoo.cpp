@@ -471,6 +471,16 @@ void voodoo_device::init_fbi(voodoo_device* vd,fbi_state *f, void *memory, int f
 			vd->fbi.clut[pen] = rgb_t(pen,pen,pen);
 	}
 
+	// build static 16-bit rgb565 to rgb888 conversion table
+	for (int val = 0; val < 65536; val++)
+	{
+		int r, g, b;
+
+		/* table 10 = 16-bit RGB (5-6-5) */
+		EXTRACT_565_TO_888(val, r, g, b);
+		vd->fbi.rgb565[val] = rgb_t(0xff, r, g, b);
+	}
+
 	/* allocate a VBLANK timer */
 	f->vblank_timer = vd->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device::vblank_callback),vd), vd);
 	f->vblank = false;
@@ -513,8 +523,7 @@ void voodoo_device::tmu_shared_state::init()
 		int r, g, b, a;
 
 		/* table 10 = 16-bit RGB (5-6-5) */
-		EXTRACT_565_TO_888(val, r, g, b);
-		rgb565[val] = rgb_t(0xff, r, g, b);
+		// Use frame buffer table
 
 		/* table 11 = 16 ARGB (1-5-5-5) */
 		EXTRACT_1555_TO_8888(val, a, r, g, b);
@@ -851,8 +860,10 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 	/* reset the last_op_time to now and start processing the next command */
 	if (vd->pci.op_pending)
 	{
+		if (LOG_VBLANK_SWAP) vd->logerror("---- swap_buffers flush begin\n");
 		vd->pci.op_end_time = vd->machine().time();
 		flush_fifos(vd, vd->pci.op_end_time);
+		if (LOG_VBLANK_SWAP) vd->logerror("---- swap_buffers flush end\n");
 	}
 
 	/* we may be able to unstall now */
@@ -922,7 +933,7 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 static void adjust_vblank_timer(voodoo_device *vd)
 {
 	attotime vblank_period = vd->screen->time_until_pos(vd->fbi.vsyncscan);
-
+	if (LOG_VBLANK_SWAP) vd->logerror("adjust_vblank_timer: period: %s\n", vblank_period.as_string());
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	if (vblank_period == attotime::zero)
 		vblank_period = vd->screen->frame_period();
@@ -1422,7 +1433,7 @@ inline int32_t voodoo_device::tmu_state::prepare()
 	return (-lodbase + (12 << 8)) / 2;
 #else
 	double tmpTex = texdx;
-	lodbase = new_log2(tmpTex);
+	lodbase = new_log2(tmpTex, 0);
 	return (lodbase + (12 << 8)) / 2;
 #endif
 }
@@ -2579,8 +2590,8 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 					visarea.set(hbp, hbp + hvis - 1, vbp, vbp + vvis - 1);
 
 					/* keep within bounds */
-					visarea.max_x = std::min(visarea.max_x, htotal - 1);
-					visarea.max_y = std::min(visarea.max_y, vtotal - 1);
+					visarea.max_x = (std::min)(visarea.max_x, htotal - 1);
+					visarea.max_y = (std::min)(visarea.max_y, vtotal - 1);
 
 					/* compute the new period for standard res, medium res, and VGA res */
 					stdperiod = HZ_TO_ATTOSECONDS(15750) * vtotal;
@@ -2951,9 +2962,11 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 {
 	uint16_t *dest, *depth;
 	uint32_t destmax, depthmax;
-	int sr[2], sg[2], sb[2], sa[2], sz[2];
+	int sa[2], sz[2];
+	uint8_t sr[2], sg[2], sb[2];
 	int x, y, scry, mask;
 	int pix, destbuf;
+	rgb_t sourceColor;
 
 	/* statistics */
 	vd->stats.lfb_writes++;
@@ -2981,15 +2994,23 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 	{
 		case 16*0 + 0:      /* ARGB, 16-bit RGB 5-6-5 */
 		case 16*2 + 0:      /* RGBA, 16-bit RGB 5-6-5 */
-			EXTRACT_565_TO_888(data, sr[0], sg[0], sb[0]);
-			EXTRACT_565_TO_888(data >> 16, sr[1], sg[1], sb[1]);
+			//EXTRACT_565_TO_888(data, sr[0], sg[0], sb[0]);
+			//EXTRACT_565_TO_888(data >> 16, sr[1], sg[1], sb[1]);
+			sourceColor = vd->fbi.rgb565[data & 0xffff];
+			sourceColor.expand_rgb(sr[0], sg[0], sb[0]);
+			sourceColor = vd->fbi.rgb565[data >> 16];
+			sourceColor.expand_rgb(sr[1], sg[1], sb[1]);
 			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
 		case 16*1 + 0:      /* ABGR, 16-bit RGB 5-6-5 */
 		case 16*3 + 0:      /* BGRA, 16-bit RGB 5-6-5 */
-			EXTRACT_565_TO_888(data, sb[0], sg[0], sr[0]);
-			EXTRACT_565_TO_888(data >> 16, sb[1], sg[1], sr[1]);
+			//EXTRACT_565_TO_888(data, sb[0], sg[0], sr[0]);
+			//EXTRACT_565_TO_888(data >> 16, sb[1], sg[1], sr[1]);
+			sourceColor = vd->fbi.rgb565[data & 0xffff];
+			sourceColor.expand_rgb(sb[0], sg[0], sr[0]);
+			sourceColor = vd->fbi.rgb565[data >> 16];
+			sourceColor.expand_rgb(sb[1], sg[1], sr[1]);
 			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
@@ -3081,13 +3102,17 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 		case 16*0 + 12:     /* ARGB, 32-bit depth+RGB 5-6-5 */
 		case 16*2 + 12:     /* RGBA, 32-bit depth+RGB 5-6-5 */
 			sz[0] = data >> 16;
-			EXTRACT_565_TO_888(data, sr[0], sg[0], sb[0]);
+			//EXTRACT_565_TO_888(data, sr[0], sg[0], sb[0]);
+			sourceColor = vd->fbi.rgb565[data & 0xffff];
+			sourceColor.expand_rgb(sr[0], sg[0], sb[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 		case 16*1 + 12:     /* ABGR, 32-bit depth+RGB 5-6-5 */
 		case 16*3 + 12:     /* BGRA, 32-bit depth+RGB 5-6-5 */
 			sz[0] = data >> 16;
-			EXTRACT_565_TO_888(data, sb[0], sg[0], sr[0]);
+			//EXTRACT_565_TO_888(data, sb[0], sg[0], sr[0]);
+			sourceColor = vd->fbi.rgb565[data & 0xffff];
+			sourceColor.expand_rgb(sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 
@@ -3296,8 +3321,8 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 				//PIXEL_PIPELINE_BEGIN(v, stats, x, y, vd->reg[fbzColorPath].u, vd->reg[fbzMode].u, iterz, iterw);
 // Start PIXEL_PIPE_BEGIN copy
 				//#define PIXEL_PIPELINE_BEGIN(VV, STATS, XX, YY, FBZCOLORPATH, FBZMODE, ITERZ, ITERW)
-					int32_t fogdepth, biasdepth;
-					int32_t r, g, b, a;
+					int32_t biasdepth;
+					int32_t r, g, b;
 
 					(stats)->pixels_in++;
 
@@ -3332,34 +3357,44 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 // End PIXEL_PIPELINE_BEGIN COPY
 
 				// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
-				fogdepth = biasdepth = (uint32_t) sz[pix];
+				biasdepth = (uint32_t) sz[pix];
 
 
 				/* Perform depth testing */
-				if (!depthTest((uint16_t) vd->reg[zaColor].u, stats, depth[x], vd->reg[fbzMode].u, biasdepth))
-					goto nextpixel;
+				if (FBZMODE_ENABLE_DEPTHBUF(vd->reg[fbzMode].u))
+					if (!depthTest((uint16_t) vd->reg[zaColor].u, stats, depth[x], vd->reg[fbzMode].u, biasdepth))
+						goto nextpixel;
 
 				/* use the RGBA we stashed above */
 				color.set(sa[pix], sr[pix], sg[pix], sb[pix]);
 
 				/* handle chroma key */
-				if (!chromaKeyTest(vd, stats, vd->reg[fbzMode].u, color))
-					goto nextpixel;
+				if (FBZMODE_ENABLE_CHROMAKEY(vd->reg[fbzMode].u))
+					if (!chromaKeyTest(vd, stats, vd->reg[fbzMode].u, color))
+						goto nextpixel;
 				/* handle alpha mask */
-				if (!alphaMaskTest(stats, vd->reg[fbzMode].u, color.get_a()))
-					goto nextpixel;
+				if (FBZMODE_ENABLE_ALPHA_MASK(vd->reg[fbzMode].u))
+					if (!alphaMaskTest(stats, vd->reg[fbzMode].u, color.get_a()))
+						goto nextpixel;
 				/* handle alpha test */
-				if (!alphaTest(vd, stats, vd->reg[alphaMode].u, color.get_a()))
-					goto nextpixel;
+				if (ALPHAMODE_ALPHATEST(vd->reg[alphaMode].u))
+					if (!alphaTest(vd->reg[alphaMode].rgb.a, stats, vd->reg[alphaMode].u, color.get_a()))
+						goto nextpixel;
 
+				/* perform fogging */
+				preFog.set(color);
+				if (FOGMODE_ENABLE_FOG(vd->reg[fogMode].u))
+					applyFogging(vd, vd->reg[fbzMode].u, vd->reg[fogMode].u, vd->reg[fbzColorPath].u, x, dither4, biasdepth, color, iterz, iterw, iterargb);
 
 				/* wait for any outstanding work to finish */
 				poly_wait(vd->poly, "LFB Write");
 
-				/* pixel pipeline part 2 handles color blending, fog, alpha, and final output */
-				PIXEL_PIPELINE_END(vd, stats, dither, dither4, dither_lookup, x, dest, depth,
-					vd->reg[fbzMode].u, vd->reg[fbzColorPath].u, vd->reg[alphaMode].u, vd->reg[fogMode].u,
-					iterz, iterw, iterargb) { };
+				/* perform alpha blending */
+				if (ALPHAMODE_ALPHABLEND(vd->reg[alphaMode].u))
+					alphaBlend(vd->reg[fbzMode].u, vd->reg[alphaMode].u, x, dither, dest[x], depth, preFog, color, vd->fbi.rgb565);
+
+				/* pixel pipeline part 2 handles final output */
+				PIXEL_PIPELINE_END(stats, dither_lookup, x, dest, depth, vd->reg[fbzMode].u) { };
 nextpixel:
 			/* advance our pointers */
 			x++;
@@ -4908,9 +4943,24 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 		case io_vidOverlayDudx:
 		case io_vidOverlayDvdy:
 		{
-			/* warning: this is a hack for now! We should really compute the screen size */
-			/* from the CRTC registers */
 			COMBINE_DATA(&banshee.io[offset]);
+
+			// Get horizontal total and vertical total from CRTC registers
+			int htotal = (banshee.crtc[0] + 5) * 8;
+			int vtotal = banshee.crtc[6];
+			vtotal |= ((banshee.crtc[7] >> 0) & 0x1) << 8;
+			vtotal |= ((banshee.crtc[7] >> 5) & 0x1) << 9;
+			int vstart = banshee.crtc[0x10];
+			vstart |= ((banshee.crtc[7] >> 2) & 0x1) << 8;
+			vstart |= ((banshee.crtc[7] >> 7) & 0x1) << 9;
+
+			// Get pll k, m and n from pllCtrl0
+			const uint32_t k = (banshee.io[io_pllCtrl0] >> 0) & 0x3;
+			const uint32_t m = (banshee.io[io_pllCtrl0] >> 2) & 0x3f;
+			const uint32_t n = (banshee.io[io_pllCtrl0] >> 8) & 0xff;
+			const double video_clock = (XTAL(14'318'181) * (n + 2) / ((m + 2) << k)).dvalue();
+			const double frame_period = vtotal * htotal / video_clock;
+			//osd_printf_info("k: %d m: %d n: %d clock: %f period: %f rate: %.2f\n", k, m, n, video_clock, frame_period, 1.0 / frame_period);
 
 			int width = fbi.width;
 			int height = fbi.height;
@@ -4919,10 +4969,17 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 				width = (fbi.width * banshee.io[io_vidOverlayDudx]) / 1048576;
 			if (banshee.io[io_vidOverlayDvdy] != 0)
 				height = (fbi.height * banshee.io[io_vidOverlayDvdy]) / 1048576;
+			if (LOG_REGISTERS)
+				logerror("configure screen: htotal: %d vtotal: %d vstart: %d width: %d height: %d refresh: %f\n",
+					htotal, vtotal, vstart, width, height, 1.0 / frame_period);
+			if (htotal > 0 && vtotal > 0) {
+				rectangle visarea(0, width - 1, 0, height - 1);
+				screen->configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
 
-			screen->set_visible_area(0, width - 1, 0, height - 1);
-
-			adjust_vblank_timer(this);
+				// Set the vsync start
+				fbi.vsyncscan = vstart;
+				adjust_vblank_timer(this);
+			}
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
 			break;
@@ -5113,6 +5170,8 @@ void voodoo_device::device_start()
 
 	/* build shared TMU tables */
 	tmushare.init();
+	// Point the rgb565 table to the frame buffer table
+	tmushare.rgb565 = fbi.rgb565;
 
 	/* set up the TMUs */
 	tmu[0].init(vd_type, tmushare, &reg[0x100], tmumem[0], tmumem0 << 20);
@@ -5139,7 +5198,10 @@ void voodoo_device::device_start()
 	banshee.io[io_sipMonitor] = 0x40000000;
 	banshee.io[io_lfbMemoryConfig] = 0x000a2200;
 	banshee.io[io_dramInit0] = 0x00579d29;
-	banshee.io[io_dramInit0] |= 0x08000000;      // Konami Viper expects 16MBit SGRAMs
+	if (m_fbmem == 16)
+		banshee.io[io_dramInit0] |= 0x0c000000;      // Midway Vegas (denver) expects 2 banks of 16MBit SGRAMs
+	else
+		banshee.io[io_dramInit0] |= 0x08000000;      // Konami Viper expects 16MBit SGRAMs
 	banshee.io[io_dramInit1] = 0x00f02200;
 	banshee.io[io_tmuGbeInit] = 0x00000bfb;
 
@@ -5223,7 +5285,7 @@ int32_t voodoo_device::fastfill(voodoo_device *vd)
 	for (y = sy; y < ey; y += ARRAY_LENGTH(extents))
 	{
 		poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(vd->poly);
-		int count = std::min(ey - y, int(ARRAY_LENGTH(extents)));
+		int count = (std::min)(ey - y, int(ARRAY_LENGTH(extents)));
 
 		extra->device = vd;
 		memcpy(extra->dither, dithermatrix, sizeof(extra->dither));
@@ -5257,7 +5319,7 @@ int32_t voodoo_device::swapbuffer(voodoo_device* vd, uint32_t data)
 
 	/* determine how many cycles to wait; we deliberately overshoot here because */
 	/* the final count gets updated on the VBLANK */
-	return (vd->fbi.vblank_swap + 1) * vd->freq / 30;
+	return (vd->fbi.vblank_swap + 1) * vd->freq / 10;
 }
 
 
@@ -5907,7 +5969,7 @@ void voodoo_device::raster_fastfill(void *destbase, int32_t y, const poly_extent
 	if (FBZMODE_AUX_BUFFER_MASK(vd->reg[fbzMode].u) && vd->fbi.auxoffs != ~0)
 	{
 		uint16_t depth = vd->reg[zaColor].u;
-		uint64_t expanded = ((uint64_t)depth << 48) | ((uint64_t)depth << 32) | (depth << 16) | depth;
+		uint64_t expanded = ((uint64_t)depth << 48) | ((uint64_t)depth << 32) | ((uint64_t)depth << 16) | (uint64_t)depth;
 		uint16_t *dest = (uint16_t *)(vd->fbi.ram + vd->fbi.auxoffs) + scry * vd->fbi.rowpixels;
 
 		for (x = startx; x < stopx && (x & 3) != 0; x++)

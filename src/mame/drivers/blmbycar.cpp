@@ -100,7 +100,7 @@ READ16_MEMBER(blmbycar_state::blmbycar_opt_wheel_r)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, blmbycar_state )
+ADDRESS_MAP_START(blmbycar_state::common_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM
 	AM_RANGE(0x100000, 0x103fff) AM_WRITEONLY                                               // ???
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY                                               // ???
 	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_SHARE("scroll_1")              // Scroll 1
 	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_SHARE("scroll_0")              // Scroll 0
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") AM_MIRROR(0x4000) // Palette
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") AM_MIRROR(0x4000) // Palette
 	AM_RANGE(0x200600, 0x203fff) AM_RAM AM_MIRROR(0x4000)
 	AM_RANGE(0x440000, 0x441fff) AM_RAM
 	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_SHARE("spriteram")// Sprites (size?)
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blmbycar_map, AS_PROGRAM, 16, blmbycar_state )
+ADDRESS_MAP_START(blmbycar_state::blmbycar_map)
 	AM_IMPORT_FROM(common_map)
 
 	AM_RANGE(0x700004, 0x700005) AM_READ(blmbycar_opt_wheel_r)                              // Wheel (optical)
@@ -136,7 +136,7 @@ READ16_MEMBER(blmbycar_state::waterball_unk_r)
 	return m_retvalue;
 }
 
-static ADDRESS_MAP_START( watrball_map, AS_PROGRAM, 16, blmbycar_state )
+ADDRESS_MAP_START(blmbycar_state::watrball_map)
 	AM_IMPORT_FROM(common_map)
 
 	AM_RANGE(0x700006, 0x700007) AM_READNOP                                                 // read
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( watrball_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x70000a, 0x70000b) AM_WRITEONLY                                               // ?? busy
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blmbycar_oki_map, 0, 8, blmbycar_state )
+ADDRESS_MAP_START(blmbycar_state::blmbycar_oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -343,10 +343,10 @@ MACHINE_RESET_MEMBER(blmbycar_state,blmbycar)
 }
 
 
-static MACHINE_CONFIG_START( blmbycar )
+MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(blmbycar_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blmbycar_state,  irq1_line_hold)
 
@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( blmbycar )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, blmbycar_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -389,7 +389,8 @@ MACHINE_RESET_MEMBER(blmbycar_state,watrball)
 	m_retvalue = 0;
 }
 
-static MACHINE_CONFIG_DERIVED( watrball, blmbycar )
+MACHINE_CONFIG_START(blmbycar_state::watrball)
+	blmbycar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

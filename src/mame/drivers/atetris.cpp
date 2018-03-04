@@ -60,8 +60,8 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_14_31818MHz
-#define BOOTLEG_CLOCK       XTAL_14_7456MHz
+#define MASTER_CLOCK        XTAL(14'318'181)
+#define BOOTLEG_CLOCK       XTAL(14'745'600)
 
 
 /*************************************
@@ -193,10 +193,10 @@ WRITE8_MEMBER(atetris_state::nvram_enable_w)
  *************************************/
 
 /* full address map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, atetris_state )
+ADDRESS_MAP_START(atetris_state::main_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x2810, 0x281f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
@@ -210,10 +210,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, atetris_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( atetrisb2_map, AS_PROGRAM, 8, atetris_state )
+ADDRESS_MAP_START(atetris_state::atetrisb2_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2802, 0x2802) AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0x2804, 0x2804) AM_DEVWRITE("sn2", sn76496_device, write)
@@ -230,10 +230,10 @@ static ADDRESS_MAP_START( atetrisb2_map, AS_PROGRAM, 8, atetris_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( atetrisb3_map, AS_PROGRAM, 8, atetris_state )
+ADDRESS_MAP_START(atetris_state::atetrisb3_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	//AM_RANGE(0x2802, 0x2802) AM_DEVWRITE("sn1", sn76489_device, write)
 	//AM_RANGE(0x2804, 0x2804) AM_DEVWRITE("sn2", sn76489_device, write)
@@ -326,7 +326,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atetris )
+MACHINE_CONFIG_START(atetris_state::atetris)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/8)
@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( atetris )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( atetrisb2 )
+MACHINE_CONFIG_START(atetris_state::atetrisb2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,BOOTLEG_CLOCK/8)
@@ -405,7 +405,8 @@ static MACHINE_CONFIG_START( atetrisb2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( atetrisb3, atetrisb2 )
+MACHINE_CONFIG_START(atetris_state::atetrisb3)
+	atetrisb2(config);
 
 	MCFG_CPU_REPLACE("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(atetrisb3_map)

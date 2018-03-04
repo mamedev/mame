@@ -38,9 +38,15 @@ public:
 	DECLARE_READ8_MEMBER(beta_enable_r);
 	DECLARE_READ8_MEMBER(beta_disable_r);
 	DECLARE_MACHINE_RESET(pentagon);
+	DECLARE_VIDEO_START(pentagon);
 	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_on);
 	TIMER_CALLBACK_MEMBER(irq_off);
+	void pent1024(machine_config &config);
+	void pentagon(machine_config &config);
+	void pentagon_io(address_map &map);
+	void pentagon_mem(address_map &map);
+	void pentagon_switch(address_map &map);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -135,7 +141,7 @@ void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int para
 TIMER_CALLBACK_MEMBER(pentagon_state::irq_on)
 {
 	m_maincpu->set_input_line(0, HOLD_LINE);
-	timer_set(attotime::from_ticks(32, XTAL_14MHz / 4), TIMER_IRQ_OFF, 0);
+	timer_set(attotime::from_ticks(32, XTAL(14'000'000) / 4), TIMER_IRQ_OFF, 0);
 }
 
 TIMER_CALLBACK_MEMBER(pentagon_state::irq_off)
@@ -145,7 +151,7 @@ TIMER_CALLBACK_MEMBER(pentagon_state::irq_off)
 
 INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
 {
-	timer_set(attotime::from_ticks(179, XTAL_14MHz / 4), TIMER_IRQ_ON, 0);
+	timer_set(attotime::from_ticks(179, XTAL(14'000'000) / 4), TIMER_IRQ_ON, 0);
 }
 
 READ8_MEMBER(pentagon_state::beta_neutral_r)
@@ -175,7 +181,14 @@ READ8_MEMBER(pentagon_state::beta_disable_r)
 	return m_program->read_byte(offset + 0x4000);
 }
 
-static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
+ADDRESS_MAP_START(pentagon_state::pentagon_mem)
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(pentagon_state::pentagon_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(pentagon_port_7ffd_w)  AM_MIRROR(0x7ffd)  // (A15 | A1) == 0
 	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, status_r, command_w) AM_MIRROR(0xff00)
@@ -188,9 +201,9 @@ static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (pentagon_switch, AS_OPCODES, 8, pentagon_state)
+ADDRESS_MAP_START(pentagon_state::pentagon_switch)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(beta_neutral_r) // Overlap with next because we want real addresses on the 3e00-3fff range
 	AM_RANGE(0x3d00, 0x3dff) AM_READ(beta_enable_r)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(beta_neutral_r) // Overlap with previous because we want real addresses on the 3e00-3fff range
 	AM_RANGE(0x4000, 0xffff) AM_READ(beta_disable_r)
 ADDRESS_MAP_END
 
@@ -221,6 +234,22 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 	pentagon_update_memory();
 }
 
+VIDEO_START_MEMBER(pentagon_state,pentagon)
+{
+	m_frame_invert_count = 16;
+	m_frame_number = 0;
+	m_flash_invert = 0;
+
+	m_previous_border_x = 0;
+	m_previous_border_y = 0;
+	m_screen->register_screen_bitmap(m_border_bitmap);
+	m_previous_screen_x = 0;
+	m_previous_screen_y = 0;
+	m_screen->register_screen_bitmap(m_screen_bitmap);
+
+	m_screen_location = m_ram->pointer() + (5 << 14);
+}
+
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
@@ -241,33 +270,39 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_DERIVED( pentagon, spectrum_128 )
+MACHINE_CONFIG_START(pentagon_state::pentagon)
+	spectrum_128(config);
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_14MHz / 4)
+	MCFG_CPU_CLOCK(XTAL(14'000'000) / 4)
+	MCFG_CPU_PROGRAM_MAP(pentagon_mem)
 	MCFG_CPU_IO_MAP(pentagon_io)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(pentagon_switch)
+	MCFG_CPU_OPCODES_MAP(pentagon_switch)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pentagon_state,  pentagon_interrupt)
 	MCFG_MACHINE_RESET_OVERRIDE(pentagon_state, pentagon )
 
 	MCFG_SCREEN_MODIFY("screen")
-	//MCFG_SCREEN_RAW_PARAMS(XTAL_14MHz / 2, 448, 0, 352,  320, 0, 304)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14MHz / 2, 448, 0, 352,  320, 0, 287)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 304)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 287)
+	MCFG_VIDEO_START_OVERRIDE(pentagon_state, pentagon )
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pentagon)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_REPLACE("ay8912", AY8912, XTAL_14MHz / 8)
+	MCFG_SOUND_REPLACE("ay8912", AY8912, XTAL(14'000'000) / 8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 
+	MCFG_DEVICE_REMOVE("exp")
+
 	MCFG_SOFTWARE_LIST_ADD("cass_list_pen","pentagon_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pent1024, pentagon)
+MACHINE_CONFIG_START(pentagon_state::pent1024)
+	pentagon(config);
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1024K")

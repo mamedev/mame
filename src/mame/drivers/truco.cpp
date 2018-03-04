@@ -212,7 +212,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_12MHz          /* confirmed */
+#define MASTER_CLOCK    XTAL(12'000'000)          /* confirmed */
 #define CPU_CLOCK       (MASTER_CLOCK/16)   /* guess */
 #define CRTC_CLOCK      (MASTER_CLOCK/8)    /* guess */
 
@@ -261,7 +261,7 @@ WRITE_LINE_MEMBER(truco_state::pia_irqb_w)
 *                Memory Map                *
 *******************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, truco_state )
+ADDRESS_MAP_START(truco_state::main_map)
 	AM_RANGE(0x0000, 0x17ff) AM_RAM                                     /* General purpose RAM */
 	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_SHARE("videoram")                /* Video RAM */
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_SHARE("battery_ram")             /* Battery backed RAM */
@@ -416,7 +416,7 @@ INTERRUPT_GEN_MEMBER(truco_state::interrupt)
 *              Machine Driver              *
 *******************************************/
 
-static MACHINE_CONFIG_START( truco )
+MACHINE_CONFIG_START(truco_state::truco)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)

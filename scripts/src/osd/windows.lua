@@ -16,9 +16,6 @@ function maintargetosdoptions(_target,_subtarget)
 	osdmodulestargetconf()
 
 	configuration { "mingw*" }
-		linkoptions {
-			"-municode",
-		}
 		links {
 			"mingw32",
 		}

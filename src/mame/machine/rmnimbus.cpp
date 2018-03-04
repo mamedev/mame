@@ -1073,7 +1073,7 @@ READ8_MEMBER(rmnimbus_state::scsi_r)
 {
 	int result = 0;
 
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 	char drive[5];
 	floppy_image_device *floppy;
 
@@ -1153,7 +1153,7 @@ WRITE8_MEMBER(rmnimbus_state::fdc_ctl_w)
 
 WRITE8_MEMBER(rmnimbus_state::scsi_w)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 
 	if(LOG_DISK_HDD)
 		logerror("Nimbus HDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x410);
@@ -1272,7 +1272,7 @@ void rmnimbus_state::ipc_dumpregs()
 
 READ8_MEMBER(rmnimbus_state::nimbus_pc8031_r)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 	uint8_t   result;
 
 	switch(offset*2)
@@ -1296,7 +1296,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_r)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_w)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 
 	switch(offset*2)
 	{
@@ -1322,7 +1322,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_w)
 
 READ8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_r)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_iocpu->pc();
 	uint8_t   result = 0;
 
 	switch (offset & 0x01)
@@ -1347,7 +1347,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_r)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_iocpu->pc();
 
 	if(LOG_PC8031)
 		logerror("8031 PCIOW %04X write of %02X to %04X\n",pc,data,offset);
@@ -1384,58 +1384,64 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 	}
 }
 
-READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port_r)
+READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port1_r)
 {
-	int pc=space.device().safe_pc();
-	uint8_t   result = 0;
+	int pc=m_iocpu->pc();
+	uint8_t   result = (m_eeprom_bits & ~4) | (m_eeprom->do_read() << 2);
 
 	if(LOG_PC8031_PORT)
-		logerror("8031: PCPORTR %04X read of %04X returns %02X\n",pc,offset,result);
-
-	switch(offset)
-	{
-		case 0x01:
-			result = (m_eeprom_bits & ~4) | (m_eeprom->do_read() << 2);
-			break;
-	}
+		logerror("8031: PCPORTR %04X read of P1 returns %02X\n",pc,result);
 
 	return result;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port_w)
+READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port3_r)
 {
-	int pc=space.device().safe_pc();
-
-	switch (offset)
-	{
-		case 0x01:
-			m_eeprom->cs_write((data & 8) ? 1 : 0);
-
-			if(!(data & 8))
-				m_eeprom_state = 0;
-			else if(!(data & 2) || (m_eeprom_state == 2))
-				m_eeprom_state = 2;
-			else if((data & 8) && (!(m_eeprom_bits & 8)))
-				m_eeprom_state = 1;
-			else if((!(data & 1)) && (m_eeprom_bits & 1) && (m_eeprom_state == 1))
-				m_eeprom_state = 2; //wait until 1 clk after cs rises to set di else it's seen as a start bit
-
-			m_eeprom->di_write(((data & 2) && (m_eeprom_state == 2)) ? 1 : 0);
-			m_eeprom->clk_write((data & 1) ? 1 : 0);
-			m_eeprom_bits = data;
-			break;
-	}
+	int pc=m_iocpu->pc();
+	uint8_t   result = 0;
 
 	if(LOG_PC8031_PORT)
-		logerror("8031 PCPORTW %04X write of %02X to %04X\n",pc,data,offset);
+		logerror("8031: PCPORTR %04X read of P3 returns %02X\n",pc,result);
+
+	return result;
 }
 
+WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port1_w)
+{
+	int pc=m_iocpu->pc();
+
+	m_eeprom->cs_write((data & 8) ? 1 : 0);
+
+	if(!(data & 8))
+		m_eeprom_state = 0;
+	else if(!(data & 2) || (m_eeprom_state == 2))
+		m_eeprom_state = 2;
+	else if((data & 8) && (!(m_eeprom_bits & 8)))
+		m_eeprom_state = 1;
+	else if((!(data & 1)) && (m_eeprom_bits & 1) && (m_eeprom_state == 1))
+		m_eeprom_state = 2; //wait until 1 clk after cs rises to set di else it's seen as a start bit
+
+	m_eeprom->di_write(((data & 2) && (m_eeprom_state == 2)) ? 1 : 0);
+	m_eeprom->clk_write((data & 1) ? 1 : 0);
+	m_eeprom_bits = data;
+
+	if(LOG_PC8031_PORT)
+		logerror("8031 PCPORTW %04X write of %02X to P1\n",pc,data);
+}
+
+WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port3_w)
+{
+	int pc=m_iocpu->pc();
+
+	if(LOG_PC8031_PORT)
+		logerror("8031 PCPORTW %04X write of %02X to P3\n",pc,data);
+}
 
 
 /* IO Unit */
 READ8_MEMBER(rmnimbus_state::nimbus_iou_r)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 	uint8_t   result=0;
 
 	if(offset==0)
@@ -1451,7 +1457,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_iou_r)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_iou_w)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 
 	if(LOG_IOU)
 		logerror("Nimbus IOUW %08X write of %02X to %04X\n",pc,data,(offset*2)+0x92);

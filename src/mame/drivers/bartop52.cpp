@@ -21,6 +21,7 @@
 #include "includes/atari400.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "sound/pokey.h"
 #include "video/gtia.h"
@@ -36,13 +37,17 @@ public:
 		: atari_common_state(mconfig, type, tag)
 	{ }
 
+	void a5200(machine_config &config);
+
+protected:
 	TIMER_DEVICE_CALLBACK_MEMBER( bartop_interrupt );
 
 	virtual void machine_reset() override;
+	void a5200_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8, bartop52_state )
+ADDRESS_MAP_START(bartop52_state::a5200_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
@@ -110,6 +115,8 @@ INPUT_PORTS_END
 
 void bartop52_state::machine_reset()
 {
+	atari_common_state::machine_reset();
+
 	pokey_device *pokey = machine().device<pokey_device>("pokey");
 	pokey->write(15,0);
 }
@@ -119,7 +126,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( bartop52_state::bartop_interrupt )
 	m_antic->generic_interrupt(4);
 }
 
-static MACHINE_CONFIG_START( a5200 )
+MACHINE_CONFIG_START(bartop52_state::a5200)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
 	MCFG_CPU_PROGRAM_MAP(a5200_mem)
@@ -140,7 +147,7 @@ static MACHINE_CONFIG_START( a5200 )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(atari_common_state, atari)
+	MCFG_PALETTE_INIT_OWNER(bartop52_state, atari)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -150,8 +157,8 @@ static MACHINE_CONFIG_START( a5200 )
 	MCFG_POKEY_POT1_R_CB(IOPORT("analog_1"))
 	MCFG_POKEY_POT2_R_CB(IOPORT("analog_2"))
 	MCFG_POKEY_POT3_R_CB(IOPORT("analog_3"))
-	MCFG_POKEY_KEYBOARD_CB(atari_common_state, a5200_keypads)
-	MCFG_POKEY_INTERRUPT_CB(atari_common_state, interrupt_cb)
+	MCFG_POKEY_KEYBOARD_CB(bartop52_state, a5200_keypads)
+	MCFG_POKEY_INTERRUPT_CB(bartop52_state, interrupt_cb)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

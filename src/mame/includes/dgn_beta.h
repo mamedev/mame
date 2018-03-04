@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef DGN_BETA_H_
-#define DGN_BETA_H_
+#ifndef MAME_INCLUDES_DGN_BETA_H
+#define MAME_INCLUDES_DGN_BETA_H
 
 #include "video/mc6845.h"
 #include "machine/wd_fdc.h"
@@ -230,11 +230,13 @@ public:
 	void ScanInKeyboard(void);
 	void dgn_beta_frame_interrupt (int data);
 
-	offs_t dgnbeta_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
+	offs_t dgnbeta_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
+	void dgnbeta(machine_config &config);
+	void dgnbeta_map(address_map &map);
 private:
 	void execute_beta_key_dump(int ref, const std::vector<std::string> &params);
 	void execute_beta_dat_log(int ref, const std::vector<std::string> &params);
 };
 
-#endif /* DGN_BETA_H_ */
+#endif // MAME_INCLUDES_DGN_BETA_H

@@ -63,7 +63,7 @@ void nmk004_device::ym2203_irq_handler(int irq)
 	m_cpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( nmk004_sound_mem_map, AS_PROGRAM, 8, nmk004_device )
+ADDRESS_MAP_START(nmk004_device::nmk004_sound_mem_map)
 	//AM_RANGE(0x0000, 0x1fff) AM_ROM /* 0x0000 - 0x1fff = internal ROM */
 	AM_RANGE(0x2000, 0xefff) AM_ROM AM_REGION(":audiocpu", 0x2000 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
@@ -109,7 +109,7 @@ void nmk004_device::device_start()
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_MEMBER( nmk004_device::device_add_mconfig )
+MACHINE_CONFIG_START(nmk004_device::device_add_mconfig)
 	MCFG_CPU_ADD("mcu",TMP90840, DERIVED_CLOCK(1,1)) // Toshiba TMP90C840AF in QFP64 package with 8Kbyte internal ROM
 	MCFG_CPU_PROGRAM_MAP(nmk004_sound_mem_map)
 	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(nmk004_device, nmk004_port4_w))

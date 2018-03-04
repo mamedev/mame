@@ -332,14 +332,14 @@ WRITE8_MEMBER(welltris_state::sound_bankswitch_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
+ADDRESS_MAP_START(welltris_state::main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_SHARE("pixelram")    /* Graph_1 & 2*/
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                             /* work */
 	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM AM_SHARE("spriteram")           /* Sprite */
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(charvideoram_w) AM_SHARE("charvideoram")     /* Char */
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    /* Palette */
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    /* Palette */
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")                 /* Bottom Controls */
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(palette_bank_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")                 /* Top Controls */
@@ -355,13 +355,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
 	AM_RANGE(0xfff00c, 0xfff00f) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, welltris_state )
+ADDRESS_MAP_START(welltris_state::sound_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, welltris_state )
+ADDRESS_MAP_START(welltris_state::sound_port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
@@ -667,7 +667,7 @@ void welltris_state::machine_start()
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
 }
 
-static MACHINE_CONFIG_START( welltris )
+MACHINE_CONFIG_START(welltris_state::welltris)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)  /* 10 MHz */
@@ -691,7 +691,7 @@ static MACHINE_CONFIG_START( welltris )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
@@ -712,7 +712,8 @@ static MACHINE_CONFIG_START( welltris )
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quiz18k, welltris )
+MACHINE_CONFIG_START(welltris_state::quiz18k)
+	welltris(config);
 
 	/* basic machine hardware */
 

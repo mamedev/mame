@@ -47,7 +47,7 @@
 #define CMP_REGISTER 0
 #define AUX_REGISTER 1
 
-#define MAIN_CLOCK XTAL_4MHz
+#define MAIN_CLOCK XTAL(4'000'000)
 
 class cops_state : public driver_device
 {
@@ -68,6 +68,10 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void revlatns(machine_config &config);
+	void cops(machine_config &config);
+	void cops_map(address_map &map);
+	void revlatns_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -200,7 +204,7 @@ uint32_t cops_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap,
 WRITE8_MEMBER(cops_state::cdrom_data_w)
 {
 	const char *regs[4] = { "CMD", "PARAM", "WRITE", "CTRL" };
-	m_cdrom_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	m_cdrom_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	uint8_t reg = ((m_cdrom_ctrl & 4) >> 1) | ((m_cdrom_ctrl & 8) >> 3);
 	if (LOG_CDROM) logerror("%s:cdrom_data_w(reg = %s, data = %02x)\n", machine().describe_context(), regs[reg & 0x03], m_cdrom_data);
 }
@@ -471,9 +475,9 @@ WRITE8_MEMBER(cops_state::dacia_w)
 				{
 					m_dacia_reg1 = CMP_REGISTER;
 				}
-				if (LOG_DACIA) logerror("DACIA TIME %02d\n", XTAL_3_6864MHz / m_dacia_ic_div_1);
+				if (LOG_DACIA) logerror("DACIA TIME %02d\n", (XTAL(3'686'400) / m_dacia_ic_div_1).value());
 
-//              m_ld_timer->adjust(attotime::from_hz(XTAL_3_6864MHz / m_dacia_ic_div_1), 0, attotime::from_hz(XTAL_3_6864MHz / m_dacia_ic_div_1));
+//              m_ld_timer->adjust(attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_1), 0, attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_1));
 
 				if (LOG_DACIA) logerror("DACIA Ctrl Register: %02x\n", data);
 
@@ -541,9 +545,9 @@ WRITE8_MEMBER(cops_state::dacia_w)
 				{
 					m_dacia_reg2 = CMP_REGISTER;
 				}
-				if (LOG_DACIA) logerror("DACIA TIME 2 %02d\n", XTAL_3_6864MHz / m_dacia_ic_div_1);
+				if (LOG_DACIA) logerror("DACIA TIME 2 %02d\n", (XTAL(3'686'400) / m_dacia_ic_div_1).value());
 
-				m_ld_timer->adjust(attotime::from_hz(XTAL_3_6864MHz / m_dacia_ic_div_2), 0, attotime::from_hz(XTAL_3_6864MHz / m_dacia_ic_div_2));
+				m_ld_timer->adjust(attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_2), 0, attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_2));
 
 				if (LOG_DACIA) logerror("DACIA Ctrl Register 2: %02x\n", data);
 
@@ -647,7 +651,7 @@ WRITE8_MEMBER(cops_state::io1_w)
 				{
 					sprintf(output_name, "digit%d", i);
 					display_data = m_lcd_data_l | (m_lcd_data_h << 8);
-					display_data = BITSWAP16(display_data, 4, 5, 12, 1, 0, 11, 10, 6, 7, 2, 9, 3, 15, 8, 14, 13);
+					display_data = bitswap<16>(display_data, 4, 5, 12, 1, 0, 11, 10, 6, 7, 2, 9, 3, 15, 8, 14, 13);
 					output().set_value(output_name, display_data);
 				}
 			}
@@ -757,7 +761,7 @@ WRITE_LINE_MEMBER(cops_state::via1_irq)
 
 WRITE8_MEMBER(cops_state::via1_b_w)
 {
-	m_sn_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	m_sn_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 	if (m_sn_cb1)
 	{
 		m_sn->write(space,0,m_sn_data);
@@ -798,7 +802,7 @@ WRITE_LINE_MEMBER(cops_state::via2_irq)
  *
  *************************************/
 
-static ADDRESS_MAP_START( cops_map, AS_PROGRAM, 8, cops_state )
+ADDRESS_MAP_START(cops_state::cops_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x9fff) AM_ROM AM_REGION("program", 0)
 	AM_RANGE(0xa000, 0xafff) AM_READWRITE(io1_r, io1_w)
@@ -810,7 +814,7 @@ static ADDRESS_MAP_START( cops_map, AS_PROGRAM, 8, cops_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("sysbank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( revlatns_map, AS_PROGRAM, 8, cops_state )
+ADDRESS_MAP_START(cops_state::revlatns_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x9fff) AM_ROM AM_REGION("program", 0)
 	AM_RANGE(0xa000, 0xafff) AM_READWRITE(io1_lm_r, io1_w)
@@ -912,10 +916,10 @@ DRIVER_INIT_MEMBER(cops_state,cops)
 	membank("sysbank1")->set_entry(2);
 }
 
-static MACHINE_CONFIG_START( cops )
+MACHINE_CONFIG_START(cops_state::cops)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502,MAIN_CLOCK/2)
+	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(cops_map)
 
 	/* video hardware */
@@ -923,15 +927,15 @@ static MACHINE_CONFIG_START( cops )
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, MAIN_CLOCK/2)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via1_irq))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, via1_b_w))
 	MCFG_VIA6522_CB1_HANDLER(WRITE8(cops_state, via1_cb1_w))
 
-	MCFG_DEVICE_ADD("via6522_2", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_2", VIA6522, MAIN_CLOCK/2)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via2_irq))
 
-	MCFG_DEVICE_ADD("via6522_3", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_3", VIA6522, MAIN_CLOCK/2)
 	MCFG_VIA6522_READPA_HANDLER(READ8(cops_state, cdrom_data_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(cops_state, cdrom_data_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, cdrom_ctrl_w))
@@ -948,10 +952,10 @@ static MACHINE_CONFIG_START( cops )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( revlatns )
+MACHINE_CONFIG_START(cops_state::revlatns)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502,MAIN_CLOCK/2)
+	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(revlatns_map)
 
 	/* video hardware */
@@ -959,12 +963,12 @@ static MACHINE_CONFIG_START( revlatns )
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, MAIN_CLOCK/2)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via1_irq))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, via1_b_w))
 	MCFG_VIA6522_CB1_HANDLER(WRITE8(cops_state, via1_cb1_w))
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 
 	/* acia (really a 65C52)*/
 

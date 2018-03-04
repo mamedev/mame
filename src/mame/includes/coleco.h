@@ -2,11 +2,12 @@
 // copyright-holders:Mike Balfour, Ben Bruscella, Sean Young
 #pragma once
 
-#ifndef __COLECO__
-#define __COLECO__
+#ifndef MAME_INCLUDES_COLECO_H
+#define MAME_INCLUDES_COLECO_H
 
 
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "machine/coleco.h"
@@ -58,6 +59,13 @@ public:
 	uint8_t coleco_paddle_read(int port, int joy_mode, uint8_t joy_status);
 	uint8_t coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1);
 
+	void colecop(machine_config &config);
+	void coleco(machine_config &config);
+	void czz50(machine_config &config);
+	void dina(machine_config &config);
+	void coleco_io_map(address_map &map);
+	void coleco_map(address_map &map);
+	void czz50_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<colecovision_cartridge_slot_device> m_cart;

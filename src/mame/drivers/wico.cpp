@@ -40,6 +40,7 @@ ToDo:
 #include "machine/genpin.h"
 
 #include "cpu/m6809/m6809.h"
+#include "machine/timer.h"
 #include "sound/sn76496.h"
 #include "speaker.h"
 
@@ -69,6 +70,9 @@ public:
 	DECLARE_READ8_MEMBER(gentmrcl_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_housekeeping);
 	TIMER_DEVICE_CALLBACK_MEMBER(firq_housekeeping);
+	void wico(machine_config &config);
+	void ccpu_map(address_map &map);
+	void hcpu_map(address_map &map);
 private:
 	bool m_zcen;
 	bool m_gten;
@@ -83,7 +87,7 @@ private:
 };
 
 // housekeeping cpu
-static ADDRESS_MAP_START( hcpu_map, AS_PROGRAM, 8, wico_state )
+ADDRESS_MAP_START(wico_state::hcpu_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x1fe0, 0x1fe0) AM_WRITE(muxld_w)
 	//AM_RANGE(0x1fe1, 0x1fe1) AM_WRITE(store_w)
@@ -105,7 +109,7 @@ static ADDRESS_MAP_START( hcpu_map, AS_PROGRAM, 8, wico_state )
 ADDRESS_MAP_END
 
 // command cpu
-static ADDRESS_MAP_START( ccpu_map, AS_PROGRAM, 8, wico_state )
+ADDRESS_MAP_START(wico_state::ccpu_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram") // 2128  2k RAM
 	//AM_RANGE(0x1fe0, 0x1fe0) AM_WRITE(muxld_w) // to display module
 	//AM_RANGE(0x1fe1, 0x1fe1) AM_WRITE(store_w) // enable save to nvram
@@ -384,7 +388,7 @@ READ8_MEMBER( wico_state::lampst_r )
 			j = m_shared_ram[0x7f9 + i];
 		else
 			j = 0;
-		output().set_digit_value(i * 10 + (m_shared_ram[0x96] & 7), BITSWAP16(j, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(i * 10 + (m_shared_ram[0x96] & 7), bitswap<16>(j, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0));
 	}
 	return 0xff;
 }
@@ -427,11 +431,11 @@ void wico_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( wico )
+MACHINE_CONFIG_START(wico_state::wico)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("ccpu", M6809, 10000000 / 8)
+	MCFG_CPU_ADD("ccpu", MC6809E, XTAL(10'000'000) / 8) // MC68A09EP @ U51
 	MCFG_CPU_PROGRAM_MAP(ccpu_map)
-	MCFG_CPU_ADD("hcpu", M6809, 10000000 / 8)
+	MCFG_CPU_ADD("hcpu", MC6809E, XTAL(10'000'000) / 8) // MC68A09EP @ U24
 	MCFG_CPU_PROGRAM_MAP(hcpu_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", wico_state, irq_housekeeping, attotime::from_hz(120)) // zero crossing
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq", wico_state, firq_housekeeping, attotime::from_hz(750)) // time generator
@@ -441,9 +445,9 @@ static MACHINE_CONFIG_START( wico )
 	MCFG_DEFAULT_LAYOUT(layout_wico)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76494", SN76494, 10000000 / 64)
+	MCFG_SOUND_ADD("sn76494", SN76494, XTAL(10'000'000) / 64)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

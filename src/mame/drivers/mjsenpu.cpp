@@ -100,6 +100,9 @@ public:
 	uint32_t screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<palette_device> m_palette;
+	void mjsenpu(machine_config &config);
+	void mjsenpu_32bit_map(address_map &map);
+	void mjsenpu_io(address_map &map);
 };
 
 
@@ -158,7 +161,7 @@ WRITE8_MEMBER(mjsenpu_state::control_w)
 	// bits 0x08 is used in the alt payout / hopper mode (see dipswitches)
 
 	// 0x04 seem to be hopper/ticket related? different ones get used depending on the dips
-	m_hopper->write(space, 0, data & 0x04);
+	m_hopper->motor_w(data & 0x04);
 
 	// bit 0x02 could be coin counter?
 	machine().bookkeeping().coin_counter_w(0, data & 0x02 );
@@ -211,7 +214,7 @@ READ32_MEMBER(mjsenpu_state::muxed_inputs_r)
 	return 0x00000000;// 0xffffffff;
 }
 
-static ADDRESS_MAP_START( mjsenpu_32bit_map, AS_PROGRAM, 32, mjsenpu_state )
+ADDRESS_MAP_START(mjsenpu_state::mjsenpu_32bit_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("user2",0) // main game rom
 
@@ -226,7 +229,7 @@ static ADDRESS_MAP_START( mjsenpu_32bit_map, AS_PROGRAM, 32, mjsenpu_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mjsenpu_io, AS_IO, 32, mjsenpu_state )
+ADDRESS_MAP_START(mjsenpu_state::mjsenpu_io)
 	AM_RANGE(0x4000, 0x4003)  AM_READ(muxed_inputs_r)
 	AM_RANGE(0x4010, 0x4013)  AM_READ_PORT("IN1")
 
@@ -454,7 +457,7 @@ following clocks are on the PCB
 
 */
 
-static MACHINE_CONFIG_START( mjsenpu )
+MACHINE_CONFIG_START(mjsenpu_state::mjsenpu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E132XT, 27000000*2) /* ?? Mhz */
@@ -504,7 +507,7 @@ READ32_MEMBER(mjsenpu_state::mjsenpu_speedup_r)
 
 	if (pc == 0xadb8)
 	{
-		space.device().execute().spin_until_interrupt();
+		m_maincpu->spin_until_interrupt();
 	}
 	else
 	{

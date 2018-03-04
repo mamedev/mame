@@ -181,6 +181,7 @@ Not all regional versions are available for each Megatouch series
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
@@ -257,7 +258,7 @@ public:
 	DECLARE_MACHINE_START(meritm_crt250_crt252_crt258);
 	DECLARE_MACHINE_START(meritm_crt260);
 	DECLARE_MACHINE_START(merit_common);
-	uint32_t screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_meritm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_end_tick);
 	void meritm_crt250_switch_banks(  );
@@ -266,11 +267,21 @@ public:
 	uint8_t binary_to_BCD(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(meritm_vdp0_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(meritm_vdp1_interrupt);
+	void meritm_crt260(machine_config &config);
+	void meritm_crt250(machine_config &config);
+	void meritm_crt250_questions(machine_config &config);
+	void meritm_crt250_crt252_crt258(machine_config &config);
+	void meritm_crt250_crt258_io_map(address_map &map);
+	void meritm_crt250_io_map(address_map &map);
+	void meritm_crt250_map(address_map &map);
+	void meritm_crt250_questions_map(address_map &map);
+	void meritm_io_map(address_map &map);
+	void meritm_map(address_map &map);
 };
 
 
-#define SYSTEM_CLK  XTAL_21_4772MHz
-#define UART_CLK    XTAL_1_8432MHz // standard 8250 clock
+#define SYSTEM_CLK  XTAL(21'477'272)
+#define UART_CLK    XTAL(1'843'200) // standard 8250 clock
 
 
 /*************************************
@@ -333,7 +344,7 @@ void meritm_state::video_start()
 	save_item(NAME(m_interrupt_vdp1_state));
 }
 
-uint32_t meritm_state::screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t meritm_state::screen_update_meritm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if(machine().input().code_pressed_once(KEYCODE_Q))
 	{
@@ -346,7 +357,7 @@ uint32_t meritm_state::screen_update_meritm(screen_device &screen, bitmap_ind16 
 		popmessage("Layer 1 %sabled",m_layer1_enabled ? "en" : "dis");
 	}
 
-	bitmap.fill(m_v9938_0->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if ( m_layer0_enabled )
 	{
@@ -355,7 +366,7 @@ uint32_t meritm_state::screen_update_meritm(screen_device &screen, bitmap_ind16 
 
 	if ( m_layer1_enabled )
 	{
-		copybitmap_trans(bitmap, m_v9938_1->get_bitmap(), 0, 0, -6, -12, cliprect, m_v9938_1->get_transpen());
+		copybitmap_transalpha(bitmap, m_v9938_1->get_bitmap(), 0, 0, -6, -12, cliprect);
 	}
 	return 0;
 }
@@ -397,7 +408,7 @@ void meritm_state::meritm_switch_banks(  )
 WRITE8_MEMBER(meritm_state::meritm_psd_a15_w)
 {
 	m_psd_a15 = data;
-	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, space.device().safe_pc() );
+	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, m_maincpu->pc() );
 	meritm_switch_banks();
 }
 
@@ -526,12 +537,12 @@ READ8_MEMBER(meritm_state::meritm_ds1644_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( meritm_crt250_map, AS_PROGRAM, 8, meritm_state )
+ADDRESS_MAP_START(meritm_state::meritm_crt250_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_crt250_questions_map, AS_PROGRAM, 8, meritm_state )
+ADDRESS_MAP_START(meritm_state::meritm_crt250_questions_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(meritm_crt250_questions_lo_w)
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(meritm_crt250_questions_hi_w)
@@ -539,7 +550,7 @@ static ADDRESS_MAP_START( meritm_crt250_questions_map, AS_PROGRAM, 8, meritm_sta
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_crt250_io_map, AS_IO, 8, meritm_state )
+ADDRESS_MAP_START(meritm_state::meritm_crt250_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
@@ -551,7 +562,7 @@ static ADDRESS_MAP_START( meritm_crt250_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, AS_IO, 8, meritm_state )
+ADDRESS_MAP_START(meritm_state::meritm_crt250_crt258_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
@@ -564,13 +575,13 @@ static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_map, AS_PROGRAM, 8, meritm_state )
+ADDRESS_MAP_START(meritm_state::meritm_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank3") AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_io_map, AS_IO, 8, meritm_state )
+ADDRESS_MAP_START(meritm_state::meritm_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(meritm_psd_a15_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
@@ -1086,7 +1097,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_end_tick)
 	m_z80pio_0->port_a_write(m_vint);
 }
 
-static MACHINE_CONFIG_START( meritm_crt250 )
+MACHINE_CONFIG_START(meritm_state::meritm_crt250)
 	MCFG_CPU_ADD("maincpu", Z80, SYSTEM_CLK/6)
 	MCFG_CPU_PROGRAM_MAP(meritm_crt250_map)
 	MCFG_CPU_IO_MAP(meritm_crt250_io_map)
@@ -1134,13 +1145,15 @@ static MACHINE_CONFIG_START( meritm_crt250 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( meritm_crt250_questions, meritm_crt250 )
+MACHINE_CONFIG_START(meritm_state::meritm_crt250_questions)
+	meritm_crt250(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(meritm_crt250_questions_map)
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_questions)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( meritm_crt250_crt252_crt258, meritm_crt250_questions )
+MACHINE_CONFIG_START(meritm_state::meritm_crt250_crt252_crt258)
+	meritm_crt250_questions(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(meritm_crt250_crt258_io_map)
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_crt252_crt258)
@@ -1151,7 +1164,8 @@ static MACHINE_CONFIG_DERIVED( meritm_crt250_crt252_crt258, meritm_crt250_questi
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
+MACHINE_CONFIG_START(meritm_state::meritm_crt260)
+	meritm_crt250(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(meritm_map)
 	MCFG_CPU_IO_MAP(meritm_io_map)

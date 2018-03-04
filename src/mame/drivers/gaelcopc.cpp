@@ -39,6 +39,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void gaelcopc(machine_config &config);
+	void gaelcopc_map(address_map &map);
 protected:
 
 	// devices
@@ -58,7 +60,7 @@ uint32_t gaelcopc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static ADDRESS_MAP_START( gaelcopc_map, AS_PROGRAM, 32, gaelcopc_state )
+ADDRESS_MAP_START(gaelcopc_state::gaelcopc_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -66,7 +68,7 @@ static INPUT_PORTS_START( gaelcopc )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( gaelcopc )
+MACHINE_CONFIG_START(gaelcopc_state::gaelcopc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Pentium4? */
 	MCFG_CPU_PROGRAM_MAP(gaelcopc_map)

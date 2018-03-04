@@ -32,10 +32,11 @@ Unable to proceed due to no info available (& in English).
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "cpu/z80/z80.h"
+//#include "cpu/z80/z80.h"
+#include "bus/rs232/rs232.h"
+#include "machine/ay31015.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
-#include "machine/terminal.h"
 #include "video/mc6845.h"
 #include "screen.h"
 
@@ -52,6 +53,8 @@ public:
 		m_line3(*this, "LINE3"),
 		m_line4(*this, "LINE4"),
 		m_maincpu(*this, "maincpu"),
+		m_uart(*this, "uart"),
+		m_v24(*this, "v24"),
 		m_palette(*this, "palette")
 	{
 	}
@@ -66,6 +69,13 @@ public:
 	DECLARE_READ8_MEMBER(sapi3_25_r);
 	DECLARE_WRITE8_MEMBER(sapi3_25_w);
 	void kbd_put(u8 data);
+	DECLARE_READ8_MEMBER(uart_status_r);
+	DECLARE_WRITE8_MEMBER(modem_control_w);
+	DECLARE_READ8_MEMBER(uart_ready_r);
+	DECLARE_WRITE8_MEMBER(uart_mode_w);
+	DECLARE_READ8_MEMBER(uart_data_r);
+	DECLARE_WRITE8_MEMBER(uart_data_w);
+	DECLARE_WRITE8_MEMBER(uart_reset_w);
 	DECLARE_DRIVER_INIT(sapizps3);
 	DECLARE_DRIVER_INIT(sapizps3a);
 	DECLARE_DRIVER_INIT(sapizps3b);
@@ -74,6 +84,19 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sapi3(machine_config &config);
+	void sapi1(machine_config &config);
+	void sapi2(machine_config &config);
+	void sapi3a(machine_config &config);
+	void sapi3b(machine_config &config);
+	void sapi1_mem(address_map &map);
+	void sapi2_mem(address_map &map);
+	void sapi3_io(address_map &map);
+	void sapi3_mem(address_map &map);
+	void sapi3a_io(address_map &map);
+	void sapi3a_mem(address_map &map);
+	void sapi3b_io(address_map &map);
+	void sapi3b_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	uint8_t m_keyboard_mask;
@@ -86,6 +109,8 @@ private:
 	required_ioport m_line3;
 	required_ioport m_line4;
 	required_device<cpu_device> m_maincpu;
+	optional_device<ay31015_device> m_uart;
+	optional_device<rs232_port_device> m_v24;
 public:
 	optional_device<palette_device> m_palette;
 };
@@ -166,7 +191,7 @@ static const uint8_t MHB2501[] = {
 
 
 /* Address maps */
-static ADDRESS_MAP_START(sapi1_mem, AS_PROGRAM, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi1_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // Extension ROM
@@ -179,7 +204,7 @@ static ADDRESS_MAP_START(sapi1_mem, AS_PROGRAM, 8, sapi1_state )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM // REM-1
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sapi2_mem, AS_PROGRAM, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // Extension ROM
@@ -190,14 +215,14 @@ static ADDRESS_MAP_START(sapi2_mem, AS_PROGRAM, 8, sapi1_state )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM // REM-1
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sapi3_mem, AS_PROGRAM, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi3_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
 	AM_RANGE(0x0800, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sapi3a_mem, AS_PROGRAM, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi3a_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
 	AM_RANGE(0x0800, 0xf7ff) AM_RAM
@@ -205,7 +230,7 @@ static ADDRESS_MAP_START(sapi3a_mem, AS_PROGRAM, 8, sapi1_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sapi3b_mem, AS_PROGRAM, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi3b_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
 	AM_RANGE(0x0800, 0xafff) AM_RAM
@@ -213,22 +238,25 @@ static ADDRESS_MAP_START(sapi3b_mem, AS_PROGRAM, 8, sapi1_state )
 	AM_RANGE(0xb800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sapi3_io, AS_IO, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi3_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
 	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sapi3a_io, AS_IO, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi3a_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
-	AM_RANGE(0x12, 0x12) AM_READ(sapi2_keyboard_data_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
+	AM_RANGE(0x10, 0x10) AM_READWRITE(uart_status_r, modem_control_w)
+	AM_RANGE(0x11, 0x11) AM_READWRITE(uart_ready_r, uart_mode_w)
+	AM_RANGE(0x12, 0x12) AM_READWRITE(uart_data_r, uart_data_w)
+	AM_RANGE(0x13, 0x13) AM_WRITE(uart_reset_w)
 	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sapi3b_io, AS_IO, 8, sapi1_state )
+ADDRESS_MAP_START(sapi1_state::sapi3b_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
@@ -472,6 +500,67 @@ void sapi1_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
+READ8_MEMBER(sapi1_state::uart_status_r)
+{
+	uint8_t result = 0;
+	result |= m_uart->tbmt_r() || m_uart->dav_r();
+	result |= m_uart->or_r() << 1;
+	result |= m_uart->fe_r() << 2;
+	result |= m_uart->pe_r() << 3;
+	// RD4 = RI (= SI)
+	result |= m_v24->dcd_r() << 5;
+	result |= m_v24->dsr_r() << 6;
+	result |= m_v24->cts_r() << 7;
+	return result;
+}
+
+WRITE8_MEMBER(sapi1_state::modem_control_w)
+{
+	m_v24->write_rts(BIT(data, 0));
+	m_v24->write_dtr(BIT(data, 1));
+	// WD2 = BRK
+	// WD3 = S1
+	// WD4 = KAZ
+	// WD5 = START
+	// WD6 = IET
+	// WD7 = IER
+}
+
+READ8_MEMBER(sapi1_state::uart_ready_r)
+{
+	return (m_uart->dav_r() << 7) | (m_uart->tbmt_r() << 6) | 0x3f;
+}
+
+WRITE8_MEMBER(sapi1_state::uart_mode_w)
+{
+	m_uart->write_np(BIT(data, 0));
+	m_uart->write_tsb(BIT(data, 1));
+	m_uart->write_nb1(BIT(data, 3));
+	m_uart->write_nb2(BIT(data, 2));
+	m_uart->write_eps(BIT(data, 4));
+	m_uart->write_cs(1);
+	m_uart->write_cs(0);
+}
+
+READ8_MEMBER(sapi1_state::uart_data_r)
+{
+	m_uart->write_rdav(0);
+	uint8_t result = m_uart->get_received_data();
+	m_uart->write_rdav(1);
+	return result;
+}
+
+WRITE8_MEMBER(sapi1_state::uart_data_w)
+{
+	m_uart->set_transmit_data(data);
+}
+
+WRITE8_MEMBER(sapi1_state::uart_reset_w)
+{
+	m_uart->write_xr(0);
+	m_uart->write_xr(1);
+}
+
 /**************************************
 
     Machine
@@ -522,6 +611,7 @@ DRIVER_INIT_MEMBER( sapi1_state, sapizps3a )
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0xf800);
+	m_uart->write_swe(0);
 }
 
 DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
@@ -532,9 +622,9 @@ DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( sapi1 )
+MACHINE_CONFIG_START(sapi1_state::sapi1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 2000000)
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
 	MCFG_CPU_PROGRAM_MAP(sapi1_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapi1)
 
@@ -554,7 +644,8 @@ static MACHINE_CONFIG_START( sapi1 )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sapi2, sapi1 )
+MACHINE_CONFIG_START(sapi1_state::sapi2)
+	sapi1(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi2_mem)
@@ -562,7 +653,8 @@ static MACHINE_CONFIG_DERIVED( sapi2, sapi1 )
 	MCFG_GENERIC_KEYBOARD_CB(PUT(sapi1_state, kbd_put))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sapi3, sapi2 )
+MACHINE_CONFIG_START(sapi1_state::sapi3)
+	sapi2(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi3_mem)
@@ -574,7 +666,8 @@ static MACHINE_CONFIG_DERIVED( sapi3, sapi2 )
 	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi3)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sapi3b, sapi3 )
+MACHINE_CONFIG_START(sapi1_state::sapi3b)
+	sapi3(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi3b_mem)
@@ -590,16 +683,31 @@ static MACHINE_CONFIG_DERIVED( sapi3b, sapi3 )
 	MCFG_SCREEN_NO_PALETTE
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sapi3a )
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 ) // high bit stripped off in software
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
+MACHINE_CONFIG_START(sapi1_state::sapi3a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2000000)
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
 	MCFG_CPU_PROGRAM_MAP(sapi3a_mem)
 	MCFG_CPU_IO_MAP(sapi3a_io)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(sapi1_state, kbd_put))
+	MCFG_DEVICE_ADD("uart", AY51013, 0) // Tesla MHB1012
+	MCFG_AY51013_TX_CLOCK(XTAL(12'288'000) / 80) // not actual rate?
+	MCFG_AY51013_RX_CLOCK(XTAL(12'288'000) / 80) // not actual rate?
+	MCFG_AY51013_READ_SI_CB(DEVREADLINE("v24", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("v24", rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD("v24", default_rs232_devices, "terminal")
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -621,6 +729,9 @@ ROM_START( sapi1 )
 	ROMX_LOAD( "sapi1.rom", 0x0000, 0x1000, CRC(c6e85b01) SHA1(2a26668249c6161aef7215a1e2b92bfdf6fe3671), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "mb2", "MB2 (ANK-1)" )
 	ROMX_LOAD( "mb2_4.bin", 0x0000, 0x1000, CRC(a040b3e0) SHA1(586990a07a96323741679a11ff54ad0023da87bc), ROM_BIOS(2))
+
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD( "sapi1.chr",  0x0000, 0x1000, CRC(9edafa2c) SHA1(a903db0e8923cca91646274d010dc19b6b377e3e) )
 ROM_END
 
 ROM_START( sapizps2 )

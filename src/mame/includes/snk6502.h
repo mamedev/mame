@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "machine/timer.h"
 
 class snk6502_sound_device;
 
@@ -86,6 +87,17 @@ public:
 
 	void sasuke_start_counter();
 	void postload();
+	void pballoon(machine_config &config);
+	void nibbler(machine_config &config);
+	void satansat(machine_config &config);
+	void fantasy(machine_config &config);
+	void vanguard(machine_config &config);
+	void sasuke(machine_config &config);
+	void fantasy_map(address_map &map);
+	void pballoon_map(address_map &map);
+	void sasuke_map(address_map &map);
+	void satansat_map(address_map &map);
+	void vanguard_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_SNK6502_H

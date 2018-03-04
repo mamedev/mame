@@ -349,7 +349,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::scanline)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
+ADDRESS_MAP_START(shadfrce_state::shadfrce_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(bg0videoram_w) AM_SHARE("bg0videoram") /* video */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
@@ -357,7 +357,7 @@ static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
 	AM_RANGE(0x102800, 0x103fff) AM_RAM
 	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x142000, 0x143fff) AM_RAM AM_SHARE("spvideoram") /* sprites */
-	AM_RANGE(0x180000, 0x187fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x180000, 0x187fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(bg0scrollx_w) /* SCROLL X */
 	AM_RANGE(0x1c0002, 0x1c0003) AM_WRITE(bg0scrolly_w) /* SCROLL Y */
 	AM_RANGE(0x1c0004, 0x1c0005) AM_WRITE(bg1scrollx_w) /* SCROLL X */
@@ -385,7 +385,7 @@ WRITE8_MEMBER(shadfrce_state::oki_bankswitch_w)
 	m_oki->set_rom_bank(data & 1);
 }
 
-static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8, shadfrce_state )
+ADDRESS_MAP_START(shadfrce_state::shadfrce_sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -532,19 +532,19 @@ GFXDECODE_END
 
 /* Machine Driver Bits */
 
-static MACHINE_CONFIG_START( shadfrce )
+MACHINE_CONFIG_START(shadfrce_state::shadfrce)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)          /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000) / 2)          /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(shadfrce_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shadfrce_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)         /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))         /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(shadfrce_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(shadfrce_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
@@ -559,12 +559,12 @@ static MACHINE_CONFIG_START( shadfrce )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)      /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))      /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_13_4952MHz/8, PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL(13'495'200)/8, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

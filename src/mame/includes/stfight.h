@@ -58,6 +58,14 @@ public:
 	DECLARE_WRITE8_MEMBER(stfight_68705_port_b_w);
 	DECLARE_WRITE8_MEMBER(stfight_68705_port_c_w);
 
+	void stfight_base(machine_config &config);
+	void stfight(machine_config &config);
+	void cshooter(machine_config &config);
+	void cpu1_map(address_map &map);
+	void cpu2_map(address_map &map);
+	void cshooter_cpu1_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void stfight_cpu1_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -297,7 +297,7 @@ WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
 			// It switches between on/off at each 2048 C-Sync pulses.
 			if ((m_csync_counter & 0x7ff) == 0)
 			{
-				output().set_led_value(0, !output().get_led_value(0));
+				m_led_pwr = !m_led_pwr;
 			}
 		}
 		else // Rapid Fire disabled
@@ -331,7 +331,7 @@ READ8_MEMBER(sms_state::sms_input_port_dc_r)
 	else
 	{
 		// Return if the I/O chip is disabled (1). This check isn't performed
-		// for the Game Gear because has no effect on it (even in SMS mode?).
+		// for the Game Gear because has no effect on it, even in SMS mode.
 		if (m_mem_ctrl_reg & IO_CHIP)
 			return 0xff;
 	}
@@ -376,7 +376,7 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	else
 	{
 		// Return if the I/O chip is disabled (1). This check isn't performed
-		// for the Game Gear because has no effect on it (even in SMS mode?).
+		// for the Game Gear because has no effect on it, even in SMS mode.
 		if (m_mem_ctrl_reg & IO_CHIP)
 			return 0xff;
 	}
@@ -1025,6 +1025,8 @@ void sms_state::setup_bios()
 
 MACHINE_START_MEMBER(sms_state,sms)
 {
+	m_led_pwr.resolve();
+
 	char str[7];
 
 	m_cartslot = machine().device<sega8_cart_slot_device>("slot");
@@ -1219,7 +1221,7 @@ WRITE8_MEMBER(smssdisp_state::sms_store_control_w)
 	int led_line = led_number % 4;
 	int game_number = (4 * led_column) + (3 - led_line);
 
-	logerror("0x%04X: sms_store_control write 0x%02X\n", space.device().safe_pc(), data);
+	logerror("0x%04X: sms_store_control write 0x%02X\n", m_control_cpu->pc(), data);
 	logerror("sms_store_control: LED #%d activated for game #%d\n", led_number, game_number);
 
 	if (data & 0x02)

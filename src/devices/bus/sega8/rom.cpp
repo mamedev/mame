@@ -250,6 +250,7 @@ void sega8_4pak_device::device_start()
 void sega8_4pak_device::device_reset()
 {
 	memset(m_reg, 0, sizeof(m_reg));
+	memset(m_rom_bank_base, 0, sizeof(m_rom_bank_base));
 }
 
 
@@ -713,7 +714,7 @@ WRITE8_MEMBER(sega8_eeprom_device::write_mapper)
 	}
 }
 
-MACHINE_CONFIG_MEMBER( sega8_eeprom_device::device_add_mconfig )
+MACHINE_CONFIG_START(sega8_eeprom_device::device_add_mconfig)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
@@ -870,7 +871,7 @@ READ8_MEMBER(sega8_janggun_device::read_cart)
 	if (m_rom_bank_base[bank] < 0x80)
 		return m_rom[(m_rom_bank_base[bank] & 0x3f) * 0x2000 + (offset & 0x1fff)];
 	else
-		return BITSWAP8(m_rom[(m_rom_bank_base[bank] & 0x3f) * 0x2000 + (offset & 0x1fff)], 0, 1, 2, 3, 4, 5, 6, 7);
+		return bitswap<8>(m_rom[(m_rom_bank_base[bank] & 0x3f) * 0x2000 + (offset & 0x1fff)], 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 

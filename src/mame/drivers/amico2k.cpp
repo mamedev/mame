@@ -57,10 +57,12 @@ public:
 	emu_timer *m_led_refresh_timer;
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	required_device<cpu_device> m_maincpu;
+	void amico2k(machine_config &config);
+	void amico2k_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START( amico2k_mem, AS_PROGRAM, 8, amico2k_state )
+ADDRESS_MAP_START(amico2k_state::amico2k_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 //  AM_RANGE(0x0400, 0x07ff) AM_RAM // optional expansion RAM
@@ -206,7 +208,7 @@ void amico2k_state::machine_start()
 	save_item(NAME(m_segment));
 }
 
-static MACHINE_CONFIG_START( amico2k )
+MACHINE_CONFIG_START(amico2k_state::amico2k)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000) /* 1MHz */
 	MCFG_CPU_PROGRAM_MAP(amico2k_mem)

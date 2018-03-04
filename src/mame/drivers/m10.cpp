@@ -131,18 +131,18 @@ Notes (couriersud)
 
 #define LOG(x) do { if (M10_DEBUG) printf x; } while (0)
 
-WRITE8_MEMBER(m10_state::ic8j1_output_changed)
+WRITE_LINE_MEMBER(m10_state::ic8j1_output_changed)
 {
-	LOG(("ic8j1: %d %d\n", data, m_screen->vpos()));
-	m_maincpu->set_input_line(0, !data ? CLEAR_LINE : ASSERT_LINE);
+	LOG(("ic8j1: %d %d\n", state, m_screen->vpos()));
+	m_maincpu->set_input_line(0, !state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(m10_state::ic8j2_output_changed)
+WRITE_LINE_MEMBER(m10_state::ic8j2_output_changed)
 {
 	/* written from /Q to A with slight delight */
-	LOG(("ic8j2: %d\n", data));
-	m_ic8j2->a_w(space, 0, data);
-	m_ic8j1->a_w(space, 0, data);
+	LOG(("ic8j2: %d\n", state));
+	m_ic8j2->a_w(state);
+	m_ic8j1->a_w(state);
 }
 
 /*************************************
@@ -444,8 +444,8 @@ READ8_MEMBER(m10_state::m10_a700_r)
 {
 	//LOG(("rd:%d\n",m_screen->vpos()));
 	LOG(("clear\n"));
-	m_ic8j1->clear_w(space, 0, 0);
-	m_ic8j1->clear_w(space, 0, 1);
+	m_ic8j1->clear_w(0);
+	m_ic8j1->clear_w(1);
 	return 0x00;
 }
 
@@ -454,8 +454,8 @@ READ8_MEMBER(m10_state::m11_a700_r)
 	//LOG(("rd:%d\n",m_screen->vpos()));
 	//m_maincpu->set_input_line(0, CLEAR_LINE);
 	LOG(("clear\n"));
-	m_ic8j1->clear_w(space, 0, 0);
-	m_ic8j1->clear_w(space, 0, 1);
+	m_ic8j1->clear_w(0);
+	m_ic8j1->clear_w(1);
 	return 0x00;
 }
 
@@ -525,7 +525,7 @@ INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
  *
  *************************************/
 
-static ADDRESS_MAP_START( m10_main, AS_PROGRAM, 8, m10_state )
+ADDRESS_MAP_START(m10_state::m10_main)
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_SHARE("rom")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
@@ -539,7 +539,7 @@ static ADDRESS_MAP_START( m10_main, AS_PROGRAM, 8, m10_state )
 	AM_RANGE(0xfc00, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m11_main, AS_PROGRAM, 8, m10_state )
+ADDRESS_MAP_START(m10_state::m11_main)
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_SHARE("rom")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
@@ -553,7 +553,7 @@ static ADDRESS_MAP_START( m11_main, AS_PROGRAM, 8, m10_state )
 	AM_RANGE(0xfc00, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m15_main, AS_PROGRAM, 8, m10_state )
+ADDRESS_MAP_START(m10_state::m15_main)
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
 	AM_RANGE(0x1000, 0x33ff) AM_ROM AM_SHARE("rom")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
@@ -809,7 +809,7 @@ static const char *const m10_sample_names[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( m10 )
+MACHINE_CONFIG_START(m10_state::m10)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,IREMM10_CPU_CLOCK)
@@ -841,7 +841,7 @@ static MACHINE_CONFIG_START( m10 )
 	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(m10_state, ic8j1_output_changed))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(m10_state, ic8j1_output_changed))
 	MCFG_DEVICE_ADD("ic8j2", TTL74123, 0)
 	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_DIODE)    /* the hook up type */
 	/* 10k + 20k variable resistor */
@@ -850,7 +850,7 @@ static MACHINE_CONFIG_START( m10 )
 	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(m10_state, ic8j2_output_changed))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(m10_state, ic8j2_output_changed))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -862,7 +862,8 @@ static MACHINE_CONFIG_START( m10 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( m11, m10 )
+MACHINE_CONFIG_START(m10_state::m11)
+	m10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -872,7 +873,7 @@ static MACHINE_CONFIG_DERIVED( m11, m10 )
 	/* sound hardware */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( m15 )
+MACHINE_CONFIG_START(m10_state::m15)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,IREMM15_CPU_CLOCK)
@@ -906,7 +907,8 @@ static MACHINE_CONFIG_START( m15 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( headoni, m15 )
+MACHINE_CONFIG_START(m10_state::headoni)
+	m15(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(11730000/16)
 MACHINE_CONFIG_END

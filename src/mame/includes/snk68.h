@@ -71,4 +71,11 @@ public:
 	void tile_callback_pow(int &tile, int& fx, int& fy, int& region);
 	void tile_callback_notpow(int &tile, int& fx, int& fy, int& region);
 
+	void streetsm(machine_config &config);
+	void searchar(machine_config &config);
+	void pow(machine_config &config);
+	void pow_map(address_map &map);
+	void searchar_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 };

@@ -106,8 +106,8 @@ void mexico86_state::mcu_simulate(  )
 
 		m_protection_ram[0x04] = 0x3c | (coin_in_read ^ 3);   // coin inputs
 
-		m_protection_ram[0x02] = BITSWAP8(ioport("IN1")->read(), 7,6,5,4,2,3,1,0); // player 1
-		m_protection_ram[0x03] = BITSWAP8(ioport("IN2")->read(), 7,6,5,4,2,3,1,0); // player 2
+		m_protection_ram[0x02] = bitswap<8>(ioport("IN1")->read(), 7,6,5,4,2,3,1,0); // player 1
+		m_protection_ram[0x03] = bitswap<8>(ioport("IN2")->read(), 7,6,5,4,2,3,1,0); // player 2
 
 		if (m_protection_ram[0x19] == 0xaa)  // player 2 active
 			m_protection_ram[0x1b] = m_protection_ram[0x03];
@@ -252,7 +252,7 @@ INTERRUPT_GEN_MEMBER(mexico86_state::mexico86_m68705_interrupt)
 
 WRITE8_MEMBER(mexico86_state::mexico86_68705_port_a_w)
 {
-	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
+	//logerror("%s: 68705 port A write %02x\n", machine().describe_context(), data);
 	m_port_a_out = data;
 }
 
@@ -276,7 +276,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_a_w)
 
 WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 {
-	//logerror("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data);
+	//logerror("%s: 68705 port B write %02x\n", machine().describe_context(), data);
 
 	u8 const port_a_value(m_port_a_out & (BIT(m_port_b_out, 0) ? 0xff : m_latch));
 
@@ -286,18 +286,18 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 		{
 			if (BIT(m_port_b_out, 2))
 			{
-				//logerror("%04x: 68705 read %02x from address %04x\n", space.device().safe_pc(), m_protection_ram[m_address], m_address);
+				//logerror("%s: 68705 read %02x from address %04x\n", machine().describe_context(), m_protection_ram[m_address], m_address);
 				m_latch = m_protection_ram[m_address];
 			}
 			else
 			{
-				//logerror("%04x: 68705 read input port %04x\n", space.device().safe_pc(), m_address);
+				//logerror("%s: 68705 read input port %04x\n", machine().describe_context(), m_address);
 				m_latch = ioport(BIT(m_address, 0) ? "IN2" : "IN1")->read();
 			}
 		}
 		else // write
 		{
-				//logerror("%04x: 68705 write %02x to address %04x\n",space.device().safe_pc(), port_a_value, m_address);
+				//logerror("%s: 68705 write %02x to address %04x\n",machine().describe_context(), port_a_value, m_address);
 				m_protection_ram[m_address] = port_a_value;
 		}
 	}
@@ -307,7 +307,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 	if (BIT(mem_mask, 1) && !BIT(data, 1) && BIT(m_port_b_out, 1))
 	{
 		m_address = port_a_value;
-		//if (m_address >= 0x80) logerror("%04x: 68705 address %02x\n", space.device().safe_pc(), port_a_value);
+		//if (m_address >= 0x80) logerror("%s: 68705 address %02x\n", machine().describe_context(), port_a_value);
 	}
 
 	if (BIT(mem_mask, 5) && BIT(data, 5) && !BIT(m_port_b_out, 5))
@@ -318,10 +318,10 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 	}
 
 	if (BIT(mem_mask, 6) && !BIT(data, 6) && BIT(m_port_b_out, 6))
-		logerror("%04x: 68705 unknown port B bit %02x\n", space.device().safe_pc(), data);
+		logerror("%s: 68705 unknown port B bit %02x\n", machine().describe_context(), data);
 
 	if (BIT(mem_mask, 7) && !BIT(data, 7) && BIT(m_port_b_out, 7))
-		logerror("%04x: 68705 unknown port B bit %02x\n", space.device().safe_pc(), data);
+		logerror("%s: 68705 unknown port B bit %02x\n", machine().describe_context(), data);
 
 	m_port_b_out = data;
 }

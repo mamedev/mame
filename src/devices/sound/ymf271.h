@@ -7,23 +7,17 @@
 
 
 #define MCFG_YMF271_IRQ_HANDLER(_devcb) \
-	devcb = &ymf271_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<ymf271_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
-#define MCFG_YMF271_EXT_READ_HANDLER(_devcb) \
-	devcb = &ymf271_device::set_ext_read_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_YMF271_EXT_WRITE_HANDLER(_devcb) \
-	devcb = &ymf271_device::set_ext_write_handler(*device, DEVCB_##_devcb);
-
-class ymf271_device : public device_t, public device_sound_interface
+class ymf271_device : public device_t, public device_sound_interface, public device_rom_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ymf271_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ext_read_handler(device_t &device, Object &&cb) { return downcast<ymf271_device &>(device).m_ext_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ext_write_handler(device_t &device, Object &&cb) { return downcast<ymf271_device &>(device).m_ext_write_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -37,6 +31,9 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	// device_rom_interface overrides
+	virtual void rom_bank_updated() override;
 
 private:
 	struct YMF271Slot
@@ -113,12 +110,12 @@ private:
 	void ymf271_write_fm(int bank, uint8_t address, uint8_t data);
 	void ymf271_write_pcm(uint8_t address, uint8_t data);
 	void ymf271_write_timer(uint8_t address, uint8_t data);
-	uint8_t ymf271_read_memory(uint32_t offset);
 
 	inline int get_keyscaled_rate(int rate, int keycode, int keyscale);
 	inline int get_internal_keycode(int block, int fns);
 	inline int get_external_keycode(int block, int fns);
 	inline bool check_envelope_end(YMF271Slot *slot);
+	inline void calculate_status_end(int slotnum, bool state);
 
 	// lookup tables
 	std::unique_ptr<int16_t[]> m_lut_waves[8];
@@ -141,23 +138,21 @@ private:
 	uint32_t m_timerB;
 	uint8_t m_irqstate;
 	uint8_t m_status;
+	uint16_t m_end_status;
 	uint8_t m_enable;
 
 	uint32_t m_ext_address;
 	uint8_t m_ext_rw;
 	uint8_t m_ext_readlatch;
 
-	optional_region_ptr<uint8_t> m_mem_base;
-	uint32_t m_mem_size;
+	uint32_t m_master_clock;
 
 	emu_timer *m_timA;
 	emu_timer *m_timB;
 	sound_stream *m_stream;
-	std::unique_ptr<int32_t[]> m_mix_buffer;
+	std::vector<int32_t> m_mix_buffer;
 
 	devcb_write_line m_irq_handler;
-	devcb_read8 m_ext_read_handler;
-	devcb_write8 m_ext_write_handler;
 };
 
 DECLARE_DEVICE_TYPE(YMF271, ymf271_device)

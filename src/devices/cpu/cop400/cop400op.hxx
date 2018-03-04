@@ -35,7 +35,7 @@ INSTRUCTION( asc )
 	if (A > 0xF)
 	{
 		C = 1;
-		m_skip = true;
+		skip();
 		A &= 0xF;
 	}
 	else
@@ -80,13 +80,13 @@ INSTRUCTION( add )
 
 INSTRUCTION( aisc )
 {
-	uint8_t y = opcode & 0x0f;
+	uint8_t y = m_opcode & 0x0f;
 
 	A = A + y;
 
 	if (A > 0x0f)
 	{
-		m_skip = true;
+		skip();
 		A &= 0xF;
 	}
 }
@@ -238,7 +238,7 @@ INSTRUCTION( casc )
 	if (A > 0xF)
 	{
 		C = 1;
-		m_skip = true;
+		skip();
 		A &= 0xF;
 	}
 	else
@@ -266,8 +266,6 @@ INSTRUCTION( casc )
 
 INSTRUCTION( jid )
 {
-	PC = (PC & 0x700) | (A << 4) | RAM_R(B);
-	uint8_t operand = fetch();
 	PC = (PC & 0x700) | operand;
 }
 
@@ -287,8 +285,7 @@ INSTRUCTION( jid )
 
 INSTRUCTION( jmp )
 {
-	uint8_t operand = fetch();
-	PC = ((opcode & 0x07) << 8) | operand;
+	PC = ((m_opcode & 0x07) << 8) | operand;
 }
 
 /*
@@ -317,18 +314,18 @@ INSTRUCTION( jp )
 
 	if (page == 2 || page == 3)
 	{
-		uint8_t a = opcode & 0x7f;
+		uint8_t a = m_opcode & 0x7f;
 		PC = (PC & 0x780) | a;
 	}
-	else if ((opcode & 0xc0) == 0xc0)
+	else if ((m_opcode & 0xc0) == 0xc0)
 	{
-		uint8_t a = opcode & 0x3f;
+		uint8_t a = m_opcode & 0x3f;
 		PC = (PC & 0x7c0) | a;
 	}
 	else
 	{
 		// JSRP
-		uint8_t a = opcode & 0x3f;
+		uint8_t a = m_opcode & 0x3f;
 		PUSH(PC);
 		PC = 0x80 | a;
 	}
@@ -351,9 +348,8 @@ INSTRUCTION( jp )
 
 INSTRUCTION( jsr )
 {
-	uint8_t operand = fetch();
 	PUSH(PC);
-	PC = ((opcode & 0x07) << 8) | operand;
+	PC = ((m_opcode & 0x07) << 8) | operand;
 }
 
 /*
@@ -413,7 +409,7 @@ INSTRUCTION( cop420_ret )
 INSTRUCTION( retsk )
 {
 	POP();
-	m_skip = true;
+	skip();
 }
 
 /*
@@ -529,7 +525,7 @@ INSTRUCTION( camq )
 
 INSTRUCTION( ld )
 {
-	uint8_t r = opcode & 0x30;
+	uint8_t r = m_opcode & 0x30;
 
 	A = RAM_R(B);
 	B = B ^ r;
@@ -551,9 +547,6 @@ INSTRUCTION( ld )
 
 INSTRUCTION( lqid )
 {
-	PUSH(PC);
-	PC = (PC & 0x700) | (A << 4) | RAM_R(B);
-	uint8_t operand = fetch();
 	WRITE_Q(operand);
 	POP();
 }
@@ -641,7 +634,7 @@ INSTRUCTION( smb3 ) { RAM_W(B, RAM_R(B) | 0x8); }
 
 INSTRUCTION( stii )
 {
-	uint8_t y = opcode & 0x0f;
+	uint8_t y = m_opcode & 0x0f;
 	uint16_t Bd;
 
 	RAM_W(B, y);
@@ -667,7 +660,7 @@ INSTRUCTION( stii )
 
 INSTRUCTION( x )
 {
-	uint8_t r = opcode & 0x30;
+	uint8_t r = m_opcode & 0x30;
 	uint8_t t = RAM_R(B);
 
 	RAM_W(B, A);
@@ -692,7 +685,7 @@ INSTRUCTION( x )
 
 INSTRUCTION( xad )
 {
-	uint8_t rd = opcode & 0x7f;
+	uint8_t rd = operand & 0x7f;
 	uint8_t t = A;
 
 	A = RAM_R(rd);
@@ -721,7 +714,7 @@ INSTRUCTION( xad )
 INSTRUCTION( xds )
 {
 	uint8_t t, Bd;
-	uint8_t r = opcode & 0x30;
+	uint8_t r = m_opcode & 0x30;
 
 	t = RAM_R(B);
 	RAM_W(B, A);
@@ -732,7 +725,8 @@ INSTRUCTION( xds )
 
 	B = B ^ r;
 
-	if (Bd == 0x0f) m_skip = true;
+	if (Bd == 0x0f)
+		skip();
 }
 
 /*
@@ -756,7 +750,7 @@ INSTRUCTION( xds )
 INSTRUCTION( xis )
 {
 	uint8_t t, Bd;
-	uint8_t r = opcode & 0x30;
+	uint8_t r = m_opcode & 0x30;
 
 	t = RAM_R(B);
 	RAM_W(B, A);
@@ -767,7 +761,8 @@ INSTRUCTION( xis )
 
 	B = B ^ r;
 
-	if (Bd == 0x00) m_skip = true;
+	if (Bd == 0x00)
+		skip();
 }
 
 /*
@@ -806,7 +801,7 @@ INSTRUCTION( cqma )
 
 INSTRUCTION( ldd )
 {
-	uint8_t rd = opcode & 0x7f;
+	uint8_t rd = operand & 0x7f;
 
 	A = RAM_R(rd);
 }
@@ -914,13 +909,13 @@ INSTRUCTION( lbi )
 	if (m_skip_lbi > 1) return;
 	m_skip_lbi++;
 
-	if (opcode & 0x80)
+	if (operand & 0x80)
 	{
-		B = opcode & 0x7f;
+		B = operand & 0x7f;
 	}
 	else
 	{
-		B = (opcode & 0x30) | (((opcode & 0x0f) + 1) & 0x0f);
+		B = (operand & 0x30) | (((operand & 0x0f) + 1) & 0x0f);
 	}
 }
 
@@ -940,19 +935,9 @@ INSTRUCTION( lbi )
 
 INSTRUCTION( lei )
 {
-	uint8_t y = opcode & 0x0f;
+	uint8_t y = operand & 0x0f;
 
-	EN = y;
-
-	if (BIT(EN, 2))
-	{
-		OUT_L(Q);
-	}
-	else
-	{
-		// tri-state(floating) pins
-		OUT_L(m_read_l_tristate(0, 0xff));
-	}
+	WRITE_EN(y);
 }
 
 /*
@@ -1020,7 +1005,8 @@ INSTRUCTION( cop444l_xabr )
 
 INSTRUCTION( skc )
 {
-	if (C == 1) m_skip = true;
+	if (C == 1)
+		skip();
 }
 
 /*
@@ -1038,7 +1024,8 @@ INSTRUCTION( skc )
 
 INSTRUCTION( ske )
 {
-	if (A == RAM_R(B)) m_skip = true;
+	if (A == RAM_R(B))
+		skip();
 }
 
 /*
@@ -1056,7 +1043,8 @@ INSTRUCTION( ske )
 
 INSTRUCTION( skgz )
 {
-	if (IN_G() == 0) m_skip = true;
+	if (IN_G() == 0)
+		skip();
 }
 
 /*
@@ -1081,7 +1069,8 @@ INSTRUCTION( skgz )
 
 void cop400_cpu_device::skgbz(int bit)
 {
-	if (!BIT(IN_G(), bit)) m_skip = true;
+	if (!BIT(IN_G(), bit))
+		skip();
 }
 
 INSTRUCTION( skgbz0 ) { skgbz(0); }
@@ -1111,7 +1100,8 @@ INSTRUCTION( skgbz3 ) { skgbz(3); }
 
 void cop400_cpu_device::skmbz(int bit)
 {
-	if (!BIT(RAM_R(B), bit)) m_skip = true;
+	if (!BIT(RAM_R(B), bit))
+		skip();
 }
 
 INSTRUCTION( skmbz0 ) { skmbz(0); }
@@ -1137,7 +1127,7 @@ INSTRUCTION( skt )
 	if (m_skt_latch)
 	{
 		m_skt_latch = 0;
-		m_skip = true;
+		skip();
 	}
 }
 
@@ -1241,7 +1231,11 @@ INSTRUCTION( xas )
 	SIO = A;
 	A = t;
 
-	SKL = C;
+	if (SKL != C)
+	{
+		SKL = C;
+		sk_update();
+	}
 }
 
 /*
@@ -1318,7 +1312,7 @@ INSTRUCTION( inil )
 
 INSTRUCTION( ogi )
 {
-	uint8_t y = opcode & 0x0f;
+	uint8_t y = operand & 0x0f;
 
 	WRITE_G(y);
 }

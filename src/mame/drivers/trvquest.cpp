@@ -61,7 +61,7 @@ WRITE_LINE_MEMBER(gameplan_state::trvquest_misc_w)
 	// data & 1 -> led on/off ?
 }
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, gameplan_state )
+ADDRESS_MAP_START(gameplan_state::cpu_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") // cmos ram
 	AM_RANGE(0x2000, 0x27ff) AM_RAM // main ram
 	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)
@@ -177,9 +177,9 @@ INTERRUPT_GEN_MEMBER(gameplan_state::trvquest_interrupt)
 	m_via_2->write_ca1(0);
 }
 
-static MACHINE_CONFIG_START( trvquest )
+MACHINE_CONFIG_START(gameplan_state::trvquest)
 
-	MCFG_CPU_ADD("maincpu", M6809,XTAL_6MHz/4)
+	MCFG_CPU_ADD("maincpu", M6809,XTAL(6'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gameplan_state, trvquest_interrupt)
 
@@ -188,29 +188,29 @@ static MACHINE_CONFIG_START( trvquest )
 	MCFG_MACHINE_RESET_OVERRIDE(gameplan_state,trvquest)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(trvquest_video)
+	trvquest_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/2)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(6'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_6MHz/2)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(6'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL(6'000'000)/4)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(gameplan_state, video_data_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gameplan_state, gameplan_video_command_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, video_command_trigger_w))
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL(6'000'000)/4)
 	MCFG_VIA6522_READPA_HANDLER(IOPORT("IN0"))
 	MCFG_VIA6522_READPB_HANDLER(IOPORT("IN1"))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, trvquest_coin_w))
 
-	MCFG_DEVICE_ADD("via6522_2", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_2", VIA6522, XTAL(6'000'000)/4)
 	MCFG_VIA6522_READPA_HANDLER(IOPORT("UNK"))
 	MCFG_VIA6522_READPB_HANDLER(IOPORT("DSW"))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, trvquest_misc_w))

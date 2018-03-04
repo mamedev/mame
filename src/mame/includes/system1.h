@@ -5,6 +5,7 @@
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/segacrp2_device.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class system1_state : public driver_device
@@ -15,8 +16,6 @@ public:
 		m_ppi8255(*this, "ppi8255"),
 		m_ram(*this, "ram"),
 		m_spriteram(*this, "spriteram"),
-		m_nob_mcu_latch(*this, "nob_mcu_latch"),
-		m_nob_mcu_status(*this, "nob_mcu_status"),
 		m_paletteram(*this, "palette"),
 		m_videomode_custom(nullptr),
 		m_maincpu(*this, "maincpu"),
@@ -38,8 +37,6 @@ public:
 	optional_device<i8255_device>  m_ppi8255;
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	optional_shared_ptr<uint8_t> m_nob_mcu_latch;
-	optional_shared_ptr<uint8_t> m_nob_mcu_status;
 	required_shared_ptr<uint8_t> m_paletteram;
 
 	std::unique_ptr<uint8_t[]> m_videoram;
@@ -49,6 +46,8 @@ public:
 	uint8_t m_videomode_prev;
 	uint8_t m_mcu_control;
 	uint8_t m_nob_maincpu_latch;
+	uint8_t m_nob_mcu_latch;
+	uint8_t m_nob_mcu_status;
 	int m_nobb_inport23_step;
 	std::unique_ptr<uint8_t[]> m_mix_collide;
 	uint8_t m_mix_collide_summary;
@@ -64,8 +63,11 @@ public:
 	DECLARE_READ8_MEMBER(sound_data_r);
 	DECLARE_WRITE8_MEMBER(soundport_w);
 	DECLARE_WRITE8_MEMBER(mcu_control_w);
-	DECLARE_WRITE8_MEMBER(mcu_io_w);
 	DECLARE_READ8_MEMBER(mcu_io_r);
+	DECLARE_WRITE8_MEMBER(mcu_io_w);
+	DECLARE_READ8_MEMBER(nob_mcu_latch_r);
+	DECLARE_WRITE8_MEMBER(nob_mcu_latch_w);
+	DECLARE_WRITE8_MEMBER(nob_mcu_status_w);
 	DECLARE_WRITE8_MEMBER(nob_mcu_control_p2_w);
 	DECLARE_READ8_MEMBER(nob_maincpu_latch_r);
 	DECLARE_WRITE8_MEMBER(nob_maincpu_latch_w);
@@ -143,4 +145,57 @@ public:
 	optional_memory_bank m_bank1d;
 
 	std::unique_ptr<uint8_t[]> m_banked_decrypted_opcodes;
+	void sys1ppix_315_5051(machine_config &config);
+	void sys1ppisx_315_5064(machine_config &config);
+	void sys2_317_0007(machine_config &config);
+	void sys1piox_315_5110(machine_config &config);
+	void sys1piox_315_5065(machine_config &config);
+	void sys2m(machine_config &config);
+	void sys1ppix_315_5178(machine_config &config);
+	void sys1ppix_315_5179(machine_config &config);
+	void sys1piox_315_5093(machine_config &config);
+	void sys2_315_5176(machine_config &config);
+	void sys2(machine_config &config);
+	void sys2_315_5177(machine_config &config);
+	void nob(machine_config &config);
+	void sys1ppisx_315_5041(machine_config &config);
+	void sys1piox_315_5132(machine_config &config);
+	void sys1piox_315_5162(machine_config &config);
+	void sys1piox_315_5133(machine_config &config);
+	void sys1pioxb(machine_config &config);
+	void sys1ppi(machine_config &config);
+	void sys1piox_315_5135(machine_config &config);
+	void sys2rowxboot(machine_config &config);
+	void sys1piox_315_5102(machine_config &config);
+	void sys1piosx_315_spat(machine_config &config);
+	void sys2x(machine_config &config);
+	void sys1piox_315_5051(machine_config &config);
+	void sys1piox_315_5098(machine_config &config);
+	void sys1piosx_315_5099(machine_config &config);
+	void sys2xboot(machine_config &config);
+	void sys2xb(machine_config &config);
+	void nobm(machine_config &config);
+	void mcu(machine_config &config);
+	void sys2_317_0006(machine_config &config);
+	void sys1piox_317_0006(machine_config &config);
+	void sys1ppix_315_5033(machine_config &config);
+	void sys1pio(machine_config &config);
+	void sys1pios(machine_config &config);
+	void sys2rowm(machine_config &config);
+	void sys1ppix_315_5098(machine_config &config);
+	void sys1ppix_315_5048(machine_config &config);
+	void sys2row(machine_config &config);
+	void sys1ppis(machine_config &config);
+	void sys1ppix_315_5065(machine_config &config);
+	void sys1piox_315_5177(machine_config &config);
+	void sys1piox_315_5155(machine_config &config);
+	void sys2rowxb(machine_config &config);
+	void banked_decrypted_opcodes_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void mcu_io_map(address_map &map);
+	void nobo_map(address_map &map);
+	void sound_map(address_map &map);
+	void system1_map(address_map &map);
+	void system1_pio_io_map(address_map &map);
+	void system1_ppi_io_map(address_map &map);
 };

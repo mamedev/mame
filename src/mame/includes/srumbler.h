@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Leaman
+
+#include "machine/timer.h"
 #include "video/bufsprite.h"
 
 class srumbler_state : public driver_device
@@ -42,4 +44,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void srumbler(machine_config &config);
+	void srumbler_map(address_map &map);
+	void srumbler_sound_map(address_map &map);
 };

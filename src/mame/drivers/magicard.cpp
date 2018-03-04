@@ -403,9 +403,9 @@
 #include "speaker.h"
 
 
-#define CLOCK_A XTAL_30MHz
-#define CLOCK_B XTAL_8MHz
-#define CLOCK_C XTAL_19_6608MHz
+#define CLOCK_A XTAL(30'000'000)
+#define CLOCK_B XTAL(8'000'000)
+#define CLOCK_C XTAL(19'660'800)
 
 
 class magicard_state : public driver_device
@@ -466,6 +466,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void magicard(machine_config &config);
+	void hotslots(machine_config &config);
+	void hotslots_mem(address_map &map);
+	void magicard_mem(address_map &map);
+	void ramdac_map(address_map &map);
+	void scc68070_mem(address_map &map);
 };
 
 
@@ -895,7 +901,7 @@ WRITE16_MEMBER(magicard_state::scc68070_mmu_w)
 *      Memory Maps       *
 *************************/
 
-static ADDRESS_MAP_START( scc68070_mem, AS_PROGRAM, 16, magicard_state )
+ADDRESS_MAP_START(magicard_state::scc68070_mem)
 	AM_RANGE(0x80001000, 0x8000100f) AM_READWRITE(scc68070_ext_irqc_r,scc68070_ext_irqc_w) AM_SHARE("scc_xirqc_regs") //lir
 	AM_RANGE(0x80002000, 0x8000200f) AM_READWRITE(scc68070_iic_r,scc68070_iic_w) AM_SHARE("scc_iic_regs") //i2c
 	AM_RANGE(0x80002010, 0x8000201f) AM_READWRITE(scc68070_uart_r,scc68070_uart_w) AM_SHARE("scc_uart_regs")
@@ -906,7 +912,7 @@ static ADDRESS_MAP_START( scc68070_mem, AS_PROGRAM, 16, magicard_state )
 	AM_RANGE(0x80008000, 0x8000807f) AM_READWRITE(scc68070_mmu_r,scc68070_mmu_w) AM_SHARE("scc_mmu_regs")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magicard_mem, AS_PROGRAM, 16, magicard_state )
+ADDRESS_MAP_START(magicard_state::magicard_mem)
 //  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_IMPORT_FROM(scc68070_mem)
 	AM_RANGE(0x00000000, 0x001ffbff) AM_MIRROR(0x00200000) AM_RAM AM_SHARE("magicram")
@@ -924,7 +930,7 @@ static ADDRESS_MAP_START( magicard_mem, AS_PROGRAM, 16, magicard_state )
 	AM_RANGE(0x001fffe0, 0x001fffff) AM_MIRROR(0x7fe00000) AM_READWRITE(philips_66470_r,philips_66470_w) AM_SHARE("pcab_vregs") //video registers
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotslots_mem, AS_PROGRAM, 16, magicard_state )
+ADDRESS_MAP_START(magicard_state::hotslots_mem)
 //  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_IMPORT_FROM(scc68070_mem)
 	AM_RANGE(0x00000000, 0x001ffbff) AM_MIRROR(0x00200000) AM_RAM AM_SHARE("magicram")
@@ -978,12 +984,12 @@ INTERRUPT_GEN_MEMBER(magicard_state::magicard_irq)
 		device.execute().set_input_line_and_vector(1, HOLD_LINE, 0xf0 / 4);
 }
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, magicard_state )
+ADDRESS_MAP_START(magicard_state::ramdac_map)
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( magicard )
+MACHINE_CONFIG_START(magicard_state::magicard)
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A / 2)    /* SCC-68070 CCA84 datasheet */
 	MCFG_CPU_PROGRAM_MAP(magicard_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicard_state, magicard_irq) /* no interrupts? (it erases the vectors..) */
@@ -1003,7 +1009,8 @@ static MACHINE_CONFIG_START( magicard )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hotslots, magicard )
+MACHINE_CONFIG_START(magicard_state::hotslots)
+	magicard(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hotslots_mem)
 

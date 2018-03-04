@@ -48,7 +48,7 @@
 
 /* Memory Map */
 
-static ADDRESS_MAP_START( nitedrvr_map, AS_PROGRAM, 8, nitedrvr_state )
+ADDRESS_MAP_START(nitedrvr_state::nitedrvr_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100) // SCRAM
 	AM_RANGE(0x0200, 0x027f) AM_READNOP AM_WRITE(nitedrvr_videoram_w) AM_MIRROR(0x180) AM_SHARE("videoram") // PFW
 	AM_RANGE(0x0400, 0x042f) AM_READNOP AM_WRITEONLY AM_MIRROR(0x1c0) AM_SHARE("hvc") // POSH, POSV, CHAR
@@ -139,10 +139,10 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( nitedrvr )
+MACHINE_CONFIG_START(nitedrvr_state::nitedrvr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz/12) // 1 MHz
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'096'000)/12) // 1 MHz
 	MCFG_CPU_PROGRAM_MAP(nitedrvr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nitedrvr_state, irq0_line_hold)
 

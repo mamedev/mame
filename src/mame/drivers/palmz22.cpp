@@ -103,6 +103,8 @@ public:
 	DECLARE_READ32_MEMBER(s3c2410_core_pin_r);
 	DECLARE_READ32_MEMBER(s3c2410_adc_data_r );
 
+	void palmz22(machine_config &config);
+	void palmz22_map(address_map &map);
 };
 
 
@@ -266,7 +268,7 @@ void palmz22_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( palmz22_map, AS_PROGRAM, 32, palmz22_state )
+ADDRESS_MAP_START(palmz22_state::palmz22_map)
 	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -278,7 +280,7 @@ DRIVER_INIT_MEMBER(palmz22_state,palmz22)
 {
 }
 
-static MACHINE_CONFIG_START( palmz22 )
+MACHINE_CONFIG_START(palmz22_state::palmz22)
 	MCFG_CPU_ADD("maincpu", ARM920T, 266000000)
 	MCFG_CPU_PROGRAM_MAP(palmz22_map)
 

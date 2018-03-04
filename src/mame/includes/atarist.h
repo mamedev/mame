@@ -20,6 +20,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 #include "sound/lmc1992.h"
+#include "screen.h"
 
 #define M68000_TAG      "m68000"
 #define HD6301V1_TAG    "hd6301"
@@ -39,13 +40,13 @@
 
 // Atari ST
 
-#define Y1      XTAL_2_4576MHz
+#define Y1      XTAL(2'457'600)
 
 // STBook
 
-#define U517    XTAL_16MHz
-#define Y200    XTAL_2_4576MHz
-#define Y700    XTAL_10MHz
+#define U517    XTAL(16'000'000)
+#define Y200    XTAL(2'457'600)
+#define Y700    XTAL(10'000'000)
 
 #define DMA_STATUS_DRQ              0x04
 #define DMA_STATUS_SECTOR_COUNT     0x02
@@ -120,7 +121,8 @@ public:
 			m_ikbd_mouse_pc(0),
 			m_ikbd_joy(1),
 			m_monochrome(1),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_screen(*this, "screen")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -203,6 +205,7 @@ public:
 	inline pen_t shift_mode_2();
 	void shifter_tick();
 	inline void shifter_load();
+	inline void draw_pixel(int x, int y, u32 pen);
 	void glue_tick();
 	void set_screen_parameters();
 	void blitter_source();
@@ -332,8 +335,13 @@ public:
 
 	int m_monochrome;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
+	void st(machine_config &config);
+	void ikbd_io_map(address_map &map);
+	void ikbd_map(address_map &map);
+	void st_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -347,6 +355,8 @@ public:
 
 	DECLARE_READ16_MEMBER( fpu_r );
 	DECLARE_WRITE16_MEMBER( fpu_w );
+	void megast(machine_config &config);
+	void megast_map(address_map &map);
 };
 
 class ste_state : public st_state
@@ -426,6 +436,11 @@ public:
 	emu_timer *m_microwire_timer;
 	emu_timer *m_dmasound_timer;
 
+	void falcon40(machine_config &config);
+	void tt030(machine_config &config);
+	void falcon(machine_config &config);
+	void ste(machine_config &config);
+	void ste_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -443,6 +458,8 @@ public:
 	DECLARE_WRITE16_MEMBER( cache_w );
 
 	uint16_t m_cache;
+	void megaste(machine_config &config);
+	void megaste_map(address_map &map);
 };
 
 class stbook_state : public ste_state
@@ -463,6 +480,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( psg_pa_w );
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
+	void stbook_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_ATARI_ST_H

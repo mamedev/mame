@@ -76,6 +76,15 @@
 #include "speaker.h"
 
 
+void exterm_state::machine_start()
+{
+	save_item(NAME(m_aimpos));
+	save_item(NAME(m_trackball_old));
+	save_item(NAME(m_sound_control));
+	save_item(NAME(m_last));
+}
+
+
 /*************************************
  *
  *  Master/slave communications
@@ -84,13 +93,13 @@
 
 WRITE16_MEMBER(exterm_state::exterm_host_data_w)
 {
-	m_slave->host_w(space,offset / TOWORD(0x00100000), data, 0xffff);
+	m_slave->host_w(space,offset / 0x0010000, data, 0xffff);
 }
 
 
 READ16_MEMBER(exterm_state::exterm_host_data_r)
 {
-	return m_slave->host_r(space,offset / TOWORD(0x00100000), 0xffff);
+	return m_slave->host_r(space,offset / 0x0010000, 0xffff);
 }
 
 
@@ -175,19 +184,11 @@ WRITE16_MEMBER(exterm_state::exterm_output_port_0_w)
 }
 
 
-TIMER_CALLBACK_MEMBER(exterm_state::sound_delayed_w)
+WRITE8_MEMBER(exterm_state::sound_latch_w)
 {
-	/* data is latched independently for both sound CPUs */
-	m_master_sound_latch = m_slave_sound_latch = param;
-	m_audiocpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	m_audioslave->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-}
-
-
-WRITE16_MEMBER(exterm_state::sound_latch_w)
-{
-	if (ACCESSING_BITS_0_7)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(exterm_state::sound_delayed_w),this), data & 0xff);
+	// data is latched independently for both sound CPUs
+	m_soundlatch[0]->write(space, 0, data);
+	m_soundlatch[1]->write(space, 0, data);
 }
 
 
@@ -225,22 +226,6 @@ WRITE8_MEMBER(exterm_state::sound_nmi_rate_w)
 }
 
 
-READ8_MEMBER(exterm_state::sound_master_latch_r)
-{
-	/* read latch and clear interrupt */
-	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	return m_master_sound_latch;
-}
-
-
-READ8_MEMBER(exterm_state::sound_slave_latch_r)
-{
-	/* read latch and clear interrupt */
-	m_audioslave->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	return m_slave_sound_latch;
-}
-
-
 READ8_MEMBER(exterm_state::sound_nmi_to_slave_r)
 {
 	/* a read from here triggers an NMI pulse to the slave */
@@ -269,8 +254,7 @@ WRITE8_MEMBER(exterm_state::sound_control_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16, exterm_state )
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
+ADDRESS_MAP_START(exterm_state::master_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0xfc700000) AM_RAM AM_SHARE("master_videoram")
 	AM_RANGE(0x00800000, 0x00bfffff) AM_MIRROR(0xfc400000) AM_RAM
 	AM_RANGE(0x01000000, 0x013fffff) AM_MIRROR(0xfc000000) AM_READWRITE(exterm_host_data_r, exterm_host_data_w)
@@ -278,18 +262,19 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16, exterm_state )
 	AM_RANGE(0x01440000, 0x0147ffff) AM_MIRROR(0xfc000000) AM_READ(exterm_input_port_1_r)
 	AM_RANGE(0x01480000, 0x014bffff) AM_MIRROR(0xfc000000) AM_READ_PORT("DSW")
 	AM_RANGE(0x01500000, 0x0153ffff) AM_MIRROR(0xfc000000) AM_WRITE(exterm_output_port_0_w)
-	AM_RANGE(0x01580000, 0x015bffff) AM_MIRROR(0xfc000000) AM_WRITE(sound_latch_w)
+	AM_RANGE(0x01580000, 0x015bffff) AM_MIRROR(0xfc000000) AM_WRITE8(sound_latch_w, 0x00ff)
 	AM_RANGE(0x015c0000, 0x015fffff) AM_MIRROR(0xfc000000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x01800000, 0x01807fff) AM_MIRROR(0xfc7f8000) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x01800000, 0x01807fff) AM_MIRROR(0xfc7f8000) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x02800000, 0x02807fff) AM_MIRROR(0xfc7f8000) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x03000000, 0x03ffffff) AM_MIRROR(0xfc000000) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, exterm_state )
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("slave", tms34010_device, io_register_r, io_register_w)
+ADDRESS_MAP_START(exterm_state::slave_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0xfbf00000) AM_RAM AM_SHARE("slave_videoram")
 	AM_RANGE(0x04000000, 0x047fffff) AM_MIRROR(0xfb800000) AM_RAM
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("slave", tms34010_device, io_register_r, io_register_w)
 ADDRESS_MAP_END
 
 
@@ -300,24 +285,24 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_master_map, AS_PROGRAM, 8, exterm_state )
+ADDRESS_MAP_START(exterm_state::sound_master_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_WRITE(ym2151_data_latch_w)
 	AM_RANGE(0x6000, 0x67ff) AM_WRITE(sound_nmi_rate_w)
-	AM_RANGE(0x6800, 0x6fff) AM_READ(sound_master_latch_r)
+	AM_RANGE(0x6800, 0x6fff) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)
 	AM_RANGE(0x7000, 0x77ff) AM_READ(sound_nmi_to_slave_r)
 /*  AM_RANGE(0x7800, 0x7fff) unknown - to S4-13 */
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(sound_control_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0xa000, 0xbfff) AM_WRITE(sound_control_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_slave_map, AS_PROGRAM, 8, exterm_state )
+ADDRESS_MAP_START(exterm_state::sound_slave_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_READ(sound_slave_latch_r)
+	AM_RANGE(0x4000, 0x5fff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x3ffe) AM_DEVWRITE("dacvol", dac_byte_interface, write)
 	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x3ffe) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -397,7 +382,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( exterm )
+MACHINE_CONFIG_START(exterm_state::exterm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)
@@ -422,6 +407,12 @@ static MACHINE_CONFIG_START( exterm )
 
 	MCFG_CPU_ADD("audioslave", M6502, 2000000)
 	MCFG_CPU_PROGRAM_MAP(sound_slave_map)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audioslave", M6502_IRQ_LINE))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -501,4 +492,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, exterm, 0, exterm, exterm, exterm_state, 0, ROT0, "Gottlieb / Premier Technology", "Exterminator", 0 )
+GAME( 1989, exterm, 0, exterm, exterm, exterm_state, 0, ROT0, "Gottlieb / Premier Technology", "Exterminator", MACHINE_SUPPORTS_SAVE )

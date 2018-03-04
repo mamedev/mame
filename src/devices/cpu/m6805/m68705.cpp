@@ -3,6 +3,7 @@
 #include "emu.h"
 #include "m68705.h"
 #include "m6805defs.h"
+#include "6805dasm.h"
 
 /****************************************************************************
  * Configurable logging
@@ -192,7 +193,7 @@ m68705_device::m68705_device(
 		u32 clock,
 		device_type type,
 		u32 addr_width,
-		address_map_delegate internal_map)
+		address_map_constructor internal_map)
 	: m6805_base_device(
 			mconfig,
 			tag,
@@ -646,7 +647,7 @@ void m68705_device::add_eprom_state()
  * M68705Px family
  ****************************************************************************/
 
-DEVICE_ADDRESS_MAP_START( p_map, 8, m68705p_device )
+ADDRESS_MAP_START(m68705p_device::p_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x07ff)
 	ADDRESS_MAP_UNMAP_HIGH
 
@@ -675,7 +676,7 @@ m68705p_device::m68705p_device(
 		device_t *owner,
 		u32 clock,
 		device_type type)
-	: m68705_device(mconfig, tag, owner, clock, type, 11, address_map_delegate(FUNC(m68705p_device::p_map), this))
+	: m68705_device(mconfig, tag, owner, clock, type, 11, address_map_constructor(FUNC(m68705p_device::p_map), this))
 {
 	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
 	set_port_mask<2>(0xf0);         // Port C is four bits wide
@@ -697,14 +698,9 @@ void m68705p_device::device_start()
 	state_add(M68705_MOR, "MOR", get_user_rom()[0x0784]).mask(0xff);
 }
 
-offs_t m68705p_device::disasm_disassemble(
-		std::ostream &stream,
-		offs_t pc,
-		const uint8_t *oprom,
-		const uint8_t *opram,
-		uint32_t options)
+util::disasm_interface *m68705p_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options, m68705p_syms);
+	return new m6805_disassembler(m68705p_syms);
 }
 
 
@@ -712,7 +708,7 @@ offs_t m68705p_device::disasm_disassemble(
  * M68705Ux family
  ****************************************************************************/
 
-DEVICE_ADDRESS_MAP_START( u_map, 8, m68705u_device )
+ADDRESS_MAP_START(m68705u_device::u_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
 	ADDRESS_MAP_UNMAP_HIGH
 
@@ -742,7 +738,7 @@ m68705u_device::m68705u_device(
 		device_t *owner,
 		u32 clock,
 		device_type type,
-		address_map_delegate internal_map)
+		address_map_constructor internal_map)
 	: m68705_device(mconfig, tag, owner, clock, type, 12, internal_map)
 {
 	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
@@ -754,7 +750,7 @@ m68705u_device::m68705u_device(
 		device_t *owner,
 		u32 clock,
 		device_type type)
-	: m68705u_device(mconfig, tag, owner, clock, type, address_map_delegate(FUNC(m68705u_device::u_map), this))
+	: m68705u_device(mconfig, tag, owner, clock, type, address_map_constructor(FUNC(m68705u_device::u_map), this))
 {
 }
 
@@ -776,14 +772,9 @@ void m68705u_device::device_start()
 	// TODO: MISC register
 }
 
-offs_t m68705u_device::disasm_disassemble(
-		std::ostream &stream,
-		offs_t pc,
-		const uint8_t *oprom,
-		const uint8_t *opram,
-		uint32_t options)
+util::disasm_interface *m68705u_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options, m68705u_syms);
+	return new m6805_disassembler(m68705u_syms);
 }
 
 
@@ -791,7 +782,7 @@ offs_t m68705u_device::disasm_disassemble(
  * M68705Rx family
  ****************************************************************************/
 
-DEVICE_ADDRESS_MAP_START( r_map, 8, m68705r_device )
+ADDRESS_MAP_START(m68705r_device::r_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
 	ADDRESS_MAP_UNMAP_HIGH
 
@@ -823,7 +814,7 @@ m68705r_device::m68705r_device(
 		device_t *owner,
 		u32 clock,
 		device_type type)
-	: m68705u_device(mconfig, tag, owner, clock, type, address_map_delegate(FUNC(m68705r_device::r_map), this))
+	: m68705u_device(mconfig, tag, owner, clock, type, address_map_constructor(FUNC(m68705r_device::r_map), this))
 {
 }
 
@@ -834,16 +825,10 @@ void m68705r_device::device_start()
 	// TODO: ADC
 }
 
-offs_t m68705r_device::disasm_disassemble(
-		std::ostream &stream,
-		offs_t pc,
-		const uint8_t *oprom,
-		const uint8_t *opram,
-		uint32_t options)
+util::disasm_interface *m68705r_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options, m68705r_syms);
+	return new m6805_disassembler(m68705r_syms);
 }
-
 
 /****************************************************************************
  * M68705P3 device

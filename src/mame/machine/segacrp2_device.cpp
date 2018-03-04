@@ -76,11 +76,11 @@ static void decode(uint8_t *rom, uint8_t *decrypted,
 
 		/* decode the opcodes */
 		tbl = swaptable[swap_table[2*row]];
-		decrypted[A] = BITSWAP8(src,7,tbl[0],5,tbl[1],3,tbl[2],1,tbl[3]) ^ xor_table[2*row];
+		decrypted[A] = bitswap<8>(src,7,tbl[0],5,tbl[1],3,tbl[2],1,tbl[3]) ^ xor_table[2*row];
 
 		/* decode the data */
 		tbl = swaptable[swap_table[2*row+1]];
-		rom[A] = BITSWAP8(src,7,tbl[0],5,tbl[1],3,tbl[2],1,tbl[3]) ^ xor_table[2*row+1];
+		rom[A] = bitswap<8>(src,7,tbl[0],5,tbl[1],3,tbl[2],1,tbl[3]) ^ xor_table[2*row+1];
 	}
 }
 
@@ -101,12 +101,6 @@ segacrp2_z80_device::segacrp2_z80_device(const machine_config &mconfig, device_t
 void segacrp2_z80_device::device_start() { z80_device::device_start(); decrypt();  }
 void segacrp2_z80_device::device_reset() { z80_device::device_reset(); }
 void segacrp2_z80_device::decrypt() { }
-
-void segacrp2_z80_device::set_decrypted_tag(device_t &device, const char* decrypted_tag)
-{
-	segacrp2_z80_device &dev = downcast<segacrp2_z80_device &>(device);
-	dev.m_decrypted_tag = decrypted_tag;
-}
 
 
 sega_315_5177_device::sega_315_5177_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrp2_z80_device(mconfig, SEGA_315_5177, tag, owner, clock) {}

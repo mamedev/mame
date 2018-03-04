@@ -117,6 +117,14 @@ public:
 	uint16_t* m_rom16;
 	uint8_t* m_rom8;
 
+	void spider(machine_config &config);
+	void twins(machine_config &config);
+	void twinsa(machine_config &config);
+	void ramdac_map(address_map &map);
+	void spider_io(address_map &map);
+	void twins_io(address_map &map);
+	void twins_map(address_map &map);
+	void twinsa_io(address_map &map);
 };
 
 
@@ -130,7 +138,7 @@ void twins_state::machine_start()
 READ16_MEMBER(twins_state::twins_port4_r)
 {
 // doesn't work??
-//  printf("%08x: twins_port4_r %04x\n", space.device().safe_pc(), mem_mask);
+//  printf("%08x: twins_port4_r %04x\n", m_maincpu->pc(), mem_mask);
 //  return m_i2cmem->read_sda();// | 0xfffe;
 
 	return 0x0001;
@@ -138,7 +146,7 @@ READ16_MEMBER(twins_state::twins_port4_r)
 
 WRITE16_MEMBER(twins_state::twins_port4_w)
 {
-//  printf("%08x: twins_port4_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+//  printf("%08x: twins_port4_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 	int i2c_clk = BIT(data, 1);
 	int i2c_mem = BIT(data, 0);
 	m_i2cmem->write_scl(i2c_clk);
@@ -154,13 +162,13 @@ WRITE16_MEMBER(twins_state::twins_pal_w)
 		dat = m_paletteram[m_paloff];
 
 		r = dat & 0x1f;
-		r = BITSWAP8(r,7,6,5,0,1,2,3,4);
+		r = bitswap<8>(r,7,6,5,0,1,2,3,4);
 
 		g = (dat>>5) & 0x1f;
-		g = BITSWAP8(g,7,6,5,0,1,2,3,4);
+		g = bitswap<8>(g,7,6,5,0,1,2,3,4);
 
 		b = (dat>>10) & 0x1f;
-		b = BITSWAP8(b,7,6,5,0,1,2,3,4);
+		b = bitswap<8>(b,7,6,5,0,1,2,3,4);
 
 		m_palette->set_pen_color(m_paloff, pal5bit(r),pal5bit(g),pal5bit(b));
 
@@ -274,11 +282,11 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 }
 
 
-static ADDRESS_MAP_START( twins_map, AS_PROGRAM, 16, twins_state )
+ADDRESS_MAP_START(twins_state::twins_map)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(spider_blitter_r, spider_blitter_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( twins_io, AS_IO, 16, twins_state )
+ADDRESS_MAP_START(twins_state::twins_io)
 	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
@@ -379,7 +387,7 @@ static INPUT_PORTS_START(twins)
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( twins )
+MACHINE_CONFIG_START(twins_state::twins)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(twins_map)
@@ -412,7 +420,7 @@ MACHINE_CONFIG_END
 
 
 
-static ADDRESS_MAP_START( twinsa_io, AS_IO, 16, twins_state )
+ADDRESS_MAP_START(twins_state::twinsa_io)
 	AM_RANGE(0x0000, 0x0001) AM_DEVWRITE8("ramdac",ramdac_device,index_w,0x00ff)
 	AM_RANGE(0x0002, 0x0003) AM_DEVWRITE8("ramdac",ramdac_device,mask_w,0x00ff)
 	AM_RANGE(0x0004, 0x0005) AM_DEVREADWRITE8("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
@@ -422,14 +430,14 @@ static ADDRESS_MAP_START( twinsa_io, AS_IO, 16, twins_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, twins_state )
+ADDRESS_MAP_START(twins_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( twinsa )
+MACHINE_CONFIG_START(twins_state::twinsa)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(twins_map)
 	MCFG_CPU_IO_MAP(twinsa_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", twins_state,  nmi_line_pulse)
@@ -452,7 +460,7 @@ static MACHINE_CONFIG_START( twinsa )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_16MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(16'000'000)/8) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -537,7 +545,7 @@ READ16_MEMBER(twins_state::spider_port_1e_r)
 }
 
 
-static ADDRESS_MAP_START( spider_io, AS_IO, 16, twins_state )
+ADDRESS_MAP_START(twins_state::spider_io)
 	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
@@ -556,7 +564,7 @@ ADDRESS_MAP_END
 
 
 
-static MACHINE_CONFIG_START( spider )
+MACHINE_CONFIG_START(twins_state::spider)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(twins_map)

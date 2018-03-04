@@ -43,21 +43,6 @@ device_video_interface::~device_video_interface()
 
 
 //-------------------------------------------------
-//  static_add_route - configuration helper to add
-//  a new route to the device
-//-------------------------------------------------
-
-void device_video_interface::static_set_screen(device_t &device, const char *tag)
-{
-	// find our video interface
-	device_video_interface *video;
-	if (!device.interface(video))
-		throw emu_fatalerror("MCFG_VIDEO_SET_SCREEN called on device '%s' with no video interface", device.tag());
-	video->m_screen_tag = tag;
-}
-
-
-//-------------------------------------------------
 //  interface_validity_check - validation for a
 //  device after the configuration has been
 //  constructed
@@ -134,11 +119,8 @@ void device_video_interface::interface_pre_start()
 			throw device_missing_dependencies();
 		else
 		{
-			// resolve the palette for the sake of register_screen_bitmap
-			m_screen->resolve_palette();
-
-			// no other palette may be specified (FIXME: breaks meritm.cpp)
-			if (0 && m_screen->has_palette() && palintf != &m_screen->palette())
+			// no other palette may be specified
+			if (m_screen->has_palette() && palintf != &m_screen->palette())
 				throw emu_fatalerror("Device '%s' cannot control screen '%s' with palette '%s'", device().tag(), m_screen_tag, m_screen->palette().device().tag());
 		}
 	}

@@ -6,10 +6,11 @@
  *
  ****************************************************************************/
 
-#ifndef _3DO_H_
-#define _3DO_H_
+#ifndef MAME_INCLUDES_3DO_H
+#define MAME_INCLUDES_3DO_H
 
 #include "machine/nvram.h"
+#include "machine/timer.h"
 
 
 struct SLOW2 {
@@ -177,6 +178,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER( timer_x16_cb );
 
+	void _3do(machine_config &config);
+	void _3do_pal(machine_config &config);
+	void _3do_mem(address_map &map);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -192,4 +196,4 @@ private:
 /*----------- defined in machine/3do.c -----------*/
 
 
-#endif /* _3DO_H_ */
+#endif // MAME_INCLUDES_3DO_H

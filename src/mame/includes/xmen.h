@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/k054539.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k053251.h"
@@ -71,4 +72,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(xmen_scanline);
 	K052109_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
+	void xmen(machine_config &config);
+	void xmen6p(machine_config &config);
+	void _6p_main_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

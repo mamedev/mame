@@ -1,7 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders: Olivier Galibert, Juergen Buchmueller, Krzysztof Strzecha, Robbbert
 /***************************************************************************
-    zx.c
+
+    ZX-80/ZX-81 and derivatives
 
     Original driver by:
     Juergen Buchmueller, Dec 1999
@@ -50,36 +51,37 @@
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( zx80_map, AS_PROGRAM, 8, zx_state )
+ADDRESS_MAP_START(zx_state::zx80_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_MIRROR(0x3000)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zx81_map, AS_PROGRAM, 8, zx_state )
+ADDRESS_MAP_START(zx_state::zx81_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_MIRROR(0x2000)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ula_map, AS_OPCODES, 8, zx_state )
+ADDRESS_MAP_START(zx_state::ula_map)
 	AM_RANGE(0x0000, 0x7fff) AM_READ(ula_low_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(ula_high_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zx80_io_map, AS_IO, 8, zx_state )
+ADDRESS_MAP_START(zx_state::zx80_io_map)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(zx80_io_r, zx80_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zx81_io_map, AS_IO, 8, zx_state )
+ADDRESS_MAP_START(zx_state::zx81_io_map)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(zx81_io_r, zx81_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8300_io_map, AS_IO, 8, zx_state )
+ADDRESS_MAP_START(zx_state::pc8300_io_map)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pc8300_io_r, zx81_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pow3000_io_map, AS_IO, 8, zx_state )
+ADDRESS_MAP_START(zx_state::pow3000_io_map)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pow3000_io_r, zx81_io_w)
 ADDRESS_MAP_END
+
 
 /* Input Ports */
 
@@ -307,29 +309,25 @@ INPUT_PORTS_END
 
 /* Palette Initialization */
 
-
 PALETTE_INIT_MEMBER(zx_state, zx)
 {
 	palette.set_pen_color(0, rgb_t::white());
 	palette.set_pen_color(1, rgb_t::black());
 }
 
-PALETTE_INIT_MEMBER(zx_state,ts1000)
-{
-	palette.set_pen_color(0, rgb_t(64, 244, 244)); /* cyan */
-	palette.set_pen_color(1, rgb_t::black());
-}
 
-static MACHINE_CONFIG_START( zx80 )
+/* Machine Configs */
+
+MACHINE_CONFIG_START(zx_state::zx80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_6_5MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(6'500'000)/2)
 	MCFG_CPU_PROGRAM_MAP(zx80_map)
 	MCFG_CPU_IO_MAP(zx80_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(ula_map)
-	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE16(zx_state, refresh_w))
+	MCFG_CPU_OPCODES_MAP(ula_map)
+	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(zx_state, refresh_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(XTAL_6_5MHz/2/64159.0) // 54223 for NTSC
+	MCFG_SCREEN_REFRESH_RATE(XTAL(6'500'000)/2/64159.0) // 54223 for NTSC
 
 	/* video hardware */
 	MCFG_SCREEN_UPDATE_DRIVER(zx_state, screen_update)
@@ -354,7 +352,8 @@ static MACHINE_CONFIG_START( zx80 )
 	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K,16K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( zx81, zx80 )
+MACHINE_CONFIG_START(zx_state::zx81)
+	zx80(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(zx81_map)
 	MCFG_CPU_IO_MAP(zx81_io_map)
@@ -372,7 +371,8 @@ static MACHINE_CONFIG_DERIVED( zx81, zx80 )
 	MCFG_RAM_EXTRA_OPTIONS("1K,32K,48K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( zx81_spk, zx81 )
+MACHINE_CONFIG_START(zx_state::zx81_spk )
+	zx81(config);
 	/* sound hardware */
 	/* Used by pc8300/lambda/pow3000 */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -382,22 +382,23 @@ static MACHINE_CONFIG_DERIVED( zx81_spk, zx81 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ts1000, zx81 )
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(zx_state, ts1000)
-
+MACHINE_CONFIG_START(zx_state::ts1000)
+	zx81(config);
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
+	MCFG_RAM_EXTRA_OPTIONS("1K,16K,32K,48K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ts1500, ts1000 )
+MACHINE_CONFIG_START(zx_state::ts1500)
+	ts1000(config);
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc8300, zx81_spk )
+MACHINE_CONFIG_START(zx_state::pc8300)
+	zx81_spk(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pc8300_io_map)
 
@@ -406,7 +407,8 @@ static MACHINE_CONFIG_DERIVED( pc8300, zx81_spk )
 	MCFG_RAM_DEFAULT_SIZE("16K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pow3000, zx81_spk )
+MACHINE_CONFIG_START(zx_state::pow3000)
+	zx81_spk(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pow3000_io_map)
 
@@ -491,6 +493,7 @@ ROM_START( zx97 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "zx97.rom", 0x0000, 0x8000, CRC(5cf49744) SHA1(b2a486efdc7b2bc3dc8e5a441ea5532bfa3207bd) )
 ROM_END
+
 
 /* Game Drivers */
 

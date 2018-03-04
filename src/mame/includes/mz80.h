@@ -12,6 +12,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
+#include "machine/timer.h"
 #include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
@@ -45,6 +46,11 @@ public:
 	uint32_t screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tempo_callback);
 
+	void mz80kj(machine_config &config);
+	void mz80k(machine_config &config);
+	void mz80a(machine_config &config);
+	void mz80k_io(address_map &map);
+	void mz80k_mem(address_map &map);
 private:
 	bool m_mz80k_vertical;
 	bool m_mz80k_tempo_strobe;

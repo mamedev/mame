@@ -156,6 +156,7 @@
 #include "machine/com8116.h"
 #include "machine/i8251.h"
 #include "machine/rescap.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
 #include "video/i8275.h"
@@ -209,8 +210,8 @@ public:
 	void hp64k_update_floppy_dma(void);
 	void hp64k_update_floppy_irq(void);
 	void hp64k_update_drv_ctrl(void);
-	DECLARE_WRITE8_MEMBER(hp64k_floppy0_rdy);
-	DECLARE_WRITE8_MEMBER(hp64k_floppy1_rdy);
+	DECLARE_WRITE_LINE_MEMBER(hp64k_floppy0_rdy);
+	DECLARE_WRITE_LINE_MEMBER(hp64k_floppy1_rdy);
 	void hp64k_floppy_idx_cb(floppy_image_device *floppy , int state);
 	void hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state);
 
@@ -231,6 +232,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(hp64k_beeper_off);
 
 	DECLARE_WRITE_LINE_MEMBER(hp64k_baud_clk_w);
+	void hp64k(machine_config &config);
+	void cpu_io_map(address_map &map);
+	void cpu_mem_map(address_map &map);
 private:
 	required_device<hp_5061_3011_cpu_device> m_cpu;
 	required_device<i8275_device> m_crtc;
@@ -312,14 +316,14 @@ private:
 	bool m_rts_state;
 };
 
-static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 16 , hp64k_state)
+ADDRESS_MAP_START(hp64k_state::cpu_mem_map)
 	AM_RANGE(0x0000 , 0x3fff) AM_ROM
 	AM_RANGE(0x4000 , 0x7fff) AM_READWRITE(hp64k_slot_r , hp64k_slot_w)
 	AM_RANGE(0x8000 , 0x8001) AM_WRITE(hp64k_crtc_w)
 	AM_RANGE(0x8002 , 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cpu_io_map , AS_IO , 16 , hp64k_state)
+ADDRESS_MAP_START(hp64k_state::cpu_io_map)
 	// PA = 0, IC = [0..3]
 	// Keyboard input
 	AM_RANGE(HP_MAKE_IOADDR(0 , 0) , HP_MAKE_IOADDR(0 , 3))   AM_READ(hp64k_kb_r)
@@ -438,7 +442,9 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_drq_w)
 		if (!prev_crtc && crtc_drq) {
 				address_space& prog_space = m_cpu->space(AS_PROGRAM);
 
-				uint8_t data = prog_space.read_byte(m_crtc_ptr);
+				uint16_t data = prog_space.read_word(m_crtc_ptr >> 1);
+				data = m_crtc_ptr & 1 ? data & 0xff : data >> 8;
+
 				m_crtc_ptr++;
 
 				m_crtc->dack_w(prog_space , 0 , hp64k_crtc_filter(data));
@@ -876,18 +882,18 @@ void hp64k_state::hp64k_update_drv_ctrl(void)
 		}
 }
 
-WRITE8_MEMBER(hp64k_state::hp64k_floppy0_rdy)
+WRITE_LINE_MEMBER(hp64k_state::hp64k_floppy0_rdy)
 {
-		if (data) {
+		if (state) {
 				BIT_CLR(m_floppy_status , 0);
 		} else {
 				BIT_SET(m_floppy_status , 0);
 		}
 }
 
-WRITE8_MEMBER(hp64k_state::hp64k_floppy1_rdy)
+WRITE_LINE_MEMBER(hp64k_state::hp64k_floppy1_rdy)
 {
-		if (data) {
+		if (state) {
 				BIT_CLR(m_floppy_status , 3);
 		} else {
 				BIT_SET(m_floppy_status , 3);
@@ -897,9 +903,9 @@ WRITE8_MEMBER(hp64k_state::hp64k_floppy1_rdy)
 void hp64k_state::hp64k_floppy_idx_cb(floppy_image_device *floppy , int state)
 {
 		if (floppy == m_floppy0->get_device()) {
-				m_ss0->a_w(machine().dummy_space(), 0, !state);
+				m_ss0->a_w(!state);
 		} else if (floppy == m_floppy1->get_device()) {
-				m_ss1->a_w(machine().dummy_space(), 0, !state);
+				m_ss1->a_w(!state);
 		}
 
 		if (floppy == m_current_floppy) {
@@ -1330,7 +1336,7 @@ static SLOT_INTERFACE_START(hp64k_floppies)
 	SLOT_INTERFACE("525dd" , FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(hp64k)
+MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_CPU_ADD("cpu" , HP_5061_3011 , 6250000)
 	MCFG_CPU_PROGRAM_MAP(cpu_mem_map)
 	MCFG_CPU_IO_MAP(cpu_io_map)
@@ -1357,7 +1363,7 @@ static MACHINE_CONFIG_START(hp64k)
 	MCFG_SCREEN_SIZE(720 , 390)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_FD1791_ADD("fdc" , XTAL_4MHz / 4)
+	MCFG_FD1791_ADD("fdc" , XTAL(4'000'000) / 4)
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(hp64k_state , hp64k_flp_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(hp64k_state , hp64k_flp_drq_w))
@@ -1373,7 +1379,7 @@ static MACHINE_CONFIG_START(hp64k)
 	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(16))
 	MCFG_TTL74123_B_PIN_VALUE(1)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(hp64k_state , hp64k_floppy0_rdy));
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(hp64k_state , hp64k_floppy0_rdy));
 
 	MCFG_DEVICE_ADD("fdc_rdy1" , TTL74123 , 0)
 	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_NO_DIODE)
@@ -1381,7 +1387,7 @@ static MACHINE_CONFIG_START(hp64k)
 	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(16))
 	MCFG_TTL74123_B_PIN_VALUE(1)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(hp64k_state , hp64k_floppy1_rdy));
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(hp64k_state , hp64k_floppy1_rdy));
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper" , BEEP , 2500)
@@ -1389,7 +1395,7 @@ static MACHINE_CONFIG_START(hp64k)
 
 	MCFG_TIMER_DRIVER_ADD("beep_timer" , hp64k_state , hp64k_beeper_off);
 
-	MCFG_DEVICE_ADD("baud_rate" , COM8116 , XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD("baud_rate" , COM8116 , XTAL(5'068'800))
 	MCFG_COM8116_FR_HANDLER(WRITELINE(hp64k_state , hp64k_baud_clk_w));
 
 	MCFG_DEVICE_ADD("uart" , I8251 , 0)

@@ -11,19 +11,19 @@
 //**************************************************************************
 
 #define MCFG_OKIM6258_ADD(tag, clock) \
-		MCFG_DEVICE_ADD((tag), OKIM6258, (clock))
+	MCFG_DEVICE_ADD((tag), OKIM6258, (clock))
 
 #define MCFG_OKIM6258_REPLACE(tag, clock) \
-		MCFG_DEVICE_REPLACE((tag), OKIM6258, (clock))
+	MCFG_DEVICE_REPLACE((tag), OKIM6258, (clock))
 
 #define MCFG_OKIM6258_DIVIDER(div) \
-		okim6258_device::set_start_div(*device, (okim6258_device::div));
+	downcast<okim6258_device &>(*device).set_start_div((okim6258_device::div));
 
 #define MCFG_OKIM6258_ADPCM_TYPE(type) \
-		okim6258_device::set_type(*device, (okim6258_device::type));
+	downcast<okim6258_device &>(*device).set_type((okim6258_device::type));
 
 #define MCFG_OKIM6258_OUT_BITS(bits) \
-		okim6258_device::set_outbits(*device, (okim6258_device::bits));
+	downcast<okim6258_device &>(*device).set_outbits((okim6258_device::bits));
 
 
 //**************************************************************************
@@ -48,10 +48,10 @@ public:
 
 	okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void set_start_div(device_t &device, int div) { downcast<okim6258_device &>(device).m_start_divider = div; }
-	static void set_type(device_t &device, int type) { downcast<okim6258_device &>(device).m_adpcm_type = type; }
-	static void set_outbits(device_t &device, int outbit) { downcast<okim6258_device &>(device).m_output_bits = outbit; }
+	// configuration
+	void set_start_div(int div) { m_start_divider = div; }
+	void set_type(int type) { m_adpcm_type = type; }
+	void set_outbits(int outbit) { m_output_bits = outbit; }
 
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( data_w );

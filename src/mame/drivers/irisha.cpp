@@ -29,15 +29,14 @@
 class irisha_state : public driver_device
 {
 public:
-	irisha_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_pit(*this, "pit8253"),
-		m_speaker(*this, "speaker"),
-		m_uart(*this, "uart")
-	{
-	}
+	irisha_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_pit(*this, "pit8253")
+		, m_speaker(*this, "speaker")
+		, m_keyboard(*this, "LINE%u", 0)
+	{ }
 
 	DECLARE_READ8_MEMBER(irisha_keyboard_r);
 	DECLARE_READ8_MEMBER(irisha_8255_portb_r);
@@ -46,11 +45,13 @@ public:
 	DECLARE_WRITE8_MEMBER(irisha_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(irisha_8255_portc_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	TIMER_CALLBACK_MEMBER(irisha_key);
 	uint32_t screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
 
+	void irisha(machine_config &config);
+	void irisha_io(address_map &map);
+	void irisha_mem(address_map &map);
 private:
 	bool m_sg1_line;
 	bool m_keypressed;
@@ -61,22 +62,21 @@ private:
 	void update_speaker();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	ioport_port *m_io_ports[10];
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<i8251_device> m_uart;
+	required_ioport_array<10> m_keyboard;
 };
 
 
 /* Address maps */
-static ADDRESS_MAP_START(irisha_mem, AS_PROGRAM, 8, irisha_state )
+ADDRESS_MAP_START(irisha_state::irisha_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM  // ROM
 	AM_RANGE(0x4000, 0xdfff) AM_RAM  // RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( irisha_io , AS_IO, 8, irisha_state )
+ADDRESS_MAP_START(irisha_state::irisha_io)
 	AM_RANGE(0x04, 0x05) AM_READ(irisha_keyboard_r)
 	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
 	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
@@ -327,22 +327,14 @@ TIMER_CALLBACK_MEMBER(irisha_state::irisha_key)
 
 READ8_MEMBER(irisha_state::irisha_keyboard_r)
 {
-	uint8_t keycode;
+	uint8_t keycode = 0xff;
 
 	if (m_keyboard_cnt!=0 && m_keyboard_cnt<11)
-		keycode = m_io_ports[m_keyboard_cnt-1]->read() ^ 0xff;
-	else
-		keycode = 0xff;
+		keycode = m_keyboard[m_keyboard_cnt-1]->read() ^ 0xff;
 
 	m_keyboard_cnt++;
 
 	return keycode;
-}
-
-WRITE_LINE_MEMBER(irisha_state::write_uart_clock)
-{
-	m_uart->write_txc(state);
-	m_uart->write_rxc(state);
 }
 
 
@@ -354,14 +346,6 @@ WRITE_LINE_MEMBER(irisha_state::write_uart_clock)
 
 void irisha_state::machine_start()
 {
-	static const char *const keynames[] = {
-		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
-		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9"
-	};
-
-	for ( uint8_t i = 0; i < 10; i++ )
-		m_io_ports[i] = ioport( keynames[i] );
-
 	m_key_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(irisha_state::irisha_key),this));
 	m_key_timer->adjust(attotime::from_msec(30), 0, attotime::from_msec(30));
 }
@@ -376,9 +360,9 @@ void irisha_state::machine_reset()
 }
 
 /* Machine driver */
-static MACHINE_CONFIG_START( irisha )
+MACHINE_CONFIG_START(irisha_state::irisha)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
 	MCFG_CPU_PROGRAM_MAP(irisha_mem)
 	MCFG_CPU_IO_MAP(irisha_io)
 
@@ -403,11 +387,12 @@ static MACHINE_CONFIG_START( irisha )
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_16MHz / 9)
+	MCFG_PIT8253_CLK0(XTAL(16'000'000) / 9)
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL_16MHz / 9 / 8 / 8)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(irisha_state, write_uart_clock))
-	MCFG_PIT8253_CLK2(XTAL_16MHz / 9)
+	MCFG_PIT8253_CLK1(XTAL(16'000'000) / 9 / 8 / 8)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_PIT8253_CLK2(XTAL(16'000'000) / 9)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(irisha_state, speaker_w))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)

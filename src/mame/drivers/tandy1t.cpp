@@ -129,6 +129,25 @@ public:
 	uint8_t m_tandy_bios_bank;    /* I/O port FFEAh */
 	uint8_t m_tandy_ppi_portb, m_tandy_ppi_portc;
 	uint8_t m_vram_bank;
+	static void cfg_fdc_35(device_t *device);
+	static void cfg_fdc_525(device_t *device);
+	void tandy1000_common(machine_config &config);
+	void tandy1000_90key(machine_config &config);
+	void tandy1000_101key(machine_config &config);
+	void t1000tl(machine_config &config);
+	void t1000sx(machine_config &config);
+	void t1000rl(machine_config &config);
+	void t1000sl2(machine_config &config);
+	void t1000hx(machine_config &config);
+	void t1000tx(machine_config &config);
+	void biosbank_map(address_map &map);
+	void tandy1000_16_io(address_map &map);
+	void tandy1000_286_map(address_map &map);
+	void tandy1000_bank_io(address_map &map);
+	void tandy1000_bank_map(address_map &map);
+	void tandy1000_io(address_map &map);
+	void tandy1000_map(address_map &map);
+	void tandy1000tx_io(address_map &map);
 };
 
 /* tandy 1000 eeprom
@@ -254,9 +273,9 @@ void tandy1000_state::tandy1000_write_eeprom(uint8_t data)
 
 WRITE8_MEMBER( tandy1000_state::pc_t1t_p37x_w )
 {
-//  DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", space.device().safe_pc( ),offset, data));
+//  DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", m_maincpu->pc( ),offset, data));
 	if (offset!=4)
-		logerror("T1T_p37x_w %.5x #%d $%02x\n", space.device().safe_pc( ),offset, data);
+		logerror("T1T_p37x_w %.5x #%d $%02x\n", m_maincpu->pc( ),offset, data);
 	m_tandy_data[offset]=data;
 	switch( offset )
 	{
@@ -269,7 +288,7 @@ WRITE8_MEMBER( tandy1000_state::pc_t1t_p37x_w )
 READ8_MEMBER( tandy1000_state::pc_t1t_p37x_r )
 {
 	int data = m_tandy_data[offset];
-//  DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", space.device().safe_pc( ), offset, data));
+//  DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", m_maincpu->pc( ), offset, data));
 	return data;
 }
 
@@ -408,7 +427,7 @@ READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
 {
 	uint8_t data = 0xFF;
 
-	logerror( "%s: tandy1000_bank_r: offset = %x\n", space.machine().describe_context(), offset );
+	logerror( "%s: tandy1000_bank_r: offset = %x\n", machine().describe_context(), offset );
 
 	switch( offset )
 	{
@@ -423,7 +442,7 @@ READ8_MEMBER( tandy1000_state::tandy1000_bank_r )
 
 WRITE8_MEMBER( tandy1000_state::tandy1000_bank_w )
 {
-	logerror( "%s: tandy1000_bank_w: offset = %x, data = %02x\n", space.machine().describe_context(), offset, data );
+	logerror( "%s: tandy1000_bank_w: offset = %x, data = %02x\n", machine().describe_context(), offset, data );
 
 	switch( offset )
 	{
@@ -529,61 +548,61 @@ static INPUT_PORTS_START( t1000_101key )
 	PORT_INCLUDE(at_keyboard)
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START(tandy1000_map, AS_PROGRAM, 8, tandy1000_state )
+ADDRESS_MAP_START(tandy1000_state::tandy1000_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xb8000, 0xbffff) AM_DEVICE("pcvideo_t1000:vram", address_map_bank_device, amap8)
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tandy1000_io, AS_IO, 8, tandy1000_state )
+ADDRESS_MAP_START(tandy1000_state::tandy1000_io)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", t1000_mb_device, map)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(tandy1000_pio_r, tandy1000_pio_w)
 	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(nmi_vram_bank_w)
 	AM_RANGE(0x00c0, 0x00c0) AM_DEVWRITE("sn76496", ncr7496_device, write)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", t1000_mb_device, map)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("pc_joy", pc_joy_device, joy_port_r, joy_port_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r, pc_t1t_p37x_w)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE("pcvideo_t1000", pcvideo_t1000_device, read, write)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREAD("pcvideo_t1000", pcvideo_t1000_device, read) AM_DEVWRITE("pcvideo_t1000", pcvideo_t1000_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tandy1000_bank_map, AS_PROGRAM, 16, tandy1000_state )
+ADDRESS_MAP_START(tandy1000_state::tandy1000_bank_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xb8000, 0xbffff) AM_DEVICE8("pcvideo_t1000:vram", address_map_bank_device, amap8, 0xffff)
 	AM_RANGE(0xe0000, 0xeffff) AM_DEVICE("biosbank", address_map_bank_device, amap16)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION( "rom", 0x70000 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(biosbank_map, 0, 16, tandy1000_state)
+ADDRESS_MAP_START(tandy1000_state::biosbank_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80000, 0xfffff) AM_ROM AM_REGION("rom", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16, tandy1000_state )
+ADDRESS_MAP_START(tandy1000_state::tandy1000_16_io)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", t1000_mb_device, map, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(tandy1000_pio_r, tandy1000_pio_w, 0xffff)
 	AM_RANGE(0x0064, 0x0065) AM_WRITE8(devctrl_w, 0xff00)
 	AM_RANGE(0x00a0, 0x00a1) AM_READ8(unk_r, 0x00ff)
 	AM_RANGE(0x00c0, 0x00c1) AM_DEVWRITE8("sn76496", ncr7496_device, write, 0xffff)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", t1000_mb_device, map, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r, pc_t1t_p37x_w, 0xffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("pcvideo_t1000", pcvideo_t1000_device, read, write, 0xffff)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREAD8("pcvideo_t1000", pcvideo_t1000_device, read, 0xffff) AM_DEVWRITE8("pcvideo_t1000", pcvideo_t1000_device, write, 0xffff)
 	AM_RANGE(0xffe8, 0xffe9) AM_WRITE8(vram_bank_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tandy1000_bank_io, AS_IO, 16, tandy1000_state )
+ADDRESS_MAP_START(tandy1000_state::tandy1000_bank_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM(tandy1000_16_io)
 	AM_RANGE(0xffea, 0xffeb) AM_READWRITE8(tandy1000_bank_r, tandy1000_bank_w, 0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tandy1000tx_io, AS_IO, 16, tandy1000_state )
+ADDRESS_MAP_START(tandy1000_state::tandy1000tx_io)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8(nmi_vram_bank_w, 0x00ff)
 	AM_IMPORT_FROM(tandy1000_16_io)
+	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8(nmi_vram_bank_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tandy1000_286_map, AS_PROGRAM, 16, tandy1000_state )
+ADDRESS_MAP_START(tandy1000_state::tandy1000_286_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x000fffff)
 	AM_RANGE(0xb8000, 0xbffff) AM_DEVICE8("pcvideo_t1000:vram", address_map_bank_device, amap8, 0xffff)
@@ -601,28 +620,27 @@ static const gfx_layout t1000_charlayout =
 	8
 };
 
-static MACHINE_CONFIG_START( cfg_fdc_35 )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	MCFG_SLOT_DEFAULT_OPTION("35dd")
-	MCFG_SLOT_FIXED(true)
 
-	MCFG_DEVICE_REMOVE("fdc:1")
-MACHINE_CONFIG_END
+void tandy1000_state::cfg_fdc_35(device_t *device)
+{
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+}
 
-static MACHINE_CONFIG_START( cfg_fdc_525 )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	MCFG_SLOT_FIXED(true)
-
-	MCFG_DEVICE_REMOVE("fdc:1")
-MACHINE_CONFIG_END
+void tandy1000_state::cfg_fdc_525(device_t *device)
+{
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+}
 
 static GFXDECODE_START( t1000 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, t1000_charlayout, 3, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START(tandy1000_common)
+MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	MCFG_DEVICE_ADD("mb", T1000_MOTHERBOARD, 0)
-	t1000_mb_device::static_set_cputag(*device, "maincpu");
+	downcast<t1000_mb_device &>(*device).set_cputag("^maincpu");
 
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
@@ -630,7 +648,7 @@ static MACHINE_CONFIG_START(tandy1000_common)
 	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_t1000:palette", t1000)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("sn76496", NCR7496, XTAL_14_31818MHz/4)
+	MCFG_SOUND_ADD("sn76496", NCR7496, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mb:mono", 0.80)
 
 	MCFG_NVRAM_ADD_0FILL("nvram");
@@ -651,23 +669,23 @@ static MACHINE_CONFIG_START(tandy1000_common)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(tandy1000_90key)
+MACHINE_CONFIG_START(tandy1000_state::tandy1000_90key)
 	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(tandy1000_101key)
+MACHINE_CONFIG_START(tandy1000_state::tandy1000_101key)
 	MCFG_AT_KEYB_ADD("pc_keyboard", 1, DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( t1000hx )
+MACHINE_CONFIG_START(tandy1000_state::t1000hx)
 	MCFG_CPU_ADD("maincpu", I8088, 8000000)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_map)
 	MCFG_CPU_IO_MAP(tandy1000_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD(tandy1000_common)
+	tandy1000_common(config);
 
-	MCFG_FRAGMENT_ADD(tandy1000_90key)
+	tandy1000_90key(config);
 
 	// plus cards are isa with a nonstandard conntector
 	MCFG_ISA8_SLOT_ADD("mb:isa", "plus1", pc_isa8_cards, nullptr, false)
@@ -675,7 +693,8 @@ static MACHINE_CONFIG_START( t1000hx )
 	MCFG_RAM_EXTRA_OPTIONS("256K, 384K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( t1000sx, t1000hx )
+MACHINE_CONFIG_START(tandy1000_state::t1000sx)
+	t1000hx(config);
 	MCFG_DEVICE_MODIFY("isa_fdc")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_fdc_525)
 
@@ -689,21 +708,21 @@ static MACHINE_CONFIG_DERIVED( t1000sx, t1000hx )
 	MCFG_RAM_EXTRA_OPTIONS("384K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( t1000rl )
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_28_63636MHz / 3)
+MACHINE_CONFIG_START(tandy1000_state::t1000rl)
+	MCFG_CPU_ADD("maincpu", I8086, XTAL(28'636'363) / 3)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_bank_map)
 	MCFG_CPU_IO_MAP(tandy1000_bank_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD(tandy1000_common)
+	tandy1000_common(config);
 
-	MCFG_FRAGMENT_ADD(tandy1000_101key)
+	tandy1000_101key(config);
 
 	MCFG_DEVICE_ADD("biosbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(biosbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(20)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tandy1000_state,tandy1000rl)
@@ -711,9 +730,10 @@ static MACHINE_CONFIG_START( t1000rl )
 	MCFG_RAM_EXTRA_OPTIONS("384K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( t1000sl2, t1000rl )
+MACHINE_CONFIG_START(tandy1000_state::t1000sl2)
+	t1000rl(config);
 	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_CLOCK( XTAL_24MHz / 3 )
+	MCFG_CPU_CLOCK( XTAL(24'000'000) / 3 )
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, nullptr, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, nullptr, false)
@@ -721,15 +741,15 @@ static MACHINE_CONFIG_DERIVED( t1000sl2, t1000rl )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( t1000tl )
-	MCFG_CPU_ADD("maincpu", I80286, XTAL_28_63636MHz / 2)
+MACHINE_CONFIG_START(tandy1000_state::t1000tl)
+	MCFG_CPU_ADD("maincpu", I80286, XTAL(28'636'363) / 2)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_286_map)
 	MCFG_CPU_IO_MAP(tandy1000_16_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD(tandy1000_common)
+	tandy1000_common(config);
 
-	MCFG_FRAGMENT_ADD(tandy1000_101key)
+	tandy1000_101key(config);
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, nullptr, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, nullptr, false)
@@ -738,12 +758,13 @@ static MACHINE_CONFIG_START( t1000tl )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( t1000tx, t1000tl )
+MACHINE_CONFIG_START(tandy1000_state::t1000tx)
+	t1000tl(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP(tandy1000tx_io)
 
 	MCFG_DEVICE_REMOVE("pc_keyboard")
-	MCFG_FRAGMENT_ADD(tandy1000_90key)
+	tandy1000_90key(config);
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_DEFINITION

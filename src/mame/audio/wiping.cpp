@@ -4,20 +4,19 @@
 
     Wiping sound driver (quick hack of the Namco sound driver)
 
-    used by wiping.c and clshroad.c
+    used by wiping.cpp and clshroad.cpp
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "audio/wiping.h"
 
-static constexpr int samplerate = 48000;
 static constexpr int defgain = 48;
 
-DEFINE_DEVICE_TYPE(WIPING, wiping_sound_device, "wiping_sound", "Wiping Audio Custom")
+DEFINE_DEVICE_TYPE(WIPING_CUSTOM, wiping_sound_device, "wiping_sound", "Wiping Custom Sound")
 
 wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, WIPING, tag, owner, clock),
+	: device_t(mconfig, WIPING_CUSTOM, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_last_channel(nullptr),
 	m_sound_prom(nullptr),
@@ -27,8 +26,7 @@ wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const ch
 	m_stream(nullptr),
 	m_mixer_table(nullptr),
 	m_mixer_lookup(nullptr),
-	m_mixer_buffer(nullptr),
-	m_mixer_buffer_2(nullptr)
+	m_mixer_buffer(nullptr)
 {
 	memset(m_channel_list, 0, sizeof(wp_sound_channel)*MAX_VOICES);
 	memset(m_soundregs, 0, sizeof(uint8_t)*0x4000);
@@ -44,11 +42,10 @@ void wiping_sound_device::device_start()
 	wp_sound_channel *voice;
 
 	/* get stream channels */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, samplerate);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock()/2);
 
-	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	m_mixer_buffer   = make_unique_clear<short[]>(samplerate);
-	m_mixer_buffer_2 = make_unique_clear<short[]>(samplerate);
+	/* allocate a buffer to mix into - 1 second's worth should be more than enough */
+	m_mixer_buffer   = make_unique_clear<short[]>(clock()/2);
 
 	/* build the mixer table */
 	make_mixer_table(8, defgain);
@@ -87,9 +84,6 @@ void wiping_sound_device::device_start()
 /* build a table to divide by the number of voices; gain is specified as gain*16 */
 void wiping_sound_device::make_mixer_table(int voices, int gain)
 {
-	int count = voices * 128;
-	int i;
-
 	/* allocate memory */
 	m_mixer_table = make_unique_clear<int16_t[]>(256 * voices);
 
@@ -97,7 +91,7 @@ void wiping_sound_device::make_mixer_table(int voices, int gain)
 	m_mixer_lookup = m_mixer_table.get() + (128 * voices);
 
 	/* fill in the table - 16 bit case */
-	for (i = 0; i < count; i++)
+	for (int i = 0; i < voices * 128; i++)
 	{
 		int val = i * gain * 16 / voices;
 		if (val > 32767) val = 32767;

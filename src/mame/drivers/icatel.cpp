@@ -39,8 +39,10 @@ public:
 
 	DECLARE_READ8_MEMBER(magic_string);
 
-	DECLARE_READ8_MEMBER(ioport_r);
-	DECLARE_WRITE8_MEMBER(ioport_w);
+	DECLARE_READ8_MEMBER(i80c31_p1_r);
+	DECLARE_READ8_MEMBER(i80c31_p3_r);
+	DECLARE_WRITE8_MEMBER(i80c31_p1_w);
+	DECLARE_WRITE8_MEMBER(i80c31_p3_w);
 
 	DECLARE_READ8_MEMBER(cn8_extension_r);
 	DECLARE_WRITE8_MEMBER(cn8_extension_w);
@@ -62,6 +64,10 @@ public:
 
 	HD44780_PIXEL_UPDATE(icatel_pixel_update);
 
+	void icatel(machine_config &config);
+	void i80c31_data(address_map &map);
+	void i80c31_io(address_map &map);
+	void i80c31_prg(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -69,11 +75,11 @@ private:
 	required_device<hd44780_device> m_lcdc;
 };
 
-static ADDRESS_MAP_START(i80c31_prg, AS_PROGRAM, 8, icatel_state)
+ADDRESS_MAP_START(icatel_state::i80c31_prg)
 	AM_RANGE(0x0000, 0x7FFF) AM_MIRROR(0x8000) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(i80c31_io, AS_IO, 8, icatel_state)
+ADDRESS_MAP_START(icatel_state::i80c31_io)
 	AM_RANGE(0x0000,0x3FFF) AM_RAM
 	AM_RANGE(0x8000,0x8002) AM_RAM /* HACK! */
 	AM_RANGE(0x8040,0x8040) AM_MIRROR(0x3F1E) AM_DEVWRITE("hd44780", hd44780_device, control_write) // not sure yet. CI12 (73LS273)
@@ -83,10 +89,9 @@ static ADDRESS_MAP_START(i80c31_io, AS_IO, 8, icatel_state)
 	AM_RANGE(0x80C0,0x80C0) AM_MIRROR(0x3F1F) AM_READWRITE(ci15_r, ci15_w) // 74LS244 (tristate buffer)
 	AM_RANGE(0xC000,0xCFFF) AM_READWRITE(cn8_extension_r, cn8_extension_w)
 	AM_RANGE(0xE000,0xEFFF) AM_READWRITE(modem_r, modem_w)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(ioport_r, ioport_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(i80c31_data, AS_DATA, 8, icatel_state)
+ADDRESS_MAP_START(icatel_state::i80c31_data)
 //  AM_RANGE(0x0056,0x005A) AM_READ(magic_string) /* This is a hack! */
 ADDRESS_MAP_END
 
@@ -109,19 +114,21 @@ READ8_MEMBER(icatel_state::magic_string)
 	return mstr[offset%5];
 }
 
-READ8_MEMBER(icatel_state::ioport_r)
+READ8_MEMBER(icatel_state::i80c31_p1_r)
 {
-	switch (offset%4)
-	{
-		case 0: return 0xff;
-		case 1: return 0x7f;
-		case 2: return 0xff;
-		case 3: return 0xff;
-	}
-	return 0;
+	return 0x7f;
 }
 
-WRITE8_MEMBER(icatel_state::ioport_w)
+READ8_MEMBER(icatel_state::i80c31_p3_r)
+{
+	return 0xff;
+}
+
+WRITE8_MEMBER(icatel_state::i80c31_p1_w)
+{
+}
+
+WRITE8_MEMBER(icatel_state::i80c31_p3_w)
 {
 }
 
@@ -239,12 +246,16 @@ HD44780_PIXEL_UPDATE(icatel_state::icatel_pixel_update)
 	}
 }
 
-static MACHINE_CONFIG_START( icatel )
+MACHINE_CONFIG_START(icatel_state::icatel)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL_2_097152MHz)
+	MCFG_CPU_ADD("maincpu", I80C31, XTAL(2'097'152))
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_DATA_MAP(i80c31_data)
 	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(icatel_state, i80c31_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(icatel_state, i80c31_p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(icatel_state, i80c31_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(icatel_state, i80c31_p3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

@@ -133,7 +133,7 @@ WRITE_LINE_MEMBER(leland_80186_sound_device::i80186_tmr1_w)
 	set_clock_line(7, state);
 }
 
-MACHINE_CONFIG_MEMBER( leland_80186_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(leland_80186_sound_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u31 + ad7524.u46
 	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u32 + ad7524.u47
@@ -174,7 +174,7 @@ MACHINE_CONFIG_MEMBER( leland_80186_sound_device::device_add_mconfig )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit1_2_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( redline_80186_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(redline_80186_sound_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
@@ -224,7 +224,7 @@ MACHINE_CONFIG_MEMBER( redline_80186_sound_device::device_add_mconfig )
 	MCFG_PIT8253_CLK2(7000000)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( ataxx_80186_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(ataxx_80186_sound_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
@@ -251,7 +251,7 @@ MACHINE_CONFIG_MEMBER( ataxx_80186_sound_device::device_add_mconfig )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit0_2_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( wsf_80186_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(wsf_80186_sound_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
@@ -452,7 +452,7 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_control_w )
     the next command, it uses an NMI to force the issue; unfortunately, this
     seems to really screw up the sound system. It turns out it's better to
     just wait for the original interrupt to occur naturally */
-/*  space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);*/
+/*  machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);*/
 
 	/* INT0 */
 	m_audiocpu->int0_w(data & 0x20);
@@ -809,54 +809,3 @@ WRITE8_MEMBER( leland_80186_sound_device::ataxx_80186_control_w )
 					((data & 0x08) << 1);
 	leland_80186_control_w(space, offset, modified);
 }
-
-
-
-/*************************************
- *
- *  Sound CPU memory handlers
- *
- *************************************/
-
-ADDRESS_MAP_START( leland_80186_map_program, AS_PROGRAM, 16, leland_80186_sound_device )
-	AM_RANGE(0x00000, 0x03fff) AM_MIRROR(0x1c000) AM_RAM
-	AM_RANGE(0x20000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START( ataxx_80186_map_io, AS_IO, 16, leland_80186_sound_device )
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START( redline_80186_map_io, AS_IO, 16, leland_80186_sound_device )
-	AM_RANGE(0x0000, 0xffff) AM_DEVWRITE("custom", redline_80186_sound_device, redline_dac_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START( leland_80186_map_io, AS_IO, 16, leland_80186_sound_device )
-	AM_RANGE(0x0000, 0xffff) AM_DEVWRITE("custom", leland_80186_sound_device, dac_w)
-ADDRESS_MAP_END
-
-
-/************************************************************************
-
-Memory configurations:
-
-    Redline Racer:
-        FFDF7:80186 upper chip select = E03C        -> E0000-FFFFF, 128k long
-        FFDF7:80186 lower chip select = 00FC        -> 00000-00FFF, 4k long
-        FFDF7:80186 peripheral chip select = 013C   -> 01000, 01080, 01100, 01180, 01200, 01280, 01300
-        FFDF7:80186 middle chip select = 81FC       -> 80000-C0000, 64k chunks, 256k total
-        FFDF7:80186 middle P chip select = A0FC
-
-    Quarterback, Team Quarterback, AAFB, Super Offroad, Track Pack, Pigout, Viper:
-        FFDFA:80186 upper chip select = E03C        -> E0000-FFFFF, 128k long
-        FFDFA:80186 peripheral chip select = 203C   -> 20000, 20080, 20100, 20180, 20200, 20280, 20300
-        FFDFA:80186 middle chip select = 01FC       -> 00000-7FFFF, 128k chunks, 512k total
-        FFDFA:80186 middle P chip select = C0FC
-
-    Ataxx, Indy Heat, World Soccer Finals:
-        FFD9D:80186 upper chip select = E03C        -> E0000-FFFFF, 128k long
-        FFD9D:80186 peripheral chip select = 043C   -> 04000, 04080, 04100, 04180, 04200, 04280, 04300
-        FFD9D:80186 middle chip select = 01FC       -> 00000-7FFFF, 128k chunks, 512k total
-        FFD9D:80186 middle P chip select = C0BC
-
-************************************************************************/

@@ -90,7 +90,7 @@ void xxmissio_state::machine_start()
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( map1, AS_PROGRAM, 8, xxmissio_state )
+ADDRESS_MAP_START(xxmissio_state::map1)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
@@ -106,14 +106,14 @@ static ADDRESS_MAP_START( map1, AS_PROGRAM, 8, xxmissio_state )
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(bgram_r, bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
 
-	AM_RANGE(0xd800, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd800, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0xe000, 0xefff) AM_SHARE("share5") AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_SHARE("share6") AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( map2, AS_PROGRAM, 8, xxmissio_state )
+ADDRESS_MAP_START(xxmissio_state::map2)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( map2, AS_PROGRAM, 8, xxmissio_state )
 	AM_RANGE(0xc800, 0xcfff) AM_SHARE("bgram") AM_READWRITE(bgram_r, bgram_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("spriteram") AM_RAM
 
-	AM_RANGE(0xd800, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd800, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0xe000, 0xefff) AM_SHARE("share6") AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_SHARE("share5") AM_RAM
@@ -260,7 +260,7 @@ GFXDECODE_END
 
 /****************************************************************************/
 
-static MACHINE_CONFIG_START( xxmissio )
+MACHINE_CONFIG_START(xxmissio_state::xxmissio)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4) /* 3.0MHz */

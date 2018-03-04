@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
+
 #include "cpu/mcs48/mcs48.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/sn76477.h"
 #include "screen.h"
@@ -119,10 +121,16 @@ public:
 	TIMER_CALLBACK_MEMBER( delayed_sound_1_callback );
 	void delayed_sound_2( int data );
 	TIMER_CALLBACK_MEMBER( delayed_sound_2_callback );
+	void sheriff(machine_config &config);
+	void sheriff_sound(machine_config &config);
+	void westgun2(machine_config &config);
+	void helifire(machine_config &config);
+	void helifire_sound(machine_config &config);
+	void spacefev(machine_config &config);
+	void spacefev_sound(machine_config &config);
+	void helifire_main_cpu_map(address_map &map);
+	void helifire_sound_io_map(address_map &map);
+	void main_cpu_map(address_map &map);
+	void main_io_map(address_map &map);
+	void n8080_sound_cpu_map(address_map &map);
 };
-
-/*----------- defined in audio/n8080.c -----------*/
-
-MACHINE_CONFIG_EXTERN( spacefev_sound );
-MACHINE_CONFIG_EXTERN( sheriff_sound );
-MACHINE_CONFIG_EXTERN( helifire_sound );

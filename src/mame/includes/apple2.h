@@ -20,6 +20,7 @@
 #include "machine/kb3600.h"
 #include "machine/mos6551.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 
 #include "sound/spkrdev.h"
 
@@ -368,7 +369,7 @@ public:
 	void apple2_iwm_setdiskreg(uint8_t data);
 	void apple2_init_common();
 	void apple2eplus_init_common(void *apple2cp_ce00_ram);
-	int8_t apple2_slotram_r(address_space &space, int slotnum, int offset);
+	int8_t apple2_slotram_r(int slotnum, int offset);
 	int a2_no_ctrl_reset();
 
 private:

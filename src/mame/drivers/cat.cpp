@@ -91,6 +91,11 @@ Canon cat credits easter egg:
 * hit EXPLAIN (use front + N) and the credits screen will be displayed
 
 Canon Cat credits details: (WIP)
+Jef Raskin
+John "Sandy" Bumgarner
+Charles Springer
+Jonathan Sand
+Terry Holmes - wrote tForth, the language in which the cat is programmed
 Scott Kim - responsible for fonts on swyft and cat
 Ralph Voorhees - Model construction and mockups (swyft 'flat cat')
 
@@ -352,6 +357,8 @@ public:
 	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
 	IRQ_CALLBACK_MEMBER(cat_int_ack);
 
+	void cat(machine_config &config);
+	void cat_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -750,7 +757,7 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 */
 
 
-static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
+ADDRESS_MAP_START(cat_state::cat_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x180000) // 256 KB ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("svram") AM_MIRROR(0x18C000)// SRAM powered by battery
@@ -932,7 +939,7 @@ MACHINE_RESET_MEMBER(cat_state,cat)
 	m_6ms_counter = 0;
 	m_wdt_counter = 0;
 	m_floppy_control = 0;
-	m_6ms_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL_19_968MHz/2)/65536));
+	m_6ms_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL(19'968'000)/2)/65536));
 }
 
 VIDEO_START_MEMBER(cat_state,cat)
@@ -1047,10 +1054,10 @@ WRITE_LINE_MEMBER(cat_state::prn_ack_ff) // switch the flipflop state on the ris
 #endif
 }
 
-static MACHINE_CONFIG_START( cat )
+MACHINE_CONFIG_START(cat_state::cat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_19_968MHz/4)
+	MCFG_CPU_ADD("maincpu",M68000, XTAL(19'968'000)/4)
 	MCFG_CPU_PROGRAM_MAP(cat_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cat_state,cat_int_ack)
 
@@ -1070,7 +1077,7 @@ static MACHINE_CONFIG_START( cat )
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
-	MCFG_MC68681_ADD( "duartn68681", (XTAL_19_968MHz*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
+	MCFG_DEVICE_ADD( "duartn68681", MC68681, (XTAL(19'968'000)*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(cat_state, cat_duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txa))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txb))

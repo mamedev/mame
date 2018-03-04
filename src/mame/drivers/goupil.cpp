@@ -28,6 +28,7 @@
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
 #include "machine/i8279.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "video/ef9364.h"
 #include "video/mc6845.h"
@@ -37,7 +38,7 @@
 
 #include "logmacro.h"
 
-#define MAIN_CLOCK           XTAL_4MHz
+#define MAIN_CLOCK           XTAL(4'000'000)
 #define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */
 #define CPU_CLOCK            MAIN_CLOCK / 4     /* 1 Mhz */
 
@@ -85,6 +86,9 @@ public:
 	uint8_t valkeyb;
 	TIMER_DEVICE_CALLBACK_MEMBER(goupil_scanline);
 
+	void goupil_g1(machine_config &config);
+	void goupil_io(address_map &map);
+	void goupil_mem(address_map &map);
 private:
 	required_device<acia6850_device> m_acia;
 	optional_device<ef9364_device> m_ef9364;
@@ -116,6 +120,9 @@ public:
 	DECLARE_READ8_MEMBER(visu24x80_ram_r);
 	DECLARE_WRITE8_MEMBER(visu24x80_ram_w);
 
+	void goupil_g2(machine_config &config);
+	void goupil_g2_io(address_map &map);
+	void goupil_g2_mem(address_map &map);
 protected:
 
 	required_device<palette_device> m_palette;
@@ -137,7 +144,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( goupil_g1_state::goupil_scanline )
 	m_ef9364->update_scanline((uint16_t)param);
 }
 
-static ADDRESS_MAP_START(goupil_mem, AS_PROGRAM, 8, goupil_g1_state)
+ADDRESS_MAP_START(goupil_g1_state::goupil_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x3FFF) AM_RAM
 	AM_RANGE(0x4000,0x7FFF) AM_RAM
@@ -164,11 +171,11 @@ static ADDRESS_MAP_START(goupil_mem, AS_PROGRAM, 8, goupil_g1_state)
 	AM_RANGE(0xF800,0xFFFF) AM_ROM AM_REGION("maincpu", 0xF800) // Monitor (MON 1 + MON 2)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( goupil_io, AS_IO, 8, goupil_g1_state)
+ADDRESS_MAP_START(goupil_g1_state::goupil_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(goupil_g2_mem, AS_PROGRAM, 8, goupil_g2_state)
+ADDRESS_MAP_START(goupil_g2_state::goupil_g2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x3FFF) AM_RAM
 	AM_RANGE(0x4000,0x7FFF) AM_RAM
@@ -194,11 +201,11 @@ static ADDRESS_MAP_START(goupil_g2_mem, AS_PROGRAM, 8, goupil_g2_state)
 
 	AM_RANGE(0xE8F0,0xE8FF) AM_DEVREADWRITE("fd1791", fd1791_device, read, write)
 	AM_RANGE(0xEC00,0xF3FF) AM_READWRITE(visu24x80_ram_r, visu24x80_ram_w)
-	AM_RANGE(0xF000,0xF7FF) AM_ROM AM_REGION("maincpu", 0xF000) // Monitor (MON 1)
+	AM_RANGE(0xF400,0xF7FF) AM_ROM AM_REGION("maincpu", 0xF400) // Monitor (MON 1)
 	AM_RANGE(0xF800,0xFFFF) AM_ROM AM_REGION("maincpu", 0xF800) // Monitor (MON 2)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( goupil_g2_io, AS_IO, 8, goupil_g2_state)
+ADDRESS_MAP_START(goupil_g2_state::goupil_g2_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
@@ -526,7 +533,7 @@ READ8_MEMBER( goupil_g2_state::visu24x80_ram_r )
 	return data;
 }
 
-static MACHINE_CONFIG_START( goupil_g1 )
+MACHINE_CONFIG_START(goupil_g1_state::goupil_g1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6808, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goupil_mem)
@@ -551,19 +558,19 @@ static MACHINE_CONFIG_START( goupil_g1 )
 	MCFG_EF9364_PAGES_CNT(1);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("goupil_sl", goupil_g1_state, goupil_scanline, "screen", 0, 10)
 
-	MCFG_DEVICE_ADD("m_via_video", VIA6522, 0)
+	MCFG_DEVICE_ADD("m_via_video", VIA6522, CPU_CLOCK / 4)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(goupil_g1_state, via_video_pba_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(goupil_g1_state, via_video_pbb_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(goupil_g1_state, via_video_ca2_w))
 
-	MCFG_DEVICE_ADD("m_via_keyb", VIA6522, 0)
+	MCFG_DEVICE_ADD("m_via_keyb", VIA6522, CPU_CLOCK / 4)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("m_via_modem", VIA6522, 0)
+	MCFG_DEVICE_ADD("m_via_modem", VIA6522, CPU_CLOCK / 4)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
 	/* Floppy */
-	MCFG_FD1791_ADD("fd1791", XTAL_8MHz )
+	MCFG_FD1791_ADD("fd1791", XTAL(8'000'000) )
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:0", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:1", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
@@ -582,7 +589,7 @@ static MACHINE_CONFIG_START( goupil_g1 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( goupil_g2 )
+MACHINE_CONFIG_START(goupil_g2_state::goupil_g2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6808, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goupil_g2_mem)
@@ -608,25 +615,25 @@ static MACHINE_CONFIG_START( goupil_g2 )
 	MCFG_SCREEN_VISIBLE_AREA(0, (80*8)-1, 0, (24*(8+4))-1)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_14_31818MHz/8)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(14'318'181)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(goupil_g2_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(goupil_g2_state, crtc_update_addr_changed)
 
-	MCFG_DEVICE_ADD("m_via_video", VIA6522, 0)
+	MCFG_DEVICE_ADD("m_via_video", VIA6522, CPU_CLOCK / 4)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(goupil_g2_state, via_video_pba_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(goupil_g2_state, via_video_pbb_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(goupil_g2_state, via_video_ca2_w))
 
-	MCFG_DEVICE_ADD("m_via_keyb", VIA6522, 0)
+	MCFG_DEVICE_ADD("m_via_keyb", VIA6522, CPU_CLOCK / 4)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("m_via_modem", VIA6522, 0)
+	MCFG_DEVICE_ADD("m_via_modem", VIA6522, CPU_CLOCK / 4)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
 	/* Floppy */
-	MCFG_FD1791_ADD("fd1791", XTAL_8MHz )
+	MCFG_FD1791_ADD("fd1791", XTAL(8'000'000) )
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:0", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:1", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 

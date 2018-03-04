@@ -71,6 +71,7 @@ TODO:
 
 #include "emu.h"
 #include "includes/hh_ucom4.h"
+
 #include "video/hlcd0515.h"
 #include "rendlay.h"
 #include "screen.h"
@@ -275,20 +276,21 @@ public:
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
+	void ufombs(machine_config &config);
 };
 
 // handlers
 
 void ufombs_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,3,2,1,0,4,5,6,7,8);
-	u16 plate = BITSWAP16(m_plate,15,14,13,12,11,7,10,6,9,5,8,4,0,1,2,3);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,3,2,1,0,4,5,6,7,8);
+	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,7,10,6,9,5,8,4,0,1,2,3);
 	display_matrix(10, 9, plate, grid);
 }
 
 WRITE8_MEMBER(ufombs_state::grid_w)
 {
-	// F,G,H0: vfd matrix grid
+	// F,G,H0: vfd grid
 	int shift = (offset - NEC_UCOM4_PORTF) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -296,7 +298,7 @@ WRITE8_MEMBER(ufombs_state::grid_w)
 
 WRITE8_MEMBER(ufombs_state::plate_w)
 {
-	// C,D012,I: vfd matrix plate
+	// C,D012,I: vfd plate
 	int shift = (offset == NEC_UCOM4_PORTI) ? 8 : (offset - NEC_UCOM4_PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -307,7 +309,6 @@ WRITE8_MEMBER(ufombs_state::speaker_w)
 	// E01: speaker out
 	m_speaker->level_w(data & 3);
 }
-
 
 // config
 
@@ -328,7 +329,7 @@ INPUT_PORTS_END
 
 static const s16 ufombs_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( ufombs )
+MACHINE_CONFIG_START(ufombs_state::ufombs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -388,19 +389,20 @@ public:
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_b_r);
+	void ssfball(machine_config &config);
 };
 
 // handlers
 
 void ssfball_state::prepare_display()
 {
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,10,9,8,0,1,2,4,5,6);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,10,9,8,0,1,2,4,5,6);
 	display_matrix(16, 9, plate, m_grid);
 }
 
 WRITE8_MEMBER(ssfball_state::grid_w)
 {
-	// C,D(,E3): vfd matrix grid 0-7(,8)
+	// C,D(,E3): vfd grid 0-7(,8)
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -410,7 +412,7 @@ WRITE8_MEMBER(ssfball_state::plate_w)
 {
 	m_port[offset] = data;
 
-	// E,F,G,H,I(not all!): vfd matrix plate
+	// E,F,G,H,I(not all!): vfd plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
@@ -418,7 +420,7 @@ WRITE8_MEMBER(ssfball_state::plate_w)
 	m_inp_mux = (m_port[NEC_UCOM4_PORTF] >> 3 & 1) | (m_port[NEC_UCOM4_PORTG] >> 2 & 2);
 	m_speaker->level_w(m_inp_mux);
 
-	// E3: vfd matrix grid 8
+	// E3: vfd grid 8
 	if (offset == NEC_UCOM4_PORTE)
 		grid_w(space, offset, data >> 3 & 1);
 	else
@@ -430,7 +432,6 @@ READ8_MEMBER(ssfball_state::input_b_r)
 	// B: input port 2, where B3 is multiplexed
 	return m_inp_matrix[2]->read() | read_inputs(2);
 }
-
 
 // config
 
@@ -475,7 +476,7 @@ INPUT_PORTS_END
 
 static const s16 ssfball_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( ssfball )
+MACHINE_CONFIG_START(ssfball_state::ssfball)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, 400000) // approximation
@@ -532,13 +533,14 @@ public:
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_a_r);
+	void bmsoccer(machine_config &config);
 };
 
 // handlers
 
 void bmsoccer_state::prepare_display()
 {
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,8,4,0,9,5,1,10,6,2);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,8,4,0,9,5,1,10,6,2);
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -548,7 +550,7 @@ WRITE8_MEMBER(bmsoccer_state::grid_w)
 	if (offset == NEC_UCOM4_PORTC)
 		m_inp_mux = data & 3;
 
-	// C,D(,E3): vfd matrix grid
+	// C,D(,E3): vfd grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -560,7 +562,7 @@ WRITE8_MEMBER(bmsoccer_state::plate_w)
 	if (offset == NEC_UCOM4_PORTG)
 		m_speaker->level_w(data >> 3 & 1);
 
-	// E012,F012,G012,H,I: vfd matrix plate
+	// E012,F012,G012,H,I: vfd plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
@@ -576,7 +578,6 @@ READ8_MEMBER(bmsoccer_state::input_a_r)
 	// port A: multiplexed inputs
 	return read_inputs(2);
 }
-
 
 // config
 
@@ -603,7 +604,7 @@ static INPUT_PORTS_START( bmsoccer )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shoot")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bmsoccer )
+MACHINE_CONFIG_START(bmsoccer_state::bmsoccer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -655,20 +656,21 @@ public:
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
+	void bmsafari(machine_config &config);
 };
 
 // handlers
 
 void bmsafari_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
-	u16 plate = BITSWAP16(m_plate,15,14,13,12,11,7,10,2,9,5,8,4,0,1,6,3);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
+	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,7,10,2,9,5,8,4,0,1,6,3);
 	display_matrix(10, 9, plate, grid);
 }
 
 WRITE8_MEMBER(bmsafari_state::grid_w)
 {
-	// C,D(,E3): vfd matrix grid
+	// C,D(,E3): vfd grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -676,7 +678,7 @@ WRITE8_MEMBER(bmsafari_state::grid_w)
 
 WRITE8_MEMBER(bmsafari_state::plate_w)
 {
-	// E012,H,I: vfd matrix plate
+	// E012,H,I: vfd plate
 	int shift = (offset == NEC_UCOM4_PORTE) ? 8 : (offset - NEC_UCOM4_PORTH) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
@@ -692,7 +694,6 @@ WRITE8_MEMBER(bmsafari_state::speaker_w)
 	// G0: speaker out
 	m_speaker->level_w(data & 1);
 }
-
 
 // config
 
@@ -711,7 +712,7 @@ static INPUT_PORTS_START( bmsafari )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bmsafari )
+MACHINE_CONFIG_START(bmsafari_state::bmsafari)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -765,26 +766,27 @@ public:
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_b_r);
+	void splasfgt(machine_config &config);
 };
 
 // handlers
 
 void splasfgt_state::prepare_display()
 {
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
 	display_matrix(16, 9, plate, m_grid);
 }
 
 WRITE8_MEMBER(splasfgt_state::grid_w)
 {
-	// G,H,I0: vfd matrix grid
+	// G,H,I0: vfd grid
 	int shift = (offset - NEC_UCOM4_PORTG) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 
 	// G(grid 0-3): input mux
 	m_inp_mux = m_grid & 0xf;
 
-	// I2: vfd matrix plate 6
+	// I2: vfd plate 6
 	if (offset == NEC_UCOM4_PORTI)
 		plate_w(space, 4 + NEC_UCOM4_PORTC, data >> 2 & 1);
 	else
@@ -797,7 +799,7 @@ WRITE8_MEMBER(splasfgt_state::plate_w)
 	if (offset == NEC_UCOM4_PORTF)
 		m_speaker->level_w(data & 3);
 
-	// C,D,E,F23(,I2): vfd matrix plate
+	// C,D,E,F23(,I2): vfd plate
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -808,7 +810,6 @@ READ8_MEMBER(splasfgt_state::input_b_r)
 	// B: multiplexed buttons
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -861,7 +862,7 @@ INPUT_PORTS_END
 
 static const s16 splasfgt_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( splasfgt )
+MACHINE_CONFIG_START(splasfgt_state::splasfgt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, 400000) // approximation
@@ -917,14 +918,15 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void bcclimbr(machine_config &config);
 };
 
 // handlers
 
 void bcclimbr_state::prepare_display()
 {
-	u8 grid = BITSWAP8(m_grid,7,6,0,1,2,3,4,5);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,16,17,18,19,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	u8 grid = bitswap<8>(m_grid,7,6,0,1,2,3,4,5);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,16,17,18,19,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(20, 6, plate, grid);
 }
 
@@ -934,7 +936,7 @@ WRITE8_MEMBER(bcclimbr_state::grid_w)
 	if (offset == NEC_UCOM4_PORTI)
 		m_speaker->level_w(data >> 2 & 1);
 
-	// H,I01: vfd matrix grid
+	// H,I01: vfd grid
 	int shift = (offset - NEC_UCOM4_PORTH) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -942,12 +944,11 @@ WRITE8_MEMBER(bcclimbr_state::grid_w)
 
 WRITE8_MEMBER(bcclimbr_state::plate_w)
 {
-	// C,D,E,F: vfd matrix plate
+	// C,D,E,F: vfd plate
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
-
 
 // config
 
@@ -965,10 +966,10 @@ static INPUT_PORTS_START( bcclimbr )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bcclimbr )
+MACHINE_CONFIG_START(bcclimbr_state::bcclimbr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(bcclimbr_state, plate_w))
@@ -1023,6 +1024,7 @@ public:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_WRITE8_MEMBER(input_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void tactix(machine_config &config);
 };
 
 // handlers
@@ -1052,7 +1054,6 @@ READ8_MEMBER(tactix_state::input_r)
 	// A: multiplexed inputs
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -1088,7 +1089,7 @@ static INPUT_PORTS_START( tactix )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tactix )
+MACHINE_CONFIG_START(tactix_state::tactix)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D557L, 400000) // approximation
@@ -1135,14 +1136,15 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void invspace(machine_config &config);
 };
 
 // handlers
 
 void invspace_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,8,9,7,6,5,4,3,2,1,0);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,9,14,13,8,15,11,10,7,11,3,2,6,10,1,5,9,0,4,8);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,8,9,7,6,5,4,3,2,1,0);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,9,14,13,8,15,11,10,7,11,3,2,6,10,1,5,9,0,4,8);
 	display_matrix(19, 9, plate, grid);
 }
 
@@ -1152,7 +1154,7 @@ WRITE8_MEMBER(invspace_state::grid_w)
 	if (offset == NEC_UCOM4_PORTI)
 		m_speaker->level_w(data & 1);
 
-	// C,D,I1: vfd matrix grid
+	// C,D,I1: vfd grid
 	int shift = (offset == NEC_UCOM4_PORTI) ? 8 : (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -1160,12 +1162,11 @@ WRITE8_MEMBER(invspace_state::grid_w)
 
 WRITE8_MEMBER(invspace_state::plate_w)
 {
-	// E,F,G,H123: vfd matrix plate
+	// E,F,G,H123: vfd plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
-
 
 // config
 
@@ -1182,10 +1183,10 @@ static INPUT_PORTS_START( invspace )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( invspace )
+MACHINE_CONFIG_START(invspace_state::invspace)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D552, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D552, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(invspace_state, grid_w))
@@ -1237,13 +1238,14 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void efball(machine_config &config);
 };
 
 // handlers
 
 void efball_state::prepare_display()
 {
-	u16 plate = BITSWAP16(m_plate,15,14,13,12,11,4,3,0,2,1,6,10,9,5,8,7);
+	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,4,3,0,2,1,6,10,9,5,8,7);
 	display_matrix(11, 10, plate, m_grid);
 }
 
@@ -1253,7 +1255,7 @@ WRITE8_MEMBER(efball_state::grid_w)
 	if (offset == NEC_UCOM4_PORTH)
 		m_speaker->level_w(data >> 2 & 1);
 
-	// F,G,H01: vfd matrix grid
+	// F,G,H01: vfd grid
 	int shift = (offset - NEC_UCOM4_PORTF) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -1261,12 +1263,11 @@ WRITE8_MEMBER(efball_state::grid_w)
 
 WRITE8_MEMBER(efball_state::plate_w)
 {
-	// D,E,I: vfd matrix plate
+	// D,E,I: vfd plate
 	int shift = (offset == NEC_UCOM4_PORTI) ? 8 : (offset - NEC_UCOM4_PORTD) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
-
 
 // config
 
@@ -1298,10 +1299,10 @@ static INPUT_PORTS_START( efball )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( efball )
+MACHINE_CONFIG_START(efball_state::efball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_READ_C_CB(IOPORT("IN.2"))
@@ -1350,14 +1351,16 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void galaxy2b(machine_config &config);
+	void galaxy2(machine_config &config);
 };
 
 // handlers
 
 void galaxy2_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	u16 plate = BITSWAP16(m_plate,15,3,2,6,1,5,4,0,11,10,7,12,14,13,8,9);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u16 plate = bitswap<16>(m_plate,15,3,2,6,1,5,4,0,11,10,7,12,14,13,8,9);
 	display_matrix(15, 10, plate, grid);
 }
 
@@ -1367,7 +1370,7 @@ WRITE8_MEMBER(galaxy2_state::grid_w)
 	if (offset == NEC_UCOM4_PORTE)
 		m_speaker->level_w(data >> 3 & 1);
 
-	// C,D,E01: vfd matrix grid
+	// C,D,E01: vfd grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -1375,12 +1378,11 @@ WRITE8_MEMBER(galaxy2_state::grid_w)
 
 WRITE8_MEMBER(galaxy2_state::plate_w)
 {
-	// F,G,H,I: vfd matrix plate
+	// F,G,H,I: vfd plate
 	int shift = (offset - NEC_UCOM4_PORTF) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
-
 
 // config
 
@@ -1397,10 +1399,10 @@ static INPUT_PORTS_START( galaxy2 )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( galaxy2 )
+MACHINE_CONFIG_START(galaxy2_state::galaxy2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(galaxy2_state, grid_w))
@@ -1425,7 +1427,8 @@ static MACHINE_CONFIG_START( galaxy2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( galaxy2b, galaxy2 )
+MACHINE_CONFIG_START(galaxy2_state::galaxy2b)
+	galaxy2(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1461,20 +1464,21 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void astrocmd(machine_config &config);
 };
 
 // handlers
 
 void astrocmd_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
 	display_matrix(17, 9, plate, grid);
 }
 
 WRITE8_MEMBER(astrocmd_state::grid_w)
 {
-	// C,D(,E3): vfd matrix grid
+	// C,D(,E3): vfd grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -1482,7 +1486,7 @@ WRITE8_MEMBER(astrocmd_state::grid_w)
 
 WRITE8_MEMBER(astrocmd_state::plate_w)
 {
-	// E01,F,G,H,I: vfd matrix plate
+	// E01,F,G,H,I: vfd plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
@@ -1491,13 +1495,12 @@ WRITE8_MEMBER(astrocmd_state::plate_w)
 		// E2: speaker out
 		m_speaker->level_w(data >> 2 & 1);
 
-		// E3: vfd matrix grid 8
+		// E3: vfd grid 8
 		grid_w(space, offset, data >> 3 & 1);
 	}
 	else
 		prepare_display();
 }
-
 
 // config
 
@@ -1515,10 +1518,10 @@ static INPUT_PORTS_START( astrocmd )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( astrocmd )
+MACHINE_CONFIG_START(astrocmd_state::astrocmd)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(astrocmd_state, grid_w))
@@ -1570,13 +1573,14 @@ public:
 
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void edracula(machine_config &config);
 };
 
 // handlers
 
 WRITE8_MEMBER(edracula_state::grid_w)
 {
-	// C,D: vfd matrix grid
+	// C,D: vfd grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	display_matrix(18, 8, m_plate, m_grid);
@@ -1588,12 +1592,11 @@ WRITE8_MEMBER(edracula_state::plate_w)
 	if (offset == NEC_UCOM4_PORTI)
 		m_speaker->level_w(data >> 2 & 1);
 
-	// E,F,G,H,I01: vfd matrix plate
+	// E,F,G,H,I01: vfd plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	display_matrix(18, 8, m_plate, m_grid);
 }
-
 
 // config
 
@@ -1611,10 +1614,10 @@ static INPUT_PORTS_START( edracula )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( edracula )
+MACHINE_CONFIG_START(edracula_state::edracula)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(edracula_state, grid_w))
@@ -1663,6 +1666,7 @@ public:
 
 	DECLARE_WRITE32_MEMBER(lcd_output_w);
 	DECLARE_WRITE8_MEMBER(lcd_w);
+	void mcompgin(machine_config &config);
 };
 
 // handlers
@@ -1683,7 +1687,6 @@ WRITE8_MEMBER(mcompgin_state::lcd_w)
 	m_lcd->write_clock(data >> 1 & 1);
 }
 
-
 // config
 
 static INPUT_PORTS_START( mcompgin )
@@ -1699,10 +1702,10 @@ static INPUT_PORTS_START( mcompgin )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mcompgin )
+MACHINE_CONFIG_START(mcompgin_state::mcompgin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D650, XTAL_400kHz) // TDK FCR400K
+	MCFG_CPU_ADD("maincpu", NEC_D650, 400_kHz_XTAL) // TDK FCR400K
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_E_CB(WRITE8(mcompgin_state, lcd_w))
@@ -1740,20 +1743,21 @@ public:
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
+	void mvbfree(machine_config &config);
 };
 
 // handlers
 
 void mvbfree_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
-	u16 plate = BITSWAP16(m_plate,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u16 grid = bitswap<16>(m_grid,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
 	display_matrix(10, 14, plate, grid);
 }
 
 WRITE8_MEMBER(mvbfree_state::grid_w)
 {
-	// E23,F,G,H: vfd matrix grid
+	// E23,F,G,H: vfd grid
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 
@@ -1766,7 +1770,7 @@ WRITE8_MEMBER(mvbfree_state::grid_w)
 
 WRITE8_MEMBER(mvbfree_state::plate_w)
 {
-	// C,D(,E01): vfd matrix plate
+	// C,D(,E01): vfd plate
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -1777,7 +1781,6 @@ WRITE8_MEMBER(mvbfree_state::speaker_w)
 	// I0: speaker out
 	m_speaker->level_w(data & 1);
 }
-
 
 // config
 
@@ -1796,7 +1799,7 @@ static INPUT_PORTS_START( mvbfree )
 	PORT_CONFSETTING(    0x08, "3" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mvbfree )
+MACHINE_CONFIG_START(mvbfree_state::mvbfree)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, 400000) // approximation
@@ -1851,6 +1854,7 @@ public:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_WRITE8_MEMBER(input_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void grobot9(machine_config &config);
 };
 
 // handlers
@@ -1883,7 +1887,6 @@ READ8_MEMBER(grobot9_state::input_r)
 	return read_inputs(5);
 }
 
-
 // config
 
 static INPUT_PORTS_START( grobot9 )
@@ -1915,7 +1918,7 @@ static INPUT_PORTS_START( grobot9 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, single_interrupt_line, nullptr) PORT_NAME("Start-Pitch")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( grobot9 )
+MACHINE_CONFIG_START(grobot9_state::grobot9)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D557L, 160000) // approximation
@@ -1961,14 +1964,15 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void tccombat(machine_config &config);
 };
 
 // handlers
 
 void tccombat_state::prepare_display()
 {
-	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,3,2,1,0,7,6,5,4);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,11,15,3,10,14,2,9,13,1,0,12,8,15,1,5,0,3,7,2,6);
+	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,3,2,1,0,7,6,5,4);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,11,15,3,10,14,2,9,13,1,0,12,8,15,1,5,0,3,7,2,6);
 	display_matrix(20, 9, plate, grid);
 }
 
@@ -1978,7 +1982,7 @@ WRITE8_MEMBER(tccombat_state::grid_w)
 	if (offset == NEC_UCOM4_PORTI)
 		m_speaker->level_w(data >> 1 & 1);
 
-	// C,D,I0: vfd matrix grid
+	// C,D,I0: vfd grid
 	int shift = (offset == NEC_UCOM4_PORTI) ? 8 : (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -1986,12 +1990,11 @@ WRITE8_MEMBER(tccombat_state::grid_w)
 
 WRITE8_MEMBER(tccombat_state::plate_w)
 {
-	// E,F123,G,H: vfd matrix plate
+	// E,F123,G,H: vfd plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
-
 
 // config
 
@@ -2005,7 +2008,7 @@ static INPUT_PORTS_START( tccombat )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tccombat )
+MACHINE_CONFIG_START(tccombat_state::tccombat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -2065,6 +2068,7 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
+	void tmtennis(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -2074,7 +2078,7 @@ protected:
 
 WRITE8_MEMBER(tmtennis_state::grid_w)
 {
-	// G,H,I: vfd matrix grid
+	// G,H,I: vfd grid
 	int shift = (offset - NEC_UCOM4_PORTG) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	display_matrix(12, 12, m_plate, m_grid);
@@ -2082,7 +2086,7 @@ WRITE8_MEMBER(tmtennis_state::grid_w)
 
 WRITE8_MEMBER(tmtennis_state::plate_w)
 {
-	// C,D,F: vfd matrix plate
+	// C,D,F: vfd plate
 	int shift = (offset == NEC_UCOM4_PORTF) ? 8 : (offset - NEC_UCOM4_PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	display_matrix(12, 12, m_plate, m_grid);
@@ -2102,7 +2106,6 @@ READ8_MEMBER(tmtennis_state::input_r)
 	// A,B: multiplexed buttons
 	return ~read_inputs(2) >> (offset*4);
 }
-
 
 // config
 
@@ -2162,7 +2165,7 @@ void tmtennis_state::machine_reset()
 	set_clock();
 }
 
-static MACHINE_CONFIG_START( tmtennis )
+MACHINE_CONFIG_START(tmtennis_state::tmtennis)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 360000) // see set_clock
@@ -2223,20 +2226,21 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void tmpacman(machine_config &config);
 };
 
 // handlers
 
 void tmpacman_state::prepare_display()
 {
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15) | 0x100;
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15) | 0x100;
 	display_matrix(19, 8, plate, grid);
 }
 
 WRITE8_MEMBER(tmpacman_state::grid_w)
 {
-	// C,D: vfd matrix grid
+	// C,D: vfd grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -2248,12 +2252,11 @@ WRITE8_MEMBER(tmpacman_state::plate_w)
 	if (offset == NEC_UCOM4_PORTE)
 		m_speaker->level_w(data >> 1 & 1);
 
-	// E023,F,G,H,I: vfd matrix plate
+	// E023,F,G,H,I: vfd plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
-
 
 // config
 
@@ -2271,10 +2274,10 @@ static INPUT_PORTS_START( tmpacman )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tmpacman )
+MACHINE_CONFIG_START(tmpacman_state::tmpacman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_430kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 430_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(tmpacman_state, grid_w))
@@ -2328,13 +2331,14 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void tmscramb(machine_config &config);
 };
 
 // handlers
 
 void tmscramb_state::prepare_display()
 {
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,3,15,2,14,1,13,16,0,12,8,4,9,5,10,6,11,7) | 0x400;
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,3,15,2,14,1,13,16,0,12,8,4,9,5,10,6,11,7) | 0x400;
 	display_matrix(17, 10, plate, m_grid);
 }
 
@@ -2344,7 +2348,7 @@ WRITE8_MEMBER(tmscramb_state::grid_w)
 	if (offset == NEC_UCOM4_PORTI)
 		m_speaker->level_w(data >> 2 & 1);
 
-	// C,D,I01: vfd matrix grid
+	// C,D,I01: vfd grid
 	int shift = (offset == NEC_UCOM4_PORTI) ? 8 : (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -2352,12 +2356,11 @@ WRITE8_MEMBER(tmscramb_state::grid_w)
 
 WRITE8_MEMBER(tmscramb_state::plate_w)
 {
-	// E,F,G,H: vfd matrix plate
+	// E,F,G,H: vfd plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
-
 
 // config
 
@@ -2374,10 +2377,10 @@ static INPUT_PORTS_START( tmscramb )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tmscramb )
+MACHINE_CONFIG_START(tmscramb_state::tmscramb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(tmscramb_state, grid_w))
@@ -2430,20 +2433,21 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void tcaveman(machine_config &config);
 };
 
 // handlers
 
 void tcaveman_state::prepare_display()
 {
-	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,10,11,5,6,7,8,0,9,2,18,17,16,3,15,14,13,12,4,1) | 0x40;
+	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,10,11,5,6,7,8,0,9,2,18,17,16,3,15,14,13,12,4,1) | 0x40;
 	display_matrix(19, 8, plate, grid);
 }
 
 WRITE8_MEMBER(tcaveman_state::grid_w)
 {
-	// C,D: vfd matrix grid
+	// C,D: vfd grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
@@ -2455,12 +2459,11 @@ WRITE8_MEMBER(tcaveman_state::plate_w)
 	if (offset == NEC_UCOM4_PORTE)
 		m_speaker->level_w(data >> 3 & 1);
 
-	// E012,F,G,H,I: vfd matrix plate
+	// E012,F,G,H,I: vfd plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
-
 
 // config
 
@@ -2474,10 +2477,10 @@ static INPUT_PORTS_START( tcaveman )
 	PORT_CONFSETTING(    0x08, "Professional" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tcaveman )
+MACHINE_CONFIG_START(tcaveman_state::tcaveman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(tcaveman_state, grid_w))
 	MCFG_UCOM4_WRITE_D_CB(WRITE8(tcaveman_state, grid_w))
@@ -2529,6 +2532,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void alnchase(machine_config &config);
 };
 
 // handlers
@@ -2537,7 +2541,7 @@ WRITE8_MEMBER(alnchase_state::output_w)
 {
 	if (offset <= NEC_UCOM4_PORTE)
 	{
-		// C,D,E0: vfd matrix grid
+		// C,D,E0: vfd grid
 		int shift = (offset - NEC_UCOM4_PORTC) * 4;
 		m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 
@@ -2552,7 +2556,7 @@ WRITE8_MEMBER(alnchase_state::output_w)
 
 	if (offset >= NEC_UCOM4_PORTE)
 	{
-		// E23,F,G,H,I: vfd matrix plate
+		// E23,F,G,H,I: vfd plate
 		int shift = (offset - NEC_UCOM4_PORTE) * 4;
 		m_plate = ((m_plate << 2 & ~(0xf << shift)) | (data << shift)) >> 2;
 	}
@@ -2565,7 +2569,6 @@ READ8_MEMBER(alnchase_state::input_r)
 	// A: multiplexed buttons
 	return read_inputs(2);
 }
-
 
 // config
 
@@ -2606,10 +2609,10 @@ static INPUT_PORTS_START( alnchase )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( alnchase )
+MACHINE_CONFIG_START(alnchase_state::alnchase)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(READ8(alnchase_state, input_r))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.2"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(alnchase_state, output_w))

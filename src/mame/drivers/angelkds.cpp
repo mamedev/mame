@@ -165,7 +165,7 @@ contain a level.
 
 */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, angelkds_state )
+ADDRESS_MAP_START(angelkds_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -173,8 +173,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, angelkds_state )
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(angelkds_bgbotvideoram_w) AM_SHARE("bgbotvideoram") /* Bottom Half of Screen */
 	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(angelkds_txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xec00, 0xecff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xed00, 0xedff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xee00, 0xeeff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xed00, 0xedff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xee00, 0xeeff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xef00, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(angelkds_bgtopbank_write)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(angelkds_bgtopscroll_write)
@@ -184,12 +184,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, angelkds_state )
 	AM_RANGE(0xf005, 0xf005) AM_WRITE(angelkds_layer_ctrl_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, angelkds_state )
+ADDRESS_MAP_START(angelkds_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, angelkds_state )
+ADDRESS_MAP_START(angelkds_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP // 00 on start-up, not again
 
@@ -205,7 +205,7 @@ ADDRESS_MAP_END
 
 /* sub cpu */
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, angelkds_state )
+ADDRESS_MAP_START(angelkds_state::sub_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xaaa9, 0xaaa9) AM_READNOP
@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, angelkds_state )
 	AM_RANGE(0xaaac, 0xaaac) AM_READNOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_portmap, AS_IO, 8, angelkds_state )
+ADDRESS_MAP_START(angelkds_state::sub_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
@@ -511,14 +511,14 @@ void angelkds_state::machine_reset()
 	m_bgtopbank = 0;
 }
 
-static MACHINE_CONFIG_START( angelkds )
+MACHINE_CONFIG_START(angelkds_state::angelkds)
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(6'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("sub", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(sub_portmap)
 
@@ -551,27 +551,28 @@ static MACHINE_CONFIG_START( angelkds )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_4MHz)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(4'000'000))
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.65)
 	MCFG_SOUND_ROUTE(1, "mono", 0.65)
 	MCFG_SOUND_ROUTE(2, "mono", 0.65)
 	MCFG_SOUND_ROUTE(3, "mono", 0.45)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_4MHz)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(0, "mono", 0.65)
 	MCFG_SOUND_ROUTE(1, "mono", 0.65)
 	MCFG_SOUND_ROUTE(2, "mono", 0.65)
 	MCFG_SOUND_ROUTE(3, "mono", 0.45)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( spcpostn, angelkds )
+MACHINE_CONFIG_START(angelkds_state::spcpostn)
+	angelkds(config);
 	/* encryption */
-	MCFG_CPU_REPLACE("maincpu", SEGA_317_0005, XTAL_6MHz)
+	MCFG_CPU_REPLACE("maincpu", SEGA_317_0005, XTAL(6'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
 MACHINE_CONFIG_END

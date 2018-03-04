@@ -189,7 +189,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 
 					if (card)
 					{
-						return card->read_c0nx(space, offset & 0x0f);
+						return card->read_c0nx(offset & 0x0f);
 					}
 
 					return 0xff;
@@ -212,7 +212,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 
 			if (card)
 			{
-				return card->read_cnxx(space, offset & 0xff);
+				return card->read_cnxx(offset & 0xff);
 			}
 		}
 		break;
@@ -303,7 +303,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 
 					if (card)
 					{
-						return card->write_c0nx(space, offset & 0x0f, data);
+						return card->write_c0nx(offset & 0x0f, data);
 					}
 				}
 				break;
@@ -324,7 +324,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 
 			if (card)
 			{
-				return card->write_cnxx(space, offset & 0xff, data);
+				return card->write_cnxx(offset & 0xff, data);
 			}
 		}
 		break;

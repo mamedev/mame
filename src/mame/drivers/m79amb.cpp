@@ -118,7 +118,7 @@ WRITE8_MEMBER(m79amb_state::m79amb_8002_w)
 	output().set_value("EXP_LAMP", data ? 1 : 0);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, m79amb_state )
+ADDRESS_MAP_START(m79amb_state::main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(ramtek_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x6000, 0x63ff) AM_RAM                 /* ?? */
@@ -189,10 +189,10 @@ INTERRUPT_GEN_MEMBER(m79amb_state::m79amb_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);  /* RST 08h */
 }
 
-static MACHINE_CONFIG_START( m79amb )
+MACHINE_CONFIG_START(m79amb_state::m79amb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_19_6608MHz / 10)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(19'660'800) / 10)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m79amb_state,  m79amb_interrupt)
 

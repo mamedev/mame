@@ -152,7 +152,7 @@ WRITE_LINE_MEMBER(circusc_state::irq_mask_w)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( circusc_map, AS_PROGRAM, 8, circusc_state )
+ADDRESS_MAP_START(circusc_state::circusc_map)
 	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x03f8) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x0400, 0x0400) AM_MIRROR(0x03ff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* WDOG */
 	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x03ff) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)              /* SOUND DATA */
@@ -173,7 +173,7 @@ static ADDRESS_MAP_START( circusc_map, AS_PROGRAM, 8, circusc_state )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, circusc_state )
+ADDRESS_MAP_START(circusc_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)       /* CS0 */
@@ -341,7 +341,7 @@ INTERRUPT_GEN_MEMBER(circusc_state::vblank_irq)
 		device.execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( circusc )
+MACHINE_CONFIG_START(circusc_state::circusc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 2048000)        /* 2 MHz? */
@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( circusc )
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -382,10 +382,10 @@ static MACHINE_CONFIG_START( circusc )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("sn1", SN76496, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ADD("sn1", SN76496, XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 0)
 
-	MCFG_SOUND_ADD("sn2", SN76496, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ADD("sn2", SN76496, XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 1)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 2) // ls374.7g + r44+r45+r47+r48+r50+r56+r57+r58+r59 (20k) + r46+r49+r51+r52+r53+r54+r55 (10k) + upc324.3h

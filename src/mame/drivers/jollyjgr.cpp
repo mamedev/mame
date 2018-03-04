@@ -174,6 +174,10 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_bm_palette;
+	void fspider(machine_config &config);
+	void jollyjgr(machine_config &config);
+	void fspider_map(address_map &map);
+	void jollyjgr_map(address_map &map);
 };
 
 
@@ -237,7 +241,7 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_coin_lookout_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( jollyjgr_map, AS_PROGRAM, 8, jollyjgr_state )
+ADDRESS_MAP_START(jollyjgr_state::jollyjgr_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8ff8, 0x8ff8) AM_READ_PORT("DSW1")
@@ -254,7 +258,7 @@ static ADDRESS_MAP_START( jollyjgr_map, AS_PROGRAM, 8, jollyjgr_state )
 	AM_RANGE(0xa000, 0xffff) AM_RAM AM_SHARE("bitmap")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fspider_map, AS_PROGRAM, 8, jollyjgr_state )
+ADDRESS_MAP_START(jollyjgr_state::fspider_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8ff8, 0x8ff8) AM_READ_PORT("DSW1")
@@ -670,9 +674,9 @@ void jollyjgr_state::machine_reset()
 	m_tilemap_bank = 0;
 }
 
-static MACHINE_CONFIG_START( jollyjgr )
+MACHINE_CONFIG_START(jollyjgr_state::jollyjgr)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6)  /* 3MHz verified */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'000'000)/6)  /* 3MHz verified */
 	MCFG_CPU_PROGRAM_MAP(jollyjgr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jollyjgr_state,  jollyjgr_interrupt)
 
@@ -692,11 +696,12 @@ static MACHINE_CONFIG_START( jollyjgr )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_3_579545MHz/2) /* 1.7897725MHz verified */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(3'579'545)/2) /* 1.7897725MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fspider, jollyjgr )
+MACHINE_CONFIG_START(jollyjgr_state::fspider)
+	jollyjgr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fspider_map)
 

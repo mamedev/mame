@@ -227,7 +227,7 @@ WRITE16_MEMBER( dm7000_state::dm7000_enet_w )
  400f 0xxx   IDE Controller
 
 */
-static ADDRESS_MAP_START( dm7000_mem, AS_PROGRAM, 32, dm7000_state )
+ADDRESS_MAP_START(dm7000_state::dm7000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM                                     // RAM page 0 - 32MB
 	AM_RANGE(0x20000000, 0x21ffffff) AM_RAM                                     // RAM page 1 - 32MB
@@ -300,7 +300,7 @@ void dm7000_state::kbd_put(u8 data)
 	m_scc0_lsr = 1;
 }
 
-static MACHINE_CONFIG_START( dm7000 )
+MACHINE_CONFIG_START(dm7000_state::dm7000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",PPC405GP, 252000000 / 10) // Should be PPC405D4?
 	// Slowed down 10 times in order to get normal response for now

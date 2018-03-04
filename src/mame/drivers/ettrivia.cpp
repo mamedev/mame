@@ -75,6 +75,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device_array<ay8912_device, 3> m_ay;
+	void ettrivia(machine_config &config);
+	void cpu_map(address_map &map);
+	void io_map(address_map &map);
 };
 
 
@@ -152,7 +155,7 @@ WRITE8_MEMBER(ettrivia_state::b800_w)
 	m_b800_prev = data;
 }
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, ettrivia_state )
+ADDRESS_MAP_START(ettrivia_state::cpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(ettrivia_control_w)
@@ -164,7 +167,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, ettrivia_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ettrivia_bg_w) AM_SHARE("bg_videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, ettrivia_state )
+ADDRESS_MAP_START(ettrivia_state::io_map)
 	AM_RANGE(0x0000, 0xffff) AM_READ(ettrivia_question_r)
 ADDRESS_MAP_END
 
@@ -262,7 +265,7 @@ PALETTE_INIT_MEMBER(ettrivia_state, ettrivia)
 		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
 		b = combine_2_weights(weights, bit0, bit1);
 
-		palette.set_pen_color(BITSWAP8(i,5,7,6,2,1,0,4,3), rgb_t(r, g, b));
+		palette.set_pen_color(bitswap<8>(i,5,7,6,2,1,0,4,3), rgb_t(r, g, b));
 	}
 }
 
@@ -289,7 +292,7 @@ INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( ettrivia )
+MACHINE_CONFIG_START(ettrivia_state::ettrivia)
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)

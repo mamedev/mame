@@ -186,11 +186,11 @@ READ8_MEMBER( prof180x_state::status_r )
 
 /* Address Maps */
 
-static ADDRESS_MAP_START( prof180x_mem, AS_PROGRAM, 8, prof180x_state )
+ADDRESS_MAP_START(prof180x_state::prof180x_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prof180x_io , AS_IO, 8, prof180x_state )
+ADDRESS_MAP_START(prof180x_state::prof180x_io)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(flr_w)
 	AM_RANGE(0x09, 0x09) AM_SELECT(0xff00) AM_READ(status_r)
 	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xff00) AM_DEVREADWRITE(FDC9268_TAG, upd765a_device, mdma_r, mdma_w)
@@ -234,9 +234,9 @@ void prof180x_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( prof180x )
+MACHINE_CONFIG_START(prof180x_state::prof180x)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(HD64180_TAG, Z80, XTAL_9_216MHz)
+	MCFG_CPU_ADD(HD64180_TAG, Z80, XTAL(9'216'000))
 	MCFG_CPU_PROGRAM_MAP(prof180x_mem)
 	MCFG_CPU_IO_MAP(prof180x_io)
 

@@ -10,12 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/resnet.h"
 #include "includes/popeye.h"
-
-static const size_t popeye_bitmapram_size = 0x2000;
-
-enum { TYPE_SKYSKIPR, TYPE_POPEYE };
 
 #define USE_NEW_COLOR (1)
 
@@ -59,7 +54,7 @@ enum { TYPE_SKYSKIPR, TYPE_POPEYE };
 
 ***************************************************************************/
 
-static const res_net_decode_info popeye_7051_decode_info =
+const res_net_decode_info tnx1_state::mb7051_decode_info =
 {
 	1,      /*  one prom 5 lines */
 	0,      /*  start at 0 */
@@ -67,283 +62,238 @@ static const res_net_decode_info popeye_7051_decode_info =
 	/*  R,   G,   B,  */
 	{   0,   0,   0 },      /*  offsets */
 	{   0,   3,   6 },      /*  shifts */
-	{0x07,0x07,0x03 }           /*  masks */
+	{0x07,0x07,0x03 }       /*  masks */
 };
 
-static const res_net_decode_info popeye_7052_decode_info =
+const res_net_decode_info tnx1_state::mb7052_decode_info =
 {
-	2,      /*  there may be two proms needed to construct color */
+	1,      /*  two 4 bit proms */
 	0,      /*  start at 0 */
-	255,    /*  end at 255 */
-	/*  R,   G,   B,   R,   G,   B */
-	{   0,   0,   0, 256, 256, 256},        /*  offsets */
-	{   0,   3,   0,   0,  -1,   2},        /*  shifts */
-	{0x07,0x01,0x00,0x00,0x06,0x03}         /*  masks */
+	31,     /*  end at 31 (banked) */
+	/*  R,   G,   B */
+	{   0,   0,   0},       /*  offsets */
+	{   0,   3,   6},       /*  shifts */
+	{0x07,0x07,0x03}        /*  masks */
 };
 
-static const res_net_info popeye_7051_txt_net_info =
+const res_net_info tnx1_state::txt_mb7051_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_MB7051 | RES_NET_MONITOR_SANYO_EZV20,
 	{
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  470, 220,   0 } }  /*  popeye */
+		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  470, 220,   0 } }
 	}
 };
 
-static const res_net_info popeye_7051_bck_net_info =
+const res_net_info tnx1_state::bak_mb7051_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_MB7051 | RES_NET_MONITOR_SANYO_EZV20,
 	{
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1200, 680, 470 } },
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1200, 680, 470 } },
-		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  680, 470,   0 } }  /*  popeye */
+		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  680, 470,   0 } }
 	}
 };
 
-
-static const res_net_info popeye_7052_obj_net_info =
+const res_net_info tnx1_state::obj_mb7052_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_MB7052 |  RES_NET_MONITOR_SANYO_EZV20,
 	{
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  470, 220,   0 } }  /*  popeye */
+		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  470, 220,   0 } }
 	}
 };
 
 
-void popeye_state::convert_color_prom(const uint8_t *color_prom)
+PALETTE_INIT_MEMBER(tpp1_state, palette_init)
 {
-	int i;
-
-
-	/* palette entries 0-15 are directly used by the background and changed at runtime */
-	color_prom += 32;
-
-	/* characters */
-#if USE_NEW_COLOR
-	for (i = 0; i < 16; i++)
+	/* Two of the PROM address pins are tied together */
+	for (int i = 0; i < 0x20; i++)
 	{
-		int prom_offs = i | ((i & 8) << 1); /* address bits 3 and 4 are tied together */
-		int r, g, b;
-		r = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 0) & 0x07, 0, popeye_7051_txt_net_info);
-		g = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 3) & 0x07, 1, popeye_7051_txt_net_info);
-		b = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 6) & 0x03, 2, popeye_7051_txt_net_info);
-		m_palette->set_pen_color(16 + (2 * i) + 0,rgb_t(0,0,0));
-		m_palette->set_pen_color(16 + (2 * i) + 1,rgb_t(r,g,b));
+		int color = (i & 0xf) | ((i & 0x8) << 1);
+		m_color_prom[i + 0x20] = m_color_prom[color + 0x20];
 	}
 
-#else
-	for (i = 0;i < 16;i++)
-	{
-		int prom_offs = i | ((i & 8) << 1); /* address bits 3 and 4 are tied together */
-		int bit0,bit1,bit2,r,g,b;
+	m_palette_bank_cache = -1;
 
-		/* red component */
-		bit0 = ((color_prom[prom_offs] ^ m_invertmask) >> 0) & 0x01;
-		bit1 = ((color_prom[prom_offs] ^ m_invertmask) >> 1) & 0x01;
-		bit2 = ((color_prom[prom_offs] ^ m_invertmask) >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = ((color_prom[prom_offs] ^ m_invertmask) >> 3) & 0x01;
-		bit1 = ((color_prom[prom_offs] ^ m_invertmask) >> 4) & 0x01;
-		bit2 = ((color_prom[prom_offs] ^ m_invertmask) >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = 0;
-		bit1 = ((color_prom[prom_offs] ^ m_invertmask) >> 6) & 0x01;
-		bit2 = ((color_prom[prom_offs] ^ m_invertmask) >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		m_palette->set_pen_color(16 + (2 * i) + 1,rgb_t(r,g,b));
-	}
-#endif
-
-#if USE_NEW_COLOR
-	/* sprites */
-	std::vector<rgb_t> rgb;
-	uint8_t cpi[512];
-
-	for (i=0; i<512; i++)
-		cpi[i] = m_color_prom_spr[i] ^ m_invertmask;
-
-	compute_res_net_all(rgb, &cpi[0], popeye_7052_decode_info, popeye_7052_obj_net_info);
-	m_palette->set_pen_colors(48, rgb);
-#else
-	for (i = 0;i < 256;i++)
-	{
-		int bit0,bit1,bit2,r,g,b;
-
-
-		/* red component */
-		bit0 = ((m_color_prom_spr[0] ^ m_invertmask) >> 0) & 0x01;
-		bit1 = ((m_color_prom_spr[0] ^ m_invertmask) >> 1) & 0x01;
-		bit2 = ((m_color_prom_spr[0] ^ m_invertmask) >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = ((m_color_prom_spr[0] ^ m_invertmask) >> 3) & 0x01;
-		bit1 = ((m_color_prom_spr[256] ^ m_invertmask) >> 0) & 0x01;
-		bit2 = ((m_color_prom_spr[256] ^ m_invertmask) >> 1) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = 0;
-		bit1 = ((m_color_prom_spr[256] ^ m_invertmask) >> 2) & 0x01;
-		bit2 = ((m_color_prom_spr[256] ^ m_invertmask) >> 3) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		m_palette->set_pen_color(48+i,rgb_t(r,g,b));
-
-		m_color_prom_spr++;
-	}
-#endif
+	update_palette();
 }
 
-PALETTE_INIT_MEMBER(popeye_state, popeye)
-{
-	m_invertmask = (USE_NEW_COLOR) ? 0x00 : 0xff;
-
-	convert_color_prom(m_color_prom);
-}
-
-PALETTE_INIT_MEMBER(popeye_state,popeyebl)
-{
-	m_invertmask = (USE_NEW_COLOR) ? 0xff : 0x00;
-
-	convert_color_prom(m_color_prom);
-}
-
-PALETTE_INIT_MEMBER(popeye_state, skyskipr)
+PALETTE_INIT_MEMBER(tnx1_state, palette_init)
 {
 	/* Two of the PROM address pins are tied together and one is not connected... */
 	for (int i = 0;i < 0x100;i++)
 	{
 		int color = (i & 0x3f) | ((i & 0x20) << 1);
 		m_color_prom_spr[i] = m_color_prom_spr[color];
-		m_color_prom_spr[i+0x100] = m_color_prom_spr[color+0x100];
 	}
 
-	m_invertmask = (USE_NEW_COLOR) ? 0x00 : 0xff;
+	m_palette_bank_cache = -1;
 
-	convert_color_prom(m_color_prom);
+	update_palette();
 }
 
-
-
-
-void popeye_state::set_background_palette(int bank)
+void tnx1_state::update_palette()
 {
-	int i;
-	uint8_t *color_prom = m_color_prom + 16 * bank;
+	if ((m_palette_bank ^ m_palette_bank_cache) & 0x08)
+	{
+		uint8_t *color_prom = m_color_prom + 16 * ((m_palette_bank & 0x08) >> 3);
 
 #if USE_NEW_COLOR
-	uint8_t cpi[16];
-	std::vector<rgb_t> rgb;
-	for (i=0; i<16; i++)
-		cpi[i] = color_prom[i] ^ m_invertmask;
+		std::vector<rgb_t> rgb;
 
-	compute_res_net_all(rgb, &cpi[0], popeye_7051_decode_info, popeye_7051_bck_net_info);
-	m_palette->set_pen_colors(0, rgb);
-
+		compute_res_net_all(rgb, color_prom, mb7051_decode_info, bak_mb7051_net_info);
+		m_palette->set_pen_colors(0, rgb);
 #else
-	for (i = 0;i < 16;i++)
-	{
-		int bit0,bit1,bit2;
-		int r,g,b;
-
-		/* red component */
-		bit0 = ((color_prom[0] ^ m_invertmask) >> 0) & 0x01;
-		bit1 = ((color_prom[0] ^ m_invertmask) >> 1) & 0x01;
-		bit2 = ((color_prom[0] ^ m_invertmask) >> 2) & 0x01;
-		r = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
-		/* green component */
-		bit0 = ((color_prom[0] ^ m_invertmask) >> 3) & 0x01;
-		bit1 = ((color_prom[0] ^ m_invertmask) >> 4) & 0x01;
-		bit2 = ((color_prom[0] ^ m_invertmask) >> 5) & 0x01;
-		g = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
-		/* blue component */
-		bit0 = 0;
-		bit1 = ((color_prom[0] ^ m_invertmask) >> 6) & 0x01;
-		bit2 = ((color_prom[0] ^ m_invertmask) >> 7) & 0x01;
-		if (m_bitmap_type == TYPE_SKYSKIPR)
+		for (int i = 0; i < 16; i++)
 		{
-			/* Sky Skipper has different weights */
-			bit0 = bit1;
-			bit1 = 0;
+			/* red component */
+			int bit0 = (~color_prom[i] >> 0) & 0x01;
+			int bit1 = (~color_prom[i] >> 1) & 0x01;
+			int bit2 = (~color_prom[i] >> 2) & 0x01;
+			int r = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
+			/* green component */
+			bit0 = (~color_prom[i] >> 3) & 0x01;
+			bit1 = (~color_prom[i] >> 4) & 0x01;
+			bit2 = (~color_prom[i] >> 5) & 0x01;
+			int g = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
+			/* blue component */
+			bit0 = 0;
+			bit1 = (~color_prom[i] >> 6) & 0x01;
+			bit2 = (~color_prom[i] >> 7) & 0x01;
+			//if (m_bitmap_type == TYPE_TNX1)
+			//{
+			//  /* Sky Skipper has different weights */
+			//  bit0 = bit1;
+			//  bit1 = 0;
+			//}
+			int b = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
+
+			m_palette->set_pen_color(i, rgb_t(r, g, b));
 		}
-		b = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
-
-		m_palette->set_pen_color(i,rgb_t(r,g,b));
-
-		color_prom++;
-	}
 #endif
+	}
+
+	if ((m_palette_bank ^ m_palette_bank_cache) & 0x08)
+	{
+		uint8_t *color_prom = m_color_prom + 32 + 16 * ((m_palette_bank & 0x08) >> 3);
+
+		/* characters */
+#if USE_NEW_COLOR
+		for (int i = 0; i < 16; i++)
+		{
+			int r = compute_res_net((color_prom[i] >> 0) & 0x07, 0, txt_mb7051_net_info);
+			int g = compute_res_net((color_prom[i] >> 3) & 0x07, 1, txt_mb7051_net_info);
+			int b = compute_res_net((color_prom[i] >> 6) & 0x03, 2, txt_mb7051_net_info);
+			m_palette->set_pen_color(16 + (2 * i) + 0, rgb_t(0, 0, 0));
+			m_palette->set_pen_color(16 + (2 * i) + 1, rgb_t(r, g, b));
+		}
+#else
+		for (int i = 0; i < 16; i++)
+		{
+			/* red component */
+			int bit0 = (~color_prom[i] >> 0) & 0x01;
+			int bit1 = (~color_prom[i] >> 1) & 0x01;
+			int bit2 = (~color_prom[i] >> 2) & 0x01;
+			int r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+			/* green component */
+			bit0 = (~color_prom[i] >> 3) & 0x01;
+			bit1 = (~color_prom[i] >> 4) & 0x01;
+			bit2 = (~color_prom[i] >> 5) & 0x01;
+			int g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+			/* blue component */
+			bit0 = 0;
+			bit1 = (~color_prom[i] >> 6) & 0x01;
+			bit2 = (~color_prom[i] >> 7) & 0x01;
+			int b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+			m_palette->set_pen_color(16 + (2 * i) + 1, rgb_t(r, g, b));
+		}
+#endif
+	}
+
+	if ((m_palette_bank ^ m_palette_bank_cache) & 0x07)
+	{
+		uint8_t *color_prom = m_color_prom_spr + 32 * (m_palette_bank & 0x07);
+
+#if USE_NEW_COLOR
+		/* sprites */
+		std::vector<rgb_t> rgb;
+		compute_res_net_all(rgb, color_prom, mb7052_decode_info, obj_mb7052_net_info);
+		m_palette->set_pen_colors(48, rgb);
+#else
+		for (int i = 0; i < 32; i++)
+		{
+			int bit0, bit1, bit2, r, g, b;
+
+			/* red component */
+			bit0 = (~color_prom[i] >> 0) & 0x01;
+			bit1 = (~color_prom[i] >> 1) & 0x01;
+			bit2 = (~color_prom[i] >> 2) & 0x01;
+			r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+			/* green component */
+			bit0 = (~color_prom[i] >> 3) & 0x01;
+			bit1 = (~color_prom[i] >> 4) & 0x01;
+			bit2 = (~color_prom[i] >> 5) & 0x01;
+			g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+			/* blue component */
+			bit0 = 0;
+			bit1 = (~color_prom[i] >> 6) & 0x01;
+			bit2 = (~color_prom[i] >> 7) & 0x01;
+			b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+			m_palette->set_pen_color(48 + i, rgb_t(r, g, b));
+		}
+#endif
+	}
+
+	m_palette_bank_cache = m_palette_bank;
 }
 
-WRITE8_MEMBER(popeye_state::popeye_videoram_w)
+WRITE8_MEMBER(tnx1_state::background_w)
+{
+	// TODO: confirm the memory layout
+	bool lsn = (data & 0x80) == 0;
+	if (lsn)
+	{
+		m_background_ram[offset] = (m_background_ram[offset] & 0xf0) | (data & 0xf);
+	}
+	else
+	{
+		m_background_ram[offset] = (m_background_ram[offset] & 0x0f) | (data << 4);
+	}
+}
+
+WRITE8_MEMBER(tpp2_state::background_w)
+{
+	// TODO: confirm the memory layout
+	bool lsn = (offset & 0x40) == 0;
+	offset = (offset & 0x3f) | ((offset & ~0x7f) >> 1);
+	if (lsn)
+	{
+		m_background_ram[offset] = (m_background_ram[offset] & 0xf0) | (data & 0xf);
+	}
+	else
+	{
+		m_background_ram[offset] = (m_background_ram[offset] & 0x0f) | (data << 4);
+	}
+}
+
+WRITE8_MEMBER(tnx1_state::popeye_videoram_w)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(popeye_state::popeye_colorram_w)
+WRITE8_MEMBER(tnx1_state::popeye_colorram_w)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(popeye_state::popeye_bitmap_w)
-{
-	int sx,sy,x,y,colour;
-
-	m_bitmapram[offset] = data;
-
-	if (m_bitmap_type == TYPE_SKYSKIPR)
-	{
-		sx = 8 * (offset % 128);
-		sy = 8 * (offset / 128);
-
-		if (flip_screen())
-			sy = 512-8 - sy;
-
-		colour = data & 0x0f;
-		for (y = 0; y < 8; y++)
-		{
-			for (x = 0; x < 8; x++)
-			{
-				m_tmpbitmap2->pix16(sy+y, sx+x) = colour;
-			}
-		}
-	}
-	else
-	{
-		sx = 8 * (offset % 64);
-		sy = 4 * (offset / 64);
-
-		if (flip_screen())
-			sy = 512-4 - sy;
-
-		colour = data & 0x0f;
-		for (y = 0; y < 4; y++)
-		{
-			for (x = 0; x < 8; x++)
-			{
-				m_tmpbitmap2->pix16(sy+y, sx+x) = colour;
-			}
-		}
-	}
-}
-
-WRITE8_MEMBER(popeye_state::skyskipr_bitmap_w)
-{
-	offset = ((offset & 0xfc0) << 1) | (offset & 0x03f);
-	if (data & 0x80)
-		offset |= 0x40;
-
-	popeye_bitmap_w(space,offset,data);
-}
-
-TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
+TILE_GET_INFO_MEMBER(tnx1_state::get_fg_tile_info)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;
@@ -351,134 +301,110 @@ TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-void popeye_state::video_start()
+void tnx1_state::video_start()
 {
-	m_bitmapram = std::make_unique<uint8_t[]>(popeye_bitmapram_size);
-	m_tmpbitmap2 = std::make_unique<bitmap_ind16>(1024,1024);    /* actually 1024x512 but not rolling over vertically? */
+	m_background_ram.resize(0x1000);
+	m_sprite_ram.resize(0x400);
 
-	m_bitmap_type = TYPE_SKYSKIPR;
+	m_sprite_bitmap = std::make_unique<bitmap_ind16>(512, 512);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tnx1_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_lastflip = 0;
 	m_field = 0;
 
 	save_item(NAME(m_field));
-	save_item(NAME(m_lastflip));
-	save_item(NAME(*m_tmpbitmap2));
-	save_pointer(NAME(m_bitmapram.get()), popeye_bitmapram_size);
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_palette_bank_cache));
+	save_item(NAME(m_background_ram));
+	save_item(NAME(m_background_scroll));
+	save_item(NAME(m_sprite_ram));
 }
 
-VIDEO_START_MEMBER(popeye_state,popeye)
+void tnx1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bitmapram = std::make_unique<uint8_t[]>(popeye_bitmapram_size);
-	m_tmpbitmap2 = std::make_unique<bitmap_ind16>(512,512);
+	m_sprite_bitmap->fill(0, cliprect);
 
-	m_bitmap_type = TYPE_POPEYE;
-
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_tilemap->set_transparent_pen(0);
-
-	m_lastflip = 0;
-	m_field = 0;
-
-	save_item(NAME(m_field));
-	save_item(NAME(m_lastflip));
-	save_item(NAME(*m_tmpbitmap2));
-	save_pointer(NAME(m_bitmapram.get()), popeye_bitmapram_size);
-}
-
-void popeye_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int offs;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	if (m_lastflip != flip_screen())
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (offs = 0;offs < popeye_bitmapram_size;offs++)
-			popeye_bitmap_w(space,offs,m_bitmapram[offs]);
-
-		m_lastflip = flip_screen();
-	}
-
-	set_background_palette((*m_palettebank & 0x08) >> 3);
-
-	if (m_background_pos[1] == 0)    /* no background */
-		bitmap.fill(0, cliprect);
-	else
-	{
-		/* copy the background graphics */
-		int scrollx = 200 - m_background_pos[0] - 256*(m_background_pos[2]&1); /* ??? */
-		int scrolly = 2 * (256 - m_background_pos[1]);
-
-		if (m_bitmap_type == TYPE_SKYSKIPR)
-			scrollx = 2*scrollx - 512;
-
-		if (flip_screen())
+		struct attribute_memory
 		{
-			if (m_bitmap_type == TYPE_POPEYE)
-				scrollx = -scrollx;
-			scrolly = -scrolly;
+			int row;
+			int sx;
+			uint8_t color;
+			uint16_t code;
+			int flipx;
+			int flipy;
+		} attributes[64] = { 0 };
+
+		for (int offs = 4; offs < m_dmasource.bytes(); offs += 4)
+		{
+			int sy = 0x200 - (m_sprite_ram[offs + 1] * 2);
+			int row = y - sy;
+			if (flip_screen())
+			{
+				sy ^= 0x1ff;
+				row = sy - y;
+			}
+
+			if (row >= 0 && row < 16)
+			{
+				/*
+				* offs+3:
+				* bit 7 ? TODO: figure out why olive oil and wimpy have some of these bits set
+				* bit 6 ?
+				* bit 5 ?
+				* bit 4 MSB of sprite code
+				* bit 3 vertical flip
+				* bit 2 sprite bank
+				* bit 1 \ color (with bit 2 as well)
+				* bit 0 /
+				*/
+
+				struct attribute_memory *a = &attributes[m_sprite_ram[offs] >> 2];
+				a->sx = m_sprite_ram[offs] * 2;
+				a->row = row;
+				a->code = ((m_sprite_ram[offs + 2] & 0x7f)
+					+ ((m_sprite_ram[offs + 3] & 0x10) << 3)
+					+ ((m_sprite_ram[offs + 3] & 0x04) << 6)) ^ 0x1ff;
+				a->color = (m_sprite_ram[offs + 3] & 0x07);
+				a->flipx = (m_sprite_ram[offs + 2] & 0x80) ? 0xf : 0;
+				a->flipy = (m_sprite_ram[offs + 3] & 0x08) ? 0xf : 0;
+			}
 		}
 
-		copyscrollbitmap(bitmap,*m_tmpbitmap2,1,&scrollx,1,&scrolly,cliprect);
-	}
-}
-
-void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint8_t *spriteram = m_spriteram;
-	int offs;
-
-	for (offs = 0;offs < m_spriteram.bytes();offs += 4)
-	{
-		int code,color,flipx,flipy,sx,sy;
-
-		/*
-		 * offs+3:
-		 * bit 7 ?
-		 * bit 6 ?
-		 * bit 5 ?
-		 * bit 4 MSB of sprite code
-		 * bit 3 vertical flip
-		 * bit 2 sprite bank
-		 * bit 1 \ color (with bit 2 as well)
-		 * bit 0 /
-		 */
-
-		color = (spriteram[offs + 3] & 0x07);
-		if (color == 0) continue;
-
-		code = (spriteram[offs + 2] & 0x7f)
-			+ ((spriteram[offs + 3] & 0x10) << 3)
-			+ ((spriteram[offs + 3] & 0x04) << 6);
-
-		color += (*m_palettebank & 0x07) << 3;
-
-		flipx = spriteram[offs + 2] & 0x80;
-		flipy = spriteram[offs + 3] & 0x08;
-
-		sx = 2*(spriteram[offs])-8;
-		sy = 2*(256-spriteram[offs + 1]);
-
-		if (flip_screen())
+		for (int i = 0; i < 64; i++)
 		{
-			flipx = !flipx;
-			flipy = !flipy;
-			sx = 496 - sx;
-			sy = 496 - sy;
-		}
+			struct attribute_memory *a = &attributes[i];
+			if (a->color != 0)
+			{
+				gfx_element *gfx = m_gfxdecode->gfx(1);
+				const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (a->color % gfx->colors()));
+				const uint8_t *source_base = gfx->get_data(a->code % gfx->elements());
+				const uint8_t *source = source_base + (a->row ^ a->flipy) * gfx->rowbytes();
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-					code ^ 0x1ff,
-					color,
-					flipx,flipy,
-					sx,sy,0);
+				for (int x = 0; x < 16; x++)
+				{
+					int px = a->sx + x - 8;
+					if (px >= 0 && px < 512)
+					{
+						if (flip_screen())
+							px ^= 0x1ff;
+
+						uint16_t p = source[x ^ a->flipx];
+						if (p) p = pal[p];
+
+						m_sprite_bitmap->pix(y, px) = p;
+					}
+				}
+			}
+		}
 	}
+
+	copybitmap_trans(bitmap, *m_sprite_bitmap, 0, 0, 0, 0, cliprect, 0);
 }
 
-void popeye_state::draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tnx1_state::draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x;
 	int y;
@@ -488,8 +414,87 @@ void popeye_state::draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			bitmap.pix(y, x) = 0;
 }
 
-uint32_t popeye_state::screen_update_popeye(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tnx1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		int sy = y;
+		if (flip_screen())
+			sy ^= 0x1ff;
+
+		sy -= 0x200 - (2 * m_background_scroll[1]);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			if (sy < 0)
+				bitmap.pix16(y, x) = m_background_ram[0] & 0xf; // TODO: find out exactly where the data is fetched from
+			else
+			{
+				// TODO: confirm the memory layout
+				int sx = x + (2 * (m_background_scroll[0] | ((m_background_scroll[2] & 1) << 8))) + 0x70;
+				int shift = (sx & 0x200) / 0x80;
+
+				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+			}
+		}
+	}
+}
+
+void tpp1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		int sy = y;
+		if (flip_screen())
+			sy ^= 0x1ff;
+
+		sy -= 0x200 - (2 * m_background_scroll[1]);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			if (sy < 0)
+				bitmap.pix16(y, x) = m_background_ram[0] & 0xf; // TODO: find out exactly where the data is fetched from
+			else
+			{
+				// TODO: confirm the memory layout
+				int sx = x + (2 * m_background_scroll[0]) + 0x70;
+				int shift = (sy & 4);
+
+				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+			}
+		}
+	}
+}
+
+void tpp2_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		int sy = y;
+		if (flip_screen())
+			sy ^= 0x1ff;
+
+		sy -= 0x200 - (2 * m_background_scroll[1]);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			if (sy < 0)
+				bitmap.pix16(y, x) = m_background_ram[((sy & 0x100) / 8) * 0x40] & 0xf;
+			else
+			{
+				// TODO: confirm the memory layout
+				int sx = x + (2 * m_background_scroll[0]) + 0x72;
+				int shift = (sy & 4);
+
+				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+			}
+		}
+	}
+}
+
+uint32_t tnx1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	update_palette();
 	draw_background(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

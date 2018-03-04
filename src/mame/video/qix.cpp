@@ -298,7 +298,7 @@ MC6845_UPDATE_ROW( qix_state::crtc_update_row )
  *
  *************************************/
 
-static ADDRESS_MAP_START( qix_video_map, AS_PROGRAM, 8, qix_state )
+ADDRESS_MAP_START(qix_state::qix_video_map)
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START( qix_video_map, AS_PROGRAM, 8, qix_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( kram3_video_map, AS_PROGRAM, 8, qix_state )
+ADDRESS_MAP_START(qix_state::kram3_video_map)
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
@@ -332,7 +332,7 @@ static ADDRESS_MAP_START( kram3_video_map, AS_PROGRAM, 8, qix_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( zookeep_video_map, AS_PROGRAM, 8, qix_state )
+ADDRESS_MAP_START(qix_state::zookeep_video_map)
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
@@ -351,7 +351,7 @@ static ADDRESS_MAP_START( zookeep_video_map, AS_PROGRAM, 8, qix_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slither_video_map, AS_PROGRAM, 8, qix_state )
+ADDRESS_MAP_START(qix_state::slither_video_map)
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, slither_videoram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
@@ -376,8 +376,8 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( qix_video )
-	MCFG_CPU_ADD("videocpu", M6809, MAIN_CLOCK_OSC/4/4) /* 1.25 MHz */
+MACHINE_CONFIG_START(qix_state::qix_video)
+	MCFG_CPU_ADD("videocpu", MC6809E, MAIN_CLOCK_OSC/4/4) /* 1.25 MHz */
 	MCFG_CPU_PROGRAM_MAP(qix_video_map)
 
 	MCFG_VIDEO_START_OVERRIDE(qix_state,qix)
@@ -396,20 +396,20 @@ MACHINE_CONFIG_START( qix_video )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START( kram3_video )
-	MCFG_CPU_REPLACE("videocpu", M6809E, MAIN_CLOCK_OSC/4) /* 1.25 MHz */
+MACHINE_CONFIG_START(qix_state::kram3_video)
+	MCFG_CPU_MODIFY("videocpu")
 	MCFG_CPU_PROGRAM_MAP(kram3_video_map)
-	MCFG_M6809E_LIC_CB(WRITELINE(qix_state,kram3_lic_videocpu_changed))
+	MCFG_MC6809E_LIC_CB(WRITELINE(qix_state, kram3_lic_videocpu_changed))
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START( zookeep_video )
+MACHINE_CONFIG_START(qix_state::zookeep_video)
 	MCFG_CPU_MODIFY("videocpu")
 	MCFG_CPU_PROGRAM_MAP(zookeep_video_map)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START( slither_video )
+MACHINE_CONFIG_START(qix_state::slither_video)
 	MCFG_CPU_MODIFY("videocpu")
 	MCFG_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)   /* 1.34 MHz */
 	MCFG_CPU_PROGRAM_MAP(slither_video_map)

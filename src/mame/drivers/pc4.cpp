@@ -61,13 +61,13 @@ WRITE8_MEMBER( pc4_state::beep_w )
 	m_beep->set_state(data&0x40);
 }
 
-static ADDRESS_MAP_START(pc4_mem, AS_PROGRAM, 8, pc4_state)
+ADDRESS_MAP_START(pc4_state::pc4_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc4_io, AS_IO, 8, pc4_state)
+ADDRESS_MAP_START(pc4_state::pc4_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(beep_w)
@@ -216,9 +216,9 @@ void pc4_state::machine_start()
 	m_blink = 0;
 }
 
-static MACHINE_CONFIG_START( pc4 )
+MACHINE_CONFIG_START(pc4_state::pc4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(pc4_mem)
 	MCFG_CPU_IO_MAP(pc4_io)
 
@@ -240,7 +240,7 @@ static MACHINE_CONFIG_START( pc4 )
 	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
 MACHINE_CONFIG_END
 
 ROM_START( pc4 )

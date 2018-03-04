@@ -25,6 +25,7 @@ ToDo:
 #include "machine/genpin.h"
 
 #include "cpu/m6800/m6800.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -43,6 +44,10 @@ public:
 		, m_dac1(*this, "dac1")
 	{ }
 
+	void atari_s2(machine_config &config);
+	void atari_s3(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(sound0_w);
 	DECLARE_WRITE8_MEMBER(sound1_w);
 	DECLARE_WRITE8_MEMBER(lamp_w) { };
@@ -52,6 +57,10 @@ public:
 	DECLARE_WRITE8_MEMBER(display_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
+
+	void atari_s2_map(address_map &map);
+	void atari_s3_map(address_map &map);
+
 private:
 	bool m_timer_sb;
 	uint8_t m_timer_s[5];
@@ -68,7 +77,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( atari_s2_map, AS_PROGRAM, 8, atari_s2_state )
+ADDRESS_MAP_START(atari_s2_state::atari_s2_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM
 	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("nvram") // battery backed
@@ -95,7 +104,7 @@ static ADDRESS_MAP_START( atari_s2_map, AS_PROGRAM, 8, atari_s2_state )
 	AM_RANGE(0x2800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( atari_s3_map, AS_PROGRAM, 8, atari_s2_state )
+ADDRESS_MAP_START(atari_s2_state::atari_s3_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM
 	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("nvram") // battery backed
@@ -349,9 +358,11 @@ WRITE8_MEMBER( atari_s2_state::sol0_w )
 
 WRITE8_MEMBER( atari_s2_state::display_w )
 {
-	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
-	if (offset<7)
+	static constexpr uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
+	if (offset < 7)
+	{
 		m_segment[offset] = patterns[data&15];
+	}
 	else
 	{
 		data &= 7;
@@ -464,15 +475,15 @@ void atari_s2_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( atari_s2 )
+MACHINE_CONFIG_START(atari_s2_state::atari_s2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_4MHz / 4)
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(4'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(atari_s2_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // r23-r26 (68k,33k,18k,8.2k)
@@ -484,11 +495,12 @@ static MACHINE_CONFIG_START( atari_s2 )
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_atari_s2)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", atari_s2_state, irq, attotime::from_hz(XTAL_4MHz / 8192))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", atari_s2_state, irq, attotime::from_hz(XTAL(4'000'000) / 8192))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", atari_s2_state, timer_s, attotime::from_hz(150000))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atari_s3, atari_s2 )
+MACHINE_CONFIG_START(atari_s2_state::atari_s3)
+	atari_s2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atari_s3_map)
 MACHINE_CONFIG_END

@@ -242,7 +242,7 @@ WRITE_LINE_MEMBER(sprint2_state::lamp4_w)
 	output().set_led_value(3, state);
 }
 
-static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
+ADDRESS_MAP_START(sprint2_state::sprint2_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(sprint2_wram_r,sprint2_wram_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sprint2_video_ram_w) AM_SHARE("video_ram")
@@ -509,10 +509,10 @@ static GFXDECODE_START( sprint2 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sprint2 )
+MACHINE_CONFIG_START(sprint2_state::sprint2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'096'000) / 16)
 	MCFG_CPU_PROGRAM_MAP(sprint2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sprint2_state,  sprint2)
 
@@ -551,7 +551,8 @@ static MACHINE_CONFIG_START( sprint2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sprint1, sprint2 )
+MACHINE_CONFIG_START(sprint2_state::sprint1)
+	sprint2(config);
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("lspeaker")
@@ -566,7 +567,8 @@ static MACHINE_CONFIG_DERIVED( sprint1, sprint2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dominos, sprint2 )
+MACHINE_CONFIG_START(sprint2_state::dominos)
+	sprint2(config);
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("lspeaker")
@@ -580,7 +582,8 @@ static MACHINE_CONFIG_DERIVED( dominos, sprint2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dominos4, dominos )
+MACHINE_CONFIG_START(sprint2_state::dominos4)
+	dominos(config);
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(sprint2_state, lamp3_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(sprint2_state, lamp4_w))

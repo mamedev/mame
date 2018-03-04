@@ -73,6 +73,11 @@ public:
 	uint32_t screen_update_dynadice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void dynadice(machine_config &config);
+	void dynadice_io_map(address_map &map);
+	void dynadice_map(address_map &map);
+	void dynadice_sound_io_map(address_map &map);
+	void dynadice_sound_map(address_map &map);
 };
 
 
@@ -108,13 +113,13 @@ WRITE8_MEMBER(dynadice_state::sound_control_w)
 }
 
 
-static ADDRESS_MAP_START( dynadice_map, AS_PROGRAM, 8, dynadice_state )
+ADDRESS_MAP_START(dynadice_state::dynadice_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(dynadice_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynadice_io_map, AS_IO, 8, dynadice_state )
+ADDRESS_MAP_START(dynadice_state::dynadice_io_map)
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("IN0")
 	AM_RANGE(0x51, 0x51) AM_READ_PORT("IN1")
 	AM_RANGE(0x52, 0x52) AM_READ_PORT("DSW")
@@ -123,12 +128,12 @@ static ADDRESS_MAP_START( dynadice_io_map, AS_IO, 8, dynadice_state )
 	AM_RANGE(0x70, 0x77) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynadice_sound_map, AS_PROGRAM, 8, dynadice_state )
+ADDRESS_MAP_START(dynadice_state::dynadice_sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynadice_sound_io_map, AS_IO, 8, dynadice_state )
+ADDRESS_MAP_START(dynadice_state::dynadice_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
@@ -238,7 +243,7 @@ void dynadice_state::machine_reset()
 	m_ay_data = 0;
 }
 
-static MACHINE_CONFIG_START( dynadice )
+MACHINE_CONFIG_START(dynadice_state::dynadice)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080,18432000/8)

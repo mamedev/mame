@@ -2,7 +2,7 @@
 // copyright-holders:<author_name>
 /***************************************************************************
 
-Template for squeleton device
+Template for skeleton device
 
 ***************************************************************************/
 
@@ -16,7 +16,7 @@ Template for squeleton device
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(XXX, xxx_device, "xxx", "XXX Device")
+DEFINE_DEVICE_TYPE(XXX, xxx_device, "xxx", "XXX")
 
 
 //**************************************************************************
@@ -40,7 +40,7 @@ xxx_device::xxx_device(const machine_config &mconfig, const char *tag, device_t 
 //  configuration addiitons
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(xxx_device::device_add_mconfig)
+MACHINE_CONFIG_START(xxx_device::device_add_mconfig)
 	//MCFG_CPU_ADD(...)
 MACHINE_CONFIG_END
 

@@ -63,6 +63,7 @@ To Do:
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/2203intf.h"
 #include "video/kan_pand.h"
 #include "screen.h"
@@ -148,6 +149,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void hvyunit(machine_config &config);
+	void master_io(address_map &map);
+	void master_memory(address_map &map);
+	void slave_io(address_map &map);
+	void slave_memory(address_map &map);
+	void sound_io(address_map &map);
+	void sound_memory(address_map &map);
 };
 
 
@@ -379,7 +387,7 @@ WRITE8_MEMBER(hvyunit_state::mermaid_p3_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_memory, AS_PROGRAM, 8, hvyunit_state )
+ADDRESS_MAP_START(hvyunit_state::master_memory)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("master_bank")
 	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_r, spriteram_w)
@@ -387,7 +395,7 @@ static ADDRESS_MAP_START( master_memory, AS_PROGRAM, 8, hvyunit_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_io, AS_IO, 8, hvyunit_state )
+ADDRESS_MAP_START(hvyunit_state::master_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(master_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(master_bankswitch_w) // correct?
@@ -395,18 +403,18 @@ static ADDRESS_MAP_START( master_io, AS_IO, 8, hvyunit_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slave_memory, AS_PROGRAM, 8, hvyunit_state )
+ADDRESS_MAP_START(hvyunit_state::slave_memory)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("slave_bank")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(hu_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(hu_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
+	AM_RANGE(0xd000, 0xd1ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_io, AS_IO, 8, hvyunit_state )
+ADDRESS_MAP_START(hvyunit_state::slave_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
@@ -422,25 +430,17 @@ static ADDRESS_MAP_START( slave_io, AS_IO, 8, hvyunit_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_memory, AS_PROGRAM, 8, hvyunit_state )
+ADDRESS_MAP_START(hvyunit_state::sound_memory)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("sound_bank")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io, AS_IO, 8, hvyunit_state )
+ADDRESS_MAP_START(hvyunit_state::sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( mcu_io, AS_IO, 8, hvyunit_state )
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(mermaid_p0_r, mermaid_p0_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(mermaid_p1_r, mermaid_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(mermaid_p2_r, mermaid_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(mermaid_p3_r, mermaid_p3_w)
 ADDRESS_MAP_END
 
 
@@ -608,7 +608,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( hvyunit )
+MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 
 	MCFG_CPU_ADD("master", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(master_memory)
@@ -626,7 +626,14 @@ static MACHINE_CONFIG_START( hvyunit )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("mermaid", I80C51, 6000000)
-	MCFG_CPU_IO_MAP(mcu_io)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(hvyunit_state, mermaid_p0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(hvyunit_state, mermaid_p0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(hvyunit_state, mermaid_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(hvyunit_state, mermaid_p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(hvyunit_state, mermaid_p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(hvyunit_state, mermaid_p2_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(hvyunit_state, mermaid_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(hvyunit_state, mermaid_p3_w))
 
 	MCFG_GENERIC_LATCH_8_ADD("mermaidlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mermaid", INPUT_LINE_IRQ0))

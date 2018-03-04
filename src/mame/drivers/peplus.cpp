@@ -246,8 +246,7 @@ public:
 		m_s7000_ram(*this, "s7000_ram"),
 		m_sb000_ram(*this, "sb000_ram"),
 		m_sd000_ram(*this, "sd000_ram"),
-		m_sf000_ram(*this, "sf000_ram"),
-		m_io_port(*this, "io_port")
+		m_sf000_ram(*this, "sf000_ram")
 	{
 	}
 
@@ -276,7 +275,6 @@ public:
 	required_shared_ptr<uint8_t> m_sb000_ram;
 	required_shared_ptr<uint8_t> m_sd000_ram;
 	required_shared_ptr<uint8_t> m_sf000_ram;
-	required_shared_ptr<uint8_t> m_io_port;
 
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_wingboard;
@@ -305,8 +303,12 @@ public:
 	uint8_t m_bv_data_bit;
 	uint8_t m_bv_loop_count;
 	uint16_t id023_data;
+	uint8_t m_paldata;
+	uint8_t m_paldata2;
 
 	DECLARE_WRITE8_MEMBER(peplus_bgcolor_w);
+	DECLARE_WRITE8_MEMBER(paldata_w);
+	DECLARE_WRITE8_MEMBER(paldata2_w);
 	DECLARE_WRITE8_MEMBER(peplus_crtc_display_w);
 	DECLARE_WRITE8_MEMBER(peplus_duart_w);
 	DECLARE_WRITE8_MEMBER(peplus_cmos_w);
@@ -337,6 +339,9 @@ public:
 	DECLARE_PALETTE_INIT(peplus);
 	void handle_lightpen();
 
+	void peplus(machine_config &config);
+	void peplus_iomap(address_map &map);
+	void peplus_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -443,11 +448,21 @@ WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
 	handle_lightpen();
 }
 
+WRITE8_MEMBER(peplus_state::paldata_w)
+{
+	m_paldata = data;
+}
+
+WRITE8_MEMBER(peplus_state::paldata2_w)
+{
+	m_paldata2 = data;
+}
+
 WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
 {
 	m_videoram[m_vid_address] = data;
-	m_palette_ram[m_vid_address] = m_io_port[1];
-	m_palette_ram2[m_vid_address] = m_io_port[3];
+	m_palette_ram[m_vid_address] = m_paldata;
+	m_palette_ram2[m_vid_address] = m_paldata2;
 
 	m_bg_tilemap->mark_tile_dirty(m_vid_address);
 
@@ -996,11 +1011,11 @@ GFXDECODE_END
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( peplus_map, AS_PROGRAM, 8, peplus_state )
+ADDRESS_MAP_START(peplus_state::peplus_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("prograram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
+ADDRESS_MAP_START(peplus_state::peplus_iomap)
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(peplus_cmos_w) AM_SHARE("cmos")
 
@@ -1052,9 +1067,6 @@ static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
 
 	// Superboard Data
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("sf000_ram")
-
-	/* Ports start here */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_RAM AM_SHARE("io_port")
 ADDRESS_MAP_END
 
 
@@ -1325,11 +1337,13 @@ void peplus_state::machine_reset()
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( peplus )
+MACHINE_CONFIG_START(peplus_state::peplus)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I80C32, XTAL_20MHz/2) /* 10MHz */
+	MCFG_CPU_ADD("maincpu", I80C32, XTAL(20'000'000)/2) /* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(peplus_map)
 	MCFG_CPU_IO_MAP(peplus_iomap)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(peplus_state, paldata_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(peplus_state, paldata2_w))
 
 	MCFG_NVRAM_ADD_0FILL("cmos")
 
@@ -1345,7 +1359,7 @@ static MACHINE_CONFIG_START( peplus )
 	MCFG_PALETTE_ADD("palette", 16*16*2)
 	MCFG_PALETTE_INIT_OWNER(peplus_state, peplus)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_20MHz/8/3)
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(20'000'000)/8/3)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_ADDR_CHANGED_CB(peplus_state, crtc_addr)
@@ -1356,7 +1370,7 @@ static MACHINE_CONFIG_START( peplus )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_20MHz/12)
+	MCFG_SOUND_ADD("aysnd", AY8912, XTAL(20'000'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -8306,6 +8320,35 @@ ROM_START( peps0207 ) /* Normal board : Red White & Blue Slots (PS0207) - Payout
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
 ROM_END
 
+ROM_START( peps0239 ) /* Normal board : Jackpot Jewels Slots (PS0239) - Payout 92.65% */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ps0239_545-871.u68",   0x00000, 0x08000, CRC(4a5106b4) SHA1(f84b574e371b2c9b1c0eaee1f7ca7e74a63e5984) ) /* 2 Coins Max / 1 Line */
+	ROM_RELOAD(                       0x08000, 0x08000) /* 32K version built using earlier gaming libraries */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg1151.u72",   0x00000, 0x8000, BAD_DUMP CRC(596f1207) SHA1(d66acfa509e33e9fe2dce89ef4c19909a578b3bf) ) /*  08/24/92   @ IGT  MN */
+	ROM_LOAD( "mgo-cg1151.u73",   0x08000, 0x8000, BAD_DUMP CRC(aa4984ca) SHA1(2bbf2eba739b6cac7459a8021535967520c198ba) )
+	ROM_LOAD( "mbo-cg1151.u74",   0x10000, 0x8000, BAD_DUMP CRC(cf13bf00) SHA1(beaaa9acf660bb2c59d68f9f971b1e8f11bd81e9) ) /* one of these four roms are bad as there are 7 rogue */
+	ROM_LOAD( "mxo-cg1151.u75",   0x18000, 0x8000, BAD_DUMP CRC(659d72db) SHA1(973ccd71a7993d1885f1dbd0f877f18133650616) ) /* "green" dots in the single BAR with Diamond graphic */
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1151.u50", 0x0000, 0x0100, CRC(f8079ea2) SHA1(92dc104a76b3e5fa272f2f769a328b238c1702ed) )
+ROM_END
+
+ROM_START( peps0280 ) /* Normal board : 4th of July Slots (PS0280) - Payout 90.04% */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ps0280_560-957.u68",   0x00000, 0x10000, CRC(91bd2522) SHA1(9449802726e12fa462656a41a1acea455319f5cd) ) /* 3 Coins Max / 1 Line */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg1225.u72",   0x00000, 0x8000, CRC(49fe4fff) SHA1(f886791668427f9d7d42da07cea94c024413a983) )
+	ROM_LOAD( "mgo-cg1225.u73",   0x08000, 0x8000, CRC(b6982a78) SHA1(d3853f14d4a4fad9633f482bdd24756d4416d9eb) )
+	ROM_LOAD( "mbo-cg1225.u74",   0x10000, 0x8000, CRC(1363c0bd) SHA1(70d11a201b228b8d51d8a0b16e0ef8d799f8e346) )
+	ROM_LOAD( "mxo-cg1225.u75",   0x18000, 0x8000, CRC(a3ba92d9) SHA1(43285157ed30a93dd2e96468fa1086eab069a58b) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1225.u50", 0x0000, 0x0100, CRC(3fa46756) SHA1(a7f3fd6aaa64f3c3ed5e83068b42b39a6dc7f00d) )
+ROM_END
+
 ROM_START( peps0296 ) /* Normal board : Haywire Slots (PS0296) - Payout 90.00% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0296_561-959.u68",   0x00000, 0x10000, CRC(da871550) SHA1(99e7a4fc77731b185751622ba2e08a44ad8eb7f9) ) /* 3 Coins Max / 1 Line */
@@ -13771,14 +13814,10 @@ Double Aces & Faces  ?????     99.20%
 	ROM_LOAD( "xm00009p.u66",   0x00000, 0x10000, CRC(e133d0bb) SHA1(7ed4fa335e230c28e6fc66f0c990bc7ead2b279d) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2xxx.u77",  0x00000, 0x8000, NO_DUMP ) /* This set requires an unknown CG graphics set for the correct banners on the MENU page */
-	ROM_LOAD( "mgo-cg2xxx.u78",  0x08000, 0x8000, NO_DUMP ) /* Most likely CG2227, CG2229 or CG2239 */
-	ROM_LOAD( "mbo-cg2xxx.u79",  0x10000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mxo-cg2xxx.u80",  0x18000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mro-cg2174.u77",  0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) ) /*  07/26/95   @ IGT  L95-1616  */
-	ROM_LOAD( "mgo-cg2174.u78",  0x08000, 0x8000, CRC(cc46adb0) SHA1(6065aa5dcb9091ad80e499c7ee6dc629e79c865a) ) /* Close but banners on MEMU WRONG!! */
-	ROM_LOAD( "mbo-cg2174.u79",  0x10000, 0x8000, CRC(7291a0c8) SHA1(1068f35e6ef5fd88c584922860231840a90fb623) )
-	ROM_LOAD( "mxo-cg2174.u80",  0x18000, 0x8000, CRC(14f9480c) SHA1(59323f9fc5995277aea86d088893b6eb95b4e89b) )
+	ROM_LOAD( "mro-cg2xxx.u77",  0x00000, 0x8000, BAD_DUMP CRC(26abb9df) SHA1(0721accc3cb65f00dc979231497edfff0b1faf80) ) /* This set requires an unknown CG graphics set for the correct banners on the MENU page */
+	ROM_LOAD( "mgo-cg2xxx.u78",  0x08000, 0x8000, BAD_DUMP CRC(409fd5f6) SHA1(fc4d5627fcc8b891939d6237851c585739d5e0b0) ) /* Most likely CG2227, CG2229 or CG2239 */
+	ROM_LOAD( "mbo-cg2xxx.u79",  0x10000, 0x8000, BAD_DUMP CRC(fe48d88e) SHA1(d9a3057a6af087e6d6014a2f80b3f022090970f4) )
+	ROM_LOAD( "mxo-cg2xxx.u80",  0x18000, 0x8000, BAD_DUMP CRC(e14bb037) SHA1(5b9c3627e9d29f2140c4bc02c29b319d251abb9f) ) /* Use these modified CG2174 set until correct graphics roms are dumped */
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
@@ -14427,6 +14466,8 @@ GAMEL(1996, peps0090, 0,        peplus, peplus_slots,   peplus_state, peplus,   
 GAMEL(1996, peps0092, peps0047, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0092) Wild Cherry Slots",                0, layout_pe_slots )
 GAMEL(1996, peps0206, peps0021, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0206) Red White & Blue Slots",           0, layout_pe_slots )
 GAMEL(1996, peps0207, peps0021, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0207) Red White & Blue Slots",           0, layout_pe_slots )
+GAMEL(1996, peps0239, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0239) Jackpot Jewels Slots",             0, layout_pe_slots )
+GAMEL(1996, peps0280, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0280) 4th of July Slots",                0, layout_pe_slots )
 GAMEL(1996, peps0296, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0296) Haywire Slots",                    0, layout_pe_slots )
 GAMEL(1996, peps0298, peps0042, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0298) Double Diamond Slots",             0, layout_pe_slots )
 GAMEL(1996, peps0308, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0308) Double Jackpot Slots",             0, layout_pe_slots )

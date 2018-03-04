@@ -331,7 +331,7 @@ WRITE8_MEMBER( pc8401a_state::port71_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( pc8401a_mem, AS_PROGRAM, 8, pc8401a_state )
+ADDRESS_MAP_START(pc8401a_state::pc8401a_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
@@ -339,12 +339,12 @@ static ADDRESS_MAP_START( pc8401a_mem, AS_PROGRAM, 8, pc8401a_state )
 	AM_RANGE(0xe800, 0xffff) AM_RAMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8401a_io, AS_IO, 8, pc8401a_state )
+ADDRESS_MAP_START(pc8401a_state::pc8401a_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8500_io, AS_IO, 8, pc8401a_state )
+ADDRESS_MAP_START(pc8401a_state::pc8500_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("Y.0")
@@ -568,7 +568,7 @@ WRITE8_MEMBER( pc8401a_state::ppi_pc_w )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( pc8401a )
+MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
 	MCFG_CPU_PROGRAM_MAP(pc8401a_mem)
@@ -578,7 +578,7 @@ static MACHINE_CONFIG_START( pc8401a )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, NOOP)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 	MCFG_I8255_IN_PORTC_CB(READ8(pc8401a_state, ppi_pc_r))
@@ -594,7 +594,7 @@ static MACHINE_CONFIG_START( pc8401a )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(pc8401a_video)
+	pc8401a_video(config);
 
 	/* option ROM cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
@@ -610,7 +610,7 @@ static MACHINE_CONFIG_START( pc8401a )
 	MCFG_RAM_EXTRA_OPTIONS("96K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc8500 )
+MACHINE_CONFIG_START(pc8500_state::pc8500)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
 	MCFG_CPU_PROGRAM_MAP(pc8401a_mem)
@@ -620,7 +620,7 @@ static MACHINE_CONFIG_START( pc8500 )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, NOOP)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 	MCFG_I8255_IN_PORTC_CB(READ8(pc8401a_state, ppi_pc_r))
@@ -636,7 +636,7 @@ static MACHINE_CONFIG_START( pc8500 )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(pc8500_video)
+	pc8500_video(config);
 
 	/* option ROM cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)

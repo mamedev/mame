@@ -5,6 +5,8 @@
     Fast Lane
 
 *************************************************************************/
+
+#include "machine/timer.h"
 #include "sound/k007232.h"
 #include "video/k007121.h"
 #include "video/k051733.h"
@@ -66,4 +68,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(fastlane_scanline);
 	DECLARE_WRITE8_MEMBER(volume_callback0);
 	DECLARE_WRITE8_MEMBER(volume_callback1);
+	void fastlane(machine_config &config);
+	void fastlane_map(address_map &map);
 };

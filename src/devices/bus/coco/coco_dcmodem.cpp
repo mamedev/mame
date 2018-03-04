@@ -6,14 +6,14 @@
 
     Code for emulating the CoCo Direct Connect Modem PAK
 
-    This is just a "skeleton device"; the UART is emulated but pretty much
-    nothing else
-
 ***************************************************************************/
 
 #include "emu.h"
+#include "coco_dcmodem.h"
+
 #include "cococart.h"
 #include "machine/mos6551.h"
+#include "bus/rs232/rs232.h"
 
 
 /***************************************************************************
@@ -21,6 +21,7 @@
 ***************************************************************************/
 
 #define UART_TAG        "uart"
+#define PORT_TAG        "port"
 
 
 //**************************************************************************
@@ -81,10 +82,17 @@ namespace
     IMPLEMENTATION
 ***************************************************************************/
 
-MACHINE_CONFIG_MEMBER(coco_dc_modem_device::device_add_mconfig)
+MACHINE_CONFIG_START(coco_dc_modem_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(UART_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(coco_dc_modem_device, uart_irq_w))
+	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(PORT_TAG, rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD(PORT_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(UART_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(UART_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(UART_TAG, mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UART_TAG, mos6551_device, write_cts))
 MACHINE_CONFIG_END
 
 

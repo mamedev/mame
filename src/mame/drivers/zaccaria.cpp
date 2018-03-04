@@ -145,7 +145,7 @@ WRITE_LINE_MEMBER(zaccaria_state::nmi_mask_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zaccaria_state )
+ADDRESS_MAP_START(zaccaria_state::main_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_READONLY
 	AM_RANGE(0x6400, 0x6407) AM_READ(prot1_r)
@@ -330,10 +330,10 @@ INTERRUPT_GEN_MEMBER(zaccaria_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( zaccaria )
+MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80,XTAL(18'432'000)/6)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaccaria_state,  vblank_irq)
 //  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))

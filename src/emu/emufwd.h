@@ -97,6 +97,10 @@ class symbol_table;
 // declared in debugger.h
 class debugger_manager;
 
+// declared in devcb.h
+class devcb_read_base;
+class devcb_write_base;
+
 // declared in devfind.h
 class finder_base;
 
@@ -130,7 +134,7 @@ class driver_device;
 
 // declared in emumem.h
 class address_space;
-class direct_read_data;
+template<int addr_shift> class direct_read_data;
 class memory_bank;
 class memory_block;
 class memory_manager;

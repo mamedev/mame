@@ -6,7 +6,7 @@
 #ifndef BX_SPSCQUEUE_H_HEADER_GUARD
 #define BX_SPSCQUEUE_H_HEADER_GUARD
 
-#include "bx.h"
+#include "allocator.h"
 #include "cpu.h"
 #include "semaphore.h"
 
@@ -22,7 +22,7 @@ namespace bx
 
 	public:
 		///
-		SpScUnboundedQueue();
+		SpScUnboundedQueue(AllocatorI* _allocator);
 
 		///
 		~SpScUnboundedQueue();
@@ -46,6 +46,7 @@ namespace bx
 			Node* m_next;
 		};
 
+		AllocatorI* m_allocator;
 		Node* m_first;
 		Node* m_divider;
 		Node* m_last;
@@ -62,7 +63,7 @@ namespace bx
 
 	public:
 		///
-		SpScUnboundedQueueT();
+		SpScUnboundedQueueT(AllocatorI* _allocator);
 
 		///
 		~SpScUnboundedQueueT();
@@ -80,7 +81,6 @@ namespace bx
 		SpScUnboundedQueue m_queue;
 	};
 
-
 #if BX_CONFIG_SUPPORTS_THREADING
 	///
 	class SpScBlockingUnboundedQueue
@@ -92,7 +92,7 @@ namespace bx
 
 	public:
 		///
-		SpScBlockingUnboundedQueue();
+		SpScBlockingUnboundedQueue(AllocatorI* _allocator);
 
 		///
 		~SpScBlockingUnboundedQueue();
@@ -122,7 +122,7 @@ namespace bx
 
 	public:
 		///
-		SpScBlockingUnboundedQueueT();
+		SpScBlockingUnboundedQueueT(AllocatorI* _allocator);
 
 		///
 		~SpScBlockingUnboundedQueueT();

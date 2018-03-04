@@ -116,7 +116,7 @@ static const uint8_t terminal_font[256*16] =
 	0x00, 0x02, 0x02, 0x7a, 0x86, 0x82, 0x86, 0x7a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x7c, 0x82, 0xfe, 0x80, 0x7c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x1c, 0x22, 0x20, 0xf8, 0x20, 0x20, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x7c, 0x84, 0x84, 0x7c, 0x04, 0x84, 0x78, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,//g
+	0x00, 0x00, 0x00, 0x7c, 0x84, 0x84, 0x7c, 0x04, 0x84, 0x78, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x80, 0x80, 0xbc, 0xc2, 0x82, 0x82, 0x82, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x10, 0x00, 0x30, 0x10, 0x10, 0x10, 0x7c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x04, 0x00, 0x04, 0x04, 0x04, 0x04, 0x84, 0x84, 0x78, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -145,7 +145,6 @@ static const uint8_t terminal_font[256*16] =
 
 generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, unsigned w, unsigned h)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_palette(*this, "palette")
 	, m_io_term_conf(*this, "TERM_CONF")
 	, m_width(w)
 	, m_height(h)
@@ -253,37 +252,36 @@ void generic_terminal_device::term_write(uint8_t data)
 ***************************************************************************/
 uint32_t generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const uint16_t options = m_io_term_conf->read();
-	uint16_t cursor = m_y_pos * m_width + m_x_pos;
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	uint16_t const options = m_io_term_conf->read();
+	uint16_t const cursor = m_y_pos * m_width + m_x_pos;
+	uint16_t sy=0,ma=0;
 
+	uint32_t font_color;
 	switch (options & 0x030)
 	{
 	case 0x010:
-		m_palette->set_pen_color(1, rgb_t(0xf7, 0xaa, 0x00));
+		font_color = rgb_t(0xf7, 0xaa, 0x00);
 		break;
 	case 0x020:
-		m_palette->set_pen_color(1, rgb_t::white());
+		font_color = rgb_t::white();
 		break;
 	default:
-		m_palette->set_pen_color(1, rgb_t(0x00, 0xff, 0x00));
+		font_color = rgb_t(0x00, 0xff, 0x00);
 		break;
 	}
-	pen_t font_color = m_palette->pen(1);
 
 	m_framecnt++;
 
-	for (y = 0; y < m_height; y++)
+	for (uint8_t y = 0; y < m_height; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint32_t  *p = &bitmap.pix32(sy++);
+			uint32_t *p = &bitmap.pix32(sy++);
 
-			for (x = ma; x < ma + m_width; x++)
+			for (uint16_t x = ma; x < ma + m_width; x++)
 			{
-				chr = m_buffer[x];
-				gfx = terminal_font[(chr<<4) | ra ];
+				uint8_t const chr = m_buffer[x];
+				uint8_t gfx = terminal_font[(chr << 4) | ra];
 
 				if ((x == cursor) && (options & 0x001)) // at cursor position and want a cursor
 				{
@@ -303,14 +301,14 @@ uint32_t generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bi
 				}
 
 				/* Display a scanline of a character */
-				*p++ = (BIT( gfx, 7 ))?font_color:0;
-				*p++ = (BIT( gfx, 6 ))?font_color:0;
-				*p++ = (BIT( gfx, 5 ))?font_color:0;
-				*p++ = (BIT( gfx, 4 ))?font_color:0;
-				*p++ = (BIT( gfx, 3 ))?font_color:0;
-				*p++ = (BIT( gfx, 2 ))?font_color:0;
-				*p++ = (BIT( gfx, 1 ))?font_color:0;
-				*p++ = (BIT( gfx, 0 ))?font_color:0;
+				*p++ = (BIT(gfx, 7)) ? font_color : 0;
+				*p++ = (BIT(gfx, 6)) ? font_color : 0;
+				*p++ = (BIT(gfx, 5)) ? font_color : 0;
+				*p++ = (BIT(gfx, 4)) ? font_color : 0;
+				*p++ = (BIT(gfx, 3)) ? font_color : 0;
+				*p++ = (BIT(gfx, 2)) ? font_color : 0;
+				*p++ = (BIT(gfx, 1)) ? font_color : 0;
+				*p++ = (BIT(gfx, 0)) ? font_color : 0;
 			}
 		}
 		ma += m_width;
@@ -328,22 +326,20 @@ void generic_terminal_device::kbd_put(u8 data)
     VIDEO HARDWARE
 ***************************************************************************/
 
-MACHINE_CONFIG_MEMBER( generic_terminal_device::device_add_mconfig )
-	MCFG_SCREEN_ADD_MONOCHROME(TERMINAL_SCREEN_TAG, RASTER, rgb_t::white())
+MACHINE_CONFIG_START(generic_terminal_device::device_add_mconfig)
+	MCFG_SCREEN_ADD(TERMINAL_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(generic_terminal_device::TERMINAL_WIDTH*8, generic_terminal_device::TERMINAL_HEIGHT*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, generic_terminal_device::TERMINAL_WIDTH*8-1, 0, generic_terminal_device::TERMINAL_HEIGHT*10-1)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, generic_terminal_device, update)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(generic_terminal_device, kbd_put))
 
 	MCFG_SPEAKER_STANDARD_MONO("bell")
 	MCFG_SOUND_ADD("beeper", BEEP, 2'000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 0.25)
 MACHINE_CONFIG_END
 
 void generic_terminal_device::device_start()

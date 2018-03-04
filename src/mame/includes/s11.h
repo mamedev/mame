@@ -6,8 +6,8 @@
  *  Created on: 1/01/2013
  */
 
-#ifndef S11_H_
-#define S11_H_
+#ifndef MAME_INCLUDES_S11_H
+#define MAME_INCLUDES_S11_H
 
 #include "audio/s11c_bg.h"
 #include "machine/6821pia.h"
@@ -18,7 +18,7 @@
 
 // 6802/8 CPU's input clock is 4MHz
 // but because it has an internal /4 divider, its E clock runs at 1/4 that frequency
-#define E_CLOCK (XTAL_4MHz/4)
+#define E_CLOCK (XTAL(4'000'000)/4)
 
 // Length of time in cycles between IRQs on the main 6808 CPU
 // This length is determined by the settings of the W14 and W15 jumpers
@@ -80,6 +80,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s11);
 	DECLARE_DRIVER_INIT(s11);
+	void s11(machine_config &config);
+	void s11_audio_map(address_map &map);
+	void s11_bg_map(address_map &map);
+	void s11_main_map(address_map &map);
 protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -121,4 +125,4 @@ private:
 	bool m_irq_active;
 };
 
-#endif /* S11_H_ */
+#endif // MAME_INCLUDES_S11_H

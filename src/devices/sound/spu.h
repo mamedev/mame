@@ -10,7 +10,7 @@
 //**************************************************************************
 
 #define MCFG_SPU_IRQ_HANDLER(_devcb) \
-	devcb = &spu_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<spu_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_SPU_ADD(_tag, _clock) \
 	MCFG_DEVICE_MODIFY( "maincpu" ) \
@@ -230,8 +230,8 @@ protected:
 public:
 	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<spu_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	void dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );

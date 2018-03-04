@@ -36,15 +36,34 @@
 #include "hlslAttributes.h"
 #include <cstdlib>
 #include <cctype>
+#include <algorithm>
 
 namespace glslang {
     // Map the given string to an attribute enum from TAttributeType,
     // or EatNone if invalid.
-    TAttributeType TAttributeMap::attributeFromName(const TString& name)
+    TAttributeType TAttributeMap::attributeFromName(const TString& nameSpace, const TString& name)
     {
         // These are case insensitive.
         TString lowername(name);
         std::transform(lowername.begin(), lowername.end(), lowername.begin(), ::tolower);
+        TString lowernameSpace(nameSpace);
+        std::transform(lowernameSpace.begin(), lowernameSpace.end(), lowernameSpace.begin(), ::tolower);
+
+        // handle names within a namespace
+
+        if (lowernameSpace == "vk") {
+            if (lowername == "input_attachment_index")
+                return EatInputAttachment;
+            else if (lowername == "location")
+                return EatLocation;
+            else if (lowername == "binding")
+                return EatBinding;
+            else if (lowername == "global_cbuffer_binding")
+                return EatGlobalBinding;
+        } else if (lowernameSpace.size() > 0)
+            return EatNone;
+
+        // handle names with no namespace
 
         if (lowername == "allow_uav_condition")
             return EatAllow_uav_condition;
@@ -80,18 +99,20 @@ namespace glslang {
             return EatPatchConstantFunc;
         else if (lowername == "unroll")
             return EatUnroll;
+        else if (lowername == "loop")
+            return EatLoop;
         else
             return EatNone;
     }
 
     // Look up entry, inserting if it's not there, and if name is a valid attribute name
     // as known by attributeFromName.
-    TAttributeType TAttributeMap::setAttribute(const TString* name, TIntermAggregate* value)
+    TAttributeType TAttributeMap::setAttribute(const TString& nameSpace, const TString* name, TIntermAggregate* value)
     {
         if (name == nullptr)
             return EatNone;
 
-        const TAttributeType attr = attributeFromName(*name);
+        const TAttributeType attr = attributeFromName(nameSpace, *name);
 
         if (attr != EatNone)
             attributes[attr] = value;
@@ -105,6 +126,59 @@ namespace glslang {
         const auto entry = attributes.find(attr);
 
         return (entry == attributes.end()) ? nullptr : entry->second;
+    }
+
+    // True if entry exists in map (even if value is nullptr)
+    bool TAttributeMap::contains(TAttributeType attr) const
+    {
+        return attributes.find(attr) != attributes.end();
+    }
+
+    // extract integers out of attribute arguments stored in attribute aggregate
+    bool TAttributeMap::getInt(TAttributeType attr, int& value, int argNum) const 
+    {
+        const TConstUnion* intConst = getConstUnion(attr, EbtInt, argNum);
+
+        if (intConst == nullptr)
+            return false;
+
+        value = intConst->getIConst();
+        return true;
+    };
+
+    // extract strings out of attribute arguments stored in attribute aggregate.
+    // convert to lower case if converToLower is true (for case-insensitive compare convenience)
+    bool TAttributeMap::getString(TAttributeType attr, TString& value, int argNum, bool convertToLower) const 
+    {
+        const TConstUnion* stringConst = getConstUnion(attr, EbtString, argNum);
+
+        if (stringConst == nullptr)
+            return false;
+
+        value = *stringConst->getSConst();
+
+        // Convenience.
+        if (convertToLower)
+            std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+
+        return true;
+    };
+
+    // Helper to get attribute const union.  Returns nullptr on failure.
+    const TConstUnion* TAttributeMap::getConstUnion(TAttributeType attr, TBasicType basicType, int argNum) const
+    {
+        const TIntermAggregate* attrAgg = (*this)[attr];
+        if (attrAgg == nullptr)
+            return nullptr;
+
+        if (argNum >= int(attrAgg->getSequence().size()))
+            return nullptr;
+
+        const TConstUnion* constVal = &attrAgg->getSequence()[argNum]->getAsConstantUnion()->getConstArray()[0];
+        if (constVal == nullptr || constVal->getType() != basicType)
+            return nullptr;
+        
+        return constVal;
     }
 
 } // end namespace glslang

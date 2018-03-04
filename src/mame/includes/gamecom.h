@@ -10,8 +10,8 @@
  *
  ****************************************************************************/
 
-#ifndef GAMECOM_H_
-#define GAMECOM_H_
+#ifndef MAME_INCLUDES_GAMECOM_H
+#define MAME_INCLUDES_GAMECOM_H
 
 #include "cpu/sm8500/sm8500.h"
 #include "sound/dac.h"
@@ -250,6 +250,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart1 );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart2 );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void gamecom(machine_config &config);
+	void gamecom_mem_map(address_map &map);
 private:
 	uint8_t *m_p_ram;
 	uint8_t *m_cart_ptr;
@@ -297,4 +299,4 @@ private:
 	required_ioport_array<13> m_io_grid;
 };
 
-#endif /* GAMECOM_H_ */
+#endif // MAME_INCLUDES_GAMECOM_H

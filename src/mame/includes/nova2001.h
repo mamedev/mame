@@ -63,4 +63,16 @@ public:
 	void nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void lineswap_gfx_roms(const char *region, const int bit);
+	void raiders5(machine_config &config);
+	void ninjakun(machine_config &config);
+	void nova2001(machine_config &config);
+	void pkunwar(machine_config &config);
+	void ninjakun_cpu1_map(address_map &map);
+	void ninjakun_cpu2_map(address_map &map);
+	void nova2001_map(address_map &map);
+	void pkunwar_io(address_map &map);
+	void pkunwar_map(address_map &map);
+	void raiders5_cpu1_map(address_map &map);
+	void raiders5_cpu2_map(address_map &map);
+	void raiders5_io(address_map &map);
 };

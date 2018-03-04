@@ -266,13 +266,13 @@ WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_320ram_w)
 
 READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_320ports_r)
 {
-	return m_sounddsp->space(AS_IO).read_word((offset & 7) << 1);
+	return m_sounddsp->space(AS_IO).read_word(offset & 7);
 }
 
 
 WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_320ports_w)
 {
-	m_sounddsp->space(AS_IO).write_word((offset & 7) << 1, data);
+	m_sounddsp->space(AS_IO).write_word(offset & 7, data);
 }
 
 
@@ -391,7 +391,7 @@ READ16_MEMBER(harddriv_sound_board_device::hdsnddsp_compare_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( driversnd_68k_map, AS_PROGRAM, 16, harddriv_sound_board_device )
+ADDRESS_MAP_START(harddriv_sound_board_device::driversnd_68k_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0xff0000, 0xff0fff) AM_READWRITE(hdsnd68k_data_r, hdsnd68k_data_w)
@@ -405,7 +405,7 @@ static ADDRESS_MAP_START( driversnd_68k_map, AS_PROGRAM, 16, harddriv_sound_boar
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( driversnd_dsp_program_map, AS_PROGRAM, 16, harddriv_sound_board_device )
+ADDRESS_MAP_START(harddriv_sound_board_device::driversnd_dsp_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0xfff) AM_RAM AM_SHARE("sounddsp_ram")
 ADDRESS_MAP_END
@@ -413,7 +413,7 @@ ADDRESS_MAP_END
 
 /* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-static ADDRESS_MAP_START( driversnd_dsp_io_map, AS_IO, 16, harddriv_sound_board_device )
+ADDRESS_MAP_START(harddriv_sound_board_device::driversnd_dsp_io_map)
 	AM_RANGE(0, 0) AM_READ(hdsnddsp_rom_r) AM_WRITE(hdsnddsp_dac_w)
 	AM_RANGE(1, 1) AM_READ(hdsnddsp_comram_r)
 	AM_RANGE(2, 2) AM_READ(hdsnddsp_compare_r)
@@ -429,10 +429,10 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( harddriv_sound_board_device::device_add_mconfig )
+MACHINE_CONFIG_START(harddriv_sound_board_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M68000, XTAL_16MHz/2)
+	MCFG_CPU_ADD("soundcpu", M68000, XTAL(16'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(driversnd_68k_map)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // 80R
@@ -443,7 +443,7 @@ MACHINE_CONFIG_MEMBER( harddriv_sound_board_device::device_add_mconfig )
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sounddsp", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT // RES320
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(harddriv_sound_board_device, led_w))
 
-	MCFG_CPU_ADD("sounddsp", TMS32010, XTAL_20MHz)
+	MCFG_CPU_ADD("sounddsp", TMS32010, XTAL(20'000'000))
 	MCFG_CPU_PROGRAM_MAP(driversnd_dsp_program_map)
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(driversnd_dsp_io_map)

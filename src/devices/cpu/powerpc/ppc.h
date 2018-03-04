@@ -165,7 +165,7 @@ enum
 ***************************************************************************/
 
 #define MCFG_PPC_BUS_FREQUENCY(_frequency) \
-	ppc_device::set_bus_frequency(*device, _frequency);
+	downcast<ppc_device &>(*device).set_bus_frequency(_frequency);
 
 
 class ppc_frontend;
@@ -213,7 +213,8 @@ protected:
 	ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map);
 
 public:
-	static void set_bus_frequency(device_t &device, uint32_t bus_frequency) { downcast<ppc_device &>(device).c_bus_frequency = bus_frequency; }
+	void set_bus_frequency(uint32_t bus_frequency) { c_bus_frequency = bus_frequency; }
+	void set_bus_frequency(const XTAL &xtal) { set_bus_frequency(xtal.value()); }
 
 	void ppc_set_dcstore_callback(write32_delegate callback);
 
@@ -268,9 +269,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	/* exception types */
 	enum
@@ -492,7 +491,7 @@ protected:
 	int             m_buffered_dma_rate[4];
 
 	/* internal stuff */
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	offs_t          m_codexor;
 	uint32_t          m_system_clock;
 	uint32_t          m_cpu_clock;
@@ -761,6 +760,7 @@ public:
 	DECLARE_READ8_MEMBER( ppc4xx_spu_r );
 	DECLARE_WRITE8_MEMBER( ppc4xx_spu_w );
 
+	void internal_ppc4xx(address_map &map);
 protected:
 	ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor);
 

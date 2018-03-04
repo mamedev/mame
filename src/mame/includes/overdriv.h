@@ -5,7 +5,9 @@
     Over Drive
 
 *************************************************************************/
+
 #include "machine/k053252.h"
+#include "machine/timer.h"
 #include "video/k051316.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k053251.h"
@@ -68,4 +70,9 @@ public:
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K053246_CB_MEMBER(sprite_callback);
+	void overdriv(machine_config &config);
+	void overdriv_k053260_map(address_map &map);
+	void overdriv_master_map(address_map &map);
+	void overdriv_slave_map(address_map &map);
+	void overdriv_sound_map(address_map &map);
 };

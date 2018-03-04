@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/gen_latch.h"
+#include "machine/i8212.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 
@@ -38,6 +38,11 @@ public:
 	DECLARE_WRITE8_MEMBER(lights_a_w);
 	DECLARE_WRITE8_MEMBER(lights_b_w);
 
+	void supstarf(machine_config &config);
+	void main_io_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -45,29 +50,29 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device_array<ay8910_device, 2> m_psg;
-	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+	required_device_array<i8212_device, 2> m_soundlatch;
 
 	u8 m_port1_data;
 	bool m_pcs[2];
 	bool m_latch_select;
 };
 
-static ADDRESS_MAP_START(main_map, AS_PROGRAM, 8, supstarf_state)
+ADDRESS_MAP_START(supstarf_state::main_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch1", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch1", i8212_device, read) AM_DEVWRITE("soundlatch2", i8212_device, strobe)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM // 5517 (2Kx8) at IC11
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(main_io_map, AS_IO, 8, supstarf_state)
+ADDRESS_MAP_START(supstarf_state::main_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_WRITE(driver_clk_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sound_map, AS_PROGRAM, 8, supstarf_state)
+ADDRESS_MAP_START(supstarf_state::sound_map)
 	AM_RANGE(0x000, 0xfff) AM_ROM // external EPROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sound_io_map, AS_IO, 8, supstarf_state)
+ADDRESS_MAP_START(supstarf_state::sound_io_map)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(psg_latch_r, psg_latch_w)
 ADDRESS_MAP_END
 
@@ -102,7 +107,7 @@ WRITE8_MEMBER(supstarf_state::psg_latch_w)
 	}
 
 	if (m_latch_select)
-		m_soundlatch[0]->write(space, 0, data);
+		m_soundlatch[0]->strobe(space, 0, data);
 }
 
 WRITE8_MEMBER(supstarf_state::port1_w)
@@ -163,35 +168,37 @@ void supstarf_state::machine_start()
 	save_item(NAME(m_port1_data));
 }
 
-static MACHINE_CONFIG_START(supstarf)
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
+MACHINE_CONFIG_START(supstarf_state::supstarf)
+	MCFG_CPU_ADD("maincpu", I8085A, XTAL(5'068'800))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_I8085A_SID(READLINE(supstarf_state, contacts_r))
 	MCFG_I8085A_SOD(WRITELINE(supstarf_state, displays_w))
 
-	MCFG_CPU_ADD("soundcpu", I8035, XTAL_5_0688MHz / 2) // from 8085 pin 37 (CLK OUT)
+	MCFG_CPU_ADD("soundcpu", I8035, XTAL(5'068'800) / 2) // from 8085 pin 37 (CLK OUT)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(supstarf_state, port1_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(supstarf_state, port2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(supstarf_state, phase_detect_r))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", I8085_RST55_LINE))
+	MCFG_DEVICE_ADD("soundlatch1", I8212, 0)
+	MCFG_I8212_MD_CALLBACK(GND)
+	MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", MCS48_INPUT_IRQ))
+	MCFG_DEVICE_ADD("soundlatch2", I8212, 0)
+	MCFG_I8212_MD_CALLBACK(GND)
+	MCFG_I8212_INT_CALLBACK(INPUTLINE("soundcpu", MCS48_INPUT_IRQ))
 	//MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("maincpu", I8085_READY_LINE))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("psg1", AY8910, XTAL_5_0688MHz / 6) // from 8035 pin 1 (T0)
+	MCFG_SOUND_ADD("psg1", AY8910, XTAL(5'068'800) / 6) // from 8035 pin 1 (T0)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(supstarf_state, lights_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(supstarf_state, lights_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("psg2", AY8910, XTAL_5_0688MHz / 6) // from 8035 pin 1 (T0)
+	MCFG_SOUND_ADD("psg2", AY8910, XTAL(5'068'800) / 6) // from 8035 pin 1 (T0)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JO"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("I1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

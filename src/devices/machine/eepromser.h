@@ -22,10 +22,10 @@
 
 // optional enable for streaming reads
 #define MCFG_EEPROM_SERIAL_ENABLE_STREAMING() \
-	eeprom_serial_base_device::static_enable_streaming(*device);
+	downcast<eeprom_serial_base_device &>(*device).enable_streaming(true);
 // optional enable for output on falling clock
 #define MCFG_EEPROM_SERIAL_ENABLE_OUTPUT_ON_FALLING_CLOCK() \
-	eeprom_serial_base_device::static_enable_output_on_falling_clock(*device);
+	downcast<eeprom_serial_base_device &>(*device).enable_output_on_falling_clock(true);
 
 // standard 93CX6 class of 16-bit EEPROMs
 #define MCFG_EEPROM_SERIAL_93C06_ADD(_tag) \
@@ -91,6 +91,8 @@
 #define MCFG_EEPROM_SERIAL_DATA MCFG_EEPROM_DATA
 #define MCFG_EEPROM_SERIAL_DEFAULT_VALUE MCFG_EEPROM_DEFAULT_VALUE
 
+#define MCFG_EEPROM_SERIAL_DO_CALLBACK(_devcb) \
+	devcb = &downcast<eeprom_serial_base_device &>(*device).set_do_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -104,9 +106,10 @@ class eeprom_serial_base_device : public eeprom_base_device
 {
 public:
 	// inline configuration helpers
-	static void static_set_address_bits(device_t &device, int addrbits);
-	static void static_enable_streaming(device_t &device);
-	static void static_enable_output_on_falling_clock(device_t &device);
+	void set_address_bits(int addrbits) { m_command_address_bits = addrbits; }
+	void enable_streaming(bool enable) { m_streaming_enabled = enable; }
+	void enable_output_on_falling_clock(bool enable) { m_output_on_falling_clock_enabled = enable; }
+	template<class Object> devcb_base &set_do_callback(Object &&cb) { return m_do_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// construction/destruction
@@ -174,6 +177,7 @@ protected:
 	uint8_t         m_command_address_bits;     // number of address bits in a command
 	bool            m_streaming_enabled;        // true if streaming is enabled
 	bool            m_output_on_falling_clock_enabled;  // true if the output pin is updated on the falling edge of the clock
+	devcb_write_line m_do_cb;                   // callback to push state of DO line
 
 	// runtime state
 	eeprom_state    m_state;                    // current internal state
@@ -314,7 +318,7 @@ DECLARE_SERIAL_EEPROM_DEVICE(93cxx, s29190, S29190, 16)
 DECLARE_SERIAL_EEPROM_DEVICE(93cxx, s29290, S29290, 16)
 DECLARE_SERIAL_EEPROM_DEVICE(93cxx, s29390, S29390, 16)
 
-// X24c44 8 bit 32byte ram/eeprom combo
+// X24c44 16 bit 32byte ram/eeprom combo
 DECLARE_SERIAL_EEPROM_DEVICE(x24c44, x24c44, X24C44, 16)
 
 #endif // MAME_MACHINE_EEPROMSER_H

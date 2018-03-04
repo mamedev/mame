@@ -6,13 +6,13 @@
 
   TODO:
   - EXKSA, EXKFA opcodes
-  - SM500 data book suggests that R1 divider output is selectable, but how?
   - unknown which O group is which W output, guessed for now (segments and H should be ok)
 
 */
 
 #include "emu.h"
 #include "sm500.h"
+#include "sm510d.h"
 #include "debugger.h"
 
 
@@ -21,11 +21,11 @@ DEFINE_DEVICE_TYPE(SM500, sm500_device, "sm500", "SM500") // 1.2K ROM, 4x10x4 RA
 
 
 // internal memory maps
-static ADDRESS_MAP_START(program_1_2k, AS_PROGRAM, 8, sm510_base_device)
+ADDRESS_MAP_START(sm500_device::program_1_2k)
 	AM_RANGE(0x000, 0x4bf) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_4x10x4, AS_DATA, 8, sm510_base_device)
+ADDRESS_MAP_START(sm500_device::data_4x10x4)
 	AM_RANGE(0x00, 0x09) AM_RAM
 	AM_RANGE(0x10, 0x19) AM_RAM
 	AM_RANGE(0x20, 0x29) AM_RAM
@@ -35,7 +35,7 @@ ADDRESS_MAP_END
 
 // device definitions
 sm500_device::sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm500_device(mconfig, SM500, tag, owner, clock, 1 /* stack levels */, 7 /* o group pins */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1_2k), 6 /* data width */, ADDRESS_MAP_NAME(data_4x10x4))
+	: sm500_device(mconfig, SM500, tag, owner, clock, 1 /* stack levels */, 7 /* o group pins */, 11 /* prg width */, address_map_constructor(FUNC(sm500_device::program_1_2k), this), 6 /* data width */, address_map_constructor(FUNC(sm500_device::data_4x10x4), this))
 {
 }
 
@@ -48,10 +48,9 @@ sm500_device::sm500_device(const machine_config &mconfig, device_type type, cons
 
 
 // disasm
-offs_t sm500_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *sm500_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(sm500);
-	return CPU_DISASSEMBLE_NAME(sm500)(this, stream, pc, oprom, opram, options);
+	return new sm500_disassembler;
 }
 
 
@@ -134,9 +133,9 @@ void sm500_device::lcd_update()
 
 void sm500_device::clock_melody()
 {
-	// R1 buzzer from divider, R2-R4 generic outputs
-	u8 out = m_div >> 2 & 1;
-	out = (out & ~m_r) | (~m_r & 0xe);
+	// R1 from divider or direct control, R2-R4 generic outputs
+	u8 mask = (m_r_mask_option == SM510_R_CONTROL_OUTPUT) ? 1 : (m_div >> m_r_mask_option & 1);
+	u8 out = (mask & ~m_r) | (~m_r & 0xe);
 
 	// output to R pins
 	if (out != m_r_out)

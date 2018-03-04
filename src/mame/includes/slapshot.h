@@ -91,6 +91,11 @@ public:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
+	void opwolf3(machine_config &config);
+	void slapshot(machine_config &config);
+	void opwolf3_map(address_map &map);
+	void opwolf3_z80_sound_map(address_map &map);
+	void slapshot_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

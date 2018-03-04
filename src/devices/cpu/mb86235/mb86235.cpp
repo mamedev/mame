@@ -14,6 +14,7 @@
 #include "emu.h"
 #include "mb86235.h"
 #include "mb86235fe.h"
+#include "mb86235d.h"
 
 #include "debugger.h"
 
@@ -32,11 +33,11 @@
 DEFINE_DEVICE_TYPE(MB86235, mb86235_device, "mb86235", "MB86235")
 
 
-static ADDRESS_MAP_START(internal_abus, AS_DATA, 32, mb86235_device)
+ADDRESS_MAP_START(mb86235_device::internal_abus)
 	AM_RANGE(0x000000, 0x0003ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(internal_bbus, AS_IO, 32, mb86235_device)
+ADDRESS_MAP_START(mb86235_device::internal_bbus)
 	AM_RANGE(0x000000, 0x0003ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -56,7 +57,7 @@ void mb86235_device::execute_run()
 void mb86235_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-3>();
 	m_dataa = &space(AS_DATA);
 	m_datab = &space(AS_IO);
 
@@ -207,8 +208,8 @@ void mb86235_cpu_device::execute_set_input(int irqline, int state)
 mb86235_device::mb86235_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, MB86235, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 32, -3)
-	, m_dataa_config("data_a", ENDIANNESS_LITTLE, 32, 24, -2, ADDRESS_MAP_NAME(internal_abus))
-	, m_datab_config("data_b", ENDIANNESS_LITTLE, 32, 10, -2, ADDRESS_MAP_NAME(internal_bbus))
+	, m_dataa_config("data_a", ENDIANNESS_LITTLE, 32, 24, -2, address_map_constructor(FUNC(mb86235_device::internal_abus), this))
+	, m_datab_config("data_b", ENDIANNESS_LITTLE, 32, 10, -2, address_map_constructor(FUNC(mb86235_device::internal_bbus), this))
 	, m_cache(CACHE_SIZE + sizeof(mb86235_internal_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
@@ -234,10 +235,9 @@ void mb86235_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-offs_t mb86235_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mb86235_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( mb86235 );
-	return CPU_DISASSEMBLE_NAME(mb86235)(this, stream, pc, oprom, opram, options);
+	return new mb86235_disassembler;
 }
 
 

@@ -59,6 +59,7 @@ ksm|DVK KSM,
 #include "machine/i8255.h"
 #include "machine/ms7004.h"
 #include "machine/pic8259.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 
@@ -122,6 +123,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ksm_ppi_porta_w);
 	DECLARE_WRITE8_MEMBER(ksm_ppi_portc_w);
 
+	void ksm(machine_config &config);
+	void ksm_io(address_map &map);
+	void ksm_mem(address_map &map);
 private:
 	uint32_t draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline);
 	rectangle m_tmpclip;
@@ -155,14 +159,14 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START( ksm_mem, AS_PROGRAM, 8, ksm_state )
+ADDRESS_MAP_START(ksm_state::ksm_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x0000, 0x0fff) AM_ROM
 	AM_RANGE (0x2000, 0x20ff) AM_RAM AM_MIRROR(0x0700)
 	AM_RANGE (0xc000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ksm_io, AS_IO, 8, ksm_state )
+ADDRESS_MAP_START(ksm_state::ksm_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x5e, 0x5f) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE (0x6e, 0x6e) AM_DEVREADWRITE("i8251kbd", i8251_device, data_r, data_w)
@@ -409,8 +413,8 @@ static GFXDECODE_START( ksm )
 	GFXDECODE_ENTRY("chargen", 0x0000, ksm_charlayout, 0, 1)
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ksm )
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_15_4MHz/10)
+MACHINE_CONFIG_START(ksm_state::ksm)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(15'400'000)/10)
 	MCFG_CPU_PROGRAM_MAP(ksm_mem)
 	MCFG_CPU_IO_MAP(ksm_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
@@ -419,7 +423,7 @@ static MACHINE_CONFIG_START( ksm )
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(ksm_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_15_4MHz, KSM_TOTAL_HORZ, KSM_HORZ_START,
+	MCFG_SCREEN_RAW_PARAMS(XTAL(15'400'000), KSM_TOTAL_HORZ, KSM_HORZ_START,
 		KSM_HORZ_START+KSM_DISP_HORZ, KSM_TOTAL_VERT, KSM_VERT_START,
 		KSM_VERT_START+KSM_DISP_VERT);
 

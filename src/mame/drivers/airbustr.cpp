@@ -305,7 +305,7 @@ WRITE8_MEMBER(airbustr_state::coin_counter_w)
 }
 
 /* Memory Maps */
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, airbustr_state )
+ADDRESS_MAP_START(airbustr_state::master_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("masterbank")
 	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_r, spriteram_w)
@@ -314,27 +314,27 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, airbustr_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_io_map, AS_IO, 8, airbustr_state )
+ADDRESS_MAP_START(airbustr_state::master_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(master_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_WRITENOP // ???
 	AM_RANGE(0x02, 0x02) AM_WRITE(master_nmi_trigger_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, airbustr_state )
+ADDRESS_MAP_START(airbustr_state::slave_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("slavebank")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd000, 0xd5ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd000, 0xd5ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xd600, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_io_map, AS_IO, 8, airbustr_state )
+ADDRESS_MAP_START(airbustr_state::slave_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
@@ -347,13 +347,13 @@ static ADDRESS_MAP_START( slave_io_map, AS_IO, 8, airbustr_state )
 	AM_RANGE(0x38, 0x38) AM_WRITENOP // irq ack / irq mask
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, airbustr_state )
+ADDRESS_MAP_START(airbustr_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audiobank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, airbustr_state )
+ADDRESS_MAP_START(airbustr_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
@@ -543,20 +543,20 @@ void airbustr_state::machine_reset()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( airbustr )
+MACHINE_CONFIG_START(airbustr_state::airbustr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master", Z80, XTAL_12MHz/2)   /* verified on pcb */
+	MCFG_CPU_ADD("master", Z80, XTAL(12'000'000)/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airbustr_state, airbustr_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", Z80, XTAL_12MHz/2)    /* verified on pcb */
+	MCFG_CPU_ADD("slave", Z80, XTAL(12'000'000)/2)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_IO_MAP(slave_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", airbustr_state,  slave_interrupt) /* nmi signal from master cpu */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", airbustr_state,  irq0_line_hold)       // nmi are caused by sub cpu writing a sound command
@@ -593,7 +593,7 @@ static MACHINE_CONFIG_START( airbustr )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)   /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)   /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))       // DSW-1 connected to port A
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))       // DSW-2 connected to port B
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -601,11 +601,12 @@ static MACHINE_CONFIG_START( airbustr )
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/4, PIN7_LOW)   /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/4, PIN7_LOW)   /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( airbustrb, airbustr )
+MACHINE_CONFIG_START(airbustr_state::airbustrb)
+	airbustr(config);
 	MCFG_WATCHDOG_MODIFY("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0)) // no protection device or watchdog
 MACHINE_CONFIG_END

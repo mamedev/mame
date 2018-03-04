@@ -81,7 +81,7 @@ to the page register.
 Ignore the warnings about writing to unmapped memory.
 */
 
-static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8, srumbler_state )
+ADDRESS_MAP_START(srumbler_state::srumbler_map)
 	AM_RANGE(0x0000, 0x1dff) AM_RAM  /* RAM (of 1 sort or another) */
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(background_w) AM_SHARE("backgroundram")
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8, srumbler_state )
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("6000") /* Banked ROM */
 	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP        /* Video RAM 2 ??? (not used) */
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("7000") /* Banked ROM */
-	AM_RANGE(0x7000, 0x73ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x7000, 0x73ff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("8000") /* Banked ROM */
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("9000") /* Banked ROM */
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("a000") /* Banked ROM */
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8, srumbler_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROMBANK("f000") /* Banked ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( srumbler_sound_map, AS_PROGRAM, 8, srumbler_state )
+ADDRESS_MAP_START(srumbler_state::srumbler_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym2", ym2203_device, write)
@@ -243,10 +243,10 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( srumbler )
+MACHINE_CONFIG_START(srumbler_state::srumbler)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz (?) */
+	MCFG_CPU_ADD("maincpu", MC6809, 6000000)        /* HD68B09P at 6 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(srumbler_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", srumbler_state, interrupt, "screen", 0, 1)
 

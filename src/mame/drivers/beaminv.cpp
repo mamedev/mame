@@ -90,6 +90,9 @@ public:
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 	void create_interrupt_timer();
 	void start_interrupt_timer();
+	void beaminv(machine_config &config);
+	void main_io_map(address_map &map);
+	void main_map(address_map &map);
 };
 
 
@@ -238,7 +241,7 @@ READ8_MEMBER(beaminv_state::controller_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, beaminv_state )
+ADDRESS_MAP_START(beaminv_state::main_map)
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW")
@@ -256,7 +259,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8, beaminv_state )
+ADDRESS_MAP_START(beaminv_state::main_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(controller_select_w) /* to be confirmed */
 ADDRESS_MAP_END
@@ -335,7 +338,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( beaminv )
+MACHINE_CONFIG_START(beaminv_state::beaminv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)   /* 2 MHz ? */

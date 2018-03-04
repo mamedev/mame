@@ -29,14 +29,6 @@ public:
 	// construction/destruction
 	adam_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// not really public
-	DECLARE_WRITE8_MEMBER( p1_w );
-	DECLARE_READ8_MEMBER( p2_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( p3_r );
-	DECLARE_READ8_MEMBER( p4_r );
-	DECLARE_WRITE8_MEMBER( p4_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -48,7 +40,18 @@ protected:
 	// device_adamnet_card_interface overrides
 	virtual void adamnet_reset_w(int state) override;
 
+private:
 	required_device<cpu_device> m_maincpu;
+
+	DECLARE_WRITE8_MEMBER( p1_w );
+	DECLARE_READ8_MEMBER( p2_r );
+	DECLARE_WRITE8_MEMBER( p2_w );
+	DECLARE_READ8_MEMBER( p3_r );
+	DECLARE_READ8_MEMBER( p4_r );
+	DECLARE_WRITE8_MEMBER( p4_w );
+
+	void adam_prn_io(address_map &map);
+	void adam_prn_mem(address_map &map);
 };
 
 

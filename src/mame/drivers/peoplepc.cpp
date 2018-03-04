@@ -62,6 +62,9 @@ public:
 	void floppy_unload(floppy_image_device *dev);
 
 	uint8_t m_dma0pg;
+	void olypeopl(machine_config &config);
+	void peoplepc_io(address_map &map);
+	void peoplepc_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -187,7 +190,7 @@ void peoplepc_state::machine_start()
 	m_flop1->get_device()->setup_unload_cb(floppy_image_device::unload_cb(&peoplepc_state::floppy_unload, this));
 }
 
-static ADDRESS_MAP_START( peoplepc_map, AS_PROGRAM, 16, peoplepc_state )
+ADDRESS_MAP_START(peoplepc_state::peoplepc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM
 	AM_RANGE(0xc0000, 0xdffff) AM_RAM AM_SHARE("gvram")
@@ -196,7 +199,7 @@ static ADDRESS_MAP_START( peoplepc_map, AS_PROGRAM, 16, peoplepc_state )
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(peoplepc_io, AS_IO, 16, peoplepc_state )
+ADDRESS_MAP_START(peoplepc_state::peoplepc_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0014, 0x0017) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0018, 0x001b) AM_DEVREADWRITE8("pic8259_0", pic8259_device, read, write, 0x00ff)
@@ -233,19 +236,19 @@ static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( olypeopl )
+MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_14_7456MHz/3)
+	MCFG_CPU_ADD("maincpu", I8086, XTAL(14'745'600)/3)
 	MCFG_CPU_PROGRAM_MAP(peoplepc_map)
 	MCFG_CPU_IO_MAP(peoplepc_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_0", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_14_7456MHz/6)
+	MCFG_PIT8253_CLK0(XTAL(14'745'600)/6)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(peoplepc_state, kbd_clock_tick_w))
-	MCFG_PIT8253_CLK1(XTAL_14_7456MHz/6)
+	MCFG_PIT8253_CLK1(XTAL(14'745'600)/6)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(peoplepc_state, tty_clock_tick_w))
-	MCFG_PIT8253_CLK2(XTAL_14_7456MHz/6)
+	MCFG_PIT8253_CLK2(XTAL(14'745'600)/6)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic8259_0", pic8259_device, ir0_w))
 
 	MCFG_DEVICE_ADD("pic8259_0", PIC8259, 0)
@@ -260,18 +263,18 @@ static MACHINE_CONFIG_START( olypeopl )
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL_22MHz,640,0,640,475,0,475)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(22'000'000),640,0,640,475,0,475)
 	MCFG_SCREEN_UPDATE_DEVICE( "h46505", mc6845_device, screen_update )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD("h46505", H46505, "screen", XTAL_22MHz/8)
+	MCFG_MC6845_ADD("h46505", H46505, "screen", XTAL(22'000'000)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(peoplepc_state, update_row)
 
-	MCFG_DEVICE_ADD("i8257", I8257, XTAL_14_7456MHz/3)
+	MCFG_DEVICE_ADD("i8257", I8257, XTAL(14'745'600)/3)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(peoplepc_state, hrq_w))
 	MCFG_I8257_OUT_TC_CB(WRITELINE(peoplepc_state, tc_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(peoplepc_state, memory_read_byte))

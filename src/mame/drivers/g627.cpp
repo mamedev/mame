@@ -67,6 +67,9 @@ public:
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
+	void g627(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_seg[6];
 	uint8_t m_portc;
@@ -78,13 +81,13 @@ private:
 };
 
 
-static ADDRESS_MAP_START( g627_map, AS_PROGRAM, 8, g627_state )
+ADDRESS_MAP_START(g627_state::mem_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_DEVREADWRITE("i8156", i8155_device, memory_r, memory_w)
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_SHARE("nvram") // battery backed
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( g627_io, AS_IO, 8, g627_state )
+ADDRESS_MAP_START(g627_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x02) AM_WRITE(disp_w)
 	AM_RANGE(0x03, 0x07) AM_WRITE(lamp_w)
@@ -286,11 +289,11 @@ WRITE8_MEMBER( g627_state::lamp_w )
 	}
 }
 
-static MACHINE_CONFIG_START( g627 )
+MACHINE_CONFIG_START(g627_state::g627)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 14138000/8)
-	MCFG_CPU_PROGRAM_MAP(g627_map)
-	MCFG_CPU_IO_MAP(g627_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("i8156", I8156, 14138000/8)
 	MCFG_I8155_IN_PORTA_CB(READ8(g627_state, porta_r))
@@ -301,7 +304,7 @@ static MACHINE_CONFIG_START( g627 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("astrocade",  ASTROCADE, 14138000/8) // 0066-117XX audio chip
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -97,6 +97,8 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void dai3wksi(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -319,7 +321,7 @@ WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_3_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dai3wksi_state )
+ADDRESS_MAP_START(dai3wksi_state::main_map)
 	AM_RANGE(0x0000, 0x1bff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x2400, 0x24ff) AM_MIRROR(0x100) AM_READ_PORT("IN0")
@@ -400,10 +402,10 @@ void dai3wksi_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( dai3wksi )
+MACHINE_CONFIG_START(dai3wksi_state::dai3wksi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dai3wksi_state,  irq0_line_hold)
 

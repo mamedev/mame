@@ -137,6 +137,7 @@
 #include "formats/pc_dsk.h"
 #include "machine/ncr539x.h"
 #include "machine/timekpr.h"
+#include "machine/timer.h"
 #include "machine/upd765.h"
 #include "machine/z80scc.h"
 
@@ -207,13 +208,17 @@ public:
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void sun3_80(machine_config &config);
+	void sun3_460(machine_config &config);
+	void sun3_460_mem(address_map &map);
+	void sun3_80_mem(address_map &map);
 private:
 	uint32_t m_enable, m_buserr, m_diag, m_printer, m_irqctrl, m_memreg, m_memerraddr;
 	uint32_t m_iommu[0x800];
 	bool m_bInBusErr;
 };
 
-static ADDRESS_MAP_START(sun3_80_mem, AS_PROGRAM, 32, sun3x_state)
+ADDRESS_MAP_START(sun3x_state::sun3_80_mem)
 	AM_RANGE(0x00000000, 0x03ffffff) AM_RAM AM_SHARE("p_ram") AM_WRITE(ramwrite_w)
 	AM_RANGE(0x40000000, 0x40000003) AM_READWRITE(cause_buserr_r, cause_buserr_w)
 	AM_RANGE(0x50300000, 0x50300003) AM_READ(p4id_r)
@@ -236,7 +241,7 @@ static ADDRESS_MAP_START(sun3_80_mem, AS_PROGRAM, 32, sun3x_state)
 	AM_RANGE(0xfefe0000, 0xfefeffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sun3_460_mem, AS_PROGRAM, 32, sun3x_state)
+ADDRESS_MAP_START(sun3x_state::sun3_460_mem)
 	AM_RANGE(0x00000000, 0x03ffffff) AM_RAM AM_SHARE("p_ram") AM_WRITE(ramwrite_w)
 	AM_RANGE(0x09000000, 0x09000003) AM_READWRITE(cause_buserr_r, cause_buserr_w)
 	AM_RANGE(0x50300000, 0x50300003) AM_READ(p4id_r)
@@ -264,7 +269,7 @@ READ32_MEMBER( sun3x_state::p4id_r )
 
 WRITE32_MEMBER( sun3x_state::fdc_control_w )
 {
-	logerror("FDC write %02x (%08x)\n", data >> 24, space.device().safe_pc());
+	logerror("FDC write %02x (%08x)\n", data >> 24, m_maincpu->pc());
 }
 
 READ32_MEMBER( sun3x_state::fdc_control_r )
@@ -574,20 +579,20 @@ static SLOT_INTERFACE_START( sun_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( sun3_80 )
+MACHINE_CONFIG_START(sun3x_state::sun3_80)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_80_mem)
 
 	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
 	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle")
 	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
@@ -621,15 +626,15 @@ static MACHINE_CONFIG_START( sun3_80 )
 	MCFG_SCREEN_REFRESH_RATE(72)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun3_460 )
+MACHINE_CONFIG_START(sun3x_state::sun3_460)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_460_mem)
 
 	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 

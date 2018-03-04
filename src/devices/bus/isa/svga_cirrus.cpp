@@ -30,14 +30,13 @@ DEFINE_DEVICE_TYPE(ISA16_SVGA_CIRRUS_GD542X, isa16_svga_cirrus_gd542x_device, "c
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa16_svga_cirrus_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa16_svga_cirrus_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5430_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5430, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -67,7 +66,7 @@ isa16_svga_cirrus_device::isa16_svga_cirrus_device(const machine_config &mconfig
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_svga_cirrus_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER(isa16_svga_cirrus_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_svga_cirrus_device::device_start()
 {
@@ -111,14 +110,13 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa16_svga_cirrus_gd542x_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa16_svga_cirrus_gd542x_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -148,7 +146,7 @@ isa16_svga_cirrus_gd542x_device::isa16_svga_cirrus_gd542x_device(const machine_c
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_svga_cirrus_gd542x_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER(isa16_svga_cirrus_gd542x_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa16_svga_cirrus_gd542x_device::device_start()
 {

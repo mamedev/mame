@@ -57,7 +57,7 @@ WRITE16_MEMBER(galspnbl_state::soundcommand_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, galspnbl_state )
+ADDRESS_MAP_START(galspnbl_state::main_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x700000, 0x703fff) AM_RAM     /* galspnbl work RAM */
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM     /* galspnbl work RAM, bitmaps are decompressed here */
@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, galspnbl_state )
 	AM_RANGE(0x905000, 0x907fff) AM_WRITENOP    /* ??? */
 	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_SHARE("bgvideoram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_WRITENOP    /* more palette ? */
-	AM_RANGE(0xa01000, 0xa017ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa01000, 0xa017ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa01800, 0xa027ff) AM_WRITENOP    /* more palette ? */
 	AM_RANGE(0xa80000, 0xa80001) AM_READ_PORT("IN0")
 	AM_RANGE(0xa80010, 0xa80011) AM_READ_PORT("IN1") AM_WRITE(soundcommand_w)
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, galspnbl_state )
 	AM_RANGE(0xa80050, 0xa80051) AM_WRITEONLY AM_SHARE("scroll")    /* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, galspnbl_state )
+ADDRESS_MAP_START(galspnbl_state::audio_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -212,14 +212,14 @@ void galspnbl_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( galspnbl )
+MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* 12 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* 12 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galspnbl_state,  irq3_line_hold)/* also has vector for 6, but it does nothing */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)    /* 4 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000))    /* 4 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 								/* NMI is caused by the main CPU */
 
@@ -250,11 +250,11 @@ static MACHINE_CONFIG_START( galspnbl )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* Use value from Super Pinball Action - NEEDS VERIFICATION!! */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Use value from Super Pinball Action - NEEDS VERIFICATION!! */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH) /* Use value from Super Pinball Action - clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH) /* Use value from Super Pinball Action - clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

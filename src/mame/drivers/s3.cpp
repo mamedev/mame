@@ -42,6 +42,7 @@ ToDo:
 
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -88,6 +89,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s3);
 	DECLARE_MACHINE_RESET(s3a);
+	void s3a(machine_config &config);
+	void s3(machine_config &config);
+	void s3_audio_map(address_map &map);
+	void s3_main_map(address_map &map);
 private:
 	uint8_t m_t_c;
 	uint8_t m_sound_data;
@@ -104,7 +109,7 @@ private:
 	optional_device<pia6821_device> m_pias;
 };
 
-static ADDRESS_MAP_START( s3_main_map, AS_PROGRAM, 8, s3_state )
+ADDRESS_MAP_START(s3_state::s3_main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
@@ -115,7 +120,7 @@ static ADDRESS_MAP_START( s3_main_map, AS_PROGRAM, 8, s3_state )
 	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s3_audio_map, AS_PROGRAM, 8, s3_state )
+ADDRESS_MAP_START(s3_state::s3_audio_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0400, 0x0403) AM_DEVREADWRITE("pias", pia6821_device, read, write) // sounds
@@ -423,7 +428,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( s3_state::irq )
 		m_t_c++;
 }
 
-static MACHINE_CONFIG_START( s3 )
+MACHINE_CONFIG_START(s3_state::s3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s3_main_map)
@@ -434,7 +439,7 @@ static MACHINE_CONFIG_START( s3 )
 	MCFG_DEFAULT_LAYOUT(layout_s3)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia22", PIA6821, 0)
@@ -475,7 +480,8 @@ static MACHINE_CONFIG_START( s3 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( s3a, s3 )
+MACHINE_CONFIG_START(s3_state::s3a)
+	s3(config);
 	/* Add the soundcard */
 	MCFG_CPU_ADD("audiocpu", M6802, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s3_audio_map)

@@ -72,6 +72,10 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void go2000(machine_config &config);
+	void go2000_map(address_map &map);
+	void go2000_sound_io(address_map &map);
+	void go2000_sound_map(address_map &map);
 };
 
 
@@ -81,12 +85,12 @@ WRITE16_MEMBER(go2000_state::sound_cmd_w)
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( go2000_map, AS_PROGRAM, 16, go2000_state )
+ADDRESS_MAP_START(go2000_state::go2000_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW")
 	AM_RANGE(0x620002, 0x620003) AM_WRITE(sound_cmd_w)
@@ -100,12 +104,12 @@ WRITE8_MEMBER(go2000_state::go2000_pcm_1_bankswitch_w)
 	membank("bank1")->set_entry(data & 0x07);
 }
 
-static ADDRESS_MAP_START( go2000_sound_map, AS_PROGRAM, 8, go2000_state )
+ADDRESS_MAP_START(go2000_state::go2000_sound_map)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( go2000_sound_io, AS_IO, 8, go2000_state )
+ADDRESS_MAP_START(go2000_state::go2000_sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac", dac_byte_interface, write)
@@ -333,7 +337,7 @@ void go2000_state::machine_start()
 
 }
 
-static MACHINE_CONFIG_START( go2000 )
+MACHINE_CONFIG_START(go2000_state::go2000)
 
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(go2000_map)

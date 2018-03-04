@@ -10,6 +10,7 @@
 
 #include "machine/namco_c139.h"
 #include "machine/namco_c148.h"
+#include "machine/timer.h"
 #include "video/c45.h"
 
 #include "cpu/m6502/m3745x.h"
@@ -387,6 +388,36 @@ public:
 	void GollyGhostUpdateDiorama_c0( int data );
 	void TilemapCB(uint16_t code, int *tile, int *mask);
 
+	void configure_c148_standard(machine_config &config);
+	void metlhawk(machine_config &config);
+	void gollygho(machine_config &config);
+	void assaultp(machine_config &config);
+	void sgunner2(machine_config &config);
+	void base2(machine_config &config);
+	void finallap(machine_config &config);
+	void luckywld(machine_config &config);
+	void base3(machine_config &config);
+	void sgunner(machine_config &config);
+	void base(machine_config &config);
+	void c68_default_am(address_map &map);
+	void common_default_am(address_map &map);
+	void common_finallap_am(address_map &map);
+	void common_luckywld_am(address_map &map);
+	void common_metlhawk_am(address_map &map);
+	void common_sgunner_am(address_map &map);
+	void master_default_am(address_map &map);
+	void master_finallap_am(address_map &map);
+	void master_luckywld_am(address_map &map);
+	void master_metlhawk_am(address_map &map);
+	void master_sgunner_am(address_map &map);
+	void mcu_default_am(address_map &map);
+	void namcos2_68k_default_cpu_board_am(address_map &map);
+	void slave_default_am(address_map &map);
+	void slave_finallap_am(address_map &map);
+	void slave_luckywld_am(address_map &map);
+	void slave_metlhawk_am(address_map &map);
+	void slave_sgunner_am(address_map &map);
+	void sound_default_am(address_map &map);
 };
 
 /*----------- defined in video/namcos2.c -----------*/

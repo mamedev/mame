@@ -51,7 +51,7 @@ ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config 
 
 READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 {
-	if (machine().side_effect_disabled()) return;
+	if (machine().side_effects_disabled()) return;
 
 	if (m_sbe)
 	{
@@ -70,7 +70,7 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 */
 WRITE8_MEMBER( ti_speech_synthesizer_device::write )
 {
-	if (machine().side_effect_disabled()) return;
+	if (machine().side_effects_disabled()) return;
 
 	if (m_sbe)
 	{
@@ -159,7 +159,7 @@ ROM_START( ti99_speech )
 	ROM_LOAD("cd2326a.u2b", 0x4000, 0x4000, CRC(65d00401) SHA1(a367242c2c96cebf0e2bf21862f3f6734b2b3020)) // at location u2, top of stack
 ROM_END
 
-MACHINE_CONFIG_MEMBER( ti_speech_synthesizer_device::device_add_mconfig )
+MACHINE_CONFIG_START(ti_speech_synthesizer_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

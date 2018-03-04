@@ -22,11 +22,11 @@ DEFINE_DEVICE_TYPE(ERGOLINE_KEYBOARD, ergoline_keyboard_device, "ergoline_kbd", 
 //  address_map - device-specific address maps
 //-------------------------------------------------
 
-ADDRESS_MAP_START( kbd_mem, AS_PROGRAM, 8, ergoline_keyboard_device )
+ADDRESS_MAP_START(ergoline_keyboard_device::kbd_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("firmware", 0)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( kbd_io, AS_PROGRAM, 8, ergoline_keyboard_device )
+ADDRESS_MAP_START(ergoline_keyboard_device::kbd_io)
 ADDRESS_MAP_END
 
 
@@ -56,8 +56,8 @@ const tiny_rom_entry *ergoline_keyboard_device::device_rom_region() const
 	return ROM_NAME(kbd_pcb);
 }
 
-MACHINE_CONFIG_MEMBER( ergoline_keyboard_device::device_add_mconfig )
-	MCFG_CPU_ADD("maincpu", I8031, XTAL_5_5296MHz)
+MACHINE_CONFIG_START(ergoline_keyboard_device::device_add_mconfig)
+	MCFG_CPU_ADD("maincpu", I8031, XTAL(5'529'600))
 	MCFG_CPU_PROGRAM_MAP(kbd_mem)
 	MCFG_CPU_IO_MAP(kbd_io)
 MACHINE_CONFIG_END

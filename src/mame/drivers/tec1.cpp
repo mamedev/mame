@@ -123,6 +123,12 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(tec1_kbd_callback);
+	void tec1(machine_config &config);
+	void tecjmon(machine_config &config);
+	void tec1_io(address_map &map);
+	void tec1_map(address_map &map);
+	void tecjmon_io(address_map &map);
+	void tecjmon_map(address_map &map);
 };
 
 
@@ -145,7 +151,7 @@ WRITE8_MEMBER( tec1_state::tec1_segment_w )
     d1 segment f
     d0 segment a */
 
-	m_segment = BITSWAP8(data, 4, 2, 1, 6, 7, 5, 3, 0);
+	m_segment = bitswap<8>(data, 4, 2, 1, 6, 7, 5, 3, 0);
 }
 
 WRITE8_MEMBER( tec1_state::tec1_digit_w )
@@ -321,14 +327,14 @@ void tec1_state::machine_reset()
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( tec1_map, AS_PROGRAM, 8, tec1_state )
+ADDRESS_MAP_START(tec1_state::tec1_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0fff) AM_RAM // on main board
 	AM_RANGE(0x1000, 0x3fff) AM_RAM // expansion
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tec1_io, AS_IO, 8, tec1_state )
+ADDRESS_MAP_START(tec1_state::tec1_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
 	AM_RANGE(0x00, 0x00) AM_READ(tec1_kbd_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(tec1_digit_w)
@@ -336,14 +342,14 @@ static ADDRESS_MAP_START( tec1_io, AS_IO, 8, tec1_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tecjmon_map, AS_PROGRAM, 8, tec1_state )
+ADDRESS_MAP_START(tec1_state::tecjmon_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tecjmon_io, AS_IO, 8, tec1_state )
+ADDRESS_MAP_START(tec1_state::tecjmon_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(tec1_kbd_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(tecjmon_digit_w)
@@ -402,7 +408,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tec1 )
+MACHINE_CONFIG_START(tec1_state::tec1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 1000000)   /* speed can be varied between 250kHz and 2MHz */
 	MCFG_CPU_PROGRAM_MAP(tec1_map)
@@ -417,9 +423,9 @@ static MACHINE_CONFIG_START( tec1 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tecjmon )
+MACHINE_CONFIG_START(tec1_state::tecjmon)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545) / 2)
 	MCFG_CPU_PROGRAM_MAP(tecjmon_map)
 	MCFG_CPU_IO_MAP(tecjmon_io)
 

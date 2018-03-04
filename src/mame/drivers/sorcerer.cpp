@@ -168,7 +168,7 @@ NOTES (2016-06-06)
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( sorcerer_mem, AS_PROGRAM, 8, sorcerer_state)
+ADDRESS_MAP_START(sorcerer_state::sorcerer_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xbfff) AM_RAM
@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( sorcerer_mem, AS_PROGRAM, 8, sorcerer_state)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_REGION("maincpu", 0xfc00)        /* programmable chars */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sorcererd_mem, AS_PROGRAM, 8, sorcerer_state)
+ADDRESS_MAP_START(sorcerer_state::sorcererd_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xbbff) AM_RAM
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( sorcererd_mem, AS_PROGRAM, 8, sorcerer_state)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_REGION("maincpu", 0xfc00)        /* programmable chars */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sorcerer_io, AS_IO, 8, sorcerer_state)
+ADDRESS_MAP_START(sorcerer_state::sorcerer_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xfc, 0xfc) AM_READWRITE( sorcerer_fc_r, sorcerer_fc_w )
@@ -413,7 +413,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( sorcerer )
+MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, ES_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sorcerer_mem)
@@ -481,7 +481,8 @@ static MACHINE_CONFIG_START( sorcerer )
 	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sorcererd, sorcerer )
+MACHINE_CONFIG_START(sorcerer_state::sorcererd)
+	sorcerer(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sorcererd_mem)
 

@@ -84,6 +84,9 @@ public:
 	uint8_t   m_frame;
 	uint8_t   m_adc;
 
+	void turrett(machine_config &config);
+	void cpu_map(address_map &map);
+	void turrett_sound_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
@@ -118,7 +121,7 @@ protected:
 	const address_space_config  m_space_config;
 
 private:
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	sound_stream *m_stream;
 
 	struct

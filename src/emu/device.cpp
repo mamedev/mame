@@ -108,7 +108,7 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 		m_tag.assign((owner->owner() == nullptr) ? "" : owner->tag()).append(":").append(tag);
 	else
 		m_tag.assign(":");
-	static_set_clock(*this, clock);
+	set_clock(clock);
 }
 
 
@@ -208,19 +208,19 @@ std::string device_t::parameter(const char *tag) const
 
 
 //-------------------------------------------------
-//  static_set_clock - set/change the clock on
+//  set_clock - set/change the clock on
 //  a device
 //-------------------------------------------------
 
-void device_t::static_set_clock(device_t &device, u32 clock)
+void device_t::set_clock(u32 clock)
 {
-	device.m_configured_clock = clock;
+	m_configured_clock = clock;
 
 	// derive the clock from our owner if requested
 	if ((clock & 0xff000000) == 0xff000000)
-		device.calculate_derived_clock();
+		calculate_derived_clock();
 	else
-		device.set_unscaled_clock(clock);
+		set_unscaled_clock(clock);
 }
 
 
@@ -422,32 +422,65 @@ void device_t::set_machine(running_machine &machine)
 //  list and return status
 //-------------------------------------------------
 
-bool device_t::findit(bool isvalidation) const
+bool device_t::findit(bool pre_map, bool isvalidation) const
 {
 	bool allfound = true;
 	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->next())
-	{
-		if (isvalidation)
+		if (autodev->is_pre_map() == pre_map)
 		{
-			// sanity checking
-			const char *tag = autodev->finder_tag();
-			if (tag == nullptr)
+			if (isvalidation)
 			{
-				osd_printf_error("Finder tag is null!\n");
-				allfound = false;
-				continue;
+				// sanity checking
+				const char *tag = autodev->finder_tag();
+				if (tag == nullptr)
+				{
+					osd_printf_error("Finder tag is null!\n");
+					allfound = false;
+					continue;
+				}
+				if (tag[0] == '^' && tag[1] == ':')
+				{
+					osd_printf_error("Malformed finder tag: %s\n", tag);
+					allfound = false;
+					continue;
+				}
 			}
-			if (tag[0] == '^' && tag[1] == ':')
-			{
-				osd_printf_error("Malformed finder tag: %s\n", tag);
-				allfound = false;
-				continue;
-			}
+			allfound &= autodev->findit(isvalidation);
 		}
-		allfound &= autodev->findit(isvalidation);
-	}
 	return allfound;
 }
+
+//-------------------------------------------------
+//  resolve_pre_map - find objects that may be used
+//  in memory maps
+//-------------------------------------------------
+
+void device_t::resolve_pre_map()
+{
+	// prepare the logerror buffer
+	if (m_machine->allow_logging())
+		m_string_buffer.reserve(1024);
+
+	// find all the registered pre-map objects
+	if (!findit(true, false))
+		throw emu_fatalerror("Missing some required devices, unable to proceed");
+}
+
+//-------------------------------------------------
+//  resolve_post_map - find objects that are created
+//  in memory maps
+//-------------------------------------------------
+
+void device_t::resolve_post_map()
+{
+	// find all the registered post-map objects
+	if (!findit(false, false))
+		throw emu_fatalerror("Missing some required objects, unable to proceed");
+
+	// allow implementation to do additional setup
+	device_resolve_objects();
+}
+
 
 //-------------------------------------------------
 //  start - start a device
@@ -458,10 +491,6 @@ void device_t::start()
 	// prepare the logerror buffer
 	if (m_machine->allow_logging())
 		m_string_buffer.reserve(1024);
-
-	// find all the registered devices
-	if (!findit(false))
-		throw emu_fatalerror("Missing some required objects, unable to proceed");
 
 	// let the interfaces do their pre-work
 	for (device_interface &intf : interfaces())
@@ -675,6 +704,18 @@ void device_t::device_reset()
 //-------------------------------------------------
 
 void device_t::device_reset_after_children()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void device_t::device_resolve_objects()
 {
 	// do nothing by default
 }

@@ -2,6 +2,7 @@
 // copyright-holders:Luca Elia
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "video/decmxc06.h"
 
 
@@ -73,4 +74,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void thedeep(machine_config &config);
+	void audio_map(address_map &map);
+	void main_map(address_map &map);
 };

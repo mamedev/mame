@@ -62,7 +62,7 @@ const tiny_rom_entry *imi5000h_device::device_rom_region() const
 //  ADDRESS_MAP( imi5000h_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( imi5000h_mem, AS_PROGRAM, 8, imi5000h_device )
+ADDRESS_MAP_START(imi5000h_device::imi5000h_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x1800) AM_RAM
@@ -76,7 +76,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( imi5000h_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( imi5000h_io, AS_IO, 8, imi5000h_device )
+ADDRESS_MAP_START(imi5000h_device::imi5000h_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x9f)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80PIO_0_TAG, z80pio_device, read, write)
@@ -340,19 +340,19 @@ WRITE8_MEMBER( imi5000h_device::pio3_pb_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( imi5000h_device::device_add_mconfig )
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
+MACHINE_CONFIG_START(imi5000h_device::device_add_mconfig)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
 	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(imi5000h_mem)
 	MCFG_CPU_IO_MAP(imi5000h_io)
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_8MHz / 2)
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(8'000'000) / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(imi5000h_device, ctc_z0_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(imi5000h_device, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(imi5000h_device, ctc_z2_w))
 
-	MCFG_DEVICE_ADD(Z80PIO_0_TAG, Z80PIO, XTAL_8MHz/2)
+	MCFG_DEVICE_ADD(Z80PIO_0_TAG, Z80PIO, XTAL(8'000'000)/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(imi5000h_device, pio0_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(imi5000h_device, pio0_pa_w))
@@ -361,7 +361,7 @@ MACHINE_CONFIG_MEMBER( imi5000h_device::device_add_mconfig )
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(imi5000h_device, pio0_pb_w))
 	MCFG_Z80PIO_OUT_BRDY_CB(DEVWRITELINE(Z80PIO_0_TAG, z80pio_device, strobe_b))
 
-	MCFG_DEVICE_ADD(Z80PIO_2_TAG, Z80PIO, XTAL_8MHz/2)
+	MCFG_DEVICE_ADD(Z80PIO_2_TAG, Z80PIO, XTAL(8'000'000)/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(imi5000h_device, pio2_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(imi5000h_device, pio2_pa_w))
@@ -369,7 +369,7 @@ MACHINE_CONFIG_MEMBER( imi5000h_device::device_add_mconfig )
 	MCFG_Z80PIO_IN_PB_CB(READ8(imi5000h_device, pio2_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(imi5000h_device, pio2_pb_w))
 
-	MCFG_DEVICE_ADD(Z80PIO_3_TAG, Z80PIO, XTAL_8MHz/2)
+	MCFG_DEVICE_ADD(Z80PIO_3_TAG, Z80PIO, XTAL(8'000'000)/2)
 	MCFG_Z80PIO_IN_PA_CB(READ8(imi5000h_device, pio3_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(imi5000h_device, pio3_pa_w))
 	MCFG_Z80PIO_OUT_ARDY_CB(DEVWRITELINE(Z80PIO_3_TAG, z80pio_device, strobe_a))

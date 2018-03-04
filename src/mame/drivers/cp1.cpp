@@ -53,6 +53,8 @@ public:
 	DECLARE_WRITE8_MEMBER(i8155_portb_w);
 	DECLARE_WRITE8_MEMBER(i8155_portc_w);
 
+	void cp1(machine_config &config);
+	void cp1_io(address_map &map);
 private:
 	uint8_t   m_7seg;
 	uint8_t   m_port2;
@@ -179,7 +181,7 @@ WRITE8_MEMBER(cp1_state::i8155_portc_w)
 }
 
 
-static ADDRESS_MAP_START( cp1_io , AS_IO, 8, cp1_state)
+ADDRESS_MAP_START(cp1_state::cp1_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00,             0xff )          AM_READWRITE( i8155_read, i8155_write)
 ADDRESS_MAP_END
@@ -251,9 +253,9 @@ QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( cp1 )
+MACHINE_CONFIG_START(cp1_state::cp1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8049, XTAL_6MHz)
+	MCFG_CPU_ADD("maincpu", I8049, XTAL(6'000'000))
 	MCFG_CPU_IO_MAP(cp1_io)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(cp1_state, port1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(cp1_state, port1_w))

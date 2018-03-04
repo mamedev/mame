@@ -22,7 +22,8 @@
 #include "machine/terminal.h"
 #include "imagedev/harddriv.h"
 #include "machine/idectrl.h"
-#include "machine/clock.h"
+#include "machine/bankdev.h"
+#include "machine/mc14411.h"
 #include "bus/rs232/rs232.h"
 
 
@@ -33,6 +34,7 @@ public:
 	swtpc09_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_brg(*this, "brg")
 		, m_pia(*this, "pia")
 		, m_ptm(*this, "ptm")
 		, m_acia(*this, "acia")
@@ -45,6 +47,7 @@ public:
 		, m_piaide(*this, "piaide")
 		, m_harddisk(*this, "harddisk")
 		, m_ide(*this, "ide")
+		, m_dat(*this, "dat")
 	{ }
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -58,7 +61,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
 
 	DECLARE_WRITE_LINE_MEMBER( acia_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
@@ -86,6 +88,8 @@ public:
 	DECLARE_WRITE8_MEMBER ( dc4_control_reg_w );
 
 	DECLARE_WRITE8_MEMBER(dat_w);
+	DECLARE_READ8_MEMBER(main_r);
+	DECLARE_WRITE8_MEMBER(main_w);
 
 	DECLARE_DRIVER_INIT( swtpc09 );
 	DECLARE_DRIVER_INIT( swtpc09i );
@@ -95,11 +99,26 @@ public:
 	DECLARE_READ8_MEMBER ( m6844_r );
 	DECLARE_WRITE8_MEMBER ( m6844_w );
 
+	void swtpc09_base(machine_config &config);
+	void swtpc09i(machine_config &config);
+	void swtpc09d3(machine_config &config);
+	void swtpc09u(machine_config &config);
+	void swtpc09(machine_config &config);
+	void flex_dc4_piaide_mem(address_map &map);
+	void flex_dmf2_mem(address_map &map);
+	void mp09_mem(address_map &map);
+	void uniflex_dmf2_mem(address_map &map);
+	void uniflex_dmf3_mem(address_map &map);
 protected:
+	virtual void machine_start() override;
+
 	void swtpc09_fdc_dma_transfer();
 	void swtpc09_irq_handler(uint8_t peripheral, uint8_t state);
 
+	offs_t dat_translate(offs_t offset) const;
+
 	required_device<cpu_device> m_maincpu;
+	required_device<mc14411_device> m_brg;
 	required_device<pia6821_device> m_pia;
 	required_device<ptm6840_device> m_ptm;
 	required_device<acia6850_device> m_acia;
@@ -112,6 +131,7 @@ protected:
 	optional_device<pia6821_device> m_piaide;
 	optional_device<device_t> m_harddisk;
 	optional_device<ide_controller_device> m_ide;
+	required_shared_ptr<uint8_t> m_dat;
 
 	uint8_t m_term_data;               // terminal keyboard value
 	uint8_t m_pia_counter;             // this is the counter on pia porta
@@ -124,6 +144,8 @@ protected:
 	uint8_t m_piaide_portb;
 	uint8_t m_active_interrupt;
 	uint8_t m_interrupt;
+
+	address_space *m_banked_space;
 
 	// TODO: move this in proper device
 

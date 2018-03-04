@@ -13,6 +13,7 @@
 
 #include "machine/spec_snqk.h"
 
+#include "bus/spectrum/exp.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "imagedev/cassette.h"
@@ -20,14 +21,15 @@
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
+#include "screen.h"
 
 /* Spectrum crystals */
 
-#define X1 XTAL_14MHz       // Main clock (48k Spectrum)
+#define X1 XTAL(14'000'000)       // Main clock (48k Spectrum)
 #define X1_128_AMSTRAD  35469000 // Main clock (Amstrad 128K model, +2A?)
 #define X1_128_SINCLAIR 17734475 // Main clock (Sinclair 128K model)
 
-#define X2 XTAL_4_433619MHz // PAL color subcarrier
+#define X2 XTAL(4'433'619) // PAL color subcarrier
 
 /* Spectrum screen size in pixels */
 #define SPEC_UNSEEN_LINES  16   /* Non-visible scanlines before first border
@@ -45,7 +47,7 @@
 #define SPEC_LEFT_BORDER_CYCLES   24   /* Cycles to display left hand border */
 #define SPEC_DISPLAY_XSIZE_CYCLES 128  /* Horizontal screen resolution */
 #define SPEC_RIGHT_BORDER_CYCLES  24   /* Cycles to display right hand border */
-#define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizonal retrace */
+#define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizontal retrace */
 #define SPEC_CYCLES_PER_LINE      224  /* Number of cycles to display a single line */
 
 struct EVENT_LIST_ITEM
@@ -62,14 +64,21 @@ struct EVENT_LIST_ITEM
 class spectrum_state : public driver_device
 {
 public:
+        enum
+        {
+                TIMER_IRQ_ON,
+                TIMER_IRQ_OFF,
+                TIMER_SCANLINE
+        };
 	spectrum_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
 		m_speaker(*this, "speaker"),
-		m_cart(*this, "cartslot"),
+		m_exp(*this, "exp"),
 		m_dock(*this, "dockslot"),
 		m_upd765(*this, "upd765"),
 		m_upd765_0(*this, "upd765:0"),
@@ -84,15 +93,13 @@ public:
 		m_io_line7(*this, "LINE7"),
 		m_io_nmi(*this, "NMI"),
 		m_io_config(*this, "CONFIG"),
-		m_io_joy_intf(*this, "JOY_INTF"),
-		m_io_kempston(*this, "KEMPSTON"),
-		m_io_fuller(*this, "FULLER"),
-		m_io_mikrogen(*this, "MIKROGEN"),
 		m_io_plus0(*this, "PLUS0"),
 		m_io_plus1(*this, "PLUS1"),
 		m_io_plus2(*this, "PLUS2"),
 		m_io_plus3(*this, "PLUS3"),
-		m_io_plus4(*this, "PLUS4") { }
+		m_io_plus4(*this, "PLUS4"),
+		m_io_joy1(*this, "JOY1"),
+		m_io_joy2(*this, "JOY2") { }
 
 	int m_port_fe_data;
 	int m_port_7ffd_data;
@@ -111,26 +118,33 @@ public:
 
 	int m_ROMSelection;
 
+	// Build up the screen bitmap line-by-line as the z80 uses CPU cycles.
+	// Elimiates sprite flicker on various games (E.g. Marauder and
+	// Stormlord) and makes Firefly playable.
+	emu_timer *m_scanline_timer;
 
 	EVENT_LIST_ITEM *m_pCurrentItem;
 	int m_NumEvents;
 	int m_TotalEvents;
 	char *m_pEventListBuffer;
 	int m_LastFrameStartTime;
-	int m_CyclesPerFrame;
+	int m_CyclesPerLine;
 
 	uint8_t *m_ram_0000;
 	uint8_t m_ram_disabled_by_beta;
+	DECLARE_WRITE8_MEMBER(spectrum_rom_w);
+	DECLARE_READ8_MEMBER(spectrum_rom_r);
 	DECLARE_WRITE8_MEMBER(spectrum_port_fe_w);
 	DECLARE_READ8_MEMBER(spectrum_port_fe_r);
-	DECLARE_READ8_MEMBER(spectrum_port_1f_r);
-	DECLARE_READ8_MEMBER(spectrum_port_7f_r);
-	DECLARE_READ8_MEMBER(spectrum_port_df_r);
 	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
 
+	DECLARE_WRITE8_MEMBER(spectrum_128_bank1_w);
+	DECLARE_READ8_MEMBER(spectrum_128_bank1_r);
 	DECLARE_WRITE8_MEMBER(spectrum_128_port_7ffd_w);
 	DECLARE_READ8_MEMBER(spectrum_128_ula_r);
 
+	DECLARE_WRITE8_MEMBER(spectrum_plus3_bank1_w);
+	DECLARE_READ8_MEMBER(spectrum_plus3_bank1_r);
 	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_3ffd_w);
 	DECLARE_READ8_MEMBER(spectrum_plus3_port_3ffd_r);
 	DECLARE_READ8_MEMBER(spectrum_plus3_port_2ffd_r);
@@ -161,7 +175,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_timex);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( spectrum_cart );
 
 	// for timex cart only
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( timex_cart );
@@ -182,12 +195,30 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( spectrum );
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 
+	void spectrum_common(machine_config &config);
+	void spectrum(machine_config &config);
+	void ts2068(machine_config &config);
+	void uk2086(machine_config &config);
+	void tc2048(machine_config &config);
+	void spectrum_plus3(machine_config &config);
+	void spectrum_128(machine_config &config);
+	void spectrum_128_io(address_map &map);
+	void spectrum_128_mem(address_map &map);
+	void spectrum_io(address_map &map);
+	void spectrum_mem(address_map &map);
+	void spectrum_plus3_io(address_map &map);
+	void spectrum_plus3_mem(address_map &map);
+	void tc2048_io(address_map &map);
+	void tc2048_mem(address_map &map);
+	void ts2068_io(address_map &map);
+	void ts2068_mem(address_map &map);
 protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;
-	optional_device<generic_slot_device> m_cart;
+	optional_device<spectrum_expansion_slot_device> m_exp;
 	optional_device<generic_slot_device> m_dock;
 	optional_device<upd765a_device> m_upd765;
 	optional_device<floppy_connector> m_upd765_0;
@@ -204,16 +235,17 @@ protected:
 	optional_ioport m_io_line7;
 	optional_ioport m_io_nmi;
 	optional_ioport m_io_config;
-	optional_ioport m_io_joy_intf;
-	optional_ioport m_io_kempston;
-	optional_ioport m_io_fuller;
-	optional_ioport m_io_mikrogen;
+
 	// Plus ports
 	optional_ioport m_io_plus0;
 	optional_ioport m_io_plus1;
 	optional_ioport m_io_plus2;
 	optional_ioport m_io_plus3;
 	optional_ioport m_io_plus4;
+
+	// Joystick ports
+	optional_ioport m_io_joy1;
+	optional_ioport m_io_joy2;
 
 	void spectrum_UpdateBorderBitmap();
 	void spectrum_UpdateScreenBitmap(bool eof = false);
@@ -253,8 +285,7 @@ protected:
 /*----------- defined in drivers/spectrum.c -----------*/
 
 INPUT_PORTS_EXTERN( spectrum );
+INPUT_PORTS_EXTERN( spec128 );
 INPUT_PORTS_EXTERN( spec_plus );
-
-MACHINE_CONFIG_EXTERN( spectrum );
 
 #endif // MAME_INCLUDES_SPECTRUM_H

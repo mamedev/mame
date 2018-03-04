@@ -42,8 +42,7 @@ public:
 
 	/* misc */
 	int m_generic_control_reg;
-	int m_vol_ctrl[16];
-	int  m_gametype;
+	int m_gametype;
 	int m_mask;
 
 	/* devices */
@@ -92,8 +91,18 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_RESET(ta7630);
 	uint32_t screen_update_nycaptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int nycaptor_spot(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
+	void nycaptor(machine_config &config);
+	void cyclshtg(machine_config &config);
+	void bronx(machine_config &config);
+	void bronx_master_map(address_map &map);
+	void bronx_slave_io_map(address_map &map);
+	void bronx_slave_map(address_map &map);
+	void cyclshtg_master_map(address_map &map);
+	void cyclshtg_slave_map(address_map &map);
+	void nycaptor_master_map(address_map &map);
+	void nycaptor_slave_map(address_map &map);
+	void sound_map(address_map &map);
 };

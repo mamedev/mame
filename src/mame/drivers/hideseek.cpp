@@ -27,7 +27,7 @@ Other stuff: NEC D4992 (RTC?) and xtal possibly 32.768kHz, 3V coin battery, 93L4
 
 
 #include "emu.h"
-#include "cpu/sh2/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -46,6 +46,8 @@ public:
 	DECLARE_PALETTE_INIT(hideseek);
 	uint32_t screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void hideseek(machine_config &config);
+	void mem_map(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 };
@@ -61,7 +63,7 @@ uint32_t hideseek_state::screen_update_hideseek(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 32, hideseek_state )
+ADDRESS_MAP_START(hideseek_state::mem_map)
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM // On-chip ROM
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM // CS0
 	AM_RANGE(0x00400000, 0x005fffff) AM_ROM AM_REGION("prg", 0) // CS1
@@ -96,7 +98,7 @@ PALETTE_INIT_MEMBER(hideseek_state, hideseek)
 
 
 
-static MACHINE_CONFIG_START( hideseek )
+MACHINE_CONFIG_START(hideseek_state::hideseek)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, 7372800 * 4 )

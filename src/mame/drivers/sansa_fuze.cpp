@@ -22,11 +22,13 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	void sansa_fuze(machine_config &config);
+	void sansa_fuze_map(address_map &map);
 };
 
 
 
-static ADDRESS_MAP_START( sansa_fuze_map, AS_PROGRAM, 32, sansa_fuze_state )
+ADDRESS_MAP_START(sansa_fuze_state::sansa_fuze_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 
 	AM_RANGE(0x80000000, 0x8001ffff) AM_ROM  AM_REGION("maincpu", 0x00000)
@@ -38,7 +40,7 @@ static INPUT_PORTS_START( sansa_fuze )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sansa_fuze )
+MACHINE_CONFIG_START(sansa_fuze_state::sansa_fuze)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, 50000000) // arm based, speed unknown

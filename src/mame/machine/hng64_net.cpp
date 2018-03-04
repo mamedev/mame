@@ -106,11 +106,11 @@ WRITE8_MEMBER(hng64_state::hng64_comm_mmu_w)
 	}
 }
 
-static ADDRESS_MAP_START( hng_comm_map, AS_PROGRAM, 8, hng64_state )
+ADDRESS_MAP_START(hng64_state::hng_comm_map)
 	AM_RANGE(0x0000,0xffff) AM_READWRITE(hng64_comm_space_r, hng64_comm_space_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hng_comm_io_map, AS_IO, 8, hng64_state )
+ADDRESS_MAP_START(hng64_state::hng_comm_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* Reserved for the KL5C80 internal hardware */
 	AM_RANGE(0x00, 0x07) AM_READWRITE(hng64_comm_mmu_r,hng64_comm_mmu_w )
@@ -140,7 +140,7 @@ void hng64_state::reset_net()
 	m_mmub[5] = 0; // rolls back to 0xffff
 }
 
-MACHINE_CONFIG_START( hng64_network )
+MACHINE_CONFIG_START(hng64_state::hng64_network)
 	MCFG_CPU_ADD("network", KL5C80A12, HNG64_MASTER_CLOCK / 4)        /* KL5C80A12CFP - binary compatible with Z80. */
 	MCFG_CPU_PROGRAM_MAP(hng_comm_map)
 	MCFG_CPU_IO_MAP(hng_comm_io_map)

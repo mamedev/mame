@@ -54,13 +54,30 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "coco_multi.h"
+
 #include "cococart.h"
+#include "coco_dcmodem.h"
+#include "coco_fdc.h"
+#include "coco_gmc.h"
+#include "coco_orch90.h"
+#include "coco_pak.h"
+#include "coco_rs232.h"
+#include "coco_ssc.h"
 
 #define SLOT1_TAG           "slot1"
 #define SLOT2_TAG           "slot2"
 #define SLOT3_TAG           "slot3"
 #define SLOT4_TAG           "slot4"
 
+#define SWITCH_CONFIG_TAG   "switch"
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+static constexpr uint8_t MULTI_SLOT_LOOKUP[] = {0xcc, 0xdd, 0xee, 0xff};
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -100,6 +117,8 @@ namespace
 		DECLARE_WRITE_LINE_MEMBER(multi_slot4_halt_w);
 
 		virtual address_space &cartridge_space() override;
+		virtual ioport_constructor device_input_ports() const override;
+		INPUT_CHANGED_MEMBER( switch_changed );
 
 	protected:
 		// device-level overrides
@@ -115,6 +134,7 @@ namespace
 
 		// internal state
 		uint8_t m_select;
+		uint8_t m_block;
 
 		// internal accessors
 		int active_scs_slot_number() const;
@@ -125,6 +145,7 @@ namespace
 
 		// methods
 		void set_select(uint8_t new_select);
+		DECLARE_READ8_MEMBER(ff7f_read);
 		DECLARE_WRITE8_MEMBER(ff7f_write);
 		void update_line(int slot_number, line ln);
 	};
@@ -145,6 +166,7 @@ static SLOT_INTERFACE_START(coco_cart_slot1_3)
 	SLOT_INTERFACE("pak", COCO_PAK)
 SLOT_INTERFACE_END
 static SLOT_INTERFACE_START(coco_cart_slot4)
+	SLOT_INTERFACE("cc2hdb1", COCO2_HDB1)
 	SLOT_INTERFACE("cc3hdb1", COCO3_HDB1)
 	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
 	SLOT_INTERFACE("rs232", COCO_RS232)
@@ -157,7 +179,7 @@ static SLOT_INTERFACE_START(coco_cart_slot4)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_MEMBER(coco_multipak_device::device_add_mconfig)
+MACHINE_CONFIG_START(coco_multipak_device::device_add_mconfig)
 	MCFG_COCO_CARTRIDGE_ADD(SLOT1_TAG, coco_cart_slot1_3, nullptr)
 	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_cart_w))
 	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_nmi_w))
@@ -176,6 +198,14 @@ MACHINE_CONFIG_MEMBER(coco_multipak_device::device_add_mconfig)
 	MCFG_COCO_CARTRIDGE_HALT_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot4_halt_w))
 MACHINE_CONFIG_END
 
+INPUT_PORTS_START( coco_multipack )
+	PORT_START( SWITCH_CONFIG_TAG )
+	PORT_CONFNAME( 0x03, 0x03, "Multi-Pak Slot Switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, coco_multipak_device, switch_changed, nullptr)
+		PORT_CONFSETTING( 0x00, "Slot 1" )
+		PORT_CONFSETTING( 0x01, "Slot 2" )
+		PORT_CONFSETTING( 0x02, "Slot 3" )
+		PORT_CONFSETTING( 0x03, "Slot 4" )
+INPUT_PORTS_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -190,13 +220,22 @@ DEFINE_DEVICE_TYPE(COCO_MULTIPAK, coco_multipak_device, "coco_multipack", "CoCo 
 //**************************************************************************
 
 //-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor coco_multipak_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( coco_multipack );
+}
+
+//-------------------------------------------------
 //  coco_multipak_device - constructor
 //-------------------------------------------------
 
 coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, COCO_MULTIPAK, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
-	, m_slots(*this, "slot%u", 1), m_select(0)
+	, m_slots(*this, "slot%u", 1), m_select(0), m_block(0)
 {
 }
 
@@ -208,13 +247,15 @@ coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const 
 void coco_multipak_device::device_start()
 {
 	// install $FF7F handler
-	install_write_handler(0xFF7F, 0xFF7F, write8_delegate(FUNC(coco_multipak_device::ff7f_write), this));
+	install_readwrite_handler(0xFF7F, 0xFF7F, read8_delegate(FUNC(coco_multipak_device::ff7f_read), this),write8_delegate(FUNC(coco_multipak_device::ff7f_write), this));
 
 	// initial state
 	m_select = 0xFF;
+	m_block = 0;
 
 	// save state
 	save_item(NAME(m_select));
+	save_item(NAME(m_block));
 }
 
 
@@ -224,7 +265,19 @@ void coco_multipak_device::device_start()
 
 void coco_multipak_device::device_reset()
 {
-	m_select = 0xFF;
+	set_select(MULTI_SLOT_LOOKUP[ioport(SWITCH_CONFIG_TAG)->read()]);
+	m_block = 0;
+}
+
+
+//-------------------------------------------------
+//  switch_changed - panel switch changed
+//-------------------------------------------------
+
+INPUT_CHANGED_MEMBER( coco_multipak_device::switch_changed )
+{
+	if (m_block == 0)
+		set_select(MULTI_SLOT_LOOKUP[newval]);
 }
 
 
@@ -314,11 +367,21 @@ void coco_multipak_device::set_select(uint8_t new_select)
 
 
 //-------------------------------------------------
+//  ff7f_read
+//-------------------------------------------------
+
+READ8_MEMBER(coco_multipak_device::ff7f_read)
+{
+	return m_select | 0xcc;
+}
+
+//-------------------------------------------------
 //  ff7f_write
 //-------------------------------------------------
 
 WRITE8_MEMBER(coco_multipak_device::ff7f_write)
 {
+	m_block = 0xff;
 	set_select(data);
 }
 

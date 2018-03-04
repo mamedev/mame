@@ -175,7 +175,7 @@ WRITE8_MEMBER(dribling_state::iowrite)
  *
  *************************************/
 
-static ADDRESS_MAP_START( dribling_map, AS_PROGRAM, 8, dribling_state )
+ADDRESS_MAP_START(dribling_state::dribling_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( dribling_map, AS_PROGRAM, 8, dribling_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, dribling_state )
+ADDRESS_MAP_START(dribling_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(ioread, iowrite)
 ADDRESS_MAP_END
@@ -266,7 +266,7 @@ void dribling_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( dribling )
+MACHINE_CONFIG_START(dribling_state::dribling)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)

@@ -1,14 +1,11 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
 
-#include "cdrom.h"
-#include "machine/eepromser.h"
+#include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/adsp2100/adsp2100.h"
-#include "cpu/scudsp/scudsp.h"
-#include "cpu/sh2/sh2.h"
-
-#include "bus/sat_ctrl/ctrl.h"
+#include "machine/sega_scu.h"
+#include "machine/smpc.h"
+#include "cpu/sh/sh2.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -20,16 +17,12 @@
 #include "debug/debugcmd.h"
 #include "debugger.h"
 
-#define MAX_FILTERS (24)
-#define MAX_BLOCKS  (200)
-#define MAX_DIR_SIZE    (256*1024)
-
 class saturn_state : public driver_device
 {
 public:
 	saturn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_rom(*this, "share6"),
+			m_rom(*this, "bios", 0x20000),
 			m_workram_l(*this, "workram_l"),
 			m_workram_h(*this, "workram_h"),
 			m_sound_ram(*this, "sound_ram"),
@@ -37,20 +30,14 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_slave(*this, "slave"),
 			m_audiocpu(*this, "audiocpu"),
-			m_scudsp(*this, "scudsp"),
-			m_eeprom(*this, "eeprom"),
-			m_cart1(*this, "stv_slot1"),
-			m_cart2(*this, "stv_slot2"),
-			m_cart3(*this, "stv_slot3"),
-			m_cart4(*this, "stv_slot4"),
+			m_smpc_hle(*this, "smpc"),
+			m_scu(*this, "scu"),
 			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
-			m_ctrl1(*this, "ctrl1"),
-			m_ctrl2(*this, "ctrl2")
+			m_palette(*this, "palette")
 	{
 	}
 
-	required_shared_ptr<uint32_t> m_rom;
+	required_region_ptr<uint32_t> m_rom;
 	required_shared_ptr<uint32_t> m_workram_l;
 	required_shared_ptr<uint32_t> m_workram_h;
 	required_shared_ptr<uint16_t> m_sound_ram;
@@ -58,34 +45,14 @@ public:
 
 	memory_region *m_cart_reg[4];
 	std::unique_ptr<uint8_t[]>     m_backupram;
-	std::unique_ptr<uint32_t[]>    m_scu_regs;
-	std::unique_ptr<uint16_t[]>    m_scsp_regs;
+//  std::unique_ptr<uint32_t[]>    m_scu_regs;
 	std::unique_ptr<uint16_t[]>    m_vdp2_regs;
 	std::unique_ptr<uint32_t[]>    m_vdp2_vram;
 	std::unique_ptr<uint32_t[]>    m_vdp2_cram;
 	std::unique_ptr<uint32_t[]>    m_vdp1_vram;
 	std::unique_ptr<uint16_t[]>    m_vdp1_regs;
 
-	uint8_t     m_NMI_reset;
 	uint8_t     m_en_68k;
-
-
-	struct {
-		uint32_t    src[3];       /* Source DMA lv n address*/
-		uint32_t    dst[3];       /* Destination DMA lv n address*/
-		uint32_t    src_add[3];   /* Source Addition for DMA lv n*/
-		uint32_t    dst_add[3];   /* Destination Addition for DMA lv n*/
-		uint32_t    size[3];      /* Transfer DMA size lv n*/
-		uint32_t    index[3];
-		int       start_factor[3];
-		uint8_t     enable_mask[3];
-		uint32_t    ist;
-		uint32_t    ism;
-		uint32_t    illegal_factor[3];
-		uint32_t    status;
-	}m_scu;
-
-	void scu_reset(void);
 
 	int       m_minit_boost;
 	int       m_sinit_boost;
@@ -120,6 +87,7 @@ public:
 		bitmap_rgb32 roz_bitmap[2];
 		uint8_t     dotsel;
 		uint8_t     pal;
+		uint8_t     odd;
 		uint16_t    h_count;
 		uint16_t    v_count;
 		uint8_t     exltfg;
@@ -128,56 +96,13 @@ public:
 		int       old_tvmd;
 	}m_vdp2;
 
-	struct {
-		uint8_t IOSEL1;
-		uint8_t IOSEL2;
-		uint8_t EXLE1;
-		uint8_t EXLE2;
-		uint8_t PDR1;
-		uint8_t PDR2;
-		uint8_t DDR1;
-		uint8_t DDR2;
-		uint8_t SF;
-		uint8_t SR;
-		uint8_t IREG[7];
-		uint8_t intback_buf[7];
-		uint8_t OREG[32];
-		int   intback_stage;
-		int   pmode;
-		uint8_t SMEM[4];
-		uint8_t intback;
-		uint8_t rtc_data[7];
-		uint8_t slave_on;
-	}m_smpc;
-
-	/* Saturn specific*/
-	int m_saturn_region;
-	uint8_t m_cart_type;
-	uint32_t *m_cart_dram;
-
-	/* ST-V specific */
-	uint8_t     m_stv_multi_bank;
-	uint8_t     m_prev_bankswitch;
-	emu_timer *m_stv_rtc_timer;
-	uint8_t     m_port_sel,m_mux_data;
-	uint8_t     m_system_output;
-	uint8_t     m_ioga_mode;
-	uint8_t     m_ioga_portg;
-	uint16_t    m_serial_tx;
-
 	required_device<sh2_device> m_maincpu;
 	required_device<sh2_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
-	required_device<scudsp_cpu_device> m_scudsp;
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<generic_slot_device> m_cart1;
-	optional_device<generic_slot_device> m_cart2;
-	optional_device<generic_slot_device> m_cart3;
-	optional_device<generic_slot_device> m_cart4;
+	required_device<smpc_hle_device> m_smpc_hle;
+	required_device<sega_scu_device> m_scu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_device<saturn_control_port_device> m_ctrl1;
-	optional_device<saturn_control_port_device> m_ctrl2;
 
 	bitmap_rgb32 m_tmpbitmap;
 	DECLARE_VIDEO_START(stv_vdp2);
@@ -185,17 +110,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_slave_scanline);
 
-	void scu_do_transfer(uint8_t event);
-	void scu_test_pending_irq();
-	DECLARE_READ32_MEMBER(saturn_scu_r);
-	DECLARE_WRITE32_MEMBER(saturn_scu_w);
-	TIMER_CALLBACK_MEMBER(dma_lv0_ended);
-	TIMER_CALLBACK_MEMBER(dma_lv1_ended);
-	TIMER_CALLBACK_MEMBER(dma_lv2_ended);
+
 	TIMER_CALLBACK_MEMBER(vdp1_draw_end);
-	void scu_single_transfer(address_space &space, uint32_t src, uint32_t dst,uint8_t *src_shift);
-	void scu_dma_direct(address_space &space, uint8_t dma_ch);
-	void scu_dma_indirect(address_space &space,uint8_t dma_ch);
 	DECLARE_WRITE16_MEMBER(saturn_soundram_w);
 	DECLARE_READ16_MEMBER(saturn_soundram_r);
 	DECLARE_WRITE32_MEMBER(minit_w);
@@ -204,16 +120,8 @@ public:
 	DECLARE_WRITE32_MEMBER(saturn_sinit_w);
 	DECLARE_READ8_MEMBER(saturn_backupram_r);
 	DECLARE_WRITE8_MEMBER(saturn_backupram_w);
-	TIMER_CALLBACK_MEMBER(stv_rtc_increment);
-	DECLARE_WRITE_LINE_MEMBER(scsp_to_main_irq);
 	DECLARE_WRITE8_MEMBER(scsp_irq);
 	int m_scsp_last_line;
-
-	uint8_t smpc_direct_mode(uint8_t pad_n);
-	uint8_t smpc_th_control_mode(uint8_t pad_n);
-	TIMER_CALLBACK_MEMBER( smpc_audio_reset_line_pulse );
-	DECLARE_READ8_MEMBER( saturn_SMPC_r );
-	DECLARE_WRITE8_MEMBER( saturn_SMPC_w );
 
 	DECLARE_READ16_MEMBER ( saturn_vdp1_regs_r );
 	DECLARE_READ32_MEMBER ( saturn_vdp1_vram_r );
@@ -370,6 +278,8 @@ public:
 	void stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap, bitmap_rgb32 &roz_bitmap, const rectangle &cliprect, int iRP, int planesizex, int planesizey, int planerenderedsizex, int planerenderedsizey);
+	bool stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter);
+	int get_roz_mode3_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable,uint8_t winarea);
 	void stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter );
 	uint8_t stv_vdp2_check_vram_cycle_pattern_registers( uint8_t access_command_pnmdr, uint8_t access_command_cpdr, uint8_t bitmap_enable );
 	uint8_t stv_vdp2_is_rotation_applied(void);
@@ -441,6 +351,7 @@ public:
 
 		uint8_t  line_screen_enabled;
 		uint8_t  mosaic_screen_enabled;
+		bool roz_mode3;
 
 		int layer_name; /* just to keep track */
 	} stv2_current_tilemap;
@@ -498,209 +409,32 @@ public:
 
 	} stv_rbg_cache_data;
 
-	/* stvcd */
-	DECLARE_READ32_MEMBER( stvcd_r );
-	DECLARE_WRITE32_MEMBER( stvcd_w );
-
-	TIMER_DEVICE_CALLBACK_MEMBER( stv_sector_cb );
-	TIMER_DEVICE_CALLBACK_MEMBER( stv_sh1_sim );
-
-	struct direntryT
-	{
-		uint8_t record_size;
-		uint8_t xa_record_size;
-		uint32_t firstfad;        // first sector of file
-		uint32_t length;      // length of file
-		uint8_t year;
-		uint8_t month;
-		uint8_t day;
-		uint8_t hour;
-		uint8_t minute;
-		uint8_t second;
-		uint8_t gmt_offset;
-		uint8_t flags;        // iso9660 flags
-		uint8_t file_unit_size;
-		uint8_t interleave_gap_size;
-		uint16_t volume_sequencer_number;
-		uint8_t name[128];
-	};
-
-	struct filterT
-	{
-		uint8_t mode;
-		uint8_t chan;
-		uint8_t smmask;
-		uint8_t cimask;
-		uint8_t fid;
-		uint8_t smval;
-		uint8_t cival;
-		uint8_t condtrue;
-		uint8_t condfalse;
-		uint32_t fad;
-		uint32_t range;
-	};
-
-	struct blockT
-	{
-		int32_t size; // size of block
-		int32_t FAD;  // FAD on disc
-		uint8_t data[CD_MAX_SECTOR_DATA];
-		uint8_t chan; // channel
-		uint8_t fnum; // file number
-		uint8_t subm; // subchannel mode
-		uint8_t cinf; // coding information
-	};
-
-	struct partitionT
-	{
-		int32_t size;
-		blockT *blocks[MAX_BLOCKS];
-		uint8_t bnum[MAX_BLOCKS];
-		uint8_t numblks;
-	};
-
-	// 16-bit transfer types
-	enum transT
-	{
-		XFERTYPE_INVALID,
-		XFERTYPE_TOC,
-		XFERTYPE_FILEINFO_1,
-		XFERTYPE_FILEINFO_254,
-		XFERTYPE_SUBQ,
-		XFERTYPE_SUBRW
-	};
-
-	// 32-bit transfer types
-	enum trans32T
-	{
-		XFERTYPE32_INVALID,
-		XFERTYPE32_GETSECTOR,
-		XFERTYPE32_GETDELETESECTOR,
-		XFERTYPE32_PUTSECTOR,
-		XFERTYPE32_MOVESECTOR
-	};
-
-
-	void stvcd_reset(void);
-	void stvcd_exit(void);
-	void stvcd_set_tray_open(void);
-	void stvcd_set_tray_close(void);
-
-	int get_track_index(uint32_t fad);
-	int sega_cdrom_get_adr_control(cdrom_file *file, int track);
-	void cr_standard_return(uint16_t cur_status);
-	void cd_free_block(blockT *blktofree);
-	void cd_defragblocks(partitionT *part);
-	void cd_getsectoroffsetnum(uint32_t bufnum, uint32_t *sectoffs, uint32_t *sectnum);
-
-	uint16_t cd_readWord(uint32_t addr);
-	void cd_writeWord(uint32_t addr, uint16_t data);
-	uint32_t cd_readLong(uint32_t addr);
-	void cd_writeLong(uint32_t addr, uint32_t data);
-
-	void cd_readTOC(void);
-	void cd_readblock(uint32_t fad, uint8_t *dat);
-	void cd_playdata(void);
-
-	void cd_exec_command( void );
-	// iso9660 utilities
-	void make_dir_current(uint32_t fad);
-	void read_new_dir(uint32_t fileno);
-
-	blockT *cd_alloc_block(uint8_t *blknum);
-	partitionT *cd_filterdata(filterT *flt, int trktype, uint8_t *p_ok);
-	partitionT *cd_read_filtered_sector(int32_t fad, uint8_t *p_ok);
-
-	cdrom_file *cdrom;// = (cdrom_file *)nullptr;
-
-	// local variables
-	timer_device *sector_timer;
-	timer_device *sh1_timer;
-	partitionT partitions[MAX_FILTERS];
-	partitionT *transpart;
-
-	blockT blocks[MAX_BLOCKS];
-	blockT curblock;
-
-	uint8_t tocbuf[102*4];
-	uint8_t subqbuf[5*2];
-	uint8_t subrwbuf[12*2];
-	uint8_t finfbuf[256];
-
-	int32_t sectlenin, sectlenout;
-
-	uint8_t lastbuf, playtype;
-
-	transT xfertype;
-	trans32T xfertype32;
-	uint32_t xfercount, calcsize;
-	uint32_t xferoffs, xfersect, xfersectpos, xfersectnum, xferdnum;
-
-	filterT filters[MAX_FILTERS];
-	filterT *cddevice;
-	int cddevicenum;
-
-	uint16_t cr1, cr2, cr3, cr4;
-	uint16_t prev_cr1, prev_cr2, prev_cr3, prev_cr4;
-	uint8_t status_type;
-	uint16_t hirqmask, hirqreg;
-	uint16_t cd_stat;
-	uint32_t cd_curfad;// = 0;
-	uint32_t cd_fad_seek;
-	uint32_t fadstoplay;// = 0;
-	uint32_t in_buffer;// = 0;    // amount of data in the buffer
-	int oddframe;// = 0;
-	int buffull, sectorstore, freeblocks;
-	int cur_track;
-	uint8_t cmd_pending;
-	uint8_t cd_speed;
-	uint8_t cdda_maxrepeat;
-	uint8_t cdda_repeat_count;
-	uint8_t tray_is_closed;
-	int get_timing_command( void );
-
-	direntryT curroot;       // root entry of current filesystem
-	std::vector<direntryT> curdir;       // current directory
-	int numfiles;            // # of entries in current directory
-	int firstfile;           // first non-directory file
-
 	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
-	int DectoBCD(int num);
 
-	DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
-	DECLARE_READ16_MEMBER(scudsp_dma_r);
-	DECLARE_WRITE16_MEMBER(scudsp_dma_w);
+//  DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
+//  DECLARE_READ16_MEMBER(scudsp_dma_r);
+//  DECLARE_WRITE16_MEMBER(scudsp_dma_w);
 
-	// FROM smpc.c
-	void stv_select_game(int gameno);
-	void smpc_master_on();
-	TIMER_CALLBACK_MEMBER( smpc_slave_enable );
-	TIMER_CALLBACK_MEMBER( smpc_sound_enable );
-	TIMER_CALLBACK_MEMBER( smpc_cd_enable );
-	void smpc_system_reset();
-	TIMER_CALLBACK_MEMBER( smpc_change_clock );
-	TIMER_CALLBACK_MEMBER( stv_intback_peripheral );
-	TIMER_CALLBACK_MEMBER( stv_smpc_intback );
-	TIMER_CALLBACK_MEMBER( intback_peripheral );
-	TIMER_CALLBACK_MEMBER( saturn_smpc_intback );
-	void smpc_rtc_write();
-	void smpc_memory_setting();
-	void smpc_nmi_req();
-	TIMER_CALLBACK_MEMBER( smpc_nmi_set );
-	void smpc_comreg_exec(address_space &space, uint8_t data, uint8_t is_stv);
-	DECLARE_READ8_MEMBER( stv_SMPC_r );
-	DECLARE_WRITE8_MEMBER( stv_SMPC_w );
+	// SMPC HLE delegates
+	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(master_sh2_nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(slave_sh2_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_68k_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(system_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(system_halt_w);
+	DECLARE_WRITE_LINE_MEMBER(dot_select_w);
 
-	void debug_scudma_command(int ref, const std::vector<std::string> &params);
-	void debug_scuirq_command(int ref, const std::vector<std::string> &params);
-	void debug_help_command(int ref, const std::vector<std::string> &params);
-	void debug_commands(int ref, const std::vector<std::string> &params);
 
+//  void debug_scudma_command(int ref, const std::vector<std::string> &params);
+//  void debug_scuirq_command(int ref, const std::vector<std::string> &params);
+//  void debug_help_command(int ref, const std::vector<std::string> &params);
+//  void debug_commands(int ref, const std::vector<std::string> &params);
 };
 
 
-#define MASTER_CLOCK_352 57272720
-#define MASTER_CLOCK_320 53693174
+// These two clocks are synthesized by the 315-5746
+#define MASTER_CLOCK_352 XTAL(14'318'181)*4
+#define MASTER_CLOCK_320 XTAL(14'318'181)*3.75
 #define CEF_1   m_vdp1_regs[0x010/2]|=0x0002
 #define CEF_0   m_vdp1_regs[0x010/2]&=~0x0002
 #define BEF_1   m_vdp1_regs[0x010/2]|=0x0001
@@ -709,20 +443,5 @@ public:
 #define STV_VDP1_VBE  ((STV_VDP1_TVMR & 0x0008) >> 3)
 #define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
 
-#define IRQ_VBLANK_IN  1 << 0
-#define IRQ_VBLANK_OUT 1 << 1
-#define IRQ_HBLANK_IN  1 << 2
-#define IRQ_TIMER_0    1 << 3
-#define IRQ_TIMER_1    1 << 4
-#define IRQ_DSP_END    1 << 5
-#define IRQ_SOUND_REQ  1 << 6
-#define IRQ_SMPC       1 << 7
-#define IRQ_PAD        1 << 8
-#define IRQ_DMALV2     1 << 9
-#define IRQ_DMALV1     1 << 10
-#define IRQ_DMALV0     1 << 11
-#define IRQ_DMAILL     1 << 12
-#define IRQ_VDP1_END   1 << 13
-#define IRQ_ABUS       1 << 15
 
 GFXDECODE_EXTERN( stv );

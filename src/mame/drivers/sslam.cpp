@@ -375,14 +375,16 @@ WRITE16_MEMBER(sslam_state::powerbls_sound_w)
 
 /* these will need verifying .. the game writes all over the place ... */
 
-static ADDRESS_MAP_START( sslam_program_map, AS_PROGRAM, 16, sslam_state )
+ADDRESS_MAP_START(sslam_state::sslam_program_map)
+	AM_RANGE(0x000000, 0xffffff) AM_ROM   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
+
 	AM_RANGE(0x000400, 0x07ffff) AM_RAM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(sslam_bg_tileram_w) AM_SHARE("bg_tileram")
 	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(sslam_md_tileram_w) AM_SHARE("md_tileram")
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(sslam_tx_tileram_w) AM_SHARE("tx_tileram")
 	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_SHARE("regs")
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
@@ -394,18 +396,16 @@ static ADDRESS_MAP_START( sslam_program_map, AS_PROGRAM, 16, sslam_state )
 	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW1")
 	AM_RANGE(0x30001e, 0x30001f) AM_WRITE8(sslam_snd_w, 0x00ff)
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM   /* Main RAM */
-
-	AM_RANGE(0x000000, 0xffffff) AM_ROM   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerbls_map, AS_PROGRAM, 16, sslam_state )
+ADDRESS_MAP_START(sslam_state::powerbls_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(powerbls_bg_tileram_w) AM_SHARE("bg_tileram")
 	AM_RANGE(0x104000, 0x107fff) AM_RAM // not used
 	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_SHARE("regs")
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2803ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x2803ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("IN1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("IN2")
@@ -461,11 +461,6 @@ WRITE8_MEMBER(sslam_state::playmark_snd_control_w)
 //  !(data & 0x80) -> sound enable
 //   (data & 0x40) -> always set
 }
-
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, sslam_state )
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(playmark_snd_control_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
-ADDRESS_MAP_END
 
 /* Input Ports */
 
@@ -694,7 +689,7 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( sslam )
+MACHINE_CONFIG_START(sslam_state::sslam)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -726,7 +721,7 @@ static MACHINE_CONFIG_START( sslam )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( powerbls )
+MACHINE_CONFIG_START(sslam_state::powerbls)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -734,7 +729,9 @@ static MACHINE_CONFIG_START( powerbls )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sslam_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", I80C51, 12000000)      /* 83C751 */
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(sslam_state, playmark_snd_control_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(sslam_state, playmark_snd_command_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(sslam_state, playmark_oki_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

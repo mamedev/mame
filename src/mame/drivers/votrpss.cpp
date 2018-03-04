@@ -44,13 +44,21 @@ I8251 UART:
     RESET is taken from the same inverter that resets the counters
 
 Things to be looked at:
-- Serial doesn't work, so has been disabled.
-- Bottom 3 dips must be off/serial/off, or else nothing works.
-- No sound at all.
 - volume and pitch should be controlled by ppi outputs
 - pit to be hooked up
 - bit 0 of portc is not connected according to text above, but it
   completely changes the irq operation.
+
+Notes:
+- When Serial dip is chosen, you type the commands in, but you cannot see anything.
+  If you enter text via parallel, it is echoed but otherwise ignored.
+- When Parallel dip is chosen, you type the commands in, but again you cannot
+  see anything.
+- These operations ARE BY DESIGN. Everything is working correctly.
+- Commands are case-sensitive.
+- Some tests...
+  - Say the time: EscT. (include the period)
+  - Play some notes: !T08:1234:125:129:125:130. (then press enter)
 
 ******************************************************************************/
 
@@ -62,31 +70,24 @@ Things to be looked at:
 //#include "votrpss.lh"
 
 /* Components */
-#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/votrax.h"
-
-/* For testing */
 #include "machine/terminal.h"
-
 #include "speaker.h"
-
-#define TERMINAL_TAG "terminal"
 
 class votrpss_state : public driver_device
 {
 public:
 	votrpss_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG),
-		m_ppi(*this, "ppi"),
-		m_uart(*this, "uart")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+		, m_ppi(*this, "ppi")
+	{ }
 
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(ppi_pa_r);
@@ -99,6 +100,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	IRQ_CALLBACK_MEMBER(irq_ack);
 
+	void votrpss(machine_config &config);
+	void votrpss_io(address_map &map);
+	void votrpss_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	uint8_t m_porta;
@@ -108,7 +112,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<i8255_device> m_ppi;
-	required_device<i8251_device> m_uart;
 };
 
 
@@ -116,7 +119,7 @@ private:
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(votrpss_mem, AS_PROGRAM, 8, votrpss_state)
+ADDRESS_MAP_START(votrpss_state::votrpss_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM /* main roms (in potted module) */
 	AM_RANGE(0x4000, 0x7fff) AM_NOP /* open bus/space for expansion rom (reads as 0xFF) */
@@ -126,7 +129,7 @@ static ADDRESS_MAP_START(votrpss_mem, AS_PROGRAM, 8, votrpss_state)
 	AM_RANGE(0xe000, 0xffff) AM_NOP /* open bus (space for more personality rom, not normally used) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(votrpss_io, AS_IO, 8, votrpss_state)
+ADDRESS_MAP_START(votrpss_state::votrpss_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3e) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
@@ -161,7 +164,7 @@ static INPUT_PORTS_START(votrpss)
 	PORT_DIPNAME( 0x20, 0x20, "Startup Message" )   PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR ( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR ( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Default Communications Port" )   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x00, "Default Input Port" )   PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "Serial/RS-232" )
 	PORT_DIPSETTING(    0x40, "Parallel" )
 	PORT_DIPNAME( 0x80, 0x00, "Self Test Mode" )    PORT_DIPLOCATION("SW1:8")
@@ -208,7 +211,6 @@ READ8_MEMBER( votrpss_state::ppi_pc_r )
 	}
 
 	return (m_portc & 0xdb) | data;
-	//return data;
 }
 
 WRITE8_MEMBER( votrpss_state::ppi_pa_w )
@@ -232,19 +234,14 @@ void votrpss_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-DECLARE_WRITE_LINE_MEMBER( votrpss_state::write_uart_clock )
-{
-	m_uart->write_txc(state);
-	m_uart->write_rxc(state);
-}
 
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( votrpss )
+MACHINE_CONFIG_START(votrpss_state::votrpss)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)  /* 4.000 MHz, verified */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)  /* 4.000 MHz, verified */
 	MCFG_CPU_PROGRAM_MAP(votrpss_mem)
 	MCFG_CPU_IO_MAP(votrpss_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(votrpss_state,irq_ack)
@@ -254,7 +251,7 @@ static MACHINE_CONFIG_START( votrpss )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay", AY8910, XTAL_8MHz/4) /* 2.000 MHz, verified */
+	MCFG_SOUND_ADD("ay", AY8910, XTAL(8'000'000)/4) /* 2.000 MHz, verified */
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))        // port B read
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("votrax", votrax_sc01_device, write))     // port A write
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -262,7 +259,7 @@ static MACHINE_CONFIG_START( votrpss )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(votrpss_state, kbd_put))
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
@@ -270,15 +267,18 @@ static MACHINE_CONFIG_START( votrpss )
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
+	// when serial is chosen, and you select terminal, nothing shows (by design). You can only type commands in.
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_8MHz) /* Timer 0: baud rate gen for 8251 */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(votrpss_state, write_uart_clock))
-	MCFG_PIT8253_CLK1(XTAL_8MHz / 256) /* Timer 1: Pitch */
-	MCFG_PIT8253_CLK2(XTAL_8MHz / 4096) /* Timer 2: Volume */
+	MCFG_PIT8253_CLK0(XTAL(8'000'000)) /* Timer 0: baud rate gen for 8251 */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_PIT8253_CLK1(XTAL(8'000'000) / 256) /* Timer 1: Pitch */
+	MCFG_PIT8253_CLK2(XTAL(8'000'000) / 4096) /* Timer 2: Volume */
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(votrpss_state, ppi_pa_r))
@@ -323,4 +323,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    STATE          INIT  COMPANY   FULLNAME                  FLAGS
-COMP( 1982, votrpss, 0,      0,      votrpss,   votrpss, votrpss_state, 0,    "Votrax", "Personal Speech System", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, votrpss, 0,      0,      votrpss,   votrpss, votrpss_state, 0,    "Votrax", "Personal Speech System", 0 )

@@ -11,6 +11,7 @@
 
 #define Z80_TAG         "17a"
 #define AM9512_TAG      "17d"
+#define S100_TAG        "s100"
 
 class mpz80_state : public driver_device
 {
@@ -91,6 +92,9 @@ public:
 	int m_trap_stop;
 	int m_trap_aux;
 	DECLARE_DRIVER_INIT(mpz80);
+	void mpz80(machine_config &config);
+	void mpz80_io(address_map &map);
+	void mpz80_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_MPZ80_H

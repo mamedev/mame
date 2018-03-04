@@ -61,9 +61,6 @@ a2bus_swyft_device::a2bus_swyft_device(const machine_config &mconfig, device_typ
 
 void a2bus_swyft_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(SWYFT_ROM_REGION).c_str())->base();
 
 	save_item(NAME(m_rombank));
@@ -77,7 +74,7 @@ void a2bus_swyft_device::device_reset()
 	recalc_slot_inh();
 }
 
-uint8_t a2bus_swyft_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_swyft_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
@@ -103,7 +100,7 @@ uint8_t a2bus_swyft_device::read_c0nx(address_space &space, uint8_t offset)
 	return 0xff;
 }
 
-void a2bus_swyft_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_swyft_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -127,7 +124,7 @@ void a2bus_swyft_device::write_c0nx(address_space &space, uint8_t offset, uint8_
 	}
 }
 
-uint8_t a2bus_swyft_device::read_inh_rom(address_space &space, uint16_t offset)
+uint8_t a2bus_swyft_device::read_inh_rom(uint16_t offset)
 {
 	offset -= 0xd000;
 

@@ -3,13 +3,181 @@
 
 <softwarelist name="nimbus" description="RM Nimbus disk images">
 
-	<software name="welcome">
-		<description>Welcome V3.00C</description>
-		<year>19??</year>
-		<publisher>Research Machines?</publisher>
-
+	<software name="bbcbasic">
+		<description>BBC BASIC V1.00a</description>
+		<year>1986</year>
+		<publisher>Research Machines</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="737280">
+				<rom name="bbcbasic.dsk" size="737280" crc="59ba2993" sha1="88a39723a52d482a85b4f134ac1c1de7035500d6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genutil">
+		<description>RM Nimbus General Utility Disk</description>
+		<year>1987</year>
+		<publisher>Research Machines</publisher>
+		<info name="serial" value="19327" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="general utility disk.dsk" size="737280" crc="9aadcb2e" sha1="87773d2cbeebb0634d9c88dd3a7f138eab0c10bf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibmmode">
+		<description>IBM Mode Software for Nimbus PC Rel.3</description>
+		<year>1989</year>
+		<publisher>Research Machines</publisher>
+		<info name="serial" value="23901" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ibm mode v2.70.dsk" size="737280" crc="62de19e4" sha1="2ef98b735cdafa07b411f46cec72036e7147841c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibmmode261" cloneof="ibmmode">
+		<description>IBM Mode Software For Nimbus PC V2.61</description>
+		<year>1988</year>
+		<publisher>Research Machines</publisher>
+		<info name="serial" value="23074" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ibm mode v2.61.dsk" size="737280" crc="bb021b3d" sha1="d6197a64442e0d6e71de7af2852014d5abab98d2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="isvtk102">
+		<description>Microsoft Windows ISV Toolkit Release 1.02</description>
+		<year>1986</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 of 4"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows isv toolkit 1.02 disk1.dsk" size="737280" crc="c6011d26" sha1="afd406e22292e2ff46f736f5bf16176069c17007" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 of 4"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows isv toolkit 1.02 disk2.dsk" size="737280" crc="136639de" sha1="8b0373927668e9532e638f232bed760b41ca9d2e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 of 4"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows isv toolkit 1.02 disk3.dsk" size="737280" crc="ca4817f3" sha1="4b80a615463aebf186f2f8043947637be641cf41" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4 of 4"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows isv toolkit 1.02 disk4.dsk" size="737280" crc="917c31ec" sha1="e9b0f3fdaad2362f80cfc86bfc3181170a989fa8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwftools">
+		<description>Nimbus Winchester Format Tools</description>
+		<year>198?</year>
+		<publisher>Research Machines</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="winchester format tools.dsk" size="737280" crc="8a7a3154" sha1="6d12c40a0b1ecab7a2b472cc2aff4f14bdc7b394" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pprinter">
+		<description>Parallel Printer Driver Parallel Board For I/O Board Version V1.0G</description>
+		<year>198?</year>
+		<publisher>Research Machines</publisher>
+		<info name="serial" value="23863" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="parallel printer driver.dsk" size="737280" crc="8dda2586" sha1="56bb8be461d50aba3c774d414318da925559d2f5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rmbasic">
+		<description>RM BASIC V1.0F</description>
+		<year>1985</year>
+		<publisher>Research Machines</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="rmbasic v1.0f.dsk" size="737280" crc="1e8a2fee" sha1="fe62d814487adf876b95bdfcd6eb37c3632eeb72" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rmlogo">
+		<description>RM LOGO V1.0D</description>
+		<year>1985</year>
+		<publisher>Research Machines</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="rmlogo v1.0d.dsk" size="737280" crc="f812b868" sha1="1381ae488ee12c752171075448a1bd2bd052fc83" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="setpc290">
+		<description>Release Disk SetPC V2.90 IBM Mode</description>
+		<year>1989</year>
+		<publisher>Research Machines</publisher>
+		<info name="serial" value="24778" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="setpc290.dsk" size="737280" crc="95a03696" sha1="fa7524c5a66c32b5a9d88a5bcd9f775851ffd876" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdriver">
+		<description>RM Nimbus Sketchpad Driver V1.0B</description>
+		<year>1989</year>
+		<publisher>Research Machines</publisher>
+		<info name="serial" value="22587" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="sketchpad driver v1.0b.dsk" size="737280" crc="6abcb6c9" sha1="7d00edbd8897ccb41ed31d892c664e78c02012a1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="steed">
+		<description>Steed Ver 1.4A</description>
+		<year>1985</year>
+		<publisher>Solomon Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="steed v1.4a.dsk" size="737280" crc="8baa2d98" sha1="c9a1f6d3649aab1d534a6571d9f5c3f44a447363" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="upgrd31">
+		<description>RM Nimbus PC Upgrade Disk DOS 3.1 Rel 3.10.A</description>
+		<year>1987</year>
+		<publisher>Research Machines</publisher>
+		<info name="serial" value="21345" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="upgrade31.dsk" size="737280" crc="0da3d6df" sha1="60ecbc5b062b0a55d52b74bfa425e67c81b92351" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="welcome">
+		<description>MSDOS V3.10 System and Welcome Disk Release 3.10C</description>
+		<year>1989</year>
+		<publisher>Research Machines</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
 				<rom name="welcome 3.00c.dsk" size="737280" crc="87bfe2a3" sha1="99574d1fb0248b2ce5bf67ff738909dbe7a048f8" offset="0" />
 			</dataarea>
 		</part>
@@ -17,24 +185,184 @@
 
 	<software name="welcomerd" cloneof="welcome">
 		<description>Welcome V3.00C + RAM Disk</description>
-		<year>19??</year>
-		<publisher>Research Machines?</publisher>
-
+		<year>1989</year>
+		<publisher>Research Machines</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="737280">
 				<rom name="welcome 3.00c ram disk version.dsk" size="737280" crc="12e1d204" sha1="f4eb911dd2a3e659048355b6cda6bfc672d82700" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="welcome2" cloneof="welcome">
-		<description>Welcome V2.00B</description>
-		<year>19??</year>
-		<publisher>Research Machines?</publisher>
-
+		<description>MSDOS V3.10 System and Welcome Disk Release 3.02A 4.11.85</description>
+		<year>1985</year>
+		<publisher>Research Machines</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="737280">
 				<rom name="ms-dos3.10.dsk" size="737280" crc="f15a6cea" sha1="bfdd6b451f6bd99fef762fd9cb92e60078a71480" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win102sa">
+		<description>Microsoft Windows Release 1.02 Stand Alone</description>
+		<year>1986</year>
+		<publisher>Research Machines</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 of 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 1.02 disk1.dsk" size="737280" crc="2e5a2275" sha1="4dec109d86b060c8f2ebd936b57ea7616cb6fa36" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 of 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 1.02 disk2.dsk" size="737280" crc="73b254f5" sha1="487450d94832e06013aeff49fd7579ee2928fd17" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win103sa">
+		<description>Microsoft Windows Release 1.03 Stand Alone</description>
+		<year>1987</year>
+		<publisher>Research Machines</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 of 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 1.03 disk1.dsk" size="737280" crc="d9fda546" sha1="6a7ec2a16a4592514590ef911c58676edeacdf2b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 of 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 1.03 disk2.dsk" size="737280" crc="824df9d0" sha1="5308ab522c034b658ab3a7a3a77ae75705c47851" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 of 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 1.03 disk3.dsk" size="737280" crc="aab2929d" sha1="7aa5bbdc7abf99bd9e15fbbb3727a613722674a8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win203">
+		<description>Microsoft Windows 2.03 for Nimbus PC System</description>
+		<year>1988</year>
+		<publisher>Research Machines</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 of 4"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 2.03 disk1.dsk" size="737280" crc="ff19a002" sha1="23e5bf3868bbd5a46006fc4f08f08632f461be4c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 of 4"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 2.03 disk2.dsk" size="737280" crc="05e3f26c" sha1="8e91fa2cff2933d0122d048608c51b329626553d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 of 4"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 2.03 disk3.dsk" size="737280" crc="5544ad6e" sha1="e2acf8ba9b6c1d04ac610df6eb215ec9bf1eb783" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4 of 4"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 2.03 disk4.dsk" size="737280" crc="4ee63855" sha1="4a8ed7031d4cbf5c91ec1d05411469eb7a2b41f8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win21pm">
+		<description>Microsoft Windows V2.1 Presentation Manager for Nimbus PC186</description>
+		<year>1989</year>
+		<publisher>Research Machines</publisher>
+		<info name="serial" value="24779-24782" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 of 4: System Disk"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 2.1 presentation manager disk1.dsk" size="737280" crc="ef33bc63" sha1="6bf201b89780890350d65ae7264ffde5803b1cc8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 of 4: Applications Disk"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 2.1 presentation manager disk2.dsk" size="737280" crc="f65663b6" sha1="cacf2879d57e05e55e5a7a11b0e648b2feb970f3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 of 4: Drivers Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 2.1 presentation manager disk3.dsk" size="737280" crc="79f032aa" sha1="df8afe722997f77ff823dab4447e39eeca030ff9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4 of 4: Drivers Disk 2 + Fonts"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 2.1 presentation manager disk4.dsk" size="737280" crc="97a3b86b" sha1="070bfde67e7887954e19d0ee0ccc39d4e723ed20" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win3sa">
+		<description>Microsoft Windows 3 Standalone PC 186</description>
+		<year>1990</year>
+		<publisher>Research Machines</publisher>
+		<info name="serial" value="26768-26772" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 of 5"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 3 standalone 186 disk1.dsk" size="737280" crc="195ecaff" sha1="dbad4378870e3502616ae49010b1fdec903dffc3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 of 5"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 3 standalone 186 disk2.dsk" size="737280" crc="a853e29d" sha1="fb557afcac5295e24c0d4fb36d067b4757a6830c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 of 5"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 3 standalone 186 disk3.dsk" size="737280" crc="c99bd4ed" sha1="4618cf5ca324bbf5504131a4e63c2cf43a300e63" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4 of 5"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 3 standalone 186 disk4.dsk" size="737280" crc="c345549d" sha1="11ddab75908e42e47770cda82d4423553e679589" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5 of 5"/>
+			<dataarea name="flop" size="737280">
+				<rom name="windows 3 standalone 186 disk5.dsk" size="737280" crc="7d471cc6" sha1="2a1921bda346147d7a92a561d029902cfce76766" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordstar">
+		<description>WordStar Rel. 3.30</description>
+		<year>198?</year>
+		<publisher>MicroPro International</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="wordstar.dsk" size="737280" crc="6207d906" sha1="ee0ed11dddc08c7b0b3998e05f741cdb20424436" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xfercpm">
+		<description>XferCPM V1.0A</description>
+		<year>1985</year>
+		<publisher>Research Machines</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="xfercpm1.dsk" size="737280" crc="cc81107f" sha1="48e84a71360a6aecb5d43032ae15a8ace6cab999" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

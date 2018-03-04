@@ -91,10 +91,13 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void hitpoker(machine_config &config);
+	void hitpoker_io(address_map &map);
+	void hitpoker_map(address_map &map);
 };
 
 
-#define CRTC_CLOCK XTAL_3_579545MHz
+#define CRTC_CLOCK XTAL(3'579'545)
 
 void hitpoker_state::video_start()
 {
@@ -226,10 +229,10 @@ READ8_MEMBER(hitpoker_state::hitpoker_pic_r)
 
 	if(offset == 0)
 	{
-		if(space.device().safe_pc() == 0x3143 ||
-			space.device().safe_pc() == 0x314e ||
-			space.device().safe_pc() == 0x3164 ||
-			space.device().safe_pc() == 0x3179)
+		if(m_maincpu->pc() == 0x3143 ||
+			m_maincpu->pc() == 0x314e ||
+			m_maincpu->pc() == 0x3164 ||
+			m_maincpu->pc() == 0x3179)
 			return m_pic_data;
 
 		return (m_pic_data & 0x7f) | (m_pic_data & 0x40 ? 0x80 : 0x00);
@@ -254,7 +257,10 @@ READ8_MEMBER(hitpoker_state::test_r)
 #endif
 
 /* overlap empty rom addresses */
-static ADDRESS_MAP_START( hitpoker_map, AS_PROGRAM, 8, hitpoker_state )
+ADDRESS_MAP_START(hitpoker_state::hitpoker_map)
+	AM_RANGE(0x0000, 0xbdff) AM_ROM
+	AM_RANGE(0xbf00, 0xffff) AM_ROM
+
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // stack ram
 	AM_RANGE(0x1000, 0x103f) AM_RAM // internal I/O
 	AM_RANGE(0x8000, 0xb5ff) AM_READWRITE(hitpoker_vram_r,hitpoker_vram_w)
@@ -272,11 +278,9 @@ static ADDRESS_MAP_START( hitpoker_map, AS_PROGRAM, 8, hitpoker_state )
 //  AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(hitpoker_cram_r,hitpoker_cram_w)
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(hitpoker_paletteram_r,hitpoker_paletteram_w)
-	AM_RANGE(0x0000, 0xbdff) AM_ROM
-	AM_RANGE(0xbf00, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hitpoker_io, AS_IO, 8, hitpoker_state )
+ADDRESS_MAP_START(hitpoker_state::hitpoker_io)
 	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_READWRITE(hitpoker_pic_r,hitpoker_pic_w) AM_SHARE("sys_regs")
 ADDRESS_MAP_END
 
@@ -469,7 +473,7 @@ INTERRUPT_GEN_MEMBER(hitpoker_state::hitpoker_irq)
 	device.execute().set_input_line(MC68HC11_IRQ_LINE, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( hitpoker )
+MACHINE_CONFIG_START(hitpoker_state::hitpoker)
 	MCFG_CPU_ADD("maincpu", MC68HC11,1000000)
 	MCFG_CPU_PROGRAM_MAP(hitpoker_map)
 	MCFG_CPU_IO_MAP(hitpoker_io)

@@ -19,7 +19,7 @@
 
 
 /* Address maps */
-static ADDRESS_MAP_START(specialist_mem, AS_PROGRAM, 8, special_state )
+ADDRESS_MAP_START(special_state::specialist_mem)
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
 	AM_RANGE( 0x3000, 0x8fff ) AM_RAM  // RAM
 	AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_SHARE("videoram") // Video RAM
@@ -27,7 +27,7 @@ static ADDRESS_MAP_START(specialist_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(specialp_mem, AS_PROGRAM, 8, special_state )
+ADDRESS_MAP_START(special_state::specialp_mem)
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
 	AM_RANGE( 0x3000, 0x7fff ) AM_RAM  // RAM
 	AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_SHARE("videoram") // Video RAM
@@ -35,7 +35,7 @@ static ADDRESS_MAP_START(specialp_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(erik_mem, AS_PROGRAM, 8, special_state )
+ADDRESS_MAP_START(special_state::erik_mem)
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x4000, 0x8fff ) AM_RAMBANK("bank2")
 	AM_RANGE( 0x9000, 0xbfff ) AM_RAMBANK("bank3")
@@ -44,7 +44,7 @@ static ADDRESS_MAP_START(erik_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank6")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( erik_io_map, AS_IO, 8, special_state )
+ADDRESS_MAP_START(special_state::erik_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(erik_rr_reg_r, erik_rr_reg_w)
 	AM_RANGE(0xf2, 0xf2) AM_READWRITE(erik_rc_reg_r, erik_rc_reg_w)
@@ -52,7 +52,7 @@ static ADDRESS_MAP_START( erik_io_map, AS_IO, 8, special_state )
 	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("fd1793", fd1793_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(specimx_mem, AS_PROGRAM, 8, special_state )
+ADDRESS_MAP_START(special_state::specimx_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x8fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x9000, 0xbfff ) AM_RAMBANK("bank2")
@@ -358,7 +358,7 @@ static SLOT_INTERFACE_START( specimx_floppies )
 SLOT_INTERFACE_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( special )
+MACHINE_CONFIG_START(special_state::special)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(specialist_mem)
@@ -402,7 +402,8 @@ static MACHINE_CONFIG_START( special )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","special_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( specialp, special )
+MACHINE_CONFIG_START(special_state::specialp)
+	special(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(specialp_mem)
@@ -414,7 +415,8 @@ static MACHINE_CONFIG_DERIVED( specialp, special )
 	MCFG_VIDEO_START_OVERRIDE(special_state,specialp)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( specialm, special )
+MACHINE_CONFIG_START(special_state::specialm)
+	special(config);
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
@@ -425,7 +427,8 @@ static MACHINE_CONFIG_DERIVED( specialm, special )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( specimx, special )
+MACHINE_CONFIG_START(special_state::specimx)
+	special(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(specimx_mem)
 
@@ -463,7 +466,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_I8255_IN_PORTC_CB(READ8(special_state, specialist_8255_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
 
-	MCFG_FD1793_ADD("fd1793", XTAL_8MHz / 8)
+	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(special_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
@@ -475,7 +478,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( erik )
+MACHINE_CONFIG_START(special_state::erik)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(erik_mem)
@@ -518,7 +521,7 @@ static MACHINE_CONFIG_START( erik )
 	MCFG_I8255_IN_PORTC_CB(READ8(special_state, specialist_8255_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
 
-	MCFG_FD1793_ADD("fd1793", XTAL_8MHz / 8)
+	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(special_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", special_state::specimx_floppy_formats)

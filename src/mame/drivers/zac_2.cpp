@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/s2650/s2650.h"
+#include "machine/timer.h"
 #include "zac_2.lh"
 
 class zac_2_state : public driver_device
@@ -36,6 +37,10 @@ public:
 	required_ioport_array<6> m_row;
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_outtimer);
+	void zac_2(machine_config &config);
+	void zac_2_data(address_map &map);
+	void zac_2_io(address_map &map);
+	void zac_2_map(address_map &map);
 protected:
 
 	// devices
@@ -47,7 +52,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( zac_2_map, AS_PROGRAM, 8, zac_2_state )
+ADDRESS_MAP_START(zac_2_state::zac_2_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x17ff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6400) AM_RAM AM_SHARE("ram")
@@ -57,11 +62,11 @@ static ADDRESS_MAP_START( zac_2_map, AS_PROGRAM, 8, zac_2_state )
 	AM_RANGE(0x6000, 0x67ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(zac_2_io, AS_IO, 8, zac_2_state)
+ADDRESS_MAP_START(zac_2_state::zac_2_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(zac_2_data, AS_DATA, 8, zac_2_state)
+ADDRESS_MAP_START(zac_2_state::zac_2_data)
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(ctrl_r,ctrl_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(data_r,data_w)
 ADDRESS_MAP_END
@@ -184,7 +189,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_inttimer)
 {
 	// a pulse is sent via a capacitor (similar to what one finds at a reset pin)
 	if (m_t_c > 0x80)
-		generic_pulse_irq_line_and_vector(*m_maincpu, INPUT_LINE_IRQ0, 0xbf, 2);
+		m_maincpu->pulse_input_line_and_vector(INPUT_LINE_IRQ0, 0xbf, 2 * m_maincpu->minimum_quantum_time());
 	else
 		m_t_c++;
 }
@@ -203,7 +208,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_outtimer)
 	}
 }
 
-static MACHINE_CONFIG_START( zac_2 )
+MACHINE_CONFIG_START(zac_2_state::zac_2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 6000000/2)
 	MCFG_CPU_PROGRAM_MAP(zac_2_map)

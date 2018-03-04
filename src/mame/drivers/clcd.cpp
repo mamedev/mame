@@ -551,6 +551,9 @@ public:
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
+	void clcd(machine_config &config);
+	void clcd_banked_mem(address_map &map);
+	void clcd_mem(address_map &map);
 private:
 	required_device<m65c02_device> m_maincpu;
 	required_device<mos6551_device> m_acia;
@@ -601,7 +604,7 @@ void clcd_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 }
 
 
-static ADDRESS_MAP_START( clcd_banked_mem, AS_PROGRAM, 8, clcd_state )
+ADDRESS_MAP_START(clcd_state::clcd_banked_mem)
 	/* KERN/APPL/RAM */
 	AM_RANGE(0x00000, 0x1ffff) AM_MIRROR(0x40000) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x20000, 0x3ffff) AM_MIRROR(0x40000) AM_ROM AM_REGION("maincpu",0)
@@ -614,7 +617,7 @@ static ADDRESS_MAP_START( clcd_banked_mem, AS_PROGRAM, 8, clcd_state )
 	AM_RANGE(0x8e000, 0x8f7ff) AM_READ(mmu_offset5_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( clcd_mem, AS_PROGRAM, 8, clcd_state )
+ADDRESS_MAP_START(clcd_state::clcd_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x1000, 0x3fff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
 	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bank2", address_map_bank_device, read8, write8)
@@ -734,7 +737,7 @@ static INPUT_PORTS_START( clcd )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // clears screen and goes into infinite loop
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START(clcd)
+MACHINE_CONFIG_START(clcd_state::clcd)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
 	MCFG_CPU_PROGRAM_MAP(clcd_mem)
@@ -753,7 +756,7 @@ static MACHINE_CONFIG_START(clcd)
 	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_DEVICE_ADD("acia", MOS6551, 2000000)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(clcd_state, write_irq_acia))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -771,28 +774,28 @@ static MACHINE_CONFIG_START(clcd)
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(clcd_banked_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 
 	MCFG_DEVICE_ADD("bank2", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(clcd_banked_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 
 	MCFG_DEVICE_ADD("bank3", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(clcd_banked_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 
 	MCFG_DEVICE_ADD("bank4", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(clcd_banked_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 
-	MCFG_DEVICE_ADD("rtc", MSM58321, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM58321, XTAL(32'768))
 	MCFG_MSM58321_D0_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa0))
 	MCFG_MSM58321_D1_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa1))
 	MCFG_MSM58321_D2_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa2))

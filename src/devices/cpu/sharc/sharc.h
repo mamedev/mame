@@ -74,7 +74,7 @@
 
 
 #define MCFG_SHARC_BOOT_MODE(boot_mode) \
-	adsp21062_device::set_boot_mode(*device, adsp21062_device::boot_mode);
+	downcast<adsp21062_device &>(*device).set_boot_mode(adsp21062_device::boot_mode);
 
 class sharc_frontend;
 
@@ -95,8 +95,8 @@ public:
 	// construction/destruction
 	adsp21062_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	// static configuration helpers
-	static void set_boot_mode(device_t &device, const sharc_boot_mode boot_mode) { downcast<adsp21062_device &>(device).m_boot_mode = boot_mode; }
+	// configuration helpers
+	void set_boot_mode(const sharc_boot_mode boot_mode) { m_boot_mode = boot_mode; }
 
 	void set_flag_input(int flag_num, int state);
 	void external_iop_write(uint32_t address, uint32_t data);
@@ -204,6 +204,8 @@ public:
 		EXCEPTION_COUNT
 	};
 
+	void internal_data(address_map &map);
+	void internal_pgm(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -220,10 +222,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	static constexpr uint32_t OPCODE_BYTES = 8; // actually 6, but emulation requires padding to 64 bits
-	virtual uint32_t disasm_min_opcode_bytes() const override { return OPCODE_BYTES; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return OPCODE_BYTES; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	struct alignas(16) SHARC_DAG

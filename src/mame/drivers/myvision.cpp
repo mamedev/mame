@@ -55,6 +55,9 @@ public:
 	DECLARE_WRITE8_MEMBER( ay_port_a_w );
 	DECLARE_WRITE8_MEMBER( ay_port_b_w );
 
+	void myvision(machine_config &config);
+	void myvision_io(address_map &map);
+	void myvision_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -68,7 +71,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(myvision_mem, AS_PROGRAM, 8, myvision_state)
+ADDRESS_MAP_START(myvision_state::myvision_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x0000, 0x5fff)      // mapped by the cartslot
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
@@ -77,7 +80,7 @@ static ADDRESS_MAP_START(myvision_mem, AS_PROGRAM, 8, myvision_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(myvision_io, AS_IO, 8, myvision_state)
+ADDRESS_MAP_START(myvision_state::myvision_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay8910", ay8910_device, address_w)
@@ -207,14 +210,14 @@ WRITE8_MEMBER( myvision_state::ay_port_b_w )
 	m_column = data;
 }
 
-static MACHINE_CONFIG_START( myvision )
+MACHINE_CONFIG_START(myvision_state::myvision)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_10_738635MHz/3)  /* Not verified */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(10'738'635)/3)  /* Not verified */
 	MCFG_CPU_PROGRAM_MAP(myvision_mem)
 	MCFG_CPU_IO_MAP(myvision_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9918", TMS9918A, XTAL_10_738635MHz / 2 )  /* Exact model not verified */
+	MCFG_DEVICE_ADD( "tms9918", TMS9918A, XTAL(10'738'635) / 2 )  /* Exact model not verified */
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)  /* Not verified */
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
@@ -222,7 +225,7 @@ static MACHINE_CONFIG_START( myvision )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_10_738635MHz/3/2)  /* Exact model and clock not verified */
+	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(10'738'635)/3/2)  /* Exact model and clock not verified */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(myvision_state, ay_port_a_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(myvision_state, ay_port_b_r))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(myvision_state, ay_port_a_w))

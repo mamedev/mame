@@ -170,21 +170,19 @@ class esq5505_state : public driver_device
 {
 public:
 	esq5505_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_duart(*this, "duart"),
-		m_otis(*this, "otis"),
-		m_esp(*this, "esp"),
-		m_pump(*this, "pump"),
-		m_fdc(*this, "wd1772"),
-		m_panel(*this, "panel"),
-		m_dmac(*this, "mc68450"),
-		m_mdout(*this, "mdout")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_duart(*this, "duart")
+		, m_esp(*this, "esp")
+		, m_pump(*this, "pump")
+		, m_fdc(*this, "wd1772")
+		, m_panel(*this, "panel")
+		, m_dmac(*this, "mc68450")
+		, m_mdout(*this, "mdout")
 	{ }
 
 	required_device<m68000_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
-	required_device<es5505_device> m_otis;
 	required_device<es5510_device> m_esp;
 	required_device<esq_5505_5510_pump_device> m_pump;
 	optional_device<wd1772_device> m_fdc;
@@ -218,6 +216,15 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	void sq1(machine_config &config);
+	void vfx(machine_config &config);
+	void vfxsd(machine_config &config);
+	void eps(machine_config &config);
+	void vfx32(machine_config &config);
+	void eps_map(address_map &map);
+	void sq1_map(address_map &map);
+	void vfx_map(address_map &map);
+	void vfxsd_map(address_map &map);
 private:
 	uint16_t  *m_rom, *m_ram;
 	uint16_t m_analog_values[8];
@@ -264,8 +271,7 @@ IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
 void esq5505_state::machine_start()
 {
 	driver_device::machine_start();
-	// tell the pump about the OTIS & ESP chips
-	m_pump->set_otis(m_otis);
+	// tell the pump about the ESP chips
 	m_pump->set_esp(m_esp);
 
 	m_rom = (uint16_t *)(void *)memregion("osrom")->base();
@@ -341,7 +347,7 @@ READ16_MEMBER(esq5505_state::lower_r)
 		m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
 	}
 
-	if (!machine().side_effect_disabled() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
+	if (!machine().side_effects_disabled() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
 	{
 		return m_rom[offset];
 	}
@@ -372,7 +378,7 @@ WRITE16_MEMBER(esq5505_state::lower_w)
 	}
 }
 
-static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
+ADDRESS_MAP_START(esq5505_state::vfx_map)
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
@@ -381,7 +387,7 @@ static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
+ADDRESS_MAP_START(esq5505_state::vfxsd_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
@@ -392,7 +398,7 @@ static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
+ADDRESS_MAP_START(esq5505_state::eps_map)
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)
@@ -403,7 +409,7 @@ static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sq1_map, AS_PROGRAM, 16, esq5505_state )
+ADDRESS_MAP_START(esq5505_state::sq1_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x0ff)
@@ -604,19 +610,19 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 }
 #endif
 
-static MACHINE_CONFIG_START( vfx )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+MACHINE_CONFIG_START(esq5505_state::vfx)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
-	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
+	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000))
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X40_VFX_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 
-	MCFG_MC68681_ADD("duart", 4000000)
+	MCFG_DEVICE_ADD("duart", MC68681, 4000000)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_a))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_b))
@@ -630,11 +636,11 @@ static MACHINE_CONFIG_START( vfx )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL_10MHz / (16 * 21))
+	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(10'000'000) / (16 * 21))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("otis", ES5505, XTAL_10MHz)
+	MCFG_SOUND_ADD("otis", ES5505, XTAL(10'000'000))
 	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5505_CHANNELS(4)          /* channels */
@@ -650,7 +656,8 @@ static MACHINE_CONFIG_START( vfx )
 	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(eps, vfx)
+MACHINE_CONFIG_START(esq5505_state::eps)
+	vfx(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(eps_map)
 
@@ -672,7 +679,8 @@ static MACHINE_CONFIG_DERIVED(eps, vfx)
 	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(esq5505_state, fdc_write_byte))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(vfxsd, vfx)
+MACHINE_CONFIG_START(esq5505_state::vfxsd)
+	vfx(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 
@@ -681,19 +689,19 @@ static MACHINE_CONFIG_DERIVED(vfxsd, vfx)
 MACHINE_CONFIG_END
 
 // 32-voice machines with the VFX-SD type config
-static MACHINE_CONFIG_START(vfx32)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_30_4761MHz / 2)
+MACHINE_CONFIG_START(esq5505_state::vfx32)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(30'476'100) / 2)
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
-	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
+	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000))
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X40_VFX_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 
-	MCFG_MC68681_ADD("duart", 4000000)
+	MCFG_DEVICE_ADD("duart", MC68681, 4000000)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_a))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_b))
@@ -707,11 +715,11 @@ static MACHINE_CONFIG_START(vfx32)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL_30_4761MHz / (2 * 16 * 32))
+	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(30'476'100) / (2 * 16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("otis", ES5505, XTAL_30_4761MHz / 2)
+	MCFG_SOUND_ADD("otis", ES5505, XTAL(30'476'100) / 2)
 	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5505_CHANNELS(4)          /* channels */
@@ -730,7 +738,8 @@ static MACHINE_CONFIG_START(vfx32)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(sq1, vfx)
+MACHINE_CONFIG_START(esq5505_state::sq1)
+	vfx(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(sq1_map)
 
@@ -851,8 +860,12 @@ ROM_END
 
 ROM_START( vfxsd )
 	ROM_REGION(0x40000, "osrom", 0)
-	ROM_LOAD16_BYTE( "vfxsd_200_lower.bin", 0x000000, 0x010000, CRC(7bd31aea) SHA1(812bf73c4861a5d963f128def14a4a98171c93ad) )
-	ROM_LOAD16_BYTE( "vfxsd_200_upper.bin", 0x000001, 0x010000, CRC(9a40efa2) SHA1(e38a2a4514519c1573361cb1526139bfcf94e45a) )
+	ROM_SYSTEM_BIOS( 0, "v200", "V200" )
+	ROMX_LOAD( "vfxsd_200_lower.bin", 0x000000, 0x010000, CRC(7bd31aea) SHA1(812bf73c4861a5d963f128def14a4a98171c93ad), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "vfxsd_200_upper.bin", 0x000001, 0x010000, CRC(9a40efa2) SHA1(e38a2a4514519c1573361cb1526139bfcf94e45a), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v133", "V133" )
+	ROMX_LOAD( "vfxsd_133_lower.bin", 0x000000, 0x010000, CRC(65407fcf) SHA1(83952a19f6f9ae7886ac828d8bd5ea7fee8d0fe3), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "vfxsd_133_upper.bin", 0x000001, 0x010000, CRC(150fcd18) SHA1(e42cf08604b52fab248d15d761de7d835a076940), ROM_SKIP(1) | ROM_BIOS(2) )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
 	ROM_LOAD16_BYTE( "u57.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )

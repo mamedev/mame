@@ -189,14 +189,15 @@ void screen_device::svg_renderer::render_state(std::vector<u32> &dest, const std
 
 void screen_device::svg_renderer::blit(bitmap_rgb32 &bitmap, const cached_bitmap &src) const
 {
-	const u32 *s = &src.image[0];
-	for(int y=0; y<src.sy; y++) {
-		u32 *d = &bitmap.pix(y + src.y, src.x);
-		for(int x=0; x<src.sx; x++) {
-			u32 c = *s++;
-			if(c)
-				*d = c;
-			d++;
+	if(src.sy) {
+		const u32 *s = &src.image[0];
+		for(int y=0; y<src.sy; y++) {
+			u32 *d = &bitmap.pix(y + src.y, src.x);
+			for(int x=0; x<src.sx; x++, d++) {
+				const u32 c = *s++;
+				if(c)
+					*d = c;
+			}
 		}
 	}
 }
@@ -600,159 +601,6 @@ screen_device::~screen_device()
 
 
 //-------------------------------------------------
-//  static_set_type - configuration helper
-//  to set the screen type
-//-------------------------------------------------
-
-void screen_device::static_set_type(device_t &device, screen_type_enum type)
-{
-	downcast<screen_device &>(device).m_type = type;
-}
-
-
-void screen_device::static_set_svg_region(device_t &device, const char *region)
-{
-	downcast<screen_device &>(device).m_svg_region = region;
-}
-
-
-//-------------------------------------------------
-//  static_set_raw - configuration helper
-//  to set the raw screen parameters
-//-------------------------------------------------
-
-void screen_device::static_set_raw(device_t &device, u32 pixclock, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart)
-{
-	screen_device &screen = downcast<screen_device &>(device);
-	screen.m_clock = pixclock;
-	screen.m_refresh = HZ_TO_ATTOSECONDS(pixclock) * htotal * vtotal;
-	screen.m_vblank = screen.m_refresh / vtotal * (vtotal - (vbstart - vbend));
-	screen.m_width = htotal;
-	screen.m_height = vtotal;
-	screen.m_visarea.set(hbend, hbstart - 1, vbend, vbstart - 1);
-}
-
-
-//-------------------------------------------------
-//  static_set_refresh - configuration helper
-//  to set the refresh rate
-//-------------------------------------------------
-
-void screen_device::static_set_refresh(device_t &device, attoseconds_t rate)
-{
-	downcast<screen_device &>(device).m_refresh = rate;
-}
-
-
-//-------------------------------------------------
-//  static_set_vblank_time - configuration helper
-//  to set the VBLANK duration
-//-------------------------------------------------
-
-void screen_device::static_set_vblank_time(device_t &device, attoseconds_t time)
-{
-	screen_device &screen = downcast<screen_device &>(device);
-	screen.m_vblank = time;
-	screen.m_oldstyle_vblank_supplied = true;
-}
-
-
-//-------------------------------------------------
-//  static_set_size - configuration helper to set
-//  the width/height of the screen
-//-------------------------------------------------
-
-void screen_device::static_set_size(device_t &device, u16 width, u16 height)
-{
-	screen_device &screen = downcast<screen_device &>(device);
-	screen.m_width = width;
-	screen.m_height = height;
-}
-
-
-//-------------------------------------------------
-//  static_set_visarea - configuration helper to
-//  set the visible area of the screen
-//-------------------------------------------------
-
-void screen_device::static_set_visarea(device_t &device, s16 minx, s16 maxx, s16 miny, s16 maxy)
-{
-	downcast<screen_device &>(device).m_visarea.set(minx, maxx, miny, maxy);
-}
-
-
-//-------------------------------------------------
-//  static_set_default_position - configuration
-//  helper to set the default position and scale
-//  factors for the screen
-//-------------------------------------------------
-
-void screen_device::static_set_default_position(device_t &device, double xscale, double xoffs, double yscale, double yoffs)
-{
-	screen_device &screen = downcast<screen_device &>(device);
-	screen.m_xscale = xscale;
-	screen.m_xoffset = xoffs;
-	screen.m_yscale = yscale;
-	screen.m_yoffset = yoffs;
-}
-
-
-//-------------------------------------------------
-//  static_set_screen_update - set the legacy(?)
-//  screen update callback in the device
-//  configuration
-//-------------------------------------------------
-
-void screen_device::static_set_screen_update(device_t &device, screen_update_ind16_delegate callback)
-{
-	screen_device &screen = downcast<screen_device &>(device);
-	screen.m_screen_update_ind16 = callback;
-	screen.m_screen_update_rgb32 = screen_update_rgb32_delegate();
-}
-
-void screen_device::static_set_screen_update(device_t &device, screen_update_rgb32_delegate callback)
-{
-	screen_device &screen = downcast<screen_device &>(device);
-	screen.m_screen_update_ind16 = screen_update_ind16_delegate();
-	screen.m_screen_update_rgb32 = callback;
-}
-
-
-//-------------------------------------------------
-//  static_set_palette - set the screen palette
-//  configuration
-//-------------------------------------------------
-
-void screen_device::static_set_palette(device_t &device, const char *tag)
-{
-	downcast<screen_device &>(device).m_palette_tag = tag;
-}
-
-
-//-------------------------------------------------
-//  static_set_video_attributes - set the screen
-//  video attributes
-//-------------------------------------------------
-
-void screen_device::static_set_video_attributes(device_t &device, u32 flags)
-{
-	screen_device &screen = downcast<screen_device &>(device);
-	screen.m_video_attributes = flags;
-}
-
-
-//-------------------------------------------------
-//  static_set_color - set the screen global color
-//-------------------------------------------------
-
-void screen_device::static_set_color(device_t &device, rgb_t color)
-{
-	screen_device &screen = downcast<screen_device &>(device);
-	screen.m_color = color;
-}
-
-
-//-------------------------------------------------
 //  device_validity_check - verify device
 //  configuration
 //-------------------------------------------------
@@ -804,6 +652,39 @@ void screen_device::device_validity_check(validity_checker &valid) const
 
 
 //-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void screen_device::device_resolve_objects()
+{
+	// bind our handlers
+	m_screen_update_ind16.bind_relative_to(*owner());
+	m_screen_update_rgb32.bind_relative_to(*owner());
+	m_screen_vblank.resolve_safe();
+
+	// find the specified palette
+	if (m_palette_tag != nullptr && m_palette == nullptr)
+	{
+		// find our palette as a sibling device
+		device_t *palette = owner()->subdevice(m_palette_tag);
+		if (palette == nullptr)
+			fatalerror("Screen '%s' specifies nonexistent device '%s' as palette\n",
+									tag(),
+									m_palette_tag);
+		if (!palette->interface(m_palette))
+			fatalerror("Screen '%s' specifies device '%s' as palette, but it has no palette interface\n",
+									tag(),
+									m_palette_tag);
+
+		// assign our format to the palette before it starts
+		m_palette->m_format = format();
+	}
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -826,13 +707,7 @@ void screen_device::device_start()
 		}
 	}
 
-	// bind our handlers
-	m_screen_update_ind16.bind_relative_to(*owner());
-	m_screen_update_rgb32.bind_relative_to(*owner());
-	m_screen_vblank.resolve_safe();
-
 	// if we have a palette and it's not started, wait for it
-	resolve_palette();
 	if (m_palette != nullptr && !m_palette->device().started())
 		throw device_missing_dependencies();
 
@@ -1478,28 +1353,6 @@ void screen_device::register_screen_bitmap(bitmap_t &bitmap)
 	bitmap.allocate(width(), height());
 	if (m_palette != nullptr)
 		bitmap.set_palette(m_palette->palette());
-}
-
-
-//-------------------------------------------------
-//  resolve_palette - find the specified palette
-//-------------------------------------------------
-
-void screen_device::resolve_palette()
-{
-	if (m_palette_tag != nullptr && m_palette == nullptr)
-	{
-		// find our palette as a sibling device
-		device_t *palette = owner()->subdevice(m_palette_tag);
-		if (palette == nullptr)
-			fatalerror("Screen '%s' specifies nonexistent device '%s' as palette\n",
-									tag(),
-									m_palette_tag);
-		if (!palette->interface(m_palette))
-			fatalerror("Screen '%s' specifies device '%s' as palette, but it has no palette interface\n",
-									tag(),
-									m_palette_tag);
-	}
 }
 
 

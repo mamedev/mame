@@ -12,6 +12,7 @@
 
 #include "cpu/adsp2100/adsp2100.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/dmadac.h"
 
 
@@ -38,6 +39,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
 
+	void adsp_data_map(address_map &map);
+	void adsp_io_map(address_map &map);
+	void adsp_program_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

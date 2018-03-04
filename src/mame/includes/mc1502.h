@@ -81,6 +81,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mc1502_kppi_portb_w);
 	DECLARE_WRITE8_MEMBER(mc1502_kppi_portc_w);
 
+	void mc1502(machine_config &config);
+	void mc1502_io(address_map &map);
+	void mc1502_map(address_map &map);
 private:
 	int m_pit_out2;
 };

@@ -209,7 +209,7 @@
                                                                digit #3
                                                                +-------+ swapped digits 1 & 2
                                                                |       |  +-------+------+
-    tile_offset = BITSWAP16((tile_offset & 0xfff),15,14,13,12, 8,9,10,11, 0,1,2,3, 4,5,6,7)
+    tile_offset = bitswap<16>((tile_offset & 0xfff),15,14,13,12, 8,9,10,11, 0,1,2,3, 4,5,6,7)
                                                                | | |  |   | | | | || | | |
                                                                inverted   inverted|inverted
                                                                bitorder   bitorder|bitorder
@@ -243,7 +243,7 @@
                                       1st nibble
                                   inverted bitorder
                                        | | | |
-    color_index = BITSWAP8(color_index,4,5,6,7,2,3,0,1)
+    color_index = bitswap<8>(color_index,4,5,6,7,2,3,0,1)
                                                <-> <->
                                               2nd nibble
                                             swappeed pairs
@@ -437,7 +437,7 @@
 
   So, the algorithm to properly decrypt the color codes is the following one:
 
-    color_index = BITSWAP8(color_index,7,5,6,4,3,2,1,0)
+    color_index = bitswap<8>(color_index,7,5,6,4,3,2,1,0)
                                          | |
                                        swapped
 
@@ -626,7 +626,7 @@
 #include "snookr10.lh"
 
 
-#define MASTER_CLOCK    XTAL_16MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
 
 /**********************
 * Read/Write Handlers *
@@ -764,7 +764,7 @@ READ8_MEMBER(snookr10_state::port2000_8_r)
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( snookr10_map, AS_PROGRAM, 8, snookr10_state )
+ADDRESS_MAP_START(snookr10_state::snookr10_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed 6116 */
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")        /* IN0 */
@@ -779,7 +779,7 @@ static ADDRESS_MAP_START( snookr10_map, AS_PROGRAM, 8, snookr10_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tenballs_map, AS_PROGRAM, 8, snookr10_state )
+ADDRESS_MAP_START(snookr10_state::tenballs_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed 6116 */
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("IN0")        /* IN0 */
@@ -793,7 +793,7 @@ static ADDRESS_MAP_START( tenballs_map, AS_PROGRAM, 8, snookr10_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crystalc_map, AS_PROGRAM, 8, snookr10_state )
+ADDRESS_MAP_START(snookr10_state::crystalc_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed 6116 */
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(output_port_0_w)  /* OUT0 */
 	AM_RANGE(0x1001, 0x1001) AM_WRITE(output_port_1_w)  /* OUT1 */
@@ -1037,7 +1037,7 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( snookr10 )
+MACHINE_CONFIG_START(snookr10_state::snookr10)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2 MHz (1.999 MHz measured) */
@@ -1067,7 +1067,8 @@ static MACHINE_CONFIG_START( snookr10 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apple10, snookr10 )
+MACHINE_CONFIG_START(snookr10_state::apple10)
+	snookr10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1079,7 +1080,8 @@ static MACHINE_CONFIG_DERIVED( apple10, snookr10 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tenballs, snookr10 )
+MACHINE_CONFIG_START(snookr10_state::tenballs)
+	snookr10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1087,7 +1089,8 @@ static MACHINE_CONFIG_DERIVED( tenballs, snookr10 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( crystalc, snookr10 )
+MACHINE_CONFIG_START(snookr10_state::crystalc)
+	snookr10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

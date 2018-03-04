@@ -12,7 +12,6 @@
 
     - white noise
     - scanline based update
-    - CMSEL output
 
 */
 
@@ -50,6 +49,12 @@ enum
 };
 
 
+constexpr XTAL cdp1869_device::DOT_CLK_NTSC;
+constexpr XTAL cdp1869_device::DOT_CLK_PAL;
+constexpr XTAL cdp1869_device::COLOR_CLK_NTSC;
+constexpr XTAL cdp1869_device::COLOR_CLK_PAL;
+constexpr XTAL cdp1869_device::CPU_CLK_NTSC;
+constexpr XTAL cdp1869_device::CPU_CLK_PAL;
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -59,7 +64,7 @@ enum
 DEFINE_DEVICE_TYPE(CDP1869, cdp1869_device, "cdp1869", "RCA CDP1869 VIS")
 
 // I/O map
-DEVICE_ADDRESS_MAP_START( io_map, 8, cdp1869_device )
+ADDRESS_MAP_START(cdp1869_device::io_map)
 	AM_RANGE(0x03, 0x03) AM_WRITE(out3_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(out4_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(out5_w)
@@ -68,17 +73,17 @@ DEVICE_ADDRESS_MAP_START( io_map, 8, cdp1869_device )
 ADDRESS_MAP_END
 
 // character RAM map
-DEVICE_ADDRESS_MAP_START( char_map, 8, cdp1869_device )
+ADDRESS_MAP_START(cdp1869_device::char_map)
 	AM_RANGE(0x000, 0x3ff) AM_READWRITE(char_ram_r, char_ram_w)
 ADDRESS_MAP_END
 
 // page RAM map
-DEVICE_ADDRESS_MAP_START( page_map, 8, cdp1869_device )
+ADDRESS_MAP_START(cdp1869_device::page_map)
 	AM_RANGE(0x000, 0x7ff) AM_READWRITE(page_ram_r, page_ram_w)
 ADDRESS_MAP_END
 
 // default address map
-static ADDRESS_MAP_START( cdp1869, 0, 8, cdp1869_device )
+ADDRESS_MAP_START(cdp1869_device::cdp1869)
 	AM_RANGE(0x000, 0x7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -178,7 +183,7 @@ inline void cdp1869_device::update_prd_changed_timer()
 	int start = SCANLINE_PREDISPLAY_START_PAL;
 	int end = SCANLINE_PREDISPLAY_END_PAL;
 	int next_state;
-	int scanline = m_screen->vpos();
+	int scanline = screen().vpos();
 	int next_scanline;
 
 	if (is_ntsc())
@@ -208,7 +213,7 @@ inline void cdp1869_device::update_prd_changed_timer()
 		next_state = CLEAR_LINE;
 	}
 
-	attotime duration = m_screen->time_until_pos(next_scanline);
+	attotime duration = screen().time_until_pos(next_scanline);
 	m_prd_timer->adjust(duration, next_state);
 }
 
@@ -350,7 +355,7 @@ cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, d
 	m_color_clock(0),
 	m_stream(nullptr),
 	m_palette(*this, "palette"),
-	m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, nullptr, *ADDRESS_MAP_NAME(cdp1869))
+	m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, address_map_constructor(), address_map_constructor(FUNC(cdp1869_device::cdp1869), this))
 {
 }
 
@@ -359,7 +364,7 @@ cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, d
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( cdp1869_device::device_add_mconfig )
+MACHINE_CONFIG_START(cdp1869_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 8+64)
 	MCFG_PALETTE_INIT_OWNER(cdp1869_device, cdp1869)
 MACHINE_CONFIG_END

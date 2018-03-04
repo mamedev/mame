@@ -30,15 +30,15 @@ class mikrosha_state : public radio86_state
 public:
 	mikrosha_state(const machine_config &mconfig, device_type type, const char *tag)
 		: radio86_state(mconfig, type, tag)
-		, m_cart(*this, "cartslot")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_MACHINE_RESET(mikrosha);
 
-protected:
-	required_device<generic_slot_device> m_cart;
+	void mikrosha(machine_config &config);
+	void mikrosha_io(address_map &map);
+	void mikrosha_mem(address_map &map);
 };
 
 MACHINE_RESET_MEMBER(mikrosha_state,mikrosha)
@@ -49,7 +49,7 @@ MACHINE_RESET_MEMBER(mikrosha_state,mikrosha)
 }
 
 /* Address maps */
-static ADDRESS_MAP_START(mikrosha_mem, AS_PROGRAM, 8, mikrosha_state )
+ADDRESS_MAP_START(mikrosha_state::mikrosha_mem)
 	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
 	AM_RANGE( 0x1000, 0x7fff ) AM_RAM // RAM
 	AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x07fc)
@@ -61,7 +61,7 @@ static ADDRESS_MAP_START(mikrosha_mem, AS_PROGRAM, 8, mikrosha_state )
 	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mikrosha_io , AS_IO, 8, mikrosha_state )
+ADDRESS_MAP_START(mikrosha_state::mikrosha_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0xff ) AM_READWRITE(radio_io_r,radio_io_w)
 ADDRESS_MAP_END
@@ -203,9 +203,9 @@ static GFXDECODE_START( mikrosha )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikrosha_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( mikrosha )
+MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
 	MCFG_CPU_PROGRAM_MAP(mikrosha_mem)
 	MCFG_CPU_IO_MAP(mikrosha_io)
 
@@ -220,7 +220,7 @@ static MACHINE_CONFIG_START( mikrosha )
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, mikrosha_8255_font_page_w))
 
-	MCFG_DEVICE_ADD("i8275", I8275, XTAL_16MHz / 12)
+	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mikrosha_state, display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
@@ -246,7 +246,7 @@ static MACHINE_CONFIG_START( mikrosha )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL_16MHz / 9)
+	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(16'000'000) / 9)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(radio86_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(radio86_state, memory_read_byte))
 	MCFG_I8257_OUT_MEMW_CB(WRITE8(radio86_state, memory_write_byte))

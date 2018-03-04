@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "n2a03.h"
+#include "n2a03d.h"
 
 DEFINE_DEVICE_TYPE(N2A03, n2a03_device, "n2a03", "N2A03")
 
@@ -39,7 +40,7 @@ WRITE8_MEMBER(n2a03_device::psg1_4017_w)
 //                       input        port 0x4017  ^                              ( APU_IRQCTRL )
 // is there a fall through where every write is seen by other hw, or do these addresses really not touch the APU?? APU_IRQCTRL can definitely be written by can it be read back?
 
-static ADDRESS_MAP_START( n2a03_map, AS_PROGRAM, 8, n2a03_device )
+ADDRESS_MAP_START(n2a03_device::n2a03_map)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nesapu", nesapu_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) // AM_WRITE(sprite_dma_0_w)
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg1_4015_r, psg1_4015_w) /* PSG status / first control register */
@@ -53,12 +54,12 @@ n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, devic
 	m6502_device(mconfig, N2A03, tag, owner, clock),
 	m_apu(*this, "nesapu")
 {
-	program_config.m_internal_map = ADDRESS_MAP_NAME(n2a03_map);
+	program_config.m_internal_map = address_map_constructor(FUNC(n2a03_device::n2a03_map), this);
 }
 
-offs_t n2a03_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *n2a03_device::create_disassembler()
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return new n2a03_disassembler;
 }
 
 void n2a03_device::device_start()
@@ -85,7 +86,7 @@ READ8_MEMBER(n2a03_device::apu_read_mem)
 	return mintf->program->read_byte(offset);
 }
 
-MACHINE_CONFIG_MEMBER( n2a03_device::device_add_mconfig )
+MACHINE_CONFIG_START(n2a03_device::device_add_mconfig)
 	MCFG_SOUND_ADD("nesapu", NES_APU, DERIVED_CLOCK(1,1) )
 	MCFG_NES_APU_IRQ_HANDLER(WRITELINE(n2a03_device, apu_irq))
 	MCFG_NES_APU_MEM_READ_CALLBACK(READ8(n2a03_device, apu_read_mem))

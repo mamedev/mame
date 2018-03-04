@@ -62,6 +62,9 @@ public:
 	DECLARE_WRITE8_MEMBER( speaker_w );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
 	DECLARE_PALETTE_INIT(lcmate2);
+	void lcmate2(machine_config &config);
+	void lcmate2_io(address_map &map);
+	void lcmate2_mem(address_map &map);
 };
 
 WRITE8_MEMBER( lcmate2_state::speaker_w )
@@ -92,14 +95,14 @@ WRITE8_MEMBER( lcmate2_state::bankswitch_w )
 	membank("rombank")->set_entry(data&0x0f);
 }
 
-static ADDRESS_MAP_START(lcmate2_mem, AS_PROGRAM, 8, lcmate2_state)
+ADDRESS_MAP_START(lcmate2_state::lcmate2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK("rombank")
 	AM_RANGE( 0x8000, 0x9fff ) AM_RAM   AM_MIRROR(0x6000) AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(lcmate2_io, AS_IO, 8, lcmate2_state)
+ADDRESS_MAP_START(lcmate2_state::lcmate2_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("rtc", rp5c15_device, read, write)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(speaker_w)
@@ -223,9 +226,9 @@ static GFXDECODE_START( lcmate2 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( lcmate2 )
+MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // confirmed
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545)) // confirmed
 	MCFG_CPU_PROGRAM_MAP(lcmate2_mem)
 	MCFG_CPU_IO_MAP(lcmate2_io)
 
@@ -254,7 +257,7 @@ static MACHINE_CONFIG_START( lcmate2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("rtc", RP5C15, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RP5C15, XTAL(32'768))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -267,4 +270,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY  FULLNAME             FLAGS
-COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, 0,    "Vtech", "Laser Compumate 2", MACHINE_NOT_WORKING )
+COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, 0,    "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING )

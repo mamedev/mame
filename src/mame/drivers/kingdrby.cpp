@@ -130,11 +130,23 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void kingdrbb(machine_config &config);
+	void cowrace(machine_config &config);
+	void kingdrby(machine_config &config);
+	void cowrace_sound_io(address_map &map);
+	void cowrace_sound_map(address_map &map);
+	void master_io_map(address_map &map);
+	void master_map(address_map &map);
+	void slave_1986_map(address_map &map);
+	void slave_io_map(address_map &map);
+	void slave_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
 
-#define CLK_1   XTAL_20MHz
-#define CLK_2   XTAL_3_579545MHz
+#define CLK_1   XTAL(20'000'000)
+#define CLK_2   XTAL(3'579'545)
 
 
 /*************************************
@@ -406,19 +418,19 @@ WRITE8_MEMBER(kingdrby_state::led_array_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, kingdrby_state )
+ADDRESS_MAP_START(kingdrby_state::master_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_MIRROR(0xc00) AM_SHARE("share1")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("vram")
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(sc0_attr_w) AM_SHARE("attr")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_io_map, AS_IO, 8, kingdrby_state )
+ADDRESS_MAP_START(kingdrby_state::master_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_NOP //interrupt ack
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, kingdrby_state )
+ADDRESS_MAP_START(kingdrby_state::slave_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom, tested for the post check
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram") //backup ram
@@ -438,7 +450,7 @@ WRITE8_MEMBER(kingdrby_state::kingdrbb_lamps_w)
 	// (same as the inputs but active high)
 }
 
-static ADDRESS_MAP_START( slave_1986_map, AS_PROGRAM, 8, kingdrby_state )
+ADDRESS_MAP_START(kingdrby_state::slave_1986_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom tested for the post check
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram") //backup ram
@@ -457,28 +469,28 @@ static ADDRESS_MAP_START( slave_1986_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_io_map, AS_IO, 8, kingdrby_state )
+ADDRESS_MAP_START(kingdrby_state::slave_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_NOP //interrupt ack
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, kingdrby_state )
+ADDRESS_MAP_START(kingdrby_state::sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, kingdrby_state )
+ADDRESS_MAP_START(kingdrby_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cowrace_sound_map, AS_PROGRAM, 8, kingdrby_state )
+ADDRESS_MAP_START(kingdrby_state::cowrace_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cowrace_sound_io, AS_IO, 8, kingdrby_state )
+ADDRESS_MAP_START(kingdrby_state::cowrace_sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ym2203_device, write)
 ADDRESS_MAP_END
@@ -904,7 +916,7 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 	for(i = 0; i < 0x200; i++)
 	{
 		/* this set has an extra address line shuffle applied on the prom */
-		prom[i] = raw_prom[BITSWAP16(i, 15,14,13,12,11,10,9,8,7,6,5,0,1,2,3,4)+0x1000];
+		prom[i] = raw_prom[bitswap<16>(i, 15,14,13,12,11,10,9,8,7,6,5,0,1,2,3,4)+0x1000];
 	}
 
 	for(i = 0; i < 0x200; i++)
@@ -926,7 +938,7 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 	}
 }
 
-static MACHINE_CONFIG_START( kingdrby )
+MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 	MCFG_CPU_ADD("master", Z80, CLK_2)
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)
@@ -982,7 +994,8 @@ static MACHINE_CONFIG_START( kingdrby )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kingdrbb, kingdrby )
+MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
+	kingdrby(config);
 
 	MCFG_CPU_MODIFY("slave")
 	MCFG_CPU_PROGRAM_MAP(slave_1986_map)
@@ -1005,7 +1018,8 @@ static MACHINE_CONFIG_DERIVED( kingdrbb, kingdrby )
 	/* actually unused */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cowrace, kingdrbb )
+MACHINE_CONFIG_START(kingdrby_state::cowrace)
+	kingdrbb(config);
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(cowrace_sound_map)

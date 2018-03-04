@@ -53,16 +53,19 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tekxp330(machine_config &config);
+	void cpu_map(address_map &map);
+	void tms_map(address_map &map);
 };
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, tekxp330_state )
+ADDRESS_MAP_START(tekxp330_state::cpu_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 16, tekxp330_state )
+ADDRESS_MAP_START(tekxp330_state::tms_map)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -89,13 +92,13 @@ void tekxp330_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( tekxp330 )
+MACHINE_CONFIG_START(tekxp330_state::tekxp330)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3052, XTAL_20MHz) /* IDT 79R3052E, clock unknown */
+	MCFG_CPU_ADD("maincpu", R3052, XTAL(20'000'000)) /* IDT 79R3052E, clock unknown */
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 
-	MCFG_CPU_ADD("tms", TMS34010, XTAL_40MHz) /* clock unknown */
+	MCFG_CPU_ADD("tms", TMS34010, XTAL(40'000'000)) /* clock unknown */
 	MCFG_CPU_PROGRAM_MAP(tms_map)
 
 	/* video hardware */

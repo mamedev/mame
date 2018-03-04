@@ -7,7 +7,7 @@ Device for Mazer Blazer/Great Guns custom Video Controller Unit
 Written by Angelo Salese, based off old implementation by Jarek Burczynski
 
 TODO:
-- priority, especially noticeable in Great Guns sprites and Mazer Blazer 
+- priority, especially noticeable in Great Guns sprites and Mazer Blazer
   bonus stages;
 - bit 0 of m_mode;
 - first byte of parameter info;
@@ -19,6 +19,7 @@ TODO:
 - Understand how transparent pens are handled aka is 0x0f always transparent or
   there's some clut gimmick? Great Guns title screen makes me think of the
   latter option;
+- Mazer Blazer collision detection parameters are a complete guesswork
 
 ***************************************************************************/
 
@@ -34,23 +35,13 @@ TODO:
 // device type definition
 DEFINE_DEVICE_TYPE(MB_VCU, mb_vcu_device, "mb_vcu", "Mazer Blazer custom VCU")
 
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
 
-void mb_vcu_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<mb_vcu_device &>(device).m_palette.set_tag(tag);
-}
-
-
-static ADDRESS_MAP_START( mb_vcu_vram, 0, 8, mb_vcu_device )
+ADDRESS_MAP_START(mb_vcu_device::mb_vcu_vram)
 	AM_RANGE(0x00000,0x7ffff) AM_RAM // enough for a 256x256x4 x 2 pages of framebuffer with 4 layers (TODO: doubled for simplicity)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mb_vcu_pal_ram, 1, 8, mb_vcu_device )
+ADDRESS_MAP_START(mb_vcu_device::mb_vcu_pal_ram)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAM
 	AM_RANGE(0x0400, 0x04ff) AM_RAM
@@ -154,8 +145,8 @@ mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, MB_VCU, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, nullptr, *ADDRESS_MAP_NAME(mb_vcu_vram))
-	, m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mb_vcu_pal_ram))
+	, m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, address_map_constructor(), address_map_constructor(FUNC(mb_vcu_device::mb_vcu_vram), this))
+	, m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(mb_vcu_device::mb_vcu_pal_ram), this))
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, finder_base::DUMMY_TAG)
 {
@@ -285,9 +276,9 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 	uint8_t pen = 0;
 	uint8_t cur_layer;
 	uint8_t opaque_pen;
-	
-//	printf("%02x %02x\n",m_mode >> 2,m_mode & 3);
-	
+
+//  printf("%02x %02x\n",m_mode >> 2,m_mode & 3);
+
 //  cur_layer = (m_mode & 0x3);
 	cur_layer = (m_mode & 2) >> 1;
 	opaque_pen = (cur_layer == 1);
@@ -307,7 +298,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (4-(bits & 7));
 						dot&= 0xf;
 
-						
+
 						if(dot != 0xf || opaque_pen)
 							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, dot);
 					}
@@ -365,7 +356,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 								pen = m_color2 >> 4;
 								break;
 						}
-						
+
 						if(pen != 0xf || opaque_pen)
 							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, pen);
 					}
@@ -396,7 +387,7 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 	int xi,yi;
 	int dstx,dsty;
 //  uint8_t dot;
-	
+
 	switch(m_mode)
 	{
 		case 0x13:
@@ -404,16 +395,16 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 			//int16_t srcx = m_ram[m_param_offset_latch + 1];
 			//int16_t srcy = m_ram[m_param_offset_latch + 3];
 			//uint16_t src_xsize = m_ram[m_param_offset_latch + 18] + 1;
-	        //uint16_t src_ysize = m_ram[m_param_offset_latch + 19] + 1;
-			bool collision_flag = false;
-			
+			//uint16_t src_ysize = m_ram[m_param_offset_latch + 19] + 1;
+			int collision_flag = 0;
+
 			for (yi = 0; yi < m_pix_ysize; yi++)
 			{
 				for (xi = 0; xi < m_pix_xsize; xi++)
 				{
 					dstx = (m_xpos + xi);
 					dsty = (m_ypos + yi);
-					
+
 					if(dstx < 256 && dsty < 256)
 					{
 						uint8_t res = read_byte(dstx|dsty<<8|0<<16|(m_vbank)<<18);
@@ -423,24 +414,31 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 
 						// TODO: how it calculates the pen? Might use the commented out stuff and/or the offset somehow
 						if(res == 5)
-							collision_flag = true;
+						{
+							collision_flag++;
+//                          test++;
+						}
 					}
-					
+
 					//srcx++;
 				}
 				//srcy++;
 			}
-			
-				
-			if(collision_flag == true)
+
+			// threshold for collision, necessary to avoid bogus collision hits
+			// the typical test scenario is to shoot near the top left hatch for stage 1 then keep shooting,
+			// at some point the top right hatch will bogusly detect a collision without this.
+			// It's also unlikely that game tests 1x1 targets anyway, as the faster moving targets are quite too easy to hit that way.
+			// TODO: likely it works differently (checks area?)
+			if(collision_flag > 5)
 				m_ram[m_param_offset_latch] |= 8;
 			else
 				m_ram[m_param_offset_latch] &= ~8;
 			break;
 		}
-		
+
 		case 0x03:
-		{			
+		{
 			for (yi = 0; yi < m_pix_ysize; yi++)
 			{
 				for (xi = 0; xi < m_pix_xsize; xi++)
@@ -500,12 +498,12 @@ READ8_MEMBER( mb_vcu_device::status_r )
 }
 
 WRITE8_MEMBER( mb_vcu_device::vbank_w )
-{	
+{
 	m_vbank = (data & 0x40) >> 6;
 }
 
 WRITE8_MEMBER( mb_vcu_device::vbank_clear_w )
-{	
+{
 	m_vbank = (data & 0x40) >> 6;
 
 	// setting vbank clears VRAM in the setted bank, applies to Great Guns only since it never ever access the RMW stuff

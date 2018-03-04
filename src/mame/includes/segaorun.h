@@ -9,9 +9,9 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/segaic16.h"
 #include "video/segaic16_road.h"
@@ -36,7 +36,6 @@ public:
 		m_sprites(*this, "sprites"),
 		m_segaic16vid(*this, "segaic16vid"),
 		m_segaic16road(*this, "segaic16road"),
-		m_soundlatch(*this, "soundlatch"),
 		m_bankmotor_timer(*this, "bankmotor"),
 		m_digital_ports(*this, { { "SERVICE", "UNKNOWN", "COINAGE", "DSW" } }),
 		m_adc_ports(*this, "ADC.%u", 0),
@@ -63,16 +62,11 @@ public:
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
-	uint8_t mapper_sound_r();
-	void mapper_sound_w(uint8_t data);
 
 	// main CPU read/write handlers
 	DECLARE_READ16_MEMBER( misc_io_r );
 	DECLARE_WRITE16_MEMBER( misc_io_w );
 	DECLARE_WRITE16_MEMBER( nop_w );
-
-	// Z80 sound CPU read/write handlers
-	DECLARE_READ8_MEMBER( sound_data_r );
 
 	// game-specific driver init
 	DECLARE_DRIVER_INIT(generic);
@@ -92,6 +86,18 @@ public:
 	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
 	TIMER_DEVICE_CALLBACK_MEMBER(bankmotor_update);
 
+	void shangon_fd1089b(machine_config &config);
+	void outrun_fd1094(machine_config &config);
+	void outrundx(machine_config &config);
+	void shangon(machine_config &config);
+	void outrun_fd1089a(machine_config &config);
+	void outrun(machine_config &config);
+	void outrun_base(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void outrun_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void sub_map(address_map &map);
 protected:
 	// timer IDs
 	enum
@@ -127,7 +133,6 @@ protected:
 	required_device<sega_16bit_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
-	required_device<generic_latch_8_device> m_soundlatch;
 	optional_device<timer_device> m_bankmotor_timer;
 
 	// input ports

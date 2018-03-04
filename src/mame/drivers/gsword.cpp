@@ -280,7 +280,7 @@ READ8_MEMBER(gsword_state::i8741_2_r )
 	case 0x04: /* Player 2 Controller */
 		return ioport("IN3")->read();
 //  default:
-//      logerror("8741-2 unknown read %d PC=%04x\n",offset,space.device().safe_pc());
+//      logerror("8741-2 unknown read %d %s\n",offset,machine().describe_context());
 	}
 	/* unknown */
 	return 0;
@@ -298,7 +298,7 @@ READ8_MEMBER(gsword_state::i8741_3_r )
 		return ioport("IN3")->read();
 	}
 	/* unknown */
-//  logerror("8741-3 unknown read %d PC=%04x\n",offset,space.device().safe_pc());
+//  logerror("8741-3 unknown read %d %s\n",offset,machine().describe_context());
 	return 0;
 }
 
@@ -455,7 +455,7 @@ void josvolly_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM , 8, gsword_state_base )
+ADDRESS_MAP_START(gsword_state_base::cpu1_map)
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa37f) AM_RAM
@@ -470,18 +470,18 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM , 8, gsword_state_base )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cpu1_io_map, AS_IO, 8, gsword_state )
+ADDRESS_MAP_START(gsword_state::cpu1_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7e, 0x7f) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_0, write_0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gsword_state )
+ADDRESS_MAP_START(gsword_state::cpu2_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("cpu2_ram")
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(sound_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8, gsword_state )
+ADDRESS_MAP_START(gsword_state::cpu2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_2, write_2)
 	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_3, write_3)
@@ -496,19 +496,19 @@ static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8, gsword_state )
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP /* watchdog? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, gsword_state )
+ADDRESS_MAP_START(gsword_state::cpu3_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( josvolly_cpu1_io_map, AS_IO, 8, josvolly_state )
+ADDRESS_MAP_START(josvolly_state::josvolly_cpu1_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7e, 0x7f) AM_DEVREADWRITE("mcu1", upi41_cpu_device, upi41_master_r, upi41_master_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( josvolly_cpu2_map, AS_PROGRAM, 8, josvolly_state )
+ADDRESS_MAP_START(josvolly_state::josvolly_cpu2_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("cpu2_ram")
 
@@ -519,7 +519,7 @@ static ADDRESS_MAP_START( josvolly_cpu2_map, AS_PROGRAM, 8, josvolly_state )
 	AM_RANGE(0xA000, 0xA001) AM_DEVREADWRITE("mcu2", upi41_cpu_device, upi41_master_r, upi41_master_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( josvolly_cpu2_io_map, AS_IO, 8, josvolly_state )
+ADDRESS_MAP_START(josvolly_state::josvolly_cpu2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(fake_0_r, ay8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
@@ -774,20 +774,20 @@ static GFXDECODE_START( gsword )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gsword )
+MACHINE_CONFIG_START(gsword_state::gsword)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'000'000)/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_IO_MAP(cpu1_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gsword_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_18MHz/6) /* verified on pcb */
+	MCFG_CPU_ADD("sub", Z80, XTAL(18'000'000)/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(cpu2_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(gsword_state, sound_interrupt, 4*60)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'000'000)/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000)) /* Allow time for 2nd cpu to interleave*/
@@ -820,19 +820,19 @@ static MACHINE_CONFIG_START( gsword )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18MHz/12) /* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'000'000)/12) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(gsword_state, nmi_set_w)) /* portA write */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( josvolly )
+MACHINE_CONFIG_START(josvolly_state::josvolly)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18000000/4) /* ? */

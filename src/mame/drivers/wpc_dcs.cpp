@@ -52,6 +52,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
+	void wpc_dcs(machine_config &config);
+	void wpc_dcs_map(address_map &map);
 protected:
 	// devices
 	required_device<cpu_device> maincpu;
@@ -71,7 +73,7 @@ private:
 	uint16_t rtc_base_day;
 };
 
-static ADDRESS_MAP_START( wpc_dcs_map, AS_PROGRAM, 8, wpc_dcs_state )
+ADDRESS_MAP_START(wpc_dcs_state::wpc_dcs_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("mainram")
 
 	AM_RANGE(0x3000, 0x31ff) AM_RAMBANK("dmd0")
@@ -420,12 +422,12 @@ static INPUT_PORTS_START( wpc_dcs )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wpc_dcs )
+MACHINE_CONFIG_START(wpc_dcs_state::wpc_dcs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_8MHz/4)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL(8'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(wpc_dcs_map)
 
-	MCFG_CPU_PERIODIC_INT_DRIVER(wpc_dcs_state, irq0_line_assert, XTAL_8MHz/8192.0)
+	MCFG_CPU_PERIODIC_INT_DRIVER(wpc_dcs_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zero_crossing", wpc_dcs_state, zc_timer, attotime::from_hz(120)) // Mains power zero crossing
 
 	MCFG_WPC_LAMP_ADD("lamp")

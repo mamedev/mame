@@ -23,6 +23,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
+#include "machine/timer.h"
 
 #define RS232_TAG "rs232"
 
@@ -42,10 +43,13 @@ public:
 	uint8_t m_port_f2;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
+	void h89(machine_config &config);
+	void h89_io(address_map &map);
+	void h89_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(h89_mem, AS_PROGRAM, 8, h89_state)
+ADDRESS_MAP_START(h89_state::h89_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	// Bank 0 - At startup has the format defined below, but software could swap it for RAM (Later H-89s and
 	//          Early ones with the Org-0 modification),
@@ -58,7 +62,7 @@ static ADDRESS_MAP_START(h89_mem, AS_PROGRAM, 8, h89_state)
 	AM_RANGE(0x2000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( h89_io, AS_IO, 8, h89_state)
+ADDRESS_MAP_START(h89_state::h89_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x78, 0x7b)    expansion 1    // Options - Cassette I/O (only uses 0x78 - 0x79) Requires MTR-88 ROM
@@ -177,13 +181,13 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 
-static MACHINE_CONFIG_START( h89 )
+MACHINE_CONFIG_START(h89_state::h89)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_12_288MHz / 6)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(12'288'000) / 6)
 	MCFG_CPU_PROGRAM_MAP(h89_mem)
 	MCFG_CPU_IO_MAP(h89_io)
 
-	MCFG_DEVICE_ADD( "ins8250", INS8250, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ins8250", INS8250, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "terminal")

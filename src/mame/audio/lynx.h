@@ -16,7 +16,7 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 	void count_down(int nr);
-	static void set_timer_delegate(device_t &device, timer_delegate cb);
+	template<typename Object> void set_timer_delegate(Object &&cb) { m_timer_delegate = std::forward<Object>(cb); }
 
 protected:
 	struct LYNX_AUDIO {
@@ -84,7 +84,7 @@ DECLARE_DEVICE_TYPE(LYNX2_SND, lynx2_sound_device)
 
 
 #define MCFG_LYNX_SND_SET_TIMER( _class, _method) \
-	lynx_sound_device::set_timer_delegate(*device, lynx_sound_device::timer_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+	downcast<lynx_sound_device &>(*device).set_timer_delegate(lynx_sound_device::timer_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 
 #endif // MAME_AUDIO_LYNX_H

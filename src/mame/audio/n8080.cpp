@@ -129,10 +129,9 @@ void n8080_state::spacefev_sound_pins_changed()
 	{
 		start_mono_flop(2, attotime::from_usec(550 * 22 * 33));
 	}
-	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
-	{
-		generic_pulse_irq_line(*m_audiocpu, 0, 2);
-	}
+
+	bool irq_active = (~m_curr_sound_pins & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5))) != 0;
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, irq_active ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -152,25 +151,22 @@ void n8080_state::sheriff_sound_pins_changed()
 	{
 		start_mono_flop(1, attotime::from_usec(550 * 33 * 33));
 	}
-	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
-	{
-		generic_pulse_irq_line(*m_audiocpu, 0, 2);
-	}
+
+	bool irq_active = (~m_curr_sound_pins & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5))) != 0;
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, irq_active ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 void n8080_state::helifire_sound_pins_changed()
 {
-	uint16_t changes = ~m_curr_sound_pins & m_prev_sound_pins;
+	//uint16_t changes = ~m_curr_sound_pins & m_prev_sound_pins;
 
 	/* ((m_curr_sound_pins >> 0xa) & 1) not emulated */
 	/* ((m_curr_sound_pins >> 0xb) & 1) not emulated */
 	/* ((m_curr_sound_pins >> 0xc) & 1) not emulated */
 
-	if (changes & (1 << 6))
-	{
-		generic_pulse_irq_line(*m_audiocpu, 0, 2);
-	}
+	bool irq_active = (~m_curr_sound_pins & (1 << 6)) != 0;
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, irq_active ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -464,18 +460,18 @@ SOUND_RESET_MEMBER(n8080_state,helifire)
 }
 
 
-static ADDRESS_MAP_START( n8080_sound_cpu_map, AS_PROGRAM, 8, n8080_state )
+ADDRESS_MAP_START(n8080_state::n8080_sound_cpu_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( helifire_sound_io_map, AS_IO, 8, n8080_state )
+ADDRESS_MAP_START(n8080_state::helifire_sound_io_map)
 	AM_RANGE(0x00, 0x7f) AM_READ(helifire_8035_external_ram_r)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( spacefev_sound )
+MACHINE_CONFIG_START(n8080_state::spacefev_sound)
 
 	MCFG_SOUND_START_OVERRIDE(n8080_state,spacefev)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,spacefev)
@@ -515,7 +511,7 @@ MACHINE_CONFIG_START( spacefev_sound )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START( sheriff_sound )
+MACHINE_CONFIG_START(n8080_state::sheriff_sound)
 
 	MCFG_SOUND_START_OVERRIDE(n8080_state,sheriff)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,sheriff)
@@ -553,7 +549,7 @@ MACHINE_CONFIG_START( sheriff_sound )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START( helifire_sound )
+MACHINE_CONFIG_START(n8080_state::helifire_sound)
 
 	MCFG_SOUND_START_OVERRIDE(n8080_state,helifire)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,helifire)

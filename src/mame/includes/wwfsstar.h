@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class wwfsstar_state : public driver_device
@@ -54,4 +55,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void wwfsstar(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

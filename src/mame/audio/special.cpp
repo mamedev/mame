@@ -14,7 +14,7 @@
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(SPECIMX_SND, specimx_sound_device, "specimx_sound", "Specialist MX Audio Custom")
+DEFINE_DEVICE_TYPE(SPECIMX_SND, specimx_sound_device, "specimx_sound", "Specialist MX Custom Sound")
 
 
 //**************************************************************************

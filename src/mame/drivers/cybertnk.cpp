@@ -238,6 +238,10 @@ public:
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
 	uint32_t screen_update_cybertnk_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cybertnk(machine_config &config);
+	void master_mem(address_map &map);
+	void slave_mem(address_map &map);
+	void sound_mem(address_map &map);
 };
 
 /* tile format
@@ -603,7 +607,7 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_cnt_w )
 }
 
 
-static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
+ADDRESS_MAP_START(cybertnk_state::master_mem)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM /*Work RAM*/
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spr_ram") // non-tile based sprite ram
@@ -611,7 +615,7 @@ static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM_WRITE(tilemap1_vram_w) AM_SHARE("tilemap1_vram")
 	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM_WRITE(tilemap2_vram_w) AM_SHARE("tilemap2_vram")
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x100000, 0x107fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* 2x palettes, one for each screen */
+	AM_RANGE(0x100000, 0x107fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* 2x palettes, one for each screen */
 
 	AM_RANGE(0x110000, 0x110001) AM_WRITE8(cybertnk_sound_cmd_w,0xffff)
 	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("DSW1")  AM_WRITENOP// watchdog?
@@ -629,7 +633,7 @@ static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x1100d4, 0x1100d5) AM_READ8(cybertnk_mux_r, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_mem, AS_PROGRAM, 16, cybertnk_state )
+ADDRESS_MAP_START(cybertnk_state::slave_mem)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x020001) AM_READNOP // POST debug?
 	AM_RANGE(0x07fff8, 0x07fffd) AM_READNOP // POST debug?
@@ -639,12 +643,12 @@ static ADDRESS_MAP_START( slave_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x140000, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, cybertnk_state )
+ADDRESS_MAP_START(cybertnk_state::sound_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", y8950_device, read, write)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xa005, 0xa006) AM_NOP
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", y8950_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", y8950_device, read, write)
 ADDRESS_MAP_END
 
@@ -831,16 +835,16 @@ GFXDECODE_END
 */
 
 
-static MACHINE_CONFIG_START( cybertnk )
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz/2)
+MACHINE_CONFIG_START(cybertnk_state::cybertnk)
+	MCFG_CPU_ADD("maincpu", M68000,XTAL(20'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(master_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("slave", M68000,XTAL_20MHz/2)
+	MCFG_CPU_ADD("slave", M68000,XTAL(20'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(slave_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq3_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))//arbitrary value,needed to get the communication to work
@@ -873,11 +877,11 @@ static MACHINE_CONFIG_START( cybertnk )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", Y8950, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym1", Y8950, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ym2", Y8950, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym2", Y8950, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -982,7 +986,7 @@ DRIVER_INIT_MEMBER(cybertnk_state,cybertnk)
 		// reorder the data to simplify sprite drawing
 		// we draw 8 pixels at a time, each each nibble contains a pixel, however the original order of 32-bits (8 pixels)
 		// is along the lines of 04 15 26 37 which is awkward to use
-		spr[x] = BITSWAP32(spr[x],  27,26,25,24,   19,18,17,16,  11,10,9,8,  3,2,1,0, 31,30,29,28,   23,22,21,20,   15,14,13,12,   7,6,5,4 );
+		spr[x] = bitswap<32>(spr[x],  27,26,25,24,   19,18,17,16,  11,10,9,8,  3,2,1,0, 31,30,29,28,   23,22,21,20,   15,14,13,12,   7,6,5,4 );
 	}
 
 }

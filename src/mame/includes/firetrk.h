@@ -6,6 +6,7 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 
 *************************************************************************/
 
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "screen.h"
@@ -150,6 +151,12 @@ public:
 	void check_collision(int which);
 	void set_service_mode(int enable);
 	void draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *alpha_ram, int x, int count, int height);
+	void firetrk(machine_config &config);
+	void montecar(machine_config &config);
+	void superbug(machine_config &config);
+	void firetrk_map(address_map &map);
+	void montecar_map(address_map &map);
+	void superbug_map(address_map &map);
 };
 
 

@@ -82,4 +82,14 @@ public:
 	INTERRUPT_GEN_MEMBER(wiz_sound_interrupt);
 	void draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int charbank, int colortype);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int set, int charbank);
+	void wiz(machine_config &config);
+	void kungfut(machine_config &config);
+	void scion(machine_config &config);
+	void stinger(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void kungfut_main_map(address_map &map);
+	void kungfut_sound_map(address_map &map);
+	void stinger_main_map(address_map &map);
+	void stinger_sound_map(address_map &map);
+	void wiz_main_map(address_map &map);
 };

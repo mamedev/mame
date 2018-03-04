@@ -165,7 +165,7 @@ void avigo_state::machine_start()
 	save_item(NAME(m_warm_start));
 }
 
-static ADDRESS_MAP_START(avigo_banked_map, AS_PROGRAM, 8, avigo_state)
+ADDRESS_MAP_START(avigo_state::avigo_banked_map)
 	AM_RANGE(0x0000000, 0x00fffff) AM_MIRROR(0x0300000) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
 	AM_RANGE(0x0400000, 0x041ffff) AM_MIRROR(0x03e0000) AM_RAM AM_SHARE("nvram")
 
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START(avigo_banked_map, AS_PROGRAM, 8, avigo_state)
 	AM_RANGE(0x1800000, 0x1803fff) AM_MIRROR(0x03fc000) AM_READWRITE(vid_memory_r, vid_memory_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( avigo_mem , AS_PROGRAM, 8, avigo_state)
+ADDRESS_MAP_START(avigo_state::avigo_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
 	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bank0", address_map_bank_device, read8, write8)
 	AM_RANGE(0x8000, 0xbfff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
@@ -496,7 +496,7 @@ READ8_MEMBER(avigo_state::port_04_r)
 
 
 
-static ADDRESS_MAP_START( avigo_io, AS_IO, 8, avigo_state)
+ADDRESS_MAP_START(avigo_state::avigo_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x001, 0x001) AM_READWRITE( key_data_read_r, set_key_line_w )
@@ -746,14 +746,14 @@ void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)
 	memset(base, 0x00, size);
 }
 
-static MACHINE_CONFIG_START( avigo )
+MACHINE_CONFIG_START(avigo_state::avigo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(avigo_mem)
 	MCFG_CPU_IO_MAP(avigo_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
@@ -787,7 +787,7 @@ static MACHINE_CONFIG_START( avigo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* real time clock */
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(avigo_state, tc8521_alarm_int))
 
 	/* flash ROMs */
@@ -802,13 +802,13 @@ static MACHINE_CONFIG_START( avigo )
 	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(avigo_banked_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(avigo_banked_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", avigo_state, nvram_init)

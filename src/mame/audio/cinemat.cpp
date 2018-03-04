@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER(cinemat_state::spacewar_sound4_w)
 	}
 }
 
-MACHINE_CONFIG_START( spacewar_sound )
+MACHINE_CONFIG_START(cinemat_state::spacewar_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cinemat_state, spacewar_sound0_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cinemat_state, spacewar_sound1_w))
@@ -205,7 +205,7 @@ WRITE_LINE_MEMBER(cinemat_state::barrier_sound2_w)
 		m_samples->start(2, 2);
 }
 
-MACHINE_CONFIG_START( barrier_sound )
+MACHINE_CONFIG_START(cinemat_state::barrier_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cinemat_state, barrier_sound0_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cinemat_state, barrier_sound1_w))
@@ -262,7 +262,7 @@ WRITE_LINE_MEMBER(cinemat_state::speedfrk_start_led_w)
 	output().set_led_value(0, !state);
 }
 
-MACHINE_CONFIG_START( speedfrk_sound )
+MACHINE_CONFIG_START(cinemat_state::speedfrk_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cinemat_state, speedfrk_start_led_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cinemat_state, speedfrk_sound3_w))
@@ -344,7 +344,7 @@ WRITE_LINE_MEMBER(cinemat_state::starhawk_sound7_w)
 		m_samples->stop(3);
 }
 
-MACHINE_CONFIG_START( starhawk_sound )
+MACHINE_CONFIG_START(cinemat_state::starhawk_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cinemat_state, starhawk_sound0_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cinemat_state, starhawk_sound1_w))
@@ -423,7 +423,7 @@ WRITE_LINE_MEMBER(cinemat_state::sundance_sound7_w)
 		m_samples->start(5, 5);
 }
 
-MACHINE_CONFIG_START( sundance_sound )
+MACHINE_CONFIG_START(cinemat_state::sundance_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cinemat_state, sundance_sound0_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cinemat_state, sundance_sound1_w))
@@ -506,7 +506,7 @@ WRITE_LINE_MEMBER(cinemat_state::tailg_sound_w)
 	}
 }
 
-MACHINE_CONFIG_START( tailg_sound )
+MACHINE_CONFIG_START(cinemat_state::tailg_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(cinemat_state, tailg_sound_w))
 
@@ -576,7 +576,7 @@ WRITE_LINE_MEMBER(cinemat_state::warrior_sound4_w)
 		m_samples->start(4, 4);
 }
 
-MACHINE_CONFIG_START( warrior_sound )
+MACHINE_CONFIG_START(cinemat_state::warrior_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cinemat_state, warrior_sound0_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cinemat_state, warrior_sound1_w))
@@ -676,7 +676,7 @@ WRITE_LINE_MEMBER(cinemat_state::armora_sound3_w)
 		m_samples->stop(6);
 }
 
-MACHINE_CONFIG_START( armora_sound )
+MACHINE_CONFIG_START(cinemat_state::armora_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cinemat_state, armora_sound0_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cinemat_state, armora_sound1_w))
@@ -773,7 +773,7 @@ WRITE_LINE_MEMBER(cinemat_state::ripoff_sound7_w)
 		m_samples->start(4, 4);
 }
 
-MACHINE_CONFIG_START( ripoff_sound )
+MACHINE_CONFIG_START(cinemat_state::ripoff_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cinemat_state, ripoff_sound1_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(cinemat_state, ripoff_sound2_w))
@@ -890,7 +890,7 @@ WRITE_LINE_MEMBER(cinemat_state::starcas_sound3_w)
 		m_samples->start(7, 7);
 }
 
-MACHINE_CONFIG_START( starcas_sound )
+MACHINE_CONFIG_START(cinemat_state::starcas_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cinemat_state, starcas_sound0_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cinemat_state, starcas_sound1_w))
@@ -1024,7 +1024,7 @@ WRITE_LINE_MEMBER(cinemat_state::solarq_sound0_w)
 	}
 }
 
-MACHINE_CONFIG_START( solarq_sound )
+MACHINE_CONFIG_START(cinemat_state::solarq_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cinemat_state, solarq_sound0_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cinemat_state, solarq_sound1_w))
@@ -1162,7 +1162,7 @@ WRITE_LINE_MEMBER(cinemat_state::boxingb_sound3_w)
 		m_samples->start(11, 11);
 }
 
-MACHINE_CONFIG_START( boxingb_sound )
+MACHINE_CONFIG_START(cinemat_state::boxingb_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cinemat_state, boxingb_sound0_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cinemat_state, boxingb_sound1_w))
@@ -1279,7 +1279,7 @@ WRITE_LINE_MEMBER(cinemat_state::wotw_sound3_w)
 		m_samples->start(7, 7);
 }
 
-MACHINE_CONFIG_START( wotw_sound )
+MACHINE_CONFIG_START(cinemat_state::wotw_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cinemat_state, wotw_sound0_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cinemat_state, wotw_sound1_w))
@@ -1368,7 +1368,7 @@ SOUND_RESET_MEMBER( cinemat_state, demon )
 }
 
 
-static ADDRESS_MAP_START( demon_sound_map, AS_PROGRAM, 8, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::demon_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -1381,7 +1381,7 @@ static ADDRESS_MAP_START( demon_sound_map, AS_PROGRAM, 8, cinemat_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( demon_sound_ports, AS_IO, 8, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::demon_sound_ports)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVWRITE("ctc", z80ctc_device, write)
 	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE("ctc", z80ctc_device, write)
@@ -1395,7 +1395,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-MACHINE_CONFIG_START( demon_sound )
+MACHINE_CONFIG_START(cinemat_state::demon_sound)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
@@ -1438,10 +1438,10 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cinemat_state::qb3_sound4_w)
+WRITE8_MEMBER(cinemat_state::qb3_sound_fifo_w)
 {
 	uint16_t rega = m_maincpu->state_int(ccpu_cpu_device::CCPU_A);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cinemat_state::synced_sound_w), this), ~rega & 0x0f);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cinemat_state::synced_sound_w), this), rega & 0x0f);
 }
 
 
@@ -1455,9 +1455,10 @@ SOUND_RESET_MEMBER( cinemat_state, qb3 )
 }
 
 
-MACHINE_CONFIG_DERIVED( qb3_sound, demon_sound )
+MACHINE_CONFIG_START(cinemat_state::qb3_sound)
+	demon_sound(config);
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, qb3)
 
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(cinemat_state, qb3_sound4_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // not mapped through LS259
 MACHINE_CONFIG_END

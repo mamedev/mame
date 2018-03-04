@@ -157,7 +157,10 @@ INPUT_CHANGED_MEMBER(segag80r_state::service_switch)
 void segag80r_state::machine_start()
 {
 	m_vblank_latch_clear_timer = timer_alloc(TIMER_VBLANK_LATCH_CLEAR);
+	m_scrambled_write_pc = 0xffff;
+
 	/* register for save states */
+	save_item(NAME(m_scrambled_write_pc));
 }
 
 
@@ -168,12 +171,25 @@ void segag80r_state::machine_start()
  *
  *************************************/
 
+READ8_MEMBER(segag80r_state::g80r_opcode_r)
+{
+	// opcodes themselves are not scrambled
+	uint8_t op = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+
+	// writes via opcode $32 (LD $(XXYY),A) get scrambled
+	if (!machine().side_effects_disabled())
+		m_scrambled_write_pc = (op == 0x32) ? offset : 0xffff;
+
+	return op;
+}
+
 offs_t segag80r_state::decrypt_offset(address_space &space, offs_t offset)
 {
-	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
-	offs_t pc = space.device().safe_pcbase();
-	if ((uint16_t)pc == 0xffff || space.read_byte(pc) != 0x32)
+	if (m_scrambled_write_pc == 0xffff)
 		return offset;
+
+	offs_t pc = m_scrambled_write_pc;
+	m_scrambled_write_pc = 0xffff;
 
 	/* munge the low byte of the address */
 	return (offset & 0xff00) | (*m_decrypt)(pc, offset & 0xff);
@@ -301,11 +317,11 @@ WRITE8_MEMBER(segag80r_state::sindbadm_misc_w)
 /* the data lines are flipped */
 WRITE8_MEMBER(segag80r_state::sindbadm_sn1_SN76496_w)
 {
-		m_sn1->write(space, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
+		m_sn1->write(space, offset, bitswap<8>(data, 0,1,2,3,4,5,6,7));
 }
 WRITE8_MEMBER(segag80r_state::sindbadm_sn2_SN76496_w)
 {
-		m_sn2->write(space, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
+		m_sn2->write(space, offset, bitswap<8>(data, 0,1,2,3,4,5,6,7));
 }
 
 
@@ -316,7 +332,7 @@ WRITE8_MEMBER(segag80r_state::sindbadm_sn2_SN76496_w)
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80r_state )
+ADDRESS_MAP_START(segag80r_state::main_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM     /* CPU board ROM */
 	AM_RANGE(0x0800, 0x7fff) AM_ROM     /* PROM board ROM area */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM     /* PROM board ROM area */
@@ -324,7 +340,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80r_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, segag80r_state )
+ADDRESS_MAP_START(segag80r_state::g80r_opcodes_map)
+	AM_RANGE(0x0000, 0xffff) AM_READ(g80r_opcode_r)
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(segag80r_state::sega_315_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_SHARE("mainram")
@@ -333,7 +353,7 @@ ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, segag80r_state )
+ADDRESS_MAP_START(segag80r_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xbe, 0xbf) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
 	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x04) AM_WRITE(coin_count_w)
@@ -342,7 +362,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, segag80r_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_ppi8255_portmap, AS_IO, 8, segag80r_state )
+ADDRESS_MAP_START(segag80r_state::main_ppi8255_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0xbe, 0xbf) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
@@ -352,7 +372,7 @@ static ADDRESS_MAP_START( main_ppi8255_portmap, AS_IO, 8, segag80r_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sindbadm_portmap, AS_IO, 8, segag80r_state )
+ADDRESS_MAP_START(segag80r_state::sindbadm_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x42, 0x43) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
@@ -368,7 +388,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* complete memory map derived from System 1 schematics */
-static ADDRESS_MAP_START( sindbadm_sound_map, AS_PROGRAM, 8, segag80r_state )
+ADDRESS_MAP_START(segag80r_state::sindbadm_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_WRITE(sindbadm_sn1_SN76496_w)
@@ -809,14 +829,15 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( g80r_base )
+MACHINE_CONFIG_START(segag80r_state::g80r_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  segag80r_vblank_start)
-
+	MCFG_CPU_OPCODES_MAP(g80r_opcodes_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segag80r)
@@ -832,17 +853,19 @@ static MACHINE_CONFIG_START( g80r_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( astrob, g80r_base )
+MACHINE_CONFIG_START(segag80r_state::astrob)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
 	/* sound boards */
-	MCFG_FRAGMENT_ADD(astrob_sound_board)
-	MCFG_FRAGMENT_ADD(sega_speech_board)
+	astrob_sound_board(config);
+	sega_speech_board(config);
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( 005, g80r_base )
+MACHINE_CONFIG_START(segag80r_state::sega005)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
@@ -850,11 +873,12 @@ static MACHINE_CONFIG_DERIVED( 005, g80r_base )
 	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
 
 	/* sound boards */
-	MCFG_FRAGMENT_ADD(005_sound_board)
+	sega005_sound_board(config);
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spaceod, g80r_base )
+MACHINE_CONFIG_START(segag80r_state::spaceod)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
@@ -866,11 +890,12 @@ static MACHINE_CONFIG_DERIVED( spaceod, g80r_base )
 	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound boards */
-	MCFG_FRAGMENT_ADD(spaceod_sound_board)
+	spaceod_sound_board(config);
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( monsterb, g80r_base )
+MACHINE_CONFIG_START(segag80r_state::monsterb)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
@@ -883,19 +908,22 @@ static MACHINE_CONFIG_DERIVED( monsterb, g80r_base )
 	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound boards */
-	MCFG_FRAGMENT_ADD(monsterb_sound_board)
+	monsterb_sound_board(config);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( monster2, monsterb )
+MACHINE_CONFIG_START(segag80r_state::monster2)
+	monsterb(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_SPAT, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  segag80r_vblank_start)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
+	MCFG_CPU_OPCODES_MAP(sega_315_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pignewt, g80r_base )
+MACHINE_CONFIG_START(segag80r_state::pignewt)
+	g80r_base(config);
 
 	/* basic machine hardware */
 
@@ -909,13 +937,14 @@ static MACHINE_CONFIG_DERIVED( pignewt, g80r_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
+MACHINE_CONFIG_START(segag80r_state::sindbadm)
+	g80r_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5028, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(sindbadm_portmap)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(sega_315_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  sindbadm_vblank_start)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
@@ -1596,7 +1625,7 @@ GAME( 1981, astrob2,   astrob,   astrob,   astrob2,  segag80r_state, astrob,   R
 GAME( 1981, astrob2a,  astrob,   astrob,   astrob2,  segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", MACHINE_IMPERFECT_SOUND )
 GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (version 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
 GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (German)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, 005,       0,        005,      005,      segag80r_state, 005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, 005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
 
 
 /* basic G-80 system with individual background boards */

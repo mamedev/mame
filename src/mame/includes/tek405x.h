@@ -15,7 +15,7 @@
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/ram.h"
-#include "machine/ram.h"
+#include "machine/timer.h"
 
 #include "sound/spkrdev.h"
 
@@ -144,6 +144,8 @@ public:
 	// GPIB
 	int m_talk;
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
+	void tek4051(machine_config &config);
+	void tek4051_mem(address_map &map);
 };
 
 class tek4052_state : public driver_device
@@ -161,6 +163,8 @@ public:
 	virtual void machine_start() override;
 
 	virtual void video_start() override;
+	void tek4052(machine_config &config);
+	void tek4052_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_TEK405X_H

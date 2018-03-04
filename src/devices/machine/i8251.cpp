@@ -549,7 +549,7 @@ void i8251_device::mode_w(uint8_t data)
 		/* setup for sync byte(s) */
 		m_flags |= I8251_EXPECTING_SYNC_BYTE;
 		m_sync_byte_offset = 0;
-		if (data & 0x07)
+		if (BIT(data, 7))
 		{
 			m_sync_byte_count = 1;
 		}

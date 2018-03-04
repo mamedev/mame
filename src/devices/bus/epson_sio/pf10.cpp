@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(EPSON_PF10, epson_pf10_device, "epson_pf10", "EPSON PF-10 Por
 //  address maps
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( cpu_mem, AS_PROGRAM, 8, epson_pf10_device )
+ADDRESS_MAP_START(epson_pf10_device::cpu_mem)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("maincpu", hd6303y_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM /* 192 bytes internal ram */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* external 2k ram */
@@ -34,7 +34,7 @@ static ADDRESS_MAP_START( cpu_mem, AS_PROGRAM, 8, epson_pf10_device )
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu_io, AS_IO, 8, epson_pf10_device )
+ADDRESS_MAP_START(epson_pf10_device::cpu_io)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(port1_r, port1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(port2_r, port2_w)
 ADDRESS_MAP_END
@@ -63,8 +63,8 @@ static SLOT_INTERFACE_START( pf10_floppies )
 	SLOT_INTERFACE( "smd165", EPSON_SMD_165 )
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_MEMBER( epson_pf10_device::device_add_mconfig )
-	MCFG_CPU_ADD("maincpu", HD6303Y, XTAL_4_9152MHz) // HD63A03XF
+MACHINE_CONFIG_START(epson_pf10_device::device_add_mconfig)
+	MCFG_CPU_ADD("maincpu", HD6303Y, XTAL(4'915'200)) // HD63A03XF
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)
 	MCFG_M6801_SER_TX(DEVWRITELINE(DEVICE_SELF, epson_pf10_device, hd6303_tx_w))

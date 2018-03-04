@@ -82,64 +82,6 @@ device_execute_interface::~device_execute_interface()
 
 
 //-------------------------------------------------
-//  static_set_disable - configuration helper to
-//  set the disabled state of a device
-//-------------------------------------------------
-
-void device_execute_interface::static_set_disable(device_t &device)
-{
-	device_execute_interface *exec;
-	if (!device.interface(exec))
-		throw emu_fatalerror("MCFG_DEVICE_DISABLE called on device '%s' with no execute interface", device.tag());
-	exec->m_disabled = true;
-}
-
-
-//-------------------------------------------------
-//  static_set_vblank_int - configuration helper
-//  to set up VBLANK interrupts on the device
-//-------------------------------------------------
-
-void device_execute_interface::static_set_vblank_int(device_t &device, device_interrupt_delegate function, const char *tag, int rate)
-{
-	device_execute_interface *exec;
-	if (!device.interface(exec))
-		throw emu_fatalerror("MCFG_DEVICE_VBLANK_INT called on device '%s' with no execute interface", device.tag());
-	exec->m_vblank_interrupt = function;
-	exec->m_vblank_interrupt_screen = tag;
-}
-
-
-//-------------------------------------------------
-//  static_set_periodic_int - configuration helper
-//  to set up periodic interrupts on the device
-//-------------------------------------------------
-
-void device_execute_interface::static_set_periodic_int(device_t &device, device_interrupt_delegate function, const attotime &rate)
-{
-	device_execute_interface *exec;
-	if (!device.interface(exec))
-		throw emu_fatalerror("MCFG_DEVICE_PERIODIC_INT called on device '%s' with no execute interface", device.tag());
-	exec->m_timed_interrupt = function;
-	exec->m_timed_interrupt_period = rate;
-}
-
-
-//-------------------------------------------------
-//  set_irq_acknowledge_callback - configuration helper
-//  to setup callback for IRQ acknowledge
-//-------------------------------------------------
-
-void device_execute_interface::static_set_irq_acknowledge_callback(device_t &device, device_irq_acknowledge_delegate callback)
-{
-	device_execute_interface *exec;
-	if (!device.interface(exec))
-		throw emu_fatalerror("MCFG_DEVICE_IRQ_ACKNOWLEDGE called on device '%s' with no execute interface", device.tag());
-	exec->m_driver_irq = callback;
-}
-
-
-//-------------------------------------------------
 //  executing - return true if this device is
 //  within its execute function
 //-------------------------------------------------
@@ -692,6 +634,48 @@ TIMER_CALLBACK_MEMBER(device_execute_interface::trigger_periodic_interrupt)
 		if (!m_timed_interrupt.isnull())
 			m_timed_interrupt(device());
 	}
+}
+
+
+//-------------------------------------------------
+//  irq_pulse_clear - clear a "pulsed" input line
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(device_execute_interface::irq_pulse_clear)
+{
+	int irqline = param;
+	set_input_line(irqline, CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
+//  pulse_input_line - "pulse" an input line by
+//  asserting it and then clearing it later
+//-------------------------------------------------
+
+void device_execute_interface::pulse_input_line(int irqline, const attotime &duration)
+{
+	assert(duration > attotime::zero);
+	set_input_line(irqline, ASSERT_LINE);
+
+	attotime target_time = local_time() + duration;
+	m_scheduler->timer_set(target_time - m_scheduler->time(), timer_expired_delegate(FUNC(device_execute_interface::irq_pulse_clear), this), irqline);
+}
+
+
+//-------------------------------------------------
+//  pulse_input_line_and_vector - "pulse" an
+//  input line by asserting it and then clearing it
+//  later, specifying a vector
+//-------------------------------------------------
+
+void device_execute_interface::pulse_input_line_and_vector(int irqline, int vector, const attotime &duration)
+{
+	assert(duration > attotime::zero);
+	set_input_line_and_vector(irqline, ASSERT_LINE, vector);
+
+	attotime target_time = local_time() + duration;
+	m_scheduler->timer_set(target_time - m_scheduler->time(), timer_expired_delegate(FUNC(device_execute_interface::irq_pulse_clear), this), irqline);
 }
 
 

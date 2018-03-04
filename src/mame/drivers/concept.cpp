@@ -42,7 +42,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-static ADDRESS_MAP_START(concept_memmap, AS_PROGRAM, 16, concept_state )
+ADDRESS_MAP_START(concept_state::concept_memmap)
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION("maincpu", 0x010000)  /* boot ROM mirror */
 	AM_RANGE(0x000008, 0x000fff) AM_RAM                                     /* static RAM */
 	AM_RANGE(0x010000, 0x011fff) AM_ROM AM_REGION("maincpu", 0x010000)  /* boot ROM */
@@ -208,7 +208,7 @@ SLOT_INTERFACE_END
 
 
 
-static MACHINE_CONFIG_START( concept )
+MACHINE_CONFIG_START(concept_state::concept)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8182000)        /* 16.364 MHz / 2 */
 	MCFG_CPU_PROGRAM_MAP(concept_memmap)
@@ -248,15 +248,15 @@ static MACHINE_CONFIG_START( concept )
 
 	/* ACIAs */
 	MCFG_DEVICE_ADD(ACIA_0_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 
 	MCFG_DEVICE_ADD(ACIA_1_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
 
 	MCFG_DEVICE_ADD(KBD_ACIA_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 
 	/* Apple II bus */
 	MCFG_DEVICE_ADD(A2BUS_TAG, A2BUS, 0)

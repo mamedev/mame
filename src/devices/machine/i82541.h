@@ -19,9 +19,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(registers_map, 32);
-	DECLARE_ADDRESS_MAP(flash_map, 32);
-	DECLARE_ADDRESS_MAP(registers_io_map, 32);
+	void registers_map(address_map &map);
+	void flash_map(address_map &map);
+	void registers_io_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(I82541, i82541_device)
