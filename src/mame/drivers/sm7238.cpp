@@ -230,7 +230,7 @@ void sm7238_state::recompute_parameters()
 		refresh = HZ_TO_ATTOSECONDS(20.625_MHz_XTAL) * m_video.stride * 10 * KSM_TOTAL_VERT;
 	}
 
-	machine().first_screen()->configure(m_video.stride * 10, KSM_TOTAL_VERT, visarea, refresh);
+	m_screen->configure(m_video.stride * 10, KSM_TOTAL_VERT, visarea, refresh);
 }
 
 uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

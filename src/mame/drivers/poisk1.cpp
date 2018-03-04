@@ -74,7 +74,9 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_ram(*this, RAM_TAG)
+		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_kbdio(*this, "Y%u", 1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -86,7 +88,10 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	required_ioport_array<8> m_kbdio;
 
 	DECLARE_DRIVER_INIT(poisk1);
 	DECLARE_MACHINE_START(poisk1);
@@ -241,9 +246,9 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 	if (BIT((data ^ m_video.color_select_68), 7))
 	{
 		if (BIT(data, 7))
-			machine().first_screen()->set_visible_area(0, 640 - 1, 0, 200 - 1);
+			m_screen->set_visible_area(0, 640 - 1, 0, 200 - 1);
 		else
-			machine().first_screen()->set_visible_area(0, 320 - 1, 0, 200 - 1);
+			m_screen->set_visible_area(0, 320 - 1, 0, 200 - 1);
 	}
 	m_video.color_select_68 = data;
 	set_palette_luts();
@@ -489,14 +494,14 @@ READ8_MEMBER(p1_state::p1_ppi_portb_r)
 	uint16_t key = 0xffff;
 	uint8_t ret = 0;
 
-	if (m_kbpoll_mask & 0x01) { key &= ioport("Y1")->read(); }
-	if (m_kbpoll_mask & 0x02) { key &= ioport("Y2")->read(); }
-	if (m_kbpoll_mask & 0x04) { key &= ioport("Y3")->read(); }
-	if (m_kbpoll_mask & 0x08) { key &= ioport("Y4")->read(); }
-	if (m_kbpoll_mask & 0x10) { key &= ioport("Y5")->read(); }
-	if (m_kbpoll_mask & 0x20) { key &= ioport("Y6")->read(); }
-	if (m_kbpoll_mask & 0x40) { key &= ioport("Y7")->read(); }
-	if (m_kbpoll_mask & 0x80) { key &= ioport("Y8")->read(); }
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(m_kbpoll_mask, i))
+		{
+			key &= m_kbdio[i]->read();
+		}
+	}
+
 	ret = key & 0xff;
 //  DBG_LOG(1,"p1_ppi_portb_r",("= %02X\n", ret));
 	return ret;
@@ -507,14 +512,14 @@ READ8_MEMBER(p1_state::p1_ppi_portc_r)
 	uint16_t key = 0xffff;
 	uint8_t ret = 0;
 
-	if (m_kbpoll_mask & 0x01) { key &= ioport("Y1")->read(); }
-	if (m_kbpoll_mask & 0x02) { key &= ioport("Y2")->read(); }
-	if (m_kbpoll_mask & 0x04) { key &= ioport("Y3")->read(); }
-	if (m_kbpoll_mask & 0x08) { key &= ioport("Y4")->read(); }
-	if (m_kbpoll_mask & 0x10) { key &= ioport("Y5")->read(); }
-	if (m_kbpoll_mask & 0x20) { key &= ioport("Y6")->read(); }
-	if (m_kbpoll_mask & 0x40) { key &= ioport("Y7")->read(); }
-	if (m_kbpoll_mask & 0x80) { key &= ioport("Y8")->read(); }
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(m_kbpoll_mask, i))
+		{
+			key &= m_kbdio[i]->read();
+		}
+	}
+
 	ret = (key >> 8) & 0xff;
 	DBG_LOG(2,"p1_ppi_portc_r",("= %02X\n", ret));
 	return ret;
