@@ -216,6 +216,14 @@ void volfied_state::machine_reset()
 {
 }
 
+WRITE8_MEMBER(volfied_state::counters_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(volfied_state::scanline)
 {
 	if (param == 224)
@@ -254,6 +262,7 @@ MACHINE_CONFIG_START(volfied_state::volfied)
 	MCFG_CCHIP_IN_PORTB_CB(IOPORT("F00009"))
 	MCFG_CCHIP_IN_PORTC_CB(IOPORT("F0000B"))
 	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("F0000D"))
+	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(volfied_state, counters_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 

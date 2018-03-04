@@ -39,6 +39,7 @@ public:
 	DECLARE_READ16_MEMBER(video_ctrl_r);
 	DECLARE_WRITE16_MEMBER(video_mask_w);
 	DECLARE_WRITE16_MEMBER(sprite_ctrl_w);
+	DECLARE_WRITE8_MEMBER(counters_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

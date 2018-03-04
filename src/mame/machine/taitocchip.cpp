@@ -109,7 +109,10 @@ taito_cchip_device::taito_cchip_device(const machine_config &mconfig, const char
 	m_in_pa_cb(*this),
 	m_in_pb_cb(*this),
 	m_in_pc_cb(*this),
-	m_in_ad_cb(*this)
+	m_in_ad_cb(*this),
+	m_out_pa_cb(*this),
+	m_out_pb_cb(*this),
+	m_out_pc_cb(*this)
 {
 }
 
@@ -174,21 +177,22 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(taito_cchip_device::porta_w)
 {
-	logerror("%s port A written %.2x\n", machine().describe_context(), data);
+	m_out_pa_cb(data);
 }
 
 WRITE8_MEMBER(taito_cchip_device::portb_w)
 {
-	logerror("%s port B written %.2x\n", machine().describe_context(), data);
+	m_out_pb_cb(data);
 }
 
 WRITE8_MEMBER(taito_cchip_device::portc_w)
 {
-	logerror("%s port C written %.2x\n", machine().describe_context(), data);
+	m_out_pc_cb(data);
 }
 
 WRITE8_MEMBER(taito_cchip_device::portf_w)
 {
+	// internal? related to locking out the 68k?
 	logerror("%s port F written %.2x\n", machine().describe_context(), data);
 }
 
@@ -289,6 +293,9 @@ void taito_cchip_device::device_start()
 	m_in_pb_cb.resolve_safe(0);
 	m_in_pc_cb.resolve_safe(0);
 	m_in_ad_cb.resolve_safe(0);
+	m_out_pa_cb.resolve_safe();
+	m_out_pb_cb.resolve_safe();
+	m_out_pc_cb.resolve_safe();
 }
 
 void taito_cchip_device::device_reset()

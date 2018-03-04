@@ -26,6 +26,15 @@ DECLARE_DEVICE_TYPE(TAITO_CCHIP, taito_cchip_device)
 #define MCFG_CCHIP_IN_PORTAD_CB(_devcb) \
 	devcb = &downcast<taito_cchip_device &>(*device).set_in_ad_callback(DEVCB_##_devcb);
 
+#define MCFG_CCHIP_OUT_PORTA_CB(_devcb) \
+	devcb = &downcast<taito_cchip_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
+
+#define MCFG_CCHIP_OUT_PORTB_CB(_devcb) \
+	devcb = &downcast<taito_cchip_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
+
+#define MCFG_CCHIP_OUT_PORTC_CB(_devcb) \
+	devcb = &downcast<taito_cchip_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
+
 
 class taito_cchip_device :  public device_t
 {
@@ -37,6 +46,10 @@ public:
 	template <class Object> devcb_base &set_in_pb_callback(Object &&cb)  { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_in_pc_callback(Object &&cb)  { return m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_in_ad_callback(Object &&cb)  { return m_in_ad_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pa_callback(Object &&cb) { return m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pb_callback(Object &&cb) { return m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pc_callback(Object &&cb) { return m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
+
 
 	// can be accessed externally
 	DECLARE_READ8_MEMBER(asic_r);
@@ -84,6 +97,9 @@ private:
 	devcb_read8        m_in_pb_cb;
 	devcb_read8        m_in_pc_cb;
 	devcb_read8        m_in_ad_cb;
+	devcb_write8       m_out_pa_cb;
+	devcb_write8       m_out_pb_cb;
+	devcb_write8       m_out_pc_cb;
 };
 
 #endif // MAME_MACHINE_CCHIP_DEV_H
