@@ -109,8 +109,6 @@ public:
 	DECLARE_WRITE32_MEMBER(multi32_paletteram_1_w);
 	DECLARE_READ16_MEMBER(system32_videoram_r);
 	DECLARE_WRITE16_MEMBER(system32_videoram_w);
-	DECLARE_READ32_MEMBER(multi32_videoram_r);
-	DECLARE_WRITE32_MEMBER(multi32_videoram_w);
 	DECLARE_READ8_MEMBER(sprite_control_r);
 	DECLARE_WRITE8_MEMBER(sprite_control_w);
 	DECLARE_READ16_MEMBER(system32_spriteram_r);
