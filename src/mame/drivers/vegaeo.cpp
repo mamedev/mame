@@ -18,6 +18,7 @@
 
 #include "cpu/e132xs/e132xs.h"
 #include "machine/at28c16.h"
+#include "machine/gen_latch.h"
 #include "sound/qs1000.h"
 #include "speaker.h"
 
@@ -26,8 +27,10 @@ class vegaeo_state : public eolith_state
 {
 public:
 	vegaeo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: eolith_state(mconfig, type, tag) { }
+		: eolith_state(mconfig, type, tag),
+		m_soundlatch(*this, "soundlatch") { }
 
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	std::unique_ptr<uint32_t[]> m_vega_vram;
 	uint8_t m_vega_vbuffer;
@@ -36,6 +39,8 @@ public:
 	DECLARE_READ32_MEMBER(vega_vram_r);
 	DECLARE_WRITE32_MEMBER(vega_misc_w);
 	DECLARE_READ32_MEMBER(vegaeo_custom_read);
+	DECLARE_WRITE32_MEMBER(soundlatch_w);
+	DECLARE_READ8_MEMBER(qs1000_p1_r);
 	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
@@ -47,6 +52,11 @@ public:
 	void vega(machine_config &config);
 	void vega_map(address_map &map);
 };
+
+READ8_MEMBER( vegaeo_state::qs1000_p1_r )
+{
+	return m_soundlatch->read(space, 0);
+}
 
 WRITE8_MEMBER( vegaeo_state::qs1000_p1_w )
 {
@@ -65,7 +75,7 @@ WRITE8_MEMBER( vegaeo_state::qs1000_p3_w )
 	membank("qs1000:bank")->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
-		m_soundlatch->acknowledge_w(space, 0, !BIT(data, 5));
+		m_qs1000->set_irq(CLEAR_LINE);
 }
 
 WRITE32_MEMBER(vegaeo_state::vega_vram_w)
@@ -117,6 +127,14 @@ READ32_MEMBER(vegaeo_state::vegaeo_custom_read)
 	return ioport("SYSTEM")->read();
 }
 
+WRITE32_MEMBER(vegaeo_state::soundlatch_w)
+{
+	m_soundlatch->write(space, 0, data);
+	m_qs1000->set_irq(ASSERT_LINE);
+
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+}
+
 
 ADDRESS_MAP_START(vegaeo_state::vega_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
@@ -124,11 +142,11 @@ ADDRESS_MAP_START(vegaeo_state::vega_map)
 	AM_RANGE(0xfc000000, 0xfc0000ff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0x000000ff)
 	AM_RANGE(0xfc200000, 0xfc2003ff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0xfc400000, 0xfc40005b) AM_WRITENOP // crt registers ?
-	AM_RANGE(0xfc600000, 0xfc600003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff).cswidth(32)
+	AM_RANGE(0xfc600000, 0xfc600003) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xfca00000, 0xfca00003) AM_WRITE(vega_misc_w)
 	AM_RANGE(0xfcc00000, 0xfcc00003) AM_READ(vegaeo_custom_read)
 	AM_RANGE(0xfce00000, 0xfce00003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xfd000000, 0xfeffffff) AM_ROM AM_REGION("maindata", 0)
+	AM_RANGE(0xfd000000, 0xfeffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
@@ -227,12 +245,10 @@ MACHINE_CONFIG_START(vegaeo_state::vega)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("qs1000", qs1000_device, set_irq))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_QS1000_IN_P1_CB(READ8(vegaeo_state, qs1000_p1_r))
 	MCFG_QS1000_OUT_P1_CB(WRITE8(vegaeo_state, qs1000_p1_w))
 	MCFG_QS1000_OUT_P2_CB(WRITE8(vegaeo_state, qs1000_p2_w))
 	MCFG_QS1000_OUT_P3_CB(WRITE8(vegaeo_state, qs1000_p3_w))
@@ -290,7 +306,7 @@ ROM_START( crazywar )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u7",         0x00000, 0x80000, CRC(697c2505) SHA1(c787007f05d2ddf1706e15e9d9ef9b2479708f12) )
 
-	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "00", 0x0000000, 0x200000, CRC(fbb917ae) SHA1(1fd975cda06b3cb748503b7c8009e6184b46af3f) )
 	ROM_LOAD32_WORD_SWAP( "01", 0x0000002, 0x200000, CRC(59308556) SHA1(bc8c28531fca009be5b7b3b1a4a9b3ebcc9d3c3a) )
 	ROM_LOAD32_WORD_SWAP( "02", 0x0400000, 0x200000, CRC(34813167) SHA1(d04c71164b36af78425dcd637e60aee45c39a1ba) )

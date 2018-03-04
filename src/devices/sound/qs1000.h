@@ -68,8 +68,8 @@ public:
 	//template <class Object> devcb_base &set_serial_w_callback(Object &&cb) { return m_serial_w_cb.set_callback(std::forward<Object>(cb)); }
 
 	// external
-	DECLARE_WRITE_LINE_MEMBER( serial_in );
-	DECLARE_WRITE_LINE_MEMBER( set_irq );
+	void serial_in(uint8_t data);
+	void set_irq(int state);
 
 	DECLARE_WRITE8_MEMBER( wave_w );
 
@@ -102,7 +102,6 @@ protected:
 	virtual void rom_bank_updated() override;
 
 private:
-	TIMER_CALLBACK_MEMBER( serial_w );
 	static constexpr unsigned QS1000_CHANNELS       = 32;
 	static constexpr offs_t   QS1000_ADDRESS_MASK   = 0x00ffffff;
 
