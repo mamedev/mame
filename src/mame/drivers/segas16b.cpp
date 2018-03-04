@@ -881,7 +881,7 @@ S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -       
 //  CONSTANTS
 //**************************************************************************
 
-#define MASTER_CLOCK_10MHz              XTAL(10'000'000)
+#define MASTER_CLOCK_10MHz              XTAL(20'000'000) / 2
 #define MASTER_CLOCK_8MHz               XTAL(8'000'000)
 #define MASTER_CLOCK_25MHz              XTAL(25'174'800)
 
@@ -3710,7 +3710,9 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas16b_state, memory_mapper)
+	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, MASTER_CLOCK_10MHz)
+	MCFG_SEGA_315_5195_CPU("maincpu")
+	MCFG_SEGA_315_5195_MAPPER_HANDLER(segas16b_state, memory_mapper)
 	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", 0))
 
 	// video hardware
