@@ -183,7 +183,7 @@ void hp1ll3_device::device_start()
 	// register for state saving
 	save_item(NAME(m_conf));
 
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	m_cursor.allocate(16, 16);
 	m_sprite.allocate(16, 16);

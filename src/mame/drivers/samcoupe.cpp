@@ -117,12 +117,11 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 
 READ8_MEMBER(samcoupe_state::samcoupe_pen_r)
 {
-	screen_device *scr = machine().first_screen();
 	uint8_t data;
 
 	if (offset & 0x100)
 	{
-		int vpos = scr->vpos();
+		int vpos = m_screen->vpos();
 
 		/* return the current screen line or 192 for the border area */
 		if (vpos < SAM_BORDER_TOP || vpos >= SAM_BORDER_TOP + SAM_SCREEN_HEIGHT)
@@ -133,7 +132,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_pen_r)
 	else
 	{
 		/* horizontal position is encoded into bits 3 to 8 */
-		data = scr->hpos() & 0xfc;
+		data = m_screen->hpos() & 0xfc;
 	}
 
 	return data;
