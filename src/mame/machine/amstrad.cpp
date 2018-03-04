@@ -2551,7 +2551,7 @@ void amstrad_state::update_psg()
 	case 3:
 		{/* b6 and b7 = 1 ? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
 			/* ignore if an invalid PSG register is selected, usually when the PPI port directions are changed after selecting the PSG register */
-			if(m_ppi_port_outputs[amstrad_ppi_PortA] < 15)
+			if(m_ppi_port_outputs[amstrad_ppi_PortA] <= 15)
 			{
 				m_ay->address_w(space, 0, m_ppi_port_outputs[amstrad_ppi_PortA]);
 				m_prev_reg = m_ppi_port_outputs[amstrad_ppi_PortA];
