@@ -45,38 +45,46 @@ class segajw_state : public driver_device
 {
 public:
 	segajw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_soundlatch(*this, "soundlatch")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_soundlatch(*this, "soundlatch")
+		, m_lamps(*this, "lamp%u", 0U)
+		, m_towerlamps(*this, "towerlamp%u", 0U)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
+	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
+
+	void segajw(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(coin_counter_r);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 	DECLARE_WRITE8_MEMBER(hopper_w);
 	DECLARE_WRITE8_MEMBER(lamps1_w);
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(coinlockout_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
 
-	void segajw(machine_config &config);
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	void ramdac_map(address_map &map);
 	void segajw_audiocpu_io_map(address_map &map);
 	void segajw_audiocpu_map(address_map &map);
 	void segajw_hd63484_map(address_map &map);
 	void segajw_map(address_map &map);
-protected:
 
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
+	output_finder<16> m_lamps;
+	output_finder<3> m_towerlamps;
 
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint64_t      m_coin_start_cycles;
 	uint64_t      m_hopper_start_cycles;
 	uint8_t       m_coin_counter;
@@ -101,21 +109,21 @@ WRITE8_MEMBER(segajw_state::hopper_w)
 WRITE8_MEMBER(segajw_state::lamps1_w)
 {
 	for (int i = 0; i < 8; i++)
-		output().set_lamp_value(i, BIT(data, i));
+		m_lamps[i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(segajw_state::lamps2_w)
 {
 	for (int i = 0; i < 8; i++)
-		output().set_lamp_value(8 + i, BIT(data, i));
+		m_lamps[8 + i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(segajw_state::coinlockout_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, data & 1);
 
-	for(int i=0; i<3; i++)
-		output().set_indexed_value("towerlamp", i, BIT(data, 3 + i));
+	for (int i = 0; i < 3; i++)
+		m_towerlamps[i] = BIT(data, 3 + i);
 }
 
 INPUT_CHANGED_MEMBER( segajw_state::coin_drop_start )
@@ -338,6 +346,9 @@ INPUT_PORTS_END
 
 void segajw_state::machine_start()
 {
+	m_lamps.resolve();
+	m_towerlamps.resolve();
+
 	save_item(NAME(m_coin_start_cycles));
 	save_item(NAME(m_hopper_start_cycles));
 	save_item(NAME(m_coin_counter));

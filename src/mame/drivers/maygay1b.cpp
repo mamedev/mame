@@ -710,7 +710,7 @@ WRITE8_MEMBER(maygay1b_state::mcu_port1_w)
 		{
 			bit_offset = i - 4;
 		}
-		output().set_lamp_value((8 * m_lamp_strobe) + i + 128, ((data  & (1 << bit_offset)) != 0));
+		m_lamps[((m_lamp_strobe << 3) & 0x78) | i | 128] = BIT(data, bit_offset);
 	}
 #endif
 }

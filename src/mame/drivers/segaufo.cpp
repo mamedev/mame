@@ -75,32 +75,22 @@
 class ufo_state : public driver_device
 {
 public:
-	ufo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ufo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_io1(*this, "io1"),
 		m_io2(*this, "io2"),
-		m_upd(*this, "upd")
+		m_upd(*this, "upd"),
+		m_counters(*this, "counter%u", 0U),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<sega_315_5296_device> m_io1;
-	required_device<sega_315_5296_device> m_io2;
-	optional_device<upd7759_device> m_upd;
+	void ufomini(machine_config &config);
+	void ufo21(machine_config &config);
+	void newufo(machine_config &config);
+	void ufo800(machine_config &config);
 
-	struct Player
-	{
-		struct Motor
-		{
-			uint8_t running;
-			uint8_t direction;
-			float position;
-			float speed;
-		} motor[4];
-	} m_player[2];
-
-	uint8_t m_stepper;
-
+protected:
 	void motor_tick(int p, int m);
 
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
@@ -127,14 +117,32 @@ public:
 	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(simulate_xyz);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_info);
-	void ufomini(machine_config &config);
-	void ufo21(machine_config &config);
-	void newufo(machine_config &config);
-	void ufo800(machine_config &config);
-	void ex_ufo21_portmap(address_map &map);
-	void ex_ufo800_portmap(address_map &map);
+
 	void ufo_map(address_map &map);
 	void ufo_portmap(address_map &map);
+	void ex_ufo21_portmap(address_map &map);
+	void ex_ufo800_portmap(address_map &map);
+
+private:
+	struct Player
+	{
+		struct Motor
+		{
+			uint8_t running;
+			uint8_t direction;
+			float position;
+			float speed;
+		} motor[4];
+	} m_player[2];
+
+	uint8_t m_stepper;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<sega_315_5296_device> m_io1;
+	required_device<sega_315_5296_device> m_io2;
+	optional_device<upd7759_device> m_upd;
+	output_finder<2 * 4> m_counters;
+	output_finder<2> m_digits;
 };
 
 
@@ -171,7 +179,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::update_info)
 	// 3 C: 000 = closed, 100 = open
 	for (int p = 0; p < 2; p++)
 		for (int m = 0; m < 4; m++)
-			output().set_indexed_value("counter", p*4 + m, (uint8_t)(m_player[p].motor[m].position * 100));
+			m_counters[(p << 2) | m] = uint8_t(m_player[p].motor[m].position * 100);
 
 #if 0
 	char msg1[0x100] = {0};
@@ -288,12 +296,12 @@ WRITE8_MEMBER(ufo_state::cp_lamps_w)
 
 WRITE8_MEMBER(ufo_state::cp_digits_w)
 {
-	static const uint8_t lut_7448[0x10] =
-		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
+	static constexpr uint8_t lut_7448[0x10] =
+			{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	// d0-d3: cpanel digit
 	// other bits: ?
-	output().set_digit_value(offset & 1, lut_7448[data & 0xf]);
+	m_digits[offset & 1] = lut_7448[data & 0xf];
 }
 
 WRITE8_MEMBER(ufo_state::crane_xyz_w)
