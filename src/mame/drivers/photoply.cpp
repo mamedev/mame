@@ -61,15 +61,17 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	uint32_t sis_pcm_r(int function, int reg, uint32_t mem_mask);
+	void sis_pcm_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
 // regs 0x00-0x3f both devices below
 // regs 0x40-0x7f SiS85C496 PCI & CPU Memory Controller (PCM)
 // regs 0x80-0xff SiS85C497 AT Bus Controller & Megacell (ATM)
-static uint32_t sis_pcm_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t photoply_state::sis_pcm_r(int function, int reg, uint32_t mem_mask)
 {
 	uint32_t r = 0;
-	photoply_state *state = busdevice->machine().driver_data<photoply_state>();
 
 	//printf("PCM %02x %08x\n",reg,mem_mask);
 	if(reg == 0)
@@ -92,17 +94,15 @@ static uint32_t sis_pcm_r(device_t *busdevice, device_t *device, int function, i
 	{
 
 		if(ACCESSING_BITS_8_15) // reg 0x45
-			r |= (state->m_pci_shadow_reg & 0xff00);
+			r |= (m_pci_shadow_reg & 0xff00);
 		if(ACCESSING_BITS_0_7) // reg 0x44
-			r |= (state->m_pci_shadow_reg & 0x00ff);
+			r |= (m_pci_shadow_reg & 0x00ff);
 	}
 	return r;
 }
 
-static void sis_pcm_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void photoply_state::sis_pcm_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	photoply_state *state = busdevice->machine().driver_data<photoply_state>();
-
 	if(reg == 0x44)
 	{
 
@@ -116,7 +116,7 @@ static void sis_pcm_w(device_t *busdevice, device_t *device, int function, int r
 		 * ---- ---x Shadow RAM Write Control (0=Enable)
 		 */
 		if(ACCESSING_BITS_8_15)
-			state->m_pci_shadow_reg = (data & 0xff00) | (state->m_pci_shadow_reg & 0x00ff);
+			m_pci_shadow_reg = (data & 0xff00) | (m_pci_shadow_reg & 0x00ff);
 
 		/*
 		 * shadow RAM enable:
@@ -125,9 +125,9 @@ static void sis_pcm_w(device_t *busdevice, device_t *device, int function, int r
 		 * bit 0: 0xc0000-0xc7fff shadow RAM enable
 		 */
 		if(ACCESSING_BITS_0_7) // reg 0x44
-			state->m_pci_shadow_reg = (data & 0x00ff) | (state->m_pci_shadow_reg & 0xff00);
+			m_pci_shadow_reg = (data & 0x00ff) | (m_pci_shadow_reg & 0xff00);
 
-		//printf("%04x\n",state->m_pci_shadow_reg);
+		//printf("%04x\n",m_pci_shadow_reg);
 	}
 }
 
@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir7_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(5, nullptr, sis_pcm_r, sis_pcm_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(5, DEVICE_SELF, photoply_state, sis_pcm_r, sis_pcm_w)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)

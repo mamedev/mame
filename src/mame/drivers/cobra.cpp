@@ -846,6 +846,11 @@ public:
 	void cobra_gfx_map(address_map &map);
 	void cobra_main_map(address_map &map);
 	void cobra_sub_map(address_map &map);
+
+	uint32_t mpc106_pci_r(int function, int reg, uint32_t mem_mask);
+	void mpc106_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+
+	uint32_t m_mpc106_regs[256/4];
 };
 
 void cobra_renderer::render_color_scan(int32_t scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
@@ -1427,8 +1432,7 @@ void cobra_state::gfxfifo_out_event_callback(cobra_fifo::EventType event)
 // 0x02: S2M FIFO
 // 0x04: Vblank?
 
-static uint32_t mpc106_regs[256/4];
-static uint32_t mpc106_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t cobra_state::mpc106_pci_r(int function, int reg, uint32_t mem_mask)
 {
 	//printf("MPC106: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 
@@ -1436,13 +1440,13 @@ static uint32_t mpc106_pci_r(device_t *busdevice, device_t *device, int function
 	{
 	}
 
-	return mpc106_regs[reg/4];
+	return m_mpc106_regs[reg/4];
 }
 
-static void mpc106_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void cobra_state::mpc106_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	//printf("MPC106: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
-	COMBINE_DATA(mpc106_regs + (reg/4));
+	COMBINE_DATA(&m_mpc106_regs[reg/4]);
 }
 
 READ64_MEMBER(cobra_state::main_mpc106_r)
@@ -3341,7 +3345,7 @@ MACHINE_CONFIG_START(cobra_state::cobra)
 
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, mpc106_pci_r, mpc106_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, cobra_state, mpc106_pci_r, mpc106_pci_w)
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(cobra_state, ide_interrupt))

@@ -102,6 +102,17 @@ public:
 	void gamecstl(machine_config &config);
 	void gamecstl_io(address_map &map);
 	void gamecstl_map(address_map &map);
+
+	uint8_t mtxc_config_r(int function, int reg);
+	void mtxc_config_w(int function, int reg, uint8_t data);
+	uint32_t intel82439tx_pci_r(int function, int reg, uint32_t mem_mask);
+	void intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+	uint8_t piix4_config_r(int function, int reg);
+	void piix4_config_w(int function, int reg, uint8_t data);
+	uint32_t intel82371ab_pci_r(int function, int reg, uint32_t mem_mask);
+	void intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+	uint32_t pci_3dfx_r(int function, int reg, uint32_t mem_mask);
+	void pci_3dfx_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
 
@@ -170,17 +181,15 @@ uint32_t gamecstl_state::screen_update_gamecstl(screen_device &screen, bitmap_in
 
 // Intel 82439TX System Controller (MTXC)
 
-static uint8_t mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
+uint8_t gamecstl_state::mtxc_config_r(int function, int reg)
 {
-	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-	state->logerror("MTXC: read %d, %02X\n", function, reg);
-	return state->m_mtxc_config_reg[reg];
+	logerror("MTXC: read %d, %02X\n", function, reg);
+	return m_mtxc_config_reg[reg];
 }
 
-static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
+void gamecstl_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-	state->logerror("%s:MTXC: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
+	logerror("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 
 	switch(reg)
 	{
@@ -188,17 +197,17 @@ static void mtxc_config_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data & 0x10)        // enable RAM access to region 0xf0000 - 0xfffff
 			{
-				state->membank("bank1")->set_base(state->m_bios_ram.get());
+				membank("bank1")->set_base(m_bios_ram.get());
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
-				state->membank("bank1")->set_base(state->memregion("bios")->base() + 0x30000);
+				membank("bank1")->set_base(memregion("bios")->base() + 0x30000);
 			}
 			break;
 		}
 	}
 
-	state->m_mtxc_config_reg[reg] = data;
+	m_mtxc_config_reg[reg] = data;
 }
 
 void gamecstl_state::intel82439tx_init()
@@ -211,103 +220,101 @@ void gamecstl_state::intel82439tx_init()
 	m_mtxc_config_reg[0x65] = 0x02;
 }
 
-static uint32_t intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t gamecstl_state::intel82439tx_pci_r(int function, int reg, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 3) << 24;
+		r |= mtxc_config_r(function, reg + 3) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 2) << 16;
+		r |= mtxc_config_r(function, reg + 2) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 1) << 8;
+		r |= mtxc_config_r(function, reg + 1) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 0) << 0;
+		r |= mtxc_config_r(function, reg + 0) << 0;
 	}
 	return r;
 }
 
-static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void gamecstl_state::intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
+		mtxc_config_w(function, reg + 3, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
+		mtxc_config_w(function, reg + 2, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
+		mtxc_config_w(function, reg + 1, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
+		mtxc_config_w(function, reg + 0, (data >> 0) & 0xff);
 	}
 }
 
 // Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
 
-static uint8_t piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
+uint8_t gamecstl_state::piix4_config_r(int function, int reg)
 {
-	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-	state->logerror("PIIX4: read %d, %02X\n", function, reg);
-	return state->m_piix4_config_reg[function][reg];
+	logerror("PIIX4: read %d, %02X\n", function, reg);
+	return m_piix4_config_reg[function][reg];
 }
 
-static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
+void gamecstl_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-	state->logerror("%s:PIIX4: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
-	state->m_piix4_config_reg[function][reg] = data;
+	logerror("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
+	m_piix4_config_reg[function][reg] = data;
 }
 
-static uint32_t intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t gamecstl_state::intel82371ab_pci_r(int function, int reg, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 3) << 24;
+		r |= piix4_config_r(function, reg + 3) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 2) << 16;
+		r |= piix4_config_r(function, reg + 2) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 1) << 8;
+		r |= piix4_config_r(function, reg + 1) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 0) << 0;
+		r |= piix4_config_r(function, reg + 0) << 0;
 	}
 	return r;
 }
 
-static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void gamecstl_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		piix4_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
+		piix4_config_w(function, reg + 3, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		piix4_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
+		piix4_config_w(function, reg + 2, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		piix4_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
+		piix4_config_w(function, reg + 1, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		piix4_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
+		piix4_config_w(function, reg + 0, (data >> 0) & 0xff);
 	}
 }
 
@@ -441,8 +448,8 @@ MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 	pcat_common(config);
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, gamecstl_state, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, gamecstl_state, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))

@@ -142,6 +142,11 @@ public:
 	void flashbank_map(address_map &map);
 	void funkball_io(address_map &map);
 	void funkball_map(address_map &map);
+
+	uint32_t voodoo_0_pci_r(int function, int reg, uint32_t mem_mask);
+	void voodoo_0_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+	uint32_t cx5510_pci_r(int function, int reg, uint32_t mem_mask);
+	void cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
 void funkball_state::video_start()
@@ -153,9 +158,8 @@ uint32_t funkball_state::screen_update( screen_device &screen, bitmap_rgb32 &bit
 	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
-static uint32_t voodoo_0_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t funkball_state::voodoo_0_pci_r(int function, int reg, uint32_t mem_mask)
 {
-	funkball_state* state = device->machine().driver_data<funkball_state>();
 	uint32_t val = 0;
 
 	printf("Voodoo PCI R: %x\n", reg);
@@ -166,58 +170,52 @@ static uint32_t voodoo_0_pci_r(device_t *busdevice, device_t *device, int functi
 			val = 0x0001121a;
 			break;
 		case 0x10:
-			val = state->m_voodoo_pci_regs.base_addr;
+			val = m_voodoo_pci_regs.base_addr;
 			break;
 		case 0x40:
-			val = state->m_voodoo_pci_regs.init_enable;
+			val = m_voodoo_pci_regs.init_enable;
 			break;
 	}
 	return val;
 }
 
-static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void funkball_state::voodoo_0_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	funkball_state* state = device->machine().driver_data<funkball_state>();
-
 	printf("Voodoo [%x]: %x\n", reg, data);
 
 	switch (reg)
 	{
 		case 0x04:
-			state->m_voodoo_pci_regs.command = data & 0x3;
+			m_voodoo_pci_regs.command = data & 0x3;
 			break;
 		case 0x10:
 			if (data == 0xffffffff)
-				state->m_voodoo_pci_regs.base_addr = 0xff000000;
+				m_voodoo_pci_regs.base_addr = 0xff000000;
 			else
-				state->m_voodoo_pci_regs.base_addr = data;
+				m_voodoo_pci_regs.base_addr = data;
 			break;
 		case 0x40:
-			state->m_voodoo_pci_regs.init_enable = data;
-			state->m_voodoo->voodoo_set_init_enable(data);
+			m_voodoo_pci_regs.init_enable = data;
+			m_voodoo->voodoo_set_init_enable(data);
 			break;
 	}
 }
 
-static uint32_t cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t funkball_state::cx5510_pci_r(int function, int reg, uint32_t mem_mask)
 {
-	funkball_state *state = busdevice->machine().driver_data<funkball_state>();
-
 	//osd_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 	switch (reg)
 	{
 		case 0:     return 0x00001078;
 	}
 
-	return state->m_cx5510_regs[reg/4];
+	return m_cx5510_regs[reg/4];
 }
 
-static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void funkball_state::cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	funkball_state *state = busdevice->machine().driver_data<funkball_state>();
-
 	//osd_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
-	COMBINE_DATA(state->m_cx5510_regs + (reg/4));
+	COMBINE_DATA(&m_cx5510_regs[reg/4]);
 }
 
 READ8_MEMBER( funkball_state::serial_r )
@@ -777,8 +775,8 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 	pcat_common(config);
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, "voodoo_0", voodoo_0_pci_r, voodoo_0_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(18, nullptr, cx5510_pci_r, cx5510_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, funkball_state, voodoo_0_pci_r, voodoo_0_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, funkball_state, cx5510_pci_r, cx5510_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
