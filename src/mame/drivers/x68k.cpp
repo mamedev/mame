@@ -193,20 +193,15 @@ void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 // LED timer callback
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_led_callback)
 {
-	int drive;
-	if(m_led_state == 0)
-		m_led_state = 1;
-	else
-		m_led_state = 0;
-	if(m_led_state == 1)
+	m_led_state = !m_led_state ? 1 : 0;
+	if(m_led_state)
 	{
-		for(drive=0;drive<4;drive++)
-			output().set_indexed_value("ctrl_drv",drive,m_fdc.led_ctrl[drive] ? 0 : 1);
+		for(int drive=0; drive<4; drive++)
+			m_ctrl_drv_out[drive] = m_fdc.led_ctrl[drive] ? 0 : 1;
 	}
 	else
 	{
-		for(drive=0;drive<4;drive++)
-			output().set_indexed_value("ctrl_drv",drive,1);
+		std::fill(std::begin(m_ctrl_drv_out), std::end(m_ctrl_drv_out), 1);
 	}
 
 }
@@ -639,7 +634,7 @@ WRITE16_MEMBER(x68k_state::x68k_fdc_w)
 				{
 					m_fdc.led_ctrl[drive] = data & 0x80;  // blinking drive LED if no disk inserted
 					m_fdc.led_eject[drive] = data & 0x40;  // eject button LED (on when set to 0)
-					output().set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
+					m_eject_drv_out[drive] = BIT(data, 6);
 					if((data & 0x60) == 0x20)  // ejects disk
 						m_fdc.floppy[drive]->unload();
 				}
@@ -658,9 +653,9 @@ WRITE16_MEMBER(x68k_state::x68k_fdc_w)
 			if(m_fdc.floppy[i]->exists())
 				m_fdc.floppy[i]->mon_w(!BIT(data, 7));
 
-		output().set_indexed_value("access_drv",x,0);
+		m_access_drv_out[x] = 0;
 		if(x != m_fdc.select_drive)
-			output().set_indexed_value("access_drv",m_fdc.select_drive,1);
+			m_access_drv_out[m_fdc.select_drive] = 1;
 		m_fdc.select_drive = x;
 		logerror("FDC: Drive #%i: Drive selection set to %02x\n",x,data);
 		break;
@@ -1486,15 +1481,13 @@ static SLOT_INTERFACE_START(x68000_exp_cards)
 	SLOT_INTERFACE("x68k_midi",X68K_MIDI)  // X68000 MIDI interface
 SLOT_INTERFACE_END
 
-MACHINE_RESET_MEMBER(x68k_state,x68000)
+void x68k_state::machine_reset()
 {
 	/* The last half of the IPLROM is mapped to 0x000000 on reset only
 	   Just copying the initial stack pointer and program counter should
 	   more or less do the same job */
 
-	int drive;
-	uint8_t* romdata = memregion("user2")->base();
-	attotime irq_time;
+	uint8_t *const romdata = memregion("user2")->base();
 
 	memset(m_ram->pointer(),0,m_ram->size());
 	memcpy(m_ram->pointer(),romdata,8);
@@ -1510,11 +1503,11 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	m_crtc.reg[7] = 552;  // Vertical end
 	m_crtc.reg[8] = 27;   // Horizontal adjust
 
-	m_scanline = machine().first_screen()->vpos();// = m_crtc.reg[6];  // Vertical start
+	m_scanline = m_screen->vpos();// = m_crtc.reg[6];  // Vertical start
 
 	// start VBlank timer
 	m_crtc.vblank = 1;
-	irq_time = m_screen->time_until_pos(m_crtc.reg[6],2);
+	attotime const irq_time = m_screen->time_until_pos(m_crtc.reg[6],2);
 	m_vblank_irq->adjust(irq_time);
 
 	// start HBlank timer
@@ -1538,22 +1531,24 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	output().set_value("key_led_insert",1);
 	output().set_value("key_led_hiragana",1);
 	output().set_value("key_led_fullsize",1);
-	for(drive=0;drive<4;drive++)
-	{
-		output().set_indexed_value("eject_drv",drive,1);
-		output().set_indexed_value("ctrl_drv",drive,1);
-		output().set_indexed_value("access_drv",drive,1);
-	}
+	std::fill(std::begin(m_eject_drv_out), std::end(m_eject_drv_out), 1);
+	std::fill(std::begin(m_ctrl_drv_out), std::end(m_ctrl_drv_out), 1);
+	std::fill(std::begin(m_access_drv_out), std::end(m_access_drv_out), 1);
 	m_fdc.select_drive = 0;
 
 	// reset CPU
 	m_maincpu->reset();
 }
 
-MACHINE_START_MEMBER(x68k_state,x68000)
+void x68k_state::machine_start()
 {
+	// resolve outputs
+	m_eject_drv_out.resolve();
+	m_ctrl_drv_out.resolve();
+	m_access_drv_out.resolve();
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	/*  Install RAM handlers  */
+	// install RAM handlers
 	m_spriteram = (uint16_t*)(memregion("user1")->base());
 	space.install_readwrite_bank(0x000000,m_ram->size()-1,"bank1");
 	membank("bank1")->set_base(m_ram->pointer());
@@ -1651,9 +1646,6 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(x68k_state,x68k_int_ack)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-	MCFG_MACHINE_START_OVERRIDE(x68k_state, x68000 )
-	MCFG_MACHINE_RESET_OVERRIDE(x68k_state, x68000 )
 
 	/* device hardware */
 	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, 4000000)
