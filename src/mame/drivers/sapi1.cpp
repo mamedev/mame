@@ -73,8 +73,6 @@ public:
 	DECLARE_WRITE8_MEMBER(modem_control_w);
 	DECLARE_READ8_MEMBER(uart_ready_r);
 	DECLARE_WRITE8_MEMBER(uart_mode_w);
-	DECLARE_READ8_MEMBER(uart_data_r);
-	DECLARE_WRITE8_MEMBER(uart_data_w);
 	DECLARE_WRITE8_MEMBER(uart_reset_w);
 	DECLARE_DRIVER_INIT(sapizps3);
 	DECLARE_DRIVER_INIT(sapizps3a);
@@ -251,7 +249,7 @@ ADDRESS_MAP_START(sapi1_state::sapi3a_io)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
 	AM_RANGE(0x10, 0x10) AM_READWRITE(uart_status_r, modem_control_w)
 	AM_RANGE(0x11, 0x11) AM_READWRITE(uart_ready_r, uart_mode_w)
-	AM_RANGE(0x12, 0x12) AM_READWRITE(uart_data_r, uart_data_w)
+	AM_RANGE(0x12, 0x12) AM_DEVREADWRITE("uart", ay51013_device, receive, transmit)
 	AM_RANGE(0x13, 0x13) AM_WRITE(uart_reset_w)
 	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
 ADDRESS_MAP_END
@@ -542,21 +540,9 @@ WRITE8_MEMBER(sapi1_state::uart_mode_w)
 	m_uart->write_cs(0);
 }
 
-READ8_MEMBER(sapi1_state::uart_data_r)
-{
-	m_uart->write_rdav(0);
-	uint8_t result = m_uart->get_received_data();
-	m_uart->write_rdav(1);
-	return result;
-}
-
-WRITE8_MEMBER(sapi1_state::uart_data_w)
-{
-	m_uart->set_transmit_data(data);
-}
-
 WRITE8_MEMBER(sapi1_state::uart_reset_w)
 {
+	// really pulsed by K155AG3 (=74123N): R29=22k, C16=220 (output combined with master reset)
 	m_uart->write_xr(0);
 	m_uart->write_xr(1);
 }
@@ -705,6 +691,7 @@ MACHINE_CONFIG_START(sapi1_state::sapi3a)
 	MCFG_AY51013_RX_CLOCK(XTAL(12'288'000) / 80) // not actual rate?
 	MCFG_AY51013_READ_SI_CB(DEVREADLINE("v24", rs232_port_device, rxd_r))
 	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("v24", rs232_port_device, write_txd))
+	MCFG_AY51013_AUTO_RDAV(true) // RDAV not actually tied to RDE, but pulsed by K155AG3 (=74123N): R25=22k, C14=220
 
 	MCFG_RS232_PORT_ADD("v24", default_rs232_devices, "terminal")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
