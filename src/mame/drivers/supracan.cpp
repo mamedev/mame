@@ -125,18 +125,12 @@ public:
 			m_vram(*this, "vram"),
 			m_soundram(*this, "soundram"),
 			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")
+			m_screen(*this, "screen")
 	{
 		m_m6502_reset = 0;
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<generic_slot_device> m_cart;
-
-	required_shared_ptr<uint16_t> m_vram;
-	required_shared_ptr<uint8_t> m_soundram;
-
+private:
 	DECLARE_READ16_MEMBER(_68k_soundram_r);
 	DECLARE_WRITE16_MEMBER(_68k_soundram_w);
 	DECLARE_READ8_MEMBER(_6502_soundmem_r);
@@ -151,12 +145,21 @@ public:
 	DECLARE_READ16_MEMBER(video_r);
 	DECLARE_WRITE16_MEMBER(video_w);
 	DECLARE_WRITE16_MEMBER(vram_w);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<generic_slot_device> m_cart;
+
+	required_shared_ptr<uint16_t> m_vram;
+	required_shared_ptr<uint8_t> m_soundram;
+
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+
 	acan_dma_regs_t m_acan_dma_regs;
 	acan_sprdma_regs_t m_acan_sprdma_regs;
 
 	uint16_t m_m6502_reset;
-	uint8_t m_soundlatch;
-	uint8_t m_soundcpu_irq_src;
 	uint8_t m_sound_irq_enable_reg;
 	uint8_t m_sound_irq_source_reg;
 	uint8_t m_sound_cpu_68k_irq_reg;
@@ -168,7 +171,9 @@ public:
 
 	std::vector<uint8_t> m_vram_addr_swapped;
 
+#if 0
 	uint16_t *m_pram;
+#endif
 
 	uint16_t m_sprite_count;
 	uint32_t m_sprite_base_addr;
@@ -181,7 +186,9 @@ public:
 	uint16_t m_tilemap_flags[3];
 	uint16_t m_tilemap_mode[3];
 	uint16_t m_irq_mask;
+#if 0
 	uint16_t m_hbl_mask;
+#endif
 
 	uint32_t m_roz_base_addr;
 	uint16_t m_roz_mode;
@@ -196,8 +203,6 @@ public:
 	uint16_t m_roz_coeffc;
 	uint16_t m_roz_coeffd;
 	int32_t m_roz_changed;
-	int32_t m_roz_cx;
-	int32_t m_roz_cy;
 	uint16_t m_unk_1d0;
 
 	uint16_t m_video_regs[256];
@@ -231,11 +236,10 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mark_active_tilemap_all_dirty(int layer);
 	void supracan_suprnova_draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask);
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	void supracan(machine_config &config);
 	void supracan_mem(address_map &map);
 	void supracan_sound_mem(address_map &map);
+public:
+	void supracan(machine_config &config);
 };
 
 
@@ -1518,7 +1522,7 @@ TIMER_CALLBACK_MEMBER(supracan_state::supracan_line_off_callback)
 
 TIMER_CALLBACK_MEMBER(supracan_state::supracan_video_callback)
 {
-	int vpos = machine().first_screen()->vpos();
+	int vpos = m_screen->vpos();
 
 	m_video_regs[0] &= ~0x0002;
 
@@ -1549,10 +1553,10 @@ TIMER_CALLBACK_MEMBER(supracan_state::supracan_video_callback)
 		break;
 	}
 
-	m_video_regs[1] = machine().first_screen()->vpos()-16; // for son of evil, wants vblank active around 224 instead...
+	m_video_regs[1] = m_screen->vpos()-16; // for son of evil, wants vblank active around 224 instead...
 
-	m_hbl_timer->adjust( machine().first_screen()->time_until_pos( vpos, 320 ) );
-	m_video_timer->adjust( machine().first_screen()->time_until_pos( ( vpos + 1 ) % 256, 0 ) );
+	m_hbl_timer->adjust( m_screen->time_until_pos( vpos, 320 ) );
+	m_video_timer->adjust( m_screen->time_until_pos( ( vpos + 1 ) % 256, 0 ) );
 }
 
 WRITE16_MEMBER( supracan_state::video_w )
@@ -1562,7 +1566,7 @@ WRITE16_MEMBER( supracan_state::video_w )
 	int i;
 
 	// if any of this changes we need a partial update (see sango fighters intro)
-	machine().first_screen()->update_partial(machine().first_screen()->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	COMBINE_DATA(&m_video_regs[offset]);
 	data = m_video_regs[offset];
@@ -1643,10 +1647,10 @@ WRITE16_MEMBER( supracan_state::video_w )
 				verboselog("maincpu", 3, "video_flags = %04x\n", data);
 				m_video_flags = data;
 
-				rectangle visarea = machine().first_screen()->visible_area();
+				rectangle visarea = m_screen->visible_area();
 
 				visarea.set(0, ((m_video_flags & 0x100) ? 320 : 256) - 1, 8, 232 - 1);
-				machine().first_screen()->configure(348, 256, visarea, machine().first_screen()->frame_period().attoseconds());
+				m_screen->configure(348, 256, visarea, m_screen->frame_period().attoseconds());
 			}
 			break;
 		case 0x0a/2:
@@ -1655,7 +1659,7 @@ WRITE16_MEMBER( supracan_state::video_w )
 				verboselog("maincpu", 0, "IRQ Trigger? = %04x\n", data);
 				if(data & 0x8000)
 				{
-					m_line_on_timer->adjust(machine().first_screen()->time_until_pos((data & 0x00ff), 0));
+					m_line_on_timer->adjust(m_screen->time_until_pos((data & 0x00ff), 0));
 				}
 				else
 				{
@@ -1669,7 +1673,7 @@ WRITE16_MEMBER( supracan_state::video_w )
 				verboselog("maincpu", 0, "IRQ De-Trigger? = %04x\n", data);
 				if(data & 0x8000)
 				{
-					m_line_off_timer->adjust(machine().first_screen()->time_until_pos(data & 0x00ff, 0));
+					m_line_off_timer->adjust(m_screen->time_until_pos(data & 0x00ff, 0));
 				}
 				else
 				{
@@ -1776,7 +1780,7 @@ void supracan_state::machine_reset()
 {
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
-	m_video_timer->adjust( machine().first_screen()->time_until_pos( 0, 0 ) );
+	m_video_timer->adjust( m_screen->time_until_pos( 0, 0 ) );
 	m_irq_mask = 0;
 }
 
