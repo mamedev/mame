@@ -48,6 +48,7 @@
 #include "bus/rs232/rs232.h" /* actually meant to be RS422 ports */
 #include "cpu/mb88xx/mb88xx.h"
 #include "cpu/z80/tmpz84c015.h"
+#include "machine/clock.h"
 #include "machine/cxd1095.h"
 #include "machine/eepromser.h"
 #include "machine/mb8421.h"
@@ -69,13 +70,16 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
+		, m_cxdio(*this, "cxdio")
 		, m_eeprom(*this, "eeprom")
 		, m_buzzer(*this, "buzzer")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(mb8421_intl);
 	DECLARE_WRITE_LINE_MEMBER(mb8421_intr);
 	DECLARE_WRITE_LINE_MEMBER(GPI_w);
+	DECLARE_WRITE_LINE_MEMBER(cxdio_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(external_monitor_w);
 
 	DECLARE_READ8_MEMBER(io_ky_r);
@@ -96,18 +100,27 @@ private:
 	virtual void machine_reset() override;
 	required_device<tmpz84c015_device> m_maincpu;
 	required_device<tmpz84c015_device> m_subcpu;
+	required_device<cxd1095_device> m_cxdio;
 	required_device<eeprom_serial_er5911_device> m_eeprom;
 	required_device<beep_device> m_buzzer;
+	output_finder<27> m_digits;
+
 	uint8_t io_SEL, io_LD, io_LE, io_SC, io_KY;
 	int LD_data[4];
 };
 
-WRITE_LINE_MEMBER( pve500_state::GPI_w )
+WRITE_LINE_MEMBER(pve500_state::GPI_w)
 {
 	/* TODO: Implement-me */
 }
 
-WRITE_LINE_MEMBER( pve500_state::external_monitor_w )
+WRITE_LINE_MEMBER(pve500_state::cxdio_reset_w)
+{
+	if (!state)
+		m_cxdio->reset();
+}
+
+WRITE_LINE_MEMBER(pve500_state::external_monitor_w)
 {
 	/* TODO: Implement-me */
 }
@@ -240,6 +253,7 @@ void pve500_state::machine_start()
 	io_LE = 0;
 	io_SEL = 0;
 	io_KY = 0;
+	m_digits.resolve();
 }
 
 void pve500_state::machine_reset()
@@ -291,7 +305,7 @@ READ8_MEMBER(pve500_state::io_ky_r)
 
 WRITE8_MEMBER(pve500_state::io_sc_w)
 {
-	int swap[4] = {2,1,0,3};
+	const int swap[4] = {2,1,0,3};
 
 #if LOG_7SEG_DISPLAY_SIGNALS
 	printf("CXD1095 PORTA (io_SC=%02X)\n", data);
@@ -300,8 +314,12 @@ WRITE8_MEMBER(pve500_state::io_sc_w)
 
 	for (int j=0; j<8; j++){
 		if (!BIT(io_SC,j)){
-			for (int i=0; i<4; i++)
-				output().set_digit_value(8*swap[i] + j, LD_data[i]);
+			int digits = (j < 3) ? 4 : 3;
+			for (int i = 0; i < digits; i++)
+			{
+				assert(8*swap[i] + j < 27);
+				m_digits[8*swap[i] + j] = LD_data[i];
+			}
 		}
 	}
 }
@@ -337,27 +355,28 @@ WRITE8_MEMBER(pve500_state::io_sel_w)
 
 MACHINE_CONFIG_START(pve500_state::pve500)
 	/* Main CPU */
-	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL(12'000'000) / 2) /* TMPZ84C015BF-6 */
+	MCFG_CPU_ADD("maincpu", TMPZ84C015, 12_MHz_XTAL / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(maincpu_prg)
 	MCFG_CPU_IO_MAP(maincpu_io)
 	MCFG_Z80_DAISY_CHAIN(maincpu_daisy_chain)
 	MCFG_TMPZ84C015_OUT_DTRA_CB(WRITELINE(pve500_state, GPI_w))
-	MCFG_TMPZ84C015_OUT_DTRB_CB(DEVWRITELINE("buzzer", beep_device, set_state))
+	MCFG_TMPZ84C015_OUT_DTRB_CB(DEVWRITELINE("buzzer", beep_device, set_state)) MCFG_DEVCB_INVERT
 	MCFG_TMPZ84C015_OUT_TXDA_CB(DEVWRITELINE("recorder", rs232_port_device, write_txd))
 	MCFG_TMPZ84C015_OUT_TXDB_CB(DEVWRITELINE("player1", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD("external_ctc", Z80CTC, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_ADD("external_ctc", Z80CTC, 12_MHz_XTAL / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("external_sio", Z80SIO0, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_ADD("external_sio", Z80SIO0, 12_MHz_XTAL / 2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("player2", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("edl_inout", rs232_port_device, write_txd))
 
 	/* Secondary CPU */
-	MCFG_CPU_ADD("subcpu", TMPZ84C015, XTAL(12'000'000) / 2) /* TMPZ84C015BF-6 */
+	MCFG_CPU_ADD("subcpu", TMPZ84C015, 12_MHz_XTAL / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(subcpu_prg)
 	MCFG_CPU_IO_MAP(subcpu_io)
+	MCFG_TMPZ84C015_OUT_DTRA_CB(WRITELINE(pve500_state, cxdio_reset_w))
 	MCFG_TMPZ84C015_OUT_DTRB_CB(WRITELINE(pve500_state, external_monitor_w))
 	MCFG_TMPZ84C015_OUT_TXDA_CB(DEVWRITELINE("switcher", rs232_port_device, write_txd))
 	MCFG_TMPZ84C015_OUT_TXDB_CB(DEVWRITELINE("serial_mixer", rs232_port_device, write_txd))
@@ -375,8 +394,10 @@ MACHINE_CONFIG_START(pve500_state::pve500)
 	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(pve500_state, io_sel_w))
 
 	/* Search Dial MCUs */
-	MCFG_CPU_ADD("dial_mcu_left", MB88201, XTAL(4'000'000)) /* PLAYER DIAL MCU */
-	MCFG_CPU_ADD("dial_mcu_right", MB88201, XTAL(4'000'000)) /* RECORDER DIAL MCU */
+	MCFG_CPU_ADD("dial_mcu_left", MB88201, 4_MHz_XTAL) /* PLAYER DIAL MCU */
+	MCFG_DEVICE_DISABLE()
+	MCFG_CPU_ADD("dial_mcu_right", MB88201, 4_MHz_XTAL) /* RECORDER DIAL MCU */
+	MCFG_DEVICE_DISABLE()
 
 	/* Serial EEPROM (128 bytes, 8-bit data organization) */
 	/* The EEPROM stores the setup data */
@@ -401,6 +422,16 @@ MACHINE_CONFIG_START(pve500_state::pve500)
 	MCFG_RS232_PORT_ADD("serial_mixer", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("subcpu", tmpz84c015_device, rxb_w))
 
+	MCFG_DEVICE_ADD("clk1", CLOCK, 12_MHz_XTAL / 20)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("maincpu", tmpz84c015_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("maincpu", tmpz84c015_device, rxcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("maincpu", tmpz84c015_device, txcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("subcpu", tmpz84c015_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("subcpu", tmpz84c015_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("subcpu", tmpz84c015_device, rxcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("subcpu", tmpz84c015_device, txcb_w))
+
 	/* ICF5: 2kbytes of RAM shared between the two CPUs (dual-port RAM)*/
 	MCFG_DEVICE_ADD("mb8421", MB8421, 0)
 	MCFG_MB8421_INTL_HANDLER(WRITELINE(pve500_state, mb8421_intl))
@@ -411,7 +442,7 @@ MACHINE_CONFIG_START(pve500_state::pve500)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("buzzer", BEEP, 3750) // CLK2 coming out of IC D4 (frequency divider circuitry)
+	MCFG_SOUND_ADD("buzzer", BEEP, 12_MHz_XTAL / 3200) // 3.75 kHz CLK2 coming out of IC D4 (frequency divider circuitry)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 MACHINE_CONFIG_END
