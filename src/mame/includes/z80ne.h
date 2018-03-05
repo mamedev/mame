@@ -73,7 +73,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_vdg(*this, "mc6847"),
 		m_videoram(*this, "videoram"),
-		m_ay31015(*this, "ay_3_1015"),
+		m_uart(*this, "uart"),
 		m_lx388_kr2376(*this, "lx388_kr2376"),
 		m_maincpu(*this, "z80ne"),
 		m_floppy0(*this, "wd1771:0"),
@@ -109,7 +109,7 @@ public:
 
 	optional_device<mc6847_base_device> m_vdg;
 	optional_shared_ptr<uint8_t> m_videoram;
-	required_device<ay31015_device> m_ay31015;
+	required_device<ay31015_device> m_uart;
 	optional_device<kr2376_device> m_lx388_kr2376;
 	uint8_t m_lx383_scan_counter;
 	uint8_t m_lx383_key[LX383_KEYS];
@@ -121,9 +121,7 @@ public:
 	wd17xx_state_t m_wd17xx_state;
 	DECLARE_READ8_MEMBER(lx383_r);
 	DECLARE_WRITE8_MEMBER(lx383_w);
-	DECLARE_READ8_MEMBER(lx385_data_r);
 	DECLARE_READ8_MEMBER(lx385_ctrl_r);
-	DECLARE_WRITE8_MEMBER(lx385_data_w);
 	DECLARE_WRITE8_MEMBER(lx385_ctrl_w);
 	DECLARE_READ8_MEMBER(lx388_data_r);
 	DECLARE_READ8_MEMBER(lx388_read_field_sync);
