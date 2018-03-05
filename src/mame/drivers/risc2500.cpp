@@ -27,14 +27,22 @@ class risc2500_state : public driver_device
 {
 public:
 	risc2500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, "ram"),
-			m_nvram(*this, "nvram"),
-			m_dac(*this, "dac"),
-			m_inputs(*this, "P%u", 0)
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, "ram")
+		, m_nvram(*this, "nvram")
+		, m_dac(*this, "dac")
+		, m_inputs(*this, "P%u", 0)
+		, m_digits(*this, "digit%u", 0U)
+		, m_syms(*this, "sym%u", 0U)
+		, m_leds(*this, "led%u", 0U)
+	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(on_button);
+
+	void risc2500(machine_config &config);
+
+protected:
 	DECLARE_READ32_MEMBER(p1000_r);
 	DECLARE_WRITE32_MEMBER(p1000_w);
 	DECLARE_READ32_MEMBER(disable_boot_rom);
@@ -43,18 +51,20 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(on_button);
 	void install_boot_rom();
 	void remove_boot_rom();
 
-	void risc2500(machine_config &config);
 	void risc2500_mem(address_map &map);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
 	required_device<dac_byte_interface> m_dac;
 	required_ioport_array<8> m_inputs;
+	output_finder<12> m_digits;
+	output_finder<14> m_syms;
+	output_finder<16> m_leds;
 
 	uint32_t  m_p1000;
 	uint16_t  m_vram_addr;
@@ -90,12 +100,12 @@ uint32_t risc2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		uint16_t data = ((m_vram[data_addr + 1] & 0x3) << 5) | ((m_vram[data_addr + 2] & 0x7) << 2) | (m_vram[data_addr + 4] & 0x3);
 		data = bitswap<8>(data, 7,3,0,1,4,6,5,2) | ((m_vram[data_addr - 1] & 0x04) ? 0x80 : 0);
 
-		output().set_digit_value(c, data);
-		output().set_indexed_value("sym", c, BIT(m_vram[data_addr + 1], 2));
+		m_digits[c] = data;
+		m_syms[c] = BIT(m_vram[data_addr + 1], 2);
 	}
 
-	output().set_indexed_value("sym", 12, BIT(m_vram[0x63], 0));
-	output().set_indexed_value("sym", 13, BIT(m_vram[0x4a], 0));
+	m_syms[12] = BIT(m_vram[0x63], 0);
+	m_syms[13] = BIT(m_vram[0x4a], 0);
 
 	return 0;
 }
@@ -241,12 +251,12 @@ WRITE32_MEMBER(risc2500_state::p1000_w)
 	else if (data & 0x80000000)                     // Vertical LED
 	{
 		for(int i=0; i<8; i++)
-			output().set_led_value(i, BIT(data, i));
+			m_leds[i] = BIT(data, i);
 	}
 	else if (data & 0x40000000)                     // Horizontal LED
 	{
 		for(int i=0; i<8; i++)
-			output().set_led_value(8 + i, BIT(data, i));
+			m_leds[8 + i] = BIT(data, i);
 	}
 	else if ((data & 0xff000000) == 0x08000000)     // Power OFF
 	{
@@ -271,6 +281,10 @@ TIMER_CALLBACK_MEMBER(risc2500_state::disable_boot_rom)
 
 void risc2500_state::machine_start()
 {
+	m_digits.resolve();
+	m_syms.resolve();
+	m_leds.resolve();
+
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 
 	save_item(NAME(m_p1000));
