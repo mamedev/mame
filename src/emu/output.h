@@ -162,9 +162,6 @@ public:
 	// set the value for a given output
 	void set_value(const char *outname, s32 value);
 
-	// set an indexed value for an output (concatenates basename + index)
-	void set_indexed_value(const char *basename, int index, int value);
-
 	// return the current value for a given output
 	s32 get_value(const char *outname);
 
@@ -189,6 +186,9 @@ public:
 	void resume();
 
 private:
+	// set an indexed value for an output (concatenates basename + index)
+	void set_indexed_value(const char *basename, int index, int value);
+
 	output_item *find_item(const char *string);
 	output_item &create_new_item(const char *outname, s32 value);
 
