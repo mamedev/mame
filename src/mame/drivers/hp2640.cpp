@@ -144,10 +144,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cy_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_cursor_blink_inh);
 
-	DECLARE_READ8_MEMBER(async_data_r);
 	DECLARE_READ8_MEMBER(async_status_r);
 	DECLARE_WRITE8_MEMBER(async_control_w);
-	DECLARE_WRITE8_MEMBER(async_data_w);
 	DECLARE_WRITE_LINE_MEMBER(async_dav_w);
 	DECLARE_WRITE_LINE_MEMBER(async_txd_w);
 
@@ -168,7 +166,7 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<timer_device> m_timer_cursor_blink_inh;
 	required_device<rs232_port_device> m_rs232;
-	required_device<ay31015_device> m_uart;
+	required_device<ay51013_device> m_uart;
 	required_device<beep_device> m_beep;
 	required_device<timer_device> m_timer_beep;
 
@@ -238,7 +236,7 @@ hp2645_state::hp2645_state(const machine_config &mconfig, device_type type, cons
 
 void hp2645_state::machine_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 
 	// TODO: save more state
 	save_item(NAME(m_mode_byte));
@@ -436,16 +434,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::timer_cursor_blink_inh)
 	m_cursor_blink_inh = false;
 }
 
-READ8_MEMBER(hp2645_state::async_data_r)
-{
-	uint8_t res = m_uart->get_received_data();
-	m_uart->write_rdav(0);
-	LOG("ASYNC RX=%02x\n" , res);
-	// Update datacomm IRQ
-	update_async_irq();
-	return res;
-}
-
 READ8_MEMBER(hp2645_state::async_status_r)
 {
 	uint8_t res = 0;
@@ -477,12 +465,6 @@ READ8_MEMBER(hp2645_state::async_status_r)
 WRITE8_MEMBER(hp2645_state::async_control_w)
 {
 	update_async_control(data);
-}
-
-WRITE8_MEMBER(hp2645_state::async_data_w)
-{
-	LOG("ASYNC TX=%02x\n" , data);
-	m_uart->set_transmit_data(data);
 }
 
 WRITE_LINE_MEMBER(hp2645_state::async_dav_w)
@@ -956,10 +938,10 @@ INPUT_PORTS_END
 ADDRESS_MAP_START(hp2645_state::cpu_mem_map)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000 , 0x57ff) AM_ROM
-	AM_RANGE(0x8100 , 0x8100) AM_READ(async_data_r)
+	AM_RANGE(0x8100 , 0x8100) AM_DEVREAD("uart", ay51013_device, receive)
 	AM_RANGE(0x8120 , 0x8120) AM_READ(async_status_r)
 	AM_RANGE(0x8140 , 0x8140) AM_WRITE(async_control_w)
-	AM_RANGE(0x8160 , 0x8160) AM_WRITE(async_data_w)
+	AM_RANGE(0x8160 , 0x8160) AM_DEVWRITE("uart", ay51013_device, transmit)
 	AM_RANGE(0x8300 , 0x8300) AM_WRITE(kb_led_w)
 	AM_RANGE(0x8300 , 0x830d) AM_READ(kb_r)
 	AM_RANGE(0x830e , 0x830e) AM_READ(switches_ah_r)
@@ -1002,11 +984,12 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	// RS232
 	MCFG_RS232_PORT_ADD("rs232" , default_rs232_devices , nullptr)
 
-	// UART
-	MCFG_DEVICE_ADD("uart", AY31015, 0)
-	MCFG_AY31015_READ_SI_CB(DEVREADLINE("rs232" , rs232_port_device , rxd_r))
-	MCFG_AY31015_WRITE_SO_CB(WRITELINE(hp2645_state , async_txd_w))
-	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(hp2645_state , async_dav_w))
+	// UART (TR1602B)
+	MCFG_DEVICE_ADD("uart", AY51013, 0)
+	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232" , rs232_port_device , rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE(hp2645_state , async_txd_w))
+	MCFG_AY51013_WRITE_DAV_CB(WRITELINE(hp2645_state , async_dav_w))
+	MCFG_AY51013_AUTO_RDAV(true)
 
 	// Beep
 	MCFG_SPEAKER_STANDARD_MONO("mono")
