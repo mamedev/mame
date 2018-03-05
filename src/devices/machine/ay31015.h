@@ -74,9 +74,6 @@ public:
 	DECLARE_READ8_MEMBER(receive);
 	DECLARE_WRITE8_MEMBER(transmit);
 
-	void rx_process();
-	void tx_process();
-
 protected:
 	enum input_pin
 	{
@@ -126,6 +123,8 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	void rx_process();
+	void tx_process();
 	virtual void internal_reset();
 
 	// internal state

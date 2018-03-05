@@ -138,7 +138,7 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(z80ne_state::z80ne_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xee, 0xee) AM_READWRITE(lx385_data_r, lx385_data_w )
+	AM_RANGE(0xee, 0xee) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(lx385_ctrl_r, lx385_ctrl_w )
 	AM_RANGE(0xf0, 0xff) AM_READWRITE(lx383_r, lx383_w )
 ADDRESS_MAP_END
@@ -147,7 +147,7 @@ ADDRESS_MAP_START(z80ne_state::z80net_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xea, 0xea) AM_READ(lx388_data_r )
 	AM_RANGE(0xeb, 0xeb) AM_READ(lx388_read_field_sync )
-	AM_RANGE(0xee, 0xee) AM_READWRITE(lx385_data_r, lx385_data_w )
+	AM_RANGE(0xee, 0xee) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(lx385_ctrl_r, lx385_ctrl_w )
 	AM_RANGE(0xf0, 0xff) AM_READWRITE(lx383_r, lx383_w )
 ADDRESS_MAP_END
@@ -170,7 +170,7 @@ ADDRESS_MAP_START(z80ne_state::z80netf_io)
 	AM_RANGE(0xd0, 0xd7) AM_READWRITE(lx390_fdc_r, lx390_fdc_w)
 	AM_RANGE(0xea, 0xea) AM_READ(lx388_data_r )
 	AM_RANGE(0xeb, 0xeb) AM_READ(lx388_read_field_sync )
-	AM_RANGE(0xee, 0xee) AM_READWRITE(lx385_data_r, lx385_data_w )
+	AM_RANGE(0xee, 0xee) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(lx385_ctrl_r, lx385_ctrl_w )
 	AM_RANGE(0xf0, 0xff) AM_READWRITE(lx383_r, lx383_w )
 ADDRESS_MAP_END
@@ -419,7 +419,7 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80ne)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80ne)
 
-	MCFG_DEVICE_ADD( "ay_3_1015", AY31015, 0 )
+	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(4800.0)
 	MCFG_AY31015_RX_CLOCK(4800.0)
 
@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80netb)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80netb)
 
-	MCFG_DEVICE_ADD( "ay_3_1015", AY31015, 0 )
+	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(4800.0)
 	MCFG_AY31015_RX_CLOCK(4800.0)
 
@@ -521,7 +521,7 @@ MACHINE_CONFIG_START(z80ne_state::z80netf)
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80netf)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80netf)
 
-	MCFG_DEVICE_ADD( "ay_3_1015", AY31015, 0 )
+	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(4800.0)
 	MCFG_AY31015_RX_CLOCK(4800.0)
 

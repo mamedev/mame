@@ -3,6 +3,9 @@
 #ifndef MAME_MACHINE_ESQVFD_H
 #define MAME_MACHINE_ESQVFD_H
 
+#include <memory>
+#include <tuple>
+
 
 #define MCFG_ESQ1X22_ADD(_tag)  \
 	MCFG_DEVICE_ADD(_tag, ESQ1X22, 60)
@@ -30,10 +33,30 @@ public:
 	virtual void update_display();
 	virtual bool write_contents(std::ostream &o) { return false; }
 
-	uint32_t conv_segments(uint16_t segin);
+	// why isn't the font just stored in this order?
+	static uint32_t conv_segments(uint16_t segin) { return bitswap<15>(segin, 12, 11, 7, 6, 4, 10, 3, 14, 15, 0, 13, 9, 5, 1, 2); }
 
 protected:
-	esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rows, int cols);
+	class output_helper {
+	public:
+		typedef std::unique_ptr<output_helper> ptr;
+		virtual ~output_helper() { }
+		virtual void resolve() = 0;
+		virtual int32_t set(unsigned n, int32_t value) = 0;
+	};
+
+	template <unsigned N> class output_helper_impl : public output_helper, protected output_finder<N> {
+	public:
+		output_helper_impl(device_t &device) : output_finder<N>(device, "vfd%u", 0U) { }
+		virtual void resolve() override { output_finder<N>::resolve(); }
+		virtual int32_t set(unsigned n, int32_t value) override { return this->operator[](n) = value; }
+	};
+
+	typedef std::tuple<output_helper::ptr, int, int> dimensions_param;
+
+	template <int R, int C> static dimensions_param make_dimensions(device_t &device) { return dimensions_param(std::make_unique<output_helper_impl<R * C> >(device), R, C); }
+
+	esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dimensions_param &&dimensions);
 
 	static constexpr uint8_t AT_NORMAL      = 0x00;
 	static constexpr uint8_t AT_BOLD        = 0x01;
@@ -45,6 +68,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	output_helper::ptr m_vfds;
 	int m_cursx, m_cursy;
 	int m_savedx, m_savedy;
 	int const m_rows, m_cols;

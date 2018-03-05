@@ -152,15 +152,11 @@ public:
 	DECLARE_WRITE16_MEMBER(LoadDispAddr_w);
 
 	// uarts
-	DECLARE_READ16_MEMBER(ReadKeyData_r);
 	DECLARE_READ16_MEMBER(ReadOPStatus_r);
-	DECLARE_WRITE16_MEMBER(LoadKeyData_w);
 	DECLARE_WRITE16_MEMBER(LoadKeyCtlReg_w);
 	DECLARE_WRITE16_MEMBER(KeyDataReset_w);
 	DECLARE_WRITE16_MEMBER(KeyChipReset_w);
-	DECLARE_READ16_MEMBER(ReadEIAData_r);
 	DECLARE_READ16_MEMBER(ReadEIAStatus_r);
-	DECLARE_WRITE16_MEMBER(LoadEIAData_w);
 	DECLARE_WRITE16_MEMBER(LoadEIACtlReg_w);
 	DECLARE_WRITE16_MEMBER(EIADataReset_w);
 	DECLARE_WRITE16_MEMBER(EIAChipReset_w);
@@ -308,11 +304,6 @@ WRITE16_MEMBER(notetaker_state::IPConReg_w)
 
 /* handlers for the two system hd6402s (ay-5-1013 equivalent) */
 /* * Keyboard hd6402 */
-READ16_MEMBER( notetaker_state::ReadKeyData_r )
-{
-	return 0xFF00|m_kbduart->get_received_data();
-}
-
 READ16_MEMBER( notetaker_state::ReadOPStatus_r ) // 74ls368 hex inverter at #l7 provides 4 bits, inverted
 {
 	uint16_t data = 0xFFF0;
@@ -325,11 +316,6 @@ READ16_MEMBER( notetaker_state::ReadOPStatus_r ) // 74ls368 hex inverter at #l7 
 	logerror("ReadOPStatus read, returning %04x\n", data);
 #endif
 	return data;
-}
-
-WRITE16_MEMBER( notetaker_state::LoadKeyData_w )
-{
-	m_kbduart->set_transmit_data(data&0xFF);
 }
 
 WRITE16_MEMBER( notetaker_state::LoadKeyCtlReg_w )
@@ -448,11 +434,6 @@ WRITE16_MEMBER( notetaker_state::LoadDispAddr_w )
 }
 
 /* EIA hd6402 */
-READ16_MEMBER( notetaker_state::ReadEIAData_r )
-{
-	return 0xFF00|m_eiauart->get_received_data();
-}
-
 READ16_MEMBER( notetaker_state::ReadEIAStatus_r ) // 74ls368 hex inverter at #f1 provides 2 bits, inverted
 {
 	uint16_t data = 0xFFFC;
@@ -460,11 +441,6 @@ READ16_MEMBER( notetaker_state::ReadEIAStatus_r ) // 74ls368 hex inverter at #f1
 	data |= m_eiauart->dav_r( ) ? 0 : 0x02; // DR - pin 19
 	data |= m_eiauart->tbmt_r() ? 0 : 0x01; // TBRE - pin 22
 	return data;
-}
-
-WRITE16_MEMBER( notetaker_state::LoadEIAData_w )
-{
-	m_eiauart->set_transmit_data(data&0xFF);
 }
 
 WRITE16_MEMBER( notetaker_state::LoadEIACtlReg_w )
@@ -601,10 +577,10 @@ ADDRESS_MAP_START(notetaker_state::notetaker_iocpu_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7E1C) AM_DEVREADWRITE8("iopic8259", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x20, 0x21) AM_MIRROR(0x7E1E) AM_WRITE(IPConReg_w) // I/O processor (rom mapping, etc) control register
-	AM_RANGE(0x42, 0x43) AM_MIRROR(0x7E10) AM_READ(ReadKeyData_r) // read keyboard data
+	AM_RANGE(0x42, 0x43) AM_MIRROR(0x7E10) AM_DEVREAD8("kbduart", ay31015_device, receive, 0x00ff) // read keyboard data
 	AM_RANGE(0x44, 0x45) AM_MIRROR(0x7E10) AM_READ(ReadOPStatus_r) // read keyboard fifo state
 	AM_RANGE(0x48, 0x49) AM_MIRROR(0x7E10) AM_WRITE(LoadKeyCtlReg_w) // kbd uart control register
-	AM_RANGE(0x4a, 0x4b) AM_MIRROR(0x7E10) AM_WRITE(LoadKeyData_w) // kbd uart data register
+	AM_RANGE(0x4a, 0x4b) AM_MIRROR(0x7E10) AM_DEVWRITE8("kbduart", ay31015_device, transmit, 0x00ff) // kbd uart data register
 	AM_RANGE(0x4c, 0x4d) AM_MIRROR(0x7E10) AM_WRITE(KeyDataReset_w) // kbd uart ddr switch (data reset)
 	AM_RANGE(0x4e, 0x4f) AM_MIRROR(0x7E10) AM_WRITE(KeyChipReset_w) // kbd uart reset
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0x7E1E) AM_WRITE(FIFOReg_w) // DAC sample and hold and frequency setup
@@ -615,9 +591,9 @@ ADDRESS_MAP_START(notetaker_state::notetaker_iocpu_io)
 	AM_RANGE(0x140, 0x15f) AM_MIRROR(0x7E00) AM_DEVREADWRITE8("crt5027", crt5027_device, read, write, 0x00FF) // crt controller
 	AM_RANGE(0x160, 0x161) AM_MIRROR(0x7E1E) AM_WRITE(LoadDispAddr_w) // loads the start address for the display framebuffer
 	AM_RANGE(0x1a0, 0x1a1) AM_MIRROR(0x7E10) AM_READ(ReadEIAStatus_r) // read eia fifo state
-	AM_RANGE(0x1a2, 0x1a3) AM_MIRROR(0x7E10) AM_READ(ReadEIAData_r) // read eia data
+	AM_RANGE(0x1a2, 0x1a3) AM_MIRROR(0x7E10) AM_DEVREAD8("eiauart", ay31015_device, receive, 0x00ff) // read eia data
 	AM_RANGE(0x1a8, 0x1a9) AM_MIRROR(0x7E10) AM_WRITE(LoadEIACtlReg_w) // eia uart control register
-	AM_RANGE(0x1aa, 0x1ab) AM_MIRROR(0x7E10) AM_WRITE(LoadEIAData_w) // eia uart data register
+	AM_RANGE(0x1aa, 0x1ab) AM_MIRROR(0x7E10) AM_DEVWRITE8("eiauart", ay31015_device, transmit, 0x00ff) // eia uart data register
 	AM_RANGE(0x1ac, 0x1ad) AM_MIRROR(0x7E10) AM_WRITE(EIADataReset_w) // eia uart ddr switch (data reset)
 	AM_RANGE(0x1ae, 0x1af) AM_MIRROR(0x7E10) AM_WRITE(EIAChipReset_w) // eia uart reset
 	//AM_RANGE(0x1c0, 0x1c1) AM_MIRROR(0x7E1E) AM_READ(SelADCHi_r) // ADC read

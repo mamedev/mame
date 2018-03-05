@@ -65,6 +65,7 @@ public:
 		, m_dma8257(*this, "dma8257")
 		, m_i8251(*this, "i8251")
 		, m_rs232(*this, "rs232")
+		, m_kbd_uart(*this, "589wa1")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
@@ -104,6 +105,7 @@ private:
 	required_device<i8257_device> m_dma8257;
 	required_device<i8251_device> m_i8251;
 	required_device<rs232_port_device> m_rs232;
+	required_device<ay31015_device> m_kbd_uart;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_p_chargen;
@@ -122,6 +124,7 @@ ADDRESS_MAP_START(ms6102_state::ms6102_io)
 	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
 	AM_RANGE (0x10, 0x18) AM_DEVREADWRITE("dma8257", i8257_device, read, write)
 	AM_RANGE (0x20, 0x23) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+	//AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE("589wa1", ay31015_device, receive, transmit)
 	AM_RANGE (0x30, 0x3f) AM_READ(kbd_get)
 	AM_RANGE (0x40, 0x41) AM_DEVREADWRITE("i8275", i8275_device, read, write)
 	AM_RANGE (0x50, 0x5f) AM_NOP // video disable?
@@ -176,6 +179,7 @@ I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_pixels)
 
 READ8_MEMBER(ms6102_state::misc_r)
 {
+	//return m_kbd_uart->tbmt_r() << 6;
 	return m_kbd_ready << 6;
 }
 
@@ -207,6 +211,14 @@ IRQ_CALLBACK_MEMBER(ms6102_state::ms6102_int_ack)
 void ms6102_state::machine_reset()
 {
 	m_kbd_ready = false;
+
+	m_kbd_uart->write_eps(1);
+	m_kbd_uart->write_nb1(1);
+	m_kbd_uart->write_nb2(1);
+	m_kbd_uart->write_tsb(0);
+	m_kbd_uart->write_np(1);
+	m_kbd_uart->write_cs(1);
+	m_kbd_uart->write_swe(0);
 }
 
 void ms6102_state::machine_start()
@@ -284,6 +296,9 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 
 	// keyboard
 	MCFG_DEVICE_ADD("589wa1", AY31015, 0)
+	MCFG_AY31015_RX_CLOCK(XTAL(16'400'000) / 9 / 16)
+	MCFG_AY31015_TX_CLOCK(XTAL(16'400'000) / 9 / 16)
+	MCFG_AY31015_AUTO_RDAV(true)
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(ms6102_state, kbd_put))
