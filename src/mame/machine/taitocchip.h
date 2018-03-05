@@ -54,11 +54,18 @@ public:
 	// can be accessed externally
 	DECLARE_READ8_MEMBER(asic_r);
 	DECLARE_WRITE8_MEMBER(asic_w);
+	DECLARE_WRITE8_MEMBER(asic68_w);
+
 	DECLARE_READ8_MEMBER(mem_r);
 	DECLARE_WRITE8_MEMBER(mem_w);
 
+	DECLARE_READ8_MEMBER(mem68_r);
+	DECLARE_WRITE8_MEMBER(mem68_w);
+
+
 	void cchip_map(address_map &map);
 	void cchip_ram_bank(address_map &map);
+	void cchip_ram_bank68(address_map &map);
 
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
@@ -91,6 +98,7 @@ private:
 
 	required_device<cpu_device> m_upd7811;
 	required_device<address_map_bank_device> m_upd4464_bank;
+	required_device<address_map_bank_device> m_upd4464_bank68;
 	required_shared_ptr<uint8_t> m_upd4464;
 
 	devcb_read8        m_in_pa_cb;

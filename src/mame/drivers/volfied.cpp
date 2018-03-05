@@ -78,8 +78,8 @@ ADDRESS_MAP_START(volfied_state::main_map)
 	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(video_ctrl_r, video_ctrl_w)
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
 	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0xf00000, 0xf007ff) AM_DEVREADWRITE8("cchip", taito_cchip_device, mem_r, mem_w, 0x00ff)
-	AM_RANGE(0xf00800, 0xf00fff) AM_DEVREADWRITE8("cchip", taito_cchip_device, asic_r, asic_w, 0x00ff)
+	AM_RANGE(0xf00000, 0xf007ff) AM_DEVREADWRITE8("cchip", taito_cchip_device, mem68_r, mem68_w, 0x00ff)
+	AM_RANGE(0xf00800, 0xf00fff) AM_DEVREADWRITE8("cchip", taito_cchip_device, asic_r, asic68_w, 0x00ff)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(volfied_state::z80_map)

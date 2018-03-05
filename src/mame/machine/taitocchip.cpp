@@ -105,6 +105,7 @@ taito_cchip_device::taito_cchip_device(const machine_config &mconfig, const char
 	: device_t(mconfig, TAITO_CCHIP, tag, owner, clock),
 	m_upd7811(*this, "upd7811"),
 	m_upd4464_bank(*this, "upd4464_bank"),
+	m_upd4464_bank68(*this, "upd4464_bank68"),
 	m_upd4464(*this, "upd4464"),
 	m_in_pa_cb(*this),
 	m_in_pb_cb(*this),
@@ -132,13 +133,17 @@ ADDRESS_MAP_START(taito_cchip_device::cchip_ram_bank)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("upd4464") // upd4464
 ADDRESS_MAP_END
 
+ADDRESS_MAP_START(taito_cchip_device::cchip_ram_bank68)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("upd4464")
+ADDRESS_MAP_END
+
 READ8_MEMBER(taito_cchip_device::asic_r)
 {
 	if ((offset != 0x001) && (!machine().side_effects_disabled())) // prevent logerror spam for now
 		logerror("%s: asic_r %04x\n", machine().describe_context(), offset);
 	if (offset<0x200) // 400-5ff is asic 'ram'
 		return m_asic_ram[offset&3];
-	return 0x00; // 600-7ff is read-only(?) asic banking reg, may read as open bus or never assert /DTACK on read?
+	return 0x00; // 600-7ff is write-only(?) asic banking reg, may read as open bus or never assert /DTACK on read?
 }
 
 WRITE8_MEMBER(taito_cchip_device::asic_w)
@@ -148,6 +153,18 @@ WRITE8_MEMBER(taito_cchip_device::asic_w)
 	{
 		logerror("cchip set bank to %02x\n", data & 0x7);
 		m_upd4464_bank->set_bank(data & 0x7);
+	}
+	else
+		m_asic_ram[offset&3] = data;
+}
+
+WRITE8_MEMBER(taito_cchip_device::asic68_w)
+{
+	logerror("%s: asic68_w %04x %02x\n", machine().describe_context(), offset, data);
+	if (offset == 0x200)
+	{
+		logerror("cchip (68k side) set bank to %02x\n", data & 0x7);
+		m_upd4464_bank68->set_bank(data & 0x7);
 	}
 	else
 		m_asic_ram[offset&3] = data;
@@ -163,6 +180,18 @@ WRITE8_MEMBER(taito_cchip_device::mem_w)
 {
 	offset &= 0x3ff;
 	return m_upd4464_bank->write8(space,offset,data);
+}
+
+READ8_MEMBER(taito_cchip_device::mem68_r)
+{
+	offset &= 0x3ff;
+	return m_upd4464_bank68->read8(space,offset);
+}
+
+WRITE8_MEMBER(taito_cchip_device::mem68_w)
+{
+	offset &= 0x3ff;
+	return m_upd4464_bank68->write8(space,offset,data);
 }
 
 ADDRESS_MAP_START(taito_cchip_device::cchip_map)
@@ -280,12 +309,22 @@ MACHINE_CONFIG_START(taito_cchip_device::device_add_mconfig)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
+
+	// the 68k has a different view into the banked memory?
+	MCFG_DEVICE_ADD("upd4464_bank68", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(cchip_ram_bank68)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 MACHINE_CONFIG_END
 
 
 void taito_cchip_device::device_start()
 {
 	m_upd4464_bank->set_bank(0);
+	m_upd4464_bank68->set_bank(0);
+
 	save_item(NAME(m_asic_ram));
 	m_asic_ram[0] = m_asic_ram[1] = m_asic_ram[2] = m_asic_ram[3] = 0;
 
