@@ -230,7 +230,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(volfied_state::scanline)
 	{
 		m_maincpu->set_input_line(4, HOLD_LINE);
 	}
-	else if (param == 255)
+	else if (param == 40)
 	{
 		/* it isn't clear when / how this should be generated.  if it's too close to the main vblank you get spurious inputs, including TILT and additional coins when ingame
 		   so for now we generate it at a fixed interval after vbl.  test mode doesn't use 68k interrupts so you get the odd bad frame in the input test as the idle loop
