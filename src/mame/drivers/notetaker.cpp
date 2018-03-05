@@ -577,10 +577,10 @@ ADDRESS_MAP_START(notetaker_state::notetaker_iocpu_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7E1C) AM_DEVREADWRITE8("iopic8259", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x20, 0x21) AM_MIRROR(0x7E1E) AM_WRITE(IPConReg_w) // I/O processor (rom mapping, etc) control register
-	AM_RANGE(0x42, 0x43) AM_MIRROR(0x7E10) AM_DEVREAD8("kbuart", ay31015_device, receive, 0x00ff) // read keyboard data
+	AM_RANGE(0x42, 0x43) AM_MIRROR(0x7E10) AM_DEVREAD8("kbduart", ay31015_device, receive, 0x00ff) // read keyboard data
 	AM_RANGE(0x44, 0x45) AM_MIRROR(0x7E10) AM_READ(ReadOPStatus_r) // read keyboard fifo state
 	AM_RANGE(0x48, 0x49) AM_MIRROR(0x7E10) AM_WRITE(LoadKeyCtlReg_w) // kbd uart control register
-	AM_RANGE(0x4a, 0x4b) AM_MIRROR(0x7E10) AM_DEVWRITE8("kbuart", ay31015_device, transmit, 0x00ff) // kbd uart data register
+	AM_RANGE(0x4a, 0x4b) AM_MIRROR(0x7E10) AM_DEVWRITE8("kbduart", ay31015_device, transmit, 0x00ff) // kbd uart data register
 	AM_RANGE(0x4c, 0x4d) AM_MIRROR(0x7E10) AM_WRITE(KeyDataReset_w) // kbd uart ddr switch (data reset)
 	AM_RANGE(0x4e, 0x4f) AM_MIRROR(0x7E10) AM_WRITE(KeyChipReset_w) // kbd uart reset
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0x7E1E) AM_WRITE(FIFOReg_w) // DAC sample and hold and frequency setup
