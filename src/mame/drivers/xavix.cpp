@@ -1844,6 +1844,11 @@ ROM_START( taitons1 )
 	ROM_LOAD( "taitonostalgia1.u3", 0x000000, 0x200000, CRC(25bd8c67) SHA1(a109cd2da6aa4596e3ca3abd1afce2d0001a473f) )
 ROM_END
 
+ROM_START( taitons2 )
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "taitonostalgia2.bin", 0x000000, 0x200000, CRC(d7dbd93d) SHA1(ad96f80d317e7fd64682a1fe406c5ee9dd5eabf9) )
+ROM_END
+
 ROM_START( namcons2 )
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "nostalgia.bin", 0x000000, 0x100000, CRC(03f7f755) SHA1(bdf1b10ab0104ed580951b0c428c4e93e7373afe) )
@@ -1918,6 +1923,8 @@ ROM_END
 /* Standalone TV Games */
 
 CONS( 2006, taitons1,  0,          0,  xavix,  xavix,    xavix_state, taitons1, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
+
+CONS( 2006, taitons2,  0,          0,  xavix,  namcons2, xavix_state, xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 2", MACHINE_IS_SKELETON )
 
 CONS( 2006, namcons2,  0,          0,  xavix,  namcons2, xavix_state, taitons1, "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 2", MACHINE_IS_SKELETON )
 
