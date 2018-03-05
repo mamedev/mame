@@ -126,6 +126,9 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_vector1_lo_w);
 	DECLARE_WRITE8_MEMBER(irq_vector1_hi_w);
 
+	DECLARE_READ8_MEMBER(irq_source_r);
+	DECLARE_WRITE8_MEMBER(irq_source_w);
+
 	DECLARE_READ8_MEMBER(xavix_6ff0_r);
 	DECLARE_WRITE8_MEMBER(xavix_6ff0_w);
 
@@ -822,21 +825,28 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 WRITE8_MEMBER(xavix_state::dma_trigger_w)
 {
-	logerror("%s: dma_trigger_w %02x\n", machine().describe_context(), data);
-
-	uint32_t source = (m_rom_dmasrc_hi_data << 16) | (m_rom_dmasrc_md_data<<8) | m_rom_dmasrc_lo_data;
-	uint16_t dest = (m_rom_dmadst_hi_data<<8) | m_rom_dmadst_lo_data;
-	uint16_t len = (m_rom_dmalen_hi_data<<8) | m_rom_dmalen_lo_data;
-
-	source &= m_rgnlen-1;
-	logerror("  (possible DMA op SRC %08x DST %04x LEN %04x)\n", source, dest, len);
-
-	address_space& destspace = m_maincpu->space(AS_PROGRAM);
-
-	for (int i = 0; i < len; i++)
+	if (data == 0x01)
 	{
-		uint8_t dat = m_rgn[(source + i) & (m_rgnlen-1)];
-		destspace.write_byte(dest + i, dat);
+		logerror("%s: dma_trigger_w (do DMA?)\n", machine().describe_context());
+
+		uint32_t source = (m_rom_dmasrc_hi_data << 16) | (m_rom_dmasrc_md_data << 8) | m_rom_dmasrc_lo_data;
+		uint16_t dest = (m_rom_dmadst_hi_data << 8) | m_rom_dmadst_lo_data;
+		uint16_t len = (m_rom_dmalen_hi_data << 8) | m_rom_dmalen_lo_data;
+
+		source &= m_rgnlen - 1;
+		logerror("  (possible DMA op SRC %08x DST %04x LEN %04x)\n", source, dest, len);
+
+		address_space& destspace = m_maincpu->space(AS_PROGRAM);
+
+		for (int i = 0; i < len; i++)
+		{
+			uint8_t dat = m_rgn[(source + i) & (m_rgnlen - 1)];
+			destspace.write_byte(dest + i, dat);
+		}
+	}
+	else // the interrupt routine writes 0x80 to the trigger, maybe 'clear IRQ?'
+	{
+		logerror("%s: dma_trigger_w (unknown) %02x\n", machine().describe_context(), data);
 	}
 }
 
@@ -1351,6 +1361,29 @@ READ8_MEMBER(xavix_state::xavix_4000_r)
 	}
 }
 
+READ8_MEMBER(xavix_state::irq_source_r)
+{
+	/* the 2nd IRQ routine (regular IRQ, not NMI?) reads here before deciding what to do
+
+	 the following bits have been seen to be checked (active low?)
+
+	  0x40 - Monster Truck - stuff with 6ffb 6fd6 and 6ff8
+	  0x20 - most games (but not Monster Truck) - DMA related?
+	  0x10 - card night + monster truck - 7c00 related? (increases 16-bit counter in ram stores 0xc1 at 7c00)
+	  0x08 - several games - Input related (ADC? - used for analog control on Monster Truck) (uses 7a80 top bit to determine direction, and 7a81 0x08 as an output, presumably to clock)
+	  0x04 - Monster Truck - loads/stores 7b81
+	*/
+	logerror("%s: irq_source_r\n", machine().describe_context());
+	return 0xff;
+}
+
+WRITE8_MEMBER(xavix_state::irq_source_w)
+{
+	logerror("%s: irq_source_w %02x\n", machine().describe_context(), data);
+	// cleared on startup in monster truck, no purpose?
+}
+
+
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
 
 ADDRESS_MAP_START(xavix_state::xavix_map)
@@ -1461,10 +1494,13 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x007ff5, 0x007ff6) AM_READ(mult_r)
 
 	// maybe irq enable, written after below
-	AM_RANGE(0x007ff9, 0x007ff9) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x007ff9, 0x007ff9) AM_WRITE(irq_enable_w) // interrupt related, but probalby not a simple 'enable' otherwise interrupts happen before we're ready for them.
 	// an IRQ vector (nmi?)
 	AM_RANGE(0x007ffa, 0x007ffa) AM_WRITE(irq_vector0_lo_w)
 	AM_RANGE(0x007ffb, 0x007ffb) AM_WRITE(irq_vector0_hi_w)
+
+	AM_RANGE(0x007ffc, 0x007ffc) AM_READWRITE(irq_source_r, irq_source_w)
+
 	// an IRQ vector (irq?)
 	AM_RANGE(0x007ffe, 0x007ffe) AM_WRITE(irq_vector1_lo_w)
 	AM_RANGE(0x007fff, 0x007fff) AM_WRITE(irq_vector1_hi_w)
