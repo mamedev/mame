@@ -164,7 +164,7 @@ static INPUT_PORTS_START( volfied )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL // why is this on bit 0x80 when read through the c-chip?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL // TODO: probably correct based on initial analysis, but why is this on bit 0x80 when read through the c-chip when it was 0x08 in the simulation and for P1, is it just a Taito workaround for reading through ADC?
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( volfiedu )
@@ -226,11 +226,11 @@ WRITE8_MEMBER(volfied_state::counters_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(volfied_state::scanline)
 {
-	if (param == 224)
+	if (param == 240)
 	{
 		m_maincpu->set_input_line(4, HOLD_LINE);
 	}
-	else if (param == 240)
+	else if (param == 255)
 	{
 		/* it isn't clear when / how this should be generated.  if it's too close to the main vblank you get spurious inputs, including TILT and additional coins when ingame
 		   so for now we generate it at a fixed interval after vbl.  test mode doesn't use 68k interrupts so you get the odd bad frame in the input test as the idle loop
