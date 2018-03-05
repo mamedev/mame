@@ -601,6 +601,7 @@ void sol20_state::machine_reset()
 	membank("boot")->set_entry(1);
 	timer_set(attotime::from_usec(9), TIMER_SOL20_BOOT);
 
+	m_rs232->write_dtr(0);
 	m_rs232->write_rts(1);
 }
 
