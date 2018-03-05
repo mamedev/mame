@@ -54,7 +54,7 @@ protected:
 
 	typedef std::tuple<output_helper::ptr, int, int> dimensions_param;
 
-	template <int R, int C> dimensions_param make_dimensions() { return dimensions_param(std::make_unique<output_helper_impl<R * C> >(*this), R, C); }
+	template <int R, int C> static dimensions_param make_dimensions(device_t &device) { return dimensions_param(std::make_unique<output_helper_impl<R * C> >(device), R, C); }
 
 	esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dimensions_param &&dimensions);
 
