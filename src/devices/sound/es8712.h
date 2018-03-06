@@ -40,7 +40,7 @@ public:
 
 	// configuration
 	void set_msm_tag(const char *tag) { m_msm.set_tag(tag); }
-	template <class Object> devcb_base &set_reset_handler(Object &&cb) { return m_reset_handler.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_reset_handler(Object &&cb) { return m_reset_handler.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_msm_write_callback(Object &&cb) { return m_msm_write_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER(write);
