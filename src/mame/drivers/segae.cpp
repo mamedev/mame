@@ -1010,9 +1010,6 @@ ROM_END
 //  Opa Opa (MC-8123, 317-0042), Sega System E
 //   Game ID# 833-6407-01 OPA OPA
 //
-// Known to exist: Opa Opa (unencrypted) 833-6407 - NOT dumped
-//   Program rom: EPR-11023A + EPR-11022 through EPR-11019
-//
 ROM_START( opaopa )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "epr-11054.ic7",  0x00000, 0x08000, CRC(024b1244) SHA1(59a522ac3d98982cc4ddb1c81f9584d3da453649) ) /* encrypted */
@@ -1025,6 +1022,21 @@ ROM_START( opaopa )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0042.key",  0x0000, 0x2000, CRC(d6312538) SHA1(494ac7f080775c21dc7d369e6ea78f3299e6975a) )
+ROM_END
+
+//*************************************************************************************************************************
+//  Opa Opa, Sega System E
+//   Game ID# 833-6407 OPA OPA
+//
+ROM_START( opaopan )
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "epr-11023a.ic7",  0x00000, 0x08000, CRC(101c5c6a) SHA1(5862c6b8d9e1fc8dc9cd26d87f36fde5ce9484ac) ) /* Fixed Code */
+
+	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
+	ROM_LOAD( "epr-11022.ic5",  0x10000, 0x08000, CRC(15203a42) SHA1(41cfb9a884ed313d4dc3a36696a63a87e49b3b34) )
+	ROM_LOAD( "epr-11021.ic4",  0x18000, 0x08000, CRC(b4e83340) SHA1(57955b2b1e5c55b50ed6b53f1b52787442fe716b) )
+	ROM_LOAD( "epr-11020.ic3",  0x20000, 0x08000, CRC(c51aad27) SHA1(b6828d7f7283d00964bde7c93f67f4b7f3b9dd87) )
+	ROM_LOAD( "epr-11019.ic2",  0x28000, 0x08000, CRC(bd0a6248) SHA1(6b313809dffdb50ee1dc4d83e0567811dc2f1a67) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -1107,5 +1119,6 @@ GAME( 1986, transfrm, 0,        systeme,           transfrm, systeme_state, 0,  
 GAME( 1986, astrofl,  transfrm, systemex_315_5177, transfrm, systeme_state, 0,        ROT0,   "Sega", "Astro Flash (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ridleofp, 0,        ridleofp,          ridleofp, systeme_state, 0,        ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opaopa,   0,        systemeb,          opaopa,   systeme_state, opaopa,   ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opaopan,  opaopa,   systeme,           opaopa,   systeme_state, 0,        ROT0,   "Sega", "Opa Opa (Rev A, unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, fantzn2,  0,        systemex,          fantzn2,  systeme_state, fantzn2,  ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tetrisse, 0,        systeme,           tetrisse, systeme_state, 0,        ROT0,   "Sega", "Tetris (Japan, System E)", MACHINE_SUPPORTS_SAVE )

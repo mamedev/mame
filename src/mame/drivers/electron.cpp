@@ -91,11 +91,10 @@ PALETTE_INIT_MEMBER(electron_state, electron)
 ADDRESS_MAP_START(electron_state::electron_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(electron_mem_r, electron_mem_w)           /* 32KB of RAM */
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(electron_paged_r, electron_paged_w)       /* Banked ROM pages */
-	AM_RANGE(0xc000, 0xfbff) AM_ROM AM_REGION("mos", 0x0000)                        /* OS ROM */
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("mos", 0) AM_WRITE(electron_mos_w)    /* OS ROM */
 	AM_RANGE(0xfc00, 0xfcff) AM_READWRITE(electron_fred_r, electron_fred_w )        /* FRED */
 	AM_RANGE(0xfd00, 0xfdff) AM_READWRITE(electron_jim_r, electron_jim_w )          /* JIM */
 	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(electron_sheila_r, electron_sheila_w )    /* SHEILA */
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("mos", 0x3f00)                        /* OS ROM continued */
 ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(electron_state::trigger_reset)
@@ -197,8 +196,18 @@ static INPUT_PORTS_START( electron )
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, electron_state, trigger_reset, 0)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( electron64 )
+	PORT_INCLUDE(electron)
+
+	PORT_START("MRB")
+	PORT_CONFNAME(0x03, 0x01, "MRB Mode")
+	PORT_CONFSETTING(0x00, "Normal")
+	PORT_CONFSETTING(0x01, "Turbo")
+	PORT_CONFSETTING(0x02, "Shadow")
+INPUT_PORTS_END
+
 MACHINE_CONFIG_START(electron_state::electron)
-	MCFG_CPU_ADD( "maincpu", M6502, XTAL(16'000'000)/8 )
+	MCFG_CPU_ADD( "maincpu", M6502, 16_MHz_XTAL/8 )
 	MCFG_CPU_PROGRAM_MAP( electron_mem )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -259,10 +268,17 @@ ROM_START(electron)
 	ROM_LOAD( "basic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
 ROM_END
 
+ROM_START(electron64)
+	ROM_REGION( 0x4000, "mos", 0 )
+	ROM_LOAD( "os_mrb.rom", 0x0000, 0x4000, CRC(0886741b) SHA1(2863b45dc880a7ed91ad9828795a3eb5ed0bcdd4) )
+	ROM_REGION(0x4000, "basic", 0)
+	ROM_LOAD( "basic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
+ROM_END
 
 #define rom_btm2105 rom_electron
 
 
-/*     YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY                             FULLNAME           FLAGS */
-COMP ( 1983, electron,  0,        0,      electron, electron, electron_state, 0,    "Acorn",                            "Acorn Electron",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-COMP ( 1985, btm2105,   electron, 0,      btm2105,  electron, electron_state, 0,    "British Telecom Business Systems", "BT Merlin M2105", MACHINE_NOT_WORKING )
+/*     YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT       CLASS           INIT  COMPANY                             FULLNAME                                 FLAGS */
+COMP ( 1983, electron,   0,        0,      electron, electron,   electron_state, 0,    "Acorn",                            "Acorn Electron",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP ( 1985, btm2105,    electron, 0,      btm2105,  electron,   electron_state, 0,    "British Telecom Business Systems", "BT Merlin M2105",                       MACHINE_NOT_WORKING )
+COMP ( 1987, electron64, electron, 0,      electron, electron64, electron_state, 0,    "Acorn/Slogger",                    "Acorn Electron (64K Master RAM Board)", MACHINE_NOT_WORKING )

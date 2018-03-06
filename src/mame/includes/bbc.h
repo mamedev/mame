@@ -215,6 +215,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void bbc_eprom_sockets(machine_config &config);
+	void discmon(machine_config &config);
 	void discmate(machine_config &config);
 	void reutapm(machine_config &config);
 	void bbcbp(machine_config &config);
@@ -246,6 +247,7 @@ public:
 	void bbcbp_mem(address_map &map);
 	void bbcm_mem(address_map &map);
 	void reutapm_mem(address_map &map);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -479,7 +481,7 @@ public: // HACK FOR MC6845
 };
 
 
-class torch240_state : public bbc_state
+class torch_state : public bbc_state
 {
 public:
 	using bbc_state::bbc_state;

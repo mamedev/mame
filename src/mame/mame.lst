@@ -2802,6 +2802,7 @@ bbcmc_ar                        // 1986 BBC Master Compact (Arabic)
 bbcmet                          // 1986 BBC Master ET
 bbcmt                           // 1986 BBC Master Turbo
 cfa3000                         // 1989 Henson CFA 3000
+discmon                         // 1988 Arbiter Discmonitor
 discmate                        // 1988 Arbiter Discmate
 econx25                         // 1986 Econet X25 Gateway
 ltmpbp                          // 1985 LTM Portable (B+)
@@ -12202,6 +12203,7 @@ avenger                         // (c) 1975 Electra
 @source:electron.cpp
 electron                        // 1983 Acorn Electron
 btm2105                         // 1985 BT Merlin M2105
+electron64                      // 1987 Acorn Electron (64K Master RAM Board)
 
 @source:elekscmp.cpp
 elekscmp                        //
@@ -17468,16 +17470,20 @@ winspikej                       // 1997.07 GX705 (Japan)
 
 @source:konamim2.cpp
 3do_m2                          //
-btltryst                        // GX636 (c)1998
-evilngt                         // GX810 (c)1998
-evilngte                        // GX810 (c)1998
-heatof11                        // GX703 (c)1998
-hellngt                         // GX810 (c)1998
-polystar                        // GX623 (c)1997
-totlvica                        // GX639 (c)1997
-totlvice                        // GX639 (c)1997
-totlvicj                        // GX639 (c)1997
-totlvicu                        // GX639 (c)1997
+btltryst                        // GX636 (c) 1998
+evilngt                         // GX810 (c) 1998
+evilngte                        // GX810 (c) 1998
+heatof11                        // GX703 (c) 1998
+hellngt                         // GX810 (c) 1998
+polystar                        // GX623 (c) 1997
+totlvica                        // GX639 (c) 1997
+totlvice                        // GX639 (c) 1997
+totlvicj                        // GX639 (c) 1997
+totlvicu                        // GX639 (c) 1997
+
+@source:konblands.cpp
+kbadlands						// GX455 (c) 1984
+kbadlandsh						// GX455 (c) 1984
 
 @source:konendev.cpp
 aadvent                         // African Adventure
@@ -33612,7 +33618,8 @@ westdrm                         //
 astrofl                         // 834-5803 (c) 1986
 fantzn2                         // (c) 1988
 hangonjr                        // (c) 1985
-opaopa                          //
+opaopa                          // (c) 1987
+opaopan                         // (c) 1987
 ridleofp                        // (c) 1986 Sega / Nasco
 slapshtr                        // (c) 1986 Sega
 tetrisse                        // (c) 1988

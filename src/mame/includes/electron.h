@@ -41,6 +41,7 @@ public:
 	electron_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_cassette(*this, "cassette"),
 		m_beeper(*this, "beeper"),
 		m_region_basic(*this, "basic"),
@@ -87,6 +88,7 @@ public:
 	DECLARE_WRITE8_MEMBER(electron_mem_w);
 	DECLARE_READ8_MEMBER(electron_paged_r);
 	DECLARE_WRITE8_MEMBER(electron_paged_w);
+	DECLARE_WRITE8_MEMBER(electron_mos_w);
 	DECLARE_READ8_MEMBER(electron_fred_r);
 	DECLARE_WRITE8_MEMBER(electron_fred_w);
 	DECLARE_READ8_MEMBER(electron_jim_r);
@@ -105,6 +107,7 @@ public:
 	TIMER_CALLBACK_MEMBER(setup_beep);
 	TIMER_CALLBACK_MEMBER(electron_scanline_interrupt);
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
 	required_memory_region m_region_basic;
@@ -119,6 +122,7 @@ public:
 	void electron(machine_config &config);
 	void btm2105(machine_config &config);
 	void electron_mem(address_map &map);
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

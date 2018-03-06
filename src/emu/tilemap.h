@@ -386,7 +386,7 @@ enum tilemap_standard_mapper
 #define MCFG_TILEMAP_TILE_SIZE(_width, _height) \
 	downcast<tilemap_device &>(*device).set_tile_size(_width, _height);
 #define MCFG_TILEMAP_TRANSPARENT_PEN(_pen) \
-	downcast<tilemap_device &>(*device).set_transparent_pen(_pen);
+	downcast<tilemap_device &>(*device).set_configured_transparent_pen(_pen);
 
 // common cases
 #define MCFG_TILEMAP_ADD_STANDARD(_tag, _gfxtag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows) \
@@ -736,7 +736,7 @@ public:
 		m_num_rows = rows;
 	}
 	void set_tile_size(u16 width, u16 height) { m_tile_width = width; m_tile_height = height; }
-	void set_transparent_pen(pen_t pen) { m_transparent_pen_set = true; m_transparent_pen = pen; }
+	void set_configured_transparent_pen(pen_t pen) { m_transparent_pen_set = true; m_transparent_pen = pen; }
 
 	// getters
 	memory_array &basemem() { return m_basemem; }

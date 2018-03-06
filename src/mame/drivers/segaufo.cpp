@@ -737,6 +737,9 @@ void ufo_state::machine_reset()
 
 void ufo_state::machine_start()
 {
+	m_counters.resolve();
+	m_digits.resolve();
+
 	// init/zerofill/register for savestates
 	static const float motor_speeds[4] =
 		{ 1.0f/CABINET_WIDTH, 1.0f/CABINET_DEPTH, 1.0f/CABINET_HEIGHT, 1.0f/CRANE_SIZE };
