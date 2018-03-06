@@ -161,7 +161,7 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(trs80_state::model1_map)
 	AM_RANGE(0x0000, 0x377f) AM_ROM // sys80,ht1080 needs up to 375F
 	AM_RANGE(0x37de, 0x37de) AM_READWRITE(sys80_f9_r, sys80_f8_w)
-	AM_RANGE(0x37df, 0x37df) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
+	AM_RANGE(0x37df, 0x37df) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
 	AM_RANGE(0x37e0, 0x37e3) AM_READWRITE(trs80_irq_status_r, trs80_motor_w)
 	AM_RANGE(0x37e4, 0x37e7) AM_WRITE(trs80_cassunit_w)
 	AM_RANGE(0x37e8, 0x37eb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
@@ -184,8 +184,8 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(trs80_state::sys80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf8, 0xf8) AM_READWRITE(trs80m4_eb_r, sys80_f8_w)
-	AM_RANGE(0xf9, 0xf9) AM_READWRITE(sys80_f9_r, trs80m4_eb_w)
+	AM_RANGE(0xf8, 0xf8) AM_DEVREAD("uart", ay31015_device, receive) AM_WRITE(sys80_f8_w)
+	AM_RANGE(0xf9, 0xf9) AM_READ(sys80_f9_r) AM_DEVWRITE("uart", ay31015_device, transmit)
 	AM_RANGE(0xfd, 0xfd) AM_READWRITE(trs80_printer_r, trs80_printer_w)
 	AM_RANGE(0xfe, 0xfe) AM_WRITE(sys80_fe_w)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
@@ -201,7 +201,7 @@ ADDRESS_MAP_START(trs80_state::lnw80_io)
 	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
 	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9")
 	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
-	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
+	AM_RANGE(0xeb, 0xeb) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
 	AM_RANGE(0xfe, 0xfe) AM_READWRITE(lnw80_fe_r, lnw80_fe_w)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
@@ -217,7 +217,7 @@ ADDRESS_MAP_START(trs80_state::model3_io)
 	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
 	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9") AM_WRITE(trs80m4_e9_w)
 	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
-	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
+	AM_RANGE(0xeb, 0xeb) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
 	AM_RANGE(0xec, 0xef) AM_READWRITE(trs80m4_ec_r, trs80m4_ec_w)
 	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
 	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("fdc", fd1793_device, cmd_w)
@@ -240,7 +240,7 @@ ADDRESS_MAP_START(trs80_state::model4_io)
 	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
 	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9") AM_WRITE(trs80m4_e9_w)
 	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
-	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
+	AM_RANGE(0xeb, 0xeb) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
 	AM_RANGE(0xec, 0xef) AM_READWRITE(trs80m4_ec_r, trs80m4_ec_w)
 	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
 	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("fdc", fd1793_device, cmd_w)
@@ -264,7 +264,7 @@ ADDRESS_MAP_START(trs80_state::model4p_io)
 	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
 	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9") AM_WRITE(trs80m4_e9_w)
 	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
-	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
+	AM_RANGE(0xeb, 0xeb) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
 	AM_RANGE(0xec, 0xef) AM_READWRITE(trs80m4_ec_r, trs80m4_ec_w)
 	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
 	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("fdc", fd1793_device, cmd_w)
@@ -310,7 +310,7 @@ ADDRESS_MAP_START(trs80_state::cp500_io)
 	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
 	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9") AM_WRITE(trs80m4_e9_w)
 	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
-	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
+	AM_RANGE(0xeb, 0xeb) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
 	AM_RANGE(0xec, 0xef) AM_READWRITE(trs80m4_ec_r, trs80m4_ec_w)
 	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
 	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("fdc", fd1793_device, cmd_w)
@@ -593,17 +593,13 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(trs80_state::trs80)       // the original model I, level I, with no extras
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 1796000)        /* 1.796 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 10.6445_MHz_XTAL / 6) // "a little over 1.744 MHz"
 	MCFG_CPU_PROGRAM_MAP(trs80_map)
 	MCFG_CPU_IO_MAP(trs80_io)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*6, 16*12)
-	MCFG_SCREEN_VISIBLE_AREA(0,64*6-1,0,16*12-1)
+	MCFG_SCREEN_RAW_PARAMS(10.6445_MHz_XTAL, 672, 0, 384, 264, 0, 192)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_trs80)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -618,24 +614,24 @@ MACHINE_CONFIG_START(trs80_state::trs80)       // the original model I, level I,
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 	/* devices */
-	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_ADD("cassette")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 	trs80(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( model1_map)
-	MCFG_CPU_IO_MAP( model1_io)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(model1_map)
+	MCFG_CPU_IO_MAP(model1_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt,  40)
 
 	/* devices */
-	MCFG_CASSETTE_MODIFY( "cassette" )
+	MCFG_CASSETTE_MODIFY("cassette")
 	MCFG_CASSETTE_FORMATS(trs80l2_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 0.5)
 
-	MCFG_FD1793_ADD("fdc", XTAL(1'000'000)) // todo: should be fd1771
+	MCFG_FD1793_ADD("fdc", 4_MHz_XTAL / 4) // todo: should be fd1771
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(trs80_state,trs80_fdc_intrq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats)
@@ -655,44 +651,45 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_DEVICE_ADD( "tr1602", AY31015, 0 )
+	MCFG_DEVICE_ADD("uart", AY31015, 0)
 	MCFG_AY31015_RX_CLOCK(0.0)
 	MCFG_AY31015_TX_CLOCK(0.0)
+	MCFG_AY31015_AUTO_RDAV(true)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::model3)
 	model1(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( model3_map)
-	MCFG_CPU_IO_MAP( model3_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt,  30)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(20.2752_MHz_XTAL / 10)
+	MCFG_CPU_PROGRAM_MAP(model3_map)
+	MCFG_CPU_IO_MAP(model3_io)
+	MCFG_CPU_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt, 20.2752_MHz_XTAL / 10 / 67584)
 
-	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, trs80m4 )
+	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, trs80m4)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode",trs80m4)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", trs80m4)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_trs80m4)
-	MCFG_SCREEN_SIZE(80*8, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,239)
+	MCFG_SCREEN_RAW_PARAMS(12.672_MHz_XTAL, 800, 0, 640, 264, 0, 240)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::model4)
 	model3(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_IO_MAP( model4_io)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(model4_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::model4p)
 	model3(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_IO_MAP( model4p_io)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(model4p_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::sys80)
 	model1(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_IO_MAP( sys80_io)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(sys80_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::ht1080z)
@@ -704,10 +701,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::lnw80)
 	model1(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( lnw80_map)
-	MCFG_CPU_IO_MAP( lnw80_io)
-	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, lnw80 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(16_MHz_XTAL / 4) // or 16MHz / 9
+	MCFG_CPU_PROGRAM_MAP(lnw80_map)
+	MCFG_CPU_IO_MAP(lnw80_io)
+	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, lnw80)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode",lnw80)
 
@@ -715,25 +713,28 @@ MACHINE_CONFIG_START(trs80_state::lnw80)
 	MCFG_PALETTE_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(trs80_state,lnw80)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(80*6, 16*12)
-	MCFG_SCREEN_VISIBLE_AREA(0,80*6-1,0,16*12-1)
+	MCFG_SCREEN_RAW_PARAMS(3.579545_MHz_XTAL * 3, 682, 0, 480, 264, 0, 192)
+	// LNW80 Theory of Operations gives H and V periods as 15.750kHz and 59.66Hz, which don't seem exactly divisible
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_lnw80)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::radionic)
 	model1(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(12_MHz_XTAL / 6) // or 3.579MHz / 2
+	MCFG_CPU_PERIODIC_INT_DRIVER(trs80_state, nmi_line_pulse, 12_MHz_XTAL / 12 / 16384)
+
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(64*8, 16*16)
-	MCFG_SCREEN_VISIBLE_AREA(0,64*8-1,0,16*16-1)
+	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL, 768, 0, 512, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_radionic)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", radionic)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::meritum)
 	sys80(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( meritum_map)
-	MCFG_CPU_IO_MAP( meritum_io)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(meritum_map)
+	MCFG_CPU_IO_MAP(meritum_io)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_meritum)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", meritum)
@@ -741,10 +742,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::cp500)
 	model3(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_IO_MAP( cp500_io)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(cp500_io)
 
-	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, cp500 )
+	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, cp500)
 MACHINE_CONFIG_END
 
 /***************************************************************************

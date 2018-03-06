@@ -126,23 +126,14 @@ READ8_MEMBER( trs80_state::trs80m4_ea_r )
     d2..d0 Not used */
 
 	uint8_t data=7;
-	m_ay31015->write_swe(0);
-	data |= m_ay31015->tbmt_r() ? 0x40 : 0;
-	data |= m_ay31015->dav_r( ) ? 0x80 : 0;
-	data |= m_ay31015->or_r(  ) ? 0x20 : 0;
-	data |= m_ay31015->fe_r(  ) ? 0x10 : 0;
-	data |= m_ay31015->pe_r(  ) ? 0x08 : 0;
-	m_ay31015->write_swe(1);
+	m_uart->write_swe(0);
+	data |= m_uart->tbmt_r() ? 0x40 : 0;
+	data |= m_uart->dav_r( ) ? 0x80 : 0;
+	data |= m_uart->or_r(  ) ? 0x20 : 0;
+	data |= m_uart->fe_r(  ) ? 0x10 : 0;
+	data |= m_uart->pe_r(  ) ? 0x08 : 0;
+	m_uart->write_swe(1);
 
-	return data;
-}
-
-READ8_MEMBER( trs80_state::trs80m4_eb_r )
-{
-/* UART received data */
-	uint8_t data = m_ay31015->get_received_data();
-	m_ay31015->write_rdav(0);
-	m_ay31015->write_rdav(1);
 	return data;
 }
 
@@ -166,13 +157,13 @@ READ8_MEMBER( trs80_state::sys80_f9_r )
     d0 Data Available */
 
 	uint8_t data = 70;
-	m_ay31015->write_swe(0);
-	data |= m_ay31015->tbmt_r() ? 0 : 0x80;
-	data |= m_ay31015->dav_r( ) ? 0x01 : 0;
-	data |= m_ay31015->or_r(  ) ? 0x02 : 0;
-	data |= m_ay31015->fe_r(  ) ? 0x04 : 0;
-	data |= m_ay31015->pe_r(  ) ? 0x08 : 0;
-	m_ay31015->write_swe(1);
+	m_uart->write_swe(0);
+	data |= m_uart->tbmt_r() ? 0 : 0x80;
+	data |= m_uart->dav_r( ) ? 0x01 : 0;
+	data |= m_uart->or_r(  ) ? 0x02 : 0;
+	data |= m_uart->fe_r(  ) ? 0x04 : 0;
+	data |= m_uart->pe_r(  ) ? 0x08 : 0;
+	m_uart->write_swe(1);
 
 	return data;
 }
@@ -443,8 +434,8 @@ Note: this may be a COM5016 dual baud rate generator, or may be an equivalent ci
     */
 
 	static const int baud_clock[]={ 800, 1200, 1760, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
-	m_ay31015->set_receiver_clock(baud_clock[data & 0x0f]);
-	m_ay31015->set_transmitter_clock(baud_clock[data >> 4]);
+	m_uart->set_receiver_clock(baud_clock[data & 0x0f]);
+	m_uart->set_transmitter_clock(baud_clock[data >> 4]);
 }
 
 WRITE8_MEMBER( trs80_state::trs80m4_ea_w )
@@ -464,13 +455,13 @@ WRITE8_MEMBER( trs80_state::trs80m4_ea_w )
     d0 Data-Terminal-Ready (DTR), pin 20 */
 
 	{
-		m_ay31015->write_cs(0);
-		m_ay31015->write_nb1(BIT(data, 6));
-		m_ay31015->write_nb2(BIT(data, 5));
-		m_ay31015->write_tsb(BIT(data, 4));
-		m_ay31015->write_eps(BIT(data, 7));
-		m_ay31015->write_np(BIT(data, 3));
-		m_ay31015->write_cs(1);
+		m_uart->write_cs(0);
+		m_uart->write_nb1(BIT(data, 6));
+		m_uart->write_nb2(BIT(data, 5));
+		m_uart->write_tsb(BIT(data, 4));
+		m_uart->write_eps(BIT(data, 7));
+		m_uart->write_np(BIT(data, 3));
+		m_uart->write_cs(1);
 	}
 	else
 	{
@@ -484,11 +475,6 @@ WRITE8_MEMBER( trs80_state::trs80m4_ea_w )
     d0 Request-to-Send (RTS), pin 4 */
 
 	}
-}
-
-WRITE8_MEMBER( trs80_state::trs80m4_eb_w )
-{
-	m_ay31015->set_transmit_data(data);
 }
 
 WRITE8_MEMBER( trs80_state::trs80m4_ec_w )

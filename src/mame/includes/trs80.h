@@ -37,7 +37,7 @@ public:
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_cent_status_in(*this, "cent_status_in")
-		, m_ay31015(*this, "tr1602")
+		, m_uart(*this, "uart")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
@@ -75,7 +75,6 @@ public:
 	DECLARE_WRITE8_MEMBER ( trs80m4_ff_w );
 	DECLARE_WRITE8_MEMBER ( trs80m4_f4_w );
 	DECLARE_WRITE8_MEMBER ( trs80m4_ec_w );
-	DECLARE_WRITE8_MEMBER ( trs80m4_eb_w );
 	DECLARE_WRITE8_MEMBER ( trs80m4_ea_w );
 	DECLARE_WRITE8_MEMBER ( trs80m4_e9_w );
 	DECLARE_WRITE8_MEMBER ( trs80m4_e8_w );
@@ -89,7 +88,6 @@ public:
 	DECLARE_READ8_MEMBER ( sys80_f9_r );
 	DECLARE_READ8_MEMBER ( trs80m4_ff_r );
 	DECLARE_READ8_MEMBER ( trs80m4_ec_r );
-	DECLARE_READ8_MEMBER ( trs80m4_eb_r );
 	DECLARE_READ8_MEMBER ( trs80m4_ea_r );
 	DECLARE_READ8_MEMBER ( trs80m4_e8_r );
 	DECLARE_READ8_MEMBER ( trs80m4_e4_r );
@@ -189,7 +187,7 @@ private:
 	optional_device<centronics_device> m_centronics;
 	optional_device<output_latch_device> m_cent_data_out;
 	optional_device<input_buffer_device> m_cent_status_in;
-	optional_device<ay31015_device> m_ay31015;
+	optional_device<ay31015_device> m_uart;
 	optional_device<fd1793_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
