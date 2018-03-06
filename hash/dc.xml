@@ -5210,7 +5210,6 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Comic Party (Japan) (Disc 2) (Track 1).bin" size="13138272" crc="7aa37798" md5="7065a680967409de9326d85f89652a4c" sha1="d5fa8ebdbf4e348cfc715fc4ed9ba88d95590173"/>
 		<rom name="Comic Party (Japan) (Disc 2) (Track 2).bin" size="10729824" crc="7a877b36" md5="3ce58d7c16d95dbac6aca732ac006eb1" sha1="43e03f1ca8cb46d2fbb35d47094f6cb038ae7d5f"/>
 		<rom name="Comic Party (Japan) (Disc 2) (Track 3).bin" size="1185760800" crc="a7a4de82" md5="69f709c0b6cba885a3cb083308f7c51b" sha1="fec97c9c32413ba6fae22e98cf4243184e90fe25"/>
-
 		-->
 		<description>Comic Party (Jpn)</description>
 		<year>2001</year>
@@ -5844,7 +5843,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	Redump have a complete dump available.
 	-->
 	<software name="dvineluvsg">
-		<!--
+		<!-- http://redump.org/disc/43486/
 		<rom name="D+Vine [Luv] (Japan).gdi" size="168" crc="ed403534" md5="19109f1132cf0b943aab0658e3e6b65a" sha1="e56ab98e22697aedc6efdc9effb34d5b37c62350"/>
 		<rom name="D+Vine [Luv] (Japan) (Track 1).bin" size="1058400" crc="5a53a011" md5="471a10f9120820c76b82a29568da3aa6" sha1="b7c8d38647b20d8200a19a6b150d5551bc86fb92"/>
 		<rom name="D+Vine [Luv] (Japan) (Track 2).bin" size="18279744" crc="b5c1a1d7" md5="6a3be5332c3f54c6ce6051b571b98cd3" sha1="4fdd967e6c6ed6537e1570252680a66e2deac0e1"/>
