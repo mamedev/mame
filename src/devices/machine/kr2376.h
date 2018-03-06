@@ -35,8 +35,32 @@
 #pragma once
 
 
-#define MCFG_KR2376_STROBE_CALLBACK(_write) \
-	devcb = &downcast<kr2376_device &>(*device).set_strobe_wr_callback(DEVCB_##_write);
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_KR2376_MATRIX_X0(_cb) \
+	devcb = &downcast<kr2376_device &>(*device).set_x_cb<0>(DEVCB_##_cb);
+#define MCFG_KR2376_MATRIX_X1(_cb) \
+	devcb = &downcast<kr2376_device &>(*device).set_x_cb<1>(DEVCB_##_cb);
+#define MCFG_KR2376_MATRIX_X2(_cb) \
+	devcb = &downcast<kr2376_device &>(*device).set_x_cb<2>(DEVCB_##_cb);
+#define MCFG_KR2376_MATRIX_X3(_cb) \
+	devcb = &downcast<kr2376_device &>(*device).set_x_cb<3>(DEVCB_##_cb);
+#define MCFG_KR2376_MATRIX_X4(_cb) \
+	devcb = &downcast<kr2376_device &>(*device).set_x_cb<4>(DEVCB_##_cb);
+#define MCFG_KR2376_MATRIX_X5(_cb) \
+	devcb = &downcast<kr2376_device &>(*device).set_x_cb<5>(DEVCB_##_cb);
+#define MCFG_KR2376_MATRIX_X6(_cb) \
+	devcb = &downcast<kr2376_device &>(*device).set_x_cb<6>(DEVCB_##_cb);
+#define MCFG_KR2376_MATRIX_X7(_cb) \
+	devcb = &downcast<kr2376_device &>(*device).set_x_cb<7>(DEVCB_##_cb);
+#define MCFG_KR2376_SHIFT_CB(_cb) \
+	devcb = &downcast<kr2376_device &>(*device).set_shift_cb(DEVCB_##_cb);
+#define MCFG_KR2376_CONTROL_CB(_cb) \
+	devcb = &downcast<kr2376_device &>(*device).set_control_cb(DEVCB_##_cb);
+#define MCFG_KR2376_STROBE_CB(_cb) \
+	devcb = &downcast<kr2376_device &>(*device).set_strobe_cb(DEVCB_##_cb);
 
 class kr2376_device : public device_t
 {
@@ -53,12 +77,15 @@ public:
 	enum output_pin_t
 	{
 		KR2376_SO=16,           /* SO    - Pin 16 - Strobe Output */
-		KR2376_PO=7         /* PO    - Pin  7 - Parity Output */
+		KR2376_PO=7             /* PO    - Pin  7 - Parity Output */
 	};
 
-	kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kr2376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_strobe_wr_callback(Object &&cb) { return m_write_strobe.set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_x_cb(Object &&cb) { return m_read_x[N].set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_shift_cb(Object &&cb) { return m_read_shift.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_control_cb(Object &&cb) { return m_read_control.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_strobe_cb(Object &&cb) { return m_write_strobe.set_callback(std::forward<Object>(cb)); }
 
 	/* keyboard data */
 	DECLARE_READ8_MEMBER( data_r );
@@ -73,7 +100,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual uint8_t key_codes(int mode, int x, int y) { return 0x00; }
 
 private:
 	// internal state
@@ -81,7 +108,6 @@ private:
 
 	int m_ring11;                     /* sense input scan counter */
 	int m_ring8;                      /* drive output scan counter */
-	int m_modifiers;                  /* modifier inputs */
 
 	int m_strobe;                     /* strobe output */
 	int m_strobe_old;
@@ -90,6 +116,8 @@ private:
 
 	/* timers */
 	emu_timer *m_scan_timer;          /* keyboard scan timer */
+	devcb_read16 m_read_x[8];
+	devcb_read_line m_read_shift, m_read_control;
 	devcb_write_line m_write_strobe;
 
 	enum
@@ -102,6 +130,25 @@ private:
 	void detect_keypress();
 };
 
-DECLARE_DEVICE_TYPE(KR2376, kr2376_device)
+class kr2376_st_device : public kr2376_device
+{
+public:
+	// construction/destruction
+	kr2376_st_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	virtual uint8_t key_codes(int mode, int x, int y) override;
+};
+
+//class kr2376_12_device : public kr2376_device
+//{
+//public:
+//	// construction/destruction
+//	kr2376_12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+//protected:
+//	virtual uint8_t key_codes(int mode, int x, int y) override;
+//};
+
+DECLARE_DEVICE_TYPE(KR2376_ST, kr2376_st_device)
+//DECLARE_DEVICE_TYPE(KR2376_12, kr2376_12_device)
 
 #endif // MAME_MACHINE_KR2376_H
