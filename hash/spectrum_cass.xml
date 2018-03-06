@@ -702,6 +702,7 @@
 		<year>1983</year>
 		<publisher>Currah Computer Components</publisher>
 		<info name="usage" value="Requires Currah µSpeech" />
+		<sharedfeat name="exp_default" value="uspeech"/>
 		<part name="cass1" interface="spectrum_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="20032">
@@ -721,6 +722,7 @@
 		<year>1983</year>
 		<publisher>Fuller Micro Systems</publisher>
 		<info name="usage" value="Requires Fuller Box" />
+		<sharedfeat name="exp_default" value="fuller"/>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="12252">
 				<rom name="Fuller Box &amp; Orator Demonstration.tzx" size="12252" crc="e854ac02" sha1="89459c6818962229fe7af53ac77cd44dfd95401a" offset="0"/>
@@ -733,6 +735,7 @@
 		<year>1985</year>
 		<publisher>Mikro-Gen</publisher>
 		<info name="usage" value="Requires Mikro-Plus interface" />
+		<sharedfeat name="exp_default" value="mikroplus"/>
 		<part name="cass1" interface="spectrum_cass">
 			<feature name="part_id" value="Side 1: Shadow of the Unicorn"/>
 			<dataarea name="cass" size="39018">
@@ -751,6 +754,7 @@
 		<description>Spectrum Voice Chess</description>
 		<year>1982</year>
 		<publisher>Arctic Computing</publisher>
+		<sharedfeat name="exp_default" value="uspeech"/>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="37209">
 				<rom name="Spectrum Voice Chess.tzx" size="37209" crc="e936739b" sha1="f668bd949c0a68b99e657fbdcebd4d3a78feabcd" offset="0"/>
