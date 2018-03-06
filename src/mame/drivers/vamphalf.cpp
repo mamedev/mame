@@ -97,7 +97,7 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	optional_shared_ptr<uint16_t> m_tiles;
 	optional_shared_ptr<uint16_t> m_wram;
