@@ -45,10 +45,10 @@ protected:
 		virtual int32_t set(unsigned n, int32_t value) = 0;
 	};
 
-	template <unsigned N> class output_helper_impl : public output_helper, protected output_finder<N> {
+	template <unsigned N> class output_helper_impl : public output_helper, protected output_manager::output_finder<void, N> {
 	public:
-		output_helper_impl(device_t &device) : output_finder<N>(device, "vfd%u", 0U) { }
-		virtual void resolve() override { output_finder<N>::resolve(); }
+		output_helper_impl(device_t &device) : output_manager::output_finder<void, N>(device, "vfd%u", 0U) { }
+		virtual void resolve() override { output_manager::output_finder<void, N>::resolve(); }
 		virtual int32_t set(unsigned n, int32_t value) override { return this->operator[](n) = value; }
 	};
 
