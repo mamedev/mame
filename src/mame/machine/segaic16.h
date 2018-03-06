@@ -21,9 +21,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_SEGA_315_5195_MAPPER_ADD(_tag, _cputag, _class, _mapper) \
-	MCFG_DEVICE_ADD(_tag, SEGA_315_5195_MEM_MAPPER, 0) \
-	downcast<sega_315_5195_mapper_device &>(*device).set_cputag("^" _cputag); \
+#define MCFG_SEGA_315_5195_CPU(_cputag) \
+	downcast<sega_315_5195_mapper_device &>(*device).set_cputag("^" _cputag);
+#define MCFG_SEGA_315_5195_MAPPER_HANDLER(_class, _mapper) \
 	downcast<sega_315_5195_mapper_device &>(*device).set_mapper(sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, nullptr, (_class *)nullptr));
 #define MCFG_SEGA_315_5195_PBF_CALLBACK(_devcb) \
 	devcb = &downcast<sega_315_5195_mapper_device &>(*device).set_pbf_callback(DEVCB_##_devcb);

@@ -207,6 +207,7 @@ public:
 	apple2e_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, A2_CPU_TAG),
+		m_screen(*this, "screen"),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, "maincpu"),
 		m_cecbanks(*this, "cecexp"),
@@ -247,6 +248,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	optional_memory_region m_cecbanks;
@@ -1359,12 +1361,12 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 			switch (offset)
 			{
 				case 0x5e:  // SETDHIRES
-					machine().first_screen()->update_now();
+					m_screen->update_now();
 					m_video->m_dhires = true;
 					break;
 
 				case 0x5f:  // CLRDHIRES
-					machine().first_screen()->update_now();
+					m_screen->update_now();
 					m_video->m_dhires = false;
 					break;
 			}
@@ -1417,30 +1419,30 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 		case 0x50:  // graphics mode
 			if (m_video->m_graphics == false) // avoid flickering from II+ refresh polling
 			{
-				machine().first_screen()->update_now();
+				m_screen->update_now();
 				m_video->m_graphics = true;
 			}
 			break;
 
 		case 0x51:  // text mode
-			machine().first_screen()->update_now();
+			m_screen->update_now();
 			m_video->m_graphics = false;
 			break;
 
 		case 0x52:  // no mix
-			machine().first_screen()->update_now();
+			m_screen->update_now();
 			m_video->m_mix = false;
 			break;
 
 		case 0x53:  // mixed mode
-			machine().first_screen()->update_now();
+			m_screen->update_now();
 			m_video->m_mix = true;
 			break;
 
 		case 0x54:  // set page 1
 			if (!m_video->m_80col)
 			{
-				machine().first_screen()->update_now();
+				m_screen->update_now();
 			}
 			m_page2 = false;
 			m_video->m_page2 = false;
@@ -1450,7 +1452,7 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 		case 0x55:  // set page 2
 			if (!m_video->m_80col)
 			{
-				machine().first_screen()->update_now();
+				m_screen->update_now();
 			}
 			m_page2 = true;
 			m_video->m_page2 = true;
@@ -1458,13 +1460,13 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 			break;
 
 		case 0x56: // select lo-res
-			machine().first_screen()->update_now();
+			m_screen->update_now();
 			m_video->m_hires = false;
 			auxbank_update();
 			break;
 
 		case 0x57: // select hi-res
-			machine().first_screen()->update_now();
+			m_screen->update_now();
 			m_video->m_hires = true;
 			auxbank_update();
 			break;
@@ -1558,7 +1560,7 @@ READ8_MEMBER(apple2e_state::c000_r)
 			return m_80store ? 0x80 : 0x00;
 
 		case 0x19:  // read VBLBAR
-			return machine().first_screen()->vblank() ? 0x00 : 0x80;
+			return m_screen->vblank() ? 0x00 : 0x80;
 
 		case 0x1a:  // read TEXT
 			return m_video->m_graphics ? 0x00 : 0x80;

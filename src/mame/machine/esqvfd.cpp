@@ -116,15 +116,17 @@ static const uint16_t font[]=
 	0x0000, // 0000 0000 0000 0000 (DEL)
 };
 
-esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rows, int cols) :
+esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dimensions_param &&dimensions) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_rows(rows),
-	m_cols(cols)
+	m_vfds(std::move(std::get<0>(dimensions))),
+	m_rows(std::get<1>(dimensions)),
+	m_cols(std::get<2>(dimensions))
 {
 }
 
 void esqvfd_device::device_start()
 {
+	m_vfds->resolve();
 }
 
 void esqvfd_device::device_reset()
@@ -142,30 +144,6 @@ void esqvfd_device::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 }
 
-// why isn't the font just stored in this order?
-uint32_t esqvfd_device::conv_segments(uint16_t segin)
-{
-	uint32_t segout = 0;
-
-	if ( segin & 0x0004 ) segout |=  0x0001;
-	if ( segin & 0x0002 ) segout |=  0x0002;
-	if ( segin & 0x0020 ) segout |=  0x0004;
-	if ( segin & 0x0200 ) segout |=  0x0008;
-	if ( segin & 0x2000 ) segout |=  0x0010;
-	if ( segin & 0x0001 ) segout |=  0x0020;
-	if ( segin & 0x8000 ) segout |=  0x0040;
-	if ( segin & 0x4000 ) segout |=  0x0080;
-	if ( segin & 0x0008 ) segout |=  0x0100;
-	if ( segin & 0x0400 ) segout |=  0x0200;
-	if ( segin & 0x0010 ) segout |=  0x0400;
-	if ( segin & 0x0040 ) segout |=  0x0800;
-	if ( segin & 0x0080 ) segout |=  0x1000;
-	if ( segin & 0x0800 ) segout |=  0x2000;
-	if ( segin & 0x1000 ) segout |=  0x4000;
-
-	return segout;
-}
-
 // generic display update; can override from child classes if not good enough
 void esqvfd_device::update_display()
 {
@@ -181,7 +159,7 @@ void esqvfd_device::update_display()
 				if (m_attrs[row][col] & AT_UNDERLINE)
 					segdata |= 0x0008;
 
-				machine().output().set_indexed_value("vfd", (row*m_cols) + col, segdata);
+				m_vfds->set((row * m_cols) + col, segdata);
 
 				m_dirty[row][col] = 0;
 			}
@@ -317,7 +295,8 @@ bool esq2x40_device::write_contents(std::ostream &o)
 }
 
 
-esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ2X40, tag, owner, clock, 2, 40)
+esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	esqvfd_device(mconfig, ESQ2X40, tag, owner, clock, make_dimensions<2, 40>(*this))
 {
 }
 
@@ -364,7 +343,8 @@ void esq1x22_device::write_char(int data)
 	update_display();
 }
 
-esq1x22_device::esq1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ1X22, tag, owner, clock, 1, 22)
+esq1x22_device::esq1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	esqvfd_device(mconfig, ESQ1X22, tag, owner, clock, make_dimensions<1, 22>(*this))
 {
 }
 
@@ -425,7 +405,8 @@ void esq2x40_sq1_device::write_char(int data)
 	}
 }
 
-esq2x40_sq1_device::esq2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ2X40_SQ1, tag, owner, clock, 2, 40)
+esq2x40_sq1_device::esq2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	esqvfd_device(mconfig, ESQ2X40_SQ1, tag, owner, clock, make_dimensions<2, 40>(*this))
 {
 	m_wait87shift = false;
 	m_wait88shift = false;

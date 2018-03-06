@@ -29,10 +29,12 @@ public:
 	riscpc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	DECLARE_READ32_MEMBER(a7000_iomd_r);
 	DECLARE_WRITE32_MEMBER(a7000_iomd_w);
@@ -186,7 +188,7 @@ void riscpc_state::vidc20_dynamic_screen_change()
 		{
 			/* finally ready to change the resolution */
 			int hblank_period,vblank_period;
-			rectangle visarea = machine().first_screen()->visible_area();
+			rectangle visarea = m_screen->visible_area();
 			hblank_period = (m_vidc20_horz_reg[HCR] & 0x3ffc);
 			vblank_period = (m_vidc20_vert_reg[VCR] & 0x3fff);
 			/* note that we use the border registers as the visible area */
@@ -195,7 +197,7 @@ void riscpc_state::vidc20_dynamic_screen_change()
 			visarea.min_y = (m_vidc20_vert_reg[VBSR] & 0x1fff);
 			visarea.max_y = (m_vidc20_vert_reg[VBER] & 0x1fff)-1;
 
-			machine().first_screen()->configure(hblank_period, vblank_period, visarea, machine().first_screen()->frame_period().attoseconds() );
+			m_screen->configure(hblank_period, vblank_period, visarea, m_screen->frame_period().attoseconds() );
 			logerror("VIDC20: successfully changed the screen to:\n Display Size = %d x %d\n Border Size %d x %d\n Cycle Period %d x %d\n",
 						(m_vidc20_horz_reg[HDER]-m_vidc20_horz_reg[HDSR]),(m_vidc20_vert_reg[VDER]-m_vidc20_vert_reg[VDSR]),
 						(m_vidc20_horz_reg[HBER]-m_vidc20_horz_reg[HBSR]),(m_vidc20_vert_reg[VBER]-m_vidc20_vert_reg[VBSR]),
@@ -266,7 +268,7 @@ WRITE32_MEMBER( riscpc_state::a7000_vidc20_w )
 			if(vert_reg == 4)
 			{
 				if(m_vidc20_vert_reg[VDER] != 0)
-					m_flyback_timer->adjust(machine().first_screen()->time_until_pos(m_vidc20_vert_reg[VDER]));
+					m_flyback_timer->adjust(m_screen->time_until_pos(m_vidc20_vert_reg[VDER]));
 				else
 					m_flyback_timer->adjust(attotime::never);
 			}
@@ -617,7 +619,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::flyback_timer_callback)
 		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 
-	m_flyback_timer->adjust(machine().first_screen()->time_until_pos(m_vidc20_vert_reg[VDER]));
+	m_flyback_timer->adjust(m_screen->time_until_pos(m_vidc20_vert_reg[VDER]));
 }
 
 void riscpc_state::viddma_transfer_start()
@@ -652,7 +654,7 @@ READ32_MEMBER( riscpc_state::a7000_iomd_r )
 			uint8_t flyback;
 			int vert_pos;
 
-			vert_pos = machine().first_screen()->vpos();
+			vert_pos = m_screen->vpos();
 			flyback = (vert_pos <= m_vidc20_vert_reg[VDSR] || vert_pos >= m_vidc20_vert_reg[VDER]) ? 0x80 : 0x00;
 
 			return m_IOMD_IO_ctrl | 0x34 | flyback;
@@ -808,7 +810,7 @@ void riscpc_state::machine_reset()
 
 MACHINE_CONFIG_START(riscpc_state::rpc600)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, XTAL(30'000'000) ) // ARM610
+	MCFG_CPU_ADD( "maincpu", ARM7, 60_MHz_XTAL/2) // ARM610
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
 
 	/* video hardware */
@@ -823,7 +825,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(riscpc_state::rpc700)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, XTAL(40'000'000) ) // ARM710
+	MCFG_CPU_ADD( "maincpu", ARM7, 80_MHz_XTAL/2) // ARM710
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
 
 	/* video hardware */

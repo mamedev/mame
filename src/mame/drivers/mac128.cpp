@@ -725,11 +725,8 @@ READ8_MEMBER(mac128_state::mac_via_in_b)
 {
 	int val = 0;
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (machine().first_screen())
-	{
-		if (machine().first_screen()->vpos() >= MAC_V_VIS)
-			val |= 0x40;
-	}
+	if (m_screen->vpos() >= MAC_V_VIS)
+		val |= 0x40;
 
 	if (m_mouse_bit_y)  /* Mouse Y2 */
 		val |= 0x20;

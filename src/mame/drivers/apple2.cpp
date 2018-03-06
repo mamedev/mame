@@ -101,6 +101,7 @@ public:
 	napple2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, A2_CPU_TAG),
+		m_screen(*this, "screen"),
 		m_ram(*this, RAM_TAG),
 		m_ay3600(*this, A2_KBDC_TAG),
 		m_video(*this, A2_VIDEO_TAG),
@@ -121,6 +122,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
 	required_device<ay3600_device> m_ay3600;
 	required_device<a2_video_device> m_video;
@@ -506,7 +508,7 @@ WRITE_LINE_MEMBER(napple2_state::txt_w)
 	if (m_video->m_graphics == state) // avoid flickering from II+ refresh polling
 	{
 		// select graphics or text mode
-		machine().first_screen()->update_now();
+		m_screen->update_now();
 		m_video->m_graphics = !state;
 	}
 }
@@ -514,14 +516,14 @@ WRITE_LINE_MEMBER(napple2_state::txt_w)
 WRITE_LINE_MEMBER(napple2_state::mix_w)
 {
 	// select mixed mode or nomix
-	machine().first_screen()->update_now();
+	m_screen->update_now();
 	m_video->m_mix = state;
 }
 
 WRITE_LINE_MEMBER(napple2_state::scr_w)
 {
 	// select primary or secondary page
-	machine().first_screen()->update_now();
+	m_screen->update_now();
 	m_page2 = state;
 	m_video->m_page2 = state;
 }
@@ -529,7 +531,7 @@ WRITE_LINE_MEMBER(napple2_state::scr_w)
 WRITE_LINE_MEMBER(napple2_state::res_w)
 {
 	// select lo-res or hi-res
-	machine().first_screen()->update_now();
+	m_screen->update_now();
 	m_video->m_hires = state;
 }
 

@@ -3859,7 +3859,6 @@ files {
 	MAME_DIR .. "src/mame/video/undrfire.cpp",
 	MAME_DIR .. "src/mame/drivers/volfied.cpp",
 	MAME_DIR .. "src/mame/includes/volfied.h",
-	MAME_DIR .. "src/mame/machine/volfied.cpp",
 	MAME_DIR .. "src/mame/video/volfied.cpp",
 	MAME_DIR .. "src/mame/drivers/warriorb.cpp",
 	MAME_DIR .. "src/mame/includes/warriorb.h",

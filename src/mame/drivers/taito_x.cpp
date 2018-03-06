@@ -27,23 +27,6 @@ Supported games:
 This file contains routines to interface with the Taito Controller Chip
 (or "Command Chip") version 1. It's currently used by Superman.
 
-Superman (revised SJ 060601)
---------
-
-In Superman, the C-chip's main purpose is to handle player inputs and
-coins and pass commands along to the sound chip.
-
-The 68k queries the c-chip, which passes back $100 bytes of 68k code which
-are then executed in RAM. To get around this, we hack in our own code to
-communicate with the sound board, since we are familiar with the interface
-as it's used in Rastan and Super Space Invaders '91.
-
-It is believed that the NOPs in the 68k code are there to supply the
-necessary cycles to the cchip to switch banks.
-
-This code requires that the player & coin inputs be in input ports 2-4.
-
-
 Memory map:
 ----------------------------------------------------
   0x000000 - 0x07ffff : ROM
@@ -345,113 +328,13 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "screen.h"
 #include "speaker.h"
 
-
-/* This code for sound communication is a hack, it will not be
-   identical to the code derived from the real c-chip */
-
-static const uint8_t superman_code[40] =
+WRITE8_MEMBER(taitox_state::superman_counters_w)
 {
-	0x48, 0xe7, 0x80, 0x80,             /* MOVEM.L  D0/A0,-(A7)   ( Preserve Regs ) */
-	0x20, 0x6d, 0x1c, 0x40,             /* MOVEA.L  ($1C40,A5),A0 ( Load sound pointer in A0 ) */
-	0x30, 0x2f, 0x00, 0x0c,             /* MOVE.W   ($0C,A7),D0   ( Fetch sound number ) */
-	0x10, 0x80,                         /* MOVE.B   D0,(A0)       ( Store it on sound pointer ) */
-	0x52, 0x88,                         /* ADDQ.W   #1,A0         ( Increment sound pointer ) */
-	0x20, 0x3c, 0x00, 0xf0, 0x1c, 0x40, /* MOVE.L   #$F01C40,D0   ( Load top of buffer in D0 ) */
-	0xb1, 0xc0,                         /* CMPA.L   D0,A0         ( Are we there yet? ) */
-	0x66, 0x04,                         /* BNE.S    *+$6          ( No, we arent, skip next line ) */
-	0x41, 0xed, 0x1c, 0x20,             /* LEA      ($1C20,A5),A0 ( Point to the start of the buffer ) */
-	0x2b, 0x48, 0x1c, 0x40,             /* MOVE.L   A0,($1C40,A5) ( Store new sound pointer ) */
-	0x4c, 0xdf, 0x01, 0x01,             /* MOVEM.L  (A7)+, D0/A0  ( Restore Regs ) */
-	0x4e, 0x75                          /* RTS                    ( Return ) */
-};
-
-/*************************************
- *
- * Writes to C-Chip - Important Bits
- *
- *************************************/
-
-WRITE16_MEMBER( taitox_state::cchip1_ctrl_w )
-{
-	/* value 2 is written here */
+    machine().bookkeeping().coin_lockout_w(1, data & 0x08);
+    machine().bookkeeping().coin_lockout_w(0, data & 0x04);
+    machine().bookkeeping().coin_counter_w(1, data & 0x02);
+    machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
-
-WRITE16_MEMBER( taitox_state::cchip1_bank_w )
-{
-	m_current_bank = data & 7;
-}
-
-WRITE16_MEMBER( taitox_state::cchip1_ram_w )
-{
-	if (m_current_bank == 0 && offset == 0x03)
-	{
-		m_cc_port = data;
-
-		machine().bookkeeping().coin_lockout_w(1, data & 0x08);
-		machine().bookkeeping().coin_lockout_w(0, data & 0x04);
-		machine().bookkeeping().coin_counter_w(1, data & 0x02);
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	}
-	else
-	{
-		logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",m_maincpu->pc(),m_current_bank,offset,data);
-	}
-}
-
-
-/*************************************
- *
- * Reads from C-Chip
- *
- *************************************/
-
-READ16_MEMBER( taitox_state::cchip1_ctrl_r )
-{
-	/*
-	    Bit 2 = Error signal
-	    Bit 0 = Ready signal
-	*/
-	return 0x01; /* Return 0x05 for C-Chip error */
-}
-
-READ16_MEMBER( taitox_state::cchip1_ram_r )
-{
-	/* Check for input ports */
-	if (m_current_bank == 0)
-	{
-		switch (offset)
-		{
-		case 0x00: return machine().root_device().ioport("IN0")->read();    /* Player 1 controls + START1 */
-		case 0x01: return machine().root_device().ioport("IN1")->read();    /* Player 2 controls + START2 */
-		case 0x02: return machine().root_device().ioport("IN2")->read();    /* COINn + SERVICE1 + TILT */
-		case 0x03: return m_cc_port;
-		}
-	}
-
-	/* Other non-standard offsets */
-
-	if (m_current_bank == 1 && offset <= 0xff)
-	{
-		if (offset < 40)    /* our hack code is only 40 bytes long */
-			return superman_code[offset];
-		else    /* so pad with zeros */
-			return 0;
-	}
-
-	if (m_current_bank == 2)
-	{
-		switch (offset)
-		{
-			case 0x000: return 0x47;
-			case 0x001: return 0x57;
-			case 0x002: return 0x4b;
-		}
-	}
-
-	logerror("cchip1_r bank: %02x offset: %04x\n",m_current_bank,offset);
-	return 0;
-}
-
 
 READ16_MEMBER(taitox_state::superman_dsw_input_r)
 {
@@ -542,9 +425,8 @@ ADDRESS_MAP_START(taitox_state::superman_map)
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP    /* written each frame at $3ab0, mostly 0x10 */
 	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0x900000, 0x9007ff) AM_READWRITE(cchip1_ram_r, cchip1_ram_w)
-	AM_RANGE(0x900802, 0x900803) AM_READWRITE(cchip1_ctrl_r, cchip1_ctrl_w)
-	AM_RANGE(0x900c00, 0x900c01) AM_WRITE(cchip1_bank_w)
+	AM_RANGE(0x900000, 0x9007ff) AM_DEVREADWRITE8("cchip", taito_cchip_device, mem68_r, mem68_w, 0x00ff)
+	AM_RANGE(0x900800, 0x900fff) AM_DEVREADWRITE8("cchip", taito_cchip_device, asic_r, asic68_w, 0x00ff)
 	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
@@ -737,6 +619,16 @@ static INPUT_PORTS_START( superman )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( supermanu )
@@ -904,16 +796,25 @@ MACHINE_START_MEMBER(taitox_state,taitox)
 	membank("z80bank")->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
 }
 
-MACHINE_START_MEMBER(taitox_state,superman)
+TIMER_DEVICE_CALLBACK_MEMBER(taitox_state::scanline)
 {
-	int banks = memregion("audiocpu")->bytes() / 0x4000;
-	membank("z80bank")->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
-
-	m_current_bank = 0;
-	m_cc_port = 0;
-	save_item(NAME(m_current_bank));
-	save_item(NAME(m_cc_port));
+	if (param == 240)
+	{
+		m_maincpu->set_input_line(6, HOLD_LINE);
+	}
+	else if (param == 40)
+	{
+		// see notes in volfied.cpp
+		m_cchip->ext_interrupt(ASSERT_LINE);
+		m_cchip_irq_clear->adjust(attotime::zero);
+	}
 }
+
+TIMER_DEVICE_CALLBACK_MEMBER(taitox_state::cchip_irq_clear_cb)
+{
+	m_cchip->ext_interrupt(CLEAR_LINE);
+}
+
 
 /**************************************************************************/
 
@@ -922,16 +823,23 @@ MACHINE_CONFIG_START(taitox_state::superman)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(superman_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitox_state,  irq6_line_hold)
-
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", taitox_state,  irq6_line_hold)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitox_state, scanline, "screen", 0, 1)
+	
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)/2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)) /* ? MHz */
+	MCFG_CCHIP_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_CCHIP_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("IN2"))
+	MCFG_CCHIP_OUT_PORTC_CB(WRITE8(taitox_state, superman_counters_w))
+
+	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", taitox_state, cchip_irq_clear_cb)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START_OVERRIDE(taitox_state,superman)
+	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -1178,7 +1086,7 @@ ROM_START( superman )
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, CRC(3bc5d44b) SHA1(6ba3ba35fe313af77d732412572d91a202b50542) )
 ROM_END
 
 ROM_START( supermanu ) /* No US copyright notice or FBI logo - Just a coinage difference, see notes above */
@@ -1201,7 +1109,7 @@ ROM_START( supermanu ) /* No US copyright notice or FBI logo - Just a coinage di
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, CRC(3bc5d44b) SHA1(6ba3ba35fe313af77d732412572d91a202b50542) )
 ROM_END
 
 ROM_START( supermanj ) /* Shows a Japan copyright notice */
@@ -1224,7 +1132,7 @@ ROM_START( supermanj ) /* Shows a Japan copyright notice */
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, CRC(3bc5d44b) SHA1(6ba3ba35fe313af77d732412572d91a202b50542) )
 ROM_END
 
 /*

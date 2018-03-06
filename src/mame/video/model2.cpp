@@ -688,6 +688,7 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, uint32_t at
 			zvalue = max_z;
 			break;
 		case 3: // error
+		default:
 			zvalue = 0.0f;
 			break;
 	}

@@ -13,9 +13,6 @@
 #include "emu.h"
 #include "includes/z80ne.h"
 
-/* Components */
-#include "machine/ay31015.h"
-
 /* Devices */
 #include "imagedev/flopdrv.h"
 
@@ -48,7 +45,7 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
 		m_cass_data.input.level = cass_ws;
 		m_cass_data.input.bit = ((m_cass_data.input.length < m_cass_data.wave_filter) || (m_cass_data.input.length > 0x20)) ? 1 : 0;
 		m_cass_data.input.length = 0;
-		m_ay31015->write_si(m_cass_data.input.bit);
+		m_uart->write_si(m_cass_data.input.bit);
 	}
 	m_cass_data.input.level = cass_ws;
 
@@ -63,7 +60,7 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
 		else
 		{
 			m_cass_data.output.level=1;
-			cass_ws = m_ay31015->so_r();
+			cass_ws = m_uart->so_r();
 			m_cass_data.wave_length = cass_ws ? m_cass_data.wave_short : m_cass_data.wave_long;
 		}
 		cassette_device_image()->output(m_cass_data.output.level ? -1.0 : +1.0);
@@ -275,15 +272,15 @@ MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 	m_cass_data.input.length = 0;
 	m_cass_data.input.bit = 1;
 
-	m_ay31015->write_cs(0);
-	m_ay31015->write_nb1(1);
-	m_ay31015->write_nb2(1);
-	m_ay31015->write_tsb(1);
-	m_ay31015->write_eps(1);
-	m_ay31015->write_np(m_io_lx_385->read() & 0x80 ? 1 : 0);
-	m_ay31015->write_cs(1);
-	m_ay31015->set_receiver_clock(m_cass_data.speed * 16.0);
-	m_ay31015->set_transmitter_clock(m_cass_data.speed * 16.0);
+	m_uart->write_cs(0);
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_tsb(1);
+	m_uart->write_eps(1);
+	m_uart->write_np(m_io_lx_385->read() & 0x80 ? 1 : 0);
+	m_uart->write_cs(1);
+	m_uart->set_receiver_clock(m_cass_data.speed * 16.0);
+	m_uart->set_transmitter_clock(m_cass_data.speed * 16.0);
 
 	lx385_ctrl_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 
@@ -479,33 +476,27 @@ WRITE8_MEMBER(z80ne_state::lx383_w)
 
     A manchester encoder is used. A flip-flop synchronises input
     data on the positive-edge of the clock pulse.
+
+    The UART is a RCA CDP1854 CMOS device with pin 2 jumpered to GND to select the
+    AY-3-1015 compatibility mode. The jumper at P4 can be switched to place 12 V on
+    pin 2 for an old PMOS UART.
  *
  */
-READ8_MEMBER(z80ne_state::lx385_data_r)
-{
-	return m_ay31015->get_received_data();
-}
-
 READ8_MEMBER(z80ne_state::lx385_ctrl_r)
 {
 	/* set unused bits high */
 	uint8_t data = 0xc0;
 
-	m_ay31015->write_swe(0);
-	data |= (m_ay31015->or_r(  ) ? 0x01 : 0);
-	data |= (m_ay31015->fe_r(  ) ? 0x02 : 0);
-	data |= (m_ay31015->pe_r(  ) ? 0x04 : 0);
-	data |= (m_ay31015->tbmt_r() ? 0x08 : 0);
-	data |= (m_ay31015->dav_r( ) ? 0x10 : 0);
-	data |= (m_ay31015->eoc_r( ) ? 0x20 : 0);
-	m_ay31015->write_swe(1);
+	m_uart->write_swe(0);
+	data |= (m_uart->or_r(  ) ? 0x01 : 0);
+	data |= (m_uart->fe_r(  ) ? 0x02 : 0);
+	data |= (m_uart->pe_r(  ) ? 0x04 : 0);
+	data |= (m_uart->tbmt_r() ? 0x08 : 0);
+	data |= (m_uart->dav_r( ) ? 0x10 : 0);
+	data |= (m_uart->eoc_r( ) ? 0x20 : 0);
+	m_uart->write_swe(1);
 
 	return data;
-}
-
-WRITE8_MEMBER(z80ne_state::lx385_data_w)
-{
-	m_ay31015->set_transmit_data(data);
 }
 
 #define LX385_CASSETTE_MOTOR_MASK ((1<<3)|(1<<4))
@@ -533,21 +524,21 @@ WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
 	/* UART Reset and RDAV */
 	if (uart_reset)
 	{
-		m_ay31015->write_xr(1);
-		m_ay31015->write_xr(0);
+		m_uart->write_xr(1);
+		m_uart->write_xr(0);
 	}
 
 	if (uart_rdav)
 	{
-		m_ay31015->write_rdav(1);
-		m_ay31015->write_rdav(0);
+		m_uart->write_rdav(1);
+		m_uart->write_rdav(0);
 	}
 
 	if (!changed_bits) return;
 
 	/* UART Tx Clock enable/disable */
 	if (changed_bits & 0x04)
-		m_ay31015->set_transmitter_clock(uart_tx_clock ? m_cass_data.speed * 16.0 : 0.0);
+		m_uart->set_transmitter_clock(uart_tx_clock ? m_cass_data.speed * 16.0 : 0.0);
 
 	/* motors */
 	if(changed_bits & 0x18)

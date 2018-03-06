@@ -1164,7 +1164,9 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	MCFG_I8255_IN_PORTC_CB(READ8(segaorun_state, unknown_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(segaorun_state, video_control_w))
 
-	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segaorun_state, memory_mapper)
+	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, MASTER_CLOCK/4)
+	MCFG_SEGA_315_5195_CPU("maincpu")
+	MCFG_SEGA_315_5195_MAPPER_HANDLER(segaorun_state, memory_mapper)
 	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	// video hardware

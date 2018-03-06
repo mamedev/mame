@@ -15,6 +15,8 @@ hardware, since no schematics or manuals have been found.
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "bus/rs232/rs232.h"
+#include "machine/ay31015.h"
 #include "screen.h"
 
 class zms8085_state : public driver_device
@@ -23,6 +25,8 @@ public:
 	zms8085_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_uart(*this, "uart")
+		, m_rs232(*this, "rs232")
 		, m_screen(*this, "screen")
 		, m_mainram(*this, "mainram")
 		, m_p_chargen(*this, "chargen")
@@ -31,12 +35,17 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(special_r);
+	DECLARE_READ8_MEMBER(uart_status_r);
+
+	virtual void machine_start() override;
 
 	void zephyr(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<ay51013_device> m_uart;
+	required_device<rs232_port_device> m_rs232;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<u8> m_mainram;
 	required_region_ptr<u8> m_p_chargen;
@@ -72,6 +81,11 @@ READ8_MEMBER(zms8085_state::special_r)
 	return 0x40;
 }
 
+READ8_MEMBER(zms8085_state::uart_status_r)
+{
+	return m_uart->tbmt_r() | (m_uart->dav_r() << 1);
+}
+
 
 ADDRESS_MAP_START(zms8085_state::mem_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP
@@ -79,12 +93,28 @@ ADDRESS_MAP_START(zms8085_state::mem_map)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(zms8085_state::io_map)
-	AM_RANGE(0x61, 0x61) AM_READ(special_r)
+	AM_RANGE(0x61, 0x61) AM_READ(special_r) AM_DEVWRITE("uart", ay51013_device, transmit)
+	AM_RANGE(0x62, 0x62) AM_DEVREAD("uart", ay51013_device, receive)
+	AM_RANGE(0x63, 0x63) AM_READ(uart_status_r)
 	AM_RANGE(0x68, 0x68) AM_WRITENOP
 ADDRESS_MAP_END
 
+
 static INPUT_PORTS_START( zephyr )
 INPUT_PORTS_END
+
+
+void zms8085_state::machine_start()
+{
+	m_uart->write_swe(0);
+
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_np(1);
+	m_uart->write_eps(1);
+	m_uart->write_tsb(0);
+	m_uart->write_cs(1);
+}
 
 MACHINE_CONFIG_START(zms8085_state::zephyr)
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL(15'582'000) / 2) // divider not verified
@@ -94,6 +124,16 @@ MACHINE_CONFIG_START(zms8085_state::zephyr)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'582'000), 980, 0, 800, 265, 0, 250)
 	MCFG_SCREEN_UPDATE_DRIVER(zms8085_state, screen_update)
+
+	MCFG_DEVICE_ADD("uart", AY51013, 0) // SMC COM2017
+	MCFG_AY51013_TX_CLOCK(153600) // should actually be configurable somehow
+	MCFG_AY51013_RX_CLOCK(153600)
+	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_AY51013_WRITE_DAV_CB(INPUTLINE("maincpu", I8085_RST65_LINE))
+	MCFG_AY51013_AUTO_RDAV(true)
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************
