@@ -319,7 +319,7 @@ private:
 	// inliners
 	inline void model2_3d_project( triangle *tri );
 	inline uint16_t float_to_zval( float floatval );
-
+	inline bool check_culling( raster_state *raster, uint32_t attr, float min_z, float max_z );
 };
 
 /*****************************
