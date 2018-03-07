@@ -1575,9 +1575,6 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 	model2_3d_push( raster, f2u(point.y) >> 8 );
 	model2_3d_push( raster, f2u(point.pz) >> 8 );
 
-	/* skip 4 */
-	input += 4;
-
 	/* loop through the following links */
 	for( i = 0; i < count; i++ )
 	{
@@ -1594,6 +1591,9 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 			int32_t               luma;
 			texture_parameter * texparam;
 
+			/* Skip normal */
+			input += 3;
+			
 			/* read in the next point */
 			point.x = u2f( *input++ );
 			point.y = u2f( *input++ );
@@ -1770,9 +1770,6 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 	model2_3d_push( raster, f2u(point.y) >> 8 );
 	model2_3d_push( raster, f2u(point.pz) >> 8 );
 
-	/* skip 4 */
-	input += 4;
-
 	/* loop through the following links */
 	for( i = 0; i < count; i++ )
 	{
@@ -1789,6 +1786,9 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 			int32_t               luma;
 			texture_parameter * texparam;
 
+			/* Skip normal */
+			input += 3;
+			
 			/* read in the next point */
 			point.x = u2f( *input++ );
 			point.y = u2f( *input++ );
