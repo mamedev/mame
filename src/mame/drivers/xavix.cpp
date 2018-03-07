@@ -87,8 +87,7 @@ public:
 		m_in1(*this, "IN1"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_alt_addressing(0),
-		m_alt_addressing_base(0)
+		m_alt_addressing(0)
 	{ }
 
 	// devices
@@ -278,7 +277,6 @@ private:
 	int get_current_address_byte();
 
 	int m_alt_addressing;
-	int m_alt_addressing_base;
 };
 
 void xavix_state::set_data_address(int address, int bit)
@@ -711,9 +709,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 				tile = tile * 8;
 		}
 
-		if (m_alt_addressing==1)
-			tile += m_alt_addressing_base;
-		else if (m_alt_addressing == 2)
+		if (m_alt_addressing != 0)
 		{
 			int basereg = (tile & 0xf0000) >> 16;
 			tile &= 0xffff;
@@ -825,9 +821,9 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 WRITE8_MEMBER(xavix_state::dma_trigger_w)
 {
-	if (data == 0x01)
+	if (data & 0x01) // namcons2 writes 0x81, most of the time things write 0x01
 	{
-		logerror("%s: dma_trigger_w (do DMA?)\n", machine().describe_context());
+		logerror("%s: dma_trigger_w (do DMA?) %02x\n", machine().describe_context(), data);
 
 		uint32_t source = (m_rom_dmasrc_hi_data << 16) | (m_rom_dmasrc_md_data << 8) | m_rom_dmasrc_lo_data;
 		uint16_t dest = (m_rom_dmadst_hi_data << 8) | m_rom_dmadst_lo_data;
@@ -1860,7 +1856,6 @@ DRIVER_INIT_MEMBER(xavix_state, taitons1)
 {
 	DRIVER_INIT_CALL(xavix);
 	m_alt_addressing = 1;
-	m_alt_addressing_base = 0xd8000;
 }
 
 DRIVER_INIT_MEMBER(xavix_state, rad_box)
@@ -1883,6 +1878,11 @@ ROM_END
 ROM_START( taitons2 )
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "taitonostalgia2.bin", 0x000000, 0x200000, CRC(d7dbd93d) SHA1(ad96f80d317e7fd64682a1fe406c5ee9dd5eabf9) )
+ROM_END
+
+ROM_START( namcons1 )
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "namconostalgia1.bin", 0x000000, 0x100000, CRC(9bcccccd) SHA1(cf8fe6de76fbd23974f999299db6f558f79c8f22) )
 ROM_END
 
 ROM_START( namcons2 )
@@ -1956,11 +1956,18 @@ ROM_START( eka_strt )
 	ROM_LOAD( "ekarastartcart.bin", 0x000000, 0x080000, CRC(8c12c0c2) SHA1(8cc1b098894af25a4bfccada884125b66f5fe8b2) )
 ROM_END
 
+ROM_START( has_wamg )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "minigolf.bin", 0x000000, 0x400000, CRC(35cee2ad) SHA1(c7344e8ba336bc329638485ea571cd731ebf7649) )
+ROM_END
+
 /* Standalone TV Games */
 
 CONS( 2006, taitons1,  0,          0,  xavix,  xavix,    xavix_state, taitons1, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
 
 CONS( 2006, taitons2,  0,          0,  xavix,  namcons2, xavix_state, xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 2", MACHINE_IS_SKELETON )
+
+CONS( 2006, namcons1,  0,          0,  xavix,  namcons2, xavix_state, taitons1, "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 1", MACHINE_IS_SKELETON )
 
 CONS( 2006, namcons2,  0,          0,  xavix,  namcons2, xavix_state, taitons1, "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 2", MACHINE_IS_SKELETON )
 
@@ -1983,6 +1990,8 @@ CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, xavixp,   xavix_state, rad_box,  
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
 CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue)", MACHINE_IS_SKELETON)
 CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue)", MACHINE_IS_SKELETON)
+
+CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, rad_box,  "Hasbro / Milton Bradley / SSD Company LTD",     "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
 
 CONS (200?, eka_strt,  0,          0,  xavix,  xavix,    xavix_state, xavix, "Takara / SSD Company LTD",                     "e-kara Starter", MACHINE_IS_SKELETON)
 
