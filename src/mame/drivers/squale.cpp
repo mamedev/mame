@@ -135,7 +135,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(squale_scanline);
 
 	void squale(machine_config &config);
-	void squale_io(address_map &map);
 	void squale_mem(address_map &map);
 private:
 	required_device<acia6850_device> m_acia;
@@ -636,10 +635,6 @@ ADDRESS_MAP_START(squale_state::squale_mem)
 
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(squale_state::squale_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
-
 /* Input ports */
 static INPUT_PORTS_START( squale )
 	PORT_START("X0")
@@ -785,7 +780,6 @@ MACHINE_CONFIG_START(squale_state::squale)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(squale_mem)
-	MCFG_CPU_IO_MAP(squale_io)
 
 	/* Cartridge pia */
 	MCFG_DEVICE_ADD("pia_u72", PIA6821, 0)

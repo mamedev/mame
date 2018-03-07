@@ -105,14 +105,10 @@ private:
 	required_device<cpu_device> m_maincpu;
 
 	void prg_map(address_map &map);
-	void io_map(address_map &map);
 };
 
 ADDRESS_MAP_START(milton_state::prg_map)
 	AM_RANGE(0x800, 0xfff) AM_ROM AM_REGION("maincpu", 0) // Internal ROM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(milton_state::io_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( milton )
@@ -123,7 +119,6 @@ MACHINE_CONFIG_START(milton_state::milton)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6805, 3120000) // MC6805P2, needs a CPU core
 	MCFG_CPU_PROGRAM_MAP(prg_map)
-	MCFG_CPU_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("grom3", TMC0430, 3120000 / 8)
 	downcast<tmc0430_device &>(*device).set_region_and_ident("groms", 0x0000, 0);

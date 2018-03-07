@@ -59,7 +59,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 	void mkit09a(machine_config &config);
 	void mkit09(machine_config &config);
-	void mkit09_io(address_map &map);
 	void mkit09_mem(address_map &map);
 	void mkit09a_mem(address_map &map);
 private:
@@ -84,10 +83,6 @@ ADDRESS_MAP_START(mkit09_state::mkit09a_mem)
 	AM_RANGE(0xe600,0xe603) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xee00,0xefff) AM_RAM
 	AM_RANGE(0xf000,0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(mkit09_state::mkit09_io)
-	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -198,7 +193,6 @@ MACHINE_CONFIG_START(mkit09_state::mkit09)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mkit09_mem)
-	MCFG_CPU_IO_MAP(mkit09_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mkit09)
@@ -224,7 +218,6 @@ MACHINE_CONFIG_START(mkit09_state::mkit09a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mkit09a_mem)
-	MCFG_CPU_IO_MAP(mkit09_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mkit09)
