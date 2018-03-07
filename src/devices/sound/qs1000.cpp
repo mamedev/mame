@@ -275,7 +275,7 @@ void qs1000_device::serial_in(uint8_t data)
 //-------------------------------------------------
 //  set_irq - interrupt the internal CPU
 //-------------------------------------------------
-void qs1000_device::set_irq(int state)
+WRITE_LINE_MEMBER(qs1000_device::set_irq)
 {
 	// Signal to the CPU that data is available
 	m_cpu->set_input_line(MCS51_INT1_LINE, state ? ASSERT_LINE : CLEAR_LINE);
