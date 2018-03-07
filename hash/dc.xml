@@ -8150,14 +8150,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="alt_title" value="ドリマガGD Vol.2" />
 		<info name="ring_code" value="610-7164-0128 1MB1 C 97 (Disc 1), 610-7164-0129 1M1 C 97, 610-7164-0129 1M5 C 97 (Disc 2)"/>
 		<part interface="dc_gdrom" name="gdrom1">
-			<diskarea name="gdrom">
 			<feature name="part_id" value="Disc 1"/>
+			<diskarea name="gdrom">
 				<disk name="dorimaga gd vol. 2 (jpn) (disc 1)" sha1="49abe4f9ef4c56f267b6e1c990d361a88c985b0c"/>
 			</diskarea>
 		</part>
 		<part interface="dc_gdrom" name="gdrom2">
-			<diskarea name="gdrom">
 			<feature name="part_id" value="Disc 2"/>
+			<diskarea name="gdrom">
 				<disk name="dorimaga gd vol. 2 (jpn) (disc 2)" sha1="8c46be4f4e8b87a0107b0a7c64e6988db856640e"/>
 			</diskarea>
 		</part>
@@ -13266,7 +13266,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track03.bin" size="1185760800" md5="73b443f96a919282364ef02105b8be74" sha1="626144e0343150604f76e152a3d1d58e3a4d5858"/>
 		-->
 		<description>Fur Fighters (Euro, Demo)</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Acclaim</publisher>
 		<info name="serial" value="D-0008-50"/>
 		<info name="release" value="200006xx" />
