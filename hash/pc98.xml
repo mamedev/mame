@@ -954,7 +954,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<software name="elecom">
-		<description>Ele Command (5&quot;25 Disk)</description>
+		<description>Ele Command (5.25&quot; Disk)</description>
 		<year>19??</year>
 		<publisher>Elecom</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -965,7 +965,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<software name="elecom35" cloneof="elecom">
-		<description>Ele Command (3&quot;5 Disk)</description>
+		<description>Ele Command (3.5&quot; Disk)</description>
 		<year>19??</year>
 		<publisher>Elecom</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -21320,7 +21320,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<software name="uranai" supported="no">
-		<description>Ketsuekigata-boshi Uranai (5&quot;25 Disk)</description>
+		<description>Ketsuekigata-boshi Uranai (5.25&quot; Disk)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -21331,7 +21331,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<software name="uranai35" cloneof="uranai" supported="no">
-		<description>Ketsuekigata-boshi Uranai (3&quot;5 Disks)</description>
+		<description>Ketsuekigata-boshi Uranai (3.5&quot; Disks)</description>
 		<year>19??</year>
 		<publisher>Kogaku System</publisher>
 		<info name="alt_title" value="血液型星占い" />
@@ -47806,7 +47806,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_advm" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (5&quot;25 Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (5.25&quot; Disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -47824,7 +47824,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_advm35" cloneof="ldb_advm" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (3&quot;5 Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (3.5&quot; Disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -47842,7 +47842,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_cg3d" supported="no">
-		<description>LOGiN Disk &amp; Book Series - CG Tsukuuru 3D (5&quot;25 Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - CG Tsukuuru 3D (5.25&quot; Disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -47860,7 +47860,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_cg3d35" cloneof="ldb_cg3d" supported="no">
-		<description>LOGiN Disk &amp; Book Series - CG Tsukuuru 3D (3&quot;5 Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - CG Tsukuuru 3D (3.5&quot; Disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -47878,7 +47878,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_char" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (5&quot;25 Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (5.25&quot; Disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -47896,7 +47896,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_char35" cloneof="ldb_char" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (3&quot;5 Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (3.5&quot; Disks)</description>
 		<year>1994</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -47940,7 +47940,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_draw" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Drawing Tool (5&quot;25 Disk)</description>
+		<description>LOGiN Disk &amp; Book Series - Drawing Tool (5.25&quot; Disk)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -47952,7 +47952,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 
 	<software name="ldb_draw35" cloneof="ldb_draw" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Drawing Tool (3&quot;5 Disk)</description>
+		<description>LOGiN Disk &amp; Book Series - Drawing Tool (3.5&quot; Disk)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -48014,7 +48014,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_polm">
-		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (5&quot;25 Disk)</description>
+		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (5.25&quot; Disk)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ポリゴンモデリングツクール" />
@@ -48026,7 +48026,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_polm35" cloneof="ldb_polm">
-		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (3&quot;5 Disk)</description>
+		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (3.5&quot; Disk)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ポリゴンモデリングツクール" />
@@ -48038,11 +48038,11 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_poly" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (5&quot;25 Disk)</description>
+		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (5.25&quot; Disk)</description>
 		<year>1994</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="5&quot;25 version"/>
+			<feature name="part_id" value="5.25&quot; version"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="polygon_shooting_tsukuru_5.hdm" size="1261568" crc="25745efe" sha1="2ddd45909f10301d4cc1b11a07f9426ebdcdb2db" offset="0" />
 			</dataarea>
@@ -48050,7 +48050,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_poly35" cloneof="ldb_poly" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (3&quot;5 Disk)</description>
+		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (3.5&quot; Disk)</description>
 		<year>1994</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop2" interface="floppy_3_5">
@@ -48061,7 +48061,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_rivh" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Riverhill Mystery Selection (5&quot;25 Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Riverhill Mystery Selection (5.25&quot; Disks)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -48079,7 +48079,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_rivh35" cloneof="ldb_rivh" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Riverhill Mystery Selection (3&quot;5 Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Riverhill Mystery Selection (3.5&quot; Disks)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -48133,7 +48133,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_sima">
-		<description>LOGiN Disk &amp; Book Series - SimAnt (5&quot;25 Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - SimAnt (5.25&quot; Disks)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ - シムアント" />
@@ -48146,7 +48146,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="ldb_sima35" cloneof="ldb_sima">
-		<description>LOGiN Disk &amp; Book Series - SimAnt (3&quot;5 Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - SimAnt (3.5&quot; Disks)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ - シムアント" />
@@ -60052,7 +60052,7 @@ SPACE EMPIRE
 
 
 	<software name="doujins1" supported="no">
-		<description>Doujin Soft Shuusaku Game Collection Vol. 1 (5&quot;25 Disks)</description>
+		<description>Doujin Soft Shuusaku Game Collection Vol. 1 (5.25&quot; Disks)</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
 		<info name="alt_title" value="同人ソフト秀作ゲームコレクションＶｏｌ１" />
@@ -60089,7 +60089,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="doujins135" cloneof="doujins1" supported="no">
-		<description>Doujin Soft Shuusaku Game Collection Vol. 1 (3&quot;5 Disks)</description>
+		<description>Doujin Soft Shuusaku Game Collection Vol. 1 (3.5&quot; Disks)</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
 		<info name="alt_title" value="同人ソフト秀作ゲームコレクションＶｏｌ１" />
@@ -60185,7 +60185,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="gc30" supported="no">
-		<description>Game Collection 30 (5&quot;25 Disk)</description>
+		<description>Game Collection 30 (5.25&quot; Disk)</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
 		<info name="alt_title" value="ゲームコレクション 30" />
@@ -60197,7 +60197,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="gc3035" cloneof="gc30" supported="no">
-		<description>Game Collection 30 (3&quot;5 Disk)</description>
+		<description>Game Collection 30 (3.5&quot; Disk)</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
 		<info name="alt_title" value="ゲームコレクション 30" />
@@ -60278,7 +60278,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="100best" supported="no">
-		<description>100 Best Freeware Programs Set 1 (5&quot;25 Disks)</description>
+		<description>100 Best Freeware Programs Set 1 (5.25&quot; Disks)</description>
 		<year>1992</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -60338,7 +60338,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="100best35" cloneof="100best" supported="no">
-		<description>100 Best Freeware Programs Set 1 (3&quot;5 Disks)</description>
+		<description>100 Best Freeware Programs Set 1 (3.5&quot; Disks)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">

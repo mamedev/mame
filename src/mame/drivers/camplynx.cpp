@@ -896,6 +896,10 @@ MACHINE_CONFIG_START(camplynx_state::lynx96k)
 	MCFG_CPU_IO_MAP(lynx96k_io)
 
 	lynx_disk(config);
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "camplynx_flop")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "96K")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(camplynx_state::lynx128k)
@@ -930,6 +934,10 @@ MACHINE_CONFIG_START(camplynx_state::lynx128k)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	lynx_disk(config);
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "camplynx_flop")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "128K")
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(camplynx_state, lynx48k)

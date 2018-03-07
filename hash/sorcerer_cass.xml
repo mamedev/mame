@@ -153,7 +153,7 @@
 	<software name="labyr">
 		<description>Labyrinth</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="300ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -165,7 +165,7 @@
 	<software name="qubic">
 		<description>Qubic</description>
 		<year>1985</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="301ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -177,7 +177,7 @@
 	<software name="lem">
 		<description>Lunar Entry Module</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="302ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -202,7 +202,7 @@
 	<software name="snake">
 		<description>Snake</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="304ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -214,7 +214,7 @@
 	<software name="snake1" cloneof="snake">
 		<description>Snake (alt)</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="3966884">
@@ -225,7 +225,7 @@
 	<software name="horse">
 		<description>Horse Race</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="305ES" />
 		<info name="developer" value="Gerard Neil"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
@@ -251,7 +251,7 @@
 	<software name="disas">
 		<description>Z-80 Disassembler</description>
 		<year>1979</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="307ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -263,7 +263,7 @@
 	<software name="revsi">
 		<description>Reversi</description>
 		<year>1979</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="308ES" />
 		<info name="developer" value="Terry and Kathleen Beyer"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
@@ -276,7 +276,7 @@
 	<software name="eatd">
 		<description>Eastern Australian Truck Driving</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="309ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -288,7 +288,7 @@
 	<software name="plane">
 		<description>Airmail Pilot</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="310ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -312,7 +312,7 @@
 	<software name="break">
 		<description>Breakout</description>
 		<year>1980</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="312ES" />
 		<info name="developer" value="Ray Bannon"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
@@ -325,7 +325,7 @@
 	<software name="kadat">
 		<description>Kadath</description>
 		<year>1985</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="313ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -337,7 +337,7 @@
 	<software name="pool">
 		<description>Cybernetic Pool</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="314ES" />
 		<info name="developer" value="PJB Systems"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
@@ -350,7 +350,7 @@
 	<software name="trekc">
 		<description>Super Star Trek V2.0</description>
 		<year>1979</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="315ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -362,7 +362,7 @@
 	<software name="systm">
 		<description>Graphic Animation System</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="316ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -374,7 +374,7 @@
 	<software name="demo">
 		<description>Character Animation Demo</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="318ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN. You must CLOAD and RUN &quot;systm&quot; first." />
 		<part name="cass" interface="sorcerer_cass">
@@ -386,7 +386,7 @@
 	<software name="instr">
 		<description>Instructions for Chess</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="319ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -410,7 +410,7 @@
 	<software name="orb">
 		<description>Orb of Halucidon</description>
 		<year>1982</year>
-		<publisher>System Software</publisher>
+			<publisher>System Software</publisher>
 		<info name="serial" value="321ES" />
 		<info name="developer" value="Leo Blackman"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
@@ -441,7 +441,7 @@
 	<software name="chess1">
 		<description>Sargon Chess</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="501V1ES" />
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -453,7 +453,7 @@
 	<software name="chess2" cloneof="chess1">
 		<description>Chess</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="501V2ES" />
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -477,7 +477,7 @@
 	<software name="char">
 		<description>Character Designer</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="503ES" />
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -489,7 +489,7 @@
 	<software name="adv1">
 		<description>Adventureland</description>
 		<year>1979</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="504ES" />
 		<info name="developer" value="Scott Adams"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
@@ -502,7 +502,7 @@
 	<software name="adv3">
 		<description>Mission Impossible</description>
 		<year>1979</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="505ES" />
 		<info name="developer" value="Scott Adams"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
@@ -515,7 +515,7 @@
 	<software name="adv4">
 		<description>Voodoo Castle</description>
 		<year>1979</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="developer" value="Scott and Alexis Adams"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -527,7 +527,7 @@
 	<software name="adv7">
 		<description>Mystery Fun House</description>
 		<year>1979</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="developer" value="Scott Adams"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -539,7 +539,7 @@
 	<software name="adv8">
 		<description>Pyramid of Doom</description>
 		<year>1979</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="developer" value="Scott Adams"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -603,7 +603,7 @@
 	<software name="galax">
 		<description>Galaxians (V1)</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="510V1ES" />
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -615,7 +615,7 @@
 	<software name="galx" cloneof="galax">
 		<description>Galaxians (V2)</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="510V2ES" />
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -640,7 +640,7 @@
 	<software name="spell">
 		<description>Spellbinder Word Processing System</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="512ES" />
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -652,7 +652,7 @@
 	<software name="ezy">
 		<description>Ezyfile</description>
 		<year>1981</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="513ES" />
 		<info name="developer" value="Bob Stafford"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
@@ -665,7 +665,7 @@
 	<software name="midas">
 		<description>Midas</description>
 		<year>1980</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="514ES" />
 		<info name="developer" value="R.J.V. Stafford"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
@@ -678,7 +678,7 @@
 	<software name="l2x">
 		<description>Level II Basic</description>
 		<year>198?</year>
-		<publisher>unknown</publisher><!-- Ported by Robbbert -->
+		<publisher>&lt;unknown&gt;</publisher><!-- Ported by Robbbert -->
 		<info name="serial" value="517ES" />
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -690,7 +690,7 @@
 	<software name="hpad">
 		<description>Memory Change (Hexpad)</description>
 		<year>1980</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="519ES" />
 		<info name="developer" value="Paul Grimshaw"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
@@ -703,7 +703,7 @@
 	<software name="spx48">
 		<description>Super-X 1.1</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="520ES" />
 		<info name="usage" value="In Basic, BYE then LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -741,7 +741,7 @@
 	<software name="amaze">
 		<description>Amazing Maze</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="528ES" />
 		<info name="developer" value="Brian Wyvill"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
@@ -754,7 +754,7 @@
 	<software name="invaders">
 		<description>Sorcerer Invaders</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="developer" value="Brian Wyvill"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -766,7 +766,7 @@
 	<software name="spider">
 		<description>Spider</description>
 		<year>198?</year>
-		<publisher>unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="1707474">

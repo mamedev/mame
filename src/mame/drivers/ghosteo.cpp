@@ -88,36 +88,34 @@ class ghosteo_state : public driver_device
 {
 public:
 	ghosteo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_qs1000(*this, "qs1000"),
-		m_i2cmem(*this, "i2cmem"),
-		m_s3c2410(*this, "s3c2410"),
-		m_soundlatch(*this, "soundlatch"),
-		m_system_memory(*this, "systememory") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_i2cmem(*this, "i2cmem")
+		, m_s3c2410(*this, "s3c2410")
+		, m_soundlatch(*this, "soundlatch")
+		, m_system_memory(*this, "systememory")
+		, m_flash(*this, "flash")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
-	required_device<qs1000_device> m_qs1000;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<s3c2410_device> m_s3c2410;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_shared_ptr<uint32_t> m_system_memory;
+	required_region_ptr<uint8_t> m_flash;
 
 	int m_security_count;
 	uint32_t m_bballoon_port[20];
 	struct nand_t m_nand;
 	DECLARE_READ32_MEMBER(bballoon_speedup_r);
 	DECLARE_READ32_MEMBER(touryuu_port_10000000_r);
-	DECLARE_WRITE32_MEMBER(soundlatch_w);
-
-	DECLARE_READ8_MEMBER(qs1000_p1_r);
 
 	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
 	int m_rom_pagesize;
-	uint8_t* m_flash;
 	DECLARE_DRIVER_INIT(touryuu);
 	DECLARE_DRIVER_INIT(bballoon);
 	virtual void machine_start() override;
@@ -164,11 +162,6 @@ NAND Flash Controller (4KB internal buffer)
 24-ch external interrupts Controller (Wake-up source 16-ch)
 */
 
-READ8_MEMBER( ghosteo_state::qs1000_p1_r )
-{
-	return m_soundlatch->read(space, 0);
-}
-
 WRITE8_MEMBER( ghosteo_state::qs1000_p1_w )
 {
 }
@@ -186,7 +179,7 @@ WRITE8_MEMBER( ghosteo_state::qs1000_p3_w )
 	membank("qs1000:bank")->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
-		m_qs1000->set_irq(CLEAR_LINE);
+		m_soundlatch->acknowledge_w(space, 0, !BIT(data, 5));
 }
 
 
@@ -431,7 +424,7 @@ ADDRESS_MAP_START(ghosteo_state::bballoon_map)
 	AM_RANGE(0x10000000, 0x10000003) AM_READ_PORT("10000000")
 	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
 	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
-	AM_RANGE(0x10300000, 0x10300003) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x10300000, 0x10300003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff).cswidth(32)
 	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_SHARE("systememory") AM_MIRROR(0x02000000)
 ADDRESS_MAP_END
 
@@ -439,7 +432,7 @@ ADDRESS_MAP_START(ghosteo_state::touryuu_map)
 	AM_RANGE(0x10000000, 0x10000003) AM_READ(touryuu_port_10000000_r)
 	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
 	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
-	AM_RANGE(0x10300000, 0x10300003) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x10300000, 0x10300003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff).cswidth(32)
 	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_SHARE("systememory") AM_MIRROR(0x02000000)
 ADDRESS_MAP_END
 
@@ -594,18 +587,8 @@ READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 	return ret;
 }
 
-WRITE32_MEMBER(ghosteo_state::soundlatch_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_qs1000->set_irq(ASSERT_LINE);
-
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
-}
-
 void ghosteo_state::machine_start()
 {
-	m_flash = (uint8_t *)memregion( "user1")->base();
-
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
 	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
@@ -654,10 +637,12 @@ MACHINE_CONFIG_START(ghosteo_state::ghosteo)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("qs1000", qs1000_device, set_irq))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(READ8(ghosteo_state, qs1000_p1_r))
+	MCFG_QS1000_IN_P1_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_QS1000_OUT_P1_CB(WRITE8(ghosteo_state, qs1000_p1_w))
 	MCFG_QS1000_OUT_P2_CB(WRITE8(ghosteo_state, qs1000_p2_w))
 	MCFG_QS1000_OUT_P3_CB(WRITE8(ghosteo_state, qs1000_p3_w))
@@ -728,7 +713,7 @@ Notes:
 
 // The NAND dumps are missing the ECC data.  We calculate it on the fly, because the games require it, but really it should be dumped hence the 'BAD DUMP' flags
 ROM_START( bballoon )
-	ROM_REGION( 0x2000000, "user1", 0 ) /* ARM 32 bit code */
+	ROM_REGION( 0x2000000, "flash", 0 ) /* ARM 32 bit code */
 	ROM_LOAD( "flash.u1",     0x000000, 0x2000000, BAD_DUMP CRC(73285634) SHA1(4d0210c1bebdf3113a99978ffbcd77d6ee854168) ) // missing ECC data
 
 	// banked every 0x10000 bytes ?
@@ -741,7 +726,7 @@ ROM_START( bballoon )
 ROM_END
 
 ROM_START( hapytour ) /* Same hardware: GHOST Ver1.1 2003.03.28 */
-	ROM_REGION( 0x2000000, "user1", 0 ) /* ARM 32 bit code */
+	ROM_REGION( 0x2000000, "flash", 0 ) /* ARM 32 bit code */
 	ROM_LOAD( "flash.u1",     0x000000, 0x2000000, BAD_DUMP CRC(49deb7f9) SHA1(708a27d7177cf6261a49ded975c2bbb6c2427742) ) // missing ECC data
 
 	// banked every 0x10000 bytes ?
@@ -755,7 +740,7 @@ ROM_END
 
 
 ROM_START( touryuu )
-	ROM_REGION( 0x4200000, "user1", 0 ) /* ARM 32 bit code */
+	ROM_REGION( 0x4200000, "flash", 0 ) /* ARM 32 bit code */
 	ROM_LOAD( "u1.bin",     0x000000, 0x4200000, CRC(49b6856e) SHA1(639123d2fabac4e79c9315fb87f72b13f9ae8761) )
 
 	// banked every 0x10000 bytes ?

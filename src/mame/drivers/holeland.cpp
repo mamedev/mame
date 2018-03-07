@@ -7,10 +7,9 @@
     driver by Mathis Rosenhauer
 
     TODO:
-    - tile/sprite priority in holeland - sprites appearing on top of text for
-      example GAME OVER, is still incorrect
     - missing high bit of sprite X coordinate? (see round 2 and 3 of attract
       mode in crzrally)
+
 ***************************************************************************/
 
 #include "emu.h"

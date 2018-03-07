@@ -69,7 +69,7 @@ public:
 
 	// external
 	void serial_in(uint8_t data);
-	void set_irq(int state);
+	DECLARE_WRITE_LINE_MEMBER( set_irq );
 
 	DECLARE_WRITE8_MEMBER( wave_w );
 

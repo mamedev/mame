@@ -74,7 +74,7 @@ public:
 		m_vdg(*this, "mc6847"),
 		m_videoram(*this, "videoram"),
 		m_uart(*this, "uart"),
-		m_lx388_kr2376(*this, "lx388_kr2376"),
+		m_lx387_kr2376(*this, "lx387_kr2376"),
 		m_maincpu(*this, "z80ne"),
 		m_floppy0(*this, "wd1771:0"),
 		m_floppy1(*this, "wd1771:1"),
@@ -93,7 +93,7 @@ public:
 		m_io_ctrl(*this, "CTRL"),
 		m_io_rst(*this, "RST"),
 		m_io_lx_385(*this, "LX.385"),
-		m_io_lx388_brk(*this, "LX388_BRK"),
+		m_io_lx387_brk(*this, "LX387_BRK"),
 		m_io_x0(*this, "X0"),
 		m_io_x1(*this, "X1"),
 		m_io_x2(*this, "X2"),
@@ -110,7 +110,7 @@ public:
 	optional_device<mc6847_base_device> m_vdg;
 	optional_shared_ptr<uint8_t> m_videoram;
 	required_device<ay31015_device> m_uart;
-	optional_device<kr2376_device> m_lx388_kr2376;
+	optional_device<kr2376_device> m_lx387_kr2376;
 	uint8_t m_lx383_scan_counter;
 	uint8_t m_lx383_key[LX383_KEYS];
 	int m_lx383_downsampler;
@@ -123,7 +123,9 @@ public:
 	DECLARE_WRITE8_MEMBER(lx383_w);
 	DECLARE_READ8_MEMBER(lx385_ctrl_r);
 	DECLARE_WRITE8_MEMBER(lx385_ctrl_w);
-	DECLARE_READ8_MEMBER(lx388_data_r);
+	DECLARE_READ_LINE_MEMBER(lx387_shift_r);
+	DECLARE_READ_LINE_MEMBER(lx387_control_r);
+	DECLARE_READ8_MEMBER(lx387_data_r);
 	DECLARE_READ8_MEMBER(lx388_read_field_sync);
 	DECLARE_DRIVER_INIT(z80netf);
 	DECLARE_DRIVER_INIT(z80net);
@@ -180,7 +182,7 @@ protected:
 	required_ioport m_io_ctrl;
 	required_ioport m_io_rst;
 	required_ioport m_io_lx_385;
-	optional_ioport m_io_lx388_brk;
+	optional_ioport m_io_lx387_brk;
 	optional_ioport m_io_x0;
 	optional_ioport m_io_x1;
 	optional_ioport m_io_x2;
@@ -196,7 +198,7 @@ protected:
 	emu_timer *m_timer_reset;
 
 	cassette_image_device *cassette_device_image();
-	void reset_lx388();
+	void reset_lx387();
 	void reset_lx382_banking();
 	void reset_lx390_banking();
 };
