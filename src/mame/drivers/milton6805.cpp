@@ -151,4 +151,4 @@ ROM_START( milton )
 	ROM_LOAD("miltongrom4.bin", 0x2000, 0x1800, CRC(9ac929f7) SHA1(1a27d56fc49eb4e58ea3b5c58d7fbedc5a751592) )
 ROM_END
 
-GAME( 1980, milton,  0,  milton, milton, milton_state,  0, ROT0, "Milton Bradley", "Electronic Milton",  MACHINE_IS_SKELETON )
+CONS( 1980, milton,  0,  0, milton, milton, milton_state,  0, "Milton Bradley", "Electronic Milton",  MACHINE_IS_SKELETON )

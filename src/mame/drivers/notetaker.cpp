@@ -947,3 +947,4 @@ ROM_END
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     STATE            INIT      COMPANY  FULLNAME     FLAGS
 COMP( 1978, notetakr,  0,      0,      notetakr, notetakr, notetaker_state, notetakr, "Xerox", "NoteTaker", MACHINE_IS_SKELETON)
+
