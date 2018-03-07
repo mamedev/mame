@@ -1655,7 +1655,7 @@ static INPUT_PORTS_START( ghox )
 	PORT_CONFSETTING(       0x0000b, "USA (Taito America Corporation)" )
 	PORT_CONFSETTING(       0x0000c, "USA (Taito Corporation Japan)" )
 	PORT_CONFSETTING(       0x8000d, "Europe (Taito Corporation Japan)" )
-//  PORT_CONFSETTING(        0x0000e, "Japan (Licensed to [blank])" )    // English title screen
+	PORT_CONFSETTING(        0x0000e, "Japan (Licensed to [blank])" )    // English title screen
 	PORT_CONFSETTING(        0x0000f, "Japan (Taito Corporation)" )
 
 	PORT_START("PAD1")      /* Paddle 1 (left-right)  read at $100000 */
@@ -1665,6 +1665,31 @@ static INPUT_PORTS_START( ghox )
 	PORT_START("PAD2")      /* Paddle 2 (left-right)  read at $040000 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Unknown/Unused
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( ghoxjo )
+	PORT_INCLUDE( ghox )
+
+	PORT_MODIFY("JMPR")
+	// Bit Mask 0x80000 is used here to signify European Coinage for MAME purposes - not read on the real board!
+	PORT_CONFNAME( 0x8000f, 0x80002, DEF_STR( Region ) )    //PORT_CONFLOCATION("JP:!4,!3,!2,!1,FAKE:!1")
+	PORT_CONFSETTING(       0x80002, DEF_STR( Europe ) )
+	PORT_CONFSETTING(       0x00001, DEF_STR( USA ) )
+	PORT_CONFSETTING(       0x00000, DEF_STR( Japan ) )
+	PORT_CONFSETTING(       0x00003, "Hong Kong (Honest Trading Co.)" )
+	PORT_CONFSETTING(       0x00004, DEF_STR( Korea ) )
+	PORT_CONFSETTING(       0x00005, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(       0x80006, "Spain & Portugal (APM Electronics S.A.)" )
+	PORT_CONFSETTING(       0x80007, "Italy (Star Electronica SRL)" )
+	PORT_CONFSETTING(       0x80008, "UK (JP Leisure Limited)" )
+	PORT_CONFSETTING(       0x00009, "USA (Romstar, Inc.)" )
+	PORT_CONFSETTING(       0x8000a, "Europe (Nova Apparate GMBH & Co.)" )
+	PORT_CONFSETTING(       0x0000b, "Japan (Unused) [b]" )
+	PORT_CONFSETTING(       0x0000c, "Japan (Unused) [c]" )
+	PORT_CONFSETTING(       0x0000d, "Japan (Unused) [d]" )
+	PORT_CONFSETTING(       0x0000e, "Japan (Unused) [e]" )
+	PORT_CONFSETTING(       0x0000f, "Japan (Unused) [f]" )
 INPUT_PORTS_END
 
 
@@ -4234,6 +4259,19 @@ ROM_START( ghoxj ) /* 8-way joystick for controls */
 	ROM_LOAD( "tp021-04.u37", 0x080000, 0x080000, CRC(26ed1c9a) SHA1(37da8af86ea24327444c2d4ad3dfbd936208d43d) )
 ROM_END
 
+ROM_START( ghoxjo ) /* older version (with fewer regions) of the 8-way joystick version */
+	ROM_REGION( 0x040000, "maincpu", 0 )            /* Main 68K code */
+	ROM_LOAD16_BYTE( "tp021-01.ghoxsticker.u10", 0x000000, 0x020000, CRC(ad3a8817) SHA1(317267e0c00934a86bf05c5afd6c69a7944a2ed3) ) // TP021 ?01? label covered with a handwriten 'GHOX' sticker
+	ROM_LOAD16_BYTE( "tp021-02.ghoxsticker.u11", 0x000001, 0x020000, CRC(2340e981) SHA1(d8e3f55e67fe6500f9e6c7eed1388dc895c5f574) ) // TP021 ?02? label covered with a handwriten 'GHOX' sticker
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )            /* Sound HD647180 code */
+	ROM_LOAD( "hd647180.021", 0x00000, 0x08000, CRC(6ab59e5b) SHA1(d814dd3a8f1ee638794e2bd422eed4247ba4a15e) )
+
+	ROM_REGION( 0x100000, "gp9001", 0 )
+	ROM_LOAD( "tp021-03.u36", 0x000000, 0x080000, CRC(a15d8e9d) SHA1(640a33997bdce8e84bea6a944139716379839037) )
+	ROM_LOAD( "tp021-04.u37", 0x080000, 0x080000, CRC(26ed1c9a) SHA1(37da8af86ea24327444c2d4ad3dfbd936208d43d) )
+ROM_END
+
 
 ROM_START( dogyuun )
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
@@ -5584,6 +5622,7 @@ GAME( 1991, tekipakit,   tekipaki, tekipaki,     tekipaki,   toaplan2_state, 0, 
 
 GAME( 1991, ghox,        0,        ghox,         ghox,       toaplan2_state, 0,          ROT270, "Toaplan",         "Ghox (spinner)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ghoxj,       ghox,     ghox,         ghox,       toaplan2_state, 0,          ROT270, "Toaplan",         "Ghox (joystick)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ghoxjo,      ghox,     ghox,         ghoxjo,     toaplan2_state, 0,          ROT270, "Toaplan",         "Ghox (joystick, older)",    MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, dogyuun,     0,        dogyuun,      dogyuun,    toaplan2_state, dogyuun,    ROT270, "Toaplan",         "Dogyuun",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1992, dogyuuna,    dogyuun,  dogyuun,      dogyuuna,   toaplan2_state, dogyuun,    ROT270, "Toaplan",         "Dogyuun (older set)",       MACHINE_SUPPORTS_SAVE )
