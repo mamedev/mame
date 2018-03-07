@@ -38,7 +38,7 @@
 
 	Play TV Baseball 2			72042		x8			48			2M				no				SSD 98 PL7351-181
 	Play TV Monster Truck		74026		x8			48			4M				no				SSD 98 PL7351-181
-	Radica/EA Madden Football	74021		x8			48			not dumped		no				SSD 98 PL7351-181
+	Radica/EA Madden Football	74021		x8			48			4M      		no				SSD 98 PL7351-181
 	Play TV Snowboarder Blue	71023		x8			40			1M				no				SSD 98 PL7351-181
 	Namco Nostalgia 2			CGSJ		x8			48			1M				24LC04			SSD 98 PL7351-181
 
@@ -1951,6 +1951,17 @@ ROM_START( rad_mtrkp ) // rom was dumped from NTSC unit, assuming to be the same
 	ROM_LOAD( "monstertruck.bin", 0x000000, 0x400000, CRC(dccda0a7) SHA1(7953cf29643672f8367639555b797c20bb533eab) )
 ROM_END
 
+
+ROM_START( rad_madf )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("madden.bin", 0x000000, 0x400000, CRC(e972fdcf) SHA1(52001316254880755da959c3441d232fd2c72c7a) )
+ROM_END
+
+ROM_START( rad_fb )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("rfootball.bin", 0x000000, 0x400000, CRC(025e0cb4) SHA1(60ce363de236d5119d078e346ad5d2ae50dbc7e1) )
+ROM_END
+
 ROM_START( eka_strt )
 	ROM_REGION( 0x080000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekarastartcart.bin", 0x000000, 0x080000, CRC(8c12c0c2) SHA1(8cc1b098894af25a4bfccada884125b66f5fe8b2) )
@@ -1984,12 +1995,16 @@ CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, rad_box,  
 
 CONS( 2002, rad_bb2,   0,          0,  xavix,  xavix,    xavix_state, xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
 
-CONS( 2001, rad_bass,  0,          0,  xavix,  xavix,    xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Bass Fishin'", MACHINE_IS_SKELETON)
-CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, xavixp,   xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin'", MACHINE_IS_SKELETON)
+CONS( 2001, rad_bass,  0,          0,  xavix,  xavix,    xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, xavixp,   xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_IS_SKELETON)
 
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
-CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue)", MACHINE_IS_SKELETON)
-CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IS_SKELETON)
+
+CONS( 2003, rad_madf,   0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_IS_SKELETON) // no Play TV branding, USA only release?
+
+CONS( 200?, rad_fb,     0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_IS_SKELETON) // USA only release? doesn't change logo for PAL
 
 CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, rad_box,  "Hasbro / Milton Bradley / SSD Company LTD",     "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
 
