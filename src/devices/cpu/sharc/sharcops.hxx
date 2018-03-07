@@ -402,6 +402,7 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 			switch (reg)
 			{
 				case 0x5:   m_core->pcstkp = data; break;     /* PCSTKP */
+				case 0x7:   m_core->curlcntr = data; break;   /* CURLCNTR (Zero Gunner 2B) */
 				case 0x8:   m_core->lcntr = data; break;      /* LCNTR */
 				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
