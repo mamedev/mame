@@ -85,11 +85,8 @@ NOTE: Mask roms from Power Flipper Pinball Shooting have not been dumped, but as
 #include "includes/gcpinbal.h"
 
 #include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
-#include "sound/msm5205.h"
 #include "screen.h"
 #include "speaker.h"
-
 
 
 /***********************************************************
@@ -141,7 +138,12 @@ WRITE16_MEMBER(gcpinbal_state::d80060_w)
 WRITE8_MEMBER(gcpinbal_state::bank_w)
 {
 	// MSM6585 bank, coin LEDs, maybe others?
-	m_msm_bank = data & 0x10 ? 0x100000 : 0;
+	if (m_msm_bank != ((data & 0x10) >> 4))
+	{
+		m_msm_bank = ((data & 0x10) >> 4);
+		m_essnd->set_rom_bank(m_msm_bank);
+		logerror("Bankswitching ES8712 ROM %02x\n", m_msm_bank);
+	}
 	m_oki->set_rom_bank((data & 0x20) >> 5);
 
 	m_bg0_gfxset = (data & 0x04) ? 0x1000 : 0;
@@ -161,88 +163,10 @@ WRITE8_MEMBER(gcpinbal_state::eeprom_w)
 	m_eeprom->cs_write(BIT(data, 0));
 }
 
-WRITE8_MEMBER(gcpinbal_state::es8712_ack_w)
+WRITE8_MEMBER(gcpinbal_state::es8712_reset_w)
 {
 	// This probably works by resetting the ES-8712
-	m_maincpu->set_input_line(3, CLEAR_LINE);
-	m_adpcm_idle = 1;
-	m_msm->reset_w(1);
-}
-
-WRITE8_MEMBER(gcpinbal_state::es8712_w)
-{
-	// MSM6585/ES-8712 ADPCM - mini emulation
-	switch (offset)
-	{
-		case 0:
-			m_msm_start &= 0xffff00;
-			m_msm_start |= data;
-			break;
-		case 1:
-			m_msm_start &= 0xff00ff;
-			m_msm_start |= (data << 8);
-			break;
-		case 2:
-			m_msm_start &= 0x00ffff;
-			m_msm_start |= (data << 16);
-			break;
-		case 3:
-			m_msm_end &= 0xffff00;
-			m_msm_end |= data;
-			break;
-		case 4:
-			m_msm_end &= 0xff00ff;
-			m_msm_end |= (data << 8);
-			break;
-		case 5:
-			m_msm_end &= 0x00ffff;
-			m_msm_end |= (data << 16);
-			break;
-		case 6:
-			logerror("ES-8712 playing sample %08x-%08x\n", m_msm_start + m_msm_bank, m_msm_end);
-			if (m_msm_start < m_msm_end)
-			{
-				/* data written here is adpcm param? */
-				m_adpcm_idle = 0;
-				m_msm->reset_w(0);
-				m_adpcm_start = m_msm_start + m_msm_bank;
-				m_adpcm_end = m_msm_end;
-			}
-			break;
-		default:
-			break;
-	}
-}
-
-
-/************************************************
-                      SOUND
-************************************************/
-
-
-// Controlled through ES-8712
-WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
-{
-	if (!state || m_adpcm_idle)
-		return;
-	if (m_adpcm_start >= 0x200000 || m_adpcm_start > m_adpcm_end)
-	{
-		m_adpcm_idle = 1;
-		m_msm->reset_w(1);
-		m_maincpu->set_input_line(3, ASSERT_LINE);
-		//m_adpcm_start = m_msm_start + m_msm_bank;
-		m_adpcm_trigger = 0;
-	}
-	else
-	{
-		uint8_t *ROM = memregion("msm")->base();
-
-		m_adpcm_select->ab_w(ROM[m_adpcm_start]);
-		m_adpcm_select->select_w(m_adpcm_trigger);
-		m_adpcm_trigger ^= 1;
-		if (m_adpcm_trigger == 0)
-			m_adpcm_start++;
-	}
+	m_essnd->reset();
 }
 
 
@@ -263,9 +187,9 @@ ADDRESS_MAP_START(gcpinbal_state::gcpinbal_map)
 	AM_RANGE(0xd80086, 0xd80087) AM_READ_PORT("IN1")
 	AM_RANGE(0xd80088, 0xd80089) AM_WRITE8(bank_w, 0xff00)
 	AM_RANGE(0xd8008a, 0xd8008b) AM_WRITE8(eeprom_w, 0xff00)
-	AM_RANGE(0xd8008e, 0xd8008f) AM_WRITE8(es8712_ack_w, 0xff00)
+	AM_RANGE(0xd8008e, 0xd8008f) AM_WRITE8(es8712_reset_w, 0xff00)
 	AM_RANGE(0xd800a0, 0xd800a1) AM_MIRROR(0x2) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0xd800c0, 0xd800cd) AM_WRITE8(es8712_w, 0xff00)
+	AM_RANGE(0xd800c0, 0xd800cd) AM_DEVWRITE8("essnd", es8712_device, write, 0xff00)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM /* RAM */
 ADDRESS_MAP_END
 
@@ -371,10 +295,10 @@ static const gfx_layout charlayout =
 	16,16,  /* 16*16 characters */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4, 2*4+32, 3*4+32, 0*4+32, 1*4+32, 6*4+32, 7*4+32, 4*4+32, 5*4+32 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8   /* every sprite takes 128 consecutive bytes */
+	{ STEP4(0,1) },
+	{ STEP16(0,4) },
+	{ STEP16(0,4*16) },
+	16*16*4   /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout char_8x8_layout =
@@ -382,10 +306,10 @@ static const gfx_layout char_8x8_layout =
 	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
+	8*8*4    /* every sprite takes 32 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
@@ -395,15 +319,15 @@ static const gfx_layout tilelayout =
 	4,  /* 4 bits per pixel */
 //  { 16, 48, 0, 32 },
 	{ 48, 16, 32, 0 },
-	{ 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8   /* every sprite takes 128 consecutive bytes */
+	{ STEP16(0,1) },
+	{ STEP16(0,16*4) },
+	16*16*4   /* every sprite takes 128 consecutive bytes */
 };
 
 static GFXDECODE_START( gcpinbal )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,       0, 256 )  /* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 256 )  /* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx2", 0, char_8x8_layout,  0, 256 )  /* sprites & playfield */
+	GFXDECODE_ENTRY( "sprite", 0, tilelayout,       0, 256 )  /* sprites & playfield */
+	GFXDECODE_ENTRY( "bg0", 0, charlayout,       0, 256 )  /* sprites & playfield */
+	GFXDECODE_ENTRY( "fg0", 0, char_8x8_layout,  0, 256 )  /* sprites & playfield */
 GFXDECODE_END
 
 
@@ -419,13 +343,7 @@ void gcpinbal_state::machine_start()
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_bg0_gfxset));
 	save_item(NAME(m_bg1_gfxset));
-	save_item(NAME(m_msm_start));
-	save_item(NAME(m_msm_end));
 	save_item(NAME(m_msm_bank));
-	save_item(NAME(m_adpcm_start));
-	save_item(NAME(m_adpcm_end));
-	save_item(NAME(m_adpcm_idle));
-	save_item(NAME(m_adpcm_trigger));
 }
 
 void gcpinbal_state::machine_reset()
@@ -438,14 +356,8 @@ void gcpinbal_state::machine_reset()
 		m_scrolly[i] = 0;
 	}
 
-	m_adpcm_idle = 1;
-	m_adpcm_start = 0;
-	m_adpcm_end = 0;
-	m_adpcm_trigger = 0;
 	m_bg0_gfxset = 0;
 	m_bg1_gfxset = 0;
-	m_msm_start = 0;
-	m_msm_end = 0;
 	m_msm_bank = 0;
 }
 
@@ -469,7 +381,6 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	MCFG_SCREEN_UPDATE_DRIVER(gcpinbal_state, screen_update_gcpinbal)
 	MCFG_SCREEN_PALETTE("palette")
 
-
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gcpinbal)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -482,11 +393,13 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_DEVICE_ADD("adpcm_select", HCT157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm6585_device, data_w))
+	MCFG_ES8712_ADD("essnd", 0)
+	MCFG_ES8712_RESET_HANDLER(INPUTLINE("maincpu", 3))
+	MCFG_ES8712_MSM_WRITE_CALLBACK(DEVWRITE8("msm", msm6585_device, data_w))
+	MCFG_ES8712_MSM_TAG("msm")
 
 	MCFG_SOUND_ADD("msm", MSM6585, 640_kHz_XTAL)
-	MCFG_MSM6585_VCK_CALLBACK(WRITELINE(gcpinbal_state, gcp_adpcm_int))
+	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("essnd", es8712_device, msm_int))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* 16 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -504,20 +417,20 @@ ROM_START( pwrflip ) /* Updated version of Grand Cross Pinball or semi-sequel? *
 	ROM_LOAD16_WORD_SWAP( "p.f.u45",       0x100000, 0x80000, CRC(6ad1a457) SHA1(8746c38efa05e3318e9b1a371470d149803fb6bb) )
 	ROM_LOAD16_WORD_SWAP( "p.f.u46",       0x180000, 0x80000, CRC(e0f3a1b4) SHA1(761dddf374a92c1a1e4a211ead215d5be461a082) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )  /* BG0 (16 x 16) */
-	ROM_LOAD( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 MASK ROMs */
-	ROM_LOAD( "u6",      0x100000, 0x100000, CRC(c3f024e5) SHA1(d197e2b715b154fc64ff9a61f8c6df111d6fd446) )
+	ROM_REGION( 0x200000, "bg0", 0 )  /* BG0 (16 x 16) */
+	ROM_LOAD16_WORD_SWAP( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 MASK ROMs */
+	ROM_LOAD16_WORD_SWAP( "u6",      0x100000, 0x100000, CRC(c3f024e5) SHA1(d197e2b715b154fc64ff9a61f8c6df111d6fd446) )
 
-	ROM_REGION( 0x020000, "gfx2", 0 )  /* FG0 (8 x 8) */
-	ROM_LOAD( "p.f.u10",   0x000000, 0x020000, CRC(50e34549) SHA1(ca1808513ff3feb8bcd34d9aafd7b374e4244732) )
+	ROM_REGION( 0x020000, "fg0", 0 )  /* FG0 (8 x 8) */
+	ROM_LOAD16_WORD_SWAP( "p.f.u10",   0x000000, 0x020000, CRC(50e34549) SHA1(ca1808513ff3feb8bcd34d9aafd7b374e4244732) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )  /* Sprites (16 x 16) */
-	ROM_LOAD( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 MASK ROM */
+	ROM_REGION( 0x200000, "sprite", 0 )  /* Sprites (16 x 16) */
+	ROM_LOAD16_WORD_SWAP( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 MASK ROM */
 
 	ROM_REGION( 0x080000, "oki", 0 )   /* M6295 acc to Raine */
 	ROM_LOAD( "u55",   0x000000, 0x080000, CRC(b3063351) SHA1(825e63e8a824d67d235178897528e5b0b41e4485) ) /* OKI M534001B MASK ROM */
 
-	ROM_REGION( 0x200000, "msm", 0 )   /* M6585 acc to Raine but should be for ES-8712??? */
+	ROM_REGION( 0x200000, "essnd", 0 )   /* M6585 acc to Raine but should be for ES-8712??? */
 	ROM_LOAD( "u56",   0x000000, 0x200000, CRC(092b2c0f) SHA1(2ec1904e473ddddb50dbeaa0b561642064d45336) ) /* 23C16000 MASK ROM */
 ROM_END
 
@@ -528,20 +441,20 @@ ROM_START( gcpinbal )
 	ROM_LOAD16_WORD_SWAP( "3_excellent.u45",  0x100000, 0x80000, CRC(0511ad56) SHA1(e0602ece514126ce719ebc9de6649ebe907be904) )
 	ROM_LOAD16_WORD_SWAP( "4_excellent.u46",  0x180000, 0x80000, CRC(e0f3a1b4) SHA1(761dddf374a92c1a1e4a211ead215d5be461a082) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )  /* BG0 (16 x 16) */
-	ROM_LOAD( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 MASK ROMs */
-	ROM_LOAD( "u6",      0x100000, 0x100000, CRC(c3f024e5) SHA1(d197e2b715b154fc64ff9a61f8c6df111d6fd446) )
+	ROM_REGION( 0x200000, "bg0", 0 )  /* BG0 (16 x 16) */
+	ROM_LOAD16_WORD_SWAP( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 MASK ROMs */
+	ROM_LOAD16_WORD_SWAP( "u6",      0x100000, 0x100000, CRC(c3f024e5) SHA1(d197e2b715b154fc64ff9a61f8c6df111d6fd446) )
 
-	ROM_REGION( 0x020000, "gfx2", 0 )  /* FG0 (8 x 8) */
-	ROM_LOAD( "1_excellent.u10",   0x000000, 0x020000, CRC(79321550) SHA1(61f1b772ed8cf95bfee9df8394b0c3ff727e8702) )
+	ROM_REGION( 0x020000, "fg0", 0 )  /* FG0 (8 x 8) */
+	ROM_LOAD16_WORD_SWAP( "1_excellent.u10",   0x000000, 0x020000, CRC(79321550) SHA1(61f1b772ed8cf95bfee9df8394b0c3ff727e8702) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )  /* Sprites (16 x 16) */
-	ROM_LOAD( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 MASK ROM */
+	ROM_REGION( 0x200000, "sprite", 0 )  /* Sprites (16 x 16) */
+	ROM_LOAD16_WORD_SWAP( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 MASK ROM */
 
 	ROM_REGION( 0x080000, "oki", 0 )   /* M6295 acc to Raine */
 	ROM_LOAD( "u55",   0x000000, 0x080000, CRC(b3063351) SHA1(825e63e8a824d67d235178897528e5b0b41e4485) ) /* OKI M534001B MASK ROM */
 
-	ROM_REGION( 0x200000, "msm", 0 )   /* M6585 acc to Raine but should be for ES-8712??? */
+	ROM_REGION( 0x200000, "essnd", 0 )   /* M6585 acc to Raine but should be for ES-8712??? */
 	ROM_LOAD( "u56",   0x000000, 0x200000, CRC(092b2c0f) SHA1(2ec1904e473ddddb50dbeaa0b561642064d45336) ) /* 23C16000 MASK ROM */
 ROM_END
 
