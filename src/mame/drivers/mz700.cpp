@@ -87,7 +87,6 @@
 #include "sound/sn76496.h"
 #include "sound/wave.h"
 
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 

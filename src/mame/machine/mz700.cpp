@@ -124,7 +124,7 @@ READ8_MEMBER(mz_state::mz700_e008_r)
 
 	data |= m_other_timer;
 	data |= ioport("JOY")->read();
-	data |= machine().first_screen()->hblank() << 7;
+	data |= m_screen->hblank() << 7;
 
 	LOG(1, "mz700_e008_r", ("%02X\n", data), machine());
 
@@ -504,7 +504,7 @@ READ8_MEMBER(mz_state::pio_port_c_r)
 		data |= 0x20;       /* set the RDATA status */
 
 	data |= m_cursor_timer << 6;
-	data |= machine().first_screen()->vblank() << 7;
+	data |= m_screen->vblank() << 7;
 
 	LOG(2,"mz700_pio_port_c_r",("%02X\n", data),machine());
 
@@ -596,7 +596,7 @@ READ8_MEMBER(mz_state::mz800_z80pio_port_a_r)
 
 	result |= m_centronics_busy;
 	result |= m_centronics_perror << 1;
-	result |= machine().first_screen()->hblank() << 5;
+	result |= m_screen->hblank() << 5;
 
 	return result;
 }
