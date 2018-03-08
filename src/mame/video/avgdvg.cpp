@@ -1392,7 +1392,7 @@ void avg_device::device_start()
 	if(!m_vector->started())
 		throw device_missing_dependencies();
 
-	const rectangle &visarea = machine().first_screen()->visible_area();
+	const rectangle &visarea = m_vector->screen().visible_area();
 
 	avgdvg_vectorram = reinterpret_cast<uint8_t *>(machine().root_device().memshare("vectorram")->ptr());
 	avgdvg_vectorram_size = machine().root_device().memshare("vectorram")->bytes();
@@ -1432,7 +1432,7 @@ void dvg_device::device_start()
 	if(!m_vector->started())
 		throw device_missing_dependencies();
 
-	const rectangle &visarea = machine().first_screen()->visible_area();
+	const rectangle &visarea = m_vector->screen().visible_area();
 
 	avgdvg_vectorram = reinterpret_cast<uint8_t *>(machine().root_device().memshare("vectorram")->ptr());
 	avgdvg_vectorram_size = machine().root_device().memshare("vectorram")->bytes();
