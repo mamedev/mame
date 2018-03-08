@@ -204,7 +204,7 @@ void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 				dstptr[x] = b | (g<<8) | (r<<16);
 			}
-			else if ((pri2 >= pri) && (mask))
+			else if ((pri2 >= pri) && ((mask != 0x3f00) || (mask != 0)))
 			{
 				dstptr[x] = colour2;
 			}
