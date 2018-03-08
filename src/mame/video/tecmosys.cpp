@@ -159,7 +159,7 @@ void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprec
 			uint16_t penvalue2;
 			uint32_t colour;
 			uint32_t colour2;
-			uint8_t mask;
+			uint16_t mask;
 
 			pri = srcptr[x] & 0xc000;
 			pri2 = srcptr2[x] & 0xc000;
