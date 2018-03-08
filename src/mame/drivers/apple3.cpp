@@ -18,7 +18,6 @@
 
 #include "emu.h"
 #include "includes/apple3.h"
-#include "includes/apple2.h"
 #include "sound/volt_reg.h"
 #include "formats/ap2_dsk.h"
 
