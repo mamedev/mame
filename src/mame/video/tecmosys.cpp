@@ -173,14 +173,20 @@ void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprec
 				colour2 = paldata[srcptr2[x]&0x3fff];
 				mask = srcptr2[x]&0xff;
 			}
-			else
+			else if (srcptr[x]&0xf)
 			{
 				penvalue2 = m_tilemap_paletteram16[srcptr[x]&0x7ff];
 				colour2 =   paldata[(srcptr[x]&0x7ff) | 0x4000];
 				mask = srcptr[x]&0xf;
 			}
+			else
+			{
+				penvalue2 = m_palette->basemem().read(0x3f00);
+				colour2 =   paldata[0x3f00];
+				mask = 0x3f00;
+			}
 
-			if ((penvalue & 0x8000) && (penvalue2 & 0x8000)) // blend
+			if (((penvalue & 0x8000) && (srcptr[x]&0xf)) && ((penvalue2 & 0x8000) && (mask))) // blend
 			{
 				int r,g,b;
 				int r2,g2,b2;
