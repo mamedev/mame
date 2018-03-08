@@ -13,7 +13,6 @@
 #include "audio/lynx.h"
 
 #include "cpu/m6502/m65sc02.h"
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -60,7 +59,7 @@ PALETTE_INIT_MEMBER(lynx_state, lynx)
 
 void lynx_state::video_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 }
 
 uint32_t lynx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

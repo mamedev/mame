@@ -120,7 +120,7 @@ uint32_t rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bi
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
-	m_current_display_bank = machine().first_screen()->frame_number() & 1;
+	m_current_display_bank = m_screen->frame_number() & 1;
 	if(m_single_screen_mode == true)
 		m_current_display_bank = 0;
 
@@ -144,7 +144,7 @@ uint32_t rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bi
 // the 60hz signal gets split between 2 screens
 uint32_t rungun_state::screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int m_current_display_bank = machine().first_screen()->frame_number() & 1;
+	int m_current_display_bank = m_screen->frame_number() & 1;
 
 	if (!m_current_display_bank)
 		screen_update_rng(screen, m_rng_dual_demultiplex_left_temp, cliprect);
