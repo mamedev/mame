@@ -12,7 +12,6 @@
 #define MAME_INCLUDES_APPLE3_H
 
 #include "cpu/m6502/m6502.h"
-#include "includes/apple2.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "bus/a2bus/a2bus.h"
