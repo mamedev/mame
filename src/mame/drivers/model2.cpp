@@ -368,6 +368,32 @@ MACHINE_START_MEMBER(model2_state,model2)
 	
 	// initialize custom debugger pool, @see machine/model2.cpp
 	debug_init();
+	
+	save_item(NAME(m_intreq));
+	save_item(NAME(m_intena));
+	save_item(NAME(m_coproctl));
+	save_item(NAME(m_coprocnt));
+	save_item(NAME(m_geoctl));
+	save_item(NAME(m_geocnt));
+	save_item(NAME(m_ctrlmode));
+	save_item(NAME(m_analog_channel));
+	save_item(NAME(m_timervals[0]));
+	save_item(NAME(m_timervals[1]));
+	save_item(NAME(m_timervals[2]));
+	save_item(NAME(m_timervals[3]));
+	save_item(NAME(m_timerrun[0]));
+	save_item(NAME(m_timerrun[1]));
+	save_item(NAME(m_timerrun[2]));
+	save_item(NAME(m_timerrun[3]));
+
+	save_item(NAME(m_copro_fifoin_rpos));
+	save_item(NAME(m_copro_fifoin_wpos));
+	save_item(NAME(m_copro_fifoin_num));
+	save_item(NAME(m_copro_fifoout_rpos));
+	save_item(NAME(m_copro_fifoout_wpos));
+	save_item(NAME(m_copro_fifoout_num));
+	save_item(NAME(m_geo_write_start_address));
+	save_item(NAME(m_geo_read_start_address));
 }
 
 MACHINE_START_MEMBER(model2_state,srallyc)
@@ -393,7 +419,6 @@ MACHINE_RESET_MEMBER(model2_state,model2_common)
 	m_geocnt = 0;
 	m_ctrlmode = 0;
 	m_analog_channel = 0;
-	m_soundack = 0;
 
 	m_timervals[0] = 0xfffff;
 	m_timervals[1] = 0xfffff;
