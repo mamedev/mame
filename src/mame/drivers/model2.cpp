@@ -406,6 +406,13 @@ MACHINE_RESET_MEMBER(model2_state,model2_common)
 	// TODO: HW can probably parse this at will somehow ...
 	for (i=0;i<0x20000/4;i++)
 		m_bufferram[i] = 0x07800f0f;
+
+	m_copro_fifoin_rpos = 0;
+	m_copro_fifoin_wpos = 0;
+	m_copro_fifoin_num = 0;
+	m_copro_fifoout_rpos = 0;
+	m_copro_fifoout_wpos = 0;
+	m_copro_fifoout_num = 0;
 }
 
 MACHINE_RESET_MEMBER(model2_state,model2o)
@@ -1009,7 +1016,7 @@ READ32_MEMBER(model2_state::geo_r)
 	}
 
 //  fatalerror("geo_r: %08X, %08X\n", address, mem_mask);
-	osd_printf_debug("geo_r: PC:%08x - %08X\n", m_maincpu->pc(), address);
+	logerror("geo_r: PC:%08x - %08X\n", m_maincpu->pc(), address);
 
 	return 0;
 }
