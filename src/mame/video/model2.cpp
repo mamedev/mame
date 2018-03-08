@@ -131,6 +131,28 @@ struct raster_state
 	uint8_t log_ram[0x40000];           /* Log RAM pointer */
 };
 
+/*******************************************
+ *
+ *  Geometry Engine Internal State
+ *
+ *******************************************/
+
+struct geo_state
+{
+	raster_state *          raster;
+	uint32_t              mode;                   /* bit 0 = Enable Specular, bit 1 = Calculate Normals */
+	uint32_t *          polygon_rom;            /* Polygon ROM pointer */
+	uint32_t            polygon_rom_mask;       /* Polygon ROM mask */
+	float               matrix[12];             /* Current Transformation Matrix */
+	poly_vertex         focus;                  /* Focus (x,y) */
+	poly_vertex         light;                  /* Light Vector */
+	float               lod;                    /* LOD */
+	float               coef_table[32];         /* Distane Coefficient table */
+	texture_parameter   texture_parameters[32]; /* Texture parameters */
+	uint32_t          polygon_ram0[0x8000];           /* Fast Polygon RAM pointer */
+	uint32_t          polygon_ram1[0x8000];           /* Slow Polygon RAM pointer */
+	model2_state    *state;
+};
 
 
 /*******************************************
@@ -189,6 +211,12 @@ static inline void vector_cross3( poly_vertex *dst, poly_vertex *v0, poly_vertex
 	dst->x = (p1.y * p2.pz) - (p1.pz * p2.y);
 	dst->y = (p1.pz * p2.x) - (p1.x * p2.pz);
 	dst->pz = (p1.x * p2.y) - (p1.y * p2.x);
+}
+
+static inline void apply_focus( geo_state *geo, poly_vertex *p0)
+{
+	p0->x *= geo->focus.x;
+	p0->y *= geo->focus.y;
 }
 
 /* 1.8.23 float to 4.12 float converter, courtesy of Aaron Giles */
@@ -1160,32 +1188,6 @@ void model2_state::model2_3d_push( raster_state *raster, uint32_t input )
 
 /***********************************************************************************************/
 
-
-
-/*******************************************
- *
- *  Geometry Engine Internal State
- *
- *******************************************/
-
-struct geo_state
-{
-	raster_state *          raster;
-	uint32_t              mode;                   /* bit 0 = Enable Specular, bit 1 = Calculate Normals */
-	uint32_t *          polygon_rom;            /* Polygon ROM pointer */
-	uint32_t            polygon_rom_mask;       /* Polygon ROM mask */
-	float               matrix[12];             /* Current Transformation Matrix */
-	poly_vertex         focus;                  /* Focus (x,y) */
-	poly_vertex         light;                  /* Light Vector */
-	float               lod;                    /* LOD */
-	float               coef_table[32];         /* Distane Coefficient table */
-	texture_parameter   texture_parameters[32]; /* Texture parameters */
-	uint32_t          polygon_ram0[0x8000];           /* Fast Polygon RAM pointer */
-	uint32_t          polygon_ram1[0x8000];           /* Slow Polygon RAM pointer */
-	model2_state    *state;
-};
-
-
 /*******************************************
  *
  *  Geometry Engine Initialization
@@ -1231,9 +1233,8 @@ void model2_state::geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t co
 	transform_point( &point, geo->matrix );
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1248,9 +1249,8 @@ void model2_state::geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t co
 	transform_point( &point, geo->matrix );
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1295,9 +1295,8 @@ void model2_state::geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t co
 			dotp = dot_product( &normal, &point );
 
 			/* apply focus */
-			point.x *= geo->focus.x;
-			point.y *= geo->focus.y;
-
+			apply_focus( geo, &point );
+			
 			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
@@ -1343,9 +1342,8 @@ void model2_state::geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t co
 				transform_point( &point, geo->matrix );
 
 				/* apply focus */
-				point.x *= geo->focus.x;
-				point.y *= geo->focus.y;
-
+				apply_focus( geo, &point );
+				
 				/* push to the 3d rasterizer */
 				model2_3d_push( raster, f2u(point.x) >> 8 );
 				model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1383,9 +1381,8 @@ void model2_state::geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t cou
 	transform_point( &point, geo->matrix );
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1400,9 +1397,8 @@ void model2_state::geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t cou
 	transform_point( &point, geo->matrix );
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1447,9 +1443,8 @@ void model2_state::geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t cou
 			dotp = dot_product( &normal, &point );
 
 			/* apply focus */
-			point.x *= geo->focus.x;
-			point.y *= geo->focus.y;
-
+			apply_focus( geo, &point );
+			
 			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
@@ -1504,9 +1499,8 @@ void model2_state::geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t cou
 				transform_point( &point, geo->matrix );
 
 				/* apply focus */
-				point.x *= geo->focus.x;
-				point.y *= geo->focus.y;
-
+				apply_focus( geo, &point );
+				
 				/* push to the 3d rasterizer */
 				model2_3d_push( raster, f2u(point.x) >> 8 );
 				model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1547,9 +1541,8 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 	p0.x = point.x; p0.y = point.y; p0.pz = point.pz;
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1567,9 +1560,8 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 	p1.x = point.x; p1.y = point.y; p1.pz = point.pz;
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1618,9 +1610,8 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 			dotp = dot_product( &normal, &point );
 
 			/* apply focus */
-			point.x *= geo->focus.x;
-			point.y *= geo->focus.y;
-
+			apply_focus( geo, &point );
+			
 			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
@@ -1669,9 +1660,8 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 				p3.x = point.x; p3.y = point.y; p3.pz = point.pz;
 
 				/* apply focus */
-				point.x *= geo->focus.x;
-				point.y *= geo->focus.y;
-
+				apply_focus( geo, &point );
+				
 				/* push to the 3d rasterizer */
 				model2_3d_push( raster, f2u(point.x) >> 8 );
 				model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1742,9 +1732,8 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 	p0.x = point.x; p0.y = point.y; p0.pz = point.pz;
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1762,9 +1751,8 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 	p1.x = point.x; p1.y = point.y; p1.pz = point.pz;
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1813,9 +1801,8 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 			dotp = dot_product( &normal, &point );
 
 			/* apply focus */
-			point.x *= geo->focus.x;
-			point.y *= geo->focus.y;
-
+			apply_focus( geo, &point );
+	
 			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
@@ -1873,8 +1860,7 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 				p3.x = point.x; p3.y = point.y; p3.pz = point.pz;
 
 				/* apply focus */
-				point.x *= geo->focus.x;
-				point.y *= geo->focus.y;
+				apply_focus( geo, &point );
 
 				/* push to the 3d rasterizer */
 				model2_3d_push( raster, f2u(point.x) >> 8 );
