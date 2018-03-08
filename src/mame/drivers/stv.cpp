@@ -46,7 +46,6 @@
 #include "machine/stvprot.h"
 #include "sound/scsp.h"
 
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 

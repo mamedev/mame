@@ -443,7 +443,6 @@ test1f diagnostic hacks:
 
 #include "bus/sat_ctrl/ctrl.h"
 
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
