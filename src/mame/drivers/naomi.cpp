@@ -304,10 +304,9 @@ There are also 2 types of carts manufactured by Namco: MASK-B, MASK-C
 |-------------------------------------------------------------|
 Notes:
       OSC1  - oscillator 28.000MHz
-      JP1   - JUMPER unknown function
-      JP3   - JUMPER unknown function
-      JP3   - JUMPER unknown function
-      JP4   - JUMPER master (1-2) / slave (2-3) switch, then slave data accessed at +0x10000000 at cart address space
+	  JP1   - JUMPER ROM0 (IC22) size: 1-2 = 32M, 2-3 = 16M
+	  JP2   - JUMPER ROM0 write: 1-2 = Enabled, 2-3 = Disabled
+      JP3,4 - JUMPERS Bank select: 1-2 1-2 = Master, 2-3 2-3 = Slave (slave data accessed at +0x10000000 at cart address space)
  IC1S-IC21S - FlashROM (SOP56), either 32Mb or 64Mb. Not all positions are populated
       IC22  - EPROM (DIP42), either 27C160 or 27C322
       IC37  - FlashROM (SOIC8) Xicor X76F100 Secure SerialFlash
@@ -464,7 +463,11 @@ Zombie Revenge (Rev A)                          840-0003C    21707A  19 (64Mb)  
 |-------------------------------------------------------------------|
 Notes:
       OSC1  - oscillator 20.000MHz
-     JP1-7  - JUMPER unknown function
+      JP1   - JUMPER ROM0 (IC16) size: 1-2 = 32M, 2-3 = 16M
+	  JP2   - JUMPER ROM0 write: 1-2 = Enabled, 2-3 = Disabled
+	  JP3   - JUMPER ROM board Bank: 1-2 = Slave, 2-3 = Master
+	JP4,5,7 - JUMPERS SCSI function: 1-2 2-3 1-2 = Enabled, 2-3 1-2 2-3 = Eisabled
+	  JP6   - JUMPER Unknown function (1-2)
        SW1  - PUSHBUTTON
        SW2  - 8X2 DIPswitch
  SCSI-CTRL  - SCSI-II controller MB86604A
@@ -648,8 +651,8 @@ Notes:
       IC7   - socket for EPROM (DIP42), either 27C160 or 27C322
   IC8-IC15  - S29GL512N FlashROM (TSOP56), 512Mb. Not all positions are populated
       IC16  - R3112N431A Low voltage detector with output delay (SOT-23-5)
-      JP1   - JUMPER Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
-      JP2   - JUMPER unknown function
+      JP1   - JUMPER ROM board Bank: 1-2 = Master, 2-3 = Slave
+      JP2   - JUMPER IC7 EPROM: 1-2 = Enabled, 2-3 = Disabled
    CN1/2/3  - connectors joining to main board
       CN4   - 6 legs connector for ISP programming
 
