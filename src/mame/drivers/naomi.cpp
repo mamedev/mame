@@ -2902,33 +2902,46 @@ To determine BIOS version: on test mode title screen press Service button 51 tim
 
 Info from roms starting at 0x1ffd60
 
-EPR-21576h - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
-EPR-21576g - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
-EPR-21576e - NAOMI BOOT ROM 2000 08/25  1.50 (Japan)
-EPR-21576d - NAOMI BOOT ROM 1999 06/04  1.40 (Japan)
-EPR-21576c - NAOMI BOOT ROM 1999 03/11  1.30 (Japan)
-EPR-21576b - NAOMI BOOT ROM 1999 02/15  1.20 (Japan)
-EPR-21576a - NAOMI BOOT ROM 1999 01/14  1.10 (Japan)
-EPR-21576  - NAOMI BOOT ROM 1998 12/18  1.00 (Japan)
-EPR-21577h - NAOMI BOOT ROM 2002 07/08  1.8- (USA)
-EPR-21577g - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
-EPR-21577e - NAOMI BOOT ROM 2000 08/25  1.50 (USA)
-EPR-21577d - NAOMI BOOT ROM 1999 06/04  1.40 (USA)
-EPR-21577a - NAOMI BOOT ROM 1999 02/15  1.20 (USA)    <-- "A" was v1.20 and not v1.10 (verified x3)
-EPR-21578h - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
-EPR-21578g - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
-EPR-21578e - NAOMI BOOT ROM 2000 08/25  1.50 (Export)
-EPR-21578d - NAOMI BOOT ROM 1999 06/04  1.40 (Export)
-EPR-21578a - NAOMI BOOT ROM 1999 02/15  1.20 (Export) <-- "A" was v1.20 and not v1.10 (verified)
-EPR-21579d - NAOMI BOOT ROM 1999 06/04  1.40 (Korea)
+EPR-21576  - NAOMI BOOT ROM 1998 12/18  1.00 (Japan)   only Japan ver was released
+
+EPR-21576a - NAOMI BOOT ROM 1999 01/14  1.10 (Japan)   Japan 1.10 BOOT ROM was labeled "A", all the rest had no revision character.
 EPR-21579  - NAOMI BOOT ROM 1999 01/14  1.10 (Korea)
-EPR-21580  - No known dump (Australia)
+USA, Export and Australia is missing.
 
-EPR-21577e & EPR-2178e differ by 7 bytes:
+EPR-21576b - NAOMI BOOT ROM 1999 02/15  1.20 (Japan)   Japan 1.20 BOOT ROM was labeled "B", all the rest - "A".
+EPR-21577a - NAOMI BOOT ROM 1999 02/15  1.20 (USA)
+EPR-21578a - NAOMI BOOT ROM 1999 02/15  1.20 (Export)
+Korea and Australia is missing.
 
-0x53e20 is the region byte (only one region byte)
-0x1ffffa-0x1fffff is the BIOS checksum
+EPR-21576c - NAOMI BOOT ROM 1999 03/11  1.30 (Japan)   only Japan ver was released
+EPR-21801  - NAOMI BOOT ROM 1999 03/11  1.30 (USA)     (Airline Pilots)
+EPR-21802  - NAOMI BOOT ROM 1999 03/11  1.30 (Export)  (Airline Pilots)
 
+EPR-21576d - NAOMI BOOT ROM 1999 06/04  1.40 (Japan)
+EPR-21577d - NAOMI BOOT ROM 1999 06/04  1.40 (USA)
+EPR-21578d - NAOMI BOOT ROM 1999 06/04  1.40 (Export)
+EPR-21579d - NAOMI BOOT ROM 1999 06/04  1.40 (Korea)
+Australia is missing.
+
+EPR-21576e - NAOMI BOOT ROM 2000 08/25  1.50 (Japan)
+EPR-21577e - NAOMI BOOT ROM 2000 08/25  1.50 (USA)
+EPR-21578e - NAOMI BOOT ROM 2000 08/25  1.50 (Export)
+Korea and Australia is missing.
+
+EPR-21576f - NAOMI BOOT ROM 2001 ??/??  1.60 (Japan)  (not dumped) had critical bugs, was quickly replaced by 1.70, only Japan ver was released.
+
+EPR-21576g - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
+EPR-21577g - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
+EPR-21578g - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
+Korea and Australia is missing.
+
+EPR-21576h - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
+EPR-21577h - NAOMI BOOT ROM 2002 07/08  1.8- (USA)
+EPR-21578h - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
+Korea and Australia is missing.
+
+EPR-21336  - No known dumps (Development BOOT ROM)
+EPR-21580  - No known dumps (Australia)
 
 House of the Dead 2 specific Naomi BIOS roms:
 
@@ -2958,23 +2971,13 @@ EPR-22850 & EPR-22851 differ by 7 bytes:
 0x52F08 is the region byte (only one region byte)
 0x1ffffa-0x1fffff is the BIOS checksum
 
-
-Airline Pilot specific Naomi BIOS roms:
-
-EPR-21801 - NAOMI BOOT ROM 1999 03/11  1.30 (USA)
-EPR-21802 - NAOMI BOOT ROM 1999 03/11  1.30 (Export)
-
-0x4D148 is the region byte (only one region byte)
-0x1ffffa-0x1fffff is the BIOS checksum
-
-
 Region byte encoding is as follows:
 
 0x00 = Japan
 0x01 = USA
 0x02 = Export
 0x03 = Korea
-0x?? = Australia
+0x04 = Australia
 
 Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for the region byte.
   NOTE: this doesn't work for the HOTD2 or multi screen boot roms
@@ -3034,7 +3037,7 @@ OFF  OFF  ON   Australia
 	ROM_SYSTEM_BIOS( 3, "bios3",   "epr-21576d (Japan)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 3,  "epr-21576d.ic27", 0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
 	ROM_SYSTEM_BIOS( 4, "bios4",   "epr-21576c (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4,  "epr-21576c.ic27", 0x000000, 0x200000, CRC(4599ad13) SHA1(7e730e9452a792d76f210c33a955d385538682c7) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4,  "epr-21576c.ic27", 0x000000, 0x200000, BAD_DUMP CRC(4599ad13) SHA1(7e730e9452a792d76f210c33a955d385538682c7) ) \
 	ROM_SYSTEM_BIOS( 5, "bios5",   "epr-21576b (Japan)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 5,  "epr-21576b.ic27", 0x000000, 0x200000, CRC(755a6e07) SHA1(7e8b8ccfc063144d89668e7224dcd8a36c54f3b3) ) \
 	ROM_SYSTEM_BIOS( 6, "bios6",   "epr-21576a (Japan)" ) \
@@ -3161,16 +3164,27 @@ OFF  OFF  ON   Australia
 
 /* NAOMI2 BIOS:
 
-EPR-23605C - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
-EPR-23605B - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
-EPR-23605A - NAOMI BOOT ROM 2001 06/20  1.60 (Japan)
 EPR-23605  - NAOMI BOOT ROM 2001 01/19  1.50 (Japan)
-EPR-23607B - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
 EPR-23607  - NAOMI BOOT ROM 2001 01/19  1.50 (USA)
-EPR-23608C - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
-EPR-23608B - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
-EPR-23608A - NAOMI BOOT ROM 2001 06/20  1.60 (Export)
 EPR-23608  - NAOMI BOOT ROM 2001 01/19  1.50 (Export)
+Korea and Australia is missing.
+
+EPR-23605A - NAOMI BOOT ROM 2001 06/20  1.60 (Japan)
+EPR-23608A - NAOMI BOOT ROM 2001 06/20  1.60 (Export)
+USA, Korea and Australia is missing.
+
+EPR-23605B - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
+EPR-23607B - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
+EPR-23608B - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
+Korea and Australia is missing.
+
+EPR-23605C - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
+EPR-23608C - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
+USA, Korea and Australia is missing.
+
+EPR-21604  - No known dumps (Development BOOT ROM)
+EPR-21609  - No known dumps (Korea)
+EPR-21610  - No known dumps (Australia)
 
 EPR-23605B, EPR-23607B & EPR-23608B all differ by 8 bytes:
 
@@ -3183,8 +3197,8 @@ Region byte encoding is as follows:
 0x00 = Japan
 0x01 = USA
 0x02 = Export
-0x?? = Korea
-0x?? = Australia
+0x03 = Korea
+0x04 = Australia
 
 */
 
