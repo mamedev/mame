@@ -38,7 +38,8 @@
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
     - vcop: lightgun input is offsetted (needs to be calibrated in service mode);
 	- vcop: missing 3d bug at stage select screen (priority?);
-	- vcop, vf2: 3d gets corrupted if you get into test mode then go into gameplay;
+	- vcop, daytona: 3d gets corrupted if you get into test mode then go into gameplay, looks like the dsp should be 
+	  resetted somehow, doing that from the copro_ctl1_w it breaks schamp booting;
 	- vstriker: stadium ads have terrible colors (they uses the wrong color table, @see video/model2rd.hxx)
 
 	Notes:
