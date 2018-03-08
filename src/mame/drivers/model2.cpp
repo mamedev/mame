@@ -554,7 +554,9 @@ READ32_MEMBER(model2_state::fifoctl_r)
 	}
 
 	// #### 1 if fifo empty, zerogun needs | 0x04 set
-	return r | 0x04;
+	// TODO: 0x04 is probably fifo full, zeroguna stalls with a fresh nvram with that enabled!
+	return r;
+//	return r | 0x04;
 }
 
 READ32_MEMBER(model2_state::videoctl_r)
