@@ -466,7 +466,7 @@ Notes:
       JP1   - JUMPER ROM0 (IC16) size: 1-2 = 32M, 2-3 = 16M
 	  JP2   - JUMPER ROM0 write: 1-2 = Enabled, 2-3 = Disabled
 	  JP3   - JUMPER ROM board Bank: 1-2 = Slave, 2-3 = Master
-	JP4,5,7 - JUMPERS SCSI function: 1-2 2-3 1-2 = Enabled, 2-3 1-2 2-3 = Eisabled
+	JP4,5,7 - JUMPERS SCSI function: 1-2 2-3 1-2 = Enabled, 2-3 1-2 2-3 = Disabled
 	  JP6   - JUMPER Unknown function (1-2)
        SW1  - PUSHBUTTON
        SW2  - 8X2 DIPswitch
