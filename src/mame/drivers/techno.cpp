@@ -47,8 +47,13 @@ public:
 	DECLARE_WRITE16_MEMBER(sol2_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
 
+	DECLARE_READ8_MEMBER(rd_r) { return 0; }
+	DECLARE_WRITE8_MEMBER(wr_w) {}
+
 	void techno(machine_config &config);
 	void techno_map(address_map &map);
+	void techno_sub_map(address_map &map);
+
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
@@ -82,13 +87,13 @@ ADDRESS_MAP_START(techno_state::techno_map)
 	AM_RANGE(0x17800, 0x17fff) AM_WRITE(setout_w)
 ADDRESS_MAP_END
 
-//static ADDRESS_MAP_START( techno_sub_map, AS_IO, 8, techno_state )
+ADDRESS_MAP_START(techno_state::techno_sub_map)
 //       no ram here, must be internal to the cpu
-//  AM_RANGE(0x0000, 0x3fff) AM_READ(rd_r) // to TKY2016A audio processor which has its own 3.58MHz clock
-//  AM_RANGE(0x4000, 0x7fff) AM_WRITE(wr_w) // A11=LED;A12=WR2 (DAC) ;A13=WR1 (TKY2016A as above)
-//  AM_RANGE(0x4000, 0xbfff) AM_ROM // 4000-7FFF is same as 8000-BFFF; 4x 16k ROMS bankswitched
-//  AM_RANGE(0xc000, 0xffff) AM_ROM // another 16k ROM
-//ADDRESS_MAP_END
+	AM_RANGE(0x0000, 0x3fff) AM_READ(rd_r) // to TKY2016A audio processor which has its own 3.58MHz clock
+	AM_RANGE(0x4000, 0x7fff) AM_WRITE(wr_w) // A11=LED;A12=WR2 (DAC) ;A13=WR1 (TKY2016A as above)
+	AM_RANGE(0x4000, 0xbfff) AM_ROM // 4000-7FFF is same as 8000-BFFF; 4x 16k ROMS bankswitched
+	AM_RANGE(0xc000, 0xffff) AM_ROM // another 16k ROM
+ADDRESS_MAP_END
 
 WRITE16_MEMBER( techno_state::disp1_w )
 {

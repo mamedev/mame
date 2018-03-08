@@ -58,6 +58,7 @@ public:
 	void de_type1(machine_config &config);
 	void de_type2_alpha3(machine_config &config);
 	void de_type3(machine_config &config);
+	void de_2_map(address_map &map);
 	void de_2_audio_map(address_map &map);
 protected:
 
@@ -122,7 +123,7 @@ private:
 	uint8_t m_msm_prescaler;
 };
 
-/*static ADDRESS_MAP_START( de_2_map, AS_PROGRAM, 8, de_2_state )
+ADDRESS_MAP_START(de_2_state::de_2_map)
     AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
     AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
     AM_RANGE(0x2200, 0x2200) AM_WRITE(sol3_w) // solenoids
@@ -133,7 +134,7 @@ private:
     AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE("pia34", pia6821_device, read, write) // widget
     AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-*/
+
 ADDRESS_MAP_START(de_2_state::de_2_audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)

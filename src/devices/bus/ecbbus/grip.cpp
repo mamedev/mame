@@ -164,12 +164,11 @@ ADDRESS_MAP_START(ecb_grip21_device::grip_io)
 //  AM_RANGE(0xf0, 0xf0) AM_WRITE(clrg1_w)
 ADDRESS_MAP_END
 
-/*
 //-------------------------------------------------
 //  ADDRESS_MAP( grip5_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( grip5_mem, AS_PROGRAM, 8, grip5_state )
+ADDRESS_MAP_START(grip5_state::grip5_mem)
     AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("eprom")
     AM_RANGE(0x4000, 0x5fff) AM_RAM
     AM_RANGE(0x8000, 0xffff) AM_RAMBANK("videoram")
@@ -180,7 +179,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( grip5_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( grip5_io, AS_IO, 8, grip5_device )
+ADDRESS_MAP_START(grip5_device::grip5_io)
     ADDRESS_MAP_GLOBAL_MASK(0xff)
     AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
     AM_RANGE(0x10, 0x10) AM_WRITE(eprom_w)
@@ -215,7 +214,6 @@ static ADDRESS_MAP_START( grip5_io, AS_IO, 8, grip5_device )
 //  AM_RANGE(0xe0, 0xe0) AM_WRITE(redout_w)
 //  AM_RANGE(0xf0, 0xf0) AM_WRITE(clrg1_w)
 ADDRESS_MAP_END
-*/
 
 
 

@@ -96,12 +96,6 @@ ADDRESS_MAP_START(onyx_state::c8002_mem)
 	AM_RANGE(0x08000, 0x0ffff) AM_RAM AM_SHARE("share2") // Z8002 has 64k memory
 ADDRESS_MAP_END
 
-//static ADDRESS_MAP_START(c8002_data, AS_DATA, 16, onyx_state)
-//  AM_RANGE(0x00000, 0x00fff) AM_ROM AM_SHARE("share0")
-//  AM_RANGE(0x01000, 0x07fff) AM_RAM AM_SHARE("share1")
-//  AM_RANGE(0x08000, 0xfffff) AM_RAM AM_SHARE("share2")
-//ADDRESS_MAP_END
-
 ADDRESS_MAP_START(onyx_state::c8002_io)
 	map(0xff00, 0xff07).lrw8("sio1_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio1->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio1->cd_ba_w(space, offset >> 1, data, mem_mask); });
 	map(0xff08, 0xff0f).lrw8("sio2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio1->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio1->cd_ba_w(space, offset >> 1, data, mem_mask); });
