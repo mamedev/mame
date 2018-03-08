@@ -6181,7 +6181,7 @@ GAME( 1995, skytargt,  0,       model2a,      skytargt, model2a_state, 0,       
 GAME( 1996, doaa,      doa,     model2a_0229, model2,   model2a_state, doa,     ROT0, "Sega",   "Dead or Alive (Model 2A, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, zeroguna,  zerogun, model2a_5881, model2,   model2a_state, zerogun, ROT0, "Psikyo", "Zero Gunner (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogunaj, zerogun, model2a_5881, model2,   model2a_state, zerogun, ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, motoraid,  0,       manxtt,       motoraid, model2a_state, 0,       ROT0, "Sega",   "Motor Raid - Twin", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, motoraid,  0,       manxtt,       motoraid, model2a_state, 0,       ROT0, "Sega",   "Motor Raid - Twin", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, motoraiddx,motoraid,manxtt,       motoraid, model2a_state, 0,       ROT0, "Sega",   "Motor Raid - Twin/DX", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dynamcop,  0,       model2a_5881, model2,   model2a_state, 0,       ROT0, "Sega",   "Dynamite Cop (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dyndeka2,  dynamcop,model2a_5881, model2,   model2a_state, 0,       ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
