@@ -21,6 +21,7 @@
 	           culprit is a wrong command parameter in geo_parse texture data opcode;
 	- daytona: car glasses doesn't get loaded during gameplay;
 	- doa, doaa: corrupted sound, eventually becomes silent;
+	- doa, doaa: Kasumi model has many culled polygons;
 	- dynamcopc: corrupts palette for 2d (most likely unrelated with the lack of DSP);
 	- fvipers, schamp: rasterizer has issues displaying some characters @see video/model2.cpp
     - fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
@@ -30,14 +31,22 @@
 	- manxtt: no escape from "active motion slider" tutorial (needs analog inputs), 
 	          bypass it by entering then exiting service mode;
     - manxtt: no bikes are visible (not a z-sort issue!);
+	- manxtt: course select island map doesn't rotate properly (matrix issue?);
 	- sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
 	- skytargt: really slow during gameplay;
     - srallyc: some 3d elements doesn't show up properly (trees models, last hill in course 1 is often black colored);
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
     - vcop: lightgun input is offsetted (needs to be calibrated in service mode);
 	- vcop: missing 3d bug at stage select screen (priority?);
+	- vcop, vf2: 3d gets corrupted if you get into test mode then go into gameplay;
 	- vstriker: stadium ads have terrible colors (they uses the wrong color table, @see video/model2rd.hxx)
 
+	Notes:
+	- some analog games can be calibrated in service mode via volume control item ...
+    - ... while in manxtt (maybe others) you calibrate by entering input test, press service 
+	  (a blinking > will appear near the item to be calibrated) then keep pressed shift down while 
+	  calibrating the analog input (a blinking "setting" will appear). 
+	
 ======================================================================================================================================
 
     Sega Model 2 Feedback Driver Board
@@ -362,8 +371,7 @@ MACHINE_START_MEMBER(model2_state,model2)
 
 MACHINE_START_MEMBER(model2_state,srallyc)
 {
-	m_copro_fifoin_data = make_unique_clear<uint32_t[]>(COPRO_FIFOIN_SIZE);
-	m_copro_fifoout_data = make_unique_clear<uint32_t[]>(COPRO_FIFOOUT_SIZE);
+	MACHINE_START_CALL_MEMBER(model2);
 
 	m_port_1c00004 = 2;
 	m_port_1c00006 = 3;
@@ -413,6 +421,8 @@ MACHINE_RESET_MEMBER(model2_state,model2_common)
 	m_copro_fifoout_rpos = 0;
 	m_copro_fifoout_wpos = 0;
 	m_copro_fifoout_num = 0;
+	m_geo_write_start_address = 0;
+	m_geo_read_start_address = 0;
 }
 
 MACHINE_RESET_MEMBER(model2_state,model2o)
@@ -547,6 +557,7 @@ WRITE32_MEMBER(model2_state::videoctl_w)
 	COMBINE_DATA(&m_videocontrol);
 }
 
+// 315-5649
 READ8_MEMBER(model2_state::model2_crx_in_r)
 {
 	uint8_t input = 0xff;
@@ -564,9 +575,9 @@ READ8_MEMBER(model2_state::model2_crx_in_r)
 	case 0x03:
 		input = m_in[m_port_1c00006]->read();
 		break;
+	// port G
 	case 0x06:
-		// 2A-CRX only?
-		input = (m_screen->vblank() << 3) | 0xf7;
+		input = m_dsw->read();
 		break;
 	case 0x08:
 		input = m_in[m_port_1c00010]->read();
@@ -1495,7 +1506,7 @@ READ8_MEMBER(model2o_state::model2o_in_r)
 	case 0x08: return m_in[0]->read();
 	case 0x09: return m_in[1]->read();
 	case 0x0a: return m_in[2]->read();
-	case 0x0f: return (m_screen->vblank() << 3) | 0xf7;
+	case 0x0f: return m_dsw->read();
 	default: return 0xff;
 	}
 }
@@ -1650,17 +1661,6 @@ ADDRESS_MAP_START(model2c_state::model2c_5881_mem)
 ADDRESS_MAP_END
 
 /* Input definitions */
-
-#define MODEL2_PLAYER_INPUTS(_n_, _b1_, _b2_, _b3_, _b4_) \
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_##_b1_        ) PORT_PLAYER(_n_) \
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_##_b2_        ) PORT_PLAYER(_n_) \
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_##_b3_        ) PORT_PLAYER(_n_) \
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_##_b4_        ) PORT_PLAYER(_n_) \
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(_n_) \
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_PLAYER(_n_) \
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(_n_) \
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(_n_)
-
 static INPUT_PORTS_START( model2 )
 	PORT_START("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1673,31 +1673,84 @@ static INPUT_PORTS_START( model2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2P Push Switch") PORT_CODE(KEYCODE_8)
 
 	PORT_START("IN1")
-	MODEL2_PLAYER_INPUTS(1, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 
 	PORT_START("IN2")
-	MODEL2_PLAYER_INPUTS(2, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( zerogun )
+	PORT_INCLUDE( model2 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("DSW")
+	// in service mode, enables scroll check, polygon check, bg check, stage select
+	PORT_DIPNAME( 0x01, 0x01, "Enable Debug Menu" ) PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( desert )
-	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_INCLUDE( model2 )
+
+	PORT_MODIFY("IN0")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("VR1 (Blue)")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("VR2 (Green)")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("VR3 (Red)")
 
-	PORT_START("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_TOGGLE PORT_NAME("P1 Shift")
 	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Machine Gun")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Cannon")
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STEER")
@@ -1711,7 +1764,9 @@ static INPUT_PORTS_START( desert )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vcop )
-	PORT_START("IN0")
+	PORT_INCLUDE( model2 )
+
+	PORT_MODIFY("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW )
@@ -1720,19 +1775,19 @@ static INPUT_PORTS_START( vcop )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Trigger")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("IN2")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED ) // <- vcop: one bit here enables "debug mode"
+	PORT_MODIFY("IN2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // vcop: bit 1 enables "debug mode" -> no enemies will appear
 
 	PORT_START("IN3")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN4")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	
 	PORT_START("P1_X")
 	PORT_BIT(0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1)
@@ -1776,23 +1831,20 @@ static INPUT_PORTS_START( gunblade )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( daytona )
-	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_INCLUDE( model2 )
+
+	PORT_MODIFY("IN0")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("VR 1 (Red)")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("VR 2 (Blue)")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("VR 3 (Yellow)")
 
-	PORT_START("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_NAME("VR 4 (Green)")
 	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,daytona_gearbox_r, nullptr)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STEER")
@@ -1813,20 +1865,18 @@ static INPUT_PORTS_START( daytona )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( manxtt )
-	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_INCLUDE( model2 )
+
+	PORT_MODIFY("IN0")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start / VR")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Shift Up")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shift Down")
 	PORT_BIT(0xcf, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1857,19 +1907,17 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( srallyc )
-	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_INCLUDE( model2 )
+
+	PORT_MODIFY("IN0")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("VR") // VR
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x90, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,daytona_gearbox_r, nullptr)
 	PORT_BIT(0x8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1925,66 +1973,55 @@ static INPUT_PORTS_START( overrev )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bel )
-	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE1)
-	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE) PORT_NAME("1P Push Switch") PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE) PORT_NAME("2P Push Switch") PORT_CODE(KEYCODE_8)
+	PORT_INCLUDE( gunblade )
 
-	PORT_START("IN1")
-	MODEL2_PLAYER_INPUTS(1, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
+	PORT_MODIFY("IN0")
+	// they reversed these two for some reason
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW )
 
-	PORT_START("IN2")
-	MODEL2_PLAYER_INPUTS(2, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Missile")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Missile")
+//	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rchase2 )
-	PORT_INCLUDE(model2)
-
-	PORT_MODIFY("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) // 1p shot
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) // 2p shot
-	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_INCLUDE( gunblade )
 
 	PORT_MODIFY("IN2")
-	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,rchase2_devices_r, nullptr)
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,rchase2_devices_r, nullptr)
 
-	/* FIXME: don't know yet if min max values are really correct, we'll see ... */
-	PORT_START("ANA0")
-	PORT_BIT(0xff, 0x00, IPT_AD_STICK_X) PORT_MINMAX(0x80,0x7f) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(2)
+	// reversed p1 and p2
+	PORT_MODIFY("ANA0")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2) PORT_REVERSE
 
-	PORT_START("ANA1")
-	PORT_BIT(0xff, 0x00, IPT_AD_STICK_X) PORT_MINMAX(0x80,0x7f) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
+	PORT_MODIFY("ANA1")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1) PORT_REVERSE
 
-	PORT_START("ANA2")
-	PORT_BIT(0xff, 0x00, IPT_AD_STICK_Y) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(2)
+	PORT_MODIFY("ANA2")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2) PORT_REVERSE
 
-	PORT_START("ANA3")
-	PORT_BIT(0xff, 0x00, IPT_AD_STICK_Y) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
+	PORT_MODIFY("ANA3")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1) PORT_REVERSE
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( skytargt )
-	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_INCLUDE( model2 )
+
+	PORT_MODIFY("IN0")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 View Change")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Machine Gun")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Missile")
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ANA0")
@@ -2001,7 +2038,7 @@ static INPUT_PORTS_START( skytargt )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dynabb )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE( model2 )
 
 	PORT_START("ANA0")
 	PORT_BIT(0xff, 0x00, IPT_PEDAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_PLAYER(1) PORT_NAME("P1 Bat Swing")
@@ -2011,7 +2048,7 @@ static INPUT_PORTS_START( dynabb )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vstriker )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE( model2 )
 
 	// oddly enough service mode returns standard 1-2-3 layout but actual ingame is 2-3-1
 	// also bit 3 repeats bit 2 functionality.
@@ -6150,8 +6187,8 @@ GAME( 1995, srallycdxa,srallyc, srallyc,      srallyc,  model2a_state, srallyc, 
 GAME( 1995, vcop2,     0,       model2a,      vcop,     model2a_state, 0,       ROT0, "Sega",   "Virtua Cop 2", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, skytargt,  0,       model2a,      skytargt, model2a_state, 0,       ROT0, "Sega",   "Sky Target", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, doaa,      doa,     model2a_0229, model2,   model2a_state, doa,     ROT0, "Sega",   "Dead or Alive (Model 2A, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, zeroguna,  zerogun, model2a_5881, model2,   model2a_state, zerogun, ROT0, "Psikyo", "Zero Gunner (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, zerogunaj, zerogun, model2a_5881, model2,   model2a_state, zerogun, ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, zeroguna,  zerogun, model2a_5881, zerogun,  model2a_state, zerogun, ROT0, "Psikyo", "Zero Gunner (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, zerogunaj, zerogun, model2a_5881, zerogun,  model2a_state, zerogun, ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, motoraid,  0,       manxtt,       motoraid, model2a_state, 0,       ROT0, "Sega",   "Motor Raid - Twin", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, motoraiddx,motoraid,manxtt,       motoraid, model2a_state, 0,       ROT0, "Sega",   "Motor Raid - Twin/DX", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dynamcop,  0,       model2a_5881, model2,   model2a_state, 0,       ROT0, "Sega",   "Dynamite Cop (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
@@ -6180,8 +6217,8 @@ GAME( 1996, sgt24h,    0,        indy500,      sgt24h,   model2b_state, sgt24h, 
 GAME( 1996, dynabb,    0,        model2b,      dynabb,    model2b_state, 0,        ROT0, "Sega",   "Dynamite Baseball", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, dynabb97,  0,        model2b,      dynabb,    model2b_state, 0,        ROT0, "Sega",   "Dynamite Baseball 97 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, overrevb,  overrev,  indy500,      overrev,   model2b_state, 0,        ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, zerogun,   0,        model2b_5881, model2,    model2b_state, zerogun,  ROT0, "Psikyo", "Zero Gunner (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, zerogunj,  zerogun,  model2b_5881, model2,    model2b_state, zerogun,  ROT0, "Psikyo", "Zero Gunner (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, zerogun,   0,        model2b_5881, zerogun,   model2b_state, zerogun,  ROT0, "Psikyo", "Zero Gunner (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, zerogunj,  zerogun,  model2b_5881, zerogun,   model2b_state, zerogun,  ROT0, "Psikyo", "Zero Gunner (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dynamcopb, dynamcop, model2b_5881, model2,    model2b_state, 0,        ROT0, "Sega",   "Dynamite Cop (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dyndeka2b, dynamcop, model2b_5881, model2,    model2b_state, 0,        ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkids,   0,        model2b_5881, model2,    model2b_state, pltkids,  ROT0, "Psikyo", "Pilot Kids (Model 2B, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

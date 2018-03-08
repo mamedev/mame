@@ -50,6 +50,7 @@ public:
 		m_cryptdevice(*this, "315_5881"),
 		m_0229crypt(*this, "317_0229"),
 		m_in(*this, "IN%u", 0),
+		m_dsw(*this, "DSW"),
 		m_steer(*this, "STEER"),
 		m_accel(*this, "ACCEL"),
 		m_brake(*this, "BRAKE"),
@@ -89,6 +90,7 @@ public:
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
 
 	optional_ioport_array<5> m_in;
+	required_ioport m_dsw;
 	optional_ioport m_steer;
 	optional_ioport m_accel;
 	optional_ioport m_brake;
