@@ -57,6 +57,7 @@ public:
 	smc777_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_crtc(*this, "crtc")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
@@ -110,6 +111,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;
 	required_device<mb8876_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -232,7 +234,7 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 				case 3: bk_pen = (color ^ 0xf); break; //complementary
 			}
 
-			if(blink && machine().first_screen()->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
+			if(blink && m_screen->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
 				color = bk_pen;
 
 			for(yi=0;yi<8;yi++)
@@ -266,8 +268,8 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(machine().first_screen()->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(machine().first_screen()->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(m_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(m_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)

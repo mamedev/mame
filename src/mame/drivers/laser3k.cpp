@@ -71,6 +71,7 @@ public:
 	laser3k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_ram(*this, "mainram")
 		, m_bank0(*this, "bank0")
 		, m_bank1(*this, "bank1")
@@ -83,6 +84,7 @@ public:
 	{ }
 
 	required_device<m6502_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_bank0;
 	required_device<address_map_bank_device> m_bank1;
@@ -468,10 +470,10 @@ READ8_MEMBER( laser3k_state::io2_r )
 	switch (offset)
 	{
 		case 0xc2:  // h-blank status
-			return machine().first_screen()->hblank() ? 0x80 : 0x00;
+			return m_screen->hblank() ? 0x80 : 0x00;
 
 		case 0xc3:  // v-blank status
-			return machine().first_screen()->vblank() ? 0x80 : 0x00;
+			return m_screen->vblank() ? 0x80 : 0x00;
 
 		case 0xc5:  // CPU 1/2 MHz status?
 			return 0x00;

@@ -214,6 +214,7 @@ public:
 	itt3030_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_kbdmcu(*this, "kbdmcu")
 		, m_ram(*this, "mainram")
 		, m_crtc(*this, "crt5027")
@@ -261,6 +262,7 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<i8741_device> m_kbdmcu;
 	required_device<ram_device> m_ram;
 	required_device<crt5027_device> m_crtc;
@@ -463,12 +465,12 @@ READ8_MEMBER(itt3030_state::vsync_r)
 {
 	uint8_t ret = 0;
 
-	if (machine().first_screen()->vblank())
+	if (m_screen->vblank())
 	{
 		ret |= 0xc0;    // set both bits 6 and 7 if vblank
 	}
 
-	if (machine().first_screen()->hblank())
+	if (m_screen->hblank())
 	{
 		ret |= 0x80;    // set only bit 7 if hblank
 	}
