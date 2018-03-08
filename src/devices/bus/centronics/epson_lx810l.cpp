@@ -314,7 +314,7 @@ void epson_lx810l_device::device_start()
 {
 	m_cr_timer = timer_alloc(TIMER_CR);
 
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 	m_bitmap.fill(0xffffff); /* Start with a clean white piece of paper */
 }
 
