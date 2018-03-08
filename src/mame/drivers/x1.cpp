@@ -840,7 +840,7 @@ uint16_t x1_state::get_pcg_addr( uint16_t width, uint8_t y_char_size )
 	int vbeam = m_screen->vpos() / y_char_size;
 	uint16_t pcg_offset = ((hbeam + vbeam*width) + (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))) & 0x7ff;
 
-	//logerror("%08x %d %d %d %d\n",(hbeam+vbeam*width),hbeam,vbeam,machine.first_screen()->vpos() & 7,width);
+	//logerror("%08x %d %d %d %d\n",(hbeam+vbeam*width),hbeam,vbeam,m_screen->vpos() & 7,width);
 
 	return pcg_offset;
 }

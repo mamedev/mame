@@ -43,6 +43,7 @@ public:
 	a5105_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_hgdc(*this, "upd7220")
 		, m_cass(*this, "cassette")
 		, m_beep(*this, "beeper")
@@ -86,6 +87,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<upd7220_device> m_hgdc;
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
@@ -135,7 +137,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( a5105_state::hgdc_draw_text )
 		{
 			tile_data = m_char_ram[(tile*8+yi) & 0x7ff];
 
-			if(cursor_on && cursor_addr == addr+x && machine().first_screen()->frame_number() & 0x10)
+			if(cursor_on && cursor_addr == addr+x && m_screen->frame_number() & 0x10)
 				tile_data^=0xff;
 
 			for( xi = 0; xi < 8; xi++)
@@ -148,7 +150,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( a5105_state::hgdc_draw_text )
 
 				if(yi >= 8) { pen = 0; }
 
-				if(!machine().first_screen()->visible_area().contains(res_x+0, res_y))
+				if(!m_screen->visible_area().contains(res_x+0, res_y))
 					continue;
 
 				bitmap.pix32(res_y, res_x) = palette[pen];

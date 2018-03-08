@@ -78,6 +78,7 @@ public:
 	pc88va_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_fdc(*this, "upd765"),
 		m_dmac(*this, "dmac"),
 		m_palram(*this, "palram"),
@@ -85,6 +86,7 @@ public:
 		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<upd765a_device> m_fdc;
 	required_device<am9517a_device> m_dmac;
 	required_shared_ptr<uint16_t> m_palram;
@@ -814,7 +816,7 @@ void pc88va_state::execute_sync_cmd()
 
 	refresh = HZ_TO_ATTOSECONDS(60);
 
-	machine().first_screen()->configure(640, 480, visarea, refresh);
+	m_screen->configure(640, 480, visarea, refresh);
 }
 
 void pc88va_state::execute_dspon_cmd()
@@ -967,7 +969,7 @@ WRITE16_MEMBER(pc88va_state::palette_ram_w)
 READ16_MEMBER(pc88va_state::sys_port4_r)
 {
 	uint8_t vrtc,sw1;
-	vrtc = (machine().first_screen()->vpos() < 200) ? 0x20 : 0x00; // vblank
+	vrtc = (m_screen->vpos() < 200) ? 0x20 : 0x00; // vblank
 
 	sw1 = (ioport("DSW")->read() & 1) ? 2 : 0;
 

@@ -75,6 +75,7 @@ public:
 	apc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_hgdc1(*this, "upd7220_chr"),
 		m_hgdc2(*this, "upd7220_btm"),
 		m_rtc(*this, "upd1990a"),
@@ -90,6 +91,7 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
 	required_device<upd1990a_device> m_rtc;
@@ -238,7 +240,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( apc_state::hgdc_draw_text )
 				res_x = (x*8+xi);
 				res_y = y+yi;
 
-				if(!machine().first_screen()->visible_area().contains(res_x, res_y))
+				if(!m_screen->visible_area().contains(res_x, res_y))
 					continue;
 
 				/*
@@ -271,9 +273,9 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( apc_state::hgdc_draw_text )
 				if(u_line && yi == lr-1) { tile_data = 0xff; }
 				if(o_line && yi == 0) { tile_data = 0xff; }
 				if(v_line)  { tile_data|=1; }
-				if(blink && machine().first_screen()->frame_number() & 0x20) { tile_data = 0; } // TODO: rate & correct behaviour
+				if(blink && m_screen->frame_number() & 0x20) { tile_data = 0; } // TODO: rate & correct behaviour
 
-				if(cursor_on && cursor_addr == tile_addr && machine().first_screen()->frame_number() & 0x10)
+				if(cursor_on && cursor_addr == tile_addr && m_screen->frame_number() & 0x10)
 					tile_data^=0xff;
 
 				if(yi >= char_size)

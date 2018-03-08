@@ -36,6 +36,7 @@ public:
 	osbexec_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu( *this, "maincpu" ),
+			m_screen( *this, "screen" ),
 			m_mb8877( *this, "mb8877" ),
 			m_messram( *this, RAM_TAG ),
 			m_pia_0( *this, "pia_0" ),
@@ -47,6 +48,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<mb8877_device>  m_mb8877;
 	required_device<ram_device> m_messram;
 	required_device<pia6821_device> m_pia_0;
@@ -319,7 +321,7 @@ INPUT_PORTS_END
 
 void osbexec_state::video_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 }
 
 uint32_t osbexec_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -472,7 +474,7 @@ SLOT_INTERFACE_END
 
 TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 {
-	int y = machine().first_screen()->vpos();
+	int y = m_screen->vpos();
 
 	/* Start of frame */
 	if ( y == 0 )
@@ -519,7 +521,7 @@ TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 		}
 	}
 
-	m_video_timer->adjust( machine().first_screen()->time_until_pos( y + 1, 0 ) );
+	m_video_timer->adjust( m_screen->time_until_pos( y + 1, 0 ) );
 }
 
 
@@ -544,7 +546,7 @@ void osbexec_state::machine_reset()
 
 	set_banks();
 
-	m_video_timer->adjust( machine().first_screen()->time_until_pos( 0, 0 ) );
+	m_video_timer->adjust( m_screen->time_until_pos( 0, 0 ) );
 
 	m_rtc = 0;
 
