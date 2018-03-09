@@ -33,7 +33,8 @@
     - manxtt: no bikes are visible (not a z-sort issue!);
 	- manxtt: course select island map doesn't rotate properly (matrix issue?);
 	- sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
-	- skytargt: really slow during gameplay;
+	- skytargt: really slow during gameplay (fixed?);
+	- skytargt: short draw distance (might be down to z-sort);
     - srallyc: some 3d elements doesn't show up properly (trees models, last hill in course 1 is often black colored);
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
     - vcop: lightgun input is offsetted (needs to be calibrated in service mode);
@@ -218,7 +219,8 @@ uint32_t model2_state::copro_fifoout_pop(address_space &space,uint32_t offset, u
 		/* spin the main cpu and let the TGP catch up */
 		// TODO: Daytona needs a much shorter spin time (like 25 usecs), but that breaks other games even moreso
 		// @seealso http://www.mameworld.info/ubbthreads/showflat.php?Cat=&Number=358069&page=&view=&sb=5&o=&vc=1
-		m_maincpu->spin_until_time(attotime::from_usec(25));
+		// Update: skytargt needs an ever smaller time otherwise gameplay is too slow.
+		m_maincpu->spin_until_time(attotime::from_usec(1));
 
 		// fix ld rN, (rN) case, ask desert, pltkids, zerogun ...
 		return 0x00884000+offset*4;
@@ -1285,7 +1287,8 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 			m_scsp->midi_in(space, 0, data&0xff, 0);
 
 			// give the 68k time to notice
-			m_maincpu->spin_until_time(attotime::from_usec(40));
+			// TODO: 40 usecs is too much for Sky Target
+			m_maincpu->spin_until_time(attotime::from_usec(10));
 		}
 	}
 	if (ACCESSING_BITS_16_23 && (offset == 0))
