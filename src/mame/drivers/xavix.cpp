@@ -28,7 +28,7 @@
 	There are multiple revisions of the CPU hardware, the SSD 2000 / SSD 2002 chips definitely add more opcodes
 	(thanks to Sean Riddle for this table)
 
-	name						PCB ID		ROM width	TSOP pads	ROM size		SEEPROM			die markings
+	name						PCB ID		ROM width	TSOP pads	ROM size		SEEPROM			die markings              extra components / notes
 
 	Play TV Ping Pong			8028		x8			48			1M				no				SSD 97 PA7270-107
 
@@ -39,8 +39,11 @@
 	Play TV Baseball 2			72042		x8			48			2M				no				SSD 98 PL7351-181
 	Play TV Monster Truck		74026		x8			48			4M				no				SSD 98 PL7351-181
 	Radica/EA Madden Football	74021		x8			48			4M      		no				SSD 98 PL7351-181
+	Play TV Football            -           x8          48          4M              no              SSD 98 PL7351-181
 	Play TV Snowboarder Blue	71023		x8			40			1M				no				SSD 98 PL7351-181
 	Namco Nostalgia 2			CGSJ		x8			48			1M				24LC04			SSD 98 PL7351-181
+	Taito Nostalgia 2			CGSJ		x8			ES29LV160DB Flash ROM*		24LC04			SSD 98 PL7351-181        (dumped as AMD29LV160DB)
+	Excite Fishing DX           ?           x8          ?           4M              24C08           SSD 98 PL7351-181  
 
 	Star Wars Saga Lightsaber	SWSA		x8			48			8M				24C02			SSD 2000 NEC 85605-621
 	Lord of the Rings			LORA		x8			48			8M				24C02			SSD 2000 NEC 85605-621
@@ -48,10 +51,17 @@
 
 	XaviXTennis					SGM6446		x16			48			8M				24C08			SSD 2002 NEC 85054-611
 
-	Real Swing Golf				74037		x16			48			not dumped		
-	Play TV Football 2			L7278		x16			48			not dumped		
 	XaviXBowling				SGM644C		x16			48			not dumped		
-	Basketball					75029		x16			48			not dumped		
+
+
+	TODO: put into above table (XaviXPORT cartridges)
+
+	XaviX Tennis and XaviX Baseball are the simplest: just the CPU, x16 ROM and 24C08 SEEPROM.  Bowling and Boxing also have 4 IR LEDs and a 32x32 sensor.
+	XaviX Fishing has ROM, 24C08 and a 24-pin daughterboard with a Nordic nRF24E1 2.4GHz 8051-based SoC.
+	All the rest of the carts include an S35390 I2C clock chip with crystal and battery backup, and have two x16 ROM chips, using a 5-pin single-gate inverter to create complementary /OE signals.
+	J-MAT, Fitness Exercise, Fitness Challenge and Bike Concept have a 24CS64 SEEPROM.  Bike Concept also has two 74HC14s.
+	Fitness Dance has an Atmel H93864C (maybe SEEPROM?) a Microchip DSPIC 33FJ12GP202 and two JRC 2740 dual op amps.
+	Music and Circuit has a 24CS64, two UTC324 quad op amps, a 74HC14, a 74HCT04, and an 8-pin SOIC labeled 61545, which is likely an M61545 dual electronic volume control.
 
 ***************************************************************************/
 
@@ -1962,6 +1972,11 @@ ROM_START( rad_fb )
 	ROM_LOAD("rfootball.bin", 0x000000, 0x400000, CRC(025e0cb4) SHA1(60ce363de236d5119d078e346ad5d2ae50dbc7e1) )
 ROM_END
 
+ROM_START( epo_efdx )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("excitefishing.bin", 0x000000, 0x400000, CRC(9c85b261) SHA1(6a363faed2ec89c5176e46554a98ca1e20132579) )
+ROM_END
+
 ROM_START( eka_strt )
 	ROM_REGION( 0x080000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekarastartcart.bin", 0x000000, 0x080000, CRC(8c12c0c2) SHA1(8cc1b098894af25a4bfccada884125b66f5fe8b2) )
@@ -2002,9 +2017,11 @@ CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, xavixp,   xavix_state, rad_box,  
 CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IS_SKELETON)
 CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IS_SKELETON)
 
-CONS( 2003, rad_madf,   0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_IS_SKELETON) // no Play TV branding, USA only release?
+CONS( 2003, rad_madf,  0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_IS_SKELETON) // no Play TV branding, USA only release?
 
-CONS( 200?, rad_fb,     0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_IS_SKELETON) // USA only release? doesn't change logo for PAL
+CONS( 200?, rad_fb,    0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_IS_SKELETON) // USA only release? doesn't change logo for PAL
+
+CONS( 200?, epo_efdx,  0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_IS_SKELETON)
 
 CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, rad_box,  "Hasbro / Milton Bradley / SSD Company LTD",     "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
 
