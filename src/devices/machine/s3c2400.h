@@ -23,6 +23,9 @@
 #define MCFG_S3C2400_PALETTE(palette_tag) \
 	downcast<s3c2400_device &>(*device).set_palette_tag(("^" palette_tag));
 
+#define MCFG_S3C2400_SCREEN(screen_tag) \
+	downcast<s3c2400_device &>(*device).set_screen_tag(("^" screen_tag));
+
 #define MCFG_S3C2400_CORE_PIN_R_CB(cb) \
 	devcb = &downcast<s3c2400_device &>(*device).set_core_pin_r_callback(DEVCB_##cb);
 
@@ -159,6 +162,7 @@ public:
 
 	// configuration
 	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
 	template <class Object> devcb_base &set_core_pin_r_callback(Object &&cb) { return m_pin_r_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_core_pin_w_callback(Object &&cb) { return m_pin_w_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_gpio_port_r_callback(Object &&cb) { return m_port_r_cb.set_callback(std::forward<Object>(cb)); }
@@ -488,7 +492,9 @@ private:
 	};
 
 	// internal state
+	required_device<device_t> m_cpu;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
 	memcon_t m_memcon;
 	usbhost_t m_usbhost;
@@ -507,8 +513,6 @@ private:
 	rtc_t m_rtc;
 	adc_t m_adc;
 	spi_t m_spi[SPI_COUNT];
-	mmc_t m_mmc;
-	required_device<device_t> m_cpu;
 	devcb_read32 m_pin_r_cb;
 	devcb_write32 m_pin_w_cb;
 	devcb_read32 m_port_r_cb;
@@ -519,6 +523,8 @@ private:
 	devcb_read32 m_data_r_cb;
 	devcb_write16 m_data_w_cb;
 	int m_flags;
+
+	mmc_t m_mmc;
 };
 
 DECLARE_DEVICE_TYPE(S3C2400, s3c2400_device)

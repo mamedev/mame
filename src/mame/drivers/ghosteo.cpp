@@ -616,6 +616,7 @@ MACHINE_CONFIG_START(ghosteo_state::ghosteo)
 
 	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
 	MCFG_S3C2410_PALETTE("palette")
+	MCFG_S3C2410_SCREEN("screen")
 	MCFG_S3C2410_CORE_PIN_R_CB(READ32(ghosteo_state, s3c2410_core_pin_r))
 	MCFG_S3C2410_GPIO_PORT_R_CB(READ32(ghosteo_state, s3c2410_gpio_port_r))
 	MCFG_S3C2410_GPIO_PORT_W_CB(WRITE32(ghosteo_state, s3c2410_gpio_port_w))

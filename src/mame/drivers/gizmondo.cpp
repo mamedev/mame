@@ -204,6 +204,7 @@ MACHINE_CONFIG_START(gizmondo_state::gizmondo)
 
 	MCFG_DEVICE_ADD("s3c2440", S3C2440, 12000000)
 	MCFG_S3C2440_PALETTE("palette")
+	MCFG_S3C2440_SCREEN("screen")
 	MCFG_S3C2440_GPIO_PORT_R_CB(READ32(gizmondo_state, s3c2440_gpio_port_r))
 	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(gizmondo_state, s3c2440_gpio_port_w))
 
