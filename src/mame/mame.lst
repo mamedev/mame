@@ -10573,6 +10573,8 @@ sfiii2                          // 30/09/1997 (c) 1997 (USA)
 sfiii2j                         // 30/09/1997 (c) 1997 (Japan)
 sfiii2n                         // 30/09/1997 (c) 1997 (Asia)
 sfiii3                          // 08/06/1999 (c) 1999 (Euro)
+sfiii3j                         // 08/06/1999 (c) 1999 (Japan)
+sfiii3jr1                       // 12/05/1999 (c) 1999 (Japan)
 sfiii3n                         // 08/06/1999 (c) 1999 (Japan)
 sfiii3nr1                       // 12/05/1999 (c) 1999 (Japan)
 sfiii3r1                        // 12/05/1999 (c) 1999 (Euro)
@@ -11340,7 +11342,7 @@ xfiles                          // (c) 1999 dgPIX Entertainment Inc
 xfilesk                         // (c) 1999 dgPIX Entertainment Inc (censored for the Korean market)
 
 @source:diablo1300.cpp
-diablo				//
+diablo              //
 
 @source:didact.cpp
 md6802                          //
@@ -17482,8 +17484,8 @@ totlvicj                        // GX639 (c) 1997
 totlvicu                        // GX639 (c) 1997
 
 @source:konblands.cpp
-kbadlands						// GX455 (c) 1984
-kbadlandsh						// GX455 (c) 1984
+kbadlands                       // GX455 (c) 1984
+kbadlandsh                      // GX455 (c) 1984
 
 @source:konendev.cpp
 aadvent                         // African Adventure
@@ -31590,7 +31592,7 @@ kok                             //
 
 @source:photoply.cpp
 photoply                        //
-photoply2k4						//
+photoply2k4                     //
 
 @source:phunsy.cpp
 phunsy                          //
@@ -39006,7 +39008,7 @@ xsleenaj                        // TA-0019 (c) 1986
 
 @source:xavix.cpp
 taitons1                        //
-taitons2						//
+taitons2                        //
 namcons1                        //
 namcons2                        //
 rad_ping                        //
