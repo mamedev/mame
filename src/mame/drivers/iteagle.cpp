@@ -708,6 +708,6 @@ GAME( 2005, gtfore06,   iteagle,  gtfore06, iteagle,  iteagle_state, 0, ROT0, "I
 GAME( 2002, bbhsc,      iteagle,  bbhsc,    bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.60.01)", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, bbhsca,     bbhsc,    bbhsc,    bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, bbh2sp,     iteagle,  bbh2sp,   bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.11)", MACHINE_SUPPORTS_SAVE )
-GAME( 2003, bbh2spa,    iteagle,  bbh2sp,   bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.09)", MACHINE_SUPPORTS_SAVE )
-GAME( 2003, bbh2spb,    iteagle,  bbh2sp,   bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.08)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, bbh2spa,    bbh2sp,   bbh2sp,   bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.09)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, bbh2spb,    bbh2sp,   bbh2sp,   bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.08)", MACHINE_SUPPORTS_SAVE )
 GAME( 2006, bbhcotw,    iteagle,  bbhcotw,  bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", MACHINE_SUPPORTS_SAVE )
