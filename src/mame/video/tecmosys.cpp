@@ -138,6 +138,33 @@ void tecmosys_state::tilemap_copy_to_compose(uint16_t pri, const rectangle &clip
 	}
 }
 
+#define DRAW_BLENDED                   \
+	int r,g,b;                         \
+	int r2,g2,b2;                      \
+	b = (colour & 0x000000ff) >> 0;    \
+	g = (colour & 0x0000ff00) >> 8;    \
+	r = (colour & 0x00ff0000) >> 16;   \
+	                                   \
+	b2 = (colour2 & 0x000000ff) >> 0;  \
+	g2 = (colour2 & 0x0000ff00) >> 8;  \
+	r2 = (colour2 & 0x00ff0000) >> 16; \
+	                                   \
+	r = (r + r2) >> 1;                 \
+	g = (g + g2) >> 1;                 \
+	b = (b + b2) >> 1;                 \
+	                                   \
+	dstptr[x] = b | (g<<8) | (r<<16);
+
+#define DRAW_BG                             \
+	if (srcptr[x]&0xf)                      \
+	{                                       \
+		dstptr[x] = colour;                 \
+	}                                       \
+	else                                    \
+	{                                       \
+		dstptr[x] = m_palette->pen(0x3f00); \
+	}
+
 void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *paldata = m_palette->pens();
@@ -159,7 +186,8 @@ void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprec
 			uint16_t penvalue2;
 			uint32_t colour;
 			uint32_t colour2;
-			uint16_t mask;
+			uint8_t mask = 0;
+			bool is_transparent = false;
 
 			pri = srcptr[x] & 0xc000;
 			pri2 = srcptr2[x] & 0xc000;
@@ -183,38 +211,33 @@ void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprec
 			{
 				penvalue2 = m_palette->basemem().read(0x3f00);
 				colour2 =   paldata[0x3f00];
-				mask = 0x3f00;
+				is_transparent = true;
 			}
-
-			if (((penvalue & 0x8000) && (srcptr[x]&0xf)) && ((penvalue2 & 0x8000) && (mask))) // blend
+			if (is_transparent)
 			{
-				int r,g,b;
-				int r2,g2,b2;
-				b = (colour & 0x000000ff) >> 0;
-				g = (colour & 0x0000ff00) >> 8;
-				r = (colour & 0x00ff0000) >> 16;
-
-				b2 = (colour2 & 0x000000ff) >> 0;
-				g2 = (colour2 & 0x0000ff00) >> 8;
-				r2 = (colour2 & 0x00ff0000) >> 16;
-
-				r = (r + r2) >> 1;
-				g = (g + g2) >> 1;
-				b = (b + b2) >> 1;
-
-				dstptr[x] = b | (g<<8) | (r<<16);
-			}
-			else if ((pri2 >= pri) && ((mask != 0x3f00) || (mask != 0)))
-			{
-				dstptr[x] = colour2;
-			}
-			else if (srcptr[x]&0xf)
-			{
-				dstptr[x] = colour;
+				if (((penvalue & 0x8000) && (srcptr[x]&0xf)) && (penvalue2 & 0x8000)) // blend
+				{
+					DRAW_BLENDED;
+				}
+				else
+				{
+					DRAW_BG;
+				}
 			}
 			else
 			{
-				dstptr[x] = m_palette->pen(0x3f00);
+				if (((penvalue & 0x8000) && (srcptr[x]&0xf)) && ((penvalue2 & 0x8000) && (mask))) // blend
+				{
+					DRAW_BLENDED;
+				}
+				else if ((pri2 >= pri) && (mask))
+				{
+					dstptr[x] = colour2;
+				}
+				else
+				{
+					DRAW_BG;
+				}
 			}
 		}
 	}
