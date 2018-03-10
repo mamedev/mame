@@ -100,17 +100,6 @@ machine_config::~machine_config()
 
 
 //-------------------------------------------------
-//  first_screen - return a pointer to the first
-//  screen device
-//-------------------------------------------------
-
-//screen_device *machine_config::first_screen() const
-//{
-//	return screen_device_iterator(root_device()).first();
-//}
-
-
-//-------------------------------------------------
 //  device_add - configuration helper to add a
 //  new device
 //-------------------------------------------------
