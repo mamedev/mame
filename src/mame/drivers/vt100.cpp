@@ -78,8 +78,9 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(vt102_irq_callback);
-	void vt102(machine_config &config);
 	void vt100(machine_config &config);
+	void vt101(machine_config &config);
+	void vt102(machine_config &config);
 	void vt180(machine_config &config);
 	void vt100_io(address_map &map);
 	void vt100_mem(address_map &map);
@@ -338,11 +339,11 @@ MACHINE_CONFIG_START(vt100_state::vt180)
 	MCFG_CPU_IO_MAP(vt180_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(vt100_state::vt102)
+MACHINE_CONFIG_START(vt100_state::vt101)
 	vt100(config);
 	MCFG_CPU_REPLACE("maincpu", I8085A, XTAL(24'073'400) / 4)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
-	MCFG_CPU_IO_MAP(vt102_io)
+	MCFG_CPU_IO_MAP(vt100_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state, vt102_irq_callback)
 
 	MCFG_DEVICE_MODIFY("pusart")
@@ -355,6 +356,12 @@ MACHINE_CONFIG_START(vt100_state::vt102)
 
 	MCFG_DEVICE_MODIFY("kbduart")
 	MCFG_AY31015_WRITE_TBMT_CB(INPUTLINE("maincpu", I8085_RST65_LINE))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(vt100_state::vt102)
+	vt101(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(vt102_io)
 
 	MCFG_DEVICE_ADD("printer_uart", INS8250, XTAL(24'073'400) / 16)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("printer", rs232_port_device, write_txd))
@@ -706,9 +713,9 @@ ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 // 8085 based instead of I8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-028e4-00.e71", 0x0000, 0x2000, CRC(fccce02c) SHA1(f3e3e93a857443685b816cab4fb52e34c0bc72b1)) // rom is unique to vt101; "CN55004N 8232 // DEC TP03 // 23-028E4-00" 24-pin mask rom (mc68764 pinout)
-	//e69 socket is empty/unpopulated on vt101
-	//e67 socket is empty/unpopulated on vt101
-	//dip40 chip in the lower right corner of MB in vt101 (the STP/AVO asic) is absent
+	// E69 socket is empty/unpopulated on vt101
+	// E67 socket is empty/unpopulated on vt101
+	// DIP40 at E74 in the lower right corner of MB in vt101 (WD8250 UART) is absent
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
@@ -777,8 +784,8 @@ ROM_END
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                     FULLNAME       FLAGS */
 COMP( 1978, vt100,    0,      0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100",MACHINE_NOT_WORKING)
 //COMP( 1978, vt100wp,  vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100-Wx", MACHINE_NOT_WORKING)
-COMP( 1979, vt100ac, vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING)
-COMP( 1981, vt101,    vt102,      0,       vt102,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT101", MACHINE_NOT_WORKING)
+COMP( 1979, vt100ac,  vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING)
+COMP( 1981, vt101,    vt102,  0,       vt101,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT101", MACHINE_NOT_WORKING)
 COMP( 1981, vt102,    0,      0,       vt102,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT102", MACHINE_NOT_WORKING)
 //COMP( 1979, vt103,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT103", MACHINE_NOT_WORKING)
 COMP( 1978, vt105,    vt100,  0,       vt100,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT105", MACHINE_NOT_WORKING)
