@@ -639,7 +639,7 @@ ROM_START( bbh )
 	EAGLE_BIOS
 
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
-	ROM_LOAD( "bb15-us.u53", 0x0000, 0x0880, NO_DUMP )
+	ROM_LOAD( "e2-bbh0.u53", 0x0000, 0x0880, NO_DUMP )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE("bbh_v1.00.14", 0, SHA1(dd56f758c3e421005e06ac24c21d12f0f29b0f44)) /* Build 10:59:51, Feb 25 2003 */
