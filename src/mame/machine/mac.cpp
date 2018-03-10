@@ -1355,11 +1355,8 @@ READ8_MEMBER(mac_state::mac_via_in_b)
 {
 	int val = 0;
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (machine().first_screen())
-	{
-		if (machine().first_screen()->vpos() >= MAC_V_VIS)
-			val |= 0x40;
-	}
+	if (m_screen->vpos() >= MAC_V_VIS)
+		val |= 0x40;
 
 	if (ADB_IS_BITBANG_CLASS)
 	{
@@ -1397,16 +1394,44 @@ READ8_MEMBER(mac_state::mac_via_in_b)
 	return val;
 }
 
+READ8_MEMBER(mac_state::mac_via_in_b_ii)
+{
+	int val = 0;
+
+	if (ADB_IS_BITBANG_CLASS)
+	{
+		val |= m_adb_state<<4;
+
+		if (!m_adb_irq_pending)
+		{
+			val |= 0x08;
+		}
+
+		val |= m_rtc->data_r();
+	}
+	else if (ADB_IS_EGRET)
+	{
+		val |= m_egret->get_xcvr_session()<<3;
+	}
+	else if (ADB_IS_CUDA)
+	{
+		val |= m_cuda->get_treq()<<3;
+	}
+
+//  printf("VIA1 IN_B_II = %02x (PC %x)\n", val, m_maincpu->safe_pc());
+
+	return val;
+}
+
 READ8_MEMBER(mac_state::mac_via_in_b_via2pmu)
 {
 	int val = 0;
 	// TODO: is this valid for VIA2 PMU machines?
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (machine().first_screen())
-	{
-		if (machine().first_screen()->vpos() >= MAC_V_VIS)
-			val |= 0x40;
-	}
+
+	if (m_screen->vpos() >= MAC_V_VIS)
+		val |= 0x40;
+
 
 //  printf("VIA1 IN_B = %02x (PC %x)\n", val, m_maincpu->safe_pc());
 
@@ -1866,10 +1891,15 @@ void mac_state::machine_start()
 		}
 	}
 
-	if (machine().first_screen())
+	if (m_screen)
 	{
 		this->m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_scanline_tick),this));
-		this->m_scanline_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
+		this->m_scanline_timer->adjust(m_screen->time_until_pos(0, 0));
+	}
+	else
+	{
+		m_adbupdate_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_adbrefresh_tick),this));
+		m_adbupdate_timer->adjust(attotime::from_hz(70));
 	}
 
 	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_6015_tick),this));
@@ -2305,6 +2335,12 @@ void mac_state::vblank_irq()
 	}
 }
 
+TIMER_CALLBACK_MEMBER(mac_state::mac_adbrefresh_tick)
+{
+	vblank_irq();
+	m_adbupdate_timer->adjust(attotime::from_hz(70));
+}
+
 TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 {
 	int scanline;
@@ -2320,7 +2356,7 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 		}
 	}
 
-	scanline = machine().first_screen()->vpos();
+	scanline = m_screen->vpos();
 	if (scanline == MAC_V_VIS)
 		vblank_irq();
 
@@ -2331,7 +2367,7 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 			mouse_callback();
 	}
 
-	m_scanline_timer->adjust(machine().first_screen()->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
+	m_scanline_timer->adjust(m_screen->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
 }
 
 WRITE_LINE_MEMBER(mac_state::nubus_irq_9_w)
