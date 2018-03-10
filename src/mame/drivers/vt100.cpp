@@ -27,6 +27,7 @@
 #include "machine/com8116.h"
 #include "machine/er1400.h"
 #include "machine/i8251.h"
+#include "machine/ins8250.h"
 #include "machine/rstbuf.h"
 #include "machine/vt100_kbd.h"
 #include "video/vtvideo.h"
@@ -49,6 +50,7 @@ public:
 		m_dbrg(*this, "dbrg"),
 		m_nvr(*this, "nvr"),
 		m_rstbuf(*this, "rstbuf"),
+		m_printer_uart(*this, "printer_uart"),
 		m_p_ram(*this, "p_ram")
 	{
 	}
@@ -60,9 +62,12 @@ public:
 	required_device<com8116_device> m_dbrg;
 	required_device<er1400_device> m_nvr;
 	required_device<rst_pos_buffer_device> m_rstbuf;
+	optional_device<ins8250_device> m_printer_uart;
 	DECLARE_READ8_MEMBER(vt100_flags_r);
 	DECLARE_WRITE8_MEMBER(vt100_baud_rate_w);
 	DECLARE_WRITE8_MEMBER(vt100_nvr_latch_w);
+	DECLARE_READ8_MEMBER(printer_r);
+	DECLARE_WRITE8_MEMBER(printer_w);
 	DECLARE_READ8_MEMBER(vt100_read_video_ram_r);
 	DECLARE_WRITE8_MEMBER(uart_clock_w);
 	required_shared_ptr<uint8_t> m_p_ram;
@@ -75,6 +80,7 @@ public:
 	void vt180(machine_config &config);
 	void vt100_io(address_map &map);
 	void vt100_mem(address_map &map);
+	void vt102_io(address_map &map);
 	void vt180_io(address_map &map);
 	void vt180_mem(address_map &map);
 };
@@ -164,6 +170,21 @@ ADDRESS_MAP_START(vt100_state::vt100_io)
 	AM_RANGE (0xc2, 0xc2) AM_DEVWRITE("vt100_video", vt100_video_device, dc011_w)
 	// 0xE2 Graphics port
 	// AM_RANGE (0xe2, 0xe2)
+ADDRESS_MAP_END
+
+READ8_MEMBER(vt100_state::printer_r)
+{
+	return m_printer_uart->ins8250_r(space, offset >> 2);
+}
+
+WRITE8_MEMBER(vt100_state::printer_w)
+{
+	m_printer_uart->ins8250_w(space, offset >> 2, data);
+}
+
+ADDRESS_MAP_START(vt100_state::vt102_io)
+	AM_IMPORT_FROM(vt100_io)
+	AM_RANGE(0x03, 0x03) AM_SELECT(0x1c) AM_READWRITE(printer_r, printer_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -305,7 +326,7 @@ MACHINE_CONFIG_START(vt100_state::vt102)
 	vt100(config);
 	MCFG_CPU_REPLACE("maincpu", I8085A, XTAL(24'073'400) / 4)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
-	MCFG_CPU_IO_MAP(vt100_io)
+	MCFG_CPU_IO_MAP(vt102_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state, vt102_irq_callback)
 
 	MCFG_DEVICE_MODIFY("pusart")
@@ -318,6 +339,14 @@ MACHINE_CONFIG_START(vt100_state::vt102)
 
 	MCFG_DEVICE_MODIFY("kbduart")
 	MCFG_AY31015_WRITE_TBMT_CB(INPUTLINE("maincpu", I8085_RST65_LINE))
+
+	MCFG_DEVICE_ADD("printer_uart", INS8250, XTAL(24'073'400) / 16)
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("printer", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", I8085_RST55_LINE))
+
+	MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("printer_uart", ins8250_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("printer_uart", ins8250_device, dsr_w))
 MACHINE_CONFIG_END
 
 /* VT1xx models:
