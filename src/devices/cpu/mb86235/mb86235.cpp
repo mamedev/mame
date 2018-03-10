@@ -49,6 +49,7 @@ void mb86235_device::execute_run()
 #if ENABLE_DRC
 	run_drc();
 #else
+	debugger_instruction_hook(this, m_core->pc);
 	m_core->icount = 0;
 #endif
 }
