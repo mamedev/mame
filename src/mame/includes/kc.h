@@ -25,6 +25,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "screen.h"
 
 // Devices
 #include "imagedev/cassette.h"
@@ -54,18 +55,18 @@
 // cassette input polling frequency
 #define KC_CASSETTE_TIMER_FREQUENCY attotime::from_hz(44100)
 
-
 class kc_state : public driver_device
 {
 public:
 	kc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_z80pio(*this, "z80pio"),
-			m_z80ctc(*this, "z80ctc"),
-			m_ram(*this, RAM_TAG),
-			m_speaker(*this, "speaker"),
-			m_cassette(*this, "cassette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_z80pio(*this, "z80pio")
+		, m_z80ctc(*this, "z80ctc")
+		, m_ram(*this, RAM_TAG)
+		, m_speaker(*this, "speaker")
+		, m_cassette(*this, "cassette")
+		, m_screen(*this, "screen")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -74,6 +75,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
+	required_device<screen_device> m_screen;
 
 	// defined in machine/kc.c
 	virtual void machine_start() override;
