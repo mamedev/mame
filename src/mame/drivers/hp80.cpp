@@ -281,7 +281,7 @@ hp85_state::hp85_state(const machine_config &mconfig, device_type type, const ch
 
 void hp85_state::machine_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 	m_video_mem.resize(VIDEO_MEM_SIZE);
 }
 
