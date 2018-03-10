@@ -444,8 +444,8 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 	if (m_read_ram(0) != 0x7f)
 		return;
 
-	int vert_charlines_MAX = m_height;
 	int fill_lines = m_fill_lines;
+	int vert_charlines_MAX = m_height + fill_lines;
 	if (m_linedoubler)
 	{
 		vert_charlines_MAX *= 2;
@@ -493,7 +493,6 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 			}
 		}
 	}
-
 }
 
 // ****** RAINBOW ******
