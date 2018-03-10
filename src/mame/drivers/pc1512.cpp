@@ -108,7 +108,7 @@ PC1640-HD30: Western Digital 95038 [-chs 615,6,17 -ss 512]
 //  system_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_state::system_r )
+READ8_MEMBER( pc1512_base_state::system_r )
 {
 	uint8_t data = 0;
 
@@ -180,7 +180,7 @@ READ8_MEMBER( pc1512_state::system_r )
 //  system_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_state::system_w )
+WRITE8_MEMBER( pc1512_base_state::system_w )
 {
 	switch (offset)
 	{
@@ -274,7 +274,7 @@ WRITE8_MEMBER( pc1512_state::system_w )
 //  mouse_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_state::mouse_r )
+READ8_MEMBER( pc1512_base_state::mouse_r )
 {
 	uint8_t data = 0;
 
@@ -297,7 +297,7 @@ READ8_MEMBER( pc1512_state::mouse_r )
 //  mouse_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_state::mouse_w )
+WRITE8_MEMBER( pc1512_base_state::mouse_w )
 {
 	switch (offset)
 	{
@@ -321,7 +321,7 @@ WRITE8_MEMBER( pc1512_state::mouse_w )
 //  dma_page_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_state::dma_page_w )
+WRITE8_MEMBER( pc1512_base_state::dma_page_w )
 {
 	/*
 
@@ -364,7 +364,7 @@ WRITE8_MEMBER( pc1512_state::dma_page_w )
 //  nmi_mask_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_state::nmi_mask_w )
+WRITE8_MEMBER( pc1512_base_state::nmi_mask_w )
 {
 	m_nmi_enable = BIT(data, 7);
 }
@@ -379,7 +379,7 @@ WRITE8_MEMBER( pc1512_state::nmi_mask_w )
 //  printer_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_state::printer_r )
+READ8_MEMBER( pc1512_base_state::printer_r )
 {
 	uint8_t data = 0;
 
@@ -494,7 +494,7 @@ READ8_MEMBER( pc1640_state::printer_r )
 		break;
 
 	default:
-		data = pc1512_state::printer_r(space, offset);
+		data = pc1512_base_state::printer_r(space, offset);
 		break;
 	}
 
@@ -506,7 +506,7 @@ READ8_MEMBER( pc1640_state::printer_r )
 //  printer_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_state::printer_w )
+WRITE8_MEMBER( pc1512_base_state::printer_w )
 {
 	switch (offset)
 	{
@@ -772,12 +772,12 @@ INPUT_PORTS_END
 //  PC1512_KEYBOARD_INTERFACE( kb_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pc1512_state::kbdata_w )
+WRITE_LINE_MEMBER( pc1512_base_state::kbdata_w )
 {
 	m_kbdata = state;
 }
 
-WRITE_LINE_MEMBER( pc1512_state::kbclk_w )
+WRITE_LINE_MEMBER( pc1512_base_state::kbclk_w )
 {
 	if (!BIT(m_port61, 7) && m_kbclk && !state)
 	{
@@ -795,7 +795,7 @@ WRITE_LINE_MEMBER( pc1512_state::kbclk_w )
 	m_kbclk = state;
 }
 
-WRITE8_MEMBER( pc1512_state::mouse_x_w )
+WRITE8_MEMBER( pc1512_base_state::mouse_x_w )
 {
 	if (data > m_mouse_x_old)
 		m_mouse_x+=3;
@@ -805,7 +805,7 @@ WRITE8_MEMBER( pc1512_state::mouse_x_w )
 	m_mouse_x_old = data;
 }
 
-WRITE8_MEMBER( pc1512_state::mouse_y_w )
+WRITE8_MEMBER( pc1512_base_state::mouse_y_w )
 {
 	if (data > m_mouse_y_old)
 		m_mouse_y-=3;
@@ -819,7 +819,7 @@ WRITE8_MEMBER( pc1512_state::mouse_y_w )
 //  I8237_INTERFACE( dmac_intf )
 //-------------------------------------------------
 
-void pc1512_state::update_fdc_tc()
+void pc1512_base_state::update_fdc_tc()
 {
 	if (m_nden)
 		m_fdc->tc_w(m_neop);
@@ -827,14 +827,14 @@ void pc1512_state::update_fdc_tc()
 		m_fdc->tc_w(false);
 }
 
-WRITE_LINE_MEMBER( pc1512_state::hrq_w )
+WRITE_LINE_MEMBER( pc1512_base_state::hrq_w )
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	m_dmac->hack_w(state);
 }
 
-WRITE_LINE_MEMBER( pc1512_state::eop_w )
+WRITE_LINE_MEMBER( pc1512_base_state::eop_w )
 {
 	if (m_dma_channel == 2)
 	{
@@ -843,7 +843,7 @@ WRITE_LINE_MEMBER( pc1512_state::eop_w )
 	}
 }
 
-READ8_MEMBER( pc1512_state::memr_r )
+READ8_MEMBER( pc1512_base_state::memr_r )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t page_offset = m_dma_page[m_dma_channel] << 16;
@@ -851,7 +851,7 @@ READ8_MEMBER( pc1512_state::memr_r )
 	return program.read_byte(page_offset + offset);
 }
 
-WRITE8_MEMBER( pc1512_state::memw_w )
+WRITE8_MEMBER( pc1512_base_state::memw_w )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t page_offset = m_dma_page[m_dma_channel] << 16;
@@ -859,12 +859,12 @@ WRITE8_MEMBER( pc1512_state::memw_w )
 	program.write_byte(page_offset + offset, data);
 }
 
-READ8_MEMBER( pc1512_state::ior1_r )
+READ8_MEMBER( pc1512_base_state::ior1_r )
 {
 	return m_bus->dack_r(1);
 }
 
-READ8_MEMBER( pc1512_state::ior2_r )
+READ8_MEMBER( pc1512_base_state::ior2_r )
 {
 	if (m_nden)
 		return m_fdc->dma_r();
@@ -872,23 +872,23 @@ READ8_MEMBER( pc1512_state::ior2_r )
 		return m_bus->dack_r(2);
 }
 
-READ8_MEMBER( pc1512_state::ior3_r )
+READ8_MEMBER( pc1512_base_state::ior3_r )
 {
 	return m_bus->dack_r(3);
 }
 
-WRITE8_MEMBER( pc1512_state::iow0_w )
+WRITE8_MEMBER( pc1512_base_state::iow0_w )
 {
 	m_dreq0 = 0;
 	m_dmac->dreq0_w(m_dreq0);
 }
 
-WRITE8_MEMBER( pc1512_state::iow1_w )
+WRITE8_MEMBER( pc1512_base_state::iow1_w )
 {
 	m_bus->dack_w(1, data);
 }
 
-WRITE8_MEMBER( pc1512_state::iow2_w )
+WRITE8_MEMBER( pc1512_base_state::iow2_w )
 {
 	if (m_nden)
 		m_fdc->dma_w(data);
@@ -896,27 +896,27 @@ WRITE8_MEMBER( pc1512_state::iow2_w )
 		m_bus->dack_w(2, data);
 }
 
-WRITE8_MEMBER( pc1512_state::iow3_w )
+WRITE8_MEMBER( pc1512_base_state::iow3_w )
 {
 	m_bus->dack_w(3, data);
 }
 
-WRITE_LINE_MEMBER( pc1512_state::dack0_w )
+WRITE_LINE_MEMBER( pc1512_base_state::dack0_w )
 {
 	if (!state) m_dma_channel = 0;
 }
 
-WRITE_LINE_MEMBER( pc1512_state::dack1_w )
+WRITE_LINE_MEMBER( pc1512_base_state::dack1_w )
 {
 	if (!state) m_dma_channel = 1;
 }
 
-WRITE_LINE_MEMBER( pc1512_state::dack2_w )
+WRITE_LINE_MEMBER( pc1512_base_state::dack2_w )
 {
 	if (!state) m_dma_channel = 2;
 }
 
-WRITE_LINE_MEMBER( pc1512_state::dack3_w )
+WRITE_LINE_MEMBER( pc1512_base_state::dack3_w )
 {
 	if (!state) m_dma_channel = 3;
 }
@@ -925,12 +925,12 @@ WRITE_LINE_MEMBER( pc1512_state::dack3_w )
 //  pit8253_config pit_intf
 //-------------------------------------------------
 
-void pc1512_state::update_speaker()
+void pc1512_base_state::update_speaker()
 {
 	m_speaker->level_w(m_speaker_drive & m_pit2);
 }
 
-WRITE_LINE_MEMBER( pc1512_state::pit1_w )
+WRITE_LINE_MEMBER( pc1512_base_state::pit1_w )
 {
 	if (!m_pit1 && state && !m_dreq0)
 	{
@@ -941,7 +941,7 @@ WRITE_LINE_MEMBER( pc1512_state::pit1_w )
 	m_pit1 = state;
 }
 
-WRITE_LINE_MEMBER( pc1512_state::pit2_w )
+WRITE_LINE_MEMBER( pc1512_base_state::pit2_w )
 {
 	m_pit2 = state;
 	update_speaker();
@@ -951,7 +951,7 @@ WRITE_LINE_MEMBER( pc1512_state::pit2_w )
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-void pc1512_state::update_fdc_int()
+void pc1512_base_state::update_fdc_int()
 {
 	if (m_nden)
 		m_pic->ir6_w(m_dint);
@@ -959,7 +959,7 @@ void pc1512_state::update_fdc_int()
 		m_pic->ir6_w(CLEAR_LINE);
 }
 
-void pc1512_state::update_fdc_drq()
+void pc1512_base_state::update_fdc_drq()
 {
 	if (m_nden)
 		m_dmac->dreq2_w(m_ddrq);
@@ -967,13 +967,13 @@ void pc1512_state::update_fdc_drq()
 		m_dmac->dreq2_w(0);
 }
 
-WRITE_LINE_MEMBER( pc1512_state::fdc_int_w )
+WRITE_LINE_MEMBER( pc1512_base_state::fdc_int_w )
 {
 	m_dint = state;
 	update_fdc_int();
 }
 
-WRITE_LINE_MEMBER( pc1512_state::fdc_drq_w )
+WRITE_LINE_MEMBER( pc1512_base_state::fdc_drq_w )
 {
 	m_ddrq = state;
 	update_fdc_drq();
@@ -983,7 +983,7 @@ WRITE_LINE_MEMBER( pc1512_state::fdc_drq_w )
 //  centronics_interface centronics_intf
 //-------------------------------------------------
 
-void pc1512_state::update_ack()
+void pc1512_base_state::update_ack()
 {
 	if (m_ack_int_enable)
 		m_pic->ir7_w(m_centronics_ack);
@@ -991,28 +991,28 @@ void pc1512_state::update_ack()
 		m_pic->ir7_w(CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( pc1512_state::write_centronics_ack )
+WRITE_LINE_MEMBER( pc1512_base_state::write_centronics_ack )
 {
 	m_centronics_ack = state;
 	update_ack();
 }
 
-WRITE_LINE_MEMBER( pc1512_state::write_centronics_busy )
+WRITE_LINE_MEMBER( pc1512_base_state::write_centronics_busy )
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER( pc1512_state::write_centronics_perror )
+WRITE_LINE_MEMBER( pc1512_base_state::write_centronics_perror )
 {
 	m_centronics_perror = state;
 }
 
-WRITE_LINE_MEMBER( pc1512_state::write_centronics_select )
+WRITE_LINE_MEMBER( pc1512_base_state::write_centronics_select )
 {
 	m_centronics_select = state;
 }
 
-WRITE_LINE_MEMBER( pc1512_state::write_centronics_fault )
+WRITE_LINE_MEMBER( pc1512_base_state::write_centronics_fault )
 {
 	m_centronics_fault = state;
 }
@@ -1026,7 +1026,7 @@ SLOT_INTERFACE_START( pc1640_isa8_cards )
 	SLOT_INTERFACE_INTERNAL("iga", ISA8_PC1640_IGA)
 SLOT_INTERFACE_END
 
-FLOPPY_FORMATS_MEMBER( pc1512_state::floppy_formats )
+FLOPPY_FORMATS_MEMBER( pc1512_base_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
@@ -1040,22 +1040,8 @@ SLOT_INTERFACE_END
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  MACHINE_START( pc1512 )
-//-------------------------------------------------
-
-void pc1512_state::machine_start()
+void pc1512_base_state::machine_start()
 {
-	// set RAM size
-	size_t ram_size = m_ram->size();
-
-	if (ram_size < 640 * 1024)
-	{
-		address_space &program = m_maincpu->space(AS_PROGRAM);
-		program.unmap_readwrite(ram_size, 0x9ffff);
-	}
-
-	// state saving
 	save_item(NAME(m_pit1));
 	save_item(NAME(m_pit2));
 	save_item(NAME(m_status1));
@@ -1085,6 +1071,23 @@ void pc1512_state::machine_start()
 	save_item(NAME(m_centronics_fault));
 	save_item(NAME(m_printer_data));
 	save_item(NAME(m_printer_control));
+	save_item(NAME(m_speaker_drive));
+}
+
+void pc1512_state::machine_start()
+{
+	pc1512_base_state::machine_start();
+
+	// set RAM size
+	size_t ram_size = m_ram->size();
+
+	if (ram_size < 640 * 1024)
+	{
+		address_space &program = m_maincpu->space(AS_PROGRAM);
+		program.unmap_readwrite(ram_size, 0x9ffff);
+	}
+
+	// state saving
 	save_item(NAME(m_toggle));
 	save_item(NAME(m_lpen));
 	save_item(NAME(m_blink));
@@ -1095,13 +1098,21 @@ void pc1512_state::machine_start()
 	save_item(NAME(m_vdu_plane));
 	save_item(NAME(m_vdu_rdsel));
 	save_item(NAME(m_vdu_border));
-	save_item(NAME(m_speaker_drive));
 }
 
+void pc1512_base_state::machine_reset()
+{
+	m_nmi_enable = 0;
+
+	m_kb_bits = 0;
+	m_kb->data_w(1);
+	m_pic->ir1_w(CLEAR_LINE);
+}
 
 void pc1512_state::machine_reset()
 {
-	m_nmi_enable = 0;
+	pc1512_base_state::machine_reset();
+
 	m_toggle = 0;
 	m_pit2 = 1;
 
@@ -1114,10 +1125,6 @@ void pc1512_state::machine_reset()
 	m_vdu_rdsel = 0;
 	m_vdu_plane = 0x0f;
 	m_vdu_border = 0;
-
-	m_kb_bits = 0;
-	m_kb->data_w(1);
-	m_pic->ir1_w(CLEAR_LINE);
 }
 
 
@@ -1127,50 +1134,11 @@ void pc1512_state::machine_reset()
 
 void pc1640_state::machine_start()
 {
+	pc1512_base_state::machine_start();
+
 	// state saving
-	save_item(NAME(m_pit1));
-	save_item(NAME(m_pit2));
-	save_item(NAME(m_status1));
-	save_item(NAME(m_status2));
-	save_item(NAME(m_port61));
-	save_item(NAME(m_nmi_enable));
-	save_item(NAME(m_kbd));
-	save_item(NAME(m_kb_bits));
-	save_item(NAME(m_kbclk));
-	save_item(NAME(m_kbdata));
-	save_item(NAME(m_mouse_x));
-	save_item(NAME(m_mouse_y));
-	save_item(NAME(m_mouse_x_old));
-	save_item(NAME(m_mouse_y_old));
-	save_item(NAME(m_dma_page));
-	save_item(NAME(m_dma_channel));
-	save_item(NAME(m_dreq0));
-	save_item(NAME(m_nden));
-	save_item(NAME(m_dint));
-	save_item(NAME(m_ddrq));
-	save_item(NAME(m_neop));
-	save_item(NAME(m_ack_int_enable));
-	save_item(NAME(m_centronics_ack));
-	save_item(NAME(m_centronics_busy));
-	save_item(NAME(m_centronics_perror));
-	save_item(NAME(m_centronics_select));
-	save_item(NAME(m_centronics_fault));
-	save_item(NAME(m_printer_data));
-	save_item(NAME(m_printer_control));
-	save_item(NAME(m_speaker_drive));
 	save_item(NAME(m_opt));
 }
-
-
-void pc1640_state::machine_reset()
-{
-	m_nmi_enable = 0;
-
-	m_kb_bits = 0;
-	m_kb->data_w(1);
-	m_pic->ir1_w(CLEAR_LINE);
-}
-
 
 
 //**************************************************************************
@@ -1240,8 +1208,8 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
 	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc1512_state, fdc_int_w))
 	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(pc1512_state, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_base_state::floppy_formats)
 
 	MCFG_DEVICE_ADD(INS8250_TAG, INS8250, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
@@ -1331,31 +1299,31 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 
 	// devices
 	MCFG_DEVICE_ADD(PC1512_KEYBOARD_TAG, PC1512_KEYBOARD, 0)
-	MCFG_PC1512_KEYBOARD_CLOCK_CALLBACK(WRITELINE(pc1512_state, kbclk_w))
-	MCFG_PC1512_KEYBOARD_DATA_CALLBACK(WRITELINE(pc1512_state, kbdata_w))
+	MCFG_PC1512_KEYBOARD_CLOCK_CALLBACK(WRITELINE(pc1512_base_state, kbclk_w))
+	MCFG_PC1512_KEYBOARD_DATA_CALLBACK(WRITELINE(pc1512_base_state, kbdata_w))
 
 	MCFG_PC1512_MOUSE_PORT_ADD(PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse")
-	MCFG_PC1512_MOUSE_PORT_X_CB(WRITE8(pc1512_state, mouse_x_w))
-	MCFG_PC1512_MOUSE_PORT_Y_CB(WRITE8(pc1512_state, mouse_y_w))
+	MCFG_PC1512_MOUSE_PORT_X_CB(WRITE8(pc1512_base_state, mouse_x_w))
+	MCFG_PC1512_MOUSE_PORT_Y_CB(WRITE8(pc1512_base_state, mouse_y_w))
 	MCFG_PC1512_MOUSE_PORT_M1_CB(DEVWRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
 	MCFG_PC1512_MOUSE_PORT_M2_CB(DEVWRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
 
 	MCFG_DEVICE_ADD(I8237A5_TAG, AM9517A, XTAL(24'000'000)/6)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pc1512_state, hrq_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(pc1512_state, eop_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(pc1512_state, memr_r))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(pc1512_state, memw_w))
-	MCFG_I8237_IN_IOR_1_CB(READ8(pc1512_state, ior1_r))
-	MCFG_I8237_IN_IOR_2_CB(READ8(pc1512_state, ior2_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(pc1512_state, ior3_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(pc1512_state, iow0_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(pc1512_state, iow1_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(pc1512_state, iow2_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(pc1512_state, iow3_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(pc1512_state, dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(pc1512_state, dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pc1512_state, dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pc1512_state, dack3_w))
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pc1512_base_state, hrq_w))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(pc1512_base_state, eop_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(pc1512_base_state, memr_r))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(pc1512_base_state, memw_w))
+	MCFG_I8237_IN_IOR_1_CB(READ8(pc1512_base_state, ior1_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(pc1512_base_state, ior2_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(pc1512_base_state, ior3_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(pc1512_base_state, iow0_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(pc1512_base_state, iow1_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(pc1512_base_state, iow2_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(pc1512_base_state, iow3_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(pc1512_base_state, dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(pc1512_base_state, dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pc1512_base_state, dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pc1512_base_state, dack3_w))
 
 	MCFG_DEVICE_ADD(I8259A2_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
@@ -1364,18 +1332,18 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	MCFG_PIT8253_CLK0(XTAL(28'636'363)/24)
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL(28'636'363)/24)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pc1512_state, pit1_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pc1512_base_state, pit1_w))
 	MCFG_PIT8253_CLK2(XTAL(28'636'363)/24)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc1512_state, pit2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc1512_base_state, pit2_w))
 
 	MCFG_MC146818_ADD(MC146818_TAG, XTAL(32'768))
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
 
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc1512_state, fdc_int_w))
-	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(pc1512_state, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_state::floppy_formats)
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc1512_base_state, fdc_int_w))
+	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(pc1512_base_state, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_base_state::floppy_formats)
 
 	MCFG_DEVICE_ADD(INS8250_TAG, INS8250, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
@@ -1384,11 +1352,11 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pc1512_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(pc1512_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(pc1512_state, write_centronics_perror))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(pc1512_state, write_centronics_select))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(pc1512_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pc1512_base_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(pc1512_base_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(pc1512_base_state, write_centronics_perror))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(pc1512_base_state, write_centronics_select))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(pc1512_base_state, write_centronics_fault))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
