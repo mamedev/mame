@@ -1179,41 +1179,40 @@ WRITE32_MEMBER(model2_state::hotd_lightgun_w)
 }
 
 
-#ifdef UNUSED_FUNCTION
-READ32_MEMBER(model2_state::sonic_unk_r)
-{
-	return 0x001a0000;
-}
-#endif
-
 READ32_MEMBER(model2o_state::daytona_unk_r)
 {
 	return 0x00400000;
 }
 
-#if 0
-READ32_MEMBER(model2_state::desert_unk_r)
-{
-	static uint8_t test;
-
-	test ^= 8;
-	// vcop needs bit 3 clear (infinite loop otherwise)
-	// desert needs other bits set (not sure which specifically)
-	// daytona needs the MSW to return ff
-	return 0x00f700ff | (test << 16);
-}
-#endif
-
-READ32_MEMBER(model2_state::model2_irq_r)
+READ32_MEMBER(model2_state::irq_request_r)
 {
 	m_maincpu->i960_noburst();
 
-	if (offset)
-	{
-		return m_intena;
-	}
-
 	return m_intreq;
+}
+
+READ32_MEMBER(model2_state::irq_enable_r)
+{
+	m_maincpu->i960_noburst();
+
+	return m_intena;
+}
+
+WRITE32_MEMBER(model2_state::irq_ack_w)
+{
+	m_maincpu->i960_noburst();
+
+	m_intreq &= data;
+
+	model2_check_irqack_state(data ^ 0xffffffff);
+}
+
+WRITE32_MEMBER(model2_state::irq_enable_w)
+{
+	m_maincpu->i960_noburst();
+
+	COMBINE_DATA(&m_intena);
+	model2_check_irq_state();
 }
 
 void model2_state::model2_check_irq_state()
@@ -1242,22 +1241,6 @@ void model2_state::model2_check_irqack_state(uint32_t data)
 		if(data & 1<<i)
 			m_maincpu->set_input_line(irq_type[i], CLEAR_LINE);
 	}
-}
-
-WRITE32_MEMBER(model2_state::model2_irq_w)
-{
-	m_maincpu->i960_noburst();
-
-	if (offset)
-	{
-		COMBINE_DATA(&m_intena);
-		model2_check_irq_state();
-		return;
-	}
-
-	m_intreq &= data;
-
-	model2_check_irqack_state(data ^ 0xffffffff);
 }
 
 /* TODO: rewrite this part. It's a 8251-compatible chip */
@@ -1445,7 +1428,8 @@ ADDRESS_MAP_START(model2_state::model2_base_mem)
 	AM_RANGE(0x00980030, 0x0098003f) AM_READ8(tgpid_r,0xffffffff)
 
 	AM_RANGE(0x00e00000, 0x00e00037) AM_RAM // CPU control (wait-states)
-	AM_RANGE(0x00e80000, 0x00e80007) AM_READWRITE(model2_irq_r, model2_irq_w)
+	AM_RANGE(0x00e80000, 0x00e80003) AM_READWRITE(irq_request_r, irq_ack_w)
+	AM_RANGE(0x00e80004, 0x00e80007) AM_READWRITE(irq_enable_r, irq_enable_w)
 
 	AM_RANGE(0x00f00000, 0x00f0000f) AM_READWRITE(timers_r, timers_w)
 
@@ -2276,6 +2260,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 	}
 }
 
+#ifdef UNUSED_FUNCTION
+WRITE_LINE_MEMBER(model2_state::sound_ready_w)
+{
+	if(state)
+	{
+		m_intreq |= (1<<10);
+		if(m_intena & 1<<10)
+			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
+		model2_check_irq_state();
+	}
+}
+#endif
+
 TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2c_interrupt)
 {
 	int scanline = param;
@@ -2289,23 +2286,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2c_interrupt)
 		if (m_m2comm != nullptr)
 			m_m2comm->check_vint_irq();
 	}
-	else if(scanline == 0) // 384
+	else if(scanline == 0)
 	{
 		m_intreq |= (1<<10);
 		if(m_intena & 1<<10)
 			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
 		model2_check_irq_state();
 	}
-	else if(scanline == 256)
+	#if 0
+	else if(scanline == 0)
 	{
-		/* TODO: irq source? Scroll allocation in dynamcopc? */
+		// TODO: irq source? Scroll allocation in dynamcopc?
+		// it's actually a timer 0 irq, doesn't seem necessary
 		m_intreq |= (1<<2);
 		if(m_intena & 1<<2)
 			m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
 		model2_check_irq_state();
 	}
-
-
+	#endif
 }
 
 /* Model 2 sound board emulation */
@@ -2439,6 +2437,26 @@ MACHINE_CONFIG_START(model2_state::model2_screen)
 	MCFG_PALETTE_ADD("palette", 8192)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(model2_state::model2_scsp)
+	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(model2_snd)
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("scsp", SCSP, 0)
+	MCFG_SCSP_IRQ_CB(WRITE8(model2_state,scsp_irq))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+
+	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
+//	MCFG_I8251_RXRDY_HANDLER(WRITELINE(model2_state, sound_ready_w))
+//	MCFG_I8251_TXRDY_HANDLER(WRITELINE(model2_state, sound_ready_w))
+
+	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+MACHINE_CONFIG_END
+
 /* original Model 2 */
 MACHINE_CONFIG_START(model2o_state::model2o)
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
@@ -2541,9 +2559,6 @@ MACHINE_CONFIG_START(model2a_state::model2a)
 	MCFG_CPU_PROGRAM_MAP(model2a_crx_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(model2_snd)
-
 	MCFG_CPU_ADD("tgp", MB86233, 16000000)
 	MCFG_CPU_PROGRAM_MAP(copro_tgp_map)
 	MCFG_MB86233_FIFO_READ_CB(READ32(model2_state,copro_tgp_fifoin_pop))
@@ -2559,19 +2574,7 @@ MACHINE_CONFIG_START(model2a_state::model2a)
 
 	model2_timers(config);
 	model2_screen(config);
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("scsp", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(model2_state,scsp_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
-
-	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-
-	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	model2_scsp(config);
 
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
@@ -2624,9 +2627,6 @@ MACHINE_CONFIG_START(model2b_state::model2b)
 	MCFG_CPU_PROGRAM_MAP(model2b_crx_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(model2_snd)
-
 	MCFG_CPU_ADD("dsp", ADSP21062, 40000000)
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_HOST)
 	MCFG_CPU_DATA_MAP(copro_sharc_map)
@@ -2645,19 +2645,7 @@ MACHINE_CONFIG_START(model2b_state::model2b)
 
 	model2_timers(config);
 	model2_screen(config);
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("scsp", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(model2_state,scsp_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
-
-	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-
-	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	model2_scsp(config);
 
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
@@ -2718,9 +2706,6 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 	MCFG_CPU_ADD("tgpx4", MB86235, 40000000)
 	MCFG_CPU_PROGRAM_MAP(copro_tgpx4_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(model2_snd)
-
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2c)
 
@@ -2729,19 +2714,7 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 
 	model2_timers(config);
 	model2_screen(config);
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("scsp", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(model2_state, scsp_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
-
-	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-
-	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	model2_scsp(config);
 
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END

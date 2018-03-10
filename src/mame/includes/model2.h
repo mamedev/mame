@@ -163,8 +163,10 @@ public:
 	DECLARE_WRITE32_MEMBER(geo_w);
 	DECLARE_READ8_MEMBER(hotd_lightgun_r);
 	DECLARE_WRITE32_MEMBER(hotd_lightgun_w);
-	DECLARE_READ32_MEMBER(model2_irq_r);
-	DECLARE_WRITE32_MEMBER(model2_irq_w);
+	DECLARE_READ32_MEMBER(irq_request_r);
+	DECLARE_WRITE32_MEMBER(irq_ack_w);
+	DECLARE_READ32_MEMBER(irq_enable_r);
+	DECLARE_WRITE32_MEMBER(irq_enable_w);
 	DECLARE_READ32_MEMBER(model2_serial_r);
 	DECLARE_WRITE32_MEMBER(model2o_serial_w);
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
@@ -213,7 +215,8 @@ public:
 	DECLARE_MACHINE_RESET(model2_common);
 	DECLARE_MACHINE_RESET(model2_scsp);
 	uint32_t screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
+//	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
+//	DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
@@ -238,6 +241,7 @@ public:
 
 	void model2_timers(machine_config &config);
 	void model2_screen(machine_config &config);
+	void model2_scsp(machine_config &config);
 
 	void sj25_0207_01(machine_config &config);
 	void copro_sharc_map(address_map &map);
