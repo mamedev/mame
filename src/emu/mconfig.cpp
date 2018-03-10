@@ -104,10 +104,10 @@ machine_config::~machine_config()
 //  screen device
 //-------------------------------------------------
 
-screen_device *machine_config::first_screen() const
-{
-	return screen_device_iterator(root_device()).first();
-}
+//screen_device *machine_config::first_screen() const
+//{
+//	return screen_device_iterator(root_device()).first();
+//}
 
 
 //-------------------------------------------------
