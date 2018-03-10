@@ -69,7 +69,7 @@ READ16_MEMBER(rungun_state::rng_sysregs_r)
 			    bit9 : screen output select
 			*/
 			{
-				uint8_t field_bit = machine().first_screen()->frame_number() & 1;
+				uint8_t field_bit = m_screen->frame_number() & 1;
 				if(m_single_screen_mode == true)
 					field_bit = 1;
 				return (ioport("SYSTEM")->read() & 0xfdff) | (field_bit << 9);

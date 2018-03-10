@@ -96,6 +96,7 @@ public:
 		m_maincpu(*this, A1_CPU_TAG),
 		m_pia(*this, A1_PIA_TAG),
 		m_ram(*this, RAM_TAG),
+		m_screen(*this, "screen"),
 		m_basicram(*this, A1_BASICRAM_TAG),
 		m_kb0(*this, "KEY0"),
 		m_kb1(*this, "KEY1"),
@@ -104,14 +105,33 @@ public:
 		m_kbspecial(*this, "KBSPECIAL")
 	{ }
 
+	void apple1(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_device<ram_device> m_ram;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_basicram;
 	required_ioport m_kb0, m_kb1, m_kb2, m_kb3, m_kbspecial;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	uint8_t *m_ram_ptr, *m_char_ptr;
+	int m_ram_size, m_char_size;
+
+	uint8_t m_vram[40*24];
+	int m_cursx, m_cursy;
+
+	bool m_reset_down;
+	bool m_clear_down;
+
+	uint8_t m_transchar;
+	uint16_t m_lastports[4];
+
+	emu_timer *m_ready_start_timer, *m_ready_end_timer, *m_kbd_strobe_timer;
 
 	DECLARE_PALETTE_INIT(apple2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -126,25 +146,10 @@ public:
 	TIMER_CALLBACK_MEMBER(ready_end_cb);
 	TIMER_CALLBACK_MEMBER(keyboard_strobe_cb);
 
-	void apple1(machine_config &config);
 	void apple1_map(address_map &map);
-private:
-	uint8_t *m_ram_ptr, *m_char_ptr;
-	int m_ram_size, m_char_size;
-
-	uint8_t m_vram[40*24];
-	int m_cursx, m_cursy;
-
-	bool m_reset_down;
-	bool m_clear_down;
-
-	uint8_t m_transchar;
-	uint16_t m_lastports[4];
 
 	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen);
 	void poll_keyboard();
-
-	emu_timer *m_ready_start_timer, *m_ready_end_timer, *m_kbd_strobe_timer;
 };
 
 static const uint8_t apple1_keymap[] =
@@ -493,7 +498,7 @@ WRITE_LINE_MEMBER(apple1_state::pia_display_gate_w)
 	// falling edge means start the display timer
 	if (state == CLEAR_LINE)
 	{
-		m_ready_start_timer->adjust(machine().first_screen()->time_until_pos(m_cursy, m_cursx));
+		m_ready_start_timer->adjust(m_screen->time_until_pos(m_cursy, m_cursx));
 	}
 }
 

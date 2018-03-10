@@ -27,27 +27,10 @@ ADDRESS_MAP_START(sm590_device::program_1x128x4)
 	AM_RANGE(0x000, 0x1ff) AM_ROM
 ADDRESS_MAP_END
 
-/*static ADDRESS_MAP_START(program_2x128x4, AS_PROGRAM, 8, sm510_base_device)
-    AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(program_1x128x4_1x128x2, AS_PROGRAM, 8, sm510_base_device)
-    AM_RANGE(0x000, 0x2ff) AM_ROM
-ADDRESS_MAP_END*/
-
 ADDRESS_MAP_START(sm590_device::data_16x2x4)
 	AM_RANGE(0x00, 0x0f) AM_RAM
 	AM_RANGE(0x10, 0x1f) AM_RAM
 ADDRESS_MAP_END
-
-/*
-static ADDRESS_MAP_START(data_16x3.5x4, AS_DATA, 8, sm510_base_device)
-    AM_RANGE(0x00, 0x0f) AM_RAM
-    AM_RANGE(0x10, 0x1f) AM_RAM
-    AM_RANGE(0x20, 0x2f) AM_RAM
-    AM_RANGE(0x30, 0x37) AM_RAM
-ADDRESS_MAP_END
-*/
 
 // device definitions
 sm590_device::sm590_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)

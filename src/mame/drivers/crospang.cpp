@@ -338,11 +338,11 @@ void crospang_state::machine_reset()
 MACHINE_CONFIG_START(crospang_state::crospang)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14318180)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(14'318'181)/2) /* 68000P10 @ 7.15909MHz */
 	MCFG_CPU_PROGRAM_MAP(crospang_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", crospang_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4) /* 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(crospang_sound_map)
 	MCFG_CPU_IO_MAP(crospang_sound_io_map)
 
@@ -373,11 +373,11 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545MHz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(14'318'181)/16, PIN7_HIGH) // 1.789772MHz or 0.894886MHz?? & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

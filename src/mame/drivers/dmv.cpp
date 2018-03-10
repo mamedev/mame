@@ -45,6 +45,7 @@ public:
 	dmv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
+			m_screen(*this, "screen"),
 			m_hgdc(*this, "upd7220"),
 			m_dmac(*this, "dma8237"),
 			m_pit(*this, "pit8253"),
@@ -70,6 +71,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<upd7220_device> m_hgdc;
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8253_device> m_pit;
@@ -359,7 +361,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 				res_x = x * 8 + xi;
 				res_y = y + yi;
 
-				if(!machine().first_screen()->visible_area().contains(res_x, res_y))
+				if(!m_screen->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(yi >= 16) { pen = 0; }

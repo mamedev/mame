@@ -862,6 +862,7 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_CPU_PROGRAM_MAP(z8002_map_2)
 
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2)      /* 1.536 MHz */
+	MCFG_NAMCO_51XX_SCREEN("screen")
 	MCFG_NAMCO_51XX_INPUT_0_CB(IOPORT("IN0")) MCFG_DEVCB_MASK(0x0f)
 	MCFG_NAMCO_51XX_INPUT_1_CB(IOPORT("IN0")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO_51XX_INPUT_2_CB(IOPORT("DSWB")) MCFG_DEVCB_MASK(0x0f)
@@ -996,6 +997,7 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	/* doesn't exist on the bootleg, but required for now or the game only boots in test mode!
 	   they probably simulate some of the logic */
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2)       /* 1.536 MHz */
+	MCFG_NAMCO_51XX_SCREEN("screen")
 	MCFG_NAMCO_51XX_INPUT_1_CB(IOPORT("IN0")) MCFG_DEVCB_RSHIFT(4)
 
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64)

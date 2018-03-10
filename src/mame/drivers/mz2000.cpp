@@ -57,6 +57,7 @@ public:
 		m_cass(*this, "cassette"),
 		m_floppy(nullptr),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_mb8877a(*this, "mb8877a"),
 		m_floppy0(*this, "mb8877a:0"),
 		m_floppy1(*this, "mb8877a:1"),
@@ -134,6 +135,7 @@ public:
 	void mz80b_io(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<mb8877_device> m_mb8877a;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -720,7 +722,7 @@ READ8_MEMBER(mz2000_state::mz2000_portb_r)
 	else
 		res |= 0x20;
 
-	res |= (machine().first_screen()->vblank()) ? 0x00 : 0x01;
+	res |= (m_screen->vblank()) ? 0x00 : 0x01;
 
 	return res;
 }

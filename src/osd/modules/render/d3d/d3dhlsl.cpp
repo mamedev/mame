@@ -2133,7 +2133,7 @@ void shaders::init_slider_list()
 	}
 	internal_sliders.clear();
 
-	auto first_screen = machine->first_screen();
+	const screen_device *first_screen = screen_device_iterator(machine->root_device()).first();;
 	if (first_screen == nullptr)
 	{
 		return;
@@ -2224,7 +2224,7 @@ void uniform::update()
 	renderer_d3d9 *d3d = shadersys->d3d;
 
 	auto win = d3d->assert_window();
-	auto first_screen = win->machine().first_screen();
+	const screen_device *first_screen = screen_device_iterator(win->machine().root_device()).first();
 
 	bool vector_screen =
 		first_screen != nullptr &&

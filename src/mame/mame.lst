@@ -10573,6 +10573,8 @@ sfiii2                          // 30/09/1997 (c) 1997 (USA)
 sfiii2j                         // 30/09/1997 (c) 1997 (Japan)
 sfiii2n                         // 30/09/1997 (c) 1997 (Asia)
 sfiii3                          // 08/06/1999 (c) 1999 (Euro)
+sfiii3j                         // 08/06/1999 (c) 1999 (Japan)
+sfiii3jr1                       // 12/05/1999 (c) 1999 (Japan)
 sfiii3n                         // 08/06/1999 (c) 1999 (Japan)
 sfiii3nr1                       // 12/05/1999 (c) 1999 (Japan)
 sfiii3r1                        // 12/05/1999 (c) 1999 (Euro)
@@ -11340,7 +11342,7 @@ xfiles                          // (c) 1999 dgPIX Entertainment Inc
 xfilesk                         // (c) 1999 dgPIX Entertainment Inc (censored for the Korean market)
 
 @source:diablo1300.cpp
-diablo				//
+diablo              //
 
 @source:didact.cpp
 md6802                          //
@@ -11675,8 +11677,8 @@ mjfriday                        // "26" (c) 1989 Dynax
 mjreach                         // (c) 1994 bootleg
 neruton                         // "45" Mahjong Neruton Haikujiradan 1990 Dynax
 nerutona                        // "45" Mahjong Neruton Haikujiradan 1990 Dynax
-ougonpai                        // "62" (c) 1991 Dynax
-ougonpaib                       // "62" (c) 1991 bootleg
+ougonhai                        // "62" (c) 1991 Dynax
+ougonhaib                       // "62" (c) 1991 bootleg
 quiztvqq                        // "64" Quiz TV Gassyuukoku Q&Q 1992 Dynax
 shpeng                          // (c) 1995 WSAC Systems
 intrgirl                        // (c) 1995 Barko
@@ -15477,9 +15479,12 @@ istreb                          //
 
 @source:iteagle.cpp
 bbh2sp                          //
+bbh2spa                         //
+bbh2spb                         //
 bbhcotw                         //
 bbhsc                           //
 bbhsca                          //
+bbh                             //
 carnking                        //
 gtfore01                        //
 gtfore02                        //
@@ -17482,8 +17487,8 @@ totlvicj                        // GX639 (c) 1997
 totlvicu                        // GX639 (c) 1997
 
 @source:konblands.cpp
-kbadlands						// GX455 (c) 1984
-kbadlandsh						// GX455 (c) 1984
+kbadlands                       // GX455 (c) 1984
+kbadlandsh                      // GX455 (c) 1984
 
 @source:konendev.cpp
 aadvent                         // African Adventure
@@ -31590,7 +31595,7 @@ kok                             //
 
 @source:photoply.cpp
 photoply                        //
-photoply2k4						//
+photoply2k4                     //
 
 @source:phunsy.cpp
 phunsy                          //
@@ -37160,6 +37165,7 @@ fixeightu                       // TP-026 (c) 1992 + Taito license
 fixeightut                      // TP-026 (c) 1992 + Taito license
 ghox                            // TP-021 (c) 1991 Toaplan
 ghoxj                           // TP-021 (c) 1991 Toaplan
+ghoxjo                          // TP-021 (c) 1991 Toaplan
 grindstm                        // TP-027 (c) 1993 Toaplan + Unite Trading license (Korea)
 grindstma                       // TP-027 (c) 1993 Toaplan + Unite Trading license (Korea)
 kbash                           // TP-023 (c) 1993 Toaplan
@@ -39005,7 +39011,7 @@ xsleenaj                        // TA-0019 (c) 1986
 
 @source:xavix.cpp
 taitons1                        //
-taitons2						//
+taitons2                        //
 namcons1                        //
 namcons2                        //
 rad_ping                        //
@@ -39020,6 +39026,9 @@ rad_bass                        //
 rad_bassp                       //
 rad_snow                        //
 rad_snowp                       //
+rad_madf                        //
+rad_fb                          //
+epo_efdx                        //
 has_wamg                        //
 eka_strt                        //
 xavtenni                        //

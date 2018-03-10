@@ -86,7 +86,6 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_p);
 
-	void a6809_io(address_map &map);
 	void a6809_mem(address_map &map);
 
 private:
@@ -113,10 +112,6 @@ ADDRESS_MAP_START(a6809_state::a6809_mem)
 	AM_RANGE(0x0900,0x090f) AM_MIRROR(0xf0) AM_DEVREADWRITE("via", via6522_device, read, write)
 	AM_RANGE(0xf000,0xf7ff) // optional ROM
 	AM_RANGE(0xf800,0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(a6809_state::a6809_io)
-	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -231,7 +226,6 @@ MACHINE_CONFIG_START(a6809_state::a6809)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(a6809_mem)
-	MCFG_CPU_IO_MAP(a6809_io)
 	MCFG_MACHINE_RESET_OVERRIDE(a6809_state, a6809)
 
 	/* video hardware */

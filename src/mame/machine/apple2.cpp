@@ -17,7 +17,6 @@
 #include "machine/sonydriv.h"
 
 #include "debugger.h"
-#include "screen.h"
 
 
 #ifdef MAME_DEBUG
@@ -1229,7 +1228,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 	int scanline = param;
 
 	if((scanline % 8) == 0)
-		machine().first_screen()->update_partial(machine().first_screen()->vpos());
+		m_screen->update_partial(m_screen->vpos());
 	if ((m_kbspecial->read() & 0x80) &&
 		(a2_no_ctrl_reset() || (m_kbspecial->read() & 0x08)))
 	{
@@ -1723,7 +1722,7 @@ READ8_MEMBER( apple2_state::apple2_c01x_r )
 			case 0x06:          result |= (m_flags & VAR_ALTZP)     ? 0x80 : 0x00;  break;
 			case 0x07:          result |= (m_flags & VAR_SLOTC3ROM) ? 0x80 : 0x00;  break;
 			case 0x08:          result |= (m_flags & VAR_80STORE)   ? 0x80 : 0x00;  break;
-			case 0x09:          result |= !machine().first_screen()->vblank()     ? 0x80 : 0x00;  break;
+			case 0x09:          result |= !m_screen->vblank()     ? 0x80 : 0x00;  break;
 			case 0x0A:          result |= (m_flags & VAR_TEXT)      ? 0x80 : 0x00;  break;
 			case 0x0B:          result |= (m_flags & VAR_MIXED)     ? 0x80 : 0x00;  break;
 			case 0x0C:          result |= (m_flags & VAR_PAGE2)     ? 0x80 : 0x00;  break;

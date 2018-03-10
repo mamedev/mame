@@ -26,9 +26,6 @@ private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-//static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, perq_state )
-//ADDRESS_MAP_END
-
 static INPUT_PORTS_START( perq )
 INPUT_PORTS_END
 

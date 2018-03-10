@@ -167,25 +167,34 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen") { }
 
+	void casloopy(machine_config &config);
+
+	DECLARE_DRIVER_INIT(casloopy);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	required_shared_ptr<uint32_t> m_bios_rom;
 	required_shared_ptr<uint32_t> m_vregs;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
 	std::unique_ptr<uint16_t[]> m_paletteram;
 	std::unique_ptr<uint8_t[]> m_vram;
 	std::unique_ptr<uint8_t[]> m_bitmap_vram;
 	uint16_t sh7021_regs[0x100];
 	int m_gfx_index;
-	DECLARE_DRIVER_INIT(casloopy);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER(vregs_r);
 	DECLARE_WRITE16_MEMBER(vregs_w);
 	DECLARE_READ16_MEMBER(pal_r);
@@ -198,7 +207,7 @@ public:
 	DECLARE_READ8_MEMBER(bitmap_r);
 	DECLARE_WRITE8_MEMBER(bitmap_w);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(loopy_cart);
-	void casloopy(machine_config &config);
+
 	void casloopy_map(address_map &map);
 	void casloopy_sub_map(address_map &map);
 };
@@ -244,7 +253,7 @@ void casloopy_state::video_start()
 	m_gfxdecode->set_gfx(m_gfx_index+1, std::make_unique<gfx_element>(m_palette, casloopy_8bpp_layout, m_vram.get(), 0, 1, 0));
 }
 
-uint32_t casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t casloopy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(m_gfx_index);
 	int x,y;
@@ -308,11 +317,11 @@ READ16_MEMBER(casloopy_state::vregs_r)
 {
 	if(offset == 4/2)
 	{
-		return (machine().first_screen()->vblank() << 8) | (machine().rand() & 0xff); // vblank + vpos?
+		return (m_screen->vblank() << 8) | (machine().rand() & 0xff); // vblank + vpos?
 	}
 
 	if(offset == 2/2)
-		return machine().rand();/*(machine().first_screen()->hblank() << 8) | (machine().first_screen()->hpos() & 0xff);*/ // hblank + hpos?
+		return machine().rand();/*(m_screen->hblank() << 8) | (m_screen->hpos() & 0xff);*/ // hblank + hpos?
 
 	if(offset == 0/2)
 		return machine().rand(); // pccllect
@@ -522,7 +531,7 @@ MACHINE_CONFIG_START(casloopy_state::casloopy)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 //  MCFG_SCREEN_SIZE(444, 263)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(casloopy_state, screen_update_casloopy)
+	MCFG_SCREEN_UPDATE_DRIVER(casloopy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)

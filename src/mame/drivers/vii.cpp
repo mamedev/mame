@@ -54,6 +54,12 @@ Similar Systems: ( from http://en.wkikpedia.org/wiki/V.Smile )
 - V.Smile Baby Infant Development System
 - V.Flash
 
+also on this hardware
+
+	name						PCB ID		ROM width	TSOP pads	ROM size		SEEPROM			die markings
+	Radica Play TV Football 2	L7278		x16			48			not dumped		no              Sunplus
+	Dream Life                  ?           x16         48          no tdumped      no              Sunplus
+
 Detailed list of bugs:
 - When loading a cart from file manager, sometimes it will crash
 - On 'vii_vc1' & 'vii_vc2' cart, the left-right keys are transposed with the up-down keys

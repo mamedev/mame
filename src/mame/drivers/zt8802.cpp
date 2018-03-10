@@ -30,10 +30,6 @@ private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-//static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, zt8802_state )
-//  AM_RANGE(0x80000,0xfffff) AM_ROM AM_REGION("roms", 0)
-//ADDRESS_MAP_END
-
 static INPUT_PORTS_START( zt8802 )
 INPUT_PORTS_END
 

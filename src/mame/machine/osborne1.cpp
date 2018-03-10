@@ -12,8 +12,6 @@ There are three IRQ sources:
 #include "emu.h"
 #include "includes/osborne1.h"
 
-#include "screen.h"
-
 
 WRITE8_MEMBER( osborne1_state::bank_0xxx_w )
 {
@@ -344,8 +342,8 @@ void osborne1_state::machine_reset()
 
 void osborne1_state::video_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
-	m_video_timer->adjust(machine().first_screen()->time_until_pos(1, 0));
+	m_screen->register_screen_bitmap(m_bitmap);
+	m_video_timer->adjust(m_screen->time_until_pos(1, 0));
 }
 
 uint32_t osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -357,7 +355,7 @@ uint32_t osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 {
-	int const y = machine().first_screen()->vpos();
+	int const y = m_screen->vpos();
 	uint8_t const ra = y % 10;
 	uint8_t const port_b = m_pia1->b_output();
 
@@ -430,7 +428,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 	m_beep_state = (ra & 0x04) ? 1 : 0;
 	m_speaker->level_w((BIT(port_b, 5) && m_beep_state) ? 1 : 0);
 
-	m_video_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0));
+	m_video_timer->adjust(m_screen->time_until_pos(y + 1, 0));
 }
 
 TIMER_CALLBACK_MEMBER(osborne1_state::acia_rxc_txc_callback)

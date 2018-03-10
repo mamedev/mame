@@ -718,13 +718,6 @@ ADDRESS_MAP_START(segaybd_state::motor_map)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-/*
-static ADDRESS_MAP_START( motor_portmap, AS_IO, 8, segaybd_state )
-    ADDRESS_MAP_UNMAP_HIGH
-    ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-*/
-
 //**************************************************************************
 //  GENERIC PORT DEFINITIONS
 //**************************************************************************

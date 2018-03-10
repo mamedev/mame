@@ -69,7 +69,6 @@ private:
 	DECLARE_WRITE8_MEMBER( pc_w );
 	DECLARE_READ8_MEMBER( pd_r );
 
-	void comxpl80_io(address_map &map);
 	void comxpl80_mem(address_map &map);
 };
 

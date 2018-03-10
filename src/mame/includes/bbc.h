@@ -41,6 +41,8 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "screen.h"
+
 #define RS232_TAG       "rs232"
 
 class bbc_state : public driver_device
@@ -51,6 +53,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_hd6845(*this, "hd6845"),
+		m_screen(*this, "screen"),
 		m_adlc(*this, "mc6854"),
 		m_sn(*this, "sn76489"),
 		m_keyboard(*this, "COL%u", 0),
@@ -252,6 +255,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<hd6845_device> m_hd6845;
+	required_device<screen_device> m_screen;
 	optional_device<mc6854_device> m_adlc;
 	optional_device<sn76489_device> m_sn;
 	required_ioport_array<13> m_keyboard;

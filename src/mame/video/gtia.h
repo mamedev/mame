@@ -22,8 +22,16 @@
 #define MCFG_GTIA_WRITE_CB(_devcb) \
 	devcb = &downcast<gtia_device &>(*device).set_write_callback(DEVCB_##_devcb);
 
+#define MCFG_GTIA_REGION(region) \
+	downcast<gtia_device &>(*device).set_region(region);
 
 // ======================> gtia_device
+
+enum gtia_region : unsigned
+{
+	GTIA_NTSC,
+	GTIA_PAL
+};
 
 class gtia_device :  public device_t
 {
@@ -31,6 +39,7 @@ public:
 	// construction/destruction
 	gtia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_region(gtia_region region) { m_region = region; }
 	template <class Object> devcb_base &set_read_callback(Object &&cb) { return m_read_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_write_callback(Object &&cb) { return m_write_cb.set_callback(std::forward<Object>(cb)); }
 
@@ -169,15 +178,16 @@ private:
 		uint8_t   vdelay_p3;  /* vertical delay for player 3 */
 	};
 
-	gtia_readregs   m_r;          /* read registers */
-	gtia_writeregs  m_w;          /* write registers */
-	gtia_helpervars m_h;          /* helper variables */
+	gtia_readregs   m_r;
+	gtia_writeregs  m_w;
+	gtia_helpervars m_h;
+	gtia_region     m_region;
 
 	uint8_t m_lumpf1;
 	uint8_t m_huepm0, m_huepm1, m_huepm2, m_huepm3, m_huepm4;
 	uint8_t m_huepf2, m_huebk;
 
-	uint16_t m_color_lookup[256];  /* color lookup table */   // probably better fit to ANTIC, but it remains here for the moment...
+	uint16_t m_color_lookup[256]; // probably better fit to ANTIC, but it remains here for the moment...
 
 	devcb_read8 m_read_cb;
 	devcb_write8 m_write_cb;

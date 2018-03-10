@@ -98,6 +98,63 @@
 #define pv      p[2]
 
 
+
+/*******************************************
+ *
+ *  Hardware 3D Rasterizer Internal State
+ *
+ *******************************************/
+
+#define MAX_TRIANGLES       32768
+
+struct raster_state
+{
+//	uint32_t mode;                      /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
+	uint16_t *texture_rom;              /* Texture ROM pointer */
+	uint32_t texture_rom_mask;          /* Texture ROM mask */
+	int16_t viewport[4];                /* View port (startx,starty,endx,endy) */
+	int16_t center[4][2];               /* Centers (eye 0[x,y],1[x,y],2[x,y],3[x,y]) */
+	uint16_t center_sel;                /* Selected center */
+	uint32_t reverse;                   /* Left/Right Reverse */
+	float z_adjust;                     /* ZSort Mode */
+	float triangle_z;                   /* Current Triangle z value */
+	uint8_t master_z_clip;              /* Master Z-Clip value */
+	uint32_t cur_command;               /* Current command */
+	uint32_t command_buffer[32];        /* Command buffer */
+	uint32_t command_index;             /* Command buffer index */
+	triangle tri_list[MAX_TRIANGLES];   /* Triangle list */
+	uint32_t tri_list_index;            /* Triangle list index */
+	triangle *tri_sorted_list[0x10000]; /* Sorted Triangle list */
+	uint16_t min_z;                     /* Minimum sortable Z value */
+	uint16_t max_z;                     /* Maximum sortable Z value */
+	uint16_t texture_ram[0x10000];      /* Texture RAM pointer */
+	uint8_t log_ram[0x40000];           /* Log RAM pointer */
+};
+
+/*******************************************
+ *
+ *  Geometry Engine Internal State
+ *
+ *******************************************/
+
+struct geo_state
+{
+	raster_state *          raster;
+	uint32_t              mode;                   /* bit 0 = Enable Specular, bit 1 = Calculate Normals */
+	uint32_t *          polygon_rom;            /* Polygon ROM pointer */
+	uint32_t            polygon_rom_mask;       /* Polygon ROM mask */
+	float               matrix[12];             /* Current Transformation Matrix */
+	poly_vertex         focus;                  /* Focus (x,y) */
+	poly_vertex         light;                  /* Light Vector */
+	float               lod;                    /* LOD */
+	float               coef_table[32];         /* Distane Coefficient table */
+	texture_parameter   texture_parameters[32]; /* Texture parameters */
+	uint32_t          polygon_ram0[0x8000];           /* Fast Polygon RAM pointer */
+	uint32_t          polygon_ram1[0x8000];           /* Slow Polygon RAM pointer */
+	model2_state    *state;
+};
+
+
 /*******************************************
  *
  *  Generic 3D Math Functions
@@ -156,6 +213,12 @@ static inline void vector_cross3( poly_vertex *dst, poly_vertex *v0, poly_vertex
 	dst->pz = (p1.x * p2.y) - (p1.y * p2.x);
 }
 
+static inline void apply_focus( geo_state *geo, poly_vertex *p0)
+{
+	p0->x *= geo->focus.x;
+	p0->y *= geo->focus.y;
+}
+
 /* 1.8.23 float to 4.12 float converter, courtesy of Aaron Giles */
 inline uint16_t model2_state::float_to_zval( float floatval )
 {
@@ -178,11 +241,11 @@ inline uint16_t model2_state::float_to_zval( float floatval )
 		return 0x0000;
 
 	/* between -12 and 0 create a denormal with exponent of 0 */
-	else if ( exponent < 0 )
+	if ( exponent < 0 )
 		return (mantissa | 0x1000) >> -exponent;
 
 	/* between 0 and 14 create a FP value with exponent + 1 */
-	else if ( exponent < 15 )
+	if ( exponent < 15 )
 		return (( exponent + 1 ) << 12) | mantissa;
 
 	/* above 14 is too large */
@@ -237,40 +300,32 @@ static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, plane *cp, pol
 	return outcount;
 }
 
-/***********************************************************************************************/
-
-/*******************************************
- *
- *  Hardware 3D Rasterizer Internal State
- *
- *******************************************/
-
-#define MAX_TRIANGLES       32768
-
-struct raster_state
+inline bool model2_state::check_culling( raster_state *raster, uint32_t attr, float min_z, float max_z )
 {
-//	uint32_t              mode;               /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
-	uint16_t *            texture_rom;        /* Texture ROM pointer */
-	uint32_t              texture_rom_mask;   /* Texture ROM mask */
-	int16_t               viewport[4];        /* View port (startx,starty,endx,endy) */
-	int16_t               center[4][2];       /* Centers (eye 0[x,y],1[x,y],2[x,y],3[x,y]) */
-	uint16_t              center_sel;         /* Selected center */
-	uint32_t              reverse;            /* Left/Right Reverse */
-	float               z_adjust;           /* ZSort Mode */
-	float               triangle_z;         /* Current Triangle z value */
-	uint8_t               master_z_clip;      /* Master Z-Clip value */
-	uint32_t              cur_command;        /* Current command */
-	uint32_t              command_buffer[32]; /* Command buffer */
-	uint32_t              command_index;      /* Command buffer index */
-	triangle            tri_list[MAX_TRIANGLES];            /* Triangle list */
-	uint32_t              tri_list_index;     /* Triangle list index */
-	triangle *          tri_sorted_list[0x10000];   /* Sorted Triangle list */
-	uint16_t              min_z;              /* Minimum sortable Z value */
-	uint16_t              max_z;              /* Maximum sortable Z value */
-	uint16_t          texture_ram[0x10000];       /* Texture RAM pointer */
-	uint8_t               log_ram[0x40000];           /* Log RAM pointer */
-};
+	/* if doubleside is disabled */
+	if ( ((attr >> 17) & 1) == 0 )
+	{
+		/* if it's the backface, cull it */
+		if ( raster->command_buffer[9] & 0x00800000 )
+			return true;
+	}
 
+	/* if the linktype is 0, then we can also cull it */
+	if ( ((attr >> 8) & 3) == 0 )
+		return true;
+
+	/* if the minimum z value is bigger than the master z clip value, don't render */
+	if ( (int32_t)(1.0/min_z) > raster->master_z_clip )
+		return true;
+
+	/* if the maximum z value is < 0 then we can safely clip the entire polygon */
+	if ( max_z < 0 )
+		return true;
+	
+	return false;
+}
+
+/***********************************************************************************************/
 
 /*******************************************
  *
@@ -330,12 +385,13 @@ READ32_MEMBER(model2_state::polygon_count_r)
  
 void model2_state::model2_3d_process_quad( raster_state *raster, uint32_t attr )
 {
-	quad_m2     object;
-	uint16_t      *th, *tp;
-	int32_t       tho;
-	uint32_t      cull, i;
-	float       zvalue;
-	float       min_z, max_z;
+	quad_m2 object;
+	uint16_t *th, *tp;
+	int32_t tho;
+	uint32_t i;
+	bool cull;
+	float zvalue;
+	float min_z, max_z;
 
 	/* extract P0(n-1) */
 	object.v[1].x = u2f( raster->command_buffer[2] << 8 );
@@ -413,30 +469,7 @@ void model2_state::model2_3d_process_quad( raster_state *raster, uint32_t attr )
 	object.luma = (raster->command_buffer[9] >> 15) & 0xFF;
 
 	/* determine whether we can cull this quad */
-	cull = 0;
-
-	/* if doubleside is disabled */
-	if ( ((attr >> 17) & 1) == 0 )
-	{
-		/* if it's the backface, cull it */
-		if ( raster->command_buffer[9] & 0x00800000 )
-			cull = 1;
-	}
-
-	/* if the linktype is 0, then we can also cull it */
-	if ( ((attr >> 8) & 3) == 0 )
-		cull = 1;
-
-	/* if the minimum z value is bigger than the master z clip value, don't render */
-	if ( (int32_t)(1.0/min_z) > raster->master_z_clip )
-		cull = 1;
-
-	/* if the maximum z value is < 0 then we can safely clip the entire polygon */
-	if ( max_z < 0 )
-		cull = 1;
-
-	/* set the object's z value */
-	zvalue = raster->triangle_z;
+	cull = check_culling(raster,attr,min_z,max_z);
 
 	/* set the object's z value */
 	switch((attr >> 10) & 3)
@@ -451,17 +484,18 @@ void model2_state::model2_3d_process_quad( raster_state *raster, uint32_t attr )
 			zvalue = max_z;
 			break;
 		case 3: // error
+		default:
 			zvalue = 0.0f;
 			break;
 	}
 
 	raster->triangle_z = zvalue;
 
-	if ( cull == 0 )
+	if ( cull == false )
 	{
-		int32_t       clipped_verts;
+		int32_t clipped_verts;
 		poly_vertex verts[10];
-		plane       clip_plane;
+		plane clip_plane;
 
 		clip_plane.normal.x = 0;
 		clip_plane.normal.y = 0;
@@ -574,12 +608,13 @@ void model2_state::model2_3d_process_quad( raster_state *raster, uint32_t attr )
 
 void model2_state::model2_3d_process_triangle( raster_state *raster, uint32_t attr )
 {
-	triangle    object;
-	uint16_t      *th, *tp;
-	int32_t       tho;
-	uint32_t      cull, i;
-	float       zvalue;
-	float       min_z, max_z;
+	triangle object;
+	uint16_t *th, *tp;
+	int32_t tho;
+	uint32_t i;
+	bool cull;
+	float zvalue;
+	float min_z, max_z;
 
 	/* extract P0(n-1) */
 	object.v[1].x = u2f( raster->command_buffer[2] << 8 );
@@ -653,27 +688,7 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, uint32_t at
 	object.luma = (raster->command_buffer[9] >> 15) & 0xFF;
 
 	/* determine whether we can cull this quad */
-	cull = 0;
-
-	/* if doubleside is disabled */
-	if ( ((attr >> 17) & 1) == 0 )
-	{
-		/* if it's the backface, cull it */
-		if ( raster->command_buffer[9] & 0x00800000 )
-			cull = 1;
-	}
-
-	/* if the linktype is 0, then we can also cull it */
-	if ( ((attr >> 8) & 3) == 0 )
-		cull = 1;
-
-	/* if the minimum z value is bigger than the master z clip value, don't render */
-	if ( (int32_t)(1.0/min_z) > raster->master_z_clip )
-		cull = 1;
-
-	/* if the maximum z value is < 0 then we can safely clip the entire polygon */
-	if ( max_z < 0 )
-		cull = 1;
+	cull = check_culling(raster,attr,min_z,max_z);
 
 	/* set the object's z value */
 	switch((attr >> 10) & 3)
@@ -696,7 +711,7 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, uint32_t at
 	raster->triangle_z = zvalue;
 	
 	/* if we're not culling, do z-clip and add to out triangle list */
-	if ( cull == 0 )
+	if ( cull == false )
 	{
 		int32_t       clipped_verts;
 		poly_vertex verts[10];
@@ -1173,32 +1188,6 @@ void model2_state::model2_3d_push( raster_state *raster, uint32_t input )
 
 /***********************************************************************************************/
 
-
-
-/*******************************************
- *
- *  Geometry Engine Internal State
- *
- *******************************************/
-
-struct geo_state
-{
-	raster_state *          raster;
-	uint32_t              mode;                   /* bit 0 = Enable Specular, bit 1 = Calculate Normals */
-	uint32_t *          polygon_rom;            /* Polygon ROM pointer */
-	uint32_t            polygon_rom_mask;       /* Polygon ROM mask */
-	float               matrix[12];             /* Current Transformation Matrix */
-	poly_vertex         focus;                  /* Focus (x,y) */
-	poly_vertex         light;                  /* Light Vector */
-	float               lod;                    /* LOD */
-	float               coef_table[32];         /* Distane Coefficient table */
-	texture_parameter   texture_parameters[32]; /* Texture parameters */
-	uint32_t          polygon_ram0[0x8000];           /* Fast Polygon RAM pointer */
-	uint32_t          polygon_ram1[0x8000];           /* Slow Polygon RAM pointer */
-	model2_state    *state;
-};
-
-
 /*******************************************
  *
  *  Geometry Engine Initialization
@@ -1244,9 +1233,8 @@ void model2_state::geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t co
 	transform_point( &point, geo->matrix );
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1261,9 +1249,8 @@ void model2_state::geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t co
 	transform_point( &point, geo->matrix );
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1308,9 +1295,8 @@ void model2_state::geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t co
 			dotp = dot_product( &normal, &point );
 
 			/* apply focus */
-			point.x *= geo->focus.x;
-			point.y *= geo->focus.y;
-
+			apply_focus( geo, &point );
+			
 			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
@@ -1356,9 +1342,8 @@ void model2_state::geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t co
 				transform_point( &point, geo->matrix );
 
 				/* apply focus */
-				point.x *= geo->focus.x;
-				point.y *= geo->focus.y;
-
+				apply_focus( geo, &point );
+				
 				/* push to the 3d rasterizer */
 				model2_3d_push( raster, f2u(point.x) >> 8 );
 				model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1396,9 +1381,8 @@ void model2_state::geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t cou
 	transform_point( &point, geo->matrix );
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1413,9 +1397,8 @@ void model2_state::geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t cou
 	transform_point( &point, geo->matrix );
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1460,9 +1443,8 @@ void model2_state::geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t cou
 			dotp = dot_product( &normal, &point );
 
 			/* apply focus */
-			point.x *= geo->focus.x;
-			point.y *= geo->focus.y;
-
+			apply_focus( geo, &point );
+			
 			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
@@ -1517,9 +1499,8 @@ void model2_state::geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t cou
 				transform_point( &point, geo->matrix );
 
 				/* apply focus */
-				point.x *= geo->focus.x;
-				point.y *= geo->focus.y;
-
+				apply_focus( geo, &point );
+				
 				/* push to the 3d rasterizer */
 				model2_3d_push( raster, f2u(point.x) >> 8 );
 				model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1560,9 +1541,8 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 	p0.x = point.x; p0.y = point.y; p0.pz = point.pz;
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1580,16 +1560,12 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 	p1.x = point.x; p1.y = point.y; p1.pz = point.pz;
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
 	model2_3d_push( raster, f2u(point.pz) >> 8 );
-
-	/* skip 4 */
-	input += 4;
 
 	/* loop through the following links */
 	for( i = 0; i < count; i++ )
@@ -1607,6 +1583,9 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 			int32_t               luma;
 			texture_parameter * texparam;
 
+			/* Skip normal */
+			input += 3;
+			
 			/* read in the next point */
 			point.x = u2f( *input++ );
 			point.y = u2f( *input++ );
@@ -1631,9 +1610,8 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 			dotp = dot_product( &normal, &point );
 
 			/* apply focus */
-			point.x *= geo->focus.x;
-			point.y *= geo->focus.y;
-
+			apply_focus( geo, &point );
+			
 			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
@@ -1682,9 +1660,8 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 				p3.x = point.x; p3.y = point.y; p3.pz = point.pz;
 
 				/* apply focus */
-				point.x *= geo->focus.x;
-				point.y *= geo->focus.y;
-
+				apply_focus( geo, &point );
+				
 				/* push to the 3d rasterizer */
 				model2_3d_push( raster, f2u(point.x) >> 8 );
 				model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1755,9 +1732,8 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 	p0.x = point.x; p0.y = point.y; p0.pz = point.pz;
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1775,16 +1751,12 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 	p1.x = point.x; p1.y = point.y; p1.pz = point.pz;
 
 	/* apply focus */
-	point.x *= geo->focus.x;
-	point.y *= geo->focus.y;
-
+	apply_focus( geo, &point );
+	
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
 	model2_3d_push( raster, f2u(point.pz) >> 8 );
-
-	/* skip 4 */
-	input += 4;
 
 	/* loop through the following links */
 	for( i = 0; i < count; i++ )
@@ -1802,6 +1774,9 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 			int32_t               luma;
 			texture_parameter * texparam;
 
+			/* Skip normal */
+			input += 3;
+			
 			/* read in the next point */
 			point.x = u2f( *input++ );
 			point.y = u2f( *input++ );
@@ -1826,9 +1801,8 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 			dotp = dot_product( &normal, &point );
 
 			/* apply focus */
-			point.x *= geo->focus.x;
-			point.y *= geo->focus.y;
-
+			apply_focus( geo, &point );
+	
 			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
@@ -1886,8 +1860,7 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 				p3.x = point.x; p3.y = point.y; p3.pz = point.pz;
 
 				/* apply focus */
-				point.x *= geo->focus.x;
-				point.y *= geo->focus.y;
+				apply_focus( geo, &point );
 
 				/* push to the 3d rasterizer */
 				model2_3d_push( raster, f2u(point.x) >> 8 );

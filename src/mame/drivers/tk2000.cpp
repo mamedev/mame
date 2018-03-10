@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    tk2000.c - Microdigital TK2000
+    tk2000.cpp - Microdigital TK2000
 
     Driver by R. Belmont
 
@@ -45,6 +45,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, A2_CPU_TAG),
 		m_ram(*this, RAM_TAG),
+		m_screen(*this, "screen"),
 		m_video(*this, A2_VIDEO_TAG),
 		m_row0(*this, "ROW0"),
 		m_row1(*this, "ROW1"),
@@ -59,10 +60,18 @@ public:
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
 		m_upperbank(*this, A2_UPPERBANK_TAG)
-	{ }
+		{ }
 
+	void tk2000(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<screen_device> m_screen;
 	required_device<a2_video_device> m_video;
 	required_ioport m_row0, m_row1, m_row2, m_row3, m_row4, m_row5, m_row6, m_row7;
 	required_ioport m_kbspecial;
@@ -71,10 +80,17 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
+	int m_speaker_state;
+	int m_cassette_state;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	uint8_t m_strobe;
+
+	bool m_page2;
+
+	uint8_t *m_ram_ptr;
+	int m_ram_size;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 
 	DECLARE_PALETTE_INIT(tk2000);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -88,19 +104,8 @@ public:
 	DECLARE_READ8_MEMBER(c100_r);
 	DECLARE_WRITE8_MEMBER(c100_w);
 
-	void tk2000(machine_config &config);
 	void apple2_map(address_map &map);
 	void inhbank_map(address_map &map);
-private:
-	int m_speaker_state;
-	int m_cassette_state;
-
-	uint8_t m_strobe;
-
-	bool m_page2;
-
-	uint8_t *m_ram_ptr;
-	int m_ram_size;
 
 	void do_io(address_space &space, int offset);
 	uint8_t read_floatingbus();
@@ -148,7 +153,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tk2000_state::apple2_interrupt)
 	int scanline = param;
 
 	if((scanline % 8) == 0)
-		machine().first_screen()->update_partial(machine().first_screen()->vpos());
+		m_screen->update_partial(m_screen->vpos());
 
 	// update the video system's shadow copy of the system config at the end of the frame
 	if (scanline == 192)

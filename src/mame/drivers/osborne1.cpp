@@ -92,7 +92,6 @@ TODO:
 #include "includes/osborne1.h"
 
 #include "bus/rs232/rs232.h"
-#include "screen.h"
 #include "speaker.h"
 
 #include "softlist.h"

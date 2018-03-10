@@ -117,7 +117,6 @@ public:
 
 	void gimix(machine_config &config);
 	void gimix_banked_mem(address_map &map);
-	void gimix_io(address_map &map);
 	void gimix_mem(address_map &map);
 private:
 	uint8_t m_term_data;
@@ -212,9 +211,6 @@ ADDRESS_MAP_START(gimix_state::gimix_mem)
 	AM_RANGE(0xe000, 0xefff) AM_DEVREADWRITE("bank15", address_map_bank_device, read8, write8)
 	AM_RANGE(0xf000, 0xfeff) AM_DEVREADWRITE("bank16", address_map_bank_device, read8, write8)
 	AM_RANGE(0xff00, 0xffff) AM_ROMBANK("fixedrombank") AM_WRITE(system_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(gimix_state::gimix_io)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gimix )
@@ -551,7 +547,6 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(gimix_mem)
-	MCFG_CPU_IO_MAP(gimix_io)
 
 	/* rtc */
 	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))

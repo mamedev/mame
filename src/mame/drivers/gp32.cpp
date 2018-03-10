@@ -24,7 +24,6 @@
 #include "sound/volt_reg.h"
 
 #include "rendlay.h"
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -244,10 +243,9 @@ void gp32_state::s3c240x_lcd_render_16( )
 
 TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_lcd_timer_exp)
 {
-	screen_device *screen = machine().first_screen();
 	LOGMASKED(LOG_TIMER, "LCD timer callback\n");
-	m_s3c240x_lcd.vpos = screen->vpos();
-	m_s3c240x_lcd.hpos = screen->hpos();
+	m_s3c240x_lcd.vpos = m_screen->vpos();
+	m_s3c240x_lcd.hpos = m_screen->hpos();
 	LOGMASKED(LOG_VRAM, "LCD - vpos %d hpos %d\n", m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
 	if (m_s3c240x_lcd.vramaddr_cur >= m_s3c240x_lcd.vramaddr_max)
 	{
@@ -267,12 +265,12 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_lcd_timer_exp)
 		}
 		if ((m_s3c240x_lcd.vpos == 0) && (m_s3c240x_lcd.hpos == 0)) break;
 	}
-	m_s3c240x_lcd_timer->adjust( screen->time_until_pos(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos));
+	m_s3c240x_lcd_timer->adjust(m_screen->time_until_pos(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos));
 }
 
 void gp32_state::video_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 }
 
 uint32_t gp32_state::screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -292,7 +290,7 @@ READ32_MEMBER(gp32_state::s3c240x_lcd_r)
 		{
 			// make sure line counter is going
 			uint32_t lineval = BITS( m_s3c240x_lcd_regs[1], 23, 14);
-			data = (data & ~0xFFFC0000) | ((lineval - machine().first_screen()->vpos()) << 18);
+			data = (data & ~0xFFFC0000) | ((lineval - m_screen->vpos()) << 18);
 		}
 		break;
 	}
@@ -302,7 +300,6 @@ READ32_MEMBER(gp32_state::s3c240x_lcd_r)
 
 void gp32_state::s3c240x_lcd_configure()
 {
-	screen_device *screen = machine().first_screen();
 	uint32_t vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
 	double framerate, vclk;
 	rectangle visarea;
@@ -323,16 +320,15 @@ void gp32_state::s3c240x_lcd_configure()
 	LOGMASKED(LOG_VRAM, "LCD - framerate %f\n", framerate);
 	visarea.set(0, hozval, 0, lineval);
 	LOGMASKED(LOG_VRAM, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
-	screen->configure(hozval + 1, lineval + 1, visarea, HZ_TO_ATTOSECONDS( framerate));
+	m_screen->configure(hozval + 1, lineval + 1, visarea, HZ_TO_ATTOSECONDS( framerate));
 }
 
 void gp32_state::s3c240x_lcd_start()
 {
-	screen_device *screen = machine().first_screen();
 	LOGMASKED(LOG_STARTSTOP, "LCD start\n");
 	s3c240x_lcd_configure();
 	s3c240x_lcd_dma_init();
-	m_s3c240x_lcd_timer->adjust( screen->time_until_pos(0, 0));
+	m_s3c240x_lcd_timer->adjust(m_screen->time_until_pos(0, 0));
 }
 
 void gp32_state::s3c240x_lcd_stop()

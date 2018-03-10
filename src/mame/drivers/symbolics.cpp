@@ -106,7 +106,6 @@ public:
 	virtual void machine_reset() override;
 
 	void symbolics(machine_config &config);
-	void m68k_io(address_map &map);
 	void m68k_mem(address_map &map);
 //protected:
 //  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -268,9 +267,6 @@ ADDRESS_MAP_START(symbolics_state::m68k_mem)
 	//FF018A is writable, gets 0x5555 written to it
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(symbolics_state::m68k_io)
-ADDRESS_MAP_END
-
 /******************************************************************************
  Input Ports
 ******************************************************************************/
@@ -325,7 +321,6 @@ MACHINE_CONFIG_START(symbolics_state::symbolics)
 	//       66.67MHz @J10 (main lispcpu/system clock)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
 	MCFG_CPU_PROGRAM_MAP(m68k_mem)
-	MCFG_CPU_IO_MAP(m68k_io)
 
 	//ADD ME:
 	// Framebuffer
