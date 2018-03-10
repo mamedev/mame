@@ -82,6 +82,17 @@ public:
 
 	virtual void io_map(address_map &map);
 
+	DECLARE_READ8_MEMBER( rb_r );
+	DECLARE_READ8_MEMBER( xi_r );
+	DECLARE_READ8_MEMBER( rst_r );
+	DECLARE_READ8_MEMBER( sta_r );
+	DECLARE_WRITE8_MEMBER( cmd_w );
+	DECLARE_WRITE8_MEMBER( rr_w );
+	DECLARE_WRITE8_MEMBER( tb_w );
+	DECLARE_WRITE8_MEMBER( xo_w );
+	DECLARE_WRITE8_MEMBER( mr_w );
+	DECLARE_WRITE8_MEMBER( tmr_w );
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -172,17 +183,6 @@ private:
 	int m_xi7;
 
 	emu_timer *m_timer[5];
-
-	DECLARE_READ8_MEMBER( rb_r );
-	DECLARE_READ8_MEMBER( xi_r );
-	DECLARE_READ8_MEMBER( rst_r );
-	DECLARE_READ8_MEMBER( sta_r );
-	DECLARE_WRITE8_MEMBER( cmd_w );
-	DECLARE_WRITE8_MEMBER( rr_w );
-	DECLARE_WRITE8_MEMBER( tb_w );
-	DECLARE_WRITE8_MEMBER( xo_w );
-	DECLARE_WRITE8_MEMBER( mr_w );
-	DECLARE_WRITE8_MEMBER( tmr_w );
 };
 
 

@@ -49,18 +49,11 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 {
 	uint8_t key = 0;
 
-	key |= ioport("Y1")->read();
-	key |= ioport("Y2")->read();
-	key |= ioport("Y3")->read();
-	key |= ioport("Y4")->read();
-	key |= ioport("Y5")->read();
-	key |= ioport("Y6")->read();
-	key |= ioport("Y7")->read();
-	key |= ioport("Y8")->read();
-	key |= ioport("Y9")->read();
-	key |= ioport("Y10")->read();
-	key |= ioport("Y11")->read();
-	key |= ioport("Y12")->read();
+	for (int i = 0; i < 12; i++)
+	{
+		key |= m_kbdio[i]->read();
+	}
+
 //  DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, m_kbd.pulsing,
 //      (key || m_kbd.pulsing) ? " will IRQ" : ""));
 
@@ -126,18 +119,14 @@ READ8_MEMBER(mc1502_state::mc1502_kppi_porta_r)
 {
 	uint8_t key = 0;
 
-	if (m_kbd.mask & 0x0001) { key |= ioport("Y1")->read(); }
-	if (m_kbd.mask & 0x0002) { key |= ioport("Y2")->read(); }
-	if (m_kbd.mask & 0x0004) { key |= ioport("Y3")->read(); }
-	if (m_kbd.mask & 0x0008) { key |= ioport("Y4")->read(); }
-	if (m_kbd.mask & 0x0010) { key |= ioport("Y5")->read(); }
-	if (m_kbd.mask & 0x0020) { key |= ioport("Y6")->read(); }
-	if (m_kbd.mask & 0x0040) { key |= ioport("Y7")->read(); }
-	if (m_kbd.mask & 0x0080) { key |= ioport("Y8")->read(); }
-	if (m_kbd.mask & 0x0100) { key |= ioport("Y9")->read(); }
-	if (m_kbd.mask & 0x0200) { key |= ioport("Y10")->read(); }
-	if (m_kbd.mask & 0x0400) { key |= ioport("Y11")->read(); }
-	if (m_kbd.mask & 0x0800) { key |= ioport("Y12")->read(); }
+	for (int i = 0; i < 12; i++)
+	{
+		if (BIT(m_kbd.mask, i))
+		{
+			key |= m_kbdio[i]->read();
+		}
+	}
+
 	key ^= 0xff;
 //  DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
 	return key;

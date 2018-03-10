@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu
+// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu, AJR
 /***************************************************************************
 
         DEC VT100 keyboard emulation
 
-        TODO: rewrite as externally clocked serial device
+        All data to and from the keyboard is transmitted over a single
+        bidirectional wire. The clock that runs the keyboard's UART and
+        scan counters is multiplexed with the serial data signal.
 
 ***************************************************************************/
 
@@ -75,7 +77,7 @@ static INPUT_PORTS_START(vt100_kbd)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("'") PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
 
@@ -86,7 +88,7 @@ static INPUT_PORTS_START(vt100_kbd)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("'") PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M)
 
 	PORT_START("LINE7")
@@ -157,11 +159,14 @@ INPUT_PORTS_END
 
 vt100_keyboard_device::vt100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, VT100_KEYBOARD, tag, owner, clock)
-	, m_int_cb(*this)
+	, m_signal_out_cb(*this)
+	, m_uart(*this, "uart")
 	, m_speaker(*this, "beeper")
+	, m_scan_counter(*this, "counter")
 	, m_key_row(*this, "LINE%X", 0)
-	, m_key_scan(false)
-	, m_key_code(0)
+	, m_signal_line(true)
+	, m_last_signal_change(attotime::zero)
+	, m_last_scan(0)
 {
 }
 
@@ -175,7 +180,12 @@ MACHINE_CONFIG_START(vt100_keyboard_device::device_add_mconfig)
 	MCFG_SOUND_ADD("beeper", BEEP, 786) // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("scan_timer", vt100_keyboard_device, scan_callback, attotime::from_hz(800))
+	MCFG_DEVICE_ADD("uart", AY31015, 0)
+	MCFG_AY31015_WRITE_SO_CB(WRITELINE(vt100_keyboard_device, signal_out_w))
+
+	MCFG_DEVICE_ADD("counter", RIPPLE_COUNTER, 0) // 2x 74LS93
+	MCFG_RIPPLE_COUNTER_STAGES(8)
+	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(vt100_keyboard_device, key_scan_w))
 MACHINE_CONFIG_END
 
 
@@ -197,7 +207,7 @@ ioport_constructor vt100_keyboard_device::device_input_ports() const
 
 void vt100_keyboard_device::device_resolve_objects()
 {
-	m_int_cb.resolve_safe();
+	m_signal_out_cb.resolve_safe();
 }
 
 
@@ -207,76 +217,100 @@ void vt100_keyboard_device::device_resolve_objects()
 
 void vt100_keyboard_device::device_start()
 {
-	save_item(NAME(m_key_scan));
-	save_item(NAME(m_key_code));
+	if (!m_uart->started())
+		throw device_missing_dependencies();
+
+	m_uart->write_tsb(0);
+	m_uart->write_eps(1);
+	m_uart->write_np(1);
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_cs(1);
+	m_uart->write_swe(0);
+
+	machine().output().set_value("online_led",1);
+	machine().output().set_value("local_led", 0);
+	machine().output().set_value("locked_led",1);
+	machine().output().set_value("l1_led", 1);
+	machine().output().set_value("l2_led", 1);
+	machine().output().set_value("l3_led", 1);
+	machine().output().set_value("l4_led", 1);
+
+	save_item(NAME(m_signal_line));
+	save_item(NAME(m_last_signal_change));
+	save_item(NAME(m_last_scan));
 }
 
 
 //-------------------------------------------------
-//  control_w - handle data from CPU to keyboard
-//  (FIXME: this is received through a UART)
+//  signal_line_w - handle external serial input
 //-------------------------------------------------
 
-void vt100_keyboard_device::control_w(u8 data)
+WRITE_LINE_MEMBER(vt100_keyboard_device::signal_line_w)
 {
-	machine().output().set_value("online_led",BIT(data, 5) ? 0 : 1);
-	machine().output().set_value("local_led", BIT(data, 5));
-	machine().output().set_value("locked_led",BIT(data, 4) ? 0 : 1);
-	machine().output().set_value("l1_led", BIT(data, 3) ? 0 : 1);
-	machine().output().set_value("l2_led", BIT(data, 2) ? 0 : 1);
-	machine().output().set_value("l3_led", BIT(data, 1) ? 0 : 1);
-	machine().output().set_value("l4_led", BIT(data, 0) ? 0 : 1);
-	m_key_scan = BIT(data, 6);
-	m_speaker->set_state(BIT(data, 7));
-}
+	if (m_signal_line == bool(state))
+		return;
 
+	if (machine().time() > m_last_signal_change + attotime::from_usec(5))
+		m_uart->write_si(m_signal_line);
 
-//-------------------------------------------------
-//  key_code_r - return the code of the active key
-//  (FIXME: this is delivered through a UART)
-//-------------------------------------------------
+	if (m_uart->tbmt_r())
+		m_scan_counter->clock_w(state);
 
-u8 vt100_keyboard_device::key_code_r()
-{
-	return m_key_code;
-}
-
-
-//-------------------------------------------------
-//  bit_sel -
-//-------------------------------------------------
-
-u8 vt100_keyboard_device::bit_sel(u8 data)
-{
-	if (!BIT(data,7)) return 0x70;
-	if (!BIT(data,6)) return 0x60;
-	if (!BIT(data,5)) return 0x50;
-	if (!BIT(data,4)) return 0x40;
-	if (!BIT(data,3)) return 0x30;
-	if (!BIT(data,2)) return 0x20;
-	if (!BIT(data,1)) return 0x10;
-	if (!BIT(data,0)) return 0x00;
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  scan_callback - handle the key scan timer
-//-------------------------------------------------
-
-TIMER_DEVICE_CALLBACK_MEMBER(vt100_keyboard_device::scan_callback)
-{
-	if (m_key_scan)
+	if (state)
 	{
-		for (int i = 0; i < 16; i++)
+		bool dav = m_uart->dav_r();
+		m_uart->write_rdav(!dav);
+
+		if (dav)
 		{
-			u8 code = m_key_row[i]->read();
-			if (code < 0xff)
-			{
-				m_key_code = i | bit_sel(code);
-				m_int_cb(1);
-				break;
-			}
+			u8 data = m_uart->get_received_data();
+			machine().output().set_value("online_led",BIT(data, 5) ? 0 : 1);
+			machine().output().set_value("local_led", BIT(data, 5));
+			machine().output().set_value("locked_led",BIT(data, 4) ? 0 : 1);
+			machine().output().set_value("l1_led", BIT(data, 3) ? 0 : 1);
+			machine().output().set_value("l2_led", BIT(data, 2) ? 0 : 1);
+			machine().output().set_value("l3_led", BIT(data, 1) ? 0 : 1);
+			machine().output().set_value("l4_led", BIT(data, 0) ? 0 : 1);
+			m_speaker->set_state(BIT(data, 7));
+
+			if (BIT(data, 6))
+				m_scan_counter->reset_w(0);
 		}
 	}
+
+	m_uart->write_rcp(state);
+	m_uart->write_tcp(state);
+
+	m_signal_line = bool(state);
+	m_last_signal_change = machine().time();
+}
+
+
+//-------------------------------------------------
+//  signal_out_w - transmit serial keyboard output
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(vt100_keyboard_device::signal_out_w)
+{
+	m_signal_out_cb(state);
+}
+
+
+//-------------------------------------------------
+//  key_scan_w - handle scan counter outputs
+//-------------------------------------------------
+
+WRITE8_MEMBER(vt100_keyboard_device::key_scan_w)
+{
+	if (BIT(data, 0))
+	{
+		u8 input_row = m_key_row[(data >> 1) & 15]->read();
+		if (!BIT(input_row, (data >> 5) & 7))
+			m_uart->set_transmit_data((data >> 1) & 0x7f);
+	}
+	else if (!BIT(data, 7) && BIT(m_last_scan, 7))
+		m_scan_counter->reset_w(1);
+
+	m_last_scan = data;
 }

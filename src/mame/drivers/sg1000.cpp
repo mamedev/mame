@@ -188,7 +188,7 @@ ADDRESS_MAP_START(sg1000_state::sc3000_io_map)
 ADDRESS_MAP_END
 
 /* This is how the I/O ports are really mapped, but MAME does not support overlapping ranges
-static ADDRESS_MAP_START( sc3000_io_map, AS_IO, 8, sg1000_state )
+ADDRESS_MAP_START(sg1000_state::sc3000_io_map)
     ADDRESS_MAP_GLOBAL_MASK(0xff)
     AM_RANGE(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE(UPD9255_TAG, i8255_device, read, write)
     AM_RANGE(0x00, 0x00) AM_MIRROR(0x7f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)

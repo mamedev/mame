@@ -69,25 +69,8 @@ public:
 		m_nmi_enable(0), m_back_color(0), m_vram_page(0)
 	{ }
 
-	DECLARE_PALETTE_INIT(popper);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TILE_GET_INFO_MEMBER(layer0_tile_info);
-	TILE_GET_INFO_MEMBER(layer1_tile_info);
-
-	DECLARE_WRITE8_MEMBER(nmi_control_w);
-	DECLARE_WRITE8_MEMBER(crt_direction_w);
-	DECLARE_WRITE8_MEMBER(back_color_select_w);
-	DECLARE_WRITE8_MEMBER(vram_page_select_w);
-	DECLARE_WRITE8_MEMBER(intcycle_w);
-	DECLARE_READ8_MEMBER(subcpu_nmi_r);
-	DECLARE_READ8_MEMBER(subcpu_reset_r);
-	DECLARE_WRITE8_MEMBER(ay1_w);
-	DECLARE_READ8_MEMBER(watchdog_clear_r);
-	DECLARE_READ8_MEMBER(inputs_r);
-
 	void popper(machine_config &config);
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -111,6 +94,25 @@ private:
 	int m_nmi_enable;
 	int m_back_color;
 	int m_vram_page;
+
+	void main_map(address_map &map);
+	void sub_map(address_map &map);
+
+	DECLARE_PALETTE_INIT(popper);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TILE_GET_INFO_MEMBER(layer0_tile_info);
+	TILE_GET_INFO_MEMBER(layer1_tile_info);
+
+	DECLARE_WRITE8_MEMBER(nmi_control_w);
+	DECLARE_WRITE8_MEMBER(crt_direction_w);
+	DECLARE_WRITE8_MEMBER(back_color_select_w);
+	DECLARE_WRITE8_MEMBER(vram_page_select_w);
+	DECLARE_WRITE8_MEMBER(intcycle_w);
+	DECLARE_READ8_MEMBER(subcpu_nmi_r);
+	DECLARE_READ8_MEMBER(subcpu_reset_r);
+	DECLARE_WRITE8_MEMBER(ay1_w);
+	DECLARE_READ8_MEMBER(watchdog_clear_r);
+	DECLARE_READ8_MEMBER(inputs_r);
 };
 
 
@@ -509,7 +511,7 @@ void popper_state::machine_start()
 
 	// allocate and start scanline timer
 	m_scanline_timer = timer_alloc(0);
-	m_scanline_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
+	m_scanline_timer->adjust(m_screen->time_until_pos(0, 0));
 
 	// register for save states
 	save_item(NAME(m_nmi_enable));

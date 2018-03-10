@@ -60,6 +60,7 @@ void taitoio_yoke_device::device_reset()
 {
 }
 
+// TODO: requires LEFT/RIGHT_AD_STICK in framework
 static INPUT_PORTS_START( yoke_inputs )
 	PORT_START("STICK_X")
 	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Yoke X")

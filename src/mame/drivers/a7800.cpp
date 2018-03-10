@@ -1391,6 +1391,7 @@ MACHINE_CONFIG_START(a7800_state::a7800_ntsc)
 
 	MCFG_DEVICE_ADD("maria", ATARI_MARIA, 0)
 	MCFG_MARIA_DMACPU("maincpu")
+	MCFG_MARIA_SCREEN("screen")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

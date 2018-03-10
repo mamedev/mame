@@ -105,14 +105,10 @@ private:
 	required_device<cpu_device> m_maincpu;
 
 	void prg_map(address_map &map);
-	void io_map(address_map &map);
 };
 
 ADDRESS_MAP_START(milton_state::prg_map)
 	AM_RANGE(0x800, 0xfff) AM_ROM AM_REGION("maincpu", 0) // Internal ROM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(milton_state::io_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( milton )
@@ -123,7 +119,6 @@ MACHINE_CONFIG_START(milton_state::milton)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6805, 3120000) // MC6805P2, needs a CPU core
 	MCFG_CPU_PROGRAM_MAP(prg_map)
-	MCFG_CPU_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("grom3", TMC0430, 3120000 / 8)
 	downcast<tmc0430_device &>(*device).set_region_and_ident("groms", 0x0000, 0);
@@ -151,4 +146,4 @@ ROM_START( milton )
 	ROM_LOAD("miltongrom4.bin", 0x2000, 0x1800, CRC(9ac929f7) SHA1(1a27d56fc49eb4e58ea3b5c58d7fbedc5a751592) )
 ROM_END
 
-GAME( 1980, milton,  0,  milton, milton, milton_state,  0, ROT0, "Milton Bradley", "Electronic Milton",  MACHINE_IS_SKELETON )
+CONS( 1980, milton,  0,  0, milton, milton, milton_state,  0, "Milton Bradley", "Electronic Milton",  MACHINE_IS_SKELETON )

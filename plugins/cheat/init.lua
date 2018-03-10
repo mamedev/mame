@@ -178,7 +178,7 @@ function cheat.startplugin()
 	end
 
 	local function cheat_error(cheat, msg)
-		emu.print_verbose("error cheat script error: \"" .. cheat.desc .. "\" " .. msg)
+		emu.print_error("error cheat script error: \"" .. cheat.desc .. "\" " .. msg)
 		cheat.desc = cheat.desc .. " error"
 		cheat.script = nil
 		cheat.enabled = nil

@@ -18,7 +18,6 @@
 
 #include "emu.h"
 #include "includes/apple3.h"
-#include "includes/apple2.h"
 #include "sound/volt_reg.h"
 #include "formats/ap2_dsk.h"
 
@@ -29,7 +28,6 @@
 
 #include "bus/rs232/rs232.h"
 
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 

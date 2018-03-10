@@ -51,11 +51,18 @@
 ************************************************************************/
 
 #include "emu.h"
-#include "includes/apple2.h"
 #include "video/agat7.h"
 
-#include "machine/bankdev.h"
+#include "cpu/m6502/m6502.h"
+
+#include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
+
+#include "machine/bankdev.h"
+#include "machine/kb3600.h"
+#include "machine/timer.h"
+
+#include "sound/spkrdev.h"
 
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/agat7langcard.h"

@@ -144,7 +144,7 @@ READ8_MEMBER( decwriter_state::la120_NVR_r )
 	if (!machine().side_effects_disabled())
 		m_maincpu->adjust_icount(-1);
 
-	return (m_nvm->data_r() << 7) | 0x7e;
+	return (!m_nvm->data_r() << 7) | 0x7f;
 }
 
 WRITE8_MEMBER( decwriter_state::la120_NVR_w )
@@ -154,10 +154,12 @@ WRITE8_MEMBER( decwriter_state::la120_NVR_w )
 		m_maincpu->adjust_icount(-1);
 
 	// ER1400 has negative logic, but 7406 inverters are used
-	m_nvm->clock_w(BIT(offset, 0));
 	m_nvm->c3_w(BIT(offset, 10));
 	m_nvm->c2_w(BIT(offset, 9));
 	m_nvm->c1_w(BIT(offset, 8));
+
+	// FIXME: clock line shouldn't be inverted relative to C1-C3, but accesses only seems to work this way
+	m_nvm->clock_w(!BIT(offset, 0));
 
 	// C2 is used to disable pullup on data line
 	m_nvm->data_w(!BIT(offset, 9) ? 0 : !BIT(data, 7));
@@ -180,6 +182,10 @@ WRITE8_MEMBER( decwriter_state::la120_NVR_w )
  */
 READ8_MEMBER( decwriter_state::la120_DC305_r )
 {
+	// one wait state inserted
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-1);
+
 	uint8_t data = 0x00;
 	if (DC305_VERBOSE)
 		logerror("DC305 Read from offset %01x, returning %02X\n", offset, data);
@@ -197,6 +203,10 @@ READ8_MEMBER( decwriter_state::la120_DC305_r )
  */
 WRITE8_MEMBER( decwriter_state::la120_DC305_w )
 {
+	// one wait state inserted
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-1);
+
 	if (DC305_VERBOSE)
 		logerror("DC305 Write of %02X to offset %01X\n", data, offset);
 }

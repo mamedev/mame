@@ -25,15 +25,20 @@ class eolith16_state : public eolith_state
 {
 public:
 	eolith16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: eolith_state(mconfig, type, tag) { }
+		: eolith_state(mconfig, type, tag)
+		, m_special_io(*this, "SPECIAL")
+	{
+	}
+		
+	required_ioport m_special_io;
 
-	std::unique_ptr<uint16_t[]> m_vram;
+	std::unique_ptr<uint8_t[]> m_vram;
 	int m_vbuffer;
 
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_READ16_MEMBER(eolith16_custom_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_READ16_MEMBER(vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER(vram_r);
 
 	DECLARE_DRIVER_INIT(eolith16);
 	DECLARE_VIDEO_START(eolith16);
@@ -59,33 +64,31 @@ WRITE16_MEMBER(eolith16_state::eeprom_w)
 READ16_MEMBER(eolith16_state::eolith16_custom_r)
 {
 	speedup_read();
-	return ioport("SPECIAL")->read();
+	return m_special_io->read();
 }
 
-
-
-WRITE16_MEMBER(eolith16_state::vram_w)
+WRITE8_MEMBER(eolith16_state::vram_w)
 {
-	COMBINE_DATA(&m_vram[offset + (0x10000/2) * m_vbuffer]);
+	COMBINE_DATA(&m_vram[offset + 0x10000 * m_vbuffer]);
 }
 
-READ16_MEMBER(eolith16_state::vram_r)
+READ8_MEMBER(eolith16_state::vram_r)
 {
-	return m_vram[offset + (0x10000/2) * m_vbuffer];
+	return m_vram[offset + 0x10000 * m_vbuffer];
 }
 
 ADDRESS_MAP_START(eolith16_state::eolith16_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
-	AM_RANGE(0x50000000, 0x5000ffff) AM_READWRITE(vram_r, vram_w)
+	AM_RANGE(0x50000000, 0x5000ffff) AM_READWRITE8(vram_r, vram_w, 0xffff)
 	AM_RANGE(0x90000000, 0x9000002f) AM_WRITENOP //?
-	AM_RANGE(0xff000000, 0xff1fffff) AM_ROM AM_REGION("user2", 0)
+	AM_RANGE(0xff000000, 0xff1fffff) AM_ROM AM_REGION("maindata", 0)
 	AM_RANGE(0xffe40000, 0xffe40001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xffe80000, 0xffe80001) AM_WRITE(eeprom_w)
 	AM_RANGE(0xffea0000, 0xffea0001) AM_READ(eolith16_custom_r)
 	AM_RANGE(0xffea0002, 0xffea0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xffec0000, 0xffec0001) AM_READNOP // not used?
 	AM_RANGE(0xffec0002, 0xffec0003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( eolith16 )
@@ -120,28 +123,18 @@ INPUT_PORTS_END
 
 VIDEO_START_MEMBER(eolith16_state,eolith16)
 {
-	m_vram = std::make_unique<uint16_t[]>(0x10000);
-	save_pointer(NAME(m_vram.get()), 0x10000);
+	m_vram = std::make_unique<uint8_t[]>(0x10000*2);
+	save_pointer(NAME(m_vram.get()), 0x10000*2);
 	save_item(NAME(m_vbuffer));
 }
 
 uint32_t eolith16_state::screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count;
-	int color;
-
-	count = 0;
-	for (y=0;y < 204;y++)
+	for (int y = 0; y < 204; y++)
 	{
-		for (x=0;x < 320/2;x++)
+		for (int x = 0; x < 320; x++)
 		{
-			color = m_vram[count + (0x10000/2) * (m_vbuffer ^ 1)] & 0xff;
-			bitmap.pix16(y, x*2 + 0) = color;
-
-			color = (m_vram[count + (0x10000/2) * (m_vbuffer ^ 1)] & 0xff00) >> 8;
-			bitmap.pix16(y, x*2 + 1) = color;
-
-			count++;
+			bitmap.pix16(y, x) = m_vram[0x10000 * (m_vbuffer ^ 1) + (y * 320) + x] & 0xff;
 		}
 	}
 	return 0;
@@ -171,7 +164,6 @@ PALETTE_INIT_MEMBER(eolith16_state,eolith16)
 		palette.set_pen_color(c,rgb_t(r,g,b));
 	}
 }
-
 
 
 MACHINE_CONFIG_START(eolith16_state::eolith16)
@@ -251,10 +243,10 @@ Notes:
 */
 
 ROM_START( klondkp )
-	ROM_REGION16_BE( 0x80000, "user1", 0 ) /* E1-16T program code */
+	ROM_REGION16_BE( 0x80000, "maincpu", 0 ) /* E1-16T program code */
 	ROM_LOAD( "kd.u5",  0x000000, 0x080000, CRC(591f0c73) SHA1(a9f338204c77a724fa6a6e08d78ca89bd5191aba) )
 
-	ROM_REGION16_BE( 0x200000, "user2", 0 ) /* gfx data */
+	ROM_REGION16_BE( 0x200000, "maindata", 0 ) /* gfx data */
 	ROM_LOAD16_WORD_SWAP( "kd.u31", 0x000000, 0x200000, CRC(e5dd12b5) SHA1(0a0cd75cbcdccce3575e5a58ba09c88452e1a5ee) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* oki samples */

@@ -1278,8 +1278,6 @@ void vboy_state::m_set_irq(uint16_t irq_vector)
 /* TODO: obviously all of this needs clean-ups and better implementation ... */
 void vboy_state::m_scanline_tick(int scanline, uint8_t screen_type)
 {
-	//int frame_num = machine().first_screen()->frame_number();
-
 	if(screen_type == 0)
 		m_row_num = (scanline / 8) & 0x1f;
 

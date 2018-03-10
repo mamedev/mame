@@ -74,7 +74,6 @@
 //#include "bus/a2bus/a2udrive.h"
 #include "bus/a2bus/a2hsscsi.h"
 
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 

@@ -1015,10 +1015,7 @@ READ8_MEMBER(fm7_state::fm7_mmr_r)
 
 void fm7_state::fm7_update_bank(address_space & space, int bank, uint8_t physical)
 {
-	address_map_bank_device* avbank[16] = { m_avbank1, m_avbank2, m_avbank3, m_avbank4, m_avbank5, m_avbank6, m_avbank7
-			, m_avbank8, m_avbank9, m_avbank10, m_avbank11, m_avbank12, m_avbank13, m_avbank14, m_avbank15, m_avbank16 };
-
-	avbank[bank]->set_bank(physical);
+	m_avbank[bank]->set_bank(physical);
 /*  uint8_t* RAM = memregion("maincpu")->base();
     uint16_t size = 0xfff;
     char bank_name[10];
@@ -1152,7 +1149,7 @@ void fm7_state::fm7_mmr_refresh(address_space& space)
 	}
 	else
 	{
-		space.install_readwrite_handler(0x7000,0x7fff,read8_delegate(FUNC(address_map_bank_device::read8),(address_map_bank_device*)m_avbank8),write8_delegate(FUNC(address_map_bank_device::write8),(address_map_bank_device*)m_avbank8));
+		space.install_readwrite_handler(0x7000,0x7fff,read8_delegate(FUNC(address_map_bank_device::read8),(address_map_bank_device*)m_avbank[7]),write8_delegate(FUNC(address_map_bank_device::write8),(address_map_bank_device*)m_avbank[7]));
 	}
 	if(m_init_rom_en)
 	{
@@ -1964,7 +1961,7 @@ void fm7_state::machine_reset()
 	m_subtimer->adjust(attotime::from_msec(20),0,attotime::from_msec(20));
 	m_keyboard_timer->adjust(attotime::zero,0,attotime::from_msec(10));
 	if(m_type == SYS_FM77AV || m_type == SYS_FM77AV40EX || m_type == SYS_FM11)
-		m_fm77av_vsync_timer->adjust(machine().first_screen()->time_until_vblank_end());
+		m_fm77av_vsync_timer->adjust(m_screen->time_until_vblank_end());
 
 	m_irq_mask = 0x00;
 	m_irq_flags = 0x00;

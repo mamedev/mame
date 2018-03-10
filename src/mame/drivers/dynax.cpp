@@ -36,7 +36,7 @@ Year + Game                Main Board   Sub Board    CPU   Sound                
 91 Mj Angels               D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205       RAM
 91 Mj Comic Gekijou V.1    D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
 91 Mj Tenkaigen                                      TLCS  AY8910        YM2413       M6242 RAM   Protection, Battery
-91 Mj Ougon No Pai         D6209038L1-0              TLCS  AY8910        YM2413             RAM   Undumped TMP91P640 Code, Battery
+91 Mj Ougon no Hai         D6209038L1-0              TLCS  AY8910        YM2413             RAM   Undumped TMP91P640 Code, Battery
 92 Quiz TV Gassyuukoku     D5512068L1-2 D6410288L-1  Z80   AY8912        YM2413 M5205       RAM
 92 Hanafuda Hana Tengoku   D6502208L1   D6107068L-1  Z80   AY8910        YM2413       M6242 RAM
 94 Castle Of Dracula                                 Z80   M6295                            PROM  Blitter is an FPGA
@@ -4779,7 +4779,7 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 10C on Ougon no Pai
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 10C on Ougon no Hai
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, flipscreen_w)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(dynax_state, layer_half_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(dynax_state, layer_half2_w))
@@ -6745,7 +6745,7 @@ ROM_START( tenkai )
 	// It appears that the first half of lzc-01.u6 in tenkaibb (as well as the same data in other bootleg versions)
 	// does not exist _anywhere_ in this rom dump, and in this way some girls won't show correctly (such as the 3rd one)
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
-	ROM_LOAD( "tydg002.u8",   0x000000, 0x80000, BAD_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // not dumped, rom taken from ougonpaib
+	ROM_LOAD( "tydg002.u8",   0x000000, 0x80000, BAD_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // not dumped, rom taken from ougonhaib
 	ROM_LOAD( "taicom01.15b", 0x080000, 0x80000, BAD_DUMP CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) ) // either this was dumped half size, or the above rom was missing from the pcb
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   // blitter data
@@ -6938,7 +6938,7 @@ ROM_START( tenkaicb )
 	// it doesn't need the internal rom from tenkai
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
-	ROM_LOAD( "tydg002.u8", 0x00000, 0x80000, BAD_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // not dumped, rom taken from ougonpaib
+	ROM_LOAD( "tydg002.u8", 0x00000, 0x80000, BAD_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // not dumped, rom taken from ougonhaib
 	ROM_LOAD( "rom.u12",    0x80000, 0x80000, BAD_DUMP CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) ) // either this was dumped half size, or the above rom was missing from the pcb
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   // blitter data
@@ -6976,7 +6976,7 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Ougon No Pai
+Mahjong Ougon no Hai
 DYNAX D6209038L1-0
 
 AY-3-8910A, rest of the chips are scratched
@@ -6984,25 +6984,25 @@ AY-3-8910A, rest of the chips are scratched
 
 ***************************************************************************/
 
-ROM_START( ougonpai )
+ROM_START( ougonhai )
 	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "dynax_6201b.2c", 0x00000, 0x40000, CRC(18ef8eda) SHA1(48a3e4566b0a86db907602fd235c01d96eddec23) )
 	ROM_RELOAD(                 0x10000, 0x40000 )
 	ROM_RELOAD(                 0x50000, 0x40000 )
-	ROM_LOAD( "ougonpai_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "ougonhai_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
-	ROM_LOAD( "dynax_6202.11b", 0x00000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )  // = tydg002.u8 (ougonpaib)
-	ROM_LOAD( "dynax_6203.13b", 0x80000, 0x80000, CRC(60717d91) SHA1(85dbb510d33b36d2255b740ccc4917216dd21497) )  // = tydg003.u6 (ougonpaib)
+	ROM_LOAD( "dynax_6202.11b", 0x00000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )  // = tydg002.u8 (ougonhaib)
+	ROM_LOAD( "dynax_6203.13b", 0x80000, 0x80000, CRC(60717d91) SHA1(85dbb510d33b36d2255b740ccc4917216dd21497) )  // = tydg003.u6 (ougonhaib)
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   // blitter data
-	ROM_LOAD( "dynax_6204.14b", 0x00000, 0x80000, CRC(4142f94b) SHA1(9982f12333973b307c210e39310eafc88b8620e1) )  // ~= tydg004.u21 (ougonpaib)
-	ROM_LOAD( "dynax_6205.15b", 0x80000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )  // = tydg005.u19 (ougonpaib)
+	ROM_LOAD( "dynax_6204.14b", 0x00000, 0x80000, CRC(4142f94b) SHA1(9982f12333973b307c210e39310eafc88b8620e1) )  // ~= tydg004.u21 (ougonhaib)
+	ROM_LOAD( "dynax_6205.15b", 0x80000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )  // = tydg005.u19 (ougonhaib)
 ROM_END
 
 /***************************************************************************
 
-Mahjong Ougon No Pai (bootleg, PCB is not working)
+Mahjong Ougon no Hai (bootleg, PCB is not working)
 
 PCB Layout
 ----------
@@ -7031,13 +7031,13 @@ PCB Layout
 
 ***************************************************************************/
 
-ROM_START( ougonpaib )
+ROM_START( ougonhaib )
 	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "tydg001.u11",      0x00000, 0x40000, CRC(4ffa543c) SHA1(ab6ec7bd735358643f5186c6c983fa8b599fe84b) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
 	ROM_RELOAD(                   0x50000, 0x40000 )
 	// tenkai internal rom is incompatible with the code of this set
-	ROM_LOAD( "ougonpaib_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "ougonhaib_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
 	ROM_LOAD( "tydg002.u8",  0x00000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // = lzc-01.u6 [1/2]
@@ -7343,8 +7343,8 @@ GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,
 GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg b)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg c)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonpai, 0,        tenkai,   tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Ougon No Pai",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonpaib,ougonpai, tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Ougon No Pai (bootleg)",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhai, 0,        tenkai,   tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Ougon No Hai",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib,ougonhai, tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Ougon No Hai (bootleg)",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreach,  0,        mjreach,  mjreach,  dynax_state, 0,        ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1994, cdracula, 0,        cdracula, cdracula, dynax_state, 0,        ROT0,   "Yun Sung (Escape license)","Castle Of Dracula",                                             MACHINE_SUPPORTS_SAVE ) // not a dynax board
 GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, dynax_state, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a dynax board. proms?

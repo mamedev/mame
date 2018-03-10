@@ -114,6 +114,43 @@
       - LogiChess. The page at http://www.nascomhomepage.com/games/logichess.html
         should provide enough clues to enable you to work out how to play.
 
+    Alternate ROMs for Lynx 96k:
+    - Scorpion EXTensions
+        OR
+        XOR       - create new patterns and colours
+        SON/SOFF  - scroll the screen
+        SCROLL
+        MCOPY
+        VAR       - print values of variables used
+        DIM       - print size of dimensioned arrays used
+        LSTR$     - print length of all strings used
+        OLD       - bring back NEWed programs
+        ZERODIM   - zero all arrays
+        ALTGREEN  - easily access the ALTernate GREEN BANK
+        GREEN
+        CLEAR     - clear all variables
+        UMEM      - display amount of memory used
+        VERSION   - display version
+        FAST      - faster screen printing
+        FTEXT     - fast 8*8 text
+        FPRINT
+        VAL
+        BLOCK
+        INSTR
+        WSWAP
+    - Danish EXTensions
+        PAINT
+        CAT
+        FAST
+        MULTI
+        VARS
+        RECOVER
+        MSAVE
+        ALARM
+        TIMER
+        WRUL
+        RULON/RULOFF
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -778,9 +815,10 @@ d7 = 125ns or 250ns */
 	}
 
 	floppy_image_device *floppy = nullptr;
-	if ((data & 3) == 0) floppy = m_floppy0->get_device();
-	else
-	if ((data & 3) == 1) floppy = m_floppy1->get_device();
+	if ((data & 3) == 0)
+		floppy = m_floppy0->get_device();
+	else if ((data & 3) == 1)
+		floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(floppy);
 
@@ -812,7 +850,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx_common)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(camplynx_state::lynx_disk)
-	MCFG_FD1793_ADD("fdc", XTAL(24'000'000) / 24)
+	MCFG_FD1793_ADD("fdc", 24_MHz_XTAL / 24)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
@@ -822,7 +860,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(camplynx_state::lynx48k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000) / 6)
+	MCFG_CPU_ADD("maincpu", Z80, 24_MHz_XTAL / 6)
 	MCFG_CPU_PROGRAM_MAP(lynx48k_mem)
 	MCFG_CPU_IO_MAP(lynx48k_io)
 
@@ -841,7 +879,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx48k)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(lynx48k_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
-	//MCFG_CASSETTE_INTERFACE("camplynx_cass")
+	MCFG_CASSETTE_INTERFACE("camplynx_cass")
 
 	/* devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(12'000'000) / 8 )
@@ -858,12 +896,16 @@ MACHINE_CONFIG_START(camplynx_state::lynx96k)
 	MCFG_CPU_IO_MAP(lynx96k_io)
 
 	lynx_disk(config);
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "camplynx_flop")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "96K")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(camplynx_state::lynx128k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000) / 4)
+	MCFG_CPU_ADD("maincpu", Z80, 24_MHz_XTAL / 4)
 	MCFG_CPU_PROGRAM_MAP(lynx128k_mem)
 	MCFG_CPU_IO_MAP(lynx128k_io)
 
@@ -882,16 +924,20 @@ MACHINE_CONFIG_START(camplynx_state::lynx128k)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(lynx128k_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
-	//MCFG_CASSETTE_INTERFACE("camplynx_cass")
+	MCFG_CASSETTE_INTERFACE("camplynx_cass")
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(12'000'000) / 8 )
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12_MHz_XTAL / 8 )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx128k_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	lynx_disk(config);
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "camplynx_flop")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "128K")
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(camplynx_state, lynx48k)
@@ -926,6 +972,7 @@ DRIVER_INIT_MEMBER(camplynx_state, lynx128k)
 /* ROM definition */
 ROM_START( lynx48k )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("1")
 	ROM_SYSTEM_BIOS(0, "1", "Set1")
 	ROMX_LOAD( "lynx48-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a), ROM_BIOS(1) )
 	ROMX_LOAD( "lynx48-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744), ROM_BIOS(1) )
@@ -938,7 +985,13 @@ ROM_START( lynx96k )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "lynx9646.rom",  0x0000, 0x2000, CRC(f86c5514) SHA1(77a4af7557382003d697d08f364839e2dc28f063) )
 	ROM_LOAD( "lynx9645.rom",  0x2000, 0x2000, CRC(f596b9a3) SHA1(3fca46bd68422d34c6cd801dd904507e52bd8846) )
-	ROM_LOAD( "lynx9644.rom",  0x4000, 0x1000, CRC(4b96b0de) SHA1(c372a8d26399b9b45e615b674d61ccda76491b8b) )
+	ROM_DEFAULT_BIOS("orig")
+	ROM_SYSTEM_BIOS(0, "orig", "Original")
+	ROMX_LOAD( "lynx9644.rom", 0x4000, 0x1000, CRC(4b96b0de) SHA1(c372a8d26399b9b45e615b674d61ccda76491b8b), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "scorp", "Scorpion") /* Scorpion ROM v2.1 03/86 (Reading Lynx User Group) */
+	ROMX_LOAD( "skorprom.rom", 0x4000, 0x2000, CRC(698d3de9) SHA1(c707bdcecef79774c2a8a23d1f3e9ba382cb9304), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "danish", "Danish")
+	ROMX_LOAD( "danish96k3.rom", 0x4000, 0x2000, CRC(795c22ea) SHA1(0a57394cd986c5b338b38d514e894bace7f6e47b), ROM_BIOS(3) )
 	ROM_LOAD( "dosrom.rom",    0xe000, 0x2000, CRC(011e106a) SHA1(e77f0ca99790551a7122945f3194516b2390fb69) )
 ROM_END
 

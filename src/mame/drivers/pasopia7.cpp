@@ -43,6 +43,7 @@ public:
 	pasopia7_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_ppi0(*this, "ppi8255_0")
 		, m_ppi1(*this, "ppi8255_1")
 		, m_ppi2(*this, "ppi8255_2")
@@ -127,6 +128,7 @@ private:
 	void draw_mixed_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<i8255_device> m_ppi2;
@@ -224,8 +226,8 @@ void pasopia7_state::draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &clipre
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(machine().first_screen()->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(machine().first_screen()->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(m_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(m_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)
@@ -302,8 +304,8 @@ void pasopia7_state::draw_mixed_screen(bitmap_ind16 &bitmap,const rectangle &cli
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(machine().first_screen()->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(machine().first_screen()->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(m_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(m_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)
@@ -780,7 +782,7 @@ READ8_MEMBER( pasopia7_state::crtc_portb_r )
 	// --x- ---- vsync bit
 	// ---x ---- hardcoded bit, defines if the system screen is raster (1) or LCD (0)
 	// ---- x--- disp bit
-	uint8_t vdisp = (machine().first_screen()->vpos() < (m_screen_type ? 200 : 28)) ? 0x08 : 0x00; //TODO: check LCD vpos trigger
+	uint8_t vdisp = (m_screen->vpos() < (m_screen_type ? 200 : 28)) ? 0x08 : 0x00; //TODO: check LCD vpos trigger
 	uint8_t vsync = vdisp ? 0x00 : 0x20;
 
 	return 0x40 | (m_attr_latch & 0x87) | vsync | vdisp | (m_screen_type << 4);

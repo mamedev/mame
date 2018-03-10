@@ -111,11 +111,10 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	void set_character_width(int value);
-private:
+
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
 	DECLARE_WRITE_LINE_MEMBER( lpstb_w );
 
-	void crt9007(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -136,6 +135,8 @@ private:
 		TIMER_DRB,
 		TIMER_DMA
 	};
+
+	void crt9007(address_map &map);
 
 	inline uint8_t readbyte(offs_t address);
 

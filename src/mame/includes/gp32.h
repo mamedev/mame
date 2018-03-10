@@ -7,7 +7,7 @@
 #include "machine/smartmed.h"
 #include "sound/dac.h"
 #include "machine/nvram.h"
-
+#include "screen.h"
 
 #define INT_ADC       31
 #define INT_RTC       30
@@ -103,6 +103,7 @@ public:
 		m_nvram(*this, "nvram"),
 		m_io_in0(*this, "IN0"),
 		m_io_in1(*this, "IN1"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette")  { }
 
 	virtual void video_start() override;
@@ -195,6 +196,7 @@ protected:
 	required_device<nvram_device> m_nvram;
 	required_ioport m_io_in0;
 	required_ioport m_io_in1;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	uint32_t s3c240x_get_fclk(int reg);

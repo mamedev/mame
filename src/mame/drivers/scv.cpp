@@ -23,6 +23,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this,"videoram"),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_upd1771c(*this, "upd1771c"),
 		m_cart(*this, "cartslot"),
 		m_pa(*this, "PA.%u", 0),
@@ -53,6 +54,7 @@ protected:
 	};
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<upd1771c_device> m_upd1771c;
 	required_device<scv_cart_slot_device> m_cart;
 	required_ioport_array<8> m_pa;
@@ -264,7 +266,7 @@ void scv_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	{
 		case TIMER_VB:
 			{
-				int vpos = machine().first_screen()->vpos();
+				int vpos = m_screen->vpos();
 
 				switch( vpos )
 				{
@@ -276,7 +278,7 @@ void scv_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 					break;
 				}
 
-				m_vb_timer->adjust(machine().first_screen()->time_until_pos((vpos + 1) % 262, 0));
+				m_vb_timer->adjust(m_screen->time_until_pos((vpos + 1) % 262, 0));
 			}
 			break;
 
@@ -621,7 +623,7 @@ void scv_state::machine_start()
 
 void scv_state::machine_reset()
 {
-	m_vb_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
+	m_vb_timer->adjust(m_screen->time_until_pos(0, 0));
 }
 
 

@@ -87,7 +87,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(goupil_scanline);
 
 	void goupil_g1(machine_config &config);
-	void goupil_io(address_map &map);
 	void goupil_mem(address_map &map);
 private:
 	required_device<acia6850_device> m_acia;
@@ -121,7 +120,6 @@ public:
 	DECLARE_WRITE8_MEMBER(visu24x80_ram_w);
 
 	void goupil_g2(machine_config &config);
-	void goupil_g2_io(address_map &map);
 	void goupil_g2_mem(address_map &map);
 protected:
 
@@ -171,10 +169,6 @@ ADDRESS_MAP_START(goupil_g1_state::goupil_mem)
 	AM_RANGE(0xF800,0xFFFF) AM_ROM AM_REGION("maincpu", 0xF800) // Monitor (MON 1 + MON 2)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(goupil_g1_state::goupil_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
-
 ADDRESS_MAP_START(goupil_g2_state::goupil_g2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x3FFF) AM_RAM
@@ -203,10 +197,6 @@ ADDRESS_MAP_START(goupil_g2_state::goupil_g2_mem)
 	AM_RANGE(0xEC00,0xF3FF) AM_READWRITE(visu24x80_ram_r, visu24x80_ram_w)
 	AM_RANGE(0xF400,0xF7FF) AM_ROM AM_REGION("maincpu", 0xF400) // Monitor (MON 1)
 	AM_RANGE(0xF800,0xFFFF) AM_ROM AM_REGION("maincpu", 0xF800) // Monitor (MON 2)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(goupil_g2_state::goupil_g2_io)
-	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
 WRITE8_MEMBER( goupil_g1_state::scanlines_kbd1_w )
@@ -537,7 +527,6 @@ MACHINE_CONFIG_START(goupil_g1_state::goupil_g1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6808, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goupil_mem)
-	MCFG_CPU_IO_MAP(goupil_io)
 
 	/* sound hardware */
 	// TODO !
@@ -593,7 +582,6 @@ MACHINE_CONFIG_START(goupil_g2_state::goupil_g2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6808, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goupil_g2_mem)
-	MCFG_CPU_IO_MAP(goupil_g2_io)
 
 	/* sound hardware */
 	// TODO !

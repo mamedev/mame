@@ -77,6 +77,7 @@ public:
 		m_kbd(*this, "kbd"),
 		m_vram_bank(0),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_ram(*this, RAM_TAG),
 		m_palette(*this, "palette")
 	{
@@ -152,6 +153,7 @@ public:
 	DECLARE_PALETTE_INIT(qx10);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
@@ -219,7 +221,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 			if(cursor_on && cursor_addr == addr+x) //TODO
 				tile_data^=0xff;
 
-			if(attr & 0x80 && machine().first_screen()->frame_number() & 0x10) //TODO: check for blinking interval
+			if(attr & 0x80 && m_screen->frame_number() & 0x10) //TODO: check for blinking interval
 				tile_data=0;
 
 			for( xi = 0; xi < 8; xi++)
@@ -229,7 +231,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 				res_x = x * 8 + xi;
 				res_y = y + yi;
 
-				if(!machine().first_screen()->visible_area().contains(res_x, res_y))
+				if(!m_screen->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(yi >= 16)

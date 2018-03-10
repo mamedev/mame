@@ -69,6 +69,7 @@ public:
 	mz2500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_rtc(*this, RP5C15_TAG),
 		m_pit(*this, "pit"),
 		m_beeper(*this, "beeper"),
@@ -83,6 +84,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<rp5c15_device> m_rtc;
 	required_device<pit8253_device> m_pit;
 	required_device<beep_device> m_beeper;
@@ -734,7 +736,7 @@ void mz2500_state::mz2500_reconfigure_screen()
 
 	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,m_cg_reg[0x0e]);
 
-	machine().first_screen()->configure(720, 480, visarea, machine().first_screen()->frame_period().attoseconds());
+	m_screen->configure(720, 480, visarea, m_screen->frame_period().attoseconds());
 
 	/* calculate CG window parameters here */
 	m_cg_vs = (m_cg_reg[0x08]) | ((m_cg_reg[0x09]<<8) & 1);
@@ -1052,8 +1054,8 @@ READ8_MEMBER(mz2500_state::mz2500_crtc_hvblank_r)
 {
 	uint8_t vblank_bit, hblank_bit;
 
-	vblank_bit = machine().first_screen()->vblank() ? 0 : 1;
-	hblank_bit = machine().first_screen()->hblank() ? 0 : 2;
+	vblank_bit = m_screen->vblank() ? 0 : 1;
+	hblank_bit = m_screen->hblank() ? 0 : 2;
 
 	return vblank_bit | hblank_bit;
 }
@@ -1299,7 +1301,7 @@ READ8_MEMBER(mz2500_state::mz2500_rplane_latch_r)
 	{
 		uint8_t vblank_bit;
 
-		vblank_bit = machine().first_screen()->vblank() ? 0 : 0x80 | m_cg_clear_flag;
+		vblank_bit = m_screen->vblank() ? 0 : 0x80 | m_cg_clear_flag;
 
 		return vblank_bit;
 	}
@@ -1896,7 +1898,7 @@ READ8_MEMBER(mz2500_state::mz2500_portb_r)
 {
 	uint8_t vblank_bit;
 
-	vblank_bit = machine().first_screen()->vblank() ? 0 : 1; //Guess: NOBO wants this bit to be high/low
+	vblank_bit = m_screen->vblank() ? 0 : 1; //Guess: NOBO wants this bit to be high/low
 
 	return 0xfe | vblank_bit;
 }

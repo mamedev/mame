@@ -195,7 +195,7 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START(sorcerer_state::sorcerer_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xfc, 0xfc) AM_READWRITE( sorcerer_fc_r, sorcerer_fc_w )
+	AM_RANGE(0xfc, 0xfc) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
 	AM_RANGE(0xfd, 0xfd) AM_READWRITE( sorcerer_fd_r, sorcerer_fd_w )
 	AM_RANGE(0xfe, 0xfe) AM_READWRITE( sorcerer_fe_r, sorcerer_fe_w )
 	AM_RANGE(0xff, 0xff) AM_DEVREAD("cent_status_in", input_buffer_device, read)
@@ -441,6 +441,8 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(ES_UART_CLOCK)
 	MCFG_AY31015_RX_CLOCK(ES_UART_CLOCK)
+	MCFG_AY31015_AUTO_RDAV(true)
+
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 

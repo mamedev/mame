@@ -292,16 +292,16 @@ ADDRESS_MAP_END
     ADDRESS_MAP( prophet_mem )
 -------------------------------------------------*/
 
-//static ADDRESS_MAP_START( prophet_mem, AS_PROGRAM, 8, atom_state )
-//  AM_RANGE(0x0000, 0x09ff) AM_RAM
-//  AM_RANGE(0x0a00, 0x7fff) AM_RAM
-//  AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
-//  AM_RANGE(0x9800, 0x9fff) AM_RAM
-//  AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION("ic24", 0)
-//  AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
-//  AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
-//  AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
-//ADDRESS_MAP_END
+ADDRESS_MAP_START(atom_state::prophet_mem)
+	AM_RANGE(0x0000, 0x09ff) AM_RAM
+	AM_RANGE(0x0a00, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
+	AM_RANGE(0x9800, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION("ic24", 0)
+	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
+	AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
+ADDRESS_MAP_END
 
 /***************************************************************************
     INPUT PORTS

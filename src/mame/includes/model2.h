@@ -50,6 +50,7 @@ public:
 		m_cryptdevice(*this, "315_5881"),
 		m_0229crypt(*this, "317_0229"),
 		m_in(*this, "IN%u", 0),
+		m_dsw(*this, "DSW"),
 		m_steer(*this, "STEER"),
 		m_accel(*this, "ACCEL"),
 		m_brake(*this, "BRAKE"),
@@ -89,6 +90,7 @@ public:
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
 
 	optional_ioport_array<5> m_in;
+	required_ioport m_dsw;
 	optional_ioport m_steer;
 	optional_ioport m_accel;
 	optional_ioport m_brake;
@@ -96,18 +98,6 @@ public:
 	optional_ioport_array<4> m_analog_ports;
 	optional_ioport_array<4> m_lightgun_ports;
 
-	int m_port_1c00004;
-	int m_port_1c00006;
-	int m_port_1c00010;
-	int m_port_1c00012;
-	int m_port_1c00014;
-
-	uint32_t m_intreq;
-	uint32_t m_intena;
-	uint32_t m_coproctl;
-	uint32_t m_coprocnt;
-	uint32_t m_geoctl;
-	uint32_t m_geocnt;
 	uint32_t m_timervals[4];
 	uint32_t m_timerorig[4];
 	int m_timerrun[4];
@@ -129,7 +119,6 @@ public:
 	uint32_t m_iop_data;
 	int m_geo_iop_write_num;
 	uint32_t m_geo_iop_data;
-	int m_to_68k;
 
 	uint32_t m_geo_read_start_address;
 	uint32_t m_geo_write_start_address;
@@ -137,8 +126,7 @@ public:
 	raster_state *m_raster;
 	geo_state *m_geo;
 	bitmap_rgb32 m_sys24_bitmap;
-	uint32_t m_videocontrol;
-	uint32_t m_soundack;
+//	uint32_t m_soundack;
 	void model2_check_irq_state();
 	void model2_check_irqack_state(uint32_t data);
 	uint8_t m_gearsel;
@@ -276,6 +264,19 @@ protected:
 private:
 	void tri_list_dump(FILE *dst);
 
+	uint32_t m_intreq;
+	uint32_t m_intena;
+	uint32_t m_coproctl;
+	uint32_t m_coprocnt;
+	uint32_t m_geoctl;
+	uint32_t m_geocnt;
+	uint32_t m_videocontrol;
+	int m_port_1c00004;
+	int m_port_1c00006;
+	int m_port_1c00010;
+	int m_port_1c00012;
+	int m_port_1c00014;
+
 	bool m_render_unk;
 	bool m_render_mode;
 	int16 m_crtc_xoffset, m_crtc_yoffset;
@@ -319,7 +320,7 @@ private:
 	// inliners
 	inline void model2_3d_project( triangle *tri );
 	inline uint16_t float_to_zval( float floatval );
-
+	inline bool check_culling( raster_state *raster, uint32_t attr, float min_z, float max_z );
 };
 
 /*****************************

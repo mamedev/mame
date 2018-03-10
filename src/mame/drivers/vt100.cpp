@@ -23,9 +23,12 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
+#include "machine/ay31015.h"
 #include "machine/com8116.h"
 #include "machine/er1400.h"
 #include "machine/i8251.h"
+#include "machine/ins8250.h"
+#include "machine/rstbuf.h"
 #include "machine/vt100_kbd.h"
 #include "video/vtvideo.h"
 #include "screen.h"
@@ -43,8 +46,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "vt100_video"),
 		m_keyboard(*this, "keyboard"),
+		m_kbduart(*this, "kbduart"),
 		m_dbrg(*this, "dbrg"),
 		m_nvr(*this, "nvr"),
+		m_rstbuf(*this, "rstbuf"),
+		m_printer_uart(*this, "printer_uart"),
 		m_p_ram(*this, "p_ram")
 	{
 	}
@@ -52,29 +58,29 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<vt100_video_device> m_crtc;
 	required_device<vt100_keyboard_device> m_keyboard;
+	required_device<ay31015_device> m_kbduart;
 	required_device<com8116_device> m_dbrg;
 	required_device<er1400_device> m_nvr;
+	required_device<rst_pos_buffer_device> m_rstbuf;
+	optional_device<ins8250_device> m_printer_uart;
 	DECLARE_READ8_MEMBER(vt100_flags_r);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_int_w);
-	DECLARE_WRITE8_MEMBER(vt100_keyboard_w);
-	DECLARE_READ8_MEMBER(vt100_keyboard_r);
 	DECLARE_WRITE8_MEMBER(vt100_baud_rate_w);
 	DECLARE_WRITE8_MEMBER(vt100_nvr_latch_w);
+	DECLARE_READ8_MEMBER(printer_r);
+	DECLARE_WRITE8_MEMBER(printer_w);
 	DECLARE_READ8_MEMBER(vt100_read_video_ram_r);
-	DECLARE_WRITE_LINE_MEMBER(vert_freq_intr_w);
+	DECLARE_WRITE8_MEMBER(uart_clock_w);
 	required_shared_ptr<uint8_t> m_p_ram;
-	bool m_keyboard_int;
-	bool m_receiver_int;
-	bool m_vertical_int;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	IRQ_CALLBACK_MEMBER(vt100_irq_callback);
+	IRQ_CALLBACK_MEMBER(vt102_irq_callback);
 	void vt102(machine_config &config);
 	void vt100(machine_config &config);
 	void vt180(machine_config &config);
 	void vt100_io(address_map &map);
 	void vt100_mem(address_map &map);
+	void vt102_io(address_map &map);
 	void vt180_io(address_map &map);
 	void vt180_mem(address_map &map);
 };
@@ -119,25 +125,8 @@ READ8_MEMBER( vt100_state::vt100_flags_r )
 
 	ret |= !m_nvr->data_r() << 5;
 	ret |= m_crtc->lba7_r() << 6;
-	ret |= m_keyboard_int << 7;
+	ret |= m_kbduart->tbmt_r() << 7;
 	return ret;
-}
-
-WRITE_LINE_MEMBER(vt100_state::keyboard_int_w)
-{
-	m_keyboard_int = state;
-	if (state)
-		m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
-WRITE8_MEMBER( vt100_state::vt100_keyboard_w )
-{
-	m_keyboard->control_w(data);
-}
-
-READ8_MEMBER( vt100_state::vt100_keyboard_r )
-{
-	return m_keyboard->key_code_r();
 }
 
 WRITE8_MEMBER( vt100_state::vt100_baud_rate_w )
@@ -173,16 +162,29 @@ ADDRESS_MAP_START(vt100_state::vt100_io)
 	AM_RANGE (0x42, 0x42) AM_DEVWRITE("vt100_video", vt100_video_device, brightness_w)
 	// 0x62 NVR latch
 	AM_RANGE (0x62, 0x62) AM_WRITE(vt100_nvr_latch_w)
-	// 0x82 Keyboard UART data output
-	AM_RANGE (0x82, 0x82) AM_READ(vt100_keyboard_r)
-	// 0x82 Keyboard UART data input
-	AM_RANGE (0x82, 0x82) AM_WRITE(vt100_keyboard_w)
+	// 0x82 Keyboard UART data
+	AM_RANGE (0x82, 0x82) AM_DEVREADWRITE("kbduart", ay31015_device, receive, transmit)
 	// 0xA2 Video processor DC012
 	AM_RANGE (0xa2, 0xa2) AM_DEVWRITE("vt100_video", vt100_video_device, dc012_w)
 	// 0xC2 Video processor DC011
 	AM_RANGE (0xc2, 0xc2) AM_DEVWRITE("vt100_video", vt100_video_device, dc011_w)
 	// 0xE2 Graphics port
 	// AM_RANGE (0xe2, 0xe2)
+ADDRESS_MAP_END
+
+READ8_MEMBER(vt100_state::printer_r)
+{
+	return m_printer_uart->ins8250_r(space, offset >> 2);
+}
+
+WRITE8_MEMBER(vt100_state::printer_w)
+{
+	m_printer_uart->ins8250_w(space, offset >> 2, data);
+}
+
+ADDRESS_MAP_START(vt100_state::vt102_io)
+	AM_IMPORT_FROM(vt100_io)
+	AM_RANGE(0x03, 0x03) AM_SELECT(0x1c) AM_READWRITE(printer_r, printer_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -201,30 +203,27 @@ uint32_t vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &b
 //          A4 - receiver
 //          A5 - vertical frequency
 //          all other set to 1
-IRQ_CALLBACK_MEMBER(vt100_state::vt100_irq_callback)
+IRQ_CALLBACK_MEMBER(vt100_state::vt102_irq_callback)
 {
-	uint8_t ret = 0xc7 | (m_keyboard_int << 3) | (m_receiver_int << 4) | (m_vertical_int << 5);
-	m_receiver_int = 0;
-	return ret;
+	if (irqline == 0)
+		return m_rstbuf->inta_cb(device, 0);
+	else
+		return 0xff;
 }
 
 void vt100_state::machine_start()
 {
+	m_kbduart->write_tsb(0);
+	m_kbduart->write_eps(1);
+	m_kbduart->write_np(1);
+	m_kbduart->write_nb1(1);
+	m_kbduart->write_nb2(1);
+	m_kbduart->write_cs(1);
+	m_kbduart->write_swe(0);
 }
 
 void vt100_state::machine_reset()
 {
-	m_keyboard_int = 0;
-	m_receiver_int = 0;
-	m_vertical_int = 0;
-	output().set_value("online_led",1);
-	output().set_value("local_led", 0);
-	output().set_value("locked_led",1);
-	output().set_value("l1_led", 1);
-	output().set_value("l2_led", 1);
-	output().set_value("l3_led", 1);
-	output().set_value("l4_led", 1);
-
 	vt100_nvr_latch_w(machine().dummy_space(), 0, 0);
 }
 
@@ -233,11 +232,15 @@ READ8_MEMBER( vt100_state::vt100_read_video_ram_r )
 	return m_p_ram[offset];
 }
 
-WRITE_LINE_MEMBER( vt100_state::vert_freq_intr_w )
+WRITE8_MEMBER(vt100_state::uart_clock_w)
 {
-	m_vertical_int = (state == ASSERT_LINE) ? 1 : 0;
-	if (state)
-		m_maincpu->set_input_line(0, HOLD_LINE);
+	m_kbduart->write_tcp(BIT(data, 1));
+	m_kbduart->write_rcp(BIT(data, 1));
+
+	if (data == 0 || data == 3)
+		m_keyboard->signal_line_w(m_kbduart->so_r());
+	else
+		m_keyboard->signal_line_w(BIT(data, 0));
 }
 
 /* F4 Character Displayer */
@@ -263,7 +266,7 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_CPU_ADD("maincpu", I8080, XTAL(24'883'200) / 9)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
 	MCFG_CPU_IO_MAP(vt100_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("rstbuf", rst_pos_buffer_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -281,13 +284,15 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_VT_SET_SCREEN("screen")
 	MCFG_VT_CHARGEN("chargen")
 	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(vt100_state, vt100_read_video_ram_r))
-	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE(vt100_state, vert_freq_intr_w))
+	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(DEVWRITELINE("rstbuf", rst_pos_buffer_device, rst4_w))
+	MCFG_VT_VIDEO_LBA3_LBA4_CALLBACK(WRITE8(vt100_state, uart_clock_w))
 	MCFG_VT_VIDEO_LBA7_CALLBACK(DEVWRITELINE("nvr", er1400_device, clock_w))
 
 	MCFG_DEVICE_ADD("pusart", I8251, XTAL(24'883'200) / 9)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("rstbuf", rst_pos_buffer_device, rst2_w))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxd))
@@ -300,7 +305,14 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_DEVICE_ADD("nvr", ER1400, 0)
 
 	MCFG_DEVICE_ADD("keyboard", VT100_KEYBOARD, 0)
-	MCFG_VT100_KEYBOARD_INT_CALLBACK(WRITELINE(vt100_state, keyboard_int_w))
+	MCFG_VT100_KEYBOARD_SIGNAL_OUT_CALLBACK(DEVWRITELINE("kbduart", ay31015_device, write_si))
+
+	MCFG_DEVICE_ADD("kbduart", AY31015, 0)
+	MCFG_AY31015_WRITE_DAV_CB(DEVWRITELINE("rstbuf", rst_pos_buffer_device, rst1_w))
+	MCFG_AY31015_AUTO_RDAV(true)
+
+	MCFG_DEVICE_ADD("rstbuf", RST_POS_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vt100_state::vt180)
@@ -314,15 +326,27 @@ MACHINE_CONFIG_START(vt100_state::vt102)
 	vt100(config);
 	MCFG_CPU_REPLACE("maincpu", I8085A, XTAL(24'073'400) / 4)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
-	MCFG_CPU_IO_MAP(vt100_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state,vt100_irq_callback)
+	MCFG_CPU_IO_MAP(vt102_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vt100_state, vt102_irq_callback)
 
 	MCFG_DEVICE_MODIFY("pusart")
 	MCFG_DEVICE_CLOCK(XTAL(24'073'400) / 8)
+	MCFG_I8251_TXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST75_LINE))
 
 	MCFG_DEVICE_REPLACE("dbrg", COM8116_003, XTAL(24'073'400) / 4)
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxc))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("pusart", i8251_device, write_txc))
+
+	MCFG_DEVICE_MODIFY("kbduart")
+	MCFG_AY31015_WRITE_TBMT_CB(INPUTLINE("maincpu", I8085_RST65_LINE))
+
+	MCFG_DEVICE_ADD("printer_uart", INS8250, XTAL(24'073'400) / 16)
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("printer", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", I8085_RST55_LINE))
+
+	MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("printer_uart", ins8250_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("printer_uart", ins8250_device, dsr_w))
 MACHINE_CONFIG_END
 
 /* VT1xx models:

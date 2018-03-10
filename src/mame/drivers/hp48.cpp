@@ -1262,10 +1262,10 @@ MACHINE_CONFIG_START(hp48_state::hp48_common)
 	/* cpu */
 	MCFG_CPU_ADD ( "maincpu", SATURN, 3937007 ) /* almost 4 MHz */
 	MCFG_CPU_PROGRAM_MAP ( hp48)
-	MCFG_SATURN_CONFIG( WRITE32(hp48_state, hp48_reg_out), READ32(hp48_state, hp48_reg_in),
-						WRITELINE(hp48_state, hp48_mem_reset), WRITE32(hp48_state, hp48_mem_config),
-						WRITE32(hp48_state, hp48_mem_unconfig), READ32(hp48_state, hp48_mem_id),
-						WRITE32(hp48_state, hp48_mem_crc), WRITELINE(hp48_state, hp48_rsi) )
+	MCFG_SATURN_CONFIG( WRITE32(hp48_state, reg_out), READ32(hp48_state, reg_in),
+						WRITELINE(hp48_state, mem_reset), WRITE32(hp48_state, mem_config),
+						WRITE32(hp48_state, mem_unconfig), READ32(hp48_state, mem_id),
+						WRITE32(hp48_state, mem_crc), WRITELINE(hp48_state, rsi) )
 
 	/* memory */
 	MCFG_NVRAM_ADD_0FILL("nvram")

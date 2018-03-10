@@ -101,8 +101,8 @@ JoJo's Venture                                             JJK98cA0F  CP3000U0G 
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-2   CAP-JJK-160  990108
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-3   CAP-JJK-161  990128
 
-Street Fighter III 3rd Strike: Fight for the Future  1999  33S99400F  CP300000G  JAPAN*  X          CAP-33S000  CAP-33S-1   CAP-33S-1    990512
-Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN*  X          CAP-33S000  CAP-33S-2   CAP-33S-2    990608
+Street Fighter III 3rd Strike: Fight for the Future  1999  33S99400F  CP300000G  JAPAN   X          CAP-33S000  CAP-33S-1   CAP-33S-1    990512
+Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN   X          CAP-33S000  CAP-33S-2   CAP-33S-2    990608
 Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN       X                                           990512
 Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN       X                                           990608
 Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000B0G  EUROPE  X          CAP-33S0A0  CAP-33S-1   CAP-33S-1    990512
@@ -2792,6 +2792,22 @@ ROM_START( sfiii3ur1 )
 	DISK_IMAGE_READONLY( "cap-33s-1", 0, BAD_DUMP SHA1(2f4a9006a31903114f9f9dc09465ae253e565c51) )
 ROM_END
 
+ROM_START( sfiii3j )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "sfiii3_japan.29f400.u2", 0x000000, 0x080000, CRC(63f23d1f) SHA1(58559403c325454f8c8d3eb0f569a531aa22db26) )
+
+	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_IMAGE_READONLY( "cap-33s-2", 0, BAD_DUMP SHA1(41b0e246db91cbfc3f8f0f62d981734feb4b4ab5) )
+ROM_END
+
+ROM_START( sfiii3jr1 )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "sfiii3_japan.29f400.u2", 0x000000, 0x080000, CRC(63f23d1f) SHA1(58559403c325454f8c8d3eb0f569a531aa22db26) )
+
+	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_IMAGE_READONLY( "cap-33s-1", 0, BAD_DUMP SHA1(2f4a9006a31903114f9f9dc09465ae253e565c51) )
+ROM_END
+
 
 ROM_START( jojoba )
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
@@ -3926,11 +3942,13 @@ GAME( 1998, jojonr2,   jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0
 // 990608
 GAME( 1999, sfiii3,    0,        sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990608)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, sfiii3u,   sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990608)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3j,   sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, sfiii3n,   sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
 
 // 990512
 GAME( 1999, sfiii3r1,  sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990512)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, sfiii3ur1, sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990512)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3jr1, sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, sfiii3nr1, sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* JoJo's Bizarre Adventure / JoJo no Kimyou na Bouken: Mirai e no Isan */

@@ -454,15 +454,6 @@ ADDRESS_MAP_START(twincobr_state::DSP_io_map)
 ADDRESS_MAP_END
 
 
-/******************* Flying Shark Bootleg i8741 Memory Map *******************/
-
-ADDRESS_MAP_START(twincobr_state::fsharkbt_i8741_io_map)
-	/* IO map unknown as program code isn't dumped */
-ADDRESS_MAP_END
-
-	/* $000 - 3fF  I8741 Internal Program ROM Address Space */
-
-
 /*****************************************************************************
     Input Port definitions
 *****************************************************************************/
@@ -739,7 +730,6 @@ MACHINE_CONFIG_START(twincobr_state::fsharkbt)
 
 	MCFG_CPU_ADD("mcu", I8741, XTAL(28'000'000)/16)
 	/* Program Map is internal to the CPU */
-	MCFG_CPU_IO_MAP(fsharkbt_i8741_io_map)
 	MCFG_DEVICE_DISABLE()       /* Internal program code is not dumped */
 MACHINE_CONFIG_END
 

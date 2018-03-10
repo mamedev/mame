@@ -29,6 +29,7 @@ References:
 #include "machine/ay31015.h"
 #include "machine/clock.h"
 #include "machine/com8116.h"
+#include "machine/input_merger.h"
 #include "machine/kb3600.h"
 #include "machine/netlist.h"
 #include "machine/nl_hazelvid.h"
@@ -121,6 +122,7 @@ public:
 		, m_misc_dips(*this, MISCPORT_TAG)
 		, m_kbd_misc_keys(*this, MISCKEYS_TAG)
 		, m_screen(*this, SCREEN_TAG)
+		, m_mainint(*this, "mainint")
 		, m_iowq_timer(nullptr)
 		, m_status_reg_3(0)
 		, m_kbd_status_latch(0)
@@ -140,8 +142,6 @@ public:
 	static const device_timer_id TIMER_IOWQ = 0;
 
 	uint32_t screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	DECLARE_WRITE_LINE_MEMBER(com5016_fr_w);
 
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -209,6 +209,8 @@ private:
 
 	required_device<screen_device> m_screen;
 
+	required_device<input_merger_device> m_mainint;
+
 	emu_timer* m_iowq_timer;
 
 	uint8_t m_status_reg_3;
@@ -231,6 +233,8 @@ void hazl1500_state::machine_start()
 	m_iowq_timer = timer_alloc(TIMER_IOWQ);
 	m_iowq_timer->adjust(attotime::never);
 
+	m_uart->write_swe(0);
+
 	save_item(NAME(m_status_reg_3));
 	save_item(NAME(m_kbd_status_latch));
 	save_item(NAME(m_refresh_address));
@@ -250,12 +254,6 @@ void hazl1500_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	m_cpu_iowq->write(1);
 	m_cpu_ba4->write(1);
-}
-
-WRITE_LINE_MEMBER( hazl1500_state::com5016_fr_w )
-{
-	m_uart->rx_process();
-	m_uart->tx_process();
 }
 
 uint32_t hazl1500_state::screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -340,16 +338,17 @@ READ8_MEMBER( hazl1500_state::status_reg_2_r )
 WRITE8_MEMBER( hazl1500_state::status_reg_3_w )
 {
 	m_status_reg_3 = data;
+	m_uart->write_rdav(BIT(data, 2));
 }
 
 READ8_MEMBER( hazl1500_state::uart_r )
 {
-	return m_uart->get_received_data();
+	return (m_uart->get_received_data() & 0x7f) | (m_uart->pe_r() << 7);
 }
 
 WRITE8_MEMBER( hazl1500_state::uart_w )
 {
-	m_uart->set_transmit_data(data);
+	m_uart->set_transmit_data((data & 0x7f) | (BIT(m_misc_dips->read(), 3) ? 0x00 : 0x80));
 }
 
 READ8_MEMBER( hazl1500_state::kbd_status_latch_r )
@@ -410,12 +409,12 @@ NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::tvinterq_cb)
 	if (int(data) > 1)
 	{
 		m_kbd_status_latch &= ~KBD_STATUS_TV_INT;
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+		m_mainint->in_w<1>(0);
 	}
 	else
 	{
 		m_kbd_status_latch |= KBD_STATUS_TV_INT;
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_mainint->in_w<1>(1);
 	}
 }
 
@@ -696,6 +695,9 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	MCFG_CPU_IO_MAP(hazl1500_io)
 	MCFG_QUANTUM_PERFECT_CPU(CPU_TAG)
 
+	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE(CPU_TAG, INPUT_LINE_IRQ0))
+
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(hazl1500_state, screen_update_hazl1500)
@@ -710,9 +712,11 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hazl1500)
 
 	MCFG_DEVICE_ADD(BAUDGEN_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(hazl1500_state, com5016_fr_w))
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("uart", ay51013_device, write_tcp))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", ay51013_device, write_rcp))
 
 	MCFG_DEVICE_ADD(UART_TAG, AY51013, 0)
+	MCFG_AY51013_WRITE_DAV_CB(DEVWRITELINE("mainint", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, VIDEOBRD_CLOCK)
 	MCFG_NETLIST_SETUP(hazelvid)

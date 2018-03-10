@@ -73,6 +73,8 @@ dynlib::dynlib(const pstring libname)
 	//else
 	//  fprintf(stderr, "win: library <%s> not found!\n", libname.c_str());
 	pfree_array(buffer);
+#elif defined(EMSCRIPTEN)
+	//no-op
 #else
 	//printf("loading <%s>\n", libname.c_str());
 	if (libname != "")
@@ -103,6 +105,8 @@ dynlib::dynlib(const pstring path, const pstring libname)
 		//printf("win: library <%s> not found!\n", libname.c_str());
 	}
 	pfree_array(buffer);
+#elif defined(EMSCRIPTEN)
+	//no-op
 #else
 	//printf("loading <%s>\n", libname.c_str());
 	if (libname != "")

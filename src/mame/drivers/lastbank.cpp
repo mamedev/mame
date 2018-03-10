@@ -15,6 +15,7 @@
 #include "sound/2203intf.h"
 #include "sound/es8712.h"
 #include "sound/okim6295.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/tc009xlvc.h"
 #include "machine/timer.h"
@@ -28,11 +29,12 @@ class lastbank_state : public driver_device
 {
 public:
 	lastbank_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_vdp(*this, "tc0091lvc"),
-		m_oki(*this, "oki"),
-		m_essnd(*this, "essnd")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_vdp(*this, "tc0091lvc")
+		, m_oki(*this, "oki")
+		, m_essnd(*this, "essnd")
+		, m_mainbank(*this, "mainbank")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -40,7 +42,9 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<es8712_device> m_essnd;
 
-	virtual void video_start() override;
+	required_memory_bank m_mainbank;
+
+	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
@@ -49,43 +53,30 @@ public:
 	uint8_t m_irq_vector[3];
 	uint8_t m_irq_enable;
 	uint8_t m_mux_data;
-	uint8_t m_soundlatch[2];
 	uint8_t m_sound_flags;
 
-	DECLARE_READ8_MEMBER(lastbank_rom_r);
-
-	DECLARE_READ8_MEMBER(lastbank_ram_0_r);
-	DECLARE_READ8_MEMBER(lastbank_ram_1_r);
-	DECLARE_READ8_MEMBER(lastbank_ram_2_r);
-	DECLARE_READ8_MEMBER(lastbank_ram_3_r);
-	DECLARE_WRITE8_MEMBER(lastbank_ram_0_w);
-	DECLARE_WRITE8_MEMBER(lastbank_ram_1_w);
-	DECLARE_WRITE8_MEMBER(lastbank_ram_2_w);
-	DECLARE_WRITE8_MEMBER(lastbank_ram_3_w);
+	template<int Bank> DECLARE_READ8_MEMBER(ram_r);
+	template<int Bank> DECLARE_WRITE8_MEMBER(ram_w);
 
 	DECLARE_WRITE8_MEMBER(output_w);
 
 	DECLARE_READ8_MEMBER(mux_0_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
-
-	DECLARE_READ8_MEMBER(soundlatch1_r);
-	DECLARE_READ8_MEMBER(soundlatch2_r);
 	DECLARE_WRITE8_MEMBER(sound_flags_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r);
 
-	DECLARE_READ8_MEMBER(lastbank_rom_bank_r);
-	DECLARE_WRITE8_MEMBER(lastbank_rom_bank_w);
-	DECLARE_READ8_MEMBER(lastbank_ram_bank_r);
-	DECLARE_WRITE8_MEMBER(lastbank_ram_bank_w);
-	DECLARE_READ8_MEMBER(lastbank_irq_vector_r);
-	DECLARE_WRITE8_MEMBER(lastbank_irq_vector_w);
-	DECLARE_READ8_MEMBER(lastbank_irq_enable_r);
-	DECLARE_WRITE8_MEMBER(lastbank_irq_enable_w);
+	DECLARE_READ8_MEMBER(rom_bank_r);
+	DECLARE_WRITE8_MEMBER(rom_bank_w);
+	DECLARE_READ8_MEMBER(ram_bank_r);
+	DECLARE_WRITE8_MEMBER(ram_bank_w);
+	DECLARE_READ8_MEMBER(irq_vector_r);
+	DECLARE_WRITE8_MEMBER(irq_vector_w);
+	DECLARE_READ8_MEMBER(irq_enable_r);
+	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	
+	DECLARE_DRIVER_INIT(lastbank);
 
-	uint8_t ram_bank_r(uint16_t offset, uint8_t bank_num);
-	void ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num);
-	TIMER_DEVICE_CALLBACK_MEMBER(lastbank_irq_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline);
 	void lastbank(machine_config &config);
 	void lastbank_audio_io(address_map &map);
 	void lastbank_audio_map(address_map &map);
@@ -93,8 +84,14 @@ public:
 	void tc0091lvc_map(address_map &map);
 };
 
-void lastbank_state::video_start()
+void lastbank_state::machine_start()
 {
+	save_item(NAME(m_ram_bank));
+	save_item(NAME(m_rom_bank));
+	save_item(NAME(m_irq_vector));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_sound_flags));
 }
 
 uint32_t lastbank_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -114,74 +111,61 @@ WRITE_LINE_MEMBER(lastbank_state::screen_vblank)
 	}
 }
 
-READ8_MEMBER(lastbank_state::lastbank_rom_r)
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	return ROM[offset + m_rom_bank * 0x2000];
-}
-
-READ8_MEMBER(lastbank_state::lastbank_rom_bank_r)
+READ8_MEMBER(lastbank_state::rom_bank_r)
 {
 	return m_rom_bank;
 }
 
-WRITE8_MEMBER(lastbank_state::lastbank_rom_bank_w)
+WRITE8_MEMBER(lastbank_state::rom_bank_w)
 {
-	m_rom_bank = data;
+	if (m_rom_bank != data)
+	{
+		m_rom_bank = data;
+		m_mainbank->set_entry(m_rom_bank);
+	}
 }
 
-READ8_MEMBER(lastbank_state::lastbank_irq_vector_r)
+READ8_MEMBER(lastbank_state::irq_vector_r)
 {
 	return m_irq_vector[offset];
 }
 
-WRITE8_MEMBER(lastbank_state::lastbank_irq_vector_w)
+WRITE8_MEMBER(lastbank_state::irq_vector_w)
 {
 	m_irq_vector[offset] = data;
 }
 
-READ8_MEMBER(lastbank_state::lastbank_irq_enable_r)
+READ8_MEMBER(lastbank_state::irq_enable_r)
 {
 	return m_irq_enable;
 }
 
-WRITE8_MEMBER(lastbank_state::lastbank_irq_enable_w)
+WRITE8_MEMBER(lastbank_state::irq_enable_w)
 {
 	m_irq_enable = data;
 }
 
-READ8_MEMBER(lastbank_state::lastbank_ram_bank_r)
+READ8_MEMBER(lastbank_state::ram_bank_r)
 {
 	return m_ram_bank[offset];
 }
 
-WRITE8_MEMBER(lastbank_state::lastbank_ram_bank_w)
+WRITE8_MEMBER(lastbank_state::ram_bank_w)
 {
 	m_ram_bank[offset] = data;
 }
 
-uint8_t lastbank_state::ram_bank_r(uint16_t offset, uint8_t bank_num)
+template<int Bank>
+READ8_MEMBER(lastbank_state::ram_r)
 {
-	address_space &vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
-	return vdp_space.read_byte(offset + (m_ram_bank[bank_num]) * 0x1000);;
+	return m_vdp->space().read_byte(offset + (m_ram_bank[Bank]) * 0x1000);;
 }
 
-void lastbank_state::ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num)
+template<int Bank>
+WRITE8_MEMBER(lastbank_state::ram_w)
 {
-	address_space &vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
-	vdp_space.write_byte(offset + (m_ram_bank[bank_num]) * 0x1000,data);;
+	m_vdp->space().write_byte(offset + (m_ram_bank[Bank]) * 0x1000,data);;
 }
-
-READ8_MEMBER(lastbank_state::lastbank_ram_0_r) { return ram_bank_r(offset, 0); }
-READ8_MEMBER(lastbank_state::lastbank_ram_1_r) { return ram_bank_r(offset, 1); }
-READ8_MEMBER(lastbank_state::lastbank_ram_2_r) { return ram_bank_r(offset, 2); }
-READ8_MEMBER(lastbank_state::lastbank_ram_3_r) { return ram_bank_r(offset, 3); }
-WRITE8_MEMBER(lastbank_state::lastbank_ram_0_w) { ram_bank_w(offset, data, 0); }
-WRITE8_MEMBER(lastbank_state::lastbank_ram_1_w) { ram_bank_w(offset, data, 1); }
-WRITE8_MEMBER(lastbank_state::lastbank_ram_2_w) { ram_bank_w(offset, data, 2); }
-WRITE8_MEMBER(lastbank_state::lastbank_ram_3_w) { ram_bank_w(offset, data, 3); }
-
 
 
 READ8_MEMBER(lastbank_state::mux_0_r)
@@ -226,21 +210,6 @@ WRITE8_MEMBER(lastbank_state::mux_w)
 	m_mux_data = data;
 }
 
-WRITE8_MEMBER(lastbank_state::soundlatch_w)
-{
-	m_soundlatch[offset] = data;
-}
-
-READ8_MEMBER(lastbank_state::soundlatch1_r)
-{
-	return m_soundlatch[0];
-}
-
-READ8_MEMBER(lastbank_state::soundlatch2_r)
-{
-	return m_soundlatch[1];
-}
-
 WRITE8_MEMBER(lastbank_state::sound_flags_w)
 {
 	m_sound_flags = data;
@@ -257,20 +226,20 @@ CUSTOM_INPUT_MEMBER(lastbank_state::sound_status_r)
 
 ADDRESS_MAP_START(lastbank_state::tc0091lvc_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_READ(lastbank_rom_r)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("mainbank")
 
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(lastbank_ram_0_r,lastbank_ram_0_w)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(lastbank_ram_1_r,lastbank_ram_1_w)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(lastbank_ram_2_r,lastbank_ram_2_w)
-	AM_RANGE(0xf000, 0xfdff) AM_READWRITE(lastbank_ram_3_r,lastbank_ram_3_w)
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(ram_r<0>,ram_w<0>)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(ram_r<1>,ram_w<1>)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(ram_r<2>,ram_w<2>)
+	AM_RANGE(0xf000, 0xfdff) AM_READWRITE(ram_r<3>,ram_w<3>)
 
 	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("tc0091lvc", tc0091lvc_device, vregs_r, vregs_w)
-	AM_RANGE(0xff00, 0xff02) AM_READWRITE(lastbank_irq_vector_r, lastbank_irq_vector_w)
-	AM_RANGE(0xff03, 0xff03) AM_READWRITE(lastbank_irq_enable_r, lastbank_irq_enable_w)
-	AM_RANGE(0xff04, 0xff07) AM_READWRITE(lastbank_ram_bank_r, lastbank_ram_bank_w)
-	AM_RANGE(0xff08, 0xff08) AM_READWRITE(lastbank_rom_bank_r, lastbank_rom_bank_w)
+	AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_vector_r, irq_vector_w)
+	AM_RANGE(0xff03, 0xff03) AM_READWRITE(irq_enable_r, irq_enable_w)
+	AM_RANGE(0xff04, 0xff07) AM_READWRITE(ram_bank_r, ram_bank_w)
+	AM_RANGE(0xff08, 0xff08) AM_READWRITE(rom_bank_r, rom_bank_w)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(lastbank_state::lastbank_map)
@@ -280,7 +249,8 @@ ADDRESS_MAP_START(lastbank_state::lastbank_map)
 	AM_RANGE(0xa800, 0xa802) AM_WRITE(output_w)
 	AM_RANGE(0xa803, 0xa803) AM_WRITE(mux_w) // mux for $a808 / $a80c
 	AM_RANGE(0xa804, 0xa804) AM_READ_PORT("SPECIAL")
-	AM_RANGE(0xa805, 0xa806) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xa805, 0xa805) AM_DEVWRITE("soundlatch1", generic_latch_8_device, write)
+	AM_RANGE(0xa806, 0xa806) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0xa807, 0xa807) AM_WRITENOP // hopper?
 	AM_RANGE(0xa808, 0xa808) AM_READ(mux_0_r)
 	AM_RANGE(0xa80c, 0xa80c) AM_READ(mux_0_r)
@@ -300,8 +270,9 @@ ADDRESS_MAP_START(lastbank_state::lastbank_audio_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x06) AM_DEVREADWRITE("essnd", es8712_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(soundlatch1_r) AM_WRITE(sound_flags_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch2_r)
+	AM_RANGE(0x80, 0x80) AM_WRITE(sound_flags_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( lastbank )
@@ -518,7 +489,7 @@ static GFXDECODE_START( lastbank )
 	GFXDECODE_ENTRY( "gfx1",        0, sp2_layout, 0, 16 )
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::lastbank_irq_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::irq_scanline)
 {
 	int scanline = param;
 
@@ -538,7 +509,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/4) //!!! TC0091LVC !!!
 	MCFG_CPU_PROGRAM_MAP(lastbank_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lastbank_state, lastbank_irq_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lastbank_state, irq_scanline, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -572,11 +543,20 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+	
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_ES8712_ADD("essnd", 12000)
+	MCFG_ES8712_ADD("essnd", 0)
+	MCFG_ES8712_MSM_WRITE_CALLBACK(DEVWRITE8("msm", msm6585_device, data_w))
+	MCFG_ES8712_MSM_TAG("msm")
+
+	MCFG_SOUND_ADD("msm", MSM6585, 640_kHz_XTAL) /* Not verified, It's actually MSM6585? */
+	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("essnd", es8712_device, msm_int))
+	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* Not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// A RTC-62421 is present on the Last Bank PCB. However, the code
@@ -608,4 +588,10 @@ ROM_START( lastbank )
 	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
 ROM_END
 
-GAME( 1994, lastbank,  0,   lastbank, lastbank, lastbank_state,  0, ROT0, "Excellent System", "Last Bank (v1.16)", 0 )
+DRIVER_INIT_MEMBER(lastbank_state,lastbank)
+{
+	uint32_t max = memregion("maincpu")->bytes() / 0x2000;
+	m_mainbank->configure_entries(0, max, memregion("maincpu")->base(), 0x2000);
+}
+
+GAME( 1994, lastbank,  0,   lastbank, lastbank, lastbank_state, lastbank, ROT0, "Excellent System", "Last Bank (v1.16)", 0 )

@@ -8,6 +8,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "agat7langcard.h"
 
 //#define VERBOSE 1

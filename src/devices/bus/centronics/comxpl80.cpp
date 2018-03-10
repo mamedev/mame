@@ -82,26 +82,12 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( comxpl80_io )
-//-------------------------------------------------
-
-ADDRESS_MAP_START(comx_pl80_device::comxpl80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_WRITE(pa_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(pb_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(pc_w)
-	AM_RANGE(0x03, 0x03) AM_READ(pd_r)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(comx_pl80_device::device_add_mconfig)
 	MCFG_CPU_ADD(CX005_TAG, M6805, 4000000) // CX005: some kind of MC6805/MC68HC05 clone
 	MCFG_CPU_PROGRAM_MAP(comxpl80_mem)
-	MCFG_CPU_IO_MAP(comxpl80_io)
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 

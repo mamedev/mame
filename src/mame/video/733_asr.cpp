@@ -82,10 +82,11 @@ PALETTE_INIT_MEMBER(asr733_device, asr733)
 DEFINE_DEVICE_TYPE(ASR733, asr733_device, "asr733", "733 ASR")
 
 asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ASR733, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, GFXDECODE_NAME(asr733), "palette"),
-		m_keyint_line(*this),
-		m_lineint_line(*this)
+	: device_t(mconfig, ASR733, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, GFXDECODE_NAME(asr733), "palette")
+	, m_screen(*this, "screen")
+	, m_keyint_line(*this)
+	, m_lineint_line(*this)
 {
 }
 
@@ -95,10 +96,9 @@ asr733_device::asr733_device(const machine_config &mconfig, const char *tag, dev
 
 void asr733_device::device_start()
 {
-	screen_device *screen = machine().first_screen();
-	int width = screen->width();
-	int height = screen->height();
-	const rectangle &visarea = screen->visible_area();
+	int width = m_screen->width();
+	int height = m_screen->height();
+	const rectangle &visarea = m_screen->visible_area();
 
 	m_last_key_pressed = 0x80;
 	m_bitmap = std::make_unique<bitmap_ind16>(width, height);

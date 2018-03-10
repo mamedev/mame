@@ -1272,7 +1272,45 @@ void adsp21062_device::compute_fmul_avg(int fm, int fxm, int fym, int fa, int fx
 	r_mul.f = FREG(fxm) * FREG(fym);
 	r_alu.f = (FREG(fxa) * FREG(fya))/((float) 2.0);
 
-	/* TODO: are flags right for this? */
+	// TODO: are flags right for this?
+	if (m_core->mode1 & MODE1_TRUNCATE)
+	{
+		alu_i = (int32_t)(r_alu.f);
+	}
+	else
+	{
+		alu_i = (int32_t)(r_alu.f < 0 ? (r_alu.f - 0.5f) : (r_alu.f + 0.5f));
+	}
+
+	CLEAR_MULTIPLIER_FLAGS();
+	SET_FLAG_MN(r_mul.r);
+	/* TODO: MV flag */
+	/* TODO: MU flag */
+	/* TODO: MI flag */
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AN(alu_i);
+	// AZ
+	SET_FLAG_AZ(alu_i);
+	// AU
+	m_core->stky |= (IS_FLOAT_DENORMAL(r_alu.r)) ? AUS : 0;
+	// AI
+	m_core->astat |= (IS_FLOAT_NAN(REG(fxa))) ? AI : 0;
+	/* TODO: AV flag */
+
+	FREG(fm) = r_mul.f;
+	REG(fa) = alu_i;
+	m_core->astat |= AF;
+}
+
+void adsp21062_device::compute_fmul_abs(int fm, int fxm, int fym, int fa, int fxa, int fya)
+{
+	int32_t alu_i;
+	SHARC_REG r_mul, r_alu;
+	r_mul.f = FREG(fxm) * FREG(fym);
+	r_alu.f = (float) fabs(FREG(fxa));
+
+	// TODO: are flags right for this?
 	if (m_core->mode1 & MODE1_TRUNCATE)
 	{
 		alu_i = (int32_t)(r_alu.f);

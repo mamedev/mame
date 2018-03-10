@@ -402,6 +402,7 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 			switch (reg)
 			{
 				case 0x5:   m_core->pcstkp = data; break;     /* PCSTKP */
+				case 0x7:   m_core->curlcntr = data; break;   /* CURLCNTR (Zero Gunner 2B) */
 				case 0x8:   m_core->lcntr = data; break;      /* LCNTR */
 				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
@@ -739,12 +740,20 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 				break;
 			}
 
-			case 0x1c: /* TODO! fmul_avg */
+			// TODO: verify this (last bronx)
+			case 0x1c:
 			{
 				compute_fmul_avg(fm, fxm, fym, fa, fxa, fya);
 				break;
 			}
 
+			// TODO: verify this (Gunblade NY Score Attack Remix mode)
+			case 0x1d: 
+			{
+				compute_fmul_abs(fm, fxm, fym, fa, fxa, fya);
+				break;
+			}
+			
 			case 0x1e:      /* Fm = Fxm * Fym,   Fa = MAX(Fxa, Fya) */
 			{
 				compute_fmul_fmax(fm, fxm, fym, fa, fxa, fya);

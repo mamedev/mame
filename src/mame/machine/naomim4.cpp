@@ -42,7 +42,7 @@ static uint8_t cfidata[] = {
 
 ADDRESS_MAP_START(naomi_m4_board::submap)
 	AM_IMPORT_FROM(naomi_board::submap)
-	AM_RANGE(0x1a, 0x1b) AM_READ(m4_id_r)
+	AM_RANGE(0x1a, 0x1b) AM_READ(m4_id_r) // Read: bits 8-15 - 0x55, bit 7 - 1 if IC7 EPR rom enabled; Write: bit 0 - master/slave board selection.
 ADDRESS_MAP_END
 
 naomi_m4_board::naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

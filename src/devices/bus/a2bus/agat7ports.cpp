@@ -14,6 +14,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "agat7ports.h"
 
 //#define VERBOSE 1
@@ -80,6 +81,7 @@ ioport_constructor a2bus_agat7_ports_device::device_input_ports() const
 a2bus_agat7_ports_device::a2bus_agat7_ports_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a2bus_card_interface(mconfig, *this)
+	, m_printer_cfg(*this, "PRINTER_CFG")
 	, m_d9(*this, "d9")
 	, m_d10(*this, "d10")
 	, m_centronics(*this, "centronics")
@@ -185,7 +187,7 @@ WRITE8_MEMBER(a2bus_agat7_ports_device::write_portb)
  */
 READ8_MEMBER(a2bus_agat7_ports_device::read_portc)
 {
-	return (m_centronics_busy << 7) | ioport("PRINTER_CFG")->read();
+	return (m_centronics_busy << 7) | m_printer_cfg->read();
 }
 
 WRITE_LINE_MEMBER(a2bus_agat7_ports_device::write_centronics_busy)

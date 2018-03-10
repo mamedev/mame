@@ -1421,7 +1421,7 @@ void lynx_state::lynx_timer_signal_irq(int which)
 		lynx_timer_count_down(2);
 		break;
 	case 2:
-		copybitmap(m_bitmap, m_bitmap_temp, 0, 0, 0, 0, machine().first_screen()->cliprect());
+		copybitmap(m_bitmap, m_bitmap_temp, 0, 0, 0, 0, m_screen->cliprect());
 		lynx_timer_count_down(4);
 		break;
 	case 1:

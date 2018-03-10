@@ -33,7 +33,7 @@ only storage is paper-tape.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/ay31015.h"
+#include "machine/tms5501.h"
 #include "bus/rs232/rs232.h"
 
 
@@ -43,14 +43,15 @@ public:
 	mcb216_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_uart(*this, "uart")
+		, m_tms5501(*this, "tms5501")
 	{ }
 
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_WRITE8_MEMBER(port01_w);
+	DECLARE_READ8_MEMBER(tms5501_status_r);
+
 	DECLARE_MACHINE_RESET(mcb216);
 	DECLARE_MACHINE_RESET(cb308);
+
+	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	void mcb216(machine_config &config);
 	void cb308(machine_config &config);
@@ -59,8 +60,15 @@ public:
 	void mcb216_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<ay31015_device> m_uart;
+	required_device<tms5501_device> m_tms5501;
 };
+
+READ8_MEMBER(mcb216_state::tms5501_status_r)
+{
+	// D7  D6  D5  D4  D3  D2  D1  D0
+	// TBE RDA IPG TBE RDA SRV ORE FME
+	return bitswap<8>(m_tms5501->sta_r(space, 0), 4, 3, 5, 4, 3, 2, 1, 0);
+}
 
 ADDRESS_MAP_START(mcb216_state::mcb216_mem)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -71,8 +79,13 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(mcb216_state::mcb216_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(port01_r,port01_w)
+	// 74904 PROM provides custom remapping for TMS5501 registers
+	AM_RANGE(0x00, 0x00) AM_READ(tms5501_status_r) AM_DEVWRITE("tms5501", tms5501_device, rr_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("tms5501", tms5501_device, rb_r, tb_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("tms5501", tms5501_device, cmd_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE("tms5501", tms5501_device, rst_r, mr_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("tms5501", tms5501_device, xi_r, xo_w)
+	AM_RANGE(0x05, 0x09) AM_DEVWRITE("tms5501", tms5501_device, tmr_w)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(mcb216_state::cb308_mem)
@@ -87,85 +100,52 @@ static INPUT_PORTS_START( mcb216 )
 INPUT_PORTS_END
 
 
-READ8_MEMBER( mcb216_state::port01_r )
+IRQ_CALLBACK_MEMBER(mcb216_state::irq_callback)
 {
-	m_uart->write_rdav(0);
-	u8 result = m_uart->get_received_data();
-	m_uart->write_rdav(1);
-	return result;
-}
-
-// 0x40 - a keystroke is available
-// 0x80 - ok to send to terminal
-READ8_MEMBER( mcb216_state::port00_r )
-{
-	return (m_uart->dav_r() << 6) | (m_uart->tbmt_r() << 7);
-}
-
-WRITE8_MEMBER( mcb216_state::port01_w )
-{
-	m_uart->set_transmit_data(data);
+	return m_tms5501->get_vector();
 }
 
 MACHINE_RESET_MEMBER( mcb216_state, mcb216 )
 {
-	m_uart->write_xr(0);
-	m_uart->write_xr(1);
-	m_uart->write_swe(0);
-	m_uart->write_np(1);
-	m_uart->write_tsb(0);
-	m_uart->write_nb1(1);
-	m_uart->write_nb2(1);
-	m_uart->write_eps(1);
-	m_uart->write_cs(1);
-	m_uart->write_cs(0);
 }
 
 MACHINE_RESET_MEMBER( mcb216_state, cb308 )
 {
-	m_uart->write_xr(0);
-	m_uart->write_xr(1);
-	m_uart->write_swe(0);
-	m_uart->write_np(1);
-	m_uart->write_tsb(0);
-	m_uart->write_nb1(1);
-	m_uart->write_nb2(1);
-	m_uart->write_eps(1);
-	m_uart->write_cs(1);
-	m_uart->write_cs(0);
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 
 MACHINE_CONFIG_START(mcb216_state::mcb216)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
+	MCFG_CPU_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(mcb216_mem)
 	MCFG_CPU_IO_MAP(mcb216_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mcb216_state, irq_callback)
+
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, mcb216)
 
-	/* video hardware */
-	MCFG_DEVICE_ADD("uart", AY51013, 0) // exact uart type is unknown
-	MCFG_AY51013_TX_CLOCK(153600)
-	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD("tms5501", TMS5501, 8_MHz_XTAL / 4)
+	MCFG_TMS5501_XMT_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
+
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("tms5501", tms5501_device, rcv_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mcb216_state::cb308)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
+	MCFG_CPU_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(cb308_mem)
 	MCFG_CPU_IO_MAP(mcb216_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mcb216_state, irq_callback)
+
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, cb308)
 
-	/* video hardware */
-	MCFG_DEVICE_ADD("uart", AY51013, 0) // exact uart type is unknown
-	MCFG_AY51013_TX_CLOCK(153600)
-	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD("tms5501", TMS5501, 8_MHz_XTAL / 4)
+	MCFG_TMS5501_XMT_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
+
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("tms5501", tms5501_device, rcv_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -173,6 +153,9 @@ ROM_START( mcb216 )
 	ROM_REGION(0x1000, "roms", 0)
 	ROM_LOAD( "mcb216r0", 0x0000, 0x0800, CRC(86d20cea) SHA1(9fb8fdbcb8d31bd3304a0b3339c7f423188e9d37) )
 	ROM_LOAD( "mcb216r1", 0x0800, 0x0800, CRC(68a25b2c) SHA1(3eadd4a5d65726f767742deb4b51a97df813f37d) )
+
+	ROM_REGION(0x20, "prom", 0)
+	ROM_LOAD( "74904.ic25", 0x00, 0x20, NO_DUMP ) // TBP18S030 or equivalent
 ROM_END
 
 ROM_START( cb308 )
@@ -181,6 +164,9 @@ ROM_START( cb308 )
 	ROM_LOAD( "cb308r1",  0x0400, 0x0400, CRC(03191ac1) SHA1(84665dfc797c9f51bb659291b18399986ed846fb) )
 	ROM_LOAD( "cb308r2",  0x0800, 0x0400, CRC(695ea521) SHA1(efe36a712e2a038ee804e556c5ebe05443cf798e) )
 	ROM_LOAD( "cb308r3",  0x0c00, 0x0400, CRC(e3e4a778) SHA1(a7c14458f8636d860ae25b10387fa6f7f2ef6ef9) )
+
+	ROM_REGION(0x20, "prom", 0)
+	ROM_LOAD( "74904.ic25", 0x00, 0x20, NO_DUMP ) // TBP18S030 or equivalent
 ROM_END
 
 /* Driver */

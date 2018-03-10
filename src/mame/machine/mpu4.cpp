@@ -355,18 +355,19 @@ void mpu4_state::led_write_latch(int latch, int data, int column)
 	column = 7 - column; // like main board, these are wired up in reverse
 	data = ~data;//inverted drive lines?
 
-	for(i=0; i<5; i++)
+	for (i=0; i<5; i++)
 	{
+		// FIXME: this doesn't look like it could possibly be correct - it can produce 0..17 but with lots of aliasing
 		if (diff & (1<<i))
 		{
 			column += i;
 		}
 	}
-	for(j=0; j<8; j++)
+	for (j=0; j<8; j++)
 	{
-		output().set_indexed_value("mpu4led",(8*column)+j,(data & (1 << j)) !=0);
+		m_mpu4leds[(column << 3) | j], BIT(data, j);
 	}
-	output().set_digit_value(column * 8, data);
+	m_digits[column << 3] = data; // FIXME should this really be so sparse?
 
 	m_last_latch = diff;
 }
@@ -615,8 +616,8 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_portb_w)
 				if (m_lamps[lamps2[i]]) pled_segs[1] |= (1 << i);
 			}
 
-			output().set_digit_value(8,pled_segs[0]);
-			output().set_digit_value(9,pled_segs[1]);
+			m_digits[8] = pled_segs[0];
+			m_digits[9] = pled_segs[1];
 		}
 	}
 }
@@ -714,18 +715,17 @@ void mpu4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 /* IC4, 7 seg leds, 50Hz timer reel sensors, current sensors */
 WRITE8_MEMBER(mpu4_state::pia_ic4_porta_w)
 {
-	int i;
 	if(m_ic23_active)
 	{
-		if (((m_lamp_extender == NO_EXTENDER)||(m_lamp_extender == SMALL_CARD)||(m_lamp_extender == LARGE_CARD_C))&& (m_led_extender == NO_EXTENDER))
+		if (((m_lamp_extender == NO_EXTENDER) || (m_lamp_extender == SMALL_CARD) || (m_lamp_extender == LARGE_CARD_C)) && (m_led_extender == NO_EXTENDER))
 		{
 			if(m_led_strobe != m_input_strobe)
 			{
-				for(i=0; i<8; i++)
+				for(int i=0; i<8; i++)
 				{
-					output().set_indexed_value("mpu4led",((7 - m_input_strobe) * 8) +i,(data & (1 << i)) !=0);
+					m_mpu4leds[((7 - m_input_strobe) << 3) | i] = BIT(data, i);
 				}
-				output().set_digit_value(7 - m_input_strobe,data);
+				m_digits[7 - m_input_strobe] = data;
 			}
 			m_led_strobe = m_input_strobe;
 		}
@@ -875,13 +875,13 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 		{
 			led_write_latch(data & 0x1f, m_pia4->a_output(),m_input_strobe);
 		}
-		else if ((m_led_extender != CARD_A)&&(m_led_extender != NO_EXTENDER))
+		else if ((m_led_extender != CARD_A) && (m_led_extender != NO_EXTENDER))
 		{
 			for(i=0; i<8; i++)
 			{
-				output().set_indexed_value("mpu4led",((m_input_strobe + 8) * 8) +i,(data & (1 << i)) !=0);
+				m_mpu4leds[((m_input_strobe | 8) << 3) | i] = BIT(data, i);
 			}
-			output().set_digit_value((m_input_strobe+8),data);
+			m_digits[m_input_strobe | 8] = data;
 		}
 		break;
 
@@ -902,9 +902,9 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 		{
 			for(i=0; i<8; i++)
 			{
-				output().set_indexed_value("mpu4led",(((8*(m_last_b7 >>7))+ m_input_strobe) * 8) +i,(~data & (1 << i)) !=0);
+				m_mpu4leds[((m_last_b7 >> 7) << 6) | (m_input_strobe << 3) | i] = BIT(~data, i);
 			}
-			output().set_digit_value(((8*(m_last_b7 >>7))+m_input_strobe),~data);
+			m_digits[((m_last_b7 >> 7) << 3) | m_input_strobe] = ~data;
 		}
 		break;
 
@@ -1304,11 +1304,10 @@ WRITE8_MEMBER(mpu4_state::pia_ic8_portb_w)
 	{
 //      duart.drive_sensor(data & 0x04, data & 0x01, data & 0x04, data & 0x02);
 	}
-	int i;
 	LOG_IC8(("%s: IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", machine().describe_context(),data));
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		output().set_indexed_value("triac", i, data & (1 << i));
+		m_triacs[i] = BIT(data, i);
 	}
 }
 
@@ -2156,6 +2155,9 @@ void mpu4_state::mpu4_install_mod4bwb_space(address_space &space)
 void mpu4_state::mpu4_config_common()
 {
 	m_lamps.resolve();
+	m_mpu4leds.resolve();
+	m_digits.resolve();
+	m_triacs.resolve();
 
 	m_ic24_timer = timer_alloc(TIMER_IC24);
 	m_lamp_strobe_ext_persistence = 0;
@@ -2665,338 +2667,338 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_std_3reel)
 	MCFG_MPU4_STD_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_STD_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_STD_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type2_3reel)
 	MCFG_MPU4_TYPE2_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type3_3reel)
 	MCFG_MPU4_TYPE3_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type4_3reel)
 	MCFG_MPU4_TYPE4_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_bwb_3reel)
 	MCFG_MPU4_BWB_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_BWB_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_BWB_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_std_4reel)
 	MCFG_MPU4_STD_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_STD_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_STD_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_STD_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type2_4reel)
 	MCFG_MPU4_TYPE2_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type3_4reel)
 	MCFG_MPU4_TYPE3_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type4_4reel)
 	MCFG_MPU4_TYPE4_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_bwb_4reel)
 	MCFG_MPU4_BWB_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_BWB_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_BWB_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_BWB_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_std_5reel)
 	MCFG_MPU4_STD_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_STD_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_STD_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_STD_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_STD_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type2_5reel)
 	MCFG_MPU4_TYPE2_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type3_5reel)
 	MCFG_MPU4_TYPE3_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type4_5reel)
 	MCFG_MPU4_TYPE4_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_bwb_5reel)
 	MCFG_MPU4_BWB_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_BWB_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_BWB_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_BWB_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_BWB_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_std_6reel)
 	MCFG_MPU4_STD_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_STD_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_STD_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_STD_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_STD_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 	MCFG_MPU4_STD_REEL_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type2_6reel)
 	MCFG_MPU4_TYPE2_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel5_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<5>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type3_6reel)
 	MCFG_MPU4_TYPE3_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel5_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<5>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type4_6reel)
 	MCFG_MPU4_TYPE4_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel5_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<5>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_bwb_6reel)
 	MCFG_MPU4_BWB_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_BWB_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_BWB_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_BWB_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_BWB_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 	MCFG_MPU4_BWB_REEL_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel5_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<5>))
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_std_7reel)
 	MCFG_MPU4_STD_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_STD_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_STD_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_STD_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_STD_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 	MCFG_MPU4_STD_REEL_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel5_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<5>))
 	MCFG_MPU4_STD_REEL_ADD("reel6")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel6_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<6>))
 	MCFG_MPU4_STD_REEL_ADD("reel7")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel7_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<7>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type2_7reel)
 	MCFG_MPU4_TYPE2_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel5_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<5>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel6")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel6_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<6>))
 	MCFG_MPU4_TYPE2_REEL_ADD("reel7")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel7_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<7>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type3_7reel)
 	MCFG_MPU4_TYPE3_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel5_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<5>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel6")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel6_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<6>))
 	MCFG_MPU4_TYPE3_REEL_ADD("reel7")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel7_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<7>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_type4_7reel)
 	MCFG_MPU4_TYPE4_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel5_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<5>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel6")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel6_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<6>))
 	MCFG_MPU4_TYPE4_REEL_ADD("reel7")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel7_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<7>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_bwb_7reel)
 	MCFG_MPU4_BWB_REEL_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<0>))
 	MCFG_MPU4_BWB_REEL_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<1>))
 	MCFG_MPU4_BWB_REEL_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<2>))
 	MCFG_MPU4_BWB_REEL_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<3>))
 	MCFG_MPU4_BWB_REEL_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<4>))
 	MCFG_MPU4_BWB_REEL_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel5_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<5>))
 	MCFG_MPU4_BWB_REEL_ADD("reel6")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel6_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<6>))
 	MCFG_MPU4_BWB_REEL_ADD("reel7")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel7_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu4_state, reel_optic_cb<7>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4_common)

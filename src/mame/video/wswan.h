@@ -78,6 +78,8 @@ protected:
 	void scanline_interrupt();
 	void common_save();
 
+	required_device<screen_device> m_screen;
+
 	bitmap_ind16 m_bitmap;
 	uint8_t m_layer_bg_enable;          /* Background layer on/off */
 	uint8_t m_layer_fg_enable;          /* Foreground layer on/off */
