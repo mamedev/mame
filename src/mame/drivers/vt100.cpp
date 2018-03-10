@@ -50,6 +50,7 @@ public:
 		m_dbrg(*this, "dbrg"),
 		m_nvr(*this, "nvr"),
 		m_rstbuf(*this, "rstbuf"),
+		m_rs232(*this, RS232_TAG),
 		m_printer_uart(*this, "printer_uart"),
 		m_p_ram(*this, "p_ram")
 	{
@@ -62,13 +63,15 @@ public:
 	required_device<com8116_device> m_dbrg;
 	required_device<er1400_device> m_nvr;
 	required_device<rst_pos_buffer_device> m_rstbuf;
+	required_device<rs232_port_device> m_rs232;
 	optional_device<ins8250_device> m_printer_uart;
-	DECLARE_READ8_MEMBER(vt100_flags_r);
-	DECLARE_WRITE8_MEMBER(vt100_baud_rate_w);
-	DECLARE_WRITE8_MEMBER(vt100_nvr_latch_w);
+	DECLARE_READ8_MEMBER(flags_r);
+	DECLARE_WRITE8_MEMBER(baud_rate_w);
+	DECLARE_READ8_MEMBER(modem_r);
+	DECLARE_WRITE8_MEMBER(nvr_latch_w);
 	DECLARE_READ8_MEMBER(printer_r);
 	DECLARE_WRITE8_MEMBER(printer_w);
-	DECLARE_READ8_MEMBER(vt100_read_video_ram_r);
+	DECLARE_READ8_MEMBER(video_ram_r);
 	DECLARE_WRITE8_MEMBER(uart_clock_w);
 	required_shared_ptr<uint8_t> m_p_ram;
 	virtual void machine_start() override;
@@ -119,7 +122,7 @@ ADDRESS_MAP_END
 // 5 - NVR data H
 // 6 - LBA 7 H
 // 7 - Keyboard TBMT H
-READ8_MEMBER( vt100_state::vt100_flags_r )
+READ8_MEMBER(vt100_state::flags_r)
 {
 	uint8_t ret = 0;
 
@@ -129,13 +132,25 @@ READ8_MEMBER( vt100_state::vt100_flags_r )
 	return ret;
 }
 
-WRITE8_MEMBER( vt100_state::vt100_baud_rate_w )
+WRITE8_MEMBER(vt100_state::baud_rate_w)
 {
 	m_dbrg->str_w(data & 0x0f);
 	m_dbrg->stt_w(data >> 4);
 }
 
-WRITE8_MEMBER( vt100_state::vt100_nvr_latch_w )
+READ8_MEMBER(vt100_state::modem_r)
+{
+	uint8_t ret = 0x0f;
+
+	ret |= m_rs232->cts_r() << 7;
+	ret |= 1 /* m_rs232->spdi_r() */ << 6;
+	ret |= m_rs232->ri_r() << 5;
+	ret |= m_rs232->dcd_r() << 4;
+
+	return ret;
+}
+
+WRITE8_MEMBER(vt100_state::nvr_latch_w)
 {
 	// data inverted due to negative logic
 	m_nvr->c3_w(!BIT(data, 3));
@@ -153,15 +168,15 @@ ADDRESS_MAP_START(vt100_state::vt100_io)
 	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("pusart", i8251_device, data_r, data_w)
 	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("pusart", i8251_device, status_r, control_w)
 	// 0x02 Baud rate generator
-	AM_RANGE (0x02, 0x02) AM_WRITE(vt100_baud_rate_w)
+	AM_RANGE (0x02, 0x02) AM_WRITE(baud_rate_w)
 	// 0x22 Modem buffer
-	// AM_RANGE (0x22, 0x22)
+	AM_RANGE (0x22, 0x22) AM_READ(modem_r)
 	// 0x42 Flags buffer
-	AM_RANGE (0x42, 0x42) AM_READ(vt100_flags_r)
+	AM_RANGE (0x42, 0x42) AM_READ(flags_r)
 	// 0x42 Brightness D/A latch
 	AM_RANGE (0x42, 0x42) AM_DEVWRITE("vt100_video", vt100_video_device, brightness_w)
 	// 0x62 NVR latch
-	AM_RANGE (0x62, 0x62) AM_WRITE(vt100_nvr_latch_w)
+	AM_RANGE (0x62, 0x62) AM_WRITE(nvr_latch_w)
 	// 0x82 Keyboard UART data
 	AM_RANGE (0x82, 0x82) AM_DEVREADWRITE("kbduart", ay31015_device, receive, transmit)
 	// 0xA2 Video processor DC012
@@ -184,7 +199,8 @@ WRITE8_MEMBER(vt100_state::printer_w)
 
 ADDRESS_MAP_START(vt100_state::vt102_io)
 	AM_IMPORT_FROM(vt100_io)
-	AM_RANGE(0x03, 0x03) AM_SELECT(0x1c) AM_READWRITE(printer_r, printer_w)
+	AM_RANGE(0x03, 0x03) AM_SELECT(0x1c) AM_READ(printer_r)
+	AM_RANGE(0x23, 0x23) AM_SELECT(0x1c) AM_WRITE(printer_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -224,10 +240,10 @@ void vt100_state::machine_start()
 
 void vt100_state::machine_reset()
 {
-	vt100_nvr_latch_w(machine().dummy_space(), 0, 0);
+	nvr_latch_w(machine().dummy_space(), 0, 0);
 }
 
-READ8_MEMBER( vt100_state::vt100_read_video_ram_r )
+READ8_MEMBER(vt100_state::video_ram_r)
 {
 	return m_p_ram[offset];
 }
@@ -283,7 +299,7 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_DEVICE_ADD("vt100_video", VT100_VIDEO, XTAL(24'073'400))
 	MCFG_VT_SET_SCREEN("screen")
 	MCFG_VT_CHARGEN("chargen")
-	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(vt100_state, vt100_read_video_ram_r))
+	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(vt100_state, video_ram_r))
 	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(DEVWRITELINE("rstbuf", rst_pos_buffer_device, rst4_w))
 	MCFG_VT_VIDEO_LBA3_LBA4_CALLBACK(WRITE8(vt100_state, uart_clock_w))
 	MCFG_VT_VIDEO_LBA7_CALLBACK(DEVWRITELINE("nvr", er1400_device, clock_w))
