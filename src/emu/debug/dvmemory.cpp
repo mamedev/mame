@@ -540,14 +540,16 @@ void debug_view_memory::recompute()
 
 	// determine the maximum address and address format string from the raw information
 	int addrchars;
+	u64 maxbyte;
 	if (source.m_space != nullptr)
 	{
 		m_maxaddr = m_no_translation ? source.m_space->addrmask() : source.m_space->logaddrmask();
+		maxbyte = source.m_space->address_to_byte_end(m_maxaddr);
 		addrchars = m_no_translation ? source.m_space->addrchars() : source.m_space->logaddrchars();
 	}
 	else
 	{
-		m_maxaddr = source.m_length - 1;
+		maxbyte = m_maxaddr = source.m_length - 1;
 		addrchars = string_format("%X", m_maxaddr).size();
 	}
 
@@ -607,7 +609,7 @@ void debug_view_memory::recompute()
 	}
 
 	// derive total sizes from that
-	m_total.y = (u64(m_maxaddr) - u64(m_byte_offset) + u64(m_bytes_per_row) /*- 1*/) / m_bytes_per_row;
+	m_total.y = (maxbyte - u64(m_byte_offset) + u64(m_bytes_per_row) /*- 1*/) / m_bytes_per_row;
 
 	// reset the current cursor position
 	set_cursor_pos(pos);
