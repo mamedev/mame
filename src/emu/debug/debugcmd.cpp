@@ -1416,8 +1416,8 @@ void debugger_commands::execute_wplist(int ref, const std::vector<std::string> &
 				for (device_debug::watchpoint *wp = device.debug()->watchpoint_first(spacenum); wp != nullptr; wp = wp->next())
 				{
 					buffer = string_format("%c%4X @ %0*X-%0*X %s", wp->enabled() ? ' ' : 'D', wp->index(),
-							wp->space().addrchars(), wp->space().byte_to_address(wp->address()),
-							wp->space().addrchars(), wp->space().byte_to_address_end(wp->address() + wp->length()) - 1,
+							wp->space().addrchars(), wp->address(),
+							wp->space().addrchars(), wp->address() + wp->length() - 1,
 							types[wp->type() & 3]);
 					if (std::string(wp->condition()).compare("1") != 0)
 						buffer.append(string_format(" if %s", wp->condition()));
