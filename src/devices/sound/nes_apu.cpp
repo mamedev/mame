@@ -105,15 +105,16 @@ static void create_noise(u8 *buf, const int bits, int size)
 DEFINE_DEVICE_TYPE(NES_APU, nesapu_device, "nesapu", "N2A03 APU")
 
 nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, NES_APU, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_apu_incsize(0.0),
-		m_samps_per_sync(0),
-		m_buffer_size(0),
-		m_real_rate(0),
-		m_stream(nullptr),
-		m_irq_handler(*this),
-		m_mem_read_cb(*this)
+	: device_t(mconfig, NES_APU, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_apu_incsize(0.0)
+	, m_samps_per_sync(0)
+	, m_buffer_size(0)
+	, m_real_rate(0)
+	, m_stream(nullptr)
+	, m_screen(*this, finder_base::DUMMY_TAG)
+	, m_irq_handler(*this)
+	, m_mem_read_cb(*this)
 {
 	for (auto & elem : m_noise_lut)
 	{
@@ -145,11 +146,10 @@ void nesapu_device::calculate_rates()
 {
 	int rate = clock() / 4;
 
-	screen_device *screen = machine().first_screen();
-	if (screen != nullptr)
+	if (m_screen)
 	{
-		m_samps_per_sync = rate / ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds());
-		m_real_rate = m_samps_per_sync * ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds());
+		m_samps_per_sync = rate / ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds());
+		m_real_rate = m_samps_per_sync * ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds());
 	}
 	else
 	{

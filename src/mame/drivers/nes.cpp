@@ -59,6 +59,9 @@ MACHINE_CONFIG_START(nes_state::nes)
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(nes_map)
 
+	MCFG_DEVICE_MODIFY("maincpu:nesapu")
+	MCFG_NES_APU_SCREEN_TAG("screen")
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.0988)
 	// This isn't used so much to calulate the vblank duration (the PPU code tracks that manually) but to determine

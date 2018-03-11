@@ -626,6 +626,9 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	MCFG_CPU_PROGRAM_MAP(punchout_sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, nmi_line_pulse)
 
+	MCFG_DEVICE_MODIFY("audiocpu:nesapu")
+	MCFG_NES_APU_SCREEN_TAG("top")
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2B

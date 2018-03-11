@@ -45,6 +45,9 @@
 #define MCFG_NES_APU_MEM_READ_CALLBACK(_devcb) \
 	devcb = &downcast<nesapu_device &>(*device).set_mem_read_callback(DEVCB_##_devcb);
 
+#define MCFG_NES_APU_SCREEN_TAG(screen_tag) \
+	downcast<nesapu_device &>(*device).set_screen_tag(("^^" screen_tag));
+
 class nesapu_device : public device_t,
 						public device_sound_interface
 {
@@ -52,6 +55,7 @@ public:
 	nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
+	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_mem_read_callback(Object &&cb) { return m_mem_read_cb.set_callback(std::forward<Object>(cb)); }
 
@@ -83,6 +87,7 @@ private:
 	u32     m_sync_times1[SYNCS_MAX1]; /* Samples per sync table */
 	u32     m_sync_times2[SYNCS_MAX2]; /* Samples per sync table */
 	sound_stream *m_stream;
+	optional_device<screen_device> m_screen;
 	devcb_write_line m_irq_handler;
 	devcb_read8 m_mem_read_cb;
 

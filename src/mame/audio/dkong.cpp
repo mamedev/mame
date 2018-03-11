@@ -1431,9 +1431,15 @@ MACHINE_CONFIG_START(dkong_state::dkong3_audio)
 	MCFG_CPU_PROGRAM_MAP(dkong3_sound1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state, nmi_line_pulse)
 
+	MCFG_DEVICE_MODIFY("n2a03a:nesapu")
+	MCFG_NES_APU_SCREEN_TAG("screen")
+
 	MCFG_CPU_ADD("n2a03b", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dkong3_sound2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state, nmi_line_pulse)
+
+	MCFG_DEVICE_MODIFY("n2a03b:nesapu")
+	MCFG_NES_APU_SCREEN_TAG("screen")
 
 	/* sound latches */
 	MCFG_LATCH8_ADD( "latch1")
