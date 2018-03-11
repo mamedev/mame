@@ -73,7 +73,6 @@ public:
 	void asuka(machine_config &config);
 	void cadash(machine_config &config);
 	void eto(machine_config &config);
-	void galmedes(machine_config &config);
 	void bonzeadv(machine_config &config);
 	void asuka_map(address_map &map);
 	void bonzeadv_map(address_map &map);

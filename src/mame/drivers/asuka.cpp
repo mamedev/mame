@@ -834,14 +834,14 @@ WRITE8_MEMBER(asuka_state::counters_w)
 MACHINE_CONFIG_START(asuka_state::bonzeadv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* checked on PCB */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)    /* checked on PCB */
 	MCFG_CPU_PROGRAM_MAP(bonzeadv_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  bonze_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)    /* sound CPU, also required for test mode */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)    /* sound CPU, also required for test mode */
 	MCFG_CPU_PROGRAM_MAP(bonzeadv_z80_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(20'000'000)/2) /* 20MHz OSC next to C-Chip, 10MHz?? */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)) /* 12MHz OSC near C-Chip */
 	MCFG_CCHIP_IN_PORTA_CB(IOPORT("800007"))
 	MCFG_CCHIP_IN_PORTB_CB(IOPORT("800009"))
 	MCFG_CCHIP_IN_PORTC_CB(IOPORT("80000B"))
@@ -884,7 +884,7 @@ MACHINE_CONFIG_START(asuka_state::bonzeadv)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -976,7 +976,7 @@ MACHINE_CONFIG_START(asuka_state::cadash)
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cadash_z80_map)
 
-	MCFG_CPU_ADD("subcpu", Z180, 4000000)   /* 4 MHz ??? */
+	MCFG_CPU_ADD("subcpu", Z180, XTAL(8'000'000))   /* 8MHz HD64180RP8 Z180 */
 	MCFG_CPU_PROGRAM_MAP(cadash_sub_map)
 	MCFG_CPU_IO_MAP(cadash_sub_io)
 
@@ -1099,69 +1099,6 @@ MACHINE_CONFIG_START(asuka_state::mofflott)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
-
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(asuka_state::galmedes)
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(asuka_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
-
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(cadash_z80_map)
-
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(asuka_state, coin_control_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(asuka_state, screen_vblank_asuka))
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
-	MCFG_PALETTE_ADD("palette", 4096)   /* only Mofflott uses full palette space */
-
-	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
-	MCFG_PC090OJ_OFFSETS(0, 8)
-	MCFG_PC090OJ_GFXDECODE("gfxdecode")
-	MCFG_PC090OJ_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(1)
-	MCFG_TC0100SCN_TX_REGION(2)
-	MCFG_TC0100SCN_OFFSETS(1, 0)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
-
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_YM2151_ADD("ymsnd", 4000000)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(asuka_state,sound_bankswitch_2151_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
@@ -1373,7 +1310,7 @@ ROM_START( bonzeadvp ) /* Labels consists of hand written checksum values of the
 	ROM_LOAD( "49d7.ic7",   0x60000, 0x20000, CRC(5584c02c) SHA1(00402df66debb257c97a609a37de0f8eeeb6e9f0) ) // ^
 ROM_END
 
-ROM_START( asuka )
+ROM_START( asuka ) /* Taito PCB: ASKA&ASKA - K1100388A / J1100169A */
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "b68-13.ic23", 0x00000, 0x20000, CRC(855efb3e) SHA1(644e02e207adeaec7839c824688d88ab8d046418) )
 	ROM_LOAD16_BYTE( "b68-12.ic8",  0x00001, 0x20000, CRC(271eeee9) SHA1(c08e347be4aae929c0ab95ff7618edaa1a7d6da9) )
@@ -1708,7 +1645,7 @@ ROM_START( cadashs ) // no labels on the program ROMs
 	ROM_LOAD( "pal20l8b-c21-12.ic47",   0x0600, 0x0144, CRC(bbc2cc97) SHA1(d4a68f28e0d3f5a3b39ecc25640bc9197ad0260b) )
 ROM_END
 
-ROM_START( galmedes )
+ROM_START( galmedes ) /* Taito PCB: K1100388A / J1100169A */
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "gm-prg1.ic23", 0x00000, 0x20000, CRC(32a70753) SHA1(3bd094b7ae600dbc87ba74e8b2d6b86a68346f4f) )
 	ROM_LOAD16_BYTE( "gm-prg0.ic8",  0x00001, 0x20000, CRC(fae546a4) SHA1(484cad5287daa495b347f6b5b065f3b3d02d8f0e) )
@@ -1724,12 +1661,15 @@ ROM_START( galmedes )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "gm-snd.ic27", 0x00000, 0x10000, CRC(d6f56c21) SHA1(ff9743448ac8ce57a2f8c33a26145e7b92cbe3c3) ) /* banked */
 
+	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )   /* ADPCM samples */
+	/* Empty socket on Galmedes - but sound chips present */
+
 	ROM_REGION( 0x144, "pals", 0 )
 	ROM_LOAD( "b68-04.ic32", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
 	ROM_LOAD( "b68-05.ic43", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
-ROM_START( earthjkr )
+ROM_START( earthjkr ) /* Taito PCB: K1100388A / J1100169A */
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "ej_3b.ic23",  0x00000, 0x20000, CRC(bdd86fc2) SHA1(96578860ed03718f8a68847b367eac6c81b79ca2) )
 	ROM_LOAD16_BYTE( "ej_3a.ic8",   0x00001, 0x20000, CRC(9c8050c6) SHA1(076c882f75787e8120de66ff0dcd2cb820513c45) )
@@ -1747,12 +1687,16 @@ ROM_START( earthjkr )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "ej_2.ic27", 0x00000, 0x10000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) ) /* banked */
 
+	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )   /* ADPCM samples */
+	/* Empty socket on U.N. Defense Force: Earth Joker - but sound chips present */
+
 	ROM_REGION( 0x144, "pals", 0 )
 	ROM_LOAD( "b68-04.ic32", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
 	ROM_LOAD( "b68-05.ic43", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
-// Known to exist (not dumped) a US version of Earth Joker, title screen shows "DISTRIBUTED BY ROMSTAR, INC."  ROMs were numbered
+// Known to exist (not dumped) a Japanese version with ROMs 3 & 4 also stamped "A" same as above or different version??
+// Also known to exist (not dumped) a US version of Earth Joker, title screen shows "DISTRIBUTED BY ROMSTAR, INC."  ROMs were numbered
 // from 0 through 4 and the fix rom at IC30 is labeled 1 even though IC5 is also labled as 1 similar to the below set:
 
 ROM_START( earthjkrp ) // was production PCB complete with MASK rom, could just be an early revision, not proto
@@ -1772,6 +1716,9 @@ ROM_START( earthjkrp ) // was production PCB complete with MASK rom, could just 
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "2.ic27", 0x00000, 0x10000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) ) /* banked */
+
+	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )   /* ADPCM samples */
+	/* Empty socket on U.N. Defense Force: Earth Joker - but sound chips present */
 
 	ROM_REGION( 0x144, "pals", 0 )
 	ROM_LOAD( "b68-04.ic32", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
@@ -1822,9 +1769,9 @@ GAME( 1989, cadashg,   cadash,   cadash,   cadash,   asuka_state, cadash, ROT0, 
 GAME( 1989, cadashp,   cadash,   cadash,   cadashj,  asuka_state, cadash, ROT0,   "Taito Corporation Japan",   "Cadash (World, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN)
 GAME( 1989, cadashs,   cadash,   cadash,   cadash,   asuka_state, cadash, ROT0,   "Taito Corporation Japan",   "Cadash (Spain, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
 
-GAME( 1992, galmedes,  0,        galmedes, galmedes, asuka_state, 0,      ROT270, "Visco",                     "Galmedes (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, galmedes,  0,        asuka,    galmedes, asuka_state, 0,      ROT270, "Visco",                     "Galmedes (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, earthjkr,  0,        galmedes, earthjkr, asuka_state, 0,      ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, earthjkrp, earthjkr, galmedes, earthjkr, asuka_state, 0,      ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkr,  0,        asuka,    earthjkr, asuka_state, 0,      ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkrp, earthjkr, asuka,    earthjkr, asuka_state, 0,      ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, eto,       0,        eto,      eto,      asuka_state, 0,      ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
