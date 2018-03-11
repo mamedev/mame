@@ -112,6 +112,7 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 	m_write_srq(*this),
 	m_write_atn(*this),
 	m_write_ren(*this),
+	m_write_dio(*this),
 	m_dio(0xff)
 {
 	for (auto & elem : m_line)
@@ -136,6 +137,7 @@ void ieee488_device::device_start()
 	m_write_srq.resolve_safe();
 	m_write_atn.resolve_safe();
 	m_write_ren.resolve_safe();
+	m_write_dio.resolve_safe();
 }
 
 
@@ -320,11 +322,16 @@ int ieee488_device::get_signal(int signal)
 
 void ieee488_device::set_data(device_t *device, uint8_t data)
 {
+	bool changed = false;
+	uint8_t old_state = get_data();
+
 	if (device == this)
 	{
 		if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), tag(), data);
-
-		m_dio = data;
+		if (m_dio != data) {
+			m_dio = data;
+			changed = true;
+		}
 	}
 	else
 	{
@@ -338,11 +345,21 @@ void ieee488_device::set_data(device_t *device, uint8_t data)
 				{
 					if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), device->tag(), data);
 					entry->m_dio = data;
+					changed = true;
 				}
 			}
 
 			entry = entry->next();
 		}
+	}
+
+	if (!changed) {
+		return;
+	}
+
+	uint8_t new_state = get_data();
+	if (old_state != new_state) {
+		m_write_dio(new_state);
 	}
 }
 
