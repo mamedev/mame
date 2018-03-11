@@ -54,13 +54,14 @@ class pokemini_state : public driver_device
 {
 public:
 	pokemini_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_p_ram(*this, "p_ram"),
-		m_speaker(*this, "speaker"),
-		m_i2cmem(*this, "i2cmem"),
-		m_cart(*this, "cartslot"),
-		m_inputs(*this, "INPUTS")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_p_ram(*this, "p_ram")
+		, m_speaker(*this, "speaker")
+		, m_i2cmem(*this, "i2cmem")
+		, m_cart(*this, "cartslot")
+		, m_inputs(*this, "INPUTS")
 	{ }
 
 	uint8_t m_pm_reg[0x100];
@@ -96,6 +97,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<i2cmem_device> m_i2cmem;
@@ -1744,7 +1746,7 @@ static const int16_t speaker_levels[] = {-32768, 0, 32767};
 
 void pokemini_state::video_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 }
 
 

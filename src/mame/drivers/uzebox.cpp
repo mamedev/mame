@@ -34,15 +34,17 @@ class uzebox_state : public driver_device
 {
 public:
 	uzebox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_cart(*this, "cartslot"),
-		m_ctrl1(*this, "ctrl1"),
-		m_ctrl2(*this, "ctrl2"),
-		m_speaker(*this, "speaker")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_cart(*this, "cartslot")
+		, m_ctrl1(*this, "ctrl1")
+		, m_ctrl2(*this, "ctrl2")
+		, m_speaker(*this, "speaker")
 	{ }
 
 	required_device<avr8_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<generic_slot_device> m_cart;
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;
@@ -80,7 +82,7 @@ private:
 
 void uzebox_state::machine_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));

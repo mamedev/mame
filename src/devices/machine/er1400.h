@@ -45,6 +45,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -52,6 +53,14 @@ protected:
 	virtual void nvram_write(emu_file &file) override;
 
 private:
+	enum
+	{
+		PROPAGATION_TIMER
+	};
+
+	// logging helper
+	std::string address_binary_format() const;
+
 	// internal helpers
 	void read_data();
 	void write_data();
@@ -69,6 +78,7 @@ private:
 	// timing
 	attotime m_write_time;
 	attotime m_erase_time;
+	emu_timer *m_data_propagation_timer;
 
 	// internal registers
 	u16 m_data_register;

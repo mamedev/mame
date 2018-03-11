@@ -25,6 +25,7 @@
 #include "sound/ay8910.h"
 #include "sound/spkrdev.h"
 
+#include "screen.h"
 
 class vector06_state : public driver_device
 {
@@ -41,6 +42,7 @@ public:
 		m_ay(*this, "aysnd"),
 		m_ram(*this, RAM_TAG),
 		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_ppi8255(*this, "ppi8255"),
 		m_ppi8255_2(*this, "ppi8255_2"),
 		m_pit8253(*this, "pit8253"),
@@ -91,6 +93,7 @@ private:
 	required_device<ay8910_device> m_ay;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_device<i8255_device> m_ppi8255, m_ppi8255_2;
 	required_device<pit8253_device> m_pit8253;
 	required_memory_bank m_bank1;

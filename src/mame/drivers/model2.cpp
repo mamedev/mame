@@ -14,6 +14,7 @@
 	- FIFO needs to be properly emulated in the various CPU cores (we currently rely on some workarounds);
 	- sound comms still needs some work (sometimes m68k doesn't get some commands or play them with a delay);
 	- 2C games needs TGPx4 emulation;
+	- outputs and artwork (for gearbox indicators);
 	- clean-ups;
 
 	TODO (per-game issues)
@@ -35,7 +36,7 @@
 	- sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
 	- skytargt: really slow during gameplay (fixed?);
 	- skytargt: short draw distance (might be down to z-sort);
-    - srallyc: some 3d elements doesn't show up properly (trees models, last hill in course 1 is often black colored);
+    - srallyc: some 3d elements doesn't show up properly (tree models, last hill in course 1 is often black colored);
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
     - vcop: lightgun input is offsetted (needs to be calibrated in service mode);
 	- vcop: missing 3d bug at stage select screen (priority?);
@@ -1689,7 +1690,14 @@ ADDRESS_MAP_START(model2c_state::model2c_5881_mem)
 	AM_IMPORT_FROM(model2_5881_mem)
 ADDRESS_MAP_END
 
-/* Input definitions */
+
+
+/***********************************
+ *
+ * Input definitions
+ *
+ **********************************/
+
 static INPUT_PORTS_START( model2 )
 	PORT_START("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2021,7 +2029,7 @@ static INPUT_PORTS_START( rchase2 )
 	PORT_MODIFY("IN2")
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,rchase2_devices_r, nullptr)
 
-	// reversed p1 and p2
+	// reversed p1 and p2 wrt Gunblade
 	PORT_MODIFY("ANA0")
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2) PORT_REVERSE
 
@@ -2118,6 +2126,132 @@ static INPUT_PORTS_START( von )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( skisuprg )
+	PORT_INCLUDE( model2 )
+	
+	PORT_MODIFY("IN0")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select 3 Button")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Zoom In Button")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Select 1 Button")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Select 2 Button")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Zoom Out Button")
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN2")
+	// TODO: what are these exactly? Enables/disables when all four bits are on
+	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Foot Sensor (R)")
+	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Foot Sensor (L)")
+	
+	PORT_START("ANA0")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
+
+	PORT_START("ANA1")	
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( stcc )
+	PORT_INCLUDE( sgt24h )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("View 1 Button (Zoom In)")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("View 2 Button (Zoom Out)")
+	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Shift Up")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Shift Down")
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
+	
+	PORT_MODIFY("IN2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( waverunr )
+	PORT_INCLUDE( model2 )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("View Button")
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN2")
+	// TODO: safety sensor
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT(0xf7, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	// TODO: requires LEFT/RIGHT_AD_STICK in framework
+	PORT_START("ANA0")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Handle Bar")
+
+	PORT_START("ANA1")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Roll")
+
+	PORT_START("ANA2")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Throttle Lever") PORT_REVERSE
+
+	PORT_START("ANA3")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Pitch") PORT_REVERSE
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( segawski )
+	PORT_INCLUDE( model2 )
+	
+	PORT_MODIFY("IN0")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Select (Down) Button")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Set Button")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select (Up) Button")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Pitch Left")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Pitch Right")
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_START("ANA0")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Slide")
+INPUT_PORTS_END
+
+// TODO: has testable service / test on board buttons
+static INPUT_PORTS_START( topskatr )
+	PORT_INCLUDE( model2 )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Select Right Button")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Jump Front")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Left Button")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Jump Tail")
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_MODIFY("IN2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	// TODO: requires LEFT/RIGHT_AD_STICK in framework
+	PORT_START("ANA0")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Curving")
+
+	PORT_START("ANA1")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Slide")
+INPUT_PORTS_END
+
+
+/***********************************
+ *
+ * Interrupts
+ *
+ **********************************/
 
 TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 {
@@ -6253,18 +6387,18 @@ GAME( 1998, dyndeka2b, dynamcop, model2b_5881, model2,    model2b_state, 0,     
 GAME( 1998, pltkids,   0,        model2b_5881, model2,    model2b_state, pltkids,  ROT0, "Psikyo", "Pilot Kids (Model 2B, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
-GAME( 1996, skisuprg,  0,        model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Sega Ski Super G", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, stcc,      0,        stcc,         model2,   model2c_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stccb,     stcc,     stcc,         model2,   model2c_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stcca,     stcc,     stcc,         model2,   model2c_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, waverunr,  0,        model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Wave Runner (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, skisuprg,  0,        model2c,      skisuprg, model2c_state, 0,       ROT0, "Sega",   "Sega Ski Super G", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, stcc,      0,        stcc,         stcc,     model2c_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, stccb,     stcc,     stcc,         stcc,     model2c_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, stcca,     stcc,     stcc,         stcc,     model2c_state, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, waverunr,  0,        model2c,      waverunr, model2c_state, 0,       ROT0, "Sega",   "Wave Runner (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, bel,       0,        model2c,      bel,      model2c_state, 0,       ROT0, "Sega / EPL Productions", "Behind Enemy Lines", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, hotd,      0,        model2c,      vcop,     model2c_state, 0,       ROT0, "Sega",   "The House of the Dead", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, overrev,   0,        overrev2c,    overrev,  model2c_state, 0,       ROT0, "Jaleco", "Over Rev (Model 2C, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, rascot2,   0,        model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Royal Ascot II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, segawski,  0,        model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Sega Water Ski (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, topskatr,  0,        model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Top Skater (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, topskatru, topskatr, model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Top Skater (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, topskatruo,topskatr, model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Top Skater (USA)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, topskatrj, topskatr, model2c,      model2,   model2c_state, 0,       ROT0, "Sega",   "Top Skater (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, segawski,  0,        model2c,      segawski, model2c_state, 0,       ROT0, "Sega",   "Sega Water Ski (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, topskatr,  0,        model2c,      topskatr, model2c_state, 0,       ROT0, "Sega",   "Top Skater (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, topskatru, topskatr, model2c,      topskatr, model2c_state, 0,       ROT0, "Sega",   "Top Skater (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, topskatruo,topskatr, model2c,      topskatr, model2c_state, 0,       ROT0, "Sega",   "Top Skater (USA)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, topskatrj, topskatr, model2c,      topskatr, model2c_state, 0,       ROT0, "Sega",   "Top Skater (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dynamcopc, dynamcop, model2c_5881, model2,   model2c_state, 0,       ROT0, "Sega",   "Dynamite Cop (USA, Model 2C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

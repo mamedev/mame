@@ -804,7 +804,8 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 
 //  SMPC MCU, running at 4 MHz (+ custom RTC device that runs at 32.768 KHz)
 	MCFG_SMPC_HLE_ADD("smpc", XTAL(4'000'000))
-	downcast<smpc_hle_device &>(*device).set_control_port_tags("ctrl1", "ctrl2");
+	MCFG_SMPC_HLE_SCREEN("screen")
+	MCFG_SMPC_HLE_CONTROL_PORTS("ctrl1", "ctrl2")
 	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(sat_console_state, saturn_pdr1_direct_r))
 	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(sat_console_state, saturn_pdr2_direct_r))
 	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(sat_console_state, saturn_pdr1_direct_w))

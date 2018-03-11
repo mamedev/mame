@@ -194,30 +194,36 @@ public:
 		m_sound3(0)
 	{ }
 
+	void spaceg(machine_config &config);
+
+protected:
+	virtual void driver_start() override;
+
+private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_io9400;
 	required_shared_ptr<uint8_t> m_io9401;
-	DECLARE_WRITE8_MEMBER(zvideoram_w);
-	DECLARE_READ8_MEMBER(spaceg_colorram_r);
-	DECLARE_PALETTE_INIT(spaceg);
-	uint32_t screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<samples_device> m_samples;
 	required_device<sn76477_device> m_sn;
 
-	DECLARE_WRITE8_MEMBER(sound1_w);
-	DECLARE_WRITE8_MEMBER(sound2_w);
-	DECLARE_WRITE8_MEMBER(sound3_w);
 	uint8_t m_sound1;
 	uint8_t m_sound2;
 	uint8_t m_sound3;
 
-	void spaceg(machine_config &config);
+	DECLARE_WRITE8_MEMBER(zvideoram_w);
+	DECLARE_READ8_MEMBER(colorram_r);
+	DECLARE_WRITE8_MEMBER(sound1_w);
+	DECLARE_WRITE8_MEMBER(sound2_w);
+	DECLARE_WRITE8_MEMBER(sound3_w);
+
+	DECLARE_PALETTE_INIT(spaceg);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void spaceg_map(address_map &map);
-protected:
-	virtual void driver_start() override;
 };
 
 void spaceg_state::driver_start()
@@ -301,7 +307,7 @@ WRITE8_MEMBER(spaceg_state::zvideoram_w)
 }
 
 
-READ8_MEMBER(spaceg_state::spaceg_colorram_r)
+READ8_MEMBER(spaceg_state::colorram_r)
 {
 	int rgbcolor;
 
@@ -332,7 +338,7 @@ READ8_MEMBER(spaceg_state::spaceg_colorram_r)
 }
 
 
-uint32_t spaceg_state::screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spaceg_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -423,7 +429,7 @@ ADDRESS_MAP_START(spaceg_state::spaceg_map)
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
 
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_READ(spaceg_colorram_r) AM_SHARE("colorram")
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_READ(colorram_r) AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(zvideoram_w) AM_SHARE("videoram")
 
 	AM_RANGE(0x9400, 0x9400) AM_WRITEONLY AM_SHARE("io9400") /* gfx ctrl */
@@ -512,7 +518,7 @@ MACHINE_CONFIG_START(spaceg_state::spaceg)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 32, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(spaceg_state, screen_update_spaceg)
+	MCFG_SCREEN_UPDATE_DRIVER(spaceg_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16+128-16)
@@ -567,9 +573,9 @@ ROM_START( spaceg )
 	ROM_LOAD( "15.9h", 0x3800, 0x0400, CRC(55e2950d) SHA1(2241c3620c9a6df8b8bd234ccee9af5d3d19a5d4) )
 	ROM_LOAD( "16.8h", 0x3c00, 0x0400, CRC(567259c4) SHA1(b2c3f7aaceabea075af6a43b89fb7331732278c8) )
 
-	ROM_REGION( 0x40, "proms", 0 )
-	ROM_LOAD( "prom1", 0x0000, 0x0020, NO_DUMP )
-	ROM_LOAD( "prom2", 0x0020, 0x0020, NO_DUMP )
+	ROM_REGION( 0x40, "proms", 0 ) // the 2 PROMs are identical
+	ROM_LOAD( "74s288.6a", 0x0000, 0x0020, CRC(ae1f4acd) SHA1(1d502b61db73cf6a4ac3d235455a5c464f12652a) )
+	ROM_LOAD( "74s288.6b", 0x0020, 0x0020, CRC(ae1f4acd) SHA1(1d502b61db73cf6a4ac3d235455a5c464f12652a) )
 ROM_END
 
 

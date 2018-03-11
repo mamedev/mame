@@ -1079,6 +1079,7 @@ MACHINE_CONFIG_START(stv_state::stv)
 	downcast<sega_scu_device &>(*device).set_hostcpu("maincpu");
 
 	MCFG_SMPC_HLE_ADD("smpc", XTAL(4'000'000))
+	MCFG_SMPC_HLE_SCREEN("screen")
 	downcast<smpc_hle_device &>(*device).set_region_code(0);
 	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(stv_state, pdr1_input_r))
 	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(stv_state, pdr2_input_r))

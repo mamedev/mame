@@ -990,7 +990,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 		}
 
 		// update partials
-		machine().first_screen()->update_partial(machine().first_screen()->vpos());
+		m_screen->update_partial(m_screen->vpos());
 	}
 	else if (reg >= 0x60 && reg <= 0x7c)
 	{

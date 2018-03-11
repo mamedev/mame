@@ -68,36 +68,44 @@ public:
 		, m_kbd_uart(*this, "589wa1")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_crtc1(*this, "i8275_1")
+		, m_crtc2(*this, "i8275_2")
 		, m_p_chargen(*this, "chargen")
 		{ }
 
+	void ms6102(machine_config &config);
+	void ms6102_io(address_map &map);
+	void ms6102_mem(address_map &map);
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { m_pic->r_w(N, state?0:1); }
 
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
+	I8275_DRAW_CHARACTER_MEMBER(display_attr);
 
-	DECLARE_DRIVER_INIT(ms6102);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 	DECLARE_WRITE8_MEMBER(pic_w);
 	IRQ_CALLBACK_MEMBER(ms6102_int_ack);
 
 	DECLARE_READ8_MEMBER(memory_read_byte);
+	DECLARE_WRITE8_MEMBER(vdack_w);
+
+	DECLARE_READ8_MEMBER(crtc_r);
+	DECLARE_WRITE8_MEMBER(crtc_w);
 
 	DECLARE_READ8_MEMBER(misc_r);
 	DECLARE_READ8_MEMBER(kbd_get);
 	void kbd_put(u8 data);
-
-	void ms6102(machine_config &config);
-	void ms6102_io(address_map &map);
-	void ms6102_mem(address_map &map);
-private:
 	bool m_kbd_ready;
 	uint8_t m_kbd_data;
+	u16 m_dmaaddr;
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
@@ -108,6 +116,8 @@ private:
 	required_device<ay31015_device> m_kbd_uart;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<i8275_device> m_crtc1;
+	required_device<i8275_device> m_crtc2;
 	required_region_ptr<u8> m_p_chargen;
 };
 
@@ -126,7 +136,7 @@ ADDRESS_MAP_START(ms6102_state::ms6102_io)
 	AM_RANGE (0x20, 0x23) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	//AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE("589wa1", ay31015_device, receive, transmit)
 	AM_RANGE (0x30, 0x3f) AM_READ(kbd_get)
-	AM_RANGE (0x40, 0x41) AM_DEVREADWRITE("i8275", i8275_device, read, write)
+	AM_RANGE (0x40, 0x41) AM_READWRITE(crtc_r, crtc_w)
 	AM_RANGE (0x50, 0x5f) AM_NOP // video disable?
 	AM_RANGE (0x60, 0x6f) AM_WRITE(pic_w)
 	AM_RANGE (0x70, 0x7f) AM_READ(misc_r)
@@ -157,8 +167,14 @@ WRITE_LINE_MEMBER(ms6102_state::hrq_w)
 	m_dma8257->hlda_w(state);
 }
 
+WRITE_LINE_MEMBER(ms6102_state::irq_w)
+{
+	m_maincpu->set_input_line(I8085_INTR_LINE, ASSERT_LINE);
+}
+
 READ8_MEMBER(ms6102_state::memory_read_byte)
 {
+	m_dmaaddr = offset;
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
@@ -176,6 +192,21 @@ I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_pixels)
 		bitmap.pix32(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }
 
+I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_attr) // TODO: attributes
+{
+}
+
+READ8_MEMBER(ms6102_state::crtc_r)
+{
+	m_crtc2->read(space, offset);
+	return m_crtc1->read(space, offset); // cs is same for both crtcs so they should return the same thing
+}
+
+WRITE8_MEMBER(ms6102_state::crtc_w)
+{
+	m_crtc1->write(space, offset, data);
+	m_crtc2->write(space, offset, data);
+}
 
 READ8_MEMBER(ms6102_state::misc_r)
 {
@@ -198,12 +229,21 @@ void ms6102_state::kbd_put(u8 data)
 
 WRITE8_MEMBER(ms6102_state::pic_w)
 {
-	m_pic->b_w(data & 7);
-	m_pic->sgs_w(BIT(data, 3));
+	m_pic->b_w((data & 7) ^ 7);
+	m_pic->sgs_w(BIT(data, 3) ^ 1);
+}
+
+WRITE8_MEMBER(ms6102_state::vdack_w)
+{
+	if(m_dmaaddr & 1)
+		m_crtc1->dack_w(space, offset, data);
+	else
+		m_crtc2->dack_w(space, offset, data | 0x80);
 }
 
 IRQ_CALLBACK_MEMBER(ms6102_state::ms6102_int_ack)
 {
+	m_maincpu->set_input_line(I8085_INTR_LINE, CLEAR_LINE);
 	return 0xc7 | (m_pic->a_r() << 3);
 }
 
@@ -224,10 +264,6 @@ void ms6102_state::machine_reset()
 void ms6102_state::machine_start()
 {
 	m_pic->etlg_w(1);
-}
-
-DRIVER_INIT_MEMBER( ms6102_state, ms6102 )
-{
 	// rearrange the chargen to be easier for us to access
 	int i,j;
 	for (i = 0; i < 0x100; i++)
@@ -272,11 +308,11 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("i8214", I8214, XTAL(18'432'000) / 9)
-	MCFG_I8214_INT_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE))
+	MCFG_I8214_INT_CALLBACK(WRITELINE(ms6102_state, irq_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("i8275_1", i8275_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(784, 375)
 	MCFG_SCREEN_VISIBLE_AREA(100, 100+80*8-1, 7, 7+24*15-1)
@@ -286,12 +322,16 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(18'432'000) / 9)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(ms6102_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(ms6102_state, memory_read_byte))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8(ms6102_state, vdack_w))
 
-	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'400'000) / 8) // XXX
+	MCFG_DEVICE_ADD("i8275_1", I8275, XTAL(16'400'000) / 8) // XXX
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ms6102_state, display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257", i8257_device, dreq2_w))
+
+	MCFG_DEVICE_ADD("i8275_2", I8275, XTAL(16'400'000) / 8) // XXX
+	MCFG_I8275_CHARACTER_WIDTH(8)
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ms6102_state, display_attr)
 	MCFG_I8275_IRQ_CALLBACK(WRITELINE(ms6102_state, irq<5>))
 
 	// keyboard
@@ -337,4 +377,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT       COMPANY       FULLNAME       FLAGS */
-COMP( 1984, ms6102,  0,      0,       ms6102,    0,       ms6102_state,  ms6102, "Elektronika", "MS 6102.02", MACHINE_IS_SKELETON)
+COMP( 1984, ms6102,  0,      0,       ms6102,    0,       ms6102_state,  0, "Elektronika", "MS 6102.02", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)

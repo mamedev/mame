@@ -27,6 +27,8 @@
 #include "machine/com8116.h"
 #include "machine/er1400.h"
 #include "machine/i8251.h"
+#include "machine/input_merger.h"
+#include "machine/ins8250.h"
 #include "machine/rstbuf.h"
 #include "machine/vt100_kbd.h"
 #include "video/vtvideo.h"
@@ -49,6 +51,8 @@ public:
 		m_dbrg(*this, "dbrg"),
 		m_nvr(*this, "nvr"),
 		m_rstbuf(*this, "rstbuf"),
+		m_rs232(*this, RS232_TAG),
+		m_printer_uart(*this, "printer_uart"),
 		m_p_ram(*this, "p_ram")
 	{
 	}
@@ -60,23 +64,33 @@ public:
 	required_device<com8116_device> m_dbrg;
 	required_device<er1400_device> m_nvr;
 	required_device<rst_pos_buffer_device> m_rstbuf;
-	DECLARE_READ8_MEMBER(vt100_flags_r);
-	DECLARE_WRITE8_MEMBER(vt100_baud_rate_w);
-	DECLARE_WRITE8_MEMBER(vt100_nvr_latch_w);
-	DECLARE_READ8_MEMBER(vt100_read_video_ram_r);
+	required_device<rs232_port_device> m_rs232;
+	optional_device<ins8250_device> m_printer_uart;
+	DECLARE_READ8_MEMBER(flags_r);
+	DECLARE_WRITE8_MEMBER(baud_rate_w);
+	DECLARE_READ8_MEMBER(modem_r);
+	DECLARE_WRITE8_MEMBER(nvr_latch_w);
+	DECLARE_READ8_MEMBER(printer_r);
+	DECLARE_WRITE8_MEMBER(printer_w);
+	DECLARE_READ8_MEMBER(video_ram_r);
 	DECLARE_WRITE8_MEMBER(uart_clock_w);
 	required_shared_ptr<uint8_t> m_p_ram;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(vt102_irq_callback);
-	void vt102(machine_config &config);
 	void vt100(machine_config &config);
+	void vt100ac(machine_config &config);
+	void vt101(machine_config &config);
+	void vt102(machine_config &config);
 	void vt180(machine_config &config);
-	void vt100_io(address_map &map);
 	void vt100_mem(address_map &map);
-	void vt180_io(address_map &map);
+	void vt100_io(address_map &map);
+	void vt102_io(address_map &map);
+	void stp_mem(address_map &map);
+	void stp_io(address_map &map);
 	void vt180_mem(address_map &map);
+	void vt180_io(address_map &map);
 };
 
 
@@ -113,7 +127,7 @@ ADDRESS_MAP_END
 // 5 - NVR data H
 // 6 - LBA 7 H
 // 7 - Keyboard TBMT H
-READ8_MEMBER( vt100_state::vt100_flags_r )
+READ8_MEMBER(vt100_state::flags_r)
 {
 	uint8_t ret = 0;
 
@@ -123,13 +137,25 @@ READ8_MEMBER( vt100_state::vt100_flags_r )
 	return ret;
 }
 
-WRITE8_MEMBER( vt100_state::vt100_baud_rate_w )
+WRITE8_MEMBER(vt100_state::baud_rate_w)
 {
 	m_dbrg->str_w(data & 0x0f);
 	m_dbrg->stt_w(data >> 4);
 }
 
-WRITE8_MEMBER( vt100_state::vt100_nvr_latch_w )
+READ8_MEMBER(vt100_state::modem_r)
+{
+	uint8_t ret = 0x0f;
+
+	ret |= m_rs232->cts_r() << 7;
+	ret |= 1 /* m_rs232->spdi_r() */ << 6;
+	ret |= m_rs232->ri_r() << 5;
+	ret |= m_rs232->dcd_r() << 4;
+
+	return ret;
+}
+
+WRITE8_MEMBER(vt100_state::nvr_latch_w)
 {
 	// data inverted due to negative logic
 	m_nvr->c3_w(!BIT(data, 3));
@@ -147,15 +173,15 @@ ADDRESS_MAP_START(vt100_state::vt100_io)
 	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("pusart", i8251_device, data_r, data_w)
 	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("pusart", i8251_device, status_r, control_w)
 	// 0x02 Baud rate generator
-	AM_RANGE (0x02, 0x02) AM_WRITE(vt100_baud_rate_w)
+	AM_RANGE (0x02, 0x02) AM_WRITE(baud_rate_w)
 	// 0x22 Modem buffer
-	// AM_RANGE (0x22, 0x22)
+	AM_RANGE (0x22, 0x22) AM_READ(modem_r)
 	// 0x42 Flags buffer
-	AM_RANGE (0x42, 0x42) AM_READ(vt100_flags_r)
+	AM_RANGE (0x42, 0x42) AM_READ(flags_r)
 	// 0x42 Brightness D/A latch
 	AM_RANGE (0x42, 0x42) AM_DEVWRITE("vt100_video", vt100_video_device, brightness_w)
 	// 0x62 NVR latch
-	AM_RANGE (0x62, 0x62) AM_WRITE(vt100_nvr_latch_w)
+	AM_RANGE (0x62, 0x62) AM_WRITE(nvr_latch_w)
 	// 0x82 Keyboard UART data
 	AM_RANGE (0x82, 0x82) AM_DEVREADWRITE("kbduart", ay31015_device, receive, transmit)
 	// 0xA2 Video processor DC012
@@ -164,6 +190,22 @@ ADDRESS_MAP_START(vt100_state::vt100_io)
 	AM_RANGE (0xc2, 0xc2) AM_DEVWRITE("vt100_video", vt100_video_device, dc011_w)
 	// 0xE2 Graphics port
 	// AM_RANGE (0xe2, 0xe2)
+ADDRESS_MAP_END
+
+READ8_MEMBER(vt100_state::printer_r)
+{
+	return m_printer_uart->ins8250_r(space, offset >> 2);
+}
+
+WRITE8_MEMBER(vt100_state::printer_w)
+{
+	m_printer_uart->ins8250_w(space, offset >> 2, data);
+}
+
+ADDRESS_MAP_START(vt100_state::vt102_io)
+	AM_IMPORT_FROM(vt100_io)
+	AM_RANGE(0x03, 0x03) AM_SELECT(0x1c) AM_READ(printer_r)
+	AM_RANGE(0x23, 0x23) AM_SELECT(0x1c) AM_WRITE(printer_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -203,10 +245,10 @@ void vt100_state::machine_start()
 
 void vt100_state::machine_reset()
 {
-	vt100_nvr_latch_w(machine().dummy_space(), 0, 0);
+	nvr_latch_w(machine().dummy_space(), 0, 0);
 }
 
-READ8_MEMBER( vt100_state::vt100_read_video_ram_r )
+READ8_MEMBER(vt100_state::video_ram_r)
 {
 	return m_p_ram[offset];
 }
@@ -262,7 +304,7 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_DEVICE_ADD("vt100_video", VT100_VIDEO, XTAL(24'073'400))
 	MCFG_VT_SET_SCREEN("screen")
 	MCFG_VT_CHARGEN("chargen")
-	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(vt100_state, vt100_read_video_ram_r))
+	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(vt100_state, video_ram_r))
 	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(DEVWRITELINE("rstbuf", rst_pos_buffer_device, rst4_w))
 	MCFG_VT_VIDEO_LBA3_LBA4_CALLBACK(WRITE8(vt100_state, uart_clock_w))
 	MCFG_VT_VIDEO_LBA7_CALLBACK(DEVWRITELINE("nvr", er1400_device, clock_w))
@@ -294,6 +336,56 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
 MACHINE_CONFIG_END
 
+ADDRESS_MAP_START(vt100_state::stp_mem)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("stp", 0)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(vt100_state::stp_io)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("stpusart0", i8251_device, data_r, data_w)
+	AM_RANGE(0x90, 0x90) AM_DEVREADWRITE("stpusart0", i8251_device, status_r, control_w)
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("stpusart1", i8251_device, data_r, data_w)
+	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("stpusart1", i8251_device, status_r, control_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("stpusart2", i8251_device, data_r, data_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVREADWRITE("stpusart2", i8251_device, status_r, control_w)
+ADDRESS_MAP_END
+
+MACHINE_CONFIG_START(vt100_state::vt100ac)
+	vt100(config);
+	MCFG_CPU_ADD("stpcpu", I8085A, 4915200)
+	MCFG_CPU_PROGRAM_MAP(stp_mem)
+	MCFG_CPU_IO_MAP(stp_io)
+
+	MCFG_DEVICE_ADD("stpusart0", I8251, 2457600)
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("stprxint", input_merger_device, in_w<0>))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("stptxint", input_merger_device, in_w<0>))
+
+	MCFG_DEVICE_ADD("stpusart1", I8251, 2457600)
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("stprxint", input_merger_device, in_w<1>))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("stptxint", input_merger_device, in_w<1>))
+
+	MCFG_DEVICE_ADD("stpusart2", I8251, 2457600) // for printer?
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("stprxint", input_merger_device, in_w<2>))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("stptxint", input_merger_device, in_w<2>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("stptxint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("stpcpu", I8085_RST55_LINE))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("stprxint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("stpcpu", I8085_RST65_LINE))
+
+	MCFG_DEVICE_MODIFY("dbrg")
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart0", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart1", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart2", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("pusart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart0", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart2", i8251_device, write_txc))
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(vt100_state::vt180)
 	vt100(config);
 	MCFG_CPU_ADD("z80cpu", Z80, XTAL(24'883'200) / 9)
@@ -301,7 +393,7 @@ MACHINE_CONFIG_START(vt100_state::vt180)
 	MCFG_CPU_IO_MAP(vt180_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(vt100_state::vt102)
+MACHINE_CONFIG_START(vt100_state::vt101)
 	vt100(config);
 	MCFG_CPU_REPLACE("maincpu", I8085A, XTAL(24'073'400) / 4)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
@@ -318,6 +410,20 @@ MACHINE_CONFIG_START(vt100_state::vt102)
 
 	MCFG_DEVICE_MODIFY("kbduart")
 	MCFG_AY31015_WRITE_TBMT_CB(INPUTLINE("maincpu", I8085_RST65_LINE))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(vt100_state::vt102)
+	vt101(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(vt102_io)
+
+	MCFG_DEVICE_ADD("printer_uart", INS8250, XTAL(24'073'400) / 16)
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("printer", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", I8085_RST55_LINE))
+
+	MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("printer_uart", ins8250_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("printer_uart", ins8250_device, dsr_w))
 MACHINE_CONFIG_END
 
 /* VT1xx models:
@@ -661,9 +767,9 @@ ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 // 8085 based instead of I8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-028e4-00.e71", 0x0000, 0x2000, CRC(fccce02c) SHA1(f3e3e93a857443685b816cab4fb52e34c0bc72b1)) // rom is unique to vt101; "CN55004N 8232 // DEC TP03 // 23-028E4-00" 24-pin mask rom (mc68764 pinout)
-	//e69 socket is empty/unpopulated on vt101
-	//e67 socket is empty/unpopulated on vt101
-	//dip40 chip in the lower right corner of MB in vt101 (the STP/AVO asic) is absent
+	// E69 socket is empty/unpopulated on vt101
+	// E67 socket is empty/unpopulated on vt101
+	// DIP40 at E74 in the lower right corner of MB in vt101 (WD8250 UART) is absent
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
@@ -732,8 +838,8 @@ ROM_END
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                     FULLNAME       FLAGS */
 COMP( 1978, vt100,    0,      0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100",MACHINE_NOT_WORKING)
 //COMP( 1978, vt100wp,  vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100-Wx", MACHINE_NOT_WORKING)
-COMP( 1979, vt100ac, vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING)
-COMP( 1981, vt101,    vt102,      0,       vt102,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT101", MACHINE_NOT_WORKING)
+COMP( 1979, vt100ac,  vt100,  0,       vt100ac,   vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING)
+COMP( 1981, vt101,    vt102,  0,       vt101,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT101", MACHINE_NOT_WORKING)
 COMP( 1981, vt102,    0,      0,       vt102,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT102", MACHINE_NOT_WORKING)
 //COMP( 1979, vt103,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT103", MACHINE_NOT_WORKING)
 COMP( 1978, vt105,    vt100,  0,       vt100,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT105", MACHINE_NOT_WORKING)
