@@ -485,7 +485,7 @@ void model2_state::model2_3d_process_quad( raster_state *raster, uint32_t attr )
 			break;
 		case 3: // error
 		default:
-			zvalue = 0.0f;
+			zvalue = 1e10;
 			break;
 	}
 
@@ -704,7 +704,7 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, uint32_t at
 			break;
 		case 3: // error
 		default:
-			zvalue = 0.0f;
+			zvalue = 1e10;
 			break;
 	}
 
@@ -841,8 +841,6 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 
 	/* calculate and clip to viewport */
 	rectangle vp(tri->viewport[0] + m_xoffs, tri->viewport[2] + m_xoffs, (384-tri->viewport[3]) + m_yoffs, (384-tri->viewport[1]) + m_yoffs);
-	// TODO: this seems to be more accurate but it breaks in some cases
-	//rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - tri->viewport[0], tri->viewport[1] - 90, tri->viewport[3] - tri->viewport[1]);
 	vp &= cliprect;
 
 	extra.state = &m_state;
@@ -1181,7 +1179,9 @@ void model2_state::model2_3d_push( raster_state *raster, uint32_t input )
 			raster->center_sel = ( input >> 6 ) & 3;
 
 			/* reset the triangle z value */
-			raster->triangle_z = 0.0f;
+			// Zero Gunner sets backgrounds with "previous z value" mode at the start of the display list, 
+			// needs this to be this big in order to work properly
+			raster->triangle_z = 1e10;
 		}
 	}
 }
