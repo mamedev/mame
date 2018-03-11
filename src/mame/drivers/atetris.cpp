@@ -473,6 +473,16 @@ ROM_START( atetrisb2 )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "136066-1101.35a", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // currently unused
+	ROM_LOAD( "m3-7603-5.prom1", 0x00000, 0x0020, CRC(79656af3) SHA1(bf55f100806520b291157c03999606367dd14ecc) )
+
+	ROM_REGION( 0xa00, "plds", 0 ) // all protected
+	ROM_LOAD( "tibpal16r4-25cn.pal1", 0x000, 0x104, NO_DUMP ) // sub PCB
+	ROM_LOAD( "tibpal16r4-25cn.pal3", 0x200, 0x104, NO_DUMP ) // sub PCB
+	ROM_LOAD( "tibpal16l8-25cn.pal2", 0x400, 0x104, NO_DUMP ) // sub PCB
+	ROM_LOAD( "tibpal16l8-25cn.pal4", 0x600, 0x104, NO_DUMP ) // main PCB
+	ROM_LOAD( "tibpal16l8-25cn.pal5", 0x800, 0x104, NO_DUMP ) // main PCB
 ROM_END
 
 
@@ -500,6 +510,8 @@ RC-1108
 |76489              6502                            |
 |VOL MB3713    PAL                                  |
 |---------------------------------------------------|
+
+A second PCB has been found with identical code, but with 1x additional SN76489SN, 1x additional DIP switch, a few more TTLs, and 6 PAL18l8ACN.
 */
 
 ROM_START( atetrisb3 )
@@ -517,6 +529,14 @@ ROM_START( atetrisb3 )
 	// currently unused
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.bin", 0x00000, 0x0020, CRC(79656af3) SHA1(bf55f100806520b291157c03999606367dd14ecc) )
+
+	ROM_REGION( 0xc00, "plds", 0 ) // all protected
+	ROM_LOAD( "gal18v8a-25lp.1",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal18v8a-25lp.2",   0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "palce18v8h-25pc.3", 0x400, 0x117, NO_DUMP )
+	ROM_LOAD( "palce18v8h-25pc.4", 0x600, 0x117, NO_DUMP )
+	ROM_LOAD( "pal16r4b-2cn.5",    0x800, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r4b-2cn.6",    0xa00, 0x104, NO_DUMP )
 ROM_END
 
 
