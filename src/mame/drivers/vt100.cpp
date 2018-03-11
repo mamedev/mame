@@ -27,6 +27,7 @@
 #include "machine/com8116.h"
 #include "machine/er1400.h"
 #include "machine/i8251.h"
+#include "machine/input_merger.h"
 #include "machine/ins8250.h"
 #include "machine/rstbuf.h"
 #include "machine/vt100_kbd.h"
@@ -79,14 +80,17 @@ public:
 	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(vt102_irq_callback);
 	void vt100(machine_config &config);
+	void vt100ac(machine_config &config);
 	void vt101(machine_config &config);
 	void vt102(machine_config &config);
 	void vt180(machine_config &config);
-	void vt100_io(address_map &map);
 	void vt100_mem(address_map &map);
+	void vt100_io(address_map &map);
 	void vt102_io(address_map &map);
-	void vt180_io(address_map &map);
+	void stp_mem(address_map &map);
+	void stp_io(address_map &map);
 	void vt180_mem(address_map &map);
+	void vt180_io(address_map &map);
 };
 
 
@@ -330,6 +334,55 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 
 	MCFG_DEVICE_ADD("rstbuf", RST_POS_BUFFER, 0)
 	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
+MACHINE_CONFIG_END
+
+ADDRESS_MAP_START(vt100_state::stp_mem)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("stp", 0)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(vt100_state::stp_io)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("stpusart0", i8251_device, data_r, data_w)
+	AM_RANGE(0x90, 0x90) AM_DEVREADWRITE("stpusart0", i8251_device, status_r, control_w)
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("stpusart1", i8251_device, data_r, data_w)
+	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("stpusart1", i8251_device, status_r, control_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("stpusart2", i8251_device, data_r, data_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVREADWRITE("stpusart2", i8251_device, status_r, control_w)
+ADDRESS_MAP_END
+
+MACHINE_CONFIG_START(vt100_state::vt100ac)
+	vt100(config);
+	MCFG_CPU_ADD("stpcpu", I8085A, 4915200)
+	MCFG_CPU_PROGRAM_MAP(stp_mem)
+	MCFG_CPU_IO_MAP(stp_io)
+
+	MCFG_DEVICE_ADD("stpusart0", I8251, 2457600)
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("stprxint", input_merger_device, in_w<0>))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("stptxint", input_merger_device, in_w<0>))
+
+	MCFG_DEVICE_ADD("stpusart1", I8251, 2457600)
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("stprxint", input_merger_device, in_w<1>))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("stptxint", input_merger_device, in_w<1>))
+
+	MCFG_DEVICE_ADD("stpusart2", I8251, 2457600)
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("stptxint", input_merger_device, in_w<2>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("stptxint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("stpcpu", I8085_RST55_LINE))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("stprxint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("stpcpu", I8085_RST65_LINE))
+
+	MCFG_DEVICE_MODIFY("dbrg")
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart0", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart1", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart2", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("pusart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart0", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("stpusart2", i8251_device, write_txc))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vt100_state::vt180)
@@ -784,7 +837,7 @@ ROM_END
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                     FULLNAME       FLAGS */
 COMP( 1978, vt100,    0,      0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100",MACHINE_NOT_WORKING)
 //COMP( 1978, vt100wp,  vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100-Wx", MACHINE_NOT_WORKING)
-COMP( 1979, vt100ac,  vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING)
+COMP( 1979, vt100ac,  vt100,  0,       vt100ac,   vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING)
 COMP( 1981, vt101,    vt102,  0,       vt101,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT101", MACHINE_NOT_WORKING)
 COMP( 1981, vt102,    0,      0,       vt102,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT102", MACHINE_NOT_WORKING)
 //COMP( 1979, vt103,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT103", MACHINE_NOT_WORKING)
