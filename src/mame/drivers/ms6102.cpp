@@ -377,4 +377,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT       COMPANY       FULLNAME       FLAGS */
-COMP( 1984, ms6102,  0,      0,       ms6102,    0,       ms6102_state,  0, "Elektronika", "MS 6102.02", MACHINE_NOT_WORKING)
+COMP( 1984, ms6102,  0,      0,       ms6102,    0,       ms6102_state,  0, "Elektronika", "MS 6102.02", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
