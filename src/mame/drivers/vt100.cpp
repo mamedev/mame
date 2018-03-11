@@ -365,7 +365,8 @@ MACHINE_CONFIG_START(vt100_state::vt100ac)
 	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("stprxint", input_merger_device, in_w<1>))
 	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("stptxint", input_merger_device, in_w<1>))
 
-	MCFG_DEVICE_ADD("stpusart2", I8251, 2457600)
+	MCFG_DEVICE_ADD("stpusart2", I8251, 2457600) // for printer?
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("stprxint", input_merger_device, in_w<2>))
 	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("stptxint", input_merger_device, in_w<2>))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("stptxint")
