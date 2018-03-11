@@ -511,7 +511,7 @@ RC-1108
 |VOL MB3713    PAL                                  |
 |---------------------------------------------------|
 
-A second PCB has been found with identical code, but with 1x additional SN76489SN, 1x additional DIP switch, a few more TTLs, and 6 PAL18l8ACN.
+A second PCB has been found with identical code, but with 1x additional SN76489AN, 1x additional DIP switch, a few more TTLs, and 6 PAL18l8ACN.
 */
 
 ROM_START( atetrisb3 )
