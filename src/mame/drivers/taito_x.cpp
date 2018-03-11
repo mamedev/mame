@@ -796,18 +796,11 @@ MACHINE_START_MEMBER(taitox_state,taitox)
 	membank("z80bank")->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(taitox_state::scanline)
+INTERRUPT_GEN_MEMBER(taitox_state::interrupt)
 {
-	if (param == 240)
-	{
-		m_maincpu->set_input_line(6, HOLD_LINE);
-	}
-	else if (param == 40)
-	{
-		// see notes in volfied.cpp
-		m_cchip->ext_interrupt(ASSERT_LINE);
-		m_cchip_irq_clear->adjust(attotime::zero);
-	}
+	m_maincpu->set_input_line(6, HOLD_LINE);
+	m_cchip->ext_interrupt(ASSERT_LINE);
+	m_cchip_irq_clear->adjust(attotime::zero);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(taitox_state::cchip_irq_clear_cb)
@@ -823,8 +816,7 @@ MACHINE_CONFIG_START(taitox_state::superman)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(superman_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", taitox_state,  irq6_line_hold)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitox_state, scanline, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitox_state,  interrupt)
 	
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

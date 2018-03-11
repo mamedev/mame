@@ -224,20 +224,11 @@ WRITE8_MEMBER(volfied_state::counters_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(volfied_state::scanline)
+INTERRUPT_GEN_MEMBER(volfied_state::interrupt)
 {
-	if (param == 240)
-	{
-		m_maincpu->set_input_line(4, HOLD_LINE);
-	}
-	else if (param == 40)
-	{
-		/* it isn't clear when / how this should be generated.  if it's too close to the main vblank you get spurious inputs, including TILT and additional coins when ingame
-		   so for now we generate it at a fixed interval after vbl.  test mode doesn't use 68k interrupts so you get the odd bad frame in the input test as the idle loop
-		   drifts out of sync with the vbl signal */
-		m_cchip->ext_interrupt(ASSERT_LINE);
-		m_cchip_irq_clear->adjust(attotime::zero);
-	}
+	m_maincpu->set_input_line(4, HOLD_LINE);
+	m_cchip->ext_interrupt(ASSERT_LINE);
+	m_cchip_irq_clear->adjust(attotime::zero);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(volfied_state::cchip_irq_clear_cb)
@@ -251,8 +242,7 @@ MACHINE_CONFIG_START(volfied_state::volfied)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)   /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", volfied_state,  irq4_line_hold)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", volfied_state, scanline, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", volfied_state,  interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)   /* 4MHz sound CPU, required to run the game */
 	MCFG_CPU_PROGRAM_MAP(z80_map)

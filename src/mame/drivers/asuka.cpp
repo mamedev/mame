@@ -223,7 +223,6 @@ DIP locations verified for:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z180/z180.h"
 #include "cpu/z80/z80.h"
-#include "machine/bonzeadv.h"
 #include "machine/watchdog.h"
 #include "sound/2610intf.h"
 #include "sound/msm5205.h"
@@ -340,9 +339,8 @@ ADDRESS_MAP_START(asuka_state::bonzeadv_map)
 	AM_RANGE(0x3d0000, 0x3d0001) AM_READNOP
 	AM_RANGE(0x3e0000, 0x3e0001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0x800000, 0x8007ff) AM_READWRITE(bonzeadv_cchip_ram_r, bonzeadv_cchip_ram_w)
-	AM_RANGE(0x800802, 0x800803) AM_READWRITE(bonzeadv_cchip_ctrl_r, bonzeadv_cchip_ctrl_w)
-	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(bonzeadv_cchip_bank_w)
+	AM_RANGE(0x800000, 0x8007ff) AM_DEVREADWRITE8("cchip", taito_cchip_device, mem68_r, mem68_w, 0x00ff)
+	AM_RANGE(0x800800, 0x800fff) AM_DEVREADWRITE8("cchip", taito_cchip_device, asic_r, asic68_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)  /* sprite ram */
@@ -517,11 +515,11 @@ static INPUT_PORTS_START( bonzeadv )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL // as with all c-chip through ADC reads this ends up on 0x80 instead of 0x08
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jigkmgri )
@@ -792,28 +790,16 @@ void asuka_state::machine_start()
 
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_ff));
-
-	save_item(NAME(m_current_round));
-	save_item(NAME(m_current_bank));
 	save_item(NAME(m_video_ctrl));
 	save_item(NAME(m_video_mask));
-	save_item(NAME(m_cc_port));
-	save_item(NAME(m_restart_status));
-	save_item(NAME(m_cval));
 }
 
 void asuka_state::machine_reset()
 {
 	m_adpcm_pos = 0;
 	m_adpcm_ff = false;
-	m_current_round = 0;
-	m_current_bank = 0;
 	m_video_ctrl = 0;
 	m_video_mask = 0;
-	m_cc_port = 0;
-	m_restart_status = 0;
-
-	memset(m_cval, 0, 26);
 }
 
 WRITE_LINE_MEMBER(asuka_state::screen_vblank_asuka)
@@ -825,17 +811,44 @@ WRITE_LINE_MEMBER(asuka_state::screen_vblank_asuka)
 	}
 }
 
+INTERRUPT_GEN_MEMBER(asuka_state::bonze_interrupt)
+{
+	m_maincpu->set_input_line(4, HOLD_LINE);
+	if (m_cchip) m_cchip->ext_interrupt(ASSERT_LINE);
+	if (m_cchip_irq_clear) m_cchip_irq_clear->adjust(attotime::zero);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(asuka_state::cchip_irq_clear_cb)
+{
+	m_cchip->ext_interrupt(CLEAR_LINE);
+}
+
+WRITE8_MEMBER(asuka_state::counters_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+}
+
 MACHINE_CONFIG_START(asuka_state::bonzeadv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* checked on PCB */
 	MCFG_CPU_PROGRAM_MAP(bonzeadv_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  bonze_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)    /* sound CPU, also required for test mode */
 	MCFG_CPU_PROGRAM_MAP(bonzeadv_z80_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)/2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(20'000'000)/2) /* 20MHz OSC next to C-Chip, 10MHz?? */
+	MCFG_CCHIP_IN_PORTA_CB(IOPORT("800007"))
+	MCFG_CCHIP_IN_PORTB_CB(IOPORT("800009"))
+	MCFG_CCHIP_IN_PORTC_CB(IOPORT("80000B"))
+	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("80000D"))
+	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(asuka_state, counters_w))
+
+	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", asuka_state, cchip_irq_clear_cb)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -1233,7 +1246,7 @@ ROM_START( bonzeadv )
 	ROM_LOAD16_WORD_SWAP( "b41-01.15", 0x80000, 0x80000, CRC(5d072fa4) SHA1(6ffe1b8531381eb6dd3f1fec18c91294a6aca9f6) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, CRC(75c52553) SHA1(87bbaefab90e7d43f63556fbae3e937baf9d397b) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) ) /* SCR tiles (8 x 8) */
@@ -1258,7 +1271,7 @@ ROM_START( bonzeadvo )
 	ROM_LOAD16_WORD_SWAP( "b41-01.15", 0x80000, 0x80000, CRC(5d072fa4) SHA1(6ffe1b8531381eb6dd3f1fec18c91294a6aca9f6) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, CRC(75c52553) SHA1(87bbaefab90e7d43f63556fbae3e937baf9d397b) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) ) /* SCR tiles (8 x 8) */
@@ -1283,7 +1296,7 @@ ROM_START( bonzeadvu )
 	ROM_LOAD16_WORD_SWAP( "b41-01.15", 0x80000, 0x80000, CRC(5d072fa4) SHA1(6ffe1b8531381eb6dd3f1fec18c91294a6aca9f6) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, CRC(75c52553) SHA1(87bbaefab90e7d43f63556fbae3e937baf9d397b) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) ) /* SCR tiles (8 x 8) */
@@ -1308,7 +1321,7 @@ ROM_START( jigkmgri )
 	ROM_LOAD16_WORD_SWAP( "b41-01.15", 0x80000, 0x80000, CRC(5d072fa4) SHA1(6ffe1b8531381eb6dd3f1fec18c91294a6aca9f6) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, CRC(75c52553) SHA1(87bbaefab90e7d43f63556fbae3e937baf9d397b) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) ) /* Tiles (8 x 8) */
@@ -1336,7 +1349,7 @@ ROM_START( bonzeadvp ) /* Labels consists of hand written checksum values of the
 	ROM_LOAD16_BYTE( "0e7e.ic28",  0xc0000, 0x20000, CRC(dc1f9fd0) SHA1(88addfa2c3bb854efd88a3556d23a7607b6ec848) ) // ^
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, NO_DUMP ) /* is the C-Chip the same as the final? */
+	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, CRC(75c52553) SHA1(87bbaefab90e7d43f63556fbae3e937baf9d397b) ) /* is the C-Chip the same as the final? */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "abbe.ic9",   0x00000, 0x20000, CRC(50e6581c) SHA1(230724d65c9b1ea5d72117dca077464dd599ad68) ) // first 2 == first half b41-03.1 but split
