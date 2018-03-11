@@ -48,6 +48,7 @@ public:
 		m_crtc(*this, "vt100_video"),
 		m_keyboard(*this, "keyboard"),
 		m_kbduart(*this, "kbduart"),
+		m_pusart(*this, "pusart"),
 		m_dbrg(*this, "dbrg"),
 		m_nvr(*this, "nvr"),
 		m_rstbuf(*this, "rstbuf"),
@@ -61,6 +62,7 @@ public:
 	required_device<vt100_video_device> m_crtc;
 	required_device<vt100_keyboard_device> m_keyboard;
 	required_device<ay31015_device> m_kbduart;
+	required_device<i8251_device> m_pusart;
 	required_device<com8116_device> m_dbrg;
 	required_device<er1400_device> m_nvr;
 	required_device<rst_pos_buffer_device> m_rstbuf;
@@ -131,6 +133,7 @@ READ8_MEMBER(vt100_state::flags_r)
 {
 	uint8_t ret = 0;
 
+	ret |= m_pusart->txrdy_r();
 	ret |= !m_nvr->data_r() << 5;
 	ret |= m_crtc->lba7_r() << 6;
 	ret |= m_kbduart->tbmt_r() << 7;
@@ -241,6 +244,8 @@ void vt100_state::machine_start()
 	m_kbduart->write_nb2(1);
 	m_kbduart->write_cs(1);
 	m_kbduart->write_swe(0);
+
+	m_pusart->write_cts(0);
 }
 
 void vt100_state::machine_reset()
@@ -402,7 +407,7 @@ MACHINE_CONFIG_START(vt100_state::vt101)
 
 	MCFG_DEVICE_MODIFY("pusart")
 	MCFG_DEVICE_CLOCK(XTAL(24'073'400) / 8)
-	MCFG_I8251_TXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST75_LINE))
+	MCFG_I8251_TXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST55_LINE)) // 8085 pin 9, mislabeled RST 7.5 on schematics
 
 	MCFG_DEVICE_REPLACE("dbrg", COM8116_003, XTAL(24'073'400) / 4)
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("pusart", i8251_device, write_rxc))
@@ -419,7 +424,7 @@ MACHINE_CONFIG_START(vt100_state::vt102)
 
 	MCFG_DEVICE_ADD("printer_uart", INS8250, XTAL(24'073'400) / 16)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("printer", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", I8085_RST55_LINE))
+	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", I8085_RST75_LINE)) // 8085 pin 7, mislabeled RST 5.5 on schematics
 
 	MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("printer_uart", ins8250_device, rx_w))
