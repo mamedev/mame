@@ -676,6 +676,7 @@ MACHINE_CONFIG_START(esripsys_state::esripsys)
 	MCFG_ESRIP_STATUS_IN_CALLBACK(READ8(esripsys_state, rip_status_in))
 	MCFG_ESRIP_DRAW_CALLBACK_OWNER(esripsys_state, esripsys_draw)
 	MCFG_ESRIP_LBRM_PROM("proms")
+	MCFG_ESRIP_SCREEN("screen")
 
 	MCFG_CPU_ADD("sound_cpu", MC6809E, XTAL(8'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
