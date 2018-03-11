@@ -249,6 +249,7 @@ uint32_t tecmosys_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	bitmap.fill(0, cliprect);
 	
 	// TODO : Verify 0xc00000-0xc00003 scroll both flip screen and normal screen case, Bit 4 of 0xc00004 is unknown
+	// TODO : is tilemap flip bits is correct?
 	m_tilemap[0]->set_flip(((m_scroll[0][2] & 1) ? TILEMAP_FLIPX : 0) | ((m_scroll[0][2] & 2) ? TILEMAP_FLIPY : 0) );
 
 	// TODO : Scroll is wrong/unverified when flip screen case
