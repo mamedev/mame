@@ -1538,13 +1538,13 @@ which is also found in the Wireless Air 60 ROM.
 
 ROM_START( wireless )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "wireless.nand", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796) )
+	ROM_LOAD16_WORD_SWAP( "wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796) )
 ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     STATE              INIT      COMPANY                                              FULLNAME             FLAGS
 
 // VTech systems
-CONS( 2005, vsmile,   0,        0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (US)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmile,   0,        0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (US)",      MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 CONS( 2005, vsmileg,  vsmile,   0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (Germany)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 CONS( 2005, vsmilef,  vsmile,   0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (France)",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 CONS( 2005, vsmileb,  0,        0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
@@ -1564,7 +1564,7 @@ CONS( 2006, rad_skat,  0,       0,        spg2xx_base, rad_skat, spg2xx_game_sta
 CONS( 2006, rad_skatp, rad_skat,0,        spg2xx_basep,rad_skatp,spg2xx_game_state, rad_skat, "Radica",                                            "Connectv Skateboarder (PAL)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
-CONS( 200?, zone40,    0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft",                                      "Zone 40", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2009, zone40,    0,       0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // might not fit here, NAND dump, has internal bootstrap at least, see above.
-CONS( 200?, wlsair60,  0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft",                                      "Wireless Air 60", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2011, wireless,  0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft",                                      "Wireless", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2010, wlsair60,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft / Kids Station Toys Inc",               "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, wireless,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Hamy / Kids Station Toys Inc",                      "Wireless",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
