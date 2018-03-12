@@ -43,8 +43,6 @@ enum texture_format
 // screen_update callback flags
 constexpr u32 UPDATE_HAS_NOT_CHANGED = 0x0001;   // the video has not changed
 
-constexpr u32 MAX_NUM_SCREENS = 9;
-
 /*!
  @defgroup flags for video_attributes
  @{

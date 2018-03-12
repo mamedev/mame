@@ -136,7 +136,7 @@ void debug_view_state::recompute()
 	}
 	else if (screen_count > 1)
 	{
-		for (int i = 0; i < screen_count; i++, iter++)
+		for (int i = 0; (i < screen_count) && (i < 8); i++, iter++)
 		{
 			m_state_list.emplace_back(REG_BEAMX_S0 - i, string_format("beamx%d", i).c_str(), 4);
 			m_state_list.emplace_back(REG_BEAMY_S0 - i, string_format("beamy%d", i).c_str(), 4);

@@ -193,7 +193,7 @@ private:
 		attotime            m_mng_next_frame_time;      // time of next frame
 		u32                 m_mng_frame;                // current movie frame number
 	};
-	mng_info_t			m_mngs[9];
+	std::vector<mng_info_t> m_mngs;
 
 	// movie recording - AVI
 	class avi_info_t
@@ -210,7 +210,7 @@ private:
 		attotime            m_avi_next_frame_time;      // time of next frame
 		u32                 m_avi_frame;                // current movie frame number
 	};
-	avi_info_t			m_avis[9];
+	std::vector<avi_info_t> m_avis;
 
 	static const bool   s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS];
 
