@@ -6,9 +6,8 @@
 
         29/04/2009 Preliminary driver.
 
-        TODO: keyboard doesn't work properly, kb uart comms issue?
-        TODO: vt100 gives a '2' error on startup indicating bad nvram checksum
-              adding the serial nvram support should fix this
+        TODO: some video attributes are not fully supported yet
+        TODO: vt102 modem control loopback test needs different connections
         TODO: support for the on-AVO character set roms
         TODO: finish support for the on-cpu board alternate character set rom
 
@@ -16,6 +15,25 @@
         http://www.bitsavers.org/pdf/dec/terminal/vt100/EK-VT100-TM-003_VT100_Technical_Manual_Jul82.pdf starting on page 6-70, pdf page 316
         And its schematics:
         http://bitsavers.org/pdf/dec/terminal/vt125/MP01053_VT125_Mar82.pdf
+
+*****************************************************************************
+
+        Quick overview of "Set-Up" controls:
+
+        2   Set/Clear Tab (A)       Shift+A   Set Answerback Message (B)
+        3   Clear All Tabs (A)      Shift+S   Save Settings
+        4   On Line/Local           Shift+R   Recall Settings
+        5   Set-Up A/B
+        6   Toggle 1/0 (B)
+        7   Transmit Speed (B)
+        8   Receive Speed (B)
+        9   80/132 Columns (A)
+        0   Reset Terminal
+
+        If the NVR is not yet initialized, a '2' error will appear when the
+        terminal is powered on. This is non-fatal and can ordinarily be
+        remedied by entering "Set-Up" and then saving the settings.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -252,10 +270,6 @@ void vt100_state::machine_start()
 		auto *printer_port = subdevice<rs232_port_device>("printer");
 		printer_port->write_dtr(0);
 		printer_port->write_rts(0);
-
-		m_printer_uart->cts_w(0);
-		m_printer_uart->dcd_w(0);
-		m_printer_uart->ri_w(0);
 	}
 }
 
@@ -852,15 +866,15 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                     FULLNAME       FLAGS */
-COMP( 1978, vt100,    0,      0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100",MACHINE_NOT_WORKING)
-//COMP( 1978, vt100wp,  vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100-Wx", MACHINE_NOT_WORKING)
-COMP( 1979, vt100ac,  vt100,  0,       vt100ac,   vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING)
-COMP( 1981, vt101,    vt102,  0,       vt101,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT101", MACHINE_NOT_WORKING)
-COMP( 1981, vt102,    0,      0,       vt102,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT102", MACHINE_NOT_WORKING)
-//COMP( 1979, vt103,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT103", MACHINE_NOT_WORKING)
-COMP( 1978, vt105,    vt100,  0,       vt100,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT105", MACHINE_NOT_WORKING)
-//COMP( 1978, vt110,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT110", MACHINE_NOT_WORKING)
-//COMP( 1981, vt125,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT125", MACHINE_NOT_WORKING)
-COMP( 1981, vt131,    vt102,  0,       vt102,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT131", MACHINE_NOT_WORKING)
-//COMP( 1979, vt132,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT132", MACHINE_NOT_WORKING)
-COMP( 1983, vt180,    vt100,  0,       vt180,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT180", MACHINE_NOT_WORKING)
+COMP( 1978, vt100,    0,      0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100",MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1978, vt100wp,  vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100-Wx", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1979, vt100ac,  vt100,  0,       vt100ac,   vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1981, vt101,    vt102,  0,       vt101,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT101", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1981, vt102,    0,      0,       vt102,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT102", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1979, vt103,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT103", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1978, vt105,    vt100,  0,       vt100,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT105", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1978, vt110,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT110", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1981, vt125,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT125", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1981, vt131,    vt102,  0,       vt102,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT131", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//COMP( 1979, vt132,    vt100,  0,       vt100,     vt100, vt100_state,   0,  "Digital Equipment Corporation", "VT132", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1983, vt180,    vt100,  0,       vt180,     vt100, vt100_state,   0,   "Digital Equipment Corporation", "VT180", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
