@@ -1285,49 +1285,6 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 }
 
 
-
-/* Daytona "To The MAXX" PIC protection simulation */
-READ32_MEMBER(model2o_maxx_state::maxx_r)
-{
-	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
-
-	if (offset <= 0x1f/4)
-	{
-		// special
-		if (mem_mask == 0xffff0000)
-		{
-			// 16-bit protection reads
-			m_maxxstate++;
-			m_maxxstate &= 0xf;
-			if (!m_maxxstate)
-			{
-				return 0x00070000;
-			}
-			else
-			{
-				if (m_maxxstate & 0x2)
-				{
-					return 0;
-				}
-				else
-				{
-					return 0x00040000;
-				}
-			}
-		}
-		else if (mem_mask == 0xffffffff)
-		{
-			// 32-bit read
-			if (offset == 0x22/4)
-			{
-				return 0x00ff0000;
-			}
-		}
-	}
-
-	return ROM[offset + (0x040000/4)];
-}
-
 #ifdef UNUSED_FUNCTION
 WRITE32_MEMBER(model2_state::copro_w)
 {
@@ -1563,9 +1520,70 @@ ADDRESS_MAP_START(model2o_state::model2o_mem)
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w)
 ADDRESS_MAP_END
 
+/* Daytona "To The MAXX" PIC protection simulation */
+READ32_MEMBER(model2o_maxx_state::maxx_r)
+{
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
+
+	if (offset <= 0x1f/4)
+	{
+		// special
+		if (mem_mask == 0xffff0000)
+		{
+			// 16-bit protection reads
+			m_maxxstate++;
+			m_maxxstate &= 0xf;
+			if (!m_maxxstate)
+			{
+				return 0x00070000;
+			}
+			else
+			{
+				if (m_maxxstate & 0x2)
+				{
+					return 0;
+				}
+				else
+				{
+					return 0x00040000;
+				}
+			}
+		}
+		else if (mem_mask == 0xffffffff)
+		{
+			// 32-bit read
+			if (offset == 0x22/4)
+			{
+				return 0x00ff0000;
+			}
+		}
+	}
+
+	return ROM[offset + (0x040000/4)];
+}
+
 ADDRESS_MAP_START(model2o_maxx_state::model2o_maxx_mem)
 	AM_IMPORT_FROM(model2o_mem)
 	AM_RANGE(0x00240000,0x0024ffff) AM_READ(maxx_r)
+ADDRESS_MAP_END
+
+READ8_MEMBER(model2o_gtx_state::gtx_r)
+{
+	uint8_t *ROM = memregion("prot_data")->base();
+
+	if(offset == 0xffffc) // disable protection ROM overlay (fallbacks to data rom?)
+		m_gtx_state = 2;
+	else if(offset == 0xff00c || offset == 0xf0003) // enable protection bank 0
+		m_gtx_state = 0;
+	else if(offset == 0xff000) // enable protection bank 1
+		m_gtx_state = 1;
+
+	return ROM[m_gtx_state*0x100000+offset];
+}
+
+ADDRESS_MAP_START(model2o_gtx_state::model2o_gtx_mem)
+	AM_IMPORT_FROM(model2o_mem)
+	AM_RANGE(0x02c00000,0x02cfffff) AM_READ8(gtx_r,0xffffffff)
 ADDRESS_MAP_END
 
 /* TODO: read by Sonic the Fighters (bit 1), unknown purpose */
@@ -2562,7 +2580,12 @@ MACHINE_CONFIG_START(model2o_maxx_state::daytona_maxx)
 	MCFG_CPU_PROGRAM_MAP(model2o_maxx_mem)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(model2o_gtx_state::daytona_gtx)
+	daytona(config);
 
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(model2o_gtx_mem)
+MACHINE_CONFIG_END
 
 /* 2A-CRX */
 MACHINE_CONFIG_START(model2a_state::model2a)
@@ -3144,7 +3167,8 @@ ROM_START( vf2o ) /* Virtua Fighter 2, Model 2A */
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( srallyc ) /* Sega Rally Championship Revision C, Model 2A, Sega game ID# 833-11649 RALLY TWIN, Sega ROM board ID# 834-11618 RALLY TWIN */
+/* Sega Rally Championship Revision C, Model 2A, Sega game ID# 833-11649 RALLY TWIN, Sega ROM board ID# 834-11618 RALLY TWIN */
+ROM_START( srallyc )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-17888c.12",  0x000000, 0x080000, CRC(3d6808aa) SHA1(33abf9cdcee9583dc600c94e1e29ce260e8c5d32) )
 	ROM_LOAD32_WORD( "epr-17889c.13",  0x000002, 0x080000, CRC(f43c7802) SHA1(4b1efb3d5644fed1753da1750bf5c300d3a15d2c) )
@@ -6135,6 +6159,77 @@ ROM_START( daytonam ) /* Daytona USA (Japan, To The MAXX) */
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
 	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
+	
+	ROM_REGION( 0x10000, "pic", 0)
+	ROM_LOAD("pic.bin", 0x00000, 0x10000, NO_DUMP )
+ROM_END
+
+ROM_START( daytonagtx )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_LOAD32_WORD( "gtx.12", 0x000000, 0x020000, CRC(08283a6f) SHA1(643110a3ea5fb6092c469b6b49a396084e985a7a) )
+	ROM_LOAD32_WORD( "gtx.13", 0x000002, 0x020000, CRC(f9b356ae) SHA1(ad635540d64e05c7246c9de6439a4e3b3d1cdf08) )
+
+	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data
+	ROM_LOAD32_WORD("mpr-16528.10",   0x000000, 0x200000, CRC(9ce591f6) SHA1(e22fc8a70b533f7a6191f5952c581fb8f9627906) )
+	ROM_LOAD32_WORD("mpr-16529.11",   0x000002, 0x200000, CRC(f7095eaf) SHA1(da3c922f950dd730ea348eae12aa1cb69cee9a58) )
+	ROM_LOAD32_WORD("mpr-16808.8",    0x400000, 0x200000, CRC(44f1f5a0) SHA1(343866a6e2187a8ebc17f6727080f9f2f9ac9200) )
+	ROM_LOAD32_WORD("mpr-16809.9",    0x400002, 0x200000, CRC(37a2dd12) SHA1(8192d8698d6bd52ee11cc28917aff5840c447627) )
+	ROM_LOAD32_WORD("epr-16724a.6",   0x800000, 0x080000, CRC(469f10fd) SHA1(7fad3b8d03960e5e1f7a6cb36509238977e00fcc) )
+	ROM_LOAD32_WORD("epr-16725a.7",   0x800002, 0x080000, CRC(ba0df8db) SHA1(d0c5581c56500b5266cab8e8151db24fcbdea0d7) )
+	ROM_COPY( "main_data", 0x800000, 0x900000, 0x100000 )
+	ROM_COPY( "main_data", 0x800000, 0xa00000, 0x100000 )
+	ROM_COPY( "main_data", 0x800000, 0xb00000, 0x100000 )
+	ROM_COPY( "main_data", 0x800000, 0xc00000, 0x100000 )
+	ROM_COPY( "main_data", 0x800000, 0xd00000, 0x100000 )
+	ROM_COPY( "main_data", 0x800000, 0xe00000, 0x100000 )
+	ROM_COPY( "main_data", 0x800000, 0xf00000, 0x100000 )
+
+	ROM_REGION32_LE( 0x300000, "prot_data", ROMREGION_ERASEFF ) // banked data
+	ROM_LOAD32_WORD("bank0.bin",      0x000002, 0x080000, CRC(21b603b4) SHA1(3f8f83fbf2ce5055fa85075c95da617fe2a8738a) )
+	ROM_LOAD32_WORD("bank1.bin",      0x100002, 0x080000, CRC(c1971f23) SHA1(3db88552ff2166f6eb2a9200e8609b52c1266274) )
+
+	ROM_REGION( 0x800000, "tgp", 0 ) // TGP program? (COPRO socket)
+	ROM_LOAD32_WORD("mpr-16537.ic28", 0x000000, 0x200000, CRC(36b7c35a) SHA1(b32fd1d3fc8983fb5f2a7b236b665a8c9b52769f) )
+	ROM_LOAD32_WORD("mpr-16536.ic29", 0x000002, 0x200000, CRC(6d6afed9) SHA1(2018468d7d849854b3d0cfbcd217317e2fc93555) )
+
+	ROM_REGION( 0x1000000, "polygons", 0 ) // Models
+	ROM_LOAD32_WORD("mpr-16523.ic16", 0x000000, 0x200000, CRC(2f484d42) SHA1(0b83a3fc92b7d913a14cfb01d688c63555c17c41) )
+	ROM_LOAD32_WORD("mpr-16518.ic20", 0x000002, 0x200000, CRC(df683bf7) SHA1(16afe5029591f3536b5b75d9cf50a34d0ea72c3d) )
+	ROM_LOAD32_WORD("mpr-16524.ic17", 0x400000, 0x200000, CRC(34658bd7) SHA1(71b47626ffe5b26d1140afe1b830a9a2be86c88f) )
+	ROM_LOAD32_WORD("mpr-16519.ic21", 0x400002, 0x200000, CRC(facd1c81) SHA1(dac8c281a5e9a6c4b60197e6676f3727264ee420) )
+	ROM_LOAD32_WORD("mpr-16525.ic18", 0x800000, 0x200000, CRC(fb517521) SHA1(33f5f37ea2e09fc73eed5388b46fdf1fa9e285e6) )
+	ROM_LOAD32_WORD("mpr-16520.ic22", 0x800002, 0x200000, CRC(d66bd9bd) SHA1(660171674484375a27595630e5e2d2ad76a06d1a) )
+	ROM_LOAD32_WORD("mpr-16772.ic19", 0xc00000, 0x200000, CRC(770ed912) SHA1(1789f35dd403f73f8be18495a0fe4ad1e6841417) )
+	ROM_LOAD32_WORD("mpr-16771.ic23", 0xc00002, 0x200000, CRC(a2205124) SHA1(257a3675e4ef6adbf61285a5daa5954223c28cb2) )
+
+	ROM_REGION( 0x1000000, "textures", 0 ) // Textures
+	ROM_LOAD32_WORD("mpr-16522.25", 0x000000, 0x200000, CRC(55d39a57) SHA1(abf7b0fc0f111f90da42463d600db9fa32e95efe) )
+	ROM_LOAD32_WORD("mpr-16521.24", 0x000002, 0x200000, CRC(af1934fb) SHA1(a6a21a23cd34d0de6d3e6a5c3c2687f905d0dc2a) )
+	ROM_LOAD32_WORD("mpr-16770.27", 0x800000, 0x200000, CRC(f9fa7bfb) SHA1(8aa933b74d4e05dc49987238705e50b00e5dae73) )
+	ROM_LOAD32_WORD("mpr-16769.26", 0x800002, 0x200000, CRC(e57429e9) SHA1(8c712ab09e61ef510741a55f29b3c4e497471372) )
+
+	ROM_REGION( 0x20000, "cpu3", 0) // Communication program
+	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
+
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
+	ROM_LOAD16_WORD_SWAP("epr-16720.7", 0x000000, 0x020000, CRC(8e73cffd) SHA1(9933ccc0757e8c86e0adb938d1c89210b26841ea) )
+	ROM_LOAD16_WORD_SWAP("epr-16721.8", 0x020000, 0x020000, CRC(1bb3b7b7) SHA1(ee2fd1480e535fc37e9932e6fe4e31344559fc87) )
+
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
+	ROM_LOAD("mpr-16491.32", 0x000000, 0x200000, CRC(89920903) SHA1(06d1d55470ae99f8de0f8c88c694f34c4eb13668) )
+	ROM_LOAD("mpr-16492.33", 0x200000, 0x200000, CRC(459e701b) SHA1(2054f69cecad677eb00c6a3051f5b5d90885e19b) )
+
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) // Samples
+	ROM_LOAD("mpr-16493.4", 0x000000, 0x200000, CRC(9990db15) SHA1(ea9a8b45a07dccaae62be7cf095532ce7596a70c) )
+	ROM_LOAD("mpr-16494.5", 0x200000, 0x200000, CRC(600e1d6c) SHA1(d4e246fc57a16ff562bbcbccf6a739b706f58696) )
+
+	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
+
+	ROM_REGION( 0x10000, "iocpu", 0 ) // 837-10539 I/O board
+	ROM_LOAD("epr-14869c.25", 0x000000, 0x010000, CRC(24b68e64) SHA1(c19d044d4c2fe551474492aa51922587394dd371) )
+
+	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
+	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
 ROM_END
 
 ROM_START( vcop ) /* Virtua Cop Revision B, Model 2 */
@@ -6313,9 +6408,10 @@ GAME( 1994, daytona,   0,       daytona,     daytona, model2o_state,       srall
 GAME( 1994, daytonase, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "Sega", "Daytona USA Special Edition (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, daytona93, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "Sega", "Daytona USA (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, daytonas,  daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "Sega", "Daytona USA (With Saturn Adverts)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, daytonat,  daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Japan, Turbo hack, set 1)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, daytonata, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Japan, Turbo hack, set 2)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, daytonam,  daytona, daytona_maxx,daytona, model2o_maxx_state,  srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Japan, To The MAXX)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994?,daytonat,  daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Turbo hack, set 1)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994?,daytonata, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Turbo hack, set 2)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, daytonam,  daytona, daytona_maxx,daytona, model2o_maxx_state,  srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (To The MAXX)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, daytonagtx,daytona, daytona_gtx, daytona, model2o_gtx_state,   srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (GTX 2004 Edition)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, desert,    0,       model2o,     desert,  model2o_state,       0,       ROT0, "Sega / Martin Marietta", "Desert Tank", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, vcop,      0,       model2o,     vcop,    model2o_state,       0,       ROT0, "Sega", "Virtua Cop (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, vcopa,     vcop,    model2o,     vcop,    model2o_state,       0,       ROT0, "Sega", "Virtua Cop (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

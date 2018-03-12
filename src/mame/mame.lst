@@ -21309,12 +21309,13 @@ wingwaru                        // 1994.09 Wing War (US)
 @source:model2.cpp
 bel                             // 1998.12 Behind Enemy Lines
 daytona                         // 1994.03 Daytona USA (Japan, Revision A)
-daytona93                       //
-daytonam                        // 1993, hack
-daytonas                        //
+daytona93                       // 1993    Japan
+daytonam                        // 2001    Kyle Hodgetts hack
+daytonas                        // 
 daytonase                       // 1994    Daytona USA Special Edition (Japan, Revision A)
-daytonat                        // 1993, hack
-daytonata                       // 1993, hack
+daytonat                        // 1994?   Kyle Hodgetts hack
+daytonata                       // 1994?   Kyle Hodgetts hack
+daytonagtx						// 2004    Kyle Hodgetts hack
 desert                          // 1994.07 Desert Tank
 doa                             // 1996.11 Dead or Alive (Revision B)
 doaa                            // 1996.11 Dead or Alive (Revision A)

@@ -375,6 +375,27 @@ private:
 
 /*****************************
  *
+ * Daytona GTX 2004 Edition
+ *
+ *****************************/
+
+class model2o_gtx_state : public model2o_state
+{
+public:
+	model2o_gtx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2o_state(mconfig, type, tag)
+	{}
+
+	DECLARE_READ8_MEMBER(gtx_r);
+	void daytona_gtx(machine_config &config);
+	void model2o_gtx_mem(address_map &map);
+	
+private:
+	int m_gtx_state;
+};
+ 
+/*****************************
+ *
  * Model 2A
  *
  *****************************/
