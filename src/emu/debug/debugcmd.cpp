@@ -2474,8 +2474,8 @@ void debugger_commands::execute_find(int ref, const std::vector<std::string> &pa
 		return;
 
 	/* further validation */
-	endoffset = (offset + length - 1) & space->addrmask();
-	offset = offset & space->addrmask();
+	endoffset = space->address_to_byte_end((offset + length - 1) & space->addrmask());
+	offset = space->address_to_byte(offset & space->addrmask());
 	cur_data_size = space->addr_shift() > 0 ? 2 : 1 << -space->addr_shift();
 	if (cur_data_size == 0)
 		cur_data_size = 1;
