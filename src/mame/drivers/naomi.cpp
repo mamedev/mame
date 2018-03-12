@@ -433,7 +433,7 @@ Zombie Revenge                                  840-0003C    21707   19 (64Mb)  
 Zombie Revenge (Rev A)                          840-0003C    21707A  19 (64Mb)   present     315-6213  317-0249-COM   joystick + 3 buttons
 
 
-171-7930B (C) Sega 1998
+837-14011 171-7930B (C) Sega 1998
 |------------------------------------------------------------------|
 |        JJJJJJ      SW2                        ----CN2----        -|
 | SW1    PPPPPP                                                     |
@@ -1593,29 +1593,12 @@ Premier Eleven
 
 #define CPU_CLOCK (200000000)
 
-READ64_MEMBER(naomi_state::naomi_unknown1_r )
+READ16_MEMBER(naomi_state::naomi_g2bus_r )
 {
-	if ((offset * 8) == 0xc0) // trick so that it does not "wait for multiboard sync"
-		return -1;
-	return 0;
+	// G2 bus is 16bit wide, "floating bus" value is 16 most significant address bits
+	u32 address = 0x01000000 + offset * 2;
+	return address >> 16;
 }
-
-WRITE64_MEMBER(naomi_state::naomi_unknown1_w )
-{
-}
-
-// TODO: was using same handler as Naomi, tbd
-READ64_MEMBER(atomiswave_state::aw_unknown1_r )
-{
-	if ((offset * 8) == 0xc0) // trick so that it does not "wait for multiboard sync"
-		return -1;
-	return 0;
-}
-
-WRITE64_MEMBER(atomiswave_state::aw_unknown1_w )
-{
-}
-
 
 /*
 * Non-volatile memories
@@ -1716,8 +1699,7 @@ ADDRESS_MAP_START(naomi_state::naomi_map)
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE(sh4_soundram_r, sh4_soundram_w )           // sound RAM (8 MB)
 
 	/* External Device */
-	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM   // Naomi 2 BIOS tests this, needs to read back as written
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+	AM_RANGE(0x01000000, 0x01ffffff) AM_MIRROR(0x02000000) AM_READ16(naomi_g2bus_r, 0xffffffffffffffffU)
 
 	/* Area 1 */
 	AM_RANGE(0x04000000, 0x04ffffff) AM_MIRROR(0x02000000) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
@@ -1775,8 +1757,7 @@ ADDRESS_MAP_START(naomi2_state::naomi2_map)
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE(sh4_soundram_r, sh4_soundram_w )           // sound RAM (8 MB)
 
 	/* External Device */
-	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM   // Naomi 2 BIOS tests this, needs to read back as written
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+	AM_RANGE(0x01000000, 0x01ffffff) AM_MIRROR(0x02000000) AM_READ16(naomi_g2bus_r, 0xffffffffffffffffU)
 
 	AM_RANGE(0x025f7c00, 0x025f7cff) AM_DEVICE32("powervr2_slave", powervr2_device, pd_dma_map, 0xffffffffffffffffU)
 	AM_RANGE(0x025f8000, 0x025f9fff) AM_DEVICE32("powervr2_slave", powervr2_device, ta_map, 0xffffffffffffffffU)
@@ -1949,10 +1930,7 @@ ADDRESS_MAP_START(atomiswave_state::aw_map)
 	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, 0xffffffffffffffffU)
 	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16("aicartc", aicartc_device, read, write, 0x0000ffff0000ffffU )
 	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE(sh4_soundram_r, sh4_soundram_w )           // sound RAM (8 MB)
-
-
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE(aw_unknown1_r, aw_unknown1_w ) // ???
-
+	
 	/* Area 1 - half the texture memory, like dreamcast, not naomi */
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_MIRROR(0x00800000) AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
 	AM_RANGE(0x05000000, 0x057fffff) AM_RAM AM_MIRROR(0x00800000) AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
