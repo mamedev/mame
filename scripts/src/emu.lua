@@ -273,7 +273,6 @@ custombuildtask {
 	layoutbuildtask("emu/layout", "lcd_rot"),
 	layoutbuildtask("emu/layout", "svg"),
 	layoutbuildtask("emu/layout", "noscreens"),
-	layoutbuildtask("emu/layout", "snap"),
 }
 
 project ("precompile")
