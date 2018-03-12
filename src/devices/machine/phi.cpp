@@ -110,7 +110,7 @@ constexpr uint16_t REG_INT_CLEARABLE_MASK   = 0x40c1;   // Mask of clearable bit
 constexpr uint16_t REG_INT_STATE_MASK       = 0x803e;   // Mask of "state" bits
 
 // Bits in inbound FIFO
-constexpr uint16_t REG_IFIFO_NORMAL_MASK    = 0x0000;   // Mask of D0/D1 bits for "normal" bytes
+//constexpr uint16_t REG_IFIFO_NORMAL_MASK  = 0x0000;   // Mask of D0/D1 bits for "normal" bytes
 constexpr uint16_t REG_IFIFO_CNT_EXP_MASK   = 0x8000;   // Mask for a byte that caused byte count to expire
 constexpr uint16_t REG_IFIFO_LAST_MASK      = 0xc000;   // Mask for last byte in a record
 constexpr uint16_t REG_IFIFO_2_ADDR_MASK    = 0x4000;   // Mask for secondary addresses
