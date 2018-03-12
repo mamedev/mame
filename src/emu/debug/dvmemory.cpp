@@ -631,19 +631,13 @@ bool debug_view_memory::needs_recompute()
 		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 		offs_t val = m_expression.value();
 		if (source.m_space)
-			val = source.m_space->address_to_byte(val);
+			val = source.m_space->address_to_byte(val & source.m_space->logaddrmask());
 		recompute = true;
 		m_topleft.y = (val - m_byte_offset) / m_bytes_per_row;
 		m_topleft.y = std::max(m_topleft.y, 0);
 		m_topleft.y = std::min(m_topleft.y, m_total.y - 1);
 
-		offs_t resultbyte;
-		if (source.m_space != nullptr)
-			resultbyte = val & source.m_space->logaddrmask();
-		else
-			resultbyte = val;
-
-		set_cursor_pos(cursor_pos(resultbyte, m_bytes_per_chunk * 8 - 4));
+		set_cursor_pos(cursor_pos(val, m_bytes_per_chunk * 8 - 4));
 	}
 
 	// expression is clean at this point, and future recomputation is not necessary
