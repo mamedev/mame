@@ -2527,10 +2527,10 @@ void debugger_commands::execute_find(int ref, const std::vector<std::string> &pa
 		{
 			switch (data_size[j])
 			{
-				case 1: match = (u8(m_cpu.read_byte(*space, i + suboffset, true)) == u8(data_to_find[j]));    break;
-				case 2: match = (u16(m_cpu.read_word(*space, i + suboffset, true)) == u16(data_to_find[j]));  break;
-				case 4: match = (u32(m_cpu.read_dword(*space, i + suboffset, true)) == u32(data_to_find[j])); break;
-				case 8: match = (u64(m_cpu.read_qword(*space, i + suboffset, true)) == u64(data_to_find[j])); break;
+				case 1: match = (u8(m_cpu.read_byte(*space, space->byte_to_address(i + suboffset), true)) == u8(data_to_find[j]));    break;
+				case 2: match = (u16(m_cpu.read_word(*space, space->byte_to_address(i + suboffset), true)) == u16(data_to_find[j]));  break;
+				case 4: match = (u32(m_cpu.read_dword(*space, space->byte_to_address(i + suboffset), true)) == u32(data_to_find[j])); break;
+				case 8: match = (u64(m_cpu.read_qword(*space, space->byte_to_address(i + suboffset), true)) == u64(data_to_find[j])); break;
 				default:    /* all other cases are wildcards */     break;
 			}
 			suboffset += data_size[j] & 0x0f;
