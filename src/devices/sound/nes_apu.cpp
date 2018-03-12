@@ -342,7 +342,7 @@ s8 nesapu_device::apu_triangle(apu_t::triangle_t *chan)
 	if (freq < 4) /* inaudible */
 		return 0;
 
-	chan->phaseacc -= (float) m_apu_incsize; /* # of cycles per sample */
+	chan->phaseacc --;
 	while (chan->phaseacc < 0)
 	{
 		chan->phaseacc += freq;
@@ -400,7 +400,7 @@ s8 nesapu_device::apu_noise(apu_t::noise_t *chan)
 		return 0;
 
 	freq = noise_freq[chan->regs[2] & 0x0F];
-	chan->phaseacc -= (float) m_apu_incsize; /* # of cycles per sample */
+	chan->phaseacc --;
 	while (chan->phaseacc < 0)
 	{
 		chan->phaseacc += freq;
@@ -453,7 +453,7 @@ s8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 	if (chan->enabled)
 	{
 		freq = dpcm_clocks[chan->regs[0] & 0x0F];
-		chan->phaseacc -= (float) m_apu_incsize; /* # of cycles per sample */
+		chan->phaseacc --;
 
 		while (chan->phaseacc < 0)
 		{
