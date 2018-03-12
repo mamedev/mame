@@ -39,9 +39,7 @@
     - srallyc: some 3d elements doesn't show up properly (tree models, last hill in course 1 is often black colored);
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
     - vcop: lightgun input is offsetted (needs to be calibrated in service mode);
-	- vcop: missing 3d bug at stage select screen (priority?);
-	- vcop, daytona: 3d gets corrupted if you get into test mode then go into gameplay, looks like the dsp should be 
-	  resetted somehow, doing that from the copro_ctl1_w it breaks schamp booting;
+	- vcop: missing 3d at stage select screen (priority?);
 	- vstriker: stadium ads have terrible colors (they uses the wrong color table, @see video/model2rd.hxx)
 
 	Notes:
@@ -826,6 +824,9 @@ WRITE32_MEMBER(model2_state::copro_ctl1_w)
 		{
 			logerror("Start copro upload\n");
 			m_coprocnt = 0;
+			
+			if(m_dsp_type == DSP_TYPE_TGP)
+				m_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
@@ -833,6 +834,8 @@ WRITE32_MEMBER(model2_state::copro_ctl1_w)
 			switch(m_dsp_type)
 			{
 				case DSP_TYPE_TGP:
+					// Model 2 / 2A games needs to reset TGP when exiting service mode
+					m_tgp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 					m_tgp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 					break;
 				case DSP_TYPE_SHARC:
@@ -2387,7 +2390,7 @@ ADDRESS_MAP_START(model2_state::copro_sharc_map)
 	AM_RANGE(0x0c00000, 0x13fffff) AM_WRITE(copro_sharc_output_fifo_w)
 	AM_RANGE(0x1400000, 0x1bfffff) AM_READWRITE(copro_sharc_buffer_r, copro_sharc_buffer_w)
 	AM_RANGE(0x1c00000, 0x1dfffff) AM_ROM AM_REGION("copro_data", 0)
-//  AM_RANGE(0x3c000000, 0x3fffffff) AM_WRITE(copro_sharc_output_fifo_w) // last bronx, cpu core bug?
+//	AM_RANGE(0xffff8000, 0xffffffff) AM_READWRITE(copro_sharc_buffer_r, copro_sharc_buffer_w) // last bronx, cpu core bug?
 ADDRESS_MAP_END
 
 #if 0
