@@ -253,9 +253,6 @@ dependency {
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/lcd_rot.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/svg.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/noscreens.lh" },
-
-	{ MAME_DIR .. "src/emu/video.cpp",   GEN_DIR .. "emu/layout/snap.lh" },
-
 }
 
 custombuildtask {
