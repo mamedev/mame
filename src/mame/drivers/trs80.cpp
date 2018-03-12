@@ -722,6 +722,7 @@ MACHINE_CONFIG_START(trs80_state::radionic)
 	model1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(12_MHz_XTAL / 6) // or 3.579MHz / 2 (selectable?)
+	// Komtek I "User Friendly Manual" calls for "Z80 running at 1.97 MHz." Schematics mark XTAL as 12 MHz, but is that rounded off?
 	MCFG_CPU_PERIODIC_INT_DRIVER(trs80_state, nmi_line_pulse, 12_MHz_XTAL / 12 / 16384)
 
 	MCFG_SCREEN_MODIFY("screen")
