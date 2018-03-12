@@ -59,7 +59,7 @@
 // exponentially decaying envelope (a bell sound) whereas in the emulation it's inside a
 // simple rectangular envelope.
 //
-//*U20      HP "PHI"    Custom HP-IB interface microcontroller
+// U20      HP "PHI"    Custom HP-IB interface microcontroller
 // U28      i8251       RS232 UART
 //
 // **********
@@ -145,9 +145,6 @@
 //  1  Enable drive 0 motor (0)
 //  0  Enable drive 0 (0)
 //
-//
-// ICs that are not emulated yet are marked with "*"
-//
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
@@ -162,6 +159,8 @@
 #include "video/i8275.h"
 #include "screen.h"
 #include "speaker.h"
+#include "machine/phi.h"
+#include "bus/ieee488/ieee488.h"
 
 #define BIT_MASK(n) (1U << (n))
 
@@ -228,6 +227,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(hp64k_rs232_dcd_w);
 	DECLARE_WRITE_LINE_MEMBER(hp64k_rs232_cts_w);
 
+	DECLARE_READ16_MEMBER(hp64k_phi_r);
+	DECLARE_WRITE16_MEMBER(hp64k_phi_w);
+	DECLARE_WRITE_LINE_MEMBER(hp64k_phi_int_w);
+	DECLARE_READ_LINE_MEMBER(hp64k_phi_sys_ctrl_r);
+
 	DECLARE_WRITE16_MEMBER(hp64k_beep_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(hp64k_beeper_off);
 
@@ -256,6 +260,7 @@ private:
 	required_ioport m_s5_sw;
 	required_device<i8251_device> m_uart;
 	required_device<rs232_port_device> m_rs232;
+	required_device<phi_device> m_phi;
 
 	// Character generator
 	const uint8_t *m_chargen;
@@ -314,6 +319,9 @@ private:
 	bool m_txd_state;
 	bool m_dtr_state;
 	bool m_rts_state;
+
+	// HPIB I/F
+	uint8_t m_phi_reg;
 };
 
 ADDRESS_MAP_START(hp64k_state::cpu_mem_map)
@@ -339,6 +347,9 @@ ADDRESS_MAP_START(hp64k_state::cpu_io_map)
 	// PA = 6, IC = [0..3]
 	// Read from USART
 	AM_RANGE(HP_MAKE_IOADDR(6 , 0) , HP_MAKE_IOADDR(6 , 3))   AM_READ(hp64k_usart_r)
+	// PA = 7, IC = 1
+	// PHI
+	AM_RANGE(HP_MAKE_IOADDR(7 , 1) , HP_MAKE_IOADDR(7 , 1))   AM_READWRITE(hp64k_phi_r , hp64k_phi_w)
 	// PA = 7, IC = 2
 	// Rear-panel switches and loopback relay control
 	AM_RANGE(HP_MAKE_IOADDR(7 , 2) , HP_MAKE_IOADDR(7 , 2))   AM_READWRITE(hp64k_rear_sw_r , hp64k_loopback_w)
@@ -374,7 +385,8 @@ hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const 
 	m_baud_rate(*this , "baud_rate"),
 	m_s5_sw(*this , "s5_sw"),
 	m_uart(*this , "uart"),
-	m_rs232(*this , "rs232")
+	m_rs232(*this , "rs232"),
+	m_phi(*this , "phi")
 {
 }
 
@@ -418,7 +430,7 @@ void hp64k_state::machine_reset()
 	m_txd_state = true;
 	m_dtr_state = true;
 	m_rts_state = true;
-
+	m_phi_reg = 0;
 }
 
 uint8_t hp64k_state::hp64k_crtc_filter(uint8_t data)
@@ -1027,6 +1039,7 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_rts_w)
 
 WRITE16_MEMBER(hp64k_state::hp64k_loopback_w)
 {
+	m_phi_reg = (uint8_t)((data >> 8) & 7);
 	m_loopback = BIT(data , 11);
 	hp64k_update_loopback();
 }
@@ -1058,11 +1071,37 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_rs232_dcd_w)
 	}
 }
 
+READ16_MEMBER(hp64k_state::hp64k_phi_r)
+{
+	return m_phi->reg16_r(space , m_phi_reg , mem_mask);
+}
+
+WRITE16_MEMBER(hp64k_state::hp64k_phi_w)
+{
+	m_phi->reg16_w(space , m_phi_reg , data , mem_mask);
+}
+
 WRITE_LINE_MEMBER(hp64k_state::hp64k_rs232_cts_w)
 {
 	if (!m_loopback) {
 		m_uart->write_cts(state);
 	}
+}
+
+WRITE_LINE_MEMBER(hp64k_state::hp64k_phi_int_w)
+{
+	if (state) {
+		BIT_SET(m_irl_pending , 7);
+	} else {
+		BIT_CLR(m_irl_pending , 7);
+	}
+
+	hp64k_update_irl();
+}
+
+READ_LINE_MEMBER(hp64k_state::hp64k_phi_sys_ctrl_r)
+{
+	return BIT(m_rear_panel_sw->read() , 6);
 }
 
 WRITE16_MEMBER(hp64k_state::hp64k_beep_w)
@@ -1254,6 +1293,9 @@ static INPUT_PORTS_START(hp64k)
 	PORT_DIPNAME(0x0400 , 0x0400 , "E9-1 jumper")
 	PORT_DIPSETTING(0x0000 , DEF_STR(Yes))
 	PORT_DIPSETTING(0x0400 , DEF_STR(No))
+	PORT_DIPNAME(0x0040 , 0x0000 , "System controller")
+	PORT_DIPSETTING(0x0000 , DEF_STR(No))
+	PORT_DIPSETTING(0x0040 , DEF_STR(Yes))
 	PORT_DIPNAME(0x0018 , 0x0000 , "System source")
 	PORT_DIPLOCATION("S1:!7,!6")
 	PORT_DIPSETTING(0x0000 , "Sys bus")
@@ -1410,6 +1452,30 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(hp64k_state , hp64k_rs232_dcd_w))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(hp64k_state , hp64k_rs232_cts_w))
 
+	MCFG_DEVICE_ADD("phi" , PHI , 0)
+	MCFG_PHI_INT_WRITE_CB(WRITELINE(hp64k_state , hp64k_phi_int_w))
+	MCFG_PHI_DMARQ_WRITE_CB(DEVWRITELINE("cpu" , hp_5061_3011_cpu_device , halt_w))
+	MCFG_PHI_SYS_CNTRL_READ_CB(READLINE(hp64k_state , hp64k_phi_sys_ctrl_r))
+	MCFG_PHI_DIO_READWRITE_CB(DEVREAD8(IEEE488_TAG , ieee488_device , dio_r) , DEVWRITE8(IEEE488_TAG , ieee488_device , dio_w))
+	MCFG_PHI_EOI_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , eoi_w))
+	MCFG_PHI_DAV_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , dav_w))
+	MCFG_PHI_NRFD_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , nrfd_w))
+	MCFG_PHI_NDAC_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , ndac_w))
+	MCFG_PHI_IFC_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , ifc_w))
+	MCFG_PHI_SRQ_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , srq_w))
+	MCFG_PHI_ATN_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , atn_w))
+	MCFG_PHI_REN_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , ren_w))
+	MCFG_IEEE488_BUS_ADD()
+	MCFG_IEEE488_EOI_CALLBACK(DEVWRITELINE("phi" , phi_device , eoi_w))
+	MCFG_IEEE488_DAV_CALLBACK(DEVWRITELINE("phi" , phi_device , dav_w))
+	MCFG_IEEE488_NRFD_CALLBACK(DEVWRITELINE("phi" , phi_device , nrfd_w))
+	MCFG_IEEE488_NDAC_CALLBACK(DEVWRITELINE("phi" , phi_device , ndac_w))
+	MCFG_IEEE488_IFC_CALLBACK(DEVWRITELINE("phi" , phi_device , ifc_w))
+	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("phi" , phi_device , srq_w))
+	MCFG_IEEE488_ATN_CALLBACK(DEVWRITELINE("phi" , phi_device , atn_w))
+	MCFG_IEEE488_REN_CALLBACK(DEVWRITELINE("phi" , phi_device , ren_w))
+	MCFG_IEEE488_DIO_CALLBACK(DEVWRITE8("phi" , phi_device , bus_dio_w))
+	// Feel so lonely here... waiting for the 488 remotizer ;)
 MACHINE_CONFIG_END
 
 ROM_START(hp64k)

@@ -899,6 +899,7 @@ MACHINE_CONFIG_START(hp9895_device::device_add_mconfig)
 	MCFG_PHI_REN_WRITE_CB(WRITELINE(hp9895_device , phi_ren_w))
 	MCFG_PHI_DIO_READWRITE_CB(READ8(hp9895_device , phi_dio_r) , WRITE8(hp9895_device , phi_dio_w))
 	MCFG_PHI_INT_WRITE_CB(WRITELINE(hp9895_device , phi_int_w))
+	MCFG_PHI_SYS_CNTRL_READ_CB(GND)
 
 	MCFG_FLOPPY_DRIVE_ADD("floppy0" , hp9895_floppies , "8dsdd" , hp9895_floppy_formats)
 	MCFG_SLOT_FIXED(true)
