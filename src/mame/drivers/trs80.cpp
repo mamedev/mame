@@ -593,7 +593,8 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(trs80_state::trs80)       // the original model I, level I, with no extras
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 10.6445_MHz_XTAL / 6) // about 1.774 MHz
+	MCFG_CPU_ADD("maincpu", Z80, 10.6445_MHz_XTAL / 6) // "a little over 1.774 MHz"
+	// MAME driver previously configured CPU at "1.796 MHz"; where did this number come from?
 	MCFG_CPU_PROGRAM_MAP(trs80_map)
 	MCFG_CPU_IO_MAP(trs80_io)
 
