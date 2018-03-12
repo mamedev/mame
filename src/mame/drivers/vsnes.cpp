@@ -1705,9 +1705,6 @@ MACHINE_CONFIG_START(vsnes_state::vsnes)
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
-	MCFG_DEVICE_MODIFY("maincpu:nesapu")
-	MCFG_NES_APU_SCREEN_TAG("screen1")
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen1", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1776,14 +1773,8 @@ MACHINE_CONFIG_START(vsnes_state::vsdual)
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_map)
 
-	MCFG_DEVICE_MODIFY("maincpu:nesapu")
-	MCFG_NES_APU_SCREEN_TAG("screen1")
-
 	MCFG_CPU_ADD("sub", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vsnes_cpu2_map)
-
-	MCFG_DEVICE_MODIFY("sub:nesapu")
-	MCFG_NES_APU_SCREEN_TAG("screen2")
 
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)

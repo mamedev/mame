@@ -649,9 +649,6 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_CPU_ADD("cart", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cart_map)
 
-	MCFG_DEVICE_MODIFY("cart:nesapu")
-	MCFG_NES_APU_SCREEN_TAG("bottom")
-
 	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // 7D
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(playch10_state, sdcs_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(playch10_state, cntrl_mask_w))

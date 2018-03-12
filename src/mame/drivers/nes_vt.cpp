@@ -1402,7 +1402,6 @@ MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	   DMA control still comes from the 1st, but in the new mode, sound always outputs via the
 	   2nd.  Probably need to split the APU into interface and sound gen logic. */
 	MCFG_SOUND_ADD("apu", NES_APU, NTSC_APU_CLOCK)
-	MCFG_NES_APU_SCREEN_TAG("screen")
 	MCFG_NES_APU_IRQ_HANDLER(WRITELINE(nes_vt_state, apu_irq))
 	MCFG_NES_APU_MEM_READ_CALLBACK(READ8(nes_vt_state, apu_read_mem))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

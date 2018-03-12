@@ -316,9 +316,6 @@ MACHINE_CONFIG_START(cham24_state::cham24)
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cham24_map)
 
-	MCFG_DEVICE_MODIFY("maincpu:nesapu")
-	MCFG_NES_APU_SCREEN_TAG("screen")
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

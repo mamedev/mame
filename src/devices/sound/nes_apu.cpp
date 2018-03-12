@@ -49,10 +49,6 @@
 #include "emu.h"
 #include "nes_apu.h"
 
-#include "screen.h"
-
-
-
 /* INTERNAL FUNCTIONS */
 
 /* INITIALIZE WAVE TIMES RELATIVE TO SAMPLE RATE */
@@ -107,12 +103,9 @@ DEFINE_DEVICE_TYPE(NES_APU, nesapu_device, "nesapu", "N2A03 APU")
 nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NES_APU, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_apu_incsize(0.0)
 	, m_samps_per_sync(0)
 	, m_buffer_size(0)
-	, m_real_rate(0)
 	, m_stream(nullptr)
-	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_irq_handler(*this)
 	, m_mem_read_cb(*this)
 {
@@ -146,18 +139,8 @@ void nesapu_device::calculate_rates()
 {
 	int rate = clock() / 4;
 
-	if (m_screen)
-	{
-		m_samps_per_sync = rate / ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds());
-		m_real_rate = m_samps_per_sync * ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds());
-	}
-	else
-	{
-		m_samps_per_sync = rate / screen_device::DEFAULT_FRAME_RATE;
-		m_real_rate = m_samps_per_sync * screen_device::DEFAULT_FRAME_RATE;
-	}
+	m_samps_per_sync = 89490; // Is there a different PAL value?
 	m_buffer_size = m_samps_per_sync;
-	m_apu_incsize = float(clock() / (float) m_real_rate);
 
 	create_vbltimes(m_vbl_times,vbl_length,m_samps_per_sync);
 	create_syncs(m_samps_per_sync);
@@ -168,7 +151,7 @@ void nesapu_device::calculate_rates()
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(rate);
 	else
-		m_stream = machine().sound().stream_alloc(*this, 0, 1, rate);
+		m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
 }
 
 //-------------------------------------------------
@@ -300,7 +283,7 @@ s8 nesapu_device::apu_square(apu_t::square_t *chan)
 			|| (chan->freq >> 16) < 4)
 		return 0;
 
-	chan->phaseacc -= (float) m_apu_incsize; /* # of cycles per sample */
+	chan->phaseacc --;
 
 	while (chan->phaseacc < 0)
 	{
