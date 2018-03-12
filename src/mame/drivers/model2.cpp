@@ -1347,7 +1347,7 @@ WRITE32_MEMBER(model2_state::copro_w)
 
 READ32_MEMBER(model2_state::render_mode_r)
 {
-	return (m_render_unk << 14) | (m_render_mode << 2);
+	return (m_render_unk << 14) | (m_render_mode << 2) | (m_render_test_mode << 0);
 }
 
 WRITE32_MEMBER(model2_state::render_mode_w)
@@ -1355,6 +1355,9 @@ WRITE32_MEMBER(model2_state::render_mode_w)
 	// ---- -x-- (1) 60 Hz mode
 	//           (0) 30 Hz mode - skytargt, desert, vstriker, vcop
 	// ---- ---x Test Mode (Host can "access memories that are always being reloaded")
+	//           Effectively used by Last Bronx to r/w to the framebuffer
+	m_render_test_mode = bool(BIT(data,0));
+
 	m_render_mode = bool(BIT(data,2));
 
 	// undocumented, unknown purpose
@@ -1408,6 +1411,11 @@ READ8_MEMBER(model2_state::tgpid_r)
 	return ID[offset];
 }
 
+READ16_MEMBER(model2_state::fbvram_bankA_r) { return m_fbvramA[offset]; }
+READ16_MEMBER(model2_state::fbvram_bankB_r) { return m_fbvramB[offset]; }
+WRITE16_MEMBER(model2_state::fbvram_bankA_w) { COMBINE_DATA(&m_fbvramA[offset]); }
+WRITE16_MEMBER(model2_state::fbvram_bankB_w) { COMBINE_DATA(&m_fbvramB[offset]); }
+
 /* common map for all Model 2 versions */
 ADDRESS_MAP_START(model2_state::model2_base_mem)
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP
@@ -1460,9 +1468,9 @@ ADDRESS_MAP_START(model2_state::model2_base_mem)
 //  AM_RANGE(0x10a00000, 0x10bfffff) fill memory ping
 //  AM_RANGE(0x10c00000, 0x10dfffff) fill memory pong
 
-	// format is xGGGGGBBBBBRRRRR (512x400)
-	AM_RANGE(0x11600000, 0x1167ffff) AM_RAM AM_SHARE("fbvram1") // framebuffer A (last bronx title screen)
-	AM_RANGE(0x11680000, 0x116fffff) AM_RAM AM_SHARE("fbvram2") // framebuffer B
+	// format is xGGGGGRRRRRBBBBB (512x400)
+	AM_RANGE(0x11600000, 0x1167ffff) AM_READWRITE16(fbvram_bankA_r,fbvram_bankA_w,0xffffffff) // framebuffer A (last bronx title screen)
+	AM_RANGE(0x11680000, 0x116fffff) AM_READWRITE16(fbvram_bankB_r,fbvram_bankB_w,0xffffffff) AM_SHARE("fbvram2") // framebuffer B
 
 	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE16(lumaram_r,lumaram_w,0x0000ffff) // polygon "luma" RAM
 ADDRESS_MAP_END

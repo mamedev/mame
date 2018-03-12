@@ -28,8 +28,6 @@ public:
 		m_bufferram(*this, "bufferram"),
 		m_textureram0(*this, "textureram0"),
 		m_textureram1(*this, "textureram1"),
-		m_fbvram1(*this, "fbvram1"),
-		m_fbvram2(*this, "fbvram2"),
 		m_soundram(*this, "soundram"),
 		m_tgp_program(*this, "tgp_program"),
 		m_tgpx4_program(*this, "tgpx4_program"),
@@ -66,8 +64,8 @@ public:
 	required_shared_ptr<uint32_t> m_textureram0;
 	required_shared_ptr<uint32_t> m_textureram1;
 	std::unique_ptr<uint16_t[]> m_lumaram;
-	required_shared_ptr<uint32_t> m_fbvram1;
-	required_shared_ptr<uint32_t> m_fbvram2;
+	std::unique_ptr<uint16_t[]> m_fbvramA;
+	std::unique_ptr<uint16_t[]> m_fbvramB;
 	optional_shared_ptr<uint16_t> m_soundram;
 	optional_shared_ptr<uint32_t> m_tgp_program;
 	optional_shared_ptr<uint64_t> m_tgpx4_program;
@@ -181,6 +179,10 @@ public:
 	DECLARE_WRITE32_MEMBER(model2o_tex_w1);
 	DECLARE_READ16_MEMBER(lumaram_r);
 	DECLARE_WRITE16_MEMBER(lumaram_w);
+	DECLARE_READ16_MEMBER(fbvram_bankA_r);
+	DECLARE_WRITE16_MEMBER(fbvram_bankA_w);
+	DECLARE_READ16_MEMBER(fbvram_bankB_r);
+	DECLARE_WRITE16_MEMBER(fbvram_bankB_w);
 	DECLARE_WRITE32_MEMBER(model2_3d_zclip_w);
 	DECLARE_WRITE16_MEMBER(model2snd_ctrl);
 	DECLARE_READ32_MEMBER(copro_sharc_input_fifo_r);
@@ -236,9 +238,9 @@ public:
 
 	void model2_3d_frame_start( void );
 	void geo_parse( void );
-	
 	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
-
+	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	
 	void model2_timers(machine_config &config);
 	void model2_screen(machine_config &config);
 	void model2_scsp(machine_config &config);
@@ -283,6 +285,7 @@ private:
 
 	bool m_render_unk;
 	bool m_render_mode;
+	bool m_render_test_mode;
 	int16 m_crtc_xoffset, m_crtc_yoffset;
 
 	uint32_t *geo_process_command( geo_state *geo, uint32_t opcode, uint32_t *input, bool *end_code );

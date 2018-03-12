@@ -997,6 +997,32 @@ void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &c
 	copybitmap_trans(bitmap, m_poly->destmap(), 0, 0, 0, 0, cliprect, 0x00000000);
 }
 
+// direct framebuffer drawing (enabled with render test mode, Last Bronx title screen)
+// pretty sure test mode cuts off DSP framebuffer drawing/clear, according to the manual description too
+void model2_state::draw_framebuffer( bitmap_rgb32 &bitmap, const rectangle &cliprect )
+{
+	uint16_t *fbvram = &(m_screen->frame_number() & 1 ? m_fbvramB[0] : m_fbvramA[0]);
+	// TODO: halved crtc values?
+	int xoffs = (-m_crtc_xoffset)/2;
+	int yoffs = m_crtc_yoffset/2;
+
+	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	{
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			int r,g,b;
+			int offset = (x + xoffs) + (y + yoffs)*512;
+			b = (fbvram[offset] >> 0) & 0x1f;
+			r = (fbvram[offset] >> 5) & 0x1f;
+			g = (fbvram[offset] >> 10) & 0x1f;
+			r = pal5bit(r);
+			g = pal5bit(g);
+			b = pal5bit(b);
+			bitmap.pix32(y, x) = r << 16 | g << 8 | b;
+		}
+	}
+}
+
 /* 3D Rasterizer main data input port */
 void model2_state::model2_3d_push( raster_state *raster, uint32_t input )
 {
@@ -2606,7 +2632,9 @@ void model2_state::video_start()
 	m_palram = make_unique_clear<uint16_t[]>(0x4000/2);
 	m_colorxlat = make_unique_clear<uint16_t[]>(0xc000/2);
 	m_lumaram = make_unique_clear<uint16_t[]>(0x10000/2);
-
+	m_fbvramA = make_unique_clear<uint16_t[]>(0x80000/2);
+	m_fbvramB = make_unique_clear<uint16_t[]>(0x80000/2);
+	
 	// convert (supposedly) 3d sRGB color space into linear
 	// TODO: might be slightly different algorithm (Daytona USA road/cars, VF2 character skins)
 	for(int i=0;i<256;i++)
@@ -2616,6 +2644,10 @@ void model2_state::video_start()
 		m_gamma_table[i] = (uint8_t)raw_value;
 //      printf("%02x: %02x %lf\n",i,m_gamma_table[i],raw_value);
 	}
+	
+	save_item(NAME(m_render_test_mode));
+	save_item(NAME(m_render_unk));
+	save_item(NAME(m_render_mode));
 }
 
 uint32_t model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -2634,13 +2666,19 @@ uint32_t model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 
 	copybitmap_trans(bitmap, m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	/* tell the rasterizer we're starting a frame */
-	model2_3d_frame_start();
+	if(m_render_test_mode == true)
+		draw_framebuffer( bitmap, cliprect );
+	else
+	{
+		model2_3d_frame_start();
 
-	/* let the geometry engine do it's thing */ /* TODO: don't do it here! */
-	geo_parse();
+		/* let the geometry engine do it's thing */ 
+		// TODO: move it from here
+		geo_parse();
 
-	/* have the rasterizer output the frame */
-	model2_3d_frame_end( bitmap, cliprect );
+		/* have the rasterizer output the frame */
+		model2_3d_frame_end( bitmap, cliprect );
+	}
 
 	m_sys24_bitmap.fill(0, cliprect);
 
