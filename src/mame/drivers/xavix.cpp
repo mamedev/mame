@@ -28,30 +28,168 @@
 	There are multiple revisions of the CPU hardware, the SSD 2000 / SSD 2002 chips definitely add more opcodes
 	(thanks to Sean Riddle for this table)
 
-	name						PCB ID		ROM width	TSOP pads	ROM size		SEEPROM			die markings              extra components / notes
+	preliminary list of XaviX software based on various sources (some likely still missing)
 
-	Play TV Ping Pong			8028		x8			48			1M				no				SSD 97 PA7270-107
+	 year		name																							PCB ID		ROM width		TSOP pads   ROM size        SEEPROM				die markings			extra components / notes
 
-	Play TV Bass Fishin'		71008		x8			40			1M				no				SSD 98 PA7351-107
-	Play TV Boxing				72039		x8			48			2M				no				SSD 98 PA7351-107
-	Play TV Card Night			71063		x8			40			1M				no				SSD 98 PA7351-107
-
-	Play TV Baseball 2			72042		x8			48			2M				no				SSD 98 PL7351-181
-	Play TV Monster Truck		74026		x8			48			4M				no				SSD 98 PL7351-181
-	Radica/EA Madden Football	74021		x8			48			4M      		no				SSD 98 PL7351-181
-	Play TV Football            -           x8          48          4M              no              SSD 98 PL7351-181
-	Play TV Snowboarder Blue	71023		x8			40			1M				no				SSD 98 PL7351-181
-	Namco Nostalgia 2			CGSJ		x8			48			1M				24LC04			SSD 98 PL7351-181
-	Taito Nostalgia 2			CGSJ		x8			ES29LV160DB Flash ROM*		24LC04			SSD 98 PL7351-181        (dumped as AMD29LV160DB)
-	Excite Fishing DX           ?           x8          ?           4M              24C08           SSD 98 PL7351-181  
-
-	Star Wars Saga Lightsaber	SWSA		x8			48			8M				24C02			SSD 2000 NEC 85605-621
-	Lord of the Rings			LORA		x8			48			8M				24C02			SSD 2000 NEC 85605-621
-	MX Rebel Dirt				MTXA		x8			48			8M				24C04			SSD 2000 NEC 85605-621
-
-	XaviXTennis					SGM6446		x16			48			8M				24C08			SSD 2002 NEC 85054-611
-
-	XaviXBowling				SGM644C		x16			48			not dumped		
+	2011		anpan-man kazoku de ikunou mat DX/JoyPalette/Japan												-			-				-			-				-					-						-
+	2009		anpan-man pyon-pyon ikunou mat/JoyPalette/Japan													-			-				-			-				-					-						-
+	2008		kyuukyoku! kinniku grand slam! SASUKE kanzen seiha/EPOCH/Japan									-			-				-			-				-					-						-
+	2007		Tokyo Friend park? perfect! mezase! grand slam!/EPOCH/Japan										-			-				-			-				-					-						-
+	2006	1	Let's TV Play series "Kamen Rider Kabuto" /EPOCH/Japan											-			-				-			-				-					-						-
+			2	Let's TV Play series "Bo-kenger" /EPOCH/Japan													-			-				-			-				-					-						-
+			3	Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan											-			-				-			-				-					-						-
+			4	Sasuke & Sportsman Tournament /BANDAI/Japan														-			-				-			-				-					-						-
+			5	Hyper resque, I am a resque team /BANDAI/Japan													-			-				-			-				-					-						-
+			6	Let's TV Play series "Ultraman" /BANDAI/Japan													-			-				-			-				-					-						-
+			7	Let's TV Play Classic series "Namco Nostalgia 1" /BANDAI/Japan									CGSJ		x8				48			1M				24LC04										dumped non destructively
+			8	Let's TV Play Classic series "Namco Nostalgia 2" /BANDAI/Japan									CGSJ		x8				48			1M				24LC04				SSD 98 PL7351-181		dumped
+			9	Let's TV Play Classic series "Taito Nostalgia 1" /BANDAI/Japan									CGSJ		x8				48			2M				24LC04										flash, dumped non destructively
+			10	Let's TV Play Classic series "Taito Nostalgia 2" /BANDAI/Japan									CGSJ		x8				48			2M				24LC04										flash, dumped non destructively
+			11	Let's play and study! Doraemon Hiragana book /BANDAI/Japan										-			-				-			-				-					-						-
+			12	Scan card! Exciting Stage Soccer. /EPOCH/Japan													-			-				-			-				-					-						-
+			13	Hello Kitty Super TV computer /EPOCH/Japan														-			-				-			-				-					-						-
+			14	Doraemon Super TV computer /EPOCH/Japan															-			-				-			-				-					-						-
+	2005	1	Let's TV Play series "Dragon Ball Z" /BANDAI/Japan												-			-				-			-				-					-						-
+			2	Let's TV Play series "Purikyua" /BANDAI/Japan													-			-				-			-				-					-						-
+			3	Idaten Jump /TOMY/Japan																			-			-				-			-				-					-						-
+			4	Tokyo Friend Park 2 Special /EPOCH/Japan														-			-				-			-				-					-						-
+			5	Masked Rider HIBIKI /BANDAI/Japan																-			-				-			-				-					-						-
+			6	Magic Ranger Battle /BANDAI/Japan																-			-				-			-				-					-						-
+			7	Accessory cartridge for Super TV computer "ECC Junior"/EPOCH/Japan								-			-				-			-				-					-						-
+			8	Wild Adventure Mini Golf Game /Hasbro/USA														MGFA		x8				48			4M				24C04				SSD 98 PL7351-181		dumped
+			9	MX DIRT REBEL Game /Hasbro/USA																	MTXA		x8				48			8M				24C04				SSD 2000 NEC 85605-621	dumped
+			10	Dokodemo Doraemon Japan Travel Game DX /EPOCH/Japan												-			-				-			-				-					-						-
+			11	Tomas Plarail /TOMY/Japan																		-			-				-			-				-					-						-
+			12	Thomas TV Personal Computer /EPOCH/Japan														-			-				-			-				-					-						-
+			13	STAR WARS Light Saber Battle /TOMY/Japan														-			-				-			-				-					-						-
+			14	Jala Jaland /atlus/Japan																		-			-				-			-				-					-						-
+			15	Star Wars Lightsaber Battle Game /Hasbro/USA													SWSA		x8				48			8M				24C02				SSD 2000 NEC 85605-621	dumped
+			16	Gururin World /EPOCH/Japan																		-			-				-			-				-					-						-
+			17	Toinohgi Onmyo-daisenki /BANDAI/Japan															-			-				-			-				-					-						-
+	2004	1	Accessory cartridge for Super TV computer "Double mouse party"/EPOCH/Japan						-			-				-			-				-					-						-
+			2	Printer for TV computer /EPOCH/Japan															-			-				-			-				-					-						-
+			3	Virtual punching battle of "One Piece" /BANDAI/Japan											-			-				-			-				-					-						-
+			4	Accessory cartridge for Super TV computer "Doraemon"/EPOCH/Japan								-			-				-			-				-					-						-
+			5	Accessory cartridge for Super TV computer "Hamutaro"/EPOCH/Japan								-			-				-			-				-					-						-
+			6	Super TV computer /EPOCH/Japan																	-			-				-			-				-					-						-
+			7	Super Dash ball /EPOCH/Japan																	-			-				-			-				-					-						-
+			8	Exciting sports Tennis X Fitness /EPOCH/Japan													-			-				-			-				-					-						-
+			9	Accessory memory mascot for TV mail Pc mail cot 2 characters (Putchi, Petchi) /EPOCH/Japan		-			-				-			-				-					-						-
+			10	Accessory memory mascot for TV mail Pc mail cot 2 characters (Charuru, Kurau) /EPOCH/Japan		-			-				-			-				-					-						-
+			11	The Lord of the Rings Warrior of Middle Earth /Hasbro/USA										LORA		x8				48			8M				24C02				SSD 2000 NEC 85605-621	dumped
+			12	Beyblade Arcade Challenge 5-in-1 /Hasbro/USA													-			-				-			-				-					-						-
+			13	All star Festival Quize /EPOCH/Japan															-			-				-			-				-					-						-
+			14	e-kara mix /TAKARA/Japan																		-			-				-			-				-					-						-
+			15	Jumping Popira /TAKARA/Japan																	-			-				-			-				-					-						-
+			16	Tour around Japan. I'm a Prarail motorman /TOMY/Japan											-			-				-			-				-					-						-
+			17	TV mail PC "Mercot /EPOCH/Japan																	-			-				-			-				-					-						-
+			18	Play TV Monster Truck /RADICA/USA																74026		x8				48			4M				none				SSD 98 PL7351-181		dumped
+			19	Play TV Madden Football /RADICA/USA																74021		x8				48			4M				none				SSD 98 PL7351-181		dumped
+			20	Play TV SSX Snowboarder (and Snowboarder white?) /RADICA/USA									74023						none																	have
+			21	Disney Princess "Kira-Kira magical lesson" /TOMY/Japan											-			-				-			-				-					-						-
+			22	Mermaid Melody "pichi-pichi Pitch" e-pitch microcomputer pure starter set /TAKARA/Japan			-			-				-			-				-					-						-
+			23	Hello Kitty TV computer /EPOCH/Japan															-			-				-			-				-					-						-
+			24	Gan-Gan Revoultion /TAKARA/Japan																-			-				-			-				-					-						-
+	2003	1	Tokyo Friend Park II /EPOCH/Japan																-			-				-			-				-					-						-
+			2	TV mah-jongg /EPOCH/Japan																		-			-				-			-				-					-						-
+			3	e-kara Web /TAKARA/Japan																		-			-				-			-				-					-						-
+			4	Doraemon TV computer /EPOCH/Japan																-			-				-			-				-					-						-
+			5	Exciting stadium DX, Hansin Tigers version /EPOCH/Japan											-			-				-			-				-					-						-
+			6	Dragon Quest /SQUARE ENIX/Japan																	-			-				-			-				-					-						-
+			7	Croquette! Win a medal! /EPOCH/Japan															-			-				-			-				-					-						-
+			8	Taiko Popira /TAKARA/Japan																		-			-				-			-				-					-						-
+			9	Together Minimoni, Dancing' Stage! plus /EPOCH/Japan											-			-				-			-				-					-						-
+			10	Evio /TOMY/Japan																				-			-				-			-				-					-						-
+			11	Together Minimoni,Jumping Party! /EPOCH/Japan													-			-				-			-				-					-						-
+			12	Hamutaro TV computer /EPOCH/Japan																-			-				-			-				-					-						-
+			13	Jara-Ja Land /TAKARA/Japan																		-			-				-			-				-					-						-
+			14	Tomika, Draiving by Car navigation system /TOMY/Japan											-			-				-			-				-					-						-
+			15	PLAY TV Rescue Heroes /RADICA/USA																73036		x8				48			2M				none				SSD 98 PL7351-181		dumped
+			16	PLAY TV Huntin' 2 /RADICA/USA																	73030		x8				none						none				SSD 98 PL7351-181		have
+			17	Let's play Ping-pong. Exciting pingpong2 /EPOCH/Japan											-			-				-			-				-					-						-
+			18	Cartridge for Slot machine TV "King of wild animal" /TAKARA/Japan								-			-				-			-				-					-						-
+			19	ChyoroQ "Burning up Racer /TAKARA/Japan															-			-				-			-				-					-						-
+			20	Super shot! Exciting golf /EPOCH/Japan															-			-				-			-				-					-						-
+			21	PichiPichi Pitchi /TAKARA/Japan																	-			-				-			-				-					-						-
+			22	Dual Station /TAKARA/Japan																		-			-				-			-				-					-						-
+			23	Gei-Geki GoGo! Shooting /TAKARA/Japan															-			-				-			-				-					-						-
+			24	Let's fish a big one. Exciting fishing! /EPOCH/Japan											-			-				-			-				-					-						-
+			25	Champion Pinball /TOMY/Japan																	-			-				-			-				-					-						-
+			26	Excite Fishing DX																				EF2J		x8				48			4M				24C08				SSD 98 PL7351-181		dumped
+	2002	1	Accessory cartridge for Slot machine "Gin-gin maru TV" /TAKARA/Japan							-			-				-			-				-					-						-
+			2	Wildest computer robot "Daigander" (Korean version) /TAKARA/Korea								-			-				-			-				-					-						-
+			3	Hamutaro's circus /EPOCH/Japan																	-			-				-			-				-					-						-
+			4	Doraemon ,computer megaphone /EPOCH/Japan														-			-				-			-				-					-						-
+			5	Strike! Exciting bowling /EPOCH/Japan															-			-				-			-				-					-						-
+			6	e-kara /Hasbro/Spain																			-			-				-			-				-					-						-
+			7	Starter set for e-kara H.S," Morning sisters" /TAKARA/Japan										-			-				-			-				-					-						-
+			8	e-kara H.S.(headphones set) /TAKARA/Japan														-			-				-			-				-					-						-
+			9	Accessory cartridge for Slot machine TV," Aladdin TV" /TAKARA/Japan								-			-				-			-				-					-						-
+			10	Accessory cartridge for Slot machine TV "Businessman Kintaro/TAKARA/Japan						-			-				-			-				-					-						-
+			11	Poko-poko Hammers /TAKARA/Japan																	-			-				-			-				-					-						-
+			12	e-kara N Angel blue special set /TAKARA/Japan													-			-				-			-				-					-						-
+			13	Together Minimoni,Dancing Stage! /EPOCH/Japan													-			-				-			-				-					-						-
+			14	King of shooting /TOMY/Japan																	-			-				-			-				-					-						-
+			15	Knock them out! Exciting boxing /EPOCH/Japan													-			-				-			-				-					-						-
+			16	Popira2 /TAKARA/Japan																			-			-				-			-				-					-						-
+			17	Zuba-Zuba Blade /TAKARA/Japan																	-			-				-			-				-					-						-
+			18	Starter set for e-kara N "Morning sisters" /TAKARA/Japan										-			-				-			-				-					-						-
+			19	e-kara /Hasbro/England																			-			-				-			-				-					-						-
+			20	e-kara /Takara USA/USA																			-			-				-			-				-					-						-
+			21	e-kara PLAY TV Soccer /RADICA/USA																76088500	x8				none						none				SSD 98 PA7351-107		(aka Radica PlayTV Soccer? if so, have)
+			22	PLAY TV Jr. Construction /RADICA/USA															-			-				-			-				-					-						-
+			23	PLAY TV Boxing /RADICA/Japan																	72039		x8				48			2M				none				SSD 98 PA7351-107		dumped
+			24	PLAY TV Baseball 2 /RADICA/USA																	72042		x8				48			2M				none				SSD 98 PL7351-181		dumped
+			25	Barbie Dance Party /RADICA/USA,EU																-			-				-			-				-					-						-
+			26	Compete! Exciting stadium DX /EPOCH/Japan														-			-				-			-				-					-						-
+			27	e-kara N /EPOCH/Japan																			-			-				-			-				-					-						-
+			28	Who's the ace? Excite Tennis /EPOCH/Japan														-			-				-			-				-					-						-
+			29	Wildest computer robot, "Daigander" /TAKARA/Japan												-			-				-			-				-					-						-
+			30	Cartridge for Slot machine TV "King of wild animal Jr." /TAKARA/Japan							-			-				-			-				-					-						-
+			31	Gachinko Contest! Slot machine TV /DCT/Japan													-			-				-			-				-					-						-
+			32	Beyblade Ultimate shooter /TAKARA/Japan															-			-				-			-				-					-						-
+	2001	1	Ping-pong(Chinese version) /Tenpon/China														-			-				-			-				-					-						-
+			2	TV hockey /TOMY/Japan																			-			-				-			-				-					-						-
+			3	e-kara Morning sisters /TAKARA/Japan															-			-				-			-				-					-						-
+			4	e-kara Duet microphone plus /TAKARA/Japan														-			-				-			-				-					-						-
+			5	e-kara plus /TAKARA/Japan																		-			-				-			-				-					-						-
+			6	Hamutaro, Dancing', Running /EPOCH/Japan														-			-				-			-				-					-						-
+			7	Gin-gin Snowboarders /TAKARA/Japan																-			-				-			-				-					-						-
+			8	Shoot! Exciting striker /EPOCH/Japan															-			-				-			-				-					-						-
+			9	e-kara US version /TAKARA USA, Hasbro/USA,EU													71076		x8				none		1M									SSD 98 PA7351-107		this one or #20 above?	dumped
+			10	Popira Korea version /SONOKONG/Korea															-			-				-			-				-					-						-
+			11	I singer: e-kara Korean version /SONOKONG/Korea													-			-				-			-				-					-						-
+			12	Ms.Comett, Lovely baton /TAKARA/Japan<															-			-				-			-				-					-						-
+			13	Dance Dance revolution family mat /KONAMI,KONAMI Sports/Japan									-			-				-			-				-					-						-
+			14	PLAY TV Card Night /RADICA/USA																	71063		x8				40			1M				none				SSD 98 PA7351-107		dumped
+			15	PLAY TV Bass Fishin' /RADICA/USA																71008		x8				40			1M				none				SSD 98 PA7351-107		dumped
+			16	PLAY TV Snowboarder (blue) /RADICA/USA															71023		x8				40			1M				none				SSD 98 PL7351-181		dumped
+			17	Bistro Kids /SEGA Toys/Japan																	-			-				-			-				-					-						-
+			18	Let's construct the town! /TAKARA/Japan															-			-				-			-				-					-						-
+			19	Let's fish black bass! Exciting Fishing /EPOCH/Japan											-			-				-			-				-					-						-
+			20	Baseball Korean version /SONOKONG/Korea															-			-				-			-				-					-						-
+			21	Ping-pong Korean version /SONOKONG/Korea														-			-				-			-				-					-						-
+			22	e-kara Hello Kitty /TAKARA/Japan																-			-				-			-				-					-						-
+			23	Special box "Morning sisters" /TAKARA/Japan														-			-				-			-				-					-						-
+			24	Gan-Gan Adventure /TAKARA/Japan																	-			-				-			-				-					-						-
+			25	e-kara wireless unit /TAKARA/Japan																-			-				-			-				-					-						-
+			26	Webdiver Gradion /TAKARA/Japan																	-			-				-			-				-					-						-
+			27	black bass tsurouze! Excite Fishing/EPOCH/Japan													-			-				-			-				-					-						-
+			28	Hamu-chan's Daishuugou dance surunoda! hasirunoda!/EPOCH/Japan									-			-				-			-				-					-						-
+	2000	1	Popira /TAKARA/Japan																			-			-				-			-				-					-						-
+			2	e-kara Duet microphone /TAKARA/Japan															-			-				-			-				-					-						-
+			3	e-kara /TAKARA/Japan																			-			-				-			-				-					-						-
+			4	Let's play ping-pong. Exciting ping-pong /EPOCH/Japan											-			-				-			-				-					-						-
+			5	PLAY TV Huntin' Buckmasters /RADICA/USA															8074		x8				none						none				SSD 98 PA7351-107		have
+			6	PLAY TV Ping Pong /RADICA/USA,HK,EU																8028		x8				48			1M				none				SSD 97 PA7270-107		dumped
+			7	PLAY TV OPUS /RADICA/USA,EU																		-			-				-			-				-					-						-
+			8	PLAY TV Baseball 2 /EPOCH/Japan, HK																-			-				-			-				-					-						-
+			9	Let's hit a homerun! Exciting baseball /RADICA/USA,EU											8017		x8				none						none				SSD 98 PA7351-107		(aka Radica PlayTV Baseball, if so, have)
+	1999	1	ABC Jungle Fun Hippo /Vteck/HK, USA, France														-			-				-			-				-					-						-
+	Unknown	1	PLAY TV Football /RADICA/USA																	74021		x8				48			4M				none				SSD 98 PL7351-181		dumped																						
+				XaviXTennis																						SGM6446		x16				48			8M				24C08				SSD 2002 NEC 85054-611  dumped
+				XaviXBowling																					SGM644C		x16				48																		not dumped		
 
 
 	TODO: put into above table (XaviXPORT cartridges)
@@ -1977,6 +2115,24 @@ ROM_START( epo_efdx )
 	ROM_LOAD("excitefishing.bin", 0x000000, 0x400000, CRC(9c85b261) SHA1(6a363faed2ec89c5176e46554a98ca1e20132579) )
 ROM_END
 
+ROM_START( rad_rh )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("rescueheroes.bin", 0x000000, 0x200000, CRC(38c391a7) SHA1(120334d4ce89d98438c2a35bf7e53af5096cc878) )
+ROM_END
+
+/*
+	There's more code in here than in the 'eka_strt' set, but all it seems to do is display an 'insert cartridge' message,
+	however eka_strt also seems a complete program in it's own right, it's unclear if it can see any of the data from this
+	ROM.
+
+	(TODO: turn the cartridges into a software list once the mapping is properly understood)
+*/
+
+ROM_START( eka_base )
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "ekara.bin", 0x000000, 0x100000, CRC(9b27c4a2) SHA1(d75dda7434933135d2f7e353840a9384e9a0d586) )
+ROM_END
+
 ROM_START( eka_strt )
 	ROM_REGION( 0x080000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekarastartcart.bin", 0x000000, 0x080000, CRC(8c12c0c2) SHA1(8cc1b098894af25a4bfccada884125b66f5fe8b2) )
@@ -2021,11 +2177,15 @@ CONS( 2003, rad_madf,  0,          0,  xavix,  xavix,  xavix_state, taitons1,  "
 
 CONS( 200?, rad_fb,    0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_IS_SKELETON) // USA only release? doesn't change logo for PAL
 
+CONS( 200?, rad_rh,    0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Radioa / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes", MACHINE_IS_SKELETON)
+
 CONS( 200?, epo_efdx,  0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_IS_SKELETON)
 
-CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, rad_box,  "Hasbro / Milton Bradley / SSD Company LTD",     "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
+CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,  xavix_state, rad_box,   "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
 
-CONS (200?, eka_strt,  0,          0,  xavix,  xavix,    xavix_state, xavix, "Takara / SSD Company LTD",                     "e-kara Starter", MACHINE_IS_SKELETON)
+CONS (200?, eka_base,  0,          0,  xavix,  xavix,  xavix_state, xavix,     "Takara / SSD Company LTD",                     "e-kara", MACHINE_IS_SKELETON)
+
+CONS (200?, eka_strt,  0,          0,   xavix,  xavix,  xavix_state, xavix,    "Takara / SSD Company LTD",                     "e-kara Starter", MACHINE_IS_SKELETON)
 
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.

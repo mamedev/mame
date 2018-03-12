@@ -887,7 +887,47 @@ MACHINE_CONFIG_END
 ROM_START( mastboy )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
-	ROM_LOAD( "03.bin",       0x04000, 0x4000, CRC(5020a37f) SHA1(8bc75623232f3ab457b47d5af6cd1c3fb24c0d0e) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "3.ic77",       0x04000, 0x4000, CRC(64a712ba) SHA1(a8318fa6f5b3fe1aaff4cef07aced927e3503542) ) // data (1ST AND 2ND HALF IDENTICAL)
+	ROM_CONTINUE(             0x04000, 0x4000 )
+	ROM_CONTINUE(             0x04000, 0x4000 )
+	ROM_CONTINUE(             0x04000, 0x4000 ) // only the last 16kb matters
+
+	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 ) /* RAM accessed by the video chip */
+	/* 0x00000 - 0x0ffff = banked ram */
+
+	ROM_REGION( 0x10000, "gfx2", ROMREGION_INVERT ) /* ROM accessed by the video chip */
+	ROM_LOAD( "04.bin", 0x00000, 0x10000, CRC(565932f4) SHA1(4b184aa445b5671072031ad4a2ccb13868d6d3a4) )
+
+	ROM_REGION( 0x200000, "user1", 0 ) /* banked data - 8 banks, 6 'question' slots */
+	ROM_LOAD( "01.bin", 0x000000,   0x040000, CRC(36755831) SHA1(706fba5fc765502774643bfef8a3c9d2c01eb01b) ) // 99% gfx
+	ROM_LOAD( "02.bin", 0x040000,   0x020000, CRC(69cf6b7c) SHA1(a7bdc62051d09636dcd54db102706a9b42465e63) ) // data
+	ROM_RELOAD(         0x060000,   0x020000) // 128kb roms are mirrored
+/*  Ciencias - General
+    Espectaculos - Cine
+    Sociales - Geografia Esp.
+    Sociales - Historia  */
+	ROM_LOAD( "05.bin", 0x080000,   0x020000, CRC(394cb674) SHA1(1390c666772f1e1e2da8866b960a3d24dc660e68) ) // questions
+	ROM_RELOAD(         0x0a0000,   0x020000) // 128kb roms are mirrored
+/*  Sociales - Geografia Mun.
+    Varios - Cultura General */
+	ROM_LOAD( "06.bin", 0x0c0000,   0x020000, CRC(aace7120) SHA1(5655b56a7c241bc7908081088042601174c0a0b2) ) // questions
+	ROM_RELOAD(         0x0e0000,   0x020000) // 128kb roms are mirrored
+/*  Deportes - General */
+	ROM_LOAD( "07.bin", 0x100000,   0x020000, CRC(6618b002) SHA1(79942350da335a3362b6fc43527b6568ce134ceb) ) // questions
+	ROM_RELOAD(         0x120000,   0x020000) // 128kb roms are mirrored
+/*  Ciencias - General
+    Varios - Cultura General */
+	ROM_LOAD( "08.bin", 0x140000,   0x020000, CRC(6a4870dd) SHA1(f8ca94a5bc4ba3f512767901e4ae3579c2c6355a) ) // questions
+	ROM_RELOAD(         0x160000,   0x020000) // 128kb roms are mirrored
+	/*                  0x180000 to 0x1bffff EMPTY */
+	/*                  0x1c0000 tt 0x1fffff EMPTY */
+ROM_END
+
+// this set has a number of strings used in the boot-up display intentionally terminated at the first character so they don't display
+ROM_START( mastboya )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
+	ROM_LOAD( "03.bin",       0x04000, 0x4000, CRC(5020a37f) SHA1(8bc75623232f3ab457b47d5af6cd1c3fb24c0d0e) ) // data (1ST AND 2ND HALF IDENTICAL)
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 ) // only the last 16kb matters
@@ -1000,5 +1040,7 @@ ROM_START( mastboyia )
 ROM_END
 
 GAME( 1991, mastboy,  0,          mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboya, mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A, hack?)", MACHINE_SUPPORTS_SAVE )
+// are the Italian sets legitimate, or also hacked, the startup display is incorrect displaying 'MARK' instead of 'PLAYMARK' Maybe the internal ROM should differ instead?
 GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mastboyia,mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 2)", MACHINE_SUPPORTS_SAVE )

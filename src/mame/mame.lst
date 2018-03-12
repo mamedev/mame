@@ -18472,6 +18472,7 @@ marywu                          //
 
 @source:mastboy.cpp
 mastboy                         // (c) 1987 - No Ref on the PCB
+mastboya                        // (c) 1987 - No Ref on the PCB
 mastboyi                        // (c) 1987 - No Ref on the PCB
 mastboyia                       // (c) 1987 - No Ref on the PCB
 
@@ -39029,7 +39030,9 @@ rad_snowp                       //
 rad_madf                        //
 rad_fb                          //
 epo_efdx                        //
+rad_rh				     		//
 has_wamg                        //
+eka_base                        //
 eka_strt                        //
 xavtenni                        //
 ttv_sw                          //
