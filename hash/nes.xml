@@ -9514,7 +9514,7 @@
 	</software>
 	
 	<software name="drmario900427" cloneof="drmario">
-		<description>Dr. Mario (Prototype, 19900427)</description>
+		<description>Dr. Mario (Prototype 19900427)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
