@@ -225,6 +225,17 @@ void ins8250_uart_device::clear_int(int flag)
 	update_interrupt();
 }
 
+// Baud rate generator is reset after writing to either byte of divisor latch
+void ins8250_uart_device::update_baud_rate()
+{
+	set_rate(clock(), m_regs.dl * 16);
+
+	// FIXME: Baud rate generator should not affect transmitter or receiver, but device_serial_interface resets them regardless.
+	// If the transmitter is still running at this time and we don't flush it, the shift register will never be emptied!
+	if (!(m_regs.lsr & INS8250_LSR_TSRE))
+		tra_complete();
+}
+
 WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 {
 	int tmp;
@@ -235,7 +246,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			if (m_regs.lcr & INS8250_LCR_DLAB)
 			{
 				m_regs.dl = (m_regs.dl & 0xff00) | data;
-				set_rate(clock(), m_regs.dl*16);
+				update_baud_rate();
 			}
 			else
 			{
@@ -252,7 +263,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			if (m_regs.lcr & INS8250_LCR_DLAB)
 			{
 				m_regs.dl = (m_regs.dl & 0xff) | (data << 8);
-				set_rate(clock(), m_regs.dl*16);
+				update_baud_rate();
 			}
 			else
 			{

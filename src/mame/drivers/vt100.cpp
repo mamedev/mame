@@ -53,7 +53,7 @@ public:
 		m_nvr(*this, "nvr"),
 		m_rstbuf(*this, "rstbuf"),
 		m_rs232(*this, RS232_TAG),
-		m_printer_uart(*this, "printer_uart"),
+		m_printer_uart(*this, "printuart"),
 		m_p_ram(*this, "p_ram")
 	{
 	}
@@ -246,6 +246,17 @@ void vt100_state::machine_start()
 	m_kbduart->write_swe(0);
 
 	m_pusart->write_cts(0);
+
+	if (m_printer_uart.found())
+	{
+		auto *printer_port = subdevice<rs232_port_device>("printer");
+		printer_port->write_dtr(0);
+		printer_port->write_rts(0);
+
+		m_printer_uart->cts_w(0);
+		m_printer_uart->dcd_w(0);
+		m_printer_uart->ri_w(0);
+	}
 }
 
 void vt100_state::machine_reset()
@@ -422,13 +433,13 @@ MACHINE_CONFIG_START(vt100_state::vt102)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(vt102_io)
 
-	MCFG_DEVICE_ADD("printer_uart", INS8250, XTAL(24'073'400) / 16)
+	MCFG_DEVICE_ADD("printuart", INS8250, XTAL(24'073'400) / 16)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("printer", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", I8085_RST75_LINE)) // 8085 pin 7, mislabeled RST 5.5 on schematics
 
 	MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("printer_uart", ins8250_device, rx_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("printer_uart", ins8250_device, dsr_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("printuart", ins8250_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("printuart", ins8250_device, dsr_w))
 MACHINE_CONFIG_END
 
 /* VT1xx models:

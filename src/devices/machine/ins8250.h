@@ -59,6 +59,8 @@ protected:
 	void trigger_int(int flag);
 	void clear_int(int flag);
 
+	void update_baud_rate();
+
 	const dev_type m_device_type;
 	struct {
 		uint8_t thr;  /* 0 -W transmitter holding register */
