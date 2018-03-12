@@ -30,7 +30,7 @@ Known games listed by part-no, (*) denotes undumped:
 | 500-11603-A |GER| DEMO - Herbst 2004 II                                     | LEAPSTER       |
 | 500-11777-A |ENG| Numbers on the Run - Counting on Zero                     | LEAPSTER L-MAX |
 | 500-11779-A |ENG| Letters on the Loose                                      | LEAPSTER L-MAX |
-| 500-11903-A |ENG| Spider-Man - The Case of The Sinister Speller            | LEAPSTER L-MAX |
+| 500-11903-A |ENG| Spider-Man - The Case of The Sinister Speller             | LEAPSTER L-MAX |
 | 500-11904-A |ENG| Dora the Explorer - Wildlife Rescue                       | LEAPSTER L-MAX |
 | 500-11905-A |ENG| Spongebob Squarepants - Saves the Day                     | LEAPSTER L-MAX |
 | 500-11929-A |ENG| Scholastic I Spy - Challenger                             | LEAPSTER       |
@@ -90,7 +90,7 @@ Known games listed by part-no, (*) denotes undumped:
 <softwarelist name="leapster" description="LeapFrog Leapster cartridges">
 
 	<software name="1stgrade" supported="no">
-		<description>1st Grade (US)</description>
+		<description>1st Grade (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11000" />
@@ -102,7 +102,7 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="anigeni" supported="no">
-		<description>Animal Genius (US)</description>
+		<description>Animal Genius (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12293-A" />
@@ -114,67 +114,82 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="backyard" supported="no">
-		<description>The Backyardigans (USA)</description>
+		<description>Nick Jr The Backyardigans (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13453-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MR27V6402L" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="U2" /> <!-- EEPROM (24C16A?) -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13453-a.bin" size="8388608" crc="de5fb26e" sha1="2a1df737ec907d1f1b837f9b58323ee908cb45a9" offset="0" />
+				<rom name="500-13453-A.u1" size="8388608" crc="de5fb26e" sha1="2a1df737ec907d1f1b837f9b58323ee908cb45a9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="batman" supported="no">
-		<description>Batman - Strength in Numbers (USA)</description>
+		<description>The Batman - Strength in Numbers (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12711-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MR27V6402L" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="U2" /> <!-- EEPROM (24C16A?) -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12711-a.bin" size="8388608" crc="7c934681" sha1="8db48ba9caa2f87922cb289520acd97d9931a178" offset="0" />
+				<rom name="500-12711-A.u1" size="8388608" crc="7c934681" sha1="8db48ba9caa2f87922cb289520acd97d9931a178" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="batmang" cloneof="batman" supported="no">
-		<description>Batman - Multipliziere, dividiere und regiere (Ger)</description>
+		<description>The Batman - Batman Multipliziere, dividiere und regiere (Ger)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11972-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-1XXXX-A" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="U2" /> <!-- 24LC16B -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11972-a.bin" size="8388608" crc="a0a362aa" sha1="442455a0bf2c3ca4c1084a1e8761eb80a4cd71e2" offset="0" />
+				<rom name="500-11972-A.u1" size="8388608" crc="a0a362aa" sha1="442455a0bf2c3ca4c1084a1e8761eb80a4cd71e2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="cars" supported="no">
-		<description>Cars (USA)</description>
+		<description>Disney/Pixar Cars (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12098-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-1XXXX-A" />
++			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
++			<feature name="u2" value="U2" /> <!-- 24LC16B -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12098-a.bin" size="8388608" crc="d4a7e5d4" sha1="c831db237e73e61e863e4f477dcc0298488b3d69" offset="0" />
+				<rom name="500-12098-A.u1" size="8388608" crc="d4a7e5d4" sha1="c831db237e73e61e863e4f477dcc0298488b3d69" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="carsg" cloneof="cars" supported="no">
-		<description>Cars (Ger)</description>
+		<description>Disney/Pixar Cars (Ger)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12171-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-1XXXX-A" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="U2" /> <!-- 24LC16B -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12171-a.bin" size="8388608" crc="c7b62602" sha1="bbc2b70e588710b2096741046ae3e08095397ee9" offset="0" />
+				<rom name="500-12171-A.u1" size="8388608" crc="c7b62602" sha1="bbc2b70e588710b2096741046ae3e08095397ee9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="cars2" supported="no">
-		<description>Cars 2 (US)</description>
+		<description>Cars 2 (USA)</description>
 		<year>2011</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-14320-A" />
@@ -186,25 +201,31 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="carssc" supported="no">
-		<description>Cars - Supercharged (USA)</description>
+		<description>Disney/Pixar Cars - Supercharged (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12712-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MR27V6402L" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="U2" /> <!-- 24C16AN -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12712-a.bin" size="8388608" crc="beca3909" sha1="8cda80251d6e45427dba6acbae5dff306eb84d34" offset="0" />
+				<rom name="500-12712-A.u1" size="8388608" crc="beca3909" sha1="8cda80251d6e45427dba6acbae5dff306eb84d34" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="clifread" supported="no">
-		<description>Clifford - The Big Red Dog - Reading (USA)</description>
+		<description>Clifford the Big Red Dog - Reading (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12466-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MR27V6402L" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="U2" /> <!-- 24LC16B -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12466-a.bin" size="8388608" crc="0134af49" sha1="29c3e2e9d56aeee09c752776bfd8c096e02b75c5" offset="0" />
+				<rom name="500-12466-A.u1" size="8388608" crc="0134af49" sha1="29c3e2e9d56aeee09c752776bfd8c096e02b75c5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -215,14 +236,17 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11994-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10308-A" />
+			<feature name="u2" value="U2" /> <!-- 24LC02B -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11994-a.bin" size="4194304" crc="979346d5" sha1="ecd8d3f7bae4fea1710ee99c5637224180021dd6" offset="0" />
+				<rom name="500-11994-A.u3" size="4194304" crc="979346d5" sha1="ecd8d3f7bae4fea1710ee99c5637224180021dd6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="createcr" supported="no">
-		<description>Creature Create (US)</description>
+		<description>Creature Create (USA)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12677-A" />
@@ -239,8 +263,12 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11603-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10029-A" />
+			<feature name="u1" value="U1" /> <!-- TE28F640 FLASH ROM -->
+			<feature name="u2" value="U2" /> <!-- 24LC02B -->
+			<feature name="u3" value="U3" /> <!-- Unpopulated slot -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11603-a.bin" size="8388608" crc="71062cd7" sha1="eaf0656d29f61d89b97c6d66e73a2fa7021a92e3" offset="0" />
+				<rom name="500-11603-A.u1" size="8388608" crc="71062cd7" sha1="eaf0656d29f61d89b97c6d66e73a2fa7021a92e3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -251,8 +279,11 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13681-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MR27V6402L" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="U2" /> <!-- 24C16A -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13681-a.bin" size="8388608" crc="822ca3da" sha1="ff0ac7f5fded346553e1a4697b45c27fc04ee3fe" offset="0" />
+				<rom name="500-13681-A.u1" size="8388608" crc="822ca3da" sha1="ff0ac7f5fded346553e1a4697b45c27fc04ee3fe" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -263,8 +294,11 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13514-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MR27V6402L" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="U2" /> <!-- 24C16A? -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13514-a.bin" size="8388608" crc="5ccb2ad3" sha1="42740f6597f4a2eb878a54ddbf75452a2cca301d" offset="0" />
+				<rom name="500-13514-A.u1" size="8388608" crc="5ccb2ad3" sha1="42740f6597f4a2eb878a54ddbf75452a2cca301d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -275,8 +309,11 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11496-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10028-02" />
+			<feature name="u2" value="U2" /> <!-- 24LC16B -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11496-a.bin" size="8388608" crc="bb6d5375" sha1="743d07ee756b54e2c72bf94da56dd8d18c4cd106" offset="0" />
+				<rom name="500-11496-A.u3" size="8388608" crc="bb6d5375" sha1="743d07ee756b54e2c72bf94da56dd8d18c4cd106" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -287,44 +324,56 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13448-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MX64Mb" />
+			<feature name="u2" value="U2" /> <!-- 24LC16B -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13448-a.bin" size="8388608" crc="2465f01d" sha1="d37d7ea21cf8ed01ecf497c3c99185529aee59af" offset="0" />
+				<rom name="500-13448-A.u3" size="8388608" crc="2465f01d" sha1="d37d7ea21cf8ed01ecf497c3c99185529aee59af" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="dora" supported="no">
-		<description>Dora - Retter der Wildnis (Ger)</description>
+		<description>Nick Jr Dora - Retter der Wildnis (Ger)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12562-B" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-1XXXX-A" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="U2" /> <!-- 24LC16B -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12562-b.bin" size="8388608" crc="242907d4" sha1="262ee3e208fff0fc362bc879416cbdf31bf38304" offset="0" />
+				<rom name="500-12562-B.u1" size="8388608" crc="242907d4" sha1="262ee3e208fff0fc362bc879416cbdf31bf38304" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="findnemo" supported="no">
-		<description>Finding Nemo (USA)</description>
+		<description>Disney/Pixar Finding Nemo (USA)</description>
 		<year>2005?</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10775-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-1XXXX-A" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="U2" /> <!-- 24LC02B -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-10775-a.bin" size="8388608" crc="1895f946" sha1="8baf4f44f64d17333a82ce29e59c62e51e45c0c0" offset="0" />
+				<rom name="500-10775-A.u1" size="8388608" crc="1895f946" sha1="8baf4f44f64d17333a82ce29e59c62e51e45c0c0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="findnemog" cloneof="findnemo" supported="no">
-		<description>Findet Nemo (Ger)</description>
+		<description>Disney/Pixar Findet Nemo (Ger)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11495-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10028-02" />
+			<feature name="u2" value="U2" /> <!-- 24LC02B -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11495-a.bin" size="8388608" crc="6a5e20ba" sha1="984638e1d9b869611de8900d8f5a6a760cd40539" offset="0" />
+				<rom name="500-11495-A.u3" size="8388608" crc="6a5e20ba" sha1="984638e1d9b869611de8900d8f5a6a760cd40539" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -335,8 +384,11 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12715-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MR27V6402L" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="U2" /> <!-- 24C16AN -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12715-a.bin" size="8388608" crc="e62d1684" sha1="e43820efe9dbd8dddf6312493a7967c75a29431a" offset="0" />
+				<rom name="500-12715-A.u1" size="8388608" crc="e62d1684" sha1="e43820efe9dbd8dddf6312493a7967c75a29431a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -347,20 +399,26 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12692-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MR27V6402L" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="U2" /> <!-- 24C16AN -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12692-a.bin" size="8388608" crc="05b608f0" sha1="04b3181f39e88b6cd47e39a7efb50fa14618ff2c" offset="0" />
+				<rom name="500-12692-A.u1" size="8388608" crc="05b608f0" sha1="04b3181f39e88b6cd47e39a7efb50fa14618ff2c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="diegogo" supported="no">
-		<description>Go Diego Go! - Animal Rescuer (USA)</description>
+		<description>Nick Jr Go Diego Go! - Animal Rescuer (USA)</description>
 		<year>2007?</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13447-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MR27V6402L" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="U2" /> <!-- 24C16A? -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13447-a.bin" size="8388608" crc="ebbf83a0" sha1="2412607b40f8e46881368607b4fe15ecf2f2e9eb" offset="0" />
+				<rom name="500-13447-A.u1" size="8388608" crc="ebbf83a0" sha1="2412607b40f8e46881368607b4fe15ecf2f2e9eb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -371,8 +429,11 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10935-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10028-02" />
+			<feature name="u2" value="U2" /> <!-- 24LC16B -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-10935-a.bin" size="8388608" crc="6fd44f1a" sha1="fe6e8e1aaf72901820ee99d22dcc40a01d627fac" offset="0" />
+				<rom name="500-10935-A.u3" size="8388608" crc="6fd44f1a" sha1="fe6e8e1aaf72901820ee99d22dcc40a01d627fac" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -383,8 +444,11 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11494-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10028-02" />
+			<feature name="u2" value="U2" /> <!-- 24LC16B -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11494-a.bin" size="8388608" crc="96d30f93" sha1="61dd156ae456a370a021061da9b3a4e33bda371e" offset="0" />
+				<rom name="500-11494-A.u3" size="8388608" crc="96d30f93" sha1="61dd156ae456a370a021061da9b3a4e33bda371e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -395,14 +459,18 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13298-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="300-30033" />
+			<feature name="u1" value="U1" /> <!-- 24C16A -->
+			<feature name="u2" value="U2" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u3" value="U3" /> <!-- Unpopulated slot -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13298-a.bin" size="8388608" crc="7c716016" sha1="35512ea5c267f5540cbfa64a4d35ebc54464fd31" offset="0" />
+				<rom name="500-13298-A.u2" size="8388608" crc="7c716016" sha1="35512ea5c267f5540cbfa64a4d35ebc54464fd31" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="kinderga" supported="no">
-		<description>Kindergarten (US)</description>
+		<description>Kindergarten (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10999" />
@@ -414,7 +482,7 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="lernleap" supported="no">
-		<description>Learning with Leap (US)</description>
+		<description>Learning with Leap (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10093" />
@@ -431,26 +499,33 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11078-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10028-02" />
+			<feature name="u2" value="U2" /> <!-- EEPROM -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11078-a.bin" size="8388608" crc="e1f505e7" sha1="935eb17d3b6f9df2115a12445b3c8c977005481a" offset="0" />
+				<rom name="500-11078-A.u3" size="8388608" crc="e1f505e7" sha1="935eb17d3b6f9df2115a12445b3c8c977005481a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="brunobls" supported="no">
-		<description>Lernst du Malen &amp; Schreiben - Mit Bruno Bleistift  (Ger)</description>
+	<software name="brunobls" cloneof="mrpencil" supported="no">
+		<description>Mit Bruno Bleistift Lernst du Malen &amp; Schreiben (Ger)</description>
 		<year>2004?</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11493-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10061-02" />
+			<feature name="u1" value="U1" /> <!-- Unpopulated slot -->
+			<feature name="u2" value="U2" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u3" value="U3" /> <!-- 39VF040 FLASH -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11493-a.bin" size="8388608" crc="e58eac06" sha1="a2f8c6df81fd5f72f6894b153306fd871fd20aac" offset="0" />
+				<rom name="500-11493-A.u2" size="8388608" crc="e58eac06" sha1="a2f8c6df81fd5f72f6894b153306fd871fd20aac" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="letrpilr" supported="no">
-		<description>Letterpillar (US)</description>
+		<description>Letterpillar (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12350-A" />
@@ -467,8 +542,12 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11003" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10061-02" />
+			<feature name="u1" value="U1" /> <!-- Unpopulated slot -->
+			<feature name="u2" value="U2" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u3" value="U3" /> <!-- 39VF040 FLASH -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11003.bin" size="8388608" crc="dbb767cc" sha1="280b18a8cdf3ae09c5c7b32b8e592a8e2890302c" offset="0" />
+				<rom name="500-11003.u2" size="8388608" crc="dbb767cc" sha1="280b18a8cdf3ae09c5c7b32b8e592a8e2890302c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -479,14 +558,17 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13682-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MX64Mb" />
+			<feature name="u2" value="U2" /> <!-- 24C16A? -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13682-a.bin" size="8388608" crc="2fc77c9d" sha1="266e08439be2c91fbc9942c3620f49459c157fcc" offset="0" />
+				<rom name="500-13682-A.u3" size="8388608" crc="2fc77c9d" sha1="266e08439be2c91fbc9942c3620f49459c157fcc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="numraid" supported="no">
-		<description>Number Raiders (US)</description>
+		<description>Number Raiders (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11993-A" />
@@ -503,14 +585,17 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13446-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MX64Mb" />
+			<feature name="u2" value="U2" /> <!-- 24C16A? -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13446-a.bin" size="8388608" crc="3c428a13" sha1="b90cdd518178849efabf7e3e17bf99072d964fad" offset="0" />
+				<rom name="500-13446-A.u3" size="8388608" crc="3c428a13" sha1="b90cdd518178849efabf7e3e17bf99072d964fad" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="ratat" supported="no">
-		<description>Ratatouille (US)</description>
+		<description>Ratatouille (USA)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13445-A" />
@@ -522,13 +607,17 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="ratatg" cloneof="ratat" supported="no">
-		<description>Ratatouille (Ger)</description>
+		<description>Disney/Pixar Ratatouille (Ger)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12738-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="300-30033" />
+			<feature name="u1" value="U1" /> <!-- 24C16AN -->
+			<feature name="u2" value="U2" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u3" value="U3" /> <!-- Unpopulated slot -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12738-a.bin" size="8388608" crc="df729fe7" sha1="af3c6b80d075f469388395cb065efa8bd6aeeab1" offset="0" />
+				<rom name="500-12738-A.u2" size="8388608" crc="df729fe7" sha1="af3c6b80d075f469388395cb065efa8bd6aeeab1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -539,14 +628,17 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10829-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10028-02" />
+			<feature name="u2" value="U2" /> <!-- 24LC02B -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-10829-a.bin" size="8388608" crc="2c6e623e" sha1="c298181f00109b7f863fdb12b5bd462085c4ff4f" offset="0" />
+				<rom name="500-10829-A.u3" size="8388608" crc="2c6e623e" sha1="c298181f00109b7f863fdb12b5bd462085c4ff4f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="ispychl" supported="no">
-		<description>Scholastic I Spy - Challenger (US)</description>
+		<description>Scholastic I Spy - Challenger (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11929-A" />
@@ -558,7 +650,7 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="scoutwit" supported="no">
-		<description>Scholastic OutWit! (US)</description>
+		<description>Scholastic OutWit! (USA)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13299-A" />
@@ -570,7 +662,7 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="scooby" supported="no">
-		<description>Scooby Doo! (US)</description>
+		<description>Scooby Doo! (USA)</description>
 		<year>2009</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-14005-A" />
@@ -582,7 +674,7 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="scoobsnk" supported="no">
-		<description>Scooby Doo! - Spooky Snacks! (US)</description>
+		<description>Scooby Doo! - Spooky Snacks! (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12160-A" />
@@ -594,74 +686,92 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="sonicx" supported="no">
-		<description>SonicX (USA)</description>
+		<description>Sonic X (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12296-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MR27V6402L" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="U2" /> <!-- 24LC16B -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12296-a.bin" size="8388608" crc="a9d2cdbd" sha1="e239b209239252f0f6cd2a4c71d2a46a3abfd5eb" offset="0" />
+				<rom name="500-12296-A.u1" size="8388608" crc="a9d2cdbd" sha1="e239b209239252f0f6cd2a4c71d2a46a3abfd5eb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- same ROM found in Cart ID 500-01168 -->
 	<software name="spongeb" supported="no">
-		<description>Spongebob Squarepants - Saves the Day (USA)</description>
+		<description>Nickelodeon Spongebob Squarepants - Saves the Day (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11002" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10113-A" />
+			<feature name="u2" value="U2" /> <!-- 24LC02B -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11002.bin" size="8388608" crc="0f2ad725" sha1="258e5b006086a7fd4cfa4460f3008604a5d87e1d" offset="0" />
+				<rom name="500-11002.u3" size="8388608" crc="0f2ad725" sha1="258e5b006086a7fd4cfa4460f3008604a5d87e1d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spongebg" cloneof="spongeb" supported="no">
-		<description>Spongebob Schwammkopf Hat Alles im Griff (Ger)</description>
+		<description>Nickelodeon Spongebob Schwammkopf hat alles im Griff (Ger)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10933-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10028-02" />
+			<feature name="u2" value="U2" /> <!-- 24LC02B -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-10933-a.bin" size="8388608" crc="d11e7c30" sha1="71a844d9f38f7bc915e716d3d5485f558e9bffe9" offset="0" />
+				<rom name="500-10933-A.u3" size="8388608" crc="d11e7c30" sha1="71a844d9f38f7bc915e716d3d5485f558e9bffe9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spongez" supported="no">
-		<description>Spongebob Schwammkopf - Zeitreise durch das Wurmloch (Ger)</description>
+		<description>Nick Spongebob Schwammkopf - Zeitreise durch das Wurmloch (Ger)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13273-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="300-10308" />
+			<feature name="u2" value="U2" /> <!-- 24C16A? -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13273-a.bin" size="4194304" crc="8761fc61" sha1="90b0e1faf6964ec74643a45b46f0b064ebf9ea8a" offset="0" />
+				<rom name="500-13273-A.u3" size="4194304" crc="8761fc61" sha1="90b0e1faf6964ec74643a45b46f0b064ebf9ea8a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spidermn" supported="no">
-		<description>Spider-Man - The Case of the Sinister Speller (USA)</description>
+		<description>Marvel Spider-Man - The Case of the Sinister Speller (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10825-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10028-02" />
+			<feature name="u2" value="U2" /> <!-- 24LC02B -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-10825-a.bin" size="8388608" crc="0ef61cbb" sha1="ff00b91ca8bcd2a5d1ead2c353d6d1c048994d69" offset="0" />
+				<rom name="500-10825-A.u3" size="8388608" crc="0ef61cbb" sha1="ff00b91ca8bcd2a5d1ead2c353d6d1c048994d69" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spidermng" cloneof="spidermn" supported="no">
-		<description>Spider-Man - Schachmatt den Schildersaboteuren! (Ger)</description>
+		<description>Marvel Spider-Man - Schachmatt den Schildersaboteuren! (Ger)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11497-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10028-02" />
+			<feature name="u2" value="U2" /> <!-- 24LC16B -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11497-a.bin" size="8388608" crc="9dc2e5f6" sha1="089e6739142edaaa5c0e72ba7faf6f443e1ddc59" offset="0" />
+				<rom name="500-11497-A.u3" size="8388608" crc="9dc2e5f6" sha1="089e6739142edaaa5c0e72ba7faf6f443e1ddc59" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -672,14 +782,17 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13306-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MR27V6402L" />
+			<feature name="u2" value="U2" /> <!-- EEPROM -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13306-a.bin" size="8388608" crc="27000674" sha1="a7e8e63ab74931ad9546aba20755714df572badb" offset="0" />
+				<rom name="500-13306-A.u3" size="8388608" crc="27000674" sha1="a7e8e63ab74931ad9546aba20755714df572badb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="swjedir" supported="no">
-		<description>Star Wars - Jedi Reading (US)</description>
+		<description>Star Wars - Jedi Reading (USA)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13472-A" />
@@ -691,7 +804,7 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="talkingw" supported="no">
-		<description>Talking WORDS Factory (US)</description>
+		<description>Talking WORDS Factory (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11006" />
@@ -703,7 +816,7 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="tfcall" supported="no">
-		<description>Thomas and Friends - Calling all Engines! (US)</description>
+		<description>Thomas and Friends - Calling all Engines! (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11204-A" />
@@ -715,19 +828,22 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="toystor3" supported="no">
-		<description>Toy Story 3 (USA)</description>
+		<description>Disney/Pixar Toy Story 3 (USA)</description>
 		<year>2010?</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13982-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MX64Mb" />
+			<feature name="u2" value="U2" /> <!-- 24C16AN -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13982-a.bin" size="8388608" crc="a72c61fd" sha1="3524a9167e6139101a27fccef4a97ef30dd928fe" offset="0" />
+				<rom name="500-13982-A.u3" size="8388608" crc="a72c61fd" sha1="3524a9167e6139101a27fccef4a97ef30dd928fe" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="up" supported="no">
-		<description>Up (US)</description>
+		<description>Up (USA)</description>
 		<year>2009</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13563-A" />
@@ -744,14 +860,17 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10934-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10028-02" />
+			<feature name="u2" value="U2" /> <!-- 24LC01B -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-10934-a.bin" size="8388608" crc="4c5e775e" sha1="87819e1a95f0d435fc94697423fcfca13f463a34" offset="0" />
+				<rom name="500-10934-A.u3" size="8388608" crc="4c5e775e" sha1="87819e1a95f0d435fc94697423fcfca13f463a34" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="walle" supported="no">
-		<description>Wall-E (US)</description>
+		<description>Wall-E (USA)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13272-A" />
@@ -763,13 +882,17 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="walleg" cloneof="walle" supported="no">
-		<description>Wall-E (Ger)</description>
+		<description>Disney/Pixar Wall-E (Ger)</description>
 		<year>2008?</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13441-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="300-30033" />
+			<feature name="u1" value="U1" /> <!-- 24C16A -->
+			<feature name="u2" value="U2" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u3" value="U3" /> <!-- Unpopulated slot -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13441-a.bin" size="8388608" crc="ee2c39ea" sha1="3606a63fb783ba1e16d0466766dd456eb84b4116" offset="0" />
+				<rom name="500-13441-A.u2" size="8388608" crc="ee2c39ea" sha1="3606a63fb783ba1e16d0466766dd456eb84b4116" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -780,8 +903,11 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12140-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10308-A" />
+			<feature name="u2" value="U2" /> <!-- 24LC02B -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12140-a.bin" size="4194304" crc="75164c8e" sha1="6bebaef0d3b6f8a1a4b2bb957a00a0cce4ed65a2" offset="0" />
+				<rom name="500-12140-A.u3" size="4194304" crc="75164c8e" sha1="6bebaef0d3b6f8a1a4b2bb957a00a0cce4ed65a2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -792,8 +918,11 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13744-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="MX64Mb" />
+			<feature name="u2" value="U2" /> <!-- 24C16A? -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13744-a.bin" size="8388608" crc="67bd4a6a" sha1="70c35a12e368e19956ff43101f7125f9c5679cb2" offset="0" />
+				<rom name="500-13744-A.u3" size="8388608" crc="67bd4a6a" sha1="70c35a12e368e19956ff43101f7125f9c5679cb2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -804,8 +933,11 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12142-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10308-A" />
+			<feature name="u2" value="U2" /> <!-- EEPROM -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12142-a.bin" size="4194304" crc="a707de61" sha1="76689979f08d8c585576a138579fcfb147449db5" offset="0" />
+				<rom name="500-12142-A.u3" size="4194304" crc="a707de61" sha1="76689979f08d8c585576a138579fcfb147449db5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -816,8 +948,11 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12141-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10308-A" />
+			<feature name="u2" value="U2" /> <!-- 24LC02B -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12141-a.bin" size="4194304" crc="334ab5d0" sha1="00eb76e267bfaded25fdf8361e933dc4ec72d059" offset="0" />
+				<rom name="500-12141-A.u3" size="4194304" crc="334ab5d0" sha1="00eb76e267bfaded25fdf8361e933dc4ec72d059" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -878,8 +1013,11 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11777-A" />
 		<part name="cart" interface="leapster_cart">
+			<feature name="pcb" value="FAB-300-10113-A" />
+			<feature name="u2" value="U2" /> <!-- EEPROM -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11777-a.bin" size="8388608" crc="01f12ce7" sha1="6e468f68b57d93777347d6a2e8ce15b79ccefb7f" offset="0" />
+				<rom name="500-11777-A.u3" size="8388608" crc="01f12ce7" sha1="6e468f68b57d93777347d6a2e8ce15b79ccefb7f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
