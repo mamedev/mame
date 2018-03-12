@@ -7314,7 +7314,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	Redump have a complete dump available, preferably replace this with their dump.
 	-->
-	<software name="digichrtsg">
+	<software name="digichrtsg" cloneof="digichrt">
 		<!--
 		<rom name="Di Gi Charat Fantasy v1.004 (2001)(Broccoli)(NTSC)(JP)[!].gdi" size="88" md5="d991bd2c09518469d6f5d6b9cd9ab0fe" sha1="d76ab79ab71b25e06992bb7f2f0317c35285a34a"/>
 		<rom name="track01.bin" size="12451488" md5="6250e66cb5cc4e236d8881a641c1fb2d" sha1="36b369c7a5ff67096264aaf5fc8986e3d09184a7"/>
@@ -7330,7 +7330,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="dc_gdrom" name="gdrom1">
 			<feature name="part_id" value="Di Gi Charat Fantasy"/>
 			<diskarea name="gdrom">
-				<disk name="di gi charat fantasy - shokai genteiban (jpn)" sha1="525b860f800222d26dc53f17f420d93d270c504c"/>
+				<disk name="di gi charat fantasy (jpn)" sha1="525b860f800222d26dc53f17f420d93d270c504c"/>
 			</diskarea>
 		</part>
 		<!--
@@ -7343,7 +7343,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		-->
 	</software>
 
-	<software name="digichrt" cloneof="digichrtsg">
+	<software name="digichrt">
 		<!--
 		<rom name="Di Gi Charat Fantasy v1.004 (2001)(Broccoli)(NTSC)(JP)[!].gdi" size="88" md5="d991bd2c09518469d6f5d6b9cd9ab0fe" sha1="d76ab79ab71b25e06992bb7f2f0317c35285a34a"/>
 		<rom name="track01.bin" size="12451488" md5="6250e66cb5cc4e236d8881a641c1fb2d" sha1="36b369c7a5ff67096264aaf5fc8986e3d09184a7"/>
