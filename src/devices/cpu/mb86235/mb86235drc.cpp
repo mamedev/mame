@@ -638,8 +638,16 @@ void mb86235_device::generate_ea(drcuml_block *block, compiler_state *compiler, 
 			UML_MOV(block, I0, AR(arx));
 			UML_ADD(block, AR(arx), AR(arx), 1);
 			break;
+		case 0x3:   // @ARx++disp12
+			UML_ADD(block, I0, AR(arx), disp);
+			UML_ADD(block, AR(arx), AR(arx), 1);
+			break;
 		case 0x4:   // @ARx+ARy
 			UML_ADD(block, I0, AR(arx), AR(ary));
+			break;
+		case 0x5:	// @ARx+ARy++
+			UML_ADD(block, I0, AR(arx), AR(ary));
+			UML_ADD(block, AR(ary), AR(ary), 1);
 			break;
 		case 0xa:   // @ARx+disp12
 			UML_ADD(block, I0, AR(arx), disp);
