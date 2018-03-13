@@ -657,6 +657,11 @@ void mb86235_device::generate_reg_read(drcuml_block *block, compiler_state *comp
 {
 	switch (reg)
 	{
+		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
+			// MA0-7
+			UML_MOV(block, dst, MA(reg & 7));
+			break;		
+
 		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 			// AA0-7
 			UML_MOV(block, dst, AA(reg & 7));
@@ -667,6 +672,11 @@ void mb86235_device::generate_reg_read(drcuml_block *block, compiler_state *comp
 			UML_MOV(block, dst, AR(reg & 7));
 			break;
 
+		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
+			// MB0-7
+			UML_MOV(block, dst, MB(reg & 7));
+			break;
+			
 		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
 			// AB0-7
 			UML_MOV(block, dst, AB(reg & 7));
