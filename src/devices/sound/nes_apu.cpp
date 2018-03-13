@@ -151,7 +151,7 @@ void nesapu_device::calculate_rates()
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(rate);
 	else
-		m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
+		m_stream = machine().sound().stream_alloc(*this, 0, 1, rate);
 }
 
 //-------------------------------------------------
@@ -283,7 +283,7 @@ s8 nesapu_device::apu_square(apu_t::square_t *chan)
 			|| (chan->freq >> 16) < 4)
 		return 0;
 
-	chan->phaseacc --;
+	chan->phaseacc -= 4;
 
 	while (chan->phaseacc < 0)
 	{
@@ -342,7 +342,7 @@ s8 nesapu_device::apu_triangle(apu_t::triangle_t *chan)
 	if (freq < 4) /* inaudible */
 		return 0;
 
-	chan->phaseacc --;
+	chan->phaseacc -= 4;
 	while (chan->phaseacc < 0)
 	{
 		chan->phaseacc += freq;
@@ -400,7 +400,7 @@ s8 nesapu_device::apu_noise(apu_t::noise_t *chan)
 		return 0;
 
 	freq = noise_freq[chan->regs[2] & 0x0F];
-	chan->phaseacc --;
+	chan->phaseacc -= 4;
 	while (chan->phaseacc < 0)
 	{
 		chan->phaseacc += freq;
@@ -453,7 +453,7 @@ s8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 	if (chan->enabled)
 	{
 		freq = dpcm_clocks[chan->regs[0] & 0x0F];
-		chan->phaseacc --;
+		chan->phaseacc -= 4;
 
 		while (chan->phaseacc < 0)
 		{
