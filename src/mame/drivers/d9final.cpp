@@ -7,11 +7,10 @@
     driver by Angelo Salese & David Haywood
 
     TODO:
-    - Don't know where the ES8712 samples come from;
+    - What does the ES8712 control? There's definitely no ADPCM chip or sample ROM here;
     - Main CPU banking is wrong;
     - Some inputs not understood;
     - A bunch of missing port outputs (including payout);
-    - NVRAM;
     - screen disable? Start-up fading looks horrible;
     - Game looks IGS-esque, is there any correlation?
 
@@ -27,6 +26,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/msm6242.h"
+#include "machine/nvram.h"
 #include "sound/es8712.h"
 #include "sound/ym2413.h"
 #include "screen.h"
@@ -129,7 +129,7 @@ READ8_MEMBER(d9final_state::prot_latch_r)
 ADDRESS_MAP_START(d9final_state::d9final_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sc0_lovram) AM_SHARE("lo_vram")
@@ -303,6 +303,7 @@ MACHINE_CONFIG_START(d9final_state::d9final)
 	MCFG_CPU_IO_MAP(d9final_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", d9final_state,  irq0_line_hold)
 
+	MCFG_NVRAM_ADD_0FILL("nvram") // Sharp LH5116D-10 + battery
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
