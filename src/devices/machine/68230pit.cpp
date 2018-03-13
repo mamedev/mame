@@ -629,13 +629,13 @@ TCR bit 0 - Timer Enable
 */
 void pit68230_device::wr_pitreg_tcr(uint8_t data)
 {
-	int tout  = 0;
-	int tiack = 0;
-	int irq   = 0;
+	//int tout  = 0;
+	//int tiack = 0;
+	//int irq   = 0;
 	int psc   = 0;
 	int clk   = 0;
 	int pen   = 0;
-	int sqr   = 0;
+	//int sqr   = 0;
 
 	LOG("%s(%02x) %s\n", FUNCNAME, data, tag());
 	m_tcr = data;
@@ -644,11 +644,11 @@ void pit68230_device::wr_pitreg_tcr(uint8_t data)
 	case REG_TCR_PC3_PC7:
 	case REG_TCR_PC3_PC7_DC:        LOG("- PC3 and PC7 used as I/O pins\n"); break;
 	case REG_TCR_TOUT_PC7_SQ:
-	case REG_TCR_TOUT_PC7_SQ_DC:    LOG("- PC3 used as SQuare wave TOUT and PC7 used as I/O pin - not implemented yet\n");        sqr = 1; break;
-	case REG_TCR_TOUT_TIACK:        LOG("- PC3 used as TOUT and PC7 used as TIACK - not implemented yet\n"); tout = 1; tiack = 1;          break;
-	case REG_TCR_TOUT_TIACK_INT:    LOG("- PC3 used as TOUT and PC7 used as TIACK, Interrupts enabled\n");   tout = 1; tiack = 1; irq = 1; break;
+	case REG_TCR_TOUT_PC7_SQ_DC:    LOG("- PC3 used as SQuare wave TOUT and PC7 used as I/O pin - not implemented yet\n");       /* sqr = 1; */ break;
+	case REG_TCR_TOUT_TIACK:        LOG("- PC3 used as TOUT and PC7 used as TIACK - not implemented yet\n"); /*tout = 1; tiack = 1;*/          break;
+	case REG_TCR_TOUT_TIACK_INT:    LOG("- PC3 used as TOUT and PC7 used as TIACK, Interrupts enabled\n");   /*tout = 1; tiack = 1; irq = 1;*/ break;
 	case REG_TCR_TOUT_PC7:          LOG("- PC3 used as TOUT and PC7 used as I/O pin - not implemented yet\n");                             break;
-	case REG_TCR_TOUT_PC7_INT:      LOG("- PC3 used as TOUT and PC7 used as I/O pin, Interrupts enabled\n"); tout = 1; irq = 1;            break;
+	case REG_TCR_TOUT_PC7_INT:      LOG("- PC3 used as TOUT and PC7 used as I/O pin, Interrupts enabled\n"); /*tout = 1; irq = 1; */           break;
 	}
 
 	switch (m_tcr & REG_TCR_CC_MASK)
