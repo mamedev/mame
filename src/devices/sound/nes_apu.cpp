@@ -139,7 +139,7 @@ void nesapu_device::calculate_rates()
 {
 	int rate = clock() / 4;
 
-	m_samps_per_sync = 89490; // Is there a different PAL value?
+	m_samps_per_sync = 89490 / 12; // Is there a different PAL value?
 	m_buffer_size = m_samps_per_sync;
 
 	create_vbltimes(m_vbl_times,vbl_length,m_samps_per_sync);
