@@ -711,7 +711,7 @@
 			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="DMG-P3E-0.u1" size="65536" crc="d229ac62" sha1="1e475cbd5fb7099df91155a103698e4e66da7a86" offset="0" />
+				<rom name="dmg-p3e-0.u1" size="65536" crc="d229ac62" sha1="1e475cbd5fb7099df91155a103698e4e66da7a86" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -24939,7 +24939,7 @@
 			<feature name="u2" value="" /> <!-- EPOXY BLOB Sachen MMC1 -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="VOL.7.u1" size="262144" crc="82f06e93" sha1="7506c75fdfa29935afb1e85f5b6013516b2e9f92" offset="0" />
+				<rom name="vol.7.u1" size="262144" crc="82f06e93" sha1="7506c75fdfa29935afb1e85f5b6013516b2e9f92" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -24955,7 +24955,7 @@
 			<feature name="u2" value="" /> <!-- EPOXY BLOB Sachen MMC1 -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="65536">
-				<rom name="4B-002.u1" size="65536" crc="5e438db8" sha1="d9cb1721854709be7667f5dbce0adf2488c0919b" offset="0" />
+				<rom name="4b-002.u1" size="65536" crc="5e438db8" sha1="d9cb1721854709be7667f5dbce0adf2488c0919b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -24971,7 +24971,7 @@
 			<feature name="u2" value="" /> <!-- EPOXY BLOB Sachen MMC1 -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="65536">
-				<rom name="4B-003.bin" size="65536" crc="c294aa21" sha1="b5a3ee09692476d801d873a703d508d17ee24fbd" offset="0" />
+				<rom name="4b-003.u1" size="65536" crc="c294aa21" sha1="b5a3ee09692476d801d873a703d508d17ee24fbd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -24987,7 +24987,7 @@
 			<feature name="u2" value="" /> <!-- EPOXY BLOB Sachen MMC1 -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="VOL.9.u1" size="262144" crc="c69a19f6" sha1="ca7990dc03a3b3ada1dce37afc4490deaf872402" offset="0" />
+				<rom name="vol.9.u1" size="262144" crc="c69a19f6" sha1="ca7990dc03a3b3ada1dce37afc4490deaf872402" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -25004,7 +25004,7 @@
 			<feature name="u2" value="" /> <!-- EPOXY BLOB Sachen MMC1 -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="VOL.8.u1" size="262144" crc="f4310eb3" sha1="2107979104cff88bcd635215a936bbc44354ea7c" offset="0" />
+				<rom name="vol.8.u1" size="262144" crc="f4310eb3" sha1="2107979104cff88bcd635215a936bbc44354ea7c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -25020,7 +25020,7 @@
 			<feature name="u2" value="" /> <!-- EPOXY BLOB Sachen MMC1 -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="4B-006.u1" size="262144" crc="95398da5" sha1="2e856de768c7cb442a206de8c94a23548027bb60" offset="0" />
+				<rom name="4b-006.u1" size="262144" crc="95398da5" sha1="2e856de768c7cb442a206de8c94a23548027bb60" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -25037,7 +25037,7 @@
 			<feature name="u2" value="" /> <!-- EPOXY BLOB Sachen MMC1 -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="4B-007.u1" size="262144" crc="62d9350e" sha1="0eef7f3934508ab79e1cad4ddf3bfdb3216b6b4f" offset="0" />
+				<rom name="4b-007.u1" size="262144" crc="62d9350e" sha1="0eef7f3934508ab79e1cad4ddf3bfdb3216b6b4f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -25054,7 +25054,7 @@
 			<feature name="u2" value="" /> <!-- EPOXY BLOB Sachen MMC1 -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="4B-008.u1" size="262144" crc="740e9bc8" sha1="d7c11d56a42ed7c4ef2fe3c752931a63160d7429" offset="0" />
+				<rom name="4b-008.u1" size="262144" crc="740e9bc8" sha1="d7c11d56a42ed7c4ef2fe3c752931a63160d7429" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -25070,7 +25070,7 @@
 			<feature name="u2" value="" /> <!-- EPOXY BLOB Sachen MMC1 -->
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="4B-009.u1" size="262144" crc="114e1f1e" sha1="39743e21935a9115fcb4ee86d67d51bdb4b5f6d6" offset="0" />
+				<rom name="4b-009.u1" size="262144" crc="114e1f1e" sha1="39743e21935a9115fcb4ee86d67d51bdb4b5f6d6" offset="0" />
 			</dataarea>
 		</part>
 	</software>

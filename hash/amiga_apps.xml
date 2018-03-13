@@ -5,23 +5,23 @@
 
 	<software name="appetize">
 		<!-- Included with the purchase of an Amiga 500 -->
-		<description>Appetizer (Ger)</description>
+		<description>Appetizer (De)</description>
 		<year>1989</year>
 		<publisher>Gold Disk</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Appetizer (Ger)" />
+			<feature name="part_id" value="Appetizer (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="appetizer_de.adf" size="901120" crc="cea608ca" sha1="3b653f1d6925ebbf46141e111fd28b5eecadf58e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 	
-	<software name ="appetizesw" cloneof="appetize">
-		<description>Amiga Appetizer (Swe)</description>
+	<software name ="appetizesv" cloneof="appetize">
+		<description>Amiga Appetizer (Sv)</description>
 		<year>1989</year>
 		<publisher>Gold Disk</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Amiga Appetizer (Swe)" />
+			<feature name="part_id" value="Amiga Appetizer (Sv)" />
 			<dataarea name="flop" size="901120">
 				<rom name="amiga appetizer (swe).adf" size="901120" crc="8be0554b" sha1="0bba0914ea63c8e1c69e55ae502df6add2244d22" offset="0"/>
 			</dataarea>
@@ -30,12 +30,12 @@
 
 	<software name="dast11de">
 		<!-- Part of the Amiga Magic Pack -->
-		<description>Datastore 1.1 (Ger)</description>
+		<description>Datastore 1.1 (De)</description>
 		<year>1995</year>
 		<publisher>Digita</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<!-- Verified dump -->
-			<feature name="part_id" value="Datastore 1.1 (Ger)" />
+			<feature name="part_id" value="Datastore 1.1 (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="datastore11_de.adf" size="901120" crc="8fc8bb62" sha1="05cc8175f2218532ad35b8fbb6c724b4bd0d9c3d" offset="0"/>
 			</dataarea>
@@ -44,11 +44,11 @@
 	
 	<!-- Seems to be using some sort of copy protection or possibly dumped from a faulty disk. -->
 	<software name ="deskbudg">
-		<description>Desktop Budget (Swe)</description>
+		<description>Desktop Budget (Sv)</description>
 		<year>1989</year>
 		<publisher>Gold Disk</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Desktop Budget (Swe)" />
+			<feature name="part_id" value="Desktop Budget (Sv)" />
 			<dataarea name="flop" size="901120">
 				<rom name="desktop budget (swe).adf" size="901120" crc="d16bca57" sha1="ff650ffb504ffe21ff6fb884f5a1904ddcb47912" status="baddump" offset="0"/>
 			</dataarea>
@@ -57,12 +57,12 @@
 
 	<software name="orga11de">
 		<!-- Part of the Amiga Magic Pack -->
-		<description>Organiser 1.1 (Ger)</description>
+		<description>Organiser 1.1 (De)</description>
 		<year>1995</year>
 		<publisher>Digita</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<!-- Verified dump -->
-			<feature name="part_id" value="Organiser 1.1 (Ger)" />
+			<feature name="part_id" value="Organiser 1.1 (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="organiser11_de.adf" size="901120" crc="0d8ac3ec" sha1="ce0453c1a48a648c968e84a9afe6bfb939d3817c" offset="0"/>
 			</dataarea>
@@ -71,12 +71,12 @@
 
 	<software name="pg12sede">
 		<!-- Part of the Amiga Magic Pack -->
-		<description>Photogenics 1.2a SE (Ger)</description>
+		<description>Photogenics 1.2a SE (De)</description>
 		<year>1994</year>
 		<publisher>Almathera</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<!-- Verified dump -->
-			<feature name="part_id" value="Photogenics 1.2a SE (Ger)" />
+			<feature name="part_id" value="Photogenics 1.2a SE (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="photogenics12a_se_de.adf" size="901120" crc="11ec1456" sha1="2ecbeec2b3ef12c1aaf128cd9d1b1983673df462" offset="0"/>
 			</dataarea>
@@ -104,11 +104,11 @@
 	</software>
 
 	<software name="simplet2">
-		<description>Simplex Tools 2 - RAP!TOP!COP! (Ger)</description>
+		<description>Simplex Tools 2 - RAP!TOP!COP! (De)</description>
 		<year>1992</year>
 		<publisher>MSPI</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Simplex Tools 2 - RAP!TOP!COP! (Ger)" />
+			<feature name="part_id" value="Simplex Tools 2 - RAP!TOP!COP! (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="simplex_tools_2.adf" size="901120" crc="9d211a17" sha1="a1021a34f6f95adc38021a24aed59300d6a211e6" offset="0"/>
 			</dataarea>
@@ -129,7 +129,7 @@
 
 	<software name="turboc35">
 		<!-- Part of the Amiga Magic Pack -->
-		<description>Turbo Calc 3.5 (Ger)</description>
+		<description>Turbo Calc 3.5 (De)</description>
 		<year>1995</year>
 		<publisher>Schatztruhe</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -150,7 +150,7 @@
 
 	<software name="ww4se_de">
 		<!-- Part of the Amiga Magic Pack -->
-		<description>Wordworth 4 SE (Ger)</description>
+		<description>Wordworth 4 SE (De)</description>
 		<year>1995</year>
 		<publisher>Digita</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -177,12 +177,12 @@
 
 	<software name="wwpm_de">
 		<!-- Part of the Amiga Magic Pack -->
-		<description>Wordworth Printer Manager (Ger)</description>
+		<description>Wordworth Printer Manager (De)</description>
 		<year>1995</year>
 		<publisher>Digita</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<!-- Verified dump -->
-			<feature name="part_id" value="Wordworth Printer Manager (Ger)" />
+			<feature name="part_id" value="Wordworth Printer Manager (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="wwpm_de.adf" size="901120" crc="7bedd129" sha1="e9c293c4d1b16dbada5b2092c90864634d0941e2" offset="0"/>
 			</dataarea>

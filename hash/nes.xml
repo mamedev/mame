@@ -49,7 +49,7 @@
 			<feature name="cart_back_label" value="880920" /> <!-- Blue Text -->
 			<feature name="mmc1_type" value="MMC1A" />
 			<dataarea name="prg" size="262144">
-				<rom name="IPC-J1-0 PRG.u1" size="262144" crc="ba58ed29" sha1="56fe858d1035dce4b68520f457a0858bae7bb16d" offset="00000" />
+				<rom name="ipc-j1-0 prg.u1" size="262144" crc="ba58ed29" sha1="56fe858d1035dce4b68520f457a0858bae7bb16d" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -9529,11 +9529,11 @@
 			<feature name="mmc1_type" value="MMC1B1-H" />
 			<dataarea name="prg" size="32768">
 				<!-- Real label: DR. MARIO 4/27/90 PRG 1CFB -->
-				<rom name="DR. MARIO 4-27-90 PRG 1CFB.u1" size="32768" crc="a1fb8e8a" sha1="cc310a5540391e5feaaf75d010f3afdeafc2d35a" offset="00000" />
+				<rom name="dr. mario 4-27-90 prg 1cfb.u1" size="32768" crc="a1fb8e8a" sha1="cc310a5540391e5feaaf75d010f3afdeafc2d35a" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
 				<!-- Real label: DR. MARIO 4/27/90 CHR 8C28 -->
-				<rom name="DR. MARIO 4-27-90 CHR 8C28.u2" size="32768" crc="0059e2ab" sha1="f50e5ef5f55cfc04fe7afbb27c51e3e2e25d6290" offset="00000" />
+				<rom name="dr. mario 4-27-90 chr 8c28.u2" size="32768" crc="0059e2ab" sha1="f50e5ef5f55cfc04fe7afbb27c51e3e2e25d6290" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
