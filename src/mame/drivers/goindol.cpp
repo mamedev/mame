@@ -81,38 +81,40 @@ WRITE8_MEMBER(goindol_state::prot_fcb0_w)
 
 
 
-ADDRESS_MAP_START(goindol_state::goindol_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE("soundlatch", generic_latch_8_device, write) // watchdog?
-	AM_RANGE(0xc810, 0xc810) AM_WRITE(goindol_bankswitch_w)
-	AM_RANGE(0xc820, 0xc820) AM_READ_PORT("DIAL")
-	AM_RANGE(0xc820, 0xd820) AM_WRITEONLY AM_SHARE("fg_scrolly")
-	AM_RANGE(0xc830, 0xc830) AM_READ_PORT("P1")
-	AM_RANGE(0xc830, 0xd830) AM_WRITEONLY AM_SHARE("fg_scrollx")
-	AM_RANGE(0xc834, 0xc834) AM_READ_PORT("P2")
-	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd040, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(goindol_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xe000, 0xe03f) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xe040, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goindol_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf422, 0xf422) AM_READ(prot_f422_r)
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc44, 0xfc44) AM_WRITE(prot_fc44_w)
-	AM_RANGE(0xfc66, 0xfc66) AM_WRITE(prot_fc66_w)
-	AM_RANGE(0xfcb0, 0xfcb0) AM_WRITE(prot_fcb0_w)
-	AM_RANGE(0xfd99, 0xfd99) AM_WRITE(prot_fd99_w)
-ADDRESS_MAP_END
+void goindol_state::goindol_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc7ff).ram().share("ram");
+	map(0xc800, 0xc800).nopr().w("soundlatch", FUNC(generic_latch_8_device::write)); // watchdog?
+	map(0xc810, 0xc810).w(this, FUNC(goindol_state::goindol_bankswitch_w));
+	map(0xc820, 0xc820).portr("DIAL");
+	map(0xc820, 0xd820).writeonly().share("fg_scrolly");
+	map(0xc830, 0xc830).portr("P1");
+	map(0xc830, 0xd830).writeonly().share("fg_scrollx");
+	map(0xc834, 0xc834).portr("P2");
+	map(0xd000, 0xd03f).ram().share("spriteram");
+	map(0xd040, 0xd7ff).ram();
+	map(0xd800, 0xdfff).ram().w(this, FUNC(goindol_state::goindol_bg_videoram_w)).share("bg_videoram");
+	map(0xe000, 0xe03f).ram().share("spriteram2");
+	map(0xe040, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().w(this, FUNC(goindol_state::goindol_fg_videoram_w)).share("fg_videoram");
+	map(0xf000, 0xf000).portr("DSW1");
+	map(0xf422, 0xf422).r(this, FUNC(goindol_state::prot_f422_r));
+	map(0xf800, 0xf800).portr("DSW2");
+	map(0xfc44, 0xfc44).w(this, FUNC(goindol_state::prot_fc44_w));
+	map(0xfc66, 0xfc66).w(this, FUNC(goindol_state::prot_fc66_w));
+	map(0xfcb0, 0xfcb0).w(this, FUNC(goindol_state::prot_fcb0_w));
+	map(0xfd99, 0xfd99).w(this, FUNC(goindol_state::prot_fd99_w));
+}
 
-ADDRESS_MAP_START(goindol_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym2203_device, write)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void goindol_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xa001).w("ymsnd", FUNC(ym2203_device::write));
+	map(0xc000, 0xc7ff).ram();
+	map(0xd800, 0xd800).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( goindol )

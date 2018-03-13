@@ -346,82 +346,89 @@ WRITE8_MEMBER(opwolf_state::sound_bankswitch_w)
 ***********************************************************/
 
 
-ADDRESS_MAP_START(opwolf_state::opwolf_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0f0000, 0x0f07ff) AM_MIRROR(0xf000) AM_READ(opwolf_cchip_data_r)
-	AM_RANGE(0x0f0802, 0x0f0803) AM_MIRROR(0xf000) AM_READ(opwolf_cchip_status_r)
-	AM_RANGE(0x0ff000, 0x0ff7ff) AM_WRITE(opwolf_cchip_data_w)
-	AM_RANGE(0x0ff802, 0x0ff803) AM_WRITE(opwolf_cchip_status_w)
-	AM_RANGE(0x0ffc00, 0x0ffc01) AM_WRITE(opwolf_cchip_bank_w)
-	AM_RANGE(0x100000, 0x107fff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)          /* dip switches */
-	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)  // usually 0x4, changes when you fire
-	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)     /* lightgun, read at $11e0/6 */
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP                    /* watchdog ?? */
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0xff00)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0xff00)
-	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)
-	AM_RANGE(0xc10000, 0xc1ffff) AM_WRITEONLY                   /* error in init code (?) */
-	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
-	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE("pc080sn", pc080sn_device, xscroll_word_w)
-	AM_RANGE(0xc50000, 0xc50003) AM_DEVWRITE("pc080sn", pc080sn_device, ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)  /* sprite ram */
-ADDRESS_MAP_END
+void opwolf_state::opwolf_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x0f0000, 0x0f07ff).mirror(0xf000).r(this, FUNC(opwolf_state::opwolf_cchip_data_r));
+	map(0x0f0802, 0x0f0803).mirror(0xf000).r(this, FUNC(opwolf_state::opwolf_cchip_status_r));
+	map(0x0ff000, 0x0ff7ff).w(this, FUNC(opwolf_state::opwolf_cchip_data_w));
+	map(0x0ff802, 0x0ff803).w(this, FUNC(opwolf_state::opwolf_cchip_status_w));
+	map(0x0ffc00, 0x0ffc01).w(this, FUNC(opwolf_state::opwolf_cchip_bank_w));
+	map(0x100000, 0x107fff).ram();
+	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x380000, 0x380003).r(this, FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
+	map(0x380000, 0x380003).w(this, FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
+	map(0x3a0000, 0x3a0003).r(this, FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 */
+	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
+	map(0x3e0000, 0x3e0001).nopr();
+	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0x3e0002, 0x3e0002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+	map(0xc00000, 0xc0ffff).rw(m_pc080sn, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));
+	map(0xc10000, 0xc1ffff).writeonly();                   /* error in init code (?) */
+	map(0xc20000, 0xc20003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
+	map(0xc40000, 0xc40003).w(m_pc080sn, FUNC(pc080sn_device::xscroll_word_w));
+	map(0xc50000, 0xc50003).w(m_pc080sn, FUNC(pc080sn_device::ctrl_word_w));
+	map(0xd00000, 0xd03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  /* sprite ram */
+}
 
 
-ADDRESS_MAP_START(opwolf_state::opwolfb_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0f0008, 0x0f000b) AM_READ(opwolf_in_r)           /* coins and buttons */
-	AM_RANGE(0x0ff000, 0x0fffff) AM_READWRITE(cchip_r,cchip_w)
-	AM_RANGE(0x100000, 0x107fff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)          /* dip switches */
-	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)  // usually 0x4, changes when you fire
-	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)     /* lightgun, read at $11e0/6 */
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP                    /* watchdog ?? */
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0xff00)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0xff00)
-	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)
-	AM_RANGE(0xc10000, 0xc1ffff) AM_WRITEONLY                   /* error in init code (?) */
-	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
-	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE("pc080sn", pc080sn_device, xscroll_word_w)
-	AM_RANGE(0xc50000, 0xc50003) AM_DEVWRITE("pc080sn", pc080sn_device, ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)  /* sprite ram */
-ADDRESS_MAP_END
+void opwolf_state::opwolfb_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x0f0008, 0x0f000b).r(this, FUNC(opwolf_state::opwolf_in_r));           /* coins and buttons */
+	map(0x0ff000, 0x0fffff).rw(this, FUNC(opwolf_state::cchip_r), FUNC(opwolf_state::cchip_w));
+	map(0x100000, 0x107fff).ram();
+	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x380000, 0x380003).r(this, FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
+	map(0x380000, 0x380003).w(this, FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
+	map(0x3a0000, 0x3a0003).r(this, FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 */
+	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
+	map(0x3e0000, 0x3e0001).nopr();
+	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0x3e0002, 0x3e0002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+	map(0xc00000, 0xc0ffff).rw(m_pc080sn, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));
+	map(0xc10000, 0xc1ffff).writeonly();                   /* error in init code (?) */
+	map(0xc20000, 0xc20003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
+	map(0xc40000, 0xc40003).w(m_pc080sn, FUNC(pc080sn_device::xscroll_word_w));
+	map(0xc50000, 0xc50003).w(m_pc080sn, FUNC(pc080sn_device::ctrl_word_w));
+	map(0xd00000, 0xd03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  /* sprite ram */
+}
 
-ADDRESS_MAP_START(opwolf_state::opwolfp_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x107fff) AM_RAM
+void opwolf_state::opwolfp_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x107fff).ram();
 
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)          /* dip switches */
-	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)  // usually 0x4, changes when you fire
-	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)     /* lightgun, read at $11e0/6 (AND INPUTS) */
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP                    /* watchdog ?? */
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0xff00)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0xff00)
-	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)
-	AM_RANGE(0xc10000, 0xc1ffff) AM_WRITEONLY                   /* error in init code (?) */
-	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
-	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE("pc080sn", pc080sn_device, xscroll_word_w)
-	AM_RANGE(0xc50000, 0xc50003) AM_DEVWRITE("pc080sn", pc080sn_device, ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)  /* sprite ram */
-ADDRESS_MAP_END
+	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x380000, 0x380003).r(this, FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
+	map(0x380000, 0x380003).w(this, FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
+	map(0x3a0000, 0x3a0003).r(this, FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 (AND INPUTS) */
+	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
+	map(0x3e0000, 0x3e0001).nopr();
+	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0x3e0002, 0x3e0002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+	map(0xc00000, 0xc0ffff).rw(m_pc080sn, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));
+	map(0xc10000, 0xc1ffff).writeonly();                   /* error in init code (?) */
+	map(0xc20000, 0xc20003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
+	map(0xc40000, 0xc40003).w(m_pc080sn, FUNC(pc080sn_device::xscroll_word_w));
+	map(0xc50000, 0xc50003).w(m_pc080sn, FUNC(pc080sn_device::ctrl_word_w));
+	map(0xd00000, 0xd03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  /* sprite ram */
+}
 
 
 /***************************************************************************
     This extra Z80 substitutes for the c-chip in the bootleg
  */
 
-ADDRESS_MAP_START(opwolf_state::opwolfb_sub_z80_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8800, 0x8800) AM_READ(z80_input1_r)  /* read at PC=$637: poked to $c004 */
-	AM_RANGE(0x9000, 0x9000) AM_WRITENOP            /* unknown write, 0 then 1 each interrupt */
-	AM_RANGE(0x9800, 0x9800) AM_READ(z80_input2_r)  /* read at PC=$631: poked to $c005 */
-	AM_RANGE(0xa000, 0xa000) AM_WRITENOP    /* IRQ acknowledge (unimplemented) */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("cchip_ram")
-ADDRESS_MAP_END
+void opwolf_state::opwolfb_sub_z80_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8800, 0x8800).r(this, FUNC(opwolf_state::z80_input1_r));  /* read at PC=$637: poked to $c004 */
+	map(0x9000, 0x9000).nopw();            /* unknown write, 0 then 1 each interrupt */
+	map(0x9800, 0x9800).r(this, FUNC(opwolf_state::z80_input2_r));  /* read at PC=$631: poked to $c005 */
+	map(0xa000, 0xa000).nopw();    /* IRQ acknowledge (unimplemented) */
+	map(0xc000, 0xc7ff).ram().share("cchip_ram");
+}
 
 
 /***************************************************************************/
@@ -550,19 +557,20 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_e_w)
 //  logerror("CPU #1         e00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
 }
 
-ADDRESS_MAP_START(opwolf_state::opwolf_sound_z80_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
-	AM_RANGE(0x9002, 0x9100) AM_READNOP
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xb000, 0xb006) AM_WRITE(opwolf_adpcm_b_w)
-	AM_RANGE(0xc000, 0xc006) AM_WRITE(opwolf_adpcm_c_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(opwolf_adpcm_d_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(opwolf_adpcm_e_w)
-ADDRESS_MAP_END
+void opwolf_state::opwolf_sound_z80_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("z80bank");
+	map(0x8000, 0x8fff).ram();
+	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x9002, 0x9100).nopr();
+	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
+	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
+	map(0xb000, 0xb006).w(this, FUNC(opwolf_state::opwolf_adpcm_b_w));
+	map(0xc000, 0xc006).w(this, FUNC(opwolf_state::opwolf_adpcm_c_w));
+	map(0xd000, 0xd000).w(this, FUNC(opwolf_state::opwolf_adpcm_d_w));
+	map(0xe000, 0xe000).w(this, FUNC(opwolf_state::opwolf_adpcm_e_w));
+}
 
 /***********************************************************
              INPUT PORTS, DIPs

@@ -322,33 +322,35 @@ WRITE8_MEMBER(bigbord2_state::syslatch2_w)
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(bigbord2_state::bigbord2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bankr")
-	AM_RANGE(0x1000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6fff) AM_RAMBANK("bankv")
-	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("banka")
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void bigbord2_state::bigbord2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).bankrw("bankr");
+	map(0x1000, 0x5fff).ram();
+	map(0x6000, 0x6fff).bankrw("bankv");
+	map(0x7000, 0x7fff).bankrw("banka");
+	map(0x8000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(bigbord2_state::bigbord2_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w) // u16
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write) // u37 has issues
-	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE("ctc2", z80ctc_device, read, write) // u21
-	AM_RANGE(0x8c, 0x8f) AM_DEVREADWRITE("dma", z80dma_device, read, write) // u62
-	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE("proglatch", ls259_device, write_nibble_d3) // u41 - eprom programming port
-	AM_RANGE(0xc4, 0xc7) AM_READ(status_port_r) // u11
-	AM_RANGE(0xc8, 0xcb) AM_DEVWRITE("syslatch1", ls259_device, write_nibble_d3) // u14
-	AM_RANGE(0xcc, 0xcf) AM_WRITE(syslatch2_w)
-	AM_RANGE(0xd0, 0xd3) AM_READ(kbd_r) // u1
-	AM_RANGE(0xd4, 0xd7) AM_DEVREADWRITE("fdc", mb8877_device, read, write) // u10
+void bigbord2_state::bigbord2_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x80, 0x83).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)); // u16
+	map(0x84, 0x87).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // u37 has issues
+	map(0x88, 0x8b).rw(m_ctc2, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // u21
+	map(0x8c, 0x8f).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write)); // u62
+	map(0xc0, 0xc3).w("proglatch", FUNC(ls259_device::write_nibble_d3)); // u41 - eprom programming port
+	map(0xc4, 0xc7).r(this, FUNC(bigbord2_state::status_port_r)); // u11
+	map(0xc8, 0xcb).w(m_syslatch1, FUNC(ls259_device::write_nibble_d3)); // u14
+	map(0xcc, 0xcf).w(this, FUNC(bigbord2_state::syslatch2_w));
+	map(0xd0, 0xd3).r(this, FUNC(bigbord2_state::kbd_r)); // u1
+	map(0xd4, 0xd7).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write)); // u10
 	//AM_RANGE(0xd8, 0xdb) AM_READWRITE(portd8_r, portd8_w) // various external data ports; DB = centronics printer
-	AM_RANGE(0xd9, 0xd9) AM_DEVWRITE("outlatch1", ls259_device, write_nibble_d3) // u96
-	AM_RANGE(0xdc, 0xdc) AM_MIRROR(2) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w) // u30
-	AM_RANGE(0xdd, 0xdd) AM_MIRROR(2) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-ADDRESS_MAP_END
+	map(0xd9, 0xd9).w("outlatch1", FUNC(ls259_device::write_nibble_d3)); // u96
+	map(0xdc, 0xdc).mirror(2).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w)); // u30
+	map(0xdd, 0xdd).mirror(2).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
 
 
 /* Input Ports */

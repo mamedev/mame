@@ -35,36 +35,38 @@
  *
  *************************************/
 
-ADDRESS_MAP_START(vertigo_state::vertigo_map)
-	AM_RANGE(0x000000, 0x000007) AM_ROM
-	AM_RANGE(0x000008, 0x001fff) AM_RAM AM_MIRROR(0x010000)
-	AM_RANGE(0x002000, 0x003fff) AM_RAM AM_SHARE("vectorram")
-	AM_RANGE(0x004000, 0x00400f) AM_READ(vertigo_io_convert) AM_MIRROR(0x001000)
-	AM_RANGE(0x004010, 0x00401f) AM_READ(vertigo_io_adc) AM_MIRROR(0x001000)
-	AM_RANGE(0x004020, 0x00402f) AM_READ(vertigo_coin_r) AM_MIRROR(0x001000)
-	AM_RANGE(0x004030, 0x00403f) AM_READ_PORT("GIO") AM_MIRROR(0x001000)
-	AM_RANGE(0x004040, 0x00404f) AM_READ(vertigo_sio_r) AM_MIRROR(0x001000)
-	AM_RANGE(0x004050, 0x00405f) AM_WRITE(vertigo_audio_w) AM_MIRROR(0x001000)
-	AM_RANGE(0x004060, 0x00406f) AM_WRITE(vertigo_motor_w) AM_MIRROR(0x001000)
-	AM_RANGE(0x004070, 0x00407f) AM_WRITE(vertigo_wsot_w) AM_MIRROR(0x001000)
-	AM_RANGE(0x006000, 0x006007) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
-	AM_RANGE(0x007000, 0x0073ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x800000, 0x81ffff) AM_ROM
-ADDRESS_MAP_END
+void vertigo_state::vertigo_map(address_map &map)
+{
+	map(0x000000, 0x000007).rom();
+	map(0x000008, 0x001fff).ram().mirror(0x010000);
+	map(0x002000, 0x003fff).ram().share("vectorram");
+	map(0x004000, 0x00400f).r(this, FUNC(vertigo_state::vertigo_io_convert)).mirror(0x001000);
+	map(0x004010, 0x00401f).r(this, FUNC(vertigo_state::vertigo_io_adc)).mirror(0x001000);
+	map(0x004020, 0x00402f).r(this, FUNC(vertigo_state::vertigo_coin_r)).mirror(0x001000);
+	map(0x004030, 0x00403f).portr("GIO").mirror(0x001000);
+	map(0x004040, 0x00404f).r(this, FUNC(vertigo_state::vertigo_sio_r)).mirror(0x001000);
+	map(0x004050, 0x00405f).w(this, FUNC(vertigo_state::vertigo_audio_w)).mirror(0x001000);
+	map(0x004060, 0x00406f).w(this, FUNC(vertigo_state::vertigo_motor_w)).mirror(0x001000);
+	map(0x004070, 0x00407f).w(this, FUNC(vertigo_state::vertigo_wsot_w)).mirror(0x001000);
+	map(0x006000, 0x006007).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
+	map(0x007000, 0x0073ff).ram().share("nvram");
+	map(0x800000, 0x81ffff).rom();
+}
 
-ADDRESS_MAP_START(vertigo_state::exidy440_audio_map)
-	AM_RANGE(0x0000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x801f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("custom", exidy440_sound_device, m6844_r, m6844_w)
-	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_DEVREADWRITE("custom", exidy440_sound_device, sound_volume_r, sound_volume_w)
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_DEVREAD("custom", exidy440_sound_device, sound_command_r) AM_WRITENOP
-	AM_RANGE(0x8c00, 0x93ff) AM_NOP
-	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x03fc) AM_READNOP AM_DEVWRITE("custom", exidy440_sound_device, sound_banks_w)
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READNOP AM_DEVWRITE("custom", exidy440_sound_device, sound_interrupt_clear_w)
-	AM_RANGE(0x9c00, 0x9fff) AM_NOP
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xdfff) AM_NOP
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void vertigo_state::exidy440_audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).noprw();
+	map(0x8000, 0x801f).mirror(0x03e0).rw(m_custom, FUNC(exidy440_sound_device::m6844_r), FUNC(exidy440_sound_device::m6844_w));
+	map(0x8400, 0x840f).mirror(0x03f0).rw(m_custom, FUNC(exidy440_sound_device::sound_volume_r), FUNC(exidy440_sound_device::sound_volume_w));
+	map(0x8800, 0x8800).mirror(0x03ff).r(m_custom, FUNC(exidy440_sound_device::sound_command_r)).nopw();
+	map(0x8c00, 0x93ff).noprw();
+	map(0x9400, 0x9403).mirror(0x03fc).nopr().w(m_custom, FUNC(exidy440_sound_device::sound_banks_w));
+	map(0x9800, 0x9800).mirror(0x03ff).nopr().w(m_custom, FUNC(exidy440_sound_device::sound_interrupt_clear_w));
+	map(0x9c00, 0x9fff).noprw();
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdfff).noprw();
+	map(0xe000, 0xffff).rom();
+}
 
 
 /*************************************

@@ -121,26 +121,28 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-ADDRESS_MAP_START(ms6102_state::ms6102_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x0000, 0x2fff) AM_ROM
-	AM_RANGE (0x3800, 0x3bff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE (0xc000, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void ms6102_state::ms6102_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x2fff).rom();
+	map(0x3800, 0x3bff).ram().share("nvram");
+	map(0xc000, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(ms6102_state::ms6102_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
-	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
-	AM_RANGE (0x10, 0x18) AM_DEVREADWRITE("dma8257", i8257_device, read, write)
-	AM_RANGE (0x20, 0x23) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+void ms6102_state::ms6102_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x01, 0x01).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x18).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x20, 0x23).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	//AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE("589wa1", ay31015_device, receive, transmit)
-	AM_RANGE (0x30, 0x3f) AM_READ(kbd_get)
-	AM_RANGE (0x40, 0x41) AM_READWRITE(crtc_r, crtc_w)
-	AM_RANGE (0x50, 0x5f) AM_NOP // video disable?
-	AM_RANGE (0x60, 0x6f) AM_WRITE(pic_w)
-	AM_RANGE (0x70, 0x7f) AM_READ(misc_r)
-ADDRESS_MAP_END
+	map(0x30, 0x3f).r(this, FUNC(ms6102_state::kbd_get));
+	map(0x40, 0x41).rw(this, FUNC(ms6102_state::crtc_r), FUNC(ms6102_state::crtc_w));
+	map(0x50, 0x5f).noprw(); // video disable?
+	map(0x60, 0x6f).w(this, FUNC(ms6102_state::pic_w));
+	map(0x70, 0x7f).r(this, FUNC(ms6102_state::misc_r));
+}
 
 static const gfx_layout ms6102_charlayout =
 {

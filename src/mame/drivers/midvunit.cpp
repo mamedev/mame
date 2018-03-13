@@ -577,59 +577,61 @@ WRITE8_MEMBER(midvunit_state::midvplus_xf1_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(midvunit_state::midvunit_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_SHARE("ram_base")
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM
-	AM_RANGE(0x600000, 0x600000) AM_WRITE(midvunit_dma_queue_w)
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_SHARE("32031_control")
-	AM_RANGE(0x809800, 0x809fff) AM_RAM
-	AM_RANGE(0x900000, 0x97ffff) AM_READWRITE(midvunit_videoram_r, midvunit_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x980000, 0x980000) AM_READ(midvunit_dma_queue_entries_r)
-	AM_RANGE(0x980020, 0x980020) AM_READ(midvunit_scanline_r)
-	AM_RANGE(0x980020, 0x98002b) AM_WRITE(midvunit_video_control_w)
-	AM_RANGE(0x980040, 0x980040) AM_READWRITE(midvunit_page_control_r, midvunit_page_control_w)
-	AM_RANGE(0x980080, 0x980080) AM_NOP
-	AM_RANGE(0x980082, 0x980083) AM_READ(midvunit_dma_trigger_r)
-	AM_RANGE(0x990000, 0x990000) AM_READNOP // link PAL (low 4 bits must == 4)
-	AM_RANGE(0x991030, 0x991030) AM_READ_PORT("991030")
+void midvunit_state::midvunit_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).ram().share("ram_base");
+	map(0x400000, 0x41ffff).ram();
+	map(0x600000, 0x600000).w(this, FUNC(midvunit_state::midvunit_dma_queue_w));
+	map(0x808000, 0x80807f).rw(this, FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share("32031_control");
+	map(0x809800, 0x809fff).ram();
+	map(0x900000, 0x97ffff).rw(this, FUNC(midvunit_state::midvunit_videoram_r), FUNC(midvunit_state::midvunit_videoram_w)).share("videoram");
+	map(0x980000, 0x980000).r(this, FUNC(midvunit_state::midvunit_dma_queue_entries_r));
+	map(0x980020, 0x980020).r(this, FUNC(midvunit_state::midvunit_scanline_r));
+	map(0x980020, 0x98002b).w(this, FUNC(midvunit_state::midvunit_video_control_w));
+	map(0x980040, 0x980040).rw(this, FUNC(midvunit_state::midvunit_page_control_r), FUNC(midvunit_state::midvunit_page_control_w));
+	map(0x980080, 0x980080).noprw();
+	map(0x980082, 0x980083).r(this, FUNC(midvunit_state::midvunit_dma_trigger_r));
+	map(0x990000, 0x990000).nopr(); // link PAL (low 4 bits must == 4)
+	map(0x991030, 0x991030).portr("991030");
 //  AM_RANGE(0x991050, 0x991050) AM_READONLY // seems to be another port
-	AM_RANGE(0x991060, 0x991060) AM_READ(port0_r)
-	AM_RANGE(0x992000, 0x992000) AM_READ_PORT("992000")
-	AM_RANGE(0x993000, 0x993000) AM_READWRITE(adc_r, adc_w)
-	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
-	AM_RANGE(0x995000, 0x995000) AM_READWRITE(midvunit_wheel_board_r, midvunit_wheel_board_w)
-	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
-	AM_RANGE(0x997000, 0x997000) AM_NOP // communications
-	AM_RANGE(0x9a0000, 0x9a0000) AM_WRITE(midvunit_sound_w)
-	AM_RANGE(0x9c0000, 0x9c1fff) AM_READWRITE(midvunit_cmos_r, midvunit_cmos_w) AM_SHARE("nvram")
-	AM_RANGE(0x9e0000, 0x9e7fff) AM_RAM_WRITE(midvunit_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(midvunit_textureram_r, midvunit_textureram_w) AM_SHARE("textureram")
-	AM_RANGE(0xc00000, 0xffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+	map(0x991060, 0x991060).r(this, FUNC(midvunit_state::port0_r));
+	map(0x992000, 0x992000).portr("992000");
+	map(0x993000, 0x993000).rw(this, FUNC(midvunit_state::adc_r), FUNC(midvunit_state::adc_w));
+	map(0x994000, 0x994000).w(this, FUNC(midvunit_state::midvunit_control_w));
+	map(0x995000, 0x995000).rw(this, FUNC(midvunit_state::midvunit_wheel_board_r), FUNC(midvunit_state::midvunit_wheel_board_w));
+	map(0x995020, 0x995020).w(this, FUNC(midvunit_state::midvunit_cmos_protect_w));
+	map(0x997000, 0x997000).noprw(); // communications
+	map(0x9a0000, 0x9a0000).w(this, FUNC(midvunit_state::midvunit_sound_w));
+	map(0x9c0000, 0x9c1fff).rw(this, FUNC(midvunit_state::midvunit_cmos_r), FUNC(midvunit_state::midvunit_cmos_w)).share("nvram");
+	map(0x9e0000, 0x9e7fff).ram().w(this, FUNC(midvunit_state::midvunit_paletteram_w)).share("paletteram");
+	map(0xa00000, 0xbfffff).rw(this, FUNC(midvunit_state::midvunit_textureram_r), FUNC(midvunit_state::midvunit_textureram_w)).share("textureram");
+	map(0xc00000, 0xffffff).rom().region("user1", 0);
+}
 
 
-ADDRESS_MAP_START(midvunit_state::midvplus_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_SHARE("ram_base")
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("fastram_base")
-	AM_RANGE(0x600000, 0x600000) AM_WRITE(midvunit_dma_queue_w)
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_SHARE("32031_control")
-	AM_RANGE(0x809800, 0x809fff) AM_RAM
-	AM_RANGE(0x900000, 0x97ffff) AM_READWRITE(midvunit_videoram_r, midvunit_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x980000, 0x980000) AM_READ(midvunit_dma_queue_entries_r)
-	AM_RANGE(0x980020, 0x980020) AM_READ(midvunit_scanline_r)
-	AM_RANGE(0x980020, 0x98002b) AM_WRITE(midvunit_video_control_w)
-	AM_RANGE(0x980040, 0x980040) AM_READWRITE(midvunit_page_control_r, midvunit_page_control_w)
-	AM_RANGE(0x980080, 0x980080) AM_NOP
-	AM_RANGE(0x980082, 0x980083) AM_READ(midvunit_dma_trigger_r)
-	AM_RANGE(0x990000, 0x99000f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
-	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
-	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
-	AM_RANGE(0x9a0000, 0x9a0007) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0x0000ffff)
-	AM_RANGE(0x9c0000, 0x9c7fff) AM_RAM_WRITE(midvunit_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x9d0000, 0x9d000f) AM_READWRITE(midvplus_misc_r, midvplus_misc_w) AM_SHARE("midvplus_misc")
-	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(midvunit_textureram_r, midvunit_textureram_w) AM_SHARE("textureram")
-	AM_RANGE(0xc00000, 0xcfffff) AM_RAM
-ADDRESS_MAP_END
+void midvunit_state::midvplus_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).ram().share("ram_base");
+	map(0x400000, 0x41ffff).ram().share("fastram_base");
+	map(0x600000, 0x600000).w(this, FUNC(midvunit_state::midvunit_dma_queue_w));
+	map(0x808000, 0x80807f).rw(this, FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share("32031_control");
+	map(0x809800, 0x809fff).ram();
+	map(0x900000, 0x97ffff).rw(this, FUNC(midvunit_state::midvunit_videoram_r), FUNC(midvunit_state::midvunit_videoram_w)).share("videoram");
+	map(0x980000, 0x980000).r(this, FUNC(midvunit_state::midvunit_dma_queue_entries_r));
+	map(0x980020, 0x980020).r(this, FUNC(midvunit_state::midvunit_scanline_r));
+	map(0x980020, 0x98002b).w(this, FUNC(midvunit_state::midvunit_video_control_w));
+	map(0x980040, 0x980040).rw(this, FUNC(midvunit_state::midvunit_page_control_r), FUNC(midvunit_state::midvunit_page_control_w));
+	map(0x980080, 0x980080).noprw();
+	map(0x980082, 0x980083).r(this, FUNC(midvunit_state::midvunit_dma_trigger_r));
+	map(0x990000, 0x99000f).rw(m_midway_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
+	map(0x994000, 0x994000).w(this, FUNC(midvunit_state::midvunit_control_w));
+	map(0x995020, 0x995020).w(this, FUNC(midvunit_state::midvunit_cmos_protect_w));
+	map(0x9a0000, 0x9a0007).rw("ata", FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0)).umask32(0x0000ffff);
+	map(0x9c0000, 0x9c7fff).ram().w(this, FUNC(midvunit_state::midvunit_paletteram_w)).share("paletteram");
+	map(0x9d0000, 0x9d000f).rw(this, FUNC(midvunit_state::midvplus_misc_r), FUNC(midvunit_state::midvplus_misc_w)).share("midvplus_misc");
+	map(0xa00000, 0xbfffff).rw(this, FUNC(midvunit_state::midvunit_textureram_r), FUNC(midvunit_state::midvunit_textureram_w)).share("textureram");
+	map(0xc00000, 0xcfffff).ram();
+}
 
 
 

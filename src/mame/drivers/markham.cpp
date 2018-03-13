@@ -26,40 +26,42 @@ READ8_MEMBER(markham_state::markham_e004_r)
 
 /****************************************************************************/
 
-ADDRESS_MAP_START(markham_state::markham_master_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
+void markham_state::markham_master_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
 
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(markham_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share1")
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xcfff).ram().share("spriteram");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(markham_state::markham_videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().share("share1");
 
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW1")
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P1")
-	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("P2")
+	map(0xe000, 0xe000).portr("DSW2");
+	map(0xe001, 0xe001).portr("DSW1");
+	map(0xe002, 0xe002).portr("P1");
+	map(0xe003, 0xe003).portr("P2");
 
-	AM_RANGE(0xe004, 0xe004) AM_READ(markham_e004_r) /* from CPU2 busack */
+	map(0xe004, 0xe004).r(this, FUNC(markham_state::markham_e004_r)); /* from CPU2 busack */
 
-	AM_RANGE(0xe005, 0xe005) AM_READ_PORT("SYSTEM")
+	map(0xe005, 0xe005).portr("SYSTEM");
 
-	AM_RANGE(0xe008, 0xe008) AM_WRITENOP /* coin counter? */
-	AM_RANGE(0xe009, 0xe009) AM_WRITENOP /* to CPU2 busreq */
+	map(0xe008, 0xe008).nopw(); /* coin counter? */
+	map(0xe009, 0xe009).nopw(); /* to CPU2 busreq */
 
-	AM_RANGE(0xe00c, 0xe00d) AM_WRITEONLY AM_SHARE("xscroll")
-	AM_RANGE(0xe00e, 0xe00e) AM_WRITE(markham_flipscreen_w)
-ADDRESS_MAP_END
+	map(0xe00c, 0xe00d).writeonly().share("xscroll");
+	map(0xe00e, 0xe00e).w(this, FUNC(markham_state::markham_flipscreen_w));
+}
 
-ADDRESS_MAP_START(markham_state::markham_slave_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
+void markham_state::markham_slave_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x8000, 0x87ff).ram().share("share1");
 
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("sn1", sn76496_device, write)
-	AM_RANGE(0xc001, 0xc001) AM_DEVWRITE("sn2", sn76496_device, write)
+	map(0xc000, 0xc000).w("sn1", FUNC(sn76496_device::write));
+	map(0xc001, 0xc001).w("sn2", FUNC(sn76496_device::write));
 
-	AM_RANGE(0xc002, 0xc002) AM_WRITENOP /* unknown */
-	AM_RANGE(0xc003, 0xc003) AM_WRITENOP /* unknown */
-ADDRESS_MAP_END
+	map(0xc002, 0xc002).nopw(); /* unknown */
+	map(0xc003, 0xc003).nopw(); /* unknown */
+}
 
 
 /****************************************************************************/

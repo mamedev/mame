@@ -272,24 +272,27 @@ WRITE16_MEMBER( acclaim_rax_device::host_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(acclaim_rax_device::adsp_program_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("adsp_pram")
-ADDRESS_MAP_END
+void acclaim_rax_device::adsp_program_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).ram().share("adsp_pram");
+}
 
-ADDRESS_MAP_START(acclaim_rax_device::adsp_data_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("databank")
-	AM_RANGE(0x2000, 0x3fdf) AM_RAM // Internal RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
-ADDRESS_MAP_END
+void acclaim_rax_device::adsp_data_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).bankrw("databank");
+	map(0x2000, 0x3fdf).ram(); // Internal RAM
+	map(0x3fe0, 0x3fff).rw(this, FUNC(acclaim_rax_device::adsp_control_r), FUNC(acclaim_rax_device::adsp_control_w));
+}
 
-ADDRESS_MAP_START(acclaim_rax_device::adsp_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(ram_bank_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(rom_bank_w)
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(host_r, host_w)
-ADDRESS_MAP_END
+void acclaim_rax_device::adsp_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0000).w(this, FUNC(acclaim_rax_device::ram_bank_w));
+	map(0x0001, 0x0001).w(this, FUNC(acclaim_rax_device::rom_bank_w));
+	map(0x0003, 0x0003).rw(this, FUNC(acclaim_rax_device::host_r), FUNC(acclaim_rax_device::host_w));
+}
 
 
 void acclaim_rax_device::device_start()

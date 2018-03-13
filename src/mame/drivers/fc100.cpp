@@ -118,34 +118,36 @@ private:
 };
 
 
-ADDRESS_MAP_START(fc100_state::fc100_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x5fff ) AM_ROM AM_REGION("roms", 0)
+void fc100_state::fc100_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x5fff).rom().region("roms", 0);
 	//AM_RANGE(0x6000, 0x6fff)      // mapped by the cartslot
-	AM_RANGE( 0x7800, 0x7fff ) AM_READ_BANK("bankr") AM_WRITE_BANK("bankw") // Banked RAM/ROM
-	AM_RANGE( 0x8000, 0xbfff ) AM_RAM // expansion ram pack - if omitted you get a 'Pages?' prompt at boot
-	AM_RANGE( 0xc000, 0xffff ) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+	map(0x7800, 0x7fff).bankr("bankr").bankw("bankw"); // Banked RAM/ROM
+	map(0x8000, 0xbfff).ram(); // expansion ram pack - if omitted you get a 'Pages?' prompt at boot
+	map(0xc000, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(fc100_state::fc100_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0F) AM_READ(port00_r)
+void fc100_state::fc100_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x0F).r(this, FUNC(fc100_state::port00_r));
 	// AM_RANGE(0x10, 0x10) AM_WRITE(port10_w)  // vdg, unknown effects
-	AM_RANGE(0x21, 0x21) AM_DEVWRITE("psg", ay8910_device, data_w)
-	AM_RANGE(0x22, 0x22) AM_DEVREAD("psg", ay8910_device, data_r)
-	AM_RANGE(0x23, 0x23) AM_DEVWRITE("psg", ay8910_device, address_w)
-	AM_RANGE(0x31, 0x31) AM_WRITE(port31_w)
-	AM_RANGE(0x33, 0x33) AM_WRITE(port33_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x42, 0x42) AM_WRITENOP // bit 0 could be printer select
-	AM_RANGE(0x43, 0x43) AM_WRITE(port43_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREAD("cent_status_in", input_buffer_device, read)
-	AM_RANGE(0x60, 0x61) AM_WRITE(port60_w)
-	AM_RANGE(0x70, 0x71) AM_WRITE(port70_w)
-	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0xb8, 0xb8) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+	map(0x21, 0x21).w("psg", FUNC(ay8910_device::data_w));
+	map(0x22, 0x22).r("psg", FUNC(ay8910_device::data_r));
+	map(0x23, 0x23).w("psg", FUNC(ay8910_device::address_w));
+	map(0x31, 0x31).w(this, FUNC(fc100_state::port31_w));
+	map(0x33, 0x33).w(this, FUNC(fc100_state::port33_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x42, 0x42).nopw(); // bit 0 could be printer select
+	map(0x43, 0x43).w(this, FUNC(fc100_state::port43_w));
+	map(0x44, 0x44).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0x60, 0x61).w(this, FUNC(fc100_state::port60_w));
+	map(0x70, 0x71).w(this, FUNC(fc100_state::port70_w));
+	map(0xb0, 0xb0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xb8, 0xb8).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 static INPUT_PORTS_START( fc100 )
 	PORT_START("KEY.0")

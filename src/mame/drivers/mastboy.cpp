@@ -616,30 +616,31 @@ INTERRUPT_GEN_MEMBER(mastboy_state::interrupt)
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(mastboy_state::mastboy_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM // Internal ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROM // External ROM
+void mastboy_state::mastboy_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom(); // Internal ROM
+	map(0x4000, 0x7fff).rom(); // External ROM
 
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("workram")// work ram
-	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_SHARE("tileram")// tilemap ram
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_SHARE("colram") AM_MIRROR(0x0e00)  // colour ram
+	map(0x8000, 0x8fff).ram().share("workram");// work ram
+	map(0x9000, 0x9fff).ram().share("tileram");// tilemap ram
+	map(0xa000, 0xa1ff).ram().share("colram").mirror(0x0e00);  // colour ram
 
-	AM_RANGE(0xc000, 0xffff) AM_DEVICE("bank_c000", address_map_bank_device, amap8)
+	map(0xc000, 0xffff).m("bank_c000", FUNC(address_map_bank_device::amap8));
 
-	AM_RANGE(0xff000, 0xff7ff) AM_DEVREADWRITE("earom", eeprom_parallel_28xx_device, read, write)
+	map(0xff000, 0xff7ff).rw(m_earom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 
-	AM_RANGE(0xff800, 0xff807) AM_READ_PORT("P1")
-	AM_RANGE(0xff808, 0xff80f) AM_READ_PORT("P2")
-	AM_RANGE(0xff810, 0xff817) AM_READ_PORT("DSW1")
-	AM_RANGE(0xff818, 0xff81f) AM_READ_PORT("DSW2")
+	map(0xff800, 0xff807).portr("P1");
+	map(0xff808, 0xff80f).portr("P2");
+	map(0xff810, 0xff817).portr("DSW1");
+	map(0xff818, 0xff81f).portr("DSW2");
 
-	AM_RANGE(0xff820, 0xff827) AM_WRITE(bank_w)
-	AM_RANGE(0xff828, 0xff829) AM_DEVWRITE("saa", saa1099_device, write)
-	AM_RANGE(0xff830, 0xff830) AM_WRITE(msm5205_data_w)
-	AM_RANGE(0xff838, 0xff83f) AM_DEVWRITE("outlatch", ls259_device, write_d0)
+	map(0xff820, 0xff827).w(this, FUNC(mastboy_state::bank_w));
+	map(0xff828, 0xff829).w("saa", FUNC(saa1099_device::write));
+	map(0xff830, 0xff830).w(this, FUNC(mastboy_state::msm5205_data_w));
+	map(0xff838, 0xff83f).w(m_outlatch, FUNC(ls259_device::write_d0));
 
-	AM_RANGE(0xffc00, 0xfffff) AM_RAM // Internal RAM
-ADDRESS_MAP_END
+	map(0xffc00, 0xfffff).ram(); // Internal RAM
+}
 
 // TODO : banked map is mirrored?
 ADDRESS_MAP_START(mastboy_state::bank_c000_map)
@@ -661,10 +662,11 @@ READ8_MEMBER(mastboy_state::nmi_read)
 	return 0x00;
 }
 
-ADDRESS_MAP_START(mastboy_state::mastboy_io_map)
-	AM_RANGE(0x38, 0x38) AM_READ(port_38_read)
-	AM_RANGE(0x39, 0x39) AM_READ(nmi_read)
-ADDRESS_MAP_END
+void mastboy_state::mastboy_io_map(address_map &map)
+{
+	map(0x38, 0x38).r(this, FUNC(mastboy_state::port_38_read));
+	map(0x39, 0x39).r(this, FUNC(mastboy_state::nmi_read));
+}
 
 /* Input Ports */
 

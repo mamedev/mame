@@ -53,17 +53,19 @@ public:
  *
  *********************************************************************************/
 
-ADDRESS_MAP_START(astrocde_mess_state::astrocade_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_WRITE(astrocade_funcgen_w)
-	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Star Fortress writes in here?? */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("videoram") /* ASG */
+void astrocde_mess_state::astrocade_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().w(this, FUNC(astrocde_mess_state::astrocade_funcgen_w));
+	map(0x1000, 0x3fff).rom(); /* Star Fortress writes in here?? */
+	map(0x4000, 0x4fff).ram().share("videoram"); /* ASG */
 	//AM_RANGE(0x5000, 0xffff) AM_DEVREADWRITE("exp", astrocade_exp_device, read, write)
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(astrocde_mess_state::astrocade_io)
-	AM_RANGE(0x00, 0x1f) AM_SELECT(0xff00) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
-ADDRESS_MAP_END
+void astrocde_mess_state::astrocade_io(address_map &map)
+{
+	map(0x00, 0x1f).select(0xff00).rw(this, FUNC(astrocde_mess_state::astrocade_data_chip_register_r), FUNC(astrocde_mess_state::astrocade_data_chip_register_w));
+}
 
 /*************************************
  *

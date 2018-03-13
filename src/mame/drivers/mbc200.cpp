@@ -104,11 +104,12 @@ private:
 };
 
 
-ADDRESS_MAP_START(mbc200_state::mbc200_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAM AM_REGION("maincpu", 0)
-	AM_RANGE( 0x1000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void mbc200_state::mbc200_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).ram().region("maincpu", 0);
+	map(0x1000, 0xffff).ram();
+}
 
 WRITE8_MEMBER( mbc200_state::p1_portc_w )
 {
@@ -143,26 +144,28 @@ WRITE8_MEMBER( mbc200_state::pm_portb_w )
 	m_beep->set_state(BIT(data, 1)); // key-click
 }
 
-ADDRESS_MAP_START(mbc200_state::mbc200_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void mbc200_state::mbc200_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	//AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
 	//AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	AM_RANGE(0xe0, 0xe1) AM_READ(keyboard_r) AM_WRITENOP
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_device, read, write)
-	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("ppi_m", i8255_device, read, write)
-	AM_RANGE(0xec, 0xec) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
-	AM_RANGE(0xed, 0xed) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+	map(0xe0, 0xe1).r(this, FUNC(mbc200_state::keyboard_r)).nopw();
+	map(0xe4, 0xe7).rw(m_fdc, FUNC(mb8876_device::read), FUNC(mb8876_device::write));
+	map(0xe8, 0xeb).rw(m_ppi_m, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xec, 0xec).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xed, 0xed).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 
 
-ADDRESS_MAP_START(mbc200_state::mbc200_sub_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x2fff ) AM_ROM
-	AM_RANGE( 0x3000, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_RAM AM_SHARE("vram")
-ADDRESS_MAP_END
+void mbc200_state::mbc200_sub_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x2fff).rom();
+	map(0x3000, 0x7fff).ram();
+	map(0x8000, 0xffff).ram().share("vram");
+}
 
 READ8_MEMBER(mbc200_state::p2_porta_r)
 {
@@ -173,14 +176,15 @@ READ8_MEMBER(mbc200_state::p2_porta_r)
 	return tmp;
 }
 
-ADDRESS_MAP_START(mbc200_state::mbc200_sub_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi_1", i8255_device, read, write)
-	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0xb1, 0xb1) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("ppi_2", i8255_device, read, write)
-ADDRESS_MAP_END
+void mbc200_state::mbc200_sub_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x70, 0x73).rw("ppi_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xb0, 0xb0).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0xb1, 0xb1).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xd0, 0xd3).rw("ppi_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mbc200 )

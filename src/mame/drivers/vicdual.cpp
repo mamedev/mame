@@ -288,21 +288,23 @@ WRITE8_MEMBER(vicdual_state::depthch_io_w)
 }
 
 
-ADDRESS_MAP_START(vicdual_state::depthch_map)
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::depthch_map(address_map &map)
+{
+	map(0x0000, 0x3fff).mirror(0x4000).rom();
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).mirror(0x7000).ram();
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
 
-ADDRESS_MAP_START(vicdual_state::depthch_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+void vicdual_state::depthch_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(depthch_io_r, depthch_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::depthch_io_r), FUNC(vicdual_state::depthch_io_w));
+}
 
 
 static INPUT_PORTS_START( depthch )
@@ -370,23 +372,25 @@ WRITE8_MEMBER(vicdual_state::safari_io_w)
 }
 
 
-ADDRESS_MAP_START(vicdual_state::safari_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_NOP /* unused */
-	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::safari_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).noprw(); /* unused */
+	map(0x8000, 0x8fff).mirror(0x3000).ram();
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc400, 0xc7ff).mirror(0x3000).ram();
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
 
-ADDRESS_MAP_START(vicdual_state::safari_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+void vicdual_state::safari_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(safari_io_r, safari_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::safari_io_r), FUNC(vicdual_state::safari_io_w));
+}
 
 
 static INPUT_PORTS_START( safari )
@@ -454,21 +458,23 @@ WRITE8_MEMBER(vicdual_state::frogs_io_w)
 }
 
 
-ADDRESS_MAP_START(vicdual_state::frogs_map)
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::frogs_map(address_map &map)
+{
+	map(0x0000, 0x3fff).mirror(0x4000).rom();
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).mirror(0x7000).ram();
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
 
-ADDRESS_MAP_START(vicdual_state::frogs_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+void vicdual_state::frogs_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(frogs_io_r, frogs_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::frogs_io_r), FUNC(vicdual_state::frogs_io_w));
+}
 
 
 static INPUT_PORTS_START( frogs )
@@ -579,31 +585,34 @@ WRITE8_MEMBER(vicdual_state::headon_io_w)
 }
 
 
-ADDRESS_MAP_START(vicdual_state::headon_map)
-	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_NOP /* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::headon_map(address_map &map)
+{
+	map(0x0000, 0x1fff).mirror(0x6000).rom();
+	map(0x8000, 0xbfff).noprw(); /* unused */
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc400, 0xc7ff).mirror(0x3000).ram();
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
 
-ADDRESS_MAP_START(vicdual_state::headon_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-
-	/* no decoder, just logic gates, so in theory the
-	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(headon_io_r, headon_io_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(vicdual_state::sspaceat_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+void vicdual_state::headon_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(sspaceat_io_r, headon_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::headon_io_r), FUNC(vicdual_state::headon_io_w));
+}
+
+
+void vicdual_state::sspaceat_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
+
+	/* no decoder, just logic gates, so in theory the
+	   game can read/write from multiple locations at once */
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::sspaceat_io_r), FUNC(vicdual_state::headon_io_w));
+}
 
 
 static INPUT_PORTS_START( headon )
@@ -848,28 +857,31 @@ WRITE8_MEMBER(vicdual_state::digger_io_w)
 }
 
 
-ADDRESS_MAP_START(vicdual_state::headon2_map)
-	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
+void vicdual_state::headon2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).mirror(0x6000).rom();
 	/* AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x3f00) */  /* schematics show this as battery backed RAM, but doesn't appear to be used */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc400, 0xc7ff).mirror(0x3000).ram();
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
 
-ADDRESS_MAP_START(vicdual_state::headon2_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(headon2_io_r, headon2_io_w)
-ADDRESS_MAP_END
+void vicdual_state::headon2_io_map(address_map &map)
+{
+	map.global_mask(0x1f);
+	map(0x00, 0x1f).rw(this, FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::headon2_io_w));
+}
 
 
-ADDRESS_MAP_START(vicdual_state::digger_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1f)
+void vicdual_state::digger_io_map(address_map &map)
+{
+	map.global_mask(0x1f);
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(headon2_io_r, digger_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x1f).rw(this, FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::digger_io_w));
+}
 
 
 static INPUT_PORTS_START( headon2 )
@@ -1158,184 +1170,198 @@ WRITE8_MEMBER(vicdual_state::headonn_io_w)
 }
 
 
-ADDRESS_MAP_START(vicdual_state::vicdual_dualgame_map)
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::vicdual_dualgame_map(address_map &map)
+{
+	map(0x0000, 0x3fff).mirror(0x4000).rom();
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).mirror(0x7000).ram();
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
-ADDRESS_MAP_START(vicdual_state::carhntds_dualgame_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM // also has part of a rom mapped at 0x4000
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::carhntds_dualgame_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); // also has part of a rom mapped at 0x4000
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).mirror(0x7000).ram();
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
-ADDRESS_MAP_START(vicdual_state::invho2_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
+void vicdual_state::invho2_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
 
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
-
-	/* no decoder, just logic gates, so in theory the
-	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(invho2_io_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(vicdual_state::invds_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(invds_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::invho2_io_w));
+}
 
-ADDRESS_MAP_START(vicdual_state::carhntds_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
+void vicdual_state::invds_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
 
-	/* no decoder, just logic gates, so in theory the
-	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(carhntds_io_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(vicdual_state::sspacaho_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(sspacaho_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::invds_io_w));
+}
 
+void vicdual_state::carhntds_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
 
-ADDRESS_MAP_START(vicdual_state::tranqgun_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x0c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ_PORT("IN3")
-
-	/* no decoder, just logic gates, so in theory the
-	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_WRITE(tranqgun_io_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(vicdual_state::spacetrk_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(spacetrk_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::carhntds_io_w));
+}
 
+void vicdual_state::sspacaho_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
 
-ADDRESS_MAP_START(vicdual_state::carnival_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
-
-	/* no decoder, just logic gates, so in theory the
-	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(carnival_io_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(vicdual_state::brdrline_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x0c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ_PORT("IN3")
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_WRITE(brdrline_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::sspacaho_io_w));
+}
 
 
-ADDRESS_MAP_START(vicdual_state::pulsar_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
+void vicdual_state::tranqgun_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
 
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
-
-	/* no decoder, just logic gates, so in theory the
-	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(pulsar_io_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(vicdual_state::heiankyo_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x0c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ_PORT("IN3")
+	map(0x00, 0x00).mirror(0x0c).portr("IN0");
+	map(0x01, 0x01).mirror(0x0c).portr("IN1");
+	map(0x02, 0x02).mirror(0x0c).portr("IN2");
+	map(0x03, 0x03).mirror(0x0c).portr("IN3");
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_WRITE(heiankyo_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0f).w(this, FUNC(vicdual_state::tranqgun_io_w));
+}
 
 
-ADDRESS_MAP_START(vicdual_state::alphaho_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
+void vicdual_state::spacetrk_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
 
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
-
-	/* no decoder, just logic gates, so in theory the
-	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(alphaho_io_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(vicdual_state::headonn_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(headonn_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::spacetrk_io_w));
+}
+
+
+void vicdual_state::carnival_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
+
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::carnival_io_w));
+}
+
+
+void vicdual_state::brdrline_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
+
+	map(0x00, 0x00).mirror(0x0c).portr("IN0");
+	map(0x01, 0x01).mirror(0x0c).portr("IN1");
+	map(0x02, 0x02).mirror(0x0c).portr("IN2");
+	map(0x03, 0x03).mirror(0x0c).portr("IN3");
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	map(0x00, 0x0f).w(this, FUNC(vicdual_state::brdrline_io_w));
+}
+
+
+void vicdual_state::pulsar_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
+
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::pulsar_io_w));
+}
+
+
+void vicdual_state::heiankyo_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
+
+	map(0x00, 0x00).mirror(0x0c).portr("IN0");
+	map(0x01, 0x01).mirror(0x0c).portr("IN1");
+	map(0x02, 0x02).mirror(0x0c).portr("IN2");
+	map(0x03, 0x03).mirror(0x0c).portr("IN3");
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	map(0x00, 0x0f).w(this, FUNC(vicdual_state::heiankyo_io_w));
+}
+
+
+void vicdual_state::alphaho_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
+
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::alphaho_io_w));
+}
+
+
+void vicdual_state::headonn_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
+
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::headonn_io_w));
+}
 
 
 /* several of the games' lives DIPs are spread across two input ports */
@@ -2247,26 +2273,28 @@ WRITE8_MEMBER(vicdual_state::samurai_io_w)
 
 
 /* dual game hardware */
-ADDRESS_MAP_START(vicdual_state::samurai_map)
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM AM_WRITE(samurai_protection_w)
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::samurai_map(address_map &map)
+{
+	map(0x0000, 0x3fff).mirror(0x4000).rom().w(this, FUNC(vicdual_state::samurai_protection_w));
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).mirror(0x7000).ram();
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
 
-ADDRESS_MAP_START(vicdual_state::samurai_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
+void vicdual_state::samurai_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
 
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(samurai_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::samurai_io_w));
+}
 
 
 static INPUT_PORTS_START( samurai )
@@ -2377,22 +2405,24 @@ WRITE8_MEMBER(nsub_state::nsub_io_w)
 }
 
 
-ADDRESS_MAP_START(nsub_state::nsub_map)
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_NOP /* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void nsub_state::nsub_map(address_map &map)
+{
+	map(0x0000, 0x3fff).mirror(0x4000).rom();
+	map(0x8000, 0xbfff).noprw(); /* unused */
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(nsub_state::videoram_w)).share("videoram");
+	map(0xc400, 0xc7ff).mirror(0x3000).ram();
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(nsub_state::characterram_w)).share("characterram");
+}
 
 
-ADDRESS_MAP_START(nsub_state::nsub_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+void nsub_state::nsub_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(nsub_io_r, nsub_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0f).rw(this, FUNC(nsub_state::nsub_io_r), FUNC(nsub_state::nsub_io_w));
+}
 
 
 // coinage is handled by extra hardware on a daughterboard, put before the coin-in pin on the main logic board
@@ -2564,22 +2594,24 @@ WRITE8_MEMBER(vicdual_state::invinco_io_w)
 }
 
 
-ADDRESS_MAP_START(vicdual_state::invinco_map)
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_NOP /* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::invinco_map(address_map &map)
+{
+	map(0x0000, 0x3fff).mirror(0x4000).rom();
+	map(0x8000, 0xbfff).noprw(); /* unused */
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc400, 0xc7ff).mirror(0x3000).ram();
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
 
-ADDRESS_MAP_START(vicdual_state::invinco_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+void vicdual_state::invinco_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(invinco_io_r, invinco_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::invinco_io_r), FUNC(vicdual_state::invinco_io_w));
+}
 
 
 static INPUT_PORTS_START( invinco )

@@ -119,17 +119,19 @@ READ8_MEMBER(novagf8_state::delta1_io1_r)
 
 // Delta-1
 
-ADDRESS_MAP_START(novagf8_state::delta1_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM // _A13
-	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x1f00) AM_RAM // A13
-ADDRESS_MAP_END
+void novagf8_state::delta1_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x0fff).mirror(0x1000).rom(); // _A13
+	map(0x2000, 0x20ff).mirror(0x1f00).ram(); // A13
+}
 
-ADDRESS_MAP_START(novagf8_state::delta1_io)
-	AM_RANGE(0x0, 0x0) AM_READWRITE(delta1_io0_r, delta1_io0_w )
-	AM_RANGE(0x1, 0x1) AM_READWRITE(delta1_io1_r, delta1_io1_w )
-	AM_RANGE(0xc, 0xf) AM_DEVREADWRITE("f3853", f3853_device, read, write )
-ADDRESS_MAP_END
+void novagf8_state::delta1_io(address_map &map)
+{
+	map(0x0, 0x0).rw(this, FUNC(novagf8_state::delta1_io0_r), FUNC(novagf8_state::delta1_io0_w));
+	map(0x1, 0x1).rw(this, FUNC(novagf8_state::delta1_io1_r), FUNC(novagf8_state::delta1_io1_w));
+	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
+}
 
 
 

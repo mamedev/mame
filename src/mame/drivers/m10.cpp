@@ -525,47 +525,50 @@ INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
  *
  *************************************/
 
-ADDRESS_MAP_START(m10_state::m10_main)
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
-	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_SHARE("rom")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_SHARE("colorram") /* foreground colour  */
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(m10_chargen_w) AM_SHARE("chargen") /* background ????? */
-	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
-	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(m10_ctrl_w)   /* line at bottom of screen?, sound, flip screen */
-	AM_RANGE(0xa500, 0xa500) AM_WRITE(m10_a500_w)   /* ??? */
-	AM_RANGE(0xa700, 0xa700) AM_READ(m10_a700_r)
-	AM_RANGE(0xfc00, 0xffff) AM_ROM /* for the reset / interrupt vectors */
-ADDRESS_MAP_END
+void m10_state::m10_main(address_map &map)
+{
+	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
+	map(0x1000, 0x2fff).rom().share("rom");
+	map(0x4000, 0x43ff).ram().share("videoram");
+	map(0x4800, 0x4bff).ram().w(this, FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
+	map(0x5000, 0x53ff).ram().w(this, FUNC(m10_state::m10_chargen_w)).share("chargen"); /* background ????? */
+	map(0xa200, 0xa200).portr("DSW");
+	map(0xa300, 0xa300).portr("INPUTS");
+	map(0xa400, 0xa400).w(this, FUNC(m10_state::m10_ctrl_w));   /* line at bottom of screen?, sound, flip screen */
+	map(0xa500, 0xa500).w(this, FUNC(m10_state::m10_a500_w));   /* ??? */
+	map(0xa700, 0xa700).r(this, FUNC(m10_state::m10_a700_r));
+	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
+}
 
-ADDRESS_MAP_START(m10_state::m11_main)
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
-	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_SHARE("rom")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_SHARE("colorram") /* foreground colour  */
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("chargen") /* background ????? */
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(m11_a100_w) /* sound writes ???? */
-	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
-	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(m11_ctrl_w)   /* line at bottom of screen?, sound, flip screen */
-	AM_RANGE(0xa700, 0xa700) AM_READ(m11_a700_r)
-	AM_RANGE(0xfc00, 0xffff) AM_ROM /* for the reset / interrupt vectors */
-ADDRESS_MAP_END
+void m10_state::m11_main(address_map &map)
+{
+	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
+	map(0x1000, 0x2fff).rom().share("rom");
+	map(0x4000, 0x43ff).ram().share("videoram");
+	map(0x4800, 0x4bff).ram().w(this, FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
+	map(0x5000, 0x53ff).ram().share("chargen"); /* background ????? */
+	map(0xa100, 0xa100).w(this, FUNC(m10_state::m11_a100_w)); /* sound writes ???? */
+	map(0xa200, 0xa200).portr("DSW");
+	map(0xa300, 0xa300).portr("INPUTS");
+	map(0xa400, 0xa400).w(this, FUNC(m10_state::m11_ctrl_w));   /* line at bottom of screen?, sound, flip screen */
+	map(0xa700, 0xa700).r(this, FUNC(m10_state::m11_a700_r));
+	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
+}
 
-ADDRESS_MAP_START(m10_state::m15_main)
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
-	AM_RANGE(0x1000, 0x33ff) AM_ROM AM_SHARE("rom")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_SHARE("colorram") /* foreground colour  */
-	AM_RANGE(0x5000, 0x57ff) AM_RAM_WRITE(m15_chargen_w) AM_SHARE("chargen") /* background ????? */
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2")
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(m15_a100_w) /* sound writes ???? */
-	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
-	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("P1")
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(m15_ctrl_w)   /* sound, flip screen */
-	AM_RANGE(0xfc00, 0xffff) AM_ROM /* for the reset / interrupt vectors */
-ADDRESS_MAP_END
+void m10_state::m15_main(address_map &map)
+{
+	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
+	map(0x1000, 0x33ff).rom().share("rom");
+	map(0x4000, 0x43ff).ram().share("videoram");
+	map(0x4800, 0x4bff).ram().w(this, FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
+	map(0x5000, 0x57ff).ram().w(this, FUNC(m10_state::m15_chargen_w)).share("chargen"); /* background ????? */
+	map(0xa000, 0xa000).portr("P2");
+	map(0xa100, 0xa100).w(this, FUNC(m10_state::m15_a100_w)); /* sound writes ???? */
+	map(0xa200, 0xa200).portr("DSW");
+	map(0xa300, 0xa300).portr("P1");
+	map(0xa400, 0xa400).w(this, FUNC(m10_state::m15_ctrl_w));   /* sound, flip screen */
+	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
+}
 
 /*************************************
  *

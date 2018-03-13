@@ -126,31 +126,33 @@ READ8_MEMBER(d9final_state::prot_latch_r)
 }
 
 
-ADDRESS_MAP_START(d9final_state::d9final_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sc0_lovram) AM_SHARE("lo_vram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sc0_hivram) AM_SHARE("hi_vram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sc0_cram) AM_SHARE("cram")
-	AM_RANGE(0xf000, 0xf007) AM_READ(prot_latch_r) //AM_DEVREADWRITE("essnd", es8712_device, read, write)
-	AM_RANGE(0xf800, 0xf80f) AM_DEVREADWRITE("rtc", rtc62421_device, read, write)
-ADDRESS_MAP_END
+void d9final_state::d9final_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc7ff).ram().share("nvram");
+	map(0xc800, 0xcbff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0xcc00, 0xcfff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(d9final_state::sc0_lovram)).share("lo_vram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(d9final_state::sc0_hivram)).share("hi_vram");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(d9final_state::sc0_cram)).share("cram");
+	map(0xf000, 0xf007).r(this, FUNC(d9final_state::prot_latch_r)); //AM_DEVREADWRITE("essnd", es8712_device, read, write)
+	map(0xf800, 0xf80f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
+}
 
-ADDRESS_MAP_START(d9final_state::d9final_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void d9final_state::d9final_io(address_map &map)
+{
+	map.global_mask(0xff);
 //  AM_RANGE(0x00, 0x00) AM_WRITENOP //bit 0: irq enable? screen enable?
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA")
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSWB")
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWC")
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0x60, 0x60) AM_READ_PORT("DSWD")
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("IN0")
-	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN1") AM_WRITE(bank_w)
-	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
+	map(0x00, 0x00).portr("DSWA");
+	map(0x20, 0x20).portr("DSWB");
+	map(0x40, 0x40).portr("DSWC");
+	map(0x40, 0x41).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x60, 0x60).portr("DSWD");
+	map(0x80, 0x80).portr("IN0");
+	map(0xa0, 0xa0).portr("IN1").w(this, FUNC(d9final_state::bank_w));
+	map(0xe0, 0xe0).portr("IN2");
+}
 
 static INPUT_PORTS_START( d9final )
 	PORT_START("IN0")

@@ -190,31 +190,33 @@ void peoplepc_state::machine_start()
 	m_flop1->get_device()->setup_unload_cb(floppy_image_device::unload_cb(&peoplepc_state::floppy_unload, this));
 }
 
-ADDRESS_MAP_START(peoplepc_state::peoplepc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x7ffff) AM_RAM
-	AM_RANGE(0xc0000, 0xdffff) AM_RAM AM_SHARE("gvram")
-	AM_RANGE(0xe0000, 0xe3fff) AM_RAM AM_SHARE("cvram")
-	AM_RANGE(0xe4000, 0xe5fff) AM_WRITE(charram_w)
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void peoplepc_state::peoplepc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x7ffff).ram();
+	map(0xc0000, 0xdffff).ram().share("gvram");
+	map(0xe0000, 0xe3fff).ram().share("cvram");
+	map(0xe4000, 0xe5fff).w(this, FUNC(peoplepc_state::charram_w));
+	map(0xfe000, 0xfffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(peoplepc_state::peoplepc_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0014, 0x0017) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x0018, 0x001b) AM_DEVREADWRITE8("pic8259_0", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x0020, 0x0031) AM_DEVREADWRITE8("i8257", i8257_device, read, write, 0x00ff)
-	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0048, 0x004f) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x0054, 0x0055) AM_DEVREADWRITE8("i8251_0", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x0056, 0x0057) AM_DEVREADWRITE8("i8251_0", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x005c, 0x005d) AM_DEVREADWRITE8("i8251_1", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x005e, 0x005f) AM_DEVREADWRITE8("i8251_1", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x0064, 0x0067) AM_DEVICE8("upd765", upd765a_device, map, 0x00ff)
-	AM_RANGE(0x006c, 0x006d) AM_DEVWRITE8("h46505", mc6845_device, address_w, 0x00ff)
-	AM_RANGE(0x006e, 0x006f) AM_DEVREADWRITE8("h46505", mc6845_device, register_r, register_w, 0x00ff)
-	AM_RANGE(0x0070, 0x0071) AM_WRITE8(dmapg_w, 0x00ff)
-ADDRESS_MAP_END
+void peoplepc_state::peoplepc_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0014, 0x0017).rw(m_pic_1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x0018, 0x001b).rw("pic8259_0", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x0020, 0x0031).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write)).umask16(0x00ff);
+	map(0x0040, 0x0047).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0048, 0x004f).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x0054, 0x0054).rw(m_8251key, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x0056, 0x0056).rw(m_8251key, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x005c, 0x005c).rw(m_8251ser, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x005e, 0x005e).rw(m_8251ser, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0064, 0x0067).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0x006c, 0x006c).w("h46505", FUNC(mc6845_device::address_w));
+	map(0x006e, 0x006e).rw("h46505", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0070, 0x0070).w(this, FUNC(peoplepc_state::dmapg_w));
+}
 
 static SLOT_INTERFACE_START( peoplepc_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )

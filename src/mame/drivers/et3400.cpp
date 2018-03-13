@@ -137,15 +137,16 @@ WRITE8_MEMBER(et3400_state::pia_bw)
 }
 
 
-ADDRESS_MAP_START(et3400_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAM
-	AM_RANGE( 0x1000, 0x1003 ) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE( 0x1400, 0x23ff ) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0xc000, 0xc0ff ) AM_READ(keypad_r)
-	AM_RANGE( 0xc100, 0xc1ff ) AM_WRITE(display_w)
-	AM_RANGE( 0xfc00, 0xffff ) AM_ROM AM_REGION("roms", 0x1000)
-ADDRESS_MAP_END
+void et3400_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1003).mirror(0x03fc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1400, 0x23ff).rom().region("roms", 0);
+	map(0xc000, 0xc0ff).r(this, FUNC(et3400_state::keypad_r));
+	map(0xc100, 0xc1ff).w(this, FUNC(et3400_state::display_w));
+	map(0xfc00, 0xffff).rom().region("roms", 0x1000);
+}
 
 WRITE_LINE_MEMBER(et3400_state::reset_key_w)
 {

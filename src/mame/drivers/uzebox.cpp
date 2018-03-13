@@ -199,20 +199,23 @@ READ8_MEMBER(uzebox_state::port_d_r)
 * Address maps                                       *
 \****************************************************/
 
-ADDRESS_MAP_START(uzebox_state::uzebox_prg_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM // 64 KB internal eprom  ATmega644
-ADDRESS_MAP_END
+void uzebox_state::uzebox_prg_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom(); // 64 KB internal eprom  ATmega644
+}
 
-ADDRESS_MAP_START(uzebox_state::uzebox_data_map)
-	AM_RANGE(0x0100, 0x10ff) AM_RAM //  4KB RAM
-ADDRESS_MAP_END
+void uzebox_state::uzebox_data_map(address_map &map)
+{
+	map(0x0100, 0x10ff).ram(); //  4KB RAM
+}
 
-ADDRESS_MAP_START(uzebox_state::uzebox_io_map)
-	AM_RANGE(AVR8_REG_A, AVR8_REG_A) AM_READWRITE( port_a_r, port_a_w )
-	AM_RANGE(AVR8_REG_B, AVR8_REG_B) AM_READWRITE( port_b_r, port_b_w )
-	AM_RANGE(AVR8_REG_C, AVR8_REG_C) AM_READWRITE( port_c_r, port_c_w )
-	AM_RANGE(AVR8_REG_D, AVR8_REG_D) AM_READWRITE( port_d_r, port_d_w )
-ADDRESS_MAP_END
+void uzebox_state::uzebox_io_map(address_map &map)
+{
+	map(AVR8_REG_A, AVR8_REG_A).rw(this, FUNC(uzebox_state::port_a_r), FUNC(uzebox_state::port_a_w));
+	map(AVR8_REG_B, AVR8_REG_B).rw(this, FUNC(uzebox_state::port_b_r), FUNC(uzebox_state::port_b_w));
+	map(AVR8_REG_C, AVR8_REG_C).rw(this, FUNC(uzebox_state::port_c_r), FUNC(uzebox_state::port_c_w));
+	map(AVR8_REG_D, AVR8_REG_D).rw(this, FUNC(uzebox_state::port_d_r), FUNC(uzebox_state::port_d_w));
+}
 
 /****************************************************\
 * Input ports                                        *

@@ -242,33 +242,36 @@ WRITE8_MEMBER(jongkyo_state::unknown_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(jongkyo_state::jongkyo_memmap)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITE(videoram2_w) // wrong, this doesn't seem to be video ram on write..
-	AM_RANGE(0x4000, 0x6bff) AM_ROM // fixed rom
-	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1")    // banked (8 banks)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void jongkyo_state::jongkyo_memmap(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().w(this, FUNC(jongkyo_state::videoram2_w)); // wrong, this doesn't seem to be video ram on write..
+	map(0x4000, 0x6bff).rom(); // fixed rom
+	map(0x6c00, 0x6fff).bankr("bank1");    // banked (8 banks)
+	map(0x7000, 0x77ff).ram();
+	map(0x8000, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(jongkyo_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x6bff) AM_ROMBANK("bank0d")
-	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1d")
-ADDRESS_MAP_END
+void jongkyo_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x6bff).bankr("bank0d");
+	map(0x6c00, 0x6fff).bankr("bank1d");
+}
 
 
-ADDRESS_MAP_START(jongkyo_state::jongkyo_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void jongkyo_state::jongkyo_portmap(address_map &map)
+{
+	map.global_mask(0xff);
 	// R 01 keyboard
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
 
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW") AM_WRITE(jongkyo_coin_counter_w)
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0") AM_WRITE(mux_w)
+	map(0x10, 0x10).portr("DSW").w(this, FUNC(jongkyo_state::jongkyo_coin_counter_w));
+	map(0x11, 0x11).portr("IN0").w(this, FUNC(jongkyo_state::mux_w));
 	// W 11 select keyboard row (fe fd fb f7)
-	AM_RANGE(0x40, 0x40) AM_READNOP // unknown, if (A & 0xf) == 0x0a then a bit 0 write to 0x7520 doesn't occur
-	AM_RANGE(0x40, 0x45) AM_WRITE(bank_select_w)
-	AM_RANGE(0x46, 0x4f) AM_WRITE(unknown_w)
-ADDRESS_MAP_END
+	map(0x40, 0x40).nopr(); // unknown, if (A & 0xf) == 0x0a then a bit 0 write to 0x7520 doesn't occur
+	map(0x40, 0x45).w(this, FUNC(jongkyo_state::bank_select_w));
+	map(0x46, 0x4f).w(this, FUNC(jongkyo_state::unknown_w));
+}
 
 /*************************************
  *

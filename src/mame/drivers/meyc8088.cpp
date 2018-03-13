@@ -214,20 +214,21 @@ WRITE8_MEMBER(meyc8088_state::video5_flip_w)
 }
 
 
-ADDRESS_MAP_START(meyc8088_state::meyc8088_map)
-	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xb0000, 0xb00ff) AM_DEVREADWRITE("i8155_2", i8155_device, memory_r, memory_w)
-	AM_RANGE(0xb0800, 0xb0807) AM_DEVREADWRITE("i8155_2", i8155_device, io_r, io_w)
-	AM_RANGE(0xb1000, 0xb10ff) AM_DEVREADWRITE("i8155_1", i8155_device, memory_r, memory_w)
-	AM_RANGE(0xb1800, 0xb1807) AM_DEVREADWRITE("i8155_1", i8155_device, io_r, io_w)
-	AM_RANGE(0xb2000, 0xb2000) AM_WRITE(drive_w)
-	AM_RANGE(0xb3000, 0xb3000) AM_NOP // i8251A data (debug related, unpopulated on sold boards)
-	AM_RANGE(0xb3800, 0xb3800) AM_NOP // "
-	AM_RANGE(0xb4000, 0xb4000) AM_READWRITE(screen_flip_r, screen_flip_w)
-	AM_RANGE(0xb5000, 0xb5000) AM_READWRITE(video5_flip_r, video5_flip_w)
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void meyc8088_state::meyc8088_map(address_map &map)
+{
+	map(0x00000, 0x007ff).ram().share("nvram");
+	map(0x70000, 0x77fff).ram().share("vram");
+	map(0xb0000, 0xb00ff).rw("i8155_2", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0xb0800, 0xb0807).rw("i8155_2", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0xb1000, 0xb10ff).rw("i8155_1", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0xb1800, 0xb1807).rw("i8155_1", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0xb2000, 0xb2000).w(this, FUNC(meyc8088_state::drive_w));
+	map(0xb3000, 0xb3000).noprw(); // i8251A data (debug related, unpopulated on sold boards)
+	map(0xb3800, 0xb3800).noprw(); // "
+	map(0xb4000, 0xb4000).rw(this, FUNC(meyc8088_state::screen_flip_r), FUNC(meyc8088_state::screen_flip_w));
+	map(0xb5000, 0xb5000).rw(this, FUNC(meyc8088_state::video5_flip_r), FUNC(meyc8088_state::video5_flip_w));
+	map(0xf8000, 0xfffff).rom();
+}
 
 
 READ8_MEMBER(meyc8088_state::meyc8088_input_r)

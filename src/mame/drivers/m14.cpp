@@ -300,21 +300,23 @@ WRITE8_MEMBER(m14_state::sound_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(m14_state::m14_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(m14_vram_w) AM_SHARE("video_ram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m14_cram_w) AM_SHARE("color_ram")
-ADDRESS_MAP_END
+void m14_state::m14_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0xe000, 0xe3ff).ram().w(this, FUNC(m14_state::m14_vram_w)).share("video_ram");
+	map(0xe400, 0xe7ff).ram().w(this, FUNC(m14_state::m14_cram_w)).share("color_ram");
+}
 
-ADDRESS_MAP_START(m14_state::m14_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("AN_PADDLE") AM_WRITE(ball_x_w)
-	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("IN0") AM_WRITE(ball_y_w)
-	AM_RANGE(0xfa, 0xfa) AM_READ(m14_rng_r) AM_WRITE(paddle_x_w)
-	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW") AM_WRITE(output_w)
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(sound_w)
-ADDRESS_MAP_END
+void m14_state::m14_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf8, 0xf8).portr("AN_PADDLE").w(this, FUNC(m14_state::ball_x_w));
+	map(0xf9, 0xf9).portr("IN0").w(this, FUNC(m14_state::ball_y_w));
+	map(0xfa, 0xfa).r(this, FUNC(m14_state::m14_rng_r)).w(this, FUNC(m14_state::paddle_x_w));
+	map(0xfb, 0xfb).portr("DSW").w(this, FUNC(m14_state::output_w));
+	map(0xfc, 0xfc).w(this, FUNC(m14_state::sound_w));
+}
 
 /*************************************
  *

@@ -195,15 +195,16 @@ ROM_END
 //  ADDRESS_MAP
 //-------------------------------------------------
 
-ADDRESS_MAP_START(lk201_device::lk201_map)
-	AM_RANGE(0x0000, 0x0002) AM_READWRITE(ports_r, ports_w)
-	AM_RANGE(0x0004, 0x0006) AM_READWRITE(ddr_r, ddr_w)
-	AM_RANGE(0x000a, 0x000c) AM_READWRITE(spi_r, spi_w)
-	AM_RANGE(0x000d, 0x0011) AM_READWRITE(sci_r, sci_w)
-	AM_RANGE(0x0012, 0x001b) AM_READWRITE(timer_r, timer_w)
-	AM_RANGE(0x0050, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x1fff) AM_ROM AM_REGION(LK201_CPU_TAG, 0x100)
-ADDRESS_MAP_END
+void lk201_device::lk201_map(address_map &map)
+{
+	map(0x0000, 0x0002).rw(this, FUNC(lk201_device::ports_r), FUNC(lk201_device::ports_w));
+	map(0x0004, 0x0006).rw(this, FUNC(lk201_device::ddr_r), FUNC(lk201_device::ddr_w));
+	map(0x000a, 0x000c).rw(this, FUNC(lk201_device::spi_r), FUNC(lk201_device::spi_w));
+	map(0x000d, 0x0011).rw(this, FUNC(lk201_device::sci_r), FUNC(lk201_device::sci_w));
+	map(0x0012, 0x001b).rw(this, FUNC(lk201_device::timer_r), FUNC(lk201_device::timer_w));
+	map(0x0050, 0x00ff).ram();
+	map(0x0100, 0x1fff).rom().region(LK201_CPU_TAG, 0x100);
+}
 
 
 //-------------------------------------------------

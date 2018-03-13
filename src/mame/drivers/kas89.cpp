@@ -511,31 +511,33 @@ WRITE8_MEMBER(kas89_state::led_mux_select_w)
 *             Memory Map              *
 **************************************/
 
-ADDRESS_MAP_START(kas89_state::kas89_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x0037, 0x0037) AM_WRITENOP    /* WTF? */
-	AM_RANGE(0x8000, 0x81ff) AM_RAM     /* empty */
-	AM_RANGE(0x8200, 0x83ff) AM_RAM     /* 8200-83ff (PL1) */
-	AM_RANGE(0x8400, 0x85ff) AM_RAM     /* 8400-85ff (PL2) */
-	AM_RANGE(0x8600, 0x87ff) AM_RAM     /* 8600-87ff (PL3) */
-	AM_RANGE(0x8800, 0x89ff) AM_RAM     /* 8800-89ff (PL4) */
-	AM_RANGE(0x8a00, 0x8bff) AM_RAM     /* 8a00-8bff (PL5) */
-	AM_RANGE(0x8c00, 0x8dff) AM_RAM     /* 8c00-8dff (PL6) */
-	AM_RANGE(0x8e00, 0x8fff) AM_RAM     /* empty */
-	AM_RANGE(0x9000, 0x97ff) AM_RAM
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void kas89_state::kas89_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x0037, 0x0037).nopw();    /* WTF? */
+	map(0x8000, 0x81ff).ram();     /* empty */
+	map(0x8200, 0x83ff).ram();     /* 8200-83ff (PL1) */
+	map(0x8400, 0x85ff).ram();     /* 8400-85ff (PL2) */
+	map(0x8600, 0x87ff).ram();     /* 8600-87ff (PL3) */
+	map(0x8800, 0x89ff).ram();     /* 8800-89ff (PL4) */
+	map(0x8a00, 0x8bff).ram();     /* 8a00-8bff (PL5) */
+	map(0x8c00, 0x8dff).ram();     /* 8c00-8dff (PL6) */
+	map(0x8e00, 0x8fff).ram();     /* empty */
+	map(0x9000, 0x97ff).ram();
+	map(0x9800, 0x9fff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(kas89_state::kas89_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("v9938", v9938_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_WRITE(mux_w)
-	AM_RANGE(0x81, 0x81) AM_READ(mux_r)
-	AM_RANGE(0x82, 0x82) AM_WRITE(control_w)    /* Bit6 trigger the 138Hz osc. tied to main Z80's NMI.*/
-	AM_RANGE(0x83, 0x83) AM_WRITE(led_mux_data_w)
-	AM_RANGE(0x84, 0x84) AM_WRITE(led_mux_select_w)
-	AM_RANGE(0x85, 0x85) AM_WRITE(sound_comm_w)
-ADDRESS_MAP_END
+void kas89_state::kas89_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x43).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x80, 0x80).w(this, FUNC(kas89_state::mux_w));
+	map(0x81, 0x81).r(this, FUNC(kas89_state::mux_r));
+	map(0x82, 0x82).w(this, FUNC(kas89_state::control_w));    /* Bit6 trigger the 138Hz osc. tied to main Z80's NMI.*/
+	map(0x83, 0x83).w(this, FUNC(kas89_state::led_mux_data_w));
+	map(0x84, 0x84).w(this, FUNC(kas89_state::led_mux_select_w));
+	map(0x85, 0x85).w(this, FUNC(kas89_state::sound_comm_w));
+}
 
 /*
   900d --- (RAM) NMI stores the read from / write to port $82
@@ -575,18 +577,20 @@ ADDRESS_MAP_END
   4aa1 : ret
 */
 
-ADDRESS_MAP_START(kas89_state::audio_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void kas89_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0xc000, 0xc7ff).ram();
+}
 
-ADDRESS_MAP_START(kas89_state::audio_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(int_ack_w)    // comm out (1st Z80). seems to write here the value previously read through soundlatch (port 0x02).
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void kas89_state::audio_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(kas89_state::int_ack_w));    // comm out (1st Z80). seems to write here the value previously read through soundlatch (port 0x02).
+	map(0x02, 0x02).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x04, 0x04).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x04, 0x05).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
 
 
 /**************************************

@@ -237,32 +237,33 @@ WRITE8_MEMBER(sprint4_state::attract_w)
 }
 
 
-ADDRESS_MAP_START(sprint4_state::sprint4_cpu_map)
+void sprint4_state::sprint4_cpu_map(address_map &map)
+{
 
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	map.global_mask(0x3fff);
 
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(wram_r, wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(video_ram_w) AM_SHARE("videoram")
+	map(0x0080, 0x00ff).mirror(0x700).rw(this, FUNC(sprint4_state::wram_r), FUNC(sprint4_state::wram_w));
+	map(0x0800, 0x0bff).mirror(0x400).ram().w(this, FUNC(sprint4_state::video_ram_w)).share("videoram");
 
-	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x718) AM_READ(analog_r)
-	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x718) AM_READ(coin_r)
-	AM_RANGE(0x0040, 0x0047) AM_MIRROR(0x718) AM_READ(collision_r)
-	AM_RANGE(0x0060, 0x0063) AM_MIRROR(0x71c) AM_READ(options_r)
+	map(0x0000, 0x0007).mirror(0x718).r(this, FUNC(sprint4_state::analog_r));
+	map(0x0020, 0x0027).mirror(0x718).r(this, FUNC(sprint4_state::coin_r));
+	map(0x0040, 0x0047).mirror(0x718).r(this, FUNC(sprint4_state::collision_r));
+	map(0x0060, 0x0063).mirror(0x71c).r(this, FUNC(sprint4_state::options_r));
 
-	AM_RANGE(0x1000, 0x17ff) AM_READ_PORT("IN0")
-	AM_RANGE(0x1800, 0x1fff) AM_READ_PORT("IN1")
+	map(0x1000, 0x17ff).portr("IN0");
+	map(0x1800, 0x1fff).portr("IN1");
 
-	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x71f) AM_WRITE(attract_w)
-	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x718) AM_WRITE(collision_reset_w)
-	AM_RANGE(0x0040, 0x0041) AM_MIRROR(0x718) AM_WRITE(da_latch_w)
-	AM_RANGE(0x0042, 0x0043) AM_MIRROR(0x718) AM_WRITE(bang_w)
-	AM_RANGE(0x0044, 0x0045) AM_MIRROR(0x718) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x0060, 0x006f) AM_MIRROR(0x710) AM_DEVWRITE("latch", f9334_device, write_a0)
+	map(0x0000, 0x0000).mirror(0x71f).w(this, FUNC(sprint4_state::attract_w));
+	map(0x0020, 0x0027).mirror(0x718).w(this, FUNC(sprint4_state::collision_reset_w));
+	map(0x0040, 0x0041).mirror(0x718).w(this, FUNC(sprint4_state::da_latch_w));
+	map(0x0042, 0x0043).mirror(0x718).w(this, FUNC(sprint4_state::bang_w));
+	map(0x0044, 0x0045).mirror(0x718).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x0060, 0x006f).mirror(0x710).w("latch", FUNC(f9334_device::write_a0));
 
-	AM_RANGE(0x2000, 0x27ff) AM_NOP /* diagnostic ROM */
-	AM_RANGE(0x2800, 0x3fff) AM_ROM
+	map(0x2000, 0x27ff).noprw(); /* diagnostic ROM */
+	map(0x2800, 0x3fff).rom();
 
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( sprint4 )

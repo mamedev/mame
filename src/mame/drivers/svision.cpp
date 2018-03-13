@@ -259,23 +259,25 @@ WRITE8_MEMBER(svision_state::tvlink_w)
 	}
 }
 
-ADDRESS_MAP_START(svision_state::svision_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(svision_r, svision_w) AM_SHARE("reg")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank2")
-ADDRESS_MAP_END
+void svision_state::svision_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x3fff).rw(this, FUNC(svision_state::svision_r), FUNC(svision_state::svision_w)).share("reg");
+	map(0x4000, 0x5fff).ram().share("videoram");
+	map(0x6000, 0x7fff).noprw();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xffff).bankr("bank2");
+}
 
-ADDRESS_MAP_START(svision_state::tvlink_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(tvlink_r, tvlink_w) AM_SHARE("reg")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank2")
-ADDRESS_MAP_END
+void svision_state::tvlink_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x3fff).rw(this, FUNC(svision_state::tvlink_r), FUNC(svision_state::tvlink_w)).share("reg");
+	map(0x4000, 0x5fff).ram().share("videoram");
+	map(0x6000, 0x7fff).noprw();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xffff).bankr("bank2");
+}
 
 static INPUT_PORTS_START( svision )
 	PORT_START("JOY")

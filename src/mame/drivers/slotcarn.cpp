@@ -172,38 +172,40 @@ WRITE_LINE_MEMBER(slotcarn_state::hsync_changed)
 *          Memory Map          *
 *******************************/
 
-ADDRESS_MAP_START(slotcarn_state::slotcarn_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("backup_ram")
-	AM_RANGE(0x6800, 0x6fff) AM_RAM // spielbud
-	AM_RANGE(0x7000, 0xafff) AM_ROM // spielbud
+void slotcarn_state::slotcarn_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x67ff).ram().share("backup_ram");
+	map(0x6800, 0x6fff).ram(); // spielbud
+	map(0x7000, 0xafff).rom(); // spielbud
 
 
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xb100, 0xb100) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
+	map(0xb000, 0xb000).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xb100, 0xb100).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xba00, 0xba03) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xbc00, 0xbc03) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xba00, 0xba03).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xbc00, 0xbc03).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
 
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW3")
-	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("DSW4")
+	map(0xc000, 0xc000).portr("DSW3");
+	map(0xc400, 0xc400).portr("DSW4");
 
-	AM_RANGE(0xd800, 0xd81f) AM_RAM // column scroll for reels?
+	map(0xd800, 0xd81f).ram(); // column scroll for reels?
 
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe001, 0xe001).w("crtc", FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("raattr")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("ravideo")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
+	map(0xe800, 0xefff).ram().share("raattr");
+	map(0xf000, 0xf7ff).ram().share("ravideo");
+	map(0xf800, 0xfbff).rw(this, FUNC(slotcarn_state::palette_r), FUNC(slotcarn_state::palette_w));
+}
 
 // spielbud - is the ay mirrored, or are there now 2?
-ADDRESS_MAP_START(slotcarn_state::spielbud_io_map)
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xb100, 0xb100) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-ADDRESS_MAP_END
+void slotcarn_state::spielbud_io_map(address_map &map)
+{
+	map(0xb000, 0xb000).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xb100, 0xb100).w("aysnd", FUNC(ay8910_device::data_w));
+}
 
 /********************************
 *          Input Ports          *

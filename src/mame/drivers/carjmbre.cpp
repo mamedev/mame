@@ -241,37 +241,40 @@ WRITE8_MEMBER(carjmbre_state::flipscreen_w)
 	flip_screen_set(data & 1);
 }
 
-ADDRESS_MAP_START(carjmbre_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8803, 0x8803) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0x8805, 0x8805) AM_WRITE(bgcolor_w)
-	AM_RANGE(0x8807, 0x8807) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM // 6116
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram") // 2114*4
-	AM_RANGE(0x9800, 0x98ff) AM_RAM AM_SHARE("spriteram") // 5101*2
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN1")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN2")
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void carjmbre_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8803, 0x8803).w(this, FUNC(carjmbre_state::nmi_enable_w));
+	map(0x8805, 0x8805).w(this, FUNC(carjmbre_state::bgcolor_w));
+	map(0x8807, 0x8807).w(this, FUNC(carjmbre_state::flipscreen_w));
+	map(0x8000, 0x87ff).ram(); // 6116
+	map(0x9000, 0x97ff).ram().w(this, FUNC(carjmbre_state::videoram_w)).share("videoram"); // 2114*4
+	map(0x9800, 0x98ff).ram().share("spriteram"); // 5101*2
+	map(0xa000, 0xa000).portr("IN1");
+	map(0xa800, 0xa800).portr("IN2");
+	map(0xb800, 0xb800).portr("DSW").w("soundlatch", FUNC(generic_latch_8_device::write));
+}
 
 
 // audiocpu side
 
-ADDRESS_MAP_START(carjmbre_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM // 6116
-ADDRESS_MAP_END
+void carjmbre_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).mirror(0x1000).rom();
+	map(0x2000, 0x27ff).ram(); // 6116
+}
 
-ADDRESS_MAP_START(carjmbre_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x22, 0x22) AM_WRITENOP // bdir/bc2/bc1 1/0/1 inactive write
-	AM_RANGE(0x24, 0x24) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x30, 0x31) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x32, 0x32) AM_WRITENOP // bdir/bc2/bc1 1/0/1 inactive write
-	AM_RANGE(0x34, 0x34) AM_DEVREAD("ay2", ay8910_device, data_r)
-ADDRESS_MAP_END
+void carjmbre_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x20, 0x21).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x22, 0x22).nopw(); // bdir/bc2/bc1 1/0/1 inactive write
+	map(0x24, 0x24).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x30, 0x31).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x32, 0x32).nopw(); // bdir/bc2/bc1 1/0/1 inactive write
+	map(0x34, 0x34).r("ay2", FUNC(ay8910_device::data_r));
+}
 
 
 

@@ -542,70 +542,75 @@ WRITE8_MEMBER(vt240_state::hbscrl_w)
 	m_scrl = (m_scrl & 0xff) | ((data & 0x3f) << 8);
 }
 
-ADDRESS_MAP_START(vt240_state::bank_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x80000, 0x87fff) AM_RAM
-ADDRESS_MAP_END
+void vt240_state::bank_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x1ffff).rom().region("maincpu", 0);
+	map(0x80000, 0x87fff).ram();
+}
 
 // PDF page 78 (4-25)
-ADDRESS_MAP_START(vt240_state::vt240_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0000000, 0167777) AM_READWRITE(mem_r, mem_w)
-	AM_RANGE (0170000, 0170037) AM_READWRITE8(mem_map_cs_r, mem_map_cs_w, 0x00ff)
-	AM_RANGE (0170040, 0170041) AM_WRITE8(mem_map_sel_w, 0x00ff)
-	AM_RANGE (0170100, 0170101) AM_READ8(ctrl_r, 0x00ff)
-	AM_RANGE (0170140, 0170141) AM_READWRITE8(nvr_store_r, nvr_store_w, 0x00ff)
-	AM_RANGE (0171000, 0171003) AM_DEVREADWRITE8("i8251", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE (0171004, 0171007) AM_DEVREADWRITE8("i8251", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE (0172000, 0172077) AM_READWRITE8(duart_r, duart_w, 0x00ff)
-	AM_RANGE (0173000, 0173003) AM_DEVREAD8("upd7220", upd7220_device, read, 0x00ff)
-	AM_RANGE (0173040, 0173077) AM_READ8(vom_r, 0x00ff)
-	AM_RANGE (0173140, 0173141) AM_READ8(char_buf_r, 0x00ff)
-	AM_RANGE (0174000, 0174003) AM_DEVWRITE8("upd7220", upd7220_device, write, 0x00ff)
-	AM_RANGE (0174040, 0174077) AM_WRITE8(vom_w, 0x00ff)
-	AM_RANGE (0174140, 0174141) AM_WRITE8(char_buf_w, 0x00ff)
-	AM_RANGE (0174400, 0174401) AM_WRITE8(patmult_w, 0x00ff)
-	AM_RANGE (0174440, 0174441) AM_WRITE8(mask_w, 0x00ff)
-	AM_RANGE (0174500, 0174501) AM_WRITE8(vpat_w, 0x00ff)
-	AM_RANGE (0174540, 0174541) AM_WRITE8(lu_w, 0x00ff)
-	AM_RANGE (0174600, 0174601) AM_WRITE8(reg0_w, 0x00ff)
-	AM_RANGE (0174640, 0174641) AM_WRITE8(reg1_w, 0x00ff)
-	AM_RANGE (0174700, 0174701) AM_WRITE8(hbscrl_w, 0x00ff)
-	AM_RANGE (0174740, 0174741) AM_WRITE8(lbscrl_w, 0x00ff)
-	AM_RANGE (0175000, 0175005) AM_READWRITE8(i8085_comm_r, i8085_comm_w, 0x00ff)
-	AM_RANGE (0176000, 0176777) AM_DEVREADWRITE8("x2212", x2212_device, read, write, 0x00ff)
+void vt240_state::vt240_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0000000, 0167777).rw(this, FUNC(vt240_state::mem_r), FUNC(vt240_state::mem_w));
+	map(0170000, 0170037).rw(this, FUNC(vt240_state::mem_map_cs_r), FUNC(vt240_state::mem_map_cs_w)).umask16(0x00ff);
+	map(0170040, 0170040).w(this, FUNC(vt240_state::mem_map_sel_w));
+	map(0170100, 0170100).r(this, FUNC(vt240_state::ctrl_r));
+	map(0170140, 0170140).rw(this, FUNC(vt240_state::nvr_store_r), FUNC(vt240_state::nvr_store_w));
+	map(0171000, 0171003).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0x00ff);
+	map(0171004, 0171007).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0x00ff);
+	map(0172000, 0172077).rw(this, FUNC(vt240_state::duart_r), FUNC(vt240_state::duart_w)).umask16(0x00ff);
+	map(0173000, 0173003).r(m_hgdc, FUNC(upd7220_device::read)).umask16(0x00ff);
+	map(0173040, 0173077).r(this, FUNC(vt240_state::vom_r)).umask16(0x00ff);
+	map(0173140, 0173140).r(this, FUNC(vt240_state::char_buf_r));
+	map(0174000, 0174003).w(m_hgdc, FUNC(upd7220_device::write)).umask16(0x00ff);
+	map(0174040, 0174077).w(this, FUNC(vt240_state::vom_w)).umask16(0x00ff);
+	map(0174140, 0174140).w(this, FUNC(vt240_state::char_buf_w));
+	map(0174400, 0174400).w(this, FUNC(vt240_state::patmult_w));
+	map(0174440, 0174440).w(this, FUNC(vt240_state::mask_w));
+	map(0174500, 0174500).w(this, FUNC(vt240_state::vpat_w));
+	map(0174540, 0174540).w(this, FUNC(vt240_state::lu_w));
+	map(0174600, 0174600).w(this, FUNC(vt240_state::reg0_w));
+	map(0174640, 0174640).w(this, FUNC(vt240_state::reg1_w));
+	map(0174700, 0174700).w(this, FUNC(vt240_state::hbscrl_w));
+	map(0174740, 0174740).w(this, FUNC(vt240_state::lbscrl_w));
+	map(0175000, 0175005).rw(this, FUNC(vt240_state::i8085_comm_r), FUNC(vt240_state::i8085_comm_w)).umask16(0x00ff);
+	map(0176000, 0176777).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
 	// 017700x System comm logic
-ADDRESS_MAP_END
+}
 
 // PDF page 134 (6-9)
-ADDRESS_MAP_START(vt240_state::vt240_char_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("charcpu", 0)
-	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("charcpu", 0x8000)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-ADDRESS_MAP_END
+void vt240_state::vt240_char_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom().region("charcpu", 0);
+	map(0x4000, 0x5fff).rom().region("charcpu", 0x8000);
+	map(0x8000, 0x87ff).ram();
+}
 
-ADDRESS_MAP_START(vt240_state::vt240_char_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
-	AM_RANGE(0x10, 0x1f) AM_READWRITE(vom_r, vom_w)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(t11_comm_r, t11_comm_w)
-	AM_RANGE(0x30, 0x30) AM_READWRITE(char_buf_r, char_buf_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(patmult_w)
-	AM_RANGE(0x90, 0x90) AM_WRITE(mask_w)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(vpat_w)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(lu_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(reg0_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(reg1_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(hbscrl_w)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(lbscrl_w)
-ADDRESS_MAP_END
+void vt240_state::vt240_char_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
+	map(0x10, 0x1f).rw(this, FUNC(vt240_state::vom_r), FUNC(vt240_state::vom_w));
+	map(0x20, 0x20).rw(this, FUNC(vt240_state::t11_comm_r), FUNC(vt240_state::t11_comm_w));
+	map(0x30, 0x30).rw(this, FUNC(vt240_state::char_buf_r), FUNC(vt240_state::char_buf_w));
+	map(0x80, 0x80).w(this, FUNC(vt240_state::patmult_w));
+	map(0x90, 0x90).w(this, FUNC(vt240_state::mask_w));
+	map(0xa0, 0xa0).w(this, FUNC(vt240_state::vpat_w));
+	map(0xb0, 0xb0).w(this, FUNC(vt240_state::lu_w));
+	map(0xc0, 0xc0).w(this, FUNC(vt240_state::reg0_w));
+	map(0xd0, 0xd0).w(this, FUNC(vt240_state::reg1_w));
+	map(0xe0, 0xe0).w(this, FUNC(vt240_state::hbscrl_w));
+	map(0xf0, 0xf0).w(this, FUNC(vt240_state::lbscrl_w));
+}
 
-ADDRESS_MAP_START(vt240_state::upd7220_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r, vram_w) AM_SHARE("vram")
-ADDRESS_MAP_END
+void vt240_state::upd7220_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rw(this, FUNC(vt240_state::vram_r), FUNC(vt240_state::vram_w)).share("vram");
+}
 
 
 void vt240_state::machine_reset()

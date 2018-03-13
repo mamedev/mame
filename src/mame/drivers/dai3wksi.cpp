@@ -321,16 +321,17 @@ WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_3_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(dai3wksi_state::main_map)
-	AM_RANGE(0x0000, 0x1bff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2400, 0x24ff) AM_MIRROR(0x100) AM_READ_PORT("IN0")
-	AM_RANGE(0x2800, 0x28ff) AM_MIRROR(0x100) AM_READ_PORT("IN1")
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(dai3wksi_audio_1_w)
-	AM_RANGE(0x3400, 0x3400) AM_WRITE(dai3wksi_audio_2_w)
-	AM_RANGE(0x3800, 0x3800) AM_WRITE(dai3wksi_audio_3_w)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void dai3wksi_state::main_map(address_map &map)
+{
+	map(0x0000, 0x1bff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x2400, 0x24ff).mirror(0x100).portr("IN0");
+	map(0x2800, 0x28ff).mirror(0x100).portr("IN1");
+	map(0x3000, 0x3000).w(this, FUNC(dai3wksi_state::dai3wksi_audio_1_w));
+	map(0x3400, 0x3400).w(this, FUNC(dai3wksi_state::dai3wksi_audio_2_w));
+	map(0x3800, 0x3800).w(this, FUNC(dai3wksi_state::dai3wksi_audio_3_w));
+	map(0x8000, 0xbfff).ram().share("videoram");
+}
 
 
 /*************************************

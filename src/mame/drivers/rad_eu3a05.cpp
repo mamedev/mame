@@ -903,79 +903,81 @@ READ8_MEMBER(radica_eu3a05_state::read_full_space)
 	return fullbankspace.read_byte(offset);
 }
 
-ADDRESS_MAP_START(radica_eu3a05_state::radicasi_map)
+void radica_eu3a05_state::radicasi_map(address_map &map)
+{
 	// can the addresses move around?
-	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x0600, 0x3dff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x3e00, 0x3fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x4800, 0x49ff) AM_RAM AM_SHARE("palram")
+	map(0x0000, 0x05ff).ram().share("ram");
+	map(0x0600, 0x3dff).ram().share("vram");
+	map(0x3e00, 0x3fff).ram().share("spriteram");
+	map(0x4800, 0x49ff).ram().share("palram");
 
 	// 500x system regs?
-	AM_RANGE(0x5003, 0x5003) AM_READ(radicasi_5003_r)
-	AM_RANGE(0x500b, 0x500b) AM_READ(radicasi_pal_ntsc_r) // PAL / NTSC flag at least
-	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_rombank_hi_w)
-	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_rombank_lo_r, radicasi_rombank_lo_w)
+	map(0x5003, 0x5003).r(this, FUNC(radica_eu3a05_state::radicasi_5003_r));
+	map(0x500b, 0x500b).r(this, FUNC(radica_eu3a05_state::radicasi_pal_ntsc_r)); // PAL / NTSC flag at least
+	map(0x500c, 0x500c).w(this, FUNC(radica_eu3a05_state::radicasi_rombank_hi_w));
+	map(0x500d, 0x500d).rw(this, FUNC(radica_eu3a05_state::radicasi_rombank_lo_r), FUNC(radica_eu3a05_state::radicasi_rombank_lo_w));
 
 	// 501x DMA controller
-	AM_RANGE(0x500F, 0x500F) AM_READWRITE(radicasi_dmasrc_lo_r, radicasi_dmasrc_lo_w)
-	AM_RANGE(0x5010, 0x5010) AM_READWRITE(radicasi_dmasrc_md_r, radicasi_dmasrc_md_w)
-	AM_RANGE(0x5011, 0x5011) AM_READWRITE(radicasi_dmasrc_hi_r, radicasi_dmasrc_hi_w)
+	map(0x500F, 0x500F).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasrc_lo_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_lo_w));
+	map(0x5010, 0x5010).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasrc_md_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_md_w));
+	map(0x5011, 0x5011).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasrc_hi_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_hi_w));
 
-	AM_RANGE(0x5012, 0x5012) AM_READWRITE(radicasi_dmadst_lo_r, radicasi_dmadst_lo_w)
-	AM_RANGE(0x5013, 0x5013) AM_READWRITE(radicasi_dmadst_hi_r, radicasi_dmadst_hi_w)
+	map(0x5012, 0x5012).rw(this, FUNC(radica_eu3a05_state::radicasi_dmadst_lo_r), FUNC(radica_eu3a05_state::radicasi_dmadst_lo_w));
+	map(0x5013, 0x5013).rw(this, FUNC(radica_eu3a05_state::radicasi_dmadst_hi_r), FUNC(radica_eu3a05_state::radicasi_dmadst_hi_w));
 
-	AM_RANGE(0x5014, 0x5014) AM_READWRITE(radicasi_dmasize_lo_r, radicasi_dmasize_lo_w)
-	AM_RANGE(0x5015, 0x5015) AM_READWRITE(radicasi_dmasize_hi_r, radicasi_dmasize_hi_w)
+	map(0x5014, 0x5014).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasize_lo_r), FUNC(radica_eu3a05_state::radicasi_dmasize_lo_w));
+	map(0x5015, 0x5015).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasize_hi_r), FUNC(radica_eu3a05_state::radicasi_dmasize_hi_w));
 
-	AM_RANGE(0x5016, 0x5016) AM_READWRITE(radicasi_dmatrg_r, radicasi_dmatrg_w)
+	map(0x5016, 0x5016).rw(this, FUNC(radica_eu3a05_state::radicasi_dmatrg_r), FUNC(radica_eu3a05_state::radicasi_dmatrg_w));
 
 	// 502x - 503x video regs area?
-	AM_RANGE(0x5020, 0x5026) AM_RAM // unknown, space invaders sets these to fixed values, tetris has them as 00
-	AM_RANGE(0x5027, 0x5027) AM_WRITE(radicasi_vidctrl_w)
+	map(0x5020, 0x5026).ram(); // unknown, space invaders sets these to fixed values, tetris has them as 00
+	map(0x5027, 0x5027).w(this, FUNC(radica_eu3a05_state::radicasi_vidctrl_w));
 
-	AM_RANGE(0x5029, 0x5029) AM_READWRITE(radicasi_tile_gfxbase_lo_r, radicasi_tile_gfxbase_lo_w) // tilebase
-	AM_RANGE(0x502a, 0x502a) AM_READWRITE(radicasi_tile_gfxbase_hi_r, radicasi_tile_gfxbase_hi_w) // tilebase
+	map(0x5029, 0x5029).rw(this, FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_lo_r), FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_lo_w)); // tilebase
+	map(0x502a, 0x502a).rw(this, FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_hi_r), FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_hi_w)); // tilebase
 
-	AM_RANGE(0x502b, 0x502b) AM_READWRITE(radicasi_sprite_gfxbase_lo_r, radicasi_sprite_gfxbase_lo_w) // tilebase (spr?)
-	AM_RANGE(0x502c, 0x502c) AM_READWRITE(radicasi_sprite_gfxbase_hi_r, radicasi_sprite_gfxbase_hi_w) // tilebase (spr?)
+	map(0x502b, 0x502b).rw(this, FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_r), FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_w)); // tilebase (spr?)
+	map(0x502c, 0x502c).rw(this, FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_r), FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_w)); // tilebase (spr?)
 
-	AM_RANGE(0x5031, 0x5032) AM_READWRITE(radicasi_sprite_bg_scroll_r, radicasi_sprite_bg_scroll_w)
+	map(0x5031, 0x5032).rw(this, FUNC(radica_eu3a05_state::radicasi_sprite_bg_scroll_r), FUNC(radica_eu3a05_state::radicasi_sprite_bg_scroll_w));
 
 
 	// 504x GPIO area?
-	AM_RANGE(0x5040, 0x5046) AM_DEVREADWRITE("gpio", radica6502_gpio_device, gpio_r, gpio_w)
-	AM_RANGE(0x5048, 0x504a) AM_DEVWRITE("gpio", radica6502_gpio_device, gpio_unk_w)
+	map(0x5040, 0x5046).rw("gpio", FUNC(radica6502_gpio_device::gpio_r), FUNC(radica6502_gpio_device::gpio_w));
+	map(0x5048, 0x504a).w("gpio", FUNC(radica6502_gpio_device::gpio_unk_w));
 
 	// 506x unknown
-	AM_RANGE(0x5060, 0x506d) AM_RAM // read/written by tetris
+	map(0x5060, 0x506d).ram(); // read/written by tetris
 
 	// 508x sound
-	AM_RANGE(0x5080, 0x5091) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_addr_r, radicasi_sound_addr_w)
-	AM_RANGE(0x5092, 0x50a3) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_size_r, radicasi_sound_size_w)
-	AM_RANGE(0x50a4, 0x50a4) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_unk_r, radicasi_sound_unk_w)
-	AM_RANGE(0x50a5, 0x50a5) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_trigger_r, radicasi_sound_trigger_w)
+	map(0x5080, 0x5091).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_addr_r), FUNC(radica6502_sound_device::radicasi_sound_addr_w));
+	map(0x5092, 0x50a3).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_size_r), FUNC(radica6502_sound_device::radicasi_sound_size_w));
+	map(0x50a4, 0x50a4).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_unk_r), FUNC(radica6502_sound_device::radicasi_sound_unk_w));
+	map(0x50a5, 0x50a5).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_trigger_r), FUNC(radica6502_sound_device::radicasi_sound_trigger_w));
 
-	AM_RANGE(0x50a8, 0x50a8) AM_DEVREAD("6ch_sound", radica6502_sound_device, radicasi_50a8_r) // possible 'stopped' status of above channels, waits for it to be 0x3f in places
+	map(0x50a8, 0x50a8).r("6ch_sound", FUNC(radica6502_sound_device::radicasi_50a8_r)); // possible 'stopped' status of above channels, waits for it to be 0x3f in places
 
-	AM_RANGE(0x50a9, 0x50a9) AM_READWRITE(radicasi_50a9_r, radicasi_50a9_w)
+	map(0x50a9, 0x50a9).rw(this, FUNC(radica_eu3a05_state::radicasi_50a9_r), FUNC(radica_eu3a05_state::radicasi_50a9_w));
 
 	//AM_RANGE(0x5000, 0x50ff) AM_RAM
 
-	AM_RANGE(0x6000, 0xdfff) AM_DEVICE("bank", address_map_bank_device, amap8)
+	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));
 
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f8000)
+	map(0xe000, 0xffff).rom().region("maincpu", 0x3f8000);
 	// not sure how these work, might be a modified 6502 core instead.
-	AM_RANGE(0xfffa, 0xfffb) AM_READ(radicasi_nmi_vector_r)
-	AM_RANGE(0xfffe, 0xffff) AM_READ(radicasi_irq_vector_r)
-ADDRESS_MAP_END
+	map(0xfffa, 0xfffb).r(this, FUNC(radica_eu3a05_state::radicasi_nmi_vector_r));
+	map(0xfffe, 0xffff).r(this, FUNC(radica_eu3a05_state::radicasi_irq_vector_r));
+}
 
 
-ADDRESS_MAP_START(radica_eu3a05_state::radicasi_bank_map)
-	AM_RANGE(0x000000, 0xffffff) AM_NOP // shut up any logging when video params are invalid
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM // ?? only ever cleared maybe a mirror of below?
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("pixram") // Qix writes here and sets the tile base here instead of ROM so it can have a pixel layer
-ADDRESS_MAP_END
+void radica_eu3a05_state::radicasi_bank_map(address_map &map)
+{
+	map(0x000000, 0xffffff).noprw(); // shut up any logging when video params are invalid
+	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
+	map(0x400000, 0x40ffff).ram(); // ?? only ever cleared maybe a mirror of below?
+	map(0x800000, 0x80ffff).ram().share("pixram"); // Qix writes here and sets the tile base here instead of ROM so it can have a pixel layer
+}
 
 static INPUT_PORTS_START( rad_sinv )
 	PORT_START("IN0")

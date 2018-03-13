@@ -247,23 +247,25 @@ READ8_MEMBER(sbowling_state::controls_r)
 		return ioport("TRACKX")->read();
 }
 
-ADDRESS_MAP_START(sbowling_state::main_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xf801, 0xf801) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void sbowling_state::main_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x8000, 0xbfff).ram().w(this, FUNC(sbowling_state::videoram_w)).share("videoram");
+	map(0xf800, 0xf801).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xf801, 0xf801).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xfc00, 0xffff).ram();
+}
 
 
-ADDRESS_MAP_START(sbowling_state::port_map)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(controls_r, pix_data_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(pix_data_r, pix_shift_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN1") AM_WRITENOP
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW0") AM_WRITE(system_w)
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW1") AM_WRITE(graph_control_w)
-ADDRESS_MAP_END
+void sbowling_state::port_map(address_map &map)
+{
+	map(0x00, 0x00).portr("IN0").w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x01, 0x01).rw(this, FUNC(sbowling_state::controls_r), FUNC(sbowling_state::pix_data_w));
+	map(0x02, 0x02).rw(this, FUNC(sbowling_state::pix_data_r), FUNC(sbowling_state::pix_shift_w));
+	map(0x03, 0x03).portr("IN1").nopw();
+	map(0x04, 0x04).portr("DSW0").w(this, FUNC(sbowling_state::system_w));
+	map(0x05, 0x05).portr("DSW1").w(this, FUNC(sbowling_state::graph_control_w));
+}
 
 
 

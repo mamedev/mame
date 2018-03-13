@@ -32,15 +32,17 @@ public:
 	void pc8_map(address_map &map);
 };
 
-ADDRESS_MAP_START(genpc_state::pc8_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void genpc_state::pc8_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xfe000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(genpc_state::pc8_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
-ADDRESS_MAP_END
+void genpc_state::pc8_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+}
 
 static DEVICE_INPUT_DEFAULTS_START(cga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x20)

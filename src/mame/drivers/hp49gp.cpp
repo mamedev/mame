@@ -259,13 +259,14 @@ void hp49gp_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(hp49gp_state::hp49gp_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
-	AM_RANGE(0x08000000, 0x0801ffff) AM_RAM
-	AM_RANGE(0x08020000, 0x0803ffff) AM_RAM
-	AM_RANGE(0x08040000, 0x0807ffff) AM_RAM
-	AM_RANGE(0x40000000, 0x40000fff) AM_RAM AM_SHARE("steppingstone")
-ADDRESS_MAP_END
+void hp49gp_state::hp49gp_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).rom();
+	map(0x08000000, 0x0801ffff).ram();
+	map(0x08020000, 0x0803ffff).ram();
+	map(0x08040000, 0x0807ffff).ram();
+	map(0x40000000, 0x40000fff).ram().share("steppingstone");
+}
 
 /***************************************************************************
     MACHINE DRIVERS

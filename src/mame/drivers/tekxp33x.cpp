@@ -60,13 +60,15 @@ public:
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(tekxp330_state::cpu_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void tekxp330_state::cpu_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram();
+	map(0x1fc00000, 0x1fdfffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(tekxp330_state::tms_map)
-ADDRESS_MAP_END
+void tekxp330_state::tms_map(address_map &map)
+{
+}
 
 /* Input Ports */
 

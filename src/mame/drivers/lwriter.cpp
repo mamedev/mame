@@ -201,30 +201,31 @@ The ADB bit-bang transceiver MCU connects to the VIA CB1 (adbclk) and CB2 (adbda
 as well as PA0 (ST1), PA2 (ST2) and PA3 (ADB /INT)
 */
 
-ADDRESS_MAP_START(lwriter_state::maincpu_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_READWRITE(bankedarea_r, bankedarea_w)
-	AM_RANGE(0x200000, 0x2fffff) AM_ROM AM_REGION("rom", 0) // 1MB ROM
+void lwriter_state::maincpu_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).rw(this, FUNC(lwriter_state::bankedarea_r), FUNC(lwriter_state::bankedarea_w));
+	map(0x200000, 0x2fffff).rom().region("rom", 0); // 1MB ROM
 	//AM_RANGE(0x300000, 0x3fffff) // open bus?
-	AM_RANGE(0x400000, 0x5fffff) AM_RAM AM_REGION("dram", 0) AM_MIRROR(0x200000) // 2MB DRAM
-	AM_RANGE(0x800000, 0x800001) AM_WRITE8(led_out_w, 0xff00) AM_MIRROR(0x1ffffe) // mirror is a guess given that the pals can only decode A18-A23
-	AM_RANGE(0x800000, 0x800001) AM_WRITE8(fifo_out_w, 0x00ff) AM_MIRROR(0x1ffffe) // mirror is a guess given that the pals can only decode A18-A23
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE8("scc", scc8530_device, ca_w, 0x00ff) AM_MIRROR(0x1ffff8)
-	AM_RANGE(0xc00004, 0xc00005) AM_DEVWRITE8("scc", scc8530_device, da_w, 0x00ff) AM_MIRROR(0x1ffff8)
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREAD8 ("scc", scc8530_device, ca_r, 0xff00) AM_MIRROR(0x1ffff8)
-	AM_RANGE(0xa00004, 0xa00005) AM_DEVREAD8 ("scc", scc8530_device, da_r, 0xff00) AM_MIRROR(0x1ffff8)
+	map(0x400000, 0x5fffff).ram().region("dram", 0).mirror(0x200000); // 2MB DRAM
+	map(0x800000, 0x800000).w(this, FUNC(lwriter_state::led_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
+	map(0x800001, 0x800001).w(this, FUNC(lwriter_state::fifo_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
+	map(0xc00001, 0xc00001).w(m_scc, FUNC(scc8530_device::ca_w)).mirror(0x1ffff8);
+	map(0xc00005, 0xc00005).w(m_scc, FUNC(scc8530_device::da_w)).mirror(0x1ffff8);
+	map(0xa00000, 0xa00000).r(m_scc, FUNC(scc8530_device::ca_r)).mirror(0x1ffff8);
+	map(0xa00004, 0xa00004).r(m_scc, FUNC(scc8530_device::da_r)).mirror(0x1ffff8);
 
-	AM_RANGE(0xc00002, 0xc00003) AM_DEVWRITE8("scc", scc8530_device, cb_w, 0x00ff) AM_MIRROR(0x1ffff8)
-	AM_RANGE(0xc00006, 0xc00007) AM_DEVWRITE8("scc", scc8530_device, db_w, 0x00ff) AM_MIRROR(0x1ffff8)
-	AM_RANGE(0xa00002, 0xa00003) AM_DEVREAD8 ("scc", scc8530_device, cb_r, 0xff00) AM_MIRROR(0x1ffff8)
-	AM_RANGE(0xa00006, 0xa00007) AM_DEVREAD8 ("scc", scc8530_device, db_r, 0xff00) AM_MIRROR(0x1ffff8)
+	map(0xc00003, 0xc00003).w(m_scc, FUNC(scc8530_device::cb_w)).mirror(0x1ffff8);
+	map(0xc00007, 0xc00007).w(m_scc, FUNC(scc8530_device::db_w)).mirror(0x1ffff8);
+	map(0xa00002, 0xa00002).r(m_scc, FUNC(scc8530_device::cb_r)).mirror(0x1ffff8);
+	map(0xa00006, 0xa00006).r(m_scc, FUNC(scc8530_device::db_r)).mirror(0x1ffff8);
 
 #if TPI
-	AM_RANGE(0xe00010, 0xe0001f) AM_DEVREADWRITE8 ("tpi", tpi6523_device, read, write, 0x00ff) AM_MIRROR(0x17ffe0) // Used on older boards, needs proper mapping
+	map(0xe00010, 0xe0001f).rw("tpi", FUNC(tpi6523_device::read), FUNC(tpi6523_device::write)).umask16(0x00ff).mirror(0x17ffe0); // Used on older boards, needs proper mapping
 #else
-	AM_RANGE(0xe00000, 0xe0001f) AM_DEVREADWRITE8 ("via", via6522_device, read, write, 0x00ff) AM_MIRROR(0x17ffe0)
+	map(0xe00000, 0xe0001f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0x00ff).mirror(0x17ffe0);
 #endif
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( lwriter )
 INPUT_PORTS_END

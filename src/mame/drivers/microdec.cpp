@@ -122,24 +122,26 @@ WRITE8_MEMBER( microdec_state::portf8_w )
 		m_floppy->mon_w(0);
 }
 
-ADDRESS_MAP_START(microdec_state::microdec_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE( 0x1000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void microdec_state::microdec_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).bankr("bankr0").bankw("bankw0");
+	map(0x1000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(microdec_state::microdec_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf5, 0xf5) AM_READ(portf5_r)
-	AM_RANGE(0xf6, 0xf6) AM_READWRITE(portf6_r,portf6_w)
-	AM_RANGE(0xf7, 0xf7) AM_READWRITE(portf7_r,portf7_w)
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(portf8_w)
-	AM_RANGE(0xfa, 0xfb) AM_DEVICE("fdc", upd765a_device, map)
-	AM_RANGE(0xfc, 0xfc) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	AM_RANGE(0xfd, 0xfd) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	AM_RANGE(0xfe, 0xfe) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
-	AM_RANGE(0xff, 0xff) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
+void microdec_state::microdec_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xf5, 0xf5).r(this, FUNC(microdec_state::portf5_r));
+	map(0xf6, 0xf6).rw(this, FUNC(microdec_state::portf6_r), FUNC(microdec_state::portf6_w));
+	map(0xf7, 0xf7).rw(this, FUNC(microdec_state::portf7_r), FUNC(microdec_state::portf7_w));
+	map(0xf8, 0xf8).w(this, FUNC(microdec_state::portf8_w));
+	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
+	map(0xfc, 0xfc).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xfd, 0xfd).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfe, 0xfe).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xff, 0xff).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// AM_RANGE(0xf0, 0xf3) 8253 PIT (md3 only) used as a baud rate generator for serial ports
 	// AM_RANGE(0xf4, 0xf4) Centronics data
 	// AM_RANGE(0xf5, 0xf5) motor check (md1/2)
@@ -150,7 +152,7 @@ ADDRESS_MAP_START(microdec_state::microdec_io)
 	// AM_RANGE(0xfa, 0xfb) uPD765C fdc FA=status; FB=data
 	// AM_RANGE(0xfc, 0xfd) Serial Port 1 (terminal) FC=data FD=status
 	// AM_RANGE(0xfe, 0xff) Serial Port 2 (printer) FE=data FF=status
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( microdec )

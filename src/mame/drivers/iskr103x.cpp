@@ -42,16 +42,18 @@ public:
 	void iskr1031_map(address_map &map);
 };
 
-ADDRESS_MAP_START(iskr103x_state::iskr1031_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void iskr103x_state::iskr1031_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
 
-ADDRESS_MAP_START(iskr103x_state::iskr1031_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
-ADDRESS_MAP_END
+void iskr103x_state::iskr1031_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+}
 
 
 static DEVICE_INPUT_DEFAULTS_START(iskr1030m)

@@ -61,18 +61,20 @@ private:
 	required_device<i8255_device> m_ppi8255;
 };
 
-ADDRESS_MAP_START(savia84_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff) // A15 not connected at the CPU
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM
-ADDRESS_MAP_END
+void savia84_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x7fff); // A15 not connected at the CPU
+	map(0x0000, 0x07ff).rom();
+	map(0x1800, 0x1fff).ram();
+}
 
-ADDRESS_MAP_START(savia84_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // ports F8-FB
-ADDRESS_MAP_END
+void savia84_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x07);
+	map(0x00, 0x03).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write)); // ports F8-FB
+}
 
 /* Input ports */
 static INPUT_PORTS_START( savia84 )

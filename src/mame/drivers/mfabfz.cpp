@@ -66,27 +66,30 @@ private:
 };
 
 
-ADDRESS_MAP_START(mfabfz_state::mfabfz_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mfabfz_state::mfabfz_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom().region("roms", 0);
+	map(0x8000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(mfabfz_state::mfabfz_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	AM_RANGE(0xfe, 0xfe) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
-	AM_RANGE(0xff, 0xff) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void mfabfz_state::mfabfz_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xbe, 0xbe).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xbf, 0xbf).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfe, 0xfe).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xff, 0xff).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
-ADDRESS_MAP_START(mfabfz_state::mfabfz85_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xfe, 0xfe) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
-	AM_RANGE(0xff, 0xff) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void mfabfz_state::mfabfz85_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xfe, 0xfe).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xff, 0xff).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mfabfz )

@@ -165,34 +165,36 @@ READ8_MEMBER(laserbat_state_base::rrowx_r)
 
 */
 
-ADDRESS_MAP_START(laserbat_state_base::laserbat_map)
-	ADDRESS_MAP_UNMAP_HIGH
+void laserbat_state_base::laserbat_map(address_map &map)
+{
+	map.unmap_value_high();
 
-	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x2000, 0x33ff) AM_ROM
-	AM_RANGE(0x3800, 0x3bff) AM_ROM
-	AM_RANGE(0x4000, 0x53ff) AM_ROM
-	AM_RANGE(0x6000, 0x73ff) AM_ROM
-	AM_RANGE(0x7800, 0x7bff) AM_ROM
+	map(0x0000, 0x13ff).rom();
+	map(0x2000, 0x33ff).rom();
+	map(0x3800, 0x3bff).rom();
+	map(0x4000, 0x53ff).rom();
+	map(0x6000, 0x73ff).rom();
+	map(0x7800, 0x7bff).rom();
 
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_WRITENOP
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("pvi1", s2636_device, read_data, write_data)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("pvi2", s2636_device, read_data, write_data)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("pvi3", s2636_device, read_data, write_data)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_WRITE(videoram_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
-ADDRESS_MAP_END
+	map(0x1400, 0x14ff).mirror(0x6000).nopw();
+	map(0x1500, 0x15ff).mirror(0x6000).rw(m_pvi1, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1600, 0x16ff).mirror(0x6000).rw(m_pvi2, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1700, 0x17ff).mirror(0x6000).rw(m_pvi3, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1800, 0x1bff).mirror(0x6000).w(this, FUNC(laserbat_state_base::videoram_w));
+	map(0x1c00, 0x1fff).mirror(0x6000).ram();
+}
 
-ADDRESS_MAP_START(laserbat_state_base::laserbat_io_map)
-	AM_RANGE(0x00, 0x00) AM_READ(rhsc_r)    AM_WRITE(cnt_eff_w)
-	AM_RANGE(0x01, 0x01) /* RBALL */        AM_WRITE(cnt_nav_w)
-	AM_RANGE(0x02, 0x02) AM_READ(rrowx_r)   AM_WRITE(csound1_w)
-	AM_RANGE(0x03, 0x03)                    AM_WRITE(whsc_w)
-	AM_RANGE(0x04, 0x04)                    AM_WRITE(wcoh_w)
-	AM_RANGE(0x05, 0x05)                    AM_WRITE(wcov_w)
-	AM_RANGE(0x06, 0x06)                    AM_WRITE(ct_io_w)
-	AM_RANGE(0x07, 0x07)                    AM_WRITE(csound2_w)
-ADDRESS_MAP_END
+void laserbat_state_base::laserbat_io_map(address_map &map)
+{
+	map(0x00, 0x00).r(this, FUNC(laserbat_state_base::rhsc_r)).w(this, FUNC(laserbat_state_base::cnt_eff_w));
+	map(0x01, 0x01) /* RBALL */ .w(this, FUNC(laserbat_state_base::cnt_nav_w));
+	map(0x02, 0x02).r(this, FUNC(laserbat_state_base::rrowx_r)).w(this, FUNC(laserbat_state_base::csound1_w));
+	map(0x03, 0x03).w(this, FUNC(laserbat_state_base::whsc_w));
+	map(0x04, 0x04).w(this, FUNC(laserbat_state_base::wcoh_w));
+	map(0x05, 0x05).w(this, FUNC(laserbat_state_base::wcov_w));
+	map(0x06, 0x06).w(this, FUNC(laserbat_state_base::ct_io_w));
+	map(0x07, 0x07).w(this, FUNC(laserbat_state_base::csound2_w));
+}
 
 
 static INPUT_PORTS_START( laserbat_base )

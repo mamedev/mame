@@ -147,37 +147,40 @@ WRITE8_MEMBER( zodiack_state::control_w )
 }
 
 
-ADDRESS_MAP_START(zodiack_state::main_map)
-	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0x5800, 0x5fff) AM_RAM
-	AM_RANGE(0x6081, 0x6081) AM_READ_PORT("DSW0") AM_WRITE(control_w)
-	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
-	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN0")
-	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN1")
-	AM_RANGE(0x6090, 0x6090) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(master_soundlatch_w)
-	AM_RANGE(0x7000, 0x7000) AM_READNOP AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)  /* NOP??? */
-	AM_RANGE(0x7100, 0x7100) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x7200, 0x7200) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(attributes_w) AM_SHARE("attributeram")
-	AM_RANGE(0x9040, 0x905f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9060, 0x907f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x9080, 0x93ff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram_2")
-	AM_RANGE(0xc000, 0xcfff) AM_ROM
-ADDRESS_MAP_END
+void zodiack_state::main_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom();
+	map(0x5800, 0x5fff).ram();
+	map(0x6081, 0x6081).portr("DSW0").w(this, FUNC(zodiack_state::control_w));
+	map(0x6082, 0x6082).portr("DSW1");
+	map(0x6083, 0x6083).portr("IN0");
+	map(0x6084, 0x6084).portr("IN1");
+	map(0x6090, 0x6090).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(zodiack_state::master_soundlatch_w));
+	map(0x7000, 0x7000).nopr().w("watchdog", FUNC(watchdog_timer_device::reset_w));  /* NOP??? */
+	map(0x7100, 0x7100).w(this, FUNC(zodiack_state::nmi_mask_w));
+	map(0x7200, 0x7200).w(this, FUNC(zodiack_state::flipscreen_w));
+	map(0x9000, 0x903f).ram().w(this, FUNC(zodiack_state::attributes_w)).share("attributeram");
+	map(0x9040, 0x905f).ram().share("spriteram");
+	map(0x9060, 0x907f).ram().share("bulletsram");
+	map(0x9080, 0x93ff).ram();
+	map(0xa000, 0xa3ff).ram().w(this, FUNC(zodiack_state::videoram_w)).share("videoram");
+	map(0xb000, 0xb3ff).ram().w(this, FUNC(zodiack_state::videoram2_w)).share("videoram_2");
+	map(0xc000, 0xcfff).rom();
+}
 
-ADDRESS_MAP_START(zodiack_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(sound_nmi_enable_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write)
-ADDRESS_MAP_END
+void zodiack_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x4000, 0x4000).w(this, FUNC(zodiack_state::sound_nmi_enable_w));
+	map(0x6000, 0x6000).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
+}
 
-ADDRESS_MAP_START(zodiack_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void zodiack_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 
 

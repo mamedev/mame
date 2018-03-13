@@ -36,35 +36,38 @@ Philips P2000 1 Memory map
 
 
 /* port i/o functions */
-ADDRESS_MAP_START(p2000t_state::p2000t_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_READ(p2000t_port_000f_r)
-	AM_RANGE(0x10, 0x1f) AM_WRITE(p2000t_port_101f_w)
-	AM_RANGE(0x20, 0x2f) AM_READ(p2000t_port_202f_r)
-	AM_RANGE(0x30, 0x3f) AM_WRITE(p2000t_port_303f_w)
-	AM_RANGE(0x50, 0x5f) AM_WRITE(p2000t_port_505f_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(p2000t_port_707f_w)
-	AM_RANGE(0x88, 0x8b) AM_WRITE(p2000t_port_888b_w)
-	AM_RANGE(0x8c, 0x90) AM_WRITE(p2000t_port_8c90_w)
-	AM_RANGE(0x94, 0x94) AM_WRITE(p2000t_port_9494_w)
-ADDRESS_MAP_END
+void p2000t_state::p2000t_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x0f).r(this, FUNC(p2000t_state::p2000t_port_000f_r));
+	map(0x10, 0x1f).w(this, FUNC(p2000t_state::p2000t_port_101f_w));
+	map(0x20, 0x2f).r(this, FUNC(p2000t_state::p2000t_port_202f_r));
+	map(0x30, 0x3f).w(this, FUNC(p2000t_state::p2000t_port_303f_w));
+	map(0x50, 0x5f).w(this, FUNC(p2000t_state::p2000t_port_505f_w));
+	map(0x70, 0x7f).w(this, FUNC(p2000t_state::p2000t_port_707f_w));
+	map(0x88, 0x8b).w(this, FUNC(p2000t_state::p2000t_port_888b_w));
+	map(0x8c, 0x90).w(this, FUNC(p2000t_state::p2000t_port_8c90_w));
+	map(0x94, 0x94).w(this, FUNC(p2000t_state::p2000t_port_9494_w));
+}
 
 /* Memory w/r functions */
-ADDRESS_MAP_START(p2000t_state::p2000t_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x4fff) AM_ROM
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x5800, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xffff) AM_NOP
-ADDRESS_MAP_END
+void p2000t_state::p2000t_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x4fff).rom();
+	map(0x5000, 0x57ff).ram().share("videoram");
+	map(0x5800, 0x9fff).ram();
+	map(0xa000, 0xffff).noprw();
+}
 
-ADDRESS_MAP_START(p2000m_state::p2000m_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x4fff) AM_ROM
-	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xffff) AM_NOP
-ADDRESS_MAP_END
+void p2000m_state::p2000m_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x4fff).rom();
+	map(0x5000, 0x5fff).ram().share("videoram");
+	map(0x6000, 0x9fff).ram();
+	map(0xa000, 0xffff).noprw();
+}
 
 /* graphics output */
 

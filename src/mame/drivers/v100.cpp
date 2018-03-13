@@ -227,28 +227,30 @@ WRITE8_MEMBER(v100_state::ppi_porta_w)
 	//logerror("Writing %02X to PPI port A\n", data);
 }
 
-ADDRESS_MAP_START(v100_state::mem_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x5fff) AM_RAM
-ADDRESS_MAP_END
+void v100_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("maincpu", 0);
+	map(0x4000, 0x4fff).ram().share("videoram");
+	map(0x5000, 0x5fff).ram();
+}
 
-ADDRESS_MAP_START(v100_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("vtac", crt5037_device, write)
-	AM_RANGE(0x10, 0x10) AM_WRITE(brg_w<0>)
-	AM_RANGE(0x12, 0x12) AM_DEVREADWRITE("usart1", i8251_device, data_r, data_w)
-	AM_RANGE(0x13, 0x13) AM_DEVREADWRITE("usart1", i8251_device, status_r, control_w)
-	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE("usart2", i8251_device, data_r, data_w)
-	AM_RANGE(0x15, 0x15) AM_DEVREADWRITE("usart2", i8251_device, status_r, control_w)
-	AM_RANGE(0x16, 0x16) AM_WRITE(brg_w<1>)
-	AM_RANGE(0x20, 0x20) AM_READ(earom_r)
-	AM_RANGE(0x30, 0x30) AM_WRITE(port30_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(keyboard_r, key_row_w)
-	AM_RANGE(0x48, 0x48) AM_WRITE(port48_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(picu_w)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-ADDRESS_MAP_END
+void v100_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x0f).w(m_vtac, FUNC(crt5037_device::write));
+	map(0x10, 0x10).w(this, FUNC(v100_state::brg_w<0>));
+	map(0x12, 0x12).rw("usart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x13, 0x13).rw("usart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x14, 0x14).rw("usart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x15, 0x15).rw("usart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x16, 0x16).w(this, FUNC(v100_state::brg_w<1>));
+	map(0x20, 0x20).r(this, FUNC(v100_state::earom_r));
+	map(0x30, 0x30).w(this, FUNC(v100_state::port30_w));
+	map(0x40, 0x40).rw(this, FUNC(v100_state::keyboard_r), FUNC(v100_state::key_row_w));
+	map(0x48, 0x48).w(this, FUNC(v100_state::port48_w));
+	map(0x60, 0x60).w(this, FUNC(v100_state::picu_w));
+	map(0x70, 0x73).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
 static INPUT_PORTS_START( v100 )

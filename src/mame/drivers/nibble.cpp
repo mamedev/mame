@@ -152,17 +152,19 @@ void nibble_state::machine_reset()
 * Memory Map Information *
 *************************/
 
-ADDRESS_MAP_START(nibble_state::nibble_map)
+void nibble_state::nibble_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(nibble_videoram_w) AM_SHARE("videoram")   // placeholder
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc3ff).w(this, FUNC(nibble_state::nibble_videoram_w)).share("videoram");   // placeholder
 //  AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("crtc", mc6845_device, address_w)
 //  AM_RANGE(0xff02, 0xff03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(nibble_state::nibble_cru_map)
-ADDRESS_MAP_END
+void nibble_state::nibble_cru_map(address_map &map)
+{
+}
 
 
 /*************************

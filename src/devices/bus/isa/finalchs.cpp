@@ -37,14 +37,15 @@ WRITE8_MEMBER( isa8_finalchs_device::io6000_write )
 	m_FCH_latch_data = data;
 }
 
-ADDRESS_MAP_START(isa8_finalchs_device::finalchs_mem)
-	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_READ(io7ff8_read)
-	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_WRITE(io7ff8_write)
-	AM_RANGE( 0x6000, 0x6000 ) AM_READ(io6000_read)
-	AM_RANGE( 0x6000, 0x6000 ) AM_WRITE(io6000_write)
-	AM_RANGE( 0x8000, 0xffff ) AM_ROM
-ADDRESS_MAP_END
+void isa8_finalchs_device::finalchs_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x7ff8, 0x7ff8).r(this, FUNC(isa8_finalchs_device::io7ff8_read));
+	map(0x7ff8, 0x7ff8).w(this, FUNC(isa8_finalchs_device::io7ff8_write));
+	map(0x6000, 0x6000).r(this, FUNC(isa8_finalchs_device::io6000_read));
+	map(0x6000, 0x6000).w(this, FUNC(isa8_finalchs_device::io6000_write));
+	map(0x8000, 0xffff).rom();
+}
 
 ROM_START(finalchs)
 	ROM_REGION(0x10000,"maincpu",0)

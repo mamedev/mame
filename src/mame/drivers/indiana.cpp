@@ -43,18 +43,19 @@ public:
 };
 
 
-ADDRESS_MAP_START(indiana_state::indiana_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0000ffff) AM_MIRROR(0x7f800000) AM_ROM AM_REGION("user1", 0) // 64Kb of EPROM
-	AM_RANGE(0x00100000, 0x00107fff) AM_MIRROR(0x7f8f8000) AM_RAM // SRAM 32Kb of SRAM
-	AM_RANGE(0x00200000, 0x002fffff) AM_DEVREADWRITE8(MFP_TAG, mc68901_device, read, write, 0xffffffff) AM_MIRROR(0x7f800000) // MFP
-	AM_RANGE(0x00400000, 0x004fffff) AM_DEVREADWRITE16(ISABUS_TAG, isa16_device, io16_swap_r, io16_swap_w, 0xffffffff) AM_MIRROR(0x7f800000) // 16 bit PC IO
-	AM_RANGE(0x00500000, 0x005fffff) AM_DEVREADWRITE16(ISABUS_TAG, isa16_device, mem16_swap_r, mem16_swap_w, 0xffffffff) AM_MIRROR(0x7f800000) // 16 bit PC MEM
-	AM_RANGE(0x00600000, 0x006fffff) AM_DEVREADWRITE8(ISABUS_TAG, isa16_device, io_r, io_w, 0xffffffff) AM_MIRROR(0x7f800000) // 8 bit PC IO
-	AM_RANGE(0x00700000, 0x007fffff) AM_DEVREADWRITE8(ISABUS_TAG, isa16_device, mem_r, mem_w, 0xffffffff) AM_MIRROR(0x7f800000) // 8 bit PC MEM
-	AM_RANGE(0x80000000, 0x803fffff) AM_RAM // 4 MB RAM
-	AM_RANGE(0xfffe0000, 0xfffe7fff) AM_RAM // SRAM mirror?
-ADDRESS_MAP_END
+void indiana_state::indiana_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x0000ffff).mirror(0x7f800000).rom().region("user1", 0); // 64Kb of EPROM
+	map(0x00100000, 0x00107fff).mirror(0x7f8f8000).ram(); // SRAM 32Kb of SRAM
+	map(0x00200000, 0x002fffff).rw(MFP_TAG, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x7f800000); // MFP
+	map(0x00400000, 0x004fffff).rw(ISABUS_TAG, FUNC(isa16_device::io16_swap_r), FUNC(isa16_device::io16_swap_w)).mirror(0x7f800000); // 16 bit PC IO
+	map(0x00500000, 0x005fffff).rw(ISABUS_TAG, FUNC(isa16_device::mem16_swap_r), FUNC(isa16_device::mem16_swap_w)).mirror(0x7f800000); // 16 bit PC MEM
+	map(0x00600000, 0x006fffff).rw(ISABUS_TAG, FUNC(isa16_device::io_r), FUNC(isa16_device::io_w)).mirror(0x7f800000); // 8 bit PC IO
+	map(0x00700000, 0x007fffff).rw(ISABUS_TAG, FUNC(isa16_device::mem_r), FUNC(isa16_device::mem_w)).mirror(0x7f800000); // 8 bit PC MEM
+	map(0x80000000, 0x803fffff).ram(); // 4 MB RAM
+	map(0xfffe0000, 0xfffe7fff).ram(); // SRAM mirror?
+}
 
 
 /* Input ports */

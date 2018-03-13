@@ -278,30 +278,32 @@ uint32_t unixpc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(unixpc_state::unixpc_mem)
-	AM_RANGE(0x000000, 0x3fffff) AM_DEVICE("ramrombank", address_map_bank_device, amap16)
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_SHARE("mapram")
-	AM_RANGE(0x420000, 0x427fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x460000, 0x460001) AM_READWRITE(diskdma_size_r, diskdma_size_w)
-	AM_RANGE(0x470000, 0x470001) AM_READ(line_printer_r)
-	AM_RANGE(0x480000, 0x480001) AM_WRITE(rtc_w)
-	AM_RANGE(0x4a0000, 0x4a0001) AM_WRITE(misc_control_w)
-	AM_RANGE(0x4d0000, 0x4d7fff) AM_WRITE(diskdma_ptr_w)
-	AM_RANGE(0x4e0000, 0x4e0001) AM_WRITE(disk_control_w)
-	AM_RANGE(0xe10000, 0xe10007) AM_DEVREADWRITE8("wd2797", wd_fdc_device_base, read, write, 0x00ff)
-	AM_RANGE(0xe30000, 0xe30001) AM_READ(rtc_r)
-	AM_RANGE(0xe40000, 0xe40001) AM_WRITE(error_enable_w)
-	AM_RANGE(0xe41000, 0xe41001) AM_WRITE(parity_enable_w)
-	AM_RANGE(0xe42000, 0xe42001) AM_WRITE(bpplus_w)
-	AM_RANGE(0xe43000, 0xe43001) AM_WRITE(romlmap_w)
-	AM_RANGE(0x800000, 0x803fff) AM_MIRROR(0x7fc000) AM_ROM AM_REGION("bootrom", 0)
+void unixpc_state::unixpc_mem(address_map &map)
+{
+	map(0x000000, 0x3fffff).m(m_ramrombank, FUNC(address_map_bank_device::amap16));
+	map(0x400000, 0x4007ff).ram().share("mapram");
+	map(0x420000, 0x427fff).ram().share("videoram");
+	map(0x460000, 0x460001).rw(this, FUNC(unixpc_state::diskdma_size_r), FUNC(unixpc_state::diskdma_size_w));
+	map(0x470000, 0x470001).r(this, FUNC(unixpc_state::line_printer_r));
+	map(0x480000, 0x480001).w(this, FUNC(unixpc_state::rtc_w));
+	map(0x4a0000, 0x4a0001).w(this, FUNC(unixpc_state::misc_control_w));
+	map(0x4d0000, 0x4d7fff).w(this, FUNC(unixpc_state::diskdma_ptr_w));
+	map(0x4e0000, 0x4e0001).w(this, FUNC(unixpc_state::disk_control_w));
+	map(0xe10000, 0xe10007).rw(m_wd2797, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write)).umask16(0x00ff);
+	map(0xe30000, 0xe30001).r(this, FUNC(unixpc_state::rtc_r));
+	map(0xe40000, 0xe40001).w(this, FUNC(unixpc_state::error_enable_w));
+	map(0xe41000, 0xe41001).w(this, FUNC(unixpc_state::parity_enable_w));
+	map(0xe42000, 0xe42001).w(this, FUNC(unixpc_state::bpplus_w));
+	map(0xe43000, 0xe43001).w(this, FUNC(unixpc_state::romlmap_w));
+	map(0x800000, 0x803fff).mirror(0x7fc000).rom().region("bootrom", 0);
 	// e70000 / e70002 = keyboard 6850 status/control and Rx data / Tx data
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(unixpc_state::ramrombank_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("bootrom", 0)
-	AM_RANGE(0x400000, 0x7fffff) AM_READWRITE(ram_mmu_r, ram_mmu_w)
-ADDRESS_MAP_END
+void unixpc_state::ramrombank_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom().region("bootrom", 0);
+	map(0x400000, 0x7fffff).rw(this, FUNC(unixpc_state::ram_mmu_r), FUNC(unixpc_state::ram_mmu_w));
+}
 
 /***************************************************************************
     INPUT PORTS

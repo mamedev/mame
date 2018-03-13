@@ -670,65 +670,68 @@ void bfm_sc1_state::machine_reset()
 // scorpion1 board memory map ///////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-ADDRESS_MAP_START(bfm_sc1_state::sc1_base)
+void bfm_sc1_state::sc1_base(address_map &map)
+{
 
-	AM_RANGE(0x0000, 0x1FFF) AM_RAM AM_SHARE("nvram") //8k RAM
-	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)             // reel 2+3 latch
-	AM_RANGE(0x2200, 0x23FF) AM_WRITE(reel12_w)             // reel 1+2 latch
-	AM_RANGE(0x2400, 0x25FF) AM_WRITE(vfd_w)                // vfd latch
+	map(0x0000, 0x1FFF).ram().share("nvram"); //8k RAM
+	map(0x2000, 0x21FF).w(this, FUNC(bfm_sc1_state::reel34_w));             // reel 2+3 latch
+	map(0x2200, 0x23FF).w(this, FUNC(bfm_sc1_state::reel12_w));             // reel 1+2 latch
+	map(0x2400, 0x25FF).w(this, FUNC(bfm_sc1_state::vfd_w));                // vfd latch
 
-	AM_RANGE(0x2600, 0x27FF) AM_READWRITE(mmtr_r,mmtr_w)    // mechanical meters
-	AM_RANGE(0x2800, 0x2800) AM_READWRITE(triac_r,triac_w)  // payslide triacs
+	map(0x2600, 0x27FF).rw(this, FUNC(bfm_sc1_state::mmtr_r), FUNC(bfm_sc1_state::mmtr_w));    // mechanical meters
+	map(0x2800, 0x2800).rw(this, FUNC(bfm_sc1_state::triac_r), FUNC(bfm_sc1_state::triac_w));  // payslide triacs
 
-	AM_RANGE(0x2A00, 0x2A00) AM_READWRITE(mux1latch_r,mux1latch_w) // mux1
-	AM_RANGE(0x2A01, 0x2A01) AM_READWRITE(mux1datlo_r,mux1datlo_w)
-	AM_RANGE(0x2A02, 0x2A02) AM_READWRITE(mux1dathi_r,mux1dathi_w)
+	map(0x2A00, 0x2A00).rw(this, FUNC(bfm_sc1_state::mux1latch_r), FUNC(bfm_sc1_state::mux1latch_w)); // mux1
+	map(0x2A01, 0x2A01).rw(this, FUNC(bfm_sc1_state::mux1datlo_r), FUNC(bfm_sc1_state::mux1datlo_w));
+	map(0x2A02, 0x2A02).rw(this, FUNC(bfm_sc1_state::mux1dathi_r), FUNC(bfm_sc1_state::mux1dathi_w));
 
-	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)            // irq latch
+	map(0x2E00, 0x2E00).r(this, FUNC(bfm_sc1_state::irqlatch_r));            // irq latch
 
-	AM_RANGE(0x3001, 0x3001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	map(0x3001, 0x3001).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x3001, 0x3001).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x3101, 0x3201).w("aysnd", FUNC(ay8910_device::address_w));
 
-	AM_RANGE(0x3406, 0x3406) AM_READWRITE(aciastat_r,aciactrl_w)  // MC6850 status register
-	AM_RANGE(0x3407, 0x3407) AM_READWRITE(aciadata_r,aciadata_w)  // MC6850 data register
+	map(0x3406, 0x3406).rw(this, FUNC(bfm_sc1_state::aciastat_r), FUNC(bfm_sc1_state::aciactrl_w));  // MC6850 status register
+	map(0x3407, 0x3407).rw(this, FUNC(bfm_sc1_state::aciadata_r), FUNC(bfm_sc1_state::aciadata_w));  // MC6850 data register
 
-	AM_RANGE(0x3408, 0x3408) AM_READWRITE(mux2latch_r,mux2latch_w) // mux2
-	AM_RANGE(0x3409, 0x3409) AM_READWRITE(mux2datlo_r,mux2datlo_w)
-	AM_RANGE(0x340A, 0x340A) AM_READWRITE(mux2dathi_r,mux2dathi_w)
+	map(0x3408, 0x3408).rw(this, FUNC(bfm_sc1_state::mux2latch_r), FUNC(bfm_sc1_state::mux2latch_w)); // mux2
+	map(0x3409, 0x3409).rw(this, FUNC(bfm_sc1_state::mux2datlo_r), FUNC(bfm_sc1_state::mux2datlo_w));
+	map(0x340A, 0x340A).rw(this, FUNC(bfm_sc1_state::mux2dathi_r), FUNC(bfm_sc1_state::mux2dathi_w));
 
-	AM_RANGE(0x3600, 0x3600) AM_WRITE(bankswitch_w)         // write bank
-	AM_RANGE(0x3800, 0x39FF) AM_WRITE(reel56_w)             // reel 5+6 latch
+	map(0x3600, 0x3600).w(this, FUNC(bfm_sc1_state::bankswitch_w));         // write bank
+	map(0x3800, 0x39FF).w(this, FUNC(bfm_sc1_state::reel56_w));             // reel 5+6 latch
 
-	AM_RANGE(0x4000, 0x5FFF) AM_ROM                         // 8k  ROM
-	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")                    // 8k  paged ROM (4 pages)
-	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) // 32k ROM
+	map(0x4000, 0x5FFF).rom();                         // 8k  ROM
+	map(0x6000, 0x7FFF).bankr("bank1");                    // 8k  paged ROM (4 pages)
+	map(0x8000, 0xFFFF).rom().w("watchdog", FUNC(watchdog_timer_device::reset_w)); // 32k ROM
 
-ADDRESS_MAP_END
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 // scorpion1 board + adder2 expansion memory map ////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-ADDRESS_MAP_START(bfm_sc1_state::sc1_adder2)
-	AM_IMPORT_FROM( sc1_base )
+void bfm_sc1_state::sc1_adder2(address_map &map)
+{
+	sc1_base(map);
 
-	AM_RANGE(0x3E00, 0x3E00) AM_DEVREADWRITE("adder2", bfm_adder2_device, vid_uart_ctrl_r,vid_uart_ctrl_w)  // video uart control reg read
-	AM_RANGE(0x3E01, 0x3E01) AM_DEVREADWRITE("adder2", bfm_adder2_device, vid_uart_rx_r,vid_uart_tx_w)      // video uart receive  reg
-ADDRESS_MAP_END
+	map(0x3E00, 0x3E00).rw("adder2", FUNC(bfm_adder2_device::vid_uart_ctrl_r), FUNC(bfm_adder2_device::vid_uart_ctrl_w));  // video uart control reg read
+	map(0x3E01, 0x3E01).rw("adder2", FUNC(bfm_adder2_device::vid_uart_rx_r), FUNC(bfm_adder2_device::vid_uart_tx_w));      // video uart receive  reg
+}
 
 
 /////////////////////////////////////////////////////////////////////////////////////
 // scorpion1 board + upd7759 soundcard memory map ///////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-ADDRESS_MAP_START(bfm_sc1_state::sc1_viper)
-	AM_IMPORT_FROM( sc1_base )
+void bfm_sc1_state::sc1_viper(address_map &map)
+{
+	sc1_base(map);
 
-	AM_RANGE(0x3404, 0x3404) AM_READ(dipcoin_r ) // coin input on gamecard
-	AM_RANGE(0x3801, 0x3801) AM_READ(nec_r)
-	AM_RANGE(0x3800, 0x39FF) AM_WRITE(nec_latch_w)
-ADDRESS_MAP_END
+	map(0x3404, 0x3404).r(this, FUNC(bfm_sc1_state::dipcoin_r)); // coin input on gamecard
+	map(0x3801, 0x3801).r(this, FUNC(bfm_sc1_state::nec_r));
+	map(0x3800, 0x39FF).w(this, FUNC(bfm_sc1_state::nec_latch_w));
+}
 
 // input ports for scorpion1 board //////////////////////////////////////////////////
 

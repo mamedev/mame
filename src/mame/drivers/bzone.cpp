@@ -300,49 +300,51 @@ WRITE8_MEMBER(redbaron_state::redbaron_joysound_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(bzone_state::bzone_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
-	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(bzone_coin_counter_w)
-	AM_RANGE(0x1200, 0x1200) AM_DEVWRITE("avg", avg_bzone_device, go_w)
-	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1600, 0x1600) AM_DEVWRITE("avg", avg_bzone_device, reset_w)
-	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("mathbox", mathbox_device, status_r)
-	AM_RANGE(0x1810, 0x1810) AM_DEVREAD("mathbox", mathbox_device, lo_r)
-	AM_RANGE(0x1818, 0x1818) AM_DEVREAD("mathbox", mathbox_device, hi_r)
-	AM_RANGE(0x1820, 0x182f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0x1840, 0x1840) AM_WRITE(bzone_sounds_w)
-	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE("mathbox", mathbox_device, go_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x2000)
-	AM_RANGE(0x3000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void bzone_state::bzone_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x03ff).ram();
+	map(0x0800, 0x0800).portr("IN0");
+	map(0x0a00, 0x0a00).portr("DSW0");
+	map(0x0c00, 0x0c00).portr("DSW1");
+	map(0x1000, 0x1000).w(this, FUNC(bzone_state::bzone_coin_counter_w));
+	map(0x1200, 0x1200).w("avg", FUNC(avg_bzone_device::go_w));
+	map(0x1400, 0x1400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1600, 0x1600).w("avg", FUNC(avg_bzone_device::reset_w));
+	map(0x1800, 0x1800).r(m_mathbox, FUNC(mathbox_device::status_r));
+	map(0x1810, 0x1810).r(m_mathbox, FUNC(mathbox_device::lo_r));
+	map(0x1818, 0x1818).r(m_mathbox, FUNC(mathbox_device::hi_r));
+	map(0x1820, 0x182f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x1840, 0x1840).w(this, FUNC(bzone_state::bzone_sounds_w));
+	map(0x1860, 0x187f).w(m_mathbox, FUNC(mathbox_device::go_w));
+	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
+	map(0x3000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(redbaron_state::redbaron_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
-	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1000, 0x1000) AM_WRITENOP        /* coin out - Manual states this is "Coin Counter" */
-	AM_RANGE(0x1200, 0x1200) AM_DEVWRITE("avg", avg_bzone_device, go_w)
-	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1600, 0x1600) AM_DEVWRITE("avg", avg_bzone_device, reset_w)
-	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("mathbox", mathbox_device, status_r)
-	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN4")
-	AM_RANGE(0x1804, 0x1804) AM_DEVREAD("mathbox", mathbox_device, lo_r)
-	AM_RANGE(0x1806, 0x1806) AM_DEVREAD("mathbox", mathbox_device, hi_r)
-	AM_RANGE(0x1808, 0x1808) AM_WRITE(redbaron_joysound_w)  /* and select joystick pot also */
-	AM_RANGE(0x180a, 0x180a) AM_WRITENOP                /* sound reset, yet todo */
-	AM_RANGE(0x180c, 0x180c) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0x1820, 0x185f) AM_DEVREADWRITE("earom", atari_vg_earom_device, read, write)
-	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE("mathbox", mathbox_device, go_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x2000)
-	AM_RANGE(0x3000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void redbaron_state::redbaron_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x03ff).ram();
+	map(0x0800, 0x0800).portr("IN0");
+	map(0x0a00, 0x0a00).portr("DSW0");
+	map(0x0c00, 0x0c00).portr("DSW1");
+	map(0x1000, 0x1000).nopw();        /* coin out - Manual states this is "Coin Counter" */
+	map(0x1200, 0x1200).w("avg", FUNC(avg_bzone_device::go_w));
+	map(0x1400, 0x1400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1600, 0x1600).w("avg", FUNC(avg_bzone_device::reset_w));
+	map(0x1800, 0x1800).r("mathbox", FUNC(mathbox_device::status_r));
+	map(0x1802, 0x1802).portr("IN4");
+	map(0x1804, 0x1804).r("mathbox", FUNC(mathbox_device::lo_r));
+	map(0x1806, 0x1806).r("mathbox", FUNC(mathbox_device::hi_r));
+	map(0x1808, 0x1808).w(this, FUNC(redbaron_state::redbaron_joysound_w));  /* and select joystick pot also */
+	map(0x180a, 0x180a).nopw();                /* sound reset, yet todo */
+	map(0x180c, 0x180c).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
+	map(0x1810, 0x181f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x1820, 0x185f).rw("earom", FUNC(atari_vg_earom_device::read), FUNC(atari_vg_earom_device::write));
+	map(0x1860, 0x187f).w("mathbox", FUNC(mathbox_device::go_w));
+	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
+	map(0x3000, 0x7fff).rom();
+}
 
 
 

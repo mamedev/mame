@@ -268,9 +268,10 @@ void palmz22_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(palmz22_state::palmz22_map)
-	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM
-ADDRESS_MAP_END
+void palmz22_state::palmz22_map(address_map &map)
+{
+	map(0x30000000, 0x31ffffff).ram();
+}
 
 /***************************************************************************
     MACHINE DRIVERS

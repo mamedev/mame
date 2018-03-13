@@ -605,38 +605,41 @@ READ16_MEMBER(coolpool_state::coolpool_input_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(coolpool_state::amerdart_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("vram_base")
-	AM_RANGE(0x04000000, 0x0400000f) AM_WRITE(amerdart_misc_w)
-	AM_RANGE(0x05000000, 0x0500000f) AM_READWRITE(amerdart_iop_r, amerdart_iop_w)
-	AM_RANGE(0x06000000, 0x06007fff) AM_RAM_WRITE(nvram_thrash_data_w) AM_SHARE("nvram")
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xffb00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void coolpool_state::amerdart_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).ram().share("vram_base");
+	map(0x04000000, 0x0400000f).w(this, FUNC(coolpool_state::amerdart_misc_w));
+	map(0x05000000, 0x0500000f).rw(this, FUNC(coolpool_state::amerdart_iop_r), FUNC(coolpool_state::amerdart_iop_w));
+	map(0x06000000, 0x06007fff).ram().w(this, FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
+	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xffb00000, 0xffffffff).rom().region("user1", 0);
+}
 
 
-ADDRESS_MAP_START(coolpool_state::coolpool_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram_base")
-	AM_RANGE(0x01000000, 0x010000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)    // IMSG176P-40
-	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
-	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
-	AM_RANGE(0x03000000, 0x03ffffff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0x06000000, 0x06007fff) AM_RAM_WRITE(nvram_thrash_data_w) AM_SHARE("nvram")
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void coolpool_state::coolpool_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("vram_base");
+	map(0x01000000, 0x010000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);    // IMSG176P-40
+	map(0x02000000, 0x020000ff).rw(this, FUNC(coolpool_state::coolpool_iop_r), FUNC(coolpool_state::coolpool_iop_w));
+	map(0x03000000, 0x0300000f).w(this, FUNC(coolpool_state::coolpool_misc_w));
+	map(0x03000000, 0x03ffffff).rom().region("gfx1", 0);
+	map(0x06000000, 0x06007fff).ram().w(this, FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
+	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xffe00000, 0xffffffff).rom().region("user1", 0);
+}
 
 
-ADDRESS_MAP_START(coolpool_state::nballsht_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram_base")
-	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
-	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
-	AM_RANGE(0x04000000, 0x040000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)    // IMSG176P-40
-	AM_RANGE(0x06000000, 0x0601ffff) AM_MIRROR(0x00020000) AM_RAM_WRITE(nvram_thrash_data_w) AM_SHARE("nvram")
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xff000000, 0xff7fffff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void coolpool_state::nballsht_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("vram_base");
+	map(0x02000000, 0x020000ff).rw(this, FUNC(coolpool_state::coolpool_iop_r), FUNC(coolpool_state::coolpool_iop_w));
+	map(0x03000000, 0x0300000f).w(this, FUNC(coolpool_state::coolpool_misc_w));
+	map(0x04000000, 0x040000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);    // IMSG176P-40
+	map(0x06000000, 0x0601ffff).mirror(0x00020000).ram().w(this, FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
+	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xff000000, 0xff7fffff).rom().region("gfx1", 0);
+	map(0xffc00000, 0xffffffff).rom().region("user1", 0);
+}
 
 
 
@@ -646,37 +649,41 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(coolpool_state::amerdart_dsp_pgm_map)
-	AM_RANGE(0x000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void coolpool_state::amerdart_dsp_pgm_map(address_map &map)
+{
+	map(0x000, 0x0fff).rom();
+}
 	/* 000 - 0FF  TMS32015 Internal Data RAM (256 words) in Data Address Space */
 
 
-ADDRESS_MAP_START(coolpool_state::amerdart_dsp_io_map)
-	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(amerdart_dsp_answer_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac", dac_word_interface, write)
-	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
-	AM_RANGE(0x06, 0x06) AM_READ(amerdart_trackball_r)
-	AM_RANGE(0x07, 0x07) AM_READ(amerdart_dsp_cmd_r)
-ADDRESS_MAP_END
+void coolpool_state::amerdart_dsp_io_map(address_map &map)
+{
+	map(0x00, 0x01).w(this, FUNC(coolpool_state::dsp_romaddr_w));
+	map(0x02, 0x02).w(this, FUNC(coolpool_state::amerdart_dsp_answer_w));
+	map(0x03, 0x03).w("dac", FUNC(dac_word_interface::write));
+	map(0x04, 0x04).r(this, FUNC(coolpool_state::dsp_rom_r));
+	map(0x05, 0x05).portr("IN0");
+	map(0x06, 0x06).r(this, FUNC(coolpool_state::amerdart_trackball_r));
+	map(0x07, 0x07).r(this, FUNC(coolpool_state::amerdart_dsp_cmd_r));
+}
 
 
 
-ADDRESS_MAP_START(coolpool_state::coolpool_dsp_pgm_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void coolpool_state::coolpool_dsp_pgm_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
 
-ADDRESS_MAP_START(coolpool_state::coolpool_dsp_io_map)
-	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(dsp_cmd_r, dsp_answer_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac", dac_word_interface, write)
-	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
-	AM_RANGE(0x07, 0x07) AM_READ_PORT("IN1")
-ADDRESS_MAP_END
+void coolpool_state::coolpool_dsp_io_map(address_map &map)
+{
+	map(0x00, 0x01).w(this, FUNC(coolpool_state::dsp_romaddr_w));
+	map(0x02, 0x02).rw(this, FUNC(coolpool_state::dsp_cmd_r), FUNC(coolpool_state::dsp_answer_w));
+	map(0x03, 0x03).w("dac", FUNC(dac_word_interface::write));
+	map(0x04, 0x04).r(this, FUNC(coolpool_state::dsp_rom_r));
+	map(0x05, 0x05).portr("IN0");
+	map(0x07, 0x07).portr("IN1");
+}
 
 
 

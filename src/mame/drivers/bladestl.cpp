@@ -125,37 +125,39 @@ WRITE8_MEMBER(bladestl_state::bladestl_speech_ctrl_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(bladestl_state::main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_device, read, write)    /* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_device, read, write)    /* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_device, scroll_r, scroll_w)  /* Scroll RAM */
-	AM_RANGE(0x2400, 0x245f) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")  /* palette */
-	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_device, vreg_w)          /* Video Registers */
-	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("COINSW")             /* DIPSW #3, coinsw, startsw */
-	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")                 /* 1P controls */
-	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P2")                 /* 2P controls */
-	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW2")               /* DISPW #2 */
-	AM_RANGE(0x2e40, 0x2e40) AM_READ_PORT("DSW1")               /* DIPSW #1 */
-	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(bladestl_sh_irqtrigger_w) /* cause interrupt on audio CPU */
-	AM_RANGE(0x2ec0, 0x2ec0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x2f00, 0x2f03) AM_READ(trackball_r)               /* Trackballs */
-	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(bladestl_bankswitch_w)    /* bankswitch control */
-	AM_RANGE(0x2f80, 0x2f9f) AM_DEVREADWRITE("k051733", k051733_device, read, write)    /* Protection: 051733 */
-	AM_RANGE(0x2fc0, 0x2fc0) AM_WRITENOP                        /* ??? */
-	AM_RANGE(0x4000, 0x5fff) AM_RAM                             /* Work RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")              /* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void bladestl_state::main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rw(m_k007342, FUNC(k007342_device::read), FUNC(k007342_device::write));    /* Color RAM + Video RAM */
+	map(0x2000, 0x21ff).rw(m_k007420, FUNC(k007420_device::read), FUNC(k007420_device::write));    /* Sprite RAM */
+	map(0x2200, 0x23ff).rw(m_k007342, FUNC(k007342_device::scroll_r), FUNC(k007342_device::scroll_w));  /* Scroll RAM */
+	map(0x2400, 0x245f).ram().w("palette", FUNC(palette_device::write_indirect)).share("palette");  /* palette */
+	map(0x2600, 0x2607).w(m_k007342, FUNC(k007342_device::vreg_w));          /* Video Registers */
+	map(0x2e00, 0x2e00).portr("COINSW");             /* DIPSW #3, coinsw, startsw */
+	map(0x2e01, 0x2e01).portr("P1");                 /* 1P controls */
+	map(0x2e02, 0x2e02).portr("P2");                 /* 2P controls */
+	map(0x2e03, 0x2e03).portr("DSW2");               /* DISPW #2 */
+	map(0x2e40, 0x2e40).portr("DSW1");               /* DIPSW #1 */
+	map(0x2e80, 0x2e80).w(this, FUNC(bladestl_state::bladestl_sh_irqtrigger_w)); /* cause interrupt on audio CPU */
+	map(0x2ec0, 0x2ec0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x2f00, 0x2f03).r(this, FUNC(bladestl_state::trackball_r));               /* Trackballs */
+	map(0x2f40, 0x2f40).w(this, FUNC(bladestl_state::bladestl_bankswitch_w));    /* bankswitch control */
+	map(0x2f80, 0x2f9f).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));    /* Protection: 051733 */
+	map(0x2fc0, 0x2fc0).nopw();                        /* ??? */
+	map(0x4000, 0x5fff).ram();                             /* Work RAM */
+	map(0x6000, 0x7fff).bankr("rombank");              /* banked ROM */
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(bladestl_state::sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)    /* YM2203 */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(bladestl_speech_ctrl_w)   /* UPD7759 */
-	AM_RANGE(0x4000, 0x4000) AM_READ(bladestl_speech_busy_r)    /* UPD7759 */
-	AM_RANGE(0x5000, 0x5000) AM_WRITENOP                                /* ??? */
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void bladestl_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x1000, 0x1001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));    /* YM2203 */
+	map(0x3000, 0x3000).w(this, FUNC(bladestl_state::bladestl_speech_ctrl_w));   /* UPD7759 */
+	map(0x4000, 0x4000).r(this, FUNC(bladestl_state::bladestl_speech_busy_r));    /* UPD7759 */
+	map(0x5000, 0x5000).nopw();                                /* ??? */
+	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x8000, 0xffff).rom();
+}
 
 
 /*************************************

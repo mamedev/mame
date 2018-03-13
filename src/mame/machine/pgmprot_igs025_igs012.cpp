@@ -126,11 +126,12 @@ void pgm_012_025_state::drgw2_common_init()
 
 }
 
-ADDRESS_MAP_START(pgm_012_025_state::drgw2_mem)
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0xd00000, 0xd00fff) AM_NOP // Written, but never read back? Related to the protection device? - IGS012?
-ADDRESS_MAP_END
+void pgm_012_025_state::drgw2_mem(address_map &map)
+{
+	pgm_mem(map);
+	map(0x100000, 0x1fffff).bankr("bank1"); /* Game ROM */
+	map(0xd00000, 0xd00fff).noprw(); // Written, but never read back? Related to the protection device? - IGS012?
+}
 
 MACHINE_CONFIG_START(pgm_012_025_state::pgm_012_025_drgw2)
 	pgmbase(config);

@@ -143,83 +143,88 @@ WRITE_LINE_MEMBER(tsamurai_state::coin2_counter_w)
 }
 
 
-ADDRESS_MAP_START(tsamurai_state::main_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
+void tsamurai_state::main_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
 
 	/* protection? - there are writes as well...*/
-	AM_RANGE(0xd803, 0xd803) AM_READ(tsamurai_unknown_d803_r)
-	AM_RANGE(0xd806, 0xd806) AM_READ(unknown_d806_r)
-	AM_RANGE(0xd900, 0xd900) AM_READ(unknown_d900_r)
-	AM_RANGE(0xd938, 0xd938) AM_READ(unknown_d938_r)
+	map(0xd803, 0xd803).r(this, FUNC(tsamurai_state::tsamurai_unknown_d803_r));
+	map(0xd806, 0xd806).r(this, FUNC(tsamurai_state::unknown_d806_r));
+	map(0xd900, 0xd900).r(this, FUNC(tsamurai_state::unknown_d900_r));
+	map(0xd938, 0xd938).r(this, FUNC(tsamurai_state::unknown_d938_r));
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe400, 0xe43f) AM_RAM_WRITE(fg_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe440, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_SHARE("spriteram")
+	map(0xe000, 0xe3ff).ram().w(this, FUNC(tsamurai_state::fg_videoram_w)).share("videoram");
+	map(0xe400, 0xe43f).ram().w(this, FUNC(tsamurai_state::fg_colorram_w)).share("colorram");
+	map(0xe440, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().w(this, FUNC(tsamurai_state::bg_videoram_w)).share("bg_videoram");
+	map(0xf000, 0xf3ff).ram().share("spriteram");
 
-	AM_RANGE(0xf400, 0xf400) AM_WRITENOP
-	AM_RANGE(0xf401, 0xf401) AM_WRITE(sound_command1_w)
-	AM_RANGE(0xf402, 0xf402) AM_WRITE(sound_command2_w)
+	map(0xf400, 0xf400).nopw();
+	map(0xf401, 0xf401).w(this, FUNC(tsamurai_state::sound_command1_w));
+	map(0xf402, 0xf402).w(this, FUNC(tsamurai_state::sound_command2_w));
 
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITE(bgcolor_w)
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM") AM_WRITE(scrolly_w)
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(scrollx_w)
-	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
+	map(0xf800, 0xf800).portr("P1");
+	map(0xf801, 0xf801).portr("P2").w(this, FUNC(tsamurai_state::bgcolor_w));
+	map(0xf802, 0xf802).portr("SYSTEM").w(this, FUNC(tsamurai_state::scrolly_w));
+	map(0xf803, 0xf803).w(this, FUNC(tsamurai_state::scrollx_w));
+	map(0xf804, 0xf804).portr("DSW1");
+	map(0xf805, 0xf805).portr("DSW2");
 
-	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+	map(0xfc00, 0xfc07).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
-ADDRESS_MAP_START(tsamurai_state::m660_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
+void tsamurai_state::m660_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
 
 	/* protection? - there are writes as well...*/
-	AM_RANGE(0xd803, 0xd803) AM_READ(m660_unknown_d803_r)
-	AM_RANGE(0xd806, 0xd806) AM_READ(unknown_d806_r)
-	AM_RANGE(0xd900, 0xd900) AM_READ(unknown_d900_r)
-	AM_RANGE(0xd938, 0xd938) AM_READ(unknown_d938_r)
+	map(0xd803, 0xd803).r(this, FUNC(tsamurai_state::m660_unknown_d803_r));
+	map(0xd806, 0xd806).r(this, FUNC(tsamurai_state::unknown_d806_r));
+	map(0xd900, 0xd900).r(this, FUNC(tsamurai_state::unknown_d900_r));
+	map(0xd938, 0xd938).r(this, FUNC(tsamurai_state::unknown_d938_r));
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe400, 0xe43f) AM_RAM_WRITE(fg_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe440, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_SHARE("spriteram")
+	map(0xe000, 0xe3ff).ram().w(this, FUNC(tsamurai_state::fg_videoram_w)).share("videoram");
+	map(0xe400, 0xe43f).ram().w(this, FUNC(tsamurai_state::fg_colorram_w)).share("colorram");
+	map(0xe440, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().w(this, FUNC(tsamurai_state::bg_videoram_w)).share("bg_videoram");
+	map(0xf000, 0xf3ff).ram().share("spriteram");
 
-	AM_RANGE(0xf400, 0xf400) AM_WRITENOP/* This is always written with F401, F402 & F403 data */
-	AM_RANGE(0xf401, 0xf401) AM_WRITE(m660_sound_command3_w)
-	AM_RANGE(0xf402, 0xf402) AM_WRITE(sound_command2_w)
-	AM_RANGE(0xf403, 0xf403) AM_WRITE(sound_command1_w)
+	map(0xf400, 0xf400).nopw();/* This is always written with F401, F402 & F403 data */
+	map(0xf401, 0xf401).w(this, FUNC(tsamurai_state::m660_sound_command3_w));
+	map(0xf402, 0xf402).w(this, FUNC(tsamurai_state::sound_command2_w));
+	map(0xf403, 0xf403).w(this, FUNC(tsamurai_state::sound_command1_w));
 
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITE(bgcolor_w)
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM") AM_WRITE(scrolly_w)
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(scrollx_w)
-	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
+	map(0xf800, 0xf800).portr("P1");
+	map(0xf801, 0xf801).portr("P2").w(this, FUNC(tsamurai_state::bgcolor_w));
+	map(0xf802, 0xf802).portr("SYSTEM").w(this, FUNC(tsamurai_state::scrolly_w));
+	map(0xf803, 0xf803).w(this, FUNC(tsamurai_state::scrollx_w));
+	map(0xf804, 0xf804).portr("DSW1");
+	map(0xf805, 0xf805).portr("DSW2");
 
-	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+	map(0xfc00, 0xfc07).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
-ADDRESS_MAP_START(tsamurai_state::z80_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void tsamurai_state::z80_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
-ADDRESS_MAP_START(tsamurai_state::z80_m660_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP        /* ? */
-	AM_RANGE(0x01, 0x01) AM_WRITENOP        /* Written continuously. Increments with level. */
-	AM_RANGE(0x02, 0x02) AM_WRITENOP        /* Always follows above with 0x01 data */
-ADDRESS_MAP_END
+void tsamurai_state::z80_m660_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopw();        /* ? */
+	map(0x01, 0x01).nopw();        /* Written continuously. Increments with level. */
+	map(0x02, 0x02).nopw();        /* Always follows above with 0x01 data */
+}
 
-ADDRESS_MAP_START(tsamurai_state::vsgongf_audio_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void tsamurai_state::vsgongf_audio_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 READ8_MEMBER(tsamurai_state::sound_command1_r)
 {
@@ -237,58 +242,64 @@ READ8_MEMBER(tsamurai_state::m660_sound_command3_r)
 }
 
 /*******************************************************************************/
-ADDRESS_MAP_START(tsamurai_state::sound1_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x6000, 0x6000) AM_READ(sound_command1_r)
-	AM_RANGE(0x6001, 0x6001) AM_WRITENOP /* ? - probably clear IRQ */
-	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("dac1", dac_byte_interface, write)
-	AM_RANGE(0x7f00, 0x7fff) AM_RAM
-ADDRESS_MAP_END
+void tsamurai_state::sound1_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x6000, 0x6000).r(this, FUNC(tsamurai_state::sound_command1_r));
+	map(0x6001, 0x6001).nopw(); /* ? - probably clear IRQ */
+	map(0x6002, 0x6002).w("dac1", FUNC(dac_byte_interface::write));
+	map(0x7f00, 0x7fff).ram();
+}
 
 /*******************************************************************************/
 
-ADDRESS_MAP_START(tsamurai_state::sound2_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x6000, 0x6000) AM_READ(sound_command2_r)
-	AM_RANGE(0x6001, 0x6001) AM_WRITENOP /* ? - probably clear IRQ */
-	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("dac2", dac_byte_interface, write)
-	AM_RANGE(0x7f00, 0x7fff) AM_RAM
-ADDRESS_MAP_END
+void tsamurai_state::sound2_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x6000, 0x6000).r(this, FUNC(tsamurai_state::sound_command2_r));
+	map(0x6001, 0x6001).nopw(); /* ? - probably clear IRQ */
+	map(0x6002, 0x6002).w("dac2", FUNC(dac_byte_interface::write));
+	map(0x7f00, 0x7fff).ram();
+}
 
 /*******************************************************************************/
 
-ADDRESS_MAP_START(tsamurai_state::sound1_m660_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ(sound_command1_r)
-	AM_RANGE(0xc001, 0xc001) AM_WRITENOP /* ? - probably clear IRQ */
-	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE("dac1", dac_byte_interface, write)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-ADDRESS_MAP_END
+void tsamurai_state::sound1_m660_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0xc000, 0xc000).r(this, FUNC(tsamurai_state::sound_command1_r));
+	map(0xc001, 0xc001).nopw(); /* ? - probably clear IRQ */
+	map(0xc002, 0xc002).w("dac1", FUNC(dac_byte_interface::write));
+	map(0x8000, 0x87ff).ram();
+}
 
 /*******************************************************************************/
 
-ADDRESS_MAP_START(tsamurai_state::sound2_m660_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ(sound_command2_r)
-	AM_RANGE(0xc001, 0xc001) AM_WRITENOP /* ? - probably clear IRQ */
-	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE("dac2", dac_byte_interface, write)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-ADDRESS_MAP_END
+void tsamurai_state::sound2_m660_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0xc000, 0xc000).r(this, FUNC(tsamurai_state::sound_command2_r));
+	map(0xc001, 0xc001).nopw(); /* ? - probably clear IRQ */
+	map(0xc002, 0xc002).w("dac2", FUNC(dac_byte_interface::write));
+	map(0x8000, 0x87ff).ram();
+}
 
 /*******************************************************************************/
 
-ADDRESS_MAP_START(tsamurai_state::sound3_m660_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ(m660_sound_command3_r)
-	AM_RANGE(0xc001, 0xc001) AM_WRITENOP /* ? - probably clear IRQ */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xfffc, 0xffff) AM_RAM /* CPU writes here - music data */
-ADDRESS_MAP_END
+void tsamurai_state::sound3_m660_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc000).r(this, FUNC(tsamurai_state::m660_sound_command3_r));
+	map(0xc001, 0xc001).nopw(); /* ? - probably clear IRQ */
+	map(0x8000, 0x87ff).ram();
+	map(0xfffc, 0xffff).ram(); /* CPU writes here - music data */
+}
 
-ADDRESS_MAP_START(tsamurai_state::sound3_m660_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void tsamurai_state::sound3_m660_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 /*******************************************************************************/
 
@@ -332,36 +343,38 @@ WRITE8_MEMBER(tsamurai_state::vsgongf_sound_command_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-ADDRESS_MAP_START(tsamurai_state::vsgongf_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa003, 0xa003) AM_READONLY
-	AM_RANGE(0xa006, 0xa006) AM_READ(vsgongf_a006_r) /* protection */
-	AM_RANGE(0xa100, 0xa100) AM_READ(vsgongf_a100_r) /* protection */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM                  /* work ram */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe400, 0xe43f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe440, 0xe47b) AM_RAM
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(vsgongf_sound_command_w)
-	AM_RANGE(0xec00, 0xec06) AM_WRITEONLY
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(vsgongf_color_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITEONLY /* vreg? always 0 */
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2")
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf800, 0xf800) AM_WRITENOP
-	AM_RANGE(0xf801, 0xf801) AM_WRITENOP /* vreg? always 0 */
-	AM_RANGE(0xf803, 0xf803) AM_WRITENOP /* vreg? always 0 */
-	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void tsamurai_state::vsgongf_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa003, 0xa003).readonly();
+	map(0xa006, 0xa006).r(this, FUNC(tsamurai_state::vsgongf_a006_r)); /* protection */
+	map(0xa100, 0xa100).r(this, FUNC(tsamurai_state::vsgongf_a100_r)); /* protection */
+	map(0xc000, 0xc7ff).ram();                  /* work ram */
+	map(0xe000, 0xe3ff).ram().w(this, FUNC(tsamurai_state::fg_videoram_w)).share("videoram");
+	map(0xe400, 0xe43f).ram().share("spriteram");
+	map(0xe440, 0xe47b).ram();
+	map(0xe800, 0xe800).w(this, FUNC(tsamurai_state::vsgongf_sound_command_w));
+	map(0xec00, 0xec06).writeonly();
+	map(0xf000, 0xf000).w(this, FUNC(tsamurai_state::vsgongf_color_w));
+	map(0xf400, 0xf400).writeonly(); /* vreg? always 0 */
+	map(0xf800, 0xf800).portr("P1");
+	map(0xf801, 0xf801).portr("P2");
+	map(0xf802, 0xf802).portr("SYSTEM");
+	map(0xf804, 0xf804).portr("DSW1");
+	map(0xf805, 0xf805).portr("DSW2");
+	map(0xf800, 0xf800).nopw();
+	map(0xf801, 0xf801).nopw(); /* vreg? always 0 */
+	map(0xf803, 0xf803).nopw(); /* vreg? always 0 */
+	map(0xfc00, 0xfc07).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
-ADDRESS_MAP_START(tsamurai_state::sound_vsgongf_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM /* work RAM */
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(vsgongf_sound_nmi_enable_w) /* NMI enable */
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("dac", dac_byte_interface, write)
-ADDRESS_MAP_END
+void tsamurai_state::sound_vsgongf_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x6000, 0x63ff).ram(); /* work RAM */
+	map(0x8000, 0x8000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(tsamurai_state::vsgongf_sound_nmi_enable_w)); /* NMI enable */
+	map(0xa000, 0xa000).w("dac", FUNC(dac_byte_interface::write));
+}
 
 /*******************************************************************************/
 

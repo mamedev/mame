@@ -105,34 +105,36 @@ READ8_MEMBER(gunsmoke_state::gunsmoke_protection_r)
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(gunsmoke_state::gunsmoke_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc4c9, 0xc4cb) AM_READ(gunsmoke_protection_r)
-	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(gunsmoke_c804_w)  // ROM bank switch, screen flip
-	AM_RANGE(0xc806, 0xc806) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(gunsmoke_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(gunsmoke_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd800, 0xd801) AM_RAM AM_SHARE("scrollx")
-	AM_RANGE(0xd802, 0xd802) AM_RAM AM_SHARE("scrolly")
-	AM_RANGE(0xd806, 0xd806) AM_WRITE(gunsmoke_d806_w)  // sprites and bg enable
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void gunsmoke_state::gunsmoke_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc000).portr("SYSTEM");
+	map(0xc001, 0xc001).portr("P1");
+	map(0xc002, 0xc002).portr("P2");
+	map(0xc003, 0xc003).portr("DSW1");
+	map(0xc004, 0xc004).portr("DSW2");
+	map(0xc4c9, 0xc4cb).r(this, FUNC(gunsmoke_state::gunsmoke_protection_r));
+	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc804, 0xc804).w(this, FUNC(gunsmoke_state::gunsmoke_c804_w));  // ROM bank switch, screen flip
+	map(0xc806, 0xc806).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(gunsmoke_state::gunsmoke_videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).ram().w(this, FUNC(gunsmoke_state::gunsmoke_colorram_w)).share("colorram");
+	map(0xd800, 0xd801).ram().share("scrollx");
+	map(0xd802, 0xd802).ram().share("scrolly");
+	map(0xd806, 0xd806).w(this, FUNC(gunsmoke_state::gunsmoke_d806_w));  // sprites and bg enable
+	map(0xe000, 0xefff).ram();
+	map(0xf000, 0xffff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(gunsmoke_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE("ym2", ym2203_device, write)
-ADDRESS_MAP_END
+void gunsmoke_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xc800).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xe001).w("ym1", FUNC(ym2203_device::write));
+	map(0xe002, 0xe003).w("ym2", FUNC(ym2203_device::write));
+}
 
 /* Input Ports */
 

@@ -185,17 +185,20 @@ void craft_state::video_update()
 * Address maps                                       *
 \****************************************************/
 
-ADDRESS_MAP_START(craft_state::craft_prg_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void craft_state::craft_prg_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+}
 
-ADDRESS_MAP_START(craft_state::craft_data_map)
-	AM_RANGE(0x0100, 0x04ff) AM_RAM
-ADDRESS_MAP_END
+void craft_state::craft_data_map(address_map &map)
+{
+	map(0x0100, 0x04ff).ram();
+}
 
-ADDRESS_MAP_START(craft_state::craft_io_map)
-	AM_RANGE(AVR8_IO_PORTA, AVR8_IO_PORTD) AM_READWRITE( port_r, port_w )
-ADDRESS_MAP_END
+void craft_state::craft_io_map(address_map &map)
+{
+	map(AVR8_IO_PORTA, AVR8_IO_PORTD).rw(this, FUNC(craft_state::port_r), FUNC(craft_state::port_w));
+}
 
 /****************************************************\
 * Input ports                                        *

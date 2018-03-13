@@ -180,116 +180,124 @@ MACHINE_START_MEMBER(nova2001_state,ninjakun)
  *
  *************************************/
 
-ADDRESS_MAP_START(nova2001_state::nova2001_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(nova2001_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xb800, 0xbfff) AM_WRITE(nova2001_flipscreen_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0xc003, 0xc003) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xc004, 0xc004) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("IN0")
-	AM_RANGE(0xc007, 0xc007) AM_READ_PORT("IN1")
-	AM_RANGE(0xc00e, 0xc00e) AM_READ_PORT("IN2")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+void nova2001_state::nova2001_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xa7ff).ram().w(this, FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0xa800, 0xafff).ram().w(this, FUNC(nova2001_state::nova2001_bg_videoram_w)).share("bg_videoram");
+	map(0xb000, 0xb7ff).ram().share("spriteram");
+	map(0xb800, 0xbfff).w(this, FUNC(nova2001_state::nova2001_flipscreen_w));
+	map(0xc000, 0xc000).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xc001, 0xc001).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xc002, 0xc002).w("ay1", FUNC(ay8910_device::address_w));
+	map(0xc003, 0xc003).w("ay2", FUNC(ay8910_device::address_w));
+	map(0xc004, 0xc004).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xc006, 0xc006).portr("IN0");
+	map(0xc007, 0xc007).portr("IN1");
+	map(0xc00e, 0xc00e).portr("IN2");
+	map(0xe000, 0xe7ff).ram();
+}
 
 
-ADDRESS_MAP_START(nova2001_state::ninjakun_cpu1_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
-	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITE(ninjakun_cpu1_io_A002_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(pkunwar_flipscreen_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("share2")
-ADDRESS_MAP_END
+void nova2001_state::ninjakun_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x7fff).rom();
+	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x8001, 0x8001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x8002, 0x8003).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x8003, 0x8003).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xa000, 0xa000).portr("IN0");
+	map(0xa001, 0xa001).portr("IN1");
+	map(0xa002, 0xa002).portr("IN2").w(this, FUNC(nova2001_state::ninjakun_cpu1_io_A002_w));
+	map(0xa003, 0xa003).w(this, FUNC(nova2001_state::pkunwar_flipscreen_w));
+	map(0xc000, 0xc7ff).ram().w(this, FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0xc800, 0xcfff).rw(this, FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xd9ff).ram().w(this, FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
+	map(0xe000, 0xe3ff).ram().share("share1");
+	map(0xe400, 0xe7ff).ram().share("share2");
+}
 
-ADDRESS_MAP_START(nova2001_state::ninjakun_cpu2_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x2000)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
-	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITE(ninjakun_cpu2_io_A002_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(nova2001_flipscreen_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("share2") /* swapped wrt CPU1 */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("share1") /* swapped wrt CPU1 */
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(nova2001_state::pkunwar_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(nova2001_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xa003, 0xa003) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(nova2001_state::pkunwar_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(pkunwar_flipscreen_w)
-ADDRESS_MAP_END
+void nova2001_state::ninjakun_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x7fff).rom().region("maincpu", 0x2000);
+	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x8001, 0x8001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x8002, 0x8003).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x8003, 0x8003).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xa000, 0xa000).portr("IN0");
+	map(0xa001, 0xa001).portr("IN1");
+	map(0xa002, 0xa002).portr("IN2").w(this, FUNC(nova2001_state::ninjakun_cpu2_io_A002_w));
+	map(0xa003, 0xa003).w(this, FUNC(nova2001_state::nova2001_flipscreen_w));
+	map(0xc000, 0xc7ff).ram().w(this, FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0xc800, 0xcfff).rw(this, FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xd9ff).ram().w(this, FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
+	map(0xe000, 0xe3ff).ram().share("share2"); /* swapped wrt CPU1 */
+	map(0xe400, 0xe7ff).ram().share("share1"); /* swapped wrt CPU1 */
+}
 
 
-ADDRESS_MAP_START(nova2001_state::raiders5_cpu1_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(nova2001_scroll_x_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(nova2001_scroll_y_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(pkunwar_flipscreen_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xc003, 0xc003) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void nova2001_state::pkunwar_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("spriteram");
+	map(0x8800, 0x8fff).ram().w(this, FUNC(nova2001_state::nova2001_bg_videoram_w)).share("bg_videoram");
+	map(0xa000, 0xa001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0xa001, 0xa001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0xa002, 0xa003).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xa003, 0xa003).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xc000, 0xc7ff).ram();
+	map(0xe000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(nova2001_state::raiders5_cpu2_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x9000, 0x9000) AM_READNOP /* unknown */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xc000, 0xc000) AM_READNOP /* unknown */
-	AM_RANGE(0xc800, 0xc800) AM_READNOP /* unknown */
-	AM_RANGE(0xd000, 0xd000) AM_READNOP /* unknown */
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(nova2001_scroll_x_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(nova2001_scroll_y_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(pkunwar_flipscreen_w)
-ADDRESS_MAP_END
+void nova2001_state::pkunwar_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(nova2001_state::pkunwar_flipscreen_w));
+}
 
-ADDRESS_MAP_START(nova2001_state::raiders5_io)
-	AM_RANGE(0x00, 0x00) AM_READNOP /* unknown */
-ADDRESS_MAP_END
+
+void nova2001_state::raiders5_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("spriteram");
+	map(0x8800, 0x8fff).ram().w(this, FUNC(nova2001_state::nova2001_fg_videoram_w)).share("fg_videoram");
+	map(0x9000, 0x97ff).rw(this, FUNC(nova2001_state::ninjakun_bg_videoram_r), FUNC(nova2001_state::ninjakun_bg_videoram_w)).share("bg_videoram");
+	map(0xa000, 0xa000).w(this, FUNC(nova2001_state::nova2001_scroll_x_w));
+	map(0xa001, 0xa001).w(this, FUNC(nova2001_state::nova2001_scroll_y_w));
+	map(0xa002, 0xa002).w(this, FUNC(nova2001_state::pkunwar_flipscreen_w));
+	map(0xc000, 0xc001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0xc001, 0xc001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0xc002, 0xc003).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xc003, 0xc003).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xd000, 0xd1ff).ram().w(this, FUNC(nova2001_state::ninjakun_paletteram_w)).share("palette");
+	map(0xe000, 0xe7ff).ram().share("share1");
+}
+
+void nova2001_state::raiders5_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x8001, 0x8001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x8002, 0x8003).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x8003, 0x8003).r("ay2", FUNC(ay8910_device::data_r));
+	map(0x9000, 0x9000).nopr(); /* unknown */
+	map(0xa000, 0xa7ff).ram().share("share1");
+	map(0xc000, 0xc000).nopr(); /* unknown */
+	map(0xc800, 0xc800).nopr(); /* unknown */
+	map(0xd000, 0xd000).nopr(); /* unknown */
+	map(0xe000, 0xe000).w(this, FUNC(nova2001_state::nova2001_scroll_x_w));
+	map(0xe001, 0xe001).w(this, FUNC(nova2001_state::nova2001_scroll_y_w));
+	map(0xe002, 0xe002).w(this, FUNC(nova2001_state::pkunwar_flipscreen_w));
+}
+
+void nova2001_state::raiders5_io(address_map &map)
+{
+	map(0x00, 0x00).nopr(); /* unknown */
+}
 
 
 

@@ -82,21 +82,23 @@ WRITE8_MEMBER( tmc2000e_state::keyboard_latch_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(tmc2000e_state::tmc2000e_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xfc00, 0xffff) AM_WRITEONLY AM_SHARE("colorram")
-ADDRESS_MAP_END
+void tmc2000e_state::tmc2000e_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0xc000, 0xdfff).rom();
+	map(0xfc00, 0xffff).writeonly().share("colorram");
+}
 
-ADDRESS_MAP_START(tmc2000e_state::tmc2000e_io_map)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE(CDP1864_TAG, cdp1864_device, tone_latch_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE(CDP1864_TAG, cdp1864_device, step_bgcolor_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(ascii_keyboard_r, keyboard_latch_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(vismac_r, vismac_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(floppy_r, floppy_w)
-	AM_RANGE(0x07, 0x07) AM_READ_PORT("DSW0") AM_WRITE(io_select_w)
-ADDRESS_MAP_END
+void tmc2000e_state::tmc2000e_io_map(address_map &map)
+{
+	map(0x01, 0x01).w(m_cti, FUNC(cdp1864_device::tone_latch_w));
+	map(0x02, 0x02).w(m_cti, FUNC(cdp1864_device::step_bgcolor_w));
+	map(0x03, 0x03).rw(this, FUNC(tmc2000e_state::ascii_keyboard_r), FUNC(tmc2000e_state::keyboard_latch_w));
+	map(0x04, 0x04).rw(this, FUNC(tmc2000e_state::io_r), FUNC(tmc2000e_state::io_w));
+	map(0x05, 0x05).rw(this, FUNC(tmc2000e_state::vismac_r), FUNC(tmc2000e_state::vismac_w));
+	map(0x06, 0x06).rw(this, FUNC(tmc2000e_state::floppy_r), FUNC(tmc2000e_state::floppy_w));
+	map(0x07, 0x07).portr("DSW0").w(this, FUNC(tmc2000e_state::io_select_w));
+}
 
 /* Input Ports */
 

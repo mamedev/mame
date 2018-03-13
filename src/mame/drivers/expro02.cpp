@@ -661,167 +661,178 @@ WRITE8_MEMBER( expro02_state::expro02_6295_bankswitch_w )
  *************************************/
 
 
-ADDRESS_MAP_START(expro02_state::expro02_video_base_map)
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fg_ind8ram")
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_SHARE("bg_rgb555ram")
-	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette?
-	AM_RANGE(0x680000, 0x68001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")    // sprites? 0x72f words tested
-	AM_RANGE(0x780000, 0x78001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-	AM_RANGE(0xd80000, 0xd80001) AM_DEVWRITE("view2_0",kaneko_view2_tilemap_device,galsnew_vram_1_tilebank_w)   /* ??? */
-	AM_RANGE(0xe80000, 0xe80001) AM_DEVWRITE("view2_0",kaneko_view2_tilemap_device,galsnew_vram_0_tilebank_w)   /* ??? */
-ADDRESS_MAP_END
+void expro02_state::expro02_video_base_map(address_map &map)
+{
+	map(0x500000, 0x51ffff).ram().share("fg_ind8ram");
+	map(0x520000, 0x53ffff).ram().share("bg_rgb555ram");
+	map(0x580000, 0x583fff).rw(m_view2_0, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x600000, 0x600fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // palette?
+	map(0x680000, 0x68001f).rw(m_view2_0, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x700000, 0x700fff).ram().share("spriteram");    // sprites? 0x72f words tested
+	map(0x780000, 0x78001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0xd80000, 0xd80001).w(m_view2_0, FUNC(kaneko_view2_tilemap_device::galsnew_vram_1_tilebank_w));   /* ??? */
+	map(0xe80000, 0xe80001).w(m_view2_0, FUNC(kaneko_view2_tilemap_device::galsnew_vram_0_tilebank_w));   /* ??? */
+}
 
-ADDRESS_MAP_START(expro02_state::expro02_video_base_map_noview2)
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fg_ind8ram")
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_SHARE("bg_rgb555ram")
-	AM_RANGE(0x580000, 0x583fff) AM_NOP // games still makes leftover accesses
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette?
-	AM_RANGE(0x680000, 0x68001f) AM_NOP // games still makes leftover accesses
-	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")    // sprites? 0x72f words tested
-	AM_RANGE(0x780000, 0x78001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-	AM_RANGE(0xd80000, 0xd80001) AM_NOP // games still makes leftover accesses
-	AM_RANGE(0xe80000, 0xe80001) AM_NOP // games still makes leftover accesses
-ADDRESS_MAP_END
+void expro02_state::expro02_video_base_map_noview2(address_map &map)
+{
+	map(0x500000, 0x51ffff).ram().share("fg_ind8ram");
+	map(0x520000, 0x53ffff).ram().share("bg_rgb555ram");
+	map(0x580000, 0x583fff).noprw(); // games still makes leftover accesses
+	map(0x600000, 0x600fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // palette?
+	map(0x680000, 0x68001f).noprw(); // games still makes leftover accesses
+	map(0x700000, 0x700fff).ram().share("spriteram");    // sprites? 0x72f words tested
+	map(0x780000, 0x78001f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0xd80000, 0xd80001).noprw(); // games still makes leftover accesses
+	map(0xe80000, 0xe80001).noprw(); // games still makes leftover accesses
+}
 
-ADDRESS_MAP_START(expro02_state::expro02_map)
-	AM_IMPORT_FROM(expro02_video_base_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM // main program
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user2",0) // other data
-	AM_RANGE(0x100000, 0x3fffff) AM_ROM AM_REGION("user1",0) // main data
-	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP    /* ??? */
-	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
-	AM_RANGE(0xe00000, 0xe00015) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
-ADDRESS_MAP_END
+void expro02_state::expro02_map(address_map &map)
+{
+	expro02_video_base_map(map);
+	map(0x000000, 0x03ffff).rom(); // main program
+	map(0x080000, 0x0fffff).rom().region("user2", 0); // other data
+	map(0x100000, 0x3fffff).rom().region("user1", 0); // main data
+	map(0x400001, 0x400001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0xa00000, 0xa00001).nopw();    /* ??? */
+	map(0xc80000, 0xc8ffff).ram();
+	map(0xe00000, 0xe00015).rw("calc1_mcu", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
+}
 
 
 // bigger ROM space, OKI commands moved, no CALC mcu
-ADDRESS_MAP_START(expro02_state::fantasia_map)
-	AM_IMPORT_FROM(expro02_video_base_map)
-	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x800006, 0x800007) AM_NOP // ? used ?
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP    /* ??? */
-	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
-	AM_RANGE(0xf00000, 0xf00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
-ADDRESS_MAP_END
+void expro02_state::fantasia_map(address_map &map)
+{
+	expro02_video_base_map(map);
+	map(0x000000, 0x4fffff).rom();
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+	map(0x800006, 0x800007).noprw(); // ? used ?
+	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0xa00000, 0xa00001).nopw();    /* ??? */
+	map(0xc80000, 0xc8ffff).ram();
+	map(0xf00000, 0xf00000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 
-ADDRESS_MAP_START(expro02_state::comad_map)
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
-	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
+void expro02_state::comad_map(address_map &map)
+{
+	expro02_video_base_map_noview2(map);
+	map(0x000000, 0x4fffff).rom();
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
 //  AM_RANGE(0x800006, 0x800007)    ??
-	AM_RANGE(0x80000a, 0x80000b) AM_READ(comad_timer_r) /* bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x80000c, 0x80000d) AM_READ(comad_timer_r) /* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
-	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM
-	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
-	AM_RANGE(0xf00000, 0xf00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
-	AM_RANGE(0xf80000, 0xf80001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* newfant */
-ADDRESS_MAP_END
+	map(0x80000a, 0x80000b).r(this, FUNC(expro02_state::comad_timer_r)); /* bits 8-a = timer? palette update code waits for them to be 111 */
+	map(0x80000c, 0x80000d).r(this, FUNC(expro02_state::comad_timer_r)); /* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
+	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0xc00000, 0xc0ffff).ram();
+	map(0xc80000, 0xc8ffff).ram();
+	map(0xf00000, 0xf00000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)).umask16(0xff00); /* fantasia, missw96 */
+	map(0xf80000, 0xf80000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)).umask16(0xff00); /* newfant */
+}
 
-ADDRESS_MAP_START(expro02_state::fantsia2_map)
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
-	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
+void expro02_state::fantsia2_map(address_map &map)
+{
+	expro02_video_base_map_noview2(map);
+	map(0x000000, 0x4fffff).rom();
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
 //  AM_RANGE(0x800006, 0x800007)    ??
-	AM_RANGE(0x800008, 0x800009) AM_READ(comad_timer_r) /* bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP    /* coin counters, + ? */
-	AM_RANGE(0xc80000, 0xc80001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
-	AM_RANGE(0xf80000, 0xf8ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x800008, 0x800009).r(this, FUNC(expro02_state::comad_timer_r)); /* bits 8-a = timer? palette update code waits for them to be 111 */
+	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0xa00000, 0xa00001).nopw();    /* coin counters, + ? */
+	map(0xc80000, 0xc80000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)).umask16(0xff00);
+	map(0xf80000, 0xf8ffff).ram();
+}
 
 
 
 
-ADDRESS_MAP_START(expro02_state::galhustl_map)
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
+void expro02_state::galhustl_map(address_map &map)
+{
+	expro02_video_base_map_noview2(map);
 
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x2fffff) AM_ROM AM_REGION("maincpudata", 0)
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x2fffff).rom().region("maincpudata", 0);
 
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP // ?
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0xe80000, 0xe8ffff) AM_RAM
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0xa00000, 0xa00001).nopw(); // ?
+	map(0xd00000, 0xd00000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xe80000, 0xe8ffff).ram();
 
-	AM_RANGE(0x780000, 0x78001f) AM_NOP // prevent sprites being flipped
-ADDRESS_MAP_END
+	map(0x780000, 0x78001f).noprw(); // prevent sprites being flipped
+}
 
-ADDRESS_MAP_START(expro02_state::zipzap_map)
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
+void expro02_state::zipzap_map(address_map &map)
+{
+	expro02_video_base_map_noview2(map);
 
-	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x701000, 0x71ffff) AM_RAM
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
-	AM_RANGE(0xc00000, 0xc00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
-	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM     // main ram
+	map(0x000000, 0x4fffff).rom();
+	map(0x701000, 0x71ffff).ram();
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));
+	map(0xc00000, 0xc00000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)).umask16(0xff00); /* fantasia, missw96 */
+	map(0xc80000, 0xc8ffff).ram();     // main ram
 
-	AM_RANGE(0x780000, 0x78001f) AM_NOP // prevent sprites being flipped
-ADDRESS_MAP_END
+	map(0x780000, 0x78001f).noprw(); // prevent sprites being flipped
+}
 
-ADDRESS_MAP_START(expro02_state::supmodel_map)
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
-	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x800006, 0x800007) AM_READ(comad_timer_r)
-	AM_RANGE(0x800008, 0x800009) AM_READ(comad_timer_r)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP
-	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
-	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP
-	AM_RANGE(0xe00012, 0xe00013) AM_WRITENOP
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITENOP
-	AM_RANGE(0xf80000, 0xf80001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
-ADDRESS_MAP_END
+void expro02_state::supmodel_map(address_map &map)
+{
+	expro02_video_base_map_noview2(map);
+	map(0x000000, 0x4fffff).rom();
+	map(0x500000, 0x51ffff).ram().share("fgvideoram");
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+	map(0x800006, 0x800007).r(this, FUNC(expro02_state::comad_timer_r));
+	map(0x800008, 0x800009).r(this, FUNC(expro02_state::comad_timer_r));
+	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0xa00000, 0xa00001).nopw();
+	map(0xc80000, 0xc8ffff).ram();
+	map(0xd80000, 0xd80001).nopw();
+	map(0xe00012, 0xe00013).nopw();
+	map(0xe80000, 0xe80001).nopw();
+	map(0xf80000, 0xf80000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)).umask16(0xff00); /* fantasia, missw96 */
+}
 
-ADDRESS_MAP_START(expro02_state::smissw_map)
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
-	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x800006, 0x800007) AM_READ(comad_timer_r)
-	AM_RANGE(0x80000e, 0x80000f) AM_READ(comad_timer_r)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP
-	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM
-	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP
-	AM_RANGE(0xe00012, 0xe00013) AM_WRITENOP
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITENOP
-	AM_RANGE(0xf00000, 0xf00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
-ADDRESS_MAP_END
+void expro02_state::smissw_map(address_map &map)
+{
+	expro02_video_base_map_noview2(map);
+	map(0x000000, 0x4fffff).rom();
+	map(0x500000, 0x51ffff).ram().share("fgvideoram");
+	map(0x800000, 0x800001).portr("DSW1");
+	map(0x800002, 0x800003).portr("DSW2");
+	map(0x800004, 0x800005).portr("SYSTEM");
+	map(0x800006, 0x800007).r(this, FUNC(expro02_state::comad_timer_r));
+	map(0x80000e, 0x80000f).r(this, FUNC(expro02_state::comad_timer_r));
+	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
+	map(0xa00000, 0xa00001).nopw();
+	map(0xc00000, 0xc0ffff).ram();
+	map(0xd80000, 0xd80001).nopw();
+	map(0xe00012, 0xe00013).nopw();
+	map(0xe80000, 0xe80001).nopw();
+	map(0xf00000, 0xf00000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)).umask16(0xff00); /* fantasia, missw96 */
+}
 
-ADDRESS_MAP_START(expro02_state::oki_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void expro02_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("okibank");
+}
 
 /*************************************
  *

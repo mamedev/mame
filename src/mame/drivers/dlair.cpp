@@ -380,20 +380,21 @@ WRITE8_MEMBER(dlair_state::laserdisc_w)
  *************************************/
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(dlair_state::dlus_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fc7) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xc008, 0xc008) AM_MIRROR(0x1fc7) AM_READ_PORT("P1")
-	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x1fc7) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x1fc7) AM_READ(laserdisc_r)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fc7) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0xe008, 0xe008) AM_MIRROR(0x1fc7) AM_WRITE(misc_w)
-	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1fc7) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xe020, 0xe020) AM_MIRROR(0x1fc7) AM_WRITE(laserdisc_w)
-	AM_RANGE(0xe030, 0xe037) AM_MIRROR(0x1fc0) AM_WRITE(led_den2_w)
-	AM_RANGE(0xe038, 0xe03f) AM_MIRROR(0x1fc0) AM_WRITE(led_den1_w)
-ADDRESS_MAP_END
+void dlair_state::dlus_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xa000, 0xa7ff).mirror(0x1800).ram();
+	map(0xc000, 0xc000).mirror(0x1fc7).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xc008, 0xc008).mirror(0x1fc7).portr("P1");
+	map(0xc010, 0xc010).mirror(0x1fc7).portr("SYSTEM");
+	map(0xc020, 0xc020).mirror(0x1fc7).r(this, FUNC(dlair_state::laserdisc_r));
+	map(0xe000, 0xe000).mirror(0x1fc7).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0xe008, 0xe008).mirror(0x1fc7).w(this, FUNC(dlair_state::misc_w));
+	map(0xe010, 0xe010).mirror(0x1fc7).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xe020, 0xe020).mirror(0x1fc7).w(this, FUNC(dlair_state::laserdisc_w));
+	map(0xe030, 0xe037).mirror(0x1fc0).w(this, FUNC(dlair_state::led_den2_w));
+	map(0xe038, 0xe03f).mirror(0x1fc0).w(this, FUNC(dlair_state::led_den1_w));
+}
 
 
 
@@ -404,31 +405,33 @@ ADDRESS_MAP_END
  *************************************/
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(dlair_state::dleuro_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1f47) // WT LED 1
-	AM_RANGE(0xe008, 0xe008) AM_MIRROR(0x1f47) // WT LED 2
-	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1f47) AM_WRITE(led_den1_w)         // WT EXT LED 1
-	AM_RANGE(0xe018, 0xe018) AM_MIRROR(0x1f47) AM_WRITE(led_den2_w)         // WT EXT LED 2
-	AM_RANGE(0xe020, 0xe020) AM_MIRROR(0x1f47) AM_WRITE(laserdisc_w)        // DISC WT
-	AM_RANGE(0xe028, 0xe028) AM_MIRROR(0x1f47) AM_WRITE(dleuro_misc_w)      // WT MISC
-	AM_RANGE(0xe030, 0xe030) AM_MIRROR(0x1f47) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)   // CLR WDOG
-	AM_RANGE(0xe080, 0xe080) AM_MIRROR(0x1f47) AM_READ_PORT("P1")           // CP A
-	AM_RANGE(0xe088, 0xe088) AM_MIRROR(0x1f47) AM_READ_PORT("SYSTEM")       // CP B
-	AM_RANGE(0xe090, 0xe090) AM_MIRROR(0x1f47) AM_READ_PORT("DSW1")         // OPT SW A
-	AM_RANGE(0xe098, 0xe098) AM_MIRROR(0x1f47) AM_READ_PORT("DSW2")         // OPT SW B
-	AM_RANGE(0xe0a0, 0xe0a0) AM_MIRROR(0x1f47) AM_READ(laserdisc_r)         // RD DISC DATA
-ADDRESS_MAP_END
+void dlair_state::dleuro_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xa000, 0xa7ff).mirror(0x1800).ram();
+	map(0xc000, 0xc7ff).mirror(0x1800).ram().share("videoram");
+	map(0xe000, 0xe000).mirror(0x1f47); // WT LED 1
+	map(0xe008, 0xe008).mirror(0x1f47); // WT LED 2
+	map(0xe010, 0xe010).mirror(0x1f47).w(this, FUNC(dlair_state::led_den1_w));         // WT EXT LED 1
+	map(0xe018, 0xe018).mirror(0x1f47).w(this, FUNC(dlair_state::led_den2_w));         // WT EXT LED 2
+	map(0xe020, 0xe020).mirror(0x1f47).w(this, FUNC(dlair_state::laserdisc_w));        // DISC WT
+	map(0xe028, 0xe028).mirror(0x1f47).w(this, FUNC(dlair_state::dleuro_misc_w));      // WT MISC
+	map(0xe030, 0xe030).mirror(0x1f47).w("watchdog", FUNC(watchdog_timer_device::reset_w));   // CLR WDOG
+	map(0xe080, 0xe080).mirror(0x1f47).portr("P1");           // CP A
+	map(0xe088, 0xe088).mirror(0x1f47).portr("SYSTEM");       // CP B
+	map(0xe090, 0xe090).mirror(0x1f47).portr("DSW1");         // OPT SW A
+	map(0xe098, 0xe098).mirror(0x1f47).portr("DSW2");         // OPT SW B
+	map(0xe0a0, 0xe0a0).mirror(0x1f47).r(this, FUNC(dlair_state::laserdisc_r));         // RD DISC DATA
+}
 
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(dlair_state::dleuro_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7c) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
-ADDRESS_MAP_END
+void dlair_state::dleuro_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).mirror(0x7c).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x80, 0x83).mirror(0x7c).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+}
 
 
 /*

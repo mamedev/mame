@@ -216,22 +216,24 @@ PALETTE_INIT_MEMBER(d110_state, d110)
 	palette.set_pen_color(1, rgb_t(0, 0, 0));
 }
 
-ADDRESS_MAP_START(d110_state::d110_map)
-	AM_RANGE(0x0100, 0x0100) AM_WRITE(bank_w)
-	AM_RANGE(0x0200, 0x0200) AM_WRITE(so_w)
-	AM_RANGE(0x021a, 0x021a) AM_READ_PORT("SC0") AM_WRITENOP
-	AM_RANGE(0x021c, 0x021c) AM_READ_PORT("SC1")
-	AM_RANGE(0x0300, 0x0300) AM_WRITE(lcd_data_w)
-	AM_RANGE(0x0380, 0x0380) AM_READWRITE(lcd_ctrl_r, lcd_ctrl_w)
-	AM_RANGE(0x1000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x1000)
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("fixed")
-ADDRESS_MAP_END
+void d110_state::d110_map(address_map &map)
+{
+	map(0x0100, 0x0100).w(this, FUNC(d110_state::bank_w));
+	map(0x0200, 0x0200).w(this, FUNC(d110_state::so_w));
+	map(0x021a, 0x021a).portr("SC0").nopw();
+	map(0x021c, 0x021c).portr("SC1");
+	map(0x0300, 0x0300).w(this, FUNC(d110_state::lcd_data_w));
+	map(0x0380, 0x0380).rw(this, FUNC(d110_state::lcd_ctrl_r), FUNC(d110_state::lcd_ctrl_w));
+	map(0x1000, 0x7fff).rom().region("maincpu", 0x1000);
+	map(0x8000, 0xbfff).bankrw("bank");
+	map(0xc000, 0xffff).bankrw("fixed");
+}
 
-ADDRESS_MAP_START(d110_state::d110_io)
-	AM_RANGE(i8x9x_device::SERIAL, i8x9x_device::SERIAL) AM_WRITE(midi_w)
-	AM_RANGE(i8x9x_device::P0,     i8x9x_device::P0)     AM_READ(port0_r)
-ADDRESS_MAP_END
+void d110_state::d110_io(address_map &map)
+{
+	map(i8x9x_device::SERIAL, i8x9x_device::SERIAL).w(this, FUNC(d110_state::midi_w));
+	map(i8x9x_device::P0, i8x9x_device::P0).r(this, FUNC(d110_state::port0_r));
+}
 
 MACHINE_CONFIG_START(d110_state::d110)
 	MCFG_CPU_ADD( "maincpu", P8098, XTAL(12'000'000) )

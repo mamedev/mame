@@ -34,17 +34,18 @@ u32 d400_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	return 0;
 }
 
-ADDRESS_MAP_START(d400_state::mem_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
+void d400_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
 	//AM_RANGE(0x4000, 0x403f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
-	AM_RANGE(0x4800, 0x48ff) AM_RAM
-	AM_RANGE(0x5000, 0x50ff) AM_RAM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
-	AM_RANGE(0x7880, 0x78bf) AM_DEVREADWRITE("novram", x2210_device, read, write)
-	AM_RANGE(0x7c00, 0x7c00) AM_WRITENOP
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+	map(0x4800, 0x48ff).ram();
+	map(0x5000, 0x50ff).ram();
+	map(0x6000, 0x6fff).ram();
+	map(0x7800, 0x780f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0x7880, 0x78bf).rw("novram", FUNC(x2210_device::read), FUNC(x2210_device::write));
+	map(0x7c00, 0x7c00).nopw();
+	map(0x8000, 0xffff).rom().region("maincpu", 0);
+}
 
 static INPUT_PORTS_START( d461 )
 INPUT_PORTS_END

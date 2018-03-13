@@ -26,13 +26,14 @@ public:
 };
 
 
-ADDRESS_MAP_START(by68701_state::by68701_map)
-	AM_RANGE(0x0000, 0xffff) AM_NOP
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0400, 0x04ff) AM_RAM
-	AM_RANGE(0x0500, 0x07ff) AM_RAM
-	AM_RANGE(0x7000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void by68701_state::by68701_map(address_map &map)
+{
+	map(0x0000, 0xffff).noprw();
+	map(0x0000, 0x00ff).ram();
+	map(0x0400, 0x04ff).ram();
+	map(0x0500, 0x07ff).ram();
+	map(0x7000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( by68701 )
 INPUT_PORTS_END

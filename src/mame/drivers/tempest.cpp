@@ -445,31 +445,32 @@ READ8_MEMBER(tempest_state::rom_ae1f_r)
 }
 
 
-ADDRESS_MAP_START(tempest_state::main_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x080f) AM_WRITEONLY AM_SHARE("colorram")
-	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("IN0")
-	AM_RANGE(0x0d00, 0x0d00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0e00, 0x0e00) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x2000)
-	AM_RANGE(0x3000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(tempest_coin_w)
-	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE("avg", avg_tempest_device, go_w)
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(wdclr_w)
-	AM_RANGE(0x5800, 0x5800) AM_DEVWRITE("avg", avg_tempest_device, reset_w)
-	AM_RANGE(0x6000, 0x603f) AM_DEVWRITE("earom", atari_vg_earom_device, write)
-	AM_RANGE(0x6040, 0x6040) AM_DEVREAD("mathbox", mathbox_device, status_r) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x6050, 0x6050) AM_DEVREAD("earom", atari_vg_earom_device, read)
-	AM_RANGE(0x6060, 0x6060) AM_DEVREAD("mathbox", mathbox_device, lo_r)
-	AM_RANGE(0x6070, 0x6070) AM_DEVREAD("mathbox", mathbox_device, hi_r)
-	AM_RANGE(0x6080, 0x609f) AM_DEVWRITE("mathbox", mathbox_device, go_w)
-	AM_RANGE(0x60c0, 0x60cf) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
-	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
-	AM_RANGE(0x60e0, 0x60e0) AM_WRITE(tempest_led_w)
-	AM_RANGE(0x9000, 0xdfff) AM_ROM
-	AM_RANGE(0xae1f, 0xae1f) AM_READ(rom_ae1f_r)
-	AM_RANGE(0xf000, 0xffff) AM_ROM /* for the reset / interrupt vectors */
-ADDRESS_MAP_END
+void tempest_state::main_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x080f).writeonly().share("colorram");
+	map(0x0c00, 0x0c00).portr("IN0");
+	map(0x0d00, 0x0d00).portr("DSW1");
+	map(0x0e00, 0x0e00).portr("DSW2");
+	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
+	map(0x3000, 0x3fff).rom();
+	map(0x4000, 0x4000).w(this, FUNC(tempest_state::tempest_coin_w));
+	map(0x4800, 0x4800).w(m_avg, FUNC(avg_tempest_device::go_w));
+	map(0x5000, 0x5000).w(this, FUNC(tempest_state::wdclr_w));
+	map(0x5800, 0x5800).w(m_avg, FUNC(avg_tempest_device::reset_w));
+	map(0x6000, 0x603f).w("earom", FUNC(atari_vg_earom_device::write));
+	map(0x6040, 0x6040).r(m_mathbox, FUNC(mathbox_device::status_r)).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
+	map(0x6050, 0x6050).r("earom", FUNC(atari_vg_earom_device::read));
+	map(0x6060, 0x6060).r(m_mathbox, FUNC(mathbox_device::lo_r));
+	map(0x6070, 0x6070).r(m_mathbox, FUNC(mathbox_device::hi_r));
+	map(0x6080, 0x609f).w(m_mathbox, FUNC(mathbox_device::go_w));
+	map(0x60c0, 0x60cf).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x60d0, 0x60df).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x60e0, 0x60e0).w(this, FUNC(tempest_state::tempest_led_w));
+	map(0x9000, 0xdfff).rom();
+	map(0xae1f, 0xae1f).r(this, FUNC(tempest_state::rom_ae1f_r));
+	map(0xf000, 0xffff).rom(); /* for the reset / interrupt vectors */
+}
 
 
 /*************************************

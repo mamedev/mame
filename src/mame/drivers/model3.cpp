@@ -1760,38 +1760,41 @@ WRITE64_MEMBER(model3_state::daytona2_rombank_w)
 	}
 }
 
-ADDRESS_MAP_START(model3_state::model3_10_mem)
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("work_ram")    /* work RAM */
+void model3_state::model3_10_mem(address_map &map)
+{
+	map(0x00000000, 0x007fffff).ram().share("work_ram");    /* work RAM */
 
-	AM_RANGE(0x84000000, 0x8400003f) AM_READ(real3d_status_r )
-	AM_RANGE(0x88000000, 0x88000007) AM_WRITE(real3d_cmd_w )
-	AM_RANGE(0x8e000000, 0x8e0fffff) AM_WRITE(real3d_display_list_w )
-	AM_RANGE(0x98000000, 0x980fffff) AM_WRITE(real3d_polygon_ram_w )
+	map(0x84000000, 0x8400003f).r(this, FUNC(model3_state::real3d_status_r));
+	map(0x88000000, 0x88000007).w(this, FUNC(model3_state::real3d_cmd_w));
+	map(0x8e000000, 0x8e0fffff).w(this, FUNC(model3_state::real3d_display_list_w));
+	map(0x98000000, 0x980fffff).w(this, FUNC(model3_state::real3d_polygon_ram_w));
 
-	AM_RANGE(0xf0040000, 0xf004003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_ctrl_r, model3_ctrl_w )
-	AM_RANGE(0xf0080000, 0xf008ffff) AM_MIRROR(0x0e000000) AM_READWRITE8(model3_sound_r, model3_sound_w, 0xffffffffffffffffU )
-	AM_RANGE(0xf00c0000, 0xf00dffff) AM_MIRROR(0x0e000000) AM_RAM AM_SHARE("backup")    /* backup SRAM */
-	AM_RANGE(0xf0100000, 0xf010003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_sys_r, model3_sys_w )
-	AM_RANGE(0xf0140000, 0xf014003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_rtc_r, model3_rtc_w )
+	map(0xf0040000, 0xf004003f).mirror(0x0e000000).rw(this, FUNC(model3_state::model3_ctrl_r), FUNC(model3_state::model3_ctrl_w));
+	map(0xf0080000, 0xf008ffff).mirror(0x0e000000).rw(this, FUNC(model3_state::model3_sound_r), FUNC(model3_state::model3_sound_w));
+	map(0xf00c0000, 0xf00dffff).mirror(0x0e000000).ram().share("backup");    /* backup SRAM */
+	map(0xf0100000, 0xf010003f).mirror(0x0e000000).rw(this, FUNC(model3_state::model3_sys_r), FUNC(model3_state::model3_sys_w));
+	map(0xf0140000, 0xf014003f).mirror(0x0e000000).rw(this, FUNC(model3_state::model3_rtc_r), FUNC(model3_state::model3_rtc_w));
 
-	AM_RANGE(0xf1000000, 0xf10f7fff) AM_READWRITE(model3_char_r, model3_char_w )    /* character RAM */
-	AM_RANGE(0xf10f8000, 0xf10fffff) AM_READWRITE(model3_tile_r, model3_tile_w )    /* tilemaps */
-	AM_RANGE(0xf1100000, 0xf111ffff) AM_READWRITE(model3_palette_r, model3_palette_w ) AM_SHARE("paletteram64") /* palette */
-	AM_RANGE(0xf1180000, 0xf11800ff) AM_READWRITE(model3_vid_reg_r, model3_vid_reg_w )
+	map(0xf1000000, 0xf10f7fff).rw(this, FUNC(model3_state::model3_char_r), FUNC(model3_state::model3_char_w));    /* character RAM */
+	map(0xf10f8000, 0xf10fffff).rw(this, FUNC(model3_state::model3_tile_r), FUNC(model3_state::model3_tile_w));    /* tilemaps */
+	map(0xf1100000, 0xf111ffff).rw(this, FUNC(model3_state::model3_palette_r), FUNC(model3_state::model3_palette_w)).share("paletteram64"); /* palette */
+	map(0xf1180000, 0xf11800ff).rw(this, FUNC(model3_state::model3_vid_reg_r), FUNC(model3_state::model3_vid_reg_w));
 
-	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+	map(0xff800000, 0xffffffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(model3_state::model3_mem)
-	AM_IMPORT_FROM( model3_10_mem )
-	AM_RANGE(0xc0000000, 0xc003ffff) AM_DEVICE32("comm_board", m3comm_device, m3_map, 0xffffffffffffffffU )
-ADDRESS_MAP_END
+void model3_state::model3_mem(address_map &map)
+{
+	model3_10_mem(map);
+	map(0xc0000000, 0xc003ffff).m("comm_board", FUNC(m3comm_device::m3_map));
+}
 
-ADDRESS_MAP_START(model3_state::model3_5881_mem)
-	AM_IMPORT_FROM( model3_mem )
-	AM_RANGE(0xf0180000, 0xf019ffff) AM_MIRROR(0x0e000000) AM_RAM
-	AM_RANGE(0xf01a0000, 0xf01a003f) AM_MIRROR(0x0e000000) AM_DEVICE16("315_5881", sega_315_5881_crypt_device, iomap_64be, 0xffffffffffffffffU )
-ADDRESS_MAP_END
+void model3_state::model3_5881_mem(address_map &map)
+{
+	model3_mem(map);
+	map(0xf0180000, 0xf019ffff).mirror(0x0e000000).ram();
+	map(0xf01a0000, 0xf01a003f).mirror(0x0e000000).m(m_cryptdevice, FUNC(sega_315_5881_crypt_device::iomap_64be));
+}
 
 static INPUT_PORTS_START( common )
 	PORT_START("IN0")
@@ -5694,17 +5697,18 @@ WRITE16_MEMBER(model3_state::model3snd_ctrl)
 	}
 }
 
-ADDRESS_MAP_START(model3_state::model3_snd)
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1", 0) AM_SHARE("soundram")
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp1", scsp_device, read, write)
-	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2", 0)
-	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE("scsp2", scsp_device, read, write)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(model3snd_ctrl)
-	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audiocpu", 0x80000)
-	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("samples", 0)
-	AM_RANGE(0xa00000, 0xdfffff) AM_ROMBANK("bank4")
-	AM_RANGE(0xe00000, 0xffffff) AM_ROMBANK("bank5")
-ADDRESS_MAP_END
+void model3_state::model3_snd(address_map &map)
+{
+	map(0x000000, 0x07ffff).ram().region("scsp1", 0).share("soundram");
+	map(0x100000, 0x100fff).rw(m_scsp1, FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x200000, 0x27ffff).ram().region("scsp2", 0);
+	map(0x300000, 0x300fff).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x400000, 0x400001).w(this, FUNC(model3_state::model3snd_ctrl));
+	map(0x600000, 0x67ffff).rom().region("audiocpu", 0x80000);
+	map(0x800000, 0x9fffff).rom().region("samples", 0);
+	map(0xa00000, 0xdfffff).bankr("bank4");
+	map(0xe00000, 0xffffff).bankr("bank5");
+}
 
 
 WRITE8_MEMBER(model3_state::scsp_irq)

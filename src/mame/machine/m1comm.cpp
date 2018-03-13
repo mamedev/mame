@@ -63,23 +63,25 @@ Notes:
 /*************************************
  *  M1COMM Memory Map
  *************************************/
-ADDRESS_MAP_START(m1comm_device::m1comm_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(share_r, share_w)
-ADDRESS_MAP_END
+void m1comm_device::m1comm_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xc000, 0xffff).rw(this, FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
+}
 
 /*************************************
  *  M1COMM I/O Map
  *************************************/
-ADDRESS_MAP_START(m1comm_device::m1comm_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(dlc_reg_r, dlc_reg_w)
-	AM_RANGE(0x20, 0x2f) AM_READWRITE(dma_reg_r, dma_reg_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(syn_r, syn_w)
-	AM_RANGE(0x60, 0x60) AM_READWRITE(zfg_r, zfg_w)
-	AM_RANGE(0xff, 0xff) AM_RAM
-ADDRESS_MAP_END
+void m1comm_device::m1comm_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x1f).rw(this, FUNC(m1comm_device::dlc_reg_r), FUNC(m1comm_device::dlc_reg_w));
+	map(0x20, 0x2f).rw(this, FUNC(m1comm_device::dma_reg_r), FUNC(m1comm_device::dma_reg_w));
+	map(0x40, 0x40).rw(this, FUNC(m1comm_device::syn_r), FUNC(m1comm_device::syn_w));
+	map(0x60, 0x60).rw(this, FUNC(m1comm_device::zfg_r), FUNC(m1comm_device::zfg_w));
+	map(0xff, 0xff).ram();
+}
 
 
 ROM_START( m1comm )

@@ -22,22 +22,24 @@ static GFXDECODE_START( kramermc )
 GFXDECODE_END
 
 /* Address maps */
-ADDRESS_MAP_START(kramermc_state::kramermc_mem)
-	AM_RANGE( 0x0000, 0x03ff ) AM_ROM  // Monitor
-	AM_RANGE( 0x0400, 0x07ff ) AM_ROM  // Debugger
-	AM_RANGE( 0x0800, 0x0bff ) AM_ROM  // Reassembler
-	AM_RANGE( 0x0c00, 0x0fff ) AM_RAM  // System RAM
-	AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // User RAM
-	AM_RANGE( 0x8000, 0xafff ) AM_ROM  // BASIC
-	AM_RANGE( 0xc000, 0xc3ff ) AM_ROM  // Editor
-	AM_RANGE( 0xc400, 0xdfff ) AM_ROM  // Assembler
-	AM_RANGE( 0xfc00, 0xffff ) AM_RAM  // Video RAM
-ADDRESS_MAP_END
+void kramermc_state::kramermc_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).rom();  // Monitor
+	map(0x0400, 0x07ff).rom();  // Debugger
+	map(0x0800, 0x0bff).rom();  // Reassembler
+	map(0x0c00, 0x0fff).ram();  // System RAM
+	map(0x1000, 0x7fff).ram();  // User RAM
+	map(0x8000, 0xafff).rom();  // BASIC
+	map(0xc000, 0xc3ff).rom();  // Editor
+	map(0xc400, 0xdfff).rom();  // Assembler
+	map(0xfc00, 0xffff).ram();  // Video RAM
+}
 
-ADDRESS_MAP_START(kramermc_state::kramermc_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xfc, 0x0ff) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
-ADDRESS_MAP_END
+void kramermc_state::kramermc_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xfc, 0x0ff).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( kramermc )

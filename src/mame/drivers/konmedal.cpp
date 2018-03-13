@@ -225,69 +225,72 @@ WRITE8_MEMBER(konmedal_state::bankswitch_w)
 	m_control = data & 0xf;
 }
 
-ADDRESS_MAP_START(konmedal_state::medal_main)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xafff) AM_RAM // work RAM?
-	AM_RANGE(0xb800, 0xbfff) AM_RAM // stack goes here
-	AM_RANGE(0xc000, 0xc03f) AM_DEVWRITE("k056832", k056832_device, write)
-	AM_RANGE(0xc100, 0xc100) AM_WRITE(control2_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xc500, 0xc500) AM_NOP // read to reset watchdog
-	AM_RANGE(0xc700, 0xc700) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc701, 0xc701) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc702, 0xc702) AM_READ_PORT("IN1")
-	AM_RANGE(0xc703, 0xc703) AM_READ_PORT("IN2")
-	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
-	AM_RANGE(0xc80f, 0xc80f) AM_READ(magic_r)
-	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+void konmedal_state::medal_main(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xafff).ram(); // work RAM?
+	map(0xb800, 0xbfff).ram(); // stack goes here
+	map(0xc000, 0xc03f).w(m_k056832, FUNC(k056832_device::write));
+	map(0xc100, 0xc100).w(this, FUNC(konmedal_state::control2_w));
+	map(0xc400, 0xc400).w(this, FUNC(konmedal_state::bankswitch_w));
+	map(0xc500, 0xc500).noprw(); // read to reset watchdog
+	map(0xc700, 0xc700).portr("DSW2");
+	map(0xc701, 0xc701).portr("DSW1");
+	map(0xc702, 0xc702).portr("IN1");
+	map(0xc703, 0xc703).portr("IN2");
+	map(0xc800, 0xc80f).w(m_k056832, FUNC(k056832_device::b_w));
+	map(0xc80f, 0xc80f).r(this, FUNC(konmedal_state::magic_r));
+	map(0xd000, 0xd001).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+	map(0xe000, 0xffff).rw(this, FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
+}
 
-ADDRESS_MAP_START(konmedal_state::ddboy_main)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM // work RAM
-	AM_RANGE(0xc000, 0xc03f) AM_DEVWRITE("k056832", k056832_device, write)
-	AM_RANGE(0xc100, 0xc100) AM_WRITE(control2_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xc500, 0xc500) AM_NOP // read to reset watchdog
-	AM_RANGE(0xc702, 0xc702) AM_READ_PORT("IN1")
-	AM_RANGE(0xc703, 0xc703) AM_READ_PORT("IN2")
-	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
-	AM_RANGE(0xc80f, 0xc80f) AM_READ(magic_r)
-	AM_RANGE(0xcc00, 0xcc00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_WRITENOP    // ???  writes 00 and 3f every frame
-	AM_RANGE(0xd800, 0xd87f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
-	AM_RANGE(0xd880, 0xd889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
-	AM_RANGE(0xd88a, 0xd88e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
-	AM_RANGE(0xd88f, 0xd88f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
-	AM_RANGE(0xd8e0, 0xd8ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+void konmedal_state::ddboy_main(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram(); // work RAM
+	map(0xc000, 0xc03f).w(m_k056832, FUNC(k056832_device::write));
+	map(0xc100, 0xc100).w(this, FUNC(konmedal_state::control2_w));
+	map(0xc400, 0xc400).w(this, FUNC(konmedal_state::bankswitch_w));
+	map(0xc500, 0xc500).noprw(); // read to reset watchdog
+	map(0xc702, 0xc702).portr("IN1");
+	map(0xc703, 0xc703).portr("IN2");
+	map(0xc800, 0xc80f).w(m_k056832, FUNC(k056832_device::b_w));
+	map(0xc80f, 0xc80f).r(this, FUNC(konmedal_state::magic_r));
+	map(0xcc00, 0xcc00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xd000, 0xd000).nopw();    // ???  writes 00 and 3f every frame
+	map(0xd800, 0xd87f).rw("k051649", FUNC(k051649_device::k051649_waveform_r), FUNC(k051649_device::k051649_waveform_w));
+	map(0xd880, 0xd889).w("k051649", FUNC(k051649_device::k051649_frequency_w));
+	map(0xd88a, 0xd88e).w("k051649", FUNC(k051649_device::k051649_volume_w));
+	map(0xd88f, 0xd88f).w("k051649", FUNC(k051649_device::k051649_keyonoff_w));
+	map(0xd8e0, 0xd8ff).rw("k051649", FUNC(k051649_device::k051649_test_r), FUNC(k051649_device::k051649_test_w));
+	map(0xe000, 0xffff).rw(this, FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
+}
 
-ADDRESS_MAP_START(konmedal_state::shuriboy_main)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("IN2")
-	AM_RANGE(0x8801, 0x8801) AM_READ_PORT("IN1")
-	AM_RANGE(0x8802, 0x8802) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8803, 0x8803) AM_READ_PORT("DSW2")
-	AM_RANGE(0x8b00, 0x8b00) AM_WRITENOP    // watchdog?
-	AM_RANGE(0x8c00, 0x8c00) AM_WRITE(shuri_bank_w)
-	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
-	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
-	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
-	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
-	AM_RANGE(0x98e0, 0x98ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdbff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
-	AM_RANGE(0xdd00, 0xdd00) AM_READWRITE(shuri_irq_r, shuri_irq_w)
-	AM_RANGE(0xdd80, 0xdd80) AM_WRITE(shuri_control_w)
-	AM_RANGE(0xde00, 0xde00) AM_WRITE(shuri_vrom_addr_w)
-	AM_RANGE(0xdf00, 0xdf00) AM_WRITE(shuri_vrom_bank_w)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(shuri_video_r, shuri_video_w)
-ADDRESS_MAP_END
+void konmedal_state::shuriboy_main(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8800).portr("IN2");
+	map(0x8801, 0x8801).portr("IN1");
+	map(0x8802, 0x8802).portr("DSW1");
+	map(0x8803, 0x8803).portr("DSW2");
+	map(0x8b00, 0x8b00).nopw();    // watchdog?
+	map(0x8c00, 0x8c00).w(this, FUNC(konmedal_state::shuri_bank_w));
+	map(0x9800, 0x987f).rw("k051649", FUNC(k051649_device::k051649_waveform_r), FUNC(k051649_device::k051649_waveform_w));
+	map(0x9880, 0x9889).w("k051649", FUNC(k051649_device::k051649_frequency_w));
+	map(0x988a, 0x988e).w("k051649", FUNC(k051649_device::k051649_volume_w));
+	map(0x988f, 0x988f).w("k051649", FUNC(k051649_device::k051649_keyonoff_w));
+	map(0x98e0, 0x98ff).rw("k051649", FUNC(k051649_device::k051649_test_r), FUNC(k051649_device::k051649_test_w));
+	map(0xa000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xdbff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
+	map(0xdd00, 0xdd00).rw(this, FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
+	map(0xdd80, 0xdd80).w(this, FUNC(konmedal_state::shuri_control_w));
+	map(0xde00, 0xde00).w(this, FUNC(konmedal_state::shuri_vrom_addr_w));
+	map(0xdf00, 0xdf00).w(this, FUNC(konmedal_state::shuri_vrom_bank_w));
+	map(0xe000, 0xffff).rw(this, FUNC(konmedal_state::shuri_video_r), FUNC(konmedal_state::shuri_video_w));
+}
 
 static INPUT_PORTS_START( konmedal )
 	PORT_START("DSW1")

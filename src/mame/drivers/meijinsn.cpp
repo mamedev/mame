@@ -189,29 +189,32 @@ READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 
 
 
-ADDRESS_MAP_START(meijinsn_state::meijinsn_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080e00, 0x080fff) AM_READ(alpha_mcu_r) AM_WRITENOP
-	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x180000, 0x180dff) AM_RAM
-	AM_RANGE(0x180e00, 0x180fff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0x181000, 0x181fff) AM_RAM
-	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P2")
-	AM_RANGE(0x1a0000, 0x1a0001) AM_READ_PORT("P1") AM_WRITE(sound_w)
-ADDRESS_MAP_END
+void meijinsn_state::meijinsn_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080e00, 0x080fff).r(this, FUNC(meijinsn_state::alpha_mcu_r)).nopw();
+	map(0x100000, 0x107fff).ram().share("videoram");
+	map(0x180000, 0x180dff).ram();
+	map(0x180e00, 0x180fff).ram().share("shared_ram");
+	map(0x181000, 0x181fff).ram();
+	map(0x1c0000, 0x1c0001).portr("P2");
+	map(0x1a0000, 0x1a0001).portr("P1").w(this, FUNC(meijinsn_state::sound_w));
+}
 
-ADDRESS_MAP_START(meijinsn_state::meijinsn_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-ADDRESS_MAP_END
+void meijinsn_state::meijinsn_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+}
 
-ADDRESS_MAP_START(meijinsn_state::meijinsn_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
-	AM_RANGE(0x06, 0x06) AM_WRITENOP
-ADDRESS_MAP_END
+void meijinsn_state::meijinsn_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x02).w(m_soundlatch, FUNC(generic_latch_8_device::clear_w));
+	map(0x06, 0x06).nopw();
+}
 
 static INPUT_PORTS_START( meijinsn )
 	PORT_START("P1")

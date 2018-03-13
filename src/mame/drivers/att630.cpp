@@ -32,15 +32,16 @@ u32 att630_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	return 0;
 }
 
-ADDRESS_MAP_START(att630_state::mem_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE8("duart1", scn2681_device, read, write, 0x00ff)
-	AM_RANGE(0x200020, 0x20003f) AM_DEVREADWRITE8("duart2", scn2681_device, read, write, 0x00ff)
-	AM_RANGE(0x760000, 0x77ffff) AM_RAM
-	AM_RANGE(0x780000, 0x7bffff) AM_RAM
-	AM_RANGE(0x7c0000, 0x7fffff) AM_RAM
-	AM_RANGE(0xe00000, 0xe03fff) AM_NOP // 0x00ff mask
-ADDRESS_MAP_END
+void att630_state::mem_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x200000, 0x20001f).rw("duart1", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
+	map(0x200020, 0x20003f).rw("duart2", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
+	map(0x760000, 0x77ffff).ram();
+	map(0x780000, 0x7bffff).ram();
+	map(0x7c0000, 0x7fffff).ram();
+	map(0xe00000, 0xe03fff).noprw(); // 0x00ff mask
+}
 
 static INPUT_PORTS_START( att630 )
 INPUT_PORTS_END

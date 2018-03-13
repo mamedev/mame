@@ -53,12 +53,13 @@ DEFINE_DEVICE_TYPE(PHILLIPS_22VP931, phillips_22vp931_device, "22vp931", "Philli
 //  22VP931 ROM AND MACHINE INTERFACES
 //**************************************************************************
 
-ADDRESS_MAP_START(phillips_22vp931_device::vp931_portmap)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xcf) AM_READWRITE(i8049_keypad_r, i8049_output0_w)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0xcf) AM_READWRITE(i8049_unknown_r, i8049_output1_w)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0xcf) AM_READWRITE(i8049_datic_r, i8049_lcd_w)
-	AM_RANGE(0x30, 0x30) AM_MIRROR(0xcf) AM_READWRITE(i8049_from_controller_r, i8049_to_controller_w)
-ADDRESS_MAP_END
+void phillips_22vp931_device::vp931_portmap(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xcf).rw(this, FUNC(phillips_22vp931_device::i8049_keypad_r), FUNC(phillips_22vp931_device::i8049_output0_w));
+	map(0x10, 0x10).mirror(0xcf).rw(this, FUNC(phillips_22vp931_device::i8049_unknown_r), FUNC(phillips_22vp931_device::i8049_output1_w));
+	map(0x20, 0x20).mirror(0xcf).rw(this, FUNC(phillips_22vp931_device::i8049_datic_r), FUNC(phillips_22vp931_device::i8049_lcd_w));
+	map(0x30, 0x30).mirror(0xcf).rw(this, FUNC(phillips_22vp931_device::i8049_from_controller_r), FUNC(phillips_22vp931_device::i8049_to_controller_w));
+}
 
 
 ROM_START( vp931 )

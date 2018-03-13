@@ -151,48 +151,52 @@ WRITE_LINE_MEMBER(tiamc1_state::pit8253_2_w)
 }
 
 
-ADDRESS_MAP_START(tiamc1_state::tiamc1_map)
-	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(tiamc1_videoram_w)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void tiamc1_state::tiamc1_map(address_map &map)
+{
+	map(0xb000, 0xb7ff).w(this, FUNC(tiamc1_state::tiamc1_videoram_w));
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(tiamc1_state::kotrybolov_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(kot_videoram_w)
-ADDRESS_MAP_END
+void tiamc1_state::kotrybolov_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xf000, 0xf3ff).w(this, FUNC(tiamc1_state::kot_videoram_w));
+}
 
-ADDRESS_MAP_START(tiamc1_state::tiamc1_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x4f) AM_WRITE(tiamc1_sprite_y_w) /* sprites Y */
-	AM_RANGE(0x50, 0x5f) AM_WRITE(tiamc1_sprite_x_w) /* sprites X */
-	AM_RANGE(0x60, 0x6f) AM_WRITE(tiamc1_sprite_n_w) /* sprites # */
-	AM_RANGE(0x70, 0x7f) AM_WRITE(tiamc1_sprite_a_w) /* sprites attributes */
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(tiamc1_palette_w)  /* color ram */
-	AM_RANGE(0xbc, 0xbc) AM_WRITE(tiamc1_bg_vshift_w)/* background V scroll */
-	AM_RANGE(0xbd, 0xbd) AM_WRITE(tiamc1_bg_hshift_w)/* background H scroll */
-	AM_RANGE(0xbe, 0xbe) AM_WRITE(tiamc1_bankswitch_w) /* VRAM selector */
-	AM_RANGE(0xbf, 0xbf) AM_WRITE(tiamc1_bg_bplctrl_w) /* charset control */
-	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE("2x8253", tiamc1_sound_device, tiamc1_timer0_w)   /* timer 0 */
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("kr580vv55a", i8255_device, read, write)    /* input ports + coin counters & lockout */
-	AM_RANGE(0xd4, 0xd7) AM_DEVWRITE("2x8253", tiamc1_sound_device, tiamc1_timer1_w)   /* timer 1 */
-	AM_RANGE(0xda, 0xda) AM_DEVWRITE("2x8253", tiamc1_sound_device, tiamc1_timer1_gate_w) /* timer 1 gate control */
-ADDRESS_MAP_END
+void tiamc1_state::tiamc1_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x4f).w(this, FUNC(tiamc1_state::tiamc1_sprite_y_w)); /* sprites Y */
+	map(0x50, 0x5f).w(this, FUNC(tiamc1_state::tiamc1_sprite_x_w)); /* sprites X */
+	map(0x60, 0x6f).w(this, FUNC(tiamc1_state::tiamc1_sprite_n_w)); /* sprites # */
+	map(0x70, 0x7f).w(this, FUNC(tiamc1_state::tiamc1_sprite_a_w)); /* sprites attributes */
+	map(0xa0, 0xaf).w(this, FUNC(tiamc1_state::tiamc1_palette_w));  /* color ram */
+	map(0xbc, 0xbc).w(this, FUNC(tiamc1_state::tiamc1_bg_vshift_w));/* background V scroll */
+	map(0xbd, 0xbd).w(this, FUNC(tiamc1_state::tiamc1_bg_hshift_w));/* background H scroll */
+	map(0xbe, 0xbe).w(this, FUNC(tiamc1_state::tiamc1_bankswitch_w)); /* VRAM selector */
+	map(0xbf, 0xbf).w(this, FUNC(tiamc1_state::tiamc1_bg_bplctrl_w)); /* charset control */
+	map(0xc0, 0xc3).w("2x8253", FUNC(tiamc1_sound_device::tiamc1_timer0_w));   /* timer 0 */
+	map(0xd0, 0xd3).rw("kr580vv55a", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* input ports + coin counters & lockout */
+	map(0xd4, 0xd7).w("2x8253", FUNC(tiamc1_sound_device::tiamc1_timer1_w));   /* timer 1 */
+	map(0xda, 0xda).w("2x8253", FUNC(tiamc1_sound_device::tiamc1_timer1_gate_w)); /* timer 1 gate control */
+}
 
-ADDRESS_MAP_START(tiamc1_state::kotrybolov_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_WRITE(tiamc1_sprite_y_w)    // sprites Y
-	AM_RANGE(0x10, 0x1f) AM_WRITE(tiamc1_sprite_x_w)    // sprites X
-	AM_RANGE(0x20, 0x2f) AM_WRITE(tiamc1_sprite_n_w)    // sprites #
-	AM_RANGE(0x30, 0x3f) AM_WRITE(tiamc1_sprite_a_w)    // sprites attributes
-	AM_RANGE(0xe0, 0xef) AM_WRITE(tiamc1_palette_w)     // color ram
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(tiamc1_bg_vshift_w)   // background V scroll
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(tiamc1_bg_hshift_w)   // background H scroll
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(kot_bankswitch_w)     // character rom offset
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("kr580vv55a", i8255_device, read, write)    /* input ports + coin counters & lockout */
-ADDRESS_MAP_END
+void tiamc1_state::kotrybolov_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x0f).w(this, FUNC(tiamc1_state::tiamc1_sprite_y_w));    // sprites Y
+	map(0x10, 0x1f).w(this, FUNC(tiamc1_state::tiamc1_sprite_x_w));    // sprites X
+	map(0x20, 0x2f).w(this, FUNC(tiamc1_state::tiamc1_sprite_n_w));    // sprites #
+	map(0x30, 0x3f).w(this, FUNC(tiamc1_state::tiamc1_sprite_a_w));    // sprites attributes
+	map(0xe0, 0xef).w(this, FUNC(tiamc1_state::tiamc1_palette_w));     // color ram
+	map(0xf0, 0xf0).w(this, FUNC(tiamc1_state::tiamc1_bg_vshift_w));   // background V scroll
+	map(0xf4, 0xf4).w(this, FUNC(tiamc1_state::tiamc1_bg_hshift_w));   // background H scroll
+	map(0xf8, 0xf8).w(this, FUNC(tiamc1_state::kot_bankswitch_w));     // character rom offset
+	map(0xc0, 0xc3).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xd0, 0xd3).rw("kr580vv55a", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* input ports + coin counters & lockout */
+}
 
 
 static INPUT_PORTS_START( tiamc1 )

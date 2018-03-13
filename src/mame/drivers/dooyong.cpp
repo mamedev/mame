@@ -794,190 +794,201 @@ uint32_t popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_in
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(dooyong_z80_ym2203_state::lastday_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
-	AM_RANGE(0xc008, 0xc00f) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
-	AM_RANGE(0xc010, 0xc010) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc010, 0xc010) AM_WRITE(lastday_ctrl_w)   /* coin counter, flip screen */
-	AM_RANGE(0xc011, 0xc011) AM_READ_PORT("P1")
-	AM_RANGE(0xc011, 0xc011) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xc012, 0xc012) AM_READ_PORT("P2")
-	AM_RANGE(0xc012, 0xc012) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc013, 0xc013) AM_READ_PORT("DSWA")
-	AM_RANGE(0xc014, 0xc014) AM_READ_PORT("DSWB")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(lastday_tx_r, lastday_tx_w)
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void dooyong_z80_ym2203_state::lastday_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc007).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xc008, 0xc00f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xc010, 0xc010).portr("SYSTEM");
+	map(0xc010, 0xc010).w(this, FUNC(dooyong_z80_ym2203_state::lastday_ctrl_w));   /* coin counter, flip screen */
+	map(0xc011, 0xc011).portr("P1");
+	map(0xc011, 0xc011).w(this, FUNC(dooyong_z80_ym2203_state::bankswitch_w));
+	map(0xc012, 0xc012).portr("P2");
+	map(0xc012, 0xc012).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc013, 0xc013).portr("DSWA");
+	map(0xc014, 0xc014).portr("DSWB");
+	map(0xc800, 0xcfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd000, 0xdfff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
+	map(0xe000, 0xefff).ram();
+	map(0xf000, 0xffff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(dooyong_z80_ym2203_state::pollux_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(lastday_tx_r, lastday_tx_w)
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSWA") AM_WRITE(bankswitch_w)
-	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSWB")
-	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("P1")
-	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("P2")
-	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf008, 0xf008) AM_WRITE(pollux_ctrl_w)    /* coin counter, flip screen */
-	AM_RANGE(0xf010, 0xf010) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf018, 0xf01f) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
-	AM_RANGE(0xf020, 0xf027) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(paletteram_flytiger_r, paletteram_flytiger_w)
-ADDRESS_MAP_END
+void dooyong_z80_ym2203_state::pollux_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xdfff).ram().share("spriteram");
+	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
+	map(0xf000, 0xf000).portr("DSWA").w(this, FUNC(dooyong_z80_ym2203_state::bankswitch_w));
+	map(0xf001, 0xf001).portr("DSWB");
+	map(0xf002, 0xf002).portr("P1");
+	map(0xf003, 0xf003).portr("P2");
+	map(0xf004, 0xf004).portr("SYSTEM");
+	map(0xf008, 0xf008).w(this, FUNC(dooyong_z80_ym2203_state::pollux_ctrl_w));    /* coin counter, flip screen */
+	map(0xf010, 0xf010).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xf018, 0xf01f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xf020, 0xf027).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xf800, 0xffff).rw(this, FUNC(dooyong_z80_ym2203_state::paletteram_flytiger_r), FUNC(dooyong_z80_ym2203_state::paletteram_flytiger_w));
+}
 
-ADDRESS_MAP_START(dooyong_z80_ym2203_state::gulfstrm_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(lastday_tx_r, lastday_tx_w)
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSWA")
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSWB")
-	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("P2")
-	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("P1")
-	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf008, 0xf008) AM_WRITE(pollux_ctrl_w)    /* coin counter, flip screen */
-	AM_RANGE(0xf010, 0xf010) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf018, 0xf01f) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
-	AM_RANGE(0xf020, 0xf027) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void dooyong_z80_ym2203_state::gulfstrm_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xdfff).ram().share("spriteram");
+	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
+	map(0xf000, 0xf000).portr("DSWA");
+	map(0xf000, 0xf000).w(this, FUNC(dooyong_z80_ym2203_state::bankswitch_w));
+	map(0xf001, 0xf001).portr("DSWB");
+	map(0xf002, 0xf002).portr("P2");
+	map(0xf003, 0xf003).portr("P1");
+	map(0xf004, 0xf004).portr("SYSTEM");
+	map(0xf008, 0xf008).w(this, FUNC(dooyong_z80_ym2203_state::pollux_ctrl_w));    /* coin counter, flip screen */
+	map(0xf010, 0xf010).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xf018, 0xf01f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xf020, 0xf027).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xf800, 0xffff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(dooyong_z80_state::bluehawk_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSWA")
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("DSWB")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P1")
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("P2")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc008, 0xc008) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xc010, 0xc010) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc018, 0xc01f) AM_DEVWRITE("fg2", dooyong_rom_tilemap_device, ctrl_w)
-	AM_RANGE(0xc040, 0xc047) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
-	AM_RANGE(0xc048, 0xc04f) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(bluehawk_tx_r, bluehawk_tx_w)
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void dooyong_z80_state::bluehawk_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc000).portr("DSWA");
+	map(0xc000, 0xc000).w(this, FUNC(dooyong_z80_state::flip_screen_w));
+	map(0xc001, 0xc001).portr("DSWB");
+	map(0xc002, 0xc002).portr("P1");
+	map(0xc003, 0xc003).portr("P2");
+	map(0xc004, 0xc004).portr("SYSTEM");
+	map(0xc008, 0xc008).w(this, FUNC(dooyong_z80_state::bankswitch_w));
+	map(0xc010, 0xc010).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc018, 0xc01f).w(m_fg2, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xc040, 0xc047).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xc048, 0xc04f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xc800, 0xcfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd000, 0xdfff).rw(this, FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
+	map(0xe000, 0xefff).ram().share("spriteram");
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(dooyong_z80_state::flytiger_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("P1")
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P2")
-	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xe006, 0xe006) AM_READ_PORT("DSWA")
-	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("DSWB")
-	AM_RANGE(0xe010, 0xe010) AM_WRITE(flytiger_ctrl_w)  /* coin counter, flip screen */
-	AM_RANGE(0xe020, 0xe020) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xe030, 0xe037) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
-	AM_RANGE(0xe040, 0xe047) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(paletteram_flytiger_r, paletteram_flytiger_w)
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(lastday_tx_r, lastday_tx_w)
-ADDRESS_MAP_END
+void dooyong_z80_state::flytiger_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram().share("spriteram");
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xe000).portr("P1");
+	map(0xe000, 0xe000).w(this, FUNC(dooyong_z80_state::bankswitch_w));
+	map(0xe002, 0xe002).portr("P2");
+	map(0xe004, 0xe004).portr("SYSTEM");
+	map(0xe006, 0xe006).portr("DSWA");
+	map(0xe008, 0xe008).portr("DSWB");
+	map(0xe010, 0xe010).w(this, FUNC(dooyong_z80_state::flytiger_ctrl_w));  /* coin counter, flip screen */
+	map(0xe020, 0xe020).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xe030, 0xe037).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xe040, 0xe047).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xe800, 0xefff).rw(this, FUNC(dooyong_z80_state::paletteram_flytiger_r), FUNC(dooyong_z80_state::paletteram_flytiger_w));
+	map(0xf000, 0xffff).rw(this, FUNC(dooyong_z80_state::lastday_tx_r), FUNC(dooyong_z80_state::lastday_tx_w));
+}
 
-ADDRESS_MAP_START(dooyong_z80_state::primella_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM /* what is this? looks like a palette? scratchpad RAM maybe? */
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(bluehawk_tx_r, bluehawk_tx_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSWA")
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(primella_ctrl_w)  /* bank switch, flip screen etc */
-	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("DSWB")
-	AM_RANGE(0xf810, 0xf810) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf820, 0xf820) AM_READ_PORT("P1")
-	AM_RANGE(0xf830, 0xf830) AM_READ_PORT("P2")
-	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("bg", dooyong_rom_tilemap_device, ctrl_w)
-	AM_RANGE(0xfc08, 0xfc0f) AM_DEVWRITE("fg", dooyong_rom_tilemap_device, ctrl_w)
-ADDRESS_MAP_END
+void dooyong_z80_state::primella_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xd3ff).ram(); /* what is this? looks like a palette? scratchpad RAM maybe? */
+	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
+	map(0xf000, 0xf7ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf800, 0xf800).portr("DSWA");
+	map(0xf800, 0xf800).w(this, FUNC(dooyong_z80_state::primella_ctrl_w));  /* bank switch, flip screen etc */
+	map(0xf810, 0xf810).portr("DSWB");
+	map(0xf810, 0xf810).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xf820, 0xf820).portr("P1");
+	map(0xf830, 0xf830).portr("P2");
+	map(0xf840, 0xf840).portr("SYSTEM");
+	map(0xfc00, 0xfc07).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xfc08, 0xfc0f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+}
 
-ADDRESS_MAP_START(rshark_state::rshark_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfffff)    /* super-x needs this and is similar */
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04cfff) AM_RAM
-	AM_RANGE(0x04d000, 0x04dfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x04e000, 0x04ffff) AM_RAM
-	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x0c0006, 0x0c0007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c4000, 0x0c400f) AM_DEVWRITE8("bg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
-	AM_RANGE(0x0c4010, 0x0c401f) AM_DEVWRITE8("bg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
-	AM_RANGE(0x0c8000, 0x0c8fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x0c0012, 0x0c0013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(ctrl_w)    /* flip screen + unknown stuff */
-	AM_RANGE(0x0cc000, 0x0cc00f) AM_DEVWRITE8("fg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
-	AM_RANGE(0x0cc010, 0x0cc01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
-ADDRESS_MAP_END
+void rshark_state::rshark_map(address_map &map)
+{
+	map.global_mask(0xfffff);    /* super-x needs this and is similar */
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x04cfff).ram();
+	map(0x04d000, 0x04dfff).ram().share("spriteram");
+	map(0x04e000, 0x04ffff).ram();
+	map(0x0c0002, 0x0c0003).portr("DSW");
+	map(0x0c0004, 0x0c0005).portr("P1_P2");
+	map(0x0c0006, 0x0c0007).portr("SYSTEM");
+	map(0x0c4000, 0x0c400f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0c4010, 0x0c401f).w(m_bg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0c8000, 0x0c8fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x0c0013, 0x0c0013).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x0c0014, 0x0c0015).w(this, FUNC(rshark_state::ctrl_w));    /* flip screen + unknown stuff */
+	map(0x0cc000, 0x0cc00f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0cc010, 0x0cc01f).w(m_fg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(rshark_state::superx_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0d0000, 0x0dcfff) AM_RAM
-	AM_RANGE(0x0dd000, 0x0ddfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0de000, 0x0dffff) AM_RAM
-	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")
-	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x084000, 0x08400f) AM_DEVWRITE8("bg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
-	AM_RANGE(0x084010, 0x08401f) AM_DEVWRITE8("bg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
-	AM_RANGE(0x088000, 0x088fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x080012, 0x080013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x080014, 0x080015) AM_WRITE(ctrl_w)    /* flip screen + unknown stuff */
-	AM_RANGE(0x08c000, 0x08c00f) AM_DEVWRITE8("fg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
-	AM_RANGE(0x08c010, 0x08c01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
-ADDRESS_MAP_END
+void rshark_state::superx_map(address_map &map)
+{
+	map.global_mask(0xfffff);
+	map(0x000000, 0x03ffff).rom();
+	map(0x0d0000, 0x0dcfff).ram();
+	map(0x0dd000, 0x0ddfff).ram().share("spriteram");
+	map(0x0de000, 0x0dffff).ram();
+	map(0x080002, 0x080003).portr("DSW");
+	map(0x080004, 0x080005).portr("P1_P2");
+	map(0x080006, 0x080007).portr("SYSTEM");
+	map(0x084000, 0x08400f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x084010, 0x08401f).w(m_bg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x088000, 0x088fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x080013, 0x080013).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x080014, 0x080015).w(this, FUNC(rshark_state::ctrl_w));    /* flip screen + unknown stuff */
+	map(0x08c000, 0x08c00f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x08c010, 0x08c01f).w(m_fg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(popbingo_state::popbingo_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04cfff) AM_RAM
-	AM_RANGE(0x04d000, 0x04dfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x04e000, 0x04ffff) AM_RAM
-	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x0c0006, 0x0c0007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c0012, 0x0c0013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(ctrl_w)
-	AM_RANGE(0x0c0018, 0x0c001b) AM_WRITENOP // ?
-	AM_RANGE(0x0c4000, 0x0c400f) AM_DEVWRITE8("bg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
-	AM_RANGE(0x0c4010, 0x0c401f) AM_DEVWRITE8("bg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff)
-	AM_RANGE(0x0c8000, 0x0c8fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+void popbingo_state::popbingo_map(address_map &map)
+{
+	map.global_mask(0xfffff);
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x04cfff).ram();
+	map(0x04d000, 0x04dfff).ram().share("spriteram");
+	map(0x04e000, 0x04ffff).ram();
+	map(0x0c0002, 0x0c0003).portr("DSW");
+	map(0x0c0004, 0x0c0005).portr("P1_P2");
+	map(0x0c0006, 0x0c0007).portr("SYSTEM");
+	map(0x0c0013, 0x0c0013).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x0c0014, 0x0c0015).w(this, FUNC(popbingo_state::ctrl_w));
+	map(0x0c0018, 0x0c001b).nopw(); // ?
+	map(0x0c4000, 0x0c400f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0c4010, 0x0c401f).w(m_bg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0c8000, 0x0c8fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	//AM_RANGE(0x08c000, 0x08c00f) AM_DEVWRITE8("fg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff) apparently not present
 	//AM_RANGE(0x08c010, 0x08c01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff) apparently not present
-	AM_RANGE(0x0dc000, 0x0dc01f) AM_RAM // registers of some kind?
-ADDRESS_MAP_END
+	map(0x0dc000, 0x0dc01f).ram(); // registers of some kind?
+}
 
-ADDRESS_MAP_START(dooyong_z80_ym2203_state::lastday_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-ADDRESS_MAP_END
+void dooyong_z80_ym2203_state::lastday_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xc800).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xf000, 0xf001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xf002, 0xf003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
-ADDRESS_MAP_START(dooyong_z80_ym2203_state::pollux_sound_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf802, 0xf803) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xf804, 0xf805) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-ADDRESS_MAP_END
+void dooyong_z80_ym2203_state::pollux_sound_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xf802, 0xf803).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xf804, 0xf805).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 ADDRESS_MAP_START(dooyong_state::bluehawk_sound_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM

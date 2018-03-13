@@ -72,38 +72,42 @@ WRITE8_MEMBER(kingpin_state::sound_nmi_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-ADDRESS_MAP_START(kingpin_state::kingpin_program_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void kingpin_state::kingpin_program_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xf000, 0xf7ff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(kingpin_state::dealracl_program_map)
-	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void kingpin_state::dealracl_program_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom();
+	map(0xc000, 0xc7ff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(kingpin_state::kingpin_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
-	AM_RANGE(0x60, 0x60) AM_WRITE(sound_nmi_w)
+void kingpin_state::kingpin_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x20, 0x20).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0x21, 0x21).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0x60, 0x60).w(this, FUNC(kingpin_state::sound_nmi_w));
 	//AM_RANGE(0x30, 0x30) AM_WRITENOP // lamps?
 	//AM_RANGE(0x40, 0x40) AM_WRITENOP // lamps?
 	//AM_RANGE(0x50, 0x50) AM_WRITENOP // ?
 	//AM_RANGE(0x70, 0x70) AM_WRITENOP // ?
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(kingpin_state::kingpin_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+void kingpin_state::kingpin_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x8000, 0x8001).w("aysnd", FUNC(ay8910_device::address_data_w));
 	//AM_RANGE(0x8400, 0x8400) AM_READNOP // ?
 	//AM_RANGE(0x8401, 0x8401) AM_WRITENOP // ?
-	AM_RANGE(0x8800, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+	map(0x8800, 0x8fff).ram();
+	map(0x9000, 0x9000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 

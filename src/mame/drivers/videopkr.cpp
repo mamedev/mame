@@ -974,43 +974,51 @@ TIMER_DEVICE_CALLBACK_MEMBER(videopkr_state::sound_t1_callback)
 * Memory Map Information *
 *************************/
 
-ADDRESS_MAP_START(videopkr_state::i8039_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void videopkr_state::i8039_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(videopkr_state::i8039_io_port)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(videopkr_io_r, videopkr_io_w)
-ADDRESS_MAP_END
+void videopkr_state::i8039_io_port(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(videopkr_state::videopkr_io_r), FUNC(videopkr_state::videopkr_io_w));
+}
 
-ADDRESS_MAP_START(videopkr_state::i8751_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void videopkr_state::i8751_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(videopkr_state::i8751_io_port)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM // NVRAM?
-	AM_RANGE(0x8000, 0x8000) AM_NOP // ???
-	AM_RANGE(0x9000, 0x9000) AM_WRITEONLY // ???
-	AM_RANGE(0xa000, 0xbfff) AM_RAM // video RAM?
-	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_WRITEONLY // ???
-ADDRESS_MAP_END
+void videopkr_state::i8751_io_port(address_map &map)
+{
+	map(0x0000, 0x0fff).ram(); // NVRAM?
+	map(0x8000, 0x8000).noprw(); // ???
+	map(0x9000, 0x9000).writeonly(); // ???
+	map(0xa000, 0xbfff).ram(); // video RAM?
+	map(0xc000, 0xc003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf000, 0xf000).writeonly(); // ???
+}
 
-ADDRESS_MAP_START(videopkr_state::i8039_sound_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void videopkr_state::i8039_sound_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(videopkr_state::i8039_sound_port)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(sound_io_r, sound_io_w)
-ADDRESS_MAP_END
+void videopkr_state::i8039_sound_port(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(videopkr_state::sound_io_r), FUNC(videopkr_state::sound_io_w));
+}
 
 
-ADDRESS_MAP_START(videopkr_state::i8051_sound_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void videopkr_state::i8051_sound_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(videopkr_state::i8051_sound_port)
-	AM_RANGE(0x0000, 0x1ff) AM_RAM
-ADDRESS_MAP_END
+void videopkr_state::i8051_sound_port(address_map &map)
+{
+	map(0x0000, 0x1ff).ram();
+}
 
 
 /************************

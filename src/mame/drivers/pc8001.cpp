@@ -166,32 +166,34 @@ WRITE8_MEMBER( pc8001_state::port40_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(pc8001_state::pc8001_mem)
-	AM_RANGE(0x0000, 0x5fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank3")
-ADDRESS_MAP_END
+void pc8001_state::pc8001_mem(address_map &map)
+{
+	map(0x0000, 0x5fff).bankrw("bank1");
+	map(0x6000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xffff).bankrw("bank3");
+}
 
-ADDRESS_MAP_START(pc8001_state::pc8001_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("Y0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("Y1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("Y2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("Y3")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("Y4")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("Y5")
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("Y6")
-	AM_RANGE(0x07, 0x07) AM_READ_PORT("Y7")
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("Y8")
-	AM_RANGE(0x09, 0x09) AM_READ_PORT("Y9")
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0f) AM_WRITE(port10_w)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0e) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0x21, 0x21) AM_MIRROR(0x0e) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
-	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE(port30_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_READWRITE(port40_r, port40_w)
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE(UPD3301_TAG, upd3301_device, read, write)
-	AM_RANGE(0x60, 0x68) AM_DEVREADWRITE(I8257_TAG, i8257_device, read, write)
+void pc8001_state::pc8001_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x00).portr("Y0");
+	map(0x01, 0x01).portr("Y1");
+	map(0x02, 0x02).portr("Y2");
+	map(0x03, 0x03).portr("Y3");
+	map(0x04, 0x04).portr("Y4");
+	map(0x05, 0x05).portr("Y5");
+	map(0x06, 0x06).portr("Y6");
+	map(0x07, 0x07).portr("Y7");
+	map(0x08, 0x08).portr("Y8");
+	map(0x09, 0x09).portr("Y9");
+	map(0x10, 0x10).mirror(0x0f).w(this, FUNC(pc8001_state::port10_w));
+	map(0x20, 0x20).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x21, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x30, 0x30).mirror(0x0f).w(this, FUNC(pc8001_state::port30_w));
+	map(0x40, 0x40).mirror(0x0f).rw(this, FUNC(pc8001_state::port40_r), FUNC(pc8001_state::port40_w));
+	map(0x50, 0x51).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
+	map(0x60, 0x68).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 //  AM_RANGE(0x70, 0x7f) unused
 //  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext0_w)
 //  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext1_w)
@@ -216,20 +218,22 @@ ADDRESS_MAP_START(pc8001_state::pc8001_io)
 //  AM_RANGE(0xe6, 0xe6) AM_WRITE(irq_mask_w)
 //  AM_RANGE(0xe7, 0xe7) AM_WRITE(pc8012_memory_mode_w)
 //  AM_RANGE(0xe8, 0xfb) unused
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
-ADDRESS_MAP_END
+	map(0xfc, 0xff).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(pc8001mk2_state::pc8001mk2_mem)
-	AM_RANGE(0x0000, 0x5fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void pc8001mk2_state::pc8001mk2_mem(address_map &map)
+{
+	map(0x0000, 0x5fff).bankrw("bank1");
+	map(0x6000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
-ADDRESS_MAP_START(pc8001mk2_state::pc8001mk2_io)
-	AM_IMPORT_FROM(pc8001_io)
-	AM_RANGE(0x30, 0x30) AM_WRITE(port30_w)
-	AM_RANGE(0x31, 0x31) AM_WRITE(port31_w)
+void pc8001mk2_state::pc8001mk2_io(address_map &map)
+{
+	pc8001_io(map);
+	map(0x30, 0x30).w(this, FUNC(pc8001mk2_state::port30_w));
+	map(0x31, 0x31).w(this, FUNC(pc8001mk2_state::port31_w));
 //  AM_RANGE(0x5c, 0x5c) AM_WRITE(gram_on_w)
 //  AM_RANGE(0x5f, 0x5f) AM_WRITE(gram_off_w)
 //  AM_RANGE(0xe8, 0xe8) kanji_address_lo_w, kanji_data_lo_r
@@ -245,7 +249,7 @@ ADDRESS_MAP_START(pc8001mk2_state::pc8001mk2_io)
 //  AM_RANGE(0xf9, 0xf9) DMA type 5 inch margin control
 //  AM_RANGE(0xfa, 0xfa) DMA type 5 inch FDC status
 //  AM_RANGE(0xfb, 0xfb) DMA type 5 inch FDC data register
-ADDRESS_MAP_END
+}
 
 /* Input Ports */
 

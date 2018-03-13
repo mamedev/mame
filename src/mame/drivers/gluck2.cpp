@@ -308,22 +308,23 @@ WRITE8_MEMBER(gluck2_state::counters_w)
 *           Memory map information           *
 *********************************************/
 
-ADDRESS_MAP_START(gluck2_state::gluck2_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0844, 0x084b) AM_NOP /* see below */
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram") /* 6116 #1 (2K x 8) RAM (only 1st half used) */
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram") /* 6116 #2 (2K x 8) RAM (only 1st half used) */
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SW1")
-	AM_RANGE(0x2d00, 0x2d01) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0x3400, 0x3400) AM_READ_PORT("IN0")
-	AM_RANGE(0x3500, 0x3500) AM_READ_PORT("IN1")
-	AM_RANGE(0x3600, 0x3600) AM_READ_PORT("IN2")
-	AM_RANGE(0x3700, 0x3700) AM_WRITE(counters_w )
-	AM_RANGE(0x3d00, 0x3d01) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, address_data_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void gluck2_state::gluck2_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x084b).noprw(); /* see below */
+	map(0x1000, 0x13ff).ram().w(this, FUNC(gluck2_state::videoram_w)).share("videoram"); /* 6116 #1 (2K x 8) RAM (only 1st half used) */
+	map(0x1800, 0x1bff).ram().w(this, FUNC(gluck2_state::colorram_w)).share("colorram"); /* 6116 #2 (2K x 8) RAM (only 1st half used) */
+	map(0x2000, 0x2000).portr("SW1");
+	map(0x2d00, 0x2d01).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x3400, 0x3400).portr("IN0");
+	map(0x3500, 0x3500).portr("IN1");
+	map(0x3600, 0x3600).portr("IN2");
+	map(0x3700, 0x3700).w(this, FUNC(gluck2_state::counters_w));
+	map(0x3d00, 0x3d01).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x4000, 0xffff).rom();
+}
 
 /*
   0844-0847    PIA0 leftover???

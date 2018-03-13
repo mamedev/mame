@@ -404,32 +404,35 @@ WRITE8_MEMBER(mz2000_state::mz2000_gvram_mask_w)
 	m_gvram_mask = data;
 }
 
-ADDRESS_MAP_START(mz2000_state::mz2000_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(mz2000_mem_r,mz2000_mem_w)
-ADDRESS_MAP_END
+void mz2000_state::mz2000_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(mz2000_state::mz2000_mem_r), FUNC(mz2000_state::mz2000_mem_w));
+}
 
-ADDRESS_MAP_START(mz2000_state::mz80b_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xd8, 0xdb) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0xdc, 0xdc) AM_WRITE(floppy_select_w)
-	AM_RANGE(0xdd, 0xdd) AM_WRITE(floppy_side_w)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
+void mz2000_state::mz80b_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xd8, 0xdb).rw(this, FUNC(mz2000_state::fdc_r), FUNC(mz2000_state::fdc_w));
+	map(0xdc, 0xdc).w(this, FUNC(mz2000_state::floppy_select_w));
+	map(0xdd, 0xdd).w(this, FUNC(mz2000_state::floppy_side_w));
+	map(0xe0, 0xe3).rw("i8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe4, 0xe7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xe8, 0xeb).rw("z80pio_1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0xf0, 0xf3).w(this, FUNC(mz2000_state::timer_w));
 //  AM_RANGE(0xf4, 0xf4) AM_WRITE(vram_bank_w)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(mz2000_state::mz2000_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_IMPORT_FROM(mz80b_io)
-	AM_RANGE(0xf5, 0xf5) AM_WRITE(mz2000_tvram_attr_w)
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(mz2000_gvram_mask_w)
-	AM_RANGE(0xf7, 0xf7) AM_WRITE(mz2000_gvram_bank_w)
-ADDRESS_MAP_END
+void mz2000_state::mz2000_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	mz80b_io(map);
+	map(0xf5, 0xf5).w(this, FUNC(mz2000_state::mz2000_tvram_attr_w));
+	map(0xf6, 0xf6).w(this, FUNC(mz2000_state::mz2000_gvram_mask_w));
+	map(0xf7, 0xf7).w(this, FUNC(mz2000_state::mz2000_gvram_bank_w));
+}
 
 
 /*

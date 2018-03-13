@@ -51,14 +51,16 @@ WRITE8_MEMBER(amerihok_state::control_w)
 	m_oki->ch2_w(!BIT(data, 7));
 }
 
-ADDRESS_MAP_START(amerihok_state::amerihok_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void amerihok_state::amerihok_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(amerihok_state::amerihok_data_map)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(control_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("oki", okim6376_device, write)
-ADDRESS_MAP_END
+void amerihok_state::amerihok_data_map(address_map &map)
+{
+	map(0x2000, 0x2000).w(this, FUNC(amerihok_state::control_w));
+	map(0x4000, 0x4000).w(m_oki, FUNC(okim6376_device::write));
+}
 
 static INPUT_PORTS_START( amerihok )
 INPUT_PORTS_END

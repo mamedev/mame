@@ -77,55 +77,58 @@ READ8_MEMBER(sidearms_state::turtship_ports_r)
 }
 
 
-ADDRESS_MAP_START(sidearms_state::sidearms_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("SYSTEM") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("P1") AM_WRITE(bankswitch_w)
-	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("P2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("DSW0")
-	AM_RANGE(0xc804, 0xc804) AM_READ_PORT("DSW1") AM_WRITE(c804_w)
-	AM_RANGE(0xc805, 0xc805) AM_READ_PORT("DSW2") AM_WRITE(star_scrollx_w)
-	AM_RANGE(0xc806, 0xc806) AM_WRITE(star_scrolly_w)
-	AM_RANGE(0xc808, 0xc809) AM_WRITEONLY AM_SHARE("bg_scrollx")
-	AM_RANGE(0xc80a, 0xc80b) AM_WRITEONLY AM_SHARE("bg_scrolly")
-	AM_RANGE(0xc80c, 0xc80c) AM_WRITE(gfxctrl_w)   /* background and sprite enable */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void sidearms_state::sidearms_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xc400, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xc800, 0xc800).portr("SYSTEM").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc801, 0xc801).portr("P1").w(this, FUNC(sidearms_state::bankswitch_w));
+	map(0xc802, 0xc802).portr("P2").w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xc803, 0xc803).portr("DSW0");
+	map(0xc804, 0xc804).portr("DSW1").w(this, FUNC(sidearms_state::c804_w));
+	map(0xc805, 0xc805).portr("DSW2").w(this, FUNC(sidearms_state::star_scrollx_w));
+	map(0xc806, 0xc806).w(this, FUNC(sidearms_state::star_scrolly_w));
+	map(0xc808, 0xc809).writeonly().share("bg_scrollx");
+	map(0xc80a, 0xc80b).writeonly().share("bg_scrolly");
+	map(0xc80c, 0xc80c).w(this, FUNC(sidearms_state::gfxctrl_w));   /* background and sprite enable */
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(sidearms_state::videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(sidearms_state::colorram_w)).share("colorram");
+	map(0xe000, 0xefff).ram();
+	map(0xf000, 0xffff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(sidearms_state::turtship_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xe800, 0xe807) AM_READ(turtship_ports_r)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xe802, 0xe802) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xe804, 0xe804) AM_WRITE(c804_w)
-	AM_RANGE(0xe805, 0xe805) AM_WRITE(star_scrollx_w)
-	AM_RANGE(0xe806, 0xe806) AM_WRITE(star_scrolly_w)
-	AM_RANGE(0xe808, 0xe809) AM_WRITEONLY AM_SHARE("bg_scrollx")
-	AM_RANGE(0xe80a, 0xe80b) AM_WRITEONLY AM_SHARE("bg_scrolly")
-	AM_RANGE(0xe80c, 0xe80c) AM_WRITE(gfxctrl_w)   /* background and sprite enable */
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-ADDRESS_MAP_END
+void sidearms_state::turtship_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xdfff).ram().share("spriteram");
+	map(0xe000, 0xe3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xe400, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xe800, 0xe807).r(this, FUNC(sidearms_state::turtship_ports_r));
+	map(0xe800, 0xe800).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xe801, 0xe801).w(this, FUNC(sidearms_state::bankswitch_w));
+	map(0xe802, 0xe802).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xe804, 0xe804).w(this, FUNC(sidearms_state::c804_w));
+	map(0xe805, 0xe805).w(this, FUNC(sidearms_state::star_scrollx_w));
+	map(0xe806, 0xe806).w(this, FUNC(sidearms_state::star_scrolly_w));
+	map(0xe808, 0xe809).writeonly().share("bg_scrollx");
+	map(0xe80a, 0xe80b).writeonly().share("bg_scrolly");
+	map(0xe80c, 0xe80c).w(this, FUNC(sidearms_state::gfxctrl_w));   /* background and sprite enable */
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(sidearms_state::videoram_w)).share("videoram");
+	map(0xf800, 0xffff).ram().w(this, FUNC(sidearms_state::colorram_w)).share("colorram");
+}
 
-ADDRESS_MAP_START(sidearms_state::sidearms_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-ADDRESS_MAP_END
+void sidearms_state::sidearms_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xd000, 0xd000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xf000, 0xf001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xf002, 0xf003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 /* Whizz */
 
@@ -142,41 +145,44 @@ WRITE8_MEMBER(sidearms_state::whizz_bankswitch_w)
 	membank("bank1")->set_entry(bank);
 }
 
-ADDRESS_MAP_START(sidearms_state::whizz_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("DSW0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("DSW1") AM_WRITE(whizz_bankswitch_w)
-	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("DSW2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("IN0") AM_WRITENOP
-	AM_RANGE(0xc804, 0xc804) AM_READ_PORT("IN1") AM_WRITE(c804_w)
-	AM_RANGE(0xc805, 0xc805) AM_READ_PORT("IN2") AM_WRITENOP
-	AM_RANGE(0xc806, 0xc806) AM_READ_PORT("IN3")
-	AM_RANGE(0xc807, 0xc807) AM_READ_PORT("IN4")
-	AM_RANGE(0xc808, 0xc809) AM_WRITEONLY AM_SHARE("bg_scrollx")
-	AM_RANGE(0xc80a, 0xc80b) AM_WRITEONLY AM_SHARE("bg_scrolly")
-	AM_RANGE(0xc80c, 0xc80c) AM_WRITE(gfxctrl_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xe805, 0xe805) AM_WRITE(star_scrollx_w)
-	AM_RANGE(0xe806, 0xe806) AM_WRITE(star_scrolly_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void sidearms_state::whizz_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xc400, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xc800, 0xc800).portr("DSW0").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc801, 0xc801).portr("DSW1").w(this, FUNC(sidearms_state::whizz_bankswitch_w));
+	map(0xc802, 0xc802).portr("DSW2").w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xc803, 0xc803).portr("IN0").nopw();
+	map(0xc804, 0xc804).portr("IN1").w(this, FUNC(sidearms_state::c804_w));
+	map(0xc805, 0xc805).portr("IN2").nopw();
+	map(0xc806, 0xc806).portr("IN3");
+	map(0xc807, 0xc807).portr("IN4");
+	map(0xc808, 0xc809).writeonly().share("bg_scrollx");
+	map(0xc80a, 0xc80b).writeonly().share("bg_scrolly");
+	map(0xc80c, 0xc80c).w(this, FUNC(sidearms_state::gfxctrl_w));
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(sidearms_state::videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(sidearms_state::colorram_w)).share("colorram");
+	map(0xe000, 0xefff).ram();
+	map(0xe805, 0xe805).w(this, FUNC(sidearms_state::star_scrollx_w));
+	map(0xe806, 0xe806).w(this, FUNC(sidearms_state::star_scrolly_w));
+	map(0xf000, 0xffff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(sidearms_state::whizz_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void sidearms_state::whizz_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(sidearms_state::whizz_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_WRITENOP
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void sidearms_state::whizz_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x40, 0x40).nopw();
+	map(0xc0, 0xc0).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( sidearms )

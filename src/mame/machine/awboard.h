@@ -18,7 +18,7 @@ public:
 
 	static void static_set_keyregion(device_t &device, const char *keyregion);
 
-	void submap(address_map &map);
+	virtual void submap(address_map &map) override;
 
 	DECLARE_WRITE16_MEMBER(epr_offsetl_w);          // 5f7000
 	DECLARE_WRITE16_MEMBER(epr_offseth_w);          // 5f7004

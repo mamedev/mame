@@ -84,38 +84,42 @@ WRITE8_MEMBER(gundealr_state::yamyam_bankswitch_w)
 
 
 
-ADDRESS_MAP_START(gundealr_state::base_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW0")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("IN0")
-	AM_RANGE(0xc005, 0xc005) AM_READ_PORT("IN1")
-	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("IN2")
-	AM_RANGE(0xc016, 0xc016) AM_WRITE(yamyam_bankswitch_w)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(gundealr_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gundealr_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(gundealr_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("rambase")
-ADDRESS_MAP_END
+void gundealr_state::base_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc000).portr("DSW0");
+	map(0xc001, 0xc001).portr("DSW1");
+	map(0xc004, 0xc004).portr("IN0");
+	map(0xc005, 0xc005).portr("IN1");
+	map(0xc006, 0xc006).portr("IN2");
+	map(0xc016, 0xc016).w(this, FUNC(gundealr_state::yamyam_bankswitch_w));
+	map(0xc400, 0xc7ff).ram().w(this, FUNC(gundealr_state::gundealr_paletteram_w)).share("paletteram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(gundealr_state::gundealr_bg_videoram_w)).share("bg_videoram");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(gundealr_state::gundealr_fg_videoram_w)).share("fg_videoram");
+	map(0xe000, 0xffff).ram().share("rambase");
+}
 
-ADDRESS_MAP_START(gundealr_state::gundealr_main_map)
-	AM_IMPORT_FROM(base_map)
-	AM_RANGE(0xc014, 0xc014) AM_WRITE(gundealr_flipscreen_w)
-	AM_RANGE(0xc020, 0xc023) AM_WRITE(gundealr_fg_scroll_w)
-ADDRESS_MAP_END
+void gundealr_state::gundealr_main_map(address_map &map)
+{
+	base_map(map);
+	map(0xc014, 0xc014).w(this, FUNC(gundealr_state::gundealr_flipscreen_w));
+	map(0xc020, 0xc023).w(this, FUNC(gundealr_state::gundealr_fg_scroll_w));
+}
 
-ADDRESS_MAP_START(gundealr_state::yamyam_main_map)
-	AM_IMPORT_FROM(base_map)
-	AM_RANGE(0xc010, 0xc013) AM_WRITE(yamyam_fg_scroll_w)
-	AM_RANGE(0xc014, 0xc014) AM_WRITE(yamyam_flipscreen_w)
-	AM_RANGE(0xc015, 0xc015) AM_WRITENOP // Bit 7 = MCU reset?
-ADDRESS_MAP_END
+void gundealr_state::yamyam_main_map(address_map &map)
+{
+	base_map(map);
+	map(0xc010, 0xc013).w(this, FUNC(gundealr_state::yamyam_fg_scroll_w));
+	map(0xc014, 0xc014).w(this, FUNC(gundealr_state::yamyam_flipscreen_w));
+	map(0xc015, 0xc015).nopw(); // Bit 7 = MCU reset?
+}
 
-ADDRESS_MAP_START(gundealr_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-ADDRESS_MAP_END
+void gundealr_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 
 

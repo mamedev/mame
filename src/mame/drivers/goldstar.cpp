@@ -330,73 +330,76 @@ WRITE8_MEMBER(goldstar_state::p2_lamps_w)
 }
 
 
-ADDRESS_MAP_START(goldstar_state::goldstar_map)
-	AM_RANGE(0x0000, 0xb7ff) AM_ROM
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w ) AM_SHARE("fg_vidram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w ) AM_SHARE("fg_atrram")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
-	AM_RANGE(0xf040, 0xf07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xf0c0, 0xf0ff) AM_RAM AM_SHARE("reel3_scroll")
+void goldstar_state::goldstar_map(address_map &map)
+{
+	map(0x0000, 0xb7ff).rom();
+	map(0xb800, 0xbfff).ram().share("nvram");
+	map(0xc000, 0xc7ff).rom();
+	map(0xc800, 0xcfff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xd800, 0xd9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe000, 0xe1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe800, 0xe9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf040, 0xf07f).ram().share("reel1_scroll");
+	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
+	map(0xf0c0, 0xf0ff).ram().share("reel3_scroll");
 
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("IN0")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")    /* Test Mode */
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("DSW1")
+	map(0xf800, 0xf800).portr("IN0");
+	map(0xf801, 0xf801).portr("IN1");    /* Test Mode */
+	map(0xf802, 0xf802).portr("DSW1");
 //  AM_RANGE(0xf803, 0xf803)
 //  AM_RANGE(0xf804, 0xf804)
-	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW4")   /* DSW 4 (also appears in 8910 port) */
-	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("DSW7")   /* (don't know to which one of the */
-	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("UNK1")
-	AM_RANGE(0xf811, 0xf811) AM_READ_PORT("UNK2")
-	AM_RANGE(0xf820, 0xf820) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xf900, 0xf900) AM_WRITE(p1_lamps_w)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
-	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xfd00, 0xfdff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
-ADDRESS_MAP_END
+	map(0xf805, 0xf805).portr("DSW4");   /* DSW 4 (also appears in 8910 port) */
+	map(0xf806, 0xf806).portr("DSW7");   /* (don't know to which one of the */
+	map(0xf810, 0xf810).portr("UNK1");
+	map(0xf811, 0xf811).portr("UNK2");
+	map(0xf820, 0xf820).portr("DSW2");
+	map(0xf830, 0xf830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xf840, 0xf840).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xf900, 0xf900).w(this, FUNC(goldstar_state::p1_lamps_w));
+	map(0xfa00, 0xfa00).w(this, FUNC(goldstar_state::goldstar_fa00_w));
+	map(0xfb00, 0xfb00).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xfd00, 0xfdff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xfe00, 0xfe00).rw(this, FUNC(goldstar_state::protection_r), FUNC(goldstar_state::protection_w));
+}
 
-ADDRESS_MAP_START(goldstar_state::goldstar_readport)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW6")
-ADDRESS_MAP_END
+void goldstar_state::goldstar_readport(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x10).portr("DSW6");
+}
 
 
-ADDRESS_MAP_START(sanghopm_state::star100_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
+void sanghopm_state::star100_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
 
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(fg_vidram_w) AM_SHARE("fg_vidram")    // videoram 1
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_atrram_w) AM_SHARE("fg_atrram")    // atrram 1
+	map(0xc800, 0xcfff).ram().w(this, FUNC(sanghopm_state::fg_vidram_w)).share("fg_vidram");    // videoram 1
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(sanghopm_state::fg_atrram_w)).share("fg_atrram");    // atrram 1
 
-	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xd840, 0xd9ff) AM_RAM
-	AM_RANGE(0xda00, 0xda3f) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xda40, 0xdbff) AM_RAM
-	AM_RANGE(0xdc00, 0xdc3f) AM_RAM AM_SHARE("reel3_scroll")
-	AM_RANGE(0xdc40, 0xdfff) AM_RAM
+	map(0xd800, 0xd83f).ram().share("reel1_scroll");
+	map(0xd840, 0xd9ff).ram();
+	map(0xda00, 0xda3f).ram().share("reel2_scroll");
+	map(0xda40, 0xdbff).ram();
+	map(0xdc00, 0xdc3f).ram().share("reel3_scroll");
+	map(0xdc40, 0xdfff).ram();
 
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xe200, 0xe3ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
+	map(0xe000, 0xe1ff).ram().w(this, FUNC(sanghopm_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe200, 0xe3ff).ram().w(this, FUNC(sanghopm_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe400, 0xe5ff).ram().w(this, FUNC(sanghopm_state::goldstar_reel3_ram_w)).share("reel3_ram");
 
-	AM_RANGE(0xe600, 0xe7ff) AM_RAM_WRITE(bg_vidram_w) AM_SHARE("bg_vidram")    // videoram 2
+	map(0xe600, 0xe7ff).ram().w(this, FUNC(sanghopm_state::bg_vidram_w)).share("bg_vidram");    // videoram 2
 
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(reel1_attrram_w) AM_SHARE("reel1_attrram")
-	AM_RANGE(0xea00, 0xebff) AM_RAM_WRITE(reel2_attrram_w) AM_SHARE("reel2_attrram")
-	AM_RANGE(0xec00, 0xedff) AM_RAM_WRITE(reel3_attrram_w) AM_SHARE("reel3_attrram")
+	map(0xe800, 0xe9ff).ram().w(this, FUNC(sanghopm_state::reel1_attrram_w)).share("reel1_attrram");
+	map(0xea00, 0xebff).ram().w(this, FUNC(sanghopm_state::reel2_attrram_w)).share("reel2_attrram");
+	map(0xec00, 0xedff).ram().w(this, FUNC(sanghopm_state::reel3_attrram_w)).share("reel3_attrram");
 
-	AM_RANGE(0xee00, 0xefff) AM_RAM_WRITE(bg_atrram_w) AM_SHARE("bg_atrram")    // atrram 2
+	map(0xee00, 0xefff).ram().w(this, FUNC(sanghopm_state::bg_atrram_w)).share("bg_atrram");    // atrram 2
 
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM
+	map(0xf000, 0xf7ff).ram().share("nvram");
+	map(0xf800, 0xffff).ram();
 
-ADDRESS_MAP_END
+}
 
 
 WRITE8_MEMBER(sanghopm_state::coincount_w)
@@ -423,34 +426,35 @@ WRITE8_MEMBER(sanghopm_state::enable_w)
 	m_enable_reg = data;
 }
 
-ADDRESS_MAP_START(sanghopm_state::star100_readport)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void sanghopm_state::star100_readport(address_map &map)
+{
+	map.global_mask(0xff);
 
-	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	map(0x08, 0x08).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x0c, 0x0c).w("aysnd", FUNC(ay8910_device::address_w));
 
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN2")
-	AM_RANGE(0x13, 0x13) AM_READ_PORT("IN3")
-	AM_RANGE(0x14, 0x14) AM_READ_PORT("DSW1")
+	map(0x10, 0x10).portr("IN0");
+	map(0x11, 0x11).portr("IN1");
+	map(0x12, 0x12).portr("IN2");
+	map(0x13, 0x13).portr("IN3");
+	map(0x14, 0x14).portr("DSW1");
 
-	AM_RANGE(0x1c, 0x1c) AM_DEVWRITE("ramdac", ramdac_device, index_w)
-	AM_RANGE(0x1d ,0x1d) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
-	AM_RANGE(0x1e ,0x1e) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
+	map(0x1c, 0x1c).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x1d, 0x1d).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x1e, 0x1e).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW4-0")     // the first 4 bits map to DSW4 1 to 4.
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW4-1")     // the first 4 bits map to DSW4 5 to 8.
+	map(0x20, 0x20).portr("DSW4-0");     // the first 4 bits map to DSW4 1 to 4.
+	map(0x21, 0x21).portr("DSW4-1");     // the first 4 bits map to DSW4 5 to 8.
 
-	AM_RANGE(0x24, 0x24) AM_WRITE(coincount_w)      // coin counters.
+	map(0x24, 0x24).w(this, FUNC(sanghopm_state::coincount_w));      // coin counters.
 
-	AM_RANGE(0x25, 0x25) AM_READ_PORT("DSW2")
-	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW3")
+	map(0x25, 0x25).portr("DSW2");
+	map(0x26, 0x26).portr("DSW3");
 
-	AM_RANGE(0xe0, 0xe0) AM_WRITENOP                // Writing 0's and 1's constantly.  Watchdog feeder?
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(enable_w)         // enable/disable reels register.
+	map(0xe0, 0xe0).nopw();                // Writing 0's and 1's constantly.  Watchdog feeder?
+	map(0xe1, 0xe1).w(this, FUNC(sanghopm_state::enable_w));         // enable/disable reels register.
 
-ADDRESS_MAP_END
+}
 
 /*
   08:  W (3F)   AY8910 data
@@ -601,30 +605,31 @@ WRITE8_MEMBER(goldstar_state::ncb3_port81_w)
 }
 
 
-ADDRESS_MAP_START(cb3_state::ncb3_map)
-	AM_RANGE(0x0000, 0xb7ff) AM_ROM
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-	AM_RANGE(0xf040, 0xf07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_SHARE("reel3_scroll") // moved compared to goldstar
+void cb3_state::ncb3_map(address_map &map)
+{
+	map(0x0000, 0xb7ff).rom();
+	map(0xb800, 0xbfff).ram().share("nvram");
+	map(0xc000, 0xc7ff).rom();
+	map(0xc800, 0xcfff).ram().w(this, FUNC(cb3_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(cb3_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xd800, 0xd9ff).ram().w(this, FUNC(cb3_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe000, 0xe1ff).ram().w(this, FUNC(cb3_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe800, 0xe9ff).ram().w(this, FUNC(cb3_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf040, 0xf07f).ram().share("reel1_scroll");
+	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
+	map(0xf100, 0xf17f).ram().share("reel3_scroll"); // moved compared to goldstar
 
-	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xf810, 0xf813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xf820, 0xf823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
-	AM_RANGE(0xf822, 0xf822) AM_WRITE(goldstar_fa00_w) // hack (connected to ppi output port?, needed for colour banking)
+	map(0xf800, 0xf803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xf810, 0xf813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xf820, 0xf823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
+	map(0xf822, 0xf822).w(this, FUNC(cb3_state::goldstar_fa00_w)); // hack (connected to ppi output port?, needed for colour banking)
 
-	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xf850, 0xf850) AM_WRITE(p1_lamps_w)       /* Control Set 1 lamps */
-	AM_RANGE(0xf860, 0xf860) AM_WRITE(p2_lamps_w)       /* Control Set 2 lamps */
-	AM_RANGE(0xf870, 0xf870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* guess... device is initialized, but doesn't seems to be used.*/
-ADDRESS_MAP_END
+	map(0xf830, 0xf830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xf840, 0xf840).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xf850, 0xf850).w(this, FUNC(cb3_state::p1_lamps_w));       /* Control Set 1 lamps */
+	map(0xf860, 0xf860).w(this, FUNC(cb3_state::p2_lamps_w));       /* Control Set 2 lamps */
+	map(0xf870, 0xf870).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
+}
 
 ADDRESS_MAP_START(goldstar_state::ncb3_readwriteport)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -669,38 +674,40 @@ ADDRESS_MAP_END
 */
 
 
-ADDRESS_MAP_START(goldstar_state::wcherry_map)
-	AM_RANGE(0x0000, 0xb7ff) AM_ROM
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc000, 0xc7ff) AM_ROM
+void goldstar_state::wcherry_map(address_map &map)
+{
+	map(0x0000, 0xb7ff).rom();
+	map(0xb800, 0xbfff).ram().share("nvram");
+	map(0xc000, 0xc7ff).rom();
 
 	/* Video RAM and reels stuff are there just as placeholder, and obviously in wrong offset */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w ) AM_SHARE("fg_vidram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w ) AM_SHARE("fg_atrram")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
-	AM_RANGE(0xf040, 0xf07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xf0c0, 0xf0ff) AM_RAM AM_SHARE("reel3_scroll")
+	map(0xc800, 0xcfff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xd800, 0xd9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe000, 0xe1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe800, 0xe9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf040, 0xf07f).ram().share("reel1_scroll");
+	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
+	map(0xf0c0, 0xf0ff).ram().share("reel3_scroll");
 
 	/* Not really PPI's... They are emulated/simulated inside the CPLDs */
-	AM_RANGE(0xf600, 0xf603) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xf610, 0xf613) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xf620, 0xf623) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
+	map(0xf600, 0xf603).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xf610, 0xf613).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xf620, 0xf623).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
 
-	AM_RANGE(0xf630, 0xf630) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0xf640, 0xf640) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xf650, 0xf650) AM_WRITENOP    // AM_WRITE(output_w)  // unknown register: 0x3e
-	AM_RANGE(0xf660, 0xf660) AM_WRITENOP    // AM_WRITE(output_w)  // unknown register: 0x3e
-	AM_RANGE(0xf670, 0xf670) AM_DEVWRITE("snsnd", sn76489_device, write)    /* guess... device is initialized, but doesn't seems to be used.*/
+	map(0xf630, 0xf630).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xf640, 0xf640).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xf650, 0xf650).nopw();    // AM_WRITE(output_w)  // unknown register: 0x3e
+	map(0xf660, 0xf660).nopw();    // AM_WRITE(output_w)  // unknown register: 0x3e
+	map(0xf670, 0xf670).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
 
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(goldstar_state::wcherry_readwriteport)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_END
+void goldstar_state::wcherry_readwriteport(address_map &map)
+{
+	map.global_mask(0xff);
+	}
 
 /* wcherry findings...
 
@@ -723,27 +730,28 @@ ADDRESS_MAP_START(goldstar_state::wcherry_readwriteport)
 */
 
 
-ADDRESS_MAP_START(goldstar_state::cm_map)
-	AM_RANGE(0x0000, 0xcfff) AM_ROM AM_WRITENOP
+void goldstar_state::cm_map(address_map &map)
+{
+	map(0x0000, 0xcfff).rom().nopw();
 
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
+	map(0xd000, 0xd7ff).ram().share("nvram");
+	map(0xd800, 0xdfff).ram();
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
-	AM_RANGE(0xf600, 0xf7ff) AM_RAM
+	map(0xf000, 0xf1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf600, 0xf7ff).ram();
 
-	AM_RANGE(0xf800, 0xf87f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xf880, 0xf9ff) AM_RAM
-	AM_RANGE(0xfa00, 0xfa7f) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xfa80, 0xfbff) AM_RAM
-	AM_RANGE(0xfc00, 0xfc7f) AM_RAM AM_SHARE("reel3_scroll")
-	AM_RANGE(0xfc80, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf800, 0xf87f).ram().share("reel1_scroll");
+	map(0xf880, 0xf9ff).ram();
+	map(0xfa00, 0xfa7f).ram().share("reel2_scroll");
+	map(0xfa80, 0xfbff).ram();
+	map(0xfc00, 0xfc7f).ram().share("reel3_scroll");
+	map(0xfc80, 0xffff).ram();
+}
 
 
 ADDRESS_MAP_START(goldstar_state::nfm_map)
@@ -793,76 +801,81 @@ WRITE8_MEMBER(goldstar_state::cm_coincount_w)
 		popmessage("counters: %02X", data);
 }
 
-ADDRESS_MAP_START(cmaster_state::cm_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Inputs */
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
-	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(cm_coincount_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(p1_lamps_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(girl_scroll_w)
-ADDRESS_MAP_END
+void cmaster_state::cm_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x04, 0x07).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Inputs */
+	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DIP switches */
+	map(0x10, 0x10).w(this, FUNC(cmaster_state::outport0_w));
+	map(0x11, 0x11).w(this, FUNC(cmaster_state::cm_coincount_w));
+	map(0x12, 0x12).w(this, FUNC(cmaster_state::p1_lamps_w));
+	map(0x13, 0x13).w(this, FUNC(cmaster_state::background_col_w));
+	map(0x14, 0x14).w(this, FUNC(cmaster_state::girl_scroll_w));
+}
 
 
-ADDRESS_MAP_START(goldstar_state::pkrmast_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void goldstar_state::pkrmast_portmap(address_map &map)
+{
+	map.global_mask(0xff);
 
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	map(0x04, 0x04).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x08, 0x08).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x0c, 0x0c).w("aysnd", FUNC(ay8910_device::address_w));
 
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN2")
+	map(0x10, 0x10).portr("IN0");
+	map(0x11, 0x11).portr("IN1");
+	map(0x12, 0x12).portr("IN2");
 
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW3-0")
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW3-1")
-	AM_RANGE(0x22, 0x22) AM_WRITE(p1_lamps_w)
+	map(0x20, 0x20).portr("DSW3-0");
+	map(0x21, 0x21).portr("DSW3-1");
+	map(0x22, 0x22).w(this, FUNC(goldstar_state::p1_lamps_w));
 
-	AM_RANGE(0x24, 0x24) AM_WRITE(cm_coincount_w)
-	AM_RANGE(0x25, 0x25) AM_READ_PORT("DSW1")
-	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW2")
+	map(0x24, 0x24).w(this, FUNC(goldstar_state::cm_coincount_w));
+	map(0x25, 0x25).portr("DSW1");
+	map(0x26, 0x26).portr("DSW2");
 
-	AM_RANGE(0xf0, 0xf0) AM_WRITENOP    /* Writing 0's and 1's constantly.  Watchdog feeder? */
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(goldstar_state::cmast91_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
-	AM_RANGE(0x21, 0x21) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x22, 0x23) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+	map(0xf0, 0xf0).nopw();    /* Writing 0's and 1's constantly.  Watchdog feeder? */
+}
 
 
-ADDRESS_MAP_START(cmaster_state::amcoe1_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
-	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(cm_coincount_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(p1_lamps_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-ADDRESS_MAP_END
+void goldstar_state::cmast91_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DIP switches */
+	map(0x21, 0x21).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x22, 0x23).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
 
-ADDRESS_MAP_START(cmaster_state::amcoe2_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
-	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(cm_coincount_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(p1_lamps_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
-ADDRESS_MAP_END
+
+void cmaster_state::amcoe1_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x04, 0x07).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DIP switches */
+	map(0x10, 0x10).w(this, FUNC(cmaster_state::outport0_w));
+	map(0x11, 0x11).w(this, FUNC(cmaster_state::cm_coincount_w));
+	map(0x12, 0x12).w(this, FUNC(cmaster_state::p1_lamps_w));
+	map(0x13, 0x13).w(this, FUNC(cmaster_state::background_col_w));
+	map(0x20, 0x20).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
+void cmaster_state::amcoe2_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x04, 0x07).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DIP switches */
+	map(0x10, 0x10).w(this, FUNC(cmaster_state::outport0_w));
+	map(0x11, 0x11).w(this, FUNC(cmaster_state::cm_coincount_w));
+	map(0x12, 0x12).w(this, FUNC(cmaster_state::p1_lamps_w));
+	map(0x13, 0x13).w(this, FUNC(cmaster_state::background_col_w));
+}
 
 
 ADDRESS_MAP_START(goldstar_state::lucky8_map)
@@ -999,51 +1012,53 @@ WRITE8_MEMBER(wingco_state::fl7w4_outc802_w)
 	m_fl7w4_id->write((data >> 6) & 0x01);
 }
 
-ADDRESS_MAP_START(wingco_state::magodds_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+void wingco_state::magodds_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 	// where does the extra rom data map?? it seems like it should come straight after the existing rom, but it can't if this is a plain z80?
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xa900, 0xaaff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram") // +0x100 compared to lucky8
-	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8fff).ram().w(this, FUNC(wingco_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(this, FUNC(wingco_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(this, FUNC(wingco_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(this, FUNC(wingco_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa900, 0xaaff).ram().w(this, FUNC(wingco_state::goldstar_reel3_ram_w)).share("reel3_ram"); // +0x100 compared to lucky8
+	map(0xb040, 0xb07f).ram().share("reel1_scroll");
+	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
+	map(0xb100, 0xb17f).ram().share("reel3_scroll");
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
-	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("aysnd", ay8910_device, address_w)             /* no sound... only use both ports for DSWs */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE(magodds_outb850_w)                                /* lamps */
-	AM_RANGE(0xb860, 0xb860) AM_WRITE(magodds_outb860_w)                                /* watchdog */
-	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)                /* sound */
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu",0xc000)
-ADDRESS_MAP_END
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
+	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));             /* no sound... only use both ports for DSWs */
+	map(0xb850, 0xb850).w(this, FUNC(wingco_state::magodds_outb850_w));                                /* lamps */
+	map(0xb860, 0xb860).w(this, FUNC(wingco_state::magodds_outb860_w));                                /* watchdog */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
+	map(0xc000, 0xffff).rom().region("maincpu", 0xc000);
+}
 
-ADDRESS_MAP_START(goldstar_state::kkotnoli_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM /* definitely no NVRAM */
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
+void goldstar_state::kkotnoli_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram(); /* definitely no NVRAM */
+	map(0x8800, 0x8fff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa800, 0xa9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xb040, 0xb07f).ram().share("reel1_scroll");
+	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
+	map(0xb100, 0xb17f).ram().share("reel3_scroll");
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input Port */
-	AM_RANGE(0xb830, 0xb830) AM_WRITENOP                                                /* no ay8910 */
-	AM_RANGE(0xb840, 0xb840) AM_WRITENOP                                                /* no ay8910 */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE(p1_lamps_w)
-	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)                /* sound */
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Port */
+	map(0xb830, 0xb830).nopw();                                                /* no ay8910 */
+	map(0xb840, 0xb840).nopw();                                                /* no ay8910 */
+	map(0xb850, 0xb850).w(this, FUNC(goldstar_state::p1_lamps_w));
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
+	map(0xf800, 0xffff).ram();
+}
 
 
 //WRITE8_MEMBER(goldstar_state::ladylinr_outport_w)
@@ -1062,26 +1077,27 @@ ADDRESS_MAP_END
 //  popmessage("Output: %02X", data);
 //}
 
-ADDRESS_MAP_START(goldstar_state::ladylinr_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
+void goldstar_state::ladylinr_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8fff).ram().w(this, FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(this, FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(this, FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(this, FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa800, 0xa9ff).ram().w(this, FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xb040, 0xb07f).ram().share("reel1_scroll");
+	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
+	map(0xb100, 0xb17f).ram().share("reel3_scroll");
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DSW bank */
-	AM_RANGE(0xb830, 0xb830) AM_DEVWRITE("aysnd", ay8910_device, address_w)             /* no sound... unused? */
-	AM_RANGE(0xb840, 0xb840) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0xb850, 0xb850) AM_WRITENOP                                                /* just turn off the lamps, if exist */
-	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)                /* sound */
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DSW bank */
+	map(0xb830, 0xb830).w("aysnd", FUNC(ay8910_device::address_w));             /* no sound... unused? */
+	map(0xb840, 0xb840).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xb850, 0xb850).nopw();                                                /* just turn off the lamps, if exist */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
+	map(0xf800, 0xffff).ram();
+}
 
 ADDRESS_MAP_START(goldstar_state::wcat3_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -1109,30 +1125,31 @@ ADDRESS_MAP_END
 
 
 /* newer / more capable hw */
-ADDRESS_MAP_START(unkch_state::unkch_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
+void unkch_state::unkch_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xc000, 0xc1ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xc800, 0xc9ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
+	map(0xd000, 0xd7ff).ram().share("nvram");
 
-	AM_RANGE(0xd840, 0xd87f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xd900, 0xd93f) AM_RAM AM_SHARE("reel3_scroll")
-	AM_RANGE(0xdfc0, 0xdfff) AM_RAM
+	map(0xd840, 0xd87f).ram().share("reel1_scroll");
+	map(0xd880, 0xd8bf).ram().share("reel2_scroll");
+	map(0xd900, 0xd93f).ram().share("reel3_scroll");
+	map(0xdfc0, 0xdfff).ram();
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(unkch_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(unkch_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-	AM_RANGE(0xf600, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(reel1_attrram_w) AM_SHARE("reel1_attrram")
-	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(reel2_attrram_w) AM_SHARE("reel2_attrram")
-	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(reel3_attrram_w) AM_SHARE("reel3_attrram")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf000, 0xf1ff).ram().w(this, FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(this, FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(this, FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf600, 0xf7ff).ram();
+	map(0xf800, 0xf9ff).ram().w(this, FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
+	map(0xfa00, 0xfbff).ram().w(this, FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
+	map(0xfc00, 0xfdff).ram().w(this, FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
+	map(0xfe00, 0xffff).ram();
+}
 
 
 WRITE8_MEMBER(unkch_state::coincount_w)
@@ -1195,47 +1212,49 @@ WRITE8_MEMBER(unkch_state::unkcm_0x03_w)
 }
 
 
-ADDRESS_MAP_START(unkch_state::unkch_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void unkch_state::unkch_portmap(address_map &map)
+{
+	map.global_mask(0xff);
 
-	AM_RANGE(0x01, 0x01) AM_WRITE(coincount_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(unkcm_0x02_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(unkcm_0x03_w)
+	map(0x01, 0x01).w(this, FUNC(unkch_state::coincount_w));
+	map(0x02, 0x02).w(this, FUNC(unkch_state::unkcm_0x02_w));
+	map(0x03, 0x03).w(this, FUNC(unkch_state::unkcm_0x03_w));
 
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("IN0")
-	AM_RANGE(0x09, 0x09) AM_READ_PORT("IN1")
-	AM_RANGE(0x0a, 0x0a) AM_READ_PORT("DSW4")
-	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("DSW3")
+	map(0x08, 0x08).portr("IN0");
+	map(0x09, 0x09).portr("IN1");
+	map(0x0a, 0x0a).portr("DSW4");
+	map(0x0b, 0x0b).portr("DSW3");
 
-	AM_RANGE(0x10, 0x10) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x11, 0x11) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x12, 0x12) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-ADDRESS_MAP_END
+	map(0x10, 0x10).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x11, 0x11).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x12, 0x12).w("aysnd", FUNC(ay8910_device::address_w));
+}
 
 
-ADDRESS_MAP_START(unkch_state::megaline_map)
+void unkch_state::megaline_map(address_map &map)
+{
 /* Reels stuff are there just as placeholder, and obviously in wrong offset */
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
+	map(0x0000, 0x9fff).rom();
 
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM //AM_SHARE("nvram")
+	map(0xd000, 0xd7ff).ram(); //AM_SHARE("nvram")
 
-	AM_RANGE(0xd840, 0xd87f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xd900, 0xd93f) AM_RAM AM_SHARE("reel3_scroll")
-	AM_RANGE(0xdfc0, 0xdfff) AM_RAM
+	map(0xd840, 0xd87f).ram().share("reel1_scroll");
+	map(0xd880, 0xd8bf).ram().share("reel2_scroll");
+	map(0xd900, 0xd93f).ram().share("reel3_scroll");
+	map(0xdfc0, 0xdfff).ram();
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(unkch_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(unkch_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-	AM_RANGE(0xf600, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(reel1_attrram_w) AM_SHARE("reel1_attrram")
-	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(reel2_attrram_w) AM_SHARE("reel2_attrram")
-	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(reel3_attrram_w) AM_SHARE("reel3_attrram")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf000, 0xf1ff).ram().w(this, FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(this, FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(this, FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf600, 0xf7ff).ram();
+	map(0xf800, 0xf9ff).ram().w(this, FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
+	map(0xfa00, 0xfbff).ram().w(this, FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
+	map(0xfc00, 0xfdff).ram().w(this, FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
+	map(0xfe00, 0xffff).ram();
+}
 
 /* unknown I/O byte R/W
 
@@ -1255,29 +1274,30 @@ ADDRESS_MAP_START(goldstar_state::megaline_portmap)
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START(unkch_state::bonusch_map)
+void unkch_state::bonusch_map(address_map &map)
+{
 /* Reels stuff and RAM are there just as placeholder, and obviously in wrong offset */
 
-	AM_RANGE(0x0000, 0xbfff) AM_ROM     // ok
+	map(0x0000, 0xbfff).rom();     // ok
 
-	AM_RANGE(0xd800, 0xdfff) AM_RAM //AM_SHARE("nvram")
+	map(0xd800, 0xdfff).ram(); //AM_SHARE("nvram")
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(unkch_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(unkch_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
 /* just placeholders */
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
+	map(0xf000, 0xf1ff).ram().w(this, FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(this, FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(this, FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
 
-	AM_RANGE(0xf640, 0xf67f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xf680, 0xf6bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xf700, 0xf73f) AM_RAM AM_SHARE("reel3_scroll")
+	map(0xf640, 0xf67f).ram().share("reel1_scroll");
+	map(0xf680, 0xf6bf).ram().share("reel2_scroll");
+	map(0xf700, 0xf73f).ram().share("reel3_scroll");
 
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(reel1_attrram_w) AM_SHARE("reel1_attrram")
-	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(reel2_attrram_w) AM_SHARE("reel2_attrram")
-	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(reel3_attrram_w) AM_SHARE("reel3_attrram")
-ADDRESS_MAP_END
+	map(0xf800, 0xf9ff).ram().w(this, FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
+	map(0xfa00, 0xfbff).ram().w(this, FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
+	map(0xfc00, 0xfdff).ram().w(this, FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
+}
 
 /* Bonus Chance W-8
 

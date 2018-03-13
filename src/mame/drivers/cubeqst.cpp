@@ -425,30 +425,33 @@ WRITE16_MEMBER(cubeqst_state::write_sndram)
 	m_soundcpu->sndram_w(space, offset, data, mem_mask);
 }
 
-ADDRESS_MAP_START(cubeqst_state::m68k_program_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x03ffff)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x020000, 0x027fff) AM_READWRITE(read_rotram, write_rotram)
-	AM_RANGE(0x028000, 0x028fff) AM_READWRITE(read_sndram, write_sndram)
-	AM_RANGE(0x038000, 0x038001) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x038002, 0x038003) AM_READWRITE(chop_r, ldaud_w)
-	AM_RANGE(0x038008, 0x038009) AM_READWRITE(line_r, reset_w)
-	AM_RANGE(0x03800e, 0x03800f) AM_READWRITE(laserdisc_r, laserdisc_w)
-	AM_RANGE(0x03c800, 0x03c9ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0x03cc00, 0x03cc01) AM_WRITE(control_w)
-	AM_RANGE(0x03e000, 0x03efff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x03f000, 0x03ffff) AM_RAM
-ADDRESS_MAP_END
+void cubeqst_state::m68k_program_map(address_map &map)
+{
+	map.global_mask(0x03ffff);
+	map(0x000000, 0x01ffff).rom();
+	map(0x020000, 0x027fff).rw(this, FUNC(cubeqst_state::read_rotram), FUNC(cubeqst_state::write_rotram));
+	map(0x028000, 0x028fff).rw(this, FUNC(cubeqst_state::read_sndram), FUNC(cubeqst_state::write_sndram));
+	map(0x038000, 0x038001).rw(this, FUNC(cubeqst_state::io_r), FUNC(cubeqst_state::io_w));
+	map(0x038002, 0x038003).rw(this, FUNC(cubeqst_state::chop_r), FUNC(cubeqst_state::ldaud_w));
+	map(0x038008, 0x038009).rw(this, FUNC(cubeqst_state::line_r), FUNC(cubeqst_state::reset_w));
+	map(0x03800e, 0x03800f).rw(this, FUNC(cubeqst_state::laserdisc_r), FUNC(cubeqst_state::laserdisc_w));
+	map(0x03c800, 0x03c9ff).ram().w(this, FUNC(cubeqst_state::palette_w)).share("paletteram");
+	map(0x03cc00, 0x03cc01).w(this, FUNC(cubeqst_state::control_w));
+	map(0x03e000, 0x03efff).ram().share("nvram");
+	map(0x03f000, 0x03ffff).ram();
+}
 
 
 /* For the bit-sliced CPUs */
-ADDRESS_MAP_START(cubeqst_state::rotate_map)
-	AM_RANGE(0x000, 0x1ff) AM_ROM
-ADDRESS_MAP_END
+void cubeqst_state::rotate_map(address_map &map)
+{
+	map(0x000, 0x1ff).rom();
+}
 
-ADDRESS_MAP_START(cubeqst_state::line_sound_map)
-	AM_RANGE(0x000, 0x0ff) AM_ROM
-ADDRESS_MAP_END
+void cubeqst_state::line_sound_map(address_map &map)
+{
+	map(0x000, 0x0ff).rom();
+}
 
 
 /*************************************

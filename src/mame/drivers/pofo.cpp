@@ -781,28 +781,31 @@ WRITE8_MEMBER( portfolio_state::io_w )
 //  ADDRESS_MAP( portfolio_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(portfolio_state::portfolio_mem)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mem_r, mem_w)
-ADDRESS_MAP_END
+void portfolio_state::portfolio_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(this, FUNC(portfolio_state::mem_r), FUNC(portfolio_state::mem_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( portfolio_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(portfolio_state::portfolio_io)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void portfolio_state::portfolio_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(portfolio_state::io_r), FUNC(portfolio_state::io_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( portfolio_lcdc )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(portfolio_state::portfolio_lcdc)
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-ADDRESS_MAP_END
+void portfolio_state::portfolio_lcdc(address_map &map)
+{
+	map.global_mask(0x7ff);
+	map(0x0000, 0x07ff).ram();
+}
 
 
 

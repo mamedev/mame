@@ -33,16 +33,18 @@ private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(vectrix_state::mem_map)
-	AM_RANGE(0x00000,0x07fff) AM_RAM
-	AM_RANGE(0x0c000,0x0ffff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void vectrix_state::mem_map(address_map &map)
+{
+	map(0x00000, 0x07fff).ram();
+	map(0x0c000, 0x0ffff).rom().region("roms", 0);
+	map(0xfc000, 0xfffff).rom().region("roms", 0);
+}
 
-ADDRESS_MAP_START(vectrix_state::io_map)
-	AM_RANGE(0x3000, 0x3000) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	AM_RANGE(0x3001, 0x3001) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void vectrix_state::io_map(address_map &map)
+{
+	map(0x3000, 0x3000).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x3001, 0x3001).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 static INPUT_PORTS_START( vectrix )
 INPUT_PORTS_END

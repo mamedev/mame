@@ -49,26 +49,30 @@ public:
 
 /* Memory maps */
 
-ADDRESS_MAP_START(segacoin_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segacoin_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segacoin_state::main_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void segacoin_state::main_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 
-ADDRESS_MAP_START(segacoin_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segacoin_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segacoin_state::sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void segacoin_state::sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 
 

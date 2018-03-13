@@ -117,42 +117,44 @@ READ8_MEMBER(ladyfrog_state::snd_flag_r)
 	return m_snd_flag | 0xfd;
 }
 
-ADDRESS_MAP_START(ladyfrog_state::ladyfrog_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc07f) AM_RAM
-	AM_RANGE(0xc080, 0xc87f) AM_READWRITE(ladyfrog_videoram_r, ladyfrog_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(ladyfrog_gfxctrl2_w)
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-	AM_RANGE(0xd403, 0xd403) AM_WRITE(sound_cpu_reset_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xdc00, 0xdc9f) AM_READWRITE(ladyfrog_spriteram_r,ladyfrog_spriteram_w)
-	AM_RANGE(0xdca0, 0xdcbf) AM_READWRITE(ladyfrog_scrlram_r, ladyfrog_scrlram_w) AM_SHARE("scrlram")
-	AM_RANGE(0xdcc0, 0xdcff) AM_RAM
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(ladyfrog_palette_r, ladyfrog_palette_w)
-	AM_RANGE(0xd0d0, 0xd0d0) AM_READNOP /* code jumps to ASCII text "Alfa tecnology"  @ $b7 */
-	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(ladyfrog_gfxctrl_w)
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ladyfrog_state::ladyfrog_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc07f).ram();
+	map(0xc080, 0xc87f).rw(this, FUNC(ladyfrog_state::ladyfrog_videoram_r), FUNC(ladyfrog_state::ladyfrog_videoram_w)).share("videoram");
+	map(0xd000, 0xd000).w(this, FUNC(ladyfrog_state::ladyfrog_gfxctrl2_w));
+	map(0xd400, 0xd400).rw(this, FUNC(ladyfrog_state::from_snd_r), FUNC(ladyfrog_state::sound_command_w));
+	map(0xd401, 0xd401).r(this, FUNC(ladyfrog_state::snd_flag_r));
+	map(0xd403, 0xd403).w(this, FUNC(ladyfrog_state::sound_cpu_reset_w));
+	map(0xd800, 0xd800).portr("DSW1");
+	map(0xd801, 0xd801).portr("DSW2");
+	map(0xd804, 0xd804).portr("INPUTS");
+	map(0xd806, 0xd806).portr("SYSTEM");
+	map(0xdc00, 0xdc9f).rw(this, FUNC(ladyfrog_state::ladyfrog_spriteram_r), FUNC(ladyfrog_state::ladyfrog_spriteram_w));
+	map(0xdca0, 0xdcbf).rw(this, FUNC(ladyfrog_state::ladyfrog_scrlram_r), FUNC(ladyfrog_state::ladyfrog_scrlram_w)).share("scrlram");
+	map(0xdcc0, 0xdcff).ram();
+	map(0xdd00, 0xdeff).rw(this, FUNC(ladyfrog_state::ladyfrog_palette_r), FUNC(ladyfrog_state::ladyfrog_palette_w));
+	map(0xd0d0, 0xd0d0).nopr(); /* code jumps to ASCII text "Alfa tecnology"  @ $b7 */
+	map(0xdf03, 0xdf03).w(this, FUNC(ladyfrog_state::ladyfrog_gfxctrl_w));
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(ladyfrog_state::ladyfrog_sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_WRITENOP
-	AM_RANGE(0xc802, 0xc803) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xc900, 0xc90d) AM_DEVWRITE("msm", msm5232_device, write)
-	AM_RANGE(0xca00, 0xca00) AM_WRITENOP
-	AM_RANGE(0xcb00, 0xcb00) AM_WRITENOP
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(to_main_w)
-	AM_RANGE(0xd200, 0xd200) AM_READNOP AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xd600, 0xd600) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write)       /* signed 8-bit DAC - unknown read */
-	AM_RANGE(0xe000, 0xefff) AM_NOP
-ADDRESS_MAP_END
+void ladyfrog_state::ladyfrog_sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xc801).nopw();
+	map(0xc802, 0xc803).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xc900, 0xc90d).w(m_msm, FUNC(msm5232_device::write));
+	map(0xca00, 0xca00).nopw();
+	map(0xcb00, 0xcb00).nopw();
+	map(0xcc00, 0xcc00).nopw();
+	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(ladyfrog_state::to_main_w));
+	map(0xd200, 0xd200).nopr().w(this, FUNC(ladyfrog_state::nmi_enable_w));
+	map(0xd400, 0xd400).w(this, FUNC(ladyfrog_state::nmi_disable_w));
+	map(0xd600, 0xd600).nopr().w("dac", FUNC(dac_byte_interface::write));       /* signed 8-bit DAC - unknown read */
+	map(0xe000, 0xefff).noprw();
+}
 
 
 static INPUT_PORTS_START( ladyfrog )

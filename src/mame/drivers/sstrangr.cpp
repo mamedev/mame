@@ -136,19 +136,21 @@ WRITE8_MEMBER(sstrangr_state::port_w)
 
 
 
-ADDRESS_MAP_START(sstrangr_state::sstrangr_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x6000, 0x63ff) AM_ROM
-ADDRESS_MAP_END
+void sstrangr_state::sstrangr_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).ram().share("ram");
+	map(0x6000, 0x63ff).rom();
+}
 
 
-ADDRESS_MAP_START(sstrangr_state::sstrangr_io_map)
-	AM_RANGE(0x41, 0x41) AM_READ_PORT("DSW")
-	AM_RANGE(0x42, 0x42) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x44, 0x44) AM_READ_PORT("EXT") AM_WRITE(port_w)
-ADDRESS_MAP_END
+void sstrangr_state::sstrangr_io_map(address_map &map)
+{
+	map(0x41, 0x41).portr("DSW");
+	map(0x42, 0x42).portr("INPUTS");
+	map(0x44, 0x44).portr("EXT").w(this, FUNC(sstrangr_state::port_w));
+}
 
 
 

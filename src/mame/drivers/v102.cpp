@@ -46,29 +46,32 @@ u32 v102_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 }
 
 
-ADDRESS_MAP_START(v102_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xafff) AM_RAM
-	AM_RANGE(0xb800, 0xb9ff) AM_DEVREADWRITE("eeprom", eeprom_parallel_28xx_device, read, write)
-ADDRESS_MAP_END
+void v102_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom().region("maincpu", 0);
+	map(0x8000, 0x8fff).ram();
+	map(0xa000, 0xafff).ram();
+	map(0xb800, 0xb9ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
+}
 
-ADDRESS_MAP_START(v102_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void v102_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0x3f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
-	AM_RANGE(0x18, 0x19) AM_WRITENOP
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("mpsc", upd7201_new_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
-	AM_RANGE(0x80, 0x83) AM_DEVWRITE("pit", pit8253_device, write)
-	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("ppi", i8255_device, read, write)
+	map(0x18, 0x19).nopw();
+	map(0x40, 0x43).rw("mpsc", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w));
+	map(0x60, 0x60).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x61, 0x61).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x80, 0x83).w("pit", FUNC(pit8253_device::write));
+	map(0xa0, 0xa3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	//AM_RANGE(0xbf, 0xbf) ???
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(v102_state::kbd_map)
-	AM_RANGE(0x000, 0x7ff) AM_ROM AM_REGION("keyboard", 0)
-ADDRESS_MAP_END
+void v102_state::kbd_map(address_map &map)
+{
+	map(0x000, 0x7ff).rom().region("keyboard", 0);
+}
 
 static INPUT_PORTS_START( v102 )
 INPUT_PORTS_END

@@ -672,50 +672,53 @@ READ8_MEMBER(pc9801_state::f0_r)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(pc9801_state::pc9801_map)
-	AM_RANGE(0xa0000, 0xa3fff) AM_READWRITE(tvram_r,tvram_w) //TVRAM
-	AM_RANGE(0xa8000, 0xbffff) AM_READWRITE8(gvram_r,gvram_w,0xffff) //bitmap VRAM
-	AM_RANGE(0xcc000, 0xcdfff) AM_ROM AM_REGION("sound_bios",0) //sound BIOS
-	AM_RANGE(0xd6000, 0xd6fff) AM_ROM AM_REGION("fdc_bios_2dd",0) //floppy BIOS 2dd
-	AM_RANGE(0xd7000, 0xd7fff) AM_ROM AM_REGION("fdc_bios_2hd",0) //floppy BIOS 2hd
-	AM_RANGE(0xe8000, 0xfffff) AM_ROM AM_REGION("ipl",0)
-ADDRESS_MAP_END
+void pc9801_state::pc9801_map(address_map &map)
+{
+	map(0xa0000, 0xa3fff).rw(this, FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w)); //TVRAM
+	map(0xa8000, 0xbffff).rw(this, FUNC(pc9801_state::gvram_r), FUNC(pc9801_state::gvram_w)); //bitmap VRAM
+	map(0xcc000, 0xcdfff).rom().region("sound_bios", 0); //sound BIOS
+	map(0xd6000, 0xd6fff).rom().region("fdc_bios_2dd", 0); //floppy BIOS 2dd
+	map(0xd7000, 0xd7fff).rom().region("fdc_bios_2hd", 0); //floppy BIOS 2hd
+	map(0xe8000, 0xfffff).rom().region("ipl", 0);
+}
 
 /* first device is even offsets, second one is odd offsets */
-ADDRESS_MAP_START(pc9801_state::pc9801_common_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xff00)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pic_r, pic_w, 0x00ff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-	AM_RANGE(0x0020, 0x002f) AM_WRITE8(rtc_w,0x00ff)
-	AM_RANGE(0x0030, 0x0037) AM_DEVREADWRITE8("ppi8255_sys", i8255_device, read, write, 0xff00) //i8251 RS232c / i8255 system port
-	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("ppi8255_prn", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("keyb", pc9801_kbd_device, rx_r, tx_w, 0xff00) //i8255 printer port / i8251 keyboard
-	AM_RANGE(0x0050, 0x0057) AM_DEVREADWRITE8("ppi8255_fdd", i8255_device, read, write, 0xff00)
-	AM_RANGE(0x0050, 0x0057) AM_WRITE8(nmi_ctrl_w,0x00ff) // NMI FF / i8255 floppy port (2d?)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("upd7220_chr", upd7220_device, read, write, 0x00ff) //upd7220 character ports / <undefined>
-	AM_RANGE(0x0064, 0x0065) AM_WRITE8(vrtc_clear_w,0x00ff)
+void pc9801_state::pc9801_common_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xff00);
+	map(0x0000, 0x001f).rw(this, FUNC(pc9801_state::pic_r), FUNC(pc9801_state::pic_w)).umask16(0x00ff); // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
+	map(0x0020, 0x002f).w(this, FUNC(pc9801_state::rtc_w)).umask16(0x00ff);
+	map(0x0030, 0x0037).rw("ppi8255_sys", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8251 RS232c / i8255 system port
+	map(0x0040, 0x0047).rw("ppi8255_prn", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask16(0xff00); //i8255 printer port / i8251 keyboard
+	map(0x0050, 0x0057).rw("ppi8255_fdd", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
+	map(0x0050, 0x0057).w(this, FUNC(pc9801_state::nmi_ctrl_w)).umask16(0x00ff); // NMI FF / i8255 floppy port (2d?)
+	map(0x0060, 0x0063).rw(m_hgdc1, FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff); //upd7220 character ports / <undefined>
+	map(0x0064, 0x0064).w(this, FUNC(pc9801_state::vrtc_clear_w));
 //  AM_RANGE(0x006c, 0x006f) border color / <undefined>
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00)
-	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(txt_scrl_r,txt_scrl_w,0x00ff) //display registers / i8253 pit
-	AM_RANGE(0x0080, 0x0081) AM_READWRITE8(sasi_data_r, sasi_data_w, 0x00ff)
-	AM_RANGE(0x0082, 0x0083) AM_READWRITE8(sasi_status_r, sasi_ctrl_w,0x00ff)
-	AM_RANGE(0x0090, 0x0091) AM_DEVREAD8("upd765_2hd", upd765a_device, msr_r, 0x00ff)
-	AM_RANGE(0x0092, 0x0093) AM_DEVREADWRITE8("upd765_2hd", upd765a_device, fifo_r, fifo_w, 0x00ff)
-	AM_RANGE(0x0094, 0x0095) AM_READWRITE8(fdc_2hd_ctrl_r, fdc_2hd_ctrl_w, 0x00ff)
-	AM_RANGE(0x0090, 0x0091) AM_DEVREADWRITE8(UPD8251_TAG, i8251_device, data_r, data_w, 0xff00)
-	AM_RANGE(0x0092, 0x0093) AM_DEVREADWRITE8(UPD8251_TAG, i8251_device, status_r, control_w, 0xff00)
-	AM_RANGE(0x7fd8, 0x7fdf) AM_DEVREADWRITE8("ppi8255_mouse", i8255_device, read, write, 0xff00)
-ADDRESS_MAP_END
+	map(0x0070, 0x007f).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
+	map(0x0070, 0x007f).rw(this, FUNC(pc9801_state::txt_scrl_r), FUNC(pc9801_state::txt_scrl_w)).umask16(0x00ff); //display registers / i8253 pit
+	map(0x0080, 0x0080).rw(this, FUNC(pc9801_state::sasi_data_r), FUNC(pc9801_state::sasi_data_w));
+	map(0x0082, 0x0082).rw(this, FUNC(pc9801_state::sasi_status_r), FUNC(pc9801_state::sasi_ctrl_w));
+	map(0x0090, 0x0090).r(m_fdc_2hd, FUNC(upd765a_device::msr_r));
+	map(0x0092, 0x0092).rw(m_fdc_2hd, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
+	map(0x0094, 0x0094).rw(this, FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
+	map(0x0091, 0x0091).rw(m_sio, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x0093, 0x0093).rw(m_sio, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x7fd8, 0x7fdf).rw("ppi8255_mouse", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
+}
 
-ADDRESS_MAP_START(pc9801_state::pc9801_io)
-	AM_IMPORT_FROM(pc9801_common_io)
-	AM_RANGE(0x0020, 0x002f) AM_WRITE8(dmapg4_w,0xff00)
-	AM_RANGE(0x0068, 0x0069) AM_WRITE8(pc9801_video_ff_w,0x00ff) //mode FF / <undefined>
-	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
-	AM_RANGE(0x00c8, 0x00cb) AM_DEVICE8("upd765_2dd", upd765a_device, map, 0x00ff)
-	AM_RANGE(0x00cc, 0x00cd) AM_READWRITE8(fdc_2dd_ctrl_r, fdc_2dd_ctrl_w, 0x00ff) //upd765a 2dd / <undefined>
-	AM_RANGE(0x00f0, 0x00ff) AM_READ8(f0_r,0x00ff)
-ADDRESS_MAP_END
+void pc9801_state::pc9801_io(address_map &map)
+{
+	pc9801_common_io(map);
+	map(0x0020, 0x002f).w(this, FUNC(pc9801_state::dmapg4_w)).umask16(0xff00);
+	map(0x0068, 0x0068).w(this, FUNC(pc9801_state::pc9801_video_ff_w)); //mode FF / <undefined>
+	map(0x00a0, 0x00af).rw(this, FUNC(pc9801_state::pc9801_a0_r), FUNC(pc9801_state::pc9801_a0_w)); //upd7220 bitmap ports / display registers
+	map(0x00c8, 0x00cb).m(m_fdc_2dd, FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0x00cc, 0x00cc).rw(this, FUNC(pc9801_state::fdc_2dd_ctrl_r), FUNC(pc9801_state::fdc_2dd_ctrl_w)); //upd765a 2dd / <undefined>
+	map(0x00f0, 0x00ff).r(this, FUNC(pc9801_state::f0_r)).umask16(0x00ff);
+}
 
 /*************************************
  *
@@ -1082,55 +1085,60 @@ WRITE16_MEMBER(pc9801_state::grcg_gvram0_w)
 	upd7220_grcg_w(space, offset | (m_vram_bank << 16), data, mem_mask);
 }
 
-ADDRESS_MAP_START(pc9801_state::ipl_bank)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM AM_REGION("ipl", 0)
-ADDRESS_MAP_END
+void pc9801_state::ipl_bank(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom().region("ipl", 0);
+}
 
-ADDRESS_MAP_START(pc9801_state::pc9801ux_map)
-	AM_RANGE(0x0a0000, 0x0a3fff) AM_READWRITE(tvram_r, tvram_w)
-	AM_RANGE(0x0a4000, 0x0a4fff) AM_READWRITE8(pc9801rs_knjram_r, pc9801rs_knjram_w, 0xffff)
-	AM_RANGE(0x0a8000, 0x0bffff) AM_READWRITE(grcg_gvram_r, grcg_gvram_w)
-	AM_RANGE(0x0e0000, 0x0e7fff) AM_READWRITE(grcg_gvram0_r,grcg_gvram0_w)
-	AM_RANGE(0x0e8000, 0x0fffff) AM_DEVICE("ipl_bank", address_map_bank_device, amap16)
-ADDRESS_MAP_END
+void pc9801_state::pc9801ux_map(address_map &map)
+{
+	map(0x0a0000, 0x0a3fff).rw(this, FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w));
+	map(0x0a4000, 0x0a4fff).rw(this, FUNC(pc9801_state::pc9801rs_knjram_r), FUNC(pc9801_state::pc9801rs_knjram_w));
+	map(0x0a8000, 0x0bffff).rw(this, FUNC(pc9801_state::grcg_gvram_r), FUNC(pc9801_state::grcg_gvram_w));
+	map(0x0e0000, 0x0e7fff).rw(this, FUNC(pc9801_state::grcg_gvram0_r), FUNC(pc9801_state::grcg_gvram0_w));
+	map(0x0e8000, 0x0fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+}
 
-ADDRESS_MAP_START(pc9801_state::pc9801ux_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(pc9801_common_io)
-	AM_RANGE(0x0020, 0x002f) AM_WRITE8(dmapg8_w,0xff00)
-	AM_RANGE(0x0050, 0x0057) AM_NOP // 2dd ppi?
-	AM_RANGE(0x005c, 0x005f) AM_READ(timestamp_r) AM_WRITENOP // artic
-	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9801rs_video_ff_w,0x00ff) //mode FF / <undefined>
-	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(grcg_r,      grcg_w,      0x00ff) //display registers "GRCG" / i8253 pit
-	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,        pc9801rs_a0_w,      0xffff) //upd7220 bitmap ports / display registers
-	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(fdc_mode_ctrl_r,fdc_mode_ctrl_w,0xffff)
-	AM_RANGE(0x00c8, 0x00cb) AM_DEVICE8("upd765_2hd", upd765a_device, map, 0x00ff)
-	AM_RANGE(0x00cc, 0x00cd) AM_READWRITE8(fdc_2hd_ctrl_r, fdc_2hd_ctrl_w, 0x00ff)
-	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(a20_ctrl_r,      a20_ctrl_w,      0x00ff)
-	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(access_ctrl_r,access_ctrl_w,0xffff)
-	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w, 0xffff) //ROM/RAM bank
-	AM_RANGE(0x04a0, 0x04af) AM_WRITE(egc_w)
-	AM_RANGE(0x3fd8, 0x3fdf) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00)
-ADDRESS_MAP_END
+void pc9801_state::pc9801ux_io(address_map &map)
+{
+	map.unmap_value_high();
+	pc9801_common_io(map);
+	map(0x0020, 0x002f).w(this, FUNC(pc9801_state::dmapg8_w)).umask16(0xff00);
+	map(0x0050, 0x0057).noprw(); // 2dd ppi?
+	map(0x005c, 0x005f).r(this, FUNC(pc9801_state::timestamp_r)).nopw(); // artic
+	map(0x0068, 0x006b).w(this, FUNC(pc9801_state::pc9801rs_video_ff_w)).umask16(0x00ff); //mode FF / <undefined>
+	map(0x0070, 0x007f).rw(this, FUNC(pc9801_state::grcg_r), FUNC(pc9801_state::grcg_w)).umask16(0x00ff); //display registers "GRCG" / i8253 pit
+	map(0x00a0, 0x00af).rw(this, FUNC(pc9801_state::pc9801_a0_r), FUNC(pc9801_state::pc9801rs_a0_w)); //upd7220 bitmap ports / display registers
+	map(0x00bc, 0x00bf).rw(this, FUNC(pc9801_state::fdc_mode_ctrl_r), FUNC(pc9801_state::fdc_mode_ctrl_w));
+	map(0x00c8, 0x00cb).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0x00cc, 0x00cc).rw(this, FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
+	map(0x00f0, 0x00ff).rw(this, FUNC(pc9801_state::a20_ctrl_r), FUNC(pc9801_state::a20_ctrl_w)).umask16(0x00ff);
+	map(0x0438, 0x043b).rw(this, FUNC(pc9801_state::access_ctrl_r), FUNC(pc9801_state::access_ctrl_w));
+	map(0x043c, 0x043f).w(this, FUNC(pc9801_state::pc9801rs_bank_w)); //ROM/RAM bank
+	map(0x04a0, 0x04af).w(this, FUNC(pc9801_state::egc_w));
+	map(0x3fd8, 0x3fdf).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
+}
 
-ADDRESS_MAP_START(pc9801_state::pc9801rs_map)
-	AM_IMPORT_FROM(pc9801ux_map)
+void pc9801_state::pc9801rs_map(address_map &map)
+{
+	pc9801ux_map(map);
 //  AM_RANGE(0x0d8000, 0x0d9fff) AM_ROM AM_REGION("ide",0)
-	AM_RANGE(0x0da000, 0x0dbfff) AM_RAM // ide ram
-	AM_RANGE(0xee8000, 0xefffff) AM_DEVICE("ipl_bank", address_map_bank_device, amap16)
-	AM_RANGE(0xfe8000, 0xffffff) AM_DEVICE("ipl_bank", address_map_bank_device, amap16)
-ADDRESS_MAP_END
+	map(0x0da000, 0x0dbfff).ram(); // ide ram
+	map(0xee8000, 0xefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+	map(0xfe8000, 0xffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+}
 
-ADDRESS_MAP_START(pc9801_state::pc9801rs_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(pc9801ux_io)
-	AM_RANGE(0x0430, 0x0433) AM_READWRITE8(ide_ctrl_r, ide_ctrl_w, 0x00ff)
-	AM_RANGE(0x0640, 0x064f) AM_READWRITE(ide_cs0_r, ide_cs0_w)
-	AM_RANGE(0x0740, 0x074f) AM_READWRITE(ide_cs1_r, ide_cs1_w)
-	AM_RANGE(0x1e8c, 0x1e8f) AM_NOP // temp
-	AM_RANGE(0xbfd8, 0xbfdf) AM_WRITE8(pc9801rs_mouse_freq_w, 0xffff)
-	AM_RANGE(0xe0d0, 0xe0d3) AM_READ8(midi_r, 0xffff)
-ADDRESS_MAP_END
+void pc9801_state::pc9801rs_io(address_map &map)
+{
+	map.unmap_value_high();
+	pc9801ux_io(map);
+	map(0x0430, 0x0433).rw(this, FUNC(pc9801_state::ide_ctrl_r), FUNC(pc9801_state::ide_ctrl_w)).umask16(0x00ff);
+	map(0x0640, 0x064f).rw(this, FUNC(pc9801_state::ide_cs0_r), FUNC(pc9801_state::ide_cs0_w));
+	map(0x0740, 0x074f).rw(this, FUNC(pc9801_state::ide_cs1_r), FUNC(pc9801_state::ide_cs1_w));
+	map(0x1e8c, 0x1e8f).noprw(); // temp
+	map(0xbfd8, 0xbfdf).w(this, FUNC(pc9801_state::pc9801rs_mouse_freq_w));
+	map(0xe0d0, 0xe0d3).r(this, FUNC(pc9801_state::midi_r));
+}
 
 /*************************************
  *
@@ -1407,62 +1415,64 @@ WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram0_w)
 }
 
 
-ADDRESS_MAP_START(pc9801_state::pc9821_map)
+void pc9801_state::pc9821_map(address_map &map)
+{
 	//AM_RANGE(0x00080000, 0x0009ffff) AM_READWRITE8(winram_r, winram_w, 0xffffffff)
-	AM_RANGE(0x000a0000, 0x000a3fff) AM_READWRITE16(tvram_r, tvram_w, 0xffffffff)
-	AM_RANGE(0x000a4000, 0x000a4fff) AM_READWRITE8(pc9801rs_knjram_r, pc9801rs_knjram_w, 0xffffffff)
-	AM_RANGE(0x000a8000, 0x000bffff) AM_READWRITE16(pc9821_grcg_gvram_r, pc9821_grcg_gvram_w, 0xffffffff)
-	AM_RANGE(0x000cc000, 0x000cdfff) AM_ROM AM_REGION("sound_bios",0) //sound BIOS
+	map(0x000a0000, 0x000a3fff).rw(this, FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w));
+	map(0x000a4000, 0x000a4fff).rw(this, FUNC(pc9801_state::pc9801rs_knjram_r), FUNC(pc9801_state::pc9801rs_knjram_w));
+	map(0x000a8000, 0x000bffff).rw(this, FUNC(pc9801_state::pc9821_grcg_gvram_r), FUNC(pc9801_state::pc9821_grcg_gvram_w));
+	map(0x000cc000, 0x000cdfff).rom().region("sound_bios", 0); //sound BIOS
 //  AM_RANGE(0x000d8000, 0x000d9fff) AM_ROM AM_REGION("ide",0)
-	AM_RANGE(0x000da000, 0x000dbfff) AM_RAM // ide ram
-	AM_RANGE(0x000e0000, 0x000e7fff) AM_READWRITE16(pc9821_grcg_gvram0_r,pc9821_grcg_gvram0_w, 0xffffffff)
-	AM_RANGE(0x000e8000, 0x000fffff) AM_DEVICE16("ipl_bank", address_map_bank_device, amap16, 0xffffffff)
-	AM_RANGE(0x00f00000, 0x00f9ffff) AM_RAM AM_SHARE("ext_gvram")
-	AM_RANGE(0xffee8000, 0xffefffff) AM_DEVICE16("ipl_bank", address_map_bank_device, amap16, 0xffffffff)
-	AM_RANGE(0xfffe8000, 0xffffffff) AM_DEVICE16("ipl_bank", address_map_bank_device, amap16, 0xffffffff)
-ADDRESS_MAP_END
+	map(0x000da000, 0x000dbfff).ram(); // ide ram
+	map(0x000e0000, 0x000e7fff).rw(this, FUNC(pc9801_state::pc9821_grcg_gvram0_r), FUNC(pc9801_state::pc9821_grcg_gvram0_w));
+	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+	map(0x00f00000, 0x00f9ffff).ram().share("ext_gvram");
+	map(0xffee8000, 0xffefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+	map(0xfffe8000, 0xffffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+}
 
-ADDRESS_MAP_START(pc9801_state::pc9821_io)
+void pc9801_state::pc9821_io(address_map &map)
+{
 //  ADDRESS_MAP_UNMAP_HIGH // TODO: a read to somewhere makes this to fail at POST
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xff00ff00)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pic_r, pic_w, 0x00ff00ff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-	AM_RANGE(0x0020, 0x002f) AM_WRITE8(rtc_w,0x000000ff)
-	AM_RANGE(0x0020, 0x002f) AM_WRITE8(dmapg8_w,0xff00ff00)
-	AM_RANGE(0x0030, 0x0037) AM_DEVREADWRITE8("ppi8255_sys", i8255_device, read, write, 0xff00ff00) //i8251 RS232c / i8255 system port
-	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("ppi8255_prn", i8255_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("keyb", pc9801_kbd_device, rx_r, tx_w, 0xff00ff00) //i8255 printer port / i8251 keyboard
-	AM_RANGE(0x0050, 0x0053) AM_WRITE8(nmi_ctrl_w, 0x00ff00ff)
-	AM_RANGE(0x005c, 0x005f) AM_READ16(timestamp_r,0xffffffff) AM_WRITENOP // artic
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("upd7220_chr", upd7220_device, read, write, 0x00ff00ff) //upd7220 character ports / <undefined>
-	AM_RANGE(0x0060, 0x0063) AM_READ8(unk_r, 0xff00ff00) // mouse related (unmapped checking for AT keyb controller\PS/2 mouse?)
-	AM_RANGE(0x0064, 0x0067) AM_WRITE8(vrtc_clear_w, 0x000000ff)
-	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9821_video_ff_w,  0x00ff00ff) //mode FF / <undefined>
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00ff00)
-	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(grcg_r,      grcg_w,      0x00ff00ff) //display registers "GRCG" / i8253 pit
-	AM_RANGE(0x0090, 0x0093) AM_DEVICE8("upd765_2hd", upd765a_device, map, 0x00ff00ff)
-	AM_RANGE(0x0094, 0x0097) AM_READWRITE8(fdc_2hd_ctrl_r, fdc_2hd_ctrl_w, 0x000000ff)
-	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9821_a0_r,        pc9821_a0_w,        0xffffffff) //upd7220 bitmap ports / display registers
+	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0xff00ff00);
+	map(0x0000, 0x001f).rw(this, FUNC(pc9801_state::pic_r), FUNC(pc9801_state::pic_w)).umask32(0x00ff00ff); // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
+	map(0x0020, 0x002f).w(this, FUNC(pc9801_state::rtc_w)).umask32(0x000000ff);
+	map(0x0020, 0x002f).w(this, FUNC(pc9801_state::dmapg8_w)).umask32(0xff00ff00);
+	map(0x0030, 0x0037).rw("ppi8255_sys", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00); //i8251 RS232c / i8255 system port
+	map(0x0040, 0x0047).rw("ppi8255_prn", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0x00ff00ff);
+	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask32(0xff00ff00); //i8255 printer port / i8251 keyboard
+	map(0x0050, 0x0053).w(this, FUNC(pc9801_state::nmi_ctrl_w)).umask32(0x00ff00ff);
+	map(0x005c, 0x005f).r(this, FUNC(pc9801_state::timestamp_r)).nopw(); // artic
+	map(0x0060, 0x0063).rw(m_hgdc1, FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask32(0x00ff00ff); //upd7220 character ports / <undefined>
+	map(0x0060, 0x0063).r(this, FUNC(pc9801_state::unk_r)).umask32(0xff00ff00); // mouse related (unmapped checking for AT keyb controller\PS/2 mouse?)
+	map(0x0064, 0x0064).w(this, FUNC(pc9801_state::vrtc_clear_w));
+	map(0x0068, 0x006b).w(this, FUNC(pc9801_state::pc9821_video_ff_w)).umask32(0x00ff00ff); //mode FF / <undefined>
+	map(0x0070, 0x007f).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00);
+	map(0x0070, 0x007f).rw(this, FUNC(pc9801_state::grcg_r), FUNC(pc9801_state::grcg_w)).umask32(0x00ff00ff); //display registers "GRCG" / i8253 pit
+	map(0x0090, 0x0093).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
+	map(0x0094, 0x0094).rw(this, FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
+	map(0x00a0, 0x00af).rw(this, FUNC(pc9801_state::pc9821_a0_r), FUNC(pc9801_state::pc9821_a0_w)); //upd7220 bitmap ports / display registers
 //  AM_RANGE(0x00b0, 0x00b3) PC9861k (serial port?)
 //  AM_RANGE(0x00b9, 0x00b9) PC9861k
 //  AM_RANGE(0x00bb, 0x00bb) PC9861k
-	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(fdc_mode_ctrl_r,fdc_mode_ctrl_w,0xffffffff)
-	AM_RANGE(0x00c8, 0x00cb) AM_DEVICE8("upd765_2hd", upd765a_device, map, 0x00ff00ff)
-	AM_RANGE(0x00cc, 0x00cf) AM_READWRITE8(fdc_2hd_ctrl_r, fdc_2hd_ctrl_w, 0x000000ff)
+	map(0x00bc, 0x00bf).rw(this, FUNC(pc9801_state::fdc_mode_ctrl_r), FUNC(pc9801_state::fdc_mode_ctrl_w));
+	map(0x00c8, 0x00cb).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
+	map(0x00cc, 0x00cc).rw(this, FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
 	//  AM_RANGE(0x00d8, 0x00df) AMD98 (sound?) board
-	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(a20_ctrl_r,      a20_ctrl_w,      0x00ff00ff)
+	map(0x00f0, 0x00ff).rw(this, FUNC(pc9801_state::a20_ctrl_r), FUNC(pc9801_state::a20_ctrl_w)).umask32(0x00ff00ff);
 //  AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
 //  AM_RANGE(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
-	AM_RANGE(0x0430, 0x0433) AM_READWRITE8(ide_ctrl_r, ide_ctrl_w, 0x00ff00ff)
-	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(access_ctrl_r,access_ctrl_w,0xffffffff)
+	map(0x0430, 0x0433).rw(this, FUNC(pc9801_state::ide_ctrl_r), FUNC(pc9801_state::ide_ctrl_w)).umask32(0x00ff00ff);
+	map(0x0438, 0x043b).rw(this, FUNC(pc9801_state::access_ctrl_r), FUNC(pc9801_state::access_ctrl_w));
 //  AM_RANGE(0x043d, 0x043d) ROM/RAM bank (NEC)
-	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank (EPSON)
-	AM_RANGE(0x0460, 0x0463) AM_READWRITE8(window_bank_r,window_bank_w, 0xffffffff)
-	AM_RANGE(0x04a0, 0x04af) AM_WRITE16(egc_w, 0xffffffff)
+	map(0x043c, 0x043f).w(this, FUNC(pc9801_state::pc9801rs_bank_w)); //ROM/RAM bank (EPSON)
+	map(0x0460, 0x0463).rw(this, FUNC(pc9801_state::window_bank_r), FUNC(pc9801_state::window_bank_w));
+	map(0x04a0, 0x04af).w(this, FUNC(pc9801_state::egc_w));
 //  AM_RANGE(0x04be, 0x04be) FDC "RPM" register
-	AM_RANGE(0x0640, 0x064f) AM_READWRITE16(ide_cs0_r, ide_cs0_w, 0xffffffff)
-	AM_RANGE(0x0740, 0x074f) AM_READWRITE16(ide_cs1_r, ide_cs1_w, 0xffffffff)
+	map(0x0640, 0x064f).rw(this, FUNC(pc9801_state::ide_cs0_r), FUNC(pc9801_state::ide_cs0_w));
+	map(0x0740, 0x074f).rw(this, FUNC(pc9801_state::ide_cs1_r), FUNC(pc9801_state::ide_cs1_w));
 //  AM_RANGE(0x08e0, 0x08ea) <undefined> / EMM SIO registers
-	AM_RANGE(0x09a0, 0x09a3) AM_READWRITE8(ext2_video_ff_r, ext2_video_ff_w, 0x000000ff) // GDC extended register r/w
+	map(0x09a0, 0x09a0).rw(this, FUNC(pc9801_state::ext2_video_ff_r), FUNC(pc9801_state::ext2_video_ff_w)); // GDC extended register r/w
 //  AM_RANGE(0x09a8, 0x09a8) GDC 31KHz register r/w
 //  AM_RANGE(0x0c07, 0x0c07) EPSON register w
 //  AM_RANGE(0x0c03, 0x0c03) EPSON register 0 r
@@ -1472,21 +1482,21 @@ ADDRESS_MAP_START(pc9801_state::pc9821_io)
 //  AM_RANGE(0x0c2d, 0x0c2d) cs4231 PCM board hi byte control
 //  AM_RANGE(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  AM_RANGE(0x0cfc, 0x0cff) PCI bus
-	AM_RANGE(0x1e8c, 0x1e8f) AM_NOP // IDE RAM switch
-	AM_RANGE(0x3fd8, 0x3fdf) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00ff00) // <undefined> / pit mirror ports
-	AM_RANGE(0x7fd8, 0x7fdf) AM_DEVREADWRITE8("ppi8255_mouse", i8255_device, read, write, 0xff00ff00)
-	AM_RANGE(0x841c, 0x841f) AM_READWRITE8(sdip_0_r,sdip_0_w,0xffffffff)
-	AM_RANGE(0x851c, 0x851f) AM_READWRITE8(sdip_1_r,sdip_1_w,0xffffffff)
-	AM_RANGE(0x861c, 0x861f) AM_READWRITE8(sdip_2_r,sdip_2_w,0xffffffff)
-	AM_RANGE(0x871c, 0x871f) AM_READWRITE8(sdip_3_r,sdip_3_w,0xffffffff)
-	AM_RANGE(0x881c, 0x881f) AM_READWRITE8(sdip_4_r,sdip_4_w,0xffffffff)
-	AM_RANGE(0x891c, 0x891f) AM_READWRITE8(sdip_5_r,sdip_5_w,0xffffffff)
-	AM_RANGE(0x8a1c, 0x8a1f) AM_READWRITE8(sdip_6_r,sdip_6_w,0xffffffff)
-	AM_RANGE(0x8b1c, 0x8b1f) AM_READWRITE8(sdip_7_r,sdip_7_w,0xffffffff)
-	AM_RANGE(0x8c1c, 0x8c1f) AM_READWRITE8(sdip_8_r,sdip_8_w,0xffffffff)
-	AM_RANGE(0x8d1c, 0x8d1f) AM_READWRITE8(sdip_9_r,sdip_9_w,0xffffffff)
-	AM_RANGE(0x8e1c, 0x8e1f) AM_READWRITE8(sdip_a_r,sdip_a_w,0xffffffff)
-	AM_RANGE(0x8f1c, 0x8f1f) AM_READWRITE8(sdip_b_r,sdip_b_w,0xffffffff)
+	map(0x1e8c, 0x1e8f).noprw(); // IDE RAM switch
+	map(0x3fd8, 0x3fdf).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00); // <undefined> / pit mirror ports
+	map(0x7fd8, 0x7fdf).rw("ppi8255_mouse", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00);
+	map(0x841c, 0x841f).rw(this, FUNC(pc9801_state::sdip_0_r), FUNC(pc9801_state::sdip_0_w));
+	map(0x851c, 0x851f).rw(this, FUNC(pc9801_state::sdip_1_r), FUNC(pc9801_state::sdip_1_w));
+	map(0x861c, 0x861f).rw(this, FUNC(pc9801_state::sdip_2_r), FUNC(pc9801_state::sdip_2_w));
+	map(0x871c, 0x871f).rw(this, FUNC(pc9801_state::sdip_3_r), FUNC(pc9801_state::sdip_3_w));
+	map(0x881c, 0x881f).rw(this, FUNC(pc9801_state::sdip_4_r), FUNC(pc9801_state::sdip_4_w));
+	map(0x891c, 0x891f).rw(this, FUNC(pc9801_state::sdip_5_r), FUNC(pc9801_state::sdip_5_w));
+	map(0x8a1c, 0x8a1f).rw(this, FUNC(pc9801_state::sdip_6_r), FUNC(pc9801_state::sdip_6_w));
+	map(0x8b1c, 0x8b1f).rw(this, FUNC(pc9801_state::sdip_7_r), FUNC(pc9801_state::sdip_7_w));
+	map(0x8c1c, 0x8c1f).rw(this, FUNC(pc9801_state::sdip_8_r), FUNC(pc9801_state::sdip_8_w));
+	map(0x8d1c, 0x8d1f).rw(this, FUNC(pc9801_state::sdip_9_r), FUNC(pc9801_state::sdip_9_w));
+	map(0x8e1c, 0x8e1f).rw(this, FUNC(pc9801_state::sdip_a_r), FUNC(pc9801_state::sdip_a_w));
+	map(0x8f1c, 0x8f1f).rw(this, FUNC(pc9801_state::sdip_b_r), FUNC(pc9801_state::sdip_b_w));
 //  AM_RANGE(0xa460, 0xa46f) cs4231 PCM extended port / <undefined>
 //  AM_RANGE(0xbfdb, 0xbfdb) mouse timing port
 //  AM_RANGE(0xc0d0, 0xc0d3) MIDI port, option 0 / <undefined>
@@ -1497,7 +1507,7 @@ ADDRESS_MAP_START(pc9801_state::pc9821_io)
 //  AM_RANGE(0xd4d0, 0xd4d3) MIDI port, option 5 / <undefined>
 //  AM_RANGE(0xd8d0, 0xd8d3) MIDI port, option 6 / <undefined>
 //  AM_RANGE(0xdcd0, 0xdcd3) MIDI port, option 7 / <undefined>
-	AM_RANGE(0xe0d0, 0xe0d3) AM_READ8(midi_r, 0xffffffff) // MIDI port, option 8 / <undefined>
+	map(0xe0d0, 0xe0d3).r(this, FUNC(pc9801_state::midi_r)); // MIDI port, option 8 / <undefined>
 //  AM_RANGE(0xe4d0, 0xe4d3) MIDI port, option 9 / <undefined>
 //  AM_RANGE(0xe8d0, 0xe8d3) MIDI port, option A / <undefined>
 //  AM_RANGE(0xecd0, 0xecd3) MIDI port, option B / <undefined>
@@ -1505,19 +1515,22 @@ ADDRESS_MAP_START(pc9801_state::pc9821_io)
 //  AM_RANGE(0xf4d0, 0xf4d3) MIDI port, option D / <undefined>
 //  AM_RANGE(0xf8d0, 0xf8d3) MIDI port, option E / <undefined>
 //  AM_RANGE(0xfcd0, 0xfcd3) MIDI port, option F / <undefined>
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(pc9801_state::upd7220_1_map)
-	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_SHARE("video_ram_1")
-ADDRESS_MAP_END
+void pc9801_state::upd7220_1_map(address_map &map)
+{
+	map(0x00000, 0x03fff).ram().share("video_ram_1");
+}
 
-ADDRESS_MAP_START(pc9801_state::upd7220_2_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_2")
-ADDRESS_MAP_END
+void pc9801_state::upd7220_2_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram().share("video_ram_2");
+}
 
-ADDRESS_MAP_START(pc9801_state::upd7220_grcg_2_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(upd7220_grcg_r, upd7220_grcg_w) AM_SHARE("video_ram_2")
-ADDRESS_MAP_END
+void pc9801_state::upd7220_grcg_2_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rw(this, FUNC(pc9801_state::upd7220_grcg_r), FUNC(pc9801_state::upd7220_grcg_w)).share("video_ram_2");
+}
 
 CUSTOM_INPUT_MEMBER(pc9801_state::system_type_r)
 {

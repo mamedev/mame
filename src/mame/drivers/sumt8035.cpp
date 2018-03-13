@@ -34,13 +34,15 @@ protected:
 };
 
 
-ADDRESS_MAP_START(sumt8035_state::sumt_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void sumt8035_state::sumt_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
 
-ADDRESS_MAP_START(sumt8035_state::sumt_portmap)
-ADDRESS_MAP_END
+void sumt8035_state::sumt_portmap(address_map &map)
+{
+}
 
 
 static INPUT_PORTS_START( summit )

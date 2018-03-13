@@ -332,42 +332,45 @@ WRITE8_MEMBER(welltris_state::sound_bankswitch_w)
 }
 
 
-ADDRESS_MAP_START(welltris_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_SHARE("pixelram")    /* Graph_1 & 2*/
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                             /* work */
-	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM AM_SHARE("spriteram")           /* Sprite */
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(charvideoram_w) AM_SHARE("charvideoram")     /* Char */
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    /* Palette */
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")                 /* Bottom Controls */
-	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(palette_bank_w)
-	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")                 /* Top Controls */
-	AM_RANGE(0xfff002, 0xfff003) AM_WRITE(gfxbank_w)
-	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("P3")                 /* Left Side Ctrls */
-	AM_RANGE(0xfff004, 0xfff007) AM_WRITE(scrollreg_w)
-	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("P4")                 /* Right Side Ctrls */
-	AM_RANGE(0xfff008, 0xfff009) AM_READ_PORT("SYSTEM")             /* Bit 5 Tested at start of irq 1 */
-	AM_RANGE(0xfff008, 0xfff009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("EXTRA")              /* P3+P4 Coin + Start Buttons */
-	AM_RANGE(0xfff00c, 0xfff00d) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff00c, 0xfff00f) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
-ADDRESS_MAP_END
+void welltris_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x17ffff).rom();
+	map(0x800000, 0x81ffff).ram().share("pixelram");    /* Graph_1 & 2*/
+	map(0xff8000, 0xffbfff).ram();                             /* work */
+	map(0xffc000, 0xffc3ff).ram().share("spriteram");           /* Sprite */
+	map(0xffd000, 0xffdfff).ram().w(this, FUNC(welltris_state::charvideoram_w)).share("charvideoram");     /* Char */
+	map(0xffe000, 0xffefff).ram().w("palette", FUNC(palette_device::write16)).share("palette");    /* Palette */
+	map(0xfff000, 0xfff001).portr("P1");                 /* Bottom Controls */
+	map(0xfff000, 0xfff001).w(this, FUNC(welltris_state::palette_bank_w));
+	map(0xfff002, 0xfff003).portr("P2");                 /* Top Controls */
+	map(0xfff002, 0xfff003).w(this, FUNC(welltris_state::gfxbank_w));
+	map(0xfff004, 0xfff005).portr("P3");                 /* Left Side Ctrls */
+	map(0xfff004, 0xfff007).w(this, FUNC(welltris_state::scrollreg_w));
+	map(0xfff006, 0xfff007).portr("P4");                 /* Right Side Ctrls */
+	map(0xfff008, 0xfff009).portr("SYSTEM");             /* Bit 5 Tested at start of irq 1 */
+	map(0xfff009, 0xfff009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xfff00a, 0xfff00b).portr("EXTRA");              /* P3+P4 Coin + Start Buttons */
+	map(0xfff00c, 0xfff00d).portr("DSW1");
+	map(0xfff00e, 0xfff00f).portr("DSW2");
+	map(0xfff00c, 0xfff00f).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(welltris_state::sound_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
-ADDRESS_MAP_END
+void welltris_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("soundbank");
+}
 
-ADDRESS_MAP_START(welltris_state::sound_port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-ADDRESS_MAP_END
+void welltris_state::sound_port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(welltris_state::sound_bankswitch_w));
+	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0x10, 0x10).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x18, 0x18).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+}
 
 static INPUT_PORTS_START( welltris )
 	PORT_START("SYSTEM")

@@ -45,20 +45,22 @@ private:
 	required_device<z80sio_device> m_uart;
 };
 
-ADDRESS_MAP_START(m79152pc_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_SHARE("attributes")
-ADDRESS_MAP_END
+void m79152pc_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0x8fff).ram().share("videoram");
+	map(0x9000, 0x9fff).ram().share("attributes");
+}
 
-ADDRESS_MAP_START(m79152pc_state::io_map)
+void m79152pc_state::io_map(address_map &map)
+{
 	//ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("uart", z80sio_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+	map.global_mask(0xff);
+	map(0x40, 0x43).rw(m_uart, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x44, 0x47).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( m79152pc )

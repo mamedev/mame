@@ -59,60 +59,66 @@ READ8_MEMBER(powerins_state::powerinsb_fake_ym2203_r)
 }
 
 
-ADDRESS_MAP_START(powerins_state::powerins_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW1")
-	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100014, 0x100015) AM_WRITE8(flipscreen_w, 0x00ff)
-	AM_RANGE(0x100016, 0x100017) AM_WRITENOP          // ? always 1
-	AM_RANGE(0x100018, 0x100019) AM_WRITE8(tilebank_w, 0x00ff)
-	AM_RANGE(0x10001e, 0x10001f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x120000, 0x120fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x130000, 0x130007) AM_RAM AM_SHARE("vctrl_0")
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0")
-	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1")
-	AM_RANGE(0x171000, 0x171fff) AM_WRITE(vram_1_w)
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void powerins_state::powerins_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x100001).portr("SYSTEM");
+	map(0x100002, 0x100003).portr("P1_P2");
+	map(0x100008, 0x100009).portr("DSW1");
+	map(0x10000a, 0x10000b).portr("DSW2");
+	map(0x100015, 0x100015).w(this, FUNC(powerins_state::flipscreen_w));
+	map(0x100016, 0x100017).nopw();          // ? always 1
+	map(0x100019, 0x100019).w(this, FUNC(powerins_state::tilebank_w));
+	map(0x10001f, 0x10001f).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x120000, 0x120fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x130000, 0x130007).ram().share("vctrl_0");
+	map(0x140000, 0x143fff).ram().w(this, FUNC(powerins_state::vram_0_w)).share("vram_0");
+	map(0x170000, 0x170fff).ram().w(this, FUNC(powerins_state::vram_1_w)).share("vram_1");
+	map(0x171000, 0x171fff).w(this, FUNC(powerins_state::vram_1_w));
+	map(0x180000, 0x18ffff).ram().share("spriteram");
+}
 
 /* powerinsa: same as the original one but without the sound cpu (and inferior sound HW) */
-ADDRESS_MAP_START(powerins_state::powerinsa_map)
-	AM_IMPORT_FROM(powerins_map)
-	AM_RANGE(0x100030, 0x100031) AM_WRITE8(powerinsa_okibank_w, 0x00ff)
-	AM_RANGE(0x10003e, 0x10003f) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void powerins_state::powerinsa_map(address_map &map)
+{
+	powerins_map(map);
+	map(0x100031, 0x100031).w(this, FUNC(powerins_state::powerinsa_okibank_w));
+	map(0x10003f, 0x10003f).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
-ADDRESS_MAP_START(powerins_state::powerins_sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+void powerins_state::powerins_sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
 //  AM_RANGE(0xe000, 0xe000) AM_WRITENOP // ? written only once ?
 //  AM_RANGE(0xe001, 0xe001) AM_WRITENOP // ?
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(powerins_state::powerins_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_device, okibank_w)
-ADDRESS_MAP_END
+void powerins_state::powerins_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x80, 0x80).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x88, 0x88).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x90, 0x97).w("nmk112", FUNC(nmk112_device::okibank_w));
+}
 
-ADDRESS_MAP_START(powerins_state::powerinsb_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(powerinsb_fake_ym2203_r) AM_WRITENOP
-	AM_RANGE(0x01, 0x01) AM_NOP
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_device, okibank_w)
-ADDRESS_MAP_END
+void powerins_state::powerinsb_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(powerins_state::powerinsb_fake_ym2203_r)).nopw();
+	map(0x01, 0x01).noprw();
+	map(0x80, 0x80).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x88, 0x88).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x90, 0x97).w("nmk112", FUNC(nmk112_device::okibank_w));
+}
 
-ADDRESS_MAP_START(powerins_state::powerinsa_oki_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void powerins_state::powerinsa_oki_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("okibank");
+}
 
 
 /***************************************************************************

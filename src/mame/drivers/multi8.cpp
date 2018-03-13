@@ -288,33 +288,35 @@ WRITE8_MEMBER( multi8_state::kanji_w )
 	m_knj_addr = (offset == 0) ? (m_knj_addr & 0xff00) | (data & 0xff) : (m_knj_addr & 0x00ff) | (data << 8);
 }
 
-ADDRESS_MAP_START(multi8_state::multi8_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(vram_r, vram_w)
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void multi8_state::multi8_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).rw(this, FUNC(multi8_state::vram_r), FUNC(multi8_state::vram_w));
+	map(0xc000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(multi8_state::multi8_io)
+void multi8_state::multi8_io(address_map &map)
+{
 //  ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(key_input_r) //keyboard
-	AM_RANGE(0x01, 0x01) AM_READ(key_status_r) //keyboard
-	AM_RANGE(0x18, 0x19) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x18, 0x18) AM_READ(ay8912_0_r)
-	AM_RANGE(0x1a, 0x1a) AM_READ(ay8912_1_r)
-	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x1d, 0x1d) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w) //cmt
-	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("pit", pit8253_device, read, write) //pit
-	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x2c, 0x2d) AM_DEVREADWRITE("pic", pic8259_device, read, write) //i8259
-	AM_RANGE(0x30, 0x37) AM_READWRITE(pal_r,pal_w)
-	AM_RANGE(0x40, 0x41) AM_READWRITE(kanji_r, kanji_w) //kanji regs
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(multi8_state::key_input_r)); //keyboard
+	map(0x01, 0x01).r(this, FUNC(multi8_state::key_status_r)); //keyboard
+	map(0x18, 0x19).w(m_aysnd, FUNC(ay8910_device::address_data_w));
+	map(0x18, 0x18).r(this, FUNC(multi8_state::ay8912_0_r));
+	map(0x1a, 0x1a).r(this, FUNC(multi8_state::ay8912_1_r));
+	map(0x1c, 0x1c).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x1d, 0x1d).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x20, 0x20).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x21, 0x21).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)); //cmt
+	map(0x24, 0x27).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)); //pit
+	map(0x28, 0x2b).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x2c, 0x2d).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write)); //i8259
+	map(0x30, 0x37).rw(this, FUNC(multi8_state::pal_r), FUNC(multi8_state::pal_w));
+	map(0x40, 0x41).rw(this, FUNC(multi8_state::kanji_r), FUNC(multi8_state::kanji_w)); //kanji regs
 //  AM_RANGE(0x70, 0x74) //upd765a fdc
 //  AM_RANGE(0x78, 0x78) //memory banking
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( multi8 )

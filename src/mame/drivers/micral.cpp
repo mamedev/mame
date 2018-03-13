@@ -147,43 +147,46 @@ WRITE8_MEMBER( micral_state::video_w )
 }
 
 
-ADDRESS_MAP_START(micral_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfeff) AM_ROM
-	AM_RANGE(0xff00, 0xffef) AM_RAM
-	AM_RANGE(0xfff6, 0xfff7) // AM_WRITENOP // unknown ports
-	AM_RANGE(0xfff8, 0xfff9) AM_READWRITE(video_r, video_w)
-	AM_RANGE(0xfffa, 0xfffa) AM_READ(keyin_r)
-	AM_RANGE(0xfffb, 0xfffb) AM_READ(unk_r)
-	AM_RANGE(0xfffc, 0xfffc) AM_READ(status_r)
-	AM_RANGE(0xfffd, 0xffff) // more unknown ports
-ADDRESS_MAP_END
+void micral_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xf7ff).ram();
+	map(0xf800, 0xfeff).rom();
+	map(0xff00, 0xffef).ram();
+	map(0xfff6, 0xfff7); // AM_WRITENOP // unknown ports
+	map(0xfff8, 0xfff9).rw(this, FUNC(micral_state::video_r), FUNC(micral_state::video_w));
+	map(0xfffa, 0xfffa).r(this, FUNC(micral_state::keyin_r));
+	map(0xfffb, 0xfffb).r(this, FUNC(micral_state::unk_r));
+	map(0xfffc, 0xfffc).r(this, FUNC(micral_state::status_r));
+	map(0xfffd, 0xffff); // more unknown ports
+}
 
-ADDRESS_MAP_START(micral_state::mem_kbd)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_RAM // byte returned to main cpu after receiving irq
-	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("X0")
-	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("X1")
-	AM_RANGE(0x8004, 0x8004) AM_READ_PORT("X2")
-	AM_RANGE(0x8008, 0x8008) AM_READ_PORT("X3")
-	AM_RANGE(0x8010, 0x8010) AM_READ_PORT("X4")
-	AM_RANGE(0x8020, 0x8020) AM_READ_PORT("X5")
-	AM_RANGE(0x8040, 0x8040) AM_READ_PORT("X6")
-	AM_RANGE(0x8080, 0x8080) AM_READ_PORT("X7")
-	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("X8")
-	AM_RANGE(0x8200, 0x8200) AM_READ_PORT("X9")
-	AM_RANGE(0x8400, 0x8400) AM_READ_PORT("X10")
-	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("X11")
-	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("X12")
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("X13")
-ADDRESS_MAP_END
+void micral_state::mem_kbd(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom();
+	map(0x8000, 0x8000).ram(); // byte returned to main cpu after receiving irq
+	map(0x8001, 0x8001).portr("X0");
+	map(0x8002, 0x8002).portr("X1");
+	map(0x8004, 0x8004).portr("X2");
+	map(0x8008, 0x8008).portr("X3");
+	map(0x8010, 0x8010).portr("X4");
+	map(0x8020, 0x8020).portr("X5");
+	map(0x8040, 0x8040).portr("X6");
+	map(0x8080, 0x8080).portr("X7");
+	map(0x8100, 0x8100).portr("X8");
+	map(0x8200, 0x8200).portr("X9");
+	map(0x8400, 0x8400).portr("X10");
+	map(0x8800, 0x8800).portr("X11");
+	map(0x9000, 0x9000).portr("X12");
+	map(0xa000, 0xa000).portr("X13");
+}
 
-ADDRESS_MAP_START(micral_state::io_kbd)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("X14")
-ADDRESS_MAP_END
+void micral_state::io_kbd(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("X14");
+}
 
 /* Input ports */
 static INPUT_PORTS_START( micral )

@@ -101,63 +101,67 @@ WRITE8_MEMBER(espial_state::espial_master_soundlatch_w)
 }
 
 
-ADDRESS_MAP_START(espial_state::espial_map)
-	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0x5800, 0x5fff) AM_RAM
-	AM_RANGE(0x6081, 0x6081) AM_READ_PORT("IN0")
-	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
-	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN1")
-	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN2")
-	AM_RANGE(0x6090, 0x6090) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(espial_master_soundlatch_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)
-	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_mask_w)
-	AM_RANGE(0x7200, 0x7200) AM_WRITE(espial_flipscreen_w)
-	AM_RANGE(0x8000, 0x801f) AM_RAM AM_SHARE("spriteram_1")
-	AM_RANGE(0x8020, 0x803f) AM_READONLY
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(espial_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8800, 0x880f) AM_WRITEONLY AM_SHARE("spriteram_3")
-	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(espial_attributeram_w) AM_SHARE("attributeram")
-	AM_RANGE(0x9000, 0x901f) AM_RAM AM_SHARE("spriteram_2")
-	AM_RANGE(0x9020, 0x903f) AM_RAM_WRITE(espial_scrollram_w) AM_SHARE("scrollram")
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(espial_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xc000, 0xcfff) AM_ROM
-ADDRESS_MAP_END
+void espial_state::espial_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom();
+	map(0x5800, 0x5fff).ram();
+	map(0x6081, 0x6081).portr("IN0");
+	map(0x6082, 0x6082).portr("DSW1");
+	map(0x6083, 0x6083).portr("IN1");
+	map(0x6084, 0x6084).portr("IN2");
+	map(0x6090, 0x6090).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(this, FUNC(espial_state::espial_master_soundlatch_w));
+	map(0x7000, 0x7000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
+	map(0x7100, 0x7100).w(this, FUNC(espial_state::espial_master_interrupt_mask_w));
+	map(0x7200, 0x7200).w(this, FUNC(espial_state::espial_flipscreen_w));
+	map(0x8000, 0x801f).ram().share("spriteram_1");
+	map(0x8020, 0x803f).readonly();
+	map(0x8400, 0x87ff).ram().w(this, FUNC(espial_state::espial_videoram_w)).share("videoram");
+	map(0x8800, 0x880f).writeonly().share("spriteram_3");
+	map(0x8c00, 0x8fff).ram().w(this, FUNC(espial_state::espial_attributeram_w)).share("attributeram");
+	map(0x9000, 0x901f).ram().share("spriteram_2");
+	map(0x9020, 0x903f).ram().w(this, FUNC(espial_state::espial_scrollram_w)).share("scrollram");
+	map(0x9400, 0x97ff).ram().w(this, FUNC(espial_state::espial_colorram_w)).share("colorram");
+	map(0xc000, 0xcfff).rom();
+}
 
 
 /* there are a lot of unmapped reads from all over memory as the
    code uses POP instructions in a delay loop */
-ADDRESS_MAP_START(espial_state::netwars_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x5800, 0x5fff) AM_RAM
-	AM_RANGE(0x6081, 0x6081) AM_READ_PORT("IN0")
-	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
-	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN1")
-	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN2")
-	AM_RANGE(0x6090, 0x6090) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(espial_master_soundlatch_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)
-	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_mask_w)
-	AM_RANGE(0x7200, 0x7200) AM_WRITE(espial_flipscreen_w)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(espial_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0x801f) AM_RAM AM_SHARE("spriteram_1")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(espial_attributeram_w) AM_SHARE("attributeram")
-	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("spriteram_3")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(espial_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9000, 0x901f) AM_RAM AM_SHARE("spriteram_2")
-	AM_RANGE(0x9020, 0x903f) AM_RAM_WRITE(espial_scrollram_w) AM_SHARE("scrollram")
-ADDRESS_MAP_END
+void espial_state::netwars_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x5800, 0x5fff).ram();
+	map(0x6081, 0x6081).portr("IN0");
+	map(0x6082, 0x6082).portr("DSW1");
+	map(0x6083, 0x6083).portr("IN1");
+	map(0x6084, 0x6084).portr("IN2");
+	map(0x6090, 0x6090).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(this, FUNC(espial_state::espial_master_soundlatch_w));
+	map(0x7000, 0x7000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
+	map(0x7100, 0x7100).w(this, FUNC(espial_state::espial_master_interrupt_mask_w));
+	map(0x7200, 0x7200).w(this, FUNC(espial_state::espial_flipscreen_w));
+	map(0x8000, 0x87ff).ram().w(this, FUNC(espial_state::espial_videoram_w)).share("videoram");
+	map(0x8000, 0x801f).ram().share("spriteram_1");
+	map(0x8800, 0x8fff).ram().w(this, FUNC(espial_state::espial_attributeram_w)).share("attributeram");
+	map(0x8800, 0x880f).ram().share("spriteram_3");
+	map(0x9000, 0x97ff).ram().w(this, FUNC(espial_state::espial_colorram_w)).share("colorram");
+	map(0x9000, 0x901f).ram().share("spriteram_2");
+	map(0x9020, 0x903f).ram().w(this, FUNC(espial_state::espial_scrollram_w)).share("scrollram");
+}
 
 
-ADDRESS_MAP_START(espial_state::espial_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(espial_sound_nmi_mask_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void espial_state::espial_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x4000, 0x4000).w(this, FUNC(espial_state::espial_sound_nmi_mask_w));
+	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
+}
 
-ADDRESS_MAP_START(espial_state::espial_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void espial_state::espial_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 
 /* verified from Z80 code */

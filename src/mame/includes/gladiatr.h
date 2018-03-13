@@ -3,6 +3,9 @@
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/mcs48/mcs48.h"
+#include "cpu/z80/z80.h"
 
 
 class gladiatr_state_base : public driver_device
@@ -55,13 +58,13 @@ protected:
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	required_device<cpu_device>             m_maincpu;
-	required_device<cpu_device>             m_subcpu;
-	required_device<cpu_device>             m_audiocpu;
-	optional_device<cpu_device>             m_cctl;
-	optional_device<cpu_device>             m_ccpu;
-	optional_device<cpu_device>             m_ucpu;
-	optional_device<cpu_device>             m_csnd;
+	required_device<z80_device>             m_maincpu;
+	required_device<z80_device>             m_subcpu;
+	required_device<mc6809_device>          m_audiocpu;
+	optional_device<upi41_cpu_device>       m_cctl;
+	optional_device<upi41_cpu_device>       m_ccpu;
+	optional_device<upi41_cpu_device>       m_ucpu;
+	optional_device<upi41_cpu_device>       m_csnd;
 	required_device<gfxdecode_device>       m_gfxdecode;
 	required_device<palette_device>         m_palette;
 	required_device<msm5205_device>         m_msm;

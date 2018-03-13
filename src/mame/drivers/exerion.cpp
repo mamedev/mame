@@ -191,22 +191,23 @@ READ8_MEMBER(exerion_state::exerion_protection_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(exerion_state::main_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("main_ram")
-	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8800, 0x887f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x8880, 0x8bff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(exerion_videoreg_w)
-	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xd802, 0xd802) AM_DEVREAD("ay2", ay8910_device, data_r)
-ADDRESS_MAP_END
+void exerion_state::main_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x67ff).ram().share("main_ram");
+	map(0x6008, 0x600b).r(this, FUNC(exerion_state::exerion_protection_r));
+	map(0x8000, 0x87ff).ram().share("videoram");
+	map(0x8800, 0x887f).ram().share("spriteram");
+	map(0x8880, 0x8bff).ram();
+	map(0xa000, 0xa000).portr("IN0");
+	map(0xa800, 0xa800).portr("DSW0");
+	map(0xb000, 0xb000).portr("DSW1");
+	map(0xc000, 0xc000).w(this, FUNC(exerion_state::exerion_videoreg_w));
+	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xd000, 0xd001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0xd800, 0xd801).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xd802, 0xd802).r("ay2", FUNC(ay8910_device::data_r));
+}
 
 
 
@@ -216,13 +217,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(exerion_state::sub_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x800c) AM_WRITE(exerion_video_latch_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(exerion_video_timing_r)
-ADDRESS_MAP_END
+void exerion_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x800c).w(this, FUNC(exerion_state::exerion_video_latch_w));
+	map(0xa000, 0xa000).r(this, FUNC(exerion_state::exerion_video_timing_r));
+}
 
 
 

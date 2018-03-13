@@ -583,69 +583,74 @@ void segaybd_state::update_irqs()
 //  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segaybd_state::main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE("multiplier_main", sega_315_5248_multiplier_device, read, write)
-	AM_RANGE(0x082000, 0x082001) AM_MIRROR(0x001ffe) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE("divider_main", sega_315_5249_divider_device, read, write)
+void segaybd_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x1fffff);
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x080007).mirror(0x001ff8).rw("multiplier_main", FUNC(sega_315_5248_multiplier_device::read), FUNC(sega_315_5248_multiplier_device::write));
+	map(0x082001, 0x082001).mirror(0x001ffe).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x084000, 0x08401f).mirror(0x001fe0).rw("divider_main", FUNC(sega_315_5249_divider_device::read), FUNC(sega_315_5249_divider_device::write));
 //  AM_RANGE(0x086000, 0x087fff) /DEA0
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("shareram")
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("io", sega_315_5296_device, read, write, 0x00ff)
-	AM_RANGE(0x100040, 0x100047) AM_DEVREADWRITE8("adc", msm6253_device, d7_r, address_w, 0x00ff)
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x0c0000, 0x0cffff).ram().share("shareram");
+	map(0x100000, 0x10001f).rw("io", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
+	map(0x100040, 0x100047).rw("adc", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::address_w)).umask16(0x00ff);
+	map(0x1f0000, 0x1fffff).ram();
+}
 
 
 //**************************************************************************
 //  SUB CPU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segaybd_state::subx_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE("multiplier_subx", sega_315_5248_multiplier_device, read, write)
-	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE("divider_subx", sega_315_5249_divider_device, read, write)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("shareram")
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("ysprites")
-	AM_RANGE(0x1f8000, 0x1fbfff) AM_RAM
-	AM_RANGE(0x1fc000, 0x1fffff) AM_RAM AM_SHARE("backupram")
-ADDRESS_MAP_END
+void segaybd_state::subx_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x1fffff);
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x080007).mirror(0x001ff8).rw("multiplier_subx", FUNC(sega_315_5248_multiplier_device::read), FUNC(sega_315_5248_multiplier_device::write));
+	map(0x084000, 0x08401f).mirror(0x001fe0).rw("divider_subx", FUNC(sega_315_5249_divider_device::read), FUNC(sega_315_5249_divider_device::write));
+	map(0x0c0000, 0x0cffff).ram().share("shareram");
+	map(0x180000, 0x18ffff).ram().share("ysprites");
+	map(0x1f8000, 0x1fbfff).ram();
+	map(0x1fc000, 0x1fffff).ram().share("backupram");
+}
 
-ADDRESS_MAP_START(segaybd_state::suby_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE("multiplier_suby", sega_315_5248_multiplier_device, read, write)
-	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE("divider_suby", sega_315_5249_divider_device, read, write)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("shareram")
-	AM_RANGE(0x180000, 0x1807ff) AM_MIRROR(0x007800) AM_RAM AM_SHARE("rotateram")
-	AM_RANGE(0x188000, 0x188fff) AM_MIRROR(0x007000) AM_RAM AM_SHARE("bsprites")
-	AM_RANGE(0x190000, 0x193fff) AM_MIRROR(0x004000) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x198000, 0x19ffff) AM_DEVREAD("segaic16vid", segaic16_video_device, rotate_control_r)
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
-ADDRESS_MAP_END
+void segaybd_state::suby_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x1fffff);
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x080007).mirror(0x001ff8).rw("multiplier_suby", FUNC(sega_315_5248_multiplier_device::read), FUNC(sega_315_5248_multiplier_device::write));
+	map(0x084000, 0x08401f).mirror(0x001fe0).rw("divider_suby", FUNC(sega_315_5249_divider_device::read), FUNC(sega_315_5249_divider_device::write));
+	map(0x0c0000, 0x0cffff).ram().share("shareram");
+	map(0x180000, 0x1807ff).mirror(0x007800).ram().share("rotateram");
+	map(0x188000, 0x188fff).mirror(0x007000).ram().share("bsprites");
+	map(0x190000, 0x193fff).mirror(0x004000).ram().w(this, FUNC(segaybd_state::paletteram_w)).share("paletteram");
+	map(0x198000, 0x19ffff).r(m_segaic16vid, FUNC(segaic16_video_device::rotate_control_r));
+	map(0x1f0000, 0x1fffff).ram();
+}
 
 
 //**************************************************************************
 //  Z80 SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segaybd_state::sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm", segapcm_device, sega_pcm_r, sega_pcm_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segaybd_state::sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm", FUNC(segapcm_device::sega_pcm_r), FUNC(segapcm_device::sega_pcm_w));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segaybd_state::sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void segaybd_state::sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x40, 0x40).mirror(0x3f).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 
 //**************************************************************************
@@ -681,20 +686,22 @@ WRITE16_MEMBER(segaybd_state::link2_w)
 	logerror("link2_w %04x\n", data);
 }
 
-ADDRESS_MAP_START(segaybd_state::main_map_link)
-	AM_IMPORT_FROM(main_map)
-	AM_RANGE(0x190000, 0x190fff) AM_DEVREADWRITE8("mb8421", mb8421_device, left_r, left_w, 0x00ff)
-	AM_RANGE(0x191000, 0x191001) AM_READ(link_r)
-	AM_RANGE(0x192000, 0x192001) AM_READWRITE(link2_r, link2_w)
-ADDRESS_MAP_END
+void segaybd_state::main_map_link(address_map &map)
+{
+	main_map(map);
+	map(0x190000, 0x190fff).rw("mb8421", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)).umask16(0x00ff);
+	map(0x191000, 0x191001).r(this, FUNC(segaybd_state::link_r));
+	map(0x192000, 0x192001).rw(this, FUNC(segaybd_state::link2_r), FUNC(segaybd_state::link2_w));
+}
 
 
-ADDRESS_MAP_START(segaybd_state::link_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM // 0x2000-0x2*** maybe shared with other boards?
-	AM_RANGE(0x4000, 0x47ff) AM_DEVREADWRITE("mb8421", mb8421_device, right_r, right_w)
-ADDRESS_MAP_END
+void segaybd_state::link_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x3fff).ram(); // 0x2000-0x2*** maybe shared with other boards?
+	map(0x4000, 0x47ff).rw("mb8421", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w));
+}
 
 #if 0
 READ8_MEMBER(segaybd_state::link_portc0_r)
@@ -703,20 +710,22 @@ READ8_MEMBER(segaybd_state::link_portc0_r)
 }
 #endif
 
-ADDRESS_MAP_START(segaybd_state::link_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void segaybd_state::link_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("LinkID_DSW1")
-	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("LinkID_DSW2")
-ADDRESS_MAP_END
+	map(0x40, 0x40).portr("LinkID_DSW1");
+	map(0xc0, 0xc0).portr("LinkID_DSW2");
+}
 
 
-ADDRESS_MAP_START(segaybd_state::motor_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segaybd_state::motor_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xffff).ram();
+}
 
 //**************************************************************************
 //  GENERIC PORT DEFINITIONS

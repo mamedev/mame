@@ -121,35 +121,37 @@ WRITE8_MEMBER(_88games_state::k052109_051960_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(_88games_state::main_map)
-	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bank0000") /* banked ROM */
-	AM_RANGE(0x1000, 0x1fff) AM_READ_BANK("bank1000") /* banked ROM + palette RAM */
-	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("ram")
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
-	AM_RANGE(0x5f84, 0x5f84) AM_WRITE(k88games_5f84_w)
-	AM_RANGE(0x5f88, 0x5f88) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x5f8c, 0x5f8c) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x5f90, 0x5f90) AM_WRITE(k88games_sh_irqtrigger_w)
-	AM_RANGE(0x5f94, 0x5f94) AM_READ_PORT("IN0")
-	AM_RANGE(0x5f95, 0x5f95) AM_READ_PORT("IN1")
-	AM_RANGE(0x5f96, 0x5f96) AM_READ_PORT("IN2")
-	AM_RANGE(0x5f97, 0x5f97) AM_READ_PORT("DSW1")
-	AM_RANGE(0x5f9b, 0x5f9b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x5fc0, 0x5fcf) AM_DEVWRITE("k051316", k051316_device, ctrl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void _88games_state::main_map(address_map &map)
+{
+	map(0x0000, 0x0fff).bankr("bank0000"); /* banked ROM */
+	map(0x1000, 0x1fff).bankr("bank1000"); /* banked ROM + palette RAM */
+	map(0x1000, 0x1fff).w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0x2000, 0x2fff).ram();
+	map(0x3000, 0x37ff).ram().share("nvram");
+	map(0x3800, 0x3fff).rw(this, FUNC(_88games_state::bankedram_r), FUNC(_88games_state::bankedram_w)).share("ram");
+	map(0x4000, 0x7fff).rw(this, FUNC(_88games_state::k052109_051960_r), FUNC(_88games_state::k052109_051960_w));
+	map(0x5f84, 0x5f84).w(this, FUNC(_88games_state::k88games_5f84_w));
+	map(0x5f88, 0x5f88).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x5f8c, 0x5f8c).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x5f90, 0x5f90).w(this, FUNC(_88games_state::k88games_sh_irqtrigger_w));
+	map(0x5f94, 0x5f94).portr("IN0");
+	map(0x5f95, 0x5f95).portr("IN1");
+	map(0x5f96, 0x5f96).portr("IN2");
+	map(0x5f97, 0x5f97).portr("DSW1");
+	map(0x5f9b, 0x5f9b).portr("DSW2");
+	map(0x5fc0, 0x5fcf).w(m_k051316, FUNC(k051316_device::ctrl_w));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(_88games_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(speech_msg_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(speech_control_w)
-ADDRESS_MAP_END
+void _88games_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).w(this, FUNC(_88games_state::speech_msg_w));
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xe000, 0xe000).w(this, FUNC(_88games_state::speech_control_w));
+}
 
 
 

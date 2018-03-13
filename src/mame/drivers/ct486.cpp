@@ -95,12 +95,14 @@ WRITE_LINE_MEMBER( ct486_state::cs4031_hold )
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(ct486_state::ct486_map)
-ADDRESS_MAP_END
+void ct486_state::ct486_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(ct486_state::ct486_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void ct486_state::ct486_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 
 //**************************************************************************

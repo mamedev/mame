@@ -91,19 +91,21 @@ private:
 };
 
 
-ADDRESS_MAP_START(pimps_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void pimps_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xefff).ram();
+	map(0xf000, 0xffff).rom().region("roms", 0);
+}
 
-ADDRESS_MAP_START(pimps_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
-	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void pimps_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0, 0xf0).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf1, 0xf1).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf2, 0xf2).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf3, 0xf3).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pimps )

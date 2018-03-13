@@ -217,19 +217,21 @@ MACHINE_RESET_MEMBER(mc1502_state, mc1502)
  * macros
  */
 
-ADDRESS_MAP_START(mc1502_state::mc1502_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void mc1502_state::mc1502_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(mc1502_state::mc1502_io)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x0028, 0x0028) AM_DEVREADWRITE("upd8251", i8251_device, data_r, data_w)
-	AM_RANGE(0x0029, 0x0029) AM_DEVREADWRITE("upd8251", i8251_device, status_r, control_w)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255n1", i8255_device, read, write)
-	AM_RANGE(0x0068, 0x006B) AM_DEVREADWRITE("ppi8255n2", i8255_device, read, write)    // keyboard poll
-ADDRESS_MAP_END
+void mc1502_state::mc1502_io(address_map &map)
+{
+	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0028, 0x0028).rw(m_upd8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x0029, 0x0029).rw(m_upd8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0060, 0x0063).rw(m_ppi8255n1, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0068, 0x006B).rw(m_ppi8255n2, FUNC(i8255_device::read), FUNC(i8255_device::write));    // keyboard poll
+}
 
 static INPUT_PORTS_START( mc1502 )
 	PORT_INCLUDE( mc7007_3_keyboard )

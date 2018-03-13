@@ -41,18 +41,20 @@ private:
 	required_shared_ptr<u8> m_p_videoram;
 };
 
-ADDRESS_MAP_START(cdc721_state::mem_map)
-	AM_RANGE(0x0000, 0x4fff) AM_ROM AM_REGION("maincpu", 0x10000)
+void cdc721_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom().region("maincpu", 0x10000);
 //  AM_RANGE(0x0000, 0x4fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x8000, 0xe10f) AM_RAM
-	AM_RANGE(0xe110, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+	map(0x8000, 0xe10f).ram();
+	map(0xe110, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(cdc721_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("crtc", tms9927_device, read, write)
+void cdc721_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x1f).rw("crtc", FUNC(tms9927_device::read), FUNC(tms9927_device::write));
 //  AM_RANGE(0x70, 0x70) AM_WRITE(port70_w)
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( cdc721 )
 INPUT_PORTS_END

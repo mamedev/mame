@@ -116,28 +116,31 @@ public:
 
 
 
-ADDRESS_MAP_START(vt100_state::vt100_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM ( 4 * 2K)
-	AM_RANGE( 0x2000, 0x2bff ) AM_RAM AM_SHARE("p_ram") // Screen and scratch RAM
-	AM_RANGE( 0x2c00, 0x2fff ) AM_RAM  // AVO Screen RAM
-	AM_RANGE( 0x3000, 0x3fff ) AM_RAM  // AVO Attribute RAM (4 bits wide)
+void vt100_state::vt100_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();  // ROM ( 4 * 2K)
+	map(0x2000, 0x2bff).ram().share("p_ram"); // Screen and scratch RAM
+	map(0x2c00, 0x2fff).ram();  // AVO Screen RAM
+	map(0x3000, 0x3fff).ram();  // AVO Attribute RAM (4 bits wide)
 	// 0x4000, 0x7fff is unassigned
-	AM_RANGE( 0x8000, 0x9fff ) AM_ROM  // Program memory expansion ROM (4 * 2K)
-	AM_RANGE( 0xa000, 0xbfff ) AM_ROM  // Program memory expansion ROM (1 * 8K)
+	map(0x8000, 0x9fff).rom();  // Program memory expansion ROM (4 * 2K)
+	map(0xa000, 0xbfff).rom();  // Program memory expansion ROM (1 * 8K)
 	// 0xc000, 0xffff is unassigned
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(vt100_state::vt180_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x1fff ) AM_ROM
-	AM_RANGE( 0x2000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void vt100_state::vt180_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(vt100_state::vt180_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void vt100_state::vt180_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 // 0 - XMIT flag H
 // 1 - Advance Video L
@@ -187,31 +190,32 @@ WRITE8_MEMBER(vt100_state::nvr_latch_w)
 	m_nvr->data_w(BIT(data, 2) ? 0 : !BIT(data, 0));
 }
 
-ADDRESS_MAP_START(vt100_state::vt100_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void vt100_state::vt100_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	// 0x00, 0x01 PUSART  (Intel 8251)
-	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("pusart", i8251_device, data_r, data_w)
-	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("pusart", i8251_device, status_r, control_w)
+	map(0x00, 0x00).rw("pusart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x01, 0x01).rw("pusart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// 0x02 Baud rate generator
-	AM_RANGE (0x02, 0x02) AM_WRITE(baud_rate_w)
+	map(0x02, 0x02).w(this, FUNC(vt100_state::baud_rate_w));
 	// 0x22 Modem buffer
-	AM_RANGE (0x22, 0x22) AM_READ(modem_r)
+	map(0x22, 0x22).r(this, FUNC(vt100_state::modem_r));
 	// 0x42 Flags buffer
-	AM_RANGE (0x42, 0x42) AM_READ(flags_r)
+	map(0x42, 0x42).r(this, FUNC(vt100_state::flags_r));
 	// 0x42 Brightness D/A latch
-	AM_RANGE (0x42, 0x42) AM_DEVWRITE("vt100_video", vt100_video_device, brightness_w)
+	map(0x42, 0x42).w(m_crtc, FUNC(vt100_video_device::brightness_w));
 	// 0x62 NVR latch
-	AM_RANGE (0x62, 0x62) AM_WRITE(nvr_latch_w)
+	map(0x62, 0x62).w(this, FUNC(vt100_state::nvr_latch_w));
 	// 0x82 Keyboard UART data
-	AM_RANGE (0x82, 0x82) AM_DEVREADWRITE("kbduart", ay31015_device, receive, transmit)
+	map(0x82, 0x82).rw("kbduart", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
 	// 0xA2 Video processor DC012
-	AM_RANGE (0xa2, 0xa2) AM_DEVWRITE("vt100_video", vt100_video_device, dc012_w)
+	map(0xa2, 0xa2).w(m_crtc, FUNC(vt100_video_device::dc012_w));
 	// 0xC2 Video processor DC011
-	AM_RANGE (0xc2, 0xc2) AM_DEVWRITE("vt100_video", vt100_video_device, dc011_w)
+	map(0xc2, 0xc2).w(m_crtc, FUNC(vt100_video_device::dc011_w));
 	// 0xE2 Graphics port
 	// AM_RANGE (0xe2, 0xe2)
-ADDRESS_MAP_END
+}
 
 READ8_MEMBER(vt100_state::printer_r)
 {

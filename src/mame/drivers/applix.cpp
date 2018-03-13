@@ -444,55 +444,60 @@ WRITE16_MEMBER( applix_state::fdc_cmd_w )
 	m_data_or_cmd = 1;
 }
 
-ADDRESS_MAP_START(applix_state::applix_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x3fffff) AM_RAM AM_SHARE("expansion") // Expansion
-	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_MIRROR(0x80000) AM_SHARE("base") // Main ram
-	AM_RANGE(0x500000, 0x51ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x600000, 0x60007f) AM_WRITE(palette_w)
-	AM_RANGE(0x600080, 0x6000ff) AM_WRITE(dac_latch_w)
-	AM_RANGE(0x600100, 0x60017f) AM_WRITE(video_latch_w) //video latch (=border colour, high nybble; video base, low nybble) (odd)
-	AM_RANGE(0x600180, 0x6001ff) AM_WRITE(analog_latch_w)
+void applix_state::applix_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xffffff);
+	map(0x000000, 0x3fffff).ram().share("expansion"); // Expansion
+	map(0x400000, 0x47ffff).ram().mirror(0x80000).share("base"); // Main ram
+	map(0x500000, 0x51ffff).rom().region("maincpu", 0);
+	map(0x600000, 0x60007f).w(this, FUNC(applix_state::palette_w));
+	map(0x600080, 0x6000ff).w(this, FUNC(applix_state::dac_latch_w));
+	map(0x600100, 0x60017f).w(this, FUNC(applix_state::video_latch_w)); //video latch (=border colour, high nybble; video base, low nybble) (odd)
+	map(0x600180, 0x6001ff).w(this, FUNC(applix_state::analog_latch_w));
 	//AM_RANGE(0x700000, 0x700007) z80-scc (ch b control, ch b data, ch a control, ch a data) on even addresses
-	AM_RANGE(0x700080, 0x7000ff) AM_READ(applix_inputs_r)
-	AM_RANGE(0x700100, 0x70011f) AM_MIRROR(0x60) AM_DEVREADWRITE8("via6522", via6522_device, read, write, 0xff00)
-	AM_RANGE(0x700180, 0x700181) AM_MIRROR(0x7c) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0xff00)
-	AM_RANGE(0x700182, 0x700183) AM_MIRROR(0x7c) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
-	AM_RANGE(0xffffc0, 0xffffc1) AM_READWRITE(fdc_data_r,fdc_data_w)
+	map(0x700080, 0x7000ff).r(this, FUNC(applix_state::applix_inputs_r));
+	map(0x700100, 0x70011f).mirror(0x60).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0xff00);
+	map(0x700180, 0x700180).mirror(0x7c).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x700182, 0x700182).mirror(0x7c).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xffffc0, 0xffffc1).rw(this, FUNC(applix_state::fdc_data_r), FUNC(applix_state::fdc_data_w));
 	//AM_RANGE(0xffffc2, 0xffffc3) AM_READWRITE(fdc_int_r,fdc_int_w) // optional
-	AM_RANGE(0xffffc8, 0xffffcd) AM_READ(fdc_stat_r)
-	AM_RANGE(0xffffd0, 0xffffd1) AM_WRITE(fdc_cmd_w)
+	map(0xffffc8, 0xffffcd).r(this, FUNC(applix_state::fdc_stat_r));
+	map(0xffffd0, 0xffffd1).w(this, FUNC(applix_state::fdc_cmd_w));
 	//600000, 6FFFFF  io ports and latches
 	//700000, 7FFFFF  peripheral chips and devices
 	//800000, FFC000  optional roms
 	//FFFFC0, FFFFFF  disk controller board
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(applix_state::subcpu_mem)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank1")
-ADDRESS_MAP_END
+void applix_state::subcpu_mem(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x7fff).ram();
+	map(0x8000, 0xffff).bankrw("bank1");
+}
 
-ADDRESS_MAP_START(applix_state::subcpu_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_READ(port00_r) //PORTR
-	AM_RANGE(0x08, 0x0f) AM_READWRITE(port08_r,port08_w) //Disk select
-	AM_RANGE(0x10, 0x17) AM_READWRITE(port10_r,port10_w) //IRQ
-	AM_RANGE(0x18, 0x1f) AM_READWRITE(port18_r,port18_w) //data&command
-	AM_RANGE(0x20, 0x27) AM_MIRROR(0x18) AM_READWRITE(port20_r,port20_w) //SCSI NCR5380
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE("fdc", wd1772_device, read, write) //FDC
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_READWRITE(port60_r,port60_w) //anotherZ80SCC
-ADDRESS_MAP_END
+void applix_state::subcpu_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x07).r(this, FUNC(applix_state::port00_r)); //PORTR
+	map(0x08, 0x0f).rw(this, FUNC(applix_state::port08_r), FUNC(applix_state::port08_w)); //Disk select
+	map(0x10, 0x17).rw(this, FUNC(applix_state::port10_r), FUNC(applix_state::port10_w)); //IRQ
+	map(0x18, 0x1f).rw(this, FUNC(applix_state::port18_r), FUNC(applix_state::port18_w)); //data&command
+	map(0x20, 0x27).mirror(0x18).rw(this, FUNC(applix_state::port20_r), FUNC(applix_state::port20_w)); //SCSI NCR5380
+	map(0x40, 0x43).mirror(0x1c).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)); //FDC
+	map(0x60, 0x63).mirror(0x1c).rw(this, FUNC(applix_state::port60_r), FUNC(applix_state::port60_w)); //anotherZ80SCC
+}
 
-ADDRESS_MAP_START(applix_state::keytronic_pc3270_program)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("kbdcpu", 0)
-ADDRESS_MAP_END
+void applix_state::keytronic_pc3270_program(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("kbdcpu", 0);
+}
 
-ADDRESS_MAP_START(applix_state::keytronic_pc3270_io)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(internal_data_read, internal_data_write)
-ADDRESS_MAP_END
+void applix_state::keytronic_pc3270_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(applix_state::internal_data_read), FUNC(applix_state::internal_data_write));
+}
 
 // io priorities:
 // 4 cassette

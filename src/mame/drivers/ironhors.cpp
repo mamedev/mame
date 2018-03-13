@@ -59,85 +59,90 @@ WRITE8_MEMBER(ironhors_state::filter_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(ironhors_state::master_map)
-	AM_RANGE(0x0000, 0x0002) AM_RAM
-	AM_RANGE(0x0003, 0x0003) AM_RAM_WRITE(charbank_w)
-	AM_RANGE(0x0004, 0x0004) AM_RAM AM_SHARE("int_enable")
-	AM_RANGE(0x0005, 0x001f) AM_RAM
-	AM_RANGE(0x0020, 0x003f) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0x0040, 0x005f) AM_RAM
-	AM_RANGE(0x0060, 0x00df) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x0900, 0x0900) AM_READ_PORT("DSW3") AM_WRITE(sh_irqtrigger_w)
-	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW2") AM_WRITE(palettebank_w)
-	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("DSW1") AM_WRITE(flipscreen_w)
-	AM_RANGE(0x0b01, 0x0b01) AM_READ_PORT("P2")
-	AM_RANGE(0x0b02, 0x0b02) AM_READ_PORT("P1")
-	AM_RANGE(0x0b03, 0x0b03) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // ???
-	AM_RANGE(0x1a00, 0x1a01) AM_WRITENOP // ???
-	AM_RANGE(0x1c00, 0x1dff) AM_WRITENOP // ???
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x3100, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3900, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void ironhors_state::master_map(address_map &map)
+{
+	map(0x0000, 0x0002).ram();
+	map(0x0003, 0x0003).ram().w(this, FUNC(ironhors_state::charbank_w));
+	map(0x0004, 0x0004).ram().share("int_enable");
+	map(0x0005, 0x001f).ram();
+	map(0x0020, 0x003f).ram().share("scroll");
+	map(0x0040, 0x005f).ram();
+	map(0x0060, 0x00df).ram();
+	map(0x0800, 0x0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x0900, 0x0900).portr("DSW3").w(this, FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x0a00, 0x0a00).portr("DSW2").w(this, FUNC(ironhors_state::palettebank_w));
+	map(0x0b00, 0x0b00).portr("DSW1").w(this, FUNC(ironhors_state::flipscreen_w));
+	map(0x0b01, 0x0b01).portr("P2");
+	map(0x0b02, 0x0b02).portr("P1");
+	map(0x0b03, 0x0b03).portr("SYSTEM");
+	map(0x1800, 0x1800).nopw(); // ???
+	map(0x1a00, 0x1a01).nopw(); // ???
+	map(0x1c00, 0x1dff).nopw(); // ???
+	map(0x2000, 0x23ff).ram().w(this, FUNC(ironhors_state::colorram_w)).share("colorram");
+	map(0x2400, 0x27ff).ram().w(this, FUNC(ironhors_state::videoram_w)).share("videoram");
+	map(0x2800, 0x2fff).ram();
+	map(0x3000, 0x30ff).ram().share("spriteram2");
+	map(0x3100, 0x37ff).ram();
+	map(0x3800, 0x38ff).ram().share("spriteram");
+	map(0x3900, 0x3fff).ram();
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(ironhors_state::slave_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void ironhors_state::slave_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x8000, 0x8000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(ironhors_state::slave_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
-ADDRESS_MAP_END
+void ironhors_state::slave_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
-ADDRESS_MAP_START(ironhors_state::farwest_master_map)
-	AM_RANGE(0x0000, 0x1bff) AM_ROM
+void ironhors_state::farwest_master_map(address_map &map)
+{
+	map(0x0000, 0x1bff).rom();
 
-	AM_RANGE(0x0000, 0x0002) AM_RAM
+	map(0x0000, 0x0002).ram();
 	//20=31db
 
-	AM_RANGE(0x0005, 0x001f) AM_RAM
-	AM_RANGE(0x0040, 0x005f) AM_RAM
-	AM_RANGE(0x0060, 0x00ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x0900, 0x0900) /*AM_READ_PORT("DSW3") */AM_WRITE(sh_irqtrigger_w)
-	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW2") //AM_WRITE(palettebank_w)
-	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("DSW1") AM_WRITE(flipscreen_w)
-	AM_RANGE(0x0b01, 0x0b01) AM_READ_PORT("DSW2") //AM_WRITE(palettebank_w)
-	AM_RANGE(0x0b02, 0x0b02) AM_READ_PORT("P1")
-	AM_RANGE(0x0b03, 0x0b03) AM_READ_PORT("SYSTEM")
+	map(0x0005, 0x001f).ram();
+	map(0x0040, 0x005f).ram();
+	map(0x0060, 0x00ff).ram();
+	map(0x0800, 0x0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x0900, 0x0900) /*.protr("DSW3") */ .w(this, FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x0a00, 0x0a00).portr("DSW2"); //.w(this, FUNC(ironhors_state::palettebank_w));
+	map(0x0b00, 0x0b00).portr("DSW1").w(this, FUNC(ironhors_state::flipscreen_w));
+	map(0x0b01, 0x0b01).portr("DSW2"); //.w(this, FUNC(ironhors_state::palettebank_w));
+	map(0x0b02, 0x0b02).portr("P1");
+	map(0x0b03, 0x0b03).portr("SYSTEM");
 
 
 
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(sh_irqtrigger_w)
-	AM_RANGE(0x1a00, 0x1a00) AM_RAM AM_SHARE("int_enable")
-	AM_RANGE(0x1a01, 0x1a01) AM_RAM_WRITE(charbank_w)
-	AM_RANGE(0x1a02, 0x1a02) AM_WRITE(palettebank_w)
-//  AM_RANGE(0x1c00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM
-	AM_RANGE(0x1c00, 0x1dff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x3000, 0x38ff) AM_RAM
-	AM_RANGE(0x31db, 0x31fa) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0x1e00, 0x1eff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3900, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x1800, 0x1800).w(this, FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x1a00, 0x1a00).ram().share("int_enable");
+	map(0x1a01, 0x1a01).ram().w(this, FUNC(ironhors_state::charbank_w));
+	map(0x1a02, 0x1a02).w(this, FUNC(ironhors_state::palettebank_w));
+//  map(0x1c00, 0x1fff).ram();
+	map(0x2000, 0x23ff).ram().w(this, FUNC(ironhors_state::colorram_w)).share("colorram");
+	map(0x2400, 0x27ff).ram().w(this, FUNC(ironhors_state::videoram_w)).share("videoram");
+	map(0x2800, 0x2fff).ram();
+	map(0x1c00, 0x1dff).ram().share("spriteram2");
+	map(0x3000, 0x38ff).ram();
+	map(0x31db, 0x31fa).ram().share("scroll");
+	map(0x1e00, 0x1eff).ram().share("spriteram");
+	map(0x3900, 0x3fff).ram();
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(ironhors_state::farwest_slave_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
-ADDRESS_MAP_END
+void ironhors_state::farwest_slave_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x8000, 0x8001).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 
 /*************************************

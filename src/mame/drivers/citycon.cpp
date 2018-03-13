@@ -32,27 +32,29 @@ READ8_MEMBER(citycon_state::citycon_irq_ack_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(citycon_state::citycon_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(citycon_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(citycon_linecolor_w) AM_SHARE("linecolor") AM_MIRROR(0x0700)
-	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_SHARE("spriteram") AM_MIRROR(0x0700) //0x2900-0x2fff cleared at post but unused
-	AM_RANGE(0x3000, 0x3000) AM_READ(citycon_in_r) AM_WRITE(citycon_background_w)   /* player 1 & 2 inputs multiplexed */
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0x3004, 0x3005) AM_READNOP AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0x3007, 0x3007) AM_READ(citycon_irq_ack_r)
-	AM_RANGE(0x3800, 0x3cff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void citycon_state::citycon_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1fff).ram().w(this, FUNC(citycon_state::citycon_videoram_w)).share("videoram");
+	map(0x2000, 0x20ff).ram().w(this, FUNC(citycon_state::citycon_linecolor_w)).share("linecolor").mirror(0x0700);
+	map(0x2800, 0x28ff).ram().share("spriteram").mirror(0x0700); //0x2900-0x2fff cleared at post but unused
+	map(0x3000, 0x3000).r(this, FUNC(citycon_state::citycon_in_r)).w(this, FUNC(citycon_state::citycon_background_w));   /* player 1 & 2 inputs multiplexed */
+	map(0x3001, 0x3001).portr("DSW1").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x3002, 0x3002).portr("DSW2").w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0x3004, 0x3005).nopr().writeonly().share("scroll");
+	map(0x3007, 0x3007).r(this, FUNC(citycon_state::citycon_irq_ack_r));
+	map(0x3800, 0x3cff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(citycon_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x4002, 0x4002) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void citycon_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x4000, 0x4001).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x4002, 0x4002).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x6000, 0x6001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 
 

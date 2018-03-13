@@ -72,14 +72,15 @@ private:
 
 
 
-ADDRESS_MAP_START(junior_state::junior_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x1FFF)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_RAM // 1K RAM
-	AM_RANGE(0x1a00, 0x1a7f) AM_DEVICE("riot", mos6532_new_device, ram_map)
-	AM_RANGE(0x1a80, 0x1a9f) AM_DEVICE("riot", mos6532_new_device, io_map)
-	AM_RANGE(0x1c00, 0x1fff) AM_ROM // Monitor
-ADDRESS_MAP_END
+void junior_state::junior_mem(address_map &map)
+{
+	map.global_mask(0x1FFF);
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).ram(); // 1K RAM
+	map(0x1a00, 0x1a7f).m(m_riot, FUNC(mos6532_new_device::ram_map));
+	map(0x1a80, 0x1a9f).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x1c00, 0x1fff).rom(); // Monitor
+}
 
 
 INPUT_CHANGED_MEMBER(junior_state::junior_reset)

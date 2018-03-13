@@ -115,68 +115,73 @@ WRITE16_MEMBER(shangha3_state::irq_ack_w)
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(shangha3_state::shangha3_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x200008, 0x200009) AM_WRITE(blitter_go_w)
-	AM_RANGE(0x20000a, 0x20000b) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(shangha3_coinctrl_w)
-	AM_RANGE(0x20001e, 0x20001f) AM_DEVREAD8("aysnd", ym2149_device, data_r, 0x00ff)
-	AM_RANGE(0x20002e, 0x20002f) AM_DEVWRITE8("aysnd", ym2149_device, data_w, 0x00ff)
-	AM_RANGE(0x20003e, 0x20003f) AM_DEVWRITE8("aysnd", ym2149_device, address_w, 0x00ff)
-	AM_RANGE(0x20004e, 0x20004f) AM_READWRITE(shangha3_prot_r,shangha3_prot_w)
-	AM_RANGE(0x20006e, 0x20006f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram") /* gfx & work ram */
-	AM_RANGE(0x340000, 0x340001) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(gfxlist_addr_w)
-ADDRESS_MAP_END
+void shangha3_state::shangha3_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x100fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x200000, 0x200001).portr("INPUTS");
+	map(0x200002, 0x200003).portr("SYSTEM");
+	map(0x200008, 0x200009).w(this, FUNC(shangha3_state::blitter_go_w));
+	map(0x20000a, 0x20000b).w(this, FUNC(shangha3_state::irq_ack_w));
+	map(0x20000c, 0x20000d).w(this, FUNC(shangha3_state::shangha3_coinctrl_w));
+	map(0x20001f, 0x20001f).r("aysnd", FUNC(ym2149_device::data_r));
+	map(0x20002f, 0x20002f).w("aysnd", FUNC(ym2149_device::data_w));
+	map(0x20003f, 0x20003f).w("aysnd", FUNC(ym2149_device::address_w));
+	map(0x20004e, 0x20004f).rw(this, FUNC(shangha3_state::shangha3_prot_r), FUNC(shangha3_state::shangha3_prot_w));
+	map(0x20006f, 0x20006f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
+	map(0x340000, 0x340001).w(this, FUNC(shangha3_state::flipscreen_w));
+	map(0x360000, 0x360001).w(this, FUNC(shangha3_state::gfxlist_addr_w));
+}
 
-ADDRESS_MAP_START(shangha3_state::heberpop_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("DSW")
-	AM_RANGE(0x200008, 0x200009) AM_WRITE(blitter_go_w)
-	AM_RANGE(0x20000a, 0x20000b) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(heberpop_coinctrl_w)
-	AM_RANGE(0x20000e, 0x20000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram") /* gfx & work ram */
-	AM_RANGE(0x340000, 0x340001) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(gfxlist_addr_w)
-	AM_RANGE(0x800000, 0xb7ffff) AM_ROM AM_REGION("gfx1", 0)
-ADDRESS_MAP_END
+void shangha3_state::heberpop_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x100fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x200000, 0x200001).portr("INPUTS");
+	map(0x200002, 0x200003).portr("SYSTEM");
+	map(0x200004, 0x200005).portr("DSW");
+	map(0x200008, 0x200009).w(this, FUNC(shangha3_state::blitter_go_w));
+	map(0x20000a, 0x20000b).w(this, FUNC(shangha3_state::irq_ack_w));
+	map(0x20000c, 0x20000d).w(this, FUNC(shangha3_state::heberpop_coinctrl_w));
+	map(0x20000f, 0x20000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
+	map(0x340000, 0x340001).w(this, FUNC(shangha3_state::flipscreen_w));
+	map(0x360000, 0x360001).w(this, FUNC(shangha3_state::gfxlist_addr_w));
+	map(0x800000, 0xb7ffff).rom().region("gfx1", 0);
+}
 
-ADDRESS_MAP_START(shangha3_state::blocken_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("SYSTEM") AM_WRITENOP // w -> unknown purpose
-	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("DSW")
-	AM_RANGE(0x100008, 0x100009) AM_WRITE(blitter_go_w)
-	AM_RANGE(0x10000a, 0x10000b) AM_READNOP AM_WRITE(irq_ack_w) // r -> unknown purpose (value doesn't matter, left-over?)
-	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(blocken_coinctrl_w)
-	AM_RANGE(0x10000e, 0x10000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram") /* gfx & work ram */
-	AM_RANGE(0x340000, 0x340001) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(gfxlist_addr_w)
-	AM_RANGE(0x800000, 0xb7ffff) AM_ROM AM_REGION("gfx1", 0)
-ADDRESS_MAP_END
+void shangha3_state::blocken_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x100001).portr("INPUTS");
+	map(0x100002, 0x100003).portr("SYSTEM").nopw(); // w -> unknown purpose
+	map(0x100004, 0x100005).portr("DSW");
+	map(0x100008, 0x100009).w(this, FUNC(shangha3_state::blitter_go_w));
+	map(0x10000a, 0x10000b).nopr().w(this, FUNC(shangha3_state::irq_ack_w)); // r -> unknown purpose (value doesn't matter, left-over?)
+	map(0x10000c, 0x10000d).w(this, FUNC(shangha3_state::blocken_coinctrl_w));
+	map(0x10000f, 0x10000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
+	map(0x340000, 0x340001).w(this, FUNC(shangha3_state::flipscreen_w));
+	map(0x360000, 0x360001).w(this, FUNC(shangha3_state::gfxlist_addr_w));
+	map(0x800000, 0xb7ffff).rom().region("gfx1", 0);
+}
 
 
-ADDRESS_MAP_START(shangha3_state::heberpop_sound_map)
-	AM_RANGE(0x0000, 0xf7ff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void shangha3_state::heberpop_sound_map(address_map &map)
+{
+	map(0x0000, 0xf7ff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(shangha3_state::heberpop_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void shangha3_state::heberpop_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ymsnd", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0x80, 0x80).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( shangha3 )

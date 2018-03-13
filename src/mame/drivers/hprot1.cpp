@@ -91,9 +91,10 @@ private:
 
 #define LOG_IO_PORTS 0
 
-ADDRESS_MAP_START(hprot1_state::i80c31_prg)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void hprot1_state::i80c31_prg(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
 DRIVER_INIT_MEMBER( hprot1_state, hprot1 )
 {
@@ -126,16 +127,17 @@ DRIVER_INIT_MEMBER( hprot1_state, hprot1 )
 
 //P1.4 => WhatchDog Input (after timeout resets CPU)
 
-ADDRESS_MAP_START(hprot1_state::i80c31_io)
-	AM_RANGE(0x0000,0x7fff) AM_RAM
+void hprot1_state::i80c31_io(address_map &map)
+{
+	map(0x0000, 0x7fff).ram();
 /*TODO: verify the mirror mask value for the HD44780 device */
-	AM_RANGE(0xc000,0xc000) AM_MIRROR(0x13cf) AM_DEVWRITE("hd44780", hd44780_device, control_write)
-	AM_RANGE(0xc010,0xc010) AM_MIRROR(0x13cf) AM_DEVWRITE("hd44780", hd44780_device, data_write)
-	AM_RANGE(0xc020,0xc020) AM_MIRROR(0x13cf) AM_DEVREAD("hd44780", hd44780_device, control_read)
-	AM_RANGE(0xc030,0xc030) AM_MIRROR(0x13cf) AM_DEVREAD("hd44780", hd44780_device, data_read)
+	map(0xc000, 0xc000).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::control_write));
+	map(0xc010, 0xc010).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::data_write));
+	map(0xc020, 0xc020).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::control_read));
+	map(0xc030, 0xc030).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::data_read));
 /*TODO: attach the watchdog/brownout reset device:
     AM_RANGE(0xe000,0xe0??) AM_MIRROR(?) AM_DEVREAD("adm965an", adm965an_device, data_read) */
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( hprot1 )
 /* FIXME: I am still unsure whether all these inputs are Active High or Active Low: */

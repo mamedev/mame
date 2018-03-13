@@ -600,22 +600,25 @@ uint32_t bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 
 }
 
 
-ADDRESS_MAP_START(bingor_state::bingor_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x90000, 0x9ffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_SHARE("blit_ram")
-	AM_RANGE(0xa0300, 0xa031f) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") //wrong
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("boot_prg", 0)
-ADDRESS_MAP_END
+void bingor_state::bingor_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram();
+	map(0x90000, 0x9ffff).rom().region("gfx", 0);
+	map(0xa0000, 0xaffff).ram().share("blit_ram");
+	map(0xa0300, 0xa031f).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); //wrong
+	map(0xf0000, 0xfffff).rom().region("boot_prg", 0);
+}
 
-ADDRESS_MAP_START(bingor_state::bingor2_map)
-	AM_IMPORT_FROM(bingor_map)
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("boot_prg", 0) // banked?
-ADDRESS_MAP_END
+void bingor_state::bingor2_map(address_map &map)
+{
+	bingor_map(map);
+	map(0xe0000, 0xfffff).rom().region("boot_prg", 0); // banked?
+}
 
-ADDRESS_MAP_START(bingor_state::bingor_io)
-	AM_RANGE(0x0100, 0x0103) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-ADDRESS_MAP_END
+void bingor_state::bingor_io(address_map &map)
+{
+	map(0x0100, 0x0103).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+}
 
 
 static INPUT_PORTS_START( bingor )
@@ -721,22 +724,24 @@ MACHINE_CONFIG_START(bingor_state::bingor2)
 MACHINE_CONFIG_END
 
 
-ADDRESS_MAP_START(bingor_state::vip2000_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_SHARE("blit_ram")
-	AM_RANGE(0x40300, 0x4031f) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") //wrong
+void bingor_state::vip2000_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram();
+	map(0x40000, 0x4ffff).ram().share("blit_ram");
+	map(0x40300, 0x4031f).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); //wrong
 	//AM_RANGE(0x50000, 0x5ffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0x60000, 0x60003) AM_DEVWRITE8("ymz", ymz284_device, address_data_w, 0x00ff)
-	AM_RANGE(0x80000, 0xeffff) AM_DEVREADWRITE("flash", intelfsh16_device, read, write)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("boot_prg", 0)
-ADDRESS_MAP_END
+	map(0x60000, 0x60003).w("ymz", FUNC(ymz284_device::address_data_w)).umask16(0x00ff);
+	map(0x80000, 0xeffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
+	map(0xf0000, 0xfffff).rom().region("boot_prg", 0);
+}
 
-ADDRESS_MAP_START(bingor_state::vip2000_io)
-	AM_RANGE(0x0000, 0x0001) AM_READNOP // watchdog
-	AM_RANGE(0x0080, 0x009f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
-	AM_RANGE(0x0100, 0x0101) AM_READWRITE8(fromslave_r, toslave_w, 0x00ff)
-	AM_RANGE(0x0280, 0x0281) AM_WRITE(vip2000_outputs_w)
-ADDRESS_MAP_END
+void bingor_state::vip2000_io(address_map &map)
+{
+	map(0x0000, 0x0001).nopr(); // watchdog
+	map(0x0080, 0x009f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
+	map(0x0100, 0x0100).rw(this, FUNC(bingor_state::fromslave_r), FUNC(bingor_state::toslave_w));
+	map(0x0280, 0x0281).w(this, FUNC(bingor_state::vip2000_outputs_w));
+}
 
 WRITE8_MEMBER(bingor_state::toslave_w)
 {
@@ -763,14 +768,16 @@ WRITE16_MEMBER(bingor_state::vip2000_outputs_w)
 	m_slavecpu->set_input_line(MCS51_INT0_LINE, BIT(data, 15) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-ADDRESS_MAP_START(bingor_state::slave_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void bingor_state::slave_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(bingor_state::slave_io)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(toslave_r, fromslave_w)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-ADDRESS_MAP_END
+void bingor_state::slave_io(address_map &map)
+{
+	map(0x0000, 0x0000).rw(this, FUNC(bingor_state::toslave_r), FUNC(bingor_state::fromslave_w));
+	map(0xc000, 0xcfff).ram();
+}
 
 MACHINE_CONFIG_START(bingor_state::vip2000)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL(10'000'000))

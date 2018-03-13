@@ -80,22 +80,24 @@ WRITE8_MEMBER(mjkjidai_state::keyboard_select_hi_w)
 }
 
 
-ADDRESS_MAP_START(mjkjidai_state::mjkjidai_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("nvram")   // cleared and initialized on startup if bit 6 of port 00 is 0
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mjkjidai_videoram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void mjkjidai_state::mjkjidai_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xdfff).ram().share("nvram");   // cleared and initialized on startup if bit 6 of port 00 is 0
+	map(0xe000, 0xf7ff).ram().w(this, FUNC(mjkjidai_state::mjkjidai_videoram_w)).share("videoram");
+}
 
-ADDRESS_MAP_START(mjkjidai_state::mjkjidai_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0x40, 0x40) AM_WRITE(adpcm_w)
-ADDRESS_MAP_END
+void mjkjidai_state::mjkjidai_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x13).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::write));
+	map(0x30, 0x30).w("sn2", FUNC(sn76489_device::write));
+	map(0x40, 0x40).w(this, FUNC(mjkjidai_state::adpcm_w));
+}
 
 
 static INPUT_PORTS_START( mjkjidai )

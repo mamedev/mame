@@ -55,20 +55,21 @@
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(microtan_state::microtan_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x03ff) AM_RAM_WRITE(microtan_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xbc00, 0xbc00) AM_DEVWRITE("ay8910.1", ay8910_device, address_w)
-	AM_RANGE(0xbc01, 0xbc01) AM_DEVREADWRITE("ay8910.1", ay8910_device, data_r, data_w)
-	AM_RANGE(0xbc02, 0xbc02) AM_DEVWRITE("ay8910.2", ay8910_device, address_w)
-	AM_RANGE(0xbc03, 0xbc03) AM_DEVREADWRITE("ay8910.2", ay8910_device, data_r, data_w)
-	AM_RANGE(0xbfc0, 0xbfcf) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
-	AM_RANGE(0xbfd0, 0xbfd3) AM_DEVREADWRITE("acia", mos6551_device, read, write)
-	AM_RANGE(0xbfe0, 0xbfef) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)
-	AM_RANGE(0xbff0, 0xbfff) AM_READWRITE(microtan_bffx_r, microtan_bffx_w)
-	AM_RANGE(0xc000, 0xe7ff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void microtan_state::microtan_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x0200, 0x03ff).ram().w(this, FUNC(microtan_state::microtan_videoram_w)).share("videoram");
+	map(0xbc00, 0xbc00).w("ay8910.1", FUNC(ay8910_device::address_w));
+	map(0xbc01, 0xbc01).rw("ay8910.1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xbc02, 0xbc02).w("ay8910.2", FUNC(ay8910_device::address_w));
+	map(0xbc03, 0xbc03).rw("ay8910.2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xbfc0, 0xbfcf).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xbfd0, 0xbfd3).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xbfe0, 0xbfef).rw(m_via6522_1, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xbff0, 0xbfff).rw(this, FUNC(microtan_state::microtan_bffx_r), FUNC(microtan_state::microtan_bffx_w));
+	map(0xc000, 0xe7ff).rom();
+	map(0xf000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( microtan )
 	PORT_START("DSW")

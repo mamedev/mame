@@ -216,25 +216,26 @@ READ8_MEMBER(lbeach_state::lbeach_in2_r)
 	return (ioport("IN2")->read() & 0x3f) | d6 | d7;
 }
 
-ADDRESS_MAP_START(lbeach_state::lbeach_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4000, 0x41ff) AM_RAM_WRITE(lbeach_bg_vram_w) AM_SHARE("bg_vram")
-	AM_RANGE(0x4000, 0x4000) AM_READ(lbeach_in1_r)
-	AM_RANGE(0x4200, 0x43ff) AM_RAM
-	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(lbeach_fg_vram_w) AM_SHARE("fg_vram")
-	AM_RANGE(0x8000, 0x8000) AM_READ(lbeach_in2_r)
-	AM_RANGE(0x8000, 0x8000) AM_WRITEONLY AM_SHARE("scroll_y")
-	AM_RANGE(0x8001, 0x8001) AM_WRITEONLY AM_SHARE("sprite_x")
-	AM_RANGE(0x8002, 0x8002) AM_WRITEONLY AM_SHARE("sprite_code")
+void lbeach_state::lbeach_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().share("nvram");
+	map(0x4000, 0x41ff).ram().w(this, FUNC(lbeach_state::lbeach_bg_vram_w)).share("bg_vram");
+	map(0x4000, 0x4000).r(this, FUNC(lbeach_state::lbeach_in1_r));
+	map(0x4200, 0x43ff).ram();
+	map(0x4400, 0x47ff).ram().w(this, FUNC(lbeach_state::lbeach_fg_vram_w)).share("fg_vram");
+	map(0x8000, 0x8000).r(this, FUNC(lbeach_state::lbeach_in2_r));
+	map(0x8000, 0x8000).writeonly().share("scroll_y");
+	map(0x8001, 0x8001).writeonly().share("sprite_x");
+	map(0x8002, 0x8002).writeonly().share("sprite_code");
 //  AM_RANGE(0x8003, 0x8003) AM_WRITENOP // ?
 //  AM_RANGE(0x8004, 0x8004) AM_WRITENOP // ?
 //  AM_RANGE(0x8005, 0x8005) AM_WRITENOP // ?
-	AM_RANGE(0x8007, 0x8007) AM_WRITENOP // probably watchdog
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
+	map(0x8007, 0x8007).nopw(); // probably watchdog
+	map(0xa000, 0xa000).portr("IN0");
 //  AM_RANGE(0xa003, 0xa003) AM_READNOP // ? tests d7 at game over
-	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xc000, 0xcfff).rom();
+	map(0xf000, 0xffff).rom();
+}
 
 
 

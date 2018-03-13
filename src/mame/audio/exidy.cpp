@@ -726,17 +726,18 @@ void venture_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 
 
-ADDRESS_MAP_START(exidy_state::venture_audio_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0780) AM_RAM
-	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x07fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1800, 0x1803) AM_MIRROR(0x07fc) AM_DEVREADWRITE("custom", venture_sound_device, sh8253_r, sh8253_w)
-	AM_RANGE(0x2000, 0x27ff) AM_DEVWRITE("custom", venture_sound_device, filter_w)
-	AM_RANGE(0x2800, 0x2807) AM_MIRROR(0x07f8) AM_DEVREADWRITE("custom", venture_sound_device, sh6840_r, sh6840_w)
-	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x07fc) AM_DEVWRITE("custom", venture_sound_device, sfxctrl_w)
-	AM_RANGE(0x5800, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void exidy_state::venture_audio_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x007f).mirror(0x0780).ram();
+	map(0x0800, 0x087f).mirror(0x0780).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x1000, 0x1003).mirror(0x07fc).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1800, 0x1803).mirror(0x07fc).rw("custom", FUNC(venture_sound_device::sh8253_r), FUNC(venture_sound_device::sh8253_w));
+	map(0x2000, 0x27ff).w("custom", FUNC(venture_sound_device::filter_w));
+	map(0x2800, 0x2807).mirror(0x07f8).rw("custom", FUNC(venture_sound_device::sh6840_r), FUNC(venture_sound_device::sh6840_w));
+	map(0x3000, 0x3003).mirror(0x07fc).w("custom", FUNC(venture_sound_device::sfxctrl_w));
+	map(0x5800, 0x7fff).rom();
+}
 
 
 MACHINE_CONFIG_START(exidy_state::venture_audio)
@@ -806,16 +807,18 @@ READ8_MEMBER( venture_sound_device::mtrap_voiceio_r )
 }
 
 
-ADDRESS_MAP_START(exidy_state::cvsd_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void exidy_state::cvsd_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x3fff).rom();
+}
 
 
-ADDRESS_MAP_START(exidy_state::cvsd_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_DEVREADWRITE("custom", venture_sound_device, mtrap_voiceio_r, mtrap_voiceio_w)
-ADDRESS_MAP_END
+void exidy_state::cvsd_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw("custom", FUNC(venture_sound_device::mtrap_voiceio_r), FUNC(venture_sound_device::mtrap_voiceio_w));
+}
 
 
 MACHINE_CONFIG_START(exidy_state::mtrap_cvsd_audio)
@@ -980,17 +983,18 @@ void victory_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 
 
-ADDRESS_MAP_START(victory_state::victory_audio_map)
-	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0f00) AM_RAM
-	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("custom", victory_sound_device, sh8253_r, sh8253_w)
-	AM_RANGE(0x4000, 0x4fff) AM_NOP
-	AM_RANGE(0x5000, 0x5007) AM_MIRROR(0x0ff8) AM_DEVREADWRITE("custom", victory_sound_device, sh6840_r, sh6840_w)
-	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x0ffc) AM_DEVWRITE("custom", victory_sound_device, sfxctrl_w)
-	AM_RANGE(0x7000, 0xafff) AM_NOP
-	AM_RANGE(0xb000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void victory_state::victory_audio_map(address_map &map)
+{
+	map(0x0000, 0x00ff).mirror(0x0f00).ram();
+	map(0x1000, 0x107f).mirror(0x0f80).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x2000, 0x2003).mirror(0x0ffc).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x3000, 0x3003).mirror(0x0ffc).rw("custom", FUNC(victory_sound_device::sh8253_r), FUNC(victory_sound_device::sh8253_w));
+	map(0x4000, 0x4fff).noprw();
+	map(0x5000, 0x5007).mirror(0x0ff8).rw("custom", FUNC(victory_sound_device::sh6840_r), FUNC(victory_sound_device::sh6840_w));
+	map(0x6000, 0x6003).mirror(0x0ffc).w("custom", FUNC(victory_sound_device::sfxctrl_w));
+	map(0x7000, 0xafff).noprw();
+	map(0xb000, 0xffff).rom();
+}
 
 
 MACHINE_CONFIG_START(victory_state::victory_audio)

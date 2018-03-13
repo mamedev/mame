@@ -44,34 +44,37 @@ WRITE_LINE_MEMBER(suprloco_state::pc0_w)
 	machine().output().set_lamp_value(0, state); // ???
 }
 
-ADDRESS_MAP_START(suprloco_state::main_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc200, 0xc7ff) AM_WRITENOP
-	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("P1")
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("P2")
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe800, 0xe803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0xf000, 0xf6ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf700, 0xf7df) AM_RAM /* unused */
-	AM_RANGE(0xf7e0, 0xf7ff) AM_RAM_WRITE(scrollram_w) AM_SHARE("scrollram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void suprloco_state::main_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc1ff).ram().share("spriteram");
+	map(0xc200, 0xc7ff).nopw();
+	map(0xc800, 0xc800).portr("SYSTEM");
+	map(0xd000, 0xd000).portr("P1");
+	map(0xd800, 0xd800).portr("P2");
+	map(0xe000, 0xe000).portr("DSW1");
+	map(0xe001, 0xe001).portr("DSW2");
+	map(0xe800, 0xe803).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf000, 0xf6ff).ram().w(this, FUNC(suprloco_state::videoram_w)).share("videoram");
+	map(0xf700, 0xf7df).ram(); /* unused */
+	map(0xf7e0, 0xf7ff).ram().w(this, FUNC(suprloco_state::scrollram_w)).share("scrollram");
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(suprloco_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
-ADDRESS_MAP_END
+void suprloco_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8000, 0xbfff).rom().region("maincpu", 0x8000);
+}
 
-ADDRESS_MAP_START(suprloco_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_DEVWRITE("sn1", sn76496_device, write)
-	AM_RANGE(0xc000, 0xc003) AM_DEVWRITE("sn2", sn76496_device, write)
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundport_r)
-ADDRESS_MAP_END
+void suprloco_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa003).w("sn1", FUNC(sn76496_device::write));
+	map(0xc000, 0xc003).w("sn2", FUNC(sn76496_device::write));
+	map(0xe000, 0xe000).r(this, FUNC(suprloco_state::soundport_r));
+}
 
 
 

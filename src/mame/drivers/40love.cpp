@@ -349,58 +349,60 @@ READ8_MEMBER(fortyl_state::snd_flag_r)
 
 /***************************************************************************/
 
-ADDRESS_MAP_START(fortyl_state::_40love_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM /* M5517P on main board */
-	AM_RANGE(0x8800, 0x8800) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0x8801, 0x8801) AM_READWRITE(fortyl_mcu_status_r, pix1_mcu_w)      //pixel layer related
-	AM_RANGE(0x8802, 0x8802) AM_WRITE(bank_select_w)
-	AM_RANGE(0x8803, 0x8803) AM_READWRITE(pix2_r, pix2_w)       //pixel layer related
-	AM_RANGE(0x8804, 0x8804) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0x8804, 0x8804) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x8805, 0x8805) AM_READ(snd_flag_r) AM_WRITENOP /*sound_reset*/ //????
-	AM_RANGE(0x8807, 0x8807) AM_READNOP /* unknown */
-	AM_RANGE(0x8808, 0x8808) AM_READ_PORT("DSW3")
-	AM_RANGE(0x8809, 0x8809) AM_READ_PORT("P1")
-	AM_RANGE(0x880a, 0x880a) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x880b, 0x880b) AM_READ_PORT("P2")
-	AM_RANGE(0x880c, 0x880c) AM_READ_PORT("DSW1") AM_WRITE(fortyl_pixram_sel_w) /* pixram bank select */
-	AM_RANGE(0x880d, 0x880d) AM_READ_PORT("DSW2") AM_WRITENOP /* unknown */
-	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(fortyl_bg_videoram_r, fortyl_bg_videoram_w) AM_SHARE("videoram")      /* #1 M5517P on video board */
-	AM_RANGE(0x9800, 0x983f) AM_RAM AM_SHARE("video_ctrl")          /* video control area */
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_SHARE("spriteram")   /* sprites part 1 */
-	AM_RANGE(0x9880, 0x98bf) AM_READWRITE(fortyl_bg_colorram_r, fortyl_bg_colorram_w) AM_SHARE("colorram")      /* background attributes (2 bytes per line) */
-	AM_RANGE(0x98c0, 0x98ff) AM_RAM AM_SHARE("spriteram2")/* sprites part 2 */
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
+void fortyl_state::_40love_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram(); /* M5517P on main board */
+	map(0x8800, 0x8800).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+	map(0x8801, 0x8801).rw(this, FUNC(fortyl_state::fortyl_mcu_status_r), FUNC(fortyl_state::pix1_mcu_w));      //pixel layer related
+	map(0x8802, 0x8802).w(this, FUNC(fortyl_state::bank_select_w));
+	map(0x8803, 0x8803).rw(this, FUNC(fortyl_state::pix2_r), FUNC(fortyl_state::pix2_w));       //pixel layer related
+	map(0x8804, 0x8804).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0x8804, 0x8804).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x8805, 0x8805).r(this, FUNC(fortyl_state::snd_flag_r)).nopw(); /*sound_reset*/ //????
+	map(0x8807, 0x8807).nopr(); /* unknown */
+	map(0x8808, 0x8808).portr("DSW3");
+	map(0x8809, 0x8809).portr("P1");
+	map(0x880a, 0x880a).portr("SYSTEM");
+	map(0x880b, 0x880b).portr("P2");
+	map(0x880c, 0x880c).portr("DSW1").w(this, FUNC(fortyl_state::fortyl_pixram_sel_w)); /* pixram bank select */
+	map(0x880d, 0x880d).portr("DSW2").nopw(); /* unknown */
+	map(0x9000, 0x97ff).rw(this, FUNC(fortyl_state::fortyl_bg_videoram_r), FUNC(fortyl_state::fortyl_bg_videoram_w)).share("videoram");      /* #1 M5517P on video board */
+	map(0x9800, 0x983f).ram().share("video_ctrl");          /* video control area */
+	map(0x9840, 0x987f).ram().share("spriteram");   /* sprites part 1 */
+	map(0x9880, 0x98bf).rw(this, FUNC(fortyl_state::fortyl_bg_colorram_r), FUNC(fortyl_state::fortyl_bg_colorram_w)).share("colorram");      /* background attributes (2 bytes per line) */
+	map(0x98c0, 0x98ff).ram().share("spriteram2");/* sprites part 2 */
+	map(0xa000, 0xbfff).bankr("bank1");
 	//AM_RANGE(0xbf00, 0xbfff) writes here when zooms-in/out, left-over or pixel line clearance?
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(fortyl_pixram_r, fortyl_pixram_w) /* banked pixel layer */
-ADDRESS_MAP_END
+	map(0xc000, 0xffff).rw(this, FUNC(fortyl_state::fortyl_pixram_r), FUNC(fortyl_state::fortyl_pixram_w)); /* banked pixel layer */
+}
 
-ADDRESS_MAP_START(fortyl_state::undoukai_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("mcu_ram") /* M5517P on main board */
-	AM_RANGE(0xa800, 0xa800) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0xa801, 0xa801) AM_READWRITE(fortyl_mcu_status_r, pix1_w)        //pixel layer related
-	AM_RANGE(0xa802, 0xa802) AM_WRITE(bank_select_w)
-	AM_RANGE(0xa803, 0xa803) AM_READWRITE(pix2_r, pix2_w)       //pixel layer related
-	AM_RANGE(0xa804, 0xa804) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0xa804, 0xa804) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa805, 0xa805) AM_READ(snd_flag_r) AM_WRITENOP /*sound_reset*/    //????
-	AM_RANGE(0xa807, 0xa807) AM_READNOP AM_WRITENOP /* unknown */
-	AM_RANGE(0xa808, 0xa808) AM_READ_PORT("DSW3")
-	AM_RANGE(0xa809, 0xa809) AM_READ_PORT("P1")
-	AM_RANGE(0xa80a, 0xa80a) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa80b, 0xa80b) AM_READ_PORT("P2")
-	AM_RANGE(0xa80c, 0xa80c) AM_READ_PORT("DSW1") AM_WRITE(fortyl_pixram_sel_w) /* pixram bank select */
-	AM_RANGE(0xa80d, 0xa80d) AM_READ_PORT("DSW2") AM_WRITENOP /* unknown */
-	AM_RANGE(0xb000, 0xb7ff) AM_READWRITE(fortyl_bg_videoram_r, fortyl_bg_videoram_w) AM_SHARE("videoram")      /* #1 M5517P on video board */
-	AM_RANGE(0xb800, 0xb83f) AM_RAM AM_SHARE("video_ctrl")          /* video control area */
-	AM_RANGE(0xb840, 0xb87f) AM_RAM AM_SHARE("spriteram")   /* sprites part 1 */
-	AM_RANGE(0xb880, 0xb8bf) AM_READWRITE(fortyl_bg_colorram_r, fortyl_bg_colorram_w) AM_SHARE("colorram")      /* background attributes (2 bytes per line) */
-	AM_RANGE(0xb8e0, 0xb8ff) AM_RAM AM_SHARE("spriteram2") /* sprites part 2 */
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(fortyl_pixram_r, fortyl_pixram_w)
-ADDRESS_MAP_END
+void fortyl_state::undoukai_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xa7ff).ram().share("mcu_ram"); /* M5517P on main board */
+	map(0xa800, 0xa800).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+	map(0xa801, 0xa801).rw(this, FUNC(fortyl_state::fortyl_mcu_status_r), FUNC(fortyl_state::pix1_w));        //pixel layer related
+	map(0xa802, 0xa802).w(this, FUNC(fortyl_state::bank_select_w));
+	map(0xa803, 0xa803).rw(this, FUNC(fortyl_state::pix2_r), FUNC(fortyl_state::pix2_w));       //pixel layer related
+	map(0xa804, 0xa804).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0xa804, 0xa804).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xa805, 0xa805).r(this, FUNC(fortyl_state::snd_flag_r)).nopw(); /*sound_reset*/    //????
+	map(0xa807, 0xa807).nopr().nopw(); /* unknown */
+	map(0xa808, 0xa808).portr("DSW3");
+	map(0xa809, 0xa809).portr("P1");
+	map(0xa80a, 0xa80a).portr("SYSTEM");
+	map(0xa80b, 0xa80b).portr("P2");
+	map(0xa80c, 0xa80c).portr("DSW1").w(this, FUNC(fortyl_state::fortyl_pixram_sel_w)); /* pixram bank select */
+	map(0xa80d, 0xa80d).portr("DSW2").nopw(); /* unknown */
+	map(0xb000, 0xb7ff).rw(this, FUNC(fortyl_state::fortyl_bg_videoram_r), FUNC(fortyl_state::fortyl_bg_videoram_w)).share("videoram");      /* #1 M5517P on video board */
+	map(0xb800, 0xb83f).ram().share("video_ctrl");          /* video control area */
+	map(0xb840, 0xb87f).ram().share("spriteram");   /* sprites part 1 */
+	map(0xb880, 0xb8bf).rw(this, FUNC(fortyl_state::fortyl_bg_colorram_r), FUNC(fortyl_state::fortyl_bg_colorram_w)).share("colorram");      /* background attributes (2 bytes per line) */
+	map(0xb8e0, 0xb8ff).ram().share("spriteram2"); /* sprites part 2 */
+	map(0xc000, 0xffff).rw(this, FUNC(fortyl_state::fortyl_pixram_r), FUNC(fortyl_state::fortyl_pixram_w));
+}
 
 WRITE8_MEMBER(fortyl_state::sound_control_0_w)
 {
@@ -444,21 +446,22 @@ WRITE8_MEMBER(fortyl_state::sound_control_3_w)/* unknown */
 //  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
 }
 
-ADDRESS_MAP_START(fortyl_state::sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_device, write)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
-	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
-	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xd800, 0xd800) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0xda00, 0xda00) AM_READNOP // unknown read
-	AM_RANGE(0xda00, 0xda00) AM_DEVWRITE("soundnmi", input_merger_device, in_set<1>) // enable NMI
-	AM_RANGE(0xdc00, 0xdc00) AM_DEVWRITE("soundnmi", input_merger_device, in_clear<1>) // disable NMI
-	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write)       /* signed 8-bit DAC - unknown read */
-	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostics ROM */
-ADDRESS_MAP_END
+void fortyl_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xc801).w(m_ay, FUNC(ay8910_device::address_data_w));
+	map(0xca00, 0xca0d).w(m_msm, FUNC(msm5232_device::write));
+	map(0xcc00, 0xcc00).w(this, FUNC(fortyl_state::sound_control_0_w));
+	map(0xce00, 0xce00).w(this, FUNC(fortyl_state::sound_control_1_w));
+	map(0xd800, 0xd800).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xd800, 0xd800).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+	map(0xda00, 0xda00).nopr(); // unknown read
+	map(0xda00, 0xda00).w("soundnmi", FUNC(input_merger_device::in_set<1>)); // enable NMI
+	map(0xdc00, 0xdc00).w("soundnmi", FUNC(input_merger_device::in_clear<1>)); // disable NMI
+	map(0xde00, 0xde00).nopr().w("dac", FUNC(dac_byte_interface::write));       /* signed 8-bit DAC - unknown read */
+	map(0xe000, 0xefff).rom(); /* space for diagnostics ROM */
+}
 
 
 static INPUT_PORTS_START( 40love )

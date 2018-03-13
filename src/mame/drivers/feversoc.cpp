@@ -193,21 +193,22 @@ WRITE16_MEMBER( feversoc_state::output2_w )
 }
 
 
-ADDRESS_MAP_START(feversoc_state::feversoc_map)
-	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
-	AM_RANGE(0x02000000, 0x0202ffff) AM_RAM AM_SHARE("workram1") //work ram
-	AM_RANGE(0x02030000, 0x0203ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x02034000, 0x0203dfff) AM_RAM AM_SHARE("workram2") //work ram
-	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x06000000, 0x06000003) AM_WRITE16(output_w, 0xffff0000)
-	AM_RANGE(0x06000000, 0x06000003) AM_WRITE16(output2_w, 0x0000ffff)
-	AM_RANGE(0x06000004, 0x06000007) AM_WRITE16(feversoc_irq_ack, 0x0000ffff)
-	AM_RANGE(0x06000008, 0x0600000b) AM_READ16(in_r, 0xffffffff)
-	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff0000)
+void feversoc_state::feversoc_map(address_map &map)
+{
+	map(0x00000000, 0x0003ffff).rom();
+	map(0x02000000, 0x0202ffff).ram().share("workram1"); //work ram
+	map(0x02030000, 0x0203ffff).ram().share("nvram");
+	map(0x02034000, 0x0203dfff).ram().share("workram2"); //work ram
+	map(0x0203e000, 0x0203ffff).ram().share("spriteram");
+	map(0x06000000, 0x06000001).w(this, FUNC(feversoc_state::output_w));
+	map(0x06000002, 0x06000003).w(this, FUNC(feversoc_state::output2_w));
+	map(0x06000006, 0x06000007).w(this, FUNC(feversoc_state::feversoc_irq_ack));
+	map(0x06000008, 0x0600000b).r(this, FUNC(feversoc_state::in_r));
+	map(0x0600000d, 0x0600000d).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//AM_RANGE(0x06010000, 0x0601007f) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write) AM_RAM
-	AM_RANGE(0x06010060, 0x06010063) AM_WRITENOP // sprite buffering
-	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_DEVWRITE("palette",  palette_device, write32) AM_SHARE("palette")
-ADDRESS_MAP_END
+	map(0x06010060, 0x06010063).nopw(); // sprite buffering
+	map(0x06018000, 0x06019fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+}
 
 static const gfx_layout spi_spritelayout =
 {

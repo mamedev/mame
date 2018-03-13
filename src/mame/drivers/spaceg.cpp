@@ -424,33 +424,34 @@ WRITE8_MEMBER(spaceg_state::sound3_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(spaceg_state::spaceg_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_ROM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM
+void spaceg_state::spaceg_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x3000, 0x3fff).rom();
+	map(0x7000, 0x77ff).ram();
 
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_READ(colorram_r) AM_SHARE("colorram")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(zvideoram_w) AM_SHARE("videoram")
+	map(0xa000, 0xbfff).ram().r(this, FUNC(spaceg_state::colorram_r)).share("colorram");
+	map(0xc000, 0xdfff).ram().w(this, FUNC(spaceg_state::zvideoram_w)).share("videoram");
 
-	AM_RANGE(0x9400, 0x9400) AM_WRITEONLY AM_SHARE("io9400") /* gfx ctrl */
-	AM_RANGE(0x9401, 0x9401) AM_WRITEONLY AM_SHARE("io9401") /* gfx ctrl */
+	map(0x9400, 0x9400).writeonly().share("io9400"); /* gfx ctrl */
+	map(0x9401, 0x9401).writeonly().share("io9401"); /* gfx ctrl */
 	/* 9402 -
 	    bits 0 and 1 probably control the lamps under the player 1 and player 2 start buttons
 	    bit 2 - unknown -
 	    bit 3 is probably a flip screen
 	    bit 7 - unknown - set to 1 during the gameplay (coinlock ?)
 	*/
-	AM_RANGE(0x9402, 0x9402) AM_WRITENOP
-	AM_RANGE(0x9405, 0x9405) AM_WRITE(sound1_w)
-	AM_RANGE(0x9406, 0x9406) AM_WRITE(sound2_w)
-	AM_RANGE(0x9407, 0x9407) AM_WRITE(sound3_w)
+	map(0x9402, 0x9402).nopw();
+	map(0x9405, 0x9405).w(this, FUNC(spaceg_state::sound1_w));
+	map(0x9406, 0x9406).w(this, FUNC(spaceg_state::sound2_w));
+	map(0x9407, 0x9407).w(this, FUNC(spaceg_state::sound3_w));
 
-	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("9800")
-	AM_RANGE(0x9801, 0x9801) AM_READ_PORT("9801")
-	AM_RANGE(0x9802, 0x9802) AM_READ_PORT("9802")
-	AM_RANGE(0x9805, 0x9805) AM_READ_PORT("9805")
-	AM_RANGE(0x9806, 0x9806) AM_READ_PORT("9806")
-ADDRESS_MAP_END
+	map(0x9800, 0x9800).portr("9800");
+	map(0x9801, 0x9801).portr("9801");
+	map(0x9802, 0x9802).portr("9802");
+	map(0x9805, 0x9805).portr("9805");
+	map(0x9806, 0x9806).portr("9806");
+}
 
 
 

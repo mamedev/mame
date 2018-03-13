@@ -595,28 +595,30 @@ WRITE32_MEMBER( atari_cage_device::speedup_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(atari_cage_device::cage_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("cageram")
-	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
-	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")
-	AM_RANGE(0x808000, 0x8080ff) AM_READWRITE(tms32031_io_r, tms32031_io_w)
-	AM_RANGE(0x809800, 0x809fff) AM_RAM
-	AM_RANGE(0xa00000, 0xa00000) AM_READWRITE(cage_from_main_r, cage_to_main_w)
-	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK("bank11")
-ADDRESS_MAP_END
+void atari_cage_device::cage_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).ram().share("cageram");
+	map(0x200000, 0x200000).nopw();
+	map(0x400000, 0x47ffff).bankr("bank10");
+	map(0x808000, 0x8080ff).rw(this, FUNC(atari_cage_device::tms32031_io_r), FUNC(atari_cage_device::tms32031_io_w));
+	map(0x809800, 0x809fff).ram();
+	map(0xa00000, 0xa00000).rw(this, FUNC(atari_cage_device::cage_from_main_r), FUNC(atari_cage_device::cage_to_main_w));
+	map(0xc00000, 0xffffff).bankr("bank11");
+}
 
 
-ADDRESS_MAP_START(atari_cage_seattle_device::cage_map_seattle)
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("cageram")
-	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
-	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")
-	AM_RANGE(0x808000, 0x8080ff) AM_READWRITE(tms32031_io_r, tms32031_io_w)
-	AM_RANGE(0x809800, 0x809fff) AM_RAM
-	AM_RANGE(0xa00000, 0xa00000) AM_READWRITE(cage_from_main_r, cage_from_main_ack_w)
-	AM_RANGE(0xa00001, 0xa00001) AM_WRITE(cage_to_main_w)
-	AM_RANGE(0xa00003, 0xa00003) AM_READ(cage_io_status_r)
-	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK("bank11")
-ADDRESS_MAP_END
+void atari_cage_seattle_device::cage_map_seattle(address_map &map)
+{
+	map(0x000000, 0x00ffff).ram().share("cageram");
+	map(0x200000, 0x200000).nopw();
+	map(0x400000, 0x47ffff).bankr("bank10");
+	map(0x808000, 0x8080ff).rw(this, FUNC(atari_cage_seattle_device::tms32031_io_r), FUNC(atari_cage_seattle_device::tms32031_io_w));
+	map(0x809800, 0x809fff).ram();
+	map(0xa00000, 0xa00000).rw(this, FUNC(atari_cage_seattle_device::cage_from_main_r), FUNC(atari_cage_seattle_device::cage_from_main_ack_w));
+	map(0xa00001, 0xa00001).w(this, FUNC(atari_cage_seattle_device::cage_to_main_w));
+	map(0xa00003, 0xa00003).r(this, FUNC(atari_cage_seattle_device::cage_io_status_r));
+	map(0xc00000, 0xffffff).bankr("bank11");
+}
 
 
 //-------------------------------------------------

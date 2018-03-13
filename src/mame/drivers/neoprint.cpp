@@ -247,26 +247,27 @@ WRITE8_MEMBER(neoprint_state::audio_result_w)
 	m_audio_result = data;
 }
 
-ADDRESS_MAP_START(neoprint_state::neoprint_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void neoprint_state::neoprint_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 /*  AM_RANGE(0x100000, 0x17ffff) multi-cart or banking, some writes points here if anything lies there too */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("npvidram")
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x600000, 0x600001) AM_READWRITE8(neoprint_audio_result_r, audio_command_w, 0xff00)
-	AM_RANGE(0x600002, 0x600003) AM_READWRITE8(neoprint_calendar_r, neoprint_calendar_w, 0xff00)
-	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM") AM_WRITENOP
-	AM_RANGE(0x600006, 0x600007) AM_READ_PORT("IN") AM_WRITENOP
-	AM_RANGE(0x600008, 0x600009) AM_READ_PORT("DSW1")
-	AM_RANGE(0x60000a, 0x60000b) AM_READ8(neoprint_unk_r,0xff00)
-	AM_RANGE(0x60000c, 0x60000d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x60000e, 0x60000f) AM_WRITENOP
+	map(0x200000, 0x20ffff).ram();
+	map(0x300000, 0x30ffff).ram().share("nvram");
+	map(0x400000, 0x43ffff).ram().share("npvidram");
+	map(0x500000, 0x51ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x600000, 0x600000).rw(this, FUNC(neoprint_state::neoprint_audio_result_r), FUNC(neoprint_state::audio_command_w));
+	map(0x600002, 0x600002).rw(this, FUNC(neoprint_state::neoprint_calendar_r), FUNC(neoprint_state::neoprint_calendar_w));
+	map(0x600004, 0x600005).portr("SYSTEM").nopw();
+	map(0x600006, 0x600007).portr("IN").nopw();
+	map(0x600008, 0x600009).portr("DSW1");
+	map(0x60000a, 0x60000a).r(this, FUNC(neoprint_state::neoprint_unk_r));
+	map(0x60000c, 0x60000d).portr("DSW2");
+	map(0x60000e, 0x60000f).nopw();
 
-	AM_RANGE(0x700000, 0x70001b) AM_RAM AM_SHARE("npvidregs")
+	map(0x700000, 0x70001b).ram().share("npvidregs");
 
-	AM_RANGE(0x70001e, 0x70001f) AM_WRITENOP //watchdog
-ADDRESS_MAP_END
+	map(0x70001e, 0x70001f).nopw(); //watchdog
+}
 
 WRITE16_MEMBER(neoprint_state::nprsp_palette_w)
 {
@@ -315,26 +316,28 @@ READ16_MEMBER(neoprint_state::rom_window_r)
 	return rom[offset | 0x80000/2 | m_bank_val*0x40000/2];
 }
 
-ADDRESS_MAP_START(neoprint_state::nprsp_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0fffff) AM_READ(rom_window_r)
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE8(neoprint_audio_result_r, audio_command_w, 0xff00)
-	AM_RANGE(0x200002, 0x200003) AM_READWRITE8(neoprint_calendar_r, neoprint_calendar_w, 0xff00)
-	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("SYSTEM") AM_WRITENOP
-	AM_RANGE(0x200006, 0x200007) AM_READ_PORT("IN") AM_WRITENOP
-	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("DSW1") AM_WRITE8(nprsp_bank_w,0xff00)
-	AM_RANGE(0x20000a, 0x20000b) AM_READ8(neoprint_unk_r,0xff00)
-	AM_RANGE(0x20000c, 0x20000d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x20000e, 0x20000f) AM_WRITENOP
+void neoprint_state::nprsp_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x0fffff).r(this, FUNC(neoprint_state::rom_window_r));
+	map(0x200000, 0x200000).rw(this, FUNC(neoprint_state::neoprint_audio_result_r), FUNC(neoprint_state::audio_command_w));
+	map(0x200002, 0x200002).rw(this, FUNC(neoprint_state::neoprint_calendar_r), FUNC(neoprint_state::neoprint_calendar_w));
+	map(0x200004, 0x200005).portr("SYSTEM").nopw();
+	map(0x200006, 0x200007).portr("IN").nopw();
+	map(0x200008, 0x200009).portr("DSW1");
+	map(0x200008, 0x200008).w(this, FUNC(neoprint_state::nprsp_bank_w));
+	map(0x20000a, 0x20000a).r(this, FUNC(neoprint_state::neoprint_unk_r));
+	map(0x20000c, 0x20000d).portr("DSW2");
+	map(0x20000e, 0x20000f).nopw();
 
-	AM_RANGE(0x240000, 0x24001b) AM_RAM AM_SHARE("npvidregs")
-	AM_RANGE(0x24001e, 0x24001f) AM_WRITENOP //watchdog
+	map(0x240000, 0x24001b).ram().share("npvidregs");
+	map(0x24001e, 0x24001f).nopw(); //watchdog
 
-	AM_RANGE(0x300000, 0x33ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x380000, 0x38ffff) AM_RAM
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("npvidram")
-	AM_RANGE(0x500000, 0x57ffff) AM_RAM_WRITE(nprsp_palette_w) AM_SHARE("paletteram")
-ADDRESS_MAP_END
+	map(0x300000, 0x33ffff).ram().share("nvram");
+	map(0x380000, 0x38ffff).ram();
+	map(0x400000, 0x43ffff).ram().share("npvidram");
+	map(0x500000, 0x57ffff).ram().w(this, FUNC(neoprint_state::nprsp_palette_w)).share("paletteram");
+}
 
 /*************************************
  *
@@ -342,14 +345,15 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(neoprint_state::neoprint_audio_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM//AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)
+void neoprint_state::neoprint_audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();//AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)
 //  AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 3)
 //  AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 2)
 //  AM_RANGE(0xe000, 0xefff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 1)
 //  AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 0)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf800, 0xffff).ram();
+}
 
 
 
@@ -359,18 +363,19 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(neoprint_state::neoprint_audio_io_map)
+void neoprint_state::neoprint_audio_io_map(address_map &map)
+{
 	/*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r) AM_WRITENOP
-	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
+	map(0x00, 0x00).mirror(0xff00).r(this, FUNC(neoprint_state::audio_command_r)).nopw();
+	map(0x04, 0x07).mirror(0xff00).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 //  AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
 //  AM_RANGE(0x08, 0x08) AM_SELECT(0xfff0) AM_READ(audio_cpu_bank_select_f000_f7ff_r)
 //  AM_RANGE(0x09, 0x09) AM_SELECT(0xfff0) AM_READ(audio_cpu_bank_select_e000_efff_r)
 //  AM_RANGE(0x0a, 0x0a) AM_SELECT(0xfff0) AM_READ(audio_cpu_bank_select_c000_dfff_r)
 //  AM_RANGE(0x0b, 0x0b) AM_SELECT(0xfff0) AM_READ(audio_cpu_bank_select_8000_bfff_r)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(audio_result_w)
+	map(0x0c, 0x0c).mirror(0xff00).w(this, FUNC(neoprint_state::audio_result_w));
 //  AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) /* write - NMI disable? (the data written doesn't matter) */
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( neoprint )
 	PORT_START("SYSTEM")

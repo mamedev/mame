@@ -224,56 +224,60 @@ CUSTOM_INPUT_MEMBER(lastbank_state::sound_status_r)
 	return BIT(m_sound_flags, 0) << 1 | BIT(m_sound_flags, 1);
 }
 
-ADDRESS_MAP_START(lastbank_state::tc0091lvc_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("mainbank")
+void lastbank_state::tc0091lvc_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x7fff).bankr("mainbank");
 
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("nvram")
+	map(0x8000, 0x9fff).ram().share("nvram");
 
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(ram_r<0>,ram_w<0>)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(ram_r<1>,ram_w<1>)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(ram_r<2>,ram_w<2>)
-	AM_RANGE(0xf000, 0xfdff) AM_READWRITE(ram_r<3>,ram_w<3>)
+	map(0xc000, 0xcfff).rw(this, FUNC(lastbank_state::ram_r<0>), FUNC(lastbank_state::ram_w<0>));
+	map(0xd000, 0xdfff).rw(this, FUNC(lastbank_state::ram_r<1>), FUNC(lastbank_state::ram_w<1>));
+	map(0xe000, 0xefff).rw(this, FUNC(lastbank_state::ram_r<2>), FUNC(lastbank_state::ram_w<2>));
+	map(0xf000, 0xfdff).rw(this, FUNC(lastbank_state::ram_r<3>), FUNC(lastbank_state::ram_w<3>));
 
-	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("tc0091lvc", tc0091lvc_device, vregs_r, vregs_w)
-	AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_vector_r, irq_vector_w)
-	AM_RANGE(0xff03, 0xff03) AM_READWRITE(irq_enable_r, irq_enable_w)
-	AM_RANGE(0xff04, 0xff07) AM_READWRITE(ram_bank_r, ram_bank_w)
-	AM_RANGE(0xff08, 0xff08) AM_READWRITE(rom_bank_r, rom_bank_w)
-ADDRESS_MAP_END
+	map(0xfe00, 0xfeff).rw(m_vdp, FUNC(tc0091lvc_device::vregs_r), FUNC(tc0091lvc_device::vregs_w));
+	map(0xff00, 0xff02).rw(this, FUNC(lastbank_state::irq_vector_r), FUNC(lastbank_state::irq_vector_w));
+	map(0xff03, 0xff03).rw(this, FUNC(lastbank_state::irq_enable_r), FUNC(lastbank_state::irq_enable_w));
+	map(0xff04, 0xff07).rw(this, FUNC(lastbank_state::ram_bank_r), FUNC(lastbank_state::ram_bank_w));
+	map(0xff08, 0xff08).rw(this, FUNC(lastbank_state::rom_bank_r), FUNC(lastbank_state::rom_bank_w));
+}
 
-ADDRESS_MAP_START(lastbank_state::lastbank_map)
-	AM_IMPORT_FROM( tc0091lvc_map )
-	AM_RANGE(0xa000, 0xa00d) AM_NOP // MSM62X42B or equivalent probably read from here
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("COINS")
-	AM_RANGE(0xa800, 0xa802) AM_WRITE(output_w)
-	AM_RANGE(0xa803, 0xa803) AM_WRITE(mux_w) // mux for $a808 / $a80c
-	AM_RANGE(0xa804, 0xa804) AM_READ_PORT("SPECIAL")
-	AM_RANGE(0xa805, 0xa805) AM_DEVWRITE("soundlatch1", generic_latch_8_device, write)
-	AM_RANGE(0xa806, 0xa806) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0xa807, 0xa807) AM_WRITENOP // hopper?
-	AM_RANGE(0xa808, 0xa808) AM_READ(mux_0_r)
-	AM_RANGE(0xa80c, 0xa80c) AM_READ(mux_0_r)
-	AM_RANGE(0xa81c, 0xa81c) AM_READ_PORT("DSW0")
-	AM_RANGE(0xa81d, 0xa81d) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa81e, 0xa81e) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa81f, 0xa81f) AM_READ_PORT("DSW3")
-ADDRESS_MAP_END
+void lastbank_state::lastbank_map(address_map &map)
+{
+	tc0091lvc_map(map);
+	map(0xa000, 0xa00d).noprw(); // MSM62X42B or equivalent probably read from here
+	map(0xa800, 0xa800).portr("COINS");
+	map(0xa800, 0xa802).w(this, FUNC(lastbank_state::output_w));
+	map(0xa803, 0xa803).w(this, FUNC(lastbank_state::mux_w)); // mux for $a808 / $a80c
+	map(0xa804, 0xa804).portr("SPECIAL");
+	map(0xa805, 0xa805).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0xa806, 0xa806).w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0xa807, 0xa807).nopw(); // hopper?
+	map(0xa808, 0xa808).r(this, FUNC(lastbank_state::mux_0_r));
+	map(0xa80c, 0xa80c).r(this, FUNC(lastbank_state::mux_0_r));
+	map(0xa81c, 0xa81c).portr("DSW0");
+	map(0xa81d, 0xa81d).portr("DSW1");
+	map(0xa81e, 0xa81e).portr("DSW2");
+	map(0xa81f, 0xa81f).portr("DSW3");
+}
 
-ADDRESS_MAP_START(lastbank_state::lastbank_audio_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+void lastbank_state::lastbank_audio_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe7ff).ram();
+}
 
-ADDRESS_MAP_START(lastbank_state::lastbank_audio_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x06) AM_DEVREADWRITE("essnd", es8712_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_WRITE(sound_flags_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void lastbank_state::lastbank_audio_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x06).rw(m_essnd, FUNC(es8712_device::read), FUNC(es8712_device::write));
+	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x80, 0x80).w(this, FUNC(lastbank_state::sound_flags_w));
+	map(0x80, 0x80).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0xc0, 0xc0).r("soundlatch2", FUNC(generic_latch_8_device::read));
+}
 
 static INPUT_PORTS_START( lastbank )
 	PORT_START("COINS")

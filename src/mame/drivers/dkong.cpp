@@ -797,124 +797,132 @@ WRITE8_MEMBER(dkong_state::nmi_mask_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(dkong_state::dkong_map)
-	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0x6000, 0x6bff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("sprite_ram") /* sprite set 1 */
-	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w) AM_SHARE("video_ram")
-	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", i8257_device, read, write)   /* P8257 control registers */
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_DEVWRITE("ls175.3d", latch8_device, write)    /* IN0, sound CPU intf */
-	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(radarscp_grid_color_w)/* IN1 */
+void dkong_state::dkong_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom();
+	map(0x6000, 0x6bff).ram();
+	map(0x7000, 0x73ff).ram().share("sprite_ram"); /* sprite set 1 */
+	map(0x7400, 0x77ff).ram().w(this, FUNC(dkong_state::dkong_videoram_w)).share("video_ram");
+	map(0x7800, 0x780f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));   /* P8257 control registers */
+	map(0x7c00, 0x7c00).portr("IN0").w("ls175.3d", FUNC(latch8_device::write));    /* IN0, sound CPU intf */
+	map(0x7c80, 0x7c80).portr("IN1").w(this, FUNC(dkong_state::radarscp_grid_color_w));/* IN1 */
 
-	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)                               /* IN2 */
-	AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE("ls259.6h", latch8_device, bit0_w)          /* Sound signals */
+	map(0x7d00, 0x7d00).r(this, FUNC(dkong_state::dkong_in2_r));                               /* IN2 */
+	map(0x7d00, 0x7d07).w(m_dev_6h, FUNC(latch8_device::bit0_w));          /* Sound signals */
 
-	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)   /* DSW0 */
-	AM_RANGE(0x7d81, 0x7d81) AM_WRITE(radarscp_grid_enable_w)
-	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
-	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)                       /* 2 PSL Signal */
-	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x7d85, 0x7d85) AM_WRITE(p8257_drq_w)          /* P8257 ==> /DRQ0 /DRQ1 */
-	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
-ADDRESS_MAP_END
+	map(0x7d80, 0x7d80).portr("DSW0").w(this, FUNC(dkong_state::dkong_audio_irq_w));   /* DSW0 */
+	map(0x7d81, 0x7d81).w(this, FUNC(dkong_state::radarscp_grid_enable_w));
+	map(0x7d82, 0x7d82).w(this, FUNC(dkong_state::dkong_flipscreen_w));
+	map(0x7d83, 0x7d83).w(this, FUNC(dkong_state::dkong_spritebank_w));                       /* 2 PSL Signal */
+	map(0x7d84, 0x7d84).w(this, FUNC(dkong_state::nmi_mask_w));
+	map(0x7d85, 0x7d85).w(this, FUNC(dkong_state::p8257_drq_w));          /* P8257 ==> /DRQ0 /DRQ1 */
+	map(0x7d86, 0x7d87).w(this, FUNC(dkong_state::dkong_palettebank_w));
+}
 
-ADDRESS_MAP_START(dkong_state::dkongjr_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6bff) AM_RAM
-	AM_RANGE(0x6c00, 0x6fff) AM_RAM                                              /* DK3 bootleg only */
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("sprite_ram") /* sprite set 1 */
-	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w) AM_SHARE("video_ram")
-	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", i8257_device, read, write)   /* P8257 control registers */
+void dkong_state::dkongjr_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6bff).ram();
+	map(0x6c00, 0x6fff).ram();                                              /* DK3 bootleg only */
+	map(0x7000, 0x73ff).ram().share("sprite_ram"); /* sprite set 1 */
+	map(0x7400, 0x77ff).ram().w(this, FUNC(dkong_state::dkong_videoram_w)).share("video_ram");
+	map(0x7800, 0x780f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));   /* P8257 control registers */
 
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_DEVWRITE("ls174.3d", latch8_device, write)    /* IN0, sound interface */
+	map(0x7c00, 0x7c00).portr("IN0").w("ls174.3d", FUNC(latch8_device::write));    /* IN0, sound interface */
 
-	AM_RANGE(0x7c80, 0x7c87) AM_DEVWRITE("ls259.4h", latch8_device, bit0_w)     /* latch for sound and signals above */
-	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(dkongjr_gfxbank_w)
+	map(0x7c80, 0x7c87).w("ls259.4h", FUNC(latch8_device::bit0_w));     /* latch for sound and signals above */
+	map(0x7c80, 0x7c80).portr("IN1").w(this, FUNC(dkong_state::dkongjr_gfxbank_w));
 
-	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)                                /* IN2 */
-	AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE("ls259.6h", latch8_device, bit0_w)      /* Sound addrs */
+	map(0x7d00, 0x7d00).r(this, FUNC(dkong_state::dkong_in2_r));                                /* IN2 */
+	map(0x7d00, 0x7d07).w(m_dev_6h, FUNC(latch8_device::bit0_w));      /* Sound addrs */
 
-	AM_RANGE(0x7d80, 0x7d87) AM_DEVWRITE("ls259.5h", latch8_device, bit0_w)     /* latch for sound and signals above*/
-	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)   /* DSW0 */
-	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
-	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)                       /* 2 PSL Signal */
-	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x7d85, 0x7d85) AM_WRITE(p8257_drq_w)        /* P8257 ==> /DRQ0 /DRQ1 */
-	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
+	map(0x7d80, 0x7d87).w("ls259.5h", FUNC(latch8_device::bit0_w));     /* latch for sound and signals above*/
+	map(0x7d80, 0x7d80).portr("DSW0").w(this, FUNC(dkong_state::dkong_audio_irq_w));   /* DSW0 */
+	map(0x7d82, 0x7d82).w(this, FUNC(dkong_state::dkong_flipscreen_w));
+	map(0x7d83, 0x7d83).w(this, FUNC(dkong_state::dkong_spritebank_w));                       /* 2 PSL Signal */
+	map(0x7d84, 0x7d84).w(this, FUNC(dkong_state::nmi_mask_w));
+	map(0x7d85, 0x7d85).w(this, FUNC(dkong_state::p8257_drq_w));        /* P8257 ==> /DRQ0 /DRQ1 */
+	map(0x7d86, 0x7d87).w(this, FUNC(dkong_state::dkong_palettebank_w));
 
-	AM_RANGE(0x8000, 0x9fff) AM_ROM                                             /* bootleg DKjr only */
-	AM_RANGE(0xb000, 0xbfff) AM_ROM                                             /* pestplce only */
-	AM_RANGE(0xd000, 0xdfff) AM_ROM                                             /* DK3 bootleg only */
-ADDRESS_MAP_END
+	map(0x8000, 0x9fff).rom();                                             /* bootleg DKjr only */
+	map(0xb000, 0xbfff).rom();                                             /* pestplce only */
+	map(0xd000, 0xdfff).rom();                                             /* DK3 bootleg only */
+}
 
-ADDRESS_MAP_START(dkong_state::dkong3_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x6800, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("sprite_ram") /* sprite set 1 */
-	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w) AM_SHARE("video_ram")
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")  AM_DEVWRITE("latch1", latch8_device, write)
-	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")  AM_DEVWRITE("latch2", latch8_device, write)
-	AM_RANGE(0x7d00, 0x7d00) AM_READ_PORT("DSW0") AM_DEVWRITE("latch3", latch8_device, write)
-	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW1") AM_WRITE(dkong3_2a03_reset_w)
-	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(dkong3_coin_counter_w)
-	AM_RANGE(0x7e81, 0x7e81) AM_WRITE(dkong3_gfxbank_w)
-	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(dkong_flipscreen_w)
-	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(dkong_spritebank_w)                 /* 2 PSL Signal */
-	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_WRITE(dkong_z80dma_rdy_w)  /* ==> DMA Chip */
-	AM_RANGE(0x7e86, 0x7e87) AM_WRITE(dkong_palettebank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROM                                       /* DK3 and bootleg DKjr only */
-ADDRESS_MAP_END
+void dkong_state::dkong3_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x67ff).ram();
+	map(0x6800, 0x6fff).ram();
+	map(0x7000, 0x73ff).ram().share("sprite_ram"); /* sprite set 1 */
+	map(0x7400, 0x77ff).ram().w(this, FUNC(dkong_state::dkong_videoram_w)).share("video_ram");
+	map(0x7c00, 0x7c00).portr("IN0").w("latch1", FUNC(latch8_device::write));
+	map(0x7c80, 0x7c80).portr("IN1").w("latch2", FUNC(latch8_device::write));
+	map(0x7d00, 0x7d00).portr("DSW0").w("latch3", FUNC(latch8_device::write));
+	map(0x7d80, 0x7d80).portr("DSW1").w(this, FUNC(dkong_state::dkong3_2a03_reset_w));
+	map(0x7e80, 0x7e80).w(this, FUNC(dkong_state::dkong3_coin_counter_w));
+	map(0x7e81, 0x7e81).w(this, FUNC(dkong_state::dkong3_gfxbank_w));
+	map(0x7e82, 0x7e82).w(this, FUNC(dkong_state::dkong_flipscreen_w));
+	map(0x7e83, 0x7e83).w(this, FUNC(dkong_state::dkong_spritebank_w));                 /* 2 PSL Signal */
+	map(0x7e84, 0x7e84).w(this, FUNC(dkong_state::nmi_mask_w));
+	map(0x7e85, 0x7e85).w(this, FUNC(dkong_state::dkong_z80dma_rdy_w));  /* ==> DMA Chip */
+	map(0x7e86, 0x7e87).w(this, FUNC(dkong_state::dkong_palettebank_w));
+	map(0x8000, 0x9fff).rom();                                       /* DK3 and bootleg DKjr only */
+}
 
-ADDRESS_MAP_START(dkong_state::dkong3_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("z80dma", z80dma_device, read, write)  /* dma controller */
-ADDRESS_MAP_END
+void dkong_state::dkong3_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(m_z80dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));  /* dma controller */
+}
 
 /* Epos conversions */
 
-ADDRESS_MAP_START(dkong_state::epos_readport)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READ(epos_decrypt_rom)  /* Switch protection logic */
-ADDRESS_MAP_END
+void dkong_state::epos_readport(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).r(this, FUNC(dkong_state::epos_decrypt_rom));  /* Switch protection logic */
+}
 
 /* S2650 conversions */
 
-ADDRESS_MAP_START(dkong_state::s2650_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("sprite_ram")  /* 0x7000 */
-	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x007f) AM_READ_PORT("IN0") AM_DEVWRITE("ls175.3d", latch8_device, write)
-	AM_RANGE(0x1480, 0x1480) AM_READ_PORT("IN1")
-	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x007f) AM_READ(dkong_in2_r)                                 /* IN2 */
-	AM_RANGE(0x1500, 0x1507) AM_DEVWRITE("ls259.6h", latch8_device, bit0_w)       /* Sound signals */
-	AM_RANGE(0x1580, 0x1580) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)     /* DSW0 */
-	AM_RANGE(0x1582, 0x1582) AM_WRITE(dkong_flipscreen_w)
-	AM_RANGE(0x1583, 0x1583) AM_WRITE(dkong_spritebank_w)                         /* 2 PSL Signal */
-	AM_RANGE(0x1584, 0x1584) AM_NOP                                               /* Possibly still interrupt enable */
-	AM_RANGE(0x1585, 0x1585) AM_WRITE(p8257_drq_w)          /* P8257 ==> /DRQ0 /DRQ1 */
-	AM_RANGE(0x1586, 0x1587) AM_WRITE(dkong_palettebank_w)
-	AM_RANGE(0x1600, 0x17ff) AM_RAM                                               /* 0x6400  spriteram location */
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(dkong_videoram_w) AM_SHARE("video_ram")        /* 0x7400 */
-	AM_RANGE(0x1C00, 0x1f7f) AM_RAM                                               /* 0x6000 */
-	AM_RANGE(0x1f80, 0x1f8f) AM_DEVREADWRITE("dma8257", i8257_device, read, write)   /* P8257 control registers */
+void dkong_state::s2650_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x13ff).ram().share("sprite_ram");  /* 0x7000 */
+	map(0x1400, 0x1400).mirror(0x007f).portr("IN0").w("ls175.3d", FUNC(latch8_device::write));
+	map(0x1480, 0x1480).portr("IN1");
+	map(0x1500, 0x1500).mirror(0x007f).r(this, FUNC(dkong_state::dkong_in2_r));                                 /* IN2 */
+	map(0x1500, 0x1507).w(m_dev_6h, FUNC(latch8_device::bit0_w));       /* Sound signals */
+	map(0x1580, 0x1580).portr("DSW0").w(this, FUNC(dkong_state::dkong_audio_irq_w));     /* DSW0 */
+	map(0x1582, 0x1582).w(this, FUNC(dkong_state::dkong_flipscreen_w));
+	map(0x1583, 0x1583).w(this, FUNC(dkong_state::dkong_spritebank_w));                         /* 2 PSL Signal */
+	map(0x1584, 0x1584).noprw();                                               /* Possibly still interrupt enable */
+	map(0x1585, 0x1585).w(this, FUNC(dkong_state::p8257_drq_w));          /* P8257 ==> /DRQ0 /DRQ1 */
+	map(0x1586, 0x1587).w(this, FUNC(dkong_state::dkong_palettebank_w));
+	map(0x1600, 0x17ff).ram();                                               /* 0x6400  spriteram location */
+	map(0x1800, 0x1bff).ram().w(this, FUNC(dkong_state::dkong_videoram_w)).share("video_ram");        /* 0x7400 */
+	map(0x1C00, 0x1f7f).ram();                                               /* 0x6000 */
+	map(0x1f80, 0x1f8f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));   /* P8257 control registers */
 	/* 0x6800 not remapped */
-	AM_RANGE(0x2000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(s2650_mirror_r, s2650_mirror_w)
-	AM_RANGE(0x4000, 0x4fff) AM_ROM
-	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(s2650_mirror_r, s2650_mirror_w)
-	AM_RANGE(0x6000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(s2650_mirror_r, s2650_mirror_w)
-ADDRESS_MAP_END
+	map(0x2000, 0x2fff).rom();
+	map(0x3000, 0x3fff).rw(this, FUNC(dkong_state::s2650_mirror_r), FUNC(dkong_state::s2650_mirror_w));
+	map(0x4000, 0x4fff).rom();
+	map(0x5000, 0x5fff).rw(this, FUNC(dkong_state::s2650_mirror_r), FUNC(dkong_state::s2650_mirror_w));
+	map(0x6000, 0x6fff).rom();
+	map(0x7000, 0x7fff).rw(this, FUNC(dkong_state::s2650_mirror_r), FUNC(dkong_state::s2650_mirror_w));
+}
 
-ADDRESS_MAP_START(dkong_state::s2650_io_map)
-	AM_RANGE(0x00, 0x00) AM_READ(s2650_port0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(s2650_port1_r)
-ADDRESS_MAP_END
+void dkong_state::s2650_io_map(address_map &map)
+{
+	map(0x00, 0x00).r(this, FUNC(dkong_state::s2650_port0_r));
+	map(0x01, 0x01).r(this, FUNC(dkong_state::s2650_port1_r));
+}
 
-ADDRESS_MAP_START(dkong_state::s2650_data_map)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(s2650_data_w)
-ADDRESS_MAP_END
+void dkong_state::s2650_data_map(address_map &map)
+{
+	map(S2650_DATA_PORT, S2650_DATA_PORT).w(this, FUNC(dkong_state::s2650_data_w));
+}
 
 
 

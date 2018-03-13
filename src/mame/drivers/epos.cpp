@@ -70,18 +70,20 @@ WRITE8_MEMBER(epos_state::dealer_decrypt_rom)
  *
  *************************************/
 
-ADDRESS_MAP_START(epos_state::epos_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void epos_state::epos_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(epos_state::dealer_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void epos_state::dealer_map(address_map &map)
+{
+	map(0x0000, 0x5fff).bankr("bank1");
+	map(0x6000, 0x6fff).bankr("bank2");
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).ram().share("videoram");
+}
 
 /*************************************
  *
@@ -89,25 +91,27 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(epos_state::epos_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(port_1_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("INPUTS") AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("UNK")
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-ADDRESS_MAP_END
+void epos_state::epos_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSW").w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x01, 0x01).portr("SYSTEM").w(this, FUNC(epos_state::port_1_w));
+	map(0x02, 0x02).portr("INPUTS").w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x03, 0x03).portr("UNK");
+	map(0x06, 0x06).w("aysnd", FUNC(ay8910_device::address_w));
+}
 
-ADDRESS_MAP_START(epos_state::dealer_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_WRITE(dealer_pal_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x20, 0x24) AM_WRITE(dealer_decrypt_rom)
-	AM_RANGE(0x34, 0x34) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x38, 0x38) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x3c, 0x3c) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+void epos_state::dealer_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x0f).w(this, FUNC(epos_state::dealer_pal_w));
+	map(0x10, 0x13).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x20, 0x24).w(this, FUNC(epos_state::dealer_decrypt_rom));
+	map(0x34, 0x34).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x38, 0x38).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x3c, 0x3c).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x40, 0x40).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+}
 
 READ8_MEMBER(epos_state::i8255_porta_r)
 {

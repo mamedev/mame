@@ -22,19 +22,21 @@
 
 
 /* Address maps */
-ADDRESS_MAP_START(ondra_state::ondra_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0xdfff) AM_RAMBANK("bank2")
-	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank3")
-ADDRESS_MAP_END
+void ondra_state::ondra_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0xdfff).bankrw("bank2");
+	map(0xe000, 0xffff).bankrw("bank3");
+}
 
-ADDRESS_MAP_START(ondra_state::ondra_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x0b)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x03, 0x03) AM_WRITE(ondra_port_03_w)
+void ondra_state::ondra_io(address_map &map)
+{
+	map.global_mask(0x0b);
+	map.unmap_value_high();
+	map(0x03, 0x03).w(this, FUNC(ondra_state::ondra_port_03_w));
 	//AM_RANGE(0x09, 0x09) AM_WRITE(ondra_port_09_w)
 	//AM_RANGE(0x0a, 0x0a) AM_WRITE(ondra_port_0a_w)
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ondra )

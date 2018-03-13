@@ -59,9 +59,10 @@ public:
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(st17xx_state::cpu_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
-ADDRESS_MAP_END
+void st17xx_state::cpu_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).rom();
+}
 
 /* Input Ports */
 

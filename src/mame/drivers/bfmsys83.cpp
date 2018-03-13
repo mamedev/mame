@@ -24,9 +24,10 @@ public:
 
 
 
-ADDRESS_MAP_START(bfmsys83_state::memmap)
-	AM_RANGE(0x4000, 0xffff) AM_ROM                     // 32K ROM
-ADDRESS_MAP_END
+void bfmsys83_state::memmap(address_map &map)
+{
+	map(0x4000, 0xffff).rom();                     // 32K ROM
+}
 
 static INPUT_PORTS_START( bfmsys83 )
 INPUT_PORTS_END

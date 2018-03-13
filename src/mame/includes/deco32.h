@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#include "cpu/h6280/h6280.h"
 #include "audio/decobsmt.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"

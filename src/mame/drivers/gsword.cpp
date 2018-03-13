@@ -470,65 +470,72 @@ ADDRESS_MAP_START(gsword_state_base::cpu1_map)
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START(gsword_state::cpu1_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7e, 0x7f) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_0, write_0)
-ADDRESS_MAP_END
+void gsword_state::cpu1_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7e, 0x7f).rw("taito8741", FUNC(taito8741_4pack_device::read_0), FUNC(taito8741_4pack_device::write_0));
+}
 
-ADDRESS_MAP_START(gsword_state::cpu2_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("cpu2_ram")
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(sound_command_w)
-ADDRESS_MAP_END
+void gsword_state::cpu2_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram().share("cpu2_ram");
+	map(0x6000, 0x6000).w(this, FUNC(gsword_state::sound_command_w));
+}
 
-ADDRESS_MAP_START(gsword_state::cpu2_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_2, write_2)
-	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_3, write_3)
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_1, write_1)
-	AM_RANGE(0x60, 0x60) AM_READWRITE(fake_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(fake_1_r, ay8910_control_port_1_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
+void gsword_state::cpu2_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("taito8741", FUNC(taito8741_4pack_device::read_2), FUNC(taito8741_4pack_device::write_2));
+	map(0x20, 0x21).rw("taito8741", FUNC(taito8741_4pack_device::read_3), FUNC(taito8741_4pack_device::write_3));
+	map(0x40, 0x41).rw("taito8741", FUNC(taito8741_4pack_device::read_1), FUNC(taito8741_4pack_device::write_1));
+	map(0x60, 0x60).rw(this, FUNC(gsword_state::fake_0_r), FUNC(gsword_state::ay8910_control_port_0_w));
+	map(0x61, 0x61).rw(m_ay0, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x80, 0x80).rw(this, FUNC(gsword_state::fake_1_r), FUNC(gsword_state::ay8910_control_port_1_w));
+	map(0x81, 0x81).rw(m_ay1, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 
-	AM_RANGE(0xe0, 0xe0) AM_READNOP /* ?? */
-	AM_RANGE(0xa0, 0xa0) AM_WRITENOP /* ?? */
-	AM_RANGE(0xe0, 0xe0) AM_WRITENOP /* watchdog? */
-ADDRESS_MAP_END
+	map(0xe0, 0xe0).nopr(); /* ?? */
+	map(0xa0, 0xa0).nopw(); /* ?? */
+	map(0xe0, 0xe0).nopw(); /* watchdog? */
+}
 
-ADDRESS_MAP_START(gsword_state::cpu3_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(adpcm_data_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void gsword_state::cpu3_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8000).w(this, FUNC(gsword_state::adpcm_data_w));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
-ADDRESS_MAP_START(josvolly_state::josvolly_cpu1_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7e, 0x7f) AM_DEVREADWRITE("mcu1", upi41_cpu_device, upi41_master_r, upi41_master_w)
-ADDRESS_MAP_END
+void josvolly_state::josvolly_cpu1_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7e, 0x7f).rw("mcu1", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
+}
 
-ADDRESS_MAP_START(josvolly_state::josvolly_cpu2_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("cpu2_ram")
+void josvolly_state::josvolly_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram().share("cpu2_ram");
 
 	/* NEC D8255A with silkscreen removed and replaced with "AA 007" */
-	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("aa_007", i8255_device, read, write)
+	map(0x8000, 0x8003).rw("aa_007", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
 //  AM_RANGE(0x6000, 0x6000) AM_WRITE(adpcm_soundcommand_w)
-	AM_RANGE(0xA000, 0xA001) AM_DEVREADWRITE("mcu2", upi41_cpu_device, upi41_master_r, upi41_master_w)
-ADDRESS_MAP_END
+	map(0xA000, 0xA001).rw("mcu2", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
+}
 
-ADDRESS_MAP_START(josvolly_state::josvolly_cpu2_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(fake_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(fake_1_r, ay8910_control_port_1_w)
-	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
+void josvolly_state::josvolly_cpu2_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(this, FUNC(josvolly_state::fake_0_r), FUNC(josvolly_state::ay8910_control_port_0_w));
+	map(0x01, 0x01).rw(m_ay0, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x40, 0x40).rw(this, FUNC(josvolly_state::fake_1_r), FUNC(josvolly_state::ay8910_control_port_1_w));
+	map(0x41, 0x41).rw(m_ay1, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 
-	AM_RANGE(0x81, 0x81) AM_WRITE(cpu2_nmi_enable_w);
-	AM_RANGE(0xC1, 0xC1) AM_WRITE(cpu2_irq_clear_w);
-ADDRESS_MAP_END
+	map(0x81, 0x81).w(this, FUNC(josvolly_state::cpu2_nmi_enable_w));
+	map(0xC1, 0xC1).w(this, FUNC(josvolly_state::cpu2_irq_clear_w));
+}
 
 
 static INPUT_PORTS_START( gsword )

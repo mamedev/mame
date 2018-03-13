@@ -73,18 +73,20 @@ uint32_t dlair2_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-ADDRESS_MAP_START(dlair2_state::dlair2_map)
-	AM_RANGE(0x00000, 0xeffff) AM_RAM
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
-ADDRESS_MAP_END
+void dlair2_state::dlair2_map(address_map &map)
+{
+	map(0x00000, 0xeffff).ram();
+	map(0xf0000, 0xfffff).rom().region("ipl", 0);
+}
 
-ADDRESS_MAP_START(dlair2_state::dlair2_io)
+void dlair2_state::dlair2_io(address_map &map)
+{
 //  AM_RANGE(0x020, 0x020) ICR
 //  AM_RANGE(0x042, 0x043) sound related
 //  AM_RANGE(0x061, 0x061) sound related
 //  AM_RANGE(0x200, 0x203) i/o, coin, eeprom
 //  AM_RANGE(0x2f8, 0x2ff) COM2
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( dlair2 )
 	/* dummy active high structure */

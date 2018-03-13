@@ -181,10 +181,11 @@ WRITE8_MEMBER(cp1_state::i8155_portc_w)
 }
 
 
-ADDRESS_MAP_START(cp1_state::cp1_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00,             0xff )          AM_READWRITE( i8155_read, i8155_write)
-ADDRESS_MAP_END
+void cp1_state::cp1_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0xff).rw(this, FUNC(cp1_state::i8155_read), FUNC(cp1_state::i8155_write));
+}
 
 /* Input ports */
 INPUT_PORTS_START( cp1 )

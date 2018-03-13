@@ -95,53 +95,56 @@ WRITE16_MEMBER(blockout_state::blockout_irq5_ack_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(blockout_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P1")
-	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P2")
-	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100010, 0x100011) AM_WRITE(blockout_irq6_ack_w)
-	AM_RANGE(0x100012, 0x100013) AM_WRITE(blockout_irq5_ack_w)
-	AM_RANGE(0x100014, 0x100015) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x100016, 0x100017) AM_WRITENOP    /* don't know, maybe reset sound CPU */
-	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM /* work RAM */
-	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM /* work RAM */
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("frontvideoram")
-	AM_RANGE(0x208000, 0x21ffff) AM_RAM /* ??? */
-	AM_RANGE(0x280002, 0x280003) AM_WRITE(blockout_frontcolor_w)
-	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_SHARE("paletteram")
-ADDRESS_MAP_END
+void blockout_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x100001).portr("P1");
+	map(0x100002, 0x100003).portr("P2");
+	map(0x100004, 0x100005).portr("SYSTEM");
+	map(0x100006, 0x100007).portr("DSW1");
+	map(0x100008, 0x100009).portr("DSW2");
+	map(0x100010, 0x100011).w(this, FUNC(blockout_state::blockout_irq6_ack_w));
+	map(0x100012, 0x100013).w(this, FUNC(blockout_state::blockout_irq5_ack_w));
+	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
+	map(0x180000, 0x1bffff).ram().w(this, FUNC(blockout_state::blockout_videoram_w)).share("videoram");
+	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
+	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
+	map(0x200000, 0x207fff).ram().share("frontvideoram");
+	map(0x208000, 0x21ffff).ram(); /* ??? */
+	map(0x280002, 0x280003).w(this, FUNC(blockout_state::blockout_frontcolor_w));
+	map(0x280200, 0x2805ff).ram().w(this, FUNC(blockout_state::blockout_paletteram_w)).share("paletteram");
+}
 
-ADDRESS_MAP_START(blockout_state::agress_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P1")
-	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P2")
-	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100010, 0x100011) AM_WRITE(blockout_irq6_ack_w)
-	AM_RANGE(0x100012, 0x100013) AM_WRITE(blockout_irq5_ack_w)
-	AM_RANGE(0x100014, 0x100015) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x100016, 0x100017) AM_WRITENOP    /* don't know, maybe reset sound CPU */
-	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM /* work RAM */
-	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM /* work RAM */
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("frontvideoram")
-	AM_RANGE(0x208000, 0x21ffff) AM_RAM /* ??? */
-	AM_RANGE(0x280002, 0x280003) AM_WRITE(blockout_frontcolor_w)
-	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_SHARE("paletteram")
-ADDRESS_MAP_END
+void blockout_state::agress_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x100001).portr("P1");
+	map(0x100002, 0x100003).portr("P2");
+	map(0x100004, 0x100005).portr("SYSTEM");
+	map(0x100006, 0x100007).portr("DSW1");
+	map(0x100008, 0x100009).portr("DSW2");
+	map(0x100010, 0x100011).w(this, FUNC(blockout_state::blockout_irq6_ack_w));
+	map(0x100012, 0x100013).w(this, FUNC(blockout_state::blockout_irq5_ack_w));
+	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
+	map(0x180000, 0x1bffff).ram().w(this, FUNC(blockout_state::blockout_videoram_w)).share("videoram");
+	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
+	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
+	map(0x200000, 0x207fff).ram().share("frontvideoram");
+	map(0x208000, 0x21ffff).ram(); /* ??? */
+	map(0x280002, 0x280003).w(this, FUNC(blockout_state::blockout_frontcolor_w));
+	map(0x280200, 0x2805ff).ram().w(this, FUNC(blockout_state::blockout_paletteram_w)).share("paletteram");
+}
 
-ADDRESS_MAP_START(blockout_state::audio_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void blockout_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 /*************************************

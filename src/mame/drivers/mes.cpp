@@ -57,21 +57,23 @@ READ8_MEMBER( mes_state::port08_r )
 	return m_port08 | (m_term_data ? 0x80 : 0);
 }
 
-ADDRESS_MAP_START(mes_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x1000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void mes_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom().region("roms", 0);
+	map(0x1000, 0xefff).ram();
+	map(0xf000, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(mes_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
-	AM_RANGE(0x08, 0x08) AM_READ(port08_r)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("sio", z80sio_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("pio", z80pio_device, read, write)
-ADDRESS_MAP_END
+void mes_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(mes_state::port00_r));
+	map(0x08, 0x08).r(this, FUNC(mes_state::port08_r));
+	map(0x0c, 0x0f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x10, 0x13).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x18, 0x1b).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mes )

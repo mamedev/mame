@@ -33,25 +33,27 @@ private:
 };
 
 
-ADDRESS_MAP_START(vector4_state::vector4_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf8ff) AM_ROM
-	AM_RANGE(0xfc00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void vector4_state::vector4_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xdfff).ram();
+	map(0xe000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf8ff).rom();
+	map(0xfc00, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(vector4_state::vector4_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
-	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("uart3", i8251_device, data_r, data_w)
-	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE("uart3", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void vector4_state::vector4_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x02, 0x02).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x03, 0x03).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x04, 0x04).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x05, 0x05).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x06, 0x06).rw("uart3", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x07, 0x07).rw("uart3", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vector4 )

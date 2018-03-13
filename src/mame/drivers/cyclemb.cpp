@@ -572,41 +572,45 @@ WRITE8_MEMBER( cyclemb_state::skydest_i8741_0_w )
 }
 
 
-ADDRESS_MAP_START(cyclemb_state::cyclemb_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("cram")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("obj1_ram") //ORAM1 (only a000-a3ff tested)
-	AM_RANGE(0xa800, 0xafff) AM_RAM AM_SHARE("obj2_ram") //ORAM2 (only a800-abff tested)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("obj3_ram") //ORAM3 (only b000-b3ff tested)
-	AM_RANGE(0xb800, 0xbfff) AM_RAM //WRAM
-ADDRESS_MAP_END
+void cyclemb_state::cyclemb_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).bankr("bank1");
+	map(0x9000, 0x97ff).ram().share("vram");
+	map(0x9800, 0x9fff).ram().share("cram");
+	map(0xa000, 0xa7ff).ram().share("obj1_ram"); //ORAM1 (only a000-a3ff tested)
+	map(0xa800, 0xafff).ram().share("obj2_ram"); //ORAM2 (only a800-abff tested)
+	map(0xb000, 0xb7ff).ram().share("obj3_ram"); //ORAM3 (only b000-b3ff tested)
+	map(0xb800, 0xbfff).ram(); //WRAM
+}
 
-ADDRESS_MAP_START(cyclemb_state::cyclemb_io)
+void cyclemb_state::cyclemb_io(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
+	map(0xc000, 0xc000).w(this, FUNC(cyclemb_state::cyclemb_bankswitch_w));
 	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
-	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE(skydest_i8741_0_r, skydest_i8741_0_w)
-	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE(cyclemb_flip_w) //flip screen
-ADDRESS_MAP_END
+	map(0xc09e, 0xc09f).rw(this, FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
+	map(0xc0bf, 0xc0bf).w(this, FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
+}
 
 
-ADDRESS_MAP_START(cyclemb_state::skydest_io)
+void cyclemb_state::skydest_io(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
+	map(0xc000, 0xc000).w(this, FUNC(cyclemb_state::cyclemb_bankswitch_w));
 	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
-	AM_RANGE(0xc080, 0xc081) AM_READWRITE(skydest_i8741_0_r, skydest_i8741_0_w)
+	map(0xc080, 0xc081).rw(this, FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
 	//AM_RANGE(0xc0a0, 0xc0a0) AM_WRITENOP // ?
-	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE(cyclemb_flip_w) //flip screen
-ADDRESS_MAP_END
+	map(0xc0bf, 0xc0bf).w(this, FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
+}
 
 
-ADDRESS_MAP_START(cyclemb_state::cyclemb_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM
+void cyclemb_state::cyclemb_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x6000, 0x63ff).ram();
 
-ADDRESS_MAP_END
+}
 
 READ8_MEMBER(cyclemb_state::skydest_i8741_1_r)
 {
@@ -633,11 +637,12 @@ WRITE8_MEMBER(cyclemb_state::skydest_i8741_1_w)
 }
 
 
-ADDRESS_MAP_START(cyclemb_state::cyclemb_sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x40, 0x41) AM_READWRITE(skydest_i8741_1_r, skydest_i8741_1_w)
-ADDRESS_MAP_END
+void cyclemb_state::cyclemb_sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x40, 0x41).rw(this, FUNC(cyclemb_state::skydest_i8741_1_r), FUNC(cyclemb_state::skydest_i8741_1_w));
+}
 
 
 void cyclemb_state::machine_start()

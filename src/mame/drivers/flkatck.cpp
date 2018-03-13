@@ -92,29 +92,31 @@ WRITE8_MEMBER(flkatck_state::multiply_w)
 }
 
 
-ADDRESS_MAP_START(flkatck_state::flkatck_map)
-	AM_RANGE(0x0000, 0x0007) AM_RAM_WRITE(flkatck_k007121_regs_w)                                   /* 007121 registers */
-	AM_RANGE(0x0008, 0x03ff) AM_RAM                                                                 /* RAM */
-	AM_RANGE(0x0400, 0x041f) AM_READWRITE(flkatck_ls138_r, flkatck_ls138_w)                         /* inputs, DIPS, bankswitch, counters, sound command */
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") /* palette */
-	AM_RANGE(0x1000, 0x1fff) AM_RAM                                                                 /* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(flkatck_k007121_w) AM_SHARE("k007121_ram")                    /* Video RAM (007121) */
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")                                                            /* banked ROM */
-	AM_RANGE(0x6000, 0xffff) AM_ROM                                                                 /* ROM */
-ADDRESS_MAP_END
+void flkatck_state::flkatck_map(address_map &map)
+{
+	map(0x0000, 0x0007).ram().w(this, FUNC(flkatck_state::flkatck_k007121_regs_w));                                   /* 007121 registers */
+	map(0x0008, 0x03ff).ram();                                                                 /* RAM */
+	map(0x0400, 0x041f).rw(this, FUNC(flkatck_state::flkatck_ls138_r), FUNC(flkatck_state::flkatck_ls138_w));                         /* inputs, DIPS, bankswitch, counters, sound command */
+	map(0x0800, 0x0bff).ram().w("palette", FUNC(palette_device::write8)).share("palette"); /* palette */
+	map(0x1000, 0x1fff).ram();                                                                 /* RAM */
+	map(0x2000, 0x3fff).ram().w(this, FUNC(flkatck_state::flkatck_k007121_w)).share("k007121_ram");                    /* Video RAM (007121) */
+	map(0x4000, 0x5fff).bankr("bank1");                                                            /* banked ROM */
+	map(0x6000, 0xffff).rom();                                                                 /* ROM */
+}
 
-ADDRESS_MAP_START(flkatck_state::flkatck_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                                             /* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM                                             /* RAM */
-	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)                                // 007452: Protection (see wecleman, but unused here?)
-	AM_RANGE(0x9001, 0x9001) AM_READNOP                                         // 007452: ?
-	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)                               // 007452: Protection (see wecleman, but unused here?)
-	AM_RANGE(0x9004, 0x9004) AM_READNOP                                         // 007452: ?
-	AM_RANGE(0x9006, 0x9006) AM_WRITENOP                                        // 007452: ?
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write) /* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)           /* YM2151 */
-ADDRESS_MAP_END
+void flkatck_state::flkatck_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                                             /* ROM */
+	map(0x8000, 0x87ff).ram();                                             /* RAM */
+	map(0x9000, 0x9000).r(this, FUNC(flkatck_state::multiply_r));                                // 007452: Protection (see wecleman, but unused here?)
+	map(0x9001, 0x9001).nopr();                                         // 007452: ?
+	map(0x9000, 0x9001).w(this, FUNC(flkatck_state::multiply_w));                               // 007452: Protection (see wecleman, but unused here?)
+	map(0x9004, 0x9004).nopr();                                         // 007452: ?
+	map(0x9006, 0x9006).nopw();                                        // 007452: ?
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write)); /* 007232 registers */
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));           /* YM2151 */
+}
 
 
 static INPUT_PORTS_START( flkatck )

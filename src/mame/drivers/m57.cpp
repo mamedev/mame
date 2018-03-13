@@ -69,20 +69,21 @@
  *
  *************************************/
 
-ADDRESS_MAP_START(m57_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(m57_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_SHARE("scrollram")
-	AM_RANGE(0xc820, 0xc8ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(m57_flipscreen_w) /* + coin counters */
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0")
-	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1")
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN2")
-	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+void m57_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().w(this, FUNC(m57_state::m57_videoram_w)).share("videoram");
+	map(0x9000, 0x91ff).ram().share("scrollram");
+	map(0xc820, 0xc8ff).writeonly().share("spriteram");
+	map(0xd000, 0xd000).w("irem_audio", FUNC(irem_audio_device::cmd_w));
+	map(0xd001, 0xd001).w(this, FUNC(m57_state::m57_flipscreen_w)); /* + coin counters */
+	map(0xd000, 0xd000).portr("IN0");
+	map(0xd001, 0xd001).portr("IN1");
+	map(0xd002, 0xd002).portr("IN2");
+	map(0xd003, 0xd003).portr("DSW1");
+	map(0xd004, 0xd004).portr("DSW2");
+	map(0xe000, 0xe7ff).ram();
+}
 
 
 

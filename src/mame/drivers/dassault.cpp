@@ -213,7 +213,6 @@ TODO:
 #include "includes/dassault.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
 #include "machine/mb8421.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
@@ -275,62 +274,65 @@ READ16_MEMBER(dassault_state::dassault_sub_control_r)
 
 /**********************************************************************************/
 
-ADDRESS_MAP_START(dassault_state::dassault_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void dassault_state::dassault_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0x100000, 0x103fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0x140004, 0x140005) AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x140006, 0x140007) AM_WRITENOP /* ? */
+	map(0x140004, 0x140005).w(this, FUNC(dassault_state::main_irq_ack_w));
+	map(0x140006, 0x140007).nopw(); /* ? */
 
-	AM_RANGE(0x180000, 0x180001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	map(0x180001, 0x180001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	AM_RANGE(0x1c0000, 0x1c000f) AM_READ(dassault_control_r)
-	AM_RANGE(0x1c000a, 0x1c000b) AM_WRITE(priority_w)
-	AM_RANGE(0x1c000c, 0x1c000d) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write)
-	AM_RANGE(0x1c000e, 0x1c000f) AM_WRITE(dassault_control_w)
+	map(0x1c0000, 0x1c000f).r(this, FUNC(dassault_state::dassault_control_r));
+	map(0x1c000a, 0x1c000b).w(this, FUNC(dassault_state::priority_w));
+	map(0x1c000c, 0x1c000d).w(m_spriteram2, FUNC(buffered_spriteram16_device::write));
+	map(0x1c000e, 0x1c000f).w(this, FUNC(dassault_state::dassault_control_w));
 
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x212000, 0x212fff) AM_WRITEONLY AM_SHARE("pf2_rowscroll")
-	AM_RANGE(0x220000, 0x22000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
+	map(0x200000, 0x201fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x202000, 0x203fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x212000, 0x212fff).writeonly().share("pf2_rowscroll");
+	map(0x220000, 0x22000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
 
-	AM_RANGE(0x240000, 0x240fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x242000, 0x242fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x252000, 0x252fff) AM_WRITEONLY AM_SHARE("pf4_rowscroll")
-	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("tilegen2", deco16ic_device, pf_control_w)
+	map(0x240000, 0x240fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x242000, 0x242fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x252000, 0x252fff).writeonly().share("pf4_rowscroll");
+	map(0x260000, 0x26000f).w(m_deco_tilegen2, FUNC(deco16ic_device::pf_control_w));
 
-	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("ram") /* Main ram */
-	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram2") /* Spriteram (2nd) */
-	AM_RANGE(0x3fe000, 0x3fefff) AM_DEVREADWRITE("sharedram", mb8421_mb8431_16_device, left_r, left_w)
-ADDRESS_MAP_END
+	map(0x3f8000, 0x3fbfff).ram().share("ram"); /* Main ram */
+	map(0x3fc000, 0x3fcfff).ram().share("spriteram2"); /* Spriteram (2nd) */
+	map(0x3fe000, 0x3fefff).rw("sharedram", FUNC(mb8421_mb8431_16_device::left_r), FUNC(mb8421_mb8431_16_device::left_w));
+}
 
-ADDRESS_MAP_START(dassault_state::dassault_sub_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void dassault_state::dassault_sub_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 
-	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(sub_irq_ack_w)
-	AM_RANGE(0x100004, 0x100007) AM_WRITENOP /* ? */
-	AM_RANGE(0x100004, 0x100005) AM_READ(dassault_sub_control_r)
+	map(0x100000, 0x100001).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
+	map(0x100002, 0x100003).w(this, FUNC(dassault_state::sub_irq_ack_w));
+	map(0x100004, 0x100007).nopw(); /* ? */
+	map(0x100004, 0x100005).r(this, FUNC(dassault_state::dassault_sub_control_r));
 
-	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("ram2") /* Sub cpu ram */
-	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram") /* Sprite ram */
-	AM_RANGE(0x3fe000, 0x3fefff) AM_DEVREADWRITE("sharedram", mb8421_mb8431_16_device, right_r, right_w)
-ADDRESS_MAP_END
+	map(0x3f8000, 0x3fbfff).ram().share("ram2"); /* Sub cpu ram */
+	map(0x3fc000, 0x3fcfff).ram().share("spriteram"); /* Sprite ram */
+	map(0x3fe000, 0x3fefff).rw("sharedram", FUNC(mb8421_mb8431_16_device::right_r), FUNC(mb8421_mb8431_16_device::right_w));
+}
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(dassault_state::sound_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void dassault_state::sound_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x100000, 0x100001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x110000, 0x110001).rw("ym2", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x140000, 0x140001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1f0000, 0x1f1fff).bankrw("bank8");
+	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
+	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+}
 
 /**********************************************************************************/
 

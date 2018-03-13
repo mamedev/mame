@@ -1129,121 +1129,124 @@ WRITE_LINE_MEMBER(x68k_state::x68k_scsi_drq)
 	// TODO
 }
 
-ADDRESS_MAP_START(x68k_state::x68k_map)
-	AM_RANGE(0x000000, 0xbffffb) AM_READWRITE(x68k_emptyram_r, x68k_emptyram_w)
-	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w)
-	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
-	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read16, write16) AM_SHARE("gfxpalette")
-	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read16, write16) AM_SHARE("pcgpalette")
-	AM_RANGE(0xe82400, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
-	AM_RANGE(0xe84000, 0xe85fff) AM_DEVREADWRITE("hd63450", hd63450_device, read, write)
-	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
-	AM_RANGE(0xe88000, 0xe89fff) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
-	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
+void x68k_state::x68k_map(address_map &map)
+{
+	map(0x000000, 0xbffffb).rw(this, FUNC(x68k_state::x68k_emptyram_r), FUNC(x68k_state::x68k_emptyram_w));
+	map(0xbffffc, 0xbfffff).rw(this, FUNC(x68k_state::x68k_rom0_r), FUNC(x68k_state::x68k_rom0_w));
+	map(0xc00000, 0xdfffff).rw(this, FUNC(x68k_state::x68k_gvram_r), FUNC(x68k_state::x68k_gvram_w));
+	map(0xe00000, 0xe7ffff).rw(this, FUNC(x68k_state::x68k_tvram_r), FUNC(x68k_state::x68k_tvram_w));
+	map(0xe80000, 0xe81fff).rw(this, FUNC(x68k_state::x68k_crtc_r), FUNC(x68k_state::x68k_crtc_w));
+	map(0xe82000, 0xe821ff).rw(m_gfxpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("gfxpalette");
+	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("pcgpalette");
+	map(0xe82400, 0xe83fff).rw(this, FUNC(x68k_state::x68k_vid_r), FUNC(x68k_state::x68k_vid_w));
+	map(0xe84000, 0xe85fff).rw(m_hd63450, FUNC(hd63450_device::read), FUNC(hd63450_device::write));
+	map(0xe86000, 0xe87fff).rw(this, FUNC(x68k_state::x68k_areaset_r), FUNC(x68k_state::x68k_areaset_w));
+	map(0xe88000, 0xe89fff).rw(m_mfpdev, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
+	map(0xe8a000, 0xe8bfff).rw(m_rtc, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
-	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
-	AM_RANGE(0xe90000, 0xe91fff) AM_DEVREADWRITE8("ym2151", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_device, status_r, ctrl_w, 0x00ff)
-	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_device, status_r, data_w, 0x00ff)
-	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff)
-	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
-	AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc", x68k_hdc_image_device, hdc_r, hdc_w)
-	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
-	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE(x68k_ppi_r, x68k_ppi_w)
-	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE(x68k_ioc_r, x68k_ioc_w)
-	AM_RANGE(0xe9e000, 0xe9e3ff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // FPU (Optional)
-	AM_RANGE(0xea0000, 0xea1fff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // external SCSI ROM and controller
-	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE(x68k_exp_r, x68k_exp_w)
-	AM_RANGE(0xeafa80, 0xeafa89) AM_READWRITE(x68k_areaset_r, x68k_enh_areaset_w)
-	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE(x68k_spritereg_r, x68k_spritereg_w)
-	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE(x68k_spriteram_r, x68k_spriteram_w)
-	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // User I/O
-	AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(x68k_sram_r, x68k_sram_w)
-	AM_RANGE(0xed4000, 0xefffff) AM_NOP
-	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
-	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // internal SCSI ROM
-	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xe8e000, 0xe8ffff).rw(this, FUNC(x68k_state::x68k_sysport_r), FUNC(x68k_state::x68k_sysport_w));
+	map(0xe90000, 0xe91fff).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0xe92001, 0xe92001).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::ctrl_w));
+	map(0xe92003, 0xe92003).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::data_w));
+	map(0xe94000, 0xe94003).m(m_upd72065, FUNC(upd72065_device::map)).umask16(0x00ff);
+	map(0xe94004, 0xe94007).rw(this, FUNC(x68k_state::x68k_fdc_r), FUNC(x68k_state::x68k_fdc_w));
+	map(0xe96000, 0xe9601f).rw("x68k_hdc", FUNC(x68k_hdc_image_device::hdc_r), FUNC(x68k_hdc_image_device::hdc_w));
+	map(0xe98000, 0xe99fff).rw(this, FUNC(x68k_state::x68k_scc_r), FUNC(x68k_state::x68k_scc_w));
+	map(0xe9a000, 0xe9bfff).rw(this, FUNC(x68k_state::x68k_ppi_r), FUNC(x68k_state::x68k_ppi_w));
+	map(0xe9c000, 0xe9dfff).rw(this, FUNC(x68k_state::x68k_ioc_r), FUNC(x68k_state::x68k_ioc_w));
+	map(0xe9e000, 0xe9e3ff).rw(this, FUNC(x68k_state::x68k_exp_r), FUNC(x68k_state::x68k_exp_w));  // FPU (Optional)
+	map(0xea0000, 0xea1fff).rw(this, FUNC(x68k_state::x68k_exp_r), FUNC(x68k_state::x68k_exp_w));  // external SCSI ROM and controller
+	map(0xeafa00, 0xeafa1f).rw(this, FUNC(x68k_state::x68k_exp_r), FUNC(x68k_state::x68k_exp_w));
+	map(0xeafa80, 0xeafa89).rw(this, FUNC(x68k_state::x68k_areaset_r), FUNC(x68k_state::x68k_enh_areaset_w));
+	map(0xeb0000, 0xeb7fff).rw(this, FUNC(x68k_state::x68k_spritereg_r), FUNC(x68k_state::x68k_spritereg_w));
+	map(0xeb8000, 0xebffff).rw(this, FUNC(x68k_state::x68k_spriteram_r), FUNC(x68k_state::x68k_spriteram_w));
+	map(0xece000, 0xece3ff).rw(this, FUNC(x68k_state::x68k_exp_r), FUNC(x68k_state::x68k_exp_w));  // User I/O
+	map(0xed0000, 0xed3fff).rw(this, FUNC(x68k_state::x68k_sram_r), FUNC(x68k_state::x68k_sram_w));
+	map(0xed4000, 0xefffff).noprw();
+	map(0xf00000, 0xfbffff).rom();
+	map(0xfc0000, 0xfdffff).rw(this, FUNC(x68k_state::x68k_exp_r), FUNC(x68k_state::x68k_exp_w));  // internal SCSI ROM
+	map(0xfe0000, 0xffffff).rom();
+}
 
-ADDRESS_MAP_START(x68k_state::x68kxvi_map)
-	AM_RANGE(0x000000, 0xbffffb) AM_READWRITE(x68k_emptyram_r, x68k_emptyram_w)
-	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w)
-	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
-	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read16, write16) AM_SHARE("gfxpalette")
-	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read16, write16) AM_SHARE("pcgpalette")
-	AM_RANGE(0xe82400, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
-	AM_RANGE(0xe84000, 0xe85fff) AM_DEVREADWRITE("hd63450", hd63450_device, read, write)
-	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
-	AM_RANGE(0xe88000, 0xe89fff) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
-	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
+void x68k_state::x68kxvi_map(address_map &map)
+{
+	map(0x000000, 0xbffffb).rw(this, FUNC(x68k_state::x68k_emptyram_r), FUNC(x68k_state::x68k_emptyram_w));
+	map(0xbffffc, 0xbfffff).rw(this, FUNC(x68k_state::x68k_rom0_r), FUNC(x68k_state::x68k_rom0_w));
+	map(0xc00000, 0xdfffff).rw(this, FUNC(x68k_state::x68k_gvram_r), FUNC(x68k_state::x68k_gvram_w));
+	map(0xe00000, 0xe7ffff).rw(this, FUNC(x68k_state::x68k_tvram_r), FUNC(x68k_state::x68k_tvram_w));
+	map(0xe80000, 0xe81fff).rw(this, FUNC(x68k_state::x68k_crtc_r), FUNC(x68k_state::x68k_crtc_w));
+	map(0xe82000, 0xe821ff).rw(m_gfxpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("gfxpalette");
+	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("pcgpalette");
+	map(0xe82400, 0xe83fff).rw(this, FUNC(x68k_state::x68k_vid_r), FUNC(x68k_state::x68k_vid_w));
+	map(0xe84000, 0xe85fff).rw(m_hd63450, FUNC(hd63450_device::read), FUNC(hd63450_device::write));
+	map(0xe86000, 0xe87fff).rw(this, FUNC(x68k_state::x68k_areaset_r), FUNC(x68k_state::x68k_areaset_w));
+	map(0xe88000, 0xe89fff).rw(m_mfpdev, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
+	map(0xe8a000, 0xe8bfff).rw(m_rtc, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
-	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
-	AM_RANGE(0xe90000, 0xe91fff) AM_DEVREADWRITE8("ym2151", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_device, status_r, ctrl_w, 0x00ff)
-	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_device, status_r, data_w, 0x00ff)
-	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff)
-	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
+	map(0xe8e000, 0xe8ffff).rw(this, FUNC(x68k_state::x68k_sysport_r), FUNC(x68k_state::x68k_sysport_w));
+	map(0xe90000, 0xe91fff).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0xe92001, 0xe92001).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::ctrl_w));
+	map(0xe92003, 0xe92003).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::data_w));
+	map(0xe94000, 0xe94003).m(m_upd72065, FUNC(upd72065_device::map)).umask16(0x00ff);
+	map(0xe94004, 0xe94007).rw(this, FUNC(x68k_state::x68k_fdc_r), FUNC(x68k_state::x68k_fdc_w));
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc", x68k_hdc_image_device, hdc_r, hdc_w)
-	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("mb89352",mb89352_device,mb89352_r,mb89352_w,0x00ff)
-	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
-	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE(x68k_ppi_r, x68k_ppi_w)
-	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE(x68k_ioc_r, x68k_ioc_w)
-	AM_RANGE(0xe9e000, 0xe9e3ff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // FPU (Optional)
-	AM_RANGE(0xea0000, 0xea1fff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // external SCSI ROM and controller
-	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE(x68k_exp_r, x68k_exp_w)
-	AM_RANGE(0xeafa80, 0xeafa89) AM_READWRITE(x68k_areaset_r, x68k_enh_areaset_w)
-	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE(x68k_spritereg_r, x68k_spritereg_w)
-	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE(x68k_spriteram_r, x68k_spriteram_w)
-	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // User I/O
-	AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(x68k_sram_r, x68k_sram_w)
-	AM_RANGE(0xed4000, 0xefffff) AM_NOP
-	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
-	AM_RANGE(0xfc0000, 0xfdffff) AM_ROM  // internal SCSI ROM
-	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xe96020, 0xe9603f).rw("mb89352", FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask16(0x00ff);
+	map(0xe98000, 0xe99fff).rw(this, FUNC(x68k_state::x68k_scc_r), FUNC(x68k_state::x68k_scc_w));
+	map(0xe9a000, 0xe9bfff).rw(this, FUNC(x68k_state::x68k_ppi_r), FUNC(x68k_state::x68k_ppi_w));
+	map(0xe9c000, 0xe9dfff).rw(this, FUNC(x68k_state::x68k_ioc_r), FUNC(x68k_state::x68k_ioc_w));
+	map(0xe9e000, 0xe9e3ff).rw(this, FUNC(x68k_state::x68k_exp_r), FUNC(x68k_state::x68k_exp_w));  // FPU (Optional)
+	map(0xea0000, 0xea1fff).rw(this, FUNC(x68k_state::x68k_exp_r), FUNC(x68k_state::x68k_exp_w));  // external SCSI ROM and controller
+	map(0xeafa00, 0xeafa1f).rw(this, FUNC(x68k_state::x68k_exp_r), FUNC(x68k_state::x68k_exp_w));
+	map(0xeafa80, 0xeafa89).rw(this, FUNC(x68k_state::x68k_areaset_r), FUNC(x68k_state::x68k_enh_areaset_w));
+	map(0xeb0000, 0xeb7fff).rw(this, FUNC(x68k_state::x68k_spritereg_r), FUNC(x68k_state::x68k_spritereg_w));
+	map(0xeb8000, 0xebffff).rw(this, FUNC(x68k_state::x68k_spriteram_r), FUNC(x68k_state::x68k_spriteram_w));
+	map(0xece000, 0xece3ff).rw(this, FUNC(x68k_state::x68k_exp_r), FUNC(x68k_state::x68k_exp_w));  // User I/O
+	map(0xed0000, 0xed3fff).rw(this, FUNC(x68k_state::x68k_sram_r), FUNC(x68k_state::x68k_sram_w));
+	map(0xed4000, 0xefffff).noprw();
+	map(0xf00000, 0xfbffff).rom();
+	map(0xfc0000, 0xfdffff).rom();  // internal SCSI ROM
+	map(0xfe0000, 0xffffff).rom();
+}
 
-ADDRESS_MAP_START(x68k_state::x68030_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)  // Still only has 24-bit address space
-	AM_RANGE(0x000000, 0xbffffb) AM_READWRITE16(x68k_emptyram_r, x68k_emptyram_w,0xffffffff)
-	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(x68k_gvram_r, x68k_gvram_w, 0xffffffff)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE16(x68k_tvram_r, x68k_tvram_w, 0xffffffff)
-	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE16(x68k_crtc_r, x68k_crtc_w,0xffffffff)
-	AM_RANGE(0xe82000, 0xe821ff) AM_DEVREADWRITE("gfxpalette", palette_device, read32, write32) AM_SHARE("gfxpalette")
-	AM_RANGE(0xe82200, 0xe823ff) AM_DEVREADWRITE("pcgpalette", palette_device, read32, write32) AM_SHARE("pcgpalette")
-	AM_RANGE(0xe82400, 0xe83fff) AM_READWRITE16(x68k_vid_r, x68k_vid_w,0xffffffff)
-	AM_RANGE(0xe84000, 0xe85fff) AM_DEVREADWRITE16("hd63450", hd63450_device, read, write, 0xffffffff)
-	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE16(x68k_areaset_r, x68k_areaset_w,0xffffffff)
-	AM_RANGE(0xe88000, 0xe89fff) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff00ff)
-	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff00ff)
+void x68k_state::x68030_map(address_map &map)
+{
+	map.global_mask(0x00ffffff);  // Still only has 24-bit address space
+	map(0x000000, 0xbffffb).rw(this, FUNC(x68k_state::x68k_emptyram_r), FUNC(x68k_state::x68k_emptyram_w));
+	map(0xbffffc, 0xbfffff).rw(this, FUNC(x68k_state::x68k_rom0_r), FUNC(x68k_state::x68k_rom0_w));
+	map(0xc00000, 0xdfffff).rw(this, FUNC(x68k_state::x68k_gvram_r), FUNC(x68k_state::x68k_gvram_w));
+	map(0xe00000, 0xe7ffff).rw(this, FUNC(x68k_state::x68k_tvram_r), FUNC(x68k_state::x68k_tvram_w));
+	map(0xe80000, 0xe81fff).rw(this, FUNC(x68k_state::x68k_crtc_r), FUNC(x68k_state::x68k_crtc_w));
+	map(0xe82000, 0xe821ff).rw(m_gfxpalette, FUNC(palette_device::read32), FUNC(palette_device::write32)).share("gfxpalette");
+	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read32), FUNC(palette_device::write32)).share("pcgpalette");
+	map(0xe82400, 0xe83fff).rw(this, FUNC(x68k_state::x68k_vid_r), FUNC(x68k_state::x68k_vid_w));
+	map(0xe84000, 0xe85fff).rw(m_hd63450, FUNC(hd63450_device::read), FUNC(hd63450_device::write));
+	map(0xe86000, 0xe87fff).rw(this, FUNC(x68k_state::x68k_areaset_r), FUNC(x68k_state::x68k_areaset_w));
+	map(0xe88000, 0xe89fff).rw(m_mfpdev, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask32(0x00ff00ff);
+	map(0xe8a000, 0xe8bfff).rw(m_rtc, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask32(0x00ff00ff);
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
-	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE16(x68k_sysport_r, x68k_sysport_w,0xffffffff)
-	AM_RANGE(0xe90000, 0xe91fff) AM_DEVREADWRITE8("ym2151", ym2151_device, read, write, 0x00ff00ff)
-	AM_RANGE(0xe92000, 0xe92003) AM_DEVREAD8("okim6258", okim6258_device, status_r, 0x00ff00ff) AM_WRITE8(x68030_adpcm_w, 0x00ff00ff)
-	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff00ff)
-	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE16(x68k_fdc_r, x68k_fdc_w,0xffffffff)
+	map(0xe8e000, 0xe8ffff).rw(this, FUNC(x68k_state::x68k_sysport_r), FUNC(x68k_state::x68k_sysport_w));
+	map(0xe90000, 0xe91fff).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask32(0x00ff00ff);
+	map(0xe92000, 0xe92003).r(m_okim6258, FUNC(okim6258_device::status_r)).umask32(0x00ff00ff).w(this, FUNC(x68k_state::x68030_adpcm_w)).umask32(0x00ff00ff);
+	map(0xe94000, 0xe94003).m(m_upd72065, FUNC(upd72065_device::map)).umask32(0x00ff00ff);
+	map(0xe94004, 0xe94007).rw(this, FUNC(x68k_state::x68k_fdc_r), FUNC(x68k_state::x68k_fdc_w));
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE16("x68k_hdc", x68k_hdc_image_device, hdc_r, hdc_w, 0xffffffff)
-	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("mb89352",mb89352_device,mb89352_r,mb89352_w,0x00ff00ff)
-	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE16(x68k_scc_r, x68k_scc_w,0xffffffff)
-	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE16(x68k_ppi_r, x68k_ppi_w,0xffffffff)
-	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE16(x68k_ioc_r, x68k_ioc_w,0xffffffff)
-	AM_RANGE(0xe9e000, 0xe9e3ff) AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)  // FPU (Optional)
-	AM_RANGE(0xea0000, 0xea1fff) AM_NOP//AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)  // external SCSI ROM and controller
-	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)
-	AM_RANGE(0xeafa80, 0xeafa8b) AM_READWRITE16(x68k_areaset_r, x68k_enh_areaset_w,0xffffffff)
-	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE16(x68k_spritereg_r, x68k_spritereg_w,0xffffffff)
-	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE16(x68k_spriteram_r, x68k_spriteram_w,0xffffffff)
-	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)  // User I/O
-	AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE16(x68k_sram_r, x68k_sram_w, 0xffffffff)
-	AM_RANGE(0xed4000, 0xefffff) AM_NOP
-	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
-	AM_RANGE(0xfc0000, 0xfdffff) AM_ROM  // internal SCSI ROM
-	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xe96020, 0xe9603f).rw("mb89352", FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask32(0x00ff00ff);
+	map(0xe98000, 0xe99fff).rw(this, FUNC(x68k_state::x68k_scc_r), FUNC(x68k_state::x68k_scc_w));
+	map(0xe9a000, 0xe9bfff).rw(this, FUNC(x68k_state::x68k_ppi_r), FUNC(x68k_state::x68k_ppi_w));
+	map(0xe9c000, 0xe9dfff).rw(this, FUNC(x68k_state::x68k_ioc_r), FUNC(x68k_state::x68k_ioc_w));
+	map(0xe9e000, 0xe9e3ff).rw(this, FUNC(x68k_state::x68k_exp_r), FUNC(x68k_state::x68k_exp_w));  // FPU (Optional)
+	map(0xea0000, 0xea1fff).noprw();//AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)  // external SCSI ROM and controller
+	map(0xeafa00, 0xeafa1f).rw(this, FUNC(x68k_state::x68k_exp_r), FUNC(x68k_state::x68k_exp_w));
+	map(0xeafa80, 0xeafa8b).rw(this, FUNC(x68k_state::x68k_areaset_r), FUNC(x68k_state::x68k_enh_areaset_w));
+	map(0xeb0000, 0xeb7fff).rw(this, FUNC(x68k_state::x68k_spritereg_r), FUNC(x68k_state::x68k_spritereg_w));
+	map(0xeb8000, 0xebffff).rw(this, FUNC(x68k_state::x68k_spriteram_r), FUNC(x68k_state::x68k_spriteram_w));
+	map(0xece000, 0xece3ff).rw(this, FUNC(x68k_state::x68k_exp_r), FUNC(x68k_state::x68k_exp_w));  // User I/O
+	map(0xed0000, 0xed3fff).rw(this, FUNC(x68k_state::x68k_sram_r), FUNC(x68k_state::x68k_sram_w));
+	map(0xed4000, 0xefffff).noprw();
+	map(0xf00000, 0xfbffff).rom();
+	map(0xfc0000, 0xfdffff).rom();  // internal SCSI ROM
+	map(0xfe0000, 0xffffff).rom();
+}
 
 static INPUT_PORTS_START( x68000 )
 	PORT_START("ctrltype")

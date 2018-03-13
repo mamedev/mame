@@ -28,12 +28,13 @@ public:
 
 
 
-ADDRESS_MAP_START(sansa_fuze_state::sansa_fuze_map)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
+void sansa_fuze_state::sansa_fuze_map(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom();
 
-	AM_RANGE(0x80000000, 0x8001ffff) AM_ROM  AM_REGION("maincpu", 0x00000)
-	AM_RANGE(0x81000000, 0x81ffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x80000000, 0x8001ffff).rom().region("maincpu", 0x00000);
+	map(0x81000000, 0x81ffffff).ram();
+}
 
 
 static INPUT_PORTS_START( sansa_fuze )

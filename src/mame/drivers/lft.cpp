@@ -37,22 +37,24 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-ADDRESS_MAP_START(lft_state::lft_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x5ffff) AM_RAM
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void lft_state::lft_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x5ffff).ram();
+	map(0xfc000, 0xfffff).rom().region("roms", 0);
+}
 
-ADDRESS_MAP_START(lft_state::lft_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void lft_state::lft_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	// screen 1
-	AM_RANGE(0x00, 0x01) AM_READNOP
-	AM_RANGE(0x04, 0x05) AM_READWRITE(keyin_r,term_w)
+	map(0x00, 0x01).nopr();
+	map(0x04, 0x05).rw(this, FUNC(lft_state::keyin_r), FUNC(lft_state::term_w));
 	// screen 2
-	AM_RANGE(0x02, 0x03) AM_READNOP
-	AM_RANGE(0x06, 0x07) AM_WRITENOP
-ADDRESS_MAP_END
+	map(0x02, 0x03).nopr();
+	map(0x06, 0x07).nopw();
+}
 
 
 /* Input ports */

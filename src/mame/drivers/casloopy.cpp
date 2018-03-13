@@ -424,23 +424,24 @@ READ32_MEMBER(casloopy_state::cart_r)
 }
 
 
-ADDRESS_MAP_START(casloopy_state::casloopy_map)
-	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("bios_rom")
-	AM_RANGE(0x01000000, 0x0107ffff) AM_RAM AM_SHARE("wram")// stack pointer points here
-	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE8(bitmap_r, bitmap_w, 0xffffffff)
-	AM_RANGE(0x04040000, 0x0404ffff) AM_READWRITE8(vram_r, vram_w, 0xffffffff) // tilemap + PCG
-	AM_RANGE(0x04050000, 0x040503ff) AM_RAM // ???
-	AM_RANGE(0x04051000, 0x040511ff) AM_READWRITE16(pal_r, pal_w, 0xffffffff)
-	AM_RANGE(0x04058000, 0x04058007) AM_READWRITE16(vregs_r, vregs_w, 0xffffffff)
-	AM_RANGE(0x0405b000, 0x0405b00f) AM_RAM AM_SHARE("vregs") // RGB555 brightness control plus scrolling
+void casloopy_state::casloopy_map(address_map &map)
+{
+	map(0x00000000, 0x00007fff).ram().share("bios_rom");
+	map(0x01000000, 0x0107ffff).ram().share("wram");// stack pointer points here
+	map(0x04000000, 0x0401ffff).rw(this, FUNC(casloopy_state::bitmap_r), FUNC(casloopy_state::bitmap_w));
+	map(0x04040000, 0x0404ffff).rw(this, FUNC(casloopy_state::vram_r), FUNC(casloopy_state::vram_w)); // tilemap + PCG
+	map(0x04050000, 0x040503ff).ram(); // ???
+	map(0x04051000, 0x040511ff).rw(this, FUNC(casloopy_state::pal_r), FUNC(casloopy_state::pal_w));
+	map(0x04058000, 0x04058007).rw(this, FUNC(casloopy_state::vregs_r), FUNC(casloopy_state::vregs_w));
+	map(0x0405b000, 0x0405b00f).ram().share("vregs"); // RGB555 brightness control plus scrolling
 //  AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r, sh7021_w, 0xffffffff)
 //  AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
-	AM_RANGE(0x06000000, 0x062fffff) AM_READ(cart_r)
-	AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
-	AM_RANGE(0x09000000, 0x0907ffff) AM_RAM AM_SHARE("wram")
-	AM_RANGE(0x0e000000, 0x0e2fffff) AM_READ(cart_r)
-	AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")
-ADDRESS_MAP_END
+	map(0x06000000, 0x062fffff).r(this, FUNC(casloopy_state::cart_r));
+	map(0x07000000, 0x070003ff).ram().share("oram");// on-chip RAM, actually at 0xf000000 (1 kb)
+	map(0x09000000, 0x0907ffff).ram().share("wram");
+	map(0x0e000000, 0x0e2fffff).r(this, FUNC(casloopy_state::cart_r));
+	map(0x0f000000, 0x0f0003ff).ram().share("oram");
+}
 
 #if 0
 ADDRESS_MAP_START(casloopy_state::casloopy_sub_map)

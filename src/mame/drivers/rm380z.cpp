@@ -171,30 +171,34 @@ Module timer tag static_vblank_timer name m_expire.seconds
 #include "screen.h"
 
 
-ADDRESS_MAP_START(rm380z_state::rm380z_mem)
-	AM_RANGE( 0xe000, 0xefff ) AM_ROM AM_REGION(RM380Z_MAINCPU_TAG, 0)
-	AM_RANGE( 0xf000, 0xf5ff ) AM_READWRITE(videoram_read,videoram_write)
-	AM_RANGE( 0xf600, 0xf9ff ) AM_ROM AM_REGION(RM380Z_MAINCPU_TAG, 0x1000)     /* Extra ROM space for COS4.0 */
-	AM_RANGE( 0xfa00, 0xfaff ) AM_RAM
-	AM_RANGE( 0xfb00, 0xfbff ) AM_READWRITE( port_read, port_write )
-	AM_RANGE( 0xfc00, 0xffff ) AM_READWRITE(hiram_read,hiram_write)
-ADDRESS_MAP_END
+void rm380z_state::rm380z_mem(address_map &map)
+{
+	map(0xe000, 0xefff).rom().region(RM380Z_MAINCPU_TAG, 0);
+	map(0xf000, 0xf5ff).rw(this, FUNC(rm380z_state::videoram_read), FUNC(rm380z_state::videoram_write));
+	map(0xf600, 0xf9ff).rom().region(RM380Z_MAINCPU_TAG, 0x1000);     /* Extra ROM space for COS4.0 */
+	map(0xfa00, 0xfaff).ram();
+	map(0xfb00, 0xfbff).rw(this, FUNC(rm380z_state::port_read), FUNC(rm380z_state::port_write));
+	map(0xfc00, 0xffff).rw(this, FUNC(rm380z_state::hiram_read), FUNC(rm380z_state::hiram_write));
+}
 
-ADDRESS_MAP_START(rm380z_state::rm380z_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xbf) AM_READWRITE(rm380z_portlow_r, rm380z_portlow_w)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("wd1771", fd1771_device, read, write)
-	AM_RANGE(0xc4, 0xc4) AM_WRITE(disk_0_control)
-	AM_RANGE(0xc5, 0xff) AM_READWRITE(rm380z_porthi_r, rm380z_porthi_w)
-ADDRESS_MAP_END
+void rm380z_state::rm380z_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xbf).rw(this, FUNC(rm380z_state::rm380z_portlow_r), FUNC(rm380z_state::rm380z_portlow_w));
+	map(0xc0, 0xc3).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
+	map(0xc4, 0xc4).w(this, FUNC(rm380z_state::disk_0_control));
+	map(0xc5, 0xff).rw(this, FUNC(rm380z_state::rm380z_porthi_r), FUNC(rm380z_state::rm380z_porthi_w));
+}
 
-ADDRESS_MAP_START(rm380z_state::rm480z_mem)
-	AM_RANGE( 0x0000, 0xe7ff ) AM_RAM
-	AM_RANGE( 0xe800, 0xf7ff ) AM_ROM AM_REGION(RM380Z_MAINCPU_TAG, 0)
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void rm380z_state::rm480z_mem(address_map &map)
+{
+	map(0x0000, 0xe7ff).ram();
+	map(0xe800, 0xf7ff).rom().region(RM380Z_MAINCPU_TAG, 0);
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(rm380z_state::rm480z_io)
+void rm380z_state::rm480z_io(address_map &map)
+{
 	//AM_RANGE(0x00, 0x17) AM_RAM // videoram
 	//AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) // control port 0
 	//AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) // control port 1
@@ -207,7 +211,7 @@ ADDRESS_MAP_START(rm380z_state::rm480z_io)
 	//AM_RANGE(0x2c, 0x2f) AM_MIRROR(0xff00) // z80ctc IEEE int, Maths int, RTC, RTC // option
 	//AM_RANGE(0x30, 0x37) AM_MIRROR(0xff00) // IEEE chip // option
 	//AM_RANGE(0x38, 0x3b) AM_MIRROR(0xff00) // Hi-res graphics option
-ADDRESS_MAP_END
+}
 
 INPUT_PORTS_START( rm380z )
 //  PORT_START("additional_chars")

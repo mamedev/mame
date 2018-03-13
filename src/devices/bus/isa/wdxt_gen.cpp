@@ -92,9 +92,10 @@ const tiny_rom_entry *wdxt_gen_device::device_rom_region() const
 //  ADDRESS_MAP( wd1015_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(wdxt_gen_device::wd1015_io)
-	AM_RANGE(0x00, 0xff) AM_DEVREADWRITE(WD11C00_17_TAG, wd11c00_17_device, read, write)
-ADDRESS_MAP_END
+void wdxt_gen_device::wd1015_io(address_map &map)
+{
+	map(0x00, 0xff).rw(WD11C00_17_TAG, FUNC(wd11c00_17_device::read), FUNC(wd11c00_17_device::write));
+}
 
 
 //-------------------------------------------------

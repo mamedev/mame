@@ -35,15 +35,16 @@
  *
  *************************************/
 
-ADDRESS_MAP_START(cchasm_state::memmap)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04000f) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0xff)
-	AM_RANGE(0x050000, 0x050001) AM_WRITE(refresh_control_w)
-	AM_RANGE(0x060000, 0x060001) AM_READ_PORT("DSW") AM_WRITE(led_w)
-	AM_RANGE(0x070000, 0x070001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xf80000, 0xf800ff) AM_READWRITE(io_r,io_w)
-	AM_RANGE(0xffb000, 0xffffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void cchasm_state::memmap(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x040000, 0x04000f).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	map(0x050000, 0x050001).w(this, FUNC(cchasm_state::refresh_control_w));
+	map(0x060000, 0x060001).portr("DSW").w(this, FUNC(cchasm_state::led_w));
+	map(0x070000, 0x070001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0xf80000, 0xf800ff).rw(this, FUNC(cchasm_state::io_r), FUNC(cchasm_state::io_w));
+	map(0xffb000, 0xffffff).ram().share("ram");
+}
 
 /*************************************
  *
@@ -51,25 +52,27 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(cchasm_state::sound_memmap)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM
-	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0xf9e) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0xf9e) AM_READ(coin_sound_r)
-	AM_RANGE(0x6001, 0x6001) AM_MIRROR(0xf9e) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x6020, 0x6021) AM_MIRROR(0xf9e) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x6021, 0x6021) AM_MIRROR(0xf9e) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x6040, 0x6040) AM_MIRROR(0xf9e) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch3", generic_latch_8_device, write)
-	AM_RANGE(0x6041, 0x6041) AM_MIRROR(0xf9e) AM_READWRITE(soundlatch2_r, soundlatch4_w)
-	AM_RANGE(0x6061, 0x6061) AM_MIRROR(0xf9e) AM_WRITE(reset_coin_flag_w)
-	AM_RANGE(0x7041, 0x7041) AM_NOP // TODO
-ADDRESS_MAP_END
+void cchasm_state::sound_memmap(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x5000, 0x53ff).ram();
+	map(0x6000, 0x6001).mirror(0xf9e).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x6000, 0x6000).mirror(0xf9e).r(this, FUNC(cchasm_state::coin_sound_r));
+	map(0x6001, 0x6001).mirror(0xf9e).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x6020, 0x6021).mirror(0xf9e).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x6021, 0x6021).mirror(0xf9e).r("ay2", FUNC(ay8910_device::data_r));
+	map(0x6040, 0x6040).mirror(0xf9e).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch3, FUNC(generic_latch_8_device::write));
+	map(0x6041, 0x6041).mirror(0xf9e).rw(this, FUNC(cchasm_state::soundlatch2_r), FUNC(cchasm_state::soundlatch4_w));
+	map(0x6061, 0x6061).mirror(0xf9e).w(this, FUNC(cchasm_state::reset_coin_flag_w));
+	map(0x7041, 0x7041).noprw(); // TODO
+}
 
-ADDRESS_MAP_START(cchasm_state::sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void cchasm_state::sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 /*************************************
  *

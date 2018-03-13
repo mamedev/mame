@@ -222,14 +222,15 @@ WRITE8_MEMBER(cham24_state::cham24_mapper_w)
 	}
 }
 
-ADDRESS_MAP_START(cham24_state::cham24_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(cham24_IN0_r,        cham24_IN0_w)            /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(cham24_IN1_r)    /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(cham24_mapper_w)
-ADDRESS_MAP_END
+void cham24_state::cham24_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); /* NES RAM */
+	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x4014, 0x4014).w(this, FUNC(cham24_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(this, FUNC(cham24_state::cham24_IN0_r), FUNC(cham24_state::cham24_IN0_w));            /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(this, FUNC(cham24_state::cham24_IN1_r));    /* IN1 - input port 2 / PSG second control register */
+	map(0x8000, 0xffff).rom().w(this, FUNC(cham24_state::cham24_mapper_w));
+}
 
 static INPUT_PORTS_START( cham24 )
 	PORT_START("P1") /* IN0 */

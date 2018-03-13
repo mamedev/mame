@@ -376,12 +376,13 @@ uint32_t pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_in
 	return 0;
 }
 
-ADDRESS_MAP_START(pinkiri8_state::pinkiri8_map)
-	AM_RANGE(0x00000, 0x0bfff) AM_ROM
-	AM_RANGE(0x0c000, 0x0dfff) AM_RAM
-	AM_RANGE(0x0e000, 0x0ffff) AM_ROM
-	AM_RANGE(0x10000, 0x1ffff) AM_ROM
-ADDRESS_MAP_END
+void pinkiri8_state::pinkiri8_map(address_map &map)
+{
+	map(0x00000, 0x0bfff).rom();
+	map(0x0c000, 0x0dfff).ram();
+	map(0x0e000, 0x0ffff).rom();
+	map(0x10000, 0x1ffff).rom();
+}
 
 WRITE8_MEMBER(pinkiri8_state::output_regs_w)
 {
@@ -461,42 +462,43 @@ READ8_MEMBER(pinkiri8_state::mux_p1_r)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(pinkiri8_state::pinkiri8_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_RAM //Z180 internal I/O
-	AM_RANGE(0x60, 0x60) AM_WRITE(output_regs_w)
-	AM_RANGE(0x80, 0x83) AM_WRITE(pinkiri8_vram_w)
+void pinkiri8_state::pinkiri8_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x3f).ram(); //Z180 internal I/O
+	map(0x60, 0x60).w(this, FUNC(pinkiri8_state::output_regs_w));
+	map(0x80, 0x83).w(this, FUNC(pinkiri8_state::pinkiri8_vram_w));
 
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("oki", okim6295_device, read, write) //correct?
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(mux_w) //mux
-	AM_RANGE(0xb0, 0xb0) AM_READ(mux_p2_r) // mux inputs
-	AM_RANGE(0xb1, 0xb1) AM_READ(mux_p1_r) // mux inputs
-	AM_RANGE(0xb2, 0xb2) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("DSW3")
-	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW4")
+	map(0xa0, 0xa0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); //correct?
+	map(0xb0, 0xb0).w(this, FUNC(pinkiri8_state::mux_w)); //mux
+	map(0xb0, 0xb0).r(this, FUNC(pinkiri8_state::mux_p2_r)); // mux inputs
+	map(0xb1, 0xb1).r(this, FUNC(pinkiri8_state::mux_p1_r)); // mux inputs
+	map(0xb2, 0xb2).portr("SYSTEM");
+	map(0xf8, 0xf8).portr("DSW1");
+	map(0xf9, 0xf9).portr("DSW2");
+	map(0xfa, 0xfa).portr("DSW3");
+	map(0xfb, 0xfb).portr("DSW4");
 
 	/* Wing custom sound chip, same as Lucky Girl Z180 */
-	AM_RANGE(0xc3, 0xc3) AM_WRITENOP
-	AM_RANGE(0xc7, 0xc7) AM_WRITENOP
-	AM_RANGE(0xcb, 0xcb) AM_WRITENOP
-	AM_RANGE(0xcf, 0xcf) AM_WRITENOP
+	map(0xc3, 0xc3).nopw();
+	map(0xc7, 0xc7).nopw();
+	map(0xcb, 0xcb).nopw();
+	map(0xcf, 0xcf).nopw();
 
-	AM_RANGE(0xd3, 0xd3) AM_WRITENOP
-	AM_RANGE(0xd7, 0xd7) AM_WRITENOP
-	AM_RANGE(0xdb, 0xdb) AM_WRITENOP
-	AM_RANGE(0xdf, 0xdf) AM_WRITENOP
+	map(0xd3, 0xd3).nopw();
+	map(0xd7, 0xd7).nopw();
+	map(0xdb, 0xdb).nopw();
+	map(0xdf, 0xdf).nopw();
 
-	AM_RANGE(0xe3, 0xe3) AM_WRITENOP
-	AM_RANGE(0xe7, 0xe7) AM_WRITENOP
-	AM_RANGE(0xeb, 0xeb) AM_WRITENOP
-	AM_RANGE(0xef, 0xef) AM_WRITENOP
+	map(0xe3, 0xe3).nopw();
+	map(0xe7, 0xe7).nopw();
+	map(0xeb, 0xeb).nopw();
+	map(0xef, 0xef).nopw();
 
-	AM_RANGE(0xf3, 0xf3) AM_WRITENOP
-	AM_RANGE(0xf7, 0xf7) AM_WRITENOP
+	map(0xf3, 0xf3).nopw();
+	map(0xf7, 0xf7).nopw();
 
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( base_inputs )
 	PORT_START("SYSTEM")

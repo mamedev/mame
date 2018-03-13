@@ -37,9 +37,10 @@ public:
 	void hapyfish_map(address_map &map);
 };
 
-ADDRESS_MAP_START(hapyfish_state::hapyfish_map)
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
-ADDRESS_MAP_END
+void hapyfish_state::hapyfish_map(address_map &map)
+{
+	map(0x00000000, 0x00003fff).rom();
+}
 
 static INPUT_PORTS_START( hapyfish )
 INPUT_PORTS_END

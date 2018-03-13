@@ -34,22 +34,23 @@ DEFINE_DEVICE_TYPE_NS(A500_KBD_GB, bus::amiga::keyboard, a500_kbd_gb_device, "a5
 
 namespace bus { namespace amiga { namespace keyboard {
 
-ADDRESS_MAP_START(a500_kbd_device::mpu6500_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x000, 0x03f) AM_RAM
-	AM_RANGE(0x080, 0x080) AM_READWRITE(port_a_r, port_a_w)
-	AM_RANGE(0x081, 0x081) AM_READ_PORT("special") AM_WRITE(port_b_w)
-	AM_RANGE(0x082, 0x082) AM_WRITE(port_c_w)
-	AM_RANGE(0x083, 0x083) AM_WRITE(port_d_w)
-	AM_RANGE(0x084, 0x085) AM_WRITE(latch_w)
-	AM_RANGE(0x086, 0x087) AM_READ(counter_r)
-	AM_RANGE(0x088, 0x088) AM_WRITE(transfer_latch_w)
-	AM_RANGE(0x089, 0x089) AM_WRITE(clear_pa0_detect)
-	AM_RANGE(0x08a, 0x08a) AM_WRITE(clear_pa1_detect)
-	AM_RANGE(0x08f, 0x08f) AM_READWRITE(control_r, control_w)
-	AM_RANGE(0x090, 0x0ff) AM_NOP
-	AM_RANGE(0x800, 0xfff) AM_ROM AM_REGION("ic1", 0)
-ADDRESS_MAP_END
+void a500_kbd_device::mpu6500_map(address_map &map)
+{
+	map.global_mask(0xfff);
+	map(0x000, 0x03f).ram();
+	map(0x080, 0x080).rw(this, FUNC(a500_kbd_device::port_a_r), FUNC(a500_kbd_device::port_a_w));
+	map(0x081, 0x081).portr("special").w(this, FUNC(a500_kbd_device::port_b_w));
+	map(0x082, 0x082).w(this, FUNC(a500_kbd_device::port_c_w));
+	map(0x083, 0x083).w(this, FUNC(a500_kbd_device::port_d_w));
+	map(0x084, 0x085).w(this, FUNC(a500_kbd_device::latch_w));
+	map(0x086, 0x087).r(this, FUNC(a500_kbd_device::counter_r));
+	map(0x088, 0x088).w(this, FUNC(a500_kbd_device::transfer_latch_w));
+	map(0x089, 0x089).w(this, FUNC(a500_kbd_device::clear_pa0_detect));
+	map(0x08a, 0x08a).w(this, FUNC(a500_kbd_device::clear_pa1_detect));
+	map(0x08f, 0x08f).rw(this, FUNC(a500_kbd_device::control_r), FUNC(a500_kbd_device::control_w));
+	map(0x090, 0x0ff).noprw();
+	map(0x800, 0xfff).rom().region("ic1", 0);
+}
 
 namespace {
 

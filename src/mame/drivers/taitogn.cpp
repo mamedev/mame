@@ -635,53 +635,56 @@ DRIVER_INIT_MEMBER(taitogn_state,coh3002t_nz)
 	m_has_zoom = false;
 }
 
-ADDRESS_MAP_START(taitogn_state::taitogn_map)
-	AM_RANGE(0x1f000000, 0x1f7fffff) AM_DEVICE16("flashbank", address_map_bank_device, amap16, 0xffffffff)
-	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
-	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
-	AM_RANGE(0x1fa00200, 0x1fa00203) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x1fa00300, 0x1fa00303) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1fa10000, 0x1fa10003) AM_READ_PORT("P3")
-	AM_RANGE(0x1fa10100, 0x1fa10103) AM_READ_PORT("P4")
-	AM_RANGE(0x1fa10200, 0x1fa10203) AM_READ8(boardconfig_r, 0x000000ff)
-	AM_RANGE(0x1fa10300, 0x1fa10303) AM_READWRITE8(znsecsel_r, znsecsel_w, 0x000000ff)
-	AM_RANGE(0x1fa20000, 0x1fa20003) AM_READWRITE8(coin_r, coin_w, 0x000000ff)
-	AM_RANGE(0x1fa30000, 0x1fa30003) AM_READWRITE8(control3_r, control3_w, 0x000000ff)
-	AM_RANGE(0x1fa51c00, 0x1fa51dff) AM_READNOP // systematic read at spu_address + 250000, result dropped, maybe other accesses
-	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READ16(hack1_r, 0xffffffff)
-	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xffffffff) /* eeprom */
-	AM_RANGE(0x1fb00000, 0x1fb0ffff) AM_DEVREADWRITE16("rf5c296", rf5c296_device, io_r, io_w, 0xffffffff)
-	AM_RANGE(0x1fb40000, 0x1fb40003) AM_READWRITE8(control_r, control_w, 0x000000ff)
-	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE16(control2_w, 0x0000ffff)
-	AM_RANGE(0x1fb70000, 0x1fb70003) AM_READWRITE16(gn_1fb70000_r, gn_1fb70000_w, 0x0000ffff)
-	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, reg_data_w, 0x0000ffff)
-	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, reg_address_w, 0xffff0000)
-	AM_RANGE(0x1fba0000, 0x1fba0003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, sound_irq_w, 0x0000ffff)
-	AM_RANGE(0x1fbc0000, 0x1fbc0003) AM_DEVREAD16("taito_zoom", taito_zoom_device, sound_irq_r, 0x0000ffff)
-	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0x00ff00ff) // M66220FP for comms with the MN10200
-ADDRESS_MAP_END
+void taitogn_state::taitogn_map(address_map &map)
+{
+	map(0x1f000000, 0x1f7fffff).m(m_flashbank, FUNC(address_map_bank_device::amap16));
+	map(0x1fa00000, 0x1fa00003).portr("P1");
+	map(0x1fa00100, 0x1fa00103).portr("P2");
+	map(0x1fa00200, 0x1fa00203).portr("SERVICE");
+	map(0x1fa00300, 0x1fa00303).portr("SYSTEM");
+	map(0x1fa10000, 0x1fa10003).portr("P3");
+	map(0x1fa10100, 0x1fa10103).portr("P4");
+	map(0x1fa10200, 0x1fa10200).r(this, FUNC(taitogn_state::boardconfig_r));
+	map(0x1fa10300, 0x1fa10300).rw(this, FUNC(taitogn_state::znsecsel_r), FUNC(taitogn_state::znsecsel_w));
+	map(0x1fa20000, 0x1fa20000).rw(this, FUNC(taitogn_state::coin_r), FUNC(taitogn_state::coin_w));
+	map(0x1fa30000, 0x1fa30000).rw(this, FUNC(taitogn_state::control3_r), FUNC(taitogn_state::control3_w));
+	map(0x1fa51c00, 0x1fa51dff).nopr(); // systematic read at spu_address + 250000, result dropped, maybe other accesses
+	map(0x1fa60000, 0x1fa60003).r(this, FUNC(taitogn_state::hack1_r));
+	map(0x1faf0000, 0x1faf07ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)); /* eeprom */
+	map(0x1fb00000, 0x1fb0ffff).rw("rf5c296", FUNC(rf5c296_device::io_r), FUNC(rf5c296_device::io_w));
+	map(0x1fb40000, 0x1fb40000).rw(this, FUNC(taitogn_state::control_r), FUNC(taitogn_state::control_w));
+	map(0x1fb60000, 0x1fb60001).w(this, FUNC(taitogn_state::control2_w));
+	map(0x1fb70000, 0x1fb70001).rw(this, FUNC(taitogn_state::gn_1fb70000_r), FUNC(taitogn_state::gn_1fb70000_w));
+	map(0x1fb80000, 0x1fb80001).w(m_zoom, FUNC(taito_zoom_device::reg_data_w));
+	map(0x1fb80002, 0x1fb80003).w(m_zoom, FUNC(taito_zoom_device::reg_address_w));
+	map(0x1fba0000, 0x1fba0001).w(m_zoom, FUNC(taito_zoom_device::sound_irq_w));
+	map(0x1fbc0000, 0x1fbc0001).r(m_zoom, FUNC(taito_zoom_device::sound_irq_r));
+	map(0x1fbe0000, 0x1fbe01ff).rw(m_zoom, FUNC(taito_zoom_device::shared_ram_r), FUNC(taito_zoom_device::shared_ram_w)).umask32(0x00ff00ff); // M66220FP for comms with the MN10200
+}
 
-ADDRESS_MAP_START(taitogn_state::flashbank_map)
+void taitogn_state::flashbank_map(address_map &map)
+{
 	// Bank 0 has access to the sub-bios, the mn102 flash and the rf5c296 mem zone
-	AM_RANGE(0x00000000, 0x001fffff) AM_DEVREADWRITE("biosflash", intelfsh16_device, read, write)
-	AM_RANGE(0x00200000, 0x002fffff) AM_DEVREADWRITE("rf5c296", rf5c296_device, mem_r, mem_w )
-	AM_RANGE(0x00300000, 0x0037ffff) AM_DEVREADWRITE("pgmflash", intelfsh16_device, read, write)
+	map(0x00000000, 0x001fffff).rw("biosflash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
+	map(0x00200000, 0x002fffff).rw("rf5c296", FUNC(rf5c296_device::mem_r), FUNC(rf5c296_device::mem_w));
+	map(0x00300000, 0x0037ffff).rw(m_pgmflash, FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 
 	// Bank 1 & 3 has access to the 3 samples flashes
-	AM_RANGE(0x08000000, 0x081fffff) AM_MIRROR(0x10000000) AM_DEVREADWRITE("sndflash0", intelfsh16_device, read, write)
-	AM_RANGE(0x08200000, 0x083fffff) AM_MIRROR(0x10000000) AM_DEVREADWRITE("sndflash1", intelfsh16_device, read, write)
-	AM_RANGE(0x08400000, 0x085fffff) AM_MIRROR(0x10000000) AM_DEVREADWRITE("sndflash2", intelfsh16_device, read, write)
+	map(0x08000000, 0x081fffff).mirror(0x10000000).rw(m_sndflash0, FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
+	map(0x08200000, 0x083fffff).mirror(0x10000000).rw(m_sndflash1, FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
+	map(0x08400000, 0x085fffff).mirror(0x10000000).rw(m_sndflash2, FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 
 	// Bank 2 has access to the sub-bios, the mn102 flash and the mask eprom
-	AM_RANGE(0x10000000, 0x100fffff) AM_ROM AM_REGION("bioseprom", 0)
-	AM_RANGE(0x10100000, 0x1017ffff) AM_MIRROR(0x80000) AM_DEVREADWRITE("pgmflash", intelfsh16_device, read, write)
-	AM_RANGE(0x10200000, 0x103fffff) AM_DEVREADWRITE("biosflash", intelfsh16_device, read, write)
-ADDRESS_MAP_END
+	map(0x10000000, 0x100fffff).rom().region("bioseprom", 0);
+	map(0x10100000, 0x1017ffff).mirror(0x80000).rw(m_pgmflash, FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
+	map(0x10200000, 0x103fffff).rw("biosflash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
+}
 
-ADDRESS_MAP_START(taitogn_state::taitogn_mp_map)
-	AM_IMPORT_FROM(taitogn_map)
-	AM_RANGE(0x1fa10100, 0x1fa10103) AM_READ8(gnet_mahjong_panel_r, 0x000000ff)
-ADDRESS_MAP_END
+void taitogn_state::taitogn_mp_map(address_map &map)
+{
+	taitogn_map(map);
+	map(0x1fa10100, 0x1fa10100).r(this, FUNC(taitogn_state::gnet_mahjong_panel_r));
+}
 
 SLOT_INTERFACE_START(slot_ataflash)
 	SLOT_INTERFACE("taitopccard1", TAITO_PCCARD1)

@@ -20,7 +20,6 @@
 #include "includes/vaportra.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
@@ -44,41 +43,43 @@ WRITE8_MEMBER(vaportra_state::irq6_ack_w)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(vaportra_state::main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("PLAYERS")
-	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("COINS")
-	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("DSW")
-	AM_RANGE(0x100000, 0x100003) AM_WRITE(vaportra_priority_w)
-	AM_RANGE(0x100006, 0x100007) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("tilegen2", deco16ic_device, pf_control_w)
-	AM_RANGE(0x280000, 0x281fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x282000, 0x283fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x2c0000, 0x2c000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-	AM_RANGE(0x300000, 0x3009ff) AM_RAM_WRITE(vaportra_palette_24bit_rg_w) AM_SHARE("paletteram")
-	AM_RANGE(0x304000, 0x3049ff) AM_RAM_WRITE(vaportra_palette_24bit_b_w) AM_SHARE("paletteram2")
-	AM_RANGE(0x308000, 0x308001) AM_READWRITE8(irq6_ack_r, irq6_ack_w, 0x00ff)
-	AM_RANGE(0x30c000, 0x30c001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
-	AM_RANGE(0x318000, 0x3187ff) AM_MIRROR(0xce0000) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void vaportra_state::main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x100001).portr("PLAYERS");
+	map(0x100002, 0x100003).portr("COINS");
+	map(0x100004, 0x100005).portr("DSW");
+	map(0x100000, 0x100003).w(this, FUNC(vaportra_state::vaportra_priority_w));
+	map(0x100007, 0x100007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x200000, 0x201fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x202000, 0x203fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x240000, 0x24000f).w(m_deco_tilegen2, FUNC(deco16ic_device::pf_control_w));
+	map(0x280000, 0x281fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x282000, 0x283fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x2c0000, 0x2c000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x300000, 0x3009ff).ram().w(this, FUNC(vaportra_state::vaportra_palette_24bit_rg_w)).share("paletteram");
+	map(0x304000, 0x3049ff).ram().w(this, FUNC(vaportra_state::vaportra_palette_24bit_b_w)).share("paletteram2");
+	map(0x308001, 0x308001).rw(this, FUNC(vaportra_state::irq6_ack_r), FUNC(vaportra_state::irq6_ack_w));
+	map(0x30c000, 0x30c001).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
+	map(0x318000, 0x3187ff).mirror(0xce0000).ram().share("spriteram");
+	map(0xffc000, 0xffffff).ram();
+}
 
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(vaportra_state::sound_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")  /* ??? LOOKUP ??? */
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void vaportra_state::sound_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x100000, 0x100001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x110000, 0x110001).rw("ym2", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x140000, 0x140001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1f0000, 0x1f1fff).bankrw("bank8");  /* ??? LOOKUP ??? */
+	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
+	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+}
 
 /******************************************************************************/
 

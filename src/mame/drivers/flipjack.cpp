@@ -305,41 +305,45 @@ INPUT_CHANGED_MEMBER(flipjack_state::flipjack_coin)
 }
 
 
-ADDRESS_MAP_START(flipjack_state::flipjack_main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x6800, 0x6803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(flipjack_soundlatch_w)
-	AM_RANGE(0x7010, 0x7010) AM_DEVWRITE("crtc", hd6845_device, address_w)
-	AM_RANGE(0x7011, 0x7011) AM_DEVWRITE("crtc", hd6845_device, register_w)
-	AM_RANGE(0x7020, 0x7020) AM_READ_PORT("DSW")
-	AM_RANGE(0x7800, 0x7800) AM_WRITE(flipjack_layer_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("cram")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("fb_ram")
-ADDRESS_MAP_END
+void flipjack_state::flipjack_main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).bankr("bank1");
+	map(0x4000, 0x5fff).ram();
+	map(0x6000, 0x67ff).ram();
+	map(0x6800, 0x6803).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7000, 0x7000).w(this, FUNC(flipjack_state::flipjack_soundlatch_w));
+	map(0x7010, 0x7010).w(m_crtc, FUNC(hd6845_device::address_w));
+	map(0x7011, 0x7011).w(m_crtc, FUNC(hd6845_device::register_w));
+	map(0x7020, 0x7020).portr("DSW");
+	map(0x7800, 0x7800).w(this, FUNC(flipjack_state::flipjack_layer_w));
+	map(0x8000, 0x9fff).rom();
+	map(0xa000, 0xbfff).ram().share("cram");
+	map(0xc000, 0xdfff).ram().share("vram");
+	map(0xe000, 0xffff).ram().share("fb_ram");
+}
 
-ADDRESS_MAP_START(flipjack_state::flipjack_main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xff, 0xff) AM_WRITE(flipjack_bank_w)
-ADDRESS_MAP_END
+void flipjack_state::flipjack_main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xff, 0xff).w(this, FUNC(flipjack_state::flipjack_bank_w));
+}
 
-ADDRESS_MAP_START(flipjack_state::flipjack_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ay1", ay8910_device, address_w)
-ADDRESS_MAP_END
+void flipjack_state::flipjack_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram();
+	map(0x4000, 0x4000).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x6000, 0x6000).w("ay2", FUNC(ay8910_device::address_w));
+	map(0x8000, 0x8000).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xa000, 0xa000).w("ay1", FUNC(ay8910_device::address_w));
+}
 
-ADDRESS_MAP_START(flipjack_state::flipjack_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(flipjack_sound_nmi_ack_w)
-ADDRESS_MAP_END
+void flipjack_state::flipjack_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(flipjack_state::flipjack_sound_nmi_ack_w));
+}
 
 
 /***************************************************************************

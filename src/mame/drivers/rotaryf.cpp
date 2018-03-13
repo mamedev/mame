@@ -194,23 +194,25 @@ uint32_t rotaryf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 }
 
 
-ADDRESS_MAP_START(rotaryf_state::rotaryf_map)
-	AM_RANGE(0x0000, 0x17ff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x7000, 0x73ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x4000) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM /* writes 00, 18, 27, 3C, 7E, FE to A019, A039, A059... A179 */
-ADDRESS_MAP_END
+void rotaryf_state::rotaryf_map(address_map &map)
+{
+	map(0x0000, 0x17ff).mirror(0x4000).rom();
+	map(0x7000, 0x73ff).mirror(0x0c00).ram();
+	map(0x8000, 0x9fff).mirror(0x4000).ram().share("videoram");
+	map(0xa000, 0xa1ff).ram(); /* writes 00, 18, 27, 3C, 7E, FE to A019, A039, A059... A179 */
+}
 
-ADDRESS_MAP_START(rotaryf_state::rotaryf_io_map)
-	AM_RANGE(0x02, 0x02) AM_WRITENOP
-	AM_RANGE(0x04, 0x04) AM_WRITENOP
-	AM_RANGE(0x07, 0x07) AM_WRITENOP
-	AM_RANGE(0x20, 0x20) AM_WRITENOP
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("COIN") AM_WRITENOP
-	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW")
-	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x30, 0x30) AM_WRITE(port30_w)
-ADDRESS_MAP_END
+void rotaryf_state::rotaryf_io_map(address_map &map)
+{
+	map(0x02, 0x02).nopw();
+	map(0x04, 0x04).nopw();
+	map(0x07, 0x07).nopw();
+	map(0x20, 0x20).nopw();
+	map(0x21, 0x21).portr("COIN").nopw();
+	map(0x26, 0x26).portr("DSW");
+	map(0x28, 0x2b).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x30, 0x30).w(this, FUNC(rotaryf_state::port30_w));
+}
 
 
 static INPUT_PORTS_START( rotaryf )

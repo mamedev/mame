@@ -645,52 +645,56 @@ WRITE8_MEMBER( amaticmg_state::unk80_w )
 *      Memory Map Information       *
 ************************************/
 
-ADDRESS_MAP_START(amaticmg_state::amaticmg_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM // AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xafff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_SHARE("attr")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void amaticmg_state::amaticmg_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram(); // AM_SHARE("nvram")
+	map(0xa000, 0xafff).ram().share("vram");
+	map(0xb000, 0xbfff).ram().share("attr");
+	map(0xc000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(amaticmg_state::amaticmg_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(unk80_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
+void amaticmg_state::amaticmg_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x20, 0x23).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x41).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x60, 0x60).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x61, 0x61).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x80, 0x80).w(this, FUNC(amaticmg_state::unk80_w));
+	map(0xc0, 0xc0).w(this, FUNC(amaticmg_state::rombank_w));
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_byte_interface, write)
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_byte_interface, write)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(amaticmg_state::amaticmg2_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void amaticmg_state::amaticmg2_portmap(address_map &map)
+{
+	map.global_mask(0xff);
 //  ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_device, address_w)                  // 0e for mg_iii_vger_3.64_v_8309
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w) // 0f for mg_iii_vger_3.64_v_8309
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
-	AM_RANGE(0xe6, 0xe6) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-ADDRESS_MAP_END
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x20, 0x23).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x41).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x60, 0x60).w("crtc", FUNC(mc6845_device::address_w));                  // 0e for mg_iii_vger_3.64_v_8309
+	map(0x61, 0x61).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w)); // 0f for mg_iii_vger_3.64_v_8309
+	map(0xc0, 0xc0).w(this, FUNC(amaticmg_state::rombank_w));
+	map(0xe6, 0xe6).w(this, FUNC(amaticmg_state::nmi_mask_w));
+	map(0xe8, 0xeb).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(amaticmg_state::amaticmg4_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void amaticmg_state::amaticmg4_portmap(address_map &map)
+{
+	map.global_mask(0xff);
 //  ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0x50, 0x51) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0f, 0x0f) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x04, 0x07).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x0b).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x50, 0x51).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x0e, 0x0e).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0f, 0x0f).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 //  AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
-	AM_RANGE(0xe6, 0xe6) AM_WRITE(nmi_mask_w)
-ADDRESS_MAP_END
+	map(0xe6, 0xe6).w(this, FUNC(amaticmg_state::nmi_mask_w));
+}
 
 
 /************************************

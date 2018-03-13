@@ -650,39 +650,40 @@ WRITE32_MEMBER(crystal_state::DMA1_w)
 }
 
 
-ADDRESS_MAP_START(crystal_state::crystal_mem)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_WRITENOP
+void crystal_state::crystal_mem(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom().nopw();
 
-	AM_RANGE(0x01200000, 0x0120000f) AM_READ(Input_r)
-	AM_RANGE(0x01280000, 0x01280003) AM_WRITE(Banksw_w)
-	AM_RANGE(0x01400000, 0x0140ffff) AM_RAM AM_SHARE("nvram")
+	map(0x01200000, 0x0120000f).r(this, FUNC(crystal_state::Input_r));
+	map(0x01280000, 0x01280003).w(this, FUNC(crystal_state::Banksw_w));
+	map(0x01400000, 0x0140ffff).ram().share("nvram");
 
-	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
+	map(0x01800000, 0x0180ffff).ram().share("sysregs");
 
-	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
-	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
+	map(0x01800800, 0x01800803).rw(this, FUNC(crystal_state::DMA0_r), FUNC(crystal_state::DMA0_w));
+	map(0x01800810, 0x01800813).rw(this, FUNC(crystal_state::DMA1_r), FUNC(crystal_state::DMA1_w));
 
-	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
+	map(0x01800c04, 0x01800c07).w(this, FUNC(crystal_state::IntAck_w));
 
-	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
-	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE(Timer1_r, Timer1_w)
-	AM_RANGE(0x01801410, 0x01801413) AM_READWRITE(Timer2_r, Timer2_w)
-	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
-	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, PIO_w)
+	map(0x01801400, 0x01801403).rw(this, FUNC(crystal_state::Timer0_r), FUNC(crystal_state::Timer0_w));
+	map(0x01801408, 0x0180140b).rw(this, FUNC(crystal_state::Timer1_r), FUNC(crystal_state::Timer1_w));
+	map(0x01801410, 0x01801413).rw(this, FUNC(crystal_state::Timer2_r), FUNC(crystal_state::Timer2_w));
+	map(0x01801418, 0x0180141b).rw(this, FUNC(crystal_state::Timer3_r), FUNC(crystal_state::Timer3_w));
+	map(0x01802004, 0x01802007).rw(this, FUNC(crystal_state::PIO_r), FUNC(crystal_state::PIO_w));
 
-	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
+	map(0x02000000, 0x027fffff).ram().share("workram");
 
-	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_SHARE("vidregs")
-	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_SHARE("textureram")
-	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("frameram")
-	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE("vrender", vrender0_device, vr0_snd_read, vr0_snd_write)
+	map(0x03000000, 0x0300ffff).ram().share("vidregs");
+	map(0x030000a4, 0x030000a7).rw(this, FUNC(crystal_state::FlipCount_r), FUNC(crystal_state::FlipCount_w));
+	map(0x03800000, 0x03ffffff).ram().share("textureram");
+	map(0x04000000, 0x047fffff).ram().share("frameram");
+	map(0x04800000, 0x04800fff).rw("vrender", FUNC(vrender0_device::vr0_snd_read), FUNC(vrender0_device::vr0_snd_write));
 
-	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
+	map(0x05000000, 0x05ffffff).bankr("bank1");
+	map(0x05000000, 0x05000003).rw(this, FUNC(crystal_state::FlashCmd_r), FUNC(crystal_state::FlashCmd_w));
 
-	AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
-ADDRESS_MAP_END
+	map(0x44414F4C, 0x44414F7F).ram().share("reset_patch");
+}
 
 // Trivia R Us
 // To do: touch panel, RTC
@@ -708,57 +709,59 @@ WRITE32_MEMBER(crystal_state::trivrus_input_w)
 		m_trivrus_input = data & 0xff;
 }
 
-ADDRESS_MAP_START(crystal_state::trivrus_mem)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_WRITENOP
+void crystal_state::trivrus_mem(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom().nopw();
 
 //  0x01280000 & 0x0000ffff (written at boot)
-	AM_RANGE(0x01500000, 0x01500003) AM_READWRITE(trivrus_input_r, trivrus_input_w)
+	map(0x01500000, 0x01500003).rw(this, FUNC(crystal_state::trivrus_input_r), FUNC(crystal_state::trivrus_input_w));
 //  0x01500010 & 0x000000ff = sec
 //  0x01500010 & 0x00ff0000 = min
 //  0x01500014 & 0x000000ff = hour
 //  0x01500014 & 0x00ff0000 = day
 //  0x01500018 & 0x000000ff = month
 //  0x0150001c & 0x000000ff = year - 2000
-	AM_RANGE(0x01600000, 0x01607fff) AM_RAM AM_SHARE("nvram")
+	map(0x01600000, 0x01607fff).ram().share("nvram");
 
-	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
+	map(0x01800000, 0x0180ffff).ram().share("sysregs");
 
-	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
-	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
+	map(0x01800800, 0x01800803).rw(this, FUNC(crystal_state::DMA0_r), FUNC(crystal_state::DMA0_w));
+	map(0x01800810, 0x01800813).rw(this, FUNC(crystal_state::DMA1_r), FUNC(crystal_state::DMA1_w));
 
-	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
+	map(0x01800c04, 0x01800c07).w(this, FUNC(crystal_state::IntAck_w));
 
-	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
-	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE(Timer1_r, Timer1_w)
-	AM_RANGE(0x01801410, 0x01801413) AM_READWRITE(Timer2_r, Timer2_w)
-	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
-	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, PIO_w)
+	map(0x01801400, 0x01801403).rw(this, FUNC(crystal_state::Timer0_r), FUNC(crystal_state::Timer0_w));
+	map(0x01801408, 0x0180140b).rw(this, FUNC(crystal_state::Timer1_r), FUNC(crystal_state::Timer1_w));
+	map(0x01801410, 0x01801413).rw(this, FUNC(crystal_state::Timer2_r), FUNC(crystal_state::Timer2_w));
+	map(0x01801418, 0x0180141b).rw(this, FUNC(crystal_state::Timer3_r), FUNC(crystal_state::Timer3_w));
+	map(0x01802004, 0x01802007).rw(this, FUNC(crystal_state::PIO_r), FUNC(crystal_state::PIO_w));
 
-	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
+	map(0x02000000, 0x027fffff).ram().share("workram");
 
 
-	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_SHARE("vidregs")
-	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_SHARE("textureram")
-	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("frameram")
-	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE("vrender", vrender0_device, vr0_snd_read, vr0_snd_write)
+	map(0x03000000, 0x0300ffff).ram().share("vidregs");
+	map(0x030000a4, 0x030000a7).rw(this, FUNC(crystal_state::FlipCount_r), FUNC(crystal_state::FlipCount_w));
+	map(0x03800000, 0x03ffffff).ram().share("textureram");
+	map(0x04000000, 0x047fffff).ram().share("frameram");
+	map(0x04800000, 0x04800fff).rw("vrender", FUNC(vrender0_device::vr0_snd_read), FUNC(vrender0_device::vr0_snd_write));
 
-	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
+	map(0x05000000, 0x05ffffff).bankr("bank1");
+	map(0x05000000, 0x05000003).rw(this, FUNC(crystal_state::FlashCmd_r), FUNC(crystal_state::FlashCmd_w));
 
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(crystal_state::crospuzl_mem)
-	AM_IMPORT_FROM( trivrus_mem )
+void crystal_state::crospuzl_mem(address_map &map)
+{
+	trivrus_mem(map);
 
-	AM_RANGE(0x01500000, 0x01500003) AM_READ(FlashCmd_r)
-	AM_RANGE(0x01500100, 0x01500103) AM_WRITE(FlashCmd_w)
-	AM_RANGE(0x01510000, 0x01510003) AM_READ_PORT("IN0")
-	AM_RANGE(0x01511000, 0x01511003) AM_READ_PORT("IN1")
-	AM_RANGE(0x01512000, 0x01512003) AM_READ_PORT("IN2")
-	AM_RANGE(0x01513000, 0x01513003) AM_READ_PORT("IN3")
-ADDRESS_MAP_END
+	map(0x01500000, 0x01500003).r(this, FUNC(crystal_state::FlashCmd_r));
+	map(0x01500100, 0x01500103).w(this, FUNC(crystal_state::FlashCmd_w));
+	map(0x01510000, 0x01510003).portr("IN0");
+	map(0x01511000, 0x01511003).portr("IN1");
+	map(0x01512000, 0x01512003).portr("IN2");
+	map(0x01513000, 0x01513003).portr("IN3");
+}
 
 // Crazy Dou Di Zhu II
 // To do: HY04 (pic?) protection
@@ -801,41 +804,42 @@ crzyddz2    in      out
 	return 0xffffff00 | data | m_crzyddz2_prot;
 }
 
-ADDRESS_MAP_START(crystal_state::crzyddz2_mem)
-	AM_RANGE(0x00000000, 0x00ffffff) AM_ROM AM_WRITENOP
+void crystal_state::crzyddz2_mem(address_map &map)
+{
+	map(0x00000000, 0x00ffffff).rom().nopw();
 
-	AM_RANGE(0x01280000, 0x01280003) AM_WRITE(Banksw_w)
-	AM_RANGE(0x01400000, 0x0140ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x01500000, 0x01500003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x01500004, 0x01500007) AM_READ(crzyddz2_key_r)
+	map(0x01280000, 0x01280003).w(this, FUNC(crystal_state::Banksw_w));
+	map(0x01400000, 0x0140ffff).ram().share("nvram");
+	map(0x01500000, 0x01500003).portr("P1_P2");
+	map(0x01500004, 0x01500007).r(this, FUNC(crystal_state::crzyddz2_key_r));
 
-	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
+	map(0x01800000, 0x0180ffff).ram().share("sysregs");
 
-	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
-	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
+	map(0x01800800, 0x01800803).rw(this, FUNC(crystal_state::DMA0_r), FUNC(crystal_state::DMA0_w));
+	map(0x01800810, 0x01800813).rw(this, FUNC(crystal_state::DMA1_r), FUNC(crystal_state::DMA1_w));
 
-	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
+	map(0x01800c04, 0x01800c07).w(this, FUNC(crystal_state::IntAck_w));
 
-	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
-	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE(Timer1_r, Timer1_w)
-	AM_RANGE(0x01801410, 0x01801413) AM_READWRITE(Timer2_r, Timer2_w)
-	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
-	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, crzyddz2_PIO_w)
+	map(0x01801400, 0x01801403).rw(this, FUNC(crystal_state::Timer0_r), FUNC(crystal_state::Timer0_w));
+	map(0x01801408, 0x0180140b).rw(this, FUNC(crystal_state::Timer1_r), FUNC(crystal_state::Timer1_w));
+	map(0x01801410, 0x01801413).rw(this, FUNC(crystal_state::Timer2_r), FUNC(crystal_state::Timer2_w));
+	map(0x01801418, 0x0180141b).rw(this, FUNC(crystal_state::Timer3_r), FUNC(crystal_state::Timer3_w));
+	map(0x01802004, 0x01802007).rw(this, FUNC(crystal_state::PIO_r), FUNC(crystal_state::crzyddz2_PIO_w));
 
-	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
+	map(0x02000000, 0x027fffff).ram().share("workram");
 
 
-	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_SHARE("vidregs")
-	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_SHARE("textureram")
-	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("frameram")
-	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE("vrender", vrender0_device, vr0_snd_read, vr0_snd_write)
+	map(0x03000000, 0x0300ffff).ram().share("vidregs");
+	map(0x030000a4, 0x030000a7).rw(this, FUNC(crystal_state::FlipCount_r), FUNC(crystal_state::FlipCount_w));
+	map(0x03800000, 0x03ffffff).ram().share("textureram");
+	map(0x04000000, 0x047fffff).ram().share("frameram");
+	map(0x04800000, 0x04800fff).rw("vrender", FUNC(vrender0_device::vr0_snd_read), FUNC(vrender0_device::vr0_snd_write));
 
-	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
+	map(0x05000000, 0x05ffffff).bankr("bank1");
+	map(0x05000000, 0x05000003).rw(this, FUNC(crystal_state::FlashCmd_r), FUNC(crystal_state::FlashCmd_w));
 
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
-ADDRESS_MAP_END
+}
 
 
 void crystal_state::PatchReset(  )

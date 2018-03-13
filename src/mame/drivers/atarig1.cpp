@@ -190,29 +190,30 @@ void atarig1_state::pitfightb_cheap_slapstic_init()
  *
  *************************************/
 
-ADDRESS_MAP_START(atarig1_state::main_map)
-	AM_RANGE(0x000000, 0x037fff) AM_ROM
-	AM_RANGE(0x038000, 0x03ffff) AM_ROM /* pitfight slapstic goes here */
-	AM_RANGE(0x040000, 0x077fff) AM_ROM
-	AM_RANGE(0x078000, 0x07ffff) AM_ROM /* hydra slapstic goes here */
-	AM_RANGE(0xf80000, 0xf80001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xf88000, 0xf8ffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0xf90000, 0xf90001) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0xff00)
-	AM_RANGE(0xf98000, 0xf98001) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
-	AM_RANGE(0xfa0000, 0xfa0001) AM_DEVWRITE8("rle", atari_rle_objects_device, control_write, 0x00ff)
-	AM_RANGE(0xfb0000, 0xfb0001) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(special_port0_r)
-	AM_RANGE(0xfc8000, 0xfc8007) AM_READWRITE(a2d_data_r, a2d_select_w)
-	AM_RANGE(0xfd0000, 0xfd0001) AM_DEVREAD8("jsa", atari_jsa_ii_device, main_response_r, 0xff00)
-	AM_RANGE(0xfd8000, 0xfdffff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
+void atarig1_state::main_map(address_map &map)
+{
+	map(0x000000, 0x037fff).rom();
+	map(0x038000, 0x03ffff).rom(); /* pitfight slapstic goes here */
+	map(0x040000, 0x077fff).rom();
+	map(0x078000, 0x07ffff).rom(); /* hydra slapstic goes here */
+	map(0xf80000, 0xf80001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0xf88000, 0xf8ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0xf90000, 0xf90000).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
+	map(0xf98000, 0xf98001).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
+	map(0xfa0001, 0xfa0001).w(m_rle, FUNC(atari_rle_objects_device::control_write));
+	map(0xfb0000, 0xfb0001).w(this, FUNC(atarig1_state::video_int_ack_w));
+	map(0xfc0000, 0xfc0001).r(this, FUNC(atarig1_state::special_port0_r));
+	map(0xfc8000, 0xfc8007).rw(this, FUNC(atarig1_state::a2d_data_r), FUNC(atarig1_state::a2d_select_w));
+	map(0xfd0000, 0xfd0000).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
+	map(0xfd8000, 0xfdffff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
-	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-	AM_RANGE(0xff0000, 0xff0fff) AM_RAM AM_SHARE("rle")
-	AM_RANGE(0xff2000, 0xff2001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
-	AM_RANGE(0xff4000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0xff6000, 0xff6fff) AM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
-ADDRESS_MAP_END
+	map(0xfe8000, 0xfe89ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xff0000, 0xffffff).ram();
+	map(0xff0000, 0xff0fff).ram().share("rle");
+	map(0xff2000, 0xff2001).w(this, FUNC(atarig1_state::mo_command_w)).share("mo_command");
+	map(0xff4000, 0xff5fff).w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0xff6000, 0xff6fff).w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+}
 
 
 

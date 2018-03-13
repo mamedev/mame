@@ -181,23 +181,24 @@ WRITE8_MEMBER(albazc_state::albazc_vregs_w)
 
 /* main cpu */
 
-ADDRESS_MAP_START(albazc_state::hanaroku_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("spriteram1")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_SHARE("spriteram3")
-	AM_RANGE(0xa200, 0xa2ff) AM_WRITENOP    // ??? written once during P.O.S.T.
-	AM_RANGE(0xa300, 0xa304) AM_WRITE(albazc_vregs_w)   // ???
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // ??? always 0x40
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM         // main ram
-	AM_RANGE(0xc400, 0xc4ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITE(hanaroku_out_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("IN1")
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN2") AM_WRITE(hanaroku_out_1_w)
-	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("DSW3") AM_WRITE(hanaroku_out_2_w)
-ADDRESS_MAP_END
+void albazc_state::hanaroku_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("spriteram1");
+	map(0x9000, 0x97ff).ram().share("spriteram2");
+	map(0xa000, 0xa1ff).ram().share("spriteram3");
+	map(0xa200, 0xa2ff).nopw();    // ??? written once during P.O.S.T.
+	map(0xa300, 0xa304).w(this, FUNC(albazc_state::albazc_vregs_w));   // ???
+	map(0xb000, 0xb000).nopw();    // ??? always 0x40
+	map(0xc000, 0xc3ff).ram();         // main ram
+	map(0xc400, 0xc4ff).ram().share("nvram");
+	map(0xd000, 0xd000).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xe000, 0xe000).portr("IN0").w(this, FUNC(albazc_state::hanaroku_out_0_w));
+	map(0xe001, 0xe001).portr("IN1");
+	map(0xe002, 0xe002).portr("IN2").w(this, FUNC(albazc_state::hanaroku_out_1_w));
+	map(0xe004, 0xe004).portr("DSW3").w(this, FUNC(albazc_state::hanaroku_out_2_w));
+}
 
 
 static INPUT_PORTS_START( hanaroku )

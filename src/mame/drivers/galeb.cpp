@@ -64,20 +64,21 @@ READ8_MEMBER(galeb_state::tape_data_r)
 }
 
 /* Address maps */
-ADDRESS_MAP_START(galeb_state::galeb_mem)
-	AM_RANGE( 0x0000, 0x1fff ) AM_RAM  // RAM
-	AM_RANGE( 0xbfe0, 0xbfe7 ) AM_READ(keyboard_r )
-	AM_RANGE( 0xbfe0, 0xbfe0 ) AM_WRITE(dac_w)
-	AM_RANGE( 0xbffe, 0xbffe ) AM_READ(tape_status_r)
-	AM_RANGE( 0xbfff, 0xbfff ) AM_READWRITE(tape_data_r, tape_data_w)
-	AM_RANGE( 0xb000, 0xb3ff ) AM_RAM  AM_SHARE("video_ram") // video ram
-	AM_RANGE( 0xc000, 0xc7ff ) AM_ROM  // BASIC 01 ROM
-	AM_RANGE( 0xc800, 0xcfff ) AM_ROM  // BASIC 02 ROM
-	AM_RANGE( 0xd000, 0xd7ff ) AM_ROM  // BASIC 03 ROM
-	AM_RANGE( 0xd800, 0xdfff ) AM_ROM  // BASIC 04 ROM
-	AM_RANGE( 0xf000, 0xf7ff ) AM_ROM  // Monitor ROM
-	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
-ADDRESS_MAP_END
+void galeb_state::galeb_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();  // RAM
+	map(0xbfe0, 0xbfe7).r(this, FUNC(galeb_state::keyboard_r));
+	map(0xbfe0, 0xbfe0).w(this, FUNC(galeb_state::dac_w));
+	map(0xbffe, 0xbffe).r(this, FUNC(galeb_state::tape_status_r));
+	map(0xbfff, 0xbfff).rw(this, FUNC(galeb_state::tape_data_r), FUNC(galeb_state::tape_data_w));
+	map(0xb000, 0xb3ff).ram().share("video_ram"); // video ram
+	map(0xc000, 0xc7ff).rom();  // BASIC 01 ROM
+	map(0xc800, 0xcfff).rom();  // BASIC 02 ROM
+	map(0xd000, 0xd7ff).rom();  // BASIC 03 ROM
+	map(0xd800, 0xdfff).rom();  // BASIC 04 ROM
+	map(0xf000, 0xf7ff).rom();  // Monitor ROM
+	map(0xf800, 0xffff).rom();  // System ROM
+}
 
 /* Input ports */
 static INPUT_PORTS_START( galeb )

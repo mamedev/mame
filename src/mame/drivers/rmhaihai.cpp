@@ -251,53 +251,57 @@ void themj_state::machine_reset()
 
 
 
-ADDRESS_MAP_START(rmhaihai_state::rmhaihai_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb83c, 0xb83c) AM_WRITENOP    // ??
-	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP    // ??
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM         /* rmhaisei only */
-ADDRESS_MAP_END
+void rmhaihai_state::rmhaihai_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xa000, 0xa7ff).ram().share("nvram");
+	map(0xa800, 0xafff).ram().w(this, FUNC(rmhaihai_state::colorram_w)).share("colorram");
+	map(0xb000, 0xb7ff).ram().w(this, FUNC(rmhaihai_state::videoram_w)).share("videoram");
+	map(0xb83c, 0xb83c).nopw();    // ??
+	map(0xbc00, 0xbc00).nopw();    // ??
+	map(0xc000, 0xdfff).rom();
+	map(0xe000, 0xffff).rom();         /* rmhaisei only */
+}
 
-ADDRESS_MAP_START(rmhaihai_state::rmhaihai_io_map)
-	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP    // ??
-	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)    // ??
-	AM_RANGE(0x8020, 0x8020) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
-	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
-	AM_RANGE(0x8080, 0x8080) AM_WRITENOP    // ??
-	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP    // ??
-	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP    // ??
-ADDRESS_MAP_END
+void rmhaihai_state::rmhaihai_io_map(address_map &map)
+{
+	map(0x0000, 0x7fff).r(this, FUNC(rmhaihai_state::samples_r));
+	map(0x8000, 0x8000).r(this, FUNC(rmhaihai_state::keyboard_r)).nopw();    // ??
+	map(0x8001, 0x8001).nopr().w(this, FUNC(rmhaihai_state::keyboard_w));    // ??
+	map(0x8020, 0x8020).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x8020, 0x8021).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x8040, 0x8040).w(this, FUNC(rmhaihai_state::adpcm_w));
+	map(0x8060, 0x8060).w(this, FUNC(rmhaihai_state::ctrl_w));
+	map(0x8080, 0x8080).nopw();    // ??
+	map(0xbc04, 0xbc04).nopw();    // ??
+	map(0xbc0c, 0xbc0c).nopw();    // ??
+}
 
-ADDRESS_MAP_START(themj_state::themj_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void themj_state::themj_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xa7ff).ram();
+	map(0xa800, 0xafff).ram().w(this, FUNC(themj_state::colorram_w)).share("colorram");
+	map(0xb000, 0xb7ff).ram().w(this, FUNC(themj_state::videoram_w)).share("videoram");
+	map(0xc000, 0xdfff).bankr("bank2");
+	map(0xe000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(themj_state::themj_io_map)
-	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP    // ??
-	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)    // ??
-	AM_RANGE(0x8020, 0x8020) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
-	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
-	AM_RANGE(0x8080, 0x8080) AM_WRITENOP    // ??
-	AM_RANGE(0x80a0, 0x80a0) AM_WRITE(themj_rombank_w)
-	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP    // ??
-	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP    // ??
-ADDRESS_MAP_END
+void themj_state::themj_io_map(address_map &map)
+{
+	map(0x0000, 0x7fff).r(this, FUNC(themj_state::samples_r));
+	map(0x8000, 0x8000).r(this, FUNC(themj_state::keyboard_r)).nopw();    // ??
+	map(0x8001, 0x8001).nopr().w(this, FUNC(themj_state::keyboard_w));    // ??
+	map(0x8020, 0x8020).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x8020, 0x8021).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x8040, 0x8040).w(this, FUNC(themj_state::adpcm_w));
+	map(0x8060, 0x8060).w(this, FUNC(themj_state::ctrl_w));
+	map(0x8080, 0x8080).nopw();    // ??
+	map(0x80a0, 0x80a0).w(this, FUNC(themj_state::themj_rombank_w));
+	map(0xbc04, 0xbc04).nopw();    // ??
+	map(0xbc0c, 0xbc0c).nopw();    // ??
+}
 
 
 static INPUT_PORTS_START( mjctrl )

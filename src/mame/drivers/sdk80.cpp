@@ -68,20 +68,22 @@ private:
 	uint8_t m_usart_clock_state;
 };
 
-ADDRESS_MAP_START(sdk80_state::sdk80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-ADDRESS_MAP_END
+void sdk80_state::sdk80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x13ff).ram();
+}
 
-ADDRESS_MAP_START(sdk80_state::sdk80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xec, 0xef) AM_DEVREADWRITE(I8255A_1_TAG, i8255_device, read, write)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE(I8255A_0_TAG, i8255_device, read, write)
-	AM_RANGE(0xfa, 0xfa) AM_DEVREADWRITE(I8251A_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE(I8251A_TAG, i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void sdk80_state::sdk80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xec, 0xef).rw(m_ppi_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf4, 0xf7).rw(m_ppi_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xfa, 0xfa).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xfb, 0xfb).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 static INPUT_PORTS_START( sdk80 )
 	PORT_START(I8251A_BAUD_TAG)

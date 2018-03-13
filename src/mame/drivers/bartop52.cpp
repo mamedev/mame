@@ -47,14 +47,15 @@ protected:
 };
 
 
-ADDRESS_MAP_START(bartop52_state::a5200_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
-	AM_RANGE(0xd400, 0xd5ff) AM_DEVREADWRITE("antic", antic_device, read, write)
-	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void bartop52_state::a5200_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+	map(0x4000, 0xbfff).rom();
+	map(0xc000, 0xc0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
+	map(0xd400, 0xd5ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
+	map(0xe800, 0xe8ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0xf800, 0xffff).rom();
+}
 
 #define JOYSTICK_DELTA          10
 #define JOYSTICK_SENSITIVITY    200

@@ -107,17 +107,20 @@ WRITE8_MEMBER(rambo_state::port_w)
 * Address maps                                       *
 \****************************************************/
 
-ADDRESS_MAP_START(rambo_state::rambo_prg_map)
-	AM_RANGE(0x0000, 0x1FFFF) AM_ROM
-ADDRESS_MAP_END
+void rambo_state::rambo_prg_map(address_map &map)
+{
+	map(0x0000, 0x1FFFF).rom();
+}
 
-ADDRESS_MAP_START(rambo_state::rambo_data_map)
-	AM_RANGE(0x0200, 0x21FF) AM_RAM  /* ATMEGA2560 Internal SRAM */
-ADDRESS_MAP_END
+void rambo_state::rambo_data_map(address_map &map)
+{
+	map(0x0200, 0x21FF).ram();  /* ATMEGA2560 Internal SRAM */
+}
 
-ADDRESS_MAP_START(rambo_state::rambo_io_map)
-	AM_RANGE(AVR8_IO_PORTA, AVR8_IO_PORTL) AM_READWRITE( port_r, port_w )
-ADDRESS_MAP_END
+void rambo_state::rambo_io_map(address_map &map)
+{
+	map(AVR8_IO_PORTA, AVR8_IO_PORTL).rw(this, FUNC(rambo_state::port_r), FUNC(rambo_state::port_w));
+}
 
 /****************************************************\
 * Machine definition                                 *

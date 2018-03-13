@@ -100,33 +100,35 @@ WRITE16_MEMBER( pktgaldx_state::vblank_ack_w )
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(pktgaldx_state::pktgaldx_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void pktgaldx_state::pktgaldx_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x110000, 0x1107ff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x112000, 0x1127ff) AM_RAM AM_SHARE("pf2_rowscroll")
+	map(0x100000, 0x100fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x102000, 0x102fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x110000, 0x1107ff).ram().share("pf1_rowscroll");
+	map(0x112000, 0x1127ff).ram().share("pf2_rowscroll");
 
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x130000, 0x130fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0x120000, 0x1207ff).ram().share("spriteram");
+	map(0x130000, 0x130fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8("oki1", okim6295_device, read, 0x00ff)
-	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8("oki2", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8("oki2", okim6295_device, read, 0x00ff)
+	map(0x140000, 0x14000f).w("oki1", FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x140007, 0x140007).r("oki1", FUNC(okim6295_device::read));
+	map(0x150000, 0x15000f).w(m_oki2, FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x150007, 0x150007).r(m_oki2, FUNC(okim6295_device::read));
 
-	AM_RANGE(0x161800, 0x16180f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-	AM_RANGE(0x164800, 0x164801) AM_WRITE(pktgaldx_oki_bank_w)
-	AM_RANGE(0x166800, 0x166801) AM_WRITE(vblank_ack_w)
-	AM_RANGE(0x167800, 0x167fff) AM_READWRITE(pktgaldx_protection_region_f_104_r,pktgaldx_protection_region_f_104_w) AM_SHARE("prot16ram") /* Protection device */
+	map(0x161800, 0x16180f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x164800, 0x164801).w(this, FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
+	map(0x166800, 0x166801).w(this, FUNC(pktgaldx_state::vblank_ack_w));
+	map(0x167800, 0x167fff).rw(this, FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_r), FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_w)).share("prot16ram"); /* Protection device */
 
-	AM_RANGE(0x170000, 0x17ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x170000, 0x17ffff).ram();
+}
 
-ADDRESS_MAP_START(pktgaldx_state::decrypted_opcodes_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void pktgaldx_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().share("decrypted_opcodes");
+}
 
 
 /* Pocket Gal Deluxe (bootleg!) */
@@ -155,38 +157,39 @@ cpu #0 (PC=0000923C): unmapped program memory word read from 00167DB2 & 00FF
 /* do the 300000 addresses somehow interact with the protection addresses on this bootleg? */
 /* or maybe protection writes go to sound ... */
 
-ADDRESS_MAP_START(pktgaldx_state::pktgaldb_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("pktgaldb_fgram") // fgram on original?
-	AM_RANGE(0x102000, 0x102fff) AM_RAM // bgram on original?
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("pktgaldb_spr")
+void pktgaldx_state::pktgaldb_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x100fff).ram().share("pktgaldb_fgram"); // fgram on original?
+	map(0x102000, 0x102fff).ram(); // bgram on original?
+	map(0x120000, 0x123fff).ram().share("pktgaldb_spr");
 
-	AM_RANGE(0x130000, 0x130fff) AM_RAM // palette on original?
+	map(0x130000, 0x130fff).ram(); // palette on original?
 
-	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8("oki1", okim6295_device, read, 0x00ff)
-	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8("oki2", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8("oki2", okim6295_device, read, 0x00ff)
+	map(0x140000, 0x14000f).w("oki1", FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x140007, 0x140007).r("oki1", FUNC(okim6295_device::read));
+	map(0x150000, 0x15000f).w(m_oki2, FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x150007, 0x150007).r(m_oki2, FUNC(okim6295_device::read));
 
 //  AM_RANGE(0x160000, 0x167fff) AM_RAM
-	AM_RANGE(0x164800, 0x164801) AM_WRITE(pktgaldx_oki_bank_w)
-	AM_RANGE(0x16500a, 0x16500b) AM_READ(pckgaldx_unknown_r)
-	AM_RANGE(0x166800, 0x166801) AM_WRITE(vblank_ack_w)
+	map(0x164800, 0x164801).w(this, FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
+	map(0x16500a, 0x16500b).r(this, FUNC(pktgaldx_state::pckgaldx_unknown_r));
+	map(0x166800, 0x166801).w(this, FUNC(pktgaldx_state::vblank_ack_w));
 	/* should we really be using these to read the i/o in the BOOTLEG?
 	  these look like i/o through protection ... */
-	AM_RANGE(0x167842, 0x167843) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x167c4c, 0x167c4d) AM_READ_PORT("DSW")
-	AM_RANGE(0x167db2, 0x167db3) AM_READ_PORT("SYSTEM")
+	map(0x167842, 0x167843).portr("INPUTS");
+	map(0x167c4c, 0x167c4d).portr("DSW");
+	map(0x167db2, 0x167db3).portr("SYSTEM");
 
-	AM_RANGE(0x167d10, 0x167d11) AM_READ(pckgaldx_protection_r) // check code at 6ea
-	AM_RANGE(0x167d1a, 0x167d1b) AM_READ(pckgaldx_protection_r) // check code at 7C4
+	map(0x167d10, 0x167d11).r(this, FUNC(pktgaldx_state::pckgaldx_protection_r)); // check code at 6ea
+	map(0x167d1a, 0x167d1b).r(this, FUNC(pktgaldx_state::pckgaldx_protection_r)); // check code at 7C4
 
-	AM_RANGE(0x170000, 0x17ffff) AM_RAM
+	map(0x170000, 0x17ffff).ram();
 
-	AM_RANGE(0x300000, 0x30000f) AM_RAM // ??
+	map(0x300000, 0x30000f).ram(); // ??
 
-	AM_RANGE(0x330000, 0x330bff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // extra colours?
-ADDRESS_MAP_END
+	map(0x330000, 0x330bff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // extra colours?
+}
 
 
 /**********************************************************************************/

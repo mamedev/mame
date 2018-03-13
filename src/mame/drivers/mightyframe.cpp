@@ -30,9 +30,10 @@ private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(mightyframe_state::mem_map)
-	AM_RANGE(0x000000, 0x007fff) AM_ROM
-ADDRESS_MAP_END
+void mightyframe_state::mem_map(address_map &map)
+{
+	map(0x000000, 0x007fff).rom();
+}
 
 static INPUT_PORTS_START( mightyframe )
 INPUT_PORTS_END

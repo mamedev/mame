@@ -38,20 +38,21 @@ Bugs
 ***************************************************************************/
 
 /* Note: RAM is mapped dynamically in machine/aim65.c */
-ADDRESS_MAP_START(aim65_state::aim65_mem)
-	AM_RANGE( 0x1000, 0x3fff ) AM_NOP /* User available expansions */
-	AM_RANGE( 0x4000, 0x7fff ) AM_ROM /* 4 ROM sockets in 16K PROM/ROM module */
-	AM_RANGE( 0x8000, 0x9fff ) AM_NOP /* User available expansions */
-	AM_RANGE( 0xa000, 0xa00f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE("via6522_1", via6522_device, read, write) // user via
-	AM_RANGE( 0xa400, 0xa47f ) AM_DEVICE("riot", mos6532_new_device, ram_map)
-	AM_RANGE( 0xa480, 0xa497 ) AM_DEVICE("riot", mos6532_new_device, io_map)
-	AM_RANGE( 0xa498, 0xa7ff ) AM_NOP /* Not available */
-	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE("via6522_0", via6522_device, read, write) // system via
-	AM_RANGE( 0xac00, 0xac03 ) AM_DEVREADWRITE("pia6821", pia6821_device, read, write)
-	AM_RANGE( 0xac04, 0xac43 ) AM_RAM /* PIA RAM */
-	AM_RANGE( 0xac44, 0xafff ) AM_NOP /* Not available */
-	AM_RANGE( 0xb000, 0xffff ) AM_ROM /* 5 ROM sockets */
-ADDRESS_MAP_END
+void aim65_state::aim65_mem(address_map &map)
+{
+	map(0x1000, 0x3fff).noprw(); /* User available expansions */
+	map(0x4000, 0x7fff).rom(); /* 4 ROM sockets in 16K PROM/ROM module */
+	map(0x8000, 0x9fff).noprw(); /* User available expansions */
+	map(0xa000, 0xa00f).mirror(0x3f0).rw("via6522_1", FUNC(via6522_device::read), FUNC(via6522_device::write)); // user via
+	map(0xa400, 0xa47f).m("riot", FUNC(mos6532_new_device::ram_map));
+	map(0xa480, 0xa497).m("riot", FUNC(mos6532_new_device::io_map));
+	map(0xa498, 0xa7ff).noprw(); /* Not available */
+	map(0xa800, 0xa80f).mirror(0x3f0).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write)); // system via
+	map(0xac00, 0xac03).rw("pia6821", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xac04, 0xac43).ram(); /* PIA RAM */
+	map(0xac44, 0xafff).noprw(); /* Not available */
+	map(0xb000, 0xffff).rom(); /* 5 ROM sockets */
+}
 
 
 /***************************************************************************

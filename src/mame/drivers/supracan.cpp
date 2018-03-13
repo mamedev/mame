@@ -1122,22 +1122,23 @@ WRITE16_MEMBER( supracan_state::vram_w )
 
 }
 
-ADDRESS_MAP_START(supracan_state::supracan_mem)
+void supracan_state::supracan_mem(address_map &map)
+{
 	//AM_RANGE( 0x000000, 0x3fffff )        // mapped by the cartslot
-	AM_RANGE( 0xe80000, 0xe8ffff ) AM_READWRITE(_68k_soundram_r, _68k_soundram_w)
-	AM_RANGE( 0xe80200, 0xe80201 ) AM_READ_PORT("P1")
-	AM_RANGE( 0xe80202, 0xe80203 ) AM_READ_PORT("P2")
-	AM_RANGE( 0xe80208, 0xe80209 ) AM_READ_PORT("P3")
-	AM_RANGE( 0xe8020c, 0xe8020d ) AM_READ_PORT("P4")
-	AM_RANGE( 0xe90000, 0xe9001f ) AM_READWRITE(sound_r, sound_w)
-	AM_RANGE( 0xe90020, 0xe9002f ) AM_WRITE(dma_channel0_w)
-	AM_RANGE( 0xe90030, 0xe9003f ) AM_WRITE(dma_channel1_w)
+	map(0xe80000, 0xe8ffff).rw(this, FUNC(supracan_state::_68k_soundram_r), FUNC(supracan_state::_68k_soundram_w));
+	map(0xe80200, 0xe80201).portr("P1");
+	map(0xe80202, 0xe80203).portr("P2");
+	map(0xe80208, 0xe80209).portr("P3");
+	map(0xe8020c, 0xe8020d).portr("P4");
+	map(0xe90000, 0xe9001f).rw(this, FUNC(supracan_state::sound_r), FUNC(supracan_state::sound_w));
+	map(0xe90020, 0xe9002f).w(this, FUNC(supracan_state::dma_channel0_w));
+	map(0xe90030, 0xe9003f).w(this, FUNC(supracan_state::dma_channel1_w));
 
-	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE(video_r, video_w)
-	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE( 0xf40000, 0xf5ffff ) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
-	AM_RANGE( 0xfc0000, 0xfcffff ) AM_MIRROR(0x30000) AM_RAM /* System work ram */
-ADDRESS_MAP_END
+	map(0xf00000, 0xf001ff).rw(this, FUNC(supracan_state::video_r), FUNC(supracan_state::video_w));
+	map(0xf00200, 0xf003ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0xf40000, 0xf5ffff).ram().w(this, FUNC(supracan_state::vram_w)).share("vram");
+	map(0xfc0000, 0xfcffff).mirror(0x30000).ram(); /* System work ram */
+}
 
 READ8_MEMBER( supracan_state::_6502_soundmem_r )
 {
@@ -1233,9 +1234,10 @@ WRITE8_MEMBER( supracan_state::_6502_soundmem_w )
 	}
 }
 
-ADDRESS_MAP_START(supracan_state::supracan_sound_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(_6502_soundmem_r, _6502_soundmem_w) AM_SHARE("soundram")
-ADDRESS_MAP_END
+void supracan_state::supracan_sound_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(supracan_state::_6502_soundmem_r), FUNC(supracan_state::_6502_soundmem_w)).share("soundram");
+}
 
 static INPUT_PORTS_START( supracan )
 	PORT_START("P1")

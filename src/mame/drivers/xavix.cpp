@@ -1530,75 +1530,76 @@ WRITE8_MEMBER(xavix_state::irq_source_w)
 
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
 
-ADDRESS_MAP_START(xavix_state::xavix_map)
-	AM_RANGE(0x000000, 0x0001ff) AM_RAM
-	AM_RANGE(0x000200, 0x003fff) AM_RAM AM_SHARE("mainram")
+void xavix_state::xavix_map(address_map &map)
+{
+	map(0x000000, 0x0001ff).ram();
+	map(0x000200, 0x003fff).ram().share("mainram");
 
 	// this might not be a real area, the tilemap base register gets set to 0x40 in monster truck service mode, and expects a fixed layout.
 	// As that would point at this address maybe said layout is being read from here, or maybe it's just a magic tilemap register value that doesn't read address space at all.
-	AM_RANGE(0x004000, 0x0041ff) AM_READ(xavix_4000_r)
+	map(0x004000, 0x0041ff).r(this, FUNC(xavix_state::xavix_4000_r));
 
 	// 6xxx ranges are the video hardware
 	// appears to be 256 sprites (shares will be renamed once their purpose is known)
-	AM_RANGE(0x006000, 0x0060ff) AM_RAM AM_SHARE("spr_attr0")
-	AM_RANGE(0x006100, 0x0061ff) AM_RAM AM_SHARE("spr_attr1")
-	AM_RANGE(0x006200, 0x0062ff) AM_RAM AM_SHARE("spr_ypos") // cleared to 0x80 by both games, maybe enable registers?
-	AM_RANGE(0x006300, 0x0063ff) AM_RAM AM_SHARE("spr_xpos")
-	AM_RANGE(0x006400, 0x0064ff) AM_RAM // 6400 range gets populated in some cases, but it seems to be more like work ram, data doesn't matter and must be ignored?
-	AM_RANGE(0x006500, 0x0065ff) AM_RAM AM_SHARE("spr_addr_lo")
-	AM_RANGE(0x006600, 0x0066ff) AM_RAM AM_SHARE("spr_addr_md")
-	AM_RANGE(0x006700, 0x0067ff) AM_RAM AM_SHARE("spr_addr_hi")
-	AM_RANGE(0x006800, 0x0068ff) AM_RAM AM_SHARE("palram1") // written with 6900
-	AM_RANGE(0x006900, 0x0069ff) AM_RAM AM_SHARE("palram2") // startup (taitons1)
-	AM_RANGE(0x006a00, 0x006a1f) AM_RAM AM_SHARE("spr_attra") // test mode, pass flag 0x20
+	map(0x006000, 0x0060ff).ram().share("spr_attr0");
+	map(0x006100, 0x0061ff).ram().share("spr_attr1");
+	map(0x006200, 0x0062ff).ram().share("spr_ypos"); // cleared to 0x80 by both games, maybe enable registers?
+	map(0x006300, 0x0063ff).ram().share("spr_xpos");
+	map(0x006400, 0x0064ff).ram(); // 6400 range gets populated in some cases, but it seems to be more like work ram, data doesn't matter and must be ignored?
+	map(0x006500, 0x0065ff).ram().share("spr_addr_lo");
+	map(0x006600, 0x0066ff).ram().share("spr_addr_md");
+	map(0x006700, 0x0067ff).ram().share("spr_addr_hi");
+	map(0x006800, 0x0068ff).ram().share("palram1"); // written with 6900
+	map(0x006900, 0x0069ff).ram().share("palram2"); // startup (taitons1)
+	map(0x006a00, 0x006a1f).ram().share("spr_attra"); // test mode, pass flag 0x20
 
 
-	AM_RANGE(0x006fc0, 0x006fc0) AM_WRITE(xavix_6fc0_w) // startup (maybe this is a mirror of tmap1_regs_w)
+	map(0x006fc0, 0x006fc0).w(this, FUNC(xavix_state::xavix_6fc0_w)); // startup (maybe this is a mirror of tmap1_regs_w)
 
-	AM_RANGE(0x006fc8, 0x006fcf) AM_WRITE(tmap1_regs_w) // video registers
+	map(0x006fc8, 0x006fcf).w(this, FUNC(xavix_state::tmap1_regs_w)); // video registers
 
-	AM_RANGE(0x006fd0, 0x006fd7) AM_READWRITE(tmap2_regs_r, tmap2_regs_w)
-	AM_RANGE(0x006fd8, 0x006fd8) AM_WRITE(xavix_6fd8_w) // startup (mirror of tmap2_regs_w?)
+	map(0x006fd0, 0x006fd7).rw(this, FUNC(xavix_state::tmap2_regs_r), FUNC(xavix_state::tmap2_regs_w));
+	map(0x006fd8, 0x006fd8).w(this, FUNC(xavix_state::xavix_6fd8_w)); // startup (mirror of tmap2_regs_w?)
 
-	AM_RANGE(0x006fe0, 0x006fe0) AM_READWRITE(vid_dma_trigger_r, vid_dma_trigger_w) // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
-	AM_RANGE(0x006fe1, 0x006fe2) AM_WRITE(vid_dma_params_1_w)
-	AM_RANGE(0x006fe5, 0x006fe6) AM_WRITE(vid_dma_params_2_w)
+	map(0x006fe0, 0x006fe0).rw(this, FUNC(xavix_state::vid_dma_trigger_r), FUNC(xavix_state::vid_dma_trigger_w)); // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
+	map(0x006fe1, 0x006fe2).w(this, FUNC(xavix_state::vid_dma_params_1_w));
+	map(0x006fe5, 0x006fe6).w(this, FUNC(xavix_state::vid_dma_params_2_w));
 
 	// function in rad_mtrk at 0184b7 uses this
-	AM_RANGE(0x006fe8, 0x006fe8) AM_RAM // r/w tested
-	AM_RANGE(0x006fe9, 0x006fe9) AM_RAM // r/w tested
+	map(0x006fe8, 0x006fe8).ram(); // r/w tested
+	map(0x006fe9, 0x006fe9).ram(); // r/w tested
 	//AM_RANGE(0x006fea, 0x006fea) AM_WRITENOP
 
-	AM_RANGE(0x006ff0, 0x006ff0) AM_READWRITE(xavix_6ff0_r, xavix_6ff0_w) // r/w tested
+	map(0x006ff0, 0x006ff0).rw(this, FUNC(xavix_state::xavix_6ff0_r), FUNC(xavix_state::xavix_6ff0_w)); // r/w tested
 	//AM_RANGE(0x006ff1, 0x006ff1) AM_WRITENOP // startup - cleared in interrupt 0
 	//AM_RANGE(0x006ff2, 0x006ff2) AM_WRITENOP // set to 07 after clearing above things in interrupt 0
 
-	AM_RANGE(0x006ff8, 0x006ff8) AM_READWRITE(xavix_6ff8_r, xavix_6ff8_w) // always seems to be a read/store or read/modify/store
-	AM_RANGE(0x006ff9, 0x006ff9) AM_READ(pal_ntsc_r)
+	map(0x006ff8, 0x006ff8).rw(this, FUNC(xavix_state::xavix_6ff8_r), FUNC(xavix_state::xavix_6ff8_w)); // always seems to be a read/store or read/modify/store
+	map(0x006ff9, 0x006ff9).r(this, FUNC(xavix_state::pal_ntsc_r));
 
 	// 7xxx ranges system controller?
 
-	AM_RANGE(0x0075f0, 0x0075f0) AM_READWRITE(xavix_75f0_r, xavix_75f0_w) // r/w tested read/written 8 times in a row
-	AM_RANGE(0x0075f1, 0x0075f1) AM_READWRITE(xavix_75f1_r, xavix_75f1_w) // r/w tested read/written 8 times in a row
-	AM_RANGE(0x0075f3, 0x0075f3) AM_RAM
-	AM_RANGE(0x0075f4, 0x0075f4) AM_READ(xavix_75f4_r) // related to 75f0 (read after writing there - rad_mtrk)
-	AM_RANGE(0x0075f5, 0x0075f5) AM_READ(xavix_75f5_r) // related to 75f1 (read after writing there - rad_mtrk)
+	map(0x0075f0, 0x0075f0).rw(this, FUNC(xavix_state::xavix_75f0_r), FUNC(xavix_state::xavix_75f0_w)); // r/w tested read/written 8 times in a row
+	map(0x0075f1, 0x0075f1).rw(this, FUNC(xavix_state::xavix_75f1_r), FUNC(xavix_state::xavix_75f1_w)); // r/w tested read/written 8 times in a row
+	map(0x0075f3, 0x0075f3).ram();
+	map(0x0075f4, 0x0075f4).r(this, FUNC(xavix_state::xavix_75f4_r)); // related to 75f0 (read after writing there - rad_mtrk)
+	map(0x0075f5, 0x0075f5).r(this, FUNC(xavix_state::xavix_75f5_r)); // related to 75f1 (read after writing there - rad_mtrk)
 
 	// taitons1 after 75f7/75f8
-	AM_RANGE(0x0075f6, 0x0075f6) AM_READWRITE(xavix_75f6_r, xavix_75f6_w) // r/w tested
+	map(0x0075f6, 0x0075f6).rw(this, FUNC(xavix_state::xavix_75f6_r), FUNC(xavix_state::xavix_75f6_w)); // r/w tested
 	// taitons1 written as a pair
-	AM_RANGE(0x0075f7, 0x0075f7) AM_WRITE(xavix_75f7_w)
-	AM_RANGE(0x0075f8, 0x0075f8) AM_READWRITE(xavix_75f8_r, xavix_75f8_w) // r/w tested
+	map(0x0075f7, 0x0075f7).w(this, FUNC(xavix_state::xavix_75f7_w));
+	map(0x0075f8, 0x0075f8).rw(this, FUNC(xavix_state::xavix_75f8_r), FUNC(xavix_state::xavix_75f8_w)); // r/w tested
 	// taitons1 written after 75f6, then read
-	AM_RANGE(0x0075f9, 0x0075f9) AM_READWRITE(xavix_75f9_r, xavix_75f9_w)
+	map(0x0075f9, 0x0075f9).rw(this, FUNC(xavix_state::xavix_75f9_r), FUNC(xavix_state::xavix_75f9_w));
 	// at another time
-	AM_RANGE(0x0075fa, 0x0075fa) AM_READWRITE(xavix_75fa_r, xavix_75fa_w) // r/w tested
-	AM_RANGE(0x0075fb, 0x0075fb) AM_READWRITE(xavix_75fb_r, xavix_75fb_w) // r/w tested
-	AM_RANGE(0x0075fc, 0x0075fc) AM_READWRITE(xavix_75fc_r, xavix_75fc_w) // r/w tested
-	AM_RANGE(0x0075fd, 0x0075fd) AM_READWRITE(xavix_75fd_r, xavix_75fd_w) // r/w tested
-	AM_RANGE(0x0075fe, 0x0075fe) AM_WRITE(xavix_75fe_w)
+	map(0x0075fa, 0x0075fa).rw(this, FUNC(xavix_state::xavix_75fa_r), FUNC(xavix_state::xavix_75fa_w)); // r/w tested
+	map(0x0075fb, 0x0075fb).rw(this, FUNC(xavix_state::xavix_75fb_r), FUNC(xavix_state::xavix_75fb_w)); // r/w tested
+	map(0x0075fc, 0x0075fc).rw(this, FUNC(xavix_state::xavix_75fc_r), FUNC(xavix_state::xavix_75fc_w)); // r/w tested
+	map(0x0075fd, 0x0075fd).rw(this, FUNC(xavix_state::xavix_75fd_r), FUNC(xavix_state::xavix_75fd_w)); // r/w tested
+	map(0x0075fe, 0x0075fe).w(this, FUNC(xavix_state::xavix_75fe_w));
 	// taitons1 written other 75xx operations
-	AM_RANGE(0x0075ff, 0x0075ff) AM_WRITE(xavix_75ff_w)
+	map(0x0075ff, 0x0075ff).w(this, FUNC(xavix_state::xavix_75ff_w));
 
 	//AM_RANGE(0x007810, 0x007810) AM_WRITENOP // startup
 
@@ -1606,21 +1607,21 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	//AM_RANGE(0x007902, 0x007902) AM_WRITENOP // startup
 
 	// DMA trigger for below (written after the others) waits on status of bit 1 in a loop
-	AM_RANGE(0x007980, 0x007980) AM_READWRITE(dma_trigger_r, dma_trigger_w)
+	map(0x007980, 0x007980).rw(this, FUNC(xavix_state::dma_trigger_r), FUNC(xavix_state::dma_trigger_w));
 	// DMA source
-	AM_RANGE(0x007981, 0x007981) AM_WRITE(rom_dmasrc_lo_w)
-	AM_RANGE(0x007982, 0x007982) AM_WRITE(rom_dmasrc_md_w)
-	AM_RANGE(0x007983, 0x007983) AM_WRITE(rom_dmasrc_hi_w)
+	map(0x007981, 0x007981).w(this, FUNC(xavix_state::rom_dmasrc_lo_w));
+	map(0x007982, 0x007982).w(this, FUNC(xavix_state::rom_dmasrc_md_w));
+	map(0x007983, 0x007983).w(this, FUNC(xavix_state::rom_dmasrc_hi_w));
 	// DMA dest
-	AM_RANGE(0x007984, 0x007984) AM_WRITE(rom_dmadst_lo_w)
-	AM_RANGE(0x007985, 0x007985) AM_WRITE(rom_dmadst_hi_w)
+	map(0x007984, 0x007984).w(this, FUNC(xavix_state::rom_dmadst_lo_w));
+	map(0x007985, 0x007985).w(this, FUNC(xavix_state::rom_dmadst_hi_w));
 	// DMA length
-	AM_RANGE(0x007986, 0x007986) AM_WRITE(rom_dmalen_lo_w)
-	AM_RANGE(0x007987, 0x007987) AM_WRITE(rom_dmalen_hi_w)
+	map(0x007986, 0x007986).w(this, FUNC(xavix_state::rom_dmalen_lo_w));
+	map(0x007987, 0x007987).w(this, FUNC(xavix_state::rom_dmalen_hi_w));
 
 	// GPIO stuff
-	AM_RANGE(0x007a00, 0x007a00) AM_READ(xavix_io_0_r)
-	AM_RANGE(0x007a01, 0x007a01) AM_READ(xavix_io_1_r) //AM_WRITENOP // startup (taitons1)
+	map(0x007a00, 0x007a00).r(this, FUNC(xavix_state::xavix_io_0_r));
+	map(0x007a01, 0x007a01).r(this, FUNC(xavix_state::xavix_io_1_r)); //AM_WRITENOP // startup (taitons1)
 	//AM_RANGE(0x007a02, 0x007a02) AM_WRITENOP // startup, gets set to 20, 7a00 is then also written with 20
 	//AM_RANGE(0x007a03, 0x007a03) AM_READNOP AM_WRITENOP // startup (gets set to 84 which is the same as the bits checked on 7a01, possible port direction register?)
 
@@ -1634,24 +1635,24 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	//AM_RANGE(0x007c02, 0x007c02) AM_WRITENOP // once
 
 	// this is a multiplication chip
-	AM_RANGE(0x007ff2, 0x007ff4) AM_WRITE(mult_param_w)
-	AM_RANGE(0x007ff5, 0x007ff6) AM_READ(mult_r)
+	map(0x007ff2, 0x007ff4).w(this, FUNC(xavix_state::mult_param_w));
+	map(0x007ff5, 0x007ff6).r(this, FUNC(xavix_state::mult_r));
 
 	// maybe irq enable, written after below
-	AM_RANGE(0x007ff9, 0x007ff9) AM_WRITE(irq_enable_w) // interrupt related, but probalby not a simple 'enable' otherwise interrupts happen before we're ready for them.
+	map(0x007ff9, 0x007ff9).w(this, FUNC(xavix_state::irq_enable_w)); // interrupt related, but probalby not a simple 'enable' otherwise interrupts happen before we're ready for them.
 	// an IRQ vector (nmi?)
-	AM_RANGE(0x007ffa, 0x007ffa) AM_WRITE(irq_vector0_lo_w)
-	AM_RANGE(0x007ffb, 0x007ffb) AM_WRITE(irq_vector0_hi_w)
+	map(0x007ffa, 0x007ffa).w(this, FUNC(xavix_state::irq_vector0_lo_w));
+	map(0x007ffb, 0x007ffb).w(this, FUNC(xavix_state::irq_vector0_hi_w));
 
-	AM_RANGE(0x007ffc, 0x007ffc) AM_READWRITE(irq_source_r, irq_source_w)
+	map(0x007ffc, 0x007ffc).rw(this, FUNC(xavix_state::irq_source_r), FUNC(xavix_state::irq_source_w));
 
 	// an IRQ vector (irq?)
-	AM_RANGE(0x007ffe, 0x007ffe) AM_WRITE(irq_vector1_lo_w)
-	AM_RANGE(0x007fff, 0x007fff) AM_WRITE(irq_vector1_hi_w)
+	map(0x007ffe, 0x007ffe).w(this, FUNC(xavix_state::irq_vector1_lo_w));
+	map(0x007fff, 0x007fff).w(this, FUNC(xavix_state::irq_vector1_hi_w));
 
 //  rom is installed in init due to different rom sizes and mirroring required
 //  AM_RANGE(0x008000, 0x7fffff) AM_ROM AM_REGION("bios", 0x008000) AM_MIRROR(0x800000) // rad_mtrk relies on rom mirroring
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( xavix )
 	PORT_START("IN0")

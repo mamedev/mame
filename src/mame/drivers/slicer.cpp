@@ -64,22 +64,24 @@ WRITE_LINE_MEMBER(slicer_state::drive_sel_w)
 	m_fdc->set_floppy(floppy);
 }
 
-ADDRESS_MAP_START(slicer_state::slicer_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM // fixed 256k for now
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void slicer_state::slicer_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram(); // fixed 256k for now
+	map(0xf8000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(slicer_state::slicer_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_DEVREADWRITE8("fdc", fd1797_device, read, write, 0x00ff) //PCS0
-	AM_RANGE(0x0080, 0x00ff) AM_DEVREADWRITE8("duart", scn2681_device, read, write, 0x00ff) //PCS1
-	AM_RANGE(0x0100, 0x0107) AM_MIRROR(0x0078) AM_DEVWRITE8("drivelatch", ls259_device, write_d0, 0x00ff) //PCS2
+void slicer_state::slicer_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x007f).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write)).umask16(0x00ff); //PCS0
+	map(0x0080, 0x00ff).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff); //PCS1
+	map(0x0100, 0x0107).mirror(0x0078).w("drivelatch", FUNC(ls259_device::write_d0)).umask16(0x00ff); //PCS2
 	// TODO: 0x180 sets ack
-	AM_RANGE(0x0180, 0x0181) AM_DEVREAD8("sasi_data_in", input_buffer_device, read, 0x00ff) AM_DEVWRITE8("sasi_data_out", output_latch_device, write, 0x00ff) //PCS3
-	AM_RANGE(0x0180, 0x0181) AM_DEVREAD8("sasi_ctrl_in", input_buffer_device, read, 0xff00)
-	AM_RANGE(0x0184, 0x0185) AM_DEVREAD8("sasi_data_in", input_buffer_device, read, 0x00ff) AM_DEVWRITE8("sasi_data_out", output_latch_device, write, 0x00ff)
-	AM_RANGE(0x0184, 0x0185) AM_DEVREAD8("sasi_ctrl_in", input_buffer_device, read, 0xff00)
-ADDRESS_MAP_END
+	map(0x0180, 0x0180).r("sasi_data_in", FUNC(input_buffer_device::read)).w("sasi_data_out", FUNC(output_latch_device::write)).umask16(0x00ff); //PCS3
+	map(0x0181, 0x0181).r("sasi_ctrl_in", FUNC(input_buffer_device::read));
+	map(0x0184, 0x0184).r("sasi_data_in", FUNC(input_buffer_device::read)).w("sasi_data_out", FUNC(output_latch_device::write)).umask16(0x00ff);
+	map(0x0185, 0x0185).r("sasi_ctrl_in", FUNC(input_buffer_device::read));
+}
 
 static SLOT_INTERFACE_START( slicer_floppies )
 	SLOT_INTERFACE("525dd", FLOPPY_525_DD)

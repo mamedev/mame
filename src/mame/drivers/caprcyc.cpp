@@ -39,9 +39,10 @@ public:
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(caprcyc_state::caprcyc_map) // TODO...
-	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
-ADDRESS_MAP_END
+void caprcyc_state::caprcyc_map(address_map &map)
+{ // TODO...
+	map(0x00000000, 0x0003ffff).rom();
+}
 
 
 

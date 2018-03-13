@@ -347,29 +347,31 @@ WRITE32_MEMBER(gamecstl_state::bios_ram_w)
 
 /*****************************************************************************/
 
-ADDRESS_MAP_START(gamecstl_state::gamecstl_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
-	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_SHARE("cga_ram")
-	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
-	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
-ADDRESS_MAP_END
+void gamecstl_state::gamecstl_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000affff).ram();
+	map(0x000b0000, 0x000b7fff).ram().share("cga_ram");
+	map(0x000e0000, 0x000effff).ram();
+	map(0x000f0000, 0x000fffff).bankr("bank1");
+	map(0x000f0000, 0x000fffff).w(this, FUNC(gamecstl_state::bios_ram_w));
+	map(0x00100000, 0x01ffffff).ram();
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+}
 
-ADDRESS_MAP_START(gamecstl_state::gamecstl_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x00e8, 0x00eb) AM_NOP
-	AM_RANGE(0x00ec, 0x00ef) AM_NOP
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
-	AM_RANGE(0x0300, 0x03af) AM_NOP
-	AM_RANGE(0x03b0, 0x03df) AM_NOP
-	AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
-	AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-ADDRESS_MAP_END
+void gamecstl_state::gamecstl_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x00e8, 0x00eb).noprw();
+	map(0x00ec, 0x00ef).noprw();
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
+	map(0x0300, 0x03af).noprw();
+	map(0x03b0, 0x03df).noprw();
+	map(0x0278, 0x027b).w(this, FUNC(gamecstl_state::pnp_config_w));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
+	map(0x0a78, 0x0a7b).w(this, FUNC(gamecstl_state::pnp_data_w));
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+}
 
 /*****************************************************************************/
 

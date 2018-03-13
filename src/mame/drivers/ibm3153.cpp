@@ -64,16 +64,18 @@ private:
 };
 
 
-ADDRESS_MAP_START(ibm3153_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0x0ffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void ibm3153_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x0ffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(ibm3153_state::io_map)
-	AM_RANGE(0x0000,0xffff) AM_RAM
+void ibm3153_state::io_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
 	//ADDRESS_MAP_UNMAP_HIGH
 	//ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+}
 
 
 /* Input ports */

@@ -28,9 +28,10 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(ampscarp_state::mem_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void ampscarp_state::mem_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("maincpu", 0);
+}
 
 static INPUT_PORTS_START( ampscarp )
 INPUT_PORTS_END

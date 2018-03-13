@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 #include "machine/74157.h"
+#include "cpu/h6280/h6280.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "video/decbac06.h"
@@ -38,7 +39,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_subcpu;
+	optional_device<h6280_device> m_subcpu;
 	optional_device<cpu_device> m_mcu;
 	required_device<palette_device> m_palette;
 	optional_device<deco_bac06_device> m_tilegen1;

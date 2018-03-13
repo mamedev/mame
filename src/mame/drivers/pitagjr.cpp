@@ -177,11 +177,12 @@ public:
 };
 
 
-ADDRESS_MAP_START(pitagjr_state::pitajr_mem)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_ROM // boot ROM ???
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")
-ADDRESS_MAP_END
+void pitagjr_state::pitajr_mem(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+	map(0x1000, 0x1fff).rom(); // boot ROM ???
+	map(0x2000, 0x3fff).bankr("rombank");
+}
 
 /* Input ports */
 INPUT_PORTS_START( pitajr )

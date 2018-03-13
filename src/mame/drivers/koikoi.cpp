@@ -232,20 +232,22 @@ WRITE8_MEMBER(koikoi_state::io_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(koikoi_state::koikoi_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW")
-	AM_RANGE(0x9000, 0x9007) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void koikoi_state::koikoi_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x6000, 0x67ff).ram();
+	map(0x7000, 0x77ff).ram().w(this, FUNC(koikoi_state::vram_w)).share("videoram");
+	map(0x8000, 0x8000).portr("DSW");
+	map(0x9000, 0x9007).rw(this, FUNC(koikoi_state::io_r), FUNC(koikoi_state::io_w));
+}
 
-ADDRESS_MAP_START(koikoi_state::koikoi_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_WRITENOP //watchdog
-	AM_RANGE(0x03, 0x03) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void koikoi_state::koikoi_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x02).nopw(); //watchdog
+	map(0x03, 0x03).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x06, 0x07).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
 
 /*************************************
  *

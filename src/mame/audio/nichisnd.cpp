@@ -41,15 +41,17 @@ nichisnd_device::nichisnd_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-ADDRESS_MAP_START(nichisnd_device::nichisnd_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM AM_REGION("audiorom",0)
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
-ADDRESS_MAP_END
+void nichisnd_device::nichisnd_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom().region("audiorom", 0);
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("soundbank");
+}
 
-ADDRESS_MAP_START(nichisnd_device::nichisnd_io_map)
-	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_DEVWRITE("ymsnd", ym3812_device, write)
-ADDRESS_MAP_END
+void nichisnd_device::nichisnd_io_map(address_map &map)
+{
+	map(0x80, 0x81).mirror(0xff00).w("ymsnd", FUNC(ym3812_device::write));
+}
 
 
 WRITE8_MEMBER(nichisnd_device::soundbank_w)

@@ -385,87 +385,94 @@ READ16_MEMBER(gaiden_state::raiga_protection_r)
 	return m_prot;
 }
 
-ADDRESS_MAP_START(gaiden_state::gaiden_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("videoram3")
-	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2") AM_WRITE(gaiden_sproffsety_w)
-	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
-	AM_RANGE(0x07a104, 0x07a105) AM_WRITE(gaiden_txscrolly_w)
-	AM_RANGE(0x07a108, 0x07a109) AM_WRITE(gaiden_txoffsety_w)
-	AM_RANGE(0x07a10c, 0x07a10d) AM_WRITE(gaiden_txscrollx_w)
-	AM_RANGE(0x07a204, 0x07a205) AM_WRITE(gaiden_fgscrolly_w)
-	AM_RANGE(0x07a208, 0x07a209) AM_WRITE(gaiden_fgoffsety_w)
-	AM_RANGE(0x07a20c, 0x07a20d) AM_WRITE(gaiden_fgscrollx_w)
-	AM_RANGE(0x07a304, 0x07a305) AM_WRITE(gaiden_bgscrolly_w)
-	AM_RANGE(0x07a308, 0x07a309) AM_WRITE(gaiden_bgoffsety_w)
-	AM_RANGE(0x07a30c, 0x07a30d) AM_WRITE(gaiden_bgscrollx_w)
-	AM_RANGE(0x07a800, 0x07a801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
+void gaiden_state::gaiden_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x060000, 0x063fff).ram();
+	map(0x070000, 0x070fff).ram().w(this, FUNC(gaiden_state::tx_videoram_w)).share("videoram1");
+	map(0x072000, 0x073fff).ram().w(this, FUNC(gaiden_state::fg_videoram_w)).share("videoram2");
+	map(0x074000, 0x075fff).ram().w(this, FUNC(gaiden_state::bg_videoram_w)).share("videoram3");
+	map(0x076000, 0x077fff).ram().share("spriteram");
+	map(0x078000, 0x079fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x07a000, 0x07a001).portr("SYSTEM");
+	map(0x07a002, 0x07a003).portr("P1_P2").w(this, FUNC(gaiden_state::gaiden_sproffsety_w));
+	map(0x07a004, 0x07a005).portr("DSW");
+	map(0x07a104, 0x07a105).w(this, FUNC(gaiden_state::gaiden_txscrolly_w));
+	map(0x07a108, 0x07a109).w(this, FUNC(gaiden_state::gaiden_txoffsety_w));
+	map(0x07a10c, 0x07a10d).w(this, FUNC(gaiden_state::gaiden_txscrollx_w));
+	map(0x07a204, 0x07a205).w(this, FUNC(gaiden_state::gaiden_fgscrolly_w));
+	map(0x07a208, 0x07a209).w(this, FUNC(gaiden_state::gaiden_fgoffsety_w));
+	map(0x07a20c, 0x07a20d).w(this, FUNC(gaiden_state::gaiden_fgscrollx_w));
+	map(0x07a304, 0x07a305).w(this, FUNC(gaiden_state::gaiden_bgscrolly_w));
+	map(0x07a308, 0x07a309).w(this, FUNC(gaiden_state::gaiden_bgoffsety_w));
+	map(0x07a30c, 0x07a30d).w(this, FUNC(gaiden_state::gaiden_bgscrollx_w));
+	map(0x07a800, 0x07a801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	// Ninja Gaiden writes only to the lower byte; Tecmo Knight and Strato Fighter write to the upper byte instead.
 	// It's not clear which 8 data lines are actually connected, but byte smearing is almost certainly involved.
-	AM_RANGE(0x07a802, 0x07a803) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff).cswidth(16)
-	AM_RANGE(0x07a806, 0x07a807) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
-ADDRESS_MAP_END
+	map(0x07a802, 0x07a803).w("soundlatch", FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x07a806, 0x07a807).w(this, FUNC(gaiden_state::irq_ack_w));
+	map(0x07a808, 0x07a809).w(this, FUNC(gaiden_state::gaiden_flip_w));
+}
 
-ADDRESS_MAP_START(gaiden_state::wildfang_map)
-	AM_IMPORT_FROM(gaiden_map)
-	AM_RANGE(0x07a006, 0x07a007) AM_READ(wildfang_protection_r)
-	AM_RANGE(0x07a804, 0x07a805) AM_WRITE(wildfang_protection_w)
-ADDRESS_MAP_END
+void gaiden_state::wildfang_map(address_map &map)
+{
+	gaiden_map(map);
+	map(0x07a006, 0x07a007).r(this, FUNC(gaiden_state::wildfang_protection_r));
+	map(0x07a804, 0x07a805).w(this, FUNC(gaiden_state::wildfang_protection_w));
+}
 
-ADDRESS_MAP_START(gaiden_state::raiga_map)
-	AM_IMPORT_FROM(gaiden_map)
-	AM_RANGE(0x07a006, 0x07a007) AM_READ(raiga_protection_r)
-	AM_RANGE(0x07a804, 0x07a805) AM_WRITE(raiga_protection_w)
-ADDRESS_MAP_END
+void gaiden_state::raiga_map(address_map &map)
+{
+	gaiden_map(map);
+	map(0x07a006, 0x07a007).r(this, FUNC(gaiden_state::raiga_protection_r));
+	map(0x07a804, 0x07a805).w(this, FUNC(gaiden_state::raiga_protection_w));
+}
 
-ADDRESS_MAP_START(gaiden_state::drgnbowl_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("videoram3")
-	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
-	AM_RANGE(0x07a00e, 0x07a00f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
-	AM_RANGE(0x07e000, 0x07e001) AM_WRITE8(drgnbowl_irq_ack_w, 0xff00)
-	AM_RANGE(0x07f000, 0x07f001) AM_WRITE(gaiden_bgscrolly_w)
-	AM_RANGE(0x07f002, 0x07f003) AM_WRITE(gaiden_bgscrollx_w)
-	AM_RANGE(0x07f004, 0x07f005) AM_WRITE(gaiden_fgscrolly_w)
-	AM_RANGE(0x07f006, 0x07f007) AM_WRITE(gaiden_fgscrollx_w)
-ADDRESS_MAP_END
+void gaiden_state::drgnbowl_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x060000, 0x063fff).ram();
+	map(0x070000, 0x070fff).ram().w(this, FUNC(gaiden_state::tx_videoram_w)).share("videoram1");
+	map(0x072000, 0x073fff).ram().w(this, FUNC(gaiden_state::fg_videoram_w)).share("videoram2");
+	map(0x074000, 0x075fff).ram().w(this, FUNC(gaiden_state::bg_videoram_w)).share("videoram3");
+	map(0x076000, 0x077fff).ram().share("spriteram");
+	map(0x078000, 0x079fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x07a000, 0x07a001).portr("SYSTEM");
+	map(0x07a002, 0x07a003).portr("P1_P2");
+	map(0x07a004, 0x07a005).portr("DSW");
+	map(0x07a00e, 0x07a00e).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x07e000, 0x07e000).w(this, FUNC(gaiden_state::drgnbowl_irq_ack_w));
+	map(0x07f000, 0x07f001).w(this, FUNC(gaiden_state::gaiden_bgscrolly_w));
+	map(0x07f002, 0x07f003).w(this, FUNC(gaiden_state::gaiden_bgscrollx_w));
+	map(0x07f004, 0x07f005).w(this, FUNC(gaiden_state::gaiden_fgscrolly_w));
+	map(0x07f006, 0x07f007).w(this, FUNC(gaiden_state::gaiden_fgscrollx_w));
+}
 
-ADDRESS_MAP_START(gaiden_state::sound_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xefff) AM_ROM /* raiga only */
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ym2", ym2203_device, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
-	AM_RANGE(0xfc20, 0xfc20) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void gaiden_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xefff).rom(); /* raiga only */
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xf810, 0xf811).w("ym1", FUNC(ym2203_device::write));
+	map(0xf820, 0xf821).w("ym2", FUNC(ym2203_device::write));
+	map(0xfc00, 0xfc00).noprw(); /* ?? */
+	map(0xfc20, 0xfc20).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(gaiden_state::drgnbowl_sound_map)
-	AM_RANGE(0x0000, 0xf7ff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void gaiden_state::drgnbowl_sound_map(address_map &map)
+{
+	map(0x0000, 0xf7ff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(gaiden_state::drgnbowl_sound_port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void gaiden_state::drgnbowl_sound_port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x80, 0x80).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc0, 0xc0).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 static INPUT_PORTS_START( common )
 	PORT_START("SYSTEM")
@@ -914,17 +921,18 @@ Others
 2x      8x2 switches DIP
 */
 
-ADDRESS_MAP_START(gaiden_state::mastninj_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("adpcm_bank")
-	AM_RANGE(0xc400, 0xc401) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xcc00, 0xcc00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("adpcm_select2", ls157_device, ba_w)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(adpcm_bankswitch_w)
-	AM_RANGE(0xd800, 0xd800) AM_DEVWRITE("adpcm_select1", ls157_device, ba_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-ADDRESS_MAP_END
+void gaiden_state::mastninj_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("adpcm_bank");
+	map(0xc400, 0xc401).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xc800, 0xc801).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xcc00, 0xcc00).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xd000, 0xd000).w("adpcm_select2", FUNC(ls157_device::ba_w));
+	map(0xd400, 0xd400).w(this, FUNC(gaiden_state::adpcm_bankswitch_w));
+	map(0xd800, 0xd800).w("adpcm_select1", FUNC(ls157_device::ba_w));
+	map(0xf000, 0xf7ff).ram();
+}
 
 WRITE_LINE_MEMBER(gaiden_state::vck_flipflop_w)
 {
@@ -955,30 +963,31 @@ MACHINE_START_MEMBER(gaiden_state,mastninj)
 	save_item(NAME(m_adpcm_toggle));
 }
 
-ADDRESS_MAP_START(gaiden_state::mastninj_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("videoram3")
-	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+void gaiden_state::mastninj_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x060000, 0x063fff).ram();
+	map(0x070000, 0x070fff).ram().w(this, FUNC(gaiden_state::tx_videoram_w)).share("videoram1");
+	map(0x072000, 0x073fff).ram().w(this, FUNC(gaiden_state::fg_videoram_w)).share("videoram2");
+	map(0x074000, 0x075fff).ram().w(this, FUNC(gaiden_state::bg_videoram_w)).share("videoram3");
+	map(0x076000, 0x077fff).ram().share("spriteram");
+	map(0x078000, 0x079fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 //  AM_RANGE(0x078800, 0x079fff) AM_RAM
-	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
+	map(0x07a000, 0x07a001).portr("SYSTEM");
+	map(0x07a002, 0x07a003).portr("P1_P2");
+	map(0x07a004, 0x07a005).portr("DSW");
 //  AM_RANGE(0x07a104, 0x07a105) AM_WRITE(gaiden_txscrolly_w)
 //  AM_RANGE(0x07a10c, 0x07a10d) AM_WRITE(gaiden_txscrollx_w)
-	AM_RANGE(0x07f000, 0x07f001) AM_WRITE(gaiden_bgscrolly_w)
-	AM_RANGE(0x07f002, 0x07f003) AM_WRITE(gaiden_bgscrollx_w)
-	AM_RANGE(0x07f004, 0x07f005) AM_WRITE(gaiden_fgscrolly_w)
-	AM_RANGE(0x07f006, 0x07f007) AM_WRITE(gaiden_fgscrollx_w)
-	AM_RANGE(0x07a800, 0x07a801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
+	map(0x07f000, 0x07f001).w(this, FUNC(gaiden_state::gaiden_bgscrolly_w));
+	map(0x07f002, 0x07f003).w(this, FUNC(gaiden_state::gaiden_bgscrollx_w));
+	map(0x07f004, 0x07f005).w(this, FUNC(gaiden_state::gaiden_fgscrolly_w));
+	map(0x07f006, 0x07f007).w(this, FUNC(gaiden_state::gaiden_fgscrollx_w));
+	map(0x07a800, 0x07a801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 //  AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
 //  AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
-	AM_RANGE(0x07a00e, 0x07a00f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
-	AM_RANGE(0x07e000, 0x07e001) AM_WRITE8(drgnbowl_irq_ack_w, 0xff00)
-ADDRESS_MAP_END
+	map(0x07a00e, 0x07a00e).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x07e000, 0x07e000).w(this, FUNC(gaiden_state::drgnbowl_irq_ack_w));
+}
 
 MACHINE_CONFIG_START(gaiden_state::mastninj)
 

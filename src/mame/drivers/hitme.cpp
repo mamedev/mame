@@ -220,32 +220,34 @@ WRITE8_MEMBER(hitme_state::output_port_1_w)
     upper 8 bits.
 */
 
-ADDRESS_MAP_START(hitme_state::hitme_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x09ff) AM_ROM
-	AM_RANGE(0x0c00, 0x0eff) AM_RAM_WRITE(hitme_vidram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x300) AM_RAM
-	AM_RANGE(0x1400, 0x14ff) AM_READ(hitme_port_0_r)
-	AM_RANGE(0x1500, 0x15ff) AM_READ(hitme_port_1_r)
-	AM_RANGE(0x1600, 0x16ff) AM_READ(hitme_port_2_r)
-	AM_RANGE(0x1700, 0x17ff) AM_READ(hitme_port_3_r)
-	AM_RANGE(0x1800, 0x18ff) AM_READ_PORT("IN4")
-	AM_RANGE(0x1900, 0x19ff) AM_READ_PORT("IN5")
-	AM_RANGE(0x1d00, 0x1dff) AM_WRITE(output_port_0_w)
-	AM_RANGE(0x1e00, 0x1fff) AM_WRITE(output_port_1_w)
-ADDRESS_MAP_END
+void hitme_state::hitme_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x09ff).rom();
+	map(0x0c00, 0x0eff).ram().w(this, FUNC(hitme_state::hitme_vidram_w)).share("videoram");
+	map(0x1000, 0x10ff).mirror(0x300).ram();
+	map(0x1400, 0x14ff).r(this, FUNC(hitme_state::hitme_port_0_r));
+	map(0x1500, 0x15ff).r(this, FUNC(hitme_state::hitme_port_1_r));
+	map(0x1600, 0x16ff).r(this, FUNC(hitme_state::hitme_port_2_r));
+	map(0x1700, 0x17ff).r(this, FUNC(hitme_state::hitme_port_3_r));
+	map(0x1800, 0x18ff).portr("IN4");
+	map(0x1900, 0x19ff).portr("IN5");
+	map(0x1d00, 0x1dff).w(this, FUNC(hitme_state::output_port_0_w));
+	map(0x1e00, 0x1fff).w(this, FUNC(hitme_state::output_port_1_w));
+}
 
 
-ADDRESS_MAP_START(hitme_state::hitme_portmap)
-	AM_RANGE(0x14, 0x14) AM_READ(hitme_port_0_r)
-	AM_RANGE(0x15, 0x15) AM_READ(hitme_port_1_r)
-	AM_RANGE(0x16, 0x16) AM_READ(hitme_port_2_r)
-	AM_RANGE(0x17, 0x17) AM_READ(hitme_port_3_r)
-	AM_RANGE(0x18, 0x18) AM_READ_PORT("IN4")
-	AM_RANGE(0x19, 0x19) AM_READ_PORT("IN5")
-	AM_RANGE(0x1d, 0x1d) AM_WRITE(output_port_0_w)
-	AM_RANGE(0x1e, 0x1f) AM_WRITE(output_port_1_w)
-ADDRESS_MAP_END
+void hitme_state::hitme_portmap(address_map &map)
+{
+	map(0x14, 0x14).r(this, FUNC(hitme_state::hitme_port_0_r));
+	map(0x15, 0x15).r(this, FUNC(hitme_state::hitme_port_1_r));
+	map(0x16, 0x16).r(this, FUNC(hitme_state::hitme_port_2_r));
+	map(0x17, 0x17).r(this, FUNC(hitme_state::hitme_port_3_r));
+	map(0x18, 0x18).portr("IN4");
+	map(0x19, 0x19).portr("IN5");
+	map(0x1d, 0x1d).w(this, FUNC(hitme_state::output_port_0_w));
+	map(0x1e, 0x1f).w(this, FUNC(hitme_state::output_port_1_w));
+}
 
 
 

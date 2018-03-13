@@ -347,52 +347,56 @@ WRITE8_MEMBER(firetrap_state::flip_screen_w)
 	flip_screen_set(data);
 }
 
-ADDRESS_MAP_START(firetrap_state::firetrap_base_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(firetrap_bg1videoram_w) AM_SHARE("bg1videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(firetrap_bg2videoram_w) AM_SHARE("bg2videoram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(firetrap_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xe800, 0xe97f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP    /* IRQ acknowledge */
-	AM_RANGE(0xf001, 0xf001) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(firetrap_bankselect_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(firetrap_nmi_disable_w)
-	AM_RANGE(0xf005, 0xf005) AM_WRITE(firetrap_8751_w)
-	AM_RANGE(0xf008, 0xf009) AM_WRITE(firetrap_bg1_scrollx_w)
-	AM_RANGE(0xf00a, 0xf00b) AM_WRITE(firetrap_bg1_scrolly_w)
-	AM_RANGE(0xf00c, 0xf00d) AM_WRITE(firetrap_bg2_scrollx_w)
-	AM_RANGE(0xf00e, 0xf00f) AM_WRITE(firetrap_bg2_scrolly_w)
-	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
-	AM_RANGE(0xf011, 0xf011) AM_READ_PORT("IN1")
-	AM_RANGE(0xf012, 0xf012) AM_READ_PORT("IN2")
-	AM_RANGE(0xf013, 0xf013) AM_READ_PORT("DSW0")
-	AM_RANGE(0xf014, 0xf014) AM_READ_PORT("DSW1")
-ADDRESS_MAP_END
+void firetrap_state::firetrap_base_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(firetrap_state::firetrap_bg1videoram_w)).share("bg1videoram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(firetrap_state::firetrap_bg2videoram_w)).share("bg2videoram");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(firetrap_state::firetrap_fgvideoram_w)).share("fgvideoram");
+	map(0xe800, 0xe97f).ram().share("spriteram");
+	map(0xf000, 0xf000).nopw();    /* IRQ acknowledge */
+	map(0xf001, 0xf001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xf002, 0xf002).w(this, FUNC(firetrap_state::firetrap_bankselect_w));
+	map(0xf003, 0xf003).w(this, FUNC(firetrap_state::flip_screen_w));
+	map(0xf004, 0xf004).w(this, FUNC(firetrap_state::firetrap_nmi_disable_w));
+	map(0xf005, 0xf005).w(this, FUNC(firetrap_state::firetrap_8751_w));
+	map(0xf008, 0xf009).w(this, FUNC(firetrap_state::firetrap_bg1_scrollx_w));
+	map(0xf00a, 0xf00b).w(this, FUNC(firetrap_state::firetrap_bg1_scrolly_w));
+	map(0xf00c, 0xf00d).w(this, FUNC(firetrap_state::firetrap_bg2_scrollx_w));
+	map(0xf00e, 0xf00f).w(this, FUNC(firetrap_state::firetrap_bg2_scrolly_w));
+	map(0xf010, 0xf010).portr("IN0");
+	map(0xf011, 0xf011).portr("IN1");
+	map(0xf012, 0xf012).portr("IN2");
+	map(0xf013, 0xf013).portr("DSW0");
+	map(0xf014, 0xf014).portr("DSW1");
+}
 
-ADDRESS_MAP_START(firetrap_state::firetrap_map)
-	AM_IMPORT_FROM( firetrap_base_map )
-	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_r)
-ADDRESS_MAP_END
+void firetrap_state::firetrap_map(address_map &map)
+{
+	firetrap_base_map(map);
+	map(0xf016, 0xf016).r(this, FUNC(firetrap_state::firetrap_8751_r));
+}
 
-ADDRESS_MAP_START(firetrap_state::firetrap_bootleg_map)
-	AM_IMPORT_FROM( firetrap_base_map )
-	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_bootleg_r)
-	AM_RANGE(0xf800, 0xf8ff) AM_ROM /* extra ROM in the bootleg with unprotection code */
-ADDRESS_MAP_END
+void firetrap_state::firetrap_bootleg_map(address_map &map)
+{
+	firetrap_base_map(map);
+	map(0xf016, 0xf016).r(this, FUNC(firetrap_state::firetrap_8751_bootleg_r));
+	map(0xf800, 0xf8ff).rom(); /* extra ROM in the bootleg with unprotection code */
+}
 
-ADDRESS_MAP_START(firetrap_state::sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ymsnd", ym3526_device, write)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_data_w)
-	AM_RANGE(0x2400, 0x2400) AM_WRITE(sound_flip_flop_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(sound_bankselect_w)
-	AM_RANGE(0x3400, 0x3400) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void firetrap_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x1000, 0x1001).w("ymsnd", FUNC(ym3526_device::write));
+	map(0x2000, 0x2000).w(this, FUNC(firetrap_state::adpcm_data_w));
+	map(0x2400, 0x2400).w(this, FUNC(firetrap_state::sound_flip_flop_w));
+	map(0x2800, 0x2800).w(this, FUNC(firetrap_state::sound_bankselect_w));
+	map(0x3400, 0x3400).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x4000, 0x7fff).bankr("bank2");
+	map(0x8000, 0xffff).rom();
+}
 
 INPUT_CHANGED_MEMBER(firetrap_state::coin_inserted)
 {

@@ -26,15 +26,16 @@
 
 
 /* Address maps */
-ADDRESS_MAP_START(orao_state::orao_mem)
-	AM_RANGE( 0x0000, 0x5fff ) AM_RAM AM_SHARE("memory")
-	AM_RANGE( 0x6000, 0x7fff ) AM_RAM AM_SHARE("video_ram") // video ram
-	AM_RANGE( 0x8000, 0x9fff ) AM_READWRITE(orao_io_r, orao_io_w )
-	AM_RANGE( 0xa000, 0xafff ) AM_RAM  // extension
-	AM_RANGE( 0xb000, 0xbfff ) AM_RAM  // DOS
-	AM_RANGE( 0xc000, 0xdfff ) AM_ROM
-	AM_RANGE( 0xe000, 0xffff ) AM_ROM
-ADDRESS_MAP_END
+void orao_state::orao_mem(address_map &map)
+{
+	map(0x0000, 0x5fff).ram().share("memory");
+	map(0x6000, 0x7fff).ram().share("video_ram"); // video ram
+	map(0x8000, 0x9fff).rw(this, FUNC(orao_state::orao_io_r), FUNC(orao_state::orao_io_w));
+	map(0xa000, 0xafff).ram();  // extension
+	map(0xb000, 0xbfff).ram();  // DOS
+	map(0xc000, 0xdfff).rom();
+	map(0xe000, 0xffff).rom();
+}
 
 
 /* Input ports */

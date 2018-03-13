@@ -72,29 +72,32 @@ private:
 	required_device<clock_device> m_monotone;
 };
 
-ADDRESS_MAP_START(play_1_state::play_1_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x0800, 0x081f) AM_RAM AM_SHARE("nvram") // capacitor acting as a 2-month "battery"
-	AM_RANGE(0x0c00, 0x0c1f) AM_RAM
-ADDRESS_MAP_END
+void play_1_state::play_1_map(address_map &map)
+{
+	map.global_mask(0xfff);
+	map(0x0000, 0x07ff).rom().region("roms", 0);
+	map(0x0800, 0x081f).ram().share("nvram"); // capacitor acting as a 2-month "battery"
+	map(0x0c00, 0x0c1f).ram();
+}
 
-ADDRESS_MAP_START(play_1_state::chance_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x0bff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x0c00, 0x0c1f) AM_RAM
-	AM_RANGE(0x0e00, 0x0e1f) AM_RAM AM_SHARE("nvram") // capacitor acting as a 2-month "battery"
-ADDRESS_MAP_END
+void play_1_state::chance_map(address_map &map)
+{
+	map.global_mask(0xfff);
+	map(0x0000, 0x0bff).rom().region("roms", 0);
+	map(0x0c00, 0x0c1f).ram();
+	map(0x0e00, 0x0e1f).ram().share("nvram"); // capacitor acting as a 2-month "battery"
+}
 
-ADDRESS_MAP_START(play_1_state::play_1_io)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(port01_w) //segments
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(port02_w) // N1-8
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN3") AM_WRITE(port03_w) // D1-4
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN4") AM_WRITE(port04_w) // U1-8
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN5") AM_WRITE(port05_w) // V1-8
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("IN6") AM_WRITE(port06_w) // W1-8
-	AM_RANGE(0x07, 0x07) AM_READ(port07_r)
-ADDRESS_MAP_END
+void play_1_state::play_1_io(address_map &map)
+{
+	map(0x01, 0x01).portr("IN1").w(this, FUNC(play_1_state::port01_w)); //segments
+	map(0x02, 0x02).portr("IN2").w(this, FUNC(play_1_state::port02_w)); // N1-8
+	map(0x03, 0x03).portr("IN3").w(this, FUNC(play_1_state::port03_w)); // D1-4
+	map(0x04, 0x04).portr("IN4").w(this, FUNC(play_1_state::port04_w)); // U1-8
+	map(0x05, 0x05).portr("IN5").w(this, FUNC(play_1_state::port05_w)); // V1-8
+	map(0x06, 0x06).portr("IN6").w(this, FUNC(play_1_state::port06_w)); // W1-8
+	map(0x07, 0x07).r(this, FUNC(play_1_state::port07_r));
+}
 
 static INPUT_PORTS_START( chance )
 	PORT_START("X.0")

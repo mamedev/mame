@@ -123,23 +123,25 @@ Some bugs left :
 /* Memory is banked in 16k blocks. However, the multiface
 pages the memory in 8k blocks! The ROM can
 be paged into bank 0 and bank 3. */
-ADDRESS_MAP_START(amstrad_state::amstrad_mem)
-	AM_RANGE(0x00000, 0x01fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank9")
-	AM_RANGE(0x02000, 0x03fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank10")
-	AM_RANGE(0x04000, 0x05fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank11")
-	AM_RANGE(0x06000, 0x07fff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank12")
-	AM_RANGE(0x08000, 0x09fff) AM_READ_BANK("bank5") AM_WRITE_BANK("bank13")
-	AM_RANGE(0x0a000, 0x0bfff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank14")
-	AM_RANGE(0x0c000, 0x0dfff) AM_READ_BANK("bank7") AM_WRITE_BANK("bank15")
-	AM_RANGE(0x0e000, 0x0ffff) AM_READ_BANK("bank8") AM_WRITE_BANK("bank16")
-ADDRESS_MAP_END
+void amstrad_state::amstrad_mem(address_map &map)
+{
+	map(0x00000, 0x01fff).bankr("bank1").bankw("bank9");
+	map(0x02000, 0x03fff).bankr("bank2").bankw("bank10");
+	map(0x04000, 0x05fff).bankr("bank3").bankw("bank11");
+	map(0x06000, 0x07fff).bankr("bank4").bankw("bank12");
+	map(0x08000, 0x09fff).bankr("bank5").bankw("bank13");
+	map(0x0a000, 0x0bfff).bankr("bank6").bankw("bank14");
+	map(0x0c000, 0x0dfff).bankr("bank7").bankw("bank15");
+	map(0x0e000, 0x0ffff).bankr("bank8").bankw("bank16");
+}
 
 /* I've handled the I/O ports in this way, because the ports
 are not fully decoded by the CPC h/w. Doing it this way means
 I can decode it myself and a lot of  software should work */
-ADDRESS_MAP_START(amstrad_state::amstrad_io)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(amstrad_cpc_io_r, amstrad_cpc_io_w )
-ADDRESS_MAP_END
+void amstrad_state::amstrad_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(amstrad_state::amstrad_cpc_io_r), FUNC(amstrad_state::amstrad_cpc_io_w));
+}
 
 
 /*************************************

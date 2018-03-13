@@ -61,27 +61,29 @@ WRITE8_MEMBER( pc4_state::beep_w )
 	m_beep->set_state(data&0x40);
 }
 
-ADDRESS_MAP_START(pc4_state::pc4_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("rombank")
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void pc4_state::pc4_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("rombank");
+	map(0x8000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(pc4_state::pc4_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(beep_w)
-	AM_RANGE(0x1fff, 0x1fff) AM_WRITE(bank_w)
+void pc4_state::pc4_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x000f).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
+	map(0x1000, 0x1000).w(this, FUNC(pc4_state::beep_w));
+	map(0x1fff, 0x1fff).w(this, FUNC(pc4_state::bank_w));
 
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(lcd_control_w)
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(lcd_data_w)
-	AM_RANGE(0x3002, 0x3002) AM_READ(lcd_control_r)
-	AM_RANGE(0x3003, 0x3003) AM_READ(lcd_data_r)
-	AM_RANGE(0x3005, 0x3005) AM_WRITE(lcd_offset_w)
+	map(0x3000, 0x3000).w(this, FUNC(pc4_state::lcd_control_w));
+	map(0x3001, 0x3001).w(this, FUNC(pc4_state::lcd_data_w));
+	map(0x3002, 0x3002).r(this, FUNC(pc4_state::lcd_control_r));
+	map(0x3003, 0x3003).r(this, FUNC(pc4_state::lcd_data_r));
+	map(0x3005, 0x3005).w(this, FUNC(pc4_state::lcd_offset_w));
 
 	//keyboard read, offset used as matrix
-	AM_RANGE(0x5000, 0x50ff) AM_READ(kb_r)
-ADDRESS_MAP_END
+	map(0x5000, 0x50ff).r(this, FUNC(pc4_state::kb_r));
+}
 
 static INPUT_PORTS_START( pc4 )
 	PORT_START("LINE0")

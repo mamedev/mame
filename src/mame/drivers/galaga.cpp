@@ -832,103 +832,110 @@ MACHINE_RESET_MEMBER(xevious_state,battles)
 
 
 /* the same memory map is used by all three CPUs; all RAM areas are shared */
-ADDRESS_MAP_START(bosco_state::bosco_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP         /* the only area different for each CPU */
-	AM_RANGE(0x6800, 0x6807) AM_READ(bosco_dsw_r)
-	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
-	AM_RANGE(0x6820, 0x6827) AM_DEVWRITE("misclatch", ls259_device, write_d0)
-	AM_RANGE(0x6830, 0x6830) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx_0", namco_06xx_device, data_r, data_w)
-	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx_0", namco_06xx_device, ctrl_r, ctrl_w)
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(bosco_videoram_w) AM_SHARE("videoram")/* + sprite registers */
-	AM_RANGE(0x9000, 0x90ff) AM_DEVREADWRITE("06xx_1", namco_06xx_device, data_r, data_w)
-	AM_RANGE(0x9100, 0x9100) AM_DEVREADWRITE("06xx_1", namco_06xx_device, ctrl_r, ctrl_w)
-	AM_RANGE(0x9800, 0x980f) AM_WRITEONLY AM_SHARE("bosco_radarattr")
-	AM_RANGE(0x9810, 0x9810) AM_WRITE(bosco_scrollx_w)
-	AM_RANGE(0x9820, 0x9820) AM_WRITE(bosco_scrolly_w)
-	AM_RANGE(0x9830, 0x9830) AM_WRITEONLY AM_SHARE("starcontrol")
-	AM_RANGE(0x9840, 0x9840) AM_WRITE(bosco_starclr_w)
-	AM_RANGE(0x9870, 0x9877) AM_DEVWRITE("videolatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void bosco_state::bosco_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().nopw();         /* the only area different for each CPU */
+	map(0x6800, 0x6807).r(this, FUNC(bosco_state::bosco_dsw_r));
+	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x6820, 0x6827).w("misclatch", FUNC(ls259_device::write_d0));
+	map(0x6830, 0x6830).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x7000, 0x70ff).rw("06xx_0", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
+	map(0x7100, 0x7100).rw("06xx_0", FUNC(namco_06xx_device::ctrl_r), FUNC(namco_06xx_device::ctrl_w));
+	map(0x7800, 0x7fff).ram().share("share1");
+	map(0x8000, 0x8fff).ram().w(this, FUNC(bosco_state::bosco_videoram_w)).share("videoram");/* + sprite registers */
+	map(0x9000, 0x90ff).rw("06xx_1", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
+	map(0x9100, 0x9100).rw("06xx_1", FUNC(namco_06xx_device::ctrl_r), FUNC(namco_06xx_device::ctrl_w));
+	map(0x9800, 0x980f).writeonly().share("bosco_radarattr");
+	map(0x9810, 0x9810).w(this, FUNC(bosco_state::bosco_scrollx_w));
+	map(0x9820, 0x9820).w(this, FUNC(bosco_state::bosco_scrolly_w));
+	map(0x9830, 0x9830).writeonly().share("starcontrol");
+	map(0x9840, 0x9840).w(this, FUNC(bosco_state::bosco_starclr_w));
+	map(0x9870, 0x9877).w(m_videolatch, FUNC(ls259_device::write_d0));
+}
 
 
-ADDRESS_MAP_START(galaga_state::galaga_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP         /* the only area different for each CPU */
-	AM_RANGE(0x6800, 0x6807) AM_READ(bosco_dsw_r)
-	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
-	AM_RANGE(0x6820, 0x6827) AM_DEVWRITE("misclatch", ls259_device, write_d0)
-	AM_RANGE(0x6830, 0x6830) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx", namco_06xx_device, data_r, data_w)
-	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx", namco_06xx_device, ctrl_r, ctrl_w)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(galaga_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE("galaga_ram1")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("galaga_ram2")
-	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("galaga_ram3")
-	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("videolatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void galaga_state::galaga_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().nopw();         /* the only area different for each CPU */
+	map(0x6800, 0x6807).r(this, FUNC(galaga_state::bosco_dsw_r));
+	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x6820, 0x6827).w("misclatch", FUNC(ls259_device::write_d0));
+	map(0x6830, 0x6830).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x7000, 0x70ff).rw("06xx", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
+	map(0x7100, 0x7100).rw("06xx", FUNC(namco_06xx_device::ctrl_r), FUNC(namco_06xx_device::ctrl_w));
+	map(0x8000, 0x87ff).ram().w(this, FUNC(galaga_state::galaga_videoram_w)).share("videoram");
+	map(0x8800, 0x8bff).ram().share("galaga_ram1");
+	map(0x9000, 0x93ff).ram().share("galaga_ram2");
+	map(0x9800, 0x9bff).ram().share("galaga_ram3");
+	map(0xa000, 0xa007).w(m_videolatch, FUNC(ls259_device::write_d0));
+}
 
-ADDRESS_MAP_START(galaga_state::gatsbee_main_map)
-	AM_IMPORT_FROM(galaga_map)
-	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x3ff8) AM_DEVWRITE("extralatch", ls259_device, write_d0)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(xevious_state::xevious_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP         /* the only area different for each CPU */
-	AM_RANGE(0x6800, 0x6807) AM_READ(bosco_dsw_r)
-	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
-	AM_RANGE(0x6820, 0x6827) AM_DEVWRITE("misclatch", ls259_device, write_d0)
-	AM_RANGE(0x6830, 0x6830) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx", namco_06xx_device, data_r, data_w)
-	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx", namco_06xx_device, ctrl_r, ctrl_w)
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("share1")                          /* work RAM */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("xevious_sr1") /* work RAM + sprite registers */
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("xevious_sr2") /* work RAM + sprite registers */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("xevious_sr3") /* work RAM + sprite registers */
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(xevious_fg_colorram_w) AM_SHARE("fg_colorram")
-	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(xevious_bg_colorram_w) AM_SHARE("bg_colorram")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(xevious_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(xevious_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xd000, 0xd07f) AM_WRITE(xevious_vh_latch_w)
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(xevious_bb_r, xevious_bs_w)
-ADDRESS_MAP_END
+void galaga_state::gatsbee_main_map(address_map &map)
+{
+	galaga_map(map);
+	map(0x0000, 0x0007).mirror(0x3ff8).w("extralatch", FUNC(ls259_device::write_d0));
+}
 
 
-ADDRESS_MAP_START(digdug_state::digdug_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP         /* the only area different for each CPU */
-	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
-	AM_RANGE(0x6820, 0x6827) AM_DEVWRITE("misclatch", ls259_device, write_d0)
-	AM_RANGE(0x6830, 0x6830) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx", namco_06xx_device, data_r, data_w)
-	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx", namco_06xx_device, ctrl_r, ctrl_w)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(digdug_videoram_w) AM_SHARE("videoram") /* tilemap RAM (bottom half of RAM 0 */
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("share1")                          /* work RAM (top half for RAM 0 */
-	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE("digdug_objram")   /* work RAM + sprite registers */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("digdug_posram")   /* work RAM + sprite registers */
-	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("digdug_flpram")   /* work RAM + sprite registers */
-	AM_RANGE(0xa000, 0xa007) AM_READNOP AM_DEVWRITE("videolatch", ls259_device, write_d0)   /* video latches (spurious reads when setting latch bits) */
-	AM_RANGE(0xb800, 0xb83f) AM_DEVREADWRITE("earom", atari_vg_earom_device, read, write)   /* non volatile memory data */
-	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)                    /* non volatile memory control */
-ADDRESS_MAP_END
+void xevious_state::xevious_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().nopw();         /* the only area different for each CPU */
+	map(0x6800, 0x6807).r(this, FUNC(xevious_state::bosco_dsw_r));
+	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x6820, 0x6827).w("misclatch", FUNC(ls259_device::write_d0));
+	map(0x6830, 0x6830).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x7000, 0x70ff).rw("06xx", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
+	map(0x7100, 0x7100).rw("06xx", FUNC(namco_06xx_device::ctrl_r), FUNC(namco_06xx_device::ctrl_w));
+	map(0x7800, 0x7fff).ram().share("share1");                          /* work RAM */
+	map(0x8000, 0x87ff).ram().share("xevious_sr1"); /* work RAM + sprite registers */
+	map(0x9000, 0x97ff).ram().share("xevious_sr2"); /* work RAM + sprite registers */
+	map(0xa000, 0xa7ff).ram().share("xevious_sr3"); /* work RAM + sprite registers */
+	map(0xb000, 0xb7ff).ram().w(this, FUNC(xevious_state::xevious_fg_colorram_w)).share("fg_colorram");
+	map(0xb800, 0xbfff).ram().w(this, FUNC(xevious_state::xevious_bg_colorram_w)).share("bg_colorram");
+	map(0xc000, 0xc7ff).ram().w(this, FUNC(xevious_state::xevious_fg_videoram_w)).share("fg_videoram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(xevious_state::xevious_bg_videoram_w)).share("bg_videoram");
+	map(0xd000, 0xd07f).w(this, FUNC(xevious_state::xevious_vh_latch_w));
+	map(0xf000, 0xffff).rw(this, FUNC(xevious_state::xevious_bb_r), FUNC(xevious_state::xevious_bs_w));
+}
+
+
+void digdug_state::digdug_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().nopw();         /* the only area different for each CPU */
+	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x6820, 0x6827).w("misclatch", FUNC(ls259_device::write_d0));
+	map(0x6830, 0x6830).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x7000, 0x70ff).rw("06xx", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
+	map(0x7100, 0x7100).rw("06xx", FUNC(namco_06xx_device::ctrl_r), FUNC(namco_06xx_device::ctrl_w));
+	map(0x8000, 0x83ff).ram().w(this, FUNC(digdug_state::digdug_videoram_w)).share("videoram"); /* tilemap RAM (bottom half of RAM 0 */
+	map(0x8400, 0x87ff).ram().share("share1");                          /* work RAM (top half for RAM 0 */
+	map(0x8800, 0x8bff).ram().share("digdug_objram");   /* work RAM + sprite registers */
+	map(0x9000, 0x93ff).ram().share("digdug_posram");   /* work RAM + sprite registers */
+	map(0x9800, 0x9bff).ram().share("digdug_flpram");   /* work RAM + sprite registers */
+	map(0xa000, 0xa007).nopr().w(m_videolatch, FUNC(ls259_device::write_d0));   /* video latches (spurious reads when setting latch bits) */
+	map(0xb800, 0xb83f).rw("earom", FUNC(atari_vg_earom_device::read), FUNC(atari_vg_earom_device::write));   /* non volatile memory data */
+	map(0xb840, 0xb840).w("earom", FUNC(atari_vg_earom_device::ctrl_w));                    /* non volatile memory control */
+}
 
 
 
 /* bootleg 4th CPU replacing the 5xXX chips */
-ADDRESS_MAP_START(galaga_state::galaga_mem4)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x107f) AM_RAM
-ADDRESS_MAP_END
+void galaga_state::galaga_mem4(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x107f).ram();
+}
 
-ADDRESS_MAP_START(xevious_state::battles_mem4)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x4000, 0x4003) AM_READ(battles_input_port_r)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(battles_CPU4_coin_w)
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(battles_noise_sound_w)
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(battles_customio3_r, battles_customio3_w)
-	AM_RANGE(0x7000, 0x7000) AM_READWRITE(battles_customio_data3_r, battles_customio_data3_w)
-	AM_RANGE(0x8000, 0x80ff) AM_RAM
-ADDRESS_MAP_END
+void xevious_state::battles_mem4(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x4000, 0x4003).r(this, FUNC(xevious_state::battles_input_port_r));
+	map(0x4001, 0x4001).w(this, FUNC(xevious_state::battles_CPU4_coin_w));
+	map(0x5000, 0x5000).w(this, FUNC(xevious_state::battles_noise_sound_w));
+	map(0x6000, 0x6000).rw(this, FUNC(xevious_state::battles_customio3_r), FUNC(xevious_state::battles_customio3_w));
+	map(0x7000, 0x7000).rw(this, FUNC(xevious_state::battles_customio_data3_r), FUNC(xevious_state::battles_customio_data3_w));
+	map(0x8000, 0x80ff).ram();
+}
 
 ADDRESS_MAP_START(galaga_state::dzigzag_mem4)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM

@@ -71,30 +71,32 @@ ToDo:
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(zorba_state::zorba_mem)
-	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE( 0x4000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void zorba_state::zorba_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bankr0").bankw("bankw0");
+	map(0x4000, 0xffff).ram();
+}
 
 
-ADDRESS_MAP_START(zorba_state::zorba_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit", pit8254_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(rom_r, rom_w)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("crtc", i8275_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("uart0", i8251_device, data_r, data_w)
-	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("uart0", i8251_device, status_r, control_w)
-	AM_RANGE(0x22, 0x22) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	AM_RANGE(0x23, 0x23) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	AM_RANGE(0x24, 0x24) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
-	AM_RANGE(0x25, 0x25) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
-	AM_RANGE(0x26, 0x26) AM_WRITE(intmask_w)
-	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE("dma", z80dma_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-ADDRESS_MAP_END
+void zorba_state::zorba_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x04, 0x04).rw(this, FUNC(zorba_state::rom_r), FUNC(zorba_state::rom_w));
+	map(0x05, 0x05).rw(this, FUNC(zorba_state::ram_r), FUNC(zorba_state::ram_w));
+	map(0x10, 0x11).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0x20, 0x20).rw(m_uart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x21, 0x21).rw(m_uart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x22, 0x22).rw(m_uart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x23, 0x23).rw(m_uart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x24, 0x24).rw(m_uart2, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x25, 0x25).rw(m_uart2, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x26, 0x26).w(this, FUNC(zorba_state::intmask_w));
+	map(0x30, 0x30).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x40, 0x43).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x50, 0x53).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x60, 0x63).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+}
 
 namespace {
 

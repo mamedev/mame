@@ -116,55 +116,61 @@ private:
 };
 
 
-ADDRESS_MAP_START(mrgame_state::main_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x020000, 0x02ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x030000, 0x030001) AM_READ8(rsw_r, 0xff) //RSW ACK
-	AM_RANGE(0x030002, 0x030003) AM_WRITE8(sound_w, 0xff) //W SOUND
-	AM_RANGE(0x030004, 0x030005) AM_WRITE8(video_w, 0xff00) //W VID
-	AM_RANGE(0x030006, 0x030007) AM_WRITE8(triple_w, 0xff) //W CS
-	AM_RANGE(0x030008, 0x030009) AM_WRITENOP //W DATA - lamp/sol data
-	AM_RANGE(0x03000a, 0x03000b) AM_WRITE8(row_w, 0xff) //W ROW
-	AM_RANGE(0x03000c, 0x03000d) AM_READ8(col_r, 0xff) //R COL
-	AM_RANGE(0x03000e, 0x03000f) AM_WRITENOP //EXT ADD - lamp/sol data
-ADDRESS_MAP_END
+void mrgame_state::main_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom().region("roms", 0);
+	map(0x020000, 0x02ffff).ram().share("nvram");
+	map(0x030001, 0x030001).r(this, FUNC(mrgame_state::rsw_r)); //RSW ACK
+	map(0x030003, 0x030003).w(this, FUNC(mrgame_state::sound_w)); //W SOUND
+	map(0x030004, 0x030004).w(this, FUNC(mrgame_state::video_w)); //W VID
+	map(0x030007, 0x030007).w(this, FUNC(mrgame_state::triple_w)); //W CS
+	map(0x030008, 0x030009).nopw(); //W DATA - lamp/sol data
+	map(0x03000b, 0x03000b).w(this, FUNC(mrgame_state::row_w)); //W ROW
+	map(0x03000d, 0x03000d).r(this, FUNC(mrgame_state::col_r)); //R COL
+	map(0x03000e, 0x03000f).nopw(); //EXT ADD - lamp/sol data
+}
 
-ADDRESS_MAP_START(mrgame_state::video_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("video", 0)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("objectram")
-	AM_RANGE(0x6800, 0x6807) AM_MIRROR(0x07f8) AM_WRITE(video_ctrl_w)
-	AM_RANGE(0x7000, 0x77ff) AM_READNOP //AFR - looks like a watchdog
-	AM_RANGE(0x8100, 0x8103) AM_MIRROR(0x7efc) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-ADDRESS_MAP_END
+void mrgame_state::video_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("video", 0);
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().share("objectram");
+	map(0x6800, 0x6807).mirror(0x07f8).w(this, FUNC(mrgame_state::video_ctrl_w));
+	map(0x7000, 0x77ff).nopr(); //AFR - looks like a watchdog
+	map(0x8100, 0x8103).mirror(0x7efc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(mrgame_state::audio1_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("audio1", 0)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mrgame_state::audio1_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("audio1", 0);
+	map(0xfc00, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(mrgame_state::audio1_io)
-	ADDRESS_MAP_GLOBAL_MASK(3)
-	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("dacvol", dac_byte_interface, write) //DA1
-	AM_RANGE(0x0001, 0x0001) AM_READ(sound_r) //IN1
-	AM_RANGE(0x0002, 0x0002) AM_WRITE(ack1_w) //AKL1
-	AM_RANGE(0x0003, 0x0003) AM_WRITENOP //SGS pass data to M114
-ADDRESS_MAP_END
+void mrgame_state::audio1_io(address_map &map)
+{
+	map.global_mask(3);
+	map(0x0000, 0x0000).w("dacvol", FUNC(dac_byte_interface::write)); //DA1
+	map(0x0001, 0x0001).r(this, FUNC(mrgame_state::sound_r)); //IN1
+	map(0x0002, 0x0002).w(this, FUNC(mrgame_state::ack1_w)); //AKL1
+	map(0x0003, 0x0003).nopw(); //SGS pass data to M114
+}
 
-ADDRESS_MAP_START(mrgame_state::audio2_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("audio2", 0)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mrgame_state::audio2_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("audio2", 0);
+	map(0xfc00, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(mrgame_state::audio2_io)
-	ADDRESS_MAP_GLOBAL_MASK(7)
-	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("ldac", dac_byte_interface, write) //DA2
-	AM_RANGE(0x0001, 0x0001) AM_READ(sound_r) //IN2
-	AM_RANGE(0x0002, 0x0002) AM_WRITE(ack2_w) //AKL2
-	AM_RANGE(0x0003, 0x0003) AM_DEVREADWRITE("tms", tms5220_device, status_r, data_w) //Speech
-	AM_RANGE(0x0004, 0x0004) AM_DEVWRITE("rdac", dac_byte_interface, write) //DA3
-ADDRESS_MAP_END
+void mrgame_state::audio2_io(address_map &map)
+{
+	map.global_mask(7);
+	map(0x0000, 0x0000).w("ldac", FUNC(dac_byte_interface::write)); //DA2
+	map(0x0001, 0x0001).r(this, FUNC(mrgame_state::sound_r)); //IN2
+	map(0x0002, 0x0002).w(this, FUNC(mrgame_state::ack2_w)); //AKL2
+	map(0x0003, 0x0003).rw("tms", FUNC(tms5220_device::status_r), FUNC(tms5220_device::data_w)); //Speech
+	map(0x0004, 0x0004).w("rdac", FUNC(dac_byte_interface::write)); //DA3
+}
 
 static INPUT_PORTS_START( mrgame )
 	PORT_START("DSW0")

@@ -279,46 +279,50 @@ WRITE8_MEMBER(junofrst_state::i8039_irqen_and_status_w)
 }
 
 
-ADDRESS_MAP_START(junofrst_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0x800f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x8010, 0x8010) AM_READ_PORT("DSW2")
-	AM_RANGE(0x801c, 0x801c) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x8020, 0x8020) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x8024, 0x8024) AM_READ_PORT("P1")
-	AM_RANGE(0x8028, 0x8028) AM_READ_PORT("P2")
-	AM_RANGE(0x802c, 0x802c) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8030, 0x8037) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x8040, 0x8040) AM_WRITE(sh_irqtrigger_w)
-	AM_RANGE(0x8050, 0x8050) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x8060, 0x8060) AM_WRITE(bankselect_w)
-	AM_RANGE(0x8070, 0x8073) AM_WRITE(blitter_w)
-	AM_RANGE(0x8100, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void junofrst_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).ram().share("videoram");
+	map(0x8000, 0x800f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x8010, 0x8010).portr("DSW2");
+	map(0x801c, 0x801c).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8020, 0x8020).portr("SYSTEM");
+	map(0x8024, 0x8024).portr("P1");
+	map(0x8028, 0x8028).portr("P2");
+	map(0x802c, 0x802c).portr("DSW1");
+	map(0x8030, 0x8037).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x8040, 0x8040).w(this, FUNC(junofrst_state::sh_irqtrigger_w));
+	map(0x8050, 0x8050).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x8060, 0x8060).w(this, FUNC(junofrst_state::bankselect_w));
+	map(0x8070, 0x8073).w(this, FUNC(junofrst_state::blitter_w));
+	map(0x8100, 0x8fff).ram();
+	map(0x9000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(junofrst_state::audio_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(i8039_irq_w)
-ADDRESS_MAP_END
+void junofrst_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x4000, 0x4000).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x4001, 0x4001).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x4002, 0x4002).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x5000, 0x5000).w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0x6000, 0x6000).w(this, FUNC(junofrst_state::i8039_irq_w));
+}
 
 
-ADDRESS_MAP_START(junofrst_state::mcu_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void junofrst_state::mcu_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
 
-ADDRESS_MAP_START(junofrst_state::mcu_io_map)
-	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void junofrst_state::mcu_io_map(address_map &map)
+{
+	map(0x00, 0xff).r("soundlatch2", FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( junofrst )

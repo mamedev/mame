@@ -198,16 +198,17 @@ const tiny_rom_entry *epson_ex800_device::device_rom_region() const
 //  ADDRESS_MAP( ex800_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(epson_ex800_device::ex800_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM /* external RAM */
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_READWRITE(devsel_r, devsel_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(gate5a_r, gate5a_w)
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(iosel_r, iosel_w)
-	AM_RANGE(0xf000, 0xf001) AM_MIRROR(0x07fc) AM_READ(gate7a_r)
-	AM_RANGE(0xf002, 0xf003) AM_MIRROR(0x07fc) AM_WRITE(gate7a_w)
-	AM_RANGE(0xf800, 0xfeff) AM_NOP /* not connected */
-ADDRESS_MAP_END
+void epson_ex800_device::ex800_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0xbfff).ram(); /* external RAM */
+	map(0xc000, 0xc7ff).mirror(0x1800).rw(this, FUNC(epson_ex800_device::devsel_r), FUNC(epson_ex800_device::devsel_w));
+	map(0xe000, 0xe7ff).rw(this, FUNC(epson_ex800_device::gate5a_r), FUNC(epson_ex800_device::gate5a_w));
+	map(0xe800, 0xefff).rw(this, FUNC(epson_ex800_device::iosel_r), FUNC(epson_ex800_device::iosel_w));
+	map(0xf000, 0xf001).mirror(0x07fc).r(this, FUNC(epson_ex800_device::gate7a_r));
+	map(0xf002, 0xf003).mirror(0x07fc).w(this, FUNC(epson_ex800_device::gate7a_w));
+	map(0xf800, 0xfeff).noprw(); /* not connected */
+}
 
 
 //-------------------------------------------------

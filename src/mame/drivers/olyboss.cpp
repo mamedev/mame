@@ -162,38 +162,41 @@ void olyboss_state::device_timer(emu_timer &timer, device_timer_id id, int param
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(olyboss_state::olyboss_mem)
-	AM_RANGE(0x0000, 0x7ff ) AM_READWRITE(rom_r, rom_w) AM_SHARE("lowram")
-	AM_RANGE(0x800,  0xffff) AM_RAM
-ADDRESS_MAP_END
+void olyboss_state::olyboss_mem(address_map &map)
+{
+	map(0x0000, 0x7ff).rw(this, FUNC(olyboss_state::rom_r), FUNC(olyboss_state::rom_w)).share("lowram");
+	map(0x800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(olyboss_state::olyboss_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0, 0x8) AM_DEVREADWRITE(I8257_TAG, i8257_device, read, write)
-	AM_RANGE(0x10, 0x11) AM_DEVICE("fdc", upd765a_device, map)
+void olyboss_state::olyboss_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x0, 0x8).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x10, 0x11).m(m_fdc, FUNC(upd765a_device::map));
 	//AM_RANGE(0x20, 0x20) //beeper?
-	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE("uic", am9519_device, data_r, data_w)
-	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("uic", am9519_device, stat_r, cmd_w)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppi", i8255_device, read, write)
+	map(0x30, 0x30).rw(m_uic, FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
+	map(0x31, 0x31).rw(m_uic, FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
+	map(0x40, 0x43).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	//AM_RANGE(0x50, 0x53) COM2651
-	AM_RANGE(0x60, 0x60) AM_READWRITE(fdcctrl_r, fdcctrl_w)
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE(UPD3301_TAG, upd3301_device, read, write)
-	AM_RANGE(0x82, 0x84) AM_WRITE(vchrmap_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(vchrram_w)
-ADDRESS_MAP_END
+	map(0x60, 0x60).rw(this, FUNC(olyboss_state::fdcctrl_r), FUNC(olyboss_state::fdcctrl_w));
+	map(0x80, 0x81).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
+	map(0x82, 0x84).w(this, FUNC(olyboss_state::vchrmap_w));
+	map(0x90, 0x9f).w(this, FUNC(olyboss_state::vchrram_w));
+}
 
-ADDRESS_MAP_START(olyboss_state::olyboss85_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0, 0x8) AM_DEVREADWRITE(I8257_TAG, i8257_device, read, write)
-	AM_RANGE(0x10, 0x11) AM_DEVICE("fdc", upd765a_device, map)
-	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE(UPD3301_TAG, upd3301_device, read, write)
-	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("pic", pic8259_device, read, write)
-	AM_RANGE(0x42, 0x42) AM_READ(keyboard_read)
-	AM_RANGE(0x42, 0x44) AM_WRITE(vchrram85_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE(fdcctrl85_w)
-ADDRESS_MAP_END
+void olyboss_state::olyboss85_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x0, 0x8).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x10, 0x11).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x20, 0x21).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
+	map(0x30, 0x31).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x42, 0x42).r(this, FUNC(olyboss_state::keyboard_read));
+	map(0x42, 0x44).w(this, FUNC(olyboss_state::vchrram85_w));
+	map(0x45, 0x45).w(this, FUNC(olyboss_state::fdcctrl85_w));
+}
 
 static INPUT_PORTS_START( olyboss )
 	PORT_START("DSW")

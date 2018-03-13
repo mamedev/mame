@@ -285,12 +285,13 @@ void md6802_state::machine_reset()
 }
 
 // This address map is traced from schema
-ADDRESS_MAP_START(md6802_state::md6802_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE(PIA1_TAG, pia6821_device, read, write) AM_MIRROR(0x1ffc)
-	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE(PIA2_TAG, pia6821_device, read, write) AM_MIRROR(0x1ffc)
-	AM_RANGE(0xe000, 0xe7ff) AM_ROM AM_MIRROR(0x1800) AM_REGION("maincpu", 0xe000)
-ADDRESS_MAP_END
+void md6802_state::md6802_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().mirror(0x1800);
+	map(0xa000, 0xa003).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).mirror(0x1ffc);
+	map(0xc000, 0xc003).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).mirror(0x1ffc);
+	map(0xe000, 0xe7ff).rom().mirror(0x1800).region("maincpu", 0xe000);
+}
 
 /*
  *  ___________________________________________________________________________________________________________           _____________________________________________________
@@ -477,13 +478,14 @@ void mp68a_state::machine_start()
 }
 
 // This address map is traced from pcb
-ADDRESS_MAP_START(mp68a_state::mp68a_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0xf000)
-	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE(PIA1_TAG, pia6820_device, read, write) AM_MIRROR(0xf0fc)
-	AM_RANGE(0x0600, 0x0603) AM_DEVREADWRITE(PIA2_TAG, pia6820_device, read, write) AM_MIRROR(0xf0fc)
-	AM_RANGE(0x0700, 0x07ff) AM_RAM AM_MIRROR(0xf000)
-	AM_RANGE(0x0800, 0x0bff) AM_ROM AM_MIRROR(0xf400) AM_REGION("maincpu", 0x0800)
-ADDRESS_MAP_END
+void mp68a_state::mp68a_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().mirror(0xf000);
+	map(0x0500, 0x0503).rw(m_pia1, FUNC(pia6820_device::read), FUNC(pia6820_device::write)).mirror(0xf0fc);
+	map(0x0600, 0x0603).rw(m_pia2, FUNC(pia6820_device::read), FUNC(pia6820_device::write)).mirror(0xf0fc);
+	map(0x0700, 0x07ff).ram().mirror(0xf000);
+	map(0x0800, 0x0bff).rom().mirror(0xf400).region("maincpu", 0x0800);
+}
 
 static INPUT_PORTS_START( md6802 )
 	PORT_START("LINE0") /* KEY ROW 0 */

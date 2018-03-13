@@ -47,9 +47,10 @@ ROM_END
 //  ADDRESS_MAP
 //-------------------------------------------------
 
-ADDRESS_MAP_START(ms7004_device::ms7004_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void ms7004_device::ms7004_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
 
 
 //-------------------------------------------------

@@ -206,19 +206,21 @@ void spacefb_state::machine_reset()
  *
  *************************************/
 
-ADDRESS_MAP_START(spacefb_state::spacefb_main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x3c00) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_NOP
-ADDRESS_MAP_END
+void spacefb_state::spacefb_main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).noprw();
+	map(0x8000, 0x83ff).mirror(0x3c00).ram().share("videoram");
+	map(0xc000, 0xc7ff).mirror(0x3000).ram();
+	map(0xc800, 0xcfff).mirror(0x3000).noprw();
+}
 
 
-ADDRESS_MAP_START(spacefb_state::spacefb_audio_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-ADDRESS_MAP_END
+void spacefb_state::spacefb_audio_map(address_map &map)
+{
+	map.global_mask(0x3ff);
+	map(0x0000, 0x03ff).rom();
+}
 
 
 
@@ -228,19 +230,20 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(spacefb_state::spacefb_main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW")
-	AM_RANGE(0x04, 0x07) AM_READNOP  /* yes, this is correct (1-of-8 decoder) */
+void spacefb_state::spacefb_main_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).portr("P1");
+	map(0x01, 0x01).portr("P2");
+	map(0x02, 0x02).portr("SYSTEM");
+	map(0x03, 0x03).portr("DSW");
+	map(0x04, 0x07).nopr();  /* yes, this is correct (1-of-8 decoder) */
 
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_WRITE(port_0_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_WRITE(port_1_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_WRITE(port_2_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_WRITENOP
-ADDRESS_MAP_END
+	map(0x00, 0x00).mirror(0x04).w(this, FUNC(spacefb_state::port_0_w));
+	map(0x01, 0x01).mirror(0x04).w(this, FUNC(spacefb_state::port_1_w));
+	map(0x02, 0x02).mirror(0x04).w(this, FUNC(spacefb_state::port_2_w));
+	map(0x03, 0x03).mirror(0x04).nopw();
+}
 
 
 

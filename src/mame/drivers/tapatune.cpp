@@ -280,41 +280,44 @@ READ8_MEMBER(tapatune_state::read_data_from_68k)
  *
  *************************************/
 
-ADDRESS_MAP_START(tapatune_state::video_map)
-	AM_RANGE(0x000000, 0x2fffff) AM_ROM
-	AM_RANGE(0x300000, 0x31ffff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x320000, 0x33ffff) AM_RAM
-	AM_RANGE(0x400000, 0x400003) AM_READWRITE(read_from_z80, write_to_z80)
-	AM_RANGE(0x400010, 0x400011) AM_NOP // Watchdog?
-	AM_RANGE(0x600000, 0x600005) AM_WRITE(palette_w)
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0xff00)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
-ADDRESS_MAP_END
+void tapatune_state::video_map(address_map &map)
+{
+	map(0x000000, 0x2fffff).rom();
+	map(0x300000, 0x31ffff).ram().share("videoram");
+	map(0x320000, 0x33ffff).ram();
+	map(0x400000, 0x400003).rw(this, FUNC(tapatune_state::read_from_z80), FUNC(tapatune_state::write_to_z80));
+	map(0x400010, 0x400011).noprw(); // Watchdog?
+	map(0x600000, 0x600005).w(this, FUNC(tapatune_state::palette_w));
+	map(0x800000, 0x800000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x800002, 0x800002).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
 
 
-ADDRESS_MAP_START(tapatune_state::maincpu_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void tapatune_state::maincpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().nopw();
+	map(0xe000, 0xffff).ram().share("nvram");
+}
 
 
-ADDRESS_MAP_START(tapatune_state::maincpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(bsmt_data_lo_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(bsmt_data_hi_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(bsmt_reg_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(controls_mux)
-	AM_RANGE(0x20, 0x20) AM_READ(sound_irq_clear)
-	AM_RANGE(0x28, 0x28) AM_READ(status_r)
-	AM_RANGE(0x30, 0x30) AM_READ(controls_r)
-	AM_RANGE(0x38, 0x38) AM_READ_PORT("COINS")
-	AM_RANGE(0x60, 0x60) AM_WRITE(write_index_to_68k)
-	AM_RANGE(0x61, 0x61) AM_WRITE(write_data_to_68k)
-	AM_RANGE(0x63, 0x63) AM_WRITE(lamps_w)
-	AM_RANGE(0x68, 0x68) AM_READ(read_index_from_68k)
-	AM_RANGE(0x69, 0x69) AM_READ(read_data_from_68k)
-	AM_RANGE(0x6b, 0x6b) AM_READ(special_r)
-ADDRESS_MAP_END
+void tapatune_state::maincpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(tapatune_state::bsmt_data_lo_w));
+	map(0x08, 0x08).w(this, FUNC(tapatune_state::bsmt_data_hi_w));
+	map(0x10, 0x10).w(this, FUNC(tapatune_state::bsmt_reg_w));
+	map(0x18, 0x18).w(this, FUNC(tapatune_state::controls_mux));
+	map(0x20, 0x20).r(this, FUNC(tapatune_state::sound_irq_clear));
+	map(0x28, 0x28).r(this, FUNC(tapatune_state::status_r));
+	map(0x30, 0x30).r(this, FUNC(tapatune_state::controls_r));
+	map(0x38, 0x38).portr("COINS");
+	map(0x60, 0x60).w(this, FUNC(tapatune_state::write_index_to_68k));
+	map(0x61, 0x61).w(this, FUNC(tapatune_state::write_data_to_68k));
+	map(0x63, 0x63).w(this, FUNC(tapatune_state::lamps_w));
+	map(0x68, 0x68).r(this, FUNC(tapatune_state::read_index_from_68k));
+	map(0x69, 0x69).r(this, FUNC(tapatune_state::read_data_from_68k));
+	map(0x6b, 0x6b).r(this, FUNC(tapatune_state::special_r));
+}
 
 
 /*************************************

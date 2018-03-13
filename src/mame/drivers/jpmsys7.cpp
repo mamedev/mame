@@ -42,14 +42,15 @@ protected:
 };
 
 
-ADDRESS_MAP_START(jpmsys7_state::jpmsys7_map)
-	AM_RANGE(0x00000000, 0x002fffff) AM_ROM
-	AM_RANGE(0x10000000, 0x1000ffff) AM_RAM
-	AM_RANGE(0x20000018, 0x2000001b) AM_WRITENOP // large data upload like astra/pluto?
-	AM_RANGE(0x50000000, 0x50001fff) AM_RAM
+void jpmsys7_state::jpmsys7_map(address_map &map)
+{
+	map(0x00000000, 0x002fffff).rom();
+	map(0x10000000, 0x1000ffff).ram();
+	map(0x20000018, 0x2000001b).nopw(); // large data upload like astra/pluto?
+	map(0x50000000, 0x50001fff).ram();
 
-	AM_RANGE(0xf0000000, 0xf00003ff) AM_DEVREADWRITE("maincpu_onboard", mcf5206e_peripheral_device, dev_r, dev_w) // technically this can be moved with MBAR
-ADDRESS_MAP_END
+	map(0xf0000000, 0xf00003ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
+}
 
 static INPUT_PORTS_START(  jpmsys7 )
 INPUT_PORTS_END

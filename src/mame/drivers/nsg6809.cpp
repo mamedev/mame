@@ -54,13 +54,14 @@ public:
 };
 
 
-ADDRESS_MAP_START(nsg6809_state::main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2800, 0x280f) AM_DEVREADWRITE("via", via6522_device, read, write)
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("acia", mos6551_device, read, write)
-	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE("deadman", watchdog_timer_device, reset_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void nsg6809_state::main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2800, 0x280f).rw("via", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x3000, 0x3003).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x3e00, 0x3e00).w("deadman", FUNC(watchdog_timer_device::reset_w));
+	map(0x8000, 0xffff).rom().region("maincpu", 0);
+}
 
 static INPUT_PORTS_START( pitchhit )
 INPUT_PORTS_END

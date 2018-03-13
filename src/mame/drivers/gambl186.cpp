@@ -360,30 +360,32 @@ WRITE16_MEMBER(gambl186_state::upd_w)
 //  m_upd7759->start_w(1);
 }
 
-ADDRESS_MAP_START(gambl186_state::gambl186_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x7ffff) AM_ROMBANK("data_bank")
-	AM_RANGE(0xa0000, 0xbffff) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffff)
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("ipl",0)
-ADDRESS_MAP_END
+void gambl186_state::gambl186_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram().share("nvram");
+	map(0x40000, 0x7ffff).bankr("data_bank");
+	map(0xa0000, 0xbffff).rw("vga", FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
+	map(0xc0000, 0xfffff).rom().region("ipl", 0);
+}
 
-ADDRESS_MAP_START(gambl186_state::gambl186_io)
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, 0xffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03c0_r, port_03c0_w, 0xffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03d0_r, port_03d0_w, 0xffff)
-	AM_RANGE(0x0400, 0x0401) AM_WRITE(upd_w)      // upd7759 sample index/input
-	AM_RANGE(0x0500, 0x0501) AM_READ_PORT("IN0")
-	AM_RANGE(0x0502, 0x0503) AM_READ_PORT("IN1")
-	AM_RANGE(0x0504, 0x0505) AM_READ_PORT("IN2")  // Seems to writes more upd7759 params in MSB...
+void gambl186_state::gambl186_io(address_map &map)
+{
+	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5428_device::port_03d0_r), FUNC(cirrus_gd5428_device::port_03d0_w));
+	map(0x0400, 0x0401).w(this, FUNC(gambl186_state::upd_w));      // upd7759 sample index/input
+	map(0x0500, 0x0501).portr("IN0");
+	map(0x0502, 0x0503).portr("IN1");
+	map(0x0504, 0x0505).portr("IN2");  // Seems to writes more upd7759 params in MSB...
 
 	//AM_RANGE(0x0500, 0x050f) AM_READ(unk_r)
-	AM_RANGE(0x0580, 0x0581) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0582, 0x0583) AM_READ_PORT("JOY")
-	AM_RANGE(0x0584, 0x0585) AM_READ_PORT("DSW0") AM_WRITENOP // Watchdog: bit 8
+	map(0x0580, 0x0581).portr("DSW1");
+	map(0x0582, 0x0583).portr("JOY");
+	map(0x0584, 0x0585).portr("DSW0").nopw(); // Watchdog: bit 8
 //  AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
-	AM_RANGE(0x0680, 0x0683) AM_READWRITE(comms_r, comms_w)
-	AM_RANGE(0x0700, 0x0701) AM_WRITE(data_bank_w)
-ADDRESS_MAP_END
+	map(0x0680, 0x0683).rw(this, FUNC(gambl186_state::comms_r), FUNC(gambl186_state::comms_w));
+	map(0x0700, 0x0701).w(this, FUNC(gambl186_state::data_bank_w));
+}
 
 
 

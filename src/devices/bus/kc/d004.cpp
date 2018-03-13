@@ -22,32 +22,35 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-ADDRESS_MAP_START(kc_d004_device::kc_d004_mem)
-	AM_RANGE(0x0000, 0xfbff) AM_RAM
-	AM_RANGE(0xfc00, 0xffff) AM_RAM     AM_SHARE("koppelram")
-ADDRESS_MAP_END
+void kc_d004_device::kc_d004_mem(address_map &map)
+{
+	map(0x0000, 0xfbff).ram();
+	map(0xfc00, 0xffff).ram().share("koppelram");
+}
 
-ADDRESS_MAP_START(kc_d004_device::kc_d004_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf1) AM_DEVICE(UPD765_TAG, upd765a_device, map)
-	AM_RANGE(0xf2, 0xf3) AM_DEVREADWRITE(UPD765_TAG, upd765a_device, mdma_r, mdma_w)
-	AM_RANGE(0xf4, 0xf4) AM_READ(hw_input_gate_r)
-	AM_RANGE(0xf6, 0xf7) AM_WRITE(fdd_select_w)
-	AM_RANGE(0xf8, 0xf9) AM_WRITE(hw_terminal_count_w)
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-ADDRESS_MAP_END
+void kc_d004_device::kc_d004_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xf0, 0xf1).m(UPD765_TAG, FUNC(upd765a_device::map));
+	map(0xf2, 0xf3).rw(UPD765_TAG, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
+	map(0xf4, 0xf4).r(this, FUNC(kc_d004_device::hw_input_gate_r));
+	map(0xf6, 0xf7).w(this, FUNC(kc_d004_device::fdd_select_w));
+	map(0xf8, 0xf9).w(this, FUNC(kc_d004_device::hw_terminal_count_w));
+	map(0xfc, 0xff).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
-ADDRESS_MAP_START(kc_d004_gide_device::kc_d004_gide_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(gide_r, gide_w)
-	AM_RANGE(0x00f0, 0x00f1) AM_MIRROR(0xff00)  AM_DEVICE(UPD765_TAG, upd765a_device, map)
-	AM_RANGE(0x00f2, 0x00f3) AM_MIRROR(0xff00)  AM_DEVREADWRITE(UPD765_TAG, upd765a_device, mdma_r, mdma_w)
-	AM_RANGE(0x00f4, 0x00f4) AM_MIRROR(0xff00)  AM_READ(hw_input_gate_r)
-	AM_RANGE(0x00f6, 0x00f7) AM_MIRROR(0xff00)  AM_WRITE(fdd_select_w)
-	AM_RANGE(0x00f8, 0x00f9) AM_MIRROR(0xff00)  AM_WRITE(hw_terminal_count_w)
-	AM_RANGE(0x00fc, 0x00ff) AM_MIRROR(0xff00)  AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-ADDRESS_MAP_END
+void kc_d004_gide_device::kc_d004_gide_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(kc_d004_gide_device::gide_r), FUNC(kc_d004_gide_device::gide_w));
+	map(0x00f0, 0x00f1).mirror(0xff00).m(UPD765_TAG, FUNC(upd765a_device::map));
+	map(0x00f2, 0x00f3).mirror(0xff00).rw(UPD765_TAG, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
+	map(0x00f4, 0x00f4).mirror(0xff00).r(this, FUNC(kc_d004_gide_device::hw_input_gate_r));
+	map(0x00f6, 0x00f7).mirror(0xff00).w(this, FUNC(kc_d004_gide_device::fdd_select_w));
+	map(0x00f8, 0x00f9).mirror(0xff00).w(this, FUNC(kc_d004_gide_device::hw_terminal_count_w));
+	map(0x00fc, 0x00ff).mirror(0xff00).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 FLOPPY_FORMATS_MEMBER( kc_d004_device::floppy_formats )
 	FLOPPY_KC85_FORMAT

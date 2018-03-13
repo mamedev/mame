@@ -114,14 +114,15 @@ WRITE8_MEMBER(redalert_state::redalert_ay8910_latch_2_w)
 	m_ay8910_latch_2 = data;
 }
 
-ADDRESS_MAP_START(redalert_state::redalert_audio_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0ffe) AM_READNOP AM_WRITE(redalert_AY8910_w)
-	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x0ffe) AM_READWRITE(redalert_ay8910_latch_1_r, redalert_ay8910_latch_2_w)
-	AM_RANGE(0x2000, 0x6fff) AM_NOP
-	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM
-ADDRESS_MAP_END
+void redalert_state::redalert_audio_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x03ff).mirror(0x0c00).ram();
+	map(0x1000, 0x1000).mirror(0x0ffe).nopr().w(this, FUNC(redalert_state::redalert_AY8910_w));
+	map(0x1001, 0x1001).mirror(0x0ffe).rw(this, FUNC(redalert_state::redalert_ay8910_latch_1_r), FUNC(redalert_state::redalert_ay8910_latch_2_w));
+	map(0x2000, 0x6fff).noprw();
+	map(0x7000, 0x77ff).mirror(0x0800).rom();
+}
 
 /*************************************
  *
@@ -161,12 +162,13 @@ READ_LINE_MEMBER(redalert_state::sid_callback)
 }
 
 
-ADDRESS_MAP_START(redalert_state::redalert_voice_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x3c00) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x3fff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITENOP
-ADDRESS_MAP_END
+void redalert_state::redalert_voice_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).noprw();
+	map(0x8000, 0x83ff).mirror(0x3c00).ram();
+	map(0xc000, 0xc000).mirror(0x3fff).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).nopw();
+}
 
 
 
@@ -313,12 +315,13 @@ WRITE8_MEMBER(redalert_state::demoneye_ay8910_data_w)
 }
 
 
-ADDRESS_MAP_START(redalert_state::demoneye_audio_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE("sndpia", pia6821_device, read, write)
-	AM_RANGE(0x2000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void redalert_state::demoneye_audio_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x007f).ram();
+	map(0x0500, 0x0503).rw("sndpia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2000, 0x3fff).rom();
+}
 
 
 /*************************************

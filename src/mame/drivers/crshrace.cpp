@@ -146,40 +146,43 @@ WRITE8_MEMBER(crshrace_state::crshrace_sh_bankswitch_w)
 }
 
 
-ADDRESS_MAP_START(crshrace_state::crshrace_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x300000, 0x3fffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("user2", 0) AM_MIRROR(0x100000)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xd00000, 0xd01fff) AM_RAM_WRITE(crshrace_videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xe00000, 0xe01fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM
-	AM_RANGE(0xffc000, 0xffc001) AM_WRITE(crshrace_roz_bank_w)
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(crshrace_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1") AM_WRITE(crshrace_gfxctrl_w)
-	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
-	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW0")
-	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("P3")
-	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
-	AM_RANGE(0xfff044, 0xfff047) AM_WRITEONLY   // ??? moves during race
-ADDRESS_MAP_END
+void crshrace_state::crshrace_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x300000, 0x3fffff).rom().region("user1", 0);
+	map(0x400000, 0x4fffff).rom().region("user2", 0).mirror(0x100000);
+	map(0xa00000, 0xa0ffff).ram().share("spriteram2");
+	map(0xd00000, 0xd01fff).ram().w(this, FUNC(crshrace_state::crshrace_videoram1_w)).share("videoram1");
+	map(0xe00000, 0xe01fff).ram().share("spriteram");
+	map(0xfe0000, 0xfeffff).ram();
+	map(0xffc000, 0xffc001).w(this, FUNC(crshrace_state::crshrace_roz_bank_w));
+	map(0xffd000, 0xffdfff).ram().w(this, FUNC(crshrace_state::crshrace_videoram2_w)).share("videoram2");
+	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfff000, 0xfff001).portr("P1").w(this, FUNC(crshrace_state::crshrace_gfxctrl_w));
+	map(0xfff002, 0xfff003).portr("P2");
+	map(0xfff004, 0xfff005).portr("DSW0");
+	map(0xfff006, 0xfff007).portr("DSW2");
+	map(0xfff009, 0xfff009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xfff00a, 0xfff00b).portr("DSW1");
+	map(0xfff00e, 0xfff00f).portr("P3");
+	map(0xfff020, 0xfff03f).w(m_k053936, FUNC(k053936_device::ctrl_w));
+	map(0xfff044, 0xfff047).writeonly();   // ??? moves during race
+}
 
-ADDRESS_MAP_START(crshrace_state::sound_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void crshrace_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(crshrace_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(crshrace_sh_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-ADDRESS_MAP_END
+void crshrace_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(crshrace_state::crshrace_sh_bankswitch_w));
+	map(0x04, 0x04).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+}
 
 
 static INPUT_PORTS_START( crshrace )

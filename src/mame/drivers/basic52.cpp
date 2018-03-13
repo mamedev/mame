@@ -60,23 +60,25 @@ private:
 };
 
 
-ADDRESS_MAP_START(basic52_state::basic52_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x7fff) AM_RAM
+void basic52_state::basic52_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x7fff).ram();
 	//AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
 	//AM_RANGE(0xc000, 0xdfff) // Expansion block
 	//AM_RANGE(0xe000, 0xffff) // Expansion block
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(basic52_state::basic52_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)  // PPI-8255
+void basic52_state::basic52_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0x9fff).rom(); // EPROM
+	map(0xa000, 0xa003).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));  // PPI-8255
 	//AM_RANGE(0xc000, 0xdfff) // Expansion block
 	//AM_RANGE(0xe000, 0xffff) // Expansion block
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( basic52 )
