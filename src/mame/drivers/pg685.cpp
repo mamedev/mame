@@ -107,6 +107,7 @@ public:
 		m_vram(*this, "framebuffer"),
 		m_vram16(*this, "framebuffer16"),
 		m_fontram(*this, "charcopy"),
+		m_bppit(*this, "bppit"),
 		m_fdc(*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1")
@@ -144,6 +145,7 @@ private:
 	optional_shared_ptr<uint8_t> m_vram;
 	optional_shared_ptr<uint16_t> m_vram16;
 	optional_shared_ptr<uint8_t> m_fontram;
+	optional_device<pit8253_device> m_bppit;
 	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
@@ -259,8 +261,10 @@ READ8_MEMBER(pg685_state::f9f33_r)
 
 WRITE8_MEMBER(pg685_state::f9f3e_w)
 {
-	// 00 written at startup
-	logerror("Writing %02X to F9F3E\n", data);
+	m_bppit->write_gate0(BIT(data, 6));
+	m_bppit->write_gate1(BIT(data, 7));
+
+	// On PC16-11, D5 is AND-ed with the PIT's OUT2, and other bits are used to select the baud rate for a 8251.
 }
 
 READ8_MEMBER(pg685_state::f9f3f_r)
@@ -390,11 +394,14 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 
 MACHINE_CONFIG_START(pg685_state::pg685_backplane)
 	MCFG_DEVICE_ADD("bppit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL(12'288'000) / 10) // same input clock as for PC16-11?
+	MCFG_PIT8253_CLK1(XTAL(12'288'000) / 10)
+	MCFG_PIT8253_CLK2(XTAL(12'288'000) / 10)
 
 	MCFG_DEVICE_ADD("bppic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(NOOP) // ???
+	MCFG_PIC8259_OUT_INT_CB(NOOP) // configured in single 8086 mode?
 
-	MCFG_DEVICE_ADD("bpuart", MC2661, XTAL(4'915'200)) // internal clock
+	MCFG_DEVICE_ADD("bpuart", MC2661, 4915200)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pg685_state::pg685_module)
