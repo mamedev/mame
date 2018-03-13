@@ -26,27 +26,19 @@
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
-#define LOG_READ    0x08
-#define LOG_BIT     0x10
-#define LOG_DR      0x20
-#define LOG_INT     0x40
+#define LOG_READ    0x04
+#define LOG_BIT     0x08
+#define LOG_DR      0x10
+#define LOG_INT     0x20
 
-#define VERBOSE 0 //(LOG_PRINTF | LOG_SETUP | LOG_GENERAL | LOG_INT | LOG_BIT | LOG_DR)
+#define VERBOSE 0 //(LOG_SETUP | LOG_GENERAL | LOG_INT | LOG_BIT | LOG_DR)
+#include "logmacro.h"
 
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
-
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-#define LOGR(...)     LOGMASK(LOG_READ,    __VA_ARGS__)
-#define LOGBIT(...)   LOGMASK(LOG_BIT,     __VA_ARGS__)
-#define LOGDR(...)    LOGMASK(LOG_DR,      __VA_ARGS__)
-#define LOGINT(...)   LOGMASK(LOG_INT,     __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
+#define LOGR(...)     LOGMASKED(LOG_READ,  __VA_ARGS__)
+#define LOGBIT(...)   LOGMASKED(LOG_BIT,   __VA_ARGS__)
+#define LOGDR(...)    LOGMASKED(LOG_DR,    __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -687,7 +679,6 @@ void pit68230_device::wr_pitreg_tcr(uint8_t data)
 	else
 	{
 		pit_timer->adjust(attotime::never, TIMER_ID_PIT, attotime::never);
-		m_tcr = tout + tiack + irq + sqr; // remove this when the variables are used for the different modes!! Just here to to avoid warnings
 	}
 }
 

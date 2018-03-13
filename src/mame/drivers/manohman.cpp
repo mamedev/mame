@@ -173,8 +173,12 @@ void manohman_state::machine_start()
 
 IRQ_CALLBACK_MEMBER(manohman_state::iack_handler)
 {
-	// TODO: fetch 68230 vector
-	return m_duart->get_irq_vector();
+	if (irqline >= M68K_IRQ_4)
+		return m_duart->get_irq_vector();
+	else if (irqline >= M68K_IRQ_2)
+		return m_pit->irq_tiack();
+	else
+		return M68K_INT_ACK_SPURIOUS; // doesn't really matter
 }
 
 
@@ -189,6 +193,8 @@ ADDRESS_MAP_START(manohman_state::mem_map)
 	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff) AM_READNOP
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("nvram") //work RAM
+	AM_RANGE(0x600002, 0x600003) AM_WRITENOP // output through shift register?
+	AM_RANGE(0x600004, 0x600005) AM_READNOP
 	AM_RANGE(0x600006, 0x600007) AM_NOP //(r) is discarded (watchdog?)
 ADDRESS_MAP_END
 
@@ -242,6 +248,7 @@ MACHINE_CONFIG_START(manohman_state::manohman)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(manohman_state, iack_handler)
 
 	MCFG_DEVICE_ADD("pit", PIT68230, XTAL(8'000'000)) // MC68230P8
+	MCFG_PIT68230_TIMER_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_2))
 
 	MCFG_DEVICE_ADD("duart", MC68681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
