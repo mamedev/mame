@@ -32927,6 +32927,9 @@ rvoicepc                        //
 @source:rx78.cpp
 rx78                            //
 
+@source:rz1.cpp
+rz1								// 1986 Casio
+
 @source:rzone.cpp
 rzbatfor                        //
 rzindy500                       //
