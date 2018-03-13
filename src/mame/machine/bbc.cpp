@@ -1017,32 +1017,6 @@ READ8_MEMBER(bbc_state::bbcb_via_system_read_portb)
 }
 
 
-/**********************************************************************
-USER VIA
-Port A output is buffered before being connected to the printer connector.
-This means that they can only be operated as output lines.
-CA1 is pulled high by a 4K7 resistor. CA1 normally acts as an acknowledge
-line when a printer is used. CA2 is buffered so that it has become an open
-collector output only. It usually acts as the printer strobe line.
-***********************************************************************/
-
-/* USER VIA 6522 port B is connected to the BBC user port */
-READ8_MEMBER(bbc_state::bbcb_via_user_read_portb)
-{
-	// D0 of portb is joystick FIRE (Compact)
-	// D1 of portb is joystick LEFT (Compact)
-	// D2 of portb is joystick DOWN (Compact)
-	// D3 of portb is joystick UP (Compact)
-	// D4 of portb is joystick RIGHT (Compact)
-	return ((m_joyport ? m_joyport->pb_r() : 0x1f) | 0xe0);
-}
-
-WRITE8_MEMBER(bbc_state::bbcb_via_user_write_portb)
-{
-	m_userport = data;
-}
-
-
 /**************************************
 BBC Joystick Support
 **************************************/

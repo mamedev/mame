@@ -178,8 +178,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_portb);
 	DECLARE_READ8_MEMBER(bbcb_via_system_read_porta);
 	DECLARE_READ8_MEMBER(bbcb_via_system_read_portb);
-	DECLARE_READ8_MEMBER(bbcb_via_user_read_portb);
-	DECLARE_WRITE8_MEMBER(bbcb_via_user_write_portb);
 	DECLARE_WRITE_LINE_MEMBER(bbc_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_de_changed);

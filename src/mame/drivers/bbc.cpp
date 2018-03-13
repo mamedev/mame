@@ -1648,6 +1648,12 @@ MACHINE_CONFIG_START(bbc_state::bbcmc)
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcmc)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcmc)
 
+	/* user via */
+	MCFG_DEVICE_MODIFY("via6522_1")
+	// TODO: Joyport connected to PB0-PB4 only. PB5-PB7 are expansion port.
+	MCFG_VIA6522_READPB_HANDLER(DEVREAD8("joyport", bbc_joyport_slot_device, pb_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(DEVWRITE8("joyport", bbc_joyport_slot_device, pb_w))
+
 	/* cartridge sockets */
 	MCFG_DEVICE_REMOVE("exp_rom1")
 	MCFG_DEVICE_REMOVE("exp_rom2")
@@ -1664,8 +1670,11 @@ MACHINE_CONFIG_START(bbc_state::bbcmc)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_pro128s", "pro128s_flop")
 
 	/* expansion ports */
+	MCFG_BBC_JOYPORT_ADD("joyport", bbc_joyport_devices, "joystick")
+	MCFG_BBC_JOYPORT_CB1_HANDLER(DEVWRITELINE("via6522_1", via6522_device, write_cb1))
+	MCFG_BBC_JOYPORT_CB2_HANDLER(DEVWRITELINE("via6522_1", via6522_device, write_cb2))
+
 	MCFG_DEVICE_REMOVE("analogue")
-	MCFG_COMPACT_JOYPORT_ADD("joyport", bbc_joyport_devices, "joystick")
 	MCFG_DEVICE_REMOVE("intube")
 	MCFG_DEVICE_REMOVE("extube")
 MACHINE_CONFIG_END
