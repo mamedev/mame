@@ -27,25 +27,29 @@ public:
 	eolith16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: eolith_state(mconfig, type, tag)
 		, m_special_io(*this, "SPECIAL")
+		, m_vram(*this, "vram", 16)
+		, m_vrambank(*this, "vrambank")
 	{
 	}
-		
-	required_ioport m_special_io;
 
-	std::unique_ptr<uint8_t[]> m_vram;
-	int m_vbuffer;
+	void eolith16(machine_config &config);
+
+	DECLARE_DRIVER_INIT(eolith16);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	required_ioport m_special_io;
+	required_shared_ptr<uint8_t> m_vram;
+	required_memory_bank m_vrambank;
 
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_READ16_MEMBER(eolith16_custom_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(vram_r);
 
-	DECLARE_DRIVER_INIT(eolith16);
-	DECLARE_VIDEO_START(eolith16);
 	DECLARE_PALETTE_INIT(eolith16);
 
 	uint32_t screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void eolith16(machine_config &config);
 	void eolith16_map(address_map &map);
 };
 
@@ -53,7 +57,7 @@ public:
 
 WRITE16_MEMBER(eolith16_state::eeprom_w)
 {
-	m_vbuffer = (data & 0x80) >> 7;
+	m_vrambank->set_entry(((data & 0x80) >> 7) ^ 1);
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 
 	m_eepromoutport->write(data, 0xff);
@@ -67,19 +71,9 @@ READ16_MEMBER(eolith16_state::eolith16_custom_r)
 	return m_special_io->read();
 }
 
-WRITE8_MEMBER(eolith16_state::vram_w)
-{
-	COMBINE_DATA(&m_vram[offset + 0x10000 * m_vbuffer]);
-}
-
-READ8_MEMBER(eolith16_state::vram_r)
-{
-	return m_vram[offset + 0x10000 * m_vbuffer];
-}
-
 ADDRESS_MAP_START(eolith16_state::eolith16_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
-	AM_RANGE(0x50000000, 0x5000ffff) AM_READWRITE8(vram_r, vram_w, 0xffff)
+	AM_RANGE(0x50000000, 0x5000ffff) AM_RAMBANK("vrambank") AM_SHARE("vram")
 	AM_RANGE(0x90000000, 0x9000002f) AM_WRITENOP //?
 	AM_RANGE(0xff000000, 0xff1fffff) AM_ROM AM_REGION("maindata", 0)
 	AM_RANGE(0xffe40000, 0xffe40001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -121,11 +115,10 @@ static INPUT_PORTS_START( eolith16 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 INPUT_PORTS_END
 
-VIDEO_START_MEMBER(eolith16_state,eolith16)
+void eolith16_state::video_start()
 {
-	m_vram = std::make_unique<uint8_t[]>(0x10000*2);
-	save_pointer(NAME(m_vram.get()), 0x10000*2);
-	save_item(NAME(m_vbuffer));
+	m_vrambank->configure_entries(0, 2, memshare("vram")->ptr(), 0x10000);
+	m_vrambank->set_entry(0);
 }
 
 uint32_t eolith16_state::screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -134,7 +127,7 @@ uint32_t eolith16_state::screen_update_eolith16(screen_device &screen, bitmap_in
 	{
 		for (int x = 0; x < 320; x++)
 		{
-			bitmap.pix16(y, x) = m_vram[0x10000 * (m_vbuffer ^ 1) + (y * 320) + x] & 0xff;
+			bitmap.pix16(y, x) = m_vram[(y * 320) + x] & 0xff;
 		}
 	}
 	return 0;
@@ -144,9 +137,7 @@ uint32_t eolith16_state::screen_update_eolith16(screen_device &screen, bitmap_in
 // setup a custom palette because pixels use 8 bits per color
 PALETTE_INIT_MEMBER(eolith16_state,eolith16)
 {
-	int c;
-
-	for (c = 0; c < 256; c++)
+	for (int c = 0; c < 256; c++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 		bit0 = (c >> 0) & 0x01;
@@ -167,7 +158,7 @@ PALETTE_INIT_MEMBER(eolith16_state,eolith16)
 
 
 MACHINE_CONFIG_START(eolith16_state::eolith16)
-	MCFG_CPU_ADD("maincpu", E116T, 60000000)        /* no internal multiplier */
+	MCFG_CPU_ADD("maincpu", E116T, XTAL(60'000'000))        /* no internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(eolith16_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith16_state, eolith_speedup, "screen", 0, 1)
 
@@ -185,11 +176,10 @@ MACHINE_CONFIG_START(eolith16_state::eolith16)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(eolith16_state,eolith16)
-	MCFG_VIDEO_START_OVERRIDE(eolith16_state,eolith16)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
