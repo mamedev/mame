@@ -2732,6 +2732,8 @@ MACHINE_CONFIG_END
 
 ADDRESS_MAP_START(model2_state::copro_tgpx4_map)
 	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("tgpx4_program")
+//	AM_RANGE(0x00400000, 0x007fffff) // bufferram
+//	AM_RANGE(0x00800000, 0x00ffffff) // ROM data
 ADDRESS_MAP_END
 
 /* 2C-CRX */
