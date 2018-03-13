@@ -2,6 +2,16 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
+TODO:
+
+Sort list by name
+Sort clones by region
+Make comments uniformly formatted
+Create easy-to-browse missing dumps list
+Check romanization of Japanese titles
+-->
+
+<!--
 This is a software list of the disc-based media released for the Sega Dreamcast.
 
 Much of the information in this softlist has been gathered from Sega Retro:
@@ -1082,11 +1092,23 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--
-	The Limited Edition (T-18705M) comes in a DVD-style case and includes an embroidered St. Kirigamori High School Emblem and an audio CD.
-
-	Redump have a complete dump available, preferably replace this with their dump.
+	<software name="after">
+		<description>After...: Wasureenu Kizuna (Jpn)</description>
+		<year>2004</year>
+		<publisher>Pionesoft</publisher>
+		<info name="serial" value="T-18706M"/>
+		<info name="release" value="20040226" />
+		<info name="alt_title" value="After... 〜忘れえぬ絆〜" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="after... wasureenu kizuna (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
 	-->
-	<software name="aftersg">
+
+	<!-- The Limited Edition (T-18705M) comes in a DVD-style case and includes an embroidered St. Kirigamori High School Emblem and an audio CD. -->
+	<software name="aftersg"> <!-- cloneof="after" -->
 		<!--
 		<rom name="After- - Wasureenu Kizuna (Japan) (Limited Edition).gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
 		<rom name="track01.bin" size="705600" md5="44920ffcbe0a3f2e39181d5bcf33432a" sha1="f36dc1960e47d47a9b7ae04cbc8867b6510675dd"/>
@@ -1105,31 +1127,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 				<disk name="after... wasureenu kizuna - shokai genteiban (jpn)" sha1="ce398638a22c7fd395cd0fc67b552392a02c5de7"/>
 			</diskarea>
 		</part>
-		<!--
 		<part interface="dc_gdrom" name="gdrom2">
 			<feature name="part_id" value="Kaze no Form"/>
 			<diskarea name="gdrom">
 				<disk name="after... wasureenu kizuna - shokai genteiban (jpn) (kaze no form)" status="nodump"/>
 			</diskarea>
 		</part>
-		-->
 	</software>
-
-	<!--
-	<software name="after" cloneof="aftersg">
-		<description>After...: Wasureenu Kizuna (Jpn)</description>
-		<year>2004</year>
-		<publisher>Pionesoft</publisher>
-		<info name="serial" value="T-18706M"/>
-		<info name="release" value="20040226" />
-		<info name="alt_title" value="After... 〜忘れえぬ絆〜" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
-				<disk name="after... wasureenu kizuna (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
-	-->
 
 	<!--
 	<rom name="Agartha-E3Demo.cdi" size="68002765" md5="55402ec7e3afc39c51f7348e7356d52a" sha1="fe0fa3c9a6c1d0df87b8169372e4c8c013e406df"/>
@@ -1481,7 +1485,21 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!--
-	<software name="alicedtce">
+	<software name="alicedt">
+		<description>Alice Dreams Tournament (USA)</description>
+		<year>2017</year>
+		<publisher>Alice Dreams</publisher>
+		<info name="release" value="20170218" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="alice dreams tournament (usa)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="alicedtce" cloneof="alicedt">
 		<description>Alice Dreams Tournament - Collector's Edition (USA)</description>
 		<year>2017</year>
 		<publisher>Alice Dreams</publisher>
@@ -1502,21 +1520,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!--
-	<software name="alicedt" cloneof="alicedtce">
-		<description>Alice Dreams Tournament (USA)</description>
-		<year>2017</year>
-		<publisher>Alice Dreams</publisher>
-		<info name="release" value="20170218" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
-				<disk name="alice dreams tournament (usa)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
-	-->
-
-	<!--
-	<software name="alicedte" cloneof="alicedtce">
+	<software name="alicedte" cloneof="alicedt">
 		<description>Alice Dreams Tournament (Euro)</description>
 		<year>2017</year>
 		<publisher>Alice Dreams</publisher>
@@ -1530,7 +1534,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!--
-	<software name="alicedtcee" cloneof="alicedtce">
+	<software name="alicedtcee" cloneof="alicedt">
 		<description>Alice Dreams Tournament - Collector's Edition (Euro)</description>
 		<year>2017</year>
 		<publisher>Alice Dreams</publisher>
@@ -1551,7 +1555,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!--
-	<software name="alicedtj" cloneof="alicedtce">
+	<software name="alicedtj" cloneof="alicedt">
 		<description>Alice Dreams Tournament (Jpn)</description>
 		<year>2017</year>
 		<publisher>Alice Dreams</publisher>
@@ -1565,7 +1569,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!--
-	<software name="alicedtcej" cloneof="alicedtce">
+	<software name="alicedtcej" cloneof="alicedt">
 		<description>Alice Dreams Tournament - Collector's Edition (Jpn)</description>
 		<year>2017</year>
 		<publisher>Alice Dreams</publisher>
@@ -1586,7 +1590,23 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!--
-	<software name="alicemomle">
+	<software name="alicemom">
+		<description>Alice's Mom's Rescue (World)</description>
+		<year>2015</year>
+		<publisher>Hucast</publisher>
+		<info name="serial" value="AMRRE-1"/>
+		<info name="release" value="20150209" />
+		<info name="alt_title" value="アリスの母親の救出" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="alice's mom's rescue (world)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="alicemomle" cloneof="alicemom">
 		<description>Alice's Mom's Rescue - Limited Edition (World)</description>
 		<year>2015</year>
 		<publisher>Hucast</publisher>
@@ -1602,22 +1622,6 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 			<diskarea name="gdrom">
 			<feature name="part_id" value="Alice OST"/>
 				<disk name="alice's mom's rescue - limited edition (world) (alice ost)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
-	-->
-
-	<!--
-	<software name="alicemom" cloneof="alicemomle">
-		<description>Alice's Mom's Rescue (World)</description>
-		<year>2015</year>
-		<publisher>Hucast</publisher>
-		<info name="serial" value="AMRRE-1"/>
-		<info name="release" value="20150209" />
-		<info name="alt_title" value="アリスの母親の救出" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
-				<disk name="alice's mom's rescue (world)" status="nodump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1808,7 +1812,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="aitdnnis" cloneof="aitdnn">
-		<description>Alone in the Dark: The New Nightmare (Ita / Spa)</description>
+		<description>Alone in the Dark: The New Nightmare (Ita, Spa)</description>
 		<year>2001</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="T-15112D-60"/>
@@ -1816,13 +1820,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="dc_gdrom" name="gdrom1">
 			<feature name="part_id" value="Disc 1"/>
 			<diskarea name="gdrom">
-				<disk name="alone in the dark the new nightmare (ita-spa) (disc 1)" status="nodump"/>
+				<disk name="alone in the dark the new nightmare (ita, spa) (disc 1)" status="nodump"/>
 			</diskarea>
 		</part>
 		<part interface="dc_gdrom" name="gdrom2">
 			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="gdrom">
-				<disk name="alone in the dark the new nightmare (ita-spa) (disc 2)" status="nodump"/>
+				<disk name="alone in the dark the new nightmare (ita, spa) (disc 2)" status="nodump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1862,9 +1866,29 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
+	<software name="anglwish">
+		<!-- http://redump.org/disc/44566/
+		<rom name="Angel Wish - Kimi no Egao ni Chu! (Japan).gdi" size="231" crc="f9ee0634" md5="24117dbab9c50fc3f70e1c612202296d" sha1="f214104fd65ca7a84b745b72361598f5440c1370"/>
+		<rom name="Angel Wish - Kimi no Egao ni Chu! (Japan) (Track 1).bin" size="705600" crc="296a7ea3" md5="ecb140b3f47b6d21dc6c7f259dbe6b06" sha1="3e848f351b063d27bea6c54ff4f02513667b4586"/>
+		<rom name="Angel Wish - Kimi no Egao ni Chu! (Japan) (Track 2).bin" size="2295552" crc="47dba3d6" md5="d03ec9a9fab111ba842b9c27663b8673" sha1="49a604931946b382e3aed0056a4266fe418cbf6f"/>
+		<rom name="Angel Wish - Kimi no Egao ni Chu! (Japan) (Track 3).bin" size="1185760800" crc="6fea9595" md5="72a70f5e59f6b6bfccb6e299e603edf4" sha1="cf36ae235bca28dcbdd8e0c8621bb5ac1e626c5e"/>
+		-->
+		<description>Angel Wish: Kimi no Egao ni Chu! (Jpn)</description>
+		<year>2005</year>
+		<publisher>Pionesoft</publisher>
+		<info name="serial" value="T-18712M"/>
+		<info name="release" value="20050224" />
+		<info name="ring_code" value="T-18712M-0922 2MS1 C 51"/>
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="angel wish kimi no egao ni chu! (jpn)" sha1="65c1da4807da03a1600219f5d90d8b725d190e98"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- The Limited Edition (PIO-05202) comes in a large DVD-style case and includes a mouse pad, phone strap and audio drama CD. -->
 	<!--
-	<software name="anglwishsp">
+	<software name="anglwishsp" cloneof="anglwish">
 		<description>Angel Wish: Kimi no Egao ni Chu! - Special Pack-ban (Jpn)</description>
 		<year>2005</year>
 		<publisher>Pionesoft</publisher>
@@ -1884,26 +1908,6 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 	-->
-
-	<software name="anglwish"> <!-- cloneof="anglwishsp" -->
-		<!-- http://redump.org/disc/44566/
-		<rom name="Angel Wish - Kimi no Egao ni Chu! (Japan).gdi" size="231" crc="f9ee0634" md5="24117dbab9c50fc3f70e1c612202296d" sha1="f214104fd65ca7a84b745b72361598f5440c1370"/>
-		<rom name="Angel Wish - Kimi no Egao ni Chu! (Japan) (Track 1).bin" size="705600" crc="296a7ea3" md5="ecb140b3f47b6d21dc6c7f259dbe6b06" sha1="3e848f351b063d27bea6c54ff4f02513667b4586"/>
-		<rom name="Angel Wish - Kimi no Egao ni Chu! (Japan) (Track 2).bin" size="2295552" crc="47dba3d6" md5="d03ec9a9fab111ba842b9c27663b8673" sha1="49a604931946b382e3aed0056a4266fe418cbf6f"/>
-		<rom name="Angel Wish - Kimi no Egao ni Chu! (Japan) (Track 3).bin" size="1185760800" crc="6fea9595" md5="72a70f5e59f6b6bfccb6e299e603edf4" sha1="cf36ae235bca28dcbdd8e0c8621bb5ac1e626c5e"/>
-		-->
-		<description>Angel Wish: Kimi no Egao ni Chu! (Jpn)</description>
-		<year>2005</year>
-		<publisher>Pionesoft</publisher>
-		<info name="serial" value="T-18712M"/>
-		<info name="release" value="20050224" />
-		<info name="ring_code" value="T-18712M-0922 2MS1 C 51"/>
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
-				<disk name="angel wish kimi no egao ni chu! (jpn)" sha1="65c1da4807da03a1600219f5d90d8b725d190e98"/>
-			</diskarea>
-		</part>
-	</software>
 
 	<software name="animasta">
 		<!--
@@ -2583,14 +2587,12 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Eidos</publisher>
 		<info name="serial" value="T-36806D-06"/>
 		<info name="ring_code" value="T-36806D-0230SS EMI CD HOLLAND @ 1 (Disc 2)"/>
-		<!--
 		<part interface="dc_gdrom" name="gdrom1">
 			<feature name="part_id" value="Disc 1"/>
 			<diskarea name="gdrom">
 				<disk name="resident evil code veronica (spa) (disc 1)" status="nodump"/>
 			</diskarea>
 		</part>
-		-->
 		<part interface="dc_gdrom" name="gdrom2">
 			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="gdrom">
@@ -3038,11 +3040,23 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!--
-	The Limited Edition (T-23204M) comes in a cardboard slipcase and includes a fan CD.
-
-	Redump have a complete dump available.
+	<software name="bsb">
+		<description>Blue-Sky-Blue: Sora o Mau Tsubasa (Jpn)</description>
+		<year>2003</year>
+		<publisher>Ecole</publisher>
+		<info name="serial" value="T-23205M"/>
+		<info name="release" value="20030626" />
+		<info name="alt_title" value="Blue-Sky-Blue【s】 -空を舞う翼-" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="blue-sky-blue sora o mau tsubasa (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
 	-->
-	<software name="bsbsg">
+
+	<!-- The Limited Edition (T-23204M) comes in a cardboard slipcase and includes a fan CD. -->
+	<software name="bsbsg"> <!-- cloneof="bsb" -->
 		<!-- http://redump.org/disc/43713/
 		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan).gdi" size="243" crc="3494ccc6" md5="aede4489a8f62e9146a5d489110993da" sha1="ecacde76f17665539d69629c14d52218cb42766a"/>
 		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 1).bin" size="2241456" crc="e607e01e" md5="93ae63a963ad44c86a023dafde9a63f1" sha1="b47a76464907cbd06ddf85345950f145782d00ba"/>
@@ -3062,31 +3076,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 				<disk name="blue-sky-blue sora o mau tsubasa - shokai genteiban (jpn)" sha1="1b6db61f78b11afc250aac17f5ad4cfa651c9e19"/>
 			</diskarea>
 		</part>
-		<!--
 		<part interface="dc_gdrom" name="gdrom2">
 			<feature name="part_id" value="Premium Fan Disc"/>
 			<diskarea name="gdrom">
 				<disk name="blue-sky-blue sora o mau tsubasa - shokai genteiban (jpn) (premium fan disc)" status="nodump"/>
 			</diskarea>
 		</part>
-		-->
 	</software>
-
-	<!--
-	<software name="bsb" cloneof="bsbsg">
-		<description>Blue-Sky-Blue: Sora o Mau Tsubasa (Jpn)</description>
-		<year>2003</year>
-		<publisher>Ecole</publisher>
-		<info name="serial" value="T-23205M"/>
-		<info name="release" value="20030626" />
-		<info name="alt_title" value="Blue-Sky-Blue【s】 -空を舞う翼-" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
-				<disk name="blue-sky-blue sora o mau tsubasa (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
-	-->
 
 	<software name="bokomu">
 		<!-- http://redump.org/disc/44289/
@@ -3256,31 +3252,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!-- The Limited Edition (T-46702M) includes a soundtrack CD. -->
-	<!--
-	<software name="bdrdowng">
-		<description>Border Down - Genteiban (Jpn)</description>
-		<year>2003</year>
-		<publisher>G.rev</publisher>
-		<info name="serial" value="T-46702M (Game), SRIN-1009 (Audio CD)"/>
-		<info name="release" value="20030925" />
-		<info name="alt_title" value="ボーダーダウン" />
-		<part interface="dc_gdrom" name="gdrom1">
-			<feature name="part_id" value="Border Down (Game)"/>
-			<diskarea name="gdrom">
-				<disk name="border down - genteiban (jpn) (game)" status="nodump"/>
-			</diskarea>
-		</part>
-		<part interface="dc_gdrom" name="gdrom2">
-			<feature name="part_id" value="Border Down (Audio CD)"/>
-			<diskarea name="gdrom">
-				<disk name="border down - genteiban (jpn) (Audio CD)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
-	-->
-
-	<software name="bdrdown"> <!-- cloneof="borddowng" -->
+	<software name="brdrdown">
 		<!--
 		<rom name="Border Down v1.000 (2003)(G.rev)(NTSC)(JP)(en)[!].gdi" size="88" md5="7d8f9c647c25e74e5cdae79f9846159f" sha1="8a10b260b38af5d15746d54e0a468061109549b0"/>
 		<rom name="track01.bin" size="8843520" md5="117ae1ab33d4d48f713c75633d0e7335" sha1="4b254fca04ce63e2c4b532aa800bf76aea72ebf0"/>
@@ -3299,6 +3271,30 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- The Limited Edition (T-46702M) includes a soundtrack CD. -->
+	<!--
+	<software name="brdrdowng" cloneof="brdrdown">
+		<description>Border Down - Genteiban (Jpn)</description>
+		<year>2003</year>
+		<publisher>G.rev</publisher>
+		<info name="serial" value="T-46702M (Game), SRIN-1009 (Audio CD)"/>
+		<info name="release" value="20030925" />
+		<info name="alt_title" value="ボーダーダウン" />
+		<part interface="dc_gdrom" name="gdrom1">
+			<feature name="part_id" value="Border Down (Game)"/>
+			<diskarea name="gdrom">
+				<disk name="border down - genteiban (jpn) (game)" status="nodump"/>
+			</diskarea>
+		</part>
+		<part interface="dc_gdrom" name="gdrom2">
+			<feature name="part_id" value="Border Down (Audio CD)"/>
+			<diskarea name="gdrom">
+				<disk name="border down - genteiban (jpn) (audio cd)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
 
 	<software name="bohusara">
 		<!--
@@ -3709,7 +3705,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	The Limited Edition (HDR-0175) shares the same disc as the regular edition (HDR-0172) but includes a doctors' bag
-	with first aid kit, a pen, memo pad, clipboard, seven stamps with different motives, stamp ink and phone strap.
+	with first aid kit, a pen, memo pad, clipboard, seven stamps with different motives, stamp ink and a phone strap.
 	-->
 	<software name="cndystrp">
 		<!--
@@ -3983,11 +3979,23 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--
-	The Limited Edition (T-44405M) includes a talk CD.
-
-	Redump have a complete dump available.
+	<software name="cardofd">
+		<description>Card of Destiny: Hikari to Yami no Tougousha (Jpn)</description>
+		<year>2002</year>
+		<publisher>Abel</publisher>
+		<info name="serial" value="T-44406M"/>
+		<info name="release" value="20020328" />
+		<info name="alt_title" value="カード･オブ･デスティニー 〜光と闇の統合者〜" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="card of destiny hikari to yami no tougousha (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
 	-->
-	<software name="cardofdg">
+
+	<!-- The Limited Edition (T-44405M) includes a talk CD. -->
+	<software name="cardofdg"> <!-- cloneof="cardofd" -->
 		<!-- http://redump.org/disc/43448/
 		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan).gdi" size="443" crc="3dfadc62" md5="7bdcceabf60b2f9b3f4de04c0c9d4538" sha1="ec48b83cae09f2d0212c6b7cb99db74c45b5a834"/>
 		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Track 1).bin" size="1996848" crc="1e1a120b" md5="ca2382871576766a33e3e2581750e3ca" sha1="7c9b57119f30f7a57ced292dd84258bf541365a8"/>
@@ -4009,31 +4017,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 				<disk name="card of destiny hikari to yami no tougousha - genteiban (jpn)" sha1="79a8dccf13f16beaa3b6293672c08d90d0c5f64e"/>
 			</diskarea>
 		</part>
-		<!--
 		<part interface="dc_gdrom" name="gdrom2">
 			<feature name="part_id" value="Special Talk CD"/>
 			<diskarea name="gdrom">
 				<disk name="card of destiny hikari to yami no tougousha - genteiban (jpn) (special talk cd)" status="nodump"/>
 			</diskarea>
 		</part>
-		-->
 	</software>
-
-	<!--
-	<software name="cardofd" cloneof="cardofdg">
-		<description>Card of Destiny: Hikari to Yami no Tougousha (Jpn)</description>
-		<year>2002</year>
-		<publisher>Abel</publisher>
-		<info name="serial" value="T-44406M"/>
-		<info name="release" value="20020328" />
-		<info name="alt_title" value="カード･オブ･デスティニー 〜光と闇の統合者〜" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
-				<disk name="card of destiny hikari to yami no tougousha (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
-	-->
 
 	<!--
 	The Limited Box (HDR-0132) shares the same disc as the regular edition (HDR-0115) but comes in a larger cardboard case
@@ -4310,55 +4300,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<!-- The Sega Direct version shares the same disc as the regular edition (T-47801M) but comes with a bonus CD. -->
-	<!--
-	<software name="cfieldsd1">
-		<description>Chaos Field (Jpn, Sega Direct)</description>
-		<year>2004</year>
-		<publisher>Milestone Inc.</publisher>
-		<info name="serial" value="T-47801M, STRV-002 (Bonus CD)"/>
-		<info name="release" value="20041216" />
-		<info name="alt_title" value="カオスフィールド" />
-		<part interface="dc_gdrom" name="gdrom1">
-			<feature name="part_id" value="Chaos Field"/>
-			<diskarea name="gdrom">
-				<disk name="chaos field (jpn, sega direct)" sha1="cb02299d6e0809c334e73bf2e9e5b48ed83cc42f"/>
-			</diskarea>
-		</part>
-		<part interface="dc_gdrom" name="gdrom2">
-			<feature name="part_id" value="Special Bonus CD"/>
-			<diskarea name="gdrom">
-				<disk name="chaos field (jpn, sega direct) (special bonus cd)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
-	-->
-
-	<!-- The Sega Direct version shares the same disc as the regular edition (T-47801M) but comes with a bonus CD. -->
-	<!--
-	<software name="cfieldsd" cloneof="cfieldsd">
-		<description>Chaos Field (Jpn, Sega Direct, Rev. 1)</description>
-		<year>2004</year>
-		<publisher>Milestone Inc.</publisher>
-		<info name="serial" value="T-47801M, STRV-003 (Bonus CD)"/>
-		<info name="release" value="20050224" />
-		<info name="alt_title" value="カオスフィールド" />
-		<part interface="dc_gdrom" name="gdrom1">
-			<feature name="part_id" value="Chaos Field"/>
-			<diskarea name="gdrom">
-				<disk name="chaos field (jpn, sega direct, rev. 1)" sha1="cb02299d6e0809c334e73bf2e9e5b48ed83cc42f"/>
-			</diskarea>
-		</part>
-		<part interface="dc_gdrom" name="gdrom2">
-			<feature name="part_id" value="Special Bonus CD Vol. 2"/>
-			<diskarea name="gdrom">
-				<disk name="chaos field (jpn, sega direct, rev.1) (special bonus cd vol. 2)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
-	-->
-
-	<software name="cfield"> <!-- cloneof="cfieldsd" -->
+	<software name="cfield">
 		<!--
 		<rom name="Chaos Field v1.003 (2004)(Milestone)(NTSC)(JP)(en)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
 		<rom name="track01.bin" size="705600" md5="b00f57ae7e87793842232c5079006103" sha1="fc642d6e85015273870c4aa49d7cd50cca842195"/>
@@ -4374,6 +4316,50 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
 				<disk name="chaos field (jpn)" sha1="cb02299d6e0809c334e73bf2e9e5b48ed83cc42f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- The Sega Direct version shares the same disc as the regular edition (T-47801M) but comes with a bonus CD. -->
+	<software name="cfieldsd" cloneof="cfield">
+		<description>Chaos Field (Jpn, Sega Direct)</description>
+		<year>2004</year>
+		<publisher>Milestone Inc.</publisher>
+		<info name="serial" value="T-47801M, STRV-002 (Bonus CD)"/>
+		<info name="release" value="20041216" />
+		<info name="alt_title" value="カオスフィールド" />
+		<part interface="dc_gdrom" name="gdrom1">
+			<feature name="part_id" value="Chaos Field"/>
+			<diskarea name="gdrom">
+				<disk name="chaos field (jpn)" sha1="cb02299d6e0809c334e73bf2e9e5b48ed83cc42f"/>
+			</diskarea>
+		</part>
+		<part interface="dc_gdrom" name="gdrom2">
+			<feature name="part_id" value="Special Bonus CD"/>
+			<diskarea name="gdrom">
+				<disk name="chaos field (jpn, sega direct) (special bonus cd)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- The Sega Direct version shares the same disc as the regular edition (T-47801M) but comes with a bonus CD. -->
+	<software name="cfieldsd1" cloneof="cfield">
+		<description>Chaos Field (Jpn, Sega Direct, Rev. 1)</description>
+		<year>2004</year>
+		<publisher>Milestone Inc.</publisher>
+		<info name="serial" value="T-47801M, STRV-003 (Bonus CD)"/>
+		<info name="release" value="20050224" />
+		<info name="alt_title" value="カオスフィールド" />
+		<part interface="dc_gdrom" name="gdrom1">
+			<feature name="part_id" value="Chaos Field"/>
+			<diskarea name="gdrom">
+				<disk name="chaos field (jpn)" sha1="cb02299d6e0809c334e73bf2e9e5b48ed83cc42f"/>
+			</diskarea>
+		</part>
+		<part interface="dc_gdrom" name="gdrom2">
+			<feature name="part_id" value="Special Bonus CD Vol. 2"/>
+			<diskarea name="gdrom">
+				<disk name="chaos field (jpn, sega direct, rev.1) (special bonus cd vol. 2)" status="nodump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4495,9 +4481,30 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
+	<software name="cherryb">
+		<!-- http://redump.org/disc/42043/
+		<rom name="Cherry Blossom (Japan).gdi" size="174" crc="7b876e95" md5="28737a1fa4dfa174452e4588481581d2" sha1="e2393cc4d436aa530291b60fe47c86113182f0ab"/>
+		<rom name="Cherry Blossom (Japan) (Track 1).bin" size="705600" crc="26771b18" md5="b0bbffc90313b7b68f7b3a3bab5ffbc3" sha1="775ac21ef260680be1a1f19da295f80a00ecf325"/>
+		<rom name="Cherry Blossom (Japan) (Track 2).bin" size="2789472" crc="1d14db05" md5="87ea87080a2244deceacdbeabc918fe6" sha1="c66a5b5bbee2597ab28093cb4ab7dabb1ffa1de8"/>
+		<rom name="Cherry Blossom (Japan) (Track 3).bin" size="1185760800" crc="9b17a921" md5="38aa27a71ef52c320baa8b81efa8293c" sha1="4679458e0e09cd47c10dd66e1a5b0c703bffd82e"/>
+		-->
+		<description>Cherry Blossom (Jpn)</description>
+		<year>2004</year>
+		<publisher>Takuyo</publisher>
+		<info name="serial" value="T-37912M"/>
+		<info name="release" value="20040428" />
+		<info name="alt_title" value="チェリーブロッサム" />
+		<info name="ring_code" value="T-37912M-0913 1MS1 C 43"/>
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="cherry blossom (jpn)" sha1="0d6e60904f091dc3cba5bf72e4dc0073b66f1564"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- The Limited Edition (T-37913M) comes in a cardboard slipcase and includes a mini drama CD. -->
 	<!--
-	<software name="cherrybsg">
+	<software name="cherrybsg" cloneof="cherryb">
 		<description>Cherry Blossom - Shokai Genteiban (Jpn)</description>
 		<year>2004</year>
 		<publisher>Takuyo</publisher>
@@ -4518,27 +4525,6 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 	-->
-
-	<software name="cherryb"> <!-- cloneof="cherrybsg" -->
-		<!-- http://redump.org/disc/42043/
-		<rom name="Cherry Blossom (Japan).gdi" size="174" crc="7b876e95" md5="28737a1fa4dfa174452e4588481581d2" sha1="e2393cc4d436aa530291b60fe47c86113182f0ab"/>
-		<rom name="Cherry Blossom (Japan) (Track 1).bin" size="705600" crc="26771b18" md5="b0bbffc90313b7b68f7b3a3bab5ffbc3" sha1="775ac21ef260680be1a1f19da295f80a00ecf325"/>
-		<rom name="Cherry Blossom (Japan) (Track 2).bin" size="2789472" crc="1d14db05" md5="87ea87080a2244deceacdbeabc918fe6" sha1="c66a5b5bbee2597ab28093cb4ab7dabb1ffa1de8"/>
-		<rom name="Cherry Blossom (Japan) (Track 3).bin" size="1185760800" crc="9b17a921" md5="38aa27a71ef52c320baa8b81efa8293c" sha1="4679458e0e09cd47c10dd66e1a5b0c703bffd82e"/>
-		-->
-		<description>Cherry Blossom (Jpn)</description>
-		<year>2004</year>
-		<publisher>Takuyo</publisher>
-		<info name="serial" value="T-37912M"/>
-		<info name="release" value="20040428" />
-		<info name="alt_title" value="チェリーブロッサム" />
-		<info name="ring_code" value="T-37912M-0913 1MS1 C 43"/>
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
-				<disk name="cherry blossom (jpn)" sha1="0d6e60904f091dc3cba5bf72e4dc0073b66f1564"/>
-			</diskarea>
-		</part>
-	</software>
 
 	<software name="chickrun">
 		<!--
@@ -4571,14 +4557,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="12681984" md5="4b1ddc559cc2e6a09cbf34dec134170c" sha1="d0530ee47e3f283ed7c4f3b81b447876d4199f0f"/>
 		<rom name="track05.bin" size="17106096" md5="38d5cd6e6b2b30ec0c62695bd20f80ac" sha1="24971abe01183c31f474db7f235dd5d5697d91a0"/>
 		-->
-		<description>Chicken Run (Euro, English)</description>
+		<description>Chicken Run (Euro)</description>
 		<year>2000</year>
 		<publisher>Eidos Interactive</publisher>
 		<info name="serial" value="T-36814D-05"/>
 		<info name="release" value="20001124" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="chicken run (euro, english)" sha1="c0be5c9e635c9d8e641d998395322c0f9b6f1877"/>
+				<disk name="chicken run (euro)" sha1="c0be5c9e635c9d8e641d998395322c0f9b6f1877"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4597,15 +4583,15 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="12681984" md5="4b1ddc559cc2e6a09cbf34dec134170c" sha1="d0530ee47e3f283ed7c4f3b81b447876d4199f0f"/>
 		<rom name="track05.bin" size="17106096" md5="85d3435e44a3a507d384a272a33a52d4" sha1="4686687a2b560a476feebfa61674190af78ce349"/>
 		-->
-		<description>Chicken Run (Euro, French / Italian / Spanish / German)</description>
+		<description>Chicken Run (Fra, Ger, Ita, Spa)</description>
 		<year>2000</year>
 		<publisher>Eidos Interactive</publisher>
 		<info name="serial" value="T-36814D-06, T-36814D-09, T-36814D-13, T-36814D-18, T-36814D-87"/>
 		<info name="release" value="20001124" />
-		<info name="alt_title" value="Chicken Run - Hennen Rennen (Ger), Chicken Run - Evasión en la Granja (Spa), Galline in fuga - Chicken Run (Ita)" />
+		<info name="alt_title" value="Chicken Run - Hennen Rennen (Ger), Galline in fuga - Chicken Run (Ita), Chicken Run - Evasión en la Granja (Spa)" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="chicken run (euro, french - italian - spanish - german)" sha1="4df5f17e1b8ee124939e86c821ac27cc0fbd5f81"/>
+				<disk name="chicken run (fra, ger, ita, spa)" sha1="4df5f17e1b8ee124939e86c821ac27cc0fbd5f81"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4631,7 +4617,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="chocolatt"> <!-- cloneof="chocolat" -->
+	<software name="chocolatt" cloneof="chocolat">
 		<!--
 		<rom name="Chocolat - Maid Cafe Curio Taikenban v1.002 (2003)(Alchemist)(NTSC)(JP)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
 		<rom name="track01.bin" size="705600" md5="3d6b30772f7fffc352058d9a7a72049f" sha1="efc1a3ed37d873edc874436cf2fe1b18efd28112"/>
@@ -4756,7 +4742,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="dc_gdrom" name="gdrom2">
 			<feature name="part_id" value="Present Disc"/>
 			<diskarea name="gdrom">
-				<disk name="christmas seaman omoi o tsutaeru mou hitotsu no houhou - message kit (jpn) (present disc)" sha1="d04cb12d5dd9b674688b665084944851cbe68bf9"/>
+				<disk name="christmas seaman omoi o tsutaeru mou hitotsu no houhou - present disc (jpn)" sha1="d04cb12d5dd9b674688b665084944851cbe68bf9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4962,7 +4948,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="dc_gdrom" name="gdrom1">
 			<feature name="part_id" value="ChuChu Rocket!"/>
 			<diskarea name="gdrom">
-				<disk name="chuchu rocket including dreamkey 1.5 (euro) (chuchu rocket)" sha1="80a7f65474b0490ed4efefb46595e08f665b8061"/>
+				<disk name="chuchu rocket (euro)" sha1="80a7f65474b0490ed4efefb46595e08f665b8061"/>
 			</diskarea>
 		</part>
 		<part interface="dc_gdrom" name="gdrom2">
@@ -5012,7 +4998,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="dc_gdrom" name="gdrom1">
 			<feature name="part_id" value="ChuChu Rocket!"/>
 			<diskarea name="gdrom">
-				<disk name="chuchu rocket inclus dreamkey 1.5 (fra) (chuchu rocket)" sha1="80a7f65474b0490ed4efefb46595e08f665b8061"/>
+				<disk name="chuchu rocket (euro)" sha1="80a7f65474b0490ed4efefb46595e08f665b8061"/>
 			</diskarea>
 		</part>
 		<part interface="dc_gdrom" name="gdrom2">
@@ -5401,7 +5387,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--
-	<software name="cooltoontt">
+	<software name="cooltoontt" cloneof="cooltoon">
 		<description>Cool Cool Toon - Tentou Taikenban (Jpn)</description>
 		<year>200?</year>
 		<publisher>SNK</publisher>
@@ -5837,12 +5823,25 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
+	<!-- Also released as a Dorikore version, which is identical to retail. -->
 	<!--
-	The Limited Edition (T-46502M) comes with a opening theme song CD, which apparently have several (at least five) different designs.
-
-	Redump have a complete dump available.
+	<software name="dvineluv">
+		<description>D+Vine [Luv] (Jpn)</description>
+		<year>2001</year>
+		<publisher>Princess Soft</publisher>
+		<info name="serial" value="T-46501M"/>
+		<info name="release" value="20011025" />
+		<info name="alt_title" value="ディヴァイン ラヴ" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="d+vine [luv] (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
 	-->
-	<software name="dvineluvsg">
+
+	<!-- The Limited Edition (T-46502M) comes with a opening theme song CD, which apparently have several (at least five) different designs. -->
+	<software name="dvineluvsg"> <!-- cloneof="dvineluv" -->
 		<!-- http://redump.org/disc/43486/
 		<rom name="D+Vine [Luv] (Japan).gdi" size="168" crc="ed403534" md5="19109f1132cf0b943aab0658e3e6b65a" sha1="e56ab98e22697aedc6efdc9effb34d5b37c62350"/>
 		<rom name="D+Vine [Luv] (Japan) (Track 1).bin" size="1058400" crc="5a53a011" md5="471a10f9120820c76b82a29568da3aa6" sha1="b7c8d38647b20d8200a19a6b150d5551bc86fb92"/>
@@ -5862,32 +5861,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 				<disk name="d+vine [luv] - shokai genteiban (jpn)" sha1="a55d24f09e8d191a8671fd1fcb63fc2e5c1ceb9c"/>
 			</diskarea>
 		</part>
-		<!--
 		<part interface="dc_gdrom" name="gdrom2">
 			<feature name="part_id" value="Opening Themesong CD"/>
 			<diskarea name="gdrom">
 				<disk name="d+vine [luv] - shokai genteiban (jpn) (opening themesong cd)" status="nodump"/>
 			</diskarea>
 		</part>
-		-->
 	</software>
-
-	<!-- Also released as a Dorikore version, which is identical to retail. -->
-	<!--
-	<software name="dvineluv" cloneof="dvineluvsg">
-		<description>D+Vine [Luv] (Jpn)</description>
-		<year>2001</year>
-		<publisher>Princess Soft</publisher>
-		<info name="serial" value="T-46501M"/>
-		<info name="release" value="20011025" />
-		<info name="alt_title" value="ディヴァイン ラヴ" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
-				<disk name="d+vine [luv] (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
-	-->
 
 	<software name="d2">
 		<!--
@@ -6045,7 +6025,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="dc_gdrom" name="gdrom2">
 			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="gdrom">
-				<disk name="d no shokutaku 2 (jpn, alt) (disc 2)" sha1="8d7815e3dcdcc8a090b9ac13725307b362fcd598"/>
+				<disk name="d no shokutaku 2 (jpn) (disc 2)" sha1="8d7815e3dcdcc8a090b9ac13725307b362fcd598"/>
 			</diskarea>
 		</part>
 		<part interface="dc_gdrom" name="gdrom3">
@@ -6057,7 +6037,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="dc_gdrom" name="gdrom4">
 			<feature name="part_id" value="Disc 4"/>
 			<diskarea name="gdrom">
-				<disk name="d no shokutaku 2 (jpn, alt) (disc 4)" sha1="ee717ed0a0ccbf87e222e745404cbe954eedc1bb"/>
+				<disk name="d no shokutaku 2 (jpn) (disc 4)" sha1="ee717ed0a0ccbf87e222e745404cbe954eedc1bb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7174,7 +7154,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="dksnnh">
+	<software name="nasubi">
 		<!--
 		<rom name="Denpashonenteki Kenshoseikatsu Soft Nasubi no Heya v1.000 (1999)(Hudson)(NTSC)(JP)[!].gdi" size="181" md5="e91605939b005447f1f5be14301502e1" sha1="3cf00cd897748d92145d81d2ec4f405c8d348ce5"/>
 		<rom name="track01.bin" size="2241456" md5="eaaad3b2a146e064677b51320fd7c4fb" sha1="3299cbe94f8755c2599936730f335d90210712f9"/>
@@ -7184,7 +7164,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track05.raw" size="24999408" md5="f628bd4215392a2c4212b297513b7907" sha1="a61dbbd83305916539be23cda6c2b7c10b04e8b5"/>
 		<rom name="track06.bin" size="431923632" md5="cd4f7bd0192257f5aece8078facc93db" sha1="5f0128716c9268e4b64970792129e87957515c0b"/>
 		-->
-		<description>Denpa Shonenteki Kenshoseikatsu Soft Nasubi no Heya (Jpn)</description>
+		<description>Denpa Shounen-teki Kenshou Seikatsu Soft: Nasubi no Heya (Jpn)</description>
 		<year>1999</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14305M"/>
@@ -7192,7 +7172,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="alt_title" value="電波少年的懸賞生活ソフト なすびの部屋" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="denpa shonenteki kenshoseikatsu soft nasubi no heya (jpn)" sha1="972606d97b5289f4474a9a89526c5bc69e83b401"/>
+				<disk name="denpa shounen-teki kenshou seikatsu soft nasubi no heya (jpn)" sha1="972606d97b5289f4474a9a89526c5bc69e83b401"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7309,11 +7289,27 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<!--
-	The Limited Edition (T-46301M) shares the same disc as the regular edition (T-46302M) but includes an audio CD, a VMU and a calendar.
+	<software name="digichrt">
+		<!--
+		<rom name="Di Gi Charat Fantasy v1.004 (2001)(Broccoli)(NTSC)(JP)[!].gdi" size="88" md5="d991bd2c09518469d6f5d6b9cd9ab0fe" sha1="d76ab79ab71b25e06992bb7f2f0317c35285a34a"/>
+		<rom name="track01.bin" size="12451488" md5="6250e66cb5cc4e236d8881a641c1fb2d" sha1="36b369c7a5ff67096264aaf5fc8986e3d09184a7"/>
+		<rom name="track02.raw" size="1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
+		<rom name="track03.bin" size="1185760800" md5="5b860d94ecff2e0a3919edf3f7ffb6a7" sha1="1eefcd921904020a50792c7fb989ce0aad362064"/>
+		-->
+		<description>Di Gi Charat Fantasy (Jpn)</description>
+		<year>2001</year>
+		<publisher>Broccoli</publisher>
+		<info name="serial" value="T-46302M"/>
+		<info name="release" value="20010906" />
+		<info name="alt_title" value="デ･ジ･キャラット ファンタジー" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="di gi charat fantasy (jpn)" sha1="525b860f800222d26dc53f17f420d93d270c504c"/>
+			</diskarea>
+		</part>
+	</software>
 
-	Redump have a complete dump available, preferably replace this with their dump.
-	-->
+	<!-- The Limited Edition (T-46301M) shares the same disc as the regular edition (T-46302M) but includes an audio CD, a VMU and a calendar. -->
 	<software name="digichrtsg" cloneof="digichrt">
 		<!--
 		<rom name="Di Gi Charat Fantasy v1.004 (2001)(Broccoli)(NTSC)(JP)[!].gdi" size="88" md5="d991bd2c09518469d6f5d6b9cd9ab0fe" sha1="d76ab79ab71b25e06992bb7f2f0317c35285a34a"/>
@@ -7333,32 +7329,10 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 				<disk name="di gi charat fantasy (jpn)" sha1="525b860f800222d26dc53f17f420d93d270c504c"/>
 			</diskarea>
 		</part>
-		<!--
 		<part interface="dc_gdrom" name="gdrom2">
 			<feature name="part_id" value="Soundtrack Arrangement CD"/>
 			<diskarea name="gdrom">
 				<disk name="di gi charat fantasy - shokai genteiban (jpn) (soundtrack arrangement cd)" status="nodump"/>
-			</diskarea>
-		</part>
-		-->
-	</software>
-
-	<software name="digichrt">
-		<!--
-		<rom name="Di Gi Charat Fantasy v1.004 (2001)(Broccoli)(NTSC)(JP)[!].gdi" size="88" md5="d991bd2c09518469d6f5d6b9cd9ab0fe" sha1="d76ab79ab71b25e06992bb7f2f0317c35285a34a"/>
-		<rom name="track01.bin" size="12451488" md5="6250e66cb5cc4e236d8881a641c1fb2d" sha1="36b369c7a5ff67096264aaf5fc8986e3d09184a7"/>
-		<rom name="track02.raw" size="1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
-		<rom name="track03.bin" size="1185760800" md5="5b860d94ecff2e0a3919edf3f7ffb6a7" sha1="1eefcd921904020a50792c7fb989ce0aad362064"/>
-		-->
-		<description>Di Gi Charat Fantasy (Jpn)</description>
-		<year>2001</year>
-		<publisher>Broccoli</publisher>
-		<info name="serial" value="T-46302M"/>
-		<info name="release" value="20010906" />
-		<info name="alt_title" value="デ･ジ･キャラット ファンタジー" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
-				<disk name="di gi charat fantasy (jpn)" sha1="525b860f800222d26dc53f17f420d93d270c504c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7738,14 +7712,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="1587600" md5="dc3bbcbf98aeccd2a6b4277a7d8168df" sha1="6f7e0d7d9695af0f65081b614d6afc3b4315b36a"/>
 		<rom name="track05.bin" size="662572512" md5="d7bd0e6867eafffab0a9419448f1476d" sha1="cca1e59cebb98ed602c4ad7c96c0f28190223628"/>
 		-->
-		<description>Disney's 102 Dalmatians: Puppies to the Rescue (Euro, English)</description>
+		<description>Disney's 102 Dalmatians: Puppies to the Rescue (Euro)</description>
 		<year>2000</year>
 		<publisher>Eidos</publisher>
 		<info name="serial" value="T-36813D-05"/>
 		<info name="release" value="20001220" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="disney's 102 dalmatians puppies to the rescue (euro, english)" sha1="e008c3c68bd5307a55455ed40b1b3de41ed03326"/>
+				<disk name="disney's 102 dalmatians puppies to the rescue (euro)" sha1="e008c3c68bd5307a55455ed40b1b3de41ed03326"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7764,15 +7738,15 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="1587600" md5="dc3bbcbf98aeccd2a6b4277a7d8168df" sha1="6f7e0d7d9695af0f65081b614d6afc3b4315b36a"/>
 		<rom name="track05.bin" size="835155216" md5="20230cf71489dd9b2be44a8352e07a7d" sha1="d0de249d291fa00116541fec98c884742c851e42"/>
 		-->
-		<description>Disney Les 102 Dalmatiens à la rescousse ! (Euro, French / Italian / Spanish / German)</description>
+		<description>Disney Les 102 Dalmatiens à la rescousse ! (Fra, Ger, Ita, Spa)</description>
 		<year>2001</year>
 		<publisher>Eidos</publisher>
 		<info name="serial" value="T-36813D-06, T-36813D-09, T-36813D-13, T-36813D-18, T-36813D-50, 950-0145-50 952-0147-50"/>
 		<info name="release" value="20001220" />
-		<info name="alt_title" value="Disney La Carica dei 102: Cuccioli alla Riscossa (Ita), Disney 102 Dálmatas: Cachorros al rescate (Spa), Disneys 102 Dalmatiner (Ger)" />
+		<info name="alt_title" value="Disneys 102 Dalmatiner (Ger), Disney La Carica dei 102: Cuccioli alla Riscossa (Ita), Disney 102 Dálmatas: Cachorros al rescate (Spa)" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="disney les 102 dalmatiens a la rescousse (euro, french italian spanish german)" sha1="89854cde030ae64fedcec57bafd1ded6dc46c000"/>
+				<disk name="disney les 102 dalmatiens a la rescousse (fra, ger, ita, spa)" sha1="89854cde030ae64fedcec57bafd1ded6dc46c000"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7875,7 +7849,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Ubisoft</publisher>
 		<info name="serial" value="T-17714D-50, T-17714D-74, T-17714D-75"/>
 		<info name="release" value="20001215" />
-		<info name="alt_title" value="Disney Donald &quot;Cou@k Att@k&quot;?*! (Fra/Spa/Ita)" />
+		<info name="alt_title" value="Disney Donald &quot;Cou@k Att@k&quot;?*! (Fra, Ita, Spa)" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
 				<disk name="disney's donald duck quack attack (euro)" sha1="1eaceff3cfee491ee8ee93da6ca39d96675c3d4f"/>
@@ -8150,14 +8124,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="alt_title" value="ドリマガGD Vol.2" />
 		<info name="ring_code" value="610-7164-0128 1MB1 C 97 (Disc 1), 610-7164-0129 1M1 C 97, 610-7164-0129 1M5 C 97 (Disc 2)"/>
 		<part interface="dc_gdrom" name="gdrom1">
-			<feature name="part_id" value="Disc 1"/>
 			<diskarea name="gdrom">
+			<feature name="part_id" value="Disc 1"/>
 				<disk name="dorimaga gd vol. 2 (jpn) (disc 1)" sha1="49abe4f9ef4c56f267b6e1c990d361a88c985b0c"/>
 			</diskarea>
 		</part>
 		<part interface="dc_gdrom" name="gdrom2">
-			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="gdrom">
+			<feature name="part_id" value="Disc 2"/>
 				<disk name="dorimaga gd vol. 2 (jpn) (disc 2)" sha1="8c46be4f4e8b87a0107b0a7c64e6988db856640e"/>
 			</diskarea>
 		</part>
@@ -8531,13 +8505,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track07.raw" size="33643008" md5="0966a1426fa55d484a506e3bd7745033" sha1="e7826d592768ae29d4d9235c58fa737518073baa"/>
 		<rom name="track08.bin" size="1078272048" md5="6b6c4581f3291f5708a6f4b124fd4d01" sha1="a73431ae0fca08058c8b3516ca879d497363c77f"/>
 		-->
-		<description>Dream On Collection 2 (Euro)</description>
+		<description>DreamOn Collection 2 (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-7817"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on collection 2 (euro)" sha1="6d141e1c2421b276eea5b3ff9b7f58e94d0621fd"/>
+				<disk name="dreamon collection 2 (euro)" sha1="6d141e1c2421b276eea5b3ff9b7f58e94d0621fd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8550,13 +8524,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.bin" size="1185760800" md5="211c8aa75197b4d7ba6daa506cae72ac" sha1="ef2594e04b7c738a1f7e75ad208aeaf7a30d827f"/>
 		-->
-		<description>Dream On Collection 3 (Euro)</description>
+		<description>DreamOn Collection 3 (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="833-0022-50 832-0026-50"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on collection 3 (euro)" sha1="52ddb82b82a8f8bae589d5ead32a9a640873c3f7"/>
+				<disk name="dreamon collection 3 (euro)" sha1="52ddb82b82a8f8bae589d5ead32a9a640873c3f7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8569,14 +8543,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Dreamon Collection 4 (Europe) (En,Fr,De,Es) (Track 2).bin" size="14347200" crc="49e43706" md5="9cca4624e62f04dc398aed22b5370a34" sha1="a34bdc73ac1e360b13d0592b501a388e0225e994"/>
 		<rom name="Dreamon Collection 4 (Europe) (En,Fr,De,Es) (Track 3).bin" size="1185760800" crc="6b218419" md5="15ff5c3901514b28d92f744852134391" sha1="ee7765c34a59d8306d5fe162360701955fa41015"/>
 		-->
-		<description>Dream On Collection 4 (Euro)</description>
+		<description>DreamOn Collection 4 (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0040-50 833-0030-50"/>
 		<info name="ring_code" value="610-7935-0488 MT B05"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on collection 4 (euro)" sha1="eb924c18b5439c5551e59d14baaf6d0371eee7cb"/>
+				<disk name="dreamon collection 4 (euro)" sha1="eb924c18b5439c5551e59d14baaf6d0371eee7cb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8595,13 +8569,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track08.raw" size="33643008" md5="0966a1426fa55d484a506e3bd7745033" sha1="e7826d592768ae29d4d9235c58fa737518073baa"/>
 		<rom name="track09.bin" size="576785664" md5="913858cf429958fd8c820a3620011432" sha1="ab42a454faac3d8f7c34065aa9c012d9bf511c69"/>
 		-->
-		<description>Dream On Volume 1 (Euro)</description>
+		<description>DreamOn Volume 1 (Euro)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="833-0002-50"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 1 (euro)" sha1="b8d0a3a629c6d35d0f6885af35ae8cee0837e1d6"/>
+				<disk name="dreamon volume 1 (euro)" sha1="b8d0a3a629c6d35d0f6885af35ae8cee0837e1d6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8619,14 +8593,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="38582208" md5="2d387017270566b91746fcd6ac01ef06" sha1="ae954aee1fad542aea9ed192eec3aa989708287c"/>
 		<rom name="track05.bin" size="556095120" md5="ff8e83a484b5ce8b73c1d4400b7c852c" sha1="28d62db16fc6577f6ddc23a2139867e63ab7c3cd"/>
 		-->
-		<description>Dream On Volume 2 (Euro)</description>
+		<description>DreamOn Volume 2 (Euro)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0001-50"/>
 		<info name="release" value="199910xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 2 (euro)" sha1="555bf62bc6bd732694a0bcc5e7f0e58fccfdff3e"/>
+				<disk name="dreamon volume 2 (euro)" sha1="555bf62bc6bd732694a0bcc5e7f0e58fccfdff3e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8644,14 +8618,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="32100096" md5="0782f155cb9d926297d79e782ab771ee" sha1="f5a085d995d549cb5e5d6a21ae007f7c4743b725"/>
 		<rom name="track05.bin" size="620318832" md5="1b48c729230f9072e430d2321e83024c" sha1="6ffd6f8ce44bad3f7f1e4d5b242aff4110f55c27"/>
 		-->
-		<description>Dream On Volume 3 (Euro)</description>
+		<description>DreamOn Volume 3 (Euro)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="833-0008-71"/>
 		<info name="release" value="1999011xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 3 (euro)" sha1="f4d00adae78559d2a33273fa6fba3c46179744b8"/>
+				<disk name="dreamon volume 3 (euro)" sha1="f4d00adae78559d2a33273fa6fba3c46179744b8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8676,14 +8650,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track11.raw" size="25182864" md5="8b026a6e5743e7fafe66d2fae4d7a250" sha1="d4d1470129138a63cd89f235e5a2cb50e166af16"/>
 		<rom name="track12.bin" size="404433456" md5="939bb9c16b0df736fea390979464eb58" sha1="0380dc5f7d7b89fa99aa7f6ecefe33048cf33140"/>
 		-->
-		<description>Dream On Volume 4 (Euro)</description>
+		<description>DreamOn Volume 4 (Euro)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0011-50"/>
 		<info name="release" value="199912xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 4 (euro)" sha1="5b02913558dd2a01b941eb9fd87cf3d5a9e9521b"/>
+				<disk name="dreamon volume 4 (euro)" sha1="5b02913558dd2a01b941eb9fd87cf3d5a9e9521b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8702,14 +8676,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track05.raw" size="43046304" md5="983bc97410546f524f184c6b62ca5995" sha1="c754db8f00503f8a5c081cf16b912b37b2a43f31"/>
 		<rom name="track06.bin" size="479182368" md5="e6adc1befb222befcd03a30581f55794" sha1="ed071c8c7327ec840a75a40c64afa78576e5efc8"/>
 		-->
-		<description>Dream On Volume 5 (Euro)</description>
+		<description>DreamOn Volume 5 (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="830-0011-50"/>
 		<info name="release" value="200001xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 5 (euro)" sha1="d18cff8f2920121a2f039c346333546b656d5a3d"/>
+				<disk name="dreamon volume 5 (euro)" sha1="d18cff8f2920121a2f039c346333546b656d5a3d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8725,14 +8699,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.bin" size="1185760800" md5="910c402a76b6a4c175ae85633c15e8c6" sha1="e7b4d6a1b2d4b1667bedd680008aae91aa2d8db6"/>
 		-->
-		<description>Dream On Volume 6 (Euro)</description>
+		<description>DreamOn Volume 6 (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="833-0012-50"/>
 		<info name="release" value="200002xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 6 (euro)" sha1="6a729de4273854b55b13d2703b8216bfb2bb48ec"/>
+				<disk name="dreamon volume 6 (euro)" sha1="6a729de4273854b55b13d2703b8216bfb2bb48ec"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8753,14 +8727,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track07.raw" size="12089280" md5="f5969521da574d2fbf591ca13392ea7e" sha1="0eba22cef97196e1a2d91c43dd700f81c99b0c91"/>
 		<rom name="track08.bin" size="449229648" md5="d71a878f9ae8b01e5457df16aaf530f9" sha1="856ac92a1156fae682b8060b8ebb824061f4c3ed"/>
 		-->
-		<description>Dream On Volume 7 (Euro)</description>
+		<description>DreamOn Volume 7 (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="833-0014-50 832-0017-50"/>
 		<info name="release" value="200004xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 7 (euro)" sha1="bde4fd8b1ba6bed8233133f1814d493e3ebbf917"/>
+				<disk name="dreamon volume 7 (euro)" sha1="bde4fd8b1ba6bed8233133f1814d493e3ebbf917"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8768,14 +8742,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	<!-- Bundled with the May/June 2000 (#4) issue of "Dreamcast: Le Magazine Officiel". -->
 	<!--
 	<software name="dreamon7n8">
-		<description>Dream On Volume 7 &amp; 8 (Fra)</description>
+		<description>DreamOn Volume 7 &amp; 8 (Fra)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="833-0020-50 832-0025-50"/>
 		<info name="release" value="200005xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 7 and 8 (fra)" status="nodump"/>
+				<disk name="dreamon volume 7 and 8 (fra)" status="nodump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8792,14 +8766,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.bin" size="1185760800" md5="253ce68ac86e061e77f9d41555fcb547" sha1="d04f79f8c2c4f3eb9f4b53fe85ff08ce14bf5905"/>
 		-->
-		<description>Dream On Volume 8 (Euro)</description>
+		<description>DreamOn Volume 8 (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="833-0015-50 832-0019-50"/>
 		<info name="release" value="200005xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 8 (euro)" sha1="3db1d626b2c1d0480fcb31681f43bae74f6c351b"/>
+				<disk name="dreamon volume 8 (euro)" sha1="3db1d626b2c1d0480fcb31681f43bae74f6c351b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8815,7 +8789,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.bin" size="1185760800" md5="bd1206ddf7a9b485b3702c78f795396c" sha1="ce7e91b6f12a0a650b091a5f92fdf0901dc80318"/>
 		-->
-		<description>Dreamon Volume 9 (Euro)</description>
+		<description>DreamOn Volume 9 (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0023-50 833-0019-50"/>
@@ -8837,14 +8811,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="22226400" md5="71e04c96b9b867daffcd0ca97cb73a0c" sha1="142893b9241b259cc9a98200a7395cac1e4ba446"/>
 		<rom name="track05.bin" size="1043295456" md5="c26f5afe36acb8796d1f6a298adb6202" sha1="02ac5eec6829a0d5ae2233f87ab15d58ae0a5de0"/>
 		-->
-		<description>Dream On Volume 10 (Euro)</description>
+		<description>DreamOn Volume 10 (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="833-0025-50 832-0028-50"/>
 		<info name="release" value="200007xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 10 (euro)" sha1="6cdf20cb222ebf9c054ed6d29e2b6364c110ca5a"/>
+				<disk name="dreamon volume 10 (euro)" sha1="6cdf20cb222ebf9c054ed6d29e2b6364c110ca5a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8859,14 +8833,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="22226400" md5="71e04c96b9b867daffcd0ca97cb73a0c" sha1="142893b9241b259cc9a98200a7395cac1e4ba446"/>
 		<rom name="track05.bin" size="756628992" md5="217de3743d954c983efd7fbb76703c90" sha1="0767bf1a72efbe4aad9f002b1bb4d9330465de42"/>
 		-->
-		<description>Dream On Volume 10 (Ger)</description>
+		<description>DreamOn Volume 10 (Ger)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="833-0024-50 832-0027-50"/>
 		<info name="release" value="200007xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 10 (ger)" sha1="f401effc77403a38d81bc6ac3dad8e83a5ff6042"/>
+				<disk name="dreamon volume 10 (ger)" sha1="f401effc77403a38d81bc6ac3dad8e83a5ff6042"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8874,14 +8848,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	<!-- Bundled with the July/August 2000 (#5) issue of "Dreamcast: Le Magazine Officiel". -->
 	<!--
 	<software name="dreamon10f" cloneof="dreamon10">
-		<description>Dream On Volume 10 (Fra)</description>
+		<description>DreamOn Volume 10 (Fra)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="833-0026-09 832-0031-09"/>
 		<info name="release" value="200007xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 10 (fra)" status="nodump"/>
+				<disk name="dreamon volume 10 (fra)" status="nodump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8900,14 +8874,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="25182864" md5="8b026a6e5743e7fafe66d2fae4d7a250" sha1="d4d1470129138a63cd89f235e5a2cb50e166af16"/>
 		<rom name="track05.bin" size="628353264" md5="3eb1007cce607e727b4793689880c28e" sha1="e1ce284f2af4861710b042967a2410930e451ae6"/>
 		-->
-		<description>Dream On Volume 11 (Euro)</description>
+		<description>DreamOn Volume 11 (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="833-0027-50 832-0033-50"/>
 		<info name="release" value="200008xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 11 (euro)" sha1="6e5c5e1499e0d06fc4ac869b1044d0d3e14f0ec6"/>
+				<disk name="dreamon volume 11 (euro)" sha1="6e5c5e1499e0d06fc4ac869b1044d0d3e14f0ec6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8923,14 +8897,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.bin" size="1185760800" md5="fd2aa97a0bb10406d8baf77c2871fdb6" sha1="98c2008bb63fd5bb90ae10926a7f446e4b0a09a9"/>
 		-->
-		<description>Dream On Volume 12 (Euro)</description>
+		<description>DreamOn Volume 12 (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="833-0031-50 832-0035-50"/>
 		<info name="release" value="200009xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 12 (euro)" sha1="1bdfb7e0c2b142da97a56570dbe89f6a35f3f693"/>
+				<disk name="dreamon volume 12 (euro)" sha1="1bdfb7e0c2b142da97a56570dbe89f6a35f3f693"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8946,14 +8920,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.bin" size="1185760800" md5="829c7c302db5282fcc2ebeaa48825e97" sha1="abfc0cadceeb2942d2122aa22925738430a5b743"/>
 		-->
-		<description>Dream On Volume 13 (Euro)</description>
+		<description>DreamOn Volume 13 (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="833-0029-50 832-0038-50"/>
 		<info name="release" value="200010xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 13 (euro)" sha1="1915e112c56cb3dd146fe411d108eb0df46874d5"/>
+				<disk name="dreamon volume 13 (euro)" sha1="1915e112c56cb3dd146fe411d108eb0df46874d5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8971,14 +8945,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="68796000" md5="20221c7675ef1a7d5e968f7e8eeb9a58" sha1="8859d3c5ac3d087d6982a0e9fc907c2bef983f58"/>
 		<rom name="track05.bin" size="587642496" md5="764ca2893170754c9051cfaa3193be73" sha1="06a97cd3e07b41343717b40c67941a63bd8948c2"/>
 		-->
-		<description>Dream On Volume 14 (Euro)</description>
+		<description>DreamOn Volume 14 (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0043-50 833-0034-50"/>
 		<info name="release" value="200011xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 14 (euro)" sha1="2777f93dbf96631082208f968a9a31de511b3efb"/>
+				<disk name="dreamon volume 14 (euro)" sha1="2777f93dbf96631082208f968a9a31de511b3efb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8999,14 +8973,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track07.raw" size="12987744" md5="d6c76c1c5dc8c0642c0e1518280624ef" sha1="8d3cd9480658db2cb69516033f9408ad4dadc3bd"/>
 		<rom name="track08.bin" size="1043227248" md5="2334b91fa46cbeab93638a176e198e24" sha1="4c9770bda4dd6e19559bb1ac58fbdf18536ea8d3"/>
 		-->
-		<description>Dream On Volume 15 (Euro)</description>
+		<description>DreamOn Volume 15 (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0047-50 833-0036-50"/>
 		<info name="release" value="200012xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 15 (euro)" sha1="57b76466d479424d756cfe8073eed52486c7312c"/>
+				<disk name="dreamon volume 15 (euro)" sha1="57b76466d479424d756cfe8073eed52486c7312c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9031,14 +9005,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track11.raw" size="1959216" md5="33bd34cb2ed3050dbf0032836358a05c" sha1="8640872aa244d1f8b37bd0723e282bc8ea3cb157"/>
 		<rom name="track12.bin" size="703353840" md5="3d492bd61a88723d5a03e7e98d3d61f9" sha1="389b6dd780d50ed3b89d9f43ddd49d29dff8210a"/>
 		-->
-		<description>Dream On Volume 16 (Euro)</description>
+		<description>DreamOn Volume 16 (Euro)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0051-50 833-0038-50"/>
 		<info name="release" value="200101xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 16 (euro)" sha1="3ee4c477025b0b84addf802cadd533049ebe38ef"/>
+				<disk name="dreamon volume 16 (euro)" sha1="3ee4c477025b0b84addf802cadd533049ebe38ef"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9058,14 +9032,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track06.raw" size="29233008" md5="3c1177052d007698767e1c65d98fb44b" sha1="0592e543326a318b062cd6738a02c215564ce25c"/>
 		<rom name="track07.bin" size="829639776" md5="92bb04019fdab7b79365efaa8b8447d1" sha1="f907c292b8ca67bcf581596b629336a45751c14f"/>
 		-->
-		<description>Dream On Volume 17 (Euro)</description>
+		<description>DreamOn Volume 17 (Euro)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0054-50 833-0041-50"/>
 		<info name="release" value="200102xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 17 (euro)" sha1="fce26a06c5b3f92c8008ee8972547b3bf1b3c898"/>
+				<disk name="dreamon volume 17 (euro)" sha1="fce26a06c5b3f92c8008ee8972547b3bf1b3c898"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9081,14 +9055,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.bin" size="1185760800" md5="9162e24bb78dac7dc87dbbb28723dbe0" sha1="5e8b1490849443fba70c60b6ab1cdd4c35d52177"/>
 		-->
-		<description>Dream On Volume 18 (Euro)</description>
+		<description>DreamOn Volume 18 (Euro)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0056-50 833-0042-50"/>
 		<info name="release" value="200103xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 18 (euro)" sha1="5c1a8d0b77a675a282b6b7188b3b7605e9d3e3ea"/>
+				<disk name="dreamon volume 18 (euro)" sha1="5c1a8d0b77a675a282b6b7188b3b7605e9d3e3ea"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9106,14 +9080,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="29233008" md5="3c1177052d007698767e1c65d98fb44b" sha1="0592e543326a318b062cd6738a02c215564ce25c"/>
 		<rom name="track05.bin" size="975844800" md5="d263e81fd8de4421936d798475ec9136" sha1="0d357a2becdbb5e008e71203f9e1e72c3c827fcf"/>
 		-->
-		<description>Dream On Volume 19 (Euro)</description>
+		<description>DreamOn Volume 19 (Euro)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0060-50 833-0045-50"/>
 		<info name="release" value="200104xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 19 (euro)" sha1="a1fdbc9384fae0ee0a04b601ac39ba60faef6e0d"/>
+				<disk name="dreamon volume 19 (euro)" sha1="a1fdbc9384fae0ee0a04b601ac39ba60faef6e0d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9129,14 +9103,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.bin" size="1185760800" md5="1b66176355c21d3761887a8c1991e2fa" sha1="b43096a125c28ed7af6753f03010d45817277e44"/>
 		-->
-		<description>Dream On Volume 20 (Euro)</description>
+		<description>DreamOn Volume 20 (Euro)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0062-50 833-0046-50"/>
 		<info name="release" value="200104xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 20 (euro)" sha1="8873fb2b70dd09b3733447e85db8f46ce767b904"/>
+				<disk name="dreamon volume 20 (euro)" sha1="8873fb2b70dd09b3733447e85db8f46ce767b904"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9152,14 +9126,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.bin" size="1185760800" md5="b4790cc8670de164c3b0eaef2c4d90c2" sha1="4defe8e0d94a94e3cafc46434a2ebeb30d398f3f"/>
 		-->
-		<description>Dream On Volume 21 (Euro)</description>
+		<description>DreamOn Volume 21 (Euro)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0064-50 833-0047-50"/>
 		<info name="release" value="200106xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 21 (euro)" sha1="aaceea8c402ac62468f8cef62f58292eddcd93e6"/>
+				<disk name="dreamon volume 21 (euro)" sha1="aaceea8c402ac62468f8cef62f58292eddcd93e6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9175,14 +9149,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.bin" size="1185760800" md5="f10fd1aef5edc3fbd88fd4569d3d65a9" sha1="bf3ea2452f24dbb756c6d2ee4af0c2f2f76684dc"/>
 		-->
-		<description>Dream On Volume 22 (Euro)</description>
+		<description>DreamOn Volume 22 (Euro)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0066-50 833-0048-50"/>
 		<info name="release" value="200107xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream on volume 22 (euro)" sha1="6a5c119382db259d6ceb4035359885bb68a68595"/>
+				<disk name="dreamon volume 22 (euro)" sha1="6a5c119382db259d6ceb4035359885bb68a68595"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10004,14 +9978,12 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 				<disk name="dreamcast express vol. 7 (jpn) (special disk)" sha1="b21fdf87b34d51d542f1a0d17e34cad50c287ee6"/>
 			</diskarea>
 		</part>
-		<!--
 		<part interface="dc_gdrom" name="gdrom2">
 			<feature name="part_id" value="Trail & Movie Disk"/>
 			<diskarea name="gdrom">
 				<disk name="dreamcast express vol. 7 (jpn) (trail and movie disk)" status="nodump"/>
 			</diskarea>
 		</part>
-		-->
 	</software>
 
 	<!--
@@ -10122,6 +10094,20 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--
+	<software name="dcnoid">
+		<description>Dreamcastnoid (World)</description>
+		<year>2017</year>
+		<publisher>Matra</publisher>
+		<info name="release" value="20171006" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="dreamcastnoid (world)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
 	<rom name="DCNoid.mdf" size="119674464" md5="852edc359098141042fb2c8294c2f948" sha1="2173eab77dcf8e96fe66b7196613a4f52cacfb44"/>
 	<rom name="DCNoid.mds" size="1390" md5="d45b9f5286f201f83379628bfa060347" sha1="5dd29072e9c9e2126a320468f6ae671c3c088548"/>
 
@@ -10137,20 +10123,6 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
 				<disk name="dreamcastnoid (world, prototype 20161219)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
-	-->
-
-	<!--
-	<software name="dcnoid">
-		<description>Dreamcastnoid (World)</description>
-		<year>2017</year>
-		<publisher>Matra</publisher>
-		<info name="release" value="20171006" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
-				<disk name="dreamcastnoid (world)" status="nodump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10212,7 +10184,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="release" value="19991014" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dreamkey (euro)" sha1="3cc7d9c54185eff8cc7031d8a8301b5ec529f8c3"/>
+				<disk name="dreamkey (euro, rev. 1)" sha1="3cc7d9c54185eff8cc7031d8a8301b5ec529f8c3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10344,13 +10316,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
 		<rom name="track05.bin" size="114255456" md5="8f9e158df702ac84322c7432ab8bac5e" sha1="9b621a8290c1e083775afae6e495d9d53bed8811"/>
 		-->
-		<description>DreamKey Version 2.0 (Swe, Fin, Bel, Swi, Dut)</description>
+		<description>DreamKey Version 2.0 (Bel, Fin, Ned, Swe, Swi)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0045-46"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dreamkey version 2.0 (swe, fin, bel, swi, dut)" sha1="bd0cbdc5daf8d36519d586c74582d5fb3d8906fe"/>
+				<disk name="dreamkey version 2.0 (swe, fin, bel, swi, Ned)" sha1="bd0cbdc5daf8d36519d586c74582d5fb3d8906fe"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10358,7 +10330,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	<!-- Bundled together with Dreamcast consoles. -->
 	<!--
 	<software name="dreamkey2a" cloneof="dreamkey3">
-		<description>DreamKey Version 2.0 (Eng, Ger, Fra, Spa)</description>
+		<description>DreamKey Version 2.0 (Fra, Ger, Spa, UK)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0053-50"/>
@@ -10536,9 +10508,25 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
+	<!--
+	<software name="dux" cloneof="dux15">
+		<description>Dux (World)</description>
+		<year>2009</year>
+		<publisher>HUCAST</publisher>
+		<info name="serial" value="DX10RE"/>
+		<info name="release" value="20090617" />
+		<info name="alt_title" value="ダユックス" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="dux (world)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
 	<!-- The Limited Edition (DX10LE) shares the same disc as the regular edition (DX10RE) but includes a soundtrack CD. -->
 	<!--
-	<software name="duxle" cloneof="dux15ce">
+	<software name="duxle" cloneof="dux15">
 		<description>Dux - Limited Edition (World)</description>
 		<year>2009</year>
 		<publisher>HUCAST</publisher>
@@ -10560,25 +10548,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<!--
-	<software name="dux" cloneof="dux15ce">
-		<description>Dux (World)</description>
-		<year>2009</year>
-		<publisher>HUCAST</publisher>
-		<info name="serial" value="DX10RE"/>
-		<info name="release" value="20090617" />
-		<info name="alt_title" value="ダユックス" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
-				<disk name="dux (world)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
-	-->
-
 	<!-- Also released as a jewelcase version, which is identical to retail. -->
 	<!--
-	<software name="dux15" cloneof="dux15ce">
+	<software name="dux15">
 		<description>Dux - Version 1.5 (World)</description>
 		<year>2013</year>
 		<publisher>HUCAST</publisher>
@@ -10595,7 +10567,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!-- JoshProd re-release. Possibly the same as the original release. -->
 	<!--
-	<software name="dux15jp" cloneof="dux15ce">
+	<software name="dux15jp" cloneof="dux15">
 		<description>Dux - Version 1.5 (World, Re-Release)</description>
 		<year>2017</year>
 		<publisher>JoshProd</publisher>
@@ -10610,7 +10582,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!-- The Limited Edition (DX15LE-JP) shares the same disc as the regular edition (DX15RE-JP) but includes a soundtrack CD. -->
 	<!--
-	<software name="dux15le" cloneof="dux15ce">
+	<software name="dux15le" cloneof="dux15">
 		<description>Dux 1.5 - Limited Edition (World)</description>
 		<year>2013</year>
 		<publisher>HUCAST</publisher>
@@ -10634,7 +10606,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!-- The Collector's Edition (DX15CE-JP) shares the same disc as the regular edition (DX15RE-JP) but includes Dux 1.1 and two soundtrack CDs. -->
 	<!--
-	<software name="dux15ce">
+	<software name="dux15ce" cloneof="dux15">
 		<description>Dux 1.5 - Collector's Edition (World)</description>
 		<year>2014</year>
 		<publisher>HUCAST</publisher>
@@ -11211,8 +11183,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!--
 	<software name="egate2">
+	    <!--
+		<rom name="Eldorado Gate Vol. 2 v1.000 (2000)(Capcom)(NTSC)(JP)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+		<rom name="track01.bin" size="705600" md5="9dfa8ba9522e65289fe06de15475e8d9" sha1="1d64fee604d50a84acabe03dd429bb5a7c55182a"/>
+		<rom name="track02.raw" size="1735776" md5="c2d41d5626e4c6fd8a89879f47a6200b" sha1="afebf7addfadd6dc7f95710e44e933c795dc4c5f"/>
+		<rom name="track03.bin" size="1185760800" md5="04264068316f3f74f83b3f116f3bce23" sha1="4cc29723c80d349c98e6e3c224e846e99872fc11"/>
+		-->
 		<description>Eldorado Gate Vol. 2 (Jpn)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
@@ -11221,11 +11198,10 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="alt_title" value="エルドラドゲート 第2巻" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="eldorado gate vol. 2 (jpn)" status="nodump"/>
+				<disk name="eldorado gate vol. 2 (jpn)" sha1="aa6f826b092eed7b405cce595d8877bb09ad320e"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<software name="egate3">
 		<!--
@@ -11495,8 +11471,15 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!--
 	<software name="nba2night">
+		<!--
+		<rom name="ESPN NBA 2night v1.005 (2000)(Konami)(NTSC)(US)[!].gdi" size="149" md5="e41415911b4815ef93ae0ad076b8527c" sha1="bf0932e2744c2fb498fa10ca835f240fc7f48422"/>
+		<rom name="track01.bin" size="1425312" md5="12d9c76651c04622e738d248367142b0" sha1="d412313881d51824ade904f604d3ca8661a7b23a"/>
+		<rom name="track02.raw" size="1237152" md5="a93da720e44dce50b73f86be12ab7c47" sha1="f88eee7b2458e4222f829fcdaee185fcf861f59d"/>
+		<rom name="track03.bin" size="586219536" md5="7b3ff348377cc1db1dc20c4aa2ac51fc" sha1="c22c72e77fcdf19ba33554834b35bcc081aaa138"/>
+		<rom name="track04.raw" size="1060752" md5="166d547d4b80a87ad3538f9377fbf6d8" sha1="471abb758a709c9d678bd2e76f31a6d721b5f4f0"/>
+		<rom name="track05.bin" size="597774912" md5="b3c90071aa5e2cadbe5f54b83f244002" sha1="f6b5648968a67dc622163f165198f1ec890c5c0e"/>
+		-->
 		<description>ESPN NBA 2Night (USA)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
@@ -11504,11 +11487,10 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="release" value="20001120" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="espn nba 2night (usa)" status="nodump"/>
+				<disk name="espn nba 2night (usa)" sha1="03f35405346799e52cd64ddbfe09901f25170adc"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!-- Two promo versions exists (950-0154-50 952-0149-50 and P830-0188-50 T-7015D-50), they are most likely the same as retail. -->
 	<software name="euroleag">
@@ -11555,7 +11537,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!--
-	<software name="ever17" cloneof="ever17pe">
+	<software name="ever17">
 		<description>Ever 17: The Out of Infinity (Jpn)</description>
 		<year>2002</year>
 		<publisher>KID</publisher>
@@ -11572,7 +11554,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
 	<!--
-	<software name="ever17pe">
+	<software name="ever17pe" cloneof="ever17">
 		<description>Ever 17: The Out of Infinity - Premium Edition (Jpn)</description>
 		<year>2003</year>
 		<publisher>KID</publisher>
@@ -11659,8 +11641,15 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- A promo version exists (950-0190-50 952-0180-50), it is most likely the same as retail. -->
-	<!--
 	<software name="eviltwin">
+		<!--
+		<rom name="Evil Twin - Cyprien's Chronicles v1.001 (2002)(Bigben - Ubi Soft)(PAL)(M5)[!].gdi" size="147" md5="95465f5f5c99b9809ba2336b28ca11db" sha1="c35030796fcda4324f0037f220455bffca6600cd"/>
+		<rom name="track01.bin" size="705600" md5="fbeaf9152d11ff0dcb751cf50c63f2ad" sha1="4e23f289f5477fe56498a2499c2c9a5d76995b90"/>
+		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+		<rom name="track03.bin" size="38706864" md5="dcf7dd4df4c0490db2daed05e9ad5e11" sha1="e9e6f425b929ba2c6c9b97346126b47f25a2f829"/>
+		<rom name="track04.raw" size="13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
+		<rom name="track05.bin" size="1132530336" md5="d40503cf36be324ca2784ee7eb28a0ee" sha1="4abe325e8caf1600e8a1647dc3ebff713b0f8837"/>
+		-->
 		<description>Evil Twin: Cyprien's Chronicles (Euro)</description>
 		<year>2002</year>
 		<publisher>Bigben Interactive</publisher>
@@ -11668,11 +11657,10 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="release" value="20020412" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="evil twin cyprien's chronicles (euro)" status="nodump"/>
+				<disk name="evil twin cyprien's chronicles (euro)" sha1="d83c0515cce6a787fab7efc89b80c519a9fe9c2f"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!-- It is unknown what (if any) difference this has to the T-46605D-80 release. -->
 	<!--
@@ -12495,7 +12483,22 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--
-	<software name="fststrkrle">
+	<software name="fststrkr">
+		<description>Fast Striker (World)</description>
+		<year>2010</year>
+		<publisher>NG:DEV.TEAM</publisher>
+		<info name="release" value="20101221" />
+		<info name="alt_title" value="高速ストライカー" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="fast striker (world)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="fststrkrle" cloneof="fststrkr">
 		<description>Fast Striker: Limited Edition (World)</description>
 		<year>2010</year>
 		<publisher>NG:DEV.TEAM</publisher>
@@ -12511,21 +12514,6 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 			<feature name="part_id" value="Fast Striker: Original Soundtrack"/>
 			<diskarea name="gdrom">
 				<disk name="fast striker limited edition (world) (original soundtrack)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
-	-->
-
-	<!--
-	<software name="fststrkr" cloneof="fststrkrle">
-		<description>Fast Striker (World)</description>
-		<year>2010</year>
-		<publisher>NG:DEV.TEAM</publisher>
-		<info name="release" value="20101221" />
-		<info name="alt_title" value="高速ストライカー" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
-				<disk name="fast striker (world)" status="nodump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12668,7 +12656,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track05.raw" size="13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
 		<rom name="track06.bin" size="745148880" md5="f7667b695ab4841ab8d2fca719776a38" sha1="b686099ffb1a5cb44b01a9e4cf86ab3ab34507af"/>
 		-->
-		<description>Fighting Force 2 (Euro, Eng)</description>
+		<description>Fighting Force 2 (Euro)</description>
 		<year>1999</year>
 		<publisher>Eidos Interactive</publisher>
 		<info name="serial" value="T-36802D-05"/>
@@ -12703,13 +12691,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="fforce2fd" cloneof="fforce2">
-		<description>Fighting Force 2 (Euro, Fra / Dut)</description>
+		<description>Fighting Force 2 (Fra, Ned)</description>
 		<year>1999</year>
 		<publisher>Eidos Interactive</publisher>
 		<info name="serial" value="T-36802D-59"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="fighting force 2 (euro, fra - dut)" status="nodump"/>
+				<disk name="fighting force 2 (fra, ned)" status="nodump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -12813,11 +12801,34 @@ P830-****-** : Appears to be a Sega part number for promo discs.
  	-->
 
 	<!--
+	<software name="frstkiss2">
+		<description>First Kiss Monogatari II: Anata ga Irukara (Jpn)</description>
+		<year>2002</year>
+		<publisher>Broccoli</publisher>
+		<info name="serial" value="T-46305M"/>
+		<info name="release" value="20020808" />
+		<info name="alt_title" value="ファーストKiss☆物語II 〜あなたがいるから〜" />
+		<part interface="dc_gdrom" name="gdrom1">
+			<feature name="part_id" value="Disc 1"/>
+			<diskarea name="gdrom">
+				<disk name="first kiss monogatari ii anata ga irukara (jpn) (disc 1)" status="nodump"/>
+			</diskarea>
+		</part>
+		<part interface="dc_gdrom" name="gdrom2">
+			<feature name="part_id" value="Disc 2"/>
+			<diskarea name="gdrom">
+				<disk name="first kiss monogatari ii anata ga irukara (jpn) (disc 2)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
 	The Limited Edition (T-46304M) shares the same disc as the regular edition (T-46305M) but includes two postcards,
 	one telephone cards, a special cardboard box and the bonus game "First Kiss Story".
 	-->
 	<!--
-	<software name="frstkiss2tb">
+	<software name="frstkiss2tb" cloneof="frstkiss2">
 		<description>First Kiss Monogatari II: Anata ga Irukara - Tokubetsu Genteiban (Jpn)</description>
 		<year>2002</year>
 		<publisher>Broccoli</publisher>
@@ -12846,29 +12857,6 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 			<feature name="part_id" value="First Kiss Story - Disc 2"/>
 			<diskarea name="gdrom">
 				<disk name="first kiss story (jpn) (disc 2)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
-	-->
-
-	<!--
-	<software name="frstkiss2" cloneof="frstkiss2tb">
-		<description>First Kiss Monogatari II: Anata ga Irukara (Jpn)</description>
-		<year>2002</year>
-		<publisher>Broccoli</publisher>
-		<info name="serial" value="T-46305M"/>
-		<info name="release" value="20020808" />
-		<info name="alt_title" value="ファーストKiss☆物語II 〜あなたがいるから〜" />
-		<part interface="dc_gdrom" name="gdrom1">
-			<feature name="part_id" value="Disc 1"/>
-			<diskarea name="gdrom">
-				<disk name="first kiss monogatari ii anata ga irukara (jpn) (disc 1)" status="nodump"/>
-			</diskarea>
-		</part>
-		<part interface="dc_gdrom" name="gdrom2">
-			<feature name="part_id" value="Disc 2"/>
-			<diskarea name="gdrom">
-				<disk name="first kiss monogatari ii anata ga irukara (jpn) (disc 2)" status="nodump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13266,7 +13254,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track03.bin" size="1185760800" md5="73b443f96a919282364ef02105b8be74" sha1="626144e0343150604f76e152a3d1d58e3a4d5858"/>
 		-->
 		<description>Fur Fighters (Euro, Demo)</description>
-		<year>19??</year>
+		<year>2000</year>
 		<publisher>Acclaim</publisher>
 		<info name="serial" value="D-0008-50"/>
 		<info name="release" value="200006xx" />
