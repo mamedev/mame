@@ -32,7 +32,8 @@
 	- manxtt: no escape from "active motion slider" tutorial (needs analog inputs), 
 	          bypass it by entering then exiting service mode;
     - manxtt: no bikes are visible (not a z-sort issue!);
-	- manxtt: course select island map doesn't rotate properly (matrix issue?);
+	- manxtt: course select island map doesn't rotate properly:
+		      timing issue, i960 sends read/write geo addresses to bufferram 0x918000/4 which TGP never reads in time.
 	- sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
 	- skytargt: really slow during gameplay (fixed?);
 	- skytargt: short draw distance (might be down to z-sort);
