@@ -167,11 +167,12 @@ uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-ADDRESS_MAP_START(sfcbox_state::snes_map)
-	AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(snes_r_bank1, snes_w_bank1)
-	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes_r_bank2, snes_w_bank2)    /* Mirror and ROM */
-ADDRESS_MAP_END
+void sfcbox_state::snes_map(address_map &map)
+{
+	map(0x000000, 0x7dffff).rw(this, FUNC(sfcbox_state::snes_r_bank1), FUNC(sfcbox_state::snes_w_bank1));
+	map(0x7e0000, 0x7fffff).ram();                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
+	map(0x800000, 0xffffff).rw(this, FUNC(sfcbox_state::snes_r_bank2), FUNC(sfcbox_state::snes_w_bank2));    /* Mirror and ROM */
+}
 
 READ8_MEMBER(sfcbox_state::spc_ram_100_r)
 {
@@ -183,18 +184,20 @@ WRITE8_MEMBER(sfcbox_state::spc_ram_100_w)
 	m_spc700->spc_ram_w(space, offset + 0x100, data);
 }
 
-ADDRESS_MAP_START(sfcbox_state::spc_mem)
-	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", snes_sound_device, spc_ram_r, spc_ram_w) /* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", snes_sound_device, spc_io_r, spc_io_w)   /* spc io */
-	AM_RANGE(0x0100, 0xffff) AM_READWRITE(spc_ram_100_r, spc_ram_100_w)
-ADDRESS_MAP_END
+void sfcbox_state::spc_mem(address_map &map)
+{
+	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
+	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
+	map(0x0100, 0xffff).rw(this, FUNC(sfcbox_state::spc_ram_100_r), FUNC(sfcbox_state::spc_ram_100_w));
+}
 
-ADDRESS_MAP_START(sfcbox_state::sfcbox_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_ROM AM_REGION("krom", 0)
-	AM_RANGE(0x20000, 0x27fff) AM_RAM
-	AM_RANGE(0x40000, 0x47fff) AM_ROM AM_REGION("grom1", 0)
-	AM_RANGE(0x60000, 0x67fff) AM_ROM AM_REGION("grom2", 0)
-ADDRESS_MAP_END
+void sfcbox_state::sfcbox_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).rom().region("krom", 0);
+	map(0x20000, 0x27fff).ram();
+	map(0x40000, 0x47fff).rom().region("grom1", 0);
+	map(0x60000, 0x67fff).rom().region("grom2", 0);
+}
 
 
 WRITE8_MEMBER( sfcbox_state::port_80_w )
@@ -283,21 +286,22 @@ WRITE8_MEMBER( sfcbox_state::snes_map_1_w )
 	printf("%s SRAM Size\n",sram_size[((data & 0xc0) >> 6)]);
 }
 
-ADDRESS_MAP_START(sfcbox_state::sfcbox_io)
-	AM_RANGE(0x00, 0x3f) AM_RAM // internal i/o
-	AM_RANGE(0x0b, 0x0b) AM_DEVWRITE("mb90082",mb90082_device,write)
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("KEY") AM_WRITE(port_80_w) // Keyswitch and Button Inputs / SNES Transfer and Misc Output
-	AM_RANGE(0x81, 0x81) AM_READWRITE(port_81_r,port_81_w) // SNES Transfer and Misc Input / Misc Output
+void sfcbox_state::sfcbox_io(address_map &map)
+{
+	map(0x00, 0x3f).ram(); // internal i/o
+	map(0x0b, 0x0b).w(m_mb90082, FUNC(mb90082_device::write));
+	map(0x80, 0x80).portr("KEY").w(this, FUNC(sfcbox_state::port_80_w)); // Keyswitch and Button Inputs / SNES Transfer and Misc Output
+	map(0x81, 0x81).rw(this, FUNC(sfcbox_state::port_81_r), FUNC(sfcbox_state::port_81_w)); // SNES Transfer and Misc Input / Misc Output
 //  AM_RANGE(0x82, 0x82) // Unknown/unused
-	AM_RANGE(0x83, 0x83) AM_READWRITE(port_83_r,port_83_w) // Joypad Input/Status / Joypad Output/Control
+	map(0x83, 0x83).rw(this, FUNC(sfcbox_state::port_83_r), FUNC(sfcbox_state::port_83_w)); // Joypad Input/Status / Joypad Output/Control
 //  AM_RANGE(0x84, 0x84) // Joypad 1, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
 //  AM_RANGE(0x85, 0x85) // Joypad 1, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
 //  AM_RANGE(0x86, 0x86) // Joypad 2, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
 //  AM_RANGE(0x87, 0x87) // Joypad 2, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
-	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("RTC_R") AM_WRITE_PORT("RTC_W") //  Real Time Clock
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(snes_map_0_w) // SNES Mapping Register 0
-	AM_RANGE(0xc1, 0xc1) AM_WRITE(snes_map_1_w) // SNES Mapping Register 1
-ADDRESS_MAP_END
+	map(0xa0, 0xa0).portr("RTC_R").portw("RTC_W"); //  Real Time Clock
+	map(0xc0, 0xc0).w(this, FUNC(sfcbox_state::snes_map_0_w)); // SNES Mapping Register 0
+	map(0xc1, 0xc1).w(this, FUNC(sfcbox_state::snes_map_1_w)); // SNES Mapping Register 1
+}
 
 
 static INPUT_PORTS_START( snes )

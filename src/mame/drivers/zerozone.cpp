@@ -49,27 +49,29 @@ WRITE16_MEMBER( zerozone_state::sound_w )
 }
 
 
-ADDRESS_MAP_START(zerozone_state::main_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSWB")
-	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("DSWA")
-	AM_RANGE(0x084000, 0x084001) AM_WRITE(sound_w)
-	AM_RANGE(0x088000, 0x0881ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x098000, 0x098001) AM_RAM     /* Watchdog? */
-	AM_RANGE(0x09ce00, 0x09ffff) AM_RAM_WRITE(tilemap_w) AM_SHARE("videoram")
-	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITE(tilebank_w)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM
-	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM     /* Never read from */
-ADDRESS_MAP_END
+void zerozone_state::main_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x080000, 0x080001).portr("SYSTEM");
+	map(0x080002, 0x080003).portr("INPUTS");
+	map(0x080008, 0x080009).portr("DSWB");
+	map(0x08000a, 0x08000b).portr("DSWA");
+	map(0x084000, 0x084001).w(this, FUNC(zerozone_state::sound_w));
+	map(0x088000, 0x0881ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x098000, 0x098001).ram();     /* Watchdog? */
+	map(0x09ce00, 0x09ffff).ram().w(this, FUNC(zerozone_state::tilemap_w)).share("videoram");
+	map(0x0b4000, 0x0b4001).w(this, FUNC(zerozone_state::tilebank_w));
+	map(0x0c0000, 0x0cffff).ram();
+	map(0x0f8000, 0x0f87ff).ram();     /* Never read from */
+}
 
-ADDRESS_MAP_START(zerozone_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void zerozone_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( zerozone )

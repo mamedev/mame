@@ -309,23 +309,24 @@ They can run the same software and accept the same devices and extensions.
 
 /* ------------ address maps ------------ */
 
-ADDRESS_MAP_START(thomson_state::to7)
+void thomson_state::to7(address_map &map)
+{
 
-	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE(to7_cartridge_w ) /* 4 * 16 KB */
-	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to7_vram_w )
-	AM_RANGE ( 0x6000, 0x7fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 1 * 8 KB */
-	AM_RANGE ( 0x8000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 16 or 24 KB (for extension) */
-	AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-	AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE("mc6846", mc6846_device, read, write)
-	AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE(to7_floppy_r, to7_floppy_w )
-	AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_DEVREADWRITE( "to7_io:pia_2", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
-	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
-	AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE(to7_modem_mea8000_r, to7_modem_mea8000_w )
-	AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
+	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(this, FUNC(thomson_state::to7_cartridge_w)); /* 4 * 16 KB */
+	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(this, FUNC(thomson_state::to7_vram_w));
+	map(0x6000, 0x7fff).bankrw(THOM_BASE_BANK); /* 1 * 8 KB */
+	map(0x8000, 0xdfff).bankrw(THOM_RAM_BANK);  /* 16 or 24 KB (for extension) */
+	map(0xe000, 0xe7bf).bankr(THOM_FLOP_BANK);
+	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
+	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7d0, 0xe7df).rw(this, FUNC(thomson_state::to7_floppy_r), FUNC(thomson_state::to7_floppy_w));
+	map(0xe7e0, 0xe7e3).rw("to7_io:pia_2", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xe7f2, 0xe7f3).rw(this, FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
+	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7fe, 0xe7ff).rw(this, FUNC(thomson_state::to7_modem_mea8000_r), FUNC(thomson_state::to7_modem_mea8000_w));
+	map(0xe800, 0xffff).rom();       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
@@ -336,7 +337,7 @@ ADDRESS_MAP_START(thomson_state::to7)
    0x6000 - 0x9fff: 16 KB extended RAM
    0xa000 - 0xbfff:  8 KB more extended RAM
  */
-ADDRESS_MAP_END
+}
 
 
 
@@ -820,24 +821,25 @@ In arabic mode, Ctrl+E / Ctrl+X to start / stop typing in-line latin.
 
 **********************************************************************/
 
-ADDRESS_MAP_START(thomson_state::to770)
+void thomson_state::to770(address_map &map)
+{
 
-	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to7_cartridge_w ) /* 4 * 16 KB */
-	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
-	AM_RANGE ( 0x6000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 16 KB */
-	AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 6 * 16 KB */
-	AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-	AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE("mc6846", mc6846_device, read, write)
-	AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE(to7_floppy_r, to7_floppy_w )
-	AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_DEVREADWRITE( "to7_io:pia_2", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE(to770_gatearray_r, to770_gatearray_w )
-	AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
-	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
-	AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE(to7_modem_mea8000_r, to7_modem_mea8000_w )
-	AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
+	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(this, FUNC(thomson_state::to7_cartridge_w)); /* 4 * 16 KB */
+	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(this, FUNC(thomson_state::to770_vram_w));
+	map(0x6000, 0x9fff).bankrw(THOM_BASE_BANK); /* 16 KB */
+	map(0xa000, 0xdfff).bankrw(THOM_RAM_BANK);  /* 6 * 16 KB */
+	map(0xe000, 0xe7bf).bankr(THOM_FLOP_BANK);
+	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
+	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7d0, 0xe7df).rw(this, FUNC(thomson_state::to7_floppy_r), FUNC(thomson_state::to7_floppy_w));
+	map(0xe7e0, 0xe7e3).rw("to7_io:pia_2", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7e4, 0xe7e7).rw(this, FUNC(thomson_state::to770_gatearray_r), FUNC(thomson_state::to770_gatearray_w));
+	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xe7f2, 0xe7f3).rw(this, FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
+	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7fe, 0xe7ff).rw(this, FUNC(thomson_state::to7_modem_mea8000_r), FUNC(thomson_state::to7_modem_mea8000_w));
+	map(0xe800, 0xffff).rom();       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
@@ -848,7 +850,7 @@ ADDRESS_MAP_START(thomson_state::to770)
    0x08000 - 0x1ffff: 6 * 16 KB banked extended RAM
  */
 
-ADDRESS_MAP_END
+}
 
 
 
@@ -1021,22 +1023,23 @@ Differences include:
 
 **********************************************************************/
 
-ADDRESS_MAP_START(thomson_state::mo5)
+void thomson_state::mo5(address_map &map)
+{
 
-	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to770_vram_w )
-	AM_RANGE ( 0x2000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK )
-	AM_RANGE ( 0xa000, 0xa7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-	AM_RANGE ( 0xa7c0, 0xa7c3 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE(mo5_ext_w )
-	AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xa7d0, 0xa7df ) AM_READWRITE(to7_floppy_r, to7_floppy_w )
-	AM_RANGE ( 0xa7e0, 0xa7e3 ) AM_DEVREADWRITE( "to7_io:pia_2", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE(mo5_gatearray_r, mo5_gatearray_w )
-	AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
-	AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
-	AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE("mea8000", mea8000_device, read, write)
-	AM_RANGE ( 0xb000, 0xefff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(mo5_cartridge_w )
-	AM_RANGE ( 0xf000, 0xffff ) AM_ROM       /* system bios */
+	map(0x0000, 0x1fff).bankr(THOM_VRAM_BANK).w(this, FUNC(thomson_state::to770_vram_w));
+	map(0x2000, 0x9fff).bankrw(THOM_BASE_BANK);
+	map(0xa000, 0xa7bf).bankr(THOM_FLOP_BANK);
+	map(0xa7c0, 0xa7c3).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xa7cb, 0xa7cb).w(this, FUNC(thomson_state::mo5_ext_w));
+	map(0xa7cc, 0xa7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xa7d0, 0xa7df).rw(this, FUNC(thomson_state::to7_floppy_r), FUNC(thomson_state::to7_floppy_w));
+	map(0xa7e0, 0xa7e3).rw("to7_io:pia_2", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xa7e4, 0xa7e7).rw(this, FUNC(thomson_state::mo5_gatearray_r), FUNC(thomson_state::mo5_gatearray_w));
+	map(0xa7e8, 0xa7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xa7f2, 0xa7f3).rw(this, FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
+	map(0xa7fe, 0xa7ff).rw(m_mea8000, FUNC(mea8000_device::read), FUNC(mea8000_device::write));
+	map(0xb000, 0xefff).bankr(THOM_CART_BANK).w(this, FUNC(thomson_state::mo5_cartridge_w));
+	map(0xf000, 0xffff).rom();       /* system bios */
 
 /* 0x10000 - 0x1ffff: 16 KB integrated BASIC / 64 KB external cartridge */
 /* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
@@ -1047,7 +1050,7 @@ ADDRESS_MAP_START(thomson_state::mo5)
    0x0c000 - 0x1bfff: 4 * 16 KB bank extended RAM
  */
 
-ADDRESS_MAP_END
+}
 
 
 
@@ -1244,26 +1247,27 @@ It was replaced quickly with the improved TO9+.
 
 **********************************************************************/
 
-ADDRESS_MAP_START(thomson_state::to9)
+void thomson_state::to9(address_map &map)
+{
 
-	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE(to9_cartridge_w )/* 4 * 16 KB */
-	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to770_vram_w )
-	AM_RANGE ( 0x6000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 16 KB */
-	AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 10 * 16 KB */
-	AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-	AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE("mc6846", mc6846_device, read, write)
-	AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE(to9_floppy_r, to9_floppy_w )
-	AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE(to9_vreg_r, to9_vreg_w )
-	AM_RANGE ( 0xe7de, 0xe7df ) AM_READWRITE(to9_kbd_r, to9_kbd_w )
-	AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE(to9_gatearray_r, to9_gatearray_w )
-	AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
+	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(this, FUNC(thomson_state::to9_cartridge_w));/* 4 * 16 KB */
+	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(this, FUNC(thomson_state::to770_vram_w));
+	map(0x6000, 0x9fff).bankrw(THOM_BASE_BANK); /* 16 KB */
+	map(0xa000, 0xdfff).bankrw(THOM_RAM_BANK);  /* 10 * 16 KB */
+	map(0xe000, 0xe7bf).bankr(THOM_FLOP_BANK);
+	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
+	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7d0, 0xe7d9).rw(this, FUNC(thomson_state::to9_floppy_r), FUNC(thomson_state::to9_floppy_w));
+	map(0xe7da, 0xe7dd).rw(this, FUNC(thomson_state::to9_vreg_r), FUNC(thomson_state::to9_vreg_w));
+	map(0xe7de, 0xe7df).rw(this, FUNC(thomson_state::to9_kbd_r), FUNC(thomson_state::to9_kbd_w));
+	map(0xe7e4, 0xe7e7).rw(this, FUNC(thomson_state::to9_gatearray_r), FUNC(thomson_state::to9_gatearray_w));
+	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 /*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
-	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
-	AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE(to7_modem_mea8000_r, to7_modem_mea8000_w )
-	AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
+	map(0xe7f2, 0xe7f3).rw(this, FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
+	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7fe, 0xe7ff).rw(this, FUNC(thomson_state::to7_modem_mea8000_r), FUNC(thomson_state::to7_modem_mea8000_w));
+	map(0xe800, 0xffff).rom();       /* system bios  */
 
 /* 0x10000 - 0x1ffff:  64 KB external ROM cartridge */
 /* 0x20000 - 0x3ffff: 128 KB internal software ROM */
@@ -1275,7 +1279,7 @@ ADDRESS_MAP_START(thomson_state::to9)
    0x08000 - 0x2ffff: 10 * 16 KB banked extended RAM
  */
 
-ADDRESS_MAP_END
+}
 
 
 
@@ -1573,27 +1577,28 @@ The TO8D is simply a TO8 with an integrated 3"1/2 floppy drive.
 **********************************************************************/
 
 
-ADDRESS_MAP_START(thomson_state::to8)
+void thomson_state::to8(address_map &map)
+{
 
-	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to8_cartridge_w ) /* 4 * 16 KB */
-	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
-	AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE(to8_sys_lo_w )
-	AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE(to8_sys_hi_w )
-	AM_RANGE ( 0xa000, 0xbfff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE(to8_data_lo_w )
-	AM_RANGE ( 0xc000, 0xdfff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE(to8_data_hi_w )
-	AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK ) /* 2 * 2 KB */
-	AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE("mc6846", mc6846_device, read, write)
-	AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE(to8_floppy_r, to8_floppy_w )
-	AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE(to8_vreg_r, to8_vreg_w )
-	AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE(to8_gatearray_r, to8_gatearray_w )
-	AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
+	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(this, FUNC(thomson_state::to8_cartridge_w)); /* 4 * 16 KB */
+	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(this, FUNC(thomson_state::to770_vram_w));
+	map(0x6000, 0x7fff).bankr(TO8_SYS_LO).w(this, FUNC(thomson_state::to8_sys_lo_w));
+	map(0x8000, 0x9fff).bankr(TO8_SYS_HI).w(this, FUNC(thomson_state::to8_sys_hi_w));
+	map(0xa000, 0xbfff).bankr(TO8_DATA_LO).w(this, FUNC(thomson_state::to8_data_lo_w));
+	map(0xc000, 0xdfff).bankr(TO8_DATA_HI).w(this, FUNC(thomson_state::to8_data_hi_w));
+	map(0xe000, 0xe7bf).bankr(THOM_FLOP_BANK); /* 2 * 2 KB */
+	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
+	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7d0, 0xe7d9).rw(this, FUNC(thomson_state::to8_floppy_r), FUNC(thomson_state::to8_floppy_w));
+	map(0xe7da, 0xe7dd).rw(this, FUNC(thomson_state::to8_vreg_r), FUNC(thomson_state::to8_vreg_w));
+	map(0xe7e4, 0xe7e7).rw(this, FUNC(thomson_state::to8_gatearray_r), FUNC(thomson_state::to8_gatearray_w));
+	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 /*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
-	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
-	AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE(to7_modem_mea8000_r, to7_modem_mea8000_w )
-	AM_RANGE ( 0xe800, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK ) /* 2 * 6 KB */
+	map(0xe7f2, 0xe7f3).rw(this, FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
+	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7fe, 0xe7ff).rw(this, FUNC(thomson_state::to7_modem_mea8000_r), FUNC(thomson_state::to7_modem_mea8000_w));
+	map(0xe800, 0xffff).bankr(TO8_BIOS_BANK); /* 2 * 6 KB */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB internal software ROM */
@@ -1602,7 +1607,7 @@ ADDRESS_MAP_START(thomson_state::to8)
 
 /* RAM mapping: 512 KB flat (including video) */
 
-ADDRESS_MAP_END
+}
 
 
 /* ------------ ROMS ------------ */
@@ -1786,28 +1791,29 @@ The differences with the TO8 are:
 
 **********************************************************************/
 
-ADDRESS_MAP_START(thomson_state::to9p)
+void thomson_state::to9p(address_map &map)
+{
 
-	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to8_cartridge_w ) /* 4 * 16 KB */
-	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
-	AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE(to8_sys_lo_w )
-	AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE(to8_sys_hi_w )
-	AM_RANGE ( 0xa000, 0xbfff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE(to8_data_lo_w )
-	AM_RANGE ( 0xc000, 0xdfff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE(to8_data_hi_w )
-	AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK ) /* 2 * 2 KB */
-	AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE("mc6846", mc6846_device, read, write)
-	AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE(to8_floppy_r, to8_floppy_w )
-	AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE(to8_vreg_r, to8_vreg_w )
-	AM_RANGE ( 0xe7de, 0xe7df ) AM_READWRITE(to9_kbd_r, to9_kbd_w )
-	AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE(to8_gatearray_r, to8_gatearray_w )
-	AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
+	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(this, FUNC(thomson_state::to8_cartridge_w)); /* 4 * 16 KB */
+	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(this, FUNC(thomson_state::to770_vram_w));
+	map(0x6000, 0x7fff).bankr(TO8_SYS_LO).w(this, FUNC(thomson_state::to8_sys_lo_w));
+	map(0x8000, 0x9fff).bankr(TO8_SYS_HI).w(this, FUNC(thomson_state::to8_sys_hi_w));
+	map(0xa000, 0xbfff).bankr(TO8_DATA_LO).w(this, FUNC(thomson_state::to8_data_lo_w));
+	map(0xc000, 0xdfff).bankr(TO8_DATA_HI).w(this, FUNC(thomson_state::to8_data_hi_w));
+	map(0xe000, 0xe7bf).bankr(THOM_FLOP_BANK); /* 2 * 2 KB */
+	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
+	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7d0, 0xe7d9).rw(this, FUNC(thomson_state::to8_floppy_r), FUNC(thomson_state::to8_floppy_w));
+	map(0xe7da, 0xe7dd).rw(this, FUNC(thomson_state::to8_vreg_r), FUNC(thomson_state::to8_vreg_w));
+	map(0xe7de, 0xe7df).rw(this, FUNC(thomson_state::to9_kbd_r), FUNC(thomson_state::to9_kbd_w));
+	map(0xe7e4, 0xe7e7).rw(this, FUNC(thomson_state::to8_gatearray_r), FUNC(thomson_state::to8_gatearray_w));
+	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 /*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
-	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
-	AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE(to7_modem_mea8000_r, to7_modem_mea8000_w )
-	AM_RANGE ( 0xe800, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK ) /* 2 * 6 KB */
+	map(0xe7f2, 0xe7f3).rw(this, FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
+	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe7fe, 0xe7ff).rw(this, FUNC(thomson_state::to7_modem_mea8000_r), FUNC(thomson_state::to7_modem_mea8000_w));
+	map(0xe800, 0xffff).bankr(TO8_BIOS_BANK); /* 2 * 6 KB */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB internal software ROM */
@@ -1816,7 +1822,7 @@ ADDRESS_MAP_START(thomson_state::to9p)
 
 /* RAM mapping: 512 KB flat (including video) */
 
-ADDRESS_MAP_END
+}
 
 
 /* ------------ ROMS ------------ */
@@ -1966,29 +1972,28 @@ a PC XT.
 
 **********************************************************************/
 
-ADDRESS_MAP_START(thomson_state::mo6)
+void thomson_state::mo6(address_map &map)
+{
 
-	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
-	AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE(to8_sys_lo_w )
-	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE(to8_sys_hi_w )
-	AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE(to8_data_lo_w )
-	AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE(to8_data_hi_w )
-	AM_RANGE ( 0xa000, 0xa7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-	AM_RANGE ( 0xa7c0, 0xa7c3 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE(mo6_ext_w )
-	AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE(to7_floppy_r, to7_floppy_w )
-	AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE(mo6_vreg_r, mo6_vreg_w )
-	AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE(mo6_gatearray_r, mo6_gatearray_w )
-	AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
-/*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w )*/
-	AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
-	AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE("mea8000", mea8000_device, read, write)
-	AM_RANGE ( 0xb000, 0xbfff ) AM_ROMBANK   ( MO6_CART_LO )
-					AM_WRITE     ( mo6_cartridge_w )
-	AM_RANGE ( 0xc000, 0xefff ) AM_ROMBANK   ( MO6_CART_HI )
-					AM_WRITE     ( mo6_cartridge_w )
-	AM_RANGE ( 0xf000, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK )
+	map(0x0000, 0x1fff).bankr(THOM_VRAM_BANK).w(this, FUNC(thomson_state::to770_vram_w));
+	map(0x2000, 0x3fff).bankr(TO8_SYS_LO).w(this, FUNC(thomson_state::to8_sys_lo_w));
+	map(0x4000, 0x5fff).bankr(TO8_SYS_HI).w(this, FUNC(thomson_state::to8_sys_hi_w));
+	map(0x6000, 0x7fff).bankr(TO8_DATA_LO).w(this, FUNC(thomson_state::to8_data_lo_w));
+	map(0x8000, 0x9fff).bankr(TO8_DATA_HI).w(this, FUNC(thomson_state::to8_data_hi_w));
+	map(0xa000, 0xa7bf).bankr(THOM_FLOP_BANK);
+	map(0xa7c0, 0xa7c3).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xa7cb, 0xa7cb).w(this, FUNC(thomson_state::mo6_ext_w));
+	map(0xa7cc, 0xa7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xa7d0, 0xa7d9).rw(this, FUNC(thomson_state::to7_floppy_r), FUNC(thomson_state::to7_floppy_w));
+	map(0xa7da, 0xa7dd).rw(this, FUNC(thomson_state::mo6_vreg_r), FUNC(thomson_state::mo6_vreg_w));
+	map(0xa7e4, 0xa7e7).rw(this, FUNC(thomson_state::mo6_gatearray_r), FUNC(thomson_state::mo6_gatearray_w));
+	map(0xa7e8, 0xa7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+/*  map(0xa7f0, 0xa7f7).rw(this, FUNC(thomson_state::to9_ieee_r), FUNC(homson_state::to9_ieee_w));*/
+	map(0xa7f2, 0xa7f3).rw(this, FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
+	map(0xa7fe, 0xa7ff).rw(m_mea8000, FUNC(mea8000_device::read), FUNC(mea8000_device::write));
+	map(0xb000, 0xbfff).bankr(MO6_CART_LO).w(this, FUNC(thomson_state::mo6_cartridge_w));
+	map(0xc000, 0xefff).bankr(MO6_CART_HI).w(this, FUNC(thomson_state::mo6_cartridge_w));
+	map(0xf000, 0xffff).bankr(TO8_BIOS_BANK);
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB BIOS ROM */
@@ -1996,7 +2001,7 @@ ADDRESS_MAP_START(thomson_state::mo6)
 
 /* RAM mapping: 128 KB flat (including video) */
 
-ADDRESS_MAP_END
+}
 
 
 /* ------------ ROMS ------------ */
@@ -2321,33 +2326,32 @@ Here are the differences between the MO6 and MO5NR:
 
 **********************************************************************/
 
-ADDRESS_MAP_START(thomson_state::mo5nr)
+void thomson_state::mo5nr(address_map &map)
+{
 
-	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
-	AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE(to8_sys_lo_w )
-	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE(to8_sys_hi_w )
-	AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE(to8_data_lo_w )
-	AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE(to8_data_hi_w )
-	AM_RANGE ( 0xa000, 0xa7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-	AM_RANGE ( 0xa7c0, 0xa7c3 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE(mo6_ext_w )
-	AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE(mo5nr_net_r, mo5nr_net_w )
-	AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE(mo6_vreg_r, mo6_vreg_w )
-	AM_RANGE ( 0xa7e1, 0xa7e1 ) AM_DEVREAD("cent_data_in", input_buffer_device, read)
-	AM_RANGE ( 0xa7e1, 0xa7e1 ) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE ( 0xa7e3, 0xa7e3 ) AM_READWRITE(mo5nr_prn_r, mo5nr_prn_w )
-	AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE(mo6_gatearray_r, mo6_gatearray_w )
-	AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
-/*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
-	AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
-	AM_RANGE ( 0xa7f8, 0xa7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE("mea8000", mea8000_device, read, write)
-	AM_RANGE ( 0xb000, 0xbfff ) AM_ROMBANK   ( MO6_CART_LO )
-					AM_WRITE     ( mo6_cartridge_w )
-	AM_RANGE ( 0xc000, 0xefff ) AM_ROMBANK   ( MO6_CART_HI )
-					AM_WRITE     ( mo6_cartridge_w )
-	AM_RANGE ( 0xf000, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK )
+	map(0x0000, 0x1fff).bankr(THOM_VRAM_BANK).w(this, FUNC(thomson_state::to770_vram_w));
+	map(0x2000, 0x3fff).bankr(TO8_SYS_LO).w(this, FUNC(thomson_state::to8_sys_lo_w));
+	map(0x4000, 0x5fff).bankr(TO8_SYS_HI).w(this, FUNC(thomson_state::to8_sys_hi_w));
+	map(0x6000, 0x7fff).bankr(TO8_DATA_LO).w(this, FUNC(thomson_state::to8_data_lo_w));
+	map(0x8000, 0x9fff).bankr(TO8_DATA_HI).w(this, FUNC(thomson_state::to8_data_hi_w));
+	map(0xa000, 0xa7bf).bankr(THOM_FLOP_BANK);
+	map(0xa7c0, 0xa7c3).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xa7cb, 0xa7cb).w(this, FUNC(thomson_state::mo6_ext_w));
+	map(0xa7cc, 0xa7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xa7d0, 0xa7d9).rw(this, FUNC(thomson_state::mo5nr_net_r), FUNC(thomson_state::mo5nr_net_w));
+	map(0xa7da, 0xa7dd).rw(this, FUNC(thomson_state::mo6_vreg_r), FUNC(thomson_state::mo6_vreg_w));
+	map(0xa7e1, 0xa7e1).r("cent_data_in", FUNC(input_buffer_device::read));
+	map(0xa7e1, 0xa7e1).w(m_cent_data_out, FUNC(output_latch_device::write));
+	map(0xa7e3, 0xa7e3).rw(this, FUNC(thomson_state::mo5nr_prn_r), FUNC(thomson_state::mo5nr_prn_w));
+	map(0xa7e4, 0xa7e7).rw(this, FUNC(thomson_state::mo6_gatearray_r), FUNC(thomson_state::mo6_gatearray_w));
+	map(0xa7e8, 0xa7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+/*  map(0xa7f0, 0xa7f7).rw(this, FUNC(thomson_state::to9_ieee_r), FUNC(homson_state::to9_ieee_w));*/
+	map(0xa7f2, 0xa7f3).rw(this, FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
+	map(0xa7f8, 0xa7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xa7fe, 0xa7ff).rw(m_mea8000, FUNC(mea8000_device::read), FUNC(mea8000_device::write));
+	map(0xb000, 0xbfff).bankr(MO6_CART_LO).w(this, FUNC(thomson_state::mo6_cartridge_w));
+	map(0xc000, 0xefff).bankr(MO6_CART_HI).w(this, FUNC(thomson_state::mo6_cartridge_w));
+	map(0xf000, 0xffff).bankr(TO8_BIOS_BANK);
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB BIOS ROM */
@@ -2355,7 +2359,7 @@ ADDRESS_MAP_START(thomson_state::mo5nr)
 
 /* RAM mapping: 128 KB flat (including video) */
 
-ADDRESS_MAP_END
+}
 
 
 /* ------------ ROMS ------------ */

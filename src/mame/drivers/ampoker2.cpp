@@ -591,35 +591,37 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_watchdog_reset_w)
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(ampoker2_state::ampoker2_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(ampoker2_videoram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void ampoker2_state::ampoker2_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram().share("nvram");
+	map(0xe000, 0xefff).ram().w(this, FUNC(ampoker2_state::ampoker2_videoram_w)).share("videoram");
+}
 
-ADDRESS_MAP_START(ampoker2_state::ampoker2_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x0f) AM_WRITENOP                /* inexistent in the real hardware */
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN2")
-	AM_RANGE(0x13, 0x13) AM_READ_PORT("IN3")
-	AM_RANGE(0x14, 0x14) AM_READ_PORT("IN4")
-	AM_RANGE(0x15, 0x15) AM_READ_PORT("IN5")
-	AM_RANGE(0x16, 0x16) AM_READ_PORT("IN6")
-	AM_RANGE(0x17, 0x17) AM_READ_PORT("IN7")
+void ampoker2_state::ampoker2_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x08, 0x0f).nopw();                /* inexistent in the real hardware */
+	map(0x10, 0x10).portr("IN0");
+	map(0x11, 0x11).portr("IN1");
+	map(0x12, 0x12).portr("IN2");
+	map(0x13, 0x13).portr("IN3");
+	map(0x14, 0x14).portr("IN4");
+	map(0x15, 0x15).portr("IN5");
+	map(0x16, 0x16).portr("IN6");
+	map(0x17, 0x17).portr("IN7");
 //  AM_RANGE(0x21, 0x21) AM_WRITENOP                    /* undocumented, write 0x1a after each reset */
-	AM_RANGE(0x30, 0x30) AM_WRITE(ampoker2_port30_w)    /* see write handlers */
-	AM_RANGE(0x31, 0x31) AM_WRITE(ampoker2_port31_w)    /* see write handlers */
-	AM_RANGE(0x32, 0x32) AM_WRITE(ampoker2_port32_w)    /* see write handlers */
-	AM_RANGE(0x33, 0x33) AM_WRITE(ampoker2_port33_w)    /* see write handlers */
-	AM_RANGE(0x34, 0x34) AM_WRITE(ampoker2_port34_w)    /* see write handlers */
-	AM_RANGE(0x35, 0x35) AM_WRITE(ampoker2_port35_w)    /* see write handlers */
-	AM_RANGE(0x36, 0x36) AM_WRITE(ampoker2_port36_w)    /* see write handlers */
-	AM_RANGE(0x37, 0x37) AM_WRITE(ampoker2_watchdog_reset_w)
-	AM_RANGE(0x38, 0x39) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x3A, 0x3A) AM_DEVREAD("aysnd", ay8910_device, data_r)
-ADDRESS_MAP_END
+	map(0x30, 0x30).w(this, FUNC(ampoker2_state::ampoker2_port30_w));    /* see write handlers */
+	map(0x31, 0x31).w(this, FUNC(ampoker2_state::ampoker2_port31_w));    /* see write handlers */
+	map(0x32, 0x32).w(this, FUNC(ampoker2_state::ampoker2_port32_w));    /* see write handlers */
+	map(0x33, 0x33).w(this, FUNC(ampoker2_state::ampoker2_port33_w));    /* see write handlers */
+	map(0x34, 0x34).w(this, FUNC(ampoker2_state::ampoker2_port34_w));    /* see write handlers */
+	map(0x35, 0x35).w(this, FUNC(ampoker2_state::ampoker2_port35_w));    /* see write handlers */
+	map(0x36, 0x36).w(this, FUNC(ampoker2_state::ampoker2_port36_w));    /* see write handlers */
+	map(0x37, 0x37).w(this, FUNC(ampoker2_state::ampoker2_watchdog_reset_w));
+	map(0x38, 0x39).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x3A, 0x3A).r("aysnd", FUNC(ay8910_device::data_r));
+}
 
 /*
 

@@ -177,18 +177,20 @@ READ8_MEMBER(nsmpoker_state::debug_r)
 * Memory Map Information *
 *************************/
 
-ADDRESS_MAP_START(nsmpoker_state::nsmpoker_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x9000, 0xafff) AM_RAM // OK... cleared at beginning.
-	AM_RANGE(0xb000, 0xcfff) AM_ROM // WRONG... just to map the last rom somewhere.
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(nsmpoker_videoram_w) AM_SHARE("videoram") // WRONG... just a placeholder.
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(nsmpoker_colorram_w) AM_SHARE("colorram") // WRONG... just a placeholder.
-ADDRESS_MAP_END
+void nsmpoker_state::nsmpoker_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x9000, 0xafff).ram(); // OK... cleared at beginning.
+	map(0xb000, 0xcfff).rom(); // WRONG... just to map the last rom somewhere.
+	map(0xe000, 0xefff).ram().w(this, FUNC(nsmpoker_state::nsmpoker_videoram_w)).share("videoram"); // WRONG... just a placeholder.
+	map(0xf000, 0xffff).ram().w(this, FUNC(nsmpoker_state::nsmpoker_colorram_w)).share("colorram"); // WRONG... just a placeholder.
+}
 
-ADDRESS_MAP_START(nsmpoker_state::nsmpoker_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_READ(debug_r)   // kind of trap at beginning
-ADDRESS_MAP_END
+void nsmpoker_state::nsmpoker_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).r(this, FUNC(nsmpoker_state::debug_r));   // kind of trap at beginning
+}
 
 /* I/O byte R/W
 

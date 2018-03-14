@@ -65,26 +65,27 @@ READ16_MEMBER(xybots_state::special_port1_r)
  *************************************/
 
 /* full map verified from schematics */
-ADDRESS_MAP_START(xybots_state::main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x007fff) AM_MIRROR(0x7c0000) AM_ROM
-	AM_RANGE(0x008000, 0x00ffff) AM_MIRROR(0x7c0000) AM_ROM /* slapstic maps here */
-	AM_RANGE(0x010000, 0x03ffff) AM_MIRROR(0x7c0000) AM_ROM
-	AM_RANGE(0x800000, 0x800fff) AM_MIRROR(0x7f8000) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
-	AM_RANGE(0x801000, 0x802dff) AM_MIRROR(0x7f8000) AM_RAM
-	AM_RANGE(0x802e00, 0x802fff) AM_MIRROR(0x7f8000) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0x803000, 0x803fff) AM_MIRROR(0x7f8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0x804000, 0x8047ff) AM_MIRROR(0x7f8800) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x805000, 0x805fff) AM_MIRROR(0x7f8000) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0x806000, 0x8060ff) AM_MIRROR(0x7f8000) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
-	AM_RANGE(0x806100, 0x8061ff) AM_MIRROR(0x7f8000) AM_READ_PORT("FFE100")
-	AM_RANGE(0x806200, 0x8062ff) AM_MIRROR(0x7f8000) AM_READ(special_port1_r)
-	AM_RANGE(0x806800, 0x8068ff) AM_MIRROR(0x7f8000) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0x806900, 0x8069ff) AM_MIRROR(0x7f8000) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
-	AM_RANGE(0x806a00, 0x806aff) AM_MIRROR(0x7f8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x806b00, 0x806bff) AM_MIRROR(0x7f8000) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0x806e00, 0x806eff) AM_MIRROR(0x7f8000) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
-ADDRESS_MAP_END
+void xybots_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x007fff).mirror(0x7c0000).rom();
+	map(0x008000, 0x00ffff).mirror(0x7c0000).rom(); /* slapstic maps here */
+	map(0x010000, 0x03ffff).mirror(0x7c0000).rom();
+	map(0x800000, 0x800fff).mirror(0x7f8000).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(0x801000, 0x802dff).mirror(0x7f8000).ram();
+	map(0x802e00, 0x802fff).mirror(0x7f8000).ram().share("mob");
+	map(0x803000, 0x803fff).mirror(0x7f8000).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0x804000, 0x8047ff).mirror(0x7f8800).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x805000, 0x805fff).mirror(0x7f8000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x806000, 0x8060ff).mirror(0x7f8000).r(m_jsa, FUNC(atari_jsa_i_device::main_response_r)).umask16(0x00ff);
+	map(0x806100, 0x8061ff).mirror(0x7f8000).portr("FFE100");
+	map(0x806200, 0x8062ff).mirror(0x7f8000).r(this, FUNC(xybots_state::special_port1_r));
+	map(0x806800, 0x8068ff).mirror(0x7f8000).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0x806900, 0x8069ff).mirror(0x7f8000).w(m_jsa, FUNC(atari_jsa_i_device::main_command_w)).umask16(0x00ff);
+	map(0x806a00, 0x806aff).mirror(0x7f8000).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x806b00, 0x806bff).mirror(0x7f8000).w(this, FUNC(xybots_state::video_int_ack_w));
+	map(0x806e00, 0x806eff).mirror(0x7f8000).w(m_jsa, FUNC(atari_jsa_i_device::sound_reset_w));
+}
 
 
 

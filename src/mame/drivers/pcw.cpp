@@ -192,12 +192,13 @@ WRITE_LINE_MEMBER( pcw_state::pcw_fdc_interrupt )
     block 3 could be paged into any bank, and this explains the
     setup of the memory below.
 */
-ADDRESS_MAP_START(pcw_state::pcw_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
-	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
-	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
-	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
-ADDRESS_MAP_END
+void pcw_state::pcw_map(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank1").bankw("bank5");
+	map(0x4000, 0x7fff).bankr("bank2").bankw("bank6");
+	map(0x8000, 0xbfff).bankr("bank3").bankw("bank7");
+	map(0xc000, 0xffff).bankr("bank4").bankw("bank8");
+}
 
 
 /* Keyboard is read by the MCU and sent as serial data to the gate array ASIC */
@@ -948,34 +949,36 @@ WRITE8_MEMBER(pcw_state::pcw9512_parallel_w)
 	logerror("pcw9512 parallel w: offs: %04x data: %02x\n",offset,data);
 }
 
-ADDRESS_MAP_START(pcw_state::pcw_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000, 0x001) AM_MIRROR(0x7e) AM_DEVICE("upd765",      upd765a_device, map)
-	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,            pcw_expansion_w)
-	AM_RANGE(0x0f0, 0x0f3) AM_WRITE(                                pcw_bank_select_w)
-	AM_RANGE(0x0f4, 0x0f4) AM_READWRITE(pcw_interrupt_counter_r,    pcw_bank_force_selection_w)
-	AM_RANGE(0x0f5, 0x0f5) AM_WRITE(                                pcw_roller_ram_addr_w)
-	AM_RANGE(0x0f6, 0x0f6) AM_WRITE(                                pcw_pointer_table_top_scan_w)
-	AM_RANGE(0x0f7, 0x0f7) AM_WRITE(                                pcw_vdu_video_control_register_w)
-	AM_RANGE(0x0f8, 0x0f8) AM_READWRITE(pcw_system_status_r,        pcw_system_control_w)
-	AM_RANGE(0x0fc, 0x0fc) AM_READWRITE(pcw_printer_data_r,         pcw_printer_data_w)
-	AM_RANGE(0x0fd, 0x0fd) AM_READWRITE(pcw_printer_status_r,       pcw_printer_command_w)
-ADDRESS_MAP_END
+void pcw_state::pcw_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x000, 0x001).mirror(0x7e).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x080, 0x0ef).rw(this, FUNC(pcw_state::pcw_expansion_r), FUNC(pcw_state::pcw_expansion_w));
+	map(0x0f0, 0x0f3).w(this, FUNC(pcw_state::pcw_bank_select_w));
+	map(0x0f4, 0x0f4).rw(this, FUNC(pcw_state::pcw_interrupt_counter_r), FUNC(pcw_state::pcw_bank_force_selection_w));
+	map(0x0f5, 0x0f5).w(this, FUNC(pcw_state::pcw_roller_ram_addr_w));
+	map(0x0f6, 0x0f6).w(this, FUNC(pcw_state::pcw_pointer_table_top_scan_w));
+	map(0x0f7, 0x0f7).w(this, FUNC(pcw_state::pcw_vdu_video_control_register_w));
+	map(0x0f8, 0x0f8).rw(this, FUNC(pcw_state::pcw_system_status_r), FUNC(pcw_state::pcw_system_control_w));
+	map(0x0fc, 0x0fc).rw(this, FUNC(pcw_state::pcw_printer_data_r), FUNC(pcw_state::pcw_printer_data_w));
+	map(0x0fd, 0x0fd).rw(this, FUNC(pcw_state::pcw_printer_status_r), FUNC(pcw_state::pcw_printer_command_w));
+}
 
 
 
-ADDRESS_MAP_START(pcw_state::pcw9512_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000, 0x001) AM_MIRROR(0x7e) AM_DEVICE("upd765",      upd765a_device, map)
-	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,            pcw_expansion_w)
-	AM_RANGE(0x0f0, 0x0f3) AM_WRITE(                                pcw_bank_select_w)
-	AM_RANGE(0x0f4, 0x0f4) AM_READWRITE(pcw_interrupt_counter_r,    pcw_bank_force_selection_w)
-	AM_RANGE(0x0f5, 0x0f5) AM_WRITE(                                pcw_roller_ram_addr_w)
-	AM_RANGE(0x0f6, 0x0f6) AM_WRITE(                                pcw_pointer_table_top_scan_w)
-	AM_RANGE(0x0f7, 0x0f7) AM_WRITE(                                pcw_vdu_video_control_register_w)
-	AM_RANGE(0x0f8, 0x0f8) AM_READWRITE(pcw_system_status_r,        pcw_system_control_w)
-	AM_RANGE(0x0fc, 0x0fd) AM_READWRITE(pcw9512_parallel_r,         pcw9512_parallel_w)
-ADDRESS_MAP_END
+void pcw_state::pcw9512_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x000, 0x001).mirror(0x7e).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x080, 0x0ef).rw(this, FUNC(pcw_state::pcw_expansion_r), FUNC(pcw_state::pcw_expansion_w));
+	map(0x0f0, 0x0f3).w(this, FUNC(pcw_state::pcw_bank_select_w));
+	map(0x0f4, 0x0f4).rw(this, FUNC(pcw_state::pcw_interrupt_counter_r), FUNC(pcw_state::pcw_bank_force_selection_w));
+	map(0x0f5, 0x0f5).w(this, FUNC(pcw_state::pcw_roller_ram_addr_w));
+	map(0x0f6, 0x0f6).w(this, FUNC(pcw_state::pcw_pointer_table_top_scan_w));
+	map(0x0f7, 0x0f7).w(this, FUNC(pcw_state::pcw_vdu_video_control_register_w));
+	map(0x0f8, 0x0f8).rw(this, FUNC(pcw_state::pcw_system_status_r), FUNC(pcw_state::pcw_system_control_w));
+	map(0x0fc, 0x0fd).rw(this, FUNC(pcw_state::pcw9512_parallel_r), FUNC(pcw_state::pcw9512_parallel_w));
+}
 
 
 TIMER_CALLBACK_MEMBER(pcw_state::setup_beep)

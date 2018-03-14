@@ -104,28 +104,29 @@ There's a separate sound board also, but it wasn't available so is not documente
  *
  *************************************/
 
-ADDRESS_MAP_START(midxunit_state::main_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_READWRITE(midtunit_vram_data_r, midtunit_vram_data_w)
-	AM_RANGE(0x00800000, 0x00bfffff) AM_READWRITE(midtunit_vram_color_r, midtunit_vram_color_w)
-	AM_RANGE(0x20000000, 0x20ffffff) AM_RAM
-	AM_RANGE(0x40800000, 0x4fffffff) AM_WRITE(midxunit_unknown_w)
-	AM_RANGE(0x60400000, 0x6040001f) AM_READWRITE(midxunit_status_r, midxunit_security_clock_w)
-	AM_RANGE(0x60c00000, 0x60c0001f) AM_READ_PORT("IN0")
-	AM_RANGE(0x60c00020, 0x60c0003f) AM_READ_PORT("IN1")
-	AM_RANGE(0x60c00040, 0x60c0005f) AM_READ_PORT("IN2")
-	AM_RANGE(0x60c00060, 0x60c0007f) AM_READ_PORT("DSW")
-	AM_RANGE(0x60c00080, 0x60c000df) AM_WRITE(midxunit_io_w)
-	AM_RANGE(0x60c000e0, 0x60c000ff) AM_READWRITE(midxunit_security_r, midxunit_security_w)
-	AM_RANGE(0x80800000, 0x8080000f) AM_DEVREAD8("adc", adc0848_device, read, 0x00ff) AM_DEVWRITE8("adc", adc0848_device, write, 0x00ff)
-	AM_RANGE(0x80800010, 0x8080001f) AM_NOP
-	AM_RANGE(0x80c00000, 0x80c000ff) AM_READWRITE(midxunit_uart_r, midxunit_uart_w)
-	AM_RANGE(0xa0440000, 0xa047ffff) AM_READWRITE(midxunit_cmos_r, midxunit_cmos_w) AM_SHARE("nvram")
-	AM_RANGE(0xa0800000, 0xa08fffff) AM_READWRITE(midxunit_paletteram_r, midxunit_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0xc0000000, 0xc00003ff) AM_DEVREADWRITE("maincpu", tms34020_device, io_register_r, io_register_w)
-	AM_RANGE(0xc0800000, 0xc08000ff) AM_MIRROR(0x00400000) AM_READWRITE(midtunit_dma_r, midtunit_dma_w)
-	AM_RANGE(0xf8000000, 0xfeffffff) AM_READ(midwunit_gfxrom_r)
-	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void midxunit_state::main_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).rw(this, FUNC(midxunit_state::midtunit_vram_data_r), FUNC(midxunit_state::midtunit_vram_data_w));
+	map(0x00800000, 0x00bfffff).rw(this, FUNC(midxunit_state::midtunit_vram_color_r), FUNC(midxunit_state::midtunit_vram_color_w));
+	map(0x20000000, 0x20ffffff).ram();
+	map(0x40800000, 0x4fffffff).w(this, FUNC(midxunit_state::midxunit_unknown_w));
+	map(0x60400000, 0x6040001f).rw(this, FUNC(midxunit_state::midxunit_status_r), FUNC(midxunit_state::midxunit_security_clock_w));
+	map(0x60c00000, 0x60c0001f).portr("IN0");
+	map(0x60c00020, 0x60c0003f).portr("IN1");
+	map(0x60c00040, 0x60c0005f).portr("IN2");
+	map(0x60c00060, 0x60c0007f).portr("DSW");
+	map(0x60c00080, 0x60c000df).w(this, FUNC(midxunit_state::midxunit_io_w));
+	map(0x60c000e0, 0x60c000ff).rw(this, FUNC(midxunit_state::midxunit_security_r), FUNC(midxunit_state::midxunit_security_w));
+	map(0x80800000, 0x8080000f).r("adc", FUNC(adc0848_device::read)).umask16(0x00ff).w("adc", FUNC(adc0848_device::write)).umask16(0x00ff);
+	map(0x80800010, 0x8080001f).noprw();
+	map(0x80c00000, 0x80c000ff).rw(this, FUNC(midxunit_state::midxunit_uart_r), FUNC(midxunit_state::midxunit_uart_w));
+	map(0xa0440000, 0xa047ffff).rw(this, FUNC(midxunit_state::midxunit_cmos_r), FUNC(midxunit_state::midxunit_cmos_w)).share("nvram");
+	map(0xa0800000, 0xa08fffff).rw(this, FUNC(midxunit_state::midxunit_paletteram_r), FUNC(midxunit_state::midxunit_paletteram_w)).share("palette");
+	map(0xc0000000, 0xc00003ff).rw("maincpu", FUNC(tms34020_device::io_register_r), FUNC(tms34020_device::io_register_w));
+	map(0xc0800000, 0xc08000ff).mirror(0x00400000).rw(this, FUNC(midxunit_state::midtunit_dma_r), FUNC(midxunit_state::midtunit_dma_w));
+	map(0xf8000000, 0xfeffffff).r(this, FUNC(midxunit_state::midwunit_gfxrom_r));
+	map(0xff000000, 0xffffffff).rom().region("maincpu", 0);
+}
 
 
 

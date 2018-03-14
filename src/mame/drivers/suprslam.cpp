@@ -102,35 +102,38 @@ WRITE8_MEMBER(suprslam_state::suprslam_sh_bankswitch_w)
 
 /*** MEMORY MAPS *************************************************************/
 
-ADDRESS_MAP_START(suprslam_state::suprslam_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0xfb0000, 0xfb1fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfc0000, 0xfcffff) AM_RAM AM_SHARE("sp_videoram")
-	AM_RANGE(0xfd0000, 0xfdffff) AM_RAM
-	AM_RANGE(0xfe0000, 0xfe0fff) AM_RAM_WRITE(suprslam_screen_videoram_w) AM_SHARE("screen_videoram")
-	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(suprslam_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xff2000, 0xff203f) AM_RAM AM_SHARE("screen_vregs")
-	AM_RANGE(0xff3000, 0xff3001) AM_WRITENOP // sprite buffer trigger?
-	AM_RANGE(0xff8000, 0xff8fff) AM_DEVREADWRITE("k053936", k053936_device, linectrl_r, linectrl_w)
-	AM_RANGE(0xff9000, 0xff9001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xffa000, 0xffafff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xffd000, 0xffd01f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
-	AM_RANGE(0xffe000, 0xffe001) AM_WRITE(suprslam_bank_w)
-	AM_RANGE(0xfff000, 0xfff01f) AM_DEVREADWRITE8("io", vs9209_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void suprslam_state::suprslam_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0xfb0000, 0xfb1fff).ram().share("spriteram");
+	map(0xfc0000, 0xfcffff).ram().share("sp_videoram");
+	map(0xfd0000, 0xfdffff).ram();
+	map(0xfe0000, 0xfe0fff).ram().w(this, FUNC(suprslam_state::suprslam_screen_videoram_w)).share("screen_videoram");
+	map(0xff0000, 0xff1fff).ram().w(this, FUNC(suprslam_state::suprslam_bg_videoram_w)).share("bg_videoram");
+	map(0xff2000, 0xff203f).ram().share("screen_vregs");
+	map(0xff3000, 0xff3001).nopw(); // sprite buffer trigger?
+	map(0xff8000, 0xff8fff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));
+	map(0xff9001, 0xff9001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xffa000, 0xffafff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xffd000, 0xffd01f).w(m_k053936, FUNC(k053936_device::ctrl_w));
+	map(0xffe000, 0xffe001).w(this, FUNC(suprslam_state::suprslam_bank_w));
+	map(0xfff000, 0xfff01f).rw("io", FUNC(vs9209_device::read), FUNC(vs9209_device::write)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(suprslam_state::sound_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void suprslam_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(suprslam_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(suprslam_sh_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-ADDRESS_MAP_END
+void suprslam_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(suprslam_state::suprslam_sh_bankswitch_w));
+	map(0x04, 0x04).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+}
 
 /*** INPUT PORTS *************************************************************/
 

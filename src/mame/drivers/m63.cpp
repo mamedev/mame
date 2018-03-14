@@ -472,52 +472,56 @@ WRITE_LINE_MEMBER(m63_state::nmi_mask_w)
 }
 
 
-ADDRESS_MAP_START(m63_state::m63_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM
-	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe300, 0xe3ff) AM_RAM AM_SHARE("scrollram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m63_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(m63_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xec00, 0xefff) AM_RAM_WRITE(m63_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xf000, 0xf007) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITENOP /* continues game when in stop mode (cleared by NMI handler) */
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(snd_irq_w)
-	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
+void m63_state::m63_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xe1ff).ram();
+	map(0xe200, 0xe2ff).ram().share("spriteram");
+	map(0xe300, 0xe3ff).ram().share("scrollram");
+	map(0xe400, 0xe7ff).ram().w(this, FUNC(m63_state::m63_videoram2_w)).share("videoram2");
+	map(0xe800, 0xebff).ram().w(this, FUNC(m63_state::m63_videoram_w)).share("videoram");
+	map(0xec00, 0xefff).ram().w(this, FUNC(m63_state::m63_colorram_w)).share("colorram");
+	map(0xf000, 0xf007).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xf800, 0xf800).portr("P1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xf801, 0xf801).portr("P2").nopw(); /* continues game when in stop mode (cleared by NMI handler) */
+	map(0xf802, 0xf802).portr("DSW1");
+	map(0xf803, 0xf803).w(this, FUNC(m63_state::snd_irq_w));
+	map(0xf806, 0xf806).portr("DSW2");
+}
 
-ADDRESS_MAP_START(m63_state::fghtbskt_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM
-	AM_RANGE(0xd200, 0xd2ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd300, 0xd3ff) AM_RAM AM_SHARE("scrollram")
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(m63_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(m63_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(m63_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xf000, 0xf000) AM_READ(snd_status_r)
-	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("P1")
-	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("P2")
-	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("DSW")
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(snd_irq_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITENOP
-	AM_RANGE(0xf002, 0xf002) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf800, 0xf807) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(fghtbskt_samples_w) // FIXME
-ADDRESS_MAP_END
+void m63_state::fghtbskt_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xd000, 0xd1ff).ram();
+	map(0xd200, 0xd2ff).ram().share("spriteram");
+	map(0xd300, 0xd3ff).ram().share("scrollram");
+	map(0xd400, 0xd7ff).ram().w(this, FUNC(m63_state::m63_videoram2_w)).share("videoram2");
+	map(0xd800, 0xdbff).ram().w(this, FUNC(m63_state::m63_videoram_w)).share("videoram");
+	map(0xdc00, 0xdfff).ram().w(this, FUNC(m63_state::m63_colorram_w)).share("colorram");
+	map(0xf000, 0xf000).r(this, FUNC(m63_state::snd_status_r));
+	map(0xf001, 0xf001).portr("P1");
+	map(0xf002, 0xf002).portr("P2");
+	map(0xf003, 0xf003).portr("DSW");
+	map(0xf000, 0xf000).w(this, FUNC(m63_state::snd_irq_w));
+	map(0xf001, 0xf001).nopw();
+	map(0xf002, 0xf002).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xf800, 0xf807).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xf807, 0xf807).w(this, FUNC(m63_state::fghtbskt_samples_w)); // FIXME
+}
 
-ADDRESS_MAP_START(m63_state::i8039_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void m63_state::i8039_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
 
-ADDRESS_MAP_START(m63_state::i8039_port_map)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(snddata_r, snddata_w)
-ADDRESS_MAP_END
+void m63_state::i8039_port_map(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(m63_state::snddata_r), FUNC(m63_state::snddata_w));
+}
 
 
 

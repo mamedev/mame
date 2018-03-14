@@ -252,19 +252,25 @@ inline uint16_t model2_state::float_to_zval( float floatval )
 	return 0xffff;
 }
 
-static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, plane *cp, poly_vertex *vout)
+static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, poly_vertex *vout)
 {
 	poly_vertex *cur, *out;
 	float   curdot, nextdot, scale;
 	int32_t   i, curin, nextin, nextvert, outcount;
+	plane clip_plane;
+	
+	clip_plane.normal.x = 0.0f;
+	clip_plane.normal.y = 0.0f;
+	clip_plane.normal.pz = 1.0f;
+	clip_plane.distance = 0.0f;
 
 	outcount = 0;
 
 	cur = v;
 	out = vout;
 
-	curdot = dot_product( cur, &cp->normal );
-	curin = (curdot >= cp->distance) ? 1 : 0;
+	curdot = dot_product( cur, &clip_plane.normal );
+	curin = (curdot >= clip_plane.distance) ? 1 : 0;
 
 	for( i = 0; i < num_vertices; i++ )
 	{
@@ -273,8 +279,8 @@ static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, plane *cp, pol
 		/* if the current point is inside the plane, add it */
 		if ( curin ) memcpy( &out[outcount++], cur, sizeof( poly_vertex ) );
 
-		nextdot = dot_product( &v[nextvert], &cp->normal );
-		nextin = (nextdot >= cp->distance) ? 1 : 0;
+		nextdot = dot_product( &v[nextvert], &clip_plane.normal );
+		nextin = (nextdot >= clip_plane.distance) ? 1 : 0;
 
 		/* Add a clipped vertex if one end of the current edge is inside the plane and the other is outside */
 		// TODO: displaying Honey in Fighting Vipers and Bean in Sonic the Fighters somehow causes a NaN dot product here, 
@@ -282,7 +288,7 @@ static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, plane *cp, pol
 		//       which might be related.
 		if ( curin != nextin && std::isnan(curdot) == false && std::isnan(nextdot) == false )
 		{
-			scale = (cp->distance - curdot) / (nextdot - curdot);
+			scale = (clip_plane.distance - curdot) / (nextdot - curdot);
 
 			out[outcount].x = cur->x + ((v[nextvert].x - cur->x) * scale);
 			out[outcount].y = cur->y + ((v[nextvert].y - cur->y) * scale);
@@ -495,15 +501,9 @@ void model2_state::model2_3d_process_quad( raster_state *raster, uint32_t attr )
 	{
 		int32_t clipped_verts;
 		poly_vertex verts[10];
-		plane clip_plane;
-
-		clip_plane.normal.x = 0;
-		clip_plane.normal.y = 0;
-		clip_plane.normal.pz = 1;
-		clip_plane.distance = 0;
 
 		/* do near z clipping */
-		clipped_verts = clip_polygon( object.v, 4, &clip_plane, verts);
+		clipped_verts = clip_polygon( object.v, 4, verts);
 
 		if ( clipped_verts > 2 )
 		{
@@ -715,15 +715,9 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, uint32_t at
 	{
 		int32_t       clipped_verts;
 		poly_vertex verts[10];
-		plane       clip_plane;
-
-		clip_plane.normal.x = 0;
-		clip_plane.normal.y = 0;
-		clip_plane.normal.pz = 1;
-		clip_plane.distance = 0;
 
 		/* do near z clipping */
-		clipped_verts = clip_polygon( object.v, 3, &clip_plane, verts);
+		clipped_verts = clip_polygon( object.v, 3, verts);
 
 		if ( clipped_verts > 2 )
 		{
@@ -2648,6 +2642,10 @@ void model2_state::video_start()
 	save_item(NAME(m_render_test_mode));
 	save_item(NAME(m_render_unk));
 	save_item(NAME(m_render_mode));
+	save_pointer(NAME(m_palram.get()), 0x4000/2);
+	save_pointer(NAME(m_colorxlat.get()), 0xc000/2);
+	save_pointer(NAME(m_lumaram.get()), 0x10000/2);
+	save_pointer(NAME(m_gamma_table), 256);
 }
 
 uint32_t model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

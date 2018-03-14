@@ -56,21 +56,23 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-ADDRESS_MAP_START(mx2178_state::mx2178_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+void mx2178_state::mx2178_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom().region("roms", 0);
+	map(0x2000, 0x27ff).ram().share("videoram");
+	map(0x6000, 0x6fff).ram();
+	map(0xe000, 0xe7ff).ram();
+}
 
-ADDRESS_MAP_START(mx2178_state::mx2178_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("acia1", acia6850_device, read, write)
-	AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE("acia2", acia6850_device, read, write)
-ADDRESS_MAP_END
+void mx2178_state::mx2178_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x01, 0x01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x80, 0x81).rw("acia1", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xa0, 0xa1).rw("acia2", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+}
 
 
 /* Input ports */

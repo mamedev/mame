@@ -25,26 +25,27 @@
 
 
 /* Address maps */
-ADDRESS_MAP_START(partner_state::partner_mem)
-	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x0800, 0x3fff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0x4000, 0x5fff ) AM_RAMBANK("bank3")
-	AM_RANGE( 0x6000, 0x7fff ) AM_RAMBANK("bank4")
-	AM_RANGE( 0x8000, 0x9fff ) AM_RAMBANK("bank5")
-	AM_RANGE( 0xa000, 0xb7ff ) AM_RAMBANK("bank6")
-	AM_RANGE( 0xb800, 0xbfff ) AM_RAMBANK("bank7")
-	AM_RANGE( 0xc000, 0xc7ff ) AM_RAMBANK("bank8")
-	AM_RANGE( 0xc800, 0xcfff ) AM_RAMBANK("bank9")
-	AM_RANGE( 0xd000, 0xd7ff ) AM_RAMBANK("bank10")
-	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE("i8275", i8275_device, read, write)  // video
-	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE( 0xda00, 0xdaff ) AM_WRITE(partner_mem_page_w)
-	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE("dma8257", i8257_device, write)    // DMA
-	AM_RANGE( 0xdc00, 0xddff ) AM_RAMBANK("bank11")
-	AM_RANGE( 0xde00, 0xdeff ) AM_WRITE(partner_win_memory_page_w)
-	AM_RANGE( 0xe000, 0xe7ff ) AM_RAMBANK("bank12")
-	AM_RANGE( 0xe800, 0xffff ) AM_RAMBANK("bank13")
-ADDRESS_MAP_END
+void partner_state::partner_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).bankrw("bank1");
+	map(0x0800, 0x3fff).bankrw("bank2");
+	map(0x4000, 0x5fff).bankrw("bank3");
+	map(0x6000, 0x7fff).bankrw("bank4");
+	map(0x8000, 0x9fff).bankrw("bank5");
+	map(0xa000, 0xb7ff).bankrw("bank6");
+	map(0xb800, 0xbfff).bankrw("bank7");
+	map(0xc000, 0xc7ff).bankrw("bank8");
+	map(0xc800, 0xcfff).bankrw("bank9");
+	map(0xd000, 0xd7ff).bankrw("bank10");
+	map(0xd800, 0xd8ff).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write));  // video
+	map(0xd900, 0xd9ff).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xda00, 0xdaff).w(this, FUNC(partner_state::partner_mem_page_w));
+	map(0xdb00, 0xdbff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
+	map(0xdc00, 0xddff).bankrw("bank11");
+	map(0xde00, 0xdeff).w(this, FUNC(partner_state::partner_win_memory_page_w));
+	map(0xe000, 0xe7ff).bankrw("bank12");
+	map(0xe800, 0xffff).bankrw("bank13");
+}
 
 /* Input ports */
 static INPUT_PORTS_START( partner )

@@ -281,62 +281,67 @@ WRITE8_MEMBER(a7150_state::a7150_kgs_w)
 }
 
 
-ADDRESS_MAP_START(a7150_state::a7150_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xf7fff) AM_RAM
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void a7150_state::a7150_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xf7fff).ram();
+	map(0xf8000, 0xfffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(a7150_state::a7150_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x004a, 0x004b) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff) // KES board
-	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x00d0, 0x00d7) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x00d8, 0x00d9) AM_DEVREADWRITE8("uart8251", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x00da, 0x00db) AM_DEVREADWRITE8("uart8251", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x0200, 0x0203) AM_READWRITE8(a7150_kgs_r, a7150_kgs_w, 0x00ff) // ABS/KGS board
-	AM_RANGE(0x0300, 0x031f) AM_UNMAP // ASP board #1
-	AM_RANGE(0x0320, 0x033f) AM_UNMAP // ASP board #2
-ADDRESS_MAP_END
+void a7150_state::a7150_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x004a, 0x004a).w("isbc_215g", FUNC(isbc_215g_device::write)); // KES board
+	map(0x00c0, 0x00c3).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x00c8, 0x00cf).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x00d0, 0x00d7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x00d8, 0x00d8).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x00da, 0x00da).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0200, 0x0203).rw(this, FUNC(a7150_state::a7150_kgs_r), FUNC(a7150_state::a7150_kgs_w)).umask16(0x00ff); // ABS/KGS board
+	map(0x0300, 0x031f).unmaprw(); // ASP board #1
+	map(0x0320, 0x033f).unmaprw(); // ASP board #2
+}
 
-ADDRESS_MAP_START(a7150_state::k7070_cpu_banked)
-	ADDRESS_MAP_UNMAP_HIGH
+void a7150_state::k7070_cpu_banked(address_map &map)
+{
+	map.unmap_value_high();
 	// default map: IML=0, MSEL=0.  ROM + local RAM.
-	AM_RANGE(0x00000, 0x01fff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x02000, 0x07fff) AM_RAMBANK("kgs_ram1")
-	AM_RANGE(0x08000, 0x0ffff) AM_RAMBANK("kgs_ram2")
+	map(0x00000, 0x01fff).rom().region("user2", 0);
+	map(0x02000, 0x07fff).bankrw("kgs_ram1");
+	map(0x08000, 0x0ffff).bankrw("kgs_ram2");
 	// IML=1, MSEL=0.   local RAM only.
-	AM_RANGE(0x10000, 0x11fff) AM_RAMBANK("kgs_ram0")
-	AM_RANGE(0x12000, 0x17fff) AM_RAMBANK("kgs_ram1")
-	AM_RANGE(0x18000, 0x1ffff) AM_RAMBANK("kgs_ram2")
+	map(0x10000, 0x11fff).bankrw("kgs_ram0");
+	map(0x12000, 0x17fff).bankrw("kgs_ram1");
+	map(0x18000, 0x1ffff).bankrw("kgs_ram2");
 	// IML=0, MSEL=1.  ROM + local RAM.
-	AM_RANGE(0x20000, 0x21fff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x22000, 0x27fff) AM_RAMBANK("kgs_ram1")
+	map(0x20000, 0x21fff).rom().region("user2", 0);
+	map(0x22000, 0x27fff).bankrw("kgs_ram1");
 	// IML=1, MSEL=1.   local RAM only.
-	AM_RANGE(0x30000, 0x31fff) AM_RAMBANK("kgs_ram0")
-	AM_RANGE(0x32000, 0x37fff) AM_RAMBANK("kgs_ram1")
-	AM_RANGE(0x38000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+	map(0x30000, 0x31fff).bankrw("kgs_ram0");
+	map(0x32000, 0x37fff).bankrw("kgs_ram1");
+	map(0x38000, 0x3ffff).ram().share("video_ram");
+}
 
-ADDRESS_MAP_START(a7150_state::k7070_cpu_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("video_bankdev", address_map_bank_device, read8, write8)
-ADDRESS_MAP_END
+void a7150_state::k7070_cpu_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(m_video_bankdev, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+}
 
 
-ADDRESS_MAP_START(a7150_state::k7070_cpu_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0003) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x0008, 0x000b) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x0010, 0x0017) AM_READWRITE(kgs_host_r, kgs_host_w) // p. 11 of KGS-K7070.pdf
+void a7150_state::k7070_cpu_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x0000, 0x0003).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x0008, 0x000b).rw(Z80SIO_TAG, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x0010, 0x0017).rw(this, FUNC(a7150_state::kgs_host_r), FUNC(a7150_state::kgs_host_w)); // p. 11 of KGS-K7070.pdf
 
-	AM_RANGE(0x0020, 0x0021) AM_NOP // address register
-	AM_RANGE(0x0022, 0x0022) AM_NOP // function register (p. 6 of ABG-K7072.pdf)
-	AM_RANGE(0x0023, 0x0023) AM_NOP // split register
-	AM_RANGE(0x0030, 0x003f) AM_NOP // palette register
-ADDRESS_MAP_END
+	map(0x0020, 0x0021).noprw(); // address register
+	map(0x0022, 0x0022).noprw(); // function register (p. 6 of ABG-K7072.pdf)
+	map(0x0023, 0x0023).noprw(); // split register
+	map(0x0030, 0x003f).noprw(); // palette register
+}
 
 /* Input ports */
 static INPUT_PORTS_START( a7150 )

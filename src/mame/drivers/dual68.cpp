@@ -48,31 +48,34 @@ WRITE16_MEMBER( dual68_state::terminal_w )
 	m_terminal->write(space, 0, data >> 8);
 }
 
-ADDRESS_MAP_START(dual68_state::dual68_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x00080000, 0x00081fff) AM_ROM AM_REGION("user1",0)
-	AM_RANGE(0x007f0000, 0x007f0001) AM_WRITE(terminal_w)
-	AM_RANGE(0x00800000, 0x00801fff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
+void dual68_state::dual68_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x0000ffff).ram().share("ram");
+	map(0x00080000, 0x00081fff).rom().region("user1", 0);
+	map(0x007f0000, 0x007f0001).w(this, FUNC(dual68_state::terminal_w));
+	map(0x00800000, 0x00801fff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(dual68_state::sio4_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void dual68_state::sio4_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(dual68_state::sio4_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x22, 0x22) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	AM_RANGE(0x23, 0x23) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	AM_RANGE(0x2a, 0x2a) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
-	AM_RANGE(0x2b, 0x2b) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
-	AM_RANGE(0x32, 0x32) AM_DEVREADWRITE("uart3", i8251_device, status_r, control_w)
-	AM_RANGE(0x33, 0x33) AM_DEVREADWRITE("uart3", i8251_device, data_r, data_w)
-	AM_RANGE(0x3a, 0x3a) AM_DEVREADWRITE("uart4", i8251_device, status_r, control_w)
-	AM_RANGE(0x3b, 0x3b) AM_DEVREADWRITE("uart4", i8251_device, data_r, data_w)
-ADDRESS_MAP_END
+void dual68_state::sio4_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x22, 0x22).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x23, 0x23).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x2a, 0x2a).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x2b, 0x2b).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x32, 0x32).rw("uart3", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x33, 0x33).rw("uart3", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x3a, 0x3a).rw("uart4", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x3b, 0x3b).rw("uart4", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( dual68 )

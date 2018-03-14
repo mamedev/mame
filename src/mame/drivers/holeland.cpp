@@ -29,35 +29,38 @@ WRITE_LINE_MEMBER(holeland_state::coin_counter_w)
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-ADDRESS_MAP_START(holeland_state::holeland_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("speech", sp0256_device, ald_w)
-	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("latch", ls259_device, write_d0) AM_READNOP
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void holeland_state::holeland_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xbfff).rom();
+	map(0xa000, 0xa000).w("speech", FUNC(sp0256_device::ald_w));
+	map(0xc000, 0xc007).w(m_latch, FUNC(ls259_device::write_d0)).nopr();
+	map(0xe000, 0xe3ff).ram().w(this, FUNC(holeland_state::colorram_w)).share("colorram");
+	map(0xe400, 0xe7ff).ram().w(this, FUNC(holeland_state::videoram_w)).share("videoram");
+	map(0xf000, 0xf3ff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(holeland_state::crzrally_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(scroll_w)
-	AM_RANGE(0xf800, 0xf807) AM_DEVWRITE("latch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void holeland_state::crzrally_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram().share("nvram");
+	map(0xe000, 0xe3ff).ram().w(this, FUNC(holeland_state::colorram_w)).share("colorram");
+	map(0xe400, 0xe7ff).ram().w(this, FUNC(holeland_state::videoram_w)).share("videoram");
+	map(0xe800, 0xebff).ram().share("spriteram");
+	map(0xf000, 0xf000).w(this, FUNC(holeland_state::scroll_w));
+	map(0xf800, 0xf807).w(m_latch, FUNC(ls259_device::write_d0));
+}
 
-ADDRESS_MAP_START(holeland_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)  /* ? */
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void holeland_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("watchdog", FUNC(watchdog_timer_device::reset_r));  /* ? */
+	map(0x04, 0x04).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x04, 0x05).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x06, 0x06).r("ay2", FUNC(ay8910_device::data_r));
+	map(0x06, 0x07).w("ay2", FUNC(ay8910_device::address_data_w));
+}
 
 /* Note - manual states cocktail mode should be default */
 static INPUT_PORTS_START( holeland )

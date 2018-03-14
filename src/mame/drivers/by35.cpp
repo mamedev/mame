@@ -241,22 +241,24 @@ protected:
 };
 
 
-ADDRESS_MAP_START(by35_state::by35_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)     // A15 is not connected
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write)
-	AM_RANGE(0x0200, 0x02ff) AM_RAM AM_READWRITE(nibble_nvram_r, nibble_nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x1000, 0x7fff) AM_ROM // AM_REGION("roms", 0 )
-ADDRESS_MAP_END
+void by35_state::by35_map(address_map &map)
+{
+	map.global_mask(0x7fff);     // A15 is not connected
+	map(0x0000, 0x007f).ram();
+	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0200, 0x02ff).ram().rw(this, FUNC(by35_state::nibble_nvram_r), FUNC(by35_state::nibble_nvram_w)).share("nvram");
+	map(0x1000, 0x7fff).rom(); // AM_REGION("roms", 0 )
+}
 
-ADDRESS_MAP_START(by35_state::nuovo_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+void by35_state::nuovo_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
 //  AM_RANGE(0x0000, 0x007f) AM_RAM     // Schematics infer that the M6802 internal RAM is disabled.
-	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0xffff).rom();
+}
 
 
 

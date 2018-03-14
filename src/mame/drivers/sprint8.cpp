@@ -109,24 +109,25 @@ WRITE_LINE_MEMBER(sprint8_state::team_w)
 }
 
 
-ADDRESS_MAP_START(sprint8_state::sprint8_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(video_ram_w) AM_SHARE("video_ram")
-	AM_RANGE(0x1c00, 0x1c00) AM_READ(collision_r)
-	AM_RANGE(0x1c01, 0x1c08) AM_READ(input_r)
-	AM_RANGE(0x1c09, 0x1c09) AM_READ_PORT("IN0")
-	AM_RANGE(0x1c0a, 0x1c0a) AM_READ_PORT("IN1")
-	AM_RANGE(0x1c0f, 0x1c0f) AM_READ_PORT("VBLANK")
-	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_SHARE("pos_h_ram")
-	AM_RANGE(0x1c10, 0x1c1f) AM_WRITEONLY AM_SHARE("pos_v_ram")
-	AM_RANGE(0x1c20, 0x1c2f) AM_WRITEONLY AM_SHARE("pos_d_ram")
-	AM_RANGE(0x1c30, 0x1c37) AM_WRITE(lockout_w)
-	AM_RANGE(0x1d00, 0x1d07) AM_DEVWRITE("latch", f9334_device, write_d0)
-	AM_RANGE(0x1e00, 0x1e07) AM_DEVWRITE("motor", f9334_device, write_d0)
-	AM_RANGE(0x1f00, 0x1f00) AM_WRITENOP /* probably a watchdog, disabled in service mode */
-	AM_RANGE(0x2000, 0x3fff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void sprint8_state::sprint8_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+	map(0x1800, 0x1bff).ram().w(this, FUNC(sprint8_state::video_ram_w)).share("video_ram");
+	map(0x1c00, 0x1c00).r(this, FUNC(sprint8_state::collision_r));
+	map(0x1c01, 0x1c08).r(this, FUNC(sprint8_state::input_r));
+	map(0x1c09, 0x1c09).portr("IN0");
+	map(0x1c0a, 0x1c0a).portr("IN1");
+	map(0x1c0f, 0x1c0f).portr("VBLANK");
+	map(0x1c00, 0x1c0f).writeonly().share("pos_h_ram");
+	map(0x1c10, 0x1c1f).writeonly().share("pos_v_ram");
+	map(0x1c20, 0x1c2f).writeonly().share("pos_d_ram");
+	map(0x1c30, 0x1c37).w(this, FUNC(sprint8_state::lockout_w));
+	map(0x1d00, 0x1d07).w("latch", FUNC(f9334_device::write_d0));
+	map(0x1e00, 0x1e07).w("motor", FUNC(f9334_device::write_d0));
+	map(0x1f00, 0x1f00).nopw(); /* probably a watchdog, disabled in service mode */
+	map(0x2000, 0x3fff).rom();
+	map(0xf800, 0xffff).rom();
+}
 
 
 static INPUT_PORTS_START( sprint8 )

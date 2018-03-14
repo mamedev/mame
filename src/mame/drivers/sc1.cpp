@@ -124,18 +124,20 @@ READ8_MEMBER( sc1_state::pio_port_b_r )
 }
 
 
-ADDRESS_MAP_START(sc1_state::sc1_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
-	AM_RANGE( 0x4000, 0x43ff ) AM_RAM
-ADDRESS_MAP_END
+void sc1_state::sc1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x4000, 0x43ff).ram();
+}
 
-ADDRESS_MAP_START(sc1_state::sc1_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(matrix_w)
-ADDRESS_MAP_END
+void sc1_state::sc1_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x83).rw("z80pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0xfc, 0xfc).w(this, FUNC(sc1_state::matrix_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sc1 )

@@ -657,35 +657,37 @@ void nwktr_state::machine_start()
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nwktr_state::sound_irq), this));
 }
 
-ADDRESS_MAP_START(nwktr_state::nwktr_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("work_ram")        /* Work RAM */
-	AM_RANGE(0x74000000, 0x740000ff) AM_DEVREADWRITE("k001604", k001604_device, reg_r, reg_w)
-	AM_RANGE(0x74010000, 0x74017fff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
-	AM_RANGE(0x74020000, 0x7403ffff) AM_DEVREADWRITE("k001604", k001604_device, tile_r, tile_w)
-	AM_RANGE(0x74040000, 0x7407ffff) AM_DEVREADWRITE("k001604", k001604_device, char_r, char_w)
-	AM_RANGE(0x78000000, 0x7800ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
-	AM_RANGE(0x780c0000, 0x780c0003) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
-	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ(sysreg_r)
-	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE(sysreg_w)
-	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0xffffffff)  /* M48T58Y RTC/NVRAM */
-	AM_RANGE(0x7d030000, 0x7d03000f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
-	AM_RANGE(0x7d040000, 0x7d04ffff) AM_READWRITE(lanc1_r, lanc1_w)
-	AM_RANGE(0x7d050000, 0x7d05ffff) AM_READWRITE(lanc2_r, lanc2_w)
-	AM_RANGE(0x7e000000, 0x7e7fffff) AM_ROM AM_REGION("user2", 0)   /* Data ROM */
-	AM_RANGE(0x7f000000, 0x7f1fffff) AM_ROM AM_SHARE("share2")
-	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")    /* Program ROM */
-ADDRESS_MAP_END
+void nwktr_state::nwktr_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram().share("work_ram");        /* Work RAM */
+	map(0x74000000, 0x740000ff).rw(m_k001604, FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
+	map(0x74010000, 0x74017fff).ram().w(this, FUNC(nwktr_state::paletteram32_w)).share("paletteram");
+	map(0x74020000, 0x7403ffff).rw(m_k001604, FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
+	map(0x74040000, 0x7407ffff).rw(m_k001604, FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
+	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
+	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
+	map(0x7d000000, 0x7d00ffff).r(this, FUNC(nwktr_state::sysreg_r));
+	map(0x7d010000, 0x7d01ffff).w(this, FUNC(nwktr_state::sysreg_w));
+	map(0x7d020000, 0x7d021fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));  /* M48T58Y RTC/NVRAM */
+	map(0x7d030000, 0x7d03000f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
+	map(0x7d040000, 0x7d04ffff).rw(this, FUNC(nwktr_state::lanc1_r), FUNC(nwktr_state::lanc1_w));
+	map(0x7d050000, 0x7d05ffff).rw(this, FUNC(nwktr_state::lanc2_r), FUNC(nwktr_state::lanc2_w));
+	map(0x7e000000, 0x7e7fffff).rom().region("user2", 0);   /* Data ROM */
+	map(0x7f000000, 0x7f1fffff).rom().share("share2");
+	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0).share("share2");    /* Program ROM */
+}
 
 /*****************************************************************************/
 
-ADDRESS_MAP_START(nwktr_state::sound_memmap)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)      /* Ricoh RF5C400 */
-	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("k056800", k056800_device, sound_r, sound_w, 0x00ff)
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(soundtimer_en_w) AM_READNOP
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(soundtimer_count_w) AM_READNOP
-ADDRESS_MAP_END
+void nwktr_state::sound_memmap(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x200000, 0x200fff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));      /* Ricoh RF5C400 */
+	map(0x300000, 0x30001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
+	map(0x500000, 0x500001).w(this, FUNC(nwktr_state::soundtimer_en_w)).nopr();
+	map(0x600000, 0x600001).w(this, FUNC(nwktr_state::soundtimer_count_w)).nopr();
+}
 
 /*****************************************************************************/
 
@@ -710,25 +712,27 @@ WRITE32_MEMBER(nwktr_state::dsp_dataram1_w)
 	m_sharc1_dataram[offset] = data;
 }
 
-ADDRESS_MAP_START(nwktr_state::sharc0_map)
-	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
-	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("konppc", konppc_device, nwk_voodoo_0_r, nwk_voodoo_0_w)
-	AM_RANGE(0x3400000, 0x34000ff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
-	AM_RANGE(0x3500000, 0x35000ff) AM_DEVREADWRITE("konppc", konppc_device, K033906_0_r, K033906_0_w)
-	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
-ADDRESS_MAP_END
+void nwktr_state::sharc0_map(address_map &map)
+{
+	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
+	map(0x0500000, 0x05fffff).rw(this, FUNC(nwktr_state::dsp_dataram0_r), FUNC(nwktr_state::dsp_dataram0_w));
+	map(0x1400000, 0x14fffff).ram();
+	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r), FUNC(konppc_device::nwk_voodoo_0_w));
+	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
+	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_0_r), FUNC(konppc_device::K033906_0_w));
+	map(0x3600000, 0x37fffff).bankr("bank5");
+}
 
-ADDRESS_MAP_START(nwktr_state::sharc1_map)
-	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w)
-	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("konppc", konppc_device, nwk_voodoo_0_r, nwk_voodoo_0_w)
-	AM_RANGE(0x3400000, 0x34000ff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
-	AM_RANGE(0x3500000, 0x35000ff) AM_DEVREADWRITE("konppc", konppc_device, K033906_1_r, K033906_1_w)
-	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank6")
-ADDRESS_MAP_END
+void nwktr_state::sharc1_map(address_map &map)
+{
+	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
+	map(0x0500000, 0x05fffff).rw(this, FUNC(nwktr_state::dsp_dataram1_r), FUNC(nwktr_state::dsp_dataram1_w));
+	map(0x1400000, 0x14fffff).ram();
+	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r), FUNC(konppc_device::nwk_voodoo_0_w));
+	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
+	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_1_r), FUNC(konppc_device::K033906_1_w));
+	map(0x3600000, 0x37fffff).bankr("bank6");
+}
 
 /*****************************************************************************/
 

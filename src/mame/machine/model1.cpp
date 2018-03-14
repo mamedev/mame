@@ -2165,8 +2165,9 @@ WRITE16_MEMBER(model1_state::model1_vr_tgp_w)
 }
 
 /* TGP memory map */
-ADDRESS_MAP_START(model1_state::model1_vr_tgp_map)
-	AM_RANGE(0x00000000, 0x000007ff) AM_RAM AM_REGION("tgp", 0)
-	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE(copro_ram_r, copro_ram_w)
-	AM_RANGE(0xff800000, 0xff87ffff) AM_ROM AM_REGION("tgp_data", 0)
-ADDRESS_MAP_END
+void model1_state::model1_vr_tgp_map(address_map &map)
+{
+	map(0x00000000, 0x000007ff).ram().region("tgp", 0);
+	map(0x00400000, 0x00407fff).rw(this, FUNC(model1_state::copro_ram_r), FUNC(model1_state::copro_ram_w));
+	map(0xff800000, 0xff87ffff).rom().region("tgp_data", 0);
+}

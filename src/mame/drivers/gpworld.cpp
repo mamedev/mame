@@ -321,31 +321,33 @@ WRITE8_MEMBER(gpworld_state::palette_write)
 }
 
 /* PROGRAM MAP */
-ADDRESS_MAP_START(gpworld_state::mainmem)
-	AM_RANGE(0x0000,0xbfff) AM_ROM
-	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_SHARE("sprite_ram")
-	AM_RANGE(0xc800,0xcfff) AM_RAM_WRITE(palette_write) AM_SHARE("palette_ram") /* The memory test reads at 0xc800 */
-	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_SHARE("tile_ram")
-	AM_RANGE(0xd800,0xd800) AM_READWRITE(ldp_read,ldp_write)
+void gpworld_state::mainmem(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram().share("sprite_ram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(gpworld_state::palette_write)).share("palette_ram"); /* The memory test reads at 0xc800 */
+	map(0xd000, 0xd7ff).ram().share("tile_ram");
+	map(0xd800, 0xd800).rw(this, FUNC(gpworld_state::ldp_read), FUNC(gpworld_state::ldp_write));
 /*  AM_RANGE(0xd801,0xd801) AM_READ(???) */
-	AM_RANGE(0xda00,0xda00) AM_READ_PORT("INWHEEL") //8255 here....
+	map(0xda00, 0xda00).portr("INWHEEL"); //8255 here....
 /*  AM_RANGE(0xda01,0xda01) AM_WRITE(???) */                 /* These inputs are interesting - there are writes and reads all over these addr's */
-	AM_RANGE(0xda02,0xda02) AM_WRITE(brake_gas_write)               /*bit 0 select gas/brake input */
-	AM_RANGE(0xda20,0xda20) AM_READ(pedal_in)
+	map(0xda02, 0xda02).w(this, FUNC(gpworld_state::brake_gas_write));               /*bit 0 select gas/brake input */
+	map(0xda20, 0xda20).r(this, FUNC(gpworld_state::pedal_in));
 
-	AM_RANGE(0xe000,0xffff) AM_RAM                              /* Potentially not all work RAM? */
-ADDRESS_MAP_END
+	map(0xe000, 0xffff).ram();                              /* Potentially not all work RAM? */
+}
 
 
 /* I/O MAP */
-ADDRESS_MAP_START(gpworld_state::mainport)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_WRITE(misc_io_write)
-	AM_RANGE(0x80,0x80) AM_READ_PORT("IN0")
-	AM_RANGE(0x81,0x81) AM_READ_PORT("IN1")
-	AM_RANGE(0x82,0x82) AM_READ_PORT("DSW1")
-	AM_RANGE(0x83,0x83) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
+void gpworld_state::mainport(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).w(this, FUNC(gpworld_state::misc_io_write));
+	map(0x80, 0x80).portr("IN0");
+	map(0x81, 0x81).portr("IN1");
+	map(0x82, 0x82).portr("DSW1");
+	map(0x83, 0x83).portr("DSW2");
+}
 
 
 /* PORTS */

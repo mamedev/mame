@@ -422,16 +422,17 @@ READ8_MEMBER(mgavegas_state::ay8910_b_r)
 * Memory Map Information *
 *************************/
 
-ADDRESS_MAP_START(mgavegas_state::mgavegas_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa003) AM_READWRITE(r_a0,w_a0)            // AY-3-8910
-	AM_RANGE(0xc000, 0xc001) AM_WRITE(cso1_w)                   // /CSout1
-	AM_RANGE(0xc400, 0xc401) AM_WRITE(cso2_w)                   // /CSout2
-	AM_RANGE(0xc800, 0xc801) AM_READWRITE(csoki_r,csoki_w)      // /CSoki
+void mgavegas_state::mgavegas_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram().share("nvram");
+	map(0xa000, 0xa003).rw(this, FUNC(mgavegas_state::r_a0), FUNC(mgavegas_state::w_a0));            // AY-3-8910
+	map(0xc000, 0xc001).w(this, FUNC(mgavegas_state::cso1_w));                   // /CSout1
+	map(0xc400, 0xc401).w(this, FUNC(mgavegas_state::cso2_w));                   // /CSout2
+	map(0xc800, 0xc801).rw(this, FUNC(mgavegas_state::csoki_r), FUNC(mgavegas_state::csoki_w));      // /CSoki
 	//AM_RANGE(0xcc00, 0xcc01) AM_READWRITE(cso3_r,cso3_w)      // /CSout3 unused
 	//AM_RANGE(0xe000, 0xe003) AM_READWRITE(r_e0,w_e0)          // /CSaux unused
-ADDRESS_MAP_END
+}
 
 
 

@@ -74,71 +74,78 @@ WRITE8_MEMBER(vigilant_state::kikcubic_coin_w)
 
 
 
-ADDRESS_MAP_START(vigilant_state::vigilant_map)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")        /* Fallthrough */
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc020, 0xc0df) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void vigilant_state::vigilant_map(address_map &map)
+{
+	map(0x8000, 0xbfff).bankr("bank1");        /* Fallthrough */
+	map(0x0000, 0x7fff).rom();
+	map(0xc020, 0xc0df).ram().share("spriteram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(vigilant_state::paletteram_w)).share("paletteram");
+	map(0xd000, 0xdfff).ram().share("videoram");
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(vigilant_state::vigilant_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)    /* SD */
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(vigilant_out2_w)          /* OUT2 */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(bank_select_w)  /* PBANK */
-	AM_RANGE(0x80, 0x81) AM_WRITE(vigilant_horiz_scroll_w)      /* HSPL, HSPH */
-	AM_RANGE(0x82, 0x83) AM_WRITE(vigilant_rear_horiz_scroll_w) /* RHSPL, RHSPH */
-	AM_RANGE(0x84, 0x84) AM_WRITE(vigilant_rear_color_w)        /* RCOD */
-ADDRESS_MAP_END
+void vigilant_state::vigilant_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));    /* SD */
+	map(0x01, 0x01).portr("IN1").w(this, FUNC(vigilant_state::vigilant_out2_w));          /* OUT2 */
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).portr("DSW1");
+	map(0x04, 0x04).portr("DSW2").w(this, FUNC(vigilant_state::bank_select_w));  /* PBANK */
+	map(0x80, 0x81).w(this, FUNC(vigilant_state::vigilant_horiz_scroll_w));      /* HSPL, HSPH */
+	map(0x82, 0x83).w(this, FUNC(vigilant_state::vigilant_rear_horiz_scroll_w)); /* RHSPL, RHSPH */
+	map(0x84, 0x84).w(this, FUNC(vigilant_state::vigilant_rear_color_w));        /* RCOD */
+}
 
-ADDRESS_MAP_START(vigilant_state::kikcubic_map)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")        /* Fallthrough */
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void vigilant_state::kikcubic_map(address_map &map)
+{
+	map(0x8000, 0xbfff).bankr("bank1");        /* Fallthrough */
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc0ff).ram().share("spriteram");
+	map(0xc800, 0xcaff).ram().w(this, FUNC(vigilant_state::paletteram_w)).share("paletteram");
+	map(0xd000, 0xdfff).ram().share("videoram");
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(vigilant_state::kikcubic_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(kikcubic_coin_w) /* also flip screen, and...? */
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_WRITE(bank_select_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+void vigilant_state::kikcubic_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSW1").w(this, FUNC(vigilant_state::kikcubic_coin_w)); /* also flip screen, and...? */
+	map(0x01, 0x01).portr("DSW2");
+	map(0x02, 0x02).portr("IN0");
+	map(0x03, 0x03).portr("IN1");
+	map(0x04, 0x04).portr("IN2").w(this, FUNC(vigilant_state::bank_select_w));
+	map(0x06, 0x06).w("soundlatch", FUNC(generic_latch_8_device::write));
 //  AM_RANGE(0x07, 0x07) AM_WRITENOP /* ?? */
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(vigilant_state::sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void vigilant_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(vigilant_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x81) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("m72", m72_audio_device, vigilant_sample_addr_w)   /* STL / STH */
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)            /* COUNT UP */
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w) /* IRQ clear */
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r) /* S ROM C */
-ADDRESS_MAP_END
+void vigilant_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x80, 0x81).r("soundlatch", FUNC(generic_latch_8_device::read)).w(m_audio, FUNC(m72_audio_device::vigilant_sample_addr_w));   /* STL / STH */
+	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));            /* COUNT UP */
+	map(0x83, 0x83).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w)); /* IRQ clear */
+	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r)); /* S ROM C */
+}
 
-ADDRESS_MAP_START(vigilant_state::buccanrs_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)             /* SDRE */
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, vigilant_sample_addr_w)  /* STL / STH */
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)                /* COUNT UP */
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)   /* IRQ clear */
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)             /* S ROM C */
-ADDRESS_MAP_END
+void vigilant_state::buccanrs_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x02, 0x03).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x80, 0x80).r("soundlatch", FUNC(generic_latch_8_device::read));             /* SDRE */
+	map(0x80, 0x81).w(m_audio, FUNC(m72_audio_device::vigilant_sample_addr_w));  /* STL / STH */
+	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));                /* COUNT UP */
+	map(0x83, 0x83).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));   /* IRQ clear */
+	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));             /* S ROM C */
+}
 
 
 static INPUT_PORTS_START( vigilant )

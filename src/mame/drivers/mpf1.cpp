@@ -58,54 +58,61 @@
 
 /* Address Maps */
 
-ADDRESS_MAP_START(mpf1_state::mpf1_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM
-ADDRESS_MAP_END
+void mpf1_state::mpf1_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1800, 0x1fff).ram();
+}
 
-ADDRESS_MAP_START(mpf1_state::mpf1_step)
-	AM_RANGE(0x0000, 0xffff) AM_READ(step_r)
-ADDRESS_MAP_END
+void mpf1_state::mpf1_step(address_map &map)
+{
+	map(0x0000, 0xffff).r(this, FUNC(mpf1_state::step_r));
+}
 
-ADDRESS_MAP_START(mpf1_state::mpf1b_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2fff) AM_ROM
-	AM_RANGE(0x5000, 0x6fff) AM_ROM
-ADDRESS_MAP_END
+void mpf1_state::mpf1b_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1800, 0x1fff).ram();
+	map(0x2000, 0x2fff).rom();
+	map(0x5000, 0x6fff).rom();
+}
 
-ADDRESS_MAP_START(mpf1_state::mpf1p_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mpf1_state::mpf1p_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x6000, 0x6fff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(mpf1_state::mpf1_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
-ADDRESS_MAP_END
+void mpf1_state::mpf1_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).mirror(0x3c).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x43).mirror(0x3c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x80, 0x83).mirror(0x3c).rw(Z80PIO_TAG, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
-ADDRESS_MAP_START(mpf1_state::mpf1b_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
-	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0x01) AM_DEVREADWRITE(TMS5220_TAG, tms5220_device, status_r, data_w)
-ADDRESS_MAP_END
+void mpf1_state::mpf1b_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).mirror(0x3c).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x43).mirror(0x3c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x80, 0x83).mirror(0x3c).rw(Z80PIO_TAG, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0xfe, 0xfe).mirror(0x01).rw(TMS5220_TAG, FUNC(tms5220_device::status_r), FUNC(tms5220_device::data_w));
+}
 
-ADDRESS_MAP_START(mpf1_state::mpf1p_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
-ADDRESS_MAP_END
+void mpf1_state::mpf1p_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).mirror(0x3c).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x43).mirror(0x3c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x80, 0x83).mirror(0x3c).rw(Z80PIO_TAG, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
 /* Input Ports */
 

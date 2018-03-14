@@ -33,28 +33,30 @@ TODO:
 #include "speaker.h"
 
 /* Address maps */
-ADDRESS_MAP_START(vector06_state::vector06_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE_BANK("bank1")
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank2")
-	AM_RANGE(0xa000, 0xdfff) AM_READWRITE_BANK("bank3")
-ADDRESS_MAP_END
+void vector06_state::vector06_mem(address_map &map)
+{
+	map(0x0000, 0xffff).bankrw("bank1");
+	map(0x0000, 0x7fff).bankr("bank2");
+	map(0xa000, 0xdfff).bankrw("bank3");
+}
 
-ADDRESS_MAP_START(vector06_state::vector06_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
+void vector06_state::vector06_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
 	;
 	map(0x00, 0x03).lrw8("ppi8255_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_ppi8255->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ppi8255->write(space, offset^3, data, mem_mask); });
 	map(0x04, 0x07).lrw8("ppi8255_2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_ppi8255_2->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ppi8255_2->write(space, offset^3, data, mem_mask); });
 	map(0x08, 0x0b).lrw8("pit8253_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_pit8253->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pit8253->write(space, offset^3, data, mem_mask); });
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(vector06_color_set)
-	AM_RANGE(0x10, 0x10) AM_WRITE(vector06_ramdisk_w)
-	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_address_w)
-	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("wd1793", kr1818vg93_device, data_r, data_w)
-	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("wd1793", kr1818vg93_device, sector_r, sector_w)
-	AM_RANGE(0x1a, 0x1a) AM_DEVREADWRITE("wd1793", kr1818vg93_device, track_r, track_w)
-	AM_RANGE(0x1b, 0x1b) AM_DEVREADWRITE("wd1793", kr1818vg93_device, status_r, cmd_w)
-	AM_RANGE(0x1c, 0x1c) AM_WRITE(vector06_disc_w)
-ADDRESS_MAP_END
+	map(0x0c, 0x0c).w(this, FUNC(vector06_state::vector06_color_set));
+	map(0x10, 0x10).w(this, FUNC(vector06_state::vector06_ramdisk_w));
+	map(0x14, 0x15).rw(m_ay, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_address_w));
+	map(0x18, 0x18).rw(m_fdc, FUNC(kr1818vg93_device::data_r), FUNC(kr1818vg93_device::data_w));
+	map(0x19, 0x19).rw(m_fdc, FUNC(kr1818vg93_device::sector_r), FUNC(kr1818vg93_device::sector_w));
+	map(0x1a, 0x1a).rw(m_fdc, FUNC(kr1818vg93_device::track_r), FUNC(kr1818vg93_device::track_w));
+	map(0x1b, 0x1b).rw(m_fdc, FUNC(kr1818vg93_device::status_r), FUNC(kr1818vg93_device::cmd_w));
+	map(0x1c, 0x1c).w(this, FUNC(vector06_state::vector06_disc_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vector06 )

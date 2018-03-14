@@ -1368,24 +1368,26 @@ SOUND_RESET_MEMBER( cinemat_state, demon )
 }
 
 
-ADDRESS_MAP_START(cinemat_state::demon_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x4002, 0x4003) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x5000, 0x5001) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x5002, 0x5003) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVREAD("ay3", ay8910_device, data_r)
-	AM_RANGE(0x6002, 0x6003) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
-	AM_RANGE(0x7000, 0x7000) AM_WRITENOP  /* watchdog? */
-ADDRESS_MAP_END
+void cinemat_state::demon_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x3000, 0x33ff).ram();
+	map(0x4000, 0x4001).r(m_ay1, FUNC(ay8910_device::data_r));
+	map(0x4002, 0x4003).w(m_ay1, FUNC(ay8910_device::data_address_w));
+	map(0x5000, 0x5001).r("ay2", FUNC(ay8910_device::data_r));
+	map(0x5002, 0x5003).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0x6000, 0x6001).r("ay3", FUNC(ay8910_device::data_r));
+	map(0x6002, 0x6003).w("ay3", FUNC(ay8910_device::data_address_w));
+	map(0x7000, 0x7000).nopw();  /* watchdog? */
+}
 
 
-ADDRESS_MAP_START(cinemat_state::demon_sound_ports)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVWRITE("ctc", z80ctc_device, write)
-	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE("ctc", z80ctc_device, write)
-ADDRESS_MAP_END
+void cinemat_state::demon_sound_ports(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).w("ctc", FUNC(z80ctc_device::write));
+	map(0x1c, 0x1f).w("ctc", FUNC(z80ctc_device::write));
+}
 
 
 static const z80_daisy_config daisy_chain[] =

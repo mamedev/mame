@@ -143,17 +143,19 @@ WRITE8_MEMBER(bob85_state::bob85_7seg_w)
 	output().set_digit_value(offset, bitswap<8>( data,3,2,1,0,7,6,5,4 ));
 }
 
-ADDRESS_MAP_START(bob85_state::bob85_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x02ff) AM_ROM
-	AM_RANGE(0x0600, 0x09ff) AM_RAM
-ADDRESS_MAP_END
+void bob85_state::bob85_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x02ff).rom();
+	map(0x0600, 0x09ff).ram();
+}
 
-ADDRESS_MAP_START(bob85_state::bob85_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0a, 0x0a) AM_READ(bob85_keyboard_r)
-	AM_RANGE(0x0a, 0x0f) AM_WRITE(bob85_7seg_w)
-ADDRESS_MAP_END
+void bob85_state::bob85_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0a, 0x0a).r(this, FUNC(bob85_state::bob85_keyboard_r));
+	map(0x0a, 0x0f).w(this, FUNC(bob85_state::bob85_7seg_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( bob85 )

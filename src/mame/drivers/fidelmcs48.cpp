@@ -116,9 +116,10 @@ READ_LINE_MEMBER(fidelmcs48_state::sc6_input7_r)
 
 // SC6
 
-ADDRESS_MAP_START(fidelmcs48_state::sc6_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void fidelmcs48_state::sc6_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
 
 

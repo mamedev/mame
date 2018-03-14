@@ -196,26 +196,28 @@ Some logic, resistors/caps/transistors, some connectors etc.
 
 /*************************************************************/
 
-ADDRESS_MAP_START(namcond1_state::namcond1_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0x800000, 0x80000f) AM_DEVICE8("ygv608", ygv608_device, port_map, 0xff00)
-	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xff00)
-	AM_RANGE(0xc3ff00, 0xc3ffff) AM_READWRITE(cuskey_r,cuskey_w)
-ADDRESS_MAP_END
+void namcond1_state::namcond1_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x40ffff).ram().share("shared_ram");
+	map(0x800000, 0x80000f).m(m_ygv608, FUNC(ygv608_device::port_map)).umask16(0xff00);
+	map(0xa00000, 0xa00fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask16(0xff00);
+	map(0xc3ff00, 0xc3ffff).rw(this, FUNC(namcond1_state::cuskey_r), FUNC(namcond1_state::cuskey_w));
+}
 
-ADDRESS_MAP_START(namcond1_state::abcheck_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_SHARE("zpr1")
-	AM_RANGE(0x608000, 0x60ffff) AM_RAM AM_SHARE("zpr2")
-	AM_RANGE(0x700000, 0x700001) AM_WRITENOP
-	AM_RANGE(0x740000, 0x740001) AM_WRITENOP
-	AM_RANGE(0x780000, 0x780001) AM_READ(printer_r)
-	AM_RANGE(0x800000, 0x80000f) AM_DEVICE8("ygv608", ygv608_device, port_map, 0xff00)
-	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xff00)
-	AM_RANGE(0xc3ff00, 0xc3ffff) AM_READWRITE(cuskey_r,cuskey_w)
-ADDRESS_MAP_END
+void namcond1_state::abcheck_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x40ffff).ram().share("shared_ram");
+	map(0x600000, 0x607fff).ram().share("zpr1");
+	map(0x608000, 0x60ffff).ram().share("zpr2");
+	map(0x700000, 0x700001).nopw();
+	map(0x740000, 0x740001).nopw();
+	map(0x780000, 0x780001).r(this, FUNC(namcond1_state::printer_r));
+	map(0x800000, 0x80000f).m(m_ygv608, FUNC(ygv608_device::port_map)).umask16(0xff00);
+	map(0xa00000, 0xa00fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask16(0xff00);
+	map(0xc3ff00, 0xc3ffff).rw(this, FUNC(namcond1_state::cuskey_r), FUNC(namcond1_state::cuskey_w));
+}
 
 READ16_MEMBER(namcond1_state::printer_r)
 {
@@ -298,25 +300,27 @@ WRITE16_MEMBER(namcond1_state::mcu_pa_write)
 }
 
 /* H8/3002 MCU stuff */
-ADDRESS_MAP_START(namcond1_state::nd1h8rwmap)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0xa00000, 0xa07fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("DSW")
-	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xc00010, 0xc00011) AM_NOP
-	AM_RANGE(0xc00030, 0xc00031) AM_NOP
-	AM_RANGE(0xc00040, 0xc00041) AM_NOP
-	AM_RANGE(0xffff1a, 0xffff1b) AM_NOP     // abcheck
-	AM_RANGE(0xffff1e, 0xffff1f) AM_NOP     // ^
-ADDRESS_MAP_END
+void namcond1_state::nd1h8rwmap(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x20ffff).ram().share("shared_ram");
+	map(0xa00000, 0xa07fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
+	map(0xc00000, 0xc00001).portr("DSW");
+	map(0xc00002, 0xc00003).portr("P1_P2");
+	map(0xc00010, 0xc00011).noprw();
+	map(0xc00030, 0xc00031).noprw();
+	map(0xc00040, 0xc00041).noprw();
+	map(0xffff1a, 0xffff1b).noprw();     // abcheck
+	map(0xffff1e, 0xffff1f).noprw();     // ^
+}
 
-ADDRESS_MAP_START(namcond1_state::nd1h8iomap)
-	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ(mcu_p7_read )
-	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(mcu_pa_read, mcu_pa_write )
-	AM_RANGE(h8_device::ADC_0,  h8_device::ADC_3)  AM_NOP // MCU reads these, but the games have no analog controls
-	AM_RANGE(0x14, 0x17) AM_READNOP         // abcheck
-ADDRESS_MAP_END
+void namcond1_state::nd1h8iomap(address_map &map)
+{
+	map(h8_device::PORT_7, h8_device::PORT_7).r(this, FUNC(namcond1_state::mcu_p7_read));
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(this, FUNC(namcond1_state::mcu_pa_read), FUNC(namcond1_state::mcu_pa_write));
+	map(h8_device::ADC_0, h8_device::ADC_3).noprw(); // MCU reads these, but the games have no analog controls
+	map(0x14, 0x17).nopr();         // abcheck
+}
 
 INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
 {

@@ -40,9 +40,10 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(vsmilpro_state::vsmilpro_map)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
-ADDRESS_MAP_END
+void vsmilpro_state::vsmilpro_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom();
+}
 
 
 /* Input ports */

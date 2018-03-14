@@ -130,24 +130,26 @@ WRITE8_MEMBER(dorachan_state::control_w)
 }
 
 
-ADDRESS_MAP_START(dorachan_state::dorachan_map)
-	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_ROM
-	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03ff) AM_READ(protection_r)
-	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READ_PORT("IN0")
-	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_READ_PORT("IN1")
-	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ(v128_r)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x77ff) AM_ROM
-ADDRESS_MAP_END
+void dorachan_state::dorachan_map(address_map &map)
+{
+	map(0x0000, 0x17ff).rom();
+	map(0x1800, 0x1fff).ram();
+	map(0x2000, 0x23ff).rom();
+	map(0x2400, 0x2400).mirror(0x03ff).r(this, FUNC(dorachan_state::protection_r));
+	map(0x2800, 0x2800).mirror(0x03ff).portr("IN0");
+	map(0x2c00, 0x2c00).mirror(0x03ff).portr("IN1");
+	map(0x3800, 0x3800).mirror(0x03ff).r(this, FUNC(dorachan_state::v128_r));
+	map(0x4000, 0x5fff).ram().share("videoram");
+	map(0x6000, 0x77ff).rom();
+}
 
-ADDRESS_MAP_START(dorachan_state::dorachan_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_WRITENOP
-	AM_RANGE(0x02, 0x02) AM_WRITENOP
-	AM_RANGE(0x03, 0x03) AM_WRITE(control_w)
-ADDRESS_MAP_END
+void dorachan_state::dorachan_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).nopw();
+	map(0x02, 0x02).nopw();
+	map(0x03, 0x03).w(this, FUNC(dorachan_state::control_w));
+}
 
 
 

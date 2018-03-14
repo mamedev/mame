@@ -362,43 +362,45 @@ READ32_MEMBER(srmp5_state::irq_ack_clear)
 	return 0;
 }
 
-ADDRESS_MAP_START(srmp5_state::srmp5_mem)
-	AM_RANGE(0x00000000, 0x000fffff) AM_RAM //maybe 0 - 2fffff ?
-	AM_RANGE(0x002f0000, 0x002f7fff) AM_RAM
-	AM_RANGE(0x01000000, 0x01000003) AM_WRITEONLY  // 0xaa .. watchdog ?
-	AM_RANGE(0x01800000, 0x01800003) AM_RAM //?1
-	AM_RANGE(0x01800004, 0x01800007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x01800008, 0x0180000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0180000c, 0x0180000f) AM_WRITE(bank_w)
-	AM_RANGE(0x01800010, 0x01800013) AM_READ(srmp5_inputs_r) //multiplexed controls (selected by writes to 1c)
-	AM_RANGE(0x01800014, 0x01800017) AM_READ_PORT("TEST")
-	AM_RANGE(0x0180001c, 0x0180001f) AM_WRITE(input_select_w)//c1 c2 c4 c8 => mahjong inputs (at $10) - bits 0-3
-	AM_RANGE(0x01800200, 0x01800203) AM_RAM  //sound related ? only few writes after boot
-	AM_RANGE(0x01802000, 0x01802003) AM_WRITE(cmd1_w)
-	AM_RANGE(0x01802004, 0x01802007) AM_WRITE(cmd2_w)
-	AM_RANGE(0x01802008, 0x0180200b) AM_READ(cmd_stat32_r)
-	AM_RANGE(0x01a00000, 0x01bfffff) AM_READ(chrrom_r)
-	AM_RANGE(0x01c00000, 0x01c00003) AM_READNOP // debug? 'Toru'
+void srmp5_state::srmp5_mem(address_map &map)
+{
+	map(0x00000000, 0x000fffff).ram(); //maybe 0 - 2fffff ?
+	map(0x002f0000, 0x002f7fff).ram();
+	map(0x01000000, 0x01000003).writeonly();  // 0xaa .. watchdog ?
+	map(0x01800000, 0x01800003).ram(); //?1
+	map(0x01800004, 0x01800007).portr("DSW1");
+	map(0x01800008, 0x0180000b).portr("DSW2");
+	map(0x0180000c, 0x0180000f).w(this, FUNC(srmp5_state::bank_w));
+	map(0x01800010, 0x01800013).r(this, FUNC(srmp5_state::srmp5_inputs_r)); //multiplexed controls (selected by writes to 1c)
+	map(0x01800014, 0x01800017).portr("TEST");
+	map(0x0180001c, 0x0180001f).w(this, FUNC(srmp5_state::input_select_w));//c1 c2 c4 c8 => mahjong inputs (at $10) - bits 0-3
+	map(0x01800200, 0x01800203).ram();  //sound related ? only few writes after boot
+	map(0x01802000, 0x01802003).w(this, FUNC(srmp5_state::cmd1_w));
+	map(0x01802004, 0x01802007).w(this, FUNC(srmp5_state::cmd2_w));
+	map(0x01802008, 0x0180200b).r(this, FUNC(srmp5_state::cmd_stat32_r));
+	map(0x01a00000, 0x01bfffff).r(this, FUNC(srmp5_state::chrrom_r));
+	map(0x01c00000, 0x01c00003).nopr(); // debug? 'Toru'
 
-	AM_RANGE(0x0a000000, 0x0a0fffff) AM_READWRITE(spr_r, spr_w)
-	AM_RANGE(0x0a100000, 0x0a17ffff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
+	map(0x0a000000, 0x0a0fffff).rw(this, FUNC(srmp5_state::spr_r), FUNC(srmp5_state::spr_w));
+	map(0x0a100000, 0x0a17ffff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	//0?N???A?????????i??????????
-	AM_RANGE(0x0a180000, 0x0a18011f) AM_READWRITE(srmp5_vidregs_r, srmp5_vidregs_w)
-	AM_RANGE(0x0a180000, 0x0a180003) AM_READNOP // write 0x00000400
-	AM_RANGE(0x0a200000, 0x0a3fffff) AM_READWRITE(tileram_r, tileram_w)
-	AM_RANGE(0x0fc00000, 0x0fdfffff) AM_MIRROR(0x10000000) AM_ROM AM_REGION("maincpu", 0)
+	map(0x0a180000, 0x0a18011f).rw(this, FUNC(srmp5_state::srmp5_vidregs_r), FUNC(srmp5_state::srmp5_vidregs_w));
+	map(0x0a180000, 0x0a180003).nopr(); // write 0x00000400
+	map(0x0a200000, 0x0a3fffff).rw(this, FUNC(srmp5_state::tileram_r), FUNC(srmp5_state::tileram_w));
+	map(0x0fc00000, 0x0fdfffff).mirror(0x10000000).rom().region("maincpu", 0);
 
-	AM_RANGE(0x1eff0000, 0x1eff001f) AM_WRITEONLY
-	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ(irq_ack_clear)
-ADDRESS_MAP_END
+	map(0x1eff0000, 0x1eff001f).writeonly();
+	map(0x1eff003c, 0x1eff003f).r(this, FUNC(srmp5_state::irq_ack_clear));
+}
 
-ADDRESS_MAP_START(srmp5_state::st0016_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
+void srmp5_state::st0016_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("soundbank");
 	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
 	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).ram();
+}
 
 READ8_MEMBER(srmp5_state::cmd1_r)
 {
@@ -423,16 +425,17 @@ WRITE8_MEMBER(srmp5_state::st0016_rom_bank_w)
 }
 
 
-ADDRESS_MAP_START(srmp5_state::st0016_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void srmp5_state::st0016_io(address_map &map)
+{
+	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ(cmd1_r)
-	AM_RANGE(0xc1, 0xc1) AM_READ(cmd2_r)
-	AM_RANGE(0xc2, 0xc2) AM_READ(cmd_stat8_r)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
-	AM_RANGE(0xe7, 0xe7) AM_WRITE(st0016_rom_bank_w)
+	map(0xc0, 0xc0).r(this, FUNC(srmp5_state::cmd1_r));
+	map(0xc1, 0xc1).r(this, FUNC(srmp5_state::cmd2_r));
+	map(0xc2, 0xc2).r(this, FUNC(srmp5_state::cmd_stat8_r));
+	map(0xe1, 0xe1).w(this, FUNC(srmp5_state::st0016_rom_bank_w));
+	map(0xe7, 0xe7).w(this, FUNC(srmp5_state::st0016_rom_bank_w));
 	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( srmp5 )

@@ -613,22 +613,24 @@ WRITE8_MEMBER( segas18_state::soundbank_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(segas18_state::system18_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
+void segas18_state::system18_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0xffffff).rw(m_mapper, FUNC(sega_315_5195_mapper_device::read), FUNC(sega_315_5195_mapper_device::write)).umask16(0x00ff);
 
 	// these get overwritten by the memory mapper above, but we put them here
 	// so they are properly allocated and tracked for saving
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("paletteram")
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("tileram")
-	AM_RANGE(0x400000, 0x400fff) AM_RAM AM_SHARE("textram")
-	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+	map(0x100000, 0x1007ff).ram().share("sprites");
+	map(0x200000, 0x200fff).ram().share("paletteram");
+	map(0x300000, 0x30ffff).ram().share("tileram");
+	map(0x400000, 0x400fff).ram().share("textram");
+	map(0x500000, 0x503fff).ram().share("workram");
+}
 
-ADDRESS_MAP_START(segas18_state::decrypted_opcodes_map)
-	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
-ADDRESS_MAP_END
+void segas18_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
+}
 
 /*************************************
  *
@@ -636,23 +638,25 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(segas18_state::sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x10000)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE("rfsnd", rf5c68_device, rf5c68_w)
-	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE("rfsnd", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w)
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segas18_state::sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x9fff).rom().region("soundcpu", 0x10000);
+	map(0xa000, 0xbfff).bankr("soundbank");
+	map(0xc000, 0xc00f).mirror(0x0ff0).w("rfsnd", FUNC(rf5c68_device::rf5c68_w));
+	map(0xd000, 0xdfff).rw("rfsnd", FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w));
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segas18_state::sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym1", ym3438_device, read, write)
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym2", ym3438_device, read, write)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1f) AM_WRITE(soundbank_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_DEVREADWRITE("mapper", sega_315_5195_mapper_device, pread, pwrite)
-ADDRESS_MAP_END
+void segas18_state::sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x83).mirror(0x0c).rw("ym1", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0x90, 0x93).mirror(0x0c).rw("ym2", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0xa0, 0xa0).mirror(0x1f).w(this, FUNC(segas18_state::soundbank_w));
+	map(0xc0, 0xc0).mirror(0x1f).rw(m_mapper, FUNC(sega_315_5195_mapper_device::pread), FUNC(sega_315_5195_mapper_device::pwrite));
+}
 
 
 
@@ -662,11 +666,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(segas18_state::mcu_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff) // port 2 not used for high order address byte
-	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("mapper", sega_315_5195_mapper_device, read, write)
-ADDRESS_MAP_END
+void segas18_state::mcu_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff); // port 2 not used for high order address byte
+	map(0x00, 0x1f).rw(m_mapper, FUNC(sega_315_5195_mapper_device::read), FUNC(sega_315_5195_mapper_device::write));
+}
 
 
 

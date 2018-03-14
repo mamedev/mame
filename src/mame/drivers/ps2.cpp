@@ -41,29 +41,33 @@ MACHINE_CONFIG_START(ps2_state::at_softlists)
 	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
 MACHINE_CONFIG_END
 
-ADDRESS_MAP_START(ps2_state::ps2_16_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void ps2_state::ps2_16_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x09ffff).bankrw("bank10");
+	map(0x0e0000, 0x0fffff).rom().region("bios", 0);
+	map(0xfe0000, 0xffffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(ps2_state::ps2_32_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void ps2_state::ps2_32_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x0009ffff).bankrw("bank10");
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0);
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(ps2_state::ps2_16_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
-ADDRESS_MAP_END
+void ps2_state::ps2_16_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(at_mb_device::map));
+}
 
-ADDRESS_MAP_START(ps2_state::ps2_32_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xffffffff)
-ADDRESS_MAP_END
+void ps2_state::ps2_32_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(at_mb_device::map));
+}
 
 void ps2_state::machine_start()
 {

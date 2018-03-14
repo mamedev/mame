@@ -239,9 +239,10 @@ WRITE32_MEMBER(pluto5_state::pluto5_mem_w)
 }
 
 
-ADDRESS_MAP_START(pluto5_state::pluto5_map)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(pluto5_mem_r, pluto5_mem_w)
-ADDRESS_MAP_END
+void pluto5_state::pluto5_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(this, FUNC(pluto5_state::pluto5_mem_r), FUNC(pluto5_state::pluto5_mem_w));
+}
 
 static INPUT_PORTS_START(  pluto5 )
 INPUT_PORTS_END

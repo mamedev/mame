@@ -375,46 +375,48 @@ WRITE16_MEMBER(sslam_state::powerbls_sound_w)
 
 /* these will need verifying .. the game writes all over the place ... */
 
-ADDRESS_MAP_START(sslam_state::sslam_program_map)
-	AM_RANGE(0x000000, 0xffffff) AM_ROM   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
+void sslam_state::sslam_program_map(address_map &map)
+{
+	map(0x000000, 0xffffff).rom();   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
 
-	AM_RANGE(0x000400, 0x07ffff) AM_RAM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(sslam_bg_tileram_w) AM_SHARE("bg_tileram")
-	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(sslam_md_tileram_w) AM_SHARE("md_tileram")
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(sslam_tx_tileram_w) AM_SHARE("tx_tileram")
-	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_SHARE("regs")
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
-	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
-	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("IN1")
-	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("IN2")
-	AM_RANGE(0x300016, 0x300017) AM_READ_PORT("IN3")
-	AM_RANGE(0x300018, 0x300019) AM_READ_PORT("IN4")
-	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW1")
-	AM_RANGE(0x30001e, 0x30001f) AM_WRITE8(sslam_snd_w, 0x00ff)
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM   /* Main RAM */
-ADDRESS_MAP_END
+	map(0x000400, 0x07ffff).ram();
+	map(0x100000, 0x103fff).ram().w(this, FUNC(sslam_state::sslam_bg_tileram_w)).share("bg_tileram");
+	map(0x104000, 0x107fff).ram().w(this, FUNC(sslam_state::sslam_md_tileram_w)).share("md_tileram");
+	map(0x108000, 0x10ffff).ram().w(this, FUNC(sslam_state::sslam_tx_tileram_w)).share("tx_tileram");
+	map(0x110000, 0x11000d).ram().share("regs");
+	map(0x200000, 0x200001).nopw();
+	map(0x280000, 0x280fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x201000, 0x201fff).ram().share("spriteram");
+	map(0x304000, 0x304001).nopw();
+	map(0x300010, 0x300011).portr("IN0");
+	map(0x300012, 0x300013).portr("IN1");
+	map(0x300014, 0x300015).portr("IN2");
+	map(0x300016, 0x300017).portr("IN3");
+	map(0x300018, 0x300019).portr("IN4");
+	map(0x30001a, 0x30001b).portr("DSW2");
+	map(0x30001c, 0x30001d).portr("DSW1");
+	map(0x30001f, 0x30001f).w(this, FUNC(sslam_state::sslam_snd_w));
+	map(0xf00000, 0xffffff).ram();   /* Main RAM */
+}
 
-ADDRESS_MAP_START(sslam_state::powerbls_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(powerbls_bg_tileram_w) AM_SHARE("bg_tileram")
-	AM_RANGE(0x104000, 0x107fff) AM_RAM // not used
-	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_SHARE("regs")
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
-	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2803ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
-	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("IN1")
-	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("IN2")
-	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW1")
-	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(powerbls_sound_w)
-	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM   /* Main RAM */
-ADDRESS_MAP_END
+void sslam_state::powerbls_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x103fff).ram().w(this, FUNC(sslam_state::powerbls_bg_tileram_w)).share("bg_tileram");
+	map(0x104000, 0x107fff).ram(); // not used
+	map(0x110000, 0x11000d).ram().share("regs");
+	map(0x200000, 0x200001).nopw();
+	map(0x201000, 0x201fff).ram().share("spriteram");
+	map(0x280000, 0x2803ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x300010, 0x300011).portr("IN0");
+	map(0x300012, 0x300013).portr("IN1");
+	map(0x300014, 0x300015).portr("IN2");
+	map(0x30001a, 0x30001b).portr("DSW1");
+	map(0x30001c, 0x30001d).portr("DSW2");
+	map(0x30001e, 0x30001f).w(this, FUNC(sslam_state::powerbls_sound_w));
+	map(0x304000, 0x304001).nopw();
+	map(0xff0000, 0xffffff).ram();   /* Main RAM */
+}
 
 
 /*

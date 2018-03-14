@@ -63,16 +63,17 @@ uint32_t hideseek_state::screen_update_hideseek(screen_device &screen, bitmap_in
 	return 0;
 }
 
-ADDRESS_MAP_START(hideseek_state::mem_map)
-	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM // On-chip ROM
-	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM // CS0
-	AM_RANGE(0x00400000, 0x005fffff) AM_ROM AM_REGION("prg", 0) // CS1
+void hideseek_state::mem_map(address_map &map)
+{
+	map(0x00000000, 0x0003ffff).rom(); // On-chip ROM
+	map(0x00200000, 0x0023ffff).ram(); // CS0
+	map(0x00400000, 0x005fffff).rom().region("prg", 0); // CS1
 	// CS2 - CS3
-	AM_RANGE(0x01000000, 0x01ffffff) AM_RAM // DRAM
-	AM_RANGE(0xffff8000, 0xffff87ff) AM_RAM // HD64F7045F28 i/os
-	AM_RANGE(0xfffff000, 0xffffffff) AM_RAM // on-chip RAM
+	map(0x01000000, 0x01ffffff).ram(); // DRAM
+	map(0xffff8000, 0xffff87ff).ram(); // HD64F7045F28 i/os
+	map(0xfffff000, 0xffffffff).ram(); // on-chip RAM
 //  AM_RANGE(0x06000000, 0x07ffffff) AM_ROM AM_REGION("blit_data", 0)
-ADDRESS_MAP_END
+}
 
 
 

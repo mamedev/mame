@@ -174,44 +174,48 @@ CUSTOM_INPUT_MEMBER( segajw_state::coin_sensors_r )
 	return data;
 }
 
-ADDRESS_MAP_START(segajw_state::segajw_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+void segajw_state::segajw_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
-	AM_RANGE(0x080000, 0x080001) AM_DEVREADWRITE("hd63484", hd63484_device, status16_r, address16_w)
-	AM_RANGE(0x080002, 0x080003) AM_DEVREADWRITE("hd63484", hd63484_device, data16_r, data16_w)
+	map(0x080000, 0x080001).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
+	map(0x080002, 0x080003).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
 
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW0")
-	AM_RANGE(0x180004, 0x180005) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("DSW1")
-	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("DSW3")
-	AM_RANGE(0x18000c, 0x18000d) AM_READ_PORT("DSW2")
+	map(0x180000, 0x180001).portr("DSW0");
+	map(0x180005, 0x180005).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0x180008, 0x180009).portr("DSW1");
+	map(0x18000a, 0x18000b).portr("DSW3");
+	map(0x18000c, 0x18000d).portr("DSW2");
 
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE8("io1a", sega_315_5296_device, read, write, 0x00ff)
+	map(0x1a0000, 0x1a001f).rw("io1a", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE8("io1c", sega_315_5296_device, read, write, 0x00ff)
+	map(0x1c0000, 0x1c001f).rw("io1c", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x280002, 0x280003) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x280004, 0x280005) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+	map(0x280001, 0x280001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x280003, 0x280003).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x280005, 0x280005).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0xff0000, 0xffffff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(segajw_state::segajw_audiocpu_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segajw_state::segajw_audiocpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segajw_state::segajw_audiocpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void segajw_state::segajw_audiocpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x83).rw("ymsnd", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
+}
 
-ADDRESS_MAP_START(segajw_state::segajw_hd63484_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-	AM_RANGE(0x80000, 0xbffff) AM_ROM AM_REGION("gfx1", 0)
-ADDRESS_MAP_END
+void segajw_state::segajw_hd63484_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+	map(0x80000, 0xbffff).rom().region("gfx1", 0);
+}
 
 
 static INPUT_PORTS_START( segajw )
@@ -362,9 +366,10 @@ void segajw_state::machine_reset()
 	m_coin_counter = 0xff;
 }
 
-ADDRESS_MAP_START(segajw_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void segajw_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 MACHINE_CONFIG_START(segajw_state::segajw)
 	/* basic machine hardware */

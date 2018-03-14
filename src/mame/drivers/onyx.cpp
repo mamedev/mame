@@ -90,13 +90,15 @@ MACHINE_RESET_MEMBER(onyx_state, c8002)
 {
 }
 
-ADDRESS_MAP_START(onyx_state::c8002_mem)
-	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_SHARE("share0")
-	AM_RANGE(0x01000, 0x07fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x08000, 0x0ffff) AM_RAM AM_SHARE("share2") // Z8002 has 64k memory
-ADDRESS_MAP_END
+void onyx_state::c8002_mem(address_map &map)
+{
+	map(0x00000, 0x00fff).rom().share("share0");
+	map(0x01000, 0x07fff).ram().share("share1");
+	map(0x08000, 0x0ffff).ram().share("share2"); // Z8002 has 64k memory
+}
 
-ADDRESS_MAP_START(onyx_state::c8002_io)
+void onyx_state::c8002_io(address_map &map)
+{
 	map(0xff00, 0xff07).lrw8("sio1_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio1->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio1->cd_ba_w(space, offset >> 1, data, mem_mask); });
 	map(0xff08, 0xff0f).lrw8("sio2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio1->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio1->cd_ba_w(space, offset >> 1, data, mem_mask); });
 	map(0xff10, 0xff17).lrw8("sio3_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_sio1->cd_ba_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sio1->cd_ba_w(space, offset >> 1, data, mem_mask); });
@@ -107,19 +109,21 @@ ADDRESS_MAP_START(onyx_state::c8002_io)
 	map(0xff40, 0xff47).lrw8("ctc3_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_ctc3->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ctc3->write(space, offset >> 1, data, mem_mask); });
 	map(0xff50, 0xff57).lrw8("pio1_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_pio1->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pio1->write(space, offset >> 1, data, mem_mask); });
 	map(0xff58, 0xff5f).lrw8("pio2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_pio2->read(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pio2->write(space, offset >> 1, data, mem_mask); });
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(onyx_state::submem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void onyx_state::submem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(onyx_state::subio)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pio1s", z80pio_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_READNOP   // disk status?
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("sio1s", z80sio_device, cd_ba_r, cd_ba_w )
-ADDRESS_MAP_END
+void onyx_state::subio(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("pio1s", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x04, 0x04).nopr();   // disk status?
+	map(0x0c, 0x0f).rw("sio1s", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+}
 
 /***************************************************************************
 
@@ -227,15 +231,17 @@ Labels of proms: 339, 153, XMN4, 2_1, 1_2
 
 *********************************************************************************************************************************/
 
-ADDRESS_MAP_START(onyx_state::c5000_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void onyx_state::c5000_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(onyx_state::c5000_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("sio1", z80sio_device, cd_ba_r, cd_ba_w )
-ADDRESS_MAP_END
+void onyx_state::c5000_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x13).rw(m_sio1, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+}
 
 MACHINE_CONFIG_START(onyx_state::c5000)
 	/* basic machine hardware */

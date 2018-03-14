@@ -276,41 +276,43 @@ WRITE32_MEMBER(taitowlf_state::bios_ram_w)
 }
 
 
-ADDRESS_MAP_START(taitowlf_state::taitowlf_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
+void taitowlf_state::taitowlf_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
 	#if ENABLE_VGA
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
 	#else
-	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
+	map(0x000a0000, 0x000bffff).ram();
 	#endif
 	#if ENABLE_VGA
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
+	map(0x000c0000, 0x000c7fff).ram().region("video_bios", 0);
 	#else
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_NOP
+	map(0x000c0000, 0x000c7fff).noprw();
 	#endif
-	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
-	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
+	map(0x000e0000, 0x000effff).ram();
+	map(0x000f0000, 0x000fffff).bankr("bank1");
+	map(0x000f0000, 0x000fffff).w(this, FUNC(taitowlf_state::bios_ram_w));
+	map(0x00100000, 0x01ffffff).ram();
 //  AM_RANGE(0xf8000000, 0xf83fffff) AM_ROM AM_REGION("user3", 0)
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)   /* System BIOS */
-ADDRESS_MAP_END
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);   /* System BIOS */
+}
 
-ADDRESS_MAP_START(taitowlf_state::taitowlf_io)
-	AM_IMPORT_FROM(pcat32_io_common)
+void taitowlf_state::taitowlf_io(address_map &map)
+{
+	pcat32_io_common(map);
 
-	AM_RANGE(0x00e8, 0x00eb) AM_NOP
-	AM_RANGE(0x0300, 0x03af) AM_NOP
-	AM_RANGE(0x03b0, 0x03df) AM_NOP
-	AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
+	map(0x00e8, 0x00eb).noprw();
+	map(0x0300, 0x03af).noprw();
+	map(0x03b0, 0x03df).noprw();
+	map(0x0278, 0x027b).w(this, FUNC(taitowlf_state::pnp_config_w));
 	#if ENABLE_VGA
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
+	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 	#endif
-	AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-ADDRESS_MAP_END
+	map(0x0a78, 0x0a7b).w(this, FUNC(taitowlf_state::pnp_data_w));
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+}
 
 /*****************************************************************************/
 

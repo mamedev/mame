@@ -48,12 +48,13 @@ IRQ_CALLBACK_MEMBER(tti_state::intack)
 static INPUT_PORTS_START( tti )
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(tti_state::prg_map)
-	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x7e000, 0x7ffff) AM_RAM
-	AM_RANGE(0x80000, 0x80017) AM_DEVREADWRITE("mfp", mc68901_device, read, write)
-	AM_RANGE(0x80070, 0x80077) AM_DEVWRITE("bitlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void tti_state::prg_map(address_map &map)
+{
+	map(0x00000, 0x07fff).rom().region("maincpu", 0);
+	map(0x7e000, 0x7ffff).ram();
+	map(0x80000, 0x80017).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write));
+	map(0x80070, 0x80077).w("bitlatch", FUNC(ls259_device::write_d0));
+}
 
 MACHINE_CONFIG_START(tti_state::tti)
 	MCFG_DEVICE_ADD("maincpu", M68008, XTAL(20'000'000) / 2) // guess

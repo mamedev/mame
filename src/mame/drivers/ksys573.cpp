@@ -613,54 +613,60 @@ void ATTR_PRINTF( 3,4 )  ksys573_state::verboselog( int n_level, const char *s_f
 	}
 }
 
-ADDRESS_MAP_START(ksys573_state::konami573_map)
-	AM_RANGE( 0x1f000000, 0x1f3fffff ) AM_DEVICE16( "flashbank", address_map_bank_device, amap16, 0xffffffff )
-	AM_RANGE( 0x1f400000, 0x1f400003 ) AM_READ_PORT( "IN0" ) AM_WRITE_PORT( "OUT0" )
-	AM_RANGE( 0x1f400004, 0x1f400007 ) AM_READ_PORT( "IN1" )
-	AM_RANGE( 0x1f400008, 0x1f40000b ) AM_READ_PORT( "IN2" )
-	AM_RANGE( 0x1f40000c, 0x1f40000f ) AM_READ_PORT( "IN3" )
-	AM_RANGE( 0x1f480000, 0x1f48000f ) AM_DEVREADWRITE16( "ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff )
-	AM_RANGE( 0x1f500000, 0x1f500003 ) AM_READWRITE16( control_r, control_w, 0x0000ffff )    // Konami can't make a game without a "control" register.
-	AM_RANGE( 0x1f560000, 0x1f560003 ) AM_WRITE16( atapi_reset_w, 0x0000ffff )
-	AM_RANGE( 0x1f5c0000, 0x1f5c0003 ) AM_WRITENOP                // watchdog?
-	AM_RANGE( 0x1f600000, 0x1f600003 ) AM_WRITE_PORT( "LAMPS" )
-	AM_RANGE( 0x1f620000, 0x1f623fff ) AM_DEVREADWRITE8( "m48t58", timekeeper_device, read, write, 0x00ff00ff )
-	AM_RANGE( 0x1f680000, 0x1f68001f ) AM_DEVREADWRITE8( "mb89371", mb89371_device, read, write, 0x00ff00ff )
-	AM_RANGE( 0x1f6a0000, 0x1f6a0003 ) AM_READWRITE16( security_r, security_w, 0x0000ffff )
-ADDRESS_MAP_END
+void ksys573_state::konami573_map(address_map &map)
+{
+	map(0x1f000000, 0x1f3fffff).m(m_flashbank, FUNC(address_map_bank_device::amap16));
+	map(0x1f400000, 0x1f400003).portr("IN0").portw("OUT0");
+	map(0x1f400004, 0x1f400007).portr("IN1");
+	map(0x1f400008, 0x1f40000b).portr("IN2");
+	map(0x1f40000c, 0x1f40000f).portr("IN3");
+	map(0x1f480000, 0x1f48000f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0));
+	map(0x1f500000, 0x1f500001).rw(this, FUNC(ksys573_state::control_r), FUNC(ksys573_state::control_w));    // Konami can't make a game without a "control" register.
+	map(0x1f560000, 0x1f560001).w(this, FUNC(ksys573_state::atapi_reset_w));
+	map(0x1f5c0000, 0x1f5c0003).nopw();                // watchdog?
+	map(0x1f600000, 0x1f600003).portw("LAMPS");
+	map(0x1f620000, 0x1f623fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask32(0x00ff00ff);
+	map(0x1f680000, 0x1f68001f).rw("mb89371", FUNC(mb89371_device::read), FUNC(mb89371_device::write)).umask32(0x00ff00ff);
+	map(0x1f6a0000, 0x1f6a0001).rw(this, FUNC(ksys573_state::security_r), FUNC(ksys573_state::security_w));
+}
 
-ADDRESS_MAP_START(ksys573_state::flashbank_map)
-	AM_RANGE( 0x0000000, 0x03fffff ) AM_DEVREADWRITE8( "29f016a.31m", intelfsh8_device, read, write, 0x00ff )
-	AM_RANGE( 0x0000000, 0x03fffff ) AM_DEVREADWRITE8( "29f016a.27m", intelfsh8_device, read, write, 0xff00 )
-	AM_RANGE( 0x0400000, 0x07fffff ) AM_DEVREADWRITE8( "29f016a.31l", intelfsh8_device, read, write, 0x00ff )
-	AM_RANGE( 0x0400000, 0x07fffff ) AM_DEVREADWRITE8( "29f016a.27l", intelfsh8_device, read, write, 0xff00 )
-	AM_RANGE( 0x0800000, 0x0bfffff ) AM_DEVREADWRITE8( "29f016a.31j", intelfsh8_device, read, write, 0x00ff )
-	AM_RANGE( 0x0800000, 0x0bfffff ) AM_DEVREADWRITE8( "29f016a.27j", intelfsh8_device, read, write, 0xff00 )
-	AM_RANGE( 0x0c00000, 0x0ffffff ) AM_DEVREADWRITE8( "29f016a.31h", intelfsh8_device, read, write, 0x00ff )
-	AM_RANGE( 0x0c00000, 0x0ffffff ) AM_DEVREADWRITE8( "29f016a.27h", intelfsh8_device, read, write, 0xff00 )
-	AM_RANGE( 0x4000000, 0x7ffffff ) AM_DEVREADWRITE( "pccard1", pccard_slot_device, read_memory, write_memory )
-	AM_RANGE( 0x8000000, 0xbffffff ) AM_DEVREADWRITE( "pccard2", pccard_slot_device, read_memory, write_memory )
-ADDRESS_MAP_END
+void ksys573_state::flashbank_map(address_map &map)
+{
+	map(0x0000000, 0x03fffff).rw("29f016a.31m", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x0000000, 0x03fffff).rw("29f016a.27m", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x0400000, 0x07fffff).rw("29f016a.31l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x0400000, 0x07fffff).rw("29f016a.27l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x0800000, 0x0bfffff).rw("29f016a.31j", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x0800000, 0x0bfffff).rw("29f016a.27j", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x0c00000, 0x0ffffff).rw("29f016a.31h", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x0c00000, 0x0ffffff).rw("29f016a.27h", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x4000000, 0x7ffffff).rw("pccard1", FUNC(pccard_slot_device::read_memory), FUNC(pccard_slot_device::write_memory));
+	map(0x8000000, 0xbffffff).rw("pccard2", FUNC(pccard_slot_device::read_memory), FUNC(pccard_slot_device::write_memory));
+}
 
-ADDRESS_MAP_START(ksys573_state::konami573d_map)
-	AM_IMPORT_FROM( konami573_map )
-	AM_RANGE( 0x1f640000, 0x1f6400ff ) AM_DEVICE16( "k573dio", k573dio_device, amap, 0xffffffff )
-ADDRESS_MAP_END
+void ksys573_state::konami573d_map(address_map &map)
+{
+	konami573_map(map);
+	map(0x1f640000, 0x1f6400ff).m("k573dio", FUNC(k573dio_device::amap));
+}
 
-ADDRESS_MAP_START(ksys573_state::konami573a_map)
-	AM_IMPORT_FROM( konami573_map )
-	AM_RANGE( 0x1f640000, 0x1f6400ff ) AM_READWRITE16( gx700pwbf_io_r, gx700pwbf_io_w, 0xffffffff )
-ADDRESS_MAP_END
+void ksys573_state::konami573a_map(address_map &map)
+{
+	konami573_map(map);
+	map(0x1f640000, 0x1f6400ff).rw(this, FUNC(ksys573_state::gx700pwbf_io_r), FUNC(ksys573_state::gx700pwbf_io_w));
+}
 
-ADDRESS_MAP_START(ksys573_state::fbaitbc_map)
-	AM_IMPORT_FROM( konami573_map )
-	AM_RANGE( 0x1f640000, 0x1f6400ff ) AM_READWRITE16( ge765pwbba_r, ge765pwbba_w, 0xffffffff )
-ADDRESS_MAP_END
+void ksys573_state::fbaitbc_map(address_map &map)
+{
+	konami573_map(map);
+	map(0x1f640000, 0x1f6400ff).rw(this, FUNC(ksys573_state::ge765pwbba_r), FUNC(ksys573_state::ge765pwbba_w));
+}
 
-ADDRESS_MAP_START(ksys573_state::gunmania_map)
-	AM_IMPORT_FROM( konami573_map )
-	AM_RANGE( 0x1f640000, 0x1f6400ff ) AM_READWRITE16( gunmania_r, gunmania_w, 0xffffffff )
-ADDRESS_MAP_END
+void ksys573_state::gunmania_map(address_map &map)
+{
+	konami573_map(map);
+	map(0x1f640000, 0x1f6400ff).rw(this, FUNC(ksys573_state::gunmania_r), FUNC(ksys573_state::gunmania_w));
+}
 
 READ16_MEMBER( ksys573_state::control_r )
 {

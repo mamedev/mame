@@ -218,37 +218,39 @@ WRITE8_MEMBER( micronic_state::rtc_data_w )
     Machine
 ***************************************************************************/
 
-ADDRESS_MAP_START(micronic_state::micronic_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_RAM  AM_SHARE("ram_base")
-ADDRESS_MAP_END
+void micronic_state::micronic_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).bankrw("bank1");
+	map(0x8000, 0xffff).ram().share("ram_base");
+}
 
-ADDRESS_MAP_START(micronic_state::micronic_io)
-	ADDRESS_MAP_GLOBAL_MASK (0xff)
+void micronic_state::micronic_io(address_map &map)
+{
+	map.global_mask(0xff);
 
 	/* keypad */
-	AM_RANGE(0x00, 0x00) AM_READ(keypad_r)
-	AM_RANGE(0x02, 0x02) AM_WRITE(kp_matrix_w)
+	map(0x00, 0x00).r(this, FUNC(micronic_state::keypad_r));
+	map(0x02, 0x02).w(this, FUNC(micronic_state::kp_matrix_w));
 
 	/* hd61830 */
-	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE(HD61830_TAG, hd61830_device, data_r, data_w)
-	AM_RANGE(0x23, 0x23) AM_DEVREADWRITE(HD61830_TAG, hd61830_device, status_r, control_w)
+	map(0x03, 0x03).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w));
+	map(0x23, 0x23).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w));
 
 	/* rtc-146818 */
-	AM_RANGE(0x08, 0x08) AM_WRITE(rtc_address_w)
-	AM_RANGE(0x28, 0x28) AM_READWRITE(rtc_data_r, rtc_data_w)
+	map(0x08, 0x08).w(this, FUNC(micronic_state::rtc_address_w));
+	map(0x28, 0x28).rw(this, FUNC(micronic_state::rtc_data_r), FUNC(micronic_state::rtc_data_w));
 
 	/* sound */
-	AM_RANGE(0x2b, 0x2b) AM_WRITE(beep_w)
+	map(0x2b, 0x2b).w(this, FUNC(micronic_state::beep_w));
 
 	/* basic machine */
-	AM_RANGE(0x05, 0x05) AM_READ(irq_flag_r)
-	AM_RANGE(0x2c, 0x2c) AM_WRITE(port_2c_w)
-	AM_RANGE(0x47, 0x47) AM_WRITE(bank_select_w)
-	AM_RANGE(0x46, 0x46) AM_WRITE(lcd_contrast_w)
-	AM_RANGE(0x48, 0x48) AM_WRITE(status_flag_w)
-	AM_RANGE(0x49, 0x49) AM_READ(status_flag_r)
-ADDRESS_MAP_END
+	map(0x05, 0x05).r(this, FUNC(micronic_state::irq_flag_r));
+	map(0x2c, 0x2c).w(this, FUNC(micronic_state::port_2c_w));
+	map(0x47, 0x47).w(this, FUNC(micronic_state::bank_select_w));
+	map(0x46, 0x46).w(this, FUNC(micronic_state::lcd_contrast_w));
+	map(0x48, 0x48).w(this, FUNC(micronic_state::status_flag_w));
+	map(0x49, 0x49).r(this, FUNC(micronic_state::status_flag_r));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( micronic )

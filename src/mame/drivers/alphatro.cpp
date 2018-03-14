@@ -388,62 +388,67 @@ INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
-ADDRESS_MAP_START(alphatro_state::alphatro_map)
-	AM_RANGE(0x0000, 0x5fff) AM_DEVICE("lowbank", address_map_bank_device, amap8)
-	AM_RANGE(0x6000, 0x9fff) AM_READWRITE(ram6000_r, ram6000_w)
-	AM_RANGE(0xa000, 0xdfff) AM_DEVICE("cartbank", address_map_bank_device, amap8)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(rame000_r, rame000_w)
-	AM_RANGE(0xf000, 0xffff) AM_DEVICE("monbank", address_map_bank_device, amap8)
+void alphatro_state::alphatro_map(address_map &map)
+{
+	map(0x0000, 0x5fff).m(m_lowbank, FUNC(address_map_bank_device::amap8));
+	map(0x6000, 0x9fff).rw(this, FUNC(alphatro_state::ram6000_r), FUNC(alphatro_state::ram6000_w));
+	map(0xa000, 0xdfff).m("cartbank", FUNC(address_map_bank_device::amap8));
+	map(0xe000, 0xefff).rw(this, FUNC(alphatro_state::rame000_r), FUNC(alphatro_state::rame000_w));
+	map(0xf000, 0xffff).m("monbank", FUNC(address_map_bank_device::amap8));
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(alphatro_state::rombank_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION("roms", 0x0000) AM_WRITE(ram0000_w)
-	AM_RANGE(0x6000, 0xbfff) AM_READWRITE(ram0000_r, ram0000_w)
-ADDRESS_MAP_END
+void alphatro_state::rombank_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom().region("roms", 0x0000).w(this, FUNC(alphatro_state::ram0000_w));
+	map(0x6000, 0xbfff).rw(this, FUNC(alphatro_state::ram0000_r), FUNC(alphatro_state::ram0000_w));
+}
 
-ADDRESS_MAP_START(alphatro_state::cartbank_map)
-	AM_RANGE(0x0000, 0x3fff) AM_DEVREAD("cartslot", generic_slot_device, read_rom) AM_WRITE(rama000_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(rama000_r, rama000_w)
-ADDRESS_MAP_END
+void alphatro_state::cartbank_map(address_map &map)
+{
+	map(0x0000, 0x3fff).r(m_cart, FUNC(generic_slot_device::read_rom)).w(this, FUNC(alphatro_state::rama000_w));
+	map(0x4000, 0x7fff).rw(this, FUNC(alphatro_state::rama000_r), FUNC(alphatro_state::rama000_w));
+}
 
-ADDRESS_MAP_START(alphatro_state::monbank_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("roms", 0x8000)
-	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_REGION("roms", 0x9000)
-ADDRESS_MAP_END
+void alphatro_state::monbank_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("videoram");
+	map(0x1000, 0x1fff).rom().region("roms", 0x8000);
+	map(0x2000, 0x2fff).rom().region("roms", 0x9000);
+}
 
-ADDRESS_MAP_START(alphatro_state::alphatro_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x10, 0x10) AM_READWRITE(port10_r, port10_w)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("X0") AM_WRITE(port20_w)
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("X1")
-	AM_RANGE(0x22, 0x22) AM_READ_PORT("X2")
-	AM_RANGE(0x23, 0x23) AM_READ_PORT("X3")
-	AM_RANGE(0x24, 0x24) AM_READ_PORT("X4")
-	AM_RANGE(0x25, 0x25) AM_READ_PORT("X5")
-	AM_RANGE(0x26, 0x26) AM_READ_PORT("X6")
-	AM_RANGE(0x27, 0x27) AM_READ_PORT("X7")
-	AM_RANGE(0x28, 0x28) AM_READ_PORT("X8")
-	AM_RANGE(0x29, 0x29) AM_READ_PORT("X9")
-	AM_RANGE(0x2a, 0x2a) AM_READ_PORT("XA")
-	AM_RANGE(0x2b, 0x2b) AM_READ_PORT("XB")
-	AM_RANGE(0x30, 0x30) AM_READWRITE(port30_r, port30_w)
+void alphatro_state::alphatro_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x10, 0x10).rw(this, FUNC(alphatro_state::port10_r), FUNC(alphatro_state::port10_w));
+	map(0x20, 0x20).portr("X0").w(this, FUNC(alphatro_state::port20_w));
+	map(0x21, 0x21).portr("X1");
+	map(0x22, 0x22).portr("X2");
+	map(0x23, 0x23).portr("X3");
+	map(0x24, 0x24).portr("X4");
+	map(0x25, 0x25).portr("X5");
+	map(0x26, 0x26).portr("X6");
+	map(0x27, 0x27).portr("X7");
+	map(0x28, 0x28).portr("X8");
+	map(0x29, 0x29).portr("X9");
+	map(0x2a, 0x2a).portr("XA");
+	map(0x2b, 0x2b).portr("XB");
+	map(0x30, 0x30).rw(this, FUNC(alphatro_state::port30_r), FUNC(alphatro_state::port30_w));
 	// USART for cassette reading and writing
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
-	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
+	map(0x40, 0x40).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x41, 0x41).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// CRTC - HD46505 / HD6845SP
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	map(0x50, 0x50).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x51, 0x51).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	// 8257 DMAC
-	AM_RANGE(0x60, 0x68) AM_DEVREADWRITE("dmac", i8257_device, read, write)
+	map(0x60, 0x68).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	// 8259 PIT
 	//AM_RANGE(0x70, 0x72) AM_DEVREADWRITE("
-	AM_RANGE(0xf0, 0xf0) AM_READ(portf0_r) AM_WRITE(portf0_w)
-	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE("fdc", upd765a_device, fifo_r, fifo_w)
-	AM_RANGE(0xf9, 0xf9) AM_DEVREAD("fdc", upd765a_device, msr_r)
-ADDRESS_MAP_END
+	map(0xf0, 0xf0).r(this, FUNC(alphatro_state::portf0_r)).w(this, FUNC(alphatro_state::portf0_w));
+	map(0xf8, 0xf8).rw(m_fdc, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
+	map(0xf9, 0xf9).r(m_fdc, FUNC(upd765a_device::msr_r));
+}
 
 static INPUT_PORTS_START( alphatro )
 	PORT_START("X0")

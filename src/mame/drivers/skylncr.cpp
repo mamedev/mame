@@ -455,107 +455,113 @@ READ8_MEMBER(skylncr_state::bdream97_opcode_r)
 *             Memory Map              *
 **************************************/
 
-ADDRESS_MAP_START(skylncr_state::mem_map_skylncr)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
+void skylncr_state::mem_map_skylncr(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("nvram");
 
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(skylncr_videoram_w ) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(skylncr_colorram_w ) AM_SHARE("colorram")
+	map(0x8800, 0x8fff).ram().w(this, FUNC(skylncr_state::skylncr_videoram_w)).share("videoram");
+	map(0x9000, 0x97ff).ram().w(this, FUNC(skylncr_state::skylncr_colorram_w)).share("colorram");
 
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(reeltiles_1_w ) AM_SHARE("reeltiles_1_ram")
-	AM_RANGE(0x9a00, 0x9bff) AM_RAM_WRITE(reeltiles_2_w ) AM_SHARE("reeltiles_2_ram")
-	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(reeltiles_3_w ) AM_SHARE("reeltiles_3_ram")
-	AM_RANGE(0x9e00, 0x9fff) AM_RAM_WRITE(reeltiles_4_w ) AM_SHARE("reeltiles_4_ram")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(reeltileshigh_1_w ) AM_SHARE("rthigh_1_ram")
-	AM_RANGE(0xa200, 0xa3ff) AM_RAM_WRITE(reeltileshigh_2_w ) AM_SHARE("rthigh_2_ram")
-	AM_RANGE(0xa400, 0xa5ff) AM_RAM_WRITE(reeltileshigh_3_w ) AM_SHARE("rthigh_3_ram")
-	AM_RANGE(0xa600, 0xa7ff) AM_RAM_WRITE(reeltileshigh_4_w ) AM_SHARE("rthigh_4_ram")
+	map(0x9800, 0x99ff).ram().w(this, FUNC(skylncr_state::reeltiles_1_w)).share("reeltiles_1_ram");
+	map(0x9a00, 0x9bff).ram().w(this, FUNC(skylncr_state::reeltiles_2_w)).share("reeltiles_2_ram");
+	map(0x9c00, 0x9dff).ram().w(this, FUNC(skylncr_state::reeltiles_3_w)).share("reeltiles_3_ram");
+	map(0x9e00, 0x9fff).ram().w(this, FUNC(skylncr_state::reeltiles_4_w)).share("reeltiles_4_ram");
+	map(0xa000, 0xa1ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_1_w)).share("rthigh_1_ram");
+	map(0xa200, 0xa3ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_2_w)).share("rthigh_2_ram");
+	map(0xa400, 0xa5ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_3_w)).share("rthigh_3_ram");
+	map(0xa600, 0xa7ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_4_w)).share("rthigh_4_ram");
 
-	AM_RANGE(0xaa55, 0xaa55) AM_READ(ret_ff )
+	map(0xaa55, 0xaa55).r(this, FUNC(skylncr_state::ret_ff));
 
-	AM_RANGE(0xb000, 0xb03f) AM_RAM_WRITE(reelscroll1_w) AM_SHARE("reelscroll1")
-	AM_RANGE(0xb040, 0xb07f) AM_RAM_WRITE(reelscroll1_w)
-	AM_RANGE(0xb080, 0xb0bf) AM_RAM_WRITE(reelscroll1_w)
-	AM_RANGE(0xb0c0, 0xb0ff) AM_RAM_WRITE(reelscroll1_w)
-	AM_RANGE(0xb100, 0xb13f) AM_RAM_WRITE(reelscroll1_w)
-	AM_RANGE(0xb140, 0xb17f) AM_RAM_WRITE(reelscroll1_w)
-	AM_RANGE(0xb180, 0xb1bf) AM_RAM_WRITE(reelscroll1_w)
-	AM_RANGE(0xb1c0, 0xb1ff) AM_RAM_WRITE(reelscroll1_w)
+	map(0xb000, 0xb03f).ram().w(this, FUNC(skylncr_state::reelscroll1_w)).share("reelscroll1");
+	map(0xb040, 0xb07f).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
+	map(0xb080, 0xb0bf).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
+	map(0xb0c0, 0xb0ff).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
+	map(0xb100, 0xb13f).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
+	map(0xb140, 0xb17f).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
+	map(0xb180, 0xb1bf).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
+	map(0xb1c0, 0xb1ff).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
 
-	AM_RANGE(0xb200, 0xb23f) AM_RAM_WRITE(reelscroll2_w) AM_SHARE("reelscroll2")
-	AM_RANGE(0xb240, 0xb27f) AM_RAM_WRITE(reelscroll2_w)
-	AM_RANGE(0xb280, 0xb2bf) AM_RAM_WRITE(reelscroll2_w)
-	AM_RANGE(0xb2c0, 0xb2ff) AM_RAM_WRITE(reelscroll2_w)
-	AM_RANGE(0xb300, 0xb33f) AM_RAM_WRITE(reelscroll2_w)
-	AM_RANGE(0xb340, 0xb37f) AM_RAM_WRITE(reelscroll2_w)
-	AM_RANGE(0xb380, 0xb3bf) AM_RAM_WRITE(reelscroll2_w)
-	AM_RANGE(0xb3c0, 0xb3ff) AM_RAM_WRITE(reelscroll2_w)
+	map(0xb200, 0xb23f).ram().w(this, FUNC(skylncr_state::reelscroll2_w)).share("reelscroll2");
+	map(0xb240, 0xb27f).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
+	map(0xb280, 0xb2bf).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
+	map(0xb2c0, 0xb2ff).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
+	map(0xb300, 0xb33f).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
+	map(0xb340, 0xb37f).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
+	map(0xb380, 0xb3bf).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
+	map(0xb3c0, 0xb3ff).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
 
-	AM_RANGE(0xb400, 0xb43f) AM_RAM_WRITE(reelscroll3_w) AM_SHARE("reelscroll3")
-	AM_RANGE(0xb440, 0xb47f) AM_RAM_WRITE(reelscroll3_w)
-	AM_RANGE(0xb480, 0xb4bf) AM_RAM_WRITE(reelscroll3_w)
-	AM_RANGE(0xb4c0, 0xb4ff) AM_RAM_WRITE(reelscroll3_w)
-	AM_RANGE(0xb500, 0xb53f) AM_RAM_WRITE(reelscroll3_w)
-	AM_RANGE(0xb540, 0xb57f) AM_RAM_WRITE(reelscroll3_w)
-	AM_RANGE(0xb580, 0xb5bf) AM_RAM_WRITE(reelscroll3_w)
-	AM_RANGE(0xb5c0, 0xb5ff) AM_RAM_WRITE(reelscroll3_w)
+	map(0xb400, 0xb43f).ram().w(this, FUNC(skylncr_state::reelscroll3_w)).share("reelscroll3");
+	map(0xb440, 0xb47f).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
+	map(0xb480, 0xb4bf).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
+	map(0xb4c0, 0xb4ff).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
+	map(0xb500, 0xb53f).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
+	map(0xb540, 0xb57f).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
+	map(0xb580, 0xb5bf).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
+	map(0xb5c0, 0xb5ff).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
 
-	AM_RANGE(0xb600, 0xb63f) AM_RAM_WRITE(reelscroll4_w) AM_SHARE("reelscroll4")
-	AM_RANGE(0xb640, 0xb67f) AM_RAM_WRITE(reelscroll4_w)
-	AM_RANGE(0xb680, 0xb6bf) AM_RAM_WRITE(reelscroll4_w)
-	AM_RANGE(0xb6c0, 0xb6ff) AM_RAM_WRITE(reelscroll4_w)
-	AM_RANGE(0xb700, 0xb73f) AM_RAM_WRITE(reelscroll4_w)
-	AM_RANGE(0xb740, 0xb77f) AM_RAM_WRITE(reelscroll4_w)
-	AM_RANGE(0xb780, 0xb7bf) AM_RAM_WRITE(reelscroll4_w)
-	AM_RANGE(0xb7c0, 0xb7ff) AM_RAM_WRITE(reelscroll4_w)
+	map(0xb600, 0xb63f).ram().w(this, FUNC(skylncr_state::reelscroll4_w)).share("reelscroll4");
+	map(0xb640, 0xb67f).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
+	map(0xb680, 0xb6bf).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
+	map(0xb6c0, 0xb6ff).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
+	map(0xb700, 0xb73f).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
+	map(0xb740, 0xb77f).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
+	map(0xb780, 0xb7bf).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
+	map(0xb7c0, 0xb7ff).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
 
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(skylncr_state::io_map_skylncr)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-
-	AM_RANGE(0x20, 0x20) AM_WRITE(skylncr_coin_w)
-
-	AM_RANGE(0x30, 0x31) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x31, 0x31) AM_DEVREAD("aysnd", ay8910_device, data_r)
-
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("ramdac", ramdac_device, index_w)
-	AM_RANGE(0x41, 0x41) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
-	AM_RANGE(0x42, 0x42) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
-
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE("ramdac2", ramdac_device, index_w)
-	AM_RANGE(0x51, 0x51) AM_DEVWRITE("ramdac2", ramdac_device, pal_w)
-	AM_RANGE(0x52, 0x52) AM_DEVWRITE("ramdac2", ramdac_device, mask_w)
-
-	AM_RANGE(0x70, 0x70) AM_WRITE(skylncr_nmi_enable_w)
-ADDRESS_MAP_END
+	map(0xc000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(skylncr_state::io_map_mbutrfly)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_IMPORT_FROM(io_map_skylncr)
-	AM_RANGE(0x60, 0x60) AM_WRITE(mbutrfly_prot_w)
-ADDRESS_MAP_END
+void skylncr_state::io_map_skylncr(address_map &map)
+{
+	map.global_mask(0xff);
+
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+
+	map(0x20, 0x20).w(this, FUNC(skylncr_state::skylncr_coin_w));
+
+	map(0x30, 0x31).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x31, 0x31).r("aysnd", FUNC(ay8910_device::data_r));
+
+	map(0x40, 0x40).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x41, 0x41).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x42, 0x42).w("ramdac", FUNC(ramdac_device::mask_w));
+
+	map(0x50, 0x50).w("ramdac2", FUNC(ramdac_device::index_w));
+	map(0x51, 0x51).w("ramdac2", FUNC(ramdac_device::pal_w));
+	map(0x52, 0x52).w("ramdac2", FUNC(ramdac_device::mask_w));
+
+	map(0x70, 0x70).w(this, FUNC(skylncr_state::skylncr_nmi_enable_w));
+}
 
 
-ADDRESS_MAP_START(skylncr_state::bdream97_opcode_map)
-	AM_RANGE(0x0000, 0xffff) AM_READ(bdream97_opcode_r)
-ADDRESS_MAP_END
+void skylncr_state::io_map_mbutrfly(address_map &map)
+{
+	map.global_mask(0xff);
+	io_map_skylncr(map);
+	map(0x60, 0x60).w(this, FUNC(skylncr_state::mbutrfly_prot_w));
+}
 
 
-ADDRESS_MAP_START(skylncr_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
-ADDRESS_MAP_END
+void skylncr_state::bdream97_opcode_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(this, FUNC(skylncr_state::bdream97_opcode_r));
+}
 
 
-ADDRESS_MAP_START(skylncr_state::ramdac2_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac2", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
-ADDRESS_MAP_END
+void skylncr_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
+
+
+void skylncr_state::ramdac2_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac2", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 
 

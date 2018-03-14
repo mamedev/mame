@@ -376,61 +376,66 @@ WRITE8_MEMBER(cosmic_state::flip_screen_w)
 }
 
 
-ADDRESS_MAP_START(cosmic_state::panic_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("P1")
-	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")
-	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
-	AM_RANGE(0x6803, 0x6803) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x7000, 0x700b) AM_WRITE(panic_sound_output_w)
-	AM_RANGE(0x700c, 0x700e) AM_WRITE(cosmic_color_register_w)
-	AM_RANGE(0x700f, 0x700f) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x7800, 0x7801) AM_WRITE(panic_sound_output2_w)
-ADDRESS_MAP_END
+void cosmic_state::panic_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).ram().share("videoram");
+	map(0x6000, 0x601f).writeonly().share("spriteram");
+	map(0x6800, 0x6800).portr("P1");
+	map(0x6801, 0x6801).portr("P2");
+	map(0x6802, 0x6802).portr("DSW");
+	map(0x6803, 0x6803).portr("SYSTEM");
+	map(0x7000, 0x700b).w(this, FUNC(cosmic_state::panic_sound_output_w));
+	map(0x700c, 0x700e).w(this, FUNC(cosmic_state::cosmic_color_register_w));
+	map(0x700f, 0x700f).w(this, FUNC(cosmic_state::flip_screen_w));
+	map(0x7800, 0x7801).w(this, FUNC(cosmic_state::panic_sound_output2_w));
+}
 
 
-ADDRESS_MAP_START(cosmic_state::cosmica_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("P1")
-	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")
-	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
-	AM_RANGE(0x6803, 0x6803) AM_READ(cosmica_pixel_clock_r)
-	AM_RANGE(0x7000, 0x700b) AM_WRITE(cosmica_sound_output_w)
-	AM_RANGE(0x700c, 0x700d) AM_WRITE(cosmic_color_register_w)
-	AM_RANGE(0x700f, 0x700f) AM_WRITE(flip_screen_w)
-ADDRESS_MAP_END
+void cosmic_state::cosmica_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).ram().share("videoram");
+	map(0x6000, 0x601f).writeonly().share("spriteram");
+	map(0x6800, 0x6800).portr("P1");
+	map(0x6801, 0x6801).portr("P2");
+	map(0x6802, 0x6802).portr("DSW");
+	map(0x6803, 0x6803).r(this, FUNC(cosmic_state::cosmica_pixel_clock_r));
+	map(0x7000, 0x700b).w(this, FUNC(cosmic_state::cosmica_sound_output_w));
+	map(0x700c, 0x700d).w(this, FUNC(cosmic_state::cosmic_color_register_w));
+	map(0x700f, 0x700f).w(this, FUNC(cosmic_state::flip_screen_w));
+}
 
 
-ADDRESS_MAP_START(cosmic_state::cosmicg_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void cosmic_state::cosmicg_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(cosmic_state::cosmicg_io_map)
-	AM_RANGE(0x00, 0x00) AM_READ(cosmicg_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x00, 0x15) AM_WRITE(cosmicg_output_w)
-	AM_RANGE(0x16, 0x17) AM_WRITE(cosmic_color_register_w)
-ADDRESS_MAP_END
+void cosmic_state::cosmicg_io_map(address_map &map)
+{
+	map(0x00, 0x00).r(this, FUNC(cosmic_state::cosmicg_port_0_r));
+	map(0x01, 0x01).portr("IN1");
+	map(0x00, 0x15).w(this, FUNC(cosmic_state::cosmicg_output_w));
+	map(0x16, 0x17).w(this, FUNC(cosmic_state::cosmic_color_register_w));
+}
 
 
-ADDRESS_MAP_START(cosmic_state::magspot_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
-	AM_RANGE(0x4000, 0x401f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(dac_w)
-	AM_RANGE(0x480c, 0x480d) AM_WRITE(cosmic_color_register_w)
-	AM_RANGE(0x480f, 0x480f) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
-	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
-	AM_RANGE(0x5002, 0x5002) AM_READ_PORT("IN2")
-	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("IN3")
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void cosmic_state::magspot_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3800, 0x3807).r(this, FUNC(cosmic_state::magspot_coinage_dip_r));
+	map(0x4000, 0x401f).writeonly().share("spriteram");
+	map(0x4800, 0x4800).w(this, FUNC(cosmic_state::dac_w));
+	map(0x480c, 0x480d).w(this, FUNC(cosmic_state::cosmic_color_register_w));
+	map(0x480f, 0x480f).w(this, FUNC(cosmic_state::flip_screen_w));
+	map(0x5000, 0x5000).portr("IN0");
+	map(0x5001, 0x5001).portr("IN1");
+	map(0x5002, 0x5002).portr("IN2");
+	map(0x5003, 0x5003).portr("IN3");
+	map(0x6000, 0x7fff).ram().share("videoram");
+}
 
 
 WRITE_LINE_MEMBER(cosmic_state::panic_coin_inserted)

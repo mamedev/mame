@@ -32,23 +32,27 @@ private:
 	required_device<cpu_device> m_lightcpu;
 };
 
-ADDRESS_MAP_START(strkzn_state::main_mem)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void strkzn_state::main_mem(address_map &map)
+{
+	map(0x0000, 0xdfff).rom().region("maincpu", 0);
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(strkzn_state::main_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void strkzn_state::main_io(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
-ADDRESS_MAP_START(strkzn_state::light_mem)
-	AM_RANGE(0x00000, 0x00fff) AM_RAM
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("lightcpu", 0)
-ADDRESS_MAP_END
+void strkzn_state::light_mem(address_map &map)
+{
+	map(0x00000, 0x00fff).ram();
+	map(0xf0000, 0xfffff).rom().region("lightcpu", 0);
+}
 
-ADDRESS_MAP_START(strkzn_state::light_io)
-	AM_RANGE(0x0007, 0x0007) AM_READNOP
-ADDRESS_MAP_END
+void strkzn_state::light_io(address_map &map)
+{
+	map(0x0007, 0x0007).nopr();
+}
 
 MACHINE_CONFIG_START(strkzn_state::strkzn)
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)

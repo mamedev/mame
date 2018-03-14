@@ -466,28 +466,31 @@ WRITE32_MEMBER(indigo_state::int_w)
 	osd_printf_info("INT: write %x to ofs %x (mask %x) (PC=%x)\n", data, offset, mem_mask, m_maincpu->pc());
 }
 
-ADDRESS_MAP_START(indigo_state::indigo_map)
-	AM_RANGE( 0x00000000, 0x001fffff ) AM_RAM AM_SHARE("share10")
-	AM_RANGE( 0x08000000, 0x08ffffff ) AM_RAM AM_SHARE("share5")
-	AM_RANGE( 0x09000000, 0x097fffff ) AM_RAM AM_SHARE("share6")
-	AM_RANGE( 0x0a000000, 0x0a7fffff ) AM_RAM AM_SHARE("share7")
-	AM_RANGE( 0x0c000000, 0x0c7fffff ) AM_RAM AM_SHARE("share8")
-	AM_RANGE( 0x10000000, 0x107fffff ) AM_RAM AM_SHARE("share9")
-	AM_RANGE( 0x18000000, 0x187fffff ) AM_RAM AM_SHARE("share1")
-	AM_RANGE( 0x1fb80000, 0x1fb8ffff ) AM_READWRITE(hpc_r, hpc_w )
-	AM_RANGE( 0x1fbd9000, 0x1fbd903f ) AM_READWRITE(int_r, int_w )
-ADDRESS_MAP_END
+void indigo_state::indigo_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("share10");
+	map(0x08000000, 0x08ffffff).ram().share("share5");
+	map(0x09000000, 0x097fffff).ram().share("share6");
+	map(0x0a000000, 0x0a7fffff).ram().share("share7");
+	map(0x0c000000, 0x0c7fffff).ram().share("share8");
+	map(0x10000000, 0x107fffff).ram().share("share9");
+	map(0x18000000, 0x187fffff).ram().share("share1");
+	map(0x1fb80000, 0x1fb8ffff).rw(this, FUNC(indigo_state::hpc_r), FUNC(indigo_state::hpc_w));
+	map(0x1fbd9000, 0x1fbd903f).rw(this, FUNC(indigo_state::int_r), FUNC(indigo_state::int_w));
+}
 
-ADDRESS_MAP_START(indigo_state::indigo3k_map)
-	AM_IMPORT_FROM( indigo_map )
-	AM_RANGE( 0x1fc00000, 0x1fc3ffff ) AM_ROM AM_SHARE("share2") AM_REGION( "user1", 0 )
-ADDRESS_MAP_END
+void indigo_state::indigo3k_map(address_map &map)
+{
+	indigo_map(map);
+	map(0x1fc00000, 0x1fc3ffff).rom().share("share2").region("user1", 0);
+}
 
-ADDRESS_MAP_START(indigo_state::indigo4k_map)
-	AM_IMPORT_FROM( indigo_map )
-	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_DEVREADWRITE("sgi_mc", sgi_mc_device, read, write )
-	AM_RANGE( 0x1fc00000, 0x1fc7ffff ) AM_ROM AM_SHARE("share2") AM_REGION( "user1", 0 )
-ADDRESS_MAP_END
+void indigo_state::indigo4k_map(address_map &map)
+{
+	indigo_map(map);
+	map(0x1fa00000, 0x1fa1ffff).rw("sgi_mc", FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
+	map(0x1fc00000, 0x1fc7ffff).rom().share("share2").region("user1", 0);
+}
 
 WRITE_LINE_MEMBER(indigo_state::scsi_irq)
 {

@@ -134,22 +134,23 @@ WRITE32_MEMBER(galastrm_state::galastrm_adstick_ctrl_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-ADDRESS_MAP_START(galastrm_state::galastrm_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram")                             /* main CPUA ram */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x400000, 0x400007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
-	AM_RANGE(0x40fff0, 0x40fff3) AM_WRITENOP
-	AM_RANGE(0x500000, 0x500007) AM_READWRITE(galastrm_adstick_ctrl_r, galastrm_adstick_ctrl_w)
-	AM_RANGE(0x600000, 0x6007ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff) /* Sound shared ram */
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)        /* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
-	AM_RANGE(0x900000, 0x900003) AM_WRITE(galastrm_palette_w)                               /* TC0110PCR */
-	AM_RANGE(0xb00000, 0xb00003) AM_WRITE(galastrm_tc0610_0_w)                              /* TC0610 */
-	AM_RANGE(0xc00000, 0xc00003) AM_WRITE(galastrm_tc0610_1_w)
-	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)        /* piv tilemaps */
-	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_long_r, ctrl_long_w)
-ADDRESS_MAP_END
+void galastrm_state::galastrm_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x21ffff).ram().share("ram");                             /* main CPUA ram */
+	map(0x300000, 0x303fff).ram().share("spriteram");
+	map(0x400000, 0x400007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
+	map(0x40fff0, 0x40fff3).nopw();
+	map(0x500000, 0x500007).rw(this, FUNC(galastrm_state::galastrm_adstick_ctrl_r), FUNC(galastrm_state::galastrm_adstick_ctrl_w));
+	map(0x600000, 0x6007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)); /* Sound shared ram */
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
+	map(0x900000, 0x900003).w(this, FUNC(galastrm_state::galastrm_palette_w));                               /* TC0110PCR */
+	map(0xb00000, 0xb00003).w(this, FUNC(galastrm_state::galastrm_tc0610_0_w));                              /* TC0610 */
+	map(0xc00000, 0xc00003).w(this, FUNC(galastrm_state::galastrm_tc0610_1_w));
+	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::long_r), FUNC(tc0100scn_device::long_w));        /* piv tilemaps */
+	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
+}
 
 /***********************************************************
              INPUT PORTS (dips in eprom)

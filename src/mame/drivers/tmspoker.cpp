@@ -326,15 +326,16 @@ void tmspoker_state::machine_reset()
 * Memory Map Information *
 *************************/
 //59a
-ADDRESS_MAP_START(tmspoker_state::tmspoker_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x2800, 0x2800) AM_READNOP AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(tmspoker_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3800, 0x3fff) AM_RAM //NVRAM?
-	AM_RANGE(0x2000, 0x20ff) AM_RAM //color RAM?
-ADDRESS_MAP_END
+void tmspoker_state::tmspoker_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x0fff).bankr("bank1");
+	map(0x2800, 0x2800).nopr().w("crtc", FUNC(mc6845_device::address_w));
+	map(0x2801, 0x2801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x3000, 0x33ff).ram().w(this, FUNC(tmspoker_state::tmspoker_videoram_w)).share("videoram");
+	map(0x3800, 0x3fff).ram(); //NVRAM?
+	map(0x2000, 0x20ff).ram(); //color RAM?
+}
 
 
 READ8_MEMBER(tmspoker_state::unk_r)
@@ -343,9 +344,10 @@ READ8_MEMBER(tmspoker_state::unk_r)
 	return 0;//0xff;//mame_rand(machine);
 }
 
-ADDRESS_MAP_START(tmspoker_state::tmspoker_cru_map)
-	AM_RANGE(0x0000, 0x07ff) AM_READ(unk_r)
-ADDRESS_MAP_END
+void tmspoker_state::tmspoker_cru_map(address_map &map)
+{
+	map(0x0000, 0x07ff).r(this, FUNC(tmspoker_state::unk_r));
+}
 
 /* I/O byte R/W
 

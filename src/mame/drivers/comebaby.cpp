@@ -218,16 +218,18 @@ uint32_t comebaby_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-ADDRESS_MAP_START(comebaby_state::comebaby_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
-	AM_RANGE(0x000c0000, 0x000fffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void comebaby_state::comebaby_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).ram();
+	map(0x000c0000, 0x000fffff).rom().region("bios", 0);
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(comebaby_state::comebaby_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-ADDRESS_MAP_END
+void comebaby_state::comebaby_io(address_map &map)
+{
+	pcat32_io_common(map);
+}
 
 static INPUT_PORTS_START( comebaby )
 INPUT_PORTS_END

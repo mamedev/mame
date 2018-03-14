@@ -145,23 +145,25 @@ WRITE8_MEMBER(quizo_state::port60_w)
 	membank("bank1")->set_entry(rombankLookup[data]);
 }
 
-ADDRESS_MAP_START(quizo_state::memmap)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(vram_w)
+void quizo_state::memmap(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xffff).w(this, FUNC(quizo_state::vram_w));
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(quizo_state::portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN1")
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("IN2")
-	AM_RANGE(0x50, 0x51) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE(port70_w)
-ADDRESS_MAP_END
+void quizo_state::portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x10, 0x10).portr("IN1");
+	map(0x40, 0x40).portr("IN2");
+	map(0x50, 0x51).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x60, 0x60).w(this, FUNC(quizo_state::port60_w));
+	map(0x70, 0x70).w(this, FUNC(quizo_state::port70_w));
+}
 
 static INPUT_PORTS_START( quizo )
 	PORT_START("IN0")

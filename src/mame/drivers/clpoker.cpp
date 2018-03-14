@@ -79,28 +79,31 @@ private:
 	bool m_nmi_enable;
 };
 
-ADDRESS_MAP_START(clpoker_state::prg_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("ramdac", ramdac_device, index_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
-	AM_RANGE(0xf002, 0xf002) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
-ADDRESS_MAP_END
+void clpoker_state::prg_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram().w(this, FUNC(clpoker_state::videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().share("nvram");
+	map(0xf000, 0xf000).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0xf001, 0xf001).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0xf002, 0xf002).w("ramdac", FUNC(ramdac_device::mask_w));
+}
 
-ADDRESS_MAP_START(clpoker_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi_outputs", i8255_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi_inputs", i8255_device, read, write)
-	AM_RANGE(0x30, 0x30) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x32, 0x32) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x34, 0x34) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xc0, 0xc0) AM_READNOP // mystery read at startup
-ADDRESS_MAP_END
+void clpoker_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi_outputs", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x13).rw("ppi_inputs", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x30, 0x30).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x32, 0x32).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x34, 0x34).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xc0, 0xc0).nopr(); // mystery read at startup
+}
 
-ADDRESS_MAP_START(clpoker_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
-ADDRESS_MAP_END
+void clpoker_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 WRITE8_MEMBER(clpoker_state::output_a_w)
 {

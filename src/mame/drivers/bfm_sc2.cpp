@@ -1529,50 +1529,51 @@ void bfm_sc2_novid_state::save_state()
 }
 
 
-ADDRESS_MAP_START(bfm_sc2_state::sc2_basemap)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k
+void bfm_sc2_state::sc2_basemap(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("nvram"); //8k
 
-	AM_RANGE(0x2300, 0x230B) AM_READ(mux_input_r)
-	AM_RANGE(0x2300, 0x231F) AM_WRITE(mux_output_w)
-	AM_RANGE(0x2320, 0x2323) AM_WRITE(dimas_w)              /* ?unknown dim related */
+	map(0x2300, 0x230B).r(this, FUNC(bfm_sc2_state::mux_input_r));
+	map(0x2300, 0x231F).w(this, FUNC(bfm_sc2_state::mux_output_w));
+	map(0x2320, 0x2323).w(this, FUNC(bfm_sc2_state::dimas_w));              /* ?unknown dim related */
 
-	AM_RANGE(0x2324, 0x2324) AM_READWRITE(expansion_latch_r, expansion_latch_w)
-	AM_RANGE(0x2325, 0x2327) AM_WRITE(unknown_w)
-	AM_RANGE(0x2328, 0x2328) AM_WRITE(muxena_w)
-	AM_RANGE(0x2329, 0x2329) AM_READWRITE(timerirqclr_r, timerirq_w)
-	AM_RANGE(0x232A, 0x232D) AM_WRITE(unknown_w)
-	AM_RANGE(0x232E, 0x232E) AM_READ(irqstatus_r)
+	map(0x2324, 0x2324).rw(this, FUNC(bfm_sc2_state::expansion_latch_r), FUNC(bfm_sc2_state::expansion_latch_w));
+	map(0x2325, 0x2327).w(this, FUNC(bfm_sc2_state::unknown_w));
+	map(0x2328, 0x2328).w(this, FUNC(bfm_sc2_state::muxena_w));
+	map(0x2329, 0x2329).rw(this, FUNC(bfm_sc2_state::timerirqclr_r), FUNC(bfm_sc2_state::timerirq_w));
+	map(0x232A, 0x232D).w(this, FUNC(bfm_sc2_state::unknown_w));
+	map(0x232E, 0x232E).r(this, FUNC(bfm_sc2_state::irqstatus_r));
 
-	AM_RANGE(0x232F, 0x232F) AM_WRITE(coininhib_w)
-	AM_RANGE(0x2330, 0x2330) AM_WRITE(payout_latch_w)
-	AM_RANGE(0x2331, 0x2331) AM_WRITE(payout_triac_w)
-	AM_RANGE(0x2332, 0x2332) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x2333, 0x2333) AM_WRITE(mmtr_w)
-	AM_RANGE(0x2334, 0x2335) AM_WRITE(unknown_w)
-	AM_RANGE(0x2336, 0x2336) AM_WRITE(dimcnt_w)
-	AM_RANGE(0x2337, 0x2337) AM_WRITE(volume_override_w)
-	AM_RANGE(0x2338, 0x2338) AM_WRITE(payout_select_w)
-	AM_RANGE(0x2339, 0x2339) AM_WRITE(unknown_w)
-	AM_RANGE(0x2400, 0x2400) AM_READWRITE(uart1stat_r, uart1ctrl_w) /* mc6850 compatible uart */
-	AM_RANGE(0x2500, 0x2500) AM_READWRITE(uart1data_r, uart1data_w)
-	AM_RANGE(0x2600, 0x2600) AM_READWRITE(uart2stat_r, uart2ctrl_w) /* mc6850 compatible uart */
-	AM_RANGE(0x2700, 0x2700) AM_READWRITE(uart2data_r, uart2data_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_bd1_w)                   /* vfd1 data */
-	AM_RANGE(0x2900, 0x2900) AM_WRITE(vfd_reset_w)                  /* vfd1+vfd2 reset line */
-	AM_RANGE(0x2A00, 0x2AFF) AM_WRITE(nec_latch_w)
-	AM_RANGE(0x2B00, 0x2BFF) AM_WRITE(nec_reset_w)
-	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)                     /* custom chip unlock */
-	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)                 /* write bank (rom page select for 0x6000 - 0x7fff ) */
+	map(0x232F, 0x232F).w(this, FUNC(bfm_sc2_state::coininhib_w));
+	map(0x2330, 0x2330).w(this, FUNC(bfm_sc2_state::payout_latch_w));
+	map(0x2331, 0x2331).w(this, FUNC(bfm_sc2_state::payout_triac_w));
+	map(0x2332, 0x2332).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x2333, 0x2333).w(this, FUNC(bfm_sc2_state::mmtr_w));
+	map(0x2334, 0x2335).w(this, FUNC(bfm_sc2_state::unknown_w));
+	map(0x2336, 0x2336).w(this, FUNC(bfm_sc2_state::dimcnt_w));
+	map(0x2337, 0x2337).w(this, FUNC(bfm_sc2_state::volume_override_w));
+	map(0x2338, 0x2338).w(this, FUNC(bfm_sc2_state::payout_select_w));
+	map(0x2339, 0x2339).w(this, FUNC(bfm_sc2_state::unknown_w));
+	map(0x2400, 0x2400).rw(this, FUNC(bfm_sc2_state::uart1stat_r), FUNC(bfm_sc2_state::uart1ctrl_w)); /* mc6850 compatible uart */
+	map(0x2500, 0x2500).rw(this, FUNC(bfm_sc2_state::uart1data_r), FUNC(bfm_sc2_state::uart1data_w));
+	map(0x2600, 0x2600).rw(this, FUNC(bfm_sc2_state::uart2stat_r), FUNC(bfm_sc2_state::uart2ctrl_w)); /* mc6850 compatible uart */
+	map(0x2700, 0x2700).rw(this, FUNC(bfm_sc2_state::uart2data_r), FUNC(bfm_sc2_state::uart2data_w));
+	map(0x2800, 0x2800).w(this, FUNC(bfm_sc2_state::vfd1_bd1_w));                   /* vfd1 data */
+	map(0x2900, 0x2900).w(this, FUNC(bfm_sc2_state::vfd_reset_w));                  /* vfd1+vfd2 reset line */
+	map(0x2A00, 0x2AFF).w(this, FUNC(bfm_sc2_state::nec_latch_w));
+	map(0x2B00, 0x2BFF).w(this, FUNC(bfm_sc2_state::nec_reset_w));
+	map(0x2C00, 0x2C00).w(this, FUNC(bfm_sc2_state::unlock_w));                     /* custom chip unlock */
+	map(0x2D00, 0x2D01).w(m_ym2413, FUNC(ym2413_device::write));
+	map(0x2E00, 0x2E00).w(this, FUNC(bfm_sc2_state::bankswitch_w));                 /* write bank (rom page select for 0x6000 - 0x7fff ) */
 	//AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)                /* vfd2 data (not usually connected!)*/
 
-	AM_RANGE(0x3FFE, 0x3FFE) AM_READ(direct_input_r )
-	AM_RANGE(0x3FFF, 0x3FFF) AM_READ(coin_input_r)
-	AM_RANGE(0x4000, 0x5FFF) AM_ROM
-	AM_RANGE(0x4000, 0xFFFF) AM_WRITE(unknown_w)            // contains unknown I/O registers
-	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xFFFF) AM_ROM
-ADDRESS_MAP_END
+	map(0x3FFE, 0x3FFE).r(this, FUNC(bfm_sc2_state::direct_input_r));
+	map(0x3FFF, 0x3FFF).r(this, FUNC(bfm_sc2_state::coin_input_r));
+	map(0x4000, 0x5FFF).rom();
+	map(0x4000, 0xFFFF).w(this, FUNC(bfm_sc2_state::unknown_w));            // contains unknown I/O registers
+	map(0x6000, 0x7FFF).bankr("bank1");
+	map(0x8000, 0xFFFF).rom();
+}
 
 ADDRESS_MAP_START(bfm_sc2_novid_state::memmap_no_vid)
 	AM_IMPORT_FROM( sc2_basemap )
@@ -1584,20 +1585,21 @@ ADDRESS_MAP_END
 
 // memory map for scorpion2 board video addon /////////////////////////////
 
-ADDRESS_MAP_START(bfm_sc2_vid_state::memmap_vid)
-	AM_IMPORT_FROM( sc2_basemap )
+void bfm_sc2_vid_state::memmap_vid(address_map &map)
+{
+	sc2_basemap(map);
 
-	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_hop_r)      // vfd status register
-	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_vid_w)
-	AM_RANGE(0x2100, 0x21FF) AM_WRITENOP
-	AM_RANGE(0x2200, 0x22FF) AM_WRITENOP
+	map(0x2000, 0x2000).r(this, FUNC(bfm_sc2_vid_state::vfd_status_hop_r));      // vfd status register
+	map(0x2000, 0x20FF).w(this, FUNC(bfm_sc2_vid_state::reel12_vid_w));
+	map(0x2100, 0x21FF).nopw();
+	map(0x2200, 0x22FF).nopw();
 
-	AM_RANGE(0x3C00, 0x3C07) AM_READ(key_r)
-	AM_RANGE(0x3C80, 0x3C80) AM_WRITE(e2ram_w)
+	map(0x3C00, 0x3C07).r(this, FUNC(bfm_sc2_vid_state::key_r));
+	map(0x3C80, 0x3C80).w(this, FUNC(bfm_sc2_vid_state::e2ram_w));
 
-	AM_RANGE(0x3E00, 0x3E00) AM_DEVREADWRITE("adder2", bfm_adder2_device, vid_uart_ctrl_r, vid_uart_ctrl_w)     // video uart control reg
-	AM_RANGE(0x3E01, 0x3E01) AM_DEVREADWRITE("adder2", bfm_adder2_device, vid_uart_rx_r,   vid_uart_tx_w)       // video uart data  reg
-ADDRESS_MAP_END
+	map(0x3E00, 0x3E00).rw("adder2", FUNC(bfm_adder2_device::vid_uart_ctrl_r), FUNC(bfm_adder2_device::vid_uart_ctrl_w));     // video uart control reg
+	map(0x3E01, 0x3E01).rw("adder2", FUNC(bfm_adder2_device::vid_uart_rx_r), FUNC(bfm_adder2_device::vid_uart_tx_w));       // video uart data  reg
+}
 
 // input ports for pyramid ////////////////////////////////////////
 

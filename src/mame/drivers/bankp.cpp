@@ -124,24 +124,26 @@
  *
  *************************************/
 
-ADDRESS_MAP_START(bankp_state::bankp_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
-ADDRESS_MAP_END
+void bankp_state::bankp_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xefff).ram();
+	map(0xf000, 0xf3ff).ram().w(this, FUNC(bankp_state::videoram_w)).share("videoram");
+	map(0xf400, 0xf7ff).ram().w(this, FUNC(bankp_state::colorram_w)).share("colorram");
+	map(0xf800, 0xfbff).ram().w(this, FUNC(bankp_state::videoram2_w)).share("videoram2");
+	map(0xfc00, 0xffff).ram().w(this, FUNC(bankp_state::colorram2_w)).share("colorram2");
+}
 
-ADDRESS_MAP_START(bankp_state::bankp_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_DEVWRITE("sn3", sn76489_device, write)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")
-	AM_RANGE(0x05, 0x05) AM_WRITE(scroll_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(out_w)
-ADDRESS_MAP_END
+void bankp_state::bankp_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w("sn1", FUNC(sn76489_device::write));
+	map(0x01, 0x01).portr("IN1").w("sn2", FUNC(sn76489_device::write));
+	map(0x02, 0x02).portr("IN2").w("sn3", FUNC(sn76489_device::write));
+	map(0x04, 0x04).portr("DSW1");
+	map(0x05, 0x05).w(this, FUNC(bankp_state::scroll_w));
+	map(0x07, 0x07).w(this, FUNC(bankp_state::out_w));
+}
 
 
 /*************************************

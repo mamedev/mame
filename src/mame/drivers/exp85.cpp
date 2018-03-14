@@ -40,21 +40,23 @@
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(exp85_state::exp85_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_ROM
-	AM_RANGE(0xf800, 0xf8ff) AM_RAM
-ADDRESS_MAP_END
+void exp85_state::exp85_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).bankr("bank1");
+	map(0xc000, 0xdfff).rom();
+	map(0xf000, 0xf7ff).rom();
+	map(0xf800, 0xf8ff).ram();
+}
 
-ADDRESS_MAP_START(exp85_state::exp85_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(I8355_TAG, i8355_device, io_r, io_w)
-	AM_RANGE(0xf8, 0xfd) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
+void exp85_state::exp85_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xf0, 0xf3).rw(I8355_TAG, FUNC(i8355_device::io_r), FUNC(i8355_device::io_w));
+	map(0xf8, 0xfd).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 //  AM_RANGE(0xfe, 0xff) AM_DEVREADWRITE(I8279_TAG, i8279_r, i8279_w)
-ADDRESS_MAP_END
+}
 
 /* Input Ports */
 

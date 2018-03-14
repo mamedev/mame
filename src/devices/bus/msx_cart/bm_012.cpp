@@ -32,10 +32,11 @@ msx_cart_bm_012_device::msx_cart_bm_012_device(const machine_config &mconfig, co
 }
 
 
-ADDRESS_MAP_START(msx_cart_bm_012_device::bm_012_memory_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void msx_cart_bm_012_device::bm_012_memory_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
 
 MACHINE_CONFIG_START(msx_cart_bm_012_device::device_add_mconfig)

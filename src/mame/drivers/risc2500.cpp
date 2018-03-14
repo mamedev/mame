@@ -302,12 +302,13 @@ void risc2500_state::machine_reset()
 	install_boot_rom();
 }
 
-ADDRESS_MAP_START(risc2500_state::risc2500_mem)
-	AM_RANGE( 0x00000000,  0x0001ffff )  AM_RAM
-	AM_RANGE( 0x01800000,  0x01800003 )  AM_READ(disable_boot_rom)
-	AM_RANGE( 0x01000000,  0x01000003 )  AM_READWRITE(p1000_r, p1000_w)
-	AM_RANGE( 0x02000000,  0x0203ffff )  AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void risc2500_state::risc2500_mem(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).ram();
+	map(0x01800000, 0x01800003).r(this, FUNC(risc2500_state::disable_boot_rom));
+	map(0x01000000, 0x01000003).rw(this, FUNC(risc2500_state::p1000_r), FUNC(risc2500_state::p1000_w));
+	map(0x02000000, 0x0203ffff).rom().region("maincpu", 0);
+}
 
 
 MACHINE_CONFIG_START(risc2500_state::risc2500)

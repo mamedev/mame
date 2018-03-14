@@ -178,13 +178,14 @@ WRITE8_MEMBER(gameplan_state::r6532_soundlatch_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(gameplan_state::gameplan_main_map)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x2000, 0x200f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)    /* VIA 1 */
-	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)    /* VIA 2 */
-	AM_RANGE(0x3000, 0x300f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)    /* VIA 3 */
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void gameplan_state::gameplan_main_map(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x1c00).ram();
+	map(0x2000, 0x200f).mirror(0x07f0).rw(m_via_0, FUNC(via6522_device::read), FUNC(via6522_device::write));    /* VIA 1 */
+	map(0x2800, 0x280f).mirror(0x07f0).rw(m_via_1, FUNC(via6522_device::read), FUNC(via6522_device::write));    /* VIA 2 */
+	map(0x3000, 0x300f).mirror(0x07f0).rw(m_via_2, FUNC(via6522_device::read), FUNC(via6522_device::write));    /* VIA 3 */
+	map(0x8000, 0xffff).rom();
+}
 
 
 
@@ -194,25 +195,27 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(gameplan_state::gameplan_audio_map)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
-	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_ROM
-ADDRESS_MAP_END
+void gameplan_state::gameplan_audio_map(address_map &map)
+{
+	map(0x0000, 0x007f).mirror(0x1780).ram();  /* 6532 internal RAM */
+	map(0x0800, 0x081f).mirror(0x17e0).rw(m_riot, FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0xa000, 0xa000).mirror(0x1ffc).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xa001, 0xa001).mirror(0x1ffc).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xa002, 0xa002).mirror(0x1ffc).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0xe000, 0xe7ff).mirror(0x1800).rom();
+}
 
 
 /* same as Gameplan, but larger ROM */
-ADDRESS_MAP_START(gameplan_state::leprechn_audio_map)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
-	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM
-ADDRESS_MAP_END
+void gameplan_state::leprechn_audio_map(address_map &map)
+{
+	map(0x0000, 0x007f).mirror(0x1780).ram();  /* 6532 internal RAM */
+	map(0x0800, 0x081f).mirror(0x17e0).rw(m_riot, FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0xa000, 0xa000).mirror(0x1ffc).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xa001, 0xa001).mirror(0x1ffc).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xa002, 0xa002).mirror(0x1ffc).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0xe000, 0xefff).mirror(0x1000).rom();
+}
 
 
 

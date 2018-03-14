@@ -326,26 +326,28 @@ WRITE8_MEMBER(r2dtank_state::pia_comp_w)
 }
 
 
-ADDRESS_MAP_START(r2dtank_state::r2dtank_main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x6000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x8003) AM_DEVREAD("pia_main", pia6821_device, read) AM_WRITE(pia_comp_w)
-	AM_RANGE(0x8004, 0x8004) AM_READWRITE(audio_answer_r, audio_command_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xc000, 0xc007) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void r2dtank_state::r2dtank_main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("videoram");
+	map(0x2000, 0x3fff).ram();
+	map(0x4000, 0x5fff).ram().share("colorram");
+	map(0x6000, 0x7fff).ram();
+	map(0x8000, 0x8003).r("pia_main", FUNC(pia6821_device::read)).w(this, FUNC(r2dtank_state::pia_comp_w));
+	map(0x8004, 0x8004).rw(this, FUNC(r2dtank_state::audio_answer_r), FUNC(r2dtank_state::audio_command_w));
+	map(0xb000, 0xb000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xb001, 0xb001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xc000, 0xc007).ram().share("nvram");
+	map(0xc800, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(r2dtank_state::r2dtank_audio_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
-	AM_RANGE(0xd000, 0xd003) AM_DEVREADWRITE("pia_audio", pia6821_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(audio_command_r, audio_answer_w)
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void r2dtank_state::r2dtank_audio_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();     /* internal RAM */
+	map(0xd000, 0xd003).rw("pia_audio", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xf000, 0xf000).rw(this, FUNC(r2dtank_state::audio_command_r), FUNC(r2dtank_state::audio_answer_w));
+	map(0xf800, 0xffff).rom();
+}
 
 
 

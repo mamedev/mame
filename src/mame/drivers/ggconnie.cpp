@@ -24,7 +24,6 @@
 #include "video/huc6270.h"
 #include "video/huc6260.h"
 #include "video/huc6202.h"
-#include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
 #include "sound/okim6295.h"
 #include "machine/msm6242.h"
@@ -70,32 +69,34 @@ WRITE8_MEMBER(ggconnie_state::oki_bank_w)
 }
 
 
-ADDRESS_MAP_START(ggconnie_state::sgx_mem)
-	AM_RANGE( 0x000000, 0x17ffff) AM_ROM
-	AM_RANGE( 0x180000, 0x1edfff) AM_NOP
-	AM_RANGE( 0x1ee800, 0x1effff) AM_NOP
-	AM_RANGE( 0x1f0000, 0x1f5fff) AM_RAM
-	AM_RANGE( 0x1f7000, 0x1f7000) AM_READ_PORT("SWA")
-	AM_RANGE( 0x1f7100, 0x1f7100) AM_READ_PORT("SWB")
-	AM_RANGE( 0x1f7200, 0x1f7200) AM_READ_PORT("SWC")
-	AM_RANGE( 0x1f7700, 0x1f7700) AM_READ_PORT("IN1")
-	AM_RANGE( 0x1f7800, 0x1f7800) AM_WRITE(output_w)
-	AM_RANGE( 0x1fe000, 0x1fe007) AM_DEVREADWRITE( "huc6270_0", huc6270_device, read, write ) AM_MIRROR(0x03E0)
-	AM_RANGE( 0x1fe008, 0x1fe00f) AM_DEVREADWRITE( "huc6202", huc6202_device, read, write ) AM_MIRROR(0x03E0)
-	AM_RANGE( 0x1fe010, 0x1fe017) AM_DEVREADWRITE( "huc6270_1", huc6270_device, read, write ) AM_MIRROR(0x03E0)
-	AM_RANGE( 0x1fe400, 0x1fe7ff) AM_DEVREADWRITE( "huc6260", huc6260_device, read, write )
-	AM_RANGE( 0x1fe800, 0x1febff) AM_DEVREADWRITE("c6280", c6280_device, c6280_r, c6280_w)
-	AM_RANGE( 0x1fec00, 0x1fefff) AM_DEVREADWRITE("maincpu", h6280_device, timer_r, timer_w)
-	AM_RANGE( 0x1f7300, 0x1f7300) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE( 0x1f7400, 0x1f74ff) AM_WRITE(oki_bank_w)
-	AM_RANGE( 0x1f7500, 0x1f750f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE( 0x1ff000, 0x1ff000) AM_READ_PORT("IN0") AM_WRITE(lamp_w)
-	AM_RANGE( 0x1ff400, 0x1ff7ff) AM_DEVREADWRITE("maincpu", h6280_device, irq_status_r, irq_status_w )
-ADDRESS_MAP_END
+void ggconnie_state::sgx_mem(address_map &map)
+{
+	map(0x000000, 0x17ffff).rom();
+	map(0x180000, 0x1edfff).noprw();
+	map(0x1ee800, 0x1effff).noprw();
+	map(0x1f0000, 0x1f5fff).ram();
+	map(0x1f7000, 0x1f7000).portr("SWA");
+	map(0x1f7100, 0x1f7100).portr("SWB");
+	map(0x1f7200, 0x1f7200).portr("SWC");
+	map(0x1f7700, 0x1f7700).portr("IN1");
+	map(0x1f7800, 0x1f7800).w(this, FUNC(ggconnie_state::output_w));
+	map(0x1fe000, 0x1fe007).rw("huc6270_0", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
+	map(0x1fe008, 0x1fe00f).rw("huc6202", FUNC(huc6202_device::read), FUNC(huc6202_device::write)).mirror(0x03E0);
+	map(0x1fe010, 0x1fe017).rw("huc6270_1", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
+	map(0x1fe400, 0x1fe7ff).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
+	map(0x1fe800, 0x1febff).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
+	map(0x1fec00, 0x1fefff).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
+	map(0x1f7300, 0x1f7300).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x1f7400, 0x1f74ff).w(this, FUNC(ggconnie_state::oki_bank_w));
+	map(0x1f7500, 0x1f750f).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x1ff000, 0x1ff000).portr("IN0").w(this, FUNC(ggconnie_state::lamp_w));
+	map(0x1ff400, 0x1ff7ff).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
+}
 
-ADDRESS_MAP_START(ggconnie_state::sgx_io)
-	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6202", huc6202_device, io_read, io_write )
-ADDRESS_MAP_END
+void ggconnie_state::sgx_io(address_map &map)
+{
+	map(0x00, 0x03).rw("huc6202", FUNC(huc6202_device::io_read), FUNC(huc6202_device::io_write));
+}
 
 
 static INPUT_PORTS_START(ggconnie)

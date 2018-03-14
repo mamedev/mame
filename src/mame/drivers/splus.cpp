@@ -589,39 +589,41 @@ DRIVER_INIT_MEMBER(splus_state,splus)
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(splus_state::splus_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("prograram")
-ADDRESS_MAP_END
+void splus_state::splus_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().share("prograram");
+}
 
-ADDRESS_MAP_START(splus_state::splus_iomap)
+void splus_state::splus_iomap(address_map &map)
+{
 	// Serial I/O
-	AM_RANGE(0x0000, 0x0000) AM_READ(splus_serial_r) AM_WRITE(splus_serial_w)
+	map(0x0000, 0x0000).r(this, FUNC(splus_state::splus_serial_r)).w(this, FUNC(splus_state::splus_serial_w));
 
 	// Battery-backed RAM (Lower 4K) 0x1500-0x16ff eeprom staging area
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("cmosl")
+	map(0x1000, 0x1fff).ram().share("cmosl");
 
 	// Watchdog, 7-segment Display
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE(splus_watchdog_r, splus_7seg_w)
+	map(0x2000, 0x2000).rw(this, FUNC(splus_state::splus_watchdog_r), FUNC(splus_state::splus_7seg_w));
 
 	// DUART
-	AM_RANGE(0x3000, 0x300f) AM_READWRITE(splus_duart_r, splus_duart_w)
+	map(0x3000, 0x300f).rw(this, FUNC(splus_state::splus_duart_r), FUNC(splus_state::splus_duart_w));
 
 	// Dip Switches, Sound
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("SW1") AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	map(0x4000, 0x4000).portr("SW1").w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x4001, 0x4001).w("aysnd", FUNC(ay8910_device::data_w));
 
 	// Reel Optics, EEPROM
-	AM_RANGE(0x5000, 0x5000) AM_READ(splus_reel_optics_r) AM_WRITE(i2c_nvram_w)
+	map(0x5000, 0x5000).r(this, FUNC(splus_state::splus_reel_optics_r)).w(this, FUNC(splus_state::i2c_nvram_w));
 
 	// Reset Registers in Realtime Clock, Serial I/O Load Pulse
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(splus_registers_r, splus_load_pulse_w)
+	map(0x6000, 0x6000).rw(this, FUNC(splus_state::splus_registers_r), FUNC(splus_state::splus_load_pulse_w));
 
 	// Battery-backed RAM (Upper 4K)
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("cmosh")
+	map(0x7000, 0x7fff).ram().share("cmosh");
 
 	// SSxxxx Reel Chip
-	AM_RANGE(0x8000, 0x9fff) AM_READ(splus_m_reel_ram_r) AM_SHARE("reel_ram")
-ADDRESS_MAP_END
+	map(0x8000, 0x9fff).r(this, FUNC(splus_state::splus_m_reel_ram_r)).share("reel_ram");
+}
 
 /*************************
 *      Input ports       *

@@ -135,6 +135,18 @@ address_map_entry &address_map_entry::m(const char *tag, address_map_constructor
 	m_read.m_tag = tag;
 	m_write.m_type = AMH_DEVICE_SUBMAP;
 	m_write.m_tag = tag;
+	m_submap_device = nullptr;
+	m_submap_delegate = func;
+	return *this;
+}
+
+address_map_entry &address_map_entry::m(device_t *device, address_map_constructor func)
+{
+	m_read.m_type = AMH_DEVICE_SUBMAP;
+	m_read.m_tag = nullptr;
+	m_write.m_type = AMH_DEVICE_SUBMAP;
+	m_write.m_tag = nullptr;
+	m_submap_device = device;
 	m_submap_delegate = func;
 	return *this;
 }
@@ -284,7 +296,7 @@ address_map_entry &address_map_entry::rw(read64_delegate rfunc, write64_delegate
 //  set_handler - handler setter for setoffset
 //-------------------------------------------------
 
-address_map_entry &address_map_entry::set_handler(setoffset_delegate func)
+address_map_entry &address_map_entry::setoffset(setoffset_delegate func)
 {
 	assert(!func.isnull());
 	m_setoffsethd.m_type = AMH_DEVICE_DELEGATE;
@@ -437,7 +449,7 @@ address_map::address_map(const address_space &space, offs_t start, offs_t end, u
 		m_unmapval(space.unmap()),
 		m_globalmask(space.addrmask())
 {
-	(*this)(start, end).m(DEVICE_SELF, submap_delegate).umask64(unitmask).cswidth(cswidth);
+	(*this)(start, end).m(&device, submap_delegate).umask64(unitmask).cswidth(cswidth);
 }
 
 
@@ -488,11 +500,16 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 	{
 		if (entry->m_read.m_type == AMH_DEVICE_SUBMAP)
 		{
-			std::string tag = owner.subtag(entry->m_read.m_tag);
-			device_t *mapdevice = machine.device(tag.c_str());
-			if (mapdevice == nullptr) {
-				throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag.c_str(), m_spacenum, m_device->basetag());
+			device_t *mapdevice = entry->m_submap_device;
+			if (!mapdevice)
+			{
+				std::string tag = owner.subtag(entry->m_read.m_tag);
+				mapdevice = machine.device(tag.c_str());
+				if (mapdevice == nullptr) {
+					throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag.c_str(), m_spacenum, m_device->basetag());
+				}
 			}
+
 			// Grab the submap
 			address_map submap(*mapdevice, entry);
 

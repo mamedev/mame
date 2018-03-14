@@ -297,18 +297,20 @@ Timings:
 
 /* I/O ports */
 
-ADDRESS_MAP_START(lviv_state::io_map)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(lviv_io_r,lviv_io_w)
-ADDRESS_MAP_END
+void lviv_state::io_map(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(lviv_state::lviv_io_r), FUNC(lviv_state::lviv_io_w));
+}
 
 /* memory w/r functions */
 
-ADDRESS_MAP_START(lviv_state::lviv_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void lviv_state::lviv_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
 
 /* keyboard input */

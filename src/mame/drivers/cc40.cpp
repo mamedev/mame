@@ -363,25 +363,26 @@ WRITE8_MEMBER(cc40_state::keyboard_w)
 	m_key_select = data;
 }
 
-ADDRESS_MAP_START(cc40_state::main_map)
-	ADDRESS_MAP_UNMAP_HIGH
+void cc40_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
 
-	AM_RANGE(0x0110, 0x0110) AM_READWRITE(bus_control_r, bus_control_w)
-	AM_RANGE(0x0111, 0x0111) AM_WRITE(power_w)
-	AM_RANGE(0x0112, 0x0112) AM_NOP // d0-d3: Hexbus data
-	AM_RANGE(0x0113, 0x0113) AM_NOP // d0: Hexbus available
-	AM_RANGE(0x0114, 0x0114) AM_NOP // d0,d1: Hexbus handshake
-	AM_RANGE(0x0115, 0x0115) AM_DEVWRITE("dac", dac_bit_interface, write) // d0: piezo control
-	AM_RANGE(0x0116, 0x0116) AM_READ(battery_r)
-	AM_RANGE(0x0119, 0x0119) AM_READWRITE(bankswitch_r, bankswitch_w)
-	AM_RANGE(0x011a, 0x011a) AM_READWRITE(clock_control_r, clock_control_w)
-	AM_RANGE(0x011e, 0x011f) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
+	map(0x0110, 0x0110).rw(this, FUNC(cc40_state::bus_control_r), FUNC(cc40_state::bus_control_w));
+	map(0x0111, 0x0111).w(this, FUNC(cc40_state::power_w));
+	map(0x0112, 0x0112).noprw(); // d0-d3: Hexbus data
+	map(0x0113, 0x0113).noprw(); // d0: Hexbus available
+	map(0x0114, 0x0114).noprw(); // d0,d1: Hexbus handshake
+	map(0x0115, 0x0115).w("dac", FUNC(dac_bit_interface::write)); // d0: piezo control
+	map(0x0116, 0x0116).r(this, FUNC(cc40_state::battery_r));
+	map(0x0119, 0x0119).rw(this, FUNC(cc40_state::bankswitch_r), FUNC(cc40_state::bankswitch_w));
+	map(0x011a, 0x011a).rw(this, FUNC(cc40_state::clock_control_r), FUNC(cc40_state::clock_control_w));
+	map(0x011e, 0x011f).rw("hd44780", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("sysram.0")
-	AM_RANGE(0x1000, 0x4fff) AM_READWRITE(sysram_r, sysram_w)
-	AM_RANGE(0x5000, 0xcfff) AM_ROMBANK("cartbank")
-	AM_RANGE(0xd000, 0xefff) AM_ROMBANK("sysbank")
-ADDRESS_MAP_END
+	map(0x0800, 0x0fff).ram().share("sysram.0");
+	map(0x1000, 0x4fff).rw(this, FUNC(cc40_state::sysram_r), FUNC(cc40_state::sysram_w));
+	map(0x5000, 0xcfff).bankr("cartbank");
+	map(0xd000, 0xefff).bankr("sysbank");
+}
 
 
 

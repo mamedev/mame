@@ -401,13 +401,15 @@ DRIVER_INIT_MEMBER(drw80pkr_state,drw80pkr)
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(drw80pkr_state::drw80pkr_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void drw80pkr_state::drw80pkr_map(address_map &map)
+{
+	map(0x0000, 0x0fff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(drw80pkr_state::drw80pkr_io_map)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(drw80pkr_io_r, drw80pkr_io_w)
-ADDRESS_MAP_END
+void drw80pkr_state::drw80pkr_io_map(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(drw80pkr_state::drw80pkr_io_r), FUNC(drw80pkr_state::drw80pkr_io_w));
+}
 
 /*************************
 *      Input ports       *

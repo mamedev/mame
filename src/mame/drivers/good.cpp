@@ -114,23 +114,24 @@ uint32_t good_state::screen_update_good(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-ADDRESS_MAP_START(good_state::good_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+void good_state::good_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
 
 	//AM_RANGE(0x270000, 0x270007) AM_RAM // scroll?
-	AM_RANGE(0x270000, 0x270001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	map(0x270001, 0x270001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")
-	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")
-	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("IN2")
+	map(0x280000, 0x280001).portr("IN0");
+	map(0x280002, 0x280003).portr("IN1");
+	map(0x280004, 0x280005).portr("IN2");
 
-	AM_RANGE(0x800000, 0x8007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0x800000, 0x8007ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_SHARE("fg_tilemapram")
-	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_SHARE("bg_tilemapram")
+	map(0x820000, 0x820fff).ram().w(this, FUNC(good_state::fg_tilemapram_w)).share("fg_tilemapram");
+	map(0x822000, 0x822fff).ram().w(this, FUNC(good_state::bg_tilemapram_w)).share("bg_tilemapram");
 
-	AM_RANGE(0xff0000, 0xffefff) AM_RAM
-ADDRESS_MAP_END
+	map(0xff0000, 0xffefff).ram();
+}
 
 static INPUT_PORTS_START( good )
 	PORT_START("IN0")

@@ -225,17 +225,18 @@ WRITE8_MEMBER(igt_gameking_state::unk_w)
 }
 
 
-ADDRESS_MAP_START(igt_gameking_state::igt_gameking_map)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x08000000, 0x081fffff) AM_ROM AM_REGION("game", 0)
-	AM_RANGE(0x08200000, 0x083fffff) AM_ROM AM_REGION("plx", 0)
+void igt_gameking_state::igt_gameking_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom().region("maincpu", 0);
+	map(0x08000000, 0x081fffff).rom().region("game", 0);
+	map(0x08200000, 0x083fffff).rom().region("plx", 0);
 
 
 	// it's unclear how much of this is saved and how much total RAM there is.
-	AM_RANGE(0x10000000, 0x1001ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x10020000, 0x17ffffff) AM_RAM
+	map(0x10000000, 0x1001ffff).ram().share("nvram");
+	map(0x10020000, 0x17ffffff).ram();
 
-	AM_RANGE(0x18000000, 0x181fffff) AM_RAM AM_SHARE("vram") // igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
+	map(0x18000000, 0x181fffff).ram().share("vram"); // igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
 
 	// 28000000: MEZ2 SEL, also connected to ymz chip select?
 	// 28010000: first 28C94 QUART (QRT1 SEL)
@@ -245,36 +246,37 @@ ADDRESS_MAP_START(igt_gameking_state::igt_gameking_map)
 	// 28050000: SOUND SEL
 	// 28060000: COLOR SEL
 	// 28070000: OUT SEL
-//  AM_RANGE(0x28010000, 0x2801007f) AM_DEVREADWRITE8("quart1", sc28c94_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x28010008, 0x2801000b) AM_READ(uart_status_r)
-	AM_RANGE(0x2801001c, 0x2801001f) AM_WRITENOP
-	AM_RANGE(0x28010030, 0x28010033) AM_READ(uart_status_r) // channel D
-	AM_RANGE(0x28010034, 0x28010037) AM_WRITE(uart_w)       // channel D
-	AM_RANGE(0x28020000, 0x280205ff) AM_RAM // CMOS?
-//  AM_RANGE(0x28020000, 0x2802007f) AM_READ(igt_gk_28010008_r) AM_WRITENOP
-	AM_RANGE(0x28030000, 0x28030003) AM_READ_PORT("IN0")
-//  AM_RANGE(0x28040000, 0x2804007f) AM_DEVREADWRITE8("quart2", sc28c94_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x28040008, 0x2804000b) AM_WRITE8(unk_w,0x00ff0000)
-	AM_RANGE(0x28040008, 0x2804000b) AM_READWRITE8(irq_vector_r,irq_enable_w,0x000000ff)
-	AM_RANGE(0x28040018, 0x2804001b) AM_READ_PORT("IN1") AM_WRITENOP
-	AM_RANGE(0x2804001c, 0x2804001f) AM_READ_PORT("IN4") AM_WRITENOP
-	AM_RANGE(0x28040028, 0x2804002b) AM_READNOP AM_WRITE8(irq_ack_w,0x00ff0000)
-	//  AM_RANGE(0x28040038, 0x2804003b) AM_READ8(timer_r,0x00ff0000)
-	AM_RANGE(0x28040038, 0x2804003b) AM_READ_PORT("IN2") AM_WRITENOP
-	AM_RANGE(0x2804003c, 0x2804003f) AM_READ_PORT("IN3") AM_WRITENOP
-	AM_RANGE(0x28040050, 0x28040053) AM_READ8(frame_number_r,0x000000ff)
-	AM_RANGE(0x28040054, 0x28040057) AM_WRITENOP
-//  AM_RANGE(0x28040054, 0x28040057) AM_WRITE8(irq_ack_w,0x000000ff)
+//  map(0x28010000, 0x2801007f).rw("quart1", FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
+	map(0x28010008, 0x2801000b).r(this, FUNC(igt_gameking_state::uart_status_r));
+	map(0x2801001c, 0x2801001f).nopw();
+	map(0x28010030, 0x28010033).r(this, FUNC(igt_gameking_state::uart_status_r)); // channel D
+	map(0x28010034, 0x28010037).w(this, FUNC(igt_gameking_state::uart_w));       // channel D
+	map(0x28020000, 0x280205ff).ram(); // CMOS?
+//  map(0x28020000, 0x2802007f).r(this, FUNC(igt_gameking_state::igt_gk_28010008_r)).nopw();
+	map(0x28030000, 0x28030003).portr("IN0");
+//  map(0x28040000, 0x2804007f).rw("quart2", FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
+	map(0x2804000a, 0x2804000a).w(this, FUNC(igt_gameking_state::unk_w));
+	map(0x28040008, 0x28040008).rw(this, FUNC(igt_gameking_state::irq_vector_r), FUNC(igt_gameking_state::irq_enable_w));
+	map(0x28040018, 0x2804001b).portr("IN1").nopw();
+	map(0x2804001c, 0x2804001f).portr("IN4").nopw();
+	map(0x28040028, 0x2804002b).nopr();
+	map(0x2804002a, 0x2804002a).w(this, FUNC(igt_gameking_state::irq_ack_w));
+//  map(0x28040038, 0x2804003b).r(this, FUNC(igt_gameking_state::timer_r)).umask32(0x00ff0000);
+	map(0x28040038, 0x2804003b).portr("IN2").nopw();
+	map(0x2804003c, 0x2804003f).portr("IN3").nopw();
+	map(0x28040050, 0x28040050).r(this, FUNC(igt_gameking_state::frame_number_r));
+	map(0x28040054, 0x28040057).nopw();
+//  map(0x28040054, 0x28040057).w(this, FUNC(igt_gameking_state::irq_ack_w).umask32(0x000000ff);
 
-	AM_RANGE(0x28050000, 0x28050003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x28060000, 0x28060003) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0x000000ff )
-	AM_RANGE(0x28060000, 0x28060003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0x00ff0000 )
-	AM_RANGE(0x28060004, 0x28060007) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0x000000ff )
+	map(0x28050000, 0x28050003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x00ff00ff);
+	map(0x28060000, 0x28060000).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x28060002, 0x28060002).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x28060004, 0x28060004).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0x3b000000, 0x3b1fffff) AM_ROM AM_REGION("snd", 0)
+	map(0x3b000000, 0x3b1fffff).rom().region("snd", 0);
 
-	AM_RANGE(0xa1000000, 0xa1011fff) AM_RAM // used by gkkey for restart IAC
-ADDRESS_MAP_END
+	map(0xa1000000, 0xa1011fff).ram(); // used by gkkey for restart IAC
+}
 
 READ16_MEMBER(igt_gameking_state::version_r)
 {
@@ -288,11 +290,12 @@ READ8_MEMBER(igt_gameking_state::timer_r)
 	return m_timer_count++;
 }
 
-ADDRESS_MAP_START(igt_gameking_state::igt_ms72c_map)
-	AM_IMPORT_FROM( igt_gameking_map )
-	AM_RANGE(0x18200000, 0x18200003) AM_READ16(version_r, 0x0000ffff)
-	AM_RANGE(0x28040038, 0x2804003b) AM_READ8(timer_r,0x00ff0000)
-ADDRESS_MAP_END
+void igt_gameking_state::igt_ms72c_map(address_map &map)
+{
+	igt_gameking_map(map);
+	map(0x18200000, 0x18200001).r(this, FUNC(igt_gameking_state::version_r));
+	map(0x2804003a, 0x2804003a).r(this, FUNC(igt_gameking_state::timer_r));
+}
 
 static INPUT_PORTS_START( igt_gameking )
 	PORT_START("IN0")
@@ -568,9 +571,10 @@ static GFXDECODE_START( igt_gameking )
 	GFXDECODE_ENTRY( "cg", 0, igt_gameking_layout,   0x0, 1  )
 GFXDECODE_END
 
-ADDRESS_MAP_START(igt_gameking_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void igt_gameking_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 void igt_gameking_state::machine_start()
 {

@@ -466,46 +466,49 @@ WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
 
 // Memory Maps
 
-ADDRESS_MAP_START(v1050_state::v1050_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank4")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank5")
-ADDRESS_MAP_END
+void v1050_state::v1050_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).bankrw("bank1");
+	map(0x2000, 0x3fff).bankrw("bank2");
+	map(0x4000, 0x7fff).bankrw("bank3");
+	map(0x8000, 0xbfff).bankrw("bank4");
+	map(0xc000, 0xffff).bankrw("bank5");
+}
 
-ADDRESS_MAP_START(v1050_state::v1050_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(I8255A_DISP_TAG, i8255_device, read, write)
+void v1050_state::v1050_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x84, 0x87).rw(m_ppi_disp, FUNC(i8255_device::read), FUNC(i8255_device::write));
 //  AM_RANGE(0x88, 0x88) AM_DEVREADWRITE(I8251A_KB_TAG, i8251_device, data_r, data_w)
 //  AM_RANGE(0x89, 0x89) AM_DEVREADWRITE(I8251A_KB_TAG, i8251_device, status_r, control_w)
-	AM_RANGE(0x88, 0x88) AM_READ(kb_data_r) AM_DEVWRITE(I8251A_KB_TAG, i8251_device, data_w)
-	AM_RANGE(0x89, 0x89) AM_READ(kb_status_r) AM_DEVWRITE(I8251A_KB_TAG, i8251_device, control_w)
-	AM_RANGE(0x8c, 0x8c) AM_DEVREADWRITE(I8251A_SIO_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0x8d, 0x8d) AM_DEVREADWRITE(I8251A_SIO_TAG, i8251_device, status_r, control_w)
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE(I8255A_MISC_TAG, i8255_device, read, write)
-	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE(MB8877_TAG, mb8877_device, read, write)
-	AM_RANGE(0x9c, 0x9f) AM_DEVREADWRITE(I8255A_RTC_TAG, i8255_device, read, write)
-	AM_RANGE(0xa0, 0xa0) AM_READWRITE(vint_clr_r, vint_clr_w)
-	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(v1050_i8214_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(bank_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(sasi_data_w) AM_DEVREAD("scsi_data_in", input_buffer_device, read)
-	AM_RANGE(0xe1, 0xe1) AM_DEVREAD("scsi_ctrl_in", input_buffer_device, read) AM_WRITE(sasi_ctrl_w)
-ADDRESS_MAP_END
+	map(0x88, 0x88).r(this, FUNC(v1050_state::kb_data_r)).w(m_uart_kb, FUNC(i8251_device::data_w));
+	map(0x89, 0x89).r(this, FUNC(v1050_state::kb_status_r)).w(m_uart_kb, FUNC(i8251_device::control_w));
+	map(0x8c, 0x8c).rw(m_uart_sio, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x8d, 0x8d).rw(m_uart_sio, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x90, 0x93).rw(I8255A_MISC_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x94, 0x97).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write));
+	map(0x9c, 0x9f).rw(I8255A_RTC_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa0, 0xa0).rw(this, FUNC(v1050_state::vint_clr_r), FUNC(v1050_state::vint_clr_w));
+	map(0xb0, 0xb0).rw(this, FUNC(v1050_state::dint_clr_r), FUNC(v1050_state::dint_clr_w));
+	map(0xc0, 0xc0).w(this, FUNC(v1050_state::v1050_i8214_w));
+	map(0xd0, 0xd0).w(this, FUNC(v1050_state::bank_w));
+	map(0xe0, 0xe0).w(this, FUNC(v1050_state::sasi_data_w)).r(m_sasi_data_in, FUNC(input_buffer_device::read));
+	map(0xe1, 0xe1).r(m_sasi_ctrl_in, FUNC(input_buffer_device::read)).w(this, FUNC(v1050_state::sasi_ctrl_w));
+}
 
-ADDRESS_MAP_START(v1050_state::v1050_crt_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(videoram_r, videoram_w) AM_SHARE("video_ram")
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(H46505_TAG, mc6845_device, address_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREADWRITE(H46505_TAG, mc6845_device, register_r, register_w)
-	AM_RANGE(0x9000, 0x9003) AM_DEVREADWRITE(I8255A_M6502_TAG, i8255_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READWRITE(attr_r, attr_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(dint_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(dvint_clr_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void v1050_state::v1050_crt_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rw(this, FUNC(v1050_state::videoram_r), FUNC(v1050_state::videoram_w)).share("video_ram");
+	map(0x8000, 0x8000).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x8001, 0x8001).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x9000, 0x9003).rw(m_ppi_6502, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa000, 0xa000).rw(this, FUNC(v1050_state::attr_r), FUNC(v1050_state::attr_w));
+	map(0xb000, 0xb000).w(this, FUNC(v1050_state::dint_w));
+	map(0xc000, 0xc000).w(this, FUNC(v1050_state::dvint_clr_w));
+	map(0xe000, 0xffff).rom();
+}
 
 // Input Ports
 

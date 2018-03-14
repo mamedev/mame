@@ -441,7 +441,9 @@ void pit68230_device::wr_pitreg_pcddr(uint8_t data)
 
 void pit68230_device::wr_pitreg_pivr(uint8_t data)
 {
-	LOG("%s(%02x) \"%s\": Not implemented yet\n", FUNCNAME, data, tag());
+	LOG("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data);
+	LOGSETUP("%s PIVR: %02x\n", tag(), data);
+	m_pivr = data & 0xfc; // lowest two bits are read as zero
 }
 
 void pit68230_device::wr_pitreg_pacr(uint8_t data)

@@ -64,59 +64,63 @@ READ16_MEMBER(deadang_state::ghunter_trackball_high_r)
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(deadang_state::main_map)
-	AM_RANGE(0x00000, 0x037ff) AM_RAM
-	AM_RANGE(0x03800, 0x03fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x05000, 0x05fff) AM_WRITEONLY
-	AM_RANGE(0x06000, 0x0600f) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
-	AM_RANGE(0x06010, 0x07fff) AM_WRITEONLY
-	AM_RANGE(0x08000, 0x087ff) AM_WRITE(text_w) AM_SHARE("videoram")
-	AM_RANGE(0x08800, 0x0bfff) AM_WRITEONLY
-	AM_RANGE(0x0a000, 0x0a001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x0a002, 0x0a003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0c000, 0x0cfff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x0d000, 0x0dfff) AM_WRITEONLY
-	AM_RANGE(0x0e000, 0x0e0ff) AM_WRITEONLY AM_SHARE("scroll_ram")
-	AM_RANGE(0x0e100, 0x0ffff) AM_WRITEONLY
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void deadang_state::main_map(address_map &map)
+{
+	map(0x00000, 0x037ff).ram();
+	map(0x03800, 0x03fff).ram().share("spriteram");
+	map(0x04000, 0x04fff).ram().share("share1");
+	map(0x05000, 0x05fff).writeonly();
+	map(0x06000, 0x0600f).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
+	map(0x06010, 0x07fff).writeonly();
+	map(0x08000, 0x087ff).w(this, FUNC(deadang_state::text_w)).share("videoram");
+	map(0x08800, 0x0bfff).writeonly();
+	map(0x0a000, 0x0a001).portr("P1_P2");
+	map(0x0a002, 0x0a003).portr("DSW");
+	map(0x0c000, 0x0cfff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x0d000, 0x0dfff).writeonly();
+	map(0x0e000, 0x0e0ff).writeonly().share("scroll_ram");
+	map(0x0e100, 0x0ffff).writeonly();
+	map(0xc0000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(deadang_state::sub_map)
-	AM_RANGE(0x00000, 0x037ff) AM_RAM
-	AM_RANGE(0x03800, 0x03fff) AM_RAM_WRITE(foreground_w) AM_SHARE("video_data")
-	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x08000, 0x08001) AM_WRITE(bank_w)
-	AM_RANGE(0x0c000, 0x0c001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void deadang_state::sub_map(address_map &map)
+{
+	map(0x00000, 0x037ff).ram();
+	map(0x03800, 0x03fff).ram().w(this, FUNC(deadang_state::foreground_w)).share("video_data");
+	map(0x04000, 0x04fff).ram().share("share1");
+	map(0x08000, 0x08001).w(this, FUNC(deadang_state::bank_w));
+	map(0x0c000, 0x0c001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0xe0000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(deadang_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
-	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm1", seibu_adpcm_device, adr_w)
-	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
-	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
-	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("adpcm1", seibu_adpcm_device, ctl_w)
-	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
-	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_device, adr_w)
-	AM_RANGE(0x6008, 0x6009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_device, ctl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
-ADDRESS_MAP_END
+void deadang_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).r("sei80bu", FUNC(sei80bu_device::data_r));
+	map(0x2000, 0x27ff).ram();
+	map(0x4000, 0x4000).w(m_seibu_sound, FUNC(seibu_sound_device::pending_w));
+	map(0x4001, 0x4001).w(m_seibu_sound, FUNC(seibu_sound_device::irq_clear_w));
+	map(0x4002, 0x4002).w(m_seibu_sound, FUNC(seibu_sound_device::rst10_ack_w));
+	map(0x4003, 0x4003).w(m_seibu_sound, FUNC(seibu_sound_device::rst18_ack_w));
+	map(0x4005, 0x4006).w(m_adpcm1, FUNC(seibu_adpcm_device::adr_w));
+	map(0x4007, 0x4007).w(m_seibu_sound, FUNC(seibu_sound_device::bank_w));
+	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
+	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
+	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
+	map(0x4013, 0x4013).portr("COIN");
+	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
+	map(0x401a, 0x401a).w(m_adpcm1, FUNC(seibu_adpcm_device::ctl_w));
+	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
+	map(0x6005, 0x6006).w(m_adpcm2, FUNC(seibu_adpcm_device::adr_w));
+	map(0x6008, 0x6009).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x601a, 0x601a).w(m_adpcm2, FUNC(seibu_adpcm_device::ctl_w));
+	map(0x8000, 0xffff).bankr("seibu_bank1");
+}
 
-ADDRESS_MAP_START(deadang_state::sound_decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
-ADDRESS_MAP_END
+void deadang_state::sound_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x1fff).r("sei80bu", FUNC(sei80bu_device::opcode_r));
+	map(0x8000, 0xffff).bankr("seibu_bank1");
+}
 
 /* Input Ports */
 

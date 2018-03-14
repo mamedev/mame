@@ -78,18 +78,19 @@ READ16_MEMBER(aztarac_state::joystick_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(aztarac_state::main_map)
-	AM_RANGE(0x000000, 0x00bfff) AM_ROM
-	AM_RANGE(0x022000, 0x0220ff) AM_READ(nvram_r) AM_WRITEONLY AM_SHARE("nvram")
-	AM_RANGE(0x027000, 0x027001) AM_READ(joystick_r)
-	AM_RANGE(0x027004, 0x027005) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x027008, 0x027009) AM_READWRITE(sound_r, sound_w)
-	AM_RANGE(0x02700c, 0x02700d) AM_READ_PORT("DIAL")
-	AM_RANGE(0x02700e, 0x02700f) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0xff8000, 0xffafff) AM_RAM AM_SHARE("vectorram")
-	AM_RANGE(0xffb000, 0xffb001) AM_WRITE(ubr_w)
-	AM_RANGE(0xffe000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void aztarac_state::main_map(address_map &map)
+{
+	map(0x000000, 0x00bfff).rom();
+	map(0x022000, 0x0220ff).r(this, FUNC(aztarac_state::nvram_r)).writeonly().share("nvram");
+	map(0x027000, 0x027001).r(this, FUNC(aztarac_state::joystick_r));
+	map(0x027004, 0x027005).portr("INPUTS");
+	map(0x027008, 0x027009).rw(this, FUNC(aztarac_state::sound_r), FUNC(aztarac_state::sound_w));
+	map(0x02700c, 0x02700d).portr("DIAL");
+	map(0x02700e, 0x02700f).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
+	map(0xff8000, 0xffafff).ram().share("vectorram");
+	map(0xffb000, 0xffb001).w(this, FUNC(aztarac_state::ubr_w));
+	map(0xffe000, 0xffffff).ram();
+}
 
 
 
@@ -99,16 +100,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(aztarac_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_READ(snd_command_r)
-	AM_RANGE(0x8c00, 0x8c01) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_address_w)
-	AM_RANGE(0x8c02, 0x8c03) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_address_w)
-	AM_RANGE(0x8c04, 0x8c05) AM_DEVREADWRITE("ay3", ay8910_device, data_r, data_address_w)
-	AM_RANGE(0x8c06, 0x8c07) AM_DEVREADWRITE("ay4", ay8910_device, data_r, data_address_w)
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(snd_status_r, snd_status_w)
-ADDRESS_MAP_END
+void aztarac_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8800).r(this, FUNC(aztarac_state::snd_command_r));
+	map(0x8c00, 0x8c01).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_address_w));
+	map(0x8c02, 0x8c03).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_address_w));
+	map(0x8c04, 0x8c05).rw("ay3", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_address_w));
+	map(0x8c06, 0x8c07).rw("ay4", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_address_w));
+	map(0x9000, 0x9000).rw(this, FUNC(aztarac_state::snd_status_r), FUNC(aztarac_state::snd_status_w));
+}
 
 
 

@@ -27,8 +27,9 @@ private:
 	//required_region_ptr<u8> m_p_chargen;
 };
 
-ADDRESS_MAP_START(terminals_state::mem_map)
-ADDRESS_MAP_END
+void terminals_state::mem_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( terminals )
 INPUT_PORTS_END

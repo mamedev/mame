@@ -101,33 +101,35 @@ WRITE16_MEMBER(gotcha_state::gotcha_oki_bank_w)
 }
 
 
-ADDRESS_MAP_START(gotcha_state::gotcha_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(gotcha_lamps_w)
-	AM_RANGE(0x100004, 0x100005) AM_WRITE(gotcha_oki_bank_w)
-	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1405ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("DSW")
-	AM_RANGE(0x300000, 0x300001) AM_WRITE(gotcha_gfxbank_select_w)
-	AM_RANGE(0x300002, 0x300009) AM_WRITE(gotcha_scroll_w)
+void gotcha_state::gotcha_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100001, 0x100001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x100002, 0x100003).w(this, FUNC(gotcha_state::gotcha_lamps_w));
+	map(0x100004, 0x100005).w(this, FUNC(gotcha_state::gotcha_oki_bank_w));
+	map(0x120000, 0x12ffff).ram();
+	map(0x140000, 0x1405ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x160000, 0x1607ff).ram().share("spriteram");
+	map(0x180000, 0x180001).portr("INPUTS");
+	map(0x180002, 0x180003).portr("SYSTEM");
+	map(0x180004, 0x180005).portr("DSW");
+	map(0x300000, 0x300001).w(this, FUNC(gotcha_state::gotcha_gfxbank_select_w));
+	map(0x300002, 0x300009).w(this, FUNC(gotcha_state::gotcha_scroll_w));
 //  { 0x30000c, 0x30000d,
-	AM_RANGE(0x30000e, 0x30000f) AM_WRITE(gotcha_gfxbank_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE(gotcha_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE(gotcha_bgvideoram_w) AM_SHARE("bgvideoram")
-ADDRESS_MAP_END
+	map(0x30000e, 0x30000f).w(this, FUNC(gotcha_state::gotcha_gfxbank_w));
+	map(0x320000, 0x320fff).w(this, FUNC(gotcha_state::gotcha_fgvideoram_w)).share("fgvideoram");
+	map(0x322000, 0x322fff).w(this, FUNC(gotcha_state::gotcha_bgvideoram_w)).share("bgvideoram");
+}
 
 
-ADDRESS_MAP_START(gotcha_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write) AM_MIRROR(1)
-	AM_RANGE(0xc006, 0xc006) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-ADDRESS_MAP_END
+void gotcha_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xc002, 0xc002).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).mirror(1);
+	map(0xc006, 0xc006).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xd000, 0xd7ff).ram();
+}
 
 
 

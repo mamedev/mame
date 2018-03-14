@@ -56,23 +56,25 @@ READ8_MEMBER( z80dev_state::test_r )
 	return machine().rand();
 }
 
-ADDRESS_MAP_START(z80dev_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x1000, 0x10ff) AM_RAM
-ADDRESS_MAP_END
+void z80dev_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom();
+	map(0x1000, 0x10ff).ram();
+}
 
-ADDRESS_MAP_START(z80dev_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK (0xff)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("LINE0")
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("LINE1")
-	AM_RANGE(0x22, 0x22) AM_READ_PORT("LINE2")
-	AM_RANGE(0x23, 0x23) AM_READ_PORT("LINE3")
-	AM_RANGE(0x20, 0x25) AM_WRITE(display_w)
+void z80dev_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x20, 0x20).portr("LINE0");
+	map(0x21, 0x21).portr("LINE1");
+	map(0x22, 0x22).portr("LINE2");
+	map(0x23, 0x23).portr("LINE3");
+	map(0x20, 0x25).w(this, FUNC(z80dev_state::display_w));
 
-	AM_RANGE(0x13, 0x13) AM_READ(test_r)
-ADDRESS_MAP_END
+	map(0x13, 0x13).r(this, FUNC(z80dev_state::test_r));
+}
 
 /* Input ports */
 INPUT_PORTS_START( z80dev )

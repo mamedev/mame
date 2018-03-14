@@ -181,29 +181,30 @@ WRITE8_MEMBER(drgnmst_state::drgnmst_snd_control_w)
 
 /***************************** 68000 Memory Map *****************************/
 
-ADDRESS_MAP_START(drgnmst_state::drgnmst_main_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x800018, 0x800019) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x80001a, 0x80001b) AM_READ_PORT("DSW1")
-	AM_RANGE(0x80001c, 0x80001d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800030, 0x800031) AM_WRITE(drgnmst_coin_w)
-	AM_RANGE(0x800100, 0x80011f) AM_WRITEONLY AM_SHARE("vidregs")
-	AM_RANGE(0x800120, 0x800121) AM_WRITENOP
-	AM_RANGE(0x80014a, 0x80014b) AM_WRITENOP
-	AM_RANGE(0x800154, 0x800155) AM_WRITEONLY AM_SHARE("vidregs2") // seems to be priority control
-	AM_RANGE(0x800176, 0x800177) AM_READ_PORT("EXTRA")
-	AM_RANGE(0x800180, 0x800181) AM_WRITE(drgnmst_snd_command_w)
-	AM_RANGE(0x800188, 0x800189) AM_WRITE(drgnmst_snd_flag_w)
-	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITENOP
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(drgnmst_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x904000, 0x907fff) AM_RAM_WRITE(drgnmst_md_videoram_w) AM_SHARE("md_videoram")
-	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(drgnmst_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(drgnmst_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x920000, 0x923fff) AM_RAM AM_SHARE("rowscrollram") // rowscroll ram
-	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void drgnmst_state::drgnmst_main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x800000, 0x800001).portr("P1_P2");
+	map(0x800018, 0x800019).portr("SYSTEM");
+	map(0x80001a, 0x80001b).portr("DSW1");
+	map(0x80001c, 0x80001d).portr("DSW2");
+	map(0x800030, 0x800031).w(this, FUNC(drgnmst_state::drgnmst_coin_w));
+	map(0x800100, 0x80011f).writeonly().share("vidregs");
+	map(0x800120, 0x800121).nopw();
+	map(0x80014a, 0x80014b).nopw();
+	map(0x800154, 0x800155).writeonly().share("vidregs2"); // seems to be priority control
+	map(0x800176, 0x800177).portr("EXTRA");
+	map(0x800180, 0x800181).w(this, FUNC(drgnmst_state::drgnmst_snd_command_w));
+	map(0x800188, 0x800189).w(this, FUNC(drgnmst_state::drgnmst_snd_flag_w));
+	map(0x8001e0, 0x8001e1).nopw();
+	map(0x900000, 0x903fff).ram().w(this, FUNC(drgnmst_state::drgnmst_paletteram_w)).share("paletteram");
+	map(0x904000, 0x907fff).ram().w(this, FUNC(drgnmst_state::drgnmst_md_videoram_w)).share("md_videoram");
+	map(0x908000, 0x90bfff).ram().w(this, FUNC(drgnmst_state::drgnmst_bg_videoram_w)).share("bg_videoram");
+	map(0x90c000, 0x90ffff).ram().w(this, FUNC(drgnmst_state::drgnmst_fg_videoram_w)).share("fg_videoram");
+	map(0x920000, 0x923fff).ram().share("rowscrollram"); // rowscroll ram
+	map(0x930000, 0x9307ff).ram().share("spriteram");   // Sprites
+	map(0xff0000, 0xffffff).ram();
+}
 
 
 static INPUT_PORTS_START( drgnmst )

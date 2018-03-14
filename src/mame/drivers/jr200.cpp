@@ -372,29 +372,30 @@ WRITE8_MEMBER(jr200_state::mn1271_io_w)
 	}
 }
 
-ADDRESS_MAP_START(jr200_state::jr200_mem)
+void jr200_state::jr200_mem(address_map &map)
+{
 /*
     0000-3fff RAM
     4000-4fff RAM ( 4k expansion)
     4000-7fff RAM (16k expansion)
     4000-bfff RAM (32k expansion)
 */
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
+	map(0x0000, 0x7fff).ram();
 
-	AM_RANGE(0xa000, 0xbfff) AM_ROM
+	map(0xa000, 0xbfff).rom();
 
-	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(jr200_pcg_1_r,jr200_pcg_1_w) //PCG area (1)
-	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xc400, 0xc4ff) AM_READWRITE(jr200_pcg_2_r,jr200_pcg_2_w) //PCG area (2)
-	AM_RANGE(0xc500, 0xc7ff) AM_RAM AM_SHARE("cram")
+	map(0xc000, 0xc0ff).rw(this, FUNC(jr200_state::jr200_pcg_1_r), FUNC(jr200_state::jr200_pcg_1_w)); //PCG area (1)
+	map(0xc100, 0xc3ff).ram().share("vram");
+	map(0xc400, 0xc4ff).rw(this, FUNC(jr200_state::jr200_pcg_2_r), FUNC(jr200_state::jr200_pcg_2_w)); //PCG area (2)
+	map(0xc500, 0xc7ff).ram().share("cram");
 
 //  0xc800 - 0xcfff I / O area
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(mn1271_io_r,mn1271_io_w) AM_SHARE("mn1271_ram")
+	map(0xc800, 0xcfff).rw(this, FUNC(jr200_state::mn1271_io_r), FUNC(jr200_state::mn1271_io_w)).share("mn1271_ram");
 
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(jr200_bios_char_r,jr200_bios_char_w) //BIOS PCG RAM area
-	AM_RANGE(0xd800, 0xdfff) AM_ROM // cart space (header 0x7e)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xd000, 0xd7ff).rw(this, FUNC(jr200_state::jr200_bios_char_r), FUNC(jr200_state::jr200_bios_char_w)); //BIOS PCG RAM area
+	map(0xd800, 0xdfff).rom(); // cart space (header 0x7e)
+	map(0xe000, 0xffff).rom();
+}
 
 /* Input ports */
 static INPUT_PORTS_START( jr200 )

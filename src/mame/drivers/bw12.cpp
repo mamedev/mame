@@ -168,23 +168,25 @@ READ8_MEMBER( bw12_state::ls259_r )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(bw12_state::bw12_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x8000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void bw12_state::bw12_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).bankrw("bank1");
+	map(0x8000, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram().share("video_ram");
+}
 
-ADDRESS_MAP_START(bw12_state::bw12_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(ls259_r, ls259_w)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
-	AM_RANGE(0x20, 0x21) AM_MIRROR(0x0e) AM_DEVICE(UPD765_TAG, upd765a_device, map)
-	AM_RANGE(0x30, 0x33) AM_MIRROR(0x0c) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x0c) AM_DEVREADWRITE(PIT8253_TAG, pit8253_device, read, write)
-ADDRESS_MAP_END
+void bw12_state::bw12_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x0f).rw(this, FUNC(bw12_state::ls259_r), FUNC(bw12_state::ls259_w));
+	map(0x10, 0x10).mirror(0x0e).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x11, 0x11).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x20, 0x21).mirror(0x0e).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x30, 0x33).mirror(0x0c).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x40, 0x43).mirror(0x0c).rw(m_sio, FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
+	map(0x50, 0x50).mirror(0x0f).w("dac", FUNC(dac_byte_interface::write));
+	map(0x60, 0x63).mirror(0x0c).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+}
 
 /* Input Ports */
 

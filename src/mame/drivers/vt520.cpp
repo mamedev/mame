@@ -36,9 +36,10 @@ public:
 };
 
 
-ADDRESS_MAP_START(vt520_state::vt520_mem)
-	AM_RANGE(0x0000, 0xffff) AM_RAMBANK("bank1")
-ADDRESS_MAP_END
+void vt520_state::vt520_mem(address_map &map)
+{
+	map(0x0000, 0xffff).bankrw("bank1");
+}
 
 /*
     On the board there is TC160G41AF (1222) custom chip
@@ -53,10 +54,11 @@ READ8_MEMBER( vt520_state::vt520_some_r )
 	return 0x40;
 }
 
-ADDRESS_MAP_START(vt520_state::vt520_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x7ffb, 0x7ffb) AM_READ(vt520_some_r)
-ADDRESS_MAP_END
+void vt520_state::vt520_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x7ffb, 0x7ffb).r(this, FUNC(vt520_state::vt520_some_r));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vt520 )

@@ -52,15 +52,16 @@ private:
 
 
 
-ADDRESS_MAP_START(jonos_state::jonos_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x1800, 0x27ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3001) AM_WRITE(cursor_w) // unknown device
-	AM_RANGE(0x4000, 0x4001) // unknown device
-	AM_RANGE(0x5000, 0x5003) AM_READ(keyboard_r) // unknown device
-	AM_RANGE(0x6000, 0x6001) // unknown device
-ADDRESS_MAP_END
+void jonos_state::jonos_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom().region("roms", 0);
+	map(0x1800, 0x27ff).ram().share("videoram");
+	map(0x3000, 0x3001).w(this, FUNC(jonos_state::cursor_w)); // unknown device
+	map(0x4000, 0x4001); // unknown device
+	map(0x5000, 0x5003).r(this, FUNC(jonos_state::keyboard_r)); // unknown device
+	map(0x6000, 0x6001); // unknown device
+}
 
 /* Input ports */
 static INPUT_PORTS_START( jonos )

@@ -140,51 +140,54 @@ WRITE8_MEMBER(wc90b_state::slave_irq_ack_w)
 }
 
 
-ADDRESS_MAP_START(wc90b_state::wc90b_map1)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM /* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("mainbank")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(sound_command_w)
-	AM_RANGE(0xfd04, 0xfd04) AM_WRITEONLY AM_SHARE("scroll1y")
-	AM_RANGE(0xfd06, 0xfd06) AM_WRITEONLY AM_SHARE("scroll1x")
-	AM_RANGE(0xfd08, 0xfd08) AM_WRITEONLY AM_SHARE("scroll2y")
-	AM_RANGE(0xfd0a, 0xfd0a) AM_WRITEONLY AM_SHARE("scroll2x")
-	AM_RANGE(0xfd0e, 0xfd0e) AM_WRITEONLY AM_SHARE("scroll_x_lo")
-	AM_RANGE(0xfd00, 0xfd00) AM_READ_PORT("P1")
-	AM_RANGE(0xfd02, 0xfd02) AM_READ_PORT("P2")
-	AM_RANGE(0xfd06, 0xfd06) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfd08, 0xfd08) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfd0c, 0xfd0c) AM_READ(master_irq_ack_r)
-ADDRESS_MAP_END
+void wc90b_state::wc90b_map1(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram(); /* Main RAM */
+	map(0xa000, 0xafff).ram().w(this, FUNC(wc90b_state::fgvideoram_w)).share("fgvideoram");
+	map(0xc000, 0xcfff).ram().w(this, FUNC(wc90b_state::bgvideoram_w)).share("bgvideoram");
+	map(0xe000, 0xefff).ram().w(this, FUNC(wc90b_state::txvideoram_w)).share("txvideoram");
+	map(0xf000, 0xf7ff).bankr("mainbank");
+	map(0xf800, 0xfbff).ram().share("share1");
+	map(0xfc00, 0xfc00).w(this, FUNC(wc90b_state::bankswitch_w));
+	map(0xfd00, 0xfd00).w(this, FUNC(wc90b_state::sound_command_w));
+	map(0xfd04, 0xfd04).writeonly().share("scroll1y");
+	map(0xfd06, 0xfd06).writeonly().share("scroll1x");
+	map(0xfd08, 0xfd08).writeonly().share("scroll2y");
+	map(0xfd0a, 0xfd0a).writeonly().share("scroll2x");
+	map(0xfd0e, 0xfd0e).writeonly().share("scroll_x_lo");
+	map(0xfd00, 0xfd00).portr("P1");
+	map(0xfd02, 0xfd02).portr("P2");
+	map(0xfd06, 0xfd06).portr("DSW1");
+	map(0xfd08, 0xfd08).portr("DSW2");
+	map(0xfd0c, 0xfd0c).r(this, FUNC(wc90b_state::master_irq_ack_r));
+}
 
-ADDRESS_MAP_START(wc90b_state::wc90b_map2)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xe800, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(bankswitch1_w)
-	AM_RANGE(0xfd0c, 0xfd0c) AM_WRITE(slave_irq_ack_w)
-ADDRESS_MAP_END
+void wc90b_state::wc90b_map2(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xdfff).ram();
+	map(0xe000, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xe800, 0xefff).rom();
+	map(0xf000, 0xf7ff).bankr("subbank");
+	map(0xf800, 0xfbff).ram().share("share1");
+	map(0xfc00, 0xfc00).w(this, FUNC(wc90b_state::bankswitch1_w));
+	map(0xfd0c, 0xfd0c).w(this, FUNC(wc90b_state::slave_irq_ack_w));
+}
 
-ADDRESS_MAP_START(wc90b_state::sound_cpu)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audiobank")
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_control_w)
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_data_w)
-	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd1", ym2203_device, read, write)
-	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ymsnd2", ym2203_device, read, write)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void wc90b_state::sound_cpu(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0xe000, 0xe000).w(this, FUNC(wc90b_state::adpcm_control_w));
+	map(0xe400, 0xe400).w(this, FUNC(wc90b_state::adpcm_data_w));
+	map(0xe800, 0xe801).rw("ymsnd1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xec00, 0xec01).rw("ymsnd2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 

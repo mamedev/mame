@@ -139,14 +139,15 @@ private:
 
 ************************************************************/
 
-ADDRESS_MAP_START(mekd2_state::mekd2_mem)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM // user ram
-	AM_RANGE(0x8004, 0x8007) AM_DEVREADWRITE("pia_u", pia6821_device, read, write)
-	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0x8020, 0x8023) AM_DEVREADWRITE("pia_s", pia6821_device, read, write)
-	AM_RANGE(0xa000, 0xa07f) AM_RAM // system ram
-	AM_RANGE(0xe000, 0xe3ff) AM_ROM AM_MIRROR(0x1c00)   /* JBUG ROM */
-ADDRESS_MAP_END
+void mekd2_state::mekd2_mem(address_map &map)
+{
+	map(0x0000, 0x00ff).ram(); // user ram
+	map(0x8004, 0x8007).rw(m_pia_u, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8008, 0x8009).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x8020, 0x8023).rw(m_pia_s, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xa000, 0xa07f).ram(); // system ram
+	map(0xe000, 0xe3ff).rom().mirror(0x1c00);   /* JBUG ROM */
+}
 
 /***********************************************************
 

@@ -226,28 +226,30 @@ WRITE8_MEMBER( vidbrain_state::f3853_w )
 //  ADDRESS_MAP( vidbrain_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(vidbrain_state::vidbrain_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("res1", 0)
-	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x2300) AM_DEVREADWRITE(UV201_TAG, uv201_device, read, write)
-	AM_RANGE(0x0c00, 0x0fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_DEVREADWRITE(VIDEOBRAIN_EXPANSION_SLOT_TAG, videobrain_expansion_slot_device, cs1_r, cs1_w)
-	AM_RANGE(0x1800, 0x1fff) AM_DEVREADWRITE(VIDEOBRAIN_EXPANSION_SLOT_TAG, videobrain_expansion_slot_device, cs2_r, cs2_w)
-	AM_RANGE(0x2000, 0x27ff) AM_ROM AM_REGION("res2", 0)
-	AM_RANGE(0x3000, 0x3fff) AM_DEVREADWRITE(VIDEOBRAIN_EXPANSION_SLOT_TAG, videobrain_expansion_slot_device, unmap_r, unmap_w)
-ADDRESS_MAP_END
+void vidbrain_state::vidbrain_mem(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).rom().region("res1", 0);
+	map(0x0800, 0x08ff).mirror(0x2300).rw(m_uv, FUNC(uv201_device::read), FUNC(uv201_device::write));
+	map(0x0c00, 0x0fff).mirror(0x2000).ram();
+	map(0x1000, 0x17ff).rw(m_exp, FUNC(videobrain_expansion_slot_device::cs1_r), FUNC(videobrain_expansion_slot_device::cs1_w));
+	map(0x1800, 0x1fff).rw(m_exp, FUNC(videobrain_expansion_slot_device::cs2_r), FUNC(videobrain_expansion_slot_device::cs2_w));
+	map(0x2000, 0x27ff).rom().region("res2", 0);
+	map(0x3000, 0x3fff).rw(m_exp, FUNC(videobrain_expansion_slot_device::unmap_r), FUNC(videobrain_expansion_slot_device::unmap_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( vidbrain_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(vidbrain_state::vidbrain_io)
-	AM_RANGE(0x00, 0x00) AM_WRITE(keyboard_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(keyboard_r, sound_w)
-	AM_RANGE(0x0c, 0x0f) AM_WRITE(f3853_w)
+void vidbrain_state::vidbrain_io(address_map &map)
+{
+	map(0x00, 0x00).w(this, FUNC(vidbrain_state::keyboard_w));
+	map(0x01, 0x01).rw(this, FUNC(vidbrain_state::keyboard_r), FUNC(vidbrain_state::sound_w));
+	map(0x0c, 0x0f).w(this, FUNC(vidbrain_state::f3853_w));
 //  AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(F3853_TAG, f3853_device, read, write)
-ADDRESS_MAP_END
+}
 
 
 

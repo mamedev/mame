@@ -39,19 +39,21 @@ u32 qvt103_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	return 0;
 }
 
-ADDRESS_MAP_START(qvt103_state::mem_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("kbdmcu", i8741_device, upi41_master_r, upi41_master_w)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
+void qvt103_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom().region("maincpu", 0);
+	map(0x6000, 0x6001).rw("kbdmcu", FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w));
+	map(0x8000, 0x87ff).ram();
 	//AM_RANGE(0xa000, 0xa03f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
-	AM_RANGE(0xc000, 0xffff) AM_RAM // not entirely contiguous?
-ADDRESS_MAP_END
+	map(0xc000, 0xffff).ram(); // not entirely contiguous?
+}
 
-ADDRESS_MAP_START(qvt103_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("dart", z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void qvt103_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x14, 0x17).rw("dart", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x18, 0x1b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 static INPUT_PORTS_START( qvt103 )
 INPUT_PORTS_END

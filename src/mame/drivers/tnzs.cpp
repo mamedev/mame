@@ -720,155 +720,172 @@ WRITE8_MEMBER(kageki_state::csport_w)
 	}
 }
 
-ADDRESS_MAP_START(tnzs_base_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("mainbank", address_map_bank_device, amap8)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", seta001_device, spritectrl_w8)  /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("spritegen", seta001_device, spritebgflag_w8)   /* enable / disable background transparency */
-	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE(ramrom_bankswitch_w)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void tnzs_base_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).m(m_mainbank, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xcfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
+	map(0xd000, 0xdfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xe000, 0xefff).ram().share("share1");
+	map(0xf000, 0xf2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
+	map(0xf300, 0xf303).mirror(0xfc).w(m_seta001, FUNC(seta001_device::spritectrl_w8));  /* control registers (0x80 mirror used by Arkanoid 2) */
+	map(0xf400, 0xf400).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
+	map(0xf600, 0xf600).nopr().w(this, FUNC(tnzs_base_state::ramrom_bankswitch_w));
+	map(0xf800, 0xfbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(extrmatn_state::prompal_main_map)
-	AM_IMPORT_FROM(main_map)
+void extrmatn_state::prompal_main_map(address_map &map)
+{
+	main_map(map);
 	/* arknoid2, extrmatn, plumppop and drtoppel have PROMs instead of RAM */
 	/* drtoppel writes here anyway! (maybe leftover from tests during development) */
-	AM_RANGE(0xf800, 0xfbff) AM_WRITENOP
-ADDRESS_MAP_END
+	map(0xf800, 0xfbff).nopw();
+}
 
-ADDRESS_MAP_START(tnzsb_state::tnzsb_main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("mainbank", address_map_bank_device, amap8)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", seta001_device, spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("spritegen", seta001_device, spritebgflag_w8)   /* enable / disable background transparency */
-	AM_RANGE(0xf600, 0xf600) AM_WRITE(ramrom_bankswitch_w)
+void tnzsb_state::tnzsb_main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).m(m_mainbank, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xcfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
+	map(0xd000, 0xdfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xe000, 0xefff).ram().share("share1");
+	map(0xf000, 0xf2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
+	map(0xf300, 0xf303).mirror(0xfc).w(m_seta001, FUNC(seta001_device::spritectrl_w8)); /* control registers (0x80 mirror used by Arkanoid 2) */
+	map(0xf400, 0xf400).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
+	map(0xf600, 0xf600).w(this, FUNC(tnzsb_state::ramrom_bankswitch_w));
 	/* kabukiz still writes here but it's not used (it's paletteram in type1 map) */
-	AM_RANGE(0xf800, 0xfbff) AM_WRITENOP
-ADDRESS_MAP_END
+	map(0xf800, 0xfbff).nopw();
+}
 
-ADDRESS_MAP_START(tnzs_base_state::base_sub_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("subbank")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(bankswitch1_w)
-	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void tnzs_base_state::base_sub_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("subbank");
+	map(0xa000, 0xa000).w(this, FUNC(tnzs_base_state::bankswitch1_w));
+	map(0xb000, 0xb001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xefff).ram().share("share1");
+}
 
-ADDRESS_MAP_START(tnzs_mcu_state::tnzs_sub_map)
-	AM_IMPORT_FROM(base_sub_map)
-	AM_RANGE(0xc000, 0xc001) AM_READWRITE(mcu_r, mcu_w)   /* not present in insectx */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(bankswitch1_w)
-	AM_RANGE(0xf000, 0xf003) AM_READ(analog_r) /* paddles in arkanoid2/plumppop. The ports are */
+void tnzs_mcu_state::tnzs_sub_map(address_map &map)
+{
+	base_sub_map(map);
+	map(0xc000, 0xc001).rw(this, FUNC(tnzs_mcu_state::mcu_r), FUNC(tnzs_mcu_state::mcu_w));   /* not present in insectx */
+	map(0xa000, 0xa000).w(this, FUNC(tnzs_mcu_state::bankswitch1_w));
+	map(0xf000, 0xf003).r(this, FUNC(tnzs_mcu_state::analog_r)); /* paddles in arkanoid2/plumppop. The ports are */
 											   /* read but not used by the other games, and are not read at */
 											   /* all by insectx. */
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(arknoid2_state::arknoid2_sub_map)
-	AM_IMPORT_FROM(tnzs_sub_map)
-	AM_RANGE(0xc000, 0xc001) AM_READWRITE(mcu_r, mcu_w)
-ADDRESS_MAP_END
+void arknoid2_state::arknoid2_sub_map(address_map &map)
+{
+	tnzs_sub_map(map);
+	map(0xc000, 0xc001).rw(this, FUNC(arknoid2_state::mcu_r), FUNC(arknoid2_state::mcu_w));
+}
 
-ADDRESS_MAP_START(kageki_state::kageki_sub_map)
-	AM_IMPORT_FROM(base_sub_map)
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
+void kageki_state::kageki_sub_map(address_map &map)
+{
+	base_sub_map(map);
+	map(0xc000, 0xc000).portr("IN0");
+	map(0xc001, 0xc001).portr("IN1");
+	map(0xc002, 0xc002).portr("IN2");
+}
 
-ADDRESS_MAP_START(insectx_state::insectx_sub_map)
-	AM_IMPORT_FROM(base_sub_map)
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
+void insectx_state::insectx_sub_map(address_map &map)
+{
+	base_sub_map(map);
+	map(0xc000, 0xc000).portr("IN0");
+	map(0xc001, 0xc001).portr("IN1");
+	map(0xc002, 0xc002).portr("IN2");
+}
 
 /* the later board is different, it has a third CPU (and of course no mcu) */
 
-ADDRESS_MAP_START(tnzsb_state::tnzsb_base_sub_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("subbank")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(bankswitch1_w)
-	AM_RANGE(0xb002, 0xb002) AM_READ_PORT("DSWA")
-	AM_RANGE(0xb003, 0xb003) AM_READ_PORT("DSWB")
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(sound_command_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void tnzsb_state::tnzsb_base_sub_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("subbank");
+	map(0xa000, 0xa000).w(this, FUNC(tnzsb_state::bankswitch1_w));
+	map(0xb002, 0xb002).portr("DSWA");
+	map(0xb003, 0xb003).portr("DSWB");
+	map(0xb004, 0xb004).w(this, FUNC(tnzsb_state::sound_command_w));
+	map(0xc000, 0xc000).portr("IN0");
+	map(0xc001, 0xc001).portr("IN1");
+	map(0xc002, 0xc002).portr("IN2");
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xefff).ram().share("share1");
+}
 
-ADDRESS_MAP_START(tnzsb_state::tnzsb_sub_map)
-	AM_IMPORT_FROM(tnzsb_base_sub_map)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void tnzsb_state::tnzsb_sub_map(address_map &map)
+{
+	tnzsb_base_sub_map(map);
+	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(kabukiz_state::kabukiz_sub_map)
-	AM_IMPORT_FROM(tnzsb_base_sub_map)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void kabukiz_state::kabukiz_sub_map(address_map &map)
+{
+	tnzsb_base_sub_map(map);
+	map(0xf800, 0xfbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(tnzsb_state::tnzsb_cpu2_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-ADDRESS_MAP_END
+void tnzsb_state::tnzsb_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xdfff).ram();
+}
 
-ADDRESS_MAP_START(kabukiz_state::kabukiz_cpu2_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audiobank")
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void kabukiz_state::kabukiz_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(tnzsb_state::tnzsb_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void tnzsb_state::tnzsb_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x02, 0x02).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(jpopnics_state::jpopnics_main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("mainbank", address_map_bank_device, amap8)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1") /* WORK RAM (shared by the 2 z80's) */
-	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", seta001_device, spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("spritegen", seta001_device, spritebgflag_w8)   /* enable / disable background transparency */
-	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE(ramrom_bankswitch_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void jpopnics_state::jpopnics_main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).m(m_mainbank, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xcfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
+	map(0xd000, 0xdfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xe000, 0xefff).ram().share("share1"); /* WORK RAM (shared by the 2 z80's) */
+	map(0xf000, 0xf2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
+	map(0xf300, 0xf303).mirror(0xfc).w(m_seta001, FUNC(seta001_device::spritectrl_w8)); /* control registers (0x80 mirror used by Arkanoid 2) */
+	map(0xf400, 0xf400).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
+	map(0xf600, 0xf600).nopr().w(this, FUNC(jpopnics_state::ramrom_bankswitch_w));
+	map(0xf800, 0xffff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(jpopnics_state::jpopnics_sub_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("subbank")
+void jpopnics_state::jpopnics_sub_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("subbank");
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(subbankswitch_w)
-	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN1")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN2")
-	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSWA")
-	AM_RANGE(0xc601, 0xc601) AM_READ_PORT("DSWB")
+	map(0xa000, 0xa000).w(this, FUNC(jpopnics_state::subbankswitch_w));
+	map(0xb000, 0xb001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xc000, 0xc000).portr("IN1");
+	map(0xc001, 0xc001).portr("IN2");
+	map(0xc600, 0xc600).portr("DSWA");
+	map(0xc601, 0xc601).portr("DSWB");
 
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xefff).ram().share("share1");
 
-	AM_RANGE(0xf000, 0xf003) AM_DEVREAD("upd4701", upd4701_device, read_xy)
-ADDRESS_MAP_END
+	map(0xf000, 0xf003).r(m_upd4701, FUNC(upd4701_device::read_xy));
+}
 
 /* RAM/ROM bank that maps at 0x8000-0xbfff on maincpu */
-ADDRESS_MAP_START(tnzs_base_state::mainbank_map)
-	AM_RANGE(0x00000, 0x07fff) AM_RAM // instead of the first two banks of ROM being repeated redundantly the hardware maps RAM here
-	AM_RANGE(0x08000, 0x1ffff) AM_ROM AM_REGION(":maincpu", 0x8000)
-ADDRESS_MAP_END
+void tnzs_base_state::mainbank_map(address_map &map)
+{
+	map(0x00000, 0x07fff).ram(); // instead of the first two banks of ROM being repeated redundantly the hardware maps RAM here
+	map(0x08000, 0x1ffff).rom().region(":maincpu", 0x8000);
+}
 
 MACHINE_CONFIG_START(tnzs_base_state::tnzs_mainbank)
 	MCFG_DEVICE_ADD("mainbank", ADDRESS_MAP_BANK, 0)

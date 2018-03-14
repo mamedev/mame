@@ -99,38 +99,41 @@ WRITE8_MEMBER(aquarium_state::aquarium_oki_w)
 
 
 
-ADDRESS_MAP_START(aquarium_state::main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(aquarium_mid_videoram_w) AM_SHARE("mid_videoram")
-	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(aquarium_bak_videoram_w) AM_SHARE("bak_videoram")
-	AM_RANGE(0xc02000, 0xc03fff) AM_RAM_WRITE(aquarium_txt_videoram_w) AM_SHARE("txt_videoram")
-	AM_RANGE(0xc80000, 0xc81fff) AM_DEVREADWRITE8("spritegen", excellent_spr_device, read, write, 0x00ff)
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xd80014, 0xd8001f) AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP        /* probably not used */
-	AM_RANGE(0xd80080, 0xd80081) AM_READ_PORT("DSW")
-	AM_RANGE(0xd80082, 0xd80083) AM_READNOP /* stored but not read back ? check code at 0x01f440 */
-	AM_RANGE(0xd80084, 0xd80085) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xd80086, 0xd80087) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd80088, 0xd80089) AM_WRITE8(aquarium_watchdog_w, 0xff00)
-	AM_RANGE(0xd8008a, 0xd8008b) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void aquarium_state::main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0xc00000, 0xc00fff).ram().w(this, FUNC(aquarium_state::aquarium_mid_videoram_w)).share("mid_videoram");
+	map(0xc01000, 0xc01fff).ram().w(this, FUNC(aquarium_state::aquarium_bak_videoram_w)).share("bak_videoram");
+	map(0xc02000, 0xc03fff).ram().w(this, FUNC(aquarium_state::aquarium_txt_videoram_w)).share("txt_videoram");
+	map(0xc80000, 0xc81fff).rw(m_sprgen, FUNC(excellent_spr_device::read), FUNC(excellent_spr_device::write)).umask16(0x00ff);
+	map(0xd00000, 0xd00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xd80014, 0xd8001f).writeonly().share("scroll");
+	map(0xd80068, 0xd80069).nopw();        /* probably not used */
+	map(0xd80080, 0xd80081).portr("DSW");
+	map(0xd80082, 0xd80083).nopr(); /* stored but not read back ? check code at 0x01f440 */
+	map(0xd80084, 0xd80085).portr("INPUTS");
+	map(0xd80086, 0xd80087).portr("SYSTEM");
+	map(0xd80088, 0xd80088).w(this, FUNC(aquarium_state::aquarium_watchdog_w));
+	map(0xd8008b, 0xd8008b).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xff0000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(aquarium_state::snd_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void aquarium_state::snd_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(aquarium_state::snd_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(aquarium_oki_r, aquarium_oki_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w) // only written with 0 for some reason
-	AM_RANGE(0x08, 0x08) AM_WRITE(aquarium_z80_bank_w)
-ADDRESS_MAP_END
+void aquarium_state::snd_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x02, 0x02).rw(this, FUNC(aquarium_state::aquarium_oki_r), FUNC(aquarium_state::aquarium_oki_w));
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x06, 0x06).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w)); // only written with 0 for some reason
+	map(0x08, 0x08).w(this, FUNC(aquarium_state::aquarium_z80_bank_w));
+}
 
 static INPUT_PORTS_START( aquarium )
 	PORT_START("DSW")

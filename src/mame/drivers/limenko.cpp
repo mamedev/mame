@@ -198,54 +198,58 @@ WRITE8_MEMBER(limenko_state::qs1000_p3_w)
   MEMORY MAPS
 *****************************************************************************************************/
 
-ADDRESS_MAP_START(limenko_state::limenko_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("maindata",0)
-	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_SHARE("md_videoram")
-	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x80018000, 0x80019fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
-	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_SHARE("videoreg")
-	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu",0)
-ADDRESS_MAP_END
+void limenko_state::limenko_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("mainram");
+	map(0x40000000, 0x403fffff).rom().region("maindata", 0);
+	map(0x80000000, 0x80007fff).ram().w(this, FUNC(limenko_state::fg_videoram_w)).share("fg_videoram");
+	map(0x80008000, 0x8000ffff).ram().w(this, FUNC(limenko_state::md_videoram_w)).share("md_videoram");
+	map(0x80010000, 0x80017fff).ram().w(this, FUNC(limenko_state::bg_videoram_w)).share("bg_videoram");
+	map(0x80018000, 0x80019fff).ram().share("spriteram");
+	map(0x8001c000, 0x8001dfff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x8001e000, 0x8001ebff).ram(); // ? not used
+	map(0x8001ffec, 0x8001ffff).ram().share("videoreg");
+	map(0x8003e000, 0x8003e003).w(this, FUNC(limenko_state::spriteram_buffer_w));
+	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(limenko_state::limenko_io_map)
-	AM_RANGE(0x0000, 0x0003) AM_READ_PORT("IN0")
-	AM_RANGE(0x0800, 0x0803) AM_READ_PORT("IN1")
-	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("IN2")
-	AM_RANGE(0x4000, 0x4003) AM_WRITE(limenko_coincounter_w)
-	AM_RANGE(0x4800, 0x4803) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x5000, 0x5003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff0000).cswidth(32)
-ADDRESS_MAP_END
+void limenko_state::limenko_io_map(address_map &map)
+{
+	map(0x0000, 0x0003).portr("IN0");
+	map(0x0800, 0x0803).portr("IN1");
+	map(0x1000, 0x1003).portr("IN2");
+	map(0x4000, 0x4003).w(this, FUNC(limenko_state::limenko_coincounter_w));
+	map(0x4800, 0x4803).portw("EEPROMOUT");
+	map(0x5000, 0x5003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x00ff0000).cswidth(32);
+}
 
 
 /* Spotty memory map */
 
-ADDRESS_MAP_START(limenko_state::spotty_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x40002000, 0x400024d3) AM_RAM //?
-	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_SHARE("md_videoram")
-	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x80018000, 0x80019fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
-	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_SHARE("videoreg")
-	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("maincpu",0)
-ADDRESS_MAP_END
+void limenko_state::spotty_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("mainram");
+	map(0x40002000, 0x400024d3).ram(); //?
+	map(0x80000000, 0x80007fff).ram().w(this, FUNC(limenko_state::fg_videoram_w)).share("fg_videoram");
+	map(0x80008000, 0x8000ffff).ram().w(this, FUNC(limenko_state::md_videoram_w)).share("md_videoram");
+	map(0x80010000, 0x80017fff).ram().w(this, FUNC(limenko_state::bg_videoram_w)).share("bg_videoram");
+	map(0x80018000, 0x80019fff).ram().share("spriteram");
+	map(0x8001c000, 0x8001dfff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x8001e000, 0x8001ebff).ram(); // ? not used
+	map(0x8001ffec, 0x8001ffff).ram().share("videoreg");
+	map(0x8003e000, 0x8003e003).w(this, FUNC(limenko_state::spriteram_buffer_w));
+	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(limenko_state::spotty_io_map)
-	AM_RANGE(0x0000, 0x0003) AM_READ_PORT("IN0")
-	AM_RANGE(0x0800, 0x0803) AM_READ_PORT("IN1")
-	AM_RANGE(0x0800, 0x0803) AM_WRITENOP // hopper related
-	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("IN2")
-	AM_RANGE(0x4800, 0x4803) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x5000, 0x5003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff0000).cswidth(32)
-ADDRESS_MAP_END
+void limenko_state::spotty_io_map(address_map &map)
+{
+	map(0x0000, 0x0003).portr("IN0");
+	map(0x0800, 0x0803).portr("IN1");
+	map(0x0800, 0x0803).nopw(); // hopper related
+	map(0x1000, 0x1003).portr("IN2");
+	map(0x4800, 0x4803).portw("EEPROMOUT");
+	map(0x5000, 0x5003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x00ff0000).cswidth(32);
+}
 
 WRITE8_MEMBER(limenko_state::spotty_sound_cmd_w)
 {

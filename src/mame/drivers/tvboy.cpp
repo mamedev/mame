@@ -62,17 +62,18 @@ WRITE8_MEMBER(tvboy_state::bank_write)
 		m_crom->set_entry(data);
 }
 
-ADDRESS_MAP_START(tvboy_state::tvboy_mem) // 6507 has 13-bit address space, 0x0000 - 0x1fff
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0f00) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0d00) AM_RAM AM_SHARE("riot_ram")
+void tvboy_state::tvboy_mem(address_map &map)
+{ // 6507 has 13-bit address space, 0x0000 - 0x1fff
+	map(0x0000, 0x007f).mirror(0x0f00).rw("tia_video", FUNC(tia_video_device::read), FUNC(tia_video_device::write));
+	map(0x0080, 0x00ff).mirror(0x0d00).ram().share("riot_ram");
 #if USE_NEW_RIOT
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d00) AM_DEVICE("riot", mos6532_t, io_map)
+	map(0x0280, 0x029f).mirror(0x0d00).m("riot", FUNC(mos6532_t::io_map));
 #else
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d00) AM_DEVREADWRITE("riot", riot6532_device, read, write)
+	map(0x0280, 0x029f).mirror(0x0d00).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 #endif
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(bank_write)
-	AM_RANGE(0x1000, 0x1fff) AM_ROMBANK("crom")
-ADDRESS_MAP_END
+	map(0x1000, 0x1fff).w(this, FUNC(tvboy_state::bank_write));
+	map(0x1000, 0x1fff).bankr("crom");
+}
 
 #define MASTER_CLOCK_PAL    3546894
 

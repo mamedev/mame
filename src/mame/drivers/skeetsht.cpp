@@ -188,16 +188,18 @@ WRITE8_MEMBER(skeetsht_state::ay8910_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(skeetsht_state::hc11_pgm_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("68hc11", 0)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(ay8910_w)
-	AM_RANGE(0x2800, 0x2807) AM_READWRITE(tms_r, tms_w)
-	AM_RANGE(0xb600, 0xbdff) AM_RAM //internal EEPROM
-ADDRESS_MAP_END
+void skeetsht_state::hc11_pgm_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("68hc11", 0);
+	map(0x1800, 0x1800).w(this, FUNC(skeetsht_state::ay8910_w));
+	map(0x2800, 0x2807).rw(this, FUNC(skeetsht_state::tms_r), FUNC(skeetsht_state::tms_w));
+	map(0xb600, 0xbdff).ram(); //internal EEPROM
+}
 
-ADDRESS_MAP_START(skeetsht_state::hc11_io_map)
-	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_READWRITE(hc11_porta_r, hc11_porta_w)
-ADDRESS_MAP_END
+void skeetsht_state::hc11_io_map(address_map &map)
+{
+	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(this, FUNC(skeetsht_state::hc11_porta_r), FUNC(skeetsht_state::hc11_porta_w));
+}
 
 
 /*************************************
@@ -206,12 +208,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(skeetsht_state::tms_program_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("tms_vram")
-	AM_RANGE(0x00440000, 0x004fffff) AM_READWRITE(ramdac_r, ramdac_w)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xff800000, 0xffbfffff) AM_ROM AM_MIRROR(0x00400000) AM_REGION("tms", 0)
-ADDRESS_MAP_END
+void skeetsht_state::tms_program_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram().share("tms_vram");
+	map(0x00440000, 0x004fffff).rw(this, FUNC(skeetsht_state::ramdac_r), FUNC(skeetsht_state::ramdac_w));
+	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xff800000, 0xffbfffff).rom().mirror(0x00400000).region("tms", 0);
+}
 
 
 /*************************************

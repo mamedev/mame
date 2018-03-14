@@ -233,36 +233,38 @@ WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
 	machine().output().set_value("lamp_p3_b", BIT(data, 10));
 }
 
-ADDRESS_MAP_START(pasha2_state::pasha2_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram")
-	AM_RANGE(0x40000000, 0x4001ffff) AM_RAM_WRITE(bitmap_0_w)
-	AM_RANGE(0x40020000, 0x4003ffff) AM_RAM_WRITE(bitmap_1_w)
-	AM_RANGE(0x40060000, 0x40060001) AM_WRITENOP
-	AM_RANGE(0x40064000, 0x40064001) AM_WRITENOP
-	AM_RANGE(0x40068000, 0x40068001) AM_WRITENOP
-	AM_RANGE(0x4006c000, 0x4006c001) AM_WRITENOP
-	AM_RANGE(0x40070000, 0x40070001) AM_WRITE(vbuffer_clear_w)
-	AM_RANGE(0x40074000, 0x40074001) AM_WRITE(vbuffer_set_w)
-	AM_RANGE(0x40078000, 0x40078001) AM_WRITENOP //once at startup -> to disable the eeprom?
-	AM_RANGE(0x80000000, 0x803fffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe0000000, 0xe00003ff) AM_RAM_WRITE(pasha2_palette_w) AM_SHARE("paletteram") //tilemap? palette?
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
+void pasha2_state::pasha2_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("wram");
+	map(0x40000000, 0x4001ffff).ram().w(this, FUNC(pasha2_state::bitmap_0_w));
+	map(0x40020000, 0x4003ffff).ram().w(this, FUNC(pasha2_state::bitmap_1_w));
+	map(0x40060000, 0x40060001).nopw();
+	map(0x40064000, 0x40064001).nopw();
+	map(0x40068000, 0x40068001).nopw();
+	map(0x4006c000, 0x4006c001).nopw();
+	map(0x40070000, 0x40070001).w(this, FUNC(pasha2_state::vbuffer_clear_w));
+	map(0x40074000, 0x40074001).w(this, FUNC(pasha2_state::vbuffer_set_w));
+	map(0x40078000, 0x40078001).nopw(); //once at startup -> to disable the eeprom?
+	map(0x80000000, 0x803fffff).bankr("bank1");
+	map(0xe0000000, 0xe00003ff).ram().w(this, FUNC(pasha2_state::pasha2_palette_w)).share("paletteram"); //tilemap? palette?
+	map(0xfff80000, 0xffffffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(pasha2_state::pasha2_io)
-	AM_RANGE(0x08, 0x0b) AM_READNOP //sound status?
-	AM_RANGE(0x18, 0x1b) AM_READNOP //sound status?
-	AM_RANGE(0x20, 0x23) AM_WRITE(pasha2_lamps_w)
-	AM_RANGE(0x40, 0x43) AM_READ_PORT("COINS")
-	AM_RANGE(0x60, 0x63) AM_READ_PORT("DSW")
-	AM_RANGE(0x80, 0x83) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa0, 0xa3) AM_WRITENOP //soundlatch?
-	AM_RANGE(0xc0, 0xc3) AM_WRITE(pasha2_misc_w)
-	AM_RANGE(0xe2, 0xe3) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xe6, 0xe7) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xe8, 0xeb) AM_WRITE(oki1_bank_w)
-	AM_RANGE(0xec, 0xef) AM_WRITE(oki2_bank_w)
-ADDRESS_MAP_END
+void pasha2_state::pasha2_io(address_map &map)
+{
+	map(0x08, 0x0b).nopr(); //sound status?
+	map(0x18, 0x1b).nopr(); //sound status?
+	map(0x20, 0x23).w(this, FUNC(pasha2_state::pasha2_lamps_w));
+	map(0x40, 0x43).portr("COINS");
+	map(0x60, 0x63).portr("DSW");
+	map(0x80, 0x83).portr("INPUTS");
+	map(0xa0, 0xa3).nopw(); //soundlatch?
+	map(0xc0, 0xc3).w(this, FUNC(pasha2_state::pasha2_misc_w));
+	map(0xe3, 0xe3).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xe7, 0xe7).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xe8, 0xeb).w(this, FUNC(pasha2_state::oki1_bank_w));
+	map(0xec, 0xef).w(this, FUNC(pasha2_state::oki2_bank_w));
+}
 
 static INPUT_PORTS_START( pasha2 )
 	PORT_START("COINS")

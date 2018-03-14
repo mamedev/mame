@@ -168,20 +168,22 @@ WRITE8_MEMBER(alphasmart_state::port_d_w)
 }
 
 
-ADDRESS_MAP_START(alphasmart_state::alphasmart_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("rambank")
-	AM_RANGE( 0x0000, 0x003f ) AM_NOP   // internal registers
-	AM_RANGE( 0x0040, 0x00ff ) AM_RAM   // internal RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROM   AM_REGION("maincpu", 0)
-	AM_RANGE( 0x8000, 0x8000 ) AM_READWRITE(kb_r, kb_matrixh_w)
-	AM_RANGE( 0xc000, 0xc000 ) AM_WRITE(kb_matrixl_w)
-ADDRESS_MAP_END
+void alphasmart_state::alphasmart_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).bankrw("rambank");
+	map(0x0000, 0x003f).noprw();   // internal registers
+	map(0x0040, 0x00ff).ram();   // internal RAM
+	map(0x8000, 0xffff).rom().region("maincpu", 0);
+	map(0x8000, 0x8000).rw(this, FUNC(alphasmart_state::kb_r), FUNC(alphasmart_state::kb_matrixh_w));
+	map(0xc000, 0xc000).w(this, FUNC(alphasmart_state::kb_matrixl_w));
+}
 
-ADDRESS_MAP_START(alphasmart_state::alphasmart_io)
-	AM_RANGE( MC68HC11_IO_PORTA, MC68HC11_IO_PORTA ) AM_READWRITE(port_a_r, port_a_w)
-	AM_RANGE( MC68HC11_IO_PORTD, MC68HC11_IO_PORTD ) AM_READWRITE(port_d_r, port_d_w)
-ADDRESS_MAP_END
+void alphasmart_state::alphasmart_io(address_map &map)
+{
+	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(this, FUNC(alphasmart_state::port_a_r), FUNC(alphasmart_state::port_a_w));
+	map(MC68HC11_IO_PORTD, MC68HC11_IO_PORTD).rw(this, FUNC(alphasmart_state::port_d_r), FUNC(alphasmart_state::port_d_w));
+}
 
 READ8_MEMBER(asma2k_state::io_r)
 {
@@ -228,14 +230,15 @@ WRITE8_MEMBER(asma2k_state::port_a_w)
 }
 
 
-ADDRESS_MAP_START(asma2k_state::asma2k_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("rambank")
-	AM_RANGE( 0x0000, 0x003f ) AM_NOP   // internal registers
-	AM_RANGE( 0x0040, 0x00ff ) AM_RAM AM_SHARE("internal_ram")   // internal RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROM   AM_REGION("maincpu", 0)
-	AM_RANGE( 0x9000, 0x9000 ) AM_WRITE(kb_matrixl_w)
-ADDRESS_MAP_END
+void asma2k_state::asma2k_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).bankrw("rambank");
+	map(0x0000, 0x003f).noprw();   // internal registers
+	map(0x0040, 0x00ff).ram().share("internal_ram");   // internal RAM
+	map(0x8000, 0xffff).rom().region("maincpu", 0);
+	map(0x9000, 0x9000).w(this, FUNC(asma2k_state::kb_matrixl_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( alphasmart )

@@ -76,21 +76,22 @@ PALETTE_INIT_MEMBER(bsktball_state, bsktball)
  *
  *************************************/
 
-ADDRESS_MAP_START(bsktball_state::main_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM /* Zero Page RAM */
-	AM_RANGE(0x0800, 0x0800) AM_READ(bsktball_in0_r)
-	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("IN1")
-	AM_RANGE(0x0803, 0x0803) AM_READ_PORT("DSW")
-	AM_RANGE(0x1000, 0x1000) AM_WRITENOP /* Timer Reset */
-	AM_RANGE(0x1010, 0x1010) AM_WRITE(bsktball_bounce_w) /* Crowd Amp / Bounce */
-	AM_RANGE(0x1020, 0x102f) AM_DEVWRITE("outlatch", f9334_device, write_a0)
-	AM_RANGE(0x1030, 0x1030) AM_WRITE(bsktball_note_w) /* Music Ckt Note Dvsr */
-	AM_RANGE(0x1800, 0x1bbf) AM_RAM_WRITE(bsktball_videoram_w) AM_SHARE("videoram") /* DISPLAY */
-	AM_RANGE(0x1bc0, 0x1bff) AM_RAM AM_SHARE("motion")
-	AM_RANGE(0x1c00, 0x1cff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_ROM /* PROGRAM */
-ADDRESS_MAP_END
+void bsktball_state::main_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x01ff).ram(); /* Zero Page RAM */
+	map(0x0800, 0x0800).r(this, FUNC(bsktball_state::bsktball_in0_r));
+	map(0x0802, 0x0802).portr("IN1");
+	map(0x0803, 0x0803).portr("DSW");
+	map(0x1000, 0x1000).nopw(); /* Timer Reset */
+	map(0x1010, 0x1010).w(this, FUNC(bsktball_state::bsktball_bounce_w)); /* Crowd Amp / Bounce */
+	map(0x1020, 0x102f).w("outlatch", FUNC(f9334_device::write_a0));
+	map(0x1030, 0x1030).w(this, FUNC(bsktball_state::bsktball_note_w)); /* Music Ckt Note Dvsr */
+	map(0x1800, 0x1bbf).ram().w(this, FUNC(bsktball_state::bsktball_videoram_w)).share("videoram"); /* DISPLAY */
+	map(0x1bc0, 0x1bff).ram().share("motion");
+	map(0x1c00, 0x1cff).ram();
+	map(0x2000, 0x3fff).rom(); /* PROGRAM */
+}
 
 
 

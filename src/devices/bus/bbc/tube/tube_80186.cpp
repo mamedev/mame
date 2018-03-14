@@ -25,17 +25,19 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_80186, bbc_tube_80186_device, "bbc_tube_80186", "Aco
 //  ADDRESS_MAP( tube_80186_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(bbc_tube_80186_device::tube_80186_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void bbc_tube_80186_device::tube_80186_mem(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 //-------------------------------------------------
 //  ADDRESS_MAP( tube_80186_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(bbc_tube_80186_device::tube_80186_io)
-	AM_RANGE(0x80, 0x8f) AM_DEVREADWRITE8("ula", tube_device, parasite_r, parasite_w, 0x00ff)
-ADDRESS_MAP_END
+void bbc_tube_80186_device::tube_80186_io(address_map &map)
+{
+	map(0x80, 0x8f).rw("ula", FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w)).umask16(0x00ff);
+}
 
 //-------------------------------------------------
 //  ROM( tube_80186 )

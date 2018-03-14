@@ -102,27 +102,29 @@ protected:
 };
 
 
-ADDRESS_MAP_START(whouse_testcons_state::program_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x2003) AM_DEVWRITE("dsp0", dl1416_device, bus_w)
-	AM_RANGE(0x2004, 0x2007) AM_DEVWRITE("dsp1", dl1416_device, bus_w)
-	AM_RANGE(0x2008, 0x200b) AM_DEVWRITE("dsp2", dl1416_device, bus_w)
-	AM_RANGE(0x200c, 0x200f) AM_DEVWRITE("dsp3", dl1416_device, bus_w)
-	AM_RANGE(0x2800, 0x28ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("row0")
-	AM_RANGE(0x8801, 0x8801) AM_READ_PORT("row1")
-	AM_RANGE(0x8802, 0x8802) AM_READ_PORT("row2")
-	AM_RANGE(0x8803, 0x8803) AM_READ_PORT("row3")
-ADDRESS_MAP_END
+void whouse_testcons_state::program_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x2003).w("dsp0", FUNC(dl1416_device::bus_w));
+	map(0x2004, 0x2007).w("dsp1", FUNC(dl1416_device::bus_w));
+	map(0x2008, 0x200b).w("dsp2", FUNC(dl1416_device::bus_w));
+	map(0x200c, 0x200f).w("dsp3", FUNC(dl1416_device::bus_w));
+	map(0x2800, 0x28ff).rw("i8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0x3000, 0x3fff).ram();
+	map(0x8800, 0x8800).portr("row0");
+	map(0x8801, 0x8801).portr("row1");
+	map(0x8802, 0x8802).portr("row2");
+	map(0x8803, 0x8803).portr("row3");
+}
 
-ADDRESS_MAP_START(whouse_testcons_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x80, 0x87) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
-	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE("i8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void whouse_testcons_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x80, 0x87).rw("i8155", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0x88, 0x8b).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
 INPUT_PORTS_START(whousetc)

@@ -325,25 +325,27 @@ WRITE16_MEMBER(highvdeo_state::write1_w)
 //  popmessage("%04x %04x",t1,t3);
 }
 
-ADDRESS_MAP_START(highvdeo_state::tv_vcf_map)
-	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
-	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
-ADDRESS_MAP_END
+void highvdeo_state::tv_vcf_map(address_map &map)
+{
+	map(0x00000, 0x003ff).ram(); /*irq vector area*/
+	map(0x00400, 0x03fff).ram().share("nvram");
+	map(0x40000, 0x4ffff).ram().share("blit_ram"); /*blitter ram*/
+	map(0x80000, 0xbffff).bankr("bank1");
+	map(0xc0000, 0xfffff).rom().region("boot_prg", 0);
+}
 
-ADDRESS_MAP_START(highvdeo_state::tv_vcf_io)
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
-	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
-	AM_RANGE(0x0008, 0x0009) AM_READ(read0_r )
-	AM_RANGE(0x000a, 0x000b) AM_READ(read1_r )
-	AM_RANGE(0x000c, 0x000d) AM_READ(read2_r )
-	AM_RANGE(0x0010, 0x0011) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
-	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x0030, 0x0031) AM_WRITE(tv_vcf_bankselect_w ) AM_READ(tv_oki6376_r )
-ADDRESS_MAP_END
+void highvdeo_state::tv_vcf_io(address_map &map)
+{
+	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w)); // lamps
+	map(0x0006, 0x0007).w(this, FUNC(highvdeo_state::tv_oki6376_w));
+	map(0x0008, 0x0009).r(this, FUNC(highvdeo_state::read0_r));
+	map(0x000a, 0x000b).r(this, FUNC(highvdeo_state::read1_r));
+	map(0x000c, 0x000d).r(this, FUNC(highvdeo_state::read2_r));
+	map(0x0010, 0x0010).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x0012, 0x0012).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x0014, 0x0014).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x0030, 0x0031).w(this, FUNC(highvdeo_state::tv_vcf_bankselect_w)).r(this, FUNC(highvdeo_state::tv_oki6376_r));
+}
 
 
 READ16_MEMBER(highvdeo_state::tv_ncf_read1_r)
@@ -374,52 +376,56 @@ WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_st_w)
 	}
 }
 
-ADDRESS_MAP_START(highvdeo_state::tv_ncf_map)
-	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x20000, 0x2ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
-	AM_RANGE(0x40000, 0xbffff) AM_ROM AM_REGION("user1",0x40000)
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
-ADDRESS_MAP_END
+void highvdeo_state::tv_ncf_map(address_map &map)
+{
+	map(0x00000, 0x003ff).ram(); /*irq vector area*/
+	map(0x00400, 0x03fff).ram().share("nvram");
+	map(0x20000, 0x2ffff).ram().share("blit_ram"); /*blitter ram*/
+	map(0x40000, 0xbffff).rom().region("user1", 0x40000);
+	map(0xc0000, 0xfffff).rom().region("boot_prg", 0);
+}
 
-ADDRESS_MAP_START(highvdeo_state::tv_ncf_io)
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
-	AM_RANGE(0x0008, 0x0009) AM_WRITE(tv_ncf_oki6376_w )
-	AM_RANGE(0x000a, 0x000b) AM_WRITE(tv_ncf_oki6376_st_w )
-	AM_RANGE(0x000c, 0x000d) AM_READ(read0_r )
-	AM_RANGE(0x0010, 0x0011) AM_READ(tv_ncf_read1_r )
-	AM_RANGE(0x0012, 0x0013) AM_READ(read2_r )
-	AM_RANGE(0x0030, 0x0031) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x0032, 0x0033) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
-	AM_RANGE(0x0034, 0x0035) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-ADDRESS_MAP_END
+void highvdeo_state::tv_ncf_io(address_map &map)
+{
+	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w)); // lamps
+	map(0x0008, 0x0009).w(this, FUNC(highvdeo_state::tv_ncf_oki6376_w));
+	map(0x000a, 0x000b).w(this, FUNC(highvdeo_state::tv_ncf_oki6376_st_w));
+	map(0x000c, 0x000d).r(this, FUNC(highvdeo_state::read0_r));
+	map(0x0010, 0x0011).r(this, FUNC(highvdeo_state::tv_ncf_read1_r));
+	map(0x0012, 0x0013).r(this, FUNC(highvdeo_state::read2_r));
+	map(0x0030, 0x0030).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x0032, 0x0032).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x0034, 0x0034).w("ramdac", FUNC(ramdac_device::pal_w));
+}
 
 
-ADDRESS_MAP_START(highvdeo_state::nyjoker_map)
-	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
-	AM_RANGE(0x40000, 0xbffff) AM_ROM AM_REGION("user1",0x40000)
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
-ADDRESS_MAP_END
+void highvdeo_state::nyjoker_map(address_map &map)
+{
+	map(0x00000, 0x003ff).ram(); /*irq vector area*/
+	map(0x00400, 0x03fff).ram().share("nvram");
+	map(0x10000, 0x1ffff).ram().share("blit_ram"); /*blitter ram*/
+	map(0x40000, 0xbffff).rom().region("user1", 0x40000);
+	map(0xc0000, 0xfffff).rom().region("boot_prg", 0);
+}
 
-ADDRESS_MAP_START(highvdeo_state::nyjoker_io)
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w )    // lamps
-	AM_RANGE(0x0002, 0x0003) AM_WRITENOP            // alternate coin counter (bits 0 and 2)
-	AM_RANGE(0x0004, 0x0005) AM_WRITE(nyj_write2_w ) // coin and note counter
+void highvdeo_state::nyjoker_io(address_map &map)
+{
+	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w));    // lamps
+	map(0x0002, 0x0003).nopw();            // alternate coin counter (bits 0 and 2)
+	map(0x0004, 0x0005).w(this, FUNC(highvdeo_state::nyj_write2_w)); // coin and note counter
 //  AM_RANGE(0x0006, 0x0007) AM_WRITENOP
-	AM_RANGE(0x0008, 0x0009) AM_WRITE(tv_ncf_oki6376_w )
-	AM_RANGE(0x000a, 0x000b) AM_WRITE(tv_ncf_oki6376_st_w )
-	AM_RANGE(0x000c, 0x000d) AM_READ_PORT("IN0")
-	AM_RANGE(0x000e, 0x000f) AM_READ_PORT("DSW")
-	AM_RANGE(0x0010, 0x0011) AM_READ_PORT("IN2")
-	AM_RANGE(0x0012, 0x0013) AM_READ_PORT("IN3")
-	AM_RANGE(0x0014, 0x0015) AM_READ(tv_ncf_read1_r )
-	AM_RANGE(0x0020, 0x0021) AM_WRITENOP
-	AM_RANGE(0x0030, 0x0031) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x0032, 0x0033) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
-	AM_RANGE(0x0034, 0x0035) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-ADDRESS_MAP_END
+	map(0x0008, 0x0009).w(this, FUNC(highvdeo_state::tv_ncf_oki6376_w));
+	map(0x000a, 0x000b).w(this, FUNC(highvdeo_state::tv_ncf_oki6376_st_w));
+	map(0x000c, 0x000d).portr("IN0");
+	map(0x000e, 0x000f).portr("DSW");
+	map(0x0010, 0x0011).portr("IN2");
+	map(0x0012, 0x0013).portr("IN3");
+	map(0x0014, 0x0015).r(this, FUNC(highvdeo_state::tv_ncf_read1_r));
+	map(0x0020, 0x0021).nopw();
+	map(0x0030, 0x0030).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x0032, 0x0032).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x0034, 0x0034).w("ramdac", FUNC(ramdac_device::pal_w));
+}
 
 
 WRITE16_MEMBER(highvdeo_state::nyj_write2_w)
@@ -447,22 +453,24 @@ WRITE16_MEMBER(highvdeo_state::tv_tcf_bankselect_w)
 	membank("bank1")->set_base(&ROM[bankaddress]);
 }
 
-ADDRESS_MAP_START(highvdeo_state::tv_tcf_map)
-	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
-	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
-ADDRESS_MAP_END
+void highvdeo_state::tv_tcf_map(address_map &map)
+{
+	map(0x00000, 0x003ff).ram(); /*irq vector area*/
+	map(0x00400, 0x03fff).ram().share("nvram");
+	map(0x40000, 0x5d4bf).ram().share("blit_ram"); /*blitter ram*/
+	map(0x7fe00, 0x7ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x80000, 0xbffff).bankr("bank1");
+	map(0xc0000, 0xfffff).rom().region("boot_prg", 0);
+}
 
-ADDRESS_MAP_START(highvdeo_state::tv_tcf_io)
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
-	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
-	AM_RANGE(0x0008, 0x0009) AM_READ(read0_r )
-	AM_RANGE(0x000a, 0x000b) AM_READ(read1_r )
-	AM_RANGE(0x0030, 0x0031) AM_READ(read2_r ) AM_WRITE(tv_tcf_bankselect_w )
-ADDRESS_MAP_END
+void highvdeo_state::tv_tcf_io(address_map &map)
+{
+	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w)); // lamps
+	map(0x0006, 0x0007).w(this, FUNC(highvdeo_state::tv_oki6376_w));
+	map(0x0008, 0x0009).r(this, FUNC(highvdeo_state::read0_r));
+	map(0x000a, 0x000b).r(this, FUNC(highvdeo_state::read1_r));
+	map(0x0030, 0x0031).r(this, FUNC(highvdeo_state::read2_r)).w(this, FUNC(highvdeo_state::tv_tcf_bankselect_w));
+}
 
 /****************************
 *
@@ -504,29 +512,31 @@ WRITE16_MEMBER(highvdeo_state::write2_w)
 	}
 }
 
-ADDRESS_MAP_START(highvdeo_state::newmcard_map)
-	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
-	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
-ADDRESS_MAP_END
+void highvdeo_state::newmcard_map(address_map &map)
+{
+	map(0x00000, 0x003ff).ram(); /*irq vector area*/
+	map(0x00400, 0x0ffff).ram().share("nvram");
+	map(0x40000, 0x7ffff).ram().share("blit_ram"); /*blitter ram*/
+	map(0x80000, 0xbffff).bankr("bank1");
+	map(0xc0000, 0xfffff).rom().region("boot_prg", 0);
+}
 
-ADDRESS_MAP_START(highvdeo_state::newmcard_io)
-	AM_RANGE(0x0030, 0x0033) AM_READ(newmcard_status_r )
-	AM_RANGE(0x0030, 0x0031) AM_WRITE(tv_tcf_bankselect_w )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
-	AM_RANGE(0x0002, 0x0003) AM_WRITE(write2_w ) // coin counter & coin lockout
-	AM_RANGE(0x0004, 0x0005) AM_WRITE(newmcard_vblank_w )
-	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
-	AM_RANGE(0x0008, 0x0009) AM_READ(read0_r )
-	AM_RANGE(0x000a, 0x000b) AM_READ(read1_r )
-	AM_RANGE(0x000c, 0x000d) AM_READ(newmcard_vblank_r )
-	AM_RANGE(0x000e, 0x000f) AM_READ(read2_r )
-	AM_RANGE(0x0010, 0x0011) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
-	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-ADDRESS_MAP_END
+void highvdeo_state::newmcard_io(address_map &map)
+{
+	map(0x0030, 0x0033).r(this, FUNC(highvdeo_state::newmcard_status_r));
+	map(0x0030, 0x0031).w(this, FUNC(highvdeo_state::tv_tcf_bankselect_w));
+	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w)); // lamps
+	map(0x0002, 0x0003).w(this, FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
+	map(0x0004, 0x0005).w(this, FUNC(highvdeo_state::newmcard_vblank_w));
+	map(0x0006, 0x0007).w(this, FUNC(highvdeo_state::tv_oki6376_w));
+	map(0x0008, 0x0009).r(this, FUNC(highvdeo_state::read0_r));
+	map(0x000a, 0x000b).r(this, FUNC(highvdeo_state::read1_r));
+	map(0x000c, 0x000d).r(this, FUNC(highvdeo_state::newmcard_vblank_r));
+	map(0x000e, 0x000f).r(this, FUNC(highvdeo_state::read2_r));
+	map(0x0010, 0x0010).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x0012, 0x0012).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x0014, 0x0014).w("ramdac", FUNC(ramdac_device::pal_w));
+}
 
 /****************************
 *
@@ -624,52 +634,56 @@ READ16_MEMBER(highvdeo_state::magicbom_status_r)
 }
 
 
-ADDRESS_MAP_START(highvdeo_state::brasil_map)
-	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
-	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
-ADDRESS_MAP_END
+void highvdeo_state::brasil_map(address_map &map)
+{
+	map(0x00000, 0x003ff).ram(); /*irq vector area*/
+	map(0x00400, 0x0ffff).ram().share("nvram");
+	map(0x40000, 0x7ffff).ram().share("blit_ram"); /*blitter ram*/
+	map(0x80000, 0xbffff).bankr("bank1");
+	map(0xc0000, 0xfffff).rom().region("boot_prg", 0);
+}
 
-ADDRESS_MAP_START(highvdeo_state::brasil_io)
-	AM_RANGE(0x0030, 0x0033) AM_READ(brasil_status_r )
-	AM_RANGE(0x0030, 0x0031) AM_WRITE(brasil_status_w )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
-	AM_RANGE(0x0002, 0x0003) AM_WRITE(write2_w ) // coin counter & coin lockout
-	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
-	AM_RANGE(0x0008, 0x0009) AM_READ(read0_r )
-	AM_RANGE(0x000a, 0x000b) AM_READ(read1_r )
-	AM_RANGE(0x000e, 0x000f) AM_READ(read2_r )
+void highvdeo_state::brasil_io(address_map &map)
+{
+	map(0x0030, 0x0033).r(this, FUNC(highvdeo_state::brasil_status_r));
+	map(0x0030, 0x0031).w(this, FUNC(highvdeo_state::brasil_status_w));
+	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w)); // lamps
+	map(0x0002, 0x0003).w(this, FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
+	map(0x0006, 0x0007).w(this, FUNC(highvdeo_state::tv_oki6376_w));
+	map(0x0008, 0x0009).r(this, FUNC(highvdeo_state::read0_r));
+	map(0x000a, 0x000b).r(this, FUNC(highvdeo_state::read1_r));
+	map(0x000e, 0x000f).r(this, FUNC(highvdeo_state::read2_r));
 //  AM_RANGE(0x000e, 0x000f) AM_WRITE
 //  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(highvdeo_state::grancapi_io)
-	AM_RANGE(0x0030, 0x0033) AM_READ(grancapi_status_r )
-	AM_RANGE(0x000e, 0x000f) AM_WRITE(grancapi_status_w )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
-	AM_RANGE(0x0002, 0x0003) AM_WRITE(write2_w ) // coin counter & coin lockout
-	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
-	AM_RANGE(0x0008, 0x0009) AM_READ(read0_r )
-	AM_RANGE(0x000a, 0x000b) AM_READ(read1_r )
-	AM_RANGE(0x000e, 0x000f) AM_READ(read2_r )
+void highvdeo_state::grancapi_io(address_map &map)
+{
+	map(0x0030, 0x0033).r(this, FUNC(highvdeo_state::grancapi_status_r));
+	map(0x000e, 0x000f).w(this, FUNC(highvdeo_state::grancapi_status_w));
+	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w)); // lamps
+	map(0x0002, 0x0003).w(this, FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
+	map(0x0006, 0x0007).w(this, FUNC(highvdeo_state::tv_oki6376_w));
+	map(0x0008, 0x0009).r(this, FUNC(highvdeo_state::read0_r));
+	map(0x000a, 0x000b).r(this, FUNC(highvdeo_state::read1_r));
+	map(0x000e, 0x000f).r(this, FUNC(highvdeo_state::read2_r));
 //  AM_RANGE(0x000e, 0x000f) AM_WRITE
 //  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(highvdeo_state::magicbom_io)
-	AM_RANGE(0x0030, 0x0033) AM_READ(magicbom_status_r )
-	AM_RANGE(0x000e, 0x000f) AM_WRITE(grancapi_status_w )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
-	AM_RANGE(0x0002, 0x0003) AM_WRITE(write2_w ) // coin counter & coin lockout
-	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
-	AM_RANGE(0x0008, 0x0009) AM_READ(read0_r )
-	AM_RANGE(0x000a, 0x000b) AM_READ(read1_r )
-	AM_RANGE(0x000e, 0x000f) AM_READ(read2_r )
+void highvdeo_state::magicbom_io(address_map &map)
+{
+	map(0x0030, 0x0033).r(this, FUNC(highvdeo_state::magicbom_status_r));
+	map(0x000e, 0x000f).w(this, FUNC(highvdeo_state::grancapi_status_w));
+	map(0x0000, 0x0001).w(this, FUNC(highvdeo_state::write1_w)); // lamps
+	map(0x0002, 0x0003).w(this, FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
+	map(0x0006, 0x0007).w(this, FUNC(highvdeo_state::tv_oki6376_w));
+	map(0x0008, 0x0009).r(this, FUNC(highvdeo_state::read0_r));
+	map(0x000a, 0x000b).r(this, FUNC(highvdeo_state::read1_r));
+	map(0x000e, 0x000f).r(this, FUNC(highvdeo_state::read2_r));
 //  AM_RANGE(0x000e, 0x000f) AM_WRITE
 //  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( tv_vcf )
@@ -1143,9 +1157,10 @@ INTERRUPT_GEN_MEMBER(highvdeo_state::vblank_irq_80186)
 	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-ADDRESS_MAP_START(highvdeo_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void highvdeo_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 
 MACHINE_CONFIG_START(highvdeo_state::tv_vcf)

@@ -36,17 +36,18 @@ private:
 	//required_region_ptr<u8> m_p_chargen;
 };
 
-ADDRESS_MAP_START(milwaukee_state::mem_map)
-	AM_RANGE(0x0000, 0xf7ff) AM_RAM
+void milwaukee_state::mem_map(address_map &map)
+{
+	map(0x0000, 0xf7ff).ram();
 	//AM_RANGE(0xf800, 0xf87f) expansion i/o
-	AM_RANGE(0xf880, 0xf881) AM_DEVREADWRITE("acia1", acia6850_device, read, write) // terminal
-	AM_RANGE(0xf882, 0xf883) AM_DEVREADWRITE("acia2", acia6850_device, read, write) // remote
-	AM_RANGE(0xf884, 0xf887) AM_DEVREADWRITE("pia1", pia6821_device, read, write) // centronics
-	AM_RANGE(0xf888, 0xf88b) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0xf88c, 0xf88f) AM_DEVREADWRITE("pia2", pia6821_device, read, write) // disk controller
-	AM_RANGE(0xf890, 0xf891) AM_DEVREADWRITE("ssda", mc6852_device, read, write)
-	AM_RANGE(0xf898, 0xffff) AM_ROM AM_REGION("roms", 0x0098)
-ADDRESS_MAP_END
+	map(0xf880, 0xf881).rw("acia1", FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // terminal
+	map(0xf882, 0xf883).rw("acia2", FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // remote
+	map(0xf884, 0xf887).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // centronics
+	map(0xf888, 0xf88b).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xf88c, 0xf88f).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // disk controller
+	map(0xf890, 0xf891).rw("ssda", FUNC(mc6852_device::read), FUNC(mc6852_device::write));
+	map(0xf898, 0xffff).rom().region("roms", 0x0098);
+}
 
 static INPUT_PORTS_START( milwaukee )
 INPUT_PORTS_END

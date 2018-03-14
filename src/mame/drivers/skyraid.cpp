@@ -71,23 +71,24 @@ WRITE8_MEMBER(skyraid_state::skyraid_scroll_w)
 }
 
 
-ADDRESS_MAP_START(skyraid_state::skyraid_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x300)
-	AM_RANGE(0x0400, 0x040f) AM_WRITEONLY AM_SHARE("pos_ram")
-	AM_RANGE(0x0800, 0x087f) AM_RAM AM_MIRROR(0x480) AM_SHARE("alpha_num_ram")
-	AM_RANGE(0x1000, 0x1000) AM_READ(skyraid_port_0_r)
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW")
-	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("COIN")
-	AM_RANGE(0x1401, 0x1401) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_SHARE("obj_ram")
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(skyraid_scroll_w)
-	AM_RANGE(0x4400, 0x4400) AM_WRITE(skyraid_sound_w)
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(skyraid_range_w)
-	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x5800, 0x5800) AM_WRITE(skyraid_offset_w)
-	AM_RANGE(0x7000, 0x7fff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void skyraid_state::skyraid_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().mirror(0x300);
+	map(0x0400, 0x040f).writeonly().share("pos_ram");
+	map(0x0800, 0x087f).ram().mirror(0x480).share("alpha_num_ram");
+	map(0x1000, 0x1000).r(this, FUNC(skyraid_state::skyraid_port_0_r));
+	map(0x1001, 0x1001).portr("DSW");
+	map(0x1400, 0x1400).portr("COIN");
+	map(0x1401, 0x1401).portr("SYSTEM");
+	map(0x1c00, 0x1c0f).writeonly().share("obj_ram");
+	map(0x4000, 0x4000).w(this, FUNC(skyraid_state::skyraid_scroll_w));
+	map(0x4400, 0x4400).w(this, FUNC(skyraid_state::skyraid_sound_w));
+	map(0x4800, 0x4800).w(this, FUNC(skyraid_state::skyraid_range_w));
+	map(0x5000, 0x5000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x5800, 0x5800).w(this, FUNC(skyraid_state::skyraid_offset_w));
+	map(0x7000, 0x7fff).rom();
+	map(0xf000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( skyraid )
 	PORT_START("LANGUAGE")

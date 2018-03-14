@@ -128,48 +128,49 @@ private:
 	floppy_image_device *m_floppy;
 };
 
-ADDRESS_MAP_START(ms0515_state::ms0515_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0000000, 0017777) AM_RAMBANK("bank0") // RAM
-	AM_RANGE(0020000, 0037777) AM_RAMBANK("bank1") // RAM
-	AM_RANGE(0040000, 0057777) AM_RAMBANK("bank2") // RAM
-	AM_RANGE(0060000, 0077777) AM_RAMBANK("bank3") // RAM
-	AM_RANGE(0100000, 0117777) AM_RAMBANK("bank4") // RAM
-	AM_RANGE(0120000, 0137777) AM_RAMBANK("bank5") // RAM
-	AM_RANGE(0140000, 0157777) AM_RAMBANK("bank6") // RAM
+void ms0515_state::ms0515_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0000000, 0017777).bankrw("bank0"); // RAM
+	map(0020000, 0037777).bankrw("bank1"); // RAM
+	map(0040000, 0057777).bankrw("bank2"); // RAM
+	map(0060000, 0077777).bankrw("bank3"); // RAM
+	map(0100000, 0117777).bankrw("bank4"); // RAM
+	map(0120000, 0137777).bankrw("bank5"); // RAM
+	map(0140000, 0157777).bankrw("bank6"); // RAM
 
-	AM_RANGE(0160000, 0177377) AM_ROM AM_WRITENOP
+	map(0160000, 0177377).rom().nopw();
 
-	AM_RANGE(0177400, 0177437) AM_WRITE(ms0515_bank_w) // Register for RAM expansion
+	map(0177400, 0177437).w(this, FUNC(ms0515_state::ms0515_bank_w)); // Register for RAM expansion
 
-	AM_RANGE(0177440, 0177441) AM_DEVREAD8("i8251kbd", i8251_device, data_r, 0x00ff)
-	AM_RANGE(0177442, 0177443) AM_DEVREADWRITE8("i8251kbd", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0177460, 0177461) AM_DEVWRITE8("i8251kbd", i8251_device, data_w, 0x00ff)
-	AM_RANGE(0177462, 0177463) AM_DEVWRITE8("i8251kbd", i8251_device, control_w, 0x00ff)
+	map(0176720, 0176720).r(m_i8251kbd, FUNC(i8251_device::data_r));
+	map(0176722, 0176722).rw(m_i8251kbd, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0177460, 0177460).w(m_i8251kbd, FUNC(i8251_device::data_w));
+	map(0177462, 0177462).w(m_i8251kbd, FUNC(i8251_device::control_w));
 
-	AM_RANGE(0177500, 0177507) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0177520, 0177527) AM_DEVWRITE8("pit8253", pit8253_device, write, 0x00ff)
+	map(0177500, 0177507).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0177520, 0177527).w(m_pit8253, FUNC(pit8253_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0177540, 0177547) AM_NOP
-//  AM_RANGE(0177540, 0177541)
-//  AM_RANGE(0177542, 0177543)
-//  AM_RANGE(0177544, 0177545)  // i8255 for MS-7007 Keyboard
-//  AM_RANGE(0177546, 0177547)
+	map(0177540, 0177547).noprw();
+//  map(0177540, 0177541)
+//  map(0177542, 0177543)
+//  map(0177544, 0177545)  // i8255 for MS-7007 Keyboard
+//  map(0177546, 0177547)
 
-	AM_RANGE(0177600, 0177607) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0x00ff)
+	map(0177600, 0177607).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0177640, 0177641) AM_DEVREADWRITE8("vg93", kr1818vg93_device, status_r, cmd_w, 0x00ff)
-	AM_RANGE(0177642, 0177643) AM_DEVREADWRITE8("vg93", kr1818vg93_device, track_r, track_w, 0x00ff)
-	AM_RANGE(0177644, 0177645) AM_DEVREADWRITE8("vg93", kr1818vg93_device, sector_r, sector_w, 0x00ff)
-	AM_RANGE(0177646, 0177647) AM_DEVREADWRITE8("vg93", kr1818vg93_device, data_r, data_w, 0x00ff)
+	map(0177640, 0177640).rw(m_fdc, FUNC(kr1818vg93_device::status_r), FUNC(kr1818vg93_device::cmd_w));
+	map(0177642, 0177642).rw(m_fdc, FUNC(kr1818vg93_device::track_r), FUNC(kr1818vg93_device::track_w));
+	map(0177644, 0177644).rw(m_fdc, FUNC(kr1818vg93_device::sector_r), FUNC(kr1818vg93_device::sector_w));
+	map(0177646, 0177646).rw(m_fdc, FUNC(kr1818vg93_device::data_r), FUNC(kr1818vg93_device::data_w));
 
-	AM_RANGE(0177700, 0177701) AM_DEVREAD8("i8251line", i8251_device, data_r, 0x00ff)
-	AM_RANGE(0177702, 0177703) AM_DEVREADWRITE8("i8251line", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0177720, 0177721) AM_DEVWRITE8("i8251line", i8251_device, data_w, 0x00ff)
-	AM_RANGE(0177722, 0177723) AM_DEVWRITE8("i8251line", i8251_device, control_w, 0x00ff)
+	map(0177700, 0177700).r(m_i8251line, FUNC(i8251_device::data_r));
+	map(0177702, 0177702).rw(m_i8251line, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0177704, 0177704).w(m_i8251line, FUNC(i8251_device::data_w));
+	map(0177706, 0177706).w(m_i8251line, FUNC(i8251_device::control_w));
 
-	AM_RANGE(0177770, 0177771) AM_READWRITE(ms0515_halt_r, ms0515_halt_w) // read/write -- halt and system timer
-ADDRESS_MAP_END
+	map(0177770, 0177771).rw(this, FUNC(ms0515_state::ms0515_halt_r), FUNC(ms0515_state::ms0515_halt_w)); // read/write -- halt and system timer
+}
 
 /*
  * (page 15-16)

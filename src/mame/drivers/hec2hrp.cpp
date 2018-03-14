@@ -90,118 +90,127 @@
 
 
 /*****************************************************************************/
-ADDRESS_MAP_START(hec2hrp_state::hecdisc2_mem)
+void hec2hrp_state::hecdisc2_mem(address_map &map)
+{
 /*****************************************************************************/
-	ADDRESS_MAP_UNMAP_HIGH
+	map.unmap_value_high();
 
 	/* Hardward address mapping*/
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank3") /*zone with ROM at start up, RAM later*/
+	map(0x0000, 0x3fff).bankrw("bank3"); /*zone with ROM at start up, RAM later*/
 
-	AM_RANGE( 0x4000, 0xffff ) AM_RAM
+	map(0x4000, 0xffff).ram();
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(hec2hrp_state::hecdisc2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void hec2hrp_state::hecdisc2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	// ROM Page managing
-	AM_RANGE(0x000,0x00f) AM_READWRITE(hector_disc2_io00_port_r, hector_disc2_io00_port_w )
+	map(0x000, 0x00f).rw(this, FUNC(hec2hrp_state::hector_disc2_io00_port_r), FUNC(hec2hrp_state::hector_disc2_io00_port_w));
 	// RS232 - 8251 managing
-	AM_RANGE(0x020,0x02f) AM_READWRITE(hector_disc2_io20_port_r, hector_disc2_io20_port_w )
+	map(0x020, 0x02f).rw(this, FUNC(hec2hrp_state::hector_disc2_io20_port_r), FUNC(hec2hrp_state::hector_disc2_io20_port_w));
 	// Hector communication managing
-	AM_RANGE(0x030,0x03f) AM_READWRITE(hector_disc2_io30_port_r, hector_disc2_io30_port_w )
-	AM_RANGE(0x040,0x04f) AM_READWRITE(hector_disc2_io40_port_r, hector_disc2_io40_port_w )
-	AM_RANGE(0x050,0x05f) AM_READWRITE(hector_disc2_io50_port_r, hector_disc2_io50_port_w )
+	map(0x030, 0x03f).rw(this, FUNC(hec2hrp_state::hector_disc2_io30_port_r), FUNC(hec2hrp_state::hector_disc2_io30_port_w));
+	map(0x040, 0x04f).rw(this, FUNC(hec2hrp_state::hector_disc2_io40_port_r), FUNC(hec2hrp_state::hector_disc2_io40_port_w));
+	map(0x050, 0x05f).rw(this, FUNC(hec2hrp_state::hector_disc2_io50_port_r), FUNC(hec2hrp_state::hector_disc2_io50_port_w));
 	// uPD765 link:
-	AM_RANGE(0x060,0x061) AM_DEVICE("upd765", upd765a_device, map)
-	AM_RANGE(0x070,0x07f) AM_DEVREADWRITE("upd765", upd765a_device, mdma_r, mdma_w)
-ADDRESS_MAP_END
+	map(0x060, 0x061).m("upd765", FUNC(upd765a_device::map));
+	map(0x070, 0x07f).rw("upd765", FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
+}
 
 /*****************************************************************************/
-ADDRESS_MAP_START(hec2hrp_state::hec2hrp_mem)
+void hec2hrp_state::hec2hrp_mem(address_map &map)
+{
 /*****************************************************************************/
-	ADDRESS_MAP_UNMAP_HIGH
+	map.unmap_value_high();
 	/* Main ROM page*/
-	AM_RANGE(0x0000,0x3fff) AM_ROM
+	map(0x0000, 0x3fff).rom();
 
 	/* Hardware address mapping*/
-	AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)/* Bank management*/
-	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
-	AM_RANGE(0x1800,0x1800) AM_WRITE(hector_color_b_w)  /* Color c2/c3*/
-	AM_RANGE(0x2000,0x2003) AM_WRITE(hector_sn_2000_w)  /* Sound*/
-	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
-	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
-	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
+	map(0x0800, 0x0808).w(this, FUNC(hec2hrp_state::hector_switch_bank_w));/* Bank management*/
+	map(0x1000, 0x1000).w(this, FUNC(hec2hrp_state::hector_color_a_w));  /* Color c0/c1*/
+	map(0x1800, 0x1800).w(this, FUNC(hec2hrp_state::hector_color_b_w));  /* Color c2/c3*/
+	map(0x2000, 0x2003).w(this, FUNC(hec2hrp_state::hector_sn_2000_w));  /* Sound*/
+	map(0x2800, 0x2803).w(this, FUNC(hec2hrp_state::hector_sn_2800_w));  /* Sound*/
+	map(0x3000, 0x3000).rw(this, FUNC(hec2hrp_state::hector_cassette_r), FUNC(hec2hrp_state::hector_sn_3000_w));/* Write necessary*/
+	map(0x3800, 0x3807).rw(this, FUNC(hec2hrp_state::hector_keyboard_r), FUNC(hec2hrp_state::hector_keyboard_w));  /* Keyboard*/
 
 	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
+	map(0x4000, 0x49ff).ram().share("videoram");
 	/* continous RAM*/
-	AM_RANGE(0x4A00,0xbfff) AM_RAM
+	map(0x4A00, 0xbfff).ram();
 	/* from 0xC000 to 0xFFFF => Bank Ram for video and data !*/
-	AM_RANGE(0xc000,0xffff) AM_RAM AM_SHARE("hector_videoram")
-ADDRESS_MAP_END
+	map(0xc000, 0xffff).ram().share("hector_videoram");
+}
 
 /*****************************************************************************/
-ADDRESS_MAP_START(hec2hrp_state::hec2hrx_mem)
+void hec2hrp_state::hec2hrx_mem(address_map &map)
+{
 /*****************************************************************************/
-	ADDRESS_MAP_UNMAP_HIGH
+	map.unmap_value_high();
 	/* Main ROM page*/
-	AM_RANGE(0x0000,0x3fff) AM_ROMBANK("bank2")
+	map(0x0000, 0x3fff).bankr("bank2");
 
 	/* Hardware address mapping*/
-	AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)/* Bank management*/
-	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
-	AM_RANGE(0x1800,0x1800) AM_WRITE(hector_color_b_w)  /* Color c2/c3*/
-	AM_RANGE(0x2000,0x2003) AM_WRITE(hector_sn_2000_w)  /* Sound*/
-	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
-	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
-	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
+	map(0x0800, 0x0808).w(this, FUNC(hec2hrp_state::hector_switch_bank_w));/* Bank management*/
+	map(0x1000, 0x1000).w(this, FUNC(hec2hrp_state::hector_color_a_w));  /* Color c0/c1*/
+	map(0x1800, 0x1800).w(this, FUNC(hec2hrp_state::hector_color_b_w));  /* Color c2/c3*/
+	map(0x2000, 0x2003).w(this, FUNC(hec2hrp_state::hector_sn_2000_w));  /* Sound*/
+	map(0x2800, 0x2803).w(this, FUNC(hec2hrp_state::hector_sn_2800_w));  /* Sound*/
+	map(0x3000, 0x3000).rw(this, FUNC(hec2hrp_state::hector_cassette_r), FUNC(hec2hrp_state::hector_sn_3000_w));/* Write necessary*/
+	map(0x3800, 0x3807).rw(this, FUNC(hec2hrp_state::hector_keyboard_r), FUNC(hec2hrp_state::hector_keyboard_w));  /* Keyboard*/
 
 	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
+	map(0x4000, 0x49ff).ram().share("videoram");
 	/* continous RAM*/
-	AM_RANGE(0x4A00,0xbfff) AM_RAM
+	map(0x4A00, 0xbfff).ram();
 	/* from 0xC000 to 0xFFFF => Bank Ram for video and data !*/
-	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1") AM_SHARE("hector_videoram")
-ADDRESS_MAP_END
+	map(0xc000, 0xffff).bankrw("bank1").share("hector_videoram");
+}
 
-ADDRESS_MAP_START(hec2hrp_state::hec2hrp_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
-ADDRESS_MAP_END
+void hec2hrp_state::hec2hrp_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x000, 0x0ff).rw(this, FUNC(hec2hrp_state::hector_io_8255_r), FUNC(hec2hrp_state::hector_io_8255_w));
+}
 
-ADDRESS_MAP_START(hec2hrp_state::hec2hrx_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0f0,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
-ADDRESS_MAP_END
+void hec2hrp_state::hec2hrx_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x0f0, 0x0ff).rw(this, FUNC(hec2hrp_state::hector_io_8255_r), FUNC(hec2hrp_state::hector_io_8255_w));
+}
 
-ADDRESS_MAP_START(hec2hrp_state::hec2mdhrx_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void hec2hrp_state::hec2mdhrx_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 
 	// Minidisc commands and changing the rom page !*/
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("wd179x", fd1793_device, read, write)
-	AM_RANGE(0x08, 0x08) AM_WRITE(minidisc_control_w)
-	AM_RANGE(0x0f0,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
-ADDRESS_MAP_END
+	map(0x04, 0x07).rw(m_minidisc_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x08, 0x08).w(this, FUNC(hec2hrp_state::minidisc_control_w));
+	map(0x0f0, 0x0ff).rw(this, FUNC(hec2hrp_state::hector_io_8255_r), FUNC(hec2hrp_state::hector_io_8255_w));
+}
 
-ADDRESS_MAP_START(hec2hrp_state::hec2mx40_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000,0x0ef) AM_WRITE(hector_mx40_io_port_w )
-	AM_RANGE(0x0f0,0x0f3) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
-ADDRESS_MAP_END
+void hec2hrp_state::hec2mx40_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x000, 0x0ef).w(this, FUNC(hec2hrp_state::hector_mx40_io_port_w));
+	map(0x0f0, 0x0f3).rw(this, FUNC(hec2hrp_state::hector_io_8255_r), FUNC(hec2hrp_state::hector_io_8255_w));
+}
 
-ADDRESS_MAP_START(hec2hrp_state::hec2mx80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000,0x0ef) AM_WRITE(hector_mx80_io_port_w )
-	AM_RANGE(0x0f0,0x0f3) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
+void hec2hrp_state::hec2mx80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x000, 0x0ef).w(this, FUNC(hec2hrp_state::hector_mx80_io_port_w));
+	map(0x0f0, 0x0f3).rw(this, FUNC(hec2hrp_state::hector_io_8255_r), FUNC(hec2hrp_state::hector_io_8255_w));
 
 
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( hec2hrp )

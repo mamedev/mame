@@ -716,35 +716,37 @@ READ16_MEMBER(fanucspmg_state::magic_r)
 	return 0x0041;  // 31 = memory error
 }
 
-ADDRESS_MAP_START(fanucspmg_state::maincpu_mem)
-	AM_RANGE(0x00000, 0x7ffff) AM_RAM   // main RAM
+void fanucspmg_state::maincpu_mem(address_map &map)
+{
+	map(0x00000, 0x7ffff).ram();   // main RAM
 
-	AM_RANGE(0x80000, 0x81fff) AM_RAM   // believed to be shared RAM with a CPU inside the Program File
-	AM_RANGE(0x88000, 0x88001) AM_NOP   // Program File "ready" bit
+	map(0x80000, 0x81fff).ram();   // believed to be shared RAM with a CPU inside the Program File
+	map(0x88000, 0x88001).noprw();   // Program File "ready" bit
 
-	AM_RANGE(0xf0000, 0xf0003) AM_DEVREADWRITE8(PIC0_TAG, pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0xf0004, 0xf0007) AM_DEVICE8(FDC_TAG, upd765a_device, map, 0x00ff)
-	AM_RANGE(0xf0008, 0xf000f) AM_DEVREADWRITE8(PIT0_TAG, pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0xf0010, 0xf0011) AM_DEVREADWRITE8(USART0_TAG, i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xf0012, 0xf0013) AM_DEVREADWRITE8(USART0_TAG, i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xf0014, 0xf0015) AM_DEVREADWRITE8(USART1_TAG, i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xf0016, 0xf0017) AM_DEVREADWRITE8(USART1_TAG, i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xf0018, 0xf0019) AM_DEVREADWRITE8(USART2_TAG, i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xf001a, 0xf001b) AM_DEVREADWRITE8(USART2_TAG, i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xf001c, 0xf001d) AM_DEVREADWRITE8(USART3_TAG, i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xf001e, 0xf001f) AM_DEVREADWRITE8(USART3_TAG, i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xf0020, 0xf0029) AM_DEVREADWRITE8(DMAC_TAG, i8257_device, read, write, 0xffff)
-	AM_RANGE(0xf0042, 0xf0043) AM_READ(magic_r)
-	AM_RANGE(0xf0046, 0xf0047) AM_WRITE8(dma_page_w, 0x00ff)
-	AM_RANGE(0xf0048, 0xf004f) AM_DEVREADWRITE8(PIT1_TAG, pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0xf2000, 0xf2003) AM_DEVREADWRITE8(PIC1_TAG, pic8259_device, read, write, 0x00ff)
+	map(0xf0000, 0xf0003).rw(m_pic0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0xf0004, 0xf0007).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0xf0008, 0xf000f).rw(m_pit0, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0xf0010, 0xf0010).rw(m_usart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf0012, 0xf0012).rw(m_usart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf0014, 0xf0014).rw(m_usart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf0016, 0xf0016).rw(m_usart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf0018, 0xf0018).rw(m_usart2, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf001a, 0xf001a).rw(m_usart2, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf001c, 0xf001c).rw(m_usart3, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf001e, 0xf001e).rw(m_usart3, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf0020, 0xf0029).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0xf0042, 0xf0043).r(this, FUNC(fanucspmg_state::magic_r));
+	map(0xf0046, 0xf0046).w(this, FUNC(fanucspmg_state::dma_page_w));
+	map(0xf0048, 0xf004f).rw(m_pit1, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0xf2000, 0xf2003).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0xf8000, 0xf9fff) AM_READWRITE8(shared_r, shared_w, 0xffff)
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(MAINCPU_TAG, 0)
-ADDRESS_MAP_END
+	map(0xf8000, 0xf9fff).rw(this, FUNC(fanucspmg_state::shared_r), FUNC(fanucspmg_state::shared_w));
+	map(0xfc000, 0xfffff).rom().region(MAINCPU_TAG, 0);
+}
 
-ADDRESS_MAP_START(fanucspmg_state::maincpu_io)
-ADDRESS_MAP_END
+void fanucspmg_state::maincpu_io(address_map &map)
+{
+}
 
 WRITE_LINE_MEMBER(fanucspmg_state::vsync_w)
 {
@@ -817,24 +819,25 @@ WRITE8_MEMBER(fanucspmg_state::video_ctrl_w)
 	m_video_ctrl = data;
 }
 
-ADDRESS_MAP_START(fanucspmg_state::subcpu_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION(SUBCPU_TAG, 0)
+void fanucspmg_state::subcpu_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region(SUBCPU_TAG, 0);
 
-	AM_RANGE(0x4000, 0x45ff) AM_READWRITE(vram1_r, vram1_w)
-	AM_RANGE(0x4800, 0x4dff) AM_READWRITE(vram2_r, vram2_w)
+	map(0x4000, 0x45ff).rw(this, FUNC(fanucspmg_state::vram1_r), FUNC(fanucspmg_state::vram1_w));
+	map(0x4800, 0x4dff).rw(this, FUNC(fanucspmg_state::vram2_r), FUNC(fanucspmg_state::vram2_w));
 
-	AM_RANGE(0x5000, 0x5000) AM_DEVREADWRITE(CRTC_TAG, mc6845_device, status_r, address_w)
-	AM_RANGE(0x5001, 0x5001) AM_DEVREADWRITE(CRTC_TAG, mc6845_device, register_r, register_w)
-	AM_RANGE(0x5008, 0x5008) AM_WRITE(keyboard_row_w)
-	AM_RANGE(0x5009, 0x5009) AM_READ(keyboard_r)
-	AM_RANGE(0x500a, 0x500b) AM_WRITENOP    // keyboard rows 2 and 3 control what's written here.  dip switches?
-	AM_RANGE(0x500c, 0x500c) AM_WRITE(vbl_ctrl_w)
-	AM_RANGE(0x500d, 0x500d) AM_WRITE(vram_bank_w)
-	AM_RANGE(0x500e, 0x500e) AM_READ(vblank_ack_r)
-	AM_RANGE(0x5018, 0x5018) AM_WRITE(video_ctrl_w)
+	map(0x5000, 0x5000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x5001, 0x5001).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x5008, 0x5008).w(this, FUNC(fanucspmg_state::keyboard_row_w));
+	map(0x5009, 0x5009).r(this, FUNC(fanucspmg_state::keyboard_r));
+	map(0x500a, 0x500b).nopw();    // keyboard rows 2 and 3 control what's written here.  dip switches?
+	map(0x500c, 0x500c).w(this, FUNC(fanucspmg_state::vbl_ctrl_w));
+	map(0x500d, 0x500d).w(this, FUNC(fanucspmg_state::vram_bank_w));
+	map(0x500e, 0x500e).r(this, FUNC(fanucspmg_state::vblank_ack_r));
+	map(0x5018, 0x5018).w(this, FUNC(fanucspmg_state::video_ctrl_w));
 
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE(SHARED_TAG) // shared RAM
-ADDRESS_MAP_END
+	map(0xe000, 0xffff).ram().share(SHARED_TAG); // shared RAM
+}
 
 /* Input ports */
 static INPUT_PORTS_START( fanucspmg )

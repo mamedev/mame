@@ -55,19 +55,21 @@ WRITE8_MEMBER( spc1000_fdd_exp_device::control_w )
 		m_fd1->mon_w(!BIT(data, 0));
 }
 
-ADDRESS_MAP_START(spc1000_fdd_exp_device::sd725_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void spc1000_fdd_exp_device::sd725_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(spc1000_fdd_exp_device::sd725_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_READWRITE(tc_r, control_w) // (R) Terminal Count Port (W) Motor Control Port
-	AM_RANGE(0xfa, 0xfb) AM_DEVICE("upd765", upd765a_device, map)
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("d8255_master", i8255_device, read, write)
-ADDRESS_MAP_END
+void spc1000_fdd_exp_device::sd725_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xf8, 0xf8).rw(this, FUNC(spc1000_fdd_exp_device::tc_r), FUNC(spc1000_fdd_exp_device::control_w)); // (R) Terminal Count Port (W) Motor Control Port
+	map(0xfa, 0xfb).m("upd765", FUNC(upd765a_device::map));
+	map(0xfc, 0xff).rw("d8255_master", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 static SLOT_INTERFACE_START( sd725_floppies )
 	SLOT_INTERFACE("sd320", EPSON_SD_320)

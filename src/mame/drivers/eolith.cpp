@@ -217,18 +217,19 @@ WRITE8_MEMBER(eolith_state::soundcpu_to_qs1000)
  *
  *************************************/
 
-ADDRESS_MAP_START(eolith_state::eolith_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM // fort2b wants ram here
-	AM_RANGE(0x40000000, 0x401fffff) AM_RAM
-	AM_RANGE(0x90000000, 0x9003ffff) AM_READWRITE16(eolith_vram_r, eolith_vram_w, 0xffffffff)
-	AM_RANGE(0xfc000000, 0xfc000003) AM_READ(eolith_custom_r)
-	AM_RANGE(0xfc400000, 0xfc400003) AM_WRITE(systemcontrol_w)
-	AM_RANGE(0xfc800000, 0xfc800003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff).cswidth(32)
-	AM_RANGE(0xfca00000, 0xfca00003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfcc00000, 0xfcc0005b) AM_WRITENOP // crt registers ?
-	AM_RANGE(0xfd000000, 0xfeffffff) AM_ROM AM_REGION("maindata", 0)
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void eolith_state::eolith_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram(); // fort2b wants ram here
+	map(0x40000000, 0x401fffff).ram();
+	map(0x90000000, 0x9003ffff).rw(this, FUNC(eolith_state::eolith_vram_r), FUNC(eolith_state::eolith_vram_w));
+	map(0xfc000000, 0xfc000003).r(this, FUNC(eolith_state::eolith_custom_r));
+	map(0xfc400000, 0xfc400003).w(this, FUNC(eolith_state::systemcontrol_w));
+	map(0xfc800000, 0xfc800003).w("soundlatch", FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
+	map(0xfca00000, 0xfca00003).portr("DSW1");
+	map(0xfcc00000, 0xfcc0005b).nopw(); // crt registers ?
+	map(0xfd000000, 0xfeffffff).rom().region("maindata", 0);
+	map(0xfff80000, 0xffffffff).rom().region("maincpu", 0);
+}
 
 ADDRESS_MAP_START(eolith_state::hidctch3_map)
 	AM_IMPORT_FROM(eolith_map)
@@ -245,14 +246,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(eolith_state::sound_prg_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void eolith_state::sound_prg_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(eolith_state::sound_io_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("sound_bank")
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void eolith_state::sound_io_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("sound_bank");
+	map(0x8000, 0x8000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 
 /*************************************

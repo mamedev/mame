@@ -24,38 +24,41 @@
 #include "speaker.h"
 
 /* Address maps */
-ADDRESS_MAP_START(b2m_state::b2m_mem)
-	AM_RANGE (0x0000, 0x27ff) AM_RAMBANK("bank1")
-	AM_RANGE (0x2800, 0x2fff) AM_RAMBANK("bank2")
-	AM_RANGE (0x3000, 0x6fff) AM_RAMBANK("bank3")
-	AM_RANGE (0x7000, 0xdfff) AM_RAMBANK("bank4")
-	AM_RANGE (0xe000, 0xffff) AM_RAMBANK("bank5")
-ADDRESS_MAP_END
+void b2m_state::b2m_mem(address_map &map)
+{
+	map(0x0000, 0x27ff).bankrw("bank1");
+	map(0x2800, 0x2fff).bankrw("bank2");
+	map(0x3000, 0x6fff).bankrw("bank3");
+	map(0x7000, 0xdfff).bankrw("bank4");
+	map(0xe000, 0xffff).bankrw("bank5");
+}
 
-ADDRESS_MAP_START(b2m_state::b2m_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w)
-	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w)
-	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE("pic8259", pic8259_device, read, write )
-	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("fd1793", fd1793_device, read, write)
-ADDRESS_MAP_END
+void b2m_state::b2m_io(address_map &map)
+{
+	map.global_mask(0x1f);
+	map(0x00, 0x03).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x04, 0x07).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0c, 0x0c).rw(this, FUNC(b2m_state::b2m_localmachine_r), FUNC(b2m_state::b2m_localmachine_w));
+	map(0x10, 0x13).rw(this, FUNC(b2m_state::b2m_palette_r), FUNC(b2m_state::b2m_palette_w));
+	map(0x14, 0x15).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x18, 0x18).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x19, 0x19).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x1c, 0x1f).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+}
 
-ADDRESS_MAP_START(b2m_state::b2m_rom_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w)
-	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w)
-	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE("pic8259", pic8259_device, read, write )
-	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void b2m_state::b2m_rom_io(address_map &map)
+{
+	map.global_mask(0x1f);
+	map(0x00, 0x03).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x04, 0x07).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0c, 0x0c).rw(this, FUNC(b2m_state::b2m_localmachine_r), FUNC(b2m_state::b2m_localmachine_w));
+	map(0x10, 0x13).rw(this, FUNC(b2m_state::b2m_palette_r), FUNC(b2m_state::b2m_palette_w));
+	map(0x14, 0x15).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x18, 0x18).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x19, 0x19).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 
 /* Input ports */

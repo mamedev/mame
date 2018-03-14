@@ -46,28 +46,30 @@
     ADDRESS_MAP( mtx_mem )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(mtx_state::mtx_mem)
-ADDRESS_MAP_END
+void mtx_state::mtx_mem(address_map &map)
+{
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( mtx_io )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(mtx_state::mtx_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(mtx_strobe_r, mtx_bankswitch_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("tms9929a", tms9929a_device, vram_read, vram_write)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("tms9929a", tms9929a_device, register_read, register_write)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(mtx_sound_strobe_r, mtx_cst_w)
-	AM_RANGE(0x04, 0x04) AM_READ(mtx_prt_r) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(mtx_key_lo_r, mtx_sense_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(mtx_key_hi_r, mtx_sound_latch_w)
+void mtx_state::mtx_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(this, FUNC(mtx_state::mtx_strobe_r), FUNC(mtx_state::mtx_bankswitch_w));
+	map(0x01, 0x01).rw("tms9929a", FUNC(tms9929a_device::vram_read), FUNC(tms9929a_device::vram_write));
+	map(0x02, 0x02).rw("tms9929a", FUNC(tms9929a_device::register_read), FUNC(tms9929a_device::register_write));
+	map(0x03, 0x03).rw(this, FUNC(mtx_state::mtx_sound_strobe_r), FUNC(mtx_state::mtx_cst_w));
+	map(0x04, 0x04).r(this, FUNC(mtx_state::mtx_prt_r)).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x05, 0x05).rw(this, FUNC(mtx_state::mtx_key_lo_r), FUNC(mtx_state::mtx_sense_w));
+	map(0x06, 0x06).rw(this, FUNC(mtx_state::mtx_key_hi_r), FUNC(mtx_state::mtx_sound_latch_w));
 //  AM_RANGE(0x07, 0x07) PIO
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x1f, 0x1f) AM_WRITE(mtx_cst_motor_w)
-	AM_RANGE(0x30, 0x31) AM_WRITE(hrx_address_w)
-	AM_RANGE(0x32, 0x32) AM_READWRITE(hrx_data_r, hrx_data_w)
-	AM_RANGE(0x33, 0x33) AM_READWRITE(hrx_attr_r, hrx_attr_w)
+	map(0x08, 0x0b).rw(m_z80ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x1f, 0x1f).w(this, FUNC(mtx_state::mtx_cst_motor_w));
+	map(0x30, 0x31).w(this, FUNC(mtx_state::hrx_address_w));
+	map(0x32, 0x32).rw(this, FUNC(mtx_state::hrx_data_r), FUNC(mtx_state::hrx_data_w));
+	map(0x33, 0x33).rw(this, FUNC(mtx_state::hrx_attr_r), FUNC(mtx_state::hrx_attr_w));
 //  AM_RANGE(0x38, 0x38) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 //  AM_RANGE(0x39, 0x39) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
 /*  AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY(FD1791_TAG, wd17xx_r, wd17xx_w)
@@ -75,16 +77,17 @@ ADDRESS_MAP_START(mtx_state::mtx_io)
     AM_RANGE(0x45, 0x45) AM_WRITE(fdx_drv_sel_w)
     AM_RANGE(0x46, 0x46) AM_WRITE(fdx_dma_lo_w)
     AM_RANGE(0x47, 0x47) AM_WRITE(fdx_dma_hi_w)*/
-ADDRESS_MAP_END
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( rs128_io )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(mtx_state::rs128_io)
-	AM_IMPORT_FROM(mtx_io)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, cd_ba_r, cd_ba_w)
-ADDRESS_MAP_END
+void mtx_state::rs128_io(address_map &map)
+{
+	mtx_io(map);
+	map(0x0c, 0x0f).rw(m_z80dart, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
+}
 
 /***************************************************************************
     INPUT PORTS

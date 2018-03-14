@@ -1166,26 +1166,27 @@ WRITE32_MEMBER(ip22_state::hpc3_unkpbus0_w)
 	//COMBINE_DATA(&m_unkpbus0[offset]);
 }
 
-ADDRESS_MAP_START(ip22_state::ip225015_map)
-	AM_RANGE( 0x00000000, 0x0007ffff ) AM_RAMBANK( "bank1" )    /* mirror of first 512k of main RAM */
-	AM_RANGE( 0x08000000, 0x0fffffff ) AM_SHARE("mainram") AM_RAM_WRITE(ip22_write_ram)     /* 128 MB of main RAM */
-	AM_RANGE( 0x1f0f0000, 0x1f0f1fff ) AM_DEVREADWRITE("newport", newport_video_device, rex3_r, rex3_w )
-	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_DEVREADWRITE("sgi_mc", sgi_mc_device, read, write )
-	AM_RANGE( 0x1fb90000, 0x1fb9ffff ) AM_READWRITE(hpc3_hd_enet_r, hpc3_hd_enet_w )
-	AM_RANGE( 0x1fbb0000, 0x1fbb0003 ) AM_RAM   /* unknown, but read a lot and discarded */
-	AM_RANGE( 0x1fbc0000, 0x1fbc7fff ) AM_READWRITE(hpc3_hd0_r, hpc3_hd0_w )
-	AM_RANGE( 0x1fbc8000, 0x1fbcffff ) AM_READWRITE(hpc3_unkpbus0_r, hpc3_unkpbus0_w ) AM_SHARE("unkpbus0")
-	AM_RANGE( 0x1fb80000, 0x1fb8ffff ) AM_READWRITE(hpc3_pbusdma_r, hpc3_pbusdma_w )
-	AM_RANGE( 0x1fbd8000, 0x1fbd83ff ) AM_READWRITE(hal2_r, hal2_w )
-	AM_RANGE( 0x1fbd8400, 0x1fbd87ff ) AM_RAM /* hack */
-	AM_RANGE( 0x1fbd9000, 0x1fbd93ff ) AM_READWRITE(hpc3_pbus4_r, hpc3_pbus4_w )
-	AM_RANGE( 0x1fbd9800, 0x1fbd9bff ) AM_DEVREADWRITE(IOC2_TAG, ioc2_device, read, write)
-	AM_RANGE( 0x1fbdc000, 0x1fbdc7ff ) AM_RAM
-	AM_RANGE( 0x1fbdd000, 0x1fbdd3ff ) AM_RAM
-	AM_RANGE( 0x1fbe0000, 0x1fbe04ff ) AM_DEVREADWRITE8(RTC_TAG, ds1386_device, data_r, data_w, 0x000000ff)
-	AM_RANGE( 0x1fc00000, 0x1fc7ffff ) AM_ROM AM_REGION( "user1", 0 )
-	AM_RANGE( 0x20000000, 0x27ffffff ) AM_SHARE("mainram") AM_RAM_WRITE(ip22_write_ram)
-ADDRESS_MAP_END
+void ip22_state::ip225015_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).bankrw("bank1");    /* mirror of first 512k of main RAM */
+	map(0x08000000, 0x0fffffff).share("mainram").ram().w(this, FUNC(ip22_state::ip22_write_ram));     /* 128 MB of main RAM */
+	map(0x1f0f0000, 0x1f0f1fff).rw(m_newport, FUNC(newport_video_device::rex3_r), FUNC(newport_video_device::rex3_w));
+	map(0x1fa00000, 0x1fa1ffff).rw(m_sgi_mc, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
+	map(0x1fb90000, 0x1fb9ffff).rw(this, FUNC(ip22_state::hpc3_hd_enet_r), FUNC(ip22_state::hpc3_hd_enet_w));
+	map(0x1fbb0000, 0x1fbb0003).ram();   /* unknown, but read a lot and discarded */
+	map(0x1fbc0000, 0x1fbc7fff).rw(this, FUNC(ip22_state::hpc3_hd0_r), FUNC(ip22_state::hpc3_hd0_w));
+	map(0x1fbc8000, 0x1fbcffff).rw(this, FUNC(ip22_state::hpc3_unkpbus0_r), FUNC(ip22_state::hpc3_unkpbus0_w)).share("unkpbus0");
+	map(0x1fb80000, 0x1fb8ffff).rw(this, FUNC(ip22_state::hpc3_pbusdma_r), FUNC(ip22_state::hpc3_pbusdma_w));
+	map(0x1fbd8000, 0x1fbd83ff).rw(this, FUNC(ip22_state::hal2_r), FUNC(ip22_state::hal2_w));
+	map(0x1fbd8400, 0x1fbd87ff).ram(); /* hack */
+	map(0x1fbd9000, 0x1fbd93ff).rw(this, FUNC(ip22_state::hpc3_pbus4_r), FUNC(ip22_state::hpc3_pbus4_w));
+	map(0x1fbd9800, 0x1fbd9bff).rw(m_ioc2, FUNC(ioc2_device::read), FUNC(ioc2_device::write));
+	map(0x1fbdc000, 0x1fbdc7ff).ram();
+	map(0x1fbdd000, 0x1fbdd3ff).ram();
+	map(0x1fbe0000, 0x1fbe04ff).rw(m_rtc, FUNC(ds1386_device::data_r), FUNC(ds1386_device::data_w)).umask32(0x000000ff);
+	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
+	map(0x20000000, 0x27ffffff).share("mainram").ram().w(this, FUNC(ip22_state::ip22_write_ram));
+}
 
 
 void ip22_state::machine_reset()

@@ -50,17 +50,18 @@ WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 	}
 }
 
-ADDRESS_MAP_START(skyfox_state::skyfox_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd400, 0xdfff) AM_RAM // ?
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW0")
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW1")
-	AM_RANGE(0xe008, 0xe00f) AM_WRITE(skyfox_vregs_w)
-	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
+void skyfox_state::skyfox_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xd3ff).ram().share("spriteram");
+	map(0xd400, 0xdfff).ram(); // ?
+	map(0xe000, 0xe000).portr("INPUTS");
+	map(0xe001, 0xe001).portr("DSW0");
+	map(0xe002, 0xe002).portr("DSW1");
+	map(0xe008, 0xe00f).w(this, FUNC(skyfox_state::skyfox_vregs_w));
+	map(0xf001, 0xf001).portr("DSW2");
+}
 
 
 /***************************************************************************
@@ -69,15 +70,16 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(skyfox_state::skyfox_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
+void skyfox_state::skyfox_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
 //  AM_RANGE(0x9000, 0x9001) AM_WRITENOP // ??
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
+	map(0xa000, 0xa001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 //  AM_RANGE(0xb000, 0xb001) AM_WRITENOP // ??
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+	map(0xc000, 0xc001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xb000, 0xb000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 /***************************************************************************

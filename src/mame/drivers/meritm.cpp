@@ -537,64 +537,70 @@ READ8_MEMBER(meritm_state::meritm_ds1644_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(meritm_state::meritm_crt250_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void meritm_state::meritm_crt250_map(address_map &map)
+{
+	map(0x0000, 0xdfff).bankr("bank1");
+	map(0xe000, 0xffff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(meritm_state::meritm_crt250_questions_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(meritm_crt250_questions_lo_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(meritm_crt250_questions_hi_w)
-	AM_RANGE(0x0002, 0x0002) AM_WRITE(meritm_crt250_questions_bank_w)
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void meritm_state::meritm_crt250_questions_map(address_map &map)
+{
+	map(0x0000, 0xdfff).bankr("bank1");
+	map(0x0000, 0x0000).w(this, FUNC(meritm_state::meritm_crt250_questions_lo_w));
+	map(0x0001, 0x0001).w(this, FUNC(meritm_state::meritm_crt250_questions_hi_w));
+	map(0x0002, 0x0002).w(this, FUNC(meritm_state::meritm_crt250_questions_bank_w));
+	map(0xe000, 0xffff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(meritm_state::meritm_crt250_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8930_device, data_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8930_device, address_data_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
-ADDRESS_MAP_END
+void meritm_state::meritm_crt250_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x13).rw(m_v9938_0, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x20, 0x23).rw(m_v9938_1, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x30, 0x33).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x43).rw(m_z80pio_0, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x50, 0x53).rw(m_z80pio_1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x80, 0x80).r("aysnd", FUNC(ay8930_device::data_r));
+	map(0x80, 0x81).w("aysnd", FUNC(ay8930_device::address_data_w));
+	map(0xff, 0xff).w(this, FUNC(meritm_state::meritm_crt250_bank_w));
+}
 
-ADDRESS_MAP_START(meritm_state::meritm_crt250_crt258_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
-	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8930_device, data_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8930_device, address_data_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
-ADDRESS_MAP_END
+void meritm_state::meritm_crt250_crt258_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x13).rw(m_v9938_0, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x20, 0x23).rw(m_v9938_1, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x30, 0x33).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x43).rw(m_z80pio_0, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x50, 0x53).rw(m_z80pio_1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x60, 0x67).rw(m_uart, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+	map(0x80, 0x80).r("aysnd", FUNC(ay8930_device::data_r));
+	map(0x80, 0x81).w("aysnd", FUNC(ay8930_device::address_data_w));
+	map(0xff, 0xff).w(this, FUNC(meritm_state::meritm_crt250_bank_w));
+}
 
-ADDRESS_MAP_START(meritm_state::meritm_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank3") AM_SHARE("nvram")
-ADDRESS_MAP_END
+void meritm_state::meritm_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xdfff).bankr("bank2");
+	map(0xe000, 0xffff).bankrw("bank3").share("nvram");
+}
 
-ADDRESS_MAP_START(meritm_state::meritm_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(meritm_psd_a15_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
-	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8930_device, data_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8930_device, address_data_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_bank_w)
-ADDRESS_MAP_END
+void meritm_state::meritm_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(meritm_state::meritm_psd_a15_w));
+	map(0x01, 0x01).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x10, 0x13).rw(m_v9938_0, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x20, 0x23).rw(m_v9938_1, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x30, 0x33).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x43).rw(m_z80pio_0, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x50, 0x53).rw(m_z80pio_1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x60, 0x67).rw(m_uart, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+	map(0x80, 0x80).r("aysnd", FUNC(ay8930_device::data_r));
+	map(0x80, 0x81).w("aysnd", FUNC(ay8930_device::address_data_w));
+	map(0xff, 0xff).w(this, FUNC(meritm_state::meritm_bank_w));
+}
 
 /*************************************
  *

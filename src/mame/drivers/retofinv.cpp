@@ -177,50 +177,54 @@ READ8_MEMBER(retofinv_state::mcu_status_r)
    empty socket at IC73 from 6000-7fff) and if it finds a particular
    string there, it jumps to that area, presumably for diagnostic use */
 
-ADDRESS_MAP_START(retofinv_state::bootleg_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(coincounter_w)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xb800, 0xb802) AM_WRITE(gfx_ctrl_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
-	AM_RANGE(0xc002, 0xc002) AM_READNOP /* bit 7 must be 0, otherwise game resets */
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc005, 0xc005) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc007, 0xc007) AM_READ_PORT("DSW3")
-	AM_RANGE(0xc800, 0xc807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(soundcommand_w)
-	AM_RANGE(0xf800, 0xf800) AM_READ(cpu0_mf800_r)
-ADDRESS_MAP_END
+void retofinv_state::bootleg_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x7fff, 0x7fff).w(this, FUNC(retofinv_state::coincounter_w));
+	map(0x8000, 0x87ff).ram().w(this, FUNC(retofinv_state::fg_videoram_w)).share("fg_videoram");
+	map(0x8800, 0x9fff).ram().share("sharedram");
+	map(0xa000, 0xa7ff).ram().w(this, FUNC(retofinv_state::bg_videoram_w)).share("bg_videoram");
+	map(0xb800, 0xb802).w(this, FUNC(retofinv_state::gfx_ctrl_w));
+	map(0xc000, 0xc000).portr("P1");
+	map(0xc001, 0xc001).portr("P2");
+	map(0xc002, 0xc002).nopr(); /* bit 7 must be 0, otherwise game resets */
+	map(0xc004, 0xc004).portr("SYSTEM");
+	map(0xc005, 0xc005).portr("DSW1");
+	map(0xc006, 0xc006).portr("DSW2");
+	map(0xc007, 0xc007).portr("DSW3");
+	map(0xc800, 0xc807).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xd000, 0xd000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xd800, 0xd800).w(this, FUNC(retofinv_state::soundcommand_w));
+	map(0xf800, 0xf800).r(this, FUNC(retofinv_state::cpu0_mf800_r));
+}
 
-ADDRESS_MAP_START(retofinv_state::main_map)
-	AM_IMPORT_FROM(bootleg_map)
-	AM_RANGE(0xc003, 0xc003) AM_READ(mcu_status_r)
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("68705", taito68705_mcu_device, data_r)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("68705", taito68705_mcu_device, data_w)
-ADDRESS_MAP_END
+void retofinv_state::main_map(address_map &map)
+{
+	bootleg_map(map);
+	map(0xc003, 0xc003).r(this, FUNC(retofinv_state::mcu_status_r));
+	map(0xe000, 0xe000).r(m_68705, FUNC(taito68705_mcu_device::data_r));
+	map(0xe800, 0xe800).w(m_68705, FUNC(taito68705_mcu_device::data_w));
+}
 
-ADDRESS_MAP_START(retofinv_state::sub_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xc800, 0xc807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void retofinv_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().w(this, FUNC(retofinv_state::fg_videoram_w)).share("fg_videoram");
+	map(0x8800, 0x9fff).ram().share("sharedram");
+	map(0xa000, 0xa7ff).ram().w(this, FUNC(retofinv_state::bg_videoram_w)).share("bg_videoram");
+	map(0xc800, 0xc807).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
-ADDRESS_MAP_START(retofinv_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM /* 6116 sram at IC28 */
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(cpu2_m6000_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn2", sn76489a_device, write)
-	AM_RANGE(0xe000, 0xffff) AM_ROM         /* space for diagnostic ROM */
-ADDRESS_MAP_END
+void retofinv_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram(); /* 6116 sram at IC28 */
+	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x6000, 0x6000).w(this, FUNC(retofinv_state::cpu2_m6000_w));
+	map(0x8000, 0x8000).w("sn1", FUNC(sn76489a_device::write));
+	map(0xa000, 0xa000).w("sn2", FUNC(sn76489a_device::write));
+	map(0xe000, 0xffff).rom();         /* space for diagnostic ROM */
+}
 
 
 

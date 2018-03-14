@@ -492,36 +492,38 @@ WRITE8_MEMBER( qx10_state::vram_bank_w )
 	}
 }
 
-ADDRESS_MAP_START(qx10_state::qx10_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x8000, 0xdfff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0xe000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void qx10_state::qx10_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).bankrw("bank1");
+	map(0x8000, 0xdfff).bankrw("bank2");
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(qx10_state::qx10_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit8253_1", pit8253_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("pit8253_2", pit8253_device, read, write)
-	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("pic8259_master", pic8259_device, read, write)
-	AM_RANGE(0x0c, 0x0d) AM_DEVREADWRITE("pic8259_slave", pic8259_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("upd7201", z80dart_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("i8255", i8255_device, read, write)
-	AM_RANGE(0x18, 0x1b) AM_READ_PORT("DSW") AM_WRITE(qx10_18_w)
-	AM_RANGE(0x1c, 0x1f) AM_WRITE(prom_sel_w)
-	AM_RANGE(0x20, 0x23) AM_WRITE(cmos_sel_w)
-	AM_RANGE(0x2c, 0x2c) AM_READ_PORT("CONFIG")
-	AM_RANGE(0x2d, 0x2d) AM_READWRITE(vram_bank_r,vram_bank_w)
-	AM_RANGE(0x30, 0x33) AM_READWRITE(qx10_30_r, fdd_motor_w)
-	AM_RANGE(0x34, 0x35) AM_DEVICE("upd765", upd765a_device, map)
-	AM_RANGE(0x38, 0x39) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
+void qx10_state::qx10_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw(m_pit_1, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x04, 0x07).rw(m_pit_2, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x08, 0x09).rw(m_pic_m, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0c, 0x0d).rw(m_pic_s, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x10, 0x13).rw(m_scc, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
+	map(0x14, 0x17).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x18, 0x1b).portr("DSW").w(this, FUNC(qx10_state::qx10_18_w));
+	map(0x1c, 0x1f).w(this, FUNC(qx10_state::prom_sel_w));
+	map(0x20, 0x23).w(this, FUNC(qx10_state::cmos_sel_w));
+	map(0x2c, 0x2c).portr("CONFIG");
+	map(0x2d, 0x2d).rw(this, FUNC(qx10_state::vram_bank_r), FUNC(qx10_state::vram_bank_w));
+	map(0x30, 0x33).rw(this, FUNC(qx10_state::qx10_30_r), FUNC(qx10_state::fdd_motor_w));
+	map(0x34, 0x35).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x38, 0x39).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 //  AM_RANGE(0x3a, 0x3a) GDC zoom
 //  AM_RANGE(0x3b, 0x3b) GDC light pen req
-	AM_RANGE(0x3c, 0x3d) AM_READWRITE(mc146818_r, mc146818_w)
-	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("8237dma_1", am9517a_device, read, write)
-	AM_RANGE(0x50, 0x5f) AM_DEVREADWRITE("8237dma_2", am9517a_device, read, write)
+	map(0x3c, 0x3d).rw(this, FUNC(qx10_state::mc146818_r), FUNC(qx10_state::mc146818_w));
+	map(0x40, 0x4f).rw(m_dma_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x50, 0x5f).rw(m_dma_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 //  AM_RANGE(0xfc, 0xfd) Multi-Font comms
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 /* TODO: shift break */
@@ -663,9 +665,10 @@ WRITE16_MEMBER( qx10_state::vram_w )
 	COMBINE_DATA(&m_video_ram[offset + (0x20000 * bank)]);
 }
 
-ADDRESS_MAP_START(qx10_state::upd7220_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r,vram_w)
-ADDRESS_MAP_END
+void qx10_state::upd7220_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rw(this, FUNC(qx10_state::vram_r), FUNC(qx10_state::vram_w));
+}
 
 static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("qx10", QX10_KEYBOARD)

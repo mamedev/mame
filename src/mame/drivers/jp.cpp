@@ -84,24 +84,26 @@ private:
 };
 
 
-ADDRESS_MAP_START(jp_state::jp_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("nvram") // ram-"5128" battery backed
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1ffc) AM_DEVWRITE("ay", ay8910_device, address_w)
-	AM_RANGE(0x6001, 0x6001) AM_MIRROR(0x1ffc) AM_DEVREAD("ay", ay8910_device, data_r)
-	AM_RANGE(0x6002, 0x6002) AM_MIRROR(0x1ffc) AM_DEVWRITE("ay", ay8910_device, data_w)
-	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x1ff8) AM_WRITE(out1_w)
-	AM_RANGE(0xc000, 0xc007) AM_MIRROR(0x1ff8) AM_WRITE(out2_w)
-ADDRESS_MAP_END
+void jp_state::jp_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).mirror(0x1800).ram().share("nvram"); // ram-"5128" battery backed
+	map(0x6000, 0x6000).mirror(0x1ffc).w("ay", FUNC(ay8910_device::address_w));
+	map(0x6001, 0x6001).mirror(0x1ffc).r("ay", FUNC(ay8910_device::data_r));
+	map(0x6002, 0x6002).mirror(0x1ffc).w("ay", FUNC(ay8910_device::data_w));
+	map(0xa000, 0xa007).mirror(0x1ff8).w(this, FUNC(jp_state::out1_w));
+	map(0xc000, 0xc007).mirror(0x1ff8).w(this, FUNC(jp_state::out2_w));
+}
 
-ADDRESS_MAP_START(jp_state::jp_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM // includes ADPCM data from 0x0400 to 0x3fff
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(sample_bank_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(adpcm_reset_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("adpcm_bank")
-ADDRESS_MAP_END
+void jp_state::jp_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom(); // includes ADPCM data from 0x0400 to 0x3fff
+	map(0x4000, 0x47ff).ram();
+	map(0x5000, 0x5000).w(this, FUNC(jp_state::sample_bank_w));
+	map(0x6000, 0x6000).w(m_adpcm_select, FUNC(ls157_device::ba_w));
+	map(0x7000, 0x7000).w(this, FUNC(jp_state::adpcm_reset_w));
+	map(0x8000, 0xffff).bankr("adpcm_bank");
+}
 
 static INPUT_PORTS_START( jp )
 	PORT_START("SW.0")

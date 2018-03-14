@@ -321,31 +321,32 @@ WRITE8_MEMBER(ccastles_state::nvram_w)
  *************************************/
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(ccastles_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM_WRITE(ccastles_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(ccastles_bitmode_addr_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(ccastles_bitmode_r, ccastles_bitmode_w)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x8e00, 0x8fff) AM_SHARE("spriteram")
-	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0300) AM_READWRITE(nvram_r, nvram_w)
-	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x01fc) AM_READ(leta_r)
-	AM_RANGE(0x9600, 0x97ff) AM_READ_PORT("IN0")
-	AM_RANGE(0x9800, 0x980f) AM_MIRROR(0x01f0) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
-	AM_RANGE(0x9a00, 0x9a0f) AM_MIRROR(0x01f0) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
-	AM_RANGE(0x9c00, 0x9c7f) AM_WRITE(nvram_recall_w)
-	AM_RANGE(0x9c80, 0x9cff) AM_WRITE(ccastles_hscroll_w)
-	AM_RANGE(0x9d00, 0x9d7f) AM_WRITE(ccastles_vscroll_w)
-	AM_RANGE(0x9d80, 0x9dff) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x9e00, 0x9e7f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x9e80, 0x9e81) AM_MIRROR(0x0078) AM_WRITE(led_w)
-	AM_RANGE(0x9e82, 0x9e83) AM_MIRROR(0x0078) AM_WRITE(nvram_store_w)
-	AM_RANGE(0x9e85, 0x9e86) AM_MIRROR(0x0078) AM_WRITE(ccounter_w)
-	AM_RANGE(0x9e87, 0x9e87) AM_MIRROR(0x0078) AM_WRITE(bankswitch_w)
-	AM_RANGE(0x9f00, 0x9f07) AM_MIRROR(0x0078) AM_WRITE(ccastles_video_control_w)
-	AM_RANGE(0x9f80, 0x9fbf) AM_MIRROR(0x0040) AM_WRITE(ccastles_paletteram_w)
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void ccastles_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).ram().w(this, FUNC(ccastles_state::ccastles_videoram_w)).share("videoram");
+	map(0x0000, 0x0001).w(this, FUNC(ccastles_state::ccastles_bitmode_addr_w));
+	map(0x0002, 0x0002).rw(this, FUNC(ccastles_state::ccastles_bitmode_r), FUNC(ccastles_state::ccastles_bitmode_w));
+	map(0x8000, 0x8fff).ram();
+	map(0x8e00, 0x8fff).share("spriteram");
+	map(0x9000, 0x90ff).mirror(0x0300).rw(this, FUNC(ccastles_state::nvram_r), FUNC(ccastles_state::nvram_w));
+	map(0x9400, 0x9403).mirror(0x01fc).r(this, FUNC(ccastles_state::leta_r));
+	map(0x9600, 0x97ff).portr("IN0");
+	map(0x9800, 0x980f).mirror(0x01f0).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x9a00, 0x9a0f).mirror(0x01f0).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x9c00, 0x9c7f).w(this, FUNC(ccastles_state::nvram_recall_w));
+	map(0x9c80, 0x9cff).w(this, FUNC(ccastles_state::ccastles_hscroll_w));
+	map(0x9d00, 0x9d7f).w(this, FUNC(ccastles_state::ccastles_vscroll_w));
+	map(0x9d80, 0x9dff).w(this, FUNC(ccastles_state::irq_ack_w));
+	map(0x9e00, 0x9e7f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x9e80, 0x9e81).mirror(0x0078).w(this, FUNC(ccastles_state::led_w));
+	map(0x9e82, 0x9e83).mirror(0x0078).w(this, FUNC(ccastles_state::nvram_store_w));
+	map(0x9e85, 0x9e86).mirror(0x0078).w(this, FUNC(ccastles_state::ccounter_w));
+	map(0x9e87, 0x9e87).mirror(0x0078).w(this, FUNC(ccastles_state::bankswitch_w));
+	map(0x9f00, 0x9f07).mirror(0x0078).w(this, FUNC(ccastles_state::ccastles_video_control_w));
+	map(0x9f80, 0x9fbf).mirror(0x0040).w(this, FUNC(ccastles_state::ccastles_paletteram_w));
+	map(0xa000, 0xdfff).bankr("bank1");
+	map(0xe000, 0xffff).rom();
+}
 
 
 

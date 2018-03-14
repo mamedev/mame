@@ -66,12 +66,13 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-ADDRESS_MAP_START(inder_sb_device::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x0020, 0x0020) AM_SELECT(0x0006) AM_READ(vec_bankswitch_r)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("snddata")
-ADDRESS_MAP_END
+void inder_sb_device::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x0020, 0x0020).select(0x0006).r(this, FUNC(inder_sb_device::vec_bankswitch_r));
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("snddata");
+}
 
 READ8_MEMBER(inder_sb_device::megaphx_sound_cmd_r)
 {
@@ -124,31 +125,32 @@ WRITE8_MEMBER(inder_sb_device::dac3_rombank_write)
 }
 
 
-ADDRESS_MAP_START(inder_sb_device::sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac0", dac_byte_interface, write)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("dac0vol", dac_byte_interface, write)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_byte_interface, write)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac1vol", dac_byte_interface, write)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("dac2", dac_byte_interface, write)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE("dac2vol", dac_byte_interface, write)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("dac3", dac_byte_interface, write)
-	AM_RANGE(0x07, 0x07) AM_DEVWRITE("dac3vol", dac_byte_interface, write)
+void inder_sb_device::sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("dac0", FUNC(dac_byte_interface::write));
+	map(0x01, 0x01).w("dac0vol", FUNC(dac_byte_interface::write));
+	map(0x02, 0x02).w("dac1", FUNC(dac_byte_interface::write));
+	map(0x03, 0x03).w("dac1vol", FUNC(dac_byte_interface::write));
+	map(0x04, 0x04).w("dac2", FUNC(dac_byte_interface::write));
+	map(0x05, 0x05).w("dac2vol", FUNC(dac_byte_interface::write));
+	map(0x06, 0x06).w("dac3", FUNC(dac_byte_interface::write));
+	map(0x07, 0x07).w("dac3vol", FUNC(dac_byte_interface::write));
 
 	// not 100% sure how rom banking works.. but each channel can specify a different bank for the 0x8000 range.  Maybe the bank happens when the interrupt triggers so each channel reads the correct data? (so we'd need to put the actual functions in the CTC callbacks)
-	AM_RANGE(0x10, 0x10) AM_WRITE(dac0_rombank_write)
-	AM_RANGE(0x11, 0x11) AM_WRITE(dac1_rombank_write)
-	AM_RANGE(0x12, 0x12) AM_WRITE(dac2_rombank_write)
-	AM_RANGE(0x13, 0x13) AM_WRITE(dac3_rombank_write)
+	map(0x10, 0x10).w(this, FUNC(inder_sb_device::dac0_rombank_write));
+	map(0x11, 0x11).w(this, FUNC(inder_sb_device::dac1_rombank_write));
+	map(0x12, 0x12).w(this, FUNC(inder_sb_device::dac2_rombank_write));
+	map(0x13, 0x13).w(this, FUNC(inder_sb_device::dac3_rombank_write));
 
 
 
 
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+	map(0x20, 0x23).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
-	AM_RANGE(0x30, 0x30) AM_READWRITE(megaphx_sound_cmd_r, megaphx_sound_to_68k_w)
-	AM_RANGE(0x31, 0x31) AM_READ(megaphx_sound_sent_r)
-ADDRESS_MAP_END
+	map(0x30, 0x30).rw(this, FUNC(inder_sb_device::megaphx_sound_cmd_r), FUNC(inder_sb_device::megaphx_sound_to_68k_w));
+	map(0x31, 0x31).r(this, FUNC(inder_sb_device::megaphx_sound_sent_r));
+}
 
 
 MACHINE_CONFIG_START(inder_sb_device::device_add_mconfig)

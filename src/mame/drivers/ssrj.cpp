@@ -62,23 +62,24 @@ READ8_MEMBER(ssrj_state::wheel_r)
 	return retval;
 }
 
-ADDRESS_MAP_START(ssrj_state::ssrj_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(vram1_w) AM_SHARE("vram1")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(vram2_w) AM_SHARE("vram2")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("vram3")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(vram4_w) AM_SHARE("vram4")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("scrollram")
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0")
-	AM_RANGE(0xf001, 0xf001) AM_READ(wheel_r)
-	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN2")
-	AM_RANGE(0xf003, 0xf003) AM_WRITENOP /* unknown */
-	AM_RANGE(0xf401, 0xf401) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xf400, 0xf401) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xf800, 0xf800) AM_WRITENOP /* wheel ? */
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITENOP /* unknown */
-ADDRESS_MAP_END
+void ssrj_state::ssrj_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram().w(this, FUNC(ssrj_state::vram1_w)).share("vram1");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(ssrj_state::vram2_w)).share("vram2");
+	map(0xd000, 0xd7ff).ram().share("vram3");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(ssrj_state::vram4_w)).share("vram4");
+	map(0xe000, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().share("scrollram");
+	map(0xf000, 0xf000).portr("IN0");
+	map(0xf001, 0xf001).r(this, FUNC(ssrj_state::wheel_r));
+	map(0xf002, 0xf002).portr("IN2");
+	map(0xf003, 0xf003).nopw(); /* unknown */
+	map(0xf401, 0xf401).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xf400, 0xf401).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xf800, 0xf800).nopw(); /* wheel ? */
+	map(0xfc00, 0xfc00).nopw(); /* unknown */
+}
 
 static INPUT_PORTS_START( ssrj )
 	PORT_START("IN0")

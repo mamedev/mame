@@ -123,26 +123,30 @@ uint32_t wms_state::screen_update_wms(screen_device &screen, bitmap_ind16 &bitma
 *           Memory Map Information           *
 *********************************************/
 
-ADDRESS_MAP_START(wms_state::wms_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x60000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x60000) // TODO: fix me
-ADDRESS_MAP_END
+void wms_state::wms_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram();
+	map(0x60000, 0xfffff).rom().region("maincpu", 0x60000); // TODO: fix me
+}
 
 READ8_MEMBER(wms_state::test_r)
 {
 	return 1;
 }
 
-ADDRESS_MAP_START(wms_state::wms_io)
-	AM_RANGE(0x1207, 0x1207) AM_READ(test_r)
-ADDRESS_MAP_END
+void wms_state::wms_io(address_map &map)
+{
+	map(0x1207, 0x1207).r(this, FUNC(wms_state::test_r));
+}
 
 
-ADDRESS_MAP_START(wms_state::adsp_program_map)
-ADDRESS_MAP_END
+void wms_state::adsp_program_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(wms_state::adsp_data_map)
-ADDRESS_MAP_END
+void wms_state::adsp_data_map(address_map &map)
+{
+}
 
 
 /*********************************************

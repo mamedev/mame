@@ -117,34 +117,39 @@ Interrupts:
 #include "formats/primoptp.h"
 
 
-ADDRESS_MAP_START(primo_state::primoa_port)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x3f ) AM_READWRITE(primo_be_1_r, primo_ki_1_w )
-	AM_RANGE( 0xfd, 0xfd ) AM_WRITE(primo_FD_w )
-ADDRESS_MAP_END
+void primo_state::primoa_port(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x3f).rw(this, FUNC(primo_state::primo_be_1_r), FUNC(primo_state::primo_ki_1_w));
+	map(0xfd, 0xfd).w(this, FUNC(primo_state::primo_FD_w));
+}
 
-ADDRESS_MAP_START(primo_state::primob_port)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x3f ) AM_READWRITE(primo_be_1_r, primo_ki_1_w )
-	AM_RANGE( 0x40, 0x7f ) AM_READWRITE(primo_be_2_r, primo_ki_2_w )
-	AM_RANGE( 0xfd, 0xfd ) AM_WRITE(primo_FD_w )
-ADDRESS_MAP_END
+void primo_state::primob_port(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x3f).rw(this, FUNC(primo_state::primo_be_1_r), FUNC(primo_state::primo_ki_1_w));
+	map(0x40, 0x7f).rw(this, FUNC(primo_state::primo_be_2_r), FUNC(primo_state::primo_ki_2_w));
+	map(0xfd, 0xfd).w(this, FUNC(primo_state::primo_FD_w));
+}
 
-ADDRESS_MAP_START(primo_state::primo32_mem)
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM AM_MIRROR ( 0x8000 )
-ADDRESS_MAP_END
+void primo_state::primo32_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x7fff).ram().mirror(0x8000);
+}
 
-ADDRESS_MAP_START(primo_state::primo48_mem)
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xbfff ) AM_RAM AM_MIRROR ( 0x4000 )
-ADDRESS_MAP_END
+void primo_state::primo48_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0xbfff).ram().mirror(0x4000);
+}
 
-ADDRESS_MAP_START(primo_state::primo64_mem)
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x4000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void primo_state::primo64_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0xffff).ram();
+}
 
 static INPUT_PORTS_START( primo )
 	PORT_START( "IN0" )

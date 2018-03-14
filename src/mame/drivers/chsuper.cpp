@@ -206,29 +206,31 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 *   Memory Map handlers    *
 ***************************/
 
-ADDRESS_MAP_START(chsuper_state::chsuper_prg_map)
-	AM_RANGE(0x00000, 0x0efff) AM_ROM
-	AM_RANGE(0x00000, 0x01fff) AM_WRITE( chsuper_vram_w )
-	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_REGION("maincpu", 0xf000)
-	AM_RANGE(0xfb000, 0xfbfff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void chsuper_state::chsuper_prg_map(address_map &map)
+{
+	map(0x00000, 0x0efff).rom();
+	map(0x00000, 0x01fff).w(this, FUNC(chsuper_state::chsuper_vram_w));
+	map(0x0f000, 0x0ffff).ram().region("maincpu", 0xf000);
+	map(0xfb000, 0xfbfff).ram().share("nvram");
+}
 
 //  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
-ADDRESS_MAP_START(chsuper_state::chsuper_portmap)
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
-	AM_RANGE( 0x00e8, 0x00e8 ) AM_READ_PORT("IN0")
-	AM_RANGE( 0x00e9, 0x00e9 ) AM_READ_PORT("IN1")
-	AM_RANGE( 0x00ea, 0x00ea ) AM_READ_PORT("DSW")
-	AM_RANGE( 0x00ed, 0x00ed ) AM_WRITENOP // mirror of EFh, but with bit0 active...
-	AM_RANGE( 0x00ee, 0x00ee ) AM_WRITE(chsuper_outporta_w)
-	AM_RANGE( 0x00ef, 0x00ef ) AM_WRITE(chsuper_outportb_w)
-	AM_RANGE( 0x00fc, 0x00fc ) AM_DEVWRITE("ramdac", ramdac_device, index_w)
-	AM_RANGE( 0x00fd, 0x00fd ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
-	AM_RANGE( 0x00fe, 0x00fe ) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
-	AM_RANGE( 0x8300, 0x8300 ) AM_READ_PORT("IN2")  // valid input port present in test mode.
-	AM_RANGE( 0xff20, 0xff3f ) AM_DEVWRITE("dac", dac_byte_interface, write) // unk writes
-ADDRESS_MAP_END
+void chsuper_state::chsuper_portmap(address_map &map)
+{
+	map(0x0000, 0x003f).ram(); // Z180 internal regs
+	map(0x00e8, 0x00e8).portr("IN0");
+	map(0x00e9, 0x00e9).portr("IN1");
+	map(0x00ea, 0x00ea).portr("DSW");
+	map(0x00ed, 0x00ed).nopw(); // mirror of EFh, but with bit0 active...
+	map(0x00ee, 0x00ee).w(this, FUNC(chsuper_state::chsuper_outporta_w));
+	map(0x00ef, 0x00ef).w(this, FUNC(chsuper_state::chsuper_outportb_w));
+	map(0x00fc, 0x00fc).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x00fd, 0x00fd).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x00fe, 0x00fe).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x8300, 0x8300).portr("IN2");  // valid input port present in test mode.
+	map(0xff20, 0xff3f).w("dac", FUNC(dac_byte_interface::write)); // unk writes
+}
 
 /* About Sound...
 
@@ -346,9 +348,10 @@ static GFXDECODE_START( chsuper )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 1 )
 GFXDECODE_END
 
-ADDRESS_MAP_START(chsuper_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void chsuper_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 
 /***************************

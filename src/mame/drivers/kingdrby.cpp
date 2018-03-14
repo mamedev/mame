@@ -418,82 +418,91 @@ WRITE8_MEMBER(kingdrby_state::led_array_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(kingdrby_state::master_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_MIRROR(0xc00) AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("vram")
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(sc0_attr_w) AM_SHARE("attr")
-ADDRESS_MAP_END
+void kingdrby_state::master_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3000, 0x33ff).ram().mirror(0xc00).share("share1");
+	map(0x4000, 0x43ff).ram().w(this, FUNC(kingdrby_state::sc0_vram_w)).share("vram");
+	map(0x5000, 0x53ff).ram().w(this, FUNC(kingdrby_state::sc0_attr_w)).share("attr");
+}
 
-ADDRESS_MAP_START(kingdrby_state::master_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_NOP //interrupt ack
-ADDRESS_MAP_END
+void kingdrby_state::master_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).noprw(); //interrupt ack
+}
 
-ADDRESS_MAP_START(kingdrby_state::slave_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom, tested for the post check
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram") //backup ram
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* I/O Ports */
-	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* I/O Ports */
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x7801, 0x780f) AM_WRITE(led_array_w)
-	AM_RANGE(0x7a00, 0x7a00) AM_RAM //buffer for the key matrix
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+void kingdrby_state::slave_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3000, 0x3fff).rom(); //sound rom, tested for the post check
+	map(0x4000, 0x43ff).ram().share("nvram"); //backup ram
+	map(0x5000, 0x5003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
+	map(0x6000, 0x6003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
+	map(0x7000, 0x73ff).ram().share("share1");
+	map(0x7400, 0x74ff).ram().share("spriteram");
+	map(0x7600, 0x7600).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x7601, 0x7601).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x7801, 0x780f).w(this, FUNC(kingdrby_state::led_array_w));
+	map(0x7a00, 0x7a00).ram(); //buffer for the key matrix
+	map(0x7c00, 0x7c00).portr("DSW");
+}
 
 WRITE8_MEMBER(kingdrby_state::kingdrbb_lamps_w)
 {
 	// (same as the inputs but active high)
 }
 
-ADDRESS_MAP_START(kingdrby_state::slave_1986_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom tested for the post check
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram") //backup ram
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* I/O Ports */
+void kingdrby_state::slave_1986_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3000, 0x3fff).rom(); //sound rom tested for the post check
+	map(0x4000, 0x47ff).ram().share("nvram"); //backup ram
+	map(0x5000, 0x5003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
 //  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) /* I/O Ports */
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("KEY0")
-	AM_RANGE(0x7801, 0x7801) AM_READ_PORT("KEY1")
-	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("KEY2")
-	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("KEY3")
-	AM_RANGE(0x7800, 0x7803) AM_WRITE(kingdrbb_lamps_w)
-	AM_RANGE(0x7a00, 0x7a00) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+	map(0x7000, 0x73ff).ram().share("share1");
+	map(0x7400, 0x74ff).ram().share("spriteram");
+	map(0x7600, 0x7600).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x7601, 0x7601).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x7800, 0x7800).portr("KEY0");
+	map(0x7801, 0x7801).portr("KEY1");
+	map(0x7802, 0x7802).portr("KEY2");
+	map(0x7803, 0x7803).portr("KEY3");
+	map(0x7800, 0x7803).w(this, FUNC(kingdrby_state::kingdrbb_lamps_w));
+	map(0x7a00, 0x7a00).portr("SYSTEM");
+	map(0x7c00, 0x7c00).portr("DSW");
+}
 
-ADDRESS_MAP_START(kingdrby_state::slave_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_NOP //interrupt ack
-ADDRESS_MAP_END
+void kingdrby_state::slave_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).noprw(); //interrupt ack
+}
 
-ADDRESS_MAP_START(kingdrby_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-ADDRESS_MAP_END
+void kingdrby_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x23ff).ram();
+}
 
-ADDRESS_MAP_START(kingdrby_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void kingdrby_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
 
-ADDRESS_MAP_START(kingdrby_state::cowrace_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-ADDRESS_MAP_END
+void kingdrby_state::cowrace_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+}
 
-ADDRESS_MAP_START(kingdrby_state::cowrace_sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ym2203_device, write)
-ADDRESS_MAP_END
+void kingdrby_state::cowrace_sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x41).w("aysnd", FUNC(ym2203_device::write));
+}
 
 
 WRITE8_MEMBER(kingdrby_state::outportb_w)

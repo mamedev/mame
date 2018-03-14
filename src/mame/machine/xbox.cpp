@@ -826,37 +826,39 @@ void xbox_base_state::machine_start()
 	save_item(NAME(pic16lc_buffer));
 }
 
-ADDRESS_MAP_START(xbox_base_state::xbox_base_map)
-	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM // 128 megabytes
+void xbox_base_state::xbox_base_map(address_map &map)
+{
+	map(0x00000000, 0x07ffffff).ram(); // 128 megabytes
 #if 0
-	AM_RANGE(0xf0000000, 0xf7ffffff) AM_RAM AM_SHARE("nv2a_share") // 3d accelerator wants this
-	AM_RANGE(0xfd000000, 0xfdffffff) AM_RAM AM_READWRITE(geforce_r, geforce_w)
-	AM_RANGE(0xfed00000, 0xfed003ff) AM_READWRITE(ohci_usb_r, ohci_usb_w)
-	AM_RANGE(0xfed08000, 0xfed083ff) AM_READWRITE(ohci_usb2_r, ohci_usb2_w)
-	AM_RANGE(0xfe800000, 0xfe87ffff) AM_READWRITE(audio_apu_r, audio_apu_w)
-	AM_RANGE(0xfec00000, 0xfec00fff) AM_READWRITE(audio_ac93_r, audio_ac93_w)
-	AM_RANGE(0xfef00000, 0xfef003ff) AM_READWRITE(network_r, network_w)
+	map(0xf0000000, 0xf7ffffff).ram().share("nv2a_share"); // 3d accelerator wants this
+	map(0xfd000000, 0xfdffffff).ram().rw(this, FUNC(xbox_base_state::geforce_r), FUNC(xbox_base_state::geforce_w));
+	map(0xfed00000, 0xfed003ff).rw(this, FUNC(xbox_base_state::ohci_usb_r), FUNC(xbox_base_state::ohci_usb_w));
+	map(0xfed08000, 0xfed083ff).rw(this, FUNC(xbox_base_state::ohci_usb2_r), FUNC(xbox_base_state::ohci_usb2_w));
+	map(0xfe800000, 0xfe87ffff).rw(this, FUNC(xbox_base_state::audio_apu_r), FUNC(xbox_base_state::audio_apu_w));
+	map(0xfec00000, 0xfec00fff).rw(this, FUNC(xbox_base_state::audio_ac93_r), FUNC(xbox_base_state::audio_ac93_w));
+	map(0xfef00000, 0xfef003ff).rw(this, FUNC(xbox_base_state::network_r), FUNC(xbox_base_state::network_w));
 #endif
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(xbox_base_state::xbox_base_map_io)
-	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x002c, 0x002f) AM_READWRITE8(superio_read, superio_write, 0xffff0000)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00a3) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE(":pci:09.0:ide", bus_master_ide_controller_device, read_cs0, write_cs0)
-	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE8(superiors232_read, superiors232_write, 0xffffffff)
+void xbox_base_state::xbox_base_map_io(address_map &map)
+{
+	map(0x0020, 0x0023).rw("pic8259_1", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x002e, 0x002f).rw(this, FUNC(xbox_base_state::superio_read), FUNC(xbox_base_state::superio_write));
+	map(0x0040, 0x0043).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x00a0, 0x00a3).rw("pic8259_2", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x01f0, 0x01f7).rw(":pci:09.0:ide", FUNC(bus_master_ide_controller_device::read_cs0), FUNC(bus_master_ide_controller_device::write_cs0));
+	map(0x03f8, 0x03ff).rw(this, FUNC(xbox_base_state::superiors232_read), FUNC(xbox_base_state::superiors232_write));
 #if 0
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(dummy_r, dummy_w) // lpc bridge
-	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(smbus_r, smbus_w)
-	AM_RANGE(0xc200, 0xc21f) AM_READWRITE(smbus2_r, smbus2_w)
-	AM_RANGE(0xd000, 0xd0ff) AM_NOP // ac97
-	AM_RANGE(0xd200, 0xd27f) AM_NOP // ac97
-	AM_RANGE(0xe000, 0xe007) AM_READWRITE(networkio_r, networkio_w)
-	AM_RANGE(0xff60, 0xff6f) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w)
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+	map(0x8000, 0x80ff).rw(this, FUNC(xbox_base_state::dummy_r), FUNC(xbox_base_state::dummy_w)); // lpc bridge
+	map(0xc000, 0xc00f).rw(this, FUNC(xbox_base_state::smbus_r), FUNC(xbox_base_state::smbus_w));
+	map(0xc200, 0xc21f).rw(this, FUNC(xbox_base_state::smbus2_r), FUNC(xbox_base_state::smbus2_w));
+	map(0xd000, 0xd0ff).noprw(); // ac97
+	map(0xd200, 0xd27f).noprw(); // ac97
+	map(0xe000, 0xe007).rw(this, FUNC(xbox_base_state::networkio_r), FUNC(xbox_base_state::networkio_w));
+	map(0xff60, 0xff6f).rw("ide", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
 #endif
-ADDRESS_MAP_END
+}
 
 MACHINE_CONFIG_START(xbox_base_state::xbox_base)
 	/* basic machine hardware */

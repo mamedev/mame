@@ -89,19 +89,21 @@ const tiny_rom_entry *abc77_device::device_rom_region() const
 //  ADDRESS_MAP( abc77_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc77_device::abc77_map)
-	AM_RANGE(0x000, 0xfff) AM_ROM AM_REGION("z16", 0)
-ADDRESS_MAP_END
+void abc77_device::abc77_map(address_map &map)
+{
+	map(0x000, 0xfff).rom().region("z16", 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc77_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc77_device::abc77_io)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_WRITE(j3_w)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+void abc77_device::abc77_io(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff).w(this, FUNC(abc77_device::j3_w));
+	map(0x00, 0x00).mirror(0xff).portr("DSW");
+}
 
 
 //-------------------------------------------------

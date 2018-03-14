@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
+#include "cpu/m6800/m6801.h"
 #include "sound/namco.h"
 
 class skykid_state : public driver_device
@@ -21,7 +22,7 @@ public:
 	required_shared_ptr<uint8_t> m_textram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<hd63701_cpu_device> m_mcu;
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

@@ -201,23 +201,24 @@ READ8_MEMBER(mole_state::mole_protection_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(mole_state::mole_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0800, 0x08ff) AM_READ(mole_protection_r)
-	AM_RANGE(0x0800, 0x0800) AM_WRITENOP // ???
-	AM_RANGE(0x0820, 0x0820) AM_WRITENOP // ???
-	AM_RANGE(0x5000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(mole_tileram_w) AM_READNOP
-	AM_RANGE(0x8400, 0x8400) AM_WRITE(mole_tilebank_w)
-	AM_RANGE(0x8c00, 0x8c01) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x8c40, 0x8c40) AM_WRITENOP // ???
-	AM_RANGE(0x8c80, 0x8c80) AM_WRITENOP // ???
-	AM_RANGE(0x8c81, 0x8c81) AM_WRITENOP // ???
-	AM_RANGE(0x8d00, 0x8d00) AM_READ_PORT("DSW") AM_WRITE(mole_irqack_w)
-	AM_RANGE(0x8d40, 0x8d40) AM_READ_PORT("IN0")
-	AM_RANGE(0x8d80, 0x8d80) AM_READ_PORT("IN1")
-	AM_RANGE(0x8dc0, 0x8dc0) AM_READ_PORT("IN2") AM_WRITE(mole_flipscreen_w)
-ADDRESS_MAP_END
+void mole_state::mole_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0800, 0x08ff).r(this, FUNC(mole_state::mole_protection_r));
+	map(0x0800, 0x0800).nopw(); // ???
+	map(0x0820, 0x0820).nopw(); // ???
+	map(0x5000, 0x7fff).mirror(0x8000).rom();
+	map(0x8000, 0x83ff).w(this, FUNC(mole_state::mole_tileram_w)).nopr();
+	map(0x8400, 0x8400).w(this, FUNC(mole_state::mole_tilebank_w));
+	map(0x8c00, 0x8c01).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x8c40, 0x8c40).nopw(); // ???
+	map(0x8c80, 0x8c80).nopw(); // ???
+	map(0x8c81, 0x8c81).nopw(); // ???
+	map(0x8d00, 0x8d00).portr("DSW").w(this, FUNC(mole_state::mole_irqack_w));
+	map(0x8d40, 0x8d40).portr("IN0");
+	map(0x8d80, 0x8d80).portr("IN1");
+	map(0x8dc0, 0x8dc0).portr("IN2").w(this, FUNC(mole_state::mole_flipscreen_w));
+}
 
 
 /*************************************

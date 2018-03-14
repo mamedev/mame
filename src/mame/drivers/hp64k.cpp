@@ -324,45 +324,47 @@ private:
 	uint8_t m_phi_reg;
 };
 
-ADDRESS_MAP_START(hp64k_state::cpu_mem_map)
-	AM_RANGE(0x0000 , 0x3fff) AM_ROM
-	AM_RANGE(0x4000 , 0x7fff) AM_READWRITE(hp64k_slot_r , hp64k_slot_w)
-	AM_RANGE(0x8000 , 0x8001) AM_WRITE(hp64k_crtc_w)
-	AM_RANGE(0x8002 , 0xffff) AM_RAM
-ADDRESS_MAP_END
+void hp64k_state::cpu_mem_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).rw(this, FUNC(hp64k_state::hp64k_slot_r), FUNC(hp64k_state::hp64k_slot_w));
+	map(0x8000, 0x8001).w(this, FUNC(hp64k_state::hp64k_crtc_w));
+	map(0x8002, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(hp64k_state::cpu_io_map)
+void hp64k_state::cpu_io_map(address_map &map)
+{
 	// PA = 0, IC = [0..3]
 	// Keyboard input
-	AM_RANGE(HP_MAKE_IOADDR(0 , 0) , HP_MAKE_IOADDR(0 , 3))   AM_READ(hp64k_kb_r)
+	map(HP_MAKE_IOADDR( 0, 0), HP_MAKE_IOADDR( 0, 3)).r(this, FUNC(hp64k_state::hp64k_kb_r));
 	// PA = 2, IC = [0..3]
 	// Line sync interrupt clear/watchdog reset
-	AM_RANGE(HP_MAKE_IOADDR(2 , 0) , HP_MAKE_IOADDR(2 , 3))   AM_READWRITE(hp64k_deltat_r , hp64k_deltat_w)
+	map(HP_MAKE_IOADDR( 2, 0), HP_MAKE_IOADDR( 2, 3)).rw(this, FUNC(hp64k_state::hp64k_deltat_r), FUNC(hp64k_state::hp64k_deltat_w));
 	// PA = 4, IC = [0..3]
 	// Floppy I/F
-	AM_RANGE(HP_MAKE_IOADDR(4 , 0) , HP_MAKE_IOADDR(4 , 3))   AM_READWRITE(hp64k_flp_r , hp64k_flp_w)
+	map(HP_MAKE_IOADDR( 4, 0), HP_MAKE_IOADDR( 4, 3)).rw(this, FUNC(hp64k_state::hp64k_flp_r), FUNC(hp64k_state::hp64k_flp_w));
 	// PA = 5, IC = [0..3]
 	// Write to USART
-	AM_RANGE(HP_MAKE_IOADDR(5 , 0) , HP_MAKE_IOADDR(5 , 3))   AM_WRITE(hp64k_usart_w)
+	map(HP_MAKE_IOADDR( 5, 0), HP_MAKE_IOADDR( 5, 3)).w(this, FUNC(hp64k_state::hp64k_usart_w));
 	// PA = 6, IC = [0..3]
 	// Read from USART
-	AM_RANGE(HP_MAKE_IOADDR(6 , 0) , HP_MAKE_IOADDR(6 , 3))   AM_READ(hp64k_usart_r)
+	map(HP_MAKE_IOADDR( 6, 0), HP_MAKE_IOADDR( 6, 3)).r(this, FUNC(hp64k_state::hp64k_usart_r));
 	// PA = 7, IC = 1
 	// PHI
-	AM_RANGE(HP_MAKE_IOADDR(7 , 1) , HP_MAKE_IOADDR(7 , 1))   AM_READWRITE(hp64k_phi_r , hp64k_phi_w)
+	map(HP_MAKE_IOADDR( 7, 1), HP_MAKE_IOADDR( 7, 1)).rw(this, FUNC(hp64k_state::hp64k_phi_r), FUNC(hp64k_state::hp64k_phi_w));
 	// PA = 7, IC = 2
 	// Rear-panel switches and loopback relay control
-	AM_RANGE(HP_MAKE_IOADDR(7 , 2) , HP_MAKE_IOADDR(7 , 2))   AM_READWRITE(hp64k_rear_sw_r , hp64k_loopback_w)
+	map(HP_MAKE_IOADDR( 7, 2), HP_MAKE_IOADDR( 7, 2)).rw(this, FUNC(hp64k_state::hp64k_rear_sw_r), FUNC(hp64k_state::hp64k_loopback_w));
 	// PA = 9, IC = [0..3]
 	// Beeper control & interrupt status read
-	AM_RANGE(HP_MAKE_IOADDR(9 , 0) , HP_MAKE_IOADDR(9 , 3))   AM_WRITE(hp64k_beep_w)
+	map(HP_MAKE_IOADDR( 9, 0), HP_MAKE_IOADDR( 9, 3)).w(this, FUNC(hp64k_state::hp64k_beep_w));
 	// PA = 10, IC = [0..3]
 	// Slot selection
-	AM_RANGE(HP_MAKE_IOADDR(10 , 0) , HP_MAKE_IOADDR(10 , 3)) AM_WRITE(hp64k_slot_sel_w)
+	map(HP_MAKE_IOADDR(10, 0), HP_MAKE_IOADDR(10, 3)).w(this, FUNC(hp64k_state::hp64k_slot_sel_w));
 	// PA = 12, IC = [0..3]
 	// Interrupt mask
-	AM_RANGE(HP_MAKE_IOADDR(12 , 0) , HP_MAKE_IOADDR(12 , 3)) AM_WRITE(hp64k_irl_mask_w)
-ADDRESS_MAP_END
+	map(HP_MAKE_IOADDR(12, 0), HP_MAKE_IOADDR(12, 3)).w(this, FUNC(hp64k_state::hp64k_irl_mask_w));
+}
 
 hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig , type , tag),

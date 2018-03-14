@@ -457,272 +457,311 @@ WRITE16_MEMBER(taitob_state::realpunc_output_w)
 }
 
 
-#define TC0180VCU_MEMRW( ADDR )                                         \
-	AM_RANGE(ADDR+0x00000, ADDR+0x0ffff) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_device, word_r, word_w)    \
-	AM_RANGE(ADDR+0x10000, ADDR+0x1197f) AM_RAM AM_SHARE("spriteram")   \
-	AM_RANGE(ADDR+0x11980, ADDR+0x137ff) AM_RAM                 \
-	AM_RANGE(ADDR+0x13800, ADDR+0x13fff) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_device, scroll_r, scroll_w)    \
-	AM_RANGE(ADDR+0x18000, ADDR+0x1801f) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_device, ctrl_r, ctrl_w)        \
-	AM_RANGE(ADDR+0x40000, ADDR+0x7ffff) AM_READWRITE(tc0180vcu_framebuffer_word_r, tc0180vcu_framebuffer_word_w)
+void taitob_state::tc0180vcu_memrw(address_map &map, u32 addr)
+{
+	map(addr+0x00000, addr+0x0ffff).rw(m_tc0180vcu, FUNC(tc0180vcu_device::word_r), FUNC(tc0180vcu_device::word_w));
+	map(addr+0x10000, addr+0x1197f).ram().share("spriteram");
+	map(addr+0x11980, addr+0x137ff).ram();
+	map(addr+0x13800, addr+0x13fff).rw(m_tc0180vcu, FUNC(tc0180vcu_device::scroll_r), FUNC(tc0180vcu_device::scroll_w));
+	map(addr+0x18000, addr+0x1801f).rw(m_tc0180vcu, FUNC(tc0180vcu_device::ctrl_r), FUNC(tc0180vcu_device::ctrl_w));
+	map(addr+0x40000, addr+0x7ffff).rw(this, FUNC(taitob_state::tc0180vcu_framebuffer_word_r), FUNC(taitob_state::tc0180vcu_framebuffer_word_w));
+}
+
+void taitob_state::rastsag2_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x201fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x600000, 0x607fff).ram(); /* Main RAM */ /*ashura up to 603fff only*/
+	tc0180vcu_memrw(map, 0x400000);
+	map(0x800000, 0x800001).nopr();
+	map(0x800000, 0x800000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x800002, 0x800002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0xa00000, 0xa0000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
+}
 
 
-ADDRESS_MAP_START(taitob_state::rastsag2_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x600000, 0x607fff) AM_RAM /* Main RAM */ /*ashura up to 603fff only*/
-	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
-ADDRESS_MAP_END
+void taitob_state::crimec_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x20000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
+	tc0180vcu_memrw(map, 0x400000);
+	map(0x600000, 0x600001).nopr();
+	map(0x600000, 0x600000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x600002, 0x600002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0x800000, 0x801fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xa00000, 0xa0ffff).ram(); /* Main RAM */
+}
 
 
-ADDRESS_MAP_START(taitob_state::crimec_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
-	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x600001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM /* Main RAM */
-ADDRESS_MAP_END
+void taitob_state::tetrist_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x200001).nopr();
+	map(0x200000, 0x200000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x200002, 0x200002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	tc0180vcu_memrw(map, 0x400000);
+	map(0x600000, 0x60000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
+	map(0x800000, 0x807fff).ram(); /* Main RAM */
+	map(0xa00000, 0xa01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+}
+
+void taitob_state::tetrista_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x201fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	tc0180vcu_memrw(map, 0x400000);
+	map(0x600000, 0x600003).rw("tc0040ioc", FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0xff00);
+	map(0x800000, 0x803fff).ram(); /* Main RAM */
+	map(0xa00000, 0xa00001).nopr();
+	map(0xa00000, 0xa00000).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0xa00002, 0xa00002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+}
 
 
-ADDRESS_MAP_START(taitob_state::tetrist_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
-	AM_RANGE(0x800000, 0x807fff) AM_RAM /* Main RAM */
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(taitob_state::tetrista_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x600003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0xff00)
-	AM_RANGE(0x800000, 0x803fff) AM_RAM /* Main RAM */
-	AM_RANGE(0xa00000, 0xa00001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0xff00)
-	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0xff00)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(taitob_state::hitice_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
-	AM_RANGE(0x610000, 0x610001) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x700000, 0x700001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0xff00)
-	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x803fff) AM_RAM /* Main RAM */
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM_WRITE(hitice_pixelram_w) AM_SHARE("pixelram")
-	AM_RANGE(0xbffff0, 0xbffff5) AM_WRITE(hitice_pixel_scroll_w)
+void taitob_state::hitice_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	tc0180vcu_memrw(map, 0x400000);
+	map(0x600000, 0x60000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
+	map(0x610000, 0x610001).portr("P3_P4");
+	map(0x700000, 0x700001).nopr();
+	map(0x700000, 0x700000).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0x700002, 0x700002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+	map(0x800000, 0x803fff).ram(); /* Main RAM */
+	map(0xa00000, 0xa01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xb00000, 0xb7ffff).ram().w(this, FUNC(taitob_state::hitice_pixelram_w)).share("pixelram");
+	map(0xbffff0, 0xbffff5).w(this, FUNC(taitob_state::hitice_pixel_scroll_w));
 //  { 0xbffffa, 0xbffffb, ???
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(taitob_state::rambo3_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
-	AM_RANGE(0x600010, 0x600011) AM_READ(tracky1_lo_r) /*player 1*/
-	AM_RANGE(0x600012, 0x600013) AM_READ(tracky1_hi_r)
-	AM_RANGE(0x600014, 0x600015) AM_READ(trackx1_lo_r)
-	AM_RANGE(0x600016, 0x600017) AM_READ(trackx1_hi_r)
-	AM_RANGE(0x600018, 0x600019) AM_READ(tracky2_lo_r) /*player 2*/
-	AM_RANGE(0x60001a, 0x60001b) AM_READ(tracky2_hi_r)
-	AM_RANGE(0x60001c, 0x60001d) AM_READ(trackx2_lo_r)
-	AM_RANGE(0x60001e, 0x60001f) AM_READ(trackx2_hi_r)
-	AM_RANGE(0x800000, 0x803fff) AM_RAM /* Main RAM */
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-ADDRESS_MAP_END
+void taitob_state::rambo3_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x200001).nopr();
+	map(0x200000, 0x200000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x200002, 0x200002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	tc0180vcu_memrw(map, 0x400000);
+	map(0x600000, 0x60000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
+	map(0x600010, 0x600011).r(this, FUNC(taitob_state::tracky1_lo_r)); /*player 1*/
+	map(0x600012, 0x600013).r(this, FUNC(taitob_state::tracky1_hi_r));
+	map(0x600014, 0x600015).r(this, FUNC(taitob_state::trackx1_lo_r));
+	map(0x600016, 0x600017).r(this, FUNC(taitob_state::trackx1_hi_r));
+	map(0x600018, 0x600019).r(this, FUNC(taitob_state::tracky2_lo_r)); /*player 2*/
+	map(0x60001a, 0x60001b).r(this, FUNC(taitob_state::tracky2_hi_r));
+	map(0x60001c, 0x60001d).r(this, FUNC(taitob_state::trackx2_lo_r));
+	map(0x60001e, 0x60001f).r(this, FUNC(taitob_state::trackx2_hi_r));
+	map(0x800000, 0x803fff).ram(); /* Main RAM */
+	map(0xa00000, 0xa01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+}
 
 
-ADDRESS_MAP_START(taitob_state::pbobble_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x500000, 0x50000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
-	AM_RANGE(0x500024, 0x500025) AM_READ_PORT("P3_P4_A")        /* shown in service mode, game omits to read it */
-	AM_RANGE(0x500026, 0x500027) AM_READWRITE(eep_latch_r, eeprom_w)
-	AM_RANGE(0x500028, 0x500029) AM_WRITE(player_34_coin_ctrl_w)    /* simply locks coins 3&4 out */
-	AM_RANGE(0x50002e, 0x50002f) AM_READ_PORT("P3_P4_B")        /* shown in service mode, game omits to read it */
-	AM_RANGE(0x600000, 0x600003) AM_WRITE(gain_control_w)
-	AM_RANGE(0x700000, 0x700001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM /* Main RAM */
-ADDRESS_MAP_END
+void taitob_state::pbobble_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	tc0180vcu_memrw(map, 0x400000);
+	map(0x500000, 0x50000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
+	map(0x500024, 0x500025).portr("P3_P4_A");        /* shown in service mode, game omits to read it */
+	map(0x500026, 0x500027).rw(this, FUNC(taitob_state::eep_latch_r), FUNC(taitob_state::eeprom_w));
+	map(0x500028, 0x500029).w(this, FUNC(taitob_state::player_34_coin_ctrl_w));    /* simply locks coins 3&4 out */
+	map(0x50002e, 0x50002f).portr("P3_P4_B");        /* shown in service mode, game omits to read it */
+	map(0x600000, 0x600003).w(this, FUNC(taitob_state::gain_control_w));
+	map(0x700000, 0x700001).nopr();
+	map(0x700000, 0x700000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x700002, 0x700002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0x800000, 0x801fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x900000, 0x90ffff).ram(); /* Main RAM */
+}
 
 /* identical to pbobble, above??? */
-ADDRESS_MAP_START(taitob_state::spacedx_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x500000, 0x50000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
-	AM_RANGE(0x500024, 0x500025) AM_READ_PORT("P3_P4_A")
-	AM_RANGE(0x500026, 0x500027) AM_READWRITE(eep_latch_r, eeprom_w)
-	AM_RANGE(0x500028, 0x500029) AM_WRITE(player_34_coin_ctrl_w)    /* simply locks coins 3&4 out */
-	AM_RANGE(0x50002e, 0x50002f) AM_READ_PORT("P3_P4_B")
-	AM_RANGE(0x600000, 0x600003) AM_WRITE(gain_control_w)
-	AM_RANGE(0x700000, 0x700001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM /* Main RAM */
-ADDRESS_MAP_END
+void taitob_state::spacedx_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	tc0180vcu_memrw(map, 0x400000);
+	map(0x500000, 0x50000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
+	map(0x500024, 0x500025).portr("P3_P4_A");
+	map(0x500026, 0x500027).rw(this, FUNC(taitob_state::eep_latch_r), FUNC(taitob_state::eeprom_w));
+	map(0x500028, 0x500029).w(this, FUNC(taitob_state::player_34_coin_ctrl_w));    /* simply locks coins 3&4 out */
+	map(0x50002e, 0x50002f).portr("P3_P4_B");
+	map(0x600000, 0x600003).w(this, FUNC(taitob_state::gain_control_w));
+	map(0x700000, 0x700001).nopr();
+	map(0x700000, 0x700000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x700002, 0x700002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0x800000, 0x801fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x900000, 0x90ffff).ram(); /* Main RAM */
+}
 
-ADDRESS_MAP_START(taitob_state::spacedxo_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREAD8("tc0220ioc", tc0220ioc_device, read, 0x00ff)
-	AM_RANGE(0x200000, 0x20000f) AM_WRITE(spacedxo_tc0220ioc_w)
-	AM_RANGE(0x210000, 0x210001) AM_READ_PORT("IN3")
-	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("IN4")
-	AM_RANGE(0x230000, 0x230001) AM_READ_PORT("IN5")
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x302000, 0x303fff) AM_READONLY
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM /* Main RAM */
-	TC0180VCU_MEMRW( 0x500000 )
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(taitob_state::qzshowby_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
-	AM_RANGE(0x200024, 0x200025) AM_READ_PORT("P3_P4_A")    /* player 3,4 start */
-	AM_RANGE(0x200026, 0x200027) AM_WRITE(eeprom_w)
-	AM_RANGE(0x200028, 0x200029) AM_READWRITE(player_34_coin_ctrl_r, player_34_coin_ctrl_w)
-	AM_RANGE(0x20002e, 0x20002f) AM_READ_PORT("P3_P4_B")    /* player 3,4 buttons */
-	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x600001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-	AM_RANGE(0x700000, 0x700003) AM_WRITE(gain_control_w)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM /* Main RAM */
-ADDRESS_MAP_END
+void taitob_state::spacedxo_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x100001).nopr();
+	map(0x100000, 0x100000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x100002, 0x100002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0x200000, 0x20000f).r(m_tc0220ioc, FUNC(tc0220ioc_device::read)).umask16(0x00ff);
+	map(0x200000, 0x20000f).w(this, FUNC(taitob_state::spacedxo_tc0220ioc_w));
+	map(0x210000, 0x210001).portr("IN3");
+	map(0x220000, 0x220001).portr("IN4");
+	map(0x230000, 0x230001).portr("IN5");
+	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x302000, 0x303fff).readonly();
+	map(0x400000, 0x40ffff).ram(); /* Main RAM */
+	tc0180vcu_memrw(map, 0x500000);
+}
 
 
-ADDRESS_MAP_START(taitob_state::viofight_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0xff00)
-	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0xff00)
-	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM /* Main RAM */
-ADDRESS_MAP_END
+void taitob_state::qzshowby_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x20000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
+	map(0x200024, 0x200025).portr("P3_P4_A");    /* player 3,4 start */
+	map(0x200026, 0x200027).w(this, FUNC(taitob_state::eeprom_w));
+	map(0x200028, 0x200029).rw(this, FUNC(taitob_state::player_34_coin_ctrl_r), FUNC(taitob_state::player_34_coin_ctrl_w));
+	map(0x20002e, 0x20002f).portr("P3_P4_B");    /* player 3,4 buttons */
+	tc0180vcu_memrw(map, 0x400000);
+	map(0x600000, 0x600001).nopr();
+	map(0x600000, 0x600000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x600002, 0x600002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0x700000, 0x700003).w(this, FUNC(taitob_state::gain_control_w));
+	map(0x800000, 0x801fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x900000, 0x90ffff).ram(); /* Main RAM */
+}
 
 
-ADDRESS_MAP_START(taitob_state::masterw_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x203fff) AM_RAM /* Main RAM */
-	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0xff00)
-	AM_RANGE(0xa00000, 0xa00001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0xff00)
-	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0xff00)
-ADDRESS_MAP_END
+void taitob_state::viofight_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x200001).nopr();
+	map(0x200000, 0x200000).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0x200002, 0x200002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+	tc0180vcu_memrw(map, 0x400000);
+	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x800000, 0x80000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
+	map(0xa00000, 0xa03fff).ram(); /* Main RAM */
+}
 
 
-ADDRESS_MAP_START(taitob_state::silentd_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-//  AM_RANGE(0x10001a, 0x10001b) AM_READNOP // ??? read at $1e344
-//  AM_RANGE(0x10001c, 0x10001d) AM_READNOP // ??? read at $1e356
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
-	AM_RANGE(0x210000, 0x210001) AM_READ_PORT("IN3")
-	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("IN4")
-	AM_RANGE(0x230000, 0x230001) AM_READ_PORT("IN5")
-	AM_RANGE(0x240000, 0x240001) AM_WRITENOP // ???
-//  AM_RANGE(0x240000, 0x240001) AM_READNOP /* read 4 times at init */
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x400000, 0x403fff) AM_RAM /* Main RAM */
-	TC0180VCU_MEMRW( 0x500000 )
-ADDRESS_MAP_END
+void taitob_state::masterw_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x203fff).ram(); /* Main RAM */
+	tc0180vcu_memrw(map, 0x400000);
+	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x800000, 0x800003).rw("tc0040ioc", FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0xff00);
+	map(0xa00000, 0xa00001).nopr();
+	map(0xa00000, 0xa00000).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0xa00002, 0xa00002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+}
 
 
-ADDRESS_MAP_START(taitob_state::selfeena_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM /* Main RAM */
-	TC0180VCU_MEMRW( 0x200000 )
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
-	AM_RANGE(0x410000, 0x41000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00) /* mirror address - seems to be only used for coin control */
-	AM_RANGE(0x500000, 0x500001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x500002, 0x500003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-ADDRESS_MAP_END
+void taitob_state::silentd_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x100001).nopr();
+	map(0x100000, 0x100000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x100002, 0x100002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+//  map(0x10001a, 0x10001b).nopr(); // ??? read at $1e344
+//  map(0x10001c, 0x10001d).nopr(); // ??? read at $1e356
+	map(0x200000, 0x20000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
+	map(0x210000, 0x210001).portr("IN3");
+	map(0x220000, 0x220001).portr("IN4");
+	map(0x230000, 0x230001).portr("IN5");
+	map(0x240000, 0x240001).nopw(); // ???
+//  map(0x240000, 0x240001).nopr(); /* read 4 times at init */
+	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x400000, 0x403fff).ram(); /* Main RAM */
+	tc0180vcu_memrw(map, 0x500000);
+}
 
 
-ADDRESS_MAP_START(taitob_state::sbm_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* Main RAM */
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_wordswap_r, halfword_wordswap_w)
-	AM_RANGE(0x320000, 0x320001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-	TC0180VCU_MEMRW( 0x900000 )
-ADDRESS_MAP_END
+void taitob_state::selfeena_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x103fff).ram(); /* Main RAM */
+	tc0180vcu_memrw(map, 0x200000);
+	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x400000, 0x40000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
+	map(0x410000, 0x41000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00); /* mirror address - seems to be only used for coin control */
+	map(0x500000, 0x500001).nopr();
+	map(0x500000, 0x500000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x500002, 0x500002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+}
 
-ADDRESS_MAP_START(taitob_state::realpunc_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x110000, 0x12ffff) AM_RAM
-	AM_RANGE(0x130000, 0x13ffff) AM_RAM // Check me
-	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_wordswap_r, halfword_wordswap_w)
-	AM_RANGE(0x184000, 0x184001) AM_WRITE(realpunc_video_ctrl_w)
-	AM_RANGE(0x188000, 0x188001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x188002, 0x188003) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_comm_w, 0xff00)
-	AM_RANGE(0x18c000, 0x18c001) AM_WRITE(realpunc_output_w)
-	TC0180VCU_MEMRW( 0x200000 )
-	AM_RANGE(0x280000, 0x281fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE("hd63484", hd63484_device, status16_r, address16_w)
-	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE("hd63484", hd63484_device, data16_r, data16_w)
-//  AM_RANGE(0x320000, 0x320001) AM_NOP // ?
-	AM_RANGE(0x320002, 0x320003) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_comm_w, 0xff00)
-ADDRESS_MAP_END
 
-ADDRESS_MAP_START(taitob_state::realpunc_hd63484_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_RAM
-ADDRESS_MAP_END
+void taitob_state::sbm_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x10ffff).ram(); /* Main RAM */
+	map(0x200000, 0x201fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x300000, 0x30000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
+	map(0x320000, 0x320001).nopr();
+	map(0x320000, 0x320000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x320002, 0x320002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	tc0180vcu_memrw(map, 0x900000);
+}
 
-ADDRESS_MAP_START(taitob_state::masterw_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
-ADDRESS_MAP_END
+void taitob_state::realpunc_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x110000, 0x12ffff).ram();
+	map(0x130000, 0x13ffff).ram(); // Check me
+	map(0x180000, 0x18000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
+	map(0x184000, 0x184001).w(this, FUNC(taitob_state::realpunc_video_ctrl_w));
+	map(0x188000, 0x188001).nopr();
+	map(0x188000, 0x188000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x188002, 0x188003).nopr();
+	map(0x188002, 0x188002).w("tc0140syt", FUNC(tc0140syt_device::master_comm_w));
+	map(0x18c000, 0x18c001).w(this, FUNC(taitob_state::realpunc_output_w));
+	tc0180vcu_memrw(map, 0x200000);
+	map(0x280000, 0x281fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x300000, 0x300001).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
+	map(0x300002, 0x300003).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+//  map(0x320000, 0x320001).nop(); // ?
+	map(0x320002, 0x320003).nopr();
+	map(0x320002, 0x320002).w("tc0140syt", FUNC(tc0140syt_device::master_comm_w));
+}
 
-ADDRESS_MAP_START(taitob_state::sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
-	AM_RANGE(0xe600, 0xe600) AM_WRITENOP /* ? */
-	AM_RANGE(0xea00, 0xea00) AM_READNOP
-	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(bankswitch_w)
-ADDRESS_MAP_END
+void taitob_state::realpunc_hd63484_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).ram();
+}
 
-ADDRESS_MAP_START(taitob_state::viofight_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("oki", okim6295_device, read, write)       /* yes, both addresses for the same chip */
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
-ADDRESS_MAP_END
+void taitob_state::masterw_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0x8fff).ram();
+	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
+	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
+}
+
+void taitob_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe200, 0xe200).nopr().w("tc0140syt", FUNC(tc0140syt_device::slave_port_w));
+	map(0xe201, 0xe201).rw("tc0140syt", FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
+	map(0xe400, 0xe403).nopw(); /* pan */
+	map(0xe600, 0xe600).nopw(); /* ? */
+	map(0xea00, 0xea00).nopr();
+	map(0xee00, 0xee00).nopw(); /* ? */
+	map(0xf000, 0xf000).nopw(); /* ? */
+	map(0xf200, 0xf200).w(this, FUNC(taitob_state::bankswitch_w));
+}
+
+void taitob_state::viofight_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0x8fff).ram();
+	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xb000, 0xb001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));       /* yes, both addresses for the same chip */
+	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
+	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
+}
 
 
 /***********************************************************

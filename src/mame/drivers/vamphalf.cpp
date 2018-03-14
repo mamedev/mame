@@ -443,183 +443,201 @@ WRITE8_MEMBER( vamphalf_state::qs1000_p3_w )
 }
 
 
-ADDRESS_MAP_START(vamphalf_state::common_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram")
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("maincpu",0)
-ADDRESS_MAP_END
+void vamphalf_state::common_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("wram");
+	map(0x40000000, 0x4003ffff).ram().share("tiles");
+	map(0x80000000, 0x8000ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(vamphalf_state::common_32bit_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram32")
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("maincpu",0)
-ADDRESS_MAP_END
+void vamphalf_state::common_32bit_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("wram32");
+	map(0x40000000, 0x4003ffff).ram().share("tiles32");
+	map(0x80000000, 0x8000ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(vamphalf_state::yorijori_32bit_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram32")
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu",0)
-ADDRESS_MAP_END
+void vamphalf_state::yorijori_32bit_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("wram32");
+	map(0x40000000, 0x4003ffff).ram().share("tiles32");
+	map(0x80000000, 0x8000ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(vamphalf_state::vamphalf_io)
-	AM_RANGE(0x0c0, 0x0c1) AM_NOP // return 0, when oki chip is read / written
-	AM_RANGE(0x0c2, 0x0c3) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x140, 0x143) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
-	AM_RANGE(0x146, 0x147) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
-	AM_RANGE(0x1c0, 0x1c3) AM_READ(eeprom_r)
-	AM_RANGE(0x240, 0x243) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x600, 0x603) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x604, 0x607) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x608, 0x60b) AM_WRITE(eeprom_w)
-ADDRESS_MAP_END
+void vamphalf_state::vamphalf_io(address_map &map)
+{
+	map(0x0c0, 0x0c1).noprw(); // return 0, when oki chip is read / written
+	map(0x0c3, 0x0c3).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x140, 0x143).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
+	map(0x147, 0x147).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
+	map(0x1c0, 0x1c3).r(this, FUNC(vamphalf_state::eeprom_r));
+	map(0x240, 0x243).w(this, FUNC(vamphalf_state::flipscreen_w));
+	map(0x600, 0x603).portr("SYSTEM");
+	map(0x604, 0x607).portr("P1_P2");
+	map(0x608, 0x60b).w(this, FUNC(vamphalf_state::eeprom_w));
+}
 
-ADDRESS_MAP_START(vamphalf_state::misncrft_io)
-	AM_RANGE(0x100, 0x103) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x200, 0x203) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x240, 0x243) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3c0, 0x3c3) AM_WRITE(eeprom_w)
-	AM_RANGE(0x400, 0x403) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff).cswidth(16)
-	AM_RANGE(0x580, 0x583) AM_READ(eeprom_r)
-ADDRESS_MAP_END
+void vamphalf_state::misncrft_io(address_map &map)
+{
+	map(0x100, 0x103).w(this, FUNC(vamphalf_state::flipscreen_w));
+	map(0x200, 0x203).portr("P1_P2");
+	map(0x240, 0x243).portr("SYSTEM");
+	map(0x3c0, 0x3c3).w(this, FUNC(vamphalf_state::eeprom_w));
+	map(0x400, 0x403).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x580, 0x583).r(this, FUNC(vamphalf_state::eeprom_r));
+}
 
-ADDRESS_MAP_START(vamphalf_state::coolmini_io)
-	AM_RANGE(0x200, 0x203) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x300, 0x303) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x304, 0x307) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x308, 0x30b) AM_WRITE(eeprom_w)
-	AM_RANGE(0x4c0, 0x4c1) AM_NOP // return 0, when oki chip is read / written
-	AM_RANGE(0x4c2, 0x4c3) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x540, 0x543) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
-	AM_RANGE(0x544, 0x547) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
-	AM_RANGE(0x7c0, 0x7c3) AM_READ(eeprom_r)
-ADDRESS_MAP_END
+void vamphalf_state::coolmini_io(address_map &map)
+{
+	map(0x200, 0x203).w(this, FUNC(vamphalf_state::flipscreen_w));
+	map(0x300, 0x303).portr("SYSTEM");
+	map(0x304, 0x307).portr("P1_P2");
+	map(0x308, 0x30b).w(this, FUNC(vamphalf_state::eeprom_w));
+	map(0x4c0, 0x4c1).noprw(); // return 0, when oki chip is read / written
+	map(0x4c3, 0x4c3).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x540, 0x543).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
+	map(0x544, 0x547).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
+	map(0x7c0, 0x7c3).r(this, FUNC(vamphalf_state::eeprom_r));
+}
 
-ADDRESS_MAP_START(vamphalf_state::mrkicker_io)
-	AM_RANGE(0x002, 0x003) AM_WRITE(mrkicker_oki_bank_w)
-	AM_IMPORT_FROM(coolmini_io)
-ADDRESS_MAP_END
+void vamphalf_state::mrkicker_io(address_map &map)
+{
+	map(0x002, 0x003).w(this, FUNC(vamphalf_state::mrkicker_oki_bank_w));
+	coolmini_io(map);
+}
 
-ADDRESS_MAP_START(vamphalf_state::suplup_io)
-	AM_RANGE(0x020, 0x023) AM_WRITE(eeprom_w)
-	AM_RANGE(0x040, 0x043) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x060, 0x063) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x080, 0x081) AM_NOP // return 0, when oki chip is read / written
-	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
-	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
-	AM_RANGE(0x100, 0x103) AM_READ(eeprom_r)
-ADDRESS_MAP_END
+void vamphalf_state::suplup_io(address_map &map)
+{
+	map(0x020, 0x023).w(this, FUNC(vamphalf_state::eeprom_w));
+	map(0x040, 0x043).portr("P1_P2");
+	map(0x060, 0x063).portr("SYSTEM");
+	map(0x080, 0x081).noprw(); // return 0, when oki chip is read / written
+	map(0x083, 0x083).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0c0, 0x0c3).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
+	map(0x0c4, 0x0c7).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
+	map(0x100, 0x103).r(this, FUNC(vamphalf_state::eeprom_r));
+}
 
-ADDRESS_MAP_START(vamphalf_state::wyvernwg_io)
-	AM_RANGE(0x1800, 0x1803) AM_READWRITE(wyvernwg_prot_r, wyvernwg_prot_w)
-	AM_RANGE(0x2000, 0x2003) AM_WRITE(flipscreen32_w)
-	AM_RANGE(0x2800, 0x2803) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x3000, 0x3003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x5400, 0x5403) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff).cswidth(32)
-	AM_RANGE(0x7000, 0x7003) AM_WRITE(eeprom32_w)
-	AM_RANGE(0x7c00, 0x7c03) AM_READ(eeprom32_r)
-ADDRESS_MAP_END
+void vamphalf_state::wyvernwg_io(address_map &map)
+{
+	map(0x1800, 0x1803).rw(this, FUNC(vamphalf_state::wyvernwg_prot_r), FUNC(vamphalf_state::wyvernwg_prot_w));
+	map(0x2000, 0x2003).w(this, FUNC(vamphalf_state::flipscreen32_w));
+	map(0x2800, 0x2803).portr("P1_P2");
+	map(0x3000, 0x3003).portr("SYSTEM");
+	map(0x5400, 0x5403).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
+	map(0x7000, 0x7003).w(this, FUNC(vamphalf_state::eeprom32_w));
+	map(0x7c00, 0x7c03).r(this, FUNC(vamphalf_state::eeprom32_r));
+}
 
-ADDRESS_MAP_START(vamphalf_state::finalgdr_io)
-	AM_RANGE(0x2400, 0x2403) AM_READ(finalgdr_prot_r)
-	AM_RANGE(0x2800, 0x2803) AM_WRITE(finalgdr_backupram_bank_w)
-	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(finalgdr_backupram_r, finalgdr_backupram_w)
-	AM_RANGE(0x3000, 0x3007) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x0000ff00)
-	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x0000ff00)
-	AM_RANGE(0x3c00, 0x3c03) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x4400, 0x4403) AM_READ(eeprom32_r)
-	AM_RANGE(0x6000, 0x6003) AM_READNOP //?
-	AM_RANGE(0x6000, 0x6003) AM_WRITE(finalgdr_eeprom_w)
-	AM_RANGE(0x6040, 0x6043) AM_WRITE(finalgdr_prot_w)
+void vamphalf_state::finalgdr_io(address_map &map)
+{
+	map(0x2400, 0x2403).r(this, FUNC(vamphalf_state::finalgdr_prot_r));
+	map(0x2800, 0x2803).w(this, FUNC(vamphalf_state::finalgdr_backupram_bank_w));
+	map(0x2c00, 0x2dff).rw(this, FUNC(vamphalf_state::finalgdr_backupram_r), FUNC(vamphalf_state::finalgdr_backupram_w));
+	map(0x3000, 0x3007).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask32(0x0000ff00);
+	map(0x3800, 0x3803).portr("P1_P2");
+	map(0x3402, 0x3402).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3c00, 0x3c03).portr("SYSTEM");
+	map(0x4400, 0x4403).r(this, FUNC(vamphalf_state::eeprom32_r));
+	map(0x6000, 0x6003).nopr(); //?
+	map(0x6000, 0x6003).w(this, FUNC(vamphalf_state::finalgdr_eeprom_w));
+	map(0x6040, 0x6043).w(this, FUNC(vamphalf_state::finalgdr_prot_w));
 	//AM_RANGE(0x6080, 0x6083) AM_WRITE(flipscreen32_w) //?
-	AM_RANGE(0x6060, 0x6063) AM_WRITE(finalgdr_prize_w)
-	AM_RANGE(0x60a0, 0x60a3) AM_WRITE(finalgdr_oki_bank_w)
-ADDRESS_MAP_END
+	map(0x6060, 0x6063).w(this, FUNC(vamphalf_state::finalgdr_prize_w));
+	map(0x60a0, 0x60a3).w(this, FUNC(vamphalf_state::finalgdr_oki_bank_w));
+}
 
-ADDRESS_MAP_START(vamphalf_state::mrkickera_io)
-	AM_RANGE(0x2400, 0x2403) AM_READ(eeprom32_r)
-	AM_RANGE(0x4000, 0x4003) AM_READNOP //?
-	AM_RANGE(0x4000, 0x4003) AM_WRITE(finalgdr_eeprom_w)
-	AM_RANGE(0x4040, 0x4043) AM_WRITE(finalgdr_prot_w)
-	AM_RANGE(0x4084, 0x4087) AM_WRITENOP //?
-	AM_RANGE(0x40a0, 0x40a3) AM_WRITE(finalgdr_oki_bank_w)
-	AM_RANGE(0x6400, 0x6403) AM_READ(finalgdr_prot_r)
-	AM_RANGE(0x7000, 0x7007) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x0000ff00)
-	AM_RANGE(0x7400, 0x7403) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x0000ff00)
-	AM_RANGE(0x7800, 0x7803) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x7c00, 0x7c03) AM_READ_PORT("SYSTEM")
-ADDRESS_MAP_END
+void vamphalf_state::mrkickera_io(address_map &map)
+{
+	map(0x2400, 0x2403).r(this, FUNC(vamphalf_state::eeprom32_r));
+	map(0x4000, 0x4003).nopr(); //?
+	map(0x4000, 0x4003).w(this, FUNC(vamphalf_state::finalgdr_eeprom_w));
+	map(0x4040, 0x4043).w(this, FUNC(vamphalf_state::finalgdr_prot_w));
+	map(0x4084, 0x4087).nopw(); //?
+	map(0x40a0, 0x40a3).w(this, FUNC(vamphalf_state::finalgdr_oki_bank_w));
+	map(0x6400, 0x6403).r(this, FUNC(vamphalf_state::finalgdr_prot_r));
+	map(0x7000, 0x7007).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask32(0x0000ff00);
+	map(0x7402, 0x7402).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x7800, 0x7803).portr("P1_P2");
+	map(0x7c00, 0x7c03).portr("SYSTEM");
+}
 
 
 
-ADDRESS_MAP_START(vamphalf_state::jmpbreak_io)
-	AM_RANGE(0x0c0, 0x0c3) AM_NOP // ?
-	AM_RANGE(0x100, 0x103) AM_WRITENOP // ?
-	AM_RANGE(0x240, 0x243) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x280, 0x283) AM_WRITE(eeprom_w)
-	AM_RANGE(0x2c0, 0x2c3) AM_READ(eeprom_r)
-	AM_RANGE(0x440, 0x441) AM_NOP // return 0, when oki chip is read / written
-	AM_RANGE(0x442, 0x443) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x540, 0x543) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x680, 0x683) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
-	AM_RANGE(0x684, 0x687) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
-ADDRESS_MAP_END
+void vamphalf_state::jmpbreak_io(address_map &map)
+{
+	map(0x0c0, 0x0c3).noprw(); // ?
+	map(0x100, 0x103).nopw(); // ?
+	map(0x240, 0x243).portr("P1_P2");
+	map(0x280, 0x283).w(this, FUNC(vamphalf_state::eeprom_w));
+	map(0x2c0, 0x2c3).r(this, FUNC(vamphalf_state::eeprom_r));
+	map(0x440, 0x441).noprw(); // return 0, when oki chip is read / written
+	map(0x443, 0x443).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x540, 0x543).portr("SYSTEM");
+	map(0x680, 0x683).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
+	map(0x684, 0x687).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(vamphalf_state::mrdig_io)
-	AM_RANGE(0x500, 0x503) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x3c0, 0x3c3) AM_WRITE(eeprom_w)
-	AM_RANGE(0x180, 0x183) AM_READ(eeprom_r)
-	AM_RANGE(0x080, 0x081) AM_NOP // return 0, when oki chip is read / written
-	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x280, 0x283) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
-	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
-ADDRESS_MAP_END
+void vamphalf_state::mrdig_io(address_map &map)
+{
+	map(0x500, 0x503).portr("P1_P2");
+	map(0x3c0, 0x3c3).w(this, FUNC(vamphalf_state::eeprom_w));
+	map(0x180, 0x183).r(this, FUNC(vamphalf_state::eeprom_r));
+	map(0x080, 0x081).noprw(); // return 0, when oki chip is read / written
+	map(0x083, 0x083).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x280, 0x283).portr("SYSTEM");
+	map(0x0c0, 0x0c3).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
+	map(0x0c4, 0x0c7).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(vamphalf_state::aoh_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("wram32")
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x80210000, 0x80210003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x80220000, 0x80220003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("maincpu",0)
-ADDRESS_MAP_END
+void vamphalf_state::aoh_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram().share("wram32");
+	map(0x40000000, 0x4003ffff).ram().share("tiles32");
+	map(0x80000000, 0x8000ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x80210000, 0x80210003).portr("SYSTEM");
+	map(0x80220000, 0x80220003).portr("P1_P2");
+	map(0xffc00000, 0xffffffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(vamphalf_state::aoh_io)
-	AM_RANGE(0x0480, 0x0483) AM_WRITE(eeprom32_w)
-	AM_RANGE(0x0620, 0x0623) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x0000ff00)
-	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8("oki_1", okim6295_device, read, write, 0x0000ff00)
-	AM_RANGE(0x0640, 0x0647) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x0000ff00)
-	AM_RANGE(0x0680, 0x0683) AM_WRITE(aoh_oki_bank_w)
-ADDRESS_MAP_END
+void vamphalf_state::aoh_io(address_map &map)
+{
+	map(0x0480, 0x0483).w(this, FUNC(vamphalf_state::eeprom32_w));
+	map(0x0622, 0x0622).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0662, 0x0662).rw("oki_1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0640, 0x0647).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask32(0x0000ff00);
+	map(0x0680, 0x0683).w(this, FUNC(vamphalf_state::aoh_oki_bank_w));
+}
 
-ADDRESS_MAP_START(vamphalf_state::boonggab_io)
-	AM_RANGE(0x0c0, 0x0c3) AM_READ(eeprom_r)
-	AM_RANGE(0x200, 0x203) AM_NOP // seems unused
-	AM_RANGE(0x300, 0x303) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x400, 0x403) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x404, 0x407) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x408, 0x40b) AM_WRITE(eeprom_w)
-	AM_RANGE(0x410, 0x413) AM_WRITE(boonggab_prize_w)
-	AM_RANGE(0x414, 0x41b) AM_WRITE(boonggab_lamps_w)
-	AM_RANGE(0x600, 0x603) AM_WRITE(boonggab_oki_bank_w)
-	AM_RANGE(0x700, 0x701) AM_NOP // return 0, when oki chip is read / written
-	AM_RANGE(0x702, 0x703) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x740, 0x743) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
-	AM_RANGE(0x744, 0x747) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
-ADDRESS_MAP_END
+void vamphalf_state::boonggab_io(address_map &map)
+{
+	map(0x0c0, 0x0c3).r(this, FUNC(vamphalf_state::eeprom_r));
+	map(0x200, 0x203).noprw(); // seems unused
+	map(0x300, 0x303).w(this, FUNC(vamphalf_state::flipscreen_w));
+	map(0x400, 0x403).portr("SYSTEM");
+	map(0x404, 0x407).portr("P1_P2");
+	map(0x408, 0x40b).w(this, FUNC(vamphalf_state::eeprom_w));
+	map(0x410, 0x413).w(this, FUNC(vamphalf_state::boonggab_prize_w));
+	map(0x414, 0x41b).w(this, FUNC(vamphalf_state::boonggab_lamps_w));
+	map(0x600, 0x603).w(this, FUNC(vamphalf_state::boonggab_oki_bank_w));
+	map(0x700, 0x701).noprw(); // return 0, when oki chip is read / written
+	map(0x702, 0x703).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask32(0x000000ff);
+	map(0x743, 0x743).w("ymsnd", FUNC(ym2151_device::register_w));
+	map(0x747, 0x747).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
+}
 
-ADDRESS_MAP_START(vamphalf_state::yorijori_io)
-ADDRESS_MAP_END
+void vamphalf_state::yorijori_io(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(vamphalf_state::banked_oki_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void vamphalf_state::banked_oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
+}
 
 /*
 Sprite list:

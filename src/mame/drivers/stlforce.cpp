@@ -92,33 +92,35 @@ WRITE8_MEMBER(stlforce_state::oki_bank_w)
 	}
 }
 
-ADDRESS_MAP_START(stlforce_state::stlforce_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(mlow_videoram_w) AM_SHARE("mlow_videoram")
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(mhigh_videoram_w) AM_SHARE("mhigh_videoram")
-	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("tx_videoram")
-	AM_RANGE(0x102800, 0x102fff) AM_RAM /* unknown / ram */
-	AM_RANGE(0x103000, 0x1033ff) AM_RAM AM_SHARE("bg_scrollram")
-	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_SHARE("mlow_scrollram")
-	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_SHARE("mhigh_scrollram")
-	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_SHARE("vidattrram")
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x105000, 0x107fff) AM_RAM /* unknown / ram */
-	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x109000, 0x11ffff) AM_RAM
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUT")
-	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x400010, 0x400011) AM_WRITE8(eeprom_w, 0x00ff)
-	AM_RANGE(0x400012, 0x400013) AM_WRITE8(oki_bank_w, 0xff00)
-	AM_RANGE(0x40001e, 0x40001f) AM_WRITENOP // sprites buffer commands
-	AM_RANGE(0x410000, 0x410001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void stlforce_state::stlforce_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x1007ff).ram().w(this, FUNC(stlforce_state::bg_videoram_w)).share("bg_videoram");
+	map(0x100800, 0x100fff).ram().w(this, FUNC(stlforce_state::mlow_videoram_w)).share("mlow_videoram");
+	map(0x101000, 0x1017ff).ram().w(this, FUNC(stlforce_state::mhigh_videoram_w)).share("mhigh_videoram");
+	map(0x101800, 0x1027ff).ram().w(this, FUNC(stlforce_state::tx_videoram_w)).share("tx_videoram");
+	map(0x102800, 0x102fff).ram(); /* unknown / ram */
+	map(0x103000, 0x1033ff).ram().share("bg_scrollram");
+	map(0x103400, 0x1037ff).ram().share("mlow_scrollram");
+	map(0x103800, 0x103bff).ram().share("mhigh_scrollram");
+	map(0x103c00, 0x103fff).ram().share("vidattrram");
+	map(0x104000, 0x104fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x105000, 0x107fff).ram(); /* unknown / ram */
+	map(0x108000, 0x108fff).ram().share("spriteram");
+	map(0x109000, 0x11ffff).ram();
+	map(0x400000, 0x400001).portr("INPUT");
+	map(0x400002, 0x400003).portr("SYSTEM");
+	map(0x400011, 0x400011).w(this, FUNC(stlforce_state::eeprom_w));
+	map(0x400012, 0x400012).w(this, FUNC(stlforce_state::oki_bank_w));
+	map(0x40001e, 0x40001f).nopw(); // sprites buffer commands
+	map(0x410001, 0x410001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
-ADDRESS_MAP_START(stlforce_state::twinbrat_oki_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void stlforce_state::twinbrat_oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
+}
 
 static INPUT_PORTS_START( stlforce )
 	PORT_START("INPUT")

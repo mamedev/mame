@@ -1142,16 +1142,18 @@ DRIVER_INIT_MEMBER(igs017_state,spkrform)
 // iqblocka
 
 
-ADDRESS_MAP_START(igs017_state::iqblocka_map)
-	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
-	AM_RANGE( 0x0e000, 0x0efff ) AM_RAM
-	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM
-	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
-ADDRESS_MAP_END
+void igs017_state::iqblocka_map(address_map &map)
+{
+	map(0x00000, 0x0dfff).rom();
+	map(0x0e000, 0x0efff).ram();
+	map(0x0f000, 0x0ffff).ram();
+	map(0x10000, 0x3ffff).rom();
+}
 
-ADDRESS_MAP_START(igs017_state::decrypted_opcodes_map)
-	AM_RANGE( 0x00000, 0x3ffff ) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void igs017_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom().share("decrypted_opcodes");
+}
 
 
 
@@ -1198,20 +1200,21 @@ READ8_MEMBER(igs017_state::input_r)
 	}
 }
 
-ADDRESS_MAP_START(igs017_state::iqblocka_io)
-	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
+void igs017_state::iqblocka_io(address_map &map)
+{
+	map(0x0000, 0x7fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
+	map(0x0000, 0x003f).ram(); // internal regs
 
-	AM_RANGE( 0x8000, 0x8000 ) AM_WRITE(input_select_w )
-	AM_RANGE( 0x8001, 0x8001 ) AM_READ(input_r )
+	map(0x8000, 0x8000).w(this, FUNC(igs017_state::input_select_w));
+	map(0x8001, 0x8001).r(this, FUNC(igs017_state::input_r));
 
-	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	map(0x9000, 0x9000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE( 0xa000, 0xa000 ) AM_READ_PORT( "BUTTONS" )
+	map(0xa000, 0xa000).portr("BUTTONS");
 
-	AM_RANGE( 0xb000, 0xb001 ) AM_DEVWRITE("ymsnd", ym2413_device, write)
-ADDRESS_MAP_END
+	map(0xb000, 0xb001).w("ymsnd", FUNC(ym2413_device::write));
+}
 
 
 // mgcs
@@ -1471,16 +1474,17 @@ READ8_MEMBER(igs017_state::mgcs_keys_r)
 
 
 
-ADDRESS_MAP_START(igs017_state::mgcs)
-	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x300000, 0x303fff ) AM_RAM
-	AM_RANGE( 0x49c000, 0x49c003 ) AM_WRITE(mgcs_magic_w ) AM_READ(mgcs_magic_r )
+void igs017_state::mgcs(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x300000, 0x303fff).ram();
+	map(0x49c000, 0x49c003).w(this, FUNC(igs017_state::mgcs_magic_w)).r(this, FUNC(igs017_state::mgcs_magic_r));
 
-	AM_RANGE( 0xa00000, 0xa0ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+	map(0xa00000, 0xa0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
-	AM_RANGE( 0xa12000, 0xa12001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
+	map(0xa12001, 0xa12001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	// oki banking through protection (code at $1a350)?
-ADDRESS_MAP_END
+}
 
 
 // sdmg2
@@ -1553,16 +1557,17 @@ READ16_MEMBER(igs017_state::sdmg2_magic_r)
 	return 0xffff;
 }
 
-ADDRESS_MAP_START(igs017_state::sdmg2)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
+void igs017_state::sdmg2(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x1f0000, 0x1fffff).ram();
 
-	AM_RANGE(0x200000, 0x20ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+	map(0x200000, 0x20ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x210000, 0x210001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(sdmg2_magic_w )
-	AM_RANGE(0x300002, 0x300003) AM_READ(sdmg2_magic_r )
-ADDRESS_MAP_END
+	map(0x210001, 0x210001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x300000, 0x300003).w(this, FUNC(igs017_state::sdmg2_magic_w));
+	map(0x300002, 0x300003).r(this, FUNC(igs017_state::sdmg2_magic_r));
+}
 
 
 // mgdh, mgdha
@@ -1666,16 +1671,17 @@ READ16_MEMBER(igs017_state::mgdha_magic_r)
 	return 0xffff;
 }
 
-ADDRESS_MAP_START(igs017_state::mgdha_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x600000, 0x603fff) AM_RAM
-	AM_RANGE(0x876000, 0x876003) AM_WRITE(mgdha_magic_w )
-	AM_RANGE(0x876002, 0x876003) AM_READ(mgdha_magic_r )
+void igs017_state::mgdha_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x600000, 0x603fff).ram();
+	map(0x876000, 0x876003).w(this, FUNC(igs017_state::mgdha_magic_w));
+	map(0x876002, 0x876003).r(this, FUNC(igs017_state::mgdha_magic_r));
 
-	AM_RANGE(0xa00000, 0xa0ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+	map(0xa00000, 0xa0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0xa10000, 0xa10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
-ADDRESS_MAP_END
+	map(0xa10001, 0xa10001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 // tjsb
@@ -1731,36 +1737,39 @@ READ8_MEMBER(igs017_state::tjsb_input_r)
 	}
 }
 
-ADDRESS_MAP_START(igs017_state::tjsb_map)
-	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
-	AM_RANGE( 0x0e000, 0x0e000 ) AM_WRITE(input_select_w )
-	AM_RANGE( 0x0e001, 0x0e001 ) AM_READWRITE(tjsb_input_r, tjsb_output_w )
-	AM_RANGE( 0x0e002, 0x0efff ) AM_RAM
-	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM
-	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
-ADDRESS_MAP_END
+void igs017_state::tjsb_map(address_map &map)
+{
+	map(0x00000, 0x0dfff).rom();
+	map(0x0e000, 0x0e000).w(this, FUNC(igs017_state::input_select_w));
+	map(0x0e001, 0x0e001).rw(this, FUNC(igs017_state::tjsb_input_r), FUNC(igs017_state::tjsb_output_w));
+	map(0x0e002, 0x0efff).ram();
+	map(0x0f000, 0x0ffff).ram();
+	map(0x10000, 0x3ffff).rom();
+}
 
-ADDRESS_MAP_START(igs017_state::tjsb_io)
-	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
+void igs017_state::tjsb_io(address_map &map)
+{
+	map(0x0000, 0x7fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
+	map(0x0000, 0x003f).ram(); // internal regs
 
-	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	map(0x9000, 0x9000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE( 0xb000, 0xb001 ) AM_DEVWRITE("ymsnd", ym2413_device, write)
-ADDRESS_MAP_END
+	map(0xb000, 0xb001).w("ymsnd", FUNC(ym2413_device::write));
+}
 
 
 // spkrform
 
 
-ADDRESS_MAP_START(igs017_state::spkrform_map)
-	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
-	AM_RANGE( 0x0e000, 0x0efff ) AM_RAM
-	AM_RANGE( 0x0e9bf, 0x0e9bf ) AM_NOP // hack: uncomment to switch to Formosa
-	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM
-	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
-ADDRESS_MAP_END
+void igs017_state::spkrform_map(address_map &map)
+{
+	map(0x00000, 0x0dfff).rom();
+	map(0x0e000, 0x0efff).ram();
+	map(0x0e9bf, 0x0e9bf).noprw(); // hack: uncomment to switch to Formosa
+	map(0x0f000, 0x0ffff).ram();
+	map(0x10000, 0x3ffff).rom();
+}
 
 READ8_MEMBER(igs017_state::spkrform_input_r)
 {
@@ -1780,21 +1789,22 @@ READ8_MEMBER(igs017_state::spkrform_input_r)
 	}
 }
 
-ADDRESS_MAP_START(igs017_state::spkrform_io)
-	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
+void igs017_state::spkrform_io(address_map &map)
+{
+	map(0x0000, 0x7fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
+	map(0x0000, 0x003f).ram(); // internal regs
 
-	AM_RANGE( 0x8000, 0x8000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	map(0x8000, 0x8000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE( 0x9000, 0x9001 ) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	map(0x9000, 0x9001).w("ymsnd", FUNC(ym2413_device::write));
 
-	AM_RANGE( 0xa000, 0xa000 ) AM_READ_PORT( "A000" )   // Game selection
-	AM_RANGE( 0xa001, 0xa001 ) AM_READ_PORT( "A001" )
+	map(0xa000, 0xa000).portr("A000");   // Game selection
+	map(0xa001, 0xa001).portr("A001");
 
-	AM_RANGE( 0xb000, 0xb000 ) AM_WRITE(input_select_w )
-	AM_RANGE( 0xb001, 0xb001 ) AM_READ(spkrform_input_r )
-ADDRESS_MAP_END
+	map(0xb000, 0xb000).w(this, FUNC(igs017_state::input_select_w));
+	map(0xb001, 0xb001).r(this, FUNC(igs017_state::spkrform_input_r));
+}
 
 
 // lhzb2
@@ -1858,16 +1868,17 @@ READ16_MEMBER(igs017_state::lhzb2_magic_r)
 	return 0xffff;
 }
 
-ADDRESS_MAP_START(igs017_state::lhzb2)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x500000, 0x503fff) AM_RAM
-	AM_RANGE(0x910000, 0x910003) AM_WRITE( lhzb2_magic_w )
-	AM_RANGE(0x910002, 0x910003) AM_READ( lhzb2_magic_r )
+void igs017_state::lhzb2(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x500000, 0x503fff).ram();
+	map(0x910000, 0x910003).w(this, FUNC(igs017_state::lhzb2_magic_w));
+	map(0x910002, 0x910003).r(this, FUNC(igs017_state::lhzb2_magic_r));
 
-	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+	map(0xb00000, 0xb0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0xb10000, 0xb10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
-ADDRESS_MAP_END
+	map(0xb10001, 0xb10001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 // lhzb2a
@@ -2170,24 +2181,25 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 	}
 }
 
-ADDRESS_MAP_START(igs017_state::lhzb2a)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void igs017_state::lhzb2a(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 
 	// prot2
-	AM_RANGE(0x003200, 0x003201) AM_WRITE( lhzb2a_prot2_reset_w )
-	AM_RANGE(0x003202, 0x003203) AM_WRITE( lhzb2a_prot2_dec_w )
-	AM_RANGE(0x003206, 0x003207) AM_WRITE( lhzb2a_prot2_inc_w )
-	AM_RANGE(0x00320a, 0x00320b) AM_READ( lhzb2a_prot2_r )
+	map(0x003200, 0x003201).w(this, FUNC(igs017_state::lhzb2a_prot2_reset_w));
+	map(0x003202, 0x003203).w(this, FUNC(igs017_state::lhzb2a_prot2_dec_w));
+	map(0x003206, 0x003207).w(this, FUNC(igs017_state::lhzb2a_prot2_inc_w));
+	map(0x00320a, 0x00320b).r(this, FUNC(igs017_state::lhzb2a_prot2_r));
 
-	AM_RANGE(0x500000, 0x503fff) AM_RAM
+	map(0x500000, 0x503fff).ram();
 //  AM_RANGE(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
 
-	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+	map(0xb00000, 0xb0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0xb10000, 0xb10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
-	AM_RANGE(0xb12000, 0xb12001) AM_WRITE( lhzb2a_input_select_w )
+	map(0xb10001, 0xb10001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xb12000, 0xb12001).w(this, FUNC(igs017_state::lhzb2a_input_select_w));
 //  Inputs dynamically mapped at xx8000, protection at xx4000 (xx = f0 initially). xx written to xxc000
-ADDRESS_MAP_END
+}
 
 
 // slqz2
@@ -2240,17 +2252,18 @@ READ16_MEMBER(igs017_state::slqz2_magic_r)
 	return 0xffff;
 }
 
-ADDRESS_MAP_START(igs017_state::slqz2)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x602000, 0x602003) AM_WRITE( slqz2_magic_w )
-	AM_RANGE(0x602002, 0x602003) AM_READ( slqz2_magic_r )
+void igs017_state::slqz2(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x103fff).ram();
+	map(0x602000, 0x602003).w(this, FUNC(igs017_state::slqz2_magic_w));
+	map(0x602002, 0x602003).r(this, FUNC(igs017_state::slqz2_magic_r));
 
-	AM_RANGE(0x900000, 0x90ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+	map(0x900000, 0x90ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
 
-	AM_RANGE(0x910000, 0x910001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
-ADDRESS_MAP_END
+	map(0x910001, 0x910001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 /***************************************************************************

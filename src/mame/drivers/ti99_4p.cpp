@@ -284,17 +284,19 @@ enum
 	ROM6UBASE = 0xe000
 };
 
-ADDRESS_MAP_START(ti99_4p_state::memmap)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE( memread, memwrite ) AM_SETOFFSET( setoffset )
-ADDRESS_MAP_END
+void ti99_4p_state::memmap(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(ti99_4p_state::memread), FUNC(ti99_4p_state::memwrite)).setoffset(this, FUNC(ti99_4p_state::setoffset));
+}
 
-ADDRESS_MAP_START(ti99_4p_state::cru_map)
-	AM_RANGE(0x0000, 0x01ff) AM_READ( cruread )
-	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
+void ti99_4p_state::cru_map(address_map &map)
+{
+	map(0x0000, 0x01ff).r(this, FUNC(ti99_4p_state::cruread));
+	map(0x0000, 0x003f).r(m_tms9901, FUNC(tms9901_device::read));
 
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE( cruwrite )
-	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
-ADDRESS_MAP_END
+	map(0x0000, 0x0fff).w(this, FUNC(ti99_4p_state::cruwrite));
+	map(0x0000, 0x01ff).w(m_tms9901, FUNC(tms9901_device::write));
+}
 
 /*
     Input ports, used by machine code for TI keyboard and joystick emulation.

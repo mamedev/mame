@@ -35,7 +35,7 @@ public:
 			m_analog_x(*this, "ANALOGX"),
 			m_analog_y(*this, "ANALOGY") { }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tms34010_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<tlc34076_device> m_tlc34076;
 	required_device<ticket_dispenser_device> m_ticket;
@@ -191,29 +191,30 @@ READ16_MEMBER(xtheball_state::analogy_watchdog_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(xtheball_state::main_map)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_SHARE("vrabg")
-	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_SHARE("vrafg")
-	AM_RANGE(0x03000000, 0x030000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
-	AM_RANGE(0x03020000, 0x0302005f) AM_UNMAP // looks like a CRTC of some sort
-	AM_RANGE(0x03040000, 0x0304007f) AM_DEVWRITE8("latch1", ls259_device, write_d0, 0x00ff)
-	AM_RANGE(0x03040080, 0x0304008f) AM_READ_PORT("DSW")
-	AM_RANGE(0x03040080, 0x030400ff) AM_DEVWRITE8("latch2", ls259_device, write_d0, 0x00ff)
-	AM_RANGE(0x03040100, 0x0304010f) AM_READ(analogx_r)
-	AM_RANGE(0x03040110, 0x0304011f) AM_READ_PORT("COIN1")
-	AM_RANGE(0x03040130, 0x0304013f) AM_READ_PORT("SERVICE2")
-	AM_RANGE(0x03040140, 0x0304014f) AM_READ_PORT("COIN3")
-	AM_RANGE(0x03040150, 0x0304015f) AM_READ_PORT("BUTTON1")
-	AM_RANGE(0x03040160, 0x0304016f) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x03040170, 0x0304017f) AM_READ_PORT("SERVICE1")
-	AM_RANGE(0x03040100, 0x0304017f) AM_DEVWRITE8("latch3", ls259_device, write_d0, 0x00ff)
-	AM_RANGE(0x03040180, 0x0304018f) AM_READ(analogy_watchdog_r) AM_WRITENOP
-	AM_RANGE(0x03060000, 0x0306000f) AM_DEVWRITE8("dac", dac_byte_interface, write, 0xff00)
-	AM_RANGE(0x04000000, 0x057fffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void xtheball_state::main_map(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).ram().share("nvram");
+	map(0x01000000, 0x010fffff).ram().share("vrabg");
+	map(0x02000000, 0x020fffff).ram().share("vrafg");
+	map(0x03000000, 0x030000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0x03020000, 0x0302005f).unmaprw(); // looks like a CRTC of some sort
+	map(0x03040000, 0x0304007f).w("latch1", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x03040080, 0x0304008f).portr("DSW");
+	map(0x03040080, 0x030400ff).w("latch2", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x03040100, 0x0304010f).r(this, FUNC(xtheball_state::analogx_r));
+	map(0x03040110, 0x0304011f).portr("COIN1");
+	map(0x03040130, 0x0304013f).portr("SERVICE2");
+	map(0x03040140, 0x0304014f).portr("COIN3");
+	map(0x03040150, 0x0304015f).portr("BUTTON1");
+	map(0x03040160, 0x0304016f).portr("SERVICE");
+	map(0x03040170, 0x0304017f).portr("SERVICE1");
+	map(0x03040100, 0x0304017f).w("latch3", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x03040180, 0x0304018f).r(this, FUNC(xtheball_state::analogy_watchdog_r)).nopw();
+	map(0x03060000, 0x0306000f).w("dac", FUNC(dac_byte_interface::write)).umask16(0xff00);
+	map(0x04000000, 0x057fffff).rom().region("user2", 0);
+	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xfff80000, 0xffffffff).rom().region("user1", 0);
+}
 
 
 

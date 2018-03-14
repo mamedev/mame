@@ -196,38 +196,39 @@ WRITE16_MEMBER(midas_state::livequiz_coin_w)
 #endif
 }
 
-ADDRESS_MAP_START(midas_state::livequiz_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+void midas_state::livequiz_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
 
-	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW_PLAYER1")
-	AM_RANGE(0x920000, 0x920001) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("PLAYER2")
-	AM_RANGE(0x980000, 0x980001) AM_READ_PORT("START")
+	map(0x900000, 0x900001).portr("DSW_PLAYER1");
+	map(0x920000, 0x920001).portr("SERVICE");
+	map(0x940000, 0x940001).portr("PLAYER2");
+	map(0x980000, 0x980001).portr("START");
 
-	AM_RANGE(0x980000, 0x980001) AM_WRITE(livequiz_coin_w )
+	map(0x980000, 0x980001).w(this, FUNC(midas_state::livequiz_coin_w));
 
-	AM_RANGE(0x9a0000, 0x9a0001) AM_WRITE(midas_eeprom_w )
+	map(0x9a0000, 0x9a0001).w(this, FUNC(midas_state::midas_eeprom_w));
 
-	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w )
-	AM_RANGE(0x9c000c, 0x9c000d) AM_WRITENOP    // IRQ Ack, temporary
+	map(0x9c0000, 0x9c0005).w(this, FUNC(midas_state::midas_gfxregs_w));
+	map(0x9c000c, 0x9c000d).nopw();    // IRQ Ack, temporary
 
-	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
+	map(0xa00000, 0xa3ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xa40000, 0xa7ffff).ram();
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READ(ret_ffff )
-	AM_RANGE(0xb20000, 0xb20001) AM_READ(ret_ffff )
-	AM_RANGE(0xb40000, 0xb40001) AM_READ(ret_ffff )
-	AM_RANGE(0xb60000, 0xb60001) AM_READ(ret_ffff )
+	map(0xb00000, 0xb00001).r(this, FUNC(midas_state::ret_ffff));
+	map(0xb20000, 0xb20001).r(this, FUNC(midas_state::ret_ffff));
+	map(0xb40000, 0xb40001).r(this, FUNC(midas_state::ret_ffff));
+	map(0xb60000, 0xb60001).r(this, FUNC(midas_state::ret_ffff));
 
-	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff )
+	map(0xb80008, 0xb8000b).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("START3")
-	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("PLAYER3")
+	map(0xba0000, 0xba0001).portr("START3");
+	map(0xbc0000, 0xbc0001).portr("PLAYER3");
 
-	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM_WRITE(midas_zoomtable_w) AM_SHARE("zoomtable") // zoom table?
+	map(0xd00000, 0xd1ffff).ram().w(this, FUNC(midas_state::midas_zoomtable_w)).share("zoomtable"); // zoom table?
 
-	AM_RANGE(0xe00000, 0xe3ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xe00000, 0xe3ffff).ram();
+}
 
 /***************************************************************************************
                                           Hammer
@@ -267,42 +268,43 @@ WRITE16_MEMBER(midas_state::hammer_motor_w)
 #endif
 }
 
-ADDRESS_MAP_START(midas_state::hammer_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+void midas_state::hammer_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
 
-	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW")
-	AM_RANGE(0x920000, 0x920001) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("IN0")
-	AM_RANGE(0x980000, 0x980001) AM_READ_PORT("TILT")
+	map(0x900000, 0x900001).portr("DSW");
+	map(0x920000, 0x920001).portr("SERVICE");
+	map(0x940000, 0x940001).portr("IN0");
+	map(0x980000, 0x980001).portr("TILT");
 
-	AM_RANGE(0x980000, 0x980001) AM_WRITE(hammer_coin_w )
+	map(0x980000, 0x980001).w(this, FUNC(midas_state::hammer_coin_w));
 
-	AM_RANGE(0x9a0000, 0x9a0001) AM_WRITE(midas_eeprom_w )
+	map(0x9a0000, 0x9a0001).w(this, FUNC(midas_state::midas_eeprom_w));
 
-	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w )
-	AM_RANGE(0x9c000c, 0x9c000d) AM_WRITENOP    // IRQ Ack, temporary
+	map(0x9c0000, 0x9c0005).w(this, FUNC(midas_state::midas_gfxregs_w));
+	map(0x9c000c, 0x9c000d).nopw();    // IRQ Ack, temporary
 
-	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
+	map(0xa00000, 0xa3ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xa40000, 0xa7ffff).ram();
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READ(ret_ffff )
-	AM_RANGE(0xb20000, 0xb20001) AM_READ(ret_ffff )
-	AM_RANGE(0xb40000, 0xb40001) AM_READ(ret_ffff )
-	AM_RANGE(0xb60000, 0xb60001) AM_READ(ret_ffff )
+	map(0xb00000, 0xb00001).r(this, FUNC(midas_state::ret_ffff));
+	map(0xb20000, 0xb20001).r(this, FUNC(midas_state::ret_ffff));
+	map(0xb40000, 0xb40001).r(this, FUNC(midas_state::ret_ffff));
+	map(0xb60000, 0xb60001).r(this, FUNC(midas_state::ret_ffff));
 
-	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff )
+	map(0xb80008, 0xb8000b).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("IN1")
-	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("HAMMER")
+	map(0xba0000, 0xba0001).portr("IN1");
+	map(0xbc0000, 0xbc0001).portr("HAMMER");
 
-	AM_RANGE(0xbc0002, 0xbc0003) AM_WRITE(hammer_motor_w )
+	map(0xbc0002, 0xbc0003).w(this, FUNC(midas_state::hammer_motor_w));
 
-	AM_RANGE(0xbc0004, 0xbc0005) AM_READ(hammer_sensor_r )
+	map(0xbc0004, 0xbc0005).r(this, FUNC(midas_state::hammer_sensor_r));
 
-	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM_WRITE(midas_zoomtable_w) AM_SHARE("zoomtable") // zoom table?
+	map(0xd00000, 0xd1ffff).ram().w(this, FUNC(midas_state::midas_zoomtable_w)).share("zoomtable"); // zoom table?
 
-	AM_RANGE(0xe00000, 0xe3ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xe00000, 0xe3ffff).ram();
+}
 
 
 static const gfx_layout layout16x16x8 =

@@ -509,30 +509,31 @@ WRITE16_MEMBER(wecleman_state::blitter_w)
                     WEC Le Mans 24 Main CPU Handlers
 ***************************************************************************/
 
-ADDRESS_MAP_START(wecleman_state::wecleman_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM // ROM (03c000-03ffff used as RAM sometimes!)
-	AM_RANGE(0x040000, 0x043fff) AM_RAM // RAM
-	AM_RANGE(0x040494, 0x040495) AM_WRITE(wecleman_videostatus_w) AM_SHARE("videostatus")   // cloud blending control (HACK)
-	AM_RANGE(0x060000, 0x060005) AM_WRITE(wecleman_protection_w) AM_SHARE("protection_ram")
-	AM_RANGE(0x060006, 0x060007) AM_READ(wecleman_protection_r) // MCU read
-	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_SHARE("blitter_regs")   // Blitter
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wecleman_pageram_w) AM_SHARE("pageram")   // Background Layers
-	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(wecleman_txtram_w) AM_SHARE("txtram") // Text Layer
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE("share1")  // Shared with main CPU
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)    // To sound CPU
-	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)    // Selects accelerator / wheel / ..
-	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)    // Main CPU controls the other CPUs
-	AM_RANGE(0x140006, 0x140007) AM_WRITENOP    // Watchdog reset
-	AM_RANGE(0x140010, 0x140011) AM_READ_PORT("IN0")    // Coins + brake + gear
-	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")    // ??
-	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSWA")   // DSW 2
-	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSWB")   // DSW 1
-	AM_RANGE(0x140020, 0x140021) AM_WRITEONLY   // Paired with writes to $140003
-	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r) // Accelerator or Wheel or ..
-	AM_RANGE(0x140030, 0x140031) AM_WRITENOP    // toggles between 0 & 1 on hitting bumps and crashes (vibration?)
-ADDRESS_MAP_END
+void wecleman_state::wecleman_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom(); // ROM (03c000-03ffff used as RAM sometimes!)
+	map(0x040000, 0x043fff).ram(); // RAM
+	map(0x040494, 0x040495).w(this, FUNC(wecleman_state::wecleman_videostatus_w)).share("videostatus");   // cloud blending control (HACK)
+	map(0x060000, 0x060005).w(this, FUNC(wecleman_state::wecleman_protection_w)).share("protection_ram");
+	map(0x060006, 0x060007).r(this, FUNC(wecleman_state::wecleman_protection_r)); // MCU read
+	map(0x080000, 0x080011).ram().w(this, FUNC(wecleman_state::blitter_w)).share("blitter_regs");   // Blitter
+	map(0x100000, 0x103fff).ram().w(this, FUNC(wecleman_state::wecleman_pageram_w)).share("pageram");   // Background Layers
+	map(0x108000, 0x108fff).ram().w(this, FUNC(wecleman_state::wecleman_txtram_w)).share("txtram"); // Text Layer
+	map(0x110000, 0x110fff).ram().w(this, FUNC(wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w)).share("paletteram");
+	map(0x124000, 0x127fff).ram().share("share1");  // Shared with main CPU
+	map(0x130000, 0x130fff).ram().share("spriteram");   // Sprites
+	map(0x140001, 0x140001).w("soundlatch", FUNC(generic_latch_8_device::write));    // To sound CPU
+	map(0x140002, 0x140003).w(this, FUNC(wecleman_state::selected_ip_w));    // Selects accelerator / wheel / ..
+	map(0x140004, 0x140005).w(this, FUNC(wecleman_state::irqctrl_w));    // Main CPU controls the other CPUs
+	map(0x140006, 0x140007).nopw();    // Watchdog reset
+	map(0x140010, 0x140011).portr("IN0");    // Coins + brake + gear
+	map(0x140012, 0x140013).portr("IN1");    // ??
+	map(0x140014, 0x140015).portr("DSWA");   // DSW 2
+	map(0x140016, 0x140017).portr("DSWB");   // DSW 1
+	map(0x140020, 0x140021).writeonly();   // Paired with writes to $140003
+	map(0x140020, 0x140021).r(this, FUNC(wecleman_state::selected_ip_r)); // Accelerator or Wheel or ..
+	map(0x140030, 0x140031).nopw();    // toggles between 0 & 1 on hitting bumps and crashes (vibration?)
+}
 
 
 /***************************************************************************
@@ -541,54 +542,57 @@ ADDRESS_MAP_END
 
 
 
-ADDRESS_MAP_START(wecleman_state::hotchase_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x041fff) AM_RAM                                 // RAM
-	AM_RANGE(0x060000, 0x063fff) AM_RAM                                 // RAM
-	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_SHARE("blitter_regs")   // Blitter
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE8("k051316_1", k051316_device, read, write, 0x00ff) // Background
-	AM_RANGE(0x101000, 0x10101f) AM_DEVWRITE8("k051316_1", k051316_device, ctrl_w, 0x00ff)   // Background Ctrl
-	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE8("k051316_2", k051316_device, read, write, 0x00ff) // Foreground
-	AM_RANGE(0x103000, 0x10301f) AM_DEVWRITE8("k051316_2", k051316_device, ctrl_w, 0x00ff)   // Foreground Ctrl
-	AM_RANGE(0x110000, 0x111fff) AM_RAM_WRITE(hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("share1")                  // Shared with sub CPU
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)    // To sound CPU
-	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)    // Selects accelerator / wheel /
-	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)    // Main CPU controls the other CPUs
-	AM_RANGE(0x140006, 0x140007) AM_READNOP // Watchdog reset
-	AM_RANGE(0x140010, 0x140011) AM_READ_PORT("IN0")    // Coins + brake + gear
-	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")    // ?? bit 4 from sound cpu
-	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSW2")   // DSW 2
-	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSW1")   // DSW 1
-	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r) AM_WRITENOP // Paired with writes to $140003
-	AM_RANGE(0x140022, 0x140023) AM_READNOP // read and written at $601c0, unknown purpose
-	AM_RANGE(0x140030, 0x140031) AM_WRITENOP    // signal to cabinet vibration motors?
-ADDRESS_MAP_END
+void wecleman_state::hotchase_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x041fff).ram();                                 // RAM
+	map(0x060000, 0x063fff).ram();                                 // RAM
+	map(0x080000, 0x080011).ram().w(this, FUNC(wecleman_state::blitter_w)).share("blitter_regs");   // Blitter
+	map(0x100000, 0x100fff).rw("k051316_1", FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); // Background
+	map(0x101000, 0x10101f).w("k051316_1", FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   // Background Ctrl
+	map(0x102000, 0x102fff).rw("k051316_2", FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); // Foreground
+	map(0x103000, 0x10301f).w("k051316_2", FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   // Foreground Ctrl
+	map(0x110000, 0x111fff).ram().w(this, FUNC(wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w)).share("paletteram");
+	map(0x120000, 0x123fff).ram().share("share1");                  // Shared with sub CPU
+	map(0x130000, 0x130fff).ram().share("spriteram");   // Sprites
+	map(0x140001, 0x140001).w("soundlatch", FUNC(generic_latch_8_device::write));    // To sound CPU
+	map(0x140002, 0x140003).w(this, FUNC(wecleman_state::selected_ip_w));    // Selects accelerator / wheel /
+	map(0x140004, 0x140005).w(this, FUNC(wecleman_state::irqctrl_w));    // Main CPU controls the other CPUs
+	map(0x140006, 0x140007).nopr(); // Watchdog reset
+	map(0x140010, 0x140011).portr("IN0");    // Coins + brake + gear
+	map(0x140012, 0x140013).portr("IN1");    // ?? bit 4 from sound cpu
+	map(0x140014, 0x140015).portr("DSW2");   // DSW 2
+	map(0x140016, 0x140017).portr("DSW1");   // DSW 1
+	map(0x140020, 0x140021).r(this, FUNC(wecleman_state::selected_ip_r)).nopw(); // Paired with writes to $140003
+	map(0x140022, 0x140023).nopr(); // read and written at $601c0, unknown purpose
+	map(0x140030, 0x140031).nopw();    // signal to cabinet vibration motors?
+}
 
 
 /***************************************************************************
                     WEC Le Mans 24 Sub CPU Handlers
 ***************************************************************************/
 
-ADDRESS_MAP_START(wecleman_state::wecleman_sub_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM // ROM
-	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("roadram") // Road
-	AM_RANGE(0x070000, 0x073fff) AM_RAM AM_SHARE("share1")  // RAM (Shared with main CPU)
-ADDRESS_MAP_END
+void wecleman_state::wecleman_sub_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom(); // ROM
+	map(0x060000, 0x060fff).ram().share("roadram"); // Road
+	map(0x070000, 0x073fff).ram().share("share1");  // RAM (Shared with main CPU)
+}
 
 
 /***************************************************************************
                         Hot Chase Sub CPU Handlers
 ***************************************************************************/
 
-ADDRESS_MAP_START(wecleman_state::hotchase_sub_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM // ROM
-	AM_RANGE(0x020000, 0x020fff) AM_RAM AM_SHARE("roadram") // Road
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("share1") // Shared with main CPU
-	AM_RANGE(0x060000, 0x060fff) AM_RAM // a table, presumably road related
-	AM_RANGE(0x061000, 0x06101f) AM_RAM // road vregs?
-ADDRESS_MAP_END
+void wecleman_state::hotchase_sub_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom(); // ROM
+	map(0x020000, 0x020fff).ram().share("roadram"); // Road
+	map(0x040000, 0x043fff).ram().share("share1"); // Shared with main CPU
+	map(0x060000, 0x060fff).ram(); // a table, presumably road related
+	map(0x061000, 0x06101f).ram(); // road vregs?
+}
 
 
 /***************************************************************************
@@ -633,18 +637,19 @@ WRITE8_MEMBER(wecleman_state::wecleman_K00723216_bank_w)
 	m_k007232[0]->set_bank(0, ~data&1 );  //* (wecleman062gre)
 }
 
-ADDRESS_MAP_START(wecleman_state::wecleman_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8500, 0x8500) AM_WRITENOP            // increased with speed (global volume)?
-	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)    // 007452: Protection
-	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)   // 007452: Protection
-	AM_RANGE(0x9006, 0x9006) AM_WRITENOP            // 007452: ?
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From main CPU
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_1", k007232_device, read, write) // K007232 (Reading offset 5/b triggers the sample)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(wecleman_K00723216_bank_w)    // Samples banking
-ADDRESS_MAP_END
+void wecleman_state::wecleman_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram();
+	map(0x8500, 0x8500).nopw();            // increased with speed (global volume)?
+	map(0x9000, 0x9000).r(this, FUNC(wecleman_state::multiply_r));    // 007452: Protection
+	map(0x9000, 0x9001).w(this, FUNC(wecleman_state::multiply_w));   // 007452: Protection
+	map(0x9006, 0x9006).nopw();            // 007452: ?
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read)); // From main CPU
+	map(0xb000, 0xb00d).rw("k007232_1", FUNC(k007232_device::read), FUNC(k007232_device::write)); // K007232 (Reading offset 5/b triggers the sample)
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xf000, 0xf000).w(this, FUNC(wecleman_state::wecleman_K00723216_bank_w));    // Samples banking
+}
 
 
 /***************************************************************************
@@ -717,17 +722,18 @@ WRITE8_MEMBER(wecleman_state::hotchase_k007232_w)
 	m_k007232[Chip]->write(space, offset ^ 1, data);
 }
 
-ADDRESS_MAP_START(wecleman_state::hotchase_sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x100d) AM_READWRITE(hotchase_k007232_r<0>, hotchase_k007232_w<0>)   // 3 x K007232
-	AM_RANGE(0x2000, 0x200d) AM_READWRITE(hotchase_k007232_r<1>, hotchase_k007232_w<1>)
-	AM_RANGE(0x3000, 0x300d) AM_READWRITE(hotchase_k007232_r<2>, hotchase_k007232_w<2>)
-	AM_RANGE(0x4000, 0x4007) AM_WRITE(hotchase_sound_control_w) // Sound volume, banking, etc.
-	AM_RANGE(0x5000, 0x5000) AM_WRITENOP   // 0 at start of IRQ service, 1 at end (irq mask?)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From main CPU (Read on IRQ)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(hotchase_sound_hs_w)    // ACK signal to main CPU
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void wecleman_state::hotchase_sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x1000, 0x100d).rw(this, FUNC(wecleman_state::hotchase_k007232_r<0>), FUNC(wecleman_state::hotchase_k007232_w<0>));   // 3 x K007232
+	map(0x2000, 0x200d).rw(this, FUNC(wecleman_state::hotchase_k007232_r<1>), FUNC(wecleman_state::hotchase_k007232_w<1>));
+	map(0x3000, 0x300d).rw(this, FUNC(wecleman_state::hotchase_k007232_r<2>), FUNC(wecleman_state::hotchase_k007232_w<2>));
+	map(0x4000, 0x4007).w(this, FUNC(wecleman_state::hotchase_sound_control_w)); // Sound volume, banking, etc.
+	map(0x5000, 0x5000).nopw();   // 0 at start of IRQ service, 1 at end (irq mask?)
+	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read)); // From main CPU (Read on IRQ)
+	map(0x7000, 0x7000).w(this, FUNC(wecleman_state::hotchase_sound_hs_w));    // ACK signal to main CPU
+	map(0x8000, 0xffff).rom();
+}
 
 
 /***************************************************************************

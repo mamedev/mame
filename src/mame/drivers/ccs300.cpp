@@ -47,24 +47,26 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(ccs300_state::ccs300_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x0800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ccs300_state::ccs300_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).bankr("bankr0").bankw("bankw0");
+	map(0x0800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(ccs300_state::ccs300_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("pio", z80pio_device, read_alt, write_alt)  // init bytes seem to be for a PIO
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)  // init bytes seem to be for a CTC
-	AM_RANGE(0x30, 0x33) // fdc?
-	AM_RANGE(0x34, 0x34) // motor control?
-	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)
-	AM_RANGE(0xf0, 0xf0) // unknown, long sequence of init bytes
-	AM_RANGE(0xf2, 0xf2) // dip or jumper?
-ADDRESS_MAP_END
+void ccs300_state::ccs300_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x10, 0x13).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x14, 0x17).rw("pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));  // init bytes seem to be for a PIO
+	map(0x18, 0x1b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));  // init bytes seem to be for a CTC
+	map(0x30, 0x33); // fdc?
+	map(0x34, 0x34); // motor control?
+	map(0x40, 0x40).w(this, FUNC(ccs300_state::port40_w));
+	map(0xf0, 0xf0); // unknown, long sequence of init bytes
+	map(0xf2, 0xf2); // dip or jumper?
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ccs300 )

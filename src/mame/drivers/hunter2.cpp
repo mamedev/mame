@@ -88,37 +88,40 @@ private:
 	required_device<address_map_bank_device> m_bank3;
 };
 
-ADDRESS_MAP_START(hunter2_state::hunter2_banked_mem)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM AM_REGION("roms", 0x0000)
-	AM_RANGE(0x30000, 0x3ffff) AM_NOP
-	AM_RANGE(0x40000, 0xfffff) AM_RAM AM_REGION("rams", 0x0000)
-ADDRESS_MAP_END
+void hunter2_state::hunter2_banked_mem(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom().region("roms", 0x0000);
+	map(0x30000, 0x3ffff).noprw();
+	map(0x40000, 0xfffff).ram().region("rams", 0x0000);
+}
 
-ADDRESS_MAP_START(hunter2_state::hunter2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bank2", address_map_bank_device, read8, write8)
-	AM_RANGE(0x8000, 0xbfff) AM_DEVREADWRITE("bank3", address_map_bank_device, read8, write8)
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void hunter2_state::hunter2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rw(m_bank1, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x4000, 0x7fff).rw(m_bank2, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x8000, 0xbfff).rw(m_bank3, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xc000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(hunter2_state::hunter2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("iotimer", nsc810_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("lcdc", hd61830_device, data_w)
-	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("lcdc", hd61830_device, status_r, control_w)
-	AM_RANGE(0x3e, 0x3e) AM_DEVREAD("lcdc", hd61830_device, data_r)
-	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("rtc", mm58274c_device, read, write)
-	AM_RANGE(0x60, 0x60) AM_WRITE(display_ctrl_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(port80_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(serial_tx_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(serial_dtr_w)
-	AM_RANGE(0x84, 0x84) AM_WRITE(serial_rts_w)
-	AM_RANGE(0x86, 0x86) AM_WRITE(speaker_w)
-	AM_RANGE(0xbb, 0xbb) AM_WRITE(irqctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(memmap_w)
-ADDRESS_MAP_END
+void hunter2_state::hunter2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x1f).rw("iotimer", FUNC(nsc810_device::read), FUNC(nsc810_device::write));
+	map(0x20, 0x20).w("lcdc", FUNC(hd61830_device::data_w));
+	map(0x21, 0x21).rw("lcdc", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w));
+	map(0x3e, 0x3e).r("lcdc", FUNC(hd61830_device::data_r));
+	map(0x40, 0x4f).rw("rtc", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write));
+	map(0x60, 0x60).w(this, FUNC(hunter2_state::display_ctrl_w));
+	map(0x80, 0x80).w(this, FUNC(hunter2_state::port80_w));
+	map(0x81, 0x81).w(this, FUNC(hunter2_state::serial_tx_w));
+	map(0x82, 0x82).w(this, FUNC(hunter2_state::serial_dtr_w));
+	map(0x84, 0x84).w(this, FUNC(hunter2_state::serial_rts_w));
+	map(0x86, 0x86).w(this, FUNC(hunter2_state::speaker_w));
+	map(0xbb, 0xbb).w(this, FUNC(hunter2_state::irqctrl_w));
+	map(0xe0, 0xe0).w(this, FUNC(hunter2_state::memmap_w));
+}
 
 
 /* Input ports */

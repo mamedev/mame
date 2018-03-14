@@ -315,34 +315,36 @@ READ16_MEMBER(coinmvga_state::test_r)
 * Memory Map Information *
 *************************/
 
-ADDRESS_MAP_START(coinmvga_state::coinmvga_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0) //maybe not
+void coinmvga_state::coinmvga_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x0fffff).rom().region("maincpu", 0); //maybe not
 
 //  AM_RANGE(0x0a0000, 0x0fffff) AM_RAM
 //  AM_RANGE(0x100000, 0x1fffff) AM_RAM //colorama
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("vram")
+	map(0x210000, 0x21ffff).ram().share("vram");
 //  AM_RANGE(0x40746e, 0x40746f) AM_READ(test_r) AM_WRITENOP //touch screen related, colorama
 //  AM_RANGE(0x403afa, 0x403afb) AM_READ(test_r) AM_WRITENOP //touch screen related, cmrltv75
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM
+	map(0x400000, 0x40ffff).ram();
 
-	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
-	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x600002, 0x600003) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00)
-	AM_RANGE(0x600004, 0x600005) AM_DEVWRITE8("ramdac2", ramdac_device, index_w, 0xff00)
-	AM_RANGE(0x600004, 0x600005) AM_DEVWRITE8("ramdac2", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x600006, 0x600007) AM_DEVWRITE8("ramdac2", ramdac_device, mask_w, 0xff00)
-	AM_RANGE(0x600008, 0x600009) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xffff)
-	AM_RANGE(0x610000, 0x61000f) AM_RAM //touch screen i/o
+	map(0x600000, 0x600000).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x600001, 0x600001).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x600002, 0x600002).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x600004, 0x600004).w("ramdac2", FUNC(ramdac_device::index_w));
+	map(0x600005, 0x600005).w("ramdac2", FUNC(ramdac_device::pal_w));
+	map(0x600006, 0x600006).w("ramdac2", FUNC(ramdac_device::mask_w));
+	map(0x600008, 0x600009).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+	map(0x610000, 0x61000f).ram(); //touch screen i/o
 
-	AM_RANGE(0x700000, 0x7fffff) AM_ROM AM_REGION("maincpu", 0) // ?
+	map(0x700000, 0x7fffff).rom().region("maincpu", 0); // ?
 
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1") //"arrow" r?
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
+	map(0x800000, 0x800001).portr("DSW1"); //"arrow" r?
+	map(0x800002, 0x800003).portr("DSW2");
 	//0x800008 "arrow" w?
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(coinmvga_state::coinmvga_io_map)
+void coinmvga_state::coinmvga_io_map(address_map &map)
+{
 /*  Digital I/O ports (ports 4-B are valid on 16-bit H8/3xx) */
 //  AM_RANGE(h8_device::PORT_4, h8_device::PORT_4)
 //  AM_RANGE(h8_device::PORT_5, h8_device::PORT_5)
@@ -358,7 +360,7 @@ ADDRESS_MAP_START(coinmvga_state::coinmvga_io_map)
 //  AM_RANGE(h8_device::ADC_1, h8_device::ADC_1)
 //  AM_RANGE(h8_device::ADC_2, h8_device::ADC_2)
 //  AM_RANGE(h8_device::ADC_3, h8_device::ADC_3)
-ADDRESS_MAP_END
+}
 
 /*  unknown writes (cmrltv75):
 
@@ -622,13 +624,15 @@ INTERRUPT_GEN_MEMBER(coinmvga_state::vblank_irq)
 *    Machine Drivers     *
 *************************/
 
-ADDRESS_MAP_START(coinmvga_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void coinmvga_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
-ADDRESS_MAP_START(coinmvga_state::ramdac2_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac2",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void coinmvga_state::ramdac2_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac2", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 
 MACHINE_CONFIG_START(coinmvga_state::coinmvga)

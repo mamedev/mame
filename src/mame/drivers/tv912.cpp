@@ -352,24 +352,27 @@ void tv912_state::machine_reset()
 	m_uart->write_cs(1);
 }
 
-ADDRESS_MAP_START(tv912_state::prog_map)
-	AM_RANGE(0x000, 0xfff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void tv912_state::prog_map(address_map &map)
+{
+	map(0x000, 0xfff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(tv912_state::io_map)
-	AM_RANGE(0x00, 0xff) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void tv912_state::io_map(address_map &map)
+{
+	map(0x00, 0xff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(tv912_state::bank_map)
-	AM_RANGE(0x000, 0x0ff) AM_MIRROR(0x300) AM_RAM
-	AM_RANGE(0x400, 0x403) AM_MIRROR(0x3c0) AM_SELECT(0x030) AM_READWRITE(crtc_r, crtc_w)
-	AM_RANGE(0x404, 0x404) AM_MIRROR(0x3f3) AM_DEVREAD("uart", ay51013_device, receive)
-	AM_RANGE(0x408, 0x40b) AM_MIRROR(0x3f0) AM_READ(uart_status_r)
-	AM_RANGE(0x408, 0x408) AM_MIRROR(0x3f3) AM_DEVWRITE("uart", ay51013_device, transmit)
-	AM_RANGE(0x40c, 0x40f) AM_MIRROR(0x3f0) AM_READ(keyboard_r)
-	AM_RANGE(0x40c, 0x40c) AM_MIRROR(0x3f3) AM_WRITE(output_40c)
-	AM_RANGE(0x800, 0xfff) AM_RAMBANK("dispram")
-ADDRESS_MAP_END
+void tv912_state::bank_map(address_map &map)
+{
+	map(0x000, 0x0ff).mirror(0x300).ram();
+	map(0x400, 0x403).mirror(0x3c0).select(0x030).rw(this, FUNC(tv912_state::crtc_r), FUNC(tv912_state::crtc_w));
+	map(0x404, 0x404).mirror(0x3f3).r(m_uart, FUNC(ay51013_device::receive));
+	map(0x408, 0x40b).mirror(0x3f0).r(this, FUNC(tv912_state::uart_status_r));
+	map(0x408, 0x408).mirror(0x3f3).w(m_uart, FUNC(ay51013_device::transmit));
+	map(0x40c, 0x40f).mirror(0x3f0).r(this, FUNC(tv912_state::keyboard_r));
+	map(0x40c, 0x40c).mirror(0x3f3).w(this, FUNC(tv912_state::output_40c));
+	map(0x800, 0xfff).bankrw("dispram");
+}
 
 INPUT_CHANGED_MEMBER(tv912_state::uart_settings_changed)
 {

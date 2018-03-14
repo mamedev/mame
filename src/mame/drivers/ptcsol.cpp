@@ -424,26 +424,28 @@ WRITE8_MEMBER( sol20_state::sol20_fe_w )
 	m_sol20_fe = data;
 }
 
-ADDRESS_MAP_START(sol20_state::sol20_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
-	AM_RANGE(0x0800, 0xbfff) AM_RAM // optional s100 ram
-	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM // system ram
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xd000, 0xffff) AM_RAM // optional s100 ram
-ADDRESS_MAP_END
+void sol20_state::sol20_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).bankrw("boot");
+	map(0x0800, 0xbfff).ram(); // optional s100 ram
+	map(0xc000, 0xc7ff).rom();
+	map(0xc800, 0xcbff).ram(); // system ram
+	map(0xcc00, 0xcfff).ram().share("videoram");
+	map(0xd000, 0xffff).ram(); // optional s100 ram
+}
 
-ADDRESS_MAP_START(sol20_state::sol20_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_READWRITE(sol20_f8_r, sol20_f8_w)
-	AM_RANGE(0xf9, 0xf9) AM_DEVREADWRITE("uart", ay51013_device, receive, transmit)
-	AM_RANGE(0xfa, 0xfa) AM_READWRITE(sol20_fa_r, sol20_fa_w)
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("uart_s", ay51013_device, receive, transmit)
-	AM_RANGE(0xfc, 0xfc) AM_READ(sol20_fc_r)
-	AM_RANGE(0xfd, 0xfd) AM_READWRITE(sol20_fd_r, sol20_fd_w)
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sol20_fe_w)
-	AM_RANGE(0xff, 0xff) AM_READ_PORT("S2")
+void sol20_state::sol20_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xf8, 0xf8).rw(this, FUNC(sol20_state::sol20_f8_r), FUNC(sol20_state::sol20_f8_w));
+	map(0xf9, 0xf9).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
+	map(0xfa, 0xfa).rw(this, FUNC(sol20_state::sol20_fa_r), FUNC(sol20_state::sol20_fa_w));
+	map(0xfb, 0xfb).rw(m_uart_s, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
+	map(0xfc, 0xfc).r(this, FUNC(sol20_state::sol20_fc_r));
+	map(0xfd, 0xfd).rw(this, FUNC(sol20_state::sol20_fd_r), FUNC(sol20_state::sol20_fd_w));
+	map(0xfe, 0xfe).w(this, FUNC(sol20_state::sol20_fe_w));
+	map(0xff, 0xff).portr("S2");
 /*  AM_RANGE(0xf8, 0xf8) serial status in (bit 6=data av, bit 7=tmbe)
     AM_RANGE(0xf9, 0xf9) serial data in, out
     AM_RANGE(0xfa, 0xfa) general status in (bit 0=keyb data av, bit 1=parin data av, bit 2=parout ready)
@@ -452,7 +454,7 @@ ADDRESS_MAP_START(sol20_state::sol20_io)
     AM_RANGE(0xfd, 0xfd) parallel data in, out
     AM_RANGE(0xfe, 0xfe) scroll register
     AM_RANGE(0xff, 0xff) sense switches */
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sol20 )

@@ -246,31 +246,33 @@ WRITE8_MEMBER(naughtyb_state::popflame_protection_w)
 
 
 
-ADDRESS_MAP_START(naughtyb_state::naughtyb_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0x9000, 0x97ff) AM_WRITE(naughtyb_videoreg_w)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("scrollreg")
-	AM_RANGE(0xa000, 0xa7ff) AM_DEVWRITE("naughtyb_custom", naughtyb_sound_device, control_a_w)
-	AM_RANGE(0xa800, 0xafff) AM_DEVWRITE("naughtyb_custom", naughtyb_sound_device, control_b_w)
-	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)    // IN0
-	AM_RANGE(0xb800, 0xbfff) AM_READ(dsw0_port_r)   // DSW0
-ADDRESS_MAP_END
+void naughtyb_state::naughtyb_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0x87ff).ram().share("videoram");
+	map(0x8800, 0x8fff).ram().share("videoram2");
+	map(0x9000, 0x97ff).w(this, FUNC(naughtyb_state::naughtyb_videoreg_w));
+	map(0x9800, 0x9fff).ram().share("scrollreg");
+	map(0xa000, 0xa7ff).w(m_naughtyb_custom, FUNC(naughtyb_sound_device::control_a_w));
+	map(0xa800, 0xafff).w(m_naughtyb_custom, FUNC(naughtyb_sound_device::control_b_w));
+	map(0xb000, 0xb7ff).r(this, FUNC(naughtyb_state::in0_port_r));    // IN0
+	map(0xb800, 0xbfff).r(this, FUNC(naughtyb_state::dsw0_port_r));   // DSW0
+}
 
-ADDRESS_MAP_START(naughtyb_state::popflame_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0x9000, 0x97ff) AM_WRITE(popflame_videoreg_w)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("scrollreg")
-	AM_RANGE(0xa000, 0xa7ff) AM_DEVWRITE("popflame_custom", popflame_sound_device, control_a_w)
-	AM_RANGE(0xa800, 0xafff) AM_DEVWRITE("popflame_custom", popflame_sound_device, control_b_w)
-	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)    // IN0
-	AM_RANGE(0xb800, 0xbfff) AM_READ(dsw0_port_r)   // DSW0
-ADDRESS_MAP_END
+void naughtyb_state::popflame_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0x87ff).ram().share("videoram");
+	map(0x8800, 0x8fff).ram().share("videoram2");
+	map(0x9000, 0x97ff).w(this, FUNC(naughtyb_state::popflame_videoreg_w));
+	map(0x9800, 0x9fff).ram().share("scrollreg");
+	map(0xa000, 0xa7ff).w(m_popflame_custom, FUNC(popflame_sound_device::control_a_w));
+	map(0xa800, 0xafff).w(m_popflame_custom, FUNC(popflame_sound_device::control_b_w));
+	map(0xb000, 0xb7ff).r(this, FUNC(naughtyb_state::in0_port_r));    // IN0
+	map(0xb800, 0xbfff).r(this, FUNC(naughtyb_state::dsw0_port_r));   // DSW0
+}
 
 
 

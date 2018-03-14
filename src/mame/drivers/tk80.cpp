@@ -120,49 +120,55 @@ WRITE8_MEMBER( tk80_state::display_w )
 	m_digit[offset & 0x7] = data;
 }
 
-ADDRESS_MAP_START(tk80_state::tk80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x83ff) // A10-14 not connected
-	AM_RANGE(0x0000, 0x02ff) AM_ROM
-	AM_RANGE(0x0300, 0x03ff) AM_RAM // EEPROM
-	AM_RANGE(0x8000, 0x83f7) AM_RAM // RAM
-	AM_RANGE(0x83f8, 0x83ff) AM_RAM AM_READWRITE(display_r,display_w)
-ADDRESS_MAP_END
+void tk80_state::tk80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x83ff); // A10-14 not connected
+	map(0x0000, 0x02ff).rom();
+	map(0x0300, 0x03ff).ram(); // EEPROM
+	map(0x8000, 0x83f7).ram(); // RAM
+	map(0x83f8, 0x83ff).ram().rw(this, FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
+}
 
-ADDRESS_MAP_START(tk80_state::tk85_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x87ff) // A10-14 not connected
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x8000, 0x83f7) AM_RAM
-	AM_RANGE(0x83f8, 0x83ff) AM_RAM AM_READWRITE(display_r,display_w)
-ADDRESS_MAP_END
+void tk80_state::tk85_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x87ff); // A10-14 not connected
+	map(0x0000, 0x07ff).rom();
+	map(0x8000, 0x83f7).ram();
+	map(0x83f8, 0x83ff).ram().rw(this, FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
+}
 
-ADDRESS_MAP_START(tk80_state::ics8080_mem)
-	ADDRESS_MAP_UNMAP_HIGH
+void tk80_state::ics8080_mem(address_map &map)
+{
+	map.unmap_value_high();
 	//ADDRESS_MAP_GLOBAL_MASK(0x87ff) // A10-14 not connected
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x83f7) AM_RAM
-	AM_RANGE(0x83f8, 0x83ff) AM_RAM AM_READWRITE(display_r,display_w)
-	AM_RANGE(0x8400, 0x8fff) AM_RAM
-ADDRESS_MAP_END
+	map(0x0000, 0x1fff).rom();
+	map(0x8000, 0x83f7).ram();
+	map(0x83f8, 0x83ff).ram().rw(this, FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
+	map(0x8400, 0x8fff).ram();
+}
 
-ADDRESS_MAP_START(tk80_state::tk80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x03)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void tk80_state::tk80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x03);
+	map(0x00, 0x03).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(tk80_state::mikrolab_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x03)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void tk80_state::mikrolab_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x03);
+	map(0x00, 0x03).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(tk80_state::nd80z_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x03)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void tk80_state::nd80z_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x03);
+	map(0x00, 0x03).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( tk80 )

@@ -311,31 +311,35 @@ DRIVER_INIT_MEMBER(tsispch_state,prose2k)
      1   1   0   *    *   *   *   *    *   *  *  *   *  *  *  *   *  *  *  s  ROMs 2 and 3
      1   1   1   *    *   *   *   *    *   *  *  *   *  *  *  *   *  *  *  s  ROMs 0 and 1
 */
-ADDRESS_MAP_START(tsispch_state::i8086_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x02FFF) AM_MIRROR(0x34000) AM_RAM // verified; 6264*2 sram, only first 3/4 used
-	AM_RANGE(0x03000, 0x03001) AM_MIRROR(0x341FC) AM_DEVREADWRITE8("i8251a_u15", i8251_device, data_r, data_w, 0x00FF)
-	AM_RANGE(0x03002, 0x03003) AM_MIRROR(0x341FC) AM_DEVREADWRITE8("i8251a_u15", i8251_device, status_r, control_w, 0x00FF)
-	AM_RANGE(0x03200, 0x03203) AM_MIRROR(0x341FC) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00FF) // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
-	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_READ8(dsw_r, 0x00FF) // verified, read from dipswitch s4
-	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_WRITE8(peripheral_w, 0xFF00) // verified, write to the 4 leds, plus 4 control bits
-	AM_RANGE(0x03600, 0x03601) AM_MIRROR(0x341FC) AM_READWRITE(dsp_data_r, dsp_data_w) // verified; UPD77P20 data reg r/w
-	AM_RANGE(0x03602, 0x03603) AM_MIRROR(0x341FC) AM_READWRITE(dsp_status_r, dsp_status_w) // verified; UPD77P20 status reg r
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM // verified
-ADDRESS_MAP_END
+void tsispch_state::i8086_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x02FFF).mirror(0x34000).ram(); // verified; 6264*2 sram, only first 3/4 used
+	map(0x03000, 0x03000).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x03002, 0x03002).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x03200, 0x03203).mirror(0x341FC).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
+	map(0x03400, 0x03400).mirror(0x341FE).r(this, FUNC(tsispch_state::dsw_r)); // verified, read from dipswitch s4
+	map(0x03401, 0x03401).mirror(0x341FE).w(this, FUNC(tsispch_state::peripheral_w)); // verified, write to the 4 leds, plus 4 control bits
+	map(0x03600, 0x03601).mirror(0x341FC).rw(this, FUNC(tsispch_state::dsp_data_r), FUNC(tsispch_state::dsp_data_w)); // verified; UPD77P20 data reg r/w
+	map(0x03602, 0x03603).mirror(0x341FC).rw(this, FUNC(tsispch_state::dsp_status_r), FUNC(tsispch_state::dsp_status_w)); // verified; UPD77P20 status reg r
+	map(0xc0000, 0xfffff).rom(); // verified
+}
 
 // Technically the IO line of the i8086 is completely ignored (it is running in 8086 MIN mode,I believe, which may ignore IO)
-ADDRESS_MAP_START(tsispch_state::i8086_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void tsispch_state::i8086_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
-ADDRESS_MAP_START(tsispch_state::dsp_prg_map)
-	AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION("dspprg", 0)
-ADDRESS_MAP_END
+void tsispch_state::dsp_prg_map(address_map &map)
+{
+	map(0x0000, 0x01ff).rom().region("dspprg", 0);
+}
 
-ADDRESS_MAP_START(tsispch_state::dsp_data_map)
-	AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION("dspdata", 0)
-ADDRESS_MAP_END
+void tsispch_state::dsp_data_map(address_map &map)
+{
+	map(0x0000, 0x01ff).rom().region("dspdata", 0);
+}
 
 
 /******************************************************************************

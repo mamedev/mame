@@ -160,12 +160,13 @@ PALETTE_INIT_MEMBER(othello_state, othello)
 	palette.set_pen_color(0x0f, rgb_t(0xff, 0xff, 0xff));
 }
 
-ADDRESS_MAP_START(othello_state::main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x97ff) AM_NOP /* not populated */
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void othello_state::main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x8000, 0x97ff).noprw(); /* not populated */
+	map(0x9800, 0x9fff).ram().share("videoram");
+	map(0xf000, 0xffff).ram();
+}
 
 READ8_MEMBER(othello_state::unk_87_r)
 {
@@ -213,20 +214,21 @@ WRITE8_MEMBER(othello_state::tilebank_w)
 	logerror("tilebank -> %x\n", data);
 }
 
-ADDRESS_MAP_START(othello_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("INP")
-	AM_RANGE(0x81, 0x81) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x83, 0x83) AM_READ_PORT("DSW")
-	AM_RANGE(0x86, 0x86) AM_WRITE(tilebank_w)
-	AM_RANGE(0x87, 0x87) AM_READ(unk_87_r)
-	AM_RANGE(0x8a, 0x8a) AM_WRITE(unk_8a_w)
-	AM_RANGE(0x8c, 0x8c) AM_READWRITE(unk_8c_r, unk_8c_w)
-	AM_RANGE(0x8d, 0x8d) AM_READ(sound_ack_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x8f, 0x8f) AM_WRITE(unk_8f_w)
-ADDRESS_MAP_END
+void othello_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x08, 0x08).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x09, 0x09).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x80, 0x80).portr("INP");
+	map(0x81, 0x81).portr("SYSTEM");
+	map(0x83, 0x83).portr("DSW");
+	map(0x86, 0x86).w(this, FUNC(othello_state::tilebank_w));
+	map(0x87, 0x87).r(this, FUNC(othello_state::unk_87_r));
+	map(0x8a, 0x8a).w(this, FUNC(othello_state::unk_8a_w));
+	map(0x8c, 0x8c).rw(this, FUNC(othello_state::unk_8c_r), FUNC(othello_state::unk_8c_w));
+	map(0x8d, 0x8d).r(this, FUNC(othello_state::sound_ack_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x8f, 0x8f).w(this, FUNC(othello_state::unk_8f_w));
+}
 
 READ8_MEMBER(othello_state::latch_r)
 {
@@ -257,19 +259,21 @@ WRITE8_MEMBER(othello_state::ay_data_w)
 	if (m_ay_select & 2) m_ay2->data_w(space, 0, data);
 }
 
-ADDRESS_MAP_START(othello_state::audio_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-ADDRESS_MAP_END
+void othello_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x8000, 0x83ff).ram();
+}
 
-ADDRESS_MAP_START(othello_state::audio_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(latch_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ay_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(ay_address_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(ack_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(ay_select_w)
-ADDRESS_MAP_END
+void othello_state::audio_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(othello_state::latch_r));
+	map(0x01, 0x01).w(this, FUNC(othello_state::ay_data_w));
+	map(0x03, 0x03).w(this, FUNC(othello_state::ay_address_w));
+	map(0x04, 0x04).w(this, FUNC(othello_state::ack_w));
+	map(0x08, 0x08).w(this, FUNC(othello_state::ay_select_w));
+}
 
 WRITE8_MEMBER(othello_state::n7751_rom_control_w)
 {

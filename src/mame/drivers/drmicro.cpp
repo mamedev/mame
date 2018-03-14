@@ -76,22 +76,24 @@ WRITE8_MEMBER(drmicro_state::pcm_set_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(drmicro_state::drmicro_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(drmicro_videoram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void drmicro_state::drmicro_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xefff).ram().w(this, FUNC(drmicro_state::drmicro_videoram_w));
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(drmicro_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76496_device, write)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76496_device, write)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn3", sn76496_device, write)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(pcm_set_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(nmi_enable_w)
-	AM_RANGE(0x05, 0x05) AM_NOP // unused? / watchdog?
-ADDRESS_MAP_END
+void drmicro_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76496_device::write));
+	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76496_device::write));
+	map(0x02, 0x02).w("sn3", FUNC(sn76496_device::write));
+	map(0x03, 0x03).portr("DSW1").w(this, FUNC(drmicro_state::pcm_set_w));
+	map(0x04, 0x04).portr("DSW2").w(this, FUNC(drmicro_state::nmi_enable_w));
+	map(0x05, 0x05).noprw(); // unused? / watchdog?
+}
 
 /*************************************
  *

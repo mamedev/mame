@@ -628,50 +628,52 @@ WRITE16_MEMBER(tumbleb_state::tumbleb2_soundmcu_w)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(tumbleb_state::tumblepopb_main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void tumbleb_state::tumblepopb_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 #if TUMBLEP_HACK
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY   /* To write levels modifications */
+	map(0x000000, 0x07ffff).writeonly();   /* To write levels modifications */
 #endif
-	AM_RANGE(0x100000, 0x100001) AM_READWRITE(tumblepb_prot_r, tumblepb_oki_w)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram") /* Bootleg sprite buffer */
-	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY /* writes past the end of spriteram */
-	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
-	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE(tumblepb_pf1_data_w) AM_SHARE("pf1_data")
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_SHARE("pf2_data")
-	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
-	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
-	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP
-	AM_RANGE(0x342400, 0x34247f) AM_WRITENOP
-ADDRESS_MAP_END
+	map(0x100000, 0x100001).rw(this, FUNC(tumbleb_state::tumblepb_prot_r), FUNC(tumbleb_state::tumblepb_oki_w));
+	map(0x120000, 0x123fff).ram().share("mainram");
+	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x160000, 0x1607ff).ram().share("spriteram"); /* Bootleg sprite buffer */
+	map(0x160800, 0x160807).writeonly(); /* writes past the end of spriteram */
+	map(0x180000, 0x18000f).r(this, FUNC(tumbleb_state::tumblepopb_controls_r));
+	map(0x18000c, 0x18000d).nopw();
+	map(0x1a0000, 0x1a07ff).ram();
+	map(0x300000, 0x30000f).w(this, FUNC(tumbleb_state::tumblepb_control_0_w));
+	map(0x320000, 0x320fff).w(this, FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
+	map(0x322000, 0x322fff).w(this, FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
+	map(0x340000, 0x3401ff).nopw(); /* Unused row scroll */
+	map(0x340400, 0x34047f).nopw(); /* Unused col scroll */
+	map(0x342000, 0x3421ff).nopw();
+	map(0x342400, 0x34247f).nopw();
+}
 
-ADDRESS_MAP_START(tumbleb_state::fncywld_main_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+void tumbleb_state::fncywld_main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
 #if FNCYWLD_HACK
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITEONLY   /* To write levels modifications */
+	map(0x000000, 0x0fffff).writeonly();   /* To write levels modifications */
 #endif
-	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0x100004, 0x100005) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x140000, 0x140fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram") /* sprites */
-	AM_RANGE(0x160800, 0x16080f) AM_WRITEONLY /* goes slightly past the end of spriteram? */
-	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
-	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(fncywld_pf1_data_w) AM_SHARE("pf1_data")
-	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(fncywld_pf2_data_w) AM_SHARE("pf2_data")
-	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
-	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
-	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP
-	AM_RANGE(0x342400, 0x34247f) AM_WRITENOP
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x100000, 0x100003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0x100005, 0x100005).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x140000, 0x140fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x160000, 0x1607ff).ram().share("spriteram"); /* sprites */
+	map(0x160800, 0x16080f).writeonly(); /* goes slightly past the end of spriteram? */
+	map(0x180000, 0x18000f).r(this, FUNC(tumbleb_state::tumblepopb_controls_r));
+	map(0x18000c, 0x18000d).nopw();
+	map(0x1a0000, 0x1a07ff).ram();
+	map(0x300000, 0x30000f).w(this, FUNC(tumbleb_state::tumblepb_control_0_w));
+	map(0x320000, 0x321fff).ram().w(this, FUNC(tumbleb_state::fncywld_pf1_data_w)).share("pf1_data");
+	map(0x322000, 0x323fff).ram().w(this, FUNC(tumbleb_state::fncywld_pf2_data_w)).share("pf2_data");
+	map(0x340000, 0x3401ff).nopw(); /* Unused row scroll */
+	map(0x340400, 0x34047f).nopw(); /* Unused col scroll */
+	map(0x342000, 0x3421ff).nopw();
+	map(0x342400, 0x34247f).nopw();
+	map(0xff0000, 0xffffff).ram();
+}
 
 
 READ16_MEMBER(tumbleb_state::semibase_unknown_r)
@@ -679,23 +681,24 @@ READ16_MEMBER(tumbleb_state::semibase_unknown_r)
 	return machine().rand();
 }
 
-ADDRESS_MAP_START(tumbleb_state::htchctch_main_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10000f) AM_READ(semibase_unknown_r)
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(semicom_soundcmd_w)
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(bcstory_tilebank_w)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x160000, 0x160fff) AM_RAM AM_SHARE("spriteram") /* Bootleg sprite buffer */
-	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
-	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
-	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x321fff) AM_WRITE(tumblepb_pf1_data_w) AM_SHARE("pf1_data")
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_SHARE("pf2_data")
-	AM_RANGE(0x323000, 0x331fff) AM_NOP // metal saver writes there when clearing the above tilemaps, flaw in the program routine
-	AM_RANGE(0x341000, 0x342fff) AM_RAM             // Extra ram?
-ADDRESS_MAP_END
+void tumbleb_state::htchctch_main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x10000f).r(this, FUNC(tumbleb_state::semibase_unknown_r));
+	map(0x100000, 0x100001).w(this, FUNC(tumbleb_state::semicom_soundcmd_w));
+	map(0x100002, 0x100003).w(this, FUNC(tumbleb_state::bcstory_tilebank_w));
+	map(0x120000, 0x123fff).ram().share("mainram");
+	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x160000, 0x160fff).ram().share("spriteram"); /* Bootleg sprite buffer */
+	map(0x180000, 0x18000f).r(this, FUNC(tumbleb_state::tumblepopb_controls_r));
+	map(0x18000c, 0x18000d).nopw();
+	map(0x1a0000, 0x1a0fff).ram();
+	map(0x300000, 0x30000f).w(this, FUNC(tumbleb_state::tumblepb_control_0_w));
+	map(0x320000, 0x321fff).w(this, FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
+	map(0x322000, 0x322fff).w(this, FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
+	map(0x323000, 0x331fff).noprw(); // metal saver writes there when clearing the above tilemaps, flaw in the program routine
+	map(0x341000, 0x342fff).ram();             // Extra ram?
+}
 
 
 
@@ -705,32 +708,34 @@ WRITE16_MEMBER(tumbleb_state::jumpkids_sound_w)
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-ADDRESS_MAP_START(tumbleb_state::suprtrio_main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa00000, 0xa0000f) AM_RAM AM_SHARE("control")
-	AM_RANGE(0xa20000, 0xa20fff) AM_RAM_WRITE(tumblepb_pf1_data_w) AM_SHARE("pf1_data")
-	AM_RANGE(0xa22000, 0xa22fff) AM_RAM_WRITE(tumblepb_pf2_data_w) AM_SHARE("pf2_data")
-	AM_RANGE(0xcf0000, 0xcf05ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("PLAYERS") AM_WRITE(suprtrio_tilebank_w)
-	AM_RANGE(0xe40000, 0xe40001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xe80002, 0xe80003) AM_READ_PORT("DSW")
-	AM_RANGE(0xec0000, 0xec0001) AM_WRITE(semicom_soundcmd_w)
-	AM_RANGE(0xf00000, 0xf07fff) AM_RAM
-ADDRESS_MAP_END
+void tumbleb_state::suprtrio_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x700000, 0x700fff).ram().share("spriteram");
+	map(0xa00000, 0xa0000f).ram().share("control");
+	map(0xa20000, 0xa20fff).ram().w(this, FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
+	map(0xa22000, 0xa22fff).ram().w(this, FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
+	map(0xcf0000, 0xcf05ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xe00000, 0xe00001).portr("PLAYERS").w(this, FUNC(tumbleb_state::suprtrio_tilebank_w));
+	map(0xe40000, 0xe40001).portr("SYSTEM");
+	map(0xe80002, 0xe80003).portr("DSW");
+	map(0xec0000, 0xec0001).w(this, FUNC(tumbleb_state::semicom_soundcmd_w));
+	map(0xf00000, 0xf07fff).ram();
+}
 
-ADDRESS_MAP_START(tumbleb_state::pangpang_main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram") /* Bootleg sprite buffer */
-	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY // writes past the end of spriteram
-	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(pangpang_pf1_data_w) AM_SHARE("pf1_data")
-	AM_RANGE(0x340000, 0x341fff) AM_RAM_WRITE(pangpang_pf2_data_w) AM_SHARE("pf2_data")
-ADDRESS_MAP_END
+void tumbleb_state::pangpang_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x120000, 0x123fff).ram().share("mainram");
+	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x160000, 0x1607ff).ram().share("spriteram"); /* Bootleg sprite buffer */
+	map(0x160800, 0x160807).writeonly(); // writes past the end of spriteram
+	map(0x180000, 0x18000f).r(this, FUNC(tumbleb_state::tumblepopb_controls_r));
+	map(0x1a0000, 0x1a07ff).ram();
+	map(0x300000, 0x30000f).w(this, FUNC(tumbleb_state::tumblepb_control_0_w));
+	map(0x320000, 0x321fff).ram().w(this, FUNC(tumbleb_state::pangpang_pf1_data_w)).share("pf1_data");
+	map(0x340000, 0x341fff).ram().w(this, FUNC(tumbleb_state::pangpang_pf2_data_w)).share("pf2_data");
+}
 
 
 /******************************************************************************/
@@ -753,45 +758,48 @@ WRITE8_MEMBER(tumbleb_state::oki_sound_bank_w)
 	memcpy(&oki[0x30000], &oki[(data * 0x10000) + 0x40000], 0x10000);
 }
 
-ADDRESS_MAP_START(tumbleb_state::semicom_sound_map)
-	AM_RANGE(0x0000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+void tumbleb_state::semicom_sound_map(address_map &map)
+{
+	map(0x0000, 0xcfff).rom();
+	map(0xd000, 0xd7ff).ram();
+	map(0xf000, 0xf001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xf002, 0xf002).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//AM_RANGE(0xf006, 0xf006) ??
-	AM_RANGE(0xf008, 0xf008) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(oki_sound_bank_w)
-ADDRESS_MAP_END
+	map(0xf008, 0xf008).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xf00e, 0xf00e).w(this, FUNC(tumbleb_state::oki_sound_bank_w));
+}
 
-ADDRESS_MAP_START(tumbleb_state::suprtrio_sound_map)
-	AM_RANGE(0x0000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+void tumbleb_state::suprtrio_sound_map(address_map &map)
+{
+	map(0x0000, 0xcfff).rom();
+	map(0xd000, 0xd7ff).ram();
+	map(0xf002, 0xf002).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//AM_RANGE(0xf006, 0xf006) ??
-	AM_RANGE(0xf008, 0xf008) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(oki_sound_bank_w)
-ADDRESS_MAP_END
+	map(0xf008, 0xf008).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xf00e, 0xf00e).w(this, FUNC(tumbleb_state::oki_sound_bank_w));
+}
 
 /* Jump Kids */
 
-ADDRESS_MAP_START(tumbleb_state::jumpkids_main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(jumpkids_sound_w)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram") /* Bootleg sprite buffer */
-	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY /* writes past the end of spriteram */
-	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
-	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE(tumblepb_pf1_data_w) AM_SHARE("pf1_data")
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_SHARE("pf2_data")
-	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
-	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
-	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP
-	AM_RANGE(0x342400, 0x34247f) AM_WRITENOP
-ADDRESS_MAP_END
+void tumbleb_state::jumpkids_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x100001).w(this, FUNC(tumbleb_state::jumpkids_sound_w));
+	map(0x120000, 0x123fff).ram().share("mainram");
+	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x160000, 0x1607ff).ram().share("spriteram"); /* Bootleg sprite buffer */
+	map(0x160800, 0x160807).writeonly(); /* writes past the end of spriteram */
+	map(0x180000, 0x18000f).r(this, FUNC(tumbleb_state::tumblepopb_controls_r));
+	map(0x18000c, 0x18000d).nopw();
+	map(0x1a0000, 0x1a07ff).ram();
+	map(0x300000, 0x30000f).w(this, FUNC(tumbleb_state::tumblepb_control_0_w));
+	map(0x320000, 0x320fff).w(this, FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
+	map(0x322000, 0x322fff).w(this, FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
+	map(0x340000, 0x3401ff).nopw(); /* Unused row scroll */
+	map(0x340400, 0x34047f).nopw(); /* Unused col scroll */
+	map(0x342000, 0x3421ff).nopw();
+	map(0x342400, 0x34247f).nopw();
+}
 
 WRITE8_MEMBER(tumbleb_state::jumpkids_oki_bank_w)
 {
@@ -802,13 +810,14 @@ WRITE8_MEMBER(tumbleb_state::jumpkids_oki_bank_w)
 	memcpy(sound1 + 0x20000, sound2 + bank * 0x20000, 0x20000);
 }
 
-ADDRESS_MAP_START(tumbleb_state::jumpkids_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(jumpkids_oki_bank_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void tumbleb_state::jumpkids_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).w(this, FUNC(tumbleb_state::jumpkids_oki_bank_w));
+	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 /* Semicom AT89C52 MCU */

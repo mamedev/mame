@@ -94,14 +94,15 @@ private:
  Address Maps
 ******************************************************************************/
 
-ADDRESS_MAP_START(eacc_state::eacc_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xc7ff) // A11,A12,A13 not connected
-	AM_RANGE(0x0000, 0x001f) AM_RAM AM_SHARE("nvram") // inside cpu, battery-backed
-	AM_RANGE(0x0020, 0x007f) AM_RAM // inside cpu
-	AM_RANGE(0x4000, 0x47ff) AM_ROM AM_MIRROR(0x8000)
-	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x7fc) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-ADDRESS_MAP_END
+void eacc_state::eacc_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xc7ff); // A11,A12,A13 not connected
+	map(0x0000, 0x001f).ram().share("nvram"); // inside cpu, battery-backed
+	map(0x0020, 0x007f).ram(); // inside cpu
+	map(0x4000, 0x47ff).rom().mirror(0x8000);
+	map(0x8000, 0x8003).mirror(0x7fc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+}
 
 
 /******************************************************************************

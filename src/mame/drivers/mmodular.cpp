@@ -84,79 +84,84 @@ private:
 };
 
 
-ADDRESS_MAP_START(mmodular_state::alm16_mem)
-	AM_RANGE( 0x000000, 0x01ffff )  AM_ROM
+void mmodular_state::alm16_mem(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
 
-	AM_RANGE( 0xc00000, 0xc00001 ) AM_DEVREAD8("board", mephisto_board_device, input_r, 0xff00)
-	AM_RANGE( 0xc80000, 0xc80001 ) AM_DEVWRITE8("board", mephisto_board_device, mux_w, 0xff00)
-	AM_RANGE( 0xd00000, 0xd00001 ) AM_DEVWRITE8("board", mephisto_board_device, led_w, 0xff00)
-	AM_RANGE( 0xf00000, 0xf00003 ) AM_READ_PORT("KEY1")
-	AM_RANGE( 0xf00004, 0xf00007 ) AM_READ_PORT("KEY2")
-	AM_RANGE( 0xf00008, 0xf0000b ) AM_READ_PORT("KEY3")
-	AM_RANGE( 0xd80000, 0xd80001 ) AM_DEVWRITE8("display", mephisto_display_modul_device, latch_w, 0xff00)
-	AM_RANGE( 0xd80008, 0xd80009 ) AM_DEVWRITE8("display", mephisto_display_modul_device, io_w, 0xff00)
+	map(0xc00000, 0xc00000).r("board", FUNC(mephisto_board_device::input_r));
+	map(0xc80000, 0xc80000).w("board", FUNC(mephisto_board_device::mux_w));
+	map(0xd00000, 0xd00000).w("board", FUNC(mephisto_board_device::led_w));
+	map(0xf00000, 0xf00003).portr("KEY1");
+	map(0xf00004, 0xf00007).portr("KEY2");
+	map(0xf00008, 0xf0000b).portr("KEY3");
+	map(0xd80000, 0xd80000).w("display", FUNC(mephisto_display_modul_device::latch_w));
+	map(0xd80008, 0xd80008).w("display", FUNC(mephisto_display_modul_device::io_w));
 
-	AM_RANGE( 0x400000, 0x47ffff ) AM_RAM
-	AM_RANGE( 0x800000, 0x803fff ) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0x400000, 0x47ffff).ram();
+	map(0x800000, 0x803fff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(mmodular_state::van16_mem)
-	AM_IMPORT_FROM(alm16_mem)
+void mmodular_state::van16_mem(address_map &map)
+{
+	alm16_mem(map);
 
-	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM
+	map(0x000000, 0x03ffff).rom();
 
 //  AM_RANGE( 0xe80004, 0xe80005 )  AM_WRITE(write_unknown2 )   // Bavaria sensors
 //  AM_RANGE( 0xe80002, 0xe80003 )  AM_READ(read_unknown1 )     // Bavaria sensors
 //  AM_RANGE( 0xe80006, 0xe80007 )  AM_READ(read_unknown3 )     // Bavaria sensors
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(mmodular_state::alm32_mem)
-	AM_RANGE( 0x00000000, 0x0001ffff )  AM_ROM
+void mmodular_state::alm32_mem(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom();
 
-	AM_RANGE( 0x800000fc, 0x800000ff ) AM_DEVREAD8("board", mephisto_board_device, input_r, 0xff000000)
-	AM_RANGE( 0x88000000, 0x88000007 ) AM_DEVWRITE8("board", mephisto_board_device, mux_w, 0xff000000)
-	AM_RANGE( 0x90000000, 0x90000007 ) AM_DEVWRITE8("board", mephisto_board_device, led_w, 0xff000000)
-	AM_RANGE( 0x800000ec, 0x800000ef ) AM_READ_PORT("KEY1")
-	AM_RANGE( 0x800000f4, 0x800000f7 ) AM_READ_PORT("KEY2")
-	AM_RANGE( 0x800000f8, 0x800000fb ) AM_READ_PORT("KEY3")
-	AM_RANGE( 0xa0000000, 0xa0000003 ) AM_DEVWRITE8("display", mephisto_display_modul_device, latch_w, 0xff000000)
-	AM_RANGE( 0xa0000010, 0xa0000013 ) AM_DEVWRITE8("display", mephisto_display_modul_device, io_w, 0xff000000)
+	map(0x800000fc, 0x800000fc).r("board", FUNC(mephisto_board_device::input_r));
+	map(0x88000000, 0x88000007).w("board", FUNC(mephisto_board_device::mux_w)).umask32(0xff000000);
+	map(0x90000000, 0x90000007).w("board", FUNC(mephisto_board_device::led_w)).umask32(0xff000000);
+	map(0x800000ec, 0x800000ef).portr("KEY1");
+	map(0x800000f4, 0x800000f7).portr("KEY2");
+	map(0x800000f8, 0x800000fb).portr("KEY3");
+	map(0xa0000000, 0xa0000000).w("display", FUNC(mephisto_display_modul_device::latch_w));
+	map(0xa0000010, 0xa0000010).w("display", FUNC(mephisto_display_modul_device::io_w));
 
-	AM_RANGE( 0x40000000, 0x400fffff ) AM_RAM
-	AM_RANGE( 0xa8000000, 0xa8007fff ) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0x40000000, 0x400fffff).ram();
+	map(0xa8000000, 0xa8007fff).ram().share("nvram");
+}
 
 
-ADDRESS_MAP_START(mmodular_state::van32_mem)
-	AM_IMPORT_FROM(alm32_mem)
+void mmodular_state::van32_mem(address_map &map)
+{
+	alm32_mem(map);
 
-	AM_RANGE( 0x00000000, 0x0003ffff ) AM_ROM
+	map(0x00000000, 0x0003ffff).rom();
 
 //  AM_RANGE( 0x98000008, 0x9800000b )  AM_WRITE(write_unknown2 )   // Bavaria sensors
 //  AM_RANGE( 0x98000004, 0x98000007 )  AM_READ(read_unknown1 ) // Bavaria sensors
 //  AM_RANGE( 0x9800000c, 0x9800000f )  AM_READ(read_unknown3 ) // Bavaria sensors
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(mmodular_state::gen32_mem)
-	AM_RANGE( 0x00000000, 0x0003ffff ) AM_ROM
+void mmodular_state::gen32_mem(address_map &map)
+{
+	map(0x00000000, 0x0003ffff).rom();
 
-	AM_RANGE( 0xc8000004, 0xc8000007 ) AM_DEVWRITE8("board", mephisto_board_device, mux_w, 0xff000000)
-	AM_RANGE( 0xd0000004, 0xd0000007 ) AM_DEVWRITE8("board", mephisto_board_device, led_w, 0xff000000)
-	AM_RANGE( 0xc0000000, 0xc0000003 ) AM_DEVREAD8("board", mephisto_board_device, input_r, 0xff000000)
-	AM_RANGE( 0xf0000004, 0xf0000007 ) AM_READ_PORT("KEY1")
-	AM_RANGE( 0xf0000008, 0xf000000b ) AM_READ_PORT("KEY2")
-	AM_RANGE( 0xf0000010, 0xf0000013 ) AM_READ_PORT("KEY3")
-	AM_RANGE( 0xe0000000, 0xe0000003 ) AM_DEVWRITE8("display", mephisto_display_modul_device, latch_w, 0xff000000)
-	AM_RANGE( 0xe0000010, 0xe0000013 ) AM_DEVWRITE8("display", mephisto_display_modul_device, io_w, 0xff000000)
+	map(0xc8000004, 0xc8000004).w("board", FUNC(mephisto_board_device::mux_w));
+	map(0xd0000004, 0xd0000004).w("board", FUNC(mephisto_board_device::led_w));
+	map(0xc0000000, 0xc0000000).r("board", FUNC(mephisto_board_device::input_r));
+	map(0xf0000004, 0xf0000007).portr("KEY1");
+	map(0xf0000008, 0xf000000b).portr("KEY2");
+	map(0xf0000010, 0xf0000013).portr("KEY3");
+	map(0xe0000000, 0xe0000000).w("display", FUNC(mephisto_display_modul_device::latch_w));
+	map(0xe0000010, 0xe0000010).w("display", FUNC(mephisto_display_modul_device::io_w));
 
 //  AM_RANGE( 0xd8000008, 0xd800000b )  AM_WRITE(write_unknown2 )   // Bavaria sensors
 //  AM_RANGE( 0xd8000004, 0xd8000007 )  AM_READ(read_unknown1 ) // Bavaria sensors
 //  AM_RANGE( 0xd800000c, 0xd800000f )  AM_READ(read_unknown3 ) // Bavaria sensors
 
-	AM_RANGE( 0x40000000, 0x4007ffff ) AM_RAM
-	AM_RANGE( 0x80000000, 0x8003ffff ) AM_RAM
-	AM_RANGE( 0xe8000000, 0xe8007fff ) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0x40000000, 0x4007ffff).ram();
+	map(0x80000000, 0x8003ffff).ram();
+	map(0xe8000000, 0xe8007fff).ram().share("nvram");
+}
 
 
 READ8_MEMBER(berlinp_state::berlinp_input_r)
@@ -167,18 +172,19 @@ READ8_MEMBER(berlinp_state::berlinp_input_r)
 		return m_board->input_r(space, offset) ^ 0xff;
 }
 
-ADDRESS_MAP_START(berlinp_state::berlinp_mem)
-	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM
+void berlinp_state::berlinp_mem(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
-	AM_RANGE( 0x800000, 0x800003 ) AM_READ8(berlinp_input_r, 0xff000000)
-	AM_RANGE( 0x900000, 0x900003 ) AM_DEVWRITE8("board", mephisto_board_device, mux_w, 0xff000000)
-	AM_RANGE( 0xa00000, 0xa00003 ) AM_DEVWRITE8("board", mephisto_board_device, led_w, 0xff000000)
-	AM_RANGE( 0xb00000, 0xb00003 ) AM_DEVWRITE8("display", mephisto_display_modul_device, io_w, 0xff000000)
-	AM_RANGE( 0xc00000, 0xc00003 ) AM_DEVWRITE8("display", mephisto_display_modul_device, latch_w, 0xff000000)
+	map(0x800000, 0x800000).r(this, FUNC(berlinp_state::berlinp_input_r));
+	map(0x900000, 0x900000).w(m_board, FUNC(mephisto_board_device::mux_w));
+	map(0xa00000, 0xa00000).w(m_board, FUNC(mephisto_board_device::led_w));
+	map(0xb00000, 0xb00000).w("display", FUNC(mephisto_display_modul_device::io_w));
+	map(0xc00000, 0xc00000).w("display", FUNC(mephisto_display_modul_device::latch_w));
 
-	AM_RANGE( 0x400000, 0x4fffff ) AM_RAM
-	AM_RANGE( 0xd00000, 0xd07fff ) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0x400000, 0x4fffff).ram();
+	map(0xd00000, 0xd07fff).ram().share("nvram");
+}
 
 
 static INPUT_PORTS_START( alm16 )

@@ -204,32 +204,36 @@ WRITE8_MEMBER(roul_state::ball_w)
 	m_lamp_old = lamp;
 }
 
-ADDRESS_MAP_START(roul_state::roul_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void roul_state::roul_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(roul_state::roul_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf4) AM_WRITE(blitter_cmd_w)
-	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW")
-	AM_RANGE(0xf9, 0xf9) AM_WRITE(ball_w)
-	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN0")
-	AM_RANGE(0xfd, 0xfd) AM_READ_PORT("IN1")
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
-ADDRESS_MAP_END
+void roul_state::roul_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf4).w(this, FUNC(roul_state::blitter_cmd_w));
+	map(0xf5, 0xf5).r(this, FUNC(roul_state::blitter_status_r));
+	map(0xf8, 0xf8).portr("DSW");
+	map(0xf9, 0xf9).w(this, FUNC(roul_state::ball_w));
+	map(0xfa, 0xfa).portr("IN0");
+	map(0xfd, 0xfd).portr("IN1");
+	map(0xfe, 0xfe).w(this, FUNC(roul_state::sound_latch_w));
+}
 
-ADDRESS_MAP_START(roul_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-ADDRESS_MAP_END
+void roul_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x13ff).ram();
+}
 
-ADDRESS_MAP_START(roul_state::sound_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void roul_state::sound_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 void roul_state::video_start()
 {

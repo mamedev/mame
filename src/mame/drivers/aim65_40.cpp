@@ -91,16 +91,17 @@ private:
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(aim65_40_state::aim65_40_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0xa000, 0xcfff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0xf000, 0xff7f) AM_ROM AM_REGION("roms", 0x3000)
-	AM_RANGE(0xffa0, 0xffaf) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
-	AM_RANGE(0xffb0, 0xffbf) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
-	AM_RANGE(0xffc0, 0xffcf) AM_DEVREADWRITE(M6522_2_TAG, via6522_device, read, write)
-	AM_RANGE(0xffd0, 0xffd3) AM_DEVREADWRITE(M6551_TAG, mos6551_device, read, write)
-	AM_RANGE(0xffe0, 0xffff) AM_ROM AM_REGION("roms", 0x3fe0)
-ADDRESS_MAP_END
+void aim65_40_state::aim65_40_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+	map(0xa000, 0xcfff).rom().region("roms", 0);
+	map(0xf000, 0xff7f).rom().region("roms", 0x3000);
+	map(0xffa0, 0xffaf).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xffb0, 0xffbf).rw(M6522_1_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xffc0, 0xffcf).rw(M6522_2_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xffd0, 0xffd3).rw(M6551_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xffe0, 0xffff).rom().region("roms", 0x3fe0);
+}
 
 /***************************************************************************
     INPUT PORTS

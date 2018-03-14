@@ -72,21 +72,23 @@ u32 altos2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	return 0;
 }
 
-ADDRESS_MAP_START(altos2_state::mem_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void altos2_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("roms", 0);
+	map(0xc000, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(altos2_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dart1", z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("dart2", z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(video_mode_w)
-	AM_RANGE(0x40, 0x7f) AM_DEVREADWRITE("novram", x2210_device, read, write)
+void altos2_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).rw("dart1", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x04, 0x07).rw("dart2", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x08, 0x0b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x0c, 0x0c).w(this, FUNC(altos2_state::video_mode_w));
+	map(0x40, 0x7f).rw(m_novram, FUNC(x2210_device::read), FUNC(x2210_device::write));
 	//AM_RANGE(0x80, 0xff) AM_DEVREADWRITE_MOD("vpac", crt9007_device, read, write, rshift<1>)
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( altos2 )
 INPUT_PORTS_END

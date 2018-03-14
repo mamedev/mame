@@ -555,20 +555,21 @@ WRITE16_MEMBER(maygayv1_state::vsync_int_ctrl)
 		m_maincpu->set_input_line(3, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(maygayv1_state::main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("maincpu", 0x80000)
-	AM_RANGE(0x820000, 0x820001) AM_DEVREADWRITE8("i8279", i8279_device, data_r, data_w ,0xff)
-	AM_RANGE(0x820002, 0x820003) AM_DEVREADWRITE8("i8279", i8279_device, status_r, cmd_w,0xff)
-	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)
-	AM_RANGE(0x860000, 0x86000d) AM_READWRITE(read_odd, write_odd)
-	AM_RANGE(0x86000e, 0x86000f) AM_WRITE(vsync_int_ctrl)
-	AM_RANGE(0x880000, 0x89ffff) AM_READWRITE(i82716_r, i82716_w)
-	AM_RANGE(0x8a0000, 0x8a001f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff)
-	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVREAD8("pia", pia6821_device, read, 0x00ff)
-	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVWRITE8("pia", pia6821_device, write, 0xff00)
-ADDRESS_MAP_END
+void maygayv1_state::main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x083fff).ram().share("nvram");
+	map(0x100000, 0x17ffff).rom().region("maincpu", 0x80000);
+	map(0x820001, 0x820001).rw("i8279", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
+	map(0x820003, 0x820003).rw("i8279", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
+	map(0x800000, 0x800003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);
+	map(0x860000, 0x86000d).rw(this, FUNC(maygayv1_state::read_odd), FUNC(maygayv1_state::write_odd));
+	map(0x86000e, 0x86000f).w(this, FUNC(maygayv1_state::vsync_int_ctrl));
+	map(0x880000, 0x89ffff).rw(this, FUNC(maygayv1_state::i82716_r), FUNC(maygayv1_state::i82716_w));
+	map(0x8a0000, 0x8a001f).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x8c0000, 0x8c000f).r("pia", FUNC(pia6821_device::read)).umask16(0x00ff);
+	map(0x8c0000, 0x8c000f).w("pia", FUNC(pia6821_device::write)).umask16(0xff00);
+}
 
 
 /*************************************
@@ -647,17 +648,20 @@ WRITE8_MEMBER(maygayv1_state::mcu_w)
 }
 
 
-ADDRESS_MAP_START(maygayv1_state::sound_prg)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void maygayv1_state::sound_prg(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(maygayv1_state::sound_data)
-	AM_RANGE(0x0000, 0x1ff) AM_RAM // nothing?
-ADDRESS_MAP_END
+void maygayv1_state::sound_data(address_map &map)
+{
+	map(0x0000, 0x1ff).ram(); // nothing?
+}
 
-ADDRESS_MAP_START(maygayv1_state::sound_io)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(mcu_r, mcu_w)
-ADDRESS_MAP_END
+void maygayv1_state::sound_io(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(maygayv1_state::mcu_r), FUNC(maygayv1_state::mcu_w));
+}
 
 
 /*************************************

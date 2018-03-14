@@ -392,26 +392,27 @@ WRITE8_MEMBER(srmp2_state::srmp2_irq4_ack_w)
 }
 
 
-ADDRESS_MAP_START(srmp2_state::srmp2_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     /* Sprites Code + X + Attr */
-	AM_RANGE(0x180000, 0x1805ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     /* Sprites Y */
-	AM_RANGE(0x180600, 0x180607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITENOP                        /* ??? */
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(srmp2_flags_w)            /* ADPCM bank, Color bank, etc. */
-	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("SYSTEM")             /* Coinage */
-	AM_RANGE(0x900000, 0x900001) AM_WRITENOP                        /* ??? */
-	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff) /* key matrix | I/O */
-	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
-	AM_RANGE(0xb00000, 0xb00001) AM_WRITE8(adpcm_code_w,0x00ff)   /* ADPCM number */
-	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)      /* ADPCM voice status */
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE8(srmp2_irq2_ack_w,0x00ff)         /* irq ack lv 2 */
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE8(srmp2_irq4_ack_w,0x00ff)         /* irq ack lv 4 */
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP                        /* watchdog */
-	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0xf00000, 0xf00003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
-ADDRESS_MAP_END
+void srmp2_state::srmp2_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x0c0000, 0x0c3fff).ram().share("nvram");
+	map(0x140000, 0x143fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     /* Sprites Code + X + Attr */
+	map(0x180000, 0x1805ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     /* Sprites Y */
+	map(0x180600, 0x180607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
+	map(0x1c0000, 0x1c0001).nopw();                        /* ??? */
+	map(0x800000, 0x800001).w(this, FUNC(srmp2_state::srmp2_flags_w));            /* ADPCM bank, Color bank, etc. */
+	map(0x900000, 0x900001).portr("SYSTEM");             /* Coinage */
+	map(0x900000, 0x900001).nopw();                        /* ??? */
+	map(0xa00001, 0xa00001).rw(this, FUNC(srmp2_state::iox_mux_r), FUNC(srmp2_state::iox_command_w)); /* key matrix | I/O */
+	map(0xa00003, 0xa00003).rw(this, FUNC(srmp2_state::iox_status_r), FUNC(srmp2_state::iox_data_w));
+	map(0xb00001, 0xb00001).w(this, FUNC(srmp2_state::adpcm_code_w));   /* ADPCM number */
+	map(0xb00003, 0xb00003).r(this, FUNC(srmp2_state::vox_status_r));      /* ADPCM voice status */
+	map(0xc00001, 0xc00001).w(this, FUNC(srmp2_state::srmp2_irq2_ack_w));         /* irq ack lv 2 */
+	map(0xd00001, 0xd00001).w(this, FUNC(srmp2_state::srmp2_irq4_ack_w));         /* irq ack lv 4 */
+	map(0xe00000, 0xe00001).nopw();                        /* watchdog */
+	map(0xf00001, 0xf00001).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xf00000, 0xf00003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+}
 
 READ8_MEMBER(srmp2_state::mjyuugi_irq2_ack_r)
 {
@@ -425,32 +426,33 @@ READ8_MEMBER(srmp2_state::mjyuugi_irq4_ack_r)
 	return 0xff; // value returned doesn't matter
 }
 
-ADDRESS_MAP_START(srmp2_state::mjyuugi_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")             /* Coinage */
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(mjyuugi_flags_w)          /* Coin Counter */
-	AM_RANGE(0x100010, 0x100011) AM_READNOP                         /* ??? */
-	AM_RANGE(0x100010, 0x100011) AM_WRITE(mjyuugi_adpcm_bank_w)     /* ADPCM bank, GFX bank */
-	AM_RANGE(0x200000, 0x200001) AM_READ8(mjyuugi_irq2_ack_r,0x00ff) /* irq ack lv 2? */
-	AM_RANGE(0x300000, 0x300001) AM_READ8(mjyuugi_irq4_ack_r,0x00ff) /* irq ack lv 4? */
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW3-1")             /* DSW 3-1 */
-	AM_RANGE(0x500010, 0x500011) AM_READ_PORT("DSW3-2")             /* DSW 3-2 */
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x800000, 0x800001) AM_READNOP             /* ??? */
-	AM_RANGE(0x900000, 0x900001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff) /* key matrix | I/O */
-	AM_RANGE(0x900002, 0x900003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(adpcm_code_w,0x00ff)           /* ADPCM number */
-	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)      /* ADPCM voice status */
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP                    /* ??? */
-	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) /* Sprites Y */
-	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
+void srmp2_state::mjyuugi_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x100001).portr("SYSTEM");             /* Coinage */
+	map(0x100000, 0x100001).w(this, FUNC(srmp2_state::mjyuugi_flags_w));          /* Coin Counter */
+	map(0x100010, 0x100011).nopr();                         /* ??? */
+	map(0x100010, 0x100011).w(this, FUNC(srmp2_state::mjyuugi_adpcm_bank_w));     /* ADPCM bank, GFX bank */
+	map(0x200001, 0x200001).r(this, FUNC(srmp2_state::mjyuugi_irq2_ack_r)); /* irq ack lv 2? */
+	map(0x300001, 0x300001).r(this, FUNC(srmp2_state::mjyuugi_irq4_ack_r)); /* irq ack lv 4? */
+	map(0x500000, 0x500001).portr("DSW3-1");             /* DSW 3-1 */
+	map(0x500010, 0x500011).portr("DSW3-2");             /* DSW 3-2 */
+	map(0x700000, 0x7003ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x800000, 0x800001).nopr();             /* ??? */
+	map(0x900001, 0x900001).rw(this, FUNC(srmp2_state::iox_mux_r), FUNC(srmp2_state::iox_command_w)); /* key matrix | I/O */
+	map(0x900003, 0x900003).rw(this, FUNC(srmp2_state::iox_status_r), FUNC(srmp2_state::iox_data_w));
+	map(0xa00001, 0xa00001).w(this, FUNC(srmp2_state::adpcm_code_w));           /* ADPCM number */
+	map(0xb00003, 0xb00003).r(this, FUNC(srmp2_state::vox_status_r));      /* ADPCM voice status */
+	map(0xb00001, 0xb00001).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xb00000, 0xb00003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0xc00000, 0xc00001).nopw();                    /* ??? */
+	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16)); /* Sprites Y */
+	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 
-	AM_RANGE(0xd02000, 0xd023ff) AM_RAM                         /* ??? only writes $00fa */
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16) /* Sprites Code + X + Attr */
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0xd02000, 0xd023ff).ram();                         /* ??? only writes $00fa */
+	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16)); /* Sprites Code + X + Attr */
+	map(0xffc000, 0xffffff).ram().share("nvram");
+}
 
 WRITE8_MEMBER(srmp2_state::srmp3_flags_w)
 {
@@ -471,41 +473,44 @@ WRITE8_MEMBER(srmp2_state::srmp3_irq_ack_w)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(srmp2_state::srmp3_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")                            /* rom bank */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("nvram")   /* work ram */
-	AM_RANGE(0xa800, 0xa800) AM_WRITENOP                            /* flag ? */
-	AM_RANGE(0xb000, 0xb2ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xb300, 0xb303) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r8, spritectrl_w8)
-	AM_RANGE(0xb800, 0xb800) AM_WRITENOP                            /* flag ? */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8) /* Sprites Code + X + Attr */
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
-ADDRESS_MAP_END
+void srmp2_state::srmp3_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");                            /* rom bank */
+	map(0xa000, 0xa7ff).ram().share("nvram");   /* work ram */
+	map(0xa800, 0xa800).nopw();                            /* flag ? */
+	map(0xb000, 0xb2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
+	map(0xb300, 0xb303).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r8), FUNC(seta001_device::spritectrl_w8));
+	map(0xb800, 0xb800).nopw();                            /* flag ? */
+	map(0xc000, 0xdfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8)); /* Sprites Code + X + Attr */
+	map(0xe000, 0xffff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+}
 
-ADDRESS_MAP_START(srmp2_state::srmp3_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_WRITE(srmp3_irq_ack_w)                              /* interrupt acknowledge */
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM") AM_WRITE(srmp3_flags_w)         /* coin, service | GFX bank, counter, lockout */
-	AM_RANGE(0x60, 0x60) AM_WRITE(srmp3_rombank_w)                              /* ROM bank select */
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(adpcm_code_w)                   /* ADPCM number */
-	AM_RANGE(0xa1, 0xa1) AM_READ(vox_status_r)                                  /* ADPCM voice status */
-	AM_RANGE(0xc0, 0xc0) AM_READWRITE(iox_mux_r, iox_command_w)                 /* key matrix | I/O */
-	AM_RANGE(0xc1, 0xc1) AM_READWRITE(iox_status_r,iox_data_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xe2, 0xe2) AM_DEVREAD("aysnd", ay8910_device, data_r)
-ADDRESS_MAP_END
+void srmp2_state::srmp3_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x20, 0x20).w(this, FUNC(srmp2_state::srmp3_irq_ack_w));                              /* interrupt acknowledge */
+	map(0x40, 0x40).portr("SYSTEM").w(this, FUNC(srmp2_state::srmp3_flags_w));         /* coin, service | GFX bank, counter, lockout */
+	map(0x60, 0x60).w(this, FUNC(srmp2_state::srmp3_rombank_w));                              /* ROM bank select */
+	map(0xa0, 0xa0).w(this, FUNC(srmp2_state::adpcm_code_w));                   /* ADPCM number */
+	map(0xa1, 0xa1).r(this, FUNC(srmp2_state::vox_status_r));                                  /* ADPCM voice status */
+	map(0xc0, 0xc0).rw(this, FUNC(srmp2_state::iox_mux_r), FUNC(srmp2_state::iox_command_w));                 /* key matrix | I/O */
+	map(0xc1, 0xc1).rw(this, FUNC(srmp2_state::iox_status_r), FUNC(srmp2_state::iox_data_w));
+	map(0xe0, 0xe1).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xe2, 0xe2).r("aysnd", FUNC(ay8910_device::data_r));
+}
 
-ADDRESS_MAP_START(srmp2_state::rmgoldyh_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")                            /* rom bank */
-	AM_RANGE(0xa000, 0xafff) AM_RAM AM_SHARE("nvram")   /* work ram */
-	AM_RANGE(0xb000, 0xb2ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xb300, 0xb303) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r8, spritectrl_w8)
-	AM_RANGE(0xb800, 0xb800) AM_WRITENOP                            /* flag ? */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8) /* Sprites Code + X + Attr */
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
-ADDRESS_MAP_END
+void srmp2_state::rmgoldyh_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");                            /* rom bank */
+	map(0xa000, 0xafff).ram().share("nvram");   /* work ram */
+	map(0xb000, 0xb2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
+	map(0xb300, 0xb303).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r8), FUNC(seta001_device::spritectrl_w8));
+	map(0xb800, 0xb800).nopw();                            /* flag ? */
+	map(0xc000, 0xdfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8)); /* Sprites Code + X + Attr */
+	map(0xe000, 0xffff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+}
 
 WRITE8_MEMBER(srmp2_state::rmgoldyh_rombank_w)
 {
@@ -518,14 +523,15 @@ WRITE8_MEMBER(srmp2_state::rmgoldyh_rombank_w)
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-ADDRESS_MAP_START(srmp2_state::rmgoldyh_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_IMPORT_FROM(srmp3_io_map)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x60, 0x60) AM_WRITE(rmgoldyh_rombank_w)                       /* ROM bank select */
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW4")
-	AM_RANGE(0x81, 0x81) AM_READ_PORT("DSW3")
-ADDRESS_MAP_END
+void srmp2_state::rmgoldyh_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	srmp3_io_map(map);
+	map(0x00, 0x00).nopw(); /* watchdog */
+	map(0x60, 0x60).w(this, FUNC(srmp2_state::rmgoldyh_rombank_w));                       /* ROM bank select */
+	map(0x80, 0x80).portr("DSW4");
+	map(0x81, 0x81).portr("DSW3");
+}
 
 /***************************************************************************
 

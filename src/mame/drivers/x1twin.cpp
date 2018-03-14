@@ -52,15 +52,17 @@ uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-ADDRESS_MAP_START(x1twin_state::x1_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_mem_r,x1_mem_w)
-ADDRESS_MAP_END
+void x1twin_state::x1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(x1twin_state::x1_mem_r), FUNC(x1twin_state::x1_mem_w));
+}
 
-ADDRESS_MAP_START(x1twin_state::x1_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_DEVICE("iobank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void x1twin_state::x1_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).m(m_iobank, FUNC(address_map_bank_device::amap8));
+}
 
 #if 0
 ADDRESS_MAP_START(x1twin_state::pce_mem)

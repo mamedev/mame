@@ -311,22 +311,23 @@ PALETTE_INIT_MEMBER(mpu12wbk_state, mpu12wbk)
 * Memory Map Information *
 *************************/
 
-ADDRESS_MAP_START(mpu12wbk_state::mpu12wbk_map)
-	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("crtc", mc6845_device, address_w)                      // OK
-	AM_RANGE(0x1401, 0x1401) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)     // OK
-	AM_RANGE(0x1e00, 0x1e01) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, address_data_w)  // hmmmmm....
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(mpu12wbk_videoram_w) AM_SHARE("videoram")             // FIXME
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(mpu12wbk_colorram_w) AM_SHARE("colorram")             // FIXME
-	AM_RANGE(0x2800, 0x3fff) AM_RAM                                                             // RAM (from 2000-3fff)
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("SW1")    // dummy, placeholder
-	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("SW2")    // dummy, placeholder
-	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN0")    // dummy, placeholder
-	AM_RANGE(0x6003, 0x6003) AM_READ_PORT("IN1")    // dummy, placeholder
-	AM_RANGE(0x6004, 0x6004) AM_READ_PORT("IN2")    // dummy, placeholder
-	AM_RANGE(0x6005, 0x6005) AM_READ_PORT("IN3")    // dummy, placeholder
+void mpu12wbk_state::mpu12wbk_map(address_map &map)
+{
+	map(0x1400, 0x1400).w("crtc", FUNC(mc6845_device::address_w));                      // OK
+	map(0x1401, 0x1401).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));     // OK
+	map(0x1e00, 0x1e01).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));  // hmmmmm....
+	map(0x2000, 0x23ff).ram().w(this, FUNC(mpu12wbk_state::mpu12wbk_videoram_w)).share("videoram");             // FIXME
+	map(0x2400, 0x27ff).ram().w(this, FUNC(mpu12wbk_state::mpu12wbk_colorram_w)).share("colorram");             // FIXME
+	map(0x2800, 0x3fff).ram();                                                             // RAM (from 2000-3fff)
+	map(0x6000, 0x6000).portr("SW1");    // dummy, placeholder
+	map(0x6001, 0x6001).portr("SW2");    // dummy, placeholder
+	map(0x6002, 0x6002).portr("IN0");    // dummy, placeholder
+	map(0x6003, 0x6003).portr("IN1");    // dummy, placeholder
+	map(0x6004, 0x6004).portr("IN2");    // dummy, placeholder
+	map(0x6005, 0x6005).portr("IN3");    // dummy, placeholder
 
-	AM_RANGE(0x8000, 0xffff) AM_ROM     // OK
-ADDRESS_MAP_END
+	map(0x8000, 0xffff).rom();     // OK
+}
 
 /*
 

@@ -52,13 +52,14 @@ const tiny_rom_entry *epson_lx800_device::device_rom_region() const
 //  ADDRESS_MAP( lx800_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(epson_lx800_device::lx800_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM /* 32k firmware */
-	AM_RANGE(0x8000, 0x9fff) AM_RAM /* 8k external RAM */
-	AM_RANGE(0xa000, 0xbfff) AM_NOP /* not used */
-	AM_RANGE(0xc000, 0xc007) AM_MIRROR(0x1ff8) AM_DEVREADWRITE("ic3b", e05a03_device, read, write)
-	AM_RANGE(0xe000, 0xfeff) AM_NOP /* not used */
-ADDRESS_MAP_END
+void epson_lx800_device::lx800_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); /* 32k firmware */
+	map(0x8000, 0x9fff).ram(); /* 8k external RAM */
+	map(0xa000, 0xbfff).noprw(); /* not used */
+	map(0xc000, 0xc007).mirror(0x1ff8).rw("ic3b", FUNC(e05a03_device::read), FUNC(e05a03_device::write));
+	map(0xe000, 0xfeff).noprw(); /* not used */
+}
 
 
 //-------------------------------------------------

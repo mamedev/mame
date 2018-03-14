@@ -148,50 +148,51 @@ READ8_MEMBER(aceal_state::unk_r)
 /* 3x3106 - SRAM 256x1 */
 /* 1x3622 - ROM 512x4  - doesn't seem to be used ????????????*/
 
-ADDRESS_MAP_START(aceal_state::main_map)
-	AM_RANGE(0x0000, 0x09ff) AM_ROM
+void aceal_state::main_map(address_map &map)
+{
+	map(0x0000, 0x09ff).rom();
 
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(ace_scoreram_w) AM_SHARE("scoreram")  /* 2x2101 */
-	AM_RANGE(0x8300, 0x83ff) AM_RAM AM_SHARE("ram2")    /* 2x2101 */
-	AM_RANGE(0x8000, 0x80ff) AM_RAM_WRITE(ace_characterram_w) AM_SHARE("characterram")  /* 3x3101 (3bits: 0, 1, 2) */
+	map(0x2000, 0x20ff).ram().w(this, FUNC(aceal_state::ace_scoreram_w)).share("scoreram");  /* 2x2101 */
+	map(0x8300, 0x83ff).ram().share("ram2");    /* 2x2101 */
+	map(0x8000, 0x80ff).ram().w(this, FUNC(aceal_state::ace_characterram_w)).share("characterram");  /* 3x3101 (3bits: 0, 1, 2) */
 
-	AM_RANGE(0xc000, 0xc005) AM_WRITE(ace_objpos_w)
+	map(0xc000, 0xc005).w(this, FUNC(aceal_state::ace_objpos_w));
 
 	/* players inputs */
-	AM_RANGE(0xc008, 0xc008) AM_READ_PORT("c008")
-	AM_RANGE(0xc009, 0xc009) AM_READ_PORT("c009")
-	AM_RANGE(0xc00a, 0xc00a) AM_READ_PORT("c00a")
-	AM_RANGE(0xc00b, 0xc00b) AM_READ_PORT("c00b")
-	AM_RANGE(0xc00c, 0xc00c) AM_READ_PORT("c00c")
-	AM_RANGE(0xc00d, 0xc00d) AM_READ_PORT("c00d")
-	AM_RANGE(0xc00e, 0xc00e) AM_READ_PORT("c00e")
-	AM_RANGE(0xc00f, 0xc00f) AM_READ_PORT("c00f")
-	AM_RANGE(0xc010, 0xc010) AM_READ_PORT("c010")
-	AM_RANGE(0xc011, 0xc011) AM_READ_PORT("c011")
+	map(0xc008, 0xc008).portr("c008");
+	map(0xc009, 0xc009).portr("c009");
+	map(0xc00a, 0xc00a).portr("c00a");
+	map(0xc00b, 0xc00b).portr("c00b");
+	map(0xc00c, 0xc00c).portr("c00c");
+	map(0xc00d, 0xc00d).portr("c00d");
+	map(0xc00e, 0xc00e).portr("c00e");
+	map(0xc00f, 0xc00f).portr("c00f");
+	map(0xc010, 0xc010).portr("c010");
+	map(0xc011, 0xc011).portr("c011");
 
-	AM_RANGE(0xc012, 0xc012) AM_READ(unk_r)
+	map(0xc012, 0xc012).r(this, FUNC(aceal_state::unk_r));
 
 	/* vblank */
-	AM_RANGE(0xc014, 0xc014) AM_READ_PORT("c014")
+	map(0xc014, 0xc014).portr("c014");
 
 	/* coin */
-	AM_RANGE(0xc015, 0xc015) AM_READ_PORT("c015")
+	map(0xc015, 0xc015).portr("c015");
 
 	/* start (must read 1 at least once to make the game run) */
-	AM_RANGE(0xc016, 0xc016) AM_READ_PORT("c016")
+	map(0xc016, 0xc016).portr("c016");
 
-	AM_RANGE(0xc017, 0xc017) AM_READ(unk_r)
-	AM_RANGE(0xc018, 0xc018) AM_READ(unk_r)
-	AM_RANGE(0xc019, 0xc019) AM_READ(unk_r)
+	map(0xc017, 0xc017).r(this, FUNC(aceal_state::unk_r));
+	map(0xc018, 0xc018).r(this, FUNC(aceal_state::unk_r));
+	map(0xc019, 0xc019).r(this, FUNC(aceal_state::unk_r));
 
-	AM_RANGE(0xc020, 0xc020) AM_READ(unk_r)
-	AM_RANGE(0xc021, 0xc021) AM_READ(unk_r)
-	AM_RANGE(0xc022, 0xc022) AM_READ(unk_r)
-	AM_RANGE(0xc023, 0xc023) AM_READ(unk_r)
-	AM_RANGE(0xc024, 0xc024) AM_READ(unk_r)
-	AM_RANGE(0xc025, 0xc025) AM_READ(unk_r)
-	AM_RANGE(0xc026, 0xc026) AM_READ(unk_r)
-ADDRESS_MAP_END
+	map(0xc020, 0xc020).r(this, FUNC(aceal_state::unk_r));
+	map(0xc021, 0xc021).r(this, FUNC(aceal_state::unk_r));
+	map(0xc022, 0xc022).r(this, FUNC(aceal_state::unk_r));
+	map(0xc023, 0xc023).r(this, FUNC(aceal_state::unk_r));
+	map(0xc024, 0xc024).r(this, FUNC(aceal_state::unk_r));
+	map(0xc025, 0xc025).r(this, FUNC(aceal_state::unk_r));
+	map(0xc026, 0xc026).r(this, FUNC(aceal_state::unk_r));
+}
 
 
 static INPUT_PORTS_START( ace )

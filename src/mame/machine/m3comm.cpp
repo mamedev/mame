@@ -98,12 +98,13 @@ ADDRESS_MAP_END
 /*************************************
  *  M3COMM Memory Map
  *************************************/
-ADDRESS_MAP_START(m3comm_device::m3comm_mem)
-	AM_RANGE(0x0000000, 0x000ffff) AM_RAM AM_SHARE("m68k_ram")
-	AM_RANGE(0x0040000, 0x00400ff) AM_READWRITE(ctrl_r, ctrl_w)
-	AM_RANGE(0x0080000, 0x008ffff) AM_RAMBANK("comm_ram")
-	AM_RANGE(0x00C0000, 0x00C00ff) AM_READWRITE(ioregs_r, ioregs_w)
-ADDRESS_MAP_END
+void m3comm_device::m3comm_mem(address_map &map)
+{
+	map(0x0000000, 0x000ffff).ram().share("m68k_ram");
+	map(0x0040000, 0x00400ff).rw(this, FUNC(m3comm_device::ctrl_r), FUNC(m3comm_device::ctrl_w));
+	map(0x0080000, 0x008ffff).bankrw("comm_ram");
+	map(0x00C0000, 0x00C00ff).rw(this, FUNC(m3comm_device::ioregs_r), FUNC(m3comm_device::ioregs_w));
+}
 
 
 //**************************************************************************

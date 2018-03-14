@@ -67,19 +67,20 @@ private:
 	required_device<mc14411_device> m_brg;
 };
 
-ADDRESS_MAP_START(swtpc_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io0", ss50_interface_port_device, read, write)
-	AM_RANGE(0x8004, 0x8007) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io1", ss50_interface_port_device, read, write)
-	AM_RANGE(0x8008, 0x800b) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io2", ss50_interface_port_device, read, write)
-	AM_RANGE(0x800c, 0x800f) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io3", ss50_interface_port_device, read, write)
-	AM_RANGE(0x8010, 0x8013) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io4", ss50_interface_port_device, read, write)
-	AM_RANGE(0x8014, 0x8017) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io5", ss50_interface_port_device, read, write)
-	AM_RANGE(0x8018, 0x801b) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io6", ss50_interface_port_device, read, write)
-	AM_RANGE(0x801c, 0x801f) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io7", ss50_interface_port_device, read, write)
-	AM_RANGE(0xa000, 0xa07f) AM_RAM // MCM6810
-	AM_RANGE(0xe000, 0xe3ff) AM_MIRROR(0x1c00) AM_ROM AM_REGION("mcm6830", 0)
-ADDRESS_MAP_END
+void swtpc_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x8000, 0x8003).mirror(0x1fc0).rw("io0", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	map(0x8004, 0x8007).mirror(0x1fc0).rw("io1", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	map(0x8008, 0x800b).mirror(0x1fc0).rw("io2", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	map(0x800c, 0x800f).mirror(0x1fc0).rw("io3", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	map(0x8010, 0x8013).mirror(0x1fc0).rw("io4", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	map(0x8014, 0x8017).mirror(0x1fc0).rw("io5", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	map(0x8018, 0x801b).mirror(0x1fc0).rw("io6", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	map(0x801c, 0x801f).mirror(0x1fc0).rw("io7", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	map(0xa000, 0xa07f).ram(); // MCM6810
+	map(0xe000, 0xe3ff).mirror(0x1c00).rom().region("mcm6830", 0);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( swtpc )

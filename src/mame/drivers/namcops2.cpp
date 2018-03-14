@@ -908,10 +908,11 @@ uint32_t namcops2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-ADDRESS_MAP_START(namcops2_state::ps2_map)
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM // 32 MB RAM in consumer PS2s, do these have more?
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void namcops2_state::ps2_map(address_map &map)
+{
+	map(0x00000000, 0x01ffffff).ram(); // 32 MB RAM in consumer PS2s, do these have more?
+	map(0x1fc00000, 0x1fdfffff).rom().region("bios", 0);
+}
 
 static INPUT_PORTS_START( system246 )
 INPUT_PORTS_END

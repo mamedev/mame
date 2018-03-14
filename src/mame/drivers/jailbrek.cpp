@@ -136,35 +136,37 @@ WRITE8_MEMBER(jailbrek_state::speech_w)
 	m_vlm->rst((data >> 2) & 1);
 }
 
-ADDRESS_MAP_START(jailbrek_state::jailbrek_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x10c0, 0x14ff) AM_RAM /* ??? */
-	AM_RANGE(0x1500, 0x1fff) AM_RAM /* work ram */
-	AM_RANGE(0x2000, 0x203f) AM_RAM AM_SHARE("scroll_x")
-	AM_RANGE(0x2040, 0x2040) AM_WRITENOP /* ??? */
-	AM_RANGE(0x2041, 0x2041) AM_WRITENOP /* ??? */
-	AM_RANGE(0x2042, 0x2042) AM_RAM AM_SHARE("scroll_dir") /* bit 2 = scroll direction */
-	AM_RANGE(0x2043, 0x2043) AM_WRITENOP /* ??? */
-	AM_RANGE(0x2044, 0x2044) AM_WRITE(ctrl_w) /* irq, nmi enable, screen flip */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(coin_w)
-	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW2") AM_DEVWRITE("snsnd", sn76489a_device, write)
-	AM_RANGE(0x3200, 0x3200) AM_READ_PORT("DSW3") AM_WRITENOP /* mirror of the previous? */
-	AM_RANGE(0x3300, 0x3300) AM_READ_PORT("SYSTEM") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x3301, 0x3301) AM_READ_PORT("P1")
-	AM_RANGE(0x3302, 0x3302) AM_READ_PORT("P2")
-	AM_RANGE(0x3303, 0x3303) AM_READ_PORT("DSW1")
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(speech_w) /* speech pins */
-	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("vlm", vlm5030_device, data_w) /* speech data */
-	AM_RANGE(0x6000, 0x6000) AM_READ(speech_r)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void jailbrek_state::jailbrek_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().w(this, FUNC(jailbrek_state::colorram_w)).share("colorram");
+	map(0x0800, 0x0fff).ram().w(this, FUNC(jailbrek_state::videoram_w)).share("videoram");
+	map(0x1000, 0x10bf).ram().share("spriteram");
+	map(0x10c0, 0x14ff).ram(); /* ??? */
+	map(0x1500, 0x1fff).ram(); /* work ram */
+	map(0x2000, 0x203f).ram().share("scroll_x");
+	map(0x2040, 0x2040).nopw(); /* ??? */
+	map(0x2041, 0x2041).nopw(); /* ??? */
+	map(0x2042, 0x2042).ram().share("scroll_dir"); /* bit 2 = scroll direction */
+	map(0x2043, 0x2043).nopw(); /* ??? */
+	map(0x2044, 0x2044).w(this, FUNC(jailbrek_state::ctrl_w)); /* irq, nmi enable, screen flip */
+	map(0x3000, 0x3000).w(this, FUNC(jailbrek_state::coin_w));
+	map(0x3100, 0x3100).portr("DSW2").w("snsnd", FUNC(sn76489a_device::write));
+	map(0x3200, 0x3200).portr("DSW3").nopw(); /* mirror of the previous? */
+	map(0x3300, 0x3300).portr("SYSTEM").w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x3301, 0x3301).portr("P1");
+	map(0x3302, 0x3302).portr("P2");
+	map(0x3303, 0x3303).portr("DSW1");
+	map(0x4000, 0x4000).w(this, FUNC(jailbrek_state::speech_w)); /* speech pins */
+	map(0x5000, 0x5000).w(m_vlm, FUNC(vlm5030_device::data_w)); /* speech data */
+	map(0x6000, 0x6000).r(this, FUNC(jailbrek_state::speech_r));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(jailbrek_state::vlm_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void jailbrek_state::vlm_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x1fff).rom();
+}
 
 
 

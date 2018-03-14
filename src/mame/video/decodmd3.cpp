@@ -122,13 +122,14 @@ MC6845_UPDATE_ROW( decodmd_type3_device::crtc_update_row )
 	}
 }
 
-ADDRESS_MAP_START(decodmd_type3_device::decodmd3_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROMBANK("dmdrom")
-	AM_RANGE(0x00800000, 0x0080ffff) AM_RAMBANK("dmdram")
-	AM_RANGE(0x00c00010, 0x00c00011) AM_READWRITE(crtc_status_r,crtc_address_w)
-	AM_RANGE(0x00c00012, 0x00c00013) AM_WRITE(crtc_register_w)
-	AM_RANGE(0x00c00020, 0x00c00021) AM_READWRITE(latch_r,status_w)
-ADDRESS_MAP_END
+void decodmd_type3_device::decodmd3_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).bankr("dmdrom");
+	map(0x00800000, 0x0080ffff).bankrw("dmdram");
+	map(0x00c00010, 0x00c00011).rw(this, FUNC(decodmd_type3_device::crtc_status_r), FUNC(decodmd_type3_device::crtc_address_w));
+	map(0x00c00012, 0x00c00013).w(this, FUNC(decodmd_type3_device::crtc_register_w));
+	map(0x00c00020, 0x00c00021).rw(this, FUNC(decodmd_type3_device::latch_r), FUNC(decodmd_type3_device::status_w));
+}
 
 MACHINE_CONFIG_START(decodmd_type3_device::device_add_mconfig)
 	/* basic machine hardware */

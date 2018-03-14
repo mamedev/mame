@@ -722,31 +722,32 @@ WRITE32_MEMBER(skns_state::v3t_w)
 	m_btiles[offset*4+3] = (data & 0x000000ff) >> 0;
 }
 
-ADDRESS_MAP_START(skns_state::skns_map)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM /* BIOS ROM */
-	AM_RANGE(0x00400000, 0x0040000f) AM_WRITE(io_w) /* I/O Write */
-	AM_RANGE(0x00400000, 0x00400003) AM_READ_PORT("400000")
-	AM_RANGE(0x00400004, 0x00400007) AM_READ_PORT("400004")
+void skns_state::skns_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom(); /* BIOS ROM */
+	map(0x00400000, 0x0040000f).w(this, FUNC(skns_state::io_w)); /* I/O Write */
+	map(0x00400000, 0x00400003).portr("400000");
+	map(0x00400004, 0x00400007).portr("400004");
 	/* In between is write only */
-	AM_RANGE(0x0040000c, 0x0040000f) AM_READ_PORT("40000c")
-	AM_RANGE(0x00800000, 0x00801fff) AM_RAM AM_SHARE("nvram") /* 'backup' RAM */
-	AM_RANGE(0x00c00000, 0x00c00003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xffff0000) /* ymz280_w (sound) */
-	AM_RANGE(0x01000000, 0x0100000f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0xffffffff)
-	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(hit2_w)
-	AM_RANGE(0x02000000, 0x02003fff) AM_RAM AM_SHARE("spriteram") /* sprite ram */
-	AM_RANGE(0x02100000, 0x0210003f) AM_RAM AM_SHARE("spc_regs") /* sprite registers */
-	AM_RANGE(0x02400000, 0x0240007f) AM_RAM_WRITE(v3_regs_w) AM_SHARE("v3_regs") /* tilemap registers */
-	AM_RANGE(0x02500000, 0x02503fff) AM_RAM_WRITE(tilemapA_w) AM_SHARE("tilemapa_ram") /* tilemap A */
-	AM_RANGE(0x02504000, 0x02507fff) AM_RAM_WRITE(tilemapB_w) AM_SHARE("tilemapb_ram") /* tilemap B */
-	AM_RANGE(0x02600000, 0x02607fff) AM_RAM AM_SHARE("v3slc_ram") /* tilemap linescroll */
-	AM_RANGE(0x02a00000, 0x02a0001f) AM_RAM_WRITE(pal_regs_w) AM_SHARE("pal_regs")
-	AM_RANGE(0x02a40000, 0x02a5ffff) AM_RAM_WRITE(palette_ram_w) AM_SHARE("palette_ram")
-	AM_RANGE(0x02f00000, 0x02f000ff) AM_READWRITE(hit_r, hit_w)
-	AM_RANGE(0x04000000, 0x041fffff) AM_ROMBANK("bank1") /* GAME ROM */
-	AM_RANGE(0x04800000, 0x0483ffff) AM_RAM_WRITE(v3t_w) AM_SHARE("v3t_ram") /* tilemap b ram based tiles */
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_SHARE("main_ram")
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM AM_SHARE("cache_ram") /* 'cache' RAM */
-ADDRESS_MAP_END
+	map(0x0040000c, 0x0040000f).portr("40000c");
+	map(0x00800000, 0x00801fff).ram().share("nvram"); /* 'backup' RAM */
+	map(0x00c00000, 0x00c00001).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)); /* ymz280_w (sound) */
+	map(0x01000000, 0x0100000f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x01800000, 0x01800003).w(this, FUNC(skns_state::hit2_w));
+	map(0x02000000, 0x02003fff).ram().share("spriteram"); /* sprite ram */
+	map(0x02100000, 0x0210003f).ram().share("spc_regs"); /* sprite registers */
+	map(0x02400000, 0x0240007f).ram().w(this, FUNC(skns_state::v3_regs_w)).share("v3_regs"); /* tilemap registers */
+	map(0x02500000, 0x02503fff).ram().w(this, FUNC(skns_state::tilemapA_w)).share("tilemapa_ram"); /* tilemap A */
+	map(0x02504000, 0x02507fff).ram().w(this, FUNC(skns_state::tilemapB_w)).share("tilemapb_ram"); /* tilemap B */
+	map(0x02600000, 0x02607fff).ram().share("v3slc_ram"); /* tilemap linescroll */
+	map(0x02a00000, 0x02a0001f).ram().w(this, FUNC(skns_state::pal_regs_w)).share("pal_regs");
+	map(0x02a40000, 0x02a5ffff).ram().w(this, FUNC(skns_state::palette_ram_w)).share("palette_ram");
+	map(0x02f00000, 0x02f000ff).rw(this, FUNC(skns_state::hit_r), FUNC(skns_state::hit_w));
+	map(0x04000000, 0x041fffff).bankr("bank1"); /* GAME ROM */
+	map(0x04800000, 0x0483ffff).ram().w(this, FUNC(skns_state::v3t_w)).share("v3t_ram"); /* tilemap b ram based tiles */
+	map(0x06000000, 0x060fffff).ram().share("main_ram");
+	map(0xc0000000, 0xc0000fff).ram().share("cache_ram"); /* 'cache' RAM */
+}
 
 /***** GFX DECODE *****/
 

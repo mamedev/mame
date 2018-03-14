@@ -279,148 +279,154 @@ static INPUT_PORTS_START( intvkbd )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(intv_state::intv_mem)
-	AM_RANGE(0x0000, 0x003f) AM_READWRITE(intv_stic_r, intv_stic_w)
-	AM_RANGE(0x0100, 0x01ef) AM_READWRITE(intv_ram8_r, intv_ram8_w)
-	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914", ay8914_device, read, write, 0x00ff)
-	AM_RANGE(0x0200, 0x035f) AM_READWRITE(intv_ram16_r, intv_ram16_w)
-	AM_RANGE(0x0400, 0x04ff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom04)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000 << 1)   // Exec ROM, 10-bits wide
-	AM_RANGE(0x2000, 0x2fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom20)
-	AM_RANGE(0x3000, 0x37ff) AM_DEVREAD("stic", stic_device, grom_read) // GROM,     8-bits wide
-	AM_RANGE(0x3800, 0x39ff) AM_READWRITE(intv_gram_r, intv_gram_w)     // GRAM,     8-bits wide
-	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE(intv_gram_r, intv_gram_w)     // GRAM Alias, 8-bits wide
-	AM_RANGE(0x4000, 0x47ff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom40)
-	AM_RANGE(0x4800, 0x4fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom48)
-	AM_RANGE(0x5000, 0x5fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom50)
-	AM_RANGE(0x6000, 0x6fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom60)
-	AM_RANGE(0x7000, 0x7fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom70)
-	AM_RANGE(0x8000, 0x8fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom80)
-	AM_RANGE(0x9000, 0x9fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom90)
-	AM_RANGE(0xa000, 0xafff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_roma0)
-	AM_RANGE(0xb000, 0xbfff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_romb0)
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_romc0)
-	AM_RANGE(0xd000, 0xdfff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_romd0)
-	AM_RANGE(0xe000, 0xefff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rome0)
-	AM_RANGE(0xf000, 0xffff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_romf0)
-ADDRESS_MAP_END
+void intv_state::intv_mem(address_map &map)
+{
+	map(0x0000, 0x003f).rw(this, FUNC(intv_state::intv_stic_r), FUNC(intv_state::intv_stic_w));
+	map(0x0100, 0x01ef).rw(this, FUNC(intv_state::intv_ram8_r), FUNC(intv_state::intv_ram8_w));
+	map(0x01f0, 0x01ff).rw(m_sound, FUNC(ay8914_device::read), FUNC(ay8914_device::write)).umask16(0x00ff);
+	map(0x0200, 0x035f).rw(this, FUNC(intv_state::intv_ram16_r), FUNC(intv_state::intv_ram16_w));
+	map(0x0400, 0x04ff).r(m_cart, FUNC(intv_cart_slot_device::read_rom04));
+	map(0x1000, 0x1fff).rom().region("maincpu", 0x1000 << 1);   // Exec ROM, 10-bits wide
+	map(0x2000, 0x2fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom20));
+	map(0x3000, 0x37ff).r(m_stic, FUNC(stic_device::grom_read)); // GROM,     8-bits wide
+	map(0x3800, 0x39ff).rw(this, FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));     // GRAM,     8-bits wide
+	map(0x3a00, 0x3bff).rw(this, FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));     // GRAM Alias, 8-bits wide
+	map(0x4000, 0x47ff).r(m_cart, FUNC(intv_cart_slot_device::read_rom40));
+	map(0x4800, 0x4fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom48));
+	map(0x5000, 0x5fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom50));
+	map(0x6000, 0x6fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom60));
+	map(0x7000, 0x7fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom70));
+	map(0x8000, 0x8fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom80));
+	map(0x9000, 0x9fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom90));
+	map(0xa000, 0xafff).r(m_cart, FUNC(intv_cart_slot_device::read_roma0));
+	map(0xb000, 0xbfff).r(m_cart, FUNC(intv_cart_slot_device::read_romb0));
+	map(0xc000, 0xcfff).r(m_cart, FUNC(intv_cart_slot_device::read_romc0));
+	map(0xd000, 0xdfff).r(m_cart, FUNC(intv_cart_slot_device::read_romd0));
+	map(0xe000, 0xefff).r(m_cart, FUNC(intv_cart_slot_device::read_rome0));
+	map(0xf000, 0xffff).r(m_cart, FUNC(intv_cart_slot_device::read_romf0));
+}
 
-ADDRESS_MAP_START(intv_state::intvoice_mem)
-	AM_RANGE(0x0000, 0x003f) AM_READWRITE(intv_stic_r, intv_stic_w)
-	AM_RANGE(0x0080, 0x0081) AM_DEVREADWRITE("voice", intv_voice_device, read_speech, write_speech) // Intellivoice
-	AM_RANGE(0x0100, 0x01ef) AM_READWRITE(intv_ram8_r, intv_ram8_w)
-	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914", ay8914_device, read, write, 0x00ff)
-	AM_RANGE(0x0200, 0x035f) AM_READWRITE(intv_ram16_r, intv_ram16_w)
-	AM_RANGE(0x0400, 0x04ff) AM_DEVREAD("voice", intv_voice_device, read_rom04)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000 << 1)   // Exec ROM, 10-bits wide
-	AM_RANGE(0x2000, 0x2fff) AM_DEVREAD("voice", intv_voice_device, read_rom20)
-	AM_RANGE(0x3000, 0x37ff) AM_DEVREAD("stic", stic_device, grom_read) // GROM,     8-bits wide
-	AM_RANGE(0x3800, 0x39ff) AM_READWRITE(intv_gram_r, intv_gram_w)     // GRAM,     8-bits wide
-	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE(intv_gram_r, intv_gram_w)     // GRAM Alias, 8-bits wide
-	AM_RANGE(0x4000, 0x47ff) AM_DEVREAD("voice", intv_voice_device, read_rom40)
-	AM_RANGE(0x4800, 0x4fff) AM_DEVREAD("voice", intv_voice_device, read_rom48)
-	AM_RANGE(0x5000, 0x5fff) AM_DEVREAD("voice", intv_voice_device, read_rom50)
-	AM_RANGE(0x6000, 0x6fff) AM_DEVREAD("voice", intv_voice_device, read_rom60)
-	AM_RANGE(0x7000, 0x7fff) AM_DEVREAD("voice", intv_voice_device, read_rom70)
-	AM_RANGE(0x8000, 0x8fff) AM_DEVREAD("voice", intv_voice_device, read_rom80)
-	AM_RANGE(0x9000, 0x9fff) AM_DEVREAD("voice", intv_voice_device, read_rom90)
-	AM_RANGE(0xa000, 0xafff) AM_DEVREAD("voice", intv_voice_device, read_roma0)
-	AM_RANGE(0xb000, 0xbfff) AM_DEVREAD("voice", intv_voice_device, read_romb0)
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREAD("voice", intv_voice_device, read_romc0)
-	AM_RANGE(0xd000, 0xdfff) AM_DEVREAD("voice", intv_voice_device, read_romd0)
-	AM_RANGE(0xe000, 0xefff) AM_DEVREAD("voice", intv_voice_device, read_rome0)
-	AM_RANGE(0xf000, 0xffff) AM_DEVREAD("voice", intv_voice_device, read_romf0)
-ADDRESS_MAP_END
+void intv_state::intvoice_mem(address_map &map)
+{
+	map(0x0000, 0x003f).rw(this, FUNC(intv_state::intv_stic_r), FUNC(intv_state::intv_stic_w));
+	map(0x0080, 0x0081).rw("voice", FUNC(intv_voice_device::read_speech), FUNC(intv_voice_device::write_speech)); // Intellivoice
+	map(0x0100, 0x01ef).rw(this, FUNC(intv_state::intv_ram8_r), FUNC(intv_state::intv_ram8_w));
+	map(0x01f0, 0x01ff).rw(m_sound, FUNC(ay8914_device::read), FUNC(ay8914_device::write)).umask16(0x00ff);
+	map(0x0200, 0x035f).rw(this, FUNC(intv_state::intv_ram16_r), FUNC(intv_state::intv_ram16_w));
+	map(0x0400, 0x04ff).r("voice", FUNC(intv_voice_device::read_rom04));
+	map(0x1000, 0x1fff).rom().region("maincpu", 0x1000 << 1);   // Exec ROM, 10-bits wide
+	map(0x2000, 0x2fff).r("voice", FUNC(intv_voice_device::read_rom20));
+	map(0x3000, 0x37ff).r(m_stic, FUNC(stic_device::grom_read)); // GROM,     8-bits wide
+	map(0x3800, 0x39ff).rw(this, FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));     // GRAM,     8-bits wide
+	map(0x3a00, 0x3bff).rw(this, FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));     // GRAM Alias, 8-bits wide
+	map(0x4000, 0x47ff).r("voice", FUNC(intv_voice_device::read_rom40));
+	map(0x4800, 0x4fff).r("voice", FUNC(intv_voice_device::read_rom48));
+	map(0x5000, 0x5fff).r("voice", FUNC(intv_voice_device::read_rom50));
+	map(0x6000, 0x6fff).r("voice", FUNC(intv_voice_device::read_rom60));
+	map(0x7000, 0x7fff).r("voice", FUNC(intv_voice_device::read_rom70));
+	map(0x8000, 0x8fff).r("voice", FUNC(intv_voice_device::read_rom80));
+	map(0x9000, 0x9fff).r("voice", FUNC(intv_voice_device::read_rom90));
+	map(0xa000, 0xafff).r("voice", FUNC(intv_voice_device::read_roma0));
+	map(0xb000, 0xbfff).r("voice", FUNC(intv_voice_device::read_romb0));
+	map(0xc000, 0xcfff).r("voice", FUNC(intv_voice_device::read_romc0));
+	map(0xd000, 0xdfff).r("voice", FUNC(intv_voice_device::read_romd0));
+	map(0xe000, 0xefff).r("voice", FUNC(intv_voice_device::read_rome0));
+	map(0xf000, 0xffff).r("voice", FUNC(intv_voice_device::read_romf0));
+}
 
-ADDRESS_MAP_START(intv_state::intv2_mem)
-	AM_RANGE(0x0000, 0x003f) AM_READWRITE(intv_stic_r, intv_stic_w)
-	AM_RANGE(0x0100, 0x01ef) AM_READWRITE(intv_ram8_r, intv_ram8_w)
-	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914", ay8914_device, read, write, 0x00ff)
-	AM_RANGE(0x0200, 0x035f) AM_READWRITE(intv_ram16_r, intv_ram16_w)
-	AM_RANGE(0x0400, 0x04ff) AM_ROM AM_REGION("maincpu", 0x400 << 1)    // Exec ROM, 10-bits wide
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000 << 1)   // Exec ROM, 10-bits wide
-	AM_RANGE(0x2000, 0x2fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom20)
-	AM_RANGE(0x3000, 0x37ff) AM_DEVREAD("stic", stic_device, grom_read) // GROM,     8-bits wide
-	AM_RANGE(0x3800, 0x39ff) AM_READWRITE(intv_gram_r, intv_gram_w) // GRAM,     8-bits wide
-	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE(intv_gram_r, intv_gram_w) // GRAM Alias, 8-bits wide
-	AM_RANGE(0x4000, 0x47ff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom40)
-	AM_RANGE(0x4800, 0x4fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom48)
-	AM_RANGE(0x5000, 0x5fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom50)
-	AM_RANGE(0x6000, 0x6fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom60)
-	AM_RANGE(0x7000, 0x7fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom70)
-	AM_RANGE(0x8000, 0x8fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom80)
-	AM_RANGE(0x9000, 0x9fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom90)
-	AM_RANGE(0xa000, 0xafff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_roma0)
-	AM_RANGE(0xb000, 0xbfff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_romb0)
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_romc0)
-	AM_RANGE(0xd000, 0xdfff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_romd0)
-	AM_RANGE(0xe000, 0xefff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rome0)
-	AM_RANGE(0xf000, 0xffff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_romf0)
-ADDRESS_MAP_END
+void intv_state::intv2_mem(address_map &map)
+{
+	map(0x0000, 0x003f).rw(this, FUNC(intv_state::intv_stic_r), FUNC(intv_state::intv_stic_w));
+	map(0x0100, 0x01ef).rw(this, FUNC(intv_state::intv_ram8_r), FUNC(intv_state::intv_ram8_w));
+	map(0x01f0, 0x01ff).rw(m_sound, FUNC(ay8914_device::read), FUNC(ay8914_device::write)).umask16(0x00ff);
+	map(0x0200, 0x035f).rw(this, FUNC(intv_state::intv_ram16_r), FUNC(intv_state::intv_ram16_w));
+	map(0x0400, 0x04ff).rom().region("maincpu", 0x400 << 1);    // Exec ROM, 10-bits wide
+	map(0x1000, 0x1fff).rom().region("maincpu", 0x1000 << 1);   // Exec ROM, 10-bits wide
+	map(0x2000, 0x2fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom20));
+	map(0x3000, 0x37ff).r(m_stic, FUNC(stic_device::grom_read)); // GROM,     8-bits wide
+	map(0x3800, 0x39ff).rw(this, FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w)); // GRAM,     8-bits wide
+	map(0x3a00, 0x3bff).rw(this, FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w)); // GRAM Alias, 8-bits wide
+	map(0x4000, 0x47ff).r(m_cart, FUNC(intv_cart_slot_device::read_rom40));
+	map(0x4800, 0x4fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom48));
+	map(0x5000, 0x5fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom50));
+	map(0x6000, 0x6fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom60));
+	map(0x7000, 0x7fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom70));
+	map(0x8000, 0x8fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom80));
+	map(0x9000, 0x9fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom90));
+	map(0xa000, 0xafff).r(m_cart, FUNC(intv_cart_slot_device::read_roma0));
+	map(0xb000, 0xbfff).r(m_cart, FUNC(intv_cart_slot_device::read_romb0));
+	map(0xc000, 0xcfff).r(m_cart, FUNC(intv_cart_slot_device::read_romc0));
+	map(0xd000, 0xdfff).r(m_cart, FUNC(intv_cart_slot_device::read_romd0));
+	map(0xe000, 0xefff).r(m_cart, FUNC(intv_cart_slot_device::read_rome0));
+	map(0xf000, 0xffff).r(m_cart, FUNC(intv_cart_slot_device::read_romf0));
+}
 
-ADDRESS_MAP_START(intv_state::intvecs_mem)
-	AM_RANGE(0x0000, 0x003f) AM_READWRITE(intv_stic_r, intv_stic_w)
-	AM_RANGE(0x0080, 0x0081) AM_DEVREADWRITE("speech", sp0256_device, spb640_r, spb640_w) /* Intellivoice */
+void intv_state::intvecs_mem(address_map &map)
+{
+	map(0x0000, 0x003f).rw(this, FUNC(intv_state::intv_stic_r), FUNC(intv_state::intv_stic_w));
+	map(0x0080, 0x0081).rw("speech", FUNC(sp0256_device::spb640_r), FUNC(sp0256_device::spb640_w)); /* Intellivoice */
 	// AM_RANGE(0x00E0, 0x00E3) AM_READWRITE( intv_ecs_uart_r, intv_ecs_uart_w )
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("ecs", intv_ecs_device, read_ay, write_ay) /* ecs psg */
-	AM_RANGE(0x0100, 0x01ef) AM_READWRITE(intv_ram8_r, intv_ram8_w)
-	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914", ay8914_device, read, write, 0x00ff)
-	AM_RANGE(0x0200, 0x035f) AM_READWRITE(intv_ram16_r, intv_ram16_w)
-	AM_RANGE(0x0400, 0x04ff) AM_DEVREAD("ecs", intv_ecs_device, read_rom04)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000<<1) /* Exec ROM, 10-bits wide */
-	AM_RANGE(0x2000, 0x2fff) AM_DEVREADWRITE("ecs", intv_ecs_device, read_rom20, write_rom20)
-	AM_RANGE(0x3000, 0x37ff) AM_DEVREAD("stic", stic_device, grom_read) /* GROM,     8-bits wide */
-	AM_RANGE(0x3800, 0x39ff) AM_READWRITE(intv_gram_r, intv_gram_w)       /* GRAM,     8-bits wide */
-	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE(intv_gram_r, intv_gram_w)       /* GRAM Alias,     8-bits wide */
-	AM_RANGE(0x4000, 0x47ff) AM_DEVREADWRITE("ecs", intv_ecs_device, read_ram, write_ram)
-	AM_RANGE(0x4800, 0x4fff) AM_DEVREAD("ecs", intv_ecs_device, read_rom48)
-	AM_RANGE(0x5000, 0x5fff) AM_DEVREAD("ecs", intv_ecs_device, read_rom50)
-	AM_RANGE(0x6000, 0x6fff) AM_DEVREAD("ecs", intv_ecs_device, read_rom60)
-	AM_RANGE(0x7000, 0x7fff) AM_DEVREADWRITE("ecs", intv_ecs_device, read_rom70, write_rom70)
-	AM_RANGE(0x8000, 0x8fff) AM_DEVREAD("ecs", intv_ecs_device, read_rom80)
-	AM_RANGE(0x9000, 0x9fff) AM_DEVREAD("ecs", intv_ecs_device, read_rom90)
-	AM_RANGE(0xa000, 0xafff) AM_DEVREAD("ecs", intv_ecs_device, read_roma0)
-	AM_RANGE(0xb000, 0xbfff) AM_DEVREAD("ecs", intv_ecs_device, read_romb0)
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREAD("ecs", intv_ecs_device, read_romc0)
-	AM_RANGE(0xd000, 0xdfff) AM_DEVREAD("ecs", intv_ecs_device, read_romd0)
-	AM_RANGE(0xe000, 0xefff) AM_DEVREADWRITE("ecs", intv_ecs_device, read_rome0, write_rome0)
-	AM_RANGE(0xf000, 0xffff) AM_DEVREADWRITE("ecs", intv_ecs_device, read_romf0, write_romf0)
-ADDRESS_MAP_END
+	map(0x00f0, 0x00ff).rw("ecs", FUNC(intv_ecs_device::read_ay), FUNC(intv_ecs_device::write_ay)); /* ecs psg */
+	map(0x0100, 0x01ef).rw(this, FUNC(intv_state::intv_ram8_r), FUNC(intv_state::intv_ram8_w));
+	map(0x01f0, 0x01ff).rw(m_sound, FUNC(ay8914_device::read), FUNC(ay8914_device::write)).umask16(0x00ff);
+	map(0x0200, 0x035f).rw(this, FUNC(intv_state::intv_ram16_r), FUNC(intv_state::intv_ram16_w));
+	map(0x0400, 0x04ff).r("ecs", FUNC(intv_ecs_device::read_rom04));
+	map(0x1000, 0x1fff).rom().region("maincpu", 0x1000<<1); /* Exec ROM, 10-bits wide */
+	map(0x2000, 0x2fff).rw("ecs", FUNC(intv_ecs_device::read_rom20), FUNC(intv_ecs_device::write_rom20));
+	map(0x3000, 0x37ff).r(m_stic, FUNC(stic_device::grom_read)); /* GROM,     8-bits wide */
+	map(0x3800, 0x39ff).rw(this, FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));       /* GRAM,     8-bits wide */
+	map(0x3a00, 0x3bff).rw(this, FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));       /* GRAM Alias,     8-bits wide */
+	map(0x4000, 0x47ff).rw("ecs", FUNC(intv_ecs_device::read_ram), FUNC(intv_ecs_device::write_ram));
+	map(0x4800, 0x4fff).r("ecs", FUNC(intv_ecs_device::read_rom48));
+	map(0x5000, 0x5fff).r("ecs", FUNC(intv_ecs_device::read_rom50));
+	map(0x6000, 0x6fff).r("ecs", FUNC(intv_ecs_device::read_rom60));
+	map(0x7000, 0x7fff).rw("ecs", FUNC(intv_ecs_device::read_rom70), FUNC(intv_ecs_device::write_rom70));
+	map(0x8000, 0x8fff).r("ecs", FUNC(intv_ecs_device::read_rom80));
+	map(0x9000, 0x9fff).r("ecs", FUNC(intv_ecs_device::read_rom90));
+	map(0xa000, 0xafff).r("ecs", FUNC(intv_ecs_device::read_roma0));
+	map(0xb000, 0xbfff).r("ecs", FUNC(intv_ecs_device::read_romb0));
+	map(0xc000, 0xcfff).r("ecs", FUNC(intv_ecs_device::read_romc0));
+	map(0xd000, 0xdfff).r("ecs", FUNC(intv_ecs_device::read_romd0));
+	map(0xe000, 0xefff).rw("ecs", FUNC(intv_ecs_device::read_rome0), FUNC(intv_ecs_device::write_rome0));
+	map(0xf000, 0xffff).rw("ecs", FUNC(intv_ecs_device::read_romf0), FUNC(intv_ecs_device::write_romf0));
+}
 
-ADDRESS_MAP_START(intv_state::intvkbd_mem)
-	AM_RANGE(0x0000, 0x003f) AM_READWRITE(intv_stic_r, intv_stic_w)
-	AM_RANGE(0x0100, 0x01ef) AM_READWRITE(intv_ram8_r, intv_ram8_w)
-	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914", ay8914_device, read, write, 0x00ff)
-	AM_RANGE(0x0200, 0x035f) AM_READWRITE(intv_ram16_r, intv_ram16_w)
-	AM_RANGE(0x0400, 0x04ff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom04)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000<<1) /* Exec ROM, 10-bits wide */
-	AM_RANGE(0x2000, 0x2fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom20)
-	AM_RANGE(0x3000, 0x37ff) AM_DEVREAD("stic", stic_device, grom_read) /* GROM,     8-bits wide */
-	AM_RANGE(0x3800, 0x39ff) AM_READWRITE(intv_gram_r, intv_gram_w)       /* GRAM,     8-bits wide */
-	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE(intv_gram_r, intv_gram_w)       /* GRAM Alias,     8-bits wide */
-	AM_RANGE(0x4000, 0x47ff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom40)
-	AM_RANGE(0x4800, 0x4fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom48)
-	AM_RANGE(0x5000, 0x5fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom50)
-	AM_RANGE(0x6000, 0x6fff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rom60)
-	AM_RANGE(0x7000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x7000<<1) /* Keyboard ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(intvkbd_dualport16_w) AM_SHARE("dualport_ram")  /* Dual-port RAM */
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_romc0)
-	AM_RANGE(0xd000, 0xdfff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_romd0)
-	AM_RANGE(0xe000, 0xefff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_rome0)
-	AM_RANGE(0xf000, 0xffff) AM_DEVREAD("cartslot", intv_cart_slot_device, read_romf0)
-ADDRESS_MAP_END
+void intv_state::intvkbd_mem(address_map &map)
+{
+	map(0x0000, 0x003f).rw(this, FUNC(intv_state::intv_stic_r), FUNC(intv_state::intv_stic_w));
+	map(0x0100, 0x01ef).rw(this, FUNC(intv_state::intv_ram8_r), FUNC(intv_state::intv_ram8_w));
+	map(0x01f0, 0x01ff).rw(m_sound, FUNC(ay8914_device::read), FUNC(ay8914_device::write)).umask16(0x00ff);
+	map(0x0200, 0x035f).rw(this, FUNC(intv_state::intv_ram16_r), FUNC(intv_state::intv_ram16_w));
+	map(0x0400, 0x04ff).r(m_cart, FUNC(intv_cart_slot_device::read_rom04));
+	map(0x1000, 0x1fff).rom().region("maincpu", 0x1000<<1); /* Exec ROM, 10-bits wide */
+	map(0x2000, 0x2fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom20));
+	map(0x3000, 0x37ff).r(m_stic, FUNC(stic_device::grom_read)); /* GROM,     8-bits wide */
+	map(0x3800, 0x39ff).rw(this, FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));       /* GRAM,     8-bits wide */
+	map(0x3a00, 0x3bff).rw(this, FUNC(intv_state::intv_gram_r), FUNC(intv_state::intv_gram_w));       /* GRAM Alias,     8-bits wide */
+	map(0x4000, 0x47ff).r(m_cart, FUNC(intv_cart_slot_device::read_rom40));
+	map(0x4800, 0x4fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom48));
+	map(0x5000, 0x5fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom50));
+	map(0x6000, 0x6fff).r(m_cart, FUNC(intv_cart_slot_device::read_rom60));
+	map(0x7000, 0x7fff).rom().region("maincpu", 0x7000<<1); /* Keyboard ROM */
+	map(0x8000, 0xbfff).ram().w(this, FUNC(intv_state::intvkbd_dualport16_w)).share("dualport_ram");  /* Dual-port RAM */
+	map(0xc000, 0xcfff).r(m_cart, FUNC(intv_cart_slot_device::read_romc0));
+	map(0xd000, 0xdfff).r(m_cart, FUNC(intv_cart_slot_device::read_romd0));
+	map(0xe000, 0xefff).r(m_cart, FUNC(intv_cart_slot_device::read_rome0));
+	map(0xf000, 0xffff).r(m_cart, FUNC(intv_cart_slot_device::read_romf0));
+}
 
-ADDRESS_MAP_START(intv_state::intvkbd2_mem)
-	ADDRESS_MAP_UNMAP_HIGH  /* Required because of probing */
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(intvkbd_dualport8_lsb_r, intvkbd_dualport8_lsb_w)  /* Dual-port RAM */
-	AM_RANGE(0x4000, 0x40bf) AM_READWRITE(intvkbd_io_r, intvkbd_io_w)
-	AM_RANGE(0x40c0, 0x40cf) AM_DEVREADWRITE("crtc", tms9927_device, read, write)
-	AM_RANGE(0x4200, 0x7fff) AM_READWRITE(intvkbd_dualport8_msb_r, intvkbd_dualport8_msb_w)  /* Dual-port RAM */
-	AM_RANGE(0xb7f8, 0xb7ff) AM_READWRITE(intvkbd_periph_r, intvkbd_periph_w)
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("videoram") /* Text Display */
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_READ(intvkb_iocart_r)
-ADDRESS_MAP_END
+void intv_state::intvkbd2_mem(address_map &map)
+{
+	map.unmap_value_high();  /* Required because of probing */
+	map(0x0000, 0x3fff).rw(this, FUNC(intv_state::intvkbd_dualport8_lsb_r), FUNC(intv_state::intvkbd_dualport8_lsb_w));  /* Dual-port RAM */
+	map(0x4000, 0x40bf).rw(this, FUNC(intv_state::intvkbd_io_r), FUNC(intv_state::intvkbd_io_w));
+	map(0x40c0, 0x40cf).rw(m_crtc, FUNC(tms9927_device::read), FUNC(tms9927_device::write));
+	map(0x4200, 0x7fff).rw(this, FUNC(intv_state::intvkbd_dualport8_msb_r), FUNC(intv_state::intvkbd_dualport8_msb_w));  /* Dual-port RAM */
+	map(0xb7f8, 0xb7ff).rw(this, FUNC(intv_state::intvkbd_periph_r), FUNC(intv_state::intvkbd_periph_w));
+	map(0xb800, 0xbfff).ram().share("videoram"); /* Text Display */
+	map(0xc000, 0xdfff).rom();
+	map(0xe000, 0xffff).r(this, FUNC(intv_state::intvkb_iocart_r));
+}
 
 void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {

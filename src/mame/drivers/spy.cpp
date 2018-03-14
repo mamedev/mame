@@ -374,33 +374,35 @@ WRITE8_MEMBER(spy_state::k052109_051960_w)
 		m_k051960->k051960_w(space, offset - 0x3c00, data);
 }
 
-ADDRESS_MAP_START(spy_state::spy_map)
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(spy_bankedram1_r, spy_bankedram1_w) AM_SHARE("ram")
-	AM_RANGE(0x0800, 0x1aff) AM_RAM
-	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
-	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(bankswitch_w)
-	AM_RANGE(0x3f90, 0x3f90) AM_WRITE(spy_3f90_w)
-	AM_RANGE(0x3fa0, 0x3fa0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x3fb0, 0x3fb0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x3fc0, 0x3fc0) AM_WRITE(spy_sh_irqtrigger_w)
-	AM_RANGE(0x3fd0, 0x3fd0) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3fd1, 0x3fd1) AM_READ_PORT("P1")
-	AM_RANGE(0x3fd2, 0x3fd2) AM_READ_PORT("P2")
-	AM_RANGE(0x3fd3, 0x3fd3) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3fe0, 0x3fe0) AM_READ_PORT("DSW2")
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void spy_state::spy_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rw(this, FUNC(spy_state::spy_bankedram1_r), FUNC(spy_state::spy_bankedram1_w)).share("ram");
+	map(0x0800, 0x1aff).ram();
+	map(0x2000, 0x5fff).rw(this, FUNC(spy_state::k052109_051960_r), FUNC(spy_state::k052109_051960_w));
+	map(0x3f80, 0x3f80).w(this, FUNC(spy_state::bankswitch_w));
+	map(0x3f90, 0x3f90).w(this, FUNC(spy_state::spy_3f90_w));
+	map(0x3fa0, 0x3fa0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x3fb0, 0x3fb0).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x3fc0, 0x3fc0).w(this, FUNC(spy_state::spy_sh_irqtrigger_w));
+	map(0x3fd0, 0x3fd0).portr("SYSTEM");
+	map(0x3fd1, 0x3fd1).portr("P1");
+	map(0x3fd2, 0x3fd2).portr("P2");
+	map(0x3fd3, 0x3fd3).portr("DSW1");
+	map(0x3fe0, 0x3fe0).portr("DSW2");
+	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(spy_state::spy_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("k007232_1", k007232_device, read, write)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_2", k007232_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void spy_state::spy_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).w(this, FUNC(spy_state::sound_bank_w));
+	map(0xa000, 0xa00d).rw(m_k007232_1, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xb000, 0xb00d).rw(m_k007232_2, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0xd000, 0xd000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( spy )

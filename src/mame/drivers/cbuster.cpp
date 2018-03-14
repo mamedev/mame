@@ -42,7 +42,6 @@
 #include "includes/cbuster.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
@@ -126,43 +125,45 @@ READ16_MEMBER(cbuster_state::twocrude_control_r)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(cbuster_state::twocrude_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM
+void cbuster_state::twocrude_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x083fff).ram();
 
-	AM_RANGE(0x0a0000, 0x0a1fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x0a2000, 0x0a2fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x0a4000, 0x0a47ff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x0a6000, 0x0a67ff) AM_RAM AM_SHARE("pf2_rowscroll")
+	map(0x0a0000, 0x0a1fff).rw("tilegen1", FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x0a2000, 0x0a2fff).rw("tilegen1", FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x0a4000, 0x0a47ff).ram().share("pf1_rowscroll");
+	map(0x0a6000, 0x0a67ff).ram().share("pf2_rowscroll");
 
-	AM_RANGE(0x0a8000, 0x0a8fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x0aa000, 0x0aafff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x0ac000, 0x0ac7ff) AM_RAM AM_SHARE("pf3_rowscroll")
-	AM_RANGE(0x0ae000, 0x0ae7ff) AM_RAM AM_SHARE("pf4_rowscroll")
+	map(0x0a8000, 0x0a8fff).rw("tilegen2", FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x0aa000, 0x0aafff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x0ac000, 0x0ac7ff).ram().share("pf3_rowscroll");
+	map(0x0ae000, 0x0ae7ff).ram().share("pf4_rowscroll");
 
-	AM_RANGE(0x0b0000, 0x0b07ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITENOP
-	AM_RANGE(0x0b5000, 0x0b500f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-	AM_RANGE(0x0b6000, 0x0b600f) AM_DEVWRITE("tilegen2", deco16ic_device, pf_control_w)
-	AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM_WRITE(cbuster_palette_w) AM_SHARE("palette")
-	AM_RANGE(0x0b9000, 0x0b9fff) AM_RAM_WRITE(cbuster_palette_ext_w) AM_SHARE("palette_ext")
-	AM_RANGE(0x0bc000, 0x0bc00f) AM_READWRITE(twocrude_control_r, twocrude_control_w)
-ADDRESS_MAP_END
+	map(0x0b0000, 0x0b07ff).ram().share("spriteram");
+	map(0x0b4000, 0x0b4001).nopw();
+	map(0x0b5000, 0x0b500f).w("tilegen1", FUNC(deco16ic_device::pf_control_w));
+	map(0x0b6000, 0x0b600f).w("tilegen2", FUNC(deco16ic_device::pf_control_w));
+	map(0x0b8000, 0x0b8fff).ram().w(this, FUNC(cbuster_state::cbuster_palette_w)).share("palette");
+	map(0x0b9000, 0x0b9fff).ram().w(this, FUNC(cbuster_state::cbuster_palette_ext_w)).share("palette_ext");
+	map(0x0bc000, 0x0bc00f).rw(this, FUNC(cbuster_state::twocrude_control_r), FUNC(cbuster_state::twocrude_control_w));
+}
 
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(cbuster_state::sound_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAM
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void cbuster_state::sound_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x100000, 0x100001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x110000, 0x110001).rw("ym2", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x140000, 0x140001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1f0000, 0x1f1fff).ram();
+	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
+	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+}
 
 /******************************************************************************/
 

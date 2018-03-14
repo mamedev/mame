@@ -206,17 +206,18 @@ WRITE8_MEMBER(tnx1_state::protection_w)
 
 
 
-ADDRESS_MAP_START(tnx1_state::maincpu_program_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_WRITENOP // Attempts to initialize this area with 00 on boot
-	AM_RANGE(0x8c00, 0x8e7f) AM_RAM AM_SHARE("dmasource")
-	AM_RANGE(0x8e80, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(background_w)
-	AM_RANGE(0xe000, 0xe001) AM_READWRITE(protection_r,protection_w)
-ADDRESS_MAP_END
+void tnx1_state::maincpu_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8bff).nopw(); // Attempts to initialize this area with 00 on boot
+	map(0x8c00, 0x8e7f).ram().share("dmasource");
+	map(0x8e80, 0x8fff).ram();
+	map(0xa000, 0xa3ff).w(this, FUNC(tnx1_state::popeye_videoram_w)).share("videoram");
+	map(0xa400, 0xa7ff).w(this, FUNC(tnx1_state::popeye_colorram_w)).share("colorram");
+	map(0xc000, 0xcfff).w(this, FUNC(tnx1_state::background_w));
+	map(0xe000, 0xe001).rw(this, FUNC(tnx1_state::protection_r), FUNC(tnx1_state::protection_w));
+}
 
 ADDRESS_MAP_START(tpp2_state::maincpu_program_map)
 	AM_IMPORT_FROM(tpp1_state::maincpu_program_map)
@@ -236,14 +237,15 @@ ADDRESS_MAP_START(popeyebl_state::maincpu_program_map)
 	AM_RANGE(0xe000, 0xe01f) AM_ROM AM_REGION("blprot", 0x00)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(tnx1_state::maincpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x03, 0x03) AM_DEVREAD("aysnd", ay8910_device, data_r)
-ADDRESS_MAP_END
+void tnx1_state::maincpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x00, 0x00).portr("P1");
+	map(0x01, 0x01).portr("P2");
+	map(0x02, 0x02).portr("SYSTEM");
+	map(0x03, 0x03).r("aysnd", FUNC(ay8910_device::data_r));
+}
 
 
 CUSTOM_INPUT_MEMBER(tnx1_state::dsw1_read)

@@ -57,19 +57,21 @@ private:
 
 
 
-ADDRESS_MAP_START(altair_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xfcff ) AM_RAM AM_SHARE("ram")
-	AM_RANGE( 0xfd00, 0xfdff ) AM_ROM
-	AM_RANGE( 0xff00, 0xffff ) AM_ROM
-ADDRESS_MAP_END
+void altair_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xfcff).ram().share("ram");
+	map(0xfd00, 0xfdff).rom();
+	map(0xff00, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(altair_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void altair_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	// TODO: Remove AM_MIRROR() and use SIO address S0-S7
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x10) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-ADDRESS_MAP_END
+	map(0x00, 0x01).mirror(0x10).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( altair )

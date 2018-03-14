@@ -48,40 +48,44 @@
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(poly88_state::poly88_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_ROM // Monitor ROM
-	AM_RANGE(0x0400, 0x0bff) AM_ROM // ROM Expansion
-	AM_RANGE(0x0c00, 0x0dff) AM_RAM AM_MIRROR(0x200) // System RAM (mirrored)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM // System Expansion area
-	AM_RANGE(0x2000, 0x3fff) AM_RAM // Minimal user RAM area
-	AM_RANGE(0x4000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("video_ram") // Video RAM
-ADDRESS_MAP_END
+void poly88_state::poly88_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom(); // Monitor ROM
+	map(0x0400, 0x0bff).rom(); // ROM Expansion
+	map(0x0c00, 0x0dff).ram().mirror(0x200); // System RAM (mirrored)
+	map(0x1000, 0x1fff).rom(); // System Expansion area
+	map(0x2000, 0x3fff).ram(); // Minimal user RAM area
+	map(0x4000, 0xf7ff).ram();
+	map(0xf800, 0xfbff).ram().share("video_ram"); // Video RAM
+}
 
-ADDRESS_MAP_START(poly88_state::poly88_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(poly88_baud_rate_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(poly88_intr_w)
-	AM_RANGE(0xf8, 0xf8) AM_READ(poly88_keyboard_r)
-ADDRESS_MAP_END
+void poly88_state::poly88_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x01, 0x01).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x04, 0x04).w(this, FUNC(poly88_state::poly88_baud_rate_w));
+	map(0x08, 0x08).w(this, FUNC(poly88_state::poly88_intr_w));
+	map(0xf8, 0xf8).r(this, FUNC(poly88_state::poly88_keyboard_r));
+}
 
-ADDRESS_MAP_START(poly88_state::poly8813_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_ROM // Monitor ROM
-	AM_RANGE(0x0400, 0x0bff) AM_ROM // Disk System ROM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM // System RAM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_SHARE("video_ram") // Video RAM
-	AM_RANGE(0x2000, 0xffff) AM_RAM // RAM
-ADDRESS_MAP_END
+void poly88_state::poly8813_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom(); // Monitor ROM
+	map(0x0400, 0x0bff).rom(); // Disk System ROM
+	map(0x0c00, 0x0fff).ram(); // System RAM
+	map(0x1800, 0x1bff).ram().share("video_ram"); // Video RAM
+	map(0x2000, 0xffff).ram(); // RAM
+}
 
-ADDRESS_MAP_START(poly88_state::poly8813_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void poly88_state::poly8813_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( poly88 )

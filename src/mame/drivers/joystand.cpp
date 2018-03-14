@@ -445,37 +445,38 @@ WRITE16_MEMBER(joystand_state::cart_w)
 	bg15_tiles_dirty = true;
 }
 
-ADDRESS_MAP_START(joystand_state::joystand_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x13ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200003) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)
-	AM_RANGE(0x200008, 0x200009) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN0") // r/w
-	AM_RANGE(0x200012, 0x200013) AM_RAM_WRITE(outputs_w) AM_SHARE("outputs") // r/w
-	AM_RANGE(0x200014, 0x200015) AM_READWRITE(fpga_r, oki_bank_w) // r/w
+void joystand_state::joystand_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x13ffff).ram();
+	map(0x200000, 0x200003).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
+	map(0x200009, 0x200009).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x200010, 0x200011).portr("IN0"); // r/w
+	map(0x200012, 0x200013).ram().w(this, FUNC(joystand_state::outputs_w)).share("outputs"); // r/w
+	map(0x200014, 0x200015).rw(this, FUNC(joystand_state::fpga_r), FUNC(joystand_state::oki_bank_w)); // r/w
 //  AM_RANGE(0x200016, 0x200017) // write $9190 at boot
 
-	AM_RANGE(0x400000, 0x47ffff) AM_RAM_WRITE(bg15_0_w) AM_SHARE("bg15_0_ram") // r5g5b5 200x200 pixel-based
-	AM_RANGE(0x480000, 0x4fffff) AM_RAM // more rgb layers? (writes at offset 0)
-	AM_RANGE(0x500000, 0x57ffff) AM_RAM // ""
-	AM_RANGE(0x580000, 0x5fffff) AM_RAM // ""
+	map(0x400000, 0x47ffff).ram().w(this, FUNC(joystand_state::bg15_0_w)).share("bg15_0_ram"); // r5g5b5 200x200 pixel-based
+	map(0x480000, 0x4fffff).ram(); // more rgb layers? (writes at offset 0)
+	map(0x500000, 0x57ffff).ram(); // ""
+	map(0x580000, 0x5fffff).ram(); // ""
 
-	AM_RANGE(0x600000, 0x603fff) AM_RAM_WRITE(bg2_w) AM_SHARE("bg2_ram")
-	AM_RANGE(0x604000, 0x605fff) AM_RAM_WRITE(bg1_w) AM_SHARE("bg1_ram")
-	AM_RANGE(0x606000, 0x607fff) AM_RAM_WRITE(bg15_1_w) AM_SHARE("bg15_1_ram") // r5g5b5 200x200 tile-based
-	AM_RANGE(0x608000, 0x609fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x60c000, 0x60c003) AM_RAM AM_SHARE("scroll") // write
-	AM_RANGE(0x60c00c, 0x60c00d) AM_RAM AM_SHARE("enable") // write
+	map(0x600000, 0x603fff).ram().w(this, FUNC(joystand_state::bg2_w)).share("bg2_ram");
+	map(0x604000, 0x605fff).ram().w(this, FUNC(joystand_state::bg1_w)).share("bg1_ram");
+	map(0x606000, 0x607fff).ram().w(this, FUNC(joystand_state::bg15_1_w)).share("bg15_1_ram"); // r5g5b5 200x200 tile-based
+	map(0x608000, 0x609fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x60c000, 0x60c003).ram().share("scroll"); // write
+	map(0x60c00c, 0x60c00d).ram().share("enable"); // write
 
-	AM_RANGE(0x800000, 0xdfffff) AM_READWRITE(cart_r, cart_w) // r/w (cart flash)
+	map(0x800000, 0xdfffff).rw(this, FUNC(joystand_state::cart_r), FUNC(joystand_state::cart_w)); // r/w (cart flash)
 //  AM_RANGE(0xe00080, 0xe00081) // write (bit 0 = cart? bit 1 = ? bit 3 = ?)
-	AM_RANGE(0xe00000, 0xe00001) AM_READ(e00000_r) // copy slot
-	AM_RANGE(0xe00020, 0xe00021) AM_READ(e00020_r) // master slot
+	map(0xe00000, 0xe00001).r(this, FUNC(joystand_state::e00000_r)); // copy slot
+	map(0xe00020, 0xe00021).r(this, FUNC(joystand_state::e00020_r)); // master slot
 
-	AM_RANGE(0xe80040, 0xe8005f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
+	map(0xe80040, 0xe8005f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
-ADDRESS_MAP_END
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
+}
 
 
 static INPUT_PORTS_START( joystand )
