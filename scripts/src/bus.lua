@@ -870,6 +870,8 @@ if (BUSES["HEXBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/hexbus/hexbus.h",
 		MAME_DIR .. "src/devices/bus/hexbus/hx5102.cpp",
 		MAME_DIR .. "src/devices/bus/hexbus/hx5102.h",
+		MAME_DIR .. "src/devices/bus/hexbus/tp0370.cpp",
+		MAME_DIR .. "src/devices/bus/hexbus/tp0370.h",
 	}
 end
 

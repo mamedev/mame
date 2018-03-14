@@ -422,6 +422,33 @@ private:
 /*
     Custom chip: OSO
 */
+
+/* Status register bits */
+typedef enum
+{
+	HSKWT = 0x80,
+	HSKRD = 0x40,
+	BAVIAS = 0x20,
+	BAVAIS = 0x10,
+	SBAV = 0x08,
+	WBUSY = 0x04,
+	RBUSY = 0x02,
+	SHSK = 0x01
+} oso_status;
+
+/* Control register bits */
+typedef enum
+{
+	WIEN = 0x80,
+	RIEN = 0x40,
+	BAVIAEN = 0x20,
+	BAVAIEN = 0x10,
+	BAVC = 0x08,
+	WEN = 0x04,
+	REN = 0x02,
+	CR7 = 0x01
+} oso_control;
+
 class oso_device : public bus::hexbus::hexbus_chained_device
 {
 public:
@@ -429,9 +456,6 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	void device_start() override;
-	// Don't add a hexbus connector; we use the one from the driver instance
-	virtual void device_add_mconfig(machine_config &config) override { };
-
 	void hexbus_value_changed(uint8_t data) override;
 
 	WRITE_LINE_MEMBER( clock_in );
@@ -440,8 +464,8 @@ public:
 	devcb_write_line m_int;
 
 private:
-	bool control_bit(int bit) { return (m_control & bit)!=0; }
-	bool status_bit(int bit) { return (m_status & bit)!=0; }
+	bool control_bit(oso_control bit) { return (m_control & bit)!=0; }
+	bool status_bit(oso_status bit) { return (m_status & bit)!=0; }
 	void clear_int_status();
 	void set_status(int bit, bool set) { m_status = (set)? (m_status | bit) : (m_status & ~bit); }
 	void update_hexbus();
@@ -452,18 +476,15 @@ private:
 	uint8_t m_control;
 	uint8_t m_xmit;
 
-	// Last hexbus value; when the new value is different, send it via the hexbus
-	uint8_t m_lasthxvalue;
-
 	bool m_bav;         // Bus available; when true, a communication is about to happen
 	bool m_sbav;        // Stable BAV; the BAV signal is true for two clock cycles
 	bool m_sbavold;     // Old SBAV state
-	bool m_bavhold;     // For computing the SBAV signal
+	bool m_bavold;
 
 	bool m_hsk;         // Handshake line; when true, a bus member needs more time to process the message
+	bool m_hsklocal;	// Local level of HSK
 	bool m_shsk;        // Stable HSK
-	bool m_shskold;     // see above
-	bool m_hskhold;     // see above
+	bool m_hskold;
 
 	// Page 3 in OSO schematics: Write timing
 	bool m_wq1;         // Flipflop 1
@@ -471,6 +492,7 @@ private:
 	bool m_wq2;         // Flipflop 2
 	bool m_wq2old;      // Previous state
 	bool m_wnp;         // Write nibble selection; true means upper 4 bits
+	bool m_wbusy;       // When true, direct the transmit register towards the output
 	bool m_wbusyold;    // Old state of the WBUSY line
 	bool m_sendbyte;    // Byte has been loaded into the XMIT register
 	bool m_wrset;       // Start sending
@@ -490,6 +512,25 @@ private:
 
 	// Page 6 (RHSUS*)
 	bool m_rhsus;       // Needed to assert the HSK line until the CPU has read the byte
+	
+	bool m_rbusy;
+	
+	bool m_phi3;
+	
+	// Debugging help
+	uint8_t m_oldvalue;
+/*	
+	// This is a buffer to enqueue changes on the Hexbus
+	// This is not part of the real implementation, but in the emulation
+	// there is no guarantee that two subsequent bus changes will be sensed
+	// on the other side
+	
+	void enqueue(uint8_t val);
+	uint8_t dequeue();
+
+	uint8_t m_queue[8];
+	int m_qhead;
+	int m_qtail; */
 };
 
 class mainboard8_device : public device_t
