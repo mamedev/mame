@@ -80,14 +80,16 @@ DRIVER_INIT_MEMBER(tx0_state,tx0)
 }
 
 
-ADDRESS_MAP_START(tx0_state::tx0_64kw_map)
-	AM_RANGE(0x0000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void tx0_state::tx0_64kw_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
+}
 
 
-ADDRESS_MAP_START(tx0_state::tx0_8kw_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-ADDRESS_MAP_END
+void tx0_state::tx0_8kw_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+}
 
 
 static INPUT_PORTS_START( tx0 )

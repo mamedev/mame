@@ -19,7 +19,6 @@ Notes:
 #include "includes/skykid.h"
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/m6800/m6801.h"
 #include "machine/watchdog.h"
 #include "sound/namco.h"
 #include "screen.h"
@@ -104,32 +103,34 @@ void skykid_state::machine_start()
 
 
 
-ADDRESS_MAP_START(skykid_state::skykid_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")                /* banked ROM */
-	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(skykid_videoram_r,skykid_videoram_w) AM_SHARE("videoram")/* Video RAM (background) */
-	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(skykid_textram_r,skykid_textram_w) AM_SHARE("textram")    /* video RAM (text layer) */
-	AM_RANGE(0x4800, 0x5fff) AM_RAM AM_SHARE("spriteram")   /* RAM + Sprite RAM */
-	AM_RANGE(0x6000, 0x60ff) AM_WRITE(skykid_scroll_y_w)        /* Y scroll register map */
-	AM_RANGE(0x6200, 0x63ff) AM_WRITE(skykid_scroll_x_w)        /* X scroll register map */
-	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(skykid_irq_1_ctrl_w)      /* IRQ control */
-	AM_RANGE(0x7800, 0x7fff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x8000, 0xffff) AM_ROM                 /* ROM */
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(skykid_subreset_w)        /* MCU control */
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(skykid_bankswitch_w)      /* Bankswitch control */
-	AM_RANGE(0xa000, 0xa001) AM_WRITE(skykid_flipscreen_priority_w) /* flip screen & priority */
-ADDRESS_MAP_END
+void skykid_state::skykid_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr("bank1");                /* banked ROM */
+	map(0x2000, 0x2fff).rw(this, FUNC(skykid_state::skykid_videoram_r), FUNC(skykid_state::skykid_videoram_w)).share("videoram");/* Video RAM (background) */
+	map(0x4000, 0x47ff).rw(this, FUNC(skykid_state::skykid_textram_r), FUNC(skykid_state::skykid_textram_w)).share("textram");    /* video RAM (text layer) */
+	map(0x4800, 0x5fff).ram().share("spriteram");   /* RAM + Sprite RAM */
+	map(0x6000, 0x60ff).w(this, FUNC(skykid_state::skykid_scroll_y_w));        /* Y scroll register map */
+	map(0x6200, 0x63ff).w(this, FUNC(skykid_state::skykid_scroll_x_w));        /* X scroll register map */
+	map(0x6800, 0x6bff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); /* PSG device, shared RAM */
+	map(0x7000, 0x7fff).w(this, FUNC(skykid_state::skykid_irq_1_ctrl_w));      /* IRQ control */
+	map(0x7800, 0x7fff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8000, 0xffff).rom();                 /* ROM */
+	map(0x8000, 0x8fff).w(this, FUNC(skykid_state::skykid_subreset_w));        /* MCU control */
+	map(0x9000, 0x9fff).w(this, FUNC(skykid_state::skykid_bankswitch_w));      /* Bankswitch control */
+	map(0xa000, 0xa001).w(this, FUNC(skykid_state::skykid_flipscreen_priority_w)); /* flip screen & priority */
+}
 
-ADDRESS_MAP_START(skykid_state::mcu_map)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("mcu", hd63701_cpu_device, m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)     /* watchdog? */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(skykid_irq_2_ctrl_w)
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void skykid_state::mcu_map(address_map &map)
+{
+	map(0x0000, 0x001f).rw(m_mcu, FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0080, 0x00ff).ram();
+	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); /* PSG device, shared RAM */
+	map(0x2000, 0x3fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));     /* watchdog? */
+	map(0x4000, 0x7fff).w(this, FUNC(skykid_state::skykid_irq_2_ctrl_w));
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xf000, 0xffff).rom();
+}
 
 
 READ8_MEMBER(skykid_state::readFF)
@@ -137,12 +138,13 @@ READ8_MEMBER(skykid_state::readFF)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(skykid_state::mcu_port_map)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ(inputport_r)         /* input ports read */
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(inputport_select_w) /* input port select */
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF)  /* leds won't work otherwise */
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_WRITE(skykid_led_w)           /* lamps */
-ADDRESS_MAP_END
+void skykid_state::mcu_port_map(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).r(this, FUNC(skykid_state::inputport_r));         /* input ports read */
+	map(M6801_PORT1, M6801_PORT1).w(this, FUNC(skykid_state::inputport_select_w)); /* input port select */
+	map(M6801_PORT2, M6801_PORT2).r(this, FUNC(skykid_state::readFF));  /* leds won't work otherwise */
+	map(M6801_PORT2, M6801_PORT2).w(this, FUNC(skykid_state::skykid_led_w));           /* lamps */
+}
 
 
 

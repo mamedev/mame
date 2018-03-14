@@ -29,19 +29,20 @@ wpcsnd_device::wpcsnd_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-ADDRESS_MAP_START(wpcsnd_device::wpcsnd_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(rombank_w)
-	AM_RANGE(0x2400, 0x2401) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(bg_speech_digit_w)
-	AM_RANGE(0x3000, 0x33ff) AM_READ(latch_r)
-	AM_RANGE(0x3400, 0x37ff) AM_WRITE(bg_speech_clock_w)
-	AM_RANGE(0x3800, 0x3bff) AM_WRITE(volume_w)
-	AM_RANGE(0x3c00, 0x3fff) AM_WRITE(latch_w)
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("rombank")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("fixed")
-ADDRESS_MAP_END
+void wpcsnd_device::wpcsnd_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2000).mirror(0x03ff).w(this, FUNC(wpcsnd_device::rombank_w));
+	map(0x2400, 0x2401).mirror(0x03fe).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x2800, 0x2800).mirror(0x03ff).w("dac", FUNC(dac_byte_interface::write));
+	map(0x2c00, 0x2fff).w(this, FUNC(wpcsnd_device::bg_speech_digit_w));
+	map(0x3000, 0x33ff).r(this, FUNC(wpcsnd_device::latch_r));
+	map(0x3400, 0x37ff).w(this, FUNC(wpcsnd_device::bg_speech_clock_w));
+	map(0x3800, 0x3bff).w(this, FUNC(wpcsnd_device::volume_w));
+	map(0x3c00, 0x3fff).w(this, FUNC(wpcsnd_device::latch_w));
+	map(0x4000, 0xbfff).bankr("rombank");
+	map(0xc000, 0xffff).bankr("fixed");
+}
 
 void wpcsnd_device::ctrl_w(uint8_t data)
 {

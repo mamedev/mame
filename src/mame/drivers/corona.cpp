@@ -627,44 +627,48 @@ WRITE8_MEMBER(corona_state::wc_meters_w)
 
 */
 
-ADDRESS_MAP_START(corona_state::winner81_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xb800, 0xb8ff) AM_RAM // copied from 8000 (0x10 bytes, repeated)
-ADDRESS_MAP_END
+void corona_state::winner81_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x8fff).ram().share("nvram");
+	map(0xb800, 0xb8ff).ram(); // copied from 8000 (0x10 bytes, repeated)
+}
 
-ADDRESS_MAP_START(corona_state::winner81_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x70, 0x70) AM_WRITE(blitter_x_w)
-	AM_RANGE(0x71, 0x71) AM_WRITE(blitter_unk_w)
-	AM_RANGE(0x72, 0x72) AM_WRITE(blitter_trig_wdht_w)
-	AM_RANGE(0x74, 0x74) AM_WRITE(blitter_y_w)
-	AM_RANGE(0x75, 0x75) AM_READ(blitter_status_r)
-	AM_RANGE(0x76, 0x76) AM_WRITE(blitter_aux_w)
+void corona_state::winner81_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x70, 0x70).w(this, FUNC(corona_state::blitter_x_w));
+	map(0x71, 0x71).w(this, FUNC(corona_state::blitter_unk_w));
+	map(0x72, 0x72).w(this, FUNC(corona_state::blitter_trig_wdht_w));
+	map(0x74, 0x74).w(this, FUNC(corona_state::blitter_y_w));
+	map(0x75, 0x75).r(this, FUNC(corona_state::blitter_status_r));
+	map(0x76, 0x76).w(this, FUNC(corona_state::blitter_aux_w));
 
-	AM_RANGE(0xd8, 0xd8) AM_WRITENOP            /* dunno, but is writing 0's very often */
-	AM_RANGE(0xdf, 0xdf) AM_WRITE(sound_latch_w)
+	map(0xd8, 0xd8).nopw();            /* dunno, but is writing 0's very often */
+	map(0xdf, 0xdf).w(this, FUNC(corona_state::sound_latch_w));
 
-	AM_RANGE(0xe8, 0xe8) AM_READ_PORT("IN0")    /* credits for players A, B, C, D */
-	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("IN3")
-	AM_RANGE(0xea, 0xea) AM_READ_PORT("IN1")    /* left & right for all players */
-	AM_RANGE(0xeb, 0xeb) AM_READ_PORT("IN2")    /* bet for all players */
-	AM_RANGE(0xec, 0xec) AM_READ_PORT("IN4")
-	AM_RANGE(0xed, 0xed) AM_READ_PORT("DSW1")   /* DIP switches bank 1 */
-	AM_RANGE(0xee, 0xee) AM_READ_PORT("DSW2")
-	AM_RANGE(0xef, 0xef) AM_WRITE(wc_meters_w)  /* meters: coin1 = bit0, coin2 = bit1, coinout = bit2 */
-ADDRESS_MAP_END
+	map(0xe8, 0xe8).portr("IN0");    /* credits for players A, B, C, D */
+	map(0xe9, 0xe9).portr("IN3");
+	map(0xea, 0xea).portr("IN1");    /* left & right for all players */
+	map(0xeb, 0xeb).portr("IN2");    /* bet for all players */
+	map(0xec, 0xec).portr("IN4");
+	map(0xed, 0xed).portr("DSW1");   /* DIP switches bank 1 */
+	map(0xee, 0xee).portr("DSW2");
+	map(0xef, 0xef).w(this, FUNC(corona_state::wc_meters_w));  /* meters: coin1 = bit0, coin2 = bit1, coinout = bit2 */
+}
 
-ADDRESS_MAP_START(corona_state::winner81_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-ADDRESS_MAP_END
+void corona_state::winner81_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x8000, 0x83ff).ram();
+}
 
-ADDRESS_MAP_START(corona_state::winner81_sound_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void corona_state::winner81_sound_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 /*  Winners Circle 1982
 
@@ -684,42 +688,46 @@ ADDRESS_MAP_END
          FE ---> Sound Latch (writes 01, 02 and 03 during attract)...
 */
 
-ADDRESS_MAP_START(corona_state::winner82_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8000, 0x80ff) AM_RAM
-ADDRESS_MAP_END
+void corona_state::winner82_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).ram().share("nvram");
+	map(0x8000, 0x80ff).ram();
+}
 
-ADDRESS_MAP_START(corona_state::winner82_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITE(blitter_trig_wdht_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(blitter_aux_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
-	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
+void corona_state::winner82_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).w(this, FUNC(corona_state::blitter_x_w));
+	map(0xf1, 0xf1).w(this, FUNC(corona_state::blitter_y_w));
+	map(0xf2, 0xf2).w(this, FUNC(corona_state::blitter_trig_wdht_w));
+	map(0xf3, 0xf3).w(this, FUNC(corona_state::blitter_aux_w));
+	map(0xf4, 0xf4).w(this, FUNC(corona_state::blitter_unk_w));
+	map(0xf5, 0xf5).r(this, FUNC(corona_state::blitter_status_r));
 
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW1")   /* coinage DIP SW */
-	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("IN0")    /* controls for players A & B */
-	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN1")    /* credits for players A, B, C, D */
-	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("IN3")    /* single credits for players A, B, C, D, + fix bits 3, 4, 5, 6 in meters */
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(wc_meters_w)
-	AM_RANGE(0xfd, 0xfd) AM_READ_PORT("IN2")    /* controls for players C & D */
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
-	AM_RANGE(0xff, 0xff) AM_READ_PORT("DSW2")   /* no idea */
-ADDRESS_MAP_END
+	map(0xf8, 0xf8).portr("DSW1");   /* coinage DIP SW */
+	map(0xf9, 0xf9).portr("IN0");    /* controls for players A & B */
+	map(0xfa, 0xfa).portr("IN1");    /* credits for players A, B, C, D */
+	map(0xfb, 0xfb).portr("IN3");    /* single credits for players A, B, C, D, + fix bits 3, 4, 5, 6 in meters */
+	map(0xfc, 0xfc).w(this, FUNC(corona_state::wc_meters_w));
+	map(0xfd, 0xfd).portr("IN2");    /* controls for players C & D */
+	map(0xfe, 0xfe).w(this, FUNC(corona_state::sound_latch_w));
+	map(0xff, 0xff).portr("DSW2");   /* no idea */
+}
 
-ADDRESS_MAP_START(corona_state::winner82_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-ADDRESS_MAP_END
+void corona_state::winner82_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x13ff).ram();
+}
 
-ADDRESS_MAP_START(corona_state::winner82_sound_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x03) AM_WRITENOP    /* socket for another ay, inited but never played */
-ADDRESS_MAP_END
+void corona_state::winner82_sound_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x03).nopw();    /* socket for another ay, inited but never played */
+}
 
 /* Ruleta RE-800
 
@@ -748,38 +756,42 @@ ADDRESS_MAP_END
 
 */
 
-ADDRESS_MAP_START(corona_state::re800_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram") //801a comm?
-ADDRESS_MAP_END
+void corona_state::re800_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0x87ff).ram().share("nvram"); //801a comm?
+}
 
-ADDRESS_MAP_START(corona_state::re800_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITE(blitter_trig_wdht_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(blitter_aux_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
-	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("IN1")
-	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(mux_port_w)
-	AM_RANGE(0xfd, 0xfd) AM_READ(mux_port_r)
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE(ball_w)
-ADDRESS_MAP_END
+void corona_state::re800_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).w(this, FUNC(corona_state::blitter_x_w));
+	map(0xf1, 0xf1).w(this, FUNC(corona_state::blitter_y_w));
+	map(0xf2, 0xf2).w(this, FUNC(corona_state::blitter_trig_wdht_w));
+	map(0xf3, 0xf3).w(this, FUNC(corona_state::blitter_aux_w));
+	map(0xf4, 0xf4).w(this, FUNC(corona_state::blitter_unk_w));
+	map(0xf5, 0xf5).r(this, FUNC(corona_state::blitter_status_r));
+	map(0xf8, 0xf8).portr("IN1");
+	map(0xf9, 0xf9).portr("DSW1");
+	map(0xfc, 0xfc).w(this, FUNC(corona_state::mux_port_w));
+	map(0xfd, 0xfd).r(this, FUNC(corona_state::mux_port_r));
+	map(0xfe, 0xfe).w(this, FUNC(corona_state::sound_latch_w));
+	map(0xff, 0xff).w(this, FUNC(corona_state::ball_w));
+}
 
-ADDRESS_MAP_START(corona_state::re800_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-ADDRESS_MAP_END
+void corona_state::re800_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x8000, 0x83ff).ram();
+}
 
-ADDRESS_MAP_START(corona_state::re800_sound_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void corona_state::re800_sound_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 
 /* Lucky Roulette
@@ -808,38 +820,42 @@ ADDRESS_MAP_END
 
 */
 
-ADDRESS_MAP_START(corona_state::luckyrlt_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void corona_state::luckyrlt_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(corona_state::luckyrlt_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITE(blitter_trig_wdht_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(blitter_aux_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
-	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
+void corona_state::luckyrlt_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).w(this, FUNC(corona_state::blitter_x_w));
+	map(0xf1, 0xf1).w(this, FUNC(corona_state::blitter_y_w));
+	map(0xf2, 0xf2).w(this, FUNC(corona_state::blitter_trig_wdht_w));
+	map(0xf3, 0xf3).w(this, FUNC(corona_state::blitter_aux_w));
+	map(0xf4, 0xf4).w(this, FUNC(corona_state::blitter_unk_w));
+	map(0xf5, 0xf5).r(this, FUNC(corona_state::blitter_status_r));
 
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf9, 0xf9) AM_WRITE(ball_w)
-	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(mux_port_w)
-	AM_RANGE(0xfd, 0xfd) AM_READ(mux_port_r)
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
-ADDRESS_MAP_END
+	map(0xf8, 0xf8).portr("DSW2");
+	map(0xf9, 0xf9).w(this, FUNC(corona_state::ball_w));
+	map(0xfa, 0xfa).portr("DSW1");
+	map(0xfc, 0xfc).w(this, FUNC(corona_state::mux_port_w));
+	map(0xfd, 0xfd).r(this, FUNC(corona_state::mux_port_r));
+	map(0xfe, 0xfe).w(this, FUNC(corona_state::sound_latch_w));
+}
 
-ADDRESS_MAP_START(corona_state::luckyrlt_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-ADDRESS_MAP_END
+void corona_state::luckyrlt_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x13ff).ram();
+}
 
-ADDRESS_MAP_START(corona_state::luckyrlt_sound_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void corona_state::luckyrlt_sound_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 
 /*********************************

@@ -124,20 +124,22 @@ READ8_MEMBER(big10_state::mux_r)
 *             Memory Map              *
 **************************************/
 
-ADDRESS_MAP_START(big10_state::main_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void big10_state::main_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram().share("nvram");
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(big10_state::main_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(mux_r)         /* present in test mode */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM") /* coins and service */
-	AM_RANGE(0x98, 0x9b) AM_DEVREADWRITE("v9938", v9938_device, read, write)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_device, data_r) /* Dip-Switches routes here. */
-ADDRESS_MAP_END
+void big10_state::main_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(big10_state::mux_r));         /* present in test mode */
+	map(0x02, 0x02).portr("SYSTEM"); /* coins and service */
+	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r)); /* Dip-Switches routes here. */
+}
 
 
 /**************************************

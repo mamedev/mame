@@ -136,112 +136,117 @@ READ8_MEMBER(tecmo_state::dswb_h_r)
 }
 
 
-ADDRESS_MAP_START(tecmo_state::rygar_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("JOY1")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("BUTTONS1")
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("JOY2")
-	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
-	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
-	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ(dswa_l_r)
-	AM_RANGE(0xf807, 0xf807) AM_READ(dswa_h_r)
-	AM_RANGE(0xf808, 0xf808) AM_READ(dswb_l_r)
-	AM_RANGE(0xf809, 0xf809) AM_READ(dswb_h_r)
-	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
-	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
-	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xf80b, 0xf80b) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+void tecmo_state::rygar_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(tecmo_state::txvideoram_w)).share("txvideoram");
+	map(0xd800, 0xdbff).ram().w(this, FUNC(tecmo_state::fgvideoram_w)).share("fgvideoram");
+	map(0xdc00, 0xdfff).ram().w(this, FUNC(tecmo_state::bgvideoram_w)).share("bgvideoram");
+	map(0xe000, 0xe7ff).ram().share("spriteram");
+	map(0xe800, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf000, 0xf7ff).bankr("bank1");
+	map(0xf800, 0xf800).portr("JOY1");
+	map(0xf801, 0xf801).portr("BUTTONS1");
+	map(0xf802, 0xf802).portr("JOY2");
+	map(0xf803, 0xf803).portr("BUTTONS2");
+	map(0xf804, 0xf804).portr("SYS_0");
+	map(0xf805, 0xf805).portr("SYS_1");
+	map(0xf806, 0xf806).r(this, FUNC(tecmo_state::dswa_l_r));
+	map(0xf807, 0xf807).r(this, FUNC(tecmo_state::dswa_h_r));
+	map(0xf808, 0xf808).r(this, FUNC(tecmo_state::dswb_l_r));
+	map(0xf809, 0xf809).r(this, FUNC(tecmo_state::dswb_h_r));
+	map(0xf80f, 0xf80f).portr("SYS_2");
+	map(0xf800, 0xf802).w(this, FUNC(tecmo_state::fgscroll_w));
+	map(0xf803, 0xf805).w(this, FUNC(tecmo_state::bgscroll_w));
+	map(0xf806, 0xf806).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xf807, 0xf807).w(this, FUNC(tecmo_state::flipscreen_w));
+	map(0xf808, 0xf808).w(this, FUNC(tecmo_state::bankswitch_w));
+	map(0xf80b, 0xf80b).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+}
 
-ADDRESS_MAP_START(tecmo_state::gemini_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("JOY1")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("BUTTONS1")
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("JOY2")
-	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
-	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
-	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ(dswa_l_r)
-	AM_RANGE(0xf807, 0xf807) AM_READ(dswa_h_r)
-	AM_RANGE(0xf808, 0xf808) AM_READ(dswb_l_r)
-	AM_RANGE(0xf809, 0xf809) AM_READ(dswb_h_r)
-	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
-	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
-	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xf80b, 0xf80b) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+void tecmo_state::gemini_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(tecmo_state::txvideoram_w)).share("txvideoram");
+	map(0xd800, 0xdbff).ram().w(this, FUNC(tecmo_state::fgvideoram_w)).share("fgvideoram");
+	map(0xdc00, 0xdfff).ram().w(this, FUNC(tecmo_state::bgvideoram_w)).share("bgvideoram");
+	map(0xe000, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xe800, 0xefff).ram().share("spriteram");
+	map(0xf000, 0xf7ff).bankr("bank1");
+	map(0xf800, 0xf800).portr("JOY1");
+	map(0xf801, 0xf801).portr("BUTTONS1");
+	map(0xf802, 0xf802).portr("JOY2");
+	map(0xf803, 0xf803).portr("BUTTONS2");
+	map(0xf804, 0xf804).portr("SYS_0");
+	map(0xf805, 0xf805).portr("SYS_1");
+	map(0xf806, 0xf806).r(this, FUNC(tecmo_state::dswa_l_r));
+	map(0xf807, 0xf807).r(this, FUNC(tecmo_state::dswa_h_r));
+	map(0xf808, 0xf808).r(this, FUNC(tecmo_state::dswb_l_r));
+	map(0xf809, 0xf809).r(this, FUNC(tecmo_state::dswb_h_r));
+	map(0xf80f, 0xf80f).portr("SYS_2");
+	map(0xf800, 0xf802).w(this, FUNC(tecmo_state::fgscroll_w));
+	map(0xf803, 0xf805).w(this, FUNC(tecmo_state::bgscroll_w));
+	map(0xf806, 0xf806).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xf807, 0xf807).w(this, FUNC(tecmo_state::flipscreen_w));
+	map(0xf808, 0xf808).w(this, FUNC(tecmo_state::bankswitch_w));
+	map(0xf80b, 0xf80b).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+}
 
-ADDRESS_MAP_START(tecmo_state::silkworm_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("JOY1")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("BUTTONS1")
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("JOY2")
-	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
-	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
-	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ(dswa_l_r)
-	AM_RANGE(0xf807, 0xf807) AM_READ(dswa_h_r)
-	AM_RANGE(0xf808, 0xf808) AM_READ(dswb_l_r)
-	AM_RANGE(0xf809, 0xf809) AM_READ(dswb_h_r)
-	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
-	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
-	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xf809, 0xf809) AM_WRITENOP    /* ? */
-	AM_RANGE(0xf80b, 0xf80b) AM_WRITENOP    /* ? if mapped to watchdog like in the others, causes reset */
-ADDRESS_MAP_END
+void tecmo_state::silkworm_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc3ff).ram().w(this, FUNC(tecmo_state::bgvideoram_w)).share("bgvideoram");
+	map(0xc400, 0xc7ff).ram().w(this, FUNC(tecmo_state::fgvideoram_w)).share("fgvideoram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(tecmo_state::txvideoram_w)).share("txvideoram");
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xe7ff).ram().share("spriteram");
+	map(0xe800, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf000, 0xf7ff).bankr("bank1");
+	map(0xf800, 0xf800).portr("JOY1");
+	map(0xf801, 0xf801).portr("BUTTONS1");
+	map(0xf802, 0xf802).portr("JOY2");
+	map(0xf803, 0xf803).portr("BUTTONS2");
+	map(0xf804, 0xf804).portr("SYS_0");
+	map(0xf805, 0xf805).portr("SYS_1");
+	map(0xf806, 0xf806).r(this, FUNC(tecmo_state::dswa_l_r));
+	map(0xf807, 0xf807).r(this, FUNC(tecmo_state::dswa_h_r));
+	map(0xf808, 0xf808).r(this, FUNC(tecmo_state::dswb_l_r));
+	map(0xf809, 0xf809).r(this, FUNC(tecmo_state::dswb_h_r));
+	map(0xf80f, 0xf80f).portr("SYS_2");
+	map(0xf800, 0xf802).w(this, FUNC(tecmo_state::fgscroll_w));
+	map(0xf803, 0xf805).w(this, FUNC(tecmo_state::bgscroll_w));
+	map(0xf806, 0xf806).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xf807, 0xf807).w(this, FUNC(tecmo_state::flipscreen_w));
+	map(0xf808, 0xf808).w(this, FUNC(tecmo_state::bankswitch_w));
+	map(0xf809, 0xf809).nopw();    /* ? */
+	map(0xf80b, 0xf80b).nopw();    /* ? if mapped to watchdog like in the others, causes reset */
+}
 
-ADDRESS_MAP_START(tecmo_state::rygar_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ymsnd", ym3526_device, write)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_start_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(adpcm_end_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_vol_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-ADDRESS_MAP_END
+void tecmo_state::rygar_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0x8001).w("ymsnd", FUNC(ym3526_device::write));
+	map(0xc000, 0xc000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(this, FUNC(tecmo_state::adpcm_start_w));
+	map(0xd000, 0xd000).w(this, FUNC(tecmo_state::adpcm_end_w));
+	map(0xe000, 0xe000).w(this, FUNC(tecmo_state::adpcm_vol_w));
+	map(0xf000, 0xf000).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
+}
 
-ADDRESS_MAP_START(tecmo_state::tecmo_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x2000, 0x207f) AM_RAM             /* Silkworm set #2 has a custom CPU which */
+void tecmo_state::tecmo_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x2000, 0x207f).ram();             /* Silkworm set #2 has a custom CPU which */
 												/* writes code to this area */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_start_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(adpcm_end_w)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(adpcm_vol_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-ADDRESS_MAP_END
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa001).w("ymsnd", FUNC(ym3812_device::write));
+	map(0xc000, 0xc000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(this, FUNC(tecmo_state::adpcm_start_w));
+	map(0xc400, 0xc400).w(this, FUNC(tecmo_state::adpcm_end_w));
+	map(0xc800, 0xc800).w(this, FUNC(tecmo_state::adpcm_vol_w));
+	map(0xcc00, 0xcc00).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
+}
 
 
 

@@ -31,9 +31,10 @@ DEFINE_DEVICE_TYPE(A2BUS_TRANSWARP, a2bus_transwarp_device, "a2twarp", "Applied 
 
 #define CPU_TAG         "tw65c02"
 
-ADDRESS_MAP_START(a2bus_transwarp_device::m65c02_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dma_r, dma_w)
-ADDRESS_MAP_END
+void a2bus_transwarp_device::m65c02_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(a2bus_transwarp_device::dma_r), FUNC(a2bus_transwarp_device::dma_w));
+}
 
 ROM_START( warprom )
 	ROM_REGION(0x1000, "twrom", 0)

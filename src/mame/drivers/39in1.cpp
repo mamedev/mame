@@ -1454,18 +1454,19 @@ DRIVER_INIT_MEMBER(_39in1_state,39in1)
 
 
 
-ADDRESS_MAP_START(_39in1_state::_39in1_map)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
-	AM_RANGE(0x00400000, 0x005fffff) AM_ROM AM_REGION("data", 0)
-	AM_RANGE(0x04000000, 0x047fffff) AM_READWRITE(cpld_r, cpld_w )
-	AM_RANGE(0x40000000, 0x400002ff) AM_READWRITE(pxa255_dma_r, pxa255_dma_w )
-	AM_RANGE(0x40400000, 0x40400083) AM_READWRITE(pxa255_i2s_r, pxa255_i2s_w )
-	AM_RANGE(0x40a00000, 0x40a0001f) AM_READWRITE(pxa255_ostimer_r, pxa255_ostimer_w )
-	AM_RANGE(0x40d00000, 0x40d00017) AM_READWRITE(pxa255_intc_r, pxa255_intc_w )
-	AM_RANGE(0x40e00000, 0x40e0006b) AM_READWRITE(pxa255_gpio_r, pxa255_gpio_w )
-	AM_RANGE(0x44000000, 0x4400021f) AM_READWRITE(pxa255_lcd_r,  pxa255_lcd_w )
-	AM_RANGE(0xa0000000, 0xa07fffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void _39in1_state::_39in1_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom();
+	map(0x00400000, 0x005fffff).rom().region("data", 0);
+	map(0x04000000, 0x047fffff).rw(this, FUNC(_39in1_state::cpld_r), FUNC(_39in1_state::cpld_w));
+	map(0x40000000, 0x400002ff).rw(this, FUNC(_39in1_state::pxa255_dma_r), FUNC(_39in1_state::pxa255_dma_w));
+	map(0x40400000, 0x40400083).rw(this, FUNC(_39in1_state::pxa255_i2s_r), FUNC(_39in1_state::pxa255_i2s_w));
+	map(0x40a00000, 0x40a0001f).rw(this, FUNC(_39in1_state::pxa255_ostimer_r), FUNC(_39in1_state::pxa255_ostimer_w));
+	map(0x40d00000, 0x40d00017).rw(this, FUNC(_39in1_state::pxa255_intc_r), FUNC(_39in1_state::pxa255_intc_w));
+	map(0x40e00000, 0x40e0006b).rw(this, FUNC(_39in1_state::pxa255_gpio_r), FUNC(_39in1_state::pxa255_gpio_w));
+	map(0x44000000, 0x4400021f).rw(this, FUNC(_39in1_state::pxa255_lcd_r), FUNC(_39in1_state::pxa255_lcd_w));
+	map(0xa0000000, 0xa07fffff).ram().share("ram");
+}
 
 static INPUT_PORTS_START( 39in1 )
 	PORT_START("MCUIPT")

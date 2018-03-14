@@ -137,15 +137,17 @@ DEFINE_DEVICE_TYPE(QS1000, qs1000_device, "qs1000", "QS1000")
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-ADDRESS_MAP_START(qs1000_device::qs1000_prg_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void qs1000_device::qs1000_prg_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
 
-ADDRESS_MAP_START(qs1000_device::qs1000_io_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0200, 0x0211) AM_WRITE(wave_w)
-ADDRESS_MAP_END
+void qs1000_device::qs1000_io_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+	map(0x0200, 0x0211).w(this, FUNC(qs1000_device::wave_w));
+}
 
 
 // ROM definition for the QS1000 internal program ROM

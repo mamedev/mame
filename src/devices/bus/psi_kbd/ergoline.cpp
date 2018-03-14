@@ -22,12 +22,14 @@ DEFINE_DEVICE_TYPE(ERGOLINE_KEYBOARD, ergoline_keyboard_device, "ergoline_kbd", 
 //  address_map - device-specific address maps
 //-------------------------------------------------
 
-ADDRESS_MAP_START(ergoline_keyboard_device::kbd_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("firmware", 0)
-ADDRESS_MAP_END
+void ergoline_keyboard_device::kbd_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("firmware", 0);
+}
 
-ADDRESS_MAP_START(ergoline_keyboard_device::kbd_io)
-ADDRESS_MAP_END
+void ergoline_keyboard_device::kbd_io(address_map &map)
+{
+}
 
 
 //-------------------------------------------------

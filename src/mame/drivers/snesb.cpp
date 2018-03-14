@@ -297,11 +297,12 @@ READ8_MEMBER(snesb_state::snesb_coin_r)
 }
 
 
-ADDRESS_MAP_START(snesb_state::snesb_map)
-	AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(snes_r_bank1, snes_w_bank1)
-	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes_r_bank2, snes_w_bank2)    /* Mirror and ROM */
-ADDRESS_MAP_END
+void snesb_state::snesb_map(address_map &map)
+{
+	map(0x000000, 0x7dffff).rw(this, FUNC(snesb_state::snes_r_bank1), FUNC(snesb_state::snes_w_bank1));
+	map(0x7e0000, 0x7fffff).ram();                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
+	map(0x800000, 0xffffff).rw(this, FUNC(snesb_state::snes_r_bank2), FUNC(snesb_state::snes_w_bank2));    /* Mirror and ROM */
+}
 
 READ8_MEMBER(snesb_state::spc_ram_100_r)
 {
@@ -313,11 +314,12 @@ WRITE8_MEMBER(snesb_state::spc_ram_100_w)
 	m_spc700->spc_ram_w(space, offset + 0x100, data);
 }
 
-ADDRESS_MAP_START(snesb_state::spc_mem)
-	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", snes_sound_device, spc_ram_r, spc_ram_w) /* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", snes_sound_device, spc_io_r, spc_io_w)   /* spc io */
-	AM_RANGE(0x0100, 0xffff) AM_READWRITE(spc_ram_100_r, spc_ram_100_w)
-ADDRESS_MAP_END
+void snesb_state::spc_mem(address_map &map)
+{
+	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
+	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
+	map(0x0100, 0xffff).rw(this, FUNC(snesb_state::spc_ram_100_r), FUNC(snesb_state::spc_ram_100_w));
+}
 
 static INPUT_PORTS_START( snes_common )
 
@@ -721,8 +723,9 @@ MACHINE_CONFIG_START(snesb_state::kinstb)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-ADDRESS_MAP_START(snesb_state::mcu_io_map)
-ADDRESS_MAP_END
+void snesb_state::mcu_io_map(address_map &map)
+{
+}
 
 
 MACHINE_CONFIG_START(snesb_state::mk3snes)

@@ -55,16 +55,18 @@ public:
 };
 
 
-ADDRESS_MAP_START(p112_state::p112_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x07fff) AM_ROM
-	AM_RANGE(0x08000, 0xfffff) AM_RAM
-ADDRESS_MAP_END
+void p112_state::p112_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x07fff).rom();
+	map(0x08000, 0xfffff).ram();
+}
 
-ADDRESS_MAP_START(p112_state::p112_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void p112_state::p112_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( p112 )

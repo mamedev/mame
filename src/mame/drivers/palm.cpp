@@ -165,10 +165,11 @@ PALETTE_INIT_MEMBER(palm_state, palm)
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(palm_state::palm_map)
-	AM_RANGE(0xc00000, 0xe07fff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xfff000, 0xffffff) AM_DEVREADWRITE(MC68328_TAG, mc68328_device, read, write)
-ADDRESS_MAP_END
+void palm_state::palm_map(address_map &map)
+{
+	map(0xc00000, 0xe07fff).rom().region("bios", 0);
+	map(0xfff000, 0xffffff).rw(m_lsi, FUNC(mc68328_device::read), FUNC(mc68328_device::write));
+}
 
 
 /***************************************************************************

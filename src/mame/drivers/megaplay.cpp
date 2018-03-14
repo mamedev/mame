@@ -587,17 +587,18 @@ WRITE8_MEMBER(mplay_state::game_w)
 	logerror("BIOS bank addr = %X\n", m_bios_bank_addr);
 }
 
-ADDRESS_MAP_START(mplay_state::megaplay_bios_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(game_w)
-	AM_RANGE(0x6200, 0x6207) AM_DEVREADWRITE("io1", cxd1095_device, read, write)
-	AM_RANGE(0x6400, 0x6407) AM_DEVREADWRITE("io2", cxd1095_device, read, write)
-	AM_RANGE(0x6600, 0x6600) AM_READWRITE(bios_6600_r, bios_6600_w)
-	AM_RANGE(0x6800, 0x77ff) AM_RAM AM_SHARE("ic3_ram")
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(bank_r, bank_w)
-ADDRESS_MAP_END
+void mplay_state::megaplay_bios_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).ram();
+	map(0x5000, 0x5fff).ram();
+	map(0x6000, 0x6000).w(this, FUNC(mplay_state::game_w));
+	map(0x6200, 0x6207).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
+	map(0x6400, 0x6407).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
+	map(0x6600, 0x6600).rw(this, FUNC(mplay_state::bios_6600_r), FUNC(mplay_state::bios_6600_w));
+	map(0x6800, 0x77ff).ram().share("ic3_ram");
+	map(0x8000, 0xffff).rw(this, FUNC(mplay_state::bank_r), FUNC(mplay_state::bank_w));
+}
 
 
 
@@ -610,14 +611,15 @@ READ8_MEMBER(mplay_state::vdp1_count_r)
 		return m_vdp1->vcount_read(prg, offset);
 }
 
-ADDRESS_MAP_START(mplay_state::megaplay_bios_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_device, write)
+void mplay_state::megaplay_bios_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7f, 0x7f).w("sn2", FUNC(sn76496_device::write));
 
-	AM_RANGE(0x40, 0x41) AM_MIRROR(0x3e) AM_READ(vdp1_count_r)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("vdp1", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("vdp1", sega315_5124_device, register_read, register_write)
-ADDRESS_MAP_END
+	map(0x40, 0x41).mirror(0x3e).r(this, FUNC(mplay_state::vdp1_count_r));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+}
 
 
 uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

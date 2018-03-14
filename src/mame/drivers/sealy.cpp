@@ -70,9 +70,10 @@ uint32_t sealy_state::screen_update_sealy(screen_device &screen, bitmap_rgb32 &b
 }
 
 
-ADDRESS_MAP_START(sealy_state::sealy_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-ADDRESS_MAP_END
+void sealy_state::sealy_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom();
+}
 
 
 static INPUT_PORTS_START( sealy )

@@ -248,45 +248,48 @@ READ8_MEMBER( atomeb_state::dos_r )
     ADDRESS_MAP( atom_mem )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(atom_state::atom_mem)
-	AM_RANGE(0x0000, 0x09ff) AM_RAM
-	AM_RANGE(0x0a00, 0x0a03) AM_MIRROR(0x1f8) AM_DEVICE(I8271_TAG, i8271_device, map)
-	AM_RANGE(0x0a04, 0x0a04) AM_MIRROR(0x1f8) AM_DEVREADWRITE(I8271_TAG, i8271_device, data_r, data_w)
-	AM_RANGE(0x0a05, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x9800, 0x9fff) AM_RAM
+void atom_state::atom_mem(address_map &map)
+{
+	map(0x0000, 0x09ff).ram();
+	map(0x0a00, 0x0a03).mirror(0x1f8).m(m_fdc, FUNC(i8271_device::map));
+	map(0x0a04, 0x0a04).mirror(0x1f8).rw(m_fdc, FUNC(i8271_device::data_r), FUNC(i8271_device::data_w));
+	map(0x0a05, 0x7fff).ram();
+	map(0x8000, 0x97ff).ram().share("video_ram");
+	map(0x9800, 0x9fff).ram();
 //  AM_RANGE(0xa000, 0xafff)        // mapped by the cartslot
-	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
+	map(0xb000, 0xb003).mirror(0x3fc).rw(INS8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 //  AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
 //  AM_RANGE(0xb404, 0xb404) AM_READ_PORT("ECONET")
-	AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
-ADDRESS_MAP_END
+	map(0xb800, 0xb80f).mirror(0x3f0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xc000, 0xffff).rom().region(SY6502_TAG, 0);
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( atomeb_mem )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(atomeb_state::atomeb_mem)
-	AM_IMPORT_FROM(atom_mem)
-	AM_RANGE(0xa000, 0xafff) AM_READ(ext_r)
-	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(eprom_r, eprom_w)
-	AM_RANGE(0xe000, 0xefff) AM_READ(dos_r)
-ADDRESS_MAP_END
+void atomeb_state::atomeb_mem(address_map &map)
+{
+	atom_mem(map);
+	map(0xa000, 0xafff).r(this, FUNC(atomeb_state::ext_r));
+	map(0xbfff, 0xbfff).rw(this, FUNC(atomeb_state::eprom_r), FUNC(atomeb_state::eprom_w));
+	map(0xe000, 0xefff).r(this, FUNC(atomeb_state::dos_r));
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( atombb_mem )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(atom_state::atombb_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x57ff) AM_RAM AM_SHARE("video_ram")
+void atom_state::atombb_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+	map(0x4000, 0x57ff).ram().share("video_ram");
 
-	AM_RANGE(0x7000, 0x7003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
-	AM_RANGE(0x7800, 0x780f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
-	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("basic", 0)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
-ADDRESS_MAP_END
+	map(0x7000, 0x7003).mirror(0x3fc).rw(INS8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7800, 0x780f).mirror(0x3f0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0xbfff).rom().region("basic", 0);
+	map(0xf000, 0xffff).rom().region(SY6502_TAG, 0);
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( prophet_mem )

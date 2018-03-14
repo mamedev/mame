@@ -38,31 +38,33 @@ READ8_MEMBER(dcon_state::sdgndmps_sound_comms_r)
 	return m_seibu_sound->main_r(space, offset);
 }
 
-ADDRESS_MAP_START(dcon_state::dcon_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x80000, 0x8bfff) AM_RAM
+void dcon_state::dcon_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0x80000, 0x8bfff).ram();
 
-	AM_RANGE(0x8c000, 0x8c7ff) AM_RAM_WRITE(background_w) AM_SHARE("back_data")
-	AM_RANGE(0x8c800, 0x8cfff) AM_RAM_WRITE(foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x8d000, 0x8d7ff) AM_RAM_WRITE(midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x8d800, 0x8e7ff) AM_RAM_WRITE(text_w) AM_SHARE("textram")
-	AM_RANGE(0x8e800, 0x8f7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x8f800, 0x8ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9d000, 0x9d7ff) AM_WRITE(gfxbank_w)
+	map(0x8c000, 0x8c7ff).ram().w(this, FUNC(dcon_state::background_w)).share("back_data");
+	map(0x8c800, 0x8cfff).ram().w(this, FUNC(dcon_state::foreground_w)).share("fore_data");
+	map(0x8d000, 0x8d7ff).ram().w(this, FUNC(dcon_state::midground_w)).share("mid_data");
+	map(0x8d800, 0x8e7ff).ram().w(this, FUNC(dcon_state::text_w)).share("textram");
+	map(0x8e800, 0x8f7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x8f800, 0x8ffff).ram().share("spriteram");
+	map(0x9d000, 0x9d7ff).w(this, FUNC(dcon_state::gfxbank_w));
 
-	AM_RANGE(0xa0000, 0xa000d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
-	AM_RANGE(0xc0000, 0xc004f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	AM_RANGE(0xc0080, 0xc0081) AM_WRITENOP
-	AM_RANGE(0xc00c0, 0xc00c1) AM_WRITENOP
-	AM_RANGE(0xe0000, 0xe0001) AM_READ_PORT("DSW")
-	AM_RANGE(0xe0002, 0xe0003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xe0004, 0xe0005) AM_READ_PORT("SYSTEM")
-ADDRESS_MAP_END
+	map(0xa0000, 0xa000d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
+	map(0xc0000, 0xc004f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+	map(0xc0080, 0xc0081).nopw();
+	map(0xc00c0, 0xc00c1).nopw();
+	map(0xe0000, 0xe0001).portr("DSW");
+	map(0xe0002, 0xe0003).portr("P1_P2");
+	map(0xe0004, 0xe0005).portr("SYSTEM");
+}
 
-ADDRESS_MAP_START(dcon_state::sdgndmps_map)
-	AM_IMPORT_FROM(dcon_map)
-	AM_RANGE(0xa0000, 0xa000d) AM_READ8(sdgndmps_sound_comms_r, 0x00ff)
-ADDRESS_MAP_END
+void dcon_state::sdgndmps_map(address_map &map)
+{
+	dcon_map(map);
+	map(0xa0000, 0xa000d).r(this, FUNC(dcon_state::sdgndmps_sound_comms_r)).umask16(0x00ff);
+}
 
 /******************************************************************************/
 

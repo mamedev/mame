@@ -69,17 +69,20 @@ public:
 };
 
 
-	ADDRESS_MAP_START(sart3733_state::sart3733_rom)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("maincpu", 0x0000)
-ADDRESS_MAP_END
+	void sart3733_state::sart3733_rom(address_map &map)
+{
+	map(0x0000, 0x07ff).rom().region("maincpu", 0x0000);
+}
 
-	ADDRESS_MAP_START(sart3733_state::sart3733_memory)
-	AM_RANGE(0x0000, 0x007f) AM_RAM // 2 * 4002
-ADDRESS_MAP_END
+	void sart3733_state::sart3733_memory(address_map &map)
+{
+	map(0x0000, 0x007f).ram(); // 2 * 4002
+}
 
-	ADDRESS_MAP_START(sart3733_state::sart3733_status)
-	AM_RANGE(0x0000, 0x001f) AM_RAM // 2 * 4002
-ADDRESS_MAP_END
+	void sart3733_state::sart3733_status(address_map &map)
+{
+	map(0x0000, 0x001f).ram(); // 2 * 4002
+}
 
 
 MACHINE_CONFIG_START(sart3733_state::sart3733)

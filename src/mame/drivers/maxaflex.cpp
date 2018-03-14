@@ -199,19 +199,20 @@ INPUT_CHANGED_MEMBER(maxaflex_state::coin_inserted)
 
 
 
-ADDRESS_MAP_START(maxaflex_state::a600xl_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION("maincpu", 0xd000)    /* self test */
-	AM_RANGE(0x8000, 0xbfff) AM_ROM /* game cartridge */
-	AM_RANGE(0xc000, 0xcfff) AM_ROM /* OS */
-	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
-	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("antic", antic_device, read, write)
-	AM_RANGE(0xd500, 0xd7ff) AM_NOP
-	AM_RANGE(0xd800, 0xffff) AM_ROM /* OS */
-ADDRESS_MAP_END
+void maxaflex_state::a600xl_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+	map(0x5000, 0x57ff).rom().region("maincpu", 0xd000);    /* self test */
+	map(0x8000, 0xbfff).rom(); /* game cartridge */
+	map(0xc000, 0xcfff).rom(); /* OS */
+	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
+	map(0xd100, 0xd1ff).noprw();
+	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0xd300, 0xd3ff).rw("pia", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
+	map(0xd500, 0xd7ff).noprw();
+	map(0xd800, 0xffff).rom(); /* OS */
+}
 
 
 static INPUT_PORTS_START( a600xl )

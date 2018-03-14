@@ -292,44 +292,45 @@ WRITE16_MEMBER(tecmosys_state::lineram_w)
 	if (data!=0x0000) popmessage("non 0 write to bg%01x lineram %04x %04x",Layer,offset,data);
 }
 
-ADDRESS_MAP_START(tecmosys_state::main_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM // work ram
-	AM_RANGE(0x210000, 0x210001) AM_READNOP // single byte overflow on stack defined as 0x210000
-	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(vram_w<1>) AM_SHARE("vram_1") // bg0 ram
-	AM_RANGE(0x301000, 0x3013ff) AM_RAM_WRITE(lineram_w<0>) AM_SHARE("bg0_lineram")// bg0 linescroll? (guess)
+void tecmosys_state::main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x20ffff).ram(); // work ram
+	map(0x210000, 0x210001).nopr(); // single byte overflow on stack defined as 0x210000
+	map(0x300000, 0x300fff).ram().w(this, FUNC(tecmosys_state::vram_w<1>)).share("vram_1"); // bg0 ram
+	map(0x301000, 0x3013ff).ram().w(this, FUNC(tecmosys_state::lineram_w<0>)).share("bg0_lineram");// bg0 linescroll? (guess)
 
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(vram_w<2>) AM_SHARE("vram_2") // bg1 ram
-	AM_RANGE(0x401000, 0x4013ff) AM_RAM_WRITE(lineram_w<1>) AM_SHARE("bg1_lineram")// bg1 linescroll? (guess)
+	map(0x400000, 0x400fff).ram().w(this, FUNC(tecmosys_state::vram_w<2>)).share("vram_2"); // bg1 ram
+	map(0x401000, 0x4013ff).ram().w(this, FUNC(tecmosys_state::lineram_w<1>)).share("bg1_lineram");// bg1 linescroll? (guess)
 
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(vram_w<3>) AM_SHARE("vram_3") // bg2 ram
-	AM_RANGE(0x501000, 0x5013ff) AM_RAM_WRITE(lineram_w<2>) AM_SHARE("bg2_lineram") // bg2 linescroll? (guess)
+	map(0x500000, 0x500fff).ram().w(this, FUNC(tecmosys_state::vram_w<3>)).share("vram_3"); // bg2 ram
+	map(0x501000, 0x5013ff).ram().w(this, FUNC(tecmosys_state::lineram_w<2>)).share("bg2_lineram"); // bg2 linescroll? (guess)
 
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(vram_w<0>) AM_SHARE("vram_0") // fix ram
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram") // obj ram
-	AM_RANGE(0x880000, 0x88000b) AM_READ(unk880000_r)
-	AM_RANGE(0x880000, 0x88002f) AM_WRITE(unk880000_w) AM_SHARE("880000regs")  // 10 byte dta@88000c, 880022=watchdog?
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // AM_WRITEONLY // obj pal
+	map(0x700000, 0x703fff).ram().w(this, FUNC(tecmosys_state::vram_w<0>)).share("vram_0"); // fix ram
+	map(0x800000, 0x80ffff).ram().share("spriteram"); // obj ram
+	map(0x880000, 0x88000b).r(this, FUNC(tecmosys_state::unk880000_r));
+	map(0x880000, 0x88002f).w(this, FUNC(tecmosys_state::unk880000_w)).share("880000regs");  // 10 byte dta@88000c, 880022=watchdog?
+	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // AM_WRITEONLY // obj pal
 
-	//AM_RANGE(0x980000, 0x9807ff) AM_WRITEONLY // bg pal
-	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // fix pal
+	//map(0x980000, 0x9807ff).writeonly(); // bg pal
+	//map(0x980800, 0x980fff).w(this, FUNC(tecmosys_state::paletteram_xGGGGGRRRRRBBBBB_word_w)).share("paletteram"); // fix pal
 	// the two above are as tested by the game code, I've only rolled them into one below to get colours to show right.
-	AM_RANGE(0x980000, 0x980fff) AM_RAM_WRITE(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("tmap_palette")
+	map(0x980000, 0x980fff).ram().w(this, FUNC(tecmosys_state::tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w)).share("tmap_palette");
 
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(eeprom_w  )
-	AM_RANGE(0xa80000, 0xa80005) AM_WRITEONLY AM_SHARE("scroll_2")    // a80000-3 scroll? a80004 inverted ? 3 : 0
-	AM_RANGE(0xb00000, 0xb00005) AM_WRITEONLY AM_SHARE("scroll_3")    // b00000-3 scroll?, b00004 inverted ? 3 : 0
-	AM_RANGE(0xb80000, 0xb80001) AM_READWRITE(prot_status_r, prot_status_w)
-	AM_RANGE(0xc00000, 0xc00005) AM_WRITEONLY AM_SHARE("scroll_0")    // c00000-3 scroll? c00004 inverted ? 13 : 10
-	AM_RANGE(0xc80000, 0xc80005) AM_WRITEONLY AM_SHARE("scroll_1")    // c80000-3 scroll? c80004 inverted ? 3 : 0
-	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("P1")
-	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("P2")
-	AM_RANGE(0xd80000, 0xd80001) AM_READ(eeprom_r)
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(prot_data_w)
-	AM_RANGE(0xf00000, 0xf00001) AM_READ8(sound_command_pending_r, 0x00ff)
-	AM_RANGE(0xf80000, 0xf80001) AM_READ(prot_data_r)
-ADDRESS_MAP_END
+	map(0xa00000, 0xa00001).w(this, FUNC(tecmosys_state::eeprom_w));
+	map(0xa80000, 0xa80005).writeonly().share("scroll_2");    // a80000-3 scroll? a80004 inverted ? 3 : 0
+	map(0xb00000, 0xb00005).writeonly().share("scroll_3");    // b00000-3 scrool?, b00004 inverted ? 3 : 0
+	map(0xb80000, 0xb80001).rw(this, FUNC(tecmosys_state::prot_status_r), FUNC(tecmosys_state::prot_status_w));
+	map(0xc00000, 0xc00005).writeonly().share("scroll_0");    // c00000-3 scroll? c00004 inverted ? 13 : 10
+	map(0xc80000, 0xc80005).writeonly().share("scroll_1");    // c80000-3 scrool? c80004 inverted ? 3 : 0
+	map(0xd00000, 0xd00001).portr("P1");
+	map(0xd00002, 0xd00003).portr("P2");
+	map(0xd80000, 0xd80001).r(this, FUNC(tecmosys_state::eeprom_r));
+	map(0xe00001, 0xe00001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xe80000, 0xe80001).w(this, FUNC(tecmosys_state::prot_data_w));
+	map(0xf00001, 0xf00001).r(this, FUNC(tecmosys_state::sound_command_pending_r));
+	map(0xf80000, 0xf80001).r(this, FUNC(tecmosys_state::prot_data_r));
+}
 
 
 WRITE8_MEMBER(tecmosys_state::z80_bank_w)
@@ -343,28 +344,31 @@ WRITE8_MEMBER(tecmosys_state::oki_bank_w)
 	m_okibank[1]->set_entry((data & 0x30) >> 4);
 }
 
-ADDRESS_MAP_START(tecmosys_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audiobank")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM
-ADDRESS_MAP_END
 
-ADDRESS_MAP_START(tecmosys_state::oki_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("okibank1")
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank2")
-ADDRESS_MAP_END
+void tecmosys_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0xe000, 0xf7ff).ram();
+}
 
-ADDRESS_MAP_START(tecmosys_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymf", ymf262_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_WRITE(oki_bank_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(z80_bank_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x50, 0x50) AM_WRITE(sound_nmi_disable_w)
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
-ADDRESS_MAP_END
+void tecmosys_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).bankr("okibank1");
+	map(0x20000, 0x3ffff).bankr("okibank2");
+}
 
+void tecmosys_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ymf", FUNC(ymf262_device::read), FUNC(ymf262_device::write));
+	map(0x10, 0x10).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x20, 0x20).w(this, FUNC(tecmosys_state::oki_bank_w));
+	map(0x30, 0x30).w(this, FUNC(tecmosys_state::z80_bank_w));
+	map(0x40, 0x40).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x50, 0x50).w(this, FUNC(tecmosys_state::sound_nmi_disable_w));
+	map(0x60, 0x61).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+}
 
 
 static INPUT_PORTS_START( tecmosys )

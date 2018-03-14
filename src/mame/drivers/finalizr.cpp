@@ -104,41 +104,44 @@ WRITE8_MEMBER(finalizr_state::i8039_T0_w)
 	*/
 }
 
-ADDRESS_MAP_START(finalizr_state::main_map)
-	AM_RANGE(0x0001, 0x0001) AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0x0003, 0x0003) AM_WRITE(finalizr_videoctrl_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(finalizr_flipscreen_w)
+void finalizr_state::main_map(address_map &map)
+{
+	map(0x0001, 0x0001).writeonly().share("scroll");
+	map(0x0003, 0x0003).w(this, FUNC(finalizr_state::finalizr_videoctrl_w));
+	map(0x0004, 0x0004).w(this, FUNC(finalizr_state::finalizr_flipscreen_w));
 //  AM_RANGE(0x0020, 0x003f) AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0808, 0x0808) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0810, 0x0810) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0811, 0x0811) AM_READ_PORT("P1")
-	AM_RANGE(0x0812, 0x0812) AM_READ_PORT("P2")
-	AM_RANGE(0x0813, 0x0813) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0818, 0x0818) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x0819, 0x0819) AM_WRITE(finalizr_coin_w)
-	AM_RANGE(0x081a, 0x081a) AM_DEVWRITE("snsnd", sn76489a_device, write)   /* This address triggers the SN chip to read the data port. */
-	AM_RANGE(0x081b, 0x081b) AM_WRITENOP        /* Loads the snd command into the snd latch */
-	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w) /* custom sound chip */
-	AM_RANGE(0x081d, 0x081d) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* custom sound chip */
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("colorram2")
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3200, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("spriteram_2")
-	AM_RANGE(0x3a00, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x0800, 0x0800).portr("DSW3");
+	map(0x0808, 0x0808).portr("DSW2");
+	map(0x0810, 0x0810).portr("SYSTEM");
+	map(0x0811, 0x0811).portr("P1");
+	map(0x0812, 0x0812).portr("P2");
+	map(0x0813, 0x0813).portr("DSW1");
+	map(0x0818, 0x0818).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x0819, 0x0819).w(this, FUNC(finalizr_state::finalizr_coin_w));
+	map(0x081a, 0x081a).w("snsnd", FUNC(sn76489a_device::write));   /* This address triggers the SN chip to read the data port. */
+	map(0x081b, 0x081b).nopw();        /* Loads the snd command into the snd latch */
+	map(0x081c, 0x081c).w(this, FUNC(finalizr_state::finalizr_i8039_irq_w)); /* custom sound chip */
+	map(0x081d, 0x081d).w("soundlatch", FUNC(generic_latch_8_device::write)); /* custom sound chip */
+	map(0x2000, 0x23ff).ram().share("colorram");
+	map(0x2400, 0x27ff).ram().share("videoram");
+	map(0x2800, 0x2bff).ram().share("colorram2");
+	map(0x2c00, 0x2fff).ram().share("videoram2");
+	map(0x3000, 0x31ff).ram().share("spriteram");
+	map(0x3200, 0x37ff).ram();
+	map(0x3800, 0x39ff).ram().share("spriteram_2");
+	map(0x3a00, 0x3fff).ram();
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(finalizr_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void finalizr_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(finalizr_state::sound_io_map)
-	AM_RANGE(0x00, 0xff)                   AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void finalizr_state::sound_io_map(address_map &map)
+{
+	map(0x00, 0xff).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( finalizr )

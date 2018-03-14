@@ -65,23 +65,25 @@ static DEVICE_INPUT_DEFAULTS_START(altos8600_terminal)
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-ADDRESS_MAP_START(acs8600_ics_device::ics_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("icscpu", 0)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(hostram_r, hostram_w)
-ADDRESS_MAP_END
+void acs8600_ics_device::ics_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("icscpu", 0);
+	map(0x1000, 0x17ff).ram();
+	map(0x8000, 0xffff).rw(this, FUNC(acs8600_ics_device::hostram_r), FUNC(acs8600_ics_device::hostram_w));
+}
 
-ADDRESS_MAP_START(acs8600_ics_device::ics_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("sio1", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("sio2", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("sio3", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("sio4", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("stc1", am9513_device, read8, write8)
-	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE("stc2", am9513_device, read8, write8)
-	AM_RANGE(0x18, 0x18) AM_WRITE(ctrl_w)
-	AM_RANGE(0x1c, 0x1c) AM_WRITE(hiaddr_w)
-ADDRESS_MAP_END
+void acs8600_ics_device::ics_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x04, 0x07).rw("sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x08, 0x0b).rw("sio3", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x0c, 0x0f).rw("sio4", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x10, 0x11).rw("stc1", FUNC(am9513_device::read8), FUNC(am9513_device::write8));
+	map(0x14, 0x15).rw("stc2", FUNC(am9513_device::read8), FUNC(am9513_device::write8));
+	map(0x18, 0x18).w(this, FUNC(acs8600_ics_device::ctrl_w));
+	map(0x1c, 0x1c).w(this, FUNC(acs8600_ics_device::hiaddr_w));
+}
 
 static const z80_daisy_config ics_daisy_chain[] =
 {

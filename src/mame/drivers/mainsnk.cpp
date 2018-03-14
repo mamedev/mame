@@ -126,36 +126,39 @@ READ8_MEMBER(mainsnk_state::sound_ack_r)
 
 
 
-ADDRESS_MAP_START(mainsnk_state::main_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
-	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
-	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
-	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3")
-	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc600, 0xc600) AM_WRITE(c600_w)
-	AM_RANGE(0xc700, 0xc700) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0xdc00, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")    // + work RAM
-ADDRESS_MAP_END
+void mainsnk_state::main_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc000).portr("IN0");
+	map(0xc100, 0xc100).portr("IN1");
+	map(0xc200, 0xc200).portr("IN2");
+	map(0xc300, 0xc300).portr("IN3");
+	map(0xc400, 0xc400).portr("DSW1");
+	map(0xc500, 0xc500).portr("DSW2");
+	map(0xc600, 0xc600).w(this, FUNC(mainsnk_state::c600_w));
+	map(0xc700, 0xc700).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xd800, 0xdbff).ram().w(this, FUNC(mainsnk_state::bgram_w)).share("bgram");
+	map(0xdc00, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().share("spriteram");
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(mainsnk_state::fgram_w)).share("fgram");    // + work RAM
+}
 
-ADDRESS_MAP_START(mainsnk_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, acknowledge_r)
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0xe002, 0xe003) AM_WRITENOP    // ? always FFFF, snkwave leftover?
-	AM_RANGE(0xe008, 0xe009) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void mainsnk_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_r));
+	map(0xe000, 0xe001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0xe002, 0xe003).nopw();    // ? always FFFF, snkwave leftover?
+	map(0xe008, 0xe009).w("ay2", FUNC(ay8910_device::address_data_w));
+}
 
-ADDRESS_MAP_START(mainsnk_state::sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sound_ack_r)
-ADDRESS_MAP_END
+void mainsnk_state::sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(mainsnk_state::sound_ack_r));
+}
 
 
 

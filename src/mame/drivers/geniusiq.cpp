@@ -415,30 +415,31 @@ INPUT_CHANGED_MEMBER( geniusiq_state::send_input )
 }
 
 
-ADDRESS_MAP_START(geniusiq_state::geniusiq_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1FFFFF) AM_ROM
-	AM_RANGE(0x200000, 0x23FFFF) AM_RAM
-	AM_RANGE(0x300000, 0x30FFFF) AM_RAM     AM_SHARE("vram")
-	AM_RANGE(0x310000, 0x31FFFF) AM_RAM
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_DEVREADWRITE8("flash", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x600300, 0x600301) AM_READ(input_r)
+void geniusiq_state::geniusiq_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1FFFFF).rom();
+	map(0x200000, 0x23FFFF).ram();
+	map(0x300000, 0x30FFFF).ram().share("vram");
+	map(0x310000, 0x31FFFF).ram();
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw("flash", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x600300, 0x600301).r(this, FUNC(geniusiq_state::input_r));
 	//AM_RANGE(0x600500, 0x60050f)                      // read during IRQ 5
 	//AM_RANGE(0x600600, 0x600605)                      // sound ??
-	AM_RANGE(0x600606, 0x600609) AM_WRITE(gfx_base_w)
-	AM_RANGE(0x60060a, 0x60060b) AM_WRITE(gfx_idx_w)
-	AM_RANGE(0x600802, 0x600803) AM_READ(cart_state_r)  // cartridge state
-	AM_RANGE(0x600108, 0x600109) AM_READ(unk0_r)        // read before run a BASIC program
-	AM_RANGE(0x600918, 0x600919) AM_READ(unk0_r)        // loop at start if bit 0 is set
-	AM_RANGE(0x601008, 0x601009) AM_READ(unk_r)         // unknown, read at start and expect that bit 2 changes several times before continue
-	AM_RANGE(0x601010, 0x601011) AM_READ(unk0_r)        // loop at start if bit 1 is set
-	AM_RANGE(0x601018, 0x60101b) AM_WRITE(gfx_dest_w)
-	AM_RANGE(0x60101c, 0x60101f) AM_WRITE(gfx_color_w)
-	AM_RANGE(0x601060, 0x601063) AM_WRITE(mouse_pos_w)
-	AM_RANGE(0x601100, 0x6011ff) AM_RAM     AM_SHARE("mouse_gfx")   // mouse cursor gfx (24x16)
-	AM_RANGE(0xa00000, 0xafffff) AM_DEVREAD("cartslot", generic_slot_device, read16_rom)
+	map(0x600606, 0x600609).w(this, FUNC(geniusiq_state::gfx_base_w));
+	map(0x60060a, 0x60060b).w(this, FUNC(geniusiq_state::gfx_idx_w));
+	map(0x600802, 0x600803).r(this, FUNC(geniusiq_state::cart_state_r));  // cartridge state
+	map(0x600108, 0x600109).r(this, FUNC(geniusiq_state::unk0_r));        // read before run a BASIC program
+	map(0x600918, 0x600919).r(this, FUNC(geniusiq_state::unk0_r));        // loop at start if bit 0 is set
+	map(0x601008, 0x601009).r(this, FUNC(geniusiq_state::unk_r));         // unknown, read at start and expect that bit 2 changes several times before continue
+	map(0x601010, 0x601011).r(this, FUNC(geniusiq_state::unk0_r));        // loop at start if bit 1 is set
+	map(0x601018, 0x60101b).w(this, FUNC(geniusiq_state::gfx_dest_w));
+	map(0x60101c, 0x60101f).w(this, FUNC(geniusiq_state::gfx_color_w));
+	map(0x601060, 0x601063).w(this, FUNC(geniusiq_state::mouse_pos_w));
+	map(0x601100, 0x6011ff).ram().share("mouse_gfx");   // mouse cursor gfx (24x16)
+	map(0xa00000, 0xafffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
 	// 0x600000 : some memory mapped hardware
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( geniusiq )

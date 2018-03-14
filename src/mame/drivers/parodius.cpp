@@ -92,43 +92,47 @@ WRITE8_MEMBER(parodius_state::sound_arm_nmi_w)
 
 /********************************************/
 
-ADDRESS_MAP_START(parodius_state::parodius_map)
-	AM_RANGE(0x0000, 0x07ff) AM_DEVICE("bank0000", address_map_bank_device, amap8)
-	AM_RANGE(0x0800, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
-	AM_RANGE(0x2000, 0x27ff) AM_DEVICE("bank2000", address_map_bank_device, amap8)
-	AM_RANGE(0x3f8c, 0x3f8c) AM_READ_PORT("P1")
-	AM_RANGE(0x3f8d, 0x3f8d) AM_READ_PORT("P2")
-	AM_RANGE(0x3f8e, 0x3f8e) AM_READ_PORT("DSW3")
-	AM_RANGE(0x3f8f, 0x3f8f) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3f90, 0x3f90) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3fa0, 0x3faf) AM_DEVREADWRITE("k053245", k05324x_device, k053244_r, k053244_w)
-	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE("k053251", k053251_device, write)
-	AM_RANGE(0x3fc0, 0x3fc0) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(parodius_3fc0_w)
-	AM_RANGE(0x3fc4, 0x3fc4) AM_WRITE(parodius_videobank_w)
-	AM_RANGE(0x3fc8, 0x3fc8) AM_WRITE(parodius_sh_irqtrigger_w)
-	AM_RANGE(0x3fcc, 0x3fcd) AM_DEVREADWRITE("k053260", k053260_device, main_read, main_write)
-	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")            /* banked ROM */
-	AM_RANGE(0xa000, 0xffff) AM_ROM AM_REGION("maincpu", 0x3a000)
-ADDRESS_MAP_END
+void parodius_state::parodius_map(address_map &map)
+{
+	map(0x0000, 0x07ff).m(m_bank0000, FUNC(address_map_bank_device::amap8));
+	map(0x0800, 0x1fff).ram();
+	map(0x2000, 0x5fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
+	map(0x2000, 0x27ff).m(m_bank2000, FUNC(address_map_bank_device::amap8));
+	map(0x3f8c, 0x3f8c).portr("P1");
+	map(0x3f8d, 0x3f8d).portr("P2");
+	map(0x3f8e, 0x3f8e).portr("DSW3");
+	map(0x3f8f, 0x3f8f).portr("DSW1");
+	map(0x3f90, 0x3f90).portr("DSW2");
+	map(0x3fa0, 0x3faf).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
+	map(0x3fb0, 0x3fbf).w(m_k053251, FUNC(k053251_device::write));
+	map(0x3fc0, 0x3fc0).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(parodius_state::parodius_3fc0_w));
+	map(0x3fc4, 0x3fc4).w(this, FUNC(parodius_state::parodius_videobank_w));
+	map(0x3fc8, 0x3fc8).w(this, FUNC(parodius_state::parodius_sh_irqtrigger_w));
+	map(0x3fcc, 0x3fcd).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
+	map(0x6000, 0x9fff).bankr("bank1");            /* banked ROM */
+	map(0xa000, 0xffff).rom().region("maincpu", 0x3a000);
+}
 
-ADDRESS_MAP_START(parodius_state::bank0000_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void parodius_state::bank0000_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x1000, 0x1fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(parodius_state::bank2000_map)
-	AM_RANGE(0x0000, 0x07ff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
-	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("k053245", k05324x_device, k053245_r, k053245_w)
-ADDRESS_MAP_END
+void parodius_state::bank2000_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
+	map(0x0800, 0x0fff).rw(m_k053245, FUNC(k05324x_device::k053245_r), FUNC(k05324x_device::k053245_w));
+}
 
-ADDRESS_MAP_START(parodius_state::parodius_sound_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
-ADDRESS_MAP_END
+void parodius_state::parodius_sound_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xfa00, 0xfa00).w(this, FUNC(parodius_state::sound_arm_nmi_w));
+	map(0xfc00, 0xfc2f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
+}
 
 /***************************************************************************
 

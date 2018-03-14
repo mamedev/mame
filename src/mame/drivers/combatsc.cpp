@@ -346,56 +346,59 @@ READ8_MEMBER(combatsc_state::unk_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(combatsc_state::combatsc_map)
-	AM_RANGE(0x0000, 0x0007) AM_WRITE(combatsc_pf_control_w)
-	AM_RANGE(0x001f, 0x001f) AM_READ(unk_r)
-	AM_RANGE(0x0020, 0x005f) AM_READWRITE(combatsc_scrollram_r, combatsc_scrollram_w)
+void combatsc_state::combatsc_map(address_map &map)
+{
+	map(0x0000, 0x0007).w(this, FUNC(combatsc_state::combatsc_pf_control_w));
+	map(0x001f, 0x001f).r(this, FUNC(combatsc_state::unk_r));
+	map(0x0020, 0x005f).rw(this, FUNC(combatsc_state::combatsc_scrollram_r), FUNC(combatsc_state::combatsc_scrollram_w));
 //  AM_RANGE(0x0060, 0x00ff) AM_WRITEONLY                 /* RAM */
 
-	AM_RANGE(0x0200, 0x0201) AM_READWRITE(protection_r, protection_w)
-	AM_RANGE(0x0206, 0x0206) AM_WRITE(protection_clock_w)
+	map(0x0200, 0x0201).rw(this, FUNC(combatsc_state::protection_r), FUNC(combatsc_state::protection_w));
+	map(0x0206, 0x0206).w(this, FUNC(combatsc_state::protection_clock_w));
 
-	AM_RANGE(0x0400, 0x0400) AM_READ_PORT("IN0")
-	AM_RANGE(0x0401, 0x0401) AM_READ_PORT("DSW3")           /* DSW #3 */
-	AM_RANGE(0x0402, 0x0402) AM_READ_PORT("DSW1")           /* DSW #1 */
-	AM_RANGE(0x0403, 0x0403) AM_READ_PORT("DSW2")           /* DSW #2 */
-	AM_RANGE(0x0404, 0x0407) AM_READ(trackball_r)           /* 1P & 2P controls / trackball */
-	AM_RANGE(0x0408, 0x0408) AM_WRITE(combatsc_coin_counter_w)  /* coin counters */
-	AM_RANGE(0x040c, 0x040c) AM_WRITE(combatsc_vreg_w)
-	AM_RANGE(0x0410, 0x0410) AM_READNOP AM_WRITE(combatsc_bankselect_w) // read is clr a (discarded)
-	AM_RANGE(0x0414, 0x0414) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x0418, 0x0418) AM_WRITE(combatsc_sh_irqtrigger_w)
-	AM_RANGE(0x041c, 0x041c) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* watchdog reset? */
+	map(0x0400, 0x0400).portr("IN0");
+	map(0x0401, 0x0401).portr("DSW3");           /* DSW #3 */
+	map(0x0402, 0x0402).portr("DSW1");           /* DSW #1 */
+	map(0x0403, 0x0403).portr("DSW2");           /* DSW #2 */
+	map(0x0404, 0x0407).r(this, FUNC(combatsc_state::trackball_r));           /* 1P & 2P controls / trackball */
+	map(0x0408, 0x0408).w(this, FUNC(combatsc_state::combatsc_coin_counter_w));  /* coin counters */
+	map(0x040c, 0x040c).w(this, FUNC(combatsc_state::combatsc_vreg_w));
+	map(0x0410, 0x0410).nopr().w(this, FUNC(combatsc_state::combatsc_bankselect_w)); // read is clr a (discarded)
+	map(0x0414, 0x0414).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x0418, 0x0418).w(this, FUNC(combatsc_state::combatsc_sh_irqtrigger_w));
+	map(0x041c, 0x041c).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* watchdog reset? */
 
-	AM_RANGE(0x0600, 0x06ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
-	AM_RANGE(0x0800, 0x1fff) AM_RAM                             /* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(combatsc_video_r, combatsc_video_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                        /* banked ROM area */
-	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* ROM */
-ADDRESS_MAP_END
+	map(0x0600, 0x06ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
+	map(0x0800, 0x1fff).ram();                             /* RAM */
+	map(0x2000, 0x3fff).rw(this, FUNC(combatsc_state::combatsc_video_r), FUNC(combatsc_state::combatsc_video_w));
+	map(0x4000, 0x7fff).bankr("bank1");                        /* banked ROM area */
+	map(0x8000, 0xffff).rom();                             /* ROM */
+}
 
-ADDRESS_MAP_START(combatsc_state::combatscb_map)
-	AM_RANGE(0x0000, 0x04ff) AM_RAM
-	AM_RANGE(0x0500, 0x0500) AM_WRITE(combatscb_bankselect_w)
-	AM_RANGE(0x0600, 0x06ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
-	AM_RANGE(0x0800, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(combatsc_video_r, combatsc_video_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                        /* banked ROM/RAM area */
-	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* ROM */
-ADDRESS_MAP_END
+void combatsc_state::combatscb_map(address_map &map)
+{
+	map(0x0000, 0x04ff).ram();
+	map(0x0500, 0x0500).w(this, FUNC(combatsc_state::combatscb_bankselect_w));
+	map(0x0600, 0x06ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
+	map(0x0800, 0x1fff).ram();
+	map(0x2000, 0x3fff).rw(this, FUNC(combatsc_state::combatsc_video_r), FUNC(combatsc_state::combatsc_video_w));
+	map(0x4000, 0x7fff).bankr("bank1");                        /* banked ROM/RAM area */
+	map(0x8000, 0xffff).rom();                             /* ROM */
+}
 
-ADDRESS_MAP_START(combatsc_state::combatsc_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                                             /* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM                                             /* RAM */
+void combatsc_state::combatsc_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                                             /* ROM */
+	map(0x8000, 0x87ff).ram();                                             /* RAM */
 
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(combatsc_play_w)                  /* upd7759 play voice */
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("upd", upd7759_device, port_w)                  /* upd7759 voice select */
-	AM_RANGE(0xb000, 0xb000) AM_READ(combatsc_busy_r)                   /* upd7759 busy? */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(combatsc_voice_reset_w)           /* upd7759 reset? */
+	map(0x9000, 0x9000).w(this, FUNC(combatsc_state::combatsc_play_w));                  /* upd7759 play voice */
+	map(0xa000, 0xa000).w(m_upd7759, FUNC(upd7759_device::port_w));                  /* upd7759 voice select */
+	map(0xb000, 0xb000).r(this, FUNC(combatsc_state::combatsc_busy_r));                   /* upd7759 busy? */
+	map(0xc000, 0xc000).w(this, FUNC(combatsc_state::combatsc_voice_reset_w));           /* upd7759 reset? */
 
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) /* soundlatch read? */
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)   /* YM 2203 intercepted */
-ADDRESS_MAP_END
+	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read)); /* soundlatch read? */
+	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));   /* YM 2203 intercepted */
+}
 
 WRITE8_MEMBER(combatsc_state::combatscb_msm_w)
 {
@@ -410,16 +413,17 @@ WRITE8_MEMBER(combatsc_state::combatscb_sound_irq_ack)
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(combatsc_state::combatscb_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                                     /* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM                                     /* RAM */
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)   /* YM 2203 */
-	AM_RANGE(0x9008, 0x9009) AM_DEVREAD("ymsnd", ym2203_device, read)               /* ??? */
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(combatscb_msm_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) /* soundlatch read? */
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(combatscb_sound_irq_ack)
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bl_abank")
-ADDRESS_MAP_END
+void combatsc_state::combatscb_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                                     /* ROM */
+	map(0x8000, 0x87ff).ram();                                     /* RAM */
+	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));   /* YM 2203 */
+	map(0x9008, 0x9009).r("ymsnd", FUNC(ym2203_device::read));               /* ??? */
+	map(0x9800, 0x9800).w(this, FUNC(combatsc_state::combatscb_msm_w));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read)); /* soundlatch read? */
+	map(0xa800, 0xa800).w(this, FUNC(combatsc_state::combatscb_sound_irq_ack));
+	map(0xc000, 0xffff).bankr("bl_abank");
+}
 
 /*************************************
  *

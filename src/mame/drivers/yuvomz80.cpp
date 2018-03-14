@@ -59,33 +59,38 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(yuvomz80_state::mem_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-ADDRESS_MAP_END
+void yuvomz80_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("maincpu", 0);
+	map(0x8000, 0x87ff).ram();
+}
 
-ADDRESS_MAP_START(yuvomz80_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi0", i8255_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi3", i8255_device, read, write)
-ADDRESS_MAP_END
+void yuvomz80_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x04, 0x07).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x0b).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0c, 0x0f).rw("ppi3", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(yuvomz80_state::audio_mem_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("audiocpu", 0)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-ADDRESS_MAP_END
+void yuvomz80_state::audio_mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
+	map(0x8000, 0x87ff).ram();
+}
 
-ADDRESS_MAP_START(yuvomz80_state::audio_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
-ADDRESS_MAP_END
+void yuvomz80_state::audio_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+}
 
-ADDRESS_MAP_START(yuvomz80_state::hexapres_audio_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-ADDRESS_MAP_END
+void yuvomz80_state::hexapres_audio_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+}
 
 static INPUT_PORTS_START( goldhexa )
 INPUT_PORTS_END

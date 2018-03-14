@@ -161,21 +161,23 @@ WRITE16_MEMBER(pdp11_state::teletype_ctrl_w)
 	}
 }
 
-ADDRESS_MAP_START(pdp11_state::pdp11_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xdfff ) AM_RAM  // RAM
-	AM_RANGE( 0xea00, 0xfeff ) AM_ROM
-	AM_RANGE( 0xff70, 0xff77 ) AM_READWRITE(teletype_ctrl_r,teletype_ctrl_w)
+void pdp11_state::pdp11_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xdfff).ram();  // RAM
+	map(0xea00, 0xfeff).rom();
+	map(0xff70, 0xff77).rw(this, FUNC(pdp11_state::teletype_ctrl_r), FUNC(pdp11_state::teletype_ctrl_w));
 
-	AM_RANGE( 0xfe78, 0xfe7b ) AM_DEVWRITE("rx01", rx01_device, write)
-ADDRESS_MAP_END
+	map(0xfe78, 0xfe7b).w("rx01", FUNC(rx01_device::write));
+}
 
-ADDRESS_MAP_START(pdp11_state::pdp11qb_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xe9ff ) AM_RAM  // RAM
-	AM_RANGE( 0xea00, 0xefff ) AM_ROM
-	AM_RANGE( 0xf000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void pdp11_state::pdp11qb_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xe9ff).ram();  // RAM
+	map(0xea00, 0xefff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
 #define M9312_PORT_CONFSETTING \
 PORT_CONFSETTING ( 0x00, "'DL' BOOT prom for RL11 controller") \

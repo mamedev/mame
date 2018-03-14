@@ -60,31 +60,33 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_soundcontrol_w)
 
 
 
-ADDRESS_MAP_START(dogfgt_state::main_map)
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")
-	AM_RANGE(0x0f80, 0x0fdf) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x1000, 0x17ff) AM_WRITE(dogfgt_bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(dogfgt_1800_w)    /* text color, flip screen & coin counters */
-	AM_RANGE(0x1810, 0x1810) AM_READ_PORT("P2")
-	AM_RANGE(0x1810, 0x1810) AM_WRITE(subirqtrigger_w)
-	AM_RANGE(0x1820, 0x1820) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1820, 0x1823) AM_WRITE(dogfgt_scroll_w)
-	AM_RANGE(0x1824, 0x1824) AM_WRITE(dogfgt_plane_select_w)
-	AM_RANGE(0x1830, 0x1830) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1830, 0x1830) AM_WRITE(dogfgt_soundlatch_w)
-	AM_RANGE(0x1840, 0x1840) AM_WRITE(dogfgt_soundcontrol_w)
-	AM_RANGE(0x1870, 0x187f) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(dogfgt_bitmapram_r, dogfgt_bitmapram_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dogfgt_state::main_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rw(this, FUNC(dogfgt_state::sharedram_r), FUNC(dogfgt_state::sharedram_w)).share("sharedram");
+	map(0x0f80, 0x0fdf).writeonly().share("spriteram");
+	map(0x1000, 0x17ff).w(this, FUNC(dogfgt_state::dogfgt_bgvideoram_w)).share("bgvideoram");
+	map(0x1800, 0x1800).portr("P1");
+	map(0x1800, 0x1800).w(this, FUNC(dogfgt_state::dogfgt_1800_w));    /* text color, flip screen & coin counters */
+	map(0x1810, 0x1810).portr("P2");
+	map(0x1810, 0x1810).w(this, FUNC(dogfgt_state::subirqtrigger_w));
+	map(0x1820, 0x1820).portr("DSW1");
+	map(0x1820, 0x1823).w(this, FUNC(dogfgt_state::dogfgt_scroll_w));
+	map(0x1824, 0x1824).w(this, FUNC(dogfgt_state::dogfgt_plane_select_w));
+	map(0x1830, 0x1830).portr("DSW2");
+	map(0x1830, 0x1830).w(this, FUNC(dogfgt_state::dogfgt_soundlatch_w));
+	map(0x1840, 0x1840).w(this, FUNC(dogfgt_state::dogfgt_soundcontrol_w));
+	map(0x1870, 0x187f).w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x2000, 0x3fff).rw(this, FUNC(dogfgt_state::dogfgt_bitmapram_r), FUNC(dogfgt_state::dogfgt_bitmapram_w));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(dogfgt_state::sub_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(sharedram_r, sharedram_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_irqack_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dogfgt_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x2000, 0x27ff).rw(this, FUNC(dogfgt_state::sharedram_r), FUNC(dogfgt_state::sharedram_w));
+	map(0x4000, 0x4000).w(this, FUNC(dogfgt_state::sub_irqack_w));
+	map(0x8000, 0xffff).rom();
+}
 
 
 

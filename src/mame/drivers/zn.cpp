@@ -357,22 +357,23 @@ WRITE8_MEMBER(zn_state::coin_w)
 	}
 }
 
-ADDRESS_MAP_START(zn_state::zn_map)
-	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
-	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
-	AM_RANGE(0x1fa00200, 0x1fa00203) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x1fa00300, 0x1fa00303) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1fa10000, 0x1fa10003) AM_READ_PORT("P3")
-	AM_RANGE(0x1fa10100, 0x1fa10103) AM_READ_PORT("P4")
-	AM_RANGE(0x1fa10200, 0x1fa10203) AM_READ8(boardconfig_r, 0x000000ff)
-	AM_RANGE(0x1fa10300, 0x1fa10303) AM_READWRITE8(znsecsel_r, znsecsel_w, 0x000000ff)
-	AM_RANGE(0x1fa20000, 0x1fa20003) AM_WRITE8(coin_w, 0x000000ff)
-	AM_RANGE(0x1fa30000, 0x1fa30003) AM_NOP /* ?? */
-	AM_RANGE(0x1fa40000, 0x1fa40003) AM_READNOP /* ?? */
-	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READNOP /* ?? */
-	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xffffffff) /* eeprom */
-	AM_RANGE(0x1fb20000, 0x1fb20007) AM_READ16(unknown_r, 0xffffffff)
-ADDRESS_MAP_END
+void zn_state::zn_map(address_map &map)
+{
+	map(0x1fa00000, 0x1fa00003).portr("P1");
+	map(0x1fa00100, 0x1fa00103).portr("P2");
+	map(0x1fa00200, 0x1fa00203).portr("SERVICE");
+	map(0x1fa00300, 0x1fa00303).portr("SYSTEM");
+	map(0x1fa10000, 0x1fa10003).portr("P3");
+	map(0x1fa10100, 0x1fa10103).portr("P4");
+	map(0x1fa10200, 0x1fa10200).r(this, FUNC(zn_state::boardconfig_r));
+	map(0x1fa10300, 0x1fa10300).rw(this, FUNC(zn_state::znsecsel_r), FUNC(zn_state::znsecsel_w));
+	map(0x1fa20000, 0x1fa20000).w(this, FUNC(zn_state::coin_w));
+	map(0x1fa30000, 0x1fa30003).noprw(); /* ?? */
+	map(0x1fa40000, 0x1fa40003).nopr(); /* ?? */
+	map(0x1fa60000, 0x1fa60003).nopr(); /* ?? */
+	map(0x1faf0000, 0x1faf07ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)); /* eeprom */
+	map(0x1fb20000, 0x1fb20007).r(this, FUNC(zn_state::unknown_r));
+}
 
 MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 
@@ -597,17 +598,18 @@ INTERRUPT_GEN_MEMBER(zn_state::qsound_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-ADDRESS_MAP_START(zn_state::coh1000c_map)
-	AM_IMPORT_FROM(zn_map)
+void zn_state::coh1000c_map(address_map &map)
+{
+	zn_map(map);
 
-	AM_RANGE(0x1f000000, 0x1f3fffff) AM_ROM AM_REGION("bankedroms", 0)
-	AM_RANGE(0x1f400000, 0x1f7fffff) AM_ROMBANK("rombank1")
-	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(bank_coh1000c_w, 0x000000ff)
-	AM_RANGE(0x1fb40010, 0x1fb40013) AM_READ16(capcom_kickharness_r, 0x0000ffff)
-	AM_RANGE(0x1fb40020, 0x1fb40023) AM_READ16(capcom_kickharness_r, 0x0000ffff)
-	AM_RANGE(0x1fb80000, 0x1fbfffff) AM_ROM AM_REGION("countryrom", 0)
-	AM_RANGE(0x1fb60000, 0x1fb60003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff)
-ADDRESS_MAP_END
+	map(0x1f000000, 0x1f3fffff).rom().region("bankedroms", 0);
+	map(0x1f400000, 0x1f7fffff).bankr("rombank1");
+	map(0x1fb00000, 0x1fb00000).w(this, FUNC(zn_state::bank_coh1000c_w));
+	map(0x1fb40010, 0x1fb40011).r(this, FUNC(zn_state::capcom_kickharness_r));
+	map(0x1fb40020, 0x1fb40021).r(this, FUNC(zn_state::capcom_kickharness_r));
+	map(0x1fb80000, 0x1fbfffff).rom().region("countryrom", 0);
+	map(0x1fb60000, 0x1fb60000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+}
 
 MACHINE_START_MEMBER(zn_state,coh1000c)
 {
@@ -627,19 +629,21 @@ MACHINE_RESET_MEMBER(zn_state,glpracr)
 	MACHINE_RESET_CALL_MEMBER(coh1000c);
 }
 
-ADDRESS_MAP_START(zn_state::qsound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")       /* banked (contains music data) */
-	AM_RANGE(0xd000, 0xd002) AM_DEVWRITE("qsound", qsound_device, qsound_w)
-	AM_RANGE(0xd003, 0xd003) AM_WRITE(qsound_bankswitch_w)
-	AM_RANGE(0xd007, 0xd007) AM_DEVREAD("qsound", qsound_device, qsound_r)
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void zn_state::qsound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("soundbank");       /* banked (contains music data) */
+	map(0xd000, 0xd002).w("qsound", FUNC(qsound_device::qsound_w));
+	map(0xd003, 0xd003).w(this, FUNC(zn_state::qsound_bankswitch_w));
+	map(0xd007, 0xd007).r("qsound", FUNC(qsound_device::qsound_r));
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(zn_state::qsound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void zn_state::qsound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 MACHINE_CONFIG_START(zn_state::coh1000c)
 	zn1_1mb_vram(config);
@@ -1084,14 +1088,15 @@ WRITE8_MEMBER(zn_state::fx1a_sound_bankswitch_w)
 	m_soundbank->set_entry( ( data - 1 ) & 0x07 );
 }
 
-ADDRESS_MAP_START(zn_state::coh1000ta_map)
-	AM_IMPORT_FROM(zn_map)
+void zn_state::coh1000ta_map(address_map &map)
+{
+	zn_map(map);
 
-	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("rombank1")
-	AM_RANGE(0x1fb40000, 0x1fb40003) AM_WRITE8(bank_coh1000t_w, 0x000000ff)
-	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x000000ff)
-	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff0000)
-ADDRESS_MAP_END
+	map(0x1f000000, 0x1f7fffff).bankr("rombank1");
+	map(0x1fb40000, 0x1fb40000).w(this, FUNC(zn_state::bank_coh1000t_w));
+	map(0x1fb80000, 0x1fb80000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x1fb80002, 0x1fb80002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+}
 
 MACHINE_START_MEMBER(zn_state,coh1000ta)
 {
@@ -1107,18 +1112,19 @@ MACHINE_RESET_MEMBER(zn_state,coh1000ta)
 		m_soundbank->set_entry( 0 );
 }
 
-ADDRESS_MAP_START(zn_state::fx1a_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
-	AM_RANGE(0xee00, 0xee00) AM_NOP /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(fx1a_sound_bankswitch_w)
-ADDRESS_MAP_END
+void zn_state::fx1a_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("soundbank");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe200, 0xe200).nopr().w("tc0140syt", FUNC(tc0140syt_device::slave_port_w));
+	map(0xe201, 0xe201).rw("tc0140syt", FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
+	map(0xe400, 0xe403).nopw(); /* pan */
+	map(0xee00, 0xee00).noprw(); /* ? */
+	map(0xf000, 0xf000).nopw(); /* ? */
+	map(0xf200, 0xf200).w(this, FUNC(zn_state::fx1a_sound_bankswitch_w));
+}
 
 
 MACHINE_CONFIG_START(zn_state::coh1000ta)
@@ -1156,17 +1162,18 @@ READ8_MEMBER(zn_state::fx1b_fram_r)
 	return m_fx1b_fram[offset];
 }
 
-ADDRESS_MAP_START(zn_state::coh1000tb_map)
-	AM_IMPORT_FROM(zn_map)
-	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("rombank1")
-	AM_RANGE(0x1fb00000, 0x1fb003ff) AM_READWRITE8(fx1b_fram_r, fx1b_fram_w, 0x00ff00ff)
-	AM_RANGE(0x1fb40000, 0x1fb40003) AM_WRITE8(bank_coh1000t_w, 0x000000ff)
-	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, reg_data_w, 0x0000ffff)
-	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, reg_address_w, 0xffff0000)
-	AM_RANGE(0x1fba0000, 0x1fba0003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, sound_irq_w, 0x0000ffff)
-	AM_RANGE(0x1fbc0000, 0x1fbc0003) AM_DEVREAD16("taito_zoom", taito_zoom_device, sound_irq_r, 0x0000ffff)
-	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0x00ff00ff) // M66220FP for comm with the MN10200
-ADDRESS_MAP_END
+void zn_state::coh1000tb_map(address_map &map)
+{
+	zn_map(map);
+	map(0x1f000000, 0x1f7fffff).bankr("rombank1");
+	map(0x1fb00000, 0x1fb003ff).rw(this, FUNC(zn_state::fx1b_fram_r), FUNC(zn_state::fx1b_fram_w)).umask32(0x00ff00ff);
+	map(0x1fb40000, 0x1fb40000).w(this, FUNC(zn_state::bank_coh1000t_w));
+	map(0x1fb80000, 0x1fb80001).w(m_zoom, FUNC(taito_zoom_device::reg_data_w));
+	map(0x1fb80002, 0x1fb80003).w(m_zoom, FUNC(taito_zoom_device::reg_address_w));
+	map(0x1fba0000, 0x1fba0001).w(m_zoom, FUNC(taito_zoom_device::sound_irq_w));
+	map(0x1fbc0000, 0x1fbc0001).r(m_zoom, FUNC(taito_zoom_device::sound_irq_r));
+	map(0x1fbe0000, 0x1fbe01ff).rw(m_zoom, FUNC(taito_zoom_device::shared_ram_r), FUNC(taito_zoom_device::shared_ram_w)).umask32(0x00ff00ff); // M66220FP for comm with the MN10200
+}
 
 DRIVER_INIT_MEMBER(zn_state,coh1000tb)
 {
@@ -1436,14 +1443,15 @@ DRIVER_INIT_MEMBER(zn_state,primrag2)
 	save_item(NAME(m_vt83c461_latch));
 }
 
-ADDRESS_MAP_START(zn_state::coh1000w_map)
-	AM_IMPORT_FROM(zn_map)
-	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x1f000000, 0x1f000003) AM_WRITENOP
-	AM_RANGE(0x1f7e8000, 0x1f7e8003) AM_NOP
-	AM_RANGE(0x1f7e4000, 0x1f7e4fff) AM_READWRITE16(vt83c461_16_r, vt83c461_16_w, 0xffffffff)
-	AM_RANGE(0x1f7f4000, 0x1f7f4fff) AM_READWRITE16(vt83c461_32_r, vt83c461_32_w, 0xffffffff)
-ADDRESS_MAP_END
+void zn_state::coh1000w_map(address_map &map)
+{
+	zn_map(map);
+	map(0x1f000000, 0x1f1fffff).rom().region("roms", 0);
+	map(0x1f000000, 0x1f000003).nopw();
+	map(0x1f7e8000, 0x1f7e8003).noprw();
+	map(0x1f7e4000, 0x1f7e4fff).rw(this, FUNC(zn_state::vt83c461_16_r), FUNC(zn_state::vt83c461_16_w));
+	map(0x1f7f4000, 0x1f7f4fff).rw(this, FUNC(zn_state::vt83c461_32_r), FUNC(zn_state::vt83c461_32_w));
+}
 
 MACHINE_CONFIG_START(zn_state::coh1000w)
 	zn1_2mb_vram(config);
@@ -1619,14 +1627,15 @@ WRITE8_MEMBER(zn_state::coh1002e_sound_irq_w)
 	m_audiocpu->set_input_line(2, HOLD_LINE); // irq 2 on the 68k
 }
 
-ADDRESS_MAP_START(zn_state::coh1002e_map)
-	AM_IMPORT_FROM(zn_map)
+void zn_state::coh1002e_map(address_map &map)
+{
+	zn_map(map);
 
-	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("rombank1")
-	AM_RANGE(0x1fa10300, 0x1fa10303) AM_WRITE8(coh1002e_bank_w, 0x000000ff)
-	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff)
-	AM_RANGE(0x1fb00004, 0x1fb00007) AM_WRITE8(coh1002e_sound_irq_w, 0x000000ff)
-ADDRESS_MAP_END
+	map(0x1f000000, 0x1f7fffff).bankr("rombank1");
+	map(0x1fa10300, 0x1fa10300).w(this, FUNC(zn_state::coh1002e_bank_w));
+	map(0x1fb00000, 0x1fb00000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x1fb00004, 0x1fb00004).w(this, FUNC(zn_state::coh1002e_sound_irq_w));
+}
 
 MACHINE_START_MEMBER(zn_state,coh1002e)
 {
@@ -1642,23 +1651,26 @@ MACHINE_RESET_MEMBER(zn_state,coh1002e)
 		m_okibank->set_entry( 0 );
 }
 
-ADDRESS_MAP_START(zn_state::psarc_snd_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("ymf", ymf271_device, read, write, 0x00ff )
-	AM_RANGE(0x180008, 0x180009) AM_DEVREAD8("soundlatch", generic_latch_8_device, read, 0x00ff )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITENOP
-	AM_RANGE(0x100020, 0xffffff) AM_WRITENOP
-ADDRESS_MAP_END
+void zn_state::psarc_snd_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x0fffff).ram();
+	map(0x100000, 0x10001f).rw("ymf", FUNC(ymf271_device::read), FUNC(ymf271_device::write)).umask16(0x00ff);
+	map(0x180009, 0x180009).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x000000, 0x07ffff).nopw();
+	map(0x100020, 0xffffff).nopw();
+}
 
-ADDRESS_MAP_START(zn_state::beastrzrb_snd_map) // Internal ROM Not dumped
+void zn_state::beastrzrb_snd_map(address_map &map)
+{ // Internal ROM Not dumped
 //  AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(zn_state::oki_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void zn_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("okibank");
+}
 
 MACHINE_CONFIG_START(zn_state::coh1002e)
 	zn1_2mb_vram(config);
@@ -1791,14 +1803,15 @@ READ16_MEMBER(zn_state::bam2_unk_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(zn_state::bam2_map)
-	AM_IMPORT_FROM(zn_map)
+void zn_state::bam2_map(address_map &map)
+{
+	zn_map(map);
 
-	AM_RANGE(0x1f000000, 0x1f3fffff) AM_ROM AM_REGION("bankedroms", 0)
-	AM_RANGE(0x1f400000, 0x1f7fffff) AM_ROMBANK("rombank1")
-	AM_RANGE(0x1fa20000, 0x1fa20003) AM_READ16(bam2_unk_r, 0x0000ffff)
-	AM_RANGE(0x1fb00000, 0x1fb00007) AM_READWRITE16(bam2_mcu_r, bam2_mcu_w, 0xffffffff)
-ADDRESS_MAP_END
+	map(0x1f000000, 0x1f3fffff).rom().region("bankedroms", 0);
+	map(0x1f400000, 0x1f7fffff).bankr("rombank1");
+	map(0x1fa20000, 0x1fa20001).r(this, FUNC(zn_state::bam2_unk_r));
+	map(0x1fb00000, 0x1fb00007).rw(this, FUNC(zn_state::bam2_mcu_r), FUNC(zn_state::bam2_mcu_w));
+}
 
 DRIVER_INIT_MEMBER(zn_state,bam2)
 {
@@ -2101,27 +2114,30 @@ WRITE8_MEMBER(zn_state::nbajamex_backup_w)
 
 
 
-ADDRESS_MAP_START(zn_state::coh1000a_map)
-	AM_IMPORT_FROM(zn_map)
-	AM_RANGE(0x1fbfff00, 0x1fbfff03) AM_WRITE16(acpsx_00_w, 0xffffffff)
-	AM_RANGE(0x1fbfff10, 0x1fbfff13) AM_WRITE16(acpsx_10_w, 0xffff0000)
-ADDRESS_MAP_END
+void zn_state::coh1000a_map(address_map &map)
+{
+	zn_map(map);
+	map(0x1fbfff00, 0x1fbfff03).w(this, FUNC(zn_state::acpsx_00_w));
+	map(0x1fbfff12, 0x1fbfff13).w(this, FUNC(zn_state::acpsx_10_w));
+}
 
-ADDRESS_MAP_START(zn_state::nbajamex_map)
-	AM_IMPORT_FROM(coh1000a_map)
+void zn_state::nbajamex_map(address_map &map)
+{
+	coh1000a_map(map);
 
-	AM_RANGE(0x1f000000, 0x1f7fffff) AM_DEVICE("nbajamex_bankmap", address_map_bank_device, amap32)
-	AM_RANGE(0x1fbfff00, 0x1fbfff07) AM_WRITE16(nbajamex_bank_w, 0xffffffff)
-	AM_RANGE(0x1fbfff08, 0x1fbfff0b) AM_READ16(nbajamex_08_r, 0xffff)
-	AM_RANGE(0x1fbfff80, 0x1fbfff83) AM_READWRITE16(nbajamex_80_r, nbajamex_80_w, 0xffff)
-ADDRESS_MAP_END
+	map(0x1f000000, 0x1f7fffff).m(m_nbajamex_bankmap, FUNC(address_map_bank_device::amap32));
+	map(0x1fbfff00, 0x1fbfff07).w(this, FUNC(zn_state::nbajamex_bank_w));
+	map(0x1fbfff08, 0x1fbfff09).r(this, FUNC(zn_state::nbajamex_08_r));
+	map(0x1fbfff80, 0x1fbfff81).rw(this, FUNC(zn_state::nbajamex_80_r), FUNC(zn_state::nbajamex_80_w));
+}
 
-ADDRESS_MAP_START(zn_state::nbajamex_bank_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x800000) AM_ROMBANK("rombank1")
-	AM_RANGE(0x200000, 0x207fff) AM_MIRROR(0x800000) AM_WRITE8(nbajamex_backup_w, 0xffffffff)
-	AM_RANGE(0x200000, 0x207fff) AM_ROMBANK("sram")
-	AM_RANGE(0xa00000, 0xffffff) AM_ROMBANK("rombank2")
-ADDRESS_MAP_END
+void zn_state::nbajamex_bank_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).mirror(0x800000).bankr("rombank1");
+	map(0x200000, 0x207fff).mirror(0x800000).w(this, FUNC(zn_state::nbajamex_backup_w));
+	map(0x200000, 0x207fff).bankr("sram");
+	map(0xa00000, 0xffffff).bankr("rombank2");
+}
 
 DRIVER_INIT_MEMBER(zn_state,nbajamex)
 {
@@ -2153,13 +2169,14 @@ DRIVER_INIT_MEMBER(zn_state,jdredd)
 	save_item(NAME(m_jdredd_gun_mux));
 }
 
-ADDRESS_MAP_START(zn_state::jdredd_map)
-	AM_IMPORT_FROM(coh1000a_map)
+void zn_state::jdredd_map(address_map &map)
+{
+	coh1000a_map(map);
 
-	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x1fbfff80, 0x1fbfff8f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff)
-	AM_RANGE(0x1fbfff90, 0x1fbfff9f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff)
-ADDRESS_MAP_END
+	map(0x1f000000, 0x1f1fffff).rom().region("roms", 0);
+	map(0x1fbfff80, 0x1fbfff8f).rw("ata", FUNC(ata_interface_device::read_cs1), FUNC(ata_interface_device::write_cs1));
+	map(0x1fbfff90, 0x1fbfff9f).rw("ata", FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0));
+}
 
 MACHINE_CONFIG_START(zn_state::coh1000a)
 	zn1_2mb_vram(config);
@@ -2327,13 +2344,14 @@ WRITE8_MEMBER(zn_state::coh1001l_bank_w)
 	m_rombank[0]->set_entry( data & 3 );
 }
 
-ADDRESS_MAP_START(zn_state::coh1001l_map)
-	AM_IMPORT_FROM(zn_map)
+void zn_state::coh1001l_map(address_map &map)
+{
+	zn_map(map);
 
-	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("rombank1")
-	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVWRITE16("soundlatch16", generic_latch_16_device, write, 0x0000ffff)
-	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(coh1001l_bank_w, 0x00ff0000)
-ADDRESS_MAP_END
+	map(0x1f000000, 0x1f7fffff).bankr("rombank1");
+	map(0x1fb00000, 0x1fb00001).w(m_soundlatch16, FUNC(generic_latch_16_device::write));
+	map(0x1fb00002, 0x1fb00002).w(this, FUNC(zn_state::coh1001l_bank_w));
+}
 
 MACHINE_START_MEMBER(zn_state,coh1001l)
 {
@@ -2345,12 +2363,13 @@ MACHINE_RESET_MEMBER(zn_state,coh1001l)
 	m_rombank[0]->set_entry( 0 );
 }
 
-ADDRESS_MAP_START(zn_state::atlus_snd_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREAD("soundlatch16", generic_latch_16_device, read) AM_WRITE(coh1001l_sound_unk_w)
-	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM
-ADDRESS_MAP_END
+void zn_state::atlus_snd_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x100001).r(m_soundlatch16, FUNC(generic_latch_16_device::read)).w(this, FUNC(zn_state::coh1001l_sound_unk_w));
+	map(0x200000, 0x200003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);
+	map(0x700000, 0x70ffff).ram();
+}
 
 
 MACHINE_CONFIG_START(zn_state::coh1001l)
@@ -2391,12 +2410,13 @@ WRITE8_MEMBER(zn_state::coh1002v_bank_w)
 	m_rombank[0]->set_entry( data );
 }
 
-ADDRESS_MAP_START(zn_state::coh1002v_map)
-	AM_IMPORT_FROM(zn_map)
-	AM_RANGE(0x1f000000, 0x1f27ffff) AM_ROM AM_REGION("fixedroms", 0)
-	AM_RANGE(0x1fb00000, 0x1fbfffff) AM_ROMBANK("rombank1")
-	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(coh1002v_bank_w, 0x000000ff)
-ADDRESS_MAP_END
+void zn_state::coh1002v_map(address_map &map)
+{
+	zn_map(map);
+	map(0x1f000000, 0x1f27ffff).rom().region("fixedroms", 0);
+	map(0x1fb00000, 0x1fbfffff).bankr("rombank1");
+	map(0x1fb00000, 0x1fb00000).w(this, FUNC(zn_state::coh1002v_bank_w));
+}
 
 MACHINE_START_MEMBER(zn_state,coh1002v)
 {
@@ -2581,11 +2601,12 @@ WRITE8_MEMBER(zn_state::coh1002m_bank_w)
 	m_rombank[0]->set_entry( data );
 }
 
-ADDRESS_MAP_START(zn_state::coh1002m_map)
-	AM_IMPORT_FROM(zn_map)
-	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("rombank1")
-	AM_RANGE(0x1fb00004, 0x1fb00007) AM_WRITE8(coh1002m_bank_w, 0x00ff0000)
-ADDRESS_MAP_END
+void zn_state::coh1002m_map(address_map &map)
+{
+	zn_map(map);
+	map(0x1f000000, 0x1f7fffff).bankr("rombank1");
+	map(0x1fb00006, 0x1fb00006).w(this, FUNC(zn_state::coh1002m_bank_w));
+}
 
 MACHINE_START_MEMBER(zn_state,coh1002m)
 {
@@ -2612,12 +2633,13 @@ READ8_MEMBER(zn_state::cbaj_sound_main_status_r)
 	return m_cbaj_fifo[1]->ef_r() << 1;
 }
 
-ADDRESS_MAP_START(zn_state::coh1002msnd_map)
-	AM_IMPORT_FROM(coh1002m_map)
-	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVREAD8("cbaj_fifo2", fifo7200_device, data_byte_r, 0x000000ff)
-	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVWRITE8("cbaj_fifo1", fifo7200_device, data_byte_w, 0x000000ff)
-	AM_RANGE(0x1fb00000, 0x1fb00003) AM_READ8(cbaj_sound_main_status_r, 0xff000000)
-ADDRESS_MAP_END
+void zn_state::coh1002msnd_map(address_map &map)
+{
+	coh1002m_map(map);
+	map(0x1fb00000, 0x1fb00000).r("cbaj_fifo2", FUNC(fifo7200_device::data_byte_r));
+	map(0x1fb00000, 0x1fb00000).w("cbaj_fifo1", FUNC(fifo7200_device::data_byte_w));
+	map(0x1fb00003, 0x1fb00003).r(this, FUNC(zn_state::cbaj_sound_main_status_r));
+}
 
 READ8_MEMBER(zn_state::cbaj_sound_z80_status_r)
 {
@@ -2625,27 +2647,31 @@ READ8_MEMBER(zn_state::cbaj_sound_z80_status_r)
 	return m_cbaj_fifo[0]->ef_r() << 1;
 }
 
-ADDRESS_MAP_START(zn_state::cbaj_z80_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void zn_state::cbaj_z80_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(zn_state::cbaj_z80_port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x84, 0x85) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
-	AM_RANGE(0x90, 0x90) AM_DEVREAD("cbaj_fifo1", fifo7200_device, data_byte_r)
-	AM_RANGE(0x90, 0x90) AM_DEVWRITE("cbaj_fifo2", fifo7200_device, data_byte_w)
-	AM_RANGE(0x91, 0x91) AM_READ(cbaj_sound_z80_status_r)
-ADDRESS_MAP_END
+void zn_state::cbaj_z80_port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x84, 0x85).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+	map(0x90, 0x90).r("cbaj_fifo1", FUNC(fifo7200_device::data_byte_r));
+	map(0x90, 0x90).w("cbaj_fifo2", FUNC(fifo7200_device::data_byte_w));
+	map(0x91, 0x91).r(this, FUNC(zn_state::cbaj_sound_z80_status_r));
+}
 
-ADDRESS_MAP_START(zn_state::coh1002ml_link_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void zn_state::coh1002ml_link_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(zn_state::coh1002ml_link_port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void zn_state::coh1002ml_link_port_map(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 MACHINE_CONFIG_START(zn_state::coh1002msnd)
 	coh1002m(config);

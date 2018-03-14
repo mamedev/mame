@@ -1237,21 +1237,22 @@ WRITE_LINE_MEMBER(gba_state::dma_vblank_callback)
 	}
 }
 
-ADDRESS_MAP_START(gba_state::gba_map)
-	ADDRESS_MAP_UNMAP_HIGH // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_MIRROR(0x01ffc000) AM_READ(gba_bios_r)
-	AM_RANGE(0x02000000, 0x0203ffff) AM_RAM AM_MIRROR(0xfc0000)
-	AM_RANGE(0x03000000, 0x03007fff) AM_RAM AM_MIRROR(0xff8000)
-	AM_RANGE(0x04000000, 0x0400005f) AM_DEVREADWRITE("lcd", gba_lcd_device, video_r, video_w)
-	AM_RANGE(0x04000060, 0x040003ff) AM_READWRITE(gba_io_r, gba_io_w)
-	AM_RANGE(0x04000400, 0x04ffffff) AM_NOP                                         // Not used
-	AM_RANGE(0x05000000, 0x050003ff) AM_MIRROR(0x00fffc00) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_pram_r, gba_pram_w)  // Palette RAM
-	AM_RANGE(0x06000000, 0x06017fff) AM_MIRROR(0x00fe0000) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_vram_r, gba_vram_w)  // VRAM
-	AM_RANGE(0x06018000, 0x0601ffff) AM_MIRROR(0x00fe0000) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_vram_r, gba_vram_w)  // VRAM
-	AM_RANGE(0x07000000, 0x070003ff) AM_MIRROR(0x00fffc00) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_oam_r, gba_oam_w)    // OAM
+void gba_state::gba_map(address_map &map)
+{
+	map.unmap_value_high(); // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
+	map(0x00000000, 0x00003fff).rom().mirror(0x01ffc000).r(this, FUNC(gba_state::gba_bios_r));
+	map(0x02000000, 0x0203ffff).ram().mirror(0xfc0000);
+	map(0x03000000, 0x03007fff).ram().mirror(0xff8000);
+	map(0x04000000, 0x0400005f).rw("lcd", FUNC(gba_lcd_device::video_r), FUNC(gba_lcd_device::video_w));
+	map(0x04000060, 0x040003ff).rw(this, FUNC(gba_state::gba_io_r), FUNC(gba_state::gba_io_w));
+	map(0x04000400, 0x04ffffff).noprw();                                         // Not used
+	map(0x05000000, 0x050003ff).mirror(0x00fffc00).rw("lcd", FUNC(gba_lcd_device::gba_pram_r), FUNC(gba_lcd_device::gba_pram_w));  // Palette RAM
+	map(0x06000000, 0x06017fff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
+	map(0x06018000, 0x0601ffff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
+	map(0x07000000, 0x070003ff).mirror(0x00fffc00).rw("lcd", FUNC(gba_lcd_device::gba_oam_r), FUNC(gba_lcd_device::gba_oam_w));    // OAM
 	//AM_RANGE(0x08000000, 0x0cffffff)  // cart ROM + mirrors, mapped here at machine_start if a cart is present
-	AM_RANGE(0x10000000, 0xffffffff) AM_READ(gba_10000000_r) // for "Justice League Chronicles" (game bug)
-ADDRESS_MAP_END
+	map(0x10000000, 0xffffffff).r(this, FUNC(gba_state::gba_10000000_r)); // for "Justice League Chronicles" (game bug)
+}
 
 static INPUT_PORTS_START( gbadv )
 	PORT_START("INPUTS")

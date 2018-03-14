@@ -151,26 +151,28 @@ WRITE_LINE_MEMBER(timeplt_audio_device::mute_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(timeplt_audio_device::timeplt_sound_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(filter_w)
-ADDRESS_MAP_END
+void timeplt_audio_device::timeplt_sound_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3000, 0x33ff).mirror(0x0c00).ram();
+	map(0x4000, 0x4000).mirror(0x0fff).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x5000, 0x5000).mirror(0x0fff).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x6000, 0x6000).mirror(0x0fff).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x7000, 0x7000).mirror(0x0fff).w("ay2", FUNC(ay8910_device::address_w));
+	map(0x8000, 0xffff).w(this, FUNC(timeplt_audio_device::filter_w));
+}
 
 
-ADDRESS_MAP_START(timeplt_audio_device::locomotn_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(filter_w)
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-ADDRESS_MAP_END
+void timeplt_audio_device::locomotn_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).mirror(0x0c00).ram();
+	map(0x3000, 0x3fff).w(this, FUNC(timeplt_audio_device::filter_w));
+	map(0x4000, 0x4000).mirror(0x0fff).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x5000, 0x5000).mirror(0x0fff).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x6000, 0x6000).mirror(0x0fff).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x7000, 0x7000).mirror(0x0fff).w("ay2", FUNC(ay8910_device::address_w));
+}
 
 
 /*************************************

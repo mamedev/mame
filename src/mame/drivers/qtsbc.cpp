@@ -67,19 +67,21 @@ READ8_MEMBER( qtsbc_state::qtsbc_43_r )
 	return 0; // this controls where the new ram program gets built at. 0 = 0xE000.
 }
 
-ADDRESS_MAP_START(qtsbc_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("ram") AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void qtsbc_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).ram().share("ram").region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(qtsbc_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x43, 0x43) AM_READ(qtsbc_43_r)
-ADDRESS_MAP_END
+void qtsbc_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x06, 0x06).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x07, 0x07).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x43, 0x43).r(this, FUNC(qtsbc_state::qtsbc_43_r));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( qtsbc )

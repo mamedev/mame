@@ -326,52 +326,55 @@ READ8_MEMBER( funkball_state::in_r )
 	return m_inputs[offset]->read();
 }
 
-ADDRESS_MAP_START(funkball_state::funkball_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
-	AM_RANGE(0x000b0000, 0x000bffff) AM_DEVICE("flashbank", address_map_bank_device, amap32)
-	AM_RANGE(0x000c0000, 0x000cffff) AM_RAM
-	AM_RANGE(0x000d0000, 0x000dffff) AM_RAM
-	AM_RANGE(0x000e0000, 0x000e3fff) AM_ROMBANK("bios_ext1")
-	AM_RANGE(0x000e4000, 0x000e7fff) AM_ROMBANK("bios_ext2")
-	AM_RANGE(0x000e8000, 0x000ebfff) AM_ROMBANK("bios_ext3")
-	AM_RANGE(0x000ec000, 0x000effff) AM_ROMBANK("bios_ext4")
-	AM_RANGE(0x000f0000, 0x000f3fff) AM_ROMBANK("bios_bank1")
-	AM_RANGE(0x000f4000, 0x000f7fff) AM_ROMBANK("bios_bank2")
-	AM_RANGE(0x000f8000, 0x000fbfff) AM_ROMBANK("bios_bank3")
-	AM_RANGE(0x000fc000, 0x000fffff) AM_ROMBANK("bios_bank4")
-	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE8(bios_ram_w,0xffffffff)
-	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM
+void funkball_state::funkball_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000affff).ram();
+	map(0x000b0000, 0x000bffff).m(m_flashbank, FUNC(address_map_bank_device::amap32));
+	map(0x000c0000, 0x000cffff).ram();
+	map(0x000d0000, 0x000dffff).ram();
+	map(0x000e0000, 0x000e3fff).bankr("bios_ext1");
+	map(0x000e4000, 0x000e7fff).bankr("bios_ext2");
+	map(0x000e8000, 0x000ebfff).bankr("bios_ext3");
+	map(0x000ec000, 0x000effff).bankr("bios_ext4");
+	map(0x000f0000, 0x000f3fff).bankr("bios_bank1");
+	map(0x000f4000, 0x000f7fff).bankr("bios_bank2");
+	map(0x000f8000, 0x000fbfff).bankr("bios_bank3");
+	map(0x000fc000, 0x000fffff).bankr("bios_bank4");
+	map(0x000e0000, 0x000fffff).w(this, FUNC(funkball_state::bios_ram_w));
+	map(0x00100000, 0x07ffffff).ram();
 //  AM_RANGE(0x08000000, 0x0fffffff) AM_NOP
-	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE(biu_ctrl_r, biu_ctrl_w)
-	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_SHARE("unk_ram")
-	AM_RANGE(0xff000000, 0xfffdffff) AM_DEVREADWRITE("voodoo_0", voodoo_device, voodoo_r, voodoo_w)
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
-ADDRESS_MAP_END
+	map(0x40008000, 0x400080ff).rw(this, FUNC(funkball_state::biu_ctrl_r), FUNC(funkball_state::biu_ctrl_w));
+	map(0x40010e00, 0x40010eff).ram().share("unk_ram");
+	map(0xff000000, 0xfffdffff).rw(m_voodoo, FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+}
 
-ADDRESS_MAP_START(funkball_state::flashbank_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE16("u29", intel_28f320j5_device, read, write, 0xffffffff ) // needed to boot
-	AM_RANGE(0x00400000, 0x007fffff) AM_DEVREADWRITE16("u30", intel_28f320j5_device, read, write, 0xffffffff ) // i assume it maps directly after
+void funkball_state::flashbank_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).rw("u29", FUNC(intel_28f320j5_device::read), FUNC(intel_28f320j5_device::write)); // needed to boot
+	map(0x00400000, 0x007fffff).rw("u30", FUNC(intel_28f320j5_device::read), FUNC(intel_28f320j5_device::write)); // i assume it maps directly after
 //  AM_RANGE(0x02000000, 0x023fffff) AM_DEVREADWRITE16("u3", intel_28f320j5_device, read, write, 0xffffffff ) // sound program, don't think it matters where we map it, might not even be visible in this space
 	/* it checks for 64MBit chips at 0x80000000 the way things are set up, they must return an intel Flash ID of 0x15 */
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(funkball_state::funkball_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
-	AM_RANGE(0x00e8, 0x00ef) AM_NOP
+void funkball_state::funkball_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x0022, 0x0023).rw(this, FUNC(funkball_state::io20_r), FUNC(funkball_state::io20_w));
+	map(0x00e8, 0x00ef).noprw();
 
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE8(serial_r,serial_w,0xffffffff)
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
+	map(0x03f8, 0x03ff).rw(this, FUNC(funkball_state::serial_r), FUNC(funkball_state::serial_w));
 
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 
-	AM_RANGE(0x0360, 0x0363) AM_WRITE(flash_w)
+	map(0x0360, 0x0363).w(this, FUNC(funkball_state::flash_w));
 
 //  AM_RANGE(0x0320, 0x0323) AM_READ(test_r)
-	AM_RANGE(0x0360, 0x036f) AM_READ8(in_r,0xffffffff) // inputs
-ADDRESS_MAP_END
+	map(0x0360, 0x036f).r(this, FUNC(funkball_state::in_r)); // inputs
+}
 
 static INPUT_PORTS_START( funkball )
 	PORT_START("IN.0")

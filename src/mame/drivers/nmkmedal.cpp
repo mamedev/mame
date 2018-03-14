@@ -46,10 +46,11 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(nmkmedal_state::mem_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void nmkmedal_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0xc000, 0xc7ff).ram();
+}
 
 static INPUT_PORTS_START( trocana )
 INPUT_PORTS_END

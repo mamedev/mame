@@ -84,36 +84,39 @@ private:
 };
 
 
-ADDRESS_MAP_START(monty_state::monty_mem)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
+void monty_state::monty_mem(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
 	//AM_RANGE(0x4000, 0x4000) // The main rom checks to see if another program is here on startup
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(monty_state::mmonty_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+void monty_state::mmonty_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
 	//AM_RANGE(0xc000, 0xc000) // The main rom checks to see if another program is here on startup
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-ADDRESS_MAP_END
+	map(0x8000, 0xffff).rom();
+	map(0x7800, 0x7fff).ram();
+}
 
 
-ADDRESS_MAP_START(monty_state::monty_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ioCommandWrite0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(sound_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ioCommandWrite1_w)
-	AM_RANGE(0x80, 0xff) AM_WRITE(ioDisplayWrite_w)
+void monty_state::monty_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(monty_state::ioCommandWrite0_w));
+	map(0x01, 0x01).w(this, FUNC(monty_state::sound_w));
+	map(0x02, 0x02).w(this, FUNC(monty_state::ioCommandWrite1_w));
+	map(0x80, 0xff).w(this, FUNC(monty_state::ioDisplayWrite_w));
 
 	// 7 reads from a bit shifted IO port
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("X1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("X2")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("X3")
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("X4")
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("X5")
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("X6")
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("X7")
-ADDRESS_MAP_END
+	map(0x01, 0x01).portr("X1");
+	map(0x02, 0x02).portr("X2");
+	map(0x04, 0x04).portr("X3");
+	map(0x08, 0x08).portr("X4");
+	map(0x10, 0x10).portr("X5");
+	map(0x20, 0x20).portr("X6");
+	map(0x40, 0x40).portr("X7");
+}
 
 
 // Input ports

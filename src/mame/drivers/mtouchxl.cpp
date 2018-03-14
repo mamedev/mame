@@ -104,44 +104,47 @@ WRITE8_MEMBER(mtxl_state::key_w)
 	m_multikey->write_dq((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(mtxl_state::at32_map)
-	ADDRESS_MAP_UNMAP_HIGH
+void mtxl_state::at32_map(address_map &map)
+{
+	map.unmap_value_high();
 	#ifndef REAL_PCI_CHIPSET
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x000d0000, 0x000dffff) AM_DEVICE("dbank", address_map_bank_device, amap32)
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
+	map(0x00000000, 0x0009ffff).bankrw("bank10");
+	map(0x000c8000, 0x000cffff).ram().share("nvram");
+	map(0x000d0000, 0x000dffff).m(m_iocard, FUNC(address_map_bank_device::amap32));
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0);
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
 	#endif
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(mtxl_state::at32_io)
-	ADDRESS_MAP_UNMAP_HIGH
+void mtxl_state::at32_io(address_map &map)
+{
+	map.unmap_value_high();
 	#ifndef REAL_PCI_CHIPSET
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("mb:dma8237_1", am9517a_device, read, write, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("mb:pic8259_master", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("mb:pit8254", pit8254_device, read, write, 0xffffffff)
-	AM_RANGE(0x0060, 0x0067) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("mb", at_mb_device, portb_r, portb_w, 0x0000ff00)
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("mb:rtc", mc146818_device, read, write, 0xffffffff)
-	AM_RANGE(0x0080, 0x009f) AM_DEVREADWRITE8("mb", at_mb_device, page8_r, page8_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("mb:pic8259_slave", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("mb:dma8237_2", am9517a_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x0224, 0x0227) AM_DEVREADWRITE8("cs4231", ad1848_device, read, write, 0xffffffff)
+	map(0x0000, 0x001f).rw("mb:dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x0020, 0x003f).rw("mb:pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0040, 0x005f).rw("mb:pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x0060, 0x0067).rw("kbdc", FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
+	map(0x0061, 0x0061).rw("mb", FUNC(at_mb_device::portb_r), FUNC(at_mb_device::portb_w));
+	map(0x0070, 0x007f).rw("mb:rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x0080, 0x009f).rw("mb", FUNC(at_mb_device::page8_r), FUNC(at_mb_device::page8_w));
+	map(0x00a0, 0x00bf).rw("mb:pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x00c0, 0x00df).rw("mb:dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0x00ff00ff);
+	map(0x0224, 0x0227).rw("cs4231", FUNC(ad1848_device::read), FUNC(ad1848_device::write));
 	#endif
-	AM_RANGE(0x0228, 0x022b) AM_READ_PORT("Unknown")
-	AM_RANGE(0x022c, 0x022f) AM_WRITE8(bank_w, 0xff000000)
-	AM_RANGE(0x022c, 0x022f) AM_READWRITE8(key_r, key_w, 0x0000ff00)
-	AM_RANGE(0x022c, 0x022f) AM_READ8(coin_r, 0x000000ff)
+	map(0x0228, 0x022b).portr("Unknown");
+	map(0x022f, 0x022f).w(this, FUNC(mtxl_state::bank_w));
+	map(0x022d, 0x022d).rw(this, FUNC(mtxl_state::key_r), FUNC(mtxl_state::key_w));
+	map(0x022c, 0x022c).r(this, FUNC(mtxl_state::coin_r));
 	#ifndef REAL_PCI_CHIPSET
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16550", ns16550_device, ins8250_r, ins8250_w, 0xffffffff)
+	map(0x03f8, 0x03ff).rw("ns16550", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	#endif
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(mtxl_state::dbank_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("ioboard", 0)
-	AM_RANGE(0x100000, 0x17ffff) AM_DEVREADWRITE8("flash", intelfsh8_device, read, write, 0xffffffff)
-ADDRESS_MAP_END
+void mtxl_state::dbank_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom().region("ioboard", 0);
+	map(0x100000, 0x17ffff).rw("flash", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+}
 
 static INPUT_PORTS_START(mtouchxl)
 	PORT_START("Coin")

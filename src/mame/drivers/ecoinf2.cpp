@@ -230,25 +230,27 @@ WRITE8_MEMBER(ecoinf2_state::ox_port5c_out_w)
 	// Watchdog?
 }
 
-ADDRESS_MAP_START(ecoinf2_state::oxo_memmap)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ecoinf2_state::oxo_memmap(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(ecoinf2_state::oxo_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_RAM // z180 internal area?
+void ecoinf2_state::oxo_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x3f).ram(); // z180 internal area?
 
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ic10_lamp", i8255_device, read, write) //*
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("ic24_coin", i8255_device, read, write) //*
-	AM_RANGE(0x48, 0x4b) AM_DEVREADWRITE("ic22_inpt", i8255_device, read, write) //*
-	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("ic23_reel", i8255_device, read, write)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("ic13_leds", i8255_device, read, write) //*
+	map(0x40, 0x43).rw("ic10_lamp", FUNC(i8255_device::read), FUNC(i8255_device::write)); //*
+	map(0x44, 0x47).rw("ic24_coin", FUNC(i8255_device::read), FUNC(i8255_device::write)); //*
+	map(0x48, 0x4b).rw("ic22_inpt", FUNC(i8255_device::read), FUNC(i8255_device::write)); //*
+	map(0x4c, 0x4f).rw("ic23_reel", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x50, 0x53).rw("ic13_leds", FUNC(i8255_device::read), FUNC(i8255_device::write)); //*
 //  AM_RANGE(0x54, 0x57) AM_DEVREADWRITE("ic25_dips", i8255_device, read, write) // is this an 8255, or a mirrored byte read?
 
 
 //  AM_RANGE(0x5c, 0x5c) AM_WRITE(ox_port5c_out_w)
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( ecoinf2 )

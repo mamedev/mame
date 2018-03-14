@@ -71,9 +71,10 @@ public:
 	void pgm3_map(address_map &map);
 };
 
-ADDRESS_MAP_START(pgm3_state::pgm3_map)
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
-ADDRESS_MAP_END
+void pgm3_state::pgm3_map(address_map &map)
+{
+	map(0x00000000, 0x00003fff).rom();
+}
 
 static INPUT_PORTS_START( pgm3 )
 INPUT_PORTS_END

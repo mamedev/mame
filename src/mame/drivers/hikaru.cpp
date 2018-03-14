@@ -445,43 +445,45 @@ INPUT_PORTS_END
 
 */
 
-ADDRESS_MAP_START(hikaru_state::hikaru_map)
+void hikaru_state::hikaru_map(address_map &map)
+{
 //  Area 0
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1")  // boot ROM
-	AM_RANGE(0x00400000, 0x00400007) AM_NOP // unknown
-	AM_RANGE(0x00800000, 0x0083ffff) AM_NOP // MIE + Service/Test switches and more
-	AM_RANGE(0x00c00000, 0x00c0ffff) AM_RAM // backup RAM
-	AM_RANGE(0x01000000, 0x01000007) AM_NOP // unknown
-	AM_RANGE(0x01000100, 0x01000107) AM_NOP // unknown
-	AM_RANGE(0x02000000, 0x02ffffff) AM_NOP // banked area (ROMBD + AICA + COMM + other devices)
-	AM_RANGE(0x03000000, 0x03ffffff) AM_NOP // banked area (ROMBD + EEPROM + COMM + other devices)
+	map(0x00000000, 0x001fffff).rom().share("share1");  // boot ROM
+	map(0x00400000, 0x00400007).noprw(); // unknown
+	map(0x00800000, 0x0083ffff).noprw(); // MIE + Service/Test switches and more
+	map(0x00c00000, 0x00c0ffff).ram(); // backup RAM
+	map(0x01000000, 0x01000007).noprw(); // unknown
+	map(0x01000100, 0x01000107).noprw(); // unknown
+	map(0x02000000, 0x02ffffff).noprw(); // banked area (ROMBD + AICA + COMM + other devices)
+	map(0x03000000, 0x03ffffff).noprw(); // banked area (ROMBD + EEPROM + COMM + other devices)
 //  Area 1
-	AM_RANGE(0x04000000, 0x0400003f) AM_NOP // memory controller (Master)
+	map(0x04000000, 0x0400003f).noprw(); // memory controller (Master)
 //  Area 3
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM // main Work RAM
+	map(0x0c000000, 0x0dffffff).ram(); // main Work RAM
 //  Area 5
-	AM_RANGE(0x14000000, 0x140000ff) AM_NOP // Master/Slave COMM
-	AM_RANGE(0x14000100, 0x143fffff) AM_RAM // GPU command RAM
-	AM_RANGE(0x15000000, 0x150000ff) AM_NOP // GPU Regs
-	AM_RANGE(0x16010000, 0x17ffffff) AM_RAM // Slave Work RAM
-	AM_RANGE(0x16001000, 0x163fffff) AM_RAM // ? \ these two overlap [selected by 040000xx = 0x04,0x06,0x40]
+	map(0x14000000, 0x140000ff).noprw(); // Master/Slave COMM
+	map(0x14000100, 0x143fffff).ram(); // GPU command RAM
+	map(0x15000000, 0x150000ff).noprw(); // GPU Regs
+	map(0x16010000, 0x17ffffff).ram(); // Slave Work RAM
+	map(0x16001000, 0x163fffff).ram(); // ? \ these two overlap [selected by 040000xx = 0x04,0x06,0x40]
 //  Area 6
-	AM_RANGE(0x18001000, 0x1800101f) AM_NOP // unknown
-	AM_RANGE(0x1a000000, 0x1a000107) AM_NOP // GPU Regs
-	AM_RANGE(0x1a000180, 0x1a0001bf) AM_NOP // GPU Texture Regs A
-	AM_RANGE(0x1a000200, 0x1a00023f) AM_NOP // GPU Texture Regs B
-	AM_RANGE(0x1a040000, 0x1a04000f) AM_NOP // GPU Texture FIFO (?)
-	AM_RANGE(0x1b000000, 0x1b7fffff) AM_NOP // GPU Texture RAM and framebuffer (a 2048x2048x16-bit sheet?)
-ADDRESS_MAP_END
+	map(0x18001000, 0x1800101f).noprw(); // unknown
+	map(0x1a000000, 0x1a000107).noprw(); // GPU Regs
+	map(0x1a000180, 0x1a0001bf).noprw(); // GPU Texture Regs A
+	map(0x1a000200, 0x1a00023f).noprw(); // GPU Texture Regs B
+	map(0x1a040000, 0x1a04000f).noprw(); // GPU Texture FIFO (?)
+	map(0x1b000000, 0x1b7fffff).noprw(); // GPU Texture RAM and framebuffer (a 2048x2048x16-bit sheet?)
+}
 
-ADDRESS_MAP_START(hikaru_state::hikaru_map_slave)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x001FFFFF) AM_ROM AM_SHARE("share1")
-	AM_RANGE(0x0C000000, 0x0DFFFFFF) AM_RAM
-	AM_RANGE(0x10000000, 0x100000FF) AM_RAM
-	AM_RANGE(0x1A800000, 0x1A8000FF) AM_RAM
-	AM_RANGE(0x1B000000, 0x1B0001FF) AM_RAM
-ADDRESS_MAP_END
+void hikaru_state::hikaru_map_slave(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x001FFFFF).rom().share("share1");
+	map(0x0C000000, 0x0DFFFFFF).ram();
+	map(0x10000000, 0x100000FF).ram();
+	map(0x1A800000, 0x1A8000FF).ram();
+	map(0x1B000000, 0x1B0001FF).ram();
+}
 
 
 MACHINE_CONFIG_START(hikaru_state::hikaru)

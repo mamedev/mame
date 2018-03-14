@@ -111,36 +111,37 @@ CUSTOM_INPUT_MEMBER(inufuku_state::soundflag_r)
 
 ******************************************************************************/
 
-ADDRESS_MAP_START(inufuku_state::inufuku_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM         // main rom
+void inufuku_state::inufuku_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();         // main rom
 
 //  AM_RANGE(0x100000, 0x100007) AM_WRITENOP    // ?
 
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P1")
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("P2")
-	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("P4")
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("EXTRA")
-	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("P3")
+	map(0x180000, 0x180001).portr("P1");
+	map(0x180002, 0x180003).portr("P2");
+	map(0x180004, 0x180005).portr("SYSTEM");
+	map(0x180006, 0x180007).portr("P4");
+	map(0x180008, 0x180009).portr("EXTRA");
+	map(0x18000a, 0x18000b).portr("P3");
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)   // sound command
+	map(0x200000, 0x200001).portw("EEPROMOUT");
+	map(0x280001, 0x280001).w(m_soundlatch, FUNC(generic_latch_8_device::write));   // sound command
 
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")                        // palette ram
-	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_SHARE("bg_rasterram")                                  // bg raster ram
-	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_SHARE("bg_videoram")     // bg ram
-	AM_RANGE(0x402000, 0x403fff) AM_READWRITE(inufuku_tx_videoram_r, inufuku_tx_videoram_w) AM_SHARE("tx_videoram")     // text ram
-	AM_RANGE(0x404000, 0x40ffff) AM_RAM // ?? mirror (3on3dunk)
-	AM_RANGE(0x580000, 0x581fff) AM_RAM AM_SHARE("spriteram1")                          // sprite table + sprite attribute
-	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_SHARE("spriteram2")                                          // cell table
+	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");                        // palette ram
+	map(0x380000, 0x3801ff).writeonly().share("bg_rasterram");                                  // bg raster ram
+	map(0x400000, 0x401fff).rw(this, FUNC(inufuku_state::inufuku_bg_videoram_r), FUNC(inufuku_state::inufuku_bg_videoram_w)).share("bg_videoram");     // bg ram
+	map(0x402000, 0x403fff).rw(this, FUNC(inufuku_state::inufuku_tx_videoram_r), FUNC(inufuku_state::inufuku_tx_videoram_w)).share("tx_videoram");     // text ram
+	map(0x404000, 0x40ffff).ram(); // ?? mirror (3on3dunk)
+	map(0x580000, 0x581fff).ram().share("spriteram1");                          // sprite table + sprite attribute
+	map(0x600000, 0x61ffff).ram().share("spriteram2");                                          // cell table
 
-	AM_RANGE(0x780000, 0x780013) AM_WRITE(inufuku_palettereg_w) // bg & text palettebank register
-	AM_RANGE(0x7a0000, 0x7a0023) AM_WRITE(inufuku_scrollreg_w)  // bg & text scroll register
+	map(0x780000, 0x780013).w(this, FUNC(inufuku_state::inufuku_palettereg_w)); // bg & text palettebank register
+	map(0x7a0000, 0x7a0023).w(this, FUNC(inufuku_state::inufuku_scrollreg_w));  // bg & text scroll register
 //  AM_RANGE(0x7e0000, 0x7e0001) AM_WRITENOP                    // ?
 
-	AM_RANGE(0x800000, 0xbfffff) AM_ROM // data rom
-	AM_RANGE(0xfd0000, 0xfdffff) AM_RAM // work ram
-ADDRESS_MAP_END
+	map(0x800000, 0xbfffff).rom(); // data rom
+	map(0xfd0000, 0xfdffff).ram(); // work ram
+}
 
 
 /******************************************************************************
@@ -149,18 +150,20 @@ ADDRESS_MAP_END
 
 ******************************************************************************/
 
-ADDRESS_MAP_START(inufuku_state::inufuku_sound_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void inufuku_state::inufuku_sound_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(inufuku_state::inufuku_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(inufuku_soundrombank_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-ADDRESS_MAP_END
+void inufuku_state::inufuku_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(inufuku_state::inufuku_soundrombank_w));
+	map(0x04, 0x04).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+}
 
 /******************************************************************************
 

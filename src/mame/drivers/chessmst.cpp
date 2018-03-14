@@ -88,32 +88,36 @@ private:
 };
 
 
-ADDRESS_MAP_START(chessmst_state::chessmst_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff) // A15 not connected
-	AM_RANGE( 0x0000, 0x27ff ) AM_ROM
-	AM_RANGE( 0x3400, 0x3bff ) AM_RAM
-ADDRESS_MAP_END
+void chessmst_state::chessmst_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x7fff); // A15 not connected
+	map(0x0000, 0x27ff).rom();
+	map(0x3400, 0x3bff).ram();
+}
 
-ADDRESS_MAP_START(chessmst_state::chessmstdm)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
-	AM_RANGE( 0x4000, 0x7fff ) AM_DEVREAD("cartslot", generic_slot_device, read_rom)
-	AM_RANGE( 0x8000, 0x8bff ) AM_RAM
-ADDRESS_MAP_END
+void chessmst_state::chessmstdm(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));
+	map(0x8000, 0x8bff).ram();
+}
 
-ADDRESS_MAP_START(chessmst_state::chessmst_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void chessmst_state::chessmst_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0x03) AM_MIRROR(0xf0) read/write in both, not used by the software
-	AM_RANGE(0x04, 0x07) AM_MIRROR(0xf0) AM_DEVREADWRITE("z80pio1", z80pio_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xf0) AM_DEVREADWRITE("z80pio2", z80pio_device, read, write)
-ADDRESS_MAP_END
+	map(0x04, 0x07).mirror(0xf0).rw("z80pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x08, 0x0b).mirror(0xf0).rw(m_pia2, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
-ADDRESS_MAP_START(chessmst_state::chessmstdm_io)
-	AM_IMPORT_FROM(chessmst_io)
-	AM_RANGE(0x4c, 0x4c) AM_WRITE(digits_w)
-ADDRESS_MAP_END
+void chessmst_state::chessmstdm_io(address_map &map)
+{
+	chessmst_io(map);
+	map(0x4c, 0x4c).w(this, FUNC(chessmst_state::digits_w));
+}
 
 WRITE_LINE_MEMBER( chessmst_state::timer_555_w )
 {

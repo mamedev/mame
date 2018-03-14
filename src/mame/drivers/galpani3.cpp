@@ -390,42 +390,43 @@ WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrolly_w)
 }
 
 
-ADDRESS_MAP_START(galpani3_state::galpani3_map)
-	AM_RANGE(0x000000, 0x17ffff) AM_ROM
+void galpani3_state::galpani3_map(address_map &map)
+{
+	map(0x000000, 0x17ffff).rom();
 
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM // area [B] - Work RAM
-	AM_RANGE(0x280000, 0x287fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // area [A] - palette for sprites
+	map(0x200000, 0x20ffff).ram(); // area [B] - Work RAM
+	map(0x280000, 0x287fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // area [A] - palette for sprites
 
-	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(galpani3_suprnova_sprite32_w) AM_SHARE("spriteram")
-	AM_RANGE(0x380000, 0x38003f) AM_RAM_WRITE(galpani3_suprnova_sprite32regs_w) AM_SHARE("sprregs")
+	map(0x300000, 0x303fff).ram().w(this, FUNC(galpani3_state::galpani3_suprnova_sprite32_w)).share("spriteram");
+	map(0x380000, 0x38003f).ram().w(this, FUNC(galpani3_state::galpani3_suprnova_sprite32regs_w)).share("sprregs");
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("mcuram") // area [C]
+	map(0x400000, 0x40ffff).ram().share("mcuram"); // area [C]
 
-	AM_RANGE(0x580000, 0x580001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com0_w)
-	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
-	AM_RANGE(0x680000, 0x680001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
-	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
-	AM_RANGE(0x780000, 0x780001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
+	map(0x580000, 0x580001).w("toybox", FUNC(kaneko_toybox_device::mcu_com0_w));
+	map(0x600000, 0x600001).w("toybox", FUNC(kaneko_toybox_device::mcu_com1_w));
+	map(0x680000, 0x680001).w("toybox", FUNC(kaneko_toybox_device::mcu_com2_w));
+	map(0x700000, 0x700001).w("toybox", FUNC(kaneko_toybox_device::mcu_com3_w));
+	map(0x780000, 0x780001).r("toybox", FUNC(kaneko_toybox_device::mcu_status_r));
 	
-	AM_RANGE(0x800000, 0x9fffff) AM_DEVICE( "grap2_0", kaneko_grap2_device, grap2_map)
-	AM_RANGE(0xa00000, 0xbfffff) AM_DEVICE( "grap2_1", kaneko_grap2_device, grap2_map)
-	AM_RANGE(0xc00000, 0xdfffff) AM_DEVICE( "grap2_2", kaneko_grap2_device, grap2_map)
+	map(0x800000, 0x9fffff).m("grap2_0", FUNC(kaneko_grap2_device::grap2_map));
+	map(0xa00000, 0xbfffff).m("grap2_1", FUNC(kaneko_grap2_device::grap2_map));
+	map(0xc00000, 0xdfffff).m("grap2_2", FUNC(kaneko_grap2_device::grap2_map));
 
 	// ?? priority / alpha buffer?
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM AM_SHARE("priority_buffer") // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(galpani3_priority_buffer_scrollx_w) // scroll?
-	AM_RANGE(0xe80002, 0xe80003) AM_WRITE(galpani3_priority_buffer_scrolly_w) // scroll?
+	map(0xe00000, 0xe7ffff).ram().share("priority_buffer"); // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
+	map(0xe80000, 0xe80001).w(this, FUNC(galpani3_state::galpani3_priority_buffer_scrollx_w)); // scroll?
+	map(0xe80002, 0xe80003).w(this, FUNC(galpani3_state::galpani3_priority_buffer_scrolly_w)); // scroll?
 
 
-	AM_RANGE(0xf00000, 0xf00001) AM_NOP // ? written once (2nd opcode, $1.b)
-	AM_RANGE(0xf00010, 0xf00011) AM_READ_PORT("P1")
-	AM_RANGE(0xf00012, 0xf00013) AM_READ_PORT("P2")
-	AM_RANGE(0xf00014, 0xf00015) AM_READ_PORT("COIN")
-	AM_RANGE(0xf00016, 0xf00017) AM_NOP // ? read, but overwritten
-	AM_RANGE(0xf00020, 0xf00023) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff)     // sound
-	AM_RANGE(0xf00040, 0xf00041) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-	AM_RANGE(0xf00050, 0xf00051) AM_NOP // ? written once (3rd opcode, $30.b)
-ADDRESS_MAP_END
+	map(0xf00000, 0xf00001).noprw(); // ? written once (2nd opcode, $1.b)
+	map(0xf00010, 0xf00011).portr("P1");
+	map(0xf00012, 0xf00013).portr("P2");
+	map(0xf00014, 0xf00015).portr("COIN");
+	map(0xf00016, 0xf00017).noprw(); // ? read, but overwritten
+	map(0xf00020, 0xf00023).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff);     // sound
+	map(0xf00040, 0xf00041).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+	map(0xf00050, 0xf00051).noprw(); // ? written once (3rd opcode, $30.b)
+}
 
 
 MACHINE_CONFIG_START(galpani3_state::galpani3)

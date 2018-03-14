@@ -51,36 +51,43 @@
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(zx_state::zx80_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_MIRROR(0x3000)
-	AM_RANGE(0x4000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void zx_state::zx80_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().mirror(0x3000);
+	map(0x4000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(zx_state::zx81_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_MIRROR(0x2000)
-	AM_RANGE(0x4000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void zx_state::zx81_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().mirror(0x2000);
+	map(0x4000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(zx_state::ula_map)
-	AM_RANGE(0x0000, 0x7fff) AM_READ(ula_low_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(ula_high_r)
-ADDRESS_MAP_END
+void zx_state::ula_map(address_map &map)
+{
+	map(0x0000, 0x7fff).r(this, FUNC(zx_state::ula_low_r));
+	map(0x8000, 0xffff).r(this, FUNC(zx_state::ula_high_r));
+}
 
-ADDRESS_MAP_START(zx_state::zx80_io_map)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(zx80_io_r, zx80_io_w)
-ADDRESS_MAP_END
+void zx_state::zx80_io_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(zx_state::zx80_io_r), FUNC(zx_state::zx80_io_w));
+}
 
-ADDRESS_MAP_START(zx_state::zx81_io_map)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(zx81_io_r, zx81_io_w)
-ADDRESS_MAP_END
+void zx_state::zx81_io_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(zx_state::zx81_io_r), FUNC(zx_state::zx81_io_w));
+}
 
-ADDRESS_MAP_START(zx_state::pc8300_io_map)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pc8300_io_r, zx81_io_w)
-ADDRESS_MAP_END
+void zx_state::pc8300_io_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(zx_state::pc8300_io_r), FUNC(zx_state::zx81_io_w));
+}
 
-ADDRESS_MAP_START(zx_state::pow3000_io_map)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pow3000_io_r, zx81_io_w)
-ADDRESS_MAP_END
+void zx_state::pow3000_io_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(zx_state::pow3000_io_r), FUNC(zx_state::zx81_io_w));
+}
 
 
 /* Input Ports */

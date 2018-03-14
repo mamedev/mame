@@ -100,10 +100,11 @@ void acvirus_state::machine_reset()
 {
 }
 
-ADDRESS_MAP_START(acvirus_state::virus_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0) // fixed 32K of flash image
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("rombank")
-ADDRESS_MAP_END
+void acvirus_state::virus_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0); // fixed 32K of flash image
+	map(0x8000, 0xffff).bankr("rombank");
+}
 
 MACHINE_CONFIG_START(acvirus_state::virus)
 	MCFG_CPU_ADD("maincpu", I8052, XTAL(12'000'000))

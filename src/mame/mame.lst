@@ -12410,6 +12410,7 @@ exl100                          //
 exerion                         // (c) 1983 Jaleco
 exerionb                        // bootleg
 exeriont                        // (c) 1983 Jaleco + Taito America license
+irion                           //
 
 @source:exidy.cpp
 fax                             // (c) 1983
@@ -13826,6 +13827,7 @@ gkigt43n                        //
 gkigt4ms                        //
 gkigt5p                         //
 gkigtez                         //
+gkigtezms                       //
 gkkey                           //
 igtsc                           //
 ms72c                           //
@@ -18472,6 +18474,7 @@ marywu                          //
 
 @source:mastboy.cpp
 mastboy                         // (c) 1987 - No Ref on the PCB
+mastboya                        // (c) 1987 - No Ref on the PCB
 mastboyi                        // (c) 1987 - No Ref on the PCB
 mastboyia                       // (c) 1987 - No Ref on the PCB
 
@@ -21307,12 +21310,13 @@ wingwaru                        // 1994.09 Wing War (US)
 @source:model2.cpp
 bel                             // 1998.12 Behind Enemy Lines
 daytona                         // 1994.03 Daytona USA (Japan, Revision A)
-daytona93                       //
-daytonam                        // 1993, hack
-daytonas                        //
+daytona93                       // 1993    Japan
+daytonam                        // 2001    Kyle Hodgetts hack
+daytonas                        // 
 daytonase                       // 1994    Daytona USA Special Edition (Japan, Revision A)
-daytonat                        // 1993, hack
-daytonata                       // 1993, hack
+daytonat                        // 1994?   Kyle Hodgetts hack
+daytonata                       // 1994?   Kyle Hodgetts hack
+daytonagtx						// 2004    Kyle Hodgetts hack
 desert                          // 1994.07 Desert Tank
 doa                             // 1996.11 Dead or Alive (Revision B)
 doaa                            // 1996.11 Dead or Alive (Revision A)
@@ -32923,6 +32927,9 @@ rvoicepc                        //
 @source:rx78.cpp
 rx78                            //
 
+@source:rz1.cpp
+rz1								// 1986 Casio
+
 @source:rzone.cpp
 rzbatfor                        //
 rzindy500                       //
@@ -39029,7 +39036,9 @@ rad_snowp                       //
 rad_madf                        //
 rad_fb                          //
 epo_efdx                        //
+rad_rh				     		//
 has_wamg                        //
+eka_base                        //
 eka_strt                        //
 xavtenni                        //
 ttv_sw                          //

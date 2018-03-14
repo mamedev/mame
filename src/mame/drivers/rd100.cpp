@@ -43,15 +43,16 @@ private:
 };
 
 
-ADDRESS_MAP_START(rd100_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
+void rd100_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).ram();
 	//AM_RANGE(0x8608, 0x860f) AM_DEVREADWRITE("timer", ptm6840_device, read, write)
-	AM_RANGE(0x8640, 0x8643) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x8680, 0x8683) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
+	map(0x8640, 0x8643).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8680, 0x8683).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	//AM_RANGE(0x8700, 0x8700)  // device
-	AM_RANGE(0x8800, 0xffff) AM_ROM AM_REGION("roms", 0x800)
-ADDRESS_MAP_END
+	map(0x8800, 0xffff).rom().region("roms", 0x800);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( rd100 )

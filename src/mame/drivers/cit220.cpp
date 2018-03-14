@@ -46,30 +46,33 @@ WRITE_LINE_MEMBER(cit220_state::sod_w)
 	// probably asserts PBREQ on SCN2674 to access memory at Exxx
 }
 
-ADDRESS_MAP_START(cit220_state::mem_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa1ff) AM_ROM AM_REGION("eeprom", 0x800)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM // ???
-ADDRESS_MAP_END
+void cit220_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa1ff).rom().region("eeprom", 0x800);
+	map(0xe000, 0xe7ff).ram(); // ???
+}
 
-ADDRESS_MAP_START(cit220_state::io_map)
-	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
-	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("avdc", scn2674_device, read, write)
-	AM_RANGE(0xa0, 0xa0) AM_UNMAP // ???
-	AM_RANGE(0xc0, 0xc0) AM_UNMAP // ???
-ADDRESS_MAP_END
+void cit220_state::io_map(address_map &map)
+{
+	map(0x00, 0x0f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0x10, 0x10).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x11, 0x11).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x27).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write));
+	map(0xa0, 0xa0).unmaprw(); // ???
+	map(0xc0, 0xc0).unmaprw(); // ???
+}
 
 
 SCN2674_DRAW_CHARACTER_MEMBER(cit220_state::draw_character)
 {
 }
 
-ADDRESS_MAP_START(cit220_state::vram_map)
-	AM_RANGE(0x0000, 0x27ff) AM_NOP
-ADDRESS_MAP_END
+void cit220_state::vram_map(address_map &map)
+{
+	map(0x0000, 0x27ff).noprw();
+}
 
 
 static INPUT_PORTS_START( cit220p )

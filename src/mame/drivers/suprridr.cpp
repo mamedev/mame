@@ -143,32 +143,34 @@ WRITE8_MEMBER(suprridr_state::coin_lock_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(suprridr_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0x9800, 0x983f) AM_RAM
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9880, 0x9bff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xb002, 0xb003) AM_WRITE(coin_lock_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(flipx_w)
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(flipy_w)
-	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE(fgdisable_w)
-	AM_RANGE(0xc802, 0xc802) AM_WRITE(fgscrolly_w)
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(bgscrolly_w)
-	AM_RANGE(0xc000, 0xefff) AM_ROM
-ADDRESS_MAP_END
+void suprridr_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8bff).ram().w(this, FUNC(suprridr_state::bgram_w)).share("bgram");
+	map(0x9000, 0x97ff).ram().w(this, FUNC(suprridr_state::fgram_w)).share("fgram");
+	map(0x9800, 0x983f).ram();
+	map(0x9840, 0x987f).ram().share("spriteram");
+	map(0x9880, 0x9bff).ram();
+	map(0xa000, 0xa000).portr("INPUTS");
+	map(0xa800, 0xa800).portr("SYSTEM");
+	map(0xb000, 0xb000).portr("DSW").w(this, FUNC(suprridr_state::nmi_enable_w));
+	map(0xb002, 0xb003).w(this, FUNC(suprridr_state::coin_lock_w));
+	map(0xb006, 0xb006).w(this, FUNC(suprridr_state::flipx_w));
+	map(0xb007, 0xb007).w(this, FUNC(suprridr_state::flipy_w));
+	map(0xb800, 0xb800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xc801, 0xc801).w(this, FUNC(suprridr_state::fgdisable_w));
+	map(0xc802, 0xc802).w(this, FUNC(suprridr_state::fgscrolly_w));
+	map(0xc804, 0xc804).w(this, FUNC(suprridr_state::bgscrolly_w));
+	map(0xc000, 0xefff).rom();
+}
 
 
-ADDRESS_MAP_START(suprridr_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-ADDRESS_MAP_END
+void suprridr_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
 
 
@@ -178,20 +180,22 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(suprridr_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM
-ADDRESS_MAP_END
+void suprridr_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x3800, 0x3bff).ram();
+}
 
 
-ADDRESS_MAP_START(suprridr_state::sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x8d, 0x8d) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x8f, 0x8f) AM_DEVREAD("ay2", ay8910_device, data_r)
-ADDRESS_MAP_END
+void suprridr_state::sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x8c, 0x8d).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x8d, 0x8d).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x8e, 0x8f).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x8f, 0x8f).r("ay2", FUNC(ay8910_device::data_r));
+}
 
 
 

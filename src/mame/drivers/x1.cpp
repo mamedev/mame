@@ -1319,106 +1319,112 @@ WRITE8_MEMBER( x1_state::x1turbo_mem_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(x1_state::x1_io_banks_common)
-	ADDRESS_MAP_UNMAP_HIGH
+void x1_state::x1_io_banks_common(address_map &map)
+{
+	map.unmap_value_high();
 
-	AM_RANGE(0x0e00, 0x0e02)                   AM_WRITE(x1_rom_w)
-	AM_RANGE(0x0e03, 0x0e03)                   AM_READ(x1_rom_r)
+	map(0x0e00, 0x0e02).w(this, FUNC(x1_state::x1_rom_w));
+	map(0x0e03, 0x0e03).r(this, FUNC(x1_state::x1_rom_r));
 
-	AM_RANGE(0x0ff8, 0x0fff)                   AM_READWRITE(x1_fdc_r, x1_fdc_w)
+	map(0x0ff8, 0x0fff).rw(this, FUNC(x1_state::x1_fdc_r), FUNC(x1_state::x1_fdc_w));
 
-	AM_RANGE(0x1300, 0x1300) AM_MIRROR(0x00ff) AM_WRITE(x1_pri_w)
-	AM_RANGE(0x1400, 0x17ff)                   AM_READWRITE(x1_pcg_r, x1_pcg_w)
+	map(0x1300, 0x1300).mirror(0x00ff).w(this, FUNC(x1_state::x1_pri_w));
+	map(0x1400, 0x17ff).rw(this, FUNC(x1_state::x1_pcg_r), FUNC(x1_state::x1_pcg_w));
 
-	AM_RANGE(0x1800, 0x1801)                   AM_WRITE(x1_6845_w)
+	map(0x1800, 0x1801).w(this, FUNC(x1_state::x1_6845_w));
 
-	AM_RANGE(0x1900, 0x1900) AM_MIRROR(0x00ff) AM_READWRITE(x1_sub_io_r, x1_sub_io_w)
-	AM_RANGE(0x1a00, 0x1a03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x1b00, 0x1b00) AM_MIRROR(0x00ff) AM_DEVREADWRITE("ay", ay8910_device, data_r, data_w)
-	AM_RANGE(0x1c00, 0x1c00) AM_MIRROR(0x00ff) AM_DEVWRITE("ay", ay8910_device, address_w)
-	AM_RANGE(0x1d00, 0x1d00) AM_MIRROR(0x00ff) AM_WRITE(x1_rom_bank_1_w)
-	AM_RANGE(0x1e00, 0x1e00) AM_MIRROR(0x00ff) AM_WRITE(x1_rom_bank_0_w)
+	map(0x1900, 0x1900).mirror(0x00ff).rw(this, FUNC(x1_state::x1_sub_io_r), FUNC(x1_state::x1_sub_io_w));
+	map(0x1a00, 0x1a03).mirror(0x00fc).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x1b00, 0x1b00).mirror(0x00ff).rw("ay", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x1c00, 0x1c00).mirror(0x00ff).w("ay", FUNC(ay8910_device::address_w));
+	map(0x1d00, 0x1d00).mirror(0x00ff).w(this, FUNC(x1_state::x1_rom_bank_1_w));
+	map(0x1e00, 0x1e00).mirror(0x00ff).w(this, FUNC(x1_state::x1_rom_bank_0_w));
 
-	AM_RANGE(0x1fa0, 0x1fa3)                   AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x1fa8, 0x1fab)                   AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+	map(0x1fa0, 0x1fa3).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x1fa8, 0x1fab).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
-	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("avram")
+	map(0x2000, 0x27ff).mirror(0x0800).ram().share("avram");
 
-	AM_RANGE(0x4000, 0xffff)                   AM_READWRITE_BANK("bitmapbank")
+	map(0x4000, 0xffff).bankrw("bitmapbank");
 
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(x1_ex_gfxram_r, x1_ex_gfxram_w)
-ADDRESS_MAP_END
+	map(0x10000, 0x1ffff).rw(this, FUNC(x1_state::x1_ex_gfxram_r), FUNC(x1_state::x1_ex_gfxram_w));
+}
 
 
-ADDRESS_MAP_START(x1_state::x1_io_banks)
-	AM_IMPORT_FROM(x1_io_banks_common)
+void x1_state::x1_io_banks(address_map &map)
+{
+	x1_io_banks_common(map);
 
 //  AM_RANGE(0x0700, 0x0701) TODO: user could install ym2151 on plain X1 too
 
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x00ff) AM_WRITE(x1_pal_b_w)
-	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x00ff) AM_WRITE(x1_pal_r_w)
-	AM_RANGE(0x1200, 0x1200) AM_MIRROR(0x00ff) AM_WRITE(x1_pal_g_w)
+	map(0x1000, 0x1000).mirror(0x00ff).w(this, FUNC(x1_state::x1_pal_b_w));
+	map(0x1100, 0x1100).mirror(0x00ff).w(this, FUNC(x1_state::x1_pal_r_w));
+	map(0x1200, 0x1200).mirror(0x00ff).w(this, FUNC(x1_state::x1_pal_g_w));
 
-	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("tvram") // Ys checks if it's a x1/x1turbo machine by checking if this area is a mirror
-ADDRESS_MAP_END
+	map(0x3000, 0x37ff).mirror(0x0800).ram().share("tvram"); // Ys checks if it's a x1/x1turbo machine by checking if this area is a mirror
+}
 
 
-ADDRESS_MAP_START(x1_state::x1turbo_io_banks)
-	AM_IMPORT_FROM(x1_io_banks_common)
+void x1_state::x1turbo_io_banks(address_map &map)
+{
+	x1_io_banks_common(map);
 
 	// a * at the end states devices used on plain X1 too
 
-	AM_RANGE(0x0700, 0x0701)                   AM_READ(ym_r) AM_DEVWRITE("ym", ym2151_device, write)
+	map(0x0700, 0x0701).r(this, FUNC(x1_state::ym_r)).w("ym", FUNC(ym2151_device::write));
 	// 0x704 is FM sound detection port on X1 turboZ
-	AM_RANGE(0x0704, 0x0707)                   AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+	map(0x0704, 0x0707).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
-	AM_RANGE(0x0800, 0x0800)                   AM_WRITE(color_board_w)                          // *
-	AM_RANGE(0x0801, 0x0801)                   AM_READ(color_board_r)                           // *
-	AM_RANGE(0x0802, 0x0802)                   AM_WRITE(color_board_2_w)                        // *
-	AM_RANGE(0x0803, 0x0803)                   AM_READ(color_board_2_r)                         // *
-	AM_RANGE(0x0a00, 0x0a07)                   AM_READWRITE(stereo_board_r, stereo_board_w)     // *
-	AM_RANGE(0x0b00, 0x0b00)                   AM_READWRITE(x1turbo_bank_r, x1turbo_bank_w)
-	AM_RANGE(0x0c00, 0x0cff)                   AM_READWRITE(rs232_r, rs232_w)                   // *
-	AM_RANGE(0x0d00, 0x0dff)                   AM_READWRITE(x1_emm_r, x1_emm_w)                 // *
-	AM_RANGE(0x0e80, 0x0e81)                   AM_READ(x1_kanji_r)
-	AM_RANGE(0x0e80, 0x0e83)                   AM_WRITE(x1_kanji_w)
-	AM_RANGE(0x0fd0, 0x0fd3)                   AM_READWRITE(sasi_r, sasi_w)                     // *
-	AM_RANGE(0x0fe8, 0x0fef)                   AM_READWRITE(fdd8_r, fdd8_w)                     // *
+	map(0x0800, 0x0800).w(this, FUNC(x1_state::color_board_w));                          // *
+	map(0x0801, 0x0801).r(this, FUNC(x1_state::color_board_r));                           // *
+	map(0x0802, 0x0802).w(this, FUNC(x1_state::color_board_2_w));                        // *
+	map(0x0803, 0x0803).r(this, FUNC(x1_state::color_board_2_r));                         // *
+	map(0x0a00, 0x0a07).rw(this, FUNC(x1_state::stereo_board_r), FUNC(x1_state::stereo_board_w));     // *
+	map(0x0b00, 0x0b00).rw(this, FUNC(x1_state::x1turbo_bank_r), FUNC(x1_state::x1turbo_bank_w));
+	map(0x0c00, 0x0cff).rw(this, FUNC(x1_state::rs232_r), FUNC(x1_state::rs232_w));                   // *
+	map(0x0d00, 0x0dff).rw(this, FUNC(x1_state::x1_emm_r), FUNC(x1_state::x1_emm_w));                 // *
+	map(0x0e80, 0x0e81).r(this, FUNC(x1_state::x1_kanji_r));
+	map(0x0e80, 0x0e83).w(this, FUNC(x1_state::x1_kanji_w));
+	map(0x0fd0, 0x0fd3).rw(this, FUNC(x1_state::sasi_r), FUNC(x1_state::sasi_w));                     // *
+	map(0x0fe8, 0x0fef).rw(this, FUNC(x1_state::fdd8_r), FUNC(x1_state::fdd8_w));                     // *
 
-	AM_RANGE(0x1000, 0x12ff)                   AM_WRITE(x1turboz_4096_palette_w)
+	map(0x1000, 0x12ff).w(this, FUNC(x1_state::x1turboz_4096_palette_w));
 
-	AM_RANGE(0x1f80, 0x1f80) AM_MIRROR(0x000f) AM_DEVREADWRITE("dma", z80dma_device, read, write)
-	AM_RANGE(0x1f90, 0x1f93)                   AM_DEVREADWRITE("sio", z80sio0_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x1f98, 0x1f9f)                   AM_READWRITE(ext_sio_ctc_r, ext_sio_ctc_w)
-	AM_RANGE(0x1fb0, 0x1fb0)                   AM_READWRITE(x1turbo_pal_r, x1turbo_pal_w)       // Z only!
-	AM_RANGE(0x1fb8, 0x1fbf)                   AM_READWRITE(x1turbo_txpal_r, x1turbo_txpal_w)   // Z only!
-	AM_RANGE(0x1fc0, 0x1fc0)                   AM_READWRITE(x1turbo_txdisp_r, x1turbo_txdisp_w) // Z only!
-	AM_RANGE(0x1fc1, 0x1fc1)                   AM_WRITE(z_img_cap_w)                            // Z only!
-	AM_RANGE(0x1fc2, 0x1fc2)                   AM_WRITE(z_mosaic_w)                             // Z only!
-	AM_RANGE(0x1fc3, 0x1fc3)                   AM_WRITE(z_chroma_key_w)                         // Z only!
-	AM_RANGE(0x1fc4, 0x1fc4)                   AM_WRITE(z_extra_scroll_w)                       // Z only!
-	AM_RANGE(0x1fc5, 0x1fc5)                   AM_READWRITE(x1turbo_gfxpal_r, x1turbo_gfxpal_w) // Z only!
+	map(0x1f80, 0x1f80).mirror(0x000f).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x1f90, 0x1f93).rw("sio", FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
+	map(0x1f98, 0x1f9f).rw(this, FUNC(x1_state::ext_sio_ctc_r), FUNC(x1_state::ext_sio_ctc_w));
+	map(0x1fb0, 0x1fb0).rw(this, FUNC(x1_state::x1turbo_pal_r), FUNC(x1_state::x1turbo_pal_w));       // Z only!
+	map(0x1fb8, 0x1fbf).rw(this, FUNC(x1_state::x1turbo_txpal_r), FUNC(x1_state::x1turbo_txpal_w));   // Z only!
+	map(0x1fc0, 0x1fc0).rw(this, FUNC(x1_state::x1turbo_txdisp_r), FUNC(x1_state::x1turbo_txdisp_w)); // Z only!
+	map(0x1fc1, 0x1fc1).w(this, FUNC(x1_state::z_img_cap_w));                            // Z only!
+	map(0x1fc2, 0x1fc2).w(this, FUNC(x1_state::z_mosaic_w));                             // Z only!
+	map(0x1fc3, 0x1fc3).w(this, FUNC(x1_state::z_chroma_key_w));                         // Z only!
+	map(0x1fc4, 0x1fc4).w(this, FUNC(x1_state::z_extra_scroll_w));                       // Z only!
+	map(0x1fc5, 0x1fc5).rw(this, FUNC(x1_state::x1turbo_gfxpal_r), FUNC(x1_state::x1turbo_gfxpal_w)); // Z only!
 //  AM_RANGE(0x1fd0, 0x1fdf)                   AM_READ(x1_scrn_r)                               // Z only!
-	AM_RANGE(0x1fd0, 0x1fd0) AM_MIRROR(0x000f) AM_WRITE(x1_scrn_w)
-	AM_RANGE(0x1fe0, 0x1fe0)                   AM_READWRITE(x1turboz_blackclip_r, x1turbo_blackclip_w)
-	AM_RANGE(0x1ff0, 0x1ff0)                   AM_READ_PORT("X1TURBO_DSW")
+	map(0x1fd0, 0x1fd0).mirror(0x000f).w(this, FUNC(x1_state::x1_scrn_w));
+	map(0x1fe0, 0x1fe0).rw(this, FUNC(x1_state::x1turboz_blackclip_r), FUNC(x1_state::x1turbo_blackclip_w));
+	map(0x1ff0, 0x1ff0).portr("X1TURBO_DSW");
 
-	AM_RANGE(0x3000, 0x37ff)                   AM_RAM AM_SHARE("tvram")
-	AM_RANGE(0x3800, 0x3fff)                   AM_RAM AM_SHARE("kvram")
-ADDRESS_MAP_END
+	map(0x3000, 0x37ff).ram().share("tvram");
+	map(0x3800, 0x3fff).ram().share("kvram");
+}
 
 
-ADDRESS_MAP_START(x1_state::x1_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_mem_r,x1_mem_w)
-ADDRESS_MAP_END
+void x1_state::x1_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(x1_state::x1_mem_r), FUNC(x1_state::x1_mem_w));
+}
 
-ADDRESS_MAP_START(x1_state::x1turbo_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1turbo_mem_r,x1turbo_mem_w)
-ADDRESS_MAP_END
+void x1_state::x1turbo_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(x1_state::x1turbo_mem_r), FUNC(x1_state::x1turbo_mem_w));
+}
 
-ADDRESS_MAP_START(x1_state::x1_io)
-	AM_RANGE(0x0000, 0xffff) AM_DEVICE("iobank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void x1_state::x1_io(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_iobank, FUNC(address_map_bank_device::amap8));
+}
 
 /*************************************
  *

@@ -87,50 +87,52 @@ private:
 };
 
 // housekeeping cpu
-ADDRESS_MAP_START(wico_state::hcpu_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x1fe0, 0x1fe0) AM_WRITE(muxld_w)
+void wico_state::hcpu_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("sharedram");
+	map(0x1fe0, 0x1fe0).w(this, FUNC(wico_state::muxld_w));
 	//AM_RANGE(0x1fe1, 0x1fe1) AM_WRITE(store_w)
-	AM_RANGE(0x1fe2, 0x1fe2) AM_WRITE(muxen_w)
+	map(0x1fe2, 0x1fe2).w(this, FUNC(wico_state::muxen_w));
 	//AM_RANGE(0x1fe3, 0x1fe3) AM_WRITE(csols_w)
-	AM_RANGE(0x1fe4, 0x1fe4) AM_NOP
-	AM_RANGE(0x1fe5, 0x1fe5) AM_DEVWRITE("sn76494", sn76494_device, write)
-	AM_RANGE(0x1fe6, 0x1fe6) AM_WRITE(wdogcl_w)
-	AM_RANGE(0x1fe7, 0x1fe7) AM_WRITE(zcres_w)
-	AM_RANGE(0x1fe8, 0x1fe8) AM_WRITE(dled0_w)
-	AM_RANGE(0x1fe9, 0x1fe9) AM_WRITE(dled1_w)
-	AM_RANGE(0x1fea, 0x1fea) AM_READ(gentmrcl_r)
-	AM_RANGE(0x1feb, 0x1feb) AM_READ(lampst_r)
+	map(0x1fe4, 0x1fe4).noprw();
+	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::write));
+	map(0x1fe6, 0x1fe6).w(this, FUNC(wico_state::wdogcl_w));
+	map(0x1fe7, 0x1fe7).w(this, FUNC(wico_state::zcres_w));
+	map(0x1fe8, 0x1fe8).w(this, FUNC(wico_state::dled0_w));
+	map(0x1fe9, 0x1fe9).w(this, FUNC(wico_state::dled1_w));
+	map(0x1fea, 0x1fea).r(this, FUNC(wico_state::gentmrcl_r));
+	map(0x1feb, 0x1feb).r(this, FUNC(wico_state::lampst_r));
 	//AM_RANGE(0x1fec, 0x1fec) AM_READ(sast_r)
 	//AM_RANGE(0x1fed, 0x1fed) AM_READ(solst1_r)
 	//AM_RANGE(0x1fee, 0x1fee) AM_READ(solst0_r)
-	AM_RANGE(0x1fef, 0x1fef) AM_READ(switch_r)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x1fef, 0x1fef).r(this, FUNC(wico_state::switch_r));
+	map(0xf000, 0xffff).rom();
+}
 
 // command cpu
-ADDRESS_MAP_START(wico_state::ccpu_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram") // 2128  2k RAM
+void wico_state::ccpu_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("sharedram"); // 2128  2k RAM
 	//AM_RANGE(0x1fe0, 0x1fe0) AM_WRITE(muxld_w) // to display module
 	//AM_RANGE(0x1fe1, 0x1fe1) AM_WRITE(store_w) // enable save to nvram
-	AM_RANGE(0x1fe2, 0x1fe2) AM_WRITE(muxen_w) // digit to display on diagnostic LED; d0=L will disable main displays
-	AM_RANGE(0x1fe3, 0x1fe3) AM_WRITE(csols_w) // solenoid column
-	AM_RANGE(0x1fe4, 0x1fe4) AM_WRITE(msols_w) // solenoid row
-	AM_RANGE(0x1fe5, 0x1fe5) AM_DEVWRITE("sn76494", sn76494_device, write)
-	AM_RANGE(0x1fe6, 0x1fe6) AM_WRITE(wdogcl_w) // watchdog clear
-	AM_RANGE(0x1fe7, 0x1fe7) AM_WRITE(zcres_w) // enable IRQ on hcpu
-	AM_RANGE(0x1fe8, 0x1fe8) AM_WRITE(dled0_w) // turn off diagnostic LED
-	AM_RANGE(0x1fe9, 0x1fe9) AM_WRITE(dled1_w) // turn on diagnostic LED
-	AM_RANGE(0x1fea, 0x1fea) AM_READ(gentmrcl_r) // enable IRQ on ccpu
+	map(0x1fe2, 0x1fe2).w(this, FUNC(wico_state::muxen_w)); // digit to display on diagnostic LED; d0=L will disable main displays
+	map(0x1fe3, 0x1fe3).w(this, FUNC(wico_state::csols_w)); // solenoid column
+	map(0x1fe4, 0x1fe4).w(this, FUNC(wico_state::msols_w)); // solenoid row
+	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::write));
+	map(0x1fe6, 0x1fe6).w(this, FUNC(wico_state::wdogcl_w)); // watchdog clear
+	map(0x1fe7, 0x1fe7).w(this, FUNC(wico_state::zcres_w)); // enable IRQ on hcpu
+	map(0x1fe8, 0x1fe8).w(this, FUNC(wico_state::dled0_w)); // turn off diagnostic LED
+	map(0x1fe9, 0x1fe9).w(this, FUNC(wico_state::dled1_w)); // turn on diagnostic LED
+	map(0x1fea, 0x1fea).r(this, FUNC(wico_state::gentmrcl_r)); // enable IRQ on ccpu
 	//AM_RANGE(0x1feb, 0x1feb) AM_READ(lampst_r) // lamps?
 	//AM_RANGE(0x1fec, 0x1fec) AM_READ(sast_r) // a pwron pulse to d0 L->H
 	//AM_RANGE(0x1fed, 0x1fed) AM_READ(solst1_r) // switches
 	//AM_RANGE(0x1fee, 0x1fee) AM_READ(solst0_r) // switches
 	//AM_RANGE(0x1fef, 0x1fef) AM_READ(switch_r) // switches
-	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram") // X2212 4bit x 256 NVRAM, stores only when store_w is active
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x4000, 0x40ff).ram().share("nvram"); // X2212 4bit x 256 NVRAM, stores only when store_w is active
+	map(0x8000, 0x9fff).rom();
+	map(0xe000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( wico )
 	PORT_START("X0")

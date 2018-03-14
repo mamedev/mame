@@ -250,34 +250,36 @@ WRITE8_MEMBER(pt68k4_state::fdc_select_w)
 	}
 }
 
-ADDRESS_MAP_START(pt68k4_state::pt68k2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("rambase") // 1MB RAM
-	AM_RANGE(0xf80000, 0xf8ffff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0xc00000, 0xdfffff) AM_DEVREADWRITE8(ISABUS_TAG, isa8_device, mem_r, mem_w, 0x00ff)
-	AM_RANGE(0xfa0000, 0xfbffff) AM_DEVREADWRITE8(ISABUS_TAG, isa8_device, io_r, io_w, 0x00ff)
-	AM_RANGE(0xfe0000, 0xfe001f) AM_DEVREADWRITE8(DUART1_TAG, mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0xfe0040, 0xfe005f) AM_DEVREADWRITE8(DUART2_TAG, mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0xfe0080, 0xfe00bf) AM_READ8(pia_stub_r, 0x00ff)
-	AM_RANGE(0xfe00c0, 0xfe00ff) AM_WRITE8(fdc_select_w, 0x00ff)
-	AM_RANGE(0xfe0100, 0xfe013f) AM_DEVREADWRITE8(WDFDC_TAG, wd1772_device, read, write, 0x00ff)
-	AM_RANGE(0xfe01c0, 0xfe01c3) AM_READWRITE8(keyboard_r, keyboard_w, 0x00ff)
-	AM_RANGE(0xff0000, 0xff0fff) AM_READWRITE8(hiram_r, hiram_w, 0xff00)
-	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE8(TIMEKEEPER_TAG, timekeeper_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void pt68k4_state::pt68k2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x0fffff).ram().share("rambase"); // 1MB RAM
+	map(0xf80000, 0xf8ffff).rom().region("roms", 0);
+	map(0xc00000, 0xdfffff).rw(m_isa, FUNC(isa8_device::mem_r), FUNC(isa8_device::mem_w)).umask16(0x00ff);
+	map(0xfa0000, 0xfbffff).rw(m_isa, FUNC(isa8_device::io_r), FUNC(isa8_device::io_w)).umask16(0x00ff);
+	map(0xfe0000, 0xfe001f).rw(m_duart1, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0xfe0040, 0xfe005f).rw(m_duart2, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0xfe0080, 0xfe00bf).r(this, FUNC(pt68k4_state::pia_stub_r)).umask16(0x00ff);
+	map(0xfe00c0, 0xfe00ff).w(this, FUNC(pt68k4_state::fdc_select_w)).umask16(0x00ff);
+	map(0xfe0100, 0xfe013f).rw(m_wdfdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
+	map(0xfe01c0, 0xfe01c3).rw(this, FUNC(pt68k4_state::keyboard_r), FUNC(pt68k4_state::keyboard_w)).umask16(0x00ff);
+	map(0xff0000, 0xff0fff).rw(this, FUNC(pt68k4_state::hiram_r), FUNC(pt68k4_state::hiram_w)).umask16(0xff00);
+	map(0xff0000, 0xff0fff).rw(TIMEKEEPER_TAG, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(pt68k4_state::pt68k4_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("rambase") // 1MB RAM (OS9 needs more)
-	AM_RANGE(0xf80000, 0xf8ffff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0xc00000, 0xdfffff) AM_DEVREADWRITE8(ISABUS_TAG, isa8_device, mem_r, mem_w, 0x00ff)
-	AM_RANGE(0xfa0000, 0xfbffff) AM_DEVREADWRITE8(ISABUS_TAG, isa8_device, io_r, io_w, 0x00ff)
-	AM_RANGE(0xfe0000, 0xfe001f) AM_DEVREADWRITE8(DUART1_TAG, mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0xfe0040, 0xfe005f) AM_DEVREADWRITE8(DUART2_TAG, mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0xfe01c0, 0xfe01c3) AM_READWRITE8(keyboard_r, keyboard_w, 0x00ff)
-	AM_RANGE(0xff0000, 0xff0fff) AM_READWRITE8(hiram_r, hiram_w, 0xff00)
-	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE8(TIMEKEEPER_TAG, timekeeper_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void pt68k4_state::pt68k4_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x0fffff).ram().share("rambase"); // 1MB RAM (OS9 needs more)
+	map(0xf80000, 0xf8ffff).rom().region("roms", 0);
+	map(0xc00000, 0xdfffff).rw(m_isa, FUNC(isa8_device::mem_r), FUNC(isa8_device::mem_w)).umask16(0x00ff);
+	map(0xfa0000, 0xfbffff).rw(m_isa, FUNC(isa8_device::io_r), FUNC(isa8_device::io_w)).umask16(0x00ff);
+	map(0xfe0000, 0xfe001f).rw(m_duart1, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0xfe0040, 0xfe005f).rw(m_duart2, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0xfe01c0, 0xfe01c3).rw(this, FUNC(pt68k4_state::keyboard_r), FUNC(pt68k4_state::keyboard_w)).umask16(0x00ff);
+	map(0xff0000, 0xff0fff).rw(this, FUNC(pt68k4_state::hiram_r), FUNC(pt68k4_state::hiram_w)).umask16(0xff00);
+	map(0xff0000, 0xff0fff).rw(TIMEKEEPER_TAG, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0x00ff);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pt68k4 )

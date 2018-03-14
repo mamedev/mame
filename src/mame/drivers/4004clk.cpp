@@ -82,30 +82,35 @@ WRITE8_MEMBER(nixieclock_state::neon_w)
 	m_neon_out[3] = BIT(data,0);
 }
 
-ADDRESS_MAP_START(nixieclock_state::_4004clk_rom)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void nixieclock_state::_4004clk_rom(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(nixieclock_state::_4004clk_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-ADDRESS_MAP_END
+void nixieclock_state::_4004clk_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x007f).ram();
+}
 
-ADDRESS_MAP_START(nixieclock_state::_4004clk_stat)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_RAM
-ADDRESS_MAP_END
+void nixieclock_state::_4004clk_stat(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x001f).ram();
+}
 
-ADDRESS_MAP_START(nixieclock_state::_4004clk_rp)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0700) AM_READ_PORT("INPUT")
-	AM_RANGE(0x0000, 0x00ef) AM_MIRROR(0x0700) AM_WRITE(nixie_w)
-	AM_RANGE(0x00f0, 0x00ff) AM_MIRROR(0x0700) AM_WRITE(neon_w)
-ADDRESS_MAP_END
+void nixieclock_state::_4004clk_rp(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x000f).mirror(0x0700).portr("INPUT");
+	map(0x0000, 0x00ef).mirror(0x0700).w(this, FUNC(nixieclock_state::nixie_w));
+	map(0x00f0, 0x00ff).mirror(0x0700).w(this, FUNC(nixieclock_state::neon_w));
+}
 
-ADDRESS_MAP_START(nixieclock_state::_4004clk_mp)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac", dac_bit_interface, write)
-ADDRESS_MAP_END
+void nixieclock_state::_4004clk_mp(address_map &map)
+{
+	map(0x00, 0x00).w("dac", FUNC(dac_bit_interface::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( 4004clk )

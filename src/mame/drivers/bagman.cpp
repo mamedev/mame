@@ -128,53 +128,56 @@ WRITE_LINE_MEMBER(bagman_state::irq_mask_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(bagman_state::main_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP    /* written to, but unused */
-	AM_RANGE(0xa000, 0xa000) AM_READ(pal16r6_r)
-	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xc000, 0xffff) AM_ROM /* Super Bagman only */
-	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_SHARE("spriteram") /* hidden portion of color RAM */
+void bagman_state::main_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x67ff).ram();
+	map(0x9000, 0x93ff).ram().w(this, FUNC(bagman_state::videoram_w)).share("videoram");
+	map(0x9800, 0x9bff).ram().w(this, FUNC(bagman_state::colorram_w)).share("colorram");
+	map(0x9c00, 0x9fff).nopw();    /* written to, but unused */
+	map(0xa000, 0xa000).r(this, FUNC(bagman_state::pal16r6_r));
+	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xc000, 0xffff).rom(); /* Super Bagman only */
+	map(0x9800, 0x981f).writeonly().share("spriteram"); /* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
 									/* writes are handled by colorram_w */
-	AM_RANGE(0xa800, 0xa807) AM_WRITE(ls259_w) /* TMS5110 driving state machine */
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
-	AM_RANGE(0xb800, 0xb800) AM_READNOP                             /* looks like watchdog from schematics */
+	map(0xa800, 0xa807).w(this, FUNC(bagman_state::ls259_w)); /* TMS5110 driving state machine */
+	map(0xb000, 0xb000).portr("DSW");
+	map(0xb800, 0xb800).nopr();                             /* looks like watchdog from schematics */
 
 #if 0
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    /* ???? */
-	AM_RANGE(0xb800, 0xb800) AM_WRITENOP    /* ???? */
+	map(0xb000, 0xb000).nopw();    /* ???? */
+	map(0xb800, 0xb800).nopw();    /* ???? */
 #endif
-ADDRESS_MAP_END
+}
 
 
 
-ADDRESS_MAP_START(bagman_state::pickin_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_SHARE("spriteram") /* hidden portion of color RAM */
+void bagman_state::pickin_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x7000, 0x77ff).ram();
+	map(0x8800, 0x8bff).ram().w(this, FUNC(bagman_state::videoram_w)).share("videoram");
+	map(0x9800, 0x9bff).ram().w(this, FUNC(bagman_state::colorram_w)).share("colorram");
+	map(0x9800, 0x981f).writeonly().share("spriteram"); /* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
 									/* writes are handled by colorram_w */
-	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP    /* written to, but unused */
-	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW")
+	map(0x9c00, 0x9fff).nopw();    /* written to, but unused */
+	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xa800, 0xa800).portr("DSW");
 
 	/* guess */
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xb800, 0xb800) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-ADDRESS_MAP_END
+	map(0xb000, 0xb000).w("ay2", FUNC(ay8910_device::address_w));
+	map(0xb800, 0xb800).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+}
 
-ADDRESS_MAP_START(bagman_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("aysnd", ay8910_device, data_r)
+void bagman_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x08, 0x09).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x0c, 0x0c).r("aysnd", FUNC(ay8910_device::data_r));
 	//AM_RANGE(0x56, 0x56) AM_WRITENOP
-ADDRESS_MAP_END
+}
 
 
 

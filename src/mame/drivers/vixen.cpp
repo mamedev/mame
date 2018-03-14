@@ -260,40 +260,43 @@ READ8_MEMBER( vixen_state::port3_r )
 //-------------------------------------------------
 
 // when M1 is inactive: read and write of data
-ADDRESS_MAP_START(vixen_state::vixen_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4") AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void vixen_state::vixen_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xefff).ram();
+	map(0xf000, 0xffff).bankr("bank3").bankw("bank4").share("video_ram");
+}
 
 // when M1 is active: read opcodes
-ADDRESS_MAP_START(vixen_state::bios_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xefff) AM_READ(opram_r)
-	AM_RANGE(0xf000, 0xffff) AM_READ(oprom_r)
-ADDRESS_MAP_END
+void vixen_state::bios_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xefff).r(this, FUNC(vixen_state::opram_r));
+	map(0xf000, 0xffff).r(this, FUNC(vixen_state::oprom_r));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( vixen_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(vixen_state::vixen_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(FDC1797_TAG, fd1797_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READWRITE(status_r, cmd_w)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0x01) AM_DEVREADWRITE(P8155H_TAG, i8155_device, read, write)
-	AM_RANGE(0x0c, 0x0d) AM_DEVWRITE(P8155H_TAG, i8155_device, ale_w)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x07) AM_DEVREAD(IEEE488_TAG, ieee488_device, dio_r)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0x07) AM_READ(ieee488_r)
-	AM_RANGE(0x20, 0x21) AM_MIRROR(0x04) AM_DEVWRITE(P8155H_IO_TAG, i8155_device, ale_w)
-	AM_RANGE(0x28, 0x28) AM_MIRROR(0x05) AM_DEVREADWRITE(P8155H_IO_TAG, i8155_device, read, write)
-	AM_RANGE(0x30, 0x30) AM_MIRROR(0x06) AM_DEVREADWRITE(P8251A_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREADWRITE(P8251A_TAG, i8251_device, status_r, control_w)
-	AM_RANGE(0x38, 0x38) AM_MIRROR(0x07) AM_READ(port3_r)
+void vixen_state::vixen_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
+	map(0x04, 0x04).mirror(0x03).rw(this, FUNC(vixen_state::status_r), FUNC(vixen_state::cmd_w));
+	map(0x08, 0x08).mirror(0x01).rw(P8155H_TAG, FUNC(i8155_device::read), FUNC(i8155_device::write));
+	map(0x0c, 0x0d).w(P8155H_TAG, FUNC(i8155_device::ale_w));
+	map(0x10, 0x10).mirror(0x07).r(m_ieee488, FUNC(ieee488_device::dio_r));
+	map(0x18, 0x18).mirror(0x07).r(this, FUNC(vixen_state::ieee488_r));
+	map(0x20, 0x21).mirror(0x04).w(m_io_i8155, FUNC(i8155_device::ale_w));
+	map(0x28, 0x28).mirror(0x05).rw(m_io_i8155, FUNC(i8155_device::read), FUNC(i8155_device::write));
+	map(0x30, 0x30).mirror(0x06).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x31, 0x31).mirror(0x06).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x38, 0x38).mirror(0x07).r(this, FUNC(vixen_state::port3_r));
 //  AM_RANGE(0xf0, 0xff) Hard Disk?
-ADDRESS_MAP_END
+}
 
 
 

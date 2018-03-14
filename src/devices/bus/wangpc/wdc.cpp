@@ -64,26 +64,28 @@ const tiny_rom_entry *wangpc_wdc_device::device_rom_region() const
 //  ADDRESS_MAP( wangpc_wdc_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(wangpc_wdc_device::wangpc_wdc_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-ADDRESS_MAP_END
+void wangpc_wdc_device::wangpc_wdc_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region(Z80_TAG, 0);
+	map(0x1000, 0x17ff).ram();
+	map(0x2000, 0x27ff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( wangpc_wdc_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(wangpc_wdc_device::wangpc_wdc_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(port_r)
-	AM_RANGE(0x03, 0x03) AM_WRITE(status_w)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(ctc_ch0_r, ctc_ch0_w)
-	AM_RANGE(0x14, 0x14) AM_READWRITE(ctc_ch1_r, ctc_ch1_w)
-	AM_RANGE(0x18, 0x18) AM_READWRITE(ctc_ch2_r, ctc_ch2_w)
-	AM_RANGE(0x1c, 0x1c) AM_READWRITE(ctc_ch3_r, ctc_ch3_w)
-ADDRESS_MAP_END
+void wangpc_wdc_device::wangpc_wdc_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(this, FUNC(wangpc_wdc_device::port_r));
+	map(0x03, 0x03).w(this, FUNC(wangpc_wdc_device::status_w));
+	map(0x10, 0x10).rw(this, FUNC(wangpc_wdc_device::ctc_ch0_r), FUNC(wangpc_wdc_device::ctc_ch0_w));
+	map(0x14, 0x14).rw(this, FUNC(wangpc_wdc_device::ctc_ch1_r), FUNC(wangpc_wdc_device::ctc_ch1_w));
+	map(0x18, 0x18).rw(this, FUNC(wangpc_wdc_device::ctc_ch2_r), FUNC(wangpc_wdc_device::ctc_ch2_w));
+	map(0x1c, 0x1c).rw(this, FUNC(wangpc_wdc_device::ctc_ch3_r), FUNC(wangpc_wdc_device::ctc_ch3_w));
+}
 
 
 //-------------------------------------------------

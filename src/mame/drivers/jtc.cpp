@@ -210,86 +210,90 @@ WRITE8_MEMBER( jtces40_state::banksel_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(jtc_state::jtc_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff0) AM_READ_PORT("Y1")
-	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff0) AM_READ_PORT("Y2")
-	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff0) AM_READ_PORT("Y3")
-	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x0ff0) AM_READ_PORT("Y4")
-	AM_RANGE(0x7005, 0x7005) AM_MIRROR(0x0ff0) AM_READ_PORT("Y5")
-	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x0ff0) AM_READ_PORT("Y6")
-	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x0ff0) AM_READ_PORT("Y7")
-	AM_RANGE(0x7008, 0x7008) AM_MIRROR(0x0ff0) AM_READ_PORT("Y8")
-	AM_RANGE(0x7009, 0x7009) AM_MIRROR(0x0ff0) AM_READ_PORT("Y9")
-	AM_RANGE(0x700a, 0x700a) AM_MIRROR(0x0ff0) AM_READ_PORT("Y10")
-	AM_RANGE(0x700b, 0x700b) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
-	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
-	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void jtc_state::jtc_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x7001, 0x7001).mirror(0x0ff0).portr("Y1");
+	map(0x7002, 0x7002).mirror(0x0ff0).portr("Y2");
+	map(0x7003, 0x7003).mirror(0x0ff0).portr("Y3");
+	map(0x7004, 0x7004).mirror(0x0ff0).portr("Y4");
+	map(0x7005, 0x7005).mirror(0x0ff0).portr("Y5");
+	map(0x7006, 0x7006).mirror(0x0ff0).portr("Y6");
+	map(0x7007, 0x7007).mirror(0x0ff0).portr("Y7");
+	map(0x7008, 0x7008).mirror(0x0ff0).portr("Y8");
+	map(0x7009, 0x7009).mirror(0x0ff0).portr("Y9");
+	map(0x700a, 0x700a).mirror(0x0ff0).portr("Y10");
+	map(0x700b, 0x700b).mirror(0x0ff0).portr("Y11");
+	map(0x700c, 0x700c).mirror(0x0ff0).portr("Y12");
+	map(0xe000, 0xfdff).ram();
+	map(0xfe00, 0xffff).ram().share("video_ram");
+}
 
-ADDRESS_MAP_START(jtces88_state::jtc_es1988_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0800, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_ROM
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff0) AM_READ_PORT("Y1")
-	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff0) AM_READ_PORT("Y2")
-	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff0) AM_READ_PORT("Y3")
-	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x0ff0) AM_READ_PORT("Y4")
-	AM_RANGE(0x7005, 0x7005) AM_MIRROR(0x0ff0) AM_READ_PORT("Y5")
-	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x0ff0) AM_READ_PORT("Y6")
-	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x0ff0) AM_READ_PORT("Y7")
-	AM_RANGE(0x7008, 0x7008) AM_MIRROR(0x0ff0) AM_READ_PORT("Y8")
-	AM_RANGE(0x7009, 0x7009) AM_MIRROR(0x0ff0) AM_READ_PORT("Y9")
-	AM_RANGE(0x700a, 0x700a) AM_MIRROR(0x0ff0) AM_READ_PORT("Y10")
-	AM_RANGE(0x700b, 0x700b) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
-	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
-	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void jtces88_state::jtc_es1988_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0800, 0x0fff).rom();
+	map(0x2000, 0x27ff).rom();
+	map(0x7001, 0x7001).mirror(0x0ff0).portr("Y1");
+	map(0x7002, 0x7002).mirror(0x0ff0).portr("Y2");
+	map(0x7003, 0x7003).mirror(0x0ff0).portr("Y3");
+	map(0x7004, 0x7004).mirror(0x0ff0).portr("Y4");
+	map(0x7005, 0x7005).mirror(0x0ff0).portr("Y5");
+	map(0x7006, 0x7006).mirror(0x0ff0).portr("Y6");
+	map(0x7007, 0x7007).mirror(0x0ff0).portr("Y7");
+	map(0x7008, 0x7008).mirror(0x0ff0).portr("Y8");
+	map(0x7009, 0x7009).mirror(0x0ff0).portr("Y9");
+	map(0x700a, 0x700a).mirror(0x0ff0).portr("Y10");
+	map(0x700b, 0x700b).mirror(0x0ff0).portr("Y11");
+	map(0x700c, 0x700c).mirror(0x0ff0).portr("Y12");
+	map(0xe000, 0xfdff).ram();
+	map(0xfe00, 0xffff).ram().share("video_ram");
+}
 
-ADDRESS_MAP_START(jtces23_state::jtc_es23_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0800, 0x17ff) AM_ROM
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff0) AM_READ_PORT("Y0")
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff0) AM_READ_PORT("Y1")
-	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff0) AM_READ_PORT("Y2")
-	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff0) AM_READ_PORT("Y3")
-	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x0ff0) AM_READ_PORT("Y4")
-	AM_RANGE(0x7005, 0x7005) AM_MIRROR(0x0ff0) AM_READ_PORT("Y5")
-	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x0ff0) AM_READ_PORT("Y6")
-	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x0ff0) AM_READ_PORT("Y7")
-	AM_RANGE(0x7008, 0x7008) AM_MIRROR(0x0ff0) AM_READ_PORT("Y8")
-	AM_RANGE(0x7009, 0x7009) AM_MIRROR(0x0ff0) AM_READ_PORT("Y9")
-	AM_RANGE(0x700a, 0x700a) AM_MIRROR(0x0ff0) AM_READ_PORT("Y10")
-	AM_RANGE(0x700b, 0x700b) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
-	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
-	AM_RANGE(0x700d, 0x700d) AM_MIRROR(0x0ff0) AM_READ_PORT("Y13")
-	AM_RANGE(0x700e, 0x700e) AM_MIRROR(0x0ff0) AM_READ_PORT("Y14")
-	AM_RANGE(0x700f, 0x700f) AM_MIRROR(0x0ff0) AM_READ_PORT("Y15")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void jtces23_state::jtc_es23_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0800, 0x17ff).rom();
+	map(0x7000, 0x7000).mirror(0x0ff0).portr("Y0");
+	map(0x7001, 0x7001).mirror(0x0ff0).portr("Y1");
+	map(0x7002, 0x7002).mirror(0x0ff0).portr("Y2");
+	map(0x7003, 0x7003).mirror(0x0ff0).portr("Y3");
+	map(0x7004, 0x7004).mirror(0x0ff0).portr("Y4");
+	map(0x7005, 0x7005).mirror(0x0ff0).portr("Y5");
+	map(0x7006, 0x7006).mirror(0x0ff0).portr("Y6");
+	map(0x7007, 0x7007).mirror(0x0ff0).portr("Y7");
+	map(0x7008, 0x7008).mirror(0x0ff0).portr("Y8");
+	map(0x7009, 0x7009).mirror(0x0ff0).portr("Y9");
+	map(0x700a, 0x700a).mirror(0x0ff0).portr("Y10");
+	map(0x700b, 0x700b).mirror(0x0ff0).portr("Y11");
+	map(0x700c, 0x700c).mirror(0x0ff0).portr("Y12");
+	map(0x700d, 0x700d).mirror(0x0ff0).portr("Y13");
+	map(0x700e, 0x700e).mirror(0x0ff0).portr("Y14");
+	map(0x700f, 0x700f).mirror(0x0ff0).portr("Y15");
+	map(0xe000, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram().share("video_ram");
+}
 
-ADDRESS_MAP_START(jtces40_state::jtc_es40_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0800, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(videoram_r, videoram_w)
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(banksel_w)
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff0) AM_READ_PORT("Y1")
-	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff0) AM_READ_PORT("Y2")
-	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff0) AM_READ_PORT("Y3")
-	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x0ff0) AM_READ_PORT("Y4")
-	AM_RANGE(0x7005, 0x7005) AM_MIRROR(0x0ff0) AM_READ_PORT("Y5")
-	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x0ff0) AM_READ_PORT("Y6")
-	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x0ff0) AM_READ_PORT("Y7")
-	AM_RANGE(0x7008, 0x7008) AM_MIRROR(0x0ff0) AM_READ_PORT("Y8")
-	AM_RANGE(0x7009, 0x7009) AM_MIRROR(0x0ff0) AM_READ_PORT("Y9")
-	AM_RANGE(0x700a, 0x700a) AM_MIRROR(0x0ff0) AM_READ_PORT("Y10")
-	AM_RANGE(0x700b, 0x700b) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
-	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
-	AM_RANGE(0x8000, 0xffff) AM_RAM//BANK(1)
-ADDRESS_MAP_END
+void jtces40_state::jtc_es40_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0800, 0x1fff).rom();
+	map(0x4000, 0x5fff).rw(this, FUNC(jtces40_state::videoram_r), FUNC(jtces40_state::videoram_w));
+	map(0x6000, 0x63ff).w(this, FUNC(jtces40_state::banksel_w));
+	map(0x7001, 0x7001).mirror(0x0ff0).portr("Y1");
+	map(0x7002, 0x7002).mirror(0x0ff0).portr("Y2");
+	map(0x7003, 0x7003).mirror(0x0ff0).portr("Y3");
+	map(0x7004, 0x7004).mirror(0x0ff0).portr("Y4");
+	map(0x7005, 0x7005).mirror(0x0ff0).portr("Y5");
+	map(0x7006, 0x7006).mirror(0x0ff0).portr("Y6");
+	map(0x7007, 0x7007).mirror(0x0ff0).portr("Y7");
+	map(0x7008, 0x7008).mirror(0x0ff0).portr("Y8");
+	map(0x7009, 0x7009).mirror(0x0ff0).portr("Y9");
+	map(0x700a, 0x700a).mirror(0x0ff0).portr("Y10");
+	map(0x700b, 0x700b).mirror(0x0ff0).portr("Y11");
+	map(0x700c, 0x700c).mirror(0x0ff0).portr("Y12");
+	map(0x8000, 0xffff).ram();//BANK(1)
+}
 
 /* Input Ports */
 

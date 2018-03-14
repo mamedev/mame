@@ -70,20 +70,22 @@ private:
 };
 
 
-ADDRESS_MAP_START(mkit09_state::mkit09_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0x07ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xa004,0xa007) AM_MIRROR(0x1ff8) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xe000,0xe7ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void mkit09_state::mkit09_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).mirror(0x1800).ram();
+	map(0xa004, 0xa007).mirror(0x1ff8).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe000, 0xe7ff).mirror(0x1800).rom().region("roms", 0);
+}
 
-ADDRESS_MAP_START(mkit09_state::mkit09a_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0x07ff) AM_RAM
-	AM_RANGE(0xe600,0xe603) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xee00,0xefff) AM_RAM
-	AM_RANGE(0xf000,0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void mkit09_state::mkit09a_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).ram();
+	map(0xe600, 0xe603).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xee00, 0xefff).ram();
+	map(0xf000, 0xffff).rom().region("roms", 0);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mkit09 )

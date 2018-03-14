@@ -3699,35 +3699,37 @@ MACHINE_CONFIG_END
     - all LPU RAM is dynamically mapped at machine start according to -ramsize option
 */
 
-ADDRESS_MAP_START(hp9845_base_state::global_mem_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3f7fff)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x014000 , 0x017fff) AM_RAM AM_SHARE("ppu_ram")
-	AM_RANGE(0x030000 , 0x037fff) AM_ROM AM_REGION("lpu" , 0)
-	AM_RANGE(0x050000 , 0x057fff) AM_ROM AM_REGION("ppu" , 0)
-ADDRESS_MAP_END
+void hp9845_base_state::global_mem_map(address_map &map)
+{
+	map.global_mask(0x3f7fff);
+	map.unmap_value_low();
+	map(0x014000, 0x017fff).ram().share("ppu_ram");
+	map(0x030000, 0x037fff).rom().region("lpu", 0);
+	map(0x050000, 0x057fff).rom().region("ppu", 0);
+}
 
-ADDRESS_MAP_START(hp9845_base_state::ppu_io_map)
-	ADDRESS_MAP_UNMAP_LOW
+void hp9845_base_state::ppu_io_map(address_map &map)
+{
+	map.unmap_value_low();
 	// PA = 0, IC = 0..1
 	// Internal printer
-	AM_RANGE(HP_MAKE_IOADDR(PRINTER_PA , 0) , HP_MAKE_IOADDR(PRINTER_PA , 1)) AM_DEVREADWRITE("printer" , hp9845_printer_device , printer_r , printer_w)
+	map(HP_MAKE_IOADDR(PRINTER_PA, 0), HP_MAKE_IOADDR(PRINTER_PA, 1)).rw("printer", FUNC(hp9845_printer_device::printer_r), FUNC(hp9845_printer_device::printer_w));
 	// PA = 0, IC = 2
 	// Keyboard scancode input
-	AM_RANGE(HP_MAKE_IOADDR(0 , 2) , HP_MAKE_IOADDR(0 , 2)) AM_READ(kb_scancode_r)
+	map(HP_MAKE_IOADDR(0, 2), HP_MAKE_IOADDR(0, 2)).r(this, FUNC(hp9845_base_state::kb_scancode_r));
 	// PA = 0, IC = 3
 	// Keyboard status input & keyboard interrupt clear
-	AM_RANGE(HP_MAKE_IOADDR(0 , 3) , HP_MAKE_IOADDR(0 , 3)) AM_READWRITE(kb_status_r , kb_irq_clear_w)
+	map(HP_MAKE_IOADDR(0, 3), HP_MAKE_IOADDR(0, 3)).rw(this, FUNC(hp9845_base_state::kb_status_r), FUNC(hp9845_base_state::kb_irq_clear_w));
 	// PA = 13, IC = 0..3
 	// Graphic video
-	AM_RANGE(HP_MAKE_IOADDR(GVIDEO_PA , 0) , HP_MAKE_IOADDR(GVIDEO_PA , 3)) AM_READWRITE(graphic_r , graphic_w)
+	map(HP_MAKE_IOADDR(GVIDEO_PA, 0), HP_MAKE_IOADDR(GVIDEO_PA, 3)).rw(this, FUNC(hp9845_base_state::graphic_r), FUNC(hp9845_base_state::graphic_w));
 	// PA = 14, IC = 0..3
 	// Left-hand side tape drive (T14)
-	AM_RANGE(HP_MAKE_IOADDR(T14_PA , 0) , HP_MAKE_IOADDR(T14_PA , 3))        AM_DEVREADWRITE("t14" , hp_taco_device , reg_r , reg_w)
+	map(HP_MAKE_IOADDR(T14_PA, 0), HP_MAKE_IOADDR(T14_PA, 3)).rw("t14", FUNC(hp_taco_device::reg_r), FUNC(hp_taco_device::reg_w));
 	// PA = 15, IC = 0..3
 	// Right-hand side tape drive (T15)
-	AM_RANGE(HP_MAKE_IOADDR(T15_PA , 0) , HP_MAKE_IOADDR(T15_PA , 3))        AM_DEVREADWRITE("t15" , hp_taco_device , reg_r , reg_w)
-ADDRESS_MAP_END
+	map(HP_MAKE_IOADDR(T15_PA, 0), HP_MAKE_IOADDR(T15_PA, 3)).rw("t15", FUNC(hp_taco_device::reg_r), FUNC(hp_taco_device::reg_w));
+}
 
 MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	MCFG_CPU_ADD("lpu", HP_5061_3001, 5700000)

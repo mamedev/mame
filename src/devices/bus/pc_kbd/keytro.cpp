@@ -344,13 +344,15 @@ DEFINE_DEVICE_TYPE(PC_KBD_KEYTRONIC_PC3270_AT, pc_kbd_keytronic_pc3270_at_device
     ADDRESS MAPS
 *****************************************************************************/
 
-ADDRESS_MAP_START(pc_kbd_keytronic_pc3270_device::keytronic_pc3270_program)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("kb_keytr", 0)
-ADDRESS_MAP_END
+void pc_kbd_keytronic_pc3270_device::keytronic_pc3270_program(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("kb_keytr", 0);
+}
 
-ADDRESS_MAP_START(pc_kbd_keytronic_pc3270_device::keytronic_pc3270_io)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(internal_data_read, internal_data_write)
-ADDRESS_MAP_END
+void pc_kbd_keytronic_pc3270_device::keytronic_pc3270_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(pc_kbd_keytronic_pc3270_device::internal_data_read), FUNC(pc_kbd_keytronic_pc3270_device::internal_data_write));
+}
 
 
 /***************************************************************************

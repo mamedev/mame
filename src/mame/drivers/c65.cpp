@@ -484,31 +484,32 @@ READ8_MEMBER(c65_state::dummy_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(c65_state::c65_map)
-	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("wram") // TODO: bank
-	AM_RANGE(0x0c800, 0x0cfff) AM_ROM AM_REGION("maincpu", 0xc800)
-	AM_RANGE(0x0d000, 0x0d07f) AM_READWRITE(vic4567_dummy_r,vic4567_dummy_w) // 0x0d000, 0x0d07f VIC-4567
-	AM_RANGE(0x0d080, 0x0d081) AM_READ(dummy_r) // 0x0d080, 0x0d09f FDC
+void c65_state::c65_map(address_map &map)
+{
+	map(0x00000, 0x07fff).ram().share("wram"); // TODO: bank
+	map(0x0c800, 0x0cfff).rom().region("maincpu", 0xc800);
+	map(0x0d000, 0x0d07f).rw(this, FUNC(c65_state::vic4567_dummy_r), FUNC(c65_state::vic4567_dummy_w)); // 0x0d000, 0x0d07f VIC-4567
+	map(0x0d080, 0x0d081).r(this, FUNC(c65_state::dummy_r)); // 0x0d080, 0x0d09f FDC
 	// 0x0d0a0, 0x0d0ff Ram Expansion Control (REC)
-	AM_RANGE(0x0d100, 0x0d1ff) AM_RAM_WRITE(PalRed_w) AM_SHARE("redpal")// 0x0d100, 0x0d1ff Red Palette
-	AM_RANGE(0x0d200, 0x0d2ff) AM_RAM_WRITE(PalGreen_w) AM_SHARE("greenpal") // 0x0d200, 0x0d2ff Green Palette
-	AM_RANGE(0x0d300, 0x0d3ff) AM_RAM_WRITE(PalBlue_w) AM_SHARE("bluepal") // 0x0d300, 0x0d3ff Blue Palette
+	map(0x0d100, 0x0d1ff).ram().w(this, FUNC(c65_state::PalRed_w)).share("redpal");// 0x0d100, 0x0d1ff Red Palette
+	map(0x0d200, 0x0d2ff).ram().w(this, FUNC(c65_state::PalGreen_w)).share("greenpal"); // 0x0d200, 0x0d2ff Green Palette
+	map(0x0d300, 0x0d3ff).ram().w(this, FUNC(c65_state::PalBlue_w)).share("bluepal"); // 0x0d300, 0x0d3ff Blue Palette
 	// 0x0d400, 0x0d4*f Right SID
 	// 0x0d440, 0x0d4*f Left  SID
-	AM_RANGE(0x0d600, 0x0d6ff) AM_READWRITE(uart_r, uart_w)
-	AM_RANGE(0x0d700, 0x0d702) AM_WRITE(DMAgic_w) AM_SHARE("dmalist") // 0x0d700, 0x0d7** DMAgic
+	map(0x0d600, 0x0d6ff).rw(this, FUNC(c65_state::uart_r), FUNC(c65_state::uart_w));
+	map(0x0d700, 0x0d702).w(this, FUNC(c65_state::DMAgic_w)).share("dmalist"); // 0x0d700, 0x0d7** DMAgic
 	//AM_RANGE(0x0d703, 0x0d703) AM_READ(DMAgic_r)
 	// 0x0d800, 0x0d8** Color matrix
-	AM_RANGE(0x0d800, 0x0dfff) AM_READWRITE(CIASelect_r,CIASelect_w) AM_SHARE("cram")
+	map(0x0d800, 0x0dfff).rw(this, FUNC(c65_state::CIASelect_r), FUNC(c65_state::CIASelect_w)).share("cram");
 	// 0x0dc00, 0x0dc** CIA-1
 	// 0x0dd00, 0x0dd** CIA-2
 	// 0x0de00, 0x0de** Ext I/O Select 1
 	// 0x0df00, 0x0df** Ext I/O Select 2 (RAM window?)
-	AM_RANGE(0x0e000, 0x0ffff) AM_ROM AM_REGION("maincpu",0x0e000)
-	AM_RANGE(0x10000, 0x1f7ff) AM_RAM
-	AM_RANGE(0x1f800, 0x1ffff) AM_RAM // VRAM attributes
-	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("maincpu",0)
-ADDRESS_MAP_END
+	map(0x0e000, 0x0ffff).rom().region("maincpu", 0x0e000);
+	map(0x10000, 0x1f7ff).ram();
+	map(0x1f800, 0x1ffff).ram(); // VRAM attributes
+	map(0x20000, 0x3ffff).rom().region("maincpu", 0);
+}
 
 
 

@@ -71,35 +71,37 @@ READ8_MEMBER(pcktgal_state::adpcm_reset_r)
 
 /***************************************************************************/
 
-ADDRESS_MAP_START(pcktgal_state::pcktgal_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_8bit_r, pf_data_8bit_w)
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
-	AM_RANGE(0x1800, 0x1807) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control0_8bit_w)
-	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_control1_8bit_r, pf_control1_8bit_w)
+void pcktgal_state::pcktgal_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0fff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x1000, 0x11ff).ram().share("spriteram");
+	map(0x1800, 0x1800).portr("P1");
+	map(0x1800, 0x1807).w(m_tilegen1, FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x1810, 0x181f).rw(m_tilegen1, FUNC(deco_bac06_device::pf_control1_8bit_r), FUNC(deco_bac06_device::pf_control1_8bit_w));
 
-	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("P2") AM_WRITE(sound_w)
-	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW") AM_WRITE(bank_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x1a00, 0x1a00).portr("P2").w(this, FUNC(pcktgal_state::sound_w));
+	map(0x1c00, 0x1c00).portr("DSW").w(this, FUNC(pcktgal_state::bank_w));
+	map(0x4000, 0x5fff).bankr("bank1");
+	map(0x6000, 0x7fff).bankr("bank2");
+	map(0x8000, 0xffff).rom();
+}
 
 
 /***************************************************************************/
 
-ADDRESS_MAP_START(pcktgal_state::pcktgal_sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_device, write)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(adpcm_data_w) /* ADPCM data for the MSM5205 chip */
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(sound_bank_w)
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x3400, 0x3400) AM_READ(adpcm_reset_r) /* ? not sure */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void pcktgal_state::pcktgal_sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
+	map(0x1000, 0x1001).w("ym2", FUNC(ym3812_device::write));
+	map(0x1800, 0x1800).w(this, FUNC(pcktgal_state::adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
+	map(0x2000, 0x2000).w(this, FUNC(pcktgal_state::sound_bank_w));
+	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x3400, 0x3400).r(this, FUNC(pcktgal_state::adpcm_reset_r)); /* ? not sure */
+	map(0x4000, 0x7fff).bankr("bank3");
+	map(0x8000, 0xffff).rom();
+}
 
 
 /***************************************************************************/

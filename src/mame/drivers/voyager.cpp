@@ -240,23 +240,24 @@ WRITE32_MEMBER(voyager_state::bios_ram_w)
 	}
 }
 
-ADDRESS_MAP_START(voyager_state::voyager_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", trident_vga_device, mem_r, mem_w, 0xffffffff) // VGA VRAM
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
-	AM_RANGE(0x000c8000, 0x000cffff) AM_NOP
+void voyager_state::voyager_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w)); // VGA VRAM
+	map(0x000c0000, 0x000c7fff).ram().region("video_bios", 0);
+	map(0x000c8000, 0x000cffff).noprw();
 	//AM_RANGE(0x000d0000, 0x000d0003) AM_RAM  // XYLINX - Sincronus serial communication
-	AM_RANGE(0x000d0008, 0x000d000b) AM_WRITENOP // ???
-	AM_RANGE(0x000d0800, 0x000d0fff) AM_ROM AM_REGION("nvram",0) //
+	map(0x000d0008, 0x000d000b).nopw(); // ???
+	map(0x000d0800, 0x000d0fff).rom().region("nvram", 0); //
 //  AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
 
 	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	//GRULL-AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	//GRULL AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE(bios_ram_w)
-	AM_RANGE(0x00100000, 0x03ffffff) AM_RAM  // 64MB
-	AM_RANGE(0x04000000, 0x28ffffff) AM_NOP
+	map(0x000e0000, 0x000fffff).bankr("bank1");
+	map(0x000e0000, 0x000fffff).w(this, FUNC(voyager_state::bios_ram_w));
+	map(0x00100000, 0x03ffffff).ram();  // 64MB
+	map(0x04000000, 0x28ffffff).noprw();
 	//AM_RANGE(0x04000000, 0x040001ff) AM_RAM
 	//AM_RANGE(0x08000000, 0x080001ff) AM_RAM
 	//AM_RANGE(0x0c000000, 0x0c0001ff) AM_RAM
@@ -265,45 +266,46 @@ ADDRESS_MAP_START(voyager_state::voyager_map)
 	//AM_RANGE(0x18000000, 0x180001ff) AM_RAM
 	//AM_RANGE(0x20000000, 0x200001ff) AM_RAM
 	//AM_RANGE(0x28000000, 0x280001ff) AM_RAM
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
-ADDRESS_MAP_END
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+}
 
-ADDRESS_MAP_START(voyager_state::voyager_io)
-	AM_IMPORT_FROM(pcat32_io_common)
+void voyager_state::voyager_io(address_map &map)
+{
+	pcat32_io_common(map);
 
 	//AM_RANGE(0x00e8, 0x00eb) AM_NOP
-	AM_RANGE(0x00e8, 0x00ef) AM_NOP //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
-	AM_RANGE(0x0170, 0x0177) AM_NOP //To debug
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
-	AM_RANGE(0x0200, 0x021f) AM_NOP //To debug
-	AM_RANGE(0x0260, 0x026f) AM_NOP //To debug
-	AM_RANGE(0x0278, 0x027b) AM_WRITENOP//AM_WRITE(pnp_config_w)
-	AM_RANGE(0x0280, 0x0287) AM_NOP //To debug
-	AM_RANGE(0x02a0, 0x02a7) AM_NOP //To debug
-	AM_RANGE(0x02c0, 0x02c7) AM_NOP //To debug
-	AM_RANGE(0x02e0, 0x02ef) AM_NOP //To debug
-	AM_RANGE(0x02f8, 0x02ff) AM_NOP //To debug
-	AM_RANGE(0x0320, 0x038f) AM_NOP //To debug
-	AM_RANGE(0x03a0, 0x03a7) AM_NOP //To debug
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", trident_vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", trident_vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", trident_vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x03e0, 0x03ef) AM_NOP //To debug
-	AM_RANGE(0x0378, 0x037f) AM_NOP //To debug
+	map(0x00e8, 0x00ef).noprw(); //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
+	map(0x0170, 0x0177).noprw(); //To debug
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
+	map(0x0200, 0x021f).noprw(); //To debug
+	map(0x0260, 0x026f).noprw(); //To debug
+	map(0x0278, 0x027b).nopw();//AM_WRITE(pnp_config_w)
+	map(0x0280, 0x0287).noprw(); //To debug
+	map(0x02a0, 0x02a7).noprw(); //To debug
+	map(0x02c0, 0x02c7).noprw(); //To debug
+	map(0x02e0, 0x02ef).noprw(); //To debug
+	map(0x02f8, 0x02ff).noprw(); //To debug
+	map(0x0320, 0x038f).noprw(); //To debug
+	map(0x03a0, 0x03a7).noprw(); //To debug
+	map(0x03b0, 0x03bf).rw("vga", FUNC(trident_vga_device::port_03b0_r), FUNC(trident_vga_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(trident_vga_device::port_03c0_r), FUNC(trident_vga_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(trident_vga_device::port_03d0_r), FUNC(trident_vga_device::port_03d0_w));
+	map(0x03e0, 0x03ef).noprw(); //To debug
+	map(0x0378, 0x037f).noprw(); //To debug
 	// AM_RANGE(0x0300, 0x03af) AM_NOP
 	// AM_RANGE(0x03b0, 0x03df) AM_NOP
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_NOP // To debug Serial Port COM1:
-	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE(pnp_data_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-	AM_RANGE(0x42e8, 0x43ef) AM_NOP //To debug
-	AM_RANGE(0x43c0, 0x43cf) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x46e8, 0x46ef) AM_NOP //To debug
-	AM_RANGE(0x4ae8, 0x4aef) AM_NOP //To debug
-	AM_RANGE(0x83c0, 0x83cf) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x92e8, 0x92ef) AM_NOP //To debug
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
+	map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
+	map(0x0a78, 0x0a7b).nopw();//AM_WRITE(pnp_data_w)
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+	map(0x42e8, 0x43ef).noprw(); //To debug
+	map(0x43c0, 0x43cf).ram().share("share1");
+	map(0x46e8, 0x46ef).noprw(); //To debug
+	map(0x4ae8, 0x4aef).noprw(); //To debug
+	map(0x83c0, 0x83cf).ram().share("share1");
+	map(0x92e8, 0x92ef).noprw(); //To debug
 
-ADDRESS_MAP_END
+}
 
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)

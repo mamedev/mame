@@ -188,23 +188,25 @@ WRITE8_MEMBER( univac_state::porte6_w )
 }
 
 
-ADDRESS_MAP_START(univac_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x4fff ) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(bank_r, bank_w)
-	AM_RANGE( 0xc000, 0xffff ) AM_RAM_WRITE(ram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void univac_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x4fff).rom().region("roms", 0);
+	map(0x8000, 0xbfff).rw(this, FUNC(univac_state::bank_r), FUNC(univac_state::bank_w));
+	map(0xc000, 0xffff).ram().w(this, FUNC(univac_state::ram_w)).share("videoram");
+}
 
-ADDRESS_MAP_START(univac_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("uart", z80sio_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x43, 0x43) AM_WRITE(port43_w)
-	AM_RANGE(0x80, 0xbf) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0xc4, 0xc4) AM_WRITE(portc4_w)
-	AM_RANGE(0xe6, 0xe6) AM_WRITE(porte6_w)
-ADDRESS_MAP_END
+void univac_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).rw(m_uart, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x20, 0x23).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x43, 0x43).w(this, FUNC(univac_state::port43_w));
+	map(0x80, 0xbf).ram().w(this, FUNC(univac_state::nvram_w)).share("nvram");
+	map(0xc4, 0xc4).w(this, FUNC(univac_state::portc4_w));
+	map(0xe6, 0xe6).w(this, FUNC(univac_state::porte6_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( uts20 )

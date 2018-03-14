@@ -93,42 +93,45 @@ DRIVER_INIT_MEMBER(nbmj8900_state,togenkyo)
 }
 
 
-ADDRESS_MAP_START(nbmj8900_state::ohpaipee_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(clut_r, clut_w)
-	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(palette_type1_r, palette_type1_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void nbmj8900_state::ohpaipee_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf00f).rw(this, FUNC(nbmj8900_state::clut_r), FUNC(nbmj8900_state::clut_w));
+	map(0xf400, 0xf5ff).rw(this, FUNC(nbmj8900_state::palette_type1_r), FUNC(nbmj8900_state::palette_type1_w));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(nbmj8900_state::togenkyo_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(clut_r, clut_w)
-	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(palette_type1_r, palette_type1_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void nbmj8900_state::togenkyo_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf00f).rw(this, FUNC(nbmj8900_state::clut_r), FUNC(nbmj8900_state::clut_w));
+	map(0xf400, 0xf5ff).rw(this, FUNC(nbmj8900_state::palette_type1_r), FUNC(nbmj8900_state::palette_type1_w));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(nbmj8900_state::ohpaipee_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
-	AM_RANGE(0x20, 0x27) AM_WRITE(blitter_w)
+void nbmj8900_state::ohpaipee_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r));
+	map(0x00, 0x00).w(m_nb1413m3, FUNC(nb1413m3_device::nmi_clock_w));
+	map(0x20, 0x27).w(this, FUNC(nbmj8900_state::blitter_w));
 
-	AM_RANGE(0x40, 0x40) AM_WRITE(clutsel_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(romsel_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE(scrolly_w)
+	map(0x40, 0x40).w(this, FUNC(nbmj8900_state::clutsel_w));
+	map(0x60, 0x60).w(this, FUNC(nbmj8900_state::romsel_w));
+	map(0x70, 0x70).w(this, FUNC(nbmj8900_state::scrolly_w));
 
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
+	map(0x80, 0x81).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 
-	AM_RANGE(0x90, 0x90) AM_DEVREAD("nb1413m3", nb1413m3_device, inputport0_r)
+	map(0x90, 0x90).r(m_nb1413m3, FUNC(nb1413m3_device::inputport0_r));
 
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport1_r, inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport2_r, sndrombank1_w)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("nb1413m3", nb1413m3_device, inputport3_r)
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(vramsel_w)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, dipsw2_r, outcoin_w)
-ADDRESS_MAP_END
+	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
+	map(0xb0, 0xb0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r), FUNC(nb1413m3_device::sndrombank1_w));
+	map(0xc0, 0xc0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport3_r));
+	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::write));
+	map(0xe0, 0xe0).w(this, FUNC(nbmj8900_state::vramsel_w));
+	map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+	map(0xf1, 0xf1).rw(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r), FUNC(nb1413m3_device::outcoin_w));
+}
 
 
 static INPUT_PORTS_START( ohpaipee )

@@ -156,24 +156,25 @@ WRITE32_MEMBER(groundfx_state::motor_control_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-ADDRESS_MAP_START(groundfx_state::groundfx_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram") /* main CPUA ram */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("spriteram") /* sprite ram */
-	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)  /* gun vibration */
-	AM_RANGE(0x500000, 0x500007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
-	AM_RANGE(0x600000, 0x600003) AM_READWRITE(adc_r, adc_w)
-	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff)
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)      /* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)  // debugging
-	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)    /* 6bpp tilemaps */
-	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_long_r, ctrl_long_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM                     // ?? single bytes, blending ??
-	AM_RANGE(0xc00000, 0xc00007) AM_READNOP /* Network? */
-	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w) /* perhaps port based rotate control? */
+void groundfx_state::groundfx_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x21ffff).ram().share("ram"); /* main CPUA ram */
+	map(0x300000, 0x303fff).ram().share("spriteram"); /* sprite ram */
+	map(0x400000, 0x400003).w(this, FUNC(groundfx_state::motor_control_w));  /* gun vibration */
+	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
+	map(0x600000, 0x600003).rw(this, FUNC(groundfx_state::adc_r), FUNC(groundfx_state::adc_w));
+	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));      /* tilemaps */
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));  // debugging
+	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::long_r), FUNC(tc0100scn_device::long_w));    /* 6bpp tilemaps */
+	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
+	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xb00000, 0xb003ff).ram();                     // ?? single bytes, blending ??
+	map(0xc00000, 0xc00007).nopr(); /* Network? */
+	map(0xd00000, 0xd00003).w(this, FUNC(groundfx_state::rotate_control_w)); /* perhaps port based rotate control? */
 	/* f00000 is seat control? */
-ADDRESS_MAP_END
+}
 
 /***********************************************************
              INPUT PORTS (dips in eprom)

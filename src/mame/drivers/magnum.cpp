@@ -132,19 +132,21 @@ WRITE8_MEMBER(magnum_state::beep_w)
 	m_beep->set_state(BIT(data, 0));
 }
 
-ADDRESS_MAP_START(magnum_state::magnum_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM // fixed 256k for now
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void magnum_state::magnum_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram(); // fixed 256k for now
+	map(0xe0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(magnum_state::magnum_io)
-	ADDRESS_MAP_UNMAP_HIGH
+void magnum_state::magnum_io(address_map &map)
+{
+	map.unmap_value_high();
 	//AM_RANGE(0x000a, 0x000b) cdp1854 1
 	//AM_RANGE(0x000e, 0x000f) cpd1854 2
-	AM_RANGE(0x0018, 0x001f) AM_READWRITE8(lcd_r, lcd_w, 0x00ff)
-	AM_RANGE(0x0056, 0x0057) AM_WRITE8(beep_w, 0x00ff)
-	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE8("rtc", cdp1879_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+	map(0x0018, 0x001f).rw(this, FUNC(magnum_state::lcd_r), FUNC(magnum_state::lcd_w)).umask16(0x00ff);
+	map(0x0056, 0x0056).w(this, FUNC(magnum_state::beep_w));
+	map(0x0080, 0x008f).rw("rtc", FUNC(cdp1879_device::read), FUNC(cdp1879_device::write)).umask16(0x00ff);
+}
 
 MACHINE_CONFIG_START(magnum_state::magnum)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL(12'000'000) / 2)

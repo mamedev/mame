@@ -71,7 +71,6 @@ public:
 protected:
 	required_device<m68000_device> m_maincpu;
 
-private:
 	uint32_t snowboard_latch;
 
 	uint16_t *m_videoram;

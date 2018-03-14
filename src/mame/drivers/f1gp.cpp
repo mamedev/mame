@@ -53,75 +53,80 @@ READ8_MEMBER(f1gp_state::command_pending_r)
 }
 
 
-ADDRESS_MAP_START(f1gp_state::f1gp_cpu1_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x2fffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(f1gp_zoomdata_r, f1gp_zoomdata_w)
-	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_SHARE("rozvideoram")
-	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)                            /* mirror */
-	AM_RANGE(0xd04000, 0xd05fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)                            /* mirror */
-	AM_RANGE(0xd06000, 0xd07fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)                            /* mirror */
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_SHARE("spr1cgram")               // SPR-1 CG RAM
-	AM_RANGE(0xe04000, 0xe07fff) AM_RAM AM_SHARE("spr2cgram")               // SPR-2 CG RAM
-	AM_RANGE(0xf00000, 0xf003ff) AM_RAM AM_SHARE("spr1vram")                                // SPR-1 VRAM
-	AM_RANGE(0xf10000, 0xf103ff) AM_RAM AM_SHARE("spr2vram")                                // SPR-2 VRAM
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                                                         // WORK RAM-1
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")       // DUAL RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")         // CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // PALETTE
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(f1gp_gfxctrl_w)
+void f1gp_state::f1gp_cpu1_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x2fffff).rom().region("user1", 0);
+	map(0xa00000, 0xbfffff).rom().region("user2", 0);
+	map(0xc00000, 0xc3ffff).rw(this, FUNC(f1gp_state::f1gp_zoomdata_r), FUNC(f1gp_state::f1gp_zoomdata_w));
+	map(0xd00000, 0xd01fff).rw(this, FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w)).share("rozvideoram");
+	map(0xd02000, 0xd03fff).rw(this, FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));                            /* mirror */
+	map(0xd04000, 0xd05fff).rw(this, FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));                            /* mirror */
+	map(0xd06000, 0xd07fff).rw(this, FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));                            /* mirror */
+	map(0xe00000, 0xe03fff).ram().share("spr1cgram");               // SPR-1 CG RAM
+	map(0xe04000, 0xe07fff).ram().share("spr2cgram");               // SPR-2 CG RAM
+	map(0xf00000, 0xf003ff).ram().share("spr1vram");                                // SPR-1 VRAM
+	map(0xf10000, 0xf103ff).ram().share("spr2vram");                                // SPR-2 VRAM
+	map(0xff8000, 0xffbfff).ram();                                                         // WORK RAM-1
+	map(0xffc000, 0xffcfff).ram().share("sharedram");       // DUAL RAM
+	map(0xffd000, 0xffdfff).ram().w(this, FUNC(f1gp_state::f1gp_fgvideoram_w)).share("fgvideoram");         // CHARACTER
+	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // PALETTE
+	map(0xfff000, 0xfff001).portr("INPUTS");
+	map(0xfff000, 0xfff001).w(this, FUNC(f1gp_state::f1gp_gfxctrl_w));
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
-	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfff002, 0xfff005) AM_WRITE(f1gp_fgscroll_w)
-	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_READ8(command_pending_r, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xfff020, 0xfff023) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
-	AM_RANGE(0xfff040, 0xfff05f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
-	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
-ADDRESS_MAP_END
+	map(0xfff004, 0xfff005).portr("DSW1");
+	map(0xfff002, 0xfff005).w(this, FUNC(f1gp_state::f1gp_fgscroll_w));
+	map(0xfff006, 0xfff007).portr("DSW2");
+	map(0xfff009, 0xfff009).r(this, FUNC(f1gp_state::command_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff020, 0xfff023).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
+	map(0xfff040, 0xfff05f).w(m_k053936, FUNC(k053936_device::ctrl_w));
+	map(0xfff050, 0xfff051).portr("DSW3");
+}
 
-ADDRESS_MAP_START(f1gp_state::f1gp2_cpu1_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x2fffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_SHARE("sprcgram")                                    // SPR-1 CG RAM + SPR-2 CG RAM
-	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_SHARE("rozvideoram")   // BACK VRAM
-	AM_RANGE(0xe00000, 0xe00fff) AM_RAM AM_SHARE("spritelist")                          // not checked + SPR-1 VRAM + SPR-2 VRAM
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                                                             // WORK RAM-1
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")           // DUAL RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")             // CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")            // PALETTE
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(f1gp2_gfxctrl_w)
+void f1gp_state::f1gp2_cpu1_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x2fffff).rom().region("user1", 0);
+	map(0xa00000, 0xa07fff).ram().share("sprcgram");                                    // SPR-1 CG RAM + SPR-2 CG RAM
+	map(0xd00000, 0xd01fff).rw(this, FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w)).share("rozvideoram");   // BACK VRAM
+	map(0xe00000, 0xe00fff).ram().share("spritelist");                          // not checked + SPR-1 VRAM + SPR-2 VRAM
+	map(0xff8000, 0xffbfff).ram();                                                             // WORK RAM-1
+	map(0xffc000, 0xffcfff).ram().share("sharedram");           // DUAL RAM
+	map(0xffd000, 0xffdfff).ram().w(this, FUNC(f1gp_state::f1gp_fgvideoram_w)).share("fgvideoram");             // CHARACTER
+	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");            // PALETTE
+	map(0xfff000, 0xfff001).portr("INPUTS").w(this, FUNC(f1gp_state::f1gp2_gfxctrl_w));
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
-	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_READ8(command_pending_r, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW3")
-	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
-	AM_RANGE(0xfff044, 0xfff047) AM_WRITE(f1gp_fgscroll_w)
-ADDRESS_MAP_END
+	map(0xfff004, 0xfff005).portr("DSW1");
+	map(0xfff006, 0xfff007).portr("DSW2");
+	map(0xfff009, 0xfff009).r(this, FUNC(f1gp_state::command_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff00a, 0xfff00b).portr("DSW3");
+	map(0xfff020, 0xfff03f).w(m_k053936, FUNC(k053936_device::ctrl_w));
+	map(0xfff044, 0xfff047).w(this, FUNC(f1gp_state::f1gp_fgscroll_w));
+}
 
-ADDRESS_MAP_START(f1gp_state::f1gp_cpu2_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM  AM_SHARE("sharedram")
-	AM_RANGE(0xfff030, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void f1gp_state::f1gp_cpu2_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0xff8000, 0xffbfff).ram();
+	map(0xffc000, 0xffcfff).ram().share("sharedram");
+	map(0xfff030, 0xfff033).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(f1gp_state::sound_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void f1gp_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(f1gp_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(f1gp_sh_bankswitch_w) // f1gp
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(f1gp_sh_bankswitch_w) // f1gp2
-	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-ADDRESS_MAP_END
+void f1gp_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(f1gp_state::f1gp_sh_bankswitch_w)); // f1gp
+	map(0x0c, 0x0c).w(this, FUNC(f1gp_state::f1gp_sh_bankswitch_w)); // f1gp2
+	map(0x14, 0x14).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x18, 0x1b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+}
 
 WRITE16_MEMBER(f1gp_state::f1gpb_misc_w)
 {
@@ -148,44 +153,46 @@ WRITE16_MEMBER(f1gp_state::f1gpb_misc_w)
 	*/
 }
 
-ADDRESS_MAP_START(f1gp_state::f1gpb_cpu1_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x2fffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(f1gp_zoomdata_r, f1gp_zoomdata_w)
-	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_SHARE("rozvideoram")
-	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)   /* mirror */
-	AM_RANGE(0xd04000, 0xd05fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)   /* mirror */
-	AM_RANGE(0xd06000, 0xd07fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)   /* mirror */
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM //unused
-	AM_RANGE(0xe04000, 0xe07fff) AM_RAM //unused
-	AM_RANGE(0xf00000, 0xf003ff) AM_RAM //unused
-	AM_RANGE(0xf10000, 0xf103ff) AM_RAM //unused
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_READNOP //?
-	AM_RANGE(0xfff006, 0xfff007) AM_WRITENOP
-	AM_RANGE(0xfff00a, 0xfff00b) AM_RAM AM_SHARE("fgregs")
-	AM_RANGE(0xfff00e, 0xfff00f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITE(f1gpb_misc_w)
-	AM_RANGE(0xfff010, 0xfff011) AM_WRITENOP
-	AM_RANGE(0xfff020, 0xfff023) AM_WRITENOP // GGA access
-	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
-	AM_RANGE(0xfff800, 0xfff809) AM_RAM AM_SHARE("rozregs")
-ADDRESS_MAP_END
+void f1gp_state::f1gpb_cpu1_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x2fffff).rom().region("user1", 0);
+	map(0xa00000, 0xbfffff).rom().region("user2", 0);
+	map(0x800000, 0x801fff).ram().share("spriteram");
+	map(0xc00000, 0xc3ffff).rw(this, FUNC(f1gp_state::f1gp_zoomdata_r), FUNC(f1gp_state::f1gp_zoomdata_w));
+	map(0xd00000, 0xd01fff).rw(this, FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w)).share("rozvideoram");
+	map(0xd02000, 0xd03fff).rw(this, FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));   /* mirror */
+	map(0xd04000, 0xd05fff).rw(this, FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));   /* mirror */
+	map(0xd06000, 0xd07fff).rw(this, FUNC(f1gp_state::f1gp_rozvideoram_r), FUNC(f1gp_state::f1gp_rozvideoram_w));   /* mirror */
+	map(0xe00000, 0xe03fff).ram(); //unused
+	map(0xe04000, 0xe07fff).ram(); //unused
+	map(0xf00000, 0xf003ff).ram(); //unused
+	map(0xf10000, 0xf103ff).ram(); //unused
+	map(0xff8000, 0xffbfff).ram();
+	map(0xffc000, 0xffcfff).ram().share("sharedram");
+	map(0xffd000, 0xffdfff).ram().w(this, FUNC(f1gp_state::f1gp_fgvideoram_w)).share("fgvideoram");
+	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfff000, 0xfff001).portr("INPUTS");
+	map(0xfff004, 0xfff005).portr("DSW1");
+	map(0xfff006, 0xfff007).portr("DSW2");
+	map(0xfff008, 0xfff009).nopr(); //?
+	map(0xfff006, 0xfff007).nopw();
+	map(0xfff00a, 0xfff00b).ram().share("fgregs");
+	map(0xfff00f, 0xfff00f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xfff00c, 0xfff00d).w(this, FUNC(f1gp_state::f1gpb_misc_w));
+	map(0xfff010, 0xfff011).nopw();
+	map(0xfff020, 0xfff023).nopw(); // GGA access
+	map(0xfff050, 0xfff051).portr("DSW3");
+	map(0xfff800, 0xfff809).ram().share("rozregs");
+}
 
-ADDRESS_MAP_START(f1gp_state::f1gpb_cpu2_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xfff030, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void f1gp_state::f1gpb_cpu2_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0xff8000, 0xffbfff).ram();
+	map(0xffc000, 0xffcfff).ram().share("sharedram");
+	map(0xfff030, 0xfff033).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+}
 
 static INPUT_PORTS_START( f1gp )
 	PORT_START("INPUTS")

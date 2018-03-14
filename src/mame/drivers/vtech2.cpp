@@ -78,21 +78,23 @@
 #include "formats/vt_cas.h"
 
 
-ADDRESS_MAP_START(vtech2_state::vtech2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void vtech2_state::vtech2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
-ADDRESS_MAP_START(vtech2_state::vtech2_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x1f) AM_READWRITE(laser_fdc_r, laser_fdc_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(laser_bank_select_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE(laser_bg_mode_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE(laser_two_color_w)
-ADDRESS_MAP_END
+void vtech2_state::vtech2_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x1f).rw(this, FUNC(vtech2_state::laser_fdc_r), FUNC(vtech2_state::laser_fdc_w));
+	map(0x40, 0x43).w(this, FUNC(vtech2_state::laser_bank_select_w));
+	map(0x44, 0x44).w(this, FUNC(vtech2_state::laser_bg_mode_w));
+	map(0x45, 0x45).w(this, FUNC(vtech2_state::laser_two_color_w));
+}
 
 /* 2008-05 FP:
 Small note about natural keyboard: currently,

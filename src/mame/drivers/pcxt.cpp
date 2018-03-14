@@ -364,40 +364,45 @@ WRITE8_MEMBER(pcxt_state::fdc_dor_w)
 	m_mb->m_pic8259->ir6_w(1);
 }
 
-ADDRESS_MAP_START(pcxt_state::filetto_map)
-	AM_RANGE(0xc0000, 0xcffff) AM_DEVICE("bank", address_map_bank_device, amap8)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void pcxt_state::filetto_map(address_map &map)
+{
+	map(0xc0000, 0xcffff).m(m_bank, FUNC(address_map_bank_device::amap8));
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(pcxt_state::filetto_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
-	AM_RANGE(0x0060, 0x0060) AM_READ(port_a_r)  //not a real 8255
-	AM_RANGE(0x0061, 0x0061) AM_READWRITE(port_b_r, port_b_w)
-	AM_RANGE(0x0062, 0x0062) AM_READ(port_c_r)
-	AM_RANGE(0x0201, 0x0201) AM_READ_PORT("COIN") //game port
-	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
-	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
-	AM_RANGE(0x03f2, 0x03f2) AM_WRITE(fdc_dor_w)
-	AM_RANGE(0x03f4, 0x03f4) AM_READ(fdc765_status_r) //765 Floppy Disk Controller (FDC) Status
-	AM_RANGE(0x03f5, 0x03f5) AM_READWRITE(fdc765_data_r,fdc765_data_w)//FDC Data
-ADDRESS_MAP_END
+void pcxt_state::filetto_io(address_map &map)
+{
+	map.global_mask(0x3ff);
+	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
+	map(0x0060, 0x0060).r(this, FUNC(pcxt_state::port_a_r));  //not a real 8255
+	map(0x0061, 0x0061).rw(this, FUNC(pcxt_state::port_b_r), FUNC(pcxt_state::port_b_w));
+	map(0x0062, 0x0062).r(this, FUNC(pcxt_state::port_c_r));
+	map(0x0201, 0x0201).portr("COIN"); //game port
+	map(0x0310, 0x0311).rw(this, FUNC(pcxt_state::disk_iobank_r), FUNC(pcxt_state::disk_iobank_w)); //Prototyping card
+	map(0x0312, 0x0312).portr("IN0"); //Prototyping card,read only
+	map(0x03f2, 0x03f2).w(this, FUNC(pcxt_state::fdc_dor_w));
+	map(0x03f4, 0x03f4).r(this, FUNC(pcxt_state::fdc765_status_r)); //765 Floppy Disk Controller (FDC) Status
+	map(0x03f5, 0x03f5).rw(this, FUNC(pcxt_state::fdc765_data_r), FUNC(pcxt_state::fdc765_data_w));//FDC Data
+}
 
-ADDRESS_MAP_START(pcxt_state::tetriskr_map)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void pcxt_state::tetriskr_map(address_map &map)
+{
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(pcxt_state::tetriskr_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
-	AM_RANGE(0x03c8, 0x03c8) AM_READ_PORT("IN0")
-	AM_RANGE(0x03c9, 0x03c9) AM_READ_PORT("IN1")
+void pcxt_state::tetriskr_io(address_map &map)
+{
+	map.global_mask(0x3ff);
+	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
+	map(0x03c8, 0x03c8).portr("IN0");
+	map(0x03c9, 0x03c9).portr("IN1");
 //  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1") //read then discarded?
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(pcxt_state::bank_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM AM_REGION("game_prg", 0)
-ADDRESS_MAP_END
+void pcxt_state::bank_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom().region("game_prg", 0);
+}
 
 static INPUT_PORTS_START( filetto )
 	PORT_START("IN0")

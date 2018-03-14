@@ -140,52 +140,56 @@ WRITE_LINE_MEMBER(punchout_state::nmi_mask_w)
 	m_nmi_mask = state;
 }
 
-ADDRESS_MAP_START(punchout_state::punchout_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_SHARE("bg_top_videoram")
-	AM_RANGE(0xdff0, 0xdff7) AM_SHARE("spr1_ctrlram")
-	AM_RANGE(0xdff8, 0xdffc) AM_SHARE("spr2_ctrlram")
-	AM_RANGE(0xdffd, 0xdffd) AM_SHARE("palettebank")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_SHARE("spr1_videoram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_SHARE("spr2_videoram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_SHARE("bg_bot_videoram")   // also contains scroll RAM
-ADDRESS_MAP_END
+void punchout_state::punchout_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc3ff).ram().share("nvram");
+	map(0xd000, 0xd7ff).ram();
+	map(0xd800, 0xdfff).ram().w(this, FUNC(punchout_state::punchout_bg_top_videoram_w)).share("bg_top_videoram");
+	map(0xdff0, 0xdff7).share("spr1_ctrlram");
+	map(0xdff8, 0xdffc).share("spr2_ctrlram");
+	map(0xdffd, 0xdffd).share("palettebank");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(punchout_state::punchout_spr1_videoram_w)).share("spr1_videoram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(punchout_state::punchout_spr2_videoram_w)).share("spr2_videoram");
+	map(0xf000, 0xffff).ram().w(this, FUNC(punchout_state::punchout_bg_bot_videoram_w)).share("bg_bot_videoram");   // also contains scroll RAM
+}
 
 
-ADDRESS_MAP_START(punchout_state::armwrest_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(armwrest_fg_videoram_w) AM_SHARE("armwrest_fgram")
-	AM_RANGE(0xdff0, 0xdff7) AM_SHARE("spr1_ctrlram")
-	AM_RANGE(0xdff8, 0xdffc) AM_SHARE("spr2_ctrlram")
-	AM_RANGE(0xdffd, 0xdffd) AM_SHARE("palettebank")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_SHARE("spr1_videoram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_SHARE("spr2_videoram")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_SHARE("bg_bot_videoram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_SHARE("bg_top_videoram")
-ADDRESS_MAP_END
+void punchout_state::armwrest_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc3ff).ram().share("nvram");
+	map(0xd000, 0xd7ff).ram();
+	map(0xd800, 0xdfff).ram().w(this, FUNC(punchout_state::armwrest_fg_videoram_w)).share("armwrest_fgram");
+	map(0xdff0, 0xdff7).share("spr1_ctrlram");
+	map(0xdff8, 0xdffc).share("spr2_ctrlram");
+	map(0xdffd, 0xdffd).share("palettebank");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(punchout_state::punchout_spr1_videoram_w)).share("spr1_videoram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(punchout_state::punchout_spr2_videoram_w)).share("spr2_videoram");
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(punchout_state::punchout_bg_bot_videoram_w)).share("bg_bot_videoram");
+	map(0xf800, 0xffff).ram().w(this, FUNC(punchout_state::punchout_bg_top_videoram_w)).share("bg_top_videoram");
+}
 
 
-ADDRESS_MAP_START(punchout_state::punchout_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x00, 0x01) AM_WRITENOP // the 2A03 #1 is not present
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("vlm", vlm5030_device, data_w)
-	AM_RANGE(0x05, 0x07) AM_WRITENOP // spunchout protection
-	AM_RANGE(0x08, 0x0f) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void punchout_state::punchout_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x00, 0x01).nopw(); // the 2A03 #1 is not present
+	map(0x02, 0x02).portr("DSW2").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x03, 0x03).portr("DSW1").w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0x04, 0x04).w(m_vlm, FUNC(vlm5030_device::data_w));
+	map(0x05, 0x07).nopw(); // spunchout protection
+	map(0x08, 0x0f).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
 
-ADDRESS_MAP_START(punchout_state::punchout_vlm_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void punchout_state::punchout_vlm_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x3fff).rom();
+}
 
 
 // Super Punch-Out!! comes with an extra security PCB that plugs into the Z80 socket
@@ -235,21 +239,23 @@ WRITE8_MEMBER(punchout_state::spunchout_rp5h01_clock_w)
 	m_rp5h01->test_w(data & 1);
 }
 
-ADDRESS_MAP_START(punchout_state::spnchout_io_map)
-	AM_IMPORT_FROM( punchout_io_map )
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0xf0) AM_WRITE(spunchout_rp5h01_reset_w)
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0xf0) AM_WRITE(spunchout_rp5h01_clock_w)
-	AM_RANGE(0x07, 0x07) AM_SELECT(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w) // protection ports
-ADDRESS_MAP_END
+void punchout_state::spnchout_io_map(address_map &map)
+{
+	punchout_io_map(map);
+	map(0x05, 0x05).mirror(0xf0).w(this, FUNC(punchout_state::spunchout_rp5h01_reset_w));
+	map(0x06, 0x06).mirror(0xf0).w(this, FUNC(punchout_state::spunchout_rp5h01_clock_w));
+	map(0x07, 0x07).select(0xf0).rw(this, FUNC(punchout_state::spunchout_exp_r), FUNC(punchout_state::spunchout_exp_w)); // protection ports
+}
 
 // 2A03 (sound)
 
-ADDRESS_MAP_START(punchout_state::punchout_sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4016, 0x4016) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x4017, 0x4017) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void punchout_state::punchout_sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x4016, 0x4016).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x4017, 0x4017).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xffff).rom();
+}
 
 
 

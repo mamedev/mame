@@ -374,28 +374,29 @@ void sgi_ip2_state::machine_reset()
 ***************************************************************************/
 
 
-ADDRESS_MAP_START(sgi_ip2_state::sgi_ip2_map)
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x02100000, 0x0210ffff) AM_RAM AM_SHARE("bss") // ??? I don't understand the need for this...
-	AM_RANGE(0x30000000, 0x30017fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x30800000, 0x30800003) AM_READWRITE8(sgi_ip2_m_but_r,         sgi_ip2_m_but_w,        0xffffffff)
-	AM_RANGE(0x31000000, 0x31000003) AM_READWRITE16(sgi_ip2_m_quad_r,       sgi_ip2_m_quad_w,       0xffffffff)
-	AM_RANGE(0x31800000, 0x31800003) AM_READ16(sgi_ip2_swtch_r,                                     0xffffffff)
-	AM_RANGE(0x32000000, 0x3200000f) AM_DEVREADWRITE8("duart68681a", mc68681_device, read, write,   0xffffffff)
-	AM_RANGE(0x32800000, 0x3280000f) AM_DEVREADWRITE8("duart68681b", mc68681_device, read, write,   0xffffffff)
-	AM_RANGE(0x33000000, 0x330007ff) AM_RAM
-	AM_RANGE(0x34000000, 0x34000003) AM_READWRITE8(sgi_ip2_clock_ctl_r,     sgi_ip2_clock_ctl_w,    0xffffffff)
-	AM_RANGE(0x35000000, 0x35000003) AM_READWRITE8(sgi_ip2_clock_data_r,    sgi_ip2_clock_data_w,   0xffffffff)
-	AM_RANGE(0x36000000, 0x36000003) AM_READWRITE8(sgi_ip2_os_base_r,       sgi_ip2_os_base_w,      0xffffffff)
-	AM_RANGE(0x38000000, 0x38000003) AM_READWRITE16(sgi_ip2_status_r,       sgi_ip2_status_w,       0xffffffff)
-	AM_RANGE(0x39000000, 0x39000003) AM_READWRITE8(sgi_ip2_parctl_r,        sgi_ip2_parctl_w,       0xffffffff)
-	AM_RANGE(0x3a000000, 0x3a000003) AM_READWRITE8(sgi_ip2_mbp_r,           sgi_ip2_mbp_w,          0xffffffff)
-	AM_RANGE(0x3b000000, 0x3b003fff) AM_READWRITE(sgi_ip2_ptmap_r, sgi_ip2_ptmap_w) AM_SHARE("ptmap")
-	AM_RANGE(0x3c000000, 0x3c000003) AM_READWRITE16(sgi_ip2_tdbase_r,       sgi_ip2_tdbase_w,       0xffffffff)
-	AM_RANGE(0x3d000000, 0x3d000003) AM_READWRITE16(sgi_ip2_tdlmt_r,        sgi_ip2_tdlmt_w,        0xffffffff)
-	AM_RANGE(0x3e000000, 0x3e000003) AM_READWRITE16(sgi_ip2_stkbase_r,      sgi_ip2_stkbase_w,      0xffffffff)
-	AM_RANGE(0x3f000000, 0x3f000003) AM_READWRITE16(sgi_ip2_stklmt_r,       sgi_ip2_stklmt_w,       0xffffffff)
-ADDRESS_MAP_END
+void sgi_ip2_state::sgi_ip2_map(address_map &map)
+{
+	map(0x00000000, 0x00ffffff).ram().share("mainram");
+	map(0x02100000, 0x0210ffff).ram().share("bss"); // ??? I don't understand the need for this...
+	map(0x30000000, 0x30017fff).rom().region("maincpu", 0);
+	map(0x30800000, 0x30800003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_m_but_r), FUNC(sgi_ip2_state::sgi_ip2_m_but_w));
+	map(0x31000000, 0x31000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_m_quad_r), FUNC(sgi_ip2_state::sgi_ip2_m_quad_w));
+	map(0x31800000, 0x31800003).r(this, FUNC(sgi_ip2_state::sgi_ip2_swtch_r));
+	map(0x32000000, 0x3200000f).rw(m_duarta, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
+	map(0x32800000, 0x3280000f).rw(m_duartb, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
+	map(0x33000000, 0x330007ff).ram();
+	map(0x34000000, 0x34000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_clock_ctl_r), FUNC(sgi_ip2_state::sgi_ip2_clock_ctl_w));
+	map(0x35000000, 0x35000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_clock_data_r), FUNC(sgi_ip2_state::sgi_ip2_clock_data_w));
+	map(0x36000000, 0x36000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_os_base_r), FUNC(sgi_ip2_state::sgi_ip2_os_base_w));
+	map(0x38000000, 0x38000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_status_r), FUNC(sgi_ip2_state::sgi_ip2_status_w));
+	map(0x39000000, 0x39000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_parctl_r), FUNC(sgi_ip2_state::sgi_ip2_parctl_w));
+	map(0x3a000000, 0x3a000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_mbp_r), FUNC(sgi_ip2_state::sgi_ip2_mbp_w));
+	map(0x3b000000, 0x3b003fff).rw(this, FUNC(sgi_ip2_state::sgi_ip2_ptmap_r), FUNC(sgi_ip2_state::sgi_ip2_ptmap_w)).share("ptmap");
+	map(0x3c000000, 0x3c000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_tdbase_r), FUNC(sgi_ip2_state::sgi_ip2_tdbase_w));
+	map(0x3d000000, 0x3d000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_tdlmt_r), FUNC(sgi_ip2_state::sgi_ip2_tdlmt_w));
+	map(0x3e000000, 0x3e000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_stkbase_r), FUNC(sgi_ip2_state::sgi_ip2_stkbase_w));
+	map(0x3f000000, 0x3f000003).rw(this, FUNC(sgi_ip2_state::sgi_ip2_stklmt_r), FUNC(sgi_ip2_state::sgi_ip2_stklmt_w));
+}
 
 /***************************************************************************
     MACHINE DRIVERS

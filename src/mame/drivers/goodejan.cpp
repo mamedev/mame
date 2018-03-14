@@ -437,39 +437,49 @@ WRITE16_MEMBER(goodejan_state::mahjong_panel_w)
 	m_mux_data = data;
 }
 
-ADDRESS_MAP_START(goodejan_state::goodejan_map)
-	AM_RANGE(0x00000, 0x0afff) AM_RAM
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(seibucrtc_sc0vram_w) AM_SHARE("sc0_vram")
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(seibucrtc_sc3vram_w) AM_SHARE("sc3_vram")
-	AM_RANGE(0x0d000, 0x0dfff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+void goodejan_state::goodejan_map(address_map &map)
+{
+	map(0x00000, 0x0afff).ram();
+	map(0x0c000, 0x0c7ff).ram().w(this, FUNC(goodejan_state::seibucrtc_sc0vram_w)).share("sc0_vram");
+	map(0x0c800, 0x0cfff).ram().w(this, FUNC(goodejan_state::seibucrtc_sc3vram_w)).share("sc3_vram");
+	map(0x0d000, 0x0dfff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	/*Guess: these two aren't used/initialized at all.*/
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(seibucrtc_sc1vram_w) AM_SHARE("sc1_vram")
-	AM_RANGE(0x0e800, 0x0efff) AM_RAM_WRITE(seibucrtc_sc2vram_w) AM_SHARE("sc2_vram")
-	AM_RANGE(0x0f800, 0x0ffff) AM_RAM AM_SHARE("sprite_ram")
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(goodejan_state::seibucrtc_sc1vram_w)).share("sc1_vram");
+	map(0x0e800, 0x0efff).ram().w(this, FUNC(goodejan_state::seibucrtc_sc2vram_w)).share("sc2_vram");
+	map(0x0f800, 0x0ffff).ram().share("sprite_ram");
+	map(0xc0000, 0xfffff).rom();
+}
 
 /* totmejan CRTC is at 8000-804f,goodejan is at 8000-807f */
-ADDRESS_MAP_START(goodejan_state::common_io_map)
-	AM_RANGE(0x9000, 0x9001) AM_WRITE(gfxbank_w)
-	AM_RANGE(0xb000, 0xb003) AM_WRITENOP
-	AM_RANGE(0xb004, 0xb005) AM_WRITE(mahjong_panel_w)
+void goodejan_state::common_io_map(address_map &map)
+{
+	map(0x9000, 0x9001).w(this, FUNC(goodejan_state::gfxbank_w));
+	map(0xb000, 0xb003).nopw();
+	map(0xb004, 0xb005).w(this, FUNC(goodejan_state::mahjong_panel_w));
 
-	AM_RANGE(0xc000, 0xc001) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc002, 0xc003) AM_READ(mahjong_panel_r)
-	AM_RANGE(0xc004, 0xc005) AM_READ_PORT("DSW2") // switches
-	AM_RANGE(0xd000, 0xd00f) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
-ADDRESS_MAP_END
+	map(0xc000, 0xc001).portr("DSW1");
+	map(0xc002, 0xc003).r(this, FUNC(goodejan_state::mahjong_panel_r));
+	map(0xc004, 0xc005).portr("DSW2"); // switches
+	map(0xd000, 0xd00f).rw("seibu_sound", FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(goodejan_state::totmejan_io_map)
-	AM_IMPORT_FROM(common_io_map)
-	AM_RANGE(0x8000, 0x804f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-ADDRESS_MAP_END
+void goodejan_state::totmejan_io_map(address_map &map)
+{
+	common_io_map(map);
+	map(0x8000, 0x804f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+}
 
-ADDRESS_MAP_START(goodejan_state::goodejan_io_map)
-	AM_IMPORT_FROM(common_io_map)
-	;map(0x8000, 0x807f).lrw16("crtc_rw", [this](address_space &space, offs_t offset, u16 mem_mask){ return m_crtc->read(space, offset ^ 0x20, mem_mask); }, [this](address_space &space, offs_t offset, u16 data, u16 mem_mask){ m_crtc->write(space, offset ^ 0x20, data, mem_mask); });
-ADDRESS_MAP_END
+void goodejan_state::goodejan_io_map(address_map &map)
+{
+	common_io_map(map);
+	map(0x8000, 0x807f).lrw16("crtc_rw",
+							  [this](address_space &space, offs_t offset, u16 mem_mask) {
+								  return m_crtc->read(space, offset ^ 0x20, mem_mask);
+							  },
+							  [this](address_space &space, offs_t offset, u16 data, u16 mem_mask) {
+								  m_crtc->write(space, offset ^ 0x20, data, mem_mask);
+							  });
+}
 
 static INPUT_PORTS_START( goodejan )
 	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */

@@ -142,16 +142,18 @@ uint32_t dotrikun_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-ADDRESS_MAP_START(dotrikun_state::dotrikun_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x85ff) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
-	AM_RANGE(0x8600, 0x87ff) AM_RAM
-ADDRESS_MAP_END
+void dotrikun_state::dotrikun_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x85ff).ram().w(this, FUNC(dotrikun_state::vram_w)).share("vram");
+	map(0x8600, 0x87ff).ram();
+}
 
-ADDRESS_MAP_START(dotrikun_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ_PORT("INPUTS") AM_WRITE(color_w)
-ADDRESS_MAP_END
+void dotrikun_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0xff).portr("INPUTS").w(this, FUNC(dotrikun_state::color_w));
+}
 
 
 /*************************************

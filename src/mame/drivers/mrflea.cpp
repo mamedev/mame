@@ -97,43 +97,47 @@ WRITE8_MEMBER(mrflea_state::mrflea_data1_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(mrflea_state::mrflea_master_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(mrflea_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe800, 0xe83f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xec00, 0xecff) AM_RAM_WRITE(mrflea_spriteram_w) AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void mrflea_state::mrflea_master_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(mrflea_state::mrflea_videoram_w)).share("videoram");
+	map(0xe800, 0xe83f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xec00, 0xecff).ram().w(this, FUNC(mrflea_state::mrflea_spriteram_w)).share("spriteram");
+}
 
-ADDRESS_MAP_START(mrflea_state::mrflea_master_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog? */
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("mainppi", i8255_device, read, write)
-	AM_RANGE(0x60, 0x60) AM_WRITE(mrflea_gfx_bank_w)
-ADDRESS_MAP_END
+void mrflea_state::mrflea_master_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopw(); /* watchdog? */
+	map(0x40, 0x43).rw("mainppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x60, 0x60).w(this, FUNC(mrflea_state::mrflea_gfx_bank_w));
+}
 
 
-ADDRESS_MAP_START(mrflea_state::mrflea_slave_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x80ff) AM_RAM
-	AM_RANGE(0x9000, 0x905a) AM_RAM /* ? */
-ADDRESS_MAP_END
+void mrflea_state::mrflea_slave_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x3fff).rom();
+	map(0x8000, 0x80ff).ram();
+	map(0x9000, 0x905a).ram(); /* ? */
+}
 
-ADDRESS_MAP_START(mrflea_state::mrflea_slave_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("pic", pic8259_device, read, write)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("subppi", i8255_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x41, 0x41) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x42, 0x42) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0x43, 0x43) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREADWRITE("ay3", ay8910_device, data_r, data_w)
-	AM_RANGE(0x45, 0x45) AM_DEVWRITE("ay3", ay8910_device, address_w)
-	AM_RANGE(0x46, 0x46) AM_DEVREADWRITE("ay4", ay8910_device, data_r, data_w)
-	AM_RANGE(0x47, 0x47) AM_DEVWRITE("ay4", ay8910_device, address_w)
-ADDRESS_MAP_END
+void mrflea_state::mrflea_slave_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopw(); /* watchdog */
+	map(0x10, 0x11).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x20, 0x23).rw("subppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x40).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x41, 0x41).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x42, 0x42).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x43, 0x43).w("ay2", FUNC(ay8910_device::address_w));
+	map(0x44, 0x44).rw("ay3", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x45, 0x45).w("ay3", FUNC(ay8910_device::address_w));
+	map(0x46, 0x46).rw("ay4", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x47, 0x47).w("ay4", FUNC(ay8910_device::address_w));
+}
 
 /*************************************
  *

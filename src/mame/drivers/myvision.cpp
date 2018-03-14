@@ -71,22 +71,24 @@ private:
 };
 
 
-ADDRESS_MAP_START(myvision_state::myvision_mem)
-	ADDRESS_MAP_UNMAP_HIGH
+void myvision_state::myvision_mem(address_map &map)
+{
+	map.unmap_value_high();
 	//AM_RANGE(0x0000, 0x5fff)      // mapped by the cartslot
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("tms9918", tms9918a_device, vram_read, vram_write)
-	AM_RANGE(0xe002, 0xe002) AM_DEVREADWRITE("tms9918", tms9918a_device, register_read, register_write)
-ADDRESS_MAP_END
+	map(0xa000, 0xa7ff).ram();
+	map(0xe000, 0xe000).rw("tms9918", FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
+	map(0xe002, 0xe002).rw("tms9918", FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
+}
 
 
-ADDRESS_MAP_START(myvision_state::myvision_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay8910", ay8910_device, data_r)
-ADDRESS_MAP_END
+void myvision_state::myvision_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0x01, 0x01).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0x02, 0x02).r("ay8910", FUNC(ay8910_device::data_r));
+}
 
 
 /* Input ports */

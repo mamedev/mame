@@ -252,26 +252,28 @@ READ8_MEMBER(pipedrm_state::pending_command_r )
  *
  *************************************/
 
-ADDRESS_MAP_START(pipedrm_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void pipedrm_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd000, 0xffff).rw(this, FUNC(pipedrm_state::fromance_videoram_r), FUNC(pipedrm_state::fromance_videoram_w)).share("videoram");
+}
 
 
-ADDRESS_MAP_START(pipedrm_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("P2") AM_WRITE(pipedrm_bankswitch_w)
-	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
-	AM_RANGE(0x22, 0x22) AM_READ_PORT("DSW1")
-	AM_RANGE(0x23, 0x23) AM_READ_PORT("DSW2")
-	AM_RANGE(0x24, 0x24) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x25, 0x25) AM_READ(pending_command_r)
-ADDRESS_MAP_END
+void pipedrm_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x11).w(m_gga, FUNC(vsystem_gga_device::write));
+	map(0x20, 0x20).portr("P1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x21, 0x21).portr("P2").w(this, FUNC(pipedrm_state::pipedrm_bankswitch_w));
+	map(0x22, 0x25).w(this, FUNC(pipedrm_state::fromance_scroll_w));
+	map(0x22, 0x22).portr("DSW1");
+	map(0x23, 0x23).portr("DSW2");
+	map(0x24, 0x24).portr("SYSTEM");
+	map(0x25, 0x25).r(this, FUNC(pipedrm_state::pending_command_r));
+}
 
 
 
@@ -281,28 +283,31 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(pipedrm_state::sound_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank2")
-ADDRESS_MAP_END
+void pipedrm_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank2");
+}
 
 
-ADDRESS_MAP_START(pipedrm_state::sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0x16, 0x16) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x17, 0x17) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-ADDRESS_MAP_END
+void pipedrm_state::sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x04, 0x04).w(this, FUNC(pipedrm_state::sound_bankswitch_w));
+	map(0x16, 0x16).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x17, 0x17).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x18, 0x1b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+}
 
 
-ADDRESS_MAP_START(pipedrm_state::hatris_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x08) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x05, 0x05) AM_READ(pending_command_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-ADDRESS_MAP_END
+void pipedrm_state::hatris_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).mirror(0x08).rw("ymsnd", FUNC(ym2608_device::read), FUNC(ym2608_device::write));
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x05, 0x05).r(this, FUNC(pipedrm_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+}
 
 
 

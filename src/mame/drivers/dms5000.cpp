@@ -30,15 +30,17 @@ public:
 };
 
 
-ADDRESS_MAP_START(dms5000_state::dms5000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
+void dms5000_state::dms5000_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x1ffff).ram();
+	map(0xfc000, 0xfffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(dms5000_state::dms5000_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void dms5000_state::dms5000_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 /* Input ports */
 static INPUT_PORTS_START( dms5000 )

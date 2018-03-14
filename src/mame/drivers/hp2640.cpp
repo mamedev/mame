@@ -935,30 +935,32 @@ static INPUT_PORTS_START(hp2645)
 	PORT_CONFSETTING(0x80, DEF_STR(Off))
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(hp2645_state::cpu_mem_map)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000 , 0x57ff) AM_ROM
-	AM_RANGE(0x8100 , 0x8100) AM_DEVREAD("uart", ay51013_device, receive)
-	AM_RANGE(0x8120 , 0x8120) AM_READ(async_status_r)
-	AM_RANGE(0x8140 , 0x8140) AM_WRITE(async_control_w)
-	AM_RANGE(0x8160 , 0x8160) AM_DEVWRITE("uart", ay51013_device, transmit)
-	AM_RANGE(0x8300 , 0x8300) AM_WRITE(kb_led_w)
-	AM_RANGE(0x8300 , 0x830d) AM_READ(kb_r)
-	AM_RANGE(0x830e , 0x830e) AM_READ(switches_ah_r)
-	AM_RANGE(0x830f , 0x830f) AM_READ(datacomm_sw_r)
-	AM_RANGE(0x8320 , 0x8320) AM_WRITE(kb_prev_w)
-	AM_RANGE(0x8380 , 0x8380) AM_READWRITE(switches_jr_r , kb_reset_w)
-	AM_RANGE(0x83a0 , 0x83a0) AM_READ(switches_sz_r)
-	AM_RANGE(0x8700 , 0x8700) AM_WRITE(cx_w)
-	AM_RANGE(0x8720 , 0x8720) AM_WRITE(cy_w)
-	AM_RANGE(0x9100 , 0x91ff) AM_RAM
-	AM_RANGE(0xc000 , 0xffff) AM_RAM
-ADDRESS_MAP_END
+void hp2645_state::cpu_mem_map(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x0000, 0x57ff).rom();
+	map(0x8100, 0x8100).r(m_uart, FUNC(ay51013_device::receive));
+	map(0x8120, 0x8120).r(this, FUNC(hp2645_state::async_status_r));
+	map(0x8140, 0x8140).w(this, FUNC(hp2645_state::async_control_w));
+	map(0x8160, 0x8160).w(m_uart, FUNC(ay51013_device::transmit));
+	map(0x8300, 0x8300).w(this, FUNC(hp2645_state::kb_led_w));
+	map(0x8300, 0x830d).r(this, FUNC(hp2645_state::kb_r));
+	map(0x830e, 0x830e).r(this, FUNC(hp2645_state::switches_ah_r));
+	map(0x830f, 0x830f).r(this, FUNC(hp2645_state::datacomm_sw_r));
+	map(0x8320, 0x8320).w(this, FUNC(hp2645_state::kb_prev_w));
+	map(0x8380, 0x8380).rw(this, FUNC(hp2645_state::switches_jr_r), FUNC(hp2645_state::kb_reset_w));
+	map(0x83a0, 0x83a0).r(this, FUNC(hp2645_state::switches_sz_r));
+	map(0x8700, 0x8700).w(this, FUNC(hp2645_state::cx_w));
+	map(0x8720, 0x8720).w(this, FUNC(hp2645_state::cy_w));
+	map(0x9100, 0x91ff).ram();
+	map(0xc000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(hp2645_state::cpu_io_map)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x00 , 0xff) AM_WRITE(mode_byte_w)
-ADDRESS_MAP_END
+void hp2645_state::cpu_io_map(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x00, 0xff).w(this, FUNC(hp2645_state::mode_byte_w));
+}
 
 MACHINE_CONFIG_START(hp2645_state::hp2645)
 	MCFG_CPU_ADD("cpu" , I8080A , SYS_CLOCK / 2)

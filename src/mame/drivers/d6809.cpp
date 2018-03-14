@@ -123,15 +123,16 @@ WRITE8_MEMBER( d6809_state::term_w )
 		m_terminal->write(space, 0, data);
 }
 
-ADDRESS_MAP_START(d6809_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
+void d6809_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
 	// 00-FF is for various devices.
-	AM_RANGE(0x0000, 0x0003) AM_DEVREADWRITE("acia1", mos6551_device, read, write)
-	AM_RANGE(0x0004, 0x0007) AM_DEVREADWRITE("acia2", mos6551_device, read, write)
-	AM_RANGE(0x00ff, 0x00ff) AM_READWRITE(term_r,term_w)
-	AM_RANGE(0x1000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+	map(0x0000, 0x0003).rw("acia1", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x0004, 0x0007).rw("acia2", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x00ff, 0x00ff).rw(this, FUNC(d6809_state::term_r), FUNC(d6809_state::term_w));
+	map(0x1000, 0xdfff).ram();
+	map(0xe000, 0xffff).rom().region("roms", 0);
+}
 
 
 /* Input ports */

@@ -190,37 +190,39 @@ WRITE8_MEMBER(photoply_state::eeprom_w)
 	// Bits 4-7 are set for some writes, but may do nothing?
 }
 
-ADDRESS_MAP_START(photoply_state::photoply_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, mem_r, mem_w, 0xffffffff)
+void photoply_state::photoply_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(cirrus_gd5446_device::mem_r), FUNC(cirrus_gd5446_device::mem_w));
 //  AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
 //  AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_REGION("ex_bios", 0)
-	AM_RANGE(0x000c0000, 0x000fffff) AM_READWRITE8(bios_r,bios_w,0xffffffff)
-	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM // 64MB RAM, guess!
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+	map(0x000c0000, 0x000fffff).rw(this, FUNC(photoply_state::bios_r), FUNC(photoply_state::bios_w));
+	map(0x00100000, 0x07ffffff).ram(); // 64MB RAM, guess!
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
+}
 
 
 
-ADDRESS_MAP_START(photoply_state::photoply_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x00e8, 0x00eb) AM_NOP
+void photoply_state::photoply_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x00e8, 0x00eb).noprw();
 
-	AM_RANGE(0x0170, 0x0177) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs0, write_cs0)
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
-	AM_RANGE(0x0200, 0x0203) AM_WRITE8(eeprom_w, 0x00ff0000)
+	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
+	map(0x0202, 0x0202).w(this, FUNC(photoply_state::eeprom_w));
 //  AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
-	AM_RANGE(0x0370, 0x0377) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs1, write_cs1)
+	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
 //  AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, port_03d0_r, port_03d0_w, 0xffffffff)
+	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5446_device::port_03b0_r), FUNC(cirrus_gd5446_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5446_device::port_03c0_r), FUNC(cirrus_gd5446_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5446_device::port_03d0_r), FUNC(cirrus_gd5446_device::port_03d0_w));
 
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs1, write_cs1)
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
 
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 
-ADDRESS_MAP_END
+}
 
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)

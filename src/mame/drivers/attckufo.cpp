@@ -45,22 +45,25 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(attckufo_state::cpu_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("mos6560", mos6560_device, read, write)
-	AM_RANGE(0x1400, 0x1403) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void attckufo_state::cpu_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x100f).rw("mos6560", FUNC(mos6560_device::read), FUNC(mos6560_device::write));
+	map(0x1400, 0x1403).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1c00, 0x1fff).ram();
+	map(0x2000, 0x3fff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(attckufo_state::vic_videoram_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
-ADDRESS_MAP_END
+void attckufo_state::vic_videoram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).r(this, FUNC(attckufo_state::vic_videoram_r));
+}
 
-ADDRESS_MAP_START(attckufo_state::vic_colorram_map)
-	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
-ADDRESS_MAP_END
+void attckufo_state::vic_colorram_map(address_map &map)
+{
+	map(0x000, 0x3ff).r(this, FUNC(attckufo_state::vic_colorram_r));
+}
 
 
 //**************************************************************************

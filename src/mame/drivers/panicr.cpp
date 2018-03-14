@@ -428,29 +428,30 @@ WRITE8_MEMBER(panicr_state::t5182shared_w)
 }
 
 
-ADDRESS_MAP_START(panicr_state::panicr_map)
-	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x02000, 0x03cff) AM_RAM AM_SHARE("spriteram") // how big is sprite ram, some places definitely have sprites at 3000+
-	AM_RANGE(0x03d00, 0x03fff) AM_RAM
-	AM_RANGE(0x08000, 0x0bfff) AM_READ(collision_r)
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_SHARE("textram")
-	AM_RANGE(0x0d000, 0x0d000) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
-	AM_RANGE(0x0d002, 0x0d002) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
-	AM_RANGE(0x0d004, 0x0d004) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
-	AM_RANGE(0x0d006, 0x0d006) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_release_w)
-	AM_RANGE(0x0d200, 0x0d2ff) AM_READWRITE(t5182shared_r, t5182shared_w)
-	AM_RANGE(0x0d400, 0x0d400) AM_READ_PORT("P1")
-	AM_RANGE(0x0d402, 0x0d402) AM_READ_PORT("P2")
-	AM_RANGE(0x0d404, 0x0d404) AM_READ_PORT("START")
-	AM_RANGE(0x0d406, 0x0d406) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0d407, 0x0d407) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0d802, 0x0d802) AM_WRITE(scrollx_hi_w)
-	AM_RANGE(0x0d804, 0x0d804) AM_WRITE(scrollx_lo_w)
-	AM_RANGE(0x0d80a, 0x0d80a) AM_WRITE(output_w)
-	AM_RANGE(0x0d80c, 0x0d80c) AM_WRITEONLY AM_SHARE("spritebank")
-	AM_RANGE(0x0d818, 0x0d818) AM_WRITENOP // watchdog?
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void panicr_state::panicr_map(address_map &map)
+{
+	map(0x00000, 0x01fff).ram().share("mainram");
+	map(0x02000, 0x03cff).ram().share("spriteram"); // how big is sprite ram, some places definitely have sprites at 3000+
+	map(0x03d00, 0x03fff).ram();
+	map(0x08000, 0x0bfff).r(this, FUNC(panicr_state::collision_r));
+	map(0x0c000, 0x0cfff).ram().share("textram");
+	map(0x0d000, 0x0d000).w(m_t5182, FUNC(t5182_device::sound_irq_w));
+	map(0x0d002, 0x0d002).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_acquire_w));
+	map(0x0d004, 0x0d004).r(m_t5182, FUNC(t5182_device::sharedram_semaphore_snd_r));
+	map(0x0d006, 0x0d006).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_release_w));
+	map(0x0d200, 0x0d2ff).rw(this, FUNC(panicr_state::t5182shared_r), FUNC(panicr_state::t5182shared_w));
+	map(0x0d400, 0x0d400).portr("P1");
+	map(0x0d402, 0x0d402).portr("P2");
+	map(0x0d404, 0x0d404).portr("START");
+	map(0x0d406, 0x0d406).portr("DSW1");
+	map(0x0d407, 0x0d407).portr("DSW2");
+	map(0x0d802, 0x0d802).w(this, FUNC(panicr_state::scrollx_hi_w));
+	map(0x0d804, 0x0d804).w(this, FUNC(panicr_state::scrollx_lo_w));
+	map(0x0d80a, 0x0d80a).w(this, FUNC(panicr_state::output_w));
+	map(0x0d80c, 0x0d80c).writeonly().share("spritebank");
+	map(0x0d818, 0x0d818).nopw(); // watchdog?
+	map(0xf0000, 0xfffff).rom();
+}
 
 
 /***************************************************************************

@@ -143,49 +143,54 @@ WRITE_LINE_MEMBER(megazone_state::irq_mask_w)
 }
 
 
-ADDRESS_MAP_START(megazone_state::megazone_map)
-	AM_RANGE(0x0000, 0x0007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_SHARE("scrolly")
-	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY AM_SHARE("scrollx")
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("colorram2")
-	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x4000, 0xffff) AM_ROM     /* 4000->5FFF is a debug rom */
-ADDRESS_MAP_END
+void megazone_state::megazone_map(address_map &map)
+{
+	map(0x0000, 0x0007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x0800, 0x0800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1000, 0x1000).writeonly().share("scrolly");
+	map(0x1800, 0x1800).writeonly().share("scrollx");
+	map(0x2000, 0x23ff).ram().share("videoram");
+	map(0x2400, 0x27ff).ram().share("videoram2");
+	map(0x2800, 0x2bff).ram().share("colorram");
+	map(0x2c00, 0x2fff).ram().share("colorram2");
+	map(0x3000, 0x33ff).ram().share("spriteram");
+	map(0x3800, 0x3fff).ram().share("share1");
+	map(0x4000, 0xffff).rom();     /* 4000->5FFF is a debug rom */
+}
 
-ADDRESS_MAP_START(megazone_state::megazone_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(megazone_i8039_irq_w) /* START line. Interrupts 8039 */
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)            /* CODE  line. Command Interrupts 8039 */
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")            /* IO Coin */
-	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("IN1")            /* P1 IO */
-	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN2")            /* P2 IO */
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW2")
-	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa000, 0xa000) AM_WRITENOP                    /* INTMAIN - Interrupts main CPU (unused) */
-	AM_RANGE(0xc000, 0xc000) AM_WRITENOP                    /* INT (Actually is NMI) enable/disable (unused)*/
-	AM_RANGE(0xc001, 0xc001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void megazone_state::megazone_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x2000).w(this, FUNC(megazone_state::megazone_i8039_irq_w)); /* START line. Interrupts 8039 */
+	map(0x4000, 0x4000).w("soundlatch", FUNC(generic_latch_8_device::write));            /* CODE  line. Command Interrupts 8039 */
+	map(0x6000, 0x6000).portr("IN0");            /* IO Coin */
+	map(0x6001, 0x6001).portr("IN1");            /* P1 IO */
+	map(0x6002, 0x6002).portr("IN2");            /* P2 IO */
+	map(0x8000, 0x8000).portr("DSW2");
+	map(0x8001, 0x8001).portr("DSW1");
+	map(0xa000, 0xa000).nopw();                    /* INTMAIN - Interrupts main CPU (unused) */
+	map(0xc000, 0xc000).nopw();                    /* INT (Actually is NMI) enable/disable (unused)*/
+	map(0xc001, 0xc001).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xe000, 0xe7ff).ram().share("share1");
+}
 
-ADDRESS_MAP_START(megazone_state::megazone_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x00, 0x02) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-ADDRESS_MAP_END
+void megazone_state::megazone_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x00, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x02).w("aysnd", FUNC(ay8910_device::data_w));
+}
 
-ADDRESS_MAP_START(megazone_state::megazone_i8039_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void megazone_state::megazone_i8039_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(megazone_state::megazone_i8039_io_map)
-	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void megazone_state::megazone_i8039_io_map(address_map &map)
+{
+	map(0x00, 0xff).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 static INPUT_PORTS_START( megazone )
 	/* 0x6000 -> 0xe320 (CPU1) = 0x3b20 (CPU0) */

@@ -800,42 +800,44 @@ READ8_MEMBER(sigmab98_state::dodghero_regs2_r)
 	}
 }
 
-ADDRESS_MAP_START(sigmab98_state::dodghero_mem_map)
-	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0xa7ff ) AM_ROMBANK("rombank")
+void sigmab98_state::dodghero_mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xa7ff).bankr("rombank");
 
-	AM_RANGE( 0xa800, 0xb7ff ) AM_RAM AM_SHARE("spriteram")
+	map(0xa800, 0xb7ff).ram().share("spriteram");
 
-	AM_RANGE( 0xc800, 0xc9ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	map(0xc800, 0xc9ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	AM_RANGE( 0xd001, 0xd07f ) AM_RAM AM_SHARE("vtable")
+	map(0xd001, 0xd07f).ram().share("vtable");
 
-	AM_RANGE( 0xd800, 0xdfff ) AM_RAMBANK("rambank")    // not used, where is it mapped?
+	map(0xd800, 0xdfff).bankrw("rambank");    // not used, where is it mapped?
 
-	AM_RANGE( 0xd800, 0xd821 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
-	AM_RANGE( 0xd813, 0xd813 ) AM_READ(d013_r)
-	AM_RANGE( 0xd821, 0xd821 ) AM_READ(d021_r)
+	map(0xd800, 0xd821).rw(this, FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
+	map(0xd813, 0xd813).r(this, FUNC(sigmab98_state::d013_r));
+	map(0xd821, 0xd821).r(this, FUNC(sigmab98_state::d021_r));
 
-	AM_RANGE( 0xe000, 0xefff ) AM_RAM AM_SHARE("nvram") // battery backed RAM
+	map(0xe000, 0xefff).ram().share("nvram"); // battery backed RAM
 
-	AM_RANGE( 0xf000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(sigmab98_state::dodghero_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void sigmab98_state::dodghero_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 
-	AM_RANGE( 0x00, 0x01 ) AM_DEVREADWRITE("ymz", ymz280b_device, read, write )
+	map(0x00, 0x01).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 
-	AM_RANGE( 0xa0, 0xa1 ) AM_READWRITE(dodghero_regs_r,  dodghero_regs_w )
+	map(0xa0, 0xa1).rw(this, FUNC(sigmab98_state::dodghero_regs_r), FUNC(sigmab98_state::dodghero_regs_w));
 //  AM_RANGE( 0xa2, 0xa3 )
-	AM_RANGE( 0xa4, 0xa5 ) AM_READWRITE(dodghero_regs2_r, dodghero_regs2_w )
+	map(0xa4, 0xa5).rw(this, FUNC(sigmab98_state::dodghero_regs2_r), FUNC(sigmab98_state::dodghero_regs2_w));
 
-	AM_RANGE( 0xc0, 0xc0 ) AM_READ_PORT( "EEPROM" ) AM_WRITE(eeprom_w)
-	AM_RANGE( 0xc2, 0xc2 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0xc4, 0xc4 ) AM_READ_PORT( "PAYOUT" ) AM_WRITE(c4_w )
-	AM_RANGE( 0xc6, 0xc6 ) AM_WRITE(c6_w )
-	AM_RANGE( 0xc8, 0xc8 ) AM_WRITE(c8_w )
-ADDRESS_MAP_END
+	map(0xc0, 0xc0).portr("EEPROM").w(this, FUNC(sigmab98_state::eeprom_w));
+	map(0xc2, 0xc2).portr("BUTTON");
+	map(0xc4, 0xc4).portr("PAYOUT").w(this, FUNC(sigmab98_state::c4_w));
+	map(0xc6, 0xc6).w(this, FUNC(sigmab98_state::c6_w));
+	map(0xc8, 0xc8).w(this, FUNC(sigmab98_state::c8_w));
+}
 
 /***************************************************************************
                         GeGeGe no Kitarou Youkai Slot
@@ -996,44 +998,46 @@ WRITE8_MEMBER(sigmab98_state::c8_w)
 	show_outputs();
 }
 
-ADDRESS_MAP_START(sigmab98_state::gegege_mem_map)
-	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("rombank")
+void sigmab98_state::gegege_mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("rombank");
 
-	AM_RANGE( 0xa000, 0xafff ) AM_RAM AM_SHARE("spriteram")
+	map(0xa000, 0xafff).ram().share("spriteram");
 
-	AM_RANGE( 0xc000, 0xc1ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	map(0xc000, 0xc1ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	AM_RANGE( 0xc800, 0xc87f ) AM_RAM AM_SHARE("vtable")
+	map(0xc800, 0xc87f).ram().share("vtable");
 
-	AM_RANGE( 0xd000, 0xd021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
-	AM_RANGE( 0xd013, 0xd013 ) AM_READ(d013_r)
-	AM_RANGE( 0xd021, 0xd021 ) AM_READ(d021_r)
+	map(0xd000, 0xd021).rw(this, FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
+	map(0xd013, 0xd013).r(this, FUNC(sigmab98_state::d013_r));
+	map(0xd021, 0xd021).r(this, FUNC(sigmab98_state::d021_r));
 
-	AM_RANGE( 0xd800, 0xdfff ) AM_RAMBANK("rambank")
+	map(0xd800, 0xdfff).bankrw("rambank");
 
-	AM_RANGE( 0xe000, 0xefff ) AM_RAM AM_SHARE("nvram") // battery backed RAM
+	map(0xe000, 0xefff).ram().share("nvram"); // battery backed RAM
 
-	AM_RANGE( 0xf000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(sigmab98_state::gegege_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void sigmab98_state::gegege_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 
-	AM_RANGE( 0x00, 0x01 ) AM_DEVREADWRITE("ymz", ymz280b_device, read, write )
+	map(0x00, 0x01).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 
-	AM_RANGE( 0xa0, 0xa1 ) AM_READWRITE(gegege_regs_r,  gegege_regs_w )
+	map(0xa0, 0xa1).rw(this, FUNC(sigmab98_state::gegege_regs_r), FUNC(sigmab98_state::gegege_regs_w));
 //  AM_RANGE( 0xa2, 0xa3 )
-	AM_RANGE( 0xa4, 0xa5 ) AM_READWRITE(gegege_regs2_r, gegege_regs2_w )
+	map(0xa4, 0xa5).rw(this, FUNC(sigmab98_state::gegege_regs2_r), FUNC(sigmab98_state::gegege_regs2_w));
 
-	AM_RANGE( 0xc0, 0xc0 ) AM_READ_PORT( "EEPROM" ) AM_WRITE(eeprom_w)
-	AM_RANGE( 0xc2, 0xc2 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0xc4, 0xc4 ) AM_READ_PORT( "PAYOUT" ) AM_WRITE(c4_w )
-	AM_RANGE( 0xc6, 0xc6 ) AM_WRITE(c6_w )
-	AM_RANGE( 0xc8, 0xc8 ) AM_WRITE(c8_w )
+	map(0xc0, 0xc0).portr("EEPROM").w(this, FUNC(sigmab98_state::eeprom_w));
+	map(0xc2, 0xc2).portr("BUTTON");
+	map(0xc4, 0xc4).portr("PAYOUT").w(this, FUNC(sigmab98_state::c4_w));
+	map(0xc6, 0xc6).w(this, FUNC(sigmab98_state::c6_w));
+	map(0xc8, 0xc8).w(this, FUNC(sigmab98_state::c8_w));
 
-	AM_RANGE( 0xe5, 0xe5 ) AM_READNOP   // during irq
-ADDRESS_MAP_END
+	map(0xe5, 0xe5).nopr();   // during irq
+}
 
 /***************************************************************************
                            Minna Ganbare! Dash Hero
@@ -1095,23 +1099,24 @@ READ8_MEMBER(sigmab98_state::dashhero_regs2_r)
 	}
 }
 
-ADDRESS_MAP_START(sigmab98_state::dashhero_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void sigmab98_state::dashhero_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 
-	AM_RANGE( 0x00, 0x01 ) AM_DEVREADWRITE("ymz", ymz280b_device, read, write )
+	map(0x00, 0x01).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 
-	AM_RANGE( 0xa0, 0xa1 ) AM_READWRITE(gegege_regs_r,  gegege_regs_w )
+	map(0xa0, 0xa1).rw(this, FUNC(sigmab98_state::gegege_regs_r), FUNC(sigmab98_state::gegege_regs_w));
 	//  AM_RANGE( 0xa2, 0xa3 )
-	AM_RANGE( 0xa4, 0xa5 ) AM_READWRITE(dashhero_regs2_r, dashhero_regs2_w )
+	map(0xa4, 0xa5).rw(this, FUNC(sigmab98_state::dashhero_regs2_r), FUNC(sigmab98_state::dashhero_regs2_w));
 
-	AM_RANGE( 0xc0, 0xc0 ) AM_READ_PORT( "EEPROM" ) AM_WRITE(eeprom_w)
-	AM_RANGE( 0xc2, 0xc2 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0xc4, 0xc4 ) AM_READ_PORT( "PAYOUT" ) AM_WRITE(c4_w )
-	AM_RANGE( 0xc6, 0xc6 ) AM_WRITE(c6_w )
-	AM_RANGE( 0xc8, 0xc8 ) AM_WRITE(c8_w )
+	map(0xc0, 0xc0).portr("EEPROM").w(this, FUNC(sigmab98_state::eeprom_w));
+	map(0xc2, 0xc2).portr("BUTTON");
+	map(0xc4, 0xc4).portr("PAYOUT").w(this, FUNC(sigmab98_state::c4_w));
+	map(0xc6, 0xc6).w(this, FUNC(sigmab98_state::c6_w));
+	map(0xc8, 0xc8).w(this, FUNC(sigmab98_state::c8_w));
 
-	AM_RANGE( 0xe5, 0xe5 ) AM_READNOP   // during irq
-ADDRESS_MAP_END
+	map(0xe5, 0xe5).nopr();   // during irq
+}
 
 
 /***************************************************************************
@@ -1227,36 +1232,38 @@ WRITE8_MEMBER(lufykzku_state::lufykzku_c8_w)
 	show_outputs();
 }
 
-ADDRESS_MAP_START(lufykzku_state::lufykzku_mem_map)
-	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0xbfff ) AM_RAMBANK("romrambank") AM_SHARE("nvram") // ROM | NVRAM
+void lufykzku_state::lufykzku_mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankrw("romrambank").share("nvram"); // ROM | NVRAM
 
-	AM_RANGE( 0xc000, 0xcfff ) AM_RAM AM_SHARE("spriteram")
+	map(0xc000, 0xcfff).ram().share("spriteram");
 
-	AM_RANGE( 0xd000, 0xefff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // more palette entries
+	map(0xd000, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // more palette entries
 
-	AM_RANGE( 0xf000, 0xf021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
-	AM_RANGE( 0xf013, 0xf013 ) AM_READ(d013_r)
-	AM_RANGE( 0xf021, 0xf021 ) AM_READ(d021_r)
+	map(0xf000, 0xf021).rw(this, FUNC(lufykzku_state::vregs_r), FUNC(lufykzku_state::vregs_w)).share("vregs");
+	map(0xf013, 0xf013).r(this, FUNC(lufykzku_state::d013_r));
+	map(0xf021, 0xf021).r(this, FUNC(lufykzku_state::d021_r));
 
-	AM_RANGE( 0xf400, 0xf47f ) AM_RAM AM_SHARE("vtable")
+	map(0xf400, 0xf47f).ram().share("vtable");
 
-	AM_RANGE( 0xfc00, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+	map(0xfc00, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(lufykzku_state::lufykzku_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_DEVWRITE("oki", okim9810_device, write )
-	AM_RANGE( 0x01, 0x01 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
+void lufykzku_state::lufykzku_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("oki", FUNC(okim9810_device::write));
+	map(0x01, 0x01).w("oki", FUNC(okim9810_device::write_tmp_register));
 
-	AM_RANGE( 0xa2, 0xa3 ) AM_READWRITE(lufykzku_regs_r, lufykzku_regs_w )
+	map(0xa2, 0xa3).rw(this, FUNC(lufykzku_state::lufykzku_regs_r), FUNC(lufykzku_state::lufykzku_regs_w));
 
-	AM_RANGE( 0xc0, 0xc0 ) AM_READ_PORT( "COIN"   ) AM_WRITE(lufykzku_watchdog_w ) // bit 7 -> watchdog
-	AM_RANGE( 0xc2, 0xc2 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0xc4, 0xc4 ) AM_READ_PORT( "PAYOUT" ) AM_WRITE(lufykzku_c4_w) // bit 7 = medal lock, bit 6 = coin3, bit 5 = yen
-	AM_RANGE( 0xc6, 0xc6 ) AM_WRITE(lufykzku_c6_w )
-	AM_RANGE( 0xc8, 0xc8 ) AM_READWRITE(lufykzku_c8_r, lufykzku_c8_w ) // 0xc8 bit 6 read (eeprom?)
-ADDRESS_MAP_END
+	map(0xc0, 0xc0).portr("COIN").w(this, FUNC(lufykzku_state::lufykzku_watchdog_w)); // bit 7 -> watchdog
+	map(0xc2, 0xc2).portr("BUTTON");
+	map(0xc4, 0xc4).portr("PAYOUT").w(this, FUNC(lufykzku_state::lufykzku_c4_w)); // bit 7 = medal lock, bit 6 = coin3, bit 5 = yen
+	map(0xc6, 0xc6).w(this, FUNC(lufykzku_state::lufykzku_c6_w));
+	map(0xc8, 0xc8).rw(this, FUNC(lufykzku_state::lufykzku_c8_r), FUNC(lufykzku_state::lufykzku_c8_w)); // 0xc8 bit 6 read (eeprom?)
+}
 
 
 /***************************************************************************
@@ -1466,42 +1473,44 @@ READ8_MEMBER(sigmab98_state::sammymdl_coin_hopper_r)
 	return ret;
 }
 
-ADDRESS_MAP_START(sigmab98_state::animalc_map)
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
-	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK( "rombank" )
-	AM_RANGE( 0x8000, 0x8fff ) AM_RAMBANK( "rambank" ) AM_SHARE( "nvram" )
+void sigmab98_state::animalc_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("rombank");
+	map(0x8000, 0x8fff).bankrw("rambank").share("nvram");
 
-	AM_RANGE( 0x9000, 0x9fff ) AM_RAM
-	AM_RANGE( 0xa000, 0xafff ) AM_RAM
-	AM_RANGE( 0xb000, 0xbfff ) AM_RAMBANK("sprbank")
+	map(0x9000, 0x9fff).ram();
+	map(0xa000, 0xafff).ram();
+	map(0xb000, 0xbfff).bankrw("sprbank");
 
-	AM_RANGE( 0xd000, 0xd1ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE( 0xd800, 0xd87f ) AM_RAM AM_SHARE("vtable")
+	map(0xd000, 0xd1ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd800, 0xd87f).ram().share("vtable");
 
-	AM_RANGE( 0xe000, 0xe021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
-	AM_RANGE( 0xe011, 0xe011 ) AM_WRITENOP  // IRQ Enable? Screen disable?
-	AM_RANGE( 0xe013, 0xe013 ) AM_READWRITE(vblank_r, vblank_w )    // IRQ Ack?
+	map(0xe000, 0xe021).rw(this, FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
+	map(0xe011, 0xe011).nopw();  // IRQ Enable? Screen disable?
+	map(0xe013, 0xe013).rw(this, FUNC(sigmab98_state::vblank_r), FUNC(sigmab98_state::vblank_w));    // IRQ Ack?
 
-	AM_RANGE( 0xfe00, 0xffff ) AM_RAM   // High speed internal RAM
-ADDRESS_MAP_END
+	map(0xfe00, 0xffff).ram();   // High speed internal RAM
+}
 
-ADDRESS_MAP_START(sigmab98_state::animalc_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(animalc_rombank_r, animalc_rombank_w )
-	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(animalc_rambank_r, animalc_rambank_w )
+void sigmab98_state::animalc_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x03).rw(this, FUNC(sigmab98_state::animalc_rombank_r), FUNC(sigmab98_state::animalc_rombank_w));
+	map(0x04, 0x05).rw(this, FUNC(sigmab98_state::animalc_rambank_r), FUNC(sigmab98_state::animalc_rambank_w));
 
-	AM_RANGE( 0x2c, 0x2c ) AM_READWRITE(sammymdl_eeprom_r, sammymdl_eeprom_w )
-	AM_RANGE( 0x2e, 0x2e ) AM_READ(sammymdl_coin_hopper_r )
-	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, sammymdl_coin_counter_w )
-	AM_RANGE( 0x32, 0x32 ) AM_READWRITE(sammymdl_leds_r, sammymdl_leds_w )
-	AM_RANGE( 0x34, 0x34 ) AM_READ(unk_34_r )
-	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
-	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
-	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
-ADDRESS_MAP_END
+	map(0x2c, 0x2c).rw(this, FUNC(sigmab98_state::sammymdl_eeprom_r), FUNC(sigmab98_state::sammymdl_eeprom_w));
+	map(0x2e, 0x2e).r(this, FUNC(sigmab98_state::sammymdl_coin_hopper_r));
+	map(0x30, 0x30).portr("BUTTON");
+	map(0x31, 0x31).rw(this, FUNC(sigmab98_state::sammymdl_coin_counter_r), FUNC(sigmab98_state::sammymdl_coin_counter_w));
+	map(0x32, 0x32).rw(this, FUNC(sigmab98_state::sammymdl_leds_r), FUNC(sigmab98_state::sammymdl_leds_w));
+	map(0x34, 0x34).r(this, FUNC(sigmab98_state::unk_34_r));
+	map(0x90, 0x90).w("oki", FUNC(okim9810_device::write));
+	map(0x91, 0x91).w("oki", FUNC(okim9810_device::write_tmp_register));
+	map(0x92, 0x92).r("oki", FUNC(okim9810_device::read));
+	map(0xb0, 0xb0).w(this, FUNC(sigmab98_state::sammymdl_hopper_w));
+	map(0xc0, 0xc0).w("watchdog", FUNC(watchdog_timer_device::reset_w));  // 1
+}
 
 /***************************************************************************
                                Go Go Cowboy
@@ -1755,15 +1764,16 @@ WRITE8_MEMBER(sigmab98_state::gocowboy_dc00_w)
 	logerror("%s: unknown write to %02x = %02x with rambank = %02x\n", machine().describe_context(), offset + 0xdc00, data, m_rambank);
 }
 
-ADDRESS_MAP_START(sigmab98_state::gocowboy_map)
-	AM_RANGE(0x0000, 0x43ff) AM_ROM
+void sigmab98_state::gocowboy_map(address_map &map)
+{
+	map(0x0000, 0x43ff).rom();
 
-	AM_RANGE( 0x4400, 0xdbff ) AM_READWRITE(gocowboy_4400_r, gocowboy_4400_w )    // SPRITERAM + PALETTERAM + VTABLE + VREGS | NVRAM
+	map(0x4400, 0xdbff).rw(this, FUNC(sigmab98_state::gocowboy_4400_r), FUNC(sigmab98_state::gocowboy_4400_w));    // SPRITERAM + PALETTERAM + VTABLE + VREGS | NVRAM
 
-	AM_RANGE( 0xdc00, 0xfbff ) AM_READWRITE(gocowboy_dc00_r, gocowboy_dc00_w ) AM_SHARE("nvram")  // PALETTERAM | NVRAM
+	map(0xdc00, 0xfbff).rw(this, FUNC(sigmab98_state::gocowboy_dc00_r), FUNC(sigmab98_state::gocowboy_dc00_w)).share("nvram");  // PALETTERAM | NVRAM
 
-	AM_RANGE( 0xfe00, 0xffff ) AM_RAM   // High speed internal RAM
-ADDRESS_MAP_END
+	map(0xfe00, 0xffff).ram();   // High speed internal RAM
+}
 
 
 WRITE8_MEMBER(sigmab98_state::gocowboy_leds_w)
@@ -1782,22 +1792,23 @@ WRITE8_MEMBER(sigmab98_state::gocowboy_leds_w)
 	show_3_outputs();
 }
 
-ADDRESS_MAP_START(sigmab98_state::gocowboy_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(gocowboy_rombank_r, gocowboy_rombank_w )
-	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(gocowboy_rambank_r, gocowboy_rambank_w )
+void sigmab98_state::gocowboy_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x03).rw(this, FUNC(sigmab98_state::gocowboy_rombank_r), FUNC(sigmab98_state::gocowboy_rombank_w));
+	map(0x04, 0x05).rw(this, FUNC(sigmab98_state::gocowboy_rambank_r), FUNC(sigmab98_state::gocowboy_rambank_w));
 
-	AM_RANGE( 0x2c, 0x2c ) AM_READWRITE(sammymdl_eeprom_r, sammymdl_eeprom_w )
-	AM_RANGE( 0x2e, 0x2e ) AM_READ(sammymdl_coin_hopper_r )
-	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, sammymdl_coin_counter_w )
-	AM_RANGE( 0x32, 0x32 ) AM_READWRITE(sammymdl_leds_r, gocowboy_leds_w )
-	AM_RANGE( 0x90, 0x90 ) AM_DEVREADWRITE("oki", okim9810_device, read, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
-	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
-	AM_RANGE( 0xb0, 0xb0 ) AM_WRITENOP
-	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
-ADDRESS_MAP_END
+	map(0x2c, 0x2c).rw(this, FUNC(sigmab98_state::sammymdl_eeprom_r), FUNC(sigmab98_state::sammymdl_eeprom_w));
+	map(0x2e, 0x2e).r(this, FUNC(sigmab98_state::sammymdl_coin_hopper_r));
+	map(0x30, 0x30).portr("BUTTON");
+	map(0x31, 0x31).rw(this, FUNC(sigmab98_state::sammymdl_coin_counter_r), FUNC(sigmab98_state::sammymdl_coin_counter_w));
+	map(0x32, 0x32).rw(this, FUNC(sigmab98_state::sammymdl_leds_r), FUNC(sigmab98_state::gocowboy_leds_w));
+	map(0x90, 0x90).rw("oki", FUNC(okim9810_device::read), FUNC(okim9810_device::write));
+	map(0x91, 0x91).w("oki", FUNC(okim9810_device::write_tmp_register));
+	map(0x92, 0x92).r("oki", FUNC(okim9810_device::read));
+	map(0xb0, 0xb0).nopw();
+	map(0xc0, 0xc0).w("watchdog", FUNC(watchdog_timer_device::reset_w));  // 1
+}
 
 /***************************************************************************
                              Hae Hae Ka Ka Ka
@@ -2019,29 +2030,31 @@ WRITE8_MEMBER(sigmab98_state::haekaka_coin_counter_w)
 	show_3_outputs();
 }
 
-ADDRESS_MAP_START(sigmab98_state::haekaka_map)
-	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0xb000, 0xcfff ) AM_READWRITE(haekaka_b000_r, haekaka_b000_w )
-	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" )
-	AM_RANGE( 0xfe00, 0xffff ) AM_RAM   // High speed internal RAM
-ADDRESS_MAP_END
+void sigmab98_state::haekaka_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xb000, 0xcfff).rw(this, FUNC(sigmab98_state::haekaka_b000_r), FUNC(sigmab98_state::haekaka_b000_w));
+	map(0xd000, 0xefff).ram().share("nvram");
+	map(0xfe00, 0xffff).ram();   // High speed internal RAM
+}
 
-ADDRESS_MAP_START(sigmab98_state::haekaka_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(haekaka_rombank_r, haekaka_rombank_w )
-	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(haekaka_rambank_r, haekaka_rambank_w )
+void sigmab98_state::haekaka_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x03).rw(this, FUNC(sigmab98_state::haekaka_rombank_r), FUNC(sigmab98_state::haekaka_rombank_w));
+	map(0x04, 0x05).rw(this, FUNC(sigmab98_state::haekaka_rambank_r), FUNC(sigmab98_state::haekaka_rambank_w));
 
-	AM_RANGE( 0x2c, 0x2c ) AM_READWRITE(sammymdl_eeprom_r, sammymdl_eeprom_w )
-	AM_RANGE( 0x2e, 0x2e ) AM_READ(sammymdl_coin_hopper_r )
-	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, haekaka_coin_counter_w )
-	AM_RANGE( 0x32, 0x32 ) AM_READWRITE(sammymdl_leds_r, haekaka_leds_w )
-	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
-	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
-	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
-ADDRESS_MAP_END
+	map(0x2c, 0x2c).rw(this, FUNC(sigmab98_state::sammymdl_eeprom_r), FUNC(sigmab98_state::sammymdl_eeprom_w));
+	map(0x2e, 0x2e).r(this, FUNC(sigmab98_state::sammymdl_coin_hopper_r));
+	map(0x30, 0x30).portr("BUTTON");
+	map(0x31, 0x31).rw(this, FUNC(sigmab98_state::sammymdl_coin_counter_r), FUNC(sigmab98_state::haekaka_coin_counter_w));
+	map(0x32, 0x32).rw(this, FUNC(sigmab98_state::sammymdl_leds_r), FUNC(sigmab98_state::haekaka_leds_w));
+	map(0x90, 0x90).w("oki", FUNC(okim9810_device::write));
+	map(0x91, 0x91).w("oki", FUNC(okim9810_device::write_tmp_register));
+	map(0x92, 0x92).r("oki", FUNC(okim9810_device::read));
+	map(0xb0, 0xb0).w(this, FUNC(sigmab98_state::sammymdl_hopper_w));
+	map(0xc0, 0xc0).w("watchdog", FUNC(watchdog_timer_device::reset_w));  // 1
+}
 
 /***************************************************************************
                               Itazura Monkey
@@ -2257,47 +2270,50 @@ READ8_MEMBER(sigmab98_state::itazuram_palette_r)
 	return m_paletteram[offset];
 }
 
-ADDRESS_MAP_START(sigmab98_state::itazuram_map)
-	AM_RANGE( 0x0000, 0x37ff ) AM_ROM
-	AM_RANGE( 0x3800, 0x47ff ) AM_READ_BANK( "rombank0" ) AM_WRITE_BANK( "sprbank0" )
-	AM_RANGE( 0x4800, 0x57ff ) AM_READ_BANK( "rombank1" ) AM_WRITE_BANK( "sprbank1" )
+void sigmab98_state::itazuram_map(address_map &map)
+{
+	map(0x0000, 0x37ff).rom();
+	map(0x3800, 0x47ff).bankr("rombank0").bankw("sprbank0");
+	map(0x4800, 0x57ff).bankr("rombank1").bankw("sprbank1");
 
-	AM_RANGE( 0x5800, 0x59ff ) AM_READWRITE(itazuram_palette_r, itazuram_palette_w )
-	AM_RANGE( 0x6000, 0x607f ) AM_RAM AM_SHARE("vtable")
+	map(0x5800, 0x59ff).rw(this, FUNC(sigmab98_state::itazuram_palette_r), FUNC(sigmab98_state::itazuram_palette_w));
+	map(0x6000, 0x607f).ram().share("vtable");
 
-	AM_RANGE( 0x6800, 0x6821 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
-	AM_RANGE( 0x6811, 0x6811 ) AM_WRITENOP  // IRQ Enable? Screen disable?
-	AM_RANGE( 0x6813, 0x6813 ) AM_WRITENOP  // IRQ Ack?
-	AM_RANGE( 0xdc00, 0xfdff ) AM_READ_BANK( "palbank" ) AM_WRITE(itazuram_nvram_palette_w ) AM_SHARE( "nvram" )    // nvram | paletteram
+	map(0x6800, 0x6821).rw(this, FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
+	map(0x6811, 0x6811).nopw();  // IRQ Enable? Screen disable?
+	map(0x6813, 0x6813).nopw();  // IRQ Ack?
+	map(0xdc00, 0xfdff).bankr("palbank").w(this, FUNC(sigmab98_state::itazuram_nvram_palette_w)).share("nvram");    // nvram | paletteram
 
-	AM_RANGE( 0xfe00, 0xffff ) AM_RAM   // High speed internal RAM
-ADDRESS_MAP_END
+	map(0xfe00, 0xffff).ram();   // High speed internal RAM
+}
 
-ADDRESS_MAP_START(sigmab98_state::itazuram_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(itazuram_rombank_r, itazuram_rombank_w )
-	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(itazuram_rambank_r, itazuram_rambank_w )
+void sigmab98_state::itazuram_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x03).rw(this, FUNC(sigmab98_state::itazuram_rombank_r), FUNC(sigmab98_state::itazuram_rombank_w));
+	map(0x04, 0x05).rw(this, FUNC(sigmab98_state::itazuram_rambank_r), FUNC(sigmab98_state::itazuram_rambank_w));
 
-	AM_RANGE( 0x2c, 0x2c ) AM_READWRITE(sammymdl_eeprom_r, sammymdl_eeprom_w )
-	AM_RANGE( 0x2e, 0x2e ) AM_READ(sammymdl_coin_hopper_r )
-	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, sammymdl_coin_counter_w )
-	AM_RANGE( 0x32, 0x32 ) AM_READWRITE(sammymdl_leds_r, sammymdl_leds_w )
-	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
-	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
-	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
-ADDRESS_MAP_END
+	map(0x2c, 0x2c).rw(this, FUNC(sigmab98_state::sammymdl_eeprom_r), FUNC(sigmab98_state::sammymdl_eeprom_w));
+	map(0x2e, 0x2e).r(this, FUNC(sigmab98_state::sammymdl_coin_hopper_r));
+	map(0x30, 0x30).portr("BUTTON");
+	map(0x31, 0x31).rw(this, FUNC(sigmab98_state::sammymdl_coin_counter_r), FUNC(sigmab98_state::sammymdl_coin_counter_w));
+	map(0x32, 0x32).rw(this, FUNC(sigmab98_state::sammymdl_leds_r), FUNC(sigmab98_state::sammymdl_leds_w));
+	map(0x90, 0x90).w("oki", FUNC(okim9810_device::write));
+	map(0x91, 0x91).w("oki", FUNC(okim9810_device::write_tmp_register));
+	map(0x92, 0x92).r("oki", FUNC(okim9810_device::read));
+	map(0xb0, 0xb0).w(this, FUNC(sigmab98_state::sammymdl_hopper_w));
+	map(0xc0, 0xc0).w("watchdog", FUNC(watchdog_timer_device::reset_w));  // 1
+}
 
 /***************************************************************************
                              Pye-nage Taikai
 ***************************************************************************/
 
-ADDRESS_MAP_START(sigmab98_state::pyenaget_io)
-	AM_IMPORT_FROM( haekaka_io )
-	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, sammymdl_coin_counter_w )
-ADDRESS_MAP_END
+void sigmab98_state::pyenaget_io(address_map &map)
+{
+	haekaka_io(map);
+	map(0x31, 0x31).rw(this, FUNC(sigmab98_state::sammymdl_coin_counter_r), FUNC(sigmab98_state::sammymdl_coin_counter_w));
+}
 
 /***************************************************************************
                              Taihou de Doboon
@@ -2495,29 +2511,31 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_c000_w)
 	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", machine().describe_context(), offset+0xc000, data, m_rombank);
 }
 
-ADDRESS_MAP_START(sigmab98_state::tdoboon_map)
-	AM_RANGE( 0x0000, 0xbfff ) AM_ROM
-	AM_RANGE( 0xc000, 0xcfff ) AM_READWRITE(tdoboon_c000_r, tdoboon_c000_w )
-	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" )
-	AM_RANGE( 0xfe00, 0xffff ) AM_RAM   // High speed internal RAM
-ADDRESS_MAP_END
+void sigmab98_state::tdoboon_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).rw(this, FUNC(sigmab98_state::tdoboon_c000_r), FUNC(sigmab98_state::tdoboon_c000_w));
+	map(0xd000, 0xefff).ram().share("nvram");
+	map(0xfe00, 0xffff).ram();   // High speed internal RAM
+}
 
-ADDRESS_MAP_START(sigmab98_state::tdoboon_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(tdoboon_rombank_r, tdoboon_rombank_w )
-	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(tdoboon_rambank_r, tdoboon_rambank_w )
+void sigmab98_state::tdoboon_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x03).rw(this, FUNC(sigmab98_state::tdoboon_rombank_r), FUNC(sigmab98_state::tdoboon_rombank_w));
+	map(0x04, 0x05).rw(this, FUNC(sigmab98_state::tdoboon_rambank_r), FUNC(sigmab98_state::tdoboon_rambank_w));
 
-	AM_RANGE( 0x2c, 0x2c ) AM_READWRITE(sammymdl_eeprom_r, sammymdl_eeprom_w )
-	AM_RANGE( 0x2e, 0x2e ) AM_READ(sammymdl_coin_hopper_r )
-	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, sammymdl_coin_counter_w )
-	AM_RANGE( 0x32, 0x32 ) AM_READWRITE(sammymdl_leds_r, sammymdl_leds_w )
-	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
-	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
-	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
-ADDRESS_MAP_END
+	map(0x2c, 0x2c).rw(this, FUNC(sigmab98_state::sammymdl_eeprom_r), FUNC(sigmab98_state::sammymdl_eeprom_w));
+	map(0x2e, 0x2e).r(this, FUNC(sigmab98_state::sammymdl_coin_hopper_r));
+	map(0x30, 0x30).portr("BUTTON");
+	map(0x31, 0x31).rw(this, FUNC(sigmab98_state::sammymdl_coin_counter_r), FUNC(sigmab98_state::sammymdl_coin_counter_w));
+	map(0x32, 0x32).rw(this, FUNC(sigmab98_state::sammymdl_leds_r), FUNC(sigmab98_state::sammymdl_leds_w));
+	map(0x90, 0x90).w("oki", FUNC(okim9810_device::write));
+	map(0x91, 0x91).w("oki", FUNC(okim9810_device::write_tmp_register));
+	map(0x92, 0x92).r("oki", FUNC(okim9810_device::read));
+	map(0xb0, 0xb0).w(this, FUNC(sigmab98_state::sammymdl_hopper_w));
+	map(0xc0, 0xc0).w("watchdog", FUNC(watchdog_timer_device::reset_w));  // 1
+}
 
 
 /***************************************************************************

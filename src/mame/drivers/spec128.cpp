@@ -233,20 +233,22 @@ READ8_MEMBER( spectrum_state::spectrum_128_ula_r )
 	return vpos<193 ? m_screen_location[0x1800|(vpos&0xf8)<<2]:0xff;
 }
 
-ADDRESS_MAP_START(spectrum_state::spectrum_128_io)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xfffe)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(spectrum_128_port_7ffd_w) AM_MIRROR(0x7ffc)   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x0001, 0x0001) AM_READ(spectrum_128_ula_r) AM_MIRROR(0xfffe)
-ADDRESS_MAP_END
+void spectrum_state::spectrum_128_io(address_map &map)
+{
+	map(0x0000, 0x0000).rw(this, FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0x0001, 0x0001).w(this, FUNC(spectrum_state::spectrum_128_port_7ffd_w)).mirror(0x7ffc);   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
+	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
+	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
+	map(0x0001, 0x0001).r(this, FUNC(spectrum_state::spectrum_128_ula_r)).mirror(0xfffe);
+}
 
-ADDRESS_MAP_START(spectrum_state::spectrum_128_mem)
-	AM_RANGE( 0x0000, 0x3fff) AM_READWRITE(spectrum_128_bank1_r, spectrum_128_bank1_w)
-	AM_RANGE( 0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE( 0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE( 0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void spectrum_state::spectrum_128_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rw(this, FUNC(spectrum_state::spectrum_128_bank1_r), FUNC(spectrum_state::spectrum_128_bank1_w));
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
 {

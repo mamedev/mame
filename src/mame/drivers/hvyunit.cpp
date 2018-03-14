@@ -387,61 +387,67 @@ WRITE8_MEMBER(hvyunit_state::mermaid_p3_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(hvyunit_state::master_memory)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("master_bank")
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_r, spriteram_w)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void hvyunit_state::master_memory(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("master_bank");
+	map(0xc000, 0xcfff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_r), FUNC(kaneko_pandora_device::spriteram_w));
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xffff).ram().share("share1");
+}
 
-ADDRESS_MAP_START(hvyunit_state::master_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(master_bankswitch_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(master_bankswitch_w) // correct?
-	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_slave_cpu)
-ADDRESS_MAP_END
+void hvyunit_state::master_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(hvyunit_state::master_bankswitch_w));
+	map(0x01, 0x01).w(this, FUNC(hvyunit_state::master_bankswitch_w)); // correct?
+	map(0x02, 0x02).w(this, FUNC(hvyunit_state::trigger_nmi_on_slave_cpu));
+}
 
 
-ADDRESS_MAP_START(hvyunit_state::slave_memory)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("slave_bank")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(hu_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(hu_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void hvyunit_state::slave_memory(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("slave_bank");
+	map(0xc000, 0xc3ff).ram().w(this, FUNC(hvyunit_state::hu_videoram_w)).share("videoram");
+	map(0xc400, 0xc7ff).ram().w(this, FUNC(hvyunit_state::hu_colorram_w)).share("colorram");
+	map(0xd000, 0xdfff).ram();
+	map(0xd000, 0xd1ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xd800, 0xd9ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xe000, 0xffff).ram().share("share1");
+}
 
-ADDRESS_MAP_START(hvyunit_state::slave_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("slavelatch", generic_latch_8_device, read)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mermaidlatch", generic_latch_8_device, write)
-	AM_RANGE(0x06, 0x06) AM_WRITE(hu_scrolly_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(hu_scrollx_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(mermaid_status_r)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(coin_count_w)
+void hvyunit_state::slave_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(hvyunit_state::slave_bankswitch_w));
+	map(0x02, 0x02).w(this, FUNC(hvyunit_state::trigger_nmi_on_sound_cpu2));
+	map(0x04, 0x04).r(m_slavelatch, FUNC(generic_latch_8_device::read));
+	map(0x04, 0x04).w(m_mermaidlatch, FUNC(generic_latch_8_device::write));
+	map(0x06, 0x06).w(this, FUNC(hvyunit_state::hu_scrolly_w));
+	map(0x08, 0x08).w(this, FUNC(hvyunit_state::hu_scrollx_w));
+	map(0x0c, 0x0c).r(this, FUNC(hvyunit_state::mermaid_status_r));
+	map(0x0e, 0x0e).w(this, FUNC(hvyunit_state::coin_count_w));
 
 //  AM_RANGE(0x22, 0x22) AM_READ(hu_scrolly_hi_reset) //22/a2 taken from ram $f065
 //  AM_RANGE(0xa2, 0xa2) AM_READ(hu_scrolly_hi_set)
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(hvyunit_state::sound_memory)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("sound_bank")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void hvyunit_state::sound_memory(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("sound_bank");
+	map(0xc000, 0xc7ff).ram();
+}
 
-ADDRESS_MAP_START(hvyunit_state::sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void hvyunit_state::sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(hvyunit_state::sound_bankswitch_w));
+	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 /*************************************

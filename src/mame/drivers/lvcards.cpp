@@ -148,43 +148,47 @@ READ8_MEMBER(lvcards_state::payout_r)
 	return m_result;
 }
 
-ADDRESS_MAP_START(lvcards_state::ponttehk_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(lvcards_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(lvcards_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1") AM_WRITENOP // lamps
-	AM_RANGE(0xa002, 0xa002) AM_READ(payout_r) AM_WRITE(control_port_2a_w)//AM_WRITENOP // ???
-ADDRESS_MAP_END
+void lvcards_state::ponttehk_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x67ff).ram().share("nvram");
+	map(0x8000, 0x83ff).ram().w(this, FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(this, FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
+	map(0xa000, 0xa000).portr("IN0");
+	map(0xa001, 0xa001).portr("IN1").nopw(); // lamps
+	map(0xa002, 0xa002).r(this, FUNC(lvcards_state::payout_r)).w(this, FUNC(lvcards_state::control_port_2a_w));//AM_WRITENOP // ???
+}
 
-ADDRESS_MAP_START(lvcards_state::lvcards_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(lvcards_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(lvcards_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1") AM_WRITENOP
-	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITENOP
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-ADDRESS_MAP_END
+void lvcards_state::lvcards_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x67ff).ram().share("nvram");
+	map(0x9000, 0x93ff).ram().w(this, FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
+	map(0x9400, 0x97ff).ram().w(this, FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
+	map(0xa000, 0xa000).portr("IN0");
+	map(0xa001, 0xa001).portr("IN1").nopw();
+	map(0xa002, 0xa002).portr("IN2").nopw();
+	map(0xc000, 0xdfff).rom();
+}
 
-ADDRESS_MAP_START(lvcards_state::lvcards_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void lvcards_state::lvcards_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
 
-ADDRESS_MAP_START(lvcards_state::lvpoker_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(lvcards_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(lvcards_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1") AM_WRITENOP // lamps
-	AM_RANGE(0xa002, 0xa002) AM_READ(payout_r) AM_WRITE(control_port_2_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-ADDRESS_MAP_END
+void lvcards_state::lvpoker_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x67ff).ram().share("nvram");
+	map(0x9000, 0x93ff).ram().w(this, FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
+	map(0x9400, 0x97ff).ram().w(this, FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
+	map(0xa000, 0xa000).portr("IN0");
+	map(0xa001, 0xa001).portr("IN1").nopw(); // lamps
+	map(0xa002, 0xa002).r(this, FUNC(lvcards_state::payout_r)).w(this, FUNC(lvcards_state::control_port_2_w));
+	map(0xc000, 0xdfff).rom();
+}
 
 static INPUT_PORTS_START( lvcards )
 	PORT_START("IN0")

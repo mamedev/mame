@@ -378,53 +378,59 @@ private:
 ****************************************************************************************/
 
 /* we have to fill in the ROM addresses for systeme due to the encrypted games */
-ADDRESS_MAP_START(systeme_state::systeme_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                                                     /* Fixed ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank1") AM_WRITE_BANK("vram_write")          /* Banked ROM */
-	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("mainram")
-ADDRESS_MAP_END
+void systeme_state::systeme_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                                                     /* Fixed ROM */
+	map(0x8000, 0xbfff).bankr("bank1").bankw("vram_write");          /* Banked ROM */
+	map(0xc000, 0xffff).ram().share("mainram");
+}
 
-ADDRESS_MAP_START(systeme_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("mainram")
-ADDRESS_MAP_END
+void systeme_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xffff).ram().share("mainram");
+}
 
-ADDRESS_MAP_START(systeme_state::banked_decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
-	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("mainram")
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(systeme_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
-	AM_RANGE(0x7b, 0x7b) AM_DEVWRITE("sn1", segapsg_device, write)
-	AM_RANGE(0x7e, 0x7f) AM_DEVWRITE("sn2", segapsg_device, write)
-	AM_RANGE(0x7e, 0x7e) AM_DEVREAD("vdp1", sega315_5124_device, vcount_read)
-	AM_RANGE(0xba, 0xba) AM_DEVREADWRITE("vdp1", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0xbb, 0xbb) AM_DEVREADWRITE("vdp1", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE("vdp2", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE("vdp2", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("e0")
-	AM_RANGE(0xe1, 0xe1) AM_READ_PORT("e1")
-	AM_RANGE(0xe2, 0xe2) AM_READ_PORT("e2")
-	AM_RANGE(0xf2, 0xf2) AM_READ_PORT("f2")
-	AM_RANGE(0xf3, 0xf3) AM_READ_PORT("f3")
-	AM_RANGE(0xf7, 0xf7) AM_WRITE(bank_write)
-	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-ADDRESS_MAP_END
+void systeme_state::banked_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank0d");
+	map(0x8000, 0xbfff).bankr("bank1d");
+	map(0xc000, 0xffff).ram().share("mainram");
+}
 
 
-ADDRESS_MAP_START(systeme_state::vdp1_map)
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("vdp1_bank")
-ADDRESS_MAP_END
+void systeme_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+
+	map(0x7b, 0x7b).w("sn1", FUNC(segapsg_device::write));
+	map(0x7e, 0x7f).w("sn2", FUNC(segapsg_device::write));
+	map(0x7e, 0x7e).r(m_vdp1, FUNC(sega315_5124_device::vcount_read));
+	map(0xba, 0xba).rw(m_vdp1, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0xbb, 0xbb).rw(m_vdp1, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xbe, 0xbe).rw(m_vdp2, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0xbf, 0xbf).rw(m_vdp2, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xe0, 0xe0).portr("e0");
+	map(0xe1, 0xe1).portr("e1");
+	map(0xe2, 0xe2).portr("e2");
+	map(0xf2, 0xf2).portr("f2");
+	map(0xf3, 0xf3).portr("f3");
+	map(0xf7, 0xf7).w(this, FUNC(systeme_state::bank_write));
+	map(0xf8, 0xfb).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
-ADDRESS_MAP_START(systeme_state::vdp2_map)
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("vdp2_bank")
-ADDRESS_MAP_END
+void systeme_state::vdp1_map(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("vdp1_bank");
+}
+
+
+void systeme_state::vdp2_map(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("vdp2_bank");
+}
 
 
 WRITE8_MEMBER(systeme_state::bank_write)

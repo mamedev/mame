@@ -509,16 +509,17 @@ WRITE32_MEMBER(rollext_state::cmd_callback)
 
 
 // Master Processor memory map
-ADDRESS_MAP_START(rollext_state::memmap)
-	AM_RANGE(0x40000000, 0x40ffffff) AM_RAM AM_SHARE("main_ram")
-	AM_RANGE(0x60000000, 0x600fffff) AM_RAM AM_SHARE("disp_ram")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM AM_SHARE("palette_ram")
-	AM_RANGE(0x90000000, 0x9007ffff) AM_RAM AM_SHARE("texture_mask")
-	AM_RANGE(0xa0000000, 0xa00000ff) AM_READWRITE(a0000000_r, a0000000_w)
-	AM_RANGE(0xb0000000, 0xb0000007) AM_READ(b0000000_r)
-	AM_RANGE(0xc0000000, 0xc03fffff) AM_ROM AM_REGION("rom1", 0)
-	AM_RANGE(0xff000000, 0xffffffff) AM_RAM AM_REGION("rom0", 0)
-ADDRESS_MAP_END
+void rollext_state::memmap(address_map &map)
+{
+	map(0x40000000, 0x40ffffff).ram().share("main_ram");
+	map(0x60000000, 0x600fffff).ram().share("disp_ram");
+	map(0x80000000, 0x8000ffff).ram().share("palette_ram");
+	map(0x90000000, 0x9007ffff).ram().share("texture_mask");
+	map(0xa0000000, 0xa00000ff).rw(this, FUNC(rollext_state::a0000000_r), FUNC(rollext_state::a0000000_w));
+	map(0xb0000000, 0xb0000007).r(this, FUNC(rollext_state::b0000000_r));
+	map(0xc0000000, 0xc03fffff).rom().region("rom1", 0);
+	map(0xff000000, 0xffffffff).ram().region("rom0", 0);
+}
 
 
 static INPUT_PORTS_START(rollext)

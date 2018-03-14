@@ -16,34 +16,36 @@
 
 
 /* Address maps */
-ADDRESS_MAP_START(pp01_state::pp01_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK("bank4")
-	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank5")
-	AM_RANGE(0x5000, 0x5fff) AM_RAMBANK("bank6")
-	AM_RANGE(0x6000, 0x6fff) AM_RAMBANK("bank7")
-	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x8000, 0x8fff) AM_RAMBANK("bank9")
-	AM_RANGE(0x9000, 0x9fff) AM_RAMBANK("bank10")
-	AM_RANGE(0xa000, 0xafff) AM_RAMBANK("bank11")
-	AM_RANGE(0xb000, 0xbfff) AM_RAMBANK("bank12")
-	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK("bank13")
-	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("bank14")
-	AM_RANGE(0xe000, 0xefff) AM_RAMBANK("bank15")
-	AM_RANGE(0xf000, 0xffff) AM_RAMBANK("bank16")
-ADDRESS_MAP_END
+void pp01_state::pp01_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankrw("bank1");
+	map(0x1000, 0x1fff).bankrw("bank2");
+	map(0x2000, 0x2fff).bankrw("bank3");
+	map(0x3000, 0x3fff).bankrw("bank4");
+	map(0x4000, 0x4fff).bankrw("bank5");
+	map(0x5000, 0x5fff).bankrw("bank6");
+	map(0x6000, 0x6fff).bankrw("bank7");
+	map(0x7000, 0x7fff).bankrw("bank8");
+	map(0x8000, 0x8fff).bankrw("bank9");
+	map(0x9000, 0x9fff).bankrw("bank10");
+	map(0xa000, 0xafff).bankrw("bank11");
+	map(0xb000, 0xbfff).bankrw("bank12");
+	map(0xc000, 0xcfff).bankrw("bank13");
+	map(0xd000, 0xdfff).bankrw("bank14");
+	map(0xe000, 0xefff).bankrw("bank15");
+	map(0xf000, 0xffff).bankrw("bank16");
+}
 
-ADDRESS_MAP_START(pp01_state::pp01_io)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // system
+void pp01_state::pp01_io(address_map &map)
+{
+	map(0xc0, 0xc3).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)); // system
 	//AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // user
-	AM_RANGE(0xc8, 0xc8) AM_MIRROR(2) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0xc9, 0xc9) AM_MIRROR(2) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0xcc, 0xcf) AM_WRITE(pp01_video_write_mode_w)
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE(0xe0, 0xef) AM_MIRROR(0x10) AM_READWRITE(pp01_mem_block_r, pp01_mem_block_w)
-ADDRESS_MAP_END
+	map(0xc8, 0xc8).mirror(2).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xc9, 0xc9).mirror(2).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xcc, 0xcf).w(this, FUNC(pp01_state::pp01_video_write_mode_w));
+	map(0xd0, 0xd3).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xe0, 0xef).mirror(0x10).rw(this, FUNC(pp01_state::pp01_mem_block_r), FUNC(pp01_state::pp01_mem_block_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pp01 )

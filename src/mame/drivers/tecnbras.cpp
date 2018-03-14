@@ -58,16 +58,18 @@ private:
 	char m_digit[14][7];
 };
 
-ADDRESS_MAP_START(tecnbras_state::i80c31_prg)
-	AM_RANGE(0x0000, 0x7FFF) AM_ROM
-	AM_RANGE(0x8000, 0xFFFF) AM_RAM
-ADDRESS_MAP_END
+void tecnbras_state::i80c31_prg(address_map &map)
+{
+	map(0x0000, 0x7FFF).rom();
+	map(0x8000, 0xFFFF).ram();
+}
 
 #define DMD_OFFSET 24 //This is a guess. We should verify the real hardware behaviour
-ADDRESS_MAP_START(tecnbras_state::i80c31_io)
-	AM_RANGE(0x0100+DMD_OFFSET, 0x0145+DMD_OFFSET) AM_WRITE(set_x_position_w)
-	AM_RANGE(0x06B8, 0x06BC) AM_WRITE(print_column_w)
-ADDRESS_MAP_END
+void tecnbras_state::i80c31_io(address_map &map)
+{
+	map(0x0100+DMD_OFFSET, 0x0145+DMD_OFFSET).w(this, FUNC(tecnbras_state::set_x_position_w));
+	map(0x06B8, 0x06BC).w(this, FUNC(tecnbras_state::print_column_w));
+}
 
 WRITE8_MEMBER(tecnbras_state::set_x_position_w)
 {

@@ -412,18 +412,20 @@ WRITE8_MEMBER(fp200_state::fp200_io_w)
 	}
 }
 
-ADDRESS_MAP_START(fp200_state::fp200_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
+void fp200_state::fp200_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
 //  0xa000, 0xffff exp RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(fp200_state::fp200_io)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(fp200_io_r,fp200_io_w)
-ADDRESS_MAP_END
+void fp200_state::fp200_io(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(fp200_state::fp200_io_r), FUNC(fp200_state::fp200_io_w));
+}
 
 INPUT_CHANGED_MEMBER(fp200_state::keyb_irq)
 {

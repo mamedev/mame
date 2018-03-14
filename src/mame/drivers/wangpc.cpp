@@ -730,51 +730,53 @@ READ8_MEMBER( wangpc_state::option_id_r )
 //  ADDRESS_MAP( wangpc_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(wangpc_state::wangpc_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0x40000, 0xf3fff) AM_DEVREADWRITE(WANGPC_BUS_TAG, wangpcbus_device, mrdc_r, amwc_w)
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
-ADDRESS_MAP_END
+void wangpc_state::wangpc_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x1ffff).ram();
+	map(0x40000, 0xf3fff).rw(m_bus, FUNC(wangpcbus_device::mrdc_r), FUNC(wangpcbus_device::amwc_w));
+	map(0xfc000, 0xfffff).rom().region(I8086_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( wangpc_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(wangpc_state::wangpc_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x1000, 0x1001) AM_WRITE8(fdc_ctrl_w, 0x00ff)
-	AM_RANGE(0x1004, 0x1005) AM_READWRITE8(deselect_drive1_r, deselect_drive1_w, 0x00ff)
-	AM_RANGE(0x1006, 0x1007) AM_READWRITE8(select_drive1_r, select_drive1_w, 0x00ff)
-	AM_RANGE(0x1008, 0x1009) AM_READWRITE8(deselect_drive2_r, deselect_drive2_w, 0x00ff)
-	AM_RANGE(0x100a, 0x100b) AM_READWRITE8(select_drive2_r, select_drive2_w, 0x00ff)
-	AM_RANGE(0x100c, 0x100d) AM_READWRITE8(motor1_off_r, motor1_off_w, 0x00ff)
-	AM_RANGE(0x100e, 0x100f) AM_READWRITE8(motor1_on_r, motor1_on_w, 0x00ff)
-	AM_RANGE(0x1010, 0x1011) AM_READWRITE8(motor2_off_r, motor2_off_w, 0x00ff)
-	AM_RANGE(0x1012, 0x1013) AM_READWRITE8(motor2_on_r, motor2_on_w, 0x00ff)
-	AM_RANGE(0x1014, 0x1017) AM_DEVICE8(UPD765_TAG, upd765a_device, map, 0x00ff)
-	AM_RANGE(0x1018, 0x1019) AM_MIRROR(0x0002) AM_READWRITE8(fdc_reset_r, fdc_reset_w, 0x00ff)
-	AM_RANGE(0x101c, 0x101d) AM_MIRROR(0x0002) AM_READWRITE8(fdc_tc_r, fdc_tc_w, 0x00ff)
-	AM_RANGE(0x1020, 0x1027) AM_DEVREADWRITE8(I8255A_TAG, i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x1028, 0x1029) //AM_WRITE(?)
-	AM_RANGE(0x1040, 0x1047) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x1060, 0x1063) AM_DEVREADWRITE8(I8259A_TAG, pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x1080, 0x1087) AM_DEVREAD8(SCN2661_TAG, mc2661_device, read, 0x00ff)
-	AM_RANGE(0x1088, 0x108f) AM_DEVWRITE8(SCN2661_TAG, mc2661_device, write, 0x00ff)
-	AM_RANGE(0x10a0, 0x10bf) AM_DEVREADWRITE8(AM9517A_TAG, am9517a_device, read, write, 0x00ff)
-	AM_RANGE(0x10c2, 0x10c7) AM_WRITE8(dma_page_w, 0x00ff)
-	AM_RANGE(0x10e0, 0x10e1) AM_READWRITE8(status_r, timer0_irq_clr_w, 0x00ff)
-	AM_RANGE(0x10e2, 0x10e3) AM_READWRITE8(timer2_irq_clr_r, nmi_mask_w, 0x00ff)
-	AM_RANGE(0x10e4, 0x10e5) AM_READWRITE8(led_on_r, fpu_mask_w, 0x00ff)
-	AM_RANGE(0x10e6, 0x10e7) AM_READWRITE8(dma_eop_clr_r, uart_tbre_clr_w, 0x00ff)
-	AM_RANGE(0x10e8, 0x10e9) AM_READWRITE8(uart_r, uart_w, 0x00ff)
-	AM_RANGE(0x10ea, 0x10eb) AM_READWRITE8(centronics_r, centronics_w, 0x00ff)
-	AM_RANGE(0x10ec, 0x10ed) AM_READWRITE8(busy_clr_r, acknlg_clr_w, 0x00ff)
-	AM_RANGE(0x10ee, 0x10ef) AM_READWRITE8(led_off_r, parity_nmi_clr_w, 0x00ff)
-	AM_RANGE(0x10fe, 0x10ff) AM_READ8(option_id_r, 0x00ff)
-	AM_RANGE(0x1100, 0x1fff) AM_DEVREADWRITE(WANGPC_BUS_TAG, wangpcbus_device, sad_r, sad_w)
-ADDRESS_MAP_END
+void wangpc_state::wangpc_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x1000, 0x1000).w(this, FUNC(wangpc_state::fdc_ctrl_w));
+	map(0x1004, 0x1004).rw(this, FUNC(wangpc_state::deselect_drive1_r), FUNC(wangpc_state::deselect_drive1_w));
+	map(0x1006, 0x1006).rw(this, FUNC(wangpc_state::select_drive1_r), FUNC(wangpc_state::select_drive1_w));
+	map(0x1008, 0x1008).rw(this, FUNC(wangpc_state::deselect_drive2_r), FUNC(wangpc_state::deselect_drive2_w));
+	map(0x100a, 0x100a).rw(this, FUNC(wangpc_state::select_drive2_r), FUNC(wangpc_state::select_drive2_w));
+	map(0x100c, 0x100c).rw(this, FUNC(wangpc_state::motor1_off_r), FUNC(wangpc_state::motor1_off_w));
+	map(0x100e, 0x100e).rw(this, FUNC(wangpc_state::motor1_on_r), FUNC(wangpc_state::motor1_on_w));
+	map(0x1010, 0x1010).rw(this, FUNC(wangpc_state::motor2_off_r), FUNC(wangpc_state::motor2_off_w));
+	map(0x1012, 0x1012).rw(this, FUNC(wangpc_state::motor2_on_r), FUNC(wangpc_state::motor2_on_w));
+	map(0x1014, 0x1017).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0x1018, 0x1018).mirror(0x0002).rw(this, FUNC(wangpc_state::fdc_reset_r), FUNC(wangpc_state::fdc_reset_w));
+	map(0x101c, 0x101c).mirror(0x0002).rw(this, FUNC(wangpc_state::fdc_tc_r), FUNC(wangpc_state::fdc_tc_w));
+	map(0x1020, 0x1027).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x1028, 0x1029); //AM_WRITE(?)
+	map(0x1040, 0x1047).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x1060, 0x1063).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x1080, 0x1087).r(m_epci, FUNC(mc2661_device::read)).umask16(0x00ff);
+	map(0x1088, 0x108f).w(m_epci, FUNC(mc2661_device::write)).umask16(0x00ff);
+	map(0x10a0, 0x10bf).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
+	map(0x10c2, 0x10c7).w(this, FUNC(wangpc_state::dma_page_w)).umask16(0x00ff);
+	map(0x10e0, 0x10e0).rw(this, FUNC(wangpc_state::status_r), FUNC(wangpc_state::timer0_irq_clr_w));
+	map(0x10e2, 0x10e2).rw(this, FUNC(wangpc_state::timer2_irq_clr_r), FUNC(wangpc_state::nmi_mask_w));
+	map(0x10e4, 0x10e4).rw(this, FUNC(wangpc_state::led_on_r), FUNC(wangpc_state::fpu_mask_w));
+	map(0x10e6, 0x10e6).rw(this, FUNC(wangpc_state::dma_eop_clr_r), FUNC(wangpc_state::uart_tbre_clr_w));
+	map(0x10e8, 0x10e8).rw(this, FUNC(wangpc_state::uart_r), FUNC(wangpc_state::uart_w));
+	map(0x10ea, 0x10ea).rw(this, FUNC(wangpc_state::centronics_r), FUNC(wangpc_state::centronics_w));
+	map(0x10ec, 0x10ec).rw(this, FUNC(wangpc_state::busy_clr_r), FUNC(wangpc_state::acknlg_clr_w));
+	map(0x10ee, 0x10ee).rw(this, FUNC(wangpc_state::led_off_r), FUNC(wangpc_state::parity_nmi_clr_w));
+	map(0x10fe, 0x10fe).r(this, FUNC(wangpc_state::option_id_r));
+	map(0x1100, 0x1fff).rw(m_bus, FUNC(wangpcbus_device::sad_r), FUNC(wangpcbus_device::sad_w));
+}
 
 
 

@@ -380,50 +380,51 @@ WRITE16_MEMBER(bmcpokr_state::irq_ack_w)
 	}
 }
 
-ADDRESS_MAP_START(bmcpokr_state::bmcpokr_mem)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("nvram")
+void bmcpokr_state::bmcpokr_mem(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x210000, 0x21ffff).ram().share("nvram");
 
-	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(videoram_1_w) AM_SHARE("videoram_1")
-	AM_RANGE(0x288000, 0x28ffff) AM_RAM_WRITE(videoram_2_w) AM_SHARE("videoram_2")
-	AM_RANGE(0x290000, 0x297fff) AM_RAM
+	map(0x280000, 0x287fff).ram().w(this, FUNC(bmcpokr_state::videoram_1_w)).share("videoram_1");
+	map(0x288000, 0x28ffff).ram().w(this, FUNC(bmcpokr_state::videoram_2_w)).share("videoram_2");
+	map(0x290000, 0x297fff).ram();
 
-	AM_RANGE(0x2a0000, 0x2dffff) AM_RAM_WRITE(pixram_w) AM_SHARE("pixram")
+	map(0x2a0000, 0x2dffff).ram().w(this, FUNC(bmcpokr_state::pixram_w)).share("pixram");
 
-	AM_RANGE(0x2ff800, 0x2ff9ff) AM_RAM AM_SHARE("scrollram_1")
-	AM_RANGE(0x2ffa00, 0x2ffbff) AM_RAM AM_SHARE("scrollram_2")
-	AM_RANGE(0x2ffc00, 0x2ffdff) AM_RAM AM_SHARE("scrollram_3")
-	AM_RANGE(0x2ffe00, 0x2fffff) AM_RAM
+	map(0x2ff800, 0x2ff9ff).ram().share("scrollram_1");
+	map(0x2ffa00, 0x2ffbff).ram().share("scrollram_2");
+	map(0x2ffc00, 0x2ffdff).ram().share("scrollram_3");
+	map(0x2ffe00, 0x2fffff).ram();
 
-	AM_RANGE(0x320000, 0x320003) AM_RAM AM_SHARE("layerctrl")
+	map(0x320000, 0x320003).ram().share("layerctrl");
 
-	AM_RANGE(0x330000, 0x330001) AM_READWRITE(prot_r, prot_w)
+	map(0x330000, 0x330001).rw(this, FUNC(bmcpokr_state::prot_r), FUNC(bmcpokr_state::prot_w));
 
-	AM_RANGE(0x340000, 0x340001) AM_RAM // 340001.b, rw
-	AM_RANGE(0x340002, 0x340003) AM_RAM // 340003.b, w(9d)
-	AM_RANGE(0x340006, 0x340007) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x340008, 0x340009) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x34000e, 0x34000f) AM_RAM AM_SHARE("priority")    // 34000f.b, w (priority?)
-	AM_RANGE(0x340016, 0x340017) AM_WRITE(pixpal_w)
-	AM_RANGE(0x340018, 0x340019) AM_RAM // 340019.b, w
-	AM_RANGE(0x34001a, 0x34001b) AM_READ(unk_r) AM_WRITENOP
-	AM_RANGE(0x34001c, 0x34001d) AM_RAM // 34001d.b, w(0)
+	map(0x340000, 0x340001).ram(); // 340001.b, rw
+	map(0x340002, 0x340003).ram(); // 340003.b, w(9d)
+	map(0x340006, 0x340007).w(this, FUNC(bmcpokr_state::irq_ack_w));
+	map(0x340008, 0x340009).w(this, FUNC(bmcpokr_state::irq_enable_w));
+	map(0x34000e, 0x34000f).ram().share("priority");    // 34000f.b, w (priority?)
+	map(0x340016, 0x340017).w(this, FUNC(bmcpokr_state::pixpal_w));
+	map(0x340018, 0x340019).ram(); // 340019.b, w
+	map(0x34001a, 0x34001b).r(this, FUNC(bmcpokr_state::unk_r)).nopw();
+	map(0x34001c, 0x34001d).ram(); // 34001d.b, w(0)
 
-	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0x00ff )
-	AM_RANGE(0x350002, 0x350003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w,   0x00ff )
-	AM_RANGE(0x350004, 0x350005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w,  0x00ff )
+	map(0x350001, 0x350001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x350003, 0x350003).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x350005, 0x350005).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0x360000, 0x360001) AM_READ(dsw_r)
+	map(0x360000, 0x360001).r(this, FUNC(bmcpokr_state::dsw_r));
 
-	AM_RANGE(0x370000, 0x370001) AM_READ_PORT("INPUTS")
+	map(0x370000, 0x370001).portr("INPUTS");
 
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(mux_w)
+	map(0x380000, 0x380001).w(this, FUNC(bmcpokr_state::mux_w));
 
-	AM_RANGE(0x390000, 0x390003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
-	AM_RANGE(0x398000, 0x398001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	map(0x390000, 0x390003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
+	map(0x398001, 0x398001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x3b0000, 0x3b0001) AM_READ_PORT("INPUTS2")
-ADDRESS_MAP_END
+	map(0x3b0000, 0x3b0001).portr("INPUTS2");
+}
 
 
 READ16_MEMBER(bmcpokr_state::mjmaglmp_dsw_r)
@@ -452,46 +453,47 @@ READ16_MEMBER(bmcpokr_state::mjmaglmp_key_r)
 	return ioport("INPUTS")->read() | (key & 0x3f);
 }
 
-ADDRESS_MAP_START(bmcpokr_state::mjmaglmp_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("nvram")
+void bmcpokr_state::mjmaglmp_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x210000, 0x21ffff).ram().share("nvram");
 
-	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(videoram_1_w) AM_SHARE("videoram_1")
-	AM_RANGE(0x288000, 0x28ffff) AM_RAM_WRITE(videoram_2_w) AM_SHARE("videoram_2")
-	AM_RANGE(0x290000, 0x297fff) AM_RAM
+	map(0x280000, 0x287fff).ram().w(this, FUNC(bmcpokr_state::videoram_1_w)).share("videoram_1");
+	map(0x288000, 0x28ffff).ram().w(this, FUNC(bmcpokr_state::videoram_2_w)).share("videoram_2");
+	map(0x290000, 0x297fff).ram();
 
-	AM_RANGE(0x2a0000, 0x2dffff) AM_RAM_WRITE(pixram_w) AM_SHARE("pixram")
+	map(0x2a0000, 0x2dffff).ram().w(this, FUNC(bmcpokr_state::pixram_w)).share("pixram");
 
-	AM_RANGE(0x2ff800, 0x2ff9ff) AM_RAM AM_SHARE("scrollram_1")
-	AM_RANGE(0x2ffa00, 0x2ffbff) AM_RAM AM_SHARE("scrollram_2")
-	AM_RANGE(0x2ffc00, 0x2ffdff) AM_RAM AM_SHARE("scrollram_3")
-	AM_RANGE(0x2ffe00, 0x2fffff) AM_RAM
+	map(0x2ff800, 0x2ff9ff).ram().share("scrollram_1");
+	map(0x2ffa00, 0x2ffbff).ram().share("scrollram_2");
+	map(0x2ffc00, 0x2ffdff).ram().share("scrollram_3");
+	map(0x2ffe00, 0x2fffff).ram();
 
-	AM_RANGE(0x320000, 0x320003) AM_RAM AM_SHARE("layerctrl")
+	map(0x320000, 0x320003).ram().share("layerctrl");
 
-	AM_RANGE(0x388000, 0x388001) AM_WRITE(mux_w)
+	map(0x388000, 0x388001).w(this, FUNC(bmcpokr_state::mux_w));
 
-	AM_RANGE(0x390000, 0x390001) AM_READ(mjmaglmp_dsw_r)
+	map(0x390000, 0x390001).r(this, FUNC(bmcpokr_state::mjmaglmp_dsw_r));
 
-	AM_RANGE(0x398000, 0x398001) AM_READ(mjmaglmp_key_r)
+	map(0x398000, 0x398001).r(this, FUNC(bmcpokr_state::mjmaglmp_key_r));
 
-	AM_RANGE(0x3c8800, 0x3c8803) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
-	AM_RANGE(0x3c9000, 0x3c9001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	map(0x3c8800, 0x3c8803).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
+	map(0x3c9001, 0x3c9001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x3c9800, 0x3c9801) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0x00ff )
-	AM_RANGE(0x3c9802, 0x3c9803) AM_DEVWRITE8("ramdac",ramdac_device, pal_w,   0x00ff )
-	AM_RANGE(0x3c9804, 0x3c9805) AM_DEVWRITE8("ramdac",ramdac_device, mask_w,  0x00ff )
+	map(0x3c9801, 0x3c9801).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x3c9803, 0x3c9803).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x3c9805, 0x3c9805).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0x3ca000, 0x3ca001) AM_RAM // 3ca001.b, rw
-	AM_RANGE(0x3ca002, 0x3ca003) AM_RAM // 3ca003.b, w(9d)
-	AM_RANGE(0x3ca006, 0x3ca007) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x3ca008, 0x3ca009) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x3ca00e, 0x3ca00f) AM_RAM AM_SHARE("priority")    // 3ca00f.b, w (priority?)
-	AM_RANGE(0x3ca016, 0x3ca017) AM_WRITE(pixpal_w)
-	AM_RANGE(0x3ca018, 0x3ca019) AM_RAM // 3ca019.b, w
-	AM_RANGE(0x3ca01a, 0x3ca01b) AM_READ(unk_r) AM_WRITENOP
-	AM_RANGE(0x3ca01c, 0x3ca01d) AM_RAM // 3ca01d.b, w(0)
-ADDRESS_MAP_END
+	map(0x3ca000, 0x3ca001).ram(); // 3ca001.b, rw
+	map(0x3ca002, 0x3ca003).ram(); // 3ca003.b, w(9d)
+	map(0x3ca006, 0x3ca007).w(this, FUNC(bmcpokr_state::irq_ack_w));
+	map(0x3ca008, 0x3ca009).w(this, FUNC(bmcpokr_state::irq_enable_w));
+	map(0x3ca00e, 0x3ca00f).ram().share("priority");    // 3ca00f.b, w (priority?)
+	map(0x3ca016, 0x3ca017).w(this, FUNC(bmcpokr_state::pixpal_w));
+	map(0x3ca018, 0x3ca019).ram(); // 3ca019.b, w
+	map(0x3ca01a, 0x3ca01b).r(this, FUNC(bmcpokr_state::unk_r)).nopw();
+	map(0x3ca01c, 0x3ca01d).ram(); // 3ca01d.b, w(0)
+}
 
 /***************************************************************************
                                 Input Ports
@@ -801,9 +803,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(bmcpokr_state::interrupt)
 		if (m_irq_enable & (1<<6)) m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
-ADDRESS_MAP_START(bmcpokr_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void bmcpokr_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(42'000'000) / 4) // 68000 @10.50MHz (42/4)

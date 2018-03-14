@@ -179,20 +179,22 @@ WRITE8_MEMBER( cosmicos_state::display_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(cosmicos_state::cosmicos_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void cosmicos_state::cosmicos_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(cosmicos_state::read), FUNC(cosmicos_state::write));
+}
 
-ADDRESS_MAP_START(cosmicos_state::cosmicos_io)
+void cosmicos_state::cosmicos_io(address_map &map)
+{
 //  AM_RANGE(0x00, 0x00)
-	AM_RANGE(0x01, 0x01) AM_READ(video_on_r)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(video_off_r, audio_latch_w)
+	map(0x01, 0x01).r(this, FUNC(cosmicos_state::video_on_r));
+	map(0x02, 0x02).rw(this, FUNC(cosmicos_state::video_off_r), FUNC(cosmicos_state::audio_latch_w));
 //  AM_RANGE(0x03, 0x03)
 //  AM_RANGE(0x04, 0x04)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(hex_keyboard_r, hex_keylatch_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(reset_counter_r, segment_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(data_r, display_w)
-ADDRESS_MAP_END
+	map(0x05, 0x05).rw(this, FUNC(cosmicos_state::hex_keyboard_r), FUNC(cosmicos_state::hex_keylatch_w));
+	map(0x06, 0x06).rw(this, FUNC(cosmicos_state::reset_counter_r), FUNC(cosmicos_state::segment_w));
+	map(0x07, 0x07).rw(this, FUNC(cosmicos_state::data_r), FUNC(cosmicos_state::display_w));
+}
 
 /* Input Ports */
 

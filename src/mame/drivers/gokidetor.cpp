@@ -86,36 +86,38 @@ WRITE8_MEMBER(gokidetor_state::ym_porta_w)
 }
 
 
-ADDRESS_MAP_START(gokidetor_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROM // probably banked
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
+void gokidetor_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).rom(); // probably banked
+	map(0xa000, 0xbfff).ram();
 	// c000-c??? = ?
 	// c200-c??? = ?
 	// d000 = ?output
 	// d001 = ?output
 	// d101 = ?output
 	// d1c0 = ?output
-	AM_RANGE(0xd800, 0xd80f) AM_DEVREADWRITE("te7750", te7750_device, read, write)
+	map(0xd800, 0xd80f).rw("te7750", FUNC(te7750_device::read), FUNC(te7750_device::write));
 	//AM_RANGE(0xda00, 0xda01) AM_DEVWRITE("pwm", m66240_device, write)
 	// de00 ?input
 	// df00 ?input
-	AM_RANGE(0xe000, 0xe003) AM_READNOP // ?input
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("ciu", pc060ha_device, master_port_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("ciu", pc060ha_device, master_comm_r, master_comm_w)
+	map(0xe000, 0xe003).nopr(); // ?input
+	map(0xf000, 0xf000).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0xf001, 0xf001).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 	// f600 ?output
 	// f700 ?output
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(gokidetor_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-ADDRESS_MAP_END
+void gokidetor_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram();
+	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
+	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
+	map(0xb000, 0xb000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 MACHINE_CONFIG_START(gokidetor_state::gokidetor)

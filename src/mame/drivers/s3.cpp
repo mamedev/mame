@@ -109,23 +109,25 @@ private:
 	optional_device<pia6821_device> m_pias;
 };
 
-ADDRESS_MAP_START(s3_state::s3_main_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2200, 0x2203) AM_DEVREADWRITE("pia22", pia6821_device, read, write) // solenoids
-	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
-	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
-	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void s3_state::s3_main_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x00ff).ram();
+	map(0x0100, 0x01ff).ram().share("nvram");
+	map(0x2200, 0x2203).rw(m_pia22, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // solenoids
+	map(0x2400, 0x2403).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
+	map(0x2800, 0x2803).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
+	map(0x3000, 0x3003).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
+	map(0x6000, 0x7fff).rom().region("roms", 0);
+}
 
-ADDRESS_MAP_START(s3_state::s3_audio_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0400, 0x0403) AM_DEVREADWRITE("pias", pia6821_device, read, write) // sounds
-	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("audioroms", 0)
-ADDRESS_MAP_END
+void s3_state::s3_audio_map(address_map &map)
+{
+	map.global_mask(0xfff);
+	map(0x0000, 0x007f).ram();
+	map(0x0400, 0x0403).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sounds
+	map(0x0800, 0x0fff).rom().region("audioroms", 0);
+}
 
 static INPUT_PORTS_START( s3 )
 	PORT_START("X0")

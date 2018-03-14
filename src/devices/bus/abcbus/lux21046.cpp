@@ -137,30 +137,32 @@ const tiny_rom_entry *luxor_55_21046_device::device_rom_region() const
 //  ADDRESS_MAP( luxor_55_21046_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(luxor_55_21046_device::luxor_55_21046_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(Z80_TAG, 0x2000) // A13 pull-up
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void luxor_55_21046_device::luxor_55_21046_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x3fff);
+	map(0x0000, 0x1fff).rom().region(Z80_TAG, 0x2000); // A13 pull-up
+	map(0x2000, 0x3fff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( luxor_55_21046_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(luxor_55_21046_device::luxor_55_21046_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff03) AM_READ(out_r)
-	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xff03) AM_WRITE(inp_w)
-	AM_RANGE(0x2c, 0x2c) AM_MIRROR(0xff03) AM_WRITE(_4b_w)
-	AM_RANGE(0x3c, 0x3c) AM_MIRROR(0xff03) AM_WRITE(_9b_w)
-	AM_RANGE(0x4c, 0x4c) AM_MIRROR(0xff03) AM_WRITE(_8a_w)
-	AM_RANGE(0x58, 0x58) AM_MIRROR(0x0007) AM_SELECT(0xff00) AM_READ(_9a_r)
-	AM_RANGE(0x68, 0x6b) AM_MIRROR(0xff00) AM_DEVREAD(SAB1793_TAG, fd1793_device, read)
-	AM_RANGE(0x78, 0x7b) AM_MIRROR(0xff00) AM_DEVWRITE(SAB1793_TAG, fd1793_device, write)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff77) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
-ADDRESS_MAP_END
+void luxor_55_21046_device::luxor_55_21046_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0c, 0x0c).mirror(0xff03).r(this, FUNC(luxor_55_21046_device::out_r));
+	map(0x1c, 0x1c).mirror(0xff03).w(this, FUNC(luxor_55_21046_device::inp_w));
+	map(0x2c, 0x2c).mirror(0xff03).w(this, FUNC(luxor_55_21046_device::_4b_w));
+	map(0x3c, 0x3c).mirror(0xff03).w(this, FUNC(luxor_55_21046_device::_9b_w));
+	map(0x4c, 0x4c).mirror(0xff03).w(this, FUNC(luxor_55_21046_device::_8a_w));
+	map(0x58, 0x58).mirror(0x0007).select(0xff00).r(this, FUNC(luxor_55_21046_device::_9a_r));
+	map(0x68, 0x6b).mirror(0xff00).r(SAB1793_TAG, FUNC(fd1793_device::read));
+	map(0x78, 0x7b).mirror(0xff00).w(SAB1793_TAG, FUNC(fd1793_device::write));
+	map(0x80, 0x80).mirror(0xff77).rw(Z80DMA_TAG, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+}
 
 
 //-------------------------------------------------

@@ -191,10 +191,6 @@ TODO:
 #include "emu.h"
 #include "includes/gladiatr.h"
 
-#include "cpu/m6809/m6809.h"
-#include "cpu/mcs48/mcs48.h"
-#include "cpu/z80/z80.h"
-
 #include "machine/74259.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
@@ -619,86 +615,94 @@ MACHINE_RESET_MEMBER(ppking_state, ppking)
 	m_mcu[0].state = 0;
 }
 
-ADDRESS_MAP_START(ppking_state::ppking_cpu1_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(ppking_video_registers_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(textram_w) AM_SHARE("textram")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
-ADDRESS_MAP_END
+void ppking_state::ppking_cpu1_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcbff).ram().share("spriteram");
+	map(0xcc00, 0xcfff).w(this, FUNC(ppking_state::ppking_video_registers_w));
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(ppking_state::paletteram_w)).share("paletteram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(ppking_state::videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(ppking_state::colorram_w)).share("colorram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(ppking_state::textram_w)).share("textram");
+	map(0xf000, 0xf7ff).ram().share("nvram"); /* battery backed RAM */
+}
 
 
-ADDRESS_MAP_START(ppking_state::ppking_cpu3_map)
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(ppking_adpcm_w)
-	AM_RANGE(0x2000, 0x2fff) AM_READ(adpcm_command_r)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITENOP
-ADDRESS_MAP_END
+void ppking_state::ppking_cpu3_map(address_map &map)
+{
+	map(0x1000, 0x1fff).w(this, FUNC(ppking_state::ppking_adpcm_w));
+	map(0x2000, 0x2fff).r(this, FUNC(ppking_state::adpcm_command_r));
+	map(0x8000, 0xffff).rom().nopw();
+}
 
-ADDRESS_MAP_START(ppking_state::ppking_cpu1_io)
+void ppking_state::ppking_cpu1_io(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+	map(0xc000, 0xc007).w("mainlatch", FUNC(ls259_device::write_d0));
 //  AM_RANGE(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
-	AM_RANGE(0xc09e, 0xc09f) AM_READ(ppking_qx0_r) AM_WRITE(ppking_qx0_w)
-	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP // watchdog
-	AM_RANGE(0xc0c0, 0xc0c1) AM_READ(ppking_qxcomu_r) AM_WRITE(ppking_qxcomu_w)
-ADDRESS_MAP_END
+	map(0xc09e, 0xc09f).r(this, FUNC(ppking_state::ppking_qx0_r)).w(this, FUNC(ppking_state::ppking_qx0_w));
+	map(0xc0bf, 0xc0bf).noprw(); // watchdog
+	map(0xc0c0, 0xc0c1).r(this, FUNC(ppking_state::ppking_qxcomu_r)).w(this, FUNC(ppking_state::ppking_qxcomu_w));
+}
 
-ADDRESS_MAP_START(ppking_state::ppking_cpu2_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x20, 0x21) AM_READ(ppking_qx1_r) AM_WRITE(ppking_qx1_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(cpu2_irq_ack_w)
-	AM_RANGE(0x80, 0x81) AM_READWRITE(ppking_qx3_r,ppking_qx3_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(adpcm_command_w)
-ADDRESS_MAP_END
+void ppking_state::ppking_cpu2_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x20, 0x21).r(this, FUNC(ppking_state::ppking_qx1_r)).w(this, FUNC(ppking_state::ppking_qx1_w));
+	map(0x40, 0x40).w(this, FUNC(ppking_state::cpu2_irq_ack_w));
+	map(0x80, 0x81).rw(this, FUNC(ppking_state::ppking_qx3_r), FUNC(ppking_state::ppking_qx3_w));
+	map(0xe0, 0xe0).w(this, FUNC(ppking_state::adpcm_command_w));
+}
 
 
 
 
-ADDRESS_MAP_START(gladiatr_state::gladiatr_cpu1_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(gladiatr_video_registers_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(textram_w) AM_SHARE("textram")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
-ADDRESS_MAP_END
+void gladiatr_state::gladiatr_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcbff).ram().share("spriteram");
+	map(0xcc00, 0xcfff).w(this, FUNC(gladiatr_state::gladiatr_video_registers_w));
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(gladiatr_state::paletteram_w)).share("paletteram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(gladiatr_state::videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(gladiatr_state::colorram_w)).share("colorram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(gladiatr_state::textram_w)).share("textram");
+	map(0xf000, 0xf7ff).ram().share("nvram"); /* battery backed RAM */
+}
 
 ADDRESS_MAP_START(gladiatr_state_base::cpu2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(gladiatr_state::gladiatr_cpu3_map)
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(gladiator_adpcm_w)
-	AM_RANGE(0x2000, 0x2fff) AM_READ(adpcm_command_r)
-	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank2") AM_WRITENOP
-ADDRESS_MAP_END
+void gladiatr_state::gladiatr_cpu3_map(address_map &map)
+{
+	map(0x1000, 0x1fff).w(this, FUNC(gladiatr_state::gladiator_adpcm_w));
+	map(0x2000, 0x2fff).r(this, FUNC(gladiatr_state::adpcm_command_r));
+	map(0x4000, 0xffff).bankr("bank2").nopw();
+}
 
 
-ADDRESS_MAP_START(gladiatr_state::gladiatr_cpu1_io)
-	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
-	AM_RANGE(0xc09e, 0xc09f) AM_DEVREADWRITE("ucpu", upi41_cpu_device, upi41_master_r, upi41_master_w)
-	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP // watchdog_reset_w doesn't work
-ADDRESS_MAP_END
+void gladiatr_state::gladiatr_cpu1_io(address_map &map)
+{
+	map(0xc000, 0xc007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xc004, 0xc004).w(this, FUNC(gladiatr_state::gladiatr_irq_patch_w)); /* !!! patch to 2nd CPU IRQ !!! */
+	map(0xc09e, 0xc09f).rw(m_ucpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
+	map(0xc0bf, 0xc0bf).noprw(); // watchdog_reset_w doesn't work
+}
 
-ADDRESS_MAP_START(gladiatr_state::gladiatr_cpu2_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE("csnd", upi41_cpu_device, upi41_master_r, upi41_master_w)
-	AM_RANGE(0x40, 0x40) AM_NOP // WRITE(sub_irq_ack_w)
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("cctl", upi41_cpu_device, upi41_master_r, upi41_master_w)
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ccpu", upi41_cpu_device, upi41_master_r, upi41_master_w)
-	AM_RANGE(0xa0, 0xa7) AM_DEVWRITE("filtlatch", ls259_device, write_d0)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(adpcm_command_w)
-ADDRESS_MAP_END
+void gladiatr_state::gladiatr_cpu2_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x20, 0x21).rw(m_csnd, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
+	map(0x40, 0x40).noprw(); // WRITE(sub_irq_ack_w)
+	map(0x60, 0x61).rw(m_cctl, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
+	map(0x80, 0x81).rw(m_ccpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
+	map(0xa0, 0xa7).w("filtlatch", FUNC(ls259_device::write_d0));
+	map(0xe0, 0xe0).w(this, FUNC(gladiatr_state::adpcm_command_w));
+}
 
 
 static INPUT_PORTS_START( ppking )

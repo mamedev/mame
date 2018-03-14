@@ -66,20 +66,22 @@ const tiny_rom_entry *cbm2_hrg_device::device_rom_region() const
 //  ADDRESS_MAP( hrg_a_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(cbm2_hrg_a_device::hrg_a_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-ADDRESS_MAP_END
+void cbm2_hrg_a_device::hrg_a_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x7fff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( hrg_b_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(cbm2_hrg_b_device::hrg_b_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void cbm2_hrg_b_device::hrg_b_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x3fff).ram();
+}
 
 
 //-------------------------------------------------

@@ -1157,9 +1157,10 @@ READ8_MEMBER( p500_state::vic_colorram_r )
 //  ADDRESS_MAP( cbm2_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(cbm2_state::cbm2_mem)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void cbm2_state::cbm2_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(this, FUNC(cbm2_state::read), FUNC(cbm2_state::write));
+}
 
 
 //-------------------------------------------------
@@ -1187,27 +1188,30 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( p500_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(p500_state::p500_mem)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void p500_state::p500_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(this, FUNC(p500_state::read), FUNC(p500_state::write));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(p500_state::vic_videoram_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
-ADDRESS_MAP_END
+void p500_state::vic_videoram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).r(this, FUNC(p500_state::vic_videoram_r));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(p500_state::vic_colorram_map)
-	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
-ADDRESS_MAP_END
+void p500_state::vic_colorram_map(address_map &map)
+{
+	map(0x000, 0x3ff).r(this, FUNC(p500_state::vic_colorram_r));
+}
 
 
 

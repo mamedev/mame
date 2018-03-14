@@ -125,14 +125,15 @@ private:
 };
 
 
-ADDRESS_MAP_START(by17_state::by17_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write)
-	AM_RANGE(0x0200, 0x02ff) AM_RAM AM_READWRITE(nibble_nvram_r, nibble_nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("roms", 0 )
-ADDRESS_MAP_END
+void by17_state::by17_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x007f).ram();
+	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0200, 0x02ff).ram().rw(this, FUNC(by17_state::nibble_nvram_r), FUNC(by17_state::nibble_nvram_w)).share("nvram");
+	map(0x1000, 0x1fff).rom().region("roms", 0);
+}
 
 
 static INPUT_PORTS_START( by17 )

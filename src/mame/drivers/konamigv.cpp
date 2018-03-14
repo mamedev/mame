@@ -185,52 +185,57 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(konamigv_state::konamigv_map)
-	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("am53cf96", am53cf96_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x1f100000, 0x1f100003) AM_READ_PORT("P1")
-	AM_RANGE(0x1f100004, 0x1f100007) AM_READ_PORT("P2")
-	AM_RANGE(0x1f100008, 0x1f10000b) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x1f680000, 0x1f68001f) AM_DEVREADWRITE8("mb89371", mb89371_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x1f780000, 0x1f780003) AM_WRITENOP /* watchdog? */
-ADDRESS_MAP_END
+void konamigv_state::konamigv_map(address_map &map)
+{
+	map(0x1f000000, 0x1f00001f).rw(m_am53cf96, FUNC(am53cf96_device::read), FUNC(am53cf96_device::write)).umask32(0x00ff00ff);
+	map(0x1f100000, 0x1f100003).portr("P1");
+	map(0x1f100004, 0x1f100007).portr("P2");
+	map(0x1f100008, 0x1f10000b).portr("P3_P4");
+	map(0x1f180000, 0x1f180003).portw("EEPROMOUT");
+	map(0x1f680000, 0x1f68001f).rw("mb89371", FUNC(mb89371_device::read), FUNC(mb89371_device::write)).umask32(0x00ff00ff);
+	map(0x1f780000, 0x1f780003).nopw(); /* watchdog? */
+}
 
-ADDRESS_MAP_START(konamigv_state::simpbowl_map)
-	AM_IMPORT_FROM( konamigv_map )
+void konamigv_state::simpbowl_map(address_map &map)
+{
+	konamigv_map(map);
 
-	AM_RANGE(0x1f680080, 0x1f68008f) AM_READWRITE16(flash_r, flash_w, 0xffffffff)
-	AM_RANGE(0x1f6800c0, 0x1f6800c7) AM_DEVREAD8("upd", upd4701_device, read_xy, 0xff00ff00)
-	AM_RANGE(0x1f6800c8, 0x1f6800cb) AM_DEVREAD8("upd", upd4701_device, reset_xy, 0x0000ff00)
-ADDRESS_MAP_END
+	map(0x1f680080, 0x1f68008f).rw(this, FUNC(konamigv_state::flash_r), FUNC(konamigv_state::flash_w));
+	map(0x1f6800c0, 0x1f6800c7).r("upd", FUNC(upd4701_device::read_xy)).umask32(0xff00ff00);
+	map(0x1f6800c9, 0x1f6800c9).r("upd", FUNC(upd4701_device::reset_xy));
+}
 
-ADDRESS_MAP_START(konamigv_state::btchamp_map)
-	AM_IMPORT_FROM( konamigv_map )
+void konamigv_state::btchamp_map(address_map &map)
+{
+	konamigv_map(map);
 
-	AM_RANGE(0x1f380000, 0x1f3fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)
-	AM_RANGE(0x1f680080, 0x1f680087) AM_DEVREAD8("upd1", upd4701_device, read_xy, 0xff00ff00)
-	AM_RANGE(0x1f680080, 0x1f680087) AM_DEVREAD8("upd2", upd4701_device, read_xy, 0x00ff00ff)
-	AM_RANGE(0x1f680088, 0x1f68008b) AM_WRITE16(btc_trackball_w, 0x0000ffff)
-	AM_RANGE(0x1f6800e0, 0x1f6800e3) AM_WRITENOP
-ADDRESS_MAP_END
+	map(0x1f380000, 0x1f3fffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
+	map(0x1f680080, 0x1f680087).r("upd1", FUNC(upd4701_device::read_xy)).umask32(0xff00ff00);
+	map(0x1f680080, 0x1f680087).r("upd2", FUNC(upd4701_device::read_xy)).umask32(0x00ff00ff);
+	map(0x1f680088, 0x1f680089).w(this, FUNC(konamigv_state::btc_trackball_w));
+	map(0x1f6800e0, 0x1f6800e3).nopw();
+}
 
-ADDRESS_MAP_START(konamigv_state::kdeadeye_map)
-	AM_IMPORT_FROM( konamigv_map )
+void konamigv_state::kdeadeye_map(address_map &map)
+{
+	konamigv_map(map);
 
-	AM_RANGE(0x1f380000, 0x1f3fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)
-	AM_RANGE(0x1f680080, 0x1f680083) AM_READ_PORT("GUNX1")
-	AM_RANGE(0x1f680090, 0x1f680093) AM_READ_PORT("GUNY1")
-	AM_RANGE(0x1f6800a0, 0x1f6800a3) AM_READ_PORT("GUNX2")
-	AM_RANGE(0x1f6800b0, 0x1f6800b3) AM_READ_PORT("GUNY2")
-	AM_RANGE(0x1f6800c0, 0x1f6800c3) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0x1f6800e0, 0x1f6800e3) AM_WRITENOP
-ADDRESS_MAP_END
+	map(0x1f380000, 0x1f3fffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
+	map(0x1f680080, 0x1f680083).portr("GUNX1");
+	map(0x1f680090, 0x1f680093).portr("GUNY1");
+	map(0x1f6800a0, 0x1f6800a3).portr("GUNX2");
+	map(0x1f6800b0, 0x1f6800b3).portr("GUNY2");
+	map(0x1f6800c0, 0x1f6800c3).portr("BUTTONS");
+	map(0x1f6800e0, 0x1f6800e3).nopw();
+}
 
-ADDRESS_MAP_START(konamigv_state::tmosh_map)
-	AM_IMPORT_FROM( konamigv_map )
+void konamigv_state::tmosh_map(address_map &map)
+{
+	konamigv_map(map);
 
-	AM_RANGE(0x1f680080, 0x1f680083) AM_READ16(tokimeki_serial_r, 0x0000ffff)
-	AM_RANGE(0x1f680090, 0x1f680093) AM_WRITE16(tokimeki_serial_w, 0x0000ffff)
-ADDRESS_MAP_END
+	map(0x1f680080, 0x1f680081).r(this, FUNC(konamigv_state::tokimeki_serial_r));
+	map(0x1f680090, 0x1f680091).w(this, FUNC(konamigv_state::tokimeki_serial_w));
+}
 
 /* SCSI */
 

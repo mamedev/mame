@@ -174,24 +174,25 @@ WRITE8_MEMBER(gcpinbal_state::es8712_reset_w)
                      MEMORY STRUCTURES
 ***********************************************************/
 
-ADDRESS_MAP_START(gcpinbal_state::gcpinbal_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_SHARE("tilemapram")
-	AM_RANGE(0xc80000, 0xc81fff) AM_DEVREADWRITE8("spritegen", excellent_spr_device, read, write, 0x00ff)
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xd80010, 0xd8002f) AM_RAM_WRITE(d80010_w) AM_SHARE("d80010")
-	AM_RANGE(0xd80040, 0xd8005b) AM_WRITE8(d80040_w, 0x00ff)
-	AM_RANGE(0xd80060, 0xd80077) AM_RAM_WRITE(d80060_w) AM_SHARE("d80060")
-	AM_RANGE(0xd80080, 0xd80081) AM_READ_PORT("DSW")
-	AM_RANGE(0xd80084, 0xd80085) AM_READ_PORT("IN0")
-	AM_RANGE(0xd80086, 0xd80087) AM_READ_PORT("IN1")
-	AM_RANGE(0xd80088, 0xd80089) AM_WRITE8(bank_w, 0xff00)
-	AM_RANGE(0xd8008a, 0xd8008b) AM_WRITE8(eeprom_w, 0xff00)
-	AM_RANGE(0xd8008e, 0xd8008f) AM_WRITE8(es8712_reset_w, 0xff00)
-	AM_RANGE(0xd800a0, 0xd800a1) AM_MIRROR(0x2) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0xd800c0, 0xd800cd) AM_DEVWRITE8("essnd", es8712_device, write, 0xff00)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM /* RAM */
-ADDRESS_MAP_END
+void gcpinbal_state::gcpinbal_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0xc00000, 0xc03fff).rw(this, FUNC(gcpinbal_state::gcpinbal_tilemaps_word_r), FUNC(gcpinbal_state::gcpinbal_tilemaps_word_w)).share("tilemapram");
+	map(0xc80000, 0xc81fff).rw(m_sprgen, FUNC(excellent_spr_device::read), FUNC(excellent_spr_device::write)).umask16(0x00ff);
+	map(0xd00000, 0xd00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xd80010, 0xd8002f).ram().w(this, FUNC(gcpinbal_state::d80010_w)).share("d80010");
+	map(0xd80040, 0xd8005b).w(this, FUNC(gcpinbal_state::d80040_w)).umask16(0x00ff);
+	map(0xd80060, 0xd80077).ram().w(this, FUNC(gcpinbal_state::d80060_w)).share("d80060");
+	map(0xd80080, 0xd80081).portr("DSW");
+	map(0xd80084, 0xd80085).portr("IN0");
+	map(0xd80086, 0xd80087).portr("IN1");
+	map(0xd80088, 0xd80088).w(this, FUNC(gcpinbal_state::bank_w));
+	map(0xd8008a, 0xd8008a).w(this, FUNC(gcpinbal_state::eeprom_w));
+	map(0xd8008e, 0xd8008e).w(this, FUNC(gcpinbal_state::es8712_reset_w));
+	map(0xd800a0, 0xd800a0).mirror(0x2).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xd800c0, 0xd800cd).w(m_essnd, FUNC(es8712_device::write)).umask16(0xff00);
+	map(0xff0000, 0xffffff).ram(); /* RAM */
+}
 
 
 

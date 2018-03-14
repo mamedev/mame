@@ -93,7 +93,6 @@ Notes:
 #include "includes/funkyjet.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
 #include "machine/decocrpt.h"
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
@@ -131,35 +130,37 @@ WRITE16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_w )
 }
 
 
-ADDRESS_MAP_START(funkyjet_state::funkyjet_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x140000, 0x143fff) AM_RAM
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(funkyjet_protection_region_0_146_r,funkyjet_protection_region_0_146_w) AM_SHARE("prot16ram") /* Protection device */ // unlikely to be cs0 region
-	AM_RANGE(0x184000, 0x184001) AM_WRITENOP
-	AM_RANGE(0x188000, 0x188001) AM_WRITENOP
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x340000, 0x340bff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x342000, 0x342bff) AM_RAM AM_SHARE("pf2_rowscroll")
-ADDRESS_MAP_END
+void funkyjet_state::funkyjet_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x120000, 0x1207ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x140000, 0x143fff).ram();
+	map(0x160000, 0x1607ff).ram().share("spriteram");
+	map(0x180000, 0x183fff).rw(this, FUNC(funkyjet_state::funkyjet_protection_region_0_146_r), FUNC(funkyjet_state::funkyjet_protection_region_0_146_w)).share("prot16ram"); /* Protection device */ // unlikely to be cs0 region
+	map(0x184000, 0x184001).nopw();
+	map(0x188000, 0x188001).nopw();
+	map(0x300000, 0x30000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x320000, 0x321fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x322000, 0x323fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x340000, 0x340bff).ram().share("pf1_rowscroll");
+	map(0x342000, 0x342bff).ram().share("pf2_rowscroll");
+}
 
 /******************************************************************************/
 
 /* Physical memory map (21 bits) */
-ADDRESS_MAP_START(funkyjet_state::sound_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_NOP /* YM2203 - this board doesn't have one */
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_NOP /* This board only has 1 oki chip */
-	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot", deco146_device, soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void funkyjet_state::sound_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x100000, 0x100001).noprw(); /* YM2203 - this board doesn't have one */
+	map(0x110000, 0x110001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x120000, 0x120001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).noprw(); /* This board only has 1 oki chip */
+	map(0x140000, 0x140000).r(m_deco146, FUNC(deco146_device::soundlatch_r));
+	map(0x1f0000, 0x1f1fff).bankrw("bank8");
+	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
+	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+}
 
 /******************************************************************************/
 

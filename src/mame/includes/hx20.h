@@ -68,8 +68,8 @@ public:
 			m_kbrequest(1)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	required_device<hd63701_cpu_device> m_maincpu;
+	required_device<hd63701_cpu_device> m_subcpu;
 	required_device<mc146818_device> m_rtc;
 	required_device<upd7227_device> m_lcdc0;
 	required_device<upd7227_device> m_lcdc1;

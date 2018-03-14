@@ -54,36 +54,39 @@ WRITE8_MEMBER(speedbal_state::coincounter_w)
 	/* unknown: (data & 0x10) and (data & 4) */
 }
 
-ADDRESS_MAP_START(speedbal_state::main_cpu_map)
-	AM_RANGE(0x0000, 0xdbff) AM_ROM
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with SOUND
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(background_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(foreground_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xf000, 0xf5ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xf600, 0xfeff) AM_RAM
-	AM_RANGE(0xff00, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void speedbal_state::main_cpu_map(address_map &map)
+{
+	map(0x0000, 0xdbff).rom();
+	map(0xdc00, 0xdfff).ram().share("share1"); // shared with SOUND
+	map(0xe000, 0xe1ff).ram().w(this, FUNC(speedbal_state::background_videoram_w)).share("bg_videoram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(speedbal_state::foreground_videoram_w)).share("fg_videoram");
+	map(0xf000, 0xf5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf600, 0xfeff).ram();
+	map(0xff00, 0xffff).ram().share("spriteram");
+}
 
 WRITE8_MEMBER(speedbal_state::maincpu_50_w)
 {
 	//logerror("%s: maincpu_50_w %02x\n", this->machine().describe_context(), data);
 }
 
-ADDRESS_MAP_START(speedbal_state::main_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW2")
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1")
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("P2")
-	AM_RANGE(0x40, 0x40) AM_WRITE(coincounter_w)
-	AM_RANGE(0x50, 0x50) AM_WRITE(maincpu_50_w)
-ADDRESS_MAP_END
+void speedbal_state::main_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSW2");
+	map(0x10, 0x10).portr("DSW1");
+	map(0x20, 0x20).portr("P1");
+	map(0x30, 0x30).portr("P2");
+	map(0x40, 0x40).w(this, FUNC(speedbal_state::coincounter_w));
+	map(0x50, 0x50).w(this, FUNC(speedbal_state::maincpu_50_w));
+}
 
-ADDRESS_MAP_START(speedbal_state::sound_cpu_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xd800, 0xdbff) AM_RAM
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with MAIN CPU
-ADDRESS_MAP_END
+void speedbal_state::sound_cpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xd800, 0xdbff).ram();
+	map(0xdc00, 0xdfff).ram().share("share1"); // shared with MAIN CPU
+}
 
 
 
@@ -117,14 +120,15 @@ WRITE8_MEMBER(speedbal_state::leds_shift_bit)
 
 
 
-ADDRESS_MAP_START(speedbal_state::sound_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_WRITE(leds_output_block)
-	AM_RANGE(0x80, 0x80) AM_WRITE(leds_start_block)
-	AM_RANGE(0x82, 0x82) AM_WRITENOP // ?
-	AM_RANGE(0xc1, 0xc1) AM_WRITE(leds_shift_bit)
-ADDRESS_MAP_END
+void speedbal_state::sound_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x40, 0x40).w(this, FUNC(speedbal_state::leds_output_block));
+	map(0x80, 0x80).w(this, FUNC(speedbal_state::leds_start_block));
+	map(0x82, 0x82).nopw(); // ?
+	map(0xc1, 0xc1).w(this, FUNC(speedbal_state::leds_shift_bit));
+}
 
 
 static INPUT_PORTS_START( speedbal )

@@ -223,18 +223,20 @@ void pes_state::machine_reset()
  Address Maps
 ******************************************************************************/
 
-ADDRESS_MAP_START(pes_state::i80c31_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM /* 27C64 ROM */
+void pes_state::i80c31_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom(); /* 27C64 ROM */
 	// AM_RANGE(0x2000, 0x3fff) AM_RAM /* 6164 8k SRAM, not populated */
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(pes_state::i80c31_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0, 0x0) AM_WRITE(rsq_wsq_w) /* /WS(0) and /RS(1) */
-	AM_RANGE(0x1, 0x1) AM_READWRITE(port1_r, port1_w) /* tms5220 reads and writes */
-	AM_RANGE(0x3, 0x3) AM_READWRITE(port3_r, port3_w) /* writes and reads from port 3, see top of file */
-ADDRESS_MAP_END
+void pes_state::i80c31_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0, 0x0).w(this, FUNC(pes_state::rsq_wsq_w)); /* /WS(0) and /RS(1) */
+	map(0x1, 0x1).rw(this, FUNC(pes_state::port1_r), FUNC(pes_state::port1_w)); /* tms5220 reads and writes */
+	map(0x3, 0x3).rw(this, FUNC(pes_state::port3_r), FUNC(pes_state::port3_w)); /* writes and reads from port 3, see top of file */
+}
 
 /******************************************************************************
  Input Ports

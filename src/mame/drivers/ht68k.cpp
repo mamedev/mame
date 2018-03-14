@@ -70,15 +70,16 @@ public:
 };
 
 
-ADDRESS_MAP_START(ht68k_state::ht68k_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("p_ram") // 512 KB RAM / ROM at boot
+void ht68k_state::ht68k_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x0007ffff).ram().share("p_ram"); // 512 KB RAM / ROM at boot
 	//AM_RANGE(0x00080000, 0x000fffff) // Expansion
 	//AM_RANGE(0x00d80000, 0x00d8ffff) // Printer
-	AM_RANGE(0x00e00000, 0x00e00007) AM_MIRROR(0xfff8) AM_DEVREADWRITE8("wd1770", wd1770_device, read, write, 0x00ff) // FDC WD1770
-	AM_RANGE(0x00e80000, 0x00e800ff) AM_MIRROR(0xff00) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
-	AM_RANGE(0x00f00000, 0x00f07fff) AM_ROM AM_MIRROR(0xf8000) AM_REGION("user1",0)
-ADDRESS_MAP_END
+	map(0x00e00000, 0x00e00007).mirror(0xfff8).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write)).umask16(0x00ff); // FDC WD1770
+	map(0x00e80000, 0x00e800ff).mirror(0xff00).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x00f00000, 0x00f07fff).rom().mirror(0xf8000).region("user1", 0);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ht68k )

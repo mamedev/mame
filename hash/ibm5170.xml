@@ -5190,6 +5190,22 @@
 		</part>
 	</software>
 
+	<software name="tngclips">
+		<description>AudioClips Digital Sounds for Windows 3.1 - Star Trek: The Next Generation - "Encounter at Farpoint"</description>
+		<year>1992</year>
+		<publisher>Sound Source Unlimited</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="audioclips1.img" size="1474560" crc="e860f5c2" sha1="62774444f558111c0c638952078b6364be2a2467" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="audioclips2.img" size="737280" crc="7945c8d2" sha1="ca144550b9fd1357a943dcf6f7fbd3a1c6c6bcbe" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msbob">
 		<description>Bob (1.00a)</description>
 		<year>1995</year>
@@ -5274,6 +5290,27 @@
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size = "1720320">
 				<rom name="disk7.img" size="1720320" crc="afb0e89c" sha1="cd456a4304f4dafa27d869350d3f713cc934beb4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bizppak1">
+		<description>Business Clip Art PicturePak 1</description>
+		<year>1992</year>
+		<publisher>ImageLine</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PicturePak 1-disk1.img" size="737280" crc="cbbd976c" sha1="2c6dac693776bf5a569b2a2129f6c27913d735e2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PicturePak 1-disk2.img" size="737280" crc="7b00b374" sha1="6c1ca89e79f6c1a289b06d752a4813c4fd40170f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PicturePak 1-disk3.img" size="737280" crc="8f09be8d" sha1="461ceb235816d11830c57864de5e3eb64d4cc28c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7735,6 +7772,19 @@
 		</part>
 	</software>
 
+	<software name="crystalc">
+		<description>Crystal Caves</description>
+		<year>1991</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Apogee Software" />
+		<info name="version" value="1.0a" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Crystal Caves [Apogee Software] [1991] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="f4360e24" sha1="93a63c8bb0764ba83829b30263ce8870d1902c9f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cybrstrk">
 		<description>Cyberstrike</description>
 		<year>1994</year>
@@ -8684,6 +8734,19 @@
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Disk4.img" size="1474560" crc="969dae3c" sha1="0627faa028b550c931b73de88598cecce138e443" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hocuspoc">
+		<description>Hocus Pocus</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Moonlite Software" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Hocus Pocus [Apogee] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="d5acb22b" sha1="8d13ab1daca1d99dbae3880727efd62cfbc76686" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

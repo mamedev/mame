@@ -264,26 +264,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(quickpick5_state::scanline)
 	}
 }
 
-ADDRESS_MAP_START(quickpick5_state::quickpick5_main)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdbff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xdc00, 0xdc0f) AM_DEVREADWRITE("k053252", k053252_device, read, write)
-	AM_RANGE(0xdc40, 0xdc4f) AM_READWRITE(k244_r, k244_w)
-	AM_RANGE(0xdc80, 0xdc80) AM_READ_PORT("DSW3")
-	AM_RANGE(0xdc81, 0xdc81) AM_READ_PORT("DSW4")
-	AM_RANGE(0xdcc0, 0xdcc0) AM_READ_PORT("DSW1")
-	AM_RANGE(0xdcc1, 0xdcc1) AM_READ_PORT("DSW2")
-	AM_RANGE(0xdd00, 0xdd00) AM_WRITENOP
-	AM_RANGE(0xdd40, 0xdd40) AM_NOP
-	AM_RANGE(0xdd80, 0xdd80) AM_READWRITE(control_r, control_w)
-	AM_RANGE(0xddc0, 0xddc0) AM_WRITENOP
-	AM_RANGE(0xde00, 0xde00) AM_WRITENOP
-	AM_RANGE(0xde40, 0xde40) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(vram_r, vram_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(k245_r, k245_w)
-ADDRESS_MAP_END
+void quickpick5_state::quickpick5_main(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xdbff).ram().share("nvram");
+	map(0xdc00, 0xdc0f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
+	map(0xdc40, 0xdc4f).rw(this, FUNC(quickpick5_state::k244_r), FUNC(quickpick5_state::k244_w));
+	map(0xdc80, 0xdc80).portr("DSW3");
+	map(0xdc81, 0xdc81).portr("DSW4");
+	map(0xdcc0, 0xdcc0).portr("DSW1");
+	map(0xdcc1, 0xdcc1).portr("DSW2");
+	map(0xdd00, 0xdd00).nopw();
+	map(0xdd40, 0xdd40).noprw();
+	map(0xdd80, 0xdd80).rw(this, FUNC(quickpick5_state::control_r), FUNC(quickpick5_state::control_w));
+	map(0xddc0, 0xddc0).nopw();
+	map(0xde00, 0xde00).nopw();
+	map(0xde40, 0xde40).w(m_oki, FUNC(okim6295_device::write));
+	map(0xe000, 0xefff).rw(this, FUNC(quickpick5_state::vram_r), FUNC(quickpick5_state::vram_w));
+	map(0xf000, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf800, 0xffff).rw(this, FUNC(quickpick5_state::k245_r), FUNC(quickpick5_state::k245_w));
+}
 
 static INPUT_PORTS_START( quickpick5 )
 	PORT_START("DSW1")

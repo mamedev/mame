@@ -157,19 +157,21 @@ WRITE8_MEMBER( marywu_state::display_7seg_data_w )
 	output().set_digit_value(2 * m_selected_7seg_module + 1, patterns[(data >> 4) & 0x0F]);
 }
 
-ADDRESS_MAP_START(marywu_state::program_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void marywu_state::program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(marywu_state::io_map)
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_RAM /* HM6116: 2kbytes of Static RAM */
-	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x9001, 0x9001) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x9002, 0x9002) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x9003, 0x9003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0xb000, 0xb001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("i8279", i8279_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_NOP /* TODO: Investigate this. There's something going on at this address range. */
-ADDRESS_MAP_END
+void marywu_state::io_map(address_map &map)
+{
+	map(0x8000, 0x87ff).mirror(0x0800).ram(); /* HM6116: 2kbytes of Static RAM */
+	map(0x9000, 0x9000).mirror(0x0ffc).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x9001, 0x9001).mirror(0x0ffc).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x9002, 0x9002).mirror(0x0ffc).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0x9003, 0x9003).mirror(0x0ffc).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xb000, 0xb001).mirror(0x0ffe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0xf000, 0xf000).noprw(); /* TODO: Investigate this. There's something going on at this address range. */
+}
 
 MACHINE_CONFIG_START(marywu_state::marywu)
 	/* basic machine hardware */

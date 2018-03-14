@@ -445,31 +445,32 @@ WRITE_LINE_MEMBER(atarisy1_state::coin_counter_left_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(atarisy1_state::main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x087fff) AM_ROM /* slapstic maps here */
-	AM_RANGE(0x2e0000, 0x2e0001) AM_READ(atarisy1_int3state_r)
-	AM_RANGE(0x400000, 0x401fff) AM_RAM
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(atarisy1_xscroll_w) AM_SHARE("xscroll")
-	AM_RANGE(0x820000, 0x820001) AM_WRITE(atarisy1_yscroll_w) AM_SHARE("yscroll")
-	AM_RANGE(0x840000, 0x840001) AM_WRITE(atarisy1_priority_w)
-	AM_RANGE(0x860000, 0x860001) AM_WRITE(atarisy1_bankselect_w) AM_SHARE("bankselect")
-	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0x8c0000, 0x8c0001) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0x900000, 0x9fffff) AM_RAM
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0xa02000, 0xa02fff) AM_RAM_WRITE(atarisy1_spriteram_w) AM_SHARE("mob")
-	AM_RANGE(0xa03000, 0xa03fff) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
-	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xf00000, 0xf00fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0xf20000, 0xf20007) AM_READ(trakball_r)
-	AM_RANGE(0xf40000, 0xf4001f) AM_READWRITE(joystick_r, joystick_w)
-	AM_RANGE(0xf60000, 0xf60003) AM_READ_PORT("F60000")
-	AM_RANGE(0xf80000, 0xf80001) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff) /* used by roadbls2 */
-	AM_RANGE(0xfc0000, 0xfc0001) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
-	AM_RANGE(0xfe0000, 0xfe0001) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
-ADDRESS_MAP_END
+void atarisy1_state::main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x087fff).rom(); /* slapstic maps here */
+	map(0x2e0000, 0x2e0001).r(this, FUNC(atarisy1_state::atarisy1_int3state_r));
+	map(0x400000, 0x401fff).ram();
+	map(0x800000, 0x800001).w(this, FUNC(atarisy1_state::atarisy1_xscroll_w)).share("xscroll");
+	map(0x820000, 0x820001).w(this, FUNC(atarisy1_state::atarisy1_yscroll_w)).share("yscroll");
+	map(0x840000, 0x840001).w(this, FUNC(atarisy1_state::atarisy1_priority_w));
+	map(0x860000, 0x860001).w(this, FUNC(atarisy1_state::atarisy1_bankselect_w)).share("bankselect");
+	map(0x880000, 0x880001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x8a0000, 0x8a0001).w(this, FUNC(atarisy1_state::video_int_ack_w));
+	map(0x8c0000, 0x8c0001).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0x900000, 0x9fffff).ram();
+	map(0xa00000, 0xa01fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0xa02000, 0xa02fff).ram().w(this, FUNC(atarisy1_state::atarisy1_spriteram_w)).share("mob");
+	map(0xa03000, 0xa03fff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(0xb00000, 0xb007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xf00000, 0xf00fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0xf20000, 0xf20007).r(this, FUNC(atarisy1_state::trakball_r));
+	map(0xf40000, 0xf4001f).rw(this, FUNC(atarisy1_state::joystick_r), FUNC(atarisy1_state::joystick_w));
+	map(0xf60000, 0xf60003).portr("F60000");
+	map(0xf80001, 0xf80001).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w)); /* used by roadbls2 */
+	map(0xfc0001, 0xfc0001).r(m_soundcomm, FUNC(atari_sound_comm_device::main_response_r));
+	map(0xfe0001, 0xfe0001).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w));
+}
 
 
 
@@ -479,16 +480,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(atarisy1_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
-	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x1810, 0x1810) AM_DEVREADWRITE("soundcomm", atari_sound_comm_device, sound_command_r, sound_response_w)
-	AM_RANGE(0x1820, 0x1820) AM_READ(switch_6502_r)
-	AM_RANGE(0x1820, 0x1827) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-	AM_RANGE(0x1870, 0x187f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void atarisy1_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x100f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1800, 0x1801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x1810, 0x1810).rw(m_soundcomm, FUNC(atari_sound_comm_device::sound_command_r), FUNC(atari_sound_comm_device::sound_response_w));
+	map(0x1820, 0x1820).r(this, FUNC(atarisy1_state::switch_6502_r));
+	map(0x1820, 0x1827).w(m_outlatch, FUNC(ls259_device::write_d0));
+	map(0x1870, 0x187f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x4000, 0xffff).rom();
+}
 
 
 

@@ -41,19 +41,21 @@ private:
 };
 
 
-ADDRESS_MAP_START(jade_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x0800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void jade_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom().region("roms", 0);
+	map(0x0800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(jade_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("ctc2", z80ctc_device, read, write)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("sio", z80sio_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void jade_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x28, 0x2b).rw("ctc2", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x30, 0x33).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x40, 0x43).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( jade )

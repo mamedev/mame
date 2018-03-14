@@ -453,17 +453,19 @@ WRITE8_MEMBER(tk2000_state::ram_w)
 	}
 }
 
-ADDRESS_MAP_START(tk2000_state::apple2_map)
-	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0xc000, 0xc07f) AM_READWRITE(c000_r, c000_w)
-	AM_RANGE(0xc080, 0xc0ff) AM_READWRITE(c080_r, c080_w)
-	AM_RANGE(0xc100, 0xffff) AM_DEVICE(A2_UPPERBANK_TAG, address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void tk2000_state::apple2_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rw(this, FUNC(tk2000_state::ram_r), FUNC(tk2000_state::ram_w));
+	map(0xc000, 0xc07f).rw(this, FUNC(tk2000_state::c000_r), FUNC(tk2000_state::c000_w));
+	map(0xc080, 0xc0ff).rw(this, FUNC(tk2000_state::c080_r), FUNC(tk2000_state::c080_w));
+	map(0xc100, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(tk2000_state::inhbank_map)
-	AM_RANGE(0x0000, 0x3eff) AM_ROM AM_REGION("maincpu", 0x100)
-	AM_RANGE(0x4000, 0x7eff) AM_READWRITE(c100_r, c100_w)
-ADDRESS_MAP_END
+void tk2000_state::inhbank_map(address_map &map)
+{
+	map(0x0000, 0x3eff).rom().region("maincpu", 0x100);
+	map(0x4000, 0x7eff).rw(this, FUNC(tk2000_state::c100_r), FUNC(tk2000_state::c100_w));
+}
 
 /***************************************************************************
     INPUT PORTS

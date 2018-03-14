@@ -212,159 +212,173 @@ TI-86 ports:
 
 /* port i/o functions */
 
-ADDRESS_MAP_START(ti85_state::ti81_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ti85_port_0000_r, ti85_port_0000_w )
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(ti85_port_0002_r, ti85_port_0002_w )
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(ti85_port_0003_r, ti85_port_0003_w )
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(ti85_port_0004_r, ti85_port_0004_w )
-	AM_RANGE(0x0005, 0x0005) AM_READWRITE(ti85_port_0005_r, ti85_port_0005_w )
-	AM_RANGE(0x0007, 0x0007) AM_WRITE(ti81_port_0007_w)
-ADDRESS_MAP_END
+void ti85_state::ti81_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x0000).rw(this, FUNC(ti85_state::ti85_port_0000_r), FUNC(ti85_state::ti85_port_0000_w));
+	map(0x0001, 0x0001).rw(this, FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
+	map(0x0002, 0x0002).rw(this, FUNC(ti85_state::ti85_port_0002_r), FUNC(ti85_state::ti85_port_0002_w));
+	map(0x0003, 0x0003).rw(this, FUNC(ti85_state::ti85_port_0003_r), FUNC(ti85_state::ti85_port_0003_w));
+	map(0x0004, 0x0004).rw(this, FUNC(ti85_state::ti85_port_0004_r), FUNC(ti85_state::ti85_port_0004_w));
+	map(0x0005, 0x0005).rw(this, FUNC(ti85_state::ti85_port_0005_r), FUNC(ti85_state::ti85_port_0005_w));
+	map(0x0007, 0x0007).w(this, FUNC(ti85_state::ti81_port_0007_w));
+}
 
-ADDRESS_MAP_START(ti85_state::ti85_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ti85_port_0000_r, ti85_port_0000_w )
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(ti85_port_0002_r, ti85_port_0002_w )
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(ti85_port_0003_r, ti85_port_0003_w )
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(ti85_port_0004_r, ti85_port_0004_w )
-	AM_RANGE(0x0005, 0x0005) AM_READWRITE(ti85_port_0005_r, ti85_port_0005_w )
-	AM_RANGE(0x0006, 0x0006) AM_READWRITE(ti85_port_0006_r, ti85_port_0006_w )
-	AM_RANGE(0x0007, 0x0007) AM_READWRITE(ti8x_serial_r, ti8x_serial_w )
-ADDRESS_MAP_END
+void ti85_state::ti85_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x0000).rw(this, FUNC(ti85_state::ti85_port_0000_r), FUNC(ti85_state::ti85_port_0000_w));
+	map(0x0001, 0x0001).rw(this, FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
+	map(0x0002, 0x0002).rw(this, FUNC(ti85_state::ti85_port_0002_r), FUNC(ti85_state::ti85_port_0002_w));
+	map(0x0003, 0x0003).rw(this, FUNC(ti85_state::ti85_port_0003_r), FUNC(ti85_state::ti85_port_0003_w));
+	map(0x0004, 0x0004).rw(this, FUNC(ti85_state::ti85_port_0004_r), FUNC(ti85_state::ti85_port_0004_w));
+	map(0x0005, 0x0005).rw(this, FUNC(ti85_state::ti85_port_0005_r), FUNC(ti85_state::ti85_port_0005_w));
+	map(0x0006, 0x0006).rw(this, FUNC(ti85_state::ti85_port_0006_r), FUNC(ti85_state::ti85_port_0006_w));
+	map(0x0007, 0x0007).rw(this, FUNC(ti85_state::ti8x_serial_r), FUNC(ti85_state::ti8x_serial_w));
+}
 
-ADDRESS_MAP_START(ti85_state::ti82_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ti8x_serial_r, ti8x_serial_w )
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(ti82_port_0002_r, ti82_port_0002_w )
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(ti85_port_0003_r, ti85_port_0003_w )
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(ti85_port_0004_r, ti85_port_0004_w )
-	AM_RANGE(0x0010, 0x0010) AM_DEVREADWRITE("t6a04", t6a04_device, control_read, control_write)
-	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE("t6a04", t6a04_device, data_read, data_write)
-ADDRESS_MAP_END
+void ti85_state::ti82_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x0000).rw(this, FUNC(ti85_state::ti8x_serial_r), FUNC(ti85_state::ti8x_serial_w));
+	map(0x0001, 0x0001).rw(this, FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
+	map(0x0002, 0x0002).rw(this, FUNC(ti85_state::ti82_port_0002_r), FUNC(ti85_state::ti82_port_0002_w));
+	map(0x0003, 0x0003).rw(this, FUNC(ti85_state::ti85_port_0003_r), FUNC(ti85_state::ti85_port_0003_w));
+	map(0x0004, 0x0004).rw(this, FUNC(ti85_state::ti85_port_0004_r), FUNC(ti85_state::ti85_port_0004_w));
+	map(0x0010, 0x0010).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
+	map(0x0011, 0x0011).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
+}
 
-ADDRESS_MAP_START(ti85_state::ti81v2_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(ti82_port_0002_r, ti82_port_0002_w )
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(ti85_port_0003_r, ti85_port_0003_w )
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(ti85_port_0004_r, ti85_port_0004_w )
-	AM_RANGE(0x0010, 0x0010) AM_DEVREADWRITE("t6a04", t6a04_device, control_read, control_write)
-	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE("t6a04", t6a04_device, data_read, data_write)
-ADDRESS_MAP_END
+void ti85_state::ti81v2_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0001, 0x0001).rw(this, FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
+	map(0x0002, 0x0002).rw(this, FUNC(ti85_state::ti82_port_0002_r), FUNC(ti85_state::ti82_port_0002_w));
+	map(0x0003, 0x0003).rw(this, FUNC(ti85_state::ti85_port_0003_r), FUNC(ti85_state::ti85_port_0003_w));
+	map(0x0004, 0x0004).rw(this, FUNC(ti85_state::ti85_port_0004_r), FUNC(ti85_state::ti85_port_0004_w));
+	map(0x0010, 0x0010).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
+	map(0x0011, 0x0011).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
+}
 
-ADDRESS_MAP_START(ti85_state::ti83_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ti83_port_0000_r, ti83_port_0000_w )  //TODO
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(ti83_port_0002_r, ti83_port_0002_w )
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(ti83_port_0003_r, ti83_port_0003_w )
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(ti85_port_0004_r, ti85_port_0004_w )
-	AM_RANGE(0x0010, 0x0010) AM_DEVREADWRITE("t6a04", t6a04_device, control_read, control_write)
-	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE("t6a04", t6a04_device, data_read, data_write)
-	AM_RANGE(0x0014, 0x0014) AM_READ_PORT( "BATTERY" )
-ADDRESS_MAP_END
+void ti85_state::ti83_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x0000).rw(this, FUNC(ti85_state::ti83_port_0000_r), FUNC(ti85_state::ti83_port_0000_w));  //TODO
+	map(0x0001, 0x0001).rw(this, FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
+	map(0x0002, 0x0002).rw(this, FUNC(ti85_state::ti83_port_0002_r), FUNC(ti85_state::ti83_port_0002_w));
+	map(0x0003, 0x0003).rw(this, FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83_port_0003_w));
+	map(0x0004, 0x0004).rw(this, FUNC(ti85_state::ti85_port_0004_r), FUNC(ti85_state::ti85_port_0004_w));
+	map(0x0010, 0x0010).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
+	map(0x0011, 0x0011).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
+	map(0x0014, 0x0014).portr("BATTERY");
+}
 
-ADDRESS_MAP_START(ti85_state::ti83p_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ti8x_plus_serial_r, ti8x_plus_serial_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
-	AM_RANGE(0x0002, 0x0002) AM_READ(ti83p_port_0002_r)
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(ti83_port_0003_r, ti83p_int_mask_w )
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(ti83p_port_0004_r, ti83p_port_0004_w )
-	AM_RANGE(0x0006, 0x0006) AM_READWRITE(ti86_port_0005_r, ti83p_port_0006_w )
-	AM_RANGE(0x0007, 0x0007) AM_READWRITE(ti86_port_0006_r, ti83p_port_0007_w )
-	AM_RANGE(0x0010, 0x0010) AM_DEVREADWRITE("t6a04", t6a04_device, control_read, control_write)
-	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE("t6a04", t6a04_device, data_read, data_write)
+void ti85_state::ti83p_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x0000).rw(this, FUNC(ti85_state::ti8x_plus_serial_r), FUNC(ti85_state::ti8x_plus_serial_w));
+	map(0x0001, 0x0001).rw(this, FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
+	map(0x0002, 0x0002).r(this, FUNC(ti85_state::ti83p_port_0002_r));
+	map(0x0003, 0x0003).rw(this, FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83p_int_mask_w));
+	map(0x0004, 0x0004).rw(this, FUNC(ti85_state::ti83p_port_0004_r), FUNC(ti85_state::ti83p_port_0004_w));
+	map(0x0006, 0x0006).rw(this, FUNC(ti85_state::ti86_port_0005_r), FUNC(ti85_state::ti83p_port_0006_w));
+	map(0x0007, 0x0007).rw(this, FUNC(ti85_state::ti86_port_0006_r), FUNC(ti85_state::ti83p_port_0007_w));
+	map(0x0010, 0x0010).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
+	map(0x0011, 0x0011).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
 //  AM_RANGE(0x0014, 0x0014) AM_WRITE(ti83p_port_0014_w )
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(ti85_state::ti83pse_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ti8x_plus_serial_r, ti8x_plus_serial_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(ti83pse_port_0002_r, ti83pse_int_ack_w )
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(ti83_port_0003_r, ti83p_int_mask_w )
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(ti83p_port_0004_r, ti83pse_port_0004_w )
-	AM_RANGE(0x0005, 0x0005) AM_READWRITE(ti83pse_port_0005_r, ti83pse_port_0005_w )
-	AM_RANGE(0x0006, 0x0006) AM_READWRITE(ti86_port_0005_r, ti83pse_port_0006_w )
-	AM_RANGE(0x0007, 0x0007) AM_READWRITE(ti86_port_0006_r, ti83pse_port_0007_w )
-	AM_RANGE(0x0009, 0x0009) AM_READ(ti83pse_port_0009_r)
-	AM_RANGE(0x0010, 0x0010) AM_DEVREADWRITE("t6a04", t6a04_device, control_read, control_write)
-	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE("t6a04", t6a04_device, data_read, data_write)
-	AM_RANGE(0x0012, 0x0012) AM_DEVREADWRITE("t6a04", t6a04_device, control_read, control_write)
-	AM_RANGE(0x0013, 0x0013) AM_DEVREADWRITE("t6a04", t6a04_device, data_read, data_write)
-	AM_RANGE(0x0014, 0x0014) AM_WRITE(ti83p_port_0014_w )
-	AM_RANGE(0x0015, 0x0015) AM_READ(ti83pse_port_0015_r)
-	AM_RANGE(0x0020, 0x0020) AM_READWRITE(ti83pse_port_0020_r, ti83pse_port_0020_w )
-	AM_RANGE(0x0021, 0x0021) AM_READWRITE(ti83pse_port_0021_r, ti83pse_port_0021_w )
+void ti85_state::ti83pse_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x0000).rw(this, FUNC(ti85_state::ti8x_plus_serial_r), FUNC(ti85_state::ti8x_plus_serial_w));
+	map(0x0001, 0x0001).rw(this, FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
+	map(0x0002, 0x0002).rw(this, FUNC(ti85_state::ti83pse_port_0002_r), FUNC(ti85_state::ti83pse_int_ack_w));
+	map(0x0003, 0x0003).rw(this, FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83p_int_mask_w));
+	map(0x0004, 0x0004).rw(this, FUNC(ti85_state::ti83p_port_0004_r), FUNC(ti85_state::ti83pse_port_0004_w));
+	map(0x0005, 0x0005).rw(this, FUNC(ti85_state::ti83pse_port_0005_r), FUNC(ti85_state::ti83pse_port_0005_w));
+	map(0x0006, 0x0006).rw(this, FUNC(ti85_state::ti86_port_0005_r), FUNC(ti85_state::ti83pse_port_0006_w));
+	map(0x0007, 0x0007).rw(this, FUNC(ti85_state::ti86_port_0006_r), FUNC(ti85_state::ti83pse_port_0007_w));
+	map(0x0009, 0x0009).r(this, FUNC(ti85_state::ti83pse_port_0009_r));
+	map(0x0010, 0x0010).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
+	map(0x0011, 0x0011).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
+	map(0x0012, 0x0012).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
+	map(0x0013, 0x0013).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
+	map(0x0014, 0x0014).w(this, FUNC(ti85_state::ti83p_port_0014_w));
+	map(0x0015, 0x0015).r(this, FUNC(ti85_state::ti83pse_port_0015_r));
+	map(0x0020, 0x0020).rw(this, FUNC(ti85_state::ti83pse_port_0020_r), FUNC(ti85_state::ti83pse_port_0020_w));
+	map(0x0021, 0x0021).rw(this, FUNC(ti85_state::ti83pse_port_0021_r), FUNC(ti85_state::ti83pse_port_0021_w));
 
-	AM_RANGE(0x0030, 0x0030) AM_READWRITE(ti83pse_ctimer1_setup_r, ti83pse_ctimer1_setup_w )
-	AM_RANGE(0x0031, 0x0031) AM_READWRITE(ti83pse_ctimer1_loop_r, ti83pse_ctimer1_loop_w )
-	AM_RANGE(0x0032, 0x0032) AM_READWRITE(ti83pse_ctimer1_count_r, ti83pse_ctimer1_count_w )
-	AM_RANGE(0x0033, 0x0033) AM_READWRITE(ti83pse_ctimer2_setup_r, ti83pse_ctimer2_setup_w )
-	AM_RANGE(0x0034, 0x0034) AM_READWRITE(ti83pse_ctimer2_loop_r, ti83pse_ctimer2_loop_w )
-	AM_RANGE(0x0035, 0x0035) AM_READWRITE(ti83pse_ctimer2_count_r, ti83pse_ctimer2_count_w )
-	AM_RANGE(0x0036, 0x0036) AM_READWRITE(ti83pse_ctimer3_setup_r, ti83pse_ctimer3_setup_w )
-	AM_RANGE(0x0037, 0x0037) AM_READWRITE(ti83pse_ctimer3_loop_r, ti83pse_ctimer3_loop_w )
-	AM_RANGE(0x0038, 0x0038) AM_READWRITE(ti83pse_ctimer3_count_r, ti83pse_ctimer3_count_w )
+	map(0x0030, 0x0030).rw(this, FUNC(ti85_state::ti83pse_ctimer1_setup_r), FUNC(ti85_state::ti83pse_ctimer1_setup_w));
+	map(0x0031, 0x0031).rw(this, FUNC(ti85_state::ti83pse_ctimer1_loop_r), FUNC(ti85_state::ti83pse_ctimer1_loop_w));
+	map(0x0032, 0x0032).rw(this, FUNC(ti85_state::ti83pse_ctimer1_count_r), FUNC(ti85_state::ti83pse_ctimer1_count_w));
+	map(0x0033, 0x0033).rw(this, FUNC(ti85_state::ti83pse_ctimer2_setup_r), FUNC(ti85_state::ti83pse_ctimer2_setup_w));
+	map(0x0034, 0x0034).rw(this, FUNC(ti85_state::ti83pse_ctimer2_loop_r), FUNC(ti85_state::ti83pse_ctimer2_loop_w));
+	map(0x0035, 0x0035).rw(this, FUNC(ti85_state::ti83pse_ctimer2_count_r), FUNC(ti85_state::ti83pse_ctimer2_count_w));
+	map(0x0036, 0x0036).rw(this, FUNC(ti85_state::ti83pse_ctimer3_setup_r), FUNC(ti85_state::ti83pse_ctimer3_setup_w));
+	map(0x0037, 0x0037).rw(this, FUNC(ti85_state::ti83pse_ctimer3_loop_r), FUNC(ti85_state::ti83pse_ctimer3_loop_w));
+	map(0x0038, 0x0038).rw(this, FUNC(ti85_state::ti83pse_ctimer3_count_r), FUNC(ti85_state::ti83pse_ctimer3_count_w));
 
-	AM_RANGE(0x0055, 0x0055) AM_READ(ti84pse_port_0055_r)
-	AM_RANGE(0x0056, 0x0056) AM_READ(ti84pse_port_0056_r)
-ADDRESS_MAP_END
+	map(0x0055, 0x0055).r(this, FUNC(ti85_state::ti84pse_port_0055_r));
+	map(0x0056, 0x0056).r(this, FUNC(ti85_state::ti84pse_port_0056_r));
+}
 
-ADDRESS_MAP_START(ti85_state::ti86_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ti85_port_0000_r, ti85_port_0000_w )
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(ti85_port_0002_r, ti85_port_0002_w )
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(ti85_port_0003_r, ti85_port_0003_w )
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(ti85_port_0006_r, ti85_port_0006_w )
-	AM_RANGE(0x0005, 0x0005) AM_READWRITE(ti86_port_0005_r, ti86_port_0005_w )
-	AM_RANGE(0x0006, 0x0006) AM_READWRITE(ti86_port_0006_r, ti86_port_0006_w )
-	AM_RANGE(0x0007, 0x0007) AM_READWRITE(ti8x_serial_r, ti8x_serial_w )
-ADDRESS_MAP_END
+void ti85_state::ti86_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x0000).rw(this, FUNC(ti85_state::ti85_port_0000_r), FUNC(ti85_state::ti85_port_0000_w));
+	map(0x0001, 0x0001).rw(this, FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
+	map(0x0002, 0x0002).rw(this, FUNC(ti85_state::ti85_port_0002_r), FUNC(ti85_state::ti85_port_0002_w));
+	map(0x0003, 0x0003).rw(this, FUNC(ti85_state::ti85_port_0003_r), FUNC(ti85_state::ti85_port_0003_w));
+	map(0x0004, 0x0004).rw(this, FUNC(ti85_state::ti85_port_0006_r), FUNC(ti85_state::ti85_port_0006_w));
+	map(0x0005, 0x0005).rw(this, FUNC(ti85_state::ti86_port_0005_r), FUNC(ti85_state::ti86_port_0005_w));
+	map(0x0006, 0x0006).rw(this, FUNC(ti85_state::ti86_port_0006_r), FUNC(ti85_state::ti86_port_0006_w));
+	map(0x0007, 0x0007).rw(this, FUNC(ti85_state::ti8x_serial_r), FUNC(ti85_state::ti8x_serial_w));
+}
 
 /* memory w/r functions */
 
-ADDRESS_MAP_START(ti85_state::ti81_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void ti85_state::ti81_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("bank2");
+	map(0x8000, 0xffff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(ti85_state::ti86_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void ti85_state::ti86_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
-ADDRESS_MAP_START(ti85_state::ti83pse_banked_mem)
-	AM_RANGE(0x0000, 0x1fffff) AM_DEVREADWRITE("flash", intelfsh8_device, read, write)
-	AM_RANGE(0x200000, 0x21BFFF) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void ti85_state::ti83pse_banked_mem(address_map &map)
+{
+	map(0x0000, 0x1fffff).rw(m_flash, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x200000, 0x21BFFF).ram().share("nvram");
+}
 
 
-ADDRESS_MAP_START(ti85_state::ti84p_banked_mem)
-	AM_RANGE(0x0000, 0xfffff) AM_DEVREADWRITE("flash", intelfsh8_device, read, write)
-	AM_RANGE(0x200000, 0x21BFFF) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void ti85_state::ti84p_banked_mem(address_map &map)
+{
+	map(0x0000, 0xfffff).rw(m_flash, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x200000, 0x21BFFF).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(ti85_state::ti83p_banked_mem)
-	AM_RANGE(0x00000, 0x7ffff) AM_DEVREADWRITE("flash", intelfsh8_device, read, write)
-	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void ti85_state::ti83p_banked_mem(address_map &map)
+{
+	map(0x00000, 0x7ffff).rw(m_flash, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x100000, 0x107fff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(ti85_state::ti83p_asic_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("membank1", address_map_bank_device, read8, write8)
-	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE("membank2", address_map_bank_device, write8) AM_READ(ti83p_membank2_r)
-	AM_RANGE(0x8000, 0xbfff) AM_DEVWRITE("membank3", address_map_bank_device, write8) AM_READ(ti83p_membank3_r)
-	AM_RANGE(0xc000, 0xffff) AM_DEVREADWRITE("membank4", address_map_bank_device, read8, write8)
-ADDRESS_MAP_END
+void ti85_state::ti83p_asic_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rw(m_membank1, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x4000, 0x7fff).w(m_membank2, FUNC(address_map_bank_device::write8)).r(this, FUNC(ti85_state::ti83p_membank2_r));
+	map(0x8000, 0xbfff).w(m_membank3, FUNC(address_map_bank_device::write8)).r(this, FUNC(ti85_state::ti83p_membank3_r));
+	map(0xc000, 0xffff).rw(m_membank4, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+}
 
 /* keyboard input */
 

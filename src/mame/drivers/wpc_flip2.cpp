@@ -9,19 +9,20 @@
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(wpc_flip2_state::wpc_flip2_map)
-	AM_RANGE(0x0000, 0x2fff) AM_READWRITE(ram_r,ram_w)
-	AM_RANGE(0x3000, 0x31ff) AM_RAMBANK("dmdbank1")
-	AM_RANGE(0x3200, 0x33ff) AM_RAMBANK("dmdbank2")
-	AM_RANGE(0x3400, 0x35ff) AM_RAMBANK("dmdbank3")
-	AM_RANGE(0x3600, 0x37ff) AM_RAMBANK("dmdbank4")
-	AM_RANGE(0x3800, 0x39ff) AM_RAMBANK("dmdbank5")
-	AM_RANGE(0x3a00, 0x3bff) AM_RAMBANK("dmdbank6")
-	AM_RANGE(0x3c00, 0x3faf) AM_RAM
-	AM_RANGE(0x3fb0, 0x3fff) AM_DEVREADWRITE("wpc",wpc_device,read,write) // WPC device
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("cpubank")
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("fixedbank")
-ADDRESS_MAP_END
+void wpc_flip2_state::wpc_flip2_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rw(this, FUNC(wpc_flip2_state::ram_r), FUNC(wpc_flip2_state::ram_w));
+	map(0x3000, 0x31ff).bankrw("dmdbank1");
+	map(0x3200, 0x33ff).bankrw("dmdbank2");
+	map(0x3400, 0x35ff).bankrw("dmdbank3");
+	map(0x3600, 0x37ff).bankrw("dmdbank4");
+	map(0x3800, 0x39ff).bankrw("dmdbank5");
+	map(0x3a00, 0x3bff).bankrw("dmdbank6");
+	map(0x3c00, 0x3faf).ram();
+	map(0x3fb0, 0x3fff).rw(m_wpc, FUNC(wpc_device::read), FUNC(wpc_device::write)); // WPC device
+	map(0x4000, 0x7fff).bankr("cpubank");
+	map(0x8000, 0xffff).bankr("fixedbank");
+}
 
 static INPUT_PORTS_START( wpc_flip2 )
 	PORT_START("INP0")

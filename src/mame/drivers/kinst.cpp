@@ -448,15 +448,16 @@ WRITE32_MEMBER(kinst_state::control_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(kinst_state::main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_SHARE("rambase2")
-	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE(control_r, control_w) AM_SHARE("control")
-	AM_RANGE(0x10000100, 0x1000013f) AM_READWRITE(ide_r, ide_w)
-	AM_RANGE(0x10000170, 0x10000173) AM_READWRITE(ide_extra_r, ide_extra_w)
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rombase")
-ADDRESS_MAP_END
+void kinst_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x0007ffff).ram().share("rambase");
+	map(0x08000000, 0x087fffff).ram().share("rambase2");
+	map(0x10000080, 0x100000ff).rw(this, FUNC(kinst_state::control_r), FUNC(kinst_state::control_w)).share("control");
+	map(0x10000100, 0x1000013f).rw(this, FUNC(kinst_state::ide_r), FUNC(kinst_state::ide_w));
+	map(0x10000170, 0x10000173).rw(this, FUNC(kinst_state::ide_extra_r), FUNC(kinst_state::ide_extra_w));
+	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0).share("rombase");
+}
 
 
 

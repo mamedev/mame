@@ -79,25 +79,26 @@ WRITE8_MEMBER(buster_state::coin_output_w)
 	// bit 7 enabled on spin
 }
 
-ADDRESS_MAP_START(buster_state::mainmap)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM// AM_SHARE("rom")
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("wram")
-	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x6001, 0x6001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x7c00, 0x7cff) AM_RAM // i/o, protected/exotic chip???
-	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN0")
-	AM_RANGE(0x7c82, 0x7c82) AM_READ_PORT("IN1")
-	AM_RANGE(0x7c84, 0x7c84) AM_READ_PORT("IN2")
-	AM_RANGE(0x7c86, 0x7c86) AM_READ_PORT("IN3")
-	AM_RANGE(0x7c88, 0x7c88) AM_READ_PORT("IN4")
-	AM_RANGE(0x7c8a, 0x7c8a) AM_READ_PORT("IN5")
-	AM_RANGE(0x7c8c, 0x7c8c) AM_READ_PORT("IN6")
-	AM_RANGE(0x7c8e, 0x7c8e) AM_READ_PORT("IN7")
-	AM_RANGE(0x7cb0, 0x7cb7) AM_WRITE(coin_output_w)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("wram") // ???
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM // nvram?
-ADDRESS_MAP_END
+void buster_state::mainmap(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();// AM_SHARE("rom")
+	map(0x4000, 0x47ff).ram().share("wram");
+	map(0x5000, 0x5fff).ram().share("vram");
+	map(0x6000, 0x6000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x6001, 0x6001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x7c00, 0x7cff).ram(); // i/o, protected/exotic chip???
+	map(0x7c80, 0x7c80).portr("IN0");
+	map(0x7c82, 0x7c82).portr("IN1");
+	map(0x7c84, 0x7c84).portr("IN2");
+	map(0x7c86, 0x7c86).portr("IN3");
+	map(0x7c88, 0x7c88).portr("IN4");
+	map(0x7c8a, 0x7c8a).portr("IN5");
+	map(0x7c8c, 0x7c8c).portr("IN6");
+	map(0x7c8e, 0x7c8e).portr("IN7");
+	map(0x7cb0, 0x7cb7).w(this, FUNC(buster_state::coin_output_w));
+	map(0x8800, 0x8fff).ram().share("wram"); // ???
+	map(0xa000, 0xa0ff).ram(); // nvram?
+}
 
 
 

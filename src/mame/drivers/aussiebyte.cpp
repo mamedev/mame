@@ -43,44 +43,46 @@
 
 ************************************************************/
 
-ADDRESS_MAP_START(aussiebyte_state::aussiebyte_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank2")
-	AM_RANGE(0xc000, 0xffff) AM_RAM AM_REGION("mram", 0x0000)
-ADDRESS_MAP_END
+void aussiebyte_state::aussiebyte_map(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bankr0").bankw("bankw0");
+	map(0x4000, 0x7fff).bankrw("bank1");
+	map(0x8000, 0xbfff).bankrw("bank2");
+	map(0xc000, 0xffff).ram().region("mram", 0x0000);
+}
 
-ADDRESS_MAP_START(aussiebyte_state::aussiebyte_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("sio1", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("pio1", z80pio_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_NOP // winchester interface
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", wd2797_device, read, write)
-	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE("dma", z80dma_device, read, write)
-	AM_RANGE(0x15, 0x15) AM_WRITE(port15_w) // boot rom disable
-	AM_RANGE(0x16, 0x16) AM_WRITE(port16_w) // fdd select
-	AM_RANGE(0x17, 0x17) AM_WRITE(port17_w) // DMA mux
-	AM_RANGE(0x18, 0x18) AM_WRITE(port18_w) // fdc select
-	AM_RANGE(0x19, 0x19) AM_READ(port19_r) // info port
-	AM_RANGE(0x1a, 0x1a) AM_WRITE(port1a_w) // membank
-	AM_RANGE(0x1b, 0x1b) AM_WRITE(port1b_w) // winchester control
-	AM_RANGE(0x1c, 0x1f) AM_WRITE(port1c_w) // gpebh select
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("pio2", z80pio_device, read, write)
-	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("sio2", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x28, 0x28) AM_READ(port28_r) AM_DEVWRITE("votrax", votrax_sc01_device, write)
-	AM_RANGE(0x2c, 0x2c) AM_DEVWRITE("votrax", votrax_sc01_device, inflection_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(address_w)
-	AM_RANGE(0x31, 0x31) AM_DEVREAD("crtc", mc6845_device, status_r)
-	AM_RANGE(0x32, 0x32) AM_WRITE(register_w)
-	AM_RANGE(0x33, 0x33) AM_READ(port33_r)
-	AM_RANGE(0x34, 0x34) AM_WRITE(port34_w) // video control
-	AM_RANGE(0x35, 0x35) AM_WRITE(port35_w) // data to vram and aram
-	AM_RANGE(0x36, 0x36) AM_READ(port36_r) // data from vram and aram
-	AM_RANGE(0x37, 0x37) AM_READ(port37_r) // read dispen flag
-	AM_RANGE(0x40, 0x4f) AM_READWRITE(rtc_r, rtc_w)
-ADDRESS_MAP_END
+void aussiebyte_state::aussiebyte_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x04, 0x07).rw(m_pio1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x08, 0x0b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x0c, 0x0f).noprw(); // winchester interface
+	map(0x10, 0x13).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write));
+	map(0x14, 0x14).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x15, 0x15).w(this, FUNC(aussiebyte_state::port15_w)); // boot rom disable
+	map(0x16, 0x16).w(this, FUNC(aussiebyte_state::port16_w)); // fdd select
+	map(0x17, 0x17).w(this, FUNC(aussiebyte_state::port17_w)); // DMA mux
+	map(0x18, 0x18).w(this, FUNC(aussiebyte_state::port18_w)); // fdc select
+	map(0x19, 0x19).r(this, FUNC(aussiebyte_state::port19_r)); // info port
+	map(0x1a, 0x1a).w(this, FUNC(aussiebyte_state::port1a_w)); // membank
+	map(0x1b, 0x1b).w(this, FUNC(aussiebyte_state::port1b_w)); // winchester control
+	map(0x1c, 0x1f).w(this, FUNC(aussiebyte_state::port1c_w)); // gpebh select
+	map(0x20, 0x23).rw(m_pio2, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x24, 0x27).rw("sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x28, 0x28).r(this, FUNC(aussiebyte_state::port28_r)).w(m_votrax, FUNC(votrax_sc01_device::write));
+	map(0x2c, 0x2c).w(m_votrax, FUNC(votrax_sc01_device::inflection_w));
+	map(0x30, 0x30).w(this, FUNC(aussiebyte_state::address_w));
+	map(0x31, 0x31).r(m_crtc, FUNC(mc6845_device::status_r));
+	map(0x32, 0x32).w(this, FUNC(aussiebyte_state::register_w));
+	map(0x33, 0x33).r(this, FUNC(aussiebyte_state::port33_r));
+	map(0x34, 0x34).w(this, FUNC(aussiebyte_state::port34_w)); // video control
+	map(0x35, 0x35).w(this, FUNC(aussiebyte_state::port35_w)); // data to vram and aram
+	map(0x36, 0x36).r(this, FUNC(aussiebyte_state::port36_r)); // data from vram and aram
+	map(0x37, 0x37).r(this, FUNC(aussiebyte_state::port37_r)); // read dispen flag
+	map(0x40, 0x4f).rw(this, FUNC(aussiebyte_state::rtc_r), FUNC(aussiebyte_state::rtc_w));
+}
 
 /***********************************************************
 

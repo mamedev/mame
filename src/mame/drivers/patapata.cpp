@@ -182,23 +182,24 @@ also
 
 */
 
-ADDRESS_MAP_START(patapata_state::main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void patapata_state::main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN0")
-	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("IN1")
-	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW1")
-	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100014, 0x100015) AM_WRITE8(flipscreen_w, 0x00ff)
-	AM_RANGE(0x110000, 0x1103ff) AM_RAM AM_SHARE("videoregs")
-	AM_RANGE(0x120000, 0x1205ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x130000, 0x13ffff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x140000, 0x14ffff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x150000, 0x150001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x150010, 0x150011) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x150020, 0x15002f) AM_DEVWRITE8("nmk112", nmk112_device, okibank_w, 0x00ff)
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM // mainram?
-ADDRESS_MAP_END
+	map(0x100000, 0x100001).portr("IN0");
+	map(0x100002, 0x100003).portr("IN1");
+	map(0x100008, 0x100009).portr("DSW1");
+	map(0x10000a, 0x10000b).portr("DSW2");
+	map(0x100015, 0x100015).w(this, FUNC(patapata_state::flipscreen_w));
+	map(0x110000, 0x1103ff).ram().share("videoregs");
+	map(0x120000, 0x1205ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x130000, 0x13ffff).ram().w(this, FUNC(patapata_state::fg_videoram_w)).share("fg_videoram");
+	map(0x140000, 0x14ffff).ram().w(this, FUNC(patapata_state::bg_videoram_w)).share("bg_videoram");
+	map(0x150001, 0x150001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x150011, 0x150011).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x150020, 0x15002f).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
+	map(0x180000, 0x18ffff).ram(); // mainram?
+}
 
 static INPUT_PORTS_START( patapata )
 	PORT_START("IN0")

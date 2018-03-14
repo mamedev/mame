@@ -19,53 +19,58 @@
 
 
 /* Address maps */
-ADDRESS_MAP_START(special_state::specialist_mem)
-	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
-	AM_RANGE( 0x3000, 0x8fff ) AM_RAM  // RAM
-	AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_SHARE("videoram") // Video RAM
-	AM_RANGE( 0xc000, 0xefff ) AM_ROM  // System ROM
-	AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void special_state::specialist_mem(address_map &map)
+{
+	map(0x0000, 0x2fff).bankrw("bank1"); // First bank
+	map(0x3000, 0x8fff).ram();  // RAM
+	map(0x9000, 0xbfff).ram().share("videoram"); // Video RAM
+	map(0xc000, 0xefff).rom();  // System ROM
+	map(0xf800, 0xf803).mirror(0x7fc).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(special_state::specialp_mem)
-	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
-	AM_RANGE( 0x3000, 0x7fff ) AM_RAM  // RAM
-	AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_SHARE("videoram") // Video RAM
-	AM_RANGE( 0xc000, 0xefff ) AM_ROM  // System ROM
-	AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void special_state::specialp_mem(address_map &map)
+{
+	map(0x0000, 0x2fff).bankrw("bank1"); // First bank
+	map(0x3000, 0x7fff).ram();  // RAM
+	map(0x8000, 0xbfff).ram().share("videoram"); // Video RAM
+	map(0xc000, 0xefff).rom();  // System ROM
+	map(0xf800, 0xf803).mirror(0x7fc).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(special_state::erik_mem)
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x4000, 0x8fff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0x9000, 0xbfff ) AM_RAMBANK("bank3")
-	AM_RANGE( 0xc000, 0xefff ) AM_RAMBANK("bank4")
-	AM_RANGE( 0xf000, 0xf7ff ) AM_RAMBANK("bank5")
-	AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank6")
-ADDRESS_MAP_END
+void special_state::erik_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x8fff).bankrw("bank2");
+	map(0x9000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xefff).bankrw("bank4");
+	map(0xf000, 0xf7ff).bankrw("bank5");
+	map(0xf800, 0xffff).bankrw("bank6");
+}
 
-ADDRESS_MAP_START(special_state::erik_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf1, 0xf1) AM_READWRITE(erik_rr_reg_r, erik_rr_reg_w)
-	AM_RANGE(0xf2, 0xf2) AM_READWRITE(erik_rc_reg_r, erik_rc_reg_w)
-	AM_RANGE(0xf3, 0xf3) AM_READWRITE(erik_disk_reg_r, erik_disk_reg_w)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("fd1793", fd1793_device, read, write)
-ADDRESS_MAP_END
+void special_state::erik_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf1, 0xf1).rw(this, FUNC(special_state::erik_rr_reg_r), FUNC(special_state::erik_rr_reg_w));
+	map(0xf2, 0xf2).rw(this, FUNC(special_state::erik_rc_reg_r), FUNC(special_state::erik_rc_reg_w));
+	map(0xf3, 0xf3).rw(this, FUNC(special_state::erik_disk_reg_r), FUNC(special_state::erik_disk_reg_w));
+	map(0xf4, 0xf7).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+}
 
-ADDRESS_MAP_START(special_state::specimx_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x8fff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x9000, 0xbfff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0xc000, 0xffbf ) AM_RAMBANK("bank3")
-	AM_RANGE( 0xffc0, 0xffdf ) AM_RAMBANK("bank4")
-	AM_RANGE( 0xffe0, 0xffe3 ) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE( 0xffe4, 0xffe7 ) AM_RAM //external 8255
-	AM_RANGE( 0xffe8, 0xffeb ) AM_DEVREADWRITE("fd1793", fd1793_device, read, write)
-	AM_RANGE( 0xffec, 0xffef ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE( 0xfff0, 0xfff3 ) AM_READWRITE(specimx_disk_ctrl_r, specimx_disk_ctrl_w)
-	AM_RANGE( 0xfff8, 0xfffb ) AM_READWRITE(specimx_video_color_r,specimx_video_color_w)
-	AM_RANGE( 0xfffc, 0xffff ) AM_WRITE(specimx_select_bank)
-ADDRESS_MAP_END
+void special_state::specimx_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x8fff).bankrw("bank1");
+	map(0x9000, 0xbfff).bankrw("bank2");
+	map(0xc000, 0xffbf).bankrw("bank3");
+	map(0xffc0, 0xffdf).bankrw("bank4");
+	map(0xffe0, 0xffe3).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xffe4, 0xffe7).ram(); //external 8255
+	map(0xffe8, 0xffeb).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0xffec, 0xffef).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xfff0, 0xfff3).rw(this, FUNC(special_state::specimx_disk_ctrl_r), FUNC(special_state::specimx_disk_ctrl_w));
+	map(0xfff8, 0xfffb).rw(this, FUNC(special_state::specimx_video_color_r), FUNC(special_state::specimx_video_color_w));
+	map(0xfffc, 0xffff).w(this, FUNC(special_state::specimx_select_bank));
+}
 
 /* Input ports */
 

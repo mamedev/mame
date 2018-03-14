@@ -59,28 +59,30 @@ private:
 };
 
 
-ADDRESS_MAP_START(mc8030_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
+void mc8030_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
 	//  ZRE 4 * 2KB
-	AM_RANGE(0x0000, 0x1fff) AM_ROM // ZRE ROM's 4 * 2716
-	AM_RANGE(0x2000, 0x27ff) AM_ROM // SPE ROM's 2 * 2708
-	AM_RANGE(0x2800, 0x3fff) AM_ROM // For extension
-	AM_RANGE(0x4000, 0xbfff) AM_RAM // SPE RAM
-	AM_RANGE(0xc000, 0xffff) AM_RAM // ZRE RAM
-ADDRESS_MAP_END
+	map(0x0000, 0x1fff).rom(); // ZRE ROM's 4 * 2716
+	map(0x2000, 0x27ff).rom(); // SPE ROM's 2 * 2708
+	map(0x2800, 0x3fff).rom(); // For extension
+	map(0x4000, 0xbfff).ram(); // SPE RAM
+	map(0xc000, 0xffff).ram(); // ZRE RAM
+}
 
-ADDRESS_MAP_START(mc8030_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x30, 0x3f) AM_MIRROR(0xff00) AM_NOP //"mass storage"
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0xff00) AM_DEVREADWRITE("zve_ctc", z80ctc_device, read, write) // user CTC
-	AM_RANGE(0x84, 0x87) AM_MIRROR(0xff00) AM_DEVREADWRITE("zve_pio", z80pio_device, read, write) // PIO unknown usage
-	AM_RANGE(0x88, 0x8f) AM_MIRROR(0xff00) AM_WRITE(zve_write_protect_w)
-	AM_RANGE(0xc0, 0xcf) AM_SELECT(0xff00) AM_WRITE(vis_w)
-	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_sio", z80sio_device, ba_cd_r, ba_cd_w) // keyboard & IFSS?
-	AM_RANGE(0xd4, 0xd7) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_ctc", z80ctc_device, read, write) // sio bauds, KMBG? and kbd
-	AM_RANGE(0xd8, 0xdb) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_pio", z80pio_device, read, write) // external bus
-	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(eprom_prog_w)
-ADDRESS_MAP_END
+void mc8030_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x30, 0x3f).mirror(0xff00).noprw(); //"mass storage"
+	map(0x80, 0x83).mirror(0xff00).rw("zve_ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // user CTC
+	map(0x84, 0x87).mirror(0xff00).rw("zve_pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // PIO unknown usage
+	map(0x88, 0x8f).mirror(0xff00).w(this, FUNC(mc8030_state::zve_write_protect_w));
+	map(0xc0, 0xcf).select(0xff00).w(this, FUNC(mc8030_state::vis_w));
+	map(0xd0, 0xd3).mirror(0xff00).rw("asp_sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)); // keyboard & IFSS?
+	map(0xd4, 0xd7).mirror(0xff00).rw("asp_ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // sio bauds, KMBG? and kbd
+	map(0xd8, 0xdb).mirror(0xff00).rw("asp_pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // external bus
+	map(0xe0, 0xef).mirror(0xff00).w(this, FUNC(mc8030_state::eprom_prog_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mc8030 )

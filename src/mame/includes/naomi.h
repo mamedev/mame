@@ -59,8 +59,7 @@ class naomi_state : public dc_state
 	DECLARE_DRIVER_INIT(hotd2);
 	DECLARE_DRIVER_INIT(naomi_mp);
 
-	DECLARE_READ64_MEMBER( naomi_unknown1_r );
-	DECLARE_WRITE64_MEMBER( naomi_unknown1_w );
+	DECLARE_READ16_MEMBER( naomi_g2bus_r );
 	DECLARE_READ64_MEMBER( eeprom_93c46a_r );
 	DECLARE_WRITE64_MEMBER( eeprom_93c46a_w );
 
@@ -127,9 +126,7 @@ public:
 	DECLARE_WRITE64_MEMBER( aw_flash_w );
 	DECLARE_READ64_MEMBER( aw_modem_r );
 	DECLARE_WRITE64_MEMBER( aw_modem_w );
-	DECLARE_READ64_MEMBER( aw_unknown1_r );
-	DECLARE_WRITE64_MEMBER( aw_unknown1_w );
-
+	
 	DECLARE_DRIVER_INIT(atomiswave);
 	DECLARE_DRIVER_INIT(xtrmhnt2);
 

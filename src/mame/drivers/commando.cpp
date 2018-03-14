@@ -56,37 +56,40 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(commando_state::commando_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(commando_c804_w)
-	AM_RANGE(0xc808, 0xc809) AM_WRITE(commando_scrollx_w)
-	AM_RANGE(0xc80a, 0xc80b) AM_WRITE(commando_scrolly_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(commando_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(commando_colorram2_w) AM_SHARE("colorram2")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(commando_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(commando_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xff7f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xff80, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void commando_state::commando_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc000).portr("SYSTEM");
+	map(0xc001, 0xc001).portr("P1");
+	map(0xc002, 0xc002).portr("P2");
+	map(0xc003, 0xc003).portr("DSW1");
+	map(0xc004, 0xc004).portr("DSW2");
+	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc804, 0xc804).w(this, FUNC(commando_state::commando_c804_w));
+	map(0xc808, 0xc809).w(this, FUNC(commando_state::commando_scrollx_w));
+	map(0xc80a, 0xc80b).w(this, FUNC(commando_state::commando_scrolly_w));
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(commando_state::commando_videoram2_w)).share("videoram2");
+	map(0xd400, 0xd7ff).ram().w(this, FUNC(commando_state::commando_colorram2_w)).share("colorram2");
+	map(0xd800, 0xdbff).ram().w(this, FUNC(commando_state::commando_videoram_w)).share("videoram");
+	map(0xdc00, 0xdfff).ram().w(this, FUNC(commando_state::commando_colorram_w)).share("colorram");
+	map(0xe000, 0xfdff).ram();
+	map(0xfe00, 0xff7f).ram().share("spriteram");
+	map(0xff80, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(commando_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void commando_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom().share("decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(commando_state::sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ym2", ym2203_device, write)
-ADDRESS_MAP_END
+void commando_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x8001).w("ym1", FUNC(ym2203_device::write));
+	map(0x8002, 0x8003).w("ym2", FUNC(ym2203_device::write));
+}
 
 /* Input Ports */
 

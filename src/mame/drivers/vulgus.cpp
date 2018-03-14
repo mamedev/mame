@@ -58,32 +58,34 @@ INTERRUPT_GEN_MEMBER(vulgus_state::vblank_irq)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h - vblank */
 }
 
-ADDRESS_MAP_START(vulgus_state::main_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc801, 0xc801) AM_WRITENOP // ?
-	AM_RANGE(0xc802, 0xc803) AM_RAM AM_SHARE("scroll_low")
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(c804_w)
-	AM_RANGE(0xc805, 0xc805) AM_WRITE(palette_bank_w)
-	AM_RANGE(0xc902, 0xc903) AM_RAM AM_SHARE("scroll_high")
-	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void vulgus_state::main_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xc000, 0xc000).portr("SYSTEM");
+	map(0xc001, 0xc001).portr("P1");
+	map(0xc002, 0xc002).portr("P2");
+	map(0xc003, 0xc003).portr("DSW1");
+	map(0xc004, 0xc004).portr("DSW2");
+	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc801, 0xc801).nopw(); // ?
+	map(0xc802, 0xc803).ram().share("scroll_low");
+	map(0xc804, 0xc804).w(this, FUNC(vulgus_state::c804_w));
+	map(0xc805, 0xc805).w(this, FUNC(vulgus_state::palette_bank_w));
+	map(0xc902, 0xc903).ram().share("scroll_high");
+	map(0xcc00, 0xcc7f).ram().share("spriteram");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(vulgus_state::fgvideoram_w)).share("fgvideoram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(vulgus_state::bgvideoram_w)).share("bgvideoram");
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(vulgus_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void vulgus_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0xc000, 0xc001).w("ay2", FUNC(ay8910_device::address_data_w));
+}
 
 
 static INPUT_PORTS_START( vulgus )

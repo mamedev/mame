@@ -17,20 +17,22 @@
 
 
 /* Address maps */
-ADDRESS_MAP_START(pecom_state::pecom64_mem)
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0x8000, 0xbfff ) AM_ROM  // ROM 1
-	AM_RANGE( 0xc000, 0xf3ff ) AM_ROM  // ROM 2
-	AM_RANGE( 0xf000, 0xf7ff ) AM_RAMBANK("bank3") // CDP1869 / ROM
-	AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank4") // CDP1869 / ROM
-ADDRESS_MAP_END
+void pecom_state::pecom64_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).rom();  // ROM 1
+	map(0xc000, 0xf3ff).rom();  // ROM 2
+	map(0xf000, 0xf7ff).bankrw("bank3"); // CDP1869 / ROM
+	map(0xf800, 0xffff).bankrw("bank4"); // CDP1869 / ROM
+}
 
-ADDRESS_MAP_START(pecom_state::pecom64_io)
-	AM_RANGE(0x01, 0x01) AM_WRITE(pecom_bank_w)
-	AM_RANGE(0x03, 0x03) AM_READ(pecom_keyboard_r)
-	AM_RANGE(0x03, 0x07) AM_WRITE(pecom_cdp1869_w)
-ADDRESS_MAP_END
+void pecom_state::pecom64_io(address_map &map)
+{
+	map(0x01, 0x01).w(this, FUNC(pecom_state::pecom_bank_w));
+	map(0x03, 0x03).r(this, FUNC(pecom_state::pecom_keyboard_r));
+	map(0x03, 0x07).w(this, FUNC(pecom_state::pecom_cdp1869_w));
+}
 
 /* Input ports */
 /* Pecom 64 keyboard layout is as follows

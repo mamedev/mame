@@ -107,17 +107,18 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #define X601_CLOCK      XTAL(16'934'400)
 
 
-ADDRESS_MAP_START(_3do_state::_3do_mem)
-	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK("bank1") AM_SHARE("dram")                       /* DRAM */
-	AM_RANGE(0x00200000, 0x003FFFFF) AM_RAM AM_SHARE("vram")                                    /* VRAM */
-	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK("bank2")                                    /* BIOS */
-	AM_RANGE(0x03100000, 0x0313FFFF) AM_RAM                                                 /* Brooktree? */
-	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE8(_3do_nvarea_r, _3do_nvarea_w, 0x000000ff)                /* NVRAM */
-	AM_RANGE(0x03180000, 0x031BFFFF) AM_READWRITE(_3do_slow2_r, _3do_slow2_w)               /* Slow bus - additional expansion */
-	AM_RANGE(0x03200000, 0x0320FFFF) AM_READWRITE(_3do_svf_r, _3do_svf_w)                   /* special vram access1 */
-	AM_RANGE(0x03300000, 0x033FFFFF) AM_READWRITE(_3do_madam_r, _3do_madam_w)               /* address decoder */
-	AM_RANGE(0x03400000, 0x034FFFFF) AM_READWRITE(_3do_clio_r, _3do_clio_w)                 /* io controller */
-ADDRESS_MAP_END
+void _3do_state::_3do_mem(address_map &map)
+{
+	map(0x00000000, 0x001FFFFF).bankrw("bank1").share("dram");                       /* DRAM */
+	map(0x00200000, 0x003FFFFF).ram().share("vram");                                    /* VRAM */
+	map(0x03000000, 0x030FFFFF).bankr("bank2");                                    /* BIOS */
+	map(0x03100000, 0x0313FFFF).ram();                                                 /* Brooktree? */
+	map(0x03140000, 0x0315FFFF).rw(this, FUNC(_3do_state::_3do_nvarea_r), FUNC(_3do_state::_3do_nvarea_w)).umask32(0x000000ff);                /* NVRAM */
+	map(0x03180000, 0x031BFFFF).rw(this, FUNC(_3do_state::_3do_slow2_r), FUNC(_3do_state::_3do_slow2_w));               /* Slow bus - additional expansion */
+	map(0x03200000, 0x0320FFFF).rw(this, FUNC(_3do_state::_3do_svf_r), FUNC(_3do_state::_3do_svf_w));                   /* special vram access1 */
+	map(0x03300000, 0x033FFFFF).rw(this, FUNC(_3do_state::_3do_madam_r), FUNC(_3do_state::_3do_madam_w));               /* address decoder */
+	map(0x03400000, 0x034FFFFF).rw(this, FUNC(_3do_state::_3do_clio_r), FUNC(_3do_state::_3do_clio_w));                 /* io controller */
+}
 
 
 static INPUT_PORTS_START( 3do )

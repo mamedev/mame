@@ -174,27 +174,29 @@ void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 //      floppy->ss_w(BIT(data, 4));
 //}
 
-ADDRESS_MAP_START(amust_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-ADDRESS_MAP_END
+void amust_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xf7ff).ram();
+	map(0xf800, 0xffff).bankr("bankr0").bankw("bankw0");
+}
 
-ADDRESS_MAP_START(amust_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
-	AM_RANGE(0x0d, 0x0d) AM_READNOP AM_WRITE(port0d_w)
-	AM_RANGE(0x0e, 0x0e) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x0f, 0x0f) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x10, 0x11) AM_DEVICE("fdc", upd765a_device, map)
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-ADDRESS_MAP_END
+void amust_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x01, 0x01).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x02, 0x02).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x03, 0x03).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x04, 0x07).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x0b).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0d, 0x0d).nopr().w(this, FUNC(amust_state::port0d_w));
+	map(0x0e, 0x0e).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x0f, 0x0f).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x10, 0x11).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x14, 0x17).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+}
 
 static SLOT_INTERFACE_START( amust_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )

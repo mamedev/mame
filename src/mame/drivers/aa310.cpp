@@ -188,14 +188,15 @@ void aa310_state::machine_reset()
 	archimedes_reset();
 }
 
-ADDRESS_MAP_START(aa310_state::aa310_mem)
-	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
-	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
-	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
-	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("extension", 0x000000) AM_WRITE(archimedes_vidc_w)
-	AM_RANGE(0x03600000, 0x037fffff) AM_ROM AM_REGION("extension", 0x200000) AM_WRITE(archimedes_memc_w)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_memc_page_w)
-ADDRESS_MAP_END
+void aa310_state::aa310_mem(address_map &map)
+{
+	map(0x00000000, 0x01ffffff).rw(this, FUNC(aa310_state::archimedes_memc_logical_r), FUNC(aa310_state::archimedes_memc_logical_w));
+	map(0x02000000, 0x02ffffff).ram().share("physicalram"); /* physical RAM - 16 MB for now, should be 512k for the A310 */
+	map(0x03000000, 0x033fffff).rw(this, FUNC(aa310_state::archimedes_ioc_r), FUNC(aa310_state::archimedes_ioc_w));
+	map(0x03400000, 0x035fffff).rom().region("extension", 0x000000).w(this, FUNC(aa310_state::archimedes_vidc_w));
+	map(0x03600000, 0x037fffff).rom().region("extension", 0x200000).w(this, FUNC(aa310_state::archimedes_memc_w));
+	map(0x03800000, 0x03ffffff).rom().region("maincpu", 0).w(this, FUNC(aa310_state::archimedes_memc_page_w));
+}
 
 
 INPUT_CHANGED_MEMBER(aa310_state::key_stroke)

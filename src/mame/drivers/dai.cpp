@@ -67,22 +67,24 @@ Timings:
 #include "speaker.h"
 
 /* I/O ports */
-ADDRESS_MAP_START(dai_state::dai_io)
-ADDRESS_MAP_END
+void dai_state::dai_io(address_map &map)
+{
+}
 
 /* memory w/r functions */
-ADDRESS_MAP_START(dai_state::dai_mem)
-	AM_RANGE( 0x0000, 0xbfff) AM_RAMBANK("bank1")
-	AM_RANGE( 0xc000, 0xdfff) AM_ROM
-	AM_RANGE( 0xe000, 0xefff) AM_ROMBANK("bank2")
-	AM_RANGE( 0xf000, 0xf7ff) AM_WRITE(dai_stack_interrupt_circuit_w )
-	AM_RANGE( 0xf800, 0xf8ff) AM_RAM
-	AM_RANGE( 0xfb00, 0xfbff) AM_READWRITE(dai_amd9511_r, dai_amd9511_w )
-	AM_RANGE( 0xfc00, 0xfcff) AM_READWRITE(dai_pit_r, dai_pit_w) // AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE( 0xfd00, 0xfdff) AM_READWRITE(dai_io_discrete_devices_r, dai_io_discrete_devices_w )
-	AM_RANGE( 0xfe00, 0xfeff) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE( 0xff00, 0xff0f) AM_MIRROR(0xf0) AM_DEVICE("tms5501", tms5501_device, io_map)
-ADDRESS_MAP_END
+void dai_state::dai_mem(address_map &map)
+{
+	map(0x0000, 0xbfff).bankrw("bank1");
+	map(0xc000, 0xdfff).rom();
+	map(0xe000, 0xefff).bankr("bank2");
+	map(0xf000, 0xf7ff).w(this, FUNC(dai_state::dai_stack_interrupt_circuit_w));
+	map(0xf800, 0xf8ff).ram();
+	map(0xfb00, 0xfbff).rw(this, FUNC(dai_state::dai_amd9511_r), FUNC(dai_state::dai_amd9511_w));
+	map(0xfc00, 0xfcff).rw(this, FUNC(dai_state::dai_pit_r), FUNC(dai_state::dai_pit_w)); // AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+	map(0xfd00, 0xfdff).rw(this, FUNC(dai_state::dai_io_discrete_devices_r), FUNC(dai_state::dai_io_discrete_devices_w));
+	map(0xfe00, 0xfeff).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xff00, 0xff0f).mirror(0xf0).m(m_tms5501, FUNC(tms5501_device::io_map));
+}
 
 
 /* keyboard input */

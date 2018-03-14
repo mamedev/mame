@@ -229,28 +229,30 @@ READ16_MEMBER( paso1600_state::test_hi_r )
 	return 0xffff;
 }
 
-ADDRESS_MAP_START(paso1600_state::paso1600_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0x7ffff) AM_RAM
-	AM_RANGE(0xb0000,0xb0fff) AM_RAM AM_SHARE("vram") // tvram
-	AM_RANGE(0xbfff0,0xbffff) AM_READWRITE8(paso1600_pcg_r,paso1600_pcg_w,0xffff)
-	AM_RANGE(0xc0000,0xdffff) AM_RAM AM_SHARE("gvram")// gvram
-	AM_RANGE(0xe0000,0xeffff) AM_ROM AM_REGION("kanji",0)// kanji rom, banked via port 0x93
-	AM_RANGE(0xfe000,0xfffff) AM_ROM AM_REGION("ipl", 0)
-ADDRESS_MAP_END
+void paso1600_state::paso1600_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x7ffff).ram();
+	map(0xb0000, 0xb0fff).ram().share("vram"); // tvram
+	map(0xbfff0, 0xbffff).rw(this, FUNC(paso1600_state::paso1600_pcg_r), FUNC(paso1600_state::paso1600_pcg_w));
+	map(0xc0000, 0xdffff).ram().share("gvram");// gvram
+	map(0xe0000, 0xeffff).rom().region("kanji", 0);// kanji rom, banked via port 0x93
+	map(0xfe000, 0xfffff).rom().region("ipl", 0);
+}
 
-ADDRESS_MAP_START(paso1600_state::paso1600_io)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000,0x000f) AM_DEVREADWRITE8("8237dma", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0010,0x0011) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff) // i8259
-	AM_RANGE(0x001a,0x001b) AM_READ(test_hi_r) // causes RAM error otherwise?
-	AM_RANGE(0x0030,0x0033) AM_READWRITE8(key_r,key_w,0xffff) //UART keyboard?
-	AM_RANGE(0x0048,0x0049) AM_READ(test_hi_r)
-	AM_RANGE(0x0090,0x0091) AM_READWRITE8(paso1600_6845_status_r,paso1600_6845_address_w,0x00ff)
-	AM_RANGE(0x0090,0x0091) AM_READWRITE8(paso1600_6845_data_r,paso1600_6845_data_w,0xff00)
+void paso1600_state::paso1600_io(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x0000, 0x000f).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x0010, 0x0011).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)); // i8259
+	map(0x001a, 0x001b).r(this, FUNC(paso1600_state::test_hi_r)); // causes RAM error otherwise?
+	map(0x0030, 0x0033).rw(this, FUNC(paso1600_state::key_r), FUNC(paso1600_state::key_w)); //UART keyboard?
+	map(0x0048, 0x0049).r(this, FUNC(paso1600_state::test_hi_r));
+	map(0x0090, 0x0090).rw(this, FUNC(paso1600_state::paso1600_6845_status_r), FUNC(paso1600_state::paso1600_6845_address_w));
+	map(0x0091, 0x0091).rw(this, FUNC(paso1600_state::paso1600_6845_data_r), FUNC(paso1600_state::paso1600_6845_data_w));
 //  AM_RANGE(0x00d8,0x00df) //fdc, unknown type
 // other undefined ports: 18, 1C, 92
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( paso1600 )

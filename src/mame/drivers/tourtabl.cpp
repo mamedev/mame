@@ -66,15 +66,16 @@ READ8_MEMBER(tourtabl_state::tourtabl_get_databus_contents)
 }
 
 
-ADDRESS_MAP_START(tourtabl_state::main_map)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM
-	AM_RANGE(0x0280, 0x029f) AM_DEVREADWRITE("riot1", riot6532_device, read, write)
-	AM_RANGE(0x0400, 0x047f) AM_RAM
-	AM_RANGE(0x0500, 0x051f) AM_DEVREADWRITE("riot2", riot6532_device, read, write)
-	AM_RANGE(0x0800, 0x1fff) AM_ROM
-	AM_RANGE(0xe800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void tourtabl_state::main_map(address_map &map)
+{
+	map(0x0000, 0x007f).mirror(0x0100).rw("tia_video", FUNC(tia_video_device::read), FUNC(tia_video_device::write));
+	map(0x0080, 0x00ff).mirror(0x0100).ram();
+	map(0x0280, 0x029f).rw("riot1", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x0400, 0x047f).ram();
+	map(0x0500, 0x051f).rw("riot2", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x0800, 0x1fff).rom();
+	map(0xe800, 0xffff).rom();
+}
 
 
 static INPUT_PORTS_START( tourtabl )

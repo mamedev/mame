@@ -32,41 +32,42 @@
 READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return m_dma8237_2->read(space, offset / 2); }
 WRITE8_MEMBER(bebox_state::at_dma8237_1_w) { m_dma8237_2->write(space, offset / 2, data); }
 
-ADDRESS_MAP_START(bebox_state::bebox_mem)
-	AM_RANGE(0x7FFFF0F0, 0x7FFFF0F7) AM_READWRITE(bebox_cpu0_imask_r, bebox_cpu0_imask_w )
-	AM_RANGE(0x7FFFF1F0, 0x7FFFF1F7) AM_READWRITE(bebox_cpu1_imask_r, bebox_cpu1_imask_w )
-	AM_RANGE(0x7FFFF2F0, 0x7FFFF2F7) AM_READ(bebox_interrupt_sources_r )
-	AM_RANGE(0x7FFFF3F0, 0x7FFFF3F7) AM_READWRITE(bebox_crossproc_interrupts_r, bebox_crossproc_interrupts_w )
-	AM_RANGE(0x7FFFF4F0, 0x7FFFF4F7) AM_WRITE(bebox_processor_resets_w )
+void bebox_state::bebox_mem(address_map &map)
+{
+	map(0x7FFFF0F0, 0x7FFFF0F7).rw(this, FUNC(bebox_state::bebox_cpu0_imask_r), FUNC(bebox_state::bebox_cpu0_imask_w));
+	map(0x7FFFF1F0, 0x7FFFF1F7).rw(this, FUNC(bebox_state::bebox_cpu1_imask_r), FUNC(bebox_state::bebox_cpu1_imask_w));
+	map(0x7FFFF2F0, 0x7FFFF2F7).r(this, FUNC(bebox_state::bebox_interrupt_sources_r));
+	map(0x7FFFF3F0, 0x7FFFF3F7).rw(this, FUNC(bebox_state::bebox_crossproc_interrupts_r), FUNC(bebox_state::bebox_crossproc_interrupts_w));
+	map(0x7FFFF4F0, 0x7FFFF4F7).w(this, FUNC(bebox_state::bebox_processor_resets_w));
 
-	AM_RANGE(0x80000000, 0x8000001F) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffffffffffffU )
-	AM_RANGE(0x80000020, 0x8000003F) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffffffffffffU )
-	AM_RANGE(0x80000040, 0x8000005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffffffffffffU )
-	AM_RANGE(0x80000060, 0x8000006F) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffffffffffffU )
-	AM_RANGE(0x80000070, 0x8000007F) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , 0xffffffffffffffffU )
-	AM_RANGE(0x80000080, 0x8000009F) AM_READWRITE8(bebox_page_r, bebox_page_w, 0xffffffffffffffffU )
-	AM_RANGE(0x800000A0, 0x800000BF) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffffffffffffU )
-	AM_RANGE(0x800000C0, 0x800000DF) AM_READWRITE8(at_dma8237_1_r, at_dma8237_1_w, 0xffffffffffffffffU)
-	AM_RANGE(0x800001F0, 0x800001F7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffffffffffffU )
-	AM_RANGE(0x800002F8, 0x800002FF) AM_DEVREADWRITE8( "ns16550_1", ns16550_device, ins8250_r, ins8250_w, 0xffffffffffffffffU )
-	AM_RANGE(0x80000380, 0x80000387) AM_DEVREADWRITE8( "ns16550_2", ns16550_device, ins8250_r, ins8250_w, 0xffffffffffffffffU )
-	AM_RANGE(0x80000388, 0x8000038F) AM_DEVREADWRITE8( "ns16550_3", ns16550_device, ins8250_r, ins8250_w, 0xffffffffffffffffU )
-	AM_RANGE(0x800003b0, 0x800003bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, 0xffffffffffffffffU)
-	AM_RANGE(0x800003c0, 0x800003cf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03c0_r, port_03c0_w, 0xffffffffffffffffU)
-	AM_RANGE(0x800003d0, 0x800003df) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03d0_r, port_03d0_w, 0xffffffffffffffffU)
-	AM_RANGE(0x800003F0, 0x800003F7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffffffffffffU )
-	AM_RANGE(0x800003F0, 0x800003F7) AM_DEVICE8( "smc37c78", smc37c78_device, map, 0xffffffffffffffffU )
-	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE8( "ns16550_0",ns16550_device,  ins8250_r, ins8250_w, 0xffffffffffffffffU )
-	AM_RANGE(0x80000480, 0x8000048F) AM_READWRITE8(bebox_80000480_r, bebox_80000480_w, 0xffffffffffffffffU )
-	AM_RANGE(0x80000CF8, 0x80000CFF) AM_DEVREADWRITE("pcibus", pci_bus_device, read_64be, write_64be )
+	map(0x80000000, 0x8000001F).rw(m_dma8237_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x80000020, 0x8000003F).rw(m_pic8259_1, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x80000040, 0x8000005f).rw(m_pit8254, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x80000060, 0x8000006F).rw("kbdc", FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
+	map(0x80000070, 0x8000007F).rw("rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x80000080, 0x8000009F).rw(this, FUNC(bebox_state::bebox_page_r), FUNC(bebox_state::bebox_page_w));
+	map(0x800000A0, 0x800000BF).rw(m_pic8259_2, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x800000C0, 0x800000DF).rw(this, FUNC(bebox_state::at_dma8237_1_r), FUNC(bebox_state::at_dma8237_1_w));
+	map(0x800001F0, 0x800001F7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
+	map(0x800002F8, 0x800002FF).rw("ns16550_1", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+	map(0x80000380, 0x80000387).rw("ns16550_2", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+	map(0x80000388, 0x8000038F).rw("ns16550_3", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+	map(0x800003b0, 0x800003bf).rw("vga", FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
+	map(0x800003c0, 0x800003cf).rw("vga", FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
+	map(0x800003d0, 0x800003df).rw("vga", FUNC(cirrus_gd5428_device::port_03d0_r), FUNC(cirrus_gd5428_device::port_03d0_w));
+	map(0x800003F0, 0x800003F7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
+	map(0x800003F0, 0x800003F7).m(m_smc37c78, FUNC(smc37c78_device::map));
+	map(0x800003F8, 0x800003FF).rw("ns16550_0", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+	map(0x80000480, 0x8000048F).rw(this, FUNC(bebox_state::bebox_80000480_r), FUNC(bebox_state::bebox_80000480_w));
+	map(0x80000CF8, 0x80000CFF).rw(m_pcibus, FUNC(pci_bus_device::read_64be), FUNC(pci_bus_device::write_64be));
 	//AM_RANGE(0x800042E8, 0x800042EF) AM_DEVWRITE8("cirrus", cirrus_device, cirrus_42E8_w, 0xffffffffffffffffU )
 
-	AM_RANGE(0xBFFFFFF0, 0xBFFFFFFF) AM_READ(bebox_interrupt_ack_r )
-	AM_RANGE(0xC00A0000, 0xC00BFFFF) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffffffffffffffffU )
-	AM_RANGE(0xC1000000, 0xC11FFFFF) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_linear_r, mem_linear_w, 0xffffffffffffffffU )
-	AM_RANGE(0xFFF00000, 0xFFF03FFF) AM_ROMBANK("bank2")
-	AM_RANGE(0xFFF04000, 0xFFFFFFFF) AM_READWRITE8(bebox_flash_r, bebox_flash_w, 0xffffffffffffffffU )
-ADDRESS_MAP_END
+	map(0xBFFFFFF0, 0xBFFFFFFF).r(this, FUNC(bebox_state::bebox_interrupt_ack_r));
+	map(0xC00A0000, 0xC00BFFFF).rw("vga", FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
+	map(0xC1000000, 0xC11FFFFF).rw("vga", FUNC(cirrus_gd5428_device::mem_linear_r), FUNC(cirrus_gd5428_device::mem_linear_w));
+	map(0xFFF00000, 0xFFF03FFF).bankr("bank2");
+	map(0xFFF04000, 0xFFFFFFFF).rw(this, FUNC(bebox_state::bebox_flash_r), FUNC(bebox_state::bebox_flash_w));
+}
 
 // The following is a gross hack to let the BeBox boot ROM identify the processors correctly.
 // This needs to be done in a better way if someone comes up with one.
@@ -82,11 +83,12 @@ READ64_MEMBER(bebox_state::bb_slave_64be_r)
 	return m_pcibus->read_64be(space, offset, mem_mask);
 }
 
-ADDRESS_MAP_START(bebox_state::bebox_slave_mem)
-	AM_IMPORT_FROM(bebox_mem)
-	AM_RANGE(0x80000cf8, 0x80000cff) AM_READ(bb_slave_64be_r)
-	AM_RANGE(0x80000cf8, 0x80000cff) AM_DEVWRITE("pcibus", pci_bus_device, write_64be )
-ADDRESS_MAP_END
+void bebox_state::bebox_slave_mem(address_map &map)
+{
+	bebox_mem(map);
+	map(0x80000cf8, 0x80000cff).r(this, FUNC(bebox_state::bb_slave_64be_r));
+	map(0x80000cf8, 0x80000cff).w(m_pcibus, FUNC(pci_bus_device::write_64be));
+}
 
 #define BYTE_REVERSE32(x)       (((x >> 24) & 0xff) | \
 								((x >> 8) & 0xff00) | \

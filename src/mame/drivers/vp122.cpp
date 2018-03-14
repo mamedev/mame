@@ -37,31 +37,34 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-ADDRESS_MAP_START(vp122_state::mem_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xe7ff) AM_NOP
-ADDRESS_MAP_END
+void vp122_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom().region("maincpu", 0);
+	map(0xa000, 0xa7ff).ram().share("nvram");
+	map(0xe000, 0xe7ff).noprw();
+}
 
-ADDRESS_MAP_START(vp122_state::io_map)
-	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE("avdc", scn2674_device, read, write)
-	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
-	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
-	AM_RANGE(0x50, 0x50) AM_WRITENOP
-	AM_RANGE(0x60, 0x60) AM_WRITENOP
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-ADDRESS_MAP_END
+void vp122_state::io_map(address_map &map)
+{
+	map(0x00, 0x07).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write));
+	map(0x10, 0x1f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0x20, 0x20).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x21, 0x21).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x50, 0x50).nopw();
+	map(0x60, 0x60).nopw();
+	map(0x70, 0x73).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+}
 
 
 SCN2674_DRAW_CHARACTER_MEMBER(vp122_state::draw_character)
 {
 }
 
-ADDRESS_MAP_START(vp122_state::vram_map)
-	AM_RANGE(0x0000, 0x07ff) AM_NOP
-	AM_RANGE(0x1800, 0x2fff) AM_NOP
-ADDRESS_MAP_END
+void vp122_state::vram_map(address_map &map)
+{
+	map(0x0000, 0x07ff).noprw();
+	map(0x1800, 0x2fff).noprw();
+}
 
 
 static INPUT_PORTS_START( vp122 )

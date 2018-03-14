@@ -427,28 +427,30 @@ WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a_alpha_display)
 	std::transform(std::begin(m_chars), std::end(m_chars), std::begin(m_vfd_outputs), set_display);
 }
 
-ADDRESS_MAP_START(ecoinf3_state::pyramid_memmap)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ecoinf3_state::pyramid_memmap(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(ecoinf3_state::pyramid_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_RAM // z180 internal area!
+void ecoinf3_state::pyramid_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x3f).ram(); // z180 internal area!
 
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppi8255_a", i8255_device, read, write)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("ppi8255_b", i8255_device, read, write)
-	AM_RANGE(0x48, 0x4b) AM_DEVREADWRITE("ppi8255_c", i8255_device, read, write)
-	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("ppi8255_d", i8255_device, read, write)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("ppi8255_e", i8255_device, read, write)
-	AM_RANGE(0x54, 0x57) AM_DEVREADWRITE("ppi8255_f", i8255_device, read, write)
-	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("ppi8255_g", i8255_device, read, write)
-	AM_RANGE(0x5c, 0x5f) AM_DEVREADWRITE("ppi8255_h", i8255_device, read, write)
+	map(0x40, 0x43).rw("ppi8255_a", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x44, 0x47).rw("ppi8255_b", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x48, 0x4b).rw("ppi8255_c", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x4c, 0x4f).rw("ppi8255_d", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x50, 0x53).rw("ppi8255_e", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x54, 0x57).rw("ppi8255_f", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x58, 0x5b).rw("ppi8255_g", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5c, 0x5f).rw("ppi8255_h", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	// frequently accesses DB after 5B, mirror? bug?
-	AM_RANGE(0xDB, 0xDB) AM_DEVWRITE("sn1", sn76489_device, write)  // no idea what the sound chip is, this sounds terrible
+	map(0xDB, 0xDB).w("sn1", FUNC(sn76489_device::write));  // no idea what the sound chip is, this sounds terrible
 
 
-ADDRESS_MAP_END
+}
 
 
 

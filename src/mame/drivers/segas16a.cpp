@@ -960,52 +960,58 @@ void segas16a_state::sjryuko_lamp_changed_w(uint8_t changed, uint8_t newval)
 //  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segas16a_state::system16a_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x380000) AM_ROM
-	AM_RANGE(0x400000, 0x407fff) AM_MIRROR(0xb88000) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_MIRROR(0xb8f000) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x4407ff) AM_MIRROR(0x3bf800) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x840000, 0x840fff) AM_MIRROR(0x3bf000) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc40000, 0xc43fff) AM_MIRROR(0x39c000) AM_READWRITE(misc_io_r, misc_io_w)
-	AM_RANGE(0xc60000, 0xc6ffff) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0xc70000, 0xc73fff) AM_MIRROR(0x38c000) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void segas16a_state::system16a_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).mirror(0x380000).rom();
+	map(0x400000, 0x407fff).mirror(0xb88000).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).mirror(0xb8f000).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x440000, 0x4407ff).mirror(0x3bf800).ram().share("sprites");
+	map(0x840000, 0x840fff).mirror(0x3bf000).ram().w(this, FUNC(segas16a_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc43fff).mirror(0x39c000).rw(this, FUNC(segas16a_state::misc_io_r), FUNC(segas16a_state::misc_io_w));
+	map(0xc60000, 0xc6ffff).r(m_watchdog, FUNC(watchdog_timer_device::reset16_r));
+	map(0xc70000, 0xc73fff).mirror(0x38c000).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(segas16a_state::decrypted_opcodes_map)
-	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
-ADDRESS_MAP_END
+void segas16a_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
+}
 
 //**************************************************************************
 //  SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segas16a_state::sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe800, 0xe800) AM_READ(sound_data_r)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segas16a_state::sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0xe800, 0xe800).r(this, FUNC(segas16a_state::sound_data_r));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segas16a_state::sound_decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("sound_decrypted_opcodes")
-ADDRESS_MAP_END
+void segas16a_state::sound_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("sound_decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(segas16a_state::sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_WRITE(n7751_command_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-ADDRESS_MAP_END
+void segas16a_state::sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x80, 0x80).mirror(0x3f).w(this, FUNC(segas16a_state::n7751_command_w));
+	map(0xc0, 0xc0).mirror(0x3f).r(this, FUNC(segas16a_state::sound_data_r));
+}
 
-ADDRESS_MAP_START(segas16a_state::sound_no7751_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_NOP
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-ADDRESS_MAP_END
+void segas16a_state::sound_no7751_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x80, 0x80).mirror(0x3f).noprw();
+	map(0xc0, 0xc0).mirror(0x3f).r(this, FUNC(segas16a_state::sound_data_r));
+}
 
 
 
@@ -1013,9 +1019,10 @@ ADDRESS_MAP_END
 //  I8751 MCU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segas16a_state::mcu_io_map)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
-ADDRESS_MAP_END
+void segas16a_state::mcu_io_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(segas16a_state::mcu_io_r), FUNC(segas16a_state::mcu_io_w));
+}
 
 
 

@@ -254,28 +254,30 @@ WRITE8_MEMBER(exterm_state::sound_control_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(exterm_state::master_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0xfc700000) AM_RAM AM_SHARE("master_videoram")
-	AM_RANGE(0x00800000, 0x00bfffff) AM_MIRROR(0xfc400000) AM_RAM
-	AM_RANGE(0x01000000, 0x013fffff) AM_MIRROR(0xfc000000) AM_READWRITE(exterm_host_data_r, exterm_host_data_w)
-	AM_RANGE(0x01400000, 0x0143ffff) AM_MIRROR(0xfc000000) AM_READ(exterm_input_port_0_r)
-	AM_RANGE(0x01440000, 0x0147ffff) AM_MIRROR(0xfc000000) AM_READ(exterm_input_port_1_r)
-	AM_RANGE(0x01480000, 0x014bffff) AM_MIRROR(0xfc000000) AM_READ_PORT("DSW")
-	AM_RANGE(0x01500000, 0x0153ffff) AM_MIRROR(0xfc000000) AM_WRITE(exterm_output_port_0_w)
-	AM_RANGE(0x01580000, 0x015bffff) AM_MIRROR(0xfc000000) AM_WRITE8(sound_latch_w, 0x00ff)
-	AM_RANGE(0x015c0000, 0x015fffff) AM_MIRROR(0xfc000000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x01800000, 0x01807fff) AM_MIRROR(0xfc7f8000) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x02800000, 0x02807fff) AM_MIRROR(0xfc7f8000) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x03000000, 0x03ffffff) AM_MIRROR(0xfc000000) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
-ADDRESS_MAP_END
+void exterm_state::master_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).mirror(0xfc700000).ram().share("master_videoram");
+	map(0x00800000, 0x00bfffff).mirror(0xfc400000).ram();
+	map(0x01000000, 0x013fffff).mirror(0xfc000000).rw(this, FUNC(exterm_state::exterm_host_data_r), FUNC(exterm_state::exterm_host_data_w));
+	map(0x01400000, 0x0143ffff).mirror(0xfc000000).r(this, FUNC(exterm_state::exterm_input_port_0_r));
+	map(0x01440000, 0x0147ffff).mirror(0xfc000000).r(this, FUNC(exterm_state::exterm_input_port_1_r));
+	map(0x01480000, 0x014bffff).mirror(0xfc000000).portr("DSW");
+	map(0x01500000, 0x0153ffff).mirror(0xfc000000).w(this, FUNC(exterm_state::exterm_output_port_0_w));
+	map(0x01580000, 0x015bffff).mirror(0xfc000000).w(this, FUNC(exterm_state::sound_latch_w)).umask16(0x00ff);
+	map(0x015c0000, 0x015fffff).mirror(0xfc000000).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x01800000, 0x01807fff).mirror(0xfc7f8000).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x02800000, 0x02807fff).mirror(0xfc7f8000).ram().share("nvram");
+	map(0x03000000, 0x03ffffff).mirror(0xfc000000).rom().region("user1", 0);
+	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+}
 
 
-ADDRESS_MAP_START(exterm_state::slave_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0xfbf00000) AM_RAM AM_SHARE("slave_videoram")
-	AM_RANGE(0x04000000, 0x047fffff) AM_MIRROR(0xfb800000) AM_RAM
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("slave", tms34010_device, io_register_r, io_register_w)
-ADDRESS_MAP_END
+void exterm_state::slave_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).mirror(0xfbf00000).ram().share("slave_videoram");
+	map(0x04000000, 0x047fffff).mirror(0xfb800000).ram();
+	map(0xc0000000, 0xc00001ff).rw(m_slave, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+}
 
 
 
@@ -285,25 +287,27 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(exterm_state::sound_master_map)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(ym2151_data_latch_w)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(sound_nmi_rate_w)
-	AM_RANGE(0x6800, 0x6fff) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)
-	AM_RANGE(0x7000, 0x77ff) AM_READ(sound_nmi_to_slave_r)
+void exterm_state::sound_master_map(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x1800).ram();
+	map(0x4000, 0x5fff).w(this, FUNC(exterm_state::ym2151_data_latch_w));
+	map(0x6000, 0x67ff).w(this, FUNC(exterm_state::sound_nmi_rate_w));
+	map(0x6800, 0x6fff).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0x7000, 0x77ff).r(this, FUNC(exterm_state::sound_nmi_to_slave_r));
 /*  AM_RANGE(0x7800, 0x7fff) unknown - to S4-13 */
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(sound_control_w)
-ADDRESS_MAP_END
+	map(0x8000, 0xffff).rom();
+	map(0xa000, 0xbfff).w(this, FUNC(exterm_state::sound_control_w));
+}
 
 
-ADDRESS_MAP_START(exterm_state::sound_slave_map)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x3ffe) AM_DEVWRITE("dacvol", dac_byte_interface, write)
-	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x3ffe) AM_DEVWRITE("dac", dac_byte_interface, write)
-ADDRESS_MAP_END
+void exterm_state::sound_slave_map(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x3800).ram();
+	map(0x4000, 0x5fff).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0xffff).rom();
+	map(0x8000, 0x8000).mirror(0x3ffe).w("dacvol", FUNC(dac_byte_interface::write));
+	map(0x8001, 0x8001).mirror(0x3ffe).w("dac", FUNC(dac_byte_interface::write));
+}
 
 
 

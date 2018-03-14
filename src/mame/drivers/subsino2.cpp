@@ -920,58 +920,60 @@ WRITE16_MEMBER(subsino2_state::bishjan_outputs_w)
 }
 
 
-ADDRESS_MAP_START(subsino2_state::bishjan_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+void subsino2_state::bishjan_map(address_map &map)
+{
+	map.global_mask(0xffffff);
 
-	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION("maincpu", 0)
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x080000, 0x0fffff).rom().region("maincpu", 0);
 
-	AM_RANGE( 0x200000, 0x207fff ) AM_RAM AM_SHARE("nvram") // battery
+	map(0x200000, 0x207fff).ram().share("nvram"); // battery
 
 	// read lo (L1)   (only half tilemap?)
-	AM_RANGE( 0x412000, 0x412fff ) AM_READ8(ss9601_videoram_1_lo_r, 0xffff )
-	AM_RANGE( 0x413000, 0x4131ff ) AM_READWRITE8(ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w, 0xffff )
+	map(0x412000, 0x412fff).r(this, FUNC(subsino2_state::ss9601_videoram_1_lo_r));
+	map(0x413000, 0x4131ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
 	// read lo (REEL)
-	AM_RANGE( 0x416000, 0x416fff ) AM_READ8(ss9601_reelram_lo_r, 0xffff )
-	AM_RANGE( 0x417000, 0x4171ff ) AM_READWRITE8(ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w, 0xffff )
+	map(0x416000, 0x416fff).r(this, FUNC(subsino2_state::ss9601_reelram_lo_r));
+	map(0x417000, 0x4171ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
 
 	// read hi (L1)
-	AM_RANGE( 0x422000, 0x422fff ) AM_READ8(ss9601_videoram_1_hi_r, 0xffff )
-	AM_RANGE( 0x423000, 0x4231ff ) AM_READWRITE8(ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w, 0xffff )
+	map(0x422000, 0x422fff).r(this, FUNC(subsino2_state::ss9601_videoram_1_hi_r));
+	map(0x423000, 0x4231ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
 	// read hi (REEL)
-	AM_RANGE( 0x426000, 0x426fff ) AM_READ8(ss9601_reelram_hi_r, 0xffff )
-	AM_RANGE( 0x427000, 0x4271ff ) AM_READWRITE8(ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w, 0xffff )
+	map(0x426000, 0x426fff).r(this, FUNC(subsino2_state::ss9601_reelram_hi_r));
+	map(0x427000, 0x4271ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
 
 	// write both (L1)
-	AM_RANGE( 0x430000, 0x431fff ) AM_WRITE8(ss9601_videoram_1_hi_lo_w, 0xffff )
-	AM_RANGE( 0x432000, 0x432fff ) AM_WRITE8(ss9601_videoram_1_hi_lo_w, 0xffff )
-	AM_RANGE( 0x433000, 0x4331ff ) AM_WRITE8(ss9601_scrollram_1_hi_lo_w, 0xffff )
+	map(0x430000, 0x431fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x432000, 0x432fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x433000, 0x4331ff).w(this, FUNC(subsino2_state::ss9601_scrollram_1_hi_lo_w));
 	// write both (L0 & REEL)
-	AM_RANGE( 0x434000, 0x435fff ) AM_WRITE8(ss9601_videoram_0_hi_lo_w, 0xffff )
-	AM_RANGE( 0x436000, 0x436fff ) AM_WRITE8(ss9601_reelram_hi_lo_w, 0xffff )
-	AM_RANGE( 0x437000, 0x4371ff ) AM_WRITE8(ss9601_scrollram_0_hi_lo_w, 0xffff )
+	map(0x434000, 0x435fff).w(this, FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
+	map(0x436000, 0x436fff).w(this, FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
+	map(0x437000, 0x4371ff).w(this, FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_READNOP AM_WRITE(bishjan_sound_w )
-	AM_RANGE( 0x600040, 0x600041 ) AM_WRITE8(ss9601_scrollctrl_w, 0xff00 )
-	AM_RANGE( 0x600060, 0x600061 ) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
-	AM_RANGE( 0x600060, 0x600061 ) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE( 0x600062, 0x600063 ) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00)
-	AM_RANGE( 0x600080, 0x600081 ) AM_WRITE8(ss9601_tilesize_w, 0xff00 )
-	AM_RANGE( 0x6000a0, 0x6000a1 ) AM_WRITE8(ss9601_byte_lo_w, 0xff00 )
+	map(0x600000, 0x600001).nopr().w(this, FUNC(subsino2_state::bishjan_sound_w));
+	map(0x600040, 0x600040).w(this, FUNC(subsino2_state::ss9601_scrollctrl_w));
+	map(0x600060, 0x600060).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x600061, 0x600061).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x600062, 0x600062).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x600080, 0x600080).w(this, FUNC(subsino2_state::ss9601_tilesize_w));
+	map(0x6000a0, 0x6000a0).w(this, FUNC(subsino2_state::ss9601_byte_lo_w));
 
-	AM_RANGE( 0xa0001e, 0xa0001f ) AM_WRITE8(ss9601_disable_w, 0x00ff )
-	AM_RANGE( 0xa00020, 0xa00025 ) AM_WRITE8(ss9601_scroll_w, 0xffff )
+	map(0xa0001f, 0xa0001f).w(this, FUNC(subsino2_state::ss9601_disable_w));
+	map(0xa00020, 0xa00025).w(this, FUNC(subsino2_state::ss9601_scroll_w));
 
-	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ_PORT("DSW")                              // SW1
-	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ_PORT("JOY") AM_WRITE(bishjan_input_w )   // IN C
-	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ(bishjan_input_r )                        // IN A & B
-	AM_RANGE( 0xc00006, 0xc00007 ) AM_READ(bishjan_serial_r )                       // IN D
-	AM_RANGE( 0xc00008, 0xc00009 ) AM_READ_PORT("RESET") AM_WRITE(bishjan_outputs_w ) AM_SHARE("outputs16")
-ADDRESS_MAP_END
+	map(0xc00000, 0xc00001).portr("DSW");                              // SW1
+	map(0xc00002, 0xc00003).portr("JOY").w(this, FUNC(subsino2_state::bishjan_input_w));   // IN C
+	map(0xc00004, 0xc00005).r(this, FUNC(subsino2_state::bishjan_input_r));                        // IN A & B
+	map(0xc00006, 0xc00007).r(this, FUNC(subsino2_state::bishjan_serial_r));                       // IN D
+	map(0xc00008, 0xc00009).portr("RESET").w(this, FUNC(subsino2_state::bishjan_outputs_w)).share("outputs16");
+}
 
-ADDRESS_MAP_START(subsino2_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
-ADDRESS_MAP_END
+void subsino2_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 /***************************************************************************
                                   New 2001
@@ -1008,63 +1010,65 @@ WRITE16_MEMBER(subsino2_state::new2001_outputs_w)
 }
 
 // Same as bishjan (except for i/o and lo2 usage like xplan)
-ADDRESS_MAP_START(subsino2_state::new2001_base_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+void subsino2_state::new2001_base_map(address_map &map)
+{
+	map.global_mask(0xffffff);
 
-	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION("maincpu", 0)
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x080000, 0x0fffff).rom().region("maincpu", 0);
 
-	AM_RANGE( 0x200000, 0x207fff ) AM_RAM AM_SHARE("nvram") // battery
+	map(0x200000, 0x207fff).ram().share("nvram"); // battery
 
 	// write both (L1, byte_lo2)
-	AM_RANGE( 0x410000, 0x411fff ) AM_WRITE8(ss9601_videoram_1_hi_lo2_w, 0xffff )
+	map(0x410000, 0x411fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo2_w));
 	// read lo (L1)   (only half tilemap?)
-	AM_RANGE( 0x412000, 0x412fff ) AM_READ8(ss9601_videoram_1_lo_r, 0xffff )
-	AM_RANGE( 0x413000, 0x4131ff ) AM_READWRITE8(ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w, 0xffff )
+	map(0x412000, 0x412fff).r(this, FUNC(subsino2_state::ss9601_videoram_1_lo_r));
+	map(0x413000, 0x4131ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
 	// write both (L0 & REEL, byte_lo2)
-	AM_RANGE( 0x414000, 0x415fff ) AM_WRITE8(ss9601_videoram_0_hi_lo2_w, 0xffff )
+	map(0x414000, 0x415fff).w(this, FUNC(subsino2_state::ss9601_videoram_0_hi_lo2_w));
 	// read lo (REEL)
-	AM_RANGE( 0x416000, 0x416fff ) AM_READ8(ss9601_reelram_lo_r, 0xffff )
-	AM_RANGE( 0x417000, 0x4171ff ) AM_READWRITE8(ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w, 0xffff )
+	map(0x416000, 0x416fff).r(this, FUNC(subsino2_state::ss9601_reelram_lo_r));
+	map(0x417000, 0x4171ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
 
 	// read hi (L1)
-	AM_RANGE( 0x422000, 0x422fff ) AM_READ8(ss9601_videoram_1_hi_r, 0xffff )
-	AM_RANGE( 0x423000, 0x4231ff ) AM_READWRITE8(ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w, 0xffff )
+	map(0x422000, 0x422fff).r(this, FUNC(subsino2_state::ss9601_videoram_1_hi_r));
+	map(0x423000, 0x4231ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
 	// read hi (REEL)
-	AM_RANGE( 0x426000, 0x426fff ) AM_READ8(ss9601_reelram_hi_r, 0xffff )
-	AM_RANGE( 0x427000, 0x4271ff ) AM_READWRITE8(ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w, 0xffff )
+	map(0x426000, 0x426fff).r(this, FUNC(subsino2_state::ss9601_reelram_hi_r));
+	map(0x427000, 0x4271ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
 
 	// write both (L1, byte_lo)
-	AM_RANGE( 0x430000, 0x431fff ) AM_WRITE8(ss9601_videoram_1_hi_lo_w, 0xffff )
-	AM_RANGE( 0x432000, 0x432fff ) AM_WRITE8(ss9601_videoram_1_hi_lo_w, 0xffff )
-	AM_RANGE( 0x433000, 0x4331ff ) AM_WRITE8(ss9601_scrollram_1_hi_lo_w, 0xffff )
+	map(0x430000, 0x431fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x432000, 0x432fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x433000, 0x4331ff).w(this, FUNC(subsino2_state::ss9601_scrollram_1_hi_lo_w));
 	// write both (L0 & REEL, byte_lo)
-	AM_RANGE( 0x434000, 0x435fff ) AM_WRITE8(ss9601_videoram_0_hi_lo_w, 0xffff )
-	AM_RANGE( 0x436000, 0x436fff ) AM_WRITE8(ss9601_reelram_hi_lo_w, 0xffff )
-	AM_RANGE( 0x437000, 0x4371ff ) AM_WRITE8(ss9601_scrollram_0_hi_lo_w, 0xffff )
+	map(0x434000, 0x435fff).w(this, FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
+	map(0x436000, 0x436fff).w(this, FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
+	map(0x437000, 0x4371ff).w(this, FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_READNOP AM_WRITE(bishjan_sound_w )
-	AM_RANGE( 0x600020, 0x600021 ) AM_WRITE8(ss9601_byte_lo2_w, 0xff00 )
-	AM_RANGE( 0x600040, 0x600041 ) AM_WRITE8(ss9601_scrollctrl_w, 0xff00 )
-	AM_RANGE( 0x600060, 0x600061 ) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
-	AM_RANGE( 0x600060, 0x600061 ) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE( 0x600062, 0x600063 ) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00)
-	AM_RANGE( 0x600080, 0x600081 ) AM_WRITE8(ss9601_tilesize_w, 0xff00 )
-	AM_RANGE( 0x6000a0, 0x6000a1 ) AM_WRITE8(ss9601_byte_lo_w, 0xff00 )
+	map(0x600000, 0x600001).nopr().w(this, FUNC(subsino2_state::bishjan_sound_w));
+	map(0x600020, 0x600020).w(this, FUNC(subsino2_state::ss9601_byte_lo2_w));
+	map(0x600040, 0x600040).w(this, FUNC(subsino2_state::ss9601_scrollctrl_w));
+	map(0x600060, 0x600060).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x600061, 0x600061).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x600062, 0x600062).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x600080, 0x600080).w(this, FUNC(subsino2_state::ss9601_tilesize_w));
+	map(0x6000a0, 0x6000a0).w(this, FUNC(subsino2_state::ss9601_byte_lo_w));
 
-	AM_RANGE( 0xa0001e, 0xa0001f ) AM_WRITE8(ss9601_disable_w, 0x00ff )
-	AM_RANGE( 0xa00020, 0xa00025 ) AM_WRITE8(ss9601_scroll_w, 0xffff )
+	map(0xa0001f, 0xa0001f).w(this, FUNC(subsino2_state::ss9601_disable_w));
+	map(0xa00020, 0xa00025).w(this, FUNC(subsino2_state::ss9601_scroll_w));
 
-	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ_PORT("DSW")
-	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ_PORT("IN C")
-	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ_PORT("IN A & B")
-	AM_RANGE( 0xc00006, 0xc00007 ) AM_READ(bishjan_serial_r )
-ADDRESS_MAP_END
+	map(0xc00000, 0xc00001).portr("DSW");
+	map(0xc00002, 0xc00003).portr("IN C");
+	map(0xc00004, 0xc00005).portr("IN A & B");
+	map(0xc00006, 0xc00007).r(this, FUNC(subsino2_state::bishjan_serial_r));
+}
 
-ADDRESS_MAP_START(subsino2_state::new2001_map)
-	AM_IMPORT_FROM(new2001_base_map)
-	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(new2001_outputs_w ) AM_SHARE("outputs16")
-ADDRESS_MAP_END
+void subsino2_state::new2001_map(address_map &map)
+{
+	new2001_base_map(map);
+	map(0xc00008, 0xc00009).w(this, FUNC(subsino2_state::new2001_outputs_w)).share("outputs16");
+}
 
 /***************************************************************************
                              Humlan's Lyckohjul
@@ -1097,10 +1101,11 @@ WRITE16_MEMBER(subsino2_state::humlan_outputs_w)
 //  popmessage("0: %04x", m_outputs16[0]);
 }
 
-ADDRESS_MAP_START(subsino2_state::humlan_map)
-	AM_IMPORT_FROM(new2001_base_map)
-	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(humlan_outputs_w ) AM_SHARE("outputs16")
-ADDRESS_MAP_END
+void subsino2_state::humlan_map(address_map &map)
+{
+	new2001_base_map(map);
+	map(0xc00008, 0xc00009).w(this, FUNC(subsino2_state::humlan_outputs_w)).share("outputs16");
+}
 
 /***************************************************************************
                        Express Card / Top Card
@@ -1231,44 +1236,46 @@ READ8_MEMBER(subsino2_state::mtrain_prot_r)
 	return "SUBSION"[offset];
 }
 
-ADDRESS_MAP_START(subsino2_state::mtrain_map)
-	AM_RANGE( 0x00000, 0x06fff ) AM_ROM
+void subsino2_state::mtrain_map(address_map &map)
+{
+	map(0x00000, 0x06fff).rom();
 
-	AM_RANGE( 0x07800, 0x07fff ) AM_RAM AM_SHARE("nvram")   // battery
+	map(0x07800, 0x07fff).ram().share("nvram");   // battery
 
-	AM_RANGE( 0x08000, 0x08fff ) AM_WRITE(mtrain_videoram_w )
+	map(0x08000, 0x08fff).w(this, FUNC(subsino2_state::mtrain_videoram_w));
 
-	AM_RANGE( 0x0911f, 0x0911f ) AM_WRITE(ss9601_disable_w )
-	AM_RANGE( 0x09120, 0x09125 ) AM_WRITE(ss9601_scroll_w )
+	map(0x0911f, 0x0911f).w(this, FUNC(subsino2_state::ss9601_disable_w));
+	map(0x09120, 0x09125).w(this, FUNC(subsino2_state::ss9601_scroll_w));
 
-	AM_RANGE( 0x0912f, 0x0912f ) AM_WRITE(ss9601_byte_lo_w )
+	map(0x0912f, 0x0912f).w(this, FUNC(subsino2_state::ss9601_byte_lo_w));
 
-	AM_RANGE( 0x09140, 0x09142 ) AM_WRITE(mtrain_outputs_w ) AM_SHARE("outputs")
-	AM_RANGE( 0x09143, 0x09143 ) AM_READ_PORT( "IN D" ) // (not shown in system test) 0x40 serial out, 0x80 serial in
-	AM_RANGE( 0x09144, 0x09144 ) AM_READ_PORT( "IN A" ) // A
-	AM_RANGE( 0x09145, 0x09145 ) AM_READ_PORT( "IN B" ) // B
-	AM_RANGE( 0x09146, 0x09146 ) AM_READ_PORT( "IN C" ) // C
-	AM_RANGE( 0x09147, 0x09147 ) AM_READ(dsw_r )
-	AM_RANGE( 0x09148, 0x09148 ) AM_WRITE(dsw_mask_w )
+	map(0x09140, 0x09142).w(this, FUNC(subsino2_state::mtrain_outputs_w)).share("outputs");
+	map(0x09143, 0x09143).portr("IN D"); // (not shown in system test) 0x40 serial out, 0x80 serial in
+	map(0x09144, 0x09144).portr("IN A"); // A
+	map(0x09145, 0x09145).portr("IN B"); // B
+	map(0x09146, 0x09146).portr("IN C"); // C
+	map(0x09147, 0x09147).r(this, FUNC(subsino2_state::dsw_r));
+	map(0x09148, 0x09148).w(this, FUNC(subsino2_state::dsw_mask_w));
 
-	AM_RANGE( 0x09152, 0x09152 ) AM_READ(vblank_bit2_r ) AM_WRITE(oki_bank_bit0_w )
+	map(0x09152, 0x09152).r(this, FUNC(subsino2_state::vblank_bit2_r)).w(this, FUNC(subsino2_state::oki_bank_bit0_w));
 
-	AM_RANGE( 0x09158, 0x0915e ) AM_READ(mtrain_prot_r )
+	map(0x09158, 0x0915e).r(this, FUNC(subsino2_state::mtrain_prot_r));
 
-	AM_RANGE( 0x09160, 0x09160 ) AM_DEVWRITE("ramdac", ramdac_device, index_w)
-	AM_RANGE( 0x09161, 0x09161 ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
-	AM_RANGE( 0x09162, 0x09162 ) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
-	AM_RANGE( 0x09164, 0x09164 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE( 0x09168, 0x09168 ) AM_WRITE(mtrain_tilesize_w )
+	map(0x09160, 0x09160).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x09161, 0x09161).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x09162, 0x09162).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x09164, 0x09164).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x09168, 0x09168).w(this, FUNC(subsino2_state::mtrain_tilesize_w));
 
-	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
+	map(0x09800, 0x09fff).ram();
 
-	AM_RANGE( 0x0a000, 0x0ffff ) AM_ROM
-ADDRESS_MAP_END
+	map(0x0a000, 0x0ffff).rom();
+}
 
-ADDRESS_MAP_START(subsino2_state::mtrain_io)
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
-ADDRESS_MAP_END
+void subsino2_state::mtrain_io(address_map &map)
+{
+	map(0x0000, 0x003f).ram(); // internal regs
+}
 
 /***************************************************************************
                           Sakura Love - Ying Hua Lian
@@ -1299,58 +1306,60 @@ WRITE8_MEMBER(subsino2_state::saklove_outputs_w)
 //  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
 }
 
-ADDRESS_MAP_START(subsino2_state::saklove_map)
-	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("nvram") // battery
+void subsino2_state::saklove_map(address_map &map)
+{
+	map(0x00000, 0x07fff).ram().share("nvram"); // battery
 
 	// read lo (L1)   (only half tilemap?)
-	AM_RANGE(0x12000, 0x12fff) AM_READWRITE(ss9601_videoram_1_lo_r,  ss9601_videoram_1_lo_w )
-	AM_RANGE(0x13000, 0x131ff) AM_READWRITE(ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w )
+	map(0x12000, 0x12fff).rw(this, FUNC(subsino2_state::ss9601_videoram_1_lo_r), FUNC(subsino2_state::ss9601_videoram_1_lo_w));
+	map(0x13000, 0x131ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
 	// read lo (L0)
-	AM_RANGE(0x16000, 0x16fff) AM_READWRITE(ss9601_videoram_0_lo_r,  ss9601_videoram_0_lo_w )
-	AM_RANGE(0x17000, 0x171ff) AM_READWRITE(ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w )
+	map(0x16000, 0x16fff).rw(this, FUNC(subsino2_state::ss9601_videoram_0_lo_r), FUNC(subsino2_state::ss9601_videoram_0_lo_w));
+	map(0x17000, 0x171ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
 
 	// read hi (L1)
-	AM_RANGE(0x22000, 0x22fff) AM_READWRITE(ss9601_videoram_1_hi_r,  ss9601_videoram_1_hi_w )
-	AM_RANGE(0x23000, 0x231ff) AM_READWRITE(ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w )
+	map(0x22000, 0x22fff).rw(this, FUNC(subsino2_state::ss9601_videoram_1_hi_r), FUNC(subsino2_state::ss9601_videoram_1_hi_w));
+	map(0x23000, 0x231ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
 	// read hi (L0)
-	AM_RANGE(0x26000, 0x26fff) AM_READWRITE(ss9601_videoram_0_hi_r,  ss9601_videoram_0_hi_w )
-	AM_RANGE(0x27000, 0x271ff) AM_READWRITE(ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w )
+	map(0x26000, 0x26fff).rw(this, FUNC(subsino2_state::ss9601_videoram_0_hi_r), FUNC(subsino2_state::ss9601_videoram_0_hi_w));
+	map(0x27000, 0x271ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
 
 	// write both (L1)
-	AM_RANGE(0x30000, 0x31fff) AM_READWRITE(ss9601_videoram_1_hi_r, ss9601_videoram_1_hi_lo_w )
+	map(0x30000, 0x31fff).rw(this, FUNC(subsino2_state::ss9601_videoram_1_hi_r), FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
 	// write both (L0)
-	AM_RANGE(0x34000, 0x35fff) AM_READWRITE(ss9601_videoram_0_hi_r, ss9601_videoram_0_hi_lo_w )
+	map(0x34000, 0x35fff).rw(this, FUNC(subsino2_state::ss9601_videoram_0_hi_r), FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
 
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("maincpu",0)
-ADDRESS_MAP_END
+	map(0xe0000, 0xfffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(subsino2_state::saklove_io)
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(ss9601_scrollctrl_w )
+void subsino2_state::saklove_io(address_map &map)
+{
+	map(0x0000, 0x0000).w(this, FUNC(subsino2_state::ss9601_scrollctrl_w));
 
-	AM_RANGE(0x0020, 0x0020) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x0040, 0x0041) AM_DEVWRITE("ymsnd", ym3812_device, write)
+	map(0x0020, 0x0020).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0040, 0x0041).w("ymsnd", FUNC(ym3812_device::write));
 
-	AM_RANGE(0x0060, 0x0060) AM_DEVWRITE("ramdac", ramdac_device, index_w)
-	AM_RANGE(0x0061, 0x0061) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
-	AM_RANGE(0x0062, 0x0062) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
+	map(0x0060, 0x0060).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x0061, 0x0061).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x0062, 0x0062).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0x0080, 0x0080) AM_WRITE(ss9601_tilesize_w )
-	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(ss9601_byte_lo_w )
-	AM_RANGE(0x021f, 0x021f) AM_WRITE(ss9601_disable_w )
-	AM_RANGE(0x0220, 0x0225) AM_WRITE(ss9601_scroll_w )
+	map(0x0080, 0x0080).w(this, FUNC(subsino2_state::ss9601_tilesize_w));
+	map(0x00a0, 0x00a0).w(this, FUNC(subsino2_state::ss9601_byte_lo_w));
+	map(0x021f, 0x021f).w(this, FUNC(subsino2_state::ss9601_disable_w));
+	map(0x0220, 0x0225).w(this, FUNC(subsino2_state::ss9601_scroll_w));
 
-	AM_RANGE(0x0300, 0x0303) AM_WRITE(saklove_outputs_w ) AM_SHARE("outputs")
-	AM_RANGE(0x0303, 0x0303) AM_READ_PORT( "IN D" ) // 0x40 serial out, 0x80 serial in
-	AM_RANGE(0x0304, 0x0304) AM_READ_PORT( "IN A" )
-	AM_RANGE(0x0305, 0x0305) AM_READ_PORT( "IN B" )
-	AM_RANGE(0x0306, 0x0306) AM_READ_PORT( "IN C" )
+	map(0x0300, 0x0303).w(this, FUNC(subsino2_state::saklove_outputs_w)).share("outputs");
+	map(0x0303, 0x0303).portr("IN D"); // 0x40 serial out, 0x80 serial in
+	map(0x0304, 0x0304).portr("IN A");
+	map(0x0305, 0x0305).portr("IN B");
+	map(0x0306, 0x0306).portr("IN C");
 
-	AM_RANGE(0x0307, 0x0307) AM_READ(dsw_r )
-	AM_RANGE(0x0308, 0x0308) AM_WRITE(dsw_mask_w )
+	map(0x0307, 0x0307).r(this, FUNC(subsino2_state::dsw_r));
+	map(0x0308, 0x0308).w(this, FUNC(subsino2_state::dsw_mask_w));
 
-	AM_RANGE(0x0312, 0x0312) AM_READ(vblank_bit2_r ) AM_WRITE(oki_bank_bit0_w )
+	map(0x0312, 0x0312).r(this, FUNC(subsino2_state::vblank_bit2_r)).w(this, FUNC(subsino2_state::oki_bank_bit0_w));
 
-ADDRESS_MAP_END
+}
 
 /***************************************************************************
                                 X-Plan
@@ -1389,70 +1398,72 @@ WRITE8_MEMBER(subsino2_state::xplan_outputs_w)
 //  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
 }
 
-ADDRESS_MAP_START(subsino2_state::xplan_map)
-	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("nvram") // battery
+void subsino2_state::xplan_map(address_map &map)
+{
+	map(0x00000, 0x07fff).ram().share("nvram"); // battery
 
 	// write both (L1, byte_lo2)
-	AM_RANGE( 0x10000, 0x11fff ) AM_WRITE(ss9601_videoram_1_hi_lo2_w )
+	map(0x10000, 0x11fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo2_w));
 	// read lo (L1)   (only half tilemap?)
-	AM_RANGE( 0x12000, 0x12fff ) AM_READ(ss9601_videoram_1_lo_r )
-	AM_RANGE( 0x13000, 0x131ff ) AM_READWRITE(ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w )
+	map(0x12000, 0x12fff).r(this, FUNC(subsino2_state::ss9601_videoram_1_lo_r));
+	map(0x13000, 0x131ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_lo_r), FUNC(subsino2_state::ss9601_scrollram_1_lo_w));
 
 	// write both (L0, byte_lo2)
-	AM_RANGE( 0x14000, 0x15fff ) AM_WRITE(ss9601_videoram_0_hi_lo2_w )
+	map(0x14000, 0x15fff).w(this, FUNC(subsino2_state::ss9601_videoram_0_hi_lo2_w));
 	// read lo (REEL)
-	AM_RANGE( 0x16000, 0x16fff ) AM_READ(ss9601_reelram_lo_r )
-	AM_RANGE( 0x17000, 0x171ff ) AM_READWRITE(ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w )
+	map(0x16000, 0x16fff).r(this, FUNC(subsino2_state::ss9601_reelram_lo_r));
+	map(0x17000, 0x171ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_lo_r), FUNC(subsino2_state::ss9601_scrollram_0_lo_w));
 
 	// read hi (L1)
-	AM_RANGE( 0x22000, 0x22fff ) AM_READ(ss9601_videoram_1_hi_r )
-	AM_RANGE( 0x23000, 0x231ff ) AM_READWRITE(ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w )
+	map(0x22000, 0x22fff).r(this, FUNC(subsino2_state::ss9601_videoram_1_hi_r));
+	map(0x23000, 0x231ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_1_hi_r), FUNC(subsino2_state::ss9601_scrollram_1_hi_w));
 	// read hi (REEL)
-	AM_RANGE( 0x26000, 0x26fff ) AM_READ(ss9601_reelram_hi_r )
-	AM_RANGE( 0x27000, 0x271ff ) AM_READWRITE(ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w )
+	map(0x26000, 0x26fff).r(this, FUNC(subsino2_state::ss9601_reelram_hi_r));
+	map(0x27000, 0x271ff).rw(this, FUNC(subsino2_state::ss9601_scrollram_0_hi_r), FUNC(subsino2_state::ss9601_scrollram_0_hi_w));
 
 	// write both (L1, byte_lo)
-	AM_RANGE( 0x30000, 0x31fff ) AM_WRITE(ss9601_videoram_1_hi_lo_w )
-	AM_RANGE( 0x32000, 0x32fff ) AM_WRITE(ss9601_videoram_1_hi_lo_w )
-	AM_RANGE( 0x33000, 0x331ff ) AM_WRITE(ss9601_scrollram_1_hi_lo_w )
+	map(0x30000, 0x31fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x32000, 0x32fff).w(this, FUNC(subsino2_state::ss9601_videoram_1_hi_lo_w));
+	map(0x33000, 0x331ff).w(this, FUNC(subsino2_state::ss9601_scrollram_1_hi_lo_w));
 	// write both (L0 & REEL, byte_lo)
-	AM_RANGE( 0x34000, 0x35fff ) AM_WRITE(ss9601_videoram_0_hi_lo_w )
-	AM_RANGE( 0x36000, 0x36fff ) AM_WRITE(ss9601_reelram_hi_lo_w )
-	AM_RANGE( 0x37000, 0x371ff ) AM_WRITE(ss9601_scrollram_0_hi_lo_w )
+	map(0x34000, 0x35fff).w(this, FUNC(subsino2_state::ss9601_videoram_0_hi_lo_w));
+	map(0x36000, 0x36fff).w(this, FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
+	map(0x37000, 0x371ff).w(this, FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
 
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("maincpu",0)
-ADDRESS_MAP_END
+	map(0xc0000, 0xfffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(subsino2_state::xplan_io)
-	AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+void subsino2_state::xplan_io(address_map &map)
+{
+	map(0x0000, 0x0000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x0020, 0x0020) AM_WRITE(ss9601_byte_lo2_w )
+	map(0x0020, 0x0020).w(this, FUNC(subsino2_state::ss9601_byte_lo2_w));
 
-	AM_RANGE(0x0040, 0x0040) AM_WRITE(ss9601_scrollctrl_w )
+	map(0x0040, 0x0040).w(this, FUNC(subsino2_state::ss9601_scrollctrl_w));
 
-	AM_RANGE(0x0060, 0x0060) AM_DEVWRITE("ramdac", ramdac_device, index_w)
-	AM_RANGE(0x0061, 0x0061) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
-	AM_RANGE(0x0062, 0x0062) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
+	map(0x0060, 0x0060).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x0061, 0x0061).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x0062, 0x0062).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0x0080, 0x0080) AM_WRITE(ss9601_tilesize_w )
-	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(ss9601_byte_lo_w )
+	map(0x0080, 0x0080).w(this, FUNC(subsino2_state::ss9601_tilesize_w));
+	map(0x00a0, 0x00a0).w(this, FUNC(subsino2_state::ss9601_byte_lo_w));
 
-	AM_RANGE(0x021f, 0x021f) AM_WRITE(ss9601_disable_w )
-	AM_RANGE(0x0220, 0x0225) AM_WRITE(ss9601_scroll_w )
+	map(0x021f, 0x021f).w(this, FUNC(subsino2_state::ss9601_disable_w));
+	map(0x0220, 0x0225).w(this, FUNC(subsino2_state::ss9601_scroll_w));
 
-	AM_RANGE(0x0235, 0x0235) AM_NOP // INT0 Ack.?
+	map(0x0235, 0x0235).noprw(); // INT0 Ack.?
 
-	AM_RANGE(0x0300, 0x0300) AM_READ(vblank_bit6_r ) AM_WRITE(oki_bank_bit4_w )
-	AM_RANGE(0x0301, 0x0301) AM_WRITE(dsw_mask_w )
-	AM_RANGE(0x0302, 0x0302) AM_READ(dsw_r )
-	AM_RANGE(0x0303, 0x0303) AM_READ_PORT( "IN C" )
-	AM_RANGE(0x0304, 0x0304) AM_READ_PORT( "IN B" )
-	AM_RANGE(0x0305, 0x0305) AM_READ_PORT( "IN A" )
-	AM_RANGE(0x0306, 0x0306) AM_READ_PORT( "IN D" ) // 0x40 serial out, 0x80 serial in
+	map(0x0300, 0x0300).r(this, FUNC(subsino2_state::vblank_bit6_r)).w(this, FUNC(subsino2_state::oki_bank_bit4_w));
+	map(0x0301, 0x0301).w(this, FUNC(subsino2_state::dsw_mask_w));
+	map(0x0302, 0x0302).r(this, FUNC(subsino2_state::dsw_r));
+	map(0x0303, 0x0303).portr("IN C");
+	map(0x0304, 0x0304).portr("IN B");
+	map(0x0305, 0x0305).portr("IN A");
+	map(0x0306, 0x0306).portr("IN D"); // 0x40 serial out, 0x80 serial in
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	AM_RANGE(0x0306, 0x0309) AM_WRITE(xplan_outputs_w ) AM_SHARE("outputs")
-ADDRESS_MAP_END
+	map(0x0306, 0x0309).w(this, FUNC(subsino2_state::xplan_outputs_w)).share("outputs");
+}
 
 /***************************************************************************
                                 X-Train
@@ -1492,19 +1503,21 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 //  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
 }
 
-ADDRESS_MAP_START(subsino2_state::expcard_io)
-	AM_IMPORT_FROM( xplan_io )
+void subsino2_state::expcard_io(address_map &map)
+{
+	xplan_io(map);
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	AM_RANGE(0x0306, 0x0309) AM_WRITE(expcard_outputs_w ) AM_SHARE("outputs")
-ADDRESS_MAP_END
+	map(0x0306, 0x0309).w(this, FUNC(subsino2_state::expcard_outputs_w)).share("outputs");
+}
 
-ADDRESS_MAP_START(subsino2_state::xtrain_io)
-	AM_IMPORT_FROM( xplan_io )
+void subsino2_state::xtrain_io(address_map &map)
+{
+	xplan_io(map);
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	AM_RANGE(0x0306, 0x0309) AM_WRITE(xtrain_outputs_w ) AM_SHARE("outputs")
-ADDRESS_MAP_END
+	map(0x0306, 0x0309).w(this, FUNC(subsino2_state::xtrain_outputs_w)).share("outputs");
+}
 
 
 /***************************************************************************

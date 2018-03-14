@@ -211,27 +211,29 @@ READ8_MEMBER(osbexec_state::osbexec_rtc_r)
 }
 
 
-ADDRESS_MAP_START(osbexec_state::osbexec_mem)
-	AM_RANGE( 0x0000, 0x1FFF ) AM_READ_BANK("0000") AM_WRITE(osbexec_0000_w )   /* ROM and maybe also banked ram */
-	AM_RANGE( 0x2000, 0x3FFF ) AM_RAMBANK("2000")                               /* Banked RAM */
-	AM_RANGE( 0x4000, 0xBFFF ) AM_RAMBANK("4000")                               /* Banked RAM */
-	AM_RANGE( 0xC000, 0xDFFF ) AM_READWRITE(osbexec_c000_r, osbexec_c000_w )    /* Video ram / Banked RAM */
-	AM_RANGE( 0xE000, 0xEFFF ) AM_RAMBANK("e000")                               /* Banked RAM */
-	AM_RANGE( 0xF000, 0xFFFF ) AM_RAM                                           /* 4KB of non-banked RAM for system stack etc */
-ADDRESS_MAP_END
+void osbexec_state::osbexec_mem(address_map &map)
+{
+	map(0x0000, 0x1FFF).bankr("0000").w(this, FUNC(osbexec_state::osbexec_0000_w));   /* ROM and maybe also banked ram */
+	map(0x2000, 0x3FFF).bankrw("2000");                               /* Banked RAM */
+	map(0x4000, 0xBFFF).bankrw("4000");                               /* Banked RAM */
+	map(0xC000, 0xDFFF).rw(this, FUNC(osbexec_state::osbexec_c000_r), FUNC(osbexec_state::osbexec_c000_w));    /* Video ram / Banked RAM */
+	map(0xE000, 0xEFFF).bankrw("e000");                               /* Banked RAM */
+	map(0xF000, 0xFFFF).ram();                                           /* 4KB of non-banked RAM for system stack etc */
+}
 
 
-ADDRESS_MAP_START(osbexec_state::osbexec_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read, write)       /* 6821 PIA @ UD12 */
-	AM_RANGE( 0x04, 0x07 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("ctc", pit8253_device, read, write)          /* 8253 @UD1 */
-	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("mb8877", wd_fdc_device_base, read, write )  /* MB8877 @ UB17 input clock = 1MHz */
-	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w )    /* SIO @ UD4 */
-	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_1", pia6821_device, read, write)       /* 6821 PIA @ UD8 */
-	AM_RANGE( 0x14, 0x17 ) AM_SELECT( 0xff00 ) AM_READ(osbexec_kbd_r )                                      /* KBD */
-	AM_RANGE( 0x18, 0x1b ) AM_MIRROR( 0xff00 ) AM_READ(osbexec_rtc_r )                                      /* "RTC" @ UE13/UF13 */
+void osbexec_state::osbexec_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x03).mirror(0xff00).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));       /* 6821 PIA @ UD12 */
+	map(0x04, 0x07).mirror(0xff00).rw("ctc", FUNC(pit8253_device::read), FUNC(pit8253_device::write));          /* 8253 @UD1 */
+	map(0x08, 0x0B).mirror(0xff00).rw(m_mb8877, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));  /* MB8877 @ UB17 input clock = 1MHz */
+	map(0x0C, 0x0F).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));    /* SIO @ UD4 */
+	map(0x10, 0x13).mirror(0xff00).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));       /* 6821 PIA @ UD8 */
+	map(0x14, 0x17).select(0xff00).r(this, FUNC(osbexec_state::osbexec_kbd_r));                                      /* KBD */
+	map(0x18, 0x1b).mirror(0xff00).r(this, FUNC(osbexec_state::osbexec_rtc_r));                                      /* "RTC" @ UE13/UF13 */
 	/* ?? - vid ? */
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( osbexec )

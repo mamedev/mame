@@ -38,45 +38,47 @@ WRITE16_MEMBER(darkseal_state::irq_ack_w)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(darkseal_state::darkseal_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(palette_24bit_rg_w) AM_SHARE("paletteram")
-	AM_RANGE(0x141000, 0x141fff) AM_RAM_WRITE(palette_24bit_b_w) AM_SHARE("paletteram2")
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW")
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x180006, 0x180007) AM_READNOP AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
-	AM_RANGE(0x180008, 0x180009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff).cswidth(16)
-	AM_RANGE(0x18000a, 0x18000b) AM_READNOP AM_WRITE(irq_ack_w)
+void darkseal_state::darkseal_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x103fff).ram().share("ram");
+	map(0x120000, 0x1207ff).ram().share("spriteram");
+	map(0x140000, 0x140fff).ram().w(this, FUNC(darkseal_state::palette_24bit_rg_w)).share("paletteram");
+	map(0x141000, 0x141fff).ram().w(this, FUNC(darkseal_state::palette_24bit_b_w)).share("paletteram2");
+	map(0x180000, 0x180001).portr("DSW");
+	map(0x180002, 0x180003).portr("P1_P2");
+	map(0x180004, 0x180005).portr("SYSTEM");
+	map(0x180006, 0x180007).nopr().w(m_spriteram, FUNC(buffered_spriteram16_device::write));
+	map(0x180008, 0x180009).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x18000a, 0x18000b).nopr().w(this, FUNC(darkseal_state::irq_ack_w));
 
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("tilegen2", deco16ic_device, pf_control_w)
+	map(0x200000, 0x201fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x202000, 0x203fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x240000, 0x24000f).w(m_deco_tilegen2, FUNC(deco16ic_device::pf_control_w));
 
-	AM_RANGE(0x220000, 0x220fff) AM_RAM AM_SHARE("pf1_rowscroll")
+	map(0x220000, 0x220fff).ram().share("pf1_rowscroll");
 	// pf2 & 4 rowscrolls are where? (maybe don't exist?)
-	AM_RANGE(0x222000, 0x222fff) AM_RAM AM_SHARE("pf3_rowscroll")
+	map(0x222000, 0x222fff).ram().share("pf3_rowscroll");
 
-	AM_RANGE(0x260000, 0x261fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x262000, 0x263fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-ADDRESS_MAP_END
+	map(0x260000, 0x261fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x262000, 0x263fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x2a0000, 0x2a000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+}
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(darkseal_state::sound_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void darkseal_state::sound_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x100000, 0x100001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x110000, 0x110001).rw("ym2", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x140000, 0x140001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1f0000, 0x1f1fff).bankrw("bank8");
+	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
+	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+}
 
 /******************************************************************************/
 

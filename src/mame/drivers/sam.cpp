@@ -14,10 +14,11 @@ public:
 		void sam_map(address_map &map);
 };
 
-ADDRESS_MAP_START(sam_state::sam_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("boot",0)
-	AM_RANGE(0x00300000, 0x003fffff) AM_RAM
-ADDRESS_MAP_END
+void sam_state::sam_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).rom().region("boot", 0);
+	map(0x00300000, 0x003fffff).ram();
+}
 
 static INPUT_PORTS_START( sam )
 INPUT_PORTS_END

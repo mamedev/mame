@@ -399,18 +399,19 @@ WRITE8_MEMBER( cocoloco_state::coincounter_w )
 *      Memory Map Information      *
 ***********************************/
 
-ADDRESS_MAP_START(cocoloco_state::cocoloco_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(vram_r, vram_w)     // 256 x 256 x 1
-	AM_RANGE(0x6001, 0x6001) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0x6003, 0x6003) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(vbank_w)
-	AM_RANGE(0x8005, 0x8005) AM_WRITE(coincounter_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa005, 0xa005) AM_WRITE(vram_clear_w)
-	AM_RANGE(0xd000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void cocoloco_state::cocoloco_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x3fff).rw(this, FUNC(cocoloco_state::vram_r), FUNC(cocoloco_state::vram_w));     // 256 x 256 x 1
+	map(0x6001, 0x6001).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x6002, 0x6002).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0x6003, 0x6003).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0x8003, 0x8003).w(this, FUNC(cocoloco_state::vbank_w));
+	map(0x8005, 0x8005).w(this, FUNC(cocoloco_state::coincounter_w));
+	map(0xa000, 0xa000).portr("IN0");
+	map(0xa005, 0xa005).w(this, FUNC(cocoloco_state::vram_clear_w));
+	map(0xd000, 0xffff).rom();
+}
 
 /*
   1800-3fff: RW  --> code inits reading and writing the whole range.

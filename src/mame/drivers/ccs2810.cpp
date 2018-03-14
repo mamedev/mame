@@ -178,21 +178,24 @@ WRITE8_MEMBER(ccs_state::io_write)
 		m_ins8250->ins8250_w(space, offset & 7, data);
 }
 
-ADDRESS_MAP_START(ccs_state::ccs2810_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(memory_read, memory_write)
-ADDRESS_MAP_END
+void ccs_state::ccs2810_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(ccs_state::memory_read), FUNC(ccs_state::memory_write));
+}
 
-ADDRESS_MAP_START(ccs_state::ccs2810_io)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_read, io_write)
-ADDRESS_MAP_END
+void ccs_state::ccs2810_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(ccs_state::io_read), FUNC(ccs_state::io_write));
+}
 
-ADDRESS_MAP_START(ccs_state::ccs2422_io)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_read, io_write)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff00) AM_READWRITE(port04_r,port04_w)
-	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff00) AM_DEVREADWRITE("fdc", mb8877_device, read, write)
-	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_READWRITE(port34_r,port34_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0xff00) AM_WRITE(port40_w)
-ADDRESS_MAP_END
+void ccs_state::ccs2422_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(ccs_state::io_read), FUNC(ccs_state::io_write));
+	map(0x04, 0x04).mirror(0xff00).rw(this, FUNC(ccs_state::port04_r), FUNC(ccs_state::port04_w));
+	map(0x30, 0x33).mirror(0xff00).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write));
+	map(0x34, 0x34).mirror(0xff00).rw(this, FUNC(ccs_state::port34_r), FUNC(ccs_state::port34_w));
+	map(0x40, 0x40).mirror(0xff00).w(this, FUNC(ccs_state::port40_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ccs2810 )

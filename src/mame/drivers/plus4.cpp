@@ -482,18 +482,20 @@ READ8_MEMBER( plus4_state::ted_videoram_r )
 //  ADDRESS_MAP( plus4_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(plus4_state::plus4_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void plus4_state::plus4_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(plus4_state::read), FUNC(plus4_state::write));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( ted_videoram_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(plus4_state::ted_videoram_map)
-	AM_RANGE(0x0000, 0xffff) AM_READ(ted_videoram_r)
-ADDRESS_MAP_END
+void plus4_state::ted_videoram_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(this, FUNC(plus4_state::ted_videoram_r));
+}
 
 
 

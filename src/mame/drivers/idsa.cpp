@@ -77,31 +77,33 @@ private:
 	optional_device_array<i8255_device, 2> m_ppi;
 };
 
-ADDRESS_MAP_START(idsa_state::maincpu_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-ADDRESS_MAP_END
+void idsa_state::maincpu_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+}
 
-ADDRESS_MAP_START(idsa_state::maincpu_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_READ_PORT("X0")
-	AM_RANGE(0x10, 0x1f) AM_READ_PORT("X1")
-	AM_RANGE(0x20, 0x2f) AM_READ_PORT("X2")
-	AM_RANGE(0x30, 0x3f) AM_READ_PORT("X3")
-	AM_RANGE(0x40, 0x4f) AM_READ_PORT("X4")
-	AM_RANGE(0x50, 0x5f) AM_READ_PORT("X5")
-	AM_RANGE(0x60, 0x6f) AM_READ_PORT("X6")
-	AM_RANGE(0x70, 0x7f) AM_READ_PORT("X7")
-	AM_RANGE(0x80, 0x8f) AM_WRITE(port80_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(port90_w)
-	AM_RANGE(0xb0, 0xb3) AM_READ(portb0_r)
-	AM_RANGE(0xbd, 0xbd) AM_READ_PORT("X8")
-	AM_RANGE(0xd0, 0xdf) AM_DEVWRITE("speech", sp0256_device, ald_w)
-	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("aysnd1", ay8910_device, data_r, address_data_w)
-	AM_RANGE(0xf0, 0xff) AM_DEVREADWRITE("aysnd2", ay8910_device, data_r, address_data_w)
-ADDRESS_MAP_END
+void idsa_state::maincpu_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x0f).portr("X0");
+	map(0x10, 0x1f).portr("X1");
+	map(0x20, 0x2f).portr("X2");
+	map(0x30, 0x3f).portr("X3");
+	map(0x40, 0x4f).portr("X4");
+	map(0x50, 0x5f).portr("X5");
+	map(0x60, 0x6f).portr("X6");
+	map(0x70, 0x7f).portr("X7");
+	map(0x80, 0x8f).w(this, FUNC(idsa_state::port80_w));
+	map(0x90, 0x9f).w(this, FUNC(idsa_state::port90_w));
+	map(0xb0, 0xb3).r(this, FUNC(idsa_state::portb0_r));
+	map(0xbd, 0xbd).portr("X8");
+	map(0xd0, 0xdf).w(m_speech, FUNC(sp0256_device::ald_w));
+	map(0xe0, 0xef).rw("aysnd1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0xf0, 0xff).rw("aysnd2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+}
 
 
 static INPUT_PORTS_START( idsa )

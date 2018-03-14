@@ -1017,58 +1017,60 @@ WRITE16_MEMBER(jalmah_state::jalmah_flip_screen_w)
 //  popmessage("%04x",data);
 }
 
-ADDRESS_MAP_START(jalmah_state::jalmah)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")
+void jalmah_state::jalmah(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x080001).portr("SYSTEM");
+	map(0x080002, 0x080003).portr("DSW");
 	//       0x080004, 0x080005  MCU read,different for each game
-	AM_RANGE(0x080010, 0x080011) AM_WRITE(jalmah_flip_screen_w)
+	map(0x080010, 0x080011).w(this, FUNC(jalmah_state::jalmah_flip_screen_w));
 	//       0x080012, 0x080013  MCU write related,same for each game
 	//       0x080014, 0x080015  MCU write related,same for each game
-/**/AM_RANGE(0x080016, 0x080017) AM_RAM_WRITE(jalmah_tilebank_w)
-	AM_RANGE(0x080018, 0x080019) AM_WRITE(jalmah_okibank_w)
-	AM_RANGE(0x08001a, 0x08001b) AM_WRITE(jalmah_okirom_w)
-/**/AM_RANGE(0x080020, 0x08003f) AM_RAM_WRITE(jalmah_scroll_w)
-	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+/**/map(0x080016, 0x080017).ram().w(this, FUNC(jalmah_state::jalmah_tilebank_w));
+	map(0x080018, 0x080019).w(this, FUNC(jalmah_state::jalmah_okibank_w));
+	map(0x08001a, 0x08001b).w(this, FUNC(jalmah_state::jalmah_okirom_w));
+/**/map(0x080020, 0x08003f).ram().w(this, FUNC(jalmah_state::jalmah_scroll_w));
+	map(0x080041, 0x080041).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//       0x084000, 0x084001  ?
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* Palette RAM */
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("sc0_vram")
-	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(sc1_vram_w) AM_SHARE("sc1_vram")
-	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(sc2_vram_w) AM_SHARE("sc2_vram")
-	AM_RANGE(0x09c000, 0x09ffff) AM_RAM_WRITE(sc3_vram_w) AM_SHARE("sc3_vram")
-	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_SHARE("jshared_ram")/*shared with MCU*/
-	AM_RANGE(0x0f1000, 0x0fffff) AM_RAM /*Work Ram*/
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("jmcu_code")/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
-ADDRESS_MAP_END
+	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
+	map(0x090000, 0x093fff).ram().w(this, FUNC(jalmah_state::sc0_vram_w)).share("sc0_vram");
+	map(0x094000, 0x097fff).ram().w(this, FUNC(jalmah_state::sc1_vram_w)).share("sc1_vram");
+	map(0x098000, 0x09bfff).ram().w(this, FUNC(jalmah_state::sc2_vram_w)).share("sc2_vram");
+	map(0x09c000, 0x09ffff).ram().w(this, FUNC(jalmah_state::sc3_vram_w)).share("sc3_vram");
+	map(0x0f0000, 0x0f0fff).ram().share("jshared_ram");/*shared with MCU*/
+	map(0x0f1000, 0x0fffff).ram(); /*Work Ram*/
+	map(0x100000, 0x10ffff).ram().share("jmcu_code");/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
+}
 
-ADDRESS_MAP_START(jalmah_state::urashima)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")
+void jalmah_state::urashima(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x080001).portr("SYSTEM");
+	map(0x080002, 0x080003).portr("DSW");
 	//       0x080004, 0x080005  MCU read,different for each game
-	AM_RANGE(0x080010, 0x080011) AM_WRITE(jalmah_flip_screen_w)
+	map(0x080010, 0x080011).w(this, FUNC(jalmah_state::jalmah_flip_screen_w));
 	//       0x080012, 0x080013  MCU write related,same for each game
 	//       0x080014, 0x080015  MCU write related,same for each game
-/**/AM_RANGE(0x080016, 0x080017) AM_RAM_WRITE(urashima_dma_w)
-	AM_RANGE(0x080018, 0x080019) AM_WRITE(jalmah_okibank_w)
-	AM_RANGE(0x08001a, 0x08001b) AM_WRITE(jalmah_okirom_w)
-/**/AM_RANGE(0x08001c, 0x08001d) AM_RAM_WRITE(urashima_bank_w)
-	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+/**/map(0x080016, 0x080017).ram().w(this, FUNC(jalmah_state::urashima_dma_w));
+	map(0x080018, 0x080019).w(this, FUNC(jalmah_state::jalmah_okibank_w));
+	map(0x08001a, 0x08001b).w(this, FUNC(jalmah_state::jalmah_okirom_w));
+/**/map(0x08001c, 0x08001d).ram().w(this, FUNC(jalmah_state::urashima_bank_w));
+	map(0x080041, 0x080041).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//       0x084000, 0x084001  ?
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* Palette RAM */
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(urashima_sc0_vram_w) AM_SHARE("sc0_vram")
-	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(urashima_sc0_vram_w)
-	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(urashima_sc0_vram_w)
+	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
+	map(0x090000, 0x093fff).ram().w(this, FUNC(jalmah_state::urashima_sc0_vram_w)).share("sc0_vram");
+	map(0x094000, 0x097fff).ram().w(this, FUNC(jalmah_state::urashima_sc0_vram_w));
+	map(0x098000, 0x09bfff).ram().w(this, FUNC(jalmah_state::urashima_sc0_vram_w));
 //  AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(urashima_sc1_vram_w) AM_SHARE("sc1_vram")/*unused*/
 //  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(urashima_sc2_vram_w) AM_SHARE("sc2_vram")/*unused*/
 	/*$9c000-$9cfff Video Registers*/
-/**/AM_RANGE(0x09c000, 0x09dfff) AM_WRITE(urashima_vregs_w)
+/**/map(0x09c000, 0x09dfff).w(this, FUNC(jalmah_state::urashima_vregs_w));
 /**///AM_RANGE(0x09c480, 0x09c49f) AM_RAM_WRITE(urashima_sc2vregs_w)
-	AM_RANGE(0x09e000, 0x0a1fff) AM_RAM_WRITE(urashima_sc3_vram_w) AM_SHARE("sc3_vram")
-	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_SHARE("jshared_ram")/*shared with MCU*/
-	AM_RANGE(0x0f1000, 0x0fffff) AM_RAM /*Work Ram*/
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("jmcu_code")/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
-ADDRESS_MAP_END
+	map(0x09e000, 0x0a1fff).ram().w(this, FUNC(jalmah_state::urashima_sc3_vram_w)).share("sc3_vram");
+	map(0x0f0000, 0x0f0fff).ram().share("jshared_ram");/*shared with MCU*/
+	map(0x0f1000, 0x0fffff).ram(); /*Work Ram*/
+	map(0x100000, 0x10ffff).ram().share("jmcu_code");/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
+}
 
 static INPUT_PORTS_START( common )
 	PORT_START("SYSTEM")

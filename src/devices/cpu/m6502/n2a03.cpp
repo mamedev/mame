@@ -50,9 +50,9 @@ ADDRESS_MAP_END
 
 
 
-n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, N2A03, tag, owner, clock),
-	m_apu(*this, "nesapu")
+n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6502_device(mconfig, N2A03, tag, owner, clock)
+	, m_apu(*this, "nesapu")
 {
 	program_config.m_internal_map = address_map_constructor(FUNC(n2a03_device::n2a03_map), this);
 }

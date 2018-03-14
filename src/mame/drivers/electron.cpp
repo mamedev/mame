@@ -88,14 +88,15 @@ PALETTE_INIT_MEMBER(electron_state, electron)
 	palette.set_pen_colors(0, electron_palette, ARRAY_LENGTH(electron_palette));
 }
 
-ADDRESS_MAP_START(electron_state::electron_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(electron_mem_r, electron_mem_w)           /* 32KB of RAM */
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(electron_paged_r, electron_paged_w)       /* Banked ROM pages */
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("mos", 0) AM_WRITE(electron_mos_w)    /* OS ROM */
-	AM_RANGE(0xfc00, 0xfcff) AM_READWRITE(electron_fred_r, electron_fred_w )        /* FRED */
-	AM_RANGE(0xfd00, 0xfdff) AM_READWRITE(electron_jim_r, electron_jim_w )          /* JIM */
-	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(electron_sheila_r, electron_sheila_w )    /* SHEILA */
-ADDRESS_MAP_END
+void electron_state::electron_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rw(this, FUNC(electron_state::electron_mem_r), FUNC(electron_state::electron_mem_w));           /* 32KB of RAM */
+	map(0x8000, 0xbfff).rw(this, FUNC(electron_state::electron_paged_r), FUNC(electron_state::electron_paged_w));       /* Banked ROM pages */
+	map(0xc000, 0xffff).rom().region("mos", 0).w(this, FUNC(electron_state::electron_mos_w));    /* OS ROM */
+	map(0xfc00, 0xfcff).rw(this, FUNC(electron_state::electron_fred_r), FUNC(electron_state::electron_fred_w));        /* FRED */
+	map(0xfd00, 0xfdff).rw(this, FUNC(electron_state::electron_jim_r), FUNC(electron_state::electron_jim_w));          /* JIM */
+	map(0xfe00, 0xfeff).rw(this, FUNC(electron_state::electron_sheila_r), FUNC(electron_state::electron_sheila_w));    /* SHEILA */
+}
 
 INPUT_CHANGED_MEMBER(electron_state::trigger_reset)
 {

@@ -91,27 +91,28 @@ READ16_MEMBER(ashnojoe_state::fake_4a00a_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(ashnojoe_state::ashnojoe_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x041fff) AM_RAM_WRITE(ashnojoe_tileram3_w) AM_SHARE("tileram_3")
-	AM_RANGE(0x042000, 0x043fff) AM_RAM_WRITE(ashnojoe_tileram4_w) AM_SHARE("tileram_4")
-	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE(ashnojoe_tileram5_w) AM_SHARE("tileram_5")
-	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE(ashnojoe_tileram2_w) AM_SHARE("tileram_2")
-	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(ashnojoe_tileram6_w) AM_SHARE("tileram_6")
-	AM_RANGE(0x047000, 0x047fff) AM_RAM_WRITE(ashnojoe_tileram7_w) AM_SHARE("tileram_7")
-	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE(ashnojoe_tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x049000, 0x049fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x04a000, 0x04a001) AM_READ_PORT("P1")
-	AM_RANGE(0x04a002, 0x04a003) AM_READ_PORT("P2")
-	AM_RANGE(0x04a004, 0x04a005) AM_READ_PORT("DSW")
-	AM_RANGE(0x04a006, 0x04a007) AM_WRITEONLY AM_SHARE("tilemap_reg")
-	AM_RANGE(0x04a008, 0x04a009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x04a00a, 0x04a00b) AM_READ(fake_4a00a_r)  // ??
-	AM_RANGE(0x04a010, 0x04a019) AM_WRITE(joe_tilemaps_xscroll_w)
-	AM_RANGE(0x04a020, 0x04a029) AM_WRITE(joe_tilemaps_yscroll_w)
-	AM_RANGE(0x04c000, 0x04ffff) AM_RAM
-	AM_RANGE(0x080000, 0x0bffff) AM_ROM
-ADDRESS_MAP_END
+void ashnojoe_state::ashnojoe_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x040000, 0x041fff).ram().w(this, FUNC(ashnojoe_state::ashnojoe_tileram3_w)).share("tileram_3");
+	map(0x042000, 0x043fff).ram().w(this, FUNC(ashnojoe_state::ashnojoe_tileram4_w)).share("tileram_4");
+	map(0x044000, 0x044fff).ram().w(this, FUNC(ashnojoe_state::ashnojoe_tileram5_w)).share("tileram_5");
+	map(0x045000, 0x045fff).ram().w(this, FUNC(ashnojoe_state::ashnojoe_tileram2_w)).share("tileram_2");
+	map(0x046000, 0x046fff).ram().w(this, FUNC(ashnojoe_state::ashnojoe_tileram6_w)).share("tileram_6");
+	map(0x047000, 0x047fff).ram().w(this, FUNC(ashnojoe_state::ashnojoe_tileram7_w)).share("tileram_7");
+	map(0x048000, 0x048fff).ram().w(this, FUNC(ashnojoe_state::ashnojoe_tileram_w)).share("tileram");
+	map(0x049000, 0x049fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x04a000, 0x04a001).portr("P1");
+	map(0x04a002, 0x04a003).portr("P2");
+	map(0x04a004, 0x04a005).portr("DSW");
+	map(0x04a006, 0x04a007).writeonly().share("tilemap_reg");
+	map(0x04a009, 0x04a009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x04a00a, 0x04a00b).r(this, FUNC(ashnojoe_state::fake_4a00a_r));  // ??
+	map(0x04a010, 0x04a019).w(this, FUNC(ashnojoe_state::joe_tilemaps_xscroll_w));
+	map(0x04a020, 0x04a029).w(this, FUNC(ashnojoe_state::joe_tilemaps_yscroll_w));
+	map(0x04c000, 0x04ffff).ram();
+	map(0x080000, 0x0bffff).rom();
+}
 
 
 WRITE8_MEMBER(ashnojoe_state::adpcm_w)
@@ -124,19 +125,21 @@ READ8_MEMBER(ashnojoe_state::sound_latch_status_r)
 	return m_soundlatch->pending_r();
 }
 
-ADDRESS_MAP_START(ashnojoe_state::sound_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank4")
-ADDRESS_MAP_END
+void ashnojoe_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank4");
+}
 
-ADDRESS_MAP_START(ashnojoe_state::sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x06, 0x06) AM_READ(sound_latch_status_r)
-ADDRESS_MAP_END
+void ashnojoe_state::sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x02, 0x02).w(this, FUNC(ashnojoe_state::adpcm_w));
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x06, 0x06).r(this, FUNC(ashnojoe_state::sound_latch_status_r));
+}
 
 
 static INPUT_PORTS_START( ashnojoe )

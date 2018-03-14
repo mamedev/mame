@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
+#include "cpu/h6280/h6280.h"
 
 /*************************************************************************
 
@@ -32,7 +33,7 @@ public:
 	int            m_trio_control_select;
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<h6280_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<deco_bac06_device> m_tilegen1;
 	required_device<deco_bac06_device> m_tilegen2;

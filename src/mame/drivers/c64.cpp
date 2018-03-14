@@ -536,27 +536,30 @@ READ8_MEMBER( c64_state::vic_colorram_r )
 //  ADDRESS_MAP( c64_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c64_state::c64_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void c64_state::c64_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(c64_state::read), FUNC(c64_state::write));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c64_state::vic_videoram_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
-ADDRESS_MAP_END
+void c64_state::vic_videoram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).r(this, FUNC(c64_state::vic_videoram_r));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c64_state::vic_colorram_map)
-	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
-ADDRESS_MAP_END
+void c64_state::vic_colorram_map(address_map &map)
+{
+	map(0x000, 0x3ff).r(this, FUNC(c64_state::vic_colorram_r));
+}
 
 
 

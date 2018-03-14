@@ -111,62 +111,67 @@ WRITE8_MEMBER(sraider_state::sraider_misc_w)
 }
 
 
-ADDRESS_MAP_START(ladybug_state::ladybug_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_DEVWRITE("video", ladybug_video_device, spr_w)
-	AM_RANGE(0x8000, 0x8fff) AM_READNOP
-	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN0")
-	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("IN1")
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW0")
-	AM_RANGE(0x9003, 0x9003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("videolatch", ls259_device, write_d0)
-	AM_RANGE(0xb000, 0xbfff) AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0xd000, 0xd7ff) AM_DEVREADWRITE("video", ladybug_video_device, bg_r, bg_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
+void ladybug_state::ladybug_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram();
+	map(0x7000, 0x73ff).w(m_video, FUNC(ladybug_video_device::spr_w));
+	map(0x8000, 0x8fff).nopr();
+	map(0x9000, 0x9000).portr("IN0");
+	map(0x9001, 0x9001).portr("IN1");
+	map(0x9002, 0x9002).portr("DSW0");
+	map(0x9003, 0x9003).portr("DSW1");
+	map(0xa000, 0xa007).w("videolatch", FUNC(ls259_device::write_d0));
+	map(0xb000, 0xbfff).w("sn1", FUNC(sn76489_device::write));
+	map(0xc000, 0xcfff).w("sn2", FUNC(sn76489_device::write));
+	map(0xd000, 0xd7ff).rw(m_video, FUNC(ladybug_video_device::bg_r), FUNC(ladybug_video_device::bg_w));
+	map(0xe000, 0xe000).portr("IN2");
+}
 
 
-ADDRESS_MAP_START(dorodon_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void dorodon_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom().share("decrypted_opcodes");
+}
 
 
-ADDRESS_MAP_START(sraider_state::sraider_cpu1_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_DEVWRITE("video", ladybug_video_device, spr_w)
-	AM_RANGE(0x8005, 0x8005) AM_READ(sraider_8005_r)  // protection check?
-	AM_RANGE(0x8006, 0x8006) AM_WRITEONLY AM_SHARE("sound_low")
-	AM_RANGE(0x8007, 0x8007) AM_WRITEONLY AM_SHARE("sound_high")
-	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN0")
-	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("IN1")
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW0")
-	AM_RANGE(0x9003, 0x9003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd000, 0xd7ff) AM_DEVWRITE("video", ladybug_video_device, bg_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITENOP  //unknown 0x10 when in attract, 0x20 when coined/playing
-ADDRESS_MAP_END
+void sraider_state::sraider_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram();
+	map(0x7000, 0x73ff).w("video", FUNC(ladybug_video_device::spr_w));
+	map(0x8005, 0x8005).r(this, FUNC(sraider_state::sraider_8005_r));  // protection check?
+	map(0x8006, 0x8006).writeonly().share("sound_low");
+	map(0x8007, 0x8007).writeonly().share("sound_high");
+	map(0x9000, 0x9000).portr("IN0");
+	map(0x9001, 0x9001).portr("IN1");
+	map(0x9002, 0x9002).portr("DSW0");
+	map(0x9003, 0x9003).portr("DSW1");
+	map(0xd000, 0xd7ff).w("video", FUNC(ladybug_video_device::bg_w));
+	map(0xe000, 0xe000).nopw();  //unknown 0x10 when in attract, 0x20 when coined/playing
+}
 
-ADDRESS_MAP_START(sraider_state::sraider_cpu2_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READONLY AM_SHARE("sound_low")
-	AM_RANGE(0xa000, 0xa000) AM_READONLY AM_SHARE("sound_high")
-	AM_RANGE(0xc000, 0xc000) AM_READNOP //some kind of sync
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_SHARE("grid_data")
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(sraider_io_w)
-ADDRESS_MAP_END
+void sraider_state::sraider_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x63ff).ram();
+	map(0x8000, 0x8000).readonly().share("sound_low");
+	map(0xa000, 0xa000).readonly().share("sound_high");
+	map(0xc000, 0xc000).nopr(); //some kind of sync
+	map(0xe000, 0xe0ff).writeonly().share("grid_data");
+	map(0xe800, 0xe800).w(this, FUNC(sraider_state::sraider_io_w));
+}
 
-ADDRESS_MAP_START(sraider_state::sraider_cpu2_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("sn3", sn76489_device, write)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE("sn4", sn76489_device, write)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("sn5", sn76489_device, write)
-	AM_RANGE(0x28, 0x3f) AM_WRITE(sraider_misc_w)  // lots unknown
-ADDRESS_MAP_END
+void sraider_state::sraider_cpu2_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("sn1", FUNC(sn76489_device::write));
+	map(0x08, 0x08).w("sn2", FUNC(sn76489_device::write));
+	map(0x10, 0x10).w("sn3", FUNC(sn76489_device::write));
+	map(0x18, 0x18).w("sn4", FUNC(sn76489_device::write));
+	map(0x20, 0x20).w("sn5", FUNC(sn76489_device::write));
+	map(0x28, 0x3f).w(this, FUNC(sraider_state::sraider_misc_w));  // lots unknown
+}
 
 
 INPUT_CHANGED_MEMBER(ladybug_state::coin1_inserted)

@@ -230,39 +230,42 @@ WRITE8_MEMBER(renegade_state::coincounter_w)
 
 /********************************************************************************************/
 
-ADDRESS_MAP_START(renegade_state::renegade_nomcu_map)
-	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x3000, 0x30ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x3100, 0x31ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0") AM_WRITE(scroll_lsb_w)       /* Player#1 controls, P1,P2 start */
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1") AM_WRITE(scroll_msb_w)       /* Player#2 controls, coin triggers */
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* DIP2  various IO ports */
-	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1") AM_WRITE(flipscreen_w)   /* DIP1 */
-	AM_RANGE(0x3805, 0x3805) AM_READNOP AM_WRITE(bankswitch_w)
-	AM_RANGE(0x3806, 0x3806) AM_WRITENOP // ?? watchdog
-	AM_RANGE(0x3807, 0x3807) AM_WRITE(coincounter_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("rombank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void renegade_state::renegade_nomcu_map(address_map &map)
+{
+	map(0x0000, 0x17ff).ram();
+	map(0x1800, 0x1fff).ram().w(this, FUNC(renegade_state::fg_videoram_w)).share("fg_videoram");
+	map(0x2000, 0x27ff).ram().share("spriteram");
+	map(0x2800, 0x2fff).ram().w(this, FUNC(renegade_state::bg_videoram_w)).share("bg_videoram");
+	map(0x3000, 0x30ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0x3100, 0x31ff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x3800, 0x3800).portr("IN0").w(this, FUNC(renegade_state::scroll_lsb_w));       /* Player#1 controls, P1,P2 start */
+	map(0x3801, 0x3801).portr("IN1").w(this, FUNC(renegade_state::scroll_msb_w));       /* Player#2 controls, coin triggers */
+	map(0x3802, 0x3802).portr("DSW2").w(m_soundlatch, FUNC(generic_latch_8_device::write)); /* DIP2  various IO ports */
+	map(0x3803, 0x3803).portr("DSW1").w(this, FUNC(renegade_state::flipscreen_w));   /* DIP1 */
+	map(0x3805, 0x3805).nopr().w(this, FUNC(renegade_state::bankswitch_w));
+	map(0x3806, 0x3806).nopw(); // ?? watchdog
+	map(0x3807, 0x3807).w(this, FUNC(renegade_state::coincounter_w));
+	map(0x4000, 0x7fff).bankr("rombank");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(renegade_state::renegade_map)
-	AM_IMPORT_FROM(renegade_nomcu_map)
-	AM_RANGE(0x3804, 0x3804) AM_DEVREADWRITE("mcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0x3805, 0x3805) AM_READ(mcu_reset_r)
-ADDRESS_MAP_END
+void renegade_state::renegade_map(address_map &map)
+{
+	renegade_nomcu_map(map);
+	map(0x3804, 0x3804).rw(m_mcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+	map(0x3805, 0x3805).r(this, FUNC(renegade_state::mcu_reset_r));
+}
 
-ADDRESS_MAP_START(renegade_state::renegade_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(adpcm_start_w)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_addr_w)
-	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(adpcm_stop_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void renegade_state::renegade_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1800, 0x1800).w(this, FUNC(renegade_state::adpcm_start_w));
+	map(0x2000, 0x2000).w(this, FUNC(renegade_state::adpcm_addr_w));
+	map(0x2800, 0x2801).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
+	map(0x3000, 0x3000).w(this, FUNC(renegade_state::adpcm_stop_w));
+	map(0x8000, 0xffff).rom();
+}
 
 
 static INPUT_PORTS_START( renegade )

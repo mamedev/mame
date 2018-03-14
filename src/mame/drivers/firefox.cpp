@@ -555,36 +555,37 @@ void firefox_state::machine_start()
  *
  *************************************/
 
-ADDRESS_MAP_START(firefox_state::main_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2800, 0x2aff) AM_RAM_WRITE(sprite_palette_w) AM_SHARE("sprite_palette")
-	AM_RANGE(0x2b00, 0x2b00) AM_MIRROR(0x04ff) AM_WRITE(firefox_objram_bank_w)
-	AM_RANGE(0x2c00, 0x2eff) AM_RAM_WRITE(tile_palette_w) AM_SHARE("tile_palette")
-	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x40ff) AM_READWRITE(nvram_r, nvram_w)                     /* NOVRAM */
-	AM_RANGE(0x4100, 0x4100) AM_MIRROR(0x00f8) AM_READ_PORT("rdin0")            /* RDIN0 */
-	AM_RANGE(0x4101, 0x4101) AM_MIRROR(0x00f8) AM_READ_PORT("rdin1")            /* RDIN1 */
-	AM_RANGE(0x4102, 0x4102) AM_MIRROR(0x00f8) AM_READ(firefox_disc_status_r)   /* RDIN2 */
-	AM_RANGE(0x4103, 0x4103) AM_MIRROR(0x00f8) AM_READ_PORT("opt0")             /* OPT0 */
-	AM_RANGE(0x4104, 0x4104) AM_MIRROR(0x00f8) AM_READ_PORT("opt1")             /* OPT1 */
-	AM_RANGE(0x4105, 0x4105) AM_MIRROR(0x00f8) AM_READ(firefox_disc_data_r)     /* DREAD */
-	AM_RANGE(0x4106, 0x4106) AM_MIRROR(0x00f8) AM_READ(sound_to_main_r)         /* RDSOUND */
-	AM_RANGE(0x4107, 0x4107) AM_MIRROR(0x00f8) AM_READ(adc_r)                   /* ADC */
-	AM_RANGE(0x4200, 0x4200) AM_MIRROR(0x0047) AM_WRITE(main_irq_clear_w)       /* RSTIRQ */
-	AM_RANGE(0x4208, 0x4208) AM_MIRROR(0x0047) AM_WRITE(main_firq_clear_w)      /* RSTFIRQ */
-	AM_RANGE(0x4210, 0x4210) AM_MIRROR(0x0047) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)       /* WDCLK */
-	AM_RANGE(0x4218, 0x4218) AM_MIRROR(0x0047) AM_WRITE(firefox_disc_read_w)    /* DSKREAD */
-	AM_RANGE(0x4220, 0x4223) AM_MIRROR(0x0044) AM_WRITE(adc_select_w)           /* ADCSTART */
-	AM_RANGE(0x4230, 0x4230) AM_MIRROR(0x0047) AM_WRITE(self_reset_w)           /* AMUCK */
-	AM_RANGE(0x4280, 0x4287) AM_MIRROR(0x0040) AM_DEVWRITE("latch0", ls259_device, write_d7)
-	AM_RANGE(0x4288, 0x428f) AM_MIRROR(0x0040) AM_DEVWRITE("latch1", ls259_device, write_d7)
-	AM_RANGE(0x4290, 0x4290) AM_MIRROR(0x0047) AM_WRITE(rom_bank_w)             /* WRTREG */
-	AM_RANGE(0x4298, 0x4298) AM_MIRROR(0x0047) AM_WRITE(main_to_sound_w)        /* WRSOUND */
-	AM_RANGE(0x42a0, 0x42a0) AM_MIRROR(0x0047) AM_WRITE(firefox_disc_data_w)    /* DSKLATCH */
-	AM_RANGE(0x4400, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void firefox_state::main_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1fff).ram().w(this, FUNC(firefox_state::tileram_w)).share("tileram");
+	map(0x2000, 0x27ff).ram().share("spriteram");
+	map(0x2800, 0x2aff).ram().w(this, FUNC(firefox_state::sprite_palette_w)).share("sprite_palette");
+	map(0x2b00, 0x2b00).mirror(0x04ff).w(this, FUNC(firefox_state::firefox_objram_bank_w));
+	map(0x2c00, 0x2eff).ram().w(this, FUNC(firefox_state::tile_palette_w)).share("tile_palette");
+	map(0x3000, 0x3fff).bankr("bank1");
+	map(0x4000, 0x40ff).rw(this, FUNC(firefox_state::nvram_r), FUNC(firefox_state::nvram_w));                     /* NOVRAM */
+	map(0x4100, 0x4100).mirror(0x00f8).portr("rdin0");            /* RDIN0 */
+	map(0x4101, 0x4101).mirror(0x00f8).portr("rdin1");            /* RDIN1 */
+	map(0x4102, 0x4102).mirror(0x00f8).r(this, FUNC(firefox_state::firefox_disc_status_r));   /* RDIN2 */
+	map(0x4103, 0x4103).mirror(0x00f8).portr("opt0");             /* OPT0 */
+	map(0x4104, 0x4104).mirror(0x00f8).portr("opt1");             /* OPT1 */
+	map(0x4105, 0x4105).mirror(0x00f8).r(this, FUNC(firefox_state::firefox_disc_data_r));     /* DREAD */
+	map(0x4106, 0x4106).mirror(0x00f8).r(this, FUNC(firefox_state::sound_to_main_r));         /* RDSOUND */
+	map(0x4107, 0x4107).mirror(0x00f8).r(this, FUNC(firefox_state::adc_r));                   /* ADC */
+	map(0x4200, 0x4200).mirror(0x0047).w(this, FUNC(firefox_state::main_irq_clear_w));       /* RSTIRQ */
+	map(0x4208, 0x4208).mirror(0x0047).w(this, FUNC(firefox_state::main_firq_clear_w));      /* RSTFIRQ */
+	map(0x4210, 0x4210).mirror(0x0047).w("watchdog", FUNC(watchdog_timer_device::reset_w));       /* WDCLK */
+	map(0x4218, 0x4218).mirror(0x0047).w(this, FUNC(firefox_state::firefox_disc_read_w));    /* DSKREAD */
+	map(0x4220, 0x4223).mirror(0x0044).w(this, FUNC(firefox_state::adc_select_w));           /* ADCSTART */
+	map(0x4230, 0x4230).mirror(0x0047).w(this, FUNC(firefox_state::self_reset_w));           /* AMUCK */
+	map(0x4280, 0x4287).mirror(0x0040).w("latch0", FUNC(ls259_device::write_d7));
+	map(0x4288, 0x428f).mirror(0x0040).w("latch1", FUNC(ls259_device::write_d7));
+	map(0x4290, 0x4290).mirror(0x0047).w(this, FUNC(firefox_state::rom_bank_w));             /* WRTREG */
+	map(0x4298, 0x4298).mirror(0x0047).w(this, FUNC(firefox_state::main_to_sound_w));        /* WRSOUND */
+	map(0x42a0, 0x42a0).mirror(0x0047).w(this, FUNC(firefox_state::firefox_disc_data_w));    /* DSKLATCH */
+	map(0x4400, 0xffff).rom();
+}
 
 
 
@@ -594,18 +595,19 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(firefox_state::audio_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0700) AM_RAM /* RIOT ram */
-	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x0760) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0x1000, 0x1000) AM_READ(main_to_sound_r)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_to_main_w)
-	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
-	AM_RANGE(0x2800, 0x280f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
-	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE("pokey3", pokey_device, read, write)
-	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE("pokey4", pokey_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void firefox_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x087f).mirror(0x0700).ram(); /* RIOT ram */
+	map(0x0880, 0x089f).mirror(0x0760).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x1000, 0x1000).r(this, FUNC(firefox_state::main_to_sound_r));
+	map(0x1800, 0x1800).w(this, FUNC(firefox_state::sound_to_main_w));
+	map(0x2000, 0x200f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x2800, 0x280f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x3000, 0x300f).rw("pokey3", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x3800, 0x380f).rw("pokey4", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 
 

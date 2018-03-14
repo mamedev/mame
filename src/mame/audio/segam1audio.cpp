@@ -22,29 +22,32 @@
 #define MPCMBANK1_TAG   "m1pcm1_bank"
 #define MPCMBANK2_TAG   "m1pcm2_bank"
 
-ADDRESS_MAP_START(segam1audio_device::segam1audio_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x09ffff) AM_ROM AM_REGION(M68000_TAG, 0x20000) // mirror of upper ROM socket
-	AM_RANGE(0xc20000, 0xc20001) AM_DEVREADWRITE8(UART_TAG, i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xc20002, 0xc20003) AM_DEVREADWRITE8(UART_TAG, i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8(MULTIPCM_1_TAG, multipcm_device, read, write, 0x00ff)
-	AM_RANGE(0xc40012, 0xc40013) AM_WRITENOP
-	AM_RANGE(0xc50000, 0xc50001) AM_WRITE(m1_snd_mpcm_bnk1_w)
-	AM_RANGE(0xc60000, 0xc60007) AM_DEVREADWRITE8(MULTIPCM_2_TAG, multipcm_device, read, write, 0x00ff)
-	AM_RANGE(0xc70000, 0xc70001) AM_WRITE(m1_snd_mpcm_bnk2_w)
-	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8(YM3438_TAG, ym3438_device, read, write, 0x00ff)
-	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
-ADDRESS_MAP_END
+void segam1audio_device::segam1audio_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x09ffff).rom().region(M68000_TAG, 0x20000); // mirror of upper ROM socket
+	map(0xc20001, 0xc20001).rw(UART_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xc20003, 0xc20003).rw(UART_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc40000, 0xc40007).rw(MULTIPCM_1_TAG, FUNC(multipcm_device::read), FUNC(multipcm_device::write)).umask16(0x00ff);
+	map(0xc40012, 0xc40013).nopw();
+	map(0xc50000, 0xc50001).w(this, FUNC(segam1audio_device::m1_snd_mpcm_bnk1_w));
+	map(0xc60000, 0xc60007).rw(MULTIPCM_2_TAG, FUNC(multipcm_device::read), FUNC(multipcm_device::write)).umask16(0x00ff);
+	map(0xc70000, 0xc70001).w(this, FUNC(segam1audio_device::m1_snd_mpcm_bnk2_w));
+	map(0xd00000, 0xd00007).rw(YM3438_TAG, FUNC(ym3438_device::read), FUNC(ym3438_device::write)).umask16(0x00ff);
+	map(0xf00000, 0xf0ffff).ram();
+}
 
-ADDRESS_MAP_START(segam1audio_device::mpcm1_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK(MPCMBANK1_TAG)
-ADDRESS_MAP_END
+void segam1audio_device::mpcm1_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x1fffff).bankr(MPCMBANK1_TAG);
+}
 
-ADDRESS_MAP_START(segam1audio_device::mpcm2_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK(MPCMBANK2_TAG)
-ADDRESS_MAP_END
+void segam1audio_device::mpcm2_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x1fffff).bankr(MPCMBANK2_TAG);
+}
 
 //**************************************************************************
 //  GLOBAL VARIABLES

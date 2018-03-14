@@ -507,50 +507,56 @@ void smashdrv_state::machine_reset()
 
 // ATV Track
 
-ADDRESS_MAP_START(atvtrack_state::atvtrack_main_map)
-	AM_RANGE(0x00000000, 0x000003ff) AM_RAM AM_SHARE("sharedmem")
-	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE(control_r, control_w) // control registers
+void atvtrack_state::atvtrack_main_map(address_map &map)
+{
+	map(0x00000000, 0x000003ff).ram().share("sharedmem");
+	map(0x00020000, 0x00020007).rw(this, FUNC(atvtrack_state::control_r), FUNC(atvtrack_state::control_w)); // control registers
 //  AM_RANGE(0x00020040, 0x0002007f) // audio DAC buffer
-	AM_RANGE(0x14000000, 0x14000007) AM_READWRITE(nand_data_r, nand_data_w)
-	AM_RANGE(0x14100000, 0x14100007) AM_WRITE(nand_cmd_w)
-	AM_RANGE(0x14200000, 0x14200007) AM_WRITE(nand_addr_w)
-	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x14000000, 0x14000007).rw(this, FUNC(atvtrack_state::nand_data_r), FUNC(atvtrack_state::nand_data_w));
+	map(0x14100000, 0x14100007).w(this, FUNC(atvtrack_state::nand_cmd_w));
+	map(0x14200000, 0x14200007).w(this, FUNC(atvtrack_state::nand_addr_w));
+	map(0x0c000000, 0x0c7fffff).ram();
+}
 
-ADDRESS_MAP_START(atvtrack_state::atvtrack_main_port)
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(ioport_r, ioport_w)
-ADDRESS_MAP_END
+void atvtrack_state::atvtrack_main_port(address_map &map)
+{
+	map(0x00, 0x1f).rw(this, FUNC(atvtrack_state::ioport_r), FUNC(atvtrack_state::ioport_w));
+}
 
 // Smashing Drive
 
-ADDRESS_MAP_START(smashdrv_state::smashdrv_main_map)
-	AM_RANGE(0x00000000, 0x03ffffff) AM_ROM
-	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM
-	AM_RANGE(0x10000000, 0x100003ff) AM_RAM AM_SHARE("sharedmem")
-	AM_RANGE(0x10000400, 0x10000407) AM_READWRITE(control_r, control_w) // control registers
+void smashdrv_state::smashdrv_main_map(address_map &map)
+{
+	map(0x00000000, 0x03ffffff).rom();
+	map(0x0c000000, 0x0c7fffff).ram();
+	map(0x10000000, 0x100003ff).ram().share("sharedmem");
+	map(0x10000400, 0x10000407).rw(this, FUNC(smashdrv_state::control_r), FUNC(smashdrv_state::control_w)); // control registers
 
 // 0x10000400 - 0x1000043F control registers
 // 0x10000440 - 0x1000047F Audio DAC buffer
-	AM_RANGE(0x14000000, 0x143fffff) AM_ROM AM_REGION("data", 0)
-ADDRESS_MAP_END
+	map(0x14000000, 0x143fffff).rom().region("data", 0);
+}
 
-ADDRESS_MAP_START(smashdrv_state::smashdrv_main_port)
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(ioport_r, ioport_w)
-ADDRESS_MAP_END
+void smashdrv_state::smashdrv_main_port(address_map &map)
+{
+	map(0x00, 0x1f).rw(this, FUNC(smashdrv_state::ioport_r), FUNC(smashdrv_state::ioport_w));
+}
 
 // Sub CPU (same for both games)
 
-ADDRESS_MAP_START(atvtrack_state::atvtrack_sub_map)
-	AM_RANGE(0x00000000, 0x000003ff) AM_RAM AM_SHARE("sharedmem")
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM
-	AM_RANGE(0x14000000, 0x14003fff) AM_READWRITE32(gpu_r, gpu_w, 0xffffffffffffffffU)
+void atvtrack_state::atvtrack_sub_map(address_map &map)
+{
+	map(0x00000000, 0x000003ff).ram().share("sharedmem");
+	map(0x0c000000, 0x0cffffff).ram();
+	map(0x14000000, 0x14003fff).rw(this, FUNC(atvtrack_state::gpu_r), FUNC(atvtrack_state::gpu_w));
 // 0x14004xxx GPU PCI CONFIG registers
-	AM_RANGE(0x18000000, 0x19ffffff) AM_RAM
+	map(0x18000000, 0x19ffffff).ram();
 // 0x18000000 - 0x19FFFFFF GPU RAM (32MB)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(atvtrack_state::atvtrack_sub_port)
-ADDRESS_MAP_END
+void atvtrack_state::atvtrack_sub_port(address_map &map)
+{
+}
 
 
 static INPUT_PORTS_START( atvtrack )

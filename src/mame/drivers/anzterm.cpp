@@ -401,13 +401,14 @@ GFXDECODE_START( anzterm )
 GFXDECODE_END
 
 
-ADDRESS_MAP_START(anzterm_state::anzterm)
+void anzterm_state::anzterm(address_map &map)
+{
 	// There are two battery-backed 2kB SRAM chips with a 4kb SRAM chip for parity
 	// There are two 64kB DRAM banks (with parity)
 	// There's also a whole lot of ROM
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x0000, 0x3fff).ram();
+	map(0xe000, 0xffff).rom();
+}
 
 
 MACHINE_CONFIG_START(anzterm_state::anzterm)

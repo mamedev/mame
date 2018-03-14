@@ -35,40 +35,44 @@ WRITE8_MEMBER(tail2nos_state::sound_bankswitch_w)
 	membank("bank3")->set_entry(data & 0x01);
 }
 
-ADDRESS_MAP_START(tail2nos_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("user1", 0)    /* extra ROM */
-	AM_RANGE(0x2c0000, 0x2dffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(tail2nos_zoomdata_w) AM_SHARE("k051316")
-	AM_RANGE(0x500000, 0x500fff) AM_DEVREADWRITE8("k051316", k051316_device, read, write, 0x00ff)
-	AM_RANGE(0x510000, 0x51001f) AM_DEVWRITE8("k051316", k051316_device, ctrl_w, 0x00ff)
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                             /* work RAM */
-	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xffc300, 0xffcfff) AM_RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(tail2nos_txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("IN0") AM_WRITE8(tail2nos_gfxbank_w, 0x00ff)
-	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1")
-	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
-	AM_RANGE(0xfff008, 0xfff009) AM_READ8(sound_semaphore_r, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xfff020, 0xfff023) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
-	AM_RANGE(0xfff030, 0xfff033) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void tail2nos_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x200000, 0x27ffff).rom().region("user1", 0);    /* extra ROM */
+	map(0x2c0000, 0x2dffff).rom().region("user2", 0);
+	map(0x400000, 0x41ffff).ram().w(this, FUNC(tail2nos_state::tail2nos_zoomdata_w)).share("k051316");
+	map(0x500000, 0x500fff).rw(m_k051316, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff);
+	map(0x510000, 0x51001f).w(m_k051316, FUNC(k051316_device::ctrl_w)).umask16(0x00ff);
+	map(0xff8000, 0xffbfff).ram();                             /* work RAM */
+	map(0xffc000, 0xffc2ff).ram().share("spriteram");
+	map(0xffc300, 0xffcfff).ram();
+	map(0xffd000, 0xffdfff).ram().w(this, FUNC(tail2nos_state::tail2nos_txvideoram_w)).share("txvideoram");
+	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfff000, 0xfff001).portr("IN0");
+	map(0xfff001, 0xfff001).w(this, FUNC(tail2nos_state::tail2nos_gfxbank_w));
+	map(0xfff002, 0xfff003).portr("IN1");
+	map(0xfff004, 0xfff005).portr("DSW");
+	map(0xfff009, 0xfff009).r(this, FUNC(tail2nos_state::sound_semaphore_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff020, 0xfff023).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
+	map(0xfff030, 0xfff033).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(tail2nos_state::sound_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank3")
-ADDRESS_MAP_END
+void tail2nos_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank3");
+}
 
-ADDRESS_MAP_START(tail2nos_state::sound_port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("ymsnd", ym2608_device, write)
+void tail2nos_state::sound_port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x07, 0x07).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x08, 0x0b).w("ymsnd", FUNC(ym2608_device::write));
 #if 0
-	AM_RANGE(0x18, 0x1b) AM_DEVREAD("ymsnd", ym2608_device, read)
+	map(0x18, 0x1b).r("ymsnd", FUNC(ym2608_device::read));
 #endif
-ADDRESS_MAP_END
+}
 
 CUSTOM_INPUT_MEMBER(tail2nos_state::analog_in_r)
 {

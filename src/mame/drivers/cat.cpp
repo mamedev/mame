@@ -757,32 +757,33 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 */
 
 
-ADDRESS_MAP_START(cat_state::cat_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x180000) // 256 KB ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("svram") AM_MIRROR(0x18C000)// SRAM powered by battery
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("svrom",0x0000) AM_MIRROR(0x180000) // SV ROM
-	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_SHARE("p_cat_vram") AM_MIRROR(0x180000) // 512 KB RAM
-	AM_RANGE(0x600000, 0x67ffff) AM_READWRITE(cat_2e80_r,cat_video_control_w) AM_MIRROR(0x180000) // Gate Array #1: Video Addressing and Timing, dram refresh timing, dram /cs and /wr (ga2 does the actual video invert/display and access to the dram data bus)
-	AM_RANGE(0x800000, 0x800001) AM_READWRITE(cat_floppy_control_r, cat_floppy_control_w) AM_MIRROR(0x18FFE0) // floppy control lines and readback
-	AM_RANGE(0x800002, 0x800003) AM_READWRITE(cat_0080_r, cat_keyboard_w) AM_MIRROR(0x18FFE0) // keyboard col write
-	AM_RANGE(0x800004, 0x800005) AM_READWRITE(cat_0080_r, cat_printer_data_w) AM_MIRROR(0x18FFE0) // Centronics Printer Data
-	AM_RANGE(0x800006, 0x800007) AM_READWRITE(cat_floppy_data_r,cat_floppy_data_w) AM_MIRROR(0x18FFE0) // floppy data read/write
-	AM_RANGE(0x800008, 0x800009) AM_READ(cat_floppy_status_r) AM_MIRROR(0x18FFE0) // floppy status lines
-	AM_RANGE(0x80000a, 0x80000b) AM_READ(cat_keyboard_r) AM_MIRROR(0x18FFE0) // keyboard row read
-	AM_RANGE(0x80000c, 0x80000d) AM_READ(cat_0080_r) AM_MIRROR(0x18FFE0) // Open bus?
-	AM_RANGE(0x80000e, 0x80000f) AM_READWRITE(cat_battery_r,cat_printer_control_w) AM_MIRROR(0x18FFE0) // Centronics Printer Control, keyboard led and country code enable
-	AM_RANGE(0x800010, 0x80001f) AM_READ(cat_0080_r) AM_MIRROR(0x18FFE0) // Open bus?
-	AM_RANGE(0x810000, 0x81001f) AM_DEVREADWRITE8("duartn68681", mc68681_device, read, write, 0xff ) AM_MIRROR(0x18FFE0)
-	AM_RANGE(0x820000, 0x82003f) AM_READWRITE(cat_modem_r,cat_modem_w) AM_MIRROR(0x18FFC0) // AMI S35213 Modem Chip, all access is on bit 7
-	AM_RANGE(0x830000, 0x830001) AM_READ(cat_6ms_counter_r) AM_MIRROR(0x18FFFE) // 16bit 6ms counter clocked by output of another 16bit counter clocked at 10mhz
-	AM_RANGE(0x840000, 0x840001) AM_READWRITE(cat_2e80_r,cat_opr_w) AM_MIRROR(0x18FFFE) // GA2 Output port register (video enable, invert, watchdog reset, phone relays)
-	AM_RANGE(0x850000, 0x850001) AM_READ(cat_wdt_r) AM_MIRROR(0x18FFFE) // watchdog and power fail state read
-	AM_RANGE(0x860000, 0x860001) AM_READWRITE(cat_0000_r, cat_tcb_w) AM_MIRROR(0x18FFFE) // Test mode
-	AM_RANGE(0x870000, 0x870001) AM_READ(cat_2e80_r) AM_MIRROR(0x18FFFE) // Open bus?
-	AM_RANGE(0xA00000, 0xA00001) AM_READ(cat_2e80_r) AM_MIRROR(0x1FFFFE) // Open bus/dtack? The 0xA00000-0xA3ffff area is ram used for shadow rom storage on cat developer machines, which is either banked over top of, or jumped to instead of the normal rom
-	AM_RANGE(0xC00000, 0xC00001) AM_READ(cat_2e80_r) AM_MIRROR(0x3FFFFE) // Open bus/vme?
-ADDRESS_MAP_END
+void cat_state::cat_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).rom().mirror(0x180000); // 256 KB ROM
+	map(0x040000, 0x043fff).ram().share("svram").mirror(0x18C000);// SRAM powered by battery
+	map(0x200000, 0x27ffff).rom().region("svrom", 0x0000).mirror(0x180000); // SV ROM
+	map(0x400000, 0x47ffff).ram().share("p_cat_vram").mirror(0x180000); // 512 KB RAM
+	map(0x600000, 0x67ffff).rw(this, FUNC(cat_state::cat_2e80_r), FUNC(cat_state::cat_video_control_w)).mirror(0x180000); // Gate Array #1: Video Addressing and Timing, dram refresh timing, dram /cs and /wr (ga2 does the actual video invert/display and access to the dram data bus)
+	map(0x800000, 0x800001).rw(this, FUNC(cat_state::cat_floppy_control_r), FUNC(cat_state::cat_floppy_control_w)).mirror(0x18FFE0); // floppy control lines and readback
+	map(0x800002, 0x800003).rw(this, FUNC(cat_state::cat_0080_r), FUNC(cat_state::cat_keyboard_w)).mirror(0x18FFE0); // keyboard col write
+	map(0x800004, 0x800005).rw(this, FUNC(cat_state::cat_0080_r), FUNC(cat_state::cat_printer_data_w)).mirror(0x18FFE0); // Centronics Printer Data
+	map(0x800006, 0x800007).rw(this, FUNC(cat_state::cat_floppy_data_r), FUNC(cat_state::cat_floppy_data_w)).mirror(0x18FFE0); // floppy data read/write
+	map(0x800008, 0x800009).r(this, FUNC(cat_state::cat_floppy_status_r)).mirror(0x18FFE0); // floppy status lines
+	map(0x80000a, 0x80000b).r(this, FUNC(cat_state::cat_keyboard_r)).mirror(0x18FFE0); // keyboard row read
+	map(0x80000c, 0x80000d).r(this, FUNC(cat_state::cat_0080_r)).mirror(0x18FFE0); // Open bus?
+	map(0x80000e, 0x80000f).rw(this, FUNC(cat_state::cat_battery_r), FUNC(cat_state::cat_printer_control_w)).mirror(0x18FFE0); // Centronics Printer Control, keyboard led and country code enable
+	map(0x800010, 0x80001f).r(this, FUNC(cat_state::cat_0080_r)).mirror(0x18FFE0); // Open bus?
+	map(0x810000, 0x81001f).rw("duartn68681", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff).mirror(0x18FFE0);
+	map(0x820000, 0x82003f).rw(this, FUNC(cat_state::cat_modem_r), FUNC(cat_state::cat_modem_w)).mirror(0x18FFC0); // AMI S35213 Modem Chip, all access is on bit 7
+	map(0x830000, 0x830001).r(this, FUNC(cat_state::cat_6ms_counter_r)).mirror(0x18FFFE); // 16bit 6ms counter clocked by output of another 16bit counter clocked at 10mhz
+	map(0x840000, 0x840001).rw(this, FUNC(cat_state::cat_2e80_r), FUNC(cat_state::cat_opr_w)).mirror(0x18FFFE); // GA2 Output port register (video enable, invert, watchdog reset, phone relays)
+	map(0x850000, 0x850001).r(this, FUNC(cat_state::cat_wdt_r)).mirror(0x18FFFE); // watchdog and power fail state read
+	map(0x860000, 0x860001).rw(this, FUNC(cat_state::cat_0000_r), FUNC(cat_state::cat_tcb_w)).mirror(0x18FFFE); // Test mode
+	map(0x870000, 0x870001).r(this, FUNC(cat_state::cat_2e80_r)).mirror(0x18FFFE); // Open bus?
+	map(0xA00000, 0xA00001).r(this, FUNC(cat_state::cat_2e80_r)).mirror(0x1FFFFE); // Open bus/dtack? The 0xA00000-0xA3ffff area is ram used for shadow rom storage on cat developer machines, which is either banked over top of, or jumped to instead of the normal rom
+	map(0xC00000, 0xC00001).r(this, FUNC(cat_state::cat_2e80_r)).mirror(0x3FFFFE); // Open bus/vme?
+}
 
 /* Input ports */
 

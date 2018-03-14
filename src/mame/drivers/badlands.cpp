@@ -368,26 +368,27 @@ WRITE8_MEMBER(badlands_state::audio_io_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(badlands_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0xfc0000, 0xfc1fff) AM_READ(sound_busy_r) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
-	AM_RANGE(0xfd0000, 0xfd1fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0xfe0000, 0xfe1fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xfe2000, 0xfe3fff) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xfe4000, 0xfe5fff) AM_READ_PORT("FE4000")
-	AM_RANGE(0xfe6000, 0xfe6001) AM_READ_PORT("FE6000")
-	AM_RANGE(0xfe6002, 0xfe6003) AM_READ_PORT("FE6002")
-	AM_RANGE(0xfe6004, 0xfe6005) AM_READ(pedal_0_r)
-	AM_RANGE(0xfe6006, 0xfe6007) AM_READ(pedal_1_r)
-	AM_RANGE(0xfe8000, 0xfe9fff) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0xff00)
-	AM_RANGE(0xfea000, 0xfebfff) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0xff00)
-	AM_RANGE(0xfec000, 0xfedfff) AM_WRITE(badlands_pf_bank_w)
-	AM_RANGE(0xfee000, 0xfeffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0xffc000, 0xffc3ff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0xff00) AM_SHARE("palette")
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0xfff000, 0xfff1ff) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0xfff200, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void badlands_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0xfc0000, 0xfc1fff).r(this, FUNC(badlands_state::sound_busy_r)).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_reset_w));
+	map(0xfd0000, 0xfd1fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0xfe0000, 0xfe1fff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0xfe2000, 0xfe3fff).w(this, FUNC(badlands_state::video_int_ack_w));
+	map(0xfe4000, 0xfe5fff).portr("FE4000");
+	map(0xfe6000, 0xfe6001).portr("FE6000");
+	map(0xfe6002, 0xfe6003).portr("FE6002");
+	map(0xfe6004, 0xfe6005).r(this, FUNC(badlands_state::pedal_0_r));
+	map(0xfe6006, 0xfe6007).r(this, FUNC(badlands_state::pedal_1_r));
+	map(0xfe8000, 0xfe9fff).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w)).umask16(0xff00);
+	map(0xfea000, 0xfebfff).r(m_soundcomm, FUNC(atari_sound_comm_device::main_response_r)).umask16(0xff00);
+	map(0xfec000, 0xfedfff).w(this, FUNC(badlands_state::badlands_pf_bank_w));
+	map(0xfee000, 0xfeffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0xffc000, 0xffc3ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
+	map(0xffe000, 0xffefff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0xfff000, 0xfff1ff).ram().share("mob");
+	map(0xfff200, 0xffffff).ram();
+}
 
 
 
@@ -397,13 +398,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(badlands_state::audio_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(audio_io_r, audio_io_w)
-	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("soundbank")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void badlands_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x2800, 0x2bff).rw(this, FUNC(badlands_state::audio_io_r), FUNC(badlands_state::audio_io_w));
+	map(0x3000, 0x3fff).bankr("soundbank");
+	map(0x4000, 0xffff).rom();
+}
 
 
 /*************************************

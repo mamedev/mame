@@ -124,36 +124,38 @@ const tiny_rom_entry *ecb_grip21_device::device_rom_region() const
 //  ADDRESS_MAP( grip_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(ecb_grip21_device::grip_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("videoram")
-ADDRESS_MAP_END
+void ecb_grip21_device::grip_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0xffff).bankrw("videoram");
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( grip_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(ecb_grip21_device::grip_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
+void ecb_grip21_device::grip_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(this, FUNC(ecb_grip21_device::cxstb_r), FUNC(ecb_grip21_device::cxstb_w));
 //  AM_RANGE(0x10, 0x10) AM_WRITE(ccon_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
+	map(0x11, 0x11).w(this, FUNC(ecb_grip21_device::vol0_w));
 //  AM_RANGE(0x12, 0x12) AM_WRITE(rts_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(page_w)
+	map(0x13, 0x13).w(this, FUNC(ecb_grip21_device::page_w));
 //  AM_RANGE(0x14, 0x14) AM_WRITE(cc1_w)
 //  AM_RANGE(0x15, 0x15) AM_WRITE(cc2_w)
-	AM_RANGE(0x16, 0x16) AM_WRITE(flash_w)
-	AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
-	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE(Z80STI_TAG, z80sti_device, read, write)
-	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
-	AM_RANGE(0x40, 0x40) AM_READ(stat_r)
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
-	AM_RANGE(0x52, 0x52) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_w)
-	AM_RANGE(0x53, 0x53) AM_DEVREAD(MC6845_TAG, mc6845_device, register_r)
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
+	map(0x16, 0x16).w(this, FUNC(ecb_grip21_device::flash_w));
+	map(0x17, 0x17).w(this, FUNC(ecb_grip21_device::vol1_w));
+	map(0x20, 0x2f).rw(Z80STI_TAG, FUNC(z80sti_device::read), FUNC(z80sti_device::write));
+	map(0x30, 0x30).rw(this, FUNC(ecb_grip21_device::lrs_r), FUNC(ecb_grip21_device::lrs_w));
+	map(0x40, 0x40).r(this, FUNC(ecb_grip21_device::stat_r));
+	map(0x50, 0x50).w(MC6845_TAG, FUNC(mc6845_device::address_w));
+	map(0x52, 0x52).w(MC6845_TAG, FUNC(mc6845_device::register_w));
+	map(0x53, 0x53).r(MC6845_TAG, FUNC(mc6845_device::register_r));
+	map(0x60, 0x60).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x70, 0x73).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 //  AM_RANGE(0x80, 0x80) AM_WRITE(bl2out_w)
 //  AM_RANGE(0x90, 0x90) AM_WRITE(gr2out_w)
 //  AM_RANGE(0xa0, 0xa0) AM_WRITE(rd2out_w)
@@ -162,7 +164,7 @@ ADDRESS_MAP_START(ecb_grip21_device::grip_io)
 //  AM_RANGE(0xd0, 0xd0) AM_WRITE(grnout_w)
 //  AM_RANGE(0xe0, 0xe0) AM_WRITE(redout_w)
 //  AM_RANGE(0xf0, 0xf0) AM_WRITE(clrg1_w)
-ADDRESS_MAP_END
+}
 
 
 //**************************************************************************

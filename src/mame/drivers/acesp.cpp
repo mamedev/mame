@@ -44,10 +44,11 @@ public:
 
 
 
-ADDRESS_MAP_START(ace_sp_state::ace_sp_map)
+void ace_sp_state::ace_sp_map(address_map &map)
+{
 	/**** 6303Y internal area ****/
 	//----- 0x0000 - 0x0027 is internal registers -----
-	AM_RANGE(0x0000, 0x0027) AM_RAM
+	map(0x0000, 0x0027).ram();
 	//----- 0x0028 - 0x003f is external access -----
 	// 0x30 - reels write
 	// 0x31 - lamp high
@@ -57,25 +58,26 @@ ADDRESS_MAP_START(ace_sp_state::ace_sp_map)
 	// 0x35 - shift clk
 	// 0x36 - sio
 	// 0x37 - watchdog?
-	AM_RANGE(0x0038, 0x003b) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	map(0x0038, 0x003b).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	/* 0x3c */
 	/* 0x3d */
 	/* 0x3e */
 	/* 0x3f */
 	//----- 0x0040 - 0x013f is internal RAM (256 bytes) -----
-	AM_RANGE(0x0040, 0x013f) AM_RAM
+	map(0x0040, 0x013f).ram();
 
 
 	/**** regular map ****/
-	AM_RANGE(0x0140, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x0140, 0x1fff).ram();
+	map(0x2000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(ace_sp_state::ace_sp_portmap)
+void ace_sp_state::ace_sp_portmap(address_map &map)
+{
 	//AM_RANGE(0x02, 0x02) // misc
 	//AM_RANGE(0x05, 0x06) // AYs
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( ace_sp )

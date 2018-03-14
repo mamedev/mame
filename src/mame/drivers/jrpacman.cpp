@@ -142,28 +142,30 @@ WRITE_LINE_MEMBER(jrpacman_state::irq_mask_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(jrpacman_state::main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4fef) AM_RAM
-	AM_RANGE(0x4ff0, 0x4fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("P1")
-	AM_RANGE(0x5000, 0x5007) AM_DEVWRITE("latch1", ls259_device, write_d0)
-	AM_RANGE(0x5040, 0x507f) AM_READ_PORT("P2")
-	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
-	AM_RANGE(0x5060, 0x506f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0x5070, 0x5077) AM_DEVWRITE("latch2", ls259_device, write_d0)
-	AM_RANGE(0x5080, 0x50bf) AM_READ_PORT("DSW")
-	AM_RANGE(0x5080, 0x5080) AM_WRITE(jrpacman_scroll_w)
-	AM_RANGE(0x50c0, 0x50c0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x8000, 0xdfff) AM_ROM
-ADDRESS_MAP_END
+void jrpacman_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram().w(this, FUNC(jrpacman_state::jrpacman_videoram_w)).share("videoram");
+	map(0x4800, 0x4fef).ram();
+	map(0x4ff0, 0x4fff).ram().share("spriteram");
+	map(0x5000, 0x503f).portr("P1");
+	map(0x5000, 0x5007).w("latch1", FUNC(ls259_device::write_d0));
+	map(0x5040, 0x507f).portr("P2");
+	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5060, 0x506f).writeonly().share("spriteram2");
+	map(0x5070, 0x5077).w("latch2", FUNC(ls259_device::write_d0));
+	map(0x5080, 0x50bf).portr("DSW");
+	map(0x5080, 0x5080).w(this, FUNC(jrpacman_state::jrpacman_scroll_w));
+	map(0x50c0, 0x50c0).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x8000, 0xdfff).rom();
+}
 
 
-ADDRESS_MAP_START(jrpacman_state::port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0, 0) AM_WRITE(jrpacman_interrupt_vector_w)
-ADDRESS_MAP_END
+void jrpacman_state::port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0, 0).w(this, FUNC(jrpacman_state::jrpacman_interrupt_vector_w));
+}
 
 
 

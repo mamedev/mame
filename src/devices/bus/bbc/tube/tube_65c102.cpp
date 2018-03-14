@@ -25,9 +25,10 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_65C102, bbc_tube_65c102_device, "bbc_tube_65c102", "
 //  ADDRESS_MAP( tube_6502_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(bbc_tube_65c102_device::tube_6502_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void bbc_tube_65c102_device::tube_6502_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(bbc_tube_65c102_device::read), FUNC(bbc_tube_65c102_device::write));
+}
 
 //-------------------------------------------------
 //  ROM( tube_65c102 )

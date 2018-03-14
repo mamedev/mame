@@ -858,263 +858,290 @@ WRITE16_MEMBER(m72_state::soundram_w)
 		m_soundram[offset * 2 + 1] = data >> 8;
 }
 
-ADDRESS_MAP_START(m72_state::m72_cpu1_common_map)
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void m72_state::m72_cpu1_common_map(address_map &map)
+{
+	map(0xc0000, 0xc03ff).ram().share("spriteram");
+	map(0xc8000, 0xc8bff).rw(this, FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
+	map(0xcc000, 0xccbff).rw(this, FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xd0000, 0xd3fff).ram().w(this, FUNC(m72_state::videoram1_w)).share("videoram1");
+	map(0xd8000, 0xdbfff).ram().w(this, FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xe0000, 0xeffff).rw(this, FUNC(m72_state::soundram_r), FUNC(m72_state::soundram_w));
+	map(0xffff0, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(m72_state::m72_map)
-	AM_IMPORT_FROM( m72_cpu1_common_map )
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa3fff) AM_RAM    /* work RAM */
-ADDRESS_MAP_END
+void m72_state::m72_map(address_map &map)
+{
+	m72_cpu1_common_map(map);
+	map(0x00000, 0x7ffff).rom();
+	map(0xa0000, 0xa3fff).ram();    /* work RAM */
+}
 
-ADDRESS_MAP_START(m72_state::rtype_map)
-	AM_IMPORT_FROM( m72_cpu1_common_map )
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-	AM_RANGE(0x40000, 0x43fff) AM_RAM    /* work RAM */
-ADDRESS_MAP_END
+void m72_state::rtype_map(address_map &map)
+{
+	m72_cpu1_common_map(map);
+	map(0x00000, 0x3ffff).rom();
+	map(0x40000, 0x43fff).ram();    /* work RAM */
+}
 
-ADDRESS_MAP_START(m72_state::xmultiplm72_map)
-	AM_IMPORT_FROM( m72_cpu1_common_map )
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x80000, 0x83fff) AM_RAM    /* work RAM */
-ADDRESS_MAP_END
+void m72_state::xmultiplm72_map(address_map &map)
+{
+	m72_cpu1_common_map(map);
+	map(0x00000, 0x7ffff).rom();
+	map(0x80000, 0x83fff).ram();    /* work RAM */
+}
 
-ADDRESS_MAP_START(m72_state::dbreedm72_map)
-	AM_IMPORT_FROM( m72_cpu1_common_map )
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x90000, 0x93fff) AM_RAM    /* work RAM */
-ADDRESS_MAP_END
+void m72_state::dbreedm72_map(address_map &map)
+{
+	m72_cpu1_common_map(map);
+	map(0x00000, 0x7ffff).rom();
+	map(0x90000, 0x93fff).ram();    /* work RAM */
+}
 
-ADDRESS_MAP_START(m72_state::m81_cpu1_common_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void m72_state::m81_cpu1_common_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0xb0ffe, 0xb0fff).writeonly(); /* leftover from protection?? */
+	map(0xc0000, 0xc03ff).ram().share("spriteram");
+	map(0xc8000, 0xc8bff).rw(this, FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
+	map(0xcc000, 0xccbff).rw(this, FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xd0000, 0xd3fff).ram().w(this, FUNC(m72_state::videoram1_w)).share("videoram1");
+	map(0xd8000, 0xdbfff).ram().w(this, FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xffff0, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(m72_state::xmultipl_map)
-	AM_IMPORT_FROM( m81_cpu1_common_map )
-	AM_RANGE(0x9c000, 0x9ffff) AM_RAM    /* work RAM */
-ADDRESS_MAP_END
+void m72_state::xmultipl_map(address_map &map)
+{
+	m81_cpu1_common_map(map);
+	map(0x9c000, 0x9ffff).ram();    /* work RAM */
+}
 
-ADDRESS_MAP_START(m72_state::dbreed_map)
-	AM_IMPORT_FROM( m81_cpu1_common_map )
-	AM_RANGE(0x88000, 0x8bfff) AM_RAM    /* work RAM */
-ADDRESS_MAP_END
+void m72_state::dbreed_map(address_map &map)
+{
+	m81_cpu1_common_map(map);
+	map(0x88000, 0x8bfff).ram();    /* work RAM */
+}
 
-ADDRESS_MAP_START(m72_state::hharry_map)
-	AM_IMPORT_FROM( m81_cpu1_common_map )
-	AM_RANGE(0xa0000, 0xa3fff) AM_RAM    /* work RAM */
-ADDRESS_MAP_END
+void m72_state::hharry_map(address_map &map)
+{
+	m81_cpu1_common_map(map);
+	map(0xa0000, 0xa3fff).ram();    /* work RAM */
+}
 
-ADDRESS_MAP_START(m72_state::m84_cpu1_common_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(irq_line_w)
-	AM_RANGE(0xb4000, 0xb4001) AM_WRITENOP  /* ??? */
-	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(dmaon_w)
-	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe0000, 0xe3fff) AM_RAM   /* work RAM */
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void m72_state::m84_cpu1_common_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0xb0000, 0xb0001).w(this, FUNC(m72_state::irq_line_w));
+	map(0xb4000, 0xb4001).nopw();  /* ??? */
+	map(0xbc000, 0xbc001).w(this, FUNC(m72_state::dmaon_w));
+	map(0xb0ffe, 0xb0fff).writeonly(); /* leftover from protection?? */
+	map(0xc0000, 0xc03ff).ram().share("spriteram");
+	map(0xe0000, 0xe3fff).ram();   /* work RAM */
+	map(0xffff0, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(m72_state::rtype2_map)
-	AM_IMPORT_FROM( m84_cpu1_common_map )
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
-ADDRESS_MAP_END
+void m72_state::rtype2_map(address_map &map)
+{
+	m84_cpu1_common_map(map);
+	map(0xd0000, 0xd3fff).ram().w(this, FUNC(m72_state::videoram1_w)).share("videoram1");
+	map(0xd4000, 0xd7fff).ram().w(this, FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xc8000, 0xc8bff).rw(this, FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
+	map(0xd8000, 0xd8bff).rw(this, FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+}
 
-ADDRESS_MAP_START(m72_state::hharryu_map)
-	AM_IMPORT_FROM( m84_cpu1_common_map )
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
-ADDRESS_MAP_END
+void m72_state::hharryu_map(address_map &map)
+{
+	m84_cpu1_common_map(map);
+	map(0xd0000, 0xd3fff).ram().w(this, FUNC(m72_state::videoram1_w)).share("videoram1");
+	map(0xd4000, 0xd7fff).ram().w(this, FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xa0000, 0xa0bff).rw(this, FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
+	map(0xa8000, 0xa8bff).rw(this, FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+}
 
-ADDRESS_MAP_START(m72_state::kengo_map)
-	AM_IMPORT_FROM( m84_cpu1_common_map )
-	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0x84000, 0x87fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(m72_state::m82_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa03ff) AM_RAM AM_SHARE("majtitle_rowscr")
-	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xac000, 0xaffff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xb0000, 0xbffff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")  /* larger than the other games */
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc8000, 0xc83ff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM   /* work RAM */
-	AM_RANGE(0xe0000, 0xe0001) AM_WRITE(irq_line_w)
-	AM_RANGE(0xe4000, 0xe4001) AM_WRITEONLY /* playfield enable? 1 during screen transitions, 0 otherwise */
-	AM_RANGE(0xec000, 0xec001) AM_WRITE(dmaon_w)
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void m72_state::kengo_map(address_map &map)
+{
+	m84_cpu1_common_map(map);
+	map(0x80000, 0x83fff).ram().w(this, FUNC(m72_state::videoram1_w)).share("videoram1");
+	map(0x84000, 0x87fff).ram().w(this, FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xa0000, 0xa0bff).rw(this, FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
+	map(0xa8000, 0xa8bff).rw(this, FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+}
 
 
+void m72_state::m82_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0xa0000, 0xa03ff).ram().share("majtitle_rowscr");
+	map(0xa4000, 0xa4bff).rw(this, FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xac000, 0xaffff).ram().w(this, FUNC(m72_state::videoram1_w)).share("videoram1");
+	map(0xb0000, 0xbffff).ram().w(this, FUNC(m72_state::videoram2_w)).share("videoram2");  /* larger than the other games */
+	map(0xc0000, 0xc03ff).ram().share("spriteram");
+	map(0xc8000, 0xc83ff).ram().share("spriteram2");
+	map(0xcc000, 0xccbff).rw(this, FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
+	map(0xd0000, 0xd3fff).ram();   /* work RAM */
+	map(0xe0000, 0xe0001).w(this, FUNC(m72_state::irq_line_w));
+	map(0xe4000, 0xe4001).writeonly(); /* playfield enable? 1 during screen transitions, 0 otherwise */
+	map(0xec000, 0xec001).w(this, FUNC(m72_state::dmaon_w));
+	map(0xffff0, 0xfffff).rom();
+}
 
 
-ADDRESS_MAP_START(m72_state::m72_portmap)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE8(port02_w, 0x00ff) /* coin counters, reset sound cpu, other stuff? */
-	AM_RANGE(0x04, 0x05) AM_WRITE(dmaon_w)
-	AM_RANGE(0x06, 0x07) AM_WRITE(irq_line_w)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
+
+
+void m72_state::m72_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("IN0");
+	map(0x02, 0x03).portr("IN1");
+	map(0x04, 0x05).portr("DSW");
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(this, FUNC(m72_state::port02_w)); /* coin counters, reset sound cpu, other stuff? */
+	map(0x04, 0x05).w(this, FUNC(m72_state::dmaon_w));
+	map(0x06, 0x07).w(this, FUNC(m72_state::irq_line_w));
+	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x80, 0x81).w(this, FUNC(m72_state::scrolly1_w));
+	map(0x82, 0x83).w(this, FUNC(m72_state::scrollx1_w));
+	map(0x84, 0x85).w(this, FUNC(m72_state::scrolly2_w));
+	map(0x86, 0x87).w(this, FUNC(m72_state::scrollx2_w));
 /*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(m72_state::m84_portmap)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
-ADDRESS_MAP_END
+void m72_state::m84_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("IN0");
+	map(0x02, 0x03).portr("IN1");
+	map(0x04, 0x05).portr("DSW");
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(this, FUNC(m72_state::rtype2_port02_w));
+	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x80, 0x81).w(this, FUNC(m72_state::scrolly1_w));
+	map(0x82, 0x83).w(this, FUNC(m72_state::scrollx1_w));
+	map(0x84, 0x85).w(this, FUNC(m72_state::scrolly2_w));
+	map(0x86, 0x87).w(this, FUNC(m72_state::scrollx2_w));
+}
 
-ADDRESS_MAP_START(m72_state::m84_v33_portmap)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
-	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
+void m72_state::m84_v33_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("IN0");
+	map(0x02, 0x03).portr("IN1");
+	map(0x04, 0x05).portr("DSW");
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(this, FUNC(m72_state::rtype2_port02_w));
+	map(0x80, 0x81).w(this, FUNC(m72_state::scrolly1_w));
+	map(0x82, 0x83).w(this, FUNC(m72_state::scrollx1_w));
+	map(0x84, 0x85).w(this, FUNC(m72_state::scrolly2_w));
+	map(0x86, 0x87).w(this, FUNC(m72_state::scrollx2_w));
 //  AM_RANGE(0x8c, 0x8f) AM_WRITENOP    /* ??? */
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(m72_state::poundfor_portmap)
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x08, 0x0f) AM_DEVREAD8("upd4701l", upd4701_device, read_xy, 0x00ff)
-	AM_RANGE(0x08, 0x0f) AM_DEVREAD8("upd4701h", upd4701_device, read_xy, 0xff00)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE8(poundfor_port02_w, 0x00ff)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
-ADDRESS_MAP_END
+void m72_state::poundfor_portmap(address_map &map)
+{
+	map(0x02, 0x03).portr("IN1");
+	map(0x04, 0x05).portr("DSW");
+	map(0x08, 0x0f).r("upd4701l", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
+	map(0x08, 0x0f).r("upd4701h", FUNC(upd4701_device::read_xy)).umask16(0xff00);
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(this, FUNC(m72_state::poundfor_port02_w));
+	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x80, 0x81).w(this, FUNC(m72_state::scrolly1_w));
+	map(0x82, 0x83).w(this, FUNC(m72_state::scrollx1_w));
+	map(0x84, 0x85).w(this, FUNC(m72_state::scrolly2_w));
+	map(0x86, 0x87).w(this, FUNC(m72_state::scrollx2_w));
+}
 
-ADDRESS_MAP_START(m72_state::m82_portmap)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
+void m72_state::m82_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("IN0");
+	map(0x02, 0x03).portr("IN1");
+	map(0x04, 0x05).portr("DSW");
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(this, FUNC(m72_state::rtype2_port02_w));
+	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x80, 0x81).w(this, FUNC(m72_state::scrolly1_w));
+	map(0x82, 0x83).w(this, FUNC(m72_state::scrollx1_w));
+	map(0x84, 0x85).w(this, FUNC(m72_state::scrolly2_w));
+	map(0x86, 0x87).w(this, FUNC(m72_state::scrollx2_w));
 
 	// these ports control the tilemap sizes, rowscroll etc. that m82 has, exact bit usage not known (maybe one for each layer?)
-	AM_RANGE(0x8c, 0x8d) AM_WRITE(m82_tm_ctrl_w)
-	AM_RANGE(0x8e, 0x8f) AM_WRITE(m82_gfx_ctrl_w)
-ADDRESS_MAP_END
+	map(0x8c, 0x8d).w(this, FUNC(m72_state::m82_tm_ctrl_w));
+	map(0x8e, 0x8f).w(this, FUNC(m72_state::m82_gfx_ctrl_w));
+}
 
-ADDRESS_MAP_START(m72_state::m81_portmap)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)  /* coin counters, reset sound cpu, other stuff? */
-	AM_RANGE(0x04, 0x05) AM_WRITE(dmaon_w)
-	AM_RANGE(0x06, 0x07) AM_WRITE(irq_line_w)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
-ADDRESS_MAP_END
+void m72_state::m81_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("IN0");
+	map(0x02, 0x03).portr("IN1");
+	map(0x04, 0x05).portr("DSW");
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(this, FUNC(m72_state::rtype2_port02_w));  /* coin counters, reset sound cpu, other stuff? */
+	map(0x04, 0x05).w(this, FUNC(m72_state::dmaon_w));
+	map(0x06, 0x07).w(this, FUNC(m72_state::irq_line_w));
+	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x80, 0x81).w(this, FUNC(m72_state::scrolly1_w));
+	map(0x82, 0x83).w(this, FUNC(m72_state::scrollx1_w));
+	map(0x84, 0x85).w(this, FUNC(m72_state::scrolly2_w));
+	map(0x86, 0x87).w(this, FUNC(m72_state::scrollx2_w));
+}
 
 
 
-ADDRESS_MAP_START(m72_state::sound_ram_map)
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("soundram")
-ADDRESS_MAP_END
+void m72_state::sound_ram_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram().share("soundram");
+}
 
-ADDRESS_MAP_START(m72_state::sound_rom_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void m72_state::sound_rom_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(m72_state::rtype_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-ADDRESS_MAP_END
+void m72_state::rtype_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x02, 0x02).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x06, 0x06).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
+}
 
-ADDRESS_MAP_START(m72_state::sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
-ADDRESS_MAP_END
+void m72_state::sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x02, 0x02).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x06, 0x06).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));
+	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));
+}
 
-ADDRESS_MAP_START(m72_state::rtype2_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, rtype2_sample_addr_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
+void m72_state::rtype2_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x80, 0x80).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x80, 0x81).w(m_audio, FUNC(m72_audio_device::rtype2_sample_addr_w));
+	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));
+	map(0x83, 0x83).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));
 //  AM_RANGE(0x87, 0x87) AM_WRITENOP    /* ??? */
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(m72_state::poundfor_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE("m72", m72_audio_device, poundfor_sample_addr_w)
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x42, 0x42) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
-ADDRESS_MAP_END
+void m72_state::poundfor_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x13).w(m_audio, FUNC(m72_audio_device::poundfor_sample_addr_w));
+	map(0x40, 0x41).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x42, 0x42).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+}
 
-ADDRESS_MAP_START(m72_state::mcu_io_map)
+void m72_state::mcu_io_map(address_map &map)
+{
 	/* External access */
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(mcu_sample_r, mcu_low_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(mcu_high_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(mcu_snd_r, mcu_ack_w)
+	map(0x0000, 0x0000).rw(this, FUNC(m72_state::mcu_sample_r), FUNC(m72_state::mcu_low_w));
+	map(0x0001, 0x0001).w(this, FUNC(m72_state::mcu_high_w));
+	map(0x0002, 0x0002).rw(this, FUNC(m72_state::mcu_snd_r), FUNC(m72_state::mcu_ack_w));
 	/* shared at b0000 - b0fff on the main cpu */
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(mcu_data_r,mcu_data_w )
-ADDRESS_MAP_END
+	map(0xc000, 0xcfff).rw(this, FUNC(m72_state::mcu_data_r), FUNC(m72_state::mcu_data_w));
+}
 
 #define COIN_MODE_1 \
 	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0400, NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW1:5,6,7,8") \

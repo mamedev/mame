@@ -49,37 +49,41 @@ WRITE8_MEMBER(shisen_state::coin_w)
 
 
 
-ADDRESS_MAP_START(shisen_state::shisen_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void shisen_state::shisen_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc800, 0xcaff).ram().w(this, FUNC(shisen_state::paletteram_w)).share("paletteram");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(shisen_state::videoram_w)).share("videoram");
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(shisen_state::shisen_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(dsw1_r, coin_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1") AM_WRITE(bankswitch_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("COIN")
-ADDRESS_MAP_END
+void shisen_state::shisen_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(this, FUNC(shisen_state::dsw1_r), FUNC(shisen_state::coin_w));
+	map(0x01, 0x01).portr("DSW2").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).portr("P1").w(this, FUNC(shisen_state::bankswitch_w));
+	map(0x03, 0x03).portr("P2");
+	map(0x04, 0x04).portr("COIN");
+}
 
-ADDRESS_MAP_START(shisen_state::shisen_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0xfd00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void shisen_state::shisen_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0xfd00, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(shisen_state::shisen_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, shisen_sample_addr_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
-ADDRESS_MAP_END
+void shisen_state::shisen_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x80, 0x80).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x80, 0x81).w(m_audio, FUNC(m72_audio_device::shisen_sample_addr_w));
+	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));
+	map(0x83, 0x83).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));
+}
 
 
 static INPUT_PORTS_START( shisen )

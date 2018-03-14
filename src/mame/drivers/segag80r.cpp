@@ -332,52 +332,58 @@ WRITE8_MEMBER(segag80r_state::sindbadm_sn2_SN76496_w)
  *************************************/
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(segag80r_state::main_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM     /* CPU board ROM */
-	AM_RANGE(0x0800, 0x7fff) AM_ROM     /* PROM board ROM area */
-	AM_RANGE(0x8000, 0xbfff) AM_ROM     /* PROM board ROM area */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_SHARE("mainram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void segag80r_state::main_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();     /* CPU board ROM */
+	map(0x0800, 0x7fff).rom();     /* PROM board ROM area */
+	map(0x8000, 0xbfff).rom();     /* PROM board ROM area */
+	map(0xc800, 0xcfff).ram().w(this, FUNC(segag80r_state::mainram_w)).share("mainram");
+	map(0xe000, 0xffff).ram().w(this, FUNC(segag80r_state::vidram_w)).share("videoram");
+}
 
-ADDRESS_MAP_START(segag80r_state::g80r_opcodes_map)
-	AM_RANGE(0x0000, 0xffff) AM_READ(g80r_opcode_r)
-ADDRESS_MAP_END
+void segag80r_state::g80r_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(this, FUNC(segag80r_state::g80r_opcode_r));
+}
 
-ADDRESS_MAP_START(segag80r_state::sega_315_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_SHARE("mainram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void segag80r_state::sega_315_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8000, 0xbfff).rom().region("maincpu", 0x8000);
+	map(0xc800, 0xcfff).ram().w(this, FUNC(segag80r_state::mainram_w)).share("mainram");
+	map(0xe000, 0xffff).ram().w(this, FUNC(segag80r_state::vidram_w)).share("videoram");
+}
 
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(segag80r_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xbe, 0xbf) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
-	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x04) AM_WRITE(coin_count_w)
-	AM_RANGE(0xf8, 0xfb) AM_READ(mangled_ports_r)
-	AM_RANGE(0xfc, 0xfc) AM_READ_PORT("FC")
-ADDRESS_MAP_END
+void segag80r_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xbe, 0xbf).rw(this, FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
+	map(0xf9, 0xf9).mirror(0x04).w(this, FUNC(segag80r_state::coin_count_w));
+	map(0xf8, 0xfb).r(this, FUNC(segag80r_state::mangled_ports_r));
+	map(0xfc, 0xfc).portr("FC");
+}
 
 
-ADDRESS_MAP_START(segag80r_state::main_ppi8255_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0xbe, 0xbf) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
-	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x04) AM_WRITE(coin_count_w)
-	AM_RANGE(0xf8, 0xfb) AM_READ(mangled_ports_r)
-	AM_RANGE(0xfc, 0xfc) AM_READ_PORT("FC")
-ADDRESS_MAP_END
+void segag80r_state::main_ppi8255_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0c, 0x0f).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xbe, 0xbf).rw(this, FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
+	map(0xf9, 0xf9).mirror(0x04).w(this, FUNC(segag80r_state::coin_count_w));
+	map(0xf8, 0xfb).r(this, FUNC(segag80r_state::mangled_ports_r));
+	map(0xfc, 0xfc).portr("FC");
+}
 
 
-ADDRESS_MAP_START(segag80r_state::sindbadm_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x42, 0x43) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0xf8, 0xfb) AM_READ(mangled_ports_r)
-ADDRESS_MAP_END
+void segag80r_state::sindbadm_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x42, 0x43).rw(this, FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
+	map(0x80, 0x83).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf8, 0xfb).r(this, FUNC(segag80r_state::mangled_ports_r));
+}
 
 
 
@@ -388,13 +394,14 @@ ADDRESS_MAP_END
  *************************************/
 
 /* complete memory map derived from System 1 schematics */
-ADDRESS_MAP_START(segag80r_state::sindbadm_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_WRITE(sindbadm_sn1_SN76496_w)
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ffc) AM_WRITE(sindbadm_sn2_SN76496_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void segag80r_state::sindbadm_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x8000, 0x87ff).mirror(0x1800).ram();
+	map(0xa000, 0xa003).mirror(0x1ffc).w(this, FUNC(segag80r_state::sindbadm_sn1_SN76496_w));
+	map(0xc000, 0xc003).mirror(0x1ffc).w(this, FUNC(segag80r_state::sindbadm_sn2_SN76496_w));
+	map(0xe000, 0xe000).mirror(0x1fff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 

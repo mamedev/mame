@@ -81,19 +81,21 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(blockade_state::main_map)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x6000) AM_ROM
-	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x6000) AM_ROM // comotion, blasto, hustle
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x6c00) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x6f00) AM_RAM
-ADDRESS_MAP_END
+void blockade_state::main_map(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x6000).rom();
+	map(0x0400, 0x07ff).mirror(0x6000).rom(); // comotion, blasto, hustle
+	map(0x8000, 0x83ff).mirror(0x6c00).ram().w(this, FUNC(blockade_state::videoram_w)).share("videoram");
+	map(0x9000, 0x90ff).mirror(0x6f00).ram();
+}
 
-ADDRESS_MAP_START(blockade_state::main_io_map)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITE(coin_latch_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1") AM_WRITE(sound_freq_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_WRITE(env_on_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(env_off_w)
-ADDRESS_MAP_END
+void blockade_state::main_io_map(address_map &map)
+{
+	map(0x01, 0x01).portr("IN0").w(this, FUNC(blockade_state::coin_latch_w));
+	map(0x02, 0x02).portr("IN1").w(this, FUNC(blockade_state::sound_freq_w));
+	map(0x04, 0x04).portr("IN2").w(this, FUNC(blockade_state::env_on_w));
+	map(0x08, 0x08).w(this, FUNC(blockade_state::env_off_w));
+}
 
 
 //**************************************************************************

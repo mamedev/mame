@@ -107,6 +107,7 @@ public:
 		m_vram(*this, "framebuffer"),
 		m_vram16(*this, "framebuffer16"),
 		m_fontram(*this, "charcopy"),
+		m_bppit(*this, "bppit"),
 		m_fdc(*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1")
@@ -144,6 +145,7 @@ private:
 	optional_shared_ptr<uint8_t> m_vram;
 	optional_shared_ptr<uint16_t> m_vram16;
 	optional_shared_ptr<uint8_t> m_fontram;
+	optional_device<pit8253_device> m_bppit;
 	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
@@ -153,75 +155,78 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(pg685_state::pg675_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0xbffff) AM_RAM
-	AM_RANGE(0xf0000,0xf1fff) AM_RAM
-	AM_RANGE(0xf9f00, 0xf9f01) AM_DEVREADWRITE("kbdc", i8279_device, read, write)
-	AM_RANGE(0xf9f02, 0xf9f02) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0xf9f03, 0xf9f03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0xf9f04, 0xf9f04) AM_READWRITE(f9f04_r, f9f04_w)
-	AM_RANGE(0xf9f06, 0xf9f07) AM_DEVREADWRITE("mainpic", pic8259_device, read, write)
-	AM_RANGE(0xf9f08, 0xf9f08) AM_DEVREADWRITE("mainuart", i8251_device, data_r, data_w)
-	AM_RANGE(0xf9f09, 0xf9f09) AM_DEVREADWRITE("mainuart", i8251_device, status_r, control_w)
-	AM_RANGE(0xf9f20, 0xf9f23) AM_DEVREADWRITE("fdc", fd1797_device, read, write)
-	AM_RANGE(0xf9f24, 0xf9f24) AM_READWRITE(f9f24_r, f9f24_w)
-	AM_RANGE(0xf9f28, 0xf9f2b) AM_DEVREADWRITE("modppi1", i8255_device, read, write)
-	AM_RANGE(0xf9f2c, 0xf9f2f) AM_DEVREADWRITE("modppi2", i8255_device, read, write)
-	AM_RANGE(0xf9f30, 0xf9f30) AM_DEVREADWRITE("moduart", i8251_device, data_r, data_w)
-	AM_RANGE(0xf9f31, 0xf9f31) AM_DEVREADWRITE("moduart", i8251_device, status_r, control_w)
-	AM_RANGE(0xf9f32, 0xf9f32) AM_WRITE(f9f32_w)
-	AM_RANGE(0xf9f33, 0xf9f33) AM_READ(f9f33_r)
-	AM_RANGE(0xf9f40, 0xf9f5f) AM_DEVREADWRITE("rtc", mm58167_device, read, write)
-	AM_RANGE(0xfa000,0xfa7ff) AM_RAM AM_SHARE ("charcopy")
-	AM_RANGE(0xfb000,0xfb7ff) AM_RAM AM_SHARE ("framebuffer")
-	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void pg685_state::pg675_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xbffff).ram();
+	map(0xf0000, 0xf1fff).ram();
+	map(0xf9f00, 0xf9f01).rw("kbdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0xf9f02, 0xf9f02).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0xf9f03, 0xf9f03).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xf9f04, 0xf9f04).rw(this, FUNC(pg685_state::f9f04_r), FUNC(pg685_state::f9f04_w));
+	map(0xf9f06, 0xf9f07).rw("mainpic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xf9f08, 0xf9f08).rw("mainuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf9f09, 0xf9f09).rw("mainuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf9f20, 0xf9f23).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
+	map(0xf9f24, 0xf9f24).rw(this, FUNC(pg685_state::f9f24_r), FUNC(pg685_state::f9f24_w));
+	map(0xf9f28, 0xf9f2b).rw("modppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf9f2c, 0xf9f2f).rw("modppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf9f30, 0xf9f30).rw("moduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf9f31, 0xf9f31).rw("moduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf9f32, 0xf9f32).w(this, FUNC(pg685_state::f9f32_w));
+	map(0xf9f33, 0xf9f33).r(this, FUNC(pg685_state::f9f33_r));
+	map(0xf9f40, 0xf9f5f).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write));
+	map(0xfa000, 0xfa7ff).ram().share("charcopy");
+	map(0xfb000, 0xfb7ff).ram().share("framebuffer");
+	map(0xfc000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(pg685_state::pg685_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(pg675_mem)
-	AM_RANGE(0xf9f34, 0xf9f37) AM_DEVREADWRITE("bppit", pit8253_device, read, write)
-	AM_RANGE(0xf9f38, 0xf9f3b) AM_DEVREADWRITE("bpuart", mc2661_device, read, write)
-	AM_RANGE(0xf9f3c, 0xf9f3d) AM_DEVREADWRITE("bppic", pic8259_device, read, write)
-	AM_RANGE(0xf9f3e, 0xf9f3e) AM_WRITE(f9f3e_w)
-	AM_RANGE(0xf9f70, 0xf9f77) AM_DEVREADWRITE("hdc", wd2010_device, read, write)
-	AM_RANGE(0xf9f78, 0xf9f78) AM_READWRITE(f9f78_r, f9f78_w)
-	AM_RANGE(0xf9f79, 0xf9f79) AM_WRITE(f9f79_w)
-ADDRESS_MAP_END
+void pg685_state::pg685_mem(address_map &map)
+{
+	map.unmap_value_high();
+	pg675_mem(map);
+	map(0xf9f34, 0xf9f37).rw("bppit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xf9f38, 0xf9f3b).rw("bpuart", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0xf9f3c, 0xf9f3d).rw("bppic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xf9f3e, 0xf9f3e).w(this, FUNC(pg685_state::f9f3e_w));
+	map(0xf9f70, 0xf9f77).rw("hdc", FUNC(wd2010_device::read), FUNC(wd2010_device::write));
+	map(0xf9f78, 0xf9f78).rw(this, FUNC(pg685_state::f9f78_r), FUNC(pg685_state::f9f78_w));
+	map(0xf9f79, 0xf9f79).w(this, FUNC(pg685_state::f9f79_w));
+}
 
-ADDRESS_MAP_START(pg685_state::pg685oua12_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0xdffff) AM_RAM
-	AM_RANGE(0xe0000,0xeffff) AM_RAM AM_SHARE ("framebuffer16")
-	AM_RANGE(0xf0000,0xf1fff) AM_RAM
-	AM_RANGE(0xf9f00, 0xf9f01) AM_DEVREADWRITE8("kbdc", i8279_device, read, write, 0xffff)
-	AM_RANGE(0xf9f04, 0xf9f05) AM_READWRITE8(f9f04_r, f9f04_w, 0x00ff)
-	AM_RANGE(0xf9f06, 0xf9f07) AM_DEVREADWRITE8("mainpic", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0xf9f08, 0xf9f09) AM_DEVREADWRITE8("mainuart", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xf9f08, 0xf9f09) AM_DEVREADWRITE8("mainuart", i8251_device, status_r, control_w, 0xff00)
-	AM_RANGE(0xf9f20, 0xf9f23) AM_DEVREADWRITE8("fdc", fd1797_device, read, write, 0xffff)
-	AM_RANGE(0xf9f24, 0xf9f25) AM_READWRITE8(f9f24_r, f9f24_w, 0x00ff)
-	AM_RANGE(0xf9f28, 0xf9f2b) AM_DEVREADWRITE8("modppi1", i8255_device, read, write, 0xffff)
-	AM_RANGE(0xf9f2c, 0xf9f2f) AM_DEVREADWRITE8("modppi2", i8255_device, read, write, 0xffff)
-	AM_RANGE(0xf9f30, 0xf9f31) AM_DEVREADWRITE8("moduart", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xf9f30, 0xf9f31) AM_DEVREADWRITE8("moduart", i8251_device, status_r, control_w, 0xff00)
-	AM_RANGE(0xf9f32, 0xf9f33) AM_WRITE8(f9f32_w, 0x00ff)
-	AM_RANGE(0xf9f32, 0xf9f33) AM_READ8(f9f33_r, 0xff00)
-	AM_RANGE(0xf9f34, 0xf9f37) AM_DEVREADWRITE8("bppit", pit8253_device, read, write, 0xffff)
-	AM_RANGE(0xf9f38, 0xf9f3b) AM_DEVREADWRITE8("bpuart", mc2661_device, read, write, 0xffff)
-	AM_RANGE(0xf9f3c, 0xf9f3d) AM_DEVREADWRITE8("bppic", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0xf9f3e, 0xf9f3f) AM_WRITE8(f9f3e_w, 0x00ff)
-	AM_RANGE(0xf9f3e, 0xf9f3f) AM_READ8(f9f3f_r, 0xff00)
-	AM_RANGE(0xf9f40, 0xf9f5f) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0xffff)
-	AM_RANGE(0xf9f70, 0xf9f77) AM_DEVREADWRITE8("hdc", wd2010_device, read, write, 0xffff)
-	AM_RANGE(0xf9f78, 0xf9f79) AM_READWRITE8(f9f78_r, f9f78_w, 0x00ff)
-	AM_RANGE(0xf9f78, 0xf9f79) AM_WRITE8(f9f79_w, 0xff00)
-	AM_RANGE(0xf9f80, 0xf9f81) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0x00ff)
-	AM_RANGE(0xf9f80, 0xf9f81) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
-	AM_RANGE(0xfc000,0xfffff) AM_RAM    // BIOS RAM shadow
-	AM_RANGE(0xffc000,0xffffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void pg685_state::pg685oua12_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xdffff).ram();
+	map(0xe0000, 0xeffff).ram().share("framebuffer16");
+	map(0xf0000, 0xf1fff).ram();
+	map(0xf9f00, 0xf9f01).rw("kbdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0xf9f04, 0xf9f04).rw(this, FUNC(pg685_state::f9f04_r), FUNC(pg685_state::f9f04_w));
+	map(0xf9f06, 0xf9f07).rw("mainpic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xf9f08, 0xf9f08).rw("mainuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf9f09, 0xf9f09).rw("mainuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf9f20, 0xf9f23).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
+	map(0xf9f24, 0xf9f24).rw(this, FUNC(pg685_state::f9f24_r), FUNC(pg685_state::f9f24_w));
+	map(0xf9f28, 0xf9f2b).rw("modppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf9f2c, 0xf9f2f).rw("modppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf9f30, 0xf9f30).rw("moduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf9f31, 0xf9f31).rw("moduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf9f32, 0xf9f32).w(this, FUNC(pg685_state::f9f32_w));
+	map(0xf9f33, 0xf9f33).r(this, FUNC(pg685_state::f9f33_r));
+	map(0xf9f34, 0xf9f37).rw("bppit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xf9f38, 0xf9f3b).rw("bpuart", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0xf9f3c, 0xf9f3d).rw("bppic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xf9f3e, 0xf9f3e).w(this, FUNC(pg685_state::f9f3e_w));
+	map(0xf9f3f, 0xf9f3f).r(this, FUNC(pg685_state::f9f3f_r));
+	map(0xf9f40, 0xf9f5f).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write));
+	map(0xf9f70, 0xf9f77).rw("hdc", FUNC(wd2010_device::read), FUNC(wd2010_device::write));
+	map(0xf9f78, 0xf9f78).rw(this, FUNC(pg685_state::f9f78_r), FUNC(pg685_state::f9f78_w));
+	map(0xf9f79, 0xf9f79).w(this, FUNC(pg685_state::f9f79_w));
+	map(0xf9f80, 0xf9f80).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0xf9f81, 0xf9f81).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xfc000, 0xfffff).ram();    // BIOS RAM shadow
+	map(0xffc000, 0xffffff).rom().region("bios", 0);
+}
 
 
 //**************************************************************************
@@ -259,8 +264,10 @@ READ8_MEMBER(pg685_state::f9f33_r)
 
 WRITE8_MEMBER(pg685_state::f9f3e_w)
 {
-	// 00 written at startup
-	logerror("Writing %02X to F9F3E\n", data);
+	m_bppit->write_gate0(BIT(data, 6));
+	m_bppit->write_gate1(BIT(data, 7));
+
+	// On PC16-11, D5 is AND-ed with the PIT's OUT2, and other bits are used to select the baud rate for a 8251.
 }
 
 READ8_MEMBER(pg685_state::f9f3f_r)
@@ -390,11 +397,14 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 
 MACHINE_CONFIG_START(pg685_state::pg685_backplane)
 	MCFG_DEVICE_ADD("bppit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL(12'288'000) / 10) // same input clock as for PC16-11?
+	MCFG_PIT8253_CLK1(XTAL(12'288'000) / 10)
+	MCFG_PIT8253_CLK2(XTAL(12'288'000) / 10)
 
 	MCFG_DEVICE_ADD("bppic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(NOOP) // ???
+	MCFG_PIC8259_OUT_INT_CB(NOOP) // configured in single 8086 mode?
 
-	MCFG_DEVICE_ADD("bpuart", MC2661, XTAL(4'915'200)) // internal clock
+	MCFG_DEVICE_ADD("bpuart", MC2661, 4915200)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pg685_state::pg685_module)

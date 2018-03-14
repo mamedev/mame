@@ -204,29 +204,30 @@ WRITE8_MEMBER(cmmb_state::flash_dbg_1_w)
 }
 
 /* overlap empty addresses */
-ADDRESS_MAP_START(cmmb_state::cmmb_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM /* zero page address */
+void cmmb_state::cmmb_map(address_map &map)
+{
+	map.global_mask(0xffff);
+	map(0x0000, 0x0fff).ram(); /* zero page address */
 //  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("IN3")
-	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("IN4")
-	AM_RANGE(0x2011, 0x2011) AM_READ_PORT("IN5")
-	AM_RANGE(0x2480, 0x249f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x2505, 0x2505) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x2600, 0x2600) AM_WRITE(irq_ack_w)
+	map(0x1000, 0x13ff).ram().share("videoram");
+	map(0x2000, 0x2000).portr("IN3");
+	map(0x2001, 0x2001).portr("IN4");
+	map(0x2011, 0x2011).portr("IN5");
+	map(0x2480, 0x249f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x2505, 0x2505).w(this, FUNC(cmmb_state::irq_enable_w));
+	map(0x2600, 0x2600).w(this, FUNC(cmmb_state::irq_ack_w));
 	//AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w)
 	//AM_RANGE(0x4900, 0x4900) AM_READ(kludge_r)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("maincpu", 0x18000)
-	AM_RANGE(0xa000, 0xafff) AM_RAM
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(cmmb_charram_r,cmmb_charram_w)
-	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(cmmb_input_r,cmmb_output_w)
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0x9fff).rom().region("maincpu", 0x18000);
+	map(0xa000, 0xafff).ram();
+	map(0xb000, 0xbfff).rw(this, FUNC(cmmb_state::cmmb_charram_r), FUNC(cmmb_state::cmmb_charram_w));
+	map(0xc000, 0xc00f).rw(this, FUNC(cmmb_state::cmmb_input_r), FUNC(cmmb_state::cmmb_output_w));
 	// debugging, to be removed
 //  AM_RANGE(0x2aaa, 0x2aaa) AM_WRITE(flash_dbg_0_w)
 //  AM_RANGE(0x5555, 0x5555) AM_WRITE(flash_dbg_1_w)
-	AM_RANGE(0xc010, 0xffff) AM_ROM AM_REGION("maincpu", 0x1c010)
-ADDRESS_MAP_END
+	map(0xc010, 0xffff).rom().region("maincpu", 0x1c010);
+}
 
 
 static INPUT_PORTS_START( cmmb )

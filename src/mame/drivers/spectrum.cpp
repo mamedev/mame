@@ -431,19 +431,21 @@ READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(spectrum_state::spectrum_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(spectrum_rom_r, spectrum_rom_w)
-	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_SHARE("video_ram")
+void spectrum_state::spectrum_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rw(this, FUNC(spectrum_state::spectrum_rom_r), FUNC(spectrum_state::spectrum_rom_w));
+	map(0x4000, 0x5aff).ram().share("video_ram");
 //  AM_RANGE(0x5b00, 0x7fff) AM_RAM
 //  AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+}
 
 /* ports are not decoded full.
 The function decodes the ports appropriately */
-ADDRESS_MAP_START(spectrum_state::spectrum_io)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r, spectrum_port_fe_w) AM_SELECT(0xfffe)
-	AM_RANGE(0x01, 0x01) AM_READ(spectrum_port_ula_r) AM_MIRROR(0xfffe)
-ADDRESS_MAP_END
+void spectrum_state::spectrum_io(address_map &map)
+{
+	map(0x00, 0x00).rw(this, FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0x01, 0x01).r(this, FUNC(spectrum_state::spectrum_port_ula_r)).mirror(0xfffe);
+}
 
 /* Input ports */
 

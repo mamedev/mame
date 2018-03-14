@@ -80,11 +80,12 @@ void sk1_state::driver_start()
 }
 
 
-ADDRESS_MAP_START(sk1_state::sk1_memory)
+void sk1_state::sk1_memory(address_map &map)
+{
 	// chip selects are driven by decoding A13 and A15 with IC3 quad 2-input NOR gate
-	AM_RANGE(0x0000, 0x7fff)                   AM_ROM AM_REGION("lsi2", 0x0000)
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x4000) AM_RAM
-ADDRESS_MAP_END
+	map(0x0000, 0x7fff).rom().region("lsi2", 0x0000);
+	map(0x8000, 0x83ff).mirror(0x4000).ram();
+}
 
 
 MACHINE_CONFIG_START(sk1_state::sk1)

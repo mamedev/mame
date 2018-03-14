@@ -187,69 +187,73 @@ WRITE8_MEMBER(fastfred_state::sound_nmi_mask_w)
 	m_sound_nmi_mask = data & 1;
 }
 
-ADDRESS_MAP_START(fastfred_state::fastfred_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x400) AM_RAM_WRITE(fastfred_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(fastfred_attributes_w) AM_SHARE("attributesram")
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd860, 0xdbff) AM_RAM // Unused, but initialized
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS") AM_WRITEONLY AM_SHARE("bgcolor")
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
-	AM_RANGE(0xf000, 0xf007) AM_MIRROR(0x07f8) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void fastfred_state::fastfred_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xd000, 0xd3ff).mirror(0x400).ram().w(this, FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
+	map(0xd800, 0xd83f).ram().w(this, FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
+	map(0xd840, 0xd85f).ram().share("spriteram");
+	map(0xd860, 0xdbff).ram(); // Unused, but initialized
+	map(0xe000, 0xe000).portr("BUTTONS").writeonly().share("bgcolor");
+	map(0xe800, 0xe800).portr("JOYS");
+	map(0xf000, 0xf007).mirror(0x07f8).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xf000, 0xf000).portr("DSW").nopw();
+	map(0xf800, 0xf800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("soundlatch", FUNC(generic_latch_8_device::write));
+}
 
 
-ADDRESS_MAP_START(fastfred_state::jumpcoas_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd03f) AM_RAM_WRITE(fastfred_attributes_w) AM_SHARE("attributesram")
-	AM_RANGE(0xd040, 0xd05f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd060, 0xd3ff) AM_RAM
-	AM_RANGE(0xd800, 0xdbff) AM_MIRROR(0x400) AM_RAM_WRITE(fastfred_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xe000) AM_WRITEONLY AM_SHARE("bgcolor")
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSW1")
-	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0xe803, 0xe803) AM_READ_PORT("JOYS")
-	AM_RANGE(0xf000, 0xf007) AM_MIRROR(0x07f8) AM_DEVWRITE("outlatch", ls259_device, write_d0)
+void fastfred_state::jumpcoas_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xd000, 0xd03f).ram().w(this, FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
+	map(0xd040, 0xd05f).ram().share("spriteram");
+	map(0xd060, 0xd3ff).ram();
+	map(0xd800, 0xdbff).mirror(0x400).ram().w(this, FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
+	map(0xe000, 0xe000).writeonly().share("bgcolor");
+	map(0xe800, 0xe800).portr("DSW1");
+	map(0xe801, 0xe801).portr("DSW2");
+	map(0xe802, 0xe802).portr("BUTTONS");
+	map(0xe803, 0xe803).portr("JOYS");
+	map(0xf000, 0xf007).mirror(0x07f8).w("outlatch", FUNC(ls259_device::write_d0));
 	//AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)  // Why doesn't this work???
-	AM_RANGE(0xf800, 0xf801) AM_READNOP AM_DEVWRITE("ay8910.1", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+	map(0xf800, 0xf801).nopr().w("ay8910.1", FUNC(ay8910_device::address_data_w));
+}
 
 
-ADDRESS_MAP_START(fastfred_state::imago_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x1fff) AM_READ(imago_sprites_offset_r)
-	AM_RANGE(0x2000, 0x6fff) AM_ROM
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM // same fg videoram (which one of the 2 is really used?)
-	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(imago_sprites_dma_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(imago_fg_videoram_w) AM_SHARE("imago_fg_vram")
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(fastfred_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(fastfred_attributes_w) AM_SHARE("attributesram")
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd860, 0xd8ff) AM_RAM // Unused, but initialized
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW")
-	AM_RANGE(0xf000, 0xf007) AM_MIRROR(0x03f8) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-	AM_RANGE(0xf400, 0xf400) AM_WRITENOP // writes 0 or 2
-	AM_RANGE(0xf401, 0xf401) AM_WRITE(imago_sprites_bank_w)
-	AM_RANGE(0xf800, 0xf800) AM_READNOP AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void fastfred_state::imago_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x1fff).r(this, FUNC(fastfred_state::imago_sprites_offset_r));
+	map(0x2000, 0x6fff).rom();
+	map(0xb000, 0xb3ff).ram(); // same fg videoram (which one of the 2 is really used?)
+	map(0xb800, 0xbfff).ram().w(this, FUNC(fastfred_state::imago_sprites_dma_w));
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xcbff).ram().w(this, FUNC(fastfred_state::imago_fg_videoram_w)).share("imago_fg_vram");
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
+	map(0xd800, 0xd83f).ram().w(this, FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
+	map(0xd840, 0xd85f).ram().share("spriteram");
+	map(0xd860, 0xd8ff).ram(); // Unused, but initialized
+	map(0xe000, 0xe000).portr("BUTTONS");
+	map(0xe800, 0xe800).portr("JOYS");
+	map(0xf000, 0xf000).portr("DSW");
+	map(0xf000, 0xf007).mirror(0x03f8).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xf400, 0xf400).nopw(); // writes 0 or 2
+	map(0xf401, 0xf401).w(this, FUNC(fastfred_state::imago_sprites_bank_w));
+	map(0xf800, 0xf800).nopr().w("soundlatch", FUNC(generic_latch_8_device::write));
+}
 
-ADDRESS_MAP_START(fastfred_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(sound_nmi_mask_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY  // Reset PSG's
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay8910.1", ay8910_device, address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay8910.2", ay8910_device, address_data_w)
-	AM_RANGE(0x7000, 0x7000) AM_READNOP // only for Imago, read but not used
-ADDRESS_MAP_END
+void fastfred_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(this, FUNC(fastfred_state::sound_nmi_mask_w));
+	map(0x4000, 0x4000).writeonly();  // Reset PSG's
+	map(0x5000, 0x5001).w("ay8910.1", FUNC(ay8910_device::address_data_w));
+	map(0x6000, 0x6001).w("ay8910.2", FUNC(ay8910_device::address_data_w));
+	map(0x7000, 0x7000).nopr(); // only for Imago, read but not used
+}
 
 
 static INPUT_PORTS_START( common )

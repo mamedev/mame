@@ -104,257 +104,311 @@ READ8_MEMBER(legionna_state::denjinmk_sound_comms_r)
 	return m_seibu_sound->main_r(space, (offset >> 1) & 7);
 }
 
-ADDRESS_MAP_START(legionna_state::legionna_cop_mem)
-	AM_RANGE(0x100400, 0x100401) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sprite_dma_param_lo_w) // grainbow
-	AM_RANGE(0x100402, 0x100403) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sprite_dma_param_hi_w) // grainbow
-	AM_RANGE(0x10040c, 0x10040d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sprite_dma_size_w) // grainbow
-	AM_RANGE(0x100410, 0x100411) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sprite_dma_inc_w) // grainbow
-	AM_RANGE(0x100412, 0x100413) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sprite_dma_src_hi_w) // grainbow
-	AM_RANGE(0x100414, 0x100415) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sprite_dma_src_lo_w) // grainbow
+void legionna_state::legionna_cop_mem(address_map &map)
+{
+	map(0x100400, 0x100401).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_param_lo_w)); // grainbow
+	map(0x100402, 0x100403).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_param_hi_w)); // grainbow
+	map(0x10040c, 0x10040d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_size_w)); // grainbow
+	map(0x100410, 0x100411).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_inc_w)); // grainbow
+	map(0x100412, 0x100413).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_src_hi_w)); // grainbow
+	map(0x100414, 0x100415).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_src_lo_w)); // grainbow
 
-	AM_RANGE(0x10041c, 0x10041d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_angle_target_w) // angle target (for 0x6200 COP macro)
-	AM_RANGE(0x10041e, 0x10041f) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_angle_step_w)   // angle step   (for 0x6200 COP macro)
+	map(0x10041c, 0x10041d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_target_w)); // angle target (for 0x6200 COP macro)
+	map(0x10041e, 0x10041f).w(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_step_w));   // angle step   (for 0x6200 COP macro)
 
-	AM_RANGE(0x100420, 0x100421) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_low_w)
-	AM_RANGE(0x100422, 0x100423) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_high_w)
-	AM_RANGE(0x100424, 0x100425) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_mode_w)
-	AM_RANGE(0x100428, 0x100429) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_v1_w)
-	AM_RANGE(0x10042a, 0x10042b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_v2_w)
-	AM_RANGE(0x10042c, 0x10042d) AM_DEVREADWRITE("raiden2cop", raiden2cop_device, cop_prng_maxvalue_r, cop_prng_maxvalue_w)
+	map(0x100420, 0x100421).w(m_raiden2cop, FUNC(raiden2cop_device::cop_itoa_low_w));
+	map(0x100422, 0x100423).w(m_raiden2cop, FUNC(raiden2cop_device::cop_itoa_high_w));
+	map(0x100424, 0x100425).w(m_raiden2cop, FUNC(raiden2cop_device::cop_itoa_mode_w));
+	map(0x100428, 0x100429).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_v1_w));
+	map(0x10042a, 0x10042b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_v2_w));
+	map(0x10042c, 0x10042d).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_prng_maxvalue_r), FUNC(raiden2cop_device::cop_prng_maxvalue_w));
 
-	AM_RANGE(0x100432, 0x100433) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_data_w)
-	AM_RANGE(0x100434, 0x100435) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_addr_w)
-	AM_RANGE(0x100436, 0x100437) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_hitbox_baseadr_w)
-	AM_RANGE(0x100438, 0x100439) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_value_w)
-	AM_RANGE(0x10043a, 0x10043b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_mask_w)
-	AM_RANGE(0x10043c, 0x10043d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_trigger_w)
-	//AM_RANGE(0x10043e, 0x10043f) AM_DEVWRITE("raiden2cop", raiden2cop_device,)    /*  0 in all 68k based games,   0xffff in raiden2 / raidendx,   0x2000 in zeroteam / xsedae , it's always set up just before the 0x474 register */
+	map(0x100432, 0x100433).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_data_w));
+	map(0x100434, 0x100435).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_addr_w));
+	map(0x100436, 0x100437).w(m_raiden2cop, FUNC(raiden2cop_device::cop_hitbox_baseadr_w));
+	map(0x100438, 0x100439).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_value_w));
+	map(0x10043a, 0x10043b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_mask_w));
+	map(0x10043c, 0x10043d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_trigger_w));
+	//map(0x10043e, 0x10043f).rw(m_raiden2cop, ...);    /*  0 in all 68k based games,   0xffff in raiden2 / raidendx,   0x2000 in zeroteam / xsedae , it's always set up just before the 0x474 register */
 
-	AM_RANGE(0x100440, 0x100441) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_unk_param_a_w)
-	AM_RANGE(0x100442, 0x100443) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_unk_param_b_w)
-	AM_RANGE(0x100444, 0x100445) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_scale_w)
-	AM_RANGE(0x100446, 0x100447) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_rom_addr_hi_w) // cupsoc
-	AM_RANGE(0x100448, 0x100449) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_rom_addr_lo_w) // cupsoc
-	AM_RANGE(0x10044a, 0x10044b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_precmd_w) // cupsoc
+	map(0x100440, 0x100441).w(m_raiden2cop, FUNC(raiden2cop_device::cop_unk_param_a_w));
+	map(0x100442, 0x100443).w(m_raiden2cop, FUNC(raiden2cop_device::cop_unk_param_b_w));
+	map(0x100444, 0x100445).w(m_raiden2cop, FUNC(raiden2cop_device::cop_scale_w));
+	map(0x100446, 0x100447).w(m_raiden2cop, FUNC(raiden2cop_device::cop_rom_addr_hi_w)); // cupsoc
+	map(0x100448, 0x100449).w(m_raiden2cop, FUNC(raiden2cop_device::cop_rom_addr_lo_w)); // cupsoc
+	map(0x10044a, 0x10044b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_precmd_w)); // cupsoc
 
-	AM_RANGE(0x100450, 0x100451) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_ram_addr_hi_w)
-	AM_RANGE(0x100452, 0x100453) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_ram_addr_lo_w)
-	AM_RANGE(0x100454, 0x100455) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_lookup_hi_w)
-	AM_RANGE(0x100456, 0x100457) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_lookup_lo_w)
-	AM_RANGE(0x100458, 0x100459) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_param_w)
-	AM_RANGE(0x10045a, 0x10045b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pal_brightness_val_w) //palette DMA brightness val, used by X Se Dae / Zero Team
-	AM_RANGE(0x10045c, 0x10045d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pal_brightness_mode_w)  //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
+	map(0x100450, 0x100451).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_ram_addr_hi_w));
+	map(0x100452, 0x100453).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_ram_addr_lo_w));
+	map(0x100454, 0x100455).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_lookup_hi_w));
+	map(0x100456, 0x100457).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_lookup_lo_w));
+	map(0x100458, 0x100459).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_param_w));
+	map(0x10045a, 0x10045b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_val_w)); //palette DMA brightness val, used by X Se Dae / Zero Team
+	map(0x10045c, 0x10045d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_mode_w));  //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
 
-//  AM_RANGE(0x100470, 0x100471) AM_READWRITE(cop_tile_bank_2_r,cop_tile_bank_2_w)
-//  AM_RANGE(0x100474, 0x100475) AM_DEVWRITE("raiden2cop", raiden2cop_device,) // this gets set to a pointer to spriteram (relative to start of ram) on all games excecpt raiden 2, where it isn't set
-	AM_RANGE(0x100476, 0x100477) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_adr_rel_w)
-	AM_RANGE(0x100478, 0x100479) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_src_w)
-	AM_RANGE(0x10047a, 0x10047b) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_size_w)
-	AM_RANGE(0x10047c, 0x10047d) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_dst_w)
-	AM_RANGE(0x10047e, 0x10047f) AM_DEVREADWRITE("raiden2cop", raiden2cop_device, cop_dma_mode_r, cop_dma_mode_w)
+//  map(0x100470, 0x100471).rw(this, FUNC(legionna_state::cop_tile_bank_2_r), FUNC(legionna_state::cop_tile_bank_2_w));
+//  map(0x100474, 0x100475).w(m_raiden2cop, FUNC(raiden2cop_device::...)); // this gets set to a pointer to spriteram (relative to start of ram) on all games excecpt raiden 2, where it isn't set
+	map(0x100476, 0x100477).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_adr_rel_w));
+	map(0x100478, 0x100479).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_src_w));
+	map(0x10047a, 0x10047b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_size_w));
+	map(0x10047c, 0x10047d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_dst_w));
+	map(0x10047e, 0x10047f).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_mode_r), FUNC(raiden2cop_device::cop_dma_mode_w));
 
-	AM_RANGE(0x10048c, 0x10048d) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_sprite_dma_abs_y_w) // 68k
-	AM_RANGE(0x10048e, 0x10048f) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_sprite_dma_abs_x_w) // 68k
+	map(0x10048c, 0x10048d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_abs_y_w)); // 68k
+	map(0x10048e, 0x10048f).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_abs_x_w)); // 68k
 
-	AM_RANGE(0x1004a0, 0x1004ad) AM_DEVREADWRITE("raiden2cop", raiden2cop_device, cop_reg_high_r, cop_reg_high_w)
-	AM_RANGE(0x1004c0, 0x1004cd) AM_DEVREADWRITE("raiden2cop", raiden2cop_device, cop_reg_low_r, cop_reg_low_w)
+	map(0x1004a0, 0x1004ad).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_reg_high_r), FUNC(raiden2cop_device::cop_reg_high_w));
+	map(0x1004c0, 0x1004cd).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_reg_low_r), FUNC(raiden2cop_device::cop_reg_low_w));
 
-//  AM_RANGE(0x100500, 0x100505) AM_WRITE(cop_cmd_w) // ADD ME
-	AM_RANGE(0x100500, 0x100505) AM_DEVWRITE("raiden2cop", raiden2cop_device,LEGACY_cop_cmd_w) // REMOVE ME
+//  map(0x100500, 0x100505).w(this, FUNC(legionna_state::cop_cmd_w)); // ADD ME
+	map(0x100500, 0x100505).w(m_raiden2cop, FUNC(raiden2cop_device::LEGACY_cop_cmd_w)); // REMOVE ME
 
-	AM_RANGE(0x100580, 0x100581) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_collision_status_r)
-	AM_RANGE(0x100582, 0x100587) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_collision_status_val_r)
-
-
-	AM_RANGE(0x100588, 0x100589) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_collision_status_stat_r)
-	AM_RANGE(0x100590, 0x100599) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_itoa_digits_r)
-
-	AM_RANGE(0x1005a0, 0x1005a7) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_prng_r)
-
-	AM_RANGE(0x1005b0, 0x1005b1) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_status_r)
-	AM_RANGE(0x1005b2, 0x1005b3) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_dist_r)
-	AM_RANGE(0x1005b4, 0x1005b5) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_angle_r)
-
-	AM_RANGE(0x1006fc, 0x1006fd) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_trigger_w)
-	AM_RANGE(0x1006fe, 0x1006ff) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_sort_dma_trig_w) // sort-DMA trigger
-ADDRESS_MAP_END
+	map(0x100580, 0x100581).r(m_raiden2cop, FUNC(raiden2cop_device::cop_collision_status_r));
+	map(0x100582, 0x100587).r(m_raiden2cop, FUNC(raiden2cop_device::cop_collision_status_val_r));
 
 
-ADDRESS_MAP_START(legionna_state::legionna_map)
-	AM_IMPORT_FROM( legionna_cop_mem )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100470, 0x100471) AM_WRITENOP // toggles 0x2000 / 0x0000, tile bank on some games
-	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	;map(0x100700, 0x10071f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
-	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
-	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
-	AM_RANGE(0x10074c, 0x10074d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x102800, 0x1037ff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
-	AM_RANGE(0x104000, 0x104fff) AM_RAM // _DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    /* palette xRRRRxGGGGxBBBBx ? */
-	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x106000, 0x107fff) AM_RAM
-	AM_RANGE(0x108000, 0x11ffff) AM_RAM /* main ram */
-ADDRESS_MAP_END
+	map(0x100588, 0x100589).r(m_raiden2cop, FUNC(raiden2cop_device::cop_collision_status_stat_r));
+	map(0x100590, 0x100599).r(m_raiden2cop, FUNC(raiden2cop_device::cop_itoa_digits_r));
+
+	map(0x1005a0, 0x1005a7).r(m_raiden2cop, FUNC(raiden2cop_device::cop_prng_r));
+
+	map(0x1005b0, 0x1005b1).r(m_raiden2cop, FUNC(raiden2cop_device::cop_status_r));
+	map(0x1005b2, 0x1005b3).r(m_raiden2cop, FUNC(raiden2cop_device::cop_dist_r));
+	map(0x1005b4, 0x1005b5).r(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_r));
+
+	map(0x1006fc, 0x1006fd).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_trigger_w));
+	map(0x1006fe, 0x1006ff).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_dma_trig_w)); // sort-DMA trigger
+}
 
 
-ADDRESS_MAP_START(legionna_state::heatbrl_map)
-	AM_IMPORT_FROM( legionna_cop_mem )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100470, 0x100471) AM_WRITE(heatbrl_setgfxbank)
-	AM_RANGE(0x100600, 0x100601) AM_WRITENOP // irq ack?
-	AM_RANGE(0x100640, 0x10068f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
-	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
-	AM_RANGE(0x10074c, 0x10074d) AM_READ_PORT("SYSTEM")
-	;map(0x1007c0, 0x1007df).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
-	AM_RANGE(0x100800, 0x100fff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x102000, 0x102fff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
-	AM_RANGE(0x103000, 0x103fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x104000, 0x104fff) AM_RAM // _DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x108000, 0x11ffff) AM_RAM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(legionna_state::godzilla_map)
-	AM_IMPORT_FROM( legionna_cop_mem )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100470, 0x100471) AM_WRITE(denjinmk_setgfxbank)
-	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	;map(0x100700, 0x10071f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
-	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
-	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
-	AM_RANGE(0x10074c, 0x10074d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x100800, 0x100fff) AM_RAM
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x102800, 0x1037ff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
-	AM_RANGE(0x103800, 0x103fff) AM_RAM // check?
-	AM_RANGE(0x104000, 0x104fff) AM_RAM // _DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x106000, 0x1067ff) AM_RAM
-	AM_RANGE(0x106800, 0x106fff) AM_RAM
-	AM_RANGE(0x107000, 0x107fff) AM_RAM /*Ani-DSP ram*/
-	AM_RANGE(0x108000, 0x11ffff) AM_RAM
-ADDRESS_MAP_END
+void legionna_state::legionna_map(address_map &map)
+{
+	legionna_cop_mem(map);
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x1003ff).ram();
+	map(0x100470, 0x100471).nopw(); // toggles 0x2000 / 0x0000, tile bank on some games
+	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+	map(0x100680, 0x100681).nopw(); // irq ack?
+	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
+								 [this](address_space &space, offs_t offset, u8 mem_mask) {
+									 return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+								 },
+								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+									 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+								 }).umask16(0x00ff);
+	map(0x100740, 0x100741).portr("DSW1");
+	map(0x100744, 0x100745).portr("PLAYERS12");
+	map(0x100748, 0x100749).portr("PLAYERS34");
+	map(0x10074c, 0x10074d).portr("SYSTEM");
+	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x102000, 0x1027ff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102800, 0x103fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x104000, 0x104fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");    /* palette xRRRRxGGGGxBBBBx ? */
+	map(0x105000, 0x105fff).ram().share("spriteram");
+	map(0x106000, 0x107fff).ram();
+	map(0x108000, 0x11ffff).ram(); /* main ram */
+}
 
 
-ADDRESS_MAP_START(legionna_state::denjinmk_map)
-	AM_IMPORT_FROM( legionna_cop_mem )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100470, 0x100471) AM_WRITE(denjinmk_setgfxbank)
-	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	;map(0x100700, 0x10071f).r(this, FUNC(legionna_state::denjinmk_sound_comms_r)).lw8("seibu_sound_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
-	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
-	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
-	AM_RANGE(0x10074c, 0x10074d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x10075c, 0x10075d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100800, 0x100fff) AM_RAM
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x102800, 0x103fff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
-	AM_RANGE(0x104000, 0x104fff) AM_RAM
-	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x106000, 0x107fff) AM_RAM
-	AM_RANGE(0x108000, 0x11dfff) AM_RAM
-	AM_RANGE(0x11e000, 0x11efff) AM_RAM
-	AM_RANGE(0x11f000, 0x11ffff) AM_RAM
-ADDRESS_MAP_END
+void legionna_state::heatbrl_map(address_map &map)
+{
+	legionna_cop_mem(map);
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x1003ff).ram();
+	map(0x100470, 0x100471).w(this, FUNC(legionna_state::heatbrl_setgfxbank));
+	map(0x100600, 0x100601).nopw(); // irq ack?
+	map(0x100640, 0x10068f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+	map(0x100740, 0x100741).portr("DSW1");
+	map(0x100744, 0x100745).portr("PLAYERS12");
+	map(0x100748, 0x100749).portr("PLAYERS34");
+	map(0x10074c, 0x10074d).portr("SYSTEM");
+	map(0x1007c0, 0x1007df).lrw8("seibu_sound_rw",
+								 [this](address_space &space, offs_t offset, u8 mem_mask) {
+									 return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+								 },
+								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+									 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+								 }).umask16(0x00ff);
+	map(0x100800, 0x100fff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x103000, 0x103fff).ram().share("spriteram");
+	map(0x104000, 0x104fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
+	map(0x108000, 0x11ffff).ram();
+}
 
-ADDRESS_MAP_START(legionna_state::grainbow_map)
-	AM_IMPORT_FROM( legionna_cop_mem )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100480, 0x100487) AM_WRITE(grainbow_layer_config_w) // probably a COP feature
-	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	;map(0x100700, 0x10071f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
-	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
-	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
-	AM_RANGE(0x10074c, 0x10074d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x10075c, 0x10075d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100800, 0x100fff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x102000, 0x102fff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
-	AM_RANGE(0x103000, 0x103fff) AM_RAM // _DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x104000, 0x104fff) AM_RAM//_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x105000, 0x105fff) AM_RAM
-	AM_RANGE(0x106000, 0x106fff) AM_RAM
-	AM_RANGE(0x107000, 0x107fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x108000, 0x11ffff) AM_RAM
-ADDRESS_MAP_END
+void legionna_state::godzilla_map(address_map &map)
+{
+	legionna_cop_mem(map);
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x1003ff).ram();
+	map(0x100470, 0x100471).w(this, FUNC(legionna_state::denjinmk_setgfxbank));
+	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+	map(0x100680, 0x100681).nopw(); // irq ack?
+	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
+								 [this](address_space &space, offs_t offset, u8 mem_mask) {
+									 return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+								 },
+								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+									 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+								 }).umask16(0x00ff);
+	map(0x100740, 0x100741).portr("DSW1");
+	map(0x100744, 0x100745).portr("PLAYERS12");
+	map(0x100748, 0x100749).portr("PLAYERS34");
+	map(0x10074c, 0x10074d).portr("SYSTEM");
+	map(0x100800, 0x100fff).ram();
+	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x102000, 0x1027ff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102800, 0x103fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x103800, 0x103fff).ram(); // check?
+	map(0x104000, 0x104fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
+	map(0x105000, 0x105fff).ram().share("spriteram");
+	map(0x106000, 0x1067ff).ram();
+	map(0x106800, 0x106fff).ram();
+	map(0x107000, 0x107fff).ram(); /*Ani-DSP ram*/
+	map(0x108000, 0x11ffff).ram();
+}
 
-ADDRESS_MAP_START(legionna_state::cupsoc_mem)
-	AM_IMPORT_FROM( legionna_cop_mem )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	;map(0x100700, 0x10071f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
-	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
-	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
-	AM_RANGE(0x10074c, 0x10074d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x10075c, 0x10075d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100800, 0x100fff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x102000, 0x102fff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
-	AM_RANGE(0x103000, 0x103fff) AM_RAM // _DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x104000, 0x104fff) AM_RAM
-	AM_RANGE(0x105000, 0x106fff) AM_RAM
-	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x107800, 0x107fff) AM_RAM /*Ani Dsp(?) Ram*/
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM
-	AM_RANGE(0x110000, 0x119fff) AM_RAM
-	AM_RANGE(0x11a000, 0x11dfff) AM_RAM
-	AM_RANGE(0x11e000, 0x11ffff) AM_RAM /*Stack Ram*/
-ADDRESS_MAP_END
 
-ADDRESS_MAP_START(legionna_state::cupsocs_mem)
-	AM_IMPORT_FROM( legionna_cop_mem )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	;map(0x100600, 0x10067f).lrw16("crtc_rw", [this](address_space &space, offs_t offset, u16 mem_mask){ return m_crtc->read(space, offset ^ 0x20, mem_mask); }, [this](address_space &space, offs_t offset, u16 data, u16 mem_mask){ m_crtc->write(space, offset ^ 0x20, data, mem_mask); });
-	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	AM_RANGE(0x100700, 0x100701) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100704, 0x100705) AM_READ_PORT("PLAYERS12")
-	AM_RANGE(0x100708, 0x100709) AM_READ_PORT("PLAYERS34")
-	AM_RANGE(0x10070c, 0x10070d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x10071c, 0x10071d) AM_READ_PORT("DSW2")
-	;map(0x100740, 0x10075f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
-	AM_RANGE(0x100800, 0x100fff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x102000, 0x102fff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
-	AM_RANGE(0x103000, 0x103fff) AM_RAM // _DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x104000, 0x104fff) AM_RAM
-	AM_RANGE(0x105000, 0x106fff) AM_RAM
-	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x107800, 0x107fff) AM_RAM /*Ani Dsp(?) Ram*/
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM
-	AM_RANGE(0x110000, 0x119fff) AM_RAM
-	AM_RANGE(0x11a000, 0x11dfff) AM_RAM
-	AM_RANGE(0x11e000, 0x11ffff) AM_RAM /*Stack Ram*/
-ADDRESS_MAP_END
+void legionna_state::denjinmk_map(address_map &map)
+{
+	legionna_cop_mem(map);
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x1003ff).ram();
+	map(0x100470, 0x100471).w(this, FUNC(legionna_state::denjinmk_setgfxbank));
+	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+	map(0x100680, 0x100681).nopw(); // irq ack?
+	map(0x100700, 0x10071f).r(this, FUNC(legionna_state::denjinmk_sound_comms_r))
+		.lw8("seibu_sound_w",
+			 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+				 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+			 }).umask16(0x00ff);
+	map(0x100740, 0x100741).portr("DSW1");
+	map(0x100744, 0x100745).portr("PLAYERS12");
+	map(0x100748, 0x100749).portr("PLAYERS34");
+	map(0x10074c, 0x10074d).portr("SYSTEM");
+	map(0x10075c, 0x10075d).portr("DSW2");
+	map(0x100800, 0x100fff).ram();
+	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x102000, 0x1027ff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102800, 0x103fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x104000, 0x104fff).ram();
+	map(0x105000, 0x105fff).ram().share("spriteram");
+	map(0x106000, 0x107fff).ram();
+	map(0x108000, 0x11dfff).ram();
+	map(0x11e000, 0x11efff).ram();
+	map(0x11f000, 0x11ffff).ram();
+}
+
+void legionna_state::grainbow_map(address_map &map)
+{
+	legionna_cop_mem(map);
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x1003ff).ram();
+	map(0x100480, 0x100487).w(this, FUNC(legionna_state::grainbow_layer_config_w)); // probably a COP feature
+	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+	map(0x100680, 0x100681).nopw(); // irq ack?
+	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
+								 [this](address_space &space, offs_t offset, u8 mem_mask) {
+									 return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+								 },
+								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+									 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+								 }).umask16(0x00ff);
+	map(0x100740, 0x100741).portr("DSW1");
+	map(0x100744, 0x100745).portr("PLAYERS12");
+	map(0x100748, 0x100749).portr("PLAYERS34");
+	map(0x10074c, 0x10074d).portr("SYSTEM");
+	map(0x10075c, 0x10075d).portr("DSW2");
+	map(0x100800, 0x100fff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x103000, 0x103fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
+	map(0x104000, 0x104fff).ram(); // .w(this, FUNC(legionna_state::paletteram_xBBBBBGGGGGRRRRR_word_w)).share("paletteram");
+	map(0x105000, 0x105fff).ram();
+	map(0x106000, 0x106fff).ram();
+	map(0x107000, 0x107fff).ram().share("spriteram");
+	map(0x108000, 0x11ffff).ram();
+}
+
+void legionna_state::cupsoc_mem(address_map &map)
+{
+	legionna_cop_mem(map);
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x1003ff).ram();
+	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+	map(0x100680, 0x100681).nopw(); // irq ack?
+	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
+								 [this](address_space &space, offs_t offset, u8 mem_mask) {
+									 return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+								 },
+								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+									 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+								 }).umask16(0x00ff);
+	map(0x100740, 0x100741).portr("DSW1");
+	map(0x100744, 0x100745).portr("PLAYERS12");
+	map(0x100748, 0x100749).portr("PLAYERS34");
+	map(0x10074c, 0x10074d).portr("SYSTEM");
+	map(0x10075c, 0x10075d).portr("DSW2");
+	map(0x100800, 0x100fff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x103000, 0x103fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
+	map(0x104000, 0x104fff).ram();
+	map(0x105000, 0x106fff).ram();
+	map(0x107000, 0x1077ff).ram().share("spriteram");
+	map(0x107800, 0x107fff).ram(); /*Ani Dsp(?) Ram*/
+	map(0x108000, 0x10ffff).ram();
+	map(0x110000, 0x119fff).ram();
+	map(0x11a000, 0x11dfff).ram();
+	map(0x11e000, 0x11ffff).ram(); /*Stack Ram*/
+}
+
+void legionna_state::cupsocs_mem(address_map &map)
+{
+	legionna_cop_mem(map);
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x1003ff).ram();
+	map(0x100600, 0x10067f).lrw16("crtc_rw",
+								  [this](address_space &space, offs_t offset, u16 mem_mask) {
+									  return m_crtc->read(space, offset ^ 0x20, mem_mask);
+								  },
+								  [this](address_space &space, offs_t offset, u16 data, u16 mem_mask) {
+									  m_crtc->write(space, offset ^ 0x20, data, mem_mask);
+								  });
+	map(0x100680, 0x100681).nopw(); // irq ack?
+	map(0x100700, 0x100701).portr("DSW1");
+	map(0x100704, 0x100705).portr("PLAYERS12");
+	map(0x100708, 0x100709).portr("PLAYERS34");
+	map(0x10070c, 0x10070d).portr("SYSTEM");
+	map(0x10071c, 0x10071d).portr("DSW2");
+	map(0x100740, 0x10075f).lrw8("seibu_sound_rw",
+								 [this](address_space &space, offs_t offset, u8 mem_mask) {
+									 return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+								 },
+								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+									 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+								 }).umask16(0x00ff);
+	map(0x100800, 0x100fff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x103000, 0x103fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
+	map(0x104000, 0x104fff).ram();
+	map(0x105000, 0x106fff).ram();
+	map(0x107000, 0x1077ff).ram().share("spriteram");
+	map(0x107800, 0x107fff).ram(); /*Ani Dsp(?) Ram*/
+	map(0x108000, 0x10ffff).ram();
+	map(0x110000, 0x119fff).ram();
+	map(0x11a000, 0x11dfff).ram();
+	map(0x11e000, 0x11ffff).ram(); /*Stack Ram*/
+}
 
 
 /*****************************************************************************/

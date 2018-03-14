@@ -57,15 +57,17 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-ADDRESS_MAP_START(grfd2301_state::mem_map)
-	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void grfd2301_state::mem_map(address_map &map)
+{
+	map(0xe000, 0xefff).rom().region("maincpu", 0);
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(grfd2301_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void grfd2301_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 static INPUT_PORTS_START( grfd2301 )
 INPUT_PORTS_END

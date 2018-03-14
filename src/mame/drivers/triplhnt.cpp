@@ -114,26 +114,27 @@ READ8_MEMBER(triplhnt_state::da_latch_r)
 }
 
 
-ADDRESS_MAP_START(triplhnt_state::triplhnt_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x300)
-	AM_RANGE(0x0400, 0x04ff) AM_WRITEONLY AM_SHARE("playfield_ram")
-	AM_RANGE(0x0800, 0x080f) AM_WRITEONLY AM_SHARE("vpos_ram")
-	AM_RANGE(0x0810, 0x081f) AM_WRITEONLY AM_SHARE("hpos_ram")
-	AM_RANGE(0x0820, 0x082f) AM_WRITEONLY AM_SHARE("orga_ram")
-	AM_RANGE(0x0830, 0x083f) AM_WRITEONLY AM_SHARE("code_ram")
-	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("0C00")
-	AM_RANGE(0x0c08, 0x0c08) AM_READ_PORT("0C08")
-	AM_RANGE(0x0c09, 0x0c09) AM_READ_PORT("0C09")
-	AM_RANGE(0x0c0a, 0x0c0a) AM_READ_PORT("0C0A")
-	AM_RANGE(0x0c0b, 0x0c0b) AM_READ(input_port_4_r)
-	AM_RANGE(0x0c10, 0x0c1f) AM_READ(da_latch_r)
-	AM_RANGE(0x0c20, 0x0c2f) AM_READ(cmos_r) AM_SHARE("nvram")
-	AM_RANGE(0x0c30, 0x0c3f) AM_READ(misc_r) AM_DEVWRITE("latch", f9334_device, write_a0)
-	AM_RANGE(0x0c40, 0x0c40) AM_READ_PORT("0C40")
-	AM_RANGE(0x0c48, 0x0c48) AM_READ_PORT("0C48")
-	AM_RANGE(0x7000, 0x7fff) AM_ROM /* program */
-ADDRESS_MAP_END
+void triplhnt_state::triplhnt_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x00ff).ram().mirror(0x300);
+	map(0x0400, 0x04ff).writeonly().share("playfield_ram");
+	map(0x0800, 0x080f).writeonly().share("vpos_ram");
+	map(0x0810, 0x081f).writeonly().share("hpos_ram");
+	map(0x0820, 0x082f).writeonly().share("orga_ram");
+	map(0x0830, 0x083f).writeonly().share("code_ram");
+	map(0x0c00, 0x0c00).portr("0C00");
+	map(0x0c08, 0x0c08).portr("0C08");
+	map(0x0c09, 0x0c09).portr("0C09");
+	map(0x0c0a, 0x0c0a).portr("0C0A");
+	map(0x0c0b, 0x0c0b).r(this, FUNC(triplhnt_state::input_port_4_r));
+	map(0x0c10, 0x0c1f).r(this, FUNC(triplhnt_state::da_latch_r));
+	map(0x0c20, 0x0c2f).r(this, FUNC(triplhnt_state::cmos_r)).share("nvram");
+	map(0x0c30, 0x0c3f).r(this, FUNC(triplhnt_state::misc_r)).w(m_latch, FUNC(f9334_device::write_a0));
+	map(0x0c40, 0x0c40).portr("0C40");
+	map(0x0c48, 0x0c48).portr("0C48");
+	map(0x7000, 0x7fff).rom(); /* program */
+}
 
 
 static INPUT_PORTS_START( triplhnt )

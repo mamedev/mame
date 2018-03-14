@@ -35,7 +35,7 @@ public:
 		m_light1_y(*this, "LIGHT1_Y")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tms34010_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<ticket_dispenser_device> m_ticket;
 	optional_ioport m_paddle;

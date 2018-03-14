@@ -101,40 +101,44 @@ WRITE8_MEMBER(blueprnt_state::blueprnt_coin_counter_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(blueprnt_state::blueprnt_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM // service mode checks for 8 chips = 64K
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(blueprnt_videoram_w) AM_MIRROR(0x400) AM_SHARE("videoram")
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("scrollram")
-	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1") AM_WRITE(blueprnt_coin_counter_w)
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
-	AM_RANGE(0xc003, 0xc003) AM_READ(blueprnt_sh_dipsw_r)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(blueprnt_sound_command_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(blueprnt_flipscreen_w)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(blueprnt_colorram_w) AM_MIRROR(0x400) AM_SHARE("colorram")
-ADDRESS_MAP_END
+void blueprnt_state::blueprnt_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); // service mode checks for 8 chips = 64K
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x93ff).ram().w(this, FUNC(blueprnt_state::blueprnt_videoram_w)).mirror(0x400).share("videoram");
+	map(0xa000, 0xa0ff).ram().share("scrollram");
+	map(0xb000, 0xb0ff).ram().share("spriteram");
+	map(0xc000, 0xc000).portr("P1").w(this, FUNC(blueprnt_state::blueprnt_coin_counter_w));
+	map(0xc001, 0xc001).portr("P2");
+	map(0xc003, 0xc003).r(this, FUNC(blueprnt_state::blueprnt_sh_dipsw_r));
+	map(0xd000, 0xd000).w(this, FUNC(blueprnt_state::blueprnt_sound_command_w));
+	map(0xe000, 0xe000).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(blueprnt_state::blueprnt_flipscreen_w));
+	map(0xf000, 0xf3ff).ram().w(this, FUNC(blueprnt_state::blueprnt_colorram_w)).mirror(0x400).share("colorram");
+}
 
-ADDRESS_MAP_START(blueprnt_state::grasspin_map)
-	AM_IMPORT_FROM( blueprnt_map )
-	AM_RANGE(0xc003, 0xc003) AM_READ(grasspin_sh_dipsw_r)
-ADDRESS_MAP_END
+void blueprnt_state::grasspin_map(address_map &map)
+{
+	blueprnt_map(map);
+	map(0xc003, 0xc003).r(this, FUNC(blueprnt_state::grasspin_sh_dipsw_r));
+}
 
 
-ADDRESS_MAP_START(blueprnt_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_MIRROR(0x1000)
-	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_MIRROR(0x1000)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x6002, 0x6002) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x8002, 0x8002) AM_DEVREAD("ay2", ay8910_device, data_r)
-ADDRESS_MAP_END
+void blueprnt_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().mirror(0x1000);
+	map(0x2000, 0x2fff).rom().mirror(0x1000);
+	map(0x4000, 0x43ff).ram();
+	map(0x6000, 0x6001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x6002, 0x6002).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x8000, 0x8001).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x8002, 0x8002).r("ay2", FUNC(ay8910_device::data_r));
+}
 
-ADDRESS_MAP_START(blueprnt_state::sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_NOP // nmi mask maybe? grasspin writes it 0/1
-ADDRESS_MAP_END
+void blueprnt_state::sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x02).noprw(); // nmi mask maybe? grasspin writes it 0/1
+}
 
 
 

@@ -606,217 +606,240 @@ WRITE8_MEMBER(royalmah_state::mjclub_bank_w)
 }
 
 
-ADDRESS_MAP_START(royalmah_state::royalmah_map)
-	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITENOP
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "mainbank" )    // banked ROMs not present in royalmah
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
-ADDRESS_MAP_END
+void royalmah_state::royalmah_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom().nopw();
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).bankr("mainbank");    // banked ROMs not present in royalmah
+	map(0x8000, 0xffff).writeonly().share("videoram");
+}
 
-ADDRESS_MAP_START(royalmah_state::mjapinky_map)
-	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITENOP
-	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x7800, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "mainbank" )
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
-	AM_RANGE( 0x8000, 0x8000 ) AM_READ(mjapinky_dsw_r )
-ADDRESS_MAP_END
+void royalmah_state::mjapinky_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom().nopw();
+	map(0x7000, 0x77ff).ram().share("nvram");
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("mainbank");
+	map(0x8000, 0xffff).writeonly().share("videoram");
+	map(0x8000, 0x8000).r(this, FUNC(royalmah_state::mjapinky_dsw_r));
+}
 
-ADDRESS_MAP_START(royalmah_state::tahjong_map)
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM AM_WRITENOP
-	AM_RANGE( 0x4000, 0x6fff ) AM_ROMBANK("mainbank")
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
-ADDRESS_MAP_END
+void royalmah_state::tahjong_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().nopw();
+	map(0x4000, 0x6fff).bankr("mainbank");
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).writeonly().share("videoram");
+}
 
 
 
 
-ADDRESS_MAP_START(royalmah_state::royalmah_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(royalmah_palbank_w )
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-ADDRESS_MAP_END
+void royalmah_state::royalmah_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+}
 
-ADDRESS_MAP_START(royalmah_state::ippatsu_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(royalmah_palbank_w )
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-	AM_RANGE( 0x12, 0x12 ) AM_READ_PORT("DSW2")
-	AM_RANGE( 0x13, 0x13 ) AM_READ_PORT("DSW3")
-ADDRESS_MAP_END
+void royalmah_state::ippatsu_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x12, 0x12).portr("DSW2");
+	map(0x13, 0x13).portr("DSW3");
+}
 
-ADDRESS_MAP_START(royalmah_state::janyoup2_iomap)
-	AM_IMPORT_FROM( ippatsu_iomap )
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x21, 0x21) AM_DEVWRITE("crtc", mc6845_device, register_w)
-ADDRESS_MAP_END
+void royalmah_state::janyoup2_iomap(address_map &map)
+{
+	ippatsu_iomap(map);
+	map(0x20, 0x20).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x21, 0x21).w("crtc", FUNC(mc6845_device::register_w));
+}
 
-ADDRESS_MAP_START(royalmah_state::seljan_map)
-	AM_RANGE( 0x0000, 0x8fff ) AM_ROM AM_WRITENOP
-	AM_RANGE( 0xe000, 0xefff ) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void royalmah_state::seljan_map(address_map &map)
+{
+	map(0x0000, 0x8fff).rom().nopw();
+	map(0xe000, 0xefff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(royalmah_state::seljan_iomap)
-	AM_RANGE( 0x0001, 0x0001 ) AM_MIRROR(0x7f00) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x0002, 0x0003 ) AM_MIRROR(0x7f00) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x0010, 0x0010 ) AM_MIRROR(0x7f00) AM_READ_PORT("DSW1") AM_WRITE(royalmah_palbank_w )
-	AM_RANGE( 0x0011, 0x0011 ) AM_MIRROR(0x7f00) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-	AM_RANGE( 0x0012, 0x0012 ) AM_MIRROR(0x7f00) AM_READ_PORT("DSW2") AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE( 0x0013, 0x0013 ) AM_MIRROR(0x7f00) AM_READ_PORT("DSW3") AM_DEVWRITE("crtc", mc6845_device, register_w)
+void royalmah_state::seljan_iomap(address_map &map)
+{
+	map(0x0001, 0x0001).mirror(0x7f00).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x0002, 0x0003).mirror(0x7f00).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x0010, 0x0010).mirror(0x7f00).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x0011, 0x0011).mirror(0x7f00).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x0012, 0x0012).mirror(0x7f00).portr("DSW2").w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0013, 0x0013).mirror(0x7f00).portr("DSW3").w("crtc", FUNC(mc6845_device::register_w));
 
 	// TODO: following actually starts at 0x8000, needs custom 6845 routine because it uses start address register.
-	AM_RANGE( 0x7e00, 0xffff ) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+	map(0x7e00, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(royalmah_state::tahjong_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(royalmah_palbank_w )
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-	AM_RANGE( 0x12, 0x12 ) AM_WRITE(tahjong_bank_w)
-	AM_RANGE( 0x13, 0x13 ) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
+void royalmah_state::tahjong_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x12, 0x12).w(this, FUNC(royalmah_state::tahjong_bank_w));
+	map(0x13, 0x13).portr("DSW2");
+}
 
-ADDRESS_MAP_START(royalmah_state::suzume_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(royalmah_palbank_w )
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-	AM_RANGE( 0x80, 0x80 ) AM_READ(suzume_dsw_r )
-	AM_RANGE( 0x81, 0x81 ) AM_WRITE(suzume_bank_w )
-ADDRESS_MAP_END
+void royalmah_state::suzume_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x80, 0x80).r(this, FUNC(royalmah_state::suzume_dsw_r));
+	map(0x81, 0x81).w(this, FUNC(royalmah_state::suzume_bank_w));
+}
 
-ADDRESS_MAP_START(royalmah_state::mjyarou_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(royalmah_palbank_w )
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-	AM_RANGE( 0x12, 0x12 ) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
+void royalmah_state::mjyarou_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x12, 0x12).portr("DSW2");
+}
 
-ADDRESS_MAP_START(royalmah_state::dondenmj_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(royalmah_palbank_w )
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-	AM_RANGE( 0x85, 0x85 ) AM_READ_PORT("DSW2") // DSW2
-	AM_RANGE( 0x86, 0x86 ) AM_READ_PORT("DSW3") // DSW3
-	AM_RANGE( 0x87, 0x87 ) AM_WRITE(dynax_bank_w )
-ADDRESS_MAP_END
+void royalmah_state::dondenmj_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x85, 0x85).portr("DSW2"); // DSW2
+	map(0x86, 0x86).portr("DSW3"); // DSW3
+	map(0x87, 0x87).w(this, FUNC(royalmah_state::dynax_bank_w));
+}
 
-ADDRESS_MAP_START(royalmah_state::makaijan_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(royalmah_palbank_w )
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-	AM_RANGE( 0x84, 0x84 ) AM_READ_PORT("DSW2") // DSW2
-	AM_RANGE( 0x85, 0x85 ) AM_READ_PORT("DSW3") // DSW3
-	AM_RANGE( 0x86, 0x86 ) AM_WRITE(dynax_bank_w )
-ADDRESS_MAP_END
+void royalmah_state::makaijan_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x84, 0x84).portr("DSW2"); // DSW2
+	map(0x85, 0x85).portr("DSW3"); // DSW3
+	map(0x86, 0x86).w(this, FUNC(royalmah_state::dynax_bank_w));
+}
 
-ADDRESS_MAP_START(royalmah_state::daisyari_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x10, 0x10 ) AM_WRITE(royalmah_palbank_w )
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_READWRITE(daisyari_dsw_r, daisyari_bank_w )
-ADDRESS_MAP_END
+void royalmah_state::daisyari_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).w(this, FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0xc0, 0xc0).rw(this, FUNC(royalmah_state::daisyari_dsw_r), FUNC(royalmah_state::daisyari_bank_w));
+}
 
-ADDRESS_MAP_START(royalmah_state::mjclub_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_READWRITE(mjclub_dsw_r, mjclub_bank_w )
-	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(royalmah_palbank_w )
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-ADDRESS_MAP_END
+void royalmah_state::mjclub_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(this, FUNC(royalmah_state::mjclub_dsw_r), FUNC(royalmah_state::mjclub_bank_w));
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+}
 
-ADDRESS_MAP_START(royalmah_state::mjdiplob_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(royalmah_palbank_w )
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-	AM_RANGE( 0x61, 0x61 ) AM_WRITE(tontonb_bank_w)
-	AM_RANGE( 0x62, 0x62 ) AM_READ_PORT("DSW2") // DSW2
-	AM_RANGE( 0x63, 0x63 ) AM_READ_PORT("DSW3") // DSW3
-ADDRESS_MAP_END
+void royalmah_state::mjdiplob_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x61, 0x61).w(this, FUNC(royalmah_state::tontonb_bank_w));
+	map(0x62, 0x62).portr("DSW2"); // DSW2
+	map(0x63, 0x63).portr("DSW3"); // DSW3
+}
 
-ADDRESS_MAP_START(royalmah_state::tontonb_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(royalmah_palbank_w )
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-	AM_RANGE( 0x44, 0x44 ) AM_WRITE(tontonb_bank_w )
-	AM_RANGE( 0x46, 0x46 ) AM_READ_PORT("DSW2") // DSW2
-	AM_RANGE( 0x47, 0x47 ) AM_READ_PORT("DSW3") // DSW3
-ADDRESS_MAP_END
+void royalmah_state::tontonb_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x44, 0x44).w(this, FUNC(royalmah_state::tontonb_bank_w));
+	map(0x46, 0x46).portr("DSW2"); // DSW2
+	map(0x47, 0x47).portr("DSW3"); // DSW3
+}
 
-ADDRESS_MAP_START(royalmah_state::majs101b_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(royalmah_palbank_w )
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-	AM_RANGE( 0x00, 0x00 ) AM_READWRITE(majs101b_dsw_r, dynax_bank_w )
-ADDRESS_MAP_END
+void royalmah_state::majs101b_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x00, 0x00).rw(this, FUNC(royalmah_state::majs101b_dsw_r), FUNC(royalmah_state::dynax_bank_w));
+}
 
-ADDRESS_MAP_START(royalmah_state::mjderngr_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+void royalmah_state::mjderngr_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
 //  AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1")
-	AM_RANGE( 0x10, 0x10 ) AM_WRITE(mjderngr_coin_w )   // palette bank is set separately
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-	AM_RANGE( 0x20, 0x20 ) AM_WRITE(dynax_bank_w )
-	AM_RANGE( 0x40, 0x40 ) AM_READ_PORT("DSW2")
-	AM_RANGE( 0x4c, 0x4c ) AM_READ_PORT("DSW1")
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE(mjderngr_palbank_w )
-ADDRESS_MAP_END
+	map(0x10, 0x10).w(this, FUNC(royalmah_state::mjderngr_coin_w));   // palette bank is set separately
+	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x20, 0x20).w(this, FUNC(royalmah_state::dynax_bank_w));
+	map(0x40, 0x40).portr("DSW2");
+	map(0x4c, 0x4c).portr("DSW1");
+	map(0x60, 0x60).w(this, FUNC(royalmah_state::mjderngr_palbank_w));
+}
 
-ADDRESS_MAP_START(royalmah_state::mjapinky_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE(mjapinky_bank_w )
-	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x04, 0x04 ) AM_READ_PORT("DSW2")
-	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(mjapinky_palbank_w )
-	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-ADDRESS_MAP_END
+void royalmah_state::mjapinky_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(royalmah_state::mjapinky_bank_w));
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x04, 0x04).portr("DSW2");
+	map(0x10, 0x10).portr("DSW1").w(this, FUNC(royalmah_state::mjapinky_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+}
 
-ADDRESS_MAP_START(royalmah_state::janoh_map)
-	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITENOP
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
-ADDRESS_MAP_END
+void royalmah_state::janoh_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom().nopw();
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).writeonly().share("videoram");
+}
 
 
 /* this CPU makes little sense - what is it for? why so many addresses accessed?
   -- it puts a value in shared ram to allow the main CPU to boot, then.. ?
 */
-ADDRESS_MAP_START(royalmah_state::janoh_sub_map)
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
-	AM_RANGE( 0x4100, 0x413f ) AM_RAM
-	AM_RANGE( 0x6000, 0x607f ) AM_RAM
-	AM_RANGE( 0x7000, 0x7000 ) AM_READNOP
-	AM_RANGE( 0x7200, 0x7200 ) AM_WRITENOP
-	AM_RANGE( 0xf000, 0xffff ) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void royalmah_state::janoh_sub_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4100, 0x413f).ram();
+	map(0x6000, 0x607f).ram();
+	map(0x7000, 0x7000).nopr();
+	map(0x7200, 0x7200).nopw();
+	map(0xf000, 0xffff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(royalmah_state::janoh_sub_iomap)
-ADDRESS_MAP_END
+void royalmah_state::janoh_sub_iomap(address_map &map)
+{
+}
 
 /****************************************************************************
                                 Jansou
@@ -900,46 +923,50 @@ WRITE8_MEMBER(royalmah_state::jansou_sound_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-ADDRESS_MAP_START(royalmah_state::jansou_map)
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM AM_WRITENOP
+void royalmah_state::jansou_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().nopw();
 
-	AM_RANGE( 0x6000, 0x600f ) AM_WRITE(jansou_colortable_w)
-	AM_RANGE( 0x6400, 0x6400 ) AM_WRITE(jansou_6400_w)
-	AM_RANGE( 0x6401, 0x6401 ) AM_WRITE(jansou_6401_w)
-	AM_RANGE( 0x6402, 0x6402 ) AM_WRITE(jansou_6402_w)
-	AM_RANGE( 0x6403, 0x6403 ) AM_READ(jansou_6403_r)
-	AM_RANGE( 0x6404, 0x6404 ) AM_READ(jansou_6404_r)
-	AM_RANGE( 0x6405, 0x6405 ) AM_READ(jansou_6405_r)
-	AM_RANGE( 0x6406, 0x6406 ) AM_WRITE(jansou_dsw_sel_w)
-	AM_RANGE( 0x6407, 0x6407 ) AM_READ(jansou_dsw_r)
-	AM_RANGE( 0x6800, 0x6800 ) AM_WRITE(jansou_sound_w)
+	map(0x6000, 0x600f).w(this, FUNC(royalmah_state::jansou_colortable_w));
+	map(0x6400, 0x6400).w(this, FUNC(royalmah_state::jansou_6400_w));
+	map(0x6401, 0x6401).w(this, FUNC(royalmah_state::jansou_6401_w));
+	map(0x6402, 0x6402).w(this, FUNC(royalmah_state::jansou_6402_w));
+	map(0x6403, 0x6403).r(this, FUNC(royalmah_state::jansou_6403_r));
+	map(0x6404, 0x6404).r(this, FUNC(royalmah_state::jansou_6404_r));
+	map(0x6405, 0x6405).r(this, FUNC(royalmah_state::jansou_6405_r));
+	map(0x6406, 0x6406).w(this, FUNC(royalmah_state::jansou_dsw_sel_w));
+	map(0x6407, 0x6407).r(this, FUNC(royalmah_state::jansou_dsw_r));
+	map(0x6800, 0x6800).w(this, FUNC(royalmah_state::jansou_sound_w));
 
-	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
-ADDRESS_MAP_END
+	map(0x7000, 0x77ff).ram().share("nvram");
+	map(0x8000, 0xffff).writeonly().share("videoram");
+}
 
-ADDRESS_MAP_START(royalmah_state::jansou_sub_map)
-	AM_RANGE( 0x0000, 0xffff ) AM_ROM AM_WRITENOP // tries to write to the stack at irq generation
-ADDRESS_MAP_END
+void royalmah_state::jansou_sub_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().nopw(); // tries to write to the stack at irq generation
+}
 
 
-ADDRESS_MAP_START(royalmah_state::jansou_sub_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("dac", dac_byte_interface, write)
-ADDRESS_MAP_END
+void royalmah_state::jansou_sub_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("dac", FUNC(dac_byte_interface::write));
+}
 
 
 /****************************************************************************
                                 Janputer '96
 ****************************************************************************/
 
-ADDRESS_MAP_START(royalmah_state::janptr96_map)
-	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
-	AM_RANGE( 0x6000, 0x6fff ) AM_RAMBANK("bank3") AM_SHARE("nvram")    // nvram
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAMBANK("rambank")  // banked nvram
-	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("mainbank")
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
-ADDRESS_MAP_END
+void royalmah_state::janptr96_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).bankrw("bank3").share("nvram");    // nvram
+	map(0x7000, 0x7fff).bankrw("rambank");  // banked nvram
+	map(0x8000, 0xffff).bankr("mainbank");
+	map(0x8000, 0xffff).writeonly().share("videoram");
+}
 
 WRITE8_MEMBER(royalmah_state::janptr96_dswsel_w)
 {
@@ -981,17 +1008,18 @@ WRITE8_MEMBER(royalmah_state::janptr96_coin_counter_w)
 	machine().bookkeeping().coin_counter_w(1,data & 1);  // out
 }
 
-ADDRESS_MAP_START(royalmah_state::janptr96_iomap)
-	AM_RANGE( 0x00, 0x00 ) AM_MIRROR(0xff00) AM_WRITE(janptr96_rombank_w )    // BANK ROM Select
-	AM_RANGE( 0x20, 0x20 ) AM_MIRROR(0xff00) AM_READWRITE(janptr96_unknown_r, janptr96_rambank_w )
-	AM_RANGE( 0x50, 0x50 ) AM_MIRROR(0xff00) AM_WRITE(mjderngr_palbank_w )
-	AM_RANGE( 0x60, 0x6f ) AM_MIRROR(0xff00) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE( 0x81, 0x81 ) AM_MIRROR(0xff00) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x82, 0x83 ) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x93, 0x93 ) AM_MIRROR(0xff00) AM_WRITE(input_port_select_w )
-	AM_RANGE( 0xd8, 0xd8 ) AM_MIRROR(0xff00) AM_WRITE(janptr96_coin_counter_w )
-	AM_RANGE( 0xd9, 0xd9 ) AM_MIRROR(0xff00) AM_READ_PORT("SYSTEM") AM_WRITENOP // second input select?
-ADDRESS_MAP_END
+void royalmah_state::janptr96_iomap(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff00).w(this, FUNC(royalmah_state::janptr96_rombank_w));    // BANK ROM Select
+	map(0x20, 0x20).mirror(0xff00).rw(this, FUNC(royalmah_state::janptr96_unknown_r), FUNC(royalmah_state::janptr96_rambank_w));
+	map(0x50, 0x50).mirror(0xff00).w(this, FUNC(royalmah_state::mjderngr_palbank_w));
+	map(0x60, 0x6f).mirror(0xff00).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x81, 0x81).mirror(0xff00).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x82, 0x83).mirror(0xff00).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x93, 0x93).mirror(0xff00).w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0xd8, 0xd8).mirror(0xff00).w(this, FUNC(royalmah_state::janptr96_coin_counter_w));
+	map(0xd9, 0xd9).mirror(0xff00).portr("SYSTEM").nopw(); // second input select?
+}
 
 /****************************************************************************
                                 Mahjong If
@@ -1056,13 +1084,14 @@ WRITE8_MEMBER(royalmah_state::mjifb_videoram_w)
 	m_videoram[offset + 0x4000] = data;
 }
 
-ADDRESS_MAP_START(royalmah_state::mjifb_map)
-	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjifb_rom_io_r, mjifb_rom_io_w) AM_SHARE("videoram")
-	AM_RANGE( 0xc000, 0xffff ) AM_ROM AM_WRITE(mjifb_videoram_w)
+void royalmah_state::mjifb_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xbfff).rw(this, FUNC(royalmah_state::mjifb_rom_io_r), FUNC(royalmah_state::mjifb_rom_io_w)).share("videoram");
+	map(0xc000, 0xffff).rom().w(this, FUNC(royalmah_state::mjifb_videoram_w));
 //  AM_RANGE( 0xc000, 0xffff ) AM_ROM AM_WRITEONLY  This should, but doesn't work
-ADDRESS_MAP_END
+}
 
 READ8_MEMBER(royalmah_state::mjifb_p3_r)
 {
@@ -1146,12 +1175,13 @@ WRITE8_MEMBER(royalmah_state::mjdejavu_rom_io_w)
 	logerror("%04X: unmapped input write at %04X = %02X\n", m_maincpu->pc(), offset,data);
 }
 
-ADDRESS_MAP_START(royalmah_state::mjdejavu_map)
-	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjdejavu_rom_io_r, mjdejavu_rom_io_w) AM_SHARE("videoram")
-	AM_RANGE( 0xc000, 0xffff ) AM_ROM AM_WRITE(mjifb_videoram_w)
-ADDRESS_MAP_END
+void royalmah_state::mjdejavu_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xbfff).rw(this, FUNC(royalmah_state::mjdejavu_rom_io_r), FUNC(royalmah_state::mjdejavu_rom_io_w)).share("videoram");
+	map(0xc000, 0xffff).rom().w(this, FUNC(royalmah_state::mjifb_videoram_w));
+}
 
 
 /****************************************************************************
@@ -1178,21 +1208,22 @@ WRITE8_MEMBER(royalmah_state::mjtensin_6ff3_w)
 	mjtensin_update_rombank();
 }
 
-ADDRESS_MAP_START(royalmah_state::mjtensin_map)
-	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
-	AM_RANGE( 0x6000, 0x6fbf ) AM_RAM
-	AM_RANGE( 0x6fc1, 0x6fc1 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x6fc2, 0x6fc3 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x6fd0, 0x6fd0 ) AM_WRITE(janptr96_coin_counter_w )
-	AM_RANGE( 0x6fd1, 0x6fd1 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-	AM_RANGE( 0x6fe0, 0x6fef ) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE( 0x6ff0, 0x6ff0 ) AM_READWRITE(janptr96_dsw_r, janptr96_dswsel_w )
-	AM_RANGE( 0x6ff1, 0x6ff1 ) AM_WRITE(mjderngr_palbank_w )
-	AM_RANGE( 0x6ff3, 0x6ff3 ) AM_WRITE(mjtensin_6ff3_w )
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "mainbank" )
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
-ADDRESS_MAP_END
+void royalmah_state::mjtensin_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fbf).ram();
+	map(0x6fc1, 0x6fc1).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x6fc2, 0x6fc3).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x6fd0, 0x6fd0).w(this, FUNC(royalmah_state::janptr96_coin_counter_w));
+	map(0x6fd1, 0x6fd1).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x6fe0, 0x6fef).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x6ff0, 0x6ff0).rw(this, FUNC(royalmah_state::janptr96_dsw_r), FUNC(royalmah_state::janptr96_dswsel_w));
+	map(0x6ff1, 0x6ff1).w(this, FUNC(royalmah_state::mjderngr_palbank_w));
+	map(0x6ff3, 0x6ff3).w(this, FUNC(royalmah_state::mjtensin_6ff3_w));
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).bankr("mainbank");
+	map(0x8000, 0xffff).writeonly().share("videoram");
+}
 
 
 /****************************************************************************
@@ -1241,23 +1272,24 @@ WRITE8_MEMBER(royalmah_state::cafetime_7fe3_w)
 //  popmessage("%02x",data);
 }
 
-ADDRESS_MAP_START(royalmah_state::cafetime_map)
-	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
-	AM_RANGE( 0x6000, 0x7eff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x7fc1, 0x7fc1 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x7fc2, 0x7fc3 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x7fd0, 0x7fd0 ) AM_WRITE(janptr96_coin_counter_w )
-	AM_RANGE( 0x7fd1, 0x7fd1 ) AM_READ_PORT("SYSTEM") AM_WRITENOP
-	AM_RANGE( 0x7fd3, 0x7fd3 ) AM_WRITE(input_port_select_w )
-	AM_RANGE( 0x7fe0, 0x7fe0 ) AM_READ(cafetime_dsw_r )
-	AM_RANGE( 0x7fe1, 0x7fe1 ) AM_WRITE(cafetime_dsw_w )
-	AM_RANGE( 0x7fe2, 0x7fe2 ) AM_WRITE(mjderngr_palbank_w )
-	AM_RANGE( 0x7fe3, 0x7fe3 ) AM_WRITE(cafetime_7fe3_w )
-	AM_RANGE( 0x7fe4, 0x7fe4 ) AM_READ(cafetime_7fe4_r )
-	AM_RANGE( 0x7ff0, 0x7fff ) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "mainbank" )
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
-ADDRESS_MAP_END
+void royalmah_state::cafetime_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x7eff).ram().share("nvram");
+	map(0x7fc1, 0x7fc1).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x7fc2, 0x7fc3).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x7fd0, 0x7fd0).w(this, FUNC(royalmah_state::janptr96_coin_counter_w));
+	map(0x7fd1, 0x7fd1).portr("SYSTEM").nopw();
+	map(0x7fd3, 0x7fd3).w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x7fe0, 0x7fe0).r(this, FUNC(royalmah_state::cafetime_dsw_r));
+	map(0x7fe1, 0x7fe1).w(this, FUNC(royalmah_state::cafetime_dsw_w));
+	map(0x7fe2, 0x7fe2).w(this, FUNC(royalmah_state::mjderngr_palbank_w));
+	map(0x7fe3, 0x7fe3).w(this, FUNC(royalmah_state::cafetime_7fe3_w));
+	map(0x7fe4, 0x7fe4).r(this, FUNC(royalmah_state::cafetime_7fe4_r));
+	map(0x7ff0, 0x7fff).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x8000, 0xffff).bankr("mainbank");
+	map(0x8000, 0xffff).writeonly().share("videoram");
+}
 
 
 /****************************************************************************
@@ -1331,26 +1363,27 @@ READ8_MEMBER(royalmah_state::mjvegasa_12500_r)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(royalmah_state::mjvegasa_map)
+void royalmah_state::mjvegasa_map(address_map &map)
+{
 
-	AM_RANGE( 0x00000, 0x05fff ) AM_ROM
-	AM_RANGE( 0x06000, 0x07fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x08000, 0x0ffff ) AM_READWRITE(mjvegasa_rom_io_r, mjvegasa_rom_io_w) AM_SHARE("videoram")
+	map(0x00000, 0x05fff).rom();
+	map(0x06000, 0x07fff).ram().share("nvram");
+	map(0x08000, 0x0ffff).rw(this, FUNC(royalmah_state::mjvegasa_rom_io_r), FUNC(royalmah_state::mjvegasa_rom_io_w)).share("videoram");
 
-	AM_RANGE( 0x10001, 0x10001 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE( 0x10002, 0x10003 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE( 0x10010, 0x10010 ) AM_WRITE(mjvegasa_coin_counter_w )
-	AM_RANGE( 0x10011, 0x10011 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
-	AM_RANGE( 0x10013, 0x10013 ) AM_WRITE(input_port_select_w )
+	map(0x10001, 0x10001).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x10002, 0x10003).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x10010, 0x10010).w(this, FUNC(royalmah_state::mjvegasa_coin_counter_w));
+	map(0x10011, 0x10011).portr("SYSTEM").w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0x10013, 0x10013).w(this, FUNC(royalmah_state::input_port_select_w));
 
-	AM_RANGE( 0x12000, 0x12000 ) AM_WRITE(mjvegasa_rombank_w )
-	AM_RANGE( 0x12100, 0x12100 ) AM_READ(cafetime_dsw_r )
-	AM_RANGE( 0x12200, 0x12200 ) AM_WRITE(cafetime_dsw_w )
-	AM_RANGE( 0x12300, 0x12300 ) AM_WRITE(mjderngr_palbank_w )
-	AM_RANGE( 0x12400, 0x12400 ) AM_WRITE(mjvegasa_12400_w )
-	AM_RANGE( 0x12500, 0x12500 ) AM_READ(mjvegasa_12500_r )
+	map(0x12000, 0x12000).w(this, FUNC(royalmah_state::mjvegasa_rombank_w));
+	map(0x12100, 0x12100).r(this, FUNC(royalmah_state::cafetime_dsw_r));
+	map(0x12200, 0x12200).w(this, FUNC(royalmah_state::cafetime_dsw_w));
+	map(0x12300, 0x12300).w(this, FUNC(royalmah_state::mjderngr_palbank_w));
+	map(0x12400, 0x12400).w(this, FUNC(royalmah_state::mjvegasa_12400_w));
+	map(0x12500, 0x12500).r(this, FUNC(royalmah_state::mjvegasa_12500_r));
 
-ADDRESS_MAP_END
+}
 
 
 

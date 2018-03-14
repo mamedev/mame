@@ -185,66 +185,71 @@ WRITE8_MEMBER(sauro_state::adpcm_w)
 	m_sp0256->ald_w(space, 0, data);
 }
 
-ADDRESS_MAP_START(sauro_state::sauro_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(sauro_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(sauro_colorram2_w) AM_SHARE("colorram2")
-ADDRESS_MAP_END
+void sauro_state::sauro_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe7ff).ram().share("nvram");
+	map(0xe800, 0xebff).ram().share("spriteram");
+	map(0xf000, 0xf3ff).ram().w(this, FUNC(sauro_state::videoram_w)).share("videoram");
+	map(0xf400, 0xf7ff).ram().w(this, FUNC(sauro_state::colorram_w)).share("colorram");
+	map(0xf800, 0xfbff).ram().w(this, FUNC(sauro_state::sauro_videoram2_w)).share("videoram2");
+	map(0xfc00, 0xffff).ram().w(this, FUNC(sauro_state::sauro_colorram2_w)).share("colorram2");
+}
 
-ADDRESS_MAP_START(sauro_state::sauro_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW2")
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("P1")
-	AM_RANGE(0x60, 0x60) AM_READ_PORT("P2")
-	AM_RANGE(0x80, 0x80) AM_WRITE(sauro_sound_command_w)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(scroll_bg_w)
-	AM_RANGE(0xa1, 0xa1) AM_WRITE(sauro_scroll_fg_w)
-	AM_RANGE(0xc0, 0xcf) AM_DEVWRITE("mainlatch", ls259_device, write_a0)
-	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+void sauro_state::sauro_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSW1");
+	map(0x20, 0x20).portr("DSW2");
+	map(0x40, 0x40).portr("P1");
+	map(0x60, 0x60).portr("P2");
+	map(0x80, 0x80).w(this, FUNC(sauro_state::sauro_sound_command_w));
+	map(0xa0, 0xa0).w(this, FUNC(sauro_state::scroll_bg_w));
+	map(0xa1, 0xa1).w(this, FUNC(sauro_state::sauro_scroll_fg_w));
+	map(0xc0, 0xcf).w("mainlatch", FUNC(ls259_device::write_a0));
+	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+}
 
-ADDRESS_MAP_START(sauro_state::sauro_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(adpcm_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ(sauro_sound_command_r)
-	AM_RANGE(0xe000, 0xe006) AM_WRITENOP    /* echo from write to e0000 */
-	AM_RANGE(0xe00e, 0xe00f) AM_WRITENOP
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(sauro_state::saurob_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
-	AM_RANGE(0xe000, 0xe000) AM_READ(sauro_sound_command_r)
-	AM_RANGE(0xe000, 0xe006) AM_WRITENOP    /* echo from write to e0000 */
-	AM_RANGE(0xe00e, 0xe00f) AM_WRITENOP
-ADDRESS_MAP_END
+void sauro_state::sauro_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xc000, 0xc001).w("ymsnd", FUNC(ym3812_device::write));
+	map(0xa000, 0xa000).w(this, FUNC(sauro_state::adpcm_w));
+	map(0xe000, 0xe000).r(this, FUNC(sauro_state::sauro_sound_command_r));
+	map(0xe000, 0xe006).nopw();    /* echo from write to e0000 */
+	map(0xe00e, 0xe00f).nopw();
+}
 
 
-ADDRESS_MAP_START(sauro_state::trckydoc_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_MIRROR(0x400) AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("P1")
-	AM_RANGE(0xf818, 0xf818) AM_READ_PORT("P2")
-	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xf828, 0xf828) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xf830, 0xf830) AM_WRITE(scroll_bg_w)
-	AM_RANGE(0xf838, 0xf83f) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void sauro_state::saurob_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xc000, 0xc001).w("ymsnd", FUNC(ym3812_device::write));
+	map(0xa000, 0xa000).nopw();
+	map(0xe000, 0xe000).r(this, FUNC(sauro_state::sauro_sound_command_r));
+	map(0xe000, 0xe006).nopw();    /* echo from write to e0000 */
+	map(0xe00e, 0xe00f).nopw();
+}
+
+
+void sauro_state::trckydoc_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe7ff).ram().share("nvram");
+	map(0xe800, 0xebff).ram().mirror(0x400).share("spriteram");
+	map(0xf000, 0xf3ff).ram().w(this, FUNC(sauro_state::videoram_w)).share("videoram");
+	map(0xf400, 0xf7ff).ram().w(this, FUNC(sauro_state::colorram_w)).share("colorram");
+	map(0xf800, 0xf800).portr("DSW1");
+	map(0xf808, 0xf808).portr("DSW2");
+	map(0xf810, 0xf810).portr("P1");
+	map(0xf818, 0xf818).portr("P2");
+	map(0xf820, 0xf821).w("ymsnd", FUNC(ym3812_device::write));
+	map(0xf828, 0xf828).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xf830, 0xf830).w(this, FUNC(sauro_state::scroll_bg_w));
+	map(0xf838, 0xf83f).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
 
 /* verified from Z80 code */

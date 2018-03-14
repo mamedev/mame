@@ -526,14 +526,15 @@ WRITE64_MEMBER(taitopjc_state::dsp_w)
 // DBAT2 U: 0xc0000003   L: 0xc0000022      (0xc0000000...0xc001ffff)
 // DBAT3 U: 0xfe0003ff   L: 0xfe000022      (0xfe000000...0xffffffff)
 
-ADDRESS_MAP_START(taitopjc_state::ppc603e_mem)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM // Work RAM
-	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE(video_r, video_w)
-	AM_RANGE(0x80000000, 0x80003fff) AM_READWRITE(dsp_r, dsp_w)
-	AM_RANGE(0xc0000000, 0xc0003fff) AM_READWRITE(ppc_common_r, ppc_common_w)
-	AM_RANGE(0xfe800000, 0xff7fffff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void taitopjc_state::ppc603e_mem(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram(); // Work RAM
+	map(0x40000000, 0x4000000f).rw(this, FUNC(taitopjc_state::video_r), FUNC(taitopjc_state::video_w));
+	map(0x80000000, 0x80003fff).rw(this, FUNC(taitopjc_state::dsp_r), FUNC(taitopjc_state::dsp_w));
+	map(0xc0000000, 0xc0003fff).rw(this, FUNC(taitopjc_state::ppc_common_r), FUNC(taitopjc_state::ppc_common_w));
+	map(0xfe800000, 0xff7fffff).rom().region("gfx1", 0);
+	map(0xffe00000, 0xffffffff).rom().region("user1", 0);
+}
 
 
 
@@ -625,18 +626,20 @@ WRITE16_MEMBER(taitopjc_state::tlcs_unk_w)
 // 0xfc0fb5: INTRX1
 // 0xfc0f41: INTTX1
 
-ADDRESS_MAP_START(taitopjc_state::tlcs900h_mem)
-	AM_RANGE(0x010000, 0x02ffff) AM_RAM     // Work RAM
-	AM_RANGE(0x040000, 0x0400ff) AM_READWRITE8(tlcs_sound_r, tlcs_sound_w, 0xffff)
-	AM_RANGE(0x044000, 0x045fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x060000, 0x061fff) AM_READWRITE8(tlcs_common_r, tlcs_common_w, 0xffff)
-	AM_RANGE(0x06c000, 0x06c00f) AM_WRITE(tlcs_unk_w)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
-ADDRESS_MAP_END
+void taitopjc_state::tlcs900h_mem(address_map &map)
+{
+	map(0x010000, 0x02ffff).ram();     // Work RAM
+	map(0x040000, 0x0400ff).rw(this, FUNC(taitopjc_state::tlcs_sound_r), FUNC(taitopjc_state::tlcs_sound_w));
+	map(0x044000, 0x045fff).ram().share("nvram");
+	map(0x060000, 0x061fff).rw(this, FUNC(taitopjc_state::tlcs_common_r), FUNC(taitopjc_state::tlcs_common_w));
+	map(0x06c000, 0x06c00f).w(this, FUNC(taitopjc_state::tlcs_unk_w));
+	map(0xfc0000, 0xffffff).rom().region("io_cpu", 0);
+}
 
-ADDRESS_MAP_START(taitopjc_state::mn10200_map)
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mn10200", 0)
-ADDRESS_MAP_END
+void taitopjc_state::mn10200_map(address_map &map)
+{
+	map(0x080000, 0x0fffff).rom().region("mn10200", 0);
+}
 
 
 
@@ -676,25 +679,28 @@ WRITE16_MEMBER(taitopjc_state::dsp_romh_w)
 }
 
 
-ADDRESS_MAP_START(taitopjc_state::tms_program_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x4c00, 0xefff) AM_ROM AM_REGION("user2", 0x9800)
-ADDRESS_MAP_END
+void taitopjc_state::tms_program_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("user2", 0);
+	map(0x4c00, 0xefff).rom().region("user2", 0x9800);
+}
 
-ADDRESS_MAP_START(taitopjc_state::tms_data_map)
-	AM_RANGE(0x4000, 0x6fff) AM_ROM AM_REGION("user2", 0x8000)
-	AM_RANGE(0x7000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(tms_dspshare_r, tms_dspshare_w)
-ADDRESS_MAP_END
+void taitopjc_state::tms_data_map(address_map &map)
+{
+	map(0x4000, 0x6fff).rom().region("user2", 0x8000);
+	map(0x7000, 0xefff).ram();
+	map(0xf000, 0xffff).rw(this, FUNC(taitopjc_state::tms_dspshare_r), FUNC(taitopjc_state::tms_dspshare_w));
+}
 
-ADDRESS_MAP_START(taitopjc_state::tms_io_map)
-	AM_RANGE(0x0053, 0x0053) AM_WRITE(dsp_roml_w)
-	AM_RANGE(0x0057, 0x0057) AM_WRITE(dsp_romh_w)
-	AM_RANGE(0x0058, 0x0058) AM_DEVWRITE("tc0780fpa", tc0780fpa_device, poly_fifo_w)
-	AM_RANGE(0x005a, 0x005a) AM_DEVWRITE("tc0780fpa", tc0780fpa_device, tex_w)
-	AM_RANGE(0x005b, 0x005b) AM_DEVREADWRITE("tc0780fpa", tc0780fpa_device, tex_addr_r, tex_addr_w)
-	AM_RANGE(0x005f, 0x005f) AM_READ(dsp_rom_r)
-ADDRESS_MAP_END
+void taitopjc_state::tms_io_map(address_map &map)
+{
+	map(0x0053, 0x0053).w(this, FUNC(taitopjc_state::dsp_roml_w));
+	map(0x0057, 0x0057).w(this, FUNC(taitopjc_state::dsp_romh_w));
+	map(0x0058, 0x0058).w(m_tc0780fpa, FUNC(tc0780fpa_device::poly_fifo_w));
+	map(0x005a, 0x005a).w(m_tc0780fpa, FUNC(tc0780fpa_device::tex_w));
+	map(0x005b, 0x005b).rw(m_tc0780fpa, FUNC(tc0780fpa_device::tex_addr_r), FUNC(tc0780fpa_device::tex_addr_w));
+	map(0x005f, 0x005f).r(this, FUNC(taitopjc_state::dsp_rom_r));
+}
 
 
 static INPUT_PORTS_START( taitopjc )

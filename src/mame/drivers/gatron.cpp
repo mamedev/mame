@@ -447,18 +447,20 @@ WRITE8_MEMBER(gatron_state::output_port_1_w)
 * Memory Map Information *
 *************************/
 
-ADDRESS_MAP_START(gatron_state::gat_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(gat_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")                          /* battery backed RAM */
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("snsnd", sn76489_device, write)       /* PSG */
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(output_port_0_w)                         /* lamps */
-ADDRESS_MAP_END
+void gatron_state::gat_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x63ff).ram().w(this, FUNC(gatron_state::gat_videoram_w)).share("videoram");
+	map(0x8000, 0x87ff).ram().share("nvram");                          /* battery backed RAM */
+	map(0xa000, 0xa000).w("snsnd", FUNC(sn76489_device::write));       /* PSG */
+	map(0xe000, 0xe000).w(this, FUNC(gatron_state::output_port_0_w));                         /* lamps */
+}
 
-ADDRESS_MAP_START(gatron_state::gat_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void gatron_state::gat_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
 /*************************

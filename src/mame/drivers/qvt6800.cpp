@@ -42,25 +42,27 @@ MC6845_UPDATE_ROW(qvt6800_state::update_row)
 {
 }
 
-ADDRESS_MAP_START(qvt6800_state::qvt102_mem_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2800, 0x2803) AM_DEVWRITE("ctc", z80ctc_device, write)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0x8000) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x9800, 0x9801) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void qvt6800_state::qvt102_mem_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().share("nvram");
+	map(0x2800, 0x2803).w("ctc", FUNC(z80ctc_device::write));
+	map(0x4000, 0x47ff).ram().share("videoram");
+	map(0x8000, 0x8000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x8001, 0x8001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x9800, 0x9801).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xe000, 0xffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(qvt6800_state::qvt190_mem_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2500, 0x2501) AM_DEVREADWRITE("acia1", acia6850_device, read, write)
-	AM_RANGE(0x2600, 0x2601) AM_DEVREADWRITE("acia2", acia6850_device, read, write)
-	AM_RANGE(0x2800, 0x2800) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void qvt6800_state::qvt190_mem_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x2500, 0x2501).rw("acia1", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x2600, 0x2601).rw("acia2", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x2800, 0x2800).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x2801, 0x2801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x4000, 0x47ff).ram().share("videoram");
+	map(0x8000, 0xffff).rom().region("maincpu", 0);
+}
 
 static INPUT_PORTS_START( qvt6800 )
 INPUT_PORTS_END

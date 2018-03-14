@@ -345,19 +345,20 @@ WRITE_LINE_MEMBER(miniboy7_state::pia_ca2_w)
 *      Memory Map Information      *
 ***********************************/
 
-ADDRESS_MAP_START(miniboy7_state::miniboy7_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM? */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("videoram_a")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("colorram_a")
-	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("videoram_b")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("colorram_b")
-	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x3000, 0x3001) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, address_data_w)  // FIXME
-	AM_RANGE(0x3080, 0x3083) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x3800, 0x3800) AM_READNOP // R (right after each read, another value is loaded to the ACCU, so it lacks of sense)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void miniboy7_state::miniboy7_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram"); /* battery backed RAM? */
+	map(0x0800, 0x0fff).ram().share("videoram_a");
+	map(0x1000, 0x17ff).ram().share("colorram_a");
+	map(0x1800, 0x1fff).ram().share("videoram_b");
+	map(0x2000, 0x27ff).ram().share("colorram_b");
+	map(0x2800, 0x2800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x2801, 0x2801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x3000, 0x3001).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));  // FIXME
+	map(0x3080, 0x3083).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x3800, 0x3800).nopr(); // R (right after each read, another value is loaded to the ACCU, so it lacks of sense)
+	map(0x4000, 0xffff).rom();
+}
 
 /*
 

@@ -165,34 +165,36 @@ WRITE8_MEMBER(baraduke_state::baraduke_irq_ack_w)
 
 
 
-ADDRESS_MAP_START(baraduke_state::baraduke_map)
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(baraduke_spriteram_r,baraduke_spriteram_w) AM_SHARE("spriteram")  /* Sprite RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(baraduke_videoram_r,baraduke_videoram_w) AM_SHARE("videoram") /* Video RAM */
-	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)       /* PSG device, shared RAM */
-	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(baraduke_textram_r,baraduke_textram_w) AM_SHARE("textram")/* video RAM (text layer) */
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* watchdog reset */
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(baraduke_irq_ack_w)       /* irq acknowledge */
-	AM_RANGE(0xb000, 0xb002) AM_WRITE(baraduke_scroll0_w)       /* scroll (layer 0) */
-	AM_RANGE(0xb004, 0xb006) AM_WRITE(baraduke_scroll1_w)       /* scroll (layer 1) */
-	AM_RANGE(0x6000, 0xffff) AM_ROM                             /* ROM */
-ADDRESS_MAP_END
+void baraduke_state::baraduke_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rw(this, FUNC(baraduke_state::baraduke_spriteram_r), FUNC(baraduke_state::baraduke_spriteram_w)).share("spriteram");  /* Sprite RAM */
+	map(0x2000, 0x3fff).rw(this, FUNC(baraduke_state::baraduke_videoram_r), FUNC(baraduke_state::baraduke_videoram_w)).share("videoram"); /* Video RAM */
+	map(0x4000, 0x43ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));       /* PSG device, shared RAM */
+	map(0x4800, 0x4fff).rw(this, FUNC(baraduke_state::baraduke_textram_r), FUNC(baraduke_state::baraduke_textram_w)).share("textram");/* video RAM (text layer) */
+	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* watchdog reset */
+	map(0x8800, 0x8800).w(this, FUNC(baraduke_state::baraduke_irq_ack_w));       /* irq acknowledge */
+	map(0xb000, 0xb002).w(this, FUNC(baraduke_state::baraduke_scroll0_w));       /* scroll (layer 0) */
+	map(0xb004, 0xb006).w(this, FUNC(baraduke_state::baraduke_scroll1_w));       /* scroll (layer 1) */
+	map(0x6000, 0xffff).rom();                             /* ROM */
+}
 
 READ8_MEMBER(baraduke_state::soundkludge_r)
 {
 	return ((m_counter++) >> 4) & 0xff;
 }
 
-ADDRESS_MAP_START(baraduke_state::mcu_map)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("mcu", hd63701_cpu_device, m6801_io_r,m6801_io_w)/* internal registers */
-	AM_RANGE(0x0080, 0x00ff) AM_RAM                             /* built in RAM */
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
-	AM_RANGE(0x1105, 0x1105) AM_READ(soundkludge_r)             /* cures speech */
-	AM_RANGE(0x8000, 0xbfff) AM_ROM                             /* MCU external ROM */
-	AM_RANGE(0x8000, 0x8000) AM_WRITENOP                        /* watchdog reset? */
-	AM_RANGE(0x8800, 0x8800) AM_WRITENOP                        /* irq acknoledge? */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM                             /* RAM */
-	AM_RANGE(0xf000, 0xffff) AM_ROM                             /* MCU internal ROM */
-ADDRESS_MAP_END
+void baraduke_state::mcu_map(address_map &map)
+{
+	map(0x0000, 0x001f).rw("mcu", FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));/* internal registers */
+	map(0x0080, 0x00ff).ram();                             /* built in RAM */
+	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); /* PSG device, shared RAM */
+	map(0x1105, 0x1105).r(this, FUNC(baraduke_state::soundkludge_r));             /* cures speech */
+	map(0x8000, 0xbfff).rom();                             /* MCU external ROM */
+	map(0x8000, 0x8000).nopw();                        /* watchdog reset? */
+	map(0x8800, 0x8800).nopw();                        /* irq acknoledge? */
+	map(0xc000, 0xc7ff).ram();                             /* RAM */
+	map(0xf000, 0xffff).rom();                             /* MCU internal ROM */
+}
 
 
 READ8_MEMBER(baraduke_state::readFF)
@@ -200,12 +202,13 @@ READ8_MEMBER(baraduke_state::readFF)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(baraduke_state::mcu_port_map)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ(inputport_r)         /* input ports read */
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(inputport_select_w) /* input port select */
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF)  /* leds won't work otherwise */
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_WRITE(baraduke_lamps_w)       /* lamps */
-ADDRESS_MAP_END
+void baraduke_state::mcu_port_map(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).r(this, FUNC(baraduke_state::inputport_r));         /* input ports read */
+	map(M6801_PORT1, M6801_PORT1).w(this, FUNC(baraduke_state::inputport_select_w)); /* input port select */
+	map(M6801_PORT2, M6801_PORT2).r(this, FUNC(baraduke_state::readFF));  /* leds won't work otherwise */
+	map(M6801_PORT2, M6801_PORT2).w(this, FUNC(baraduke_state::baraduke_lamps_w));       /* lamps */
+}
 
 
 

@@ -519,26 +519,27 @@ void bfm_adder2_device::adder2_decode_char_roms()
 // adder2 board memorymap /////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-ADDRESS_MAP_START(bfm_adder2_device::adder2_memmap)
+void bfm_adder2_device::adder2_memmap(address_map &map)
+{
 
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(adder2_screen_page_w)      // screen access/display select
-	AM_RANGE(0x0000, 0x7FFF) AM_ROMBANK("bank2")                // 8k  paged ROM (4 pages)
-	AM_RANGE(0x8000, 0x917F) AM_READWRITE(screen_ram_r, screen_ram_w)
-	AM_RANGE(0x9180, 0x9FFF) AM_READWRITE(normal_ram_r, normal_ram_w)
+	map(0x0000, 0x0000).w(this, FUNC(bfm_adder2_device::adder2_screen_page_w));      // screen access/display select
+	map(0x0000, 0x7FFF).bankr("bank2");                // 8k  paged ROM (4 pages)
+	map(0x8000, 0x917F).rw(this, FUNC(bfm_adder2_device::screen_ram_r), FUNC(bfm_adder2_device::screen_ram_w));
+	map(0x9180, 0x9FFF).rw(this, FUNC(bfm_adder2_device::normal_ram_r), FUNC(bfm_adder2_device::normal_ram_w));
 
-	AM_RANGE(0xC000, 0xC000) AM_WRITE(adder2_rom_page_w)     // ROM page select
-	AM_RANGE(0xC001, 0xC001) AM_WRITE(adder2_c001_w)         // ??
+	map(0xC000, 0xC000).w(this, FUNC(bfm_adder2_device::adder2_rom_page_w));     // ROM page select
+	map(0xC001, 0xC001).w(this, FUNC(bfm_adder2_device::adder2_c001_w));         // ??
 
-	AM_RANGE(0xC101, 0xC101) AM_READWRITE(adder2_vbl_ctrl_r, adder2_vbl_ctrl_w)
-	AM_RANGE(0xC103, 0xC103) AM_READ(adder2_irq_r)               // IRQ latch read
+	map(0xC101, 0xC101).rw(this, FUNC(bfm_adder2_device::adder2_vbl_ctrl_r), FUNC(bfm_adder2_device::adder2_vbl_ctrl_w));
+	map(0xC103, 0xC103).r(this, FUNC(bfm_adder2_device::adder2_irq_r));               // IRQ latch read
 
 	// MC6850 compatible uart connected to main (scorpion2) board ///////////////////////////////////////
 
-	AM_RANGE(0xC200, 0xC200) AM_READWRITE(adder2_uart_ctrl_r, adder2_uart_ctrl_w )   // 6850 compatible uart control reg
-	AM_RANGE(0xC201, 0xC201) AM_READWRITE(adder2_uart_rx_r, adder2_uart_tx_w )   // 6850 compatible uart data reg
+	map(0xC200, 0xC200).rw(this, FUNC(bfm_adder2_device::adder2_uart_ctrl_r), FUNC(bfm_adder2_device::adder2_uart_ctrl_w));   // 6850 compatible uart control reg
+	map(0xC201, 0xC201).rw(this, FUNC(bfm_adder2_device::adder2_uart_rx_r), FUNC(bfm_adder2_device::adder2_uart_tx_w));   // 6850 compatible uart data reg
 
-	AM_RANGE(0xE000, 0xFFFF) AM_ROM  AM_REGION(":adder2", 0xE000)                         // 8k  ROM
-ADDRESS_MAP_END
+	map(0xE000, 0xFFFF).rom().region(":adder2", 0xE000);                         // 8k  ROM
+}
 
 
 //-------------------------------------------------

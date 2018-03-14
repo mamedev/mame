@@ -591,41 +591,45 @@ READ8_MEMBER(mz3500_state::mz3500_fdc_dma_r)
 	return m_fdc->dma_r();
 }
 
-ADDRESS_MAP_START(mz3500_state::mz3500_master_map)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mz3500_master_mem_r,mz3500_master_mem_w)
-ADDRESS_MAP_END
+void mz3500_state::mz3500_master_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(mz3500_state::mz3500_master_mem_r), FUNC(mz3500_state::mz3500_master_mem_w));
+}
 
-ADDRESS_MAP_START(mz3500_state::mz3500_master_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void mz3500_state::mz3500_master_io(address_map &map)
+{
+	map.global_mask(0xff);
 //  ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0xe4, 0xe7) SFD upd765
 //  AM_RANGE(0xe8, 0xeb) SFD I/O port and DMAC chip select
 //  AM_RANGE(0xec, 0xef) irq signal from slave to master CPU
-	AM_RANGE(0xf4, 0xf5) AM_DEVICE("upd765a", upd765a_device, map) // MFD upd765
+	map(0xf4, 0xf5).m(m_fdc, FUNC(upd765a_device::map)); // MFD upd765
 //  AM_RANGE(0xf8, 0xfb) MFD I/O port
-	AM_RANGE(0xf8, 0xf8) AM_READWRITE(mz3500_fdc_r,mz3500_fdc_w)
-	AM_RANGE(0xf9, 0xf9) AM_READ(mz3500_fdc_dma_r)
-	AM_RANGE(0xfc, 0xff) AM_READWRITE(mz3500_io_r,mz3500_io_w) // memory mapper
-ADDRESS_MAP_END
+	map(0xf8, 0xf8).rw(this, FUNC(mz3500_state::mz3500_fdc_r), FUNC(mz3500_state::mz3500_fdc_w));
+	map(0xf9, 0xf9).r(this, FUNC(mz3500_state::mz3500_fdc_dma_r));
+	map(0xfc, 0xff).rw(this, FUNC(mz3500_state::mz3500_io_r), FUNC(mz3500_state::mz3500_io_w)); // memory mapper
+}
 
-ADDRESS_MAP_START(mz3500_state::mz3500_slave_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ipl", 0)
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(mz3500_shared_ram_r, mz3500_shared_ram_w)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-ADDRESS_MAP_END
+void mz3500_state::mz3500_slave_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("ipl", 0);
+	map(0x2000, 0x27ff).rw(this, FUNC(mz3500_state::mz3500_shared_ram_r), FUNC(mz3500_state::mz3500_shared_ram_w));
+	map(0x4000, 0x5fff).ram();
+}
 
-ADDRESS_MAP_START(mz3500_state::mz3500_slave_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
+void mz3500_state::mz3500_slave_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
 //  AM_RANGE(0x00, 0x0f) f/f and irq to master CPU
 //  AM_RANGE(0x10, 0x1f) i8251
 //  AM_RANGE(0x20, 0x2f) pit8253
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("i8255", i8255_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSW")
-	AM_RANGE(0x50, 0x5f) AM_RAM_WRITE(mz3500_crtc_w)
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("upd7220_gfx", upd7220_device, read, write)
-	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("upd7220_chr", upd7220_device, read, write)
-ADDRESS_MAP_END
+	map(0x30, 0x33).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x40).portr("DSW");
+	map(0x50, 0x5f).ram().w(this, FUNC(mz3500_state::mz3500_crtc_w));
+	map(0x60, 0x61).rw(m_hgdc2, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
+	map(0x70, 0x71).rw(m_hgdc1, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
+}
 
 WRITE8_MEMBER(mz3500_state::mz3500_pa_w)
 {
@@ -793,14 +797,16 @@ void mz3500_state::machine_reset()
 }
 
 
-ADDRESS_MAP_START(mz3500_state::upd7220_1_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x00000, 0x00fff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void mz3500_state::upd7220_1_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x00000, 0x00fff).ram().share("video_ram");
+}
 
-ADDRESS_MAP_START(mz3500_state::upd7220_2_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM // AM_SHARE("video_ram_2")
-ADDRESS_MAP_END
+void mz3500_state::upd7220_2_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram(); // AM_SHARE("video_ram_2")
+}
 
 static SLOT_INTERFACE_START( mz3500_floppies )
 	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )

@@ -49,6 +49,7 @@ void mb86235_device::execute_run()
 #if ENABLE_DRC
 	run_drc();
 #else
+	debugger_instruction_hook(this, m_core->pc);
 	m_core->icount = 0;
 #endif
 }
@@ -249,7 +250,7 @@ void mb86235_device::fifoin_w(uint64_t data)
 		fatalerror("fifoin_w: pushing to full fifo");
 	}
 
-	printf("FIFOIN push %08X%08X\n", (uint32_t)(data >> 32), (uint32_t)(data));
+	//printf("FIFOIN push %08X%08X\n", (uint32_t)(data >> 32), (uint32_t)(data));
 
 	m_core->fifoin.data[m_core->fifoin.wpos] = data;
 

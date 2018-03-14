@@ -841,21 +841,22 @@ WRITE32_MEMBER(pockstat_state::ps_audio_w)
 	verboselog(0, "ps_audio_w: Unknown Write: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), data, mem_mask);
 }
 
-ADDRESS_MAP_START(pockstat_state::pockstat_mem)
-	AM_RANGE(0x00000000, 0x000007ff) AM_RAM
-	AM_RANGE(0x02000000, 0x02ffffff) AM_READ(ps_rombank_r)
-	AM_RANGE(0x04000000, 0x04003fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x06000000, 0x06000307) AM_READWRITE(ps_ftlb_r, ps_ftlb_w)
-	AM_RANGE(0x08000000, 0x0801ffff) AM_READWRITE(ps_flash_r, ps_flash_w)
-	AM_RANGE(0x0a000000, 0x0a000013) AM_READWRITE(ps_intc_r, ps_intc_w)
-	AM_RANGE(0x0a800000, 0x0a80002b) AM_READWRITE(ps_timer_r, ps_timer_w)
-	AM_RANGE(0x0b000000, 0x0b000007) AM_READWRITE(ps_clock_r, ps_clock_w)
-	AM_RANGE(0x0b800000, 0x0b80000f) AM_READWRITE(ps_rtc_r, ps_rtc_w)
-	AM_RANGE(0x0d000000, 0x0d000003) AM_READWRITE(ps_lcd_r, ps_lcd_w)
-	AM_RANGE(0x0d000100, 0x0d00017f) AM_RAM AM_SHARE("lcd_buffer")
-	AM_RANGE(0x0d80000c, 0x0d80000f) AM_READWRITE(ps_audio_r, ps_audio_w)
-	AM_RANGE(0x0d800014, 0x0d800017) AM_DEVWRITE16("dac", dac_word_interface, write, 0x0000ffff)
-ADDRESS_MAP_END
+void pockstat_state::pockstat_mem(address_map &map)
+{
+	map(0x00000000, 0x000007ff).ram();
+	map(0x02000000, 0x02ffffff).r(this, FUNC(pockstat_state::ps_rombank_r));
+	map(0x04000000, 0x04003fff).rom().region("maincpu", 0);
+	map(0x06000000, 0x06000307).rw(this, FUNC(pockstat_state::ps_ftlb_r), FUNC(pockstat_state::ps_ftlb_w));
+	map(0x08000000, 0x0801ffff).rw(this, FUNC(pockstat_state::ps_flash_r), FUNC(pockstat_state::ps_flash_w));
+	map(0x0a000000, 0x0a000013).rw(this, FUNC(pockstat_state::ps_intc_r), FUNC(pockstat_state::ps_intc_w));
+	map(0x0a800000, 0x0a80002b).rw(this, FUNC(pockstat_state::ps_timer_r), FUNC(pockstat_state::ps_timer_w));
+	map(0x0b000000, 0x0b000007).rw(this, FUNC(pockstat_state::ps_clock_r), FUNC(pockstat_state::ps_clock_w));
+	map(0x0b800000, 0x0b80000f).rw(this, FUNC(pockstat_state::ps_rtc_r), FUNC(pockstat_state::ps_rtc_w));
+	map(0x0d000000, 0x0d000003).rw(this, FUNC(pockstat_state::ps_lcd_r), FUNC(pockstat_state::ps_lcd_w));
+	map(0x0d000100, 0x0d00017f).ram().share("lcd_buffer");
+	map(0x0d80000c, 0x0d80000f).rw(this, FUNC(pockstat_state::ps_audio_r), FUNC(pockstat_state::ps_audio_w));
+	map(0x0d800014, 0x0d800015).w("dac", FUNC(dac_word_interface::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pockstat )

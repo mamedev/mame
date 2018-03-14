@@ -168,39 +168,42 @@ NOTES (2016-06-06)
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(sorcerer_state::sorcerer_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
-	AM_RANGE(0x0800, 0xbfff) AM_RAM
+void sorcerer_state::sorcerer_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).bankrw("boot");
+	map(0x0800, 0xbfff).ram();
 	//AM_RANGE(0xc000, 0xdfff)      // mapped by the cartslot
-	AM_RANGE(0xe000, 0xefff) AM_ROM                     /* rom pac and bios */
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)        /* screen ram */
-	AM_RANGE(0xf800, 0xfbff) AM_ROM                     /* char rom */
-	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_REGION("maincpu", 0xfc00)        /* programmable chars */
-ADDRESS_MAP_END
+	map(0xe000, 0xefff).rom();                     /* rom pac and bios */
+	map(0xf000, 0xf7ff).ram().region("maincpu", 0xf000);        /* screen ram */
+	map(0xf800, 0xfbff).rom();                     /* char rom */
+	map(0xfc00, 0xffff).ram().region("maincpu", 0xfc00);        /* programmable chars */
+}
 
-ADDRESS_MAP_START(sorcerer_state::sorcererd_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
-	AM_RANGE(0x0800, 0xbbff) AM_RAM
-	AM_RANGE(0xbc00, 0xbcff) AM_ROM
-	AM_RANGE(0xbe00, 0xbe03) AM_DEVREADWRITE("fdc", micropolis_device, read, write)
+void sorcerer_state::sorcererd_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).bankrw("boot");
+	map(0x0800, 0xbbff).ram();
+	map(0xbc00, 0xbcff).rom();
+	map(0xbe00, 0xbe03).rw("fdc", FUNC(micropolis_device::read), FUNC(micropolis_device::write));
 	//AM_RANGE(0xc000, 0xdfff)      // mapped by the cartslot
-	AM_RANGE(0xe000, 0xefff) AM_ROM                     /* rom pac and bios */
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)        /* screen ram */
-	AM_RANGE(0xf800, 0xfbff) AM_ROM                     /* char rom */
-	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_REGION("maincpu", 0xfc00)        /* programmable chars */
-ADDRESS_MAP_END
+	map(0xe000, 0xefff).rom();                     /* rom pac and bios */
+	map(0xf000, 0xf7ff).ram().region("maincpu", 0xf000);        /* screen ram */
+	map(0xf800, 0xfbff).rom();                     /* char rom */
+	map(0xfc00, 0xffff).ram().region("maincpu", 0xfc00);        /* programmable chars */
+}
 
-ADDRESS_MAP_START(sorcerer_state::sorcerer_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xfc, 0xfc) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
-	AM_RANGE(0xfd, 0xfd) AM_READWRITE( sorcerer_fd_r, sorcerer_fd_w )
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE( sorcerer_fe_r, sorcerer_fe_w )
-	AM_RANGE(0xff, 0xff) AM_DEVREAD("cent_status_in", input_buffer_device, read)
-	AM_RANGE(0xff, 0xff) AM_WRITE( sorcerer_ff_w )
-ADDRESS_MAP_END
+void sorcerer_state::sorcerer_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xfc, 0xfc).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0xfd, 0xfd).rw(this, FUNC(sorcerer_state::sorcerer_fd_r), FUNC(sorcerer_state::sorcerer_fd_w));
+	map(0xfe, 0xfe).rw(this, FUNC(sorcerer_state::sorcerer_fe_r), FUNC(sorcerer_state::sorcerer_fe_w));
+	map(0xff, 0xff).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0xff, 0xff).w(this, FUNC(sorcerer_state::sorcerer_ff_w));
+}
 
 static INPUT_PORTS_START(sorcerer)
 	PORT_START("VS")

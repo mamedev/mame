@@ -159,130 +159,137 @@ WRITE8_MEMBER(fromanc2_state::subcpu_rombank_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(fromanc2_state::fromanc2_main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                 // MAIN ROM
+void fromanc2_state::fromanc2_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                                 // MAIN ROM
 
-	AM_RANGE(0x802000, 0x802fff) AM_READNOP                             // ???
-	AM_RANGE(0x800000, 0x803fff) AM_WRITE(fromanc2_videoram_0_w)        // VRAM 0, 1 (1P)
-	AM_RANGE(0x880000, 0x883fff) AM_WRITE(fromanc2_videoram_1_w)        // VRAM 2, 3 (1P)
-	AM_RANGE(0x900000, 0x903fff) AM_WRITE(fromanc2_videoram_2_w)        // VRAM 0, 1 (2P)
-	AM_RANGE(0x980000, 0x983fff) AM_WRITE(fromanc2_videoram_3_w)        // VRAM 2, 3 (2P)
+	map(0x802000, 0x802fff).nopr();                             // ???
+	map(0x800000, 0x803fff).w(this, FUNC(fromanc2_state::fromanc2_videoram_0_w));        // VRAM 0, 1 (1P)
+	map(0x880000, 0x883fff).w(this, FUNC(fromanc2_state::fromanc2_videoram_1_w));        // VRAM 2, 3 (1P)
+	map(0x900000, 0x903fff).w(this, FUNC(fromanc2_state::fromanc2_videoram_2_w));        // VRAM 0, 1 (2P)
+	map(0x980000, 0x983fff).w(this, FUNC(fromanc2_state::fromanc2_videoram_3_w));        // VRAM 2, 3 (2P)
 
-	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_DEVWRITE("lpalette", palette_device, write16) AM_SHARE("lpalette") // PALETTE (1P)
-	AM_RANGE(0xa80000, 0xa80fff) AM_RAM_DEVWRITE("rpalette", palette_device, write16) AM_SHARE("rpalette") // PALETTE (2P)
+	map(0xa00000, 0xa00fff).ram().w(m_lpalette, FUNC(palette_device::write16)).share("lpalette"); // PALETTE (1P)
+	map(0xa80000, 0xa80fff).ram().w(m_rpalette, FUNC(palette_device::write16)).share("rpalette"); // PALETTE (2P)
 
-	AM_RANGE(0xd00000, 0xd00023) AM_WRITE(fromanc2_gfxreg_0_w)          // SCROLL REG (1P/2P)
-	AM_RANGE(0xd00100, 0xd00123) AM_WRITE(fromanc2_gfxreg_2_w)          // SCROLL REG (1P/2P)
-	AM_RANGE(0xd00200, 0xd00223) AM_WRITE(fromanc2_gfxreg_1_w)          // SCROLL REG (1P/2P)
-	AM_RANGE(0xd00300, 0xd00323) AM_WRITE(fromanc2_gfxreg_3_w)          // SCROLL REG (1P/2P)
+	map(0xd00000, 0xd00023).w(this, FUNC(fromanc2_state::fromanc2_gfxreg_0_w));          // SCROLL REG (1P/2P)
+	map(0xd00100, 0xd00123).w(this, FUNC(fromanc2_state::fromanc2_gfxreg_2_w));          // SCROLL REG (1P/2P)
+	map(0xd00200, 0xd00223).w(this, FUNC(fromanc2_state::fromanc2_gfxreg_1_w));          // SCROLL REG (1P/2P)
+	map(0xd00300, 0xd00323).w(this, FUNC(fromanc2_state::fromanc2_gfxreg_3_w));          // SCROLL REG (1P/2P)
 
-	AM_RANGE(0xd00400, 0xd00413) AM_WRITENOP                            // ???
-	AM_RANGE(0xd00500, 0xd00513) AM_WRITENOP                            // ???
+	map(0xd00400, 0xd00413).nopw();                            // ???
+	map(0xd00500, 0xd00513).nopw();                            // ???
 
-	AM_RANGE(0xd01000, 0xd01001) AM_WRITE(sndcmd_w)                     // SOUND REQ (1P/2P)
-	AM_RANGE(0xd01100, 0xd01101) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(subcpu_w)                     // SUB CPU WRITE
-	AM_RANGE(0xd01300, 0xd01301) AM_READ(subcpu_r)                      // SUB CPU READ
-	AM_RANGE(0xd01400, 0xd01401) AM_WRITE(fromanc2_gfxbank_0_w)         // GFXBANK (1P)
-	AM_RANGE(0xd01500, 0xd01501) AM_WRITE(fromanc2_gfxbank_1_w)         // GFXBANK (2P)
-	AM_RANGE(0xd01600, 0xd01601) AM_WRITE_PORT("EEPROMOUT")             // EEPROM DATA
-	AM_RANGE(0xd01800, 0xd01801) AM_READ(keymatrix_r)                   // INPUT KEY MATRIX
-	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE(portselect_w)                 // PORT SELECT (1P/2P)
+	map(0xd01000, 0xd01001).w(this, FUNC(fromanc2_state::sndcmd_w));                     // SOUND REQ (1P/2P)
+	map(0xd01100, 0xd01101).portr("SYSTEM");
+	map(0xd01200, 0xd01201).w(this, FUNC(fromanc2_state::subcpu_w));                     // SUB CPU WRITE
+	map(0xd01300, 0xd01301).r(this, FUNC(fromanc2_state::subcpu_r));                      // SUB CPU READ
+	map(0xd01400, 0xd01401).w(this, FUNC(fromanc2_state::fromanc2_gfxbank_0_w));         // GFXBANK (1P)
+	map(0xd01500, 0xd01501).w(this, FUNC(fromanc2_state::fromanc2_gfxbank_1_w));         // GFXBANK (2P)
+	map(0xd01600, 0xd01601).portw("EEPROMOUT");             // EEPROM DATA
+	map(0xd01800, 0xd01801).r(this, FUNC(fromanc2_state::keymatrix_r));                   // INPUT KEY MATRIX
+	map(0xd01a00, 0xd01a01).w(this, FUNC(fromanc2_state::portselect_w));                 // PORT SELECT (1P/2P)
 
-	AM_RANGE(0xd80000, 0xd8ffff) AM_RAM                                 // WORK RAM
-ADDRESS_MAP_END
+	map(0xd80000, 0xd8ffff).ram();                                 // WORK RAM
+}
 
-ADDRESS_MAP_START(fromanc2_state::fromancr_main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                 // MAIN ROM
+void fromanc2_state::fromancr_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                                 // MAIN ROM
 
-	AM_RANGE(0x800000, 0x803fff) AM_WRITE(fromancr_videoram_0_w)        // VRAM BG (1P/2P)
-	AM_RANGE(0x880000, 0x883fff) AM_WRITE(fromancr_videoram_1_w)        // VRAM FG (1P/2P)
-	AM_RANGE(0x900000, 0x903fff) AM_WRITE(fromancr_videoram_2_w)        // VRAM TEXT (1P/2P)
-	AM_RANGE(0x980000, 0x983fff) AM_WRITENOP                            // VRAM Unused ?
+	map(0x800000, 0x803fff).w(this, FUNC(fromanc2_state::fromancr_videoram_0_w));        // VRAM BG (1P/2P)
+	map(0x880000, 0x883fff).w(this, FUNC(fromanc2_state::fromancr_videoram_1_w));        // VRAM FG (1P/2P)
+	map(0x900000, 0x903fff).w(this, FUNC(fromanc2_state::fromancr_videoram_2_w));        // VRAM TEXT (1P/2P)
+	map(0x980000, 0x983fff).nopw();                            // VRAM Unused ?
 
-	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_DEVWRITE("lpalette", palette_device, write16) AM_SHARE("lpalette") // PALETTE (1P)
-	AM_RANGE(0xa80000, 0xa80fff) AM_RAM_DEVWRITE("rpalette", palette_device, write16) AM_SHARE("rpalette") // PALETTE (2P)
+	map(0xa00000, 0xa00fff).ram().w(m_lpalette, FUNC(palette_device::write16)).share("lpalette"); // PALETTE (1P)
+	map(0xa80000, 0xa80fff).ram().w(m_rpalette, FUNC(palette_device::write16)).share("rpalette"); // PALETTE (2P)
 
-	AM_RANGE(0xd00000, 0xd00023) AM_WRITE(fromancr_gfxreg_1_w)          // SCROLL REG (1P/2P)
-	AM_RANGE(0xd00200, 0xd002ff) AM_WRITENOP                            // ?
-	AM_RANGE(0xd00400, 0xd00413) AM_WRITENOP                            // ???
-	AM_RANGE(0xd00500, 0xd00513) AM_WRITENOP                            // ???
-	AM_RANGE(0xd01000, 0xd01001) AM_WRITE(sndcmd_w)                     // SOUND REQ (1P/2P)
-	AM_RANGE(0xd00100, 0xd00123) AM_WRITE(fromancr_gfxreg_0_w)          // SCROLL REG (1P/2P)
-	AM_RANGE(0xd01100, 0xd01101) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(subcpu_w)                     // SUB CPU WRITE
-	AM_RANGE(0xd01300, 0xd01301) AM_READ(subcpu_r)                      // SUB CPU READ
-	AM_RANGE(0xd01400, 0xd01401) AM_WRITENOP                            // COIN COUNTER ?
-	AM_RANGE(0xd01600, 0xd01601) AM_WRITE(fromancr_gfxbank_eeprom_w)    // EEPROM DATA, GFXBANK (1P/2P)
-	AM_RANGE(0xd01800, 0xd01801) AM_READ(keymatrix_r)                   // INPUT KEY MATRIX
-	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE(portselect_w)                 // PORT SELECT (1P/2P)
+	map(0xd00000, 0xd00023).w(this, FUNC(fromanc2_state::fromancr_gfxreg_1_w));          // SCROLL REG (1P/2P)
+	map(0xd00200, 0xd002ff).nopw();                            // ?
+	map(0xd00400, 0xd00413).nopw();                            // ???
+	map(0xd00500, 0xd00513).nopw();                            // ???
+	map(0xd01000, 0xd01001).w(this, FUNC(fromanc2_state::sndcmd_w));                     // SOUND REQ (1P/2P)
+	map(0xd00100, 0xd00123).w(this, FUNC(fromanc2_state::fromancr_gfxreg_0_w));          // SCROLL REG (1P/2P)
+	map(0xd01100, 0xd01101).portr("SYSTEM");
+	map(0xd01200, 0xd01201).w(this, FUNC(fromanc2_state::subcpu_w));                     // SUB CPU WRITE
+	map(0xd01300, 0xd01301).r(this, FUNC(fromanc2_state::subcpu_r));                      // SUB CPU READ
+	map(0xd01400, 0xd01401).nopw();                            // COIN COUNTER ?
+	map(0xd01600, 0xd01601).w(this, FUNC(fromanc2_state::fromancr_gfxbank_eeprom_w));    // EEPROM DATA, GFXBANK (1P/2P)
+	map(0xd01800, 0xd01801).r(this, FUNC(fromanc2_state::keymatrix_r));                   // INPUT KEY MATRIX
+	map(0xd01a00, 0xd01a01).w(this, FUNC(fromanc2_state::portselect_w));                 // PORT SELECT (1P/2P)
 
-	AM_RANGE(0xd80000, 0xd8ffff) AM_RAM                                 // WORK RAM
-ADDRESS_MAP_END
+	map(0xd80000, 0xd8ffff).ram();                                 // WORK RAM
+}
 
-ADDRESS_MAP_START(fromanc2_state::fromanc4_main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                             // MAIN ROM
-	AM_RANGE(0x400000, 0x7fffff) AM_ROM                             // DATA ROM
+void fromanc2_state::fromanc4_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                             // MAIN ROM
+	map(0x400000, 0x7fffff).rom();                             // DATA ROM
 
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM                             // WORK RAM
+	map(0x800000, 0x81ffff).ram();                             // WORK RAM
 
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(portselect_w)             // PORT SELECT (1P/2P)
+	map(0xd00000, 0xd00001).w(this, FUNC(fromanc2_state::portselect_w));             // PORT SELECT (1P/2P)
 
-	AM_RANGE(0xd10000, 0xd10001) AM_WRITENOP                        // ?
-	AM_RANGE(0xd30000, 0xd30001) AM_WRITENOP                        // ?
-	AM_RANGE(0xd50000, 0xd50001) AM_WRITE_PORT("EEPROMOUT")         // EEPROM DATA
+	map(0xd10000, 0xd10001).nopw();                        // ?
+	map(0xd30000, 0xd30001).nopw();                        // ?
+	map(0xd50000, 0xd50001).portw("EEPROMOUT");         // EEPROM DATA
 
-	AM_RANGE(0xd70000, 0xd70001) AM_WRITE(sndcmd_w)                 // SOUND REQ (1P/2P)
+	map(0xd70000, 0xd70001).w(this, FUNC(fromanc2_state::sndcmd_w));                 // SOUND REQ (1P/2P)
 
-	AM_RANGE(0xd80000, 0xd8ffff) AM_WRITE(fromanc4_videoram_0_w)    // VRAM FG (1P/2P)
-	AM_RANGE(0xd90000, 0xd9ffff) AM_WRITE(fromanc4_videoram_1_w)    // VRAM BG (1P/2P)
-	AM_RANGE(0xda0000, 0xdaffff) AM_WRITE(fromanc4_videoram_2_w)    // VRAM TEXT (1P/2P)
+	map(0xd80000, 0xd8ffff).w(this, FUNC(fromanc2_state::fromanc4_videoram_0_w));    // VRAM FG (1P/2P)
+	map(0xd90000, 0xd9ffff).w(this, FUNC(fromanc2_state::fromanc4_videoram_1_w));    // VRAM BG (1P/2P)
+	map(0xda0000, 0xdaffff).w(this, FUNC(fromanc2_state::fromanc4_videoram_2_w));    // VRAM TEXT (1P/2P)
 
-	AM_RANGE(0xdb0000, 0xdb0fff) AM_RAM_DEVWRITE("lpalette", palette_device, write16) AM_SHARE("lpalette") // PALETTE (1P)
-	AM_RANGE(0xdc0000, 0xdc0fff) AM_RAM_DEVWRITE("rpalette", palette_device, write16) AM_SHARE("rpalette") // PALETTE (2P)
+	map(0xdb0000, 0xdb0fff).ram().w(m_lpalette, FUNC(palette_device::write16)).share("lpalette"); // PALETTE (1P)
+	map(0xdc0000, 0xdc0fff).ram().w(m_rpalette, FUNC(palette_device::write16)).share("rpalette"); // PALETTE (2P)
 
-	AM_RANGE(0xd10000, 0xd10001) AM_READ(keymatrix_r)               // INPUT KEY MATRIX
-	AM_RANGE(0xd20000, 0xd20001) AM_READ_PORT("SYSTEM")
+	map(0xd10000, 0xd10001).r(this, FUNC(fromanc2_state::keymatrix_r));               // INPUT KEY MATRIX
+	map(0xd20000, 0xd20001).portr("SYSTEM");
 
-	AM_RANGE(0xe00000, 0xe0001d) AM_WRITE(fromanc4_gfxreg_0_w)      // SCROLL, GFXBANK (1P/2P)
-	AM_RANGE(0xe10000, 0xe1001d) AM_WRITE(fromanc4_gfxreg_1_w)      // SCROLL, GFXBANK (1P/2P)
-	AM_RANGE(0xe20000, 0xe2001d) AM_WRITE(fromanc4_gfxreg_2_w)      // SCROLL, GFXBANK (1P/2P)
+	map(0xe00000, 0xe0001d).w(this, FUNC(fromanc2_state::fromanc4_gfxreg_0_w));      // SCROLL, GFXBANK (1P/2P)
+	map(0xe10000, 0xe1001d).w(this, FUNC(fromanc2_state::fromanc4_gfxreg_1_w));      // SCROLL, GFXBANK (1P/2P)
+	map(0xe20000, 0xe2001d).w(this, FUNC(fromanc2_state::fromanc4_gfxreg_2_w));      // SCROLL, GFXBANK (1P/2P)
 
-	AM_RANGE(0xe30000, 0xe30013) AM_WRITENOP                        // ???
-	AM_RANGE(0xe40000, 0xe40013) AM_WRITENOP                        // ???
+	map(0xe30000, 0xe30013).nopw();                        // ???
+	map(0xe40000, 0xe40013).nopw();                        // ???
 
-	AM_RANGE(0xe50000, 0xe5000f) AM_DEVREADWRITE8("uart", ns16550_device, ins8250_r, ins8250_w, 0x00ff).cswidth(16) // EXT-COMM PORT ?
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(fromanc2_state::fromanc2_sub_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM                                 // ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                    // ROM(BANK)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM                                 // RAM(WORK)
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank2")                    // RAM(BANK)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(fromanc2_state::fromanc2_sub_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(subcpu_rombank_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(maincpu_r_l, maincpu_w_l) // to/from MAIN CPU
-	AM_RANGE(0x04, 0x04) AM_READWRITE(maincpu_r_h, maincpu_w_h) // to/from MAIN CPU
-	AM_RANGE(0x06, 0x06) AM_WRITE(subcpu_nmi_clr)
-ADDRESS_MAP_END
+	map(0xe50000, 0xe5000f).rw(m_uart, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask16(0x00ff).cswidth(16); // EXT-COMM PORT ?
+}
 
 
-ADDRESS_MAP_START(fromanc2_state::fromanc2_sound_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void fromanc2_state::fromanc2_sub_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();                                 // ROM
+	map(0x4000, 0x7fff).bankr("bank1");                    // ROM(BANK)
+	map(0x8000, 0xbfff).ram();                                 // RAM(WORK)
+	map(0xc000, 0xffff).bankrw("bank2");                    // RAM(BANK)
+}
 
-ADDRESS_MAP_START(fromanc2_state::fromanc2_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP     // snd cmd (1P) / ?
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)                // snd cmd (2P)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0x0c, 0x0c) AM_READ(sndcpu_nmi_clr)
-ADDRESS_MAP_END
+void fromanc2_state::fromanc2_sub_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(fromanc2_state::subcpu_rombank_w));
+	map(0x02, 0x02).rw(this, FUNC(fromanc2_state::maincpu_r_l), FUNC(fromanc2_state::maincpu_w_l)); // to/from MAIN CPU
+	map(0x04, 0x04).rw(this, FUNC(fromanc2_state::maincpu_r_h), FUNC(fromanc2_state::maincpu_w_h)); // to/from MAIN CPU
+	map(0x06, 0x06).w(this, FUNC(fromanc2_state::subcpu_nmi_clr));
+}
+
+
+void fromanc2_state::fromanc2_sound_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xffff).ram();
+}
+
+void fromanc2_state::fromanc2_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw();     // snd cmd (1P) / ?
+	map(0x04, 0x04).r(m_soundlatch2, FUNC(generic_latch_8_device::read));                // snd cmd (2P)
+	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0x0c, 0x0c).r(this, FUNC(fromanc2_state::sndcpu_nmi_clr));
+}
 
 
 /*************************************

@@ -428,11 +428,12 @@ WRITE8_MEMBER(dunhuang_state::layers_w)
                                 Memory Maps
 ***************************************************************************/
 
-ADDRESS_MAP_START(dunhuang_state::dunhuang_map)
-	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
-	AM_RANGE( 0x6000, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "mainbank" )
-ADDRESS_MAP_END
+void dunhuang_state::dunhuang_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("mainbank");
+}
 
 // Inputs
 
@@ -483,53 +484,55 @@ WRITE8_MEMBER(dunhuang_state::rombank_w)
 }
 
 
-ADDRESS_MAP_START(dunhuang_state::dunhuang_io_map)
-	AM_RANGE( 0x0000, 0x0000 ) AM_WRITE(pos_x_w )
-	AM_RANGE( 0x0001, 0x0001 ) AM_WRITE(pos_y_w )
-	AM_RANGE( 0x0002, 0x0004 ) AM_WRITE(tile_w )
-	AM_RANGE( 0x0005, 0x0007 ) AM_WRITE(tile2_w )
+void dunhuang_state::dunhuang_io_map(address_map &map)
+{
+	map(0x0000, 0x0000).w(this, FUNC(dunhuang_state::pos_x_w));
+	map(0x0001, 0x0001).w(this, FUNC(dunhuang_state::pos_y_w));
+	map(0x0002, 0x0004).w(this, FUNC(dunhuang_state::tile_w));
+	map(0x0005, 0x0007).w(this, FUNC(dunhuang_state::tile2_w));
 
-	AM_RANGE( 0x0008, 0x0008 ) AM_WRITE(vert_clear_w )
+	map(0x0008, 0x0008).w(this, FUNC(dunhuang_state::vert_clear_w));
 
-	AM_RANGE( 0x000c, 0x000c ) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
+	map(0x000c, 0x000c).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 
-	AM_RANGE( 0x000f, 0x000f ) AM_WRITE(block_addr_lo_w )
-	AM_RANGE( 0x0010, 0x0010 ) AM_WRITE(block_addr_hi_w )
+	map(0x000f, 0x000f).w(this, FUNC(dunhuang_state::block_addr_lo_w));
+	map(0x0010, 0x0010).w(this, FUNC(dunhuang_state::block_addr_hi_w));
 //  AM_RANGE( 0x0011, 0x0011 ) ?
-	AM_RANGE( 0x0012, 0x0012 ) AM_WRITE(block_c_w )
-	AM_RANGE( 0x0015, 0x0015 ) AM_WRITE(block_x_w )
-	AM_RANGE( 0x0016, 0x0016 ) AM_WRITE(block_y_w )
-	AM_RANGE( 0x0017, 0x0017 ) AM_WRITE(block_w_w )
-	AM_RANGE( 0x0018, 0x0018 ) AM_WRITE(block_h_w )
+	map(0x0012, 0x0012).w(this, FUNC(dunhuang_state::block_c_w));
+	map(0x0015, 0x0015).w(this, FUNC(dunhuang_state::block_x_w));
+	map(0x0016, 0x0016).w(this, FUNC(dunhuang_state::block_y_w));
+	map(0x0017, 0x0017).w(this, FUNC(dunhuang_state::block_w_w));
+	map(0x0018, 0x0018).w(this, FUNC(dunhuang_state::block_h_w));
 
-	AM_RANGE( 0x0019, 0x0019 ) AM_WRITE(clear_y_w )
-	AM_RANGE( 0x001a, 0x001a ) AM_WRITE(horiz_clear_w )
+	map(0x0019, 0x0019).w(this, FUNC(dunhuang_state::clear_y_w));
+	map(0x001a, 0x001a).w(this, FUNC(dunhuang_state::horiz_clear_w));
 
-	AM_RANGE( 0x001b, 0x001b ) AM_WRITE(block_dest_w )
+	map(0x001b, 0x001b).w(this, FUNC(dunhuang_state::block_dest_w));
 
-	AM_RANGE( 0x0081, 0x0081 ) AM_DEVWRITE("ymsnd", ym2413_device, register_port_w)
-	AM_RANGE( 0x0089, 0x0089 ) AM_DEVWRITE("ymsnd", ym2413_device, data_port_w)
+	map(0x0081, 0x0081).w("ymsnd", FUNC(ym2413_device::register_port_w));
+	map(0x0089, 0x0089).w("ymsnd", FUNC(ym2413_device::data_port_w));
 
-	AM_RANGE( 0x0082, 0x0082 ) AM_DEVWRITE("oki", okim6295_device, write)
+	map(0x0082, 0x0082).w("oki", FUNC(okim6295_device::write));
 
-	AM_RANGE( 0x0083, 0x0083 ) AM_DEVWRITE("ramdac", ramdac_device, index_w)
-	AM_RANGE( 0x008b, 0x008b ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
-	AM_RANGE( 0x0093, 0x0093 ) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
+	map(0x0083, 0x0083).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x008b, 0x008b).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x0093, 0x0093).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE( 0x0084, 0x0084 ) AM_READ(service_r )
-	AM_RANGE( 0x0085, 0x0085 ) AM_READ(input_r )
+	map(0x0084, 0x0084).r(this, FUNC(dunhuang_state::service_r));
+	map(0x0085, 0x0085).r(this, FUNC(dunhuang_state::input_r));
 
-	AM_RANGE( 0x0086, 0x0086 ) AM_WRITE(rombank_w )
-	AM_RANGE( 0x0087, 0x0087 ) AM_WRITE(layers_w )
+	map(0x0086, 0x0086).w(this, FUNC(dunhuang_state::rombank_w));
+	map(0x0087, 0x0087).w(this, FUNC(dunhuang_state::layers_w));
 
-	AM_RANGE( 0x0088, 0x0088 ) AM_DEVREAD("ay8910", ay8910_device, data_r )
-	AM_RANGE( 0x0090, 0x0090 ) AM_DEVWRITE("ay8910", ay8910_device, data_w )
-	AM_RANGE( 0x0098, 0x0098 ) AM_DEVWRITE("ay8910", ay8910_device, address_w )
-ADDRESS_MAP_END
+	map(0x0088, 0x0088).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0090, 0x0090).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0x0098, 0x0098).w("ay8910", FUNC(ay8910_device::address_w));
+}
 
-ADDRESS_MAP_START(dunhuang_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
-ADDRESS_MAP_END
+void dunhuang_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 /***************************************************************************
                                 Input Ports

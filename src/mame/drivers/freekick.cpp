@@ -193,106 +193,115 @@ WRITE8_MEMBER(freekick_state::freekick_ff_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(freekick_state::omega_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM // ram is 2x sony cxk5813d-55
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd900, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
-	AM_RANGE(0xe000, 0xe007) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("IN1")
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1") AM_WRITENOP //bankswitch ?
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("sn2", sn76489a_device, write)
-	AM_RANGE(0xfc02, 0xfc02) AM_DEVWRITE("sn3", sn76489a_device, write)
-	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76489a_device, write)
-ADDRESS_MAP_END
+void freekick_state::omega_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram(); // ram is 2x sony cxk5813d-55
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(freekick_state::freek_videoram_w)).share("videoram");
+	map(0xd800, 0xd8ff).ram().share("spriteram");
+	map(0xd900, 0xdfff).ram();
+	map(0xe000, 0xe000).portr("IN0");
+	map(0xe000, 0xe007).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xe800, 0xe800).portr("IN1");
+	map(0xf000, 0xf000).portr("DSW1").nopw(); //bankswitch ?
+	map(0xf800, 0xf800).portr("DSW2");
+	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::write));
+	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::write));
+	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::write));
+	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::write));
+}
 
-ADDRESS_MAP_START(freekick_state::pbillrd_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd900, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
-	AM_RANGE(0xe000, 0xe007) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("IN1")
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1") AM_WRITE(pbillrd_bankswitch_w)
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("sn2", sn76489a_device, write)
-	AM_RANGE(0xfc02, 0xfc02) AM_DEVWRITE("sn3", sn76489a_device, write)
-	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76489a_device, write)
-ADDRESS_MAP_END
+void freekick_state::pbillrd_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(freekick_state::freek_videoram_w)).share("videoram");
+	map(0xd800, 0xd8ff).ram().share("spriteram");
+	map(0xd900, 0xdfff).ram();
+	map(0xe000, 0xe000).portr("IN0");
+	map(0xe000, 0xe007).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xe800, 0xe800).portr("IN1");
+	map(0xf000, 0xf000).portr("DSW1").w(this, FUNC(freekick_state::pbillrd_bankswitch_w));
+	map(0xf800, 0xf800).portr("DSW2");
+	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::write));
+	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::write));
+	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::write));
+	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::write));
+}
 
-ADDRESS_MAP_START(freekick_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
-ADDRESS_MAP_END
+void freekick_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank0d");
+	map(0x8000, 0xbfff).bankr("bank1d");
+}
 
-ADDRESS_MAP_START(freekick_state::freekick_map)
-	AM_RANGE(0x0000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(freek_videoram_w) AM_SHARE("videoram")    // tilemap
-	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_SHARE("spriteram")   // sprites
-	AM_RANGE(0xec00, 0xec03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("IN0")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")
-	AM_RANGE(0xf802, 0xf802) AM_READNOP //MUST return bit 0 = 0, otherwise game resets
-	AM_RANGE(0xf803, 0xf803) AM_READ(spinner_r)
-	AM_RANGE(0xf800, 0xf807) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("sn2", sn76489a_device, write)
-	AM_RANGE(0xfc02, 0xfc02) AM_DEVWRITE("sn3", sn76489a_device, write)
-	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76489a_device, write)
-ADDRESS_MAP_END
+void freekick_state::freekick_map(address_map &map)
+{
+	map(0x0000, 0xcfff).rom();
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(freekick_state::freek_videoram_w)).share("videoram");    // tilemap
+	map(0xe800, 0xe8ff).ram().share("spriteram");   // sprites
+	map(0xec00, 0xec03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf000, 0xf003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf800, 0xf800).portr("IN0");
+	map(0xf801, 0xf801).portr("IN1");
+	map(0xf802, 0xf802).nopr(); //MUST return bit 0 = 0, otherwise game resets
+	map(0xf803, 0xf803).r(this, FUNC(freekick_state::spinner_r));
+	map(0xf800, 0xf807).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::write));
+	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::write));
+	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::write));
+	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::write));
+}
 
-ADDRESS_MAP_START(freekick_state::gigas_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd900, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
-	AM_RANGE(0xe000, 0xe007) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("IN1")
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1") AM_WRITENOP //bankswitch ?
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("sn2", sn76489a_device, write)
-	AM_RANGE(0xfc02, 0xfc02) AM_DEVWRITE("sn3", sn76489a_device, write)
-	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76489a_device, write)
-ADDRESS_MAP_END
+void freekick_state::gigas_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(freekick_state::freek_videoram_w)).share("videoram");
+	map(0xd800, 0xd8ff).ram().share("spriteram");
+	map(0xd900, 0xdfff).ram();
+	map(0xe000, 0xe000).portr("IN0");
+	map(0xe000, 0xe007).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xe800, 0xe800).portr("IN1");
+	map(0xf000, 0xf000).portr("DSW1").nopw(); //bankswitch ?
+	map(0xf800, 0xf800).portr("DSW2");
+	map(0xfc00, 0xfc00).w("sn1", FUNC(sn76489a_device::write));
+	map(0xfc01, 0xfc01).w("sn2", FUNC(sn76489a_device::write));
+	map(0xfc02, 0xfc02).w("sn3", FUNC(sn76489a_device::write));
+	map(0xfc03, 0xfc03).w("sn4", FUNC(sn76489a_device::write));
+}
 
-ADDRESS_MAP_START(freekick_state::omega_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, gigas_spinner_select_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW3")
-ADDRESS_MAP_END
+void freekick_state::omega_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(this, FUNC(freekick_state::spinner_r), FUNC(freekick_state::gigas_spinner_select_w));
+	map(0x01, 0x01).portr("DSW3");
+}
 
-ADDRESS_MAP_START(freekick_state::gigas_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, gigas_spinner_select_w)
-	AM_RANGE(0x01, 0x01) AM_READNOP //unused dip 3
-ADDRESS_MAP_END
+void freekick_state::gigas_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(this, FUNC(freekick_state::spinner_r), FUNC(freekick_state::gigas_spinner_select_w));
+	map(0x01, 0x01).nopr(); //unused dip 3
+}
 
-ADDRESS_MAP_START(freekick_state::oigas_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, gigas_spinner_select_w)
-	AM_RANGE(0x01, 0x01) AM_READNOP //unused dip 3
-	AM_RANGE(0x02, 0x02) AM_READ(oigas_2_r)
-	AM_RANGE(0x03, 0x03) AM_READ(oigas_3_r)
-	AM_RANGE(0x05, 0x05) AM_WRITE(oigas_5_w)
-ADDRESS_MAP_END
+void freekick_state::oigas_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(this, FUNC(freekick_state::spinner_r), FUNC(freekick_state::gigas_spinner_select_w));
+	map(0x01, 0x01).nopr(); //unused dip 3
+	map(0x02, 0x02).r(this, FUNC(freekick_state::oigas_2_r));
+	map(0x03, 0x03).r(this, FUNC(freekick_state::oigas_3_r));
+	map(0x05, 0x05).w(this, FUNC(freekick_state::oigas_5_w));
+}
 
-ADDRESS_MAP_START(freekick_state::freekick_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(freekick_ff_r, freekick_ff_w)
-ADDRESS_MAP_END
+void freekick_state::freekick_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xff, 0xff).rw(this, FUNC(freekick_state::freekick_ff_r), FUNC(freekick_state::freekick_ff_w));
+}
 
 
 /*************************************

@@ -61,15 +61,16 @@ const tiny_rom_entry *cmd_hd_device::device_rom_region() const
 //  ADDRESS_MAP( cmd_hd_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(cmd_hd_device::cmd_hd_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
-	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x1f0) AM_DEVWRITE(M6522_1_TAG, via6522_device, write)
-	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x1f0) AM_DEVWRITE(M6522_2_TAG, via6522_device, write)
-	AM_RANGE(0x8800, 0x8803) AM_MIRROR(0x1fc) AM_DEVWRITE(I8255A_TAG, i8255_device, write)
-	AM_RANGE(0x8c00, 0x8c0f) AM_MIRROR(0x1f0) AM_DEVWRITE(RTC72421A_TAG, rtc72421_device, write)
-	AM_RANGE(0x8f00, 0x8f00) AM_MIRROR(0xff) AM_WRITE(led_w)
-ADDRESS_MAP_END
+void cmd_hd_device::cmd_hd_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom().region(M6502_TAG, 0);
+	map(0x8000, 0x800f).mirror(0x1f0).w(M6522_1_TAG, FUNC(via6522_device::write));
+	map(0x8400, 0x840f).mirror(0x1f0).w(M6522_2_TAG, FUNC(via6522_device::write));
+	map(0x8800, 0x8803).mirror(0x1fc).w(I8255A_TAG, FUNC(i8255_device::write));
+	map(0x8c00, 0x8c0f).mirror(0x1f0).w(RTC72421A_TAG, FUNC(rtc72421_device::write));
+	map(0x8f00, 0x8f00).mirror(0xff).w(this, FUNC(cmd_hd_device::led_w));
+}
 
 
 //-------------------------------------------------

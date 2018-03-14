@@ -83,18 +83,20 @@ WRITE8_MEMBER(daruma_state::dev2_w)
 	//m_speaker->level_w(data & 0x01);
 }
 
-ADDRESS_MAP_START(daruma_state::mem_prg)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void daruma_state::mem_prg(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(daruma_state::mem_io)
-	AM_RANGE(0x0000, 0x0000) AM_READ(dev0_r)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(dev1_w)
+void daruma_state::mem_io(address_map &map)
+{
+	map(0x0000, 0x0000).r(this, FUNC(daruma_state::dev0_r));
+	map(0x1000, 0x1000).w(this, FUNC(daruma_state::dev1_w));
 //    AM_RANGE(0x2000, 0x2000) AM_WRITE(dev2_w)
 //    AM_RANGE(0x3000, 0x3000) AM_WRITE(dev3_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ(dev4_r)
-	AM_RANGE(0x8000, 0xffff) AM_RAM /* 32K CMOS SRAM (HYUNDAY hy62256a) */
-ADDRESS_MAP_END
+	map(0x4000, 0x4000).r(this, FUNC(daruma_state::dev4_r));
+	map(0x8000, 0xffff).ram(); /* 32K CMOS SRAM (HYUNDAY hy62256a) */
+}
 
 //TODO: These buttons and switches are all guesses. We'll need to further investigate this.
 static INPUT_PORTS_START( daruma )

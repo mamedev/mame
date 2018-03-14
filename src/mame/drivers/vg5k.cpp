@@ -159,42 +159,44 @@ WRITE8_MEMBER ( vg5k_state::cassette_w )
 }
 
 
-ADDRESS_MAP_START(vg5k_state::vg5k_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_NOP /* messram expansion memory */
-ADDRESS_MAP_END
+void vg5k_state::vg5k_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0xffff).noprw(); /* messram expansion memory */
+}
 
-ADDRESS_MAP_START(vg5k_state::vg5k_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK (0xff)
+void vg5k_state::vg5k_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 
 	/* joystick */
-	AM_RANGE( 0x07, 0x07 ) AM_READ_PORT("JOY0")
-	AM_RANGE( 0x08, 0x08 ) AM_READ_PORT("JOY1")
+	map(0x07, 0x07).portr("JOY0");
+	map(0x08, 0x08).portr("JOY1");
 
 	/* printer */
-	AM_RANGE( 0x10, 0x10 ) AM_READ(printer_r)
-	AM_RANGE( 0x11, 0x11 ) AM_WRITE(printer_w)
+	map(0x10, 0x10).r(this, FUNC(vg5k_state::printer_r));
+	map(0x11, 0x11).w(this, FUNC(vg5k_state::printer_w));
 
 	/* keyboard */
-	AM_RANGE( 0x80, 0x80 ) AM_READ_PORT("ROW1")
-	AM_RANGE( 0x81, 0x81 ) AM_READ_PORT("ROW2")
-	AM_RANGE( 0x82, 0x82 ) AM_READ_PORT("ROW3")
-	AM_RANGE( 0x83, 0x83 ) AM_READ_PORT("ROW4")
-	AM_RANGE( 0x84, 0x84 ) AM_READ_PORT("ROW5")
-	AM_RANGE( 0x85, 0x85 ) AM_READ_PORT("ROW6")
-	AM_RANGE( 0x86, 0x86 ) AM_READ_PORT("ROW7")
-	AM_RANGE( 0x87, 0x87 ) AM_READ_PORT("ROW8")
+	map(0x80, 0x80).portr("ROW1");
+	map(0x81, 0x81).portr("ROW2");
+	map(0x82, 0x82).portr("ROW3");
+	map(0x83, 0x83).portr("ROW4");
+	map(0x84, 0x84).portr("ROW5");
+	map(0x85, 0x85).portr("ROW6");
+	map(0x86, 0x86).portr("ROW7");
+	map(0x87, 0x87).portr("ROW8");
 
 	/* EF9345 */
-	AM_RANGE( 0x8f, 0x8f ) AM_WRITE(ef9345_offset_w)
-	AM_RANGE( 0xcf, 0xcf ) AM_READWRITE(ef9345_io_r, ef9345_io_w)
+	map(0x8f, 0x8f).w(this, FUNC(vg5k_state::ef9345_offset_w));
+	map(0xcf, 0xcf).rw(this, FUNC(vg5k_state::ef9345_io_r), FUNC(vg5k_state::ef9345_io_w));
 
 	/* cassette */
-	AM_RANGE( 0xaf,0xaf ) AM_READWRITE(cassette_r, cassette_w)
-ADDRESS_MAP_END
+	map(0xaf, 0xaf).rw(this, FUNC(vg5k_state::cassette_r), FUNC(vg5k_state::cassette_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vg5k )

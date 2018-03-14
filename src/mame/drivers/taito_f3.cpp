@@ -184,44 +184,46 @@ WRITE16_MEMBER(taito_f3_state::f3_unk_w)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(taito_f3_state::f3_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_SHARE("f3_ram")
-	AM_RANGE(0x440000, 0x447fff) AM_RAM_WRITE(f3_palette_24bit_w) AM_SHARE("paletteram")
-	AM_RANGE(0x4a0000, 0x4a001f) AM_READWRITE(f3_control_r,  f3_control_w)
-	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE16(f3_unk_w,0xffffffff)
-	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE16(f3_spriteram_r,f3_spriteram_w,0xffffffff) //AM_SHARE("spriteram")
-	AM_RANGE(0x610000, 0x61bfff) AM_READWRITE16(f3_pf_data_r,f3_pf_data_w,0xffffffff)       //AM_SHARE("f3_pf_data")
-	AM_RANGE(0x61c000, 0x61dfff) AM_READWRITE16(f3_videoram_r,f3_videoram_w,0xffffffff)     //AM_SHARE("videoram")
-	AM_RANGE(0x61e000, 0x61ffff) AM_READWRITE16(f3_vram_r,f3_vram_w,0xffffffff)             //AM_SHARE("f3_vram")
-	AM_RANGE(0x620000, 0x62ffff) AM_READWRITE16(f3_lineram_r,f3_lineram_w,0xffffffff)       //AM_SHARE("f3_line_ram")
-	AM_RANGE(0x630000, 0x63ffff) AM_READWRITE16(f3_pivot_r,f3_pivot_w,0xffffffff)           //AM_SHARE("f3_pivot_ram")
-	AM_RANGE(0x660000, 0x66000f) AM_WRITE16(f3_control_0_w,0xffffffff)
-	AM_RANGE(0x660010, 0x66001f) AM_WRITE16(f3_control_1_w,0xffffffff)
-	AM_RANGE(0xc00000, 0xc007ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff)
-	AM_RANGE(0xc80000, 0xc80003) AM_WRITE(f3_sound_reset_0_w)
-	AM_RANGE(0xc80100, 0xc80103) AM_WRITE(f3_sound_reset_1_w)
-ADDRESS_MAP_END
+void taito_f3_state::f3_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x300000, 0x30007f).w(this, FUNC(taito_f3_state::f3_sound_bankswitch_w));
+	map(0x400000, 0x41ffff).mirror(0x20000).ram().share("f3_ram");
+	map(0x440000, 0x447fff).ram().w(this, FUNC(taito_f3_state::f3_palette_24bit_w)).share("paletteram");
+	map(0x4a0000, 0x4a001f).rw(this, FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
+	map(0x4c0000, 0x4c0003).w(this, FUNC(taito_f3_state::f3_unk_w));
+	map(0x600000, 0x60ffff).rw(this, FUNC(taito_f3_state::f3_spriteram_r), FUNC(taito_f3_state::f3_spriteram_w)); //AM_SHARE("spriteram")
+	map(0x610000, 0x61bfff).rw(this, FUNC(taito_f3_state::f3_pf_data_r), FUNC(taito_f3_state::f3_pf_data_w));       //AM_SHARE("f3_pf_data")
+	map(0x61c000, 0x61dfff).rw(this, FUNC(taito_f3_state::f3_videoram_r), FUNC(taito_f3_state::f3_videoram_w));     //AM_SHARE("videoram")
+	map(0x61e000, 0x61ffff).rw(this, FUNC(taito_f3_state::f3_vram_r), FUNC(taito_f3_state::f3_vram_w));             //AM_SHARE("f3_vram")
+	map(0x620000, 0x62ffff).rw(this, FUNC(taito_f3_state::f3_lineram_r), FUNC(taito_f3_state::f3_lineram_w));       //AM_SHARE("f3_line_ram")
+	map(0x630000, 0x63ffff).rw(this, FUNC(taito_f3_state::f3_pivot_r), FUNC(taito_f3_state::f3_pivot_w));           //AM_SHARE("f3_pivot_ram")
+	map(0x660000, 0x66000f).w(this, FUNC(taito_f3_state::f3_control_0_w));
+	map(0x660010, 0x66001f).w(this, FUNC(taito_f3_state::f3_control_1_w));
+	map(0xc00000, 0xc007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+	map(0xc80000, 0xc80003).w(this, FUNC(taito_f3_state::f3_sound_reset_0_w));
+	map(0xc80100, 0xc80103).w(this, FUNC(taito_f3_state::f3_sound_reset_1_w));
+}
 
-ADDRESS_MAP_START(taito_f3_state::bubsympb_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_SHARE("f3_ram")
-	AM_RANGE(0x440000, 0x447fff) AM_RAM_WRITE(f3_palette_24bit_w) AM_SHARE("paletteram")
-	AM_RANGE(0x4a0000, 0x4a001b) AM_READWRITE(f3_control_r,  f3_control_w)
-	AM_RANGE(0x4a001c, 0x4a001f) AM_READWRITE(bubsympb_oki_r, bubsympb_oki_w)
-	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE16(f3_unk_w,0xffffffff)
-	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE16(f3_spriteram_r,f3_spriteram_w,0xffffffff) //AM_SHARE("spriteram")
-	AM_RANGE(0x610000, 0x61bfff) AM_READWRITE16(f3_pf_data_r,f3_pf_data_w,0xffffffff)       //AM_SHARE("f3_pf_data")
-	AM_RANGE(0x61c000, 0x61dfff) AM_READWRITE16(f3_videoram_r,f3_videoram_w,0xffffffff)     //AM_SHARE("videoram")
-	AM_RANGE(0x61e000, 0x61ffff) AM_READWRITE16(f3_vram_r,f3_vram_w,0xffffffff)             //AM_SHARE("f3_vram")
-	AM_RANGE(0x620000, 0x62ffff) AM_READWRITE16(f3_lineram_r,f3_lineram_w,0xffffffff)       //AM_SHARE("f3_line_ram")
-	AM_RANGE(0x630000, 0x63ffff) AM_READWRITE16(f3_pivot_r,f3_pivot_w,0xffffffff)           //AM_SHARE("f3_pivot_ram")
-	AM_RANGE(0x660000, 0x66000f) AM_WRITE16(f3_control_0_w,0xffffffff)
-	AM_RANGE(0x660010, 0x66001f) AM_WRITE16(f3_control_1_w,0xffffffff)
-	AM_RANGE(0xc00000, 0xc007ff) AM_RAM
-ADDRESS_MAP_END
+void taito_f3_state::bubsympb_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x300000, 0x30007f).w(this, FUNC(taito_f3_state::f3_sound_bankswitch_w));
+	map(0x400000, 0x41ffff).mirror(0x20000).ram().share("f3_ram");
+	map(0x440000, 0x447fff).ram().w(this, FUNC(taito_f3_state::f3_palette_24bit_w)).share("paletteram");
+	map(0x4a0000, 0x4a001b).rw(this, FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
+	map(0x4a001c, 0x4a001f).rw(this, FUNC(taito_f3_state::bubsympb_oki_r), FUNC(taito_f3_state::bubsympb_oki_w));
+	map(0x4c0000, 0x4c0003).w(this, FUNC(taito_f3_state::f3_unk_w));
+	map(0x600000, 0x60ffff).rw(this, FUNC(taito_f3_state::f3_spriteram_r), FUNC(taito_f3_state::f3_spriteram_w)); //AM_SHARE("spriteram")
+	map(0x610000, 0x61bfff).rw(this, FUNC(taito_f3_state::f3_pf_data_r), FUNC(taito_f3_state::f3_pf_data_w));       //AM_SHARE("f3_pf_data")
+	map(0x61c000, 0x61dfff).rw(this, FUNC(taito_f3_state::f3_videoram_r), FUNC(taito_f3_state::f3_videoram_w));     //AM_SHARE("videoram")
+	map(0x61e000, 0x61ffff).rw(this, FUNC(taito_f3_state::f3_vram_r), FUNC(taito_f3_state::f3_vram_w));             //AM_SHARE("f3_vram")
+	map(0x620000, 0x62ffff).rw(this, FUNC(taito_f3_state::f3_lineram_r), FUNC(taito_f3_state::f3_lineram_w));       //AM_SHARE("f3_line_ram")
+	map(0x630000, 0x63ffff).rw(this, FUNC(taito_f3_state::f3_pivot_r), FUNC(taito_f3_state::f3_pivot_w));           //AM_SHARE("f3_pivot_ram")
+	map(0x660000, 0x66000f).w(this, FUNC(taito_f3_state::f3_control_0_w));
+	map(0x660010, 0x66001f).w(this, FUNC(taito_f3_state::f3_control_1_w));
+	map(0xc00000, 0xc007ff).ram();
+}
 
 
 

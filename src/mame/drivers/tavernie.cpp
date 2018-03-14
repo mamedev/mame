@@ -116,30 +116,32 @@ private:
 };
 
 
-ADDRESS_MAP_START(tavernie_state::cpu09_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x1000, 0x1fff) AM_NOP
-	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xeb04, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0xeb08, 0xeb0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
-	AM_RANGE(0xec00, 0xefff) AM_RAM // 1Kx8 RAM MK4118
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void tavernie_state::cpu09_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x1000, 0x1fff).noprw();
+	map(0xeb00, 0xeb03).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xeb04, 0xeb05).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xeb08, 0xeb0f).rw("ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0xec00, 0xefff).ram(); // 1Kx8 RAM MK4118
+	map(0xf000, 0xffff).rom().region("roms", 0);
+}
 
-ADDRESS_MAP_START(tavernie_state::ivg09_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pia_ivg", pia6821_device, read, write)
-	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("fdc", fd1795_device, read, write)
-	AM_RANGE(0xe080, 0xe080) AM_WRITE(ds_w)
-	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xeb04, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0xeb08, 0xeb0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
-	AM_RANGE(0xec00, 0xefff) AM_RAM // 1Kx8 RAM MK4118
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void tavernie_state::ivg09_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x1000, 0x1fff).ram().share("videoram");
+	map(0x2000, 0x2003).rw(m_pia_ivg, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2080, 0x2080).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x2081, 0x2081).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xe000, 0xe003).rw(m_fdc, FUNC(fd1795_device::read), FUNC(fd1795_device::write));
+	map(0xe080, 0xe080).w(this, FUNC(tavernie_state::ds_w));
+	map(0xeb00, 0xeb03).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xeb04, 0xeb05).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xeb08, 0xeb0f).rw("ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0xec00, 0xefff).ram(); // 1Kx8 RAM MK4118
+	map(0xf000, 0xffff).rom().region("roms", 0);
+}
 
 
 /* Input ports */

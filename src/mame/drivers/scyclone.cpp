@@ -299,48 +299,52 @@ uint32_t scyclone_state::screen_update_scyclone(screen_device &screen, bitmap_rg
 
 
 
-ADDRESS_MAP_START(scyclone_state::scyclone_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4400, 0x5fff) AM_READWRITE(vram_r,vram_w)
-	AM_RANGE(0x6000, 0x60ff) AM_NOP // this just seems to be overflow from the VRAM writes, probably goes nowhere
-ADDRESS_MAP_END
+void scyclone_state::scyclone_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x4400, 0x5fff).rw(this, FUNC(scyclone_state::vram_r), FUNC(scyclone_state::vram_w));
+	map(0x6000, 0x60ff).noprw(); // this just seems to be overflow from the VRAM writes, probably goes nowhere
+}
 
 
-ADDRESS_MAP_START(scyclone_state::scyclone_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("mb14241", mb14241_device, shift_result_r) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE(vidctrl_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(sprite_xpos_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(sprite_ypos_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w) // possible watchdog, unlikely to be twinkle related.
-	AM_RANGE(0x08, 0x08) AM_WRITE(sprite_colour_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(sprite_tile_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(starscroll_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(port0e_w)
-	AM_RANGE(0x0f, 0x0f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x40, 0x40) AM_WRITE(videomask1_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(videomask2_w)
-ADDRESS_MAP_END
+void scyclone_state::scyclone_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("mb14241", FUNC(mb14241_device::shift_result_r)).w("mb14241", FUNC(mb14241_device::shift_count_w));
+	map(0x01, 0x01).portr("IN0").w("mb14241", FUNC(mb14241_device::shift_data_w));
+	map(0x02, 0x02).portr("IN1");
+	map(0x03, 0x03).portr("DSW0").w(this, FUNC(scyclone_state::vidctrl_w));
+	map(0x04, 0x04).w(this, FUNC(scyclone_state::sprite_xpos_w));
+	map(0x05, 0x05).w(this, FUNC(scyclone_state::sprite_ypos_w));
+	map(0x06, 0x06).w(this, FUNC(scyclone_state::port06_w)); // possible watchdog, unlikely to be twinkle related.
+	map(0x08, 0x08).w(this, FUNC(scyclone_state::sprite_colour_w));
+	map(0x09, 0x09).w(this, FUNC(scyclone_state::sprite_tile_w));
+	map(0x0a, 0x0a).w(this, FUNC(scyclone_state::starscroll_w));
+	map(0x0e, 0x0e).w(this, FUNC(scyclone_state::port0e_w));
+	map(0x0f, 0x0f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x40, 0x40).w(this, FUNC(scyclone_state::videomask1_w));
+	map(0x80, 0x80).w(this, FUNC(scyclone_state::videomask2_w));
+}
 
 
-ADDRESS_MAP_START(scyclone_state::scyclone_sub_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
+void scyclone_state::scyclone_sub_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
 
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("dac", dac_byte_interface, write) // music
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(snd_3001_w) // written at the same time, with the same data as 0x3005
-	AM_RANGE(0x3002, 0x3002) AM_DEVWRITE("dac2", dac_byte_interface, write) // speech
+	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("dac", FUNC(dac_byte_interface::write)); // music
+	map(0x3001, 0x3001).w(this, FUNC(scyclone_state::snd_3001_w)); // written at the same time, with the same data as 0x3005
+	map(0x3002, 0x3002).w("dac2", FUNC(dac_byte_interface::write)); // speech
 //  AM_RANGE(0x3003, 0x3003) AM_WRITE(snd_3003_w) // writes 02 or 00
 //  AM_RANGE(0x3004, 0x3004) AM_WRITE(snd_3004_w) // always writes 00?
-	AM_RANGE(0x3005, 0x3005) AM_WRITE(snd_3005_w) // written at the same time, with the same data as 0x3001
-ADDRESS_MAP_END
+	map(0x3005, 0x3005).w(this, FUNC(scyclone_state::snd_3005_w)); // written at the same time, with the same data as 0x3001
+}
 
-ADDRESS_MAP_START(scyclone_state::scyclone_sub_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void scyclone_state::scyclone_sub_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 
 // appears to be when a white bitmap pixel (col 0x7) collides with a large sprite?

@@ -99,36 +99,37 @@ WRITE16_MEMBER(skullxbo_state::skullxbo_mobwr_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(skullxbo_state::main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0xff0000, 0xff07ff) AM_WRITE(skullxbo_mobmsb_w)
-	AM_RANGE(0xff0800, 0xff0bff) AM_WRITE(skullxbo_halt_until_hblank_0_w)
-	AM_RANGE(0xff0c00, 0xff0fff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0xff1000, 0xff13ff) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xff1400, 0xff17ff) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0x00ff)
-	AM_RANGE(0xff1800, 0xff1bff) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
-	AM_RANGE(0xff1c00, 0xff1c7f) AM_WRITE(playfield_latch_w)
-	AM_RANGE(0xff1c80, 0xff1cff) AM_WRITE(skullxbo_xscroll_w) AM_SHARE("xscroll")
-	AM_RANGE(0xff1d00, 0xff1d7f) AM_WRITE(scanline_int_ack_w)
-	AM_RANGE(0xff1d80, 0xff1dff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xff1e00, 0xff1e7f) AM_WRITE(playfield_latch_w)
-	AM_RANGE(0xff1e80, 0xff1eff) AM_WRITE(skullxbo_xscroll_w)
-	AM_RANGE(0xff1f00, 0xff1f7f) AM_WRITE(scanline_int_ack_w)
-	AM_RANGE(0xff1f80, 0xff1fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xff4000, 0xff47ff) AM_WRITE(skullxbo_yscroll_w) AM_SHARE("yscroll")
-	AM_RANGE(0xff4800, 0xff4fff) AM_WRITE(skullxbo_mobwr_w)
-	AM_RANGE(0xff5000, 0xff5001) AM_DEVREAD8("jsa", atari_jsa_ii_device, main_response_r, 0x00ff)
-	AM_RANGE(0xff5800, 0xff5801) AM_READ_PORT("FF5800")
-	AM_RANGE(0xff5802, 0xff5803) AM_READ_PORT("FF5802")
-	AM_RANGE(0xff6000, 0xff6fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0xff8000, 0xff9fff) AM_RAM_WRITE(playfield_latched_w) AM_SHARE("playfield")
-	AM_RANGE(0xffa000, 0xffbfff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16_ext) AM_SHARE("playfield_ext")
-	AM_RANGE(0xffc000, 0xffcf7f) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
-	AM_RANGE(0xffcf80, 0xffcfff) AM_RAM AM_SHARE("mob:slip")
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0xffe000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void skullxbo_state::main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0xff0000, 0xff07ff).w(this, FUNC(skullxbo_state::skullxbo_mobmsb_w));
+	map(0xff0800, 0xff0bff).w(this, FUNC(skullxbo_state::skullxbo_halt_until_hblank_0_w));
+	map(0xff0c00, 0xff0fff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0xff1000, 0xff13ff).w(this, FUNC(skullxbo_state::video_int_ack_w));
+	map(0xff1400, 0xff17ff).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w)).umask16(0x00ff);
+	map(0xff1800, 0xff1bff).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
+	map(0xff1c00, 0xff1c7f).w(this, FUNC(skullxbo_state::playfield_latch_w));
+	map(0xff1c80, 0xff1cff).w(this, FUNC(skullxbo_state::skullxbo_xscroll_w)).share("xscroll");
+	map(0xff1d00, 0xff1d7f).w(this, FUNC(skullxbo_state::scanline_int_ack_w));
+	map(0xff1d80, 0xff1dff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0xff1e00, 0xff1e7f).w(this, FUNC(skullxbo_state::playfield_latch_w));
+	map(0xff1e80, 0xff1eff).w(this, FUNC(skullxbo_state::skullxbo_xscroll_w));
+	map(0xff1f00, 0xff1f7f).w(this, FUNC(skullxbo_state::scanline_int_ack_w));
+	map(0xff1f80, 0xff1fff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0xff2000, 0xff2fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xff4000, 0xff47ff).w(this, FUNC(skullxbo_state::skullxbo_yscroll_w)).share("yscroll");
+	map(0xff4800, 0xff4fff).w(this, FUNC(skullxbo_state::skullxbo_mobwr_w));
+	map(0xff5001, 0xff5001).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
+	map(0xff5800, 0xff5801).portr("FF5800");
+	map(0xff5802, 0xff5803).portr("FF5802");
+	map(0xff6000, 0xff6fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0xff8000, 0xff9fff).ram().w(this, FUNC(skullxbo_state::playfield_latched_w)).share("playfield");
+	map(0xffa000, 0xffbfff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16_ext)).share("playfield_ext");
+	map(0xffc000, 0xffcf7f).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(0xffcf80, 0xffcfff).ram().share("mob:slip");
+	map(0xffd000, 0xffdfff).ram().share("mob");
+	map(0xffe000, 0xffffff).ram();
+}
 
 
 

@@ -219,15 +219,16 @@ GFXDECODE_END
   Memory map - see description above
 */
 
-ADDRESS_MAP_START(ti99_2_state::ti99_2_memmap)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM         /* system ROM */
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")    /* system ROM, banked on 32kb ROMs protos */
-	AM_RANGE(0x6000, 0xdfff) AM_NOP         /* free for expansion */
-	AM_RANGE(0xe000, 0xebff) AM_RAM         /* system RAM */
-	AM_RANGE(0xec00, 0xeeff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xef00, 0xefff) AM_RAM         /* system RAM */
-	AM_RANGE(0xf000, 0xffff) AM_NOP         /* free for expansion (and internal processor RAM) */
-ADDRESS_MAP_END
+void ti99_2_state::ti99_2_memmap(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();         /* system ROM */
+	map(0x4000, 0x5fff).bankr("bank1");    /* system ROM, banked on 32kb ROMs protos */
+	map(0x6000, 0xdfff).noprw();         /* free for expansion */
+	map(0xe000, 0xebff).ram();         /* system RAM */
+	map(0xec00, 0xeeff).ram().share("videoram");
+	map(0xef00, 0xefff).ram();         /* system RAM */
+	map(0xf000, 0xffff).noprw();         /* free for expansion (and internal processor RAM) */
+}
 
 
 /*
@@ -296,12 +297,13 @@ READ8_MEMBER(ti99_2_state::ti99_2_read_misc_cru)
 	return 0;
 }
 
-ADDRESS_MAP_START(ti99_2_state::ti99_2_io)
-	AM_RANGE(0x0E00, 0x0E7f) AM_READ(ti99_2_read_kbd)
-	AM_RANGE(0x0E80, 0x0Eff) AM_READ(ti99_2_read_misc_cru)
-	AM_RANGE(0x7000, 0x73ff) AM_WRITE(ti99_2_write_kbd)
-	AM_RANGE(0x7400, 0x77ff) AM_WRITE(ti99_2_write_misc_cru)
-ADDRESS_MAP_END
+void ti99_2_state::ti99_2_io(address_map &map)
+{
+	map(0x0E00, 0x0E7f).r(this, FUNC(ti99_2_state::ti99_2_read_kbd));
+	map(0x0E80, 0x0Eff).r(this, FUNC(ti99_2_state::ti99_2_read_misc_cru));
+	map(0x7000, 0x73ff).w(this, FUNC(ti99_2_state::ti99_2_write_kbd));
+	map(0x7400, 0x77ff).w(this, FUNC(ti99_2_state::ti99_2_write_misc_cru));
+}
 
 
 /* ti99/2 : 54-key keyboard */

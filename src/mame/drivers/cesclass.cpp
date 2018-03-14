@@ -125,24 +125,25 @@ WRITE16_MEMBER( cesclassic_state::outputs_w )
 	logerror("Output: %02x\n",data);
 }
 
-ADDRESS_MAP_START(cesclassic_state::cesclassic_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40cfff) AM_RAM
-	AM_RANGE(0x40d000, 0x40ffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x410000, 0x410001) AM_READ_PORT("VBLANK") //probably m68681 lies there instead
-	AM_RANGE(0x410004, 0x410005) AM_WRITE(irq3_ack_w)
-	AM_RANGE(0x410006, 0x410007) AM_WRITE(irq2_ack_w)
-	AM_RANGE(0x480000, 0x481fff) AM_RAM AM_SHARE("nvram") //8k according to schematics (games doesn't use that much tho)
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x610000, 0x610001) AM_WRITE(outputs_w)
+void cesclassic_state::cesclassic_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x40cfff).ram();
+	map(0x40d000, 0x40ffff).ram().share("vram");
+	map(0x410000, 0x410001).portr("VBLANK"); //probably m68681 lies there instead
+	map(0x410004, 0x410005).w(this, FUNC(cesclassic_state::irq3_ack_w));
+	map(0x410006, 0x410007).w(this, FUNC(cesclassic_state::irq2_ack_w));
+	map(0x480000, 0x481fff).ram().share("nvram"); //8k according to schematics (games doesn't use that much tho)
+	map(0x600000, 0x600001).portr("SYSTEM");
+	map(0x610000, 0x610001).w(this, FUNC(cesclassic_state::outputs_w));
 //  AM_RANGE(0x640000, 0x640001) AM_WRITENOP
-	AM_RANGE(0x640040, 0x640041) AM_WRITE(lamps_w)
-	AM_RANGE(0x670000, 0x670001) AM_READ_PORT("DSW")
-	AM_RANGE(0x70ff00, 0x70ff01) AM_WRITENOP // writes 0xffff at irq 3 end of service, watchdog?
-	AM_RANGE(0x900000, 0x900001) AM_DEVREAD8("oki", okim6295_device, read,0x00ff) // unsure about this ...
-	AM_RANGE(0x900100, 0x900101) AM_DEVWRITE8("oki", okim6295_device, write,0x00ff)
+	map(0x640040, 0x640041).w(this, FUNC(cesclassic_state::lamps_w));
+	map(0x670000, 0x670001).portr("DSW");
+	map(0x70ff00, 0x70ff01).nopw(); // writes 0xffff at irq 3 end of service, watchdog?
+	map(0x900001, 0x900001).r(m_oki, FUNC(okim6295_device::read)); // unsure about this ...
+	map(0x900101, 0x900101).w(m_oki, FUNC(okim6295_device::write));
 //  AM_RANGE(0x904000, 0x904001) AM_WRITENOP //some kind of serial
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( cesclassic )
 	PORT_START("SYSTEM")

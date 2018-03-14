@@ -62,17 +62,18 @@ private:
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
 };
 
-ADDRESS_MAP_START(gts80b_state::gts80b_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x017f) AM_RAM
-	AM_RANGE(0x0200, 0x027f) AM_DEVREADWRITE("riot1", riot6532_device, read, write)
-	AM_RANGE(0x0280, 0x02ff) AM_DEVREADWRITE("riot2", riot6532_device, read, write)
-	AM_RANGE(0x0300, 0x037f) AM_DEVREADWRITE("riot3", riot6532_device, read, write)
-	AM_RANGE(0x1000, 0x17ff) AM_ROM
-	AM_RANGE(0x1800, 0x18ff) AM_RAM AM_SHARE("nvram") // 5101L-1 256x4
-	AM_RANGE(0x2000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void gts80b_state::gts80b_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x017f).ram();
+	map(0x0200, 0x027f).rw("riot1", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x0280, 0x02ff).rw("riot2", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x0300, 0x037f).rw("riot3", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x1000, 0x17ff).rom();
+	map(0x1800, 0x18ff).ram().share("nvram"); // 5101L-1 256x4
+	map(0x2000, 0x2fff).rom();
+	map(0x3000, 0x3fff).rom();
+}
 
 static INPUT_PORTS_START( gts80b )
 	PORT_START("DSW.0")

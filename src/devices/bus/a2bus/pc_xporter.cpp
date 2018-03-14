@@ -91,19 +91,21 @@
 
 DEFINE_DEVICE_TYPE(A2BUS_PCXPORTER, a2bus_pcxporter_device, "a2pcxport", "Applied Engineering PC Transporter")
 
-ADDRESS_MAP_START(a2bus_pcxporter_device::pc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void a2bus_pcxporter_device::pc_map(address_map &map)
+{
+	map.unmap_value_high();
+}
 
-ADDRESS_MAP_START(a2bus_pcxporter_device::pc_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xffff)
-	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(kbd_6502_r, kbd_6502_w, 0xffff)
-	AM_RANGE(0x0080, 0x008f) AM_WRITE8(pc_page_w, 0xffff)
-	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8(nmi_enable_w, 0xffff)
-ADDRESS_MAP_END
+void a2bus_pcxporter_device::pc_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x000f).rw("dma8237", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x0020, 0x002f).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0040, 0x004f).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0060, 0x0065).rw(this, FUNC(a2bus_pcxporter_device::kbd_6502_r), FUNC(a2bus_pcxporter_device::kbd_6502_w));
+	map(0x0080, 0x008f).w(this, FUNC(a2bus_pcxporter_device::pc_page_w));
+	map(0x00a0, 0x00a1).w(this, FUNC(a2bus_pcxporter_device::nmi_enable_w));
+}
 
 /***************************************************************************
     FUNCTION PROTOTYPES

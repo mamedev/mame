@@ -174,44 +174,46 @@ private:
 	required_ioport m_dma_dip;
 };
 
-ADDRESS_MAP_START(gimix_state::gimix_banked_mem)
-	AM_RANGE(0x00000, 0x0dfff) AM_RAMBANK("lower_ram")
-	AM_RANGE(0x0e000, 0x0e001) AM_DEVREADWRITE("acia1", acia6850_device, read, write)
-	AM_RANGE(0x0e004, 0x0e005) AM_DEVREADWRITE("acia2", acia6850_device, read, write)
+void gimix_state::gimix_banked_mem(address_map &map)
+{
+	map(0x00000, 0x0dfff).bankrw("lower_ram");
+	map(0x0e000, 0x0e001).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x0e004, 0x0e005).rw(m_acia2, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	//AM_RANGE(0x0e018, 0x0e01b) AM_READWRITE(fdc_r, fdc_w)  // FD1797 FDC (PIO)
-	AM_RANGE(0x0e100, 0x0e1ff) AM_RAM
+	map(0x0e100, 0x0e1ff).ram();
 	//AM_RANGE(0x0e200, 0x0e20f) // 9511A / 9512 Arithmetic Processor
-	AM_RANGE(0x0e210, 0x0e21f) AM_DEVREADWRITE("timer", ptm6840_device, read, write)
-	AM_RANGE(0x0e220, 0x0e23f) AM_DEVREADWRITE("rtc", mm58167_device, read, write)
-	AM_RANGE(0x0e240, 0x0e3af) AM_RAM
-	AM_RANGE(0x0e3b0, 0x0e3b3) AM_READWRITE(dma_r, dma_w)  // DMA controller (custom?)
-	AM_RANGE(0x0e3b4, 0x0e3b7) AM_READWRITE(fdc_r, fdc_w)  // FD1797 FDC
-	AM_RANGE(0x0e400, 0x0e7ff) AM_RAM  // scratchpad RAM
-	AM_RANGE(0x0e800, 0x0efff) AM_RAM
-	AM_RANGE(0x0f000, 0x0f7ff) AM_ROMBANK("rombank2")
-	AM_RANGE(0x0f800, 0x0ffff) AM_ROMBANK("rombank1")
+	map(0x0e210, 0x0e21f).rw("timer", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x0e220, 0x0e23f).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write));
+	map(0x0e240, 0x0e3af).ram();
+	map(0x0e3b0, 0x0e3b3).rw(this, FUNC(gimix_state::dma_r), FUNC(gimix_state::dma_w));  // DMA controller (custom?)
+	map(0x0e3b4, 0x0e3b7).rw(this, FUNC(gimix_state::fdc_r), FUNC(gimix_state::fdc_w));  // FD1797 FDC
+	map(0x0e400, 0x0e7ff).ram();  // scratchpad RAM
+	map(0x0e800, 0x0efff).ram();
+	map(0x0f000, 0x0f7ff).bankr("rombank2");
+	map(0x0f800, 0x0ffff).bankr("rombank1");
 	//AM_RANGE(0x10000, 0x1ffff) AM_RAM
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(gimix_state::gimix_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
-	AM_RANGE(0x1000, 0x1fff) AM_DEVREADWRITE("bank2", address_map_bank_device, read8, write8)
-	AM_RANGE(0x2000, 0x2fff) AM_DEVREADWRITE("bank3", address_map_bank_device, read8, write8)
-	AM_RANGE(0x3000, 0x3fff) AM_DEVREADWRITE("bank4", address_map_bank_device, read8, write8)
-	AM_RANGE(0x4000, 0x4fff) AM_DEVREADWRITE("bank5", address_map_bank_device, read8, write8)
-	AM_RANGE(0x5000, 0x5fff) AM_DEVREADWRITE("bank6", address_map_bank_device, read8, write8)
-	AM_RANGE(0x6000, 0x6fff) AM_DEVREADWRITE("bank7", address_map_bank_device, read8, write8)
-	AM_RANGE(0x7000, 0x7fff) AM_DEVREADWRITE("bank8", address_map_bank_device, read8, write8)
-	AM_RANGE(0x8000, 0x8fff) AM_DEVREADWRITE("bank9", address_map_bank_device, read8, write8)
-	AM_RANGE(0x9000, 0x9fff) AM_DEVREADWRITE("bank10", address_map_bank_device, read8, write8)
-	AM_RANGE(0xa000, 0xafff) AM_DEVREADWRITE("bank11", address_map_bank_device, read8, write8)
-	AM_RANGE(0xb000, 0xbfff) AM_DEVREADWRITE("bank12", address_map_bank_device, read8, write8)
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("bank13", address_map_bank_device, read8, write8)
-	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE("bank14", address_map_bank_device, read8, write8)
-	AM_RANGE(0xe000, 0xefff) AM_DEVREADWRITE("bank15", address_map_bank_device, read8, write8)
-	AM_RANGE(0xf000, 0xfeff) AM_DEVREADWRITE("bank16", address_map_bank_device, read8, write8)
-	AM_RANGE(0xff00, 0xffff) AM_ROMBANK("fixedrombank") AM_WRITE(system_w)
-ADDRESS_MAP_END
+void gimix_state::gimix_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rw(m_bank1, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x1000, 0x1fff).rw(m_bank2, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x2000, 0x2fff).rw(m_bank3, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x3000, 0x3fff).rw(m_bank4, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x4000, 0x4fff).rw(m_bank5, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x5000, 0x5fff).rw(m_bank6, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x6000, 0x6fff).rw(m_bank7, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x7000, 0x7fff).rw(m_bank8, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x8000, 0x8fff).rw(m_bank9, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x9000, 0x9fff).rw(m_bank10, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xa000, 0xafff).rw(m_bank11, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xb000, 0xbfff).rw(m_bank12, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xc000, 0xcfff).rw(m_bank13, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xd000, 0xdfff).rw(m_bank14, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xe000, 0xefff).rw(m_bank15, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xf000, 0xfeff).rw(m_bank16, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xff00, 0xffff).bankr("fixedrombank").w(this, FUNC(gimix_state::system_w));
+}
 
 static INPUT_PORTS_START( gimix )
 	PORT_START("dma_s2")

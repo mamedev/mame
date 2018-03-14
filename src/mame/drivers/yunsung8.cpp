@@ -70,25 +70,27 @@ WRITE8_MEMBER(yunsung8_state::main_irq_ack_w)
     d000-dfff   Tiles   ""
 */
 
-ADDRESS_MAP_START(yunsung8_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(bankswitch_w)    // ROM Bank (again?)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")    // Banked ROM
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(videoram_r, videoram_w) // Video RAM (Banked)
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void yunsung8_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x0001, 0x0001).w(this, FUNC(yunsung8_state::bankswitch_w));    // ROM Bank (again?)
+	map(0x8000, 0xbfff).bankr("mainbank");    // Banked ROM
+	map(0xc000, 0xdfff).rw(this, FUNC(yunsung8_state::videoram_r), FUNC(yunsung8_state::videoram_w)); // Video RAM (Banked)
+	map(0xe000, 0xffff).ram();
+}
 
 
-ADDRESS_MAP_START(yunsung8_state::port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE(videobank_w)  // video RAM bank
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(bankswitch_w) // ROM Bank + Layers Enable
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write) // To Sound CPU
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x06, 0x06) AM_WRITE(flipscreen_w)    // Flip Screen
-	AM_RANGE(0x07, 0x07) AM_WRITE(main_irq_ack_w)
-ADDRESS_MAP_END
+void yunsung8_state::port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("SYSTEM").w(this, FUNC(yunsung8_state::videobank_w));  // video RAM bank
+	map(0x01, 0x01).portr("P1").w(this, FUNC(yunsung8_state::bankswitch_w)); // ROM Bank + Layers Enable
+	map(0x02, 0x02).portr("P2").w("soundlatch", FUNC(generic_latch_8_device::write)); // To Sound CPU
+	map(0x03, 0x03).portr("DSW1");
+	map(0x04, 0x04).portr("DSW2");
+	map(0x06, 0x06).w(this, FUNC(yunsung8_state::flipscreen_w));    // Flip Screen
+	map(0x07, 0x07).w(this, FUNC(yunsung8_state::main_irq_ack_w));
+}
 
 
 
@@ -112,15 +114,16 @@ WRITE8_MEMBER(yunsung8_state::sound_bankswitch_w)
 
 
 
-ADDRESS_MAP_START(yunsung8_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")      // Banked ROM
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w) // ROM Bank
-	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
-	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From Main CPU
-ADDRESS_MAP_END
+void yunsung8_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("soundbank");      // Banked ROM
+	map(0xe000, 0xe000).w(this, FUNC(yunsung8_state::sound_bankswitch_w)); // ROM Bank
+	map(0xe400, 0xe400).w(m_adpcm_select, FUNC(ls157_device::ba_w));
+	map(0xec00, 0xec01).w("ymsnd", FUNC(ym3812_device::write));
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).r("soundlatch", FUNC(generic_latch_8_device::read)); // From Main CPU
+}
 
 
 

@@ -69,15 +69,16 @@ WRITE16_MEMBER( terak_state::terak_fdc_data_w )
 	logerror("terak_fdc_data_w %04x\n",data);
 }
 
-ADDRESS_MAP_START(terak_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000,  0xf5ff ) AM_RAM // RAM
+void terak_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xf5ff).ram(); // RAM
 
 	// octal
-	AM_RANGE( 0173000, 0173177 ) AM_ROM // ROM
-	AM_RANGE( 0177000, 0177001 ) AM_READWRITE(terak_fdc_status_r,terak_fdc_command_w)
-	AM_RANGE( 0177002, 0177003 ) AM_READWRITE(terak_fdc_data_r,terak_fdc_data_w)
-ADDRESS_MAP_END
+	map(0173000, 0173177).rom(); // ROM
+	map(0177000, 0177001).rw(this, FUNC(terak_state::terak_fdc_status_r), FUNC(terak_state::terak_fdc_command_w));
+	map(0177002, 0177003).rw(this, FUNC(terak_state::terak_fdc_data_r), FUNC(terak_state::terak_fdc_data_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( terak )

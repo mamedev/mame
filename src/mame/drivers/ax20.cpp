@@ -80,21 +80,23 @@ uint32_t ax20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 
-ADDRESS_MAP_START(ax20_state::ax20_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0x1ffff) AM_RAM
-	AM_RANGE(0x20000,0x3ffff) AM_RAM //optional RAM
-	AM_RANGE(0xf0400,0xf0fff) AM_RAM AM_SHARE("p_vram")
-	AM_RANGE(0xff800,0xfffff) AM_ROM AM_REGION("ipl", 0)
-ADDRESS_MAP_END
+void ax20_state::ax20_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x1ffff).ram();
+	map(0x20000, 0x3ffff).ram(); //optional RAM
+	map(0xf0400, 0xf0fff).ram().share("p_vram");
+	map(0xff800, 0xfffff).rom().region("ipl", 0);
+}
 
-ADDRESS_MAP_START(ax20_state::ax20_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xffc0, 0xffc0) AM_WRITE(tc_w)
-	AM_RANGE(0xffd0, 0xffd0) AM_WRITE(ctl_w)
-	AM_RANGE(0xffe0, 0xffe0) AM_READ(unk_r)
-	AM_RANGE(0xff80, 0xff81) AM_DEVICE("fdc", i8272a_device, map)
-ADDRESS_MAP_END
+void ax20_state::ax20_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xffc0, 0xffc0).w(this, FUNC(ax20_state::tc_w));
+	map(0xffd0, 0xffd0).w(this, FUNC(ax20_state::ctl_w));
+	map(0xffe0, 0xffe0).r(this, FUNC(ax20_state::unk_r));
+	map(0xff80, 0xff81).m(m_fdc, FUNC(i8272a_device::map));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ax20 )

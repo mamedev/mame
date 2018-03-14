@@ -80,59 +80,61 @@ READ8_MEMBER(decocass_state::mirrorcolorram_r)
 }
 
 
-ADDRESS_MAP_START(decocass_state::decocass_map)
-	AM_RANGE(0x0000, 0x5fff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE(decocass_charram_w) AM_SHARE("charram") /* still RMS3 RAM */
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(decocass_fgvideoram_w) AM_SHARE("fgvideoram")  /* DSP3 RAM */
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(decocass_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(mirrorvideoram_r, mirrorvideoram_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(mirrorcolorram_r, mirrorcolorram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(decocass_tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(decocass_objectram_w) AM_SHARE("objectram")
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM_WRITE(decocass_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xe300, 0xe300) AM_READ_PORT("DSW1") AM_WRITE(decocass_watchdog_count_w)
-	AM_RANGE(0xe301, 0xe301) AM_READ_PORT("DSW2") AM_WRITE(decocass_watchdog_flip_w)
-	AM_RANGE(0xe302, 0xe302) AM_WRITE(decocass_color_missiles_w)
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(decocass_reset_w)
+void decocass_state::decocass_map(address_map &map)
+{
+	map(0x0000, 0x5fff).ram().share("rambase");
+	map(0x6000, 0xbfff).ram().w(this, FUNC(decocass_state::decocass_charram_w)).share("charram"); /* still RMS3 RAM */
+	map(0xc000, 0xc3ff).ram().w(this, FUNC(decocass_state::decocass_fgvideoram_w)).share("fgvideoram");  /* DSP3 RAM */
+	map(0xc400, 0xc7ff).ram().w(this, FUNC(decocass_state::decocass_colorram_w)).share("colorram");
+	map(0xc800, 0xcbff).rw(this, FUNC(decocass_state::mirrorvideoram_r), FUNC(decocass_state::mirrorvideoram_w));
+	map(0xcc00, 0xcfff).rw(this, FUNC(decocass_state::mirrorcolorram_r), FUNC(decocass_state::mirrorcolorram_w));
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(decocass_state::decocass_tileram_w)).share("tileram");
+	map(0xd800, 0xdbff).ram().w(this, FUNC(decocass_state::decocass_objectram_w)).share("objectram");
+	map(0xe000, 0xe0ff).ram().w(this, FUNC(decocass_state::decocass_paletteram_w)).share("paletteram");
+	map(0xe300, 0xe300).portr("DSW1").w(this, FUNC(decocass_state::decocass_watchdog_count_w));
+	map(0xe301, 0xe301).portr("DSW2").w(this, FUNC(decocass_state::decocass_watchdog_flip_w));
+	map(0xe302, 0xe302).w(this, FUNC(decocass_state::decocass_color_missiles_w));
+	map(0xe400, 0xe400).w(this, FUNC(decocass_state::decocass_reset_w));
 
 /* BIO-3 board */
-	AM_RANGE(0xe402, 0xe402) AM_WRITE(decocass_mode_set_w)      /* scroll mode regs + various enable regs */
-	AM_RANGE(0xe403, 0xe403) AM_WRITE(decocass_back_h_shift_w)  /* back (both)  tilemap x scroll */
-	AM_RANGE(0xe404, 0xe404) AM_WRITE(decocass_back_vl_shift_w) /* back (left)  (top@rot0) tilemap y scroll */
-	AM_RANGE(0xe405, 0xe405) AM_WRITE(decocass_back_vr_shift_w) /* back (right) (bot@rot0) tilemap y scroll */
-	AM_RANGE(0xe406, 0xe406) AM_WRITE(decocass_part_h_shift_w) /* headlight */
-	AM_RANGE(0xe407, 0xe407) AM_WRITE(decocass_part_v_shift_w) /* headlight */
+	map(0xe402, 0xe402).w(this, FUNC(decocass_state::decocass_mode_set_w));      /* scroll mode regs + various enable regs */
+	map(0xe403, 0xe403).w(this, FUNC(decocass_state::decocass_back_h_shift_w));  /* back (both)  tilemap x scroll */
+	map(0xe404, 0xe404).w(this, FUNC(decocass_state::decocass_back_vl_shift_w)); /* back (left)  (top@rot0) tilemap y scroll */
+	map(0xe405, 0xe405).w(this, FUNC(decocass_state::decocass_back_vr_shift_w)); /* back (right) (bot@rot0) tilemap y scroll */
+	map(0xe406, 0xe406).w(this, FUNC(decocass_state::decocass_part_h_shift_w)); /* headlight */
+	map(0xe407, 0xe407).w(this, FUNC(decocass_state::decocass_part_v_shift_w)); /* headlight */
 
-	AM_RANGE(0xe410, 0xe410) AM_WRITE(decocass_color_center_bot_w)
-	AM_RANGE(0xe411, 0xe411) AM_WRITE(decocass_center_h_shift_space_w)
-	AM_RANGE(0xe412, 0xe412) AM_WRITE(decocass_center_v_shift_w)
-	AM_RANGE(0xe413, 0xe413) AM_WRITE(decocass_coin_counter_w)
-	AM_RANGE(0xe414, 0xe414) AM_READWRITE(decocass_sound_command_main_r, decocass_sound_command_w)
-	AM_RANGE(0xe415, 0xe416) AM_WRITE(decocass_quadrature_decoder_reset_w)
-	AM_RANGE(0xe417, 0xe417) AM_WRITE(decocass_nmi_reset_w)
-	AM_RANGE(0xe420, 0xe42f) AM_WRITE(decocass_adc_w)
+	map(0xe410, 0xe410).w(this, FUNC(decocass_state::decocass_color_center_bot_w));
+	map(0xe411, 0xe411).w(this, FUNC(decocass_state::decocass_center_h_shift_space_w));
+	map(0xe412, 0xe412).w(this, FUNC(decocass_state::decocass_center_v_shift_w));
+	map(0xe413, 0xe413).w(this, FUNC(decocass_state::decocass_coin_counter_w));
+	map(0xe414, 0xe414).rw(this, FUNC(decocass_state::decocass_sound_command_main_r), FUNC(decocass_state::decocass_sound_command_w));
+	map(0xe415, 0xe416).w(this, FUNC(decocass_state::decocass_quadrature_decoder_reset_w));
+	map(0xe417, 0xe417).w(this, FUNC(decocass_state::decocass_nmi_reset_w));
+	map(0xe420, 0xe42f).w(this, FUNC(decocass_state::decocass_adc_w));
 
-	AM_RANGE(0xe500, 0xe5ff) AM_READWRITE(decocass_e5xx_r, decocass_e5xx_w) /* read data from 8041/status */
+	map(0xe500, 0xe5ff).rw(this, FUNC(decocass_state::decocass_e5xx_r), FUNC(decocass_state::decocass_e5xx_w)); /* read data from 8041/status */
 
-	AM_RANGE(0xe600, 0xe6ff) AM_READ(decocass_input_r)      /* inputs */
-	AM_RANGE(0xe700, 0xe700) AM_READ(decocass_sound_data_r) /* read sound CPU data */
-	AM_RANGE(0xe701, 0xe701) AM_READ(decocass_sound_ack_r)  /* read sound CPU ack status */
+	map(0xe600, 0xe6ff).r(this, FUNC(decocass_state::decocass_input_r));      /* inputs */
+	map(0xe700, 0xe700).r(this, FUNC(decocass_state::decocass_sound_data_r)); /* read sound CPU data */
+	map(0xe701, 0xe701).r(this, FUNC(decocass_state::decocass_sound_ack_r));  /* read sound CPU ack status */
 
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(decocass_state::decocass_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(decocass_sound_nmi_enable_r, decocass_sound_nmi_enable_w)
-	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(decocass_sound_data_ack_reset_r, decocass_sound_data_ack_reset_w)
-	AM_RANGE(0x2000, 0x2fff) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x8000, 0x8fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xa000, 0xafff) AM_READ(decocass_sound_command_r)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(decocass_sound_data_w)
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void decocass_state::decocass_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x17ff).rw(this, FUNC(decocass_state::decocass_sound_nmi_enable_r), FUNC(decocass_state::decocass_sound_nmi_enable_w));
+	map(0x1800, 0x1fff).rw(this, FUNC(decocass_state::decocass_sound_data_ack_reset_r), FUNC(decocass_state::decocass_sound_data_ack_reset_w));
+	map(0x2000, 0x2fff).w("ay1", FUNC(ay8910_device::data_w));
+	map(0x4000, 0x4fff).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x6000, 0x6fff).w("ay2", FUNC(ay8910_device::data_w));
+	map(0x8000, 0x8fff).w("ay2", FUNC(ay8910_device::address_w));
+	map(0xa000, 0xafff).r(this, FUNC(decocass_state::decocass_sound_command_r));
+	map(0xc000, 0xcfff).w(this, FUNC(decocass_state::decocass_sound_data_w));
+	map(0xf800, 0xffff).rom();
+}
 
 
 static INPUT_PORTS_START( decocass )

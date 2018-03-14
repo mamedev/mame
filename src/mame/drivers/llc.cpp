@@ -58,37 +58,41 @@
 
 
 /* Address maps */
-ADDRESS_MAP_START(llc_state::llc1_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM // Monitor ROM
-	AM_RANGE(0x0800, 0x13ff) AM_ROM // BASIC ROM
-	AM_RANGE(0x1400, 0x1bff) AM_RAM // RAM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_SHARE("videoram") // Video RAM
-ADDRESS_MAP_END
+void llc_state::llc1_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).rom(); // Monitor ROM
+	map(0x0800, 0x13ff).rom(); // BASIC ROM
+	map(0x1400, 0x1bff).ram(); // RAM
+	map(0x1c00, 0x1fff).ram().share("videoram"); // Video RAM
+}
 
-ADDRESS_MAP_START(llc_state::llc1_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xEC, 0xEF) AM_DEVREADWRITE("z80pio2", z80pio_device, read, write)
-	AM_RANGE(0xF4, 0xF7) AM_DEVREADWRITE("z80pio1", z80pio_device, read, write)
-	AM_RANGE(0xF8, 0xFB) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void llc_state::llc1_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xEC, 0xEF).rw("z80pio2", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0xF4, 0xF7).rw("z80pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0xF8, 0xFB).rw("z80ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
-ADDRESS_MAP_START(llc_state::llc2_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0x5fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x6000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void llc_state::llc2_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x5fff).bankrw("bank2");
+	map(0x6000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
-ADDRESS_MAP_START(llc_state::llc2_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xE0, 0xE3) AM_WRITE(llc2_rom_disable_w)
-	AM_RANGE(0xE4, 0xE7) AM_DEVREADWRITE("z80pio2", z80pio_device, read, write)
-	AM_RANGE(0xE8, 0xEB) AM_DEVREADWRITE("z80pio1", z80pio_device, read, write)
-	AM_RANGE(0xEC, 0xEC) AM_WRITE(llc2_basic_enable_w)
-	AM_RANGE(0xF8, 0xFB) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void llc_state::llc2_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xE0, 0xE3).w(this, FUNC(llc_state::llc2_rom_disable_w));
+	map(0xE4, 0xE7).rw("z80pio2", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0xE8, 0xEB).rw("z80pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0xEC, 0xEC).w(this, FUNC(llc_state::llc2_basic_enable_w));
+	map(0xF8, 0xFB).rw("z80ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( llc1 )

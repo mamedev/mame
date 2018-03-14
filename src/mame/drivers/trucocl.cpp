@@ -92,17 +92,18 @@ WRITE8_MEMBER(trucocl_state::audio_dac_w)
 	m_dac_irq_timer->adjust(attotime::from_hz( 16000 ));
 }
 
-ADDRESS_MAP_START(trucocl_state::main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(trucocl_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(trucocl_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x4c00, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("IN0")
-	AM_RANGE(0x5080, 0x5080) AM_WRITE(audio_dac_w)
-	AM_RANGE(0x50c0, 0x50c0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void trucocl_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram().w(this, FUNC(trucocl_state::trucocl_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).ram().w(this, FUNC(trucocl_state::trucocl_colorram_w)).share("colorram");
+	map(0x4c00, 0x4fff).ram();
+	map(0x5000, 0x5000).w(this, FUNC(trucocl_state::irq_enable_w));
+	map(0x5000, 0x503f).portr("IN0");
+	map(0x5080, 0x5080).w(this, FUNC(trucocl_state::audio_dac_w));
+	map(0x50c0, 0x50c0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x8000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( trucocl )
 	PORT_START("IN0")

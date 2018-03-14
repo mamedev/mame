@@ -120,43 +120,46 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(ambush_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xc000, 0xc07f) AM_RAM
-	AM_RANGE(0xc080, 0xc09f) AM_RAM_WRITE(scroll_ram_w) AM_SHARE("scroll_ram")  // 1 byte for each column
-	AM_RANGE(0xc0a0, 0xc0ff) AM_RAM
-	AM_RANGE(0xc100, 0xc1ff) AM_RAM AM_SHARE("attribute_ram")  // 1 line corresponds to 4 in the video ram
-	AM_RANGE(0xc200, 0xc3ff) AM_RAM AM_SHARE("sprite_ram")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("sw1")
-	AM_RANGE(0xcc00, 0xcc07) AM_WRITE(output_latches_w)
-ADDRESS_MAP_END
+void ambush_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xc000, 0xc07f).ram();
+	map(0xc080, 0xc09f).ram().w(this, FUNC(ambush_state::scroll_ram_w)).share("scroll_ram");  // 1 byte for each column
+	map(0xc0a0, 0xc0ff).ram();
+	map(0xc100, 0xc1ff).ram().share("attribute_ram");  // 1 line corresponds to 4 in the video ram
+	map(0xc200, 0xc3ff).ram().share("sprite_ram");
+	map(0xc400, 0xc7ff).ram().share("video_ram");
+	map(0xc800, 0xc800).portr("sw1");
+	map(0xcc00, 0xcc07).w(this, FUNC(ambush_state::output_latches_w));
+}
 
-ADDRESS_MAP_START(ambush_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_w)
-	AM_RANGE(0x81, 0x81) AM_DEVWRITE("ay2", ay8910_device, data_w)
-ADDRESS_MAP_END
+void ambush_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x01, 0x01).w("ay1", FUNC(ay8910_device::data_w));
+	map(0x80, 0x80).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x81, 0x81).w("ay2", FUNC(ay8910_device::data_w));
+}
 
-ADDRESS_MAP_START(ambush_state::bootleg_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x7000, 0x71ff) AM_SHARE("sprite_ram")
-	AM_RANGE(0x7200, 0x72ff) AM_SHARE("attribute_ram")
-	AM_RANGE(0x7380, 0x739f) AM_SHARE("scroll_ram")  // not used on bootlegs?
-	AM_RANGE(0x7400, 0x77ff) AM_SHARE("video_ram")
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("sw1")
-	AM_RANGE(0xa200, 0xa207) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-	AM_RANGE(0xb000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void ambush_state::bootleg_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram();
+	map(0x7000, 0x77ff).ram();
+	map(0x7000, 0x71ff).share("sprite_ram");
+	map(0x7200, 0x72ff).share("attribute_ram");
+	map(0x7380, 0x739f).share("scroll_ram");  // not used on bootlegs?
+	map(0x7400, 0x77ff).share("video_ram");
+	map(0x8000, 0x9fff).rom();
+	map(0xa000, 0xa000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xa100, 0xa100).portr("sw1");
+	map(0xa200, 0xa207).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xb000, 0xbfff).rom();
+	map(0xe000, 0xffff).rom();
+}
 
 
 //**************************************************************************
