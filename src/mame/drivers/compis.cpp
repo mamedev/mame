@@ -393,46 +393,49 @@ WRITE16_MEMBER( compis_state::pcs6_14_15_w )
 //  ADDRESS_MAP( compis_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(compis_state::compis_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0x60000, 0x63fff) AM_MIRROR(0x1c000) AM_DEVICE(I80130_TAG, i80130_device, rom_map)
-	AM_RANGE(0xe0000, 0xeffff) AM_MIRROR(0x10000) AM_ROM AM_REGION(I80186_TAG, 0)
-ADDRESS_MAP_END
+void compis_state::compis_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x1ffff).ram();
+	map(0x60000, 0x63fff).mirror(0x1c000).m(m_osp, FUNC(i80130_device::rom_map));
+	map(0xe0000, 0xeffff).mirror(0x10000).rom().region(I80186_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( compis2_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(compis_state::compis2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-	AM_RANGE(0xe0000, 0xeffff) AM_MIRROR(0x10000) AM_ROM AM_REGION(I80186_TAG, 0)
-ADDRESS_MAP_END
+void compis_state::compis2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x3ffff).ram();
+	map(0xe0000, 0xeffff).mirror(0x10000).rom().region(I80186_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( compis_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(compis_state::compis_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0007) /* PCS0 */ AM_MIRROR(0x78) AM_DEVREADWRITE8(I8255_TAG, i8255_device, read, write, 0xff00)
-	AM_RANGE(0x0080, 0x0087) /* PCS1 */ AM_MIRROR(0x78) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x0100, 0x011f) /* PCS2 */ AM_MIRROR(0x60) AM_DEVREADWRITE8(MM58174A_TAG, mm58274c_device, read, write, 0x00ff)
-	AM_RANGE(0x0180, 0x01ff) /* PCS3 */ AM_DEVREADWRITE(GRAPHICS_TAG, compis_graphics_slot_device, pcs3_r, pcs3_w)
-	//AM_RANGE(0x0200, 0x0201) /* PCS4 */ AM_MIRROR(0x7e)
-	AM_RANGE(0x0280, 0x028f) /* PCS5 */ AM_MIRROR(0x70) AM_DEVICE(I80130_TAG, i80130_device, io_map)
-	AM_RANGE(0x0300, 0x030f) AM_READWRITE(pcs6_0_1_r, pcs6_0_1_w)
-	AM_RANGE(0x0310, 0x031f) AM_READWRITE(pcs6_2_3_r, pcs6_2_3_w)
-	AM_RANGE(0x0320, 0x032f) AM_READWRITE(pcs6_4_5_r, pcs6_4_5_w)
-	AM_RANGE(0x0330, 0x033f) AM_READWRITE(pcs6_6_7_r, pcs6_6_7_w)
-	AM_RANGE(0x0340, 0x034f) AM_READWRITE(pcs6_8_9_r, pcs6_8_9_w)
-	AM_RANGE(0x0350, 0x035f) AM_READWRITE(pcs6_10_11_r, pcs6_10_11_w)
-	AM_RANGE(0x0360, 0x036f) AM_READWRITE(pcs6_12_13_r, pcs6_12_13_w)
-	AM_RANGE(0x0370, 0x037f) AM_READWRITE(pcs6_14_15_r, pcs6_14_15_w)
-ADDRESS_MAP_END
+void compis_state::compis_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0007) /* PCS0 */ .mirror(0x78).rw(I8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
+	map(0x0080, 0x0087) /* PCS1 */ .mirror(0x78).rw(I8253_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x0100, 0x011f) /* PCS2 */ .mirror(0x60).rw(MM58174A_TAG, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0x00ff);
+	map(0x0180, 0x01ff) /* PCS3 */ .rw(GRAPHICS_TAG, FUNC(compis_graphics_slot_device::pcs3_r), FUNC(compis_graphics_slot_device::pcs3_w));
+	//map(0x0200, 0x0201) /* PCS4 */ .mirror(0x7e);
+	map(0x0280, 0x028f) /* PCS5 */ .mirror(0x70).m(I80130_TAG, FUNC(i80130_device::io_map));
+	map(0x0300, 0x030f).rw(this, FUNC(compis_state::pcs6_0_1_r), FUNC(compis_state::pcs6_0_1_w));
+	map(0x0310, 0x031f).rw(this, FUNC(compis_state::pcs6_2_3_r), FUNC(compis_state::pcs6_2_3_w));
+	map(0x0320, 0x032f).rw(this, FUNC(compis_state::pcs6_4_5_r), FUNC(compis_state::pcs6_4_5_w));
+	map(0x0330, 0x033f).rw(this, FUNC(compis_state::pcs6_6_7_r), FUNC(compis_state::pcs6_6_7_w));
+	map(0x0340, 0x034f).rw(this, FUNC(compis_state::pcs6_8_9_r), FUNC(compis_state::pcs6_8_9_w));
+	map(0x0350, 0x035f).rw(this, FUNC(compis_state::pcs6_10_11_r), FUNC(compis_state::pcs6_10_11_w));
+	map(0x0360, 0x036f).rw(this, FUNC(compis_state::pcs6_12_13_r), FUNC(compis_state::pcs6_12_13_w));
+	map(0x0370, 0x037f).rw(this, FUNC(compis_state::pcs6_14_15_r), FUNC(compis_state::pcs6_14_15_w));
+}
 
 
 

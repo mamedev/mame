@@ -83,23 +83,24 @@ WRITE8_MEMBER( fuuki16_state::sound_command_w )
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
 }
 
-ADDRESS_MAP_START(fuuki16_state::fuuki16_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                     // ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM                                                                     // RAM
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram.0")                  // Layers
-	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram.1")                  //
-	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram.2")                  //
-	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(vram_3_w) AM_SHARE("vram.3")                  //
-	AM_RANGE(0x600000, 0x601fff) AM_MIRROR(0x008000) AM_DEVREADWRITE("fuukivid", fuukivid_device, fuuki_sprram_r, fuuki_sprram_w) AM_SHARE("spriteram")   // Sprites, mirrored?
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x810000, 0x810001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x880000, 0x880001) AM_READ_PORT("DSW")
-	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE8(sound_command_w, 0x00ff)                                          // To Sound CPU
-	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE(vregs_w) AM_SHARE("vregs")                        // Video Registers
-	AM_RANGE(0x8d0000, 0x8d0003) AM_RAM AM_SHARE("unknown")                                         //
-	AM_RANGE(0x8e0000, 0x8e0001) AM_RAM AM_SHARE("priority")                                            //
-ADDRESS_MAP_END
+void fuuki16_state::fuuki16_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                                                                     // ROM
+	map(0x400000, 0x40ffff).ram();                                                                     // RAM
+	map(0x500000, 0x501fff).ram().w(this, FUNC(fuuki16_state::vram_0_w)).share("vram.0");                  // Layers
+	map(0x502000, 0x503fff).ram().w(this, FUNC(fuuki16_state::vram_1_w)).share("vram.1");                  //
+	map(0x504000, 0x505fff).ram().w(this, FUNC(fuuki16_state::vram_2_w)).share("vram.2");                  //
+	map(0x506000, 0x507fff).ram().w(this, FUNC(fuuki16_state::vram_3_w)).share("vram.3");                  //
+	map(0x600000, 0x601fff).mirror(0x008000).rw(m_fuukivid, FUNC(fuukivid_device::fuuki_sprram_r), FUNC(fuukivid_device::fuuki_sprram_w)).share("spriteram");   // Sprites, mirrored?
+	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0x800000, 0x800001).portr("SYSTEM");
+	map(0x810000, 0x810001).portr("P1_P2");
+	map(0x880000, 0x880001).portr("DSW");
+	map(0x8a0001, 0x8a0001).w(this, FUNC(fuuki16_state::sound_command_w));                                          // To Sound CPU
+	map(0x8c0000, 0x8c001f).ram().w(this, FUNC(fuuki16_state::vregs_w)).share("vregs");                        // Video Registers
+	map(0x8d0000, 0x8d0003).ram().share("unknown");                                         //
+	map(0x8e0000, 0x8e0001).ram().share("priority");                                            //
+}
 
 
 /***************************************************************************
@@ -128,23 +129,25 @@ WRITE8_MEMBER(fuuki16_state::oki_banking_w)
 	m_oki->set_rom_bank((data & 6) >> 1);
 }
 
-ADDRESS_MAP_START(fuuki16_state::fuuki16_sound_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM         // ROM
-	AM_RANGE(0x6000, 0x7fff) AM_RAM         // RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")    // Banked ROM
-ADDRESS_MAP_END
+void fuuki16_state::fuuki16_sound_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();         // ROM
+	map(0x6000, 0x7fff).ram();         // RAM
+	map(0x8000, 0xffff).bankr("bank1");    // Banked ROM
+}
 
-ADDRESS_MAP_START(fuuki16_state::fuuki16_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sound_rombank_w)  // ROM Bank
-	AM_RANGE(0x11, 0x11) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP // From Main CPU / ? To Main CPU ?
-	AM_RANGE(0x20, 0x20) AM_WRITE(oki_banking_w)    // Oki Banking
-	AM_RANGE(0x30, 0x30) AM_WRITENOP    // ? In the NMI routine
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ym2", ym3812_device, read, write)
-	AM_RANGE(0x60, 0x60) AM_DEVREAD("oki", okim6295_device, read)   // M6295
-	AM_RANGE(0x61, 0x61) AM_DEVWRITE("oki", okim6295_device, write) // M6295
-ADDRESS_MAP_END
+void fuuki16_state::fuuki16_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(fuuki16_state::sound_rombank_w));  // ROM Bank
+	map(0x11, 0x11).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); // From Main CPU / ? To Main CPU ?
+	map(0x20, 0x20).w(this, FUNC(fuuki16_state::oki_banking_w));    // Oki Banking
+	map(0x30, 0x30).nopw();    // ? In the NMI routine
+	map(0x40, 0x41).w("ym1", FUNC(ym2203_device::write));
+	map(0x50, 0x51).rw("ym2", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x60, 0x60).r(m_oki, FUNC(okim6295_device::read));   // M6295
+	map(0x61, 0x61).w(m_oki, FUNC(okim6295_device::write)); // M6295
+}
 
 
 /***************************************************************************

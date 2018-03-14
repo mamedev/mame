@@ -60,12 +60,13 @@ uint32_t inteladv_state::screen_update_inteladv(screen_device &screen, bitmap_in
 	return 0;
 }
 
-ADDRESS_MAP_START(inteladv_state::inteladv_main)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM // zero page and stack
-	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("maincpu", 0x0000)    // boot code at 4000
-	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_REGION("maincpu", 0x8000)    // fixed ROM region?
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x3000)    // boot and other vectors at 3FFx
-ADDRESS_MAP_END
+void inteladv_state::inteladv_main(address_map &map)
+{
+	map(0x0000, 0x01ff).ram(); // zero page and stack
+	map(0x4000, 0x5fff).rom().region("maincpu", 0x0000);    // boot code at 4000
+	map(0x8000, 0x8fff).rom().region("maincpu", 0x8000);    // fixed ROM region?
+	map(0xf000, 0xffff).rom().region("maincpu", 0x3000);    // boot and other vectors at 3FFx
+}
 
 static INPUT_PORTS_START( inteladv )
 INPUT_PORTS_END

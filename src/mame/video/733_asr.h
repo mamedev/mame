@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "screen.h"
 #define asr733_chr_region ":gfx1"
 
 class asr733_device : public device_t, public device_gfx_interface
@@ -22,13 +23,13 @@ public:
 	DECLARE_READ8_MEMBER(cru_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
 
-	template <class Object> static devcb_base &static_set_keyint_callback(device_t &device, Object &&cb)
+	template <class Object> devcb_base &set_keyint_callback(Object &&cb)
 	{
-		return downcast<asr733_device &>(device).m_keyint_line.set_callback(std::forward<Object>(cb));
+		return m_keyint_line.set_callback(std::forward<Object>(cb));
 	}
-	template <class Object> static devcb_base &static_set_lineint_callback(device_t &device, Object &&cb)
+	template <class Object> devcb_base &set_lineint_callback(Object &&cb)
 	{
-		return downcast<asr733_device &>(device).m_lineint_line.set_callback(std::forward<Object>(cb));
+		return m_lineint_line.set_callback(std::forward<Object>(cb));
 	}
 
 protected:
@@ -59,6 +60,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	required_device<screen_device> m_screen;
+
 	emu_timer *m_line_timer;                // screen line timer
 
 	uint8_t   m_recv_buf;
@@ -83,9 +86,9 @@ private:
 DECLARE_DEVICE_TYPE(ASR733, asr733_device)
 
 #define MCFG_ASR733_KEYINT_HANDLER( _intcallb ) \
-	devcb = &asr733_device::static_set_keyint_callback( *device, DEVCB_##_intcallb );
+	devcb = &downcast<asr733_device &>(*device).set_keyint_callback(DEVCB_##_intcallb);
 
 #define MCFG_ASR733_LINEINT_HANDLER( _intcallb ) \
-	devcb = &asr733_device::static_set_lineint_callback( *device, DEVCB_##_intcallb );
+	devcb = &downcast<asr733_device &>(*device).set_lineint_callback(DEVCB_##_intcallb);
 
 #endif // MAME_VIDEO_733_ASR

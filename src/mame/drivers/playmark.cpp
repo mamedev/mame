@@ -261,154 +261,162 @@ WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
 
 /***************************** 68000 Memory Maps ****************************/
 
-ADDRESS_MAP_START(playmark_state::bigtwin_main_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x304000, 0x304001) AM_NOP             /* watchdog? irq ack? */
-	AM_RANGE(0x440000, 0x4403ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x500fff) AM_WRITE(wbeachvl_fgvideoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x501000, 0x501fff) AM_WRITENOP    /* unused RAM? */
-	AM_RANGE(0x502000, 0x503fff) AM_WRITE(wbeachvl_txvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x504000, 0x50ffff) AM_WRITENOP    /* unused RAM? */
-	AM_RANGE(0x510000, 0x51000b) AM_WRITE(bigtwin_scroll_w)
-	AM_RANGE(0x51000c, 0x51000d) AM_WRITENOP    /* always 3? */
-	AM_RANGE(0x600000, 0x67ffff) AM_RAM AM_SHARE("bgvideoram")
-	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
-	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("P2")
-	AM_RANGE(0x700016, 0x700017) AM_WRITE(coinctrl_w)
-	AM_RANGE(0x70001a, 0x70001b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("DSW1")
-	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x780000, 0x7807ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+void playmark_state::bigtwin_main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x304000, 0x304001).noprw();             /* watchdog? irq ack? */
+	map(0x440000, 0x4403ff).ram().share("spriteram");
+	map(0x500000, 0x500fff).w(this, FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
+	map(0x501000, 0x501fff).nopw();    /* unused RAM? */
+	map(0x502000, 0x503fff).w(this, FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
+	map(0x504000, 0x50ffff).nopw();    /* unused RAM? */
+	map(0x510000, 0x51000b).w(this, FUNC(playmark_state::bigtwin_scroll_w));
+	map(0x51000c, 0x51000d).nopw();    /* always 3? */
+	map(0x600000, 0x67ffff).ram().share("bgvideoram");
+	map(0x700010, 0x700011).portr("SYSTEM");
+	map(0x700012, 0x700013).portr("P1");
+	map(0x700014, 0x700015).portr("P2");
+	map(0x700016, 0x700017).w(this, FUNC(playmark_state::coinctrl_w));
+	map(0x70001a, 0x70001b).portr("DSW2");
+	map(0x70001c, 0x70001d).portr("DSW1");
+	map(0x70001e, 0x70001f).w(this, FUNC(playmark_state::playmark_snd_command_w));
+	map(0x780000, 0x7807ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 //  AM_RANGE(0xe00000, 0xe00001) ?? written on startup
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xff0000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(playmark_state::bigtwinb_main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_SHARE("videoram3")
-	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
-	AM_RANGE(0x201000, 0x2013ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
-	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")
-	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW1")
-	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x304000, 0x304001) AM_WRITENOP        /* watchdog? irq ack? */
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void playmark_state::bigtwinb_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x103fff).ram().w(this, FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
+	map(0x104000, 0x107fff).ram().w(this, FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
+	map(0x108000, 0x10ffff).ram().w(this, FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
+	map(0x110000, 0x11000d).w(this, FUNC(playmark_state::hrdtimes_scroll_w));
+	map(0x201000, 0x2013ff).ram().share("spriteram");
+	map(0x280000, 0x2807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x300010, 0x300011).portr("SYSTEM");
+	map(0x300012, 0x300013).portr("P1");
+	map(0x300014, 0x300015).portr("P2");
+	map(0x30001a, 0x30001b).portr("DSW2");
+	map(0x30001c, 0x30001d).portr("DSW1");
+	map(0x30001e, 0x30001f).w(this, FUNC(playmark_state::playmark_snd_command_w));
+	map(0x304000, 0x304001).nopw();        /* watchdog? irq ack? */
+	map(0xff0000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(playmark_state::wbeachvl_main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(wbeachvl_bgvideoram_w) AM_SHARE("videoram3")
-	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(wbeachvl_fgvideoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x508000, 0x509fff) AM_RAM_WRITE(wbeachvl_txvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x50f000, 0x50ffff) AM_RAM AM_SHARE("rowscroll")
-	AM_RANGE(0x510000, 0x51000b) AM_WRITE(wbeachvl_scroll_w)
-	AM_RANGE(0x51000c, 0x51000d) AM_WRITENOP    /* 2 and 3 */
+void playmark_state::wbeachvl_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x440000, 0x440fff).ram().share("spriteram");
+	map(0x500000, 0x501fff).ram().w(this, FUNC(playmark_state::wbeachvl_bgvideoram_w)).share("videoram3");
+	map(0x504000, 0x505fff).ram().w(this, FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
+	map(0x508000, 0x509fff).ram().w(this, FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
+	map(0x50f000, 0x50ffff).ram().share("rowscroll");
+	map(0x510000, 0x51000b).w(this, FUNC(playmark_state::wbeachvl_scroll_w));
+	map(0x51000c, 0x51000d).nopw();    /* 2 and 3 */
 //  AM_RANGE(0x700000, 0x700001) ?? written on startup
-	AM_RANGE(0x710010, 0x710011) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x710012, 0x710013) AM_READ_PORT("P1")
-	AM_RANGE(0x710014, 0x710015) AM_READ_PORT("P2")
-	AM_RANGE(0x710016, 0x710017) AM_WRITE(wbeachvl_coin_eeprom_w)
-	AM_RANGE(0x710018, 0x710019) AM_READ_PORT("P3")
-	AM_RANGE(0x71001a, 0x71001b) AM_READ_PORT("P4")
+	map(0x710010, 0x710011).portr("SYSTEM");
+	map(0x710012, 0x710013).portr("P1");
+	map(0x710014, 0x710015).portr("P2");
+	map(0x710016, 0x710017).w(this, FUNC(playmark_state::wbeachvl_coin_eeprom_w));
+	map(0x710018, 0x710019).portr("P3");
+	map(0x71001a, 0x71001b).portr("P4");
 //  AM_RANGE(0x71001c, 0x71001d) AM_READ(playmark_snd_status???)
-	AM_RANGE(0x71001e, 0x71001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x780000, 0x780fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x71001e, 0x71001f).w(this, FUNC(playmark_state::playmark_snd_command_w));
+	map(0x780000, 0x780fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xff0000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(playmark_state::excelsr_main_map)
-	AM_RANGE(0x000000, 0x2fffff) AM_ROM
-	AM_RANGE(0x304000, 0x304001) AM_WRITENOP                /* watchdog? irq ack? */
-	AM_RANGE(0x440000, 0x440cff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(wbeachvl_fgvideoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(wbeachvl_txvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x510000, 0x51000b) AM_WRITE(excelsr_scroll_w)
-	AM_RANGE(0x51000c, 0x51000d) AM_WRITENOP    /* 2 and 3 */
-	AM_RANGE(0x600000, 0x67ffff) AM_RAM AM_SHARE("bgvideoram")
-	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
-	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("P2")
-	AM_RANGE(0x700016, 0x700017) AM_WRITE(coinctrl_w)
-	AM_RANGE(0x70001a, 0x70001b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("DSW1")
-	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x780000, 0x7807ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void playmark_state::excelsr_main_map(address_map &map)
+{
+	map(0x000000, 0x2fffff).rom();
+	map(0x304000, 0x304001).nopw();                /* watchdog? irq ack? */
+	map(0x440000, 0x440cff).ram().share("spriteram");
+	map(0x500000, 0x500fff).ram().w(this, FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
+	map(0x501000, 0x501fff).ram().w(this, FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
+	map(0x510000, 0x51000b).w(this, FUNC(playmark_state::excelsr_scroll_w));
+	map(0x51000c, 0x51000d).nopw();    /* 2 and 3 */
+	map(0x600000, 0x67ffff).ram().share("bgvideoram");
+	map(0x700010, 0x700011).portr("SYSTEM");
+	map(0x700012, 0x700013).portr("P1");
+	map(0x700014, 0x700015).portr("P2");
+	map(0x700016, 0x700017).w(this, FUNC(playmark_state::coinctrl_w));
+	map(0x70001a, 0x70001b).portr("DSW2");
+	map(0x70001c, 0x70001d).portr("DSW1");
+	map(0x70001e, 0x70001f).w(this, FUNC(playmark_state::playmark_snd_command_w));
+	map(0x780000, 0x7807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xff0000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(playmark_state::hrdtimes_main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0bffff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0x0c0000)
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_SHARE("videoram3") // 32*32?
-	AM_RANGE(0x100800, 0x103fff) AM_RAM
-	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_SHARE("videoram2") // 128*32?
-	AM_RANGE(0x106000, 0x107fff) AM_RAM
-	AM_RANGE(0x108000, 0x109fff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1") // 64*64?
-	AM_RANGE(0x10a000, 0x10bfff) AM_RAM
-	AM_RANGE(0x10c000, 0x10ffff) AM_RAM // Unused
-	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x280800, 0x280fff) AM_RAM // Unused
-	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
-	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")
-	AM_RANGE(0x300016, 0x300017) AM_WRITE(hrdtimes_coin_w)
-	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW1")
+void playmark_state::hrdtimes_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x0bffff).ram();
+	map(0x0c0000, 0x0fffff).rom().region("maincpu", 0x0c0000);
+	map(0x100000, 0x1007ff).ram().w(this, FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3"); // 32*32?
+	map(0x100800, 0x103fff).ram();
+	map(0x104000, 0x105fff).ram().w(this, FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2"); // 128*32?
+	map(0x106000, 0x107fff).ram();
+	map(0x108000, 0x109fff).ram().w(this, FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1"); // 64*64?
+	map(0x10a000, 0x10bfff).ram();
+	map(0x10c000, 0x10ffff).ram(); // Unused
+	map(0x110000, 0x11000d).w(this, FUNC(playmark_state::hrdtimes_scroll_w));
+	map(0x200000, 0x200fff).ram().share("spriteram");
+	map(0x280000, 0x2807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x280800, 0x280fff).ram(); // Unused
+	map(0x300010, 0x300011).portr("SYSTEM");
+	map(0x300012, 0x300013).portr("P1");
+	map(0x300014, 0x300015).portr("P2");
+	map(0x300016, 0x300017).w(this, FUNC(playmark_state::hrdtimes_coin_w));
+	map(0x30001a, 0x30001b).portr("DSW2");
+	map(0x30001c, 0x30001d).portr("DSW1");
 //  AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x304000, 0x304001) AM_WRITENOP        /* watchdog? irq ack? */
-ADDRESS_MAP_END
+	map(0x304000, 0x304001).nopw();        /* watchdog? irq ack? */
+}
 
-ADDRESS_MAP_START(playmark_state::hotmind_main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_SHARE("videoram3")
-	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("COINS")
-	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
-	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("DISPENSER") AM_WRITE(hotmind_coin_eeprom_w)
-	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW1")
-	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x304000, 0x304001) AM_WRITENOP        /* watchdog? irq ack? */
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void playmark_state::hotmind_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x103fff).ram().w(this, FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
+	map(0x104000, 0x107fff).ram().w(this, FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
+	map(0x108000, 0x10ffff).ram().w(this, FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
+	map(0x110000, 0x11000d).w(this, FUNC(playmark_state::hrdtimes_scroll_w));
+	map(0x200000, 0x200fff).ram().share("spriteram");
+	map(0x280000, 0x2807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x300010, 0x300011).portr("COINS");
+	map(0x300012, 0x300013).portr("P1");
+	map(0x300014, 0x300015).portr("DISPENSER").w(this, FUNC(playmark_state::hotmind_coin_eeprom_w));
+	map(0x30001a, 0x30001b).portr("DSW2");
+	map(0x30001c, 0x30001d).portr("DSW1");
+	map(0x30001e, 0x30001f).w(this, FUNC(playmark_state::playmark_snd_command_w));
+	map(0x304000, 0x304001).nopw();        /* watchdog? irq ack? */
+	map(0xff0000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(playmark_state::luckboomh_main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_SHARE("videoram3")
-	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("COINS")
-	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
-	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("DISPENSER") AM_WRITE(luckboomh_dispenser_w)
-	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
-	AM_RANGE(0x304000, 0x304001) AM_WRITENOP        /* watchdog? irq ack? */
-	AM_RANGE(0xff0000, 0xff03ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xff8000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void playmark_state::luckboomh_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x103fff).ram().w(this, FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
+	map(0x104000, 0x107fff).ram().w(this, FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
+	map(0x108000, 0x10ffff).ram().w(this, FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
+	map(0x110000, 0x11000d).w(this, FUNC(playmark_state::hrdtimes_scroll_w));
+	map(0x200000, 0x200fff).ram().share("spriteram");
+	map(0x280000, 0x2807ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x300010, 0x300011).portr("COINS");
+	map(0x300012, 0x300013).portr("P1");
+	map(0x300014, 0x300015).portr("DISPENSER").w(this, FUNC(playmark_state::luckboomh_dispenser_w));
+	map(0x30001c, 0x30001d).portr("SERVICE");
+	map(0x30001e, 0x30001f).w(this, FUNC(playmark_state::playmark_snd_command_w));
+	map(0x304000, 0x304001).nopw();        /* watchdog? irq ack? */
+	map(0xff0000, 0xff03ff).ram().share("nvram");
+	map(0xff8000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(playmark_state::oki_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void playmark_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
+}
 
 
 #define PLAYMARK_COINS \

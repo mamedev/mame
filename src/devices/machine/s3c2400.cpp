@@ -179,8 +179,9 @@ DEFINE_DEVICE_TYPE(S3C2400, s3c2400_device, "s3c2400", "Samsung S3C2400 SoC")
 
 s3c2400_device::s3c2400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, S3C2400, tag, owner, clock)
-	, m_palette(*this, finder_base::DUMMY_TAG)
 	, m_cpu(*this, ":maincpu")
+	, m_palette(*this, finder_base::DUMMY_TAG)
+	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_pin_r_cb(*this)
 	, m_pin_w_cb(*this)
 	, m_port_r_cb(*this)
@@ -214,16 +215,6 @@ s3c2400_device::s3c2400_device(const machine_config &mconfig, const char *tag, d
 
 s3c2400_device::~s3c2400_device()
 {
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void s3c2400_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<s3c2400_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------

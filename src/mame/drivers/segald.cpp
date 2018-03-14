@@ -253,28 +253,30 @@ WRITE8_MEMBER(segald_state::astron_io_bankswitch_w)
 
 
 /* PROGRAM MAP */
-ADDRESS_MAP_START(segald_state::mainmem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+void segald_state::mainmem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
 
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(astron_OBJ_read, astron_OBJ_write) AM_SHARE("obj_ram")    /* OBJ according to the schematics (sprite) */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(astron_DISC_read, astron_DISC_write)                  /* DISC interface according to schematics */
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")                               /* SW bank 2 (DIPs) */
-	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")                               /* SW bank 3 (DIPs) */
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")                                /* SW bank 0 (IO) */
-	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("IN1")                                /* SW bank 1 (IO) */
-	AM_RANGE(0xd800, 0xd803) AM_READWRITE(astron_OUT_read, astron_OUT_write) AM_SHARE("out_ram")    /* OUT according to schematics (output port) */
-	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(astron_COLOR_read, astron_COLOR_write) AM_SHARE("color_ram") /* COLOR according to the schematics */
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(astron_FIX_write) AM_SHARE("fix_ram")                     /* FIX according to schematics (characters) */
-	AM_RANGE(0xf800, 0xffff) AM_RAM                                                             /* RAM according to schematics */
-ADDRESS_MAP_END
+	map(0xc000, 0xc7ff).rw(this, FUNC(segald_state::astron_OBJ_read), FUNC(segald_state::astron_OBJ_write)).share("obj_ram");    /* OBJ according to the schematics (sprite) */
+	map(0xc800, 0xcfff).rw(this, FUNC(segald_state::astron_DISC_read), FUNC(segald_state::astron_DISC_write));                  /* DISC interface according to schematics */
+	map(0xd000, 0xd000).portr("DSWA");                               /* SW bank 2 (DIPs) */
+	map(0xd001, 0xd001).portr("DSWB");                               /* SW bank 3 (DIPs) */
+	map(0xd002, 0xd002).portr("IN0");                                /* SW bank 0 (IO) */
+	map(0xd003, 0xd003).portr("IN1");                                /* SW bank 1 (IO) */
+	map(0xd800, 0xd803).rw(this, FUNC(segald_state::astron_OUT_read), FUNC(segald_state::astron_OUT_write)).share("out_ram");    /* OUT according to schematics (output port) */
+	map(0xe000, 0xe1ff).rw(this, FUNC(segald_state::astron_COLOR_read), FUNC(segald_state::astron_COLOR_write)).share("color_ram"); /* COLOR according to the schematics */
+	map(0xf000, 0xf7ff).w(this, FUNC(segald_state::astron_FIX_write)).share("fix_ram");                     /* FIX according to schematics (characters) */
+	map(0xf800, 0xffff).ram();                                                             /* RAM according to schematics */
+}
 
 
 /* I/O MAP */
-ADDRESS_MAP_START(segald_state::mainport)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(astron_io_bankswitch_w)
-ADDRESS_MAP_END
+void segald_state::mainport(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(this, FUNC(segald_state::astron_io_bankswitch_w));
+}
 
 
 /* PORTS */

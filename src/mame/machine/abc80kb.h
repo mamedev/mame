@@ -25,7 +25,7 @@
 //**************************************************************************
 
 #define MCFG_ABC80_KEYBOARD_KEYDOWN_CALLBACK(_write) \
-	devcb = &abc80_keyboard_device::set_keydown_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<abc80_keyboard_device &>(*device).set_keydown_wr_callback(DEVCB_##_write);
 
 
 
@@ -41,7 +41,7 @@ public:
 	// construction/destruction
 	abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_keydown_wr_callback(device_t &device, _Object object) { return downcast<abc80_keyboard_device &>(device).m_write_keydown.set_callback(object); }
+	template <class Object> devcb_base &set_keydown_wr_callback(Object &&cb) { return m_write_keydown.set_callback(std::forward<Object>(cb)); }
 
 	uint8_t data_r();
 

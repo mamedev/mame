@@ -4,7 +4,7 @@
 
 /*
 Notes:
-- fa/fghtatck: Global screen window effect cut one line from top/bottom of screen, especially noticeable with credit display. 
+- fa/fghtatck: Global screen window effect cut one line from top/bottom of screen, especially noticeable with credit display.
   It's a btanb according to a PCB video I've seen -AS.
 
 TODO:
@@ -441,7 +441,7 @@ void namcona1_state::draw_pixel_line( const rectangle &cliprect, uint16_t *pDest
 {
 	int x;
 	for( x=0; x<38*8; x+=2 )
-	{			
+	{
 		uint16_t data = *pSource++;
 		pPri[x+0] = 0xff;
 		pPri[x+1] = 0xff;
@@ -511,10 +511,10 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 			{
 				// TODO: not convinced about this trigger
 				if( xdata == 0xc001 )
-				{						
+				{
 				   /* This is a simplification, but produces the correct behavior for the only game that uses this
-					* feature, Numan Athletics.
-					*/
+				    * feature, Numan Athletics.
+				    */
 					// TODO: with this it breaks colors in VS Express event, likely pal bank is somewhere else in this mode, assuming it has one anyway?
 					//const pen_t *paldata = &m_palette->pen(m_bg_tilemap[which]->palette_offset());
 					const pen_t *paldata = &m_palette->pen(0);
@@ -543,10 +543,10 @@ bool namcona1_state::screen_enabled(const rectangle &cliprect)
 
 	if(cliprect.max_x < 0)
 		return false;
-	
+
 	if(cliprect.min_x > cliprect.max_x)
 		return false;
-	
+
 	if(cliprect.min_y > cliprect.max_y)
 		return false;
 
@@ -557,7 +557,7 @@ uint32_t namcona1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	int which;
 	int priority;
-	// CRTC visible area parameters 
+	// CRTC visible area parameters
 	// (used mostly by Numan Athletics for global screen window effects, cfr. start of events/title screen to demo mode transitions)
 	rectangle display_rect;
 	display_rect.min_x = m_vreg[0x80/2]-0x48;
@@ -570,7 +570,7 @@ uint32_t namcona1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	screen.priority().fill(0, cliprect );
 
 	// guess for X-Day 2 (flames in attract), seems wrong for Emeraldia but unsure
-//	bitmap.fill(0xff, cliprect ); /* background color? */
+//  bitmap.fill(0xff, cliprect ); /* background color? */
 	bitmap.fill((m_vreg[0xba/2] & 0xf) * 256, cliprect );
 
 	if( m_vreg[0x8e/2] && screen_enabled(display_rect) == true )

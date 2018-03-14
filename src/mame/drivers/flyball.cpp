@@ -23,8 +23,8 @@ TODO:
 #include "machine/74259.h"
 #include "screen.h"
 
-#define MASTER_CLOCK    XTAL(12'096'000)
-#define PIXEL_CLOCK     (MASTER_CLOCK / 2)
+static constexpr XTAL MASTER_CLOCK  = 12.096_MHz_XTAL;
+static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 2;
 
 
 class flyball_state : public driver_device
@@ -37,41 +37,19 @@ public:
 		TIMER_QUARTER
 	};
 
-	flyball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	flyball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_outlatch(*this, "outlatch"),
-		m_playfield_ram(*this, "playfield_ram") { }
+		m_playfield_ram(*this, "playfield_ram")
+	{ }
 
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<f9334_device> m_outlatch;
+	void flyball(machine_config &config);
 
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_playfield_ram;
-
-	/* video-related */
-	tilemap_t  *m_tmap;
-	uint8_t    m_pitcher_vert;
-	uint8_t    m_pitcher_horz;
-	uint8_t    m_pitcher_pic;
-	uint8_t    m_ball_vert;
-	uint8_t    m_ball_horz;
-
-	/* misc */
-	uint8_t    m_potmask;
-	uint8_t    m_potsense;
-
-	emu_timer *m_pot_assert_timer[64];
-	emu_timer *m_pot_clear_timer;
-	emu_timer *m_quarter_timer;
-
+protected:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(scanline_r);
 	DECLARE_READ8_MEMBER(potsense_r);
@@ -97,10 +75,35 @@ public:
 	TIMER_CALLBACK_MEMBER(joystick_callback);
 	TIMER_CALLBACK_MEMBER(quarter_callback);
 
-	void flyball(machine_config &config);
 	void flyball_map(address_map &map);
-protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<f9334_device> m_outlatch;
+
+	/* memory pointers */
+	required_shared_ptr<uint8_t> m_playfield_ram;
+
+	/* video-related */
+	tilemap_t  *m_tmap;
+	uint8_t    m_pitcher_vert;
+	uint8_t    m_pitcher_horz;
+	uint8_t    m_pitcher_pic;
+	uint8_t    m_ball_vert;
+	uint8_t    m_ball_horz;
+
+	/* misc */
+	uint8_t    m_potmask;
+	uint8_t    m_potsense;
+
+	emu_timer *m_pot_assert_timer[64];
+	emu_timer *m_pot_clear_timer;
+	emu_timer *m_quarter_timer;
 };
 
 
@@ -295,23 +298,24 @@ WRITE_LINE_MEMBER(flyball_state::lamp_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(flyball_state::flyball_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x100) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_NOP
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(pitcher_pic_w)
-	AM_RANGE(0x0802, 0x0802) AM_READ(scanline_r)
-	AM_RANGE(0x0803, 0x0803) AM_READ(potsense_r)
-	AM_RANGE(0x0804, 0x0804) AM_WRITE(ball_vert_w)
-	AM_RANGE(0x0805, 0x0805) AM_WRITE(ball_horz_w)
-	AM_RANGE(0x0806, 0x0806) AM_WRITE(pitcher_vert_w)
-	AM_RANGE(0x0807, 0x0807) AM_WRITE(pitcher_horz_w)
-	AM_RANGE(0x0900, 0x0900) AM_WRITE(potmask_w)
-	AM_RANGE(0x0a00, 0x0a07) AM_WRITE(misc_w)
-	AM_RANGE(0x0b00, 0x0b00) AM_READ(input_r)
-	AM_RANGE(0x0d00, 0x0eff) AM_WRITEONLY AM_SHARE("playfield_ram")
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void flyball_state::flyball_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x00ff).mirror(0x100).ram();
+	map(0x0800, 0x0800).noprw();
+	map(0x0801, 0x0801).w(this, FUNC(flyball_state::pitcher_pic_w));
+	map(0x0802, 0x0802).r(this, FUNC(flyball_state::scanline_r));
+	map(0x0803, 0x0803).r(this, FUNC(flyball_state::potsense_r));
+	map(0x0804, 0x0804).w(this, FUNC(flyball_state::ball_vert_w));
+	map(0x0805, 0x0805).w(this, FUNC(flyball_state::ball_horz_w));
+	map(0x0806, 0x0806).w(this, FUNC(flyball_state::pitcher_vert_w));
+	map(0x0807, 0x0807).w(this, FUNC(flyball_state::pitcher_horz_w));
+	map(0x0900, 0x0900).w(this, FUNC(flyball_state::potmask_w));
+	map(0x0a00, 0x0a07).w(this, FUNC(flyball_state::misc_w));
+	map(0x0b00, 0x0b00).r(this, FUNC(flyball_state::input_r));
+	map(0x0d00, 0x0eff).writeonly().share("playfield_ram");
+	map(0x1000, 0x1fff).rom().region("maincpu", 0);
+}
 
 
 /*************************************

@@ -285,37 +285,40 @@ WRITE8_MEMBER(sangho_state::sec_slot_w)
 }
 
 
-ADDRESS_MAP_START(sangho_state::sangho_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
-	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
-	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
-	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
-ADDRESS_MAP_END
+void sangho_state::sangho_map(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank1").bankw("bank5");
+	map(0x4000, 0x7fff).bankr("bank2").bankw("bank6");
+	map(0x8000, 0xbfff).bankr("bank3").bankw("bank7");
+	map(0xc000, 0xffff).bankr("bank4").bankw("bank8");
+}
 
 /* Puzzle Star Ports */
 
-ADDRESS_MAP_START(sangho_state::pzlestar_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE( 0x91, 0x91) AM_WRITE(pzlestar_bank_w )
-	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE("v9958", v9958_device, read, write )
-	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
-	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
-	AM_RANGE( 0xa8, 0xa8) AM_READWRITE(pzlestar_mem_bank_r, pzlestar_mem_bank_w )
-	AM_RANGE( 0xf7, 0xf7) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+void sangho_state::pzlestar_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7c, 0x7d).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x91, 0x91).w(this, FUNC(sangho_state::pzlestar_bank_w));
+	map(0x98, 0x9b).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
+	map(0xa0, 0xa0).portr("P1");
+	map(0xa1, 0xa1).portr("P2");
+	map(0xa8, 0xa8).rw(this, FUNC(sangho_state::pzlestar_mem_bank_r), FUNC(sangho_state::pzlestar_mem_bank_w));
+	map(0xf7, 0xf7).portr("DSW");
+}
 
 /* Sexy Boom Ports */
 
-ADDRESS_MAP_START(sangho_state::sexyboom_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
-	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
-	AM_RANGE( 0xf0, 0xf3) AM_DEVREADWRITE("v9958", v9958_device, read, write )
-	AM_RANGE( 0xf7, 0xf7) AM_READ_PORT("DSW")
-	AM_RANGE( 0xf8, 0xff) AM_WRITE(sexyboom_bank_w )
-ADDRESS_MAP_END
+void sangho_state::sexyboom_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7c, 0x7d).w("ymsnd", FUNC(ym2413_device::write));
+	map(0xa0, 0xa0).portr("P1");
+	map(0xa1, 0xa1).portr("P2");
+	map(0xf0, 0xf3).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
+	map(0xf7, 0xf7).portr("DSW");
+	map(0xf8, 0xff).w(this, FUNC(sangho_state::sexyboom_bank_w));
+}
 
 static INPUT_PORTS_START( sexyboom )
 	PORT_START("P1")

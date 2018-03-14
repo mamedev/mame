@@ -148,9 +148,10 @@ static const uint8_t text_bitmap[0x40][7] =
 //  PR-8210 ROM AND MACHINE INTERFACES
 //**************************************************************************
 
-ADDRESS_MAP_START(pioneer_pr8210_device::pr8210_portmap)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(i8049_pia_r, i8049_pia_w)
-ADDRESS_MAP_END
+void pioneer_pr8210_device::pr8210_portmap(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(pioneer_pr8210_device::i8049_pia_r), FUNC(pioneer_pr8210_device::i8049_pia_w));
+}
 
 ROM_START( pr8210 )
 	ROM_REGION( 0x800, "pr8210", 0 )
@@ -837,9 +838,10 @@ void pioneer_pr8210_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, 
 //  SIMUTREK ROM AND MACHINE INTERFACES
 //**************************************************************************
 
-ADDRESS_MAP_START(simutrek_special_device::simutrek_portmap)
-	AM_RANGE(0x00, 0xff) AM_READ(i8748_data_r)
-ADDRESS_MAP_END
+void simutrek_special_device::simutrek_portmap(address_map &map)
+{
+	map(0x00, 0xff).r(this, FUNC(simutrek_special_device::i8748_data_r));
+}
 
 
 ROM_START( simutrek )

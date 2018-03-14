@@ -71,26 +71,28 @@ READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 	return (m_ym2151->status_r(space, 0) & ~0x30) | ioport("IN0")->read();
 }
 
-ADDRESS_MAP_START(amspdwy_state::amspdwy_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x801f) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM // unused?
+void amspdwy_state::amspdwy_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x801f).w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(amspdwy_state::amspdwy_videoram_w)).share("videoram");
+	map(0x9800, 0x9bff).ram().w(this, FUNC(amspdwy_state::amspdwy_colorram_w)).share("colorram");
+	map(0x9c00, 0x9fff).ram(); // unused?
 //  AM_RANGE(0xa000, 0xa000) AM_WRITENOP // ?
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW2") AM_WRITE(amspdwy_flipscreen_w)
-	AM_RANGE(0xa800, 0xa800) AM_READ(amspdwy_wheel_0_r)
-	AM_RANGE(0xac00, 0xac00) AM_READ(amspdwy_wheel_1_r)
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP // irq ack?
-	AM_RANGE(0xb400, 0xb400) AM_READ(amspdwy_sound_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+	map(0xa000, 0xa000).portr("DSW1");
+	map(0xa400, 0xa400).portr("DSW2").w(this, FUNC(amspdwy_state::amspdwy_flipscreen_w));
+	map(0xa800, 0xa800).r(this, FUNC(amspdwy_state::amspdwy_wheel_0_r));
+	map(0xac00, 0xac00).r(this, FUNC(amspdwy_state::amspdwy_wheel_1_r));
+	map(0xb000, 0xb000).nopw(); // irq ack?
+	map(0xb400, 0xb400).r(this, FUNC(amspdwy_state::amspdwy_sound_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xc000, 0xc0ff).ram().share("spriteram");
+	map(0xe000, 0xe7ff).ram();
+}
 
-ADDRESS_MAP_START(amspdwy_state::amspdwy_portmap)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("tracks", 0)
-ADDRESS_MAP_END
+void amspdwy_state::amspdwy_portmap(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("tracks", 0);
+}
 
 
 
@@ -102,14 +104,15 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(amspdwy_state::amspdwy_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+void amspdwy_state::amspdwy_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 //  AM_RANGE(0x8000, 0x8000) AM_WRITENOP // ? writes 0 at start
-	AM_RANGE(0x9000, 0x9000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xffff, 0xffff) AM_READNOP // ??? IY = FFFF at the start ?
-ADDRESS_MAP_END
+	map(0x9000, 0x9000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xa000, 0xa001).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xc000, 0xdfff).ram();
+	map(0xffff, 0xffff).nopr(); // ??? IY = FFFF at the start ?
+}
 
 
 

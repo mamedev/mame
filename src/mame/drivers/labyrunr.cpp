@@ -46,27 +46,28 @@ WRITE8_MEMBER(labyrunr_state::labyrunr_bankswitch_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x10);
 }
 
-ADDRESS_MAP_START(labyrunr_state::labyrunr_map)
-	AM_RANGE(0x0000, 0x0007) AM_DEVWRITE("k007121", k007121_device, ctrl_w)
-	AM_RANGE(0x0020, 0x005f) AM_RAM AM_SHARE("scrollram")
-	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("ym1", ym2203_device, read_port_r, write_port_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("ym1", ym2203_device, status_port_r, control_port_w)
-	AM_RANGE(0x0900, 0x0900) AM_DEVREADWRITE("ym2", ym2203_device, read_port_r, write_port_w)
-	AM_RANGE(0x0901, 0x0901) AM_DEVREADWRITE("ym2", ym2203_device, status_port_r, control_port_w)
-	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("P2")
-	AM_RANGE(0x0a01, 0x0a01) AM_READ_PORT("P1")
-	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(labyrunr_bankswitch_w)
-	AM_RANGE(0x0d00, 0x0d1f) AM_DEVREADWRITE("k051733", k051733_device, read, write)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1000, 0x10ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
-	AM_RANGE(0x1800, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(labyrunr_vram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(labyrunr_vram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void labyrunr_state::labyrunr_map(address_map &map)
+{
+	map(0x0000, 0x0007).w(m_k007121, FUNC(k007121_device::ctrl_w));
+	map(0x0020, 0x005f).ram().share("scrollram");
+	map(0x0800, 0x0800).rw("ym1", FUNC(ym2203_device::read_port_r), FUNC(ym2203_device::write_port_w));
+	map(0x0801, 0x0801).rw("ym1", FUNC(ym2203_device::status_port_r), FUNC(ym2203_device::control_port_w));
+	map(0x0900, 0x0900).rw("ym2", FUNC(ym2203_device::read_port_r), FUNC(ym2203_device::write_port_w));
+	map(0x0901, 0x0901).rw("ym2", FUNC(ym2203_device::status_port_r), FUNC(ym2203_device::control_port_w));
+	map(0x0a00, 0x0a00).portr("P2");
+	map(0x0a01, 0x0a01).portr("P1");
+	map(0x0b00, 0x0b00).portr("SYSTEM");
+	map(0x0c00, 0x0c00).w(this, FUNC(labyrunr_state::labyrunr_bankswitch_w));
+	map(0x0d00, 0x0d1f).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));
+	map(0x0e00, 0x0e00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1000, 0x10ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
+	map(0x1800, 0x1fff).ram();
+	map(0x2000, 0x2fff).ram().share("spriteram");
+	map(0x3000, 0x37ff).ram().w(this, FUNC(labyrunr_state::labyrunr_vram1_w)).share("videoram1");
+	map(0x3800, 0x3fff).ram().w(this, FUNC(labyrunr_state::labyrunr_vram2_w)).share("videoram2");
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom();
+}
 
 
 /***************************************************************************

@@ -36,7 +36,6 @@ public:
 	// construction/destruction
 	serial_box_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void serial_box_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -53,6 +52,8 @@ protected:
 
 private:
 	required_device<m65c02_device> m_maincpu;
+
+	void serial_box_mem(address_map &map);
 };
 
 

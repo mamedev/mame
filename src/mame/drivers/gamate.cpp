@@ -116,19 +116,20 @@ READ8_MEMBER(gamate_state::read_cart)
 	return m_cartslot->read_cart(space, offset);
 }
 
-ADDRESS_MAP_START(gamate_state::gamate_mem)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x03f0) AM_READWRITE(sound_r,sound_w)
-	AM_RANGE(0x4400, 0x4400) AM_MIRROR(0x03ff) AM_READ_PORT("JOY")
-	AM_RANGE(0x4800, 0x4800) AM_MIRROR(0x03ff) AM_READ(gamate_nmi_r)
-	AM_RANGE(0x5000, 0x5007) AM_MIRROR(0x03f8) AM_DEVICE("video", gamate_video_device, regs_map)
-	AM_RANGE(0x5800, 0x5800) AM_READ(card_available_set)
-	AM_RANGE(0x5900, 0x5900) AM_WRITE(card_reset)
-	AM_RANGE(0x5a00, 0x5a00) AM_READ(card_available_check)
-	AM_RANGE(0x6000, 0xdfff) AM_READWRITE(read_cart, write_cart)
+void gamate_state::gamate_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x1c00).ram();
+	map(0x4000, 0x400f).mirror(0x03f0).rw(this, FUNC(gamate_state::sound_r), FUNC(gamate_state::sound_w));
+	map(0x4400, 0x4400).mirror(0x03ff).portr("JOY");
+	map(0x4800, 0x4800).mirror(0x03ff).r(this, FUNC(gamate_state::gamate_nmi_r));
+	map(0x5000, 0x5007).mirror(0x03f8).m("video", FUNC(gamate_video_device::regs_map));
+	map(0x5800, 0x5800).r(this, FUNC(gamate_state::card_available_set));
+	map(0x5900, 0x5900).w(this, FUNC(gamate_state::card_reset));
+	map(0x5a00, 0x5a00).r(this, FUNC(gamate_state::card_available_check));
+	map(0x6000, 0xdfff).rw(this, FUNC(gamate_state::read_cart), FUNC(gamate_state::write_cart));
 
-	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM AM_SHARE("bios") AM_REGION("maincpu",0)
-ADDRESS_MAP_END
+	map(0xe000, 0xefff).mirror(0x1000).rom().share("bios").region("maincpu", 0);
+}
 
 
 static INPUT_PORTS_START( gamate )

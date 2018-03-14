@@ -393,6 +393,8 @@ void system1_state::machine_start()
 	save_item(NAME(m_videomode_prev));
 	save_item(NAME(m_mcu_control));
 	save_item(NAME(m_nob_maincpu_latch));
+	save_item(NAME(m_nob_mcu_latch));
+	save_item(NAME(m_nob_mcu_status));
 }
 
 
@@ -657,15 +659,30 @@ TIMER_DEVICE_CALLBACK_MEMBER(system1_state::mcu_t0_callback)
  *
  *************************************/
 
+READ8_MEMBER(system1_state::nob_mcu_latch_r)
+{
+	return m_nob_mcu_latch;
+}
+
+WRITE8_MEMBER(system1_state::nob_mcu_latch_w)
+{
+	m_nob_mcu_latch = data;
+}
+
+WRITE8_MEMBER(system1_state::nob_mcu_status_w)
+{
+	m_nob_mcu_status = data;
+}
+
 WRITE8_MEMBER(system1_state::nob_mcu_control_p2_w)
 {
 	/* bit 0 triggers a read from MCU port 0 */
 	if (((m_mcu_control ^ data) & 0x01) && !(data & 0x01))
-		*m_nob_mcu_latch = m_nob_maincpu_latch;
+		m_nob_mcu_latch = m_nob_maincpu_latch;
 
 	/* bit 1 triggers a write from MCU port 0 */
 	if (((m_mcu_control ^ data) & 0x02) && !(data & 0x02))
-		m_nob_maincpu_latch = *m_nob_mcu_latch;
+		m_nob_maincpu_latch = m_nob_mcu_latch;
 
 	/* bit 2 is toggled once near the end of an IRQ */
 	if (((m_mcu_control ^ data) & 0x04) && !(data & 0x04))
@@ -697,7 +714,7 @@ WRITE8_MEMBER(system1_state::nob_maincpu_latch_w)
 
 READ8_MEMBER(system1_state::nob_mcu_status_r)
 {
-	return *m_nob_mcu_status;
+	return m_nob_mcu_status;
 }
 
 
@@ -741,72 +758,78 @@ WRITE8_MEMBER(system1_state::nobb_outport24_w)
  *************************************/
 
 /* main memory map */
-ADDRESS_MAP_START(system1_state::system1_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(system1_videoram_r, system1_videoram_w)
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(system1_mixer_collision_r, system1_mixer_collision_w)
-	AM_RANGE(0xf400, 0xf7ff) AM_WRITE(system1_mixer_collision_reset_w)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(system1_sprite_collision_r, system1_sprite_collision_w)
-	AM_RANGE(0xfc00, 0xffff) AM_WRITE(system1_sprite_collision_reset_w)
-ADDRESS_MAP_END
+void system1_state::system1_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram().share("ram");
+	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(system1_state::system1_paletteram_w)).share("palette");
+	map(0xe000, 0xefff).rw(this, FUNC(system1_state::system1_videoram_r), FUNC(system1_state::system1_videoram_w));
+	map(0xf000, 0xf3ff).rw(this, FUNC(system1_state::system1_mixer_collision_r), FUNC(system1_state::system1_mixer_collision_w));
+	map(0xf400, 0xf7ff).w(this, FUNC(system1_state::system1_mixer_collision_reset_w));
+	map(0xf800, 0xfbff).rw(this, FUNC(system1_state::system1_sprite_collision_r), FUNC(system1_state::system1_sprite_collision_w));
+	map(0xfc00, 0xffff).w(this, FUNC(system1_state::system1_sprite_collision_reset_w));
+}
 
-ADDRESS_MAP_START(system1_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("palette")
-ADDRESS_MAP_END
+void system1_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram().share("ram");
+	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(system1_state::system1_paletteram_w)).share("palette");
+}
 
-ADDRESS_MAP_START(system1_state::banked_decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("palette")
-ADDRESS_MAP_END
+void system1_state::banked_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank0d");
+	map(0x8000, 0xbfff).bankr("bank1d");
+	map(0xc000, 0xcfff).ram().share("ram");
+	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(system1_state::system1_paletteram_w)).share("palette");
+}
 
 /* same as normal System 1 except address map is shuffled (RAM/collision are swapped) */
-ADDRESS_MAP_START(system1_state::nobo_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(system1_mixer_collision_r, system1_mixer_collision_w)
-	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(system1_mixer_collision_reset_w)
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(system1_sprite_collision_r, system1_sprite_collision_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(system1_sprite_collision_reset_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(system1_videoram_r, system1_videoram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void system1_state::nobo_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc3ff).rw(this, FUNC(system1_state::system1_mixer_collision_r), FUNC(system1_state::system1_mixer_collision_w));
+	map(0xc400, 0xc7ff).w(this, FUNC(system1_state::system1_mixer_collision_reset_w));
+	map(0xc800, 0xcbff).rw(this, FUNC(system1_state::system1_sprite_collision_r), FUNC(system1_state::system1_sprite_collision_w));
+	map(0xcc00, 0xcfff).w(this, FUNC(system1_state::system1_sprite_collision_reset_w));
+	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(system1_state::system1_paletteram_w)).share("palette");
+	map(0xe000, 0xefff).rw(this, FUNC(system1_state::system1_videoram_r), FUNC(system1_state::system1_videoram_w));
+	map(0xf000, 0xffff).ram().share("ram");
+}
 
 /* I/O map for systems with an 8255 PPI */
-ADDRESS_MAP_START(system1_state::system1_ppi_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("P1")
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("P2")
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0x03) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x02) AM_READ_PORT("SWA")    /* DIP2 */
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x02) AM_READ_PORT("SWB")    /* DIP1 some games read it from here... */
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_READ_PORT("SWB")    /* DIP1 ... and some others from here but there are games which check BOTH! */
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void system1_state::system1_ppi_io_map(address_map &map)
+{
+	map.global_mask(0x1f);
+	map(0x00, 0x00).mirror(0x03).portr("P1");
+	map(0x04, 0x04).mirror(0x03).portr("P2");
+	map(0x08, 0x08).mirror(0x03).portr("SYSTEM");
+	map(0x0c, 0x0c).mirror(0x02).portr("SWA");    /* DIP2 */
+	map(0x0d, 0x0d).mirror(0x02).portr("SWB");    /* DIP1 some games read it from here... */
+	map(0x10, 0x10).mirror(0x03).portr("SWB");    /* DIP1 ... and some others from here but there are games which check BOTH! */
+	map(0x14, 0x17).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 /* I/O map for systems with a Z80 PIO chip */
-ADDRESS_MAP_START(system1_state::system1_pio_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("P1")
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("P2")
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0x03) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x02) AM_READ_PORT("SWA")    /* DIP2 */
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x02) AM_READ_PORT("SWB")    /* DIP1 some games read it from here... */
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_READ_PORT("SWB")    /* DIP1 ... and some others from here but there are games which check BOTH! */
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("pio", z80pio_device, read, write)
-ADDRESS_MAP_END
+void system1_state::system1_pio_io_map(address_map &map)
+{
+	map.global_mask(0x1f);
+	map(0x00, 0x00).mirror(0x03).portr("P1");
+	map(0x04, 0x04).mirror(0x03).portr("P2");
+	map(0x08, 0x08).mirror(0x03).portr("SYSTEM");
+	map(0x0c, 0x0c).mirror(0x02).portr("SWA");    /* DIP2 */
+	map(0x0d, 0x0d).mirror(0x02).portr("SWB");    /* DIP1 some games read it from here... */
+	map(0x10, 0x10).mirror(0x03).portr("SWB");    /* DIP1 ... and some others from here but there are games which check BOTH! */
+	map(0x18, 0x1b).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
 
 
@@ -816,13 +839,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(system1_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn2", sn76489a_device, write)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ(sound_data_r)
-ADDRESS_MAP_END
+void system1_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).mirror(0x1800).ram();
+	map(0xa000, 0xa000).mirror(0x1fff).w("sn1", FUNC(sn76489a_device::write));
+	map(0xc000, 0xc000).mirror(0x1fff).w("sn2", FUNC(sn76489a_device::write));
+	map(0xe000, 0xe000).mirror(0x1fff).r(this, FUNC(system1_state::sound_data_r));
+}
 
 
 
@@ -832,19 +856,10 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(system1_state::mcu_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(mcu_control_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(system1_state::nob_mcu_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_RAM AM_SHARE("nob_mcu_latch")
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITEONLY AM_SHARE("nob_mcu_status")
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(nob_mcu_control_p2_w)
-ADDRESS_MAP_END
+void system1_state::mcu_io_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(system1_state::mcu_io_r), FUNC(system1_state::mcu_io_w));
+}
 
 
 
@@ -2437,6 +2452,7 @@ MACHINE_CONFIG_START(system1_state::mcu)
 
 	MCFG_CPU_ADD("mcu", I8751, SOUND_CLOCK)
 	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(system1_state, mcu_control_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, mcu_irq_assert)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_t0", system1_state, mcu_t0_callback, attotime::from_usec(2500))
@@ -2458,7 +2474,10 @@ MACHINE_CONFIG_START(system1_state::nobm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("mcu", I8751, SOUND_CLOCK)
-	MCFG_CPU_IO_MAP(nob_mcu_io_map)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(system1_state, nob_mcu_latch_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(system1_state, nob_mcu_latch_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(system1_state, nob_mcu_status_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(system1_state, nob_mcu_control_p2_w))
 MACHINE_CONFIG_END
 
 

@@ -18,9 +18,9 @@ void electron_state::waitforramsync()
 {
 	int cycles = 0;
 
-	if (!(m_ula.screen_mode & 4) && machine().first_screen()->hpos()<640)
+	if (!(m_ula.screen_mode & 4) && m_screen->hpos()<640)
 	{
-		cycles += (640 - machine().first_screen()->hpos()) / 8;
+		cycles += (640 - m_screen->hpos()) / 8;
 	}
 	if (cycles & 1) cycles++;
 
@@ -206,6 +206,12 @@ READ8_MEMBER(electron_state::electron_paged_r)
 WRITE8_MEMBER(electron_state::electron_paged_w)
 {
 	m_exp->expbus_w(space, 0x8000 + offset, data);
+}
+
+WRITE8_MEMBER(electron_state::electron_mos_w)
+{
+	logerror("MOS: write %04x %02x\n", offset + 0xc000, data);
+	m_exp->expbus_w(space, 0xc000 + offset, data);
 }
 
 READ8_MEMBER(electron_state::electron_fred_r)

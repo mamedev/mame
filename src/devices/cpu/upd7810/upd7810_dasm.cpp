@@ -5260,7 +5260,7 @@ offs_t upd7810_base_disassembler::disassemble(std::ostream &stream, offs_t pc, c
 			case 'd':   /* JRE address */
 				op2 = opcodes.r8(idx++);
 				offset = (op & 1) ? -(256 - op2): + op2;
-				util::stream_format(stream, "$%04X", ( pc + idx + offset ) & 0xFFFF );
+				util::stream_format(stream, "$%04X", ( idx + offset ) & 0xFFFF );
 				break;
 			case 't':   /* CALT address */
 				ea = 0x80 + 2 * (op & (m_is_7810 ? 0x1f : 0x3f));
@@ -5273,7 +5273,7 @@ offs_t upd7810_base_disassembler::disassemble(std::ostream &stream, offs_t pc, c
 				break;
 			case 'o':   /* JR offset */
 				offset = ( ( op & 0x20 ) ? -0x20 : 0 ) + ( op & 0x1F );
-				util::stream_format(stream, "$%04X", ( pc + idx + offset ) & 0xFFFF );
+				util::stream_format(stream, "$%04X", ( idx + offset ) & 0xFFFF );
 				break;
 			case 'i':   /* bit manipulation */
 				op2 = opcodes.r8(idx++);

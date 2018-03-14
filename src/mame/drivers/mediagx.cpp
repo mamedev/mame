@@ -99,8 +99,71 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_ports(*this, {"IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8"})
-		{ }
+		m_ports(*this, "IN%u", 0U)
+	{ }
+
+	DECLARE_DRIVER_INIT(a51site4);
+	void mediagx(machine_config &config);
+
+protected:
+	DECLARE_READ32_MEMBER(disp_ctrl_r);
+	DECLARE_WRITE32_MEMBER(disp_ctrl_w);
+	DECLARE_READ32_MEMBER(memory_ctrl_r);
+	DECLARE_WRITE32_MEMBER(memory_ctrl_w);
+	DECLARE_READ32_MEMBER(biu_ctrl_r);
+	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
+	DECLARE_READ32_MEMBER(parallel_port_r);
+	DECLARE_WRITE32_MEMBER(parallel_port_w);
+	DECLARE_READ32_MEMBER(ad1847_r);
+	DECLARE_WRITE32_MEMBER(ad1847_w);
+	DECLARE_READ8_MEMBER(io20_r);
+	DECLARE_WRITE8_MEMBER(io20_w);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	uint32_t screen_update_mediagx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_READ32_MEMBER(speedup0_r);
+	DECLARE_READ32_MEMBER(speedup1_r);
+	DECLARE_READ32_MEMBER(speedup2_r);
+	DECLARE_READ32_MEMBER(speedup3_r);
+	DECLARE_READ32_MEMBER(speedup4_r);
+	DECLARE_READ32_MEMBER(speedup5_r);
+	DECLARE_READ32_MEMBER(speedup6_r);
+	DECLARE_READ32_MEMBER(speedup7_r);
+	DECLARE_READ32_MEMBER(speedup8_r);
+	DECLARE_READ32_MEMBER(speedup9_r);
+	DECLARE_READ32_MEMBER(speedup10_r);
+	DECLARE_READ32_MEMBER(speedup11_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
+	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
+	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void ad1847_reg_write(int reg, uint8_t data);
+	inline uint32_t generic_speedup(address_space &space, int idx);
+	void report_speedups();
+	void install_speedups(const speedup_entry *entries, int count);
+	void init_mediagx();
+	void mediagx_io(address_map &map);
+	void mediagx_map(address_map &map);
+	void ramdac_map(address_map &map);
+
+private:
+	uint32_t cx5510_pci_r(int function, int reg, uint32_t mem_mask)
+	{
+		//osd_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
+		switch (reg)
+		{
+			case 0:     return 0x00001078;
+		}
+
+		return m_cx5510_regs[reg/4];
+	}
+
+	void cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
+	{
+		//osd_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
+		COMBINE_DATA(&m_cx5510_regs[reg/4]);
+	}
 
 	required_device<ide_controller_32_device> m_ide;
 	required_shared_ptr<uint32_t> m_main_ram;
@@ -152,48 +215,8 @@ public:
 	uint32_t m_speedup_hits[12];
 	int m_speedup_count;
 #endif
-	DECLARE_READ32_MEMBER(disp_ctrl_r);
-	DECLARE_WRITE32_MEMBER(disp_ctrl_w);
-	DECLARE_READ32_MEMBER(memory_ctrl_r);
-	DECLARE_WRITE32_MEMBER(memory_ctrl_w);
-	DECLARE_READ32_MEMBER(biu_ctrl_r);
-	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
-	DECLARE_READ32_MEMBER(parallel_port_r);
-	DECLARE_WRITE32_MEMBER(parallel_port_w);
-	DECLARE_READ32_MEMBER(ad1847_r);
-	DECLARE_WRITE32_MEMBER(ad1847_w);
-	DECLARE_READ8_MEMBER(io20_r);
-	DECLARE_WRITE8_MEMBER(io20_w);
-	DECLARE_DRIVER_INIT(a51site4);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_mediagx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ32_MEMBER(speedup0_r);
-	DECLARE_READ32_MEMBER(speedup1_r);
-	DECLARE_READ32_MEMBER(speedup2_r);
-	DECLARE_READ32_MEMBER(speedup3_r);
-	DECLARE_READ32_MEMBER(speedup4_r);
-	DECLARE_READ32_MEMBER(speedup5_r);
-	DECLARE_READ32_MEMBER(speedup6_r);
-	DECLARE_READ32_MEMBER(speedup7_r);
-	DECLARE_READ32_MEMBER(speedup8_r);
-	DECLARE_READ32_MEMBER(speedup9_r);
-	DECLARE_READ32_MEMBER(speedup10_r);
-	DECLARE_READ32_MEMBER(speedup11_r);
-	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
-	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
-	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void ad1847_reg_write(int reg, uint8_t data);
-	inline uint32_t generic_speedup(address_space &space, int idx);
-	void report_speedups();
-	void install_speedups(const speedup_entry *entries, int count);
-	void init_mediagx();
-	void mediagx(machine_config &config);
-	void mediagx_io(address_map &map);
-	void mediagx_map(address_map &map);
-	void ramdac_map(address_map &map);
+
+	static const read32_delegate s_speedup_handlers[];
 };
 
 // Display controller registers
@@ -637,27 +660,6 @@ WRITE32_MEMBER(mediagx_state::parallel_port_w)
 	}
 }
 
-static uint32_t cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
-{
-	mediagx_state *state = busdevice->machine().driver_data<mediagx_state>();
-
-	//osd_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
-	switch (reg)
-	{
-		case 0:     return 0x00001078;
-	}
-
-	return state->m_cx5510_regs[reg/4];
-}
-
-static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-	mediagx_state *state = busdevice->machine().driver_data<mediagx_state>();
-
-	//osd_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
-	COMBINE_DATA(state->m_cx5510_regs + (reg/4));
-}
-
 /* Analog Devices AD1847 Stereo DAC */
 
 TIMER_DEVICE_CALLBACK_MEMBER(mediagx_state::sound_timer_callback)
@@ -747,29 +749,31 @@ WRITE32_MEMBER(mediagx_state::ad1847_w)
 
 /*****************************************************************************/
 
-ADDRESS_MAP_START(mediagx_state::mediagx_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM AM_SHARE("main_ram")
-	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
-	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_SHARE("cga_ram")
-	AM_RANGE(0x000c0000, 0x000fffff) AM_RAM AM_SHARE("bios_ram")
-	AM_RANGE(0x00100000, 0x00ffffff) AM_RAM
-	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE(biu_ctrl_r, biu_ctrl_w)
-	AM_RANGE(0x40008300, 0x400083ff) AM_READWRITE(disp_ctrl_r, disp_ctrl_w)
-	AM_RANGE(0x40008400, 0x400084ff) AM_READWRITE(memory_ctrl_r, memory_ctrl_w)
-	AM_RANGE(0x40800000, 0x40bfffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
-ADDRESS_MAP_END
+void mediagx_state::mediagx_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram().share("main_ram");
+	map(0x000a0000, 0x000affff).ram();
+	map(0x000b0000, 0x000b7fff).ram().share("cga_ram");
+	map(0x000c0000, 0x000fffff).ram().share("bios_ram");
+	map(0x00100000, 0x00ffffff).ram();
+	map(0x40008000, 0x400080ff).rw(this, FUNC(mediagx_state::biu_ctrl_r), FUNC(mediagx_state::biu_ctrl_w));
+	map(0x40008300, 0x400083ff).rw(this, FUNC(mediagx_state::disp_ctrl_r), FUNC(mediagx_state::disp_ctrl_w));
+	map(0x40008400, 0x400084ff).rw(this, FUNC(mediagx_state::memory_ctrl_r), FUNC(mediagx_state::memory_ctrl_w));
+	map(0x40800000, 0x40bfffff).ram().share("vram");
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+}
 
-ADDRESS_MAP_START(mediagx_state::mediagx_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
-	AM_RANGE(0x00e8, 0x00eb) AM_NOP     // I/O delay port
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
-	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs1, write_cs1)
-	AM_RANGE(0x0400, 0x04ff) AM_READWRITE(ad1847_r, ad1847_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-ADDRESS_MAP_END
+void mediagx_state::mediagx_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x0022, 0x0023).rw(this, FUNC(mediagx_state::io20_r), FUNC(mediagx_state::io20_w));
+	map(0x00e8, 0x00eb).noprw();     // I/O delay port
+	map(0x01f0, 0x01f7).rw(m_ide, FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
+	map(0x0378, 0x037b).rw(this, FUNC(mediagx_state::parallel_port_r), FUNC(mediagx_state::parallel_port_w));
+	map(0x03f0, 0x03f7).rw(m_ide, FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
+	map(0x0400, 0x04ff).rw(this, FUNC(mediagx_state::ad1847_r), FUNC(mediagx_state::ad1847_w));
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+}
 
 /*****************************************************************************/
 
@@ -871,9 +875,10 @@ void mediagx_state::machine_reset()
 	dmadac_enable(&m_dmadac[0], 2, 1);
 }
 
-ADDRESS_MAP_START(mediagx_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void mediagx_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 MACHINE_CONFIG_START(mediagx_state::mediagx)
 
@@ -886,7 +891,7 @@ MACHINE_CONFIG_START(mediagx_state::mediagx)
 	pcat_common(config);
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(18, nullptr, cx5510_pci_r, cx5510_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, mediagx_state, cx5510_pci_r, cx5510_pci_w)
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
@@ -947,11 +952,11 @@ READ32_MEMBER(mediagx_state::speedup9_r) { return generic_speedup(space, 9); }
 READ32_MEMBER(mediagx_state::speedup10_r) { return generic_speedup(space, 10); }
 READ32_MEMBER(mediagx_state::speedup11_r) { return generic_speedup(space, 11); }
 
-static const struct { read32_delegate func; } speedup_handlers[] =
+const read32_delegate mediagx_state::s_speedup_handlers[]
 {
-	{ read32_delegate(FUNC(mediagx_state::speedup0_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup1_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup2_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup3_r),(mediagx_state*)nullptr) },
-	{ read32_delegate(FUNC(mediagx_state::speedup4_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup5_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup6_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup7_r),(mediagx_state*)nullptr) },
-	{ read32_delegate(FUNC(mediagx_state::speedup8_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup9_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup10_r),(mediagx_state*)nullptr) },    { read32_delegate(FUNC(mediagx_state::speedup11_r),(mediagx_state*)nullptr) }
+	{ FUNC(mediagx_state::speedup0_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup1_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup2_r),  (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup3_r),  (mediagx_state*)nullptr },
+	{ FUNC(mediagx_state::speedup4_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup5_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup6_r),  (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup7_r),  (mediagx_state*)nullptr },
+	{ FUNC(mediagx_state::speedup8_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup9_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup10_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup11_r), (mediagx_state*)nullptr }
 };
 
 #ifdef MAME_DEBUG
@@ -968,13 +973,13 @@ void mediagx_state::install_speedups(const speedup_entry *entries, int count)
 {
 	int i;
 
-	assert(count < ARRAY_LENGTH(speedup_handlers));
+	assert(count < ARRAY_LENGTH(s_speedup_handlers));
 
 	m_speedup_table = entries;
 	m_speedup_count = count;
 
 	for (i = 0; i < count; i++) {
-		read32_delegate func = speedup_handlers[i].func;
+		read32_delegate func = s_speedup_handlers[i];
 		func.late_bind(*this);
 		m_maincpu->space(AS_PROGRAM).install_read_handler(entries[i].offset, entries[i].offset + 3, func);
 	}

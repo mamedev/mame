@@ -331,18 +331,20 @@ WRITE8_MEMBER( pc8401a_state::port71_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(pc8401a_state::pc8401a_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK("bank4")
-	AM_RANGE(0xe800, 0xffff) AM_RAMBANK("bank5")
-ADDRESS_MAP_END
+void pc8401a_state::pc8401a_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).bankrw("bank1");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xe7ff).bankrw("bank4");
+	map(0xe800, 0xffff).bankrw("bank5");
+}
 
-ADDRESS_MAP_START(pc8401a_state::pc8401a_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void pc8401a_state::pc8401a_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 ADDRESS_MAP_START(pc8401a_state::pc8500_io)
 	ADDRESS_MAP_UNMAP_HIGH

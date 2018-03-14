@@ -532,8 +532,9 @@ WRITE8_MEMBER( mpz80_state::disp_col_w )
 //  ADDRESS_MAP( mpz80_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(mpz80_state::mpz80_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_r, mmu_w)
+void mpz80_state::mpz80_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(mpz80_state::mmu_r), FUNC(mpz80_state::mmu_w));
 /*
     Task 0 Segment 0 map:
 
@@ -546,15 +547,16 @@ ADDRESS_MAP_START(mpz80_state::mpz80_mem)
     AM_RANGE(0x0800, 0x0bff) AM_ROM AM_REGION(Z80_TAG, 0)
     AM_RANGE(0x0c00, 0x0c00) AM_DEVREADWRITE(AM9512_TAG, am9512_device, read, write)
 */
-ADDRESS_MAP_END
+}
 
 //-------------------------------------------------
 //  ADDRESS_MAP( mpz80_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(mpz80_state::mpz80_io)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_io_r, mmu_io_w)
-ADDRESS_MAP_END
+void mpz80_state::mpz80_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(mpz80_state::mmu_io_r), FUNC(mpz80_state::mmu_io_w));
+}
 
 
 

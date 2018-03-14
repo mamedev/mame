@@ -51,12 +51,13 @@ WRITE16_MEMBER( tricep_state::tricep_terminal_w )
 	m_terminal->write(space, 0, data >> 8);
 }
 
-ADDRESS_MAP_START(tricep_state::tricep_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("p_ram")
-	AM_RANGE(0x00fd0000, 0x00fd1fff) AM_ROM AM_REGION("user1",0)
-	AM_RANGE(0x00ff0028, 0x00ff0029) AM_READWRITE(tricep_terminal_r,tricep_terminal_w)
-ADDRESS_MAP_END
+void tricep_state::tricep_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x0007ffff).ram().share("p_ram");
+	map(0x00fd0000, 0x00fd1fff).rom().region("user1", 0);
+	map(0x00ff0028, 0x00ff0029).rw(this, FUNC(tricep_state::tricep_terminal_r), FUNC(tricep_state::tricep_terminal_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( tricep )

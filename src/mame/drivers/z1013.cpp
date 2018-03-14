@@ -93,17 +93,19 @@ private:
 
 
 /* Address maps */
-ADDRESS_MAP_START(z1013_state::z1013_mem)
-	AM_RANGE( 0x0000, 0xebff ) AM_RAM
-	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0xf000, 0xffff ) AM_ROM //  ROM
-ADDRESS_MAP_END
+void z1013_state::z1013_mem(address_map &map)
+{
+	map(0x0000, 0xebff).ram();
+	map(0xec00, 0xefff).ram().share("videoram");
+	map(0xf000, 0xffff).rom(); //  ROM
+}
 
-ADDRESS_MAP_START(z1013_state::z1013_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE( 0x08, 0x08 ) AM_WRITE(z1013_keyboard_w)
-ADDRESS_MAP_END
+void z1013_state::z1013_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("z80pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x08, 0x08).w(this, FUNC(z1013_state::z1013_keyboard_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( z1013_8x4 )

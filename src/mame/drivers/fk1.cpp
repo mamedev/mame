@@ -309,26 +309,28 @@ WRITE8_MEMBER( fk1_state::fk1_reset_int_w )
 	logerror("fk1_reset_int_w\n");
 }
 
-ADDRESS_MAP_START(fk1_state::fk1_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void fk1_state::fk1_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
-ADDRESS_MAP_START(fk1_state::fk1_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE( 0x20, 0x23 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE( 0x30, 0x30 ) AM_READWRITE(fk1_bank_ram_r,fk1_intr_w)
-	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE( 0x50, 0x50 ) AM_READWRITE(fk1_bank_rom_r,fk1_disk_w)
-	AM_RANGE( 0x60, 0x63 ) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)
-	AM_RANGE( 0x70, 0x70 ) AM_READWRITE(fk1_mouse_r,fk1_reset_int_w)
-ADDRESS_MAP_END
+void fk1_state::fk1_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x13).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x20, 0x23).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x30, 0x30).rw(this, FUNC(fk1_state::fk1_bank_ram_r), FUNC(fk1_state::fk1_intr_w));
+	map(0x40, 0x40).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x41, 0x41).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x50, 0x50).rw(this, FUNC(fk1_state::fk1_bank_rom_r), FUNC(fk1_state::fk1_disk_w));
+	map(0x60, 0x63).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x70, 0x70).rw(this, FUNC(fk1_state::fk1_mouse_r), FUNC(fk1_state::fk1_reset_int_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( fk1 )

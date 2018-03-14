@@ -45,23 +45,24 @@ private:
 };
 
 
-ADDRESS_MAP_START(zac_proto_state::zac_proto_map)
-	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0d00, 0x0dff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0e00, 0x0e00) AM_READ_PORT("PL0")
-	AM_RANGE(0x0e01, 0x0e01) AM_READ_PORT("PL1")
-	AM_RANGE(0x0e02, 0x0e02) AM_READ_PORT("PL2")
-	AM_RANGE(0x0e03, 0x0e03) AM_READ_PORT("PL3")
-	AM_RANGE(0x0e04, 0x0e04) AM_READ_PORT("PL4")
-	AM_RANGE(0x0e05, 0x0e05) AM_READ_PORT("PL5")
-	AM_RANGE(0x0e06, 0x0e06) AM_READ_PORT("PL6")
-	AM_RANGE(0x0e07, 0x0e07) AM_READ_PORT("PL7")
-	AM_RANGE(0x0e00, 0x0e01) AM_WRITE(out0_w)
-	AM_RANGE(0x0e02, 0x0e06) AM_WRITE(digit_w)
-	AM_RANGE(0x0e07, 0x0e08) AM_WRITE(sound_w)
-	AM_RANGE(0x0e09, 0x0e16) AM_WRITE(out1_w)
-	AM_RANGE(0x1400, 0x1bff) AM_ROM
-ADDRESS_MAP_END
+void zac_proto_state::zac_proto_map(address_map &map)
+{
+	map(0x0000, 0x0bff).rom();
+	map(0x0d00, 0x0dff).ram().share("nvram");
+	map(0x0e00, 0x0e00).portr("PL0");
+	map(0x0e01, 0x0e01).portr("PL1");
+	map(0x0e02, 0x0e02).portr("PL2");
+	map(0x0e03, 0x0e03).portr("PL3");
+	map(0x0e04, 0x0e04).portr("PL4");
+	map(0x0e05, 0x0e05).portr("PL5");
+	map(0x0e06, 0x0e06).portr("PL6");
+	map(0x0e07, 0x0e07).portr("PL7");
+	map(0x0e00, 0x0e01).w(this, FUNC(zac_proto_state::out0_w));
+	map(0x0e02, 0x0e06).w(this, FUNC(zac_proto_state::digit_w));
+	map(0x0e07, 0x0e08).w(this, FUNC(zac_proto_state::sound_w));
+	map(0x0e09, 0x0e16).w(this, FUNC(zac_proto_state::out1_w));
+	map(0x1400, 0x1bff).rom();
+}
 
 static INPUT_PORTS_START( zac_proto )
 	// playfield inputs

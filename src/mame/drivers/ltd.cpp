@@ -92,32 +92,35 @@ private:
 };
 
 
-ADDRESS_MAP_START(ltd_state::ltd3_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("nvram") // internal to the cpu
-	AM_RANGE(0x0080, 0x0087) AM_MIRROR(0x78) AM_READ(io_r)
-	AM_RANGE(0x0800, 0x2fff) AM_WRITE(io_w)
-	AM_RANGE(0xc000, 0xcfff) AM_ROM AM_MIRROR(0x3000) AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void ltd_state::ltd3_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram().share("nvram"); // internal to the cpu
+	map(0x0080, 0x0087).mirror(0x78).r(this, FUNC(ltd_state::io_r));
+	map(0x0800, 0x2fff).w(this, FUNC(ltd_state::io_w));
+	map(0xc000, 0xcfff).rom().mirror(0x3000).region("roms", 0);
+}
 
-ADDRESS_MAP_START(ltd_state::ltd4_map)
-	AM_RANGE(0x0000, 0x001f) AM_RAM // internal to the cpu
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(count_reset_w)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVWRITE("aysnd_1", ay8910_device, reset_w)
-	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("aysnd_0", ay8910_device, address_w)
-	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("aysnd_0", ay8910_device, reset_w)
-	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("aysnd_1", ay8910_device, address_w)
+void ltd_state::ltd4_map(address_map &map)
+{
+	map(0x0000, 0x001f).ram(); // internal to the cpu
+	map(0x0080, 0x00ff).ram();
+	map(0x0100, 0x01ff).ram().share("nvram");
+	map(0x0800, 0x0800).w(this, FUNC(ltd_state::count_reset_w));
+	map(0x0c00, 0x0c00).w("aysnd_1", FUNC(ay8910_device::reset_w));
+	map(0x1000, 0x1000).w("aysnd_0", FUNC(ay8910_device::address_w));
+	map(0x1400, 0x1400).w("aysnd_0", FUNC(ay8910_device::reset_w));
+	map(0x1800, 0x1800).w("aysnd_1", FUNC(ay8910_device::address_w));
 	//AM_RANGE(0x2800, 0x2800) AM_WRITE(auxlamps_w)
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("aysnd_0", ay8910_device, data_w)
-	AM_RANGE(0x3800, 0x3800) AM_DEVWRITE("aysnd_1", ay8910_device, data_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_MIRROR(0x2000) AM_REGION("roms", 0)
-ADDRESS_MAP_END
+	map(0x3000, 0x3000).w("aysnd_0", FUNC(ay8910_device::data_w));
+	map(0x3800, 0x3800).w("aysnd_1", FUNC(ay8910_device::data_w));
+	map(0xc000, 0xdfff).rom().mirror(0x2000).region("roms", 0);
+}
 
-ADDRESS_MAP_START(ltd_state::ltd4_io)
-	AM_RANGE(0x0100, 0x0100) AM_READWRITE(port1_r,port1_w)
-	AM_RANGE(0x0101, 0x0101) AM_READWRITE(port2_r,port2_w)
-ADDRESS_MAP_END
+void ltd_state::ltd4_io(address_map &map)
+{
+	map(0x0100, 0x0100).rw(this, FUNC(ltd_state::port1_r), FUNC(ltd_state::port1_w));
+	map(0x0101, 0x0101).rw(this, FUNC(ltd_state::port2_r), FUNC(ltd_state::port2_w));
+}
 
 // bits 6,7 not connected to data bus
 // 1=does something in Atlantis; 2=does something in Black Hole; note that sometimes pressing G or H will reboot the machine.

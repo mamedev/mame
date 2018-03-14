@@ -49,13 +49,14 @@ READ8_MEMBER( mits680b_state::status_check_r )
 }
 
 
-ADDRESS_MAP_START(mits680b_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_RAM // 1024 bytes RAM
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0xf002, 0xf002) AM_READ(status_check_r)
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void mits680b_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).ram(); // 1024 bytes RAM
+	map(0xf000, 0xf001).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xf002, 0xf002).r(this, FUNC(mits680b_state::status_check_r));
+	map(0xff00, 0xffff).rom().region("roms", 0);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mits680b )

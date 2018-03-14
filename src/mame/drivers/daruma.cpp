@@ -29,44 +29,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker") { }
 
-	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_READ8_MEMBER(port_r);
-
 	DECLARE_READ8_MEMBER(dev0_r);
 	DECLARE_WRITE8_MEMBER(dev1_w);
 	DECLARE_WRITE8_MEMBER(dev2_w);
 	DECLARE_READ8_MEMBER(dev4_r);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	char port0, port1, port2, port3;
 	void daruma(machine_config &config);
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
 };
-
-WRITE8_MEMBER(daruma_state::port_w)
-{
-//  printf("port_w: write %02X to PORT (offset=%02X)\n", data, offset);
-	switch(offset)
-	{
-		case MCS51_PORT_P0: port0=data;
-		case MCS51_PORT_P1: port1=data;
-		case MCS51_PORT_P2: port2=data;
-		case MCS51_PORT_P3: port3=data;
-	}
-}
-
-READ8_MEMBER(daruma_state::port_r)
-{
-	switch(offset)
-	{
-		case MCS51_PORT_P0: printf("port_r: read %02X from PORT0\n", port0); return port0;
-		case MCS51_PORT_P1: printf("port_r: read %02X from PORT1\n", port1); return port1;
-		case MCS51_PORT_P2: printf("port_r: read %02X from PORT2\n", port2); return port2;
-		case MCS51_PORT_P3: printf("port_r: read %02X from PORT3\n", port3); return port3;
-	}
-	return 0;
-}
 
 READ8_MEMBER(daruma_state::dev0_r)
 {
@@ -111,19 +83,20 @@ WRITE8_MEMBER(daruma_state::dev2_w)
 	//m_speaker->level_w(data & 0x01);
 }
 
-ADDRESS_MAP_START(daruma_state::mem_prg)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void daruma_state::mem_prg(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(daruma_state::mem_io)
-	AM_RANGE(0x0000, 0x0000) AM_READ(dev0_r)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(dev1_w)
+void daruma_state::mem_io(address_map &map)
+{
+	map(0x0000, 0x0000).r(this, FUNC(daruma_state::dev0_r));
+	map(0x1000, 0x1000).w(this, FUNC(daruma_state::dev1_w));
 //    AM_RANGE(0x2000, 0x2000) AM_WRITE(dev2_w)
 //    AM_RANGE(0x3000, 0x3000) AM_WRITE(dev3_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ(dev4_r)
-	AM_RANGE(0x8000, 0xffff) AM_RAM /* 32K CMOS SRAM (HYUNDAY hy62256a) */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(port_r, port_w)
-ADDRESS_MAP_END
+	map(0x4000, 0x4000).r(this, FUNC(daruma_state::dev4_r));
+	map(0x8000, 0xffff).ram(); /* 32K CMOS SRAM (HYUNDAY hy62256a) */
+}
 
 //TODO: These buttons and switches are all guesses. We'll need to further investigate this.
 static INPUT_PORTS_START( daruma )
@@ -148,6 +121,7 @@ MACHINE_CONFIG_START(daruma_state::daruma)
 	MCFG_CPU_ADD("maincpu", I80C32,11059200) //verified on pcb
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
 	MCFG_CPU_IO_MAP(mem_io)
+	// TODO: ports
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

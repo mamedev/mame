@@ -569,7 +569,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(equites_state::equites_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(equites_state::splndrbt_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_state::splndrbt_scanline)
 {
 	int scanline = param;
 
@@ -585,12 +585,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(equites_state::splndrbt_scanline)
 /******************************************************************************/
 // CPU Handlers
 
-CUSTOM_INPUT_MEMBER(equites_state::gekisou_unknown_bit_r)
+CUSTOM_INPUT_MEMBER(gekisou_state::gekisou_unknown_bit_r)
 {
 	return m_gekisou_unknown_bit;
 }
 
-WRITE16_MEMBER(equites_state::gekisou_unknown_bit_w)
+WRITE16_MEMBER(gekisou_state::gekisou_unknown_bit_w)
 {
 	// data bit is A17 (offset)
 	m_gekisou_unknown_bit = (offset == 0) ? 0 : 1;;
@@ -640,66 +640,78 @@ WRITE_LINE_MEMBER(equites_state::mcu_switch_w)
 /******************************************************************************/
 // CPU Memory Maps
 
-ADDRESS_MAP_START(equites_state::equites_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM // ROM area is written several times (dev system?)
-	AM_RANGE(0x040000, 0x040fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_READWRITE8(equites_fg_videoram_r, equites_fg_videoram_w, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x0c0200, 0x0c0fff) AM_RAM
-	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x100000, 0x100001) AM_READ(equites_spriteram_kludge_r)
-	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE8(mcu_ram_r, mcu_ram_w, 0x00ff)
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	;map(0x180000, 0x180001).select(0x03c000).lw8("mainlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_mainlatch->write_a3(space, offset >> 13, data, mem_mask); }).umask16(0xff00);
-	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("IN0") AM_WRITE(equites_scrollreg_w)
-	AM_RANGE(0x380000, 0x380001) AM_WRITE8(equites_bgcolor_w, 0xff00)
-	AM_RANGE(0x780000, 0x780001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-ADDRESS_MAP_END
+void equites_state::equites_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x00ffff).rom(); // ROM area is written several times (dev system?)
+	map(0x040000, 0x040fff).ram();
+	map(0x080000, 0x080fff).rw(this, FUNC(equites_state::equites_fg_videoram_r), FUNC(equites_state::equites_fg_videoram_w)).umask16(0x00ff);
+	map(0x0c0000, 0x0c01ff).ram().w(this, FUNC(equites_state::equites_bg_videoram_w)).share("bg_videoram");
+	map(0x0c0200, 0x0c0fff).ram();
+	map(0x100000, 0x1001ff).ram().share("spriteram");
+	map(0x100000, 0x100001).r(this, FUNC(equites_state::equites_spriteram_kludge_r));
+	map(0x140000, 0x1407ff).rw(this, FUNC(equites_state::mcu_ram_r), FUNC(equites_state::mcu_ram_w)).umask16(0x00ff);
+	map(0x180000, 0x180001).portr("IN1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x180000, 0x180000).select(0x03c000).lw8("mainlatch_w",
+												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+													 m_mainlatch->write_a3(space, offset >> 13, data, mem_mask);
+												 });
+	map(0x180001, 0x180001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x1c0000, 0x1c0001).portr("IN0").w(this, FUNC(equites_state::equites_scrollreg_w));
+	map(0x380000, 0x380000).w(this, FUNC(equites_state::equites_bgcolor_w));
+	map(0x780000, 0x780001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+}
 
-ADDRESS_MAP_START(equites_state::gekisou_map)
-	AM_IMPORT_FROM( equites_map )
-	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram") // mainram is battery-backed
-	AM_RANGE(0x580000, 0x580001) AM_SELECT(0x020000) AM_WRITE(gekisou_unknown_bit_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(equites_state::splndrbt_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040fff) AM_RAM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x020000) AM_WRITE8(equites_bgcolor_w, 0xff00)
-	;map(0x0c0000, 0x0c0001).select(0x03c000).lw8("mainlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_mainlatch->write_a3(space, offset >> 13, data, mem_mask); }).umask16(0x00ff);
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(splndrbt_bg_scrollx_w)
-	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(splndrbt_bg_scrolly_w)
-	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE8(mcu_ram_r, mcu_ram_w, 0x00ff)
-	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x001000) AM_READWRITE8(equites_fg_videoram_r, equites_fg_videoram_w, 0x00ff)
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x400800, 0x400fff) AM_RAM
-	AM_RANGE(0x600000, 0x6000ff) AM_RAM AM_SHARE("spriteram")   // sprite RAM 0,1
-	AM_RANGE(0x600100, 0x6001ff) AM_RAM AM_SHARE("spriteram_2") // sprite RAM 2 (8-bit)
-ADDRESS_MAP_END
+void gekisou_state::gekisou_map(address_map &map)
+{
+	equites_map(map);
+	map(0x040000, 0x040fff).ram().share("nvram"); // mainram is battery-backed
+	map(0x580000, 0x580001).select(0x020000).w(this, FUNC(gekisou_state::gekisou_unknown_bit_w));
+}
 
 
-ADDRESS_MAP_START(equites_state::sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE("msm", msm5232_device, write)
-	AM_RANGE(0xc0a0, 0xc0a1) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITENOP // n.c.
-	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(equites_cymbal_ctrl_w)
-	AM_RANGE(0xc0d0, 0xc0d0) AM_WRITE(equites_dac_latch_w)  // followed by 1 (and usually 0) on 8155 port B
-	AM_RANGE(0xc0e0, 0xc0e0) AM_WRITE(equites_dac_latch_w)  // followed by 2 (and usually 0) on 8155 port B
-	AM_RANGE(0xc0f8, 0xc0ff) AM_WRITE(equites_c0f8_w)
-	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("audio8155", i8155_device, memory_r, memory_w)
-ADDRESS_MAP_END
+void splndrbt_state::splndrbt_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x00ffff).rom();
+	map(0x040000, 0x040fff).ram();
+	map(0x080000, 0x080001).portr("IN0");
+	map(0x0c0000, 0x0c0001).portr("IN1");
+	map(0x0c0000, 0x0c0000).select(0x020000).w(this, FUNC(splndrbt_state::equites_bgcolor_w));
+	map(0x0c0001, 0x0c0001).select(0x03c000).lw8("mainlatch_w",
+												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+													 m_mainlatch->write_a3(space, offset >> 13, data, mem_mask);
+												 });
+	map(0x100000, 0x100001).w(this, FUNC(splndrbt_state::splndrbt_bg_scrollx_w));
+	map(0x140001, 0x140001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x1c0000, 0x1c0001).w(this, FUNC(splndrbt_state::splndrbt_bg_scrolly_w));
+	map(0x180000, 0x1807ff).rw(this, FUNC(splndrbt_state::mcu_ram_r), FUNC(splndrbt_state::mcu_ram_w)).umask16(0x00ff);
+	map(0x200000, 0x200fff).mirror(0x001000).rw(this, FUNC(splndrbt_state::equites_fg_videoram_r), FUNC(splndrbt_state::equites_fg_videoram_w)).umask16(0x00ff);
+	map(0x400000, 0x4007ff).ram().w(this, FUNC(splndrbt_state::equites_bg_videoram_w)).share("bg_videoram");
+	map(0x400800, 0x400fff).ram();
+	map(0x600000, 0x6000ff).ram().share("spriteram");   // sprite RAM 0,1
+	map(0x600100, 0x6001ff).ram().share("spriteram_2"); // sprite RAM 2 (8-bit)
+}
 
-ADDRESS_MAP_START(equites_state::sound_portmap)
-	AM_RANGE(0x00e0, 0x00e7) AM_DEVREADWRITE("audio8155", i8155_device, io_r, io_w)
-ADDRESS_MAP_END
+
+void equites_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc080, 0xc08d).w(m_msm, FUNC(msm5232_device::write));
+	map(0xc0a0, 0xc0a1).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0xc0b0, 0xc0b0).nopw(); // n.c.
+	map(0xc0c0, 0xc0c0).w(this, FUNC(equites_state::equites_cymbal_ctrl_w));
+	map(0xc0d0, 0xc0d0).w(this, FUNC(equites_state::equites_dac_latch_w));  // followed by 1 (and usually 0) on 8155 port B
+	map(0xc0e0, 0xc0e0).w(this, FUNC(equites_state::equites_dac_latch_w));  // followed by 2 (and usually 0) on 8155 port B
+	map(0xc0f8, 0xc0ff).w(this, FUNC(equites_state::equites_c0f8_w));
+	map(0xe000, 0xe0ff).rw("audio8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+}
+
+void equites_state::sound_portmap(address_map &map)
+{
+	map(0x00e0, 0x00e7).rw("audio8155", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+}
 
 
 ADDRESS_MAP_START(equites_state::mcu_map)
@@ -781,7 +793,7 @@ static INPUT_PORTS_START( gekisou )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, equites_state, gekisou_unknown_bit_r, nullptr)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gekisou_state, gekisou_unknown_bit_r, nullptr)
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)
@@ -1082,10 +1094,7 @@ MACHINE_CONFIG_END
 void equites_state::machine_start()
 {
 	// zerofill
-	m_fg_char_bank = 0;
 	m_bgcolor = 0;
-	m_splndrbt_bg_scrollx = 0;
-	m_splndrbt_bg_scrolly = 0;
 	m_sound_prom_address = 0;
 	m_dac_latch = 0;
 	m_eq8155_port_b = 0;
@@ -1097,13 +1106,9 @@ void equites_state::machine_start()
 	m_cymvol = 0.0;
 	m_hihatvol = 0.0;
 	m_timer_count = 0;
-	m_gekisou_unknown_bit = 0;
 
 	// register for savestates
-	save_item(NAME(m_fg_char_bank));
 	save_item(NAME(m_bgcolor));
-	save_item(NAME(m_splndrbt_bg_scrollx));
-	save_item(NAME(m_splndrbt_bg_scrolly));
 	save_item(NAME(m_sound_prom_address));
 	save_item(NAME(m_dac_latch));
 	save_item(NAME(m_eq8155_port_b));
@@ -1115,10 +1120,31 @@ void equites_state::machine_start()
 	save_item(NAME(m_cymvol));
 	save_item(NAME(m_hihatvol));
 	save_item(NAME(m_timer_count));
-	save_item(NAME(m_gekisou_unknown_bit));
 
 	m_adjuster_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_frq_adjuster_callback), this));
 	m_adjuster_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+}
+
+void gekisou_state::machine_start()
+{
+	equites_state::machine_start();
+
+	m_gekisou_unknown_bit = 0;
+
+	save_item(NAME(m_gekisou_unknown_bit));
+}
+
+void splndrbt_state::machine_start()
+{
+	equites_state::machine_start();
+
+	save_item(NAME(m_fg_char_bank));
+	save_item(NAME(m_splndrbt_bg_scrollx));
+	save_item(NAME(m_splndrbt_bg_scrolly));
+
+	m_fg_char_bank = 0;
+	m_splndrbt_bg_scrollx = 0;
+	m_splndrbt_bg_scrolly = 0;
 }
 
 void equites_state::machine_reset()
@@ -1161,7 +1187,7 @@ MACHINE_CONFIG_START(equites_state::equites)
 	MCFG_VIDEO_START_OVERRIDE(equites_state,equites)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(equites_state::gekisou)
+MACHINE_CONFIG_START(gekisou_state::gekisou)
 	equites(config);
 
 	/* basic machine hardware */
@@ -1177,18 +1203,18 @@ MACHINE_CONFIG_START(equites_state::gekisou)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(equites_state::splndrbt)
+MACHINE_CONFIG_START(splndrbt_state::splndrbt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24_MHz_XTAL/4) /* 68000P8 running at 6mhz, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(splndrbt_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, splndrbt_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", splndrbt_state, splndrbt_scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(equites_state, flip_screen_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(equites_state, mcu_start_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(equites_state, mcu_switch_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(equites_state, splndrbt_selchar_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(splndrbt_state, splndrbt_selchar_w))
 
 	common_sound(config);
 
@@ -1200,18 +1226,18 @@ MACHINE_CONFIG_START(equites_state::splndrbt)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(equites_state, screen_update_splndrbt)
+	MCFG_SCREEN_UPDATE_DRIVER(splndrbt_state, screen_update_splndrbt)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", splndrbt)
 	MCFG_PALETTE_ADD("palette", 0x280)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
-	MCFG_PALETTE_INIT_OWNER(equites_state,splndrbt)
+	MCFG_PALETTE_INIT_OWNER(splndrbt_state,splndrbt)
 
-	MCFG_VIDEO_START_OVERRIDE(equites_state,splndrbt)
+	MCFG_VIDEO_START_OVERRIDE(splndrbt_state,splndrbt)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(equites_state::hvoltage)
+MACHINE_CONFIG_START(splndrbt_state::hvoltage)
 	splndrbt(config);
 
 	// mcu not dumped, so add simulated mcu
@@ -1947,7 +1973,7 @@ DRIVER_INIT_MEMBER(equites_state,equites)
 	unpack_region("gfx3");
 }
 
-DRIVER_INIT_MEMBER(equites_state,splndrbt)
+DRIVER_INIT_MEMBER(splndrbt_state,splndrbt)
 {
 	unpack_region("gfx3");
 }
@@ -1964,11 +1990,11 @@ GAME( 1984, equitess,  equites,  equites,  equites,  equites_state, equites,  RO
 GAME( 1984, bullfgtr,  0,        equites,  bullfgtr, equites_state, equites,  ROT90, "Alpha Denshi Co.", "Bull Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bullfgtrs, bullfgtr, equites,  bullfgtr, equites_state, equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, kouyakyu,  0,        equites,  kouyakyu, equites_state, equites,  ROT0,  "Alpha Denshi Co.", "The Koukou Yakyuu", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gekisou,   0,        gekisou,  gekisou,  equites_state, equites,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gekisou,   0,        gekisou,  gekisou,  gekisou_state, equites,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Splendor Blast Hardware
-GAME( 1985, splndrbt,  0,        splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, splndrbta, splndrbt, splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, splndrbtb, splndrbt, splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, splndrbt2, 0,        splndrbt, splndrbt, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast II", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, hvoltage,  0,        hvoltage, hvoltage, equites_state, splndrbt, ROT0,  "Alpha Denshi Co.", "High Voltage", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, splndrbt,  0,        splndrbt, splndrbt, splndrbt_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, splndrbta, splndrbt, splndrbt, splndrbt, splndrbt_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, splndrbtb, splndrbt, splndrbt, splndrbt, splndrbt_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, splndrbt2, 0,        splndrbt, splndrbt, splndrbt_state, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast II", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hvoltage,  0,        hvoltage, hvoltage, splndrbt_state, splndrbt, ROT0,  "Alpha Denshi Co.", "High Voltage", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

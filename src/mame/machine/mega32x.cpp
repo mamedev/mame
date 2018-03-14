@@ -249,17 +249,6 @@ sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const ch
 {
 }
 
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void sega_32x_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<sega_32x_device &>(device).m_palette.set_tag(tag);
-}
-
-
 READ16_MEMBER( sega_32x_device::_32x_68k_palette_r )
 {
 	return m_32x_palette[offset];

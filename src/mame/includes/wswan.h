@@ -5,9 +5,10 @@
  * includes/wswan.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_WSWAN_H
 #define MAME_INCLUDES_WSWAN_H
+
+#pragma once
 
 #define WSWAN_TYPE_MONO 0
 #define WSWAN_TYPE_COLOR 1
@@ -22,19 +23,11 @@
 #include "bus/wswan/rom.h"
 
 
-struct SoundDMA
-{
-	uint32_t  source;     /* Source address */
-	uint16_t  size;       /* Size */
-	uint8_t   enable;     /* Enabled */
-};
-
-
 class wswan_state : public driver_device
 {
 public:
-	wswan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wswan_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vdp(*this, "vdp"),
 		m_sound(*this, "custom"),
@@ -44,36 +37,8 @@ public:
 		m_buttons(*this, "BUTTONS")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<wswan_video_device> m_vdp;
-	required_device<wswan_sound_device> m_sound;
-	required_device<ws_cart_slot_device> m_cart;
-	DECLARE_READ8_MEMBER(bios_r);
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(port_w);
-
-	uint8_t m_ws_portram[256];
-	uint8_t m_internal_eeprom[INTERNAL_EEPROM_SIZE];
-	uint8_t m_system_type;
-	SoundDMA m_sound_dma;
-	std::unique_ptr<uint8_t[]> m_ws_bios_bank;
-	uint8_t m_bios_disabled;
-	uint8_t m_rotate;
-
-	void set_irq_line(int irq);
-	void dma_sound_cb();
-	void common_start();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(wswan);
-	DECLARE_MACHINE_START(wscolor);
-	DECLARE_PALETTE_INIT(wscolor);
-
-	void wscolor(machine_config &config);
 	void wswan(machine_config &config);
-	void wscolor_mem(address_map &map);
-	void wswan_io(address_map &map);
-	void wswan_mem(address_map &map);
+
 protected:
 	/* Interrupt flags */
 	static const uint8_t WSWAN_IFLAG_STX    = 0x01;
@@ -95,14 +60,59 @@ protected:
 	static const uint8_t WSWAN_INT_VBL    = 6;
 	static const uint8_t WSWAN_INT_HBLTMR = 7;
 
+	struct SoundDMA
+	{
+		uint32_t  source;     /* Source address */
+		uint16_t  size;       /* Size */
+		uint8_t   enable;     /* Enabled */
+	};
+
+	required_device<cpu_device> m_maincpu;
+	required_device<wswan_video_device> m_vdp;
+	required_device<wswan_sound_device> m_sound;
+	required_device<ws_cart_slot_device> m_cart;
+
+	uint8_t m_ws_portram[256];
+	uint8_t m_internal_eeprom[INTERNAL_EEPROM_SIZE];
+	uint8_t m_system_type;
+	SoundDMA m_sound_dma;
+	std::unique_ptr<uint8_t[]> m_ws_bios_bank;
+	uint8_t m_bios_disabled;
+	uint8_t m_rotate;
+
 	required_ioport m_cursx;
 	required_ioport m_cursy;
 	required_ioport m_buttons;
+
+	DECLARE_READ8_MEMBER(bios_r);
+	DECLARE_READ8_MEMBER(port_r);
+	DECLARE_WRITE8_MEMBER(port_w);
+
+	void set_irq_line(int irq);
+	void dma_sound_cb();
+	void common_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	DECLARE_PALETTE_INIT(wswan);
+
+	void wswan_io(address_map &map);
+	void wswan_mem(address_map &map);
 
 	void register_save();
 	void handle_irqs();
 	void clear_irq_line(int irq);
 };
 
+class wscolor_state : public wswan_state
+{
+public:
+	using wswan_state::wswan_state;
+	void wscolor(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	void wscolor_mem(address_map &map);
+	DECLARE_PALETTE_INIT(wscolor);
+};
 
 #endif // MAME_INCLUDES_WSWAN_H

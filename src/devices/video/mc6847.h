@@ -36,22 +36,22 @@
 	MCFG_SCREEN_VBLANK_TIME(0)
 
 #define MCFG_MC6847_HSYNC_CALLBACK(_write) \
-	devcb = &mc6847_friend_device::set_hsync_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mc6847_friend_device &>(*device).set_hsync_wr_callback(DEVCB_##_write);
 
 #define MCFG_MC6847_FSYNC_CALLBACK(_write) \
-	devcb = &mc6847_friend_device::set_fsync_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mc6847_friend_device &>(*device).set_fsync_wr_callback(DEVCB_##_write);
 
 #define MCFG_MC6847_CHARROM_CALLBACK(_class, _method) \
-	mc6847_friend_device::set_get_char_rom(*device, mc6847_friend_device::get_char_rom_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<mc6847_friend_device &>(*device).set_get_char_rom(mc6847_friend_device::get_char_rom_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_MC6847_INPUT_CALLBACK(_read) \
-	devcb = &mc6847_base_device::set_input_callback(*device, DEVCB_##_read);
+	devcb = &downcast<mc6847_base_device &>(*device).set_input_callback(DEVCB_##_read);
 
 #define MCFG_MC6847_FIXED_MODE(_mode) \
-	mc6847_base_device::set_get_fixed_mode(*device, _mode);
+	downcast<mc6847_base_device &>(*device).set_get_fixed_mode(_mode);
 
 #define MCFG_MC6847_BW(_bw) \
-	mc6847_base_device::set_black_and_white(*device, _bw);
+	downcast<mc6847_base_device &>(*device).set_black_and_white(_bw);
 
 
 #define MC6847_GET_CHARROM_MEMBER(_name)   uint8_t _name(uint8_t ch, int line)
@@ -86,10 +86,10 @@ public:
 	bool hs_r() const { return m_horizontal_sync; }
 	bool fs_r() const { return m_field_sync; }
 
-	template <class Object> static devcb_base &set_hsync_wr_callback(device_t &device, Object &&cb) { return downcast<mc6847_friend_device &>(device).m_write_hsync.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_fsync_wr_callback(device_t &device, Object &&cb) { return downcast<mc6847_friend_device &>(device).m_write_fsync.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_hsync_wr_callback(Object &&cb) { return m_write_hsync.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_fsync_wr_callback(Object &&cb) { return m_write_fsync.set_callback(std::forward<Object>(cb)); }
 
-	static void set_get_char_rom(device_t &device, get_char_rom_delegate &&cb) { downcast<mc6847_friend_device &>(device).m_charrom_cb = std::move(cb); }
+	template <typename Object> void set_get_char_rom(Object &&cb) { m_charrom_cb = std::forward<Object>(cb); }
 
 protected:
 	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
@@ -511,10 +511,10 @@ private:
 class mc6847_base_device : public mc6847_friend_device
 {
 public:
-	template <class Object> static devcb_base &set_input_callback(device_t &device, Object &&cb) { return downcast<mc6847_base_device &>(device).m_input_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_input_callback(Object &&cb) { return m_input_cb.set_callback(std::forward<Object>(cb)); }
 
-	static void set_get_fixed_mode(device_t &device, uint8_t mode) { downcast<mc6847_base_device &>(device).m_fixed_mode = mode; }
-	static void set_black_and_white(device_t &device, bool bw) { downcast<mc6847_base_device &>(device).m_black_and_white = bw; }
+	void set_get_fixed_mode(uint8_t mode) { m_fixed_mode = mode; }
+	void set_black_and_white(bool bw) { m_black_and_white = bw; }
 
 	/* updates the screen -- this will call begin_update(),
 	   followed by update_row() repeatedly and after all row

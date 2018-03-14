@@ -17,7 +17,7 @@
 
 
 #define MCFG_WPC_ROM_REGION(_region) \
-	wpcsnd_device::static_set_romregion(*device, _region);
+	downcast<wpcsnd_device &>(*device).set_romregion(_region);
 
 #define MCFG_WPC_SOUND_REPLY_CALLBACK(_reply) \
 	downcast<wpcsnd_device *>(device)->set_reply_callback(DEVCB_##_reply);
@@ -49,7 +49,7 @@ public:
 	uint8_t ctrl_r();
 	uint8_t data_r();
 
-	static void static_set_romregion(device_t &device, const char *tag);
+	void set_romregion(const char *tag) { m_rom.set_tag(tag); }
 
 	// callbacks
 	template <class Reply> void set_reply_callback(Reply &&cb) { m_reply_cb.set_callback(std::forward<Reply>(cb)); }

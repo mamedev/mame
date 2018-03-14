@@ -85,12 +85,12 @@ public:
 	address_map_entry &ram() { m_read.m_type = AMH_RAM; m_write.m_type = AMH_RAM; return *this; }
 	address_map_entry &readonly() { m_read.m_type = AMH_RAM; return *this; }
 	address_map_entry &writeonly() { m_write.m_type = AMH_RAM; return *this; }
-	address_map_entry &unmap() { m_read.m_type = AMH_UNMAP; m_write.m_type = AMH_UNMAP; return *this; }
-	address_map_entry &readunmap() { m_read.m_type = AMH_UNMAP; return *this; }
-	address_map_entry &writeunmap() { m_write.m_type = AMH_UNMAP; return *this; }
-	address_map_entry &nop() { m_read.m_type = AMH_NOP; m_write.m_type = AMH_NOP; return *this; }
-	address_map_entry &readnop() { m_read.m_type = AMH_NOP; return *this; }
-	address_map_entry &writenop() { m_write.m_type = AMH_NOP; return *this; }
+	address_map_entry &unmaprw() { m_read.m_type = AMH_UNMAP; m_write.m_type = AMH_UNMAP; return *this; }
+	address_map_entry &unmapr() { m_read.m_type = AMH_UNMAP; return *this; }
+	address_map_entry &unmapw() { m_write.m_type = AMH_UNMAP; return *this; }
+	address_map_entry &noprw() { m_read.m_type = AMH_NOP; m_write.m_type = AMH_NOP; return *this; }
+	address_map_entry &nopr() { m_read.m_type = AMH_NOP; return *this; }
+	address_map_entry &nopw() { m_write.m_type = AMH_NOP; return *this; }
 
 	// address mask setting
 	address_map_entry &mask(offs_t _mask);
@@ -100,21 +100,21 @@ public:
 	address_map_entry &umask32(u32 _mask);
 	address_map_entry &umask64(u64 _mask);
 
+	// chip select width setting
+	address_map_entry &cswidth(int _cswidth) { m_cswidth = _cswidth; return *this; }
+
 	// I/O port configuration
-	address_map_entry &read_port(const char *tag) { m_read.m_type = AMH_PORT; m_read.m_tag = tag; return *this; }
-	address_map_entry &write_port(const char *tag) { m_write.m_type = AMH_PORT; m_write.m_tag = tag; return *this; }
-	address_map_entry &readwrite_port(const char *tag) { read_port(tag); write_port(tag); return *this; }
+	address_map_entry &portr(const char *tag) { m_read.m_type = AMH_PORT; m_read.m_tag = tag; return *this; }
+	address_map_entry &portw(const char *tag) { m_write.m_type = AMH_PORT; m_write.m_tag = tag; return *this; }
+	address_map_entry &portrw(const char *tag) { portr(tag); portw(tag); return *this; }
 
 	// memory bank configuration
-	address_map_entry &read_bank(const char *tag) { m_read.m_type = AMH_BANK; m_read.m_tag = tag; return *this; }
-	address_map_entry &write_bank(const char *tag) { m_write.m_type = AMH_BANK; m_write.m_tag = tag; return *this; }
-	address_map_entry &readwrite_bank(const char *tag) { read_bank(tag); write_bank(tag); return *this; }
-
-	address_map_entry &rombank(const char *tag) { return read_bank(tag); }
-	address_map_entry &rambank(const char *tag) { return readwrite_bank(tag); }
+	address_map_entry &bankr(const char *tag) { m_read.m_type = AMH_BANK; m_read.m_tag = tag; return *this; }
+	address_map_entry &bankw(const char *tag) { m_write.m_type = AMH_BANK; m_write.m_tag = tag; return *this; }
+	address_map_entry &bankrw(const char *tag) { bankr(tag); bankw(tag); return *this; }
 
 	// set offset handler (only one version, since there is no data width to consider)
-	address_map_entry &set_handler(setoffset_delegate func);
+	address_map_entry &setoffset(setoffset_delegate func);
 
 	// type setters
 	address_map_entry &set_read_type(map_handler_type _type) { m_read.m_type = _type; return *this; }
@@ -122,6 +122,8 @@ public:
 
 	// submap referencing
 	address_map_entry &m(const char *tag, address_map_constructor func);
+	address_map_entry &m(device_t *device, address_map_constructor func);
+
 
 	// device tag -> delegate converter
 	template<typename _devr> address_map_entry &r(const char *tag, u8 (_devr::*read)(address_space &, offs_t, u8), const char *read_name) {
@@ -176,38 +178,110 @@ public:
 				  write64_delegate(write, write_name, tag, (_devw *)nullptr));
 	}
 
+	template<typename _dev> address_map_entry &m(const char *tag, void (_dev::*map)(address_map &), const char *map_name) {
+		return m(tag, address_map_constructor(map, map_name, (_dev *)nullptr));
+	}
 
-	// device pointer -> delegate converter
+	template<typename _dev> address_map_entry &setoffset(const char *tag, void (_dev::*so)(address_space &, offs_t), const char *so_name) {
+		return setoffset(setoffset_delegate(so, so_name, tag, (_dev *)nullptr));
+	}
+
+
+	// device pointer/finder -> delegate converter
 	template<typename _devc, typename _devr> std::enable_if_t<std::is_base_of<_devr, _devc>::value, address_map_entry &> r(_devc *device, u8 (_devr::*read)(address_space &, offs_t, u8), const char *read_name) {
 		return r(read8_delegate(read, read_name, device->tag(), device));
+	}
+
+	template<typename _devc, typename _devr> std::enable_if_t<std::is_base_of<_devr, _devc>::value, address_map_entry &> r(required_device<_devc> device, u8 (_devr::*read)(address_space &, offs_t, u8), const char *read_name) {
+		return r(read8_delegate(read, read_name, device->tag(), device.target()));
+	}
+
+	template<typename _devc, typename _devr> std::enable_if_t<std::is_base_of<_devr, _devc>::value, address_map_entry &> r(optional_device<_devc> device, u8 (_devr::*read)(address_space &, offs_t, u8), const char *read_name) {
+		return r(read8_delegate(read, read_name, device->tag(), device.target()));
 	}
 
 	template<typename _devc, typename _devr> std::enable_if_t<std::is_base_of<_devr, _devc>::value, address_map_entry &> r(_devc *device, u16 (_devr::*read)(address_space &, offs_t, u16), const char *read_name) {
 		return r(read16_delegate(read, read_name, device->tag(), device));
 	}
 
+	template<typename _devc, typename _devr> std::enable_if_t<std::is_base_of<_devr, _devc>::value, address_map_entry &> r(required_device<_devc> device, u16 (_devr::*read)(address_space &, offs_t, u16), const char *read_name) {
+		return r(read16_delegate(read, read_name, device->tag(), device.target()));
+	}
+
+	template<typename _devc, typename _devr> std::enable_if_t<std::is_base_of<_devr, _devc>::value, address_map_entry &> r(optional_device<_devc> device, u16 (_devr::*read)(address_space &, offs_t, u16), const char *read_name) {
+		return r(read16_delegate(read, read_name, device->tag(), device.target()));
+	}
+
 	template<typename _devc, typename _devr> std::enable_if_t<std::is_base_of<_devr, _devc>::value, address_map_entry &> r(_devc *device, u32 (_devr::*read)(address_space &, offs_t, u32), const char *read_name) {
 		return r(read32_delegate(read, read_name, device->tag(), device));
+	}
+
+	template<typename _devc, typename _devr> std::enable_if_t<std::is_base_of<_devr, _devc>::value, address_map_entry &> r(required_device<_devc> device, u32 (_devr::*read)(address_space &, offs_t, u32), const char *read_name) {
+		return r(read32_delegate(read, read_name, device->tag(), device.target()));
+	}
+
+	template<typename _devc, typename _devr> std::enable_if_t<std::is_base_of<_devr, _devc>::value, address_map_entry &> r(optional_device<_devc> device, u32 (_devr::*read)(address_space &, offs_t, u32), const char *read_name) {
+		return r(read32_delegate(read, read_name, device->tag(), device.target()));
 	}
 
 	template<typename _devc, typename _devr> std::enable_if_t<std::is_base_of<_devr, _devc>::value, address_map_entry &> r(_devc *device, u64 (_devr::*read)(address_space &, offs_t, u64), const char *read_name) {
 		return r(read64_delegate(read, read_name, device->tag(), device));
 	}
 
+	template<typename _devc, typename _devr> std::enable_if_t<std::is_base_of<_devr, _devc>::value, address_map_entry &> r(required_device<_devc> device, u64 (_devr::*read)(address_space &, offs_t, u64), const char *read_name) {
+		return r(read64_delegate(read, read_name, device->tag(), device.target()));
+	}
+
+	template<typename _devc, typename _devr> std::enable_if_t<std::is_base_of<_devr, _devc>::value, address_map_entry &> r(optional_device<_devc> device, u64 (_devr::*read)(address_space &, offs_t, u64), const char *read_name) {
+		return r(read64_delegate(read, read_name, device->tag(), device.target()));
+	}
+
 	template<typename _devc, typename _devw> std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &> w(_devc *device, void (_devw::*write)(address_space &, offs_t, u8, u8), const char *write_name) {
 		return w(write8_delegate(write, write_name, device->tag(), device));
+	}
+
+	template<typename _devc, typename _devw> std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &> w(required_device<_devc> device, void (_devw::*write)(address_space &, offs_t, u8, u8), const char *write_name) {
+		return w(write8_delegate(write, write_name, device->tag(), device.target()));
+	}
+
+	template<typename _devc, typename _devw> std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &> w(optional_device<_devc> device, void (_devw::*write)(address_space &, offs_t, u8, u8), const char *write_name) {
+		return w(write8_delegate(write, write_name, device->tag(), device.target()));
 	}
 
 	template<typename _devc, typename _devw> std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &> w(_devc *device, void (_devw::*write)(address_space &, offs_t, u16, u16), const char *write_name) {
 		return w(write16_delegate(write, write_name, device->tag(), device));
 	}
 
+	template<typename _devc, typename _devw> std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &> w(required_device<_devc> device, void (_devw::*write)(address_space &, offs_t, u16, u16), const char *write_name) {
+		return w(write16_delegate(write, write_name, device->tag(), device.target()));
+	}
+
+	template<typename _devc, typename _devw> std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &> w(optional_device<_devc> device, void (_devw::*write)(address_space &, offs_t, u16, u16), const char *write_name) {
+		return w(write16_delegate(write, write_name, device->tag(), device.target()));
+	}
+
 	template<typename _devc, typename _devw> std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &> w(_devc *device, void (_devw::*write)(address_space &, offs_t, u32, u32), const char *write_name) {
 		return w(write32_delegate(write, write_name, device->tag(), device));
 	}
 
+	template<typename _devc, typename _devw> std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &> w(required_device<_devc> device, void (_devw::*write)(address_space &, offs_t, u32, u32), const char *write_name) {
+		return w(write32_delegate(write, write_name, device->tag(), device.target()));
+	}
+
+	template<typename _devc, typename _devw> std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &> w(optional_device<_devc> device, void (_devw::*write)(address_space &, offs_t, u32, u32), const char *write_name) {
+		return w(write32_delegate(write, write_name, device->tag(), device.target()));
+	}
+
 	template<typename _devc, typename _devw> std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &> w(_devc *device, void (_devw::*write)(address_space &, offs_t, u64, u64), const char *write_name) {
 		return w(write64_delegate(write, write_name, device->tag(), device));
+	}
+
+	template<typename _devc, typename _devw> std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &> w(required_device<_devc> device, void (_devw::*write)(address_space &, offs_t, u64, u64), const char *write_name) {
+		return w(write64_delegate(write, write_name, device->tag(), device.target()));
+	}
+
+	template<typename _devc, typename _devw> std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &> w(optional_device<_devc> device, void (_devw::*write)(address_space &, offs_t, u64, u64), const char *write_name) {
+		return w(write64_delegate(write, write_name, device->tag(), device.target()));
 	}
 
 	template<typename _devc, typename _devr, typename _devw> std::enable_if_t<std::is_base_of<_devr, _devc>::value, std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &>> rw(_devc *device, u8 (_devr::*read)(address_space &, offs_t, u8), const char *read_name, void (_devw::*write)(address_space &, offs_t, u8, u8), const char *write_name) {
@@ -215,9 +289,29 @@ public:
 				  write8_delegate(write, write_name, device->tag(), device));
 	}
 
+	template<typename _devc, typename _devr, typename _devw> std::enable_if_t<std::is_base_of<_devr, _devc>::value, std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &>> rw(required_device<_devc> device, u8 (_devr::*read)(address_space &, offs_t, u8), const char *read_name, void (_devw::*write)(address_space &, offs_t, u8, u8), const char *write_name) {
+		return rw(read8_delegate(read, read_name, device->tag(), device.target()),
+				  write8_delegate(write, write_name, device->tag(), device.target()));
+	}
+
+	template<typename _devc, typename _devr, typename _devw> std::enable_if_t<std::is_base_of<_devr, _devc>::value, std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &>> rw(optional_device<_devc> device, u8 (_devr::*read)(address_space &, offs_t, u8), const char *read_name, void (_devw::*write)(address_space &, offs_t, u8, u8), const char *write_name) {
+		return rw(read8_delegate(read, read_name, device->tag(), device.target()),
+				  write8_delegate(write, write_name, device->tag(), device.target()));
+	}
+
 	template<typename _devc, typename _devr, typename _devw> std::enable_if_t<std::is_base_of<_devr, _devc>::value, std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &>> rw(_devc *device, u16 (_devr::*read)(address_space &, offs_t, u16), const char *read_name, void (_devw::*write)(address_space &, offs_t, u16, u16), const char *write_name) {
 		return rw(read16_delegate(read, read_name, device->tag(), device),
 				  write16_delegate(write, write_name, device->tag(), device));
+	}
+
+	template<typename _devc, typename _devr, typename _devw> std::enable_if_t<std::is_base_of<_devr, _devc>::value, std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &>> rw(required_device<_devc> device, u16 (_devr::*read)(address_space &, offs_t, u16), const char *read_name, void (_devw::*write)(address_space &, offs_t, u16, u16), const char *write_name) {
+		return rw(read16_delegate(read, read_name, device->tag(), device.target()),
+				  write16_delegate(write, write_name, device->tag(), device.target()));
+	}
+
+	template<typename _devc, typename _devr, typename _devw> std::enable_if_t<std::is_base_of<_devr, _devc>::value, std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &>> rw(optional_device<_devc> device, u16 (_devr::*read)(address_space &, offs_t, u16), const char *read_name, void (_devw::*write)(address_space &, offs_t, u16, u16), const char *write_name) {
+		return rw(read16_delegate(read, read_name, device->tag(), device.target()),
+				  write16_delegate(write, write_name, device->tag(), device.target()));
 	}
 
 	template<typename _devc, typename _devr, typename _devw> std::enable_if_t<std::is_base_of<_devr, _devc>::value, std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &>> rw(_devc *device, u32 (_devr::*read)(address_space &, offs_t, u32), const char *read_name, void (_devw::*write)(address_space &, offs_t, u32, u32), const char *write_name) {
@@ -225,34 +319,53 @@ public:
 				  write32_delegate(write, write_name, device->tag(), device));
 	}
 
+	template<typename _devc, typename _devr, typename _devw> std::enable_if_t<std::is_base_of<_devr, _devc>::value, std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &>> rw(required_device<_devc> device, u32 (_devr::*read)(address_space &, offs_t, u32), const char *read_name, void (_devw::*write)(address_space &, offs_t, u32, u32), const char *write_name) {
+		return rw(read32_delegate(read, read_name, device->tag(), device.target()),
+				  write32_delegate(write, write_name, device->tag(), device.target()));
+	}
+
+	template<typename _devc, typename _devr, typename _devw> std::enable_if_t<std::is_base_of<_devr, _devc>::value, std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &>> rw(optional_device<_devc> device, u32 (_devr::*read)(address_space &, offs_t, u32), const char *read_name, void (_devw::*write)(address_space &, offs_t, u32, u32), const char *write_name) {
+		return rw(read32_delegate(read, read_name, device->tag(), device.target()),
+				  write32_delegate(write, write_name, device->tag(), device.target()));
+	}
+
 	template<typename _devc, typename _devr, typename _devw> std::enable_if_t<std::is_base_of<_devr, _devc>::value, std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &>> rw(_devc *device, u64 (_devr::*read)(address_space &, offs_t, u64), const char *read_name, void (_devw::*write)(address_space &, offs_t, u64, u64), const char *write_name) {
 		return rw(read64_delegate(read, read_name, device->tag(), device),
 				  write64_delegate(write, write_name, device->tag(), device));
 	}
 
-	// device pointer unwrapping
-	template<typename _devc, typename R> address_map_entry &r(required_device<_devc> devptr, R read, const char *read_name) {
-		return r(devptr.target(), read, read_name);
+	template<typename _devc, typename _devr, typename _devw> std::enable_if_t<std::is_base_of<_devr, _devc>::value, std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &>> rw(required_device<_devc> device, u64 (_devr::*read)(address_space &, offs_t, u64), const char *read_name, void (_devw::*write)(address_space &, offs_t, u64, u64), const char *write_name) {
+		return rw(read64_delegate(read, read_name, device->tag(), device.target()),
+				  write64_delegate(write, write_name, device->tag(), device.target()));
 	}
 
-	template<typename _devc, typename R> address_map_entry &r(optional_device<_devc> devptr, R read, const char *read_name) {
-		return r(devptr.target(), read, read_name);
+	template<typename _devc, typename _devr, typename _devw> std::enable_if_t<std::is_base_of<_devr, _devc>::value, std::enable_if_t<std::is_base_of<_devw, _devc>::value, address_map_entry &>> rw(optional_device<_devc> device, u64 (_devr::*read)(address_space &, offs_t, u64), const char *read_name, void (_devw::*write)(address_space &, offs_t, u64, u64), const char *write_name) {
+		return rw(read64_delegate(read, read_name, device->tag(), device.target()),
+				  write64_delegate(write, write_name, device->tag(), device.target()));
 	}
 
-	template<typename _devc, typename W> address_map_entry &w(required_device<_devc> devptr, W write, const char *write_name) {
-		return w(devptr.target(), write, write_name);
+	template<typename _devc, typename _devm> std::enable_if_t<std::is_base_of<_devm, _devc>::value, address_map_entry &> m(_devc *device, void (_devm::*map)(address_map &), const char *map_name) {
+		return m(device, address_map_constructor(map, map_name, device));
 	}
 
-	template<typename _devc, typename W> address_map_entry &w(optional_device<_devc> devptr, W write, const char *write_name) {
-		return w(devptr.target(), write, write_name);
+	template<typename _devc, typename _devm> std::enable_if_t<std::is_base_of<_devm, _devc>::value, address_map_entry &> m(required_device<_devc> device, void (_devm::*map)(address_map &), const char *map_name) {
+		return m(device.target(), address_map_constructor(map, map_name, device.target()));
 	}
 
-	template<typename _devc, typename R, typename W> address_map_entry &rw(required_device<_devc> devptr, R read, const char *read_name, W write, const char *write_name) {
-		return rw(devptr.target(), read, read_name, write, write_name);
+	template<typename _devc, typename _devm> std::enable_if_t<std::is_base_of<_devm, _devc>::value, address_map_entry &> m(optional_device<_devc> device, void (_devm::*map)(address_map &), const char *map_name) {
+		return m(device.target(), address_map_constructor(map, map_name, device.target()));
 	}
 
-	template<typename _devc, typename R, typename W> address_map_entry &rw(optional_device<_devc> devptr, R read, const char *read_name, W write, const char *write_name) {
-		return rw(devptr.target(), read, read_name, write, write_name);
+	template<typename _devc, typename _devs> std::enable_if_t<std::is_base_of<_devs, _devc>::value, address_map_entry &> &setoffset(_devc *device, void (_devs::*so)(address_space &, offs_t), const char *so_name) {
+		return setoffset(setoffset_delegate(so, so_name, device->tag(), device));
+	}
+
+	template<typename _devc, typename _devs> std::enable_if_t<std::is_base_of<_devs, _devc>::value, address_map_entry &> &setoffset(required_device<_devc> device, void (_devs::*so)(address_space &, offs_t), const char *so_name) {
+		return setoffset(setoffset_delegate(so, so_name, device->tag(), device.target()));
+	}
+
+	template<typename _devc, typename _devs> std::enable_if_t<std::is_base_of<_devs, _devc>::value, address_map_entry &> &setoffset(optional_device<_devc> device, void (_devs::*so)(address_space &, offs_t), const char *so_name) {
+		return setoffset(setoffset_delegate(so, so_name, device->tag(), device.target()));
 	}
 
 
@@ -317,6 +430,7 @@ public:
 	offs_t                  m_addrmask;             // mask bits
 	offs_t                  m_addrselect;           // select bits
 	u64                     m_mask;                 // mask for which lanes apply
+	int                     m_cswidth;              // chip select width override
 	map_handler_data        m_read;                 // data for read handler
 	map_handler_data        m_write;                // data for write handler
 	map_handler_data        m_setoffsethd;          // data for setoffset handler
@@ -335,6 +449,7 @@ public:
 	write64_delegate        m_wproto64;             // 64-bit write proto-delegate
 
 	setoffset_delegate      m_soproto;              // set offset proto-delegate
+	device_t               *m_submap_device;
 	address_map_constructor m_submap_delegate;
 
 	// information used during processing
@@ -374,7 +489,7 @@ public:
 	// construction/destruction
 	address_map(device_t &device, int spacenum);
 	address_map(device_t &device, address_map_entry *entry);
-	address_map(const address_space &space, offs_t start, offs_t end, u64 unitmask, device_t &device, address_map_constructor submap_delegate);
+	address_map(const address_space &space, offs_t start, offs_t end, u64 unitmask, int cswidth, device_t &device, address_map_constructor submap_delegate);
 	~address_map();
 
 	// setters
@@ -460,7 +575,7 @@ public:
 // driver set offset. Upcast to base class because there are no data width variants,
 // and the compiler complains if we don't do it explicitly
 #define AM_SETOFFSET(_handler) \
-	.set_handler(setoffset_delegate(&std::remove_pointer_t<decltype(this)>::_handler, "driver_data::" #_handler, this))
+	.setoffset(this, &std::remove_pointer_t<decltype(this)>::_handler, "driver_data::" #_handler)
 
 // device reads
 #define AM_DEVREAD(_tag, _class, _handler) \
@@ -494,7 +609,7 @@ public:
 
 // device set offset
 #define AM_DEVSETOFFSET(_tag, _class, _handler) \
-	.set_handler(setoffset_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr))
+	.setoffset(_tag, &_class::_handler, #_class "::" #_handler)
 
 
 // device mapping
@@ -517,33 +632,33 @@ public:
 #define AM_WRITEONLY \
 	.writeonly()
 #define AM_UNMAP \
-	.unmap()
+	.unmaprw()
 #define AM_READUNMAP \
-	.readunmap()
+	.unmapr()
 #define AM_WRITEUNMAP \
-	.writeunmap()
+	.unmapw()
 #define AM_NOP \
-	.nop()
+	.noprw()
 #define AM_READNOP \
-	.readnop()
+	.nopr()
 #define AM_WRITENOP \
-	.writenop()
+	.nopw()
 
 // port accesses
 #define AM_READ_PORT(_tag) \
-	.read_port(_tag)
+	.portr(_tag)
 #define AM_WRITE_PORT(_tag) \
-	.write_port(_tag)
+	.portw(_tag)
 #define AM_READWRITE_PORT(_tag) \
-	.readwrite_port(_tag)
+	.portrw(_tag)
 
 // bank accesses
 #define AM_READ_BANK(_tag) \
-	.read_bank(_tag)
+	.bankr(_tag)
 #define AM_WRITE_BANK(_tag) \
-	.write_bank(_tag)
+	.bankw(_tag)
 #define AM_READWRITE_BANK(_tag) \
-	.readwrite_bank(_tag)
+	.bankrw(_tag)
 
 // attributes for accesses
 #define AM_REGION(_tag, _offs) \
@@ -552,8 +667,8 @@ public:
 	.share(_tag)
 
 // common shortcuts
-#define AM_ROMBANK(_bank)                   .rombank(_bank)
-#define AM_RAMBANK(_bank)                   .rambank(_bank)
+#define AM_ROMBANK(_bank)                   .bankr(_bank)
+#define AM_RAMBANK(_bank)                   .bankrw(_bank)
 #define AM_RAM_READ(_read)                  AM_READ(_read) AM_WRITEONLY
 #define AM_RAM_WRITE(_write)                AM_READONLY AM_WRITE(_write)
 #define AM_RAM_DEVREAD(_tag, _class, _read) AM_DEVREAD(_tag, _class, _read) AM_WRITEONLY

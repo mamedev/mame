@@ -103,33 +103,35 @@ To verify against original HW:
  *
  *************************************/
 
-ADDRESS_MAP_START(divebomb_state::divebomb_fgcpu_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void divebomb_state::divebomb_fgcpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram().w(this, FUNC(divebomb_state::fgram_w)).share("fgram");
+	map(0xe000, 0xffff).ram();
+}
 
 
-ADDRESS_MAP_START(divebomb_state::divebomb_fgcpu_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("sn0", sn76489_device, write)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("sn3", sn76489_device, write)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("sn4", sn76489_device, write)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE("sn5", sn76489_device, write)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(fgcpu_roz_comm_r, fgcpu_roz_comm_w)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(fgcpu_spr_comm_r, fgcpu_spr_comm_w)
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("IN0")
-	AM_RANGE(0x31, 0x31) AM_READ_PORT("IN1")
-	AM_RANGE(0x32, 0x32) AM_READ_PORT("DSW1")
-	AM_RANGE(0x33, 0x33) AM_READ_PORT("DSW2")
+void divebomb_state::divebomb_fgcpu_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("sn0", FUNC(sn76489_device::write));
+	map(0x01, 0x01).w("sn1", FUNC(sn76489_device::write));
+	map(0x02, 0x02).w("sn2", FUNC(sn76489_device::write));
+	map(0x03, 0x03).w("sn3", FUNC(sn76489_device::write));
+	map(0x04, 0x04).w("sn4", FUNC(sn76489_device::write));
+	map(0x05, 0x05).w("sn5", FUNC(sn76489_device::write));
+	map(0x10, 0x10).rw(this, FUNC(divebomb_state::fgcpu_roz_comm_r), FUNC(divebomb_state::fgcpu_roz_comm_w));
+	map(0x20, 0x20).rw(this, FUNC(divebomb_state::fgcpu_spr_comm_r), FUNC(divebomb_state::fgcpu_spr_comm_w));
+	map(0x30, 0x30).portr("IN0");
+	map(0x31, 0x31).portr("IN1");
+	map(0x32, 0x32).portr("DSW1");
+	map(0x33, 0x33).portr("DSW2");
 	// 34/35 aren't read but PCB has 4 banks of dips populated, so logically they would map here even if unused
-	AM_RANGE(0x34, 0x34) AM_READ_PORT("DSW3")
-	AM_RANGE(0x35, 0x35) AM_READ_PORT("DSW4")
-	AM_RANGE(0x36, 0x36) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x37, 0x37) AM_READ(fgcpu_comm_flags_r)
-ADDRESS_MAP_END
+	map(0x34, 0x34).portr("DSW3");
+	map(0x35, 0x35).portr("DSW4");
+	map(0x36, 0x36).portr("SYSTEM");
+	map(0x37, 0x37).r(this, FUNC(divebomb_state::fgcpu_comm_flags_r));
+}
 
 
 READ8_MEMBER(divebomb_state::fgcpu_spr_comm_r)
@@ -182,19 +184,21 @@ READ8_MEMBER(divebomb_state::fgcpu_comm_flags_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(divebomb_state::divebomb_spritecpu_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xdfff) AM_WRITENOP
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void divebomb_state::divebomb_spritecpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram().share("spriteram");
+	map(0xc800, 0xdfff).nopw();
+	map(0xe000, 0xffff).ram();
+}
 
 
-ADDRESS_MAP_START(divebomb_state::divebomb_spritecpu_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(spritecpu_port00_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(spritecpu_comm_r, spritecpu_comm_w)
-ADDRESS_MAP_END
+void divebomb_state::divebomb_spritecpu_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(divebomb_state::spritecpu_port00_w));
+	map(0x80, 0x80).rw(this, FUNC(divebomb_state::spritecpu_comm_r), FUNC(divebomb_state::spritecpu_comm_w));
+}
 
 
 READ8_MEMBER(divebomb_state::spritecpu_comm_r)
@@ -226,27 +230,29 @@ WRITE8_MEMBER(divebomb_state::spritecpu_port00_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(divebomb_state::divebomb_rozcpu_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_DEVREADWRITE("k051316_1", k051316_device, read, write)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_DEVREADWRITE("k051316_2", k051316_device, read, write)
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void divebomb_state::divebomb_rozcpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc7ff).ram().rw(m_k051316_1, FUNC(k051316_device::read), FUNC(k051316_device::write));
+	map(0xd000, 0xd7ff).ram().rw(m_k051316_2, FUNC(k051316_device::read), FUNC(k051316_device::write));
+	map(0xe000, 0xffff).ram();
+}
 
 
-ADDRESS_MAP_START(divebomb_state::divebomb_rozcpu_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(rozcpu_bank_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(rozcpu_wrap2_enable_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(rozcpu_enable1_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(rozcpu_enable2_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(rozcpu_wrap1_enable_w)
-	AM_RANGE(0x20, 0x2f) AM_DEVWRITE("k051316_1", k051316_device, ctrl_w)
-	AM_RANGE(0x30, 0x3f) AM_DEVWRITE("k051316_2", k051316_device, ctrl_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(rozcpu_comm_r, rozcpu_comm_w)
-	AM_RANGE(0x50, 0x50) AM_WRITE(rozcpu_pal_w)
-ADDRESS_MAP_END
+void divebomb_state::divebomb_rozcpu_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(divebomb_state::rozcpu_bank_w));
+	map(0x10, 0x10).w(this, FUNC(divebomb_state::rozcpu_wrap2_enable_w));
+	map(0x12, 0x12).w(this, FUNC(divebomb_state::rozcpu_enable1_w));
+	map(0x13, 0x13).w(this, FUNC(divebomb_state::rozcpu_enable2_w));
+	map(0x14, 0x14).w(this, FUNC(divebomb_state::rozcpu_wrap1_enable_w));
+	map(0x20, 0x2f).w(m_k051316_1, FUNC(k051316_device::ctrl_w));
+	map(0x30, 0x3f).w(m_k051316_2, FUNC(k051316_device::ctrl_w));
+	map(0x40, 0x40).rw(this, FUNC(divebomb_state::rozcpu_comm_r), FUNC(divebomb_state::rozcpu_comm_w));
+	map(0x50, 0x50).w(this, FUNC(divebomb_state::rozcpu_pal_w));
+}
 
 
 WRITE8_MEMBER(divebomb_state::rozcpu_bank_w)

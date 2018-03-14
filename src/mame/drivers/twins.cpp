@@ -282,17 +282,19 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 }
 
 
-ADDRESS_MAP_START(twins_state::twins_map)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(spider_blitter_r, spider_blitter_w)
-ADDRESS_MAP_END
+void twins_state::twins_map(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(this, FUNC(twins_state::spider_blitter_r), FUNC(twins_state::spider_blitter_w));
+}
 
-ADDRESS_MAP_START(twins_state::twins_io)
-	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
-	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
-	AM_RANGE(0x0006, 0x0007) AM_WRITE(twins_pal_w) AM_SHARE("paletteram")
-	AM_RANGE(0x000e, 0x000f) AM_WRITE(porte_paloff0_w)
-ADDRESS_MAP_END
+void twins_state::twins_io(address_map &map)
+{
+	map(0x0000, 0x0003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x0002, 0x0002).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x0004, 0x0005).rw(this, FUNC(twins_state::twins_port4_r), FUNC(twins_state::twins_port4_w));
+	map(0x0006, 0x0007).w(this, FUNC(twins_state::twins_pal_w)).share("paletteram");
+	map(0x000e, 0x000f).w(this, FUNC(twins_state::porte_paloff0_w));
+}
 
 void twins_state::video_start()
 {
@@ -420,19 +422,21 @@ MACHINE_CONFIG_END
 
 
 
-ADDRESS_MAP_START(twins_state::twinsa_io)
-	AM_RANGE(0x0000, 0x0001) AM_DEVWRITE8("ramdac",ramdac_device,index_w,0x00ff)
-	AM_RANGE(0x0002, 0x0003) AM_DEVWRITE8("ramdac",ramdac_device,mask_w,0x00ff)
-	AM_RANGE(0x0004, 0x0005) AM_DEVREADWRITE8("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
-	AM_RANGE(0x0008, 0x0009) AM_DEVWRITE8("aysnd", ay8910_device, address_w, 0x00ff)
-	AM_RANGE(0x0010, 0x0011) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x0018, 0x0019) AM_READ(twins_port4_r) AM_WRITE(twins_port4_w)
-ADDRESS_MAP_END
+void twins_state::twinsa_io(address_map &map)
+{
+	map(0x0000, 0x0000).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x0002, 0x0002).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x0004, 0x0004).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
+	map(0x0008, 0x0008).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x0010, 0x0010).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x0018, 0x0019).r(this, FUNC(twins_state::twins_port4_r)).w(this, FUNC(twins_state::twins_port4_w));
+}
 
 
-ADDRESS_MAP_START(twins_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void twins_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 
 MACHINE_CONFIG_START(twins_state::twinsa)
@@ -545,20 +549,21 @@ READ16_MEMBER(twins_state::spider_port_1e_r)
 }
 
 
-ADDRESS_MAP_START(twins_state::spider_io)
-	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
-	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
-	AM_RANGE(0x0008, 0x0009) AM_WRITE(spider_pal_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0010, 0x0011) AM_WRITE(spider_paloff0_w)
+void twins_state::spider_io(address_map &map)
+{
+	map(0x0000, 0x0003).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x0002, 0x0002).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x0004, 0x0005).rw(this, FUNC(twins_state::twins_port4_r), FUNC(twins_state::twins_port4_w));
+	map(0x0008, 0x0009).w(this, FUNC(twins_state::spider_pal_w)).share("paletteram");
+	map(0x0010, 0x0011).w(this, FUNC(twins_state::spider_paloff0_w));
 
-	AM_RANGE(0x0018, 0x0019) AM_READ(spider_port_18_r)
-	AM_RANGE(0x001a, 0x001b) AM_WRITE(spider_port_1a_w)
-	AM_RANGE(0x001c, 0x001d) AM_WRITE(spider_port_1c_w)
-	AM_RANGE(0x001e, 0x001f) AM_READ(spider_port_1e_r)
+	map(0x0018, 0x0019).r(this, FUNC(twins_state::spider_port_18_r));
+	map(0x001a, 0x001b).w(this, FUNC(twins_state::spider_port_1a_w));
+	map(0x001c, 0x001d).w(this, FUNC(twins_state::spider_port_1c_w));
+	map(0x001e, 0x001f).r(this, FUNC(twins_state::spider_port_1e_r));
 
 
-ADDRESS_MAP_END
+}
 
 
 

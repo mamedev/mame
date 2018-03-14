@@ -229,21 +229,22 @@ WRITE8_MEMBER(spool99_state::eeprom_dataline_w)
 	m_eeprom->di_write(data & 0x01);
 }
 
-ADDRESS_MAP_START(spool99_state::spool99_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x0100, 0xaeff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
-	AM_RANGE(0xaf00, 0xafff) AM_READ(spool99_io_r)
-	AM_RANGE(0xafed, 0xafed) AM_WRITE(eeprom_resetline_w )
-	AM_RANGE(0xafee, 0xafee) AM_WRITE(eeprom_clockline_w )
-	AM_RANGE(0xafef, 0xafef) AM_WRITE(eeprom_dataline_w )
-	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_device, write)
+void spool99_state::spool99_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().share("mainram");
+	map(0x0100, 0xaeff).rom().region("maincpu", 0x100).nopw();
+	map(0xaf00, 0xafff).r(this, FUNC(spool99_state::spool99_io_r));
+	map(0xafed, 0xafed).w(this, FUNC(spool99_state::eeprom_resetline_w));
+	map(0xafee, 0xafee).w(this, FUNC(spool99_state::eeprom_clockline_w));
+	map(0xafef, 0xafef).w(this, FUNC(spool99_state::eeprom_dataline_w));
+	map(0xaff8, 0xaff8).w(m_oki, FUNC(okim6295_device::write));
 
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	map(0xb000, 0xb3ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 
-	AM_RANGE(0xb800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(cram_w) AM_SHARE("cram")
-ADDRESS_MAP_END
+	map(0xb800, 0xdfff).ram();
+	map(0xe000, 0xefff).ram().w(this, FUNC(spool99_state::vram_w)).share("vram");
+	map(0xf000, 0xffff).ram().w(this, FUNC(spool99_state::cram_w)).share("cram");
+}
 
 READ8_MEMBER(spool99_state::vcarn_io_r)
 {
@@ -275,22 +276,23 @@ READ8_MEMBER(spool99_state::vcarn_io_r)
 	return ROM[0xa700+offset];
 }
 
-ADDRESS_MAP_START(spool99_state::vcarn_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x0100, 0xa6ff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
-	AM_RANGE(0xa700, 0xa7ff) AM_READ(vcarn_io_r)
-	AM_RANGE(0xa745, 0xa745) AM_WRITE(eeprom_resetline_w )
-	AM_RANGE(0xa746, 0xa746) AM_WRITE(eeprom_clockline_w )
-	AM_RANGE(0xa747, 0xa747) AM_WRITE(eeprom_dataline_w )
-	AM_RANGE(0xa780, 0xa780) AM_DEVWRITE("oki", okim6295_device, write)
+void spool99_state::vcarn_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().share("mainram");
+	map(0x0100, 0xa6ff).rom().region("maincpu", 0x100).nopw();
+	map(0xa700, 0xa7ff).r(this, FUNC(spool99_state::vcarn_io_r));
+	map(0xa745, 0xa745).w(this, FUNC(spool99_state::eeprom_resetline_w));
+	map(0xa746, 0xa746).w(this, FUNC(spool99_state::eeprom_clockline_w));
+	map(0xa747, 0xa747).w(this, FUNC(spool99_state::eeprom_dataline_w));
+	map(0xa780, 0xa780).w(m_oki, FUNC(okim6295_device::write));
 
-	AM_RANGE(0xa800, 0xabff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	map(0xa800, 0xabff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 
-	AM_RANGE(0xb000, 0xdfff) AM_RAM
+	map(0xb000, 0xdfff).ram();
 //  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_SHARE("vcarn_io")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(cram_w) AM_SHARE("cram")
-ADDRESS_MAP_END
+	map(0xe000, 0xefff).ram().w(this, FUNC(spool99_state::vram_w)).share("vram");
+	map(0xf000, 0xffff).ram().w(this, FUNC(spool99_state::cram_w)).share("cram");
+}
 
 
 

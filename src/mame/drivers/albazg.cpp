@@ -49,14 +49,37 @@ PCB:
 class albazg_state : public driver_device
 {
 public:
-	albazg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	albazg_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_cus_ram(*this, "cus_ram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
+	virtual void yumefuda(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	DECLARE_WRITE8_MEMBER(yumefuda_vram_w);
+	DECLARE_WRITE8_MEMBER(yumefuda_cram_w);
+	DECLARE_READ8_MEMBER(custom_ram_r);
+	DECLARE_WRITE8_MEMBER(custom_ram_w);
+	DECLARE_WRITE8_MEMBER(prot_lock_w);
+	DECLARE_READ8_MEMBER(mux_r);
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(yumefuda_output_w);
+	TILE_GET_INFO_MEMBER(y_get_bg_tile_info);
+	uint32_t screen_update_yumefuda(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+	void port_map(address_map &map);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_cus_ram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -69,24 +92,9 @@ public:
 	uint8_t m_mux_data;
 	int m_bank;
 	uint8_t m_prot_lock;
-	DECLARE_WRITE8_MEMBER(yumefuda_vram_w);
-	DECLARE_WRITE8_MEMBER(yumefuda_cram_w);
-	DECLARE_READ8_MEMBER(custom_ram_r);
-	DECLARE_WRITE8_MEMBER(custom_ram_w);
-	DECLARE_WRITE8_MEMBER(prot_lock_w);
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(yumefuda_output_w);
-	TILE_GET_INFO_MEMBER(y_get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_yumefuda(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void yumefuda(machine_config &config);
-	void main_map(address_map &map);
-	void port_map(address_map &map);
 };
 
 TILE_GET_INFO_MEMBER(albazg_state::y_get_bg_tile_info)
@@ -208,28 +216,30 @@ WRITE8_MEMBER(albazg_state::yumefuda_output_w)
 
 /***************************************************************************************/
 
-ADDRESS_MAP_START(albazg_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE(prot_lock_w)
-	AM_RANGE(0xa7ff, 0xa7ff) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0xaf80, 0xafff) AM_READWRITE(custom_ram_r, custom_ram_w) AM_SHARE("cus_ram")
-	AM_RANGE(0xb000, 0xb07f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xb080, 0xb0ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(yumefuda_vram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(yumefuda_cram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void albazg_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa7fc, 0xa7fc).w(this, FUNC(albazg_state::prot_lock_w));
+	map(0xa7ff, 0xa7ff).portw("EEPROMOUT");
+	map(0xaf80, 0xafff).rw(this, FUNC(albazg_state::custom_ram_r), FUNC(albazg_state::custom_ram_w)).share("cus_ram");
+	map(0xb000, 0xb07f).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0xb080, 0xb0ff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xc000, 0xc3ff).ram().w(this, FUNC(albazg_state::yumefuda_vram_w)).share("videoram");
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(albazg_state::yumefuda_cram_w)).share("colorram");
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(albazg_state::port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+void albazg_state::port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x01, 0x01).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x40, 0x40).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x80, 0x83).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc0, 0xc0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+}
 
 /***************************************************************************************/
 

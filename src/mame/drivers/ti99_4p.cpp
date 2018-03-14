@@ -284,17 +284,19 @@ enum
 	ROM6UBASE = 0xe000
 };
 
-ADDRESS_MAP_START(ti99_4p_state::memmap)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE( memread, memwrite ) AM_SETOFFSET( setoffset )
-ADDRESS_MAP_END
+void ti99_4p_state::memmap(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(ti99_4p_state::memread), FUNC(ti99_4p_state::memwrite)).setoffset(this, FUNC(ti99_4p_state::setoffset));
+}
 
-ADDRESS_MAP_START(ti99_4p_state::cru_map)
-	AM_RANGE(0x0000, 0x01ff) AM_READ( cruread )
-	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
+void ti99_4p_state::cru_map(address_map &map)
+{
+	map(0x0000, 0x01ff).r(this, FUNC(ti99_4p_state::cruread));
+	map(0x0000, 0x003f).r(m_tms9901, FUNC(tms9901_device::read));
 
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE( cruwrite )
-	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
-ADDRESS_MAP_END
+	map(0x0000, 0x0fff).w(this, FUNC(ti99_4p_state::cruwrite));
+	map(0x0000, 0x01ff).w(m_tms9901, FUNC(tms9901_device::write));
+}
 
 /*
     Input ports, used by machine code for TI keyboard and joystick emulation.
@@ -458,7 +460,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 	int addr_off8k = m_addr_buf & 0x1fff;
 
 	// If we use the debugger, decode the address now (normally done in setaddress)
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		m_addr_buf = offset << 1;
 		m_decode = decode_address(m_addr_buf);
@@ -501,7 +503,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 		break;
 
 	case SGCPU_PEB:
-		if (machine().side_effect_disabled()) return debugger_read(space, offset);
+		if (machine().side_effects_disabled()) return debugger_read(space, offset);
 		// The byte from the odd address has already been read into the latch
 		// Reading the even address now
 		m_peribox->readz(space, m_addr_buf, &hbyte);
@@ -519,7 +521,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 	int address = 0;
 
 	// If we use the debugger, decode the address now (normally done in setaddress)
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		m_addr_buf = offset << 1;
 		m_decode = decode_address(m_addr_buf);
@@ -563,7 +565,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 		break;
 
 	case SGCPU_PEB:
-		if (machine().side_effect_disabled()) { debugger_write(space, offset, data); return; }
+		if (machine().side_effects_disabled()) { debugger_write(space, offset, data); return; }
 
 		// Writing the even address now (addr)
 		// The databus multiplexer puts the even value into the latch and outputs the odd value now.

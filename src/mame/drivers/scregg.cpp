@@ -99,36 +99,38 @@ READ8_MEMBER(scregg_state::scregg_irqack_r)
 }
 
 
-ADDRESS_MAP_START(scregg_state::dommy_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITE(scregg_irqack_w)
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("P1")
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("P2")
-	AM_RANGE(0x4004, 0x4005) AM_DEVWRITE("ay1", ay8910_device, address_data_w) AM_READ(scregg_irqack_r)
-	AM_RANGE(0x4006, 0x4007) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void scregg_state::dommy_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x2000, 0x23ff).ram().share("videoram");
+	map(0x2400, 0x27ff).ram().share("colorram");
+	map(0x2800, 0x2bff).rw(this, FUNC(scregg_state::btime_mirrorvideoram_r), FUNC(scregg_state::btime_mirrorvideoram_w));
+	map(0x4000, 0x4000).portr("DSW1").w(this, FUNC(scregg_state::scregg_irqack_w));
+	map(0x4001, 0x4001).portr("DSW2").w(this, FUNC(scregg_state::btime_video_control_w));
+	map(0x4002, 0x4002).portr("P1");
+	map(0x4003, 0x4003).portr("P2");
+	map(0x4004, 0x4005).w("ay1", FUNC(ay8910_device::address_data_w)).r(this, FUNC(scregg_state::scregg_irqack_r));
+	map(0x4006, 0x4007).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xa000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(scregg_state::eggs_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r,btime_mirrorvideoram_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r,btime_mirrorcolorram_w)
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("DSW2") AM_WRITE(scregg_irqack_w)
-	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P1")
-	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("P2")
-	AM_RANGE(0x2004, 0x2005) AM_DEVWRITE("ay1", ay8910_device, address_data_w) AM_READ(scregg_irqack_r)
-	AM_RANGE(0x2006, 0x2007) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x3000, 0x7fff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM    /* reset/interrupt vectors */
-ADDRESS_MAP_END
+void scregg_state::eggs_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x1000, 0x13ff).ram().share("videoram");
+	map(0x1400, 0x17ff).ram().share("colorram");
+	map(0x1800, 0x1bff).rw(this, FUNC(scregg_state::btime_mirrorvideoram_r), FUNC(scregg_state::btime_mirrorvideoram_w));
+	map(0x1c00, 0x1fff).rw(this, FUNC(scregg_state::btime_mirrorcolorram_r), FUNC(scregg_state::btime_mirrorcolorram_w));
+	map(0x2000, 0x2000).portr("DSW1").w(this, FUNC(scregg_state::btime_video_control_w));
+	map(0x2001, 0x2001).portr("DSW2").w(this, FUNC(scregg_state::scregg_irqack_w));
+	map(0x2002, 0x2002).portr("P1");
+	map(0x2003, 0x2003).portr("P2");
+	map(0x2004, 0x2005).w("ay1", FUNC(ay8910_device::address_data_w)).r(this, FUNC(scregg_state::scregg_irqack_r));
+	map(0x2006, 0x2007).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x3000, 0x7fff).rom();
+	map(0xf000, 0xffff).rom();    /* reset/interrupt vectors */
+}
 
 
 static INPUT_PORTS_START( scregg )

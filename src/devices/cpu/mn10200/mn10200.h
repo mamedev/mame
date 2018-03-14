@@ -15,9 +15,9 @@
 
 // port setup
 #define MCFG_MN10200_READ_PORT_CB(X, _devcb) \
-	devcb = &mn10200_device::set_read_port##X##_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mn10200_device &>(*device).set_read_port##X##_callback(DEVCB_##_devcb);
 #define MCFG_MN10200_WRITE_PORT_CB(X, _devcb) \
-	devcb = &mn10200_device::set_write_port##X##_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mn10200_device &>(*device).set_write_port##X##_callback(DEVCB_##_devcb);
 
 enum
 {
@@ -42,18 +42,18 @@ enum
 class mn10200_device : public cpu_device
 {
 public:
-	// static configuration helpers
-	template <class Object> static devcb_base &set_read_port0_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_port1_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_port2_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_port3_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_port4_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port4.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_read_port0_callback(Object &&cb) { return m_read_port0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_port1_callback(Object &&cb) { return m_read_port1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_port2_callback(Object &&cb) { return m_read_port2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_port3_callback(Object &&cb) { return m_read_port3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_port4_callback(Object &&cb) { return m_read_port4.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_write_port0_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_port1_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_port2_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_port3_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_port4_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port4.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_port0_callback(Object &&cb) { return m_write_port0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_port1_callback(Object &&cb) { return m_write_port1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_port2_callback(Object &&cb) { return m_write_port2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_port3_callback(Object &&cb) { return m_write_port3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_port4_callback(Object &&cb) { return m_write_port4.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(io_control_r);
 	DECLARE_WRITE8_MEMBER(io_control_w);

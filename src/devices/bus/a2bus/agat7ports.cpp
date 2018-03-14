@@ -14,6 +14,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "agat7ports.h"
 
 //#define VERBOSE 1
@@ -80,6 +81,7 @@ ioport_constructor a2bus_agat7_ports_device::device_input_ports() const
 a2bus_agat7_ports_device::a2bus_agat7_ports_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a2bus_card_interface(mconfig, *this)
+	, m_printer_cfg(*this, "PRINTER_CFG")
 	, m_d9(*this, "d9")
 	, m_d10(*this, "d10")
 	, m_centronics(*this, "centronics")
@@ -161,12 +163,12 @@ void a2bus_agat7_ports_device::write_c0nx(uint8_t offset, uint8_t data)
 }
 
 /*
- * 0	ODD
- * 1	EVEN
- * 4	INIT
- * 5	STROBE
- * 6	/INIT
- * 7	/STROBE
+ * 0    ODD
+ * 1    EVEN
+ * 4    INIT
+ * 5    STROBE
+ * 6    /INIT
+ * 7    /STROBE
  */
 WRITE8_MEMBER(a2bus_agat7_ports_device::write_portb)
 {
@@ -175,17 +177,17 @@ WRITE8_MEMBER(a2bus_agat7_ports_device::write_portb)
 }
 
 /*
- * 1	dip CNTRLESC (0: CPA-80, FX-85, Gemini.  1: D100)
- * 2	dip ALF0
- * 3	dip A/BR (0: level, BUSY/READY.  1: edge, ACK)
- * 4	dip INVD (1: data are sent inverted)
- * 5	dip ALF1 (00: KOI-8, 01: GOST, 10: CPA-80, 11: FX-85)
- * 6	dip ABRLEV (0: BUSY, /ACK.  1: READY, ACK)
- * 7	ready signal from device
+ * 1    dip CNTRLESC (0: CPA-80, FX-85, Gemini.  1: D100)
+ * 2    dip ALF0
+ * 3    dip A/BR (0: level, BUSY/READY.  1: edge, ACK)
+ * 4    dip INVD (1: data are sent inverted)
+ * 5    dip ALF1 (00: KOI-8, 01: GOST, 10: CPA-80, 11: FX-85)
+ * 6    dip ABRLEV (0: BUSY, /ACK.  1: READY, ACK)
+ * 7    ready signal from device
  */
 READ8_MEMBER(a2bus_agat7_ports_device::read_portc)
 {
-	return (m_centronics_busy << 7) | ioport("PRINTER_CFG")->read();
+	return (m_centronics_busy << 7) | m_printer_cfg->read();
 }
 
 WRITE_LINE_MEMBER(a2bus_agat7_ports_device::write_centronics_busy)

@@ -61,33 +61,35 @@ WRITE8_MEMBER(battlnts_state::battlnts_bankswitch_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(battlnts_state::battlnts_map)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_device, read, write)    /* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_device, read, write)    /* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_device, scroll_r, scroll_w)      /* Scroll RAM */
-	AM_RANGE(0x2400, 0x24ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")/* palette */
-	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_device, vreg_w)          /* Video Registers */
-	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P2")
-	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P1")
-	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW3")               /* coinsw, testsw, startsw */
-	AM_RANGE(0x2e04, 0x2e04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2e08, 0x2e08) AM_WRITE(battlnts_bankswitch_w)    /* bankswitch control */
-	AM_RANGE(0x2e0c, 0x2e0c) AM_WRITE(battlnts_spritebank_w)    /* sprite bank select */
-	AM_RANGE(0x2e10, 0x2e10) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x2e14, 0x2e14) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* sound code # */
-	AM_RANGE(0x2e18, 0x2e18) AM_WRITE(battlnts_sh_irqtrigger_w) /* cause interrupt on audio CPU */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("rombank")              /* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* ROM 777e02.bin */
-ADDRESS_MAP_END
+void battlnts_state::battlnts_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rw(m_k007342, FUNC(k007342_device::read), FUNC(k007342_device::write));    /* Color RAM + Video RAM */
+	map(0x2000, 0x21ff).rw(m_k007420, FUNC(k007420_device::read), FUNC(k007420_device::write));    /* Sprite RAM */
+	map(0x2200, 0x23ff).rw(m_k007342, FUNC(k007342_device::scroll_r), FUNC(k007342_device::scroll_w));      /* Scroll RAM */
+	map(0x2400, 0x24ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");/* palette */
+	map(0x2600, 0x2607).w(m_k007342, FUNC(k007342_device::vreg_w));          /* Video Registers */
+	map(0x2e00, 0x2e00).portr("DSW1");
+	map(0x2e01, 0x2e01).portr("P2");
+	map(0x2e02, 0x2e02).portr("P1");
+	map(0x2e03, 0x2e03).portr("DSW3");               /* coinsw, testsw, startsw */
+	map(0x2e04, 0x2e04).portr("DSW2");
+	map(0x2e08, 0x2e08).w(this, FUNC(battlnts_state::battlnts_bankswitch_w));    /* bankswitch control */
+	map(0x2e0c, 0x2e0c).w(this, FUNC(battlnts_state::battlnts_spritebank_w));    /* sprite bank select */
+	map(0x2e10, 0x2e10).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x2e14, 0x2e14).w("soundlatch", FUNC(generic_latch_8_device::write)); /* sound code # */
+	map(0x2e18, 0x2e18).w(this, FUNC(battlnts_state::battlnts_sh_irqtrigger_w)); /* cause interrupt on audio CPU */
+	map(0x4000, 0x7fff).bankr("rombank");              /* banked ROM */
+	map(0x8000, 0xffff).rom();                             /* ROM 777e02.bin */
+}
 
-ADDRESS_MAP_START(battlnts_state::battlnts_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                         /* ROM 777c01.rom */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM                         /* RAM */
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", ym3812_device, read, write)      /* YM3812 (chip 1) */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", ym3812_device, read, write)      /* YM3812 (chip 2) */
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void battlnts_state::battlnts_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                         /* ROM 777c01.rom */
+	map(0x8000, 0x87ff).ram();                         /* RAM */
+	map(0xa000, 0xa001).rw("ym1", FUNC(ym3812_device::read), FUNC(ym3812_device::write));      /* YM3812 (chip 1) */
+	map(0xc000, 0xc001).rw("ym2", FUNC(ym3812_device::read), FUNC(ym3812_device::write));      /* YM3812 (chip 2) */
+	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 /*************************************
  *

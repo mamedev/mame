@@ -65,25 +65,27 @@ READ8_MEMBER(fruitpc_state::fruit_inp_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(fruitpc_state::fruitpc_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff) // VGA VRAM
-	AM_RANGE(0x000c0000, 0x000dffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0x000e0000, 0x000fffff) AM_RAM AM_REGION("bios", 0)
-	AM_RANGE(0x00100000, 0x008fffff) AM_RAM  // 8MB RAM
-	AM_RANGE(0x02000000, 0x28ffffff) AM_NOP
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
-ADDRESS_MAP_END
+void fruitpc_state::fruitpc_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w)); // VGA VRAM
+	map(0x000c0000, 0x000dffff).rom().region("bios", 0);
+	map(0x000e0000, 0x000fffff).ram().region("bios", 0);
+	map(0x00100000, 0x008fffff).ram();  // 8MB RAM
+	map(0x02000000, 0x28ffffff).noprw();
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+}
 
-ADDRESS_MAP_START(fruitpc_state::fruitpc_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
-	AM_RANGE(0x0310, 0x0313) AM_READ8(fruit_inp_r, 0xffffffff)
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
-ADDRESS_MAP_END
+void fruitpc_state::fruitpc_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
+	map(0x0310, 0x0313).r(this, FUNC(fruitpc_state::fruit_inp_r));
+	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
+}
 
 static INPUT_PORTS_START( fruitpc )
 	PORT_START("INP1")

@@ -283,52 +283,60 @@ WRITE8_MEMBER(cinemat_state::qb3_ram_bank_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(cinemat_state::program_map_4k)
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void cinemat_state::program_map_4k(address_map &map)
+{
+	map.global_mask(0xfff);
+	map(0x0000, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(cinemat_state::program_map_8k)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM
-	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0x1000) AM_ROM AM_REGION("maincpu", 0x1000)
-ADDRESS_MAP_END
+void cinemat_state::program_map_8k(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x0fff).mirror(0x1000).rom();
+	map(0x2000, 0x2fff).mirror(0x1000).rom().region("maincpu", 0x1000);
+}
 
-ADDRESS_MAP_START(cinemat_state::program_map_16k)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void cinemat_state::program_map_16k(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x3fff).rom();
+}
 
-ADDRESS_MAP_START(cinemat_state::program_map_32k)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(cinemat_state::data_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(cinemat_state::data_map_qb3)
-	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1") AM_SHARE("rambase")
-ADDRESS_MAP_END
+void cinemat_state::program_map_32k(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x7fff).rom();
+}
 
 
-ADDRESS_MAP_START(cinemat_state::io_map)
-	AM_RANGE(0x00, 0x0f) AM_READ(inputs_r)
-	AM_RANGE(0x10, 0x16) AM_READ(switches_r)
-	AM_RANGE(0x17, 0x17) AM_READ(coin_input_r)
+void cinemat_state::data_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+}
 
-	AM_RANGE(0x00, 0x07) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void cinemat_state::data_map_qb3(address_map &map)
+{
+	map(0x0000, 0x03ff).bankrw("bank1").share("rambase");
+}
 
-ADDRESS_MAP_START(cinemat_state::io_map_qb3)
-	AM_IMPORT_FROM(io_map)
+
+void cinemat_state::io_map(address_map &map)
+{
+	map(0x00, 0x0f).r(this, FUNC(cinemat_state::inputs_r));
+	map(0x10, 0x16).r(this, FUNC(cinemat_state::switches_r));
+	map(0x17, 0x17).r(this, FUNC(cinemat_state::coin_input_r));
+
+	map(0x00, 0x07).w(m_outlatch, FUNC(ls259_device::write_d0));
+}
+
+void cinemat_state::io_map_qb3(address_map &map)
+{
+	io_map(map);
 	// Some of the outputs here are definitely not mapped through the LS259, since they use multiple bits of data
-	AM_RANGE(0x00, 0x00) AM_WRITE(qb3_ram_bank_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(qb3_sound_fifo_w)
-	AM_RANGE(0x0f, 0x0f) AM_READ(qb3_frame_r)
-ADDRESS_MAP_END
+	map(0x00, 0x00).w(this, FUNC(cinemat_state::qb3_ram_bank_w));
+	map(0x04, 0x04).w(this, FUNC(cinemat_state::qb3_sound_fifo_w));
+	map(0x0f, 0x0f).r(this, FUNC(cinemat_state::qb3_frame_r));
+}
 
 
 

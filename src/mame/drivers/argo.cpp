@@ -144,17 +144,19 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 
 
 
-ADDRESS_MAP_START(argo_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
-	AM_RANGE(0x0800, 0xf7af) AM_RAM
-	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_WRITE(argo_videoram_w)
-ADDRESS_MAP_END
+void argo_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).bankrw("boot");
+	map(0x0800, 0xf7af).ram();
+	map(0xf7b0, 0xf7ff).ram().share("videoram");
+	map(0xf800, 0xffff).rom().w(this, FUNC(argo_state::argo_videoram_w));
+}
 
-ADDRESS_MAP_START(argo_state::io_map)
-	AM_RANGE(0x0000, 0xFFFF) AM_READWRITE(argo_io_r,argo_io_w)
-ADDRESS_MAP_END
+void argo_state::io_map(address_map &map)
+{
+	map(0x0000, 0xFFFF).rw(this, FUNC(argo_state::argo_io_r), FUNC(argo_state::argo_io_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( argo ) // Keyboard was worked out by trial & error;'F' keys produce symbols

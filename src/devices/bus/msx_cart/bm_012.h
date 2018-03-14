@@ -18,7 +18,6 @@ class msx_cart_bm_012_device : public device_t, public msx_cart_interface
 public:
 	msx_cart_bm_012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void bm_012_memory_map(address_map &map);
 protected:
 	virtual void device_start() override;
 
@@ -28,6 +27,8 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(midi_in);
+
+	void bm_012_memory_map(address_map &map);
 
 	required_device<tmpz84c015_device> m_tmpz84c015af;
 	required_device<z80pio_device> m_bm012_pio;

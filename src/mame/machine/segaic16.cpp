@@ -202,48 +202,14 @@ sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &m
 	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, tag, owner, clock)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_cpuregion(*this, finder_base::DUMMY_TAG)
+	, m_pbf_callback(*this)
+	, m_mcu_int_callback(*this)
 	, m_space(nullptr)
 	, m_decrypted_space(nullptr)
 	, m_curregion(0)
+	, m_to_sound(0)
+	, m_from_sound(0)
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_cputag - configuration helper
-//  to set the tag of the CPU device
-//-------------------------------------------------
-
-void sega_315_5195_mapper_device::static_set_cputag(device_t &device, const char *cpu)
-{
-	sega_315_5195_mapper_device &mapper = downcast<sega_315_5195_mapper_device &>(device);
-	mapper.m_cpu.set_tag(cpu);
-	mapper.m_cpuregion.set_tag(cpu);
-}
-
-
-//-------------------------------------------------
-//  static_set_mapper - configuration helper
-//  to set the mapper function
-//-------------------------------------------------
-
-void sega_315_5195_mapper_device::static_set_mapper(device_t &device, mapper_delegate callback)
-{
-	sega_315_5195_mapper_device &mapper = downcast<sega_315_5195_mapper_device &>(device);
-	mapper.m_mapper = callback;
-}
-
-
-//-------------------------------------------------
-//  static_set_sound_readwrite - configuration
-//  helper to set the sound read/write callbacks
-//-------------------------------------------------
-
-void sega_315_5195_mapper_device::static_set_sound_readwrite(device_t &device, sound_read_delegate read, sound_write_delegate write)
-{
-	sega_315_5195_mapper_device &mapper = downcast<sega_315_5195_mapper_device &>(device);
-	mapper.m_sound_read = read;
-	mapper.m_sound_write = write;
 }
 
 
@@ -278,8 +244,7 @@ if (LOG_MEMORY_MAP) osd_printf_debug("(Write %02X = %02X)\n", offset, data);
 
 		case 0x03:
 			// write through to the sound chip
-			if (!m_sound_write.isnull())
-				m_sound_write(data);
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(sega_315_5195_mapper_device::write_to_sound), this), data);
 			break;
 
 		case 0x04:
@@ -364,9 +329,9 @@ READ8_MEMBER( sega_315_5195_mapper_device::read )
 
 		case 0x03:
 			// this returns data that the sound CPU writes
-			if (!m_sound_read.isnull())
-				return m_sound_read();
-			return 0xff;
+			if (!m_mcu_int_callback.isnull() && !machine().side_effects_disabled())
+				m_mcu_int_callback(CLEAR_LINE);
+			return m_from_sound;
 
 		default:
 			logerror("Unknown memory_mapper_r from address %02X\n", offset);
@@ -518,6 +483,53 @@ void sega_315_5195_mapper_device::fd1094_state_change(uint8_t state)
 
 
 //-------------------------------------------------
+//  write_to_sound - write data for the sound CPU
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(sega_315_5195_mapper_device::write_to_sound)
+{
+	m_to_sound = param;
+	if (!m_pbf_callback.isnull())
+		m_pbf_callback(ASSERT_LINE);
+}
+
+
+//-------------------------------------------------
+//  write_from_sound - handle writes from the
+//  sound CPU
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(sega_315_5195_mapper_device::write_from_sound)
+{
+	m_from_sound = param;
+	if (!m_mcu_int_callback.isnull())
+		m_mcu_int_callback(ASSERT_LINE);
+}
+
+
+//-------------------------------------------------
+//  pread - sound CPU read handler
+//-------------------------------------------------
+
+READ8_MEMBER(sega_315_5195_mapper_device::pread)
+{
+	if (!m_pbf_callback.isnull() && !machine().side_effects_disabled())
+		m_pbf_callback(CLEAR_LINE);
+	return m_to_sound;
+}
+
+
+//-------------------------------------------------
+//  pwrite - sound CPU write handler
+//-------------------------------------------------
+
+WRITE8_MEMBER(sega_315_5195_mapper_device::pwrite)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sega_315_5195_mapper_device::write_from_sound), this), data);
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -525,8 +537,8 @@ void sega_315_5195_mapper_device::device_start()
 {
 	// bind our handlers
 	m_mapper.bind_relative_to(*owner());
-	m_sound_read.bind_relative_to(*owner());
-	m_sound_write.bind_relative_to(*owner());
+	m_pbf_callback.resolve();
+	m_mcu_int_callback.resolve();
 
 	// if we are mapping an FD1089, tell all the banks
 	fd1089_base_device *fd1089 = dynamic_cast<fd1089_base_device *>(m_cpu.target());
@@ -552,6 +564,8 @@ void sega_315_5195_mapper_device::device_start()
 
 	// register for saves
 	save_item(NAME(m_regs));
+	save_item(NAME(m_to_sound));
+	save_item(NAME(m_from_sound));
 }
 
 
@@ -570,6 +584,13 @@ void sega_315_5195_mapper_device::device_reset()
 
 	// release the CPU
 	m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+
+	m_to_sound = 0;
+	m_from_sound = 0;
+	if (!m_pbf_callback.isnull())
+		m_pbf_callback(CLEAR_LINE);
+	if (!m_mcu_int_callback.isnull())
+		m_mcu_int_callback(CLEAR_LINE);
 }
 
 
@@ -953,31 +974,8 @@ void sega_315_5249_divider_device::execute(int mode)
 
 sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGA_315_5250_COMPARE_TIMER, tag, owner, clock)
+	, m_sound_write(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_timer_ack - configuration helper
-//  to set the timer acknowledge function
-//-------------------------------------------------
-
-void sega_315_5250_compare_timer_device::static_set_timer_ack(device_t &device, timer_ack_delegate callback)
-{
-	sega_315_5250_compare_timer_device &timer = downcast<sega_315_5250_compare_timer_device &>(device);
-	timer.m_timer_ack = callback;
-}
-
-
-//-------------------------------------------------
-//  static_set_sound_readwrite - configuration
-//  helper to set the sound read/write callbacks
-//-------------------------------------------------
-
-void sega_315_5250_compare_timer_device::static_set_sound_write(device_t &device, sound_write_delegate write)
-{
-	sega_315_5250_compare_timer_device &timer = downcast<sega_315_5250_compare_timer_device &>(device);
-	timer.m_sound_write = write;
 }
 
 
@@ -1065,7 +1063,7 @@ void sega_315_5250_compare_timer_device::device_start()
 {
 	// bind our handlers
 	m_timer_ack.bind_relative_to(*owner());
-	m_sound_write.bind_relative_to(*owner());
+	m_sound_write.resolve();
 
 	// save states
 	save_item(NAME(m_regs));

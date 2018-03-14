@@ -372,123 +372,131 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_soundreset_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(ninjakd2_state::ninjakd2_main_cpu)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("KEYCOIN")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("PAD1")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("PAD2")
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DIPSW1")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DIPSW2")
-	AM_RANGE(0xc200, 0xc200) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc201, 0xc201) AM_WRITE(ninjakd2_soundreset_w)
-	AM_RANGE(0xc202, 0xc202) AM_WRITE(ninjakd2_bankselect_w)
-	AM_RANGE(0xc203, 0xc203) AM_WRITE(ninjakd2_sprite_overdraw_w)
-	AM_RANGE(0xc208, 0xc20c) AM_WRITE(ninjakd2_bg_ctrl_w)
-	AM_RANGE(0xc800, 0xcdff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xe000, 0xf9ff) AM_RAM
-	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void ninjakd2_state::ninjakd2_main_cpu(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc000).portr("KEYCOIN");
+	map(0xc001, 0xc001).portr("PAD1");
+	map(0xc002, 0xc002).portr("PAD2");
+	map(0xc003, 0xc003).portr("DIPSW1");
+	map(0xc004, 0xc004).portr("DIPSW2");
+	map(0xc200, 0xc200).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc201, 0xc201).w(this, FUNC(ninjakd2_state::ninjakd2_soundreset_w));
+	map(0xc202, 0xc202).w(this, FUNC(ninjakd2_state::ninjakd2_bankselect_w));
+	map(0xc203, 0xc203).w(this, FUNC(ninjakd2_state::ninjakd2_sprite_overdraw_w));
+	map(0xc208, 0xc20c).w(this, FUNC(ninjakd2_state::ninjakd2_bg_ctrl_w));
+	map(0xc800, 0xcdff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(ninjakd2_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(ninjakd2_state::ninjakd2_bgvideoram_w)).share("bg_videoram");
+	map(0xe000, 0xf9ff).ram();
+	map(0xfa00, 0xffff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(ninjakd2_state::mnight_main_cpu)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xd9ff) AM_RAM
-	AM_RANGE(0xda00, 0xdfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xf000, 0xf5ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("KEYCOIN")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("PAD1")
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("PAD2")
-	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("DIPSW1")
-	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DIPSW2")
-	AM_RANGE(0xfa00, 0xfa00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xfa01, 0xfa01) AM_WRITE(ninjakd2_soundreset_w)
-	AM_RANGE(0xfa02, 0xfa02) AM_WRITE(ninjakd2_bankselect_w)
-	AM_RANGE(0xfa03, 0xfa03) AM_WRITE(ninjakd2_sprite_overdraw_w)
-	AM_RANGE(0xfa08, 0xfa0c) AM_WRITE(ninjakd2_bg_ctrl_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(ninjakd2_state::robokid_main_cpu)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(robokid_bg2_videoram_r, robokid_bg2_videoram_w)   // banked
-	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(robokid_bg1_videoram_r, robokid_bg1_videoram_w)   // banked
-	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(robokid_bg0_videoram_r, robokid_bg0_videoram_w)   // banked
-	AM_RANGE(0xdc00, 0xdc00) AM_READ_PORT("KEYCOIN") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xdc01, 0xdc01) AM_READ_PORT("PAD1") AM_WRITE(ninjakd2_soundreset_w)
-	AM_RANGE(0xdc02, 0xdc02) AM_READ_PORT("PAD2") AM_WRITE(ninjakd2_bankselect_w)
-	AM_RANGE(0xdc03, 0xdc03) AM_READ_PORT("DIPSW1") AM_WRITE(ninjakd2_sprite_overdraw_w)
-	AM_RANGE(0xdc04, 0xdc04) AM_READ_PORT("DIPSW2")
-	AM_RANGE(0xdd00, 0xdd04) AM_WRITE(robokid_bg0_ctrl_w)
-	AM_RANGE(0xdd05, 0xdd05) AM_WRITE(robokid_bg0_bank_w)
-	AM_RANGE(0xde00, 0xde04) AM_WRITE(robokid_bg1_ctrl_w)
-	AM_RANGE(0xde05, 0xde05) AM_WRITE(robokid_bg1_bank_w)
-	AM_RANGE(0xdf00, 0xdf04) AM_WRITE(robokid_bg2_ctrl_w)
-	AM_RANGE(0xdf05, 0xdf05) AM_WRITE(robokid_bg2_bank_w)
-	AM_RANGE(0xe000, 0xf9ff) AM_RAM
-	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void ninjakd2_state::mnight_main_cpu(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xd9ff).ram();
+	map(0xda00, 0xdfff).ram().share("spriteram");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(ninjakd2_state::ninjakd2_bgvideoram_w)).share("bg_videoram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(ninjakd2_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xf000, 0xf5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf800, 0xf800).portr("KEYCOIN");
+	map(0xf801, 0xf801).portr("PAD1");
+	map(0xf802, 0xf802).portr("PAD2");
+	map(0xf803, 0xf803).portr("DIPSW1");
+	map(0xf804, 0xf804).portr("DIPSW2");
+	map(0xfa00, 0xfa00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xfa01, 0xfa01).w(this, FUNC(ninjakd2_state::ninjakd2_soundreset_w));
+	map(0xfa02, 0xfa02).w(this, FUNC(ninjakd2_state::ninjakd2_bankselect_w));
+	map(0xfa03, 0xfa03).w(this, FUNC(ninjakd2_state::ninjakd2_sprite_overdraw_w));
+	map(0xfa08, 0xfa0c).w(this, FUNC(ninjakd2_state::ninjakd2_bg_ctrl_w));
+}
 
 
-ADDRESS_MAP_START(ninjakd2_state::omegaf_main_cpu)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("KEYCOIN") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc001, 0xc003) AM_READ(omegaf_io_protection_r)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(ninjakd2_soundreset_w)
-	AM_RANGE(0xc002, 0xc002) AM_WRITE(ninjakd2_bankselect_w)
-	AM_RANGE(0xc003, 0xc003) AM_WRITE(ninjakd2_sprite_overdraw_w)
-	AM_RANGE(0xc004, 0xc006) AM_WRITE(omegaf_io_protection_w)
-	AM_RANGE(0xc100, 0xc104) AM_WRITE(robokid_bg0_ctrl_w)
-	AM_RANGE(0xc105, 0xc105) AM_WRITE(robokid_bg0_bank_w)
-	AM_RANGE(0xc1e7, 0xc1e7) AM_READNOP // see notes
-	AM_RANGE(0xc200, 0xc204) AM_WRITE(robokid_bg1_ctrl_w)
-	AM_RANGE(0xc205, 0xc205) AM_WRITE(robokid_bg1_bank_w)
-	AM_RANGE(0xc300, 0xc304) AM_WRITE(robokid_bg2_ctrl_w)
-	AM_RANGE(0xc305, 0xc305) AM_WRITE(robokid_bg2_bank_w)
-	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(robokid_bg0_videoram_r, robokid_bg0_videoram_w)   // banked
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(robokid_bg1_videoram_r, robokid_bg1_videoram_w)   // banked
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(robokid_bg2_videoram_r, robokid_bg2_videoram_w)   // banked
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xe000, 0xf9ff) AM_RAM
-	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void ninjakd2_state::robokid_main_cpu(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(ninjakd2_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xd000, 0xd3ff).rw(this, FUNC(ninjakd2_state::robokid_bg2_videoram_r), FUNC(ninjakd2_state::robokid_bg2_videoram_w));   // banked
+	map(0xd400, 0xd7ff).rw(this, FUNC(ninjakd2_state::robokid_bg1_videoram_r), FUNC(ninjakd2_state::robokid_bg1_videoram_w));   // banked
+	map(0xd800, 0xdbff).rw(this, FUNC(ninjakd2_state::robokid_bg0_videoram_r), FUNC(ninjakd2_state::robokid_bg0_videoram_w));   // banked
+	map(0xdc00, 0xdc00).portr("KEYCOIN").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xdc01, 0xdc01).portr("PAD1").w(this, FUNC(ninjakd2_state::ninjakd2_soundreset_w));
+	map(0xdc02, 0xdc02).portr("PAD2").w(this, FUNC(ninjakd2_state::ninjakd2_bankselect_w));
+	map(0xdc03, 0xdc03).portr("DIPSW1").w(this, FUNC(ninjakd2_state::ninjakd2_sprite_overdraw_w));
+	map(0xdc04, 0xdc04).portr("DIPSW2");
+	map(0xdd00, 0xdd04).w(this, FUNC(ninjakd2_state::robokid_bg0_ctrl_w));
+	map(0xdd05, 0xdd05).w(this, FUNC(ninjakd2_state::robokid_bg0_bank_w));
+	map(0xde00, 0xde04).w(this, FUNC(ninjakd2_state::robokid_bg1_ctrl_w));
+	map(0xde05, 0xde05).w(this, FUNC(ninjakd2_state::robokid_bg1_bank_w));
+	map(0xdf00, 0xdf04).w(this, FUNC(ninjakd2_state::robokid_bg2_ctrl_w));
+	map(0xdf05, 0xdf05).w(this, FUNC(ninjakd2_state::robokid_bg2_bank_w));
+	map(0xe000, 0xf9ff).ram();
+	map(0xfa00, 0xffff).ram().share("spriteram");
+}
 
 
-ADDRESS_MAP_START(ninjakd2_state::ninjakd2_sound_cpu)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(ninjakd2_pcm_play_w)
-ADDRESS_MAP_END
+void ninjakd2_state::omegaf_main_cpu(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc000).portr("KEYCOIN").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc001, 0xc003).r(this, FUNC(ninjakd2_state::omegaf_io_protection_r));
+	map(0xc001, 0xc001).w(this, FUNC(ninjakd2_state::ninjakd2_soundreset_w));
+	map(0xc002, 0xc002).w(this, FUNC(ninjakd2_state::ninjakd2_bankselect_w));
+	map(0xc003, 0xc003).w(this, FUNC(ninjakd2_state::ninjakd2_sprite_overdraw_w));
+	map(0xc004, 0xc006).w(this, FUNC(ninjakd2_state::omegaf_io_protection_w));
+	map(0xc100, 0xc104).w(this, FUNC(ninjakd2_state::robokid_bg0_ctrl_w));
+	map(0xc105, 0xc105).w(this, FUNC(ninjakd2_state::robokid_bg0_bank_w));
+	map(0xc1e7, 0xc1e7).nopr(); // see notes
+	map(0xc200, 0xc204).w(this, FUNC(ninjakd2_state::robokid_bg1_ctrl_w));
+	map(0xc205, 0xc205).w(this, FUNC(ninjakd2_state::robokid_bg1_bank_w));
+	map(0xc300, 0xc304).w(this, FUNC(ninjakd2_state::robokid_bg2_ctrl_w));
+	map(0xc305, 0xc305).w(this, FUNC(ninjakd2_state::robokid_bg2_bank_w));
+	map(0xc400, 0xc7ff).rw(this, FUNC(ninjakd2_state::robokid_bg0_videoram_r), FUNC(ninjakd2_state::robokid_bg0_videoram_w));   // banked
+	map(0xc800, 0xcbff).rw(this, FUNC(ninjakd2_state::robokid_bg1_videoram_r), FUNC(ninjakd2_state::robokid_bg1_videoram_w));   // banked
+	map(0xcc00, 0xcfff).rw(this, FUNC(ninjakd2_state::robokid_bg2_videoram_r), FUNC(ninjakd2_state::robokid_bg2_videoram_w));   // banked
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(ninjakd2_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xd800, 0xdfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xe000, 0xf9ff).ram();
+	map(0xfa00, 0xffff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(ninjakd2_state::ninjakid_nopcm_sound_cpu)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf000, 0xf000) AM_NOP
-ADDRESS_MAP_END
 
-ADDRESS_MAP_START(ninjakd2_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("soundcpu", 0x8000)
-ADDRESS_MAP_END
+void ninjakd2_state::ninjakd2_sound_cpu(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xf000, 0xf000).w(this, FUNC(ninjakd2_state::ninjakd2_pcm_play_w));
+}
 
-ADDRESS_MAP_START(ninjakd2_state::ninjakd2_sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("2203.1", ym2203_device, write)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("2203.2", ym2203_device, write)
-ADDRESS_MAP_END
+void ninjakd2_state::ninjakid_nopcm_sound_cpu(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xf000, 0xf000).noprw();
+}
+
+void ninjakd2_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8000, 0xbfff).rom().region("soundcpu", 0x8000);
+}
+
+void ninjakd2_state::ninjakd2_sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("2203.1", FUNC(ym2203_device::write));
+	map(0x80, 0x81).w("2203.2", FUNC(ym2203_device::write));
+}
 
 
 

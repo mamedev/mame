@@ -64,40 +64,43 @@ WRITE8_MEMBER(scotrsht_state::soundlatch_w)
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-ADDRESS_MAP_START(scotrsht_state::scotrsht_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram") /* sprites */
-	AM_RANGE(0x10c0, 0x1fff) AM_RAM /* work ram */
-	AM_RANGE(0x2000, 0x201f) AM_RAM AM_SHARE("scroll") /* scroll registers */
-	AM_RANGE(0x2040, 0x2040) AM_WRITENOP
-	AM_RANGE(0x2041, 0x2041) AM_WRITENOP
-	AM_RANGE(0x2042, 0x2042) AM_WRITENOP  /* it should be -> bit 2 = scroll direction like in jailbrek, but it's not used */
-	AM_RANGE(0x2043, 0x2043) AM_WRITE(charbank_w)
-	AM_RANGE(0x2044, 0x2044) AM_WRITE(ctrl_w)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(palettebank_w)
-	AM_RANGE(0x3100, 0x3100) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x3200, 0x3200) AM_WRITENOP /* it writes 0, 1 */
-	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3200, 0x3200) AM_READ_PORT("DSW3")
-	AM_RANGE(0x3300, 0x3300) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3301, 0x3301) AM_READ_PORT("P1")
-	AM_RANGE(0x3302, 0x3302) AM_READ_PORT("P2")
-	AM_RANGE(0x3303, 0x3303) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3300, 0x3300) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void scotrsht_state::scotrsht_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().w(this, FUNC(scotrsht_state::colorram_w)).share("colorram");
+	map(0x0800, 0x0fff).ram().w(this, FUNC(scotrsht_state::videoram_w)).share("videoram");
+	map(0x1000, 0x10bf).ram().share("spriteram"); /* sprites */
+	map(0x10c0, 0x1fff).ram(); /* work ram */
+	map(0x2000, 0x201f).ram().share("scroll"); /* scroll registers */
+	map(0x2040, 0x2040).nopw();
+	map(0x2041, 0x2041).nopw();
+	map(0x2042, 0x2042).nopw();  /* it should be -> bit 2 = scroll direction like in jailbrek, but it's not used */
+	map(0x2043, 0x2043).w(this, FUNC(scotrsht_state::charbank_w));
+	map(0x2044, 0x2044).w(this, FUNC(scotrsht_state::ctrl_w));
+	map(0x3000, 0x3000).w(this, FUNC(scotrsht_state::palettebank_w));
+	map(0x3100, 0x3100).w(this, FUNC(scotrsht_state::soundlatch_w));
+	map(0x3200, 0x3200).nopw(); /* it writes 0, 1 */
+	map(0x3100, 0x3100).portr("DSW2");
+	map(0x3200, 0x3200).portr("DSW3");
+	map(0x3300, 0x3300).portr("SYSTEM");
+	map(0x3301, 0x3301).portr("P1");
+	map(0x3302, 0x3302).portr("P2");
+	map(0x3303, 0x3303).portr("DSW1");
+	map(0x3300, 0x3300).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(scotrsht_state::scotrsht_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void scotrsht_state::scotrsht_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x8000, 0x8000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(scotrsht_state::scotrsht_sound_port)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-ADDRESS_MAP_END
+void scotrsht_state::scotrsht_sound_port(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 
 static INPUT_PORTS_START( scotrsht )

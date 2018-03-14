@@ -208,22 +208,24 @@ WRITE8_MEMBER(superdq_state::superdq_ld_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(superdq_state::superdq_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x5c00, 0x5fff) AM_RAM_WRITE(superdq_videoram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void superdq_state::superdq_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x5c00, 0x5fff).ram().w(this, FUNC(superdq_state::superdq_videoram_w)).share("videoram");
+}
 
-ADDRESS_MAP_START(superdq_state::superdq_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(superdq_ld_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
-	AM_RANGE(0x04, 0x04) AM_READ(superdq_ld_r) AM_DEVWRITE("snsnd", sn76496_device, write)
-	AM_RANGE(0x08, 0x08) AM_WRITE(superdq_io_w)
-	AM_RANGE(0x0c, 0x0d) AM_NOP /* HD46505S */
-ADDRESS_MAP_END
+void superdq_state::superdq_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w(this, FUNC(superdq_state::superdq_ld_w));
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("DSW1");
+	map(0x03, 0x03).portr("DSW2");
+	map(0x04, 0x04).r(this, FUNC(superdq_state::superdq_ld_r)).w("snsnd", FUNC(sn76496_device::write));
+	map(0x08, 0x08).w(this, FUNC(superdq_state::superdq_io_w));
+	map(0x0c, 0x0d).noprw(); /* HD46505S */
+}
 
 
 

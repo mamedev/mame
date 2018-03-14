@@ -28,7 +28,7 @@ DE-0207-0
 |MB3730  558  558  YM3014  YM2203          CP11.1C   12MHz  |
 |-----------------------------------------------------------|
 Notes:
-      6809   - clock 1.500MHz [12/8]
+      6809   - MC68B09EP, clock 1.500MHz [12/8]
       YM2203 - clock 1.500MHz [12/8]
       VSC30  - clock 3.000MHz [12/4, pin 7), custom DECO DIP40 IC
       HMC20  - DECO HMC20 custom DIP28 IC. Provides many clocks each divided by 2
@@ -228,21 +228,22 @@ uint32_t chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_in
 
 /***************************************************************************/
 
-ADDRESS_MAP_START(chanbara_state::chanbara_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(chanbara_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(chanbara_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(chanbara_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x1a00, 0x1bff) AM_RAM_WRITE(chanbara_colorram2_w) AM_SHARE("colorram2")
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P2")
-	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("P1")
-	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void chanbara_state::chanbara_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0bff).ram().w(this, FUNC(chanbara_state::chanbara_videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(this, FUNC(chanbara_state::chanbara_colorram_w)).share("colorram");
+	map(0x1000, 0x10ff).ram().share("spriteram");
+	map(0x1800, 0x19ff).ram().w(this, FUNC(chanbara_state::chanbara_videoram2_w)).share("videoram2");
+	map(0x1a00, 0x1bff).ram().w(this, FUNC(chanbara_state::chanbara_colorram2_w)).share("colorram2");
+	map(0x2000, 0x2000).portr("DSW1");
+	map(0x2001, 0x2001).portr("SYSTEM");
+	map(0x2002, 0x2002).portr("P2");
+	map(0x2003, 0x2003).portr("P1");
+	map(0x3800, 0x3801).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom();
+}
 
 /***************************************************************************/
 
@@ -389,7 +390,7 @@ void chanbara_state::machine_reset()
 
 MACHINE_CONFIG_START(chanbara_state::chanbara)
 
-	MCFG_CPU_ADD("maincpu", M6809, XTAL(12'000'000)/8)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(12'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(chanbara_map)
 
 

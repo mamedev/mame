@@ -46,7 +46,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<h6280_device> m_audiocpu;
 	required_device_array<deco_bac06_device, 3> m_tilegen;
 	required_device<deco_mxc06_device> m_spritegen;
 
@@ -61,45 +61,47 @@ public:
 /******************************************************************************/
 
 
-ADDRESS_MAP_START(madmotor_state::madmotor_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x180000, 0x180007) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_0_w)                          /* text layer */
-	AM_RANGE(0x180010, 0x180017) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_1_w)
-	AM_RANGE(0x184000, 0x18407f) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_colscroll_r, pf_colscroll_w)
-	AM_RANGE(0x184080, 0x1843ff) AM_RAM
-	AM_RANGE(0x184400, 0x1847ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_rowscroll_r, pf_rowscroll_w)
-	AM_RANGE(0x188000, 0x189fff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_r, pf_data_w)
-	AM_RANGE(0x18c000, 0x18c001) AM_NOP
-	AM_RANGE(0x190000, 0x190007) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control_0_w)                          /* text layer */
-	AM_RANGE(0x190010, 0x190017) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control_1_w)
-	AM_RANGE(0x198000, 0x1987ff) AM_DEVREADWRITE("tilegen2", deco_bac06_device, pf_data_r, pf_data_w)
-	AM_RANGE(0x19c000, 0x19c001) AM_READNOP
-	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVWRITE("tilegen3", deco_bac06_device, pf_control_0_w)                          /* text layer */
-	AM_RANGE(0x1a0010, 0x1a0017) AM_DEVWRITE("tilegen3", deco_bac06_device, pf_control_1_w)
-	AM_RANGE(0x1a4000, 0x1a4fff) AM_DEVREADWRITE("tilegen3", deco_bac06_device, pf_data_r, pf_data_w)
-	AM_RANGE(0x3e0000, 0x3e3fff) AM_RAM
-	AM_RANGE(0x3e8000, 0x3e87ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3f0000, 0x3f07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x3f8002, 0x3f8003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x3f8004, 0x3f8005) AM_READ_PORT("DSW")
-	AM_RANGE(0x3f8006, 0x3f8007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3fc004, 0x3fc005) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-ADDRESS_MAP_END
+void madmotor_state::madmotor_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x180000, 0x180007).w("tilegen1", FUNC(deco_bac06_device::pf_control_0_w));                          /* text layer */
+	map(0x180010, 0x180017).w("tilegen1", FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x184000, 0x18407f).rw("tilegen1", FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
+	map(0x184080, 0x1843ff).ram();
+	map(0x184400, 0x1847ff).rw("tilegen1", FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
+	map(0x188000, 0x189fff).rw("tilegen1", FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x18c000, 0x18c001).noprw();
+	map(0x190000, 0x190007).w("tilegen2", FUNC(deco_bac06_device::pf_control_0_w));                          /* text layer */
+	map(0x190010, 0x190017).w("tilegen2", FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x198000, 0x1987ff).rw("tilegen2", FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x19c000, 0x19c001).nopr();
+	map(0x1a0000, 0x1a0007).w("tilegen3", FUNC(deco_bac06_device::pf_control_0_w));                          /* text layer */
+	map(0x1a0010, 0x1a0017).w("tilegen3", FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x1a4000, 0x1a4fff).rw("tilegen3", FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x3e0000, 0x3e3fff).ram();
+	map(0x3e8000, 0x3e87ff).ram().share("spriteram");
+	map(0x3f0000, 0x3f07ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x3f8002, 0x3f8003).portr("P1_P2");
+	map(0x3f8004, 0x3f8005).portr("DSW");
+	map(0x3f8006, 0x3f8007).portr("SYSTEM");
+	map(0x3fc005, 0x3fc005).w("soundlatch", FUNC(generic_latch_8_device::write));
+}
 
 /******************************************************************************/
 
 /* Physical memory map (21 bits) */
-ADDRESS_MAP_START(madmotor_state::sound_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void madmotor_state::sound_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x100000, 0x100001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x110000, 0x110001).rw("ym2", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x140000, 0x140001).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x1f0000, 0x1f1fff).bankrw("bank8");
+	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
+	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+}
 
 /******************************************************************************/
 

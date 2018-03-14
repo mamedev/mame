@@ -1,14 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli, David Haywood
-/* Little Robin */
-
-/* driver by
-Pierpaolo Prazzoli
-David Haywood
-*/
-
-
 /*
+
+Little Robin, (c)1994 TCH
+
+driver by:
+  Pierpaolo Prazzoli
+  David Haywood
+
 
 Notes:
 
@@ -19,6 +18,37 @@ so it's surely not 100% correct. Sound sample playbacks looks fine at current ti
 
 ------
 
+LITTLE ROBIN  TCH S.A.
++---------------------------------------------+
+|TDA2003                       U41_RAM  44C256|
+|VR1                  U48      U40_RAM  44C256|
+|  6.000MHz                    U36_RAM  44C256|
+|                              U35_RAM  44C256|
+|                  Bt478                      |
+|J                            GAL22V10        |
+|A                            GAL20V8         |
+|M                                  TMS34010  |
+|M            555N                   40.000MHz|
+|A                    GAL22V10                |
+|              84256A-70 84256A-70            |
+|              TCH_1.U53 TCH_2.U29            |
+|    16.000MHz                                |
+|                                TCH_4.U32    |
+| DSW1 DSW2      MC68000P12      TCH_3.U26    |
+|---------------------------------------------+
+
+     CPU: MC68000 series @ 16.000MHz/2 (known to use 10MHz or 12MHz parts)
+     OSC: 40.000MHz, 16.000MHz & 6.000MHz
+Graphics: TMS34010 (surface scratched, stamped B)
+     RAM: 2 Fujitsu 84256A-70L 32K SRAM
+          4 Samsung KM44C256CP-10 256K x 4bit CMOS DRAM
+          U35, U36, U40 & U41 unknown ZIP style RAM
+     DSW: 2 8-switch dipswitch banks
+   Other: TDA2003 10Watt Amp
+          ST 555N General Purpose Single Bipolar Timer
+          Bt478KPJ35 Brooktree 80Mhz 265-Word Color Palette PS/2 RAMDAC
+          VR1 volume resistor pot
+          U48 is an unknown surface scratched socketed QFP68 part stamped A
 
 
 Dip sw.1
@@ -131,23 +161,24 @@ WRITE16_MEMBER(littlerb_state::littlerb_r_sound_w)
 	//popmessage("%04x %04x",m_sound_index_l,m_sound_index_r);
 }
 
-ADDRESS_MAP_START(littlerb_state::littlerb_main)
-	AM_RANGE(0x000008, 0x000017) AM_WRITENOP
-	AM_RANGE(0x000020, 0x00002f) AM_WRITENOP
-	AM_RANGE(0x000070, 0x000073) AM_WRITENOP
-	AM_RANGE(0x060004, 0x060007) AM_WRITENOP
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x203fff) AM_RAM // main ram?
+void littlerb_state::littlerb_main(address_map &map)
+{
+	map(0x000008, 0x000017).nopw();
+	map(0x000020, 0x00002f).nopw();
+	map(0x000070, 0x000073).nopw();
+	map(0x060004, 0x060007).nopw();
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x203fff).ram(); // main ram?
 
-	AM_RANGE(0x700000, 0x700007) AM_DEVREADWRITE("inder_vid:tms", tms34010_device, host_r, host_w)
+	map(0x700000, 0x700007).rw("inder_vid:tms", FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 
-	AM_RANGE(0x740000, 0x740001) AM_WRITE(littlerb_l_sound_w)
-	AM_RANGE(0x760000, 0x760001) AM_WRITE(littlerb_r_sound_w)
-	AM_RANGE(0x780000, 0x780001) AM_WRITENOP // generic outputs
-	AM_RANGE(0x7c0000, 0x7c0001) AM_READ_PORT("DSW")
-	AM_RANGE(0x7e0000, 0x7e0001) AM_READ_PORT("P1")
-	AM_RANGE(0x7e0002, 0x7e0003) AM_READ_PORT("P2")
-ADDRESS_MAP_END
+	map(0x740000, 0x740001).w(this, FUNC(littlerb_state::littlerb_l_sound_w));
+	map(0x760000, 0x760001).w(this, FUNC(littlerb_state::littlerb_r_sound_w));
+	map(0x780000, 0x780001).nopw(); // generic outputs
+	map(0x7c0000, 0x7c0001).portr("DSW");
+	map(0x7e0000, 0x7e0001).portr("P1");
+	map(0x7e0002, 0x7e0003).portr("P2");
+}
 
 /* guess according to DASM code and checking the gameplay speed, could be different */
 CUSTOM_INPUT_MEMBER(littlerb_state::littlerb_frame_step_r)
@@ -273,12 +304,12 @@ MACHINE_CONFIG_END
 
 ROM_START( littlerb )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "roma.u53", 0x00001, 0x80000, CRC(172fbc13) SHA1(cd165ca0d0546e2634cf182dc98004cbfb02cf9f) )
-	ROM_LOAD16_BYTE( "romb.u29", 0x00000, 0x80000, CRC(b2fb1d61) SHA1(9a9d7176c241928d07af651e5f7f21d4f019701d) )
+	ROM_LOAD16_BYTE( "tch_1.u53", 0x00001, 0x80000, CRC(172fbc13) SHA1(cd165ca0d0546e2634cf182dc98004cbfb02cf9f) )
+	ROM_LOAD16_BYTE( "tch_2.u29", 0x00000, 0x80000, CRC(b2fb1d61) SHA1(9a9d7176c241928d07af651e5f7f21d4f019701d) )
 
 	ROM_REGION( 0x80000, "samples", 0 ) /* sound samples */
-	ROM_LOAD( "romc.u26", 0x40000, 0x40000, CRC(f193c5b6) SHA1(95548a40e2b5064c558b36cabbf507d23678b1b2) )
-	ROM_LOAD( "romd.u32", 0x00000, 0x40000, CRC(d6b81583) SHA1(b7a63d18a41ccac4d3db9211de0b0cdbc914317a) )
+	ROM_LOAD( "tch_3.u26", 0x40000, 0x40000, CRC(f193c5b6) SHA1(95548a40e2b5064c558b36cabbf507d23678b1b2) )
+	ROM_LOAD( "tch_4.u32", 0x00000, 0x40000, CRC(d6b81583) SHA1(b7a63d18a41ccac4d3db9211de0b0cdbc914317a) )
 ROM_END
 
 DRIVER_INIT_MEMBER(littlerb_state,littlerb)

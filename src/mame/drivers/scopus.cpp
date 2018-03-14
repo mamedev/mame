@@ -117,21 +117,23 @@ void sagitta180_state::machine_reset()
 {
 }
 
-ADDRESS_MAP_START(sagitta180_state::maincpu_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
+void sagitta180_state::maincpu_map(address_map &map)
+{
+	map.global_mask(0xffff);
+	map(0x0000, 0x07ff).rom();
 //  AM_RANGE(0x0800, 0x17ff) AM_ROM
-	AM_RANGE(0x1800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x1800, 0xffff).ram();
+}
 
 
-ADDRESS_MAP_START(sagitta180_state::maincpu_io_map)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW")
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("crtc", i8275_device, read, write)
-	AM_RANGE(0x40, 0x48) AM_DEVREADWRITE("dma", i8257_device, read, write)
-ADDRESS_MAP_END
+void sagitta180_state::maincpu_io_map(address_map &map)
+{
+	map(0x00, 0x00).portr("DSW");
+	map(0x20, 0x20).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x21, 0x21).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x30, 0x31).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0x40, 0x48).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
+}
 
 
 static INPUT_PORTS_START( sagitta180 )

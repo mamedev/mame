@@ -66,10 +66,11 @@ public:
 	void shtzone_map(address_map &map);
 };
 
-ADDRESS_MAP_START(shtzone_state::shtzone_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-ADDRESS_MAP_END
+void shtzone_state::shtzone_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).ram();
+}
 
 
 static INPUT_PORTS_START( shtzone )

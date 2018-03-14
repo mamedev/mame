@@ -23,6 +23,7 @@
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+#include "screen.h"
 
 #include "formats/pc_dsk.h"
 
@@ -42,10 +43,10 @@
 #define RS232_TAG       "rs232"
 #define SCREEN_TAG      "screen"
 
-class pc1512_state : public driver_device
+class pc1512_base_state : public driver_device
 {
 public:
-	pc1512_state(const machine_config &mconfig, device_type type, const char *tag) :
+	pc1512_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, I8086_TAG),
 		m_dmac(*this, I8237A5_TAG),
@@ -54,7 +55,6 @@ public:
 		m_rtc(*this, MC146818_TAG),
 		m_fdc(*this, PC_FDC_XT_TAG),
 		m_uart(*this, INS8250_TAG),
-		m_vdu(*this, AMS40041_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_cent_data_out(*this, "cent_data_out"),
 		m_speaker(*this, SPEAKER_TAG),
@@ -63,8 +63,6 @@ public:
 		m_floppy0(*this, PC_FDC_XT_TAG ":0:525dd" ),
 		m_floppy1(*this, PC_FDC_XT_TAG ":1:525dd" ),
 		m_bus(*this, ISA_BUS_TAG),
-		m_char_rom(*this, AMS40041_TAG),
-		m_video_ram(*this, "video_ram"),
 		m_lk(*this, "LK"),
 		m_pit1(0),
 		m_pit2(0),
@@ -93,7 +91,6 @@ public:
 	required_device<mc146818_device> m_rtc;
 	required_device<pc_fdc_xt_device> m_fdc;
 	required_device<ins8250_device> m_uart;
-	optional_device<ams40041_device> m_vdu;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<speaker_sound_device> m_speaker;
@@ -102,31 +99,17 @@ public:
 	required_device<floppy_image_device> m_floppy0;
 	optional_device<floppy_image_device> m_floppy1;
 	required_device<isa8_device> m_bus;
-	optional_memory_region m_char_rom;
-	optional_shared_ptr<uint8_t> m_video_ram;
 	required_ioport m_lk;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	virtual void video_start() override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void update_speaker();
 	void update_fdc_int();
 	void update_fdc_drq();
 	void update_fdc_tc();
 	void update_ack();
-	int get_display_mode(uint8_t mode);
-	offs_t get_char_rom_offset();
-	int get_color(uint8_t data);
-	MC6845_UPDATE_ROW(draw_alpha);
-	MC6845_UPDATE_ROW(draw_graphics_1);
-	MC6845_UPDATE_ROW(draw_graphics_2);
 
-	DECLARE_READ8_MEMBER( video_ram_r );
-	DECLARE_WRITE8_MEMBER( video_ram_w );
 	DECLARE_READ8_MEMBER( system_r );
 	DECLARE_WRITE8_MEMBER( system_w );
 	DECLARE_READ8_MEMBER( mouse_r );
@@ -135,8 +118,6 @@ public:
 	DECLARE_WRITE8_MEMBER( nmi_mask_w );
 	DECLARE_READ8_MEMBER( printer_r );
 	DECLARE_WRITE8_MEMBER( printer_w );
-	DECLARE_READ8_MEMBER( vdu_r );
-	DECLARE_WRITE8_MEMBER( vdu_w );
 	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
 	DECLARE_WRITE_LINE_MEMBER( kbclk_w );
 	DECLARE_WRITE_LINE_MEMBER( pit1_w );
@@ -159,14 +140,13 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
 	DECLARE_WRITE8_MEMBER( mouse_x_w );
 	DECLARE_WRITE8_MEMBER( mouse_y_w );
-	MC6845_UPDATE_ROW(crtc_update_row);
 
 	// system status register
 	int m_pit1;
@@ -212,6 +192,52 @@ public:
 	uint8_t m_printer_data;
 	uint8_t m_printer_control;
 
+	// sound state
+	int m_speaker_drive;
+};
+
+class pc1512_state : public pc1512_base_state
+{
+public:
+	pc1512_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc1512_base_state(mconfig, type, tag)
+		, m_vdu(*this, AMS40041_TAG)
+		, m_video_ram(*this, "video_ram")
+		, m_char_rom(*this, AMS40041_TAG)
+		, m_screen(*this, SCREEN_TAG) { }
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void video_start() override;
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	int get_display_mode(uint8_t mode);
+	offs_t get_char_rom_offset();
+	int get_color(uint8_t data);
+	MC6845_UPDATE_ROW(draw_alpha);
+	MC6845_UPDATE_ROW(draw_graphics_1);
+	MC6845_UPDATE_ROW(draw_graphics_2);
+	MC6845_UPDATE_ROW(crtc_update_row);
+
+	DECLARE_READ8_MEMBER( video_ram_r );
+	DECLARE_WRITE8_MEMBER( video_ram_w );
+	DECLARE_READ8_MEMBER( vdu_r );
+	DECLARE_WRITE8_MEMBER( vdu_w );
+
+	void pc1512_video(machine_config &config);
+	void pc1512hd(machine_config &config);
+	void pc1512(machine_config &config);
+	void pc1512dd(machine_config &config);
+	void pc1512_io(address_map &map);
+	void pc1512_mem(address_map &map);
+
+	required_device<ams40041_device> m_vdu;
+	optional_shared_ptr<uint8_t> m_video_ram;
+	required_memory_region m_char_rom;
+	required_device<screen_device> m_screen;
+
 	// video state
 	int m_toggle;
 	int m_lpen;
@@ -223,28 +249,18 @@ public:
 	uint8_t m_vdu_plane;
 	uint8_t m_vdu_rdsel;
 	uint8_t m_vdu_border;
-
-	// sound state
-	int m_speaker_drive;
-	void pc1512_video(machine_config &config);
-	void pc1512hd(machine_config &config);
-	void pc1512(machine_config &config);
-	void pc1512dd(machine_config &config);
-	void pc1512_io(address_map &map);
-	void pc1512_mem(address_map &map);
 };
 
-class pc1640_state : public pc1512_state
+class pc1640_state : public pc1512_base_state
 {
 public:
-	pc1640_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pc1512_state(mconfig, type, tag),
-		m_sw(*this, "SW"),
-		m_opt(0)
+	pc1640_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc1512_base_state(mconfig, type, tag)
+		, m_sw(*this, "SW")
+		, m_opt(0)
 	{ }
 
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_READ8_MEMBER( printer_r );

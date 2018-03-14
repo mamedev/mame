@@ -162,32 +162,34 @@ WRITE8_MEMBER(jackal_state::jackal_spriteram_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(jackal_state::master_map)
-	AM_RANGE(0x0000, 0x0003) AM_RAM AM_SHARE("videoctrl")   // scroll + other things
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(jackal_flipscreen_w)
-	AM_RANGE(0x0010, 0x0010) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0011, 0x0011) AM_READ_PORT("IN1")
-	AM_RANGE(0x0012, 0x0012) AM_READ_PORT("IN2")
-	AM_RANGE(0x0013, 0x0013) AM_READ_PORT("IN0")
-	AM_RANGE(0x0014, 0x0015) AM_READ(jackalr_rotary_r)
-	AM_RANGE(0x0018, 0x0018) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0019, 0x0019) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x001c, 0x001c) AM_WRITE(jackal_rambank_w)
-	AM_RANGE(0x0020, 0x005f) AM_READWRITE(jackal_zram_r, jackal_zram_w)             // MAIN   Z RAM,SUB    Z RAM
-	AM_RANGE(0x0060, 0x1fff) AM_RAM AM_SHARE("share1")                          // M COMMON RAM,S COMMON RAM
-	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(jackal_voram_r, jackal_voram_w)           // MAIN V O RAM,SUB  V O RAM
-	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(jackal_spriteram_r, jackal_spriteram_w)   // MAIN V O RAM,SUB  V O RAM
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void jackal_state::master_map(address_map &map)
+{
+	map(0x0000, 0x0003).ram().share("videoctrl");   // scroll + other things
+	map(0x0004, 0x0004).w(this, FUNC(jackal_state::jackal_flipscreen_w));
+	map(0x0010, 0x0010).portr("DSW1");
+	map(0x0011, 0x0011).portr("IN1");
+	map(0x0012, 0x0012).portr("IN2");
+	map(0x0013, 0x0013).portr("IN0");
+	map(0x0014, 0x0015).r(this, FUNC(jackal_state::jackalr_rotary_r));
+	map(0x0018, 0x0018).portr("DSW2");
+	map(0x0019, 0x0019).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x001c, 0x001c).w(this, FUNC(jackal_state::jackal_rambank_w));
+	map(0x0020, 0x005f).rw(this, FUNC(jackal_state::jackal_zram_r), FUNC(jackal_state::jackal_zram_w));             // MAIN   Z RAM,SUB    Z RAM
+	map(0x0060, 0x1fff).ram().share("share1");                          // M COMMON RAM,S COMMON RAM
+	map(0x2000, 0x2fff).rw(this, FUNC(jackal_state::jackal_voram_r), FUNC(jackal_state::jackal_voram_w));           // MAIN V O RAM,SUB  V O RAM
+	map(0x3000, 0x3fff).rw(this, FUNC(jackal_state::jackal_spriteram_r), FUNC(jackal_state::jackal_spriteram_w));   // MAIN V O RAM,SUB  V O RAM
+	map(0x4000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(jackal_state::slave_map)
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")  // self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
-	AM_RANGE(0x6000, 0x605f) AM_RAM                     // SOUND RAM (Self test check 0x6000-605f, 0x7c00-0x7fff)
-	AM_RANGE(0x6060, 0x7fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void jackal_state::slave_map(address_map &map)
+{
+	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x4000, 0x43ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");  // self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
+	map(0x6000, 0x605f).ram();                     // SOUND RAM (Self test check 0x6000-605f, 0x7c00-0x7fff)
+	map(0x6060, 0x7fff).ram().share("share1");
+	map(0x8000, 0xffff).rom();
+}
 
 /*************************************
  *

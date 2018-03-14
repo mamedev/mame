@@ -114,13 +114,14 @@ class supertnk_state : public driver_device
 {
 public:
 	supertnk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
-	std::unique_ptr<uint8_t[]> m_videoram[3];
-	uint8_t m_rom_bank;
-	uint8_t m_bitplane_select;
-	pen_t m_pens[NUM_PENS];
+	DECLARE_DRIVER_INIT(supertnk);
+	void supertnk(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_0_w);
 	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_1_w);
 	DECLARE_WRITE8_MEMBER(supertnk_interrupt_ack_w);
@@ -128,16 +129,21 @@ public:
 	DECLARE_READ8_MEMBER(supertnk_videoram_r);
 	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_0_w);
 	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_1_w);
-	DECLARE_DRIVER_INIT(supertnk);
+	uint32_t screen_update_supertnk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(supertnk_interrupt);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_supertnk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(supertnk_interrupt);
-	required_device<cpu_device> m_maincpu;
-	void supertnk(machine_config &config);
 	void supertnk_io_map(address_map &map);
 	void supertnk_map(address_map &map);
+
+private:
+	std::unique_ptr<uint8_t[]> m_videoram[3];
+	uint8_t m_rom_bank;
+	uint8_t m_bitplane_select;
+	pen_t m_pens[NUM_PENS];
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -306,17 +312,18 @@ void supertnk_state::machine_reset()
  *
  *************************************/
 
-ADDRESS_MAP_START(supertnk_state::supertnk_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x17ff) AM_ROMBANK("bank1")
-	AM_RANGE(0x1800, 0x1bff) AM_RAM
-	AM_RANGE(0x1efc, 0x1efc) AM_READ_PORT("JOYS")
-	AM_RANGE(0x1efd, 0x1efd) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x1efe, 0x1eff) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x1efe, 0x1efe) AM_READ_PORT("DSW")
-	AM_RANGE(0x1eff, 0x1eff) AM_READ_PORT("UNK")
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(supertnk_videoram_r, supertnk_videoram_w)
-ADDRESS_MAP_END
+void supertnk_state::supertnk_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x17ff).bankr("bank1");
+	map(0x1800, 0x1bff).ram();
+	map(0x1efc, 0x1efc).portr("JOYS");
+	map(0x1efd, 0x1efd).portr("INPUTS");
+	map(0x1efe, 0x1eff).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x1efe, 0x1efe).portr("DSW");
+	map(0x1eff, 0x1eff).portr("UNK");
+	map(0x2000, 0x3fff).rw(this, FUNC(supertnk_state::supertnk_videoram_r), FUNC(supertnk_state::supertnk_videoram_w));
+}
 
 
 
@@ -326,15 +333,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(supertnk_state::supertnk_io_map)
-	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
-	AM_RANGE(0x0400, 0x0400) AM_WRITE(supertnk_bitplane_select_0_w)
-	AM_RANGE(0x0401, 0x0401) AM_WRITE(supertnk_bitplane_select_1_w)
-	AM_RANGE(0x0402, 0x0402) AM_WRITE(supertnk_bankswitch_0_w)
-	AM_RANGE(0x0404, 0x0404) AM_WRITE(supertnk_bankswitch_1_w)
-	AM_RANGE(0x0406, 0x0406) AM_WRITE(supertnk_interrupt_ack_w)
-	AM_RANGE(0x0407, 0x0407) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+void supertnk_state::supertnk_io_map(address_map &map)
+{
+	map(0x0000, 0x0000).nopw();
+	map(0x0400, 0x0400).w(this, FUNC(supertnk_state::supertnk_bitplane_select_0_w));
+	map(0x0401, 0x0401).w(this, FUNC(supertnk_state::supertnk_bitplane_select_1_w));
+	map(0x0402, 0x0402).w(this, FUNC(supertnk_state::supertnk_bankswitch_0_w));
+	map(0x0404, 0x0404).w(this, FUNC(supertnk_state::supertnk_bankswitch_1_w));
+	map(0x0406, 0x0406).w(this, FUNC(supertnk_state::supertnk_interrupt_ack_w));
+	map(0x0407, 0x0407).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+}
 
 
 

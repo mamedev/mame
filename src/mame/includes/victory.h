@@ -5,6 +5,10 @@
     Victory system
 
 ****************************************************************************/
+#ifndef MAME_INCLUDES_VICTORY_H
+#define MAME_INCLUDES_VICTORY_H
+
+#pragma once
 
 #include "screen.h"
 
@@ -20,29 +24,64 @@
 #define VICTORY_VBSTART                 (0x100)
 
 
-/* microcode state */
-struct micro_t
-{
-	uint16_t      i;
-	uint16_t      pc;
-	uint8_t       r,g,b;
-	uint8_t       xp,yp;
-	uint8_t       cmd,cmdlo;
-	emu_timer * timer;
-	uint8_t       timer_active;
-	attotime    endtime;
-};
-
 class victory_state : public driver_device
 {
 public:
-	victory_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	victory_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
-		m_charram(*this, "charram") { }
+		m_charram(*this, "charram")
+	{
+	}
+
+	void victory(machine_config &config);
+
+protected:
+	DECLARE_WRITE8_MEMBER(lamp_control_w);
+	DECLARE_WRITE8_MEMBER(paletteram_w);
+	DECLARE_READ8_MEMBER(video_control_r);
+	DECLARE_WRITE8_MEMBER(video_control_w);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(vblank_interrupt);
+	TIMER_CALLBACK_MEMBER(bgcoll_irq_callback);
+
+	void update_irq();
+	void set_palette();
+	int command2();
+	int command3();
+	int command4();
+	int command5();
+	int command6();
+	int command7();
+	void update_background();
+	void update_foreground();
+
+	virtual void video_start() override;
+	void victory_audio(machine_config &config);
+	void main_io_map(address_map &map);
+	void main_map(address_map &map);
+	void victory_audio_map(address_map &map);
+
+private:
+	/* microcode state */
+	struct micro_t
+	{
+		uint16_t    i;
+		uint16_t    pc;
+		uint8_t     r,g,b;
+		uint8_t     xp,yp;
+		uint8_t     cmd,cmdlo;
+		emu_timer * timer;
+		uint8_t     timer_active;
+		attotime    endtime;
+
+		void count_states(int states);
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -67,34 +106,8 @@ public:
 	uint8_t m_scrollx;
 	uint8_t m_scrolly;
 	uint8_t m_video_control;
-	struct micro_t m_micro;
+	micro_t m_micro;
 	emu_timer *m_bgcoll_irq_timer;
-
-	DECLARE_WRITE8_MEMBER(lamp_control_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_READ8_MEMBER(video_control_r);
-	DECLARE_WRITE8_MEMBER(video_control_w);
-
-	virtual void video_start() override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	TIMER_CALLBACK_MEMBER(bgcoll_irq_callback);
-
-	void update_irq();
-	void set_palette();
-	int command2();
-	int command3();
-	int command4();
-	int command5();
-	int command6();
-	int command7();
-	void update_background();
-	void update_foreground();
-	void victory(machine_config &config);
-	void victory_audio(machine_config &config);
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
-	void victory_audio_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_VICTORY_H

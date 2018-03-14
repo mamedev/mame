@@ -48,21 +48,24 @@ public:
 
 /* System with RAM at 0x0c00 */
 
-ADDRESS_MAP_START(jpmsru_state::jpmsru_map)
-	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0c00, 0x0eff) AM_RAM
-ADDRESS_MAP_END
+void jpmsru_state::jpmsru_map(address_map &map)
+{
+	map(0x0000, 0x0bff).rom();
+	map(0x0c00, 0x0eff).ram();
+}
 
 /* System with RAM at 0x0e00 */
 
-ADDRESS_MAP_START(jpmsru_state::jpmsru_4_map)
-	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0c00, 0x0eff) AM_RAM
-	AM_RANGE(0x0f00, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void jpmsru_state::jpmsru_4_map(address_map &map)
+{
+	map(0x0000, 0x0bff).rom();
+	map(0x0c00, 0x0eff).ram();
+	map(0x0f00, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(jpmsru_state::jpmsru_io)
-ADDRESS_MAP_END
+void jpmsru_state::jpmsru_io(address_map &map)
+{
+}
 
 
 static INPUT_PORTS_START( jpmsru )

@@ -53,31 +53,33 @@ WRITE16_MEMBER(stadhero_state::stadhero_control_w)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(stadhero_state::main_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(stadhero_pf1_data_w) AM_SHARE("pf1_data")
-	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_0_w)                          /* text layer */
-	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_1_w)
-	AM_RANGE(0x260000, 0x261fff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_r, pf_data_w)
-	AM_RANGE(0x30c000, 0x30c001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x30c002, 0x30c003) AM_READ_PORT("COIN")
-	AM_RANGE(0x30c004, 0x30c005) AM_READ_PORT("DSW")
-	AM_RANGE(0x30c000, 0x30c00b) AM_WRITE(stadhero_control_w)
-	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM /* Main ram */
-	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x000800) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void stadhero_state::main_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x200000, 0x2007ff).ram().w(this, FUNC(stadhero_state::stadhero_pf1_data_w)).share("pf1_data");
+	map(0x240000, 0x240007).w(m_tilegen1, FUNC(deco_bac06_device::pf_control_0_w));                          /* text layer */
+	map(0x240010, 0x240017).w(m_tilegen1, FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x260000, 0x261fff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x30c000, 0x30c001).portr("INPUTS");
+	map(0x30c002, 0x30c003).portr("COIN");
+	map(0x30c004, 0x30c005).portr("DSW");
+	map(0x30c000, 0x30c00b).w(this, FUNC(stadhero_state::stadhero_control_w));
+	map(0x310000, 0x3107ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0xff8000, 0xffbfff).ram(); /* Main ram */
+	map(0xffc000, 0xffc7ff).mirror(0x000800).ram().share("spriteram");
+}
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(stadhero_state::audio_map)
-	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_device, write)
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void stadhero_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x05ff).ram();
+	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
+	map(0x1000, 0x1001).w("ym2", FUNC(ym3812_device::write));
+	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x3800, 0x3800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 /******************************************************************************/
 

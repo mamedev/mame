@@ -78,8 +78,6 @@ public:
 	void blktigerbl(machine_config &config);
 	void blktiger_io_map(address_map &map);
 	void blktiger_map(address_map &map);
-	void blktiger_mcu_io_map(address_map &map);
-	void blktiger_mcu_map(address_map &map);
 	void blktiger_sound_map(address_map &map);
 	void blktigerbl_io_map(address_map &map);
 };

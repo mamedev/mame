@@ -136,14 +136,15 @@ private:
  Address Maps
 ******************************************************************************/
 
-ADDRESS_MAP_START(proteus3_state::proteus3_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x8004, 0x8007) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("acia1", acia6850_device, read, write) // cassette
-	AM_RANGE(0x8010, 0x8011) AM_DEVREADWRITE("acia2", acia6850_device, read, write) // serial keyboard (never writes data)
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void proteus3_state::proteus3_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).ram();
+	map(0x8004, 0x8007).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8008, 0x8009).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // cassette
+	map(0x8010, 0x8011).rw(m_acia2, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // serial keyboard (never writes data)
+	map(0xc000, 0xffff).rom();
+}
 
 
 /******************************************************************************

@@ -49,18 +49,11 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 {
 	uint8_t key = 0;
 
-	key |= ioport("Y1")->read();
-	key |= ioport("Y2")->read();
-	key |= ioport("Y3")->read();
-	key |= ioport("Y4")->read();
-	key |= ioport("Y5")->read();
-	key |= ioport("Y6")->read();
-	key |= ioport("Y7")->read();
-	key |= ioport("Y8")->read();
-	key |= ioport("Y9")->read();
-	key |= ioport("Y10")->read();
-	key |= ioport("Y11")->read();
-	key |= ioport("Y12")->read();
+	for (int i = 0; i < 12; i++)
+	{
+		key |= m_kbdio[i]->read();
+	}
+
 //  DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, m_kbd.pulsing,
 //      (key || m_kbd.pulsing) ? " will IRQ" : ""));
 
@@ -126,18 +119,14 @@ READ8_MEMBER(mc1502_state::mc1502_kppi_porta_r)
 {
 	uint8_t key = 0;
 
-	if (m_kbd.mask & 0x0001) { key |= ioport("Y1")->read(); }
-	if (m_kbd.mask & 0x0002) { key |= ioport("Y2")->read(); }
-	if (m_kbd.mask & 0x0004) { key |= ioport("Y3")->read(); }
-	if (m_kbd.mask & 0x0008) { key |= ioport("Y4")->read(); }
-	if (m_kbd.mask & 0x0010) { key |= ioport("Y5")->read(); }
-	if (m_kbd.mask & 0x0020) { key |= ioport("Y6")->read(); }
-	if (m_kbd.mask & 0x0040) { key |= ioport("Y7")->read(); }
-	if (m_kbd.mask & 0x0080) { key |= ioport("Y8")->read(); }
-	if (m_kbd.mask & 0x0100) { key |= ioport("Y9")->read(); }
-	if (m_kbd.mask & 0x0200) { key |= ioport("Y10")->read(); }
-	if (m_kbd.mask & 0x0400) { key |= ioport("Y11")->read(); }
-	if (m_kbd.mask & 0x0800) { key |= ioport("Y12")->read(); }
+	for (int i = 0; i < 12; i++)
+	{
+		if (BIT(m_kbd.mask, i))
+		{
+			key |= m_kbdio[i]->read();
+		}
+	}
+
 	key ^= 0xff;
 //  DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
 	return key;
@@ -228,19 +217,21 @@ MACHINE_RESET_MEMBER(mc1502_state, mc1502)
  * macros
  */
 
-ADDRESS_MAP_START(mc1502_state::mc1502_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void mc1502_state::mc1502_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(mc1502_state::mc1502_io)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x0028, 0x0028) AM_DEVREADWRITE("upd8251", i8251_device, data_r, data_w)
-	AM_RANGE(0x0029, 0x0029) AM_DEVREADWRITE("upd8251", i8251_device, status_r, control_w)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255n1", i8255_device, read, write)
-	AM_RANGE(0x0068, 0x006B) AM_DEVREADWRITE("ppi8255n2", i8255_device, read, write)    // keyboard poll
-ADDRESS_MAP_END
+void mc1502_state::mc1502_io(address_map &map)
+{
+	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0028, 0x0028).rw(m_upd8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x0029, 0x0029).rw(m_upd8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0060, 0x0063).rw(m_ppi8255n1, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0068, 0x006B).rw(m_ppi8255n2, FUNC(i8255_device::read), FUNC(i8255_device::write));    // keyboard poll
+}
 
 static INPUT_PORTS_START( mc1502 )
 	PORT_INCLUDE( mc7007_3_keyboard )

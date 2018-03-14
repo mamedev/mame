@@ -43,6 +43,7 @@ public:
 	a5105_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_hgdc(*this, "upd7220")
 		, m_cass(*this, "cassette")
 		, m_beep(*this, "beeper")
@@ -86,6 +87,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<upd7220_device> m_hgdc;
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
@@ -135,7 +137,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( a5105_state::hgdc_draw_text )
 		{
 			tile_data = m_char_ram[(tile*8+yi) & 0x7ff];
 
-			if(cursor_on && cursor_addr == addr+x && machine().first_screen()->frame_number() & 0x10)
+			if(cursor_on && cursor_addr == addr+x && m_screen->frame_number() & 0x10)
 				tile_data^=0xff;
 
 			for( xi = 0; xi < 8; xi++)
@@ -148,7 +150,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( a5105_state::hgdc_draw_text )
 
 				if(yi >= 8) { pen = 0; }
 
-				if(!machine().first_screen()->visible_area().contains(res_x+0, res_y))
+				if(!m_screen->visible_area().contains(res_x+0, res_y))
 					continue;
 
 				bitmap.pix32(res_y, res_x) = palette[pen];
@@ -157,13 +159,14 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( a5105_state::hgdc_draw_text )
 	}
 }
 
-ADDRESS_MAP_START(a5105_state::a5105_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE_BANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE_BANK("bank4")
-ADDRESS_MAP_END
+void a5105_state::a5105_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
 WRITE8_MEMBER( a5105_state::pcg_addr_w )
 {
@@ -350,26 +353,27 @@ WRITE8_MEMBER( a5105_state::a5105_upd765_w )
 	m_fdc->tc_w(BIT(data, 4));
 }
 
-ADDRESS_MAP_START(a5105_state::a5105_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x41) AM_DEVICE("upd765a", upd765a_device, map)
-	AM_RANGE(0x48, 0x4f) AM_WRITE(a5105_upd765_w)
+void a5105_state::a5105_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x40, 0x41).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x48, 0x4f).w(this, FUNC(a5105_state::a5105_upd765_w));
 
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
-	AM_RANGE(0x98, 0x99) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
+	map(0x80, 0x83).rw("z80ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x90, 0x93).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x98, 0x99).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 
-	AM_RANGE(0x9c, 0x9c) AM_WRITE(pcg_val_w)
+	map(0x9c, 0x9c).w(this, FUNC(a5105_state::pcg_val_w));
 //  AM_RANGE(0x9d, 0x9d) crtc area (ff-based), palette routes here
-	AM_RANGE(0x9e, 0x9e) AM_WRITE(pcg_addr_w)
+	map(0x9e, 0x9e).w(this, FUNC(a5105_state::pcg_addr_w));
 
 //  AM_RANGE(0xa0, 0xa1) ay8910?
-	AM_RANGE(0xa8, 0xa8) AM_READWRITE(a5105_memsel_r,a5105_memsel_w)
-	AM_RANGE(0xa9, 0xa9) AM_READ(key_r)
-	AM_RANGE(0xaa, 0xaa) AM_READWRITE(key_mux_r,key_mux_w)
-	AM_RANGE(0xab, 0xab) AM_WRITE(a5105_ab_w) //misc output, see above
-ADDRESS_MAP_END
+	map(0xa8, 0xa8).rw(this, FUNC(a5105_state::a5105_memsel_r), FUNC(a5105_state::a5105_memsel_w));
+	map(0xa9, 0xa9).r(this, FUNC(a5105_state::key_r));
+	map(0xaa, 0xaa).rw(this, FUNC(a5105_state::key_mux_r), FUNC(a5105_state::key_mux_w));
+	map(0xab, 0xab).w(this, FUNC(a5105_state::a5105_ab_w)); //misc output, see above
+}
 
 /* Input ports */
 static INPUT_PORTS_START( a5105 )
@@ -540,10 +544,11 @@ void a5105_state::video_start()
 	m_char_ram = memregion("pcg")->base();
 }
 
-ADDRESS_MAP_START(a5105_state::upd7220_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void a5105_state::upd7220_map(address_map &map)
+{
+	map.global_mask(0x1ffff);
+	map(0x00000, 0x1ffff).ram().share("video_ram");
+}
 
 FLOPPY_FORMATS_MEMBER( a5105_state::floppy_formats )
 	FLOPPY_A5105_FORMAT

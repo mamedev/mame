@@ -17,7 +17,7 @@
 ***************************************************************************/
 
 #define MCFG_GENERIC_TERMINAL_KEYBOARD_CB(cb) \
-		generic_terminal_device::set_keyboard_callback(*device, (KEYBOARDCB_##cb));
+	downcast<generic_terminal_device &>(*device).set_keyboard_callback((KEYBOARDCB_##cb));
 
 
 /***************************************************************************
@@ -31,8 +31,7 @@ class generic_terminal_device : public device_t
 public:
 	generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static void set_keyboard_callback(device_t &device, Object &&cb)
-	{ downcast<generic_terminal_device &>(device).m_keyboard_cb = std::forward<Object>(cb); }
+	template <class Object> void set_keyboard_callback(Object &&cb) { m_keyboard_cb = std::forward<Object>(cb); }
 
 	DECLARE_WRITE8_MEMBER(write) { term_write(data); }
 

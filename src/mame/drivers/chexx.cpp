@@ -174,12 +174,13 @@ READ8_MEMBER(chexx_state::input_r)
 
 // Chexx Memory Map
 
-ADDRESS_MAP_START(chexx_state::chexx83_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM AM_MIRROR(0x100) // 6810 - 128 x 8 static RAM
-	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE("via6522", via6522_device, read, write)
-	AM_RANGE(0x8000, 0x8000) AM_READ(input_r)
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void chexx_state::chexx83_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram().mirror(0x100); // 6810 - 128 x 8 static RAM
+	map(0x4000, 0x400f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0x8000).r(this, FUNC(chexx_state::input_r));
+	map(0xf800, 0xffff).rom().region("maincpu", 0);
+}
 
 // Face-Off Memory Map
 
@@ -211,14 +212,15 @@ WRITE8_MEMBER(chexx_state::ay_w)
 	m_ay_cmd = data;
 }
 
-ADDRESS_MAP_START(chexx_state::faceoffh_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM AM_MIRROR(0x100) // M58725P - 2KB
-	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE("via6522", via6522_device, read, write)
-	AM_RANGE(0x8000, 0x8000) AM_READ(input_r)
-	AM_RANGE(0xa000, 0xa001) AM_WRITE(ay_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(lamp_w)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void chexx_state::faceoffh_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram().mirror(0x100); // M58725P - 2KB
+	map(0x4000, 0x400f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0x8000).r(this, FUNC(chexx_state::input_r));
+	map(0xa000, 0xa001).w(this, FUNC(chexx_state::ay_w));
+	map(0xc000, 0xc000).w(this, FUNC(chexx_state::lamp_w));
+	map(0xf000, 0xffff).rom().region("maincpu", 0);
+}
 
 // Inputs
 

@@ -183,37 +183,43 @@ MACHINE_RESET_MEMBER(ec184x_state, ec1841)
 }
 
 
-ADDRESS_MAP_START(ec184x_state::ec1840_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void ec184x_state::ec1840_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(ec184x_state::ec1841_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void ec184x_state::ec1841_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(ec184x_state::ec1847_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void ec184x_state::ec1847_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xe0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(ec184x_state::ec1840_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5150_mb_device, map)
-ADDRESS_MAP_END
+void ec184x_state::ec1840_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5150_mb_device::map));
+}
 
-ADDRESS_MAP_START(ec184x_state::ec1841_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ec1841_mb_device, map, 0xffff)
-	AM_RANGE(0x02b0, 0x02b3) AM_READWRITE8(memboard_r, memboard_w, 0xffff)
-ADDRESS_MAP_END
+void ec184x_state::ec1841_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ec1841_mb_device::map));
+	map(0x02b0, 0x02b3).rw(this, FUNC(ec184x_state::memboard_r), FUNC(ec184x_state::memboard_w));
+}
 
-ADDRESS_MAP_START(ec184x_state::ec1847_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
+void ec184x_state::ec1847_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
 //  AM_RANGE(0x0210, 0x021f) AM_RAM // internal (non-standard?) bus extender
-ADDRESS_MAP_END
+}
 
 
 // XXX verify everything

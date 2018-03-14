@@ -56,22 +56,25 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-ADDRESS_MAP_START(c900_state::mem_map)
-	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void c900_state::mem_map(address_map &map)
+{
+	map(0x00000, 0x07fff).rom().region("roms", 0);
+}
 
-ADDRESS_MAP_START(c900_state::data_map)
-	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x08000, 0x6ffff) AM_RAM
-ADDRESS_MAP_END
+void c900_state::data_map(address_map &map)
+{
+	map(0x00000, 0x07fff).rom().region("roms", 0);
+	map(0x08000, 0x6ffff).ram();
+}
 
-ADDRESS_MAP_START(c900_state::io_map)
-	AM_RANGE(0x0000, 0x007f) AM_DEVREADWRITE8("cio", z8036_device, read, write, 0x00ff)
+void c900_state::io_map(address_map &map)
+{
+	map(0x0000, 0x007f).rw("cio", FUNC(z8036_device::read), FUNC(z8036_device::write)).umask16(0x00ff);
 	//AM_RANGE(0x0100, 0x011f) AM_DEVREADWRITE8("scc", scc8030_device, zbus_r, zbus_w, 0x00ff)  // range for one channel
-	AM_RANGE(0x0100, 0x0101) AM_READ(stat_r)
-	AM_RANGE(0x0110, 0x0111) AM_READ(key_r)
-	AM_RANGE(0x0110, 0x0111) AM_DEVWRITE8("terminal", generic_terminal_device, write, 0x00ff)
-ADDRESS_MAP_END
+	map(0x0100, 0x0101).r(this, FUNC(c900_state::stat_r));
+	map(0x0110, 0x0111).r(this, FUNC(c900_state::key_r));
+	map(0x0111, 0x0111).w(m_terminal, FUNC(generic_terminal_device::write));
+}
 
 static INPUT_PORTS_START( c900 )
 INPUT_PORTS_END

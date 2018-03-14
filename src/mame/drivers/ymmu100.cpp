@@ -268,11 +268,12 @@ uint32_t mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-ADDRESS_MAP_START(mu100_state::mu100_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM // 128K work RAM
-	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(snd_r, snd_w)
-ADDRESS_MAP_END
+void mu100_state::mu100_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
+	map(0x200000, 0x21ffff).ram(); // 128K work RAM
+	map(0x400000, 0x401fff).rw(this, FUNC(mu100_state::snd_r), FUNC(mu100_state::snd_w));
+}
 
 READ16_MEMBER(mu100_state::snd_r)
 {
@@ -418,21 +419,22 @@ WRITE16_MEMBER(mu100_state::pg_w)
 	logerror("pbsel3 %d\n", data & 1);
 }
 
-ADDRESS_MAP_START(mu100_state::mu100_iomap)
-	AM_RANGE(h8_device::PORT_1,  h8_device::PORT_1)  AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(h8_device::PORT_2,  h8_device::PORT_2)  AM_WRITE(p2_w)
-	AM_RANGE(h8_device::PORT_3,  h8_device::PORT_3)  AM_WRITE(p3_w)
-	AM_RANGE(h8_device::PORT_5,  h8_device::PORT_5)  AM_WRITE(p5_w)
-	AM_RANGE(h8_device::PORT_6,  h8_device::PORT_6)  AM_READWRITE(p6_r, p6_w)
-	AM_RANGE(h8_device::PORT_A,  h8_device::PORT_A)  AM_READWRITE(pa_r, pa_w)
-	AM_RANGE(h8_device::PORT_F,  h8_device::PORT_F)  AM_WRITE(pf_w)
-	AM_RANGE(h8_device::PORT_G,  h8_device::PORT_G)  AM_WRITE(pg_w)
-	AM_RANGE(h8_device::ADC_0,   h8_device::ADC_0)   AM_READ(adc0_r)
-	AM_RANGE(h8_device::ADC_2,   h8_device::ADC_2)   AM_READ(adc2_r)
-	AM_RANGE(h8_device::ADC_4,   h8_device::ADC_4)   AM_READ(adc4_r)
-	AM_RANGE(h8_device::ADC_6,   h8_device::ADC_6)   AM_READ(adc6_r)
-	AM_RANGE(h8_device::ADC_7,   h8_device::ADC_7)   AM_READ(adc7_r)
-ADDRESS_MAP_END
+void mu100_state::mu100_iomap(address_map &map)
+{
+	map(h8_device::PORT_1, h8_device::PORT_1).rw(this, FUNC(mu100_state::p1_r), FUNC(mu100_state::p1_w));
+	map(h8_device::PORT_2, h8_device::PORT_2).w(this, FUNC(mu100_state::p2_w));
+	map(h8_device::PORT_3, h8_device::PORT_3).w(this, FUNC(mu100_state::p3_w));
+	map(h8_device::PORT_5, h8_device::PORT_5).w(this, FUNC(mu100_state::p5_w));
+	map(h8_device::PORT_6, h8_device::PORT_6).rw(this, FUNC(mu100_state::p6_r), FUNC(mu100_state::p6_w));
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(this, FUNC(mu100_state::pa_r), FUNC(mu100_state::pa_w));
+	map(h8_device::PORT_F, h8_device::PORT_F).w(this, FUNC(mu100_state::pf_w));
+	map(h8_device::PORT_G, h8_device::PORT_G).w(this, FUNC(mu100_state::pg_w));
+	map(h8_device::ADC_0, h8_device::ADC_0).r(this, FUNC(mu100_state::adc0_r));
+	map(h8_device::ADC_2, h8_device::ADC_2).r(this, FUNC(mu100_state::adc2_r));
+	map(h8_device::ADC_4, h8_device::ADC_4).r(this, FUNC(mu100_state::adc4_r));
+	map(h8_device::ADC_6, h8_device::ADC_6).r(this, FUNC(mu100_state::adc6_r));
+	map(h8_device::ADC_7, h8_device::ADC_7).r(this, FUNC(mu100_state::adc7_r));
+}
 
 MACHINE_CONFIG_START(mu100_state::mu100)
 	MCFG_CPU_ADD( "maincpu", H8S2655, XTAL(16'000'000) )

@@ -43,7 +43,6 @@ public:
 		m_cmosh_ram(*this, "cmosh"),
 		m_program_ram(*this, "program_ram"),
 		m_reel_ram(*this, "reel_ram"),
-		m_io_port(*this, "io_port"),
 		m_i10(*this, "I10"),
 		m_i20(*this, "I20"),
 		m_i30(*this, "I30"),
@@ -60,6 +59,7 @@ public:
 		m_bank30 = 0x00;
 		m_bank40 = 0x00;
 
+		m_io_port1 = 0x00;
 		m_p1_reels = 0x00;
 		m_p1_unknown = 0x00;
 	}
@@ -78,7 +78,6 @@ public:
 	required_shared_ptr<uint8_t> m_reel_ram;
 
 	// IO Ports
-	required_shared_ptr<uint8_t> m_io_port;
 	required_ioport m_i10;
 	required_ioport m_i20;
 	required_ioport m_i30;
@@ -98,20 +97,21 @@ public:
 	uint8_t m_bank30;
 	uint8_t m_bank40;
 
+	uint8_t m_io_port1;
 	uint8_t m_p1_reels;
 	uint8_t m_p1_unknown;
 
 	int16_t m_stepper_pos[5];
 	uint8_t m_stop_pos[5];
 
-	DECLARE_WRITE8_MEMBER(splus_io_w);
+	DECLARE_WRITE8_MEMBER(splus_p1_w);
 	DECLARE_WRITE8_MEMBER(splus_load_pulse_w);
 	DECLARE_WRITE8_MEMBER(splus_serial_w);
 	DECLARE_WRITE8_MEMBER(splus_7seg_w);
 	DECLARE_WRITE8_MEMBER(splus_duart_w);
 	DECLARE_READ8_MEMBER(splus_serial_r);
 	DECLARE_READ8_MEMBER(splus_m_reel_ram_r);
-	DECLARE_READ8_MEMBER(splus_io_r);
+	DECLARE_READ8_MEMBER(splus_p3_r);
 	DECLARE_READ8_MEMBER(splus_duart_r);
 	DECLARE_READ8_MEMBER(splus_watchdog_r);
 	DECLARE_READ8_MEMBER(splus_registers_r);
@@ -151,7 +151,7 @@ static const uint8_t optics[200] = {
 * Write Handlers *
 ******************/
 
-WRITE8_MEMBER(splus_state::splus_io_w)
+WRITE8_MEMBER(splus_state::splus_p1_w)
 {
 	// P1.0 = Reel 1 Controller
 	// P1.1 = Reel 2 Controller
@@ -161,10 +161,11 @@ WRITE8_MEMBER(splus_state::splus_io_w)
 	// P1.5 = 7-seg display, door
 	// P1.6 = 7-seg display, prog
 	// P1.7 = Unknown
-	int x = 0;
+
+	m_io_port1 = data;
 
 	// Process Port 1
-	if (offset == 1 && ((data & 0x1f) != 0x00)) {
+	if ((data & 0x1f) != 0x00) {
 		// Unknown Bit 7
 		m_p1_unknown = (~data & 0x80);
 
@@ -174,7 +175,7 @@ WRITE8_MEMBER(splus_state::splus_io_w)
 			m_p1_reels = (data & 0x1f);
 
 			// Loop through Reel Controllers
-			for (x = 0; x < 5; x++) {
+			for (int x = 0; x < 5; x++) {
 				// Test Reel Controller
 				if (((m_p1_reels >> x) & 1) == 0x01) {
 					// Forward Direction
@@ -196,20 +197,18 @@ WRITE8_MEMBER(splus_state::splus_io_w)
 			osd_printf_info("Steppers %02X-%02X-%02X-%02X-%02X Motor=%02X Dir=%02X reels=%02X unk=%02X\n", m_stop_pos[0],m_stop_pos[1],m_stop_pos[2],m_stop_pos[3],m_stop_pos[4],((m_bank40 >> 0) & 1),((m_bank10 >> 5) & 1),(data & 0x1f), m_p1_unknown);
 #endif
 	}
-
-	m_io_port[offset] = data;
 }
 
 WRITE8_MEMBER(splus_state::splus_load_pulse_w)
 {
 //  uint8_t out = 0;
-//    out = ((~m_io_port[1] & 0xf0)>>4); // Output Bank
+//    out = ((~m_io_port1 & 0xf0)>>4); // Output Bank
 }
 
 WRITE8_MEMBER(splus_state::splus_serial_w)
 {
 	uint8_t out = 0;
-	out = ((~m_io_port[1] & 0xe0)>>5); // Output Bank
+	out = ((~m_io_port1 & 0xe0)>>5); // Output Bank
 
 	switch (out)
 	{
@@ -357,8 +356,8 @@ WRITE8_MEMBER(splus_state::splus_7seg_w)
 	seg = ((~data & 0xf0)>>4); // Segment Number
 	val = (~data & 0x0f); // Digit Value
 
-	// Need to add ~m_io_port[1]-1 to seg value
-	if (seg < 0x0a && (m_io_port[1] & 0xe0) == 0xe0)
+	// Need to add ~m_io_port1-1 to seg value
+	if (seg < 0x0a && (m_io_port1 & 0xe0) == 0xe0)
 		output().set_digit_value(seg, ls48_map[val]);
 }
 
@@ -387,7 +386,7 @@ READ8_MEMBER(splus_state::splus_serial_r)
 
 	uint8_t in = 0x00;
 	uint8_t val = 0x00;
-	in = ((~m_io_port[1] & 0xe0)>>5); // Input Bank
+	in = ((~m_io_port1 & 0xe0)>>5); // Input Bank
 
 	switch (in)
 	{
@@ -524,12 +523,9 @@ READ8_MEMBER(splus_state::splus_m_reel_ram_r)
 	return m_reel_ram[offset];
 }
 
-READ8_MEMBER(splus_state::splus_io_r)
+READ8_MEMBER(splus_state::splus_p3_r)
 {
-	if (offset == 3)
-		return m_io_port[offset] & 0xf3; // Ignore Int0 and Int1, or machine will loop forever waiting
-	else
-		return m_io_port[offset];
+	return 0xf3; // Ignore Int0 and Int1, or machine will loop forever waiting
 }
 
 READ8_MEMBER(splus_state::splus_duart_r)
@@ -593,42 +589,41 @@ DRIVER_INIT_MEMBER(splus_state,splus)
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(splus_state::splus_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("prograram")
-ADDRESS_MAP_END
+void splus_state::splus_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().share("prograram");
+}
 
-ADDRESS_MAP_START(splus_state::splus_iomap)
+void splus_state::splus_iomap(address_map &map)
+{
 	// Serial I/O
-	AM_RANGE(0x0000, 0x0000) AM_READ(splus_serial_r) AM_WRITE(splus_serial_w)
+	map(0x0000, 0x0000).r(this, FUNC(splus_state::splus_serial_r)).w(this, FUNC(splus_state::splus_serial_w));
 
 	// Battery-backed RAM (Lower 4K) 0x1500-0x16ff eeprom staging area
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("cmosl")
+	map(0x1000, 0x1fff).ram().share("cmosl");
 
 	// Watchdog, 7-segment Display
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE(splus_watchdog_r, splus_7seg_w)
+	map(0x2000, 0x2000).rw(this, FUNC(splus_state::splus_watchdog_r), FUNC(splus_state::splus_7seg_w));
 
 	// DUART
-	AM_RANGE(0x3000, 0x300f) AM_READWRITE(splus_duart_r, splus_duart_w)
+	map(0x3000, 0x300f).rw(this, FUNC(splus_state::splus_duart_r), FUNC(splus_state::splus_duart_w));
 
 	// Dip Switches, Sound
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("SW1") AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	map(0x4000, 0x4000).portr("SW1").w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x4001, 0x4001).w("aysnd", FUNC(ay8910_device::data_w));
 
 	// Reel Optics, EEPROM
-	AM_RANGE(0x5000, 0x5000) AM_READ(splus_reel_optics_r) AM_WRITE(i2c_nvram_w)
+	map(0x5000, 0x5000).r(this, FUNC(splus_state::splus_reel_optics_r)).w(this, FUNC(splus_state::i2c_nvram_w));
 
 	// Reset Registers in Realtime Clock, Serial I/O Load Pulse
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(splus_registers_r, splus_load_pulse_w)
+	map(0x6000, 0x6000).rw(this, FUNC(splus_state::splus_registers_r), FUNC(splus_state::splus_load_pulse_w));
 
 	// Battery-backed RAM (Upper 4K)
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("cmosh")
+	map(0x7000, 0x7fff).ram().share("cmosh");
 
 	// SSxxxx Reel Chip
-	AM_RANGE(0x8000, 0x9fff) AM_READ(splus_m_reel_ram_r) AM_SHARE("reel_ram")
-
-	// Ports start here
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(splus_io_r) AM_WRITE(splus_io_w) AM_SHARE("io_port")
-ADDRESS_MAP_END
+	map(0x8000, 0x9fff).r(this, FUNC(splus_state::splus_m_reel_ram_r)).share("reel_ram");
+}
 
 /*************************
 *      Input ports       *
@@ -689,6 +684,8 @@ MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
 	MCFG_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(splus_map)
 	MCFG_CPU_IO_MAP(splus_iomap)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(splus_state, splus_p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(splus_state, splus_p3_r))
 
 	// Fill NVRAM
 	MCFG_NVRAM_ADD_0FILL("cmosl")

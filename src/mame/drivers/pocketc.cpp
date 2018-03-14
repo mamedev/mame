@@ -85,79 +85,89 @@
 /* special keys
    red c-ce and reset; warm boot, program NOT lost*/
 
-ADDRESS_MAP_START(pc1401_state::pc1401_mem)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x3800, 0x47ff) AM_RAM
-	AM_RANGE( 0x6000, 0x67ff) AM_READWRITE(pc1401_lcd_read, pc1401_lcd_write ) AM_MIRROR(0x1000)
-	AM_RANGE( 0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void pc1401_state::pc1401_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x3800, 0x47ff).ram();
+	map(0x6000, 0x67ff).rw(this, FUNC(pc1401_state::pc1401_lcd_read), FUNC(pc1401_state::pc1401_lcd_write)).mirror(0x1000);
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(pc1401_state::pc1402_mem)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x2000, 0x47ff) AM_RAM
-	AM_RANGE( 0x6000, 0x67ff) AM_READWRITE(pc1401_lcd_read, pc1401_lcd_write ) AM_MIRROR(0x1000)
-	AM_RANGE( 0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void pc1401_state::pc1402_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x47ff).ram();
+	map(0x6000, 0x67ff).rw(this, FUNC(pc1401_state::pc1401_lcd_read), FUNC(pc1401_state::pc1401_lcd_write)).mirror(0x1000);
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(pc1251_state::pc1250_mem)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x4000, 0x7fff) AM_ROM
-	AM_RANGE( 0xc000, 0xc7ff) AM_RAM // 2KB RAM
-	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
-ADDRESS_MAP_END
+void pc1251_state::pc1250_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram(); // 2KB RAM
+	map(0xf800, 0xf8ff).rw(this, FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
+}
 
-ADDRESS_MAP_START(pc1251_state::pc1251_mem)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x4000, 0x7fff) AM_ROM
-	AM_RANGE( 0xb800, 0xc7ff) AM_RAM // 4KB RAM
-	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
-ADDRESS_MAP_END
+void pc1251_state::pc1251_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x7fff).rom();
+	map(0xb800, 0xc7ff).ram(); // 4KB RAM
+	map(0xf800, 0xf8ff).rw(this, FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
+}
 
-ADDRESS_MAP_START(pc1251_state::pc1255_mem)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x4000, 0x7fff) AM_ROM
-	AM_RANGE( 0xa000, 0xc7ff) AM_RAM // 10KB RAM
-	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
-ADDRESS_MAP_END
+void pc1251_state::pc1255_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x7fff).rom();
+	map(0xa000, 0xc7ff).ram(); // 10KB RAM
+	map(0xf800, 0xf8ff).rw(this, FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
+}
 
-ADDRESS_MAP_START(pc1251_state::pc1260_mem)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x2000, 0x20ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
+void pc1251_state::pc1260_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x20ff).rw(this, FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
 	//AM_RANGE( 0x2800, 0x28ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
-	AM_RANGE( 0x5800, 0x67ff) AM_RAM // 4KB RAM
-	AM_RANGE( 0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x5800, 0x67ff).ram(); // 4KB RAM
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(pc1251_state::pc1261_mem)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x2000, 0x20ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
+void pc1251_state::pc1261_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x20ff).rw(this, FUNC(pc1251_state::pc1251_lcd_read), FUNC(pc1251_state::pc1251_lcd_write));
 	//AM_RANGE( 0x2800, 0x28ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
-	AM_RANGE( 0x4000, 0x67ff) AM_RAM // 10KB RAM
-	AM_RANGE( 0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x4000, 0x67ff).ram(); // 10KB RAM
+	map(0x8000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(pc1350_state::pc1350_mem)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x7000, 0x7eff) AM_READWRITE(pc1350_lcd_read, pc1350_lcd_write )
-	AM_RANGE( 0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void pc1350_state::pc1350_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x7000, 0x7eff).rw(this, FUNC(pc1350_state::pc1350_lcd_read), FUNC(pc1350_state::pc1350_lcd_write));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(pc1403_state::pc1403_mem)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x3000, 0x30bf) AM_READWRITE(pc1403_lcd_read, pc1403_lcd_write )
-	AM_RANGE( 0x3800, 0x3fff) AM_READWRITE(pc1403_asic_read, pc1403_asic_write )
-	AM_RANGE( 0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE( 0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void pc1403_state::pc1403_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x3000, 0x30bf).rw(this, FUNC(pc1403_state::pc1403_lcd_read), FUNC(pc1403_state::pc1403_lcd_write));
+	map(0x3800, 0x3fff).rw(this, FUNC(pc1403_state::pc1403_asic_read), FUNC(pc1403_state::pc1403_asic_write));
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(pc1403_state::pc1403h_mem)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x3000, 0x30bf) AM_READWRITE(pc1403_lcd_read, pc1403_lcd_write )
-	AM_RANGE( 0x3800, 0x3fff) AM_READWRITE(pc1403_asic_read, pc1403_asic_write )
-	AM_RANGE( 0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE( 0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void pc1403_state::pc1403h_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x3000, 0x30bf).rw(this, FUNC(pc1403_state::pc1403_lcd_read), FUNC(pc1403_state::pc1403_lcd_write));
+	map(0x3800, 0x3fff).rw(this, FUNC(pc1403_state::pc1403_asic_read), FUNC(pc1403_state::pc1403_asic_write));
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).ram();
+}
 
 
 #if 0

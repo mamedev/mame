@@ -12,10 +12,10 @@
 #include "legscsi.h"
 
 #define MCFG_MB89352A_IRQ_CB(_devcb) \
-	devcb = &mb89352_device::set_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb89352_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89352A_DRQ_CB(_devcb) \
-	devcb = &mb89352_device::set_drq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mb89352_device &>(*device).set_drq_callback(DEVCB_##_devcb);
 
 class mb89352_device : public legacy_scsi_host_adapter
 {
@@ -23,8 +23,8 @@ public:
 	// construction/destruction
 	mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<mb89352_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_drq_callback(device_t &device, Object &&cb) { return downcast<mb89352_device &>(device).m_drq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drq_callback(Object &&cb) { return m_drq_cb.set_callback(std::forward<Object>(cb)); }
 
 	// any publically accessible interfaces needed for runtime
 	DECLARE_READ8_MEMBER( mb89352_r );

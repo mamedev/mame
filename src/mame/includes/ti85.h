@@ -71,7 +71,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<ti8x_link_port_device> m_link_port;
 	optional_shared_ptr<uint8_t> m_nvram;
-	optional_device<intelfsh_device> m_flash;
+	optional_device<intelfsh8_device> m_flash;
 	optional_device<address_map_bank_device> m_membank1;
 	optional_device<address_map_bank_device> m_membank2;
 	optional_device<address_map_bank_device> m_membank3;
@@ -211,7 +211,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_loop_w);
 	DECLARE_READ8_MEMBER(ti83pse_ctimer3_count_r);
 	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_count_w);
-
+	DECLARE_READ8_MEMBER(ti83p_membank2_r);
+	DECLARE_READ8_MEMBER(ti83p_membank3_r);
 
 	void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram);
 	void update_ti85_memory();

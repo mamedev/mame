@@ -268,7 +268,7 @@ private:
 	double  m_freq;
 	bool    m_active;
 
-	int     m_ptm_out0;
+	int     m_ptm_o1;
 
 	int     m_pia_0_irqa;
 	int     m_pia_0_irqb;
@@ -293,7 +293,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( pia_1_irqb );
 
 	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
-	DECLARE_WRITE_LINE_MEMBER( ptm_out0 );
+	DECLARE_WRITE_LINE_MEMBER( ptm_o1 );
 };
 
 DEFINE_DEVICE_TYPE(CMI01A_CHANNEL_CARD, cmi01a_device, "cmi_01a", "Fairlight CMI-01A Channel Card")
@@ -330,7 +330,7 @@ MACHINE_CONFIG_START(cmi01a_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("cmi01a_ptm", PTM6840, 2000000) // ptm_cmi01a_config
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 500000, 500000)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(cmi01a_device, ptm_out0))
+	MCFG_PTM6840_O1_CB(WRITELINE(cmi01a_device, ptm_o1))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi01a_device, ptm_irq))
 MACHINE_CONFIG_END
 
@@ -393,7 +393,7 @@ void cmi01a_device::device_reset()
 	m_freq = 0.0;
 	m_active = false;
 
-	m_ptm_out0 = 0;
+	m_ptm_o1 = 0;
 }
 
 class cmi_state : public driver_device
@@ -447,6 +447,7 @@ public:
 		, m_keypad_a_port(*this, "KEYPAD_A")
 		, m_keypad_b_port(*this, "KEYPAD_B")
 		, m_key_mux_ports{ { *this, "KEY_%u_0", 0 }, { *this, "KEY_%u_1", 0 }, { *this, "KEY_%u_2", 0 }, { *this, "KEY_%u_3", 0 } }
+		, m_digit(*this, "digit%u", 0U)
 		, m_cmi07_ram(*this, "cmi07_ram")
 	{
 	}
@@ -528,7 +529,7 @@ public:
 	DECLARE_WRITE8_MEMBER( cmi02_w );
 	DECLARE_WRITE8_MEMBER( master_tune_w );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_irq );
-	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_o1 );
+	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_o2 );
 
 	// Alphanumeric keyboard
 	DECLARE_READ8_MEMBER( ank_col_r );
@@ -547,9 +548,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cmi10_u20_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( cmi10_u21_cb2_w );
 	DECLARE_READ8_MEMBER( cmi10_u21_a_r );
-	DECLARE_WRITE16_MEMBER( cmi_iix_update_dp1 );
-	DECLARE_WRITE16_MEMBER( cmi_iix_update_dp2 );
-	DECLARE_WRITE16_MEMBER( cmi_iix_update_dp3 );
+	template <unsigned N> DECLARE_WRITE16_MEMBER( cmi_iix_update_dp );
 
 	DECLARE_WRITE_LINE_MEMBER( msm5832_irq );
 	DECLARE_WRITE_LINE_MEMBER( mkbd_kbd_acia_int );
@@ -564,8 +563,8 @@ public:
 	void maincpu2_map(address_map &map);
 	void midicpu_map(address_map &map);
 	void muskeys_map(address_map &map);
-protected:
 
+protected:
 	required_device<mc6809e_device> m_maincpu1;
 	required_device<mc6809e_device> m_maincpu2;
 	required_device<m6802_cpu_device> m_muskeyscpu;
@@ -625,6 +624,8 @@ protected:
 	required_ioport m_keypad_b_port;
 
 	required_ioport_array<3> m_key_mux_ports[4];
+
+	output_finder<12> m_digit;
 
 	required_shared_ptr<uint8_t> m_cmi07_ram;
 
@@ -837,7 +838,7 @@ void cmi_state::video_write(int offset)
 
 READ8_MEMBER( cmi_state::video_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return m_video_data;
 
 	m_video_data = m_video_ram[m_y_pos * (512 / 8) + (m_x_pos / 8)];
@@ -883,7 +884,7 @@ WRITE8_MEMBER( cmi_state::vram_w )
 
 READ8_MEMBER( cmi_state::vram_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return m_video_ram[offset];
 
 	/* Latch the current video position */
@@ -947,7 +948,7 @@ template<int cpunum> WRITE8_MEMBER( cmi_state::map_w )
 
 template<int cpunum> READ8_MEMBER( cmi_state::irq_ram_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return m_scratch_ram[cpunum][0xf8 + offset];
 
 	if (m_m6809_bs_hack_cnt > 0 && m_m6809_bs_hack_cpu == cpunum)
@@ -1069,49 +1070,55 @@ READ16_MEMBER( cmi_state::midi_dma_r )
 }
 
 /* The maps are dynamically populated */
-ADDRESS_MAP_START(cmi_state::maincpu1_map)
-	AM_RANGE(0xfffe, 0xffff) AM_READ(vector_r<0>)
-ADDRESS_MAP_END
+void cmi_state::maincpu1_map(address_map &map)
+{
+	map(0xfffe, 0xffff).r(this, FUNC(cmi_state::vector_r<0>));
+}
 
-ADDRESS_MAP_START(cmi_state::maincpu2_map)
-	AM_RANGE(0xfffe, 0xffff) AM_READ(vector_r<1>)
-ADDRESS_MAP_END
+void cmi_state::maincpu2_map(address_map &map)
+{
+	map(0xfffe, 0xffff).r(this, FUNC(cmi_state::vector_r<1>));
+}
 
-ADDRESS_MAP_START(cmi_state::muskeys_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("cmi10_pia_u21", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("cmi10_pia_u20", pia6821_device, read, write)
-	AM_RANGE(0x00a0, 0x00a1) AM_DEVREADWRITE("acia_mkbd_kbd", acia6850_device, read, write)
-	AM_RANGE(0x00b0, 0x00b1) AM_DEVREADWRITE("acia_mkbd_cmi", acia6850_device, read, write)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0xb000, 0xb400) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void cmi_state::muskeys_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x007f).ram();
+	map(0x0080, 0x0083).rw(m_cmi10_pia_u21, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).rw(m_cmi10_pia_u20, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x00a0, 0x00a1).rw(m_acia_mkbd_kbd, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x00b0, 0x00b1).rw(m_acia_mkbd_cmi, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x4000, 0x47ff).ram();
+	map(0xb000, 0xb400).rom();
+	map(0xf000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(cmi_state::alphakeys_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_READ_PORT("ANK_OPTIONS")
-	AM_RANGE(0x8000, 0xbfff) AM_DEVREADWRITE("ank_pia", pia6821_device, read, write)
-	AM_RANGE(0xc000, 0xc3ff) AM_ROM AM_MIRROR(0x3c00)
-ADDRESS_MAP_END
+void cmi_state::alphakeys_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x007f).ram();
+	map(0x4000, 0x7fff).portr("ANK_OPTIONS");
+	map(0x8000, 0xbfff).rw(m_ank_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc000, 0xc3ff).rom().mirror(0x3c00);
+}
 
-ADDRESS_MAP_START(cmi_state::midicpu_map)
-	AM_RANGE(0x000000, 0x003fff) AM_ROM
-	AM_RANGE(0x040000, 0x05ffff) AM_READWRITE(midi_dma_r, midi_dma_w)
+void cmi_state::midicpu_map(address_map &map)
+{
+	map(0x000000, 0x003fff).rom();
+	map(0x040000, 0x05ffff).rw(this, FUNC(cmi_state::midi_dma_r), FUNC(cmi_state::midi_dma_w));
 //  AM_RANGE(0x060000, 0x06001f) TIMERS
 //  AM_RANGE(0x060050, 0x06005f) ACIA
 //  AM_RANGE(0x060070, 0x06007f) SMPTE
-	AM_RANGE(0x080000, 0x083fff) AM_RAM
-ADDRESS_MAP_END
+	map(0x080000, 0x083fff).ram();
+}
 
-ADDRESS_MAP_START(cmi_state::cmi07cpu_map)
-	AM_RANGE(0x0000, 0x3fff) AM_NOP // TODO
-	AM_RANGE(0x4000, 0x4fff) AM_NOP // TODO
-	AM_RANGE(0x8000, 0x8fff) AM_DEVREADWRITE("cmi07_ptm", ptm6840_device, read, write)
-	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("cmi07_ram")
-ADDRESS_MAP_END
+void cmi_state::cmi07cpu_map(address_map &map)
+{
+	map(0x0000, 0x3fff).noprw(); // TODO
+	map(0x4000, 0x4fff).noprw(); // TODO
+	map(0x8000, 0x8fff).rw(m_cmi07_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0xc000, 0xffff).ram().share("cmi07_ram");
+}
 
 /* Input ports */
 static INPUT_PORTS_START( cmi2x )
@@ -1580,7 +1587,7 @@ WRITE8_MEMBER( cmi_state::fdc_w )
 
 READ8_MEMBER( cmi_state::fdc_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0;
 
 	if (offset == 0)
@@ -1819,7 +1826,7 @@ void cmi01a_device::zx_timer_cb()
 	if (m_zx_flag == 0)
 	{
 		/* Low to high transition - clock flip flop */
-		int op = m_ptm_out0;
+		int op = m_ptm_o1;
 
 		/* Set /ZCINT */
 		if (op != m_zx_ff)
@@ -1929,9 +1936,9 @@ void cmi01a_device::update_wave_addr(int inc)
 	/* Zero crossing interrupt is a pulse */
 }
 
-WRITE_LINE_MEMBER( cmi01a_device::ptm_out0 )
+WRITE_LINE_MEMBER( cmi01a_device::ptm_o1 )
 {
-	m_ptm_out0 = state;
+	m_ptm_o1 = state;
 }
 
 READ_LINE_MEMBER( cmi01a_device::eosi_r )
@@ -1986,7 +1993,7 @@ WRITE8_MEMBER( cmi01a_device::write )
 		{
 			/* PTM addressing is a little funky */
 			int a0 = offset & 1;
-			int a1 = (m_ptm_out0 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
+			int a1 = (m_ptm_o1 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
 			int a2 = BIT(offset, 1);
 
 			//printf("CH%d PTM W: [%x] = %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);
@@ -2002,7 +2009,7 @@ WRITE8_MEMBER( cmi01a_device::write )
 
 READ8_MEMBER( cmi01a_device::read )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0;
 
 	uint8_t data = 0;
@@ -2042,7 +2049,7 @@ READ8_MEMBER( cmi01a_device::read )
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		{
 			int a0 = offset & 1;
-			int a1 = (m_ptm_out0 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
+			int a1 = (m_ptm_o1 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
 			int a2 = BIT(offset, 1);
 
 			data = m_ptm->read(space, (a2 << 2) | (a1 << 1) | a0);
@@ -2068,7 +2075,7 @@ WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_irq )
 	set_interrupt(CPU_1, IRQ_TIMINT_LEVEL, m_cmi02_ptm_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_o1 )
+WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_o2 )
 {
 	m_cmi02_ptm->set_c1(state);
 	m_cmi02_ptm->set_c3(state);
@@ -2076,7 +2083,7 @@ WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_o1 )
 
 READ8_MEMBER( cmi_state::cmi02_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0;
 
 	if (offset <= 0x1f)
@@ -2506,19 +2513,9 @@ WRITE_LINE_MEMBER( cmi_state::cmi10_u20_cb2_w )
 	m_dp3->wr_w(state);
 }
 
-WRITE16_MEMBER( cmi_state::cmi_iix_update_dp1 )
+template <unsigned N> WRITE16_MEMBER( cmi_state::cmi_iix_update_dp )
 {
-	output().set_digit_value(0 + (offset ^ 3), data);
-}
-
-WRITE16_MEMBER( cmi_state::cmi_iix_update_dp2 )
-{
-	output().set_digit_value(4 + (offset ^ 3), data);
-}
-
-WRITE16_MEMBER( cmi_state::cmi_iix_update_dp3 )
-{
-	output().set_digit_value(8 + (offset ^ 3), data);
+	m_digit[(N << 2) | ((offset ^ 3) & 3)] = data;
 }
 
 /* Begin Conversion */
@@ -2700,6 +2697,8 @@ void cmi_state::machine_reset()
 
 void cmi_state::machine_start()
 {
+	m_digit.resolve();
+
 	m_q133_rom = (uint8_t *)m_q133_region->base();
 
 	// allocate timers for the built-in two channel timer
@@ -2776,11 +2775,11 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 
 	/* alpha-numeric display */
 	MCFG_DEVICE_ADD("dp1", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp1))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp<0>))
 	MCFG_DEVICE_ADD("dp2", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp2))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp<1>))
 	MCFG_DEVICE_ADD("dp3", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp3))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp<2>))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -2824,7 +2823,7 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_DEVICE_ADD("cmi02_pia_2", PIA6821, 0) // pia_cmi02_2_config
 
 	MCFG_DEVICE_ADD("cmi02_ptm", PTM6840, 2000000) // ptm_cmi02_config TODO
-	MCFG_PTM6840_OUT1_CB(WRITELINE(cmi_state, cmi02_ptm_o1))
+	MCFG_PTM6840_O2_CB(WRITELINE(cmi_state, cmi02_ptm_o2))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, cmi02_ptm_irq))
 
 	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, XTAL(1'843'200) / 12)

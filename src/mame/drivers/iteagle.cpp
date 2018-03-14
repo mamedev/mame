@@ -134,6 +134,7 @@ public:
 	void gtfore06(machine_config &config);
 	void gtfore04(machine_config &config);
 	void iteagle(machine_config &config);
+	void bbh(machine_config &config);
 	void bbhsc(machine_config &config);
 	void bbhcotw(machine_config &config);
 	void virtpool(machine_config &config);
@@ -250,6 +251,15 @@ MACHINE_CONFIG_START(iteagle_state::carnking)
 	MCFG_ITEAGLE_FPGA_INIT(0x01000a01, 0x0e0a0a)
 	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0a01, 0x9)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(iteagle_state::bbh)
+	iteagle(config);
+	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
+	// 0xXX01XXXX = tournament board
+	MCFG_ITEAGLE_FPGA_INIT(0x02010600, 0x0b0a0a)
+	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
+	MCFG_ITEAGLE_EEPROM_INIT(0x0000, 0x7)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iteagle_state::bbhsc)
@@ -625,6 +635,16 @@ ROM_START( gtfore06 )
 	DISK_IMAGE( "golf_fore_complete_v6.00.01", 0, SHA1(e902b91bd739daee0b95b10e5cf33700dd63a76b) ) /* Build 09:51:13, Jan 20 2006 */
 ROM_END
 
+ROM_START( bbh )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "e2-bbh0.u53", 0x0000, 0x0880, NO_DUMP )
+
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_IMAGE("bbh_v1.00.14", 0, SHA1(dd56f758c3e421005e06ac24c21d12f0f29b0f44)) /* Build 10:59:51, Feb 25 2003 */
+ROM_END
+
 ROM_START( bbhsc )
 	EAGLE_BIOS
 
@@ -652,11 +672,28 @@ ROM_START( bbh2sp )
 	ROM_LOAD( "bbh2-us.u53", 0x0000, 0x0880, NO_DUMP )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
-	DISK_IMAGE( "bbh2sp_v2.02.11", 0, SHA1(63e41cca534f4774bfba4b4dda9620fe805029b4) )
+	DISK_IMAGE( "bbh2sp_v2.02.11", 0, SHA1(63e41cca534f4774bfba4b4dda9620fe805029b4) ) /* Build 10:52:30, March 26, 2004 */
 ROM_END
-	//DISK_IMAGE( "bbh2sp_v2.02.08", 0, SHA1(13b9b4ea0465f55dd1c7bc6e2f962c3c9b9566bd) )
-	//DISK_IMAGE( "bbh2sp_v2.02.09", 0, SHA1(fac3963b6da35a8c8b00f6826bc10e9c7230b1d6) )
-	//DISK_IMAGE( "bbh2sp_v2.02.11", 0, SHA1(63e41cca534f4774bfba4b4dda9620fe805029b4) )
+
+ROM_START( bbh2spa )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "bbh2-us.u53", 0x0000, 0x0880, NO_DUMP ) /* Build 18:07:45, Sept 15, 2003 */
+
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_IMAGE( "bbh2sp_v2.02.09", 0, SHA1(fac3963b6da35a8c8b00f6826bc10e9c7230b1d6) ) /* Build 18:07:45, Sept 15, 2003 */
+ROM_END
+
+ROM_START( bbh2spb )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "bbh2-us.u53", 0x0000, 0x0880, NO_DUMP )
+
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_IMAGE( "bbh2sp_v2.02.08", 0, SHA1(13b9b4ea0465f55dd1c7bc6e2f962c3c9b9566bd) ) /* Build 09:09:03, July 23, 2003 */
+ROM_END
 
 ROM_START( bbhcotw ) /* This version is meant for 8meg GREEN board PCBs */
 	EAGLE_BIOS
@@ -688,7 +725,10 @@ GAME( 2004, gtfore05a,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "I
 GAME( 2004, gtfore05b,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, gtfore05c,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", MACHINE_SUPPORTS_SAVE )
 GAME( 2005, gtfore06,   iteagle,  gtfore06, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, bbh,        iteagle,  bbh,      bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Original (v1.00.14)", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, bbhsc,      iteagle,  bbhsc,    bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.60.01)", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, bbhsca,     bbhsc,    bbhsc,    bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_SUPPORTS_SAVE )
-GAME( 2003, bbh2sp,     iteagle,  bbh2sp,   bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.11)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, bbh2sp,     iteagle,  bbh2sp,   bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.11)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, bbh2spa,    bbh2sp,   bbh2sp,   bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.09)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, bbh2spb,    bbh2sp,   bbh2sp,   bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.08)", MACHINE_SUPPORTS_SAVE )
 GAME( 2006, bbhcotw,    iteagle,  bbhcotw,  bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", MACHINE_SUPPORTS_SAVE )

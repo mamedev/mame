@@ -67,16 +67,16 @@
 
 
 #define MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &plus4_expansion_slot_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<plus4_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(_read) \
-	devcb = &plus4_expansion_slot_device::set_cd_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<plus4_expansion_slot_device &>(*device).set_cd_rd_callback(DEVCB_##_read);
 
 #define MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(_write) \
-	devcb = &plus4_expansion_slot_device::set_cd_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<plus4_expansion_slot_device &>(*device).set_cd_wr_callback(DEVCB_##_write);
 
 #define MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(_write) \
-	devcb = &plus4_expansion_slot_device::set_aec_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<plus4_expansion_slot_device &>(*device).set_aec_wr_callback(DEVCB_##_write);
 
 
 
@@ -96,10 +96,10 @@ public:
 	// construction/destruction
 	plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<plus4_expansion_slot_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cd_rd_callback(device_t &device, Object &&cb) { return downcast<plus4_expansion_slot_device &>(device).m_read_dma_cd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cd_wr_callback(device_t &device, Object &&cb) { return downcast<plus4_expansion_slot_device &>(device).m_write_dma_cd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_aec_wr_callback(device_t &device, Object &&cb) { return downcast<plus4_expansion_slot_device &>(device).m_write_aec.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cd_rd_callback(Object &&cb) { return m_read_dma_cd.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cd_wr_callback(Object &&cb) { return m_write_dma_cd.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_aec_wr_callback(Object &&cb) { return m_write_aec.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);

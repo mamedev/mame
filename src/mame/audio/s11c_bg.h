@@ -18,7 +18,7 @@
 
 
 #define MCFG_S11C_BG_ROM_REGION(_region) \
-	s11c_bg_device::static_set_romregion(*device, _region);
+	downcast<s11c_bg_device &>(*device).set_romregion(_region);
 
 
 class s11c_bg_device : public device_t,
@@ -42,7 +42,7 @@ public:
 	void ctrl_w(uint8_t data);
 	void data_w(uint8_t data);
 
-	static void static_set_romregion(device_t &device, const char *tag);
+	void set_romregion(const char *tag) { m_regiontag = tag; }
 
 	void s11c_bg_map(address_map &map);
 protected:

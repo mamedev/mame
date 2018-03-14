@@ -58,17 +58,6 @@ x2212_device::x2212_device(const machine_config &mconfig, device_type type, cons
 }
 
 //-------------------------------------------------
-//  static_set_auto_save - configuration helper
-//  to set the auto-save flag
-//-------------------------------------------------
-
-void x2212_device::static_set_auto_save(device_t &device)
-{
-	downcast<x2212_device &>(device).m_auto_save = true;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

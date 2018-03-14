@@ -91,16 +91,16 @@ enum
 //**************************************************************************
 
 #define MCFG_TMS3203X_MCBL(_mode) \
-	tms3203x_device::set_mcbl_mode(*device, _mode);
+	downcast<tms3203x_device &>(*device).set_mcbl_mode(_mode);
 
 #define MCFG_TMS3203X_XF0_CB(_devcb) \
-	devcb = &tms3203x_device::set_xf0_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<tms3203x_device &>(*device).set_xf0_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS3203X_XF1_CB(_devcb) \
-	devcb = &tms3203x_device::set_xf1_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<tms3203x_device &>(*device).set_xf1_callback(DEVCB_##_devcb);
 
 #define MCFG_TMS3203X_IACK_CB(_devcb) \
-	devcb = &tms3203x_device::set_iack_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<tms3203x_device &>(*device).set_iack_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -139,10 +139,10 @@ public:
 	virtual ~tms3203x_device();
 
 	// inline configuration helpers
-	static void set_mcbl_mode(device_t &device, bool mode) { downcast<tms3203x_device &>(device).m_mcbl_mode = mode; }
-	template <class Object> static devcb_base &set_xf0_callback(device_t &device, Object &&cb) { return downcast<tms3203x_device &>(device).m_xf0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_xf1_callback(device_t &device, Object &&cb) { return downcast<tms3203x_device &>(device).m_xf1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_iack_callback(device_t &device, Object &&cb) { return downcast<tms3203x_device &>(device).m_iack_cb.set_callback(std::forward<Object>(cb)); }
+	void set_mcbl_mode(bool mode) { m_mcbl_mode = mode; }
+	template <class Object> devcb_base &set_xf0_callback(Object &&cb) { return m_xf0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_xf1_callback(Object &&cb) { return m_xf1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_iack_callback(Object &&cb) { return m_iack_cb.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	static float fp_to_float(uint32_t floatdata);

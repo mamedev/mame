@@ -18,7 +18,6 @@
 
 #include "emu.h"
 #include "includes/apple3.h"
-#include "includes/apple2.h"
 #include "sound/volt_reg.h"
 #include "formats/ap2_dsk.h"
 
@@ -29,13 +28,13 @@
 
 #include "bus/rs232/rs232.h"
 
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
-ADDRESS_MAP_START(apple3_state::apple3_map)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(apple3_memory_r, apple3_memory_w)
-ADDRESS_MAP_END
+void apple3_state::apple3_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(apple3_state::apple3_memory_r), FUNC(apple3_state::apple3_memory_w));
+}
 
 static SLOT_INTERFACE_START(apple3_cards)
 	SLOT_INTERFACE("cffa2", A2BUS_CFFA2_6502)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */

@@ -742,23 +742,26 @@ WRITE8_MEMBER(majorpkr_state::pulses_w)
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(majorpkr_state::map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_ROMBANK("rom_bank")
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xf7ff) AM_DEVICE("palette_bank", address_map_bank_device, amap8)
-	AM_RANGE(0xf800, 0xffff) AM_DEVICE("vram_bank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void majorpkr_state::map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe7ff).bankr("rom_bank");
+	map(0xe800, 0xefff).ram().share("nvram");
+	map(0xf000, 0xf7ff).m(m_palette_bank, FUNC(address_map_bank_device::amap8));
+	map(0xf800, 0xffff).m(m_vram_bank, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(majorpkr_state::palettebanks)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void majorpkr_state::palettebanks(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(majorpkr_state::vrambanks)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(fg_vram_w) AM_SHARE("fg_vram")
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(bg_vram_w) AM_SHARE("bg_vram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM // spare vram? cleared during boot along with fg and bg
-ADDRESS_MAP_END
+void majorpkr_state::vrambanks(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().w(this, FUNC(majorpkr_state::fg_vram_w)).share("fg_vram");
+	map(0x0800, 0x0fff).ram().w(this, FUNC(majorpkr_state::bg_vram_w)).share("bg_vram");
+	map(0x1000, 0x1fff).ram(); // spare vram? cleared during boot along with fg and bg
+}
 
 /*
   00  W ---> ROM bank.
@@ -781,29 +784,30 @@ ADDRESS_MAP_END
   60  W ---> PSG SN76489/96 initialization routines.
              (Maybe a leftover for different hardware).
 */
-ADDRESS_MAP_START(majorpkr_state::portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(rom_bank_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(palette_bank_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(vram_bank_w)
+void majorpkr_state::portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(majorpkr_state::rom_bank_w));
+	map(0x01, 0x01).w(this, FUNC(majorpkr_state::palette_bank_w));
+	map(0x02, 0x02).w(this, FUNC(majorpkr_state::vram_bank_w));
 
-	AM_RANGE(0x10, 0x10) AM_READ(mux_port2_r)   // muxed set of controls.
-	AM_RANGE(0x10, 0x10) AM_WRITE(pulses_w)     // kind of watchdog on bit4... mech counters on bits 0-1-2-3.
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
-	AM_RANGE(0x11, 0x11) AM_WRITE(mux_sel_w)    // multiplexer selector.
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN2")
-	AM_RANGE(0x12, 0x12) AM_WRITE(vidreg_w)     // video registers: normal or up down screen.
-	AM_RANGE(0x13, 0x13) AM_READ(mux_port_r)    // all 4 DIP switches banks multiplexed.
-	AM_RANGE(0x13, 0x13) AM_WRITE(lamps_a_w)    // lamps a out.
-	AM_RANGE(0x14, 0x14) AM_READ_PORT("TEST")   // "freeze" switch.
-	AM_RANGE(0x14, 0x14) AM_WRITE(lamps_b_w)    // lamps b out.
+	map(0x10, 0x10).r(this, FUNC(majorpkr_state::mux_port2_r));   // muxed set of controls.
+	map(0x10, 0x10).w(this, FUNC(majorpkr_state::pulses_w));     // kind of watchdog on bit4... mech counters on bits 0-1-2-3.
+	map(0x11, 0x11).portr("IN1");
+	map(0x11, 0x11).w(this, FUNC(majorpkr_state::mux_sel_w));    // multiplexer selector.
+	map(0x12, 0x12).portr("IN2");
+	map(0x12, 0x12).w(this, FUNC(majorpkr_state::vidreg_w));     // video registers: normal or up down screen.
+	map(0x13, 0x13).r(this, FUNC(majorpkr_state::mux_port_r));    // all 4 DIP switches banks multiplexed.
+	map(0x13, 0x13).w(this, FUNC(majorpkr_state::lamps_a_w));    // lamps a out.
+	map(0x14, 0x14).portr("TEST");   // "freeze" switch.
+	map(0x14, 0x14).w(this, FUNC(majorpkr_state::lamps_b_w));    // lamps b out.
 
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	map(0x30, 0x30).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x31, 0x31).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x60, 0x60) AM_WRITENOP    // leftover from a PSG SN76489/96?...
-ADDRESS_MAP_END
+	map(0x50, 0x50).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x60, 0x60).nopw();    // leftover from a PSG SN76489/96?...
+}
 
 
 /*************************

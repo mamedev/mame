@@ -53,37 +53,40 @@ public:
 	};
 
 	x68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_okim6258(*this, "okim6258"),
-			m_hd63450(*this, "hd63450"),
-			m_ram(*this, RAM_TAG),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_gfxpalette(*this, "gfxpalette"),
-			m_pcgpalette(*this, "pcgpalette"),
-			m_mfpdev(*this, MC68901_TAG),
-			m_rtc(*this, RP5C15_TAG),
-			m_scc(*this, "scc"),
-			m_ym2151(*this, "ym2151"),
-			m_ppi(*this, "ppi8255"),
-			m_screen(*this, "screen"),
-			m_upd72065(*this, "upd72065"),
-			m_expansion(*this, "exp"),
-			m_options(*this, "options"),
-			m_mouse1(*this, "mouse1"),
-			m_mouse2(*this, "mouse2"),
-			m_mouse3(*this, "mouse3"),
-			m_xpd1lr(*this, "xpd1lr"),
-			m_ctrltype(*this, "ctrltype"),
-			m_joy1(*this, "joy1"),
-			m_joy2(*this, "joy2"),
-			m_md3b(*this, "md3b"),
-			m_md6b(*this, "md6b"),
-			m_md6b_extra(*this, "md6b_extra"),
-			m_nvram(0x4000/sizeof(uint16_t)),
-			m_tvram(0x80000/sizeof(uint16_t)),
-			m_gvram(0x80000/sizeof(uint16_t)),
-			m_spritereg(0x8000/sizeof(uint16_t), 0)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_okim6258(*this, "okim6258")
+		, m_hd63450(*this, "hd63450")
+		, m_ram(*this, RAM_TAG)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_gfxpalette(*this, "gfxpalette")
+		, m_pcgpalette(*this, "pcgpalette")
+		, m_mfpdev(*this, MC68901_TAG)
+		, m_rtc(*this, RP5C15_TAG)
+		, m_scc(*this, "scc")
+		, m_ym2151(*this, "ym2151")
+		, m_ppi(*this, "ppi8255")
+		, m_screen(*this, "screen")
+		, m_upd72065(*this, "upd72065")
+		, m_expansion(*this, "exp")
+		, m_options(*this, "options")
+		, m_mouse1(*this, "mouse1")
+		, m_mouse2(*this, "mouse2")
+		, m_mouse3(*this, "mouse3")
+		, m_xpd1lr(*this, "xpd1lr")
+		, m_ctrltype(*this, "ctrltype")
+		, m_joy1(*this, "joy1")
+		, m_joy2(*this, "joy2")
+		, m_md3b(*this, "md3b")
+		, m_md6b(*this, "md6b")
+		, m_md6b_extra(*this, "md6b_extra")
+		, m_eject_drv_out(*this, "eject_drv%u", 0U)
+		, m_ctrl_drv_out(*this, "ctrl_drv%u", 0U)
+		, m_access_drv_out(*this, "access_drv%u", 0U)
+		, m_nvram(0x4000/sizeof(uint16_t))
+		, m_tvram(0x80000/sizeof(uint16_t))
+		, m_gvram(0x80000/sizeof(uint16_t))
+		, m_spritereg(0x8000/sizeof(uint16_t), 0)
 	{ }
 
 	required_device<m68000_base_device> m_maincpu;
@@ -113,6 +116,10 @@ public:
 	required_ioport m_md3b;
 	required_ioport m_md6b;
 	required_ioport m_md6b_extra;
+
+	output_finder<4> m_eject_drv_out;
+	output_finder<4> m_ctrl_drv_out;
+	output_finder<4> m_access_drv_out;
 
 	std::vector<uint16_t> m_nvram;
 	std::vector<uint16_t> m_tvram;
@@ -261,9 +268,6 @@ public:
 	TILE_GET_INFO_MEMBER(x68k_get_bg1_tile);
 	TILE_GET_INFO_MEMBER(x68k_get_bg0_tile_16);
 	TILE_GET_INFO_MEMBER(x68k_get_bg1_tile_16);
-	DECLARE_MACHINE_START(x68030);
-	DECLARE_MACHINE_RESET(x68000);
-	DECLARE_MACHINE_START(x68000);
 	DECLARE_VIDEO_START(x68000);
 	DECLARE_PALETTE_INIT(x68000);
 	uint32_t screen_update_x68000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -345,9 +349,11 @@ public:
 	void x68ksupr(machine_config &config);
 	void x68030(machine_config &config);
 	void x68000(machine_config &config);
+
 	void x68030_map(address_map &map);
 	void x68k_map(address_map &map);
 	void x68kxvi_map(address_map &map);
+
 private:
 	inline void x68k_plot_pixel(bitmap_rgb32 &bitmap, int x, int y, uint32_t color);
 	void x68k_crtc_text_copy(int src, int dest, uint8_t planes);
@@ -362,6 +368,8 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
 	bool m_bus_error;
 };

@@ -97,6 +97,10 @@ class symbol_table;
 // declared in debugger.h
 class debugger_manager;
 
+// declared in devcb.h
+class devcb_read_base;
+class devcb_write_base;
+
 // declared in devfind.h
 class finder_base;
 

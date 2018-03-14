@@ -473,36 +473,38 @@ WRITE8_MEMBER(popobear_state::irq_ack_w)
 	}
 }
 
-ADDRESS_MAP_START(popobear_state::popobear_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM
-	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_SHARE("spr") // unknown boundaries, 0x2ff800 contains a sprite list, lower area = sprite gfx
-	AM_RANGE(0x300000, 0x3fffff) AM_RAM_WRITE( vram_w ) AM_SHARE("vram") // tile definitions + tilemaps
+void popobear_state::popobear_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).rom();
+	map(0x210000, 0x21ffff).ram();
+	map(0x280000, 0x2fffff).ram().share("spr"); // unknown boundaries, 0x2ff800 contains a sprite list, lower area = sprite gfx
+	map(0x300000, 0x3fffff).ram().w(this, FUNC(popobear_state::vram_w)).share("vram"); // tile definitions + tilemaps
 
 
 	/* Most if not all of these are vregs */
-	AM_RANGE(0x480000, 0x48001f) AM_RAM AM_SHARE("vregs")
-	AM_RANGE(0x480020, 0x480023) AM_RAM
-	AM_RANGE(0x480028, 0x48002d) AM_RAM
+	map(0x480000, 0x48001f).ram().share("vregs");
+	map(0x480020, 0x480023).ram();
+	map(0x480028, 0x48002d).ram();
 //  AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ(480020_r) AM_WRITE(480020_w)
 //  AM_RANGE(0x480028, 0x480029) AM_NOP //AM_WRITE(480028_w)
 //  AM_RANGE(0x48002c, 0x48002d) AM_NOP //AM_WRITE(48002c_w)
-	AM_RANGE(0x480030, 0x480031) AM_WRITE8(irq_ack_w, 0x00ff)
-	AM_RANGE(0x480034, 0x480035) AM_RAM // coin counter or coin lockout
-	AM_RANGE(0x48003a, 0x48003b) AM_RAM //AM_READ(48003a_r) AM_WRITE(48003a_w)
+	map(0x480031, 0x480031).w(this, FUNC(popobear_state::irq_ack_w));
+	map(0x480034, 0x480035).ram(); // coin counter or coin lockout
+	map(0x48003a, 0x48003b).ram(); //AM_READ(48003a_r) AM_WRITE(48003a_w)
 
-	AM_RANGE(0x480400, 0x4807ff) AM_RAM AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0x480400, 0x4807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")
-	AM_RANGE(0x520000, 0x520001) AM_READ_PORT("IN1")
-	AM_RANGE(0x540000, 0x540001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x550000, 0x550003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
+	map(0x500000, 0x500001).portr("IN0");
+	map(0x520000, 0x520001).portr("IN1");
+	map(0x540001, 0x540001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x550000, 0x550003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x600000, 0x600001) AM_WRITENOP
-	AM_RANGE(0x620000, 0x620001) AM_READ8(_620000_r,0xff00) AM_WRITENOP
-	AM_RANGE(0x800000, 0xbfffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x600000, 0x600001).nopw();
+	map(0x620000, 0x620000).r(this, FUNC(popobear_state::_620000_r));
+	map(0x620000, 0x620001).nopw();
+	map(0x800000, 0xbfffff).rom();
+}
 
 static INPUT_PORTS_START( popobear )
 

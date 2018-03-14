@@ -94,35 +94,38 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_coinctrl_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(cbasebal_state::cbasebal_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("palette")  /* palette + vram + scrollram */
-	AM_RANGE(0xe000, 0xfdff) AM_RAM     /* work RAM */
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void cbasebal_state::cbasebal_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).rw(this, FUNC(cbasebal_state::bankedram_r), FUNC(cbasebal_state::bankedram_w)).share("palette");  /* palette + vram + scrollram */
+	map(0xe000, 0xfdff).ram();     /* work RAM */
+	map(0xfe00, 0xffff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(cbasebal_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
-ADDRESS_MAP_END
+void cbasebal_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank0d");
+	map(0x8000, 0xbfff).bankr("bank1d");
+}
 
-ADDRESS_MAP_START(cbasebal_state::cbasebal_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(cbasebal_bankswitch_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE_PORT("IO_01")
-	AM_RANGE(0x02, 0x02) AM_WRITE_PORT("IO_02")
-	AM_RANGE(0x03, 0x03) AM_WRITE_PORT("IO_03")
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0x08, 0x09) AM_WRITE(cbasebal_scrollx_w)
-	AM_RANGE(0x0a, 0x0b) AM_WRITE(cbasebal_scrolly_w)
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("P1")
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("P2")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x13, 0x13) AM_WRITE(cbasebal_gfxctrl_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(cbasebal_coinctrl_w)
-ADDRESS_MAP_END
+void cbasebal_state::cbasebal_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(cbasebal_state::cbasebal_bankswitch_w));
+	map(0x01, 0x01).portw("IO_01");
+	map(0x02, 0x02).portw("IO_02");
+	map(0x03, 0x03).portw("IO_03");
+	map(0x05, 0x05).w("oki", FUNC(okim6295_device::write));
+	map(0x06, 0x07).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x08, 0x09).w(this, FUNC(cbasebal_state::cbasebal_scrollx_w));
+	map(0x0a, 0x0b).w(this, FUNC(cbasebal_state::cbasebal_scrolly_w));
+	map(0x10, 0x10).portr("P1");
+	map(0x11, 0x11).portr("P2");
+	map(0x12, 0x12).portr("SYSTEM");
+	map(0x13, 0x13).w(this, FUNC(cbasebal_state::cbasebal_gfxctrl_w));
+	map(0x14, 0x14).w(this, FUNC(cbasebal_state::cbasebal_coinctrl_w));
+}
 
 
 /*************************************

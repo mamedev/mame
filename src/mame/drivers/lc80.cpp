@@ -48,14 +48,15 @@
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(lc80_state::lc80_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK("bank1")
-	AM_RANGE(0x0800, 0x0fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x1000, 0x17ff) AM_ROMBANK("bank3")
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2400, 0x2fff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void lc80_state::lc80_mem(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).bankr("bank1");
+	map(0x0800, 0x0fff).bankr("bank2");
+	map(0x1000, 0x17ff).bankr("bank3");
+	map(0x2000, 0x23ff).ram();
+	map(0x2400, 0x2fff).bankrw("bank4");
+}
 
 #if 0
 ADDRESS_MAP_START(lc80_state::sc80_mem)
@@ -64,12 +65,13 @@ ADDRESS_MAP_START(lc80_state::sc80_mem)
 ADDRESS_MAP_END
 #endif
 
-ADDRESS_MAP_START(lc80_state::lc80_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_device, read, write)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-ADDRESS_MAP_END
+void lc80_state::lc80_io(address_map &map)
+{
+	map.global_mask(0x1f);
+	map(0x14, 0x17).rw(Z80PIO1_TAG, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x18, 0x1b).rw(m_pio2, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x0c, 0x0f).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 /* Input Ports */
 

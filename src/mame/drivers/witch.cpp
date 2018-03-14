@@ -109,7 +109,7 @@ Sound
     1xES8712
 
     Mapped @0x8010-0x8016
-    Had to patch es8712.c to start playing on 0x8016 write and to prevent continuous looping.
+    Had to patch es8712.cpp to start playing on 0x8016 write and to prevent continuous looping.
     There's a test on bit1 at offset 0 (0x8010), so this may be a "read status" kind of port.
 
 
@@ -235,7 +235,7 @@ TODO :
 #define MAIN_CLOCK        XTAL(12'000'000)
 #define CPU_CLOCK         MAIN_CLOCK / 4
 #define YM2203_CLOCK      MAIN_CLOCK / 4
-#define ES8712_CLOCK      8000              // 8Khz, it's the only clock for sure (pin13) it come from pin14 of M5205.
+#define MSM5202_CLOCK     384_kHz_XTAL
 
 #define HOPPER_PULSE      50          // time between hopper pulses in milliseconds (not right for attendant pay)
 
@@ -244,19 +244,19 @@ class witch_state : public driver_device
 {
 public:
 	witch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_gfx0_vram(*this, "gfx0_vram"),
-		m_gfx0_cram(*this, "gfx0_cram"),
-		m_gfx1_vram(*this, "gfx1_vram"),
-		m_gfx1_cram(*this, "gfx1_cram"),
-		m_sprite_ram(*this, "sprite_ram"),
-		m_palette(*this, "palette"),
-		m_hopper(*this, "hopper")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "sub")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_gfx0_vram(*this, "gfx0_vram")
+		, m_gfx0_cram(*this, "gfx0_cram")
+		, m_gfx1_vram(*this, "gfx1_vram")
+		, m_gfx1_cram(*this, "gfx1_cram")
+		, m_sprite_ram(*this, "sprite_ram")
+		, m_palette(*this, "palette")
+		, m_hopper(*this, "hopper")
+		, m_mainbank(*this, "mainbank")
+	{ }
 
 	tilemap_t *m_gfx0a_tilemap;
 	tilemap_t *m_gfx0b_tilemap;
@@ -274,6 +274,8 @@ public:
 	required_device<palette_device> m_palette;
 
 	required_device<ticket_dispenser_device> m_hopper;
+
+	required_memory_bank m_mainbank;
 
 	int m_scrollx;
 	int m_scrolly;
@@ -420,7 +422,7 @@ WRITE8_MEMBER(witch_state::write_a002)
 	//A002 bit 7&6 = m_bank ????
 	m_reg_a002 = data;
 
-	membank("bank1")->set_entry((data >> 6) & 3);
+	m_mainbank->set_entry((data >> 6) & 3);
 }
 
 WRITE8_MEMBER(witch_state::write_a006)
@@ -481,41 +483,43 @@ WRITE8_MEMBER(witch_state::yscroll_w)
 	m_scrolly=data;
 }
 
-ADDRESS_MAP_START(witch_state::map_main)
-	AM_RANGE(0x0000, UNBANKED_SIZE-1) AM_ROM
-	AM_RANGE(UNBANKED_SIZE, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
-	AM_RANGE(0xa004, 0xa007) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
-	AM_RANGE(0xa008, 0xa008) AM_WRITE(main_write_a008)
-	AM_RANGE(0xa00c, 0xa00c) AM_READ_PORT("SERVICE")    // stats / reset
-	AM_RANGE(0xa00e, 0xa00e) AM_READ_PORT("COINS")      // coins/attendant keys
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_WRITE(gfx0_vram_w) AM_SHARE("gfx0_vram")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_WRITE(gfx0_cram_w) AM_SHARE("gfx0_cram")
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(gfx1_vram_r, gfx1_vram_w) AM_SHARE("gfx1_vram")
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(gfx1_cram_r, gfx1_cram_w) AM_SHARE("gfx1_cram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("sprite_ram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf100, 0xf1ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf200, 0xffff) AM_RAM AM_SHARE("share2")
-ADDRESS_MAP_END
+void witch_state::map_main(address_map &map)
+{
+	map(0x0000, UNBANKED_SIZE-1).rom();
+	map(UNBANKED_SIZE, 0x7fff).bankr("mainbank");
+	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8008, 0x8009).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa004, 0xa007).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa008, 0xa008).w(this, FUNC(witch_state::main_write_a008));
+	map(0xa00c, 0xa00c).portr("SERVICE");    // stats / reset
+	map(0xa00e, 0xa00e).portr("COINS");      // coins/attendant keys
+	map(0xc000, 0xc3ff).ram().w(this, FUNC(witch_state::gfx0_vram_w)).share("gfx0_vram");
+	map(0xc400, 0xc7ff).ram().w(this, FUNC(witch_state::gfx0_cram_w)).share("gfx0_cram");
+	map(0xc800, 0xcbff).rw(this, FUNC(witch_state::gfx1_vram_r), FUNC(witch_state::gfx1_vram_w)).share("gfx1_vram");
+	map(0xcc00, 0xcfff).rw(this, FUNC(witch_state::gfx1_cram_r), FUNC(witch_state::gfx1_cram_w)).share("gfx1_cram");
+	map(0xd000, 0xdfff).ram().share("sprite_ram");
+	map(0xe000, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xe800, 0xefff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xf000, 0xf0ff).ram().share("share1");
+	map(0xf100, 0xf1ff).ram().share("nvram");
+	map(0xf200, 0xffff).ram().share("share2");
+}
 
 
-ADDRESS_MAP_START(witch_state::map_sub)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x8010, 0x8016) AM_DEVREADWRITE("essnd", es8712_device, read, write)
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
-	AM_RANGE(0xa004, 0xa007) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
-	AM_RANGE(0xa008, 0xa008) AM_WRITE(sub_write_a008)
-	AM_RANGE(0xa00c, 0xa00c) AM_READ_PORT("SERVICE")    // stats / reset
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf200, 0xffff) AM_RAM AM_SHARE("share2")
-ADDRESS_MAP_END
+void witch_state::map_sub(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8008, 0x8009).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8010, 0x8016).rw("essnd", FUNC(es8712_device::read), FUNC(es8712_device::write));
+	map(0xa000, 0xa003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa004, 0xa007).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa008, 0xa008).w(this, FUNC(witch_state::sub_write_a008));
+	map(0xa00c, 0xa00c).portr("SERVICE");    // stats / reset
+	map(0xf000, 0xf0ff).ram().share("share1");
+	map(0xf200, 0xffff).ram().share("share2");
+}
 
 static INPUT_PORTS_START( witch )
 	PORT_START("SERVICE")
@@ -814,7 +818,13 @@ MACHINE_CONFIG_START(witch_state::witch)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ES8712_ADD("essnd", ES8712_CLOCK)          /* 8Khz, it's the only clock for sure (pin13) it comes from pin14 of M5205 */
+	MCFG_ES8712_ADD("essnd", 0)
+	MCFG_ES8712_MSM_WRITE_CALLBACK(DEVWRITE8("msm", msm5205_device, data_w))
+	MCFG_ES8712_MSM_TAG("msm")
+
+	MCFG_SOUND_ADD("msm", MSM5205, MSM5202_CLOCK)   /* actually MSM5202 */
+	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("essnd", es8712_device, msm_int))
+	MCFG_MSM6585_PRESCALER_SELECTOR(S48_4B)         /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("ym1", YM2203, YM2203_CLOCK)     /* 3 MHz */
@@ -919,8 +929,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(witch_state,witch)
 {
-	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000 + UNBANKED_SIZE, 0x8000);
-	membank("bank1")->set_entry(0);
+	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000 + UNBANKED_SIZE, 0x8000);
+	m_mainbank->set_entry(0);
 
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
 }

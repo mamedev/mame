@@ -188,10 +188,11 @@ uint32_t ps2sony_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-ADDRESS_MAP_START(ps2sony_state::mem_map)
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM // 32 MB RAM
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void ps2sony_state::mem_map(address_map &map)
+{
+	map(0x00000000, 0x01ffffff).ram(); // 32 MB RAM
+	map(0x1fc00000, 0x1fdfffff).rom().region("bios", 0);
+}
 
 static INPUT_PORTS_START( ps2sony )
 INPUT_PORTS_END

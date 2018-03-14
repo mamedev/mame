@@ -70,18 +70,20 @@ WRITE8_MEMBER(asst128_state::asst128_fdc_dor_w)
 	m_fdc->dor_w(space, offset, data, mem_mask);
 }
 
-ADDRESS_MAP_START(asst128_state::asst128_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void asst128_state::asst128_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(asst128_state::asst128_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", asst128_mb_device, map, 0xffff)
-	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
-	AM_RANGE(0x03f2, 0x03f3) AM_WRITE8(asst128_fdc_dor_w, 0xffff)
-	AM_RANGE(0x03f4, 0x03f5) AM_DEVICE8("fdc:upd765", upd765a_device, map, 0xffff)
-ADDRESS_MAP_END
+void asst128_state::asst128_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(asst128_mb_device::map));
+	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
+	map(0x03f2, 0x03f3).w(this, FUNC(asst128_state::asst128_fdc_dor_w));
+	map(0x03f4, 0x03f5).m("fdc:upd765", FUNC(upd765a_device::map));
+}
 
 static SLOT_INTERFACE_START( asst128_floppies )
 	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
@@ -102,7 +104,7 @@ MACHINE_CONFIG_START(asst128_state::asst128)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", ASST128_MOTHERBOARD, 0)
-	asst128_mb_device::static_set_cputag(*device, "^maincpu");
+	downcast<asst128_mb_device &>(*device).set_cputag("^maincpu");
 	MCFG_DEVICE_INPUT_DEFAULTS(asst128)
 
 	MCFG_DEVICE_MODIFY("mb:cassette")

@@ -31,8 +31,8 @@ maybe close to jalmah.cpp?
 class patapata_state : public driver_device
 {
 public:
-	patapata_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	patapata_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_vregs(*this, "videoregs"),
@@ -40,6 +40,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void patapata(machine_config &config);
+
+protected:
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
@@ -48,9 +51,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void patapata(machine_config &config);
 	void main_map(address_map &map);
-protected:
 	virtual void video_start() override;
 
 private:
@@ -181,23 +182,24 @@ also
 
 */
 
-ADDRESS_MAP_START(patapata_state::main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void patapata_state::main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN0")
-	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("IN1")
-	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW1")
-	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100014, 0x100015) AM_WRITE8(flipscreen_w, 0x00ff)
-	AM_RANGE(0x110000, 0x1103ff) AM_RAM AM_SHARE("videoregs")
-	AM_RANGE(0x120000, 0x1205ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x130000, 0x13ffff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x140000, 0x14ffff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x150000, 0x150001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x150010, 0x150011) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x150020, 0x15002f) AM_DEVWRITE8("nmk112", nmk112_device, okibank_w, 0x00ff)
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM // mainram?
-ADDRESS_MAP_END
+	map(0x100000, 0x100001).portr("IN0");
+	map(0x100002, 0x100003).portr("IN1");
+	map(0x100008, 0x100009).portr("DSW1");
+	map(0x10000a, 0x10000b).portr("DSW2");
+	map(0x100015, 0x100015).w(this, FUNC(patapata_state::flipscreen_w));
+	map(0x110000, 0x1103ff).ram().share("videoregs");
+	map(0x120000, 0x1205ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x130000, 0x13ffff).ram().w(this, FUNC(patapata_state::fg_videoram_w)).share("fg_videoram");
+	map(0x140000, 0x14ffff).ram().w(this, FUNC(patapata_state::bg_videoram_w)).share("bg_videoram");
+	map(0x150001, 0x150001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x150011, 0x150011).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x150020, 0x15002f).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
+	map(0x180000, 0x18ffff).ram(); // mainram?
+}
 
 static INPUT_PORTS_START( patapata )
 	PORT_START("IN0")
@@ -284,7 +286,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(patapata_state::scanline)
 
 MACHINE_CONFIG_START(patapata_state::patapata)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // 16 MHz XTAL, 16 MHz CPU
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL) // 16 MHz XTAL, 16 MHz CPU
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", patapata_state,  irq4_line_hold) // 1 + 4 valid? (4 main VBL)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", patapata_state, scanline, "screen", 0, 1)
@@ -304,10 +306,10 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000) / 4, PIN7_LOW) // not verified
+	MCFG_OKIM6295_ADD("oki1", 16_MHz_XTAL / 4, PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000) / 4, PIN7_LOW) // not verified
+	MCFG_OKIM6295_ADD("oki2", 16_MHz_XTAL / 4, PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0) // or 212? difficult to read (maybe 212 is 2* 112?)

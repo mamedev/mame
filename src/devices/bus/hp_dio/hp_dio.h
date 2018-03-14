@@ -22,29 +22,29 @@
 //**************************************************************************
 
 #define MCFG_DIO16_CPU(_cputag) \
-	dio16_device::static_set_cputag(*device, _cputag);
+	downcast<dio16_device &>(*device).set_cputag(_cputag);
 #define MCFG_DIO16_SLOT_ADD(_diotag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, DIO16_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	dio16_slot_device::static_set_dio16_slot(*device, this, _diotag);
+	downcast<dio16_slot_device &>(*device).set_dio16_slot(this, _diotag);
 #define MCFG_DIO32_CPU(_cputag) \
-	dio32_device::static_set_cputag(*device, _cputag);
+	downcast<dio32_device &>(*device).set_cputag(_cputag);
 #define MCFG_DIO32_SLOT_ADD(_diotag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, DIO32_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	dio32_slot_device::static_set_dio32_slot(*device, this, _diotag);
+	downcast<dio32_slot_device &>(*device).set_dio32_slot(this, _diotag);
 
 #define MCFG_ISA_OUT_IRQ3_CB(_devcb) \
-	devcb = &dio16_device::set_out_irq3_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<dio16_device &>(*device).set_out_irq3_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ4_CB(_devcb) \
-	devcb = &dio16_device::set_out_irq4_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<dio16_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ5_CB(_devcb) \
-	devcb = &dio16_device::set_out_irq5_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<dio16_device &>(*device).set_out_irq5_callback(DEVCB_##_devcb);
 
 #define MCFG_ISA_OUT_IRQ6_CB(_devcb) \
-	devcb = &dio16_device::set_out_irq6_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<dio16_device &>(*device).set_out_irq6_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -63,7 +63,7 @@ public:
 	virtual void device_start() override;
 
 	// inline configuration
-	static void static_set_dio16_slot(device_t &device, device_t *owner, const char *dio_tag);
+	void set_dio16_slot(device_t *owner, const char *dio_tag) { m_owner = owner; m_dio_tag = dio_tag; }
 
 protected:
 	dio16_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -84,11 +84,11 @@ public:
 	// construction/destruction
 	dio16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	template <class Object> static devcb_base &set_out_irq3_callback(device_t &device, Object &&cb) { return downcast<dio16_device &>(device).m_out_irq3_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq4_callback(device_t &device, Object &&cb) { return downcast<dio16_device &>(device).m_out_irq4_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq5_callback(device_t &device, Object &&cb) { return downcast<dio16_device &>(device).m_out_irq5_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq6_callback(device_t &device, Object &&cb) { return downcast<dio16_device &>(device).m_out_irq6_cb.set_callback(std::forward<Object>(cb)); }
+	void set_cputag(const char *tag) { m_cputag = tag; }
+	template <class Object> devcb_base &set_out_irq3_callback(Object &&cb) { return m_out_irq3_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq4_callback(Object &&cb) { return m_out_irq4_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq5_callback(Object &&cb) { return m_out_irq5_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq6_callback(Object &&cb) { return m_out_irq6_cb.set_callback(std::forward<Object>(cb)); }
 
 	void install_memory(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
 
@@ -155,7 +155,7 @@ public:
 	void set_dio_device();
 
 	// inline configuration
-	static void static_set_diobus(device_t &device, device_t *dio_device);
+	void set_diobus(device_t *dio_device) { m_dio_dev = dio_device; }
 
 public:
 	device_dio16_card_interface(const machine_config &mconfig, device_t &device);
@@ -178,7 +178,7 @@ public:
 	virtual void device_start() override;
 
 	// inline configuration
-	static void static_set_dio32_slot(device_t &device, device_t *owner, const char *dio_tag);
+	void set_dio32_slot(device_t *owner, const char *dio_tag) { m_owner = owner; m_dio_tag = dio_tag; }
 };
 
 

@@ -118,25 +118,26 @@ READ8_MEMBER(dragrace_state::dragrace_scanline_r)
 }
 
 
-ADDRESS_MAP_START(dragrace_state::dragrace_map)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x0800, 0x083f) AM_READ(dragrace_input_r)
-	AM_RANGE(0x0900, 0x0907) AM_DEVWRITE("latch_f5", addressable_latch_device, write_d0)
-	AM_RANGE(0x0908, 0x090f) AM_DEVWRITE("latch_a5", addressable_latch_device, write_d0)
-	AM_RANGE(0x0910, 0x0917) AM_DEVWRITE("latch_h5", addressable_latch_device, write_d0)
-	AM_RANGE(0x0918, 0x091f) AM_DEVWRITE("latch_e5", addressable_latch_device, write_d0)
-	AM_RANGE(0x0920, 0x0927) AM_DEVWRITE("latch_f5", addressable_latch_device, clear)
-	AM_RANGE(0x0928, 0x092f) AM_DEVWRITE("latch_a5", addressable_latch_device, clear)
-	AM_RANGE(0x0930, 0x0937) AM_DEVWRITE("latch_h5", addressable_latch_device, clear)
-	AM_RANGE(0x0938, 0x093f) AM_DEVWRITE("latch_e5", addressable_latch_device, clear)
-	AM_RANGE(0x0a00, 0x0aff) AM_WRITEONLY AM_SHARE("playfield_ram")
-	AM_RANGE(0x0b00, 0x0bff) AM_WRITEONLY AM_SHARE("position_ram")
-	AM_RANGE(0x0c00, 0x0c00) AM_READ(dragrace_steering_r)
-	AM_RANGE(0x0d00, 0x0d00) AM_READ(dragrace_scanline_r)
-	AM_RANGE(0x0e00, 0x0eff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM /* program */
-	AM_RANGE(0xf800, 0xffff) AM_ROM /* program mirror */
-ADDRESS_MAP_END
+void dragrace_state::dragrace_map(address_map &map)
+{
+	map(0x0080, 0x00ff).ram();
+	map(0x0800, 0x083f).r(this, FUNC(dragrace_state::dragrace_input_r));
+	map(0x0900, 0x0907).w("latch_f5", FUNC(addressable_latch_device::write_d0));
+	map(0x0908, 0x090f).w("latch_a5", FUNC(addressable_latch_device::write_d0));
+	map(0x0910, 0x0917).w("latch_h5", FUNC(addressable_latch_device::write_d0));
+	map(0x0918, 0x091f).w("latch_e5", FUNC(addressable_latch_device::write_d0));
+	map(0x0920, 0x0927).w("latch_f5", FUNC(addressable_latch_device::clear));
+	map(0x0928, 0x092f).w("latch_a5", FUNC(addressable_latch_device::clear));
+	map(0x0930, 0x0937).w("latch_h5", FUNC(addressable_latch_device::clear));
+	map(0x0938, 0x093f).w("latch_e5", FUNC(addressable_latch_device::clear));
+	map(0x0a00, 0x0aff).writeonly().share("playfield_ram");
+	map(0x0b00, 0x0bff).writeonly().share("position_ram");
+	map(0x0c00, 0x0c00).r(this, FUNC(dragrace_state::dragrace_steering_r));
+	map(0x0d00, 0x0d00).r(this, FUNC(dragrace_state::dragrace_scanline_r));
+	map(0x0e00, 0x0eff).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x1000, 0x1fff).rom(); /* program */
+	map(0xf800, 0xffff).rom(); /* program mirror */
+}
 
 
 static INPUT_PORTS_START( dragrace )

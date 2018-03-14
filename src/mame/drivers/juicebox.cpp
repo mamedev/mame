@@ -288,11 +288,12 @@ void juicebox_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(juicebox_state::juicebox_map)
-	AM_RANGE(0x00000000, 0x007fffff) AM_ROM
-	AM_RANGE(0x04000000, 0x04ffffff) AM_READWRITE(juicebox_nand_r, juicebox_nand_w )
-	AM_RANGE(0x0c000000, 0x0c1fffff) AM_RAM AM_MIRROR(0x00600000)
-ADDRESS_MAP_END
+void juicebox_state::juicebox_map(address_map &map)
+{
+	map(0x00000000, 0x007fffff).rom();
+	map(0x04000000, 0x04ffffff).rw(this, FUNC(juicebox_state::juicebox_nand_r), FUNC(juicebox_state::juicebox_nand_w));
+	map(0x0c000000, 0x0c1fffff).ram().mirror(0x00600000);
+}
 
 /***************************************************************************
     MACHINE DRIVERS

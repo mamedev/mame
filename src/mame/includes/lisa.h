@@ -20,9 +20,11 @@
 #include "machine/nvram.h"
 #include "machine/sonydriv.h"
 #include "sound/spkrdev.h"
+#include "screen.h"
 
 #define COP421_TAG      "u9f"
 #define KB_COP421_TAG   "kbcop"
+#define SCREEN_TAG		"screen"
 
 /* lisa MMU segment regs */
 struct real_mmu_entry
@@ -123,7 +125,8 @@ public:
 		m_io_line7(*this, "LINE7"),
 		m_io_mouse_x(*this, "MOUSE_X"),
 		m_io_mouse_y(*this, "MOUSE_Y"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_screen(*this, SCREEN_TAG)
 	{ }
 
 	required_device<m68000_base_device> m_maincpu;
@@ -150,6 +153,7 @@ public:
 	required_ioport m_io_mouse_y;
 
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
 	uint8_t *m_ram_ptr;
 	uint8_t *m_rom_ptr;

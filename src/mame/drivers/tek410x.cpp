@@ -43,13 +43,15 @@ public:
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(tek4107a_state::tek4107a_mem)
-	AM_RANGE(0x00000, 0xbffff) AM_RAM
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION(I80188_TAG, 0)
-ADDRESS_MAP_END
+void tek4107a_state::tek4107a_mem(address_map &map)
+{
+	map(0x00000, 0xbffff).ram();
+	map(0xc0000, 0xfffff).rom().region(I80188_TAG, 0);
+}
 
-ADDRESS_MAP_START(tek4107a_state::tek4107a_io)
-ADDRESS_MAP_END
+void tek4107a_state::tek4107a_io(address_map &map)
+{
+}
 
 /* Input Ports */
 

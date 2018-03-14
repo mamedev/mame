@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "cpu/h6280/h6280.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 #include "video/deco16ic.h"
@@ -29,7 +30,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<h6280_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
 	required_device<deco_mxc06_device> m_spritegen;
@@ -43,11 +44,8 @@ public:
 	/* misc */
 	uint16_t    m_priority[2];
 
-	DECLARE_WRITE16_MEMBER(vaportra_sound_w);
-	DECLARE_READ16_MEMBER(irq6_ack_r);
-	DECLARE_WRITE16_MEMBER(irq6_ack_w);
-	DECLARE_READ16_MEMBER(vaportra_control_r);
-	DECLARE_READ8_MEMBER(vaportra_soundlatch_r);
+	DECLARE_READ8_MEMBER(irq6_ack_r);
+	DECLARE_WRITE8_MEMBER(irq6_ack_w);
 	DECLARE_WRITE16_MEMBER(vaportra_priority_w);
 	DECLARE_WRITE16_MEMBER(vaportra_palette_24bit_rg_w);
 	DECLARE_WRITE16_MEMBER(vaportra_palette_24bit_b_w);

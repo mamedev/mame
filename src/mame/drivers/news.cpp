@@ -24,17 +24,18 @@ driver by David Haywood
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(news_state::news_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM     /* 4000-7fff is written to during startup, probably leftover code */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(news_fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(news_bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0x9000, 0x91ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc003, 0xc003) AM_WRITE(news_bgpic_w)
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void news_state::news_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();     /* 4000-7fff is written to during startup, probably leftover code */
+	map(0x8000, 0x87ff).ram().w(this, FUNC(news_state::news_fgram_w)).share("fgram");
+	map(0x8800, 0x8fff).ram().w(this, FUNC(news_state::news_bgram_w)).share("bgram");
+	map(0x9000, 0x91ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0xc000, 0xc000).portr("DSW");
+	map(0xc001, 0xc001).portr("INPUTS");
+	map(0xc002, 0xc002).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc003, 0xc003).w(this, FUNC(news_state::news_bgpic_w));
+	map(0xe000, 0xffff).ram();
+}
 
 
 static INPUT_PORTS_START( news )

@@ -26,10 +26,10 @@
 
 
 #define MCFG_I386_SMIACT(_devcb) \
-	devcb = &i386_device::set_smiact(*device, DEVCB_##_devcb);
+	devcb = &downcast<i386_device &>(*device).set_smiact(DEVCB_##_devcb);
 
 #define MCFG_I486_FERR_HANDLER(_devcb) \
-	devcb = &i386_device::set_ferr(*device, DEVCB_##_devcb);
+	devcb = &downcast<i386_device &>(*device).set_ferr(DEVCB_##_devcb);
 
 #define X86_NUM_CPUS        4
 
@@ -39,9 +39,9 @@ public:
 	// construction/destruction
 	i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_smiact(device_t &device, Object &&cb) { return downcast<i386_device &>(device).m_smiact.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ferr(device_t &device, Object &&cb) { return downcast<i386_device &>(device).m_ferr_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_smiact(Object &&cb) { return m_smiact.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ferr(Object &&cb) { return m_ferr_handler.set_callback(std::forward<Object>(cb)); }
 
 	uint64_t debug_segbase(symbol_table &table, int params, const uint64_t *param);
 	uint64_t debug_seglimit(symbol_table &table, int params, const uint64_t *param);

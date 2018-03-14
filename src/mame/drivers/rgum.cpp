@@ -74,25 +74,26 @@ uint32_t rgum_state::screen_update_royalgum(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-ADDRESS_MAP_START(rgum_state::rgum_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM //not all of it?
+void rgum_state::rgum_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); //not all of it?
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x2002, 0x2002) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, address_w)
+	map(0x2000, 0x2000).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x2002, 0x2002).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 
-	AM_RANGE(0x2801, 0x2801) AM_READNOP //read but value discarded?
-	AM_RANGE(0x2803, 0x2803) AM_READNOP
+	map(0x2801, 0x2801).nopr(); //read but value discarded?
+	map(0x2803, 0x2803).nopr();
 
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+	map(0x3000, 0x3003).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("cram")
+	map(0x4000, 0x47ff).ram().share("vram");
+	map(0x5000, 0x57ff).ram().share("cram");
 
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x8000, 0xffff).rom();
+}
 
 
 CUSTOM_INPUT_MEMBER(rgum_state::rgum_heartbeat_r)

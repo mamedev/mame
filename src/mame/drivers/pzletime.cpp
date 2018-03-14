@@ -233,21 +233,22 @@ CUSTOM_INPUT_MEMBER(pzletime_state::ticket_status_r)
 	return (m_ticket && !(m_screen->frame_number() % 128));
 }
 
-ADDRESS_MAP_START(pzletime_state::pzletime_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x700000, 0x700005) AM_RAM_WRITE(video_regs_w) AM_SHARE("video_regs")
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x900000, 0x9005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xa00000, 0xa00007) AM_RAM AM_SHARE("tilemap_regs")
-	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_SHARE("bg_videoram")
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(mid_videoram_w) AM_SHARE("mid_videoram")
-	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(txt_videoram_w) AM_SHARE("txt_videoram")
-	AM_RANGE(0xd00000, 0xd01fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("INPUT") AM_WRITE(eeprom_w)
-	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("SYSTEM") AM_WRITE(ticket_w)
-	AM_RANGE(0xe00004, 0xe00005) AM_WRITE(oki_bank_w)
-	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
-ADDRESS_MAP_END
+void pzletime_state::pzletime_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x700000, 0x700005).ram().w(this, FUNC(pzletime_state::video_regs_w)).share("video_regs");
+	map(0x800001, 0x800001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x900000, 0x9005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xa00000, 0xa00007).ram().share("tilemap_regs");
+	map(0xb00000, 0xb3ffff).ram().share("bg_videoram");
+	map(0xc00000, 0xc00fff).ram().w(this, FUNC(pzletime_state::mid_videoram_w)).share("mid_videoram");
+	map(0xc01000, 0xc01fff).ram().w(this, FUNC(pzletime_state::txt_videoram_w)).share("txt_videoram");
+	map(0xd00000, 0xd01fff).ram().share("spriteram");
+	map(0xe00000, 0xe00001).portr("INPUT").w(this, FUNC(pzletime_state::eeprom_w));
+	map(0xe00002, 0xe00003).portr("SYSTEM").w(this, FUNC(pzletime_state::ticket_w));
+	map(0xe00004, 0xe00005).w(this, FUNC(pzletime_state::oki_bank_w));
+	map(0xf00000, 0xf0ffff).ram();
+}
 
 
 static INPUT_PORTS_START( pzletime )

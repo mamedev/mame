@@ -106,7 +106,7 @@ protected:
 	inline void set_timer_divider(uint8_t data);
 	inline void set_videoram_bank(uint32_t offs);
 	inline void set_maincpu_irq_line(uint8_t vector_num);
-	
+
 	// video functions
 	void draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
 	void draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &cliprect, int attr);
@@ -191,10 +191,10 @@ protected:
 	required_memory_bank m_bank7;
 	required_memory_bank m_bank8;
 	inline void refresh_crtc_params();
-	
-	virtual void video_start() override; 
+
+	virtual void video_start() override;
 	virtual void machine_reset() override;
-	
+
 private:
 	uint8_t m_bank_r0;
 	uint8_t m_bank_r1;
@@ -249,7 +249,7 @@ public:
 	DECLARE_WRITE8_MEMBER(necsr_ppi8255_w);
 	DECLARE_WRITE8_MEMBER(sr_bitmap_yoffs_w);
 	DECLARE_WRITE8_MEMBER(sr_bitmap_xoffs_w);
-	
+
 	INTERRUPT_GEN_MEMBER(sr_vrtc_irq);
 
 	uint32_t screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -259,7 +259,7 @@ public:
 	void pc6001sr_io(address_map &map);
 	void pc6001sr_map(address_map &map);
 protected:
-	virtual void video_start() override; 
+	virtual void video_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -270,7 +270,7 @@ private:
 	uint8_t m_sr_text_rows;
 	uint8_t *m_gvram;
 	uint8_t m_bitmap_yoffs,m_bitmap_xoffs;
-	
+
 	enum{
 		SUB_CPU_IRQ = 0,
 		JOYSTICK_IRQ,
@@ -281,7 +281,7 @@ private:
 		PRINTER_IRQ,
 		EXT_IRQ
 	};
-	
+
 	required_shared_ptr<uint8_t> m_sr_irq_vectors;
 };
 

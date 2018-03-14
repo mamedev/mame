@@ -144,13 +144,13 @@ void bbc_state::set_pixel_lookup()
 WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 {
 	// Make sure vpos is never <0
-	int vpos = machine().first_screen()->vpos();
+	int vpos = m_screen->vpos();
 	if (vpos == 0)
-		machine().first_screen()->update_partial(vpos);
+		m_screen->update_partial(vpos);
 	else
-		machine().first_screen()->update_partial(vpos - 1);
+		m_screen->update_partial(vpos - 1);
 
-	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,machine().first_screen()->vpos() );
+	logerror("setting videoULA %.4x to:%.4x   at :%d \n", data, offset, vpos);
 
 	switch (offset & 0x01)
 	{

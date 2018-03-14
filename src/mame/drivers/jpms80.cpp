@@ -88,29 +88,31 @@ WRITE_LINE_MEMBER(jpms80_state::io_enable_w)
 {
 }
 
-ADDRESS_MAP_START(jpms80_state::jpms80_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void jpms80_state::jpms80_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3000, 0x3fff).ram();
+}
 
-ADDRESS_MAP_START(jpms80_state::jpms80_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
+void jpms80_state::jpms80_io_map(address_map &map)
+{
+	map.global_mask(0x1ff);
 //  AM_RANGE(0x0000, 0x001f) // I/O & Optic (in)
-	AM_RANGE(0x0000, 0x0007) AM_DEVWRITE("outlatch0", ls259_device, write_d0)
-	AM_RANGE(0x0008, 0x000f) AM_DEVWRITE("outlatch1", ls259_device, write_d0)
-	AM_RANGE(0x0010, 0x0017) AM_DEVWRITE("outlatch2", ls259_device, write_d0)
-	AM_RANGE(0x0018, 0x001f) AM_DEVWRITE("outlatch3", ls259_device, write_d0)
-	AM_RANGE(0x0020, 0x0027) AM_DEVWRITE("outlatch4", ls259_device, write_d0)
-	AM_RANGE(0x0028, 0x002f) AM_DEVWRITE("outlatch5", ls259_device, write_d0)
-	AM_RANGE(0x0030, 0x0037) AM_DEVWRITE("outlatch6", ls259_device, write_d0)
-	AM_RANGE(0x0038, 0x003f) AM_DEVWRITE("outlatch7", ls259_device, write_d0)
-	AM_RANGE(0x0040, 0x0047) AM_DEVWRITE("outlatch8", ls259_device, write_d0)
-	AM_RANGE(0x0048, 0x004f) AM_DEVWRITE("outlatch9", ls259_device, write_d0)
-	AM_RANGE(0x0050, 0x0057) AM_DEVWRITE("outlatch10", ls259_device, write_d0)
+	map(0x0000, 0x0007).w("outlatch0", FUNC(ls259_device::write_d0));
+	map(0x0008, 0x000f).w("outlatch1", FUNC(ls259_device::write_d0));
+	map(0x0010, 0x0017).w("outlatch2", FUNC(ls259_device::write_d0));
+	map(0x0018, 0x001f).w("outlatch3", FUNC(ls259_device::write_d0));
+	map(0x0020, 0x0027).w("outlatch4", FUNC(ls259_device::write_d0));
+	map(0x0028, 0x002f).w("outlatch5", FUNC(ls259_device::write_d0));
+	map(0x0030, 0x0037).w("outlatch6", FUNC(ls259_device::write_d0));
+	map(0x0038, 0x003f).w("outlatch7", FUNC(ls259_device::write_d0));
+	map(0x0040, 0x0047).w("outlatch8", FUNC(ls259_device::write_d0));
+	map(0x0048, 0x004f).w("outlatch9", FUNC(ls259_device::write_d0));
+	map(0x0050, 0x0057).w("outlatch10", FUNC(ls259_device::write_d0));
 //  AM_RANGE(0x0140, 0x015f) // AY
-	AM_RANGE(0x01e0, 0x01ff) AM_DEVREADWRITE("tms9902duart", tms9902_device, cruread, cruwrite)
+	map(0x01e0, 0x01ff).rw("tms9902duart", FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
 //  Lamps, Meters etc. can move around
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( jpms80 )

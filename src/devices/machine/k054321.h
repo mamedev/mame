@@ -20,20 +20,6 @@ public:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 
-	DECLARE_READ8_MEMBER( main1_r);
-	DECLARE_WRITE8_MEMBER(main1_w);
-	DECLARE_READ8_MEMBER( main2_r);
-	DECLARE_WRITE8_MEMBER(main2_w);
-	DECLARE_READ8_MEMBER( sound1_r);
-	DECLARE_WRITE8_MEMBER(sound1_w);
-
-	DECLARE_WRITE8_MEMBER(volume_reset_w);
-	DECLARE_WRITE8_MEMBER(volume_up_w);
-	DECLARE_WRITE8_MEMBER(active_w);
-
-	DECLARE_READ8_MEMBER(busy_r);
-	DECLARE_WRITE8_MEMBER(dummy_w);
-
 protected:
 	void device_start() override;
 
@@ -47,6 +33,20 @@ private:
 	u8 m_active;
 
 	void propagate_volume();
+
+	DECLARE_READ8_MEMBER( main1_r);
+	DECLARE_WRITE8_MEMBER(main1_w);
+	DECLARE_READ8_MEMBER( main2_r);
+	DECLARE_WRITE8_MEMBER(main2_w);
+	DECLARE_READ8_MEMBER( sound1_r);
+	DECLARE_WRITE8_MEMBER(sound1_w);
+
+	DECLARE_WRITE8_MEMBER(volume_reset_w);
+	DECLARE_WRITE8_MEMBER(volume_up_w);
+	DECLARE_WRITE8_MEMBER(active_w);
+
+	DECLARE_READ8_MEMBER(busy_r);
+	DECLARE_WRITE8_MEMBER(dummy_w);
 };
 
 DECLARE_DEVICE_TYPE(K054321, k054321_device)

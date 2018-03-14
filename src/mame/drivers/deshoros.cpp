@@ -170,23 +170,24 @@ WRITE8_MEMBER(destiny_state::sound_w)
 	m_beeper->set_state(~offset & 1);
 }
 
-ADDRESS_MAP_START(destiny_state::main_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(printer_status_r, firq_ack_w)
-	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("SYSTEM") AM_WRITE(nmi_ack_w)
-	AM_RANGE(0x9002, 0x9002) AM_READWRITE(display_ready_r, display_w)
-	AM_RANGE(0x9003, 0x9003) AM_READ_PORT("KEY1")
-	AM_RANGE(0x9004, 0x9004) AM_READ_PORT("KEY2")
-	AM_RANGE(0x9005, 0x9005) AM_READ_PORT("DIPSW") AM_WRITE(out_w)
+void destiny_state::main_map(address_map &map)
+{
+	map(0x0000, 0x5fff).bankr("bank1");
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).rw(this, FUNC(destiny_state::printer_status_r), FUNC(destiny_state::firq_ack_w));
+	map(0x9001, 0x9001).portr("SYSTEM").w(this, FUNC(destiny_state::nmi_ack_w));
+	map(0x9002, 0x9002).rw(this, FUNC(destiny_state::display_ready_r), FUNC(destiny_state::display_w));
+	map(0x9003, 0x9003).portr("KEY1");
+	map(0x9004, 0x9004).portr("KEY2");
+	map(0x9005, 0x9005).portr("DIPSW").w(this, FUNC(destiny_state::out_w));
 //  AM_RANGE(0x9006, 0x9006) AM_NOP // printer motor on
 //  AM_RANGE(0x9007, 0x9007) AM_NOP // printer data
-	AM_RANGE(0x900a, 0x900b) AM_WRITE(sound_w)
-	AM_RANGE(0x900c, 0x900c) AM_WRITE(bank_select_w)
+	map(0x900a, 0x900b).w(this, FUNC(destiny_state::sound_w));
+	map(0x900c, 0x900c).w(this, FUNC(destiny_state::bank_select_w));
 //  AM_RANGE(0x900d, 0x900d) AM_NOP // printer motor off
 //  AM_RANGE(0x900e, 0x900e) AM_NOP // printer motor jam reset
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xc000, 0xffff).rom();
+}
 
 
 

@@ -89,8 +89,32 @@ private:
 	static constexpr int REG_DIVIDER    = -10;
 	static constexpr int REG_CYCLES     = -11;
 	static constexpr int REG_BEAMX      = -12;
-	static constexpr int REG_BEAMY      = -13;
-	static constexpr int REG_FRAME      = -14;
+	static constexpr int REG_BEAMX_S0   = -12;
+	static constexpr int REG_BEAMX_S1   = -13;
+	static constexpr int REG_BEAMX_S2   = -14;
+	static constexpr int REG_BEAMX_S3   = -15;
+	static constexpr int REG_BEAMX_S4   = -16;
+	static constexpr int REG_BEAMX_S5   = -17;
+	static constexpr int REG_BEAMX_S6   = -18;
+	static constexpr int REG_BEAMX_S7   = -19;
+	static constexpr int REG_BEAMY      = -20;
+	static constexpr int REG_BEAMY_S0   = -20;
+	static constexpr int REG_BEAMY_S1   = -21;
+	static constexpr int REG_BEAMY_S2   = -22;
+	static constexpr int REG_BEAMY_S3   = -23;
+	static constexpr int REG_BEAMY_S4   = -24;
+	static constexpr int REG_BEAMY_S5   = -25;
+	static constexpr int REG_BEAMY_S6   = -26;
+	static constexpr int REG_BEAMY_S7   = -27;
+	static constexpr int REG_FRAME      = -28;
+	static constexpr int REG_FRAME_S0   = -28;
+	static constexpr int REG_FRAME_S1   = -29;
+	static constexpr int REG_FRAME_S2   = -30;
+	static constexpr int REG_FRAME_S3   = -31;
+	static constexpr int REG_FRAME_S4   = -32;
+	static constexpr int REG_FRAME_S5   = -33;
+	static constexpr int REG_FRAME_S6   = -34;
+	static constexpr int REG_FRAME_S7   = -35;
 };
 
 

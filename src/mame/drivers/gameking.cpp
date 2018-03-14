@@ -148,20 +148,21 @@ READ8_MEMBER(gameking_state::lcd_r)
 	return data;
 }
 
-ADDRESS_MAP_START(gameking_state::gameking_mem)
-	AM_RANGE(0x0000, 0x007f) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0080, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x03ff) AM_RAM // lcd 2nd copy
+void gameking_state::gameking_mem(address_map &map)
+{
+	map(0x0000, 0x007f).rw(this, FUNC(gameking_state::io_r), FUNC(gameking_state::io_w));
+	map(0x0080, 0x01ff).ram();
+	map(0x0200, 0x03ff).ram(); // lcd 2nd copy
 
-	AM_RANGE(0x0600, 0x077f) AM_READWRITE(lcd_r, lcd_w)
-	AM_RANGE(0x0d00, 0x0fff) AM_RAM // d00, e00, f00 prooved on handheld
+	map(0x0600, 0x077f).rw(this, FUNC(gameking_state::lcd_r), FUNC(gameking_state::lcd_w));
+	map(0x0d00, 0x0fff).ram(); // d00, e00, f00 prooved on handheld
 //  AM_RANGE(0x1000, 0x1fff) AM_RAM    // sthero writes to $19xx
 
 //  AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("bank3000")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank4000")
-	AM_RANGE(0x8000, 0xffaf) AM_ROMBANK("bank8000")
-	AM_RANGE(0xffb0, 0xffff) AM_ROMBANK("bankboot") // cpu seems to read from 8000 bank, and for exceptions ignore bank
-ADDRESS_MAP_END
+	map(0x4000, 0x7fff).bankr("bank4000");
+	map(0x8000, 0xffaf).bankr("bank8000");
+	map(0xffb0, 0xffff).bankr("bankboot"); // cpu seems to read from 8000 bank, and for exceptions ignore bank
+}
 
 
 static INPUT_PORTS_START( gameking )

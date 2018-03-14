@@ -155,9 +155,10 @@ uint32_t itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rg
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(itgambl2_state::itgambl2_map)
-	AM_RANGE(0x000000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void itgambl2_state::itgambl2_map(address_map &map)
+{
+	map(0x000000, 0x3fff).rom();
+}
 
 
 /*************************

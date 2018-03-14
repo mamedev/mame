@@ -166,6 +166,7 @@ dct11em.cpp
 dectalk.cpp
 decwritr.cpp
 dgn_beta.cpp
+diablo1300.cpp
 didact.cpp
 digel804.cpp
 digijet.cpp
@@ -180,6 +181,7 @@ dps1.cpp
 dragon.cpp
 dsb46.cpp
 dual68.cpp
+duet16.cpp
 dvk_kcgd.cpp
 dvk_ksm.cpp
 e100.cpp
@@ -395,6 +397,7 @@ mikro80.cpp
 mikromik.cpp
 mikrosha.cpp
 mightyframe.cpp
+milton6805.cpp
 milwaukee.cpp
 mini2440.cpp
 minicom.cpp
@@ -591,6 +594,7 @@ rsc55.cpp
 rt1715.cpp
 rvoice.cpp
 rx78.cpp
+rz1.cpp
 rzone.cpp
 sacstate.cpp
 sage2.cpp

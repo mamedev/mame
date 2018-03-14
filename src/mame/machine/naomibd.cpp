@@ -50,7 +50,7 @@
     * bit 29 (mode bit 1)
     "M2" type carts: DMA_OFFSET - no effect, ROM_OFFSET - ROM size/mapping select, 0 - 4MB ROM-mode, 1 - 8MB ROM mode. for both PIO and DMA
     "M1" type carts: DMA_OFFSET 0 = enable decryptyon/decompression during DMA transfer, ROM_OFFSET - ROM size/mapping select similar to M2 cart type
-    "M4" type carts: no effect, ROM_OFFSET bit 29 always return 1 then read, used by BIOS to determine this cart is encrypted and require bit 30 set then read ROM header
+    "M4" type carts: no effect, ROM_OFFSET bit 29 when read return 1 if security PIC present, used by BIOS to determine this cart is encrypted and require bit 30 set when read ROM header
 
     * bit 28 (mode bit 0)
     "M2" type carts: ROM_OFFSET - master/slave ROM board select
@@ -78,13 +78,6 @@ naomi_board::naomi_board(const machine_config &mconfig, device_type type, const 
 {
 	eeprom_tag = nullptr;
 }
-
-void naomi_board::static_set_eeprom_tag(device_t &device, const char *_eeprom_tag)
-{
-	naomi_board &dev = downcast<naomi_board &>(device);
-	dev.eeprom_tag = _eeprom_tag;
-}
-
 
 void naomi_board::device_start()
 {

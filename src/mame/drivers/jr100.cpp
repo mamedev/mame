@@ -130,14 +130,15 @@ WRITE8_MEMBER(jr100_state::jr100_via_w)
 	m_via->write(space,offset,data);
 }
 
-ADDRESS_MAP_START(jr100_state::jr100_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("pcg")
-	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xc800, 0xc80f) AM_DEVREAD("via", via6522_device, read) AM_WRITE(jr100_via_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void jr100_state::jr100_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).ram().share("ram");
+	map(0xc000, 0xc0ff).ram().share("pcg");
+	map(0xc100, 0xc3ff).ram().share("vram");
+	map(0xc800, 0xc80f).r(m_via, FUNC(via6522_device::read)).w(this, FUNC(jr100_state::jr100_via_w));
+	map(0xe000, 0xffff).rom();
+}
 
 /* Input ports */
 INPUT_PORTS_START( jr100 )

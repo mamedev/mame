@@ -20,20 +20,22 @@ INPUT_CHANGED_MEMBER(cheekyms_state::coin_inserted)
 }
 
 
-ADDRESS_MAP_START(cheekyms_state::main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void cheekyms_state::main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x3000, 0x33ff).ram();
+	map(0x3800, 0x3bff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(cheekyms_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x20, 0x3f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x40, 0x40) AM_WRITE(port_40_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(port_80_w) AM_SHARE("port_80")
-ADDRESS_MAP_END
+void cheekyms_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSW");
+	map(0x01, 0x01).portr("INPUTS");
+	map(0x20, 0x3f).writeonly().share("spriteram");
+	map(0x40, 0x40).w(this, FUNC(cheekyms_state::port_40_w));
+	map(0x80, 0x80).w(this, FUNC(cheekyms_state::port_80_w)).share("port_80");
+}
 
 
 static INPUT_PORTS_START( cheekyms )

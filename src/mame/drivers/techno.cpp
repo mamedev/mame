@@ -47,8 +47,13 @@ public:
 	DECLARE_WRITE16_MEMBER(sol2_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
 
+	DECLARE_READ8_MEMBER(rd_r) { return 0; }
+	DECLARE_WRITE8_MEMBER(wr_w) {}
+
 	void techno(machine_config &config);
 	void techno_map(address_map &map);
+	void techno_sub_map(address_map &map);
+
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
@@ -67,28 +72,29 @@ private:
 };
 
 
-ADDRESS_MAP_START(techno_state::techno_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
-	AM_RANGE(0x00000, 0x03fff) AM_ROM
-	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("nvram") // battery backed-up
-	AM_RANGE(0x06000, 0x0ffff) AM_ROM
-	AM_RANGE(0x14000, 0x147ff) AM_READWRITE(key_r,lamp1_w)
-	AM_RANGE(0x14800, 0x14fff) AM_READWRITE(sound_r,lamp2_w)
-	AM_RANGE(0x15000, 0x157ff) AM_READWRITE(rtrg_r,sol1_w)
-	AM_RANGE(0x15800, 0x15fff) AM_READNOP AM_WRITE(sol2_w) // reads from 15800, but shown as not connected
-	AM_RANGE(0x16000, 0x167ff) AM_WRITE(sound_w)
-	AM_RANGE(0x16800, 0x16fff) AM_WRITE(disp1_w)
-	AM_RANGE(0x17000, 0x177ff) AM_WRITE(disp2_w)
-	AM_RANGE(0x17800, 0x17fff) AM_WRITE(setout_w)
-ADDRESS_MAP_END
+void techno_state::techno_map(address_map &map)
+{
+	map.global_mask(0x1ffff);
+	map(0x00000, 0x03fff).rom();
+	map(0x04000, 0x04fff).ram().share("nvram"); // battery backed-up
+	map(0x06000, 0x0ffff).rom();
+	map(0x14000, 0x147ff).rw(this, FUNC(techno_state::key_r), FUNC(techno_state::lamp1_w));
+	map(0x14800, 0x14fff).rw(this, FUNC(techno_state::sound_r), FUNC(techno_state::lamp2_w));
+	map(0x15000, 0x157ff).rw(this, FUNC(techno_state::rtrg_r), FUNC(techno_state::sol1_w));
+	map(0x15800, 0x15fff).nopr().w(this, FUNC(techno_state::sol2_w)); // reads from 15800, but shown as not connected
+	map(0x16000, 0x167ff).w(this, FUNC(techno_state::sound_w));
+	map(0x16800, 0x16fff).w(this, FUNC(techno_state::disp1_w));
+	map(0x17000, 0x177ff).w(this, FUNC(techno_state::disp2_w));
+	map(0x17800, 0x17fff).w(this, FUNC(techno_state::setout_w));
+}
 
-//static ADDRESS_MAP_START( techno_sub_map, AS_IO, 8, techno_state )
+ADDRESS_MAP_START(techno_state::techno_sub_map)
 //       no ram here, must be internal to the cpu
-//  AM_RANGE(0x0000, 0x3fff) AM_READ(rd_r) // to TKY2016A audio processor which has its own 3.58MHz clock
-//  AM_RANGE(0x4000, 0x7fff) AM_WRITE(wr_w) // A11=LED;A12=WR2 (DAC) ;A13=WR1 (TKY2016A as above)
-//  AM_RANGE(0x4000, 0xbfff) AM_ROM // 4000-7FFF is same as 8000-BFFF; 4x 16k ROMS bankswitched
-//  AM_RANGE(0xc000, 0xffff) AM_ROM // another 16k ROM
-//ADDRESS_MAP_END
+	AM_RANGE(0x0000, 0x3fff) AM_READ(rd_r) // to TKY2016A audio processor which has its own 3.58MHz clock
+	AM_RANGE(0x4000, 0x7fff) AM_WRITE(wr_w) // A11=LED;A12=WR2 (DAC) ;A13=WR1 (TKY2016A as above)
+	AM_RANGE(0x4000, 0xbfff) AM_ROM // 4000-7FFF is same as 8000-BFFF; 4x 16k ROMS bankswitched
+	AM_RANGE(0xc000, 0xffff) AM_ROM // another 16k ROM
+ADDRESS_MAP_END
 
 WRITE16_MEMBER( techno_state::disp1_w )
 {

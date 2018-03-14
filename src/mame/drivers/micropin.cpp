@@ -75,39 +75,42 @@ private:
 };
 
 
-ADDRESS_MAP_START(micropin_state::micropin_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("nvram") // 4x 6561 RAM
-	AM_RANGE(0x4000, 0x4005) AM_WRITE(sw_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("X1")
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("X2")
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("X3")
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("X4")
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("X5")
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("pia50", pia6821_device, read, write)
-	AM_RANGE(0x5100, 0x5103) AM_READWRITE(pia51_r,pia51_w)
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(sol_w);
-	AM_RANGE(0x5202, 0x5202) AM_WRITE(lamp_w);
-	AM_RANGE(0x5203, 0x5203) AM_WRITENOP
-	AM_RANGE(0x6400, 0x7fff) AM_ROM AM_REGION("v1cpu", 0)
-ADDRESS_MAP_END
+void micropin_state::micropin_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x01ff).ram().share("nvram"); // 4x 6561 RAM
+	map(0x4000, 0x4005).w(this, FUNC(micropin_state::sw_w));
+	map(0x4000, 0x4000).portr("X1");
+	map(0x4001, 0x4001).portr("X2");
+	map(0x4002, 0x4002).portr("X3");
+	map(0x4003, 0x4003).portr("X4");
+	map(0x4004, 0x4004).portr("X5");
+	map(0x5000, 0x5003).rw("pia50", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x5100, 0x5103).rw(this, FUNC(micropin_state::pia51_r), FUNC(micropin_state::pia51_w));
+	map(0x5200, 0x5200).w(this, FUNC(micropin_state::sol_w));
+	map(0x5202, 0x5202).w(this, FUNC(micropin_state::lamp_w));
+	map(0x5203, 0x5203).nopw();
+	map(0x6400, 0x7fff).rom().region("v1cpu", 0);
+}
 
-ADDRESS_MAP_START(micropin_state::pentacup2_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-ADDRESS_MAP_END
+void micropin_state::pentacup2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+}
 
-ADDRESS_MAP_START(micropin_state::pentacup2_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0e) AM_WRITE(sw_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(lamp_w)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("X0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("X1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("X2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("X3")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("X4")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("X5")
-ADDRESS_MAP_END
+void micropin_state::pentacup2_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x0e).w(this, FUNC(micropin_state::sw_w));
+	map(0x0f, 0x0f).w(this, FUNC(micropin_state::lamp_w));
+	map(0x00, 0x00).portr("X0");
+	map(0x01, 0x01).portr("X1");
+	map(0x02, 0x02).portr("X2");
+	map(0x03, 0x03).portr("X3");
+	map(0x04, 0x04).portr("X4");
+	map(0x05, 0x05).portr("X5");
+}
 
 static INPUT_PORTS_START( micropin )
 	PORT_START("X0")

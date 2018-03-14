@@ -42,24 +42,24 @@
 class accomm_state : public driver_device
 {
 public:
-	accomm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_beeper(*this, "beeper"),
-			m_ram(*this, RAM_TAG),
-			m_via(*this, "via6522"),
-			m_acia(*this, "acia"),
-			m_acia_clock(*this, "acia_clock"),
-			m_adlc(*this, "mc6854"),
-			m_vram(*this, "vram"),
-			m_keybd1(*this, "LINE1.%u", 0),
-			m_keybd2(*this, "LINE2.%u", 0),
-			m_ch00rom_enabled(true)
+	accomm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_beeper(*this, "beeper"),
+		m_ram(*this, RAM_TAG),
+		m_via(*this, "via6522"),
+		m_acia(*this, "acia"),
+		m_acia_clock(*this, "acia_clock"),
+		m_adlc(*this, "mc6854"),
+		m_vram(*this, "vram"),
+		m_keybd1(*this, "LINE1.%u", 0),
+		m_keybd2(*this, "LINE2.%u", 0),
+		m_ch00rom_enabled(true)
 	{ }
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	void accomm(machine_config &config);
 
+protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(ch00switch_w);
@@ -75,9 +75,10 @@ public:
 	DECLARE_PALETTE_INIT(accomm);
 	INTERRUPT_GEN_MEMBER(vbl_int);
 
-	void accomm(machine_config &config);
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	void main_map(address_map &map);
-protected:
+
 	// devices
 	required_device<g65816_device> m_maincpu;
 	required_device<beep_device> m_beeper;
@@ -219,7 +220,7 @@ void accomm_state::video_start()
 
 WRITE8_MEMBER(accomm_state::ch00switch_w)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_ch00rom_enabled = false;
 }
 
@@ -634,30 +635,31 @@ WRITE_LINE_MEMBER(accomm_state::econet_clk_w)
 	m_adlc->txc_w(state);
 }
 
-ADDRESS_MAP_START(accomm_state::main_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_READWRITE(ram_r, ram_w)                                       /* System RAM */
-	AM_RANGE(0x200000, 0x3fffff) AM_NOP                                                           /* External expansion RAM */
-	AM_RANGE(0x400000, 0x400000) AM_NOP                                                           /* MODEM */
-	AM_RANGE(0x410000, 0x410000) AM_RAM                                                           /* Econet ID */
-	AM_RANGE(0x420000, 0x42000f) AM_DEVREADWRITE("via6522", via6522_device, read, write)          /* 6522 VIA (printer etc) */
-	AM_RANGE(0x430000, 0x430001) AM_DEVREADWRITE("acia", acia6850_device, read, write)            /* 2641 ACIA (RS423) */
-	AM_RANGE(0x440000, 0x440000) AM_WRITE(ch00switch_w)                                           /* CH00SWITCH */
-	AM_RANGE(0x450000, 0x457fff) AM_RAM AM_SHARE("vram")                                          /* Video RAM */
-	AM_RANGE(0x458000, 0x459fff) AM_READ(read_keyboard1)                                          /* Video ULA */
-	AM_RANGE(0x45a000, 0x45bfff) AM_READ(read_keyboard2)                                          /* Video ULA */
-	AM_RANGE(0x45fe00, 0x45feff) AM_READWRITE(sheila_r, sheila_w)                                 /* Video ULA */
-	AM_RANGE(0x460000, 0x467fff) AM_RAM AM_SHARE("nvram")                                         /* CMOS RAM */
-	AM_RANGE(0x470000, 0x47001f) AM_DEVREADWRITE("mc6854", mc6854_device, read, write)            /* 68B54 (Econet) */
-	AM_RANGE(0x480000, 0x7fffff) AM_NOP                                                           /* Reserved */
-	AM_RANGE(0x800000, 0xbfffff) AM_NOP                                                           /* External expansion IO  */
-	AM_RANGE(0xc00000, 0xf7ffff) AM_NOP                                                           /* External expansion ROM */
-	AM_RANGE(0xf80000, 0xf9ffff) AM_NOP                                                           /* Empty */
-	AM_RANGE(0xfa0000, 0xfbffff) AM_NOP                                                           /* ROM bank 4 */
-	AM_RANGE(0xfc0000, 0xfcffff) AM_ROM AM_REGION("maincpu", 0x000000)                            /* ROM bank 3 */
-	AM_RANGE(0xfd0000, 0xfdffff) AM_ROM AM_REGION("maincpu", 0x010000)                            /* ROM bank 2 */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_ROM AM_REGION("maincpu", 0x020000)                            /* ROM bank 0 */
-	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("maincpu", 0x030000)                            /* ROM bank 1 */
-ADDRESS_MAP_END
+void accomm_state::main_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rw(this, FUNC(accomm_state::ram_r), FUNC(accomm_state::ram_w));                                       /* System RAM */
+	map(0x200000, 0x3fffff).noprw();                                                           /* External expansion RAM */
+	map(0x400000, 0x400000).noprw();                                                           /* MODEM */
+	map(0x410000, 0x410000).ram();                                                           /* Econet ID */
+	map(0x420000, 0x42000f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));          /* 6522 VIA (printer etc) */
+	map(0x430000, 0x430001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));            /* 2641 ACIA (RS423) */
+	map(0x440000, 0x440000).w(this, FUNC(accomm_state::ch00switch_w));                                           /* CH00SWITCH */
+	map(0x450000, 0x457fff).ram().share("vram");                                          /* Video RAM */
+	map(0x458000, 0x459fff).r(this, FUNC(accomm_state::read_keyboard1));                                          /* Video ULA */
+	map(0x45a000, 0x45bfff).r(this, FUNC(accomm_state::read_keyboard2));                                          /* Video ULA */
+	map(0x45fe00, 0x45feff).rw(this, FUNC(accomm_state::sheila_r), FUNC(accomm_state::sheila_w));                                 /* Video ULA */
+	map(0x460000, 0x467fff).ram().share("nvram");                                         /* CMOS RAM */
+	map(0x470000, 0x47001f).rw(m_adlc, FUNC(mc6854_device::read), FUNC(mc6854_device::write));            /* 68B54 (Econet) */
+	map(0x480000, 0x7fffff).noprw();                                                           /* Reserved */
+	map(0x800000, 0xbfffff).noprw();                                                           /* External expansion IO  */
+	map(0xc00000, 0xf7ffff).noprw();                                                           /* External expansion ROM */
+	map(0xf80000, 0xf9ffff).noprw();                                                           /* Empty */
+	map(0xfa0000, 0xfbffff).noprw();                                                           /* ROM bank 4 */
+	map(0xfc0000, 0xfcffff).rom().region("maincpu", 0x000000);                            /* ROM bank 3 */
+	map(0xfd0000, 0xfdffff).rom().region("maincpu", 0x010000);                            /* ROM bank 2 */
+	map(0xfe0000, 0xfeffff).rom().region("maincpu", 0x020000);                            /* ROM bank 0 */
+	map(0xff0000, 0xffffff).rom().region("maincpu", 0x030000);                            /* ROM bank 1 */
+}
 
 static INPUT_PORTS_START( accomm )
 	PORT_START("LINE1.0")
@@ -830,7 +832,7 @@ static INPUT_PORTS_START( accomm )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(accomm_state::accomm)
-	MCFG_CPU_ADD("maincpu", G65816, XTAL(16'000'000) / 8)
+	MCFG_CPU_ADD("maincpu", G65816, 16_MHz_XTAL / 8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", accomm_state, vbl_int)
 

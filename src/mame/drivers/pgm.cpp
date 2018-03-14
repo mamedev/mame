@@ -299,53 +299,58 @@ WRITE8_MEMBER(pgm_state::z80_l3_w)
 
 /*** Z80 (sound CPU)**********************************************************/
 
-ADDRESS_MAP_START(pgm_state::pgm_z80_mem)
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("z80_mainram")
-ADDRESS_MAP_END
+void pgm_state::pgm_z80_mem(address_map &map)
+{
+	map(0x0000, 0xffff).ram().share("z80_mainram");
+}
 
-ADDRESS_MAP_START(pgm_state::pgm_z80_io)
-	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("ics", ics2115_device, read, write)
-	AM_RANGE(0x8100, 0x81ff) AM_DEVREAD("soundlatch3", generic_latch_8_device, read) AM_WRITE(z80_l3_w)
-	AM_RANGE(0x8200, 0x82ff) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write)
-	AM_RANGE(0x8400, 0x84ff) AM_DEVREADWRITE("soundlatch2", generic_latch_8_device, read, write)
-ADDRESS_MAP_END
+void pgm_state::pgm_z80_io(address_map &map)
+{
+	map(0x8000, 0x8003).rw("ics", FUNC(ics2115_device::read), FUNC(ics2115_device::write));
+	map(0x8100, 0x81ff).r(m_soundlatch3, FUNC(generic_latch_8_device::read)).w(this, FUNC(pgm_state::z80_l3_w));
+	map(0x8200, 0x82ff).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
+	map(0x8400, 0x84ff).rw("soundlatch2", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
+}
 
 /*** 68000 (main CPU) + variants for protection devices **********************/
 
-ADDRESS_MAP_START(pgm_state::pgm_base_mem)
-	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
+void pgm_state::pgm_base_mem(address_map &map)
+{
+	map(0x700006, 0x700007).nopw(); // Watchdog?
 
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_SHARE("sram") /* Main Ram */
+	map(0x800000, 0x81ffff).ram().mirror(0x0e0000).share("sram"); /* Main Ram */
 
-	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_READWRITE(pgm_videoram_r, pgm_videoram_w) AM_SHARE("videoram") /* IGS023 VIDEO CHIP */
-	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_SHARE("videoregs") /* Video Regs inc. Zoom Table */
+	map(0x900000, 0x907fff).mirror(0x0f8000).rw(this, FUNC(pgm_state::pgm_videoram_r), FUNC(pgm_state::pgm_videoram_w)).share("videoram"); /* IGS023 VIDEO CHIP */
+	map(0xa00000, 0xa011ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xb00000, 0xb0ffff).ram().share("videoregs"); /* Video Regs inc. Zoom Table */
 
-	AM_RANGE(0xc00002, 0xc00003) AM_DEVREAD8("soundlatch", generic_latch_8_device, read, 0x00ff)
-	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(m68k_l1_w)
-	AM_RANGE(0xc00004, 0xc00005) AM_DEVREADWRITE8("soundlatch2", generic_latch_8_device, read, write, 0x00ff)
-	AM_RANGE(0xc00006, 0xc00007) AM_DEVREADWRITE8("rtc", v3021_device, read, write, 0x00ff)
-	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(z80_reset_w)
-	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITE(z80_ctrl_w)
-	AM_RANGE(0xc0000c, 0xc0000d) AM_DEVREADWRITE8("soundlatch3", generic_latch_8_device, read, write, 0x00ff)
+	map(0xc00003, 0xc00003).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc00002, 0xc00003).w(this, FUNC(pgm_state::m68k_l1_w));
+	map(0xc00005, 0xc00005).rw("soundlatch2", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
+	map(0xc00007, 0xc00007).rw("rtc", FUNC(v3021_device::read), FUNC(v3021_device::write));
+	map(0xc00008, 0xc00009).w(this, FUNC(pgm_state::z80_reset_w));
+	map(0xc0000a, 0xc0000b).w(this, FUNC(pgm_state::z80_ctrl_w));
+	map(0xc0000d, 0xc0000d).rw(m_soundlatch3, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 
-	AM_RANGE(0xc08000, 0xc08001) AM_READ_PORT("P1P2")
-	AM_RANGE(0xc08002, 0xc08003) AM_READ_PORT("P3P4")
-	AM_RANGE(0xc08004, 0xc08005) AM_READ_PORT("Service")
-	AM_RANGE(0xc08006, 0xc08007) AM_READ_PORT("DSW") AM_WRITE(pgm_coin_counter_w)
+	map(0xc08000, 0xc08001).portr("P1P2");
+	map(0xc08002, 0xc08003).portr("P3P4");
+	map(0xc08004, 0xc08005).portr("Service");
+	map(0xc08006, 0xc08007).portr("DSW").w(this, FUNC(pgm_state::pgm_coin_counter_w));
 
-	AM_RANGE(0xc10000, 0xc1ffff) AM_READWRITE(z80_ram_r, z80_ram_w) /* Z80 Program */
-ADDRESS_MAP_END
+	map(0xc10000, 0xc1ffff).rw(this, FUNC(pgm_state::z80_ram_r), FUNC(pgm_state::z80_ram_w)); /* Z80 Program */
+}
 
-ADDRESS_MAP_START(pgm_state::pgm_mem)
-	AM_IMPORT_FROM(pgm_base_mem)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM   /* BIOS ROM */
-ADDRESS_MAP_END
+void pgm_state::pgm_mem(address_map &map)
+{
+	pgm_base_mem(map);
+	map(0x000000, 0x0fffff).rom();   /* BIOS ROM */
+}
 
-ADDRESS_MAP_START(pgm_state::pgm_basic_mem)
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK("bank1") /* Game ROM */
-ADDRESS_MAP_END
+void pgm_state::pgm_basic_mem(address_map &map)
+{
+	pgm_mem(map);
+	map(0x100000, 0x3fffff).bankr("bank1"); /* Game ROM */
+}
 
 
 /*** Input Ports *************************************************************/

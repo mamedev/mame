@@ -609,36 +609,38 @@ WRITE16_MEMBER(wheelfir_state::coin_cnt_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
 
-ADDRESS_MAP_START(wheelfir_state::wheelfir_main)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
+void wheelfir_state::wheelfir_main(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x20ffff).ram();
 
-	AM_RANGE(0x700000, 0x70001f) AM_WRITE(wheelfir_blit_w)
-	AM_RANGE(0x720000, 0x720001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0x00ff )
-	AM_RANGE(0x720002, 0x720003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0x00ff )
-	AM_RANGE(0x720004, 0x720005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0x00ff ) // word write?
-	AM_RANGE(0x740000, 0x740001) AM_DEVWRITE("soundlatch", generic_latch_16_device, write)
-	AM_RANGE(0x760000, 0x760001) AM_WRITE(coin_cnt_w)
-	AM_RANGE(0x780000, 0x780005) AM_WRITENOP // Start ADC0808 conversion
-	AM_RANGE(0x780000, 0x780001) AM_READ_PORT("STEERING")
-	AM_RANGE(0x780002, 0x780003) AM_READ_PORT("ACCELERATOR")
-	AM_RANGE(0x780004, 0x780005) AM_READ_PORT("BRAKE")
-	AM_RANGE(0x7a0000, 0x7a0001) AM_WRITE(wheelfir_scanline_cnt_w)
-	AM_RANGE(0x7c0000, 0x7c0001) AM_READWRITE(wheelfir_7c0000_r, wheelfir_7c0000_w)
-	AM_RANGE(0x7e0000, 0x7e0001) AM_READ_PORT("P1")
-	AM_RANGE(0x7e0002, 0x7e0003) AM_READ_PORT("P2")
-ADDRESS_MAP_END
+	map(0x700000, 0x70001f).w(this, FUNC(wheelfir_state::wheelfir_blit_w));
+	map(0x720001, 0x720001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x720003, 0x720003).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x720005, 0x720005).w("ramdac", FUNC(ramdac_device::mask_w)); // word write?
+	map(0x740000, 0x740001).w("soundlatch", FUNC(generic_latch_16_device::write));
+	map(0x760000, 0x760001).w(this, FUNC(wheelfir_state::coin_cnt_w));
+	map(0x780000, 0x780005).nopw(); // Start ADC0808 conversion
+	map(0x780000, 0x780001).portr("STEERING");
+	map(0x780002, 0x780003).portr("ACCELERATOR");
+	map(0x780004, 0x780005).portr("BRAKE");
+	map(0x7a0000, 0x7a0001).w(this, FUNC(wheelfir_state::wheelfir_scanline_cnt_w));
+	map(0x7c0000, 0x7c0001).rw(this, FUNC(wheelfir_state::wheelfir_7c0000_r), FUNC(wheelfir_state::wheelfir_7c0000_w));
+	map(0x7e0000, 0x7e0001).portr("P1");
+	map(0x7e0002, 0x7e0003).portr("P2");
+}
 
 
-ADDRESS_MAP_START(wheelfir_state::wheelfir_sub)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
+void wheelfir_state::wheelfir_sub(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x20ffff).ram();
 
-	AM_RANGE(0x780000, 0x780001) AM_DEVREAD("soundlatch", generic_latch_16_device, read)
+	map(0x780000, 0x780001).r("soundlatch", FUNC(generic_latch_16_device::read));
 
-	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE("ldac", dac_word_interface, write)
-	AM_RANGE(0x740000, 0x740001) AM_DEVWRITE("rdac", dac_word_interface, write)
-ADDRESS_MAP_END
+	map(0x700000, 0x700001).w("ldac", FUNC(dac_word_interface::write));
+	map(0x740000, 0x740001).w("rdac", FUNC(dac_word_interface::write));
+}
 
 
 static INPUT_PORTS_START( wheelfir )
@@ -747,9 +749,10 @@ void wheelfir_state::machine_start()
 	}
 }
 
-ADDRESS_MAP_START(wheelfir_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
-ADDRESS_MAP_END
+void wheelfir_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
+}
 
 MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 

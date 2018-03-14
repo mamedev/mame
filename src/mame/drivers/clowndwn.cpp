@@ -31,15 +31,16 @@ public:
 	void clowndwn_map(address_map &map);
 };
 
-ADDRESS_MAP_START(clowndwn_state::clowndwn_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4100, 0x4103) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x4200, 0x4203) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x4400, 0x4403) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("pia3", pia6821_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("pia4", pia6821_device, read, write)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void clowndwn_state::clowndwn_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x4100, 0x4103).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4200, 0x4203).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4400, 0x4403).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4800, 0x4803).rw("pia3", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x5000, 0x5003).rw("pia4", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xe000, 0xffff).rom().region("maincpu", 0);
+}
 
 static INPUT_PORTS_START( clowndwn )
 INPUT_PORTS_END

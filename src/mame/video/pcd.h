@@ -11,7 +11,7 @@
 #include "video/scn2674.h"
 
 #define MCFG_PCX_VIDEO_TXD_HANDLER(_devcb) \
-	devcb = &pcx_video_device::set_txd_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<pcx_video_device &>(*device).set_txd_handler(DEVCB_##_devcb);
 
 class pcdx_video_device : public device_t, public device_gfx_interface
 {
@@ -82,7 +82,7 @@ class pcx_video_device : public pcdx_video_device,
 {
 public:
 	pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<pcx_video_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_txd_handler(Object &&cb) { return m_txd_handler.set_callback(std::forward<Object>(cb)); }
 
 	virtual void map(address_map &map) override;
 	DECLARE_READ8_MEMBER(term_r);

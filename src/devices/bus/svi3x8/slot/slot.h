@@ -51,16 +51,16 @@
 #define MCFG_SVI_SLOT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, SVI_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	svi_slot_device::set_bus(*device, this, "slotbus");
+	downcast<svi_slot_device &>(*device).set_bus(this, "slotbus");
 
 #define MCFG_SVI_SLOT_INT_HANDLER(_devcb) \
-	devcb = &svi_slot_bus_device::set_int_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<svi_slot_bus_device &>(*device).set_int_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_SLOT_ROMDIS_HANDLER(_devcb) \
-	devcb = &svi_slot_bus_device::set_romdis_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<svi_slot_bus_device &>(*device).set_romdis_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_SLOT_RAMDIS_HANDLER(_devcb) \
-	devcb = &svi_slot_bus_device::set_ramdis_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<svi_slot_bus_device &>(*device).set_ramdis_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -79,14 +79,9 @@ public:
 	virtual ~svi_slot_bus_device();
 
 	// callbacks
-	template <class Object> static devcb_base &set_int_handler(device_t &device, Object &&cb)
-	{ return downcast<svi_slot_bus_device &>(device).m_int_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_romdis_handler(device_t &device, Object &&cb)
-	{ return downcast<svi_slot_bus_device &>(device).m_romdis_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_ramdis_handler(device_t &device, Object &&cb)
-	{ return downcast<svi_slot_bus_device &>(device).m_ramdis_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int_handler(Object &&cb) { return m_int_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_romdis_handler(Object &&cb) { return m_romdis_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ramdis_handler(Object &&cb) { return m_ramdis_handler.set_callback(std::forward<Object>(cb)); }
 
 	void add_card(device_svi_slot_interface *card);
 
@@ -130,7 +125,7 @@ public:
 	svi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	static void set_bus(device_t &device, device_t *owner, const char *bus_tag);
+	void set_bus(device_t *owner, const char *bus_tag) { m_owner = owner; m_bus_tag = bus_tag; }
 
 protected:
 	// device-level overrides

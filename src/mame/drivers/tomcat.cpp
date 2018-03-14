@@ -46,20 +46,18 @@
 class tomcat_state : public driver_device
 {
 public:
-	tomcat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tomcat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_tms(*this, "tms"),
 		m_shared_ram(*this, "shared_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_dsp(*this, "dsp"),
-		m_mainlatch(*this, "mainlatch") { }
+		m_mainlatch(*this, "mainlatch")
+	{ }
 
-	required_device<tms5220_device> m_tms;
-	int m_control_num;
-	required_shared_ptr<uint16_t> m_shared_ram;
-	uint8_t m_nvram[0x800];
-	int m_dsp_BIO;
-	int m_dsp_idle;
+	void tomcat(machine_config &config);
+
+protected:
 	DECLARE_WRITE16_MEMBER(tomcat_adcon_w);
 	DECLARE_READ16_MEMBER(tomcat_adcread_r);
 	DECLARE_READ16_MEMBER(tomcat_inputs_r);
@@ -80,13 +78,21 @@ public:
 	DECLARE_READ_LINE_MEMBER(dsp_BIO_r);
 	DECLARE_WRITE8_MEMBER(soundlatches_w);
 	virtual void machine_start() override;
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_dsp;
-	required_device<ls259_device> m_mainlatch;
-	void tomcat(machine_config &config);
 	void dsp_map(address_map &map);
 	void sound_map(address_map &map);
 	void tomcat_map(address_map &map);
+
+private:
+	required_device<tms5220_device> m_tms;
+	int m_control_num;
+	required_shared_ptr<uint16_t> m_shared_ram;
+	uint8_t m_nvram[0x800];
+	int m_dsp_BIO;
+	int m_dsp_idle;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_dsp;
+	required_device<ls259_device> m_mainlatch;
 };
 
 
@@ -242,24 +248,26 @@ WRITE8_MEMBER(tomcat_state::tomcat_nvram_w)
 	m_nvram[offset] = data;
 }
 
-ADDRESS_MAP_START(tomcat_state::tomcat_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x402000, 0x402001) AM_READ(tomcat_adcread_r) AM_WRITE(tomcat_adcon_w)
-	AM_RANGE(0x404000, 0x404001) AM_READ(tomcat_inputs_r) AM_DEVWRITE("avg", avg_tomcat_device, go_word_w)
-	AM_RANGE(0x406000, 0x406001) AM_DEVWRITE("avg", avg_tomcat_device, reset_word_w)
-	AM_RANGE(0x408000, 0x408001) AM_READ(tomcat_inputs2_r) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x40a000, 0x40a001) AM_READWRITE(tomcat_320bio_r, tomcat_irqclr_w)
-	AM_RANGE(0x40e000, 0x40e01f) AM_WRITE(main_latch_w)
-	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_SHARE("vectorram")
-	AM_RANGE(0xffa000, 0xffbfff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_DEVREADWRITE8("m48t02", timekeeper_device, read, write, 0xff00)
-	AM_RANGE(0xffd000, 0xffdfff) AM_READWRITE8(tomcat_nvram_r, tomcat_nvram_w, 0x00ff)
-ADDRESS_MAP_END
+void tomcat_state::tomcat_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x402000, 0x402001).r(this, FUNC(tomcat_state::tomcat_adcread_r)).w(this, FUNC(tomcat_state::tomcat_adcon_w));
+	map(0x404000, 0x404001).r(this, FUNC(tomcat_state::tomcat_inputs_r)).w("avg", FUNC(avg_tomcat_device::go_word_w));
+	map(0x406000, 0x406001).w("avg", FUNC(avg_tomcat_device::reset_word_w));
+	map(0x408000, 0x408001).r(this, FUNC(tomcat_state::tomcat_inputs2_r)).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x40a000, 0x40a001).rw(this, FUNC(tomcat_state::tomcat_320bio_r), FUNC(tomcat_state::tomcat_irqclr_w));
+	map(0x40e000, 0x40e01f).w(this, FUNC(tomcat_state::main_latch_w));
+	map(0x800000, 0x803fff).ram().share("vectorram");
+	map(0xffa000, 0xffbfff).ram().share("shared_ram");
+	map(0xffc000, 0xffcfff).ram();
+	map(0xffd000, 0xffdfff).rw("m48t02", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);
+	map(0xffd000, 0xffdfff).rw(this, FUNC(tomcat_state::tomcat_nvram_r), FUNC(tomcat_state::tomcat_nvram_w)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(tomcat_state::dsp_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("shared_ram")
-ADDRESS_MAP_END
+void tomcat_state::dsp_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("shared_ram");
+}
 
 
 WRITE8_MEMBER(tomcat_state::soundlatches_w)
@@ -276,17 +284,18 @@ WRITE8_MEMBER(tomcat_state::soundlatches_w)
 	}
 }
 
-ADDRESS_MAP_START(tomcat_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x3000, 0x30df) AM_WRITE(soundlatches_w)
-	AM_RANGE(0x30e0, 0x30e0) AM_NOP // COINRD Inputs: D7 = Coin L, D6 = Coin R, D5 = SOUNDFLAG
-	AM_RANGE(0x5000, 0x507f) AM_RAM // 6532 ram
-	AM_RANGE(0x5080, 0x509f) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0x6000, 0x601f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
-	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_NOP // main sound program rom
-ADDRESS_MAP_END
+void tomcat_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x3000, 0x30df).w(this, FUNC(tomcat_state::soundlatches_w));
+	map(0x30e0, 0x30e0).noprw(); // COINRD Inputs: D7 = Coin L, D6 = Coin R, D5 = SOUNDFLAG
+	map(0x5000, 0x507f).ram(); // 6532 ram
+	map(0x5080, 0x509f).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x6000, 0x601f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x7000, 0x701f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x8000, 0xffff).noprw(); // main sound program rom
+}
 
 static INPUT_PORTS_START( tomcat )
 	PORT_START("IN0")   /* INPUTS */
@@ -324,12 +333,12 @@ void tomcat_state::machine_start()
 }
 
 MACHINE_CONFIG_START(tomcat_state::tomcat)
-	MCFG_CPU_ADD("maincpu", M68010, XTAL(12'000'000) / 2)
+	MCFG_CPU_ADD("maincpu", M68010, 12_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(tomcat_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  5*60)
 	//MCFG_CPU_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  (double)XTAL(12'000'000) / 16 / 16 / 16 / 12)
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL(16'000'000))
+	MCFG_CPU_ADD("dsp", TMS32010, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP( dsp_map)
 	MCFG_TMS32010_BIO_IN_CB(READLINE(tomcat_state, dsp_BIO_r))
 

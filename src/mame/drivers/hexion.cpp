@@ -121,58 +121,60 @@ WRITE8_MEMBER(hexion_state::ccu_int_time_w)
 	m_ccu_int_time = data;
 }
 
-ADDRESS_MAP_START(hexion_state::hexion_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xdffe) AM_READWRITE(bankedram_r, bankedram_w)
-	AM_RANGE(0xdfff, 0xdfff) AM_WRITE(bankctrl_w)
-	AM_RANGE(0xe000, 0xe000) AM_NOP
-	AM_RANGE(0xe800, 0xe87f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
-	AM_RANGE(0xe880, 0xe889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
-	AM_RANGE(0xe88a, 0xe88e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
-	AM_RANGE(0xe88f, 0xe88f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
-	AM_RANGE(0xe8e0, 0xe8ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
-	AM_RANGE(0xf000, 0xf00f) AM_DEVREADWRITE("k053252", k053252_device, read, write)
-	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("P1")
-	AM_RANGE(0xf403, 0xf403) AM_READ_PORT("P2")
-	AM_RANGE(0xf440, 0xf440) AM_READ_PORT("DSW3")
-	AM_RANGE(0xf441, 0xf441) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf480, 0xf480) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xf4c0, 0xf4c0) AM_WRITE(coincntr_w)
-	AM_RANGE(0xf500, 0xf500) AM_WRITE(gfxrom_select_w)
-	AM_RANGE(0xf540, 0xf540) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-ADDRESS_MAP_END
+void hexion_state::hexion_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdffe).rw(this, FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
+	map(0xdfff, 0xdfff).w(this, FUNC(hexion_state::bankctrl_w));
+	map(0xe000, 0xe000).noprw();
+	map(0xe800, 0xe87f).rw("k051649", FUNC(k051649_device::k051649_waveform_r), FUNC(k051649_device::k051649_waveform_w));
+	map(0xe880, 0xe889).w("k051649", FUNC(k051649_device::k051649_frequency_w));
+	map(0xe88a, 0xe88e).w("k051649", FUNC(k051649_device::k051649_volume_w));
+	map(0xe88f, 0xe88f).w("k051649", FUNC(k051649_device::k051649_keyonoff_w));
+	map(0xe8e0, 0xe8ff).rw("k051649", FUNC(k051649_device::k051649_test_r), FUNC(k051649_device::k051649_test_w));
+	map(0xf000, 0xf00f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
+	map(0xf200, 0xf200).w("oki", FUNC(okim6295_device::write));
+	map(0xf400, 0xf400).portr("DSW1");
+	map(0xf401, 0xf401).portr("DSW2");
+	map(0xf402, 0xf402).portr("P1");
+	map(0xf403, 0xf403).portr("P2");
+	map(0xf440, 0xf440).portr("DSW3");
+	map(0xf441, 0xf441).portr("SYSTEM");
+	map(0xf480, 0xf480).w(this, FUNC(hexion_state::bankswitch_w));
+	map(0xf4c0, 0xf4c0).w(this, FUNC(hexion_state::coincntr_w));
+	map(0xf500, 0xf500).w(this, FUNC(hexion_state::gfxrom_select_w));
+	map(0xf540, 0xf540).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
-ADDRESS_MAP_START(hexion_state::hexionb_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xdffe) AM_READWRITE(bankedram_r, bankedram_w)
-	AM_RANGE(0xdfff, 0xdfff) AM_WRITE(bankctrl_w)
-	AM_RANGE(0xe000, 0xe000) AM_NOP
-	AM_RANGE(0xe800, 0xe87f) AM_NOP // all the code to use the k051649 is still present
-	AM_RANGE(0xe880, 0xe889) AM_NOP // but the bootleg has an additional M6295 @ 0xf5c0 instead
-	AM_RANGE(0xe88a, 0xe88e) AM_NOP
-	AM_RANGE(0xe88f, 0xe88f) AM_NOP
-	AM_RANGE(0xe8e0, 0xe8ff) AM_NOP
-	AM_RANGE(0xf000, 0xf00f) AM_DEVREADWRITE("k053252", k053252_device, read, write)
-	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("P1")
-	AM_RANGE(0xf403, 0xf403) AM_READ_PORT("P2")
-	AM_RANGE(0xf440, 0xf440) AM_READ_PORT("DSW3")
-	AM_RANGE(0xf441, 0xf441) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf480, 0xf480) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xf4c0, 0xf4c0) AM_WRITE(coincntr_w)
-	AM_RANGE(0xf500, 0xf500) AM_WRITE(gfxrom_select_w)
-	AM_RANGE(0xf540, 0xf540) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xf5c0, 0xf5c0) AM_DEVWRITE("oki2", okim6295_device, write)
-ADDRESS_MAP_END
+void hexion_state::hexionb_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdffe).rw(this, FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
+	map(0xdfff, 0xdfff).w(this, FUNC(hexion_state::bankctrl_w));
+	map(0xe000, 0xe000).noprw();
+	map(0xe800, 0xe87f).noprw(); // all the code to use the k051649 is still present
+	map(0xe880, 0xe889).noprw(); // but the bootleg has an additional M6295 @ 0xf5c0 instead
+	map(0xe88a, 0xe88e).noprw();
+	map(0xe88f, 0xe88f).noprw();
+	map(0xe8e0, 0xe8ff).noprw();
+	map(0xf000, 0xf00f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
+	map(0xf200, 0xf200).w("oki", FUNC(okim6295_device::write));
+	map(0xf400, 0xf400).portr("DSW1");
+	map(0xf401, 0xf401).portr("DSW2");
+	map(0xf402, 0xf402).portr("P1");
+	map(0xf403, 0xf403).portr("P2");
+	map(0xf440, 0xf440).portr("DSW3");
+	map(0xf441, 0xf441).portr("SYSTEM");
+	map(0xf480, 0xf480).w(this, FUNC(hexion_state::bankswitch_w));
+	map(0xf4c0, 0xf4c0).w(this, FUNC(hexion_state::coincntr_w));
+	map(0xf500, 0xf500).w(this, FUNC(hexion_state::gfxrom_select_w));
+	map(0xf540, 0xf540).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xf5c0, 0xf5c0).w("oki2", FUNC(okim6295_device::write));
+}
 
 static INPUT_PORTS_START( hexion )
 	PORT_START("DSW1")

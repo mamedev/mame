@@ -246,42 +246,46 @@ GFXDECODE_END
 
 
 
-ADDRESS_MAP_START(gstriker_state::twcup94_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  vram_r, vram_w )
-	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_SHARE("cg10103_m_vram")
-	AM_RANGE(0x180000, 0x180fff) AM_DEVREADWRITE("texttilemap", vs920a_text_tilemap_device,  vram_r, vram_w )
-	AM_RANGE(0x181000, 0x181fff) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  line_r, line_w )
-	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") AM_MIRROR(0x00f000)
+void gstriker_state::twcup94_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x103fff).rw(m_bg, FUNC(mb60553_zooming_tilemap_device::vram_r), FUNC(mb60553_zooming_tilemap_device::vram_w));
+	map(0x140000, 0x141fff).ram().share("cg10103_m_vram");
+	map(0x180000, 0x180fff).rw(m_tx, FUNC(vs920a_text_tilemap_device::vram_r), FUNC(vs920a_text_tilemap_device::vram_w));
+	map(0x181000, 0x181fff).rw(m_bg, FUNC(mb60553_zooming_tilemap_device::line_r), FUNC(mb60553_zooming_tilemap_device::line_w));
+	map(0x1c0000, 0x1c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette").mirror(0x00f000);
 
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("zoomtilemap", mb60553_zooming_tilemap_device,  regs_r, regs_w )
-	AM_RANGE(0x200010, 0x200011) AM_WRITENOP
-	AM_RANGE(0x200020, 0x200021) AM_WRITENOP
-	AM_RANGE(0x200040, 0x20005f) AM_RAM AM_SHARE("mixerregs")
-	AM_RANGE(0x200080, 0x20009f) AM_DEVREADWRITE8("io", vs9209_device, read, write, 0x00ff)
-	AM_RANGE(0x2000a0, 0x2000a1) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	map(0x200000, 0x20000f).rw(m_bg, FUNC(mb60553_zooming_tilemap_device::regs_r), FUNC(mb60553_zooming_tilemap_device::regs_w));
+	map(0x200010, 0x200011).nopw();
+	map(0x200020, 0x200021).nopw();
+	map(0x200040, 0x20005f).ram().share("mixerregs");
+	map(0x200080, 0x20009f).rw("io", FUNC(vs9209_device::read), FUNC(vs9209_device::write)).umask16(0x00ff);
+	map(0x2000a1, 0x2000a1).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("work_ram")
-ADDRESS_MAP_END
+	map(0xffc000, 0xffffff).ram().share("work_ram");
+}
 
-ADDRESS_MAP_START(gstriker_state::gstriker_map)
-	AM_IMPORT_FROM(twcup94_map)
-	AM_RANGE(0x200060, 0x200063) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void gstriker_state::gstriker_map(address_map &map)
+{
+	twcup94_map(map);
+	map(0x200060, 0x200063).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(gstriker_state::sound_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
-ADDRESS_MAP_END
+void gstriker_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("soundbank");
+}
 
-ADDRESS_MAP_START(gstriker_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_WRITE(sh_bankswitch_w)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void gstriker_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0x04, 0x04).w(this, FUNC(gstriker_state::sh_bankswitch_w));
+	map(0x08, 0x08).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x0c, 0x0c).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 

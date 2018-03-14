@@ -10,32 +10,28 @@ class eolith_state : public driver_device
 {
 public:
 	eolith_state(const machine_config &mconfig, device_type type, const char *tag)
-		:   driver_device(mconfig, type, tag),
-			m_eepromoutport(*this, "EEPROMOUT"),
-			m_qs1000(*this, "qs1000"),
-			m_maincpu(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_in0(*this, "IN0"),
-			m_penx1port(*this, "PEN_X_P1"),
-			m_peny1port(*this, "PEN_Y_P1"),
-			m_penx2port(*this, "PEN_X_P2"),
-			m_peny2port(*this, "PEN_Y_P2"),
-			m_sndbank(*this, "sound_bank")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_eepromoutport(*this, "EEPROMOUT")
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_qs1000(*this, "qs1000")
+		, m_in0(*this, "IN0")
+		, m_penxport(*this, "PEN_X_P%u", 1)
+		, m_penyport(*this, "PEN_Y_P%u", 1)
+		, m_sndbank(*this, "sound_bank")
+	{
+	}
 
 	DECLARE_CUSTOM_INPUT_MEMBER(eolith_speedup_getvblank);
 	DECLARE_CUSTOM_INPUT_MEMBER(stealsee_speedup_getvblank);
 
 	DECLARE_READ32_MEMBER(eolith_custom_r);
 	DECLARE_WRITE32_MEMBER(systemcontrol_w);
-	DECLARE_WRITE32_MEMBER(sound_w);
-	DECLARE_READ32_MEMBER(hidctch3_pen1_r);
-	DECLARE_READ32_MEMBER(hidctch3_pen2_r);
-	DECLARE_WRITE32_MEMBER(eolith_vram_w);
-	DECLARE_READ32_MEMBER(eolith_vram_r);
-	DECLARE_READ8_MEMBER(sound_cmd_r);
+	template<int Player> DECLARE_READ32_MEMBER(hidctch3_pen_r);
+	DECLARE_WRITE16_MEMBER(eolith_vram_w);
+	DECLARE_READ16_MEMBER(eolith_vram_r);
 	DECLARE_WRITE8_MEMBER(sound_p1_w);
 	DECLARE_READ8_MEMBER(qs1000_p1_r);
 	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
@@ -43,7 +39,6 @@ public:
 
 	DECLARE_DRIVER_INIT(eolith);
 	DECLARE_DRIVER_INIT(landbrk);
-	DECLARE_DRIVER_INIT(hidctch3);
 	DECLARE_DRIVER_INIT(hidctch2);
 	DECLARE_DRIVER_INIT(hidnc2k);
 	DECLARE_DRIVER_INIT(landbrka);
@@ -59,13 +54,14 @@ public:
 	void ironfort(machine_config &config);
 	void eolith50(machine_config &config);
 	void eolith45(machine_config &config);
+	void hidctch3(machine_config &config);
 	void eolith_map(address_map &map);
+	void hidctch3_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_prg_map(address_map &map);
 protected:
 	// shared with eolith16.cpp, vegaeo.cpp
 	optional_ioport m_eepromoutport;
-	optional_device<qs1000_device> m_qs1000;
 
 	void speedup_read();
 	void init_speedup();
@@ -76,20 +72,17 @@ private:
 	optional_device<i8032_device> m_soundcpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<qs1000_device> m_qs1000;
 
 	optional_ioport m_in0; // klondkp doesn't have it
-	optional_ioport m_penx1port;
-	optional_ioport m_peny1port;
-	optional_ioport m_penx2port;
-	optional_ioport m_peny2port;
+	optional_ioport_array<2> m_penxport;
+	optional_ioport_array<2> m_penyport;
 
 	optional_memory_bank m_sndbank;
 
 	int m_coin_counter_bit;
+	std::unique_ptr<uint16_t[]> m_vram;
 	int m_buffer;
-	std::unique_ptr<uint32_t[]> m_vram;
-
-	uint8_t m_sound_data;
 
 	// speedups - see machine/eolithsp.c
 	int m_speedup_address;

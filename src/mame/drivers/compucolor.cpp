@@ -83,17 +83,19 @@ public:
 	void compucolor2_mem(address_map &map);
 };
 
-ADDRESS_MAP_START(compucolor2_state::compucolor2_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION(I8080_TAG, 0)
-	AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x1000) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void compucolor2_state::compucolor2_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region(I8080_TAG, 0);
+	map(0x6000, 0x6fff).mirror(0x1000).ram().share("videoram");
+	map(0x8000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(compucolor2_state::compucolor2_io)
-	AM_RANGE(0x00, 0x0f) AM_MIRROR(0x10) AM_DEVICE(TMS5501_TAG, tms5501_device, io_map)
-	AM_RANGE(0x60, 0x6f) AM_MIRROR(0x10) AM_DEVREADWRITE(CRT5027_TAG, crt5027_device, read, write)
-	AM_RANGE(0x80, 0x9f) AM_MIRROR(0x60) AM_ROM AM_REGION("ua1", 0)
-ADDRESS_MAP_END
+void compucolor2_state::compucolor2_io(address_map &map)
+{
+	map(0x00, 0x0f).mirror(0x10).m(m_mioc, FUNC(tms5501_device::io_map));
+	map(0x60, 0x6f).mirror(0x10).rw(m_vtac, FUNC(crt5027_device::read), FUNC(crt5027_device::write));
+	map(0x80, 0x9f).mirror(0x60).rom().region("ua1", 0);
+}
 
 static INPUT_PORTS_START( compucolor2 )
 	PORT_START("Y0")
@@ -406,7 +408,7 @@ MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
-	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL(17'971'200)/2)
+	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL(17'971'200)/2/6)
 	MCFG_TMS9927_CHAR_WIDTH(6)
 	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE("blink", ripple_counter_device, clock_w))
 	MCFG_VIDEO_SET_SCREEN("screen")

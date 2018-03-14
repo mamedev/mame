@@ -232,38 +232,41 @@ WRITE8_MEMBER( mc1000_state::mc6847_attr_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(mc1000_state::mc1000_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAMBANK("bank2") AM_SHARE("mc6845_vram")
-	AM_RANGE(0x2800, 0x3fff) AM_RAM AM_SHARE("ram2800")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x8000, 0x97ff) AM_RAMBANK("bank4") AM_SHARE("mc6847_vram")
-	AM_RANGE(0x9800, 0xbfff) AM_RAMBANK("bank5")
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(Z80_TAG, 0)
-ADDRESS_MAP_END
+void mc1000_state::mc1000_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).bankrw("bank1");
+	map(0x2000, 0x27ff).bankrw("bank2").share("mc6845_vram");
+	map(0x2800, 0x3fff).ram().share("ram2800");
+	map(0x4000, 0x7fff).bankrw("bank3");
+	map(0x8000, 0x97ff).bankrw("bank4").share("mc6847_vram");
+	map(0x9800, 0xbfff).bankrw("bank5");
+	map(0xc000, 0xffff).rom().region(Z80_TAG, 0);
+}
 
-ADDRESS_MAP_START(mc1000_state::mc1000_banking_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAMBANK("bank2") AM_SHARE("mc6845_vram")
-	AM_RANGE(0x2800, 0x3fff) AM_RAM AM_SHARE("ram2800")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x8000, 0x97ff) AM_RAMBANK("bank4") AM_SHARE("mc6847_vram")
-	AM_RANGE(0x9800, 0xbfff) AM_RAMBANK("bank5")
-	AM_RANGE(0xc000, 0xffff) AM_READ(rom_banking_r)
-ADDRESS_MAP_END
+void mc1000_state::mc1000_banking_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).bankrw("bank1");
+	map(0x2000, 0x27ff).bankrw("bank2").share("mc6845_vram");
+	map(0x2800, 0x3fff).ram().share("ram2800");
+	map(0x4000, 0x7fff).bankrw("bank3");
+	map(0x8000, 0x97ff).bankrw("bank4").share("mc6847_vram");
+	map(0x9800, 0xbfff).bankrw("bank5");
+	map(0xc000, 0xffff).r(this, FUNC(mc1000_state::rom_banking_r));
+}
 
-ADDRESS_MAP_START(mc1000_state::mc1000_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(printer_r, printer_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE("cent_data_out", output_latch_device, write)
+void mc1000_state::mc1000_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x04, 0x04).rw(this, FUNC(mc1000_state::printer_r), FUNC(mc1000_state::printer_w));
+	map(0x05, 0x05).w("cent_data_out", FUNC(output_latch_device::write));
 //  AM_RANGE(0x10, 0x10) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 //  AM_RANGE(0x11, 0x11) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(mc6845_ctrl_w)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE(AY8910_TAG, ay8910_device, address_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD(AY8910_TAG, ay8910_device, data_r)
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE(AY8910_TAG, ay8910_device, data_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(mc6847_attr_w)
-ADDRESS_MAP_END
+	map(0x12, 0x12).w(this, FUNC(mc1000_state::mc6845_ctrl_w));
+	map(0x20, 0x20).w(AY8910_TAG, FUNC(ay8910_device::address_w));
+	map(0x40, 0x40).r(AY8910_TAG, FUNC(ay8910_device::data_r));
+	map(0x60, 0x60).w(AY8910_TAG, FUNC(ay8910_device::data_w));
+	map(0x80, 0x80).w(this, FUNC(mc1000_state::mc6847_attr_w));
+}
 
 /* Input Ports */
 

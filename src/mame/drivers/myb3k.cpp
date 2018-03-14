@@ -563,43 +563,45 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
  *       OFF ON  - ?
  *       ON  ON  - ?
  **********************************************************/
-ADDRESS_MAP_START(myb3k_state::myb3k_map)
-	ADDRESS_MAP_UNMAP_HIGH
+void myb3k_state::myb3k_map(address_map &map)
+{
+	map.unmap_value_high();
 	//AM_RANGE(0x00000,0x3ffff) AM_RAM // It's either 128Kb or 256Kb RAM installed by machine_start()
-	AM_RANGE(0x40000,0x7ffff) AM_NOP
-	AM_RANGE(0x80000,0xcffff) AM_NOP // Expansion Unit connected through an ISA8 cable
-	AM_RANGE(0xd0000,0xeffff) AM_RAM AM_SHARE("vram")  // Area 6, physical at 30000-3FFFF (128Kb RAM) or 10000-1FFFF (256KB RAM)
-	AM_RANGE(0xf0000,0xfffff) AM_ROM AM_REGION("ipl", 0) // Area 7, 8 x 8Kb
-ADDRESS_MAP_END
+	map(0x40000, 0x7ffff).noprw();
+	map(0x80000, 0xcffff).noprw(); // Expansion Unit connected through an ISA8 cable
+	map(0xd0000, 0xeffff).ram().share("vram");  // Area 6, physical at 30000-3FFFF (128Kb RAM) or 10000-1FFFF (256KB RAM)
+	map(0xf0000, 0xfffff).rom().region("ipl", 0); // Area 7, 8 x 8Kb
+}
 
-ADDRESS_MAP_START(myb3k_state::myb3k_io)
-	ADDRESS_MAP_UNMAP_LOW
+void myb3k_state::myb3k_io(address_map &map)
+{
+	map.unmap_value_low();
 	/* Main Unit 0-0x7ff */
 	// 0-3 8255A PPI parallel port
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi", i8255_device, read, write)
+	map(0x00, 0x03).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
 
 	// Discrete latches
-	AM_RANGE(0x04, 0x04) AM_READ(myb3k_kbd_r)
-	AM_RANGE(0x04, 0x04) AM_WRITE(myb3k_video_mode_w) // b0=40CH, b1=80CH, b2=16 raster
-	AM_RANGE(0x05, 0x05) AM_READ(myb3k_io_status_r) // printer connector bits: b3=fault b2=paper out b1 or b0=busy
-	AM_RANGE(0x05, 0x05) AM_WRITE(dma_segment_w) // b0-b3=addr, b6=A b7=B
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
+	map(0x04, 0x04).r(this, FUNC(myb3k_state::myb3k_kbd_r));
+	map(0x04, 0x04).w(this, FUNC(myb3k_state::myb3k_video_mode_w)); // b0=40CH, b1=80CH, b2=16 raster
+	map(0x05, 0x05).r(this, FUNC(myb3k_state::myb3k_io_status_r)); // printer connector bits: b3=fault b2=paper out b1 or b0=busy
+	map(0x05, 0x05).w(this, FUNC(myb3k_state::dma_segment_w)); // b0-b3=addr, b6=A b7=B
+	map(0x06, 0x06).portr("DSW2");
 
 	// 8-9 8259A interrupt controller
-	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("pic", pic8259_device, read, write)
+	map(0x08, 0x09).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 
 	// c-f 8253 PIT timer
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("pit", pit8253_device, read, write)
+	map(0x0c, 0x0f).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 
 	// 10-18 8257 DMA
-	AM_RANGE(0x10, 0x18) AM_DEVREADWRITE("dma", i8257_device, read, write)
+	map(0x10, 0x18).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 
 	// 1c-1d HD46505S CRTC
-	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("crtc", h46505_device, status_r, address_w)
-	AM_RANGE(0x1d, 0x1d) AM_DEVREADWRITE("crtc", h46505_device, register_r, register_w)
+	map(0x1c, 0x1c).rw(m_crtc, FUNC(h46505_device::status_r), FUNC(h46505_device::address_w));
+	map(0x1d, 0x1d).rw(m_crtc, FUNC(h46505_device::register_r), FUNC(h46505_device::register_w));
 
 	/* Expansion Unit 0x800 - 0xfff */
-ADDRESS_MAP_END
+}
 
 /* Input ports - from Step/One service manual */
 static INPUT_PORTS_START( myb3k )

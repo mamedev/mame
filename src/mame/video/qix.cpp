@@ -298,75 +298,79 @@ MC6845_UPDATE_ROW( qix_state::crtc_update_row )
  *
  *************************************/
 
-ADDRESS_MAP_START(qix_state::qix_video_map)
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
-	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(qix_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
-	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITEONLY AM_SHARE("videoram_addr")
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READONLY AM_SHARE("scanline_latch")
-	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE("vid_u18", mc6845_device, address_w)
-	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE("vid_u18", mc6845_device, register_r, register_w)
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void qix_state::qix_video_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rw(this, FUNC(qix_state::qix_videoram_r), FUNC(qix_state::qix_videoram_w));
+	map(0x8000, 0x83ff).ram().share("share1");
+	map(0x8400, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8800).mirror(0x03ff).w(this, FUNC(qix_state::qix_palettebank_w));
+	map(0x8c00, 0x8c00).mirror(0x03fe).rw(this, FUNC(qix_state::qix_data_firq_r), FUNC(qix_state::qix_data_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x03fe).rw(this, FUNC(qix_state::qix_video_firq_ack_r), FUNC(qix_state::qix_video_firq_ack_w));
+	map(0x9000, 0x93ff).ram().w(this, FUNC(qix_state::qix_paletteram_w)).share("paletteram");
+	map(0x9400, 0x9400).mirror(0x03fc).rw(this, FUNC(qix_state::qix_addresslatch_r), FUNC(qix_state::qix_addresslatch_w));
+	map(0x9402, 0x9403).mirror(0x03fc).writeonly().share("videoram_addr");
+	map(0x9800, 0x9800).mirror(0x03ff).readonly().share("scanline_latch");
+	map(0x9c00, 0x9c00).mirror(0x03fe).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x9c01, 0x9c01).mirror(0x03fe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xa000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(qix_state::kram3_video_map)
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
-	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(qix_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
-	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITEONLY AM_SHARE("videoram_addr")
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READONLY AM_SHARE("scanline_latch")
-	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE("vid_u18", mc6845_device, address_w)
-	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE("vid_u18", mc6845_device, register_r, register_w)
-	AM_RANGE(0xa000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void qix_state::kram3_video_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rw(this, FUNC(qix_state::qix_videoram_r), FUNC(qix_state::qix_videoram_w));
+	map(0x8000, 0x83ff).ram().share("share1");
+	map(0x8400, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8800).mirror(0x03ff).w(this, FUNC(qix_state::qix_palettebank_w));
+	map(0x8c00, 0x8c00).mirror(0x03fe).rw(this, FUNC(qix_state::qix_data_firq_r), FUNC(qix_state::qix_data_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x03fe).rw(this, FUNC(qix_state::qix_video_firq_ack_r), FUNC(qix_state::qix_video_firq_ack_w));
+	map(0x9000, 0x93ff).ram().w(this, FUNC(qix_state::qix_paletteram_w)).share("paletteram");
+	map(0x9400, 0x9400).mirror(0x03fc).rw(this, FUNC(qix_state::qix_addresslatch_r), FUNC(qix_state::qix_addresslatch_w));
+	map(0x9402, 0x9403).mirror(0x03fc).writeonly().share("videoram_addr");
+	map(0x9800, 0x9800).mirror(0x03ff).readonly().share("scanline_latch");
+	map(0x9c00, 0x9c00).mirror(0x03fe).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x9c01, 0x9c01).mirror(0x03fe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xa000, 0xffff).bankr("bank1");
+}
 
 
-ADDRESS_MAP_START(qix_state::zookeep_video_map)
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03fe) AM_WRITE(qix_palettebank_w)
-	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x03fe) AM_WRITE(zookeep_bankswitch_w)
-	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(qix_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
-	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITEONLY AM_SHARE("videoram_addr")
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READONLY AM_SHARE("scanline_latch")
-	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE("vid_u18", mc6845_device, address_w)
-	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE("vid_u18", mc6845_device, register_r, register_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void qix_state::zookeep_video_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rw(this, FUNC(qix_state::qix_videoram_r), FUNC(qix_state::qix_videoram_w));
+	map(0x8000, 0x83ff).ram().share("share1");
+	map(0x8400, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8800).mirror(0x03fe).w(this, FUNC(qix_state::qix_palettebank_w));
+	map(0x8801, 0x8801).mirror(0x03fe).w(this, FUNC(qix_state::zookeep_bankswitch_w));
+	map(0x8c00, 0x8c00).mirror(0x03fe).rw(this, FUNC(qix_state::qix_data_firq_r), FUNC(qix_state::qix_data_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x03fe).rw(this, FUNC(qix_state::qix_video_firq_ack_r), FUNC(qix_state::qix_video_firq_ack_w));
+	map(0x9000, 0x93ff).ram().w(this, FUNC(qix_state::qix_paletteram_w)).share("paletteram");
+	map(0x9400, 0x9400).mirror(0x03fc).rw(this, FUNC(qix_state::qix_addresslatch_r), FUNC(qix_state::qix_addresslatch_w));
+	map(0x9402, 0x9403).mirror(0x03fc).writeonly().share("videoram_addr");
+	map(0x9800, 0x9800).mirror(0x03ff).readonly().share("scanline_latch");
+	map(0x9c00, 0x9c00).mirror(0x03fe).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x9c01, 0x9c01).mirror(0x03fe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xa000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(qix_state::slither_video_map)
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, slither_videoram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
-	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(qix_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, slither_addresslatch_w)
-	AM_RANGE(0x9401, 0x9401) AM_MIRROR(0x03fc) AM_WRITEONLY AM_SHARE("videoram_mask")
-	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITEONLY AM_SHARE("videoram_addr")
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READONLY AM_SHARE("scanline_latch")
-	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE("vid_u18", mc6845_device, address_w)
-	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE("vid_u18", mc6845_device, register_r, register_w)
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void qix_state::slither_video_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rw(this, FUNC(qix_state::qix_videoram_r), FUNC(qix_state::slither_videoram_w));
+	map(0x8000, 0x83ff).ram().share("share1");
+	map(0x8400, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8800).mirror(0x03ff).w(this, FUNC(qix_state::qix_palettebank_w));
+	map(0x8c00, 0x8c00).mirror(0x03fe).rw(this, FUNC(qix_state::qix_data_firq_r), FUNC(qix_state::qix_data_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x03fe).rw(this, FUNC(qix_state::qix_video_firq_ack_r), FUNC(qix_state::qix_video_firq_ack_w));
+	map(0x9000, 0x93ff).ram().w(this, FUNC(qix_state::qix_paletteram_w)).share("paletteram");
+	map(0x9400, 0x9400).mirror(0x03fc).rw(this, FUNC(qix_state::qix_addresslatch_r), FUNC(qix_state::slither_addresslatch_w));
+	map(0x9401, 0x9401).mirror(0x03fc).writeonly().share("videoram_mask");
+	map(0x9402, 0x9403).mirror(0x03fc).writeonly().share("videoram_addr");
+	map(0x9800, 0x9800).mirror(0x03ff).readonly().share("scanline_latch");
+	map(0x9c00, 0x9c00).mirror(0x03fe).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x9c01, 0x9c01).mirror(0x03fe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xa000, 0xffff).rom();
+}
 
 
 

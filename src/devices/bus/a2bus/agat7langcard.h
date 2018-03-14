@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "a2bus.h"
 
 //**************************************************************************
@@ -55,7 +54,6 @@ private:
 };
 
 // device type definition
-extern const device_type A2BUS_AGAT7LANGCARD;
 DECLARE_DEVICE_TYPE(A2BUS_AGAT7LANGCARD, a2bus_agat7langcard_device)
 
 #endif // MAME_BUS_A2BUS_AGAT7LANGCARD_H

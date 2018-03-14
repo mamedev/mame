@@ -75,6 +75,7 @@ public:
 	void raidene(machine_config &config);
 	void raidenb(machine_config &config);
 	void raiden(machine_config &config);
+	void raidenkb(machine_config &config);
 	void raidenu(machine_config &config);
 	void main_map(address_map &map);
 	void raiden_sound_decrypted_opcodes_map(address_map &map);

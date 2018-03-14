@@ -35,13 +35,6 @@ wangpcbus_slot_device::wangpcbus_slot_device(const machine_config &mconfig, cons
 {
 }
 
-void wangpcbus_slot_device::static_set_wangpcbus_slot(device_t &device, int sid)
-{
-	wangpcbus_slot_device &wangpcbus_card = dynamic_cast<wangpcbus_slot_device &>(device);
-	wangpcbus_card.m_sid = sid;
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

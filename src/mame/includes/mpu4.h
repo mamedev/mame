@@ -100,32 +100,36 @@ class mpu4_state : public driver_device
 {
 public:
 	mpu4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_vfd(*this, "vfd"),
-			m_6840ptm(*this, "ptm_ic2"),
-			m_pia3(*this, "pia_ic3"),
-			m_pia4(*this, "pia_ic4"),
-			m_pia5(*this, "pia_ic5"),
-			m_pia6(*this, "pia_ic6"),
-			m_pia7(*this, "pia_ic7"),
-			m_pia8(*this, "pia_ic8"),
-			m_port_mux(*this, {"ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2"}),
-			m_aux1_port(*this, "AUX1"),
-			m_aux2_port(*this, "AUX2"),
-			m_bank1(*this, "bank1"),
-			m_msm6376(*this, "msm6376"),
-			m_reel0(*this, "reel0"),
-			m_reel1(*this, "reel1"),
-			m_reel2(*this, "reel2"),
-			m_reel3(*this, "reel3"),
-			m_reel4(*this, "reel4"),
-			m_reel5(*this, "reel5"),
-			m_reel6(*this, "reel6"),
-			m_reel7(*this, "reel7"),
-			m_palette(*this, "palette"),
-			m_meters(*this, "meters")
-	{}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_vfd(*this, "vfd")
+		, m_6840ptm(*this, "ptm_ic2")
+		, m_pia3(*this, "pia_ic3")
+		, m_pia4(*this, "pia_ic4")
+		, m_pia5(*this, "pia_ic5")
+		, m_pia6(*this, "pia_ic6")
+		, m_pia7(*this, "pia_ic7")
+		, m_pia8(*this, "pia_ic8")
+		, m_port_mux(*this, {"ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2"})
+		, m_aux1_port(*this, "AUX1")
+		, m_aux2_port(*this, "AUX2")
+		, m_bank1(*this, "bank1")
+		, m_msm6376(*this, "msm6376")
+		, m_reel0(*this, "reel0")
+		, m_reel1(*this, "reel1")
+		, m_reel2(*this, "reel2")
+		, m_reel3(*this, "reel3")
+		, m_reel4(*this, "reel4")
+		, m_reel5(*this, "reel5")
+		, m_reel6(*this, "reel6")
+		, m_reel7(*this, "reel7")
+		, m_palette(*this, "palette")
+		, m_meters(*this, "meters")
+		, m_lamps(*this, "lamp%u", 0U)
+		, m_mpu4leds(*this, "mpu4led%u", 0U)
+		, m_digits(*this, "digit%u", 0U)
+		, m_triacs(*this, "triac%u", 0U)
+	 { }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
@@ -251,14 +255,7 @@ public:
 	DECLARE_MACHINE_START(mpu4bwb);
 	DECLARE_MACHINE_START(mpu4cry);
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
-	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
-	DECLARE_WRITE_LINE_MEMBER(reel6_optic_cb) { if (state) m_optic_pattern |= 0x40; else m_optic_pattern &= ~0x40; }
-	DECLARE_WRITE_LINE_MEMBER(reel7_optic_cb) { if (state) m_optic_pattern |= 0x80; else m_optic_pattern &= ~0x80; }
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void bwboki(machine_config &config);
 	void mod2(machine_config &config);
 	void mod2_alt(machine_config &config);
@@ -315,7 +312,7 @@ protected:
 	void mpu4_config_common();
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<roc10937_device> m_vfd;
+	optional_device<rocvfd_device> m_vfd;
 	optional_device<ptm6840_device> m_6840ptm;
 	optional_device<pia6821_device> m_pia3;
 	optional_device<pia6821_device> m_pia4;
@@ -338,6 +335,29 @@ protected:
 	optional_device<stepper_device> m_reel7;
 	optional_device<palette_device> m_palette;
 	required_device<meters_device> m_meters;
+
+	// not all systems have this many lamps/LEDs/digits but the driver is too much of a mess to split up now
+
+	// 0-63 are on PIA IC3 port A (always present)
+	// 64-127 are on PIA IC3 port B (always present)
+	// 128-132 136-140 144-148 152-156 160-164 168-172 176-180 184-188 are on small lamp extender
+	// 128-255 are on large lamp externders
+	output_finder<256> m_lamps;
+
+	// 0-63 are on PIA IC4 port A (always present)
+	// 0-143 are on card B (possibly incorrectly mapped?)
+	// 64-127 are on card C
+	// 0-127 are on large card B
+	output_finder<144> m_mpu4leds;
+
+	// 0-7 are on PIA IC4 port A with no LED extender
+	// 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136 are on card B (possible incorrectly mapped?)
+	// 8-15 are on card C
+	// 8-9 are mapped to lamp lines for Connect 4
+	// 0-15 are on large card B
+	output_finder<144> m_digits;
+
+	output_finder<8> m_triacs;
 
 	enum
 	{

@@ -102,19 +102,20 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(zwackery_state::zwackery_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x037fff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM
-	AM_RANGE(0x084000, 0x084fff) AM_RAM
-	AM_RANGE(0x100000, 0x10000f) AM_READ8(ptm_r, 0xff00) AM_DEVWRITE8("ptm", ptm6840_device, write, 0xff00)
-	AM_RANGE(0x104000, 0x104007) AM_DEVREADWRITE8("pia0", pia6821_device, read, write, 0xff00)
-	AM_RANGE(0x108000, 0x108007) AM_DEVREADWRITE8("pia1", pia6821_device, read, write, 0x00ff)
-	AM_RANGE(0x10c000, 0x10c007) AM_DEVREADWRITE8("pia2", pia6821_device, read, write, 0x00ff)
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xc00000, 0xc00fff) AM_READWRITE8(spriteram_r, spriteram_w, 0x00ff)
-ADDRESS_MAP_END
+void zwackery_state::zwackery_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x037fff).rom();
+	map(0x080000, 0x080fff).ram();
+	map(0x084000, 0x084fff).ram();
+	map(0x100000, 0x10000f).r(this, FUNC(zwackery_state::ptm_r)).umask16(0xff00).w(m_ptm, FUNC(ptm6840_device::write)).umask16(0xff00);
+	map(0x104000, 0x104007).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00);
+	map(0x108000, 0x108007).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);
+	map(0x10c000, 0x10c007).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);
+	map(0x800000, 0x800fff).ram().w(this, FUNC(zwackery_state::videoram_w)).share("videoram");
+	map(0x802000, 0x803fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0xc00000, 0xc00fff).rw(this, FUNC(zwackery_state::spriteram_r), FUNC(zwackery_state::spriteram_w)).umask16(0x00ff);
+}
 
 
 //**************************************************************************

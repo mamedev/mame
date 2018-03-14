@@ -116,18 +116,19 @@ READ16_MEMBER(vax11_state::term_rx_status_r)
 	return m_term_status;
 }
 
-ADDRESS_MAP_START(vax11_state::vax11_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xbfff ) AM_RAM  // RAM
-	AM_RANGE( 0xc000, 0xd7ff ) AM_ROM
+void vax11_state::vax11_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xbfff).ram();  // RAM
+	map(0xc000, 0xd7ff).rom();
 
-	AM_RANGE( 0xfe78, 0xfe7b ) AM_DEVREADWRITE("rx01", rx01_device, read, write)
+	map(0xfe78, 0xfe7b).rw("rx01", FUNC(rx01_device::read), FUNC(rx01_device::write));
 
-	AM_RANGE( 0xff70, 0xff71 ) AM_READ(term_rx_status_r)
-	AM_RANGE( 0xff72, 0xff73 ) AM_READ(term_r)
-	AM_RANGE( 0xff74, 0xff75 ) AM_READ(term_tx_status_r)
-	AM_RANGE( 0xff76, 0xff77 ) AM_WRITE(term_w)
-ADDRESS_MAP_END
+	map(0xff70, 0xff71).r(this, FUNC(vax11_state::term_rx_status_r));
+	map(0xff72, 0xff73).r(this, FUNC(vax11_state::term_r));
+	map(0xff74, 0xff75).r(this, FUNC(vax11_state::term_tx_status_r));
+	map(0xff76, 0xff77).w(this, FUNC(vax11_state::term_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vax11 )

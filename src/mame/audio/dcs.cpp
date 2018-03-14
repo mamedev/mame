@@ -267,21 +267,23 @@ enum
  *************************************/
 
 /* DCS 2k memory map */
-ADDRESS_MAP_START(dcs_audio_device::dcs_2k_program_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dcsint")
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("dcsext")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("dcsext")
-	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("dcsext")
-ADDRESS_MAP_END
+void dcs_audio_device::dcs_2k_program_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().share("dcsint");
+	map(0x0800, 0x0fff).ram().share("dcsext");
+	map(0x1000, 0x17ff).ram().share("dcsext");
+	map(0x1800, 0x1fff).ram().share("dcsext");
+}
 
-ADDRESS_MAP_START(dcs_audio_device::dcs_2k_data_map)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
-	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
-	AM_RANGE(0x3400, 0x37ff) AM_READWRITE(input_latch_r, output_latch_w)
-	AM_RANGE(0x3800, 0x39ff) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
-ADDRESS_MAP_END
+void dcs_audio_device::dcs_2k_data_map(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x1800).rw(this, FUNC(dcs_audio_device::dcs_dataram_r), FUNC(dcs_audio_device::dcs_dataram_w));
+	map(0x2000, 0x2fff).bankr("databank");
+	map(0x3000, 0x33ff).w(this, FUNC(dcs_audio_device::dcs_data_bank_select_w));
+	map(0x3400, 0x37ff).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::output_latch_w));
+	map(0x3800, 0x39ff).ram();
+	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+}
 
 
 /* DCS 2k with UART memory map */
@@ -320,15 +322,16 @@ ADDRESS_MAP_START(dcs_audio_device::dcs_wpc_program_map)
 	AM_RANGE(0x1000, 0x3fff) AM_RAM AM_SHARE("dcsext")
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(dcs_audio_wpc_device::dcs_wpc_data_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK("databank")
-	AM_RANGE(0x1000, 0x2fff) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(dcs_data_bank_select_w)
-	AM_RANGE(0x3100, 0x3100) AM_WRITE(dcs_data_bank_select2_w)
-	AM_RANGE(0x3300, 0x3303) AM_READWRITE(input_latch_r, output_latch_w)
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("iram")
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
-ADDRESS_MAP_END
+void dcs_audio_wpc_device::dcs_wpc_data_map(address_map &map)
+{
+	map(0x0000, 0x07ff).bankr("databank");
+	map(0x1000, 0x2fff).rw(this, FUNC(dcs_audio_wpc_device::dcs_dataram_r), FUNC(dcs_audio_wpc_device::dcs_dataram_w));
+	map(0x3000, 0x3000).w(this, FUNC(dcs_audio_wpc_device::dcs_data_bank_select_w));
+	map(0x3100, 0x3100).w(this, FUNC(dcs_audio_wpc_device::dcs_data_bank_select2_w));
+	map(0x3300, 0x3303).rw(this, FUNC(dcs_audio_wpc_device::input_latch_r), FUNC(dcs_audio_wpc_device::output_latch_w));
+	map(0x3800, 0x39ff).ram().share("iram");
+	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_wpc_device::adsp_control_r), FUNC(dcs_audio_wpc_device::adsp_control_w));
+}
 
 /*************************************
  *

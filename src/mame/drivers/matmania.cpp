@@ -75,59 +75,63 @@ WRITE8_MEMBER(matmania_state::maniach_sh_command_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(matmania_state::matmania_map)
-	AM_RANGE(0x0000, 0x077f) AM_RAM
-	AM_RANGE(0x0780, 0x07df) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram2")
-	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_SHARE("videoram3")
-	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_SHARE("colorram3")
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_SHARE("pageselect")
-	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE(matmania_sh_command_w)
-	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP /* ?? */
-	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void matmania_state::matmania_map(address_map &map)
+{
+	map(0x0000, 0x077f).ram();
+	map(0x0780, 0x07df).writeonly().share("spriteram");
+	map(0x1000, 0x13ff).ram().share("videoram2");
+	map(0x1400, 0x17ff).ram().share("colorram2");
+	map(0x2000, 0x21ff).ram().share("videoram");
+	map(0x2200, 0x23ff).ram().share("colorram");
+	map(0x2400, 0x25ff).ram().share("videoram3");
+	map(0x2600, 0x27ff).ram().share("colorram3");
+	map(0x3000, 0x3000).portr("IN0").writeonly().share("pageselect");
+	map(0x3010, 0x3010).portr("IN1").w(this, FUNC(matmania_state::matmania_sh_command_w));
+	map(0x3020, 0x3020).portr("DSW2").writeonly().share("scroll");
+	map(0x3030, 0x3030).portr("DSW1").nopw(); /* ?? */
+	map(0x3050, 0x307f).w(this, FUNC(matmania_state::matmania_paletteram_w)).share("paletteram");
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(matmania_state::maniach_map)
-	AM_RANGE(0x0000, 0x077f) AM_RAM
-	AM_RANGE(0x0780, 0x07df) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram2")
-	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_SHARE("videoram3")
-	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_SHARE("colorram3")
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_SHARE("pageselect")
-	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE(maniach_sh_command_w)
-	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP   /* ?? */
-	AM_RANGE(0x3040, 0x3040) AM_DEVREADWRITE("mcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0x3041, 0x3041) AM_READ(maniach_mcu_status_r)
-	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void matmania_state::maniach_map(address_map &map)
+{
+	map(0x0000, 0x077f).ram();
+	map(0x0780, 0x07df).ram().share("spriteram");
+	map(0x1000, 0x13ff).ram().share("videoram2");
+	map(0x1400, 0x17ff).ram().share("colorram2");
+	map(0x2000, 0x21ff).ram().share("videoram");
+	map(0x2200, 0x23ff).ram().share("colorram");
+	map(0x2400, 0x25ff).ram().share("videoram3");
+	map(0x2600, 0x27ff).ram().share("colorram3");
+	map(0x3000, 0x3000).portr("IN0").writeonly().share("pageselect");
+	map(0x3010, 0x3010).portr("IN1").w(this, FUNC(matmania_state::maniach_sh_command_w));
+	map(0x3020, 0x3020).portr("DSW2").writeonly().share("scroll");
+	map(0x3030, 0x3030).portr("DSW1").nopw();   /* ?? */
+	map(0x3040, 0x3040).rw(m_mcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+	map(0x3041, 0x3041).r(this, FUNC(matmania_state::maniach_mcu_status_r));
+	map(0x3050, 0x307f).w(this, FUNC(matmania_state::matmania_paletteram_w)).share("paletteram");
+	map(0x4000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(matmania_state::matmania_sound_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x2007, 0x2007) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void matmania_state::matmania_sound_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x2000, 0x2001).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x2002, 0x2003).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::write));
+	map(0x2007, 0x2007).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(matmania_state::maniach_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ymsnd", ym3526_device, write)
-	AM_RANGE(0x2002, 0x2002) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x2004, 0x2004) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void matmania_state::maniach_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x2000, 0x2001).w("ymsnd", FUNC(ym3526_device::write));
+	map(0x2002, 0x2002).w("dac", FUNC(dac_byte_interface::write));
+	map(0x2004, 0x2004).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x4000, 0xffff).rom();
+}
 
 
 /*************************************

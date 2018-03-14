@@ -54,13 +54,13 @@ public:
 	void set_hold(int state);
 
 	// Callbacks
-	template<class _Object> static devcb_base &static_set_extop_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_external_operation.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_intlevel_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_get_intlevel.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_iaq_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_iaq_line.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_clkout_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_clock_out_line.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_wait_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_wait_line.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_holda_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_holda_line.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_dbin_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_dbin_line.set_callback(object); }
+	template<class Object> devcb_base &set_extop_callback(Object &&cb) { return m_external_operation.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_intlevel_callback(Object &&cb) { return m_get_intlevel.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_iaq_callback(Object &&cb) { return m_iaq_line.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_clkout_callback(Object &&cb) { return m_clock_out_line.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_wait_callback(Object &&cb) { return m_wait_line.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_holda_callback(Object &&cb) { return m_holda_line.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_dbin_callback(Object &&cb) { return m_dbin_line.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	tms99xx_device(const machine_config &mconfig, device_type type,

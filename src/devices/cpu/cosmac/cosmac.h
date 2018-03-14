@@ -88,34 +88,34 @@
 //**************************************************************************
 
 #define MCFG_COSMAC_WAIT_CALLBACK(_read) \
-	devcb = &cosmac_device::set_wait_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<cosmac_device &>(*device).set_wait_rd_callback(DEVCB_##_read);
 
 #define MCFG_COSMAC_CLEAR_CALLBACK(_read) \
-	devcb = &cosmac_device::set_clear_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<cosmac_device &>(*device).set_clear_rd_callback(DEVCB_##_read);
 
 #define MCFG_COSMAC_EF1_CALLBACK(_read) \
-	devcb = &cosmac_device::set_ef1_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<cosmac_device &>(*device).set_ef1_rd_callback(DEVCB_##_read);
 
 #define MCFG_COSMAC_EF2_CALLBACK(_read) \
-	devcb = &cosmac_device::set_ef2_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<cosmac_device &>(*device).set_ef2_rd_callback(DEVCB_##_read);
 
 #define MCFG_COSMAC_EF3_CALLBACK(_read) \
-	devcb = &cosmac_device::set_ef3_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<cosmac_device &>(*device).set_ef3_rd_callback(DEVCB_##_read);
 
 #define MCFG_COSMAC_EF4_CALLBACK(_read) \
-	devcb = &cosmac_device::set_ef4_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<cosmac_device &>(*device).set_ef4_rd_callback(DEVCB_##_read);
 
 #define MCFG_COSMAC_Q_CALLBACK(_write) \
-	devcb = &cosmac_device::set_q_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<cosmac_device &>(*device).set_q_wr_callback(DEVCB_##_write);
 
 #define MCFG_COSMAC_DMAR_CALLBACK(_read) \
-	devcb = &cosmac_device::set_dma_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<cosmac_device &>(*device).set_dma_rd_callback(DEVCB_##_read);
 
 #define MCFG_COSMAC_DMAW_CALLBACK(_write) \
-	devcb = &cosmac_device::set_dma_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<cosmac_device &>(*device).set_dma_wr_callback(DEVCB_##_write);
 
 #define MCFG_COSMAC_SC_CALLBACK(_write) \
-	devcb = &cosmac_device::set_sc_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<cosmac_device &>(*device).set_sc_wr_callback(DEVCB_##_write);
 
 
 
@@ -193,16 +193,16 @@ public:
 	};
 
 
-	template <class Object> static devcb_base &set_wait_rd_callback(device_t &device, Object &&cb) { return downcast<cosmac_device &>(device).m_read_wait.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_clear_rd_callback(device_t &device, Object &&cb) { return downcast<cosmac_device &>(device).m_read_clear.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ef1_rd_callback(device_t &device, Object &&cb) { return downcast<cosmac_device &>(device).m_read_ef1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ef2_rd_callback(device_t &device, Object &&cb) { return downcast<cosmac_device &>(device).m_read_ef2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ef3_rd_callback(device_t &device, Object &&cb) { return downcast<cosmac_device &>(device).m_read_ef3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ef4_rd_callback(device_t &device, Object &&cb) { return downcast<cosmac_device &>(device).m_read_ef4.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_q_wr_callback(device_t &device, Object &&cb) { return downcast<cosmac_device &>(device).m_write_q.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_rd_callback(device_t &device, Object &&cb) { return downcast<cosmac_device &>(device).m_read_dma.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_wr_callback(device_t &device, Object &&cb) { return downcast<cosmac_device &>(device).m_write_dma.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_sc_wr_callback(device_t &device, Object &&cb) { return downcast<cosmac_device &>(device).m_write_sc.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_wait_rd_callback(Object &&cb) { return m_read_wait.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_clear_rd_callback(Object &&cb) { return m_read_clear.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ef1_rd_callback(Object &&cb) { return m_read_ef1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ef2_rd_callback(Object &&cb) { return m_read_ef2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ef3_rd_callback(Object &&cb) { return m_read_ef3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ef4_rd_callback(Object &&cb) { return m_read_ef4.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_q_wr_callback(Object &&cb) { return m_write_q.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_rd_callback(Object &&cb) { return m_read_dma.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_wr_callback(Object &&cb) { return m_write_dma.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sc_wr_callback(Object &&cb) { return m_write_sc.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	offs_t get_memory_address();

@@ -246,36 +246,39 @@ WRITE16_MEMBER(supduck_state::supduck_scroll_w)
 
 
 
-ADDRESS_MAP_START(supduck_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_WRITENOP
-	AM_RANGE(0xfe0000, 0xfe1fff) AM_RAM AM_SHARE("spriteram")
+void supduck_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().nopw();
+	map(0xfe0000, 0xfe1fff).ram().share("spriteram");
 
-	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("P1_P2") AM_WRITE( supduck_4000_w )
-	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM") AM_WRITE( supduck_4002_w )
-	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("DSW")
+	map(0xfe4000, 0xfe4001).portr("P1_P2").w(this, FUNC(supduck_state::supduck_4000_w));
+	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(this, FUNC(supduck_state::supduck_4002_w));
+	map(0xfe4004, 0xfe4005).portr("DSW");
 
-	AM_RANGE(0xfe8000, 0xfe8007) AM_WRITE(supduck_scroll_w)
-	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITENOP // watchdog or irqack
+	map(0xfe8000, 0xfe8007).w(this, FUNC(supduck_state::supduck_scroll_w));
+	map(0xfe800e, 0xfe800f).nopw(); // watchdog or irqack
 
-	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(text_videoram_w) AM_SHARE("textvideoram")
-	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(back_videoram_w) AM_SHARE("backvideoram")
-	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(fore_videoram_w) AM_SHARE("forevideoram")
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM /* working RAM */
-ADDRESS_MAP_END
+	map(0xfec000, 0xfecfff).ram().w(this, FUNC(supduck_state::text_videoram_w)).share("textvideoram");
+	map(0xff0000, 0xff3fff).ram().w(this, FUNC(supduck_state::back_videoram_w)).share("backvideoram");
+	map(0xff4000, 0xff7fff).ram().w(this, FUNC(supduck_state::fore_videoram_w)).share("forevideoram");
+	map(0xff8000, 0xff87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xffc000, 0xffffff).ram(); /* working RAM */
+}
 
-ADDRESS_MAP_START(supduck_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(okibank_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void supduck_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).w(this, FUNC(supduck_state::okibank_w));
+	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(supduck_state::oki_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void supduck_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
+}
 
 WRITE8_MEMBER(supduck_state::okibank_w)
 {

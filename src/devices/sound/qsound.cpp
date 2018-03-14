@@ -40,9 +40,10 @@ DEFINE_DEVICE_TYPE(QSOUND, qsound_device, "qsound", "Q-Sound")
 // chip decapped by siliconpr0n clearly shows 3x as much ROM as that, a total
 // of 12288 words of internal ROM.
 // The older DSP16 non-a part has 2048 words of ROM.
-ADDRESS_MAP_START(qsound_device::dsp16_program_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-ADDRESS_MAP_END
+void qsound_device::dsp16_program_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+}
 
 
 // data map for the DSP16A; again, Western Electric/AT&T expanded the size of
@@ -50,10 +51,11 @@ ADDRESS_MAP_END
 // As originally released, the DSP16A had 1024 words of internal RAM,
 // but this was expanded to 2048 words in the DL-1425 decap.
 // The older DSP16 non-a part has 512 words of RAM.
-ADDRESS_MAP_START(qsound_device::dsp16_data_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-ADDRESS_MAP_END
+void qsound_device::dsp16_data_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).ram();
+}
 
 
 // ROM definition for the Qsound program ROM

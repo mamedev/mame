@@ -54,17 +54,19 @@ const tiny_rom_entry *unidisk_t::device_rom_region() const
 //  ADDRESS_MAP( unidisk_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(unidisk_t::unidisk_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(TMS9995_TAG, 0)
-ADDRESS_MAP_END
+void unidisk_t::unidisk_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region(TMS9995_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( unidisk_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(unidisk_t::unidisk_io)
-ADDRESS_MAP_END
+void unidisk_t::unidisk_io(address_map &map)
+{
+}
 
 
 //-------------------------------------------------

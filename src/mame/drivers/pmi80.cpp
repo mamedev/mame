@@ -82,18 +82,20 @@ WRITE8_MEMBER( pmi80_state::leds_w )
 	}
 }
 
-ADDRESS_MAP_START(pmi80_state::pmi80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x03ff ) AM_ROM
-	AM_RANGE( 0x0400, 0x1fff ) AM_RAM
-ADDRESS_MAP_END
+void pmi80_state::pmi80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom();
+	map(0x0400, 0x1fff).ram();
+}
 
-ADDRESS_MAP_START(pmi80_state::pmi80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(leds_w)
-	AM_RANGE(0xfa, 0xfa) AM_READWRITE(keyboard_r,keyboard_w)
-ADDRESS_MAP_END
+void pmi80_state::pmi80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xf8, 0xf8).w(this, FUNC(pmi80_state::leds_w));
+	map(0xfa, 0xfa).rw(this, FUNC(pmi80_state::keyboard_r), FUNC(pmi80_state::keyboard_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pmi80 )

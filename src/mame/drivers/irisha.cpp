@@ -70,20 +70,22 @@ private:
 
 
 /* Address maps */
-ADDRESS_MAP_START(irisha_state::irisha_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM  // ROM
-	AM_RANGE(0x4000, 0xdfff) AM_RAM  // RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void irisha_state::irisha_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();  // ROM
+	map(0x4000, 0xdfff).ram();  // RAM
+	map(0xe000, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(irisha_state::irisha_io)
-	AM_RANGE(0x04, 0x05) AM_READ(irisha_keyboard_r)
-	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
-	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x08, 0x0B) AM_DEVREADWRITE("pit8253", pit8253_device, read, write )
-	AM_RANGE(0x0C, 0x0F) AM_DEVREADWRITE("pic8259", pic8259_device, read, write ) AM_MASK( 0x01 )
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void irisha_state::irisha_io(address_map &map)
+{
+	map(0x04, 0x05).r(this, FUNC(irisha_state::irisha_keyboard_r));
+	map(0x06, 0x06).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x07, 0x07).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x08, 0x0B).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0C, 0x0F).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).mask(0x01);
+	map(0x10, 0x13).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( irisha )

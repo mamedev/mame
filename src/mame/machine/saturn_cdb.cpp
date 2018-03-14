@@ -7,8 +7,6 @@ YGR019B - Hitachi YGR019B CD-Subsystem LSI. Earlier revision is YGR019A. Later r
         into one IC (YGR022 315-5962). The SH1 and the YGR019B make up the 'CD Block' CD Authentication and CD I/O data controller.
         Another of it's functions is to prevent copied CDs from being played
 
-Attempts to use SCI, tight loops checking bit 2 of 0x5ffffc2 (TEIE)
-
 */
 
 #include "emu.h"
@@ -25,14 +23,10 @@ void saturn_cdb_device::device_start()
 {
 }
 
-ADDRESS_MAP_START(saturn_cdb_device::saturn_cdb_map)
-	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM
-	AM_RANGE(0x01000000, 0x010fffff) AM_RAM // RAM buffer area?
-	AM_RANGE(0x02000000, 0x0200003f) AM_RAM // i/f with SH-2s
-	AM_RANGE(0x02100000, 0x0210003f) AM_RAM // i/f with SH-2s
-	AM_RANGE(0x02180000, 0x0218003f) AM_RAM // i/f with SH-2s
-	AM_RANGE(0x07000000, 0x07000fff) AM_RAM // unknown, internal RAM?
-ADDRESS_MAP_END
+void saturn_cdb_device::saturn_cdb_map(address_map &map)
+{
+	map(0x00000000, 0x0000ffff).rom();
+}
 
 MACHINE_CONFIG_START(saturn_cdb_device::device_add_mconfig)
 	MCFG_CPU_ADD("cdbcpu", SH1, DERIVED_CLOCK(1, 1))

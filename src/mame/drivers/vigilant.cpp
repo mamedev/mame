@@ -26,6 +26,8 @@ Bottom board - M75-B-A (all versions regardless of mask ROM/EPROM)
 #include "includes/iremipt.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/rstbuf.h"
 #include "sound/2203intf.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2151.h"
@@ -72,71 +74,78 @@ WRITE8_MEMBER(vigilant_state::kikcubic_coin_w)
 
 
 
-ADDRESS_MAP_START(vigilant_state::vigilant_map)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")        /* Fallthrough */
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc020, 0xc0df) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void vigilant_state::vigilant_map(address_map &map)
+{
+	map(0x8000, 0xbfff).bankr("bank1");        /* Fallthrough */
+	map(0x0000, 0x7fff).rom();
+	map(0xc020, 0xc0df).ram().share("spriteram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(vigilant_state::paletteram_w)).share("paletteram");
+	map(0xd000, 0xdfff).ram().share("videoram");
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(vigilant_state::vigilant_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("m72", m72_audio_device, sound_command_w)    /* SD */
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(vigilant_out2_w)          /* OUT2 */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(bank_select_w)  /* PBANK */
-	AM_RANGE(0x80, 0x81) AM_WRITE(vigilant_horiz_scroll_w)      /* HSPL, HSPH */
-	AM_RANGE(0x82, 0x83) AM_WRITE(vigilant_rear_horiz_scroll_w) /* RHSPL, RHSPH */
-	AM_RANGE(0x84, 0x84) AM_WRITE(vigilant_rear_color_w)        /* RCOD */
-ADDRESS_MAP_END
+void vigilant_state::vigilant_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));    /* SD */
+	map(0x01, 0x01).portr("IN1").w(this, FUNC(vigilant_state::vigilant_out2_w));          /* OUT2 */
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).portr("DSW1");
+	map(0x04, 0x04).portr("DSW2").w(this, FUNC(vigilant_state::bank_select_w));  /* PBANK */
+	map(0x80, 0x81).w(this, FUNC(vigilant_state::vigilant_horiz_scroll_w));      /* HSPL, HSPH */
+	map(0x82, 0x83).w(this, FUNC(vigilant_state::vigilant_rear_horiz_scroll_w)); /* RHSPL, RHSPH */
+	map(0x84, 0x84).w(this, FUNC(vigilant_state::vigilant_rear_color_w));        /* RCOD */
+}
 
-ADDRESS_MAP_START(vigilant_state::kikcubic_map)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")        /* Fallthrough */
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void vigilant_state::kikcubic_map(address_map &map)
+{
+	map(0x8000, 0xbfff).bankr("bank1");        /* Fallthrough */
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc0ff).ram().share("spriteram");
+	map(0xc800, 0xcaff).ram().w(this, FUNC(vigilant_state::paletteram_w)).share("paletteram");
+	map(0xd000, 0xdfff).ram().share("videoram");
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(vigilant_state::kikcubic_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(kikcubic_coin_w) /* also flip screen, and...? */
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_WRITE(bank_select_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
+void vigilant_state::kikcubic_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSW1").w(this, FUNC(vigilant_state::kikcubic_coin_w)); /* also flip screen, and...? */
+	map(0x01, 0x01).portr("DSW2");
+	map(0x02, 0x02).portr("IN0");
+	map(0x03, 0x03).portr("IN1");
+	map(0x04, 0x04).portr("IN2").w(this, FUNC(vigilant_state::bank_select_w));
+	map(0x06, 0x06).w("soundlatch", FUNC(generic_latch_8_device::write));
 //  AM_RANGE(0x07, 0x07) AM_WRITENOP /* ?? */
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(vigilant_state::sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void vigilant_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(vigilant_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x81) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("m72", m72_audio_device, vigilant_sample_addr_w)   /* STL / STH */
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)            /* COUNT UP */
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w) /* IRQ clear */
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r) /* S ROM C */
-ADDRESS_MAP_END
+void vigilant_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x80, 0x81).r("soundlatch", FUNC(generic_latch_8_device::read)).w(m_audio, FUNC(m72_audio_device::vigilant_sample_addr_w));   /* STL / STH */
+	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));            /* COUNT UP */
+	map(0x83, 0x83).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w)); /* IRQ clear */
+	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r)); /* S ROM C */
+}
 
-ADDRESS_MAP_START(vigilant_state::buccanrs_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)             /* SDRE */
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, vigilant_sample_addr_w)  /* STL / STH */
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)                /* COUNT UP */
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)     /* IRQ clear */
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)             /* S ROM C */
-ADDRESS_MAP_END
+void vigilant_state::buccanrs_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x02, 0x03).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x80, 0x80).r("soundlatch", FUNC(generic_latch_8_device::read));             /* SDRE */
+	map(0x80, 0x81).w(m_audio, FUNC(m72_audio_device::vigilant_sample_addr_w));  /* STL / STH */
+	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));                /* COUNT UP */
+	map(0x83, 0x83).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));   /* IRQ clear */
+	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));             /* S ROM C */
+}
 
 
 static INPUT_PORTS_START( vigilant )
@@ -501,11 +510,16 @@ MACHINE_CONFIG_START(vigilant_state::vigilant)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+
+	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
 
 	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
 
 	MCFG_YM2151_ADD("ymsnd", 3579645)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 
@@ -544,11 +558,16 @@ MACHINE_CONFIG_START(vigilant_state::buccanrs)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+
+	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
 
 	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
 
 	MCFG_SOUND_ADD("ym1", YM2203, 18432000/6)
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
+	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst30_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.35)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.35)
@@ -586,6 +605,8 @@ MACHINE_CONFIG_START(vigilant_state::kikcubic)
 	MCFG_CPU_IO_MAP(sound_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(vigilant_state, nmi_line_pulse, 128*55)    /* clocked by V1 */
 								/* IRQs are generated by main Z80 and YM2151 */
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55)
@@ -603,11 +624,16 @@ MACHINE_CONFIG_START(vigilant_state::kikcubic)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+
+	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
 
 	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
 
 	MCFG_YM2151_ADD("ymsnd", 3579645)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst30_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 

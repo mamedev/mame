@@ -5,9 +5,10 @@
  * includes/pcw16.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_PCW16_H
 #define MAME_INCLUDES_PCW16_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"     /* FDC superio */
@@ -34,55 +35,23 @@
 class pcw16_state : public driver_device
 {
 public:
-	pcw16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_flash0(*this, "flash0"),
-			m_flash1(*this, "flash1"),
-			m_fdc(*this, "fdc"),
-			m_uart2(*this, "ns16550_2"),
-			m_beeper(*this, "beeper"),
-			m_ram(*this, RAM_TAG),
-			m_keyboard(*this, "at_keyboard"),
-			m_region_rom(*this, "maincpu"),
-			m_io_extra(*this, "EXTRA")
+	pcw16_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_flash0(*this, "flash0"),
+		m_flash1(*this, "flash1"),
+		m_fdc(*this, "fdc"),
+		m_uart2(*this, "ns16550_2"),
+		m_beeper(*this, "beeper"),
+		m_ram(*this, RAM_TAG),
+		m_keyboard(*this, "at_keyboard"),
+		m_region_rom(*this, "maincpu"),
+		m_io_extra(*this, "EXTRA")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<intel_e28f008sa_device> m_flash0;
-	required_device<intel_e28f008sa_device> m_flash1;
-	required_device<pc_fdc_superio_device> m_fdc;
-	required_device<ns16550_device> m_uart2;
-	required_device<beep_device> m_beeper;
-	required_device<ram_device> m_ram;
-	required_device<at_keyboard_device> m_keyboard;
-	required_memory_region m_region_rom;
-	required_ioport m_io_extra;
+	void pcw16(machine_config &config);
 
-	unsigned long m_interrupt_counter;
-	int m_banks[4];
-	int m_4_bit_port;
-	int m_fdc_int_code;
-	int m_system_status;
-	char *m_mem_ptr[4];
-	unsigned char m_keyboard_data_shift;
-	int m_keyboard_parity_table[256];
-	int m_keyboard_bits;
-	int m_keyboard_bits_output;
-	int m_keyboard_state;
-	int m_keyboard_previous_state;
-	unsigned char m_rtc_seconds;
-	unsigned char m_rtc_minutes;
-	unsigned char m_rtc_hours;
-	unsigned char m_rtc_days_max;
-	unsigned char m_rtc_days;
-	unsigned char m_rtc_months;
-	unsigned char m_rtc_years;
-	unsigned char m_rtc_control;
-	unsigned char m_rtc_256ths_seconds;
-	int m_previous_fdc_int_state;
-	int m_colour_palette[16];
-	int m_video_control;
+protected:
 	DECLARE_WRITE8_MEMBER(pcw16_palette_w);
 	DECLARE_READ8_MEMBER(pcw16_bankhw_r);
 	DECLARE_WRITE8_MEMBER(pcw16_bankhw_w);
@@ -141,9 +110,46 @@ public:
 	void pcw16_vh_decode_mode0(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
 	void pcw16_vh_decode_mode1(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
 	void pcw16_vh_decode_mode2(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
-	void pcw16(machine_config &config);
+
 	void pcw16_io(address_map &map);
 	void pcw16_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<intel_e28f008sa_device> m_flash0;
+	required_device<intel_e28f008sa_device> m_flash1;
+	required_device<pc_fdc_superio_device> m_fdc;
+	required_device<ns16550_device> m_uart2;
+	required_device<beep_device> m_beeper;
+	required_device<ram_device> m_ram;
+	required_device<at_keyboard_device> m_keyboard;
+	required_memory_region m_region_rom;
+	required_ioport m_io_extra;
+
+	unsigned long m_interrupt_counter;
+	int m_banks[4];
+	int m_4_bit_port;
+	int m_fdc_int_code;
+	int m_system_status;
+	char *m_mem_ptr[4];
+	unsigned char m_keyboard_data_shift;
+	int m_keyboard_parity_table[256];
+	int m_keyboard_bits;
+	int m_keyboard_bits_output;
+	int m_keyboard_state;
+	int m_keyboard_previous_state;
+	unsigned char m_rtc_seconds;
+	unsigned char m_rtc_minutes;
+	unsigned char m_rtc_hours;
+	unsigned char m_rtc_days_max;
+	unsigned char m_rtc_days;
+	unsigned char m_rtc_months;
+	unsigned char m_rtc_years;
+	unsigned char m_rtc_control;
+	unsigned char m_rtc_256ths_seconds;
+	int m_previous_fdc_int_state;
+	int m_colour_palette[16];
+	int m_video_control;
 };
 
 #endif // MAME_INCLUDES_PCW16_H

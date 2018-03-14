@@ -127,44 +127,45 @@ WRITE8_MEMBER(wolfpack_state::coldetres_w)
 }
 
 
-ADDRESS_MAP_START(wolfpack_state::main_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100)
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_SHARE("alpha_num_ram")
-	AM_RANGE(0x2000, 0x2000) AM_READ(misc_r)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(high_explo_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(sonar_ping_w)
-	AM_RANGE(0x2002, 0x2002) AM_WRITE(sirlat_w)
-	AM_RANGE(0x2003, 0x2003) AM_WRITE(pt_sound_w)
-	AM_RANGE(0x2004, 0x2004) AM_WRITE(start_speech_w)
-	AM_RANGE(0x2005, 0x2005) AM_WRITE(launch_torpedo_w)
-	AM_RANGE(0x2006, 0x2006) AM_WRITE(low_explo_w)
-	AM_RANGE(0x2007, 0x2007) AM_WRITE(screw_cont_w)
-	AM_RANGE(0x2008, 0x2008) AM_WRITE(video_invert_w)
-	AM_RANGE(0x2009, 0x2009) AM_WRITE(ship_reflect_w)
-	AM_RANGE(0x200a, 0x200a) AM_WRITE(lamp_flash_w)
-	AM_RANGE(0x200c, 0x200c) AM_WRITE(credit_w)
-	AM_RANGE(0x200d, 0x200d) AM_WRITE(attract_w)
-	AM_RANGE(0x200e, 0x200e) AM_WRITE(pt_pos_select_w)
-	AM_RANGE(0x200f, 0x200f) AM_WRITE(warning_light_w)
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW")
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(audamp_w)
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(pt_horz_w)
-	AM_RANGE(0x3003, 0x3003) AM_WRITE(pt_pic_w)
-	AM_RANGE(0x3004, 0x3004) AM_WRITE(word_w)
-	AM_RANGE(0x3007, 0x3007) AM_WRITE(coldetres_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(ship_h_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(torpedo_pic_w)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE(ship_size_w)
-	AM_RANGE(0x4003, 0x4003) AM_WRITE(ship_h_precess_w)
-	AM_RANGE(0x4004, 0x4004) AM_WRITE(ship_pic_w)
-	AM_RANGE(0x4005, 0x4005) AM_WRITE(torpedo_h_w)
-	AM_RANGE(0x4006, 0x4006) AM_WRITE(torpedo_v_w)
-	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x7000, 0x7fff) AM_ROM
-	AM_RANGE(0x9000, 0x9000) AM_READNOP /* debugger ROM location? */
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void wolfpack_state::main_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().mirror(0x100);
+	map(0x1000, 0x1000).portr("INPUTS");
+	map(0x1000, 0x10ff).writeonly().share("alpha_num_ram");
+	map(0x2000, 0x2000).r(this, FUNC(wolfpack_state::misc_r));
+	map(0x2000, 0x2000).w(this, FUNC(wolfpack_state::high_explo_w));
+	map(0x2001, 0x2001).w(this, FUNC(wolfpack_state::sonar_ping_w));
+	map(0x2002, 0x2002).w(this, FUNC(wolfpack_state::sirlat_w));
+	map(0x2003, 0x2003).w(this, FUNC(wolfpack_state::pt_sound_w));
+	map(0x2004, 0x2004).w(this, FUNC(wolfpack_state::start_speech_w));
+	map(0x2005, 0x2005).w(this, FUNC(wolfpack_state::launch_torpedo_w));
+	map(0x2006, 0x2006).w(this, FUNC(wolfpack_state::low_explo_w));
+	map(0x2007, 0x2007).w(this, FUNC(wolfpack_state::screw_cont_w));
+	map(0x2008, 0x2008).w(this, FUNC(wolfpack_state::video_invert_w));
+	map(0x2009, 0x2009).w(this, FUNC(wolfpack_state::ship_reflect_w));
+	map(0x200a, 0x200a).w(this, FUNC(wolfpack_state::lamp_flash_w));
+	map(0x200c, 0x200c).w(this, FUNC(wolfpack_state::credit_w));
+	map(0x200d, 0x200d).w(this, FUNC(wolfpack_state::attract_w));
+	map(0x200e, 0x200e).w(this, FUNC(wolfpack_state::pt_pos_select_w));
+	map(0x200f, 0x200f).w(this, FUNC(wolfpack_state::warning_light_w));
+	map(0x3000, 0x3000).portr("DSW");
+	map(0x3000, 0x3000).w(this, FUNC(wolfpack_state::audamp_w));
+	map(0x3001, 0x3001).w(this, FUNC(wolfpack_state::pt_horz_w));
+	map(0x3003, 0x3003).w(this, FUNC(wolfpack_state::pt_pic_w));
+	map(0x3004, 0x3004).w(this, FUNC(wolfpack_state::word_w));
+	map(0x3007, 0x3007).w(this, FUNC(wolfpack_state::coldetres_w));
+	map(0x4000, 0x4000).w(this, FUNC(wolfpack_state::ship_h_w));
+	map(0x4001, 0x4001).w(this, FUNC(wolfpack_state::torpedo_pic_w));
+	map(0x4002, 0x4002).w(this, FUNC(wolfpack_state::ship_size_w));
+	map(0x4003, 0x4003).w(this, FUNC(wolfpack_state::ship_h_precess_w));
+	map(0x4004, 0x4004).w(this, FUNC(wolfpack_state::ship_pic_w));
+	map(0x4005, 0x4005).w(this, FUNC(wolfpack_state::torpedo_h_w));
+	map(0x4006, 0x4006).w(this, FUNC(wolfpack_state::torpedo_v_w));
+	map(0x5000, 0x5fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x7000, 0x7fff).rom();
+	map(0x9000, 0x9000).nopr(); /* debugger ROM location? */
+	map(0xf000, 0xffff).rom();
+}
 
 
 static INPUT_PORTS_START( wolfpack )

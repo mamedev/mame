@@ -24,7 +24,7 @@ public:
 		m_master_videoram(*this, "master_videoram"),
 		m_slave_videoram(*this, "slave_videoram") { }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tms34010_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_audioslave;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;

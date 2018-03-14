@@ -61,20 +61,21 @@ WRITE_LINE_MEMBER(gameplan_state::trvquest_misc_w)
 	// data & 1 -> led on/off ?
 }
 
-ADDRESS_MAP_START(gameplan_state::cpu_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") // cmos ram
-	AM_RANGE(0x2000, 0x27ff) AM_RAM // main ram
-	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)
-	AM_RANGE(0x3810, 0x381f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)
-	AM_RANGE(0x3820, 0x382f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
-	AM_RANGE(0x3830, 0x3831) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x3840, 0x3841) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x3850, 0x3850) AM_READNOP //watchdog_reset_r ?
-	AM_RANGE(0x8000, 0x9fff) AM_READ(trvquest_question_r)
-	AM_RANGE(0xa000, 0xa000) AM_WRITEONLY AM_SHARE("trvquest_q")
-	AM_RANGE(0xa000, 0xa000) AM_READNOP // bogus read from the game code when reads question roms
-	AM_RANGE(0xb000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void gameplan_state::cpu_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("nvram"); // cmos ram
+	map(0x2000, 0x27ff).ram(); // main ram
+	map(0x3800, 0x380f).rw(m_via_1, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x3810, 0x381f).rw(m_via_2, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x3820, 0x382f).rw(m_via_0, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x3830, 0x3831).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x3840, 0x3841).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x3850, 0x3850).nopr(); //watchdog_reset_r ?
+	map(0x8000, 0x9fff).r(this, FUNC(gameplan_state::trvquest_question_r));
+	map(0xa000, 0xa000).writeonly().share("trvquest_q");
+	map(0xa000, 0xa000).nopr(); // bogus read from the game code when reads question roms
+	map(0xb000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( trvquest )
 	PORT_START("IN0")

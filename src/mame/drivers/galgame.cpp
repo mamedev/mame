@@ -286,15 +286,16 @@ WRITE16_MEMBER(galaxygame_state::clk_w)
 	m_clk = data;
 }
 
-ADDRESS_MAP_START(galaxygame_state::galaxygame_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0xfec0, 0xfecf) AM_READWRITE(ke_r, ke_w)
-	AM_RANGE(0xff52, 0xff53) AM_READWRITE(y_r, y_w) // 177522 Y
-	AM_RANGE(0xff54, 0xff55) AM_READ_PORT("COINAC") // 177524 COINAC
-	AM_RANGE(0xff5a, 0xff5b) AM_READWRITE(x_r, x_w) // 177532 X
-	AM_RANGE(0xff5c, 0xff5d) AM_READ_PORT("SR")     // 177534 SR
-	AM_RANGE(0xff66, 0xff67) AM_WRITE(clk_w)        // 177546 KW11 line frequency clock
-ADDRESS_MAP_END
+void galaxygame_state::galaxygame_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0xfec0, 0xfecf).rw(this, FUNC(galaxygame_state::ke_r), FUNC(galaxygame_state::ke_w));
+	map(0xff52, 0xff53).rw(this, FUNC(galaxygame_state::y_r), FUNC(galaxygame_state::y_w)); // 177522 Y
+	map(0xff54, 0xff55).portr("COINAC"); // 177524 COINAC
+	map(0xff5a, 0xff5b).rw(this, FUNC(galaxygame_state::x_r), FUNC(galaxygame_state::x_w)); // 177532 X
+	map(0xff5c, 0xff5d).portr("SR");     // 177534 SR
+	map(0xff66, 0xff67).w(this, FUNC(galaxygame_state::clk_w));        // 177546 KW11 line frequency clock
+}
 
 
 IRQ_CALLBACK_MEMBER(galaxygame_state::galaxygame_irq_callback)

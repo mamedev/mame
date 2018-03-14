@@ -436,69 +436,74 @@ CUSTOM_INPUT_MEMBER(zaxxon_state::zaxxon_coin_r)
  *************************************/
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(zaxxon_state::zaxxon_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM_WRITE(zaxxon_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x1f00) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x18fc) AM_READ_PORT("SW00")
-	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x18fc) AM_READ_PORT("SW01")
-	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x18fc) AM_READ_PORT("DSW02")
-	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x18fc) AM_READ_PORT("DSW03")
-	AM_RANGE(0xc100, 0xc100) AM_MIRROR(0x18ff) AM_READ_PORT("SW100")
-	AM_RANGE(0xc000, 0xc007) AM_MIRROR(0x18f8) AM_DEVWRITE("mainlatch1", ls259_device, write_d0)
-	AM_RANGE(0xe03c, 0xe03f) AM_MIRROR(0x1f00) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0xe0f0, 0xe0f3) AM_MIRROR(0x1f00) AM_SELECT(0x0008) AM_WRITE(zaxxon_control_w)
-ADDRESS_MAP_END
+void zaxxon_state::zaxxon_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram();
+	map(0x8000, 0x83ff).mirror(0x1c00).ram().w(this, FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
+	map(0xa000, 0xa0ff).mirror(0x1f00).ram().share("spriteram");
+	map(0xc000, 0xc000).mirror(0x18fc).portr("SW00");
+	map(0xc001, 0xc001).mirror(0x18fc).portr("SW01");
+	map(0xc002, 0xc002).mirror(0x18fc).portr("DSW02");
+	map(0xc003, 0xc003).mirror(0x18fc).portr("DSW03");
+	map(0xc100, 0xc100).mirror(0x18ff).portr("SW100");
+	map(0xc000, 0xc007).mirror(0x18f8).w("mainlatch1", FUNC(ls259_device::write_d0));
+	map(0xe03c, 0xe03f).mirror(0x1f00).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe0f0, 0xe0f3).mirror(0x1f00).select(0x0008).w(this, FUNC(zaxxon_state::zaxxon_control_w));
+}
 
-ADDRESS_MAP_START(zaxxon_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void zaxxon_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom().share("decrypted_opcodes");
+}
 
 /* derived from Zaxxon, different sound hardware */
-ADDRESS_MAP_START(zaxxon_state::ixion_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM_WRITE(zaxxon_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x1f00) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x18fc) AM_READ_PORT("SW00")
-	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x18fc) AM_READ_PORT("SW01")
-	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x18fc) AM_READ_PORT("DSW02")
-	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x18fc) AM_READ_PORT("DSW03")
-	AM_RANGE(0xc100, 0xc100) AM_MIRROR(0x18ff) AM_READ_PORT("SW100")
-	AM_RANGE(0xc000, 0xc007) AM_MIRROR(0x18f8) AM_DEVWRITE("mainlatch1", ls259_device, write_d0)
-	AM_RANGE(0xe03c, 0xe03c) AM_MIRROR(0x1f00) AM_DEVREADWRITE("usbsnd", usb_sound_device, status_r, data_w)
-	AM_RANGE(0xe0f0, 0xe0f3) AM_MIRROR(0x1f00) AM_SELECT(0x0008) AM_WRITE(zaxxon_control_w)
-ADDRESS_MAP_END
+void zaxxon_state::ixion_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram();
+	map(0x8000, 0x83ff).mirror(0x1c00).ram().w(this, FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
+	map(0xa000, 0xa0ff).mirror(0x1f00).ram().share("spriteram");
+	map(0xc000, 0xc000).mirror(0x18fc).portr("SW00");
+	map(0xc001, 0xc001).mirror(0x18fc).portr("SW01");
+	map(0xc002, 0xc002).mirror(0x18fc).portr("DSW02");
+	map(0xc003, 0xc003).mirror(0x18fc).portr("DSW03");
+	map(0xc100, 0xc100).mirror(0x18ff).portr("SW100");
+	map(0xc000, 0xc007).mirror(0x18f8).w("mainlatch1", FUNC(ls259_device::write_d0));
+	map(0xe03c, 0xe03c).mirror(0x1f00).rw("usbsnd", FUNC(usb_sound_device::status_r), FUNC(usb_sound_device::data_w));
+	map(0xe0f0, 0xe0f3).mirror(0x1f00).select(0x0008).w(this, FUNC(zaxxon_state::zaxxon_control_w));
+}
 
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(zaxxon_state::congo_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1800) AM_RAM_WRITE(zaxxon_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xa400, 0xa7ff) AM_MIRROR(0x1800) AM_RAM_WRITE(congo_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fc4) AM_READ_PORT("SW00")
-	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x1fc4) AM_READ_PORT("SW01")
-	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW02")
-	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW03")
-	AM_RANGE(0xc008, 0xc008) AM_MIRROR(0x1fc7) AM_READ_PORT("SW100")
-	AM_RANGE(0xc018, 0xc01f) AM_MIRROR(0x1fc0) AM_DEVWRITE("mainlatch1", ls259_device, write_d0)
-	AM_RANGE(0xc020, 0xc027) AM_MIRROR(0x1fc0) AM_DEVWRITE("mainlatch2", ls259_device, write_d0)
-	AM_RANGE(0xc028, 0xc029) AM_MIRROR(0x1fc4) AM_WRITE(bg_position_w)
-	AM_RANGE(0xc030, 0xc033) AM_MIRROR(0x1fc4) AM_WRITE(congo_sprite_custom_w)
-	AM_RANGE(0xc038, 0xc03f) AM_MIRROR(0x1fc0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void zaxxon_state::congo_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram();
+	map(0xa000, 0xa3ff).mirror(0x1800).ram().w(this, FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
+	map(0xa400, 0xa7ff).mirror(0x1800).ram().w(this, FUNC(zaxxon_state::congo_colorram_w)).share("colorram");
+	map(0xc000, 0xc000).mirror(0x1fc4).portr("SW00");
+	map(0xc001, 0xc001).mirror(0x1fc4).portr("SW01");
+	map(0xc002, 0xc002).mirror(0x1fc4).portr("DSW02");
+	map(0xc003, 0xc003).mirror(0x1fc4).portr("DSW03");
+	map(0xc008, 0xc008).mirror(0x1fc7).portr("SW100");
+	map(0xc018, 0xc01f).mirror(0x1fc0).w("mainlatch1", FUNC(ls259_device::write_d0));
+	map(0xc020, 0xc027).mirror(0x1fc0).w("mainlatch2", FUNC(ls259_device::write_d0));
+	map(0xc028, 0xc029).mirror(0x1fc4).w(this, FUNC(zaxxon_state::bg_position_w));
+	map(0xc030, 0xc033).mirror(0x1fc4).w(this, FUNC(zaxxon_state::congo_sprite_custom_w));
+	map(0xc038, 0xc03f).mirror(0x1fc0).w("soundlatch", FUNC(generic_latch_8_device::write));
+}
 
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(zaxxon_state::congo_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn2", sn76489a_device, write)
-ADDRESS_MAP_END
+void zaxxon_state::congo_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x47ff).mirror(0x1800).ram();
+	map(0x6000, 0x6000).mirror(0x1fff).w("sn1", FUNC(sn76489a_device::write));
+	map(0x8000, 0x8003).mirror(0x1ffc).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa000, 0xa000).mirror(0x1fff).w("sn2", FUNC(sn76489a_device::write));
+}
 
 
 

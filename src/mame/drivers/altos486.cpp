@@ -24,10 +24,9 @@ public:
 		m_rom(*this, "bios")
 	{ }
 
-	required_device<i80186_cpu_device> m_maincpu;
-	required_shared_ptr<uint16_t> m_ram;
-	required_memory_region m_rom;
+	void altos486(machine_config &config);
 
+protected:
 	DECLARE_READ8_MEMBER(read_rmx_ack);
 
 	DECLARE_READ16_MEMBER(mmu_ram_r);
@@ -36,14 +35,18 @@ public:
 	DECLARE_WRITE16_MEMBER(mmu_io_w);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	bool m_sys_mode;
-	uint8_t m_prot[256];
-	uint16_t m_viol[16];
-	void altos486(machine_config &config);
 	void altos486_io(address_map &map);
 	void altos486_mem(address_map &map);
 	void altos486_z80_io(address_map &map);
 	void altos486_z80_mem(address_map &map);
+
+private:
+	required_device<i80186_cpu_device> m_maincpu;
+	required_shared_ptr<uint16_t> m_ram;
+	required_memory_region m_rom;
+
+	bool m_sys_mode;
+	uint8_t m_prot[256];
 };
 
 READ8_MEMBER(altos486_state::read_rmx_ack)
@@ -102,27 +105,31 @@ static SLOT_INTERFACE_START( altos486_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-ADDRESS_MAP_START(altos486_state::altos486_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mmu_ram_r, mmu_ram_w) AM_SHARE("main_ram")
-ADDRESS_MAP_END
+void altos486_state::altos486_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xfffff).rw(this, FUNC(altos486_state::mmu_ram_r), FUNC(altos486_state::mmu_ram_w)).share("main_ram");
+}
 
-ADDRESS_MAP_START(altos486_state::altos486_io)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_io_r, mmu_io_w)
-ADDRESS_MAP_END
+void altos486_state::altos486_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(altos486_state::mmu_io_r), FUNC(altos486_state::mmu_io_w));
+}
 
-ADDRESS_MAP_START(altos486_state::altos486_z80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("iocpu", 0)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
+void altos486_state::altos486_z80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom().region("iocpu", 0);
+	map(0x2000, 0x27ff).ram();
 	//AM_RANGE(0x8000, 0xffff) AM_READWRITE(z80_shared_r, z80_shared_w)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(altos486_state::altos486_z80_io)
+void altos486_state::altos486_z80_io(address_map &map)
+{
 	//AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("sio0", z80sio0_device, read, write)
 	//AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("sio1", z80sio0_device, read, write)
 	//AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("sio2", z80sio0_device, read, write)
-ADDRESS_MAP_END
+}
 
 MACHINE_CONFIG_START(altos486_state::altos486)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL(8'000'000))

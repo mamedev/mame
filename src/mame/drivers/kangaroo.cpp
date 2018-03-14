@@ -251,17 +251,18 @@ WRITE8_MEMBER(kangaroo_state::kangaroo_coin_counter_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(kangaroo_state::main_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(kangaroo_videoram_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM
-	AM_RANGE(0xe400, 0xe400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW0")
-	AM_RANGE(0xe800, 0xe80a) AM_MIRROR(0x03f0) AM_WRITE(kangaroo_video_control_w) AM_SHARE("video_control")
-	AM_RANGE(0xec00, 0xec00) AM_MIRROR(0x00ff) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xed00, 0xed00) AM_MIRROR(0x00ff) AM_READ_PORT("IN1") AM_WRITE(kangaroo_coin_counter_w)
-	AM_RANGE(0xee00, 0xee00) AM_MIRROR(0x00ff) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
+void kangaroo_state::main_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x8000, 0xbfff).w(this, FUNC(kangaroo_state::kangaroo_videoram_w));
+	map(0xc000, 0xdfff).bankr("bank1");
+	map(0xe000, 0xe3ff).ram();
+	map(0xe400, 0xe400).mirror(0x03ff).portr("DSW0");
+	map(0xe800, 0xe80a).mirror(0x03f0).w(this, FUNC(kangaroo_state::kangaroo_video_control_w)).share("video_control");
+	map(0xec00, 0xec00).mirror(0x00ff).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xed00, 0xed00).mirror(0x00ff).portr("IN1").w(this, FUNC(kangaroo_state::kangaroo_coin_counter_w));
+	map(0xee00, 0xee00).mirror(0x00ff).portr("IN2");
+}
 
 
 
@@ -271,23 +272,25 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(kangaroo_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-ADDRESS_MAP_END
+void kangaroo_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x4000, 0x43ff).mirror(0x0c00).ram();
+	map(0x6000, 0x6000).mirror(0x0fff).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x7000, 0x7000).mirror(0x0fff).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x8000, 0x8000).mirror(0x0fff).w("aysnd", FUNC(ay8910_device::address_w));
+}
 
 
 /* yes, this is identical */
-ADDRESS_MAP_START(kangaroo_state::sound_portmap)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-ADDRESS_MAP_END
+void kangaroo_state::sound_portmap(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x4000, 0x43ff).mirror(0x0c00).ram();
+	map(0x6000, 0x6000).mirror(0x0fff).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x7000, 0x7000).mirror(0x0fff).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x8000, 0x8000).mirror(0x0fff).w("aysnd", FUNC(ay8910_device::address_w));
+}
 
 
 

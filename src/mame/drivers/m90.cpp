@@ -25,7 +25,9 @@
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/irem_cpu.h"
+#include "machine/rstbuf.h"
 #include "sound/dac.h"
 #include "sound/ym2151.h"
 #include "sound/volt_reg.h"
@@ -67,86 +69,94 @@ WRITE16_MEMBER(m90_state::unknown_w)
 
 /***************************************************************************/
 
-ADDRESS_MAP_START(m90_state::m90_main_cpu_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK("bank1")  /* Quiz F1 only */
-	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_SHARE("video_data")
-	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void m90_state::m90_main_cpu_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0x80000, 0x8ffff).bankr("bank1");  /* Quiz F1 only */
+	map(0xa0000, 0xa3fff).ram();
+	map(0xd0000, 0xdffff).ram().w(this, FUNC(m90_state::m90_video_w)).share("video_data");
+	map(0xe0000, 0xe03ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xffff0, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(m90_state::dynablsb_main_cpu_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-	AM_RANGE(0x6000e, 0x60fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_SHARE("video_data")
-	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void m90_state::dynablsb_main_cpu_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom();
+	map(0x6000e, 0x60fff).ram().share("spriteram");
+	map(0xa0000, 0xa3fff).ram();
+	map(0xd0000, 0xdffff).ram().w(this, FUNC(m90_state::m90_video_w)).share("video_data");
+	map(0xe0000, 0xe03ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xffff0, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(m90_state::bomblord_main_cpu_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
-	AM_RANGE(0xc000e, 0xc0fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_SHARE("video_data")
-	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void m90_state::bomblord_main_cpu_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0xa0000, 0xa3fff).ram();
+	map(0xc000e, 0xc0fff).ram().share("spriteram");
+	map(0xd0000, 0xdffff).ram().w(this, FUNC(m90_state::m90_video_w)).share("video_data");
+	map(0xe0000, 0xe03ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xffff0, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(m90_state::m90_main_cpu_io_map)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("m72", m72_audio_device, sound_command_w, 0x00ff)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x80, 0x8f) AM_WRITE(m90_video_control_w)
-ADDRESS_MAP_END
+void m90_state::m90_main_cpu_io_map(address_map &map)
+{
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x00, 0x01).portr("P1_P2");
+	map(0x02, 0x03).w(this, FUNC(m90_state::m90_coincounter_w));
+	map(0x02, 0x03).portr("SYSTEM");
+	map(0x04, 0x05).portr("DSW");
+	map(0x06, 0x07).portr("P3_P4");
+	map(0x80, 0x8f).w(this, FUNC(m90_state::m90_video_control_w));
+}
 
-ADDRESS_MAP_START(m90_state::dynablsb_main_cpu_io_map)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("SYSTEM")
+void m90_state::dynablsb_main_cpu_io_map(address_map &map)
+{
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x00, 0x01).portr("P1_P2");
+	map(0x02, 0x03).w(this, FUNC(m90_state::m90_coincounter_w));
+	map(0x02, 0x03).portr("SYSTEM");
 //  AM_RANGE(0x04, 0x05) AM_WRITE(unknown_w)      /* dynablsb: write continuously 0x6000 */
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x80, 0x8f) AM_WRITE(m90_video_control_w)
+	map(0x04, 0x05).portr("DSW");
+	map(0x06, 0x07).portr("P3_P4");
+	map(0x80, 0x8f).w(this, FUNC(m90_state::m90_video_control_w));
 //  AM_RANGE(0x90, 0x91) AM_WRITE(unknown_w)
-ADDRESS_MAP_END
+}
 
 /*****************************************************************************/
 
-ADDRESS_MAP_START(m90_state::m90_sound_cpu_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void m90_state::m90_sound_cpu_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(m90_state::m90_sound_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, rtype2_sample_addr_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
-ADDRESS_MAP_END
+void m90_state::m90_sound_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x80, 0x80).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x80, 0x81).w(m_audio, FUNC(m72_audio_device::rtype2_sample_addr_w));
+	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));
+	map(0x83, 0x83).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));
+}
 
-ADDRESS_MAP_START(m90_state::dynablsb_sound_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", dac_byte_interface, write)
-ADDRESS_MAP_END
+void m90_state::dynablsb_sound_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x80, 0x80).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x82, 0x82).w("dac", FUNC(dac_byte_interface::write));
+}
 
-ADDRESS_MAP_START(m90_state::m99_sound_cpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, poundfor_sample_addr_w)
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x42, 0x42) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x42, 0x42) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
-ADDRESS_MAP_END
+void m90_state::m99_sound_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(m_audio, FUNC(m72_audio_device::poundfor_sample_addr_w));
+	map(0x40, 0x41).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x42, 0x42).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+}
 
 /*****************************************************************************/
 
@@ -697,19 +707,16 @@ INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
 		m_audio->sample_w(space,0,sample);
 }
 
-INTERRUPT_GEN_MEMBER(m90_state::m90_interrupt)
+WRITE_LINE_MEMBER(m90_state::dynablsb_vblank_int_w)
 {
-	device.execute().pulse_input_line(NEC_INPUT_LINE_INTP0, device.execute().minimum_quantum_time());
+	if (state)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x60/4);
 }
 
-INTERRUPT_GEN_MEMBER(m90_state::dynablsb_interrupt)
+WRITE_LINE_MEMBER(m90_state::bomblord_vblank_int_w)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x60/4);
-}
-
-INTERRUPT_GEN_MEMBER(m90_state::bomblord_interrupt)
-{
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x50/4);
+	if (state)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x50/4);
 }
 
 
@@ -719,14 +726,13 @@ MACHINE_CONFIG_START(m90_state::m90)
 	MCFG_CPU_ADD("maincpu", V35, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(m90_main_cpu_map)
 	MCFG_CPU_IO_MAP(m90_main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m90_state,  m90_interrupt)
 
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(m90_sound_cpu_map)
 	MCFG_CPU_IO_MAP(m90_sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(m90_state, nmi_line_pulse,  128*60)    /* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -736,6 +742,7 @@ MACHINE_CONFIG_START(m90_state::m90)
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8, 47*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m90_state, screen_update_m90)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", NEC_INPUT_LINE_INTP0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m90)
 	MCFG_PALETTE_ADD("palette", 512)
@@ -745,11 +752,16 @@ MACHINE_CONFIG_START(m90_state::m90)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+
+	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
+	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
 
 	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
 
 	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
 	MCFG_SOUND_ROUTE(0, "speaker", 0.15)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.15)
 
@@ -818,7 +830,6 @@ MACHINE_CONFIG_START(m90_state::bomblord)
 	MCFG_CPU_REPLACE("maincpu", V30, 32000000/4)
 	MCFG_CPU_PROGRAM_MAP(bomblord_main_cpu_map)
 	MCFG_CPU_IO_MAP(m90_main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m90_state,  bomblord_interrupt)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(m99_sound_cpu_io_map)
@@ -827,6 +838,7 @@ MACHINE_CONFIG_START(m90_state::bomblord)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m90_state, screen_update_bomblord)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m90_state, bomblord_vblank_int_w))
 
 	MCFG_VIDEO_START_OVERRIDE(m90_state,bomblord)
 MACHINE_CONFIG_END
@@ -837,23 +849,26 @@ MACHINE_CONFIG_START(m90_state::dynablsb)
 	MCFG_CPU_REPLACE("maincpu", V30, 32000000/4)
 	MCFG_CPU_PROGRAM_MAP(dynablsb_main_cpu_map)
 	MCFG_CPU_IO_MAP(dynablsb_main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m90_state,  dynablsb_interrupt)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(dynablsb_sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(m90_state, irq0_line_hold,  64*60) /* half the sample rate of the original */
+	MCFG_CPU_IRQ_ACKNOWLEDGE_REMOVE()
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(m90_state, screen_update_dynablsb)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m90_state, dynablsb_vblank_int_w))
 
 	MCFG_VIDEO_START_OVERRIDE(m90_state,dynablsb)
 
 	MCFG_DEVICE_REMOVE("m72")
+	MCFG_DEVICE_REMOVE("soundirq")
 
 	MCFG_DEVICE_MODIFY("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(false)
 
 	MCFG_SOUND_MODIFY("ymsnd")
 	MCFG_YM2151_IRQ_HANDLER(NOOP) /* this bootleg polls the YM2151 instead of taking interrupts from it */

@@ -95,42 +95,43 @@ WRITE8_MEMBER(tank8_state::motor_w)
 	m_discrete->write(space, NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
 }
 
-ADDRESS_MAP_START(tank8_state::tank8_cpu_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0400, 0x17ff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_ROM
+void tank8_state::tank8_cpu_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+	map(0x0400, 0x17ff).rom();
+	map(0xf800, 0xffff).rom();
 
-	AM_RANGE(0x1c00, 0x1c00) AM_READ(collision_r)
+	map(0x1c00, 0x1c00).r(this, FUNC(tank8_state::collision_r));
 
-	AM_RANGE(0x1c01, 0x1c01) AM_READ_PORT("P1")
-	AM_RANGE(0x1c02, 0x1c02) AM_READ_PORT("P2")
-	AM_RANGE(0x1c03, 0x1c03) AM_READ_PORT("P3")
-	AM_RANGE(0x1c04, 0x1c04) AM_READ_PORT("P4")
-	AM_RANGE(0x1c05, 0x1c05) AM_READ_PORT("P5")
-	AM_RANGE(0x1c06, 0x1c06) AM_READ_PORT("P6")
-	AM_RANGE(0x1c07, 0x1c07) AM_READ_PORT("P7")
-	AM_RANGE(0x1c08, 0x1c08) AM_READ_PORT("P8")
-	AM_RANGE(0x1c09, 0x1c09) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1c0a, 0x1c0a) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1c0b, 0x1c0b) AM_READ_PORT("RC")
-	AM_RANGE(0x1c0f, 0x1c0f) AM_READ_PORT("VBLANK")
+	map(0x1c01, 0x1c01).portr("P1");
+	map(0x1c02, 0x1c02).portr("P2");
+	map(0x1c03, 0x1c03).portr("P3");
+	map(0x1c04, 0x1c04).portr("P4");
+	map(0x1c05, 0x1c05).portr("P5");
+	map(0x1c06, 0x1c06).portr("P6");
+	map(0x1c07, 0x1c07).portr("P7");
+	map(0x1c08, 0x1c08).portr("P8");
+	map(0x1c09, 0x1c09).portr("DSW1");
+	map(0x1c0a, 0x1c0a).portr("DSW2");
+	map(0x1c0b, 0x1c0b).portr("RC");
+	map(0x1c0f, 0x1c0f).portr("VBLANK");
 
-	AM_RANGE(0x1800, 0x1bff) AM_WRITE(video_ram_w) AM_SHARE("video_ram")
-	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_SHARE("pos_h_ram")
-	AM_RANGE(0x1c10, 0x1c1f) AM_WRITEONLY AM_SHARE("pos_v_ram")
-	AM_RANGE(0x1c20, 0x1c2f) AM_WRITEONLY AM_SHARE("pos_d_ram")
+	map(0x1800, 0x1bff).w(this, FUNC(tank8_state::video_ram_w)).share("video_ram");
+	map(0x1c00, 0x1c0f).writeonly().share("pos_h_ram");
+	map(0x1c10, 0x1c1f).writeonly().share("pos_v_ram");
+	map(0x1c20, 0x1c2f).writeonly().share("pos_d_ram");
 
-	AM_RANGE(0x1c30, 0x1c37) AM_WRITE(lockout_w)
-	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(int_reset_w)
-	AM_RANGE(0x1d01, 0x1d01) AM_WRITE(crash_w)
-	AM_RANGE(0x1d02, 0x1d02) AM_WRITE(explosion_w)
-	AM_RANGE(0x1d03, 0x1d03) AM_WRITE(bugle_w)
-	AM_RANGE(0x1d04, 0x1d04) AM_WRITE(bug_w)
-	AM_RANGE(0x1d05, 0x1d05) AM_WRITEONLY AM_SHARE("team")
-	AM_RANGE(0x1d06, 0x1d06) AM_WRITE(attract_w)
-	AM_RANGE(0x1e00, 0x1e07) AM_WRITE(motor_w)
+	map(0x1c30, 0x1c37).w(this, FUNC(tank8_state::lockout_w));
+	map(0x1d00, 0x1d00).w(this, FUNC(tank8_state::int_reset_w));
+	map(0x1d01, 0x1d01).w(this, FUNC(tank8_state::crash_w));
+	map(0x1d02, 0x1d02).w(this, FUNC(tank8_state::explosion_w));
+	map(0x1d03, 0x1d03).w(this, FUNC(tank8_state::bugle_w));
+	map(0x1d04, 0x1d04).w(this, FUNC(tank8_state::bug_w));
+	map(0x1d05, 0x1d05).writeonly().share("team");
+	map(0x1d06, 0x1d06).w(this, FUNC(tank8_state::attract_w));
+	map(0x1e00, 0x1e07).w(this, FUNC(tank8_state::motor_w));
 
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( tank8 )

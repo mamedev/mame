@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "includes/raiden2.h"
 
-
 /******************************************************************************/
 
 void raiden2_state::draw_sprites(const rectangle &cliprect)
@@ -292,6 +291,9 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 
 VIDEO_START_MEMBER(raiden2_state,raiden2)
 {
+	m_screen->register_screen_bitmap(m_tile_buffer);
+	m_screen->register_screen_bitmap(m_sprite_buffer);
+
 	m_back_data = make_unique_clear<uint16_t[]>(0x800/2);
 	m_fore_data =  make_unique_clear<uint16_t[]>(0x800/2);
 	m_mid_data =  make_unique_clear<uint16_t[]>(0x800/2);

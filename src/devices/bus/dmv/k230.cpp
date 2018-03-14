@@ -32,17 +32,19 @@ ROM_START( dmv_k235 )
 	ROM_LOAD( "dmv_int_8088_pic_33473.bin", 0x0000, 0x1000, CRC(104195dc) SHA1(08d48ca3b84ab26c1a764792e04ec4def7dad2ad))
 ROM_END
 
-ADDRESS_MAP_START(dmv_k230_device::k230_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00000, 0x7ffff ) AM_READWRITE(program_r, program_w)
-	AM_RANGE( 0x80000, 0xfffff ) AM_READ(rom_r)
-ADDRESS_MAP_END
+void dmv_k230_device::k230_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x7ffff).rw(this, FUNC(dmv_k230_device::program_r), FUNC(dmv_k230_device::program_w));
+	map(0x80000, 0xfffff).r(this, FUNC(dmv_k230_device::rom_r));
+}
 
-ADDRESS_MAP_START(dmv_k230_device::k230_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0xff ) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void dmv_k230_device::k230_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(this, FUNC(dmv_k230_device::io_r), FUNC(dmv_k230_device::io_w));
+}
 
 ADDRESS_MAP_START(dmv_k230_device::k234_mem)
 	ADDRESS_MAP_UNMAP_HIGH

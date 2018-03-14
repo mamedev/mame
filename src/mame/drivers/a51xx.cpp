@@ -40,27 +40,31 @@ public:
 };
 
 
-ADDRESS_MAP_START(a51xx_state::a5120_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x03ff ) AM_ROM
-	AM_RANGE( 0x0400, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void a51xx_state::a5120_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom();
+	map(0x0400, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(a51xx_state::a5120_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void a51xx_state::a5120_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
-ADDRESS_MAP_START(a51xx_state::a5130_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
-	AM_RANGE( 0x1000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void a51xx_state::a5130_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(a51xx_state::a5130_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void a51xx_state::a5130_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 
 /* Input ports */

@@ -339,35 +339,37 @@ WRITE8_MEMBER(dblcrown_state::watchdog_w)
 }
 
 
-ADDRESS_MAP_START(dblcrown_state::dblcrown_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("rom_bank")
-	AM_RANGE(0xa000, 0xb7ff) AM_RAM // work ram
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(vram_r, vram_w)
-	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(palette_r, palette_w)
-	AM_RANGE(0xfe00, 0xfeff) AM_RAM // ???
-	AM_RANGE(0xff00, 0xffff) AM_RAM // ???, intentional fall-through
-	AM_RANGE(0xff00, 0xff01) AM_READWRITE(vram_bank_r, vram_bank_w)
-	AM_RANGE(0xff04, 0xff04) AM_READWRITE(irq_source_r,irq_source_w)
+void dblcrown_state::dblcrown_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("rom_bank");
+	map(0xa000, 0xb7ff).ram(); // work ram
+	map(0xb800, 0xbfff).ram().share("nvram");
+	map(0xc000, 0xdfff).rw(this, FUNC(dblcrown_state::vram_r), FUNC(dblcrown_state::vram_w));
+	map(0xf000, 0xf1ff).rw(this, FUNC(dblcrown_state::palette_r), FUNC(dblcrown_state::palette_w));
+	map(0xfe00, 0xfeff).ram(); // ???
+	map(0xff00, 0xffff).ram(); // ???, intentional fall-through
+	map(0xff00, 0xff01).rw(this, FUNC(dblcrown_state::vram_bank_r), FUNC(dblcrown_state::vram_bank_w));
+	map(0xff04, 0xff04).rw(this, FUNC(dblcrown_state::irq_source_r), FUNC(dblcrown_state::irq_source_w));
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(dblcrown_state::dblcrown_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSWB")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSWC")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSWD")
-	AM_RANGE(0x04, 0x04) AM_READ(in_mux_r)
-	AM_RANGE(0x05, 0x05) AM_READ(in_mux_type_r)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ymz", ymz284_device, address_data_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(watchdog_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(output_w)
-ADDRESS_MAP_END
+void dblcrown_state::dblcrown_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x00).portr("DSWA");
+	map(0x01, 0x01).portr("DSWB");
+	map(0x02, 0x02).portr("DSWC");
+	map(0x03, 0x03).portr("DSWD");
+	map(0x04, 0x04).r(this, FUNC(dblcrown_state::in_mux_r));
+	map(0x05, 0x05).r(this, FUNC(dblcrown_state::in_mux_type_r));
+	map(0x10, 0x13).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x20, 0x21).w("ymz", FUNC(ymz284_device::address_data_w));
+	map(0x30, 0x30).w(this, FUNC(dblcrown_state::watchdog_w));
+	map(0x40, 0x40).w(this, FUNC(dblcrown_state::output_w));
+}
 
 static INPUT_PORTS_START( dblcrown )
 	PORT_START("IN0")

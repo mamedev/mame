@@ -428,12 +428,10 @@ test1f diagnostic hacks:
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
 #include "cpu/sh/sh2.h"
-#include "imagedev/chd_cd.h"
 #include "machine/nvram.h"
 #include "machine/smpc.h"
 #include "machine/stvcd.h"
 #include "machine/saturn_cdb.h"
-#include "sound/cdda.h"
 #include "sound/scsp.h"
 #include "video/stvvdp1.h"
 #include "video/stvvdp2.h"
@@ -443,7 +441,8 @@ test1f diagnostic hacks:
 #include "bus/saturn/rom.h"
 #include "bus/saturn/sat_slot.h"
 
-#include "screen.h"
+#include "bus/sat_ctrl/ctrl.h"
+
 #include "softlist.h"
 #include "speaker.h"
 
@@ -456,6 +455,7 @@ public:
 		: saturn_state(mconfig, type, tag)
 		, m_exp(*this, "exp")
 		, m_nvram(*this, "nvram")
+		, m_stvcd(*this, "stvcd")
 		, m_ctrl1(*this, "ctrl1")
 		, m_ctrl2(*this, "ctrl2")
 	{ }
@@ -489,6 +489,7 @@ public:
 
 	required_device<sat_cart_slot_device> m_exp;
 	required_device<nvram_device> m_nvram;
+	required_device<stvcd_device> m_stvcd;
 
 	required_device<saturn_control_port_device> m_ctrl1;
 	required_device<saturn_control_port_device> m_ctrl2;
@@ -517,52 +518,54 @@ READ32_MEMBER( sat_console_state::abus_dummy_r )
 	return -1;
 }
 
-ADDRESS_MAP_START(sat_console_state::saturn_mem)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_MIRROR(0x20000000) AM_REGION("bios", 0) AM_WRITENOP // bios
-	AM_RANGE(0x00100000, 0x0010007f) AM_DEVREADWRITE8("smpc", smpc_hle_device, read, write, 0xffffffff)
-	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r, saturn_backupram_w,0xffffffff) AM_SHARE("share1")
-	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("workram_l")
-	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(saturn_minit_w)
-	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(saturn_sinit_w)
+void sat_console_state::saturn_mem(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom().mirror(0x20000000).region("bios", 0).nopw(); // bios
+	map(0x00100000, 0x0010007f).rw(m_smpc_hle, FUNC(smpc_hle_device::read), FUNC(smpc_hle_device::write));
+	map(0x00180000, 0x0018ffff).rw(this, FUNC(sat_console_state::saturn_backupram_r), FUNC(sat_console_state::saturn_backupram_w)).share("share1");
+	map(0x00200000, 0x002fffff).ram().mirror(0x20100000).share("workram_l");
+	map(0x01000000, 0x017fffff).w(this, FUNC(sat_console_state::saturn_minit_w));
+	map(0x01800000, 0x01ffffff).w(this, FUNC(sat_console_state::saturn_sinit_w));
 //  AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_MIRROR(0x20000000) // Cartridge area
 //  AM_RANGE(0x02400000, 0x027fffff) AM_RAM // External Data RAM area
 //  AM_RANGE(0x04000000, 0x047fffff) AM_RAM // External Battery RAM area
-	AM_RANGE(0x04fffffc, 0x04ffffff) AM_READ8(saturn_cart_type_r,0x000000ff)
-	AM_RANGE(0x05000000, 0x057fffff) AM_READ(abus_dummy_r)
-	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
+	map(0x04ffffff, 0x04ffffff).r(this, FUNC(sat_console_state::saturn_cart_type_r));
+	map(0x05000000, 0x057fffff).r(this, FUNC(sat_console_state::abus_dummy_r));
+	map(0x05800000, 0x0589ffff).rw(m_stvcd, FUNC(stvcd_device::stvcd_r), FUNC(stvcd_device::stvcd_w));
 	/* Sound */
-	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
-	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16("scsp", scsp_device, read, write, 0xffffffff)
+	map(0x05a00000, 0x05a7ffff).rw(this, FUNC(sat_console_state::saturn_soundram_r), FUNC(sat_console_state::saturn_soundram_w));
+	map(0x05b00000, 0x05b00fff).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
 	/* VDP1 */
-	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
-	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
-	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE16(saturn_vdp1_regs_r, saturn_vdp1_regs_w,0xffffffff)
-	AM_RANGE(0x05e00000, 0x05e7ffff) AM_MIRROR(0x80000) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
-	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
-	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
-	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_DEVICE("scu", sega_scu_device, regs_map ) //AM_READWRITE(saturn_scu_r, saturn_scu_w)
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
-	AM_RANGE(0x45000000, 0x46ffffff) AM_WRITENOP
-	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP // cache address array
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array, Dragon Ball Z sprites relies on this
-ADDRESS_MAP_END
+	map(0x05c00000, 0x05c7ffff).rw(this, FUNC(sat_console_state::saturn_vdp1_vram_r), FUNC(sat_console_state::saturn_vdp1_vram_w));
+	map(0x05c80000, 0x05cbffff).rw(this, FUNC(sat_console_state::saturn_vdp1_framebuffer0_r), FUNC(sat_console_state::saturn_vdp1_framebuffer0_w));
+	map(0x05d00000, 0x05d0001f).rw(this, FUNC(sat_console_state::saturn_vdp1_regs_r), FUNC(sat_console_state::saturn_vdp1_regs_w));
+	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(this, FUNC(sat_console_state::saturn_vdp2_vram_r), FUNC(sat_console_state::saturn_vdp2_vram_w));
+	map(0x05f00000, 0x05f7ffff).rw(this, FUNC(sat_console_state::saturn_vdp2_cram_r), FUNC(sat_console_state::saturn_vdp2_cram_w));
+	map(0x05f80000, 0x05fbffff).rw(this, FUNC(sat_console_state::saturn_vdp2_regs_r), FUNC(sat_console_state::saturn_vdp2_regs_w));
+	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(sega_scu_device::regs_map)); //AM_READWRITE(saturn_scu_r, saturn_scu_w)
+	map(0x06000000, 0x060fffff).ram().mirror(0x21f00000).share("workram_h");
+	map(0x45000000, 0x46ffffff).nopw();
+	map(0x60000000, 0x600003ff).nopw(); // cache address array
+	map(0xc0000000, 0xc0000fff).ram(); // cache data array, Dragon Ball Z sprites relies on this
+}
 
-ADDRESS_MAP_START(sat_console_state::sound_mem)
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("sound_ram")
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_device, read, write)
-ADDRESS_MAP_END
+void sat_console_state::sound_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("sound_ram");
+	map(0x100000, 0x100fff).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
+}
 
 
 INPUT_CHANGED_MEMBER(sat_console_state::tray_open)
 {
 	if(newval)
-		stvcd_set_tray_open();
+		m_stvcd->set_tray_open();
 }
 
 INPUT_CHANGED_MEMBER(sat_console_state::tray_close)
 {
 	if(newval)
-		stvcd_set_tray_close();
+		m_stvcd->set_tray_close();
 }
 
 static INPUT_PORTS_START( saturn )
@@ -655,8 +658,6 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	save_item(NAME(m_scsp_last_line));
 	save_item(NAME(m_vdp2.odd));
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&sat_console_state::stvcd_exit, this));
-
 	// TODO: trampoline
 	m_audiocpu->set_reset_callback(write_line_delegate(FUNC(saturn_state::m68k_reset_callback),this));
 }
@@ -686,8 +687,6 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 
 	m_maincpu->set_unscaled_clock(MASTER_CLOCK_320/2);
 	m_slave->set_unscaled_clock(MASTER_CLOCK_320/2);
-
-	stvcd_reset();
 
 	m_vdp2.old_crmd = -1;
 	m_vdp2.old_tvmd = -1;
@@ -801,13 +800,14 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
 	MCFG_SEGA_SCU_ADD("scu")
-	sega_scu_device::static_set_hostcpu(*device, "maincpu");
+	downcast<sega_scu_device &>(*device).set_hostcpu("maincpu");
 
 //  SH-1
 
 //  SMPC MCU, running at 4 MHz (+ custom RTC device that runs at 32.768 KHz)
 	MCFG_SMPC_HLE_ADD("smpc", XTAL(4'000'000))
-	smpc_hle_device::static_set_control_port_tags(*device, "ctrl1", "ctrl2");
+	MCFG_SMPC_HLE_SCREEN("screen")
+	MCFG_SMPC_HLE_CONTROL_PORTS("ctrl1", "ctrl2")
 	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(sat_console_state, saturn_pdr1_direct_r))
 	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(sat_console_state, saturn_pdr2_direct_r))
 	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(sat_console_state, saturn_pdr1_direct_w))
@@ -826,9 +826,6 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", sat_console_state, nvram_init)
 
-	MCFG_TIMER_DRIVER_ADD("sector_timer", sat_console_state, stv_sector_cb)
-	MCFG_TIMER_DRIVER_ADD("sh1_cmd", sat_console_state, stv_sh1_sim)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_320/8, 427, 0, 320, 263, 0, 224)
@@ -844,12 +841,13 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_SOUND_ADD("scsp", SCSP, 0)
 	MCFG_SCSP_IRQ_CB(WRITE8(saturn_state, scsp_irq))
 	MCFG_SCSP_MAIN_IRQ_CB(DEVWRITELINE("scu", sega_scu_device, sound_req_w))
+	MCFG_SCSP_EXTS_CB(DEVREAD16("stvcd", stvcd_device, channel_volume_r))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("cdda", CDDA, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_DEVICE_ADD("stvcd", STVCD, 0)
+	//MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	//MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl1", saturn_controls, "joypad")
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl2", saturn_controls, "joypad")
@@ -868,8 +866,6 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(sat_console_state::saturnus)
 	saturn(config);
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
@@ -879,14 +875,12 @@ MACHINE_CONFIG_START(sat_console_state::saturnus)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 	MCFG_DEVICE_MODIFY("smpc")
-	smpc_hle_device::static_set_region_code(*device, 4);
+	downcast<smpc_hle_device &>(*device).set_region_code(4);
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sat_console_state::saturneu)
 	saturn(config);
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
@@ -896,13 +890,11 @@ MACHINE_CONFIG_START(sat_console_state::saturneu)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 	MCFG_DEVICE_MODIFY("smpc")
-	smpc_hle_device::static_set_region_code(*device, 12);
+	downcast<smpc_hle_device &>(*device).set_region_code(12);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sat_console_state::saturnjp)
 	saturn(config);
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
@@ -912,13 +904,12 @@ MACHINE_CONFIG_START(sat_console_state::saturnjp)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 	MCFG_DEVICE_MODIFY("smpc")
-	smpc_hle_device::static_set_region_code(*device, 1);
+	downcast<smpc_hle_device &>(*device).set_region_code(1);
 MACHINE_CONFIG_END
 
 
 void sat_console_state::saturn_init_driver(int rgn)
 {
-//  m_saturn_region = rgn;
 	m_vdp2.pal = (rgn == 12) ? 1 : 0;
 
 	// set compatible options

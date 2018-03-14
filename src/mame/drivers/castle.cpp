@@ -67,13 +67,15 @@ protected:
 };
 
 
-ADDRESS_MAP_START(castle_state::V1rvE_mastermap)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void castle_state::V1rvE_mastermap(address_map &map)
+{
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(castle_state::V1rvE_slavemap)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void castle_state::V1rvE_slavemap(address_map &map)
+{
+	map(0x8000, 0xffff).rom();
+}
 
 
 
@@ -91,9 +93,10 @@ MACHINE_CONFIG_END
 
 
 
-ADDRESS_MAP_START(castle_state::V2rvA_map)
-	AM_RANGE(0x2000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void castle_state::V2rvA_map(address_map &map)
+{
+	map(0x2000, 0xffff).rom();
+}
 
 
 MACHINE_CONFIG_START(castle_state::castle_V2rvA)

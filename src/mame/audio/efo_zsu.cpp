@@ -83,34 +83,37 @@ WRITE8_MEMBER(efo_zsu_device::sound_command_w)
 
 
 
-ADDRESS_MAP_START(efo_zsu_device::zsu_map)
-	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("rombank")
-ADDRESS_MAP_END
+void efo_zsu_device::zsu_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x77ff).mirror(0x0800).ram();
+	map(0x8000, 0xffff).bankr("rombank");
+}
 
-ADDRESS_MAP_START(cedar_magnet_sound_device::cedar_magnet_sound_map)
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void cedar_magnet_sound_device::cedar_magnet_sound_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram().share("ram");
+}
 
-ADDRESS_MAP_START(efo_zsu_device::zsu_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
+void efo_zsu_device::zsu_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
 
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ctc0", z80ctc_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write)
+	map(0x00, 0x03).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x04, 0x07).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
-	AM_RANGE(0x08, 0x08) AM_WRITE(adpcm_fifo_w)
+	map(0x08, 0x08).w(this, FUNC(efo_zsu_device::adpcm_fifo_w));
 
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("aysnd0", ay8910_device, address_w)
-	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE("aysnd0", ay8910_device, data_w)
+	map(0x0c, 0x0c).w("aysnd0", FUNC(ay8910_device::address_w));
+	map(0x0d, 0x0d).w("aysnd0", FUNC(ay8910_device::data_w));
 
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("aysnd1", ay8910_device, address_w)
-	AM_RANGE(0x11, 0x11) AM_DEVWRITE("aysnd1", ay8910_device, data_w)
+	map(0x10, 0x10).w("aysnd1", FUNC(ay8910_device::address_w));
+	map(0x11, 0x11).w("aysnd1", FUNC(ay8910_device::data_w));
 
-	AM_RANGE(0x14, 0x14) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	map(0x14, 0x14).r("soundlatch", FUNC(generic_latch_8_device::read));
 
-ADDRESS_MAP_END
+}
 
 WRITE8_MEMBER(efo_zsu_device::adpcm_fifo_w)
 {

@@ -646,24 +646,26 @@ READ8_MEMBER( avt_state::avt_6845_data_r )
 *********************************************/
 
 /* avtnfl, avtbingo */
-ADDRESS_MAP_START(avt_state::avt_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM // AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(avt_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(avt_colorram_w) AM_SHARE("colorram")
-ADDRESS_MAP_END
+void avt_state::avt_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x7fff).ram();
+	map(0x8000, 0x9fff).ram(); // AM_SHARE("nvram")
+	map(0xa000, 0xa7ff).ram().w(this, FUNC(avt_state::avt_videoram_w)).share("videoram");
+	map(0xc000, 0xc7ff).ram().w(this, FUNC(avt_state::avt_colorram_w)).share("colorram");
+}
 
-ADDRESS_MAP_START(avt_state::avt_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pio0", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("pio1", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ctc0", z80ctc_device, read, write)
-	AM_RANGE(0x21, 0x21) AM_DEVWRITE("aysnd", ay8910_device, data_w)     /* AY8910 data */
-	AM_RANGE(0x23, 0x23) AM_DEVWRITE("aysnd", ay8910_device, address_w)      /* AY8910 control */
-	AM_RANGE(0x28, 0x28) AM_WRITE(avt_6845_address_w)
-	AM_RANGE(0x29, 0x29) AM_READWRITE(avt_6845_data_r,avt_6845_data_w)
-ADDRESS_MAP_END
+void avt_state::avt_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw(m_pio0, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x08, 0x0b).rw(m_pio1, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x0c, 0x0f).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x21, 0x21).w("aysnd", FUNC(ay8910_device::data_w));     /* AY8910 data */
+	map(0x23, 0x23).w("aysnd", FUNC(ay8910_device::address_w));      /* AY8910 control */
+	map(0x28, 0x28).w(this, FUNC(avt_state::avt_6845_address_w));
+	map(0x29, 0x29).rw(this, FUNC(avt_state::avt_6845_data_r), FUNC(avt_state::avt_6845_data_w));
+}
 
 /* I/O byte R/W
   (from avtbingo)

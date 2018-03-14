@@ -34,33 +34,36 @@ READ8_MEMBER(n8080_state::n8080_shift_r)
 	return m_shift_data >> (8 - m_shift_bits);
 }
 
-ADDRESS_MAP_START(n8080_state::main_cpu_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void n8080_state::main_cpu_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).ram().share("videoram");
+}
 
 
-ADDRESS_MAP_START(n8080_state::helifire_main_cpu_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("colorram")
-ADDRESS_MAP_END
+void n8080_state::helifire_main_cpu_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).ram().share("videoram");
+	map(0xc000, 0xdfff).ram().share("colorram");
+}
 
-ADDRESS_MAP_START(n8080_state::main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ(n8080_shift_r)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN3")
+void n8080_state::main_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).r(this, FUNC(n8080_state::n8080_shift_r));
+	map(0x04, 0x04).portr("IN3");
 
-	AM_RANGE(0x02, 0x02) AM_WRITE(n8080_shift_bits_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(n8080_shift_data_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(n8080_sound_1_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(n8080_sound_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(n8080_video_control_w)
-ADDRESS_MAP_END
+	map(0x02, 0x02).w(this, FUNC(n8080_state::n8080_shift_bits_w));
+	map(0x03, 0x03).w(this, FUNC(n8080_state::n8080_shift_data_w));
+	map(0x04, 0x04).w(this, FUNC(n8080_state::n8080_sound_1_w));
+	map(0x05, 0x05).w(this, FUNC(n8080_state::n8080_sound_2_w));
+	map(0x06, 0x06).w(this, FUNC(n8080_state::n8080_video_control_w));
+}
 
 
 /* Input ports */

@@ -64,115 +64,115 @@
 //**************************************************************************
 
 #define MCFG_MOS6530n_IRQ_CB(_write) \
-	devcb = &mos6530_device_base::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_MOS6530n_IN_PA_CB(_read) \
-	devcb = &mos6530_device_base::set_pa_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_rd_callback(DEVCB_##_read);
 
 #define MCFG_MOS6530n_OUT_PA_CB(_write) \
-	devcb = &mos6530_device_base::set_pa_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_wr_callback(DEVCB_##_write);
 
 #define MCFG_MOS6530n_IN_PB_CB(_read) \
-	devcb = &mos6530_device_base::set_pb_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_rd_callback(DEVCB_##_read);
 
 #define MCFG_MOS6530n_OUT_PB_CB(_write) \
-	devcb = &mos6530_device_base::set_pb_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_wr_callback(DEVCB_##_write);
 
 #define MCFG_MOS6530n_IN_PA0_CB(_read) \
-	devcb = &mos6530_device_base::set_pa_rd_callback<0>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_rd_callback<0>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_IN_PA1_CB(_read) \
-	devcb = &mos6530_device_base::set_pa_rd_callback<1>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_rd_callback<1>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_IN_PA2_CB(_read) \
-	devcb = &mos6530_device_base::set_pa_rd_callback<2>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_rd_callback<2>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_IN_PA3_CB(_read) \
-	devcb = &mos6530_device_base::set_pa_rd_callback<3>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_rd_callback<3>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_IN_PA4_CB(_read) \
-	devcb = &mos6530_device_base::set_pa_rd_callback<4>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_rd_callback<4>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_IN_PA5_CB(_read) \
-	devcb = &mos6530_device_base::set_pa_rd_callback<5>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_rd_callback<5>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_IN_PA6_CB(_read) \
-	devcb = &mos6530_device_base::set_pa_rd_callback<6>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_rd_callback<6>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_IN_PA7_CB(_read) \
-	devcb = &mos6530_device_base::set_pa_rd_callback<7>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_rd_callback<7>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_OUT_PA0_CB(_write) \
-	devcb = &mos6530_device_base::set_pa_wr_callback<0>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_wr_callback<0>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_OUT_PA1_CB(_write) \
-	devcb = &mos6530_device_base::set_pa_wr_callback<1>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_wr_callback<1>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_OUT_PA2_CB(_write) \
-	devcb = &mos6530_device_base::set_pa_wr_callback<2>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_wr_callback<2>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_OUT_PA3_CB(_write) \
-	devcb = &mos6530_device_base::set_pa_wr_callback<3>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_wr_callback<3>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_OUT_PA4_CB(_write) \
-	devcb = &mos6530_device_base::set_pa_wr_callback<4>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_wr_callback<4>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_OUT_PA5_CB(_write) \
-	devcb = &mos6530_device_base::set_pa_wr_callback<5>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_wr_callback<5>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_OUT_PA6_CB(_write) \
-	devcb = &mos6530_device_base::set_pa_wr_callback<6>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_wr_callback<6>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_OUT_PA7_CB(_write) \
-	devcb = &mos6530_device_base::set_pa_wr_callback<7>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pa_wr_callback<7>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_IN_PB0_CB(_read) \
-	devcb = &mos6530_device_base::set_pb_rd_callback<0>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_rd_callback<0>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_IN_PB1_CB(_read) \
-	devcb = &mos6530_device_base::set_pb_rd_callback<1>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_rd_callback<1>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_IN_PB2_CB(_read) \
-	devcb = &mos6530_device_base::set_pb_rd_callback<2>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_rd_callback<2>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_IN_PB3_CB(_read) \
-	devcb = &mos6530_device_base::set_pb_rd_callback<3>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_rd_callback<3>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_IN_PB4_CB(_read) \
-	devcb = &mos6530_device_base::set_pb_rd_callback<4>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_rd_callback<4>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_IN_PB5_CB(_read) \
-	devcb = &mos6530_device_base::set_pb_rd_callback<5>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_rd_callback<5>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_IN_PB6_CB(_read) \
-	devcb = &mos6530_device_base::set_pb_rd_callback<6>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_rd_callback<6>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_IN_PB7_CB(_read) \
-	devcb = &mos6530_device_base::set_pb_rd_callback<7>(*device, DEVCB_##_read);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_rd_callback<7>(DEVCB_##_read);
 
 #define MCFG_MOS6530n_OUT_PB0_CB(_write) \
-	devcb = &mos6530_device_base::set_pb_wr_callback<0>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_wr_callback<0>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_OUT_PB1_CB(_write) \
-	devcb = &mos6530_device_base::set_pb_wr_callback<1>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_wr_callback<1>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_OUT_PB2_CB(_write) \
-	devcb = &mos6530_device_base::set_pb_wr_callback<2>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_wr_callback<2>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_OUT_PB3_CB(_write) \
-	devcb = &mos6530_device_base::set_pb_wr_callback<3>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_wr_callback<3>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_OUT_PB4_CB(_write) \
-	devcb = &mos6530_device_base::set_pb_wr_callback<4>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_wr_callback<4>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_OUT_PB5_CB(_write) \
-	devcb = &mos6530_device_base::set_pb_wr_callback<5>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_wr_callback<5>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_OUT_PB6_CB(_write) \
-	devcb = &mos6530_device_base::set_pb_wr_callback<6>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_wr_callback<6>(DEVCB_##_write);
 
 #define MCFG_MOS6530n_OUT_PB7_CB(_write) \
-	devcb = &mos6530_device_base::set_pb_wr_callback<7>(*device, DEVCB_##_write);
+	devcb = &downcast<mos6530_device_base &>(*device).set_pb_wr_callback<7>(DEVCB_##_write);
 
 
 
@@ -185,15 +185,15 @@
 class mos6530_device_base :  public device_t
 {
 public:
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<mos6530_device_base &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pa_rd_callback(device_t &device, Object &&cb) { return downcast<mos6530_device_base &>(device).m_in8_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pa_wr_callback(device_t &device, Object &&cb) { return downcast<mos6530_device_base &>(device).m_out8_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pb_rd_callback(device_t &device, Object &&cb) { return downcast<mos6530_device_base &>(device).m_in8_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pb_wr_callback(device_t &device, Object &&cb) { return downcast<mos6530_device_base &>(device).m_out8_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> static devcb_base &set_pa_rd_callback(device_t &device, Object &&cb) { return downcast<mos6530_device_base &>(device).m_in_pa_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> static devcb_base &set_pa_wr_callback(device_t &device, Object &&cb) { return downcast<mos6530_device_base &>(device).m_out_pa_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> static devcb_base &set_pb_rd_callback(device_t &device, Object &&cb) { return downcast<mos6530_device_base &>(device).m_in_pb_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> static devcb_base &set_pb_wr_callback(device_t &device, Object &&cb) { return downcast<mos6530_device_base &>(device).m_out_pb_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pa_rd_callback(Object &&cb) { return m_in8_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pa_wr_callback(Object &&cb) { return m_out8_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pb_rd_callback(Object &&cb) { return m_in8_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pb_wr_callback(Object &&cb) { return m_out8_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_pa_rd_callback(Object &&cb) { return m_in_pa_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_pa_wr_callback(Object &&cb) { return m_out_pa_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_pb_rd_callback(Object &&cb) { return m_in_pb_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_pb_wr_callback(Object &&cb) { return m_out_pb_cb[N].set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { pa_w(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { pa_w(1, state); }

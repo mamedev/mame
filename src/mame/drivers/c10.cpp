@@ -52,18 +52,20 @@ private:
 
 
 
-ADDRESS_MAP_START(c10_state::c10_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xf0a1) AM_RAM
-	AM_RANGE(0xf0a2, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void c10_state::c10_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).bankrw("boot");
+	map(0x1000, 0x7fff).ram();
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xf0a1).ram();
+	map(0xf0a2, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(c10_state::c10_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void c10_state::c10_io(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( c10 )

@@ -31,7 +31,6 @@ public:
 	// construction/destruction
 	c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void c2031_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -58,6 +57,8 @@ private:
 	DECLARE_READ8_MEMBER( via1_pb_r );
 	DECLARE_WRITE8_MEMBER( via1_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
+
+	void c2031_mem(address_map &map);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

@@ -5,13 +5,13 @@
 #define MAME_AUDIO_RAD_EU3A05GPIO_H
 
 #define MCFG_RADICA6502_GPIO_READ_PORT0_CB(_devcb) \
-	devcb = &radica6502_gpio_device::set_gpio_read_0_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<radica6502_gpio_device &>(*device).set_gpio_read_0_callback(DEVCB_##_devcb);
 
 #define MCFG_RADICA6502_GPIO_READ_PORT1_CB(_devcb) \
-	devcb = &radica6502_gpio_device::set_gpio_read_1_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<radica6502_gpio_device &>(*device).set_gpio_read_1_callback(DEVCB_##_devcb);
 
 #define MCFG_RADICA6502_GPIO_READ_PORT2_CB(_devcb) \
-	devcb = &radica6502_gpio_device::set_gpio_read_2_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<radica6502_gpio_device &>(*device).set_gpio_read_2_callback(DEVCB_##_devcb);
 
 
 class radica6502_gpio_device : public device_t
@@ -19,9 +19,9 @@ class radica6502_gpio_device : public device_t
 public:
 	radica6502_gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_gpio_read_0_callback(device_t &device, Object &&cb) { return downcast<radica6502_gpio_device &>(device).m_space_read0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_gpio_read_1_callback(device_t &device, Object &&cb) { return downcast<radica6502_gpio_device &>(device).m_space_read1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_gpio_read_2_callback(device_t &device, Object &&cb) { return downcast<radica6502_gpio_device &>(device).m_space_read2_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_gpio_read_0_callback(Object &&cb) { return m_space_read0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_gpio_read_1_callback(Object &&cb) { return m_space_read1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_gpio_read_2_callback(Object &&cb) { return m_space_read2_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(gpio_r);
 	DECLARE_WRITE8_MEMBER(gpio_w);

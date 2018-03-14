@@ -323,32 +323,35 @@ WRITE8_MEMBER(quizpun2_state::soundlatch_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-ADDRESS_MAP_START(quizpun2_state::quizpun2_map)
-	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("bank1")
+void quizpun2_state::quizpun2_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
 
-	AM_RANGE( 0xa000, 0xbfff ) AM_RAM_WRITE(fg_ram_w) AM_SHARE("fg_ram")
-	AM_RANGE( 0xc000, 0xcfff ) AM_RAM_WRITE(bg_ram_w) AM_SHARE("bg_ram")
+	map(0xa000, 0xbfff).ram().w(this, FUNC(quizpun2_state::fg_ram_w)).share("fg_ram");
+	map(0xc000, 0xcfff).ram().w(this, FUNC(quizpun2_state::bg_ram_w)).share("bg_ram");
 
-	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE( 0xe000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+	map(0xd000, 0xd3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(quizpun2_state::quizpun2_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x40, 0x40 ) AM_WRITE(irq_ack)
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE(soundlatch_w)
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE(rombank_w)
-	AM_RANGE( 0x70, 0x70 ) AM_WRITE(scroll_w)
-	AM_RANGE( 0x80, 0x80 ) AM_READ_PORT( "DSW" )
-	AM_RANGE( 0x90, 0x90 ) AM_READ_PORT( "IN0" )
-	AM_RANGE( 0xa0, 0xa0 ) AM_READ_PORT( "IN1" )
-	AM_RANGE( 0xe0, 0xe0 ) AM_READWRITE(quizpun_protection_r, quizpun_protection_w)
-ADDRESS_MAP_END
+void quizpun2_state::quizpun2_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).w(this, FUNC(quizpun2_state::irq_ack));
+	map(0x50, 0x50).w(this, FUNC(quizpun2_state::soundlatch_w));
+	map(0x60, 0x60).w(this, FUNC(quizpun2_state::rombank_w));
+	map(0x70, 0x70).w(this, FUNC(quizpun2_state::scroll_w));
+	map(0x80, 0x80).portr("DSW");
+	map(0x90, 0x90).portr("IN0");
+	map(0xa0, 0xa0).portr("IN1");
+	map(0xe0, 0xe0).rw(this, FUNC(quizpun2_state::quizpun_protection_r), FUNC(quizpun2_state::quizpun_protection_w));
+}
 
-ADDRESS_MAP_START(quizpun2_state::quizpun2_cop_map)
-	AM_RANGE( 0x000, 0x3ff ) AM_ROM AM_REGION("cop", 0)
-ADDRESS_MAP_END
+void quizpun2_state::quizpun2_cop_map(address_map &map)
+{
+	map(0x000, 0x3ff).rom().region("cop", 0);
+}
 
 // quizpun
 
@@ -471,18 +474,20 @@ WRITE8_MEMBER(quizpun2_state::quizpun_68705_port_c_w)
                             Memory Maps - Sound CPU
 ***************************************************************************/
 
-ADDRESS_MAP_START(quizpun2_state::quizpun2_sound_map)
-	AM_RANGE( 0x0000, 0xf7ff ) AM_ROM
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void quizpun2_state::quizpun2_sound_map(address_map &map)
+{
+	map(0x0000, 0xf7ff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(quizpun2_state::quizpun2_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_WRITENOP  // IRQ end
-	AM_RANGE( 0x20, 0x20 ) AM_WRITENOP  // NMI end
-	AM_RANGE( 0x40, 0x40 ) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE( 0x60, 0x61 ) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-ADDRESS_MAP_END
+void quizpun2_state::quizpun2_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopw();  // IRQ end
+	map(0x20, 0x20).nopw();  // NMI end
+	map(0x40, 0x40).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x60, 0x61).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 /***************************************************************************
                                 Input Ports

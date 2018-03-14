@@ -56,34 +56,36 @@ WRITE8_MEMBER(tryout_state::bankswitch_w)
 	membank("bank1")->set_entry(data & 0x01);
 }
 
-ADDRESS_MAP_START(tryout_state::main_cpu)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xc800, 0xc87f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(vram_r, vram_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW")
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("P1")
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P2")
-	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xe301, 0xe301) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xe302, 0xe302) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xe401, 0xe401) AM_WRITE(vram_bankswitch_w)
-	AM_RANGE(0xe402, 0xe404) AM_WRITEONLY AM_SHARE("gfx_control")
-	AM_RANGE(0xe414, 0xe414) AM_WRITE(sound_w)
-	AM_RANGE(0xe417, 0xe417) AM_WRITE(nmi_ack_w)
-	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0xbff0) /* reset vectors */
-ADDRESS_MAP_END
+void tryout_state::main_cpu(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x1000, 0x17ff).ram().w(this, FUNC(tryout_state::videoram_w)).share("videoram");
+	map(0x2000, 0x3fff).bankr("bank1");
+	map(0x4000, 0xbfff).rom();
+	map(0xc800, 0xc87f).ram().share("spriteram");
+	map(0xcc00, 0xcc7f).ram().share("spriteram2");
+	map(0xd000, 0xd7ff).rw(this, FUNC(tryout_state::vram_r), FUNC(tryout_state::vram_w));
+	map(0xe000, 0xe000).portr("DSW");
+	map(0xe001, 0xe001).portr("P1");
+	map(0xe002, 0xe002).portr("P2");
+	map(0xe003, 0xe003).portr("SYSTEM");
+	map(0xe301, 0xe301).w(this, FUNC(tryout_state::flipscreen_w));
+	map(0xe302, 0xe302).w(this, FUNC(tryout_state::bankswitch_w));
+	map(0xe401, 0xe401).w(this, FUNC(tryout_state::vram_bankswitch_w));
+	map(0xe402, 0xe404).writeonly().share("gfx_control");
+	map(0xe414, 0xe414).w(this, FUNC(tryout_state::sound_w));
+	map(0xe417, 0xe417).w(this, FUNC(tryout_state::nmi_ack_w));
+	map(0xfff0, 0xffff).rom().region("maincpu", 0xbff0); /* reset vectors */
+}
 
-ADDRESS_MAP_START(tryout_state::sound_cpu)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(sound_irq_ack_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void tryout_state::sound_cpu(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xd000, 0xd000).w(this, FUNC(tryout_state::sound_irq_ack_w));
+	map(0xc000, 0xffff).rom();
+}
 
 INPUT_CHANGED_MEMBER(tryout_state::coin_inserted)
 {

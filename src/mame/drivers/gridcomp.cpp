@@ -315,36 +315,39 @@ IRQ_CALLBACK_MEMBER(gridcomp_state::irq_callback)
 }
 
 
-ADDRESS_MAP_START(gridcomp_state::grid1101_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xdfe80, 0xdfe83) AM_DEVREADWRITE8("i7220", i7220_device, read, write, 0x00ff)
-	AM_RANGE(0xdfea0, 0xdfeaf) AM_UNMAP // ??
-	AM_RANGE(0xdfec0, 0xdfecf) AM_DEVREADWRITE8("modem", i8255_device, read, write, 0x00ff) // incl. DTMF generator
-	AM_RANGE(0xdff40, 0xdff5f) AM_NOP   // ?? machine ID EAROM, RTC
-	AM_RANGE(0xdff80, 0xdff8f) AM_READWRITE(grid_gpib_r, grid_gpib_w) // TMS9914
-	AM_RANGE(0xdffc0, 0xdffcf) AM_READWRITE(grid_keyb_r, grid_keyb_w) // Intel 8741 MCU
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void gridcomp_state::grid1101_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
+	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
+	map(0xdfec0, 0xdfecf).rw(m_modem, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // incl. DTMF generator
+	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
+	map(0xdff80, 0xdff8f).rw(this, FUNC(gridcomp_state::grid_gpib_r), FUNC(gridcomp_state::grid_gpib_w)); // TMS9914
+	map(0xdffc0, 0xdffcf).rw(this, FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
+	map(0xfc000, 0xfffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(gridcomp_state::grid1121_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x90000, 0x97fff) AM_UNMAP // ?? ROM slot
-	AM_RANGE(0x9ff00, 0x9ff0f) AM_UNMAP // AM_READ(grid_9ff0_r) // ?? ROM?
-	AM_RANGE(0xc0000, 0xcffff) AM_UNMAP // ?? ROM slot -- signature expected: 0x4554, 0x5048
-	AM_RANGE(0xdfe00, 0xdfe1f) AM_UNMAP // AM_DEVREADWRITE8("uart8274", i8274_new_device, ba_cd_r, ba_cd_w, 0x00ff)
-	AM_RANGE(0xdfe40, 0xdfe4f) AM_UNMAP // ?? diagnostic 8274
-	AM_RANGE(0xdfe80, 0xdfe83) AM_DEVREADWRITE8("i7220", i7220_device, read, write, 0x00ff)
-	AM_RANGE(0xdfea0, 0xdfeaf) AM_UNMAP // ??
-	AM_RANGE(0xdfec0, 0xdfecf) AM_DEVREADWRITE8("modem", i8255_device, read, write, 0x00ff) // incl. DTMF generator
-	AM_RANGE(0xdff40, 0xdff5f) AM_NOP   // ?? machine ID EAROM, RTC
-	AM_RANGE(0xdff80, 0xdff8f) AM_READWRITE(grid_gpib_r, grid_gpib_w) // TMS9914
-	AM_RANGE(0xdffc0, 0xdffcf) AM_READWRITE(grid_keyb_r, grid_keyb_w) // Intel 8741 MCU
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void gridcomp_state::grid1121_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x90000, 0x97fff).unmaprw(); // ?? ROM slot
+	map(0x9ff00, 0x9ff0f).unmaprw(); // AM_READ(grid_9ff0_r) // ?? ROM?
+	map(0xc0000, 0xcffff).unmaprw(); // ?? ROM slot -- signature expected: 0x4554, 0x5048
+	map(0xdfe00, 0xdfe1f).unmaprw(); // AM_DEVREADWRITE8("uart8274", i8274_new_device, ba_cd_r, ba_cd_w, 0x00ff)
+	map(0xdfe40, 0xdfe4f).unmaprw(); // ?? diagnostic 8274
+	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
+	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
+	map(0xdfec0, 0xdfecf).rw(m_modem, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // incl. DTMF generator
+	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
+	map(0xdff80, 0xdff8f).rw(this, FUNC(gridcomp_state::grid_gpib_r), FUNC(gridcomp_state::grid_gpib_w)); // TMS9914
+	map(0xdffc0, 0xdffcf).rw(this, FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
+	map(0xfc000, 0xfffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(gridcomp_state::grid1101_io)
-	AM_RANGE(0x0000, 0x000f) AM_DEVICE(I80130_TAG, i80130_device, io_map)
-ADDRESS_MAP_END
+void gridcomp_state::grid1101_io(address_map &map)
+{
+	map(0x0000, 0x000f).m(m_osp, FUNC(i80130_device::io_map));
+}
 
 static INPUT_PORTS_START( gridcomp )
 INPUT_PORTS_END

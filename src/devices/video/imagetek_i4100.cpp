@@ -66,7 +66,7 @@
 #include "emu.h"
 #include "imagetek_i4100.h"
 
-
+#include <algorithm>
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -253,33 +253,6 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void imagetek_i4100_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<imagetek_i4100_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-
-void imagetek_i4100_device::static_set_tmap_xoffsets(device_t &device, int x1, int x2, int x3)
-{
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldx[0] = x1;
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldx[1] = x2;
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldx[2] = x3;
-}
-
-
-void imagetek_i4100_device::static_set_tmap_yoffsets(device_t &device, int y1, int y2, int y3)
-{
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldy[0] = y1;
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldy[1] = y2;
-	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldy[2] = y3;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -369,7 +342,7 @@ WRITE16_MEMBER(imagetek_i4100_device::vram_0_w){ COMBINE_DATA(&m_vram_0[offset])
 WRITE16_MEMBER(imagetek_i4100_device::vram_1_w){ COMBINE_DATA(&m_vram_1[offset]); }
 WRITE16_MEMBER(imagetek_i4100_device::vram_2_w){ COMBINE_DATA(&m_vram_2[offset]); }
 
-/* This game uses almost only the blitter to write to the tilemaps.
+/* Some game uses almost only the blitter to write to the tilemaps.
    The CPU can only access a "window" of 512x256 pixels in the upper
    left corner of the big tilemap */
 // TODO: Puzzlet, Sankokushi & Lady Killer contradicts with aformentioned description (more like RMW?)
@@ -1079,11 +1052,38 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 
 	int windowwidth  = width >> 2;
 	int windowheight = height >> 3;
+	
+	int dx = m_tilemap_scrolldx[layer] * (m_screen_flip ? 1 : -1);
+	int dy = m_tilemap_scrolldy[layer] * (m_screen_flip ? 1 : -1);
 
-	sx += m_tilemap_scrolldx[layer] * (m_screen_flip ? 1 : -1);
-	sy += m_tilemap_scrolldy[layer] * (m_screen_flip ? 1 : -1);
+	sx += dx;
+	sy += dy;
 
-	for (y = 0; y < scrheight; y++)
+	int min_x, max_x, min_y, max_y;
+	
+	if (dx != 0)
+	{
+		min_x = 0;
+		max_x = scrwidth-1;
+	}
+	else
+	{
+		min_x = cliprect.min_x;
+		max_x = cliprect.max_x;
+	}
+
+	if (dy != 0)
+	{
+		min_y = 0;
+		max_y = scrheight-1;
+	}
+	else
+	{
+		min_y = cliprect.min_y;
+		max_y = cliprect.max_y;
+	}
+	
+	for (y = min_y; y <= max_y; y++)
 	{
 		int scrolly = (sy+y-wy)&(windowheight-1);
 		int x;
@@ -1097,7 +1097,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 			dst = &bitmap.pix16(y);
 			priority_baseaddr = &priority_bitmap.pix8(y);
 
-			for (x = 0; x < scrwidth; x++)
+			for (x = min_x; x <= max_x; x++)
 			{
 				int scrollx = (sx+x-wx)&(windowwidth-1);
 				int srccol = (wx+scrollx)&(width-1);
@@ -1121,7 +1121,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 			dst = &bitmap.pix16(scrheight-y-1);
 			priority_baseaddr = &priority_bitmap.pix8(scrheight-y-1);
 
-			for (x = 0; x < scrwidth; x++)
+			for (x = min_x; x <= max_x; x++)
 			{
 				int scrollx = (sx+x-wx)&(windowwidth-1);
 				int srccol = (wx+scrollx)&(width-1);

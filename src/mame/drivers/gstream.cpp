@@ -288,21 +288,22 @@ WRITE32_MEMBER(gstream_state::gstream_tilemap3_scrolly_w)
 	m_tmap3_scrolly = data;
 }
 
-ADDRESS_MAP_START(gstream_state::gstream_32bit_map)
-	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_SHARE("workram") // work ram
+void gstream_state::gstream_32bit_map(address_map &map)
+{
+	map(0x00000000, 0x003FFFFF).ram().share("workram"); // work ram
 //  AM_RANGE(0x40000000, 0x40FFFFFF) AM_RAM // ?? lots of data gets copied here if present, but game runs without it??
-	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_SHARE("vram") // video ram
-	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION("user2",0) // main game rom
-	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE(gstream_tilemap3_scrollx_w)
-	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE(gstream_tilemap3_scrolly_w)
-	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x4F800000, 0x4F800003) AM_WRITE(gstream_tilemap1_scrollx_w)
-	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE(gstream_tilemap1_scrolly_w)
-	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)
-	AM_RANGE(0x4FE00000, 0x4FE00003) AM_WRITE(gstream_tilemap2_scrolly_w)
-	AM_RANGE(0xFFC00000, 0xFFC01FFF) AM_RAM AM_SHARE("nvram") // Backup RAM
-	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
-ADDRESS_MAP_END
+	map(0x80000000, 0x80003FFF).ram().w(this, FUNC(gstream_state::gstream_vram_w)).share("vram"); // video ram
+	map(0x4E000000, 0x4E1FFFFF).rom().region("user2", 0); // main game rom
+	map(0x4F000000, 0x4F000003).w(this, FUNC(gstream_state::gstream_tilemap3_scrollx_w));
+	map(0x4F200000, 0x4F200003).w(this, FUNC(gstream_state::gstream_tilemap3_scrolly_w));
+	map(0x4F400000, 0x4F406FFF).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x4F800000, 0x4F800003).w(this, FUNC(gstream_state::gstream_tilemap1_scrollx_w));
+	map(0x4FA00000, 0x4FA00003).w(this, FUNC(gstream_state::gstream_tilemap1_scrolly_w));
+	map(0x4FC00000, 0x4FC00003).w(this, FUNC(gstream_state::gstream_tilemap2_scrollx_w));
+	map(0x4FE00000, 0x4FE00003).w(this, FUNC(gstream_state::gstream_tilemap2_scrolly_w));
+	map(0xFFC00000, 0xFFC01FFF).ram().share("nvram"); // Backup RAM
+	map(0xFFF80000, 0xFFFFFFFF).rom().region("user1", 0); // boot rom
+}
 
 WRITE32_MEMBER(gstream_state::gstream_oki_banking_w)
 {
@@ -369,34 +370,36 @@ WRITE32_MEMBER(gstream_state::gstream_oki_4040_w)
 	// data == 0 or data == 0x81
 }
 
-ADDRESS_MAP_START(gstream_state::gstream_io)
-	AM_RANGE(0x4000, 0x4003) AM_READ_PORT("IN0")
-	AM_RANGE(0x4010, 0x4013) AM_READ_PORT("IN1")
-	AM_RANGE(0x4020, 0x4023) AM_READ_PORT("IN2")    // extra coin switches etc
-	AM_RANGE(0x4030, 0x4033) AM_WRITE(gstream_oki_banking_w)    // oki banking
-	AM_RANGE(0x4040, 0x4043) AM_WRITE(gstream_oki_4040_w)   // some clocking?
-	AM_RANGE(0x4050, 0x4053) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff) // music and samples
-	AM_RANGE(0x4060, 0x4063) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff) // music and samples
-ADDRESS_MAP_END
+void gstream_state::gstream_io(address_map &map)
+{
+	map(0x4000, 0x4003).portr("IN0");
+	map(0x4010, 0x4013).portr("IN1");
+	map(0x4020, 0x4023).portr("IN2");    // extra coin switches etc
+	map(0x4030, 0x4033).w(this, FUNC(gstream_state::gstream_oki_banking_w));    // oki banking
+	map(0x4040, 0x4043).w(this, FUNC(gstream_state::gstream_oki_4040_w));   // some clocking?
+	map(0x4053, 0x4053).rw(m_oki_1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // music and samples
+	map(0x4063, 0x4063).rw(m_oki_2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // music and samples
+}
 
 
-ADDRESS_MAP_START(gstream_state::x2222_32bit_map)
-	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_SHARE("workram") // work ram
-	AM_RANGE(0x40000000, 0x403fffff) AM_RAM // ?? data gets copied here if present, but game runs without it??
-	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_SHARE("vram") // video ram
+void gstream_state::x2222_32bit_map(address_map &map)
+{
+	map(0x00000000, 0x003FFFFF).ram().share("workram"); // work ram
+	map(0x40000000, 0x403fffff).ram(); // ?? data gets copied here if present, but game runs without it??
+	map(0x80000000, 0x80003FFF).ram().w(this, FUNC(gstream_state::gstream_vram_w)).share("vram"); // video ram
 
-	AM_RANGE(0x4Fc00000, 0x4Fc00003) AM_WRITE(gstream_tilemap2_scrolly_w)
-	AM_RANGE(0x4Fd00000, 0x4Fd00003) AM_WRITE(gstream_tilemap2_scrollx_w)
+	map(0x4Fc00000, 0x4Fc00003).w(this, FUNC(gstream_state::gstream_tilemap2_scrolly_w));
+	map(0x4Fd00000, 0x4Fd00003).w(this, FUNC(gstream_state::gstream_tilemap2_scrollx_w));
 
-	AM_RANGE(0x4Fa00000, 0x4Fa00003) AM_WRITE(gstream_tilemap3_scrolly_w)
-	AM_RANGE(0x4Fb00000, 0x4Fb00003) AM_WRITE(gstream_tilemap3_scrollx_w)
+	map(0x4Fa00000, 0x4Fa00003).w(this, FUNC(gstream_state::gstream_tilemap3_scrolly_w));
+	map(0x4Fb00000, 0x4Fb00003).w(this, FUNC(gstream_state::gstream_tilemap3_scrollx_w));
 
-	AM_RANGE(0x4Fe00000, 0x4Fe00003) AM_WRITE(gstream_tilemap1_scrolly_w)
-	AM_RANGE(0x4Ff00000, 0x4Ff00003) AM_WRITE(gstream_tilemap1_scrollx_w)
+	map(0x4Fe00000, 0x4Fe00003).w(this, FUNC(gstream_state::gstream_tilemap1_scrolly_w));
+	map(0x4Ff00000, 0x4Ff00003).w(this, FUNC(gstream_state::gstream_tilemap1_scrollx_w));
 
-	AM_RANGE(0xFFC00000, 0xFFC01FFF) AM_RAM AM_SHARE("nvram") // Backup RAM (maybe)
-	AM_RANGE(0xFFF00000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
-ADDRESS_MAP_END
+	map(0xFFC00000, 0xFFC01FFF).ram().share("nvram"); // Backup RAM (maybe)
+	map(0xFFF00000, 0xFFFFFFFF).rom().region("user1", 0); // boot rom
+}
 
 WRITE32_MEMBER(gstream_state::x2222_sound_w)
 {
@@ -405,14 +408,15 @@ WRITE32_MEMBER(gstream_state::x2222_sound_w)
 		printf("x2222_sound_w unk %08x\n", data);
 }
 
-ADDRESS_MAP_START(gstream_state::x2222_io)
-	AM_RANGE(0x4000, 0x4003) AM_READ_PORT("P1")
-	AM_RANGE(0x4004, 0x4007) AM_READ_PORT("P2")
-	AM_RANGE(0x4008, 0x400b) AM_READ_PORT("SYS")
-	AM_RANGE(0x4010, 0x4013) AM_READ_PORT("DSW")
-	AM_RANGE(0x4028, 0x402b) AM_WRITE( x2222_sound_w )
-	AM_RANGE(0x4034, 0x4037) AM_READ_PORT("IN4")
-ADDRESS_MAP_END
+void gstream_state::x2222_io(address_map &map)
+{
+	map(0x4000, 0x4003).portr("P1");
+	map(0x4004, 0x4007).portr("P2");
+	map(0x4008, 0x400b).portr("SYS");
+	map(0x4010, 0x4013).portr("DSW");
+	map(0x4028, 0x402b).w(this, FUNC(gstream_state::x2222_sound_w));
+	map(0x4034, 0x4037).portr("IN4");
+}
 
 static INPUT_PORTS_START( gstream )
 	PORT_START("IN0")

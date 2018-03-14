@@ -113,6 +113,7 @@
 #include "emu.h"
 
 #include "cpu/i8085/i8085.h"
+#include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
@@ -156,6 +157,7 @@ public:
 		, m_cass2(*this, "cassette2")
 		, m_uart(*this, "uart")
 		, m_uart_s(*this, "uart_s")
+		, m_rs232(*this, "rs232")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_iop_arrows(*this, "ARROWS")
@@ -164,20 +166,14 @@ public:
 		, m_iop_s2(*this, "S2")
 		, m_iop_s3(*this, "S3")
 		, m_iop_s4(*this, "S4")
-		, m_cassette1(*this, "cassette")
-		, m_cassette2(*this, "cassette2")
 	{ }
 
 	DECLARE_READ8_MEMBER( sol20_f8_r );
-	DECLARE_READ8_MEMBER( sol20_f9_r );
 	DECLARE_READ8_MEMBER( sol20_fa_r );
-	DECLARE_READ8_MEMBER( sol20_fb_r );
 	DECLARE_READ8_MEMBER( sol20_fc_r );
 	DECLARE_READ8_MEMBER( sol20_fd_r );
 	DECLARE_WRITE8_MEMBER( sol20_f8_w );
-	DECLARE_WRITE8_MEMBER( sol20_f9_w );
 	DECLARE_WRITE8_MEMBER( sol20_fa_w );
-	DECLARE_WRITE8_MEMBER( sol20_fb_w );
 	DECLARE_WRITE8_MEMBER( sol20_fd_w );
 	DECLARE_WRITE8_MEMBER( sol20_fe_w );
 	void kbd_put(u8 data);
@@ -205,6 +201,7 @@ private:
 	required_device<cassette_image_device> m_cass2;
 	required_device<ay31015_device> m_uart;
 	required_device<ay31015_device> m_uart_s;
+	required_device<rs232_port_device> m_rs232;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_ioport m_iop_arrows;
@@ -213,8 +210,6 @@ private:
 	required_ioport m_iop_s2;
 	required_ioport m_iop_s3;
 	required_ioport m_iop_s4;
-	required_device<cassette_image_device> m_cassette1;
-	required_device<cassette_image_device> m_cassette2;
 };
 
 
@@ -224,9 +219,9 @@ private:
 cassette_image_device *sol20_state::cassette_device_image()
 {
 	if (m_sol20_fa & 0x40)
-		return m_cassette2;
+		return m_cass2;
 	else
-		return m_cassette1;
+		return m_cass1;
 }
 
 
@@ -266,7 +261,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 				m_cass_data.input.level = cass_ws;
 				m_cass_data.input.bit = ((m_cass_data.input.length < 0x6) || (m_cass_data.input.length > 0x20)) ? 1 : 0;
 				m_cass_data.input.length = 0;
-				m_uart->set_input_pin(AY31015_SI, m_cass_data.input.bit);
+				m_uart->write_si(m_cass_data.input.bit);
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 1200 and 2400 Hz frequencies.
@@ -275,7 +270,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 			m_cass_data.output.length++;
 			if (!(m_cass_data.output.length & 0x1f))
 			{
-				cass_ws = m_uart->get_output_pin(AY31015_SO);
+				cass_ws = m_uart->so_r();
 				if (cass_ws != m_cass_data.output.bit)
 				{
 					m_cass_data.output.bit = cass_ws;
@@ -307,7 +302,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 					m_cass_data.input.length = 0;
 					m_cass_data.input.level = cass_ws;
 				}
-				m_uart->set_input_pin(AY31015_SI, m_cass_data.input.bit);
+				m_uart->write_si(m_cass_data.input.bit);
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 600 and 1200 Hz frequencies. */
@@ -315,7 +310,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 			m_cass_data.output.length++;
 			if (!(m_cass_data.output.length & 7))
 			{
-				cass_ws = m_uart->get_output_pin(AY31015_SO);
+				cass_ws = m_uart->so_r();
 				if (cass_ws != m_cass_data.output.bit)
 				{
 					m_cass_data.output.bit = cass_ws;
@@ -337,26 +332,20 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 
 READ8_MEMBER( sol20_state::sol20_f8_r )
 {
-// d7 - TMBT; d6 - DAV; d5 - CTS; d4 - OE; d3 - PE; d2 - FE; d1 - DSR; d0 - CD
-	/* set unemulated bits (CTS/DSR/CD) high */
-	uint8_t data = 0x23;
+// d7 - TBMT; d6 - DAV; d5 - CTS; d4 - OE; d3 - PE; d2 - FE; d1 - DSR; d0 - CD
+	uint8_t data = 0;
 
-	m_uart_s->set_input_pin(AY31015_SWE, 0);
-	data |= m_uart_s->get_output_pin(AY31015_TBMT) ? 0x80 : 0;
-	data |= m_uart_s->get_output_pin(AY31015_DAV ) ? 0x40 : 0;
-	data |= m_uart_s->get_output_pin(AY31015_OR  ) ? 0x10 : 0;
-	data |= m_uart_s->get_output_pin(AY31015_PE  ) ? 0x08 : 0;
-	data |= m_uart_s->get_output_pin(AY31015_FE  ) ? 0x04 : 0;
-	m_uart_s->set_input_pin(AY31015_SWE, 1);
+	m_uart_s->write_swe(0);
+	data |= m_uart_s->tbmt_r() ? 0x80 : 0;
+	data |= m_uart_s->dav_r( ) ? 0x40 : 0;
+	data |= m_rs232->cts_r(  ) ? 0x20 : 0;
+	data |= m_uart_s->or_r(  ) ? 0x10 : 0;
+	data |= m_uart_s->pe_r(  ) ? 0x08 : 0;
+	data |= m_uart_s->fe_r(  ) ? 0x04 : 0;
+	data |= m_rs232->dsr_r(  ) ? 0x02 : 0;
+	data |= m_rs232->dcd_r(  ) ? 0x01 : 0;
+	m_uart_s->write_swe(1);
 
-	return data;
-}
-
-READ8_MEMBER( sol20_state::sol20_f9_r)
-{
-	uint8_t data = m_uart_s->get_received_data();
-	m_uart_s->set_input_pin(AY31015_RDAV, 0);
-	m_uart_s->set_input_pin(AY31015_RDAV, 1);
 	return data;
 }
 
@@ -365,25 +354,17 @@ READ8_MEMBER( sol20_state::sol20_fa_r )
 	/* set unused bits high */
 	uint8_t data = 0x26;
 
-	m_uart->set_input_pin(AY31015_SWE, 0);
-	data |= m_uart->get_output_pin(AY31015_TBMT) ? 0x80 : 0;
-	data |= m_uart->get_output_pin(AY31015_DAV ) ? 0x40 : 0;
-	data |= m_uart->get_output_pin(AY31015_OR  ) ? 0x10 : 0;
-	data |= m_uart->get_output_pin(AY31015_FE  ) ? 0x08 : 0;
-	m_uart->set_input_pin(AY31015_SWE, 1);
+	m_uart->write_swe(0);
+	data |= m_uart->tbmt_r() ? 0x80 : 0;
+	data |= m_uart->dav_r( ) ? 0x40 : 0;
+	data |= m_uart->or_r(  ) ? 0x10 : 0;
+	data |= m_uart->fe_r(  ) ? 0x08 : 0;
+	m_uart->write_swe(1);
 
 	bool arrowkey = m_iop_arrows->read() ? 0 : 1;
 	bool keydown = m_sol20_fa & 1;
 
 	return data | (arrowkey & keydown);
-}
-
-READ8_MEMBER( sol20_state::sol20_fb_r)
-{
-	uint8_t data = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV, 0);
-	m_uart->set_input_pin(AY31015_RDAV, 1);
-	return data;
 }
 
 READ8_MEMBER( sol20_state::sol20_fc_r )
@@ -407,11 +388,7 @@ READ8_MEMBER( sol20_state::sol20_fd_r )
 WRITE8_MEMBER( sol20_state::sol20_f8_w )
 {
 // The only function seems to be to send RTS from bit 4
-}
-
-WRITE8_MEMBER( sol20_state::sol20_f9_w )
-{
-	m_uart_s->set_transmit_data(data);
+	m_rs232->write_rts(BIT(data, 4));
 }
 
 WRITE8_MEMBER( sol20_state::sol20_fa_w )
@@ -437,11 +414,6 @@ WRITE8_MEMBER( sol20_state::sol20_fa_w )
 	m_uart->set_transmitter_clock((BIT(data, 5)) ? 4800.0 : 19200.0);
 }
 
-WRITE8_MEMBER( sol20_state::sol20_fb_w )
-{
-	m_uart->set_transmit_data(data);
-}
-
 WRITE8_MEMBER( sol20_state::sol20_fd_w )
 {
 // Output a byte to parallel interface
@@ -452,26 +424,28 @@ WRITE8_MEMBER( sol20_state::sol20_fe_w )
 	m_sol20_fe = data;
 }
 
-ADDRESS_MAP_START(sol20_state::sol20_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
-	AM_RANGE(0x0800, 0xbfff) AM_RAM // optional s100 ram
-	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM // system ram
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xd000, 0xffff) AM_RAM // optional s100 ram
-ADDRESS_MAP_END
+void sol20_state::sol20_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).bankrw("boot");
+	map(0x0800, 0xbfff).ram(); // optional s100 ram
+	map(0xc000, 0xc7ff).rom();
+	map(0xc800, 0xcbff).ram(); // system ram
+	map(0xcc00, 0xcfff).ram().share("videoram");
+	map(0xd000, 0xffff).ram(); // optional s100 ram
+}
 
-ADDRESS_MAP_START(sol20_state::sol20_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_READWRITE(sol20_f8_r,sol20_f8_w)
-	AM_RANGE(0xf9, 0xf9) AM_READWRITE(sol20_f9_r,sol20_f9_w)
-	AM_RANGE(0xfa, 0xfa) AM_READWRITE(sol20_fa_r,sol20_fa_w)
-	AM_RANGE(0xfb, 0xfb) AM_READWRITE(sol20_fb_r,sol20_fb_w)
-	AM_RANGE(0xfc, 0xfc) AM_READ(sol20_fc_r)
-	AM_RANGE(0xfd, 0xfd) AM_READWRITE(sol20_fd_r,sol20_fd_w)
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sol20_fe_w)
-	AM_RANGE(0xff, 0xff) AM_READ_PORT("S2")
+void sol20_state::sol20_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xf8, 0xf8).rw(this, FUNC(sol20_state::sol20_f8_r), FUNC(sol20_state::sol20_f8_w));
+	map(0xf9, 0xf9).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
+	map(0xfa, 0xfa).rw(this, FUNC(sol20_state::sol20_fa_r), FUNC(sol20_state::sol20_fa_w));
+	map(0xfb, 0xfb).rw(m_uart_s, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
+	map(0xfc, 0xfc).r(this, FUNC(sol20_state::sol20_fc_r));
+	map(0xfd, 0xfd).rw(this, FUNC(sol20_state::sol20_fd_r), FUNC(sol20_state::sol20_fd_w));
+	map(0xfe, 0xfe).w(this, FUNC(sol20_state::sol20_fe_w));
+	map(0xff, 0xff).portr("S2");
 /*  AM_RANGE(0xf8, 0xf8) serial status in (bit 6=data av, bit 7=tmbe)
     AM_RANGE(0xf9, 0xf9) serial data in, out
     AM_RANGE(0xfa, 0xfa) general status in (bit 0=keyb data av, bit 1=parin data av, bit 2=parout ready)
@@ -480,7 +454,7 @@ ADDRESS_MAP_START(sol20_state::sol20_io)
     AM_RANGE(0xfd, 0xfd) parallel data in, out
     AM_RANGE(0xfe, 0xfe) scroll register
     AM_RANGE(0xff, 0xff) sense switches */
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sol20 )
@@ -587,23 +561,23 @@ void sol20_state::machine_reset()
 	m_sol20_fa=1;
 
 	// set hard-wired uart pins
-	m_uart->set_input_pin(AY31015_CS, 0);
-	m_uart->set_input_pin(AY31015_NB1, 1);
-	m_uart->set_input_pin(AY31015_NB2, 1);
-	m_uart->set_input_pin(AY31015_TSB, 1);
-	m_uart->set_input_pin(AY31015_EPS, 1);
-	m_uart->set_input_pin(AY31015_NP,  1);
-	m_uart->set_input_pin(AY31015_CS, 1);
+	m_uart->write_cs(0);
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_tsb(1);
+	m_uart->write_eps(1);
+	m_uart->write_np(1);
+	m_uart->write_cs(1);
 
 	// set switched uart pins
 	data = m_iop_s4->read();
-	m_uart_s->set_input_pin(AY31015_CS, 0);
-	m_uart_s->set_input_pin(AY31015_NB1, BIT(data, 1));
-	m_uart_s->set_input_pin(AY31015_NB2, BIT(data, 2));
-	m_uart_s->set_input_pin(AY31015_TSB, BIT(data, 3));
-	m_uart_s->set_input_pin(AY31015_EPS, BIT(data, 0));
-	m_uart_s->set_input_pin(AY31015_NP, BIT(data, 4));
-	m_uart_s->set_input_pin(AY31015_CS, 1);
+	m_uart_s->write_cs(0);
+	m_uart_s->write_nb1(BIT(data, 1));
+	m_uart_s->write_nb2(BIT(data, 2));
+	m_uart_s->write_tsb(BIT(data, 3));
+	m_uart_s->write_eps(BIT(data, 0));
+	m_uart_s->write_np(BIT(data, 4));
+	m_uart_s->write_cs(1);
 
 	// set rs232 baud rate
 	data = m_iop_s3->read();
@@ -628,6 +602,9 @@ void sol20_state::machine_reset()
 	// boot-bank
 	membank("boot")->set_entry(1);
 	timer_set(attotime::from_usec(9), TIMER_SOL20_BOOT);
+
+	m_rs232->write_dtr(0);
+	m_rs232->write_rts(1);
 }
 
 DRIVER_INIT_MEMBER(sol20_state,sol20)
@@ -774,12 +751,20 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("sol20_cass")
 
-	MCFG_DEVICE_ADD("uart", AY31015, 0)
-	MCFG_AY31015_TX_CLOCK(4800.0)
-	MCFG_AY31015_RX_CLOCK(4800.0)
-	MCFG_DEVICE_ADD("uart_s", AY31015, 0)
-	MCFG_AY31015_TX_CLOCK(4800.0)
-	MCFG_AY31015_RX_CLOCK(4800.0)
+	MCFG_DEVICE_ADD("uart", AY51013, 0) // TMS6011NC
+	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_AY51013_TX_CLOCK(4800.0)
+	MCFG_AY51013_RX_CLOCK(4800.0)
+	MCFG_AY51013_AUTO_RDAV(true) // ROD (pin 4) tied to RDD (pin 18)
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+
+	MCFG_DEVICE_ADD("uart_s", AY51013, 0) // TMS6011NC
+	MCFG_AY51013_TX_CLOCK(4800.0)
+	MCFG_AY51013_RX_CLOCK(4800.0)
+	MCFG_AY51013_AUTO_RDAV(true) // ROD (pin 4) tied to RDD (pin 18)
+
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(sol20_state, kbd_put))
 

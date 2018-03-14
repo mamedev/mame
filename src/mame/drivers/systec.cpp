@@ -56,17 +56,19 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(systec_state::systec_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void systec_state::systec_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).ram().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(systec_state::systec_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x68, 0x6b) // fdc?
-	AM_RANGE(0x6c, 0x6c) // motor control?
-	AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("sio", z80sio_device, cd_ba_r, cd_ba_w)
-ADDRESS_MAP_END
+void systec_state::systec_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x68, 0x6b); // fdc?
+	map(0x6c, 0x6c); // motor control?
+	map(0xc4, 0xc7).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( systec )

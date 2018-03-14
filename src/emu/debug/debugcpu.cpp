@@ -59,8 +59,6 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	, m_last_periodic_update_time(0)
 	, m_comments_loaded(false)
 {
-	screen_device *first_screen = m_machine.first_screen();
-
 	m_tempvar = make_unique_clear<u64[]>(NUM_TEMP_VARIABLES);
 
 	/* create a global symbol table */
@@ -75,9 +73,28 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 
 	using namespace std::placeholders;
 	m_symtable->add("cpunum", std::bind(&debugger_cpu::get_cpunum, this, _1));
-	m_symtable->add("beamx", std::bind(&debugger_cpu::get_beamx, this, _1, first_screen));
-	m_symtable->add("beamy", std::bind(&debugger_cpu::get_beamy, this, _1, first_screen));
-	m_symtable->add("frame", std::bind(&debugger_cpu::get_frame, this, _1, first_screen));
+
+	screen_device_iterator screen_iterator = screen_device_iterator(m_machine.root_device());
+	screen_device_iterator::auto_iterator iter = screen_iterator.begin();
+	const uint32_t count = (uint32_t)screen_iterator.count();
+
+	if (count == 1)
+	{
+		m_symtable->add("beamx", std::bind(&debugger_cpu::get_beamx, this, _1, iter.current()));
+		m_symtable->add("beamy", std::bind(&debugger_cpu::get_beamy, this, _1, iter.current()));
+		m_symtable->add("frame", std::bind(&debugger_cpu::get_frame, this, _1, iter.current()));
+		iter.current()->register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
+	}
+	else if (count > 1)
+	{
+		for (uint32_t i = 0; i < count; i++, iter++)
+		{
+			m_symtable->add(string_format("beamx%d", i).c_str(), std::bind(&debugger_cpu::get_beamx, this, _1, iter.current()));
+			m_symtable->add(string_format("beamy%d", i).c_str(), std::bind(&debugger_cpu::get_beamy, this, _1, iter.current()));
+			m_symtable->add(string_format("frame%d", i).c_str(), std::bind(&debugger_cpu::get_frame, this, _1, iter.current()));
+			iter.current()->register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
+		}
+	}
 
 	/* add the temporary variables to the global symbol table */
 	for (int regnum = 0; regnum < NUM_TEMP_VARIABLES; regnum++)
@@ -97,10 +114,6 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 			break;
 		}
 	}
-
-	/* add callback for breaking on VBLANK */
-	if (m_machine.first_screen() != nullptr)
-		m_machine.first_screen()->register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
 }
 
 void debugger_cpu::configure_memory(symbol_table &table)
@@ -835,7 +848,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-				auto dis = m_machine.disable_side_effect(disable_se);
+				auto dis = m_machine.disable_side_effects(disable_se);
 				return read_memory(space, address, size, true);
 			}
 			break;
@@ -859,7 +872,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
-				auto dis = m_machine.disable_side_effect(disable_se);
+				auto dis = m_machine.disable_side_effects(disable_se);
 				return read_memory(space, address, size, false);
 			}
 			break;
@@ -877,7 +890,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			auto dis = m_machine.disable_side_effect(disable_se);
+			auto dis = m_machine.disable_side_effects(disable_se);
 			return expression_read_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 		}
@@ -894,7 +907,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			auto dis = m_machine.disable_side_effect(disable_se);
+			auto dis = m_machine.disable_side_effects(disable_se);
 			return expression_read_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 		}
@@ -1040,7 +1053,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-				auto dis = m_machine.disable_side_effect(disable_se);
+				auto dis = m_machine.disable_side_effects(disable_se);
 				write_memory(space, address, data, size, true);
 			}
 			break;
@@ -1059,7 +1072,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
-				auto dis = m_machine.disable_side_effect(disable_se);
+				auto dis = m_machine.disable_side_effects(disable_se);
 				write_memory(space, address, data, size, false);
 			}
 			break;
@@ -1072,7 +1085,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			auto dis = m_machine.disable_side_effect(disable_se);
+			auto dis = m_machine.disable_side_effects(disable_se);
 			expression_write_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			break;
 		}
@@ -1085,7 +1098,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			auto dis = m_machine.disable_side_effect(disable_se);
+			auto dis = m_machine.disable_side_effects(disable_se);
 			expression_write_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			break;
 		}
@@ -2582,7 +2595,7 @@ void device_debug::prepare_for_step_overout(offs_t pc)
 		// if we need to skip additional instructions, advance as requested
 		while (extraskip-- > 0) {
 			u32 result = buffer.disassemble_info(pc);
-			pc += buffer.next_pc_wrap(pc, result & util::disasm_interface::LENGTHMASK);
+			pc = buffer.next_pc_wrap(pc, result & util::disasm_interface::LENGTHMASK);
 		}
 		m_stepaddr = pc;
 	}
@@ -2726,7 +2739,7 @@ void device_debug::watchpoint_check(address_space& space, int type, offs_t addre
 void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, std::vector<device_debug::watchpoint *> &wplist)
 {
 	// if we're within debugger code, don't stop
-	if (m_within_instruction_hook || m_machine.side_effect_disabled())
+	if (m_within_instruction_hook || m_machine.side_effects_disabled())
 		return;
 
 	m_within_instruction_hook = true;

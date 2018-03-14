@@ -39,20 +39,22 @@ private:
 };
 
 
-ADDRESS_MAP_START(unistar_state::unistar_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-ADDRESS_MAP_END
+void unistar_state::unistar_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x2fff).rom();
+	map(0x8000, 0x8fff).ram();
+}
 
-ADDRESS_MAP_START(unistar_state::unistar_io)
+void unistar_state::unistar_io(address_map &map)
+{
 	//ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x8c, 0x8d) AM_DEVREADWRITE("stc", am9513_device, read8, write8)
-	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE("ppi", i8255_device, read, write)
+	map.global_mask(0xff);
+	map(0x8c, 0x8d).rw("stc", FUNC(am9513_device::read8), FUNC(am9513_device::write8));
+	map(0x94, 0x97).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	// ports used: 00,02,03(W),08(RW),09,0A,0B,0D,0F(W),80,81(R),82,83(W),84(R),8C,8D(W),94(R),97,98(W),99(RW)
 	// if nonzero returned from port 94, it goes into test mode.
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( unistar )

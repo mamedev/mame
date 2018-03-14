@@ -323,32 +323,35 @@ WRITE8_MEMBER( prestige_state::lcdc_w )
 }
 
 
-ADDRESS_MAP_START(prestige_state::prestige_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK("bank4")
-	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank5")
-ADDRESS_MAP_END
+void prestige_state::prestige_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("bank2");
+	map(0x8000, 0xbfff).bankr("bank3");
+	map(0xc000, 0xdfff).bankrw("bank4");
+	map(0xe000, 0xffff).bankrw("bank5");
+}
 
-ADDRESS_MAP_START(prestige_state::prestige_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x05) AM_READWRITE(mouse_r, mouse_w)
-	AM_RANGE(0x30, 0x3f) AM_WRITE(lcdc_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(kb_w)
-	AM_RANGE(0x41, 0x42) AM_READ(kb_r)
-	AM_RANGE(0x50, 0x56) AM_READWRITE(bankswitch_r, bankswitch_w)
-ADDRESS_MAP_END
+void prestige_state::prestige_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x04, 0x05).rw(this, FUNC(prestige_state::mouse_r), FUNC(prestige_state::mouse_w));
+	map(0x30, 0x3f).w(this, FUNC(prestige_state::lcdc_w));
+	map(0x40, 0x40).w(this, FUNC(prestige_state::kb_w));
+	map(0x41, 0x42).r(this, FUNC(prestige_state::kb_r));
+	map(0x50, 0x56).rw(this, FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
+}
 
-ADDRESS_MAP_START(prestige_state::glcolor_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x30, 0x3f) AM_WRITE(lcdc_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(kb_w)
-	AM_RANGE(0x41, 0x42) AM_READ(kb_r)
-	AM_RANGE(0x50, 0x56) AM_READWRITE(bankswitch_r, bankswitch_w)
-ADDRESS_MAP_END
+void prestige_state::glcolor_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x30, 0x3f).w(this, FUNC(prestige_state::lcdc_w));
+	map(0x40, 0x40).w(this, FUNC(prestige_state::kb_w));
+	map(0x41, 0x42).r(this, FUNC(prestige_state::kb_r));
+	map(0x50, 0x56).rw(this, FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
+}
 
 /* Input ports */
 INPUT_PORTS_START( prestige )

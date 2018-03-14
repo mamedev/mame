@@ -87,17 +87,20 @@ protected:
 };
 
 
-ADDRESS_MAP_START(rcorsair_state::rcorsair_main_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0xa000, 0xa03f) AM_RAM
-ADDRESS_MAP_END
+void rcorsair_state::rcorsair_main_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0xa000, 0xa03f).ram();
+}
 
-ADDRESS_MAP_START(rcorsair_state::rcorsair_sub_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void rcorsair_state::rcorsair_sub_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(rcorsair_state::rcorsair_sub_io_map)
-ADDRESS_MAP_END
+void rcorsair_state::rcorsair_sub_io_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( inports )
 	PORT_START("IN0")

@@ -29,8 +29,27 @@ public:
 	clayshoo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu")
+	{ }
 
+	void clayshoo(machine_config &config);
+
+protected:
+	DECLARE_WRITE8_MEMBER(analog_reset_w);
+	DECLARE_READ8_MEMBER(analog_r);
+	DECLARE_WRITE8_MEMBER(input_port_select_w);
+	DECLARE_READ8_MEMBER(input_port_r);
+	uint32_t screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(reset_analog_bit);
+	uint8_t difficulty_input_port_r(int bit);
+	void create_analog_timers();
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	void main_io_map(address_map &map);
+	void main_map(address_map &map);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -38,20 +57,8 @@ public:
 	emu_timer *m_analog_timer_1, *m_analog_timer_2;
 	uint8_t m_input_port_select;
 	uint8_t m_analog_port_val;
-	DECLARE_WRITE8_MEMBER(analog_reset_w);
-	DECLARE_READ8_MEMBER(analog_r);
-	DECLARE_WRITE8_MEMBER(input_port_select_w);
-	DECLARE_READ8_MEMBER(input_port_r);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	uint32_t screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(reset_analog_bit);
-	uint8_t difficulty_input_port_r( int bit );
-	void create_analog_timers(  );
+
 	required_device<cpu_device> m_maincpu;
-	void clayshoo(machine_config &config);
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
 };
 
 
@@ -207,14 +214,15 @@ uint32_t clayshoo_state::screen_update_clayshoo(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-ADDRESS_MAP_START(clayshoo_state::main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_ROM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("videoram")    /* 6k of video ram according to readme */
-	AM_RANGE(0x9800, 0xa800) AM_WRITENOP      /* not really mapped, but cleared */
-	AM_RANGE(0xc800, 0xc800) AM_READWRITE(analog_r, analog_reset_w)
-ADDRESS_MAP_END
+void clayshoo_state::main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x4000, 0x47ff).rom();
+	map(0x8000, 0x97ff).ram().share("videoram");    /* 6k of video ram according to readme */
+	map(0x9800, 0xa800).nopw();      /* not really mapped, but cleared */
+	map(0xc800, 0xc800).rw(this, FUNC(clayshoo_state::analog_r), FUNC(clayshoo_state::analog_reset_w));
+}
 
 
 
@@ -224,15 +232,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(clayshoo_state::main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+void clayshoo_state::main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x20, 0x23).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x30, 0x33).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 //  AM_RANGE(0x40, 0x43) AM_NOP // 8253 for sound?
 //  AM_RANGE(0x50, 0x50) AM_NOP // ?
 //  AM_RANGE(0x60, 0x60) AM_NOP // ?
-ADDRESS_MAP_END
+}
 
 
 

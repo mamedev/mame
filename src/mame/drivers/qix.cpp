@@ -245,47 +245,50 @@ Interrupts:
  *
  *************************************/
 
-ADDRESS_MAP_START(qix_state::main_map)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_READNOP   /* 6850 ACIA */
-	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_DEVREADWRITE("sndpia0", pia6821_device, read, write)
-	AM_RANGE(0x9400, 0x97ff) AM_DEVREAD("pia0", pia6821_device, read) AM_WRITE(qix_pia_w)
-	AM_RANGE(0x9800, 0x9bff) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x9c00, 0x9fff) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void qix_state::main_map(address_map &map)
+{
+	map(0x8000, 0x83ff).ram().share("share1");
+	map(0x8400, 0x87ff).ram();
+	map(0x8800, 0x8bff).nopr();   /* 6850 ACIA */
+	map(0x8c00, 0x8c00).mirror(0x3fe).rw(this, FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x3fe).rw(this, FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
+	map(0x9000, 0x93ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x9400, 0x97ff).r(m_pia0, FUNC(pia6821_device::read)).w(this, FUNC(qix_state::qix_pia_w));
+	map(0x9800, 0x9bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x9c00, 0x9fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xa000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(qix_state::kram3_main_map)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_READNOP   /* 6850 ACIA */
-	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_DEVREADWRITE("sndpia0", pia6821_device, read, write)
-	AM_RANGE(0x9400, 0x97ff) AM_DEVREAD("pia0", pia6821_device, read) AM_WRITE(qix_pia_w)
-	AM_RANGE(0x9800, 0x9bff) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x9c00, 0x9fff) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0xa000, 0xffff) AM_ROMBANK("bank0")
-ADDRESS_MAP_END
+void qix_state::kram3_main_map(address_map &map)
+{
+	map(0x8000, 0x83ff).ram().share("share1");
+	map(0x8400, 0x87ff).ram();
+	map(0x8800, 0x8bff).nopr();   /* 6850 ACIA */
+	map(0x8c00, 0x8c00).mirror(0x3fe).rw(this, FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x3fe).rw(this, FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
+	map(0x9000, 0x93ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x9400, 0x97ff).r(m_pia0, FUNC(pia6821_device::read)).w(this, FUNC(qix_state::qix_pia_w));
+	map(0x9800, 0x9bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x9c00, 0x9fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xa000, 0xffff).bankr("bank0");
+}
 
 
 
-ADDRESS_MAP_START(qix_state::zoo_main_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x0400, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_READNOP   /* ACIA */
-	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
-	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("sndpia0", pia6821_device, read, write)
-	AM_RANGE(0x1400, 0x17ff) AM_DEVREAD("pia0", pia6821_device, read) AM_WRITE(qix_pia_w)
-	AM_RANGE(0x1800, 0x1bff) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1c00, 0x1fff) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void qix_state::zoo_main_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().share("share1");
+	map(0x0400, 0x07ff).ram();
+	map(0x0800, 0x0bff).nopr();   /* ACIA */
+	map(0x0c00, 0x0c00).mirror(0x3fe).rw(this, FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
+	map(0x0c01, 0x0c01).mirror(0x3fe).rw(this, FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
+	map(0x1000, 0x13ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1400, 0x17ff).r(m_pia0, FUNC(pia6821_device::read)).w(this, FUNC(qix_state::qix_pia_w));
+	map(0x1800, 0x1bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1c00, 0x1fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 
 

@@ -20,12 +20,15 @@ Possibly related to ADP hardware? The HD63484 video board is definitely absent h
 class stellafr_state : public driver_device
 {
 public:
-	stellafr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_duart(*this, "duart")
+	stellafr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_duart(*this, "duart")
 	{ }
 
+	void stellafr(machine_config &config);
+
+protected:
 	IRQ_CALLBACK_MEMBER(irq_ack);
 	DECLARE_WRITE8_MEMBER(write_8000c1);
 	DECLARE_READ8_MEMBER(read_800101);
@@ -33,10 +36,9 @@ public:
 	DECLARE_WRITE8_MEMBER(duart_output_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
 
-	void stellafr(machine_config &config);
 	void stellafr_map(address_map &map);
-protected:
 
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
@@ -71,15 +73,16 @@ WRITE8_MEMBER(stellafr_state::ay8910_portb_w)
 
 
 
-ADDRESS_MAP_START(stellafr_state::stellafr_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x8000c0, 0x8000c1) AM_WRITE8(write_8000c1, 0x00ff)
-	AM_RANGE(0x800100, 0x800101) AM_READWRITE8(read_800101, write_800101, 0x00ff)
-	AM_RANGE(0x800140, 0x800141) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_w, 0x00ff)
-	AM_RANGE(0x800142, 0x800143) AM_DEVWRITE8("aysnd", ay8910_device, data_w, 0x00ff)
-	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void stellafr_state::stellafr_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x8000c1, 0x8000c1).w(this, FUNC(stellafr_state::write_8000c1));
+	map(0x800101, 0x800101).rw(this, FUNC(stellafr_state::read_800101), FUNC(stellafr_state::write_800101));
+	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0xff0000, 0xffffff).ram();
+}
 
 
 static INPUT_PORTS_START( stellafr )

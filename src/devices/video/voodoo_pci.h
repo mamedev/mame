@@ -36,9 +36,6 @@ public:
 	void set_fbmem(const int fbmem) {m_fbmem = fbmem;}
 	void set_tmumem(const int tmumem0, const int tmumem1) {m_tmumem0 = tmumem0; m_tmumem1 = tmumem1;}
 
-	DECLARE_READ32_MEMBER(pcictrl_r);
-	DECLARE_WRITE32_MEMBER(pcictrl_w);
-
 	DECLARE_READ32_MEMBER(vga_r);
 	DECLARE_WRITE32_MEMBER(vga_w);
 
@@ -58,6 +55,9 @@ private:
 	void banshee_reg_map(address_map &map);
 	void lfb_map(address_map &map);
 	void io_map(address_map &map);
+
+	DECLARE_READ32_MEMBER(pcictrl_r);
+	DECLARE_WRITE32_MEMBER(pcictrl_w);
 };
 
 DECLARE_DEVICE_TYPE(VOODOO_PCI, voodoo_pci_device)

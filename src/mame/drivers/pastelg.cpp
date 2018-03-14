@@ -45,10 +45,11 @@ READ8_MEMBER(pastelg_state::pastelg_sndrom_r)
 	return ROM[pastelg_blitter_src_addr_r() & 0x7fff];
 }
 
-ADDRESS_MAP_START(pastelg_state::pastelg_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void pastelg_state::pastelg_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xe000, 0xe7ff).ram().share("nvram");
+}
 
 READ8_MEMBER(pastelg_state::pastelg_irq_ack_r)
 {
@@ -56,21 +57,22 @@ READ8_MEMBER(pastelg_state::pastelg_irq_ack_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(pastelg_state::pastelg_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void pastelg_state::pastelg_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 //  AM_RANGE(0x00, 0x00) AM_WRITENOP
-	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
-	AM_RANGE(0x81, 0x81) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x90, 0x96) AM_WRITE(pastelg_blitter_w)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport1_r, inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_DEVREAD("nb1413m3", nb1413m3_device, inputport2_r) AM_WRITE(pastelg_romsel_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ(pastelg_sndrom_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_SHARE("clut")
-	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("DSWC")
-ADDRESS_MAP_END
+	map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r));
+	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x90, 0x90).portr("SYSTEM");
+	map(0x90, 0x96).w(this, FUNC(pastelg_state::pastelg_blitter_w));
+	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
+	map(0xb0, 0xb0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r)).w(this, FUNC(pastelg_state::pastelg_romsel_w));
+	map(0xc0, 0xc0).r(this, FUNC(pastelg_state::pastelg_sndrom_r));
+	map(0xc0, 0xcf).writeonly().share("clut");
+	map(0xd0, 0xd0).r(this, FUNC(pastelg_state::pastelg_irq_ack_r)).w("dac", FUNC(dac_byte_interface::write));
+	map(0xe0, 0xe0).portr("DSWC");
+}
 
 
 READ8_MEMBER(pastelg_state::threeds_inputport1_r)
@@ -111,18 +113,19 @@ CUSTOM_INPUT_MEMBER( pastelg_state::nb1413m3_busyflag_r )
 	return m_nb1413m3->m_busyflag & 0x01;
 }
 
-ADDRESS_MAP_START(pastelg_state::threeds_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x81, 0x81) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM") AM_WRITE(threeds_romsel_w )
-	AM_RANGE(0xf0, 0xf6) AM_WRITE(pastelg_blitter_w)
-	AM_RANGE(0xa0, 0xa0) AM_READWRITE(threeds_inputport1_r, threeds_inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_READ(threeds_inputport2_r) AM_WRITE(threeds_output_w)//writes: bit 3 is coin lockout, bit 1 is coin counter
-	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_SHARE("clut")
-	AM_RANGE(0xc0, 0xc0) AM_READ(threeds_rom_readback_r)
-	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", dac_byte_interface, write)
-ADDRESS_MAP_END
+void pastelg_state::threeds_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x90, 0x90).portr("SYSTEM").w(this, FUNC(pastelg_state::threeds_romsel_w));
+	map(0xf0, 0xf6).w(this, FUNC(pastelg_state::pastelg_blitter_w));
+	map(0xa0, 0xa0).rw(this, FUNC(pastelg_state::threeds_inputport1_r), FUNC(pastelg_state::threeds_inputportsel_w));
+	map(0xb0, 0xb0).r(this, FUNC(pastelg_state::threeds_inputport2_r)).w(this, FUNC(pastelg_state::threeds_output_w));//writes: bit 3 is coin lockout, bit 1 is coin counter
+	map(0xc0, 0xcf).writeonly().share("clut");
+	map(0xc0, 0xc0).r(this, FUNC(pastelg_state::threeds_rom_readback_r));
+	map(0xd0, 0xd0).r(this, FUNC(pastelg_state::pastelg_irq_ack_r)).w("dac", FUNC(dac_byte_interface::write));
+}
 
 static INPUT_PORTS_START( pastelg )
 	PORT_START("DSWA")

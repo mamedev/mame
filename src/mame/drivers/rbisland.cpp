@@ -346,48 +346,51 @@ WRITE16_MEMBER(rbisland_state::jumping_sound_w)
                             MEMORY STRUCTURES
 ***************************************************************************/
 
-ADDRESS_MAP_START(rbisland_state::rbisland_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x10c000, 0x10ffff) AM_RAM             /* main RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x201000, 0x203fff) AM_RAM             /* r/w in initial checks */
-	AM_RANGE(0x390000, 0x390003) AM_READ_PORT("DSWA")
-	AM_RANGE(0x3a0000, 0x3a0001) AM_WRITE(rbisland_spritectrl_w)
-	AM_RANGE(0x3b0000, 0x3b0003) AM_READ_PORT("DSWB")
-	AM_RANGE(0x3c0000, 0x3c0003) AM_WRITENOP        /* written very often, watchdog? */
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0x800000, 0x8007ff) AM_READWRITE(rbisland_cchip_ram_r,rbisland_cchip_ram_w)
-	AM_RANGE(0x800802, 0x800803) AM_READWRITE(rbisland_cchip_ctrl_r,rbisland_cchip_ctrl_w)
-	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(rbisland_cchip_bank_w)
-	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)
-	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
-	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE("pc080sn", pc080sn_device, xscroll_word_w)
-	AM_RANGE(0xc50000, 0xc50003) AM_DEVWRITE("pc080sn", pc080sn_device, ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)  /* sprite ram + other stuff */
-ADDRESS_MAP_END
+void rbisland_state::rbisland_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x10c000, 0x10ffff).ram();             /* main RAM */
+	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x201000, 0x203fff).ram();             /* r/w in initial checks */
+	map(0x390000, 0x390003).portr("DSWA");
+	map(0x3a0000, 0x3a0001).w(this, FUNC(rbisland_state::rbisland_spritectrl_w));
+	map(0x3b0000, 0x3b0003).portr("DSWB");
+	map(0x3c0000, 0x3c0003).nopw();        /* written very often, watchdog? */
+	map(0x3e0000, 0x3e0001).nopr();
+	map(0x3e0001, 0x3e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0x3e0003, 0x3e0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+	map(0x800000, 0x8007ff).rw(this, FUNC(rbisland_state::rbisland_cchip_ram_r), FUNC(rbisland_state::rbisland_cchip_ram_w));
+	map(0x800802, 0x800803).rw(this, FUNC(rbisland_state::rbisland_cchip_ctrl_r), FUNC(rbisland_state::rbisland_cchip_ctrl_w));
+	map(0x800c00, 0x800c01).w(this, FUNC(rbisland_state::rbisland_cchip_bank_w));
+	map(0xc00000, 0xc0ffff).rw(m_pc080sn, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));
+	map(0xc20000, 0xc20003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
+	map(0xc40000, 0xc40003).w(m_pc080sn, FUNC(pc080sn_device::xscroll_word_w));
+	map(0xc50000, 0xc50003).w(m_pc080sn, FUNC(pc080sn_device::ctrl_word_w));
+	map(0xd00000, 0xd03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  /* sprite ram + other stuff */
+}
 
-ADDRESS_MAP_START(rbisland_state::jumping_map)
-	AM_RANGE(0x000000, 0x09ffff) AM_ROM
-	AM_RANGE(0x10c000, 0x10ffff) AM_RAM             /* main RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x201000, 0x203fff) AM_RAM             /* r/w in initial checks */
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("DSWA")
-	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("DSWB")
-	AM_RANGE(0x401000, 0x401001) AM_READ_PORT("401001")
-	AM_RANGE(0x401002, 0x401003) AM_READ_PORT("401003")
-	AM_RANGE(0x3a0000, 0x3a0001) AM_WRITE(jumping_spritectrl_w)
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP        /* watchdog? */
-	AM_RANGE(0x400006, 0x400007) AM_WRITE(jumping_sound_w)
-	AM_RANGE(0x420000, 0x420001) AM_READNOP         /* read, but result not used */
-	AM_RANGE(0x430000, 0x430003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x800000, 0x80ffff) AM_WRITENOP        /* original c-chip location (not used) */
-	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)
-	AM_RANGE(0xc20000, 0xc20003) AM_WRITENOP        /* seems it is a leftover from rbisland: scroll y written here too */
-	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE("pc080sn", pc080sn_device, xscroll_word_w)
-	AM_RANGE(0xd00000, 0xd01fff) AM_RAM             /* original spriteram location, needed for Attract Mode */
-ADDRESS_MAP_END
+void rbisland_state::jumping_map(address_map &map)
+{
+	map(0x000000, 0x09ffff).rom();
+	map(0x10c000, 0x10ffff).ram();             /* main RAM */
+	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x201000, 0x203fff).ram();             /* r/w in initial checks */
+	map(0x400000, 0x400001).portr("DSWA");
+	map(0x400002, 0x400003).portr("DSWB");
+	map(0x401000, 0x401001).portr("401001");
+	map(0x401002, 0x401003).portr("401003");
+	map(0x3a0000, 0x3a0001).w(this, FUNC(rbisland_state::jumping_spritectrl_w));
+	map(0x3c0000, 0x3c0001).nopw();        /* watchdog? */
+	map(0x400006, 0x400007).w(this, FUNC(rbisland_state::jumping_sound_w));
+	map(0x420000, 0x420001).nopr();         /* read, but result not used */
+	map(0x430000, 0x430003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
+	map(0x440000, 0x4407ff).ram().share("spriteram");
+	map(0x800000, 0x80ffff).nopw();        /* original c-chip location (not used) */
+	map(0xc00000, 0xc0ffff).rw(m_pc080sn, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));
+	map(0xc20000, 0xc20003).nopw();        /* seems it is a leftover from rbisland: scroll y written here too */
+	map(0xc40000, 0xc40003).w(m_pc080sn, FUNC(pc080sn_device::xscroll_word_w));
+	map(0xd00000, 0xd01fff).ram();             /* original spriteram location, needed for Attract Mode */
+}
 
 
 /**********************************************************
@@ -408,25 +411,27 @@ READ8_MEMBER(rbisland_state::jumping_latch_r)
 }
 
 
-ADDRESS_MAP_START(rbisland_state::rbisland_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
-	AM_RANGE(0x9002, 0x9100) AM_READNOP
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
-ADDRESS_MAP_END
+void rbisland_state::rbisland_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0x8fff).ram();
+	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x9002, 0x9100).nopr();
+	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
+	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
+}
 
-ADDRESS_MAP_START(rbisland_state::jumping_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xb400, 0xb401) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xb800, 0xb800) AM_READ(jumping_latch_r)
-	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP    /* looks like a bankswitch, but sound works with or without it */
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void rbisland_state::jumping_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram();
+	map(0xb000, 0xb001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xb400, 0xb401).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xb800, 0xb800).r(this, FUNC(rbisland_state::jumping_latch_r));
+	map(0xbc00, 0xbc00).nopw();    /* looks like a bankswitch, but sound works with or without it */
+	map(0xc000, 0xffff).rom();
+}
 
 
 /***********************************************************

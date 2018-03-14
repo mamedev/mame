@@ -35,31 +35,6 @@ watchdog_timer_device::watchdog_timer_device(const machine_config &mconfig, cons
 
 
 //-------------------------------------------------
-//  static_set_vblank_count - configuration helper
-//  to set the number of VBLANKs
-//-------------------------------------------------
-
-void watchdog_timer_device::static_set_vblank_count(device_t &device, const char *screen_tag, int32_t count)
-{
-	watchdog_timer_device &watchdog = downcast<watchdog_timer_device &>(device);
-	watchdog.m_screen_tag = screen_tag;
-	watchdog.m_vblank_count = count;
-}
-
-
-//-------------------------------------------------
-//  static_set_time - configuration helper to set
-//  the time until reset
-//-------------------------------------------------
-
-void watchdog_timer_device::static_set_time(device_t &device, attotime time)
-{
-	watchdog_timer_device &watchdog = downcast<watchdog_timer_device &>(device);
-	watchdog.m_time = time;
-}
-
-
-//-------------------------------------------------
 //  device_validity_check - validate the device
 //  configuration
 //-------------------------------------------------

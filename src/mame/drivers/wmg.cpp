@@ -87,8 +87,6 @@ public:
 	wmg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: williams_state(mconfig, type, tag)
 		, m_p_ram(*this, "nvram")
-		, m_pia0(*this, "pia_0")
-		, m_pia1(*this, "pia_1")
 		, m_keyboard(*this, "X%d", 0)
 	{ }
 
@@ -114,8 +112,6 @@ private:
 	uint8_t m_wmg_port_select;
 	uint8_t m_wmg_vram_bank;
 	required_shared_ptr<uint8_t> m_p_ram;
-	required_device<pia6821_device> m_pia0;
-	required_device<pia6821_device> m_pia1;
 	required_ioport_array<17> m_keyboard;
 };
 
@@ -126,23 +122,25 @@ private:
  *  Address Map
  *
  *************************************/
-ADDRESS_MAP_START(wmg_state::wmg_cpu1)
-	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank7")
-	AM_RANGE(0xd000, 0xffff) AM_ROMBANK("bank5")
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(wmg_d000_w)
-ADDRESS_MAP_END
+void wmg_state::wmg_cpu1(address_map &map)
+{
+	map(0x0000, 0x8fff).bankr("bank1").writeonly().share("videoram");
+	map(0x9000, 0xbfff).ram();
+	map(0xc000, 0xcfff).bankr("bank7");
+	map(0xd000, 0xffff).bankr("bank5");
+	map(0xd000, 0xd000).w(this, FUNC(wmg_state::wmg_d000_w));
+}
 
-ADDRESS_MAP_START(wmg_state::wmg_cpu2)
-	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
-	AM_RANGE(0x0080, 0x00ff) AM_RAM     /* MC6810 RAM */
-	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
+void wmg_state::wmg_cpu2(address_map &map)
+{
+	map(0x0000, 0x007f).ram();     /* internal RAM */
+	map(0x0080, 0x00ff).ram();     /* MC6810 RAM */
+	map(0x0400, 0x0403).mirror(0x8000).rw(m_pia_2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 /* These next 2 are actually banked in CPU 1, but its not something Mame can handle very well. Placed here instead. */
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xefff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xffff) AM_ROMBANK("bank6")
-ADDRESS_MAP_END
+	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share("paletteram");
+	map(0xd000, 0xefff).ram().share("nvram");
+	map(0xf000, 0xffff).bankr("bank6");
+}
 
 /***************************************************************
  *
@@ -393,8 +391,8 @@ WRITE8_MEMBER( wmg_state::wmg_d000_w )
 	if (data == 0)
 	{
 		/* install the i/o devices into c000-cfff */
-		pia6821_device *pia0 = m_pia0;
-		pia6821_device *pia1 = m_pia1;
+		pia6821_device *pia0 = m_pia_0;
+		pia6821_device *pia1 = m_pia_1;
 
 		space.unmap_read(0xc000, 0xcfff); // throw out bank7
 		space.install_write_bank       (0xc000, 0xc00f, "bank4");
@@ -460,7 +458,7 @@ READ8_MEMBER( wmg_state::wmg_pia_0_r )
     Since there is no code in rom to handle this, it must be a hardware feature
     which probably just resets the cpu. */
 
-	uint8_t data = m_pia0->read(space, offset);
+	uint8_t data = m_pia_0->read(space, offset);
 
 	if ((m_wmg_c400) && (offset == 0) && ((data & 0x30) == 0x30))   // P1 and P2 pressed
 	{

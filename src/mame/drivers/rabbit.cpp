@@ -713,40 +713,41 @@ WRITE32_MEMBER(rabbit_state::eeprom_write)
 	}
 }
 
-ADDRESS_MAP_START(rabbit_state::rabbit_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x000000, 0x000003) AM_WRITENOP // bug in code / emulation?
-	AM_RANGE(0x000010, 0x000013) AM_WRITENOP // bug in code / emulation?
-	AM_RANGE(0x000024, 0x000027) AM_WRITENOP // bug in code / emulation?
-	AM_RANGE(0x00719c, 0x00719f) AM_WRITENOP // bug in code / emulation?
-	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("INPUTS") AM_WRITE(eeprom_write)
-	AM_RANGE(0x400010, 0x400013) AM_READ(randomrabbits) // gfx chip status?
+void rabbit_state::rabbit_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x000000, 0x000003).nopw(); // bug in code / emulation?
+	map(0x000010, 0x000013).nopw(); // bug in code / emulation?
+	map(0x000024, 0x000027).nopw(); // bug in code / emulation?
+	map(0x00719c, 0x00719f).nopw(); // bug in code / emulation?
+	map(0x200000, 0x200003).portr("INPUTS").w(this, FUNC(rabbit_state::eeprom_write));
+	map(0x400010, 0x400013).r(this, FUNC(rabbit_state::randomrabbits)); // gfx chip status?
 	/* this lot are probably gfxchip/blitter etc. related */
-	AM_RANGE(0x400010, 0x400013) AM_WRITEONLY AM_SHARE("viewregs0" )
-	AM_RANGE(0x400100, 0x400117) AM_WRITEONLY AM_SHARE("tilemap_regs.0" ) // tilemap regs1
-	AM_RANGE(0x400120, 0x400137) AM_WRITEONLY AM_SHARE("tilemap_regs.1" ) // tilemap regs2
-	AM_RANGE(0x400140, 0x400157) AM_WRITEONLY AM_SHARE("tilemap_regs.2" ) // tilemap regs3
-	AM_RANGE(0x400160, 0x400177) AM_WRITEONLY AM_SHARE("tilemap_regs.3" ) // tilemap regs4
-	AM_RANGE(0x400200, 0x40021b) AM_WRITEONLY AM_SHARE("spriteregs" ) // sprregs?
-	AM_RANGE(0x400300, 0x400303) AM_WRITE(rombank_w) // used during rom testing, rombank/area select + something else?
-	AM_RANGE(0x400400, 0x400413) AM_WRITEONLY AM_SHARE("viewregs6" ) // some global controls? (brightness etc.?)
-	AM_RANGE(0x400500, 0x400503) AM_WRITEONLY AM_SHARE("viewregs7" )
-	AM_RANGE(0x400700, 0x40070f) AM_WRITE(blitter_w) AM_SHARE("blitterregs" )
-	AM_RANGE(0x400800, 0x40080f) AM_WRITEONLY AM_SHARE("viewregs9" ) // never changes?
-	AM_RANGE(0x400900, 0x4009ff) AM_DEVREADWRITE16("i5000snd", i5000snd_device, read, write, 0xffffffff)
+	map(0x400010, 0x400013).writeonly().share("viewregs0");
+	map(0x400100, 0x400117).writeonly().share("tilemap_regs.0"); // tilemap regs1
+	map(0x400120, 0x400137).writeonly().share("tilemap_regs.1"); // tilemap regs2
+	map(0x400140, 0x400157).writeonly().share("tilemap_regs.2"); // tilemap regs3
+	map(0x400160, 0x400177).writeonly().share("tilemap_regs.3"); // tilemap regs4
+	map(0x400200, 0x40021b).writeonly().share("spriteregs"); // sprregs?
+	map(0x400300, 0x400303).w(this, FUNC(rabbit_state::rombank_w)); // used during rom testing, rombank/area select + something else?
+	map(0x400400, 0x400413).writeonly().share("viewregs6"); // some global controls? (brightness etc.?)
+	map(0x400500, 0x400503).writeonly().share("viewregs7");
+	map(0x400700, 0x40070f).w(this, FUNC(rabbit_state::blitter_w)).share("blitterregs");
+	map(0x400800, 0x40080f).writeonly().share("viewregs9"); // never changes?
+	map(0x400900, 0x4009ff).rw("i5000snd", FUNC(i5000snd_device::read), FUNC(i5000snd_device::write));
 	/* hmm */
-	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("viewregs10" )
+	map(0x479700, 0x479713).writeonly().share("viewregs10");
 
-	AM_RANGE(0x440000, 0x47ffff) AM_ROMBANK("bank1") // data (gfx / sound) rom readback for ROM testing
+	map(0x440000, 0x47ffff).bankr("bank1"); // data (gfx / sound) rom readback for ROM testing
 	/* tilemaps */
-	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(tilemap0_r,tilemap0_w)
-	AM_RANGE(0x484000, 0x487fff) AM_READWRITE(tilemap1_r,tilemap1_w)
-	AM_RANGE(0x488000, 0x48bfff) AM_READWRITE(tilemap2_r,tilemap2_w)
-	AM_RANGE(0x48c000, 0x48ffff) AM_READWRITE(tilemap3_r,tilemap3_w)
-	AM_RANGE(0x494000, 0x497fff) AM_RAM AM_SHARE("spriteram") // sprites?
-	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x480000, 0x483fff).rw(this, FUNC(rabbit_state::tilemap0_r), FUNC(rabbit_state::tilemap0_w));
+	map(0x484000, 0x487fff).rw(this, FUNC(rabbit_state::tilemap1_r), FUNC(rabbit_state::tilemap1_w));
+	map(0x488000, 0x48bfff).rw(this, FUNC(rabbit_state::tilemap2_r), FUNC(rabbit_state::tilemap2_w));
+	map(0x48c000, 0x48ffff).rw(this, FUNC(rabbit_state::tilemap3_r), FUNC(rabbit_state::tilemap3_w));
+	map(0x494000, 0x497fff).ram().share("spriteram"); // sprites?
+	map(0x4a0000, 0x4affff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xff0000, 0xffffff).ram();
+}
 
 
 static INPUT_PORTS_START( rabbit )

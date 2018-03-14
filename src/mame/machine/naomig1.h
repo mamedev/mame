@@ -24,6 +24,7 @@ public:
 	void set_dma_cb(dma_cb cb) { _dma_cb = cb; }
 
 	void amap(address_map &map);
+	virtual void submap(address_map &map) = 0;
 
 	DECLARE_READ32_MEMBER(sb_gdstar_r);   // 5f7404
 	DECLARE_WRITE32_MEMBER(sb_gdstar_w);  // 5f7404

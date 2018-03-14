@@ -133,7 +133,7 @@ READ16_MEMBER(isbc_215g_device::io_r)
 			break;
 		case 0x0c:
 			// reset channel 2
-			if(machine().side_effect_disabled()) // reading this is bad
+			if(machine().side_effects_disabled()) // reading this is bad
 				break;
 			m_dmac->sel_w(1);
 			m_dmac->ca_w(1);
@@ -295,7 +295,7 @@ WRITE16_MEMBER(isbc_215g_device::io_w)
 READ16_MEMBER(isbc_215g_device::mem_r)
 {
 	// XXX: hack to permit debugger to disassemble rom
-	if(machine().side_effect_disabled() && (offset < 0x1fff))
+	if(machine().side_effects_disabled() && (offset < 0x1fff))
 		return m_dmac->space(AS_IO).read_word_unaligned(offset*2);
 
 	switch(offset)
@@ -316,19 +316,21 @@ WRITE16_MEMBER(isbc_215g_device::mem_w)
 	m_maincpu_mem->write_word_unaligned(offset*2, data, mem_mask);
 }
 
-ADDRESS_MAP_START(isbc_215g_device::isbc_215g_mem)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mem_r, mem_w)
-ADDRESS_MAP_END
+void isbc_215g_device::isbc_215g_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(this, FUNC(isbc_215g_device::mem_r), FUNC(isbc_215g_device::mem_w));
+}
 
-ADDRESS_MAP_START(isbc_215g_device::isbc_215g_io)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("i8089", 0)
-	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0x8000, 0x8039) AM_MIRROR(0x3fc0) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0xc070, 0xc08f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs0_r, mcs0_w, 0x00ff)
-	AM_RANGE(0xc0b0, 0xc0bf) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
-	AM_RANGE(0xc0d0, 0xc0df) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs0_r, mcs0_w, 0x00ff)
-	AM_RANGE(0xc0e0, 0xc0ef) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
-ADDRESS_MAP_END
+void isbc_215g_device::isbc_215g_io(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("i8089", 0);
+	map(0x4000, 0x47ff).mirror(0x3800).ram();
+	map(0x8000, 0x8039).mirror(0x3fc0).rw(this, FUNC(isbc_215g_device::io_r), FUNC(isbc_215g_device::io_w));
+	map(0xc070, 0xc08f).rw("sbx1", FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
+	map(0xc0b0, 0xc0bf).rw("sbx1", FUNC(isbx_slot_device::mcs1_r), FUNC(isbx_slot_device::mcs1_w)).umask16(0x00ff);
+	map(0xc0d0, 0xc0df).rw("sbx2", FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
+	map(0xc0e0, 0xc0ef).rw("sbx2", FUNC(isbx_slot_device::mcs1_r), FUNC(isbx_slot_device::mcs1_w)).umask16(0x00ff);
+}
 
 WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_00_w)
 {

@@ -62,7 +62,6 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(crtc_update_row);
 
 	void trs80dt1(machine_config &config);
-	void data_map(address_map &map);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
 private:
@@ -144,25 +143,22 @@ WRITE8_MEMBER( trs80dt1_state::port3_w )
 	m_beep->set_state(BIT(data, 4));
 }
 
-ADDRESS_MAP_START(trs80dt1_state::prg_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_READ(dma_r)
-ADDRESS_MAP_END
+void trs80dt1_state::prg_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x27ff).r(this, FUNC(trs80dt1_state::dma_r));
+}
 
-ADDRESS_MAP_START(trs80dt1_state::data_map)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(trs80dt1_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xbfff) // A14 not used
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(port1_w)
-	AM_RANGE(0x0003, 0x0003) AM_WRITE(port3_w)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xa800, 0xa83f) AM_MIRROR(0x3c0) AM_DEVREADWRITE("nvram", x2210_device, read, write) // X2210
-	AM_RANGE(0xac00, 0xafff) AM_READ(key_r)
-	AM_RANGE(0xb000, 0xb3ff) AM_READ_PORT("X9") // also reads some RS232 inputs
-	AM_RANGE(0xb400, 0xb7ff) AM_WRITE(store_w)
-	AM_RANGE(0xbc00, 0xbc01) AM_MIRROR(0x3fe) AM_DEVREADWRITE("crtc", i8275_device, read, write) // i8276
-ADDRESS_MAP_END
+void trs80dt1_state::io_map(address_map &map)
+{
+	map.global_mask(0xbfff); // A14 not used
+	map(0xa000, 0xa7ff).ram().share("videoram");
+	map(0xa800, 0xa83f).mirror(0x3c0).rw(m_nvram, FUNC(x2210_device::read), FUNC(x2210_device::write)); // X2210
+	map(0xac00, 0xafff).r(this, FUNC(trs80dt1_state::key_r));
+	map(0xb000, 0xb3ff).portr("X9"); // also reads some RS232 inputs
+	map(0xb400, 0xb7ff).w(this, FUNC(trs80dt1_state::store_w));
+	map(0xbc00, 0xbc01).mirror(0x3fe).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write)); // i8276
+}
 
 /* Input ports */
 static INPUT_PORTS_START( trs80dt1 )
@@ -315,8 +311,9 @@ MACHINE_CONFIG_START(trs80dt1_state::trs80dt1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, 7372800)
 	MCFG_CPU_PROGRAM_MAP(prg_map)
-	MCFG_CPU_DATA_MAP(data_map)
 	MCFG_CPU_IO_MAP(io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(trs80dt1_state, port1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(trs80dt1_state, port3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

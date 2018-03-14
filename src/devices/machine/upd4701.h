@@ -32,26 +32,24 @@
 ***************************************************************************/
 
 #define MCFG_UPD4701_PORTX(_tag) \
-	upd4701_device::set_portx_tag(*device, "^" _tag);
+	downcast<upd4701_device &>(*device).set_portx_tag("^" _tag);
 #define MCFG_UPD4701_PORTY(_tag) \
-	upd4701_device::set_porty_tag(*device, "^" _tag);
+	downcast<upd4701_device &>(*device).set_porty_tag("^" _tag);
 #define MCFG_UPD4701_CF_CALLBACK(_devcb) \
-	devcb = upd4701_device::set_cf_cb(*device, DEVCB_##_devcb);
+	devcb = downcast<upd4701_device &>(*device).set_cf_cb(DEVCB_##_devcb);
 #define MCFG_UPD4701_SF_CALLBACK(_devcb) \
-	devcb = upd4701_device::set_sf_cb(*device, DEVCB_##_devcb);
+	devcb = downcast<upd4701_device &>(*device).set_sf_cb(DEVCB_##_devcb);
 
 class upd4701_device : public device_t
 {
 public:
 	upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// static configuration
-	static void set_portx_tag(device_t &device, const char *tag) { downcast<upd4701_device &>(device).m_portx.set_tag(tag); }
-	static void set_porty_tag(device_t &device, const char *tag) { downcast<upd4701_device &>(device).m_porty.set_tag(tag); }
-	template<class Object>
-	static devcb_base &set_cf_cb(device_t &device, Object &&cb) { return downcast<upd4701_device &>(device).m_cf_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object>
-	static devcb_base &set_sf_cb(device_t &device, Object &&cb) { return downcast<upd4701_device &>(device).m_sf_cb.set_callback(std::forward<Object>(cb)); }
+	// configuration
+	void set_portx_tag(const char *tag) { m_portx.set_tag(tag); }
+	void set_porty_tag(const char *tag) { m_porty.set_tag(tag); }
+	template<class Object> devcb_base &set_cf_cb(Object &&cb) { return m_cf_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_sf_cb(Object &&cb) { return m_sf_cb.set_callback(std::forward<Object>(cb)); }
 
 	void x_add(s16 data);
 	void y_add(s16 data);

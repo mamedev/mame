@@ -219,27 +219,12 @@ smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag,
 	m_pdr2_write(*this),
 	m_irq_line(*this),
 	m_ctrl1(nullptr),
-	m_ctrl2(nullptr)
+	m_ctrl2(nullptr),
+	m_screen(*this, finder_base::DUMMY_TAG)
 {
 	m_ctrl1 = nullptr;
 	m_ctrl2 = nullptr;
 	m_has_ctrl_ports = false;
-}
-
-// method setters
-void smpc_hle_device::static_set_region_code(device_t &device, uint8_t rgn)
-{
-	smpc_hle_device &dev = downcast<smpc_hle_device &>(device);
-	dev.m_region_code = rgn;
-}
-
-void smpc_hle_device::static_set_control_port_tags(device_t &device, const char *tag1, const char *tag2)
-{
-	smpc_hle_device &dev = downcast<smpc_hle_device &>(device);
-	dev.m_ctrl1_tag = tag1;
-	dev.m_ctrl2_tag = tag2;
-	// TODO: checking against nullptr still returns a device!?
-	dev.m_has_ctrl_ports = true;
 }
 
 //-------------------------------------------------
@@ -304,9 +289,6 @@ void smpc_hle_device::device_start()
 	m_rtc_timer = timer_alloc(RTC_ID);
 	m_intback_timer = timer_alloc(INTBACK_ID);
 	m_sndres_timer = timer_alloc(SNDRES_ID);
-
-//  TODO: tag-ify, needed when SCU will be a device
-	m_screen = machine().first_screen();
 
 	m_rtc_data[0] = DectoBCD(systime.local_time.year / 100);
 	m_rtc_data[1] = DectoBCD(systime.local_time.year % 100);

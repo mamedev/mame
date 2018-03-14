@@ -77,21 +77,23 @@ public:
  *
  *************************************/
 
-ADDRESS_MAP_START(su2000_state::pcat_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM
-	AM_RANGE(0x00100000, 0x003fffff) AM_RAM
-	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
-ADDRESS_MAP_END
+void su2000_state::pcat_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+	map(0x000c0000, 0x000c7fff).rom();
+	map(0x000f0000, 0x000fffff).rom();
+	map(0x00100000, 0x003fffff).ram();
+	map(0xffff0000, 0xffffffff).rom().region("maincpu", 0x0f0000);
+}
 
-ADDRESS_MAP_START(su2000_state::pcat_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-ADDRESS_MAP_END
+void su2000_state::pcat_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+}
 
 
 /*************************************

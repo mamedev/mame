@@ -74,7 +74,6 @@
 //#include "bus/a2bus/a2udrive.h"
 #include "bus/a2bus/a2hsscsi.h"
 
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -182,9 +181,10 @@ static const floppy_interface apple2gs_floppy525_floppy_interface =
 };
 
 
-ADDRESS_MAP_START(apple2gs_state::apple2gs_map)
+void apple2gs_state::apple2gs_map(address_map &map)
+{
 	/* nothing in the address map - everything is added dynamically */
-ADDRESS_MAP_END
+}
 
 // ADB microcontroller emulation
 //

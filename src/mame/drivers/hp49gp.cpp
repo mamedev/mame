@@ -259,13 +259,14 @@ void hp49gp_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(hp49gp_state::hp49gp_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
-	AM_RANGE(0x08000000, 0x0801ffff) AM_RAM
-	AM_RANGE(0x08020000, 0x0803ffff) AM_RAM
-	AM_RANGE(0x08040000, 0x0807ffff) AM_RAM
-	AM_RANGE(0x40000000, 0x40000fff) AM_RAM AM_SHARE("steppingstone")
-ADDRESS_MAP_END
+void hp49gp_state::hp49gp_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).rom();
+	map(0x08000000, 0x0801ffff).ram();
+	map(0x08020000, 0x0803ffff).ram();
+	map(0x08040000, 0x0807ffff).ram();
+	map(0x40000000, 0x40000fff).ram().share("steppingstone");
+}
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -296,6 +297,7 @@ MACHINE_CONFIG_START(hp49gp_state::hp49gp)
 
 	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
 	MCFG_S3C2410_PALETTE("palette")
+	MCFG_S3C2410_SCREEN("screen")
 	MCFG_S3C2410_GPIO_PORT_R_CB(READ32(hp49gp_state, s3c2410_gpio_port_r))
 	MCFG_S3C2410_GPIO_PORT_W_CB(WRITE32(hp49gp_state, s3c2410_gpio_port_w))
 	MCFG_S3C2410_LCD_FLAGS(S3C24XX_INTERFACE_LCD_REVERSE)

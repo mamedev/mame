@@ -39,18 +39,20 @@ private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 };
 
-ADDRESS_MAP_START(tvgame_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0xbfff ) AM_RAM
-	AM_RANGE( 0xc000, 0xdfff ) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void tvgame_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).ram();
+	map(0xc000, 0xdfff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(tvgame_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(3)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0003) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-ADDRESS_MAP_END
+void tvgame_state::io_map(address_map &map)
+{
+	map.global_mask(3);
+	map.unmap_value_high();
+	map(0x0000, 0x0003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 /* Input ports */
 INPUT_PORTS_START( tvgame )

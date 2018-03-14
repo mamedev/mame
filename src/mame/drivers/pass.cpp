@@ -114,30 +114,33 @@
 
 
 /* todo: check all memory regions actually readable / read from */
-ADDRESS_MAP_START(pass_state::pass_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(pass_bg_videoram_w) AM_SHARE("bg_videoram") // Background
-	AM_RANGE(0x210000, 0x213fff) AM_RAM_WRITE(pass_fg_videoram_w) AM_SHARE("fg_videoram") // Foreground
-	AM_RANGE(0x220000, 0x2203ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x230000, 0x230001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x230100, 0x230101) AM_READ_PORT("DSW")
-	AM_RANGE(0x230200, 0x230201) AM_READ_PORT("INPUTS")
-ADDRESS_MAP_END
+void pass_state::pass_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x083fff).ram();
+	map(0x200000, 0x200fff).ram().w(this, FUNC(pass_state::pass_bg_videoram_w)).share("bg_videoram"); // Background
+	map(0x210000, 0x213fff).ram().w(this, FUNC(pass_state::pass_fg_videoram_w)).share("fg_videoram"); // Foreground
+	map(0x220000, 0x2203ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x230001, 0x230001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x230100, 0x230101).portr("DSW");
+	map(0x230200, 0x230201).portr("INPUTS");
+}
 
 /* sound cpu */
-ADDRESS_MAP_START(pass_state::pass_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void pass_state::pass_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(pass_state::pass_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
-ADDRESS_MAP_END
+void pass_state::pass_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x70, 0x71).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x80, 0x80).w("oki", FUNC(okim6295_device::write));
+	map(0xc0, 0xc0).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
+}
 
 /* todo : work out function of unknown but used dsw */
 static INPUT_PORTS_START( pass )

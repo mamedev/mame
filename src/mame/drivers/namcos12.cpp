@@ -1333,34 +1333,38 @@ void namcos12_state::namcos12_sub_irq( screen_device &screen, bool vblank_state 
 	m_sub_portb = (m_sub_portb & 0x7f) | (vblank_state << 7);
 }
 
-ADDRESS_MAP_START(namcos12_state::namcos12_map)
-	AM_RANGE(0x1f000000, 0x1f000003) AM_READNOP AM_WRITE16(bankoffset_w, 0x0000ffff)          /* banking */
-	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE16(sharedram_r, sharedram_w, 0xffffffff) /* shared ram?? */
-	AM_RANGE(0x1f140000, 0x1f140fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0x00ff00ff) /* eeprom */
-	AM_RANGE(0x1f1bff08, 0x1f1bff0f) AM_WRITENOP    /* ?? */
-	AM_RANGE(0x1f700000, 0x1f70ffff) AM_WRITE16(dmaoffset_w, 0xffffffff)  /* dma */
+void namcos12_state::namcos12_map(address_map &map)
+{
+	map(0x1f000000, 0x1f000003).nopr();
+	map(0x1f000000, 0x1f000001).w(this, FUNC(namcos12_state::bankoffset_w));          /* banking */
+	map(0x1f080000, 0x1f083fff).rw(this, FUNC(namcos12_state::sharedram_r), FUNC(namcos12_state::sharedram_w)); /* shared ram?? */
+	map(0x1f140000, 0x1f140fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask32(0x00ff00ff); /* eeprom */
+	map(0x1f1bff08, 0x1f1bff0f).nopw();    /* ?? */
+	map(0x1f700000, 0x1f70ffff).w(this, FUNC(namcos12_state::dmaoffset_w));  /* dma */
 	/* Network area */
-//  AM_RANGE(0x1f780000, 0x1f78ffff) AM_READWRITE16(link_sharedram_r, link_sharedram_w, 0xffffffff) /* H8 link CPU code */
-//  AM_RANGE(0x1f796000, 0x1f796003) AM_WRITE16(linkcpu_enable_w,0xffff0000)
-//  AM_RANGE(0x1f796020, 0x1f796023) AM_WRITE16(linkcpu_disable_w,0xffff0000)
+//  map(0x1f780000, 0x1f78ffff).rw(this, FUNC(namcos12_state::link_sharedram_r), FUNC(namcos12_state::link_sharedram_w)); /* H8 link CPU code */
+//  map(0x1f796002, 0x1f796003).w(this, FUNC(namcos12_state::linkcpu_enable_w));
+//  map(0x1f796022, 0x1f796023).w(this, FUNC(namcos12_state::linkcpu_disable_w));
 
-	AM_RANGE(0x1fa00000, 0x1fbfffff) AM_ROMBANK("bank1") /* banked roms */
-ADDRESS_MAP_END
+	map(0x1fa00000, 0x1fbfffff).bankr("bank1"); /* banked roms */
+}
 
-ADDRESS_MAP_START(namcos12_state::ptblank2_map)
-	AM_IMPORT_FROM( namcos12_map )
+void namcos12_state::ptblank2_map(address_map &map)
+{
+	namcos12_map(map);
 
-	AM_RANGE(0x1f780000, 0x1f78000f) AM_READ16(system11gun_r, 0xffffffff)
-	AM_RANGE(0x1f788000, 0x1f788003) AM_WRITE16(system11gun_w, 0xffffffff)
-ADDRESS_MAP_END
+	map(0x1f780000, 0x1f78000f).r(this, FUNC(namcos12_state::system11gun_r));
+	map(0x1f788000, 0x1f788003).w(this, FUNC(namcos12_state::system11gun_w));
+}
 
-ADDRESS_MAP_START(namcos12_state::tektagt_map)
-	AM_IMPORT_FROM( namcos12_map )
+void namcos12_state::tektagt_map(address_map &map)
+{
+	namcos12_map(map);
 
-	AM_RANGE(0x1fb00000, 0x1fb00003) AM_READWRITE16(tektagt_protection_1_r, tektagt_protection_1_w, 0xffffffff)
-	AM_RANGE(0x1fb80000, 0x1fb80003) AM_READWRITE16(tektagt_protection_2_r, tektagt_protection_2_w, 0xffffffff)
-	AM_RANGE(0x1f700000, 0x1f700003) AM_READ16(tektagt_protection_3_r, 0xffffffff)
-ADDRESS_MAP_END
+	map(0x1fb00000, 0x1fb00003).rw(this, FUNC(namcos12_state::tektagt_protection_1_r), FUNC(namcos12_state::tektagt_protection_1_w));
+	map(0x1fb80000, 0x1fb80003).rw(this, FUNC(namcos12_state::tektagt_protection_2_r), FUNC(namcos12_state::tektagt_protection_2_w));
+	map(0x1f700000, 0x1f700003).r(this, FUNC(namcos12_state::tektagt_protection_3_r));
+}
 
 WRITE16_MEMBER(namcos12_state::system11gun_w)
 {
@@ -1533,26 +1537,28 @@ void namcos12_boothack_state::machine_reset()
 }
 
 /* H8/3002 MCU stuff */
-ADDRESS_MAP_START(namcos12_state::s12h8rwmap)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")
-	AM_RANGE(0x300010, 0x300011) AM_NOP // golgo13 writes here a lot, possibly also a wait state generator?
-	AM_RANGE(0x300030, 0x300031) AM_NOP // most S12 bioses write here simply to generate a wait state.  there is no deeper meaning.
-ADDRESS_MAP_END
+void namcos12_state::s12h8rwmap(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x08ffff).ram().share("sharedram");
+	map(0x280000, 0x287fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
+	map(0x300000, 0x300001).portr("IN0");
+	map(0x300002, 0x300003).portr("IN1");
+	map(0x300010, 0x300011).noprw(); // golgo13 writes here a lot, possibly also a wait state generator?
+	map(0x300030, 0x300031).noprw(); // most S12 bioses write here simply to generate a wait state.  there is no deeper meaning.
+}
 
 // map for JVS games w/o controls connected directly
-ADDRESS_MAP_START(namcos12_state::s12h8rwjvsmap)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DIN0")
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("DIN1")
-	AM_RANGE(0x300010, 0x300011) AM_NOP
-	AM_RANGE(0x300030, 0x300031) AM_NOP // most S12 bioses write here simply to generate a wait state.  there is no deeper meaning.
-ADDRESS_MAP_END
+void namcos12_state::s12h8rwjvsmap(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x08ffff).ram().share("sharedram");
+	map(0x280000, 0x287fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
+	map(0x300000, 0x300001).portr("DIN0");
+	map(0x300002, 0x300003).portr("DIN1");
+	map(0x300010, 0x300011).noprw();
+	map(0x300030, 0x300031).noprw(); // most S12 bioses write here simply to generate a wait state.  there is no deeper meaning.
+}
 
 READ16_MEMBER(namcos12_state::s12_mcu_p8_r)
 {
@@ -1598,41 +1604,44 @@ READ16_MEMBER(namcos12_state::s12_mcu_jvs_p8_r)
 	return 0x12;    // bit 4 = JVS enable.  aplarail requires it to be on, soulclbr & others will require JVS I/O if it's on
 }
 
-ADDRESS_MAP_START(namcos12_state::s12h8iomap)
-	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ(s12_mcu_p6_r)
-	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
-	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_p8_r) AM_WRITENOP
-	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(s12_mcu_pa_r, s12_mcu_pa_w)
-	AM_RANGE(h8_device::PORT_B, h8_device::PORT_B) AM_READWRITE(s12_mcu_portB_r, s12_mcu_portB_w)
-	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_NOP
-	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_NOP
-	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
-	AM_RANGE(h8_device::ADC_3, h8_device::ADC_3) AM_NOP
-ADDRESS_MAP_END
+void namcos12_state::s12h8iomap(address_map &map)
+{
+	map(h8_device::PORT_6, h8_device::PORT_6).r(this, FUNC(namcos12_state::s12_mcu_p6_r));
+	map(h8_device::PORT_7, h8_device::PORT_7).portr("DSW");
+	map(h8_device::PORT_8, h8_device::PORT_8).r(this, FUNC(namcos12_state::s12_mcu_p8_r)).nopw();
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(this, FUNC(namcos12_state::s12_mcu_pa_r), FUNC(namcos12_state::s12_mcu_pa_w));
+	map(h8_device::PORT_B, h8_device::PORT_B).rw(this, FUNC(namcos12_state::s12_mcu_portB_r), FUNC(namcos12_state::s12_mcu_portB_w));
+	map(h8_device::ADC_0, h8_device::ADC_0).noprw();
+	map(h8_device::ADC_1, h8_device::ADC_1).noprw();
+	map(h8_device::ADC_2, h8_device::ADC_2).noprw();
+	map(h8_device::ADC_3, h8_device::ADC_3).noprw();
+}
 
-ADDRESS_MAP_START(namcos12_state::s12h8jvsiomap)
-	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ(s12_mcu_p6_r)
-	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
-	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_jvs_p8_r) AM_WRITENOP
-	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(s12_mcu_pa_r, s12_mcu_pa_w)
-	AM_RANGE(h8_device::PORT_B, h8_device::PORT_B) AM_READWRITE(s12_mcu_portB_r, s12_mcu_portB_w)
-	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_NOP
-	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_NOP
-	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
-	AM_RANGE(h8_device::ADC_3, h8_device::ADC_3) AM_NOP
-ADDRESS_MAP_END
+void namcos12_state::s12h8jvsiomap(address_map &map)
+{
+	map(h8_device::PORT_6, h8_device::PORT_6).r(this, FUNC(namcos12_state::s12_mcu_p6_r));
+	map(h8_device::PORT_7, h8_device::PORT_7).portr("DSW");
+	map(h8_device::PORT_8, h8_device::PORT_8).r(this, FUNC(namcos12_state::s12_mcu_jvs_p8_r)).nopw();
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(this, FUNC(namcos12_state::s12_mcu_pa_r), FUNC(namcos12_state::s12_mcu_pa_w));
+	map(h8_device::PORT_B, h8_device::PORT_B).rw(this, FUNC(namcos12_state::s12_mcu_portB_r), FUNC(namcos12_state::s12_mcu_portB_w));
+	map(h8_device::ADC_0, h8_device::ADC_0).noprw();
+	map(h8_device::ADC_1, h8_device::ADC_1).noprw();
+	map(h8_device::ADC_2, h8_device::ADC_2).noprw();
+	map(h8_device::ADC_3, h8_device::ADC_3).noprw();
+}
 
-ADDRESS_MAP_START(namcos12_state::s12h8railiomap)
-	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ(s12_mcu_p6_r)
-	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
-	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_jvs_p8_r) AM_WRITENOP
-	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(s12_mcu_pa_r, s12_mcu_pa_w)
-	AM_RANGE(h8_device::PORT_B, h8_device::PORT_B) AM_READWRITE(s12_mcu_portB_r, s12_mcu_portB_w)
-	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_READ_PORT("LEVER")
-	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_NOP
-	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
-	AM_RANGE(h8_device::ADC_3, h8_device::ADC_3) AM_NOP
-ADDRESS_MAP_END
+void namcos12_state::s12h8railiomap(address_map &map)
+{
+	map(h8_device::PORT_6, h8_device::PORT_6).r(this, FUNC(namcos12_state::s12_mcu_p6_r));
+	map(h8_device::PORT_7, h8_device::PORT_7).portr("DSW");
+	map(h8_device::PORT_8, h8_device::PORT_8).r(this, FUNC(namcos12_state::s12_mcu_jvs_p8_r)).nopw();
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(this, FUNC(namcos12_state::s12_mcu_pa_r), FUNC(namcos12_state::s12_mcu_pa_w));
+	map(h8_device::PORT_B, h8_device::PORT_B).rw(this, FUNC(namcos12_state::s12_mcu_portB_r), FUNC(namcos12_state::s12_mcu_portB_w));
+	map(h8_device::ADC_0, h8_device::ADC_0).portr("LEVER");
+	map(h8_device::ADC_1, h8_device::ADC_1).noprw();
+	map(h8_device::ADC_2, h8_device::ADC_2).noprw();
+	map(h8_device::ADC_3, h8_device::ADC_3).noprw();
+}
 
 // Golgo 13 lightgun inputs
 
@@ -1646,13 +1655,13 @@ READ16_MEMBER(namcos12_state::s12_mcu_gun_v_r)
 	return ioport("LIGHT0_Y")->read();
 }
 
-ADDRESS_MAP_START(namcos12_state::golgo13_h8iomap)
-	AM_IMPORT_FROM( s12h8iomap )
+void namcos12_state::golgo13_h8iomap(address_map &map)
+{
+	s12h8iomap(map);
 
-	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_READ(s12_mcu_gun_h_r)
-	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_READ(s12_mcu_gun_v_r)
-ADDRESS_MAP_END
-
+	map(h8_device::ADC_1, h8_device::ADC_1).r(this, FUNC(namcos12_state::s12_mcu_gun_h_r));
+	map(h8_device::ADC_2, h8_device::ADC_2).r(this, FUNC(namcos12_state::s12_mcu_gun_v_r));
+}
 
 DRIVER_INIT_MEMBER(namcos12_state,namcos12)
 {
@@ -1752,13 +1761,15 @@ MACHINE_CONFIG_START(namcos12_boothack_state::golgo13)
 MACHINE_CONFIG_END
 
 #define JVSCLOCK    (XTAL(14'745'600))
-ADDRESS_MAP_START(namcos12_state::jvsmap)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void namcos12_state::jvsmap(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("iocpu", 0);
+	map(0xc000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(namcos12_state::jvsiomap)
-ADDRESS_MAP_END
+void namcos12_state::jvsiomap(address_map &map)
+{
+}
 
 
 MACHINE_CONFIG_START(namcos12_boothack_state::truckk)
@@ -1801,35 +1812,39 @@ READ16_MEMBER(namcos12_state::iob_p6_r)
 	return sb | 0;
 }
 
-ADDRESS_MAP_START(namcos12_state::tdjvsmap)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("iocpu", 0)
-	AM_RANGE(0x6000, 0x6001) AM_READ_PORT("IN01")
-	AM_RANGE(0x6002, 0x6003) AM_READ_PORT("IN23")
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void namcos12_state::tdjvsmap(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("iocpu", 0);
+	map(0x6000, 0x6001).portr("IN01");
+	map(0x6002, 0x6003).portr("IN23");
+	map(0xc000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(namcos12_state::tdjvsiomap)
-	AM_RANGE(h8_device::PORT_4, h8_device::PORT_4) AM_READWRITE(iob_p4_r, iob_p4_w)
-	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ(iob_p6_r)
-	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_READ_PORT("STEER")
-	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_READ_PORT("BRAKE")
-	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_READ_PORT("GAS")
-ADDRESS_MAP_END
+void namcos12_state::tdjvsiomap(address_map &map)
+{
+	map(h8_device::PORT_4, h8_device::PORT_4).rw(this, FUNC(namcos12_state::iob_p4_r), FUNC(namcos12_state::iob_p4_w));
+	map(h8_device::PORT_6, h8_device::PORT_6).r(this, FUNC(namcos12_state::iob_p6_r));
+	map(h8_device::ADC_0, h8_device::ADC_0).portr("STEER");
+	map(h8_device::ADC_1, h8_device::ADC_1).portr("BRAKE");
+	map(h8_device::ADC_2, h8_device::ADC_2).portr("GAS");
+}
 
-ADDRESS_MAP_START(namcos12_state::plarailjvsmap)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("iocpu", 0)
-	AM_RANGE(0x6000, 0x6001) AM_READ_PORT("IN01")
-	AM_RANGE(0x6002, 0x6003) AM_READ_PORT("IN23")
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void namcos12_state::plarailjvsmap(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("iocpu", 0);
+	map(0x6000, 0x6001).portr("IN01");
+	map(0x6002, 0x6003).portr("IN23");
+	map(0xc000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(namcos12_state::plarailjvsiomap)
-	AM_RANGE(h8_device::PORT_4, h8_device::PORT_4) AM_READWRITE(iob_p4_r, iob_p4_w)
-	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READ_PORT("SERVICE")
-	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_NOP
-	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_NOP
-	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
-ADDRESS_MAP_END
+void namcos12_state::plarailjvsiomap(address_map &map)
+{
+	map(h8_device::PORT_4, h8_device::PORT_4).rw(this, FUNC(namcos12_state::iob_p4_r), FUNC(namcos12_state::iob_p4_w));
+	map(h8_device::PORT_6, h8_device::PORT_6).portr("SERVICE");
+	map(h8_device::ADC_0, h8_device::ADC_0).noprw();
+	map(h8_device::ADC_1, h8_device::ADC_1).noprw();
+	map(h8_device::ADC_2, h8_device::ADC_2).noprw();
+}
 
 MACHINE_CONFIG_START(namcos12_boothack_state::technodr)
 	coh700(config);

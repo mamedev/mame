@@ -421,7 +421,7 @@ void tms99xx_device::state_string_export(const device_state_entry &entry, std::s
 uint16_t tms99xx_device::read_workspace_register_debug(int reg)
 {
 	int temp = m_icount;
-	auto dis = machine().disable_side_effect();
+	auto dis = machine().disable_side_effects();
 	uint16_t value = m_prgspace->read_word((WP+(reg<<1)) & m_prgaddr_mask & 0xfffe);
 	m_icount = temp;
 	return value;
@@ -430,7 +430,7 @@ uint16_t tms99xx_device::read_workspace_register_debug(int reg)
 void tms99xx_device::write_workspace_register_debug(int reg, uint16_t data)
 {
 	int temp = m_icount;
-	auto dis = machine().disable_side_effect();
+	auto dis = machine().disable_side_effects();
 	m_prgspace->write_word((WP+(reg<<1)) & m_prgaddr_mask & 0xfffe, data);
 	m_icount = temp;
 }

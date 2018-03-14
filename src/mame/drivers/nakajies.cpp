@@ -398,16 +398,17 @@ WRITE8_MEMBER( nakajies_state::bank6_w ) { bank_w( 6, offset, data ); }
 WRITE8_MEMBER( nakajies_state::bank7_w ) { bank_w( 7, offset, data ); }
 
 
-ADDRESS_MAP_START(nakajies_state::nakajies_map)
-	AM_RANGE( 0x00000, 0x1ffff ) AM_READ_BANK( "bank0" ) AM_WRITE( bank0_w )
-	AM_RANGE( 0x20000, 0x3ffff ) AM_READ_BANK( "bank1" ) AM_WRITE( bank1_w )
-	AM_RANGE( 0x40000, 0x5ffff ) AM_READ_BANK( "bank2" ) AM_WRITE( bank2_w )
-	AM_RANGE( 0x60000, 0x7ffff ) AM_READ_BANK( "bank3" ) AM_WRITE( bank3_w )
-	AM_RANGE( 0x80000, 0x9ffff ) AM_READ_BANK( "bank4" ) AM_WRITE( bank4_w )
-	AM_RANGE( 0xa0000, 0xbffff ) AM_READ_BANK( "bank5" ) AM_WRITE( bank5_w )
-	AM_RANGE( 0xc0000, 0xdffff ) AM_READ_BANK( "bank6" ) AM_WRITE( bank6_w )
-	AM_RANGE( 0xe0000, 0xfffff ) AM_READ_BANK( "bank7" ) AM_WRITE( bank7_w )
-ADDRESS_MAP_END
+void nakajies_state::nakajies_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).bankr("bank0").w(this, FUNC(nakajies_state::bank0_w));
+	map(0x20000, 0x3ffff).bankr("bank1").w(this, FUNC(nakajies_state::bank1_w));
+	map(0x40000, 0x5ffff).bankr("bank2").w(this, FUNC(nakajies_state::bank2_w));
+	map(0x60000, 0x7ffff).bankr("bank3").w(this, FUNC(nakajies_state::bank3_w));
+	map(0x80000, 0x9ffff).bankr("bank4").w(this, FUNC(nakajies_state::bank4_w));
+	map(0xa0000, 0xbffff).bankr("bank5").w(this, FUNC(nakajies_state::bank5_w));
+	map(0xc0000, 0xdffff).bankr("bank6").w(this, FUNC(nakajies_state::bank6_w));
+	map(0xe0000, 0xfffff).bankr("bank7").w(this, FUNC(nakajies_state::bank7_w));
+}
 
 
 /*********************************************
@@ -501,15 +502,16 @@ READ8_MEMBER( nakajies_state::keyboard_r )
 }
 
 
-ADDRESS_MAP_START(nakajies_state::nakajies_io_map)
-	AM_RANGE( 0x0000, 0x0000 ) AM_WRITE( lcd_memory_start_w )
-	AM_RANGE( 0x0010, 0x0017 ) AM_WRITE( banking_w )
-	AM_RANGE( 0x0060, 0x0060 ) AM_READWRITE( irq_enable_r, irq_enable_w )
-	AM_RANGE( 0x0090, 0x0090 ) AM_READWRITE( irq_clear_r, irq_clear_w )
-	AM_RANGE( 0x00a0, 0x00a0 ) AM_READ( unk_a0_r )
-	AM_RANGE( 0x00b0, 0x00b0 ) AM_READ( keyboard_r )
-	AM_RANGE( 0x00d0, 0x00df ) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
-ADDRESS_MAP_END
+void nakajies_state::nakajies_io_map(address_map &map)
+{
+	map(0x0000, 0x0000).w(this, FUNC(nakajies_state::lcd_memory_start_w));
+	map(0x0010, 0x0017).w(this, FUNC(nakajies_state::banking_w));
+	map(0x0060, 0x0060).rw(this, FUNC(nakajies_state::irq_enable_r), FUNC(nakajies_state::irq_enable_w));
+	map(0x0090, 0x0090).rw(this, FUNC(nakajies_state::irq_clear_r), FUNC(nakajies_state::irq_clear_w));
+	map(0x00a0, 0x00a0).r(this, FUNC(nakajies_state::unk_a0_r));
+	map(0x00b0, 0x00b0).r(this, FUNC(nakajies_state::keyboard_r));
+	map(0x00d0, 0x00df).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
+}
 
 
 INPUT_CHANGED_MEMBER(nakajies_state::trigger_irq)

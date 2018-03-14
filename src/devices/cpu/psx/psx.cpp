@@ -203,14 +203,14 @@ static const uint32_t mtc0_writemask[]=
 
 READ32_MEMBER( psxcpu_device::berr_r )
 {
-	if( !machine().side_effect_disabled() )
+	if( !machine().side_effects_disabled() )
 		m_berr = 1;
 	return 0;
 }
 
 WRITE32_MEMBER( psxcpu_device::berr_w )
 {
-	if( !machine().side_effect_disabled() )
+	if( !machine().side_effects_disabled() )
 		m_berr = 1;
 }
 
@@ -3379,11 +3379,6 @@ uint32_t psxcpu_device::getcp3cr( int reg )
 
 void psxcpu_device::setcp3cr( int reg, uint32_t value )
 {
-}
-
-psxcpu_device *psxcpu_device::getcpu( device_t &device, const char *cputag )
-{
-	return downcast<psxcpu_device *>( device.subdevice( cputag ) );
 }
 
 READ32_MEMBER( psxcpu_device::gpu_r )

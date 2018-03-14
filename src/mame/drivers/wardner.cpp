@@ -173,77 +173,84 @@ WRITE8_MEMBER(wardner_state::wardner_bank_w)
 	m_membank->set_bank(data & 7);
 }
 
-ADDRESS_MAP_START(wardner_state::main_program_map)
-	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w)                     // AM_SHARE("spriteram8")
-	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("palette", palette_device, write8)  // AM_SHARE("palette")
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITEONLY AM_SHARE("sharedram")
-	AM_RANGE(0x8000, 0xffff) AM_DEVREAD("membank", address_map_bank_device, read8)
-ADDRESS_MAP_END
+void wardner_state::main_program_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x7fff).ram();
+	map(0x8000, 0x8fff).w(this, FUNC(wardner_state::wardner_sprite_w));                     // AM_SHARE("spriteram8")
+	map(0xa000, 0xafff).w(m_palette, FUNC(palette_device::write8));  // AM_SHARE("palette")
+	map(0xc000, 0xc7ff).writeonly().share("sharedram");
+	map(0x8000, 0xffff).r(m_membank, FUNC(address_map_bank_device::read8));
+}
 
 // Overlapped RAM/Banked ROM
 // Can't use AM_RANGE(0x00000, 0x3ffff) for ROM because the shared pointers get messed up somehow
-ADDRESS_MAP_START(wardner_state::main_bank_map)
-	AM_RANGE(0x00000, 0x00fff) AM_READ(wardner_sprite_r) AM_SHARE("spriteram8")
-	AM_RANGE(0x01000, 0x01fff) AM_ROM AM_REGION("maincpu", 0x1000)
-	AM_RANGE(0x02000, 0x02fff) AM_READONLY AM_SHARE("palette")
-	AM_RANGE(0x03000, 0x03fff) AM_ROM AM_REGION("maincpu", 0x3000)
-	AM_RANGE(0x04000, 0x047ff) AM_READONLY AM_SHARE("sharedram")
-	AM_RANGE(0x04800, 0x3ffff) AM_ROM AM_REGION("maincpu", 0x4800)
-ADDRESS_MAP_END
+void wardner_state::main_bank_map(address_map &map)
+{
+	map(0x00000, 0x00fff).r(this, FUNC(wardner_state::wardner_sprite_r)).share("spriteram8");
+	map(0x01000, 0x01fff).rom().region("maincpu", 0x1000);
+	map(0x02000, 0x02fff).readonly().share("palette");
+	map(0x03000, 0x03fff).rom().region("maincpu", 0x3000);
+	map(0x04000, 0x047ff).readonly().share("sharedram");
+	map(0x04800, 0x3ffff).rom().region("maincpu", 0x4800);
+}
 
-ADDRESS_MAP_START(wardner_state::main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x10, 0x13) AM_WRITE(wardner_txscroll_w)       /* scroll text layer */
-	AM_RANGE(0x14, 0x15) AM_WRITE(wardner_txlayer_w)        /* offset in text video RAM */
-	AM_RANGE(0x20, 0x23) AM_WRITE(wardner_bgscroll_w)       /* scroll bg layer */
-	AM_RANGE(0x24, 0x25) AM_WRITE(wardner_bglayer_w)        /* offset in bg video RAM */
-	AM_RANGE(0x30, 0x33) AM_WRITE(wardner_fgscroll_w)       /* scroll fg layer */
-	AM_RANGE(0x34, 0x35) AM_WRITE(wardner_fglayer_w)        /* offset in fg video RAM */
-	AM_RANGE(0x40, 0x43) AM_WRITE(wardner_exscroll_w)       /* scroll extra layer (not used) */
-	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWA")
-	AM_RANGE(0x52, 0x52) AM_READ_PORT("DSWB")
-	AM_RANGE(0x54, 0x54) AM_READ_PORT("P1")
-	AM_RANGE(0x56, 0x56) AM_READ_PORT("P2")
-	AM_RANGE(0x58, 0x58) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x5a, 0x5a) AM_DEVWRITE("coinlatch", ls259_device, write_nibble_d0)
-	AM_RANGE(0x5c, 0x5c) AM_DEVWRITE("mainlatch", ls259_device, write_nibble_d0)
-	AM_RANGE(0x60, 0x65) AM_READWRITE(wardner_videoram_r, wardner_videoram_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE(wardner_bank_w)
-ADDRESS_MAP_END
+void wardner_state::main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x02, 0x02).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x10, 0x13).w(this, FUNC(wardner_state::wardner_txscroll_w));       /* scroll text layer */
+	map(0x14, 0x15).w(this, FUNC(wardner_state::wardner_txlayer_w));        /* offset in text video RAM */
+	map(0x20, 0x23).w(this, FUNC(wardner_state::wardner_bgscroll_w));       /* scroll bg layer */
+	map(0x24, 0x25).w(this, FUNC(wardner_state::wardner_bglayer_w));        /* offset in bg video RAM */
+	map(0x30, 0x33).w(this, FUNC(wardner_state::wardner_fgscroll_w));       /* scroll fg layer */
+	map(0x34, 0x35).w(this, FUNC(wardner_state::wardner_fglayer_w));        /* offset in fg video RAM */
+	map(0x40, 0x43).w(this, FUNC(wardner_state::wardner_exscroll_w));       /* scroll extra layer (not used) */
+	map(0x50, 0x50).portr("DSWA");
+	map(0x52, 0x52).portr("DSWB");
+	map(0x54, 0x54).portr("P1");
+	map(0x56, 0x56).portr("P2");
+	map(0x58, 0x58).portr("SYSTEM");
+	map(0x5a, 0x5a).w("coinlatch", FUNC(ls259_device::write_nibble_d0));
+	map(0x5c, 0x5c).w("mainlatch", FUNC(ls259_device::write_nibble_d0));
+	map(0x60, 0x65).rw(this, FUNC(wardner_state::wardner_videoram_r), FUNC(wardner_state::wardner_videoram_w));
+	map(0x70, 0x70).w(this, FUNC(wardner_state::wardner_bank_w));
+}
 
 
 /***************************** Z80 Sound Memory Map *************************/
 
-ADDRESS_MAP_START(wardner_state::sound_program_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x807f) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM
-ADDRESS_MAP_END
+void wardner_state::sound_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x807f).ram();
+	map(0xc000, 0xc7ff).ram().share("sharedram");
+	map(0xc800, 0xcfff).ram();
+}
 
-ADDRESS_MAP_START(wardner_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-ADDRESS_MAP_END
+void wardner_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+}
 
 
 /***************************** TMS32010 Memory Map **************************/
 
-ADDRESS_MAP_START(wardner_state::DSP_program_map)
-	AM_RANGE(0x000, 0x5ff) AM_ROM
-ADDRESS_MAP_END
+void wardner_state::DSP_program_map(address_map &map)
+{
+	map(0x000, 0x5ff).rom();
+}
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-ADDRESS_MAP_START(wardner_state::DSP_io_map)
-	AM_RANGE(0x00, 0x00) AM_WRITE(wardner_dsp_addrsel_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(wardner_dsp_r, wardner_dsp_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(twincobr_dsp_bio_w)
-ADDRESS_MAP_END
+void wardner_state::DSP_io_map(address_map &map)
+{
+	map(0x00, 0x00).w(this, FUNC(wardner_state::wardner_dsp_addrsel_w));
+	map(0x01, 0x01).rw(this, FUNC(wardner_state::wardner_dsp_r), FUNC(wardner_state::wardner_dsp_w));
+	map(0x03, 0x03).w(this, FUNC(wardner_state::twincobr_dsp_bio_w));
+}
 
 
 /*****************************************************************************

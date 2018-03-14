@@ -585,54 +585,56 @@ WRITE16_MEMBER(jpmimpct_state::jpmio_w)
  *  Main CPU memory handlers
  *
  *************************************/
-ADDRESS_MAP_START(jpmimpct_state::m68k_program_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
-	AM_RANGE(0x00100000, 0x001fffff) AM_ROM
-	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE(duart_1_r, duart_1_w)
-	AM_RANGE(0x00480020, 0x00480033) AM_READ(inputs1_r)
-	AM_RANGE(0x00480034, 0x00480035) AM_READ(unk_r)
-	AM_RANGE(0x00480060, 0x00480067) AM_READWRITE(unk_r, unk_w)//PPI
-	AM_RANGE(0x00480080, 0x00480081) AM_WRITE(upd7759_w)
-	AM_RANGE(0x00480082, 0x00480083) AM_WRITE(volume_w)
-	AM_RANGE(0x00480084, 0x00480085) AM_READ(upd7759_r)
-	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE(jpmio_r, jpmio_w)
-	AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
-	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
-	AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
-	AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
-	AM_RANGE(0x00800000, 0x00800007) AM_DEVREADWRITE("dsp", tms34010_device, host_r, host_w)
-	AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM
-	AM_RANGE(0x00d00000, 0x00dfffff) AM_ROM
-	AM_RANGE(0x00e00000, 0x00efffff) AM_ROM
-	AM_RANGE(0x00f00000, 0x00ffffff) AM_ROM
-ADDRESS_MAP_END
+void jpmimpct_state::m68k_program_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).rom();
+	map(0x00100000, 0x001fffff).rom();
+	map(0x00400000, 0x00403fff).ram().share("nvram");
+	map(0x00480000, 0x0048001f).rw(this, FUNC(jpmimpct_state::duart_1_r), FUNC(jpmimpct_state::duart_1_w));
+	map(0x00480020, 0x00480033).r(this, FUNC(jpmimpct_state::inputs1_r));
+	map(0x00480034, 0x00480035).r(this, FUNC(jpmimpct_state::unk_r));
+	map(0x00480060, 0x00480067).rw(this, FUNC(jpmimpct_state::unk_r), FUNC(jpmimpct_state::unk_w));//PPI
+	map(0x00480080, 0x00480081).w(this, FUNC(jpmimpct_state::upd7759_w));
+	map(0x00480082, 0x00480083).w(this, FUNC(jpmimpct_state::volume_w));
+	map(0x00480084, 0x00480085).r(this, FUNC(jpmimpct_state::upd7759_r));
+	map(0x004800a0, 0x004800af).rw(this, FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmio_w));
+	map(0x004800e0, 0x004800e1).w(this, FUNC(jpmimpct_state::unk_w));
+	map(0x004801dc, 0x004801dd).r(this, FUNC(jpmimpct_state::unk_r));
+	map(0x004801de, 0x004801df).r(this, FUNC(jpmimpct_state::unk_r));
+	map(0x004801e0, 0x004801ff).rw(this, FUNC(jpmimpct_state::duart_2_r), FUNC(jpmimpct_state::duart_2_w));
+	map(0x00800000, 0x00800007).rw(m_dsp, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
+	map(0x00c00000, 0x00cfffff).rom();
+	map(0x00d00000, 0x00dfffff).rom();
+	map(0x00e00000, 0x00efffff).rom();
+	map(0x00f00000, 0x00ffffff).rom();
+}
 
 /*************************************
  *
  *  Main CPU memory handlers
  *
  *************************************/
-ADDRESS_MAP_START(jpmimpct_state::awp68k_program_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // most games are 0x00000000 - 0x0003ffff, but some QPS ones go up to fffff, check for any mirroring etc.
-	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE(duart_1_r, duart_1_w)
-	AM_RANGE(0x00480020, 0x00480033) AM_READ(inputs1awp_r)
-	AM_RANGE(0x00480034, 0x00480035) AM_READ(ump_r)
-	AM_RANGE(0x00480040, 0x00480041) AM_READ(optos_r)
-	AM_RANGE(0x00480060, 0x00480067) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write,0x00ff)
-	AM_RANGE(0x00480080, 0x00480081) AM_WRITE(upd7759_w)
-	AM_RANGE(0x00480082, 0x00480083) AM_WRITE(volume_w)
-	AM_RANGE(0x00480084, 0x00480085) AM_READ(upd7759_r)
-	AM_RANGE(0x00480086, 0x0048009f) AM_READ(prot_1_r)
-	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE(jpmio_r, jpmioawp_w)
+void jpmimpct_state::awp68k_program_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).rom(); // most games are 0x00000000 - 0x0003ffff, but some QPS ones go up to fffff, check for any mirroring etc.
+	map(0x00400000, 0x00403fff).ram().share("nvram");
+	map(0x00480000, 0x0048001f).rw(this, FUNC(jpmimpct_state::duart_1_r), FUNC(jpmimpct_state::duart_1_w));
+	map(0x00480020, 0x00480033).r(this, FUNC(jpmimpct_state::inputs1awp_r));
+	map(0x00480034, 0x00480035).r(this, FUNC(jpmimpct_state::ump_r));
+	map(0x00480040, 0x00480041).r(this, FUNC(jpmimpct_state::optos_r));
+	map(0x00480060, 0x00480067).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x00480080, 0x00480081).w(this, FUNC(jpmimpct_state::upd7759_w));
+	map(0x00480082, 0x00480083).w(this, FUNC(jpmimpct_state::volume_w));
+	map(0x00480084, 0x00480085).r(this, FUNC(jpmimpct_state::upd7759_r));
+	map(0x00480086, 0x0048009f).r(this, FUNC(jpmimpct_state::prot_1_r));
+	map(0x004800a0, 0x004800af).rw(this, FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmioawp_w));
 //  AM_RANGE(0x004800b0, 0x004800df) AM_READ(prot_1_r)
 //  AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
 //  AM_RANGE(0x00480086, 0x006576ff) AM_READ(prot_1_r)
-	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(prot_1_r)
-	AM_RANGE(0x004801de, 0x006575ff) AM_READ(prot_1_r)
-	AM_RANGE(0x00657600, 0x00657601) AM_READ(prot_0_r)
-	AM_RANGE(0x00657602, 0x00ffffff) AM_READ(prot_1_r)
+	map(0x004801dc, 0x004801dd).r(this, FUNC(jpmimpct_state::prot_1_r));
+	map(0x004801de, 0x006575ff).r(this, FUNC(jpmimpct_state::prot_1_r));
+	map(0x00657600, 0x00657601).r(this, FUNC(jpmimpct_state::prot_0_r));
+	map(0x00657602, 0x00ffffff).r(this, FUNC(jpmimpct_state::prot_1_r));
 
 //  AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
 //  AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
@@ -642,7 +644,7 @@ ADDRESS_MAP_START(jpmimpct_state::awp68k_program_map)
 //  AM_RANGE(0x00d00000, 0x00dfffff) AM_ROM
 //  AM_RANGE(0x00e00000, 0x00efffff) AM_ROM
 //  AM_RANGE(0x00f00000, 0x00ffffff) AM_ROM
-ADDRESS_MAP_END
+}
 
 
 /*************************************
@@ -651,15 +653,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(jpmimpct_state::tms_program_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0xf8000000) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0xf8000000) AM_ROM AM_REGION("user1", 0x100000)
-	AM_RANGE(0x02000000, 0x027fffff) AM_MIRROR(0xf8000000) AM_ROM AM_REGION("user1", 0)
+void jpmimpct_state::tms_program_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).mirror(0xf8000000).ram().share("vram");
+	map(0x00800000, 0x00ffffff).mirror(0xf8000000).rom().region("user1", 0x100000);
+	map(0x02000000, 0x027fffff).mirror(0xf8000000).rom().region("user1", 0);
 //  AM_RANGE(0x01000000, 0x0100003f) AM_MIRROR(0xf87fffc0) AM_READWRITE(jpmimpct_bt477_r, jpmimpct_bt477_w)
-	AM_RANGE(0x01000000, 0x017fffff) AM_MIRROR(0xf8000000) AM_MASK(0x1f) AM_READWRITE(jpmimpct_bt477_r, jpmimpct_bt477_w)
-	AM_RANGE(0x07800000, 0x07bfffff) AM_MIRROR(0xf8400000) AM_RAM
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("dsp", tms34010_device, io_register_r, io_register_w)
-ADDRESS_MAP_END
+	map(0x01000000, 0x017fffff).mirror(0xf8000000).mask(0x1f).rw(this, FUNC(jpmimpct_state::jpmimpct_bt477_r), FUNC(jpmimpct_state::jpmimpct_bt477_w));
+	map(0x07800000, 0x07bfffff).mirror(0xf8400000).ram();
+	map(0xc0000000, 0xc00001ff).rw(m_dsp, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+}
 
 
 /*************************************

@@ -409,39 +409,44 @@ READ8_MEMBER(dwarfd_state::qc_b8_r)
 	return machine().rand();
 }
 
-ADDRESS_MAP_START(dwarfd_state::mem_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
-ADDRESS_MAP_END
+void dwarfd_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).rw(this, FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
+}
 
-ADDRESS_MAP_START(dwarfd_state::pokeresp_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
-ADDRESS_MAP_END
+void dwarfd_state::pokeresp_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3000, 0x3fff).rw(this, FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
+}
 
-ADDRESS_MAP_START(dwarfd_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+void dwarfd_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
 
-	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE("i8275", i8275_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_WRITENOP // unknown
-	AM_RANGE(0x60, 0x60) AM_WRITE(output1_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(output2_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc1, 0xc1) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
+	map(0x20, 0x21).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0x40, 0x40).nopw(); // unknown
+	map(0x60, 0x60).w(this, FUNC(dwarfd_state::output1_w));
+	map(0x80, 0x80).w(this, FUNC(dwarfd_state::output2_w));
+	map(0xc0, 0xc0).portr("DSW1");
+	map(0xc1, 0xc1).portr("DSW2");
+}
 
-ADDRESS_MAP_START(dwarfd_state::qc_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
-ADDRESS_MAP_END
+void dwarfd_state::qc_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).rw(this, FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
+}
 
-ADDRESS_MAP_START(dwarfd_state::qc_io_map)
-	AM_IMPORT_FROM( io_map )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xb8, 0xb8) AM_READ(qc_b8_r)
-ADDRESS_MAP_END
+void dwarfd_state::qc_io_map(address_map &map)
+{
+	io_map(map);
+	map.global_mask(0xff);
+	map(0xb8, 0xb8).r(this, FUNC(dwarfd_state::qc_b8_r));
+}
 
 static INPUT_PORTS_START( dwarfd )
 	PORT_START("DSW1")

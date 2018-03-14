@@ -130,6 +130,8 @@ protected:
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	void tc0180vcu_memrw(address_map &map, u32 addr);
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;

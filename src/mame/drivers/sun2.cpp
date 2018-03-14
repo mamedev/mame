@@ -212,7 +212,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 {
 	uint8_t fc = m_maincpu->get_fc();
 
-	if ((fc == 3) && !machine().side_effect_disabled())
+	if ((fc == 3) && !machine().side_effects_disabled())
 	{
 		if (offset & 0x4)   // set for CPU space
 		{
@@ -271,7 +271,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 	}
 
 	// debugger hack
-	if (machine().side_effect_disabled() && (offset >= (0xef0000>>1)) && (offset <= (0xef8000>>1)))
+	if (machine().side_effects_disabled() && (offset >= (0xef0000>>1)) && (offset <= (0xef8000>>1)))
 	{
 		return m_rom_ptr[offset & 0x3fff];
 	}
@@ -291,7 +291,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 		uint32_t tmp = (m_pagemap[entry] & 0xfff) << 10;
 		tmp |= (offset & 0x3ff);
 
-	//  if (!machine().side_effect_disabled())
+	//  if (!machine().side_effects_disabled())
 	//      printf("sun2: Translated addr: %08x, type %d (page %d page entry %08x, orig virt %08x, FC %d)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, entry, m_pagemap[entry], offset<<1, fc);
 
 		switch ((m_pagemap[entry] >> 22) & 7)
@@ -334,10 +334,10 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 	}
 	else
 	{
-		if (!machine().side_effect_disabled()) printf("sun2: pagemap entry not valid!\n");
+		if (!machine().side_effects_disabled()) printf("sun2: pagemap entry not valid!\n");
 	}
 
-	if (!machine().side_effect_disabled()) printf("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", offset<<1, fc, mem_mask, m_maincpu->pc(), offset>>15);
+	if (!machine().side_effects_disabled()) printf("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", offset<<1, fc, mem_mask, m_maincpu->pc(), offset>>15);
 
 	return 0xffff;
 }
@@ -437,7 +437,7 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 		uint32_t tmp = (m_pagemap[entry] & 0xfff) << 10;
 		tmp |= (offset & 0x3ff);
 
-		//if (!machine().side_effect_disabled()) printf("sun2: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, m_pagemap[entry], offset<<1);
+		//if (!machine().side_effects_disabled()) printf("sun2: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, m_pagemap[entry], offset<<1);
 
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
@@ -461,7 +461,7 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 	}
 	else
 	{
-		if (!machine().side_effect_disabled()) printf("sun2: pagemap entry not valid!\n");
+		if (!machine().side_effects_disabled()) printf("sun2: pagemap entry not valid!\n");
 	}
 
 	printf("sun2: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<1);
@@ -479,69 +479,78 @@ WRITE16_MEMBER( sun2_state::video_ctrl_w )
 	COMBINE_DATA(&m_bw2_ctrl);
 }
 
-ADDRESS_MAP_START(sun2_state::sun2_mem)
-	AM_RANGE(0x000000, 0xffffff) AM_READWRITE( tl_mmu_r, tl_mmu_w )
-ADDRESS_MAP_END
+void sun2_state::sun2_mem(address_map &map)
+{
+	map(0x000000, 0xffffff).rw(this, FUNC(sun2_state::tl_mmu_r), FUNC(sun2_state::tl_mmu_w));
+}
 
 // VME memory spaces
 // type 0 device space
-ADDRESS_MAP_START(sun2_state::vmetype0space_map)
-	AM_RANGE(0x000000, 0x7fffff) AM_READWRITE(ram_r, ram_w)
-ADDRESS_MAP_END
+void sun2_state::vmetype0space_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rw(this, FUNC(sun2_state::ram_r), FUNC(sun2_state::ram_w));
+}
 
 // type 1 device space
-ADDRESS_MAP_START(sun2_state::vmetype1space_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_SHARE("bw2_vram")
-	AM_RANGE(0x020000, 0x020001) AM_READWRITE( video_ctrl_r, video_ctrl_w )
-	AM_RANGE(0x7f0000, 0x7f07ff) AM_ROM AM_REGION("bootprom", 0)    // uses MMU loophole to read 32k from a 2k window
+void sun2_state::vmetype1space_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).ram().share("bw2_vram");
+	map(0x020000, 0x020001).rw(this, FUNC(sun2_state::video_ctrl_r), FUNC(sun2_state::video_ctrl_w));
+	map(0x7f0000, 0x7f07ff).rom().region("bootprom", 0);    // uses MMU loophole to read 32k from a 2k window
 	// 7f0800-7f0fff: Ethernet interface
 	// 7f1000-7f17ff: AM9518 encryption processor
 	//AM_RANGE(0x7f1800, 0x7f1801) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, cb_r, cb_w, 0xff00)
 	//AM_RANGE(0x7f1802, 0x7f1803) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, db_r, db_w, 0xff00)
 	//AM_RANGE(0x7f1804, 0x7f1805) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ca_r, ca_w, 0xff00)
 	//AM_RANGE(0x7f1806, 0x7f1807) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, da_r, da_w, 0xff00)
-	AM_RANGE(0x7f2000, 0x7f2001) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, cb_r, cb_w, 0xff00)
-	AM_RANGE(0x7f2002, 0x7f2003) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, db_r, db_w, 0xff00)
-	AM_RANGE(0x7f2004, 0x7f2005) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ca_r, ca_w, 0xff00)
-	AM_RANGE(0x7f2006, 0x7f2007) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, da_r, da_w, 0xff00)
-	AM_RANGE(0x7f2800, 0x7f2803) AM_MIRROR(0x7fc) AM_DEVREADWRITE("timer", am9513_device, read16, write16)
-ADDRESS_MAP_END
+	map(0x7f2000, 0x7f2000).rw(SCC2_TAG, FUNC(z80scc_device::cb_r), FUNC(z80scc_device::cb_w));
+	map(0x7f2002, 0x7f2002).rw(SCC2_TAG, FUNC(z80scc_device::db_r), FUNC(z80scc_device::db_w));
+	map(0x7f2004, 0x7f2004).rw(SCC2_TAG, FUNC(z80scc_device::ca_r), FUNC(z80scc_device::ca_w));
+	map(0x7f2006, 0x7f2006).rw(SCC2_TAG, FUNC(z80scc_device::da_r), FUNC(z80scc_device::da_w));
+	map(0x7f2800, 0x7f2803).mirror(0x7fc).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
+}
 
 // type 2 device space
-ADDRESS_MAP_START(sun2_state::vmetype2space_map)
-ADDRESS_MAP_END
+void sun2_state::vmetype2space_map(address_map &map)
+{
+}
 
 // type 3 device space
-ADDRESS_MAP_START(sun2_state::vmetype3space_map)
-ADDRESS_MAP_END
+void sun2_state::vmetype3space_map(address_map &map)
+{
+}
 
 // Multibus memory spaces
 // type 0 device space
-ADDRESS_MAP_START(sun2_state::mbustype0space_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(ram_r, ram_w)
+void sun2_state::mbustype0space_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rw(this, FUNC(sun2_state::ram_r), FUNC(sun2_state::ram_w));
 	// 7f80000-7f807ff: Keyboard/mouse SCC8530
 	//AM_RANGE(0x7f8000, 0x7f8007) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00)
-	AM_RANGE(0x700000, 0x71ffff) AM_RAM AM_SHARE("bw2_vram")
-	AM_RANGE(0x781800, 0x781801) AM_READWRITE( video_ctrl_r, video_ctrl_w )
-ADDRESS_MAP_END
+	map(0x700000, 0x71ffff).ram().share("bw2_vram");
+	map(0x781800, 0x781801).rw(this, FUNC(sun2_state::video_ctrl_r), FUNC(sun2_state::video_ctrl_w));
+}
 
 // type 1 device space
-ADDRESS_MAP_START(sun2_state::mbustype1space_map)
-	AM_RANGE(0x000000, 0x0007ff) AM_ROM AM_REGION("bootprom", 0)    // uses MMU loophole to read 32k from a 2k window
+void sun2_state::mbustype1space_map(address_map &map)
+{
+	map(0x000000, 0x0007ff).rom().region("bootprom", 0);    // uses MMU loophole to read 32k from a 2k window
 	// 001000-0017ff: AM9518 encryption processor
 	// 001800-001fff: Parallel port
-	AM_RANGE(0x002000, 0x0027ff) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00)
-	AM_RANGE(0x002800, 0x002803) AM_MIRROR(0x7fc) AM_DEVREADWRITE("timer", am9513_device, read16, write16)
-	AM_RANGE(0x003800, 0x00383f) AM_MIRROR(0x7c0) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0xff00) // 12 wait states generated by PAL16R6 (U415)
-ADDRESS_MAP_END
+	map(0x002000, 0x0027ff).rw(SCC2_TAG, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask16(0xff00);
+	map(0x002800, 0x002803).mirror(0x7fc).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
+	map(0x003800, 0x00383f).mirror(0x7c0).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0xff00); // 12 wait states generated by PAL16R6 (U415)
+}
 
 // type 2 device space (Multibus memory space)
-ADDRESS_MAP_START(sun2_state::mbustype2space_map)
-ADDRESS_MAP_END
+void sun2_state::mbustype2space_map(address_map &map)
+{
+}
 
 // type 3 device space (Multibus I/O space)
-ADDRESS_MAP_START(sun2_state::mbustype3space_map)
-ADDRESS_MAP_END
+void sun2_state::mbustype3space_map(address_map &map)
+{
+}
 
 uint32_t sun2_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

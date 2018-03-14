@@ -4,9 +4,9 @@
 
    "CG24173 6186" & "CG24143 4181" (always used as a pair?)
 
-   used by suprnova.c
-           galpani3.c
-           jchan.c
+   used by suprnova.cpp
+           galpani3.cpp
+           jchan.cpp
 
    TODO:
    - Get rid of sprite position kludges
@@ -25,11 +25,15 @@ DEFINE_DEVICE_TYPE(SKNS_SPRITE, sknsspr_device, "sknsspr", "SKNS Sprite")
 sknsspr_device::sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SKNS_SPRITE, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 27) // TODO : Unknown address bits; maybe 27?
 {
 }
 
 void sknsspr_device::device_start()
 {
+	m_decodebuffer = make_unique_clear<uint8_t[]>(SUPRNOVA_DECODE_BUFFER_SIZE);
+
+	save_pointer(NAME(m_decodebuffer.get()), SUPRNOVA_DECODE_BUFFER_SIZE);
 	//printf("sknsspr_device::device_start()\n");
 }
 
@@ -38,37 +42,39 @@ void sknsspr_device::device_reset()
 	//printf("sknsspr_device::device_reset()\n");
 }
 
-int sknsspr_device::skns_rle_decode ( int romoffset, int size, uint8_t*gfx_source, size_t gfx_length )
+void sknsspr_device::rom_bank_updated()
 {
-	uint8_t *src = gfx_source;
-	size_t srcsize = gfx_length;
-	uint8_t *dst = decodebuffer;
+	//printf("sknsspr_device::rom_bank_updated()\n");
+}
+
+int sknsspr_device::skns_rle_decode ( int romoffset, int size )
+{
 	int decodeoffset = 0;
 
 	while(size>0) {
-		uint8_t code = src[(romoffset++)%srcsize];
+		uint8_t code = read_byte((romoffset++) % (1<<27));
 		size -= (code & 0x7f) + 1;
 		if(code & 0x80) { /* (code & 0x7f) normal values will follow */
 			code &= 0x7f;
 			do {
-				dst[(decodeoffset++)%SUPRNOVA_DECODE_BUFFER_SIZE] = src[(romoffset++)%srcsize];
+				m_decodebuffer[(decodeoffset++)%SUPRNOVA_DECODE_BUFFER_SIZE] = read_byte((romoffset++) % (1<<27));
 				code--;
 			} while(code != 0xff);
 		} else {  /* repeat next value (code & 0x7f) times */
-			uint8_t val = src[(romoffset++)%srcsize];
+			uint8_t val = read_byte((romoffset++) % (1<<27));
 			do {
-				dst[(decodeoffset++)%SUPRNOVA_DECODE_BUFFER_SIZE] = val;
+				m_decodebuffer[(decodeoffset++)%SUPRNOVA_DECODE_BUFFER_SIZE] = val;
 				code--;
 			} while(code != 0xff);
 		}
 	}
-	return &src[romoffset%srcsize]-gfx_source;
+	return romoffset % (1<<27);
 }
 
 void sknsspr_device::skns_sprite_kludge(int x, int y)
 {
-	sprite_kludge_x = x;
-	sprite_kludge_y = y;
+	m_sprite_kludge_x = x;
+	m_sprite_kludge_y = y;
 }
 
 /* Zooming blitter, zoom is by way of both source and destination offsets */
@@ -233,7 +239,7 @@ static void (*const blit_z[4])(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	blit_fxy_z,
 };
 
-void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t* spriteram_source, size_t spriteram_size, uint8_t* gfx_source, size_t gfx_length, uint32_t* sprite_regs)
+void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t* spriteram_source, size_t spriteram_size, uint32_t* sprite_regs)
 {
 	/*- SPR RAM Format -**
 
@@ -285,7 +291,7 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 	int disabled = sprite_regs[0x04/4] & 0x08; // RWR1
 	int xsize,ysize, size, xpos=0,ypos=0, pri=0, romoffset, colour=0, xflip,yflip, joint;
 	int sx,sy;
-	int endromoffs=0, gfxlen;
+	int endromoffs=0;
 	int grow;
 	uint16_t zoomx_m, zoomx_s, zoomy_m, zoomy_s;
 
@@ -322,22 +328,20 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 		if (group_y_offset[3]&0x200) group_y_offset[3] -= 0x400; // Signed
 
 	//  popmessage ("x %08x y %08x x2 %08x y2 %08x",sprite_x_scroll, sprite_y_scroll,group_x_offset[1], group_y_offset[1]);
-	//  popmessage("%d %d %d %d A:%d B:%d", sprite_kludge_x, sprite_kludge_y, sprite_x_scroll, sprite_y_scroll, (skns_pal_regs[0x00/4] & 0x7000) >> 12, (skns_pal_regs[0x10/4] & 0x7000) >> 12);
-	//  if (keyboard_pressed(KEYCODE_Q)) sprite_kludge_x++;
-	//  if (keyboard_pressed(KEYCODE_W)) sprite_kludge_x--;
-	//  if (keyboard_pressed(KEYCODE_E)) sprite_kludge_y++;
-	//  if (keyboard_pressed(KEYCODE_D)) sprite_kludge_y--;
+	//  popmessage("%d %d %d %d A:%d B:%d", m_sprite_kludge_x, m_sprite_kludge_y, sprite_x_scroll, sprite_y_scroll, (skns_pal_regs[0x00/4] & 0x7000) >> 12, (skns_pal_regs[0x10/4] & 0x7000) >> 12);
+	//  if (keyboard_pressed(KEYCODE_Q)) m_sprite_kludge_x++;
+	//  if (keyboard_pressed(KEYCODE_W)) m_sprite_kludge_x--;
+	//  if (keyboard_pressed(KEYCODE_E)) m_sprite_kludge_y++;
+	//  if (keyboard_pressed(KEYCODE_D)) m_sprite_kludge_y--;
 
 		// Tilemap Pri/enables
 	//  popmessage("A: %x %x B: %x %x", skns_v3_regs[0x10/4]>>3, skns_v3_regs[0x10/4]&7, skns_v3_regs[0x34/4]>>3, skns_v3_regs[0x34/4]&7);
 
 		/* Seems that sprites are consistently off by a fixed no. of pixels in different games
 		   (Patterns emerge through Manufacturer/Date/Orientation) */
-		sprite_x_scroll += sprite_kludge_x;
-		sprite_y_scroll += sprite_kludge_y;
+		sprite_x_scroll += m_sprite_kludge_x;
+		sprite_y_scroll += m_sprite_kludge_y;
 
-
-		gfxlen = gfx_length;
 		while( source<finish )
 		{
 			xflip = (source[0] & 0x00000200) >> 9;
@@ -443,14 +447,10 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 				zoomx_s = (source[2] >> 24)&0x00fc;
 				zoomy_m = 0;
 				zoomy_s = (source[3] >> 24)&0x00fc;
-
-
 			}
 
 
-			romoffset &= gfxlen-1;
-
-			endromoffs = skns_rle_decode ( romoffset, size, gfx_source, gfx_length );
+			endromoffs = skns_rle_decode( romoffset, size );
 
 			// in Cyvern
 
@@ -470,7 +470,7 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 
 				if(zoomx_m || zoomx_s || zoomy_m || zoomy_s)
 				{
-					blit_z[ (xflip<<1) | yflip ](bitmap, cliprect, decodebuffer, sx, sy, xsize, ysize, zoomx_m, zoomx_s, zoomy_m, zoomy_s, NewColour);
+					blit_z[ (xflip<<1) | yflip ](bitmap, cliprect, m_decodebuffer.get(), sx, sy, xsize, ysize, zoomx_m, zoomx_s, zoomy_m, zoomy_s, NewColour);
 				}
 				else
 				{
@@ -486,7 +486,7 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 									if ((sy+yy < (cliprect.max_y+1)) && (sy+yy >= cliprect.min_y))
 									{
 										int pix;
-										pix = decodebuffer[xsize*yy+xx];
+										pix = m_decodebuffer[xsize*yy+xx];
 										if (pix)
 											bitmap.pix16(sy+yy, sx+xx) = pix+ NewColour; // change later
 									}
@@ -506,7 +506,7 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 									if ((sy+(ysize-1-yy) < (cliprect.max_y+1)) && (sy+(ysize-1-yy) >= cliprect.min_y))
 									{
 										int pix;
-										pix = decodebuffer[xsize*yy+xx];
+										pix = m_decodebuffer[xsize*yy+xx];
 										if (pix)
 											bitmap.pix16(sy+(ysize-1-yy), sx+xx) = pix+ NewColour; // change later
 									}
@@ -526,7 +526,7 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 									if ((sy+yy < (cliprect.max_y+1)) && (sy+yy >= cliprect.min_y))
 									{
 										int pix;
-										pix = decodebuffer[xsize*yy+xx];
+										pix = m_decodebuffer[xsize*yy+xx];
 										if (pix)
 											bitmap.pix16(sy+yy, sx+(xsize-1-xx)) = pix+ NewColour; // change later
 									}
@@ -547,7 +547,7 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 									if ((sy+(ysize-1-yy) < (cliprect.max_y+1)) && (sy+(ysize-1-yy) >= cliprect.min_y))
 									{
 										int pix;
-										pix = decodebuffer[xsize*yy+xx];
+										pix = m_decodebuffer[xsize*yy+xx];
 										if (pix)
 											bitmap.pix16(sy+(ysize-1-yy), sx+(xsize-1-xx)) = pix+ NewColour; // change later
 									}

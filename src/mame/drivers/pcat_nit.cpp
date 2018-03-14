@@ -152,27 +152,29 @@ WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 	}
 }
 
-ADDRESS_MAP_START(pcat_nit_state::pcat_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0) AM_WRITENOP
-	AM_RANGE(0x000d0000, 0x000d3fff) AM_RAM AM_REGION("disk_bios", 0)
-	AM_RANGE(0x000d7000, 0x000d7003) AM_WRITE8(pcat_nit_rombank_w, 0xff)
-	AM_RANGE(0x000d8000, 0x000dffff) AM_ROMBANK("rombank")
-	AM_RANGE(0x000f0000, 0x000fffff) AM_RAM AM_REGION("bios", 0 )
-	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
-ADDRESS_MAP_END
+void pcat_nit_state::pcat_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0).nopw();
+	map(0x000d0000, 0x000d3fff).ram().region("disk_bios", 0);
+	map(0x000d7000, 0x000d7000).w(this, FUNC(pcat_nit_state::pcat_nit_rombank_w));
+	map(0x000d8000, 0x000dffff).bankr("rombank");
+	map(0x000f0000, 0x000fffff).ram().region("bios", 0);
+	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(pcat_nit_state::bonanza_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffffffff)
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0) AM_WRITENOP
-	AM_RANGE(0x000d0000, 0x000d3fff) AM_RAM AM_REGION("disk_bios", 0)
-	AM_RANGE(0x000d7000, 0x000d7003) AM_WRITE8(pcat_nit_rombank_w, 0xff)
-	AM_RANGE(0x000d8000, 0x000dffff) AM_ROMBANK("rombank")
-	AM_RANGE(0x000f0000, 0x000fffff) AM_RAM AM_REGION("bios", 0 )
-	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
-ADDRESS_MAP_END
+void pcat_nit_state::bonanza_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
+	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0).nopw();
+	map(0x000d0000, 0x000d3fff).ram().region("disk_bios", 0);
+	map(0x000d7000, 0x000d7000).w(this, FUNC(pcat_nit_state::pcat_nit_rombank_w));
+	map(0x000d8000, 0x000dffff).bankr("rombank");
+	map(0x000f0000, 0x000fffff).ram().region("bios", 0);
+	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
+}
 
 READ8_MEMBER(pcat_nit_state::pcat_nit_io_r)
 {
@@ -189,25 +191,27 @@ READ8_MEMBER(pcat_nit_state::pcat_nit_io_r)
 	}
 }
 
-ADDRESS_MAP_START(pcat_nit_state::pcat_nit_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x0278, 0x027f) AM_READ8(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
-	AM_RANGE(0x0280, 0x0283) AM_READNOP
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
-ADDRESS_MAP_END
+void pcat_nit_state::pcat_nit_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x0278, 0x027f).r(this, FUNC(pcat_nit_state::pcat_nit_io_r)).nopw();
+	map(0x0280, 0x0283).nopr();
+	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+	map(0x03f8, 0x03ff).rw(m_uart, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w));
+}
 
-ADDRESS_MAP_START(pcat_nit_state::bonanza_io_map)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x0278, 0x027f) AM_READ8(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
-	AM_RANGE(0x0280, 0x0283) AM_READNOP
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
-ADDRESS_MAP_END
+void pcat_nit_state::bonanza_io_map(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x0278, 0x027f).r(this, FUNC(pcat_nit_state::pcat_nit_io_r)).nopw();
+	map(0x0280, 0x0283).nopr();
+	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5428_device::port_03d0_r), FUNC(cirrus_gd5428_device::port_03d0_w));
+	map(0x03f8, 0x03ff).rw(m_uart, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w));
+}
 
 static INPUT_PORTS_START( pcat_nit )
 	PORT_START("IN0")

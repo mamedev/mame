@@ -212,23 +212,24 @@ WRITE32_MEMBER(konendev_state::sound_data_w)
 {
 }
 
-ADDRESS_MAP_START(konendev_state::konendev_map)
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM
-	AM_RANGE(0x78000000, 0x78000003) AM_READ(mcu2_r)
-	AM_RANGE(0x78080000, 0x7808000f) AM_READWRITE(rtc_r, rtc_w)
-	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(sound_data_r, sound_data_w)
-	AM_RANGE(0x78100000, 0x78100003) AM_WRITE(eeprom_w)
-	AM_RANGE(0x78800000, 0x78800003) AM_READ(ifu2_r)
-	AM_RANGE(0x78800004, 0x78800007) AM_READ(ctrl0_r)
-	AM_RANGE(0x78a00000, 0x78a0001f) AM_READ(ctrl1_r)
-	AM_RANGE(0x78e00000, 0x78e00003) AM_READ(ctrl2_r)
-	AM_RANGE(0x79000000, 0x79000003) AM_DEVWRITE("gcu", k057714_device, fifo_w)
-	AM_RANGE(0x79800000, 0x798000ff) AM_DEVREADWRITE("gcu", k057714_device, read, write)
-	AM_RANGE(0x7a000000, 0x7a01ffff) AM_RAM AM_SHARE("nvram0")
-	AM_RANGE(0x7a100000, 0x7a11ffff) AM_RAM AM_SHARE("nvram1")
-	AM_RANGE(0x7e000000, 0x7f7fffff) AM_ROM AM_REGION("flash", 0)
-	AM_RANGE(0x7ff00000, 0x7fffffff) AM_ROM AM_REGION("program", 0)
-ADDRESS_MAP_END
+void konendev_state::konendev_map(address_map &map)
+{
+	map(0x00000000, 0x00ffffff).ram();
+	map(0x78000000, 0x78000003).r(this, FUNC(konendev_state::mcu2_r));
+	map(0x78080000, 0x7808000f).rw(this, FUNC(konendev_state::rtc_r), FUNC(konendev_state::rtc_w));
+	map(0x780c0000, 0x780c0003).rw(this, FUNC(konendev_state::sound_data_r), FUNC(konendev_state::sound_data_w));
+	map(0x78100000, 0x78100003).w(this, FUNC(konendev_state::eeprom_w));
+	map(0x78800000, 0x78800003).r(this, FUNC(konendev_state::ifu2_r));
+	map(0x78800004, 0x78800007).r(this, FUNC(konendev_state::ctrl0_r));
+	map(0x78a00000, 0x78a0001f).r(this, FUNC(konendev_state::ctrl1_r));
+	map(0x78e00000, 0x78e00003).r(this, FUNC(konendev_state::ctrl2_r));
+	map(0x79000000, 0x79000003).w(m_gcu, FUNC(k057714_device::fifo_w));
+	map(0x79800000, 0x798000ff).rw(m_gcu, FUNC(k057714_device::read), FUNC(k057714_device::write));
+	map(0x7a000000, 0x7a01ffff).ram().share("nvram0");
+	map(0x7a100000, 0x7a11ffff).ram().share("nvram1");
+	map(0x7e000000, 0x7f7fffff).rom().region("flash", 0);
+	map(0x7ff00000, 0x7fffffff).rom().region("program", 0);
+}
 
 
 static INPUT_PORTS_START( konendev )

@@ -669,13 +669,11 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_16()
 
 TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_timer_exp )
 {
-	screen_device *screen = machine().first_screen();
-	uint32_t tpalen;
 	verboselog( *this, 2, "LCD timer callback\n");
-	m_lcd.vpos = screen->vpos();
-	m_lcd.hpos = screen->hpos();
+	m_lcd.vpos = m_screen->vpos();
+	m_lcd.hpos = m_screen->hpos();
 	verboselog( *this, 3, "LCD - vpos %d hpos %d\n", m_lcd.vpos, m_lcd.hpos);
-	tpalen = S3C24XX_TPAL_GET_TPALEN( m_lcd.tpal);
+	uint32_t tpalen = S3C24XX_TPAL_GET_TPALEN( m_lcd.tpal);
 	if (tpalen == 0)
 	{
 		if (m_lcd.vramaddr_cur >= m_lcd.vramaddr_max)
@@ -707,14 +705,13 @@ TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_timer_exp )
 	{
 		s3c24xx_lcd_render_tpal();
 	}
-	m_lcd.timer->adjust( screen->time_until_pos( m_lcd.vpos, m_lcd.hpos));
+	m_lcd.timer->adjust(m_screen->time_until_pos(m_lcd.vpos, m_lcd.hpos));
 }
 
 void S3C24_CLASS_NAME::s3c24xx_video_start()
 {
-	screen_device *screen = machine().first_screen();
-	m_lcd.bitmap[0] = std::make_unique<bitmap_rgb32>( screen->width(), screen->height());
-	m_lcd.bitmap[1] = std::make_unique<bitmap_rgb32>( screen->width(), screen->height());
+	m_lcd.bitmap[0] = std::make_unique<bitmap_rgb32>(m_screen->width(), m_screen->height());
+	m_lcd.bitmap[1] = std::make_unique<bitmap_rgb32>(m_screen->width(), m_screen->height());
 }
 
 void S3C24_CLASS_NAME::bitmap_blend( bitmap_rgb32 &bitmap_dst, bitmap_rgb32 &bitmap_src_1, bitmap_rgb32 &bitmap_src_2)
@@ -769,7 +766,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_r )
 	case S3C24XX_LCDCON1:
 		{
 			// make sure line counter is going
-			uint32_t vpos = machine().first_screen()->vpos();
+			uint32_t vpos = m_screen->vpos();
 			if (vpos < m_lcd.vpos_min) vpos = m_lcd.vpos_min;
 			if (vpos > m_lcd.vpos_max) vpos = m_lcd.vpos_max;
 			data = (data & ~0xFFFC0000) | ((m_lcd.vpos_max - vpos) << 18);
@@ -777,7 +774,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_r )
 		break;
 	case S3C24XX_LCDCON5:
 		{
-			uint32_t vpos = machine().first_screen()->vpos();
+			uint32_t vpos = m_screen->vpos();
 			data = data & ~0x00018000;
 			if (vpos < m_lcd.vpos_min) data = data | 0x00000000;
 			if (vpos > m_lcd.vpos_max) data = data | 0x00018000;
@@ -791,95 +788,98 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_r )
 
 int S3C24_CLASS_NAME::s3c24xx_lcd_configure_tft()
 {
-	screen_device *screen = machine().first_screen();
-	uint32_t vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
-	double framerate, vclk;
-	uint32_t width, height;
-	rectangle visarea;
 	verboselog( *this, 5, "s3c24xx_lcd_configure_tft\n");
-	vspw = BITS( m_lcd.regs.lcdcon2, 5, 0);
-	vbpd = BITS( m_lcd.regs.lcdcon2, 31, 24);
-	lineval = BITS( m_lcd.regs.lcdcon2, 23, 14);
-	vfpd = BITS( m_lcd.regs.lcdcon2, 13, 6);
-	hspw = BITS( m_lcd.regs.lcdcon4, 7, 0);
-	hbpd = BITS( m_lcd.regs.lcdcon3, 25, 19);
-	hfpd = BITS( m_lcd.regs.lcdcon3, 7, 0);
-	hozval = BITS( m_lcd.regs.lcdcon3, 18, 8);
-	clkval = BITS( m_lcd.regs.lcdcon1, 17, 8);
-	hclk = s3c24xx_get_hclk();
+	uint32_t vspw = BITS( m_lcd.regs.lcdcon2, 5, 0);
+	uint32_t vbpd = BITS( m_lcd.regs.lcdcon2, 31, 24);
+	uint32_t lineval = BITS( m_lcd.regs.lcdcon2, 23, 14);
+	uint32_t vfpd = BITS( m_lcd.regs.lcdcon2, 13, 6);
+	uint32_t hspw = BITS( m_lcd.regs.lcdcon4, 7, 0);
+	uint32_t hbpd = BITS( m_lcd.regs.lcdcon3, 25, 19);
+	uint32_t hfpd = BITS( m_lcd.regs.lcdcon3, 7, 0);
+	uint32_t hozval = BITS( m_lcd.regs.lcdcon3, 18, 8);
+	uint32_t clkval = BITS( m_lcd.regs.lcdcon1, 17, 8);
+	uint32_t hclk = s3c24xx_get_hclk();
 	verboselog( *this, 3, "LCD - vspw %d vbpd %d lineval %d vfpd %d hspw %d hbpd %d hfpd %d hozval %d clkval %d hclk %d\n", vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk);
-	vclk = (double)(hclk / ((clkval + 1) * 2));
+
+	double vclk = (double)(hclk / ((clkval + 1) * 2));
 	verboselog( *this, 3, "LCD - vclk %f\n", vclk);
-	framerate = vclk / (((vspw + 1) + (vbpd + 1) + (lineval + 1) + (vfpd + 1)) * ((hspw + 1) + (hbpd + 1) + (hozval + 1) + (hfpd + 1)));
+
+	double framerate = vclk / (((vspw + 1) + (vbpd + 1) + (lineval + 1) + (vfpd + 1)) * ((hspw + 1) + (hbpd + 1) + (hozval + 1) + (hfpd + 1)));
 	verboselog( *this, 3, "LCD - framerate %f\n", framerate);
 	m_lcd.framerate = framerate;
-	width = (hspw + 1) + (hbpd + 1) + (hozval + 1) + (hfpd + 1);
-	height = (vspw + 1) + (vbpd + 1) + (lineval + 1) + (vfpd + 1);
+
+	uint32_t width = (hspw + 1) + (hbpd + 1) + (hozval + 1) + (hfpd + 1);
+	uint32_t height = (vspw + 1) + (vbpd + 1) + (lineval + 1) + (vfpd + 1);
+
+	rectangle visarea;
 	visarea.min_x = (hspw + 1) + (hbpd + 1);
 	visarea.min_y = (vspw + 1) + (vbpd + 1);
 	visarea.max_x = visarea.min_x + (hozval + 1) - 1;
 	visarea.max_y = visarea.min_y + (lineval + 1) - 1;
-	verboselog( *this, 3, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
-	verboselog( *this, 3, "video_screen_configure %d %d %f\n", width, height, m_lcd.framerate);
+	verboselog(*this, 3, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+	verboselog(*this, 3, "video_screen_configure %d %d %f\n", width, height, m_lcd.framerate);
+
 	m_lcd.hpos_min = (hspw + 1) + (hbpd + 1);
 	m_lcd.hpos_max = m_lcd.hpos_min + (hozval + 1) - 1;
 	m_lcd.vpos_min = (vspw + 1) + (vbpd + 1);
 	m_lcd.vpos_max = m_lcd.vpos_min + (lineval + 1) - 1;
-	screen->configure( width, height, visarea, HZ_TO_ATTOSECONDS( m_lcd.framerate));
+	m_screen->configure(width, height, visarea, HZ_TO_ATTOSECONDS(m_lcd.framerate));
 	return true;
 }
 
 int S3C24_CLASS_NAME::s3c24xx_lcd_configure_stn()
 {
-	screen_device *screen = machine().first_screen();
-	uint32_t pnrmode, bppmode, clkval, lineval, wdly, hozval, lineblank, wlh, hclk;
-	double vclk, framerate;
-	uint32_t width, height;
-	rectangle visarea;
 	verboselog( *this, 5, "s3c24xx_lcd_configure_stn\n");
-	pnrmode = BITS( m_lcd.regs.lcdcon1, 6, 5);
-	bppmode = BITS( m_lcd.regs.lcdcon1, 4, 1);
-	clkval = BITS( m_lcd.regs.lcdcon1, 17, 8);
-	lineval = BITS( m_lcd.regs.lcdcon2, 23, 14);
-	wdly = BITS( m_lcd.regs.lcdcon3, 20, 19);
-	hozval = BITS( m_lcd.regs.lcdcon3, 18, 8);
-	lineblank = BITS( m_lcd.regs.lcdcon3, 7, 0);
-	wlh = BITS( m_lcd.regs.lcdcon4, 1, 0);
-	hclk = s3c24xx_get_hclk();
+
+	uint32_t pnrmode = BITS( m_lcd.regs.lcdcon1, 6, 5);
+	uint32_t bppmode = BITS( m_lcd.regs.lcdcon1, 4, 1);
+	uint32_t clkval = BITS( m_lcd.regs.lcdcon1, 17, 8);
+	uint32_t lineval = BITS( m_lcd.regs.lcdcon2, 23, 14);
+	uint32_t wdly = BITS( m_lcd.regs.lcdcon3, 20, 19);
+	uint32_t hozval = BITS( m_lcd.regs.lcdcon3, 18, 8);
+	uint32_t lineblank = BITS( m_lcd.regs.lcdcon3, 7, 0);
+	uint32_t wlh = BITS( m_lcd.regs.lcdcon4, 1, 0);
+	uint32_t hclk = s3c24xx_get_hclk();
 	verboselog( *this, 3, "LCD - pnrmode %d bppmode %d clkval %d lineval %d wdly %d hozval %d lineblank %d wlh %d hclk %d\n", pnrmode, bppmode, clkval, lineval, wdly, hozval, lineblank, wlh, hclk);
 	if (clkval == 0)
 	{
 		return false;
 	}
-	vclk = (double)(hclk / ((clkval + 0) * 2));
+
+	double vclk = (double)(hclk / ((clkval + 0) * 2));
 	verboselog( *this, 3, "LCD - vclk %f\n", vclk);
-	framerate = 1 / (((1 / vclk) * (hozval + 1) + (1 / hclk) * ((1 << (4 + wlh)) + (1 << (4 + wdly)) + (lineblank * 8))) * (lineval + 1));
+	double framerate = 1 / (((1 / vclk) * (hozval + 1) + (1 / hclk) * ((1 << (4 + wlh)) + (1 << (4 + wdly)) + (lineblank * 8))) * (lineval + 1));
 	verboselog( *this, 3, "LCD - framerate %f\n", framerate);
+	m_lcd.framerate = framerate;
+
+	uint32_t width = 0;
 	switch (pnrmode)
 	{
 		case S3C24XX_PNRMODE_STN_04_SS: width = ((hozval + 1) * 4); break;
 		case S3C24XX_PNRMODE_STN_04_DS: width = ((hozval + 1) * 4); break;
 		case S3C24XX_PNRMODE_STN_08_SS: width = ((hozval + 1) * 8 / 3); break;
-		default: width = 0; break;
+		default: break;
 	}
-	height = lineval + 1;
-	m_lcd.framerate = framerate;
+
+	uint32_t height = lineval + 1;
+
+	rectangle visarea;
 	visarea.set(0, width - 1, 0, height - 1);
 	verboselog( *this, 3, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 	verboselog( *this, 3, "video_screen_configure %d %d %f\n", width, height, m_lcd.framerate);
+
 	m_lcd.hpos_min = 0;
 	m_lcd.hpos_max = width - 1;
 	m_lcd.vpos_min = 0;
 	m_lcd.vpos_max = height - 1;
-	screen->configure( width, height, visarea, HZ_TO_ATTOSECONDS( m_lcd.framerate));
+	m_screen->configure( width, height, visarea, HZ_TO_ATTOSECONDS( m_lcd.framerate));
 	return true;
 }
 
 int S3C24_CLASS_NAME::s3c24xx_lcd_configure()
 {
-	uint32_t bppmode;
 	verboselog( *this, 5, "s3c24xx_lcd_configure\n");
-	bppmode = BITS( m_lcd.regs.lcdcon1, 4, 1);
+	uint32_t bppmode = BITS(m_lcd.regs.lcdcon1, 4, 1);
 	if ((bppmode & (1 << 3)) == 0)
 	{
 		return s3c24xx_lcd_configure_stn();
@@ -892,19 +892,18 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure()
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_start()
 {
-	screen_device *screen = machine().first_screen();
-	verboselog( *this, 1, "LCD start\n");
+	verboselog(*this, 1, "LCD start\n");
 	if (s3c24xx_lcd_configure())
 	{
 		s3c24xx_lcd_dma_init();
-		m_lcd.timer->adjust( screen->time_until_pos( m_lcd.vpos_min, m_lcd.hpos_min));
+		m_lcd.timer->adjust(m_screen->time_until_pos(m_lcd.vpos_min, m_lcd.hpos_min));
 	}
 }
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_stop()
 {
 	verboselog( *this, 1, "LCD stop\n");
-	m_lcd.timer->adjust( attotime::never);
+	m_lcd.timer->adjust(attotime::never);
 }
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_recalc()
@@ -2534,7 +2533,7 @@ void S3C24_CLASS_NAME::s3c24xx_touch_screen(int state)
 {
 	m_adc.regs.adcdat0 = ((state ? 0 : 1) << 15);
 	m_adc.regs.adcdat1 = ((state ? 0 : 1) << 15);
-	s3c24xx_request_subirq( S3C24XX_SUBINT_TC);
+	s3c24xx_request_subirq(S3C24XX_SUBINT_TC);
 }
 
 #endif
@@ -3118,6 +3117,7 @@ void S3C24_CLASS_NAME::s3c24xx_device_start()
 	m_rtc.timer_tick_count = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(S3C24_CLASS_NAME::s3c24xx_rtc_timer_tick_count_exp), this));
 	m_rtc.timer_update = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(S3C24_CLASS_NAME::s3c24xx_rtc_timer_update_exp), this));
 	m_wdt.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(S3C24_CLASS_NAME::s3c24xx_wdt_timer_exp), this));
+
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 	int om0 = iface_core_pin_r(S3C24XX_CORE_PIN_OM0);
 	int om1 = iface_core_pin_r(S3C24XX_CORE_PIN_OM1);

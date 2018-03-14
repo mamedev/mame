@@ -78,16 +78,17 @@ TODO:
 class caswin_state : public driver_device
 {
 public:
-	caswin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	caswin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc0_attr(*this, "sc0_attr"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
-	required_shared_ptr<uint8_t> m_sc0_vram;
-	required_shared_ptr<uint8_t> m_sc0_attr;
-	tilemap_t *m_sc0_tilemap;
+	void vvillage(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(sc0_vram_w);
 	DECLARE_WRITE8_MEMBER(sc0_attr_w);
 	DECLARE_WRITE8_MEMBER(vvillage_scroll_w);
@@ -96,14 +97,19 @@ public:
 	DECLARE_WRITE8_MEMBER(vvillage_output_w);
 	DECLARE_WRITE8_MEMBER(vvillage_lamps_w);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(caswin);
 	uint32_t screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	void vvillage(machine_config &config);
+
+	virtual void video_start() override;
 	void vvillage_io(address_map &map);
 	void vvillage_mem(address_map &map);
+
+private:
+	required_shared_ptr<uint8_t> m_sc0_vram;
+	required_shared_ptr<uint8_t> m_sc0_attr;
+	tilemap_t *m_sc0_tilemap;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -191,25 +197,27 @@ WRITE8_MEMBER(caswin_state::vvillage_lamps_w)
 	output().set_led_value(4, data & 0x10);
 }
 
-ADDRESS_MAP_START(caswin_state::vvillage_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_READ(vvillage_rng_r) //accessed by caswin only
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("sc0_vram")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(sc0_attr_w) AM_SHARE("sc0_attr")
-ADDRESS_MAP_END
+void caswin_state::vvillage_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xa000).r(this, FUNC(caswin_state::vvillage_rng_r)); //accessed by caswin only
+	map(0xe000, 0xe7ff).ram().share("nvram");
+	map(0xf000, 0xf3ff).ram().w(this, FUNC(caswin_state::sc0_vram_w)).share("sc0_vram");
+	map(0xf800, 0xfbff).ram().w(this, FUNC(caswin_state::sc0_attr_w)).share("sc0_attr");
+}
 
-ADDRESS_MAP_START(caswin_state::vvillage_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x10,0x10) AM_READ_PORT("IN0")
-	AM_RANGE(0x11,0x11) AM_READ_PORT("IN1")
-	AM_RANGE(0x10,0x10) AM_WRITE(vvillage_scroll_w)
-	AM_RANGE(0x11,0x11) AM_WRITE(vvillage_vregs_w)
-	AM_RANGE(0x12,0x12) AM_WRITE(vvillage_lamps_w)
-	AM_RANGE(0x13,0x13) AM_WRITE(vvillage_output_w)
-ADDRESS_MAP_END
+void caswin_state::vvillage_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("IN0");
+	map(0x11, 0x11).portr("IN1");
+	map(0x10, 0x10).w(this, FUNC(caswin_state::vvillage_scroll_w));
+	map(0x11, 0x11).w(this, FUNC(caswin_state::vvillage_vregs_w));
+	map(0x12, 0x12).w(this, FUNC(caswin_state::vvillage_lamps_w));
+	map(0x13, 0x13).w(this, FUNC(caswin_state::vvillage_output_w));
+}
 
 
 static INPUT_PORTS_START( vvillage )
@@ -326,10 +334,10 @@ PALETTE_INIT_MEMBER(caswin_state, caswin)
 
 MACHINE_CONFIG_START(caswin_state::vvillage)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(vvillage_mem)
 	MCFG_CPU_IO_MAP(vvillage_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", caswin_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", caswin_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

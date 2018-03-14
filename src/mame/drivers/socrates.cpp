@@ -977,32 +977,36 @@ INPUT_CHANGED_MEMBER( iqunlimz_state::send_input )
  Address Maps
 ******************************************************************************/
 
-ADDRESS_MAP_START(socrates_state::z80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM /* system rom, bank 0 (fixed) */
-	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("rombank1", address_map_bank_device, amap8) /* banked rom space; system rom is banks 0 through F, cartridge rom is banks 10 onward, usually banks 10 through 17. area past the end of the cartridge, and the whole 10-ff area when no cartridge is inserted, reads as 0xF3 */
-	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("rambank1", address_map_bank_device, amap8) /* banked ram 'window' 0 */
-	AM_RANGE(0xc000, 0xffff) AM_DEVICE("rambank2", address_map_bank_device, amap8) /* banked ram 'window' 1 */
-ADDRESS_MAP_END
+void socrates_state::z80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom(); /* system rom, bank 0 (fixed) */
+	map(0x4000, 0x7fff).m(m_rombank1, FUNC(address_map_bank_device::amap8)); /* banked rom space; system rom is banks 0 through F, cartridge rom is banks 10 onward, usually banks 10 through 17. area past the end of the cartridge, and the whole 10-ff area when no cartridge is inserted, reads as 0xF3 */
+	map(0x8000, 0xbfff).m(m_rambank1, FUNC(address_map_bank_device::amap8)); /* banked ram 'window' 0 */
+	map(0xc000, 0xffff).m(m_rambank2, FUNC(address_map_bank_device::amap8)); /* banked ram 'window' 1 */
+}
 
-ADDRESS_MAP_START(socrates_state::socrates_rombank_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0) AM_MIRROR(0xF00000)      // xxxx 00** **** **** **** ****
-	AM_RANGE(0x040000, 0x07ffff) AM_READ(socrates_cart_r) AM_SELECT(0xF80000)            // **** *1** **** **** **** ****
-	AM_RANGE(0x080000, 0x0bffff) AM_READ(read_f3)                                        // xxxx 10** **** **** **** ****
-ADDRESS_MAP_END
+void socrates_state::socrates_rombank_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0).mirror(0xF00000);      // xxxx 00** **** **** **** ****
+	map(0x040000, 0x07ffff).r(this, FUNC(socrates_state::socrates_cart_r)).select(0xF80000);            // **** *1** **** **** **** ****
+	map(0x080000, 0x0bffff).r(this, FUNC(socrates_state::read_f3));                                        // xxxx 10** **** **** **** ****
+}
 
-ADDRESS_MAP_START(socrates_state::socrates_rambank_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_REGION("vram", 0) AM_MIRROR(0x30000)
-ADDRESS_MAP_END
+void socrates_state::socrates_rambank_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).ram().region("vram", 0).mirror(0x30000);
+}
 
-ADDRESS_MAP_START(socrates_state::z80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(common_rom_bank_r, common_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
-	AM_RANGE(0x08, 0x08) AM_READWRITE(common_ram_bank_r, common_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
-	AM_RANGE(0x10, 0x17) AM_READWRITE(read_f3, socrates_sound_w) AM_MIRROR (0x8) /* sound section:
+void socrates_state::z80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(this, FUNC(socrates_state::common_rom_bank_r), FUNC(socrates_state::common_rom_bank_w)).mirror(0x7); /* rom bank select - RW - 8 bits */
+	map(0x08, 0x08).rw(this, FUNC(socrates_state::common_ram_bank_r), FUNC(socrates_state::common_ram_bank_w)).mirror(0x7); /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
+	map(0x10, 0x17).rw(this, FUNC(socrates_state::read_f3), FUNC(socrates_state::socrates_sound_w)).mirror(0x8); /* sound section:
 	0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL(21'477'272)/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
 	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
 	0x12 - W - 0b***EVVVV enable, volume control for channel 1
@@ -1014,51 +1018,55 @@ ADDRESS_MAP_START(socrates_state::z80_io)
 	0xC0 produces a DMC wave read from an unknown address at around 342hz
 	<todo: test the others, maybe take samples?>
 	*/
-	AM_RANGE(0x20, 0x21) AM_READWRITE(read_f3, socrates_scroll_w) AM_MIRROR(0xE)
-	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, kbmcu_reset) AM_MIRROR(0xF) /* resets the keyboard IR decoder MCU */
-	AM_RANGE(0x40, 0x40) AM_READWRITE(status_and_speech, speech_command ) AM_MIRROR(0xF) /* reads status register for vblank/hblank/speech, also reads and writes speech module */
-	AM_RANGE(0x50, 0x51) AM_READWRITE(keyboard_buffer_read, keyboard_buffer_update) AM_MIRROR(0xE) /* Keyboard fifo read, pop fifo on write */
-	AM_RANGE(0x60, 0x60) AM_READWRITE(read_f3, reset_speech) AM_MIRROR(0xF) /* reset the speech module, or perhaps fire an NMI?  */
-	AM_RANGE(0x70, 0xFF) AM_READ(read_f3) // nothing mapped here afaik
-ADDRESS_MAP_END
+	map(0x20, 0x21).rw(this, FUNC(socrates_state::read_f3), FUNC(socrates_state::socrates_scroll_w)).mirror(0xE);
+	map(0x30, 0x30).rw(this, FUNC(socrates_state::read_f3), FUNC(socrates_state::kbmcu_reset)).mirror(0xF); /* resets the keyboard IR decoder MCU */
+	map(0x40, 0x40).rw(this, FUNC(socrates_state::status_and_speech), FUNC(socrates_state::speech_command)).mirror(0xF); /* reads status register for vblank/hblank/speech, also reads and writes speech module */
+	map(0x50, 0x51).rw(this, FUNC(socrates_state::keyboard_buffer_read), FUNC(socrates_state::keyboard_buffer_update)).mirror(0xE); /* Keyboard fifo read, pop fifo on write */
+	map(0x60, 0x60).rw(this, FUNC(socrates_state::read_f3), FUNC(socrates_state::reset_speech)).mirror(0xF); /* reset the speech module, or perhaps fire an NMI?  */
+	map(0x70, 0xFF).r(this, FUNC(socrates_state::read_f3)); // nothing mapped here afaik
+}
 
-ADDRESS_MAP_START(iqunlimz_state::iqunlimz_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_DEVICE("rombank2", address_map_bank_device, amap8)
-	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("rombank1", address_map_bank_device, amap8)
-	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("rambank1", address_map_bank_device, amap8)
-	AM_RANGE(0xc000, 0xffff) AM_DEVICE("rambank2", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void iqunlimz_state::iqunlimz_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).m(m_rombank2, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0x7fff).m(m_rombank1, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0xbfff).m(m_rambank1, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xffff).m(m_rambank2, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(iqunlimz_state::iqunlimz_rombank_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0) AM_MIRROR(0xF00000)      // xxxx 00** **** **** **** ****
-	AM_RANGE(0x040000, 0x07ffff) AM_READ(socrates_cart_r) AM_SELECT(0xF80000)            // **** *1** **** **** **** ****
-	AM_RANGE(0x080000, 0x0bffff) AM_ROM AM_REGION("maincpu", 0x40000) AM_MIRROR(0xF00000)// xxxx 10** **** **** **** ****
-ADDRESS_MAP_END
+void iqunlimz_state::iqunlimz_rombank_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0).mirror(0xF00000);      // xxxx 00** **** **** **** ****
+	map(0x040000, 0x07ffff).r(this, FUNC(iqunlimz_state::socrates_cart_r)).select(0xF80000);            // **** *1** **** **** **** ****
+	map(0x080000, 0x0bffff).rom().region("maincpu", 0x40000).mirror(0xF00000);// xxxx 10** **** **** **** ****
+}
 
-ADDRESS_MAP_START(iqunlimz_state::iqunlimz_rambank_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3ffff) AM_RAM AM_REGION("vram", 0)
-ADDRESS_MAP_END
+void iqunlimz_state::iqunlimz_rambank_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3ffff).ram().region("vram", 0);
+}
 
-ADDRESS_MAP_START(iqunlimz_state::iqunlimz_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_READWRITE(common_rom_bank_r, common_rom_bank_w) AM_MIRROR(0x06)
-	AM_RANGE(0x08, 0x08) AM_READWRITE(common_ram_bank_r, common_ram_bank_w) AM_MIRROR(0x07)
-	AM_RANGE(0x10, 0x17) AM_WRITE(socrates_sound_w) AM_MIRROR(0x08)
-	AM_RANGE(0x20, 0x21) AM_WRITE(socrates_scroll_w) AM_MIRROR(0x0E)
+void iqunlimz_state::iqunlimz_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw(this, FUNC(iqunlimz_state::common_rom_bank_r), FUNC(iqunlimz_state::common_rom_bank_w)).mirror(0x06);
+	map(0x08, 0x08).rw(this, FUNC(iqunlimz_state::common_ram_bank_r), FUNC(iqunlimz_state::common_ram_bank_w)).mirror(0x07);
+	map(0x10, 0x17).w(this, FUNC(iqunlimz_state::socrates_sound_w)).mirror(0x08);
+	map(0x20, 0x21).w(this, FUNC(iqunlimz_state::socrates_scroll_w)).mirror(0x0E);
 	// 30: writes an incrementing value here, once per keypress?
 	// 40: some sort of serial select/reset or enable, related to 0x60
-	AM_RANGE(0x50, 0x51) AM_READWRITE(keyboard_buffer_read, keyboard_buffer_update) AM_MIRROR(0xE)
+	map(0x50, 0x51).rw(this, FUNC(iqunlimz_state::keyboard_buffer_read), FUNC(iqunlimz_state::keyboard_buffer_update)).mirror(0xE);
 	// 60: some sort of serial read/write port, related to 0x40
-	AM_RANGE(0x70, 0x73) AM_READWRITE(video_regs_r, video_regs_w) AM_MIRROR(0x0C)
-	AM_RANGE(0x80, 0x81) AM_WRITENOP // LCD
-	AM_RANGE(0xb1, 0xb1) AM_WRITENOP
-	AM_RANGE(0xa0, 0xa0) AM_READ(status_r) AM_MIRROR(0x0F)
-	AM_RANGE(0xe0, 0xe7) AM_WRITE(colors_w) AM_MIRROR(0x08)
-ADDRESS_MAP_END
+	map(0x70, 0x73).rw(this, FUNC(iqunlimz_state::video_regs_r), FUNC(iqunlimz_state::video_regs_w)).mirror(0x0C);
+	map(0x80, 0x81).nopw(); // LCD
+	map(0xb1, 0xb1).nopw();
+	map(0xa0, 0xa0).r(this, FUNC(iqunlimz_state::status_r)).mirror(0x0F);
+	map(0xe0, 0xe7).w(this, FUNC(iqunlimz_state::colors_w)).mirror(0x08);
+}
 
 
 

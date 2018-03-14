@@ -619,349 +619,369 @@ Stephh's and AWJ's notes (based on the games M68000 and Z80 code and some tests)
 
 /***************************** 68000 Memory Map *****************************/
 
-ADDRESS_MAP_START(toaplan1_rallybik_state::rallybik_main_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(toaplan1_bcu_flipscreen_w)
-	AM_RANGE(0x100002, 0x100003) AM_READWRITE(toaplan1_tileram_offs_r, toaplan1_tileram_offs_w)
-	AM_RANGE(0x100004, 0x100007) AM_READWRITE(rallybik_tileram16_r, toaplan1_tileram16_w)
-	AM_RANGE(0x100010, 0x10001f) AM_READWRITE(toaplan1_scroll_regs_r, toaplan1_scroll_regs_w)
-	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("VBLANK")
+void toaplan1_rallybik_state::rallybik_main_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x040000, 0x07ffff).rom();
+	map(0x080000, 0x083fff).ram();
+	map(0x0c0000, 0x0c0fff).ram().share("spriteram");
+	map(0x100000, 0x100001).w(this, FUNC(toaplan1_rallybik_state::toaplan1_bcu_flipscreen_w));
+	map(0x100002, 0x100003).rw(this, FUNC(toaplan1_rallybik_state::toaplan1_tileram_offs_r), FUNC(toaplan1_rallybik_state::toaplan1_tileram_offs_w));
+	map(0x100004, 0x100007).rw(this, FUNC(toaplan1_rallybik_state::rallybik_tileram16_r), FUNC(toaplan1_rallybik_state::toaplan1_tileram16_w));
+	map(0x100010, 0x10001f).rw(this, FUNC(toaplan1_rallybik_state::toaplan1_scroll_regs_r), FUNC(toaplan1_rallybik_state::toaplan1_scroll_regs_w));
+	map(0x140000, 0x140001).portr("VBLANK");
 //  AM_RANGE(0x140000, 0x140001) AM_WRITE(?? video frame related ??)
-	AM_RANGE(0x140002, 0x140003) AM_WRITE(toaplan1_intenable_w)
-	AM_RANGE(0x140008, 0x14000f) AM_WRITE(toaplan1_bcu_control_w)
-	AM_RANGE(0x144000, 0x1447ff) AM_RAM_WRITE(toaplan1_bgpalette_w) AM_SHARE("bgpalette")
-	AM_RANGE(0x146000, 0x1467ff) AM_RAM_WRITE(toaplan1_fgpalette_w) AM_SHARE("fgpalette")
-	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(toaplan1_shared_r, toaplan1_shared_w)
-	AM_RANGE(0x1c0000, 0x1c0003) AM_WRITE(toaplan1_tile_offsets_w)
-	AM_RANGE(0x1c8000, 0x1c8001) AM_WRITE(toaplan1_reset_sound_w)
-ADDRESS_MAP_END
+	map(0x140002, 0x140003).w(this, FUNC(toaplan1_rallybik_state::toaplan1_intenable_w));
+	map(0x140008, 0x14000f).w(this, FUNC(toaplan1_rallybik_state::toaplan1_bcu_control_w));
+	map(0x144000, 0x1447ff).ram().w(this, FUNC(toaplan1_rallybik_state::toaplan1_bgpalette_w)).share("bgpalette");
+	map(0x146000, 0x1467ff).ram().w(this, FUNC(toaplan1_rallybik_state::toaplan1_fgpalette_w)).share("fgpalette");
+	map(0x180000, 0x180fff).rw(this, FUNC(toaplan1_rallybik_state::toaplan1_shared_r), FUNC(toaplan1_rallybik_state::toaplan1_shared_w));
+	map(0x1c0000, 0x1c0003).w(this, FUNC(toaplan1_rallybik_state::toaplan1_tile_offsets_w));
+	map(0x1c8000, 0x1c8001).w(this, FUNC(toaplan1_rallybik_state::toaplan1_reset_sound_w));
+}
 
-ADDRESS_MAP_START(toaplan1_state::truxton_main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(toaplan1_frame_done_r)
-	AM_RANGE(0x0c0002, 0x0c0003) AM_READWRITE(toaplan1_spriteram_offs_r, toaplan1_spriteram_offs_w)
-	AM_RANGE(0x0c0004, 0x0c0005) AM_READWRITE(toaplan1_spriteram16_r, toaplan1_spriteram16_w)
-	AM_RANGE(0x0c0006, 0x0c0007) AM_READWRITE(toaplan1_spritesizeram16_r, toaplan1_spritesizeram16_w)
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(toaplan1_bcu_flipscreen_w)
-	AM_RANGE(0x100002, 0x100003) AM_READWRITE(toaplan1_tileram_offs_r, toaplan1_tileram_offs_w)
-	AM_RANGE(0x100004, 0x100007) AM_READWRITE(toaplan1_tileram16_r, toaplan1_tileram16_w)
-	AM_RANGE(0x100010, 0x10001f) AM_READWRITE(toaplan1_scroll_regs_r, toaplan1_scroll_regs_w)
-	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("VBLANK")
+void toaplan1_state::truxton_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x083fff).ram();
+	map(0x0c0000, 0x0c0001).r(this, FUNC(toaplan1_state::toaplan1_frame_done_r));
+	map(0x0c0002, 0x0c0003).rw(this, FUNC(toaplan1_state::toaplan1_spriteram_offs_r), FUNC(toaplan1_state::toaplan1_spriteram_offs_w));
+	map(0x0c0004, 0x0c0005).rw(this, FUNC(toaplan1_state::toaplan1_spriteram16_r), FUNC(toaplan1_state::toaplan1_spriteram16_w));
+	map(0x0c0006, 0x0c0007).rw(this, FUNC(toaplan1_state::toaplan1_spritesizeram16_r), FUNC(toaplan1_state::toaplan1_spritesizeram16_w));
+	map(0x100000, 0x100001).w(this, FUNC(toaplan1_state::toaplan1_bcu_flipscreen_w));
+	map(0x100002, 0x100003).rw(this, FUNC(toaplan1_state::toaplan1_tileram_offs_r), FUNC(toaplan1_state::toaplan1_tileram_offs_w));
+	map(0x100004, 0x100007).rw(this, FUNC(toaplan1_state::toaplan1_tileram16_r), FUNC(toaplan1_state::toaplan1_tileram16_w));
+	map(0x100010, 0x10001f).rw(this, FUNC(toaplan1_state::toaplan1_scroll_regs_r), FUNC(toaplan1_state::toaplan1_scroll_regs_w));
+	map(0x140000, 0x140001).portr("VBLANK");
 //  AM_RANGE(0x140000, 0x140001) AM_WRITE(?? video frame related ??)
-	AM_RANGE(0x140002, 0x140003) AM_WRITE(toaplan1_intenable_w)
-	AM_RANGE(0x140008, 0x14000f) AM_WRITE(toaplan1_bcu_control_w)
-	AM_RANGE(0x144000, 0x1447ff) AM_RAM_WRITE(toaplan1_bgpalette_w) AM_SHARE("bgpalette")
-	AM_RANGE(0x146000, 0x1467ff) AM_RAM_WRITE(toaplan1_fgpalette_w) AM_SHARE("fgpalette")
-	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(toaplan1_shared_r, toaplan1_shared_w)
-	AM_RANGE(0x1c0000, 0x1c0003) AM_WRITE(toaplan1_tile_offsets_w)
-	AM_RANGE(0x1c0006, 0x1c0007) AM_WRITE(toaplan1_fcu_flipscreen_w)
-	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(toaplan1_reset_sound_w)
-ADDRESS_MAP_END
+	map(0x140002, 0x140003).w(this, FUNC(toaplan1_state::toaplan1_intenable_w));
+	map(0x140008, 0x14000f).w(this, FUNC(toaplan1_state::toaplan1_bcu_control_w));
+	map(0x144000, 0x1447ff).ram().w(this, FUNC(toaplan1_state::toaplan1_bgpalette_w)).share("bgpalette");
+	map(0x146000, 0x1467ff).ram().w(this, FUNC(toaplan1_state::toaplan1_fgpalette_w)).share("fgpalette");
+	map(0x180000, 0x180fff).rw(this, FUNC(toaplan1_state::toaplan1_shared_r), FUNC(toaplan1_state::toaplan1_shared_w));
+	map(0x1c0000, 0x1c0003).w(this, FUNC(toaplan1_state::toaplan1_tile_offsets_w));
+	map(0x1c0006, 0x1c0007).w(this, FUNC(toaplan1_state::toaplan1_fcu_flipscreen_w));
+	map(0x1d0000, 0x1d0001).w(this, FUNC(toaplan1_state::toaplan1_reset_sound_w));
+}
 
-ADDRESS_MAP_START(toaplan1_state::hellfire_main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x047fff) AM_RAM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("VBLANK")
+void toaplan1_state::hellfire_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x047fff).ram();
+	map(0x080000, 0x080001).portr("VBLANK");
 //  AM_RANGE(0x080000, 0x080001) AM_WRITE(?? video frame related ??)
-	AM_RANGE(0x080002, 0x080003) AM_WRITE(toaplan1_intenable_w)
-	AM_RANGE(0x080008, 0x08000f) AM_WRITE(toaplan1_bcu_control_w)
-	AM_RANGE(0x084000, 0x0847ff) AM_RAM_WRITE(toaplan1_bgpalette_w) AM_SHARE("bgpalette")
-	AM_RANGE(0x086000, 0x0867ff) AM_RAM_WRITE(toaplan1_fgpalette_w) AM_SHARE("fgpalette")
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_READWRITE(toaplan1_shared_r, toaplan1_shared_w)
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(toaplan1_bcu_flipscreen_w)
-	AM_RANGE(0x100002, 0x100003) AM_READWRITE(toaplan1_tileram_offs_r, toaplan1_tileram_offs_w)
-	AM_RANGE(0x100004, 0x100007) AM_READWRITE(toaplan1_tileram16_r, toaplan1_tileram16_w)
-	AM_RANGE(0x100010, 0x10001f) AM_READWRITE(toaplan1_scroll_regs_r, toaplan1_scroll_regs_w)
-	AM_RANGE(0x140000, 0x140001) AM_READ(toaplan1_frame_done_r)
-	AM_RANGE(0x140002, 0x140003) AM_READWRITE(toaplan1_spriteram_offs_r, toaplan1_spriteram_offs_w)
-	AM_RANGE(0x140004, 0x140005) AM_READWRITE(toaplan1_spriteram16_r, toaplan1_spriteram16_w)
-	AM_RANGE(0x140006, 0x140007) AM_READWRITE(toaplan1_spritesizeram16_r, toaplan1_spritesizeram16_w)
-	AM_RANGE(0x180000, 0x180003) AM_WRITE(toaplan1_tile_offsets_w)
-	AM_RANGE(0x180006, 0x180007) AM_WRITE(toaplan1_fcu_flipscreen_w)
-	AM_RANGE(0x180008, 0x180009) AM_WRITE(toaplan1_reset_sound_w)
-ADDRESS_MAP_END
+	map(0x080002, 0x080003).w(this, FUNC(toaplan1_state::toaplan1_intenable_w));
+	map(0x080008, 0x08000f).w(this, FUNC(toaplan1_state::toaplan1_bcu_control_w));
+	map(0x084000, 0x0847ff).ram().w(this, FUNC(toaplan1_state::toaplan1_bgpalette_w)).share("bgpalette");
+	map(0x086000, 0x0867ff).ram().w(this, FUNC(toaplan1_state::toaplan1_fgpalette_w)).share("fgpalette");
+	map(0x0c0000, 0x0c0fff).rw(this, FUNC(toaplan1_state::toaplan1_shared_r), FUNC(toaplan1_state::toaplan1_shared_w));
+	map(0x100000, 0x100001).w(this, FUNC(toaplan1_state::toaplan1_bcu_flipscreen_w));
+	map(0x100002, 0x100003).rw(this, FUNC(toaplan1_state::toaplan1_tileram_offs_r), FUNC(toaplan1_state::toaplan1_tileram_offs_w));
+	map(0x100004, 0x100007).rw(this, FUNC(toaplan1_state::toaplan1_tileram16_r), FUNC(toaplan1_state::toaplan1_tileram16_w));
+	map(0x100010, 0x10001f).rw(this, FUNC(toaplan1_state::toaplan1_scroll_regs_r), FUNC(toaplan1_state::toaplan1_scroll_regs_w));
+	map(0x140000, 0x140001).r(this, FUNC(toaplan1_state::toaplan1_frame_done_r));
+	map(0x140002, 0x140003).rw(this, FUNC(toaplan1_state::toaplan1_spriteram_offs_r), FUNC(toaplan1_state::toaplan1_spriteram_offs_w));
+	map(0x140004, 0x140005).rw(this, FUNC(toaplan1_state::toaplan1_spriteram16_r), FUNC(toaplan1_state::toaplan1_spriteram16_w));
+	map(0x140006, 0x140007).rw(this, FUNC(toaplan1_state::toaplan1_spritesizeram16_r), FUNC(toaplan1_state::toaplan1_spritesizeram16_w));
+	map(0x180000, 0x180003).w(this, FUNC(toaplan1_state::toaplan1_tile_offsets_w));
+	map(0x180006, 0x180007).w(this, FUNC(toaplan1_state::toaplan1_fcu_flipscreen_w));
+	map(0x180008, 0x180009).w(this, FUNC(toaplan1_state::toaplan1_reset_sound_w));
+}
 
-ADDRESS_MAP_START(toaplan1_state::zerowing_main_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x087fff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(toaplan1_tile_offsets_w)
-	AM_RANGE(0x0c0006, 0x0c0007) AM_WRITE(toaplan1_fcu_flipscreen_w)
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("VBLANK")
+void toaplan1_state::zerowing_main_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x040000, 0x07ffff).rom();
+	map(0x080000, 0x087fff).ram();
+	map(0x0c0000, 0x0c0003).w(this, FUNC(toaplan1_state::toaplan1_tile_offsets_w));
+	map(0x0c0006, 0x0c0007).w(this, FUNC(toaplan1_state::toaplan1_fcu_flipscreen_w));
+	map(0x400000, 0x400001).portr("VBLANK");
 //  AM_RANGE(0x400000, 0x400001) AM_WRITE(?? video frame related ??)
-	AM_RANGE(0x400002, 0x400003) AM_WRITE(toaplan1_intenable_w)
-	AM_RANGE(0x400008, 0x40000f) AM_WRITE(toaplan1_bcu_control_w)
-	AM_RANGE(0x404000, 0x4047ff) AM_RAM_WRITE(toaplan1_bgpalette_w) AM_SHARE("bgpalette")
-	AM_RANGE(0x406000, 0x4067ff) AM_RAM_WRITE(toaplan1_fgpalette_w) AM_SHARE("fgpalette")
-	AM_RANGE(0x440000, 0x440fff) AM_READWRITE(toaplan1_shared_r, toaplan1_shared_w)
-	AM_RANGE(0x480000, 0x480001) AM_WRITE(toaplan1_bcu_flipscreen_w)
-	AM_RANGE(0x480002, 0x480003) AM_READWRITE(toaplan1_tileram_offs_r, toaplan1_tileram_offs_w)
-	AM_RANGE(0x480004, 0x480007) AM_READWRITE(toaplan1_tileram16_r, toaplan1_tileram16_w)
-	AM_RANGE(0x480010, 0x48001f) AM_READWRITE(toaplan1_scroll_regs_r, toaplan1_scroll_regs_w)
-	AM_RANGE(0x4c0000, 0x4c0001) AM_READ(toaplan1_frame_done_r)
-	AM_RANGE(0x4c0002, 0x4c0003) AM_READWRITE(toaplan1_spriteram_offs_r, toaplan1_spriteram_offs_w)
-	AM_RANGE(0x4c0004, 0x4c0005) AM_READWRITE(toaplan1_spriteram16_r, toaplan1_spriteram16_w)
-	AM_RANGE(0x4c0006, 0x4c0007) AM_READWRITE(toaplan1_spritesizeram16_r, toaplan1_spritesizeram16_w)
-ADDRESS_MAP_END
+	map(0x400002, 0x400003).w(this, FUNC(toaplan1_state::toaplan1_intenable_w));
+	map(0x400008, 0x40000f).w(this, FUNC(toaplan1_state::toaplan1_bcu_control_w));
+	map(0x404000, 0x4047ff).ram().w(this, FUNC(toaplan1_state::toaplan1_bgpalette_w)).share("bgpalette");
+	map(0x406000, 0x4067ff).ram().w(this, FUNC(toaplan1_state::toaplan1_fgpalette_w)).share("fgpalette");
+	map(0x440000, 0x440fff).rw(this, FUNC(toaplan1_state::toaplan1_shared_r), FUNC(toaplan1_state::toaplan1_shared_w));
+	map(0x480000, 0x480001).w(this, FUNC(toaplan1_state::toaplan1_bcu_flipscreen_w));
+	map(0x480002, 0x480003).rw(this, FUNC(toaplan1_state::toaplan1_tileram_offs_r), FUNC(toaplan1_state::toaplan1_tileram_offs_w));
+	map(0x480004, 0x480007).rw(this, FUNC(toaplan1_state::toaplan1_tileram16_r), FUNC(toaplan1_state::toaplan1_tileram16_w));
+	map(0x480010, 0x48001f).rw(this, FUNC(toaplan1_state::toaplan1_scroll_regs_r), FUNC(toaplan1_state::toaplan1_scroll_regs_w));
+	map(0x4c0000, 0x4c0001).r(this, FUNC(toaplan1_state::toaplan1_frame_done_r));
+	map(0x4c0002, 0x4c0003).rw(this, FUNC(toaplan1_state::toaplan1_spriteram_offs_r), FUNC(toaplan1_state::toaplan1_spriteram_offs_w));
+	map(0x4c0004, 0x4c0005).rw(this, FUNC(toaplan1_state::toaplan1_spriteram16_r), FUNC(toaplan1_state::toaplan1_spriteram16_w));
+	map(0x4c0006, 0x4c0007).rw(this, FUNC(toaplan1_state::toaplan1_spritesizeram16_r), FUNC(toaplan1_state::toaplan1_spritesizeram16_w));
+}
 
-ADDRESS_MAP_START(toaplan1_state::demonwld_main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("VBLANK")
+void toaplan1_state::demonwld_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x400000, 0x400001).portr("VBLANK");
 //  AM_RANGE(0x400000, 0x400001) AM_WRITE(?? video frame related ??)
-	AM_RANGE(0x400002, 0x400003) AM_WRITE(toaplan1_intenable_w)
-	AM_RANGE(0x400008, 0x40000f) AM_WRITE(toaplan1_bcu_control_w)
-	AM_RANGE(0x404000, 0x4047ff) AM_RAM_WRITE(toaplan1_bgpalette_w) AM_SHARE("bgpalette")
-	AM_RANGE(0x406000, 0x4067ff) AM_RAM_WRITE(toaplan1_fgpalette_w) AM_SHARE("fgpalette")
-	AM_RANGE(0x600000, 0x600fff) AM_READWRITE(toaplan1_shared_r, toaplan1_shared_w)
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(toaplan1_bcu_flipscreen_w)
-	AM_RANGE(0x800002, 0x800003) AM_READWRITE(toaplan1_tileram_offs_r, toaplan1_tileram_offs_w)
-	AM_RANGE(0x800004, 0x800007) AM_READWRITE(toaplan1_tileram16_r, toaplan1_tileram16_w)
-	AM_RANGE(0x800010, 0x80001f) AM_READWRITE(toaplan1_scroll_regs_r, toaplan1_scroll_regs_w)
-	AM_RANGE(0xa00000, 0xa00001) AM_READ(toaplan1_frame_done_r)
-	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE(toaplan1_spriteram_offs_r, toaplan1_spriteram_offs_w)
-	AM_RANGE(0xa00004, 0xa00005) AM_READWRITE(toaplan1_spriteram16_r, toaplan1_spriteram16_w)
-	AM_RANGE(0xa00006, 0xa00007) AM_READWRITE(toaplan1_spritesizeram16_r, toaplan1_spritesizeram16_w)
-	AM_RANGE(0xc00000, 0xc03fff) AM_RAM
-	AM_RANGE(0xe00000, 0xe00003) AM_WRITE(toaplan1_tile_offsets_w)
-	AM_RANGE(0xe00006, 0xe00007) AM_WRITE(toaplan1_fcu_flipscreen_w)
-	AM_RANGE(0xe00008, 0xe00009) AM_WRITE(toaplan1_reset_sound_w)
-	AM_RANGE(0xe0000a, 0xe0000b) AM_WRITE(demonwld_dsp_ctrl_w)  /* DSP Comms control */
-ADDRESS_MAP_END
+	map(0x400002, 0x400003).w(this, FUNC(toaplan1_state::toaplan1_intenable_w));
+	map(0x400008, 0x40000f).w(this, FUNC(toaplan1_state::toaplan1_bcu_control_w));
+	map(0x404000, 0x4047ff).ram().w(this, FUNC(toaplan1_state::toaplan1_bgpalette_w)).share("bgpalette");
+	map(0x406000, 0x4067ff).ram().w(this, FUNC(toaplan1_state::toaplan1_fgpalette_w)).share("fgpalette");
+	map(0x600000, 0x600fff).rw(this, FUNC(toaplan1_state::toaplan1_shared_r), FUNC(toaplan1_state::toaplan1_shared_w));
+	map(0x800000, 0x800001).w(this, FUNC(toaplan1_state::toaplan1_bcu_flipscreen_w));
+	map(0x800002, 0x800003).rw(this, FUNC(toaplan1_state::toaplan1_tileram_offs_r), FUNC(toaplan1_state::toaplan1_tileram_offs_w));
+	map(0x800004, 0x800007).rw(this, FUNC(toaplan1_state::toaplan1_tileram16_r), FUNC(toaplan1_state::toaplan1_tileram16_w));
+	map(0x800010, 0x80001f).rw(this, FUNC(toaplan1_state::toaplan1_scroll_regs_r), FUNC(toaplan1_state::toaplan1_scroll_regs_w));
+	map(0xa00000, 0xa00001).r(this, FUNC(toaplan1_state::toaplan1_frame_done_r));
+	map(0xa00002, 0xa00003).rw(this, FUNC(toaplan1_state::toaplan1_spriteram_offs_r), FUNC(toaplan1_state::toaplan1_spriteram_offs_w));
+	map(0xa00004, 0xa00005).rw(this, FUNC(toaplan1_state::toaplan1_spriteram16_r), FUNC(toaplan1_state::toaplan1_spriteram16_w));
+	map(0xa00006, 0xa00007).rw(this, FUNC(toaplan1_state::toaplan1_spritesizeram16_r), FUNC(toaplan1_state::toaplan1_spritesizeram16_w));
+	map(0xc00000, 0xc03fff).ram();
+	map(0xe00000, 0xe00003).w(this, FUNC(toaplan1_state::toaplan1_tile_offsets_w));
+	map(0xe00006, 0xe00007).w(this, FUNC(toaplan1_state::toaplan1_fcu_flipscreen_w));
+	map(0xe00008, 0xe00009).w(this, FUNC(toaplan1_state::toaplan1_reset_sound_w));
+	map(0xe0000a, 0xe0000b).w(this, FUNC(toaplan1_state::demonwld_dsp_ctrl_w));  /* DSP Comms control */
+}
 
-ADDRESS_MAP_START(toaplan1_state::samesame_main_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080003) AM_WRITE(toaplan1_tile_offsets_w)
-	AM_RANGE(0x080006, 0x080007) AM_WRITE(toaplan1_fcu_flipscreen_w)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM         /* Frame done at $c1ada */
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("VBLANK")
+void toaplan1_state::samesame_main_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x040000, 0x07ffff).rom();
+	map(0x080000, 0x080003).w(this, FUNC(toaplan1_state::toaplan1_tile_offsets_w));
+	map(0x080006, 0x080007).w(this, FUNC(toaplan1_state::toaplan1_fcu_flipscreen_w));
+	map(0x0c0000, 0x0c3fff).ram();         /* Frame done at $c1ada */
+	map(0x100000, 0x100001).portr("VBLANK");
 //  AM_RANGE(0x100000, 0x100001) AM_WRITE(?? video frame related ??)
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(toaplan1_intenable_w)
-	AM_RANGE(0x100008, 0x10000f) AM_WRITE(toaplan1_bcu_control_w)
-	AM_RANGE(0x104000, 0x1047ff) AM_RAM_WRITE(toaplan1_bgpalette_w) AM_SHARE("bgpalette")
-	AM_RANGE(0x106000, 0x1067ff) AM_RAM_WRITE(toaplan1_fgpalette_w) AM_SHARE("fgpalette")
-	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("P1")
-	AM_RANGE(0x140002, 0x140003) AM_READ_PORT("P2")
-	AM_RANGE(0x140004, 0x140005) AM_READ_PORT("DSWA")
-	AM_RANGE(0x140006, 0x140007) AM_READ_PORT("DSWB")
-	AM_RANGE(0x140008, 0x140009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x14000a, 0x14000b) AM_READ(samesame_port_6_word_r)    /* Territory, and MCU ready */
-	AM_RANGE(0x14000c, 0x14000d) AM_WRITE(samesame_coin_w)  /* Coin counter/lockout */
-	AM_RANGE(0x14000e, 0x14000f) AM_WRITE(samesame_mcu_w)   /* Commands sent to HD647180 */
-	AM_RANGE(0x180000, 0x180001) AM_WRITE(toaplan1_bcu_flipscreen_w)
-	AM_RANGE(0x180002, 0x180003) AM_READWRITE(toaplan1_tileram_offs_r, toaplan1_tileram_offs_w)
-	AM_RANGE(0x180004, 0x180007) AM_READWRITE(toaplan1_tileram16_r, toaplan1_tileram16_w)
-	AM_RANGE(0x180010, 0x18001f) AM_READWRITE(toaplan1_scroll_regs_r, toaplan1_scroll_regs_w)
-	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(toaplan1_frame_done_r)
+	map(0x100002, 0x100003).w(this, FUNC(toaplan1_state::toaplan1_intenable_w));
+	map(0x100008, 0x10000f).w(this, FUNC(toaplan1_state::toaplan1_bcu_control_w));
+	map(0x104000, 0x1047ff).ram().w(this, FUNC(toaplan1_state::toaplan1_bgpalette_w)).share("bgpalette");
+	map(0x106000, 0x1067ff).ram().w(this, FUNC(toaplan1_state::toaplan1_fgpalette_w)).share("fgpalette");
+	map(0x140000, 0x140001).portr("P1");
+	map(0x140002, 0x140003).portr("P2");
+	map(0x140004, 0x140005).portr("DSWA");
+	map(0x140006, 0x140007).portr("DSWB");
+	map(0x140008, 0x140009).portr("SYSTEM");
+	map(0x14000a, 0x14000b).r(this, FUNC(toaplan1_state::samesame_port_6_word_r));    /* Territory, and MCU ready */
+	map(0x14000c, 0x14000d).w(this, FUNC(toaplan1_state::samesame_coin_w));  /* Coin counter/lockout */
+	map(0x14000e, 0x14000f).w(this, FUNC(toaplan1_state::samesame_mcu_w));   /* Commands sent to HD647180 */
+	map(0x180000, 0x180001).w(this, FUNC(toaplan1_state::toaplan1_bcu_flipscreen_w));
+	map(0x180002, 0x180003).rw(this, FUNC(toaplan1_state::toaplan1_tileram_offs_r), FUNC(toaplan1_state::toaplan1_tileram_offs_w));
+	map(0x180004, 0x180007).rw(this, FUNC(toaplan1_state::toaplan1_tileram16_r), FUNC(toaplan1_state::toaplan1_tileram16_w));
+	map(0x180010, 0x18001f).rw(this, FUNC(toaplan1_state::toaplan1_scroll_regs_r), FUNC(toaplan1_state::toaplan1_scroll_regs_w));
+	map(0x1c0000, 0x1c0001).r(this, FUNC(toaplan1_state::toaplan1_frame_done_r));
 //  AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(?? disable sprite refresh ??)
-	AM_RANGE(0x1c0002, 0x1c0003) AM_READWRITE(toaplan1_spriteram_offs_r, toaplan1_spriteram_offs_w)
-	AM_RANGE(0x1c0004, 0x1c0005) AM_READWRITE(toaplan1_spriteram16_r, toaplan1_spriteram16_w)
-	AM_RANGE(0x1c0006, 0x1c0007) AM_READWRITE(toaplan1_spritesizeram16_r, toaplan1_spritesizeram16_w)
-ADDRESS_MAP_END
+	map(0x1c0002, 0x1c0003).rw(this, FUNC(toaplan1_state::toaplan1_spriteram_offs_r), FUNC(toaplan1_state::toaplan1_spriteram_offs_w));
+	map(0x1c0004, 0x1c0005).rw(this, FUNC(toaplan1_state::toaplan1_spriteram16_r), FUNC(toaplan1_state::toaplan1_spriteram16_w));
+	map(0x1c0006, 0x1c0007).rw(this, FUNC(toaplan1_state::toaplan1_spritesizeram16_r), FUNC(toaplan1_state::toaplan1_spritesizeram16_w));
+}
 
-ADDRESS_MAP_START(toaplan1_state::outzone_main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READ(toaplan1_frame_done_r)
-	AM_RANGE(0x100002, 0x100003) AM_READWRITE(toaplan1_spriteram_offs_r, toaplan1_spriteram_offs_w)
-	AM_RANGE(0x100004, 0x100005) AM_READWRITE(toaplan1_spriteram16_r, toaplan1_spriteram16_w)
-	AM_RANGE(0x100006, 0x100007) AM_READWRITE(toaplan1_spritesizeram16_r, toaplan1_spritesizeram16_w)
-	AM_RANGE(0x140000, 0x140fff) AM_READWRITE(toaplan1_shared_r, toaplan1_shared_w)
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(toaplan1_bcu_flipscreen_w)
-	AM_RANGE(0x200002, 0x200003) AM_READWRITE(toaplan1_tileram_offs_r, toaplan1_tileram_offs_w)
-	AM_RANGE(0x200004, 0x200007) AM_READWRITE(toaplan1_tileram16_r, toaplan1_tileram16_w)
-	AM_RANGE(0x200010, 0x20001f) AM_READWRITE(toaplan1_scroll_regs_r, toaplan1_scroll_regs_w)
-	AM_RANGE(0x240000, 0x243fff) AM_RAM
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("VBLANK")
+void toaplan1_state::outzone_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x100001).r(this, FUNC(toaplan1_state::toaplan1_frame_done_r));
+	map(0x100002, 0x100003).rw(this, FUNC(toaplan1_state::toaplan1_spriteram_offs_r), FUNC(toaplan1_state::toaplan1_spriteram_offs_w));
+	map(0x100004, 0x100005).rw(this, FUNC(toaplan1_state::toaplan1_spriteram16_r), FUNC(toaplan1_state::toaplan1_spriteram16_w));
+	map(0x100006, 0x100007).rw(this, FUNC(toaplan1_state::toaplan1_spritesizeram16_r), FUNC(toaplan1_state::toaplan1_spritesizeram16_w));
+	map(0x140000, 0x140fff).rw(this, FUNC(toaplan1_state::toaplan1_shared_r), FUNC(toaplan1_state::toaplan1_shared_w));
+	map(0x200000, 0x200001).w(this, FUNC(toaplan1_state::toaplan1_bcu_flipscreen_w));
+	map(0x200002, 0x200003).rw(this, FUNC(toaplan1_state::toaplan1_tileram_offs_r), FUNC(toaplan1_state::toaplan1_tileram_offs_w));
+	map(0x200004, 0x200007).rw(this, FUNC(toaplan1_state::toaplan1_tileram16_r), FUNC(toaplan1_state::toaplan1_tileram16_w));
+	map(0x200010, 0x20001f).rw(this, FUNC(toaplan1_state::toaplan1_scroll_regs_r), FUNC(toaplan1_state::toaplan1_scroll_regs_w));
+	map(0x240000, 0x243fff).ram();
+	map(0x300000, 0x300001).portr("VBLANK");
 //  AM_RANGE(0x300000, 0x300001) AM_WRITE(?? video frame related ??)
-	AM_RANGE(0x300002, 0x300003) AM_WRITE(toaplan1_intenable_w)
-	AM_RANGE(0x300008, 0x30000f) AM_WRITE(toaplan1_bcu_control_w)
-	AM_RANGE(0x304000, 0x3047ff) AM_RAM_WRITE(toaplan1_bgpalette_w) AM_SHARE("bgpalette")
-	AM_RANGE(0x306000, 0x3067ff) AM_RAM_WRITE(toaplan1_fgpalette_w) AM_SHARE("fgpalette")
-	AM_RANGE(0x340000, 0x340003) AM_WRITE(toaplan1_tile_offsets_w)
-	AM_RANGE(0x340006, 0x340007) AM_WRITE(toaplan1_fcu_flipscreen_w)
-ADDRESS_MAP_END
+	map(0x300002, 0x300003).w(this, FUNC(toaplan1_state::toaplan1_intenable_w));
+	map(0x300008, 0x30000f).w(this, FUNC(toaplan1_state::toaplan1_bcu_control_w));
+	map(0x304000, 0x3047ff).ram().w(this, FUNC(toaplan1_state::toaplan1_bgpalette_w)).share("bgpalette");
+	map(0x306000, 0x3067ff).ram().w(this, FUNC(toaplan1_state::toaplan1_fgpalette_w)).share("fgpalette");
+	map(0x340000, 0x340003).w(this, FUNC(toaplan1_state::toaplan1_tile_offsets_w));
+	map(0x340006, 0x340007).w(this, FUNC(toaplan1_state::toaplan1_fcu_flipscreen_w));
+}
 
-ADDRESS_MAP_START(toaplan1_state::outzonecv_main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+void toaplan1_state::outzonecv_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 //  AM_RANGE(0x040000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x087fff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(toaplan1_tile_offsets_w)
-	AM_RANGE(0x0c0006, 0x0c0007) AM_WRITE(toaplan1_fcu_flipscreen_w)
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("VBLANK")
+	map(0x080000, 0x087fff).ram();
+	map(0x0c0000, 0x0c0003).w(this, FUNC(toaplan1_state::toaplan1_tile_offsets_w));
+	map(0x0c0006, 0x0c0007).w(this, FUNC(toaplan1_state::toaplan1_fcu_flipscreen_w));
+	map(0x400000, 0x400001).portr("VBLANK");
 //  AM_RANGE(0x400000, 0x400001) AM_WRITE(?? video frame related ??)
-	AM_RANGE(0x400002, 0x400003) AM_WRITE(toaplan1_intenable_w)
-	AM_RANGE(0x400008, 0x40000f) AM_WRITE(toaplan1_bcu_control_w)
-	AM_RANGE(0x404000, 0x4047ff) AM_RAM_WRITE(toaplan1_bgpalette_w) AM_SHARE("bgpalette")
-	AM_RANGE(0x406000, 0x4067ff) AM_RAM_WRITE(toaplan1_fgpalette_w) AM_SHARE("fgpalette")
-	AM_RANGE(0x440000, 0x440fff) AM_READWRITE(toaplan1_shared_r, toaplan1_shared_w)
-	AM_RANGE(0x480000, 0x480001) AM_WRITE(toaplan1_bcu_flipscreen_w)
-	AM_RANGE(0x480002, 0x480003) AM_READWRITE(toaplan1_tileram_offs_r, toaplan1_tileram_offs_w)
-	AM_RANGE(0x480004, 0x480007) AM_READWRITE(toaplan1_tileram16_r, toaplan1_tileram16_w)
-	AM_RANGE(0x480010, 0x48001f) AM_READWRITE(toaplan1_scroll_regs_r, toaplan1_scroll_regs_w)
-	AM_RANGE(0x4c0000, 0x4c0001) AM_READ(toaplan1_frame_done_r)
-	AM_RANGE(0x4c0002, 0x4c0003) AM_READWRITE(toaplan1_spriteram_offs_r, toaplan1_spriteram_offs_w)
-	AM_RANGE(0x4c0004, 0x4c0005) AM_READWRITE(toaplan1_spriteram16_r, toaplan1_spriteram16_w)
-	AM_RANGE(0x4c0006, 0x4c0007) AM_READWRITE(toaplan1_spritesizeram16_r, toaplan1_spritesizeram16_w)
-ADDRESS_MAP_END
+	map(0x400002, 0x400003).w(this, FUNC(toaplan1_state::toaplan1_intenable_w));
+	map(0x400008, 0x40000f).w(this, FUNC(toaplan1_state::toaplan1_bcu_control_w));
+	map(0x404000, 0x4047ff).ram().w(this, FUNC(toaplan1_state::toaplan1_bgpalette_w)).share("bgpalette");
+	map(0x406000, 0x4067ff).ram().w(this, FUNC(toaplan1_state::toaplan1_fgpalette_w)).share("fgpalette");
+	map(0x440000, 0x440fff).rw(this, FUNC(toaplan1_state::toaplan1_shared_r), FUNC(toaplan1_state::toaplan1_shared_w));
+	map(0x480000, 0x480001).w(this, FUNC(toaplan1_state::toaplan1_bcu_flipscreen_w));
+	map(0x480002, 0x480003).rw(this, FUNC(toaplan1_state::toaplan1_tileram_offs_r), FUNC(toaplan1_state::toaplan1_tileram_offs_w));
+	map(0x480004, 0x480007).rw(this, FUNC(toaplan1_state::toaplan1_tileram16_r), FUNC(toaplan1_state::toaplan1_tileram16_w));
+	map(0x480010, 0x48001f).rw(this, FUNC(toaplan1_state::toaplan1_scroll_regs_r), FUNC(toaplan1_state::toaplan1_scroll_regs_w));
+	map(0x4c0000, 0x4c0001).r(this, FUNC(toaplan1_state::toaplan1_frame_done_r));
+	map(0x4c0002, 0x4c0003).rw(this, FUNC(toaplan1_state::toaplan1_spriteram_offs_r), FUNC(toaplan1_state::toaplan1_spriteram_offs_w));
+	map(0x4c0004, 0x4c0005).rw(this, FUNC(toaplan1_state::toaplan1_spriteram16_r), FUNC(toaplan1_state::toaplan1_spriteram16_w));
+	map(0x4c0006, 0x4c0007).rw(this, FUNC(toaplan1_state::toaplan1_spritesizeram16_r), FUNC(toaplan1_state::toaplan1_spritesizeram16_w));
+}
 
-ADDRESS_MAP_START(toaplan1_state::vimana_main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080003) AM_WRITE(toaplan1_tile_offsets_w)
-	AM_RANGE(0x080006, 0x080007) AM_WRITE(toaplan1_fcu_flipscreen_w)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(toaplan1_frame_done_r)
-	AM_RANGE(0x0c0002, 0x0c0003) AM_READWRITE(toaplan1_spriteram_offs_r, toaplan1_spriteram_offs_w)
-	AM_RANGE(0x0c0004, 0x0c0005) AM_READWRITE(toaplan1_spriteram16_r, toaplan1_spriteram16_w)
-	AM_RANGE(0x0c0006, 0x0c0007) AM_READWRITE(toaplan1_spritesizeram16_r, toaplan1_spritesizeram16_w)
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("VBLANK")
+void toaplan1_state::vimana_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x080003).w(this, FUNC(toaplan1_state::toaplan1_tile_offsets_w));
+	map(0x080006, 0x080007).w(this, FUNC(toaplan1_state::toaplan1_fcu_flipscreen_w));
+	map(0x0c0000, 0x0c0001).r(this, FUNC(toaplan1_state::toaplan1_frame_done_r));
+	map(0x0c0002, 0x0c0003).rw(this, FUNC(toaplan1_state::toaplan1_spriteram_offs_r), FUNC(toaplan1_state::toaplan1_spriteram_offs_w));
+	map(0x0c0004, 0x0c0005).rw(this, FUNC(toaplan1_state::toaplan1_spriteram16_r), FUNC(toaplan1_state::toaplan1_spriteram16_w));
+	map(0x0c0006, 0x0c0007).rw(this, FUNC(toaplan1_state::toaplan1_spritesizeram16_r), FUNC(toaplan1_state::toaplan1_spritesizeram16_w));
+	map(0x400000, 0x400001).portr("VBLANK");
 //  AM_RANGE(0x400000, 0x400001) AM_WRITE(?? video frame related ??)
-	AM_RANGE(0x400002, 0x400003) AM_WRITE(toaplan1_intenable_w)
-	AM_RANGE(0x400008, 0x40000f) AM_WRITE(toaplan1_bcu_control_w)
-	AM_RANGE(0x404000, 0x4047ff) AM_RAM_WRITE(toaplan1_bgpalette_w) AM_SHARE("bgpalette")
-	AM_RANGE(0x406000, 0x4067ff) AM_RAM_WRITE(toaplan1_fgpalette_w) AM_SHARE("fgpalette")
-	AM_RANGE(0x440000, 0x4407ff) AM_READWRITE(toaplan1_shared_r, toaplan1_shared_w) /* inputs, coins and sound handled by 647180 MCU via this space */
-	AM_RANGE(0x480000, 0x487fff) AM_RAM
-	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITE(toaplan1_bcu_flipscreen_w)
-	AM_RANGE(0x4c0002, 0x4c0003) AM_READWRITE(toaplan1_tileram_offs_r, toaplan1_tileram_offs_w)
-	AM_RANGE(0x4c0004, 0x4c0007) AM_READWRITE(toaplan1_tileram16_r, toaplan1_tileram16_w)
-	AM_RANGE(0x4c0010, 0x4c001f) AM_READWRITE(toaplan1_scroll_regs_r, toaplan1_scroll_regs_w)
-ADDRESS_MAP_END
+	map(0x400002, 0x400003).w(this, FUNC(toaplan1_state::toaplan1_intenable_w));
+	map(0x400008, 0x40000f).w(this, FUNC(toaplan1_state::toaplan1_bcu_control_w));
+	map(0x404000, 0x4047ff).ram().w(this, FUNC(toaplan1_state::toaplan1_bgpalette_w)).share("bgpalette");
+	map(0x406000, 0x4067ff).ram().w(this, FUNC(toaplan1_state::toaplan1_fgpalette_w)).share("fgpalette");
+	map(0x440000, 0x4407ff).rw(this, FUNC(toaplan1_state::toaplan1_shared_r), FUNC(toaplan1_state::toaplan1_shared_w)); /* inputs, coins and sound handled by 647180 MCU via this space */
+	map(0x480000, 0x487fff).ram();
+	map(0x4c0000, 0x4c0001).w(this, FUNC(toaplan1_state::toaplan1_bcu_flipscreen_w));
+	map(0x4c0002, 0x4c0003).rw(this, FUNC(toaplan1_state::toaplan1_tileram_offs_r), FUNC(toaplan1_state::toaplan1_tileram_offs_w));
+	map(0x4c0004, 0x4c0007).rw(this, FUNC(toaplan1_state::toaplan1_tileram16_r), FUNC(toaplan1_state::toaplan1_tileram16_w));
+	map(0x4c0010, 0x4c001f).rw(this, FUNC(toaplan1_state::toaplan1_scroll_regs_r), FUNC(toaplan1_state::toaplan1_scroll_regs_w));
+}
 
 
 /***************************** Z80 Memory Map *******************************/
 
-ADDRESS_MAP_START(toaplan1_state::toaplan1_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("sharedram")
-ADDRESS_MAP_END
+void toaplan1_state::toaplan1_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("sharedram");
+}
 
-ADDRESS_MAP_START(toaplan1_rallybik_state::rallybik_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("P2")
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("coinlatch", ls259_device, write_nibble_d0)  /* Coin counter/lockout */
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
-	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-ADDRESS_MAP_END
+void toaplan1_rallybik_state::rallybik_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P1");
+	map(0x10, 0x10).portr("P2");
+	map(0x20, 0x20).portr("SYSTEM");
+	map(0x30, 0x30).w("coinlatch", FUNC(ls259_device::write_nibble_d0));  /* Coin counter/lockout */
+	map(0x40, 0x40).portr("DSWA");
+	map(0x50, 0x50).portr("DSWB");
+	map(0x60, 0x61).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+}
 
-ADDRESS_MAP_START(toaplan1_state::truxton_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("P2")
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x30, 0x30) AM_WRITE(toaplan1_coin_w)  /* Coin counter/lockout */
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
-	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x70, 0x70) AM_READ_PORT("TJUMP")
-ADDRESS_MAP_END
+void toaplan1_state::truxton_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P1");
+	map(0x10, 0x10).portr("P2");
+	map(0x20, 0x20).portr("SYSTEM");
+	map(0x30, 0x30).w(this, FUNC(toaplan1_state::toaplan1_coin_w));  /* Coin counter/lockout */
+	map(0x40, 0x40).portr("DSWA");
+	map(0x50, 0x50).portr("DSWB");
+	map(0x60, 0x61).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x70, 0x70).portr("TJUMP");
+}
 
-ADDRESS_MAP_START(toaplan1_state::hellfire_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA")
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSWB")
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("TJUMP")
-	AM_RANGE(0x30, 0x30) AM_WRITE(toaplan1_coin_w)  /* Coin counter/lockout */
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("P1")
-	AM_RANGE(0x50, 0x50) AM_READ_PORT("P2")
-	AM_RANGE(0x60, 0x60) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-ADDRESS_MAP_END
+void toaplan1_state::hellfire_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSWA");
+	map(0x10, 0x10).portr("DSWB");
+	map(0x20, 0x20).portr("TJUMP");
+	map(0x30, 0x30).w(this, FUNC(toaplan1_state::toaplan1_coin_w));  /* Coin counter/lockout */
+	map(0x40, 0x40).portr("P1");
+	map(0x50, 0x50).portr("P2");
+	map(0x60, 0x60).portr("SYSTEM");
+	map(0x70, 0x71).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+}
 
-ADDRESS_MAP_START(toaplan1_state::zerowing_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("P2")
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSWA")
-	AM_RANGE(0x28, 0x28) AM_READ_PORT("DSWB")
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x88, 0x88) AM_READ_PORT("TJUMP")
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(toaplan1_coin_w)  /* Coin counter/lockout */
-	AM_RANGE(0xa8, 0xa9) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-ADDRESS_MAP_END
+void toaplan1_state::zerowing_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P1");
+	map(0x08, 0x08).portr("P2");
+	map(0x20, 0x20).portr("DSWA");
+	map(0x28, 0x28).portr("DSWB");
+	map(0x80, 0x80).portr("SYSTEM");
+	map(0x88, 0x88).portr("TJUMP");
+	map(0xa0, 0xa0).w(this, FUNC(toaplan1_state::toaplan1_coin_w));  /* Coin counter/lockout */
+	map(0xa8, 0xa9).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+}
 
-ADDRESS_MAP_START(toaplan1_state::demonwld_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("TJUMP")
-	AM_RANGE(0x40, 0x40) AM_WRITE(toaplan1_coin_w)  /* Coin counter/lockout */
-	AM_RANGE(0x60, 0x60) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
-	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("DSWB")
-	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("P2")
-	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("DSWA")
-ADDRESS_MAP_END
+void toaplan1_state::demonwld_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x20, 0x20).portr("TJUMP");
+	map(0x40, 0x40).w(this, FUNC(toaplan1_state::toaplan1_coin_w));  /* Coin counter/lockout */
+	map(0x60, 0x60).portr("SYSTEM");
+	map(0x80, 0x80).portr("P1");
+	map(0xa0, 0xa0).portr("DSWB");
+	map(0xc0, 0xc0).portr("P2");
+	map(0xe0, 0xe0).portr("DSWA");
+}
 
-ADDRESS_MAP_START(toaplan1_state::outzone_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_WRITE(toaplan1_coin_w)  /* Coin counter/lockout */
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("DSWA")
-	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("DSWB")
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x14, 0x14) AM_READ_PORT("P1")
-	AM_RANGE(0x18, 0x18) AM_READ_PORT("P2")
-	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("TJUMP")
-ADDRESS_MAP_END
+void toaplan1_state::outzone_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x04, 0x04).w(this, FUNC(toaplan1_state::toaplan1_coin_w));  /* Coin counter/lockout */
+	map(0x08, 0x08).portr("DSWA");
+	map(0x0c, 0x0c).portr("DSWB");
+	map(0x10, 0x10).portr("SYSTEM");
+	map(0x14, 0x14).portr("P1");
+	map(0x18, 0x18).portr("P2");
+	map(0x1c, 0x1c).portr("TJUMP");
+}
 
 
 /***************************** TMS32010 Memory Map **************************/
 
-ADDRESS_MAP_START(toaplan1_state::DSP_program_map)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void toaplan1_state::DSP_program_map(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-ADDRESS_MAP_START(toaplan1_state::DSP_io_map)
-	AM_RANGE(0, 0) AM_WRITE(demonwld_dsp_addrsel_w)
-	AM_RANGE(1, 1) AM_READWRITE(demonwld_dsp_r, demonwld_dsp_w)
-	AM_RANGE(3, 3) AM_WRITE(demonwld_dsp_bio_w)
-ADDRESS_MAP_END
+void toaplan1_state::DSP_io_map(address_map &map)
+{
+	map(0, 0).w(this, FUNC(toaplan1_state::demonwld_dsp_addrsel_w));
+	map(1, 1).rw(this, FUNC(toaplan1_state::demonwld_dsp_r), FUNC(toaplan1_state::demonwld_dsp_w));
+	map(3, 3).w(this, FUNC(toaplan1_state::demonwld_dsp_bio_w));
+}
 
 
 /***************************** HD647180 Memory Map **************************/
 
-ADDRESS_MAP_START(toaplan1_state::vimana_hd647180_mem_map)
-	AM_RANGE(0x00000, 0x03fff) AM_ROM   /* Internal 16k byte ROM */
-	AM_RANGE(0x08000, 0x087ff) AM_RAM AM_SHARE("sharedram") /* 2048 bytes of shared ram w/maincpu */
-	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM   /* Internal 512 byte RAM */
-ADDRESS_MAP_END
+void toaplan1_state::vimana_hd647180_mem_map(address_map &map)
+{
+	map(0x00000, 0x03fff).rom();   /* Internal 16k byte ROM */
+	map(0x08000, 0x087ff).ram().share("sharedram"); /* 2048 bytes of shared ram w/maincpu */
+	map(0x0fe00, 0x0ffff).ram();   /* Internal 512 byte RAM */
+}
 
-ADDRESS_MAP_START(toaplan1_state::vimana_hd647180_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void toaplan1_state::vimana_hd647180_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 	// lots of low level 647180 peripherals are not emulated yet, ddr regs, timer regs etc, see comments below
 	// also see http://bitsavers.trailing-edge.com/pdf/hitachi/_dataBooks/U94_HD647180X_8-Bit_Microcontroller_Hardware_Manual_Jan88.pdf particularly page 38 (pdf page 56)
-	AM_RANGE(0x32, 0x32) AM_WRITENOP // DMA WAIT/Control register
-	AM_RANGE(0x33, 0x33) AM_WRITENOP // IL (int vector low) register
-	AM_RANGE(0x36, 0x36) AM_WRITENOP // refresh control register for RFSH pin
+	map(0x32, 0x32).nopw(); // DMA WAIT/Control register
+	map(0x33, 0x33).nopw(); // IL (int vector low) register
+	map(0x36, 0x36).nopw(); // refresh control register for RFSH pin
 	// 53: disable reg for port A
-	AM_RANGE(0x60, 0x60) AM_READ(vimana_dswb_invert_r) // read/write port A; note these inputs seem to be inverted, unlike the DSWA ones.
+	map(0x60, 0x60).r(this, FUNC(toaplan1_state::vimana_dswb_invert_r)); // read/write port A; note these inputs seem to be inverted, unlike the DSWA ones.
 	// 61: read/write port B
 	// 62: read/write port C
 	// 63: read/write port D
 	// 64: read/write port E
 	// 65: read/write port F
-	AM_RANGE(0x66, 0x66) AM_READ(vimana_tjump_invert_r) // read/write port G, bits 7 and 6 ALWAYS read as 1 due to port G being just 6 bits; note these inputs seem to be inverted, unlike the DSWA ones.
+	map(0x66, 0x66).r(this, FUNC(toaplan1_state::vimana_tjump_invert_r)); // read/write port G, bits 7 and 6 ALWAYS read as 1 due to port G being just 6 bits; note these inputs seem to be inverted, unlike the DSWA ones.
 	// 70: ddr for port A
-	AM_RANGE(0x71, 0x71) AM_WRITENOP // ddr for port B
-	AM_RANGE(0x72, 0x72) AM_WRITENOP // ddr for port C
-	AM_RANGE(0x73, 0x73) AM_WRITENOP // ddr for port D
-	AM_RANGE(0x74, 0x74) AM_WRITENOP // ddr for port E
-	AM_RANGE(0x75, 0x75) AM_WRITENOP // ddr for port F
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
-	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
-	AM_RANGE(0x82, 0x82) AM_READ_PORT("DSWA")
-	AM_RANGE(0x83, 0x83) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x84, 0x84) AM_WRITE(toaplan1_coin_w)  // Coin counter/lockout // needs verify
-	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
-	AM_RANGE(0x8f, 0x8f) AM_DEVREADWRITE("ymsnd", ym3812_device, read_port_r, write_port_w)
-ADDRESS_MAP_END
+	map(0x71, 0x71).nopw(); // ddr for port B
+	map(0x72, 0x72).nopw(); // ddr for port C
+	map(0x73, 0x73).nopw(); // ddr for port D
+	map(0x74, 0x74).nopw(); // ddr for port E
+	map(0x75, 0x75).nopw(); // ddr for port F
+	map(0x80, 0x80).portr("P1");
+	map(0x81, 0x81).portr("P2");
+	map(0x82, 0x82).portr("DSWA");
+	map(0x83, 0x83).portr("SYSTEM");
+	map(0x84, 0x84).w(this, FUNC(toaplan1_state::toaplan1_coin_w));  // Coin counter/lockout // needs verify
+	map(0x87, 0x87).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
+	map(0x8f, 0x8f).rw("ymsnd", FUNC(ym3812_device::read_port_r), FUNC(ym3812_device::write_port_w));
+}
 
 READ8_MEMBER(toaplan1_state::vimana_dswb_invert_r)
 {
@@ -996,21 +1016,23 @@ READ8_MEMBER(toaplan1_state::samesame_cmdavailable_r)
 	else return 0x00;
 };
 
-ADDRESS_MAP_START(toaplan1_state::samesame_hd647180_mem_map)
-	AM_RANGE(0x00000, 0x03fff) AM_ROM   /* Internal 16k byte ROM */
-	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM   /* Internal 512 byte RAM */
-ADDRESS_MAP_END
+void toaplan1_state::samesame_hd647180_mem_map(address_map &map)
+{
+	map(0x00000, 0x03fff).rom();   /* Internal 16k byte ROM */
+	map(0x0fe00, 0x0ffff).ram();   /* Internal 512 byte RAM */
+}
 
-ADDRESS_MAP_START(toaplan1_state::samesame_hd647180_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void toaplan1_state::samesame_hd647180_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 
-	AM_RANGE(0x63, 0x63) AM_READ( samesame_cmdavailable_r )
-	AM_RANGE(0xa0, 0xa0) AM_READ( samesame_soundlatch_r )
-	AM_RANGE(0xb0, 0xb0) AM_WRITE( samesame_sound_done_w )
+	map(0x63, 0x63).r(this, FUNC(toaplan1_state::samesame_cmdavailable_r));
+	map(0xa0, 0xa0).r(this, FUNC(toaplan1_state::samesame_soundlatch_r));
+	map(0xb0, 0xb0).w(this, FUNC(toaplan1_state::samesame_sound_done_w));
 
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("ymsnd", ym3812_device, read_port_r, write_port_w)
-ADDRESS_MAP_END
+	map(0x80, 0x80).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
+	map(0x81, 0x81).rw("ymsnd", FUNC(ym3812_device::read_port_r), FUNC(ym3812_device::write_port_w));
+}
 
 /*****************************************************************************
     Generic Input Port definitions

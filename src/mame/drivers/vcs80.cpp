@@ -65,19 +65,22 @@ WRITE8_MEMBER( vcs80_state::pio_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(vcs80_state::vcs80_bd_mem)
-	AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x0400, 0x07ff) AM_RAM
-ADDRESS_MAP_END
+void vcs80_state::vcs80_bd_mem(address_map &map)
+{
+	map(0x0000, 0x01ff).rom().region(Z80_TAG, 0);
+	map(0x0400, 0x07ff).ram();
+}
 
-ADDRESS_MAP_START(vcs80_state::vcs80_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w)
-ADDRESS_MAP_END
+void vcs80_state::vcs80_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(vcs80_state::mem_r), FUNC(vcs80_state::mem_w));
+}
 
-ADDRESS_MAP_START(vcs80_state::vcs80_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void vcs80_state::vcs80_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(this, FUNC(vcs80_state::io_r), FUNC(vcs80_state::io_w));
+}
 
 /* Input Ports */
 

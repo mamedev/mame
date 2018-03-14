@@ -23,19 +23,22 @@ public:
 	{
 	}
 
-	required_device<i80186_cpu_device> m_maincpu;
-	required_device<wd1772_device> m_fdc;
-	required_device<ncr5380n_device> m_scsi;
+	void lb186(machine_config &config);
 
+protected:
 	DECLARE_WRITE8_MEMBER(sio_out_w);
 	DECLARE_WRITE8_MEMBER(drive_sel_w);
 	DECLARE_READ8_MEMBER(scsi_dack_r);
 	DECLARE_WRITE8_MEMBER(scsi_dack_w);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	void lb186(machine_config &config);
 	static void ncr5380(device_t *device);
 	void lb186_io(address_map &map);
 	void lb186_map(address_map &map);
+
+private:
+	required_device<i80186_cpu_device> m_maincpu;
+	required_device<wd1772_device> m_fdc;
+	required_device<ncr5380n_device> m_scsi;
 };
 
 WRITE8_MEMBER(lb186_state::scsi_dack_w)
@@ -89,19 +92,21 @@ WRITE8_MEMBER(lb186_state::drive_sel_w)
 	floppy->ss_w(BIT(data, 4));
 }
 
-ADDRESS_MAP_START(lb186_state::lb186_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM // fixed 256k for now
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void lb186_state::lb186_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram(); // fixed 256k for now
+	map(0xfc000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(lb186_state::lb186_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x1000, 0x101f) AM_DEVREADWRITE8("duart", scn2681_device, read, write, 0x00ff)
-	AM_RANGE(0x1080, 0x108f) AM_DEVREADWRITE8("scsibus:7:ncr5380", ncr5380n_device, read, write, 0x00ff)
-	AM_RANGE(0x1100, 0x1107) AM_DEVREADWRITE8("fdc", wd1772_device, read, write, 0x00ff)
-	AM_RANGE(0x1180, 0x1181) AM_READWRITE8(scsi_dack_r, scsi_dack_w, 0x00ff)
-	AM_RANGE(0x1200, 0x1201) AM_WRITE8(drive_sel_w, 0x00ff)
-ADDRESS_MAP_END
+void lb186_state::lb186_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x1000, 0x101f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
+	map(0x1080, 0x108f).rw(m_scsi, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask16(0x00ff);
+	map(0x1100, 0x1107).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
+	map(0x1180, 0x1180).rw(this, FUNC(lb186_state::scsi_dack_r), FUNC(lb186_state::scsi_dack_w));
+	map(0x1200, 0x1200).w(this, FUNC(lb186_state::drive_sel_w));
+}
 
 static SLOT_INTERFACE_START( lb186_floppies )
 	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
@@ -127,7 +132,7 @@ FLOPPY_FORMATS_MEMBER( lb186_state::floppy_formats )
 FLOPPY_FORMATS_END
 
 MACHINE_CONFIG_START(lb186_state::lb186)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000) / 2)
+	MCFG_CPU_ADD("maincpu", I80186, 16_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(lb186_map)
 	MCFG_CPU_IO_MAP(lb186_io)
 
@@ -142,7 +147,7 @@ MACHINE_CONFIG_START(lb186_state::lb186)
 	MCFG_RS232_PORT_ADD("rs232_2", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_b_w))
 
-	MCFG_WD1772_ADD("fdc", XTAL(16'000'000)/2)
+	MCFG_WD1772_ADD("fdc", 16_MHz_XTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int2_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats)

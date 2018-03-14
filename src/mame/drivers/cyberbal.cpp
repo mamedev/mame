@@ -38,24 +38,22 @@
  *
  *************************************/
 
+void cyberbal2p_state::update_interrupts()
+{
+	m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(3, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 void cyberbal_state::update_interrupts()
 {
-	if (m_extracpu != nullptr)
-	{
-		m_maincpu->set_input_line(1, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-		m_extracpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-		m_maincpu->set_input_line(3, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-	}
+	m_maincpu->set_input_line(1, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_extracpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-MACHINE_START_MEMBER(cyberbal_state,cyberbal2p)
+void cyberbal_state::machine_start()
 {
-	atarigen_state::machine_start();
+	cyberbal_base_state::machine_start();
 
 	save_item(NAME(m_fast_68k_int));
 	save_item(NAME(m_io_68k_int));
@@ -63,19 +61,15 @@ MACHINE_START_MEMBER(cyberbal_state,cyberbal2p)
 	save_item(NAME(m_sound_data_from_6502));
 	save_item(NAME(m_sound_data_from_68k_ready));
 	save_item(NAME(m_sound_data_from_6502_ready));
-}
-
-MACHINE_START_MEMBER(cyberbal_state,cyberbal)
-{
-	MACHINE_START_CALL_MEMBER(cyberbal2p);
 
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x1000);
 }
 
 
-MACHINE_RESET_MEMBER(cyberbal_state,cyberbal)
+void cyberbal_state::machine_reset()
 {
-	atarigen_state::machine_reset();
+
+	cyberbal_base_state::machine_reset();
 	scanline_timer_reset(*m_lscreen, 8);
 
 	cyberbal_sound_reset();
@@ -85,9 +79,9 @@ MACHINE_RESET_MEMBER(cyberbal_state,cyberbal)
 }
 
 
-MACHINE_RESET_MEMBER(cyberbal_state,cyberbal2p)
+void cyberbal2p_state::machine_reset()
 {
-	atarigen_state::machine_reset();
+	cyberbal_base_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
 }
 
@@ -99,7 +93,7 @@ MACHINE_RESET_MEMBER(cyberbal_state,cyberbal2p)
  *
  *************************************/
 
-READ16_MEMBER(cyberbal_state::sound_state_r)
+READ16_MEMBER(cyberbal2p_state::sound_state_r)
 {
 	int temp = 0xffff;
 	if (m_jsa->main_to_sound_ready()) temp ^= 0xffff;
@@ -127,30 +121,31 @@ WRITE16_MEMBER(cyberbal_state::p2_reset_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(cyberbal_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0xfc0000, 0xfc0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0xfc8000, 0xfcffff) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0xff00)
-	AM_RANGE(0xfd0000, 0xfd1fff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0xfd2000, 0xfd3fff) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
-	AM_RANGE(0xfd4000, 0xfd5fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xfd6000, 0xfd7fff) AM_WRITE(p2_reset_w)
-	AM_RANGE(0xfd8000, 0xfd9fff) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0xff00)
-	AM_RANGE(0xfe0000, 0xfe0fff) AM_READ_PORT("IN0")
-	AM_RANGE(0xfe1000, 0xfe1fff) AM_READ_PORT("IN1")
-	AM_RANGE(0xfe8000, 0xfe8fff) AM_RAM_DEVWRITE("rpalette", palette_device, write16) AM_SHARE("rpalette")
-	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_DEVWRITE("lpalette", palette_device, write16) AM_SHARE("lpalette")
-	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_DEVWRITE("playfield2", tilemap_device, write16) AM_SHARE("playfield2")
-	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_DEVWRITE("alpha2", tilemap_device, write16) AM_SHARE("alpha2")
-	AM_RANGE(0xff3000, 0xff37ff) AM_RAM AM_SHARE("mob2")
-	AM_RANGE(0xff3800, 0xff3fff) AM_RAM AM_SHARE("ff3800")
-	AM_RANGE(0xff4000, 0xff5fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0xff6000, 0xff6fff) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
-	AM_RANGE(0xff7000, 0xff77ff) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0xff7800, 0xff9fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xffa000, 0xffbfff) AM_READONLY AM_WRITENOP AM_SHARE("extraram")
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("mainram")
-ADDRESS_MAP_END
+void cyberbal_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0xfc0000, 0xfc0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0xfc8000, 0xfcffff).r(m_soundcomm, FUNC(atari_sound_comm_device::main_response_r)).umask16(0xff00);
+	map(0xfd0000, 0xfd1fff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0xfd2000, 0xfd3fff).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_reset_w));
+	map(0xfd4000, 0xfd5fff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0xfd6000, 0xfd7fff).w(this, FUNC(cyberbal_state::p2_reset_w));
+	map(0xfd8000, 0xfd9fff).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w)).umask16(0xff00);
+	map(0xfe0000, 0xfe0fff).portr("IN0");
+	map(0xfe1000, 0xfe1fff).portr("IN1");
+	map(0xfe8000, 0xfe8fff).ram().w("rpalette", FUNC(palette_device::write16)).share("rpalette");
+	map(0xfec000, 0xfecfff).ram().w("lpalette", FUNC(palette_device::write16)).share("lpalette");
+	map(0xff0000, 0xff1fff).ram().w(m_playfield2_tilemap, FUNC(tilemap_device::write16)).share("playfield2");
+	map(0xff2000, 0xff2fff).ram().w(m_alpha2_tilemap, FUNC(tilemap_device::write16)).share("alpha2");
+	map(0xff3000, 0xff37ff).ram().share("mob2");
+	map(0xff3800, 0xff3fff).ram().share("ff3800");
+	map(0xff4000, 0xff5fff).ram().w("playfield", FUNC(tilemap_device::write16)).share("playfield");
+	map(0xff6000, 0xff6fff).ram().w("alpha", FUNC(tilemap_device::write16)).share("alpha");
+	map(0xff7000, 0xff77ff).ram().share("mob");
+	map(0xff7800, 0xff9fff).ram().share("sharedram");
+	map(0xffa000, 0xffbfff).readonly().nopw().share("extraram");
+	map(0xffc000, 0xffffff).ram().share("mainram");
+}
 
 
 
@@ -160,24 +155,25 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(cyberbal_state::extra_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0xfc0000, 0xfdffff) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xfe0000, 0xfe0fff) AM_READ_PORT("IN0")
-	AM_RANGE(0xfe1000, 0xfe1fff) AM_READ_PORT("IN1")
-	AM_RANGE(0xfe8000, 0xfe8fff) AM_RAM_DEVWRITE("rpalette", palette_device, write16) AM_SHARE("rpalette")
-	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_DEVWRITE("lpalette", palette_device, write16) AM_SHARE("lpalette")
-	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_DEVWRITE("playfield2", tilemap_device, write16) AM_SHARE("playfield2")
-	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_DEVWRITE("alpha2", tilemap_device, write16) AM_SHARE("alpha2")
-	AM_RANGE(0xff3000, 0xff37ff) AM_RAM AM_SHARE("mob2")
-	AM_RANGE(0xff3800, 0xff3fff) AM_RAM AM_SHARE("ff3800")
-	AM_RANGE(0xff4000, 0xff5fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0xff6000, 0xff6fff) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
-	AM_RANGE(0xff7000, 0xff77ff) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0xff7800, 0xff9fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xffa000, 0xffbfff) AM_RAM AM_SHARE("extraram")
-	AM_RANGE(0xffc000, 0xffffff) AM_READONLY AM_WRITENOP AM_SHARE("mainram")
-ADDRESS_MAP_END
+void cyberbal_state::extra_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0xfc0000, 0xfdffff).w(this, FUNC(cyberbal_state::video_int_ack_w));
+	map(0xfe0000, 0xfe0fff).portr("IN0");
+	map(0xfe1000, 0xfe1fff).portr("IN1");
+	map(0xfe8000, 0xfe8fff).ram().w("rpalette", FUNC(palette_device::write16)).share("rpalette");
+	map(0xfec000, 0xfecfff).ram().w("lpalette", FUNC(palette_device::write16)).share("lpalette");
+	map(0xff0000, 0xff1fff).ram().w(m_playfield2_tilemap, FUNC(tilemap_device::write16)).share("playfield2");
+	map(0xff2000, 0xff2fff).ram().w(m_alpha2_tilemap, FUNC(tilemap_device::write16)).share("alpha2");
+	map(0xff3000, 0xff37ff).ram().share("mob2");
+	map(0xff3800, 0xff3fff).ram().share("ff3800");
+	map(0xff4000, 0xff5fff).ram().w("playfield", FUNC(tilemap_device::write16)).share("playfield");
+	map(0xff6000, 0xff6fff).ram().w("alpha", FUNC(tilemap_device::write16)).share("alpha");
+	map(0xff7000, 0xff77ff).ram().share("mob");
+	map(0xff7800, 0xff9fff).ram().share("sharedram");
+	map(0xffa000, 0xffbfff).ram().share("extraram");
+	map(0xffc000, 0xffffff).readonly().nopw().share("mainram");
+}
 
 
 
@@ -187,20 +183,21 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(cyberbal_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x2800, 0x2801) AM_WRITE(sound_68k_6502_w)
-	AM_RANGE(0x2802, 0x2803) AM_DEVREADWRITE("soundcomm", atari_sound_comm_device, sound_irq_ack_r, sound_irq_ack_w)
-	AM_RANGE(0x2804, 0x2805) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_response_w)
-	AM_RANGE(0x2806, 0x2807) AM_WRITE(sound_bank_select_w)
-	AM_RANGE(0x2c00, 0x2c01) AM_DEVREAD("soundcomm", atari_sound_comm_device, sound_command_r)
-	AM_RANGE(0x2c02, 0x2c03) AM_READ(special_port3_r)
-	AM_RANGE(0x2c04, 0x2c05) AM_READ(sound_68k_6502_r)
-	AM_RANGE(0x2c06, 0x2c07) AM_READ(sound_6502_stat_r)
-	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("soundbank")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void cyberbal_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2001).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x2800, 0x2801).w(this, FUNC(cyberbal_state::sound_68k_6502_w));
+	map(0x2802, 0x2803).rw(m_soundcomm, FUNC(atari_sound_comm_device::sound_irq_ack_r), FUNC(atari_sound_comm_device::sound_irq_ack_w));
+	map(0x2804, 0x2805).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_response_w));
+	map(0x2806, 0x2807).w(this, FUNC(cyberbal_state::sound_bank_select_w));
+	map(0x2c00, 0x2c01).r(m_soundcomm, FUNC(atari_sound_comm_device::sound_command_r));
+	map(0x2c02, 0x2c03).r(this, FUNC(cyberbal_state::special_port3_r));
+	map(0x2c04, 0x2c05).r(this, FUNC(cyberbal_state::sound_68k_6502_r));
+	map(0x2c06, 0x2c07).r(this, FUNC(cyberbal_state::sound_6502_stat_r));
+	map(0x3000, 0x3fff).bankr("soundbank");
+	map(0x4000, 0xffff).rom();
+}
 
 
 
@@ -210,14 +207,15 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(cyberbal_state::sound_68k_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0xff8000, 0xff87ff) AM_READ(sound_68k_r)
-	AM_RANGE(0xff8800, 0xff8fff) AM_WRITE(sound_68k_w)
-	AM_RANGE(0xff9000, 0xff97ff) AM_WRITE(io_68k_irq_ack_w)
-	AM_RANGE(0xff9800, 0xff9fff) AM_WRITE(sound_68k_dac_w)
-	AM_RANGE(0xfff000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void cyberbal_state::sound_68k_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0xff8000, 0xff87ff).r(this, FUNC(cyberbal_state::sound_68k_r));
+	map(0xff8800, 0xff8fff).w(this, FUNC(cyberbal_state::sound_68k_w));
+	map(0xff9000, 0xff97ff).w(this, FUNC(cyberbal_state::io_68k_irq_ack_w));
+	map(0xff9800, 0xff9fff).w(this, FUNC(cyberbal_state::sound_68k_dac_w));
+	map(0xfff000, 0xffffff).ram();
+}
 
 
 
@@ -227,25 +225,26 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(cyberbal_state::cyberbal2p_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0xfc0000, 0xfc0003) AM_READ_PORT("IN0")
-	AM_RANGE(0xfc2000, 0xfc2003) AM_READ_PORT("IN1")
-	AM_RANGE(0xfc4000, 0xfc4003) AM_READ_PORT("IN2")
-	AM_RANGE(0xfc6000, 0xfc6003) AM_DEVREAD8("jsa", atari_jsa_ii_device, main_response_r, 0xff00)
-	AM_RANGE(0xfc8000, 0xfc8fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0xfca000, 0xfcafff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xfd0000, 0xfd0003) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0xfd2000, 0xfd2003) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
-	AM_RANGE(0xfd4000, 0xfd4003) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xfd6000, 0xfd6003) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xfd8000, 0xfd8003) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0xff00)
-	AM_RANGE(0xfe0000, 0xfe0003) AM_READ(sound_state_r)
-	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
-	AM_RANGE(0xff3000, 0xff37ff) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0xff3800, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void cyberbal2p_state::cyberbal2p_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0xfc0000, 0xfc0003).portr("IN0");
+	map(0xfc2000, 0xfc2003).portr("IN1");
+	map(0xfc4000, 0xfc4003).portr("IN2");
+	map(0xfc6000, 0xfc6003).r("jsa", FUNC(atari_jsa_ii_device::main_response_r)).umask16(0xff00);
+	map(0xfc8000, 0xfc8fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0xfca000, 0xfcafff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0xfd0000, 0xfd0003).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0xfd2000, 0xfd2003).w("jsa", FUNC(atari_jsa_ii_device::sound_reset_w));
+	map(0xfd4000, 0xfd4003).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0xfd6000, 0xfd6003).w(this, FUNC(cyberbal2p_state::video_int_ack_w));
+	map(0xfd8000, 0xfd8003).w("jsa", FUNC(atari_jsa_ii_device::main_command_w)).umask16(0xff00);
+	map(0xfe0000, 0xfe0003).r(this, FUNC(cyberbal2p_state::sound_state_r));
+	map(0xff0000, 0xff1fff).ram().w("playfield", FUNC(tilemap_device::write16)).share("playfield");
+	map(0xff2000, 0xff2fff).ram().w("alpha", FUNC(tilemap_device::write16)).share("alpha");
+	map(0xff3000, 0xff37ff).ram().share("mob");
+	map(0xff3800, 0xffffff).ram();
+}
 
 
 
@@ -407,16 +406,13 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 
 	MCFG_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(extra_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", atarigen_state, video_int_gen) /* or is it "right?" */
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", cyberbal_state, video_int_gen) /* or is it "right?" */
 
 	MCFG_CPU_ADD("dac", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sound_68k_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cyberbal_state, sound_68k_irq_gen,  10000)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
-	MCFG_MACHINE_START_OVERRIDE(cyberbal_state,cyberbal)
-	MCFG_MACHINE_RESET_OVERRIDE(cyberbal_state,cyberbal)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -457,10 +453,8 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 	MCFG_SCREEN_UPDATE_DRIVER(cyberbal_state, screen_update_cyberbal_right)
 	MCFG_SCREEN_PALETTE("rpalette")
 
-	MCFG_VIDEO_START_OVERRIDE(cyberbal_state,cyberbal)
-
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(cyberbal_state, sound_int_write_line))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
@@ -486,15 +480,12 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbalt)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(cyberbal_state::cyberbal2p)
+MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(cyberbal2p_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
-
-	MCFG_MACHINE_START_OVERRIDE(cyberbal_state,cyberbal2p)
-	MCFG_MACHINE_RESET_OVERRIDE(cyberbal_state,cyberbal2p)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyberbal2p_state, video_int_gen)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -506,9 +497,9 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal2p)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, cyberbal_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, cyberbal_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", cyberbal_state::s_mob_config)
+	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, cyberbal2p_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, cyberbal2p_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
+	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", cyberbal2p_state::s_mob_config)
 	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -516,15 +507,13 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal2p)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(cyberbal_state, screen_update_cyberbal2p)
+	MCFG_SCREEN_UPDATE_DRIVER(cyberbal2p_state, screen_update_cyberbal2p)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_VIDEO_START_OVERRIDE(cyberbal_state,cyberbal2p)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(cyberbal2p_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1074,15 +1063,15 @@ DRIVER_INIT_MEMBER(cyberbal_state,cyberbalt)
  *
  *************************************/
 
-GAMEL(1988, cyberbal,    0,        cyberbal,   cyberbal,   cyberbal_state, 0, ROT0, "Atari Games", "Cyberball (rev 4)", 0, layout_dualhsxs )
-GAMEL(1988, cyberbal2,   cyberbal, cyberbal,   cyberbal,   cyberbal_state, 0, ROT0, "Atari Games", "Cyberball (rev 2)", 0, layout_dualhsxs )
-GAMEL(1988, cyberbal1,   cyberbal, cyberbal,   cyberbal,   cyberbal_state, 0, ROT0, "Atari Games", "Cyberball (rev 1)", 0, layout_dualhsxs )
-GAMEL(1988, cyberbalp,   cyberbal, cyberbal,   cyberbal,   cyberbal_state, 0, ROT0, "Atari Games", "Cyberball (prototype)", 0, layout_dualhsxs )
+GAMEL(1988, cyberbal,    0,        cyberbal,   cyberbal,   cyberbal_state,   0,          ROT0, "Atari Games", "Cyberball (rev 4)", 0, layout_dualhsxs )
+GAMEL(1988, cyberbal2,   cyberbal, cyberbal,   cyberbal,   cyberbal_state,   0,          ROT0, "Atari Games", "Cyberball (rev 2)", 0, layout_dualhsxs )
+GAMEL(1988, cyberbal1,   cyberbal, cyberbal,   cyberbal,   cyberbal_state,   0,          ROT0, "Atari Games", "Cyberball (rev 1)", 0, layout_dualhsxs )
+GAMEL(1988, cyberbalp,   cyberbal, cyberbal,   cyberbal,   cyberbal_state,   0,          ROT0, "Atari Games", "Cyberball (prototype)", 0, layout_dualhsxs )
 
-GAME( 1989, cyberbal2p,  cyberbal, cyberbal2p, cyberbal2p, cyberbal_state, 0, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 4)", 0 )
-GAME( 1989, cyberbal2p3, cyberbal, cyberbal2p, cyberbal2p, cyberbal_state, 0, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 3)", 0 )
-GAME( 1989, cyberbal2p2, cyberbal, cyberbal2p, cyberbal2p, cyberbal_state, 0, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 2)", 0 )
-GAME( 1989, cyberbal2p1, cyberbal, cyberbal2p, cyberbal2p, cyberbal_state, 0, ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 1)", 0 )
+GAME( 1989, cyberbal2p,  cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, 0,          ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 4)", 0 )
+GAME( 1989, cyberbal2p3, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, 0,          ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 3)", 0 )
+GAME( 1989, cyberbal2p2, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, 0,          ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 2)", 0 )
+GAME( 1989, cyberbal2p1, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p_state, 0,          ROT0, "Atari Games", "Cyberball 2072 (2 player, rev 1)", 0 )
 
-GAMEL(1989, cyberbalt,   cyberbal, cyberbalt,  cyberbal,   cyberbal_state, cyberbalt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 2)", 0, layout_dualhsxs )
-GAMEL(1989, cyberbalt1,  cyberbal, cyberbalt,  cyberbal,   cyberbal_state, cyberbalt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 1)", 0, layout_dualhsxs )
+GAMEL(1989, cyberbalt,   cyberbal, cyberbalt,  cyberbal,   cyberbal_state,   cyberbalt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 2)", 0, layout_dualhsxs )
+GAMEL(1989, cyberbalt1,  cyberbal, cyberbalt,  cyberbal,   cyberbal_state,   cyberbalt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 1)", 0, layout_dualhsxs )

@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "a2bus.h"
 
 #include "bus/centronics/ctronics.h"
@@ -45,6 +44,8 @@ protected:
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 
+	required_ioport m_printer_cfg;
+
 	required_device<i8255_device> m_d9;
 	required_device<i8251_device> m_d10;
 	required_device<centronics_device> m_centronics;
@@ -58,7 +59,6 @@ private:
 };
 
 // device type definition
-extern const device_type A2BUS_AGAT7_PORTS;
 DECLARE_DEVICE_TYPE(A2BUS_AGAT7_PORTS, a2bus_agat7_ports_device)
 
 #endif // MAME_BUS_A2BUS_AGAT7_PORTS_H

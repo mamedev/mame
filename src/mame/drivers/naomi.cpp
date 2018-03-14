@@ -304,10 +304,9 @@ There are also 2 types of carts manufactured by Namco: MASK-B, MASK-C
 |-------------------------------------------------------------|
 Notes:
       OSC1  - oscillator 28.000MHz
-      JP1   - JUMPER unknown function
-      JP3   - JUMPER unknown function
-      JP3   - JUMPER unknown function
-      JP4   - JUMPER master (1-2) / slave (2-3) switch, then slave data accessed at +0x10000000 at cart address space
+	  JP1   - JUMPER ROM0 (IC22) size: 1-2 = 32M, 2-3 = 16M
+	  JP2   - JUMPER ROM0 write: 1-2 = Enabled, 2-3 = Disabled
+      JP3,4 - JUMPERS Bank select: 1-2 1-2 = Master, 2-3 2-3 = Slave (slave data accessed at +0x10000000 at cart address space)
  IC1S-IC21S - FlashROM (SOP56), either 32Mb or 64Mb. Not all positions are populated
       IC22  - EPROM (DIP42), either 27C160 or 27C322
       IC37  - FlashROM (SOIC8) Xicor X76F100 Secure SerialFlash
@@ -434,7 +433,7 @@ Zombie Revenge                                  840-0003C    21707   19 (64Mb)  
 Zombie Revenge (Rev A)                          840-0003C    21707A  19 (64Mb)   present     315-6213  317-0249-COM   joystick + 3 buttons
 
 
-171-7930B (C) Sega 1998
+837-14011 171-7930B (C) Sega 1998
 |------------------------------------------------------------------|
 |        JJJJJJ      SW2                        ----CN2----        -|
 | SW1    PPPPPP                                                     |
@@ -464,7 +463,11 @@ Zombie Revenge (Rev A)                          840-0003C    21707A  19 (64Mb)  
 |-------------------------------------------------------------------|
 Notes:
       OSC1  - oscillator 20.000MHz
-     JP1-7  - JUMPER unknown function
+      JP1   - JUMPER ROM0 (IC16) size: 1-2 = 32M, 2-3 = 16M
+	  JP2   - JUMPER ROM0 write: 1-2 = Enabled, 2-3 = Disabled
+	  JP3   - JUMPER ROM board Bank: 1-2 = Slave, 2-3 = Master
+	JP4,5,7 - JUMPERS SCSI function: 1-2 2-3 1-2 = Enabled, 2-3 1-2 2-3 = Disabled
+	  JP6   - JUMPER Unknown function (1-2)
        SW1  - PUSHBUTTON
        SW2  - 8X2 DIPswitch
  SCSI-CTRL  - SCSI-II controller MB86604A
@@ -648,8 +651,8 @@ Notes:
       IC7   - socket for EPROM (DIP42), either 27C160 or 27C322
   IC8-IC15  - S29GL512N FlashROM (TSOP56), 512Mb. Not all positions are populated
       IC16  - R3112N431A Low voltage detector with output delay (SOT-23-5)
-      JP1   - JUMPER Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
-      JP2   - JUMPER unknown function
+      JP1   - JUMPER ROM board Bank: 1-2 = Master, 2-3 = Slave
+      JP2   - JUMPER IC7 EPROM: 1-2 = Enabled, 2-3 = Disabled
    CN1/2/3  - connectors joining to main board
       CN4   - 6 legs connector for ISP programming
 
@@ -1590,29 +1593,12 @@ Premier Eleven
 
 #define CPU_CLOCK (200000000)
 
-READ64_MEMBER(naomi_state::naomi_unknown1_r )
+READ16_MEMBER(naomi_state::naomi_g2bus_r )
 {
-	if ((offset * 8) == 0xc0) // trick so that it does not "wait for multiboard sync"
-		return -1;
-	return 0;
+	// G2 bus is 16bit wide, "floating bus" value is 16 most significant address bits
+	u32 address = 0x01000000 + offset * 2;
+	return address >> 16;
 }
-
-WRITE64_MEMBER(naomi_state::naomi_unknown1_w )
-{
-}
-
-// TODO: was using same handler as Naomi, tbd
-READ64_MEMBER(atomiswave_state::aw_unknown1_r )
-{
-	if ((offset * 8) == 0xc0) // trick so that it does not "wait for multiboard sync"
-		return -1;
-	return 0;
-}
-
-WRITE64_MEMBER(atomiswave_state::aw_unknown1_w )
-{
-}
-
 
 /*
 * Non-volatile memories
@@ -1694,44 +1680,44 @@ WRITE64_MEMBER(naomi_state::eeprom_93c46a_w )
  * Naomi 1 address map
  */
 
-ADDRESS_MAP_START(naomi_state::naomi_map)
+void naomi_state::naomi_map(address_map &map)
+{
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("rombase") // BIOS
+	map(0x00000000, 0x001fffff).mirror(0xa2000000).rom().region("maincpu", 0).share("rombase"); // BIOS
 
-	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
-	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, 0xffffffffffffffffU )
-	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, 0x0000ffff0000ffffU )
-	AM_RANGE(0x005f7018, 0x005f702f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16( "comm_board", m3comm_device, naomi_r, naomi_w, 0x0000ffff0000ffffU )
-	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, 0xffffffffffffffffU )
-	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, 0xffffffffffffffffU)
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, 0xffffffffffffffffU)
-	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_modem_r, dc_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, 0xffffffffffffffffU)
-	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16("aicartc", aicartc_device, read, write, 0x0000ffff0000ffffU )
-	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE(sh4_soundram_r, sh4_soundram_w )           // sound RAM (8 MB)
+	map(0x00200000, 0x00207fff).mirror(0x02000000).ram();                                             // bios uses it (battery backed ram ?)
+	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_sysctrl_r), FUNC(naomi_state::dc_sysctrl_w));
+	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
+	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
+	map(0x005f7018, 0x005f702f).mirror(0x02000000).rw("comm_board", FUNC(m3comm_device::naomi_r), FUNC(m3comm_device::naomi_w)).umask64(0x0000ffff0000ffff);
+	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
+	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_g2_ctrl_r), FUNC(naomi_state::dc_g2_ctrl_w));
+	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
+	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
+	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_modem_r), FUNC(naomi_state::dc_modem_w));
+	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_aica_reg_r), FUNC(naomi_state::dc_aica_reg_w));
+	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
+	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(this, FUNC(naomi_state::sh4_soundram_r), FUNC(naomi_state::sh4_soundram_w));           // sound RAM (8 MB)
 
 	/* External Device */
-	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM   // Naomi 2 BIOS tests this, needs to read back as written
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(this, FUNC(naomi_state::naomi_g2bus_r));
 
 	/* Area 1 */
-	AM_RANGE(0x04000000, 0x04ffffff) AM_MIRROR(0x02000000) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_MIRROR(0x02000000) AM_RAM AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	map(0x04000000, 0x04ffffff).mirror(0x02000000).ram().share("dc_texture_ram");      // texture memory 64 bit access
+	map(0x05000000, 0x05ffffff).mirror(0x02000000).ram().share("frameram"); // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 2*/
-	AM_RANGE(0x08000000, 0x09ffffff) AM_MIRROR(0x02000000) AM_NOP // 'Unassigned'
+	map(0x08000000, 0x09ffffff).mirror(0x02000000).noprw(); // 'Unassigned'
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_MIRROR(0xa2000000) AM_RAM AM_SHARE("dc_ram")
+	map(0x0c000000, 0x0dffffff).mirror(0xa2000000).ram().share("dc_ram");
 
 	/* Area 4 */
-	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
-	AM_RANGE(0x10800000, 0x10ffffff) AM_DEVWRITE8("powervr2", powervr2_device, ta_fifo_yuv_w, 0xffffffffffffffffU)
-	AM_RANGE(0x11000000, 0x11ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath0_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
+	map(0x10000000, 0x107fffff).mirror(0x02000000).w(m_powervr2, FUNC(powervr2_device::ta_fifo_poly_w));
+	map(0x10800000, 0x10ffffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_yuv_w));
+	map(0x11000000, 0x11ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath0_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	AM_RANGE(0x13000000, 0x13ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath1_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
+	map(0x13000000, 0x13ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
 
 	/* Area 5 */
 	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
@@ -1741,7 +1727,7 @@ ADDRESS_MAP_START(naomi_state::naomi_map)
 
 	/* Area 7 */
 	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
-ADDRESS_MAP_END
+}
 
 /*
  * Naomi 2 address map
@@ -1754,55 +1740,55 @@ WRITE32_MEMBER(naomi2_state::both_pvr2_ta_w)
 	space.write_dword(0x025f8000|offset*4,data,mem_mask);
 }
 
-ADDRESS_MAP_START(naomi2_state::naomi2_map)
+void naomi2_state::naomi2_map(address_map &map)
+{
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("rombase") // BIOS
+	map(0x00000000, 0x001fffff).mirror(0xa2000000).rom().region("maincpu", 0).share("rombase"); // BIOS
 
-	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
-	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, 0xffffffffffffffffU )
-	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, 0x0000ffff0000ffffU )
-	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, 0xffffffffffffffffU )
-	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, 0xffffffffffffffffU)
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_DEVICE32("powervr2", powervr2_device, ta_map, 0xffffffffffffffffU)
-	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_modem_r, dc_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, 0xffffffffffffffffU)
-	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16("aicartc", aicartc_device, read, write, 0x0000ffff0000ffffU )
-	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE(sh4_soundram_r, sh4_soundram_w )           // sound RAM (8 MB)
+	map(0x00200000, 0x00207fff).mirror(0x02000000).ram();                                             // bios uses it (battery backed ram ?)
+	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_sysctrl_r), FUNC(naomi2_state::dc_sysctrl_w));
+	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
+	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
+	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
+	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_g2_ctrl_r), FUNC(naomi2_state::dc_g2_ctrl_w));
+	map(0x005f7c00, 0x005f7cff).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
+	map(0x005f8000, 0x005f9fff).m(m_powervr2, FUNC(powervr2_device::ta_map));
+	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_modem_r), FUNC(naomi2_state::dc_modem_w));
+	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_aica_reg_r), FUNC(naomi2_state::dc_aica_reg_w));
+	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
+	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(this, FUNC(naomi2_state::sh4_soundram_r), FUNC(naomi2_state::sh4_soundram_w));           // sound RAM (8 MB)
 
 	/* External Device */
-	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM   // Naomi 2 BIOS tests this, needs to read back as written
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(this, FUNC(naomi2_state::naomi_g2bus_r));
 
-	AM_RANGE(0x025f7c00, 0x025f7cff) AM_DEVICE32("powervr2_slave", powervr2_device, pd_dma_map, 0xffffffffffffffffU)
-	AM_RANGE(0x025f8000, 0x025f9fff) AM_DEVICE32("powervr2_slave", powervr2_device, ta_map, 0xffffffffffffffffU)
+	map(0x025f7c00, 0x025f7cff).m(m_powervr2_slave, FUNC(powervr2_device::pd_dma_map));
+	map(0x025f8000, 0x025f9fff).m(m_powervr2_slave, FUNC(powervr2_device::ta_map));
 //  AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
 //  AM_RANGE(0x025f7c00, 0x025f7cff) AM_DEVREADWRITE32("powervr2", powervr2_device, pvr_ctrl_r, pvr_ctrl_w, 0xffffffffffffffffU)
 //  AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, 0xffffffffffffffffU)
 
 	/* Area 1 */
-	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
-	AM_RANGE(0x06000000, 0x06ffffff) AM_RAM AM_SHARE("textureram2")   // 64 bit access 2nd PVR RAM
-	AM_RANGE(0x07000000, 0x07ffffff) AM_RAM AM_SHARE("frameram2")// 32 bit access 2nd PVR RAM
+	map(0x04000000, 0x04ffffff).ram().share("dc_texture_ram");      // texture memory 64 bit access
+	map(0x05000000, 0x05ffffff).ram().share("frameram"); // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	map(0x06000000, 0x06ffffff).ram().share("textureram2");   // 64 bit access 2nd PVR RAM
+	map(0x07000000, 0x07ffffff).ram().share("frameram2");// 32 bit access 2nd PVR RAM
 
 	/* Area 2*/
-	AM_RANGE(0x085f6800, 0x085f69ff) AM_WRITE(dc_sysctrl_w ) // TODO: writes to BOTH PVRs
-	AM_RANGE(0x085f8000, 0x085f9fff) AM_WRITE32(both_pvr2_ta_w, 0xffffffffffffffffU)
-	AM_RANGE(0x08800000, 0x088000ff) AM_DEVREADWRITE32("powervr2", powervr2_device, elan_regs_r, elan_regs_w, 0xffffffffffffffffU) // T&L chip registers
+	map(0x085f6800, 0x085f69ff).w(this, FUNC(naomi2_state::dc_sysctrl_w)); // TODO: writes to BOTH PVRs
+	map(0x085f8000, 0x085f9fff).w(this, FUNC(naomi2_state::both_pvr2_ta_w));
+	map(0x08800000, 0x088000ff).rw(m_powervr2, FUNC(powervr2_device::elan_regs_r), FUNC(powervr2_device::elan_regs_w)); // T&L chip registers
 //  AM_RANGE(0x09000000, 0x09??????) T&L command processing
-	AM_RANGE(0x0a000000, 0x0bffffff) AM_RAM AM_SHARE("elan_ram") // T&L chip RAM
+	map(0x0a000000, 0x0bffffff).ram().share("elan_ram"); // T&L chip RAM
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_MIRROR(0xa2000000) AM_RAM AM_SHARE("dc_ram")
+	map(0x0c000000, 0x0dffffff).mirror(0xa2000000).ram().share("dc_ram");
 
 	/* Area 4 */
-	AM_RANGE(0x10000000, 0x107fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
-	AM_RANGE(0x10800000, 0x10ffffff) AM_DEVWRITE8("powervr2", powervr2_device, ta_fifo_yuv_w, 0xffffffffffffffffU)
-	AM_RANGE(0x11000000, 0x11ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath0_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
+	map(0x10000000, 0x107fffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_poly_w));
+	map(0x10800000, 0x10ffffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_yuv_w));
+	map(0x11000000, 0x11ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath0_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	AM_RANGE(0x13000000, 0x13ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath1_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
+	map(0x13000000, 0x13ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
 
 	/* Area 5 */
 	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
@@ -1812,12 +1798,13 @@ ADDRESS_MAP_START(naomi2_state::naomi2_map)
 
 	/* Area 7 */
 	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(naomi_state::naomi_port)
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(eeprom_93c46a_r, eeprom_93c46a_w)
-ADDRESS_MAP_END
+void naomi_state::naomi_port(address_map &map)
+{
+	map(0x00, 0x0f).rw(this, FUNC(naomi_state::eeprom_93c46a_r), FUNC(naomi_state::eeprom_93c46a_w));
+}
 
 /*
  * Atomiswave address map, almost identical to Dreamcast
@@ -1929,49 +1916,47 @@ WRITE64_MEMBER(atomiswave_state::aw_modem_w )
 	osd_printf_verbose("%s",string_format("MODEM: [%08x=%x] write %x to %x, mask %x\n", 0x600000+reg*4, dat, data, offset, mem_mask).c_str());
 }
 
-ADDRESS_MAP_START(atomiswave_state::aw_map)
+void atomiswave_state::aw_map(address_map &map)
+{
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE(aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
-	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE(aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
+	map(0x00000000, 0x0001ffff).rw(this, FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w)).region("awflash", 0);
+	map(0xa0000000, 0xa001ffff).rw(this, FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w)).region("awflash", 0);
 
-	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM     // battery backed up RAM
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
-	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, 0xffffffffffffffffU )
-	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", aw_rom_board, submap, 0x0000ffff0000ffffU )
-	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, 0xffffffffffffffffU )
-	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, 0xffffffffffffffffU)
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, 0xffffffffffffffffU)
-	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE(aw_modem_r, aw_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, 0xffffffffffffffffU)
-	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16("aicartc", aicartc_device, read, write, 0x0000ffff0000ffffU )
-	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE(sh4_soundram_r, sh4_soundram_w )           // sound RAM (8 MB)
-
-
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE(aw_unknown1_r, aw_unknown1_w ) // ???
-
+	map(0x00200000, 0x0021ffff).ram();     // battery backed up RAM
+	map(0x005f6800, 0x005f69ff).rw(this, FUNC(atomiswave_state::dc_sysctrl_r), FUNC(atomiswave_state::dc_sysctrl_w));
+	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
+	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
+	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
+	map(0x005f7800, 0x005f78ff).rw(this, FUNC(atomiswave_state::dc_g2_ctrl_r), FUNC(atomiswave_state::dc_g2_ctrl_w));
+	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
+	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
+	map(0x00600000, 0x006007ff).rw(this, FUNC(atomiswave_state::aw_modem_r), FUNC(atomiswave_state::aw_modem_w));
+	map(0x00700000, 0x00707fff).rw(this, FUNC(atomiswave_state::dc_aica_reg_r), FUNC(atomiswave_state::dc_aica_reg_w));
+	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
+	map(0x00800000, 0x00ffffff).rw(this, FUNC(atomiswave_state::sh4_soundram_r), FUNC(atomiswave_state::sh4_soundram_w));           // sound RAM (8 MB)
+	
 	/* Area 1 - half the texture memory, like dreamcast, not naomi */
-	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_MIRROR(0x00800000) AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x057fffff) AM_RAM AM_MIRROR(0x00800000) AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	map(0x04000000, 0x047fffff).ram().mirror(0x00800000).share("dc_texture_ram");      // texture memory 64 bit access
+	map(0x05000000, 0x057fffff).ram().mirror(0x00800000).share("frameram"); // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 2*/
-	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
+	map(0x08000000, 0x0bffffff).noprw(); // 'Unassigned'
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("dc_ram")
-	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE("dc_ram") // extra ram on Naomi (mirror on DC)
-	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE("dc_ram") // mirror
-	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE("dc_ram") // mirror
+	map(0x0c000000, 0x0cffffff).ram().share("dc_ram");
+	map(0x0d000000, 0x0dffffff).ram().share("dc_ram"); // extra ram on Naomi (mirror on DC)
+	map(0x0e000000, 0x0effffff).ram().share("dc_ram"); // mirror
+	map(0x0f000000, 0x0fffffff).ram().share("dc_ram"); // mirror
 
-	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE("dc_ram") // RAM access through cache
-	AM_RANGE(0x8d000000, 0x8dffffff) AM_RAM AM_SHARE("dc_ram") // RAM access through cache
+	map(0x8c000000, 0x8cffffff).ram().share("dc_ram"); // RAM access through cache
+	map(0x8d000000, 0x8dffffff).ram().share("dc_ram"); // RAM access through cache
 
 	/* Area 4 - half the texture memory, like dreamcast, not naomi */
-	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
-	AM_RANGE(0x10800000, 0x10ffffff) AM_DEVWRITE8("powervr2", powervr2_device, ta_fifo_yuv_w, 0xffffffffffffffffU)
-	AM_RANGE(0x11000000, 0x117fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath0_w) AM_MIRROR(0x00800000)  // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
+	map(0x10000000, 0x107fffff).mirror(0x02000000).w(m_powervr2, FUNC(powervr2_device::ta_fifo_poly_w));
+	map(0x10800000, 0x10ffffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_yuv_w));
+	map(0x11000000, 0x117fffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath0_w)).mirror(0x00800000);  // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	AM_RANGE(0x13000000, 0x137fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath1_w) AM_MIRROR(0x00800000) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
+	map(0x13000000, 0x137fffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)).mirror(0x00800000); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
 
 	/* Area 5 */
@@ -1982,17 +1967,19 @@ ADDRESS_MAP_START(atomiswave_state::aw_map)
 
 	/* Area 7 */
 	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(atomiswave_state::aw_port)
+void atomiswave_state::aw_port(address_map &map)
+{
 //  ???
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(dc_state::dc_audio_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("dc_sound_ram")                /* shared with SH-4 */
-	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE(dc_arm_aica_r, dc_arm_aica_w)
-ADDRESS_MAP_END
+void dc_state::dc_audio_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x007fffff).ram().share("dc_sound_ram");                /* shared with SH-4 */
+	map(0x00800000, 0x00807fff).rw(this, FUNC(dc_state::dc_arm_aica_r), FUNC(dc_state::dc_arm_aica_w));
+}
 
 /*
 * Input ports
@@ -2729,7 +2716,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(naomi_state::naomi_base)
 	naomi_aw_base(config);
 
-    MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(naomi_map)
 	MCFG_CPU_IO_MAP(naomi_port)
 
@@ -2801,10 +2788,10 @@ MACHINE_CONFIG_END
  */
 /*
 MACHINE_CONFIG_START((naomi2_state::naomi2)
-	naomi(config);
+    naomi(config);
     MCFG_CPU_MODIFY("maincpu")
     MCFG_CPU_PROGRAM_MAP(naomi2_map)
-	MCFG_CPU_IO_MAP(naomi_port)
+    MCFG_CPU_IO_MAP(naomi_port)
 MACHINE_CONFIG_END
 */
 /*
@@ -2899,33 +2886,46 @@ To determine BIOS version: on test mode title screen press Service button 51 tim
 
 Info from roms starting at 0x1ffd60
 
-EPR-21576h - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
-EPR-21576g - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
-EPR-21576e - NAOMI BOOT ROM 2000 08/25  1.50 (Japan)
-EPR-21576d - NAOMI BOOT ROM 1999 06/04  1.40 (Japan)
-EPR-21576c - NAOMI BOOT ROM 1999 03/11  1.30 (Japan)
-EPR-21576b - NAOMI BOOT ROM 1999 02/15  1.20 (Japan)
-EPR-21576a - NAOMI BOOT ROM 1999 01/14  1.10 (Japan)
-EPR-21576  - NAOMI BOOT ROM 1998 12/18  1.00 (Japan)
-EPR-21577h - NAOMI BOOT ROM 2002 07/08  1.8- (USA)
-EPR-21577g - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
-EPR-21577e - NAOMI BOOT ROM 2000 08/25  1.50 (USA)
-EPR-21577d - NAOMI BOOT ROM 1999 06/04  1.40 (USA)
-EPR-21577a - NAOMI BOOT ROM 1999 02/15  1.20 (USA)    <-- "A" was v1.20 and not v1.10 (verified x3)
-EPR-21578h - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
-EPR-21578g - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
-EPR-21578e - NAOMI BOOT ROM 2000 08/25  1.50 (Export)
-EPR-21578d - NAOMI BOOT ROM 1999 06/04  1.40 (Export)
-EPR-21578a - NAOMI BOOT ROM 1999 02/15  1.20 (Export) <-- "A" was v1.20 and not v1.10 (verified)
-EPR-21579d - NAOMI BOOT ROM 1999 06/04  1.40 (Korea)
+EPR-21576  - NAOMI BOOT ROM 1998 12/18  1.00 (Japan)   only Japan ver was released
+
+EPR-21576a - NAOMI BOOT ROM 1999 01/14  1.10 (Japan)   Japan 1.10 BOOT ROM was labeled "A", all the rest had no revision character.
 EPR-21579  - NAOMI BOOT ROM 1999 01/14  1.10 (Korea)
-EPR-21580  - No known dump (Australia)
+USA, Export and Australia is missing.
 
-EPR-21577e & EPR-2178e differ by 7 bytes:
+EPR-21576b - NAOMI BOOT ROM 1999 02/15  1.20 (Japan)   Japan 1.20 BOOT ROM was labeled "B", all the rest - "A".
+EPR-21577a - NAOMI BOOT ROM 1999 02/15  1.20 (USA)
+EPR-21578a - NAOMI BOOT ROM 1999 02/15  1.20 (Export)
+Korea and Australia is missing.
 
-0x53e20 is the region byte (only one region byte)
-0x1ffffa-0x1fffff is the BIOS checksum
+EPR-21576c - NAOMI BOOT ROM 1999 03/11  1.30 (Japan)   only Japan ver was released
+EPR-21801  - NAOMI BOOT ROM 1999 03/11  1.30 (USA)     (Airline Pilots)
+EPR-21802  - NAOMI BOOT ROM 1999 03/11  1.30 (Export)  (Airline Pilots)
 
+EPR-21576d - NAOMI BOOT ROM 1999 06/04  1.40 (Japan)
+EPR-21577d - NAOMI BOOT ROM 1999 06/04  1.40 (USA)
+EPR-21578d - NAOMI BOOT ROM 1999 06/04  1.40 (Export)
+EPR-21579d - NAOMI BOOT ROM 1999 06/04  1.40 (Korea)
+Australia is missing.
+
+EPR-21576e - NAOMI BOOT ROM 2000 08/25  1.50 (Japan)
+EPR-21577e - NAOMI BOOT ROM 2000 08/25  1.50 (USA)
+EPR-21578e - NAOMI BOOT ROM 2000 08/25  1.50 (Export)
+Korea and Australia is missing.
+
+EPR-21576f - NAOMI BOOT ROM 2001 ??/??  1.60 (Japan)  (not dumped) had critical bugs, was quickly replaced by 1.70, only Japan ver was released.
+
+EPR-21576g - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
+EPR-21577g - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
+EPR-21578g - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
+Korea and Australia is missing.
+
+EPR-21576h - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
+EPR-21577h - NAOMI BOOT ROM 2002 07/08  1.8- (USA)
+EPR-21578h - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
+Korea and Australia is missing.
+
+EPR-21336  - No known dumps (Development BOOT ROM)
+EPR-21580  - No known dumps (Australia)
 
 House of the Dead 2 specific Naomi BIOS roms:
 
@@ -2955,23 +2955,13 @@ EPR-22850 & EPR-22851 differ by 7 bytes:
 0x52F08 is the region byte (only one region byte)
 0x1ffffa-0x1fffff is the BIOS checksum
 
-
-Airline Pilot specific Naomi BIOS roms:
-
-EPR-21801 - NAOMI BOOT ROM 1999 03/11  1.30 (USA)
-EPR-21802 - NAOMI BOOT ROM 1999 03/11  1.30 (Export)
-
-0x4D148 is the region byte (only one region byte)
-0x1ffffa-0x1fffff is the BIOS checksum
-
-
 Region byte encoding is as follows:
 
 0x00 = Japan
 0x01 = USA
 0x02 = Export
 0x03 = Korea
-0x?? = Australia
+0x04 = Australia
 
 Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for the region byte.
   NOTE: this doesn't work for the HOTD2 or multi screen boot roms
@@ -3031,7 +3021,7 @@ OFF  OFF  ON   Australia
 	ROM_SYSTEM_BIOS( 3, "bios3",   "epr-21576d (Japan)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 3,  "epr-21576d.ic27", 0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
 	ROM_SYSTEM_BIOS( 4, "bios4",   "epr-21576c (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4,  "epr-21576c.ic27", 0x000000, 0x200000, CRC(4599ad13) SHA1(7e730e9452a792d76f210c33a955d385538682c7) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4,  "epr-21576c.ic27", 0x000000, 0x200000, BAD_DUMP CRC(4599ad13) SHA1(7e730e9452a792d76f210c33a955d385538682c7) ) \
 	ROM_SYSTEM_BIOS( 5, "bios5",   "epr-21576b (Japan)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 5,  "epr-21576b.ic27", 0x000000, 0x200000, CRC(755a6e07) SHA1(7e8b8ccfc063144d89668e7224dcd8a36c54f3b3) ) \
 	ROM_SYSTEM_BIOS( 6, "bios6",   "epr-21576a (Japan)" ) \
@@ -3158,16 +3148,27 @@ OFF  OFF  ON   Australia
 
 /* NAOMI2 BIOS:
 
-EPR-23605C - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
-EPR-23605B - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
-EPR-23605A - NAOMI BOOT ROM 2001 06/20  1.60 (Japan)
 EPR-23605  - NAOMI BOOT ROM 2001 01/19  1.50 (Japan)
-EPR-23607B - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
 EPR-23607  - NAOMI BOOT ROM 2001 01/19  1.50 (USA)
-EPR-23608C - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
-EPR-23608B - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
-EPR-23608A - NAOMI BOOT ROM 2001 06/20  1.60 (Export)
 EPR-23608  - NAOMI BOOT ROM 2001 01/19  1.50 (Export)
+Korea and Australia is missing.
+
+EPR-23605A - NAOMI BOOT ROM 2001 06/20  1.60 (Japan)
+EPR-23608A - NAOMI BOOT ROM 2001 06/20  1.60 (Export)
+USA, Korea and Australia is missing.
+
+EPR-23605B - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
+EPR-23607B - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
+EPR-23608B - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
+Korea and Australia is missing.
+
+EPR-23605C - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
+EPR-23608C - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
+USA, Korea and Australia is missing.
+
+EPR-21604  - No known dumps (Development BOOT ROM)
+EPR-21609  - No known dumps (Korea)
+EPR-21610  - No known dumps (Australia)
 
 EPR-23605B, EPR-23607B & EPR-23608B all differ by 8 bytes:
 
@@ -3180,8 +3181,8 @@ Region byte encoding is as follows:
 0x00 = Japan
 0x01 = USA
 0x02 = Export
-0x?? = Korea
-0x?? = Australia
+0x03 = Korea
+0x04 = Australia
 
 */
 

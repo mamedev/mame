@@ -28,18 +28,26 @@ private:
 	required_device<scn2681_device> m_duart;
 };
 
-ADDRESS_MAP_START(hp700_state::mem_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x20000, 0x2ffff) AM_RAM
-	AM_RANGE(0x30000, 0x31fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x34000, 0x34000) AM_READNOP
-	;map(0x38000, 0x38fff).lrw8("duart_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_duart->read(space, offset >> 8, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_duart->write(space, offset >> 8, data, mem_mask); });
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x1fff0)
-ADDRESS_MAP_END
+void hp700_state::mem_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom().region("maincpu", 0);
+	map(0x20000, 0x2ffff).ram();
+	map(0x30000, 0x31fff).ram().share("nvram");
+	map(0x34000, 0x34000).nopr();
+	map(0x38000, 0x38fff).lrw8("duart_rw",
+							   [this](address_space &space, offs_t offset, u8 mem_mask) {
+								   return m_duart->read(space, offset >> 8, mem_mask);
+							   },
+							   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+								   m_duart->write(space, offset >> 8, data, mem_mask);
+							   });
+	map(0xffff0, 0xfffff).rom().region("maincpu", 0x1fff0);
+}
 
-ADDRESS_MAP_START(hp700_state::io_map)
-	AM_RANGE(0x00f2, 0x00f2) AM_WRITENOP
-ADDRESS_MAP_END
+void hp700_state::io_map(address_map &map)
+{
+	map(0x00f2, 0x00f2).nopw();
+}
 
 static INPUT_PORTS_START( hp700_92 )
 INPUT_PORTS_END

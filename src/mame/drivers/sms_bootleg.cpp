@@ -236,11 +236,12 @@ A Korean version has been seen too (unless this can be switched?)
 
 
 
-ADDRESS_MAP_START(smsbootleg_state::sms_supergame_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xfff7) AM_RAM
+void smsbootleg_state::sms_supergame_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xfff7).ram();
 //  AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
-ADDRESS_MAP_END
+}
 
 WRITE8_MEMBER(smsbootleg_state::port08_w)
 {
@@ -253,21 +254,22 @@ WRITE8_MEMBER(smsbootleg_state::port18_w)
 }
 
 
-ADDRESS_MAP_START(smsbootleg_state::sms_supergame_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
+void smsbootleg_state::sms_supergame_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
 
-	AM_RANGE(0x04, 0x04) AM_READNOP //AM_READ_PORT("IN0") // these
-	AM_RANGE(0x08, 0x08) AM_WRITE(port08_w)
-	AM_RANGE(0x14, 0x14) AM_READNOP //AM_READ_PORT("IN1") // seem to be from a coinage / timer MCU, changing them directly changes the credits / time value
-	AM_RANGE(0x18, 0x18) AM_WRITE(port18_w)
+	map(0x04, 0x04).nopr(); //AM_READ_PORT("IN0") // these
+	map(0x08, 0x08).w(this, FUNC(smsbootleg_state::port08_w));
+	map(0x14, 0x14).nopr(); //AM_READ_PORT("IN1") // seem to be from a coinage / timer MCU, changing them directly changes the credits / time value
+	map(0x18, 0x18).w(this, FUNC(smsbootleg_state::port18_w));
 
-	AM_RANGE(0x40, 0x7f)                 AM_READWRITE(sms_count_r, sms_psg_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
+	map(0x40, 0x7f).rw(this, FUNC(smsbootleg_state::sms_count_r), FUNC(smsbootleg_state::sms_psg_w));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
 
-	AM_RANGE(0xdc, 0xdc) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
+	map(0xdc, 0xdc).portr("IN2");
+}
 
 
 

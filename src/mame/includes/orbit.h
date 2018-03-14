@@ -41,6 +41,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void orbit(machine_config &config);
+
+protected:
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(heat_rst_led_w);
 	DECLARE_WRITE_LINE_MEMBER(hyper_led_w);
@@ -55,16 +58,15 @@ public:
 	DECLARE_WRITE8_MEMBER(orbit_noise_amp_w);
 	DECLARE_WRITE8_MEMBER(orbit_noise_rst_w);
 
-	void orbit(machine_config &config);
-	void orbit_map(address_map &map);
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	void orbit_map(address_map &map);
 
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void update_misc_flags(address_space &space, uint8_t val);
 
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_playfield_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;

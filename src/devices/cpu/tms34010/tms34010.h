@@ -104,40 +104,40 @@ enum
 
 
 #define MCFG_TMS340X0_HALT_ON_RESET(_value) \
-	tms340x0_device::set_halt_on_reset(*device, _value);
+	downcast<tms340x0_device &>(*device).set_halt_on_reset(_value);
 
 #define MCFG_TMS340X0_PIXEL_CLOCK(_value) \
-	tms340x0_device::set_pixel_clock(*device, _value);
+	downcast<tms340x0_device &>(*device).set_pixel_clock(_value);
 
 #define MCFG_TMS340X0_PIXELS_PER_CLOCK(_value) \
-	tms340x0_device::set_pixels_per_clock(*device, _value);
+	downcast<tms340x0_device &>(*device).set_pixels_per_clock(_value);
 
 #define TMS340X0_SCANLINE_IND16_CB_MEMBER(_name) void _name(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms340x0_device::display_params *params)
 
 #define MCFG_TMS340X0_SCANLINE_IND16_CB(_class, _method) \
-		tms340x0_device::set_scanline_ind16_callback(*device, tms340x0_device::scanline_ind16_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<tms340x0_device &>(*device).set_scanline_ind16_callback(tms340x0_device::scanline_ind16_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 #define TMS340X0_SCANLINE_RGB32_CB_MEMBER(_name) void _name(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms340x0_device::display_params *params)
 
 #define MCFG_TMS340X0_SCANLINE_RGB32_CB(_class, _method) \
-		tms340x0_device::set_scanline_rgb32_callback(*device, tms340x0_device::scanline_rgb32_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<tms340x0_device &>(*device).set_scanline_rgb32_callback(tms340x0_device::scanline_rgb32_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 #define MCFG_TMS340X0_OUTPUT_INT_CB(_devcb) \
-	devcb = &tms340x0_device::set_output_int_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<tms340x0_device &>(*device).set_output_int_callback(DEVCB_##_devcb);
 
 
 #define TMS340X0_TO_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, uint16_t *shiftreg)
 
 #define MCFG_TMS340X0_TO_SHIFTREG_CB(_class, _method) \
-		tms340x0_device::set_to_shiftreg_callback(*device, tms340x0_device::to_shiftreg_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<tms340x0_device &>(*device).set_to_shiftreg_callback(tms340x0_device::to_shiftreg_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 #define TMS340X0_FROM_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, uint16_t *shiftreg)
 
 #define MCFG_TMS340X0_FROM_SHIFTREG_CB(_class, _method) \
-		tms340x0_device::set_from_shiftreg_callback(*device, tms340x0_device::from_shiftreg_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<tms340x0_device &>(*device).set_from_shiftreg_callback(tms340x0_device::from_shiftreg_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 class tms340x0_device : public cpu_device,
@@ -160,15 +160,15 @@ public:
 	typedef device_delegate<void (address_space &space, offs_t address, uint16_t *shiftreg)> to_shiftreg_cb_delegate;
 	typedef device_delegate<void (address_space &space, offs_t address, uint16_t *shiftreg)> from_shiftreg_cb_delegate;
 
-	static void set_halt_on_reset(device_t &device, bool halt_on_reset) { downcast<tms340x0_device &>(device).m_halt_on_reset = halt_on_reset; }
-	static void set_pixel_clock(device_t &device, uint32_t pixclock) { downcast<tms340x0_device &>(device).m_pixclock = pixclock; }
-	static void set_pixel_clock(device_t &device, const XTAL &xtal) { set_pixel_clock(device, xtal.value()); }
-	static void set_pixels_per_clock(device_t &device, int pixperclock) { downcast<tms340x0_device &>(device).m_pixperclock = pixperclock; }
-	static void set_scanline_ind16_callback(device_t &device, scanline_ind16_cb_delegate callback) { downcast<tms340x0_device &>(device).m_scanline_ind16_cb = callback; }
-	static void set_scanline_rgb32_callback(device_t &device, scanline_rgb32_cb_delegate callback) { downcast<tms340x0_device &>(device).m_scanline_rgb32_cb = callback; }
-	template <class Object> static devcb_base &set_output_int_callback(device_t &device, Object &&cb) { return downcast<tms340x0_device &>(device).m_output_int_cb.set_callback(std::forward<Object>(cb)); }
-	static void set_to_shiftreg_callback(device_t &device, to_shiftreg_cb_delegate callback) { downcast<tms340x0_device &>(device).m_to_shiftreg_cb = callback; }
-	static void set_from_shiftreg_callback(device_t &device, from_shiftreg_cb_delegate callback) { downcast<tms340x0_device &>(device).m_from_shiftreg_cb = callback; }
+	void set_halt_on_reset(bool halt_on_reset) { m_halt_on_reset = halt_on_reset; }
+	void set_pixel_clock(uint32_t pixclock) { m_pixclock = pixclock; }
+	void set_pixel_clock(const XTAL &xtal) { set_pixel_clock(xtal.value()); }
+	void set_pixels_per_clock(int pixperclock) { m_pixperclock = pixperclock; }
+	template <typename Object> void set_scanline_ind16_callback(Object &&cb) { m_scanline_ind16_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_scanline_rgb32_callback(Object &&cb) { m_scanline_rgb32_cb = std::forward<Object>(cb); }
+	template <class Object> devcb_base &set_output_int_callback(Object &&cb) { return m_output_int_cb.set_callback(std::forward<Object>(cb)); }
+	template <typename Object> void set_to_shiftreg_callback(Object &&cb) { m_to_shiftreg_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_from_shiftreg_callback(Object &&cb) { m_from_shiftreg_cb = std::forward<Object>(cb); }
 
 	void get_display_params(display_params *params);
 	void tms34010_state_postload();

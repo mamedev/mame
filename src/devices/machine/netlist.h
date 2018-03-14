@@ -29,46 +29,46 @@ namespace netlist {
 
 
 #define MCFG_NETLIST_SETUP(_setup)                                                  \
-	netlist_mame_device::static_set_constructor(*device, NETLIST_NAME(_setup));
+	downcast<netlist_mame_device &>(*device).set_constructor(NETLIST_NAME(_setup));
 
 #define MCFG_NETLIST_ANALOG_INPUT(_basetag, _tag, _name)                            \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_ANALOG_INPUT, 0)                     \
-	netlist_mame_analog_input_device::static_set_name(*device, _name);
+	downcast<netlist_mame_analog_input_device &>(*device).set_name(_name);
 
 #define MCFG_NETLIST_ANALOG_MULT_OFFSET(_mult, _offset)                             \
-	netlist_mame_sub_interface::static_set_mult_offset(*device, _mult, _offset);
+	dynamic_cast<netlist_mame_sub_interface &>(*device).set_mult_offset(_mult, _offset);
 
 #define MCFG_NETLIST_ANALOG_OUTPUT(_basetag, _tag, _IN, _class, _member, _class_tag) \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_ANALOG_OUTPUT, 0)                    \
-	netlist_mame_analog_output_device::static_set_params(*device, _IN,              \
+	downcast<netlist_mame_analog_output_device &>(*device).set_params(_IN,              \
 				netlist_mame_analog_output_device::output_delegate(& _class :: _member, \
 						# _class "::" # _member, _class_tag, (_class *)nullptr)   );
 
 #define MCFG_NETLIST_LOGIC_OUTPUT(_basetag, _tag, _IN, _class, _member, _class_tag) \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_LOGIC_OUTPUT, 0)                    \
-	netlist_mame_logic_output_device::static_set_params(*device, _IN,              \
+	downcast<netlist_mame_logic_output_device &>(*device).set_params(_IN,              \
 				netlist_mame_logic_output_device::output_delegate(& _class :: _member, \
 						# _class "::" # _member, _class_tag, (_class *)nullptr)   );
 
 #define MCFG_NETLIST_LOGIC_INPUT(_basetag, _tag, _name, _shift)             \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_LOGIC_INPUT, 0)              \
-	netlist_mame_logic_input_device::static_set_params(*device, _name, _shift);
+	downcast<netlist_mame_logic_input_device &>(*device).set_params(_name, _shift);
 
 #define MCFG_NETLIST_INT_INPUT(_basetag, _tag, _name, _shift, _mask)        \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_INT_INPUT, 0)                \
-	netlist_mame_int_input_device::static_set_params(*device, _name, _mask, _shift);
+	downcast<netlist_mame_int_input_device &>(*device).set_params(_name, _mask, _shift);
 
 #define MCFG_NETLIST_RAM_POINTER(_basetag, _tag, _name) \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_RAM_POINTER, 0) \
-	netlist_mame_ram_pointer_device::static_set_params(*device, _name ".m_RAM");
+	downcast<netlist_mame_ram_pointer_device &>(*device).set_params(_name ".m_RAM");
 
 #define MCFG_NETLIST_STREAM_INPUT(_basetag, _chan, _name)                           \
 	MCFG_DEVICE_ADD(_basetag ":cin" # _chan, NETLIST_STREAM_INPUT, 0)               \
-	netlist_mame_stream_input_device::static_set_params(*device, _chan, _name);
+	downcast<netlist_mame_stream_input_device &>(*device).set_params(_chan, _name);
 
 #define MCFG_NETLIST_STREAM_OUTPUT(_basetag, _chan, _name)                          \
 	MCFG_DEVICE_ADD(_basetag ":cout" # _chan, NETLIST_STREAM_OUTPUT, 0)             \
-	netlist_mame_stream_output_device::static_set_params(*device, _chan, _name);
+	downcast<netlist_mame_stream_output_device &>(*device).set_params(_chan, _name);
 
 #define NETLIST_LOGIC_PORT_CHANGED(_base, _tag)                                     \
 	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_logic_input_device, input_changed, 0)
@@ -104,7 +104,7 @@ public:
 	netlist_mame_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~netlist_mame_device();
 
-	static void static_set_constructor(device_t &device, void (*setup_func)(netlist::setup_t &));
+	void set_constructor(void (*setup_func)(netlist::setup_t &));
 
 	ATTR_HOT inline netlist::setup_t &setup();
 	ATTR_HOT inline netlist_mame_t &netlist() { return *m_netlist; }
@@ -264,7 +264,7 @@ public:
 
 	inline void update_to_current_time() { m_sound->get_stream()->update(); }
 
-	static void static_set_mult_offset(device_t &device, const double mult, const double offset);
+	void set_mult_offset(const double mult, const double offset);
 
 protected:
 	double m_offset;
@@ -286,7 +286,7 @@ public:
 	// construction/destruction
 	netlist_mame_analog_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_name(device_t &device, const char *param_name);
+	void set_name(const char *param_name) { m_param_name = param_name; }
 
 	void write(const double val);
 
@@ -325,7 +325,7 @@ public:
 	// construction/destruction
 	netlist_mame_analog_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_params(device_t &device, const char *in_name, output_delegate &&adelegate);
+	void set_params(const char *in_name, output_delegate &&adelegate);
 
 protected:
 	// device-level overrides
@@ -349,7 +349,7 @@ public:
 	// construction/destruction
 	netlist_mame_logic_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_params(device_t &device, const char *in_name, output_delegate &&adelegate);
+	void set_params(const char *in_name, output_delegate &&adelegate);
 
 protected:
 	// device-level overrides
@@ -371,7 +371,7 @@ public:
 	// construction/destruction
 	netlist_mame_int_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_params(device_t &device, const char *param_name, const uint32_t mask, const uint32_t shift);
+	void set_params(const char *param_name, const uint32_t mask, const uint32_t shift);
 
 	void write(const uint32_t val);
 
@@ -405,7 +405,7 @@ public:
 	// construction/destruction
 	netlist_mame_logic_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_params(device_t &device, const char *param_name, const uint32_t shift);
+	void set_params(const char *param_name, const uint32_t shift);
 
 	void write(const uint32_t val);
 
@@ -439,7 +439,7 @@ public:
 
 	uint8_t* ptr() const { return m_data; }
 
-	static void static_set_params(device_t &device, const char *param_name);
+	void set_params(const char *param_name);
 
 protected:
 	// device-level overrides
@@ -462,7 +462,7 @@ public:
 	// construction/destruction
 	netlist_mame_stream_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_params(device_t &device, int channel, const char *param_name);
+	void set_params(int channel, const char *param_name);
 
 protected:
 	// device-level overrides
@@ -483,7 +483,7 @@ public:
 	// construction/destruction
 	netlist_mame_stream_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_params(device_t &device, int channel, const char *out_name);
+	void set_params(int channel, const char *out_name);
 
 protected:
 	// device-level overrides

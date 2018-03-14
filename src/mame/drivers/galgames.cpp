@@ -859,43 +859,46 @@ READ16_MEMBER(galgames_state::fpga_status_r)
 	return 0x3; // Pass the check at PC = 0xfae & a later one
 }
 
-ADDRESS_MAP_START(galgames_state::galgames_map)
-	AM_RANGE( 0x000000, 0x3fffff ) AM_DEVREADWRITE("slot", galgames_slot_device, read, write )
+void galgames_state::galgames_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rw(m_slot, FUNC(galgames_slot_device::read), FUNC(galgames_slot_device::write));
 
-	AM_RANGE( 0x400000, 0x400011 ) AM_DEVWRITE("blitter", cesblit_device, regs_w )
-	AM_RANGE( 0x400012, 0x400013 ) AM_DEVWRITE("blitter", cesblit_device, addr_hi_w )
-	AM_RANGE( 0x400014, 0x400015 ) AM_DEVWRITE("blitter", cesblit_device, color_w )
-	AM_RANGE( 0x400020, 0x400021 ) AM_DEVREAD( "blitter", cesblit_device, status_r )
+	map(0x400000, 0x400011).w(m_blitter, FUNC(cesblit_device::regs_w));
+	map(0x400012, 0x400013).w(m_blitter, FUNC(cesblit_device::addr_hi_w));
+	map(0x400014, 0x400015).w(m_blitter, FUNC(cesblit_device::color_w));
+	map(0x400020, 0x400021).r(m_blitter, FUNC(cesblit_device::status_r));
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_READ(fpga_status_r )
-	AM_RANGE( 0x700000, 0x700001 ) AM_READ(fpga_status_r ) AM_WRITENOP
-	AM_RANGE( 0x800020, 0x80003f ) AM_NOP   // ?
-	AM_RANGE( 0x900000, 0x900001 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
+	map(0x600000, 0x600001).r(this, FUNC(galgames_state::fpga_status_r));
+	map(0x700000, 0x700001).r(this, FUNC(galgames_state::fpga_status_r)).nopw();
+	map(0x800020, 0x80003f).noprw();   // ?
+	map(0x900000, 0x900001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 
-	AM_RANGE( 0xa00000, 0xa00001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
-	AM_RANGE( 0xb00000, 0xb7ffff ) AM_READWRITE(galgames_okiram_r, galgames_okiram_w ) // (only low bytes tested) 4x N341024SJ-15
+	map(0xa00001, 0xa00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xb00000, 0xb7ffff).rw(this, FUNC(galgames_state::galgames_okiram_r), FUNC(galgames_state::galgames_okiram_w)); // (only low bytes tested) 4x N341024SJ-15
 
-	AM_RANGE( 0xc00000, 0xc00001 ) AM_WRITE(galgames_palette_offset_w )
-	AM_RANGE( 0xc00002, 0xc00003 ) AM_WRITE(galgames_palette_data_w )
+	map(0xc00000, 0xc00001).w(this, FUNC(galgames_state::galgames_palette_offset_w));
+	map(0xc00002, 0xc00003).w(this, FUNC(galgames_state::galgames_palette_data_w));
 
-	AM_RANGE( 0xd00000, 0xd00001 ) AM_READ_PORT("TRACKBALL_1_X")
-	AM_RANGE( 0xd00000, 0xd00001 ) AM_WRITENOP  // bit 0: FPGA programming serial in (lsb first)
-	AM_RANGE( 0xd00002, 0xd00003 ) AM_READ_PORT("TRACKBALL_1_Y")
-	AM_RANGE( 0xd00004, 0xd00005 ) AM_READ_PORT("TRACKBALL_2_X")
-	AM_RANGE( 0xd00006, 0xd00007 ) AM_READ_PORT("TRACKBALL_2_Y")
-	AM_RANGE( 0xd00008, 0xd00009 ) AM_READ_PORT("P1")
-	AM_RANGE( 0xd0000a, 0xd0000b ) AM_READ_PORT("P2")
-	AM_RANGE( 0xd0000c, 0xd0000d ) AM_READ_PORT("SYSTEM") AM_WRITE(outputs_w )
+	map(0xd00000, 0xd00001).portr("TRACKBALL_1_X");
+	map(0xd00000, 0xd00001).nopw();  // bit 0: FPGA programming serial in (lsb first)
+	map(0xd00002, 0xd00003).portr("TRACKBALL_1_Y");
+	map(0xd00004, 0xd00005).portr("TRACKBALL_2_X");
+	map(0xd00006, 0xd00007).portr("TRACKBALL_2_Y");
+	map(0xd00008, 0xd00009).portr("P1");
+	map(0xd0000a, 0xd0000b).portr("P2");
+	map(0xd0000c, 0xd0000d).portr("SYSTEM").w(this, FUNC(galgames_state::outputs_w));
 
-	AM_RANGE( 0xd0000e, 0xd0000f ) AM_READNOP AM_DEVWRITE8("slot", galgames_slot_device, cart_sel_w, 0x00ff )
-	AM_RANGE( 0xd00010, 0xd00011 ) AM_DEVREADWRITE8("slot", galgames_slot_device, eeprom_r,     eeprom_w,   0x00ff )
-	AM_RANGE( 0xd00012, 0xd00013 ) AM_DEVREADWRITE8("slot", galgames_slot_device, pic_data_r,   pic_data_w, 0x00ff )
-	AM_RANGE( 0xd00014, 0xd00015 ) AM_DEVREADWRITE8("slot", galgames_slot_device, pic_status_r, ram_sel_w,  0x00ff )
-ADDRESS_MAP_END
+	map(0xd0000e, 0xd0000f).nopr();
+	map(0xd0000f, 0xd0000f).w(m_slot, FUNC(galgames_slot_device::cart_sel_w));
+	map(0xd00011, 0xd00011).rw(m_slot, FUNC(galgames_slot_device::eeprom_r), FUNC(galgames_slot_device::eeprom_w));
+	map(0xd00013, 0xd00013).rw(m_slot, FUNC(galgames_slot_device::pic_data_r), FUNC(galgames_slot_device::pic_data_w));
+	map(0xd00015, 0xd00015).rw(m_slot, FUNC(galgames_slot_device::pic_status_r), FUNC(galgames_slot_device::ram_sel_w));
+}
 
-ADDRESS_MAP_START(galgames_state::blitter_map)
-	AM_RANGE( 0x000000, 0x1fffff ) AM_DEVREAD(":slot", galgames_slot_device, rom_r)
-ADDRESS_MAP_END
+void galgames_state::blitter_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).r(":slot", FUNC(galgames_slot_device::rom_r));
+}
 
 /***************************************************************************
 

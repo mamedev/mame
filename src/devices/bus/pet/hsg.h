@@ -24,15 +24,6 @@
 
 class cbm8000_hsg_device : public device_t, public device_pet_expansion_card_interface
 {
-public:
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	// device_pet_expansion_card_interface overrides
-	virtual int pet_norom_r(address_space &space, offs_t offset, int sel) override;
-	virtual uint8_t pet_bd_r(address_space &space, offs_t offset, uint8_t data, int &sel) override;
-	virtual void pet_bd_w(address_space &space, offs_t offset, uint8_t data, int &sel) override;
-
 protected:
 	// construction/destruction
 	cbm8000_hsg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -40,6 +31,14 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	// device_pet_expansion_card_interface overrides
+	virtual int pet_norom_r(address_space &space, offs_t offset, int sel) override;
+	virtual uint8_t pet_bd_r(address_space &space, offs_t offset, uint8_t data, int &sel) override;
+	virtual void pet_bd_w(address_space &space, offs_t offset, uint8_t data, int &sel) override;
 
 private:
 	required_device<ef9365_device> m_gdc;
@@ -56,10 +55,12 @@ public:
 	// construction/destruction
 	cbm8000_hsg_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void hsg_a_map(address_map &map);
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	void hsg_a_map(address_map &map);
 };
 
 
@@ -71,10 +72,12 @@ public:
 	// construction/destruction
 	cbm8000_hsg_b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void hsg_b_map(address_map &map);
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	void hsg_b_map(address_map &map);
 };
 
 

@@ -292,17 +292,19 @@ void leapster_state::machine_reset()
 {
 }
 
-ADDRESS_MAP_START(leapster_state::leapster_map)
-	AM_RANGE(0x00000000, 0x007fffff) AM_ROM AM_MIRROR(0x40000000) // pointers in the bios region seem to be to the 40xxxxxx region, either we mirror there or something (real bios?) is acutally missing
-	AM_RANGE(0x0180D800, 0x0180D803) AM_READ(leapster_random_r)
-	AM_RANGE(0x03000000, 0x030007ff) AM_RAM // puts stack here, writes a pointer @ 0x03000000 on startup
-	AM_RANGE(0x3c000000, 0x3c1fffff) AM_RAM // really ram, or has our code execution gone wrong?
+void leapster_state::leapster_map(address_map &map)
+{
+	map(0x00000000, 0x007fffff).rom().mirror(0x40000000); // pointers in the bios region seem to be to the 40xxxxxx region, either we mirror there or something (real bios?) is acutally missing
+	map(0x0180D800, 0x0180D803).r(this, FUNC(leapster_state::leapster_random_r));
+	map(0x03000000, 0x030007ff).ram(); // puts stack here, writes a pointer @ 0x03000000 on startup
+	map(0x3c000000, 0x3c1fffff).ram(); // really ram, or has our code execution gone wrong?
 //  AM_RANGE(0x80000000, 0x807fffff) AM_ROMBANK("cartrom") // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(leapster_state::leapster_aux)
-	AM_RANGE(0x00000004b, 0x00000004b) AM_WRITE(leapster_aux004b_w) // this address isn't used by ARC internal stuff afaik, so probably leapster specific
-ADDRESS_MAP_END
+void leapster_state::leapster_aux(address_map &map)
+{
+	map(0x00000004b, 0x00000004b).w(this, FUNC(leapster_state::leapster_aux004b_w)); // this address isn't used by ARC internal stuff afaik, so probably leapster specific
+}
 
 MACHINE_CONFIG_START(leapster_state::leapster)
 	/* basic machine hardware */
@@ -341,9 +343,9 @@ ROM_START(leapster)
 	ROM_SYSTEM_BIOS( 0,  "uni15",   "Universal 1.5" )    /* 152-10346 Leapster BaseROM Universal v1.5      - Sep 04 2003 10:46:47 */
 	ROM_LOAD_BIOS( 0, "155-10072-a.bin"   , 0x00000, 0x200000, CRC(af05e5a0) SHA1(d4468d060543ba7e44785041093bc98bcd9afa07) )
 	ROM_SYSTEM_BIOS( 1,  "uk21",    "UK 2.1" )           /* 152-11452 Leapster BaseROM UK v2.1             - Aug 30 2005 16:01:46 */
-	ROM_LOAD_BIOS( 1, "leapster2_1004.bin", 0x00000, 0x800000, CRC(b466e14d) SHA1(910c234f03e76b7de55b8aa0a0c62fd1daae4910) ) 
+	ROM_LOAD_BIOS( 1, "leapster2_1004.bin", 0x00000, 0x800000, CRC(b466e14d) SHA1(910c234f03e76b7de55b8aa0a0c62fd1daae4910) )
 	ROM_SYSTEM_BIOS( 2,  "ger21",   "German 2.1" )       /* 152-11435 Leapster BaseROM German v2.1         - Oct 21 2005 18:53:59 */
-	ROM_LOAD_BIOS( 2, "leapster2_1006.bin", 0x00000, 0x800000, CRC(a69ed8ca) SHA1(e6aacba0c39b1465f344c2b07ff1cbd8a395adac) ) 
+	ROM_LOAD_BIOS( 2, "leapster2_1006.bin", 0x00000, 0x800000, CRC(a69ed8ca) SHA1(e6aacba0c39b1465f344c2b07ff1cbd8a395adac) )
 ROM_END
 
 ROM_START(leapstertv)

@@ -241,41 +241,43 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_coin_lookout_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(jollyjgr_state::jollyjgr_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8ff8, 0x8ff8) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8ff9, 0x8ff9) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE(jollyjgr_misc_w)
-	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE(jollyjgr_coin_lookout_w)
-	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9880, 0x9bff) AM_RAM
-	AM_RANGE(0xa000, 0xffff) AM_RAM AM_SHARE("bitmap")
-ADDRESS_MAP_END
+void jollyjgr_state::jollyjgr_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8ff8, 0x8ff8).portr("DSW1");
+	map(0x8ff9, 0x8ff9).portr("INPUTS");
+	map(0x8ff8, 0x8ff8).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x8ffa, 0x8ffa).portr("SYSTEM").w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x8ffc, 0x8ffc).w(this, FUNC(jollyjgr_state::jollyjgr_misc_w));
+	map(0x8ffd, 0x8ffd).w(this, FUNC(jollyjgr_state::jollyjgr_coin_lookout_w));
+	map(0x8fff, 0x8fff).portr("DSW2");
+	map(0x9000, 0x93ff).ram().w(this, FUNC(jollyjgr_state::jollyjgr_videoram_w)).share("videoram");
+	map(0x9800, 0x983f).ram().w(this, FUNC(jollyjgr_state::jollyjgr_attrram_w)).share("colorram");
+	map(0x9840, 0x987f).ram().share("spriteram");
+	map(0x9880, 0x9bff).ram();
+	map(0xa000, 0xffff).ram().share("bitmap");
+}
 
-ADDRESS_MAP_START(jollyjgr_state::fspider_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8ff8, 0x8ff8) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8ff9, 0x8ff9) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE(jollyjgr_misc_w)
-	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE(jollyjgr_coin_lookout_w)
-	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9880, 0x989f) AM_RAM // ?
-	AM_RANGE(0x98a0, 0x98af) AM_RAM AM_SHARE("bulletram")
-	AM_RANGE(0x98b0, 0x9bff) AM_RAM // ?
-	AM_RANGE(0xa000, 0xffff) AM_RAM AM_SHARE("bitmap")
-ADDRESS_MAP_END
+void jollyjgr_state::fspider_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8ff8, 0x8ff8).portr("DSW1");
+	map(0x8ff9, 0x8ff9).portr("INPUTS");
+	map(0x8ff8, 0x8ff8).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x8ffa, 0x8ffa).portr("SYSTEM").w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x8ffc, 0x8ffc).w(this, FUNC(jollyjgr_state::jollyjgr_misc_w));
+	map(0x8ffd, 0x8ffd).w(this, FUNC(jollyjgr_state::jollyjgr_coin_lookout_w));
+	map(0x8fff, 0x8fff).portr("DSW2");
+	map(0x9000, 0x93ff).ram().w(this, FUNC(jollyjgr_state::jollyjgr_videoram_w)).share("videoram");
+	map(0x9800, 0x983f).ram().w(this, FUNC(jollyjgr_state::jollyjgr_attrram_w)).share("colorram");
+	map(0x9840, 0x987f).ram().share("spriteram");
+	map(0x9880, 0x989f).ram(); // ?
+	map(0x98a0, 0x98af).ram().share("bulletram");
+	map(0x98b0, 0x9bff).ram(); // ?
+	map(0xa000, 0xffff).ram().share("bitmap");
+}
 
 
 

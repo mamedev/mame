@@ -631,19 +631,20 @@ WRITE8_MEMBER(noki3310_state::mad2_mcuif_w)
 }
 
 
-ADDRESS_MAP_START(noki3310_state::noki3310_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)
-	AM_RANGE(0x00000000, 0x0000ffff) AM_MIRROR(0x80000) AM_READWRITE16(ram_r, ram_w, 0xffffffff)                // boot ROM / RAM
-	AM_RANGE(0x00010000, 0x00010fff) AM_MIRROR(0x8f000) AM_READWRITE16(dsp_ram_r, dsp_ram_w, 0xffffffff)        // DSP shared memory
-	AM_RANGE(0x00020000, 0x000200ff) AM_MIRROR(0x8ff00) AM_READWRITE8(mad2_io_r, mad2_io_w, 0xffffffff)         // IO (Primary I/O range, configures peripherals)
-	AM_RANGE(0x00030000, 0x00030003) AM_MIRROR(0x8fffc) AM_READWRITE8(mad2_dspif_r, mad2_dspif_w, 0xffffffff)   // DSPIF (API control register)
-	AM_RANGE(0x00040000, 0x00040003) AM_MIRROR(0x8fffc) AM_READWRITE8(mad2_mcuif_r, mad2_mcuif_w, 0xffffffff)   // MCUIF (Secondary I/O range, configures memory ranges)
-	AM_RANGE(0x00100000, 0x0017ffff) AM_READWRITE16(ram_r, ram_w, 0xffffffff)                                   // RAMSelX
-	AM_RANGE(0x00200000, 0x005fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)     // ROM1SelX
-	AM_RANGE(0x00600000, 0x009fffff) AM_UNMAP                                                                   // ROM2SelX
-	AM_RANGE(0x00a00000, 0x00dfffff) AM_UNMAP                                                                   // EEPROMSelX
-	AM_RANGE(0x00e00000, 0x00ffffff) AM_UNMAP                                                                   // Reserved
-ADDRESS_MAP_END
+void noki3310_state::noki3310_map(address_map &map)
+{
+	map.global_mask(0x00ffffff);
+	map(0x00000000, 0x0000ffff).mirror(0x80000).rw(this, FUNC(noki3310_state::ram_r), FUNC(noki3310_state::ram_w));                // boot ROM / RAM
+	map(0x00010000, 0x00010fff).mirror(0x8f000).rw(this, FUNC(noki3310_state::dsp_ram_r), FUNC(noki3310_state::dsp_ram_w));        // DSP shared memory
+	map(0x00020000, 0x000200ff).mirror(0x8ff00).rw(this, FUNC(noki3310_state::mad2_io_r), FUNC(noki3310_state::mad2_io_w));         // IO (Primary I/O range, configures peripherals)
+	map(0x00030000, 0x00030003).mirror(0x8fffc).rw(this, FUNC(noki3310_state::mad2_dspif_r), FUNC(noki3310_state::mad2_dspif_w));   // DSPIF (API control register)
+	map(0x00040000, 0x00040003).mirror(0x8fffc).rw(this, FUNC(noki3310_state::mad2_mcuif_r), FUNC(noki3310_state::mad2_mcuif_w));   // MCUIF (Secondary I/O range, configures memory ranges)
+	map(0x00100000, 0x0017ffff).rw(this, FUNC(noki3310_state::ram_r), FUNC(noki3310_state::ram_w));                                   // RAMSelX
+	map(0x00200000, 0x005fffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));     // ROM1SelX
+	map(0x00600000, 0x009fffff).unmaprw();                                                                   // ROM2SelX
+	map(0x00a00000, 0x00dfffff).unmaprw();                                                                   // EEPROMSelX
+	map(0x00e00000, 0x00ffffff).unmaprw();                                                                   // Reserved
+}
 
 
 INPUT_CHANGED_MEMBER( noki3310_state::key_irq )

@@ -88,20 +88,22 @@ WRITE8_MEMBER( plan80_state::plan80_09_w )
 }
 
 
-ADDRESS_MAP_START(plan80_state::plan80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
-	AM_RANGE(0x0800, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void plan80_state::plan80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).bankrw("boot");
+	map(0x0800, 0xefff).ram();
+	map(0xf000, 0xf7ff).ram().share("videoram");
+	map(0xf800, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(plan80_state::plan80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_READ(plan80_04_r)
-	AM_RANGE(0x09, 0x09) AM_WRITE(plan80_09_w)
-ADDRESS_MAP_END
+void plan80_state::plan80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x04, 0x04).r(this, FUNC(plan80_state::plan80_04_r));
+	map(0x09, 0x09).w(this, FUNC(plan80_state::plan80_09_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( plan80 ) // Keyboard was worked out by trial & error;'F' keys produce foreign symbols

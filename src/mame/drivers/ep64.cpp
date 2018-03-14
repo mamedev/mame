@@ -363,52 +363,57 @@ WRITE8_MEMBER( ep64_state::wr2_w )
 //  ADDRESS_MAP( ep64_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(ep64_state::ep64_mem)
-	AM_RANGE(0x0000, 0xffff) AM_DEVICE(DAVE_TAG, dave_device, z80_program_map)
-ADDRESS_MAP_END
+void ep64_state::ep64_mem(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_dave, FUNC(dave_device::z80_program_map));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( ep64_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(ep64_state::ep64_io)
-	AM_RANGE(0x0000, 0xffff) AM_DEVICE(DAVE_TAG, dave_device, z80_io_map)
-ADDRESS_MAP_END
+void ep64_state::ep64_io(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_dave, FUNC(dave_device::z80_io_map));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( dave_64k_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(ep64_state::dave_64k_mem)
-	AM_RANGE(0x000000, 0x007fff) AM_ROM AM_REGION(Z80_TAG, 0)
+void ep64_state::dave_64k_mem(address_map &map)
+{
+	map(0x000000, 0x007fff).rom().region(Z80_TAG, 0);
 	//AM_RANGE(0x010000, 0x01ffff)      // mapped by the cartslot
-	AM_RANGE(0x3f0000, 0x3fffff) AM_DEVICE(NICK_TAG, nick_device, vram_map)
-ADDRESS_MAP_END
+	map(0x3f0000, 0x3fffff).m(m_nick, FUNC(nick_device::vram_map));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( dave_128k_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(ep64_state::dave_128k_mem)
-	AM_IMPORT_FROM(dave_64k_mem)
-	AM_RANGE(0x3e0000, 0x3effff) AM_RAM
-ADDRESS_MAP_END
+void ep64_state::dave_128k_mem(address_map &map)
+{
+	dave_64k_mem(map);
+	map(0x3e0000, 0x3effff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( dave_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(ep64_state::dave_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x8f) AM_DEVICE(NICK_TAG, nick_device, vio_map)
-	AM_RANGE(0xb5, 0xb5) AM_READWRITE(rd0_r, wr0_w)
-	AM_RANGE(0xb6, 0xb6) AM_READ(rd1_r) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0xb7, 0xb7) AM_WRITE(wr2_w)
-ADDRESS_MAP_END
+void ep64_state::dave_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x8f).m(m_nick, FUNC(nick_device::vio_map));
+	map(0xb5, 0xb5).rw(this, FUNC(ep64_state::rd0_r), FUNC(ep64_state::wr0_w));
+	map(0xb6, 0xb6).r(this, FUNC(ep64_state::rd1_r)).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0xb7, 0xb7).w(this, FUNC(ep64_state::wr2_w));
+}
 
 
 

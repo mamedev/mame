@@ -20,25 +20,27 @@ palazzol@home.com
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(starcrus_state::starcrus_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x10ff) AM_RAM
-ADDRESS_MAP_END
+void starcrus_state::starcrus_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x10ff).ram();
+}
 
-ADDRESS_MAP_START(starcrus_state::starcrus_io_map)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(s1_x_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_WRITE(s1_y_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(coll_det_r, s2_x_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE(s2_y_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(p1_x_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(p1_y_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(p2_x_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(p2_y_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(ship_parm_1_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(ship_parm_2_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(proj_parm_1_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(proj_parm_2_w)
-ADDRESS_MAP_END
+void starcrus_state::starcrus_io_map(address_map &map)
+{
+	map(0x00, 0x00).portr("P1").w(this, FUNC(starcrus_state::s1_x_w));
+	map(0x01, 0x01).portr("P2").w(this, FUNC(starcrus_state::s1_y_w));
+	map(0x02, 0x02).rw(this, FUNC(starcrus_state::coll_det_r), FUNC(starcrus_state::s2_x_w));
+	map(0x03, 0x03).portr("DSW").w(this, FUNC(starcrus_state::s2_y_w));
+	map(0x04, 0x04).w(this, FUNC(starcrus_state::p1_x_w));
+	map(0x05, 0x05).w(this, FUNC(starcrus_state::p1_y_w));
+	map(0x06, 0x06).w(this, FUNC(starcrus_state::p2_x_w));
+	map(0x07, 0x07).w(this, FUNC(starcrus_state::p2_y_w));
+	map(0x08, 0x08).w(this, FUNC(starcrus_state::ship_parm_1_w));
+	map(0x09, 0x09).w(this, FUNC(starcrus_state::ship_parm_2_w));
+	map(0x0a, 0x0a).w(this, FUNC(starcrus_state::proj_parm_1_w));
+	map(0x0b, 0x0b).w(this, FUNC(starcrus_state::proj_parm_2_w));
+}
 
 
 static INPUT_PORTS_START( starcrus )

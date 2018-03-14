@@ -250,25 +250,26 @@ WRITE16_MEMBER(bestleag_state::oki_bank_w)
 
 /* Memory Map */
 
-ADDRESS_MAP_START(bestleag_state::bestleag_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0d2000, 0x0d3fff) AM_NOP // left over from the original game (only read / written in memory test)
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(txram_w) AM_SHARE("txram")
-	AM_RANGE(0x0f8000, 0x0f800b) AM_RAM AM_SHARE("vregs")
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
-	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")
-	AM_RANGE(0x300016, 0x300017) AM_READ_PORT("DSWA")
-	AM_RANGE(0x300018, 0x300019) AM_READ_PORT("DSWB")
-	AM_RANGE(0x30001c, 0x30001d) AM_WRITE(oki_bank_w)
-	AM_RANGE(0x30001e, 0x30001f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
-	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void bestleag_state::bestleag_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x0d2000, 0x0d3fff).noprw(); // left over from the original game (only read / written in memory test)
+	map(0x0e0000, 0x0e3fff).ram().w(this, FUNC(bestleag_state::bgram_w)).share("bgram");
+	map(0x0e8000, 0x0ebfff).ram().w(this, FUNC(bestleag_state::fgram_w)).share("fgram");
+	map(0x0f0000, 0x0f3fff).ram().w(this, FUNC(bestleag_state::txram_w)).share("txram");
+	map(0x0f8000, 0x0f800b).ram().share("vregs");
+	map(0x100000, 0x100fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x200000, 0x200fff).ram().share("spriteram");
+	map(0x300010, 0x300011).portr("SYSTEM");
+	map(0x300012, 0x300013).portr("P1");
+	map(0x300014, 0x300015).portr("P2");
+	map(0x300016, 0x300017).portr("DSWA");
+	map(0x300018, 0x300019).portr("DSWB");
+	map(0x30001c, 0x30001d).w(this, FUNC(bestleag_state::oki_bank_w));
+	map(0x30001f, 0x30001f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x304000, 0x304001).nopw();
+	map(0xfe0000, 0xffffff).ram();
+}
 
 #define BESTLEAG_PLAYER_INPUT( player ) \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) PORT_8WAY \

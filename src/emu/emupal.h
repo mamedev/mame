@@ -178,105 +178,105 @@
 	MCFG_PALETTE_ENTRIES(_entries)
 #define MCFG_PALETTE_ADD_INIT_BLACK(_tag, _entries) \
 	MCFG_PALETTE_ADD(_tag, _entries) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_all_black), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_all_black), downcast<palette_device *>(device)));
 
 #define MCFG_PALETTE_MODIFY MCFG_DEVICE_MODIFY
 
 
 #define MCFG_PALETTE_INIT_OWNER(_class, _method) \
-	palette_device::static_set_init(*device, palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, this));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, this));
 #define MCFG_PALETTE_INIT_DEVICE(_tag, _class, _method) \
-	palette_device::static_set_init(*device, palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, _tag));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, _tag));
 
 #define MCFG_PALETTE_FORMAT(_format) \
-	palette_device::static_set_format(*device, PALETTE_FORMAT_##_format);
+	downcast<palette_device &>(*device).set_format(PALETTE_FORMAT_##_format);
 
 #define MCFG_PALETTE_FORMAT_CLASS(_bytes_per_entry, _class, _method) \
-	palette_device::static_set_format(*device, raw_to_rgb_converter(_bytes_per_entry, &_class::PALETTE_DECODER_NAME(_method)));
+	downcast<palette_device &>(*device).set_format(raw_to_rgb_converter(_bytes_per_entry, &_class::PALETTE_DECODER_NAME(_method)));
 
 #define MCFG_PALETTE_MEMBITS(_width) \
-	palette_device::static_set_membits(*device, _width);
+	downcast<palette_device &>(*device).set_membits(_width);
 
 #define MCFG_PALETTE_ENDIANNESS(_endianness) \
-	palette_device::static_set_endianness(*device, _endianness);
+	downcast<palette_device &>(*device).set_endianness(_endianness);
 
 #define MCFG_PALETTE_ENTRIES(_entries) \
-	palette_device::static_set_entries(*device, _entries);
+	downcast<palette_device &>(*device).set_entries(_entries);
 
 #define MCFG_PALETTE_INDIRECT_ENTRIES(_entries) \
-	palette_device::static_set_indirect_entries(*device, _entries);
+	downcast<palette_device &>(*device).set_indirect_entries(_entries);
 
 #define MCFG_PALETTE_ENABLE_SHADOWS() \
-	palette_device::static_enable_shadows(*device);
+	downcast<palette_device &>(*device).enable_shadows();
 
 #define MCFG_PALETTE_ENABLE_HILIGHTS() \
-	palette_device::static_enable_hilights(*device);
+	downcast<palette_device &>(*device).enable_hilights();
 
 
 // monochrome palettes
 #define MCFG_PALETTE_ADD_MONOCHROME(_tag) \
 	MCFG_PALETTE_ADD(_tag, 2) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_monochrome), downcast<palette_device *>(device)));
 
 #define MCFG_PALETTE_ADD_MONOCHROME_INVERTED(_tag) \
 	MCFG_PALETTE_ADD(_tag, 2) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_inverted), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_monochrome_inverted), downcast<palette_device *>(device)));
 
 #define MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT(_tag) \
 	MCFG_PALETTE_ADD(_tag, 3) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_highlight), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_monochrome_highlight), downcast<palette_device *>(device)));
 
 // 8-bit palettes
 #define MCFG_PALETTE_ADD_3BIT_RGB(_tag) \
 	MCFG_PALETTE_ADD(_tag, 8) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_rgb), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_3bit_rgb), downcast<palette_device *>(device)));
 
 #define MCFG_PALETTE_ADD_3BIT_RBG(_tag) \
 	MCFG_PALETTE_ADD(_tag, 8) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_rbg), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_3bit_rbg), downcast<palette_device *>(device)));
 
 #define MCFG_PALETTE_ADD_3BIT_BRG(_tag) \
 	MCFG_PALETTE_ADD(_tag, 8) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_brg), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_3bit_brg), downcast<palette_device *>(device)));
 
 #define MCFG_PALETTE_ADD_3BIT_GRB(_tag) \
 	MCFG_PALETTE_ADD(_tag, 8) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_grb), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_3bit_grb), downcast<palette_device *>(device)));
 
 #define MCFG_PALETTE_ADD_3BIT_GBR(_tag) \
 	MCFG_PALETTE_ADD(_tag, 8) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_gbr), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_3bit_gbr), downcast<palette_device *>(device)));
 
 #define MCFG_PALETTE_ADD_3BIT_BGR(_tag) \
 	MCFG_PALETTE_ADD(_tag, 8) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_3bit_bgr), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_3bit_bgr), downcast<palette_device *>(device)));
 
 // 15-bit palettes
 #define MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB(_tag) \
 	MCFG_PALETTE_ADD(_tag, 32768) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB), downcast<palette_device *>(device)));
 
 // 16-bit palettes
 #define MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR(_tag) \
 	MCFG_PALETTE_ADD(_tag, 32768) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_BBBBBGGGGGRRRRR), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_BBBBBGGGGGRRRRR), downcast<palette_device *>(device)));
 
 #define MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB(_tag) \
 	MCFG_PALETTE_ADD(_tag, 65536) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRRGGGGGGBBBBB), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_RRRRRGGGGGGBBBBB), downcast<palette_device *>(device)));
 
 
 // other standard palettes
 #define MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS(_tag, _region, _entries) \
 	MCFG_PALETTE_ADD(_tag, _entries) \
-	palette_device::static_set_prom_region(*device, "^" _region); \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_prom_region("^" _region); \
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms), downcast<palette_device *>(device)));
 
 // not implemented yet
 #if 0
 #define MCFG_PALETTE_ADD_HARDCODED(_tag, _array) \
 	MCFG_PALETTE_ADD(_tag, sizeof(_array) / 3) \
-	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms), downcast<palette_device *>(device)));
 #endif
 
 
@@ -362,16 +362,16 @@ public:
 	// construction/destruction
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// static configuration
-	static void static_set_init(device_t &device, palette_init_delegate init);
-	static void static_set_format(device_t &device, raw_to_rgb_converter raw_to_rgb);
-	static void static_set_membits(device_t &device, int membits);
-	static void static_set_endianness(device_t &device, endianness_t endianness);
-	static void static_set_entries(device_t &device, u32 entries);
-	static void static_set_indirect_entries(device_t &device, u32 entries);
-	static void static_enable_shadows(device_t &device);
-	static void static_enable_hilights(device_t &device);
-	static void static_set_prom_region(device_t &device, const char *region);
+	// configuration
+	template <typename Object> void set_init(Object &&init) { m_init = std::forward<Object>(init); }
+	void set_format(raw_to_rgb_converter raw_to_rgb) { m_raw_to_rgb = raw_to_rgb; }
+	void set_membits(int membits) { m_membits = membits; m_membits_supplied = true; }
+	void set_endianness(endianness_t endianness) { m_endianness = endianness; m_endianness_supplied = true; }
+	void set_entries(u32 entries) { m_entries = entries; }
+	void set_indirect_entries(u32 entries) { m_indirect_entries = entries; }
+	void enable_shadows() { m_enable_shadows = true; }
+	void enable_hilights() { m_enable_hilights = true; }
+	void set_prom_region(const char *region) { m_prom_region.set_tag(region); }
 
 	// palette RAM accessors
 	memory_array &basemem() { return m_paletteram; }

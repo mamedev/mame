@@ -279,13 +279,15 @@ uint32_t bingoman_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-ADDRESS_MAP_START(bingoman_state::bingoman_prg_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-ADDRESS_MAP_END
+void bingoman_state::bingoman_prg_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+}
 
-ADDRESS_MAP_START(bingoman_state::bingoman_io_map)
+void bingoman_state::bingoman_io_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( bingoman )
 	/* dummy active high structure */

@@ -17,7 +17,7 @@
 #include "machine/zs01.h"
 
 #define MCFG_KONAMI573_CASSETTE_DSR_HANDLER(_devcb) \
-	devcb = &konami573_cassette_slot_device::set_dsr_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<konami573_cassette_slot_device &>(*device).set_dsr_handler(DEVCB_##_devcb);
 
 
 DECLARE_DEVICE_TYPE(KONAMI573_CASSETTE_SLOT, konami573_cassette_slot_device)
@@ -32,7 +32,7 @@ class konami573_cassette_slot_device : public device_t,
 public:
 	konami573_cassette_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_dsr_handler(device_t &device, Object &&cb) { return downcast<konami573_cassette_slot_device &>(device).m_dsr_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dsr_handler(Object &&cb) { return m_dsr_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_line_d0);
 	DECLARE_WRITE_LINE_MEMBER(write_line_d1);
@@ -143,28 +143,28 @@ DECLARE_DEVICE_TYPE(KONAMI573_CASSETTE_Y, konami573_cassette_y_device)
 
 
 #define MCFG_KONAMI573_CASSETTE_Y_D0_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d0_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d0_handler(DEVCB_##_devcb);
 
 #define MCFG_KONAMI573_CASSETTE_Y_D1_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d1_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d1_handler(DEVCB_##_devcb);
 
 #define MCFG_KONAMI573_CASSETTE_Y_D2_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d2_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d2_handler(DEVCB_##_devcb);
 
 #define MCFG_KONAMI573_CASSETTE_Y_D3_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d3_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d3_handler(DEVCB_##_devcb);
 
 #define MCFG_KONAMI573_CASSETTE_Y_D4_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d4_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d4_handler(DEVCB_##_devcb);
 
 #define MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d5_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d5_handler(DEVCB_##_devcb);
 
 #define MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d6_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d6_handler(DEVCB_##_devcb);
 
 #define MCFG_KONAMI573_CASSETTE_Y_D7_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d7_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<konami573_cassette_y_device &>(*device).set_d7_handler(DEVCB_##_devcb);
 
 class konami573_cassette_y_device: public device_t,
 	public konami573_cassette_interface
@@ -172,15 +172,15 @@ class konami573_cassette_y_device: public device_t,
 public:
 	konami573_cassette_y_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template<class _Object> static devcb_base &set_d0_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d0_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d1_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d1_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d2_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d2_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d3_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d3_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d4_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d4_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d5_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d5_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d6_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d6_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d7_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d7_handler.set_callback(object); }
+	// configuration helpers
+	template <class Object> devcb_base &set_d0_handler(Object &&cb) { return m_d0_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d1_handler(Object &&cb) { return m_d1_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d2_handler(Object &&cb) { return m_d2_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d3_handler(Object &&cb) { return m_d3_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d4_handler(Object &&cb) { return m_d4_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d5_handler(Object &&cb) { return m_d5_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d6_handler(Object &&cb) { return m_d6_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d7_handler(Object &&cb) { return m_d7_handler.set_callback(std::forward<Object>(cb)); }
 
 	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d0) override;

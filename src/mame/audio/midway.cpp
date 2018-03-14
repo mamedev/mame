@@ -354,22 +354,36 @@ void midway_ssio_device::update_volumes()
 //-------------------------------------------------
 
 // address map verified from schematics
-ADDRESS_MAP_START(midway_ssio_device::ssio_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x9000, 0x9003) AM_MIRROR(0x0ffc) AM_READ(data_r)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay0", ay8910_device, address_w)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x0ffc) AM_DEVREAD("ay0", ay8910_device, data_r)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay0", ay8910_device, data_w)
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x0ffc) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0xb002, 0xb002) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0xc000, 0xcfff) AM_READNOP AM_WRITE(status_w)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITENOP    // low bit controls yellow LED
-	AM_RANGE(0xe000, 0xefff) AM_READ(irq_clear)
-	AM_RANGE(0xf000, 0xffff) AM_READ_PORT("DIP")    // 6 DIP switches
-ADDRESS_MAP_END
+void midway_ssio_device::ssio_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x83ff).mirror(0x0c00).ram();
+	map(0x9000, 0x9003).mirror(0x0ffc).r(this, FUNC(midway_ssio_device::data_r));
+	map(0xa000, 0xa000).mirror(0x0ffc).w("ay0", FUNC(ay8910_device::address_w));
+	map(0xa001, 0xa001).mirror(0x0ffc).r("ay0", FUNC(ay8910_device::data_r));
+	map(0xa002, 0xa002).mirror(0x0ffc).w("ay0", FUNC(ay8910_device::data_w));
+	map(0xb000, 0xb000).mirror(0x0ffc).w("ay1", FUNC(ay8910_device::address_w));
+	map(0xb001, 0xb001).mirror(0x0ffc).r("ay1", FUNC(ay8910_device::data_r));
+	map(0xb002, 0xb002).mirror(0x0ffc).w("ay1", FUNC(ay8910_device::data_w));
+	map(0xc000, 0xcfff).nopr().w(this, FUNC(midway_ssio_device::status_w));
+	map(0xd000, 0xdfff).nopw();    // low bit controls yellow LED
+	map(0xe000, 0xefff).r(this, FUNC(midway_ssio_device::irq_clear));
+	map(0xf000, 0xffff).portr("DIP");    // 6 DIP switches
+}
+
+
+//-------------------------------------------------
+//  default ports map
+//-------------------------------------------------
+
+void midway_ssio_device::ssio_input_ports(address_map &map, const char *ssio) const
+{
+	map(0x00, 0x04).mirror(0x18).r(ssio, FUNC(midway_ssio_device::ioport_read));
+	map(0x07, 0x07).mirror(0x18).r(ssio, FUNC(midway_ssio_device::read));
+	map(0x00, 0x07).w(ssio, FUNC(midway_ssio_device::ioport_write));
+	map(0x1c, 0x1f).w(ssio, FUNC(midway_ssio_device::write));
+}
 
 
 //-------------------------------------------------
@@ -561,13 +575,14 @@ WRITE_LINE_MEMBER(midway_sounds_good_device::irq_w)
 //-------------------------------------------------
 
 // address map determined by PAL; not verified
-ADDRESS_MAP_START(midway_sounds_good_device::soundsgood_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x060000, 0x060007) AM_DEVREADWRITE8("pia", pia6821_device, read_alt, write_alt, 0xff00)
-	AM_RANGE(0x070000, 0x070fff) AM_RAM
-ADDRESS_MAP_END
+void midway_sounds_good_device::soundsgood_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x7ffff);
+	map(0x000000, 0x03ffff).rom();
+	map(0x060000, 0x060007).rw("pia", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt)).umask16(0xff00);
+	map(0x070000, 0x070fff).ram();
+}
 
 
 //-------------------------------------------------
@@ -716,12 +731,13 @@ WRITE_LINE_MEMBER(midway_turbo_cheap_squeak_device::irq_w)
 //-------------------------------------------------
 
 // address map verified from schematics
-ADDRESS_MAP_START(midway_turbo_cheap_squeak_device::turbocs_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void midway_turbo_cheap_squeak_device::turbocs_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).mirror(0x3800).ram();
+	map(0x4000, 0x4003).mirror(0x3ffc).rw("pia", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0x8000, 0xffff).rom();
+}
 
 
 //-------------------------------------------------
@@ -903,14 +919,15 @@ WRITE_LINE_MEMBER(midway_squawk_n_talk_device::irq_w)
 // address map verified from schematics
 // note that jumpers control the ROM sizes; if these are changed, use the alternate
 // address map below
-ADDRESS_MAP_START(midway_squawk_n_talk_device::squawkntalk_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_RAM     // internal RAM
-	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x1fff) AM_MIRROR(0x4000) AM_WRITE(dac_w)
-	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM
-ADDRESS_MAP_END
+void midway_squawk_n_talk_device::squawkntalk_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x007f).ram();     // internal RAM
+	map(0x0080, 0x0083).mirror(0x4f6c).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).mirror(0x4f6c).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x1fff).mirror(0x4000).w(this, FUNC(midway_squawk_n_talk_device::dac_w));
+	map(0x8000, 0xbfff).mirror(0x4000).rom();
+}
 
 // alternate address map if the ROM jumpers are changed to support a smaller
 // ROM size of 2k

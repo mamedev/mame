@@ -170,63 +170,66 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_bankswitch_w)
 	/* other bits unknown */
 }
 
-ADDRESS_MAP_START(lsasquad_state::lsasquad_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM /* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")    /* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")   /* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_SHARE("spriteram")   /* OBJECT RAM */
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
-	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
-	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSWC")
-	AM_RANGE(0xe803, 0xe803) AM_READ(lsasquad_mcu_status_r) /* COIN + 68705 status */
-	AM_RANGE(0xe804, 0xe804) AM_READ_PORT("P1")
-	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
-	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
-	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
-	AM_RANGE(0xec00, 0xec00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
-	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-ADDRESS_MAP_END
+void lsasquad_state::lsasquad_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram(); /* SRAM */
+	map(0xc000, 0xdfff).ram().share("videoram");    /* SCREEN RAM */
+	map(0xe000, 0xe3ff).ram().share("scrollram");   /* SCROLL RAM */
+	map(0xe400, 0xe5ff).ram().share("spriteram");   /* OBJECT RAM */
+	map(0xe800, 0xe800).portr("DSWA");
+	map(0xe801, 0xe801).portr("DSWB");
+	map(0xe802, 0xe802).portr("DSWC");
+	map(0xe803, 0xe803).r(this, FUNC(lsasquad_state::lsasquad_mcu_status_r)); /* COIN + 68705 status */
+	map(0xe804, 0xe804).portr("P1");
+	map(0xe805, 0xe805).portr("P2");
+	map(0xe806, 0xe806).portr("START");
+	map(0xe807, 0xe807).portr("SERVICE");
+	map(0xea00, 0xea00).w(this, FUNC(lsasquad_state::lsasquad_bankswitch_w));
+	map(0xec00, 0xec00).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0xec00, 0xec00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xec01, 0xec01).r(this, FUNC(lsasquad_state::lsasquad_sound_status_r));
+	map(0xee00, 0xee00).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+}
 
-ADDRESS_MAP_START(lsasquad_state::lsasquad_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(lsasquad_sh_nmi_disable_w)
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(lsasquad_sh_nmi_enable_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ(lsasquad_sound_status_r)
-	AM_RANGE(0xe000, 0xefff) AM_ROM     /* space for diagnostic ROM? */
-ADDRESS_MAP_END
+void lsasquad_state::lsasquad_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xc000, 0xc001).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xd000, 0xd000).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+	map(0xd400, 0xd400).w(this, FUNC(lsasquad_state::lsasquad_sh_nmi_disable_w));
+	map(0xd800, 0xd800).w(this, FUNC(lsasquad_state::lsasquad_sh_nmi_enable_w));
+	map(0xd800, 0xd800).r(this, FUNC(lsasquad_state::lsasquad_sound_status_r));
+	map(0xe000, 0xefff).rom();     /* space for diagnostic ROM? */
+}
 
 
 
-ADDRESS_MAP_START(lsasquad_state::storming_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM /* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")    /* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")   /* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_SHARE("spriteram")   /* OBJECT RAM */
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
-	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
-	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSWC")
-	AM_RANGE(0xe803, 0xe803) AM_READ_PORT("COINS")
-	AM_RANGE(0xe804, 0xe804) AM_READ_PORT("P1")
-	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
-	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
-	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
-	AM_RANGE(0xec00, 0xec00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
-ADDRESS_MAP_END
+void lsasquad_state::storming_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram(); /* SRAM */
+	map(0xc000, 0xdfff).ram().share("videoram");    /* SCREEN RAM */
+	map(0xe000, 0xe3ff).ram().share("scrollram");   /* SCROLL RAM */
+	map(0xe400, 0xe5ff).ram().share("spriteram");   /* OBJECT RAM */
+	map(0xe800, 0xe800).portr("DSWA");
+	map(0xe801, 0xe801).portr("DSWB");
+	map(0xe802, 0xe802).portr("DSWC");
+	map(0xe803, 0xe803).portr("COINS");
+	map(0xe804, 0xe804).portr("P1");
+	map(0xe805, 0xe805).portr("P2");
+	map(0xe806, 0xe806).portr("START");
+	map(0xe807, 0xe807).portr("SERVICE");
+	map(0xea00, 0xea00).w(this, FUNC(lsasquad_state::lsasquad_bankswitch_w));
+	map(0xec00, 0xec00).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0xec00, 0xec00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xec01, 0xec01).r(this, FUNC(lsasquad_state::lsasquad_sound_status_r));
+}
 
 
 static INPUT_PORTS_START( lsasquad )
@@ -371,36 +374,38 @@ INPUT_PORTS_END
 
 /* DAIKAIJU */
 
-ADDRESS_MAP_START(lsasquad_state::daikaiju_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM /* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")    /* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")   /* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("spriteram")   /* OBJECT RAM */
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
-	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
-	AM_RANGE(0xe803, 0xe803) AM_READ(daikaiju_mcu_status_r) /* COIN + 68705 status */
-	AM_RANGE(0xe804, 0xe804) AM_READ_PORT("P1")
-	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
-	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
-	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
-	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-ADDRESS_MAP_END
+void lsasquad_state::daikaiju_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram(); /* SRAM */
+	map(0xc000, 0xdfff).ram().share("videoram");    /* SCREEN RAM */
+	map(0xe000, 0xe3ff).ram().share("scrollram");   /* SCROLL RAM */
+	map(0xe400, 0xe7ff).ram().share("spriteram");   /* OBJECT RAM */
+	map(0xe800, 0xe800).portr("DSWA");
+	map(0xe801, 0xe801).portr("DSWB");
+	map(0xe803, 0xe803).r(this, FUNC(lsasquad_state::daikaiju_mcu_status_r)); /* COIN + 68705 status */
+	map(0xe804, 0xe804).portr("P1");
+	map(0xe805, 0xe805).portr("P2");
+	map(0xe806, 0xe806).portr("START");
+	map(0xe807, 0xe807).portr("SERVICE");
+	map(0xea00, 0xea00).w(this, FUNC(lsasquad_state::lsasquad_bankswitch_w));
+	map(0xec00, 0xec00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xee00, 0xee00).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+}
 
-ADDRESS_MAP_START(lsasquad_state::daikaiju_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(lsasquad_sh_nmi_disable_w)
-	AM_RANGE(0xd800, 0xd800) AM_READWRITE(daikaiju_sound_status_r, lsasquad_sh_nmi_enable_w)
-	AM_RANGE(0xdc00, 0xdc00) AM_WRITENOP
-	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostic ROM? */
-ADDRESS_MAP_END
+void lsasquad_state::daikaiju_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xc000, 0xc001).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xd400, 0xd400).w(this, FUNC(lsasquad_state::lsasquad_sh_nmi_disable_w));
+	map(0xd800, 0xd800).rw(this, FUNC(lsasquad_state::daikaiju_sound_status_r), FUNC(lsasquad_state::lsasquad_sh_nmi_enable_w));
+	map(0xdc00, 0xdc00).nopw();
+	map(0xe000, 0xefff).rom(); /* space for diagnostic ROM? */
+}
 
 static INPUT_PORTS_START( daikaiju )
 	PORT_START("DSWA")

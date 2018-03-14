@@ -20,15 +20,15 @@
 	MCFG_DEVICE_ADD(_tag, PC_FDC_AT, 0)
 
 #define MCFG_PC_FDC_INTRQ_CALLBACK(_write) \
-	devcb = &pc_fdc_family_device::set_intrq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<pc_fdc_family_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
 
 #define MCFG_PC_FDC_DRQ_CALLBACK(_write) \
-	devcb = &pc_fdc_family_device::set_drq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<pc_fdc_family_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 class pc_fdc_family_device : public pc_fdc_interface {
 public:
-	template <class Object> static devcb_base &set_intrq_wr_callback(device_t &device, Object &&cb) { return downcast<pc_fdc_family_device &>(device).intrq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<pc_fdc_family_device &>(device).drq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_intrq_wr_callback(Object &&cb) { return intrq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return drq_cb.set_callback(std::forward<Object>(cb)); }
 
 	virtual void map(address_map &map) override;
 

@@ -123,25 +123,28 @@ READ8_MEMBER( chesstrv_state::diplomat_keypad_r )
 }
 
 
-ADDRESS_MAP_START(chesstrv_state::chesstrv_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
-ADDRESS_MAP_END
+void chesstrv_state::chesstrv_mem(address_map &map)
+{
+	map.global_mask(0x7ff);
+	map(0x0000, 0x07ff).rom();
+}
 
 
-ADDRESS_MAP_START(chesstrv_state::chesstrv_io)
-	AM_RANGE( 0x00, 0x00 ) AM_READWRITE( ram_addr_r, ram_addr_w )
-	AM_RANGE( 0x01, 0x01 ) AM_WRITE( display_w )
-	AM_RANGE( 0x04, 0x04 ) AM_READWRITE( ram_r, ram_w )
-	AM_RANGE( 0x05, 0x05 ) AM_READWRITE( keypad_r, matrix_w )
-ADDRESS_MAP_END
+void chesstrv_state::chesstrv_io(address_map &map)
+{
+	map(0x00, 0x00).rw(this, FUNC(chesstrv_state::ram_addr_r), FUNC(chesstrv_state::ram_addr_w));
+	map(0x01, 0x01).w(this, FUNC(chesstrv_state::display_w));
+	map(0x04, 0x04).rw(this, FUNC(chesstrv_state::ram_r), FUNC(chesstrv_state::ram_w));
+	map(0x05, 0x05).rw(this, FUNC(chesstrv_state::keypad_r), FUNC(chesstrv_state::matrix_w));
+}
 
-ADDRESS_MAP_START(chesstrv_state::borisdpl_io)
-	AM_RANGE( 0x00, 0x00 ) AM_READWRITE( diplomat_keypad_r, matrix_w )
-	AM_RANGE( 0x01, 0x01 ) AM_WRITE( diplomat_display_w )
-	AM_RANGE( 0x04, 0x04 ) AM_READWRITE( ram_r, ram_w )
-	AM_RANGE( 0x05, 0x05 ) AM_READWRITE( ram_addr_r, ram_addr_w )
-ADDRESS_MAP_END
+void chesstrv_state::borisdpl_io(address_map &map)
+{
+	map(0x00, 0x00).rw(this, FUNC(chesstrv_state::diplomat_keypad_r), FUNC(chesstrv_state::matrix_w));
+	map(0x01, 0x01).w(this, FUNC(chesstrv_state::diplomat_display_w));
+	map(0x04, 0x04).rw(this, FUNC(chesstrv_state::ram_r), FUNC(chesstrv_state::ram_w));
+	map(0x05, 0x05).rw(this, FUNC(chesstrv_state::ram_addr_r), FUNC(chesstrv_state::ram_addr_w));
+}
 
 static INPUT_PORTS_START( chesstrv )
 	PORT_START("LINE1")

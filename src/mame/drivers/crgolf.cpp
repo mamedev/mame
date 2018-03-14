@@ -94,6 +94,7 @@ protected or a snippet should do the aforementioned string copy.
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "screen.h"
@@ -125,8 +126,6 @@ void crgolf_state::machine_start()
 
 	/* register for save states */
 	save_item(NAME(m_port_select));
-	save_item(NAME(m_main_to_sound_data));
-	save_item(NAME(m_sound_to_main_data));
 	save_item(NAME(m_sample_offset));
 	save_item(NAME(m_sample_count));
 	save_item(NAME(m_color_select));
@@ -139,8 +138,6 @@ void crgolf_state::machine_start()
 void crgolf_state::machine_reset()
 {
 	m_port_select = 0;
-	m_main_to_sound_data = 0;
-	m_sound_to_main_data = 0;
 	m_sample_offset = 0;
 	m_sample_count = 0;
 }
@@ -181,60 +178,6 @@ WRITE8_MEMBER(crgolf_state::switch_input_select_w)
 WRITE8_MEMBER(crgolf_state::unknown_w)
 {
 	logerror("%04X:unknown_w = %02X\n", m_audiocpu->pc(), data);
-}
-
-
-
-/*************************************
- *
- *  Main->Sound CPU communications
- *
- *************************************/
-
-TIMER_CALLBACK_MEMBER(crgolf_state::main_to_sound_callback)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	m_main_to_sound_data = param;
-}
-
-
-WRITE8_MEMBER(crgolf_state::main_to_sound_w)
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(crgolf_state::main_to_sound_callback),this), data);
-}
-
-
-READ8_MEMBER(crgolf_state::main_to_sound_r)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return m_main_to_sound_data;
-}
-
-
-
-/*************************************
- *
- *  Sound->Main CPU communications
- *
- *************************************/
-
-TIMER_CALLBACK_MEMBER(crgolf_state::sound_to_main_callback)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	m_sound_to_main_data = param;
-}
-
-
-WRITE8_MEMBER(crgolf_state::sound_to_main_w)
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(crgolf_state::sound_to_main_callback),this), data);
-}
-
-
-READ8_MEMBER(crgolf_state::sound_to_main_r)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return m_sound_to_main_data;
 }
 
 
@@ -333,20 +276,23 @@ WRITE_LINE_MEMBER(crgolf_state::screenb_enable_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(crgolf_state::main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x8007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(sound_to_main_r, main_to_sound_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0xa000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void crgolf_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).ram();
+	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x8000, 0x8007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x8800, 0x8800).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0x8800, 0x8800).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0x9000, 0x9000).w(this, FUNC(crgolf_state::rom_bank_select_w));
+	map(0xa000, 0xffff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(crgolf_state::vrambank_map)
-	AM_RANGE(0x0000, 0x5fff) AM_RAM AM_SHARE("vrama")
-	AM_RANGE(0x8000, 0xdfff) AM_RAM AM_SHARE("vramb")
-ADDRESS_MAP_END
+void crgolf_state::vrambank_map(address_map &map)
+{
+	map(0x0000, 0x5fff).ram().share("vrama");
+	map(0x8000, 0xdfff).ram().share("vramb");
+}
 
 
 /*************************************
@@ -355,15 +301,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(crgolf_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xc002, 0xc002) AM_WRITENOP
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(switch_input_r, switch_input_select_w)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(analog_input_r, unknown_w)
-	AM_RANGE(0xe003, 0xe003) AM_READWRITE(main_to_sound_r, sound_to_main_w)
-ADDRESS_MAP_END
+void crgolf_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xc000, 0xc001).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xc002, 0xc002).nopw();
+	map(0xe000, 0xe000).rw(this, FUNC(crgolf_state::switch_input_r), FUNC(crgolf_state::switch_input_select_w));
+	map(0xe001, 0xe001).rw(this, FUNC(crgolf_state::analog_input_r), FUNC(crgolf_state::unknown_w));
+	map(0xe003, 0xe003).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0xe003, 0xe003).w("soundlatch2", FUNC(generic_latch_8_device::write));
+}
 
 
 
@@ -371,30 +319,33 @@ ADDRESS_MAP_END
 
 
 
-ADDRESS_MAP_START(crgolf_state::mastrglf_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x6000, 0x8fff) AM_RAM // maybe RAM and ROM here?
-	AM_RANGE(0x9000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
+void crgolf_state::mastrglf_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).bankr("bank1");
+	map(0x6000, 0x8fff).ram(); // maybe RAM and ROM here?
+	map(0x9000, 0x9fff).ram();
+	map(0xa000, 0xffff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
 
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(crgolf_state::mastrglf_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+void crgolf_state::mastrglf_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x07).w("mainlatch", FUNC(ls259_device::write_d0));
 //  AM_RANGE(0x20, 0x20) AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE( main_to_sound_w )
-	AM_RANGE(0xa0, 0xa0) AM_READ( sound_to_main_r )
-ADDRESS_MAP_END
+	map(0x40, 0x40).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0xa0, 0xa0).r("soundlatch2", FUNC(generic_latch_8_device::read));
+}
 
 
 
-ADDRESS_MAP_START(crgolf_state::mastrglf_submap)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-ADDRESS_MAP_END
+void crgolf_state::mastrglf_submap(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+}
 
 
 READ8_MEMBER(crgolf_state::unk_sub_02_r)
@@ -417,17 +368,18 @@ WRITE8_MEMBER(crgolf_state::unk_sub_0c_w)
 }
 
 
-ADDRESS_MAP_START(crgolf_state::mastrglf_subio)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(main_to_sound_r) AM_WRITENOP
-	AM_RANGE(0x02, 0x02) AM_READ(unk_sub_02_r )
-	AM_RANGE(0x05, 0x05) AM_READ(unk_sub_05_r )
-	AM_RANGE(0x06, 0x06) AM_READNOP
-	AM_RANGE(0x07, 0x07) AM_READ(unk_sub_07_r )
-	AM_RANGE(0x08, 0x08) AM_WRITE(sound_to_main_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(unk_sub_0c_w)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void crgolf_state::mastrglf_subio(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch1", FUNC(generic_latch_8_device::read)).nopw();
+	map(0x02, 0x02).r(this, FUNC(crgolf_state::unk_sub_02_r));
+	map(0x05, 0x05).r(this, FUNC(crgolf_state::unk_sub_05_r));
+	map(0x06, 0x06).nopr();
+	map(0x07, 0x07).r(this, FUNC(crgolf_state::unk_sub_07_r));
+	map(0x08, 0x08).w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0x0c, 0x0c).w(this, FUNC(crgolf_state::unk_sub_0c_w));
+	map(0x10, 0x11).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 
 
@@ -532,6 +484,12 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(crgolf_state, screen_select_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(crgolf_state, screenb_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(crgolf_state, screena_enable_w))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)

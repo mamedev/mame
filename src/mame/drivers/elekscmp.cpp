@@ -34,30 +34,36 @@ public:
 	elekscmp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_x0(*this, "X0")
-		, m_x1(*this, "X1")
-		, m_x2(*this, "X2")
-		, m_x3(*this, "X3")
-		{ }
+		, m_x(*this, "X%u", 0U)
+		, m_digit(*this, "digit%u", 0U)
+	{ }
+
+	void elekscmp(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(hex_display_w);
 	uint8_t convert_key(uint8_t data);
 
-	void elekscmp(machine_config &config);
 	void mem_map(address_map &map);
+
 private:
 	required_device<cpu_device> m_maincpu;
-	required_ioport m_x0;
-	required_ioport m_x1;
-	required_ioport m_x2;
-	required_ioport m_x3;
+	required_ioport_array<4> m_x;
+	output_finder<8> m_digit;
 };
 
 
+void elekscmp_state::machine_start()
+{
+	m_digit.resolve();
+}
+
 WRITE8_MEMBER(elekscmp_state::hex_display_w)
 {
-	output().set_digit_value(offset, data);
+	m_digit[offset & 0x7] = data;
 }
 
 uint8_t elekscmp_state::convert_key(uint8_t data)
@@ -73,37 +79,34 @@ READ8_MEMBER(elekscmp_state::keyboard_r)
 {
 	uint8_t data;
 
-	data = m_x0->read();
-
+	data = m_x[0]->read();
 	if (data)
 		return 0x80 | convert_key(data);
 
-	data = m_x1->read();
-
+	data = m_x[1]->read();
 	if (data)
 		return 0x88 | convert_key(data);
 
-	data = m_x2->read();
-
+	data = m_x[2]->read();
 	if (data)
 		return 0x80 | (convert_key(data) << 4);
 
-	data = m_x3->read();
-
+	data = m_x[3]->read();
 	if (data)
 		m_maincpu->reset();
 
 	return 0;
 }
 
-ADDRESS_MAP_START(elekscmp_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
-	AM_RANGE(0x000, 0x5ff) AM_ROM // ROM
-	AM_RANGE(0x700, 0x707) AM_WRITE(hex_display_w)
-	AM_RANGE(0x708, 0x70f) AM_READ(keyboard_r)
-	AM_RANGE(0x800, 0xfff) AM_RAM // RAM - up to 2K of RAM
-ADDRESS_MAP_END
+void elekscmp_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x0fff);
+	map(0x000, 0x5ff).rom(); // ROM
+	map(0x700, 0x707).w(this, FUNC(elekscmp_state::hex_display_w));
+	map(0x708, 0x70f).r(this, FUNC(elekscmp_state::keyboard_r));
+	map(0x800, 0xfff).ram(); // RAM - up to 2K of RAM
+}
 
 /* Input ports */
 static INPUT_PORTS_START( elekscmp )

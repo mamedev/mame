@@ -161,26 +161,27 @@ WRITE8_MEMBER(chaknpop_state::coinlock_w)
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(chaknpop_state::chaknpop_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0x8801, 0x8801) AM_READ(mcu_status_r)
-	AM_RANGE(0x8802, 0x8802) AM_WRITE(unknown_port_3_w)
-	AM_RANGE(0x8804, 0x8805) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w)
-	AM_RANGE(0x8806, 0x8807) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_data_w)
-	AM_RANGE(0x8808, 0x8808) AM_READ_PORT("DSWC")
-	AM_RANGE(0x8809, 0x8809) AM_READ_PORT("P1")
-	AM_RANGE(0x880a, 0x880a) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x880b, 0x880b) AM_READ_PORT("P2")
-	AM_RANGE(0x880c, 0x880c) AM_READWRITE(gfxmode_r, gfxmode_w)
-	AM_RANGE(0x880d, 0x880d) AM_WRITE(coinlock_w)                              // coin lock out
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(txram_w) AM_SHARE("tx_ram")          // TX tilemap
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(attrram_w) AM_SHARE("attr_ram")      // Color attribute
-	AM_RANGE(0x9840, 0x98ff) AM_RAM AM_SHARE("spr_ram") // sprite
-	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank1")                               // bitmap plane 1-4
-ADDRESS_MAP_END
+void chaknpop_state::chaknpop_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8800).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+	map(0x8801, 0x8801).r(this, FUNC(chaknpop_state::mcu_status_r));
+	map(0x8802, 0x8802).w(this, FUNC(chaknpop_state::unknown_port_3_w));
+	map(0x8804, 0x8805).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x8806, 0x8807).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x8808, 0x8808).portr("DSWC");
+	map(0x8809, 0x8809).portr("P1");
+	map(0x880a, 0x880a).portr("SYSTEM");
+	map(0x880b, 0x880b).portr("P2");
+	map(0x880c, 0x880c).rw(this, FUNC(chaknpop_state::gfxmode_r), FUNC(chaknpop_state::gfxmode_w));
+	map(0x880d, 0x880d).w(this, FUNC(chaknpop_state::coinlock_w));                              // coin lock out
+	map(0x9000, 0x93ff).ram().w(this, FUNC(chaknpop_state::txram_w)).share("tx_ram");          // TX tilemap
+	map(0x9800, 0x983f).ram().w(this, FUNC(chaknpop_state::attrram_w)).share("attr_ram");      // Color attribute
+	map(0x9840, 0x98ff).ram().share("spr_ram"); // sprite
+	map(0xa000, 0xbfff).rom();
+	map(0xc000, 0xffff).bankrw("bank1");                               // bitmap plane 1-4
+}
 
 /***************************************************************************
 

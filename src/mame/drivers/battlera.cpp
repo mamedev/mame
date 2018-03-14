@@ -94,7 +94,6 @@ Notes:
 
 #include "emu.h"
 #include "includes/battlera.h"
-#include "cpu/h6280/h6280.h"
 #include "sound/2203intf.h"
 #include "sound/c6280.h"
 #include "speaker.h"
@@ -141,23 +140,25 @@ READ8_MEMBER(battlera_state::control_data_r)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(battlera_state::battlera_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x1e0800, 0x1e0801) AM_WRITE(sound_w)
-	AM_RANGE(0x1e1000, 0x1e13ff) AM_DEVREADWRITE( "huc6260", huc6260_device, palette_direct_read, palette_direct_write) AM_SHARE("paletteram")
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8") /* Main ram */
-	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(control_data_r, control_data_w)
+void battlera_state::battlera_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x1e0800, 0x1e0801).w(this, FUNC(battlera_state::sound_w));
+	map(0x1e1000, 0x1e13ff).rw(m_huc6260, FUNC(huc6260_device::palette_direct_read), FUNC(huc6260_device::palette_direct_write)).share("paletteram");
+	map(0x1f0000, 0x1f1fff).bankrw("bank8"); /* Main ram */
+	map(0x1ff000, 0x1ff001).rw(this, FUNC(battlera_state::control_data_r), FUNC(battlera_state::control_data_w));
 
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_DEVREADWRITE( "huc6260", huc6260_device, read, write )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_DEVREADWRITE( "maincpu", h6280_device, timer_r, timer_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE( "maincpu", h6280_device, irq_status_r, irq_status_w )
+	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
+	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
+	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(battlera_state::battlera_portmap)
-	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
-ADDRESS_MAP_END
+void battlera_state::battlera_portmap(address_map &map)
+{
+	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+}
 
 /******************************************************************************/
 
@@ -182,15 +183,16 @@ WRITE8_MEMBER(battlera_state::adpcm_reset_w)
 	m_msm->reset_w(0);
 }
 
-ADDRESS_MAP_START(battlera_state::sound_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040001) AM_DEVWRITE("ymsnd", ym2203_device, write)
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(adpcm_data_w)
-	AM_RANGE(0x1fe800, 0x1fe80f) AM_DEVWRITE("c6280", c6280_device, c6280_w)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank7") /* Main ram */
-	AM_RANGE(0x1ff000, 0x1ff001) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_reset_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void battlera_state::sound_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x040000, 0x040001).w("ymsnd", FUNC(ym2203_device::write));
+	map(0x080000, 0x080001).w(this, FUNC(battlera_state::adpcm_data_w));
+	map(0x1fe800, 0x1fe80f).w("c6280", FUNC(c6280_device::c6280_w));
+	map(0x1f0000, 0x1f1fff).bankrw("bank7"); /* Main ram */
+	map(0x1ff000, 0x1ff001).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(battlera_state::adpcm_reset_w));
+	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+}
 
 /******************************************************************************/
 

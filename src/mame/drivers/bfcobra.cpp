@@ -233,6 +233,47 @@ public:
 	{
 	}
 
+	DECLARE_DRIVER_INIT(bfcobra);
+	void bfcobra(machine_config &config);
+
+protected:
+	DECLARE_READ8_MEMBER(chipset_r);
+	DECLARE_WRITE8_MEMBER(chipset_w);
+	DECLARE_WRITE8_MEMBER(rombank_w);
+	DECLARE_READ8_MEMBER(fdctrl_r);
+	DECLARE_READ8_MEMBER(fddata_r);
+	DECLARE_WRITE8_MEMBER(fdctrl_w);
+	DECLARE_READ8_MEMBER(int_latch_r);
+	DECLARE_READ8_MEMBER(meter_r);
+	DECLARE_WRITE8_MEMBER(meter_w);
+	DECLARE_READ8_MEMBER(latch_r);
+	DECLARE_WRITE8_MEMBER(latch_w);
+	DECLARE_READ8_MEMBER(upd_r);
+	DECLARE_WRITE8_MEMBER(upd_w);
+	DECLARE_WRITE_LINE_MEMBER(z80_acia_irq);
+	DECLARE_WRITE_LINE_MEMBER(m6809_data_irq);
+	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
+	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	uint32_t screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(timer_irq);
+	INTERRUPT_GEN_MEMBER(vblank_gen);
+	void RunBlit(address_space &space);
+	void update_irqs();
+	void reset_fdc();
+	void exec_w_phase(uint8_t data);
+	void init_ram();
+	void command_phase(struct fdc_t &fdc, uint8_t data);
+	inline uint8_t* blitter_get_addr(uint32_t addr);
+	inline void z80_bank(int num, int data);
+
+	void m6809_prog_map(address_map &map);
+	void ramdac_map(address_map &map);
+	void z80_io_map(address_map &map);
+	void z80_prog_map(address_map &map);
+
+private:
 	uint8_t m_bank_data[4];
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_video_ram;
@@ -259,37 +300,6 @@ public:
 	uint8_t m_col6bit[256];
 	struct bf_blitter_t m_blitter;
 	struct fdc_t m_fdc;
-	DECLARE_READ8_MEMBER(chipset_r);
-	DECLARE_WRITE8_MEMBER(chipset_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_READ8_MEMBER(fdctrl_r);
-	DECLARE_READ8_MEMBER(fddata_r);
-	DECLARE_WRITE8_MEMBER(fdctrl_w);
-	DECLARE_READ8_MEMBER(int_latch_r);
-	DECLARE_READ8_MEMBER(meter_r);
-	DECLARE_WRITE8_MEMBER(meter_w);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_READ8_MEMBER(upd_r);
-	DECLARE_WRITE8_MEMBER(upd_w);
-	DECLARE_WRITE_LINE_MEMBER(z80_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(m6809_data_irq);
-	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_DRIVER_INIT(bfcobra);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(timer_irq);
-	INTERRUPT_GEN_MEMBER(vblank_gen);
-	void RunBlit(address_space &space);
-	void update_irqs();
-	void reset_fdc();
-	void exec_w_phase(uint8_t data);
-	void init_ram();
-	void command_phase(struct fdc_t &fdc, uint8_t data);
-	inline uint8_t* blitter_get_addr(uint32_t addr);
-	inline void z80_bank(int num, int data);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<acia6850_device> m_acia6850_0;
@@ -298,11 +308,6 @@ public:
 	required_device<upd7759_device> m_upd7759;
 	required_device<palette_device> m_palette;
 	required_device<meters_device> m_meters;
-	void bfcobra(machine_config &config);
-	void m6809_prog_map(address_map &map);
-	void ramdac_map(address_map &map);
-	void z80_io_map(address_map &map);
-	void z80_prog_map(address_map &map);
 };
 
 
@@ -1257,31 +1262,34 @@ void bfcobra_state::machine_reset()
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(bfcobra_state::z80_prog_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank4")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank2")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank3")
-ADDRESS_MAP_END
+void bfcobra_state::z80_prog_map(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank4");
+	map(0x4000, 0x7fff).bankrw("bank1");
+	map(0x8000, 0xbfff).bankrw("bank2");
+	map(0xc000, 0xffff).bankrw("bank3");
+}
 
-ADDRESS_MAP_START(bfcobra_state::z80_io_map)
-ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x23) AM_READWRITE(chipset_r, chipset_w)
-	AM_RANGE(0x24, 0x25) AM_DEVWRITE("acia6850_0", acia6850_device, write)
-	AM_RANGE(0x26, 0x27) AM_DEVREAD("acia6850_0", acia6850_device, read)
-	AM_RANGE(0x30, 0x30) AM_READ(fdctrl_r)
-	AM_RANGE(0x31, 0x31) AM_READWRITE(fddata_r, fdctrl_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(rombank_w)
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE("ramdac", ramdac_device, index_w)
-	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("ramdac", ramdac_device, pal_r, pal_w)
-	AM_RANGE(0x52, 0x52) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
-	AM_RANGE(0x53, 0x53) AM_DEVWRITE("ramdac", ramdac_device, index_r_w)
-ADDRESS_MAP_END
+void bfcobra_state::z80_io_map(address_map &map)
+{
+map.global_mask(0xff);
+	map(0x00, 0x23).rw(this, FUNC(bfcobra_state::chipset_r), FUNC(bfcobra_state::chipset_w));
+	map(0x24, 0x25).w(m_acia6850_0, FUNC(acia6850_device::write));
+	map(0x26, 0x27).r(m_acia6850_0, FUNC(acia6850_device::read));
+	map(0x30, 0x30).r(this, FUNC(bfcobra_state::fdctrl_r));
+	map(0x31, 0x31).rw(this, FUNC(bfcobra_state::fddata_r), FUNC(bfcobra_state::fdctrl_w));
+	map(0x40, 0x40).w(this, FUNC(bfcobra_state::rombank_w));
+	map(0x50, 0x50).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x51, 0x51).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
+	map(0x52, 0x52).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x53, 0x53).w("ramdac", FUNC(ramdac_device::index_r_w));
+}
 
 
-ADDRESS_MAP_START(bfcobra_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
-ADDRESS_MAP_END
+void bfcobra_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 
 /***************************************************************************
@@ -1393,25 +1401,26 @@ WRITE8_MEMBER(bfcobra_state::upd_w)
 	m_upd7759->start_w(data & 0x40 ? 0 : 1);
 }
 
-ADDRESS_MAP_START(bfcobra_state::m6809_prog_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2000, 0x2000) AM_RAM     // W 'B', 6F
-	AM_RANGE(0x2200, 0x2200) AM_RAM     // W 'F'
-	AM_RANGE(0x2600, 0x2600) AM_READWRITE(meter_r, meter_w)
-	AM_RANGE(0x2800, 0x2800) AM_RAM     // W
-	AM_RANGE(0x2A00, 0x2A02) AM_READWRITE(latch_r, latch_w)
-	AM_RANGE(0x2E00, 0x2E00) AM_READ(int_latch_r)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x3201, 0x3201) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x3404, 0x3405) AM_DEVREADWRITE("acia6850_1", acia6850_device, read, write)
-	AM_RANGE(0x3406, 0x3407) AM_DEVREADWRITE("acia6850_2", acia6850_device, read, write)
+void bfcobra_state::m6809_prog_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("nvram");
+	map(0x2000, 0x2000).ram();     // W 'B', 6F
+	map(0x2200, 0x2200).ram();     // W 'F'
+	map(0x2600, 0x2600).rw(this, FUNC(bfcobra_state::meter_r), FUNC(bfcobra_state::meter_w));
+	map(0x2800, 0x2800).ram();     // W
+	map(0x2A00, 0x2A02).rw(this, FUNC(bfcobra_state::latch_r), FUNC(bfcobra_state::latch_w));
+	map(0x2E00, 0x2E00).r(this, FUNC(bfcobra_state::int_latch_r));
+	map(0x3001, 0x3001).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x3201, 0x3201).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x3404, 0x3405).rw(m_acia6850_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x3406, 0x3407).rw(m_acia6850_2, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 //  AM_RANGE(0x3408, 0x3408) AM_NOP
 //  AM_RANGE(0x340A, 0x340A) AM_NOP
 //  AM_RANGE(0x3600, 0x3600) AM_NOP
-	AM_RANGE(0x3801, 0x3801) AM_READWRITE(upd_r, upd_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP    /* Watchdog */
-ADDRESS_MAP_END
+	map(0x3801, 0x3801).rw(this, FUNC(bfcobra_state::upd_r), FUNC(bfcobra_state::upd_w));
+	map(0x8000, 0xffff).rom();
+	map(0xf000, 0xf000).nopw();    /* Watchdog */
+}
 
 static INPUT_PORTS_START( bfcobra )
 	PORT_START("STROBE0")

@@ -237,11 +237,12 @@ WRITE8_MEMBER(gmaster_state::gmaster_portf_w)
 }
 
 
-ADDRESS_MAP_START(gmaster_state::gmaster_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(gmaster_io_r, gmaster_io_w)
+void gmaster_state::gmaster_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).rw(this, FUNC(gmaster_state::gmaster_io_r), FUNC(gmaster_state::gmaster_io_w));
 	//AM_RANGE(0x8000, 0xfeff)      // mapped by the cartslot
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( gmaster )

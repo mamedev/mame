@@ -27,7 +27,7 @@
 
     Known u'nSP-Based Systems:
 
-	 	 D - SPG240 - Radica Skateboarder (Sunplus QL8041C die)
+         D - SPG240 - Radica Skateboarder (Sunplus QL8041C die)
         ND - SPG243 - Some form of Leapfrog "edutainment" system
         ND - SPG243 - Star Wars: Clone Wars
         ND - SPG243 - Toy Story
@@ -53,6 +53,12 @@ Similar Systems: ( from http://en.wkikpedia.org/wiki/V.Smile )
 - Leapster
 - V.Smile Baby Infant Development System
 - V.Flash
+
+also on this hardware
+
+	name						PCB ID		ROM width	TSOP pads	ROM size		SEEPROM			die markings
+	Radica Play TV Football 2	L7278		x16			48			not dumped		no              Sunplus
+	Dream Life                  ?           x16         48          no tdumped      no              Sunplus
 
 Detailed list of bugs:
 - When loading a cart from file manager, sometimes it will crash
@@ -1004,17 +1010,18 @@ WRITE16_MEMBER( spg2xx_game_state::spriteram_w )
 }
 */
 
-ADDRESS_MAP_START(spg2xx_game_state::vii_mem)
-	AM_RANGE( 0x000000, 0x3fffff ) AM_ROMBANK("cart")
+void spg2xx_game_state::vii_mem(address_map &map)
+{
+	map(0x000000, 0x3fffff).bankr("cart");
 
-	AM_RANGE( 0x000000, 0x0027ff ) AM_RAM AM_SHARE("p_ram")
-	AM_RANGE( 0x002800, 0x0028ff ) AM_READWRITE(video_r, video_w)
-	AM_RANGE( 0x002900, 0x002aff ) AM_RAM AM_SHARE("p_rowscroll")
-	AM_RANGE( 0x002b00, 0x002bff ) AM_RAM AM_SHARE("p_palette")
-	AM_RANGE( 0x002c00, 0x002fff ) AM_RAM AM_SHARE("p_spriteram")
-	AM_RANGE( 0x003000, 0x0037ff ) AM_READWRITE(audio_r, audio_w)
-	AM_RANGE( 0x003d00, 0x003eff ) AM_READWRITE(io_r,    io_w)
-ADDRESS_MAP_END
+	map(0x000000, 0x0027ff).ram().share("p_ram");
+	map(0x002800, 0x0028ff).rw(this, FUNC(spg2xx_game_state::video_r), FUNC(spg2xx_game_state::video_w));
+	map(0x002900, 0x002aff).ram().share("p_rowscroll");
+	map(0x002b00, 0x002bff).ram().share("p_palette");
+	map(0x002c00, 0x002fff).ram().share("p_spriteram");
+	map(0x003000, 0x0037ff).rw(this, FUNC(spg2xx_game_state::audio_r), FUNC(spg2xx_game_state::audio_w));
+	map(0x003d00, 0x003eff).rw(this, FUNC(spg2xx_game_state::io_r), FUNC(spg2xx_game_state::io_w));
+}
 
 static INPUT_PORTS_START( vii )
 	PORT_START("P1")
@@ -1105,14 +1112,14 @@ static INPUT_PORTS_START( rad_skat )
 
 
 	PORT_START("P3") // PAL/NTSC flag
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_SPECIAL ) 
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_SPECIAL )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rad_skatp )
 	PORT_INCLUDE(rad_skat)
-	
+
 	PORT_MODIFY("P3") // PAL/NTSC flag
-	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) 
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_SPECIAL )
 INPUT_PORTS_END
 
 
@@ -1365,64 +1372,64 @@ DRIVER_INIT_MEMBER(spg2xx_game_state, wirels60)
 }
 
 ROM_START( vii )
-	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "vii.bin", 0x0000, 0x2000000, CRC(04627639) SHA1(f883a92d31b53c9a5b0cdb112d07cd793c95fc43))
 ROM_END
 
 ROM_START( batmantv )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "batman.bin", 0x000000, 0x400000, CRC(46f848e5) SHA1(5875d57bb3fe0cac5d20e626e4f82a0e5f9bb94c) )
 ROM_END
 
 ROM_START( vsmile )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "vsmilebios.bin", 0x000000, 0x200000, CRC(11f1b416) SHA1(11f77c4973d29c962567390e41879c86a759c93b) )
 ROM_END
 
 ROM_START( vsmileg )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "bios german.bin", 0x000000, 0x200000, CRC(205c5296) SHA1(7fbcf761b5885c8b1524607aabaf364b4559c8cc) )
 ROM_END
 
 ROM_START( vsmilef )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "sysrom_france", 0x000000, 0x200000, CRC(0cd0bdf5) SHA1(5c8d1eada1b6b545555b8d2b09325d7127681af8) )
 ROM_END
 
 ROM_START( vsmileb )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "vbabybios.bin", 0x000000, 0x800000, CRC(ddc7f845) SHA1(2c17d0f54200070176d03d44a40c7923636e596a) )
 ROM_END
 
 ROM_START( walle )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, BAD_DUMP CRC(bd554cba) SHA1(6cd06a036ab12e7b0e1fd8003db873b0bb783868) )
 	// Alternate dump, we need to decide which one is correct.
 	//ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, CRC(6bc90b16) SHA1(184d72de059057aae7800da510fcf05ed1da9ec9))
 ROM_END
 
 ROM_START( zone40 )
-	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "zone40.bin", 0x0000, 0x4000000, CRC(4ba1444f) SHA1(de83046ab93421486668a247972ad6d3cda19440) )
 ROM_END
 
 ROM_START( zone60 )
-	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "zone60.bin", 0x0000, 0x4000000, CRC(4cb637d1) SHA1(1f97cbdb4299ac0fbafc2a3aa592066cb0727066))
 ROM_END
 
 ROM_START( wirels60 )
-	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "wirels60.bin", 0x0000, 0x4000000, CRC(b4df8b28) SHA1(00e3da542e4bc14baf4724ad436f66d4c0f65c84))
 ROM_END
 
 ROM_START( rad_skat )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "skateboarder.bin", 0x000000, 0x400000, CRC(08b9ab91) SHA1(6665edc4740804956136c68065890925a144626b) )
 ROM_END
 
 ROM_START( rad_skatp ) // rom was dumped from the NTSC version, but region comes from an io port, so ROM is probably the same
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "skateboarder.bin", 0x000000, 0x400000, CRC(08b9ab91) SHA1(6665edc4740804956136c68065890925a144626b) )
 ROM_END
 
@@ -1450,14 +1457,95 @@ http://www.lcis.com.tw/paper_store/paper_store/GPL162004A-507A_162005A-707AV10_c
 */
 
 ROM_START( wlsair60 )
-	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
+ROM_END
+
+/*
+Wireless
+(info provided with dump)
+
+System: Wireless Hunting Video Game System
+Publisher: Hamy / Kids Station Toys Inc
+Year: 2011
+ROM: FDI MSP55LV100G
+RAM: Micron Technology 48LC8M16A2
+
+Games:
+
+Secret Mission
+Predator
+Delta Force
+Toy Land
+Dream Forest
+Trophy Season
+Freedom Force
+Be Careful
+Net Power
+Open Training
+Super Archer
+Ultimate Frisbee
+UFO Shooting
+Happy Darts
+Balloon Shoot
+Avatair
+Angry Pirate
+Penguin War
+Ghost Shooter
+Duck Hunt
+
+
+ROM Board:
+
+Package: SO44
+Spacing: 1.27 mm
+Width: 16.14 mm
+Length: 27.78 mm
+Voltage: 3V
+Pinout:
+
+          A25  A24
+            |  |
+      +--------------------------+
+A21 --|==   #  # `.__.'        ==|-- A20
+A18 --|==                      ==|-- A19
+A17 --|==                      ==|-- A8
+ A7 --|==                      ==|-- A9
+ A6 --|==                  o   ==|-- A10
+ A5 --|==  +----------------+  ==|-- A11
+ A4 --|==  |                |  ==|-- A12
+ A3 --|==  |  MSP55LV100G   |  ==|-- A13
+ A2 --|==  |  0834 M02H     |  ==|-- A14
+ A1 --|==  |  JAPAN         |  ==|-- A15
+ A0 --|==  |                |  ==|-- A16
+#CE --|==  |                |  ==|-- A23
+GND --|==  |                |  ==|-- A22
+#OE --|==  |                |  ==|-- Q15
+ Q0 --|==  |                |  ==|-- Q7
+ Q8 --|==  |                |  ==|-- Q14
+ Q1 --|==  +----------------+  ==|-- Q6
+ Q9 --|==                      ==|-- Q13
+ Q2 --|==       M55L100G       ==|-- Q5
+Q10 --|==                      ==|-- Q12
+ Q3 --|==                      ==|-- Q4
+Q11 --|==                      ==|-- VCC
+      +--------------------------+
+
+
+The only interesting string in this ROM is SPF2ALP,
+which is also found in the Wireless Air 60 ROM.
+
+*/
+
+ROM_START( wireless )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796) )
 ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     STATE              INIT      COMPANY                                              FULLNAME             FLAGS
 
 // VTech systems
-CONS( 2005, vsmile,   0,        0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (US)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmile,   0,        0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (US)",      MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 CONS( 2005, vsmileg,  vsmile,   0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (Germany)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 CONS( 2005, vsmilef,  vsmile,   0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (France)",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 CONS( 2005, vsmileb,  0,        0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
@@ -1477,7 +1565,7 @@ CONS( 2006, rad_skat,  0,       0,        spg2xx_base, rad_skat, spg2xx_game_sta
 CONS( 2006, rad_skatp, rad_skat,0,        spg2xx_basep,rad_skatp,spg2xx_game_state, rad_skat, "Radica",                                            "Connectv Skateboarder (PAL)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
-CONS( 200?, zone40,    0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft",                                      "Zone 40", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2009, zone40,    0,       0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // might not fit here, NAND dump, has internal bootstrap at least, see above.
-CONS( 200?, wlsair60,  0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft",                                      "Wireless Air 60", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-
+CONS( 2010, wlsair60,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft / Kids Station Toys Inc",               "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, wireless,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Hamy / Kids Station Toys Inc",                      "Wireless",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

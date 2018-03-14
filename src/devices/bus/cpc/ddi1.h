@@ -49,7 +49,6 @@ private:
 };
 
 // device type definition
-extern const device_type CPC_DDI1;
 DECLARE_DEVICE_TYPE(CPC_DDI1, cpc_ddi1_device)
 
 #endif // MAME_BUS_CPC_DDI1_H

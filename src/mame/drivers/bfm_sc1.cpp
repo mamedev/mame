@@ -121,46 +121,28 @@ Optional (on expansion card) (Viper)
 class bfm_sc1_state : public driver_device
 {
 public:
-	bfm_sc1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bfm_sc1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_reel0(*this, "reel0"),
-		m_reel1(*this, "reel1"),
-		m_reel2(*this, "reel2"),
-		m_reel3(*this, "reel3"),
-		m_reel4(*this, "reel4"),
-		m_reel5(*this, "reel5"),
+		m_reels(*this, "reel%u", 0U),
 		m_upd7759(*this, "upd"),
 		m_vfd0(*this, "vfd0"),
-		m_meters(*this, "meters") { }
+		m_meters(*this, "meters")
+	{ }
 
-	int m_mmtr_latch;
-	int m_triac_latch;
-	int m_vfd_latch;  //initialized but not used
-	int m_irq_status;
-	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
-	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
-	int m_acia_status;
-	int m_locked;
-	int m_is_timer_enabled;
-	int m_coin_inhibits; //initialized but not used
-	int m_mux1_outputlatch;
-	int m_mux1_datalo;
-	int m_mux1_datahi;
-	int m_mux1_input;
-	int m_mux2_outputlatch;
-	int m_mux2_datalo;
-	int m_mux2_datahi;
-	int m_mux2_input;
-	uint8_t m_sc1_Inputs[64];
-	uint8_t m_codec_data[256];
+	DECLARE_DRIVER_INIT(toppoker);
+	DECLARE_DRIVER_INIT(lotse_bank0);
+	DECLARE_DRIVER_INIT(nocrypt_bank0);
+	DECLARE_DRIVER_INIT(lotse);
+	DECLARE_DRIVER_INIT(clatt);
+	DECLARE_DRIVER_INIT(rou029);
+	DECLARE_DRIVER_INIT(nocrypt);
+	void scorpion1_adder2(machine_config &config);
+	void scorpion1(machine_config &config);
+	void scorpion1_viper(machine_config &config);
 
-	int m_defaultbank;
+protected:
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(irqlatch_r);
 	DECLARE_WRITE8_MEMBER(reel12_w);
@@ -193,41 +175,51 @@ public:
 
 	void save_state();
 
-	DECLARE_DRIVER_INIT(toppoker);
-	DECLARE_DRIVER_INIT(lotse_bank0);
-	DECLARE_DRIVER_INIT(nocrypt_bank0);
-	DECLARE_DRIVER_INIT(lotse);
-	DECLARE_DRIVER_INIT(clatt);
-	DECLARE_DRIVER_INIT(rou029);
-	DECLARE_DRIVER_INIT(nocrypt);
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
 	void Scorpion1_SetSwitchState(int strobe, int data, int state);
-	int sc1_find_project_string( );
-	required_device<cpu_device> m_maincpu;
-	required_device<stepper_device> m_reel0;
-	required_device<stepper_device> m_reel1;
-	required_device<stepper_device> m_reel2;
-	required_device<stepper_device> m_reel3;
-	required_device<stepper_device> m_reel4;
-	required_device<stepper_device> m_reel5;
-	optional_device<upd7759_device> m_upd7759;
-	optional_device<bfm_bd1_device> m_vfd0;
-	required_device<meters_device> m_meters;
-	void scorpion1_adder2(machine_config &config);
-	void scorpion1(machine_config &config);
-	void scorpion1_viper(machine_config &config);
+	int sc1_find_project_string();
+
 	void sc1_adder2(address_map &map);
 	void sc1_base(address_map &map);
 	void sc1_viper(address_map &map);
+
+private:
+	int m_mmtr_latch;
+	int m_triac_latch;
+	int m_vfd_latch;  //initialized but not used
+	int m_irq_status;
+	int m_optic_pattern;
+
+	int m_acia_status;
+	int m_locked;
+	int m_is_timer_enabled;
+	int m_coin_inhibits; //initialized but not used
+	int m_mux1_outputlatch;
+	int m_mux1_datalo;
+	int m_mux1_datahi;
+	int m_mux1_input;
+	int m_mux2_outputlatch;
+	int m_mux2_datalo;
+	int m_mux2_datahi;
+	int m_mux2_input;
+	uint8_t m_sc1_Inputs[64];
+	uint8_t m_codec_data[256];
+
+	int m_defaultbank;
+	required_device<cpu_device> m_maincpu;
+	required_device_array<stepper_device, 6> m_reels;
+	optional_device<upd7759_device> m_upd7759;
+	optional_device<bfm_bd1_device> m_vfd0;
+	required_device<meters_device> m_meters;
 };
 
 #define VFD_RESET  0x20
 #define VFD_CLOCK1 0x80
 #define VFD_DATA   0x40
 
-#define MASTER_CLOCK    (XTAL(4'000'000))
+static constexpr XTAL MASTER_CLOCK = 4_MHz_XTAL;
 
 
 void bfm_sc1_state::save_state()
@@ -315,11 +307,11 @@ WRITE8_MEMBER(bfm_sc1_state::reel12_w)
 	}
 	else
 	{
-		m_reel0->update((data>>4)&0x0f);
-		m_reel1->update( data    &0x0f);
+		m_reels[0]->update((data>>4)&0x0f);
+		m_reels[1]->update( data    &0x0f);
 	}
-	awp_draw_reel(machine(),"reel1", *m_reel0);
-	awp_draw_reel(machine(),"reel2", *m_reel1);
+	awp_draw_reel(machine(),"reel1", *m_reels[0]);
+	awp_draw_reel(machine(),"reel2", *m_reels[1]);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -332,22 +324,22 @@ WRITE8_MEMBER(bfm_sc1_state::reel34_w)
 	}
 	else
 	{
-		m_reel2->update((data>>4)&0x0f);
-		m_reel3->update( data    &0x0f);
+		m_reels[2]->update((data>>4)&0x0f);
+		m_reels[3]->update( data    &0x0f);
 	}
-	awp_draw_reel(machine(),"reel3", *m_reel2);
-	awp_draw_reel(machine(),"reel4", *m_reel3);
+	awp_draw_reel(machine(),"reel3", *m_reels[2]);
+	awp_draw_reel(machine(),"reel4", *m_reels[3]);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 WRITE8_MEMBER(bfm_sc1_state::reel56_w)
 {
-	m_reel4->update((data>>4)&0x0f);
-	m_reel5->update( data    &0x0f);
+	m_reels[4]->update((data>>4)&0x0f);
+	m_reels[5]->update( data    &0x0f);
 
-	awp_draw_reel(machine(),"reel5", *m_reel4);
-	awp_draw_reel(machine(),"reel6", *m_reel5);
+	awp_draw_reel(machine(),"reel5", *m_reels[4]);
+	awp_draw_reel(machine(),"reel6", *m_reels[5]);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -678,65 +670,68 @@ void bfm_sc1_state::machine_reset()
 // scorpion1 board memory map ///////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-ADDRESS_MAP_START(bfm_sc1_state::sc1_base)
+void bfm_sc1_state::sc1_base(address_map &map)
+{
 
-	AM_RANGE(0x0000, 0x1FFF) AM_RAM AM_SHARE("nvram") //8k RAM
-	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)             // reel 2+3 latch
-	AM_RANGE(0x2200, 0x23FF) AM_WRITE(reel12_w)             // reel 1+2 latch
-	AM_RANGE(0x2400, 0x25FF) AM_WRITE(vfd_w)                // vfd latch
+	map(0x0000, 0x1FFF).ram().share("nvram"); //8k RAM
+	map(0x2000, 0x21FF).w(this, FUNC(bfm_sc1_state::reel34_w));             // reel 2+3 latch
+	map(0x2200, 0x23FF).w(this, FUNC(bfm_sc1_state::reel12_w));             // reel 1+2 latch
+	map(0x2400, 0x25FF).w(this, FUNC(bfm_sc1_state::vfd_w));                // vfd latch
 
-	AM_RANGE(0x2600, 0x27FF) AM_READWRITE(mmtr_r,mmtr_w)    // mechanical meters
-	AM_RANGE(0x2800, 0x2800) AM_READWRITE(triac_r,triac_w)  // payslide triacs
+	map(0x2600, 0x27FF).rw(this, FUNC(bfm_sc1_state::mmtr_r), FUNC(bfm_sc1_state::mmtr_w));    // mechanical meters
+	map(0x2800, 0x2800).rw(this, FUNC(bfm_sc1_state::triac_r), FUNC(bfm_sc1_state::triac_w));  // payslide triacs
 
-	AM_RANGE(0x2A00, 0x2A00) AM_READWRITE(mux1latch_r,mux1latch_w) // mux1
-	AM_RANGE(0x2A01, 0x2A01) AM_READWRITE(mux1datlo_r,mux1datlo_w)
-	AM_RANGE(0x2A02, 0x2A02) AM_READWRITE(mux1dathi_r,mux1dathi_w)
+	map(0x2A00, 0x2A00).rw(this, FUNC(bfm_sc1_state::mux1latch_r), FUNC(bfm_sc1_state::mux1latch_w)); // mux1
+	map(0x2A01, 0x2A01).rw(this, FUNC(bfm_sc1_state::mux1datlo_r), FUNC(bfm_sc1_state::mux1datlo_w));
+	map(0x2A02, 0x2A02).rw(this, FUNC(bfm_sc1_state::mux1dathi_r), FUNC(bfm_sc1_state::mux1dathi_w));
 
-	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)            // irq latch
+	map(0x2E00, 0x2E00).r(this, FUNC(bfm_sc1_state::irqlatch_r));            // irq latch
 
-	AM_RANGE(0x3001, 0x3001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	map(0x3001, 0x3001).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x3001, 0x3001).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x3101, 0x3201).w("aysnd", FUNC(ay8910_device::address_w));
 
-	AM_RANGE(0x3406, 0x3406) AM_READWRITE(aciastat_r,aciactrl_w)  // MC6850 status register
-	AM_RANGE(0x3407, 0x3407) AM_READWRITE(aciadata_r,aciadata_w)  // MC6850 data register
+	map(0x3406, 0x3406).rw(this, FUNC(bfm_sc1_state::aciastat_r), FUNC(bfm_sc1_state::aciactrl_w));  // MC6850 status register
+	map(0x3407, 0x3407).rw(this, FUNC(bfm_sc1_state::aciadata_r), FUNC(bfm_sc1_state::aciadata_w));  // MC6850 data register
 
-	AM_RANGE(0x3408, 0x3408) AM_READWRITE(mux2latch_r,mux2latch_w) // mux2
-	AM_RANGE(0x3409, 0x3409) AM_READWRITE(mux2datlo_r,mux2datlo_w)
-	AM_RANGE(0x340A, 0x340A) AM_READWRITE(mux2dathi_r,mux2dathi_w)
+	map(0x3408, 0x3408).rw(this, FUNC(bfm_sc1_state::mux2latch_r), FUNC(bfm_sc1_state::mux2latch_w)); // mux2
+	map(0x3409, 0x3409).rw(this, FUNC(bfm_sc1_state::mux2datlo_r), FUNC(bfm_sc1_state::mux2datlo_w));
+	map(0x340A, 0x340A).rw(this, FUNC(bfm_sc1_state::mux2dathi_r), FUNC(bfm_sc1_state::mux2dathi_w));
 
-	AM_RANGE(0x3600, 0x3600) AM_WRITE(bankswitch_w)         // write bank
-	AM_RANGE(0x3800, 0x39FF) AM_WRITE(reel56_w)             // reel 5+6 latch
+	map(0x3600, 0x3600).w(this, FUNC(bfm_sc1_state::bankswitch_w));         // write bank
+	map(0x3800, 0x39FF).w(this, FUNC(bfm_sc1_state::reel56_w));             // reel 5+6 latch
 
-	AM_RANGE(0x4000, 0x5FFF) AM_ROM                         // 8k  ROM
-	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")                    // 8k  paged ROM (4 pages)
-	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) // 32k ROM
+	map(0x4000, 0x5FFF).rom();                         // 8k  ROM
+	map(0x6000, 0x7FFF).bankr("bank1");                    // 8k  paged ROM (4 pages)
+	map(0x8000, 0xFFFF).rom().w("watchdog", FUNC(watchdog_timer_device::reset_w)); // 32k ROM
 
-ADDRESS_MAP_END
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 // scorpion1 board + adder2 expansion memory map ////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-ADDRESS_MAP_START(bfm_sc1_state::sc1_adder2)
-	AM_IMPORT_FROM( sc1_base )
+void bfm_sc1_state::sc1_adder2(address_map &map)
+{
+	sc1_base(map);
 
-	AM_RANGE(0x3E00, 0x3E00) AM_DEVREADWRITE("adder2", bfm_adder2_device, vid_uart_ctrl_r,vid_uart_ctrl_w)  // video uart control reg read
-	AM_RANGE(0x3E01, 0x3E01) AM_DEVREADWRITE("adder2", bfm_adder2_device, vid_uart_rx_r,vid_uart_tx_w)      // video uart receive  reg
-ADDRESS_MAP_END
+	map(0x3E00, 0x3E00).rw("adder2", FUNC(bfm_adder2_device::vid_uart_ctrl_r), FUNC(bfm_adder2_device::vid_uart_ctrl_w));  // video uart control reg read
+	map(0x3E01, 0x3E01).rw("adder2", FUNC(bfm_adder2_device::vid_uart_rx_r), FUNC(bfm_adder2_device::vid_uart_tx_w));      // video uart receive  reg
+}
 
 
 /////////////////////////////////////////////////////////////////////////////////////
 // scorpion1 board + upd7759 soundcard memory map ///////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-ADDRESS_MAP_START(bfm_sc1_state::sc1_viper)
-	AM_IMPORT_FROM( sc1_base )
+void bfm_sc1_state::sc1_viper(address_map &map)
+{
+	sc1_base(map);
 
-	AM_RANGE(0x3404, 0x3404) AM_READ(dipcoin_r ) // coin input on gamecard
-	AM_RANGE(0x3801, 0x3801) AM_READ(nec_r)
-	AM_RANGE(0x3800, 0x39FF) AM_WRITE(nec_latch_w)
-ADDRESS_MAP_END
+	map(0x3404, 0x3404).r(this, FUNC(bfm_sc1_state::dipcoin_r)); // coin input on gamecard
+	map(0x3801, 0x3801).r(this, FUNC(bfm_sc1_state::nec_r));
+	map(0x3800, 0x39FF).w(this, FUNC(bfm_sc1_state::nec_latch_w));
+}
 
 // input ports for scorpion1 board //////////////////////////////////////////////////
 
@@ -1102,17 +1097,17 @@ MACHINE_CONFIG_START(bfm_sc1_state::scorpion1)
 	MCFG_DEFAULT_LAYOUT(layout_sc1_vfd)
 
 	MCFG_STARPOINT_48STEP_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel_optic_cb<0>))
 	MCFG_STARPOINT_48STEP_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel_optic_cb<1>))
 	MCFG_STARPOINT_48STEP_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel_optic_cb<2>))
 	MCFG_STARPOINT_48STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel_optic_cb<3>))
 	MCFG_STARPOINT_48STEP_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel4_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel_optic_cb<4>))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel5_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel_optic_cb<5>))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
@@ -1154,12 +1149,12 @@ void bfm_sc1_state::sc1_common_init(int reels, int decrypt, int defaultbank)
 	// setup n default 96 half step reels ///////////////////////////////////////////
 	/*switch (reels)
 	{
-	case 6: m_reel5->configure(&starpoint_interface_48step);
-	case 5: m_reel4->configure(&starpoint_interface_48step);
-	case 4: m_reel3->configure(&starpoint_interface_48step);
-	case 3: m_reel2->configure(&starpoint_interface_48step);
-	case 2: m_reel1->configure(&starpoint_interface_48step);
-	case 1: m_reel0->configure(&starpoint_interface_48step);
+	case 6: m_reels[5]->configure(&starpoint_interface_48step);
+	case 5: m_reels[4]->configure(&starpoint_interface_48step);
+	case 4: m_reels[3]->configure(&starpoint_interface_48step);
+	case 3: m_reels[2]->configure(&starpoint_interface_48step);
+	case 2: m_reels[1]->configure(&starpoint_interface_48step);
+	case 1: m_reels[0]->configure(&starpoint_interface_48step);
 	}*/
 	if (decrypt) bfm_decode_mainrom(machine(),"maincpu", m_codec_data);    // decode main rom
 

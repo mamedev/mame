@@ -199,13 +199,13 @@ READ8_MEMBER( nascom_state::nascom1_port_02_r )
 {
 	uint8_t data = 0x31;
 
-	m_hd6402->set_input_pin(AY31015_SWE, 0);
-	data |= m_hd6402->get_output_pin(AY31015_OR  ) ? 0x02 : 0;
-	data |= m_hd6402->get_output_pin(AY31015_PE  ) ? 0x04 : 0;
-	data |= m_hd6402->get_output_pin(AY31015_FE  ) ? 0x08 : 0;
-	data |= m_hd6402->get_output_pin(AY31015_TBMT) ? 0x40 : 0;
-	data |= m_hd6402->get_output_pin(AY31015_DAV ) ? 0x80 : 0;
-	m_hd6402->set_input_pin(AY31015_SWE, 1);
+	m_hd6402->write_swe(0);
+	data |= m_hd6402->or_r(  ) ? 0x02 : 0;
+	data |= m_hd6402->pe_r(  ) ? 0x04 : 0;
+	data |= m_hd6402->fe_r(  ) ? 0x08 : 0;
+	data |= m_hd6402->tbmt_r() ? 0x40 : 0;
+	data |= m_hd6402->dav_r( ) ? 0x80 : 0;
+	m_hd6402->write_swe(1);
 
 	return data;
 }
@@ -335,15 +335,15 @@ image_init_result nascom2_state::load_cart(device_image_interface &image, generi
 void nascom_state::machine_reset()
 {
 	// Set up hd6402 pins
-	m_hd6402->set_input_pin(AY31015_SWE, 1);
+	m_hd6402->write_swe(1);
 
-	m_hd6402->set_input_pin(AY31015_CS, 0);
-	m_hd6402->set_input_pin(AY31015_NP, 1);
-	m_hd6402->set_input_pin(AY31015_NB1, 1);
-	m_hd6402->set_input_pin(AY31015_NB2, 1);
-	m_hd6402->set_input_pin(AY31015_EPS, 1);
-	m_hd6402->set_input_pin(AY31015_TSB, 1);
-	m_hd6402->set_input_pin(AY31015_CS, 1);
+	m_hd6402->write_cs(0);
+	m_hd6402->write_np(1);
+	m_hd6402->write_nb1(1);
+	m_hd6402->write_nb2(1);
+	m_hd6402->write_eps(1);
+	m_hd6402->write_tsb(1);
+	m_hd6402->write_cs(1);
 }
 
 DRIVER_INIT_MEMBER( nascom_state, nascom )
@@ -473,40 +473,45 @@ void nascom_state::screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(nascom1_state::nascom1_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM // MONITOR
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM // WRAM
-ADDRESS_MAP_END
+void nascom1_state::nascom1_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).rom(); // MONITOR
+	map(0x0800, 0x0bff).ram().share("videoram");
+	map(0x0c00, 0x0fff).ram(); // WRAM
+}
 
-ADDRESS_MAP_START(nascom1_state::nascom1_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(nascom1_port_00_r, nascom1_port_00_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)
-	AM_RANGE(0x02, 0x02) AM_READ(nascom1_port_02_r)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80pio", z80pio_device, read, write )
-ADDRESS_MAP_END
+void nascom1_state::nascom1_io(address_map &map)
+{
+	map.global_mask(0x0f);
+	map(0x00, 0x00).rw(this, FUNC(nascom1_state::nascom1_port_00_r), FUNC(nascom1_state::nascom1_port_00_w));
+	map(0x01, 0x01).rw(this, FUNC(nascom1_state::nascom1_port_01_r), FUNC(nascom1_state::nascom1_port_01_w));
+	map(0x02, 0x02).r(this, FUNC(nascom1_state::nascom1_port_02_r));
+	map(0x04, 0x07).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
-ADDRESS_MAP_START(nascom2_state::nascom2_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM // MONITOR
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM // WRAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("basic", 0)
-ADDRESS_MAP_END
+void nascom2_state::nascom2_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).rom(); // MONITOR
+	map(0x0800, 0x0bff).ram().share("videoram");
+	map(0x0c00, 0x0fff).ram(); // WRAM
+	map(0xe000, 0xffff).rom().region("basic", 0);
+}
 
-ADDRESS_MAP_START(nascom2_state::nascom2_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(nascom1_port_00_r, nascom1_port_00_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)
-	AM_RANGE(0x02, 0x02) AM_READ(nascom1_port_02_r)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80pio", z80pio_device, read, write )
-ADDRESS_MAP_END
+void nascom2_state::nascom2_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(this, FUNC(nascom2_state::nascom1_port_00_r), FUNC(nascom2_state::nascom1_port_00_w));
+	map(0x01, 0x01).rw(this, FUNC(nascom2_state::nascom1_port_01_r), FUNC(nascom2_state::nascom1_port_01_w));
+	map(0x02, 0x02).r(this, FUNC(nascom2_state::nascom1_port_02_r));
+	map(0x04, 0x07).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
-ADDRESS_MAP_START(nascom2_state::nascom2c_mem)
-	AM_RANGE(0xf000, 0xf7ff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xfc00, 0xffff) AM_RAM // WRAM
-ADDRESS_MAP_END
+void nascom2_state::nascom2c_mem(address_map &map)
+{
+	map(0xf000, 0xf7ff).rom().region("maincpu", 0);
+	map(0xf800, 0xfbff).ram().share("videoram");
+	map(0xfc00, 0xffff).ram(); // WRAM
+}
 
 
 //**************************************************************************
@@ -670,8 +675,8 @@ MACHINE_CONFIG_START(nascom_state::nascom)
 	MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
 	MCFG_AY31015_RX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
-	MCFG_AY51013_READ_SI_CB(READLINE(nascom_state, nascom1_hd6402_si))
-	MCFG_AY51013_WRITE_SO_CB(WRITELINE(nascom_state, nascom1_hd6402_so))
+	MCFG_AY31015_READ_SI_CB(READLINE(nascom_state, nascom1_hd6402_si))
+	MCFG_AY31015_WRITE_SO_CB(WRITELINE(nascom_state, nascom1_hd6402_so))
 
 	// cassette is connected to the uart
 	MCFG_CASSETTE_ADD("cassette")

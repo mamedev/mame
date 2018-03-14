@@ -61,17 +61,19 @@ const tiny_rom_entry *mshark_device::device_rom_region() const
 //  ADDRESS_MAP( mshark_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(mshark_device::mshark_mem)
-	AM_RANGE(0x0000, 0x4fff) AM_ROM AM_REGION(I8085_TAG, 0)
-ADDRESS_MAP_END
+void mshark_device::mshark_mem(address_map &map)
+{
+	map(0x0000, 0x4fff).rom().region(I8085_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( mshark_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(mshark_device::mshark_io)
-ADDRESS_MAP_END
+void mshark_device::mshark_io(address_map &map)
+{
+}
 
 
 //-------------------------------------------------

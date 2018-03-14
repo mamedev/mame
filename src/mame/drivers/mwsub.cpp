@@ -22,11 +22,18 @@ class submar_state : public driver_device
 {
 public:
 	submar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_motors(*this, "motor%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
+		, m_solenoids(*this, "solenoid%u", 0U)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	void submar(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(submar_sensor0_r);
 	DECLARE_READ8_MEMBER(submar_sensor1_r);
@@ -36,9 +43,15 @@ public:
 	DECLARE_WRITE8_MEMBER(submar_sound_w);
 	DECLARE_WRITE8_MEMBER(submar_led_w);
 	DECLARE_WRITE8_MEMBER(submar_irq_clear_w);
-	void submar(machine_config &config);
+
 	void submar_map(address_map &map);
 	void submar_portmap(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	output_finder<8> m_motors;
+	output_finder<8> m_lamps;
+	output_finder<8> m_solenoids;
+	output_finder<4> m_digits;
 };
 
 
@@ -47,6 +60,14 @@ public:
   I/O, Memorymap
 
 ***************************************************************************/
+
+void submar_state::machine_start()
+{
+	m_motors.resolve();
+	m_lamps.resolve();
+	m_solenoids.resolve();
+	m_digits.resolve();
+}
 
 READ8_MEMBER(submar_state::submar_sensor0_r)
 {
@@ -71,7 +92,7 @@ WRITE8_MEMBER(submar_state::submar_motor_w)
 	// d6: stir water
 	// d7: n/c
 	for (int i = 0; i < 8; i++)
-		output().set_indexed_value("motor", i, data >> i & 1);
+		m_motors[i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(submar_state::submar_lamp_w)
@@ -85,7 +106,7 @@ WRITE8_MEMBER(submar_state::submar_lamp_w)
 	// d6: front ship hit
 	// d7: scenery
 	for (int i = 0; i < 8; i++)
-		output().set_lamp_value(i, data >> i & 1);
+		m_lamps[i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(submar_state::submar_solenoid_w)
@@ -93,7 +114,7 @@ WRITE8_MEMBER(submar_state::submar_solenoid_w)
 	// d0-d4: ship1-5
 	// d5-d7: n/c
 	for (int i = 0; i < 8; i++)
-		output().set_indexed_value("solenoid", i, data >> i & 1);
+		m_solenoids[i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(submar_state::submar_sound_w)
@@ -111,12 +132,12 @@ WRITE8_MEMBER(submar_state::submar_sound_w)
 WRITE8_MEMBER(submar_state::submar_led_w)
 {
 	// 7447 (BCD to LED segment)
-	const uint8_t _7447_map[16] =
-		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
+	static constexpr uint8_t _7447_map[16] =
+			{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	// 2 digits per write. port 4: time, port 5: score
-	output().set_digit_value((offset << 1 & 2) | 0, _7447_map[data >> 4]);
-	output().set_digit_value((offset << 1 & 2) | 1, _7447_map[data & 0x0f]);
+	m_digits[((offset << 1) & 2) | 0] = _7447_map[data >> 4];
+	m_digits[((offset << 1) & 2) | 1] = _7447_map[data & 0x0f];
 }
 
 WRITE8_MEMBER(submar_state::submar_irq_clear_w)
@@ -125,22 +146,24 @@ WRITE8_MEMBER(submar_state::submar_irq_clear_w)
 }
 
 
-ADDRESS_MAP_START(submar_state::submar_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x207f) AM_RAM
-ADDRESS_MAP_END
+void submar_state::submar_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x207f).ram();
+}
 
-ADDRESS_MAP_START(submar_state::submar_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(submar_sensor0_r, submar_motor_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(submar_sensor1_r, submar_lamp_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(submar_solenoid_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE(submar_sound_w)
-	AM_RANGE(0x04, 0x05) AM_WRITE(submar_led_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(submar_irq_clear_w)
-ADDRESS_MAP_END
+void submar_state::submar_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(this, FUNC(submar_state::submar_sensor0_r), FUNC(submar_state::submar_motor_w));
+	map(0x01, 0x01).rw(this, FUNC(submar_state::submar_sensor1_r), FUNC(submar_state::submar_lamp_w));
+	map(0x02, 0x02).w(this, FUNC(submar_state::submar_solenoid_w));
+	map(0x03, 0x03).portr("DSW").w(this, FUNC(submar_state::submar_sound_w));
+	map(0x04, 0x05).w(this, FUNC(submar_state::submar_led_w));
+	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x07, 0x07).w(this, FUNC(submar_state::submar_irq_clear_w));
+}
 
 
 

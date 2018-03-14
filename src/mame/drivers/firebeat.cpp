@@ -181,32 +181,22 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_work_ram(*this, "work_ram"),
-		m_flash_main(*this, "flash_main"),
-		m_flash_snd1(*this, "flash_snd1"),
-		m_flash_snd2(*this, "flash_snd2"),
 		m_duart_midi(*this, "duart_midi"),
 		m_duart_com(*this, "duart_com"),
-		m_kbd0(*this, "kbd0"),
-		m_kbd1(*this, "kbd1"),
+		m_kbd(*this, "kbd%u", 0),
 		m_ata(*this, "ata"),
-		m_gcu0(*this, "gcu0"),
-		m_gcu1(*this, "gcu1"),
+		m_gcu(*this, "gcu%u", 0),
 		m_spuata(*this, "spu_ata")
 	{ }
 
 	required_device<ppc4xx_device> m_maincpu;
 	optional_device<m68000_device> m_audiocpu;
 	required_shared_ptr<uint32_t> m_work_ram;
-	required_device<fujitsu_29f016a_device> m_flash_main;
-	required_device<fujitsu_29f016a_device> m_flash_snd1;
-	required_device<fujitsu_29f016a_device> m_flash_snd2;
 	optional_device<pc16552_device> m_duart_midi;
 	required_device<pc16552_device> m_duart_com;
-	optional_device<midi_keyboard_device> m_kbd0;
-	optional_device<midi_keyboard_device> m_kbd1;
+	optional_device_array<midi_keyboard_device, 2> m_kbd;
 	required_device<ata_interface_device> m_ata;
-	required_device<k057714_device> m_gcu0;
-	required_device<k057714_device> m_gcu1;
+	optional_device_array<k057714_device, 2> m_gcu;
 	optional_device<ata_interface_device> m_spuata;
 
 	uint8_t m_extend_board_irq_enable;
@@ -223,7 +213,6 @@ public:
 	int m_ibutton_read_subkey_ptr;
 	uint8_t m_ibutton_subkey_data[0x40];
 
-	DECLARE_READ8_MEMBER(soundram_r);
 	DECLARE_DRIVER_INIT(ppd);
 	DECLARE_DRIVER_INIT(kbm);
 	DECLARE_DRIVER_INIT(ppp);
@@ -235,10 +224,6 @@ public:
 	INTERRUPT_GEN_MEMBER(firebeat_interrupt);
 	DECLARE_READ32_MEMBER(input_r);
 	DECLARE_READ32_MEMBER(sensor_r );
-	DECLARE_READ32_MEMBER(flashram_r);
-	DECLARE_WRITE32_MEMBER(flashram_w);
-	DECLARE_READ32_MEMBER(soundflash_r);
-	DECLARE_WRITE32_MEMBER(soundflash_w);
 	DECLARE_WRITE_LINE_MEMBER(ata_interrupt);
 	DECLARE_READ32_MEMBER(ata_command_r);
 	DECLARE_WRITE32_MEMBER(ata_command_w);
@@ -286,7 +271,9 @@ public:
 	void firebeat(machine_config &config);
 	void firebeat_spu(machine_config &config);
 	void firebeat_map(address_map &map);
+	void firebeat2_map(address_map &map);
 	void spu_map(address_map &map);
+	void ymz280b_map(address_map &map);
 };
 
 
@@ -298,8 +285,8 @@ VIDEO_START_MEMBER(firebeat_state,firebeat)
 {
 }
 
-uint32_t firebeat_state::screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return m_gcu0->draw(screen, bitmap, cliprect); }
-uint32_t firebeat_state::screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return m_gcu1->draw(screen, bitmap, cliprect); }
+uint32_t firebeat_state::screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return m_gcu[0]->draw(screen, bitmap, cliprect); }
+uint32_t firebeat_state::screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return m_gcu[1]->draw(screen, bitmap, cliprect); }
 
 /*****************************************************************************/
 
@@ -332,114 +319,6 @@ READ32_MEMBER(firebeat_state::sensor_r )
 	else
 	{
 		return ioport("SENSOR2")->read() | 0x01000100;
-	}
-}
-
-READ32_MEMBER(firebeat_state::flashram_r)
-{
-	uint32_t r = 0;
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= (m_flash_main->read((offset*4)+0) & 0xff) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= (m_flash_main->read((offset*4)+1) & 0xff) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= (m_flash_main->read((offset*4)+2) & 0xff) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= (m_flash_main->read((offset*4)+3) & 0xff) << 0;
-	}
-	return r;
-}
-
-WRITE32_MEMBER(firebeat_state::flashram_w)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		m_flash_main->write((offset*4)+0, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		m_flash_main->write((offset*4)+1, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		m_flash_main->write((offset*4)+2, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		m_flash_main->write((offset*4)+3, (data >> 0) & 0xff);
-	}
-}
-
-READ32_MEMBER(firebeat_state::soundflash_r)
-{
-	uint32_t r = 0;
-	fujitsu_29f016a_device *chip;
-	if (offset < 0x200000/4)
-	{
-		chip = m_flash_snd1;
-	}
-	else
-	{
-		chip = m_flash_snd2;
-	}
-
-	offset &= 0x7ffff;
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= (chip->read((offset*4)+0) & 0xff) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= (chip->read((offset*4)+1) & 0xff) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= (chip->read((offset*4)+2) & 0xff) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= (chip->read((offset*4)+3) & 0xff) << 0;
-	}
-	return r;
-}
-
-WRITE32_MEMBER(firebeat_state::soundflash_w)
-{
-	fujitsu_29f016a_device *chip;
-	if (offset < 0x200000/4)
-	{
-		chip = m_flash_snd1;
-	}
-	else
-	{
-		chip = m_flash_snd2;
-	}
-
-	offset &= 0x7ffff;
-
-	if (ACCESSING_BITS_24_31)
-	{
-		chip->write((offset*4)+0, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		chip->write((offset*4)+1, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		chip->write((offset*4)+2, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		chip->write((offset*4)+3, (data >> 0) & 0xff);
 	}
 }
 
@@ -1054,54 +933,60 @@ MACHINE_START_MEMBER(firebeat_state,firebeat)
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x01ffffff, false, m_work_ram);
 }
 
-ADDRESS_MAP_START(firebeat_state::firebeat_map)
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_SHARE("work_ram")
-	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE8(midi_uart_r, midi_uart_w, 0xff000000)
-	AM_RANGE(0x70006000, 0x70006003) AM_WRITE(extend_board_irq_w)
-	AM_RANGE(0x70008000, 0x7000800f) AM_READ(keyboard_wheel_r)
-	AM_RANGE(0x7000a000, 0x7000a003) AM_READ(extend_board_irq_r)
-	AM_RANGE(0x74000000, 0x740003ff) AM_READWRITE(ppc_spu_share_r, ppc_spu_share_w) // SPU shared RAM
-	AM_RANGE(0x7d000200, 0x7d00021f) AM_READ(cabinet_r)
-	AM_RANGE(0x7d000340, 0x7d000347) AM_READ(sensor_r)
-	AM_RANGE(0x7d000400, 0x7d000403) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xffff0000)
-	AM_RANGE(0x7d000800, 0x7d000803) AM_READ(input_r)
-	AM_RANGE(0x7d400000, 0x7d5fffff) AM_READWRITE(flashram_r, flashram_w)
-	AM_RANGE(0x7d800000, 0x7dbfffff) AM_READWRITE(soundflash_r, soundflash_w)
-	AM_RANGE(0x7dc00000, 0x7dc0000f) AM_DEVREADWRITE8("duart_com", pc16552_device, read, write, 0xffffffff)
-	AM_RANGE(0x7e000000, 0x7e00003f) AM_DEVREADWRITE8("rtc", rtc65271_device, rtc_r, rtc_w, 0xffffffff)
-	AM_RANGE(0x7e000100, 0x7e00013f) AM_DEVREADWRITE8("rtc", rtc65271_device, xram_r, xram_w, 0xffffffff)
-	AM_RANGE(0x7e800000, 0x7e8000ff) AM_DEVREADWRITE("gcu0", k057714_device, read, write)
-	AM_RANGE(0x7e800100, 0x7e8001ff) AM_DEVREADWRITE("gcu1", k057714_device, read, write)
-	AM_RANGE(0x7fe00000, 0x7fe0000f) AM_READWRITE(ata_command_r, ata_command_w)
-	AM_RANGE(0x7fe80000, 0x7fe8000f) AM_READWRITE(ata_control_r, ata_control_w)
-	AM_RANGE(0x7ff80000, 0x7fffffff) AM_ROM AM_REGION("user1", 0)       /* System BIOS */
-ADDRESS_MAP_END
+void firebeat_state::firebeat_map(address_map &map)
+{
+	map(0x00000000, 0x01ffffff).ram().share("work_ram");
+	map(0x70000000, 0x70000fff).rw(this, FUNC(firebeat_state::midi_uart_r), FUNC(firebeat_state::midi_uart_w)).umask32(0xff000000);
+	map(0x70006000, 0x70006003).w(this, FUNC(firebeat_state::extend_board_irq_w));
+	map(0x70008000, 0x7000800f).r(this, FUNC(firebeat_state::keyboard_wheel_r));
+	map(0x7000a000, 0x7000a003).r(this, FUNC(firebeat_state::extend_board_irq_r));
+	map(0x74000000, 0x740003ff).rw(this, FUNC(firebeat_state::ppc_spu_share_r), FUNC(firebeat_state::ppc_spu_share_w)); // SPU shared RAM
+	map(0x7d000200, 0x7d00021f).r(this, FUNC(firebeat_state::cabinet_r));
+	map(0x7d000340, 0x7d000347).r(this, FUNC(firebeat_state::sensor_r));
+	map(0x7d000400, 0x7d000401).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+	map(0x7d000800, 0x7d000803).r(this, FUNC(firebeat_state::input_r));
+	map(0x7d400000, 0x7d5fffff).rw("flash_main", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
+	map(0x7d800000, 0x7d9fffff).rw("flash_snd1", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
+	map(0x7da00000, 0x7dbfffff).rw("flash_snd2", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
+	map(0x7dc00000, 0x7dc0000f).rw(m_duart_com, FUNC(pc16552_device::read), FUNC(pc16552_device::write));
+	map(0x7e000000, 0x7e00003f).rw("rtc", FUNC(rtc65271_device::rtc_r), FUNC(rtc65271_device::rtc_w));
+	map(0x7e000100, 0x7e00013f).rw("rtc", FUNC(rtc65271_device::xram_r), FUNC(rtc65271_device::xram_w));
+	map(0x7e800000, 0x7e8000ff).rw("gcu0", FUNC(k057714_device::read), FUNC(k057714_device::write));
+	map(0x7fe00000, 0x7fe0000f).rw(this, FUNC(firebeat_state::ata_command_r), FUNC(firebeat_state::ata_command_w));
+	map(0x7fe80000, 0x7fe8000f).rw(this, FUNC(firebeat_state::ata_control_r), FUNC(firebeat_state::ata_control_w));
+	map(0x7ff80000, 0x7fffffff).rom().region("user1", 0);       /* System BIOS */
+}
 
-ADDRESS_MAP_START(firebeat_state::spu_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x13ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_READ(spu_unk_r)
-	AM_RANGE(0x220000, 0x220001) AM_WRITE(spu_220000_w)
-	AM_RANGE(0x230000, 0x230001) AM_WRITE(spu_irq_ack_w)
-	AM_RANGE(0x260000, 0x260001) AM_WRITE(spu_sdram_bank_w)
-	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(m68k_spu_share_r, m68k_spu_share_w)
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("spu_ata", ata_interface_device, read_cs0, write_cs0)
-	AM_RANGE(0x340000, 0x34000f) AM_DEVREADWRITE("spu_ata", ata_interface_device, read_cs1, write_cs1)
-	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rf5c400", rf5c400_device, rf5c400_r, rf5c400_w)
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM         // SDRAM
-	AM_RANGE(0xfc0000, 0xffffff) AM_RAM         // SDRAM
-ADDRESS_MAP_END
+void firebeat_state::firebeat2_map(address_map &map)
+{
+	firebeat_map(map);
+	map(0x7e800100, 0x7e8001ff).rw("gcu1", FUNC(k057714_device::read), FUNC(k057714_device::write));
+}
+
+void firebeat_state::spu_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x13ffff).ram();
+	map(0x200000, 0x200001).r(this, FUNC(firebeat_state::spu_unk_r));
+	map(0x220000, 0x220001).w(this, FUNC(firebeat_state::spu_220000_w));
+	map(0x230000, 0x230001).w(this, FUNC(firebeat_state::spu_irq_ack_w));
+	map(0x260000, 0x260001).w(this, FUNC(firebeat_state::spu_sdram_bank_w));
+	map(0x280000, 0x2807ff).rw(this, FUNC(firebeat_state::m68k_spu_share_r), FUNC(firebeat_state::m68k_spu_share_w));
+	map(0x300000, 0x30000f).rw(m_spuata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0));
+	map(0x340000, 0x34000f).rw(m_spuata, FUNC(ata_interface_device::read_cs1), FUNC(ata_interface_device::write_cs1));
+	map(0x400000, 0x400fff).rw("rf5c400", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));
+	map(0x800000, 0x83ffff).ram();         // SDRAM
+	map(0xfc0000, 0xffffff).ram();         // SDRAM
+}
+
+void firebeat_state::ymz280b_map(address_map &map)
+{
+	map.global_mask(0x3fffff);
+	map(0x000000, 0x1fffff).r("flash_snd1", FUNC(fujitsu_29f016a_device::read));
+	map(0x200000, 0x3fffff).r("flash_snd2", FUNC(fujitsu_29f016a_device::read));
+}
 
 /*****************************************************************************/
-
-READ8_MEMBER(firebeat_state::soundram_r)
-{
-	offset &= 0x3fffff;
-	if (offset < 0x200000)
-		return m_flash_snd1->read(offset);
-	else
-		return m_flash_snd2->read(offset & 0x1fffff);
-}
 
 WRITE_LINE_MEMBER(firebeat_state::sound_irq_callback)
 {
@@ -1314,9 +1199,6 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	MCFG_DEVICE_ADD("gcu0", K057714, 0)
 	MCFG_K057714_IRQ_CALLBACK(WRITELINE(firebeat_state, gcu0_interrupt))
 
-	MCFG_DEVICE_ADD("gcu1", K057714, 0)
-	MCFG_K057714_IRQ_CALLBACK(WRITELINE(firebeat_state, gcu1_interrupt))
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1332,7 +1214,7 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(firebeat_state, sound_irq_callback))
-	MCFG_YMZ280B_EXT_READ_HANDLER(READ8(firebeat_state, soundram_r))
+	MCFG_DEVICE_ADDRESS_MAP(0, ymz280b_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1350,7 +1232,7 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GCX, XTAL(64'000'000))
-	MCFG_CPU_PROGRAM_MAP(firebeat_map)
+	MCFG_CPU_PROGRAM_MAP(firebeat2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", firebeat_state,  firebeat_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
@@ -1400,7 +1282,7 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(firebeat_state, sound_irq_callback))
-	MCFG_YMZ280B_EXT_READ_HANDLER(READ8(firebeat_state, soundram_r))
+	MCFG_DEVICE_ADDRESS_MAP(0, ymz280b_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

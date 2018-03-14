@@ -96,25 +96,27 @@ WRITE8_MEMBER( ampro_state::io_w )
 		m_dart->ba_cd_w(space, offset>>2, data);
 }
 
-ADDRESS_MAP_START(ampro_state::ampro_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x1000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ampro_state::ampro_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).bankr("bankr0").bankw("bankw0");
+	map(0x1000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(ampro_state::ampro_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(port00_w) // system
+void ampro_state::ampro_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(ampro_state::port00_w)); // system
 	//AM_RANGE(0x01, 0x01) AM_WRITE(port01_w) // printer data
 	//AM_RANGE(0x02, 0x03) AM_WRITE(port02_w) // printer strobe
 	//AM_RANGE(0x20, 0x27) AM_READWRITE() // scsi chip
 	//AM_RANGE(0x28, 0x28) AM_WRITE(port28_w) // scsi control
 	//AM_RANGE(0x29, 0x29) AM_READ(port29_r) // ID port
-	AM_RANGE(0x40, 0x8f) AM_READWRITE(io_r,io_w)
-	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE("fdc", wd1772_device, write)
-	AM_RANGE(0xc4, 0xc7) AM_DEVREAD("fdc", wd1772_device, read)
-ADDRESS_MAP_END
+	map(0x40, 0x8f).rw(this, FUNC(ampro_state::io_r), FUNC(ampro_state::io_w));
+	map(0xc0, 0xc3).w(m_fdc, FUNC(wd1772_device::write));
+	map(0xc4, 0xc7).r(m_fdc, FUNC(wd1772_device::read));
+}
 
 static const z80_daisy_config daisy_chain_intf[] =
 {

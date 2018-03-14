@@ -86,13 +86,15 @@ uint32_t cavepc_state::screen_update_cavepc(screen_device &screen, bitmap_ind16 
 
 /*****************************************************************************/
 
-ADDRESS_MAP_START(cavepc_state::cavepc_map)
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
-ADDRESS_MAP_END
+void cavepc_state::cavepc_map(address_map &map)
+{
+	map(0x000f0000, 0x000fffff).bankr("bank1");
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+}
 
-ADDRESS_MAP_START(cavepc_state::cavepc_io)
-ADDRESS_MAP_END
+void cavepc_state::cavepc_io(address_map &map)
+{
+}
 
 /*****************************************************************************/
 

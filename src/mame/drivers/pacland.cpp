@@ -194,7 +194,6 @@ Notes:
 #include "includes/pacland.h"
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/m6800/m6801.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
 
@@ -260,33 +259,35 @@ WRITE8_MEMBER(pacland_state::irq_2_ctrl_w)
 
 
 
-ADDRESS_MAP_START(pacland_state::main_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x2000, 0x37ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3800, 0x3801) AM_WRITE(scroll0_w)
-	AM_RANGE(0x3a00, 0x3a01) AM_WRITE(scroll1_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(bankswitch_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)      /* PSG device, shared RAM */
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(irq_1_ctrl_w)
-	AM_RANGE(0x7800, 0x7fff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(subreset_w)
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(flipscreen_w)
-ADDRESS_MAP_END
+void pacland_state::main_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().w(this, FUNC(pacland_state::videoram_w)).share("videoram");
+	map(0x1000, 0x1fff).ram().w(this, FUNC(pacland_state::videoram2_w)).share("videoram2");
+	map(0x2000, 0x37ff).ram().share("spriteram");
+	map(0x3800, 0x3801).w(this, FUNC(pacland_state::scroll0_w));
+	map(0x3a00, 0x3a01).w(this, FUNC(pacland_state::scroll1_w));
+	map(0x3c00, 0x3c00).w(this, FUNC(pacland_state::bankswitch_w));
+	map(0x4000, 0x5fff).bankr("bank1");
+	map(0x6800, 0x6bff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));      /* PSG device, shared RAM */
+	map(0x7000, 0x7fff).w(this, FUNC(pacland_state::irq_1_ctrl_w));
+	map(0x7800, 0x7fff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8000, 0xffff).rom();
+	map(0x8000, 0x8fff).w(this, FUNC(pacland_state::subreset_w));
+	map(0x9000, 0x9fff).w(this, FUNC(pacland_state::flipscreen_w));
+}
 
-ADDRESS_MAP_START(pacland_state::mcu_map)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("mcu", hd63701_cpu_device, m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)      /* PSG device, shared RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)     /* watchdog? */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(irq_2_ctrl_w)
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd003) AM_READ(input_r)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void pacland_state::mcu_map(address_map &map)
+{
+	map(0x0000, 0x001f).rw(m_mcu, FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0080, 0x00ff).ram();
+	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));      /* PSG device, shared RAM */
+	map(0x2000, 0x3fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));     /* watchdog? */
+	map(0x4000, 0x7fff).w(this, FUNC(pacland_state::irq_2_ctrl_w));
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xd000, 0xd003).r(this, FUNC(pacland_state::input_r));
+	map(0xf000, 0xffff).rom();
+}
 
 
 READ8_MEMBER(pacland_state::readFF)
@@ -294,12 +295,13 @@ READ8_MEMBER(pacland_state::readFF)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(pacland_state::mcu_port_map)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("IN2")
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(coin_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF)  /* leds won't work otherwise */
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_WRITE(led_w)
-ADDRESS_MAP_END
+void pacland_state::mcu_port_map(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).portr("IN2");
+	map(M6801_PORT1, M6801_PORT1).w(this, FUNC(pacland_state::coin_w));
+	map(M6801_PORT2, M6801_PORT2).r(this, FUNC(pacland_state::readFF));  /* leds won't work otherwise */
+	map(M6801_PORT2, M6801_PORT2).w(this, FUNC(pacland_state::led_w));
+}
 
 
 
@@ -649,7 +651,7 @@ ROM_START( paclandm2 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "pl1_7.3e",       0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) )
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) 
+	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "pl2_12.6n",      0x00000, 0x2000, CRC(a63c8726) SHA1(b15903fa2267375280af03af0a7157e1b0bcb86d) )
@@ -664,7 +666,7 @@ ROM_START( paclandm2 )
 	ROM_LOAD( "pl1-11.7f",      0x0c000, 0x4000, CRC(6621361a) SHA1(4efa40adba803006e86d5e12514983d4132b5efb) )
 
 	ROM_REGION( 0x1400, "proms", 0 )
-	ROM_LOAD( "pl1-2.1t",       0x0000, 0x0400, CRC(472885de) SHA1(8d552c90b8d5bc6ad6c60934c00f4303cd180ce7) ) 
+	ROM_LOAD( "pl1-2.1t",       0x0000, 0x0400, CRC(472885de) SHA1(8d552c90b8d5bc6ad6c60934c00f4303cd180ce7) )
 	ROM_LOAD( "pl1-1.1r",       0x0400, 0x0400, CRC(a78ebdaf) SHA1(8ea215701eb5e1a2a329ef92c19fc69b18fc28c7) )
 	ROM_LOAD( "pl1-5.5t",       0x0800, 0x0400, CRC(4b7ee712) SHA1(dd0ec4c632d8b160f7b54d8f18fcf4ef1508d832) )
 	ROM_LOAD( "pl1-4.4n",       0x0c00, 0x0400, CRC(3a7be418) SHA1(475cdc68205e3acce83fe79b00b74c6a7e28dde4) )

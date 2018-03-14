@@ -8,15 +8,15 @@
 #include "pccard.h"
 
 #define MCFG_RF5C296_SLOT(name) \
-	rf5c296_device::set_pccard_name(*device, name);
+	downcast<rf5c296_device &>(*device).set_pccard_name(name);
 
 class rf5c296_device : public device_t
 {
 public:
 	rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void set_pccard_name(device_t &device, const char *name) { downcast<rf5c296_device &>(device).m_pccard_name = name; }
+	// configuration helpers
+	void set_pccard_name(const char *name) { m_pccard_name = name; }
 
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_READ16_MEMBER(io_r);

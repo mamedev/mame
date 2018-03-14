@@ -191,8 +191,8 @@ uint32_t mach32_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	if(depth == 8)
 	{
-		colour0 = m_palette->pen(m_cursor_colour0_b);
-		colour1 = m_palette->pen(m_cursor_colour1_b);
+		colour0 = pen(m_cursor_colour0_b);
+		colour1 = pen(m_cursor_colour1_b);
 	}
 	else  // 16/24/32bpp
 	{

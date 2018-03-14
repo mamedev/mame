@@ -81,17 +81,18 @@ private:
 };
 
 
-ADDRESS_MAP_START(m6805evs_state::mem_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	ADDRESS_MAP_UNMAP_HIGH
+void m6805evs_state::mem_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map.unmap_value_high();
 
 	// AM_RANGE(0x0000, 0x001f) I/O registers live here
-	AM_RANGE(0x0020, 0x004f) AM_ROM AM_REGION("eprom", 0x0020)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x0900) AM_ROM AM_REGION("eprom", 0x0100)
+	map(0x0020, 0x004f).rom().region("eprom", 0x0020);
+	map(0x0080, 0x00ff).ram();
+	map(0x0100, 0x0900).rom().region("eprom", 0x0100);
 	// AM_RANGE(0x1f00, 0x1fef) bootloader ROM lives here
-	AM_RANGE(0x1ff8, 0x1fff) AM_ROM AM_REGION("eprom", 0x1ff0)
-ADDRESS_MAP_END
+	map(0x1ff8, 0x1fff).rom().region("eprom", 0x1ff0);
+}
 
 static INPUT_PORTS_START( m6805evs )
 INPUT_PORTS_END

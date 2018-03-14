@@ -123,38 +123,42 @@ WRITE8_MEMBER(himesiki_state::himesiki_sound_w)
 
 /****************************************************************************/
 
-ADDRESS_MAP_START(himesiki_state::himesiki_prm0)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa100, 0xa7ff) AM_RAM AM_SHARE("sprram_p103a") // not on Android
-	AM_RANGE(0xa800, 0xafff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xb000, 0xbfff) AM_RAM_WRITE(himesiki_bg_ram_w) AM_SHARE("bg_ram")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void himesiki_state::himesiki_prm0(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xa0ff).ram().share("spriteram");
+	map(0xa100, 0xa7ff).ram().share("sprram_p103a"); // not on Android
+	map(0xa800, 0xafff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xb000, 0xbfff).ram().w(this, FUNC(himesiki_state::himesiki_bg_ram_w)).share("bg_ram");
+	map(0xc000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(himesiki_state::himesiki_iom0)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write) // inputs
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) // dips + rombank
-	AM_RANGE(0x08, 0x08) AM_WRITE(himesiki_scrolly_w)
-	AM_RANGE(0x09, 0x0a) AM_WRITE(himesiki_scrollx_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(himesiki_sound_w)
-ADDRESS_MAP_END
+void himesiki_state::himesiki_iom0(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)); // inputs
+	map(0x04, 0x07).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // dips + rombank
+	map(0x08, 0x08).w(this, FUNC(himesiki_state::himesiki_scrolly_w));
+	map(0x09, 0x0a).w(this, FUNC(himesiki_state::himesiki_scrollx_w));
+	map(0x0b, 0x0b).w(this, FUNC(himesiki_state::himesiki_sound_w));
+}
 
 
 
 
-ADDRESS_MAP_START(himesiki_state::himesiki_prm1)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void himesiki_state::himesiki_prm1(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(himesiki_state::himesiki_iom1)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void himesiki_state::himesiki_iom1(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 /****************************************************************************/
 

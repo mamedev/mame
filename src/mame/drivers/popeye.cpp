@@ -122,6 +122,7 @@ void tnx1_state::driver_start()
 	save_item(NAME(m_prot0));
 	save_item(NAME(m_prot1));
 	save_item(NAME(m_prot_shift));
+	save_item(NAME(m_nmi_enabled));
 }
 
 void tnx1_state::decrypt_rom()
@@ -152,12 +153,23 @@ void tpp2_state::decrypt_rom()
 	memcpy(rom,&buffer[0],len);
 }
 
-INTERRUPT_GEN_MEMBER(tnx1_state::popeye_interrupt)
+WRITE8_MEMBER(tnx1_state::refresh_w)
 {
-	m_field ^= 1;
-	/* NMIs are enabled by the I register?? How can that be? */
-	if (device.state().state_int(Z80_I) & 1)    /* skyskipr: 0/1, popeye: 2/3 but also 0/1 */
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_nmi_enabled = ((offset >> 8) & 1) != 0;
+}
+
+WRITE_LINE_MEMBER(tnx1_state::screen_vblank)
+{
+	if (state)
+	{
+		std::copy(&m_dmasource[0], &m_dmasource[m_dmasource.bytes()], m_sprite_ram.begin());
+		std::copy(&m_dmasource[0], &m_dmasource[3], m_background_scroll);
+		m_palette_bank = m_dmasource[3];
+
+		m_field ^= 1;
+		if (m_nmi_enabled)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	}
 }
 
 
@@ -194,28 +206,27 @@ WRITE8_MEMBER(tnx1_state::protection_w)
 
 
 
-ADDRESS_MAP_START(tnx1_state::maincpu_program_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_WRITENOP // Attempts to initialize this area with 00 on boot
-	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_SHARE("background_pos")
-	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_SHARE("palettebank")
-	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x8e80, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(background_w)
-	AM_RANGE(0xe000, 0xe001) AM_READWRITE(protection_r,protection_w)
-ADDRESS_MAP_END
+void tnx1_state::maincpu_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8bff).nopw(); // Attempts to initialize this area with 00 on boot
+	map(0x8c00, 0x8e7f).ram().share("dmasource");
+	map(0x8e80, 0x8fff).ram();
+	map(0xa000, 0xa3ff).w(this, FUNC(tnx1_state::popeye_videoram_w)).share("videoram");
+	map(0xa400, 0xa7ff).w(this, FUNC(tnx1_state::popeye_colorram_w)).share("colorram");
+	map(0xc000, 0xcfff).w(this, FUNC(tnx1_state::background_w));
+	map(0xe000, 0xe001).rw(this, FUNC(tnx1_state::protection_r), FUNC(tnx1_state::protection_w));
+}
 
 ADDRESS_MAP_START(tpp2_state::maincpu_program_map)
 	AM_IMPORT_FROM(tpp1_state::maincpu_program_map)
-	//AM_RANGE(0x8000, 0x87ff) AM_NOP // 7f (normally unpopulated)
+	AM_RANGE(0x8000, 0x87ff) AM_UNMAP // 7f (unpopulated)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM // 7h
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(background_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(tpp2np_state::maincpu_program_map)
+ADDRESS_MAP_START(tpp2_noalu_state::maincpu_program_map)
 	AM_IMPORT_FROM(tpp2_state::maincpu_program_map)
 	AM_RANGE(0xe000, 0xe000) AM_READUNMAP AM_WRITENOP // game still writes level number
 	AM_RANGE(0xe001, 0xe001) AM_READNOP AM_WRITEUNMAP // game still reads status but then discards it
@@ -226,14 +237,15 @@ ADDRESS_MAP_START(popeyebl_state::maincpu_program_map)
 	AM_RANGE(0xe000, 0xe01f) AM_ROM AM_REGION("blprot", 0x00)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(tnx1_state::maincpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x03, 0x03) AM_DEVREAD("aysnd", ay8910_device, data_r)
-ADDRESS_MAP_END
+void tnx1_state::maincpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x00, 0x00).portr("P1");
+	map(0x01, 0x01).portr("P2");
+	map(0x02, 0x02).portr("SYSTEM");
+	map(0x03, 0x03).r("aysnd", FUNC(ay8910_device::data_r));
+}
 
 
 CUSTOM_INPUT_MEMBER(tnx1_state::dsw1_read)
@@ -476,7 +488,7 @@ MACHINE_CONFIG_START(tnx1_state::config)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(maincpu_program_map)
 	MCFG_CPU_IO_MAP(maincpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tnx1_state,  popeye_interrupt)
+	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(tnx1_state, refresh_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -486,6 +498,7 @@ MACHINE_CONFIG_START(tnx1_state::config)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 2*16, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tnx1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tnx1_state, screen_vblank))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popeye)
 	MCFG_PALETTE_ADD("palette", 16+16*2+8*4)
@@ -819,12 +832,12 @@ ROM_START( popeyejo )
 ROM_END
 
 
-GAME( 1981, skyskipr, 0,      config, skyskipr, tnx1_state,     0, ROT0, "Nintendo", "Sky Skipper",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeye,   0,      config, popeye,   tpp2_state,     0, ROT0, "Nintendo", "Popeye (revision D)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeu,  popeye, config, popeye,   tpp2np_state,   0, ROT0, "Nintendo", "Popeye (revision D not protected)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyef,  popeye, config, popeyef,  tpp2np_state,   0, ROT0, "Nintendo", "Popeye (revision F)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyebl, popeye, config, popeye,   popeyebl_state, 0, ROT0, "bootleg",  "Popeye (bootleg set 1)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeb2, popeye, config, popeye,   popeyebl_state, 0, ROT0, "bootleg",  "Popeye (bootleg set 2)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeb3, popeye, config, popeye,   tpp2np_state,   0, ROT0, "bootleg",  "Popeye (bootleg set 3)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyej,  popeye, config, popeye,   tpp1_state,     0, ROT0, "Nintendo", "Popeye (Japan)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyejo, popeye, config, popeye,   tpp1_state,     0, ROT0, "Nintendo", "Popeye (Japan, Older)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, skyskipr, 0,        config,  skyskipr, tnx1_state,       0, ROT0, "Nintendo", "Sky Skipper",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeye,   0,        config,  popeye,   tpp2_state,       0, ROT0, "Nintendo", "Popeye (revision D)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeu,  popeye,   config,  popeye,   tpp2_noalu_state, 0, ROT0, "Nintendo", "Popeye (revision D not protected)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyef,  popeye,   config,  popeyef,  tpp2_noalu_state, 0, ROT0, "Nintendo", "Popeye (revision F)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyebl, popeye,   config,  popeye,   popeyebl_state,   0, ROT0, "bootleg",  "Popeye (bootleg set 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeb2, popeye,   config,  popeye,   popeyebl_state,   0, ROT0, "bootleg",  "Popeye (bootleg set 2)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeb3, popeye,   config,  popeye,   tpp2_noalu_state, 0, ROT0, "bootleg",  "Popeye (bootleg set 3)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyej,  popeye,   config,  popeye,   tpp1_state,       0, ROT0, "Nintendo", "Popeye (Japan)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyejo, popeye,   config,  popeye,   tpp1_state,       0, ROT0, "Nintendo", "Popeye (Japan, Older)",                MACHINE_SUPPORTS_SAVE )

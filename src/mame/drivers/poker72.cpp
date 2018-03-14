@@ -115,26 +115,27 @@ WRITE8_MEMBER(poker72_state::tile_bank_w)
 	m_tile_bank = (data & 4) >> 2;
 }
 
-ADDRESS_MAP_START(poker72_state::poker72_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM //work ram
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xf000, 0xfbff) AM_RAM_WRITE(poker72_paletteram_w) AM_SHARE("pal")
-	AM_RANGE(0xfc00, 0xfdff) AM_RAM //???
-	AM_RANGE(0xfe08, 0xfe08) AM_READ_PORT("SW1")
-	AM_RANGE(0xfe09, 0xfe09) AM_READ_PORT("IN1")
-	AM_RANGE(0xfe0a, 0xfe0a) AM_READ_PORT("IN2")
-	AM_RANGE(0xfe0c, 0xfe0c) AM_READ_PORT("SW4")
-	AM_RANGE(0xfe0d, 0xfe0d) AM_READ_PORT("SW5")
-	AM_RANGE(0xfe0e, 0xfe0e) AM_READ_PORT("SW6")
+void poker72_state::poker72_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank1");
+	map(0xc000, 0xdfff).ram(); //work ram
+	map(0xe000, 0xefff).ram().share("vram");
+	map(0xf000, 0xfbff).ram().w(this, FUNC(poker72_state::poker72_paletteram_w)).share("pal");
+	map(0xfc00, 0xfdff).ram(); //???
+	map(0xfe08, 0xfe08).portr("SW1");
+	map(0xfe09, 0xfe09).portr("IN1");
+	map(0xfe0a, 0xfe0a).portr("IN2");
+	map(0xfe0c, 0xfe0c).portr("SW4");
+	map(0xfe0d, 0xfe0d).portr("SW5");
+	map(0xfe0e, 0xfe0e).portr("SW6");
 
-	AM_RANGE(0xfe17, 0xfe17) AM_READNOP //irq ack
-	AM_RANGE(0xfe20, 0xfe20) AM_WRITE(output_w) //output, irq enable?
-	AM_RANGE(0xfe22, 0xfe22) AM_WRITE(tile_bank_w)
-	AM_RANGE(0xfe40, 0xfe40) AM_DEVREADWRITE("ay", ay8910_device, data_r, data_w)
-	AM_RANGE(0xfe60, 0xfe60) AM_DEVWRITE("ay", ay8910_device, address_w)
+	map(0xfe17, 0xfe17).nopr(); //irq ack
+	map(0xfe20, 0xfe20).w(this, FUNC(poker72_state::output_w)); //output, irq enable?
+	map(0xfe22, 0xfe22).w(this, FUNC(poker72_state::tile_bank_w));
+	map(0xfe40, 0xfe40).rw("ay", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xfe60, 0xfe60).w("ay", FUNC(ay8910_device::address_w));
 
-	AM_RANGE(0xff00, 0xffff) AM_RAM //??
+	map(0xff00, 0xffff).ram(); //??
 /*
 bp 13a
 
@@ -146,7 +147,7 @@ fe24 w
 01f9 : call 6399 --> cls
 
 */
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( poker72 )

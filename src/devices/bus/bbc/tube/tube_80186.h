@@ -31,8 +31,6 @@ public:
 	// construction/destruction
 	bbc_tube_80186_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void tube_80186_io(address_map &map);
-	void tube_80186_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -50,6 +48,9 @@ private:
 	required_device<tube_device> m_ula;
 	required_device<ram_device> m_ram;
 	required_memory_region m_bootstrap;
+
+	void tube_80186_io(address_map &map);
+	void tube_80186_mem(address_map &map);
 };
 
 

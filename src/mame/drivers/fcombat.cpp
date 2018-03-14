@@ -113,38 +113,40 @@ WRITE8_MEMBER(fcombat_state::ee00_w)
 {
 }
 
-ADDRESS_MAP_START(fcombat_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xe000) AM_READ(fcombat_port01_r)
-	AM_RANGE(0xe100, 0xe100) AM_READ_PORT("DSW0")
-	AM_RANGE(0xe200, 0xe200) AM_READ_PORT("DSW1")
-	AM_RANGE(0xe300, 0xe300) AM_READ(e300_r)
-	AM_RANGE(0xe400, 0xe400) AM_READ(fcombat_protection_r) // protection?
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(fcombat_videoreg_w)   // at least bit 0 for flip screen and joystick input multiplexor
-	AM_RANGE(0xe900, 0xe900) AM_WRITE(e900_w)
-	AM_RANGE(0xea00, 0xea00) AM_WRITE(ea00_w)
-	AM_RANGE(0xeb00, 0xeb00) AM_WRITE(eb00_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(ec00_w)
-	AM_RANGE(0xed00, 0xed00) AM_WRITE(ed00_w)
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(ee00_w)   // related to protection ? - doesn't seem to have any effect
-	AM_RANGE(0xef00, 0xef00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void fcombat_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xd000, 0xd7ff).ram().share("videoram");
+	map(0xd800, 0xd8ff).ram().share("spriteram");
+	map(0xe000, 0xe000).r(this, FUNC(fcombat_state::fcombat_port01_r));
+	map(0xe100, 0xe100).portr("DSW0");
+	map(0xe200, 0xe200).portr("DSW1");
+	map(0xe300, 0xe300).r(this, FUNC(fcombat_state::e300_r));
+	map(0xe400, 0xe400).r(this, FUNC(fcombat_state::fcombat_protection_r)); // protection?
+	map(0xe800, 0xe800).w(this, FUNC(fcombat_state::fcombat_videoreg_w));   // at least bit 0 for flip screen and joystick input multiplexor
+	map(0xe900, 0xe900).w(this, FUNC(fcombat_state::e900_w));
+	map(0xea00, 0xea00).w(this, FUNC(fcombat_state::ea00_w));
+	map(0xeb00, 0xeb00).w(this, FUNC(fcombat_state::eb00_w));
+	map(0xec00, 0xec00).w(this, FUNC(fcombat_state::ec00_w));
+	map(0xed00, 0xed00).w(this, FUNC(fcombat_state::ed00_w));
+	map(0xee00, 0xee00).w(this, FUNC(fcombat_state::ee00_w));   // related to protection ? - doesn't seem to have any effect
+	map(0xef00, 0xef00).w("soundlatch", FUNC(generic_latch_8_device::write));
+}
 
 
-ADDRESS_MAP_START(fcombat_state::audio_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ay3", ay8910_device, data_r)
-	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void fcombat_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8001, 0x8001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x8002, 0x8003).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0xa001, 0xa001).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xa002, 0xa003).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0xc001, 0xc001).r("ay3", FUNC(ay8910_device::data_r));
+	map(0xc002, 0xc003).w("ay3", FUNC(ay8910_device::data_address_w));
+}
 
 
 

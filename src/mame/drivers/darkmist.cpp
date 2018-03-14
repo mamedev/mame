@@ -44,34 +44,36 @@ WRITE8_MEMBER(darkmist_state::hw_w)
 	membank("bank1")->set_entry((data&0x80)?1:0);
 }
 
-ADDRESS_MAP_START(darkmist_state::memmap)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("P1")
-	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("P2")
-	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("START")
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(hw_w)
-	AM_RANGE(0xc805, 0xc805) AM_WRITEONLY AM_SHARE("spritebank")
-	AM_RANGE(0xc806, 0xc806) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc807, 0xc807) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc808, 0xc808) AM_READ_PORT("UNK")
-	AM_RANGE(0xd000, 0xd0ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
-	AM_RANGE(0xd200, 0xd2ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xd400, 0xd41f) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0xd600, 0xd67f) AM_DEVREADWRITE("t5182", t5182_device, sharedram_r, sharedram_w)
-	AM_RANGE(0xd680, 0xd680) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
-	AM_RANGE(0xd681, 0xd681) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
-	AM_RANGE(0xd682, 0xd682) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
-	AM_RANGE(0xd683, 0xd683) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_release_w)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(tx_vram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void darkmist_state::memmap(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc801, 0xc801).portr("P1");
+	map(0xc802, 0xc802).portr("P2");
+	map(0xc803, 0xc803).portr("START");
+	map(0xc804, 0xc804).w(this, FUNC(darkmist_state::hw_w));
+	map(0xc805, 0xc805).writeonly().share("spritebank");
+	map(0xc806, 0xc806).portr("DSW1");
+	map(0xc807, 0xc807).portr("DSW2");
+	map(0xc808, 0xc808).portr("UNK");
+	map(0xd000, 0xd0ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
+	map(0xd200, 0xd2ff).ram().w(m_palette, FUNC(palette_device::write_indirect_ext)).share("palette_ext");
+	map(0xd400, 0xd41f).ram().share("scroll");
+	map(0xd600, 0xd67f).rw(m_t5182, FUNC(t5182_device::sharedram_r), FUNC(t5182_device::sharedram_w));
+	map(0xd680, 0xd680).w(m_t5182, FUNC(t5182_device::sound_irq_w));
+	map(0xd681, 0xd681).r(m_t5182, FUNC(t5182_device::sharedram_semaphore_snd_r));
+	map(0xd682, 0xd682).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_acquire_w));
+	map(0xd683, 0xd683).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_release_w));
+	map(0xd800, 0xdfff).ram().w(this, FUNC(darkmist_state::tx_vram_w)).share("videoram");
+	map(0xe000, 0xefff).ram().share("workram");
+	map(0xf000, 0xffff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(darkmist_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void darkmist_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8000, 0xbfff).bankr("bank1");
+}
 
 static INPUT_PORTS_START( darkmist )
 	PORT_START("P1")

@@ -424,28 +424,29 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in3_r)
 	return ret;
 }
 
-ADDRESS_MAP_START(spyhuntertec_state::spyhuntertec_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
+void spyhuntertec_state::spyhuntertec_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xdfff).rom();
 
-	AM_RANGE(0xa800, 0xa8ff) AM_RAM // the ROM is a solid fill in these areas, and they get tested as RAM, I think they moved the 'real' scroll regs here
-	AM_RANGE(0xa900, 0xa9ff) AM_RAM
+	map(0xa800, 0xa8ff).ram(); // the ROM is a solid fill in these areas, and they get tested as RAM, I think they moved the 'real' scroll regs here
+	map(0xa900, 0xa9ff).ram();
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_SHARE("spyhunt_alpha")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM //AM_SHARE("nvram")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_SHARE("spriteram") // origional spriteram
-	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_RAM_WRITE(spyhuntertec_paletteram_w) AM_SHARE("paletteram")
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(spyhuntertec_state::spyhunt_videoram_w)).share("videoram");
+	map(0xe800, 0xebff).mirror(0x0400).ram().w(this, FUNC(spyhuntertec_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
+	map(0xf000, 0xf7ff).ram(); //AM_SHARE("nvram")
+	map(0xf800, 0xf9ff).ram().share("spriteram"); // origional spriteram
+	map(0xfa00, 0xfa7f).mirror(0x0180).ram().w(this, FUNC(spyhuntertec_state::spyhuntertec_paletteram_w)).share("paletteram");
 
-	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("DSW0")
-	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfc02, 0xfc02) AM_READ(spyhuntertec_in2_r)
-	AM_RANGE(0xfc03, 0xfc03) AM_READ(spyhuntertec_in3_r)
+	map(0xfc00, 0xfc00).portr("DSW0");
+	map(0xfc01, 0xfc01).portr("DSW1");
+	map(0xfc02, 0xfc02).r(this, FUNC(spyhuntertec_state::spyhuntertec_in2_r));
+	map(0xfc03, 0xfc03).r(this, FUNC(spyhuntertec_state::spyhuntertec_in3_r));
 
-	AM_RANGE(0xfd00, 0xfd00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	map(0xfd00, 0xfd00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram2") // actual spriteram for this hw??
-ADDRESS_MAP_END
+	map(0xfe00, 0xffff).ram().share("spriteram2"); // actual spriteram for this hw??
+}
 
 WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_port04_w)
 {
@@ -457,23 +458,25 @@ WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_portf0_w)
 	if ((data != 0x03) && (data != 0x08)) printf("spyhuntertec_portf0_w %02x\n", data);
 }
 
-ADDRESS_MAP_START(spyhuntertec_state::spyhuntertec_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_WRITE(spyhuntertec_port04_w)
-	AM_RANGE(0x84, 0x86) AM_WRITE(spyhunt_scroll_value_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITENOP // was watchdog
+void spyhuntertec_state::spyhuntertec_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x04, 0x04).w(this, FUNC(spyhuntertec_state::spyhuntertec_port04_w));
+	map(0x84, 0x86).w(this, FUNC(spyhuntertec_state::spyhunt_scroll_value_w));
+	map(0xe0, 0xe0).nopw(); // was watchdog
 //  AM_RANGE(0xe8, 0xe8) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf0) AM_WRITE( spyhuntertec_portf0_w )
-ADDRESS_MAP_END
+	map(0xf0, 0xf0).w(this, FUNC(spyhuntertec_state::spyhuntertec_portf0_w));
+}
 
 
-ADDRESS_MAP_START(spyhuntertec_state::spyhuntertec_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
+void spyhuntertec_state::spyhuntertec_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x8000, 0x83ff).ram();
 
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 WRITE8_MEMBER(spyhuntertec_state::sound_irq_ack)
@@ -481,22 +484,23 @@ WRITE8_MEMBER(spyhuntertec_state::sound_irq_ack)
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(spyhuntertec_state::spyhuntertec_sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void spyhuntertec_state::spyhuntertec_sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 
-	AM_RANGE(0x00, 0x00) AM_WRITE(sound_irq_ack)
+	map(0x00, 0x00).w(this, FUNC(spyhuntertec_state::sound_irq_ack));
 
-	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE("ay3", ay8912_device, address_data_w)
-	AM_RANGE(0x0012, 0x0012) AM_DEVREAD("ay3", ay8912_device, data_r)
+	map(0x0012, 0x0013).w("ay3", FUNC(ay8912_device::address_data_w));
+	map(0x0012, 0x0012).r("ay3", FUNC(ay8912_device::data_r));
 
-	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
-	AM_RANGE(0x0014, 0x0014) AM_DEVREAD("ay1", ay8912_device, data_r)
+	map(0x0014, 0x0015).w("ay1", FUNC(ay8912_device::address_data_w));
+	map(0x0014, 0x0014).r("ay1", FUNC(ay8912_device::data_r));
 
-	AM_RANGE(0x0018, 0x0019) AM_DEVWRITE("ay2", ay8912_device, address_data_w) // data written to port a
-	AM_RANGE(0x0018, 0x0018) AM_DEVREAD("ay2", ay8912_device, data_r) // actually read
+	map(0x0018, 0x0019).w("ay2", FUNC(ay8912_device::address_data_w)); // data written to port a
+	map(0x0018, 0x0018).r("ay2", FUNC(ay8912_device::data_r)); // actually read
 
-ADDRESS_MAP_END
+}
 
 
 

@@ -607,50 +607,53 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_cnt_w )
 }
 
 
-ADDRESS_MAP_START(cybertnk_state::master_mem)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x087fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spr_ram") // non-tile based sprite ram
-	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(tilemap0_vram_w) AM_SHARE("tilemap0_vram")
-	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM_WRITE(tilemap1_vram_w) AM_SHARE("tilemap1_vram")
-	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM_WRITE(tilemap2_vram_w) AM_SHARE("tilemap2_vram")
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x100000, 0x107fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* 2x palettes, one for each screen */
+void cybertnk_state::master_mem(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x087fff).ram(); /*Work RAM*/
+	map(0x0a0000, 0x0a0fff).ram().share("spr_ram"); // non-tile based sprite ram
+	map(0x0c0000, 0x0c1fff).ram().w(this, FUNC(cybertnk_state::tilemap0_vram_w)).share("tilemap0_vram");
+	map(0x0c4000, 0x0c5fff).ram().w(this, FUNC(cybertnk_state::tilemap1_vram_w)).share("tilemap1_vram");
+	map(0x0c8000, 0x0c9fff).ram().w(this, FUNC(cybertnk_state::tilemap2_vram_w)).share("tilemap2_vram");
+	map(0x0e0000, 0x0e0fff).ram().share("sharedram");
+	map(0x100000, 0x107fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* 2x palettes, one for each screen */
 
-	AM_RANGE(0x110000, 0x110001) AM_WRITE8(cybertnk_sound_cmd_w,0xffff)
-	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("DSW1")  AM_WRITENOP// watchdog?
-	AM_RANGE(0x110004, 0x110005) AM_READ8(cybertnk_io_rdy_r,0xff00)
-	AM_RANGE(0x110006, 0x110007) AM_READ_PORT("IN0")
-	AM_RANGE(0x110006, 0x110007) AM_WRITE8(cybertnk_mux_w,0xffff)
-	AM_RANGE(0x110008, 0x110009) AM_READ_PORT("IN1") AM_WRITE8(cybertnk_cnt_w, 0xffff)
-	AM_RANGE(0x11000a, 0x11000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x11000c, 0x11000d) AM_WRITE8(cybertnk_irq_ack_w,0xffff)
+	map(0x110000, 0x110001).w(this, FUNC(cybertnk_state::cybertnk_sound_cmd_w));
+	map(0x110002, 0x110003).portr("DSW1").nopw();// watchdog?
+	map(0x110004, 0x110004).r(this, FUNC(cybertnk_state::cybertnk_io_rdy_r));
+	map(0x110006, 0x110007).portr("IN0");
+	map(0x110006, 0x110007).w(this, FUNC(cybertnk_state::cybertnk_mux_w));
+	map(0x110008, 0x110009).portr("IN1").w(this, FUNC(cybertnk_state::cybertnk_cnt_w));
+	map(0x11000a, 0x11000b).portr("DSW2");
+	map(0x11000c, 0x11000d).w(this, FUNC(cybertnk_state::cybertnk_irq_ack_w));
 
-	AM_RANGE(0x110040, 0x110045) AM_RAM AM_SHARE("tilemap0_scroll")
-	AM_RANGE(0x110048, 0x11004d) AM_RAM AM_SHARE("tilemap1_scroll")
-	AM_RANGE(0x110080, 0x110085) AM_RAM AM_SHARE("tilemap2_scroll")
+	map(0x110040, 0x110045).ram().share("tilemap0_scroll");
+	map(0x110048, 0x11004d).ram().share("tilemap1_scroll");
+	map(0x110080, 0x110085).ram().share("tilemap2_scroll");
 
-	AM_RANGE(0x1100d4, 0x1100d5) AM_READ8(cybertnk_mux_r, 0x00ff)
-ADDRESS_MAP_END
+	map(0x1100d5, 0x1100d5).r(this, FUNC(cybertnk_state::cybertnk_mux_r));
+}
 
-ADDRESS_MAP_START(cybertnk_state::slave_mem)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x020000, 0x020001) AM_READNOP // POST debug?
-	AM_RANGE(0x07fff8, 0x07fffd) AM_READNOP // POST debug?
-	AM_RANGE(0x080000, 0x083fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM AM_SHARE("roadram")
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x140000, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
-ADDRESS_MAP_END
+void cybertnk_state::slave_mem(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x020000, 0x020001).nopr(); // POST debug?
+	map(0x07fff8, 0x07fffd).nopr(); // POST debug?
+	map(0x080000, 0x083fff).ram(); /*Work RAM*/
+	map(0x0c0000, 0x0c0fff).ram().share("roadram");
+	map(0x100000, 0x100fff).ram().share("sharedram");
+	map(0x140000, 0x140003).noprw(); /*Watchdog? Written during loops and interrupts*/
+}
 
-ADDRESS_MAP_START(cybertnk_state::sound_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", y8950_device, read, write)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xa005, 0xa006) AM_NOP
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", y8950_device, read, write)
-ADDRESS_MAP_END
+void cybertnk_state::sound_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xa001).rw("ym1", FUNC(y8950_device::read), FUNC(y8950_device::write));
+	map(0xa001, 0xa001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xa005, 0xa006).noprw();
+	map(0xc000, 0xc001).rw("ym2", FUNC(y8950_device::read), FUNC(y8950_device::write));
+}
 
 // Player 1 controls the Driving and the Cannons
 // Player 2 controls the Machine Guns

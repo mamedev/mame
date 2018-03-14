@@ -117,6 +117,6 @@ protected:
 	uint16_t m_sprite_dest_offs;
 	uint16_t m_misc_control;
 	int m_xcount;
-	required_device<cpu_device> m_maincpu;
+	required_device<tms34020_device> m_maincpu;
 	required_device<screen_device> m_screen;
 };

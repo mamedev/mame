@@ -764,49 +764,52 @@ READ8_MEMBER(snookr10_state::port2000_8_r)
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(snookr10_state::snookr10_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed 6116 */
-	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")        /* IN0 */
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("IN1")        /* IN1 */
-	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("IN2")        /* IN2 */
-	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("SW1")        /* DS1 */
-	AM_RANGE(0x3004, 0x3004) AM_READ(dsw_port_1_r)      /* complement of DS1, bit 7 */
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(output_port_0_w)  /* OUT0 */
-	AM_RANGE(0x5001, 0x5001) AM_WRITE(output_port_1_w)  /* OUT1 */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(snookr10_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(snookr10_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void snookr10_state::snookr10_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed 6116 */
+	map(0x1000, 0x1000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3000, 0x3000).portr("IN0");        /* IN0 */
+	map(0x3001, 0x3001).portr("IN1");        /* IN1 */
+	map(0x3002, 0x3002).portr("IN2");        /* IN2 */
+	map(0x3003, 0x3003).portr("SW1");        /* DS1 */
+	map(0x3004, 0x3004).r(this, FUNC(snookr10_state::dsw_port_1_r));      /* complement of DS1, bit 7 */
+	map(0x5000, 0x5000).w(this, FUNC(snookr10_state::output_port_0_w));  /* OUT0 */
+	map(0x5001, 0x5001).w(this, FUNC(snookr10_state::output_port_1_w));  /* OUT1 */
+	map(0x6000, 0x6fff).ram().w(this, FUNC(snookr10_state::snookr10_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(this, FUNC(snookr10_state::snookr10_colorram_w)).share("colorram");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(snookr10_state::tenballs_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed 6116 */
-	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("IN0")        /* IN0 */
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")        /* IN1 */
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("IN2")        /* IN2 */
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("SW1")        /* DS1 */
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(output_port_0_w)  /* OUT0 */
-	AM_RANGE(0x5001, 0x5001) AM_WRITE(output_port_1_w)  /* OUT1 */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(snookr10_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(snookr10_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void snookr10_state::tenballs_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed 6116 */
+	map(0x1000, 0x1000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x4000, 0x4000).portr("IN0");        /* IN0 */
+	map(0x4001, 0x4001).portr("IN1");        /* IN1 */
+	map(0x4002, 0x4002).portr("IN2");        /* IN2 */
+	map(0x4003, 0x4003).portr("SW1");        /* DS1 */
+	map(0x5000, 0x5000).w(this, FUNC(snookr10_state::output_port_0_w));  /* OUT0 */
+	map(0x5001, 0x5001).w(this, FUNC(snookr10_state::output_port_1_w));  /* OUT1 */
+	map(0x6000, 0x6fff).ram().w(this, FUNC(snookr10_state::snookr10_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(this, FUNC(snookr10_state::snookr10_colorram_w)).share("colorram");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(snookr10_state::crystalc_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed 6116 */
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(output_port_0_w)  /* OUT0 */
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(output_port_1_w)  /* OUT1 */
-	AM_RANGE(0x2000, 0x2008) AM_READ(port2000_8_r)      /* unknown... protection or data channels? */
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")        /* IN0 */
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("IN1")        /* IN1 */
-	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("IN2")        /* IN2 */
-	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("SW1")        /* DS1 */
-	AM_RANGE(0x5000, 0x5000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(snookr10_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(snookr10_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void snookr10_state::crystalc_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed 6116 */
+	map(0x1000, 0x1000).w(this, FUNC(snookr10_state::output_port_0_w));  /* OUT0 */
+	map(0x1001, 0x1001).w(this, FUNC(snookr10_state::output_port_1_w));  /* OUT1 */
+	map(0x2000, 0x2008).r(this, FUNC(snookr10_state::port2000_8_r));      /* unknown... protection or data channels? */
+	map(0x3000, 0x3000).portr("IN0");        /* IN0 */
+	map(0x3001, 0x3001).portr("IN1");        /* IN1 */
+	map(0x3002, 0x3002).portr("IN2");        /* IN2 */
+	map(0x3003, 0x3003).portr("SW1");        /* DS1 */
+	map(0x5000, 0x5000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x6000, 0x6fff).ram().w(this, FUNC(snookr10_state::snookr10_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(this, FUNC(snookr10_state::snookr10_colorram_w)).share("colorram");
+	map(0x8000, 0xffff).rom();
+}
 
 
 /*************************

@@ -66,10 +66,10 @@
 	MCFG_SPECTRUM_EXPANSION_SLOT_NMI_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, nmi_w))
 
 #define MCFG_SPECTRUM_EXPANSION_SLOT_IRQ_HANDLER(_devcb) \
-	devcb = &spectrum_expansion_slot_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<spectrum_expansion_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_SPECTRUM_EXPANSION_SLOT_NMI_HANDLER(_devcb) \
-	devcb = &spectrum_expansion_slot_device::set_nmi_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<spectrum_expansion_slot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -88,11 +88,8 @@ public:
 	virtual ~spectrum_expansion_slot_device();
 
 	// callbacks
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
-	{ return downcast<spectrum_expansion_slot_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
-	{ return downcast<spectrum_expansion_slot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_handler(Object &&cb) { return m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( mreq_r );
 	DECLARE_WRITE8_MEMBER( mreq_w );

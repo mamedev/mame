@@ -17,7 +17,6 @@
 #include "machine/sonydriv.h"
 
 #include "debugger.h"
-#include "screen.h"
 
 
 #ifdef MAME_DEBUG
@@ -315,7 +314,7 @@ void apple2_state::apple2_update_memory_postload()
 
 READ8_MEMBER(apple2_state::apple2_c0xx_r)
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		read8_delegate handlers[] =
 		{
@@ -368,7 +367,7 @@ WRITE8_MEMBER(apple2_state::apple2_c0xx_w)
 
 READ8_MEMBER(apple2_state::apple2_c080_r)
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		device_a2bus_card_interface *slotdevice;
 		int slot;
@@ -425,7 +424,7 @@ int8_t apple2_state::apple2_slotram_r(int slotnum, int offset)
 {
 	if (m_slot_ram)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 //          printf("slotram_r: taking cnxx_slot to -1\n");
 			m_a2_cnxx_slot = -1;
@@ -449,7 +448,7 @@ READ8_MEMBER(apple2_state::apple2_c1xx_r )
 
 	if (slotdevice != nullptr)
 	{
-		if ((slotdevice->take_c800()) && (!machine().side_effect_disabled()))
+		if ((slotdevice->take_c800()) && (!machine().side_effects_disabled()))
 		{
 //          printf("c1xx_r: taking cnxx_slot to %d\n", slotnum);
 			m_a2_cnxx_slot = slotnum;
@@ -499,7 +498,7 @@ READ8_MEMBER(apple2_state::apple2_c3xx_r )
 	// is a card installed in this slot?
 	if (slotdevice != nullptr)
 	{
-		if ((slotdevice->take_c800()) && (!machine().side_effect_disabled()))
+		if ((slotdevice->take_c800()) && (!machine().side_effects_disabled()))
 		{
 //          printf("c3xx_r: taking cnxx_slot to %d\n", slotnum);
 			m_a2_cnxx_slot = slotnum;
@@ -527,7 +526,7 @@ WRITE8_MEMBER(apple2_state::apple2_c3xx_w )
 
 	if (slotdevice != nullptr)
 	{
-		if ((slotdevice->take_c800()) && (!machine().side_effect_disabled()))
+		if ((slotdevice->take_c800()) && (!machine().side_effects_disabled()))
 		{
 //          printf("c3xx_w: taking cnxx_slot to %d\n", slotnum);
 			m_a2_cnxx_slot = slotnum;
@@ -553,7 +552,7 @@ READ8_MEMBER(apple2_state::apple2_c4xx_r )
 	// is a card installed in this slot?
 	if (slotdevice != nullptr)
 	{
-		if (slotdevice->take_c800() && (m_a2_cnxx_slot != slotnum) && (!machine().side_effect_disabled()))
+		if (slotdevice->take_c800() && (m_a2_cnxx_slot != slotnum) && (!machine().side_effects_disabled()))
 		{
 			m_a2_cnxx_slot = slotnum;
 			apple2_update_memory();
@@ -580,7 +579,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c4xx_w )
 
 	if (slotdevice != nullptr)
 	{
-		if ((slotdevice->take_c800()) && (!machine().side_effect_disabled()))
+		if ((slotdevice->take_c800()) && (!machine().side_effects_disabled()))
 		{
 //          printf("c4xx_w: taking cnxx_slot to %d\n", slotnum);
 			m_a2_cnxx_slot = slotnum;
@@ -598,7 +597,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c4xx_w )
 READ8_MEMBER(apple2_state::apple2_cfff_r)
 {
 	// debugger guard
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 //      printf("cfff_r: taking cnxx_slot to -1\n");
 		m_a2_cnxx_slot = -1;
@@ -610,7 +609,7 @@ READ8_MEMBER(apple2_state::apple2_cfff_r)
 
 WRITE8_MEMBER(apple2_state::apple2_cfff_w)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 //      printf("cfff_w: taking cnxx_slot to -1\n");
 		m_a2_cnxx_slot = -1;
@@ -1229,7 +1228,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 	int scanline = param;
 
 	if((scanline % 8) == 0)
-		machine().first_screen()->update_partial(machine().first_screen()->vpos());
+		m_screen->update_partial(m_screen->vpos());
 	if ((m_kbspecial->read() & 0x80) &&
 		(a2_no_ctrl_reset() || (m_kbspecial->read() & 0x08)))
 	{
@@ -1653,7 +1652,7 @@ READ8_MEMBER ( apple2_state::apple2_c00x_r )
 {
 	uint8_t result = 0;
 
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		/* Read the keyboard data and strobe */
 		g_profiler.start(PROFILER_C00X);
@@ -1707,7 +1706,7 @@ READ8_MEMBER( apple2_state::apple2_c01x_r )
 {
 	uint8_t result = apple2_getfloatingbusvalue() & 0x7F;
 
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		g_profiler.start(PROFILER_C01X);
 
@@ -1723,7 +1722,7 @@ READ8_MEMBER( apple2_state::apple2_c01x_r )
 			case 0x06:          result |= (m_flags & VAR_ALTZP)     ? 0x80 : 0x00;  break;
 			case 0x07:          result |= (m_flags & VAR_SLOTC3ROM) ? 0x80 : 0x00;  break;
 			case 0x08:          result |= (m_flags & VAR_80STORE)   ? 0x80 : 0x00;  break;
-			case 0x09:          result |= !machine().first_screen()->vblank()     ? 0x80 : 0x00;  break;
+			case 0x09:          result |= !m_screen->vblank()     ? 0x80 : 0x00;  break;
 			case 0x0A:          result |= (m_flags & VAR_TEXT)      ? 0x80 : 0x00;  break;
 			case 0x0B:          result |= (m_flags & VAR_MIXED)     ? 0x80 : 0x00;  break;
 			case 0x0C:          result |= (m_flags & VAR_PAGE2)     ? 0x80 : 0x00;  break;
@@ -1760,7 +1759,7 @@ WRITE8_MEMBER( apple2_state::apple2_c01x_w )
 
 READ8_MEMBER( apple2_state::apple2_c02x_r )
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		apple2_c02x_w(space, offset, 0, 0);
 	}
@@ -1791,7 +1790,7 @@ WRITE8_MEMBER( apple2_state::apple2_c02x_w )
 
 READ8_MEMBER ( apple2_state::apple2_c03x_r )
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		if (!offset)
 		{
@@ -1823,7 +1822,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c03x_w )
 
 READ8_MEMBER ( apple2_state::apple2_c05x_r )
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		uint32_t mask;
 
@@ -1871,7 +1870,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c05x_w )
 READ8_MEMBER ( apple2_state::apple2_c06x_r )
 {
 	int result = 0;
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		switch (offset & 0x0F)
 		{
@@ -1934,7 +1933,7 @@ READ8_MEMBER ( apple2_state::apple2_c06x_r )
 
 READ8_MEMBER ( apple2_state::apple2_c07x_r )
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		double x_calibration = attotime::from_usec(12).as_double();
 		double y_calibration = attotime::from_usec(13).as_double();

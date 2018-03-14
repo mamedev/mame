@@ -7,30 +7,30 @@
 #pragma once
 
 #define MCFG_INTERPRO_IOGA_NMI_CB(_out_nmi) \
-	devcb = &interpro_ioga_device::static_set_out_nmi_callback(*device, DEVCB_##_out_nmi);
+	devcb = &downcast<interpro_ioga_device &>(*device).set_out_nmi_callback(DEVCB_##_out_nmi);
 
 #define MCFG_INTERPRO_IOGA_IRQ_CB(_out_irq) \
-	devcb = &interpro_ioga_device::static_set_out_irq_callback(*device, DEVCB_##_out_irq);
+	devcb = &downcast<interpro_ioga_device &>(*device).set_out_irq_callback(DEVCB_##_out_irq);
 
 #define MCFG_INTERPRO_IOGA_IVEC_CB(_out_ivec) \
-	devcb = &interpro_ioga_device::static_set_out_ivec_callback(*device, DEVCB_##_out_ivec);
+	devcb = &downcast<interpro_ioga_device &>(*device).set_out_ivec_callback(DEVCB_##_out_ivec);
 
 #define MCFG_INTERPRO_IOGA_DMA_CB(_channel, _dma_r, _dma_w) \
-	devcb = &interpro_ioga_device::static_set_dma_r_callback(*device, _channel, DEVCB_##_dma_r); \
-	devcb = &interpro_ioga_device::static_set_dma_w_callback(*device, _channel, DEVCB_##_dma_w);
+	devcb = &downcast<interpro_ioga_device &>(*device).set_dma_r_callback(_channel, DEVCB_##_dma_r); \
+	devcb = &downcast<interpro_ioga_device &>(*device).set_dma_w_callback(_channel, DEVCB_##_dma_w);
 
 #define MCFG_INTERPRO_IOGA_SERIAL_DMA_CB(_channel, _dma_r, _dma_w) \
-	devcb = &interpro_ioga_device::static_set_serial_dma_r_callback(*device, _channel, DEVCB_##_dma_r); \
-	devcb = &interpro_ioga_device::static_set_serial_dma_w_callback(*device, _channel, DEVCB_##_dma_w);
+	devcb = &downcast<interpro_ioga_device &>(*device).set_serial_dma_r_callback(_channel, DEVCB_##_dma_r); \
+	devcb = &downcast<interpro_ioga_device &>(*device).set_serial_dma_w_callback(_channel, DEVCB_##_dma_w);
 
 #define MCFG_INTERPRO_IOGA_FDCTC_CB(_tc) \
-	devcb = &interpro_ioga_device::static_set_fdc_tc_callback(*device, DEVCB_##_tc);
+	devcb = &downcast<interpro_ioga_device &>(*device).set_fdc_tc_callback(DEVCB_##_tc);
 
 #define MCFG_INTERPRO_IOGA_ETH_CA_CB(_ca) \
-	devcb = &interpro_ioga_device::static_set_eth_ca_callback(*device, DEVCB_##_ca);
+	devcb = &downcast<interpro_ioga_device &>(*device).set_eth_ca_callback(DEVCB_##_ca);
 
 #define MCFG_INTERPRO_IOGA_MEMORY(_tag, _spacenum) \
-	interpro_ioga_device::static_set_memory(*device, _tag, _spacenum);
+	downcast<interpro_ioga_device &>(*device).set_memory(_tag, _spacenum);
 
 class interpro_ioga_device : public device_t
 {
@@ -106,17 +106,21 @@ protected:
 	};
 
 public:
-	template<class _Object> static devcb_base &static_set_out_nmi_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_nmi_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_out_irq_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_irq_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_out_ivec_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_ivec_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_dma_r_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_dma_channel[channel].device_r.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_dma_w_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_dma_channel[channel].device_w.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_serial_dma_r_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_serial_dma_channel[channel].device_r.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_serial_dma_w_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_serial_dma_channel[channel].device_w.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_fdc_tc_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_fdc_tc_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_eth_ca_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_eth_ca_func.set_callback(object); }
+	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_ivec_callback(Object &&cb) { return m_out_ivec_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_r_callback(int channel, Object &&cb) { return m_dma_channel[channel].device_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_w_callback(int channel, Object &&cb) { return m_dma_channel[channel].device_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_serial_dma_r_callback(int channel, Object &&cb) { return m_serial_dma_channel[channel].device_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_serial_dma_w_callback(int channel, Object &&cb) { return m_serial_dma_channel[channel].device_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_fdc_tc_callback(Object &&cb) { return m_fdc_tc_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_eth_ca_callback(Object &&cb) { return m_eth_ca_func.set_callback(std::forward<Object>(cb)); }
 
-	static void static_set_memory(device_t &device, const char *const tag, const int spacenum);
+	void set_memory(const char *const tag, const int spacenum)
+	{
+		m_memory_tag = tag;
+		m_memory_spacenum = spacenum;
+	}
 
 	virtual void map(address_map &map) = 0;
 
@@ -192,10 +196,9 @@ public:
 		DMA_CTRL_ERR     = 0x00800000, // checked for in scsi isr
 
 		DMA_CTRL_BGR     = 0x01000000, // cleared when command complete (maybe bus grant required?)
-		DMA_CTRL_WAIT    = 0x02000000, // waiting for bus grant
+		DMA_CTRL_VIRTUAL = 0x02000000, // virtual address translation required
 		DMA_CTRL_DOUBLE  = 0x04000000, // double transfer size (double or quad quad)
 
-		DMA_CTRL_VIRTUAL = 0x20000000, // use virtual addressing
 		DMA_CTRL_WRITE   = 0x40000000, // memory to device transfer
 		DMA_CTRL_QUAD    = 0x80000000, // select quad transfer size (quad quad when combined with double)
 
@@ -509,8 +512,8 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	DECLARE_WRITE32_MEMBER(eth_w);
-	DECLARE_READ32_MEMBER(eth_r);
+	DECLARE_WRITE16_MEMBER(eth_w);
+	DECLARE_READ16_MEMBER(eth_r);
 
 protected:
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) override;

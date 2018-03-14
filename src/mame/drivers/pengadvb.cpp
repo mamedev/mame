@@ -43,17 +43,16 @@ class pengadvb_state : public driver_device
 {
 public:
 	pengadvb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_page(*this, "page%u", 0U)
+		, m_bank(*this, "bank%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	DECLARE_DRIVER_INIT(pengadvb);
+	void pengadvb(machine_config &config);
 
-	address_map_bank_device *m_page[4];
-	memory_bank *m_bank[4];
-	uint8_t m_primary_slot_reg;
-	uint8_t m_kb_matrix_row;
-
+protected:
 	DECLARE_READ8_MEMBER(mem_r);
 	DECLARE_WRITE8_MEMBER(mem_w);
 	DECLARE_WRITE8_MEMBER(megarom_bank_w);
@@ -64,14 +63,20 @@ public:
 	DECLARE_READ8_MEMBER(pengadvb_ppi_port_b_r);
 	DECLARE_WRITE8_MEMBER(pengadvb_ppi_port_c_w);
 
-	DECLARE_DRIVER_INIT(pengadvb);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void pengadvb_decrypt(const char* region);
-	void pengadvb(machine_config &config);
 	void bank_mem(address_map &map);
 	void io_mem(address_map &map);
 	void program_mem(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device_array<address_map_bank_device, 4> m_page;
+	required_memory_bank_array<4> m_bank;
+
+	uint8_t m_primary_slot_reg;
+	uint8_t m_kb_matrix_row;
 };
 
 
@@ -96,34 +101,37 @@ WRITE8_MEMBER(pengadvb_state::megarom_bank_w)
 	m_bank[offset >> 13 & 3]->set_entry(data & 0xf);
 }
 
-ADDRESS_MAP_START(pengadvb_state::program_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w) // 4 pages of 16KB
-ADDRESS_MAP_END
+void pengadvb_state::program_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(pengadvb_state::mem_r), FUNC(pengadvb_state::mem_w)); // 4 pages of 16KB
+}
 
-ADDRESS_MAP_START(pengadvb_state::bank_mem)
+void pengadvb_state::bank_mem(address_map &map)
+{
 	// slot 0, MSX BIOS
-	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("maincpu", 0)
+	map(0x00000, 0x07fff).rom().region("maincpu", 0);
 
 	// slot 1, MegaROM
-	AM_RANGE(0x14000, 0x15fff) AM_ROMBANK("bank0")
-	AM_RANGE(0x16000, 0x17fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x18000, 0x19fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x1a000, 0x1bfff) AM_ROMBANK("bank3")
-	AM_RANGE(0x14000, 0x1bfff) AM_WRITE(megarom_bank_w)
+	map(0x14000, 0x15fff).bankr("bank0");
+	map(0x16000, 0x17fff).bankr("bank1");
+	map(0x18000, 0x19fff).bankr("bank2");
+	map(0x1a000, 0x1bfff).bankr("bank3");
+	map(0x14000, 0x1bfff).w(this, FUNC(pengadvb_state::megarom_bank_w));
 
 	// slot 3, 16KB RAM
-	AM_RANGE(0x3c000, 0x3ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x3c000, 0x3ffff).ram();
+}
 
-ADDRESS_MAP_START(pengadvb_state::io_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x98, 0x98) AM_DEVREADWRITE("tms9128", tms9128_device, vram_read, vram_write)
-	AM_RANGE(0x99, 0x99) AM_DEVREADWRITE("tms9128", tms9128_device, register_read, register_write)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xa8, 0xab) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void pengadvb_state::io_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x98, 0x98).rw("tms9128", FUNC(tms9128_device::vram_read), FUNC(tms9128_device::vram_write));
+	map(0x99, 0x99).rw("tms9128", FUNC(tms9128_device::register_read), FUNC(tms9128_device::register_write));
+	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
 /***************************************************************************
@@ -296,17 +304,13 @@ void pengadvb_state::pengadvb_decrypt(const char* region)
 
 	// data lines swap
 	for (int i = 0; i < memsize; i++)
-	{
 		mem[i] = bitswap<8>(mem[i],7,6,5,3,4,2,1,0);
-	}
 
 	// address line swap
 	std::vector<uint8_t> buf(memsize);
 	memcpy(&buf[0], mem, memsize);
 	for (int i = 0; i < memsize; i++)
-	{
 		mem[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,5,11,10,9,8,7,6,12,4,3,2,1,0)];
-	}
 }
 
 DRIVER_INIT_MEMBER(pengadvb_state,pengadvb)
@@ -315,15 +319,8 @@ DRIVER_INIT_MEMBER(pengadvb_state,pengadvb)
 	pengadvb_decrypt("game");
 
 	// init banks
-	static const char * const pagenames[] = { "page0", "page1", "page2", "page3" };
-	static const char * const banknames[] = { "bank0", "bank1", "bank2", "bank3" };
 	for (int i = 0; i < 4; i++)
-	{
-		m_page[i] = machine().device<address_map_bank_device>(pagenames[i]);
-
-		m_bank[i] = membank(banknames[i]);
 		m_bank[i]->configure_entries(0, 0x10, memregion("game")->base(), 0x2000);
-	}
 }
 
 

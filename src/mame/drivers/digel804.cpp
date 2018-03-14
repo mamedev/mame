@@ -70,28 +70,27 @@
 class digel804_state : public driver_device
 {
 public:
-	digel804_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	digel804_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_acia(*this, "acia"),
 		m_vfd(*this, "vfd"),
 		m_kb(*this, "74c923"),
 		m_ram(*this, RAM_TAG),
-		m_rambank(*this, "bankedram")
+		m_rambank(*this, "bankedram"),
+		m_func_leds(*this, "func_led%u", 0U)
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<mos6551_device> m_acia;
-	required_device<roc10937_device> m_vfd;
-	required_device<mm74c922_device> m_kb;
-	required_device<ram_device> m_ram;
-	required_memory_bank m_rambank;
+	DECLARE_INPUT_CHANGED_MEMBER(mode_change);
 
+	void digel804(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_DRIVER_INIT(digel804);
+
 	DECLARE_WRITE8_MEMBER( op00 );
 	DECLARE_READ8_MEMBER( ip40 );
 	DECLARE_WRITE8_MEMBER( op40 );
@@ -114,9 +113,22 @@ public:
 	DECLARE_READ8_MEMBER( acia_control_r );
 	DECLARE_WRITE8_MEMBER( acia_control_w );
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( ep804_acia_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( da_w );
-	DECLARE_INPUT_CHANGED_MEMBER(mode_change);
+
+	void z80_mem_804_1_4(address_map &map);
+	void z80_io_1_4(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<mos6551_device> m_acia;
+	required_device<roc10937_device> m_vfd;
+	required_device<mm74c922_device> m_kb;
+	required_device<ram_device> m_ram;
+	required_memory_bank m_rambank;
+
+	output_finder<16> m_func_leds;
+
 	// current speaker state for port 45
 	uint8_t m_speaker_state;
 	// ram stuff for banking
@@ -132,20 +144,44 @@ public:
 	uint8_t m_chipinsert_state;
 	uint8_t m_keyen_state;
 	uint8_t m_op41;
+};
+
+
+class ep804_state : public digel804_state
+{
+public:
+	using digel804_state::digel804_state;
+
 	void ep804(machine_config &config);
-	void digel804(machine_config &config);
-	void z80_io_1_2(address_map &map);
-	void z80_io_1_4(address_map &map);
+
+protected:
+	DECLARE_WRITE_LINE_MEMBER( ep804_acia_irq_w );
+
 	void z80_mem_804_1_2(address_map &map);
-	void z80_mem_804_1_4(address_map &map);
+	void z80_io_1_2(address_map &map);
 };
 
 
 enum { MODE_OFF, MODE_KEY, MODE_REM, MODE_SIM };
 
 
-DRIVER_INIT_MEMBER(digel804_state,digel804)
+void digel804_state::machine_start()
 {
+	m_func_leds.resolve();
+
+	save_item(NAME(m_speaker_state));
+	save_item(NAME(m_ram_bank));
+	save_item(NAME(m_acia_intq));
+	save_item(NAME(m_overload_state));
+	save_item(NAME(m_key_intq));
+	save_item(NAME(m_remote_mode));
+	save_item(NAME(m_key_mode));
+	save_item(NAME(m_sim_mode));
+	save_item(NAME(m_powerfail_state));
+	save_item(NAME(m_chipinsert_state));
+	save_item(NAME(m_keyen_state));
+	save_item(NAME(m_op41));
+
 	m_speaker_state = 0;
 	//port43_rtn = 0xEE;//0xB6;
 	m_acia_intq = 1; // /INT source 1
@@ -344,8 +380,8 @@ WRITE8_MEMBER( digel804_state::op46 )
 	output().set_value("busy_led",  BIT(data,6));
 	output().set_value("error_led", BIT(data,5));
 
-	for(int i=0; i<16; i++)
-		output().set_indexed_value("func_led", i, (!(data & 0x10) && ((~data & 0x0f) == i)) ? 1 : 0);
+	for (int i = 0; i < 16; i++)
+		m_func_leds[i] = (!(data & 0x10) && ((~data & 0x0f) == i)) ? 1 : 0;
 }
 
 WRITE8_MEMBER( digel804_state::op47 ) // eprom timing/power and control write
@@ -432,89 +468,93 @@ WRITE8_MEMBER( digel804_state::acia_control_w )
  Address Maps
 ******************************************************************************/
 
-ADDRESS_MAP_START(digel804_state::z80_mem_804_1_4)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM // 3f in mapper = rom J3
+void digel804_state::z80_mem_804_1_4(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom(); // 3f in mapper = rom J3
 	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("main_ram") // 6f in mapper = RAM D43 (6164)
 	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("main_ram") // 77 in mapper = RAM D44 (6164)
 	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("main_ram") // 7b in mapper = RAM D45 (6164)
 	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("main_ram") // 7d in mapper = RAM D46 (6164)
-	AM_RANGE(0x4000,0xbfff) AM_RAMBANK("bankedram")
+	map(0x4000, 0xbfff).bankrw("bankedram");
 	// c000-cfff is open bus in mapper, 7f
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM // 7e in mapper = RAM P3 (6116)
-	AM_RANGE(0xd800, 0xf7ff) AM_ROM // 5f in mapper = rom K3
+	map(0xd000, 0xd7ff).ram(); // 7e in mapper = RAM P3 (6116)
+	map(0xd800, 0xf7ff).rom(); // 5f in mapper = rom K3
 	// f800-ffff is open bus in mapper, 7f
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(digel804_state::z80_mem_804_1_2)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM // 3f in mapper = rom D41
-	AM_RANGE(0x2000, 0x3fff) AM_ROM // 5f in mapper = rom D42
+void ep804_state::z80_mem_804_1_2(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom(); // 3f in mapper = rom D41
+	map(0x2000, 0x3fff).rom(); // 5f in mapper = rom D42
 	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("main_ram") // 6f in mapper = RAM D43 (6164)
 	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("main_ram") // 77 in mapper = RAM D44 (6164)
 	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("main_ram") // 7b in mapper = RAM D45 (6164)
 	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("main_ram") // 7d in mapper = RAM D46 (6164)
-	AM_RANGE(0x4000,0xbfff) AM_RAMBANK("bankedram")
+	map(0x4000, 0xbfff).bankrw("bankedram");
 	// c000-cfff is open bus in mapper, 7f
 	//AM_RANGE(0xc000, 0xc7ff) AM_RAM // hack for now to test, since sometimes it writes to c3ff
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM // 7e in mapper = RAM D47 (6116)
+	map(0xd000, 0xd7ff).ram(); // 7e in mapper = RAM D47 (6116)
 	// d800-ffff is open bus in mapper, 7f
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(digel804_state::z80_io_1_4)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void digel804_state::z80_io_1_4(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	// io bits: x 1 x x x * * *
 	// writes to 47, 4e, 57, 5e, 67, 6e, 77, 7e, c7, ce, d7, de, e7, ee, f7, fe all go to 47, same with reads
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x38) AM_WRITE(op00) // W, banked ram
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0xB8) AM_READWRITE(ip40, op40) // RW, eprom socket data bus input/output value
-	AM_RANGE(0x41, 0x41) AM_MIRROR(0xB8) AM_WRITE(op41) // W, eprom socket address low out
-	AM_RANGE(0x42, 0x42) AM_MIRROR(0xB8) AM_WRITE(op42) // W, eprom socket address hi/control out
-	AM_RANGE(0x43, 0x43) AM_MIRROR(0xB8) AM_READWRITE(ip43, op43_1_4) // RW, mode and status register, also checks if keypad is pressed; write is unknown
-	AM_RANGE(0x44, 0x44) AM_MIRROR(0xB8) AM_WRITE(op44) // W, 10937 vfd controller, z80 power and state control reg
-	AM_RANGE(0x45, 0x45) AM_MIRROR(0xB8) AM_WRITE(op45) // W, speaker bit; every write inverts state
-	AM_RANGE(0x46, 0x46) AM_MIRROR(0xB8) AM_READWRITE(ip46, op46) // RW, reads keypad, writes controls the front panel leds.
-	AM_RANGE(0x47, 0x47) AM_MIRROR(0xB8) AM_WRITE(op47) // W eprom socket power and timing control
+	map(0x00, 0x00).mirror(0x38).w(this, FUNC(digel804_state::op00)); // W, banked ram
+	map(0x40, 0x40).mirror(0xB8).rw(this, FUNC(digel804_state::ip40), FUNC(digel804_state::op40)); // RW, eprom socket data bus input/output value
+	map(0x41, 0x41).mirror(0xB8).w(this, FUNC(digel804_state::op41)); // W, eprom socket address low out
+	map(0x42, 0x42).mirror(0xB8).w(this, FUNC(digel804_state::op42)); // W, eprom socket address hi/control out
+	map(0x43, 0x43).mirror(0xB8).rw(this, FUNC(digel804_state::ip43), FUNC(digel804_state::op43_1_4)); // RW, mode and status register, also checks if keypad is pressed; write is unknown
+	map(0x44, 0x44).mirror(0xB8).w(this, FUNC(digel804_state::op44)); // W, 10937 vfd controller, z80 power and state control reg
+	map(0x45, 0x45).mirror(0xB8).w(this, FUNC(digel804_state::op45)); // W, speaker bit; every write inverts state
+	map(0x46, 0x46).mirror(0xB8).rw(this, FUNC(digel804_state::ip46), FUNC(digel804_state::op46)); // RW, reads keypad, writes controls the front panel leds.
+	map(0x47, 0x47).mirror(0xB8).w(this, FUNC(digel804_state::op47)); // W eprom socket power and timing control
 	// io bits: 1 0 x x x * * *
 	// writes to 80, 88, 90, 98, a0, a8, b0, b8 all go to 80, same with reads
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x38) AM_WRITE(acia_txd_w) // (ACIA xmit reg)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x38) AM_READ(acia_rxd_r) // (ACIA rcv reg)
-	AM_RANGE(0x82, 0x82) AM_MIRROR(0x38) AM_WRITE(acia_reset_w) // (ACIA reset reg)
-	AM_RANGE(0x83, 0x83) AM_MIRROR(0x38) AM_READ(acia_status_r) // (ACIA status reg)
-	AM_RANGE(0x84, 0x84) AM_MIRROR(0x38) AM_WRITE(acia_command_w) // (ACIA command reg)
-	AM_RANGE(0x85, 0x85) AM_MIRROR(0x38) AM_READ(acia_command_r) // (ACIA command reg)
-	AM_RANGE(0x86, 0x86) AM_MIRROR(0x38) AM_WRITE(acia_control_w) // (ACIA control reg)
-	AM_RANGE(0x87, 0x87) AM_MIRROR(0x38) AM_READ(acia_control_r) // (ACIA control reg)
+	map(0x80, 0x80).mirror(0x38).w(this, FUNC(digel804_state::acia_txd_w)); // (ACIA xmit reg)
+	map(0x81, 0x81).mirror(0x38).r(this, FUNC(digel804_state::acia_rxd_r)); // (ACIA rcv reg)
+	map(0x82, 0x82).mirror(0x38).w(this, FUNC(digel804_state::acia_reset_w)); // (ACIA reset reg)
+	map(0x83, 0x83).mirror(0x38).r(this, FUNC(digel804_state::acia_status_r)); // (ACIA status reg)
+	map(0x84, 0x84).mirror(0x38).w(this, FUNC(digel804_state::acia_command_w)); // (ACIA command reg)
+	map(0x85, 0x85).mirror(0x38).r(this, FUNC(digel804_state::acia_command_r)); // (ACIA command reg)
+	map(0x86, 0x86).mirror(0x38).w(this, FUNC(digel804_state::acia_control_w)); // (ACIA control reg)
+	map(0x87, 0x87).mirror(0x38).r(this, FUNC(digel804_state::acia_control_r)); // (ACIA control reg)
 	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", mos6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(digel804_state::z80_io_1_2)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void ep804_state::z80_io_1_2(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	// io bits: x 1 x x x * * *
 	// writes to 47, 4e, 57, 5e, 67, 6e, 77, 7e, c7, ce, d7, de, e7, ee, f7, fe all go to 47, same with reads
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0xB8) AM_READWRITE(ip40, op40) // RW, eprom socket data bus input/output value
-	AM_RANGE(0x41, 0x41) AM_MIRROR(0xB8) AM_WRITE(op41) // W, eprom socket address low out
-	AM_RANGE(0x42, 0x42) AM_MIRROR(0xB8) AM_WRITE(op42) // W, eprom socket address hi/control out
-	AM_RANGE(0x43, 0x43) AM_MIRROR(0xB8) AM_READWRITE(ip43, op43) // RW, mode and status register, also checks if keypad is pressed; write is unknown
-	AM_RANGE(0x44, 0x44) AM_MIRROR(0xB8) AM_WRITE(op44) // W, 10937 vfd controller, z80 power and state control reg
-	AM_RANGE(0x45, 0x45) AM_MIRROR(0xB8) AM_WRITE(op45) // W, speaker bit; every write inverts state
-	AM_RANGE(0x46, 0x46) AM_MIRROR(0xB8) AM_READWRITE(ip46, op46) // RW, reads keypad, writes controls the front panel leds.
-	AM_RANGE(0x47, 0x47) AM_MIRROR(0xB8) AM_WRITE(op47) // W eprom socket power and timing control
+	map(0x40, 0x40).mirror(0xB8).rw(this, FUNC(ep804_state::ip40), FUNC(ep804_state::op40)); // RW, eprom socket data bus input/output value
+	map(0x41, 0x41).mirror(0xB8).w(this, FUNC(ep804_state::op41)); // W, eprom socket address low out
+	map(0x42, 0x42).mirror(0xB8).w(this, FUNC(ep804_state::op42)); // W, eprom socket address hi/control out
+	map(0x43, 0x43).mirror(0xB8).rw(this, FUNC(ep804_state::ip43), FUNC(ep804_state::op43)); // RW, mode and status register, also checks if keypad is pressed; write is unknown
+	map(0x44, 0x44).mirror(0xB8).w(this, FUNC(ep804_state::op44)); // W, 10937 vfd controller, z80 power and state control reg
+	map(0x45, 0x45).mirror(0xB8).w(this, FUNC(ep804_state::op45)); // W, speaker bit; every write inverts state
+	map(0x46, 0x46).mirror(0xB8).rw(this, FUNC(ep804_state::ip46), FUNC(ep804_state::op46)); // RW, reads keypad, writes controls the front panel leds.
+	map(0x47, 0x47).mirror(0xB8).w(this, FUNC(ep804_state::op47)); // W eprom socket power and timing control
 	// io bits: 1 0 x x x * * *
 	// writes to 80, 88, 90, 98, a0, a8, b0, b8 all go to 80, same with reads
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x38) AM_WRITE(acia_txd_w) // (ACIA xmit reg)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x38) AM_READ(acia_rxd_r) // (ACIA rcv reg)
-	AM_RANGE(0x82, 0x82) AM_MIRROR(0x38) AM_WRITE(acia_reset_w) // (ACIA reset reg)
-	AM_RANGE(0x83, 0x83) AM_MIRROR(0x38) AM_READ(acia_status_r) // (ACIA status reg)
-	AM_RANGE(0x84, 0x84) AM_MIRROR(0x38) AM_WRITE(acia_command_w) // (ACIA command reg)
-	AM_RANGE(0x85, 0x85) AM_MIRROR(0x38) AM_READ(acia_command_r) // (ACIA command reg)
-	AM_RANGE(0x86, 0x86) AM_MIRROR(0x38) AM_WRITE(acia_control_w) // (ACIA control reg)
-	AM_RANGE(0x87, 0x87) AM_MIRROR(0x38) AM_READ(acia_control_r) // (ACIA control reg)
+	map(0x80, 0x80).mirror(0x38).w(this, FUNC(ep804_state::acia_txd_w)); // (ACIA xmit reg)
+	map(0x81, 0x81).mirror(0x38).r(this, FUNC(ep804_state::acia_rxd_r)); // (ACIA rcv reg)
+	map(0x82, 0x82).mirror(0x38).w(this, FUNC(ep804_state::acia_reset_w)); // (ACIA reset reg)
+	map(0x83, 0x83).mirror(0x38).r(this, FUNC(ep804_state::acia_status_r)); // (ACIA status reg)
+	map(0x84, 0x84).mirror(0x38).w(this, FUNC(ep804_state::acia_command_w)); // (ACIA command reg)
+	map(0x85, 0x85).mirror(0x38).r(this, FUNC(ep804_state::acia_command_r)); // (ACIA command reg)
+	map(0x86, 0x86).mirror(0x38).w(this, FUNC(ep804_state::acia_control_w)); // (ACIA control reg)
+	map(0x87, 0x87).mirror(0x38).r(this, FUNC(ep804_state::acia_control_r)); // (ACIA control reg)
 	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", mos6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
 
-ADDRESS_MAP_END
+}
 
 
 /******************************************************************************
@@ -586,13 +626,13 @@ WRITE_LINE_MEMBER( digel804_state::acia_irq_w )
 	m_maincpu->set_input_line(0, (m_key_intq & m_acia_intq) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( digel804_state::ep804_acia_irq_w )
+WRITE_LINE_MEMBER( ep804_state::ep804_acia_irq_w )
 {
 }
 
 MACHINE_CONFIG_START(digel804_state::digel804)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'686'400)/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
+	MCFG_CPU_ADD("maincpu", Z80, 3.6864_MHz_XTAL/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_4)
 	MCFG_CPU_IO_MAP(z80_io_1_4)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -611,7 +651,7 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(3'686'400)/2)
+	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL/2)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(digel804_state, acia_irq_w))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -634,15 +674,16 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(digel804_state::ep804)
+MACHINE_CONFIG_START(ep804_state::ep804)
 	digel804(config);
+
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")  /* Z80, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_2)
 	MCFG_CPU_IO_MAP(z80_io_1_2)
 
 	MCFG_DEVICE_MODIFY("acia")
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(digel804_state, ep804_acia_irq_w))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(ep804_state, ep804_acia_irq_w))
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
@@ -730,6 +771,6 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY                 FULLNAME                        FLAGS
-COMP( 1985, digel804, 0,        0,      digel804, digel804, digel804_state, digel804, "Digelec, Inc",         "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
-COMP( 1982, ep804,    digel804, 0,      ep804,    digel804, digel804_state, digel804, "Wavetek/Digelec, Inc", "EP804 EPROM Programmer",       MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY                 FULLNAME                        FLAGS
+COMP( 1985, digel804, 0,        0,      digel804, digel804, digel804_state, 0,    "Digelec, Inc",         "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
+COMP( 1982, ep804,    digel804, 0,      ep804,    digel804, ep804_state,    0,    "Wavetek/Digelec, Inc", "EP804 EPROM Programmer",       MACHINE_NOT_WORKING )
