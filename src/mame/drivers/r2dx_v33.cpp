@@ -479,9 +479,7 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 	map(0x00402, 0x00403).w(this, FUNC(r2dx_v33_state::r2dx_paldma_w));  // palettes to private buffer
 
 //	map(0x00404, 0x00405).w(this, FUNC(r2dx_v33_state::r2dx_rom_bank_w)); // always 0x0002
-//	map(0x00406, 0x00407).w(this, FUNC(r2dx_v33_state::tile_bank_w)); // always 0x6022, not the same?
-
-	map(0x00406, 0x00407).noprw(); // always 6022, supposed to be the tile bank but ignores the actual value???
+	map(0x00406, 0x00407).noprw(); //.w(this, FUNC(r2dx_v33_state::tile_bank_w)); always 6022, supposed to be the tile bank but ignores the actual value???
 
 	map(0x00420, 0x00421).w(this, FUNC(r2dx_v33_state::r2dx_dx_w));
 	map(0x00422, 0x00423).w(this, FUNC(r2dx_v33_state::r2dx_dy_w));
