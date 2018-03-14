@@ -33,6 +33,7 @@ Year + Game                Main Board   Sub Board    CPU   Sound                
 91 Mj Dial Q2              D5212298L-1               Z80                 YM2413             PROM
 91 Mj Yarunara             D5512068L1-1 D4508308L-2  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001
 91 Hana wo Yaraneba!       D5512068L1-1 D4508308L-2  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
+91 Warai no Hana Tenshi    D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
 91 Mj Angels               D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205       RAM
 91 Mj Comic Gekijou V.1    D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
 91 Mj Tenkaigen                                      TLCS  AY8910        YM2413       M6242 RAM   Protection, Battery
@@ -2539,6 +2540,52 @@ static INPUT_PORTS_START( yarunara )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_INCLUDE( MAHJONG_KEYS )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( warahana )
+PORT_START("DSW0")
+PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
+PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
+PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )
+PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+PORT_DIPNAME( 0x40, 0x40, "Panel Type" )
+PORT_DIPSETTING(    0x00, "Mahjong" )
+PORT_DIPSETTING(    0x40, "Hanafuda" )
+PORT_DIPNAME( 0x80, 0x80, "Set Date" )
+PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+PORT_START("DSW1")
+PORT_DIPNAME( 0x01, 0x01, "Start with Quiz" )
+PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) )
+PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+PORT_START("COINS")
+PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "17B"
+PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "18B"
+PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test ))
+PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
+PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "06B"
+PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
+PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+PORT_INCLUDE( MAHJONG_KEYS )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hanayara )
@@ -5613,7 +5660,6 @@ ROM_START( hanayara )
 	ROM_LOAD( "5510h.2a",  0x80000, 0x20000, CRC(bb9c71e1) SHA1(21f2977196aaa27b76ee6547a08aba8da7aba76c) )
 ROM_END
 
-
 /***************************************************************************
 
 Quiz TV Gassyuukoku Q&Q (JPN ver.)
@@ -5727,6 +5773,67 @@ ROM_START( mjangels )
 	ROM_LOAD( "612-10.s5c",   0x60000, 0x20000, CRC(bf1edb0e) SHA1(932ca328c5968529d52b2c629b6bb866cfa1e784) )
 	ROM_LOAD( "612-09.s4c",   0x80000, 0x20000, CRC(8345999e) SHA1(c70c731ababcb28752dd4961d6dc54d43cb6bcba) )
 	ROM_LOAD( "612-08.s3c",   0xa0000, 0x20000, CRC(aad88516) SHA1(e6c7ef3325a17b2945530847998d314685c39f5d) )
+ROM_END
+
+
+/***************************************************************************
+
+Warai no Hana Tenshi
+(c)1991 Dynax
+
+D5512068L1-1 (DX-BASE)
+D6107068L-1 (sub board)
+
+CPU  : Z80B
+Sound: AY-3-8912A YM2413 M5205
+OSC  : 22.000MHz (near main CPU), 14.31818MHz (Sound section)
+       YC-38 (X1), 384KHz (X2, M5205)
+
+
+ROMs:
+613-01.2D (M5M27C101K-15 - 128kB)
+613-02.4D (M5M27C101K-15 - 128kB)
+613-03.5D (Fujitsu Mask ROM 831000-15 - 128kB)
+
+on Subboard
+613-04.1A (AM27C040 - 512kB)
+613-05.2A (AM27C020 - 256kB)
+613-06.1B (M5M27C101K-15 - 128kB)
+613-07.2B (M5M27C101K-15 - 128kB)
+613-08.4C (M5M27C101K-15 - 128kB)
+613-09.5C (M5M27C101K-15 - 128kB)
+613-10.6C (M5M27C101K-15 - 128kB)
+
+PALs (not dumped):
+D613A.4E
+
+on Subboard
+D613B.7B
+
+***************************************************************************/
+
+ROM_START( warahana )
+ROM_REGION( 0x150000, "maincpu", 0 )   // Z80 Code
+ROM_LOAD( "613-01.2d", 0x00000, 0x20000, CRC(1e067bfb) SHA1(9cdd261a87f5930dddc60d9224e0daf2ac6b28c9) )
+ROM_RELOAD(            0x10000, 0x20000 )
+ROM_RELOAD(            0x70000, 0x20000 )
+ROM_LOAD( "613-02.4d", 0x30000, 0x20000, CRC(d267a707) SHA1(c38cb06dc09f9062ad4cdd659333410bd2decd01) )
+ROM_LOAD( "613-03.5d", 0x50000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
+
+ROM_REGION( 0x00000, "gfx1", 0 )    // blitter data
+
+ROM_REGION( 0x00000, "gfx2", 0 )    // blitter data
+
+ROM_REGION( 0xc0000, "gfx3", 0 )    // blitter data
+ROM_LOAD( "613-04.1a",  0x00000, 0x80000, CRC(5c90cbb3) SHA1(7bb6fa95bde76382d4e86c3934d1820716f94eac) )
+ROM_LOAD( "613-05.2a",  0x80000, 0x40000, CRC(f6d03514) SHA1(de80bbc66055e4f67b66360e63aac703c5c436a3) )
+
+ROM_REGION( 0xa0000, "gfx4", 0 )    // blitter data
+ROM_LOAD( "613-06.1b",  0x00000, 0x20000, CRC(34c502e1) SHA1(730bf01bfa5af0cff1420bb64e7c08d3fe42f97c) )
+ROM_LOAD( "613-07.2b",  0x20000, 0x20000, CRC(988c04da) SHA1(74e690d23182b06171f7445fee70ef5261d7eef7) )
+ROM_LOAD( "613-10.6c",  0x40000, 0x20000, CRC(a9e7fc66) SHA1(9f97946ab089d09c85cc0fae3695355cd1b3a8b3) )
+ROM_LOAD( "613-09.5c",  0x60000, 0x20000, CRC(c2c0c47b) SHA1(72bdc654841bf7ba90a4a2a8160dcc8f2a0bac8d) )
+ROM_LOAD( "613-08.4c",  0x80000, 0x20000, CRC(7cc529c3) SHA1(0ccef8adee8ca02b2dba2addbe888fb0ee6904a5) )
 ROM_END
 
 
@@ -7364,6 +7471,7 @@ GAME( 1991, mjdialq2, 0,        mjdialq2, mjdialq2, dynax_state, 0,        ROT18
 GAME( 1991, mjdialq2a,mjdialq2, mjdialq2, mjdialq2, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan, alt.)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1991, yarunara, 0,        yarunara, yarunara, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Yarunara (Japan)",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mjangels, 0,        mjangels, yarunara, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Angels - Comic Theater Vol.2 (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, warahana, 0,        mjangels, warahana, dynax_state, 0,        ROT180, "Dynax",                    "Warai no Hana Tenshi (Japan)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1992, quiztvqq, 0,        quiztvqq, quiztvqq, dynax_state, 0,        ROT180, "Dynax",                    "Quiz TV Gassyuukoku Q&Q (Japan)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjembase, mjelctrn, mjembase, mjembase, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong Electromagnetic Base",                                  MACHINE_SUPPORTS_SAVE )
