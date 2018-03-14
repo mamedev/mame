@@ -98,7 +98,7 @@ address_map_entry &address_map_entry::mask(offs_t _mask)
 
 address_map_entry &address_map_entry::umask16(u16 _mask)
 {
-	m_mask = (u64(_mask) << 48) | (u64(_mask) << 32) | (_mask << 16) | _mask;
+	m_mask = (u64(_mask) << 48) | (u64(_mask) << 32) | (u64(_mask) << 16) | _mask;
 	return *this;
 }
 
