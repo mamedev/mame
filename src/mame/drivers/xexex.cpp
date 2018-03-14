@@ -128,6 +128,8 @@ Unresolved Issues:
 - the stage 4 boss(tentacles) sometimes appears darker (palette update timing?)
 - the furthest layer in stage 5 shakes when scrolling up or down (needs verification)
 - Elaine's end-game graphics has wrong masking effect (known non-zoomed pdrawgfx issue)
+- intro screen at wrong alpha effect; it has K054157 flag-per-tile for alpha blending?
+- Tilemap scroll is wrong at cocktail mode
 
 ***************************************************************************/
 
@@ -269,15 +271,16 @@ WRITE16_MEMBER(xexex_state::sound_irq_w)
 
 WRITE8_MEMBER(xexex_state::sound_bankswitch_w)
 {
-	membank("z80bank")->set_entry(data & 0x07);
+	m_z80bank->set_entry(data & 0x07);
 }
 
 K054539_CB_MEMBER(xexex_state::ym_set_mixing)
 {
-	m_filter1l->flt_volume_set_volume((71.0 * left) / 55.0);
-	m_filter1r->flt_volume_set_volume((71.0 * right) / 55.0);
-	m_filter2l->flt_volume_set_volume((71.0 * left) / 55.0);
-	m_filter2r->flt_volume_set_volume((71.0 * right) / 55.0);
+	for (int out = 0; out < 2; out++)
+	{
+		m_filter_l[out]->flt_volume_set_volume((71.0 * left) / 55.0);
+		m_filter_r[out]->flt_volume_set_volume((71.0 * right) / 55.0);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(xexex_state::dmaend_callback)
@@ -431,8 +434,8 @@ void xexex_state::xexex_postload()
 
 void xexex_state::machine_start()
 {
-	membank("z80bank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
-	membank("z80bank")->set_entry(0);
+	m_z80bank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
+	m_z80bank->set_entry(0);
 
 	save_item(NAME(m_cur_alpha));
 	save_item(NAME(m_sprite_colorbase));
@@ -520,10 +523,10 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL(32'000'000)/8) // 4MHz
-	MCFG_SOUND_ROUTE(0, "filter1l", 0.50)
-	MCFG_SOUND_ROUTE(0, "filter1r", 0.50)
-	MCFG_SOUND_ROUTE(1, "filter2l", 0.50)
-	MCFG_SOUND_ROUTE(1, "filter2r", 0.50)
+	MCFG_SOUND_ROUTE(0, "filter1_l", 0.50)
+	MCFG_SOUND_ROUTE(0, "filter1_r", 0.50)
+	MCFG_SOUND_ROUTE(1, "filter2_l", 0.50)
+	MCFG_SOUND_ROUTE(1, "filter2_r", 0.50)
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_APAN_CB(xexex_state, ym_set_mixing)
@@ -532,13 +535,13 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_FILTER_VOLUME_ADD("filter1l", 0)
+	MCFG_FILTER_VOLUME_ADD("filter1_l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1r", 0)
+	MCFG_FILTER_VOLUME_ADD("filter1_r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter2l", 0)
+	MCFG_FILTER_VOLUME_ADD("filter2_l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter2r", 0)
+	MCFG_FILTER_VOLUME_ADD("filter2_r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -573,8 +576,6 @@ ROM_START( xexex ) /* Europe, Version AA */
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
 	ROM_LOAD( "er5911.19b",  0x0000, 0x0080, CRC(155624cc) SHA1(457f921e3a5d053c53e4f1a44941eb0a1f22e1b2) )
 ROM_END
-
-
 
 ROM_START( orius ) /* USA, Version AA */
 	ROM_REGION( 0x180000, "maincpu", 0 )
@@ -683,7 +684,7 @@ DRIVER_INIT_MEMBER(xexex_state,xexex)
 	}
 }
 
-GAME( 1991, xexex,  0,     xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Xexex (ver EAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, orius,  xexex, xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Orius (ver UAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, xexexa, xexex, xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Xexex (ver AAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, xexexj, xexex, xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Xexex (ver JAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, xexex,  0,     xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Xexex (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, orius,  xexex, xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Orius (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, xexexa, xexex, xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Xexex (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, xexexj, xexex, xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Xexex (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
