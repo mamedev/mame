@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert, AJR
+// copyright-holders:AJR
 /***************************************************************************
 
 QT Computer Systems SBC +2/4
