@@ -1432,7 +1432,7 @@ void model2_state::model2_base_mem(address_map &map)
 
 	// format is xGGGGGRRRRRBBBBB (512x400)
 	map(0x11600000, 0x1167ffff).rw(this, FUNC(model2_state::fbvram_bankA_r), FUNC(model2_state::fbvram_bankA_w)); // framebuffer A (last bronx title screen)
-	map(0x11680000, 0x116fffff).rw(this, FUNC(model2_state::fbvram_bankB_r), FUNC(model2_state::fbvram_bankB_w)).share("fbvram2"); // framebuffer B
+	map(0x11680000, 0x116fffff).rw(this, FUNC(model2_state::fbvram_bankB_r), FUNC(model2_state::fbvram_bankB_w)); // framebuffer B
 
 	map(0x12800000, 0x1281ffff).rw(this, FUNC(model2_state::lumaram_r), FUNC(model2_state::lumaram_w)).umask32(0x0000ffff); // polygon "luma" RAM
 }
