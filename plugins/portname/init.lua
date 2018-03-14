@@ -1,9 +1,19 @@
 -- license:BSD-3-Clause
 -- copyright-holders:Carl
--- use plugin options to save the input port list to a gettext formatted file
--- the file is saved in the ctrlrpath dir
--- use #import <filename.po> to load names from a different file
--- use #set <set1>,<set2>,... to override names for a child set, common names should be listed at the top before any #set tags
+-- data files are json files named <romname>.json
+-- {
+--   "ports":{
+--     "<ioport name>":{
+--       "labels":{
+--         "player":<int player number>,
+--         "name":"<field label>"
+--     },{
+--       ...
+--     }
+--   }
+-- }
+-- any additional metadata can be included for other usage
+-- and will be ignored
 local exports = {}
 exports.name = "portname"
 exports.version = "0.0.1"
