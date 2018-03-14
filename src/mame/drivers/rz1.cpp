@@ -263,5 +263,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME  PARENT  MACHINE  INPUT  CLASS      INIT  ROTATION  COMPANY  FULLNAME  FLAGS
-GAME( 1986, rz1,  0,      rz1,     rz1,   rz1_state, 0,    ROT0,    "Casio",  "RZ-1",   MACHINE_IS_SKELETON )
+//    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  CLASS      INIT  COMPANY  FULLNAME  FLAGS
+CONS( 1986, rz1,  0,      0,       rz1,     rz1,   rz1_state, 0,   "Casio",  "RZ-1",   MACHINE_IS_SKELETON )
