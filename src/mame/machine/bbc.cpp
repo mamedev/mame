@@ -1229,9 +1229,15 @@ WRITE_LINE_MEMBER( bbc_state::bbc_txd_w )
 }
 
 
-void bbc_state::BBC_Cassette_motor(unsigned char status)
+void bbc_state::cassette_motor(bool motor_state)
 {
-	if (status)
+	const bool prev_state = ((m_cassette->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED) ? true : false;
+
+	/* cassette relay sound */
+	if (prev_state != motor_state)
+		m_samples->start(0, motor_state ? 1 : 0);
+
+	if (motor_state)
 	{
 		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
@@ -1248,7 +1254,7 @@ void bbc_state::BBC_Cassette_motor(unsigned char status)
 		m_cass_out_phase = 0;
 		m_cass_out_samples_to_go = 4;
 	}
-	output().set_value("motor_led", !status);
+	output().set_value("motor_led", !motor_state);
 }
 
 
@@ -1287,7 +1293,7 @@ WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
 	update_acia_rxd();
 	update_acia_dcd();
 	update_acia_cts();
-	if (m_cassette) BBC_Cassette_motor(m_serproc_data & 0x80);
+	if (m_cassette) cassette_motor(BIT(m_serproc_data, 7));
 
 	// Set transmit clock rate
 	m_acia_clock->set_clock_scale( (double) 1 / serial_clocks[ data & 0x07 ] );

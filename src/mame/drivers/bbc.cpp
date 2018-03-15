@@ -144,126 +144,122 @@ READ8_MEMBER(bbc_state::bbc_fe_r)
 
 void bbc_state::bbca_mem(address_map &map)
 {
-	map.unmap_value_high();                                                                                      /*  Hardware marked with a # is not present in a Model A        */
-
-	map(0x0000, 0x3fff).bankr("bank1").w(this, FUNC(bbc_state::bbc_memorya1_w));                                     /*    0000-3fff                 Regular Ram                     */
-	map(0x4000, 0x7fff).bankr("bank3").w(this, FUNC(bbc_state::bbc_memoryb3_w));                                     /*    4000-7fff                 Repeat of the Regular Ram       */
-	map(0x8000, 0xbfff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memoryb4_w));                                     /*    8000-bfff                 Paged ROM                       */
-	map(0xc000, 0xfbff).bankr("bank7");                                                              /*    c000-fbff                 OS ROM                          */
-	map(0xfc00, 0xfdff).noprw();                                                                             /*    fc00-fdff                 FRED & JIM Pages                */
-																																																							/*    fe00-feff                 SHEILA Address Page             */
-	map(0xfe00, 0xfe00).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));      /*    fe00-fe07  6845 CRTC      Video controller                */
+	map.unmap_value_high();                                                                                           /*  Hardware marked with a # is not present in a Model A        */
+	map(0x0000, 0x3fff).bankr("bank1").w(this, FUNC(bbc_state::bbc_memorya1_w));                                      /*    0000-3fff                 Regular Ram                     */
+	map(0x4000, 0x7fff).bankr("bank3").w(this, FUNC(bbc_state::bbc_memoryb3_w));                                      /*    4000-7fff                 Repeat of the Regular Ram       */
+	map(0x8000, 0xbfff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memoryb4_w));                                      /*    8000-bfff                 Paged ROM                       */
+	map(0xc000, 0xfbff).bankr("bank7");                                                                               /*    c000-fbff                 OS ROM                          */
+	map(0xfc00, 0xfdff).noprw();                                                                                      /*    fc00-fdff                 FRED & JIM Pages                */
+																																																										/*    fe00-feff                 SHEILA Address Page             */
+	map(0xfe00, 0xfe00).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));     /*    fe00-fe07  6845 CRTC      Video controller                */
 	map(0xfe01, 0xfe01).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
-	map(0xfe08, 0xfe09).mirror(0x06).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));          /*    fe08-fe0f  6850 ACIA      Serial controller               */
-	map(0xfe10, 0xfe17).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_SerialULA_w));                                            /*    fe10-fe17  Serial ULA     Serial system chip              */
-	map(0xfe18, 0xfe1f).noprw();                                                                             /*    fe18-fe1f  INTOFF/STATID  # ECONET Interrupt Off / ID No. */
-	map(0xfe20, 0xfe2f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_videoULA_w));                                             /* R: fe20-fe2f  INTON          # ECONET Interrupt On           */
-																																																							/* W: fe20-fe2f  Video ULA      Video system chip               */
-	map(0xfe30, 0xfe3f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_page_selecta_w));                                         /* R: fe30-fe3f  NC             Not Connected                   */
-																																																							/* W: fe30-fe3f  74LS161        Paged ROM selector              */
-	map(0xfe40, 0xfe5f).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                          /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
-	map(0xfe60, 0xfe7f).noprw();                                                                             /*    fe60-fe7f  6522 VIA       # USER VIA                      */
-	map(0xfe80, 0xfe9f).noprw();                                                                             /*    fe80-fe9f  8271/1770 FDC  # Floppy disc controller        */
-	map(0xfea0, 0xfebf).r(this, FUNC(bbc_state::bbc_fe_r));                                                                  /*    fea0-febf  68B54 ADLC     # ECONET controller             */
-	map(0xfec0, 0xfedf).noprw();                                                                             /*    fec0-fedf  uPD7002        # Analogue to digital converter */
-	map(0xfee0, 0xfeff).r(this, FUNC(bbc_state::bbc_fe_r));                                                                  /*    fee0-feff  Tube ULA       # Tube system interface         */
-	map(0xff00, 0xffff).rom().region("os", 0x3f00);                                                     /*    ff00-ffff                 OS Rom (continued)              */
+	map(0xfe08, 0xfe09).mirror(0x06).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));           /*    fe08-fe0f  6850 ACIA      Serial controller               */
+	map(0xfe10, 0xfe17).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_SerialULA_w));                        /*    fe10-fe17  Serial ULA     Serial system chip              */
+	map(0xfe18, 0xfe1f).noprw();                                                                                      /*    fe18-fe1f  INTOFF/STATID  # ECONET Interrupt Off / ID No. */
+	map(0xfe20, 0xfe2f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_videoULA_w));                         /* R: fe20-fe2f  INTON          # ECONET Interrupt On           */
+																																																										/* W: fe20-fe2f  Video ULA      Video system chip               */
+	map(0xfe30, 0xfe3f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_page_selecta_w));                     /* R: fe30-fe3f  NC             Not Connected                   */
+																																																										/* W: fe30-fe3f  74LS161        Paged ROM selector              */
+	map(0xfe40, 0xfe5f).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                     /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
+	map(0xfe60, 0xfe7f).noprw();                                                                                      /*    fe60-fe7f  6522 VIA       # USER VIA                      */
+	map(0xfe80, 0xfe9f).noprw();                                                                                      /*    fe80-fe9f  8271/1770 FDC  # Floppy disc controller        */
+	map(0xfea0, 0xfebf).r(this, FUNC(bbc_state::bbc_fe_r));                                                           /*    fea0-febf  68B54 ADLC     # ECONET controller             */
+	map(0xfec0, 0xfedf).noprw();                                                                                      /*    fec0-fedf  uPD7002        # Analogue to digital converter */
+	map(0xfee0, 0xfeff).r(this, FUNC(bbc_state::bbc_fe_r));                                                           /*    fee0-feff  Tube ULA       # Tube system interface         */
+	map(0xff00, 0xffff).rom().region("os", 0x3f00);                                                                   /*    ff00-ffff                 OS Rom (continued)              */
 }
 
 
 void bbc_state::bbc_base(address_map &map)
 {
 	map.unmap_value_high();
-
-	map(0xc000, 0xfbff).bankr("bank7");                                                              /*    c000-fbff                 OS ROM                          */
-	map(0xfc00, 0xfdff).noprw();                                                                             /*    fc00-fdff                 FRED & JIM Pages                */
-																																																							/*    fe00-feff                 SHEILA Address Page             */
-	map(0xfe00, 0xfe00).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));      /*    fe00-fe07  6845 CRTC      Video controller                */
+	map(0xc000, 0xfbff).bankr("bank7");                                                                               /*    c000-fbff                 OS ROM                          */
+	map(0xfc00, 0xfdff).noprw();                                                                                      /*    fc00-fdff                 FRED & JIM Pages                */
+																																																										/*    fe00-feff                 SHEILA Address Page             */
+	map(0xfe00, 0xfe00).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));     /*    fe00-fe07  6845 CRTC      Video controller                */
 	map(0xfe01, 0xfe01).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
-	map(0xfe08, 0xfe09).mirror(0x06).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));          /*    fe08-fe0f  6850 ACIA      Serial controller               */
-	map(0xfe10, 0xfe17).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_SerialULA_w));                                            /*    fe10-fe17  Serial ULA     Serial system chip              */
-	map(0xfe18, 0xfe1f).portr("STATID");                                                             /*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
-	map(0xfe20, 0xfe2f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_videoULA_w));                                             /* R: fe20-fe2f  INTON          ECONET Interrupt On             */
-																																																							/* W: fe20-fe2f  Video ULA      Video system chip               */
-	map(0xfe40, 0xfe5f).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                          /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
-	map(0xfe60, 0xfe7f).rw(m_via6522_1, FUNC(via6522_device::read), FUNC(via6522_device::write));                          /*    fe60-fe7f  6522 VIA       USER VIA                        */
-																																																							/*    fe80-fe9f  FDC            Floppy disc controller          */
-	map(0xfea0, 0xfebf).r(this, FUNC(bbc_state::bbc_fe_r));                                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
-	map(0xfec0, 0xfedf).rw(m_upd7002, FUNC(upd7002_device::read), FUNC(upd7002_device::write));                            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
-	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));                      /*    fee0-feff  Tube ULA       Tube system interface           */
-	map(0xff00, 0xffff).rom().region("os", 0x3f00);                                                     /*    ff00-ffff                 OS ROM (continued)              */
+	map(0xfe08, 0xfe09).mirror(0x06).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));           /*    fe08-fe0f  6850 ACIA      Serial controller               */
+	map(0xfe10, 0xfe17).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_SerialULA_w));                        /*    fe10-fe17  Serial ULA     Serial system chip              */
+	map(0xfe18, 0xfe1f).portr("STATID");                                                                              /*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
+	map(0xfe20, 0xfe2f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_videoULA_w));                         /* R: fe20-fe2f  INTON          ECONET Interrupt On             */
+																																																										/* W: fe20-fe2f  Video ULA      Video system chip               */
+	map(0xfe40, 0xfe5f).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                     /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
+	map(0xfe60, 0xfe7f).rw(m_via6522_1, FUNC(via6522_device::read), FUNC(via6522_device::write));                     /*    fe60-fe7f  6522 VIA       USER VIA                        */
+																																																										/*    fe80-fe9f  FDC            Floppy disc controller          */
+	map(0xfea0, 0xfebf).r(this, FUNC(bbc_state::bbc_fe_r));                                                           /*    fea0-febf  68B54 ADLC     ECONET controller               */
+	map(0xfec0, 0xfedf).rw(m_upd7002, FUNC(upd7002_device::read), FUNC(upd7002_device::write));                       /*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));           /*    fee0-feff  Tube ULA       Tube system interface           */
+	map(0xff00, 0xffff).rom().region("os", 0x3f00);                                                                   /*    ff00-ffff                 OS ROM (continued)              */
 }
 
 
 void bbc_state::bbcb_mem(address_map &map)
 {
 	bbc_base(map);
-
-	map(0x0000, 0x3fff).bankr("bank1").w(this, FUNC(bbc_state::bbc_memorya1_w));                                     /*    0000-3fff                 Regular Ram                     */
-	map(0x4000, 0x7fff).bankr("bank3").w(this, FUNC(bbc_state::bbc_memoryb3_w));                                     /*    4000-7fff                 Regular Ram                     */
-	map(0x8000, 0xbfff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memoryb4_w));                                     /*    8000-bfff                 Paged ROM                       */
-	map(0xfe30, 0xfe3f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_page_selectb_w));                                         /* R: fe30-fe3f  NC             Not Connected                   */
-																																																							/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	map(0xfe80, 0xfe83).m(m_i8271, FUNC(i8271_device::map));                                              /*    fe80-fe83  8271 FDC       Floppy disc controller          */
-	map(0xfe84, 0xfe9f).rw(m_i8271, FUNC(i8271_device::data_r), FUNC(i8271_device::data_w));                             /*    fe84-fe9f  8271 FDC       Floppy disc controller          */
+	map(0x0000, 0x3fff).bankr("bank1").w(this, FUNC(bbc_state::bbc_memorya1_w));                                      /*    0000-3fff                 Regular Ram                     */
+	map(0x4000, 0x7fff).bankr("bank3").w(this, FUNC(bbc_state::bbc_memoryb3_w));                                      /*    4000-7fff                 Regular Ram                     */
+	map(0x8000, 0xbfff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memoryb4_w));                                      /*    8000-bfff                 Paged ROM                       */
+	map(0xfe30, 0xfe3f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_page_selectb_w));                     /* R: fe30-fe3f  NC             Not Connected                   */
+																																																										/* W: fe30-fe3f  84LS161        Paged ROM selector              */
+	map(0xfe80, 0xfe83).m(m_i8271, FUNC(i8271_device::map));                                                          /*    fe80-fe83  8271 FDC       Floppy disc controller          */
+	map(0xfe84, 0xfe9f).rw(m_i8271, FUNC(i8271_device::data_r), FUNC(i8271_device::data_w));                          /*    fe84-fe9f  8271 FDC       Floppy disc controller          */
 }
 
 
 void bbc_state::bbcb_nofdc_mem(address_map &map)
 {
 	bbc_base(map);
-
-	map(0x0000, 0x3fff).bankr("bank1").w(this, FUNC(bbc_state::bbc_memorya1_w));                                     /*    0000-3fff                 Regular Ram                     */
-	map(0x4000, 0x7fff).bankr("bank3").w(this, FUNC(bbc_state::bbc_memoryb3_w));                                     /*    4000-7fff                 Regular Ram                     */
-	map(0x8000, 0xbfff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memoryb4_w));                                     /*    8000-bfff                 Paged ROM                       */
-	map(0xfe30, 0xfe3f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_page_selectb_w));                                         /* R: fe30-fe3f  NC             Not Connected                   */
-																																																							/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	map(0xfe80, 0xfe83).noprw();                                                                             /*    fe80-fe9f                 Floppy disc controller          */
+	map(0x0000, 0x3fff).bankr("bank1").w(this, FUNC(bbc_state::bbc_memorya1_w));                                      /*    0000-3fff                 Regular Ram                     */
+	map(0x4000, 0x7fff).bankr("bank3").w(this, FUNC(bbc_state::bbc_memoryb3_w));                                      /*    4000-7fff                 Regular Ram                     */
+	map(0x8000, 0xbfff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memoryb4_w));                                      /*    8000-bfff                 Paged ROM                       */
+	map(0xfe30, 0xfe3f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_page_selectb_w));                     /* R: fe30-fe3f  NC             Not Connected                   */
+																																																										/* W: fe30-fe3f  84LS161        Paged ROM selector              */
+	map(0xfe80, 0xfe83).noprw();                                                                                      /*    fe80-fe9f                 Floppy disc controller          */
 }
 
 
 void bbc_state::bbcbp_mem(address_map &map)
 {
 	bbc_base(map);
-	map(0x0000, 0x2fff).bankr("bank1").w(this, FUNC(bbc_state::bbc_memorybp1_w));                    /*    0000-2fff                 Regular Ram                     */
-	map(0x3000, 0x7fff).bankr("bank2").w(this, FUNC(bbc_state::bbc_memorybp2_w));                    /*    3000-7fff                 Video/Shadow Ram                */
-	map(0x8000, 0xafff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memorybp4_w));                    /*    8000-afff                 Paged ROM or 12K of SWRAM       */
-	map(0xb000, 0xbfff).bankr("bank6");                                              /*    b000-bfff                 Rest of paged ROM area          */
-	map(0xfe30, 0xfe3f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_page_selectbp_w));                        /* R: fe30-fe3f  NC             Not Connected                   */
-																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	map(0xfe80, 0xfe83).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_wd1770_status_w));                        /*    fe80-fe83  1770 FDC       Drive control register          */
-	map(0xfe84, 0xfe9f).rw(m_wd1770, FUNC(wd1770_device::read), FUNC(wd1770_device::write));              /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
-	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));      /*    fee0-feff  Tube ULA       Tube system interface           */
+	map(0x0000, 0x2fff).bankr("bank1").w(this, FUNC(bbc_state::bbc_memorybp1_w));                                     /*    0000-2fff                 Regular Ram                     */
+	map(0x3000, 0x7fff).bankr("bank2").w(this, FUNC(bbc_state::bbc_memorybp2_w));                                     /*    3000-7fff                 Video/Shadow Ram                */
+	map(0x8000, 0xafff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memorybp4_w));                                     /*    8000-afff                 Paged ROM or 12K of SWRAM       */
+	map(0xb000, 0xbfff).bankr("bank6");                                                                               /*    b000-bfff                 Rest of paged ROM area          */
+	map(0xfe30, 0xfe3f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_page_selectbp_w));                    /* R: fe30-fe3f  NC             Not Connected                   */
+																																																										/* W: fe30-fe3f  84LS161        Paged ROM selector              */
+	map(0xfe80, 0xfe83).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_wd1770_status_w));                    /*    fe80-fe83  1770 FDC       Drive control register          */
+	map(0xfe84, 0xfe9f).rw(m_wd1770, FUNC(wd1770_device::read), FUNC(wd1770_device::write));                          /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
+	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));           /*    fee0-feff  Tube ULA       Tube system interface           */
 }
 
 
 void bbc_state::bbcbp128_mem(address_map &map)
 {
 	bbc_base(map);
-	map(0x0000, 0x2fff).bankr("bank1").w(this, FUNC(bbc_state::bbc_memorybp1_w));                    /*    0000-2fff                 Regular Ram                     */
-	map(0x3000, 0x7fff).bankr("bank2").w(this, FUNC(bbc_state::bbc_memorybp2_w));                    /*    3000-7fff                 Video/Shadow Ram                */
-	map(0x8000, 0xafff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memorybp4_128_w));                /*    8000-afff                 Paged ROM or 12K of SWRAM       */
-	map(0xb000, 0xbfff).bankr("bank6").w(this, FUNC(bbc_state::bbc_memorybp6_128_w));                /*    b000-bfff                 Rest of paged ROM area          */
-	map(0xfe30, 0xfe3f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_page_selectbp_w));                        /* R: fe30-fe3f  NC             Not Connected                   */
-																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	map(0xfe80, 0xfe83).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_wd1770_status_w));                        /*    fe80-fe83  1770 FDC       Drive control register          */
-	map(0xfe84, 0xfe9f).rw(m_wd1770, FUNC(wd1770_device::read), FUNC(wd1770_device::write));              /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
-	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));      /*    fee0-feff  Tube ULA       Tube system interface           */
+	map(0x0000, 0x2fff).bankr("bank1").w(this, FUNC(bbc_state::bbc_memorybp1_w));                                     /*    0000-2fff                 Regular Ram                     */
+	map(0x3000, 0x7fff).bankr("bank2").w(this, FUNC(bbc_state::bbc_memorybp2_w));                                     /*    3000-7fff                 Video/Shadow Ram                */
+	map(0x8000, 0xafff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memorybp4_128_w));                                 /*    8000-afff                 Paged ROM or 12K of SWRAM       */
+	map(0xb000, 0xbfff).bankr("bank6").w(this, FUNC(bbc_state::bbc_memorybp6_128_w));                                 /*    b000-bfff                 Rest of paged ROM area          */
+	map(0xfe30, 0xfe3f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_page_selectbp_w));                    /* R: fe30-fe3f  NC             Not Connected                   */
+																																																										/* W: fe30-fe3f  84LS161        Paged ROM selector              */
+	map(0xfe80, 0xfe83).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_wd1770_status_w));                    /*    fe80-fe83  1770 FDC       Drive control register          */
+	map(0xfe84, 0xfe9f).rw(m_wd1770, FUNC(wd1770_device::read), FUNC(wd1770_device::write));                          /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
+	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));           /*    fee0-feff  Tube ULA       Tube system interface           */
 }
 
 
 void bbc_state::reutapm_mem(address_map &map)
 {
 	bbc_base(map);
-	map(0x0000, 0x2fff).bankr("bank1").w(this, FUNC(bbc_state::bbc_memorybp1_w));                    /*    0000-2fff                 Regular Ram                     */
-	map(0x3000, 0x7fff).bankr("bank2").w(this, FUNC(bbc_state::bbc_memorybp2_w));                    /*    3000-7fff                 Video/Shadow Ram                */
-	map(0x8000, 0xafff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memorybp4_w));                    /*    8000-afff                 Paged ROM or 12K of SWRAM       */
-	map(0xb000, 0xbfff).bankr("bank6");                                              /*    b000-bfff                 Rest of paged ROM area          */
-	map(0xfe30, 0xfe3f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_page_selectbp_w));                        /* R: fe30-fe3f  NC             Not Connected                   */
-																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	map(0xfe80, 0xfe83).noprw();                                                             /*    fe80-fe83  1770 FDC       Drive control register          */
-	map(0xfe84, 0xfe9f).noprw();                                                             /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
-	map(0xfee0, 0xfeff).r(this, FUNC(bbc_state::bbc_fe_r));                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
+	map(0x0000, 0x2fff).bankr("bank1").w(this, FUNC(bbc_state::bbc_memorybp1_w));                                     /*    0000-2fff                 Regular Ram                     */
+	map(0x3000, 0x7fff).bankr("bank2").w(this, FUNC(bbc_state::bbc_memorybp2_w));                                     /*    3000-7fff                 Video/Shadow Ram                */
+	map(0x8000, 0xafff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memorybp4_w));                                     /*    8000-afff                 Paged ROM or 12K of SWRAM       */
+	map(0xb000, 0xbfff).bankr("bank6");                                                                               /*    b000-bfff                 Rest of paged ROM area          */
+	map(0xfe30, 0xfe3f).rw(this, FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_page_selectbp_w));                    /* R: fe30-fe3f  NC             Not Connected                   */
+																																																										/* W: fe30-fe3f  84LS161        Paged ROM selector              */
+	map(0xfe80, 0xfe83).noprw();                                                                                      /*    fe80-fe83  1770 FDC       Drive control register          */
+	map(0xfe84, 0xfe9f).noprw();                                                                                      /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
+	map(0xfee0, 0xfeff).r(this, FUNC(bbc_state::bbc_fe_r));                                                           /*    fee0-feff  Tube ULA       Tube system interface           */
 }
 
 /******************************************************************************
@@ -292,14 +288,13 @@ void bbc_state::reutapm_mem(address_map &map)
 
 void bbc_state::bbcm_mem(address_map &map)
 {
-	map(0x0000, 0x2fff).bankr("bank1").w(this, FUNC(bbc_state::bbc_memorybm1_w));                    /*    0000-2fff                 Regular Ram                     */
-	map(0x3000, 0x7fff).bankr("bank2").w(this, FUNC(bbc_state::bbc_memorybm2_w));                    /*    3000-7fff                 Video/Shadow Ram                */
-	map(0x8000, 0x8fff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memorybm4_w));                    /*    8000-8fff                 Paged ROM/RAM or 4K of RAM ANDY */
-	map(0x9000, 0xbfff).bankr("bank5").w(this, FUNC(bbc_state::bbc_memorybm5_w));                    /*    9000-bfff                 Rest of paged ROM/RAM area      */
-	map(0xc000, 0xdfff).bankr("bank7").w(this, FUNC(bbc_state::bbc_memorybm7_w));                    /*    c000-dfff                 OS ROM or 8K of RAM       HAZEL */
-	map(0xe000, 0xfbff).rom().region("os", 0x2000);                                     /*    e000-fbff                 OS ROM                          */
-	map(0xfc00, 0xfeff).bankr("bank8").w(this, FUNC(bbc_state::bbcm_w));                             /*    processed directly because it can be ROM or hardware      */
-	map(0xff00, 0xffff).rom().region("os", 0x3f00);                                     /*    ff00-ffff                 OS ROM (continued)              */
+	map(0x0000, 0x2fff).bankr("bank1").w(this, FUNC(bbc_state::bbc_memorybm1_w));  /*    0000-2fff                 Regular Ram                     */
+	map(0x3000, 0x7fff).bankr("bank2").w(this, FUNC(bbc_state::bbc_memorybm2_w));  /*    3000-7fff                 Video/Shadow Ram                */
+	map(0x8000, 0x8fff).bankr("bank4").w(this, FUNC(bbc_state::bbc_memorybm4_w));  /*    8000-8fff                 Paged ROM/RAM or 4K of RAM ANDY */
+	map(0x9000, 0xbfff).bankr("bank5").w(this, FUNC(bbc_state::bbc_memorybm5_w));  /*    9000-bfff                 Rest of paged ROM/RAM area      */
+	map(0xc000, 0xdfff).bankr("bank7").w(this, FUNC(bbc_state::bbc_memorybm7_w));  /*    c000-dfff                 OS ROM or 8K of RAM       HAZEL */
+	map(0xe000, 0xffff).rom().region("os", 0x2000);                                /*    e000-ffff                 OS ROM                          */
+	map(0xfc00, 0xfeff).bankr("bank8").w(this, FUNC(bbc_state::bbcm_w));           /*    processed directly because it can be ROM or hardware      */
 }
 
 
@@ -820,6 +815,15 @@ static SLOT_INTERFACE_START( bbc_floppies_35 )
 SLOT_INTERFACE_END
 
 
+static const char *const bbc_sample_names[] =
+{
+	"*bbc",
+	"motoroff",
+	"motoron",
+	nullptr
+};
+
+
 WRITE_LINE_MEMBER(bbc_state::adlc_irq_w)
 {
 	m_adlc_irq = state;
@@ -914,10 +918,16 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	MCFG_SOUND_ADD("sn76489", SN76489, 16_MHz_XTAL/4) /* 4 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
+	/* cassette relay */
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(bbc_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(bbc_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
 	MCFG_CASSETTE_INTERFACE("bbc_cass")
 
 	/* software lists */
@@ -1266,6 +1276,7 @@ MACHINE_CONFIG_START(bbc_state::reutapm)
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("mono")
 	MCFG_DEVICE_REMOVE("sn76489")
+	MCFG_DEVICE_REMOVE("samples")
 	MCFG_DEVICE_REMOVE("vsm")
 	MCFG_DEVICE_REMOVE("tms5220")
 
@@ -1373,6 +1384,12 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_SOUND_ADD("sn76489", SN76489, 16_MHz_XTAL/4) /* 4 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
+	/* cassette relay */
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(bbc_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 	/* rtc and cmos */
 	MCFG_MC146818_ADD( "rtc", 32.768_kHz_XTAL )
 
@@ -1384,7 +1401,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(bbc_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
 	MCFG_CASSETTE_INTERFACE("bbc_cass")
 
 	// 2 x cartridge sockets in BBC-Master

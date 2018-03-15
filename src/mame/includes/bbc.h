@@ -29,6 +29,7 @@
 #include "video/saa5050.h"
 #include "sound/sn76496.h"
 #include "sound/tms5220.h"
+#include "sound/samples.h"
 #include "imagedev/cassette.h"
 
 #include "bus/bbc/fdc/fdc.h"
@@ -56,6 +57,7 @@ public:
 		m_screen(*this, "screen"),
 		m_adlc(*this, "mc6854"),
 		m_sn(*this, "sn76489"),
+		m_samples(*this, "samples"),
 		m_keyboard(*this, "COL%u", 0),
 		m_trom(*this, "saa5050"),
 		m_tms(*this, "tms5220"),
@@ -256,6 +258,7 @@ private:
 	required_device<screen_device> m_screen;
 	optional_device<mc6854_device> m_adlc;
 	optional_device<sn76489_device> m_sn;
+	optional_device<samples_device> m_samples;
 	required_ioport_array<13> m_keyboard;
 public: // HACK FOR MC6845
 	optional_device<saa5050_device> m_trom;
@@ -475,7 +478,7 @@ public: // HACK FOR MC6845
 	void bbcb_IC32_initialise(bbc_state *state);
 	void MC146818_set(address_space &space);
 	void MC6850_Receive_Clock(int new_clock);
-	void BBC_Cassette_motor(unsigned char status);
+	void cassette_motor(bool state);
 	void bbc_update_nmi();
 	uint16_t calculate_video_address(uint16_t ma, uint8_t ra);
 	required_device<palette_device> m_palette;
