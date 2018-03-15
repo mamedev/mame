@@ -1563,4 +1563,4 @@ DRIVER_INIT_MEMBER(gunpey_state,gunpey)
 	// ...
 }
 
-GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, gunpey,    ROT0, "Banpresto", "Gunpey (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, gunpey,    ROT0, "Bandai / Banpresto", "Gunpey (Japan)", 0 )
