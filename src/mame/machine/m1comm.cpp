@@ -67,7 +67,7 @@ void m1comm_device::m1comm_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
-	map(0xc000, 0xffff).mask(0x1000).rw(this, FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
+	map(0xc000, 0xffff).mask(0x0fff).rw(this, FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
 }
 
 /*************************************
