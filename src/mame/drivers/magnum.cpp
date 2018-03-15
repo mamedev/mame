@@ -8,6 +8,7 @@
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "machine/cdp1879.h"
+#include "video/hd61830.h"
 #include "sound/beep.h"
 #include "rendlay.h"
 #include "screen.h"
@@ -18,112 +19,30 @@ class magnum_state : public driver_device
 public:
 	magnum_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_palette(*this, "palette")
-		, m_cgrom(*this, "cgrom")
 		, m_beep(*this, "beep")
 	{
 	}
-
-	DECLARE_READ8_MEMBER(lcd_r);
-	DECLARE_WRITE8_MEMBER(lcd_w);
-	DECLARE_WRITE8_MEMBER(beep_w);
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	void magnum(machine_config &config);
-	void magnum_io(address_map &map);
-	void magnum_map(address_map &map);
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
 private:
-	required_device<palette_device> m_palette;
-	required_memory_region m_cgrom;
+	DECLARE_WRITE8_MEMBER(beep_w);
+
+	void magnum_io(address_map &map);
+	void magnum_map(address_map &map);
+	void magnum_lcdc(address_map &map);
+
 	required_device<beep_device> m_beep;
-
-	struct lcd
-	{
-		u8 vram[640];
-		u8 cmd;
-		u16 cursor;
-	};
-	lcd m_lcd[2];
 };
-
-u32 magnum_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	u8* font = m_cgrom->base();
-	u32 black = m_palette->pen(0);
-	u32 white = m_palette->pen(1);
-	for(int scr = 0; scr < 2; scr++)
-	{
-		u8* vram = m_lcd[!scr].vram;
-		for(int i = 0; i < 16; i++)
-		{
-			for(int j = 0; j < 40; j++)
-			{
-				for(int k = 0; k < 9; k++)
-				{
-					for(int l = 0; l < 6; l++)
-						bitmap.pix32((i * 9) + k, ((j + (scr * 40)) * 6) + l) = font[(vram[(i * 40) + j] * 16) + k] & (1 << (5 - l)) ? black : white;
-				}
-			}
-		}
-	}
-	return 0;
-}
 
 void magnum_state::machine_start()
 {
-	save_item(NAME(m_lcd[0].vram));
-	save_item(NAME(m_lcd[0].cmd));
-	save_item(NAME(m_lcd[0].cursor));
-	save_item(NAME(m_lcd[1].vram));
-	save_item(NAME(m_lcd[1].cmd));
-	save_item(NAME(m_lcd[1].cursor));
 }
 
 void magnum_state::machine_reset()
 {
-	memset(m_lcd, 0, sizeof(m_lcd));
-}
-
-READ8_MEMBER(magnum_state::lcd_r)
-{
-	//lcd& panel = m_lcd[BIT(offset, 1)];
-	switch(BIT(offset, 0))
-	{
-		case 1:
-			return 0; // bit 8 busy status
-	}
-	return 0;
-}
-
-WRITE8_MEMBER(magnum_state::lcd_w)
-{
-	lcd& panel = m_lcd[BIT(offset, 1)];
-	switch(BIT(offset, 0))
-	{
-		case 0:
-			switch(panel.cmd)
-			{
-				case 0xa:
-					panel.cursor = ((panel.cursor & 0xff00) | data) % 640;
-					break;
-				case 0xb:
-					panel.cursor = ((panel.cursor & 0x00ff) | (data << 8)) % 640;
-					break;
-				case 0xc:
-					panel.vram[panel.cursor] = data;
-					panel.cursor++;
-					panel.cursor %= 640;
-					break;
-			}
-			break;
-		case 1:
-			panel.cmd = data;
-			break;
-	}
 }
 
 WRITE8_MEMBER(magnum_state::beep_w)
@@ -143,9 +62,17 @@ void magnum_state::magnum_io(address_map &map)
 	map.unmap_value_high();
 	//AM_RANGE(0x000a, 0x000b) cdp1854 1
 	//AM_RANGE(0x000e, 0x000f) cpd1854 2
-	map(0x0018, 0x001f).rw(this, FUNC(magnum_state::lcd_r), FUNC(magnum_state::lcd_w)).umask16(0x00ff);
+	map(0x0018, 0x0019).rw("lcdc2", FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
+	map(0x001a, 0x001b).rw("lcdc2", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
+	map(0x001c, 0x001d).rw("lcdc1", FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
+	map(0x001e, 0x001f).rw("lcdc1", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 	map(0x0056, 0x0056).w(this, FUNC(magnum_state::beep_w));
 	map(0x0080, 0x008f).rw("rtc", FUNC(cdp1879_device::read), FUNC(cdp1879_device::write)).umask16(0x00ff);
+}
+
+void magnum_state::magnum_lcdc(address_map &map)
+{
+	map(0x0000, 0x027f).ram();
 }
 
 MACHINE_CONFIG_START(magnum_state::magnum)
@@ -155,16 +82,29 @@ MACHINE_CONFIG_START(magnum_state::magnum)
 
 	MCFG_DEVICE_ADD("rtc", CDP1879, XTAL(32'768))
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_UPDATE_DRIVER(magnum_state, screen_update)
+	MCFG_SCREEN_ADD("screen1", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(6*80, 9*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*80-1, 0, 9*16-1)
+	MCFG_SCREEN_UPDATE_DEVICE("lcdc1", hd61830_device, screen_update)
+	MCFG_SCREEN_SIZE(6*40, 9*16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 6*40-1, 0, 9*16-1)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_SCREEN_ADD("screen2", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_UPDATE_DEVICE("lcdc2", hd61830_device, screen_update)
+	MCFG_SCREEN_SIZE(6*40, 9*16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 6*40-1, 0, 9*16-1)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEVICE_ADD("lcdc1", HD61830, 1000000) // unknown clock
+	MCFG_DEVICE_ADDRESS_MAP(0, magnum_lcdc)
+	MCFG_VIDEO_SET_SCREEN("screen1")
+
+	MCFG_DEVICE_ADD("lcdc2", HD61830, 1000000) // unknown clock
+	MCFG_DEVICE_ADDRESS_MAP(0, magnum_lcdc)
+	MCFG_VIDEO_SET_SCREEN("screen2")
+
+	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("beep", BEEP, 500) /// frequency is guessed
@@ -184,9 +124,6 @@ ROM_START( magnum )
 
 	ROM_REGION(0x1000, "char", 0)
 	ROM_LOAD("dulmontcharrom.bin", 0x0000, 0x1000, CRC(9dff89bf) SHA1(d359aeba7f0b0c81accf3bca25e7da636c033721))
-
-	ROM_REGION(0x1000, "cgrom", 0) // borrow this rom for the lcd screen as it looks the same, the above is for the crt output
-	ROM_LOAD("hd44780_a00.bin", 0x0000, 0x1000,  BAD_DUMP CRC(01d108e2) SHA1(bc0cdf0c9ba895f22e183c7bd35a3f655f2ca96f))
 ROM_END
 
 COMP( 1983, magnum, 0, 0, magnum, 0, magnum_state, 0, "Dulmont", "Magnum", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
