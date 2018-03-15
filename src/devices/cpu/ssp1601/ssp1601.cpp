@@ -191,7 +191,7 @@
 #endif
 
 
-DEFINE_DEVICE_TYPE(SSP1601, ssp1601_device, "ssp1601", "SSP1601")
+DEFINE_DEVICE_TYPE(SSP1601, ssp1601_device, "ssp1601", "Samsung SSP1601")
 
 
 ssp1601_device::ssp1601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

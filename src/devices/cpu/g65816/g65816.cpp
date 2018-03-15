@@ -93,8 +93,8 @@ TODO general:
 #include "g65816.h"
 
 
-DEFINE_DEVICE_TYPE(G65816, g65816_device, "g65c816", "G65C816")
-DEFINE_DEVICE_TYPE(_5A22,  _5a22_device,  "5a22",    "5A22")
+DEFINE_DEVICE_TYPE(G65816, g65816_device, "g65c816", "Western Design Center G65C816")
+DEFINE_DEVICE_TYPE(_5A22,  _5a22_device,  "5a22",    "Ricoh 5A22")
 
 enum
 {

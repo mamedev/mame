@@ -218,7 +218,7 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 
 
 
-DEFINE_DEVICE_TYPE(SPC700, spc700_device, "spc700", "SPC700")
+DEFINE_DEVICE_TYPE(SPC700, spc700_device, "spc700", "Sony SPC700")
 
 
 spc700_device::spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

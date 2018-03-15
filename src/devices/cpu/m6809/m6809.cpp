@@ -128,8 +128,8 @@ March 2013 NPW:
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(MC6809, mc6809_device, "mc6809", "MC6809")
-DEFINE_DEVICE_TYPE(MC6809E, mc6809e_device, "mc6809e", "MC6809E")
+DEFINE_DEVICE_TYPE(MC6809, mc6809_device, "mc6809", "Motorola MC6809")
+DEFINE_DEVICE_TYPE(MC6809E, mc6809e_device, "mc6809e", "Motorola MC6809E")
 DEFINE_DEVICE_TYPE(M6809, m6809_device, "m6809", "MC6809 (legacy)")
 
 

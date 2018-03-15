@@ -21,7 +21,7 @@
 #include "mb86233d.h"
 
 
-DEFINE_DEVICE_TYPE(MB86233, mb86233_cpu_device, "mb86233", "MB86233")
+DEFINE_DEVICE_TYPE(MB86233, mb86233_cpu_device, "mb86233", "Fujitsu MB86233 \"TGP\"")
 
 
 mb86233_cpu_device::mb86233_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "tmpz84c015.h"
 
-DEFINE_DEVICE_TYPE(TMPZ84C015, tmpz84c015_device, "tmpz84c015", "TMPZ84C015")
+DEFINE_DEVICE_TYPE(TMPZ84C015, tmpz84c015_device, "tmpz84c015", "Toshiba TMPZ84C015")
 
 ADDRESS_MAP_START(tmpz84c015_device::tmpz84c015_internal_io_map)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_DEVREADWRITE("tmpz84c015_ctc", z80ctc_device, read, write)

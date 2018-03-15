@@ -289,4 +289,4 @@ util::disasm_interface *tms9980a_device::create_disassembler()
 	return new tms9900_disassembler(TMS9980_ID);
 }
 
-DEFINE_DEVICE_TYPE(TMS9980A, tms9980a_device, "tms9980a", "TMS9980A")
+DEFINE_DEVICE_TYPE(TMS9980A, tms9980a_device, "tms9980a", "Texas Instruments TMS9980A")

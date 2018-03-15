@@ -28,17 +28,17 @@
 /* seems to be defined on mingw-gcc */
 #undef i386
 
-DEFINE_DEVICE_TYPE(I386,        i386_device,        "i386",        "I386")
-DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "I386SX")
-DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "I486")
-DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "I486DX4")
-DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Pentium")
+DEFINE_DEVICE_TYPE(I386,        i386_device,        "i386",        "Intel I386")
+DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "Intel I386SX")
+DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "Intel I486")
+DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "Intel I486DX4")
+DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Intel Pentium")
 DEFINE_DEVICE_TYPE(MEDIAGX,     mediagx_device,     "mediagx",     "Cyrix MediaGX")
-DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Pentium Pro")
-DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Pentium MMX")
-DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Pentium II")
-DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Pentium III")
-DEFINE_DEVICE_TYPE(PENTIUM4,    pentium4_device,    "pentium4",    "Pentium 4")
+DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Intel Pentium Pro")
+DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Intel Pentium MMX")
+DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Intel Pentium II")
+DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Intel Pentium III")
+DEFINE_DEVICE_TYPE(PENTIUM4,    pentium4_device,    "pentium4",    "Intel Pentium 4")
 
 
 i386_device::i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

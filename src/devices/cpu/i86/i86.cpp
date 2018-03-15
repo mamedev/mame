@@ -88,8 +88,8 @@ const uint8_t i8086_cpu_device::m_i8086_timing[] =
 
 /***************************************************************************/
 
-DEFINE_DEVICE_TYPE(I8086, i8086_cpu_device, "i8086", "I8086")
-DEFINE_DEVICE_TYPE(I8088, i8088_cpu_device, "i8088", "I8088")
+DEFINE_DEVICE_TYPE(I8086, i8086_cpu_device, "i8086", "Intel I8086")
+DEFINE_DEVICE_TYPE(I8088, i8088_cpu_device, "i8088", "Intel I8088")
 
 i8088_cpu_device::i8088_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8086_cpu_device(mconfig, I8088, tag, owner, clock, 8)

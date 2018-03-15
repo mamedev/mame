@@ -12,7 +12,7 @@
 #include "r65c02.h"
 #include "r65c02d.h"
 
-DEFINE_DEVICE_TYPE(R65C02, r65c02_device, "r65c02", "R65C02")
+DEFINE_DEVICE_TYPE(R65C02, r65c02_device, "r65c02", "Rockwell R65C02")
 
 r65c02_device::r65c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	r65c02_device(mconfig, R65C02, tag, owner, clock)

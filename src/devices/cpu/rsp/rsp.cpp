@@ -19,7 +19,7 @@
 
 #include "rsp_dasm.h"
 
-DEFINE_DEVICE_TYPE(RSP, rsp_device, "rsp", "RSP")
+DEFINE_DEVICE_TYPE(RSP, rsp_device, "rsp", "Nintendo & SGI Reality Signal Processor RSP")
 
 
 #define LOG_INSTRUCTION_EXECUTION       0

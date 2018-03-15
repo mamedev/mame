@@ -244,12 +244,12 @@ ADDRESS_MAP_START(m6801_cpu_device::m6803_mem)
 ADDRESS_MAP_END
 
 
-DEFINE_DEVICE_TYPE(M6801, m6801_cpu_device, "m6801", "M6801")
-DEFINE_DEVICE_TYPE(M6803, m6803_cpu_device, "m6803", "M6803")
-DEFINE_DEVICE_TYPE(HD6301, hd6301_cpu_device, "hd6301", "HD6301")
-DEFINE_DEVICE_TYPE(HD63701, hd63701_cpu_device, "hd63701", "HD63701")
-DEFINE_DEVICE_TYPE(HD6303R, hd6303r_cpu_device, "hd6303r", "HD6303R")
-DEFINE_DEVICE_TYPE(HD6303Y, hd6303y_cpu_device, "hd6303y", "HD6303Y")
+DEFINE_DEVICE_TYPE(M6801, m6801_cpu_device, "m6801", "Motorola M6801")
+DEFINE_DEVICE_TYPE(M6803, m6803_cpu_device, "m6803", "Motorola M6803")
+DEFINE_DEVICE_TYPE(HD6301, hd6301_cpu_device, "hd6301", "Hitachi HD6301")
+DEFINE_DEVICE_TYPE(HD63701, hd63701_cpu_device, "hd63701", "Hitachi HD63701")
+DEFINE_DEVICE_TYPE(HD6303R, hd6303r_cpu_device, "hd6303r", "Hitachi HD6303R")
+DEFINE_DEVICE_TYPE(HD6303Y, hd6303y_cpu_device, "hd6303y", "Hitachi HD6303Y")
 
 m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m6801_cpu_device(mconfig, M6801, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor())

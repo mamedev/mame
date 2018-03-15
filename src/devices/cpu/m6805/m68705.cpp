@@ -88,10 +88,10 @@ constexpr u16 M68705_INT_MASK           = 0x03;
  * Global variables
  ****************************************************************************/
 
-DEFINE_DEVICE_TYPE(M68705P3, m68705p3_device, "m68705p3", "MC68705P3")
-DEFINE_DEVICE_TYPE(M68705P5, m68705p5_device, "m68705p5", "MC68705P5")
-DEFINE_DEVICE_TYPE(M68705R3, m68705r3_device, "m68705r3", "MC68705R3")
-DEFINE_DEVICE_TYPE(M68705U3, m68705u3_device, "m68705u3", "MC68705U3")
+DEFINE_DEVICE_TYPE(M68705P3, m68705p3_device, "m68705p3", "Motorola MC68705P3")
+DEFINE_DEVICE_TYPE(M68705P5, m68705p5_device, "m68705p5", "Motorola MC68705P5")
+DEFINE_DEVICE_TYPE(M68705R3, m68705r3_device, "m68705r3", "Motorola MC68705R3")
+DEFINE_DEVICE_TYPE(M68705U3, m68705u3_device, "m68705u3", "Motorola MC68705U3")
 
 
 /****************************************************************************

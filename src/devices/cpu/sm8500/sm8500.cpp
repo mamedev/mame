@@ -25,7 +25,7 @@ they are internally.
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(SM8500, sm8500_cpu_device, "sm8500", "SM8500")
+DEFINE_DEVICE_TYPE(SM8500, sm8500_cpu_device, "sm8500", "Sharp SM8500")
 
 
 static constexpr uint8_t sm8500_b2w[8] = {

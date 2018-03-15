@@ -195,16 +195,16 @@ static const uint8_t fcmp_cr_table_source[32] =
 };
 
 
-DEFINE_DEVICE_TYPE(PPC601,    ppc601_device,    "ppc601",     "PowerPC 601")
-DEFINE_DEVICE_TYPE(PPC602,    ppc602_device,    "ppc602",     "PowerPC 602")
-DEFINE_DEVICE_TYPE(PPC603,    ppc603_device,    "ppc603",     "PowerPC 603")
-DEFINE_DEVICE_TYPE(PPC603E,   ppc603e_device,   "ppc603e",    "PowerPC 603E")
-DEFINE_DEVICE_TYPE(PPC603R,   ppc603r_device,   "ppc603r",    "PowerPC 603R")
-DEFINE_DEVICE_TYPE(PPC604,    ppc604_device,    "ppc604",     "PowerPC 604")
-DEFINE_DEVICE_TYPE(MPC8240,   mpc8240_device,   "mpc8240",    "PowerPC MPC8240")
-DEFINE_DEVICE_TYPE(PPC403GA,  ppc403ga_device,  "ppc403ga",   "PowerPC 403GA")
-DEFINE_DEVICE_TYPE(PPC403GCX, ppc403gcx_device, "ppc403gcx",  "PowerPC 403GCX")
-DEFINE_DEVICE_TYPE(PPC405GP,  ppc405gp_device,  "ppc405gp",   "PowerPC 405GP")
+DEFINE_DEVICE_TYPE(PPC601,    ppc601_device,    "ppc601",     "IBM PowerPC 601")
+DEFINE_DEVICE_TYPE(PPC602,    ppc602_device,    "ppc602",     "IBM PowerPC 602")
+DEFINE_DEVICE_TYPE(PPC603,    ppc603_device,    "ppc603",     "IBM PowerPC 603")
+DEFINE_DEVICE_TYPE(PPC603E,   ppc603e_device,   "ppc603e",    "IBM PowerPC 603E")
+DEFINE_DEVICE_TYPE(PPC603R,   ppc603r_device,   "ppc603r",    "IBM PowerPC 603R")
+DEFINE_DEVICE_TYPE(PPC604,    ppc604_device,    "ppc604",     "IBM PowerPC 604")
+DEFINE_DEVICE_TYPE(MPC8240,   mpc8240_device,   "mpc8240",    "IBM PowerPC MPC8240")
+DEFINE_DEVICE_TYPE(PPC403GA,  ppc403ga_device,  "ppc403ga",   "IBM PowerPC 403GA")
+DEFINE_DEVICE_TYPE(PPC403GCX, ppc403gcx_device, "ppc403gcx",  "IBM PowerPC 403GCX")
+DEFINE_DEVICE_TYPE(PPC405GP,  ppc405gp_device,  "ppc405gp",   "IBM PowerPC 405GP")
 
 
 ppc_device::ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map)

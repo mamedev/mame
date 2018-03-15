@@ -77,14 +77,14 @@
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(PIC16C54, pic16c54_device, "pic16c54", "PIC16C54")
-DEFINE_DEVICE_TYPE(PIC16C55, pic16c55_device, "pic16c55", "PIC16C55")
-DEFINE_DEVICE_TYPE(PIC16C56, pic16c56_device, "pic16c56", "PIC16C56")
-DEFINE_DEVICE_TYPE(PIC16C57, pic16c57_device, "pic16c57", "PIC16C57")
-DEFINE_DEVICE_TYPE(PIC16C58, pic16c58_device, "pic16c58", "PIC16C58")
+DEFINE_DEVICE_TYPE(PIC16C54, pic16c54_device, "pic16c54", "Microchip PIC16C54")
+DEFINE_DEVICE_TYPE(PIC16C55, pic16c55_device, "pic16c55", "Microchip PIC16C55")
+DEFINE_DEVICE_TYPE(PIC16C56, pic16c56_device, "pic16c56", "Microchip PIC16C56")
+DEFINE_DEVICE_TYPE(PIC16C57, pic16c57_device, "pic16c57", "Microchip PIC16C57")
+DEFINE_DEVICE_TYPE(PIC16C58, pic16c58_device, "pic16c58", "Microchip PIC16C58")
 
-DEFINE_DEVICE_TYPE(PIC1650,  pic1650_device,  "pic1650",  "PIC1650")
-DEFINE_DEVICE_TYPE(PIC1655,  pic1655_device,  "pic1655",  "PIC1655")
+DEFINE_DEVICE_TYPE(PIC1650,  pic1650_device,  "pic1650",  "Microchip PIC1650")
+DEFINE_DEVICE_TYPE(PIC1655,  pic1655_device,  "pic1655",  "Microchip PIC1655")
 
 
 /****************************************************************************

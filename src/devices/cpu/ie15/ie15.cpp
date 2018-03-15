@@ -22,7 +22,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(IE15_CPU, ie15_cpu_device, "ie15_cpu", "ie15 CPU")
+DEFINE_DEVICE_TYPE(IE15_CPU, ie15_cpu_device, "ie15", "ie15 CPU")
 
 //**************************************************************************
 //  DEVICE INTERFACE

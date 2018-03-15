@@ -16,8 +16,8 @@
 
 
 
-DEFINE_DEVICE_TYPE(V53,  v53_device,  "v53",  "V53")
-DEFINE_DEVICE_TYPE(V53A, v53a_device, "v53a", "V53A")
+DEFINE_DEVICE_TYPE(V53,  v53_device,  "v53",  "NEC V53")
+DEFINE_DEVICE_TYPE(V53A, v53a_device, "v53a", "NEC V53A")
 
 WRITE8_MEMBER(v53_base_device::BSEL_w)
 {

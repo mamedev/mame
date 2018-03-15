@@ -3725,11 +3725,11 @@ device_memory_interface::space_config_vector z80_device::memory_space_config() c
 		};
 }
 
-DEFINE_DEVICE_TYPE(Z80, z80_device, "z80", "Z80")
+DEFINE_DEVICE_TYPE(Z80, z80_device, "z80", "Zilog Z80")
 
 nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80_device(mconfig, NSC800, tag, owner, clock)
 {
 }
 
-DEFINE_DEVICE_TYPE(NSC800, nsc800_device, "nsc800", "NSC800")
+DEFINE_DEVICE_TYPE(NSC800, nsc800_device, "nsc800", "National Semiconductor NSC800")

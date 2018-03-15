@@ -15,7 +15,7 @@
 #include "arcdasm.h"
 
 
-DEFINE_DEVICE_TYPE(ARC, arc_cpu_device, "arc_a4", "ARCtangent A4")
+DEFINE_DEVICE_TYPE(ARC, arc_cpu_device, "arc_a4", "Argonaut ARCtangent A4")
 
 
 arc_cpu_device::arc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

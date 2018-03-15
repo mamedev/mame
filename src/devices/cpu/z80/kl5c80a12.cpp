@@ -16,7 +16,7 @@
 #include "emu.h"
 #include "kl5c80a12.h"
 
-DEFINE_DEVICE_TYPE(KL5C80A12, kl5c80a12_device, "kl5c80a12", "KL5C80A12")
+DEFINE_DEVICE_TYPE(KL5C80A12, kl5c80a12_device, "kl5c80a12", "Kawasaki LSI KL5C80A12")
 
 
 kl5c80a12_device::kl5c80a12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

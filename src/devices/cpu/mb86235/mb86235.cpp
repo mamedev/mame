@@ -30,7 +30,7 @@
 
 
 
-DEFINE_DEVICE_TYPE(MB86235, mb86235_device, "mb86235", "MB86235")
+DEFINE_DEVICE_TYPE(MB86235, mb86235_device, "mb86235", "Fujitsu MB86235 \"TGPx4\"")
 
 
 ADDRESS_MAP_START(mb86235_device::internal_abus)
@@ -112,7 +112,7 @@ void mb86235_device::device_start()
 	m_drcuml->symbol_add(&m_core->alutemp, sizeof(m_core->alutemp), "alutemp");
 	m_drcuml->symbol_add(&m_core->multemp, sizeof(m_core->multemp), "multemp");
 
-	m_drcuml->symbol_add(&m_core->pcs_ptr, sizeof(m_core->pcs_ptr), "pcs_ptr");
+	m_drcuml->symbol_add(&m_core->pcp, sizeof(m_core->pcp), "pcp");
 
 
 	m_drcfe = std::make_unique<mb86235_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, COMPILE_MAX_SEQUENCE);

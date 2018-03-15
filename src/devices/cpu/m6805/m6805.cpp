@@ -667,6 +667,6 @@ void hd63705_device::interrupt_vector()
 }
 
 
-DEFINE_DEVICE_TYPE(M6805,     m6805_device,     "m6805",     "M6805")
-DEFINE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device, "m68hc05eg", "MC68HC05EG")
-DEFINE_DEVICE_TYPE(HD63705,   hd63705_device,   "hd63705",   "HD63705")
+DEFINE_DEVICE_TYPE(M6805,     m6805_device,     "m6805",     "Motorola M6805")
+DEFINE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device, "m68hc05eg", "Motorola MC68HC05EG")
+DEFINE_DEVICE_TYPE(HD63705,   hd63705_device,   "hd63705",   "Hitachi HD63705")

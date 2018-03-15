@@ -14,7 +14,7 @@
 #include "57002dsm.h"
 
 
-DEFINE_DEVICE_TYPE(TMS57002, tms57002_device, "tms57002", "TMS57002")
+DEFINE_DEVICE_TYPE(TMS57002, tms57002_device, "tms57002", "Texas Instruments TMS57002 \"DASP\"")
 
 // Can't use a DEVICE_ADDRESS_MAP, not yet anyway
 ADDRESS_MAP_START(tms57002_device::internal_pgm)

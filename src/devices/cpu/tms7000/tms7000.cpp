@@ -23,29 +23,29 @@
 
 // TMS7000 is the most basic one, 128 bytes internal RAM and no internal ROM.
 // TMS7020 and TMS7040 are same, but with 2KB and 4KB internal ROM respectively.
-DEFINE_DEVICE_TYPE(TMS7000, tms7000_device, "tms7000", "TMS7000")
-DEFINE_DEVICE_TYPE(TMS7020, tms7020_device, "tms7020", "TMS7020")
-DEFINE_DEVICE_TYPE(TMS7040, tms7040_device, "tms7040", "TMS7040")
+DEFINE_DEVICE_TYPE(TMS7000, tms7000_device, "tms7000", "Texas Instruments TMS7000")
+DEFINE_DEVICE_TYPE(TMS7020, tms7020_device, "tms7020", "Texas Instruments TMS7020")
+DEFINE_DEVICE_TYPE(TMS7040, tms7040_device, "tms7040", "Texas Instruments TMS7040")
 
 // Exelvision (spinoff of TI) TMS7020 added one custom opcode.
-DEFINE_DEVICE_TYPE(TMS7020_EXL, tms7020_exl_device, "tms7020_exl", "TMS7020 (Exelvision)")
+DEFINE_DEVICE_TYPE(TMS7020_EXL, tms7020_exl_device, "tms7020_exl", "Texas Instruments TMS7020 (Exelvision)")
 
 // CMOS devices biggest difference in a 'real world' setting is that the power
 // requirements are much lower. This obviously has no use in software emulation.
-DEFINE_DEVICE_TYPE(TMS70C00, tms70c00_device, "tms70c00", "TMS70C00")
-DEFINE_DEVICE_TYPE(TMS70C20, tms70c20_device, "tms70c20", "TMS70C20")
-DEFINE_DEVICE_TYPE(TMS70C40, tms70c40_device, "tms70c40", "TMS70C40")
+DEFINE_DEVICE_TYPE(TMS70C00, tms70c00_device, "tms70c00", "Texas Instruments TMS70C00")
+DEFINE_DEVICE_TYPE(TMS70C20, tms70c20_device, "tms70c20", "Texas Instruments TMS70C20")
+DEFINE_DEVICE_TYPE(TMS70C40, tms70c40_device, "tms70c40", "Texas Instruments TMS70C40")
 
 // TMS70x1 features more peripheral I/O, the main addition being a serial port.
 // TMS70x2 is the same, just with twice more RAM (256 bytes)
-DEFINE_DEVICE_TYPE(TMS7001, tms7001_device, "tms7001", "TMS7001")
-DEFINE_DEVICE_TYPE(TMS7041, tms7041_device, "tms7041", "TMS7041")
-DEFINE_DEVICE_TYPE(TMS7002, tms7002_device, "tms7002", "TMS7002")
-DEFINE_DEVICE_TYPE(TMS7042, tms7042_device, "tms7042", "TMS7042")
+DEFINE_DEVICE_TYPE(TMS7001, tms7001_device, "tms7001", "Texas Instruments TMS7001")
+DEFINE_DEVICE_TYPE(TMS7041, tms7041_device, "tms7041", "Texas Instruments TMS7041")
+DEFINE_DEVICE_TYPE(TMS7002, tms7002_device, "tms7002", "Texas Instruments TMS7002")
+DEFINE_DEVICE_TYPE(TMS7042, tms7042_device, "tms7042", "Texas Instruments TMS7042")
 
 // TMS70C46 is literally a shell around a TMS70C40, with support for external
 // memory bus, auto external clock divider on slow memory, and wake-up on keypress.
-DEFINE_DEVICE_TYPE(TMS70C46, tms70c46_device, "tms70c46", "TMC70C46")
+DEFINE_DEVICE_TYPE(TMS70C46, tms70c46_device, "tms70c46", "Texas Instruments TMS70C46")
 
 // TMS70Cx2 is an update to TMS70x2 with some extra features. Due to some changes
 // in peripheral file I/O, it is not backward compatible to TMS70x2.

@@ -197,9 +197,9 @@ op_call 8085    11        +7(18)   -2(9)
 */
 
 
-DEFINE_DEVICE_TYPE(I8080,  i8080_cpu_device,  "i8080",  "8080")
-DEFINE_DEVICE_TYPE(I8080A, i8080a_cpu_device, "i8080a", "8080A")
-DEFINE_DEVICE_TYPE(I8085A, i8085a_cpu_device, "i8085a", "8085A")
+DEFINE_DEVICE_TYPE(I8080,  i8080_cpu_device,  "i8080",  "Intel 8080")
+DEFINE_DEVICE_TYPE(I8080A, i8080a_cpu_device, "i8080a", "Intel 8080A")
+DEFINE_DEVICE_TYPE(I8085A, i8085a_cpu_device, "i8085a", "Intel 8085A")
 
 
 i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)

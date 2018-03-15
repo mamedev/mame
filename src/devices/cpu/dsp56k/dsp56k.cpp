@@ -60,7 +60,7 @@
 #include "dsp56mem.h"
 
 
-DEFINE_DEVICE_TYPE_NS(DSP56156, DSP56K, dsp56k_device, "dsp56156", "DSP56156")
+DEFINE_DEVICE_TYPE_NS(DSP56156, DSP56K, dsp56k_device, "dsp56156", "Motorola DSP56156")
 
 
 namespace DSP56K {

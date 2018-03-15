@@ -136,9 +136,10 @@ const jaguar_cpu_device::op_func jaguar_cpu_device::dsp_op_table[64] =
 
 #define ROPCODE(pc)           (m_direct->read_word(pc, WORD_XOR_BE(0)))
 
-
-DEFINE_DEVICE_TYPE(JAGUARGPU, jaguargpu_cpu_device, "jaguargpu", "Jaguar GPU")
-DEFINE_DEVICE_TYPE(JAGUARDSP, jaguardsp_cpu_device, "jaguardsp", "Jaguar DSP")
+// SC414200AT
+DEFINE_DEVICE_TYPE(JAGUARGPU, jaguargpu_cpu_device, "jaguargpu", "Motorola Atari Jaguar GPU \"Tom\"")
+// SC414201FT
+DEFINE_DEVICE_TYPE(JAGUARDSP, jaguardsp_cpu_device, "jaguardsp", "Motorola Atari Jaguar DSP \"Jerry\"")
 
 
 jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool isdsp)

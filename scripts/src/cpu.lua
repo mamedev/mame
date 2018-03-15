@@ -1172,6 +1172,7 @@ if (CPUS["MB86235"]~=null) then
 		MAME_DIR .. "src/devices/cpu/mb86235/mb86235drc.cpp",
 		MAME_DIR .. "src/devices/cpu/mb86235/mb86235fe.cpp",
 		MAME_DIR .. "src/devices/cpu/mb86235/mb86235fe.h",
+		MAME_DIR .. "src/devices/cpu/mb86235/mb86235ops.cpp",
 	}
 end
 

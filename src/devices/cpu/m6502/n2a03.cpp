@@ -12,7 +12,7 @@
 #include "n2a03.h"
 #include "n2a03d.h"
 
-DEFINE_DEVICE_TYPE(N2A03, n2a03_device, "n2a03", "N2A03")
+DEFINE_DEVICE_TYPE(N2A03, n2a03_device, "n2a03", "Ricoh N2A03")
 
 READ8_MEMBER(n2a03_device::psg1_4014_r)
 {

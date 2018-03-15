@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-
 /******************************************************************************
 
     MB86235 UML recompiler core
@@ -1629,14 +1628,14 @@ void mb86235_device::generate_control(drcuml_block *block, compiler_state *compi
 		{
 			// push PC
 			code_label no_overflow = compiler->labelnum++;
-			UML_CMP(block, mem(&m_core->pcs_ptr), 4);
+			UML_CMP(block, mem(&m_core->pcp), 4);
 			UML_JMPc(block, COND_L, no_overflow);
 			UML_MOV(block, mem(&m_core->pc), desc->pc);
 			UML_CALLC(block, cfunc_pcs_overflow, this);
 
 			UML_LABEL(block, no_overflow);
-			UML_STORE(block, m_core->pcs, mem(&m_core->pcs_ptr), desc->pc + 2, SIZE_DWORD, SCALE_x4);
-			UML_ADD(block, mem(&m_core->pcs_ptr), mem(&m_core->pcs_ptr), 1);
+			UML_STORE(block, m_core->pcs, mem(&m_core->pcp), desc->pc + 2, SIZE_DWORD, SCALE_x4);
+			UML_ADD(block, mem(&m_core->pcp), mem(&m_core->pcp), 1);
 
 			generate_branch_target(block, compiler, desc, (op >> 12) & 0xf, ef2);
 			generate_branch(block, compiler, desc);
@@ -1647,14 +1646,14 @@ void mb86235_device::generate_control(drcuml_block *block, compiler_state *compi
 		{
 			// pop PC
 			code_label no_underflow = compiler->labelnum++;
-			UML_CMP(block, mem(&m_core->pcs_ptr), 0);
+			UML_CMP(block, mem(&m_core->pcp), 0);
 			UML_JMPc(block, COND_G, no_underflow);
 			UML_MOV(block, mem(&m_core->pc), desc->pc);
 			UML_CALLC(block, cfunc_pcs_underflow, this);
 
 			UML_LABEL(block, no_underflow);
-			UML_SUB(block, mem(&m_core->pcs_ptr), mem(&m_core->pcs_ptr), 1);
-			UML_LOAD(block, I0, m_core->pcs, mem(&m_core->pcs_ptr), SIZE_DWORD, SCALE_x4);
+			UML_SUB(block, mem(&m_core->pcp), mem(&m_core->pcp), 1);
+			UML_LOAD(block, I0, m_core->pcs, mem(&m_core->pcp), SIZE_DWORD, SCALE_x4);
 
 			generate_branch(block, compiler, desc);
 			break;

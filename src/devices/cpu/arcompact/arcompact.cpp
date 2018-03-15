@@ -24,7 +24,7 @@
 #include "arcompactdasm.h"
 
 
-DEFINE_DEVICE_TYPE(ARCA5, arcompact_device, "arc_a5", "ARCtangent A5")
+DEFINE_DEVICE_TYPE(ARCA5, arcompact_device, "arc_a5", "Argonaut ARCtangent A5")
 
 
 READ32_MEMBER( arcompact_device::arcompact_auxreg002_LPSTART_r) { return m_LP_START&0xfffffffe; }

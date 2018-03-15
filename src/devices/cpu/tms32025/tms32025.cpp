@@ -184,8 +184,8 @@ Table 3-2.  TMS32025/26 Memory Blocks
 #define IND     m_AR[ARP]                       /* address used in indirect memory access operations */
 
 
-DEFINE_DEVICE_TYPE(TMS32025, tms32025_device, "tms32025", "TMS32025")
-DEFINE_DEVICE_TYPE(TMS32026, tms32026_device, "tms32026", "TMS32026")
+DEFINE_DEVICE_TYPE(TMS32025, tms32025_device, "tms32025", "Texas Instruments TMS32025")
+DEFINE_DEVICE_TYPE(TMS32026, tms32026_device, "tms32026", "Texas Instruments TMS32026")
 
 ADDRESS_MAP_START(tms32025_device::tms32025_data)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(drr_r, drr_w)

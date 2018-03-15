@@ -37,7 +37,7 @@ enum mn10200_flag
 };
 
 
-DEFINE_DEVICE_TYPE(MN1020012A, mn1020012a_device, "mn1020012a", "MN1020012A")
+DEFINE_DEVICE_TYPE(MN1020012A, mn1020012a_device, "mn1020012a", "Panasonic MN1020012A")
 
 // internal memory maps
 ADDRESS_MAP_START(mn10200_device::mn1020012a_internal_map)
