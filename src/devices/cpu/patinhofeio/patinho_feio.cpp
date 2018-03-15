@@ -50,7 +50,7 @@ void patinho_feio_cpu_device::compute_effective_address(unsigned int addr){
 	}
 }
 
-DEFINE_DEVICE_TYPE(PATO_FEIO_CPU, patinho_feio_cpu_device, "patinho_feio", "Patinho Feio")
+DEFINE_DEVICE_TYPE(PATO_FEIO_CPU, patinho_feio_cpu_device, "pato_feio_cpu", "Patinho Feio CPU")
 
 //Internal 4kbytes of RAM
 ADDRESS_MAP_START(patinho_feio_cpu_device::prog_8bit)
