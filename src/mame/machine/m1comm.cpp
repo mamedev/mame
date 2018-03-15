@@ -78,8 +78,8 @@ void m1comm_device::m1comm_io(address_map &map)
 	map.global_mask(0x7f);
 	map(0x00, 0x1f).rw(this, FUNC(m1comm_device::dlc_reg_r), FUNC(m1comm_device::dlc_reg_w));
 	map(0x20, 0x2f).rw(this, FUNC(m1comm_device::dma_reg_r), FUNC(m1comm_device::dma_reg_w));
-	map(0x40, 0x40).mask(0x01).rw(this, FUNC(m1comm_device::syn_r), FUNC(m1comm_device::syn_w));
-	map(0x60, 0x60).mask(0x01).rw(this, FUNC(m1comm_device::zfg_r), FUNC(m1comm_device::zfg_w));
+	map(0x40, 0x5f).mask(0x01).rw(this, FUNC(m1comm_device::syn_r), FUNC(m1comm_device::syn_w));
+	map(0x60, 0x7f).mask(0x01).rw(this, FUNC(m1comm_device::zfg_r), FUNC(m1comm_device::zfg_w));
 }
 
 
