@@ -1336,7 +1336,7 @@ MACHINE_CONFIG_START(cps_state::cps2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_QSOUND_ADD("qsound", QSOUND_CLOCK)
+	MCFG_DEVICE_ADD("qsound", QSOUND, QSOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

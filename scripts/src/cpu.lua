@@ -261,7 +261,6 @@ if (CPUS["DSP16A"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/dsp16/dsp16.cpp",
 		MAME_DIR .. "src/devices/cpu/dsp16/dsp16.h",
-		MAME_DIR .. "src/devices/cpu/dsp16/dsp16ops.hxx",
 	}
 end
 

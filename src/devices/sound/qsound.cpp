@@ -2,8 +2,8 @@
 // copyright-holders:Paul Leaman, Miguel Angel Horna
 /***************************************************************************
 
-  Capcom System QSound(tm)
-  ========================
+  Capcom System QSound™
+  =====================
 
   Driver by Paul Leaman and Miguel Angel Horna
 
@@ -40,28 +40,13 @@ DEFINE_DEVICE_TYPE(QSOUND, qsound_device, "qsound", "Q-Sound")
 // chip decapped by siliconpr0n clearly shows 3x as much ROM as that, a total
 // of 12288 words of internal ROM.
 // The older DSP16 non-a part has 2048 words of ROM.
-void qsound_device::dsp16_program_map(address_map &map)
-{
-	map(0x0000, 0x2fff).rom();
-}
 
 
-// data map for the DSP16A; again, Western Electric/AT&T expanded the size of
-// the ram over time.
-// As originally released, the DSP16A had 1024 words of internal RAM,
-// but this was expanded to 2048 words in the DL-1425 decap.
-// The older DSP16 non-a part has 512 words of RAM.
-void qsound_device::dsp16_data_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x07ff).ram();
-}
-
-
-// ROM definition for the Qsound program ROM
+// DSP internal ROM region
 ROM_START( qsound )
-	ROM_REGION( 0x6000, "qsound", 0 )
-	ROM_LOAD16_WORD( "dl-1425.bin", 0x0000, 0x6000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
+	ROM_REGION( 0x2000, "dsp", 0 )
+	ROM_LOAD16_WORD_SWAP( "dl-1425.bin", 0x0000, 0x2000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
+	ROM_IGNORE( 0x4000 )
 ROM_END
 
 
@@ -74,12 +59,12 @@ ROM_END
 //-------------------------------------------------
 
 qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, QSOUND, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 24),
-		m_cpu(*this, "qsound"),
-		m_data(0),
-		m_stream(nullptr)
+	: device_t(mconfig, QSOUND, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 24)
+	, m_dsp(*this, "dsp")
+	, m_stream(nullptr)
+	, m_data(0)
 {
 }
 
@@ -100,9 +85,8 @@ const tiny_rom_entry *qsound_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(qsound_device::device_add_mconfig)
-	MCFG_CPU_ADD("qsound", DSP16, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(dsp16_program_map)
-	MCFG_CPU_DATA_MAP(dsp16_data_map)
+	MCFG_CPU_ADD("dsp", DSP16A, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
 
@@ -122,7 +106,7 @@ void qsound_device::rom_bank_updated()
 
 void qsound_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, clock() / 166); // /166 clock divider?
+	m_stream = stream_alloc(0, 2, clock() / 15 / 166); // /166 clock divider?
 
 	// create pan table
 	for (int i = 0; i < 33; i++)
@@ -150,6 +134,10 @@ void qsound_device::device_start()
 		save_item(NAME(m_channel[i].rvol), i);
 		save_item(NAME(m_channel[i].step_ptr), i);
 	}
+}
+
+void qsound_device::device_reset()
+{
 }
 
 
