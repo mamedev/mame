@@ -745,14 +745,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 
 	if (scanline == 384)
 	{
+		if (m_m1comm != nullptr)
+			m_m1comm->check_vint_irq();
 		irq_raise(1);
 	}
 	else if(scanline == 384/2)
 	{
 		irq_raise(m_sound_irq);
-
-		if (m_m1comm != nullptr)
-			m_m1comm->check_vint_irq();
 	}
 }
 
