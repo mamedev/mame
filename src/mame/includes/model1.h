@@ -156,7 +156,39 @@ public:
 	class view_t
 	{
 	public:
-		view_t() { }
+		view_t() {
+			xc = 0;
+			yc = 0;
+			x1 = 0;
+			y1 = 0;
+			x2 = 0;
+			y2 = 0;
+			zoomx = 0;
+			zoomy = 0;
+			viewx = 0;
+			viewy = 0;
+			a_bottom = 0;
+			a_top = 0;
+			a_left = 0;
+			a_right = 0;
+			vxx = 0;
+			vyy = 0;
+			vzz = 0;
+			ayy = 0;
+			ayyc = 0;
+			ayys = 0;
+			for(unsigned int i=0; i != 12; i++)
+				translation[i] = 0;
+			light.x = 0;
+			light.y = 0;
+			light.z = 0;
+			for(unsigned int i=0; i != 32; i++) {
+				lightparams[i].a = 0;
+				lightparams[i].d = 0;
+				lightparams[i].s = 0;
+				lightparams[i].p = 0;
+			}
+		}
 
 		void init_translation_matrix();
 
@@ -372,7 +404,7 @@ private:
 		std::function<void(view_t*, point_t*, point_t*, point_t*)> m_clip;
 	};
 
-	view_t      *m_view;
+	std::unique_ptr<view_t> m_view;
 	point_t *m_pointdb;
 	point_t *m_pointpt;
 	quad_t      *m_quaddb;
