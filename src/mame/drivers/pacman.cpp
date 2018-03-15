@@ -5884,24 +5884,24 @@ ROM_START( eyesb )
 ROM_END
 
 
-ROM_START( eyeszac )
+ROM_START( eyeszac ) /* All ROMs / PROMs dumped and verified from actual PCB */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.7d",         0x0000, 0x1000, BAD_DUMP CRC(568851aa) SHA1(a97963556a6d77400afaafd73bcc32cb7f3a54d2) ) // 2532 vs 2732 problem, (near)identical halves
-	ROM_LOAD( "2.7f",         0x1000, 0x1000, BAD_DUMP CRC(9a0dba3b) SHA1(9f66f814bc2d483488df8918d872c7d6ce1bea3d) ) // 2532 vs 2732 problem, 1st half empty
-	ROM_LOAD( "3.7h",         0x2000, 0x1000, BAD_DUMP CRC(5a12aa81) SHA1(1adb1b033066cabbd62a5d33012ed1c66b955943) ) // 2532 vs 2732 problem, (near)identical halves
-	ROM_LOAD( "4.7j",         0x3000, 0x1000, BAD_DUMP CRC(b11958a1) SHA1(fa66fec80594f313f605e2b904dfe34693a1aa7d) ) // 2532 vs 2732 problem, (near)identical halves
+	ROM_LOAD( "1.7e",         0x0000, 0x1000, CRC(e555b265) SHA1(ef3138d3d52b678bf26e8c2299719cca08eef4bf) ) // 2532
+	ROM_LOAD( "2.7f",         0x1000, 0x1000, CRC(d6d73eb5) SHA1(b0c51afc09dd62bdda70710d57ae5b90a5e981ac) ) // 2532
+	ROM_LOAD( "3.7h",         0x2000, 0x1000, CRC(604c940c) SHA1(a611c30e42492fc35d2a215dfc8c3ebda82909f7) ) // 2532
+	ROM_LOAD( "4.7i",         0x3000, 0x1000, CRC(acc9cd8b) SHA1(d7fcf1b4b3466ee2187f82080634346a5427385e) ) // 2532
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "5.5d",         0x0000, 0x1000, BAD_DUMP CRC(7b2c4d53) SHA1(82e1a70c5cb76519dca252cfcea2a69c3601e36f) ) // 2532 vs 2732 problem, (near)identical halves
-	ROM_LOAD( "6.5f",         0x1000, 0x1000, BAD_DUMP CRC(bccb4f1a) SHA1(0abf73b78a95b7e911480d41e0136dbc635b4a34) ) // 2532 vs 2732 problem, (near)identical halves
+	ROM_LOAD( "5.5d",         0x0000, 0x1000, CRC(d6af0030) SHA1(652b779533e3f00e81cc102b78d367d503b06f33) ) // 2532
+	ROM_LOAD( "6.5f",         0x1000, 0x1000, CRC(a42b5201) SHA1(2e5cede3b6039c7bd5230de27d02aaa3f35a7b64) ) // 2532
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) ) // taken from parent
-	ROM_LOAD( "82s129.4a",    0x0020, 0x0100, CRC(d8d78829) SHA1(19820d1651423210083a087fb70ebea73ad34951) ) // taken from parent
+	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s129.4a",    0x0020, 0x0100, CRC(d8d78829) SHA1(19820d1651423210083a087fb70ebea73ad34951) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
-	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // taken from parent
-	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // taken from parent
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
 ROM_END
 
 /* It's just a decrypted version of Eyes with the copyright changes...
@@ -7399,7 +7399,7 @@ GAME( 1981, paintrlr, crush,    pacman,   paintrlr, pacman_state,  0,        ROT
 GAME( 1982, eyes,     0,        pacman,   eyes,     pacman_state,  eyes,     ROT90,  "Techstar (Rock-Ola license)", "Eyes (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, eyes2,    eyes,     pacman,   eyes,     pacman_state,  eyes,     ROT90,  "Techstar (Rock-Ola license)", "Eyes (US set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, eyesb,    eyes,     pacman,   eyes,     pacman_state,  eyes,     ROT90,  "bootleg", "Eyes (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, eyeszac,  eyes,     pacman,   eyes,     pacman_state,  eyes,     ROT90,  "Techstar (Zaccaria license)", "Eyes (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // bad dump
+GAME( 1982, eyeszac,  eyes,     pacman,   eyes,     pacman_state,  eyes,     ROT90,  "Techstar (Zaccaria license)", "Eyes (Italy)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, eyeszacb, eyes,     pacman,   eyes,     pacman_state,  0,        ROT90,  "bootleg", "Eyes (bootleg set 2, decrypted)", MACHINE_SUPPORTS_SAVE ) // based on Zaccaria version
 
 GAME( 1983, mrtnt,    0,        pacman,   mrtnt,    pacman_state,  eyes,     ROT90,  "Techstar (Telko license)", "Mr. TNT", MACHINE_SUPPORTS_SAVE )
