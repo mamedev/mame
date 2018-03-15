@@ -11,7 +11,7 @@
 	  separate RAM.  It (and the double buffered copy) appear near the top right of the
 	  framebuffer, so there are likely registers to control this that need finding.
 	- Other sprite modes supported by the video chip (not used here?)
-	- Sprite Zooming
+	- Check zooming precision against hardware
 	- Cleanup (still a lot of debug code in here)
 
 =============================================================================================
@@ -304,7 +304,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 	int x,y;
 	int bpp_sel;
 	int color;
-
+	const int ZOOM_SHIFT = 15;
 	// there doesn't seem to be a specific bit to mark compressed sprites (we currently have a hack to look at the first byte of the data)
 	// do they get decompressed at blit time instead? of are there other registers we need to look at
 
@@ -334,21 +334,26 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 	{
 		x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0x03) << 8);
 		y = (m_wram[count+4] >> 8) | ((m_wram[count+4] & 0x30) << 4);
-		uint8_t zoomheight = (m_wram[count+5] >> 8);
-		uint8_t zoomwidth = (m_wram[count+5] & 0xff);
+		uint32_t zoomheight = (m_wram[count+5] >> 8);
+		uint32_t zoomwidth = (m_wram[count+5] & 0xff);
 		bpp_sel = (m_wram[count+0] & 0x18);
 		color = (m_wram[count+0] >> 8);
 
 		x-=0x160;
 		y-=0x188;
 
-		uint8_t sourcewidth  = (m_wram[count+6] & 0xff);
-		uint8_t sourceheight = (m_wram[count+7] >> 8);
+		uint32_t sourcewidth  = (m_wram[count+6] & 0xff)<<ZOOM_SHIFT;
+		uint32_t sourceheight = (m_wram[count+7] >> 8)<<ZOOM_SHIFT;
 		int xsource = ((m_wram[count+2] & 0x003f) << 5) | ((m_wram[count+1] & 0xf800) >> 11);
 		int ysource = ((m_wram[count+3] & 0x001f) << 6) | ((m_wram[count+2] & 0xfc00) >> 10);
 
 		int alpha =  m_wram[count+1] & 0x1f;
 
+		uint32_t widthstep = 1<<ZOOM_SHIFT;
+		uint32_t heightstep = 1<<ZOOM_SHIFT;
+		
+		if (zoomwidth) widthstep = sourcewidth / zoomwidth;
+		if (zoomheight) heightstep = sourceheight / zoomheight;
 
 		uint16_t unused;
 		if (debug) printf("sprite %04x %04x %04x %04x %04x %04x %04x %04x\n", m_wram[count+0], m_wram[count+1], m_wram[count+2], m_wram[count+3], m_wram[count+4], m_wram[count+5], m_wram[count+6], m_wram[count+7]);
@@ -362,26 +367,41 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 		unused = m_wram[count+6]&~0x00ff; if (unused) printf("unused bits set in word 6 - %04x\n", unused);
 		unused = m_wram[count+7]&~0xff00; if (unused) printf("unused bits set in word 7 - %04x\n", unused);
 
-		if ((zoomwidth != sourcewidth) || (zoomheight != sourceheight))
+		if (((zoomwidth<<ZOOM_SHIFT) != sourcewidth) || ((zoomheight<<ZOOM_SHIFT) != sourceheight))
 		{
-			//printf("zoomed widths %02x %02x heights %02x %02x\n", sourcewidth, zoomwidth, sourceheight, zoomheight);
+		//	printf("sw %08x zw %08x sh %08x zh %08x heightstep %08x widthstep %08x \n", sourcewidth, zoomwidth<<ZOOM_SHIFT, sourceheight, zoomheight<<ZOOM_SHIFT, heightstep, widthstep );
 		}
 
 		if(bpp_sel == 0x00)  // 4bpp
 		{
-			for(int yi=0;yi<sourceheight;yi++)
+			int ysourceoff = 0;
+			for(int yi=0;yi<zoomheight;yi++)
 			{
-				for(int xi=0;xi<sourcewidth/2;xi++)
+				int yi2 = ysourceoff>>ZOOM_SHIFT;
+				int xsourceoff = 0;
+
+				for(int xi=0;xi<zoomwidth;xi++)
 				{
-					uint8_t data = m_vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
+					int xi2 = xsourceoff>>ZOOM_SHIFT;
+					uint8_t data = m_vram[((((ysource + yi2) & 0x7ff) * 0x800) + ((xsource + (xi2/2)) & 0x7ff))];
 					uint8_t pix;
 					uint32_t col_offs;
 					uint16_t color_data;
 
-					pix = (data & 0x0f);
-					col_offs = ((pix + color*0x10) & 0xff) << 1;
-					col_offs+= ((pix + color*0x10) >> 8)*0x800;
-					color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
+					if (xi2 & 1)
+					{
+						pix = (data & 0xf0)>>4;
+						col_offs = ((pix + color*0x10) & 0xff) << 1;
+						col_offs+= ((pix + color*0x10) >> 8)*0x800;
+						color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
+					}
+					else
+					{
+						pix = (data & 0x0f);
+						col_offs = ((pix + color*0x10) & 0xff) << 1;
+						col_offs+= ((pix + color*0x10) >> 8)*0x800;
+						color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
+					}
 
 					if(!(color_data & 0x8000))
 					{
@@ -402,15 +422,15 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 							color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
 						}
 
-						if(cliprect.contains(x+(xi*2), y+yi))
+						if(cliprect.contains(x+(xi), y+yi))
 						{
 							if (alpha==0x00) // a value of 0x00 is solid
 							{
-								bitmap.pix16(y+yi, x+(xi*2)) = color_data & 0x7fff;
+								bitmap.pix16(y+yi, x+(xi)) = color_data & 0x7fff;
 							}
 							else
 							{
-								uint16_t basecolor = bitmap.pix16(y+yi, x+(xi*2));
+								uint16_t basecolor = bitmap.pix16(y+yi, x+(xi));
 								int base_r = ((basecolor >> 10)&0x1f)*alpha;
 								int base_g = ((basecolor >> 5)&0x1f)*alpha;
 								int base_b = ((basecolor >> 0)&0x1f)*alpha;
@@ -421,91 +441,33 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 								g = (base_g+g)/0x1f;
 								b = (base_b+b)/0x1f;
 								color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
-								bitmap.pix16(y+yi, x+(xi*2)) = color_data & 0x7fff;
+								bitmap.pix16(y+yi, x+(xi)) = color_data & 0x7fff;
 							}
 						}
 					}
-
-					pix = (data & 0xf0)>>4;
-					col_offs = ((pix + color*0x10) & 0xff) << 1;
-					col_offs+= ((pix + color*0x10) >> 8)*0x800;
-					color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
-
-					if(!(color_data & 0x8000))
-					{
-						if(scene_gradient & 0x40)
-						{
-							int r,g,b;
-
-							r = (color_data & 0x7c00) >> 10;
-							g = (color_data & 0x03e0) >> 5;
-							b = (color_data & 0x001f) >> 0;
-							r-= (scene_gradient & 0x1f);
-							g-= (scene_gradient & 0x1f);
-							b-= (scene_gradient & 0x1f);
-							if(r < 0) r = 0;
-							if(g < 0) g = 0;
-							if(b < 0) b = 0;
-
-							color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
-						}
-
-						if(cliprect.contains(x+1+(xi*2),y+yi))
-						{
-							if (alpha==0x00) // a value of 0x00 is solid
-							{
-								bitmap.pix16(y+yi, x+1+(xi*2)) = color_data & 0x7fff;
-							}
-							else
-							{
-								uint16_t basecolor = bitmap.pix16(y+yi, x+1+(xi*2));
-								int base_r = ((basecolor >> 10)&0x1f)*alpha;
-								int base_g = ((basecolor >> 5)&0x1f)*alpha;
-								int base_b = ((basecolor >> 0)&0x1f)*alpha;
-								int r = ((color_data & 0x7c00) >> 10)*(0x1f-alpha);
-								int g = ((color_data & 0x03e0) >> 5)*(0x1f-alpha);
-								int b = ((color_data & 0x001f) >> 0)*(0x1f-alpha);
-								r = (base_r+r)/0x1f;
-								g = (base_g+g)/0x1f;
-								b = (base_b+b)/0x1f;
-								color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
-								bitmap.pix16(y+yi, x+1+(xi*2)) = color_data & 0x7fff;
-							}
-
-						}
-
-					}
+					xsourceoff += widthstep;
 				}
+				ysourceoff += heightstep;
 			}
 		}
 		else if(bpp_sel == 0x08) // 6bpp
 		{
 			// not used by Gunpey?
 			printf("6bpp\n");
-			#if 0
-			for(int yi=0;yi<sourceheight;yi++)
-			{
-				for(int xi=0;xi<sourcewidth;xi++)
-				{
-					uint8_t data = m_vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
-					uint8_t pix;
-					uint32_t col_offs;
-					uint16_t color_data;
-
-					pix = (data & 0x3f);
-					if(cliprect.contains(x+xi, y+yi))
-						bitmap.pix16(y+yi, x+xi) = pix + color*64;
-				}
-			}
-			#endif
 		}
 		else if(bpp_sel == 0x10) // 8bpp
 		{
-			for(int yi=0;yi<sourceheight;yi++)
+			int ysourceoff = 0;
+			for(int yi=0;yi<zoomheight;yi++)
 			{
-				for(int xi=0;xi<sourcewidth;xi++)
+				int yi2 = ysourceoff>>ZOOM_SHIFT;
+				int xsourceoff = 0;
+
+				for(int xi=0;xi<zoomwidth;xi++)
 				{
-					uint8_t data = m_vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
+					int xi2 = xsourceoff>>ZOOM_SHIFT;
+
+					uint8_t data = m_vram[((((ysource+yi2)&0x7ff)*0x800) + ((xsource+xi2)&0x7ff))];
 					uint8_t pix;
 					uint32_t col_offs;
 					uint16_t color_data;
@@ -534,8 +496,6 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 							color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
 						}
 
-
-
 						if(cliprect.contains(x+xi,y+yi))
 						{
 							if (alpha==0x00) // a value of 0x00 is solid
@@ -557,11 +517,11 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 								color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
 								bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
 							}
-
 						}
-
 					}
+					xsourceoff += widthstep;
 				}
+				ysourceoff += heightstep;
 			}
 		}
 		else if(bpp_sel == 0x18) // RGB32k
