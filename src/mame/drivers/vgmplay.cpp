@@ -1345,7 +1345,7 @@ void vgmplay_state::machine_start()
 				}
 			}
 			if(version >= 0x161 && r32(0xb4)) {
-				m_qsound->set_unscaled_clock(r32(0xb4));
+				m_qsound->set_unscaled_clock(r32(0xb4) * 15); // * 15 multipler for correct pitch
 			}
 		}
 
