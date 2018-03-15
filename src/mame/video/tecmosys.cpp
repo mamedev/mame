@@ -138,63 +138,29 @@ void tecmosys_state::tilemap_copy_to_compose(uint16_t pri, const rectangle &clip
 	}
 }
 
-#define DRAW_BLENDED                   \
-	int r,g,b;                         \
-	int r2,g2,b2;                      \
-	b = (colour & 0x000000ff) >> 0;    \
-	g = (colour & 0x0000ff00) >> 8;    \
-	r = (colour & 0x00ff0000) >> 16;   \
-	                                   \
-	b2 = (colour2 & 0x000000ff) >> 0;  \
-	g2 = (colour2 & 0x0000ff00) >> 8;  \
-	r2 = (colour2 & 0x00ff0000) >> 16; \
-	                                   \
-	r = (r + r2) >> 1;                 \
-	g = (g + g2) >> 1;                 \
-	b = (b + b2) >> 1;                 \
-	                                   \
-	dstptr[x] = b | (g<<8) | (r<<16);
-
-#define DRAW_BG                             \
-	if (srcptr[x]&0xf)                      \
-	{                                       \
-		dstptr[x] = colour;                 \
-	}                                       \
-	else                                    \
-	{                                       \
-		dstptr[x] = m_palette->pen(0x3f00); \
-	}
 
 void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *paldata = m_palette->pens();
-	int y,x;
-	uint16_t *srcptr;
-	uint16_t *srcptr2;
-	uint32_t *dstptr;
+	pen_t const *const paldata = m_palette->pens();
 
-	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for (int y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
-		srcptr = &m_tmp_tilemap_composebitmap.pix16(y);
-		srcptr2 = &m_sprite_bitmap.pix16(y);
+		uint16_t const *const srcptr = &m_tmp_tilemap_composebitmap.pix16(y);
+		uint16_t const *const srcptr2 = &m_sprite_bitmap.pix16(y);
 
-		dstptr = &bitmap.pix32(y);
-		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
+		uint32_t *const dstptr = &bitmap.pix32(y);
+		for (int x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
-			uint16_t pri, pri2;
-			uint16_t penvalue;
+			uint16_t const pri = srcptr[x] & 0xc000;
+			uint16_t const pri2 = srcptr2[x] & 0xc000;
+
+			uint16_t const penvalue = m_tilemap_paletteram16[srcptr[x]&0x7ff];
+			uint32_t const colour = paldata[(srcptr[x]&0x7ff) | 0x4000];
+
 			uint16_t penvalue2;
-			uint32_t colour;
 			uint32_t colour2;
 			uint8_t mask = 0;
 			bool is_transparent = false;
-
-			pri = srcptr[x] & 0xc000;
-			pri2 = srcptr2[x] & 0xc000;
-
-			penvalue = m_tilemap_paletteram16[srcptr[x]&0x7ff];
-			colour =   paldata[(srcptr[x]&0x7ff) | 0x4000];
-
 			if (srcptr2[x]&0xff)
 			{
 				penvalue2 = m_palette->basemem().read(srcptr2[x] & 0x3fff);
@@ -213,31 +179,48 @@ void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprec
 				colour2 =   paldata[0x3f00];
 				is_transparent = true;
 			}
+
+			auto const draw_blended =
+					[] (uint32_t colour, uint32_t colour2, uint32_t &dst)
+					{
+						int b = (colour & 0x000000ff) >> 0;
+						int g = (colour & 0x0000ff00) >> 8;
+						int r = (colour & 0x00ff0000) >> 16;
+
+						int const b2 = (colour2 & 0x000000ff) >> 0;
+						int const g2 = (colour2 & 0x0000ff00) >> 8;
+						int const r2 = (colour2 & 0x00ff0000) >> 16;
+
+						r = (r + r2) >> 1;
+						g = (g + g2) >> 1;
+						b = (b + b2) >> 1;
+
+						dst = b | (g<<8) | (r<<16);
+					};
+			auto const draw_bg =
+					[this] (uint32_t colour, uint32_t src, uint32_t &dst)
+					{
+						if (src&0xf)
+							dst = colour;
+						else
+							dst = m_palette->pen(0x3f00);
+					};
+
 			if (is_transparent)
 			{
 				if (((penvalue & 0x8000) && (srcptr[x]&0xf)) && (penvalue2 & 0x8000)) // blend
-				{
-					DRAW_BLENDED;
-				}
+					draw_blended(colour, colour2, dstptr[x]);
 				else
-				{
-					DRAW_BG;
-				}
+					draw_bg(colour, srcptr[x], dstptr[x]);
 			}
 			else
 			{
 				if (((penvalue & 0x8000) && (srcptr[x]&0xf)) && ((penvalue2 & 0x8000) && (mask))) // blend
-				{
-					DRAW_BLENDED;
-				}
+					draw_blended(colour, colour2, dstptr[x]);
 				else if ((pri2 >= pri) && (mask))
-				{
 					dstptr[x] = colour2;
-				}
 				else
-				{
-					DRAW_BG;
-				}
+					draw_bg(colour, srcptr[x], dstptr[x]);
 			}
 		}
 	}
