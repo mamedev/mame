@@ -520,7 +520,7 @@ void m1comm_device::comm_tick()
 
 			// update "ring buffer" if link established
 			// live relay does not send data
-			if (m_linkid != 0x00 && m_shared[5] != 0x00)
+			if (m_linkid != 0x00 && m_shared[4] != 0x00)
 			{
 				m_buffer[0] = m_linkid;
 				frameOffset = frameStart + (m_linkid * frameSize);
