@@ -47,9 +47,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dsp_ock_w);
 	DECLARE_READ16_MEMBER(dsp_pio_r);
 	void set_dsp_ready(void *ptr, s32 param);
-	void set_cmd_addr(void *ptr, s32 param);
-	void set_cmd_data_high(void *ptr, s32 param);
-	void set_cmd_data_low(void *ptr, s32 param);
+	void set_cmd(void *ptr, s32 param);
 
 	// MAME resources
 	required_device<dsp16_device_base> m_dsp;
@@ -57,11 +55,10 @@ private:
 
 	// DSP communication
 	u16 m_rom_bank, m_rom_offset;
-	u16 m_cmd_addr, m_cmd_data;
+	u16 m_cmd_addr, m_cmd_data, m_new_data;
 	u8  m_cmd_pending, m_dsp_ready;
 
 	// serial sample recovery
-	u64 m_last_time;
 	s16 m_samples[2];
 	u16 m_sr, m_fsr;
 	u8 m_ock, m_old, m_ready, m_channel;

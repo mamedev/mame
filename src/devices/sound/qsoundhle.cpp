@@ -27,7 +27,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "qsound.h"
+#include "qsoundhle.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(QSOUND_HLE, qsound_hle_device, "qsound_hle", "QSound (HLE)")

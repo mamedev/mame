@@ -42,12 +42,13 @@
     are 16-bit signed values, but Capcom only has 8-bit ROMs connected.
     I'm assuming byte smearing, but it may be zero-padded in the LSBs.
 
-    The DSP sends out 16-bit samples on its SIO port clocked at 2.5 MHz.
+    The DSP sends out 16-bit samples on its SIO port clocked at 5 MHz.
     The stereo samples aren't loaded fast enough for consecutive frames
     so there's an empty frame between them.  Sample pairs are loaded
     every 1,248 machine cycles, giving a sample rate of 24.03846 kHz
-    (60 MHz / 2 / 1248).  It's unknown how the real hardware identifies
-    left/right samples - I'm using a massive hack at the moment.
+    (60 MHz / 2 / 1248).  The glue logic seems to generate the WS signal
+    for the DAC from the PSEL line and the SIO control lines, but it
+    isn't clear exactly how this is achieved.
 
     The DSP writes values to pdx1 every sample cycle (alternating
     between zero and non-zero values).  This may be for the volume
@@ -93,7 +94,7 @@
 #define LOG_COMMAND     (1U << 1)
 #define LOG_SAMPLE      (1U << 2)
 
-//#define VERBOSE (LOG_GENERAL | LOG_SAMPLE)
+//#define VERBOSE (LOG_GENERAL | LOG_COMMAND | LOG_SAMPLE)
 //#define LOG_OUTPUT_STREAM std::cout
 #include "logmacro.h"
 
@@ -122,8 +123,8 @@ qsound_device::qsound_device(machine_config const &mconfig, char const *tag, dev
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this, 24)
 	, m_dsp(*this, "dsp"), m_stream(nullptr)
-	, m_rom_bank(0U), m_rom_offset(0U), m_cmd_addr(0U), m_cmd_data(0U), m_cmd_pending(0U), m_dsp_ready(1U)
-	, m_last_time(0U), m_samples{ 0, 0 }, m_sr(0U), m_fsr(0U), m_ock(1U), m_old(1U), m_ready(0U), m_channel(0U)
+	, m_rom_bank(0U), m_rom_offset(0U), m_cmd_addr(0U), m_cmd_data(0U), m_new_data(0U), m_cmd_pending(0U), m_dsp_ready(1U)
+	, m_samples{ 0, 0 }, m_sr(0U), m_fsr(0U), m_ock(1U), m_old(1U), m_ready(0U), m_channel(0U)
 {
 }
 
@@ -133,14 +134,22 @@ WRITE8_MEMBER(qsound_device::qsound_w)
 	switch (offset)
 	{
 	case 0:
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(qsound_device::set_cmd_data_high), this), unsigned(data));
+		LOGCOMMAND(
+				"QSound: set command data[h] = %02X (%04X -> %04X)\n",
+				data, m_new_data, (m_new_data & 0x00ffU) | (u16(data) << 8));
+		m_new_data = (m_new_data & 0x00ffU) | (u16(data) << 8);
 		break;
 	case 1:
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(qsound_device::set_cmd_data_low), this), unsigned(data));
+		LOGCOMMAND(
+				"QSound: set command data[l] = %02X (%04X -> %04X)\n",
+				data, m_new_data, (m_new_data & 0xff00U) | data);
+		m_new_data = (m_new_data & 0xff00U) | data;
 		break;
 	case 2:
 		m_dsp_ready = 0U;
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(qsound_device::set_cmd_addr), this), unsigned(data));
+		machine().scheduler().synchronize(
+				timer_expired_delegate(FUNC(qsound_device::set_cmd), this),
+				(unsigned(data) << 16) | m_new_data);
 		break;
 	default:
 		logerror("QSound: host write to unknown register %01X = %02X (%s)\n", offset, data, machine().describe_context());
@@ -192,11 +201,11 @@ void qsound_device::device_start()
 	save_item(NAME(m_rom_offset));
 	save_item(NAME(m_cmd_addr));
 	save_item(NAME(m_cmd_data));
+	save_item(NAME(m_new_data));
 	save_item(NAME(m_cmd_pending));
 	save_item(NAME(m_dsp_ready));
 
 	// save serial sample recovery state
-	save_item(NAME(m_last_time));
 	save_item(NAME(m_samples));
 	save_item(NAME(m_sr));
 	save_item(NAME(m_fsr));
@@ -251,7 +260,7 @@ void qsound_device::dsp_io_map(address_map &map)
 
 READ16_MEMBER(qsound_device::dsp_sample_r)
 {
-	// TODO: DSP16 doesn't like bytes, only signed words - should this zero-pad or byte-smear?
+	// FIXME: DSP16 doesn't like bytes, only signed words - should this zero-pad or byte-smear?
 	u8 const byte(read_byte((u32(m_rom_bank) << 16) | m_rom_offset));
 	if (!machine().side_effects_disabled())
 		m_rom_bank = offset;
@@ -269,7 +278,11 @@ WRITE_LINE_MEMBER(qsound_device::dsp_ock_w)
 
 	// detect start of word
 	if (m_ready && !m_fsr && !m_dsp->ose_r())
+	{
+		// FIXME: PSEL at beginning of word seems to select channel, but how does the logic derive WS from the DSP outputs?
+		m_channel = m_dsp->psel_r();
 		m_fsr = 0xffffU;
+	}
 
 	// shift in data
 	if (m_fsr)
@@ -278,16 +291,10 @@ WRITE_LINE_MEMBER(qsound_device::dsp_ock_w)
 		m_fsr >>= 1;
 		if (!m_fsr)
 		{
-			// FIXME: this is an epic hack, but I don't know how the hardware actually identifies channels
-			u64 const now(m_dsp->total_cycles());
-			if ((now - m_last_time) > 500)
-				m_channel = 0U;
-			m_last_time = now;
 			LOGSAMPLE("QSound: recovered channel %u sample %04X\n", m_channel, m_sr);
 			if (!m_channel)
 				m_stream->update();
 			m_samples[m_channel] = m_sr;
-			m_channel = m_channel ? 0U : 1U;
 #if 0 // enable to log PCM to a file - can be imported with "ffmpeg -f s16be -ar 24038 -ac 2 -i qsound.pcm qsound.wav"
 			static std::ofstream logfile("qsound.pcm", std::ios::binary);
 			logfile.put(u8(m_sr >> 8));
@@ -304,6 +311,21 @@ WRITE_LINE_MEMBER(qsound_device::dsp_ock_w)
 
 WRITE16_MEMBER(qsound_device::dsp_pio_w)
 {
+	/*
+	 *  FIXME: what does this do when PDX is high?
+	 *  There are seemingly two significant points where the program writes PDX1 every sample interval.
+	 *
+	 *  Before writing the right-channel sample to SDX - this causes the PSEL 0->1 transition:
+	 *  0:5d4: 996e       if true a0 = rnd(a0)
+	 *  0:5d5: 51e0 0000  pdx1 = 0x0000
+	 *  0:5d7: 49a0       move sdx = a0
+	 *
+	 * This curious code where it writes out the a word from RAM@0x00f1 - this value seems significant:
+	 * 0:335: 18f1       set r0 = 0x00f1
+	 * 0:336: 3cd0       nop, a0 = *r0
+	 * 0:337: d850       p = x*y, y = a1, x = *pt++i
+	 * 0:338: 49e0       move pdx1 = a0
+	 */
 	if (offset)
 		LOG("QSound: DSP PDX1 = %04X\n", data);
 	else
@@ -334,26 +356,11 @@ void qsound_device::set_dsp_ready(void *ptr, s32 param)
 	m_dsp_ready = 1U;
 }
 
-void qsound_device::set_cmd_addr(void *ptr, s32 param)
+void qsound_device::set_cmd(void *ptr, s32 param)
 {
-	LOGCOMMAND("QSound: DSP command @%02X = %04X\n", param, m_cmd_data);
-	m_cmd_addr = u16(u32(param));
+	LOGCOMMAND("QSound: DSP command @%02X = %04X\n", u32(param) >> 16, u16(u32(param)));
+	m_cmd_addr = u16(u32(param) >> 16);
+	m_cmd_data = u16(u32(param));
 	m_cmd_pending = 1U;
 	m_dsp->set_input_line(DSP16_INT_LINE, ASSERT_LINE);
-}
-
-void qsound_device::set_cmd_data_high(void *ptr, s32 param)
-{
-	LOGCOMMAND(
-			"QSound: set command data[h] = %02X (%04X -> %04X)\n",
-			param, m_cmd_data, (m_cmd_data & 0x00ffU) | (u32(param) << 8));
-	m_cmd_data = u16((m_cmd_data & 0x00ffU) | (u32(param) << 8));
-}
-
-void qsound_device::set_cmd_data_low(void *ptr, s32 param)
-{
-	LOGCOMMAND(
-			"QSound: set command data[l] = %02X (%04X -> %04X)\n",
-			param, m_cmd_data, (m_cmd_data & 0xff00U) | u32(param));
-	m_cmd_data = u16((m_cmd_data & 0xff00U) | u32(param));
 }
