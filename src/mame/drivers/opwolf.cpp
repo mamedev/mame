@@ -139,7 +139,7 @@ Notes:
       PC080SN     - Taito custom tilemap generator IC (connected to 43256 SRAM)
       PC0900J     - Taito custom sprite generator IC (connected to 2018 SRAM)
       DIP28       - unpopulated DIP28 socket
-      B20-18.73   - Taito custom C-Chip marked 'TC0030CMD, with sticker 'B20-18'
+      B20-18.73   - Taito custom C-Chip marked 'TC0030CMD, with sticker 'B20-18'. Clock input 12.00MHz on pin 20
       TC0070RGB   - Taito custom ceramic module RGB mixer IC
       PC050CM     - Taito custom ceramic module (input related functions)
       MB3771      - Fujitsu MB3771 master reset IC
