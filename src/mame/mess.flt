@@ -127,6 +127,7 @@ channelf.cpp
 chaos.cpp
 chessmst.cpp
 chesstrv.cpp
+cit101.cpp
 cit220.cpp
 ckz80.cpp
 clcd.cpp
