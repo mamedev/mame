@@ -103,8 +103,8 @@
     DEVICE TYPE DEFINITIONS
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(DSP16, dsp16_device, "dsp16", "DSP16")
-DEFINE_DEVICE_TYPE(DSP16A, dsp16a_device, "dsp16a", "DSP16A")
+DEFINE_DEVICE_TYPE(DSP16, dsp16_device, "dsp16", "WE|AT&T DSP16")
+DEFINE_DEVICE_TYPE(DSP16A, dsp16a_device, "dsp16a", "WE|AT&T DSP16A")
 
 
 /***************************************************************************

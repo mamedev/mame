@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Paul Leaman, Miguel Angel Horna
+// copyright-holders:Vas Crabb
 /*********************************************************
 
     Capcom System QSound™
@@ -14,14 +14,6 @@
 
 // default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)
 #define QSOUND_CLOCK 60_MHz_XTAL
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-
-// ======================> qsound_device
 
 class qsound_device : public device_t, public device_sound_interface, public device_rom_interface
 {
@@ -44,35 +36,43 @@ protected:
 	// device_rom_interface implementation
 	virtual void rom_bank_updated() override;
 
+	void dsp_io_map(address_map &map);
+
 private:
+	// DSP ROM access
+	DECLARE_READ16_MEMBER(dsp_sample_r);
+	DECLARE_WRITE16_MEMBER(dsp_pio_w);
+
+	// for synchronised DSP communication
+	DECLARE_WRITE_LINE_MEMBER(dsp_ock_w);
+	DECLARE_READ16_MEMBER(dsp_pio_r);
+	void set_dsp_ready(void *ptr, s32 param);
+	void set_cmd_addr(void *ptr, s32 param);
+	void set_cmd_data_high(void *ptr, s32 param);
+	void set_cmd_data_low(void *ptr, s32 param);
 
 	// MAME resources
 	required_device<dsp16_device_base> m_dsp;
 	sound_stream *m_stream;
 
-	struct qsound_channel
-	{
-		uint32_t bank;        // bank
-		uint32_t address;     // start/cur address
-		uint16_t loop;        // loop address
-		uint16_t end;         // end address
-		uint32_t freq;        // frequency
-		uint16_t vol;         // master volume
+	// DSP communication
+	u16 m_rom_bank, m_rom_offset;
+	u16 m_cmd_addr, m_cmd_data;
+	u8  m_cmd_pending, m_dsp_ready;
 
-		// work variables
-		bool enabled;       // key on / key off
-		int lvol;           // left volume
-		int rvol;           // right volume
-		uint32_t step_ptr;    // current offset counter
-	} m_channel[16];
-
-	int m_pan_table[33];    // pan volume table
-	uint16_t m_data;          // register latch data
-
-	inline int8_t read_sample(uint32_t offset) { return (int8_t)read_byte(offset); }
-	void write_data(uint8_t address, uint16_t data);
+	// serial sample recovery
+	u64 m_last_time;
+	s16 m_samples[2];
+	u16 m_sr, m_fsr;
+	u8 m_ock, m_old, m_ready, m_channel;
 };
 
 DECLARE_DEVICE_TYPE(QSOUND, qsound_device)
+
+#if !defined(QSOUND_LLE) // && 0
+#include "qsoundhle.h"
+#define qsound_device qsound_hle_device
+#define QSOUND QSOUND_HLE
+#endif // QSOUND_LLE
 
 #endif // MAME_SOUND_QSOUND_H

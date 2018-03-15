@@ -755,6 +755,8 @@ if (SOUNDS["QSOUND"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/qsound.cpp",
 		MAME_DIR .. "src/devices/sound/qsound.h",
+		MAME_DIR .. "src/devices/sound/qsoundhle.cpp",
+		MAME_DIR .. "src/devices/sound/qsoundhle.h",
 	}
 end
 
