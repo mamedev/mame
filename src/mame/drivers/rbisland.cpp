@@ -346,7 +346,7 @@ WRITE16_MEMBER(rbisland_state::jumping_sound_w)
                             MEMORY STRUCTURES
 ***************************************************************************/
 
-void rbisland_state::rbisland_map(address_map &map)
+void rbisland_state::rbisland_base_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x10c000, 0x10ffff).ram();             /* main RAM */
@@ -359,14 +359,27 @@ void rbisland_state::rbisland_map(address_map &map)
 	map(0x3e0000, 0x3e0001).nopr();
 	map(0x3e0001, 0x3e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x3e0003, 0x3e0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
-	map(0x800000, 0x8007ff).rw(this, FUNC(rbisland_state::rbisland_cchip_ram_r), FUNC(rbisland_state::rbisland_cchip_ram_w));
-	map(0x800802, 0x800803).rw(this, FUNC(rbisland_state::rbisland_cchip_ctrl_r), FUNC(rbisland_state::rbisland_cchip_ctrl_w));
-	map(0x800c00, 0x800c01).w(this, FUNC(rbisland_state::rbisland_cchip_bank_w));
+	// c-chip goes here
 	map(0xc00000, 0xc0ffff).rw(m_pc080sn, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));
 	map(0xc20000, 0xc20003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
 	map(0xc40000, 0xc40003).w(m_pc080sn, FUNC(pc080sn_device::xscroll_word_w));
 	map(0xc50000, 0xc50003).w(m_pc080sn, FUNC(pc080sn_device::ctrl_word_w));
 	map(0xd00000, 0xd03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  /* sprite ram + other stuff */
+}
+
+void rbisland_state::rbisland_sim_map(address_map &map)
+{
+	rbisland_base_map(map);
+	map(0x800000, 0x8007ff).rw(this, FUNC(rbisland_state::rbisland_cchip_ram_r), FUNC(rbisland_state::rbisland_cchip_ram_w));
+	map(0x800802, 0x800803).rw(this, FUNC(rbisland_state::rbisland_cchip_ctrl_r), FUNC(rbisland_state::rbisland_cchip_ctrl_w));
+	map(0x800c00, 0x800c01).w(this, FUNC(rbisland_state::rbisland_cchip_bank_w));
+}
+
+void rbisland_state::rbisland_emu_map(address_map &map)
+{
+	rbisland_base_map(map);
+	map(0x800000, 0x8007ff).rw(m_cchip, FUNC(taito_cchip_device::mem68_r), FUNC(taito_cchip_device::mem68_w)).umask16(0x00ff);
+	map(0x800800, 0x800fff).rw(m_cchip, FUNC(taito_cchip_device::asic_r), FUNC(taito_cchip_device::asic68_w)).umask16(0x00ff);
 }
 
 void rbisland_state::jumping_map(address_map &map)
@@ -432,7 +445,6 @@ void rbisland_state::jumping_sound_map(address_map &map)
 	map(0xbc00, 0xbc00).nopw();    /* looks like a bankswitch, but sound works with or without it */
 	map(0xc000, 0xffff).rom();
 }
-
 
 /***********************************************************
              INPUT PORTS, DIPs
@@ -526,6 +538,14 @@ static INPUT_PORTS_START( rbisland )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rbisland_emu )
+	PORT_INCLUDE(rbisland)
+
+	PORT_MODIFY("80000D")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jumping )
@@ -632,20 +652,17 @@ void rbisland_state::machine_start()
 {
 }
 
-MACHINE_CONFIG_START(rbisland_state::rbisland)
+MACHINE_CONFIG_START(rbisland_state::rbisland_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rbisland_map)
+	MCFG_CPU_PROGRAM_MAP(rbisland_sim_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rbisland_sound_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)/2) /* ? MHz */
-
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -681,6 +698,45 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
 	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
+
+INTERRUPT_GEN_MEMBER(rbisland_state::interrupt)
+{
+	m_maincpu->set_input_line(4, HOLD_LINE);
+	m_cchip->ext_interrupt(ASSERT_LINE);
+	m_cchip_irq_clear->adjust(attotime::zero);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(rbisland_state::cchip_irq_clear_cb)
+{
+	m_cchip->ext_interrupt(CLEAR_LINE);
+}
+
+WRITE8_MEMBER(rbisland_state::counters_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+}
+
+MACHINE_CONFIG_START(rbisland_state::rbisland_emu)
+	rbisland_base(config);
+	
+	MCFG_CPU_MODIFY("maincpu") 
+	MCFG_CPU_PROGRAM_MAP(rbisland_emu_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  interrupt)
+
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)/2) /* ? MHz */
+	MCFG_CCHIP_IN_PORTA_CB(IOPORT("800007"))
+	MCFG_CCHIP_IN_PORTB_CB(IOPORT("800009"))
+	MCFG_CCHIP_IN_PORTC_CB(IOPORT("80000B"))
+	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("80000D"))
+	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(rbisland_state, counters_w))
+
+	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", rbisland_state, cchip_irq_clear_cb)
+MACHINE_CONFIG_END
+
+
 
 
 /* Jumping: The PCB has 2 Xtals, 18.432MHz and 24MHz */
@@ -749,7 +805,7 @@ ROM_START( rbisland )
 	ROM_LOAD16_BYTE( "b22-04.24",     0x40001, 0x20000, CRC(91625e7f) SHA1(765afd973d9b82bb496b04beca284bf2769d6e6f) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b22-15.53",            0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "cchip_b22-15.53",            0x0000, 0x2000, CRC(08c588a6) SHA1(7e38342be68d37f7106df069dd2021c509be1244) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )
 	ROM_LOAD( "b22-14.43",            0x00000, 0x4000, CRC(113c1a5b) SHA1(effa2adf54a6be78b2d4baf3a47529342fb0d895) )
@@ -774,7 +830,7 @@ ROM_START( rbislando )
 	ROM_LOAD16_BYTE( "b22-04.24",     0x40001, 0x20000, CRC(91625e7f) SHA1(765afd973d9b82bb496b04beca284bf2769d6e6f) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b22-15.53",            0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "cchip_b22-15.53",            0x0000, 0x2000, CRC(08c588a6) SHA1(7e38342be68d37f7106df069dd2021c509be1244) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )
 	ROM_LOAD( "b22-14.43",            0x00000, 0x4000, CRC(113c1a5b) SHA1(effa2adf54a6be78b2d4baf3a47529342fb0d895) )
@@ -952,21 +1008,18 @@ ROM_START( jumpingi )
 		ROM_LOAD( "JP3.IC51",            0x000, 0x104, CRC(c1e6cb8f) SHA1(9908e62bb9b806047b7a344bb62334bd696b9fc8) ) // PAL16L8A-2CN z80 address decoder?
 ROM_END
 
+
+
+
 DRIVER_INIT_MEMBER(rbisland_state,rbisland)
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
-
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
-
-	rbisland_cchip_init(0);
 }
 
 DRIVER_INIT_MEMBER(rbisland_state,rbislande)
 {
-	uint8_t *ROM = memregion("audiocpu")->base();
-
-	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
-
+	DRIVER_INIT_CALL(rbisland);
 	rbisland_cchip_init(1);
 }
 
@@ -977,9 +1030,12 @@ DRIVER_INIT_MEMBER(rbisland_state,jumping)
 }
 
 
-GAME( 1987, rbisland,  0,        rbisland, rbisland, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (new version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rbislando, rbisland, rbisland, rbisland, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (old version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rbislande, rbisland, rbisland, rbisland, rbisland_state, rbislande, ROT0, "Taito Corporation", "Rainbow Islands (Extra)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, jumping,   rbisland, jumping,  jumping,  rbisland_state, jumping,   ROT0, "bootleg",           "Jumping (set 1)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, jumpinga,  rbisland, jumping,  jumping,  rbisland_state, jumping,   ROT0, "bootleg (Seyutu)",  "Jumping (set 2)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, jumpingi,  rbisland, jumpingi, jumping,  rbisland_state, jumping,   ROT0, "bootleg (Seyutu)",  "Jumping (set 3, Imnoe PCB)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rbisland,  0,        rbisland_emu, rbisland_emu, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (new version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rbislando, rbisland, rbisland_emu, rbisland_emu, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (old version)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1989, jumping,   rbisland, jumping,      jumping,  rbisland_state, jumping,   ROT0, "bootleg",           "Jumping (set 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jumpinga,  rbisland, jumping,      jumping,  rbisland_state, jumping,   ROT0, "bootleg (Seyutu)",  "Jumping (set 2)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jumpingi,  rbisland, jumpingi,     jumping,  rbisland_state, jumping,   ROT0, "bootleg (Seyutu)",  "Jumping (set 3, Imnoe PCB)",    MACHINE_SUPPORTS_SAVE )
+
+GAME( 1988, rbislande, rbisland, rbisland_base, rbisland, rbisland_state, rbislande, ROT0, "Taito Corporation", "Rainbow Islands - Extra Version", MACHINE_SUPPORTS_SAVE )
+
