@@ -1033,11 +1033,17 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!-- The Limited Edition (T-18705M) comes in a DVD-style case and includes an embroidered St. Kirigamori High School Emblem and an audio CD. -->
 	<software name="aftersg"> <!-- cloneof="after" -->
-		<!--
-		<rom name="After- - Wasureenu Kizuna (Japan) (Limited Edition).gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
-		<rom name="track01.bin" size="705600" md5="44920ffcbe0a3f2e39181d5bcf33432a" sha1="f36dc1960e47d47a9b7ae04cbc8867b6510675dd"/>
-		<rom name="track02.raw" size="1735776" md5="fddc71381cbacd4a4b4a738e23eca364" sha1="63863e049d253286c98ac8ee025d8bca669ab21f"/>
-		<rom name="track03.bin" size="1185760800" md5="31cd9397c045d45fa47f89e590406c64" sha1="747f081e30361945bfcdadf3a7486993e11dc59e"/>
+		<!-- http://redump.org/disc/43364/ http://redump.org/disc/43365/
+		<rom name="After... - Wasureenu Kizuna (Japan).gdi" size="213" crc="8d86e1e4" md5="af1c02ac14468137e52976faa1024b70" sha1="64c25a23bbab61b849fb3eb636c8e61ec76c20c6"/>
+		<rom name="After... - Wasureenu Kizuna (Japan) (Track 1).bin" size="705600" crc="6e1f74fa" md5="44920ffcbe0a3f2e39181d5bcf33432a" sha1="f36dc1960e47d47a9b7ae04cbc8867b6510675dd"/>
+		<rom name="After... - Wasureenu Kizuna (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
+		<rom name="After... - Wasureenu Kizuna (Japan) (Track 3).bin" size="1185760800" crc="acf6a01d" md5="31cd9397c045d45fa47f89e590406c64" sha1="747f081e30361945bfcdadf3a7486993e11dc59e"/>
+
+		<rom name="After... - Wasureenu Kizuna (Japan).cue" size="493" crc="603aa229" md5="ecce2cfa4bebe82b163a95ceeb4d862b" sha1="5b8e30f5362c8ae01bc778001380e0e15884dbca"/>
+		<rom name="After... - Wasureenu Kizuna (Japan) (Track 1).bin" size="58296672" crc="cc0188ab" md5="6bee0cc492b822661d630bece6090302" sha1="1e35b05e9029ce00aa9ee6682e88cb2e05899e87"/>
+		<rom name="After... - Wasureenu Kizuna (Japan) (Track 2).bin" size="58649472" crc="02089eea" md5="9e903f976640f36d54ec4f45bb5ccf0e" sha1="68e1d918a16e9fd6bfc9fb5a7f5a4d0c32122d09"/>
+		<rom name="After... - Wasureenu Kizuna (Japan) (Track 3).bin" size="23127216" crc="e77a97e0" md5="2bf8a15dd5770a933e21a8dbd5165df6" sha1="2c3db25247b8f8abcbbc8f103e14e4eaf5fe4936"/>
+		<rom name="After... - Wasureenu Kizuna (Japan) (Track 4).bin" size="23127216" crc="cfcd3862" md5="bb8776645ba8e7cb74360caecc56832e" sha1="4959be57958e60194f83f010e4dfa288680173ef"/>
 		-->
 		<description>After...: Wasureenu Kizuna - Shokai Genteiban (Jpn)</description>
 		<year>2004</year>
@@ -1045,16 +1051,17 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-18705M"/>
 		<info name="release" value="20040226" />
 		<info name="alt_title" value="After... 〜忘れえぬ絆〜 初回限定版" />
+		<info name="ring_code" value="T-18706M-0907 1MS1 C 41 (Game), PIONE-002 1 (Audio CD)"/>
 		<part interface="dc_gdrom" name="gdrom1">
 			<feature name="part_id" value="After...: Wasureenu Kizuna"/>
 			<diskarea name="gdrom">
-				<disk name="after... wasureenu kizuna - shokai genteiban (jpn)" sha1="ce398638a22c7fd395cd0fc67b552392a02c5de7"/>
+				<disk name="after... wasureenu kizuna - shokai genteiban (jpn)" sha1="4ca05216dd45b9a5218186e7c2c0b5cd0be76d13"/>
 			</diskarea>
 		</part>
-		<part interface="dc_gdrom" name="gdrom2">
+		<part interface="dc_cdrom" name="cdrom1">
 			<feature name="part_id" value="Kaze no Form"/>
-			<diskarea name="gdrom">
-				<disk name="after... wasureenu kizuna - shokai genteiban (jpn) (kaze no form)" status="nodump"/>
+			<diskarea name="cdrom">
+				<disk name="after... wasureenu kizuna - shokai genteiban (jpn) (kaze no form)" sha1="9cb6682fca57e78679c215baeae00d8205465fb4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1216,23 +1223,6 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 			</diskarea>
 		</part>
 	</software>
-
-	<!-- This is most likely just a disc with different write offset compared to "airforcd". -->
-	<!--
-	<software name="airforcd2" cloneof="airforcd">
-		<description>Airforce Delta (USA, Alt 2)</description>
-		<year>1999</year>
-		<publisher>Konami</publisher>
-		<info name="serial" value="T-9501N"/>
-		<info name="release" value="19990909" />
-		<info name="ring_code" value="3S T-9501NAF"/>
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
-				<disk name="airforce delta (usa, alt 2)" status="nodump"/>
-			</diskarea>
-		</part>
-	</software>
-	-->
 
 	<!-- Both the English/Spanish/Dutch (T-9501D-76) and German/French/Italian (T-9501D-77) release share the same disc (T-9501D-50). -->
 	<software name="deadlysk" cloneof="airforcd">
@@ -2965,7 +2955,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="bsb">
-		<description>Blue-Sky-Blue: Sora o Mau Tsubasa (Jpn)</description>
+		<description>Blue-Sky-Blue[s]: Sora o Mau Tsubasa (Jpn)</description>
 		<year>2003</year>
 		<publisher>Ecole</publisher>
 		<info name="serial" value="T-23205M"/>
@@ -2973,7 +2963,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="alt_title" value="Blue-Sky-Blue【s】 -空を舞う翼-" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="blue-sky-blue sora o mau tsubasa (jpn)" status="nodump"/>
+				<disk name="blue-sky-blue[s] sora o mau tsubasa (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2981,29 +2971,50 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!-- The Limited Edition (T-23204M) comes in a cardboard slipcase and includes a fan CD. -->
 	<software name="bsbsg"> <!-- cloneof="bsb" -->
-		<!-- http://redump.org/disc/43713/
+		<!-- http://redump.org/disc/43713/ http://redump.org/disc/43714/
 		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan).gdi" size="243" crc="3494ccc6" md5="aede4489a8f62e9146a5d489110993da" sha1="ecacde76f17665539d69629c14d52218cb42766a"/>
 		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 1).bin" size="2241456" crc="e607e01e" md5="93ae63a963ad44c86a023dafde9a63f1" sha1="b47a76464907cbd06ddf85345950f145782d00ba"/>
 		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 2).bin" size="2302608" crc="a9684d33" md5="3a23931b29da109b04737c79cbcc18fc" sha1="1312a9ce85a306e731945dc0e97a047b2a7c6187"/>
 		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 3).bin" size="1185760800" crc="2b4761b8" md5="25661323f8169f3a858c572c50505741" sha1="4ac729f5d37e58297685e90400344f2d8d540413"/>
+
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc).cue" size="2980" crc="5176f2bd" md5="cf5af18977c8f650cf103f8b62d7d610" sha1="1b9e6cd5ef4d6dd3fe4212f15dcf1dab41c4f5d1"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 01).bin" size="30256128" crc="f13a49c0" md5="cf6a65a5874bde5174153b9f44bf75ff" sha1="d72744889f392797019405ffc38f70fc03c882d6"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 02).bin" size="39160800" crc="ff625132" md5="bb45164bd996f7a5918dca98c7f510b1" sha1="e84ea9db7b053aad7ed86da027275eed15f92643"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 03).bin" size="30766512" crc="beaac766" md5="91a63fb269a422f4b89a818f92851d9d" sha1="2ef278fa1255baf0e5a552cd2c1022f690751c7d"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 04).bin" size="37841328" crc="fb2d9523" md5="5da6018aaa45df398f247dbad0c8f446" sha1="989dc309e26149caabf80d89e2461e1dde8f086d"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 05).bin" size="33969936" crc="6a9a3c8c" md5="217d2824b8153dedb7be876970cd73b2" sha1="03663948ac4ea2bd26593685cb24fbe2d15b6a47"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 06).bin" size="36665328" crc="72ca0449" md5="6d1cbe32b3afbd2bcaca89d5fb0dcd32" sha1="47702b78b0537905274c28130b60aaaed0b6b3d4"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 07).bin" size="59112816" crc="26e85858" md5="81da242a0a6db96323b5ebe02a298c47" sha1="76c91a26c1d40c8518e78d4dddb1b6a094ca1a89"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 08).bin" size="33741792" crc="6546438e" md5="a69746ef7f28c21b36d39e264f0eb98b" sha1="223735acf40887e269b6f9cd42282ae8a2284b5b"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 09).bin" size="25314576" crc="77bade60" md5="a3e441a9773372decffc5b1c027c9a44" sha1="6309d25465abc1cda6fe0c237be8faff91949f6f"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 10).bin" size="22221696" crc="78462bea" md5="64e3e50edee72c30305f7a0952eb3f1e" sha1="e6ffa2ed8f426025f2217d0b4fb80875dbcdd3bf"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 11).bin" size="24658368" crc="aeaf98c3" md5="6c46a930a4deb53ff47bfa2d49de22dd" sha1="e63b7903ab04a138de173d1da4a6118b10452100"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 12).bin" size="29795136" crc="44cf0fb1" md5="ff901027f4e5063b212557465cb1af2d" sha1="d95e2cffb9c567155f0d5696ae4066d0639fe384"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 13).bin" size="26949216" crc="a2a005c2" md5="6ce241f09e4a642ea700fb86e750a153" sha1="4b43f1c073ac6c4234e8f4028ba966b93c97d7a3"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 14).bin" size="29178912" crc="a7a88154" md5="a50f7d6ac781e739daa545608aa8a537" sha1="a106d87dc12b6f9cb6d36e301f7b3652fdf40427"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 15).bin" size="27588960" crc="1f62e7cc" md5="543405c953245e435ebb859fe1eaced0" sha1="51dc821f46e60e2b944f3505a39e709a10ca1fdc"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 16).bin" size="28235760" crc="32960115" md5="8be1a4af370d6052c2e5830fed4a9590" sha1="0837d5ea79725c2d034a56413713735b2f8ed454"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 17).bin" size="41451648" crc="4ffb5d5c" md5="ef86e59cf1541cc0adea62ffd58922c9" sha1="1d7622ed63faa74aecf37d90bae119925da7733e"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 18).bin" size="44156448" crc="723bb275" md5="f5ba54c98bf560c2ff7c2b418ce45e93" sha1="10512f01d713ff423b20656bce2c9322a5ea463e"/>
+		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Premium Fan Disc) (Track 19).bin" size="37808400" crc="f66551d7" md5="c1dfc917f08848a0c85c839a7a65c7ec" sha1="d49046c4381471bd23e6c1f24cb3f41ea9981263"/>
 		-->
-		<description>Blue-Sky-Blue: Sora o Mau Tsubasa - Shokai Genteiban (Jpn)</description>
+		<description>Blue-Sky-Blue[s]: Sora o Mau Tsubasa - Shokai Genteiban (Jpn)</description>
 		<year>2003</year>
 		<publisher>Ecole</publisher>
 		<info name="serial" value="T-23204M (Game), ECAP-0003 (Fan Disc)"/>
 		<info name="release" value="20030626" />
 		<info name="alt_title" value="Blue-Sky-Blue【s】 -空を舞う翼- 初回限定版" />
-		<info name="ring_code" value="T-23205M-0886 2MS1 C 36"/>
+		<info name="ring_code" value="T-23205M-0886 2MS1 C 36 (Game), ECAP-0003 * JRC-13934 Made in Korea (Fan Disc)"/>
 		<part interface="dc_gdrom" name="gdrom1">
-			<feature name="part_id" value="Blue-Sky-Blue: Sora o Mau Tsubasa"/>
+			<feature name="part_id" value="Blue-Sky-Blue[s]: Sora o Mau Tsubasa"/>
 			<diskarea name="gdrom">
-				<disk name="blue-sky-blue sora o mau tsubasa - shokai genteiban (jpn)" sha1="1b6db61f78b11afc250aac17f5ad4cfa651c9e19"/>
+				<disk name="blue-sky-blue[s] sora o mau tsubasa - shokai genteiban (jpn)" sha1="1b6db61f78b11afc250aac17f5ad4cfa651c9e19"/>
 			</diskarea>
 		</part>
-		<part interface="dc_gdrom" name="gdrom2">
+		<part interface="dc_cdrom" name="cdrom1">
 			<feature name="part_id" value="Premium Fan Disc"/>
-			<diskarea name="gdrom">
-				<disk name="blue-sky-blue sora o mau tsubasa - shokai genteiban (jpn) (premium fan disc)" status="nodump"/>
+			<diskarea name="cdrom">
+				<disk name="blue-sky-blue[s] sora o mau tsubasa - shokai genteiban (jpn) (premium fan disc)" sha1="9fc87706b7fc652cba2a6c58e709c7cacc3da03f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3920,13 +3931,32 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!-- The Limited Edition (T-44405M) includes a talk CD. -->
 	<software name="cardofdg"> <!-- cloneof="cardofd" -->
-		<!-- http://redump.org/disc/43448/
+		<!-- http://redump.org/disc/43448/ http://redump.org/disc/43449/
 		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan).gdi" size="443" crc="3dfadc62" md5="7bdcceabf60b2f9b3f4de04c0c9d4538" sha1="ec48b83cae09f2d0212c6b7cb99db74c45b5a834"/>
 		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Track 1).bin" size="1996848" crc="1e1a120b" md5="ca2382871576766a33e3e2581750e3ca" sha1="7c9b57119f30f7a57ced292dd84258bf541365a8"/>
 		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
 		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Track 3).bin" size="4706352" crc="53a5fbcb" md5="9ae4842c2c27a5a65424579fe4ffca41" sha1="0e5b51b196d18328ca82fc0c1df03e59d6b3d97c"/>
 		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Track 4).bin" size="1735776" crc="5794831d" md5="0e5ffc3bb7e5718fd8c6461cda47c4c8" sha1="7655dc694846b27043e13ccb1044ac9e79f00669"/>
 		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Track 5).bin" size="1179318672" crc="c76709de" md5="8ce62d4297f1261611165f90013a346f" sha1="0b73227d2a2b2ef82da3681595dfe9c432c707a8"/>
+
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD).cue" size="2822" crc="24ec926d" md5="28c3c8431f05f7303a3d7caa7879aece" sha1="8550f2751ec4743b55a327e382bbcfc70ef687d5"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 01).bin" size="24703056" crc="01f744ca" md5="0f122a45a24e1fa538f031f138c83246" sha1="4d95f1305989c065f7ea82f8792bfcc52753d3ef"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 02).bin" size="12242160" crc="5b0aec5a" md5="a312b40b098c7809203b991269c6da0d" sha1="ddcd0de82bc67b7e6db4ef483e5bd5a254bc47d2"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 03).bin" size="27200880" crc="12e69c93" md5="fde4071ec2136c6e9b55d76b00387626" sha1="4236837baf90baf672a3c3e18ab730b38dddb56b"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 04).bin" size="22572144" crc="8636f799" md5="53c312343c742b224240d432d21e78f2" sha1="a1ec3311b5816b1b0f2d3ea49a23e67e9c042f17"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 05).bin" size="22214640" crc="28b22fed" md5="17e50fe4883c6abef015e11ef2faee1c" sha1="3de06ef1d5bc1f7e139fe68c7414bb80744ae514"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 06).bin" size="14577696" crc="8d63efaf" md5="39fdd88f8703df37d883c390a0ff0e16" sha1="ddbc4d13c5c500e120a884099f1136de0e86f2ae"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 07).bin" size="13300560" crc="4f95977f" md5="d0bfd31f8cd0c27fa67284ae99a5d4a3" sha1="6e83ab35a361fbcbb0b740a17337790c1563b209"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 08).bin" size="13531056" crc="a5572a19" md5="bb47b006b7def1b2fee1de30107ba6fd" sha1="06b896859273d3460fe87f75b1a4228e30d3a747"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 09).bin" size="11153184" crc="b6059bbb" md5="d1f0c7af5c4565d8dfd6383559bf9a19" sha1="fa9018743aad84c4ab8b7e1ef9194206156c9ad6"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 10).bin" size="12808992" crc="87c06b8f" md5="c3520a3d48699be4d7b0dbbf7f3799a2" sha1="56b22d42a1a36382bfff4540a385a8741d3fad5e"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 11).bin" size="25095840" crc="f72ca0b6" md5="807dbe0f43a8f0c77f9d5c5bd7b5f066" sha1="eace855243ee247fb97e01c18b2bc87eb17f7def"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 12).bin" size="16739184" crc="3a333ad1" md5="d2d347c149806cdf6fe91da325d30c0a" sha1="c48e2079a21278e08bad2f94a08ceef0f964e70a"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 13).bin" size="20746992" crc="b083eb21" md5="beb72c3c54ae6fb0739e1ed712e68a40" sha1="eb288c302081c8d5c4bbd71f1d5da56a3ed5e0c3"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 14).bin" size="14314272" crc="a5f41780" md5="22d8438cc1dcebeacabd47748050ce5c" sha1="170fdcd650f9567a9ec44c175ec458ca64c4d4f5"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 15).bin" size="10852128" crc="8a2811ad" md5="494b2273380f8d2bb178c927b260b144" sha1="0352cc1da73e04e63ae841ff655eb1427821e6d5"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 16).bin" size="16638048" crc="999000b3" md5="2055faad54e3cd43abd1657556170771" sha1="97ab979cbb9f166d0b48aa1b72acb37c481d7344"/>
+		<rom name="Card of Destiny - Hikari to Yami no Tougousha (Japan) (Special Talk CD) (Track 17).bin" size="22569792" crc="57710748" md5="84b19dc7bd834bd4bef195395efa47cf" sha1="ba9119db55c319b7cb86f115090362d20fdfaca6"/>
 		-->
 		<description>Card of Destiny: Hikari to Yami no Tougousha - Genteiban (Jpn)</description>
 		<year>2002</year>
@@ -3934,17 +3964,17 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-44405M"/>
 		<info name="release" value="20020328" />
 		<info name="alt_title" value="カード･オブ･デスティニー 〜光と闇の統合者〜 限定版" />
-		<info name="ring_code" value="&lt;T-44406M-0815&gt;HM220A (Card of Destiny)"/>
+		<info name="ring_code" value="&lt;T-44406M-0815&gt;HM220A (Game), T-44405M OP222A (Talk CD)"/>
 		<part interface="dc_gdrom" name="gdrom1">
 			<feature name="part_id" value="Card of Destiny: Hikari to Yami no Tougousha"/>
 			<diskarea name="gdrom">
 				<disk name="card of destiny hikari to yami no tougousha - genteiban (jpn)" sha1="79a8dccf13f16beaa3b6293672c08d90d0c5f64e"/>
 			</diskarea>
 		</part>
-		<part interface="dc_gdrom" name="gdrom2">
+		<part interface="dc_cdrom" name="cdrom1">
 			<feature name="part_id" value="Special Talk CD"/>
-			<diskarea name="gdrom">
-				<disk name="card of destiny hikari to yami no tougousha - genteiban (jpn) (special talk cd)" status="nodump"/>
+			<diskarea name="cdrom">
+				<disk name="card of destiny hikari to yami no tougousha - genteiban (jpn) (special talk cd)" sha1="c8dba781762c063d543370a2797c5c4a3a933742"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5766,11 +5796,16 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!-- The Limited Edition (T-46502M) comes with a opening theme song CD, which apparently have several (at least five) different designs. -->
 	<software name="dvineluvsg"> <!-- cloneof="dvineluv" -->
-		<!-- http://redump.org/disc/43486/
+		<!-- http://redump.org/disc/43486/ http://redump.org/disc/43487/
 		<rom name="D+Vine [Luv] (Japan).gdi" size="168" crc="ed403534" md5="19109f1132cf0b943aab0658e3e6b65a" sha1="e56ab98e22697aedc6efdc9effb34d5b37c62350"/>
 		<rom name="D+Vine [Luv] (Japan) (Track 1).bin" size="1058400" crc="5a53a011" md5="471a10f9120820c76b82a29568da3aa6" sha1="b7c8d38647b20d8200a19a6b150d5551bc86fb92"/>
 		<rom name="D+Vine [Luv] (Japan) (Track 2).bin" size="18279744" crc="b5c1a1d7" md5="6a3be5332c3f54c6ce6051b571b98cd3" sha1="4fdd967e6c6ed6537e1570252680a66e2deac0e1"/>
 		<rom name="D+Vine [Luv] (Japan) (Track 3).bin" size="1185760800" crc="28a2df9c" md5="709126109a065e157b1c209a9552f24c" sha1="3780931c275f7a06beca2719d46b5a2b2a51b876"/>
+
+		<rom name="D+Vine [Luv] (Japan).cue" size="319" crc="df4b38f3" md5="d6c63fb98d4759af085f522578e47dc8" sha1="ab578a93e828d71e9ca0943709e677f05de3e611"/>
+		<rom name="D+Vine [Luv] (Japan) (Track 1).bin" size="63111216" crc="e0eff4bf" md5="13b919f7259048c80d50c61c8ba7abdf" sha1="5965d017f27082f3c86d47ee06048916790ad450"/>
+		<rom name="D+Vine [Luv] (Japan) (Track 2).bin" size="16586304" crc="0551cf4a" md5="7bc7f324a2084c6260e4d03fbcb05523" sha1="2e6d213671a1ba29fb5c1a7f17376d91d076032e"/>
+		<rom name="D+Vine [Luv] (Japan) (Track 3).bin" size="63464016" crc="595821a6" md5="704447167b676f2b199d4295ca44603e" sha1="22c8b5452620798fee929ccec1d9b003b87e71cf"/>
 		-->
 		<description>D+Vine [Luv] - Shokai Genteiban (Jpn)</description>
 		<year>2001</year>
@@ -5778,17 +5813,17 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-46502M, T-46552M (Alt. Audio CD)"/>
 		<info name="release" value="20011025" />
 		<info name="alt_title" value="ディヴァイン ラヴ 初回限定版" />
-		<info name="ring_code" value="T-46501M-0772 1MM1 C 19"/>
+		<info name="ring_code" value="T-46501M-0772 1MM1 C 19 (Game), T-46502M 1MM1 C 19 (Audio CD)"/>
 		<part interface="dc_gdrom" name="gdrom1">
 			<feature name="part_id" value="D+Vine [Luv]"/>
 			<diskarea name="gdrom">
 				<disk name="d+vine [luv] - shokai genteiban (jpn)" sha1="a55d24f09e8d191a8671fd1fcb63fc2e5c1ceb9c"/>
 			</diskarea>
 		</part>
-		<part interface="dc_gdrom" name="gdrom2">
+		<part interface="dc_cdrom" name="cdrom1">
 			<feature name="part_id" value="Opening Themesong CD"/>
-			<diskarea name="gdrom">
-				<disk name="d+vine [luv] - shokai genteiban (jpn) (opening themesong cd)" status="nodump"/>
+			<diskarea name="cdrom">
+				<disk name="d+vine [luv] - shokai genteiban (jpn) (opening themesong cd)" sha1="5b86e1e4a3f786c0d4e2b479ba819d05a72373db"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7214,11 +7249,11 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<software name="digichrt">
-		<!--
-		<rom name="Di Gi Charat Fantasy v1.004 (2001)(Broccoli)(NTSC)(JP)[!].gdi" size="88" md5="d991bd2c09518469d6f5d6b9cd9ab0fe" sha1="d76ab79ab71b25e06992bb7f2f0317c35285a34a"/>
-		<rom name="track01.bin" size="12451488" md5="6250e66cb5cc4e236d8881a641c1fb2d" sha1="36b369c7a5ff67096264aaf5fc8986e3d09184a7"/>
-		<rom name="track02.raw" size="1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
-		<rom name="track03.bin" size="1185760800" md5="5b860d94ecff2e0a3919edf3f7ffb6a7" sha1="1eefcd921904020a50792c7fb989ce0aad362064"/>
+		<!-- http://redump.org/disc/41911/
+		<rom name="Di Gi Charat Fantasy (Japan).gdi" size="192" crc="f3925595" md5="a79112a46e39578c1d4d77ebe82ce275" sha1="5ba68b6f6d8eb3af7eff75e87634c933e91d0e9e"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Track 1).bin" size="12451488" crc="08c65a4e" md5="6250e66cb5cc4e236d8881a641c1fb2d" sha1="36b369c7a5ff67096264aaf5fc8986e3d09184a7"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Track 3).bin" size="1185760800" crc="37d36046" md5="5b860d94ecff2e0a3919edf3f7ffb6a7" sha1="1eefcd921904020a50792c7fb989ce0aad362064"/>
 		-->
 		<description>Di Gi Charat Fantasy (Jpn)</description>
 		<year>2001</year>
@@ -7226,20 +7261,33 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-46302M"/>
 		<info name="release" value="20010906" />
 		<info name="alt_title" value="デ･ジ･キャラット ファンタジー" />
+		<info name="ring_code" value="T-46302M-0753 MT B04"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="di gi charat fantasy (jpn)" sha1="525b860f800222d26dc53f17f420d93d270c504c"/>
+				<disk name="di gi charat fantasy (jpn)" sha1="20c245d693f0d4701be99d71ea164d0cf0468539"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<!-- The Limited Edition (T-46301M) shares the same disc as the regular edition (T-46302M) but includes an audio CD, a VMU and a calendar. -->
 	<software name="digichrtsg" cloneof="digichrt">
-		<!--
-		<rom name="Di Gi Charat Fantasy v1.004 (2001)(Broccoli)(NTSC)(JP)[!].gdi" size="88" md5="d991bd2c09518469d6f5d6b9cd9ab0fe" sha1="d76ab79ab71b25e06992bb7f2f0317c35285a34a"/>
-		<rom name="track01.bin" size="12451488" md5="6250e66cb5cc4e236d8881a641c1fb2d" sha1="36b369c7a5ff67096264aaf5fc8986e3d09184a7"/>
-		<rom name="track02.raw" size="1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
-		<rom name="track03.bin" size="1185760800" md5="5b860d94ecff2e0a3919edf3f7ffb6a7" sha1="1eefcd921904020a50792c7fb989ce0aad362064"/>
+		<!-- http://redump.org/disc/41911/ http://redump.org/disc/46390/
+		<rom name="Di Gi Charat Fantasy (Japan).gdi" size="192" crc="f3925595" md5="a79112a46e39578c1d4d77ebe82ce275" sha1="5ba68b6f6d8eb3af7eff75e87634c933e91d0e9e"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Track 1).bin" size="12451488" crc="08c65a4e" md5="6250e66cb5cc4e236d8881a641c1fb2d" sha1="36b369c7a5ff67096264aaf5fc8986e3d09184a7"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Track 3).bin" size="1185760800" crc="37d36046" md5="5b860d94ecff2e0a3919edf3f7ffb6a7" sha1="1eefcd921904020a50792c7fb989ce0aad362064"/>
+
+		<rom name="Di Gi Charat Fantasy (Japan) (Soundtrack Arrangement CD).cue" size="1487" crc="56e71ed3" md5="cce43212bcd0097ef6c05a5c748c8a24" sha1="2abaa37280079725f6f81a686699ef11dc0de006"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Soundtrack Arrangement CD) (Track 01).bin" size="42947520" crc="1792bffc" md5="970e6d99108f3f63d77d2ec1dd496ca5" sha1="fef5de6ec56295080da37fe6b18217f16b0cc949"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Soundtrack Arrangement CD) (Track 02).bin" size="46468464" crc="171f6e32" md5="1cb51e190ae1749badd4d1d01b84f010" sha1="016c19510456d273519c2d223567c8eddf401b25"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Soundtrack Arrangement CD) (Track 03).bin" size="45134880" crc="88f499f6" md5="8702348dccec43c54ec0a405c08c752b" sha1="3e4fa09bdd9a3e38960ea88b7ef498d2e4beba28"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Soundtrack Arrangement CD) (Track 04).bin" size="49058016" crc="f5ee4442" md5="a1decea8c044eb42638da73b97627673" sha1="7d97af962e0e0d4e49922a833bd1ce78a37bd50f"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Soundtrack Arrangement CD) (Track 05).bin" size="40285056" crc="bef5c8f1" md5="e88fb4692ace5bd8983ee4f85f2e58d8" sha1="0ad4274a54d8664ed077bc01f1e53289170bc2bb"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Soundtrack Arrangement CD) (Track 06).bin" size="44803248" crc="8fb8392f" md5="70b1989561f27232cd4d5fea79d3fead" sha1="0aa1b9dbb1f7daf70f6bcae36c2e183ca994f0d6"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Soundtrack Arrangement CD) (Track 07).bin" size="52609536" crc="e512dca0" md5="5459a363811a2c31f6a110c1b843535c" sha1="24d0a248be1c6de8f1937910c0bbe3c6b63075b0"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Soundtrack Arrangement CD) (Track 08).bin" size="54491136" crc="bae2bdc4" md5="8a10156e3f0201b196f4098814e88247" sha1="7221c64a590542346160c7c8450d2d270e492022"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Soundtrack Arrangement CD) (Track 09).bin" size="49855344" crc="6288587c" md5="cb09d1760b856f903c05d7f0c66e2535" sha1="a633236049e5638bcbb54d73bc0a199882a9b119"/>
+		<rom name="Di Gi Charat Fantasy (Japan) (Soundtrack Arrangement CD) (Track 10).bin" size="53766720" crc="14ca0f5e" md5="80a11f4baffdf77fad971c74f95ce9d1" sha1="d22c2b4f9ad54e96f70c42d521af00f742cc9671"/>
 		-->
 		<description>Di Gi Charat Fantasy - Shokai Genteiban (Jpn)</description>
 		<year>2001</year>
@@ -7247,16 +7295,17 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-46301M"/>
 		<info name="release" value="20010906" />
 		<info name="alt_title" value="デ･ジ･キャラット ファンタジー 初回限定版" />
+		<info name="ring_code" value="T-46302M-0753 MT B04 (Game), GCFC-21 2MM1 C 18 (Audio CD)"/>
 		<part interface="dc_gdrom" name="gdrom1">
 			<feature name="part_id" value="Di Gi Charat Fantasy"/>
 			<diskarea name="gdrom">
-				<disk name="di gi charat fantasy (jpn)" sha1="525b860f800222d26dc53f17f420d93d270c504c"/>
+				<disk name="di gi charat fantasy (jpn)" sha1="20c245d693f0d4701be99d71ea164d0cf0468539"/>
 			</diskarea>
 		</part>
-		<part interface="dc_gdrom" name="gdrom2">
+		<part interface="dc_cdrom" name="cdrom1">
 			<feature name="part_id" value="Soundtrack Arrangement CD"/>
-			<diskarea name="gdrom">
-				<disk name="di gi charat fantasy - shokai genteiban (jpn) (soundtrack arrangement cd)" status="nodump"/>
+			<diskarea name="cdrom">
+				<disk name="di gi charat fantasy - shokai genteiban (jpn) (soundtrack arrangement cd)" sha1="566cd0a7b3817f346a01bd6a6da6e2df62c59339"/>
 			</diskarea>
 		</part>
 	</software>
@@ -8230,21 +8279,26 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- Bundled with the February 9th, 2001 issue of "Dreamcast Magazine". -->
-	<!--
 	<software name="dorimaga10">
+		<!-- http://redump.org/disc/46099/
+		<rom name="Dorimaga GD Vol. 10 (Japan).gdi" size="189" crc="cf6bcf47" md5="39bd3992ee938f90f9ea4ba3da015d6e" sha1="cb0dde334f6e69ccd46c8318eeb6714255a98d54"/>
+		<rom name="Dorimaga GD Vol. 10 (Japan) (Track 1).bin" size="1058400" crc="58ed6eb9" md5="1540ae545266a9cd68210a77aed69ba0" sha1="9631f4c51415c7890420ed4c0fe7baefe09fda7d"/>
+		<rom name="Dorimaga GD Vol. 10 (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
+		<rom name="Dorimaga GD Vol. 10 (Japan) (Track 3).bin" size="1185760800" crc="1a035836" md5="6a2830e18ac2e3d7312149986fbb2596" sha1="28622c73de6a81d3df8a2bf51aa8a62a9f161f84"/>
+		-->
 		<description>Dorimaga GD Vol. 10 (Jpn)</description>
 		<year>2001</year>
 		<publisher>Softbank</publisher>
 		<info name="serial" value="610-7164-11"/>
 		<info name="release" value="20010209" />
 		<info name="alt_title" value="ドリマガGD Vol.10" />
+		<info name="ring_code" value="610-7164-0627 2M2 C 0Z"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dorimaga gd vol. 10 (jpn)" status="nodump"/>
+				<disk name="dorimaga gd vol. 10 (jpn)" sha1="494db6078183b28caa274440e4c60604c62013d4"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!-- Bundled with the March 30th, 2001 issue of "Dreamcast Magazine". -->
 	<!--
@@ -9903,7 +9957,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 			</diskarea>
 		</part>
 		<part interface="dc_gdrom" name="gdrom2">
-			<feature name="part_id" value="Trail & Movie Disk"/>
+			<feature name="part_id" value="Trail &amp; Movie Disk"/>
 			<diskarea name="gdrom">
 				<disk name="dreamcast express vol. 7 (jpn) (trail and movie disk)" status="nodump"/>
 			</diskarea>
@@ -10603,21 +10657,26 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!--
 	<software name="dyndeka2" cloneof="dynamcop">
+		<!-- http://redump.org/disc/5882/
+		<rom name="Dynamite Deka 2 (Japan).gdi" size="177" crc="976ffb21" md5="9e57a8e826afc9811cde0635c5ff367b" sha1="88b060654529e7f2730057db7d5ffca3b5e99b90"/>
+		<rom name="Dynamite Deka 2 (Japan) (Track 1).bin" size="705600" crc="937cc362" md5="c4db8ea5b193af0587901f0e8a5aa457" sha1="ac7c23d3f67e7ff26ec6ecdbce642162c13a4901"/>
+		<rom name="Dynamite Deka 2 (Japan) (Track 2).bin" size="2389632" crc="b818e036" md5="f976717bc49a7decf3ec6f2a20e26092" sha1="70ff7ffbfc1e66bdf5596578a1b2fb49f7dfb592"/>
+		<rom name="Dynamite Deka 2 (Japan) (Track 3).bin" size="1185760800" crc="b21490d7" md5="6a0ee22920242d10e59433e2fb20b7ba" sha1="5473fff4d3ee66260a53da00215c6cd59b0b1fdc"/>
+		-->
 		<description>Dynamite Deka 2 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="HDR-0020"/>
 		<info name="release" value="19990527" />
 		<info name="alt_title" value="ダイナマイト刑事2" />
+		<info name="ring_code" value="HDR-0020-0081 1M2 C 95, HDR-0020-0081 1MM1 C 95"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dynamite deka 2 (jpn)" status="nodump"/>
+				<disk name="dynamite deka 2 (jpn)" sha1="5667e2f3281a9f526ee804516039833a69484144"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!-- Bundled with the May 28th, 1999 issue of "Dreamcast Magazine". -->
 	<software name="dyndeka2t" cloneof="dynamcop">
@@ -11049,21 +11108,34 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!--
 	<software name="eisei3">
+		<!-- http://redump.org/disc/5623/
+		<rom name="Eisei Meijin III - Game Creator Yoshimura Nobuhiro no Zunou (Japan).gdi" size="1159" crc="50b61453" md5="dfadeb742a5faa1da82358fe4c8953cb" sha1="5374d6912fd6190773bca76ad1488d974274f9cc"/>
+		<rom name="Eisei Meijin III - Game Creator Yoshimura Nobuhiro no Zunou (Japan) (Track 01).bin" size="1472352" crc="20e59ef1" md5="13ae30d218569306d0b8f138505adc39" sha1="e55aabf54ab084f75094bc0f8e8affc6130e96c8"/>
+		<rom name="Eisei Meijin III - Game Creator Yoshimura Nobuhiro no Zunou (Japan) (Track 02).bin" size="2302608" crc="a9684d33" md5="3a23931b29da109b04737c79cbcc18fc" sha1="1312a9ce85a306e731945dc0e97a047b2a7c6187"/>
+		<rom name="Eisei Meijin III - Game Creator Yoshimura Nobuhiro no Zunou (Japan) (Track 03).bin" size="1076700912" crc="44010895" md5="8abf378c597cc242547522c83645597c" sha1="771df673dd32a34b96fa7adf222abe0db91af2d5"/>
+		<rom name="Eisei Meijin III - Game Creator Yoshimura Nobuhiro no Zunou (Japan) (Track 04).bin" size="14939904" crc="7c7519ff" md5="24050e88175bd333d1e1e3c3cc19640d" sha1="044bf0c8a82413619e5b9398f86351b23b520c09"/>
+		<rom name="Eisei Meijin III - Game Creator Yoshimura Nobuhiro no Zunou (Japan) (Track 05).bin" size="15509088" crc="5412449b" md5="527570dbac40e6c31f47b5183cdf1ad6" sha1="21f59aa27d04c036e593635111814e7e85baa99b"/>
+		<rom name="Eisei Meijin III - Game Creator Yoshimura Nobuhiro no Zunou (Japan) (Track 06).bin" size="12376224" crc="54a8dbad" md5="805282e0e40f7b38b4e41a0cb878f775" sha1="205ac4c89e39ca893447150f7f837ea172d210aa"/>
+		<rom name="Eisei Meijin III - Game Creator Yoshimura Nobuhiro no Zunou (Japan) (Track 07).bin" size="4334736" crc="b0ce4932" md5="2de0ebef3580a0b941fcb5a2ce35a14d" sha1="a93087febab54d1e614edd3fc25a48363c7fcada"/>
+		<rom name="Eisei Meijin III - Game Creator Yoshimura Nobuhiro no Zunou (Japan) (Track 08).bin" size="13474608" crc="4d41c599" md5="548f9e78d62a18eb661495fe4f71b0bc" sha1="a1c7fb6cf365bd54d603fba56dddd753c181c370"/>
+		<rom name="Eisei Meijin III - Game Creator Yoshimura Nobuhiro no Zunou (Japan) (Track 09).bin" size="10358208" crc="cc5d4826" md5="fbad1060688401f15e2d2e2f4d0b3816" sha1="aabe04d918d999f0342671ba9a79402ba94ae27e"/>
+		<rom name="Eisei Meijin III - Game Creator Yoshimura Nobuhiro no Zunou (Japan) (Track 10).bin" size="32147136" crc="b939bd13" md5="b77c97fc0c15a62a280b20d75567a27f" sha1="7641455f3509e98f2103aad05aae89bf18982218"/>
+		<rom name="Eisei Meijin III - Game Creator Yoshimura Nobuhiro no Zunou (Japan) (Track 11).bin" size="5919984" crc="0ff85322" md5="a1361486f532e861f8e6571e3d7a6e7d" sha1="8c49c015ba10811bbcf93547cec207d809c4a0d3"/>
+		-->
 		<description>Eisei Meijin III: Game Creator Yoshimura Nobuhiro no Zunou (Jpn)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="TT-9503M"/>
 		<info name="release" value="19990708" />
 		<info name="alt_title" value="永世名人III 〜ゲームクリエイター吉村信弘の頭脳〜" />
+		<info name="ring_code" value="T-9503M-0080 MT B01"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="eisei meijin iii game creator yoshimura nobuhiro no zunou (jpn)" status="nodump"/>
+				<disk name="eisei meijin iii game creator yoshimura nobuhiro no zunou (jpn)" sha1="3d8f2e655829790ee2cf83f252c9d05257234fb4"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!--
 	<software name="elanphil">
@@ -11437,28 +11509,38 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- There does not seem to have ever been a regular edition, only this limited edition. -->
-	<!--
 	<software name="eve0">
+		<!-- http://redump.org/disc/27368/ http://redump.org/disc/27369/
+		<rom name="Eve Zero Kanzenban - Ark of the Matter (Japan) (Disc 1).gdi" size="273" crc="cc5b0006" md5="867f1880cdde312195df28a66f3fb424" sha1="d738773e2aa79286f99114facff5d95fb3fbe522"/>
+		<rom name="Eve Zero Kanzenban - Ark of the Matter (Japan) (Disc 1) (Track 1).bin" size="705600" crc="f1fde523" md5="4dfca7254aebcf41b6e8b2ecb36c4f5b" sha1="aac1cd6df7cc5814cb141134a5e13a8f537baacd"/>
+		<rom name="Eve Zero Kanzenban - Ark of the Matter (Japan) (Disc 1) (Track 2).bin" size="2693040" crc="310fbe7e" md5="35495e5d37483c65ed2d7c994842fe2f" sha1="7d85d9a32ac0eda1506c59988fbfef30cd975adb"/>
+		<rom name="Eve Zero Kanzenban - Ark of the Matter (Japan) (Disc 1) (Track 3).bin" size="1185760800" crc="c4e69cbd" md5="8bcebae8a5ec1842f32dff131cf3e200" sha1="5f3f00ca95784899a26abeb89b703e8fd62871bf"/>
+
+		<rom name="Eve Zero Kanzenban - Ark of the Matter (Japan) (Disc 2).gdi" size="273" crc="6f0effec" md5="6a96e35fec27e6b03947ee6a7c80f309" sha1="9688b46221a5c3677b1a9ccb994eda36b2fc257f"/>
+		<rom name="Eve Zero Kanzenban - Ark of the Matter (Japan) (Disc 2) (Track 1).bin" size="705600" crc="a704f79a" md5="0a90d8fb48a8ac6aba95915c14aed776" sha1="751550f83241cee8aa05ef986a2879a9377c635d"/>
+		<rom name="Eve Zero Kanzenban - Ark of the Matter (Japan) (Disc 2) (Track 2).bin" size="2081520" crc="3c306d17" md5="cf39a0296a3babf817cfd05977043421" sha1="9b10f6c9b1bccfaf63e4a43c04857b1f88b66f13"/>
+		<rom name="Eve Zero Kanzenban - Ark of the Matter (Japan) (Disc 2) (Track 3).bin" size="1185760800" crc="f676d64c" md5="0f9f57d2e866b9f6db994d74ebe110f7" sha1="6f88ff171e1cbbb5670a0732ad83b996f08ce863"/>
+		-->
 		<description>Eve Zero Kanzenban: Ark of the Matter - Shokai Gentei Pack (Jpn)</description>
 		<year>2001</year>
 		<publisher>NetVillage</publisher>
 		<info name="serial" value="T-39802M"/>
 		<info name="release" value="20010322" />
 		<info name="alt_title" value="イヴ·ゼロ 完全版 -Ark of the Matter- 初回限定パック" />
+		<info name="ring_code" value="T-39803M-0638 1M2 C 12 (Disc 1), T-39803M-0639 1M1 C 12, T-39803M-0639 1MM1 C 12 (Disc 2)"/>
 		<part interface="dc_gdrom" name="gdrom1">
 			<feature name="part_id" value="Disc 1"/>
 			<diskarea name="gdrom">
-				<disk name="eve zero kanzenban ark of the matter (jpn) (disc 1)" status="nodump"/>
+				<disk name="eve zero kanzenban ark of the matter (jpn) (disc 1)" sha1="5cebcca9f26156e1309be7184cfd1dac7c0d664f"/>
 			</diskarea>
 		</part>
 		<part interface="dc_gdrom" name="gdrom2">
 			<feature name="part_id" value="Disc 2"/>
 			<diskarea name="gdrom">
-				<disk name="eve zero kanzenban ark of the matter (jpn) (disc 2)" status="nodump"/>
+				<disk name="eve zero kanzenban ark of the matter (jpn) (disc 2)" sha1="a5dc69f88b42e53ef7f64ec60d5cd14816a6ba31"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!--
 	<software name="ever17">
@@ -13227,21 +13309,28 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!--
 	<software name="onnaaska">
+		<!-- http://redump.org/disc/6057/
+		<rom name="Fushigi no Dungeon - Fuurai no Shiren Gaiden - Onna Kenshi Asuka Kenzan! (Japan).gdi" size="583" crc="d91912ca" md5="511847b8a02d0757c8afecf7aa8d2b42" sha1="d585c8e91d4317a3766824f3a4b91516c3181ed1"/>
+		<rom name="Fushigi no Dungeon - Fuurai no Shiren Gaiden - Onna Kenshi Asuka Kenzan! (Japan) (Track 1).bin" size="1058400" crc="27dd0631" md5="c958212b61109bf68f3e899863c1cccd" sha1="3e8d1e8f4f517b65a45d3abba620bcedeeaa4ad1"/>
+		<rom name="Fushigi no Dungeon - Fuurai no Shiren Gaiden - Onna Kenshi Asuka Kenzan! (Japan) (Track 2).bin" size="2302608" crc="a9684d33" md5="3a23931b29da109b04737c79cbcc18fc" sha1="1312a9ce85a306e731945dc0e97a047b2a7c6187"/>
+		<rom name="Fushigi no Dungeon - Fuurai no Shiren Gaiden - Onna Kenshi Asuka Kenzan! (Japan) (Track 3).bin" size="222626208" crc="9329c4a2" md5="646046117769baa21bb77f8bd38475c1" sha1="fe34137023454371285f9669d7cdcc664c543c71"/>
+		<rom name="Fushigi no Dungeon - Fuurai no Shiren Gaiden - Onna Kenshi Asuka Kenzan! (Japan) (Track 4).bin" size="1949808" crc="376528d6" md5="342e74d2fe108c150f84f27788effc97" sha1="8c6f8e876d06044c5f415f8c494f13eef096d519"/>
+		<rom name="Fushigi no Dungeon - Fuurai no Shiren Gaiden - Onna Kenshi Asuka Kenzan! (Japan) (Track 5).bin" size="961184784" crc="3c0b5467" md5="a46870cee656da5c264ff63637c9b579" sha1="e624152e133f6b7c0ba675aff8426ff25b94c064"/>
+		-->
 		<description>Fushigi no Dungeon: Fuurai no Shiren Gaiden: Onnakenshi Asuka Kenzan! (Jpn)</description>
 		<year>2002</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="HDR-0187"/>
 		<info name="release" value="20020207" />
 		<info name="alt_title" value="不思議のダンジョン 風来のシレン外伝 女剣士アスカ見参!" />
+		<info name="ring_code" value="HDR-0187-0794 1M1 C 21, HDR-0187-0794 1MM1 C 21"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="fushigi no dungeon fuurai no shiren gaiden onnakenshi asuka kenzan (jpn)" status="nodump"/>
+				<disk name="fushigi no dungeon fuurai no shiren gaiden onnakenshi asuka kenzan (jpn)" sha1="82fdc8677f6b24e4c75ff5191fbce47b820dc30b"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
 	<software name="gaiamstr">
@@ -13505,7 +13594,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="gauntlet">
+	<software name="gauntleg">
 		<!--
 		<rom name="Gauntlet Legends v1.003 (2000)(Midway)(NTSC)(US)[!].gdi" size="150" md5="255a0a02a38fdbdbb206d8dfe67dc348" sha1="7469884452f804fad0952ecadddbab779bfd4146"/>
 		<rom name="track01.bin" size="1999200" md5="7f516a556811b2ae71379e32358f11eb" sha1="782f3ffdaa2bfc658a63fc460cfe20522731e288"/>
@@ -13531,7 +13620,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
  	A promo version exists (950-0076-50 952-0071-50), it is most likely the same as retail.
 	-->
-	<software name="gauntlete" cloneof="gauntlet">
+	<software name="gauntlege" cloneof="gauntleg">
 		<!--
 		<rom name="Gauntlet Legends v1.004 (2000)(Midway)(PAL)(M3)[!].gdi" size="149" md5="3cd06d824711f28ee846e23cdbd5ad71" sha1="b7b53883d6ed94469cc4822be966dae05a56d378"/>
 		<rom name="track01.bin" size="1427664" md5="8234f84e3bd58c9bbb09e7eed11f11c8" sha1="c857625d4f1af316e4594621db34fc41c667eff6"/>
@@ -13935,7 +14024,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="giantg2">
+	<software name="ggram2">
 		<!--
 		<rom name="Giant Gram - All Japan Pro Wrestling 2 in Nippon Budoukan v1.003 (1999)(Sega)(NTSC)(JP)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
 		<rom name="track01.bin" size="705600" md5="d20545ba17d0bc19b6d0771a79daaa34" sha1="0c24dda111ad8d8107f7f7881747d03fa6d18a15"/>
@@ -13955,7 +14044,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="giantg3">
+	<software name="gram2000">
 		<!--
 		<rom name="Giant Gram 2000 - All Japan Pro Wrestling 3 v1.004 (2000)(Sega)(NTSC)(JP)[!][HDR-0101-0456 2MS1].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
 		<rom name="track01.bin" size="1058400" md5="0639a61ca508773d619a13f16b833d87" sha1="ee08e9e2bc6b93819843cbbd68aae1ece2e7b21b"/>
@@ -13976,8 +14065,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!-- This is most likely just a disc with different write offset compared to "giantg3". -->
-	<software name="giantg3a" cloneof="giantg3">
+	<!-- This is most likely just a disc with different write offset compared to "gram2000". -->
+	<software name="gram2000a" cloneof="gram2000">
 		<!--
 		<rom name="Giant Gram 2000 - All Japan Pro Wrestling 3 v1.004 (2000)(Sega)(NTSC)(JP)[!][HDR-0101-0456 3M1].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
 		<rom name="track01.bin" size="1058400" md5="0639a61ca508773d619a13f16b833d87" sha1="ee08e9e2bc6b93819843cbbd68aae1ece2e7b21b"/>
@@ -13999,7 +14088,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--
-	<software name="giantg3t" cloneof="giantg3">
+	<software name="gram2000t" cloneof="gram2000">
 		<description>Giant Gram 2000: Zen Nihon Pro Wres 3 Eikou no Yuusha-tachi - Taikenban (Jpn)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
@@ -14098,7 +14187,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="gigawing2">
+	<software name="gwing2">
 		<!--
 		<rom name="GigaWing 2 v1.000 (2000)(Capcom)(NTSC)(US)[!].gdi" size="87" md5="2b76347e486970e272601475664cbf90" sha1="3f6db4a24a9ef1f4efaf36985c5cb9cc2f56013d"/>
 		<rom name="track01.bin" size="1232448" md5="067f6eb935eeab9c6cf0965f8c321b69" sha1="11109c6f8188b3b61a7fad5bae7827cffef9b6f1"/>
@@ -14117,7 +14206,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="gigawing2j" cloneof="gigawing2">
+	<software name="gwing2j" cloneof="gwing2">
 		<!--
 		<rom name="GigaWing 2 v1.001 (2000)(Capcom)(NTSC)(JP)(en)[!].gdi" size="87" md5="2b76347e486970e272601475664cbf90" sha1="3f6db4a24a9ef1f4efaf36985c5cb9cc2f56013d"/>
 		<rom name="track01.bin" size="1232448" md5="d6412e240a7ecdb76d264042bfbaf7dd" sha1="19e46c0115eb08a0c317a3826cd840d3c25ee751"/>
@@ -14203,7 +14292,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1796928" md5="f763837ad12fe52303f05b48930fe588" sha1="40d60b76cc17ff578c12b8f4b775315576095a17"/>
 		<rom name="track03.bin" size="1185760800" md5="e55431562a937469959a754fd99b0129" sha1="95f0120fbc507d91c1e6f3dcc26c7b49a6b2d969"/>
 		-->
-		<description>Godzilla Generations Maximum Impact (Jpn)</description>
+		<description>Godzilla Generations: Maximum Impact (Jpn)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="HDR-0047"/>
@@ -14984,7 +15073,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1796928" md5="f55c07b011a4ed6bce95ee02754e05c7" sha1="f190359efc94b95491cfb8dd3b738108fbb16827"/>
 		<rom name="track03.bin" size="1185760800" md5="cfd5b21f2344311e16594a4819bba43d" sha1="5cad9c5d7a74621b34c323312b398a9f62a3f7e7"/>
 		-->
-		<description>Gundam Side Story 0079: Rise from the Ashes Premium Disc - Premium Disc (Jpn)</description>
+		<description>Gundam Side Story 0079: Rise from the Ashes - Premium Disc (Jpn)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="610-7160"/>
