@@ -5,8 +5,14 @@
     Gunpey (c) 2000 Banpresto
 
     TODO:
-    - compression scheme used by the Axell video chip, game is playable but several gfxs are
-      still broken.
+    - Implement correct Axell video chip decompression scheme, currently using decompressed
+	  data extracted from the PCB (for reference)
+	- Framebuffer is actually in the same DRAM as the blitter data gets copied to, not a
+	  separate RAM.  It (and the double buffered copy) appear near the top right of the
+	  framebuffer, so there are likely registers to control this that need finding.
+	- Other sprite modes supported by the video chip (not used here?)
+	- Sprite Zooming
+	- Cleanup (still a lot of debug code in here)
 
 =============================================================================================
 ASM code study:
@@ -205,17 +211,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_wram(*this, "wram"),
-		m_palette(*this, "palette")
-		{ }
+		m_palette(*this, "palette"),
+		m_pre_index(*this, "pre_index"),
+		m_pre_data(*this, "pre_data")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<okim6295_device> m_oki;
-	required_shared_ptr<uint16_t> m_wram;
-	required_device<palette_device> m_palette;
-
-	std::unique_ptr<uint16_t[]> m_blit_buffer;
-	uint16_t m_blit_ram[0x10];
-	uint8_t m_irq_cause, m_irq_mask;
 	DECLARE_WRITE8_MEMBER(status_w);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(inputs_r);
@@ -230,8 +230,14 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	TIMER_CALLBACK_MEMBER(blitter_end);
+
+	void gunpey(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+private:
+
 	void irq_check(uint8_t irq_type);
-	uint8_t draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count,uint8_t scene_gradient);
+	uint8_t draw_gfx(bitmap_ind16 &bitmap, const rectangle &cliprect, int count, uint8_t scene_gradient);
 	uint16_t m_vram_bank;
 	uint16_t m_vreg_addr;
 
@@ -267,10 +273,22 @@ public:
 	uint32_t get_stream_bits(int bits);
 
 	int write_dest_byte(uint8_t usedata);
-	void gunpey(machine_config &config);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
 	//uint16_t main_m_vram[0x800][0x800];
+
+	uint16_t m_blit_ram[0x10];
+	uint8_t m_irq_cause, m_irq_mask;
+	std::unique_ptr<uint16_t[]> m_blit_buffer;
+
+
+	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki;
+	required_shared_ptr<uint16_t> m_wram;
+	required_device<palette_device> m_palette;
+
+	// compression workaround
+	void replace_decompressed_sprite(void);
+	required_region_ptr<uint8_t> m_pre_index;
+	required_region_ptr<uint8_t> m_pre_data;
 };
 
 
@@ -462,6 +480,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 		}
 		else if(bpp_sel == 0x08) // 6bpp
 		{
+			// not used by Gunpey?
 			printf("6bpp\n");
 			#if 0
 			for(int yi=0;yi<sourceheight;yi++)
@@ -547,6 +566,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 		}
 		else if(bpp_sel == 0x18) // RGB32k
 		{
+			// not used by Gunpey?
 			printf("32k\n");
 			// ...
 		}
@@ -1082,7 +1102,76 @@ ooutcount was 51
 
 //#define SHOW_COMPRESSED_DATA_DEBUG
 
+void gunpey_state::replace_decompressed_sprite(void)
+{
+	m_srcx = m_blit_ram[0x04] + (m_blit_ram[0x05] << 8);
+	m_srcy = m_blit_ram[0x06] + (m_blit_ram[0x07] << 8);
+	m_dstx = m_blit_ram[0x08] + (m_blit_ram[0x09] << 8);
+	m_dsty = m_blit_ram[0x0a] + (m_blit_ram[0x0b] << 8);
+	m_xsize = m_blit_ram[0x0c] + 1;
+	m_ysize = m_blit_ram[0x0e] + 1;
 
+	m_dstx <<= 1;
+	m_xsize <<= 1;
+
+	int i = 0;
+
+	for (;;)
+	{
+		uint16_t lookupx, lookupy;
+		uint32_t lookupoffset;
+
+		lookupx = (m_pre_index[i + 0] << 8) | (m_pre_index[i + 1] << 0);
+		lookupy = (m_pre_index[i + 2] << 8) | (m_pre_index[i + 3] << 0);
+		lookupoffset = (m_pre_index[i + 4] << 24) | (m_pre_index[i + 5] << 16) | (m_pre_index[i + 6] << 8) | (m_pre_index[i + 7] << 0);
+
+		// reached end up list without finding anything (shouldn't happen)
+		if ((lookupx == 0xffff) && (lookupy == 0xffff) && (lookupoffset == 0xffffffff))
+		{
+			//fatalerror("sprite replacement not found");
+			break;
+		}
+
+		if ((lookupx == m_srcx) && (lookupy == m_srcy))
+		{
+			m_dstxbase = m_dstx;
+			m_dstxcount = 0;
+			m_dstycount = 0;
+			m_srcxbase = m_srcx;
+			m_scrxcount = 0;
+			m_srcycount = 0;
+
+			for (;;)
+			{
+				uint8_t usedata = 0;
+
+				if (lookupoffset < 0x4c110a)
+				{
+					usedata = m_pre_data[lookupoffset++];
+				}
+				else
+				{
+					//fatalerror("out of data\n");
+				}
+
+				m_srcx++; m_scrxcount++;
+				if (m_scrxcount == m_xsize)
+				{
+					m_scrxcount = 0;
+					m_srcx = m_srcxbase;
+					m_srcy++; m_srcycount++;
+				}
+
+				if ((write_dest_byte(usedata)) == -1)
+					break;
+			}
+
+			break;
+		}
+
+		i += 8;
+	}
+}
 
 WRITE8_MEMBER(gunpey_state::blitter_w)
 {
@@ -1100,14 +1189,14 @@ WRITE8_MEMBER(gunpey_state::blitter_w)
 		m_dsty = blit_ram[0x0a]+(blit_ram[0x0b]<<8);
 		m_xsize = blit_ram[0x0c]+1;
 		m_ysize = blit_ram[0x0e]+1;
-		int rle = blit_ram[0x01];
+		int compression = blit_ram[0x01];
 
 		m_dstx<<=1;
 		m_xsize<<=1;
 
-		if(rle)
+		if(compression)
 		{
-			if(rle == 8)
+			if(compression == 8)
 			{
 				// compressed stream format:
 				//
@@ -1223,9 +1312,11 @@ WRITE8_MEMBER(gunpey_state::blitter_w)
 				printf("\n");
 #endif
 
+				replace_decompressed_sprite();
+
 			}
 			else
-				printf("unknown RLE mode %02x\n",rle);
+				printf("unknown compression mode %02x\n",compression);
 		}
 		else
 		{
@@ -1493,8 +1584,14 @@ ROM_START( gunpey )
 
 	ROM_REGION( 0x400000, "oki", 0 )
 	ROM_LOAD( "gp_rom5.622",  0x000000, 0x400000,  CRC(f79903e0) SHA1(4fd50b4138e64a48ec1504eb8cd172a229e0e965)) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF
-ROM_END
 
+
+	ROM_REGION( 0x3088, "pre_index", 0 )
+	ROM_LOAD( "tableoutput.bin",  0x000000, 0x3088, CRC(39c6dd4f) SHA1(61697ad9167e75f321d0cbd1cc98a3aeefb8370f) )
+
+	ROM_REGION( 0x4c110a, "pre_data", 0 )
+	ROM_LOAD( "dataoutput.bin",  0x000000, 0x4c110a, CRC(eaff7bb8) SHA1(83afdcabb59d202398b1793f1f60052556dd1811) )
+ROM_END
 
 
 DRIVER_INIT_MEMBER(gunpey_state,gunpey)
@@ -1506,4 +1603,4 @@ DRIVER_INIT_MEMBER(gunpey_state,gunpey)
 	// ...
 }
 
-GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, gunpey,    ROT0, "Banpresto", "Gunpey (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, gunpey,    ROT0, "Banpresto", "Gunpey (Japan)", MACHINE_IMPERFECT_GRAPHICS )
