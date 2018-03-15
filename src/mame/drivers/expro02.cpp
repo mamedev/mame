@@ -734,8 +734,8 @@ void expro02_state::comad_map(address_map &map)
 	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
 	map(0xc00000, 0xc0ffff).ram();
 	map(0xc80000, 0xc8ffff).ram();
-	map(0xf00000, 0xf00000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)).umask16(0xff00); /* fantasia, missw96 */
-	map(0xf80000, 0xf80000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)).umask16(0xff00); /* newfant */
+	map(0xf00000, 0xf00000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
+	map(0xf80000, 0xf80000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* newfant */
 }
 
 void expro02_state::fantsia2_map(address_map &map)
@@ -784,7 +784,7 @@ void expro02_state::zipzap_map(address_map &map)
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
 	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));
-	map(0xc00000, 0xc00000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)).umask16(0xff00); /* fantasia, missw96 */
+	map(0xc00000, 0xc00000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
 	map(0xc80000, 0xc8ffff).ram();     // main ram
 
 	map(0x780000, 0x78001f).noprw(); // prevent sprites being flipped
@@ -806,7 +806,7 @@ void expro02_state::supmodel_map(address_map &map)
 	map(0xd80000, 0xd80001).nopw();
 	map(0xe00012, 0xe00013).nopw();
 	map(0xe80000, 0xe80001).nopw();
-	map(0xf80000, 0xf80000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)).umask16(0xff00); /* fantasia, missw96 */
+	map(0xf80000, 0xf80000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
 }
 
 void expro02_state::smissw_map(address_map &map)
@@ -825,7 +825,7 @@ void expro02_state::smissw_map(address_map &map)
 	map(0xd80000, 0xd80001).nopw();
 	map(0xe00012, 0xe00013).nopw();
 	map(0xe80000, 0xe80001).nopw();
-	map(0xf00000, 0xf00000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)).umask16(0xff00); /* fantasia, missw96 */
+	map(0xf00000, 0xf00000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)); /* fantasia, missw96 */
 }
 
 void expro02_state::oki_map(address_map &map)
