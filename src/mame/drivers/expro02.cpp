@@ -728,7 +728,7 @@ void expro02_state::comad_map(address_map &map)
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
-//  AM_RANGE(0x800006, 0x800007)    ??
+//  map(0x800006, 0x800007);    ??
 	map(0x80000a, 0x80000b).r(this, FUNC(expro02_state::comad_timer_r)); /* bits 8-a = timer? palette update code waits for them to be 111 */
 	map(0x80000c, 0x80000d).r(this, FUNC(expro02_state::comad_timer_r)); /* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
 	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
@@ -745,11 +745,11 @@ void expro02_state::fantsia2_map(address_map &map)
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
-//  AM_RANGE(0x800006, 0x800007)    ??
+//  map(0x800006, 0x800007);    ??
 	map(0x800008, 0x800009).r(this, FUNC(expro02_state::comad_timer_r)); /* bits 8-a = timer? palette update code waits for them to be 111 */
 	map(0x900000, 0x900000).w(this, FUNC(expro02_state::expro02_6295_bankswitch_w));  /* not sure */
 	map(0xa00000, 0xa00001).nopw();    /* coin counters, + ? */
-	map(0xc80000, 0xc80000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write)).umask16(0xff00);
+	map(0xc80000, 0xc80000).r(this, FUNC(expro02_state::comad_okim6295_r)).w("oki", FUNC(okim6295_device::write));
 	map(0xf80000, 0xf8ffff).ram();
 }
 
