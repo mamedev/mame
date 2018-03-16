@@ -313,7 +313,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "cquestrot",       be, -3, []() -> util::disasm_interface * { return new cquestrot_disassembler; } },
 	{ "cquestsnd",       be, -3, []() -> util::disasm_interface * { return new cquestsnd_disassembler; } },
 	{ "ds5002fp",        le,  0, []() -> util::disasm_interface * { return new ds5002fp_disassembler; } },
-	{ "dsp16a",          le, -1, []() -> util::disasm_interface * { return new dsp16a_disassembler; } },
+	{ "dsp16",           le, -1, []() -> util::disasm_interface * { return new dsp16_disassembler; } },
 	{ "dsp32c",          le,  0, []() -> util::disasm_interface * { return new dsp32c_disassembler; } },
 	{ "dsp56k",          le, -1, []() -> util::disasm_interface * { return new dsp56k_disassembler; } },
 	{ "e0c6200",         be, -1, []() -> util::disasm_interface * { return new e0c6200_disassembler; } },

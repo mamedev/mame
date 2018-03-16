@@ -253,18 +253,18 @@ if (CPUS["APEXC"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
--- AT&T DSP16A
---@src/devices/cpu/dsp16/dsp16.h,CPUS["DSP16A"] = true
+-- WE|AT&T DSP16
+--@src/devices/cpu/dsp16/dsp16.h,CPUS["DSP16"] = true
 --------------------------------------------------
 
-if (CPUS["DSP16A"]~=null) then
+if (CPUS["DSP16"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/dsp16/dsp16.cpp",
 		MAME_DIR .. "src/devices/cpu/dsp16/dsp16.h",
 	}
 end
 
-if (CPUS["DSP16A"]~=null or _OPTIONS["with-tools"]) then
+if (CPUS["DSP16"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp16/dsp16dis.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp16/dsp16dis.h")
 end

@@ -622,7 +622,7 @@ void dsp16_device_base::state_export(device_state_entry const &entry)
 
 util::disasm_interface *dsp16_device_base::create_disassembler()
 {
-	return new dsp16a_disassembler;
+	return new dsp16_disassembler;
 }
 
 template <offs_t Base> READ16_MEMBER(dsp16_device_base::external_memory_r)
