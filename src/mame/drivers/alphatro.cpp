@@ -797,19 +797,24 @@ MACHINE_CONFIG_END
 
 ROM_START( alphatro )
 	ROM_REGION( 0xa000, "roms", ROMREGION_ERASE00)
-	ROM_SYSTEM_BIOS( 0, "default", "Alphatronic with Bicom graphics" )
+	ROM_SYSTEM_BIOS( 0, "pcb-ig", "Alphatronic PC PCB-IG" ) // correctly displays German Umlauts
 	ROMX_LOAD( "0_b4-6_ic1038.bin", 0x008000, 0x002000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49), ROM_BIOS(1) )
 	ROMX_LOAD( "1_b4-3_ic1058.bin", 0x000000, 0x002000, CRC(1509b15a) SHA1(225c36411de680eb8f4d6b58869460a58e60c0cf), ROM_BIOS(1) )
 	ROMX_LOAD( "2_b4-3_ic1046.bin", 0x002000, 0x002000, CRC(998a865d) SHA1(294fe64e839ae6c4032d5db1f431c35e0d80d367), ROM_BIOS(1) )
 	ROMX_LOAD( "3_b4-3_ic1037.bin", 0x004000, 0x002000, CRC(55cbafef) SHA1(e3376b92f80d5a698cdcb2afaa0f3ef4341dd624), ROM_BIOS(1) )
 
-	ROM_SYSTEM_BIOS( 1, "orig", "Plain Alphatronic")
+	ROM_SYSTEM_BIOS( 1, "pcb-ii", "Alphatronic PC PCB-II")
 	ROMX_LOAD( "613256.ic-1058", 0x0000, 0x6000, CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467), ROM_BIOS(2) )
 	ROMX_LOAD( "2764.ic-1038",   0x8000, 0x2000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49), ROM_BIOS(2) )
+	
+	ROM_SYSTEM_BIOS( 2, "bicom", "Alphatronic PC PCB-II with BICOM Graphics extension") // correctly displays German Umlauts
+	ROMX_LOAD( "613256.ic-1058", 0x0000, 0x6000, CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467), ROM_BIOS(3) )
+	ROMX_LOAD( "tapcgv2_ic1038.bin",   0x8000, 0x2000, CRC(446b4235) SHA1(ef835ae46b3fdfe6a6f394971396a577528e7b5a), ROM_BIOS(3) )	
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROMX_LOAD( "4_b4-0_ic1067.bin", 0x000000, 0x001000, CRC(00796934) SHA1(8e70f77cfe3eb2ec2051f660518da5c9d409119a), ROM_BIOS(1) )
 	ROMX_LOAD( "2732.ic-1067",   0x0000, 0x1000, CRC(61f38814) SHA1(35ba31c58a10d5bd1bdb202717792ca021dbe1a8), ROM_BIOS(2) )
+	ROMX_LOAD( "b40r_ic1067.bin",   0x0000, 0x1000, CRC(543e3ee8) SHA1(3e6c6f8c85d3a5d0735edfec52709c5670ff1646), ROM_BIOS(3) )
 ROM_END
 
 COMP( 1983, alphatro,   0,        0,    alphatro,   alphatro, alphatro_state,  0,  "Triumph-Adler", "Alphatronic PC", MACHINE_SUPPORTS_SAVE )
