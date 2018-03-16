@@ -118,4 +118,4 @@ ROM_START( cit220p )
 	ROM_LOAD( "v00_kbd.bin",   0x0000, 0x1000, CRC(f9d24190) SHA1(c4e9ef8188afb18de373f2a537ca9b7a315bfb76) )
 ROM_END
 
-COMP( 1983, cit220p, 0, 0, cit220p, cit220p, cit220_state, 0, "C. Itoh", "CIT-220+ Video Terminal", MACHINE_IS_SKELETON )
+COMP( 1984, cit220p, 0, 0, cit220p, cit220p, cit220_state, 0, "C. Itoh Electronics", "CIT-220+ Video Terminal", MACHINE_IS_SKELETON )

@@ -4,6 +4,43 @@
 
 Skeleton driver for first-generation C. Itoh video terminals.
 
+CIT-101 (released December 1980)
+    C. Itoh's first terminal, based on DEC VT100. ANSI X3.64 and V52 compatible.
+    12-inch monochrome screen displaying 24 lines of 80 or 132 characters.
+    8 x 10 character cell, 10 x 10 (80 columns)/9 x 10 (132 columns) display cell.
+    15,600 Hz horizontal frequency; 50 Hz/60 Hz vertical frequency selectable.
+    Cursor may be selected as blinking or solid block/underline, or invisible.
+    7 or 8 bit ASCII characters.
+    RS232-C or 20 mA current loop communications and auxiliary (printer) ports.
+    85-key detachable keyboard with 7 LEDs and settable key click.
+CIT-80 (released September 1981)
+    "Entry-level version" of CIT-101.
+    12-inch monochrome screen displaying 24 lines of 80 characters.
+    7-bit characters only.
+CIT-161 (released 1982)
+    Colorized version of the CIT-101.
+    12-inch color screen displaying 24 lines of 80 or 132 characters.
+    64 combinations of 8 colors are programmable.
+CIT-500 (released 1982)
+    Word processing terminal with full page display.
+    15-inch vertically oriented monochrome screen with tilt/swivel.
+    64 lines of 80 characters (interlaced).
+    105-key keyboard.
+CIT-101e (released 1983)
+    Ergonomic redesign of CIT-101.
+    Competitive with DEC VT220 (which was released several months later).
+    14-inch monochrome screen with tilt/swivel, 24 lines of 80 or 132 characters.
+    85-key low-profile keyboard.
+CIG-201
+    Plug-in graphics card for CIT-101 and CIT-101e.
+    Compatible with Tektronix 4010/4014.
+CIG-261
+    Plug-in color graphics card for CIT-161.
+    Compatible with Tektronix 4010/4014.
+CIG-267
+    Plug-in color graphics card for CIT-161.
+    Compatible with Tektronix 4027A.
+
 ************************************************************************************************************************************/
 
 #include "emu.h"
@@ -148,4 +185,4 @@ ROM_START( cit101 )
 	ROM_LOAD( "1H (5H 1 02) Char ROM.BIN", 0x0000, 0x1000, CRC(ee0ff889) SHA1(a74ada19d19041b29e1b49aaf57ba7d9d54575e1) )
 ROM_END
 
-COMP( 1981, cit101, 0, 0, cit101, cit101, cit101_state, 0, "C. Itoh", "CIT-101", MACHINE_IS_SKELETON )
+COMP( 1980, cit101, 0, 0, cit101, cit101, cit101_state, 0, "C. Itoh Electronics", "CIT-101", MACHINE_IS_SKELETON )
