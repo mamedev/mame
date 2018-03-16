@@ -8097,14 +8097,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="alt_title" value="ドリマガGD Vol.2" />
 		<info name="ring_code" value="610-7164-0128 1MB1 C 97 (Disc 1), 610-7164-0129 1M1 C 97, 610-7164-0129 1M5 C 97 (Disc 2)"/>
 		<part interface="dc_gdrom" name="gdrom1">
-			<diskarea name="gdrom">
 			<feature name="part_id" value="Disc 1"/>
+			<diskarea name="gdrom">
 				<disk name="dorimaga gd vol. 2 (jpn) (disc 1)" sha1="49abe4f9ef4c56f267b6e1c990d361a88c985b0c"/>
 			</diskarea>
 		</part>
 		<part interface="dc_gdrom" name="gdrom2">
-			<diskarea name="gdrom">
 			<feature name="part_id" value="Disc 2"/>
+			<diskarea name="gdrom">
 				<disk name="dorimaga gd vol. 2 (jpn) (disc 2)" sha1="8c46be4f4e8b87a0107b0a7c64e6988db856640e"/>
 			</diskarea>
 		</part>
@@ -14401,7 +14401,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	The English (T-8108D-05), Italian (T-8108D-13), German (T-8108D-18), Dutch/French (T-8108D-59) and Spanish (T-8108D-06) releases
 	all share the same disc (T-8108D-50).
 	-->
-	<software name="teeoff" cloneof="teeoff">
+	<software name="teeoffe" cloneof="teeoff">
 		<!--
 		<rom name="Tee Off v1.002 (2000)(Acclaim)(PAL)[!].gdi" size="88" md5="ebfa20655976b113837f162e5aff4e9f" sha1="639b5a95deb0231e933d0e93d5e6e16923d4c7b5"/>
 		<rom name="track01.bin" size="15262128" md5="9142e7a2bd0369c00f58bf319496ac69" sha1="7a550a76f3428ef8d71e346ff717b072c1419488"/>
