@@ -17,6 +17,8 @@
 #include "debug/debugcmd.h"
 #include "debugger.h"
 
+#include "screen.h"
+
 class saturn_state : public driver_device
 {
 public:
@@ -33,6 +35,7 @@ public:
 			m_smpc_hle(*this, "smpc"),
 			m_scu(*this, "scu"),
 			m_gfxdecode(*this, "gfxdecode"),
+			m_screen(*this, "screen"),
 			m_palette(*this, "palette")
 	{
 	}
@@ -102,6 +105,7 @@ public:
 	required_device<smpc_hle_device> m_smpc_hle;
 	required_device<sega_scu_device> m_scu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	bitmap_rgb32 m_tmpbitmap;

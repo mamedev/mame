@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "h83008.h"
 
-DEFINE_DEVICE_TYPE(H83008, h83008_device, "h83008", "H8/3008")
+DEFINE_DEVICE_TYPE(H83008, h83008_device, "h83008", "Hitachi H8/3008")
 
 h83008_device::h83008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8h_device(mconfig, H83008, tag, owner, clock, address_map_constructor(FUNC(h83008_device::map), this)),

@@ -43,8 +43,6 @@ public:
 	DECLARE_READ8_MEMBER(read_5841);
 	DECLARE_WRITE8_MEMBER(write_5841);
 	DECLARE_READ8_MEMBER(read_5842);
-	DECLARE_WRITE8_MEMBER(write_5842);
-	DECLARE_READ8_MEMBER(read_5843);
 	DECLARE_WRITE8_MEMBER(write_5843);
 	DECLARE_READ8_MEMBER(read_5846);
 	DECLARE_READ8_MEMBER(read_5847);
@@ -112,19 +110,6 @@ READ8_MEMBER(ampex_state::read_5842)
 	return 0;
 }
 
-WRITE8_MEMBER(ampex_state::write_5842)
-{
-	m_uart->set_transmit_data(data);
-}
-
-READ8_MEMBER(ampex_state::read_5843)
-{
-	m_uart->write_rdav(0);
-	u8 data = m_uart->get_received_data();
-	m_uart->write_rdav(1);
-	return data;
-}
-
 WRITE8_MEMBER(ampex_state::write_5843)
 {
 	logerror("%s: Write %02X to 5843\n", machine().describe_context(), data);
@@ -172,20 +157,21 @@ WRITE_LINE_MEMBER(ampex_state::dav_w)
 	// DAV should generate RST 7
 }
 
-ADDRESS_MAP_START(ampex_state::mem_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM // main RAM
-	AM_RANGE(0x4400, 0x57ff) AM_RAM // expansion RAM
-	AM_RANGE(0x5840, 0x5840) AM_READWRITE(read_5840, write_5840)
-	AM_RANGE(0x5841, 0x5841) AM_READWRITE(read_5841, write_5841)
-	AM_RANGE(0x5842, 0x5842) AM_READWRITE(read_5842, write_5842)
-	AM_RANGE(0x5843, 0x5843) AM_READWRITE(read_5843, write_5843)
-	AM_RANGE(0x5846, 0x5846) AM_READ(read_5846)
-	AM_RANGE(0x5847, 0x5847) AM_READ(read_5847)
-	AM_RANGE(0x5c00, 0x5c0f) AM_DEVREADWRITE("vtac", crt5037_device, read, write)
-	AM_RANGE(0x8000, 0x97ff) AM_READWRITE(page_r, page_w)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM // video RAM
-ADDRESS_MAP_END
+void ampex_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom().region("roms", 0);
+	map(0x4000, 0x43ff).ram(); // main RAM
+	map(0x4400, 0x57ff).ram(); // expansion RAM
+	map(0x5840, 0x5840).rw(this, FUNC(ampex_state::read_5840), FUNC(ampex_state::write_5840));
+	map(0x5841, 0x5841).rw(this, FUNC(ampex_state::read_5841), FUNC(ampex_state::write_5841));
+	map(0x5842, 0x5842).r(this, FUNC(ampex_state::read_5842)).w(m_uart, FUNC(ay31015_device::transmit));
+	map(0x5843, 0x5843).r(m_uart, FUNC(ay31015_device::receive)).w(this, FUNC(ampex_state::write_5843));
+	map(0x5846, 0x5846).r(this, FUNC(ampex_state::read_5846));
+	map(0x5847, 0x5847).r(this, FUNC(ampex_state::read_5847));
+	map(0x5c00, 0x5c0f).rw("vtac", FUNC(crt5037_device::read), FUNC(crt5037_device::write));
+	map(0x8000, 0x97ff).rw(this, FUNC(ampex_state::page_r), FUNC(ampex_state::page_w));
+	map(0xc000, 0xcfff).ram(); // video RAM
+}
 
 static INPUT_PORTS_START( ampex )
 INPUT_PORTS_END
@@ -235,6 +221,7 @@ MACHINE_CONFIG_START(ampex_state::ampex)
 	MCFG_DEVICE_ADD("uart", AY31015, 0) // COM8017, actually
 	MCFG_AY31015_WRITE_SO_CB(WRITELINE(ampex_state, so_w))
 	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(ampex_state, dav_w))
+	MCFG_AY31015_AUTO_RDAV(true)
 
 	MCFG_DEVICE_ADD("dbrg", COM5016_5, XTAL(4'915'200))
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("uart", ay31015_device, write_rcp))

@@ -61,15 +61,17 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	uint32_t sis_pcm_r(int function, int reg, uint32_t mem_mask);
+	void sis_pcm_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
 // regs 0x00-0x3f both devices below
 // regs 0x40-0x7f SiS85C496 PCI & CPU Memory Controller (PCM)
 // regs 0x80-0xff SiS85C497 AT Bus Controller & Megacell (ATM)
-static uint32_t sis_pcm_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t photoply_state::sis_pcm_r(int function, int reg, uint32_t mem_mask)
 {
 	uint32_t r = 0;
-	photoply_state *state = busdevice->machine().driver_data<photoply_state>();
 
 	//printf("PCM %02x %08x\n",reg,mem_mask);
 	if(reg == 0)
@@ -92,17 +94,15 @@ static uint32_t sis_pcm_r(device_t *busdevice, device_t *device, int function, i
 	{
 
 		if(ACCESSING_BITS_8_15) // reg 0x45
-			r |= (state->m_pci_shadow_reg & 0xff00);
+			r |= (m_pci_shadow_reg & 0xff00);
 		if(ACCESSING_BITS_0_7) // reg 0x44
-			r |= (state->m_pci_shadow_reg & 0x00ff);
+			r |= (m_pci_shadow_reg & 0x00ff);
 	}
 	return r;
 }
 
-static void sis_pcm_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void photoply_state::sis_pcm_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	photoply_state *state = busdevice->machine().driver_data<photoply_state>();
-
 	if(reg == 0x44)
 	{
 
@@ -116,7 +116,7 @@ static void sis_pcm_w(device_t *busdevice, device_t *device, int function, int r
 		 * ---- ---x Shadow RAM Write Control (0=Enable)
 		 */
 		if(ACCESSING_BITS_8_15)
-			state->m_pci_shadow_reg = (data & 0xff00) | (state->m_pci_shadow_reg & 0x00ff);
+			m_pci_shadow_reg = (data & 0xff00) | (m_pci_shadow_reg & 0x00ff);
 
 		/*
 		 * shadow RAM enable:
@@ -125,9 +125,9 @@ static void sis_pcm_w(device_t *busdevice, device_t *device, int function, int r
 		 * bit 0: 0xc0000-0xc7fff shadow RAM enable
 		 */
 		if(ACCESSING_BITS_0_7) // reg 0x44
-			state->m_pci_shadow_reg = (data & 0x00ff) | (state->m_pci_shadow_reg & 0xff00);
+			m_pci_shadow_reg = (data & 0x00ff) | (m_pci_shadow_reg & 0xff00);
 
-		//printf("%04x\n",state->m_pci_shadow_reg);
+		//printf("%04x\n",m_pci_shadow_reg);
 	}
 }
 
@@ -190,37 +190,39 @@ WRITE8_MEMBER(photoply_state::eeprom_w)
 	// Bits 4-7 are set for some writes, but may do nothing?
 }
 
-ADDRESS_MAP_START(photoply_state::photoply_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, mem_r, mem_w, 0xffffffff)
+void photoply_state::photoply_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(cirrus_gd5446_device::mem_r), FUNC(cirrus_gd5446_device::mem_w));
 //  AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
 //  AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_REGION("ex_bios", 0)
-	AM_RANGE(0x000c0000, 0x000fffff) AM_READWRITE8(bios_r,bios_w,0xffffffff)
-	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM // 64MB RAM, guess!
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+	map(0x000c0000, 0x000fffff).rw(this, FUNC(photoply_state::bios_r), FUNC(photoply_state::bios_w));
+	map(0x00100000, 0x07ffffff).ram(); // 64MB RAM, guess!
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
+}
 
 
 
-ADDRESS_MAP_START(photoply_state::photoply_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x00e8, 0x00eb) AM_NOP
+void photoply_state::photoply_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x00e8, 0x00eb).noprw();
 
-	AM_RANGE(0x0170, 0x0177) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs0, write_cs0)
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
-	AM_RANGE(0x0200, 0x0203) AM_WRITE8(eeprom_w, 0x00ff0000)
+	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
+	map(0x0202, 0x0202).w(this, FUNC(photoply_state::eeprom_w));
 //  AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
-	AM_RANGE(0x0370, 0x0377) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs1, write_cs1)
+	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
 //  AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, port_03d0_r, port_03d0_w, 0xffffffff)
+	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5446_device::port_03b0_r), FUNC(cirrus_gd5446_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5446_device::port_03c0_r), FUNC(cirrus_gd5446_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5446_device::port_03d0_r), FUNC(cirrus_gd5446_device::port_03d0_w));
 
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs1, write_cs1)
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
 
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 
-ADDRESS_MAP_END
+}
 
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
@@ -305,7 +307,7 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 
 	pcat_common(config);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", photoply )
+	MCFG_GFXDECODE_ADD("gfxdecode", "vga", photoply )
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
@@ -314,14 +316,14 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir7_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(5, nullptr, sis_pcm_r, sis_pcm_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(5, DEVICE_SELF, photoply_state, sis_pcm_r, sis_pcm_w)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5446_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5446, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))

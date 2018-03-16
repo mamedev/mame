@@ -199,77 +199,82 @@ READ8_MEMBER(vendetta_state::z80_irq_r)
 
 /********************************************/
 
-ADDRESS_MAP_START(vendetta_state::main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
+void vendetta_state::main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr("bank1");
+	map(0x2000, 0x3fff).ram();
 
 	/* what is the desired effect of overlapping these memory regions anyway? */
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
+	map(0x4000, 0x7fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 
-	AM_RANGE(0x4000, 0x4fff) AM_DEVICE("videobank0", address_map_bank_device, amap8)
-	AM_RANGE(0x5f80, 0x5f9f) AM_DEVREADWRITE("k054000", k054000_device, read, write)
-	AM_RANGE(0x5fa0, 0x5faf) AM_DEVWRITE("k053251", k053251_device, write)
-	AM_RANGE(0x5fb0, 0x5fb7) AM_DEVWRITE("k053246", k053247_device, k053246_w)
-	AM_RANGE(0x5fc0, 0x5fc0) AM_READ_PORT("P1")
-	AM_RANGE(0x5fc1, 0x5fc1) AM_READ_PORT("P2")
-	AM_RANGE(0x5fc2, 0x5fc2) AM_READ_PORT("P3")
-	AM_RANGE(0x5fc3, 0x5fc3) AM_READ_PORT("P4")
-	AM_RANGE(0x5fd0, 0x5fd0) AM_READ_PORT("EEPROM")
-	AM_RANGE(0x5fd1, 0x5fd1) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x5fe0, 0x5fe0) AM_WRITE(_5fe0_w)
-	AM_RANGE(0x5fe2, 0x5fe2) AM_WRITE(eeprom_w)
-	AM_RANGE(0x5fe4, 0x5fe4) AM_READWRITE(z80_irq_r, z80_irq_w)
-	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREADWRITE("k053260", k053260_device, main_read, main_write)
-	AM_RANGE(0x5fe8, 0x5fe9) AM_DEVREAD("k053246", k053247_device, k053246_r)
-	AM_RANGE(0x5fea, 0x5fea) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x6000, 0x6fff) AM_DEVICE("videobank1", address_map_bank_device, amap8)
+	map(0x4000, 0x4fff).m(m_videobank0, FUNC(address_map_bank_device::amap8));
+	map(0x5f80, 0x5f9f).rw(m_k054000, FUNC(k054000_device::read), FUNC(k054000_device::write));
+	map(0x5fa0, 0x5faf).w(m_k053251, FUNC(k053251_device::write));
+	map(0x5fb0, 0x5fb7).w(m_k053246, FUNC(k053247_device::k053246_w));
+	map(0x5fc0, 0x5fc0).portr("P1");
+	map(0x5fc1, 0x5fc1).portr("P2");
+	map(0x5fc2, 0x5fc2).portr("P3");
+	map(0x5fc3, 0x5fc3).portr("P4");
+	map(0x5fd0, 0x5fd0).portr("EEPROM");
+	map(0x5fd1, 0x5fd1).portr("SERVICE");
+	map(0x5fe0, 0x5fe0).w(this, FUNC(vendetta_state::_5fe0_w));
+	map(0x5fe2, 0x5fe2).w(this, FUNC(vendetta_state::eeprom_w));
+	map(0x5fe4, 0x5fe4).rw(this, FUNC(vendetta_state::z80_irq_r), FUNC(vendetta_state::z80_irq_w));
+	map(0x5fe6, 0x5fe7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
+	map(0x5fe8, 0x5fe9).r(m_k053246, FUNC(k053247_device::k053246_r));
+	map(0x5fea, 0x5fea).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x6000, 0x6fff).m(m_videobank1, FUNC(address_map_bank_device::amap8));
 
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x38000)
-ADDRESS_MAP_END
+	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
+}
 
-ADDRESS_MAP_START(vendetta_state::esckids_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM                         // 053248 64K SRAM
+void vendetta_state::esckids_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();                         // 053248 64K SRAM
 	/* what is the desired effect of overlapping these memory regions anyway? */
-	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)            // 052109 (Tilemap)
+	map(0x2000, 0x5fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));            // 052109 (Tilemap)
 
-	AM_RANGE(0x2000, 0x2fff) AM_DEVICE("videobank0", address_map_bank_device, amap8)    // 052109 (Tilemap) 0x0000-0x0fff - 052109 (Tilemap)
-	AM_RANGE(0x3f80, 0x3f80) AM_READ_PORT("P1")
-	AM_RANGE(0x3f81, 0x3f81) AM_READ_PORT("P2")
-	AM_RANGE(0x3f82, 0x3f82) AM_READ_PORT("P3")             // ???  (But not used)
-	AM_RANGE(0x3f83, 0x3f83) AM_READ_PORT("P4")             // ???  (But not used)
-	AM_RANGE(0x3f92, 0x3f92) AM_READ_PORT("EEPROM")
-	AM_RANGE(0x3f93, 0x3f93) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x3fa0, 0x3fa7) AM_DEVWRITE("k053246", k053247_device, k053246_w)           // 053246 (Sprite)
-	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE("k053251", k053251_device, write)           // 053251 (Priority Encoder)
-	AM_RANGE(0x3fc0, 0x3fcf) AM_DEVREADWRITE("k053252", k053252_device, read, write)              // Not Emulated (053252 ???)
-	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE(_5fe0_w)      // Coin Counter, 052109 RMRD, 053246 OBJCHA
-	AM_RANGE(0x3fd2, 0x3fd2) AM_WRITE(eeprom_w)    // EEPROM, Video banking
-	AM_RANGE(0x3fd4, 0x3fd4) AM_READWRITE(z80_irq_r, z80_irq_w)            // Sound
-	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVREADWRITE("k053260", k053260_device, main_read, main_write) // Sound
-	AM_RANGE(0x3fd8, 0x3fd9) AM_DEVREAD("k053246", k053247_device, k053246_r)                // 053246 (Sprite)
-	AM_RANGE(0x3fda, 0x3fda) AM_WRITENOP                // Not Emulated (Watchdog ???)
-	AM_RANGE(0x4000, 0x4fff) AM_DEVICE("videobank1", address_map_bank_device, amap8)    // 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")                    // 053248 '975r01' 1M ROM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x18000)  // 053248 '975r01' 1M ROM (0x18000-0x1ffff)
-ADDRESS_MAP_END
+	map(0x2000, 0x2fff).m(m_videobank0, FUNC(address_map_bank_device::amap8));    // 052109 (Tilemap) 0x0000-0x0fff - 052109 (Tilemap)
+	map(0x3f80, 0x3f80).portr("P1");
+	map(0x3f81, 0x3f81).portr("P2");
+	map(0x3f82, 0x3f82).portr("P3");             // ???  (But not used)
+	map(0x3f83, 0x3f83).portr("P4");             // ???  (But not used)
+	map(0x3f92, 0x3f92).portr("EEPROM");
+	map(0x3f93, 0x3f93).portr("SERVICE");
+	map(0x3fa0, 0x3fa7).w(m_k053246, FUNC(k053247_device::k053246_w));           // 053246 (Sprite)
+	map(0x3fb0, 0x3fbf).w(m_k053251, FUNC(k053251_device::write));           // 053251 (Priority Encoder)
+	map(0x3fc0, 0x3fcf).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));              // Not Emulated (053252 ???)
+	map(0x3fd0, 0x3fd0).w(this, FUNC(vendetta_state::_5fe0_w));      // Coin Counter, 052109 RMRD, 053246 OBJCHA
+	map(0x3fd2, 0x3fd2).w(this, FUNC(vendetta_state::eeprom_w));    // EEPROM, Video banking
+	map(0x3fd4, 0x3fd4).rw(this, FUNC(vendetta_state::z80_irq_r), FUNC(vendetta_state::z80_irq_w));            // Sound
+	map(0x3fd6, 0x3fd7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)); // Sound
+	map(0x3fd8, 0x3fd9).r(m_k053246, FUNC(k053247_device::k053246_r));                // 053246 (Sprite)
+	map(0x3fda, 0x3fda).nopw();                // Not Emulated (Watchdog ???)
+	map(0x4000, 0x4fff).m(m_videobank1, FUNC(address_map_bank_device::amap8));    // 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
+	map(0x6000, 0x7fff).bankr("bank1");                    // 053248 '975r01' 1M ROM (Banked)
+	map(0x8000, 0xffff).rom().region("maincpu", 0x18000);  // 053248 '975r01' 1M ROM (0x18000-0x1ffff)
+}
 
-ADDRESS_MAP_START(vendetta_state::videobank0_map)
-	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
-	AM_RANGE(0x1000, 0x1fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_r, k053247_w)
-ADDRESS_MAP_END
+void vendetta_state::videobank0_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
+	map(0x1000, 0x1fff).rw(m_k053246, FUNC(k053247_device::k053247_r), FUNC(k053247_device::k053247_w));
+}
 
-ADDRESS_MAP_START(vendetta_state::videobank1_map)
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(K052109_r, K052109_w)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void vendetta_state::videobank1_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rw(this, FUNC(vendetta_state::K052109_r), FUNC(vendetta_state::K052109_w));
+	map(0x1000, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(vendetta_state::sound_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(z80_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
-ADDRESS_MAP_END
+void vendetta_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xfa00, 0xfa00).w(this, FUNC(vendetta_state::z80_arm_nmi_w));
+	map(0xfc00, 0xfc2f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
+}
 
 /***************************************************************************
 

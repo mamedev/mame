@@ -140,18 +140,19 @@ READ32_MEMBER(micro20_state::buserror_r)
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(micro20_state::micro20_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x00200000, 0x002fffff) AM_READ(buserror_r)
-	AM_RANGE(0x00800000, 0x0083ffff) AM_ROM AM_REGION("bootrom", 0)
-	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_device, status_r, cmd_w,    0xff000000)
-	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_device, track_r, track_w,   0x00ff0000)
-	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_device, sector_r, sector_w, 0x0000ff00)
-	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_device, data_r, data_w,     0x000000ff)
-	AM_RANGE(0xffff8080, 0xffff808f) AM_DEVREADWRITE8(DUART_A_TAG, mc68681_device, read, write, 0xffffffff)
-	AM_RANGE(0xffff80a0, 0xffff80af) AM_DEVREADWRITE8(DUART_B_TAG, mc68681_device, read, write, 0xffffffff)
-	AM_RANGE(0xffff80c0, 0xffff80df) AM_DEVREADWRITE8(PIT_TAG, pit68230_device, read, write, 0xffffffff)
-ADDRESS_MAP_END
+void micro20_state::micro20_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("mainram");
+	map(0x00200000, 0x002fffff).r(this, FUNC(micro20_state::buserror_r));
+	map(0x00800000, 0x0083ffff).rom().region("bootrom", 0);
+	map(0xffff8000, 0xffff8000).rw(FDC_TAG, FUNC(wd1772_device::status_r), FUNC(wd1772_device::cmd_w));
+	map(0xffff8001, 0xffff8001).rw(FDC_TAG, FUNC(wd1772_device::track_r), FUNC(wd1772_device::track_w));
+	map(0xffff8002, 0xffff8002).rw(FDC_TAG, FUNC(wd1772_device::sector_r), FUNC(wd1772_device::sector_w));
+	map(0xffff8003, 0xffff8003).rw(FDC_TAG, FUNC(wd1772_device::data_r), FUNC(wd1772_device::data_w));
+	map(0xffff8080, 0xffff808f).rw(DUART_A_TAG, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
+	map(0xffff80a0, 0xffff80af).rw(DUART_B_TAG, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
+	map(0xffff80c0, 0xffff80df).rw(m_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write));
+}
 
 MACHINE_CONFIG_START(micro20_state::micro20)
 	/* basic machine hardware */

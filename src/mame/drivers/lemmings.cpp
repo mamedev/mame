@@ -68,32 +68,34 @@ WRITE16_MEMBER( lemmings_state::lem_protection_region_0_146_w )
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(lemmings_state::lemmings_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x160000, 0x160fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x170000, 0x17000f) AM_RAM_WRITE(lemmings_control_w) AM_SHARE("control_data")
-	AM_RANGE(0x190000, 0x19000f) AM_READ(lemmings_trackball_r)
-	AM_RANGE(0x1a0000, 0x1a3fff) AM_READWRITE(lem_protection_region_0_146_r,lem_protection_region_0_146_w)AM_SHARE("prot16ram") /* Protection device */
-	AM_RANGE(0x1c0000, 0x1c0001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* 1 written once a frame */
-	AM_RANGE(0x1e0000, 0x1e0001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write) /* 1 written once a frame */
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(lemmings_vram_w) AM_SHARE("vram_data")
-	AM_RANGE(0x202000, 0x202fff) AM_RAM
-	AM_RANGE(0x300000, 0x37ffff) AM_RAM_WRITE(lemmings_pixel_0_w) AM_SHARE("pixel_0_data")
-	AM_RANGE(0x380000, 0x39ffff) AM_RAM_WRITE(lemmings_pixel_1_w) AM_SHARE("pixel_1_data")
-ADDRESS_MAP_END
+void lemmings_state::lemmings_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x120000, 0x1207ff).ram().share("spriteram");
+	map(0x140000, 0x1407ff).ram().share("spriteram2");
+	map(0x160000, 0x160fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x170000, 0x17000f).ram().w(this, FUNC(lemmings_state::lemmings_control_w)).share("control_data");
+	map(0x190000, 0x19000f).r(this, FUNC(lemmings_state::lemmings_trackball_r));
+	map(0x1a0000, 0x1a3fff).rw(this, FUNC(lemmings_state::lem_protection_region_0_146_r), FUNC(lemmings_state::lem_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
+	map(0x1c0000, 0x1c0001).w(m_spriteram, FUNC(buffered_spriteram16_device::write)); /* 1 written once a frame */
+	map(0x1e0000, 0x1e0001).w(m_spriteram2, FUNC(buffered_spriteram16_device::write)); /* 1 written once a frame */
+	map(0x200000, 0x201fff).ram().w(this, FUNC(lemmings_state::lemmings_vram_w)).share("vram_data");
+	map(0x202000, 0x202fff).ram();
+	map(0x300000, 0x37ffff).ram().w(this, FUNC(lemmings_state::lemmings_pixel_0_w)).share("pixel_0_data");
+	map(0x380000, 0x39ffff).ram().w(this, FUNC(lemmings_state::lemmings_pixel_1_w)).share("pixel_1_data");
+}
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(lemmings_state::sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
-	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("ioprot", deco_146_base_device, soundlatch_r) AM_WRITENOP // writes an extra irq ack?
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void lemmings_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x1000, 0x1000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x1800, 0x1800).r(m_deco146, FUNC(deco_146_base_device::soundlatch_r)).nopw(); // writes an extra irq ack?
+	map(0x8000, 0xffff).rom();
+}
 
 /******************************************************************************/
 

@@ -503,13 +503,15 @@ void psx1_state::cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t
 	printf("cd_dma_write?!: addr %x, size %x\n", n_address, n_size);
 }
 
-ADDRESS_MAP_START(psx1_state::psx_map)
-	AM_RANGE(0x1f000000, 0x1f07ffff) AM_READWRITE16(parallel_r, parallel_w, 0xffffffff)
-ADDRESS_MAP_END
+void psx1_state::psx_map(address_map &map)
+{
+	map(0x1f000000, 0x1f07ffff).rw(this, FUNC(psx1_state::parallel_r), FUNC(psx1_state::parallel_w));
+}
 
-ADDRESS_MAP_START(psx1_state::subcpu_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void psx1_state::subcpu_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
 MACHINE_CONFIG_START(psx1_state::psj)
 	/* basic machine hardware */

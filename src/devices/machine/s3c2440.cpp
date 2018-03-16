@@ -250,8 +250,9 @@ DEFINE_DEVICE_TYPE(S3C2440, s3c2440_device, "s3c2440", "Samsung S3C2440 SoC")
 
 s3c2440_device::s3c2440_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, S3C2440, tag, owner, clock)
-	, m_palette(*this, finder_base::DUMMY_TAG)
 	, m_cpu(*this, ":maincpu")
+	, m_palette(*this, finder_base::DUMMY_TAG)
+	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_pin_r_cb(*this)
 	, m_pin_w_cb(*this)
 	, m_port_r_cb(*this)
@@ -261,11 +262,11 @@ s3c2440_device::s3c2440_device(const machine_config &mconfig, const char *tag, d
 	, m_sda_w_cb(*this)
 	, m_data_r_cb(*this)
 	, m_data_w_cb(*this)
+	, m_flags(0)
 	, m_command_w_cb(*this)
 	, m_address_w_cb(*this)
 	, m_nand_data_r_cb(*this)
 	, m_nand_data_w_cb(*this)
-	, m_flags(0)
 {
 	memset(m_steppingstone, 0, sizeof(m_steppingstone));
 	memset(&m_memcon, 0, sizeof(m_memcon));

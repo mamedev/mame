@@ -90,9 +90,9 @@ constexpr u16 M68HC05_INT_MASK          = M68HC05_INT_IRQ | M68HC05_INT_TIMER;
  * Global variables
  ****************************************************************************/
 
-DEFINE_DEVICE_TYPE(M68HC05C4,   m68hc05c4_device,   "m68hc05c4",   "MC68HC05C4")
-DEFINE_DEVICE_TYPE(M68HC05C8,   m68hc05c8_device,   "m68hc05c8",   "MC68HC05C8")
-DEFINE_DEVICE_TYPE(M68HC705C8A, m68hc705c8a_device, "m68hc705c8a", "MC68HC705C8A")
+DEFINE_DEVICE_TYPE(M68HC05C4,   m68hc05c4_device,   "m68hc05c4",   "Motorola MC68HC05C4")
+DEFINE_DEVICE_TYPE(M68HC05C8,   m68hc05c8_device,   "m68hc05c8",   "Motorola MC68HC05C8")
+DEFINE_DEVICE_TYPE(M68HC705C8A, m68hc705c8a_device, "m68hc705c8a", "Motorola MC68HC705C8A")
 
 
 

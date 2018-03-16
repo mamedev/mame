@@ -70,7 +70,7 @@ void electron_state::video_start()
 		m_map16[i] = ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x04 ) >> 1 ) | ( i & 0x01 );
 	}
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE_INTERRUPT);
-	m_scanline_timer->adjust( machine().first_screen()->time_until_pos(0), 0, machine().first_screen()->scan_period() );
+	m_scanline_timer->adjust( m_screen->time_until_pos(0), 0, m_screen->scan_period() );
 }
 
 inline uint8_t electron_state::read_vram(  uint16_t addr )
@@ -280,7 +280,7 @@ uint32_t electron_state::screen_update_electron(screen_device &screen, bitmap_in
 
 TIMER_CALLBACK_MEMBER(electron_state::electron_scanline_interrupt)
 {
-	switch (machine().first_screen()->vpos())
+	switch (m_screen->vpos())
 	{
 	case 43:
 		electron_interrupt_handler( INT_SET, INT_RTC );

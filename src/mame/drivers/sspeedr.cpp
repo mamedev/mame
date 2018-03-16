@@ -81,37 +81,39 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_sound_w)
 }
 
 
-ADDRESS_MAP_START(sspeedr_state::sspeedr_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x21ff) AM_RAM
-	AM_RANGE(0x7f00, 0x7f17) AM_WRITE(sspeedr_score_w)
-ADDRESS_MAP_END
+void sspeedr_state::sspeedr_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x21ff).ram();
+	map(0x7f00, 0x7f17).w(this, FUNC(sspeedr_state::sspeedr_score_w));
+}
 
 
-ADDRESS_MAP_START(sspeedr_state::sspeedr_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x00, 0x01) AM_WRITE(sspeedr_sound_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(sspeedr_lamp_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x04, 0x05) AM_WRITE(sspeedr_time_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(sspeedr_driver_horz_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(sspeedr_driver_pic_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(sspeedr_driver_horz_2_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(sspeedr_drones_horz_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(sspeedr_drones_horz_2_w)
-	AM_RANGE(0x15, 0x15) AM_WRITE(sspeedr_drones_mask_w)
-	AM_RANGE(0x16, 0x16) AM_WRITE(sspeedr_driver_vert_w)
-	AM_RANGE(0x17, 0x18) AM_WRITE(sspeedr_track_vert_w)
-	AM_RANGE(0x19, 0x19) AM_WRITE(sspeedr_track_horz_w)
-	AM_RANGE(0x1a, 0x1a) AM_WRITE(sspeedr_track_horz_2_w)
-	AM_RANGE(0x1b, 0x1b) AM_WRITE(sspeedr_track_ice_w)
-	AM_RANGE(0x1c, 0x1e) AM_WRITE(sspeedr_drones_vert_w)
-	AM_RANGE(0x1f, 0x1f) AM_WRITE(sspeedr_int_ack_w)
-ADDRESS_MAP_END
+void sspeedr_state::sspeedr_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x00, 0x01).w(this, FUNC(sspeedr_state::sspeedr_sound_w));
+	map(0x02, 0x02).w(this, FUNC(sspeedr_state::sspeedr_lamp_w));
+	map(0x03, 0x03).portr("DSW");
+	map(0x04, 0x04).portr("IN2");
+	map(0x04, 0x05).w(this, FUNC(sspeedr_state::sspeedr_time_w));
+	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x10, 0x10).w(this, FUNC(sspeedr_state::sspeedr_driver_horz_w));
+	map(0x11, 0x11).w(this, FUNC(sspeedr_state::sspeedr_driver_pic_w));
+	map(0x12, 0x12).w(this, FUNC(sspeedr_state::sspeedr_driver_horz_2_w));
+	map(0x13, 0x13).w(this, FUNC(sspeedr_state::sspeedr_drones_horz_w));
+	map(0x14, 0x14).w(this, FUNC(sspeedr_state::sspeedr_drones_horz_2_w));
+	map(0x15, 0x15).w(this, FUNC(sspeedr_state::sspeedr_drones_mask_w));
+	map(0x16, 0x16).w(this, FUNC(sspeedr_state::sspeedr_driver_vert_w));
+	map(0x17, 0x18).w(this, FUNC(sspeedr_state::sspeedr_track_vert_w));
+	map(0x19, 0x19).w(this, FUNC(sspeedr_state::sspeedr_track_horz_w));
+	map(0x1a, 0x1a).w(this, FUNC(sspeedr_state::sspeedr_track_horz_2_w));
+	map(0x1b, 0x1b).w(this, FUNC(sspeedr_state::sspeedr_track_ice_w));
+	map(0x1c, 0x1e).w(this, FUNC(sspeedr_state::sspeedr_drones_vert_w));
+	map(0x1f, 0x1f).w(this, FUNC(sspeedr_state::sspeedr_int_ack_w));
+}
 
 
 static const ioport_value sspeedr_controller_table[] =

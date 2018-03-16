@@ -388,39 +388,41 @@ READ8_MEMBER(jackie_state::expram_r)
 }
 
 
-ADDRESS_MAP_START(jackie_state::jackie_prg_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("maincpu", 0xf000)
-ADDRESS_MAP_END
+void jackie_state::jackie_prg_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xffff).ram().region("maincpu", 0xf000);
+}
 
-ADDRESS_MAP_START(jackie_state::jackie_io_map)
-	AM_RANGE(0x0520, 0x0524) AM_WRITE(unk_reg1_lo_w)
-	AM_RANGE(0x0d20, 0x0d24) AM_WRITE(unk_reg1_hi_w)
-	AM_RANGE(0x0560, 0x0564) AM_WRITE(unk_reg2_lo_w)
-	AM_RANGE(0x0d60, 0x0d64) AM_WRITE(unk_reg2_hi_w)
-	AM_RANGE(0x05a0, 0x05a4) AM_WRITE(unk_reg3_lo_w)
-	AM_RANGE(0x0da0, 0x0da4) AM_WRITE(unk_reg3_hi_w)
-	AM_RANGE(0x1000, 0x1107) AM_RAM AM_SHARE("bg_scroll2")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")           /* DSW2 */
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")           /* DSW3 */
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")           /* DSW4 */
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")           /* DSW5 */
-	AM_RANGE(0x5080, 0x5083) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
-	AM_RANGE(0x5090, 0x5093) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
-	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
-	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
-	AM_RANGE(0x6000, 0x60ff) AM_RAM_WRITE(bg_scroll_w ) AM_SHARE("bg_scroll")
-	AM_RANGE(0x6800, 0x69ff) AM_RAM_WRITE(reel1_ram_w )  AM_SHARE("reel1_ram")
-	AM_RANGE(0x6a00, 0x6bff) AM_RAM_WRITE(reel2_ram_w )  AM_SHARE("reel2_ram")
-	AM_RANGE(0x6c00, 0x6dff) AM_RAM_WRITE(reel3_ram_w )  AM_SHARE("reel3_ram")
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
-	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
-	AM_RANGE(0x8000, 0xffff) AM_READ(expram_r)
-ADDRESS_MAP_END
+void jackie_state::jackie_io_map(address_map &map)
+{
+	map(0x0520, 0x0524).w(this, FUNC(jackie_state::unk_reg1_lo_w));
+	map(0x0d20, 0x0d24).w(this, FUNC(jackie_state::unk_reg1_hi_w));
+	map(0x0560, 0x0564).w(this, FUNC(jackie_state::unk_reg2_lo_w));
+	map(0x0d60, 0x0d64).w(this, FUNC(jackie_state::unk_reg2_hi_w));
+	map(0x05a0, 0x05a4).w(this, FUNC(jackie_state::unk_reg3_lo_w));
+	map(0x0da0, 0x0da4).w(this, FUNC(jackie_state::unk_reg3_hi_w));
+	map(0x1000, 0x1107).ram().share("bg_scroll2");
+	map(0x2000, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x2800, 0x2fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x4000, 0x4000).portr("DSW1");           /* DSW1 */
+	map(0x4001, 0x4001).portr("DSW2");           /* DSW2 */
+	map(0x4002, 0x4002).portr("DSW3");           /* DSW3 */
+	map(0x4003, 0x4003).portr("DSW4");           /* DSW4 */
+	map(0x4004, 0x4004).portr("DSW5");           /* DSW5 */
+	map(0x5080, 0x5083).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5090, 0x5093).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x50a0, 0x50a0).portr("BUTTONS2");
+	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x50c0, 0x50c0).r(this, FUNC(jackie_state::igs_irqack_r)).w(this, FUNC(jackie_state::igs_irqack_w));
+	map(0x6000, 0x60ff).ram().w(this, FUNC(jackie_state::bg_scroll_w)).share("bg_scroll");
+	map(0x6800, 0x69ff).ram().w(this, FUNC(jackie_state::reel1_ram_w)).share("reel1_ram");
+	map(0x6a00, 0x6bff).ram().w(this, FUNC(jackie_state::reel2_ram_w)).share("reel2_ram");
+	map(0x6c00, 0x6dff).ram().w(this, FUNC(jackie_state::reel3_ram_w)).share("reel3_ram");
+	map(0x7000, 0x77ff).ram().w(this, FUNC(jackie_state::fg_tile_w)).share("fg_tile_ram");
+	map(0x7800, 0x7fff).ram().w(this, FUNC(jackie_state::fg_color_w)).share("fg_color_ram");
+	map(0x8000, 0xffff).r(this, FUNC(jackie_state::expram_r));
+}
 
 CUSTOM_INPUT_MEMBER(jackie_state::hopper_r)
 {

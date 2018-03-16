@@ -127,22 +127,23 @@ WRITE8_MEMBER(joctronic_state::drivers_b_w)
 	logerror("drivers_b[%d] = $%02X\n", offset, data);
 }
 
-ADDRESS_MAP_START(joctronic_state::maincpu_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9000, 0x9007) AM_MIRROR(0x0ff8) AM_READ(csin_r) // CSIN
-	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x0ff8) AM_DEVWRITE("mainlatch", ls259_device, write_d0) // PORTDS
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0fc7) AM_WRITE(display_1_w) // CSD1
-	AM_RANGE(0xc008, 0xc008) AM_MIRROR(0x0fc7) AM_WRITE(display_2_w) // CSD2
-	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x0fc7) AM_WRITE(display_3_w) // CSD3
-	AM_RANGE(0xc018, 0xc018) AM_MIRROR(0x0fc7) AM_WRITE(display_4_w) // CSD4
-	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x0fc7) AM_WRITE(display_a_w) // CSDA
-	AM_RANGE(0xc028, 0xc028) AM_MIRROR(0x0fc7) AM_WRITE(drivers_l_w) // OL
-	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0x0fc7) AM_WRITE(drivers_b_w) // OB
-	AM_RANGE(0xc038, 0xc03f) AM_MIRROR(0x0fc0) AM_WRITE(drivers_w) // OA
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x0fff) AM_WRITE(soundlatch_nmi_w) // PSON
-ADDRESS_MAP_END
+void joctronic_state::maincpu_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).mirror(0x4000).rom();
+	map(0x8000, 0x87ff).mirror(0x0800).ram().share("nvram");
+	map(0x9000, 0x9007).mirror(0x0ff8).r(this, FUNC(joctronic_state::csin_r)); // CSIN
+	map(0xa000, 0xa007).mirror(0x0ff8).w("mainlatch", FUNC(ls259_device::write_d0)); // PORTDS
+	map(0xc000, 0xc000).mirror(0x0fc7).w(this, FUNC(joctronic_state::display_1_w)); // CSD1
+	map(0xc008, 0xc008).mirror(0x0fc7).w(this, FUNC(joctronic_state::display_2_w)); // CSD2
+	map(0xc010, 0xc010).mirror(0x0fc7).w(this, FUNC(joctronic_state::display_3_w)); // CSD3
+	map(0xc018, 0xc018).mirror(0x0fc7).w(this, FUNC(joctronic_state::display_4_w)); // CSD4
+	map(0xc020, 0xc020).mirror(0x0fc7).w(this, FUNC(joctronic_state::display_a_w)); // CSDA
+	map(0xc028, 0xc028).mirror(0x0fc7).w(this, FUNC(joctronic_state::drivers_l_w)); // OL
+	map(0xc030, 0xc030).mirror(0x0fc7).w(this, FUNC(joctronic_state::drivers_b_w)); // OB
+	map(0xc038, 0xc03f).mirror(0x0fc0).w(this, FUNC(joctronic_state::drivers_w)); // OA
+	map(0xe000, 0xe000).mirror(0x0fff).w(this, FUNC(joctronic_state::soundlatch_nmi_w)); // PSON
+}
 
 READ8_MEMBER(joctronic_state::inputs_r)
 {
@@ -177,21 +178,22 @@ WRITE8_MEMBER(joctronic_state::display_ck_w)
 	logerror("display_ck[%d] = $%02X\n", offset, data);
 }
 
-ADDRESS_MAP_START(joctronic_state::slalom03_maincpu_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9000, 0x9007) AM_MIRROR(0x0ff8) AM_DEVWRITE("mainlatch", ls259_device, write_d0) // CSPORT
-	AM_RANGE(0xa008, 0xa008) AM_MIRROR(0x0fc7) AM_WRITE(display_strobe_w) // STROBE
-	AM_RANGE(0xa010, 0xa017) AM_MIRROR(0x0fc0) AM_WRITE(drivers_w)
-	AM_RANGE(0xa018, 0xa018) AM_MIRROR(0x0fc7) AM_WRITE(display_ck_w) // CKD
-	AM_RANGE(0xa020, 0xa020) AM_MIRROR(0x0fc7) AM_READ(inputs_r) // CSS
-	AM_RANGE(0xa028, 0xa028) AM_MIRROR(0x0fc7) AM_READNOP // N.C.
-	AM_RANGE(0xa030, 0xa030) AM_MIRROR(0x0fc7) AM_READNOP // N.C.
-	AM_RANGE(0xa038, 0xa038) AM_MIRROR(0x0fc7) AM_READ(ports_r) // CSP
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x0fff) AM_READ(csint_r) // CSINT
-	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0x0fff) AM_WRITE(soundlatch_nmi_pulse_w) // CSSON
-ADDRESS_MAP_END
+void joctronic_state::slalom03_maincpu_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).mirror(0x0800).ram().share("nvram");
+	map(0x9000, 0x9007).mirror(0x0ff8).w("mainlatch", FUNC(ls259_device::write_d0)); // CSPORT
+	map(0xa008, 0xa008).mirror(0x0fc7).w(this, FUNC(joctronic_state::display_strobe_w)); // STROBE
+	map(0xa010, 0xa017).mirror(0x0fc0).w(this, FUNC(joctronic_state::drivers_w));
+	map(0xa018, 0xa018).mirror(0x0fc7).w(this, FUNC(joctronic_state::display_ck_w)); // CKD
+	map(0xa020, 0xa020).mirror(0x0fc7).r(this, FUNC(joctronic_state::inputs_r)); // CSS
+	map(0xa028, 0xa028).mirror(0x0fc7).nopr(); // N.C.
+	map(0xa030, 0xa030).mirror(0x0fc7).nopr(); // N.C.
+	map(0xa038, 0xa038).mirror(0x0fc7).r(this, FUNC(joctronic_state::ports_r)); // CSP
+	map(0xe000, 0xe000).mirror(0x0fff).r(this, FUNC(joctronic_state::csint_r)); // CSINT
+	map(0xf000, 0xf000).mirror(0x0fff).w(this, FUNC(joctronic_state::soundlatch_nmi_pulse_w)); // CSSON
+}
 
 READ8_MEMBER(joctronic_state::bldyrolr_unknown_r)
 {
@@ -204,15 +206,17 @@ WRITE8_MEMBER(joctronic_state::bldyrolr_unknown_w)
 	logerror("bldyrolr_unknown = $%02X\n", data);
 }
 
-ADDRESS_MAP_START(joctronic_state::bldyrolr_maincpu_map)
-	AM_IMPORT_FROM(slalom03_maincpu_map)
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(bldyrolr_unknown_r, bldyrolr_unknown_w)
-ADDRESS_MAP_END
+void joctronic_state::bldyrolr_maincpu_map(address_map &map)
+{
+	slalom03_maincpu_map(map);
+	map(0xc000, 0xc000).rw(this, FUNC(joctronic_state::bldyrolr_unknown_r), FUNC(joctronic_state::bldyrolr_unknown_w));
+}
 
-ADDRESS_MAP_START(joctronic_state::maincpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x03)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void joctronic_state::maincpu_io_map(address_map &map)
+{
+	map.global_mask(0x03);
+	map(0x00, 0x03).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 WRITE8_MEMBER(joctronic_state::soundlatch_nmi_w)
 {
@@ -261,36 +265,40 @@ WRITE_LINE_MEMBER(joctronic_state::vck_w)
 	}
 }
 
-ADDRESS_MAP_START(joctronic_state::joctronic_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM // only lower half of 2016 used?
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(soundlatch_nmi_r) // SCSP
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_WRITE(resint_w)
-ADDRESS_MAP_END
+void joctronic_state::joctronic_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).mirror(0x4000).rom();
+	map(0x8000, 0x87ff).mirror(0x1800).ram(); // only lower half of 2016 used?
+	map(0xc000, 0xc000).mirror(0x1fff).r(this, FUNC(joctronic_state::soundlatch_nmi_r)); // SCSP
+	map(0xe000, 0xe000).mirror(0x1fff).w(this, FUNC(joctronic_state::resint_w));
+}
 
-ADDRESS_MAP_START(joctronic_state::joctronic_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x03)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("aysnd1", ay8910_device, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("aysnd1", ay8910_device, data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("aysnd2", ay8910_device, address_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("aysnd2", ay8910_device, data_w)
-ADDRESS_MAP_END
+void joctronic_state::joctronic_sound_io_map(address_map &map)
+{
+	map.global_mask(0x03);
+	map(0x00, 0x00).w("aysnd1", FUNC(ay8910_device::address_w));
+	map(0x01, 0x01).w("aysnd1", FUNC(ay8910_device::data_w));
+	map(0x02, 0x02).w("aysnd2", FUNC(ay8910_device::address_w));
+	map(0x03, 0x03).w("aysnd2", FUNC(ay8910_device::data_w));
+}
 
-ADDRESS_MAP_START(joctronic_state::slalom03_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM // only lower half of 2016 used?
-ADDRESS_MAP_END
+void joctronic_state::slalom03_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("soundbank");
+	map(0xc000, 0xc7ff).mirror(0x3800).ram(); // only lower half of 2016 used?
+}
 
-ADDRESS_MAP_START(joctronic_state::slalom03_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("aysnd1", ay8910_device, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("aysnd1", ay8910_device, data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("aysnd2", ay8910_device, address_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("aysnd2", ay8910_device, data_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x01) AM_READ(soundlatch_r) // CSPORT
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0x01) AM_WRITE(resint_w) // RESINT
-ADDRESS_MAP_END
+void joctronic_state::slalom03_sound_io_map(address_map &map)
+{
+	map.global_mask(0x07);
+	map(0x00, 0x00).w("aysnd1", FUNC(ay8910_device::address_w));
+	map(0x01, 0x01).w("aysnd1", FUNC(ay8910_device::data_w));
+	map(0x02, 0x02).w("aysnd2", FUNC(ay8910_device::address_w));
+	map(0x03, 0x03).w("aysnd2", FUNC(ay8910_device::data_w));
+	map(0x04, 0x04).mirror(0x01).r(this, FUNC(joctronic_state::soundlatch_r)); // CSPORT
+	map(0x06, 0x06).mirror(0x01).w(this, FUNC(joctronic_state::resint_w)); // RESINT
+}
 
 static const z80_daisy_config daisy_chain[] =
 {

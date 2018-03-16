@@ -553,33 +553,34 @@ READ16_MEMBER(srmp6_state::srmp6_irq_ack_r)
 	return 0; // value read doesn't matter
 }
 
-ADDRESS_MAP_START(srmp6_state::srmp6_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x23ffff) AM_RAM                 // work RAM
-	AM_RANGE(0x600000, 0x7fffff) AM_ROMBANK("bank1")    // banked ROM (used by ROM check)
-	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0)
+void srmp6_state::srmp6_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x23ffff).ram();                 // work RAM
+	map(0x600000, 0x7fffff).bankr("bank1");    // banked ROM (used by ROM check)
+	map(0x800000, 0x9fffff).rom().region("user1", 0);
 
-	AM_RANGE(0x300000, 0x300005) AM_READWRITE(srmp6_inputs_r, srmp6_input_select_w)     // inputs
-	AM_RANGE(0x480000, 0x480fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0x4d0000, 0x4d0001) AM_READ(srmp6_irq_ack_r)
+	map(0x300000, 0x300005).rw(this, FUNC(srmp6_state::srmp6_inputs_r), FUNC(srmp6_state::srmp6_input_select_w));     // inputs
+	map(0x480000, 0x480fff).ram().w(this, FUNC(srmp6_state::paletteram_w)).share("palette");
+	map(0x4d0000, 0x4d0001).r(this, FUNC(srmp6_state::srmp6_irq_ack_r));
 
 	// OBJ RAM: checked [$400000-$47dfff]
-	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_SHARE("sprram")
+	map(0x400000, 0x47ffff).ram().share("sprram");
 
 	// CHR RAM: checked [$500000-$5fffff]
-	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(tileram_r,tileram_w) AM_SHARE("chrram")
+	map(0x500000, 0x5fffff).rw(this, FUNC(srmp6_state::tileram_r), FUNC(srmp6_state::tileram_w)).share("chrram");
 	//AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE(dma_w) AM_SHARE("dmaram")
 
-	AM_RANGE(0x4c0000, 0x4c006f) AM_READWRITE(video_regs_r, video_regs_w) AM_SHARE("video_regs")    // ? gfx regs ST-0026 NiLe
-	AM_RANGE(0x4e0000, 0x4e00ff) AM_DEVREADWRITE("nile", nile_device, nile_snd_r, nile_snd_w)
-	AM_RANGE(0x4e0100, 0x4e0101) AM_DEVREADWRITE("nile", nile_device, nile_sndctrl_r, nile_sndctrl_w)
+	map(0x4c0000, 0x4c006f).rw(this, FUNC(srmp6_state::video_regs_r), FUNC(srmp6_state::video_regs_w)).share("video_regs");    // ? gfx regs ST-0026 NiLe
+	map(0x4e0000, 0x4e00ff).rw("nile", FUNC(nile_device::nile_snd_r), FUNC(nile_device::nile_snd_w));
+	map(0x4e0100, 0x4e0101).rw("nile", FUNC(nile_device::nile_sndctrl_r), FUNC(nile_device::nile_sndctrl_w));
 	//AM_RANGE(0x4e0110, 0x4e0111) AM_NOP // ? accessed once ($268dc, written $b.w)
 	//AM_RANGE(0x5fff00, 0x5fff1f) AM_RAM // ? see routine $5ca8, video_regs related ???
 
 	//AM_RANGE(0xf00004, 0xf00005) AM_RAM // ?
 	//AM_RANGE(0xf00006, 0xf00007) AM_RAM // ?
 
-ADDRESS_MAP_END
+}
 
 
 /***************************************************************************

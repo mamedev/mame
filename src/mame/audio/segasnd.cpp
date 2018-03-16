@@ -200,15 +200,17 @@ void speech_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
  *
  *************************************/
 
-ADDRESS_MAP_START(segag80snd_common::speech_map)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM
-ADDRESS_MAP_END
+void segag80snd_common::speech_map(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x0800).rom();
+}
 
 
-ADDRESS_MAP_START(segag80snd_common::speech_portmap)
-	AM_RANGE(0x00, 0xff) AM_DEVREAD("segaspeech", speech_sound_device, rom_r)
-	AM_RANGE(0x00, 0xff) AM_DEVWRITE("speech", sp0250_device, write)
-ADDRESS_MAP_END
+void segag80snd_common::speech_portmap(address_map &map)
+{
+	map(0x00, 0xff).r("segaspeech", FUNC(speech_sound_device::rom_r));
+	map(0x00, 0xff).w("speech", FUNC(sp0250_device::write));
+}
 
 
 /*************************************
@@ -846,13 +848,15 @@ void usb_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
  *
  *************************************/
 
-ADDRESS_MAP_START(usb_sound_device::usb_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("pgmram")
-ADDRESS_MAP_END
+void usb_sound_device::usb_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("pgmram");
+}
 
-ADDRESS_MAP_START(usb_sound_device::usb_portmap)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(workram_r, workram_w) AM_SHARE("workram")
-ADDRESS_MAP_END
+void usb_sound_device::usb_portmap(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(usb_sound_device::workram_r), FUNC(usb_sound_device::workram_w)).share("workram");
+}
 
 
 //-------------------------------------------------

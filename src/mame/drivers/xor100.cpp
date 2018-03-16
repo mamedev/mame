@@ -262,28 +262,30 @@ WRITE8_MEMBER( xor100_state::fdc_dsel_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(xor100_state::xor100_mem)
-	AM_RANGE(0x0000, 0xffff) AM_WRITE_BANK("bank1")
-	AM_RANGE(0x0000, 0xf7ff) AM_READ_BANK("bank2")
-	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bank3")
-ADDRESS_MAP_END
+void xor100_state::xor100_mem(address_map &map)
+{
+	map(0x0000, 0xffff).bankw("bank1");
+	map(0x0000, 0xf7ff).bankr("bank2");
+	map(0xf800, 0xffff).bankr("bank3");
+}
 
-ADDRESS_MAP_START(xor100_state::xor100_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(I8251_A_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(I8251_A_TAG, i8251_device, status_r, control_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE(I8251_B_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE(I8251_B_TAG, i8251_device, status_r, control_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
-	AM_RANGE(0x08, 0x08) AM_WRITE(mmu_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(prom_toggle_w)
-	AM_RANGE(0x0a, 0x0a) AM_READ(prom_disable_r)
-	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("DSW0") AM_WRITE(baud_w)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0xf8, 0xfb) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0xfc, 0xfc) AM_READWRITE(fdc_wait_r, fdc_dcont_w)
-	AM_RANGE(0xfd, 0xfd) AM_WRITE(fdc_dsel_w)
-ADDRESS_MAP_END
+void xor100_state::xor100_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(m_uart_a, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x01, 0x01).rw(m_uart_a, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x02, 0x02).rw(m_uart_b, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x03, 0x03).rw(m_uart_b, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x04, 0x07).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x08).w(this, FUNC(xor100_state::mmu_w));
+	map(0x09, 0x09).w(this, FUNC(xor100_state::prom_toggle_w));
+	map(0x0a, 0x0a).r(this, FUNC(xor100_state::prom_disable_r));
+	map(0x0b, 0x0b).portr("DSW0").w(this, FUNC(xor100_state::baud_w));
+	map(0x0c, 0x0f).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0xf8, 0xfb).rw(this, FUNC(xor100_state::fdc_r), FUNC(xor100_state::fdc_w));
+	map(0xfc, 0xfc).rw(this, FUNC(xor100_state::fdc_wait_r), FUNC(xor100_state::fdc_dcont_w));
+	map(0xfd, 0xfd).w(this, FUNC(xor100_state::fdc_dsel_w));
+}
 
 /* Input Ports */
 

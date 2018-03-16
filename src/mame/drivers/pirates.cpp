@@ -153,25 +153,26 @@ CUSTOM_INPUT_MEMBER(pirates_state::prot_r)
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(pirates_state::pirates_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM // main ram
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("SYSTEM")
+void pirates_state::pirates_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x10ffff).ram(); // main ram
+	map(0x300000, 0x300001).portr("INPUTS");
+	map(0x400000, 0x400001).portr("SYSTEM");
 //  AM_RANGE(0x500000, 0x5007ff) AM_RAM
-	AM_RANGE(0x500000, 0x5007ff) AM_WRITEONLY AM_SHARE("spriteram")
+	map(0x500000, 0x5007ff).writeonly().share("spriteram");
 //  AM_RANGE(0x500800, 0x50080f) AM_WRITENOP
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(out_w)
-	AM_RANGE(0x700000, 0x700001) AM_WRITEONLY AM_SHARE("scroll")    // scroll reg
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x900000, 0x90017f) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0x900180, 0x90137f) AM_RAM_WRITE(tx_tileram_w) AM_SHARE("tx_tileram")
-	AM_RANGE(0x901380, 0x902a7f) AM_RAM_WRITE(fg_tileram_w) AM_SHARE("fg_tileram")
+	map(0x600000, 0x600001).w(this, FUNC(pirates_state::out_w));
+	map(0x700000, 0x700001).writeonly().share("scroll");    // scroll reg
+	map(0x800000, 0x803fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x900000, 0x90017f).ram();  // more of tilemaps ?
+	map(0x900180, 0x90137f).ram().w(this, FUNC(pirates_state::tx_tileram_w)).share("tx_tileram");
+	map(0x901380, 0x902a7f).ram().w(this, FUNC(pirates_state::fg_tileram_w)).share("fg_tileram");
 //  AM_RANGE(0x902580, 0x902a7f) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0x902a80, 0x904187) AM_RAM_WRITE(bg_tileram_w) AM_SHARE("bg_tileram")
+	map(0x902a80, 0x904187).ram().w(this, FUNC(pirates_state::bg_tileram_w)).share("bg_tileram");
 //  AM_RANGE(0x903c80, 0x904187) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+	map(0xa00001, 0xa00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 /* Input Ports */

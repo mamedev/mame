@@ -110,29 +110,30 @@ WRITE8_MEMBER(yunsun16_state::sound_bank_w)
 	membank("okibank")->set_entry(data & 3);
 }
 
-ADDRESS_MAP_START(yunsun16_state::main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x800018, 0x800019) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x80001a, 0x80001b) AM_READ_PORT("DSW1")
-	AM_RANGE(0x80001c, 0x80001d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800030, 0x800031) AM_WRITENOP    // ? (value: don't care)
-	AM_RANGE(0x800100, 0x800101) AM_WRITENOP    // ? $9100
-	AM_RANGE(0x800102, 0x800103) AM_WRITENOP    // ? $9080
-	AM_RANGE(0x800104, 0x800105) AM_WRITENOP    // ? $90c0
-	AM_RANGE(0x80010a, 0x80010b) AM_WRITENOP    // ? $9000
-	AM_RANGE(0x80010c, 0x80010f) AM_RAM AM_SHARE("scrollram_1") // Scrolling
-	AM_RANGE(0x800114, 0x800117) AM_RAM AM_SHARE("scrollram_0") // Scrolling
-	AM_RANGE(0x800154, 0x800155) AM_RAM AM_SHARE("priorityram") // Priority
-	AM_RANGE(0x800180, 0x800181) AM_WRITE8(sound_bank_w, 0x00ff)    // Sound
-	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
-	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITENOP    // ? 0 (during int)
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1") // Layer 1
-	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0") // Layer 0
-	AM_RANGE(0x910000, 0x910fff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void yunsun16_state::main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x800000, 0x800001).portr("INPUTS");
+	map(0x800018, 0x800019).portr("SYSTEM");
+	map(0x80001a, 0x80001b).portr("DSW1");
+	map(0x80001c, 0x80001d).portr("DSW2");
+	map(0x800030, 0x800031).nopw();    // ? (value: don't care)
+	map(0x800100, 0x800101).nopw();    // ? $9100
+	map(0x800102, 0x800103).nopw();    // ? $9080
+	map(0x800104, 0x800105).nopw();    // ? $90c0
+	map(0x80010a, 0x80010b).nopw();    // ? $9000
+	map(0x80010c, 0x80010f).ram().share("scrollram_1"); // Scrolling
+	map(0x800114, 0x800117).ram().share("scrollram_0"); // Scrolling
+	map(0x800154, 0x800155).ram().share("priorityram"); // Priority
+	map(0x800181, 0x800181).w(this, FUNC(yunsun16_state::sound_bank_w));    // Sound
+	map(0x800189, 0x800189).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
+	map(0x8001fe, 0x8001ff).nopw();    // ? 0 (during int)
+	map(0x900000, 0x903fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0x908000, 0x90bfff).ram().w(this, FUNC(yunsun16_state::vram_1_w)).share("vram_1"); // Layer 1
+	map(0x90c000, 0x90ffff).ram().w(this, FUNC(yunsun16_state::vram_0_w)).share("vram_0"); // Layer 0
+	map(0x910000, 0x910fff).ram().share("spriteram");   // Sprites
+	map(0xff0000, 0xffffff).ram();
+}
 
 
 WRITE16_MEMBER(yunsun16_state::magicbub_sound_command_w)
@@ -165,22 +166,25 @@ DRIVER_INIT_MEMBER(yunsun16_state,magicbub)
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(yunsun16_state::sound_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+void yunsun16_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe7ff).ram();
+}
 
-ADDRESS_MAP_START(yunsun16_state::sound_port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x18, 0x18) AM_DEVREAD("soundlatch", generic_latch_8_device, read)     // From Main CPU
-	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_device, read, write)       // M6295
-ADDRESS_MAP_END
+void yunsun16_state::sound_port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x11).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x18, 0x18).r(m_soundlatch, FUNC(generic_latch_8_device::read));     // From Main CPU
+	map(0x1c, 0x1c).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));       // M6295
+}
 
-ADDRESS_MAP_START(yunsun16_state::oki_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
-	ADDRESS_MAP_END
+void yunsun16_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
+	}
 
 
 /***************************************************************************

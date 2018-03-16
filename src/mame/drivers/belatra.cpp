@@ -62,9 +62,10 @@ protected:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(belatra_state::belatra_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_ROM
-ADDRESS_MAP_END
+void belatra_state::belatra_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).rom();
+}
 
 static INPUT_PORTS_START( belatra )
 INPUT_PORTS_END

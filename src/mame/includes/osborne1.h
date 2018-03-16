@@ -24,6 +24,8 @@
 
 #include "video/mc6845.h"
 
+#include "screen.h"
+
 
 class osborne1_state : public driver_device
 {
@@ -32,6 +34,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_speaker(*this, "speaker"),
 		m_pia0(*this, "pia_0"),
 		m_pia1(*this, "pia_1"),
@@ -85,6 +88,7 @@ public:
 
 	required_device<cpu_device>             m_maincpu;
 	required_device<gfxdecode_device>       m_gfxdecode;
+	required_device<screen_device>          m_screen;
 	required_device<speaker_sound_device>   m_speaker;
 	required_device<pia6821_device>         m_pia0;
 	required_device<pia6821_device>         m_pia1;

@@ -106,43 +106,46 @@ const tiny_rom_entry *abc99_device::device_rom_region() const
 //  ADDRESS_MAP( abc99_z2_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc99_device::abc99_z2_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(I8035_Z2_TAG, 0)
-ADDRESS_MAP_END
+void abc99_device::abc99_z2_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region(I8035_Z2_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc99_z2_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc99_device::abc99_z2_io)
-	AM_RANGE(0x21, 0x21) AM_WRITE(z2_led_w)
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("X0") AM_WRITENOP
-	AM_RANGE(0x31, 0x31) AM_READ_PORT("X1") AM_WRITENOP
-	AM_RANGE(0x32, 0x32) AM_READ_PORT("X2") AM_WRITENOP
-	AM_RANGE(0x33, 0x33) AM_READ_PORT("X3") AM_WRITENOP
-	AM_RANGE(0x34, 0x34) AM_READ_PORT("X4") AM_WRITENOP
-	AM_RANGE(0x35, 0x35) AM_READ_PORT("X5") AM_WRITENOP
-	AM_RANGE(0x36, 0x36) AM_READ_PORT("X6") AM_WRITENOP
-	AM_RANGE(0x37, 0x37) AM_READ_PORT("X7") AM_WRITENOP
-	AM_RANGE(0x38, 0x38) AM_READ_PORT("X8") AM_WRITENOP
-	AM_RANGE(0x39, 0x39) AM_READ_PORT("X9") AM_WRITENOP
-	AM_RANGE(0x3a, 0x3a) AM_READ_PORT("X10") AM_WRITENOP
-	AM_RANGE(0x3b, 0x3b) AM_READ_PORT("X11") AM_WRITENOP
-	AM_RANGE(0x3c, 0x3c) AM_READ_PORT("X12") AM_WRITENOP
-	AM_RANGE(0x3d, 0x3d) AM_READ_PORT("X13") AM_WRITENOP
-	AM_RANGE(0x3e, 0x3e) AM_READ_PORT("X14") AM_WRITENOP
-	AM_RANGE(0x3f, 0x3f) AM_READ_PORT("X15") AM_WRITENOP
-ADDRESS_MAP_END
+void abc99_device::abc99_z2_io(address_map &map)
+{
+	map(0x21, 0x21).w(this, FUNC(abc99_device::z2_led_w));
+	map(0x30, 0x30).portr("X0").nopw();
+	map(0x31, 0x31).portr("X1").nopw();
+	map(0x32, 0x32).portr("X2").nopw();
+	map(0x33, 0x33).portr("X3").nopw();
+	map(0x34, 0x34).portr("X4").nopw();
+	map(0x35, 0x35).portr("X5").nopw();
+	map(0x36, 0x36).portr("X6").nopw();
+	map(0x37, 0x37).portr("X7").nopw();
+	map(0x38, 0x38).portr("X8").nopw();
+	map(0x39, 0x39).portr("X9").nopw();
+	map(0x3a, 0x3a).portr("X10").nopw();
+	map(0x3b, 0x3b).portr("X11").nopw();
+	map(0x3c, 0x3c).portr("X12").nopw();
+	map(0x3d, 0x3d).portr("X13").nopw();
+	map(0x3e, 0x3e).portr("X14").nopw();
+	map(0x3f, 0x3f).portr("X15").nopw();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc99_z5_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc99_device::abc99_z5_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION(I8035_Z5_TAG, 0)
-ADDRESS_MAP_END
+void abc99_device::abc99_z5_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).rom().region(I8035_Z5_TAG, 0);
+}
 
 
 //-------------------------------------------------

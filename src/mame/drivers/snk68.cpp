@@ -104,52 +104,55 @@ WRITE8_MEMBER(snk68_state::sound_w)
 
 /*******************************************************************************/
 
-ADDRESS_MAP_START(snk68_state::pow_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM
-	AM_RANGE(0x080000, 0x080001) AM_READ(control_1_r)
-	AM_RANGE(0x080000, 0x080001) AM_WRITE8(sound_w, 0xff00)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(pow_flipscreen_w)   // + char bank
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READNOP /* Watchdog or IRQ ack */
-	AM_RANGE(0x0e8000, 0x0e8001) AM_READNOP /* Watchdog or IRQ ack */
-	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
+void snk68_state::pow_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x043fff).ram();
+	map(0x080000, 0x080001).r(this, FUNC(snk68_state::control_1_r));
+	map(0x080000, 0x080000).w(this, FUNC(snk68_state::sound_w));
+	map(0x0c0000, 0x0c0001).portr("SYSTEM");
+	map(0x0c0000, 0x0c0001).w(this, FUNC(snk68_state::pow_flipscreen_w));   // + char bank
+	map(0x0e0000, 0x0e0001).nopr(); /* Watchdog or IRQ ack */
+	map(0x0e8000, 0x0e8001).nopr(); /* Watchdog or IRQ ack */
+	map(0x0f0000, 0x0f0001).portr("DSW1");
+	map(0x0f0008, 0x0f0009).portr("DSW2");
 //  AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP    /* ?? */
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(pow_fg_videoram_r, pow_fg_videoram_w) AM_MIRROR(0x1000) AM_SHARE("pow_fg_videoram")   // 8-bit
-	AM_RANGE(0x200000, 0x207fff) AM_DEVREADWRITE("sprites", snk68_spr_device, spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-ADDRESS_MAP_END
+	map(0x100000, 0x100fff).rw(this, FUNC(snk68_state::pow_fg_videoram_r), FUNC(snk68_state::pow_fg_videoram_w)).mirror(0x1000).share("pow_fg_videoram");   // 8-bit
+	map(0x200000, 0x207fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram");   // only partially populated
+	map(0x400000, 0x400fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+}
 
-ADDRESS_MAP_START(snk68_state::searchar_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM
-	AM_RANGE(0x080000, 0x080005) AM_READ(protcontrols_r) /* Player 1 & 2 */
-	AM_RANGE(0x080000, 0x080001) AM_WRITE8(sound_w, 0xff00)
-	AM_RANGE(0x080006, 0x080007) AM_WRITE(protection_w) /* top byte unknown, bottom is protection in ikari3 and streetsm */
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(searchar_flipscreen_w)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(rotary_1_r) /* Player 1 rotary */
-	AM_RANGE(0x0c8000, 0x0c8001) AM_READ(rotary_2_r) /* Player 2 rotary */
-	AM_RANGE(0x0d0000, 0x0d0001) AM_READ(rotary_lsb_r) /* Extra rotary bits */
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READNOP /* Watchdog or IRQ ack */
-	AM_RANGE(0x0e8000, 0x0e8001) AM_READNOP /* Watchdog or IRQ ack */
+void snk68_state::searchar_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x043fff).ram();
+	map(0x080000, 0x080005).r(this, FUNC(snk68_state::protcontrols_r)); /* Player 1 & 2 */
+	map(0x080000, 0x080000).w(this, FUNC(snk68_state::sound_w));
+	map(0x080006, 0x080007).w(this, FUNC(snk68_state::protection_w)); /* top byte unknown, bottom is protection in ikari3 and streetsm */
+	map(0x0c0000, 0x0c0001).w(this, FUNC(snk68_state::searchar_flipscreen_w));
+	map(0x0c0000, 0x0c0001).r(this, FUNC(snk68_state::rotary_1_r)); /* Player 1 rotary */
+	map(0x0c8000, 0x0c8001).r(this, FUNC(snk68_state::rotary_2_r)); /* Player 2 rotary */
+	map(0x0d0000, 0x0d0001).r(this, FUNC(snk68_state::rotary_lsb_r)); /* Extra rotary bits */
+	map(0x0e0000, 0x0e0001).nopr(); /* Watchdog or IRQ ack */
+	map(0x0e8000, 0x0e8001).nopr(); /* Watchdog or IRQ ack */
 //  AM_RANGE(0x0f0000, 0x0f0001) AM_WRITENOP    /* ?? */
-	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0f8000, 0x0f8001) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0xff00)
-	AM_RANGE(0x100000, 0x107fff) AM_DEVREADWRITE("sprites", snk68_spr_device, spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(searchar_fg_videoram_w) AM_MIRROR(0x1000) AM_SHARE("pow_fg_videoram") /* Mirror is used by Ikari 3 */
-	AM_RANGE(0x300000, 0x33ffff) AM_ROM AM_REGION("user1", 0) /* Extra code bank */
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-ADDRESS_MAP_END
+	map(0x0f0000, 0x0f0001).portr("DSW1");
+	map(0x0f0008, 0x0f0009).portr("DSW2");
+	map(0x0f8000, 0x0f8000).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0x100000, 0x107fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram");   // only partially populated
+	map(0x200000, 0x200fff).ram().w(this, FUNC(snk68_state::searchar_fg_videoram_w)).mirror(0x1000).share("pow_fg_videoram"); /* Mirror is used by Ikari 3 */
+	map(0x300000, 0x33ffff).rom().region("user1", 0); /* Extra code bank */
+	map(0x400000, 0x400fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+}
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(snk68_state::sound_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void snk68_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
+}
 
 WRITE8_MEMBER(snk68_state::D7759_write_port_0_w)
 {
@@ -163,13 +166,14 @@ WRITE8_MEMBER(snk68_state::D7759_upd_reset_w)
 	m_upd7759->reset_w(data & 0x80);
 }
 
-ADDRESS_MAP_START(snk68_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(D7759_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(D7759_upd_reset_w)
-ADDRESS_MAP_END
+void snk68_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
+	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
+	map(0x40, 0x40).w(this, FUNC(snk68_state::D7759_write_port_0_w));
+	map(0x80, 0x80).w(this, FUNC(snk68_state::D7759_upd_reset_w));
+}
 
 /******************************************************************************/
 

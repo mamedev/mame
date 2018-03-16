@@ -61,16 +61,18 @@ READ8_MEMBER( imds_state::term_r )
 	return (m_term_data) ? 0x21 : 0x20;
 }
 
-ADDRESS_MAP_START(imds_state::imds_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void imds_state::imds_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(imds_state::imds_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void imds_state::imds_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( imds )

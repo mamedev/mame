@@ -125,15 +125,17 @@ READ8_MEMBER(svmu_state::p7_r)
 }
 
 
-ADDRESS_MAP_START(svmu_state::svmu_mem)
-	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(prog_r, prog_w)
-ADDRESS_MAP_END
+void svmu_state::svmu_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(svmu_state::prog_r), FUNC(svmu_state::prog_w));
+}
 
-ADDRESS_MAP_START(svmu_state::svmu_io_mem)
-	AM_RANGE( LC8670_PORT1, LC8670_PORT1 ) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE( LC8670_PORT3, LC8670_PORT3 ) AM_READ_PORT("P3")
-	AM_RANGE( LC8670_PORT7, LC8670_PORT7 ) AM_READ(p7_r)
-ADDRESS_MAP_END
+void svmu_state::svmu_io_mem(address_map &map)
+{
+	map(LC8670_PORT1, LC8670_PORT1).rw(this, FUNC(svmu_state::p1_r), FUNC(svmu_state::p1_w));
+	map(LC8670_PORT3, LC8670_PORT3).portr("P3");
+	map(LC8670_PORT7, LC8670_PORT7).r(this, FUNC(svmu_state::p7_r));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( svmu )

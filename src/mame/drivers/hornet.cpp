@@ -745,41 +745,43 @@ WRITE16_MEMBER(hornet_state::soundtimer_count_w)
 
 /*****************************************************************************/
 
-ADDRESS_MAP_START(hornet_state::hornet_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("workram")     /* Work RAM */
-	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(hornet_k037122_reg_r, hornet_k037122_reg_w)
-	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(hornet_k037122_sram_r, hornet_k037122_sram_w)
-	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(hornet_k037122_char_r, hornet_k037122_char_w)
-	AM_RANGE(0x74080000, 0x7408000f) AM_READWRITE(gun_r, gun_w)
-	AM_RANGE(0x78000000, 0x7800ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
-	AM_RANGE(0x780c0000, 0x780c0003) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
-	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ8(sysreg_r, 0xffffffff)
-	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE8(sysreg_w, 0xffffffff)
-	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0xffffffff)  /* M48T58Y RTC/NVRAM */
-	AM_RANGE(0x7d030000, 0x7d03000f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
-	AM_RANGE(0x7d040004, 0x7d040007) AM_READWRITE8(comm_eeprom_r, comm_eeprom_w, 0xffffffff)
-	AM_RANGE(0x7d042000, 0x7d043fff) AM_RAM             /* COMM BOARD 0 */
-	AM_RANGE(0x7d044000, 0x7d044007) AM_READ(comm0_unk_r)
-	AM_RANGE(0x7d048000, 0x7d048003) AM_WRITE(comm1_w)
-	AM_RANGE(0x7d04a000, 0x7d04a003) AM_WRITE(comm_rombank_w)
-	AM_RANGE(0x7d050000, 0x7d05ffff) AM_ROMBANK("bank1")        /* COMM BOARD 1 */
-	AM_RANGE(0x7e000000, 0x7e7fffff) AM_ROM AM_REGION("user2", 0)       /* Data ROM */
-	AM_RANGE(0x7f000000, 0x7f3fffff) AM_ROM AM_SHARE("share2")
-	AM_RANGE(0x7fc00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")    /* Program ROM */
-ADDRESS_MAP_END
+void hornet_state::hornet_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram().share("workram");     /* Work RAM */
+	map(0x74000000, 0x740000ff).rw(this, FUNC(hornet_state::hornet_k037122_reg_r), FUNC(hornet_state::hornet_k037122_reg_w));
+	map(0x74020000, 0x7403ffff).rw(this, FUNC(hornet_state::hornet_k037122_sram_r), FUNC(hornet_state::hornet_k037122_sram_w));
+	map(0x74040000, 0x7407ffff).rw(this, FUNC(hornet_state::hornet_k037122_char_r), FUNC(hornet_state::hornet_k037122_char_w));
+	map(0x74080000, 0x7408000f).rw(this, FUNC(hornet_state::gun_r), FUNC(hornet_state::gun_w));
+	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
+	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
+	map(0x7d000000, 0x7d00ffff).r(this, FUNC(hornet_state::sysreg_r));
+	map(0x7d010000, 0x7d01ffff).w(this, FUNC(hornet_state::sysreg_w));
+	map(0x7d020000, 0x7d021fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));  /* M48T58Y RTC/NVRAM */
+	map(0x7d030000, 0x7d03000f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
+	map(0x7d040004, 0x7d040007).rw(this, FUNC(hornet_state::comm_eeprom_r), FUNC(hornet_state::comm_eeprom_w));
+	map(0x7d042000, 0x7d043fff).ram();             /* COMM BOARD 0 */
+	map(0x7d044000, 0x7d044007).r(this, FUNC(hornet_state::comm0_unk_r));
+	map(0x7d048000, 0x7d048003).w(this, FUNC(hornet_state::comm1_w));
+	map(0x7d04a000, 0x7d04a003).w(this, FUNC(hornet_state::comm_rombank_w));
+	map(0x7d050000, 0x7d05ffff).bankr("bank1");        /* COMM BOARD 1 */
+	map(0x7e000000, 0x7e7fffff).rom().region("user2", 0);       /* Data ROM */
+	map(0x7f000000, 0x7f3fffff).rom().share("share2");
+	map(0x7fc00000, 0x7fffffff).rom().region("user1", 0).share("share2");    /* Program ROM */
+}
 
 /*****************************************************************************/
 
-ADDRESS_MAP_START(hornet_state::sound_memmap)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM     /* Work RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)      /* Ricoh RF5C400 */
-	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("k056800", k056800_device, sound_r, sound_w, 0x00ff)
-	AM_RANGE(0x480000, 0x480001) AM_WRITENOP
-	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(soundtimer_en_w) AM_READNOP
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(soundtimer_count_w) AM_READNOP
-ADDRESS_MAP_END
+void hornet_state::sound_memmap(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x10ffff).ram();     /* Work RAM */
+	map(0x200000, 0x200fff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));      /* Ricoh RF5C400 */
+	map(0x300000, 0x30001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
+	map(0x480000, 0x480001).nopw();
+	map(0x4c0000, 0x4c0001).nopw();
+	map(0x500000, 0x500001).w(this, FUNC(hornet_state::soundtimer_en_w)).nopr();
+	map(0x600000, 0x600001).w(this, FUNC(hornet_state::soundtimer_count_w)).nopr();
+}
 
 /*****************************************************************************/
 
@@ -811,14 +813,15 @@ WRITE16_MEMBER(hornet_state::gn680_latch_w)
 // WORD at 30000e: IRQ 4 tests bits 6 and 7, IRQ5 tests bits 4 and 5
 // (vsync and hsync status for each of the two screens?)
 
-ADDRESS_MAP_START(hornet_state::gn680_memmap)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x200000, 0x203fff) AM_RAM
-	AM_RANGE(0x300000, 0x300001) AM_WRITE(gn680_sysctrl)
-	AM_RANGE(0x314000, 0x317fff) AM_RAM
-	AM_RANGE(0x400000, 0x400003) AM_READWRITE(gn680_latch_r, gn680_latch_w)
-	AM_RANGE(0x400008, 0x400009) AM_WRITENOP    // writes 0001 00fe each time IRQ 6 triggers
-ADDRESS_MAP_END
+void hornet_state::gn680_memmap(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x200000, 0x203fff).ram();
+	map(0x300000, 0x300001).w(this, FUNC(hornet_state::gn680_sysctrl));
+	map(0x314000, 0x317fff).ram();
+	map(0x400000, 0x400003).rw(this, FUNC(hornet_state::gn680_latch_r), FUNC(hornet_state::gn680_latch_w));
+	map(0x400008, 0x400009).nopw();    // writes 0001 00fe each time IRQ 6 triggers
+}
 
 /*****************************************************************************/
 
@@ -842,25 +845,27 @@ WRITE32_MEMBER(hornet_state::dsp_dataram1_w)
 	m_sharc_dataram1[offset] = data;
 }
 
-ADDRESS_MAP_START(hornet_state::sharc0_map)
-	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w) AM_SHARE("sharc_dataram0")
-	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("voodoo0", voodoo_device, voodoo_r, voodoo_w)
-	AM_RANGE(0x3400000, 0x34000ff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
-	AM_RANGE(0x3500000, 0x35000ff) AM_DEVREADWRITE("konppc", konppc_device, K033906_0_r, K033906_0_w)
-	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
-ADDRESS_MAP_END
+void hornet_state::sharc0_map(address_map &map)
+{
+	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
+	map(0x0500000, 0x05fffff).rw(this, FUNC(hornet_state::dsp_dataram0_r), FUNC(hornet_state::dsp_dataram0_w)).share("sharc_dataram0");
+	map(0x1400000, 0x14fffff).ram();
+	map(0x2400000, 0x27fffff).rw("voodoo0", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
+	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_0_r), FUNC(konppc_device::K033906_0_w));
+	map(0x3600000, 0x37fffff).bankr("bank5");
+}
 
-ADDRESS_MAP_START(hornet_state::sharc1_map)
-	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w) AM_SHARE("sharc_dataram1")
-	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("voodoo1", voodoo_device, voodoo_r, voodoo_w)
-	AM_RANGE(0x3400000, 0x34000ff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
-	AM_RANGE(0x3500000, 0x35000ff) AM_DEVREADWRITE("konppc", konppc_device, K033906_1_r, K033906_1_w)
-	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank6")
-ADDRESS_MAP_END
+void hornet_state::sharc1_map(address_map &map)
+{
+	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
+	map(0x0500000, 0x05fffff).rw(this, FUNC(hornet_state::dsp_dataram1_r), FUNC(hornet_state::dsp_dataram1_w)).share("sharc_dataram1");
+	map(0x1400000, 0x14fffff).ram();
+	map(0x2400000, 0x27fffff).rw("voodoo1", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
+	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_1_r), FUNC(konppc_device::K033906_1_w));
+	map(0x3600000, 0x37fffff).bankr("bank6");
+}
 
 /*****************************************************************************/
 

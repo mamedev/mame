@@ -139,44 +139,47 @@ WRITE_LINE_MEMBER(pengo_state::irq_mask_w)
 	m_irq_mask = state;
 }
 
-ADDRESS_MAP_START(pengo_state::pengo_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram") /* video and color RAM, scratchpad RAM, sprite codes */
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8800, 0x8fef) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
-	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0x9000, 0x903f) AM_READ_PORT("DSW1")
-	AM_RANGE(0x9040, 0x907f) AM_READ_PORT("DSW0")
-	AM_RANGE(0x9040, 0x9047) AM_DEVWRITE("latch", ls259_device, write_d0)
-	AM_RANGE(0x9070, 0x9070) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x9080, 0x90bf) AM_READ_PORT("IN1")
-	AM_RANGE(0x90c0, 0x90ff) AM_READ_PORT("IN0")
-ADDRESS_MAP_END
+void pengo_state::pengo_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram().w(this, FUNC(pengo_state::pacman_videoram_w)).share("videoram"); /* video and color RAM, scratchpad RAM, sprite codes */
+	map(0x8400, 0x87ff).ram().w(this, FUNC(pengo_state::pacman_colorram_w)).share("colorram");
+	map(0x8800, 0x8fef).ram().share("mainram");
+	map(0x8ff0, 0x8fff).ram().share("spriteram");
+	map(0x9000, 0x901f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x9020, 0x902f).writeonly().share("spriteram2");
+	map(0x9000, 0x903f).portr("DSW1");
+	map(0x9040, 0x907f).portr("DSW0");
+	map(0x9040, 0x9047).w("latch", FUNC(ls259_device::write_d0));
+	map(0x9070, 0x9070).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x9080, 0x90bf).portr("IN1");
+	map(0x90c0, 0x90ff).portr("IN0");
+}
 
 
-ADDRESS_MAP_START(pengo_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8800, 0x8fef) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void pengo_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8800, 0x8fef).ram().share("mainram");
+	map(0x8ff0, 0x8fff).ram().share("spriteram");
+}
 
 
-ADDRESS_MAP_START(pengo_state::jrpacmbl_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
-	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0x9030, 0x9030) AM_WRITE(jrpacman_scroll_w)
-	AM_RANGE(0x9040, 0x904f) AM_READ_PORT("DSW")
-	AM_RANGE(0x9040, 0x9047) AM_DEVWRITE("latch", ls259_device, write_d0)
-	AM_RANGE(0x9070, 0x9070) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x9080, 0x90bf) AM_READ_PORT("P2")
-	AM_RANGE(0x90c0, 0x90ff) AM_READ_PORT("P1")
-ADDRESS_MAP_END
+void pengo_state::jrpacmbl_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().w(this, FUNC(pengo_state::jrpacman_videoram_w)).share("videoram");
+	map(0x8800, 0x8fef).ram();
+	map(0x8ff0, 0x8fff).ram().share("spriteram");
+	map(0x9000, 0x901f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x9020, 0x902f).writeonly().share("spriteram2");
+	map(0x9030, 0x9030).w(this, FUNC(pengo_state::jrpacman_scroll_w));
+	map(0x9040, 0x904f).portr("DSW");
+	map(0x9040, 0x9047).w("latch", FUNC(ls259_device::write_d0));
+	map(0x9070, 0x9070).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x9080, 0x90bf).portr("P2");
+	map(0x90c0, 0x90ff).portr("P1");
+}
 
 
 

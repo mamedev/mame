@@ -993,124 +993,133 @@ WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)
 }
 
 
-ADDRESS_MAP_START(seibuspi_state::base_map)
-	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x00000400, 0x0000043f) AM_DEVREADWRITE16("crtc", seibu_crtc_device, read, write, 0xffffffff)
-	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
-	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
-	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
-	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
-	AM_RANGE(0x00000498, 0x0000049b) AM_WRITENOP // ? dma address high bits? (always writes 0)
-	AM_RANGE(0x00000600, 0x00000603) AM_READ8(spi_status_r, 0x000000ff)
-	AM_RANGE(0x00000604, 0x00000607) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x00000608, 0x0000060b) AM_READ_PORT("EXCH")
-	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
-ADDRESS_MAP_END
+void seibuspi_state::base_map(address_map &map)
+{
+	map(0x00000000, 0x0003ffff).ram().share("mainram");
+	map(0x00000400, 0x0000043f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+	map(0x00000480, 0x00000483).w(this, FUNC(seibuspi_state::tilemap_dma_start_w));
+	map(0x00000484, 0x00000487).w(this, FUNC(seibuspi_state::palette_dma_start_w));
+	map(0x00000490, 0x00000493).w(this, FUNC(seibuspi_state::video_dma_length_w));
+	map(0x00000494, 0x00000497).w(this, FUNC(seibuspi_state::video_dma_address_w));
+	map(0x00000498, 0x0000049b).nopw(); // ? dma address high bits? (always writes 0)
+	map(0x00000600, 0x00000600).r(this, FUNC(seibuspi_state::spi_status_r));
+	map(0x00000604, 0x00000607).portr("INPUTS");
+	map(0x00000608, 0x0000060b).portr("EXCH");
+	map(0x0000060c, 0x0000060f).portr("SYSTEM");
+	map(0x00200000, 0x003fffff).rom().share("share1");
+	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0).share("share1"); // ROM location in real-mode
+}
 
-ADDRESS_MAP_START(seibuspi_state::sei252_map)
+void seibuspi_state::sei252_map(address_map &map)
+{
 	//AM_RANGE(0x00000500, 0x0000057f) AM_DEVREADWRITE16("obj", sei252_device, read_xor, write_xor, 0xffffffff)
-	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
-	AM_RANGE(0x00000524, 0x00000527) AM_WRITENOP // SEI252 sprite decryption key, see machine/spisprit.c
-	AM_RANGE(0x00000528, 0x0000052b) AM_WRITENOP // SEI252 sprite decryption unknown
-	AM_RANGE(0x00000530, 0x00000533) AM_WRITENOP // SEI252 sprite decryption table key, see machine/spisprit.c
-	AM_RANGE(0x00000534, 0x00000537) AM_WRITENOP // SEI252 sprite decryption unknown
-	AM_RANGE(0x0000053c, 0x0000053f) AM_WRITENOP // SEI252 sprite decryption table index, see machine/spisprit.c
-ADDRESS_MAP_END
+	map(0x0000050e, 0x0000050f).w(this, FUNC(seibuspi_state::sprite_dma_start_w));
+	map(0x00000524, 0x00000527).nopw(); // SEI252 sprite decryption key, see machine/spisprit.c
+	map(0x00000528, 0x0000052b).nopw(); // SEI252 sprite decryption unknown
+	map(0x00000530, 0x00000533).nopw(); // SEI252 sprite decryption table key, see machine/spisprit.c
+	map(0x00000534, 0x00000537).nopw(); // SEI252 sprite decryption unknown
+	map(0x0000053c, 0x0000053f).nopw(); // SEI252 sprite decryption table index, see machine/spisprit.c
+}
 
-ADDRESS_MAP_START(seibuspi_state::rise_map)
+void seibuspi_state::rise_map(address_map &map)
+{
 	//AM_RANGE(0x00000500, 0x0000057f) AM_DEVREADWRITE16("obj", seibu_encrypted_sprite_device, read, write, 0xffffffff)
-	AM_RANGE(0x0000054c, 0x0000054f) AM_WRITENOP // RISE10/11 sprite decryption key, see machine/seibuspi.c
-	AM_RANGE(0x00000560, 0x00000563) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
-ADDRESS_MAP_END
+	map(0x0000054c, 0x0000054f).nopw(); // RISE10/11 sprite decryption key, see machine/seibuspi.c
+	map(0x00000562, 0x00000563).w(this, FUNC(seibuspi_state::sprite_dma_start_w));
+}
 
-ADDRESS_MAP_START(seibuspi_state::spi_map)
-	AM_IMPORT_FROM( base_map )
-	AM_IMPORT_FROM( sei252_map )
-	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP // ?
-	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff)
-	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
-	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
-	AM_RANGE(0x00000688, 0x0000068b) AM_WRITE8(z80_prg_transfer_w, 0x000000ff)
-	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(z80_enable_w, 0x000000ff)
-	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(rf2_layer_bank_w, 0x00ff0000)
-	AM_RANGE(0x000006d0, 0x000006d3) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_1w_reset_w, 0x000000ff)
-	AM_RANGE(0x000006d4, 0x000006d7) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_data_w, 0x000000ff)
-	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_clk_w, 0x000000ff)
-	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
-	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
-	AM_RANGE(0x00a00000, 0x013fffff) AM_ROM AM_REGION("sound01", 0)
-ADDRESS_MAP_END
+void seibuspi_state::spi_map(address_map &map)
+{
+	base_map(map);
+	sei252_map(map);
+	map(0x00000600, 0x00000603).nopw(); // ?
+	map(0x00000680, 0x00000680).r("soundfifo2", FUNC(fifo7200_device::data_byte_r));
+	map(0x00000680, 0x00000680).w("soundfifo1", FUNC(fifo7200_device::data_byte_w));
+	map(0x00000684, 0x00000684).r(this, FUNC(seibuspi_state::sound_fifo_status_r));
+	map(0x00000688, 0x00000688).w(this, FUNC(seibuspi_state::z80_prg_transfer_w));
+	map(0x0000068c, 0x0000068c).w(this, FUNC(seibuspi_state::z80_enable_w));
+	map(0x0000068e, 0x0000068e).w(this, FUNC(seibuspi_state::rf2_layer_bank_w));
+	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::ds2404_1w_reset_w));
+	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::ds2404_data_w));
+	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::ds2404_clk_w));
+	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::ds2404_data_r));
+	map(0x000006dd, 0x000006dd).r(this, FUNC(seibuspi_state::spi_ds2404_unknown_r));
+	map(0x00a00000, 0x013fffff).rom().region("sound01", 0);
+}
 
-ADDRESS_MAP_START(seibuspi_state::rdft2_map)
-	AM_IMPORT_FROM( base_map )
-	AM_IMPORT_FROM( rise_map )
-	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP // ?
-	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff)
-	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
-	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
-	AM_RANGE(0x00000688, 0x0000068b) AM_WRITE8(z80_prg_transfer_w, 0x000000ff)
-	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(z80_enable_w, 0x000000ff)
-	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(rf2_layer_bank_w, 0x00ff0000)
-	AM_RANGE(0x000006d0, 0x000006d3) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_1w_reset_w, 0x000000ff)
-	AM_RANGE(0x000006d4, 0x000006d7) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_data_w, 0x000000ff)
-	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_clk_w, 0x000000ff)
-	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
-	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
-	AM_RANGE(0x00a00000, 0x013fffff) AM_ROM AM_REGION("sound01", 0)
-ADDRESS_MAP_END
+void seibuspi_state::rdft2_map(address_map &map)
+{
+	base_map(map);
+	rise_map(map);
+	map(0x00000600, 0x00000603).nopw(); // ?
+	map(0x00000680, 0x00000680).r("soundfifo2", FUNC(fifo7200_device::data_byte_r));
+	map(0x00000680, 0x00000680).w("soundfifo1", FUNC(fifo7200_device::data_byte_w));
+	map(0x00000684, 0x00000684).r(this, FUNC(seibuspi_state::sound_fifo_status_r));
+	map(0x00000688, 0x00000688).w(this, FUNC(seibuspi_state::z80_prg_transfer_w));
+	map(0x0000068c, 0x0000068c).w(this, FUNC(seibuspi_state::z80_enable_w));
+	map(0x0000068e, 0x0000068e).w(this, FUNC(seibuspi_state::rf2_layer_bank_w));
+	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::ds2404_1w_reset_w));
+	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::ds2404_data_w));
+	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::ds2404_clk_w));
+	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::ds2404_data_r));
+	map(0x000006dd, 0x000006dd).r(this, FUNC(seibuspi_state::spi_ds2404_unknown_r));
+	map(0x00a00000, 0x013fffff).rom().region("sound01", 0);
+}
 
-ADDRESS_MAP_START(seibuspi_state::sxx2e_map)
-	AM_IMPORT_FROM( base_map )
-	AM_IMPORT_FROM( sei252_map )
-	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
-	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
-	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
-	AM_RANGE(0x00000688, 0x0000068b) AM_NOP // ?
-	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITENOP
-	AM_RANGE(0x000006d0, 0x000006d3) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_1w_reset_w, 0x000000ff)
-	AM_RANGE(0x000006d4, 0x000006d7) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_data_w, 0x000000ff)
-	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_clk_w, 0x000000ff)
-	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
-	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
-ADDRESS_MAP_END
+void seibuspi_state::sxx2e_map(address_map &map)
+{
+	base_map(map);
+	sei252_map(map);
+	map(0x00000680, 0x00000680).r(this, FUNC(seibuspi_state::sb_coin_r));
+	map(0x00000680, 0x00000680).w("soundfifo1", FUNC(fifo7200_device::data_byte_w));
+	map(0x00000684, 0x00000684).r(this, FUNC(seibuspi_state::sound_fifo_status_r));
+	map(0x00000688, 0x0000068b).noprw(); // ?
+	map(0x0000068c, 0x0000068f).nopw();
+	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::ds2404_1w_reset_w));
+	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::ds2404_data_w));
+	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::ds2404_clk_w));
+	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::ds2404_data_r));
+	map(0x000006dd, 0x000006dd).r(this, FUNC(seibuspi_state::spi_ds2404_unknown_r));
+}
 
-ADDRESS_MAP_START(seibuspi_state::sxx2f_map)
-	AM_IMPORT_FROM( base_map )
-	AM_IMPORT_FROM( rise_map )
-	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
-	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
-	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
-	AM_RANGE(0x00000688, 0x0000068b) AM_NOP // ?
-	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
-	AM_RANGE(0x00000690, 0x00000693) AM_WRITENOP // ?
-ADDRESS_MAP_END
+void seibuspi_state::sxx2f_map(address_map &map)
+{
+	base_map(map);
+	rise_map(map);
+	map(0x00000680, 0x00000680).r(this, FUNC(seibuspi_state::sb_coin_r));
+	map(0x00000680, 0x00000680).w("soundfifo1", FUNC(fifo7200_device::data_byte_w));
+	map(0x00000684, 0x00000684).r(this, FUNC(seibuspi_state::sound_fifo_status_r));
+	map(0x00000688, 0x0000068b).noprw(); // ?
+	map(0x0000068e, 0x0000068e).w(this, FUNC(seibuspi_state::spi_layerbanks_eeprom_w));
+	map(0x00000690, 0x00000693).nopw(); // ?
+}
 
-ADDRESS_MAP_START(seibuspi_state::sys386i_map)
-	AM_IMPORT_FROM( base_map )
-	AM_IMPORT_FROM( rise_map )
-	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
-	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(oki_bank_w, 0xff000000)
-	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff)
-ADDRESS_MAP_END
+void seibuspi_state::sys386i_map(address_map &map)
+{
+	base_map(map);
+	rise_map(map);
+	map(0x0000068e, 0x0000068e).w(this, FUNC(seibuspi_state::spi_layerbanks_eeprom_w));
+	map(0x0000068f, 0x0000068f).w(this, FUNC(seibuspi_state::oki_bank_w));
+	map(0x01200000, 0x01200000).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x01200004, 0x01200004).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
-ADDRESS_MAP_START(seibuspi_state::sys386f_map)
-	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
-	AM_IMPORT_FROM( rise_map )
-	AM_RANGE(0x00000010, 0x00000013) AM_READ8(spi_status_r, 0x000000ff)
-	AM_RANGE(0x00000400, 0x00000403) AM_READ_PORT("SYSTEM") AM_WRITE(ejsakura_input_select_w)
-	AM_RANGE(0x00000404, 0x00000407) AM_WRITE8(eeprom_w, 0x000000ff)
-	AM_RANGE(0x00000408, 0x0000040f) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x000000ff)
-	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
-	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
-	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
-	AM_RANGE(0x00000600, 0x00000607) AM_DEVREAD8("ymz", ymz280b_device, read, 0x000000ff)
-	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(ejsakura_keyboard_r)
-	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
-ADDRESS_MAP_END
+void seibuspi_state::sys386f_map(address_map &map)
+{
+	map(0x00000000, 0x0003ffff).ram().share("mainram");
+	rise_map(map);
+	map(0x00000010, 0x00000010).r(this, FUNC(seibuspi_state::spi_status_r));
+	map(0x00000400, 0x00000403).portr("SYSTEM").w(this, FUNC(seibuspi_state::ejsakura_input_select_w));
+	map(0x00000404, 0x00000404).w(this, FUNC(seibuspi_state::eeprom_w));
+	map(0x00000408, 0x0000040f).w("ymz", FUNC(ymz280b_device::write)).umask32(0x000000ff);
+	map(0x00000484, 0x00000487).w(this, FUNC(seibuspi_state::palette_dma_start_w));
+	map(0x00000490, 0x00000493).w(this, FUNC(seibuspi_state::video_dma_length_w));
+	map(0x00000494, 0x00000497).w(this, FUNC(seibuspi_state::video_dma_address_w));
+	map(0x00000600, 0x00000607).r("ymz", FUNC(ymz280b_device::read)).umask32(0x000000ff);
+	map(0x0000060c, 0x0000060f).r(this, FUNC(seibuspi_state::ejsakura_keyboard_r));
+	map(0x00200000, 0x003fffff).rom().share("share1");
+	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0).share("share1"); // ROM location in real-mode
+}
 
 
 /*****************************************************************************/
@@ -1151,33 +1160,36 @@ WRITE8_MEMBER(seibuspi_state::spi_coin_w)
 }
 
 
-ADDRESS_MAP_START(seibuspi_state::sxx2e_soundmap)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4002, 0x4002) AM_WRITENOP // ?
-	AM_RANGE(0x4003, 0x4003) AM_WRITENOP // ?
-	AM_RANGE(0x4004, 0x4004) AM_WRITE(spi_coin_w)
-	AM_RANGE(0x4008, 0x4008) AM_DEVREAD("soundfifo1", fifo7200_device, data_byte_r)
-	AM_RANGE(0x4008, 0x4008) AM_WRITENOP // ?
-	AM_RANGE(0x4009, 0x4009) AM_READ(z80_soundfifo_status_r)
-	AM_RANGE(0x400b, 0x400b) AM_WRITENOP // ?
-	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x401b, 0x401b) AM_WRITE(z80_bank_w)
-	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("ymf", ymf271_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("z80_bank")
-ADDRESS_MAP_END
+void seibuspi_state::sxx2e_soundmap(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).ram();
+	map(0x4002, 0x4002).nopw(); // ?
+	map(0x4003, 0x4003).nopw(); // ?
+	map(0x4004, 0x4004).w(this, FUNC(seibuspi_state::spi_coin_w));
+	map(0x4008, 0x4008).r("soundfifo1", FUNC(fifo7200_device::data_byte_r));
+	map(0x4008, 0x4008).nopw(); // ?
+	map(0x4009, 0x4009).r(this, FUNC(seibuspi_state::z80_soundfifo_status_r));
+	map(0x400b, 0x400b).nopw(); // ?
+	map(0x4013, 0x4013).portr("COIN");
+	map(0x401b, 0x401b).w(this, FUNC(seibuspi_state::z80_bank_w));
+	map(0x6000, 0x600f).rw("ymf", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
+	map(0x8000, 0xffff).bankr("z80_bank");
+}
 
-ADDRESS_MAP_START(seibuspi_state::spi_soundmap)
-	AM_IMPORT_FROM( sxx2e_soundmap )
-	AM_RANGE(0x4008, 0x4008) AM_DEVWRITE("soundfifo2", fifo7200_device, data_byte_w)
-	AM_RANGE(0x400a, 0x400a) AM_READ_PORT("JUMPERS") // TO DO: get these to actually work
-ADDRESS_MAP_END
+void seibuspi_state::spi_soundmap(address_map &map)
+{
+	sxx2e_soundmap(map);
+	map(0x4008, 0x4008).w("soundfifo2", FUNC(fifo7200_device::data_byte_w));
+	map(0x400a, 0x400a).portr("JUMPERS"); // TO DO: get these to actually work
+}
 
-ADDRESS_MAP_START(seibuspi_state::spi_ymf271_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_RANGE(0x000000, 0x0fffff) AM_DEVREADWRITE("soundflash1", intel_e28f008sa_device, read, write)
-	AM_RANGE(0x100000, 0x1fffff) AM_DEVREADWRITE("soundflash2", intel_e28f008sa_device, read, write)
-ADDRESS_MAP_END
+void seibuspi_state::spi_ymf271_map(address_map &map)
+{
+	map.global_mask(0x1fffff);
+	map(0x000000, 0x0fffff).rw("soundflash1", FUNC(intel_e28f008sa_device::read), FUNC(intel_e28f008sa_device::write));
+	map(0x100000, 0x1fffff).rw("soundflash2", FUNC(intel_e28f008sa_device::read), FUNC(intel_e28f008sa_device::write));
+}
 
 
 /*****************************************************************************/

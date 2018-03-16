@@ -129,7 +129,8 @@ ay31015_device::ay31015_device(const machine_config &mconfig, device_type type, 
 	m_write_or_cb(*this),
 	m_write_dav_cb(*this),
 	m_write_tbmt_cb(*this),
-	m_write_eoc_cb(*this)
+	m_write_eoc_cb(*this),
+	m_auto_rdav(false)
 {
 	for (auto & elem : m_pins)
 		elem = 0;
@@ -656,7 +657,7 @@ void ay31015_device::set_input_pin( ay31015_device::input_pin pin, int data )
 		if (!data)
 		{
 			m_status_reg &= ~STATUS_DAV;
-			m_pins[DAV] = 0;
+			update_status_pins();
 		}
 		break;
 	case SI:
@@ -745,7 +746,18 @@ void ay31015_device::set_transmitter_clock( double new_clock )
 
 uint8_t ay31015_device::get_received_data()
 {
+	if (m_auto_rdav && !machine().side_effects_disabled())
+	{
+		m_status_reg &= ~STATUS_DAV;
+		update_status_pins();
+	}
+	
 	return m_rx_buffer;
+}
+
+READ8_MEMBER(ay31015_device::receive)
+{
+	return get_received_data();
 }
 
 
@@ -760,4 +772,9 @@ void ay31015_device::set_transmit_data( uint8_t data )
 		m_status_reg &= ~STATUS_TBMT;
 		update_status_pins();
 	}
+}
+
+WRITE8_MEMBER(ay31015_device::transmit)
+{
+	set_transmit_data(data);
 }

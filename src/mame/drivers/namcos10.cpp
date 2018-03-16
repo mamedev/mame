@@ -490,16 +490,17 @@ public:
 };
 
 
-ADDRESS_MAP_START(namcos10_state::namcos10_map)
-	AM_RANGE(0x1f500000, 0x1f501fff) AM_RAM AM_SHARE("share3") /* ram? stores block numbers */
-	AM_RANGE(0x9f500000, 0x9f501fff) AM_RAM AM_SHARE("share3") /* ram? stores block numbers */
-	AM_RANGE(0xbf500000, 0xbf501fff) AM_RAM AM_SHARE("share3") /* ram? stores block numbers */
+void namcos10_state::namcos10_map(address_map &map)
+{
+	map(0x1f500000, 0x1f501fff).ram().share("share3"); /* ram? stores block numbers */
+	map(0x9f500000, 0x9f501fff).ram().share("share3"); /* ram? stores block numbers */
+	map(0xbf500000, 0xbf501fff).ram().share("share3"); /* ram? stores block numbers */
 
-	AM_RANGE(0x1fba0000, 0x1fba000f) AM_READWRITE16(control_r, control_w, 0xffffffff)
-	AM_RANGE(0x1fba0000, 0x1fba0003) AM_READWRITE16(sprot_r, sprot_w, 0xffff0000)
-	AM_RANGE(0x1fba0008, 0x1fba000b) AM_READWRITE16(i2c_clock_r, i2c_clock_w, 0x0000ffff)
-	AM_RANGE(0x1fba0008, 0x1fba000b) AM_READWRITE16(i2c_data_r,  i2c_data_w,  0xffff0000)
-ADDRESS_MAP_END
+	map(0x1fba0000, 0x1fba000f).rw(this, FUNC(namcos10_state::control_r), FUNC(namcos10_state::control_w));
+	map(0x1fba0002, 0x1fba0003).rw(this, FUNC(namcos10_state::sprot_r), FUNC(namcos10_state::sprot_w));
+	map(0x1fba0008, 0x1fba0009).rw(this, FUNC(namcos10_state::i2c_clock_r), FUNC(namcos10_state::i2c_clock_w));
+	map(0x1fba000a, 0x1fba000b).rw(this, FUNC(namcos10_state::i2c_data_r), FUNC(namcos10_state::i2c_data_w));
+}
 
 
 // memm variant interface
@@ -676,13 +677,14 @@ void namcos10_state::i2c_update()
 	i2c_prev_clock = clock;
 }
 
-ADDRESS_MAP_START(namcos10_state::namcos10_memm_map)
-	AM_IMPORT_FROM(namcos10_map)
+void namcos10_state::namcos10_memm_map(address_map &map)
+{
+	namcos10_map(map);
 
-	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(crypto_switch_w, 0x0000ffff)
-	AM_RANGE(0x1f400000, 0x1f5fffff) AM_READ16(range_r, 0xffffffff)
-	AM_RANGE(0x1fb40000, 0x1fb4000f) AM_WRITE16(bank_w, 0xffffffff)
-ADDRESS_MAP_END
+	map(0x1f300000, 0x1f300001).w(this, FUNC(namcos10_state::crypto_switch_w));
+	map(0x1f400000, 0x1f5fffff).r(this, FUNC(namcos10_state::range_r));
+	map(0x1fb40000, 0x1fb4000f).w(this, FUNC(namcos10_state::bank_w));
+}
 
 
 // memn variant interface
@@ -771,19 +773,20 @@ READ16_MEMBER(namcos10_state::nand_block_r)
 	return block[ offset ];
 }
 
-ADDRESS_MAP_START(namcos10_state::namcos10_memn_map)
-	AM_IMPORT_FROM(namcos10_map)
+void namcos10_state::namcos10_memn_map(address_map &map)
+{
+	namcos10_map(map);
 
-	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(crypto_switch_w, 0x0000ffff)
-	AM_RANGE(0x1f380000, 0x1f380003) AM_WRITE16(crypto_switch_w, 0x0000ffff)
-	AM_RANGE(0x1f400000, 0x1f400003) AM_READ16(nand_status_r, 0x0000ffff)
-	AM_RANGE(0x1f410000, 0x1f410003) AM_WRITE8(nand_address1_w, 0x000000ff)
-	AM_RANGE(0x1f420000, 0x1f420003) AM_WRITE8(nand_address2_w, 0x000000ff)
-	AM_RANGE(0x1f430000, 0x1f430003) AM_WRITE8(nand_address3_w, 0x000000ff)
-	AM_RANGE(0x1f440000, 0x1f440003) AM_WRITE8(nand_address4_w, 0x000000ff)
-	AM_RANGE(0x1f450000, 0x1f450003) AM_READ16(nand_data_r, 0x0000ffff)
-	AM_RANGE(0x1fb60000, 0x1fb60003) AM_READWRITE16(nand_block_r, nand_block_w, 0x0000ffff)
-ADDRESS_MAP_END
+	map(0x1f300000, 0x1f300001).w(this, FUNC(namcos10_state::crypto_switch_w));
+	map(0x1f380000, 0x1f380001).w(this, FUNC(namcos10_state::crypto_switch_w));
+	map(0x1f400000, 0x1f400001).r(this, FUNC(namcos10_state::nand_status_r));
+	map(0x1f410000, 0x1f410000).w(this, FUNC(namcos10_state::nand_address1_w));
+	map(0x1f420000, 0x1f420000).w(this, FUNC(namcos10_state::nand_address2_w));
+	map(0x1f430000, 0x1f430000).w(this, FUNC(namcos10_state::nand_address3_w));
+	map(0x1f440000, 0x1f440000).w(this, FUNC(namcos10_state::nand_address4_w));
+	map(0x1f450000, 0x1f450001).r(this, FUNC(namcos10_state::nand_data_r));
+	map(0x1fb60000, 0x1fb60001).rw(this, FUNC(namcos10_state::nand_block_r), FUNC(namcos10_state::nand_block_w));
+}
 
 void namcos10_state::memn_driver_init(  )
 {

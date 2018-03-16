@@ -40,9 +40,10 @@ DEFINE_DEVICE_TYPE(A2BUS_THEMILL, a2bus_themill_device, "a2themill", "Stellation
 
 #define M6809_TAG         "m6809"
 
-ADDRESS_MAP_START(a2bus_themill_device::m6809_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dma_r, dma_w)
-ADDRESS_MAP_END
+void a2bus_themill_device::m6809_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(a2bus_themill_device::dma_r), FUNC(a2bus_themill_device::dma_w));
+}
 
 /***************************************************************************
     FUNCTION PROTOTYPES

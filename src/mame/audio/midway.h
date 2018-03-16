@@ -64,6 +64,8 @@ public:
 	DECLARE_READ8_MEMBER(data_r);
 
 	void ssio_map(address_map &map);
+	void ssio_input_ports(address_map &map, const char *ssio) const;
+
 protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -230,15 +232,5 @@ private:
 	DECLARE_WRITE8_MEMBER(portb2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 };
-
-
-/************ SSIO input ports ***************/
-
-#define SSIO_INPUT_PORTS(ssio) \
-	AM_RANGE(0x00, 0x04) AM_MIRROR(0x18) AM_DEVREAD(ssio, midway_ssio_device, ioport_read) \
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ssio, midway_ssio_device, read) \
-	AM_RANGE(0x00, 0x07) AM_DEVWRITE(ssio, midway_ssio_device, ioport_write) \
-	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE(ssio, midway_ssio_device, write)
-
 
 #endif // MAME_AUDIO_MIDWAY_H

@@ -188,41 +188,44 @@ WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
 }
 
 
-ADDRESS_MAP_START(k3_state::k3_base_map)
-	AM_RANGE(0x0009ce, 0x0009cf) AM_WRITENOP    // k3 - bug in code? (clean up log)
-	AM_RANGE(0x0009d2, 0x0009d3) AM_WRITENOP    // l3 - bug in code? (clean up log)
+void k3_state::k3_base_map(address_map &map)
+{
+	map(0x0009ce, 0x0009cf).nopw();    // k3 - bug in code? (clean up log)
+	map(0x0009d2, 0x0009d3).nopw();    // l3 - bug in code? (clean up log)
 
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM // ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Main Ram
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_SHARE("spritera1")
-	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("spritera2")
-	AM_RANGE(0x2c0000, 0x2c07ff) AM_RAM_WRITE(k3_bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0x2c0800, 0x2c0fff) AM_RAM // or does k3 have a bigger tilemap? (flagrall is definitely 32x32 tiles)
-	AM_RANGE(0x340000, 0x340001) AM_WRITE(k3_scrollx_w)
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(k3_scrolly_w)
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x440000, 0x440001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x480000, 0x480001) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+	map(0x000000, 0x0fffff).rom(); // ROM
+	map(0x100000, 0x10ffff).ram(); // Main Ram
+	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x240000, 0x240fff).ram().share("spritera1");
+	map(0x280000, 0x280fff).ram().share("spritera2");
+	map(0x2c0000, 0x2c07ff).ram().w(this, FUNC(k3_state::k3_bgram_w)).share("bgram");
+	map(0x2c0800, 0x2c0fff).ram(); // or does k3 have a bigger tilemap? (flagrall is definitely 32x32 tiles)
+	map(0x340000, 0x340001).w(this, FUNC(k3_state::k3_scrollx_w));
+	map(0x380000, 0x380001).w(this, FUNC(k3_state::k3_scrolly_w));
+	map(0x400000, 0x400001).portr("INPUTS");
+	map(0x440000, 0x440001).portr("SYSTEM");
+	map(0x480000, 0x480001).portr("DSW");
+}
 
-ADDRESS_MAP_START(k3_state::k3_map)
-	AM_IMPORT_FROM( k3_base_map )
+void k3_state::k3_map(address_map &map)
+{
+	k3_base_map(map);
 
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(k3_soundbanks_w)
+	map(0x3c0000, 0x3c0001).w(this, FUNC(k3_state::k3_soundbanks_w));
 
-	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0x8c0000, 0x8cffff) AM_RAM // not used? (bug in code?)
-ADDRESS_MAP_END
+	map(0x4c0000, 0x4c0000).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x500000, 0x500000).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x8c0000, 0x8cffff).ram(); // not used? (bug in code?)
+}
 
 
-ADDRESS_MAP_START(k3_state::flagrall_map)
-	AM_IMPORT_FROM( k3_base_map )
+void k3_state::flagrall_map(address_map &map)
+{
+	k3_base_map(map);
 
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(flagrall_soundbanks_w)
-	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+	map(0x3c0000, 0x3c0001).w(this, FUNC(k3_state::flagrall_soundbanks_w));
+	map(0x4c0001, 0x4c0001).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 static INPUT_PORTS_START( k3 )

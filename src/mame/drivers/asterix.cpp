@@ -168,37 +168,39 @@ WRITE16_MEMBER(asterix_state::protection_w)
 	}
 }
 
-ADDRESS_MAP_START(asterix_state::main_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x107fff) AM_RAM
-	AM_RANGE(0x180000, 0x1807ff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_word_r, k053245_word_w)
-	AM_RANGE(0x180800, 0x180fff) AM_RAM                             // extra RAM, or mirror for the above?
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_word_r, k053244_word_w)
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_lsb_r, k053244_lsb_w)
-	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("IN0")
-	AM_RANGE(0x380002, 0x380003) AM_READ_PORT("IN1")
-	AM_RANGE(0x380100, 0x380101) AM_WRITE(control2_w)
-	AM_RANGE(0x380200, 0x380203) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
-	AM_RANGE(0x380300, 0x380301) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x380400, 0x380401) AM_WRITE(asterix_spritebank_w)
-	AM_RANGE(0x380500, 0x38051f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-	AM_RANGE(0x380600, 0x380601) AM_NOP                             // Watchdog
-	AM_RANGE(0x380700, 0x380707) AM_DEVWRITE("k056832", k056832_device, b_word_w)
-	AM_RANGE(0x380800, 0x380803) AM_WRITE(protection_w)
-	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("k056832", k056832_device, ram_half_word_r, ram_half_word_w)
-	AM_RANGE(0x420000, 0x421fff) AM_DEVREAD("k056832", k056832_device, old_rom_word_r)   // Passthrough to tile roms
-	AM_RANGE(0x440000, 0x44003f) AM_DEVWRITE("k056832", k056832_device, word_w)
-ADDRESS_MAP_END
+void asterix_state::main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x107fff).ram();
+	map(0x180000, 0x1807ff).rw(m_k053244, FUNC(k05324x_device::k053245_word_r), FUNC(k05324x_device::k053245_word_w));
+	map(0x180800, 0x180fff).ram();                             // extra RAM, or mirror for the above?
+	map(0x200000, 0x20000f).rw(m_k053244, FUNC(k05324x_device::k053244_word_r), FUNC(k05324x_device::k053244_word_w));
+	map(0x280000, 0x280fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x300000, 0x30001f).rw(m_k053244, FUNC(k05324x_device::k053244_lsb_r), FUNC(k05324x_device::k053244_lsb_w));
+	map(0x380000, 0x380001).portr("IN0");
+	map(0x380002, 0x380003).portr("IN1");
+	map(0x380100, 0x380101).w(this, FUNC(asterix_state::control2_w));
+	map(0x380200, 0x380203).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
+	map(0x380300, 0x380301).w(this, FUNC(asterix_state::sound_irq_w));
+	map(0x380400, 0x380401).w(this, FUNC(asterix_state::asterix_spritebank_w));
+	map(0x380500, 0x38051f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x380600, 0x380601).noprw();                             // Watchdog
+	map(0x380700, 0x380707).w(m_k056832, FUNC(k056832_device::b_word_w));
+	map(0x380800, 0x380803).w(this, FUNC(asterix_state::protection_w));
+	map(0x400000, 0x400fff).rw(m_k056832, FUNC(k056832_device::ram_half_word_r), FUNC(k056832_device::ram_half_word_w));
+	map(0x420000, 0x421fff).r(m_k056832, FUNC(k056832_device::old_rom_word_r));   // Passthrough to tile roms
+	map(0x440000, 0x44003f).w(m_k056832, FUNC(k056832_device::word_w));
+}
 
-ADDRESS_MAP_START(asterix_state::sound_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf801, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, status_r, data_w)
-	AM_RANGE(0xfa00, 0xfa2f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(sound_arm_nmi_w)
-	AM_RANGE(0xfe00, 0xfe00) AM_DEVWRITE("ymsnd", ym2151_device, register_w)
-ADDRESS_MAP_END
+void asterix_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf801, 0xf801).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
+	map(0xfa00, 0xfa2f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
+	map(0xfc00, 0xfc00).w(this, FUNC(asterix_state::sound_arm_nmi_w));
+	map(0xfe00, 0xfe00).w("ymsnd", FUNC(ym2151_device::register_w));
+}
 
 
 

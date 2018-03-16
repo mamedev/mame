@@ -54,17 +54,18 @@ private:
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
 };
 
-ADDRESS_MAP_START(gts80a_state::gts80a_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x017f) AM_RAM
-	AM_RANGE(0x0200, 0x027f) AM_DEVREADWRITE("riot1", riot6532_device, read, write)
-	AM_RANGE(0x0280, 0x02ff) AM_DEVREADWRITE("riot2", riot6532_device, read, write)
-	AM_RANGE(0x0300, 0x037f) AM_DEVREADWRITE("riot3", riot6532_device, read, write)
-	AM_RANGE(0x1000, 0x17ff) AM_ROM
-	AM_RANGE(0x1800, 0x18ff) AM_RAM AM_SHARE("nvram") // 5101L-1 256x4
-	AM_RANGE(0x2000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void gts80a_state::gts80a_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x017f).ram();
+	map(0x0200, 0x027f).rw("riot1", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x0280, 0x02ff).rw("riot2", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x0300, 0x037f).rw("riot3", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x1000, 0x17ff).rom();
+	map(0x1800, 0x18ff).ram().share("nvram"); // 5101L-1 256x4
+	map(0x2000, 0x2fff).rom();
+	map(0x3000, 0x3fff).rom();
+}
 
 static INPUT_PORTS_START( gts80a )
 	PORT_START("DSW.0")
@@ -432,14 +433,16 @@ uint32_t caveman_state::screen_update_caveman(screen_device &screen, bitmap_ind1
 }
 
 
-ADDRESS_MAP_START(caveman_state::video_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x5fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void caveman_state::video_map(address_map &map)
+{
+	map.global_mask(0xffff);
+	map(0x0000, 0x07ff).ram();
+	map(0x2000, 0x5fff).ram().share("vram");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(caveman_state::video_io_map)
+void caveman_state::video_io_map(address_map &map)
+{
 //  AM_RANGE(0x000, 0x002) AM_READWRITE() // 8259 irq controller
 //  AM_RANGE(0x100, 0x102) AM_READWRITE() // HD46505
 //  AM_RANGE(0x200, 0x200) AM_READWRITE() // 8212 in, ?? out
@@ -448,7 +451,7 @@ ADDRESS_MAP_START(caveman_state::video_io_map)
 //  AM_RANGE(0x400, 0x400) AM_READ() // joystick inputs
 //  AM_RANGE(0x500, 0x506) AM_WRITE() // palette
 
-ADDRESS_MAP_END
+}
 
 MACHINE_CONFIG_START(caveman_state::caveman)
 	gts80a_ss(config);

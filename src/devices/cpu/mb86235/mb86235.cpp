@@ -30,7 +30,7 @@
 
 
 
-DEFINE_DEVICE_TYPE(MB86235, mb86235_device, "mb86235", "MB86235")
+DEFINE_DEVICE_TYPE(MB86235, mb86235_device, "mb86235", "Fujitsu MB86235 \"TGPx4\"")
 
 
 ADDRESS_MAP_START(mb86235_device::internal_abus)
@@ -49,6 +49,7 @@ void mb86235_device::execute_run()
 #if ENABLE_DRC
 	run_drc();
 #else
+	debugger_instruction_hook(this, m_core->pc);
 	m_core->icount = 0;
 #endif
 }
@@ -111,7 +112,7 @@ void mb86235_device::device_start()
 	m_drcuml->symbol_add(&m_core->alutemp, sizeof(m_core->alutemp), "alutemp");
 	m_drcuml->symbol_add(&m_core->multemp, sizeof(m_core->multemp), "multemp");
 
-	m_drcuml->symbol_add(&m_core->pcs_ptr, sizeof(m_core->pcs_ptr), "pcs_ptr");
+	m_drcuml->symbol_add(&m_core->pcp, sizeof(m_core->pcp), "pcp");
 
 
 	m_drcfe = std::make_unique<mb86235_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, COMPILE_MAX_SEQUENCE);
@@ -249,7 +250,7 @@ void mb86235_device::fifoin_w(uint64_t data)
 		fatalerror("fifoin_w: pushing to full fifo");
 	}
 
-	printf("FIFOIN push %08X%08X\n", (uint32_t)(data >> 32), (uint32_t)(data));
+	//printf("FIFOIN push %08X%08X\n", (uint32_t)(data >> 32), (uint32_t)(data));
 
 	m_core->fifoin.data[m_core->fifoin.wpos] = data;
 

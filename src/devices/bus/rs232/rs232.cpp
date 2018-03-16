@@ -6,31 +6,32 @@
 
 ****************************************************************************
 
-    Source  DB-25  DB-9
-             1          AA  Protective Ground [Shield]
-             7      5   AB  Signal Ground [Common Return]
-    DTE →    2      3   BA  Transmitted Data
-    ← DCE    3      2   BB  Received Data
-    DTE →    4      7   CA  Request to Send
-    ← DCE    5      8   CB  Clear to Send
-    ← DCE    6      6   CC  Data Set Ready [Data Mode]
-    DTE →   20      4   CD  Data Terminal Ready
-    ← DCE   22      9   CE  Ring Indicator
-    ← DCE    8      1   CF  Received Line Signal Detector [Data Carrier Detect]
-    ← DCE   21          CG  Signal Quality Detector
-    DTE →   23          CH  Data Signal Rate Selector
-    ← DCE   23          CI  Data Signal Rate Selector [Signaling Rate Indicator]
-    DTE →   24          DA  Transmitter Signal Element Timing [External Tx Clock]
-    ← DCE   15          DB  Transmitter Signal Element Timing
-    ← DCE   17          DD  Receiver Signal Element Timing
-    DTE →   14         SBA  Secondary Transmitted Data
-    ← DCE   16         SBB  Secondary Received Data
-    DTE →   19         SCA  Secondary Request to Send
-    ← DCE   13         SCB  Secondary Clear to Send
-    ← DCE   12         SCF  Secondary Received Line Signal Detector
-    DTE →   18          LL  Local Loopback
-    DTE →   21          RL  Remote Loopback
-    ← DCE   25          TM  Test Mode
+    Source  DB-25  DB-9 EIA V.24
+             1          AA  101  Protective Ground [Shield]
+             7      5   AB  102  Signal Ground [Common Return]
+    DTE →    2      3   BA  103  Transmitted Data
+    ← DCE    3      2   BB  104  Received Data
+    DTE →    4      7   CA  105  Request to Send
+    ← DCE    5      8   CB  106  Clear to Send
+    ← DCE    6      6   CC  107  Data Set Ready [Data Mode]
+    DTE →   20             108.1 Connect Data Set to Line
+    DTE →   20      4   CD 108.2 Data Terminal Ready
+    ← DCE   22      9   CE  125  Ring Indicator
+    ← DCE    8      1   CF  109  Received Line Signal Detector [Data Carrier Detect]
+    ← DCE   21          CG  110  Signal Quality Detector
+    DTE →   23          CH  111  Data Signal Rate Selector
+    ← DCE   23          CI  112  Data Signal Rate Selector [Signaling Rate Indicator]
+    DTE →   24          DA  113  Transmitter Signal Element Timing [External Tx Clock]
+    ← DCE   15          DB  114  Transmitter Signal Element Timing
+    ← DCE   17          DD  115  Receiver Signal Element Timing
+    DTE →   14         SBA  118  Secondary Transmitted Data
+    ← DCE   16         SBB  119  Secondary Received Data
+    DTE →   19         SCA  120  Secondary Request to Send
+    ← DCE   13         SCB  121  Secondary Clear to Send
+    ← DCE   12         SCF  122  Secondary Received Line Signal Detector
+    DTE →   18          LL  141  Local Loopback
+    DTE →   21          RL  140  Remote Loopback
+    ← DCE   25          TM  142  Test Mode
 
     Mark (logic 1) = typically -12V (-3V maximum, -15V minimum)
     Space (logic 0) = typically +12V (+3V minimum, +15V maximum)

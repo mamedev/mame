@@ -128,27 +128,29 @@ WRITE8_MEMBER(photon_state::_80_portc_w)
 	m_speaker->level_w(BIT(data,7));
 }
 
-ADDRESS_MAP_START(photon_state::pk8000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
-	AM_RANGE( 0x4000, 0x7fff ) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
-	AM_RANGE( 0x8000, 0xbfff ) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
-	AM_RANGE( 0xc000, 0xffff ) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
-ADDRESS_MAP_END
+void photon_state::pk8000_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).bankr("bank1").bankw("bank5");
+	map(0x4000, 0x7fff).bankr("bank2").bankw("bank6");
+	map(0x8000, 0xbfff).bankr("bank3").bankw("bank7");
+	map(0xc000, 0xffff).bankr("bank4").bankw("bank8");
+}
 
-ADDRESS_MAP_START(photon_state::pk8000_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0x88, 0x88) AM_READWRITE(video_color_r, video_color_w)
-	AM_RANGE(0x8c, 0x8c) AM_READ_PORT("JOY1")
-	AM_RANGE(0x8d, 0x8d) AM_READ_PORT("JOY2")
-	AM_RANGE(0x90, 0x90) AM_READWRITE(text_start_r, text_start_w)
-	AM_RANGE(0x91, 0x91) AM_READWRITE(chargen_start_r, chargen_start_w)
-	AM_RANGE(0x92, 0x92) AM_READWRITE(video_start_r, video_start_w)
-	AM_RANGE(0x93, 0x93) AM_READWRITE(color_start_r, color_start_w)
-	AM_RANGE(0xa0, 0xbf) AM_READWRITE(color_r, color_w)
-ADDRESS_MAP_END
+void photon_state::pk8000_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x80, 0x83).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x84, 0x87).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x88, 0x88).rw(this, FUNC(photon_state::video_color_r), FUNC(photon_state::video_color_w));
+	map(0x8c, 0x8c).portr("JOY1");
+	map(0x8d, 0x8d).portr("JOY2");
+	map(0x90, 0x90).rw(this, FUNC(photon_state::text_start_r), FUNC(photon_state::text_start_w));
+	map(0x91, 0x91).rw(this, FUNC(photon_state::chargen_start_r), FUNC(photon_state::chargen_start_w));
+	map(0x92, 0x92).rw(this, FUNC(photon_state::video_start_r), FUNC(photon_state::video_start_w));
+	map(0x93, 0x93).rw(this, FUNC(photon_state::color_start_r), FUNC(photon_state::color_start_w));
+	map(0xa0, 0xbf).rw(this, FUNC(photon_state::color_r), FUNC(photon_state::color_w));
+}
 
 static INPUT_PORTS_START( photon )
 	PORT_START("JOY1")

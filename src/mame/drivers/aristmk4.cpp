@@ -1000,35 +1000,36 @@ ADDRESS MAP - SLOT GAMES
 
 ******************************************************************************/
 
-ADDRESS_MAP_START(aristmk4_state::aristmk4_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("mkiv_vram") // video ram -  chips U49 / U50
-	AM_RANGE(0x0800, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(mk4_printer_w)
-	AM_RANGE(0x1900, 0x19ff) AM_READ(mk4_printer_r)
-	AM_RANGE(0x2000, 0x3fff) AM_ROM  // graphics rom map
-	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") AM_SHARE("nvram")
+void aristmk4_state::aristmk4_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("mkiv_vram"); // video ram -  chips U49 / U50
+	map(0x0800, 0x17ff).ram();
+	map(0x1800, 0x1800).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x1801, 0x1801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x1c00, 0x1cff).w(this, FUNC(aristmk4_state::mk4_printer_w));
+	map(0x1900, 0x19ff).r(this, FUNC(aristmk4_state::mk4_printer_r));
+	map(0x2000, 0x3fff).rom();  // graphics rom map
+	map(0x4000, 0x4fff).bankrw("bank1").share("nvram");
 
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(u3_p0)
-	AM_RANGE(0x5002, 0x5002) AM_READ(u3_p2)
-	AM_RANGE(0x5003, 0x5003) AM_READ(u3_p3)
-	AM_RANGE(0x5005, 0x5005) AM_READ(ldsw)
-	AM_RANGE(0x500d, 0x500d) AM_READ_PORT("500d")
-	AM_RANGE(0x500e, 0x500e) AM_READ_PORT("500e")
-	AM_RANGE(0x500f, 0x500f) AM_READ_PORT("500f")
-	AM_RANGE(0x5010, 0x501f) AM_DEVREADWRITE("via6522_0",via6522_device,read,write)
-	AM_RANGE(0x5200, 0x5200) AM_READ(cashcade_r)
-	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
-	AM_RANGE(0x52c0, 0x52c0) AM_READ(bv_p0)
-	AM_RANGE(0x52c1, 0x52c1) AM_READ(bv_p1)
-	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
-	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE("pia6821_0", pia6821_device, read, write)  // RTC data - PORT A , mechanical meters - PORTB ??
-	AM_RANGE(0x5440, 0x5440) AM_WRITE(mlamps) // take win and gamble lamps
-	AM_RANGE(0x5468, 0x5468) AM_READWRITE(cgdrr,cgdrw) // 4020 ripple counter outputs
-	AM_RANGE(0x6000, 0xffff) AM_ROM  // game roms
-ADDRESS_MAP_END
+	map(0x5000, 0x5000).w(this, FUNC(aristmk4_state::u3_p0));
+	map(0x5002, 0x5002).r(this, FUNC(aristmk4_state::u3_p2));
+	map(0x5003, 0x5003).r(this, FUNC(aristmk4_state::u3_p3));
+	map(0x5005, 0x5005).r(this, FUNC(aristmk4_state::ldsw));
+	map(0x500d, 0x500d).portr("500d");
+	map(0x500e, 0x500e).portr("500e");
+	map(0x500f, 0x500f).portr("500f");
+	map(0x5010, 0x501f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x5200, 0x5200).r(this, FUNC(aristmk4_state::cashcade_r));
+	map(0x5201, 0x5201).portr("5201");
+	map(0x52c0, 0x52c0).r(this, FUNC(aristmk4_state::bv_p0));
+	map(0x52c1, 0x52c1).r(this, FUNC(aristmk4_state::bv_p1));
+	map(0x527f, 0x5281).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5300, 0x5300).portr("5300");
+	map(0x5380, 0x5383).rw("pia6821_0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));  // RTC data - PORT A , mechanical meters - PORTB ??
+	map(0x5440, 0x5440).w(this, FUNC(aristmk4_state::mlamps)); // take win and gamble lamps
+	map(0x5468, 0x5468).rw(this, FUNC(aristmk4_state::cgdrr), FUNC(aristmk4_state::cgdrw)); // 4020 ripple counter outputs
+	map(0x6000, 0xffff).rom();  // game roms
+}
 
 /******************************************************************************
 
@@ -1044,35 +1045,36 @@ The graphics rom is mapped from 0x4000 - 0x4fff
 The U87 personality rom is not required, therefore game rom code mapping is from 0x8000-0xffff
 */
 
-ADDRESS_MAP_START(aristmk4_state::aristmk4_poker_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("mkiv_vram") // video ram -  chips U49 / U50
-	AM_RANGE(0x0800, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(mk4_printer_w)
-	AM_RANGE(0x1900, 0x19ff) AM_READ(mk4_printer_r)
-	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") AM_SHARE("nvram")
+void aristmk4_state::aristmk4_poker_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("mkiv_vram"); // video ram -  chips U49 / U50
+	map(0x0800, 0x17ff).ram();
+	map(0x1800, 0x1800).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x1801, 0x1801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x1c00, 0x1cff).w(this, FUNC(aristmk4_state::mk4_printer_w));
+	map(0x1900, 0x19ff).r(this, FUNC(aristmk4_state::mk4_printer_r));
+	map(0x4000, 0x4fff).bankrw("bank1").share("nvram");
 
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(u3_p0)
-	AM_RANGE(0x5002, 0x5002) AM_READ(u3_p2)
-	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("5003")
-	AM_RANGE(0x5005, 0x5005) AM_READ(ldsw)
-	AM_RANGE(0x500d, 0x500d) AM_READ_PORT("500d")
-	AM_RANGE(0x500e, 0x500e) AM_READ_PORT("500e")
-	AM_RANGE(0x500f, 0x500f) AM_READ_PORT("500f")
-	AM_RANGE(0x5010, 0x501f) AM_DEVREADWRITE("via6522_0",via6522_device,read,write)
-	AM_RANGE(0x5200, 0x5200) AM_READ(cashcade_r)
-	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
-	AM_RANGE(0x52c0, 0x52c0) AM_READ(bv_p0)
-	AM_RANGE(0x52c1, 0x52c1) AM_READ(bv_p1)
-	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
-	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE("pia6821_0", pia6821_device, read, write)  // RTC data - PORT A , mechanical meters - PORTB ??
-	AM_RANGE(0x5440, 0x5440) AM_WRITE(mlamps) // take win and gamble lamps
-	AM_RANGE(0x5468, 0x5468) AM_READWRITE(cgdrr,cgdrw) // 4020 ripple counter outputs
-	AM_RANGE(0x6000, 0x7fff) AM_ROM  // graphics rom map
-	AM_RANGE(0x8000, 0xffff) AM_ROM  // game roms
-ADDRESS_MAP_END
+	map(0x5000, 0x5000).w(this, FUNC(aristmk4_state::u3_p0));
+	map(0x5002, 0x5002).r(this, FUNC(aristmk4_state::u3_p2));
+	map(0x5003, 0x5003).portr("5003");
+	map(0x5005, 0x5005).r(this, FUNC(aristmk4_state::ldsw));
+	map(0x500d, 0x500d).portr("500d");
+	map(0x500e, 0x500e).portr("500e");
+	map(0x500f, 0x500f).portr("500f");
+	map(0x5010, 0x501f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x5200, 0x5200).r(this, FUNC(aristmk4_state::cashcade_r));
+	map(0x5201, 0x5201).portr("5201");
+	map(0x52c0, 0x52c0).r(this, FUNC(aristmk4_state::bv_p0));
+	map(0x52c1, 0x52c1).r(this, FUNC(aristmk4_state::bv_p1));
+	map(0x527f, 0x5281).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5300, 0x5300).portr("5300");
+	map(0x5380, 0x5383).rw("pia6821_0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));  // RTC data - PORT A , mechanical meters - PORTB ??
+	map(0x5440, 0x5440).w(this, FUNC(aristmk4_state::mlamps)); // take win and gamble lamps
+	map(0x5468, 0x5468).rw(this, FUNC(aristmk4_state::cgdrr), FUNC(aristmk4_state::cgdrw)); // 4020 ripple counter outputs
+	map(0x6000, 0x7fff).rom();  // graphics rom map
+	map(0x8000, 0xffff).rom();  // game roms
+}
 
 /******************************************************************************
 

@@ -72,9 +72,10 @@ uint32_t tcl_state::screen_update_tcl(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-ADDRESS_MAP_START(tcl_state::tcl_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM  /* bfff ? */
-ADDRESS_MAP_END
+void tcl_state::tcl_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();  /* bfff ? */
+}
 
 
 static INPUT_PORTS_START( tcl )

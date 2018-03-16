@@ -14,7 +14,7 @@
 
 #define DECO16_VERBOSE 1
 
-DEFINE_DEVICE_TYPE(DECO16, deco16_device, "deco16", "DECO16")
+DEFINE_DEVICE_TYPE(DECO16, deco16_device, "deco16", "Data East DECO16")
 
 deco16_device::deco16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, DECO16, tag, owner, clock),

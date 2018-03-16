@@ -850,4 +850,4 @@ enum
 #define AVR8_SPCR_CPHA_MASK     0x04
 #define AVR8_SPCR_SPR_MASK      0x03
 
-#endif /* __AVR8_H__ */
+#endif /* MAME_CPU_AVR8_AVR8_H */

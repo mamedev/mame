@@ -87,7 +87,6 @@
 #include "includes/boogwing.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
 #include "machine/deco102.h"
 #include "machine/decocrpt.h"
 #include "machine/gen_latch.h"
@@ -123,58 +122,61 @@ WRITE16_MEMBER( boogwing_state::priority_w )
 }
 
 
-ADDRESS_MAP_START(boogwing_state::boogwing_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
+void boogwing_state::boogwing_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x20ffff).ram();
 
-	AM_RANGE(0x220000, 0x220001) AM_WRITE(priority_w)
-	AM_RANGE(0x220002, 0x22000f) AM_NOP
+	map(0x220000, 0x220001).w(this, FUNC(boogwing_state::priority_w));
+	map(0x220002, 0x22000f).noprw();
 
-	AM_RANGE(0x240000, 0x240001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
-	AM_RANGE(0x242000, 0x2427ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x244000, 0x244001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write)
-	AM_RANGE(0x246000, 0x2467ff) AM_RAM AM_SHARE("spriteram2")
+	map(0x240000, 0x240001).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
+	map(0x242000, 0x2427ff).ram().share("spriteram");
+	map(0x244000, 0x244001).w(m_spriteram2, FUNC(buffered_spriteram16_device::write));
+	map(0x246000, 0x2467ff).ram().share("spriteram2");
 
 //  AM_RANGE(0x24e6c0, 0x24e6c1) AM_READ_PORT("DSW")
 //  AM_RANGE(0x24e138, 0x24e139) AM_READ_PORT("SYSTEM")
 //  AM_RANGE(0x24e344, 0x24e345) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x24e000, 0x24efff) AM_READWRITE(boogwing_protection_region_0_104_r,boogwing_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
+	map(0x24e000, 0x24efff).rw(this, FUNC(boogwing_state::boogwing_protection_region_0_104_r), FUNC(boogwing_state::boogwing_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
 
-	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-	AM_RANGE(0x264000, 0x265fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x266000, 0x267fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x268000, 0x268fff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x26a000, 0x26afff) AM_RAM AM_SHARE("pf2_rowscroll")
+	map(0x260000, 0x26000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x264000, 0x265fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x266000, 0x267fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x268000, 0x268fff).ram().share("pf1_rowscroll");
+	map(0x26a000, 0x26afff).ram().share("pf2_rowscroll");
 
-	AM_RANGE(0x270000, 0x27000f) AM_DEVWRITE("tilegen2", deco16ic_device, pf_control_w)
-	AM_RANGE(0x274000, 0x275fff) AM_RAM_DEVWRITE("tilegen2", deco16ic_device, pf1_data_w)
-	AM_RANGE(0x276000, 0x277fff) AM_RAM_DEVWRITE("tilegen2", deco16ic_device, pf2_data_w)
-	AM_RANGE(0x278000, 0x278fff) AM_RAM AM_SHARE("pf3_rowscroll")
-	AM_RANGE(0x27a000, 0x27afff) AM_RAM AM_SHARE("pf4_rowscroll")
+	map(0x270000, 0x27000f).w(m_deco_tilegen2, FUNC(deco16ic_device::pf_control_w));
+	map(0x274000, 0x275fff).ram().w(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_w));
+	map(0x276000, 0x277fff).ram().w(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_w));
+	map(0x278000, 0x278fff).ram().share("pf3_rowscroll");
+	map(0x27a000, 0x27afff).ram().share("pf4_rowscroll");
 
-	AM_RANGE(0x280000, 0x28000f) AM_NOP // ?
-	AM_RANGE(0x282000, 0x282001) AM_NOP // Palette setup?
-	AM_RANGE(0x282008, 0x282009) AM_DEVWRITE("deco_ace", deco_ace_device, palette_dma_w)
-	AM_RANGE(0x284000, 0x285fff) AM_DEVREADWRITE("deco_ace", deco_ace_device, buffered_palette16_r, buffered_palette16_w)
+	map(0x280000, 0x28000f).noprw(); // ?
+	map(0x282000, 0x282001).noprw(); // Palette setup?
+	map(0x282008, 0x282009).w(m_deco_ace, FUNC(deco_ace_device::palette_dma_w));
+	map(0x284000, 0x285fff).rw(m_deco_ace, FUNC(deco_ace_device::buffered_palette16_r), FUNC(deco_ace_device::buffered_palette16_w));
 
-	AM_RANGE(0x3c0000, 0x3c004f) AM_DEVREADWRITE("deco_ace", deco_ace_device, ace_r, ace_w)
-ADDRESS_MAP_END
+	map(0x3c0000, 0x3c004f).rw(m_deco_ace, FUNC(deco_ace_device::ace_r), FUNC(deco_ace_device::ace_w));
+}
 
-ADDRESS_MAP_START(boogwing_state::decrypted_opcodes_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void boogwing_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom().share("decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(boogwing_state::audio_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_NOP
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot", deco104_device, soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void boogwing_state::audio_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x100000, 0x100001).noprw();
+	map(0x110000, 0x110001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x120000, 0x120001).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x140000, 0x140000).r(m_deco104, FUNC(deco104_device::soundlatch_r));
+	map(0x1f0000, 0x1f1fff).bankrw("bank8");
+	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
+	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+}
 
 
 /**********************************************************************************/

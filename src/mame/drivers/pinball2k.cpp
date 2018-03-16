@@ -101,6 +101,9 @@ public:
 	void mediagx_io(address_map &map);
 	void mediagx_map(address_map &map);
 	void ramdac_map(address_map &map);
+
+	uint32_t cx5510_pci_r(int function, int reg, uint32_t mem_mask);
+	void cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
 // Display controller registers
@@ -453,51 +456,49 @@ WRITE32_MEMBER(pinball2k_state::parallel_port_w)
 {
 }
 
-static uint32_t cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t pinball2k_state::cx5510_pci_r(int function, int reg, uint32_t mem_mask)
 {
-	pinball2k_state *state = busdevice->machine().driver_data<pinball2k_state>();
-
 	//osd_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 	switch (reg)
 	{
 		case 0:     return 0x00001078;
 	}
 
-	return state->m_cx5510_regs[reg/4];
+	return m_cx5510_regs[reg/4];
 }
 
-static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void pinball2k_state::cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	pinball2k_state *state = busdevice->machine().driver_data<pinball2k_state>();
-
 	//osd_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
-	COMBINE_DATA(state->m_cx5510_regs + (reg/4));
+	COMBINE_DATA(&m_cx5510_regs[reg/4]);
 }
 
 /*****************************************************************************/
 
-ADDRESS_MAP_START(pinball2k_state::mediagx_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM AM_SHARE("main_ram")
-	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
-	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_SHARE("cga_ram")
-	AM_RANGE(0x000c0000, 0x000fffff) AM_RAM AM_SHARE("bios_ram")
-	AM_RANGE(0x00100000, 0x00ffffff) AM_RAM
-	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE(biu_ctrl_r, biu_ctrl_w)
-	AM_RANGE(0x40008300, 0x400083ff) AM_READWRITE(disp_ctrl_r, disp_ctrl_w)
-	AM_RANGE(0x40008400, 0x400084ff) AM_READWRITE(memory_ctrl_r, memory_ctrl_w)
-	AM_RANGE(0x40800000, 0x40bfffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
-ADDRESS_MAP_END
+void pinball2k_state::mediagx_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram().share("main_ram");
+	map(0x000a0000, 0x000affff).ram();
+	map(0x000b0000, 0x000b7fff).ram().share("cga_ram");
+	map(0x000c0000, 0x000fffff).ram().share("bios_ram");
+	map(0x00100000, 0x00ffffff).ram();
+	map(0x40008000, 0x400080ff).rw(this, FUNC(pinball2k_state::biu_ctrl_r), FUNC(pinball2k_state::biu_ctrl_w));
+	map(0x40008300, 0x400083ff).rw(this, FUNC(pinball2k_state::disp_ctrl_r), FUNC(pinball2k_state::disp_ctrl_w));
+	map(0x40008400, 0x400084ff).rw(this, FUNC(pinball2k_state::memory_ctrl_r), FUNC(pinball2k_state::memory_ctrl_w));
+	map(0x40800000, 0x40bfffff).ram().share("vram");
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+}
 
-ADDRESS_MAP_START(pinball2k_state::mediagx_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
-	AM_RANGE(0x00e8, 0x00eb) AM_NOP     // I/O delay port
-	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
-	AM_RANGE(0x0400, 0x0403) AM_READWRITE(port400_r, port400_w)
-	AM_RANGE(0x0800, 0x0803) AM_READWRITE(port800_r, port800_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-ADDRESS_MAP_END
+void pinball2k_state::mediagx_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x0022, 0x0023).rw(this, FUNC(pinball2k_state::io20_r), FUNC(pinball2k_state::io20_w));
+	map(0x00e8, 0x00eb).noprw();     // I/O delay port
+	map(0x0378, 0x037b).rw(this, FUNC(pinball2k_state::parallel_port_r), FUNC(pinball2k_state::parallel_port_w));
+	map(0x0400, 0x0403).rw(this, FUNC(pinball2k_state::port400_r), FUNC(pinball2k_state::port400_w));
+	map(0x0800, 0x0803).rw(this, FUNC(pinball2k_state::port800_r), FUNC(pinball2k_state::port800_w));
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+}
 
 /*****************************************************************************/
 
@@ -591,9 +592,10 @@ void pinball2k_state::machine_reset()
 	m_maincpu->reset();
 }
 
-ADDRESS_MAP_START(pinball2k_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void pinball2k_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 MACHINE_CONFIG_START(pinball2k_state::mediagx)
 
@@ -606,7 +608,7 @@ MACHINE_CONFIG_START(pinball2k_state::mediagx)
 	pcat_common(config);
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(18, nullptr, cx5510_pci_r, cx5510_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, pinball2k_state, cx5510_pci_r, cx5510_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))

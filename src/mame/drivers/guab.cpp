@@ -116,25 +116,26 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(guab_state::guab_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04ffff) AM_ROM AM_REGION("maincpu", 0x10000)
-	AM_RANGE(0x0c0000, 0x0c0007) AM_DEVREADWRITE8("i8255_1", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0020, 0x0c0027) AM_DEVREADWRITE8("i8255_2", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0040, 0x0c0047) AM_DEVREADWRITE8("i8255_3", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0060, 0x0c0067) AM_DEVREADWRITE8("i8255_4", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0080, 0x0c0083) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
-	AM_RANGE(0x0c00a0, 0x0c00a3) AM_DEVREADWRITE8("acia6850_2", acia6850_device, read, write, 0x00ff)
-	AM_RANGE(0x0c00c0, 0x0c00cf) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0x0c00e0, 0x0c00e7) AM_DEVREADWRITE8("fdc", wd1773_device, read, write, 0x00ff)
-	AM_RANGE(0x080000, 0x080fff) AM_RAM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x100002, 0x100003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
-	AM_RANGE(0x800000, 0xb0ffff) AM_READWRITE(tms34061_r, tms34061_w)
-	AM_RANGE(0xb10000, 0xb1ffff) AM_RAM
-	AM_RANGE(0xb80000, 0xb8ffff) AM_RAM
-	AM_RANGE(0xb90000, 0xb9ffff) AM_RAM
-ADDRESS_MAP_END
+void guab_state::guab_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x040000, 0x04ffff).rom().region("maincpu", 0x10000);
+	map(0x0c0000, 0x0c0007).rw("i8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0c0020, 0x0c0027).rw("i8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0c0040, 0x0c0047).rw("i8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0c0060, 0x0c0067).rw("i8255_4", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0c0080, 0x0c0083).rw("acia6850_1", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0x0c00a0, 0x0c00a3).rw("acia6850_2", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0x0c00c0, 0x0c00cf).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	map(0x0c00e0, 0x0c00e7).rw(m_fdc, FUNC(wd1773_device::read), FUNC(wd1773_device::write)).umask16(0x00ff);
+	map(0x080000, 0x080fff).ram();
+	map(0x100001, 0x100001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
+	map(0x100003, 0x100003).w("ef9369", FUNC(ef9369_device::address_w));
+	map(0x800000, 0xb0ffff).rw(this, FUNC(guab_state::tms34061_r), FUNC(guab_state::tms34061_w));
+	map(0xb10000, 0xb1ffff).ram();
+	map(0xb80000, 0xb8ffff).ram();
+	map(0xb90000, 0xb9ffff).ram();
+}
 
 
 //**************************************************************************

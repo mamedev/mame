@@ -28,8 +28,6 @@ public:
 		m_bufferram(*this, "bufferram"),
 		m_textureram0(*this, "textureram0"),
 		m_textureram1(*this, "textureram1"),
-		m_fbvram1(*this, "fbvram1"),
-		m_fbvram2(*this, "fbvram2"),
 		m_soundram(*this, "soundram"),
 		m_tgp_program(*this, "tgp_program"),
 		m_tgpx4_program(*this, "tgpx4_program"),
@@ -50,6 +48,7 @@ public:
 		m_cryptdevice(*this, "315_5881"),
 		m_0229crypt(*this, "317_0229"),
 		m_in(*this, "IN%u", 0),
+		m_dsw(*this, "DSW"),
 		m_steer(*this, "STEER"),
 		m_accel(*this, "ACCEL"),
 		m_brake(*this, "BRAKE"),
@@ -65,8 +64,8 @@ public:
 	required_shared_ptr<uint32_t> m_textureram0;
 	required_shared_ptr<uint32_t> m_textureram1;
 	std::unique_ptr<uint16_t[]> m_lumaram;
-	required_shared_ptr<uint32_t> m_fbvram1;
-	required_shared_ptr<uint32_t> m_fbvram2;
+	std::unique_ptr<uint16_t[]> m_fbvramA;
+	std::unique_ptr<uint16_t[]> m_fbvramB;
 	optional_shared_ptr<uint16_t> m_soundram;
 	optional_shared_ptr<uint32_t> m_tgp_program;
 	optional_shared_ptr<uint64_t> m_tgpx4_program;
@@ -89,6 +88,7 @@ public:
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
 
 	optional_ioport_array<5> m_in;
+	required_ioport m_dsw;
 	optional_ioport m_steer;
 	optional_ioport m_accel;
 	optional_ioport m_brake;
@@ -96,18 +96,6 @@ public:
 	optional_ioport_array<4> m_analog_ports;
 	optional_ioport_array<4> m_lightgun_ports;
 
-	int m_port_1c00004;
-	int m_port_1c00006;
-	int m_port_1c00010;
-	int m_port_1c00012;
-	int m_port_1c00014;
-
-	uint32_t m_intreq;
-	uint32_t m_intena;
-	uint32_t m_coproctl;
-	uint32_t m_coprocnt;
-	uint32_t m_geoctl;
-	uint32_t m_geocnt;
 	uint32_t m_timervals[4];
 	uint32_t m_timerorig[4];
 	int m_timerrun[4];
@@ -129,7 +117,6 @@ public:
 	uint32_t m_iop_data;
 	int m_geo_iop_write_num;
 	uint32_t m_geo_iop_data;
-	int m_to_68k;
 
 	uint32_t m_geo_read_start_address;
 	uint32_t m_geo_write_start_address;
@@ -137,8 +124,7 @@ public:
 	raster_state *m_raster;
 	geo_state *m_geo;
 	bitmap_rgb32 m_sys24_bitmap;
-	uint32_t m_videocontrol;
-	uint32_t m_soundack;
+//	uint32_t m_soundack;
 	void model2_check_irq_state();
 	void model2_check_irqack_state(uint32_t data);
 	uint8_t m_gearsel;
@@ -175,8 +161,10 @@ public:
 	DECLARE_WRITE32_MEMBER(geo_w);
 	DECLARE_READ8_MEMBER(hotd_lightgun_r);
 	DECLARE_WRITE32_MEMBER(hotd_lightgun_w);
-	DECLARE_READ32_MEMBER(model2_irq_r);
-	DECLARE_WRITE32_MEMBER(model2_irq_w);
+	DECLARE_READ32_MEMBER(irq_request_r);
+	DECLARE_WRITE32_MEMBER(irq_ack_w);
+	DECLARE_READ32_MEMBER(irq_enable_r);
+	DECLARE_WRITE32_MEMBER(irq_enable_w);
 	DECLARE_READ32_MEMBER(model2_serial_r);
 	DECLARE_WRITE32_MEMBER(model2o_serial_w);
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
@@ -191,6 +179,10 @@ public:
 	DECLARE_WRITE32_MEMBER(model2o_tex_w1);
 	DECLARE_READ16_MEMBER(lumaram_r);
 	DECLARE_WRITE16_MEMBER(lumaram_w);
+	DECLARE_READ16_MEMBER(fbvram_bankA_r);
+	DECLARE_WRITE16_MEMBER(fbvram_bankA_w);
+	DECLARE_READ16_MEMBER(fbvram_bankB_r);
+	DECLARE_WRITE16_MEMBER(fbvram_bankB_w);
 	DECLARE_WRITE32_MEMBER(model2_3d_zclip_w);
 	DECLARE_WRITE16_MEMBER(model2snd_ctrl);
 	DECLARE_READ32_MEMBER(copro_sharc_input_fifo_r);
@@ -225,7 +217,8 @@ public:
 	DECLARE_MACHINE_RESET(model2_common);
 	DECLARE_MACHINE_RESET(model2_scsp);
 	uint32_t screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
+//	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
+//	DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
@@ -245,11 +238,12 @@ public:
 
 	void model2_3d_frame_start( void );
 	void geo_parse( void );
-	
 	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
-
+	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	
 	void model2_timers(machine_config &config);
 	void model2_screen(machine_config &config);
+	void model2_scsp(machine_config &config);
 
 	void sj25_0207_01(machine_config &config);
 	void copro_sharc_map(address_map &map);
@@ -276,8 +270,22 @@ protected:
 private:
 	void tri_list_dump(FILE *dst);
 
+	uint32_t m_intreq;
+	uint32_t m_intena;
+	uint32_t m_coproctl;
+	uint32_t m_coprocnt;
+	uint32_t m_geoctl;
+	uint32_t m_geocnt;
+	uint32_t m_videocontrol;
+	int m_port_1c00004;
+	int m_port_1c00006;
+	int m_port_1c00010;
+	int m_port_1c00012;
+	int m_port_1c00014;
+
 	bool m_render_unk;
 	bool m_render_mode;
+	bool m_render_test_mode;
 	int16 m_crtc_xoffset, m_crtc_yoffset;
 
 	uint32_t *geo_process_command( geo_state *geo, uint32_t opcode, uint32_t *input, bool *end_code );
@@ -318,6 +326,8 @@ private:
 
 	// inliners
 	inline void model2_3d_project( triangle *tri );
+	inline uint16_t float_to_zval( float floatval );
+	inline bool check_culling( raster_state *raster, uint32_t attr, float min_z, float max_z );
 };
 
 /*****************************
@@ -363,6 +373,27 @@ private:
 	int m_maxxstate;
 };
 
+/*****************************
+ *
+ * Daytona GTX 2004 Edition
+ *
+ *****************************/
+
+class model2o_gtx_state : public model2o_state
+{
+public:
+	model2o_gtx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2o_state(mconfig, type, tag)
+	{}
+
+	DECLARE_READ8_MEMBER(gtx_r);
+	void daytona_gtx(machine_config &config);
+	void model2o_gtx_mem(address_map &map);
+	
+private:
+	int m_gtx_state;
+};
+ 
 /*****************************
  *
  * Model 2A

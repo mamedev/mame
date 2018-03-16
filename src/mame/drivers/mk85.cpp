@@ -42,11 +42,12 @@ public:
 };
 
 
-ADDRESS_MAP_START(mk85_state::mk85_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM AM_MIRROR(0x4000)
-	AM_RANGE( 0x8000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void mk85_state::mk85_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom().mirror(0x4000);
+	map(0x8000, 0xffff).ram();
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mk85 )

@@ -444,27 +444,28 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_io_write )
 
 
 
-ADDRESS_MAP_START(md_base_state::megadriv_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
+void md_base_state::megadriv_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
 	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
 
-	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram,megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa04000, 0xa04003) AM_READWRITE8(megadriv_68k_YM2612_read,megadriv_68k_YM2612_write, 0xffff)
+	map(0xa00000, 0xa01fff).rw(this, FUNC(md_base_state::megadriv_68k_read_z80_ram), FUNC(md_base_state::megadriv_68k_write_z80_ram));
+	map(0xa02000, 0xa03fff).w(this, FUNC(md_base_state::megadriv_68k_write_z80_ram));
+	map(0xa04000, 0xa04003).rw(this, FUNC(md_base_state::megadriv_68k_YM2612_read), FUNC(md_base_state::megadriv_68k_YM2612_write));
 
-	AM_RANGE(0xa06000, 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
+	map(0xa06000, 0xa06001).w(this, FUNC(md_base_state::megadriv_68k_z80_bank_write));
 
-	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE(megadriv_68k_io_read,megadriv_68k_io_write)
+	map(0xa10000, 0xa1001f).rw(this, FUNC(md_base_state::megadriv_68k_io_read), FUNC(md_base_state::megadriv_68k_io_write));
 
-	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus,megadriv_68k_req_z80_bus)
-	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
+	map(0xa11100, 0xa11101).rw(this, FUNC(md_base_state::megadriv_68k_check_z80_bus), FUNC(md_base_state::megadriv_68k_req_z80_bus));
+	map(0xa11200, 0xa11201).w(this, FUNC(md_base_state::megadriv_68k_req_z80_reset));
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
-	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w) // the earth defend
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
+	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
+	map(0xd00000, 0xd0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w)); // the earth defend
+	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000).share("megadrive_ram");
 //  AM_RANGE(0xff0000, 0xffffff) AM_READONLY
 	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
-ADDRESS_MAP_END
+}
 
 
 ADDRESS_MAP_START(md_base_state::dcat16_megadriv_map)
@@ -723,24 +724,26 @@ READ8_MEMBER(md_base_state::megadriv_z80_unmapped_read )
 	return 0xff;
 }
 
-ADDRESS_MAP_START(md_base_state::megadriv_z80_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1") AM_MIRROR(0x2000) // RAM can be accessed by the 68k
-	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ymsnd", ym2612_device, read, write)
+void md_base_state::megadriv_z80_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankrw("bank1").mirror(0x2000); // RAM can be accessed by the 68k
+	map(0x4000, 0x4003).rw(m_ymsnd, FUNC(ym2612_device::read), FUNC(ym2612_device::write));
 
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(megadriv_z80_z80_bank_w)
-	AM_RANGE(0x6001, 0x6001) AM_WRITE(megadriv_z80_z80_bank_w) // wacky races uses this address
+	map(0x6000, 0x6000).w(this, FUNC(md_base_state::megadriv_z80_z80_bank_w));
+	map(0x6001, 0x6001).w(this, FUNC(md_base_state::megadriv_z80_z80_bank_w)); // wacky races uses this address
 
-	AM_RANGE(0x6100, 0x7eff) AM_READ(megadriv_z80_unmapped_read)
+	map(0x6100, 0x7eff).r(this, FUNC(md_base_state::megadriv_z80_unmapped_read));
 
-	AM_RANGE(0x7f00, 0x7fff) AM_READWRITE(megadriv_z80_vdp_read,megadriv_z80_vdp_write)
+	map(0x7f00, 0x7fff).rw(this, FUNC(md_base_state::megadriv_z80_vdp_read), FUNC(md_base_state::megadriv_z80_vdp_write));
 
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(z80_read_68k_banked_data,z80_write_68k_banked_data) // The Z80 can read the 68k address space this way
-ADDRESS_MAP_END
+	map(0x8000, 0xffff).rw(this, FUNC(md_base_state::z80_read_68k_banked_data), FUNC(md_base_state::z80_write_68k_banked_data)); // The Z80 can read the 68k address space this way
+}
 
-ADDRESS_MAP_START(md_base_state::megadriv_z80_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0xff) AM_NOP
-ADDRESS_MAP_END
+void md_base_state::megadriv_z80_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0xff).noprw();
+}
 
 uint32_t md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

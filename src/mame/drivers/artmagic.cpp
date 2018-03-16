@@ -408,54 +408,57 @@ WRITE16_MEMBER(artmagic_state::protection_bit_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(artmagic_state::main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x220000, 0x23ffff) AM_RAM
-	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("300000")
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("300002")
-	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("300004")
-	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("300006")
-	AM_RANGE(0x300008, 0x300009) AM_READ_PORT("300008")
-	AM_RANGE(0x30000a, 0x30000b) AM_READ_PORT("30000a")
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
-	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x360000, 0x360001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
-ADDRESS_MAP_END
+void artmagic_state::main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x220000, 0x23ffff).ram();
+	map(0x240000, 0x240fff).ram().share("nvram");
+	map(0x300000, 0x300001).portr("300000");
+	map(0x300002, 0x300003).portr("300002");
+	map(0x300004, 0x300005).portr("300004");
+	map(0x300006, 0x300007).portr("300006");
+	map(0x300008, 0x300009).portr("300008");
+	map(0x30000a, 0x30000b).portr("30000a");
+	map(0x300000, 0x300003).w(this, FUNC(artmagic_state::control_w)).share("control");
+	map(0x300004, 0x300007).w(this, FUNC(artmagic_state::protection_bit_w));
+	map(0x360001, 0x360001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x380000, 0x380007).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
+}
 
 
-ADDRESS_MAP_START(artmagic_state::stonebal_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x27ffff) AM_RAM
-	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("300000")
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("300002")
-	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("300004")
-	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("300006")
-	AM_RANGE(0x300008, 0x300009) AM_READ_PORT("300008")
-	AM_RANGE(0x30000a, 0x30000b) AM_READ_PORT("30000a")
-	AM_RANGE(0x30000c, 0x30000d) AM_READ_PORT("30000c")
-	AM_RANGE(0x30000e, 0x30000f) AM_READ_PORT("30000e")
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
-	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
-ADDRESS_MAP_END
+void artmagic_state::stonebal_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x27ffff).ram();
+	map(0x280000, 0x280fff).ram().share("nvram");
+	map(0x300000, 0x300001).portr("300000");
+	map(0x300002, 0x300003).portr("300002");
+	map(0x300004, 0x300005).portr("300004");
+	map(0x300006, 0x300007).portr("300006");
+	map(0x300008, 0x300009).portr("300008");
+	map(0x30000a, 0x30000b).portr("30000a");
+	map(0x30000c, 0x30000d).portr("30000c");
+	map(0x30000e, 0x30000f).portr("30000e");
+	map(0x300000, 0x300003).w(this, FUNC(artmagic_state::control_w)).share("control");
+	map(0x300004, 0x300007).w(this, FUNC(artmagic_state::protection_bit_w));
+	map(0x340001, 0x340001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x380000, 0x380007).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
+}
 
 // TODO: jumps to undefined area at PC=33a0 -> 230000, presumably protection device provides a code snippet
-ADDRESS_MAP_START(artmagic_state::shtstar_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x27ffff) AM_RAM
-	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("nvram")
+void artmagic_state::shtstar_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x27ffff).ram();
+	map(0x280000, 0x280fff).ram().share("nvram");
 
-	AM_RANGE(0x300000, 0x300001) AM_READNOP //AM_READ_PORT("300000")
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
-	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
-	AM_RANGE(0x3c0000, 0x3c001f) AM_DEVREADWRITE8("mainduart", mc68681_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+	map(0x300000, 0x300001).nopr(); //AM_READ_PORT("300000")
+	map(0x300000, 0x300003).w(this, FUNC(artmagic_state::control_w)).share("control");
+	map(0x300004, 0x300007).w(this, FUNC(artmagic_state::protection_bit_w));
+	map(0x340001, 0x340001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x380000, 0x380007).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
+	map(0x3c0000, 0x3c001f).rw("mainduart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+}
 
 
 /*************************************
@@ -464,24 +467,26 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(artmagic_state::tms_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram0")
-	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_SHARE("vram1")
-	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
-	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_RAM
-ADDRESS_MAP_END
+void artmagic_state::tms_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("vram0");
+	map(0x00400000, 0x005fffff).ram().share("vram1");
+	map(0x00800000, 0x0080007f).rw(this, FUNC(artmagic_state::artmagic_blitter_r), FUNC(artmagic_state::artmagic_blitter_w));
+	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xffe00000, 0xffffffff).ram();
+}
 
 
-ADDRESS_MAP_START(artmagic_state::stonebal_tms_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram0")
-	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_SHARE("vram1")
-	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
-	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
-ADDRESS_MAP_END
+void artmagic_state::stonebal_tms_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("vram0");
+	map(0x00400000, 0x005fffff).ram().share("vram1");
+	map(0x00800000, 0x0080007f).rw(this, FUNC(artmagic_state::artmagic_blitter_r), FUNC(artmagic_state::artmagic_blitter_w));
+	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xffc00000, 0xffffffff).ram();
+}
 
 /*************************************
  *
@@ -491,21 +496,24 @@ ADDRESS_MAP_END
  *************************************/
 
 /* see adp.c */
-ADDRESS_MAP_START(artmagic_state::shtstar_subcpu_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x800140, 0x800141) AM_DEVWRITE8("aysnd", ym2149_device, address_w, 0x00ff)
-	AM_RANGE(0x800142, 0x800143) AM_DEVREADWRITE8("aysnd", ym2149_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("subduart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void artmagic_state::shtstar_subcpu_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x800141, 0x800141).w("aysnd", FUNC(ym2149_device::address_w));
+	map(0x800143, 0x800143).rw("aysnd", FUNC(ym2149_device::data_r), FUNC(ym2149_device::data_w));
+	map(0x800180, 0x80019f).rw("subduart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0xffc000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(artmagic_state::shtstar_guncpu_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void artmagic_state::shtstar_guncpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(artmagic_state::shtstar_guncpu_io_map)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-ADDRESS_MAP_END
+void artmagic_state::shtstar_guncpu_io_map(address_map &map)
+{
+	map(0xc000, 0xcfff).ram();
+}
 
 
 /*************************************

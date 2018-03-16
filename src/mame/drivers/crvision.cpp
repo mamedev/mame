@@ -142,38 +142,40 @@ CN1     - main board connector (17x2 pin header)
     ADDRESS_MAP( crvision_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(crvision_state::crvision_map)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD(TMS9929_TAG, tms9928a_device, vram_read)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_DEVREAD(TMS9929_TAG, tms9928a_device, register_read)
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_DEVWRITE(TMS9929_TAG, tms9928a_device, vram_write)
-	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_DEVWRITE(TMS9929_TAG, tms9928a_device, register_write)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(BANK_ROM2)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(BANK_ROM1)
+void crvision_state::crvision_map(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x0c00).ram();
+	map(0x1000, 0x1003).mirror(0x0ffc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2000, 0x2000).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::vram_read));
+	map(0x2001, 0x2001).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::register_read));
+	map(0x3000, 0x3000).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::vram_write));
+	map(0x3001, 0x3001).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::register_write));
+	map(0x4000, 0x7fff).bankr(BANK_ROM2);
+	map(0x8000, 0xbfff).bankr(BANK_ROM1);
 //  AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(3)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0xe801, 0xe801) AM_DEVREAD("cent_status_in", input_buffer_device, read)
-	AM_RANGE(0xe801, 0xe801) AM_DEVWRITE("cent_ctrl_out", output_latch_device, write)
+	map(0xe800, 0xe800).w(m_cent_data_out, FUNC(output_latch_device::write));
+	map(0xe801, 0xe801).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0xe801, 0xe801).w("cent_ctrl_out", FUNC(output_latch_device::write));
 //  AM_RANGE(0xe802, 0xf7ff) AM_RAMBANK(4)
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
-ADDRESS_MAP_END
+	map(0xf800, 0xffff).rom().region(M6502_TAG, 0);
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( lasr2001_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(laser2001_state::lasr2001_map)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD(TMS9929_TAG, tms9928a_device, vram_read)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_DEVREAD(TMS9929_TAG, tms9928a_device, register_read)
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_DEVWRITE(TMS9929_TAG, tms9928a_device, vram_write)
-	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_DEVWRITE(TMS9929_TAG, tms9928a_device, register_write)
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(BANK_ROM2)
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(BANK_ROM1)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
-ADDRESS_MAP_END
+void laser2001_state::lasr2001_map(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x0c00).ram();
+	map(0x1000, 0x1003).mirror(0x0ffc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2000, 0x2000).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::vram_read));
+	map(0x2001, 0x2001).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::register_read));
+	map(0x3000, 0x3000).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::vram_write));
+	map(0x3001, 0x3001).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::register_write));
+	map(0x4000, 0x7fff).bankrw(BANK_ROM2);
+	map(0x8000, 0xbfff).bankrw(BANK_ROM1);
+	map(0xc000, 0xffff).rom().region(M6502_TAG, 0);
+}
 
 /***************************************************************************
     INPUT PORTS

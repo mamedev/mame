@@ -212,21 +212,23 @@ READ8_MEMBER( fp1100_state::slot_id_r )
 	return m_slot[m_slot_num & 7].id;
 }
 
-ADDRESS_MAP_START(fp1100_state::main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x9000, 0xffff) AM_RAM AM_REGION("wram", 0x9000)
-ADDRESS_MAP_END
+void fp1100_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x8fff).bankr("bankr0").bankw("bankw0");
+	map(0x9000, 0xffff).ram().region("wram", 0x9000);
+}
 
-ADDRESS_MAP_START(fp1100_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
+void fp1100_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
 	//AM_RANGE(0x0000, 0xfeff) slot memory area
-	AM_RANGE(0xff00, 0xff7f) AM_READWRITE(slot_id_r,slot_bank_w)
-	AM_RANGE(0xff80, 0xffff) AM_READ(sub_to_main_r)
-	AM_RANGE(0xff80, 0xff9f) AM_WRITE(irq_mask_w)
-	AM_RANGE(0xffa0, 0xffbf) AM_WRITE(main_bank_w)
-	AM_RANGE(0xffc0, 0xffff) AM_WRITE(main_to_sub_w)
-ADDRESS_MAP_END
+	map(0xff00, 0xff7f).rw(this, FUNC(fp1100_state::slot_id_r), FUNC(fp1100_state::slot_bank_w));
+	map(0xff80, 0xffff).r(this, FUNC(fp1100_state::sub_to_main_r));
+	map(0xff80, 0xff9f).w(this, FUNC(fp1100_state::irq_mask_w));
+	map(0xffa0, 0xffbf).w(this, FUNC(fp1100_state::main_bank_w));
+	map(0xffc0, 0xffff).w(this, FUNC(fp1100_state::main_to_sub_w));
+}
 
 READ8_MEMBER( fp1100_state::main_to_sub_r )
 {
@@ -275,17 +277,18 @@ WRITE8_MEMBER( fp1100_state::kbd_row_w )
 	m_beep->set_state(BIT(data, 4));
 }
 
-ADDRESS_MAP_START(fp1100_state::sub_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("sub_ipl",0x0000)
-	AM_RANGE(0x2000, 0xdfff) AM_RAM AM_SHARE("videoram") //vram B/R/G
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x3fe) AM_DEVREADWRITE("crtc", mc6845_device, status_r,address_w)
-	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x3fe) AM_DEVREADWRITE("crtc", mc6845_device, register_r,register_w)
-	AM_RANGE(0xe400, 0xe7ff) AM_READ_PORT("DSW") AM_WRITE(kbd_row_w)
-	AM_RANGE(0xe800, 0xebff) AM_READWRITE(main_to_sub_r,sub_to_main_w)
+void fp1100_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("sub_ipl", 0x0000);
+	map(0x2000, 0xdfff).ram().share("videoram"); //vram B/R/G
+	map(0xe000, 0xe000).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0xe001, 0xe001).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xe400, 0xe7ff).portr("DSW").w(this, FUNC(fp1100_state::kbd_row_w));
+	map(0xe800, 0xebff).rw(this, FUNC(fp1100_state::main_to_sub_r), FUNC(fp1100_state::sub_to_main_w));
 	//AM_RANGE(0xec00, 0xefff) "Acknowledge of INT0" is coded in but isn't currently executed
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(colour_control_w)
-	AM_RANGE(0xf400, 0xff7f) AM_ROM AM_REGION("sub_ipl",0x2400)
-ADDRESS_MAP_END
+	map(0xf000, 0xf3ff).w(this, FUNC(fp1100_state::colour_control_w));
+	map(0xf400, 0xff7f).rom().region("sub_ipl", 0x2400);
+}
 
 /*
 d0,1,2 - enable RGB guns (G,R,B)

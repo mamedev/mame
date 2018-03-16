@@ -32,7 +32,7 @@ enum {
 };
 
 
-DEFINE_DEVICE_TYPE(I860, i860_cpu_device, "i860xr", "i860XR")
+DEFINE_DEVICE_TYPE(I860, i860_cpu_device, "i860xr", "Intel i860XR")
 
 
 i860_cpu_device::i860_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

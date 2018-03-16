@@ -123,24 +123,25 @@ WRITE16_MEMBER(calcune_state::cal_vdp_w)
 		m_vdp2->vdp_w(space, offset, data, mem_mask);
 }
 
-ADDRESS_MAP_START(calcune_state::calcune_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+void calcune_state::calcune_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
 
-	AM_RANGE(0x700000, 0x700001) AM_READ(cal_700000_r)
+	map(0x700000, 0x700001).r(this, FUNC(calcune_state::cal_700000_r));
 
-	AM_RANGE(0x710000, 0x710001) AM_READ_PORT("710000")
-	AM_RANGE(0x720000, 0x720001) AM_READ_PORT("720000")
+	map(0x710000, 0x710001).portr("710000");
+	map(0x720000, 0x720001).portr("720000");
 //  AM_RANGE(0x730000, 0x730001) possible Z80 control?
-	AM_RANGE(0x760000, 0x760003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)
+	map(0x760000, 0x760003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
 
-	AM_RANGE(0x770000, 0x770001) AM_WRITE(cal_770000_w)
+	map(0x770000, 0x770001).w(this, FUNC(calcune_state::cal_770000_w));
 
-	AM_RANGE(0xA14100, 0xA14101) AM_NOP // on startup, possible z80 control
+	map(0xA14100, 0xA14101).noprw(); // on startup, possible z80 control
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(cal_vdp_r, cal_vdp_w)
+	map(0xc00000, 0xc0001f).rw(this, FUNC(calcune_state::cal_vdp_r), FUNC(calcune_state::cal_vdp_w));
 
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram") // battery on PCB
-ADDRESS_MAP_END
+	map(0xff0000, 0xffffff).ram().share("nvram"); // battery on PCB
+}
 
 
 uint32_t calcune_state::screen_update_calcune(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

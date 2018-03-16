@@ -478,22 +478,6 @@ WRITE16_MEMBER(segas32_state::system32_videoram_w)
 }
 
 
-READ32_MEMBER(segas32_state::multi32_videoram_r)
-{
-	return m_system32_videoram[offset*2+0] |
-			(m_system32_videoram[offset*2+1] << 16);
-}
-
-
-WRITE32_MEMBER(segas32_state::multi32_videoram_w)
-{
-	if (ACCESSING_BITS_0_15)
-		system32_videoram_w(space, offset*2+0, data, mem_mask);
-	if (ACCESSING_BITS_16_31)
-		system32_videoram_w(space, offset*2+1, data >> 16, mem_mask >> 16);
-}
-
-
 
 /*************************************
  *
@@ -501,7 +485,7 @@ WRITE32_MEMBER(segas32_state::multi32_videoram_w)
  *
  *************************************/
 
-READ16_MEMBER(segas32_state::system32_sprite_control_r)
+READ8_MEMBER(segas32_state::sprite_control_r)
 {
 	switch (offset)
 	{
@@ -509,7 +493,7 @@ READ16_MEMBER(segas32_state::system32_sprite_control_r)
 			/*  D1 : Seems to be '1' only during an erase in progress, this
 			         occurs very briefly though.
 			    D0 : Selected frame buffer (0= A, 1= B) */
-			return 0xfffc | (int)(&m_layer_data[MIXER_LAYER_SPRITES].bitmap < &m_layer_data[MIXER_LAYER_SPRITES_2].bitmap);
+			return 0xfc | (int)(&m_layer_data[MIXER_LAYER_SPRITES].bitmap < &m_layer_data[MIXER_LAYER_SPRITES_2].bitmap);
 
 		case 1:
 			/*  D1 : ?
@@ -523,62 +507,45 @@ READ16_MEMBER(segas32_state::system32_sprite_control_r)
 			    3 = Never occurs
 
 			    Condition 2 can occur during rendering or list processing. */
-			return 0xfffc | 1;
+			return 0xfc | 1;
 
 		case 2:
 			/*  D1 : 1= Vertical flip, 0= Normal orientation
 			    D0 : 1= Horizontal flip, 0= Normal orientation */
-			return 0xfffc | m_sprite_control_latched[2];
+			return 0xfc | m_sprite_control_latched[2];
 
 		case 3:
 			/*  D1 : 1= Manual mode, 0= Automatic mode
 			    D0 : 1= 30 Hz update, 0= 60 Hz update (automatic mode only) */
-			return 0xfffc | m_sprite_control_latched[3];
+			return 0xfc | m_sprite_control_latched[3];
 
 		case 4:
 			/*  D1 : ?
 			    D0 : ? */
-			return 0xfffc | m_sprite_control_latched[4];
+			return 0xfc | m_sprite_control_latched[4];
 
 		case 5:
 			/*  D1 : ?
 			    D0 : ? */
-			return 0xfffc | m_sprite_control_latched[5];
+			return 0xfc | m_sprite_control_latched[5];
 
 		case 6:
 			/*  D0 : 1= 416 pixels
 			         0= 320 pixels */
-			return 0xfffc | (m_sprite_control_latched[6] & 1);
+			return 0xfc | (m_sprite_control_latched[6] & 1);
 
 		case 7:
 			/*  D1 : ?
 			    D0 : ? */
-			return 0xfffc;
+			return 0xfc;
 	}
-	return 0xffff;
+	return 0xff;
 }
 
 
-WRITE16_MEMBER(segas32_state::system32_sprite_control_w)
+WRITE8_MEMBER(segas32_state::sprite_control_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_sprite_control[offset & 7] = data;
-}
-
-
-READ32_MEMBER(segas32_state::multi32_sprite_control_r)
-{
-	return system32_sprite_control_r(space, offset*2+0, mem_mask) |
-			(system32_sprite_control_r(space, offset*2+1, mem_mask >> 16) << 16);
-}
-
-
-WRITE32_MEMBER(segas32_state::multi32_sprite_control_w)
-{
-	if (ACCESSING_BITS_0_15)
-		system32_sprite_control_w(space, offset*2+0, data, mem_mask);
-	if (ACCESSING_BITS_16_31)
-		system32_sprite_control_w(space, offset*2+1, data >> 16, mem_mask >> 16);
+	m_sprite_control[offset & 7] = data;
 }
 
 

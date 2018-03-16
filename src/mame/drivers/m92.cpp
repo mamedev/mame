@@ -306,78 +306,83 @@ WRITE16_MEMBER(m92_state::m92_sound_reset_w)
 /*****************************************************************************/
 
 /* appears to be an earlier board */
-ADDRESS_MAP_START(m92_state::lethalth_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x80000, 0x8ffff) AM_RAM_WRITE(m92_vram_w) AM_SHARE("vram_data")
-	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
-	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w)
-	AM_RANGE(0xf9000, 0xf900f) AM_WRITE(m92_spritecontrol_w) AM_SHARE("spritecontrol")
-	AM_RANGE(0xf9800, 0xf9801) AM_WRITE(m92_videocontrol_w)
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
-ADDRESS_MAP_END
+void m92_state::lethalth_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0x80000, 0x8ffff).ram().w(this, FUNC(m92_state::m92_vram_w)).share("vram_data");
+	map(0xe0000, 0xeffff).ram(); /* System ram */
+	map(0xf8000, 0xf87ff).ram().share("spriteram");
+	map(0xf8800, 0xf8fff).rw(this, FUNC(m92_state::m92_paletteram_r), FUNC(m92_state::m92_paletteram_w));
+	map(0xf9000, 0xf900f).w(this, FUNC(m92_state::m92_spritecontrol_w)).share("spritecontrol");
+	map(0xf9800, 0xf9801).w(this, FUNC(m92_state::m92_videocontrol_w));
+	map(0xffff0, 0xfffff).rom().region("maincpu", 0x7fff0);
+}
 
-ADDRESS_MAP_START(m92_state::m92_map)
-	AM_RANGE(0x00000, 0x9ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc0000, 0xcffff) AM_ROM AM_REGION("maincpu", 0x00000) /* Mirror used by In The Hunt as protection */
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m92_vram_w) AM_SHARE("vram_data")
-	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
-	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w)
-	AM_RANGE(0xf9000, 0xf900f) AM_WRITE(m92_spritecontrol_w) AM_SHARE("spritecontrol")
-	AM_RANGE(0xf9800, 0xf9801) AM_WRITE(m92_videocontrol_w)
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
-ADDRESS_MAP_END
+void m92_state::m92_map(address_map &map)
+{
+	map(0x00000, 0x9ffff).rom();
+	map(0xa0000, 0xbffff).bankr("bank1");
+	map(0xc0000, 0xcffff).rom().region("maincpu", 0x00000); /* Mirror used by In The Hunt as protection */
+	map(0xd0000, 0xdffff).ram().w(this, FUNC(m92_state::m92_vram_w)).share("vram_data");
+	map(0xe0000, 0xeffff).ram(); /* System ram */
+	map(0xf8000, 0xf87ff).ram().share("spriteram");
+	map(0xf8800, 0xf8fff).rw(this, FUNC(m92_state::m92_paletteram_r), FUNC(m92_state::m92_paletteram_w));
+	map(0xf9000, 0xf900f).w(this, FUNC(m92_state::m92_spritecontrol_w)).share("spritecontrol");
+	map(0xf9800, 0xf9801).w(this, FUNC(m92_state::m92_videocontrol_w));
+	map(0xffff0, 0xfffff).rom().region("maincpu", 0x7fff0);
+}
 
-ADDRESS_MAP_START(m92_state::m92_portmap)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x08, 0x09) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff)   // answer from sound CPU
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE(m92_coincounter_w)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x80, 0x87) AM_WRITE(m92_pf1_control_w)
-	AM_RANGE(0x88, 0x8f) AM_WRITE(m92_pf2_control_w)
-	AM_RANGE(0x90, 0x97) AM_WRITE(m92_pf3_control_w)
-	AM_RANGE(0x98, 0x9f) AM_WRITE(m92_master_control_w)
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(m92_sound_reset_w)
-ADDRESS_MAP_END
+void m92_state::m92_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("P1_P2");
+	map(0x02, 0x03).portr("COINS_DSW3");
+	map(0x04, 0x05).portr("DSW");
+	map(0x06, 0x07).portr("P3_P4");
+	map(0x08, 0x08).r("soundlatch2", FUNC(generic_latch_8_device::read));   // answer from sound CPU
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x03).w(this, FUNC(m92_state::m92_coincounter_w));
+	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x80, 0x87).w(this, FUNC(m92_state::m92_pf1_control_w));
+	map(0x88, 0x8f).w(this, FUNC(m92_state::m92_pf2_control_w));
+	map(0x90, 0x97).w(this, FUNC(m92_state::m92_pf3_control_w));
+	map(0x98, 0x9f).w(this, FUNC(m92_state::m92_master_control_w));
+	map(0xc0, 0xc1).w(this, FUNC(m92_state::m92_sound_reset_w));
+}
 
 WRITE16_MEMBER(m92_state::oki_bank_w)
 {
 	m_oki->set_rom_bank((data+1) & 0x3); // +1?
 }
 
-ADDRESS_MAP_START(m92_state::ppan_portmap)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x10, 0x11) AM_WRITE(oki_bank_w)
-	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE(m92_coincounter_w)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x80, 0x87) AM_WRITE(m92_pf1_control_w)
-	AM_RANGE(0x88, 0x8f) AM_WRITE(m92_pf2_control_w)
-	AM_RANGE(0x90, 0x97) AM_WRITE(m92_pf3_control_w)
-	AM_RANGE(0x98, 0x9f) AM_WRITE(m92_master_control_w)
-ADDRESS_MAP_END
+void m92_state::ppan_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("P1_P2");
+	map(0x02, 0x03).portr("COINS_DSW3");
+	map(0x04, 0x05).portr("DSW");
+	map(0x06, 0x07).portr("P3_P4");
+	map(0x10, 0x11).w(this, FUNC(m92_state::oki_bank_w));
+	map(0x18, 0x18).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x02, 0x03).w(this, FUNC(m92_state::m92_coincounter_w));
+	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x80, 0x87).w(this, FUNC(m92_state::m92_pf1_control_w));
+	map(0x88, 0x8f).w(this, FUNC(m92_state::m92_pf2_control_w));
+	map(0x90, 0x97).w(this, FUNC(m92_state::m92_pf3_control_w));
+	map(0x98, 0x9f).w(this, FUNC(m92_state::m92_master_control_w));
+}
 
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(m92_state::sound_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
-	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", iremga20_device, irem_ga20_r, irem_ga20_w, 0x00ff)
-	AM_RANGE(0xa8040, 0xa8043) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0xa8044, 0xa8045) AM_DEVREADWRITE8("soundlatch", generic_latch_8_device, read, acknowledge_w, 0x00ff)
-	AM_RANGE(0xa8046, 0xa8047) AM_DEVWRITE8("soundlatch2", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("soundcpu", 0x1fff0)
-ADDRESS_MAP_END
+void m92_state::sound_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0xa0000, 0xa3fff).ram();
+	map(0xa8000, 0xa803f).rw("irem", FUNC(iremga20_device::irem_ga20_r), FUNC(iremga20_device::irem_ga20_w)).umask16(0x00ff);
+	map(0xa8040, 0xa8043).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0xa8044, 0xa8044).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0xa8046, 0xa8046).w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0xffff0, 0xfffff).rom().region("soundcpu", 0x1fff0);
+}
 
 /******************************************************************************/
 

@@ -267,60 +267,65 @@ TODO:
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(stfight_state::cpu1_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")                  /* sf02.bin */
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xc100, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("P1")
-	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("P2")
-	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("START")
-	AM_RANGE(0xc203, 0xc203) AM_READ_PORT("DSW0")
-	AM_RANGE(0xc204, 0xc204) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc205, 0xc205) AM_READ(stfight_coin_r)
-	AM_RANGE(0xc500, 0xc500) AM_WRITE(stfight_fm_w)
-	AM_RANGE(0xc600, 0xc600) AM_WRITE(stfight_mcu_w)
-	AM_RANGE(0xc700, 0xc700) AM_WRITE(stfight_coin_w)
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(stfight_io_w)
-	AM_RANGE(0xc806, 0xc806) AM_WRITENOP                    /* TBD */
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void stfight_state::cpu1_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("mainbank");                  /* sf02.bin */
+	map(0xc000, 0xc0ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0xc100, 0xc1ff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xc200, 0xc200).portr("P1");
+	map(0xc201, 0xc201).portr("P2");
+	map(0xc202, 0xc202).portr("START");
+	map(0xc203, 0xc203).portr("DSW0");
+	map(0xc204, 0xc204).portr("DSW1");
+	map(0xc205, 0xc205).r(this, FUNC(stfight_state::stfight_coin_r));
+	map(0xc500, 0xc500).w(this, FUNC(stfight_state::stfight_fm_w));
+	map(0xc600, 0xc600).w(this, FUNC(stfight_state::stfight_mcu_w));
+	map(0xc700, 0xc700).w(this, FUNC(stfight_state::stfight_coin_w));
+	map(0xc804, 0xc804).w(this, FUNC(stfight_state::stfight_io_w));
+	map(0xc806, 0xc806).nopw();                    /* TBD */
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(stfight_state::stfight_cpu1_map)
-	AM_IMPORT_FROM(cpu1_map)
-	AM_RANGE(0xc807, 0xc807) AM_DEVWRITE("stfight_vid", stfight_video_device, stfight_sprite_bank_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("stfight_vid", stfight_video_device, stfight_text_char_w) AM_SHARE("txram")
-	AM_RANGE(0xd800, 0xd808) AM_RAM_DEVWRITE("stfight_vid", stfight_video_device, stfight_vh_latch_w) AM_SHARE("vregs")
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("sprite_ram")
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(stfight_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void stfight_state::stfight_cpu1_map(address_map &map)
+{
+	cpu1_map(map);
+	map(0xc807, 0xc807).w("stfight_vid", FUNC(stfight_video_device::stfight_sprite_bank_w));
+	map(0xd000, 0xd7ff).ram().w("stfight_vid", FUNC(stfight_video_device::stfight_text_char_w)).share("txram");
+	map(0xd800, 0xd808).ram().w("stfight_vid", FUNC(stfight_video_device::stfight_vh_latch_w)).share("vregs");
+	map(0xf000, 0xffff).ram().share("sprite_ram");
+}
 
 
-ADDRESS_MAP_START(stfight_state::cshooter_cpu1_map)
-	AM_IMPORT_FROM(cpu1_map)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE(stfight_bank_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device, txram_w) AM_SHARE("txram")
-	AM_RANGE(0xd800, 0xd80f) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device, vregs_w) AM_SHARE("vregs") // wrong?
-	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("sprite_ram")
-ADDRESS_MAP_END
+void stfight_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+}
+
+
+void stfight_state::cshooter_cpu1_map(address_map &map)
+{
+	cpu1_map(map);
+	map(0xc801, 0xc801).w(this, FUNC(stfight_state::stfight_bank_w));
+	map(0xd000, 0xd7ff).ram().w("airraid_vid", FUNC(airraid_video_device::txram_w)).share("txram");
+	map(0xd800, 0xd80f).ram().w("airraid_vid", FUNC(airraid_video_device::vregs_w)).share("vregs"); // wrong?
+	map(0xe000, 0xfdff).ram();
+	map(0xfe00, 0xffff).ram().share("sprite_ram");
+}
 
 
 
-ADDRESS_MAP_START(stfight_state::cpu2_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_READNOP
-	AM_RANGE(0xd800, 0xd800) AM_WRITENOP
-	AM_RANGE(0xe800, 0xe800) AM_WRITENOP
-	AM_RANGE(0xf000, 0xf000) AM_READ(stfight_fm_r)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void stfight_state::cpu2_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xc800, 0xc801).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xd000, 0xd000).nopr();
+	map(0xd800, 0xd800).nopw();
+	map(0xe800, 0xe800).nopw();
+	map(0xf000, 0xf000).r(this, FUNC(stfight_state::stfight_fm_r));
+	map(0xf800, 0xffff).ram();
+}
 
 
 static INPUT_PORTS_START( stfight )

@@ -130,7 +130,6 @@
 #include "machine/ram.h"
 
 #include "debugger.h"
-#include "screen.h"
 
 #define LOG_C0XX            0
 #define LOG_ADB             0
@@ -726,8 +725,8 @@ TIMER_CALLBACK_MEMBER(apple2gs_state::apple2gs_scanline_tick)
 {
 	int scanline;
 
-	scanline = machine().first_screen()->vpos();
-	machine().first_screen()->update_partial(scanline);
+	scanline = m_screen->vpos();
+	m_screen->update_partial(scanline);
 
 	/* check scanline interrupt bits if we're in super hi-res and the current scanline is within the active display area */
 	if ((m_newvideo & 0x80) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
@@ -768,15 +767,15 @@ TIMER_CALLBACK_MEMBER(apple2gs_state::apple2gs_scanline_tick)
 		#endif
 
 		/* call Apple II interrupt handler */
-		if ((machine().first_screen()->vpos() % 8) == 7)
+		if ((m_screen->vpos() % 8) == 7)
 		{
 			//apple2_interrupt(m_maincpu);
 			/* TODO: check me! */
-			machine().first_screen()->update_partial(machine().first_screen()->vpos());
+			m_screen->update_partial(m_screen->vpos());
 		}
 	}
 
-	m_scanline_timer->adjust(machine().first_screen()->time_until_pos((scanline+1)%262, 0));
+	m_scanline_timer->adjust(m_screen->time_until_pos((scanline+1)%262, 0));
 }
 
 
@@ -881,7 +880,7 @@ int apple2gs_state::apple2gs_get_vpos()
 
 	};
 
-	scan = machine().first_screen()->vpos();
+	scan = m_screen->vpos();
 
 	if (scan < BORDER_TOP)
 	{
@@ -919,7 +918,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 		#endif
 
 		case 0x19:  /* C019 - RDVBLBAR */
-			result = (machine().first_screen()->vpos() >= (192+BORDER_TOP)) ? 0x80 : 0x00;
+			result = (m_screen->vpos() >= (192+BORDER_TOP)) ? 0x80 : 0x00;
 			break;
 
 		case 0x22:  /* C022 - TBCOLOR */
@@ -1020,7 +1019,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 			break;
 
 		case 0x2F:  /* C02F - HORIZCNT */
-			result = machine().first_screen()->hpos() / 11;
+			result = m_screen->hpos() / 11;
 			if (result > 0)
 			{
 				result += 0x40;
@@ -2046,7 +2045,7 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 	m_scanline_timer->adjust(attotime::never);
 
 	// fire on scanline zero
-	m_scanline_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
+	m_scanline_timer->adjust(m_screen->time_until_pos(0, 0));
 }
 
 MACHINE_START_MEMBER(apple2gs_state,apple2gs)

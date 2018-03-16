@@ -508,59 +508,63 @@ logerror("dma write\n");
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(fastinvaders_state::fastinvaders_map)
+void fastinvaders_state::fastinvaders_map(address_map &map)
+{
 	//AM_RANGE(0x0000, 0x1fff) AM_ROM   AM_MIRROR(0x8000)
-	AM_RANGE(0x0000, 0x27ff) AM_ROM AM_MIRROR(0x8000)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_MIRROR(0x8000) AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_MIRROR(0x8000)
-ADDRESS_MAP_END
+	map(0x0000, 0x27ff).rom().mirror(0x8000);
+	map(0x2800, 0x2fff).ram().mirror(0x8000).share("videoram");
+	map(0x3000, 0x33ff).ram().mirror(0x8000);
+}
 
-ADDRESS_MAP_START(fastinvaders_state::fastinvaders_io_base)
-ADDRESS_MAP_END
+void fastinvaders_state::fastinvaders_io_base(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(fastinvaders_state::fastinvaders_6845_io)
-	AM_IMPORT_FROM(fastinvaders_io_base)
+void fastinvaders_state::fastinvaders_6845_io(address_map &map)
+{
+	fastinvaders_io_base(map);
 
-	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("dma8257", i8257_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("6845", mc6845_device, address_w)
-	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("6845", mc6845_device, register_r, register_w)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x40, 0x4f) AM_WRITE(io_40_w)  //ds4   //latch
+	map(0x10, 0x1f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x20, 0x20).w(m_crtc6845, FUNC(mc6845_device::address_w));
+	map(0x21, 0x21).rw(m_crtc6845, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x30, 0x33).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x40, 0x4f).w(this, FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
 	//AM_RANGE(0x50, 0x50) AM_READ(io_50_r) //ds5   //latch
-	AM_RANGE(0x60, 0x60) AM_READ(io_60_r)
-	AM_RANGE(0x70, 0x70) AM_WRITE(io_70_w)  //ds7   rest55,rest65,trap, irq0 clear
-	AM_RANGE(0x80, 0x80) AM_NOP //ds8  write here a LOT ?????
-	AM_RANGE(0x90, 0x90) AM_WRITE(io_90_w)  //ds9       sound command
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(io_a0_w)  //ds10 irq1 clear
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(io_b0_w)  //ds11 irq2 clear
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(io_c0_w)  //ds12 irq3 clear
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(io_d0_w)  //ds13 irq5 clear
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(io_e0_w)  //ds14 irq4 clear
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(io_f0_w)  //ds15 irq6 clear
-ADDRESS_MAP_END
+	map(0x60, 0x60).r(this, FUNC(fastinvaders_state::io_60_r));
+	map(0x70, 0x70).w(this, FUNC(fastinvaders_state::io_70_w));  //ds7   rest55,rest65,trap, irq0 clear
+	map(0x80, 0x80).noprw(); //ds8  write here a LOT ?????
+	map(0x90, 0x90).w(this, FUNC(fastinvaders_state::io_90_w));  //ds9       sound command
+	map(0xa0, 0xa0).w(this, FUNC(fastinvaders_state::io_a0_w));  //ds10 irq1 clear
+	map(0xb0, 0xb0).w(this, FUNC(fastinvaders_state::io_b0_w));  //ds11 irq2 clear
+	map(0xc0, 0xc0).w(this, FUNC(fastinvaders_state::io_c0_w));  //ds12 irq3 clear
+	map(0xd0, 0xd0).w(this, FUNC(fastinvaders_state::io_d0_w));  //ds13 irq5 clear
+	map(0xe0, 0xe0).w(this, FUNC(fastinvaders_state::io_e0_w));  //ds14 irq4 clear
+	map(0xf0, 0xf0).w(this, FUNC(fastinvaders_state::io_f0_w));  //ds15 irq6 clear
+}
 
 
-ADDRESS_MAP_START(fastinvaders_state::fastinvaders_8275_io)
-	AM_IMPORT_FROM(fastinvaders_io_base)
+void fastinvaders_state::fastinvaders_8275_io(address_map &map)
+{
+	fastinvaders_io_base(map);
 
-	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE("8275", i8275_device, read, write)
+	map(0x20, 0x21).rw(m_crtc8275, FUNC(i8275_device::read), FUNC(i8275_device::write));
 
-AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("dma8257", i8257_device, read, write)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x40, 0x4f) AM_WRITE(io_40_w)  //ds4   //latch
+map(0x10, 0x1f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x30, 0x33).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x40, 0x4f).w(this, FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
 	//AM_RANGE(0x50, 0x50) AM_READ(io_50_r) //ds5   //latch
-	AM_RANGE(0x60, 0x60) AM_READ(io_60_r)
-	AM_RANGE(0x70, 0x70) AM_WRITE(io_70_w)  //ds7   rest55,rest65,trap, irq0 clear
-	AM_RANGE(0x80, 0x80) AM_NOP //write here a LOT
+	map(0x60, 0x60).r(this, FUNC(fastinvaders_state::io_60_r));
+	map(0x70, 0x70).w(this, FUNC(fastinvaders_state::io_70_w));  //ds7   rest55,rest65,trap, irq0 clear
+	map(0x80, 0x80).noprw(); //write here a LOT
 	//AM_RANGE(0x80, 0x80) AM_WRITE(io_80_w)    //ds8 ????
-	AM_RANGE(0x90, 0x90) AM_WRITE(io_90_w)  //ds9       sound command
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(io_a0_w)  //ds10 irq1 clear
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(io_b0_w)  //ds11 irq2 clear
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(io_c0_w)  //ds12 irq3 clear
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(io_d0_w)  //ds13 irq5 clear
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(io_e0_w)  //ds14 irq4 clear
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(io_f0_w)  //ds15 irq6 clear
-ADDRESS_MAP_END
+	map(0x90, 0x90).w(this, FUNC(fastinvaders_state::io_90_w));  //ds9       sound command
+	map(0xa0, 0xa0).w(this, FUNC(fastinvaders_state::io_a0_w));  //ds10 irq1 clear
+	map(0xb0, 0xb0).w(this, FUNC(fastinvaders_state::io_b0_w));  //ds11 irq2 clear
+	map(0xc0, 0xc0).w(this, FUNC(fastinvaders_state::io_c0_w));  //ds12 irq3 clear
+	map(0xd0, 0xd0).w(this, FUNC(fastinvaders_state::io_d0_w));  //ds13 irq5 clear
+	map(0xe0, 0xe0).w(this, FUNC(fastinvaders_state::io_e0_w));  //ds14 irq4 clear
+	map(0xf0, 0xf0).w(this, FUNC(fastinvaders_state::io_f0_w));  //ds15 irq6 clear
+}
 
 
 

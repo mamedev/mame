@@ -36,31 +36,33 @@ static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("rmnkbd", RMNIMBUS_KEYBOARD)
 SLOT_INTERFACE_END
 
-ADDRESS_MAP_START(rmnimbus_state::nimbus_mem)
-	AM_RANGE( 0x00000, 0x1FFFF ) AM_RAMBANK(RAM_BANK00_TAG)
-	AM_RANGE( 0x20000, 0x3FFFF ) AM_RAMBANK(RAM_BANK01_TAG)
-	AM_RANGE( 0x40000, 0x5FFFF ) AM_RAMBANK(RAM_BANK02_TAG)
-	AM_RANGE( 0x60000, 0x7FFFF ) AM_RAMBANK(RAM_BANK03_TAG)
-	AM_RANGE( 0x80000, 0x9FFFF ) AM_RAMBANK(RAM_BANK04_TAG)
-	AM_RANGE( 0xA0000, 0xBFFFF ) AM_RAMBANK(RAM_BANK05_TAG)
-	AM_RANGE( 0xC0000, 0xDFFFF ) AM_RAMBANK(RAM_BANK06_TAG)
-	AM_RANGE( 0xE0000, 0xEFFFF ) AM_RAMBANK(RAM_BANK07_TAG)
-	AM_RANGE( 0xF0000, 0xFFFFF ) AM_ROM AM_REGION(MAINCPU_TAG, 0x0f0000)
-ADDRESS_MAP_END
+void rmnimbus_state::nimbus_mem(address_map &map)
+{
+	map(0x00000, 0x1FFFF).bankrw(RAM_BANK00_TAG);
+	map(0x20000, 0x3FFFF).bankrw(RAM_BANK01_TAG);
+	map(0x40000, 0x5FFFF).bankrw(RAM_BANK02_TAG);
+	map(0x60000, 0x7FFFF).bankrw(RAM_BANK03_TAG);
+	map(0x80000, 0x9FFFF).bankrw(RAM_BANK04_TAG);
+	map(0xA0000, 0xBFFFF).bankrw(RAM_BANK05_TAG);
+	map(0xC0000, 0xDFFFF).bankrw(RAM_BANK06_TAG);
+	map(0xE0000, 0xEFFFF).bankrw(RAM_BANK07_TAG);
+	map(0xF0000, 0xFFFFF).rom().region(MAINCPU_TAG, 0x0f0000);
+}
 
-ADDRESS_MAP_START(rmnimbus_state::nimbus_io)
-	AM_RANGE( 0x0000, 0x0031) AM_READWRITE(nimbus_video_io_r, nimbus_video_io_w)
-	AM_RANGE( 0x0080, 0x0081) AM_READWRITE8(nimbus_mcu_r, nimbus_mcu_w, 0x00FF)
-	AM_RANGE( 0x0092, 0x0093) AM_READWRITE8(nimbus_iou_r, nimbus_iou_w, 0x00FF)
-	AM_RANGE( 0x00A4, 0x00A5) AM_READWRITE8(nimbus_mouse_js_r, nimbus_mouse_js_w, 0x00FF)
-	AM_RANGE( 0x00c0, 0x00cf) AM_READWRITE8(nimbus_pc8031_r, nimbus_pc8031_w, 0x00FF)
-	AM_RANGE( 0x00e0, 0x00ef) AM_DEVREADWRITE8(AY8910_TAG, ay8910_device, data_r, address_data_w, 0x00FF)
-	AM_RANGE( 0x00f0, 0x00f7) AM_DEVREADWRITE8(Z80SIO_TAG, z80sio2_device, cd_ba_r, cd_ba_w, 0x00ff)
-	AM_RANGE( 0x0400, 0x0401) AM_WRITE8(fdc_ctl_w, 0x00ff)
-	AM_RANGE( 0x0408, 0x040f) AM_DEVREADWRITE8(FDC_TAG, wd2793_device, read, write, 0x00ff)
-	AM_RANGE( 0x0410, 0x041f) AM_READWRITE8(scsi_r, scsi_w, 0x00ff)
-	AM_RANGE( 0x0480, 0x049f) AM_DEVREADWRITE8(VIA_TAG, via6522_device, read, write, 0x00FF)
-ADDRESS_MAP_END
+void rmnimbus_state::nimbus_io(address_map &map)
+{
+	map(0x0000, 0x0031).rw(this, FUNC(rmnimbus_state::nimbus_video_io_r), FUNC(rmnimbus_state::nimbus_video_io_w));
+	map(0x0080, 0x0080).rw(this, FUNC(rmnimbus_state::nimbus_mcu_r), FUNC(rmnimbus_state::nimbus_mcu_w));
+	map(0x0092, 0x0092).rw(this, FUNC(rmnimbus_state::nimbus_iou_r), FUNC(rmnimbus_state::nimbus_iou_w));
+	map(0x00a4, 0x00a4).rw(this, FUNC(rmnimbus_state::nimbus_mouse_js_r), FUNC(rmnimbus_state::nimbus_mouse_js_w));
+	map(0x00c0, 0x00cf).rw(this, FUNC(rmnimbus_state::nimbus_pc8031_r), FUNC(rmnimbus_state::nimbus_pc8031_w)).umask16(0x00ff);
+	map(0x00e0, 0x00ef).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x00f0, 0x00f7).rw(m_z80sio, FUNC(z80sio2_device::cd_ba_r), FUNC(z80sio2_device::cd_ba_w)).umask16(0x00ff);
+	map(0x0400, 0x0400).w(this, FUNC(rmnimbus_state::fdc_ctl_w));
+	map(0x0408, 0x040f).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write)).umask16(0x00ff);
+	map(0x0410, 0x041f).rw(this, FUNC(rmnimbus_state::scsi_r), FUNC(rmnimbus_state::scsi_w)).umask16(0x00ff);
+	map(0x0480, 0x049f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0x00ff);
+}
 
 
 static INPUT_PORTS_START( nimbus )
@@ -89,15 +91,17 @@ static INPUT_PORTS_START( nimbus )
 
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(rmnimbus_state::nimbus_iocpu_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void rmnimbus_state::nimbus_iocpu_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+}
 
-ADDRESS_MAP_START(rmnimbus_state::nimbus_iocpu_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x000FF) AM_READWRITE(nimbus_pc8031_iou_r, nimbus_pc8031_iou_w)
-ADDRESS_MAP_END
+void rmnimbus_state::nimbus_iocpu_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x000FF).rw(this, FUNC(rmnimbus_state::nimbus_pc8031_iou_r), FUNC(rmnimbus_state::nimbus_pc8031_iou_w));
+}
 
 MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 	/* basic machine hardware */

@@ -103,24 +103,27 @@ private:
 };
 
 
-ADDRESS_MAP_START(play_2_state::play_2_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("nvram") // pair of 5101, battery-backed
-ADDRESS_MAP_END
+void play_2_state::play_2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("roms", 0);
+	map(0x2000, 0x20ff).ram().share("nvram"); // pair of 5101, battery-backed
+}
 
-ADDRESS_MAP_START(play_2_state::play_2_io)
-	AM_RANGE(0x01, 0x01) AM_WRITE(port01_w) // digits
-	AM_RANGE(0x02, 0x02) AM_WRITE(port02_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("1863", cdp1863_device, str_w)
-	AM_RANGE(0x04, 0x04) AM_READ(port04_r)
-	AM_RANGE(0x05, 0x05) AM_READ(port05_r)
-	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(port07_w)
-ADDRESS_MAP_END
+void play_2_state::play_2_io(address_map &map)
+{
+	map(0x01, 0x01).w(this, FUNC(play_2_state::port01_w)); // digits
+	map(0x02, 0x02).w(this, FUNC(play_2_state::port02_w));
+	map(0x03, 0x03).w(m_1863, FUNC(cdp1863_device::str_w));
+	map(0x04, 0x04).r(this, FUNC(play_2_state::port04_r));
+	map(0x05, 0x05).r(this, FUNC(play_2_state::port05_r));
+	map(0x06, 0x06).w(this, FUNC(play_2_state::port06_w));
+	map(0x07, 0x07).w(this, FUNC(play_2_state::port07_w));
+}
 
-ADDRESS_MAP_START(play_2_state::zira_sound_map)
-	AM_RANGE(0x000, 0x3ff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void play_2_state::zira_sound_map(address_map &map)
+{
+	map(0x000, 0x3ff).bankr("bank1");
+}
 
 
 static INPUT_PORTS_START( play_2 )

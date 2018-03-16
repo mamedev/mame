@@ -74,7 +74,9 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_ram(*this, RAM_TAG)
+		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_kbdio(*this, "Y%u", 1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -86,7 +88,10 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	required_ioport_array<8> m_kbdio;
 
 	DECLARE_DRIVER_INIT(poisk1);
 	DECLARE_MACHINE_START(poisk1);
@@ -241,9 +246,9 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 	if (BIT((data ^ m_video.color_select_68), 7))
 	{
 		if (BIT(data, 7))
-			machine().first_screen()->set_visible_area(0, 640 - 1, 0, 200 - 1);
+			m_screen->set_visible_area(0, 640 - 1, 0, 200 - 1);
 		else
-			machine().first_screen()->set_visible_area(0, 320 - 1, 0, 200 - 1);
+			m_screen->set_visible_area(0, 320 - 1, 0, 200 - 1);
 	}
 	m_video.color_select_68 = data;
 	set_palette_luts();
@@ -489,14 +494,14 @@ READ8_MEMBER(p1_state::p1_ppi_portb_r)
 	uint16_t key = 0xffff;
 	uint8_t ret = 0;
 
-	if (m_kbpoll_mask & 0x01) { key &= ioport("Y1")->read(); }
-	if (m_kbpoll_mask & 0x02) { key &= ioport("Y2")->read(); }
-	if (m_kbpoll_mask & 0x04) { key &= ioport("Y3")->read(); }
-	if (m_kbpoll_mask & 0x08) { key &= ioport("Y4")->read(); }
-	if (m_kbpoll_mask & 0x10) { key &= ioport("Y5")->read(); }
-	if (m_kbpoll_mask & 0x20) { key &= ioport("Y6")->read(); }
-	if (m_kbpoll_mask & 0x40) { key &= ioport("Y7")->read(); }
-	if (m_kbpoll_mask & 0x80) { key &= ioport("Y8")->read(); }
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(m_kbpoll_mask, i))
+		{
+			key &= m_kbdio[i]->read();
+		}
+	}
+
 	ret = key & 0xff;
 //  DBG_LOG(1,"p1_ppi_portb_r",("= %02X\n", ret));
 	return ret;
@@ -507,14 +512,14 @@ READ8_MEMBER(p1_state::p1_ppi_portc_r)
 	uint16_t key = 0xffff;
 	uint8_t ret = 0;
 
-	if (m_kbpoll_mask & 0x01) { key &= ioport("Y1")->read(); }
-	if (m_kbpoll_mask & 0x02) { key &= ioport("Y2")->read(); }
-	if (m_kbpoll_mask & 0x04) { key &= ioport("Y3")->read(); }
-	if (m_kbpoll_mask & 0x08) { key &= ioport("Y4")->read(); }
-	if (m_kbpoll_mask & 0x10) { key &= ioport("Y5")->read(); }
-	if (m_kbpoll_mask & 0x20) { key &= ioport("Y6")->read(); }
-	if (m_kbpoll_mask & 0x40) { key &= ioport("Y7")->read(); }
-	if (m_kbpoll_mask & 0x80) { key &= ioport("Y8")->read(); }
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(m_kbpoll_mask, i))
+		{
+			key &= m_kbdio[i]->read();
+		}
+	}
+
 	ret = (key >> 8) & 0xff;
 	DBG_LOG(2,"p1_ppi_portc_r",("= %02X\n", ret));
 	return ret;
@@ -615,20 +620,22 @@ MACHINE_RESET_MEMBER(p1_state, poisk1)
  * macros
  */
 
-ADDRESS_MAP_START(p1_state::poisk1_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0xc000)
-ADDRESS_MAP_END
+void p1_state::poisk1_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xfc000, 0xfffff).rom().region("bios", 0xc000);
+}
 
-ADDRESS_MAP_START(p1_state::poisk1_io)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x0028, 0x002B) AM_READWRITE(p1_trap_r, p1_trap_w)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+void p1_state::poisk1_io(address_map &map)
+{
+	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0028, 0x002B).rw(this, FUNC(p1_state::p1_trap_r), FUNC(p1_state::p1_trap_w));
+	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	// can't use regular AM_DEVREADWRITE, because THIS IS SPARTA!
 	// 1st PPI occupies ports 60, 69, 6A and 6B; 2nd PPI -- 68, 61, 62 and 63.
-	AM_RANGE(0x0060, 0x006F) AM_READWRITE(p1_ppi_r, p1_ppi_w)
-	AM_RANGE(0x03D0, 0x03DF) AM_READWRITE(p1_cga_r, p1_cga_w)
-ADDRESS_MAP_END
+	map(0x0060, 0x006F).rw(this, FUNC(p1_state::p1_ppi_r), FUNC(p1_state::p1_ppi_w));
+	map(0x03D0, 0x03DF).rw(this, FUNC(p1_state::p1_cga_r), FUNC(p1_state::p1_cga_w));
+}
 
 static INPUT_PORTS_START( poisk1 )
 	PORT_INCLUDE( poisk1_keyboard_v91 )

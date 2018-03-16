@@ -277,9 +277,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(minitel_state::minitel_scanline)
 	m_ts9347->update_scanline((uint16_t)param);
 }
 
-ADDRESS_MAP_START(minitel_state::mem_prg)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void minitel_state::mem_prg(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
 ADDRESS_MAP_START(minitel_state::mem_io)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(dev_keyb_ser_r, dev_crtl_reg_w)

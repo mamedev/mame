@@ -242,28 +242,29 @@ INTERRUPT_GEN_MEMBER(fun_tech_corp_state::funtech_vblank_interrupt)
 
 
 
-ADDRESS_MAP_START(fun_tech_corp_state::funtech_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
+void fun_tech_corp_state::funtech_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
 
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
+	map(0xc000, 0xc1ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0xc800, 0xc9ff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
 
-	AM_RANGE(0xd000, 0xd7ff) AM_ROM // maybe
+	map(0xd000, 0xd7ff).rom(); // maybe
 
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("nvram")
+	map(0xd800, 0xdfff).ram().share("nvram");
 
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(reel1_ram_w) AM_SHARE("reel1ram")
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(reel2_ram_w) AM_SHARE("reel2ram")
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(reel3_ram_w) AM_SHARE("reel3ram")
-	AM_RANGE(0xf600, 0xf7ff) AM_RAM
+	map(0xe000, 0xefff).ram().w(this, FUNC(fun_tech_corp_state::fgram_w)).share("fgram");
+	map(0xf000, 0xf1ff).ram().w(this, FUNC(fun_tech_corp_state::reel1_ram_w)).share("reel1ram");
+	map(0xf200, 0xf3ff).ram().w(this, FUNC(fun_tech_corp_state::reel2_ram_w)).share("reel2ram");
+	map(0xf400, 0xf5ff).ram().w(this, FUNC(fun_tech_corp_state::reel3_ram_w)).share("reel3ram");
+	map(0xf600, 0xf7ff).ram();
 
-	AM_RANGE(0xf840, 0xf87f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xf880, 0xf8bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xf900, 0xf93f) AM_RAM AM_SHARE("reel3_scroll")
+	map(0xf840, 0xf87f).ram().share("reel1_scroll");
+	map(0xf880, 0xf8bf).ram().share("reel2_scroll");
+	map(0xf900, 0xf93f).ram().share("reel3_scroll");
 
-	AM_RANGE(0xf9c0, 0xf9ff) AM_RAM AM_SHARE("reel1_alt_scroll") // or a mirror, gets used in 'full screen' mode.
-ADDRESS_MAP_END
+	map(0xf9c0, 0xf9ff).ram().share("reel1_alt_scroll"); // or a mirror, gets used in 'full screen' mode.
+}
 
 
 WRITE8_MEMBER(fun_tech_corp_state::funtech_lamps_w)
@@ -318,24 +319,25 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_vreg_w)
 
 
 
-ADDRESS_MAP_START(fun_tech_corp_state::funtech_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void fun_tech_corp_state::funtech_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 	// lamps?
-	AM_RANGE(0x00, 0x00) AM_WRITE(funtech_lamps_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(funtech_coins_w)
+	map(0x00, 0x00).w(this, FUNC(fun_tech_corp_state::funtech_lamps_w));
+	map(0x01, 0x01).w(this, FUNC(fun_tech_corp_state::funtech_coins_w));
 
-	AM_RANGE(0x03, 0x03) AM_WRITE(funtech_vreg_w)
+	map(0x03, 0x03).w(this, FUNC(fun_tech_corp_state::funtech_vreg_w));
 
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN1")
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW1")
-	AM_RANGE(0x07, 0x07) AM_READ_PORT("DSW2")
+	map(0x04, 0x04).portr("IN0");
+	map(0x05, 0x05).portr("IN1");
+	map(0x06, 0x06).portr("DSW1");
+	map(0x07, 0x07).portr("DSW2");
 
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN4")
+	map(0x10, 0x10).portr("IN4");
 
-	AM_RANGE(0x11, 0x11) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x12, 0x12) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-ADDRESS_MAP_END
+	map(0x11, 0x11).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x12, 0x12).w("aysnd", FUNC(ay8910_device::address_w));
+}
 
 static INPUT_PORTS_START( funtech )
 	PORT_START("IN0")

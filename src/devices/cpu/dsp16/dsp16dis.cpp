@@ -1,590 +1,529 @@
 // license:BSD-3-Clause
-// copyright-holders:Andrew Gardner
+// copyright-holders:Andrew Gardner, Vas Crabb
 #include "emu.h"
 #include "dsp16dis.h"
 
-std::string dsp16a_disassembler::disasmF1Field(const uint8_t& F1, const uint8_t& D, const uint8_t& S)
+std::string dsp16a_disassembler::disasmF1Field(u8 F1, u8 D, u8 S)
 {
 	switch (F1)
 	{
-		case 0x00: return string_format("a%u = p, p = x*y", D); break;
-		case 0x01: return string_format("a%u = a%u + p, p = x*y", D, S); break;
-		case 0x02: return string_format("p = x*y"); break;
-		case 0x03: return string_format("a%u = a%u - p, p = x*y", D, S); break;
-		case 0x04: return string_format("a%u = p", D); break;
-		case 0x05: return string_format("a%u = a%u + p", D, S); break;
-		case 0x06: return string_format("NOP"); break;
-		case 0x07: return string_format("a%u = a%u - p", D, S); break;
-		case 0x08: return string_format("a%u = a%u | y", D, S); break;
-		case 0x09: return string_format("a%u = a%u ^ y", D, S); break;
-		case 0x0a: return string_format("a%u & y", S); break;
-		case 0x0b: return string_format("a%u - y", S); break;
-		case 0x0c: return string_format("a%u = y", D); break;
-		case 0x0d: return string_format("a%u = a%u + y", D, S); break;
-		case 0x0e: return string_format("a%u = a%u & y", D, S); break;
-		case 0x0f: return string_format("a%u = a%u - y", D, S); break;
-
-		default: return "UNKNOWN";
+	case 0x00: return util::string_format("a%u = p, p = x*y", D);
+	case 0x01: return util::string_format("a%u = a%u + p, p = x*y", D, S);
+	case 0x02: return util::string_format("p = x*y");
+	case 0x03: return util::string_format("a%u = a%u - p, p = x*y", D, S);
+	case 0x04: return util::string_format("a%u = p", D);
+	case 0x05: return util::string_format("a%u = a%u + p", D, S);
+	case 0x06: return util::string_format("nop");
+	case 0x07: return util::string_format("a%u = a%u - p", D, S);
+	case 0x08: return util::string_format("a%u = a%u | y", D, S);
+	case 0x09: return util::string_format("a%u = a%u ^ y", D, S);
+	case 0x0a: return util::string_format("a%u & y", S);
+	case 0x0b: return util::string_format("a%u - y", S);
+	case 0x0c: return util::string_format("a%u = y", D);
+	case 0x0d: return util::string_format("a%u = a%u + y", D, S);
+	case 0x0e: return util::string_format("a%u = a%u & y", D, S);
+	case 0x0f: return util::string_format("a%u = a%u - y", D, S);
 	}
+	return "UNKNOWN";
 }
 
-std::string dsp16a_disassembler::disasmYField(const uint8_t& Y)
+std::string dsp16a_disassembler::disasmYField(u8 Y)
 {
-	switch (Y)
+	switch (Y & 0x03U)
 	{
-		case 0x00: return "*r0";
-		case 0x01: return "*r0++";
-		case 0x02: return "*r0--";
-		case 0x03: return "*r0++j";
-
-		case 0x04: return "*r1";
-		case 0x05: return "*r1++";
-		case 0x06: return "*r1--";
-		case 0x07: return "*r1++j";
-
-		case 0x08: return "*r2";
-		case 0x09: return "*r2++";
-		case 0x0a: return "*r2--";
-		case 0x0b: return "*r2++j";
-
-		case 0x0c: return "*r3";
-		case 0x0d: return "*r3++";
-		case 0x0e: return "*r3--";
-		case 0x0f: return "*r3++j";
-
-		default: return "UNKNOWN";
+	case 0x00: return util::string_format("*r%u", Y >> 2);
+	case 0x01: return util::string_format("*r%u++", Y >> 2);
+	case 0x02: return util::string_format("*r%u--", Y >> 2);
+	case 0x03: return util::string_format("*r%u++j", Y >> 2);
 	}
-	// never executed
-	//return "";
+	return "UNKNOWN";
 }
 
-std::string dsp16a_disassembler::disasmZField(const uint8_t& Z)
+std::string dsp16a_disassembler::disasmZField(u8 Z)
 {
-	switch (Z)
+	switch (Z & 0x03U)
 	{
-		case 0x00: return "*r0zp";
-		case 0x01: return "*r0pz";
-		case 0x02: return "*r0m2";
-		case 0x03: return "*r0jk";
-
-		case 0x04: return "*r1zp";
-		case 0x05: return "*r1pz";
-		case 0x06: return "*r1m2";
-		case 0x07: return "*r1jk";
-
-		case 0x08: return "*r2zp";
-		case 0x09: return "*r2pz";
-		case 0x0a: return "*r2m2";
-		case 0x0b: return "*r2jk";
-
-		case 0x0c: return "*r3zp";
-		case 0x0d: return "*r3pz";
-		case 0x0e: return "*r3m2";
-		case 0x0f: return "*r3jk";
-
-		default: return "UNKNOWN";
+	case 0x00: return util::string_format("*r%uzp", Z >> 2);
+	case 0x01: return util::string_format("*r%upz", Z >> 2);
+	case 0x02: return util::string_format("*r%um2", Z >> 2);
+	case 0x03: return util::string_format("*r%ujk", Z >> 2);
 	}
-	// never executed
-	//return "";
+	return "UNKNOWN";
 }
 
-std::string dsp16a_disassembler::disasmF2Field(const uint8_t& F2, const uint8_t& D, const uint8_t& S)
+std::string dsp16a_disassembler::disasmF2Field(u8 F2, u8 D, u8 S)
 {
-	std::string ret = "";
 	switch (F2)
 	{
-		case 0x00: return string_format("a%u = a%u >> 1", D, S); break;
-		case 0x01: return string_format("a%u = a%u << 1", D, S); break;
-		case 0x02: return string_format("a%u = a%u >> 4", D, S); break;
-		case 0x03: return string_format("a%u = a%u << 4", D, S); break;
-		case 0x04: return string_format("a%u = a%u >> 8", D, S); break;
-		case 0x05: return string_format("a%u = a%u << 8", D, S); break;
-		case 0x06: return string_format("a%u = a%u >> 16", D, S); break;
-		case 0x07: return string_format("a%u = a%u << 16", D, S); break;
-
-		case 0x08: return string_format("a%u = p", D); break;
-		case 0x09: return string_format("a%uh = a%uh + 1", D, S); break;
-		case 0x0a: return string_format("RESERVED"); break;
-		case 0x0b: return string_format("a%u = rnd(a%u)", D, S); break;
-		case 0x0c: return string_format("a%u = y", D); break;
-		case 0x0d: return string_format("a%u = a%u + 1", D, S); break;
-		case 0x0e: return string_format("a%u = a%u", D, S); break;
-		case 0x0f: return string_format("a%u = -a%u", D, S); break;
-
-		default: return "UNKNOWN";
+	case 0x00: return util::string_format("a%u = a%u >> 1", D, S);
+	case 0x01: return util::string_format("a%u = a%u << 1", D, S);
+	case 0x02: return util::string_format("a%u = a%u >> 4", D, S);
+	case 0x03: return util::string_format("a%u = a%u << 4", D, S);
+	case 0x04: return util::string_format("a%u = a%u >> 8", D, S);
+	case 0x05: return util::string_format("a%u = a%u << 8", D, S);
+	case 0x06: return util::string_format("a%u = a%u >> 16", D, S);
+	case 0x07: return util::string_format("a%u = a%u << 16", D, S);
+	case 0x08: return util::string_format("a%u = p", D);
+	case 0x09: return util::string_format("a%uh = a%uh + 1", D, S);
+	case 0x0a: return util::string_format("RESERVED");
+	case 0x0b: return util::string_format("a%u = rnd(a%u)", D, S);
+	case 0x0c: return util::string_format("a%u = y", D);
+	case 0x0d: return util::string_format("a%u = a%u + 1", D, S);
+	case 0x0e: return util::string_format("a%u = a%u", D, S);
+	case 0x0f: return util::string_format("a%u = -a%u", D, S);
 	}
-	return ret;
+	return "UNKNOWN";
 }
 
-std::string dsp16a_disassembler::disasmCONField(const uint8_t& CON)
+std::string dsp16a_disassembler::disasmCONField(u8 CON)
 {
 	switch (CON)
 	{
-		case 0x00: return "mi";
-		case 0x01: return "pl";
-		case 0x02: return "eq";
-		case 0x03: return "ne";
-		case 0x04: return "lvs";
-		case 0x05: return "lvc";
-		case 0x06: return "mvs";
-		case 0x07: return "mvc";
-		case 0x08: return "heads";
-		case 0x09: return "tails";
-		case 0x0a: return "c0ge";
-		case 0x0b: return "c0lt";
-		case 0x0c: return "c1ge";
-		case 0x0d: return "c1lt";
-		case 0x0e: return "true";
-		case 0x0f: return "false";
-		case 0x10: return "gt";
-		case 0x11: return "le";
+	case 0x00: return "mi";
+	case 0x01: return "pl";
+	case 0x02: return "eq";
+	case 0x03: return "ne";
+	case 0x04: return "lvs";
+	case 0x05: return "lvc";
+	case 0x06: return "mvs";
+	case 0x07: return "mvc";
+	case 0x08: return "heads";
+	case 0x09: return "tails";
+	case 0x0a: return "c0ge";
+	case 0x0b: return "c0lt";
+	case 0x0c: return "c1ge";
+	case 0x0d: return "c1lt";
+	case 0x0e: return "true";
+	case 0x0f: return "false";
+	case 0x10: return "gt";
+	case 0x11: return "le";
 
-		default: return "RESERVED";
+	default: return "RESERVED";
 	}
-	// never executed
-	//return "";
 }
 
-std::string dsp16a_disassembler::disasmBField(const uint8_t& B)
+std::string dsp16a_disassembler::disasmBField(u8 B, uint32_t &dasmflags)
 {
 	switch (B)
 	{
-		case 0x00: return "return";
-		case 0x01: return "ireturn";
-		case 0x02: return "goto pt";
-		case 0x03: return "call pt";
-		case 0x04:
-		case 0x05:
-		case 0x06:
-		case 0x07: return "RESERVED";
-
-		default: return "UNKNOWN";
+	case 0x00: dasmflags |= STEP_OUT;  return "return"; // TODO: can be predicated
+	case 0x01: dasmflags |= STEP_OUT;  return "ireturn";
+	case 0x02:                         return "goto pt";
+	case 0x03: dasmflags |= STEP_OVER; return "call pt";
+	case 0x04:
+	case 0x05:
+	case 0x06:
+	case 0x07: return "RESERVED";
 	}
-	// never executed
-	//return "";
+	return "UNKNOWN";
 }
 
-std::string dsp16a_disassembler::disasmRImmediateField(const uint8_t& R)
+std::string dsp16a_disassembler::disasmRImmediateField(u8 R)
 {
 	switch (R)
 	{
-		case 0x00: return "j";
-		case 0x01: return "k";
-		case 0x02: return "rb";
-		case 0x03: return "re";
-		case 0x04: return "r0";
-		case 0x05: return "r1";
-		case 0x06: return "r2";
-		case 0x07: return "r3";
-
-		default: return "UNKNOWN";
+	case 0x00: return "j";
+	case 0x01: return "k";
+	case 0x02: return "rb";
+	case 0x03: return "re";
+	case 0x04: return "r0";
+	case 0x05: return "r1";
+	case 0x06: return "r2";
+	case 0x07: return "r3";
 	}
-	// never executed
-	//return "";
+	return "UNKNOWN";
 }
 
-std::string dsp16a_disassembler::disasmRField(const uint8_t& R)
+std::string dsp16a_disassembler::disasmRField(u8 R)
 {
 	switch (R)
 	{
-		case 0x00: return "r0";
-		case 0x01: return "r1";
-		case 0x02: return "r2";
-		case 0x03: return "r3";
-		case 0x04: return "j";
-		case 0x05: return "k";
-		case 0x06: return "rb";
-		case 0x07: return "re";
-		case 0x08: return "pt";
-		case 0x09: return "pr";
-		case 0x0a: return "pi";
-		case 0x0b: return "i";
+	case 0x00: return "r0";
+	case 0x01: return "r1";
+	case 0x02: return "r2";
+	case 0x03: return "r3";
+	case 0x04: return "j";
+	case 0x05: return "k";
+	case 0x06: return "rb";
+	case 0x07: return "re";
+	case 0x08: return "pt";
+	case 0x09: return "pr";
+	case 0x0a: return "pi";
+	case 0x0b: return "i";
+	case 0x10: return "x";
+	case 0x11: return "y";
+	case 0x12: return "yl";
+	case 0x13: return "auc";
+	case 0x14: return "psw";
+	case 0x15: return "c0";
+	case 0x16: return "c1";
+	case 0x17: return "c2";
+	case 0x18: return "sioc";
+	case 0x19: return "srta";
+	case 0x1a: return "sdx";
+	case 0x1b: return "tdms";
+	case 0x1c: return "pioc";
+	case 0x1d: return "pdx0";
+	case 0x1e: return "pdx1";
 
-		case 0x10: return "x";
-		case 0x11: return "y";
-		case 0x12: return "yl";
-		case 0x13: return "auc";
-		case 0x14: return "psw";
-		case 0x15: return "c0";
-		case 0x16: return "c1";
-		case 0x17: return "c2";
-		case 0x18: return "sioc";
-		case 0x19: return "srta";
-		case 0x1a: return "sdx";
-		case 0x1b: return "tdms";
-		case 0x1c: return "pioc";
-		case 0x1d: return "pdx0";
-		case 0x1e: return "pdx1";
-
-		default: return "RESERVED";
+	default: return "RESERVED";
 	}
-	// never executed
-	//return "";
 }
 
-std::string dsp16a_disassembler::disasmIField(const uint8_t& I)
+std::string dsp16a_disassembler::disasmIField(u8 I)
 {
 	switch (I)
 	{
-		case 0x00: return "r0/j";
-		case 0x01: return "r1/k";
-		case 0x02: return "r2/rb";
-		case 0x03: return "r3/re";
+	case 0x00: return "r0/j";
+	case 0x01: return "r1/k";
+	case 0x02: return "r2/rb";
+	case 0x03: return "r3/re";
 
-		default: return "UNKNOWN";
+	default: return "UNKNOWN";
 	}
-	// never executed
-	//return "";
 }
 
-bool dsp16a_disassembler::disasmSIField(const uint8_t& SI)
+bool dsp16a_disassembler::disasmSIField(u8 SI)
 {
 	switch (SI)
 	{
-		case 0x00: return 0;    // Not a software interrupt
-		case 0x01: return 1;    // Software Interrupt
+	case 0x00: return false;    // Not a software interrupt
+	case 0x01: return true;     // Software Interrupt
 	}
 	return false;
 }
 
 
+u32 dsp16a_disassembler::interface_flags() const
+{
+	return PAGED;
+}
+
+u32 dsp16a_disassembler::page_address_bits() const
+{
+	return 12U;
+}
+
 u32 dsp16a_disassembler::opcode_alignment() const
 {
-	return 1;
+	return 1U;
 }
 
 offs_t dsp16a_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	uint8_t opSize = 1;
+	u8 opSize = 1;
 	uint32_t dasmflags = 0;
 	uint16_t op  = opcodes.r16(pc);
 	uint16_t op2 = opcodes.r16(pc+1);
 
 	// TODO: Test for previous "if CON" instruction and tab the next instruction in?
 
-	const uint8_t opcode = (op >> 11) & 0x1f;
+	const u8 opcode = (op >> 11) & 0x1f;
 	switch(opcode)
 	{
-		// Format 1: Multiply/ALU Read/Write Group
-		case 0x06:
+	// Format 1: Multiply/ALU Read/Write Group
+	case 0x06: // F1, Y
 		{
-			// F1, Y
-			const uint8_t Y = (op & 0x000f);
-			const uint8_t S = (op & 0x0200) >> 9;
-			const uint8_t D = (op & 0x0400) >> 10;
-			const uint8_t F1 = (op & 0x01e0) >> 5;
+			const u8 Y = (op & 0x000f);
+			const u8 S = (op & 0x0200) >> 9;
+			const u8 D = (op & 0x0400) >> 10;
+			const u8 F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
 			std::string fString = disasmF1Field(F1, D, S);
 			util::stream_format(stream, "%s, %s", fString, yString);
-			break;
 		}
-		case 0x04: case 0x1c:
+		break;
+	case 0x04: // F1, Y=a1[l]
+	case 0x1c: // F1, Y=a0[l]
 		{
-			// F1 Y=a0[1] | F1 Y=a1[1]
-			const uint8_t Y = (op & 0x000f);
-			const uint8_t X = (op & 0x0010) >> 4;
-			const uint8_t S = (op & 0x0200) >> 9;
-			const uint8_t D = (op & 0x0400) >> 10;
-			const uint8_t F1 = (op & 0x01e0) >> 5;
+			const u8 Y = (op & 0x000f);
+			const u8 X = (op & 0x0010) >> 4;
+			const u8 S = (op & 0x0200) >> 9;
+			const u8 D = (op & 0x0400) >> 10;
+			const u8 F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
 			std::string fString = disasmF1Field(F1, D, S);
 			std::string aString = (opcode == 0x1c) ? "a0" : "a1";
-			std::string xString = (X) ? "" : "l";
-			util::stream_format(stream, "%s = %s%s, %s", yString, aString, xString, fString);
-			break;
+			std::string xString = X ? "" : "l";
+			util::stream_format(stream, "%s, %s = %s%s", fString, yString, aString, xString);
 		}
-		case 0x16:
+		break;
+	case 0x16: // F1, x = Y
 		{
-			// F1, x = Y
-			const uint8_t Y = (op & 0x000f);
-			const uint8_t S = (op & 0x0200) >> 9;
-			const uint8_t D = (op & 0x0400) >> 10;
-			const uint8_t F1 = (op & 0x01e0) >> 5;
+			const u8 Y = (op & 0x000f);
+			const u8 S = (op & 0x0200) >> 9;
+			const u8 D = (op & 0x0400) >> 10;
+			const u8 F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
 			std::string fString = disasmF1Field(F1, D, S);
 			util::stream_format(stream, "%s, x = %s", fString, yString);
-			break;
 		}
-		case 0x17:
+		break;
+	case 0x17: // F1, y[l] = Y
 		{
-			// F1, y[l] = Y
-			const uint8_t Y = (op & 0x000f);
-			const uint8_t X = (op & 0x0010) >> 4;
-			const uint8_t S = (op & 0x0200) >> 9;
-			const uint8_t D = (op & 0x0400) >> 10;
-			const uint8_t F1 = (op & 0x01e0) >> 5;
+			const u8 Y = (op & 0x000f);
+			const u8 X = (op & 0x0010) >> 4;
+			const u8 S = (op & 0x0200) >> 9;
+			const u8 D = (op & 0x0400) >> 10;
+			const u8 F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
 			std::string fString = disasmF1Field(F1, D, S);
-			std::string xString = (X ? "y" : "y1");
+			std::string xString = X ? "y" : "yl";
 			util::stream_format(stream, "%s, %s = %s", fString, xString, yString);
-			break;
 		}
-		case 0x1f:
+		break;
+	case 0x1f: // F1, y = Y, x = *pt++[i]
 		{
-			// F1, y = Y, x = *pt++[i]
-			const uint8_t Y = (op & 0x000f);
-			const uint8_t X = (op & 0x0010) >> 4;
-			const uint8_t S = (op & 0x0200) >> 9;
-			const uint8_t D = (op & 0x0400) >> 10;
-			const uint8_t F1 = (op & 0x01e0) >> 5;
+			const u8 Y = (op & 0x000f);
+			const u8 X = (op & 0x0010) >> 4;
+			const u8 S = (op & 0x0200) >> 9;
+			const u8 D = (op & 0x0400) >> 10;
+			const u8 F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
 			std::string fString = disasmF1Field(F1, D, S);
-			std::string xString = (X ? "*pt++i" : "*pt++");
+			std::string xString = X ? "*pt++i" : "*pt++";
 			util::stream_format(stream, "%s, y = %s, x = %s", fString, yString, xString);
-			break;
 		}
-		case 0x19: case 0x1b:
+		break;
+	case 0x19: // F1, y = a0, x = *pt++[i]
+	case 0x1b: // F1, y = a0, x = *pt++[i]
 		{
-			// F1, y = a0|1, x = *pt++[i]
-			const uint8_t Y = (op & 0x000f);
-			const uint8_t X = (op & 0x0010) >> 4;
-			const uint8_t S = (op & 0x0200) >> 9;
-			const uint8_t D = (op & 0x0400) >> 10;
-			const uint8_t F1 = (op & 0x01e0) >> 5;
+			const u8 Y = (op & 0x000f);
+			const u8 X = (op & 0x0010) >> 4;
+			const u8 S = (op & 0x0200) >> 9;
+			const u8 D = (op & 0x0400) >> 10;
+			const u8 F1 = (op & 0x01e0) >> 5;
 			std::string fString = disasmF1Field(F1, D, S);
-			std::string xString = (X ? "*pt++i" : "*pt++");
+			std::string xString = X ? "*pt++i" : "*pt++";
 			std::string aString = (opcode == 0x19) ? "a0" : "a1";
 
 			if (Y != 0x00)
 				util::stream_format(stream, "UNKNOWN");
 			else
 				util::stream_format(stream, "%s, y = %s, x = %s", fString, aString, xString);
-			break;
 		}
-		case 0x14:
+		break;
+	case 0x14: // F1, Y = y[l]
 		{
-			// F1, Y = y[1]
-			const uint8_t Y = (op & 0x000f);
-			const uint8_t X = (op & 0x0010) >> 4;
-			const uint8_t S = (op & 0x0200) >> 9;
-			const uint8_t D = (op & 0x0400) >> 10;
-			const uint8_t F1 = (op & 0x01e0) >> 5;
+			const u8 Y = (op & 0x000f);
+			const u8 X = (op & 0x0010) >> 4;
+			const u8 S = (op & 0x0200) >> 9;
+			const u8 D = (op & 0x0400) >> 10;
+			const u8 F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
-			std::string xString = (X ? "y" : "y1");
+			std::string xString = X ? "y" : "yl";
 			std::string fString = disasmF1Field(F1, D, S);
 			util::stream_format(stream, "%s, %s = %s", fString, yString, xString);
-			break;
 		}
+		break;
 
-		// Format 1a: Multiply/ALU Read/Write Group (major typo in docs on p3-51)
-		case 0x07:
+	// Format 1a: Multiply/ALU Read/Write Group (major typo in docs on p3-51)
+	case 0x07: // F1, aT[l] = Y
 		{
-			// F1, At[1] = Y
-			const uint8_t Y = (op & 0x000f);
-			const uint8_t S = (op & 0x0200) >> 9;
-			const uint8_t aT = (op & 0x0400) >> 10;
-			const uint8_t F1 = (op & 0x01e0) >> 5;
+			const u8 Y = (op & 0x000f);
+			const u8 S = (op & 0x0200) >> 9;
+			const u8 aT = (op & 0x0400) >> 10;
+			const u8 F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
-			std::string atString = (aT ? "a0" : "a1");
+			std::string atString = aT ? "a0" : "a1";
 			std::string fString = disasmF1Field(F1, aT, S);
 			util::stream_format(stream, "%s, %s = %s", fString, atString, yString);
-			break;
 		}
+		break;
 
-		// Format 2: Multiply/ALU Read/Write Group
-		case 0x15:
+	// Format 2: Multiply/ALU Read/Write Group
+	case 0x15: // F1, Z : y[l]
 		{
-			// F1, Z : y[1]
-			const uint8_t Z = (op & 0x000f);
-			const uint8_t X = (op & 0x0010) >> 4;
-			const uint8_t S = (op & 0x0200) >> 9;
-			const uint8_t D = (op & 0x0400) >> 10;
-			const uint8_t F1 = (op & 0x01e0) >> 5;
+			const u8 Z = (op & 0x000f);
+			const u8 X = (op & 0x0010) >> 4;
+			const u8 S = (op & 0x0200) >> 9;
+			const u8 D = (op & 0x0400) >> 10;
+			const u8 F1 = (op & 0x01e0) >> 5;
 			std::string zString = disasmZField(Z);
-			std::string xString = (X ? "y" : "y1");
+			std::string xString = X ? "y" : "yl";
 			std::string fString = disasmF1Field(F1, D, S);
-			util::stream_format(stream, "%s, %s <=> %s", fString, xString, zString);
+			util::stream_format(stream, "%s, %s : %s", fString, zString, xString);
 			break;
 		}
-		case 0x1d:
+	case 0x1d: // F1, Z : y, x=*pt++[i]
 		{
-			// F1, Z : y, x=*pt++[i]
-			const uint8_t Z = (op & 0x000f);
-			const uint8_t X = (op & 0x0010) >> 4;
-			const uint8_t S = (op & 0x0200) >> 9;
-			const uint8_t D = (op & 0x0400) >> 10;
-			const uint8_t F1 = (op & 0x01e0) >> 5;
+			const u8 Z = (op & 0x000f);
+			const u8 X = (op & 0x0010) >> 4;
+			const u8 S = (op & 0x0200) >> 9;
+			const u8 D = (op & 0x0400) >> 10;
+			const u8 F1 = (op & 0x01e0) >> 5;
 			std::string zString = disasmZField(Z);
-			std::string xString = (X ? "*pt++i" : "*pt++");
+			std::string xString = X ? "*pt++i" : "*pt++";
 			std::string fString = disasmF1Field(F1, D, S);
-			util::stream_format(stream, "%s, %s <=> y, x = %s", fString, zString, xString);
-			break;
+			util::stream_format(stream, "%s, %s : y, x = %s", fString, zString, xString);
 		}
+		break;
 
-		// Format 2a: Multiply/ALU Read/Write Group
-		case 0x05:
+	// Format 2a: Multiply/ALU Read/Write Group
+	case 0x05: // F1, Z : aT[l]
 		{
-			// F1, Z : aT[1]
-			const uint8_t Z = (op & 0x000f);
-			const uint8_t X = (op & 0x0010) >> 4;
-			const uint8_t S = (op & 0x0200) >> 9;
-			const uint8_t aT = (op & 0x0400) >> 10;
-			const uint8_t F1 = (op & 0x01e0) >> 5;
+			const u8 Z = (op & 0x000f);
+			const u8 X = (op & 0x0010) >> 4;
+			const u8 S = (op & 0x0200) >> 9;
+			const u8 aT = (op & 0x0400) >> 10;
+			const u8 F1 = (op & 0x01e0) >> 5;
 			std::string zString = disasmZField(Z);
 			std::string atString = (aT ? "a0" : "a1");
-			atString += X ? "" : "1";   // TODO: Figure out unclear wording.
+			atString += X ? "" : "l";
 			std::string fString = disasmF1Field(F1, aT, S);
-			util::stream_format(stream, "%s, %s <=> %s", fString, zString, atString);
+			util::stream_format(stream, "%s, %s : %s", fString, zString, atString);
 			break;
 		}
 
-		// Format 3: Special Functions
-		case 0x12:
-		case 0x13:
+	// Format 3: Special Functions
+	case 0x12: // if CON F2
+	case 0x13: // ifc CON F2
 		{
 			// if|ifc CON F2
-			const uint8_t CON = (op & 0x001f);
-			const uint8_t S = (op & 0x0200) >> 9;
-			const uint8_t D = (op & 0x0400) >> 10;
-			const uint8_t F2 = (op & 0x01e0) >> 5;
+			const u8 CON = (op & 0x001f);
+			const u8 S = (op & 0x0200) >> 9;
+			const u8 D = (op & 0x0400) >> 10;
+			const u8 F2 = (op & 0x01e0) >> 5;
 			std::string fString = disasmF2Field(F2, D, S);
 			std::string conString = disasmCONField(CON);
-			if (op & 0x0800) util::stream_format(stream,  "if %s : %s", conString, fString);
-			else             util::stream_format(stream, "ifc %s : %s", conString, fString);
-			break;
+			if (op & 0x0800) util::stream_format(stream,  "if %s %s", conString, fString);
+			else             util::stream_format(stream, "ifc %s %s", conString, fString);
 		}
+		break;
 
-		// Format 4: Branch Direct Group
-		case 0x00: case 0x01:
+	// Format 4: Branch Direct Group
+	case 0x00: case 0x01: // goto JA
 		{
-			// goto JA
 			const uint16_t JA = (op & 0x0fff) | (pc & 0xf000);
 			util::stream_format(stream, "goto 0x%04x", JA);
-			break;
 		}
-		case 0x10: case 0x11:
+		break;
+	case 0x10: case 0x11: // call JA
 		{
-			// call JA
 			const uint16_t JA = (op & 0x0fff) | (pc & 0xf000);
 			util::stream_format(stream, "call 0x%04x", JA);
-			break;
+			dasmflags |= STEP_OVER;
 		}
+		break;
 
-		// Format 5: Branch Indirect Group
-		case 0x18:
+	// Format 5: Branch Indirect Group
+	case 0x18: // goto B
 		{
-			// goto B
-			const uint8_t B = (op & 0x0700) >> 8;
-			std::string bString = disasmBField(B);
+			const u8 B = (op & 0x0700) >> 8;
+			std::string bString = disasmBField(B, dasmflags);
 			util::stream_format(stream, "%s", bString);
-			break;
 		}
+		break;
 
-		// Format 6: Contitional Branch Qualifier/Software Interrupt (icall)
-		case 0x1a:
+	// Format 6: Contitional Branch Qualifier/Software Interrupt (icall)
+	case 0x1a: // if CON [goto/call/return]
 		{
-			// if CON [goto/call/return]
-			const uint8_t CON = (op & 0x001f);
+			const u8 CON = (op & 0x001f);
 			std::string conString = disasmCONField(CON);
-			util::stream_format(stream, "if %s:", conString);
 			// TODO: Test for invalid ops
-			// icall
-			if (op == 0xd40e) util::stream_format(stream, "icall");
-			break;
+			if (op == 0xd40e)
+			{
+				util::stream_format(stream, "icall");
+				dasmflags |= STEP_OVER;
+			}
+			else
+			{
+				util::stream_format(stream, "if %s", conString);
+			}
 		}
+		break;
 
-		// Format 7: Data Move Group
-		case 0x09: case 0x0b:
+	// Format 7: Data Move Group
+	case 0x09: case 0x0b: // R = aS
 		{
-			// R = aS
-			const uint8_t R = (op & 0x03f0) >> 4;
-			const uint8_t S = (op & 0x1000) >> 12;
+			const u8 R = (op & 0x03f0) >> 4;
+			const u8 S = (op & 0x1000) >> 12;
 			std::string rString = disasmRField(R);
-			util::stream_format(stream, "%s = %s", rString, (S ? "a1" : "a0"));
-			break;
+			util::stream_format(stream, "move %s = %s", rString, S ? "a1" : "a0");
 		}
-		case 0x08:
+		break;
+	case 0x08: // aT = R
 		{
-			// aT = R
-			const uint8_t R  = (op & 0x03f0) >> 4;
-			const uint8_t aT = (op & 0x0400) >> 10;
+			const u8 R  = (op & 0x03f0) >> 4;
+			const u8 aT = (op & 0x0400) >> 10;
 			std::string rString = disasmRField(R);
-			util::stream_format(stream, "%s = %s", (aT ? "a0" : "a1"), rString);
-			break;
+			util::stream_format(stream, "move %s = %s", aT ? "a0" : "a1", rString);
 		}
-		case 0x0f:
+		break;
+	case 0x0f: // R = Y
 		{
-			// R = Y
-			const uint8_t Y = (op & 0x000f);
-			const uint8_t R = (op & 0x03f0) >> 4;
+			const u8 Y = (op & 0x000f);
+			const u8 R = (op & 0x03f0) >> 4;
 			std::string yString = disasmYField(Y);
 			std::string rString = disasmRField(R);
-			util::stream_format(stream, "%s = %s", rString, yString);
-			// TODO: Special case the R == [y, y1, or x] case
-			break;
+			util::stream_format(stream, "move %s = %s", rString, yString);
+			// TODO: Special case the R == [y, yl, or x] case
 		}
-		case 0x0c:
+		break;
+	case 0x0c: // Y = R
 		{
-			// Y = R
-			const uint8_t Y = (op & 0x000f);
-			const uint8_t R = (op & 0x03f0) >> 4;
+			const u8 Y = (op & 0x000f);
+			const u8 R = (op & 0x03f0) >> 4;
 			std::string yString = disasmYField(Y);
 			std::string rString = disasmRField(R);
-			// TODO: page 3-31 "special function encoding"
-			util::stream_format(stream, "%s = %s", yString, rString);
-			break;
+			util::stream_format(stream, "move %s = %s", yString, rString);
 		}
-		case 0x0d:
+		break;
+	case 0x0d: // Z : R
 		{
-			// Z : R
-			const uint8_t Z = (op & 0x000f);
-			const uint8_t R = (op & 0x03f0) >> 4;
+			const u8 Z = (op & 0x000f);
+			const u8 R = (op & 0x03f0) >> 4;
 			std::string zString = disasmZField(Z);
 			std::string rString = disasmRField(R);
-			util::stream_format(stream, "%s <=> %s", zString, rString);
-			break;
+			util::stream_format(stream, "move %s : %s", zString, rString);
 		}
+		break;
 
-		// Format 8: Data Move (immediate operand - 2 words)
-		case 0x0a:
+	// Format 8: Data Move (immediate operand - 2 words)
+	case 0x0a: // R = N
 		{
-			// R = N
-			const uint8_t R = (op & 0x03f0) >> 4;
+			const u8 R = (op & 0x03f0) >> 4;
 			std::string rString = disasmRField(R);
 			util::stream_format(stream, "%s = 0x%04x", rString, op2);
 			opSize = 2;
-			break;
 		}
+		break;
 
-		// Format 9: Short Immediate Group
-		case 0x02: case 0x03:
+	// Format 9: Short Immediate Group
+	case 0x02: case 0x03: // R = M
 		{
-			// R = M
 			const uint16_t M = (op & 0x01ff);
-			const uint8_t  R = (op & 0x0e00) >> 9;
+			const u8  R = (op & 0x0e00) >> 9;
 			std::string rString = disasmRImmediateField(R);
-			util::stream_format(stream, "%s = 0x%04x", rString, M);
-			break;
+			util::stream_format(stream, "set %s = 0x%04x", rString, M);
 		}
+		break;
 
-		// Format 10: do - redo
-		case 0x0e:
+	// Format 10: do - redo
+	case 0x0e: // do|redo K
 		{
-			// do|redo K
-			const uint8_t K = (op & 0x007f);
-			const uint8_t NI = (op & 0x0780) >> 7;
+			const u8 K = (op & 0x007f);
+			const u8 NI = (op & 0x0780) >> 7;
 
 			// TODO: Limits on K & NI
 			if (NI == 0x00)
-				util::stream_format(stream, "redo %d", K);
+			{
+				util::stream_format(stream, "redo %u", K);
+				dasmflags |= STEP_OVER;
+			}
 			else
-				util::stream_format(stream, "do (next %d inst) %d times", NI, K);
-			break;
+				util::stream_format(stream, "do %u { %u instructions }", K, NI);
 		}
+		break;
 
-		// RESERVED
-		case 0x1e:
-		{
-			util::stream_format(stream, "RESERVED");
-			break;
-		}
+	// RESERVED
+	case 0x1e:
+		util::stream_format(stream, "RESERVED");
+		break;
 
-		// UNKNOWN
-		default:
-		{
-			util::stream_format(stream, "UNKNOWN");
-			break;
-		}
+	// UNKNOWN
+	default:
+		util::stream_format(stream, "UNKNOWN");
 	}
 
 	return opSize | dasmflags | SUPPORTED;

@@ -48,18 +48,19 @@ READ16_MEMBER( ft68m_state::switches_r )
 }
 
 
-ADDRESS_MAP_START(ft68m_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x200000, 0x201fff) AM_ROM AM_REGION("roms", 0x0000)
-	AM_RANGE(0x400000, 0x401fff) AM_ROM AM_REGION("roms", 0x2000)
-	AM_RANGE(0x600000, 0x600007) AM_MIRROR(0x1ffff8) AM_DEVREADWRITE8("mpsc", upd7201_new_device, ba_cd_r, ba_cd_w, 0xff00)
-	AM_RANGE(0x800000, 0x800003) AM_MIRROR(0x1ffffc) AM_DEVREADWRITE("stc", am9513_device, read16, write16)
-	AM_RANGE(0xa00000, 0xbfffff) AM_RAM //Page Map
-	AM_RANGE(0xc00000, 0xdfffff) AM_RAM //Segment Map
-	AM_RANGE(0xe00000, 0xffffff) AM_READ(switches_r) //Context Register
-ADDRESS_MAP_END
+void ft68m_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xffffff);
+	map(0x000000, 0x1fffff).ram().share("rambase");
+	map(0x200000, 0x201fff).rom().region("roms", 0x0000);
+	map(0x400000, 0x401fff).rom().region("roms", 0x2000);
+	map(0x600000, 0x600007).mirror(0x1ffff8).rw("mpsc", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w)).umask16(0xff00);
+	map(0x800000, 0x800003).mirror(0x1ffffc).rw("stc", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
+	map(0xa00000, 0xbfffff).ram(); //Page Map
+	map(0xc00000, 0xdfffff).ram(); //Segment Map
+	map(0xe00000, 0xffffff).r(this, FUNC(ft68m_state::switches_r)); //Context Register
+}
 
 
 /* Input ports */

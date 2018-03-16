@@ -74,9 +74,9 @@
 #define P_OUT(A,V)      TMS32010_Out(A,V)
 
 
-DEFINE_DEVICE_TYPE(TMS32010, tms32010_device, "tms32010", "TMS32010")
-DEFINE_DEVICE_TYPE(TMS32015, tms32015_device, "tms32015", "TMS32015")
-DEFINE_DEVICE_TYPE(TMS32016, tms32016_device, "tms32016", "TMS32016")
+DEFINE_DEVICE_TYPE(TMS32010, tms32010_device, "tms32010", "Texas Instruments TMS32010")
+DEFINE_DEVICE_TYPE(TMS32015, tms32015_device, "tms32015", "Texas Instruments TMS32015")
+DEFINE_DEVICE_TYPE(TMS32016, tms32016_device, "tms32016", "Texas Instruments TMS32016")
 
 
 /****************************************************************************

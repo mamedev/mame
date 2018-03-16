@@ -207,24 +207,26 @@ DRIVER_INIT_MEMBER(aquarius_state,aquarius)
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(aquarius_state::aquarius_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(aquarius_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(aquarius_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x3800, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0xbfff) AM_NOP /* expansion ram */
-	AM_RANGE(0xc000, 0xffff) AM_READ(cartridge_r)
-ADDRESS_MAP_END
+void aquarius_state::aquarius_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x3000, 0x33ff).ram().w(this, FUNC(aquarius_state::aquarius_videoram_w)).share("videoram");
+	map(0x3400, 0x37ff).ram().w(this, FUNC(aquarius_state::aquarius_colorram_w)).share("colorram");
+	map(0x3800, 0x3fff).ram();
+	map(0x4000, 0xbfff).noprw(); /* expansion ram */
+	map(0xc000, 0xffff).r(this, FUNC(aquarius_state::cartridge_r));
+}
 
-ADDRESS_MAP_START(aquarius_state::aquarius_io)
+void aquarius_state::aquarius_io(address_map &map)
+{
 //  AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE(modem_r, modem_w)
-	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
-	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_READWRITE(cassette_r, cassette_w)
-	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_READWRITE(vsync_r, mapper_w)
-	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_READWRITE(printer_r, printer_w)
-	AM_RANGE(0xff, 0xff) AM_SELECT(0xff00) AM_READWRITE(keyboard_r, scrambler_w)
-ADDRESS_MAP_END
+	map(0xf6, 0xf6).mirror(0xff00).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xf7, 0xf7).mirror(0xff00).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0xfc, 0xfc).mirror(0xff00).rw(this, FUNC(aquarius_state::cassette_r), FUNC(aquarius_state::cassette_w));
+	map(0xfd, 0xfd).mirror(0xff00).rw(this, FUNC(aquarius_state::vsync_r), FUNC(aquarius_state::mapper_w));
+	map(0xfe, 0xfe).mirror(0xff00).rw(this, FUNC(aquarius_state::printer_r), FUNC(aquarius_state::printer_w));
+	map(0xff, 0xff).select(0xff00).rw(this, FUNC(aquarius_state::keyboard_r), FUNC(aquarius_state::scrambler_w));
+}
 
 
 /***************************************************************************

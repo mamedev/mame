@@ -233,23 +233,24 @@ private:
 	required_device<generic_slot_device> m_cart;
 };
 
-ADDRESS_MAP_START(force68k_state::force68k_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ (bootvect_r)       /* Vectors mapped from System EPROM */
-	AM_RANGE (0x000008, 0x01ffff) AM_RAM /* DRAM CPU-1B */
+void force68k_state::force68k_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x000007).rom().r(this, FUNC(force68k_state::bootvect_r));       /* Vectors mapped from System EPROM */
+	map(0x000008, 0x01ffff).ram(); /* DRAM CPU-1B */
 //AM_RANGE (0x020000, 0x07ffff) AM_RAM /* Additional DRAM CPU-1D */
-	AM_RANGE (0x080000, 0x083fff) AM_ROM /* System EPROM Area 16Kb DEBUGGER supplied as default on CPU-1B/D     */
-	AM_RANGE (0x084000, 0x09ffff) AM_ROM /* System EPROM Area 112Kb additional space for System ROM     */
+	map(0x080000, 0x083fff).rom(); /* System EPROM Area 16Kb DEBUGGER supplied as default on CPU-1B/D     */
+	map(0x084000, 0x09ffff).rom(); /* System EPROM Area 112Kb additional space for System ROM     */
 //AM_RANGE (0x0a0000, 0x0bffff) AM_ROM /* User EPROM/SRAM Area, max 128Kb mapped by a cartslot  */
-	AM_RANGE (0x0c0040, 0x0c0043) AM_DEVREADWRITE8 ("aciahost", acia6850_device, read, write, 0x00ff)
-	AM_RANGE (0x0c0080, 0x0c0083) AM_DEVREADWRITE8 ("aciaterm", acia6850_device, read, write, 0xff00)
-	AM_RANGE (0x0c0100, 0x0c0103) AM_DEVREADWRITE8 ("aciaremt", acia6850_device, read, write, 0x00ff)
-	AM_RANGE (0x0c0400, 0x0c042f) AM_DEVREADWRITE8 ("rtc", mm58167_device, read, write, 0x00ff)
-	AM_RANGE (0x0e0000, 0x0e0035) AM_DEVREADWRITE8 ("pit", pit68230_device, read, write, 0x00ff)
+	map(0x0c0040, 0x0c0043).rw(m_aciahost, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0x0c0080, 0x0c0083).rw(m_aciaterm, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
+	map(0x0c0100, 0x0c0103).rw(m_aciaremt, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0x0c0400, 0x0c042f).rw(m_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
+	map(0x0e0000, 0x0e0035).rw(m_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
 //AM_RANGE(0x0e0200, 0x0e0380) AM_READWRITE(fpu_r, fpu_w) /* optional FPCP 68881 FPU interface */
-	AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) */
-	AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) */
-ADDRESS_MAP_END
+	map(0x100000, 0xfeffff).rw(this, FUNC(force68k_state::vme_a24_r), FUNC(force68k_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) */
+	map(0xff0000, 0xffffff).rw(this, FUNC(force68k_state::vme_a16_r), FUNC(force68k_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) */
+}
 
 /* Input ports */
 static INPUT_PORTS_START (force68k)

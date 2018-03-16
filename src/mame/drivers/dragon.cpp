@@ -36,8 +36,9 @@
 //  ADDRESS_MAP( dragon_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(dragon_state::dragon_mem)
-ADDRESS_MAP_END
+void dragon_state::dragon_mem(address_map &map)
+{
+}
 
 
 //**************************************************************************
@@ -281,6 +282,7 @@ MACHINE_CONFIG_START(dragon64_state::dragon64h)
 	// Replace M6809 with HD6309
 	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(dragon_mem)
+	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
@@ -376,6 +378,7 @@ MACHINE_CONFIG_START(dragon64_state::tanodr64h)
 	// Replace M6809 CPU with HD6309 CPU
 	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(dragon_mem)
+	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

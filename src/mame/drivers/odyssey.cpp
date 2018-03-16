@@ -101,8 +101,9 @@ uint32_t odyssey_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 *             Memory Map              *
 **************************************/
 
-ADDRESS_MAP_START(odyssey_state::odyssey_map)
-ADDRESS_MAP_END
+void odyssey_state::odyssey_map(address_map &map)
+{
+}
 
 
 /**************************************

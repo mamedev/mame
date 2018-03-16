@@ -135,8 +135,8 @@ private:
 		uint32_t arg3;
 		uint64_t arg64;
 
-		uint32_t pcs[4];
-		int pcs_ptr;
+		uint32_t pcp;  		/**< PC stack pointer */
+		uint32_t pcs[4];	/**< PC stack contents */
 
 		uint32_t jmpdest;
 		uint32_t alutemp;

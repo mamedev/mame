@@ -188,20 +188,22 @@ uint32_t miniframe_state::screen_update(screen_device &screen, bitmap_ind16 &bit
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(miniframe_state::miniframe_mem)
-	AM_RANGE(0x000000, 0x3fffff) AM_DEVICE("ramrombank", address_map_bank_device, amap16)
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_SHARE("mapram")
-	AM_RANGE(0x450000, 0x450001) AM_WRITE(general_ctrl_w)
-	AM_RANGE(0x800000, 0x81ffff) AM_ROM AM_REGION("bootrom", 0)
-	AM_RANGE(0xc00000, 0xc00007) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8("baudgen", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0xc90000, 0xc90003) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void miniframe_state::miniframe_mem(address_map &map)
+{
+	map(0x000000, 0x3fffff).m(m_ramrombank, FUNC(address_map_bank_device::amap16));
+	map(0x400000, 0x4007ff).ram().share("mapram");
+	map(0x450000, 0x450001).w(this, FUNC(miniframe_state::general_ctrl_w));
+	map(0x800000, 0x81ffff).rom().region("bootrom", 0);
+	map(0xc00000, 0xc00007).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0xc40000, 0xc40007).rw("baudgen", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0xc90000, 0xc90003).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(miniframe_state::ramrombank_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("bootrom", 0)
-	AM_RANGE(0x400000, 0x7fffff) AM_READWRITE(ram_mmu_r, ram_mmu_w)
-ADDRESS_MAP_END
+void miniframe_state::ramrombank_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom().region("bootrom", 0);
+	map(0x400000, 0x7fffff).rw(this, FUNC(miniframe_state::ram_mmu_r), FUNC(miniframe_state::ram_mmu_w));
+}
 
 /***************************************************************************
     INPUT PORTS

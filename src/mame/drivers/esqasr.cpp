@@ -91,16 +91,18 @@ void esqasr_state::machine_reset()
 {
 }
 
-ADDRESS_MAP_START(esqasr_state::asr_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void esqasr_state::asr_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom().region("maincpu", 0);
+	map(0xf00000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(esqasr_state::asrx_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x08000000, 0x081fffff) AM_RAM
-	AM_RANGE(0x0be00000, 0x0befffff) AM_RAM
-ADDRESS_MAP_END
+void esqasr_state::asrx_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).rom().region("maincpu", 0);
+	map(0x08000000, 0x081fffff).ram();
+	map(0x0be00000, 0x0befffff).ram();
+}
 
 WRITE_LINE_MEMBER(esqasr_state::esq5506_otto_irq)
 {

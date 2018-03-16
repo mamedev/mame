@@ -116,10 +116,10 @@ typedef uint32_t DWORD;
 
 #include "necpriv.h"
 
-DEFINE_DEVICE_TYPE(V20,  v20_device,  "v20",  "V20")
-DEFINE_DEVICE_TYPE(V30,  v30_device,  "v30",  "V30")
-DEFINE_DEVICE_TYPE(V33,  v33_device,  "v33",  "V33")
-DEFINE_DEVICE_TYPE(V33A, v33a_device, "v33a", "V33A")
+DEFINE_DEVICE_TYPE(V20,  v20_device,  "v20",  "NEC V20")
+DEFINE_DEVICE_TYPE(V30,  v30_device,  "v30",  "NEC V30")
+DEFINE_DEVICE_TYPE(V33,  v33_device,  "v33",  "NEC V33")
+DEFINE_DEVICE_TYPE(V33A, v33a_device, "v33a", "NEC V33A")
 
 
 

@@ -304,7 +304,7 @@ void esq2x16_sq1_device::write_char(int data)
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
 esq2x16_sq1_device::esq2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esqvfd_device(mconfig, ESQ2X16_SQ1, tag, owner, clock, 2, 16),
+	esqvfd_device(mconfig, ESQ2X16_SQ1, tag, owner, clock, make_dimensions<2, 16>(*this)),
 	m_lcdPix(*this, "pg_%u%03u", 1U, 0U),
 	m_leds(*this, "rLed_%u", 0U)
 {

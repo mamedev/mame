@@ -65,15 +65,17 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-ADDRESS_MAP_START(microkit_state::microkit_mem)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ram_r,ram_w)
-	AM_RANGE(0x8000, 0x81ff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8200, 0x83ff) AM_RAM
-ADDRESS_MAP_END
+void microkit_state::microkit_mem(address_map &map)
+{
+	map(0x0000, 0x0000).rw(this, FUNC(microkit_state::ram_r), FUNC(microkit_state::ram_w));
+	map(0x8000, 0x81ff).rom().region("maincpu", 0);
+	map(0x8200, 0x83ff).ram();
+}
 
-ADDRESS_MAP_START(microkit_state::microkit_io)
-	AM_RANGE(0x07, 0x07) AM_WRITENOP // writes a lots of zeros here
-ADDRESS_MAP_END
+void microkit_state::microkit_io(address_map &map)
+{
+	map(0x07, 0x07).nopw(); // writes a lots of zeros here
+}
 
 static INPUT_PORTS_START( microkit )
 INPUT_PORTS_END

@@ -67,76 +67,81 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, co
 *      Memory maps       *
 *************************/
 
-ADDRESS_MAP_START(cdi_state::cdimono1_mem)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
-	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_SHARE("planeb")
-	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
+void cdi_state::cdimono1_mem(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).ram().share("planea");
+	map(0x00200000, 0x0027ffff).ram().share("planeb");
+	map(0x00300000, 0x00303bff).rw(m_cdic, FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
 #if ENABLE_UART_PRINTING
-	AM_RANGE(0x00301400, 0x00301403) AM_DEVREAD("scc68070", cdi68070_device, uart_loopback_enable)
+	map(0x00301400, 0x00301403).r(m_scc, FUNC(cdi68070_device::uart_loopback_enable));
 #endif
-	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)
-	AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave_hle", cdislave_device, slave_r, slave_w)
-	AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
-	AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00)    /* nvram (only low bytes used) */
-	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x004fffe0, 0x004fffff) AM_DEVREADWRITE("mcd212", mcd212_device, regs_r, regs_w)
-	AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
-	AM_RANGE(0x00580000, 0x00ffffff) AM_NOP
-	AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
-	AM_RANGE(0x80000000, 0x8000807f) AM_DEVREADWRITE("scc68070", cdi68070_device, periphs_r, periphs_w)
-ADDRESS_MAP_END
+	map(0x00303c00, 0x00303fff).rw(m_cdic, FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
+	map(0x00310000, 0x00317fff).rw(m_slave_hle, FUNC(cdislave_device::slave_r), FUNC(cdislave_device::slave_w));
+	map(0x00318000, 0x0031ffff).noprw();
+	map(0x00320000, 0x00323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
+	map(0x00400000, 0x0047ffff).rom().region("maincpu", 0);
+	map(0x004fffe0, 0x004fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
+	map(0x00500000, 0x0057ffff).ram();
+	map(0x00580000, 0x00ffffff).noprw();
+	map(0x00e00000, 0x00efffff).ram(); // DVC
+	map(0x80000000, 0x8000807f).rw(m_scc, FUNC(cdi68070_device::periphs_r), FUNC(cdi68070_device::periphs_w));
+}
 
-ADDRESS_MAP_START(cdi_state::cdimono2_mem)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
-	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_SHARE("planeb")
+void cdi_state::cdimono2_mem(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).ram().share("planea");
+	map(0x00200000, 0x0027ffff).ram().share("planeb");
 #if ENABLE_UART_PRINTING
-	AM_RANGE(0x00301400, 0x00301403) AM_DEVREAD("scc68070", cdi68070_device, uart_loopback_enable)
+	map(0x00301400, 0x00301403).r(m_scc, FUNC(cdi68070_device::uart_loopback_enable));
 #endif
 	//AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
 	//AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)
 	//AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave", cdislave_device, slave_r, slave_w)
 	//AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
-	AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00)    /* nvram (only low bytes used) */
-	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x004fffe0, 0x004fffff) AM_DEVREADWRITE("mcd212", mcd212_device, regs_r, regs_w)
+	map(0x00320000, 0x00323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
+	map(0x00400000, 0x0047ffff).rom().region("maincpu", 0);
+	map(0x004fffe0, 0x004fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
 	//AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
-	AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
+	map(0x00500000, 0x00ffffff).noprw();
 	//AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
-	AM_RANGE(0x80000000, 0x8000807f) AM_DEVREADWRITE("scc68070", cdi68070_device, periphs_r, periphs_w)
-ADDRESS_MAP_END
+	map(0x80000000, 0x8000807f).rw(m_scc, FUNC(cdi68070_device::periphs_r), FUNC(cdi68070_device::periphs_w));
+}
 
-ADDRESS_MAP_START(cdi_state::cdi910_mem)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
-	AM_RANGE(0x00180000, 0x001fffff) AM_ROM AM_REGION("maincpu", 0) // boot vectors point here
+void cdi_state::cdi910_mem(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).ram().share("planea");
+	map(0x00180000, 0x001fffff).rom().region("maincpu", 0); // boot vectors point here
 
-	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_SHARE("planeb")
+	map(0x00200000, 0x0027ffff).ram().share("planeb");
 #if ENABLE_UART_PRINTING
-	AM_RANGE(0x00301400, 0x00301403) AM_DEVREAD("scc68070", cdi68070_device, uart_loopback_enable)
+	map(0x00301400, 0x00301403).r(m_scc, FUNC(cdi68070_device::uart_loopback_enable));
 #endif
 //  AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
 //  AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)
 //  AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave_hle", cdislave_device, slave_r, slave_w)
 //  AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
-	AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00)    /* nvram (only low bytes used) */
-	AM_RANGE(0x004fffe0, 0x004fffff) AM_DEVREADWRITE("mcd212", mcd212_device, regs_r, regs_w)
+	map(0x00320000, 0x00323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
+	map(0x004fffe0, 0x004fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
 //  AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
-	AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
+	map(0x00500000, 0x00ffffff).noprw();
 //  AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
-	AM_RANGE(0x80000000, 0x8000807f) AM_DEVREADWRITE("scc68070", cdi68070_device, periphs_r, periphs_w)
-ADDRESS_MAP_END
+	map(0x80000000, 0x8000807f).rw(m_scc, FUNC(cdi68070_device::periphs_r), FUNC(cdi68070_device::periphs_w));
+}
 
 
-ADDRESS_MAP_START(cdi_state::cdimono2_servo_mem)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(servo_io_r, servo_io_w)
-	AM_RANGE(0x0050, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x1fff) AM_ROM AM_REGION("servo", 0x100)
-ADDRESS_MAP_END
+void cdi_state::cdimono2_servo_mem(address_map &map)
+{
+	map(0x0000, 0x001f).rw(this, FUNC(cdi_state::servo_io_r), FUNC(cdi_state::servo_io_w));
+	map(0x0050, 0x00ff).ram();
+	map(0x0100, 0x1fff).rom().region("servo", 0x100);
+}
 
-ADDRESS_MAP_START(cdi_state::cdimono2_slave_mem)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(slave_io_r, slave_io_w)
-	AM_RANGE(0x0050, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x1fff) AM_ROM AM_REGION("slave", 0x100)
-ADDRESS_MAP_END
+void cdi_state::cdimono2_slave_mem(address_map &map)
+{
+	map(0x0000, 0x001f).rw(this, FUNC(cdi_state::slave_io_r), FUNC(cdi_state::slave_io_w));
+	map(0x0050, 0x00ff).ram();
+	map(0x0100, 0x1fff).rom().region("slave", 0x100);
+}
 
 /*************************
 *      Input ports       *

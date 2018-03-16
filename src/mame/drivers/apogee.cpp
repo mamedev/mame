@@ -48,16 +48,17 @@ public:
 
 
 /* Address maps */
-ADDRESS_MAP_START(apogee_state::apogee_mem)
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
-	AM_RANGE( 0x1000, 0xebff ) AM_RAM  // RAM
-	AM_RANGE( 0xec00, 0xec03 ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write) AM_MIRROR(0x00fc)
-	AM_RANGE( 0xed00, 0xed03 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x00fc)
+void apogee_state::apogee_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
+	map(0x1000, 0xebff).ram();  // RAM
+	map(0xec00, 0xec03).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).mirror(0x00fc);
+	map(0xed00, 0xed03).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x00fc);
 	//AM_RANGE( 0xee00, 0xee03 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x00fc)
-	AM_RANGE( 0xef00, 0xef01 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x00fe) // video
-	AM_RANGE( 0xf000, 0xf0ff ) AM_DEVWRITE("dma8257", i8257_device, write)    // DMA
-	AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
-ADDRESS_MAP_END
+	map(0xef00, 0xef01).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x00fe); // video
+	map(0xf000, 0xf0ff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
+	map(0xf000, 0xffff).rom();  // System ROM
+}
 
 /* Input ports */
 static INPUT_PORTS_START( apogee )

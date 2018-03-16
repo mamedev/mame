@@ -1549,228 +1549,243 @@ LATCH: (write 7000-77ff)
 
 /* map derived from schematics */
 
-ADDRESS_MAP_START(galaxian_state::galaxian_map_discrete)
-	AM_RANGE(0x6004, 0x6007) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
-	AM_RANGE(0x6800, 0x6807) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, sound_w)
-	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x07ff) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
-ADDRESS_MAP_END
+void galaxian_state::galaxian_map_discrete(address_map &map)
+{
+	map(0x6004, 0x6007).mirror(0x07f8).w("cust", FUNC(galaxian_sound_device::lfo_freq_w));
+	map(0x6800, 0x6807).mirror(0x07f8).w("cust", FUNC(galaxian_sound_device::sound_w));
+	map(0x7800, 0x7800).mirror(0x07ff).w("cust", FUNC(galaxian_sound_device::pitch_w));
+}
 
-ADDRESS_MAP_START(galaxian_state::galaxian_map_base)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5800, 0x58ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
-	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x07f8) AM_WRITE(start_lamp_w)
-	AM_RANGE(0x6002, 0x6002) AM_MIRROR(0x07f8) AM_WRITE(coin_lock_w)
-	AM_RANGE(0x6003, 0x6003) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
+void galaxian_state::galaxian_map_base(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).mirror(0x0400).ram();
+	map(0x5000, 0x53ff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5800, 0x58ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6000, 0x6000).mirror(0x07ff).portr("IN0");
+	map(0x6000, 0x6001).mirror(0x07f8).w(this, FUNC(galaxian_state::start_lamp_w));
+	map(0x6002, 0x6002).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_lock_w));
+	map(0x6003, 0x6003).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
 	//AM_RANGE(0x6004, 0x6007) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
-	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
+	map(0x6800, 0x6800).mirror(0x07ff).portr("IN1");
 	//AM_RANGE(0x6800, 0x6807) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, sound_w)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
+	map(0x7000, 0x7000).mirror(0x07ff).portr("IN2");
+	map(0x7001, 0x7001).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x7004, 0x7004).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x7006, 0x7006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007, 0x7007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 	//AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x07ff) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
-	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x07ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-ADDRESS_MAP_END
+	map(0x7800, 0x7800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
-ADDRESS_MAP_START(galaxian_state::galaxian_map)
-	AM_IMPORT_FROM(galaxian_map_base)
-	AM_IMPORT_FROM(galaxian_map_discrete)
-ADDRESS_MAP_END
+void galaxian_state::galaxian_map(address_map &map)
+{
+	galaxian_map_base(map);
+	galaxian_map_discrete(map);
+}
 
 /* map derived from schematics */
 
-ADDRESS_MAP_START(galaxian_state::mooncrst_map_discrete)
-	AM_RANGE(0xa004, 0xa007) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
-	AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, sound_w)
-	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
-ADDRESS_MAP_END
+void galaxian_state::mooncrst_map_discrete(address_map &map)
+{
+	map(0xa004, 0xa007).mirror(0x07f8).w("cust", FUNC(galaxian_sound_device::lfo_freq_w));
+	map(0xa800, 0xa807).mirror(0x07f8).w("cust", FUNC(galaxian_sound_device::sound_w));
+	map(0xb800, 0xb800).mirror(0x07ff).w("cust", FUNC(galaxian_sound_device::pitch_w));
+}
 
-ADDRESS_MAP_START(galaxian_state::mooncrst_map_base)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x98ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
-	AM_RANGE(0xa000, 0xa002) AM_MIRROR(0x07f8) AM_WRITE(galaxian_gfxbank_w)
-	AM_RANGE(0xa003, 0xa003) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
+void galaxian_state::mooncrst_map_base(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x83ff).mirror(0x0400).ram();
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9800, 0x98ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa000, 0xa000).mirror(0x07ff).portr("IN0");
+	map(0xa000, 0xa002).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_gfxbank_w));
+	map(0xa003, 0xa003).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
 //  AM_RANGE(0xa004, 0xa007) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
-	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
+	map(0xa800, 0xa800).mirror(0x07ff).portr("IN1");
 //  AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, sound_w)
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xb004, 0xb004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0xb006, 0xb006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0xb007, 0xb007) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
+	map(0xb000, 0xb000).mirror(0x07ff).portr("IN2");
+	map(0xb000, 0xb000).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xb004, 0xb004).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0xb006, 0xb006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xb007, 0xb007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 //  AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
-	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-ADDRESS_MAP_END
+	map(0xb800, 0xb800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
-ADDRESS_MAP_START(galaxian_state::moonqsr_decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void galaxian_state::moonqsr_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().share("decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(galaxian_state::mooncrst_map)
-	AM_IMPORT_FROM(mooncrst_map_base)
-	AM_IMPORT_FROM(mooncrst_map_discrete)
-ADDRESS_MAP_END
+void galaxian_state::mooncrst_map(address_map &map)
+{
+	mooncrst_map_base(map);
+	mooncrst_map_discrete(map);
+}
 
 
-ADDRESS_MAP_START(galaxian_state::fantastc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8803, 0x8803) AM_DEVWRITE("8910.0", ay8910_device, address_w)
-	AM_RANGE(0x880b, 0x880b) AM_DEVWRITE("8910.0", ay8910_device, data_w)
-	AM_RANGE(0x880c, 0x880c) AM_DEVWRITE("8910.1", ay8910_device, address_w)
-	AM_RANGE(0x880e, 0x880e) AM_DEVWRITE("8910.1", ay8910_device, data_w)
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x98ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
-	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xfffe, 0xfffe) AM_NOP // ?
-ADDRESS_MAP_END
+void galaxian_state::fantastc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8803, 0x8803).w("8910.0", FUNC(ay8910_device::address_w));
+	map(0x880b, 0x880b).w("8910.0", FUNC(ay8910_device::data_w));
+	map(0x880c, 0x880c).w("8910.1", FUNC(ay8910_device::address_w));
+	map(0x880e, 0x880e).w("8910.1", FUNC(ay8910_device::data_w));
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9800, 0x98ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa000, 0xa000).mirror(0x07ff).portr("IN0");
+	map(0xa800, 0xa800).mirror(0x07ff).portr("IN1");
+	map(0xb000, 0xb000).mirror(0x07ff).portr("IN2");
+	map(0xb000, 0xb000).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xb800, 0xb800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xfffe, 0xfffe).noprw(); // ?
+}
 
-ADDRESS_MAP_START(galaxian_state::timefgtr_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8803, 0x8803) AM_DEVWRITE("8910.0", ay8910_device, address_w)
-	AM_RANGE(0x880b, 0x880b) AM_DEVWRITE("8910.0", ay8910_device, data_w)
-	AM_RANGE(0x880c, 0x880c) AM_DEVWRITE("8910.1", ay8910_device, address_w)
-	AM_RANGE(0x880e, 0x880e) AM_DEVWRITE("8910.1", ay8910_device, data_w)
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x9bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
-	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xb004, 0xb004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
+void galaxian_state::timefgtr_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8803, 0x8803).w("8910.0", FUNC(ay8910_device::address_w));
+	map(0x880b, 0x880b).w("8910.0", FUNC(ay8910_device::data_w));
+	map(0x880c, 0x880c).w("8910.1", FUNC(ay8910_device::address_w));
+	map(0x880e, 0x880e).w("8910.1", FUNC(ay8910_device::data_w));
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9800, 0x9bff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa000, 0xa000).mirror(0x07ff).portr("IN0");
+	map(0xa800, 0xa800).mirror(0x07ff).portr("IN1");
+	map(0xb000, 0xb000).mirror(0x07ff).portr("IN2");
+	map(0xb000, 0xb000).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xb004, 0xb004).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0xb800, 0xb800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 //  AM_RANGE(0xb800, 0xb800) AM_WRITENOP // ?
 //  AM_RANGE(0xfff8, 0xffff) AM_WRITENOP // sound related?
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(galaxian_state::zigzag_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x4800, 0x4fff) AM_WRITE(zigzag_ay8910_w)
-	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5800, 0x58ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
-	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x07f8) AM_WRITE(start_lamp_w)
-	AM_RANGE(0x6003, 0x6003) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x07f8) AM_WRITE(zigzag_bankswap_w)
-	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x07ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-ADDRESS_MAP_END
+void galaxian_state::zigzag_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x2fff).bankr("bank1");
+	map(0x3000, 0x3fff).bankr("bank2");
+	map(0x4000, 0x43ff).mirror(0x0400).ram();
+	map(0x4800, 0x4fff).w(this, FUNC(galaxian_state::zigzag_ay8910_w));
+	map(0x5000, 0x53ff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5800, 0x58ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6000, 0x6000).mirror(0x07ff).portr("IN0");
+	map(0x6000, 0x6001).mirror(0x07f8).w(this, FUNC(galaxian_state::start_lamp_w));
+	map(0x6003, 0x6003).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x6800, 0x6800).mirror(0x07ff).portr("IN1");
+	map(0x7000, 0x7000).mirror(0x07ff).portr("IN2");
+	map(0x7001, 0x7001).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x7002, 0x7002).mirror(0x07f8).w(this, FUNC(galaxian_state::zigzag_bankswap_w));
+	map(0x7004, 0x7004).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x7006, 0x7006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007, 0x7007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7800, 0x7800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
 
 /* map derived from schematics */
-ADDRESS_MAP_START(galaxian_state::theend_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x6801, 0x6801) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x6802, 0x6802) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0x6803, 0x6803) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_enable_w)
-	AM_RANGE(0x6804, 0x6804) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0x6805, 0x6805) AM_MIRROR(0x07f8) //POUT2
-	AM_RANGE(0x6806, 0x6806) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0x6807, 0x6807) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(theend_ppi8255_r, theend_ppi8255_w)
-ADDRESS_MAP_END
+void galaxian_state::theend_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6801, 0x6801).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x6802, 0x6802).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x6803, 0x6803).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_enable_w));
+	map(0x6804, 0x6804).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x6805, 0x6805).mirror(0x07f8); //POUT2
+	map(0x6806, 0x6806).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x6807, 0x6807).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7000, 0x7000).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8000, 0xffff).rw(this, FUNC(galaxian_state::theend_ppi8255_r), FUNC(galaxian_state::theend_ppi8255_w));
+}
 
 /* map not derived from schematics. Used by explorer and takeoff */
-ADDRESS_MAP_START(galaxian_state::explorer_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x6800, 0x6800) AM_WRITENOP // ????
-	AM_RANGE(0x6801, 0x6801) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x6802, 0x6802) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0x6803, 0x6803) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_enable_w)
-	AM_RANGE(0x6804, 0x6804) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0x6805, 0x6805) AM_MIRROR(0x07f8) //POUT2
-	AM_RANGE(0x6806, 0x6806) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0x6807, 0x6807) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w) /* watchdog works for writes as well? (or is it just disabled?) */
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0");
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ffc) AM_READ_PORT("IN1");
-	AM_RANGE(0x8002, 0x8002) AM_MIRROR(0x0ffc) AM_READ_PORT("IN2");
-	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x0ffc) AM_READ_PORT("IN3");
-	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0fff) AM_WRITE(explorer_sound_control_w);
-ADDRESS_MAP_END
+void galaxian_state::explorer_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6800, 0x6800).nopw(); // ????
+	map(0x6801, 0x6801).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x6802, 0x6802).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x6803, 0x6803).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_enable_w));
+	map(0x6804, 0x6804).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x6805, 0x6805).mirror(0x07f8); //POUT2
+	map(0x6806, 0x6806).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x6807, 0x6807).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7000, 0x7000).mirror(0x07ff).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w)); /* watchdog works for writes as well? (or is it just disabled?) */
+	map(0x8000, 0x8000).mirror(0x0ffc).portr("IN0");
+	map(0x8000, 0x8000).mirror(0x0fff).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x8001, 0x8001).mirror(0x0ffc).portr("IN1");
+	map(0x8002, 0x8002).mirror(0x0ffc).portr("IN2");
+	map(0x8003, 0x8003).mirror(0x0ffc).portr("IN3");
+	map(0x9000, 0x9000).mirror(0x0fff).w(this, FUNC(galaxian_state::explorer_sound_control_w));
+}
 
 /* map derived from schematics */
-ADDRESS_MAP_START(galaxian_state::scobra_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x4000) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x4400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x4700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x9800, 0x9803) AM_MIRROR(0x47fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x47fc) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xa801, 0xa801) AM_MIRROR(0x47f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa802, 0xa802) AM_MIRROR(0x47f8) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0xa803, 0xa803) AM_MIRROR(0x47f8) AM_WRITE(scramble_background_enable_w)
-	AM_RANGE(0xa804, 0xa804) AM_MIRROR(0x47f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0xa805, 0xa805) AM_MIRROR(0x47f8) /* POUT2 */
-	AM_RANGE(0xa806, 0xa806) AM_MIRROR(0x47f8) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0xa807, 0xa807) AM_MIRROR(0x47f8) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x47ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-ADDRESS_MAP_END
+void galaxian_state::scobra_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).mirror(0x4000).ram();
+	map(0x8800, 0x8bff).mirror(0x4400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9000, 0x90ff).mirror(0x4700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x9800, 0x9803).mirror(0x47fc).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa000, 0xa003).mirror(0x47fc).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa801, 0xa801).mirror(0x47f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xa802, 0xa802).mirror(0x47f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0xa803, 0xa803).mirror(0x47f8).w(this, FUNC(galaxian_state::scramble_background_enable_w));
+	map(0xa804, 0xa804).mirror(0x47f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0xa805, 0xa805).mirror(0x47f8); /* POUT2 */
+	map(0xa806, 0xa806).mirror(0x47f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xa807, 0xa807).mirror(0x47f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xb000, 0xb000).mirror(0x47ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
 
-ADDRESS_MAP_START(galaxian_state::anteateruk_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0400, 0x0bff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x01f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x1002, 0x1002) AM_MIRROR(0x01f8) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0x1003, 0x1003) AM_MIRROR(0x01f8) AM_WRITE(scramble_background_enable_w)
-	AM_RANGE(0x1004, 0x1004) AM_MIRROR(0x01f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0x1005, 0x1005) AM_MIRROR(0x01f8) //POUT2
-	AM_RANGE(0x1006, 0x1006) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0x1007, 0x1007) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0x1200, 0x12ff) AM_MIRROR(0x0100) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x03ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x3efc) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xc100, 0xc103) AM_MIRROR(0x3efc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-ADDRESS_MAP_END
+void galaxian_state::anteateruk_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom();
+	map(0x0400, 0x0bff).ram();
+	map(0x0c00, 0x0fff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x1001, 0x1001).mirror(0x01f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x1002, 0x1002).mirror(0x01f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x1003, 0x1003).mirror(0x01f8).w(this, FUNC(galaxian_state::scramble_background_enable_w));
+	map(0x1004, 0x1004).mirror(0x01f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x1005, 0x1005).mirror(0x01f8); //POUT2
+	map(0x1006, 0x1006).mirror(0x01f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x1007, 0x1007).mirror(0x01f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x1200, 0x12ff).mirror(0x0100).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x1400, 0x1400).mirror(0x03ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x4000, 0xbfff).rom();
+	map(0xc000, 0xc003).mirror(0x3efc).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc100, 0xc103).mirror(0x3efc).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
-ADDRESS_MAP_START(galaxian_state::spactrai_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x01ff) AM_ROM
-	AM_RANGE(0x0200, 0x05ff) AM_RAM // this sits over ROM, does the 0x400 bytes of ROM underneath bank or appear elsewhere?
-	AM_RANGE(0x0600, 0x11ff) AM_ROM
-	AM_RANGE(0x1200, 0x15ff) AM_RAM  AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram") // see above comment
-	AM_RANGE(0x1600, 0x4fff) AM_ROM
+void galaxian_state::spactrai_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x01ff).rom();
+	map(0x0200, 0x05ff).ram(); // this sits over ROM, does the 0x400 bytes of ROM underneath bank or appear elsewhere?
+	map(0x0600, 0x11ff).rom();
+	map(0x1200, 0x15ff).ram().ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram"); // see above comment
+	map(0x1600, 0x4fff).rom();
 
 // cleared on startup
 //  AM_RANGE(0x6000, 0x60ff) AM_RAM
@@ -1778,184 +1793,192 @@ ADDRESS_MAP_START(galaxian_state::spactrai_map)
 //  AM_RANGE(0x7000, 0x70ff) AM_RAM
 
 // standard galaxian mapping?
-	AM_RANGE(0x6004, 0x6007) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
-	AM_RANGE(0x6800, 0x6807) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, sound_w)
-	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x07ff) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
+	map(0x6004, 0x6007).mirror(0x07f8).w("cust", FUNC(galaxian_sound_device::lfo_freq_w));
+	map(0x6800, 0x6807).mirror(0x07f8).w("cust", FUNC(galaxian_sound_device::sound_w));
+	map(0x7800, 0x7800).mirror(0x07ff).w("cust", FUNC(galaxian_sound_device::pitch_w));
 
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
+	map(0x7001, 0x7001).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x7004, 0x7004).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x7006, 0x7006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007, 0x7007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 
 
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
-	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("IN1")
+	map(0x6000, 0x6000).portr("IN0");
+	map(0x6800, 0x6800).portr("IN1");
 
-	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN2")
-	AM_RANGE(0x7800, 0x7800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
+	map(0x7000, 0x7000).portr("IN2");
+	map(0x7800, 0x7800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 
-	AM_RANGE(0xfe00, 0xfeff) AM_RAM AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
+	map(0xfe00, 0xfeff).ram().ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(galaxian_state::anteaterg_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0400, 0x0bff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x2400, 0x2403) AM_MIRROR(0x01fc) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x2601, 0x2601) AM_MIRROR(0x01f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x2602, 0x2602) AM_MIRROR(0x01f8) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0x2603, 0x2603) AM_MIRROR(0x01f8) AM_WRITE(scramble_background_enable_w)
-	AM_RANGE(0x2604, 0x2604) AM_MIRROR(0x01f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0x2605, 0x2605) AM_MIRROR(0x01f8) //POUT2
-	AM_RANGE(0x2606, 0x2606) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0x2607, 0x2607) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0x4000, 0x7bff) AM_ROM
-	AM_RANGE(0x7c00, 0x7fff) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram") /* mirror! */
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xf400, 0xf400) AM_MIRROR(0x01ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x01fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-ADDRESS_MAP_END
+void galaxian_state::anteaterg_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom();
+	map(0x0400, 0x0bff).ram();
+	map(0x0c00, 0x0fff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x2000, 0x20ff).mirror(0x0300).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x2400, 0x2403).mirror(0x01fc).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x2601, 0x2601).mirror(0x01f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x2602, 0x2602).mirror(0x01f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x2603, 0x2603).mirror(0x01f8).w(this, FUNC(galaxian_state::scramble_background_enable_w));
+	map(0x2604, 0x2604).mirror(0x01f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x2605, 0x2605).mirror(0x01f8); //POUT2
+	map(0x2606, 0x2606).mirror(0x01f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x2607, 0x2607).mirror(0x01f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x4000, 0x7bff).rom();
+	map(0x7c00, 0x7fff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram"); /* mirror! */
+	map(0x8000, 0xbfff).rom();
+	map(0xf400, 0xf400).mirror(0x01ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xf600, 0xf603).mirror(0x01fc).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(galaxian_state::anteatergg_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(galaxian_map_discrete)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
+void galaxian_state::anteatergg_map(address_map &map)
+{
+	map.unmap_value_high();
+	galaxian_map_discrete(map);
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).ram();
+	map(0x5000, 0x53ff).ram().ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5800, 0x58ff).ram().ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 //  AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
+	map(0x6000, 0x6000).mirror(0x07ff).portr("IN0");
 //  AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x07f8) AM_WRITE(start_lamp_w)
 //  AM_RANGE(0x6002, 0x6002) AM_MIRROR(0x07f8) AM_WRITE(coin_lock_w)
 //  AM_RANGE(0x6003, 0x6003) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0x7800, 0x7800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-ADDRESS_MAP_END
+	map(0x6800, 0x6800).mirror(0x07ff).portr("IN1");
+	map(0x7000, 0x7000).mirror(0x07ff).portr("IN2");
+	map(0x7001, 0x7001).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x7004, 0x7004).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x7006, 0x7006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007, 0x7007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7800, 0x7800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
 /* map derived from schematics */
-ADDRESS_MAP_START(galaxian_state::frogger_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xa800, 0xabff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0xb808, 0xb808) AM_MIRROR(0x07e3) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xb80c, 0xb80c) AM_MIRROR(0x07e3) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0xb810, 0xb810) AM_MIRROR(0x07e3) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0xb818, 0xb818) AM_MIRROR(0x07e3) AM_WRITE(coin_count_0_w) /* IOPC7 */
-	AM_RANGE(0xb81c, 0xb81c) AM_MIRROR(0x07e3) AM_WRITE(coin_count_1_w) /* POUT1 */
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(frogger_ppi8255_r, frogger_ppi8255_w)
-ADDRESS_MAP_END
+void galaxian_state::frogger_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xa800, 0xabff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0xb000, 0xb0ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xb808, 0xb808).mirror(0x07e3).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xb80c, 0xb80c).mirror(0x07e3).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xb810, 0xb810).mirror(0x07e3).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xb818, 0xb818).mirror(0x07e3).w(this, FUNC(galaxian_state::coin_count_0_w)); /* IOPC7 */
+	map(0xb81c, 0xb81c).mirror(0x07e3).w(this, FUNC(galaxian_state::coin_count_1_w)); /* POUT1 */
+	map(0xc000, 0xffff).rw(this, FUNC(galaxian_state::frogger_ppi8255_r), FUNC(galaxian_state::frogger_ppi8255_w));
+}
 
 
 /* map derived from schematics */
-ADDRESS_MAP_START(galaxian_state::turtles_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x4000) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x4400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x98ff) AM_MIRROR(0x4700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x47c7) AM_WRITE(scramble_background_red_w)
-	AM_RANGE(0xa008, 0xa008) AM_MIRROR(0x47c7) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa010, 0xa010) AM_MIRROR(0x47c7) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0xa018, 0xa018) AM_MIRROR(0x47c7) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0xa020, 0xa020) AM_MIRROR(0x47c7) AM_WRITE(scramble_background_green_w)
-	AM_RANGE(0xa028, 0xa028) AM_MIRROR(0x47c7) AM_WRITE(scramble_background_blue_w)
-	AM_RANGE(0xa030, 0xa030) AM_MIRROR(0x47c7) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0xa038, 0xa038) AM_MIRROR(0x47c7) AM_WRITE(coin_count_1_w)
-	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x47ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xb000, 0xb03f) AM_MIRROR(0x47c0) AM_READWRITE(turtles_ppi8255_0_r, turtles_ppi8255_0_w)
-	AM_RANGE(0xb800, 0xb83f) AM_MIRROR(0x47c0) AM_READWRITE(turtles_ppi8255_1_r, turtles_ppi8255_1_w)
-ADDRESS_MAP_END
+void galaxian_state::turtles_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).mirror(0x4000).ram();
+	map(0x9000, 0x93ff).mirror(0x4400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9800, 0x98ff).mirror(0x4700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa000, 0xa000).mirror(0x47c7).w(this, FUNC(galaxian_state::scramble_background_red_w));
+	map(0xa008, 0xa008).mirror(0x47c7).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xa010, 0xa010).mirror(0x47c7).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xa018, 0xa018).mirror(0x47c7).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xa020, 0xa020).mirror(0x47c7).w(this, FUNC(galaxian_state::scramble_background_green_w));
+	map(0xa028, 0xa028).mirror(0x47c7).w(this, FUNC(galaxian_state::scramble_background_blue_w));
+	map(0xa030, 0xa030).mirror(0x47c7).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0xa038, 0xa038).mirror(0x47c7).w(this, FUNC(galaxian_state::coin_count_1_w));
+	map(0xa800, 0xa800).mirror(0x47ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xb000, 0xb03f).mirror(0x47c0).rw(this, FUNC(galaxian_state::turtles_ppi8255_0_r), FUNC(galaxian_state::turtles_ppi8255_0_w));
+	map(0xb800, 0xb83f).mirror(0x47c0).rw(this, FUNC(galaxian_state::turtles_ppi8255_1_r), FUNC(galaxian_state::turtles_ppi8255_1_w));
+}
 
 
 /* map NOT derived from schematics */
-ADDRESS_MAP_START(galaxian_state::amigo2_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("IN2")
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("IN3")
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(konami_sound_control_w)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x90ff) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(scramble_background_red_w)
-	AM_RANGE(0xa008, 0xa008) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa010, 0xa010) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0xa018, 0xa018) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0xa020, 0xa020) AM_WRITE(scramble_background_green_w)
-	AM_RANGE(0xa028, 0xa028) AM_WRITE(scramble_background_blue_w)
-	AM_RANGE(0xa030, 0xa030) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0xa038, 0xa038) AM_WRITE(coin_count_1_w)
-	AM_RANGE(0xa800, 0xa800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-ADDRESS_MAP_END
+void galaxian_state::amigo2_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4000).portr("IN0").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x4001, 0x4001).portr("IN1");
+	map(0x4002, 0x4002).portr("IN2");
+	map(0x4003, 0x4003).portr("IN3");
+	map(0x5000, 0x5000).w(this, FUNC(galaxian_state::konami_sound_control_w));
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8bff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9000, 0x90ff).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa000, 0xa000).w(this, FUNC(galaxian_state::scramble_background_red_w));
+	map(0xa008, 0xa008).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xa010, 0xa010).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xa018, 0xa018).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xa020, 0xa020).w(this, FUNC(galaxian_state::scramble_background_green_w));
+	map(0xa028, 0xa028).w(this, FUNC(galaxian_state::scramble_background_blue_w));
+	map(0xa030, 0xa030).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0xa038, 0xa038).w(this, FUNC(galaxian_state::coin_count_1_w));
+	map(0xa800, 0xa800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
-ADDRESS_MAP_START(galaxian_state::turpins_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x98ff) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xa030, 0xa030) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0xa038, 0xa038) AM_WRITE(coin_count_1_w)
-	AM_RANGE(0xa801, 0xa801) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-ADDRESS_MAP_END
+void galaxian_state::turpins_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9800, 0x98ff).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa000, 0xa003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa030, 0xa030).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0xa038, 0xa038).w(this, FUNC(galaxian_state::coin_count_1_w));
+	map(0xa801, 0xa801).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xa806, 0xa806).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xa807, 0xa807).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xc000, 0xc003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
 
 /* this is the same as theend, except for separate RGB background controls
    and some extra ROM space at $7000 and $C000 */
-ADDRESS_MAP_START(galaxian_state::sfx_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_red_w)
-	AM_RANGE(0x6801, 0x6801) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x6802, 0x6802) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0x6803, 0x6803) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_blue_w)
-	AM_RANGE(0x6804, 0x6804) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0x6805, 0x6805) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_green_w)
-	AM_RANGE(0x6806, 0x6806) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0x6807, 0x6807) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(theend_ppi8255_r, theend_ppi8255_w)
-	AM_RANGE(0xc000, 0xefff) AM_ROM
-ADDRESS_MAP_END
+void galaxian_state::sfx_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6800, 0x6800).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_red_w));
+	map(0x6801, 0x6801).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x6802, 0x6802).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x6803, 0x6803).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_blue_w));
+	map(0x6804, 0x6804).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x6805, 0x6805).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_green_w));
+	map(0x6806, 0x6806).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x6807, 0x6807).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7000, 0x7fff).rom();
+	map(0x8000, 0xbfff).rw(this, FUNC(galaxian_state::theend_ppi8255_r), FUNC(galaxian_state::theend_ppi8255_w));
+	map(0xc000, 0xefff).rom();
+}
 
 
-ADDRESS_MAP_START(galaxian_state::monsterz_map)
-	AM_RANGE(0x0000, 0x37ff) AM_ROM
-	AM_RANGE(0x3800, 0x3fff) AM_RAM // extra RAM used by protection
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_red_w)
-	AM_RANGE(0x6801, 0x6801) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x6802, 0x6802) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0x6803, 0x6803) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_blue_w)
-	AM_RANGE(0x6804, 0x6804) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0x6805, 0x6805) AM_MIRROR(0x07f8) AM_WRITE(scramble_background_green_w)
-	AM_RANGE(0x6806, 0x6806) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0x6807, 0x6807) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(theend_ppi8255_r, theend_ppi8255_w)
-	AM_RANGE(0xc000, 0xd7ff) AM_ROM
-	AM_RANGE(0xd800, 0xd800) AM_READ(monsterz_protection_r)
-ADDRESS_MAP_END
+void galaxian_state::monsterz_map(address_map &map)
+{
+	map(0x0000, 0x37ff).rom();
+	map(0x3800, 0x3fff).ram(); // extra RAM used by protection
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6800, 0x6800).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_red_w));
+	map(0x6801, 0x6801).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x6802, 0x6802).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x6803, 0x6803).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_blue_w));
+	map(0x6804, 0x6804).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x6805, 0x6805).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_green_w));
+	map(0x6806, 0x6806).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x6807, 0x6807).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x8000, 0xbfff).rw(this, FUNC(galaxian_state::theend_ppi8255_r), FUNC(galaxian_state::theend_ppi8255_w));
+	map(0xc000, 0xd7ff).rom();
+	map(0xd800, 0xd800).r(this, FUNC(galaxian_state::monsterz_protection_r));
+}
 
 
 /* changes from galaxian map:
@@ -1967,75 +1990,80 @@ ADDRESS_MAP_END
     $8000-$afff: additional ROM area
     $b000-$bfff: protection
 */
-ADDRESS_MAP_START(galaxian_state::jumpbug_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x00ff) AM_DEVWRITE("8910.0", ay8910_device, data_w)
-	AM_RANGE(0x5900, 0x5900) AM_MIRROR(0x00ff) AM_DEVWRITE("8910.0", ay8910_device, address_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
-	AM_RANGE(0x6002, 0x6006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_gfxbank_w)
-	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
-	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0x8000, 0xafff) AM_ROM
-	AM_RANGE(0xb000, 0xbfff) AM_READ(jumpbug_protection_r)
-ADDRESS_MAP_END
+void galaxian_state::jumpbug_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x5800, 0x5800).mirror(0x00ff).w("8910.0", FUNC(ay8910_device::data_w));
+	map(0x5900, 0x5900).mirror(0x00ff).w("8910.0", FUNC(ay8910_device::address_w));
+	map(0x6000, 0x6000).mirror(0x07ff).portr("IN0");
+	map(0x6002, 0x6006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_gfxbank_w));
+	map(0x6800, 0x6800).mirror(0x07ff).portr("IN1");
+	map(0x7000, 0x7000).mirror(0x07ff).portr("IN2");
+	map(0x7001, 0x7001).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x7002, 0x7002).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x7004, 0x7004).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x7006, 0x7006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007, 0x7007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x8000, 0xafff).rom();
+	map(0xb000, 0xbfff).r(this, FUNC(galaxian_state::jumpbug_protection_r));
+}
 
 
-ADDRESS_MAP_START(galaxian_state::frogf_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0xa802, 0xa802) AM_MIRROR(0x07f1) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0xa804, 0xa804) AM_MIRROR(0x07f1) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa806, 0xa806) AM_MIRROR(0x07f1) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0xa808, 0xa808) AM_MIRROR(0x07f1) AM_WRITE(coin_count_1_w)
-	AM_RANGE(0xa80e, 0xa80e) AM_MIRROR(0x07f1) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(frogf_ppi8255_r, frogf_ppi8255_w)
-ADDRESS_MAP_END
+void galaxian_state::frogf_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8bff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9000, 0x90ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa802, 0xa802).mirror(0x07f1).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xa804, 0xa804).mirror(0x07f1).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xa806, 0xa806).mirror(0x07f1).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xa808, 0xa808).mirror(0x07f1).w(this, FUNC(galaxian_state::coin_count_1_w));
+	map(0xa80e, 0xa80e).mirror(0x07f1).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0xb800, 0xb800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xc000, 0xffff).rw(this, FUNC(galaxian_state::frogf_ppi8255_r), FUNC(galaxian_state::frogf_ppi8255_w));
+}
 
 
 /* mooncrst */
-ADDRESS_MAP_START(galaxian_state::mshuttle_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x98ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(galaxian_flip_screen_xy_w)
-	AM_RANGE(0xa004, 0xa004) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_trigger_w)
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(mshuttle_ay8910_cs_w)
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
-	AM_RANGE(0xa800, 0xa800) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_rate_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("IN2")
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_volume_w)
-	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-ADDRESS_MAP_END
+void galaxian_state::mshuttle_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram();
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9800, 0x98ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa000, 0xa000).portr("IN0");
+	map(0xa000, 0xa000).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xa001, 0xa001).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0xa002, 0xa002).w(this, FUNC(galaxian_state::galaxian_flip_screen_xy_w));
+	map(0xa004, 0xa004).w("cclimber_audio", FUNC(cclimber_audio_device::sample_trigger_w));
+	map(0xa007, 0xa007).w(this, FUNC(galaxian_state::mshuttle_ay8910_cs_w));
+	map(0xa800, 0xa800).portr("IN1");
+	map(0xa800, 0xa800).w("cclimber_audio", FUNC(cclimber_audio_device::sample_rate_w));
+	map(0xb000, 0xb000).portr("IN2");
+	map(0xb000, 0xb000).w("cclimber_audio", FUNC(cclimber_audio_device::sample_volume_w));
+	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
-ADDRESS_MAP_START(galaxian_state::mshuttle_decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void galaxian_state::mshuttle_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(galaxian_state::mshuttle_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x08, 0x08) AM_WRITE(mshuttle_ay8910_control_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(mshuttle_ay8910_data_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(mshuttle_ay8910_data_r)
-ADDRESS_MAP_END
+void galaxian_state::mshuttle_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x0f);
+	map(0x08, 0x08).w(this, FUNC(galaxian_state::mshuttle_ay8910_control_w));
+	map(0x09, 0x09).w(this, FUNC(galaxian_state::mshuttle_ay8910_data_w));
+	map(0x0c, 0x0c).r(this, FUNC(galaxian_state::mshuttle_ay8910_data_r));
+}
 
 
 WRITE8_MEMBER(galaxian_state::tenspot_unk_6000_w)
@@ -2053,17 +2081,18 @@ WRITE8_MEMBER(galaxian_state::tenspot_unk_e000_w)
 	logerror("tenspot_unk_e000_w %02x\n",data);
 }
 
-ADDRESS_MAP_START(galaxian_state::tenspot_select_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("SELECT2")
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(tenspot_unk_6000_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SELECT")
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(tenspot_unk_8000_w)
-	AM_RANGE(0xa000, 0xa03f) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(tenspot_unk_e000_w)
-ADDRESS_MAP_END
+void galaxian_state::tenspot_select_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x4000, 0x4000).portr("SELECT2");
+	map(0x6000, 0x6000).w(this, FUNC(galaxian_state::tenspot_unk_6000_w));
+	map(0xc000, 0xc000).portr("SELECT");
+	map(0x8000, 0x8000).w(this, FUNC(galaxian_state::tenspot_unk_8000_w));
+	map(0xa000, 0xa03f).ram();
+	map(0xe000, 0xe000).w(this, FUNC(galaxian_state::tenspot_unk_e000_w));
+}
 
 
 READ8_MEMBER(galaxian_state::froggeram_ppi8255_r)
@@ -2083,19 +2112,20 @@ WRITE8_MEMBER(galaxian_state::froggeram_ppi8255_w)
 	if (offset & 0x0200) m_ppi8255[1]->write(space, offset & 3, data);
 }
 
-ADDRESS_MAP_START(galaxian_state::froggeram_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(froggeram_ppi8255_r, froggeram_ppi8255_w)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xa800, 0xabff) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb000, 0xb0ff) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0xb801, 0xb801) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xb802, 0xb802) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0xb806, 0xb806) AM_WRITE(galaxian_flip_screen_x_w) // always set to 0?
-	AM_RANGE(0xb807, 0xb807) AM_WRITE(galaxian_flip_screen_y_w) // always set to 0?
-ADDRESS_MAP_END
+void galaxian_state::froggeram_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x2fff).rom();
+	map(0x4000, 0x43ff).rw(this, FUNC(galaxian_state::froggeram_ppi8255_r), FUNC(galaxian_state::froggeram_ppi8255_w));
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xa800, 0xabff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0xb000, 0xb0ff).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xb801, 0xb801).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xb802, 0xb802).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0xb806, 0xb806).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w)); // always set to 0?
+	map(0xb807, 0xb807).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w)); // always set to 0?
+}
 
 /*************************************
  *
@@ -2104,103 +2134,117 @@ ADDRESS_MAP_END
  *************************************/
 
 /* Konami Frogger with 1 x AY-8910A */
-ADDRESS_MAP_START(galaxian_state::frogger_sound_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x1000) AM_WRITE(konami_sound_filter_w)
-ADDRESS_MAP_END
+void galaxian_state::frogger_sound_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x43ff).mirror(0x1c00).ram();
+	map(0x6000, 0x6fff).mirror(0x1000).w(this, FUNC(galaxian_state::konami_sound_filter_w));
+}
 
-ADDRESS_MAP_START(galaxian_state::frogger_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(frogger_ay8910_r, frogger_ay8910_w)
-ADDRESS_MAP_END
+void galaxian_state::frogger_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(this, FUNC(galaxian_state::frogger_ay8910_r), FUNC(galaxian_state::frogger_ay8910_w));
+}
 
 
 /* Konami generic with 2 x AY-8910A */
-ADDRESS_MAP_START(galaxian_state::konami_sound_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x6c00) AM_RAM
-	AM_RANGE(0x9000, 0x9fff) AM_MIRROR(0x6000) AM_WRITE(konami_sound_filter_w)
-ADDRESS_MAP_END
+void galaxian_state::konami_sound_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x8000, 0x83ff).mirror(0x6c00).ram();
+	map(0x9000, 0x9fff).mirror(0x6000).w(this, FUNC(galaxian_state::konami_sound_filter_w));
+}
 
-ADDRESS_MAP_START(galaxian_state::konami_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(konami_ay8910_r, konami_ay8910_w)
-ADDRESS_MAP_END
+void galaxian_state::konami_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(this, FUNC(galaxian_state::konami_ay8910_r), FUNC(galaxian_state::konami_ay8910_w));
+}
 
 
 /* Checkman with 1 x AY-8910A */
-ADDRESS_MAP_START(galaxian_state::checkman_sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-ADDRESS_MAP_END
+void galaxian_state::checkman_sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x23ff).ram();
+}
 
-ADDRESS_MAP_START(galaxian_state::checkman_sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x03, 0x03) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("8910.0", ay8910_device, address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("8910.0", ay8910_device, data_r)
-ADDRESS_MAP_END
+void galaxian_state::checkman_sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x03, 0x03).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x04, 0x05).w("8910.0", FUNC(ay8910_device::address_data_w));
+	map(0x06, 0x06).r("8910.0", FUNC(ay8910_device::data_r));
+}
 
 
 /* Checkman alternate with 1 x AY-8910A */
-ADDRESS_MAP_START(galaxian_state::checkmaj_sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("8910.0", ay8910_device, address_data_w)
-	AM_RANGE(0xa002, 0xa002) AM_DEVREAD("8910.0", ay8910_device, data_r)
-ADDRESS_MAP_END
+void galaxian_state::checkmaj_sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x8000, 0x83ff).ram();
+	map(0xa000, 0xa001).w("8910.0", FUNC(ay8910_device::address_data_w));
+	map(0xa002, 0xa002).r("8910.0", FUNC(ay8910_device::data_r));
+}
 
 
 /* Take Off with 1x AY-8912*/
 
-ADDRESS_MAP_START(galaxian_state::takeoff_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x6c00) AM_RAM
-ADDRESS_MAP_END
+void galaxian_state::takeoff_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x8000, 0x83ff).mirror(0x6c00).ram();
+}
 
-ADDRESS_MAP_START(galaxian_state::takeoff_sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_READ(konami_sound_timer_r)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("8912", ay8912_device, address_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("8912", ay8912_device, data_r, data_w)
-ADDRESS_MAP_END
+void galaxian_state::takeoff_sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x20, 0x20).r(this, FUNC(galaxian_state::konami_sound_timer_r));
+	map(0x40, 0x40).w("8912", FUNC(ay8912_device::address_w));
+	map(0x80, 0x80).rw("8912", FUNC(ay8912_device::data_r), FUNC(ay8912_device::data_w));
+}
 
 /* King and Balloon with DAC */
-ADDRESS_MAP_START(galaxian_state::kingball_sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
-ADDRESS_MAP_END
+void galaxian_state::kingball_sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x3fff);
+	map(0x0000, 0x1fff).rom();
+	map(0x0000, 0x03ff).mirror(0x1c00).ram();
+}
 
-ADDRESS_MAP_START(galaxian_state::kingball_sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(kingball_dac_w)
-ADDRESS_MAP_END
+void galaxian_state::kingball_sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0xff).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(galaxian_state::kingball_dac_w));
+}
 
 
 /* SF-X sample player */
-ADDRESS_MAP_START(galaxian_state::sfx_sample_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x6c00) AM_RAM
-ADDRESS_MAP_END
+void galaxian_state::sfx_sample_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x8000, 0x83ff).mirror(0x6c00).ram();
+}
 
-ADDRESS_MAP_START(galaxian_state::sfx_sample_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(sfx_sample_io_r, sfx_sample_io_w)
-ADDRESS_MAP_END
+void galaxian_state::sfx_sample_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(this, FUNC(galaxian_state::sfx_sample_io_r), FUNC(galaxian_state::sfx_sample_io_w));
+}
 
-ADDRESS_MAP_START(galaxian_state::turpins_sound_map)
-	AM_IMPORT_FROM(konami_sound_map)
-	AM_RANGE(0x9000, 0x9000) AM_READ(konami_sound_timer_r) // why does it read it here AND from the AY port?
-ADDRESS_MAP_END
+void galaxian_state::turpins_sound_map(address_map &map)
+{
+	konami_sound_map(map);
+	map(0x9000, 0x9000).r(this, FUNC(galaxian_state::konami_sound_timer_r)); // why does it read it here AND from the AY port?
+}
 
 
 /*************************************

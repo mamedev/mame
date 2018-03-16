@@ -16,14 +16,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ER2055_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, ER2055, 0)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -44,7 +36,8 @@ public:
 	void set_data(uint8_t data) { m_data = data; }
 
 	// control lines -- all lines are specified as active-high (even CS2)
-	void set_control(uint8_t cs1, uint8_t cs2, uint8_t c1, uint8_t c2, uint8_t ck);
+	void set_control(uint8_t cs1, uint8_t cs2, uint8_t c1, uint8_t c2);
+	DECLARE_WRITE_LINE_MEMBER(set_clk);
 
 protected:
 	// device-level overrides
@@ -59,6 +52,8 @@ protected:
 	virtual void nvram_write(emu_file &file) override;
 
 private:
+	void update_state();
+
 	static const int SIZE_DATA = 0x40;
 
 	static const uint8_t CK  = 0x01;

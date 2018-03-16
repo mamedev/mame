@@ -131,13 +131,14 @@ WRITE_LINE_MEMBER(tubep_state::coin2_counter_w)
 }
 
 
-ADDRESS_MAP_START(tubep_state::tubep_main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_SHARE("textram")  /* RAM on GFX PCB @B13 */
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITEONLY AM_SHARE("share1")
-	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("backgroundram")             /* row of 8 x 2147 RAMs on main PCB */
-ADDRESS_MAP_END
+void tubep_state::tubep_main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xa7ff).ram();
+	map(0xc000, 0xc7ff).w(this, FUNC(tubep_state::tubep_textram_w)).share("textram");  /* RAM on GFX PCB @B13 */
+	map(0xe000, 0xe7ff).writeonly().share("share1");
+	map(0xe800, 0xebff).writeonly().share("backgroundram");             /* row of 8 x 2147 RAMs on main PCB */
+}
 
 
 WRITE8_MEMBER(tubep_state::main_cpu_irq_line_clear_w)
@@ -153,20 +154,21 @@ WRITE8_MEMBER(tubep_state::tubep_soundlatch_w)
 	m_sound_latch = (data&0x7f) | 0x80;
 }
 
-ADDRESS_MAP_START(tubep_state::tubep_main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW1")
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("DSW3")
+void tubep_state::tubep_main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x80).portr("DSW1");
+	map(0x90, 0x90).portr("DSW2");
+	map(0xa0, 0xa0).portr("DSW3");
 
-	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("P2")
-	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("P1")
+	map(0xb0, 0xb0).portr("SYSTEM");
+	map(0xc0, 0xc0).portr("P2");
+	map(0xd0, 0xd0).portr("P1");
 
-	AM_RANGE(0x80, 0x80) AM_WRITE(main_cpu_irq_line_clear_w)
-	AM_RANGE(0xb0, 0xb7) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(tubep_soundlatch_w)
-ADDRESS_MAP_END
+	map(0x80, 0x80).w(this, FUNC(tubep_state::main_cpu_irq_line_clear_w));
+	map(0xb0, 0xb7).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xd0, 0xd0).w(this, FUNC(tubep_state::tubep_soundlatch_w));
+}
 
 
 
@@ -184,21 +186,23 @@ WRITE8_MEMBER(tubep_state::second_cpu_irq_line_clear_w)
 }
 
 
-ADDRESS_MAP_START(tubep_state::tubep_second_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(tubep_background_a000_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(tubep_background_c000_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")                              /* 6116 #1 */
-	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("backgroundram") /* row of 8 x 2147 RAMs on main PCB */
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_SHARE("sprite_color")                      /* sprites color lookup table */
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")                                  /* program copies here part of shared ram ?? */
-ADDRESS_MAP_END
+void tubep_state::tubep_second_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xa000).w(this, FUNC(tubep_state::tubep_background_a000_w));
+	map(0xc000, 0xc000).w(this, FUNC(tubep_state::tubep_background_c000_w));
+	map(0xe000, 0xe7ff).ram().share("share1");                              /* 6116 #1 */
+	map(0xe800, 0xebff).writeonly().share("backgroundram"); /* row of 8 x 2147 RAMs on main PCB */
+	map(0xf000, 0xf3ff).writeonly().share("sprite_color");                      /* sprites color lookup table */
+	map(0xf800, 0xffff).ram().share("share2");                                  /* program copies here part of shared ram ?? */
+}
 
 
-ADDRESS_MAP_START(tubep_state::tubep_second_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_WRITE(second_cpu_irq_line_clear_w)
-ADDRESS_MAP_END
+void tubep_state::tubep_second_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7f, 0x7f).w(this, FUNC(tubep_state::second_cpu_irq_line_clear_w));
+}
 
 
 READ8_MEMBER(tubep_state::tubep_soundlatch_r)
@@ -224,21 +228,23 @@ WRITE8_MEMBER(tubep_state::tubep_sound_unknown)
 }
 
 
-ADDRESS_MAP_START(tubep_state::tubep_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0xd000, 0xd000) AM_READ(tubep_sound_irq_ack)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM     /* 6116 #3 */
-ADDRESS_MAP_END
+void tubep_state::tubep_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0xd000, 0xd000).r(this, FUNC(tubep_state::tubep_sound_irq_ack));
+	map(0xe000, 0xe7ff).ram();     /* 6116 #3 */
+}
 
 
-ADDRESS_MAP_START(tubep_state::tubep_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
-	AM_RANGE(0x06, 0x06) AM_READ(tubep_soundlatch_r)
-	AM_RANGE(0x07, 0x07) AM_WRITE(tubep_sound_unknown)
-ADDRESS_MAP_END
+void tubep_state::tubep_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x04, 0x05).w("ay3", FUNC(ay8910_device::address_data_w));
+	map(0x06, 0x06).r(this, FUNC(tubep_state::tubep_soundlatch_r));
+	map(0x07, 0x07).w(this, FUNC(tubep_state::tubep_sound_unknown));
+}
 
 
 void tubep_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -362,13 +368,14 @@ MACHINE_RESET_MEMBER(tubep_state,tubep)
  *************************************/
 
 /* MS2010-A CPU (equivalent to NSC8105 with one new opcode: 0xec) on graphics PCB */
-ADDRESS_MAP_START(tubep_state::nsc_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("sprite_color")
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x2000, 0x2009) AM_WRITE(tubep_sprite_control_w)
-	AM_RANGE(0x200a, 0x200b) AM_WRITENOP /* not used by the games - perhaps designed for debugging */
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void tubep_state::nsc_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().share("sprite_color");
+	map(0x0800, 0x0fff).ram().share("share2");
+	map(0x2000, 0x2009).w(this, FUNC(tubep_state::tubep_sprite_control_w));
+	map(0x200a, 0x200b).nopw(); /* not used by the games - perhaps designed for debugging */
+	map(0xc000, 0xffff).rom();
+}
 
 
 
@@ -378,43 +385,47 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(tubep_state::rjammer_main_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM                                 /* MB8416 SRAM on daughterboard on main PCB (there are two SRAMs, this is the one on the left) */
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_SHARE("textram")/* RAM on GFX PCB @B13 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")                      /* MB8416 SRAM on daughterboard (the one on the right) */
-ADDRESS_MAP_END
+void tubep_state::rjammer_main_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xa000, 0xa7ff).ram();                                 /* MB8416 SRAM on daughterboard on main PCB (there are two SRAMs, this is the one on the left) */
+	map(0xc000, 0xc7ff).w(this, FUNC(tubep_state::tubep_textram_w)).share("textram");/* RAM on GFX PCB @B13 */
+	map(0xe000, 0xe7ff).ram().share("share1");                      /* MB8416 SRAM on daughterboard (the one on the right) */
+}
 
 
-ADDRESS_MAP_START(tubep_state::rjammer_main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW2")   /* a bug in game code (during attract mode) */
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW2")
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("P1")
-	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("P2")
+void tubep_state::rjammer_main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSW2");   /* a bug in game code (during attract mode) */
+	map(0x80, 0x80).portr("DSW2");
+	map(0x90, 0x90).portr("DSW1");
+	map(0xa0, 0xa0).portr("SYSTEM");
+	map(0xb0, 0xb0).portr("P1");
+	map(0xc0, 0xc0).portr("P2");
 
-	AM_RANGE(0xd0, 0xd7) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(main_cpu_irq_line_clear_w)    /* clear IRQ interrupt */
-	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(tubep_state::rjammer_second_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM                         /* M5M5117P @21G */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")              /* MB8416 on daughterboard (the one on the right) */
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("rjammer_bgram")/* M5M5117P @19B (background) */
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")
-ADDRESS_MAP_END
+	map(0xd0, 0xd7).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xe0, 0xe0).w(this, FUNC(tubep_state::main_cpu_irq_line_clear_w));    /* clear IRQ interrupt */
+	map(0xf0, 0xf0).w("soundlatch", FUNC(generic_latch_8_device::write));
+}
 
 
-ADDRESS_MAP_START(tubep_state::rjammer_second_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(rjammer_background_page_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(rjammer_background_LS377_w)
-ADDRESS_MAP_END
+void tubep_state::rjammer_second_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xa7ff).ram();                         /* M5M5117P @21G */
+	map(0xe000, 0xe7ff).ram().share("share1");              /* MB8416 on daughterboard (the one on the right) */
+	map(0xe800, 0xefff).ram().share("rjammer_bgram");/* M5M5117P @19B (background) */
+	map(0xf800, 0xffff).ram().share("share2");
+}
+
+
+void tubep_state::rjammer_second_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xb0, 0xb0).w(this, FUNC(tubep_state::rjammer_background_page_w));
+	map(0xd0, 0xd0).w(this, FUNC(tubep_state::rjammer_background_LS377_w));
+}
 
 
 TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
@@ -562,23 +573,25 @@ WRITE8_MEMBER(tubep_state::rjammer_voice_intensity_control_w)
 }
 
 
-ADDRESS_MAP_START(tubep_state::rjammer_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM     /* M5M5117P (M58125P @2C on schematics) */
-ADDRESS_MAP_END
+void tubep_state::rjammer_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xe7ff).ram();     /* M5M5117P (M58125P @2C on schematics) */
+}
 
 
-ADDRESS_MAP_START(tubep_state::rjammer_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x10, 0x10) AM_WRITE(rjammer_voice_startstop_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(rjammer_voice_frequency_select_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(rjammer_voice_input_w)
-	AM_RANGE(0x90, 0x91) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x92, 0x93) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x94, 0x95) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
-	AM_RANGE(0x96, 0x96) AM_WRITE(rjammer_voice_intensity_control_w)
-ADDRESS_MAP_END
+void tubep_state::rjammer_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x10, 0x10).w(this, FUNC(tubep_state::rjammer_voice_startstop_w));
+	map(0x18, 0x18).w(this, FUNC(tubep_state::rjammer_voice_frequency_select_w));
+	map(0x80, 0x80).w(this, FUNC(tubep_state::rjammer_voice_input_w));
+	map(0x90, 0x91).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x92, 0x93).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x94, 0x95).w("ay3", FUNC(ay8910_device::address_data_w));
+	map(0x96, 0x96).w(this, FUNC(tubep_state::rjammer_voice_intensity_control_w));
+}
 
 
 WRITE8_MEMBER(tubep_state::ay8910_portA_0_w)

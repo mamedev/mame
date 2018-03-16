@@ -222,21 +222,22 @@ required_device<scc8530_device> m_sccterm;
 	uint16_t  m_sysram[4];
 };
 
-ADDRESS_MAP_START(hk68v10_state::hk68v10_mem)
-ADDRESS_MAP_UNMAP_HIGH
-AM_RANGE (0x000000, 0x000007) AM_RAM AM_WRITE (bootvect_w)       /* After first write we act as RAM */
-AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ  (bootvect_r)       /* ROM mirror just durin reset */
-AM_RANGE (0x000008, 0x1fffff) AM_RAM /* 2 Mb RAM */
-AM_RANGE (0xFC0000, 0xFC3fff) AM_ROM /* System EPROM Area 16Kb HBUG */
-AM_RANGE (0xFC4000, 0xFDffff) AM_ROM /* System EPROM Area an additional 112Kb for System ROM */
-AM_RANGE (0xFE9000, 0xFE9007) AM_DEVREADWRITE8("cio", z8536_device, read, write, 0xff00)
-AM_RANGE (0xFEA000, 0xFEA001) AM_DEVREADWRITE8("scc", scc8530_device, ca_r, ca_w, 0xff00) /* Dual serial port Z80-SCC */
-AM_RANGE (0xFEA002, 0xFEA003) AM_DEVREADWRITE8("scc", scc8530_device, cb_r, cb_w, 0xff00) /* Dual serial port Z80-SCC */
-AM_RANGE (0xFEA004, 0xFEA005) AM_DEVREADWRITE8("scc", scc8530_device, da_r, da_w, 0xff00) /* Dual serial port Z80-SCC */
-AM_RANGE (0xFEA006, 0xFEA007) AM_DEVREADWRITE8("scc", scc8530_device, db_r, db_w, 0xff00) /* Dual serial port Z80-SCC */
+void hk68v10_state::hk68v10_mem(address_map &map)
+{
+map.unmap_value_high();
+map(0x000000, 0x000007).ram().w(this, FUNC(hk68v10_state::bootvect_w));       /* After first write we act as RAM */
+map(0x000000, 0x000007).rom().r(this, FUNC(hk68v10_state::bootvect_r));       /* ROM mirror just durin reset */
+map(0x000008, 0x1fffff).ram(); /* 2 Mb RAM */
+map(0xFC0000, 0xFC3fff).rom(); /* System EPROM Area 16Kb HBUG */
+map(0xFC4000, 0xFDffff).rom(); /* System EPROM Area an additional 112Kb for System ROM */
+map(0xFE9000, 0xFE9007).rw("cio", FUNC(z8536_device::read), FUNC(z8536_device::write)).umask16(0xff00);
+map(0xfea000, 0xfea000).rw(m_sccterm, FUNC(scc8530_device::ca_r), FUNC(scc8530_device::ca_w)); /* Dual serial port Z80-SCC */
+map(0xfea002, 0xfea002).rw(m_sccterm, FUNC(scc8530_device::cb_r), FUNC(scc8530_device::cb_w)); /* Dual serial port Z80-SCC */
+map(0xfea004, 0xfea004).rw(m_sccterm, FUNC(scc8530_device::da_r), FUNC(scc8530_device::da_w)); /* Dual serial port Z80-SCC */
+map(0xfea006, 0xfea006).rw(m_sccterm, FUNC(scc8530_device::db_r), FUNC(scc8530_device::db_w)); /* Dual serial port Z80-SCC */
 //AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
 //AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START (hk68v10)

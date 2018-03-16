@@ -1295,31 +1295,33 @@ WRITE16_MEMBER(gunpey_state::vregs_addr_w)
 
 /***************************************************************************************/
 
-ADDRESS_MAP_START(gunpey_state::mem_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("wram")
+void gunpey_state::mem_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram().share("wram");
 //  AM_RANGE(0x50000, 0x500ff) AM_RAM
 //  AM_RANGE(0x50100, 0x502ff) AM_NOP
-	AM_RANGE(0x80000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x80000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(gunpey_state::io_map)
-	AM_RANGE(0x7f40, 0x7f45) AM_READ8(inputs_r,0xffff)
+void gunpey_state::io_map(address_map &map)
+{
+	map(0x7f40, 0x7f45).r(this, FUNC(gunpey_state::inputs_r));
 
-	AM_RANGE(0x7f48, 0x7f49) AM_WRITE8(output_w,0x00ff)
-	AM_RANGE(0x7f80, 0x7f81) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xffff)
+	map(0x7f48, 0x7f48).w(this, FUNC(gunpey_state::output_w));
+	map(0x7f80, 0x7f81).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 
-	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	map(0x7f88, 0x7f88).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8(status_r, status_w, 0xffff )
-	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8(blitter_w, 0xffff )
-	AM_RANGE(0x7fe0, 0x7fe5) AM_WRITE8(blitter_upper_w, 0xffff )
-	AM_RANGE(0x7ff0, 0x7ff5) AM_WRITE8(blitter_upper2_w, 0xffff )
+	map(0x7fc8, 0x7fc9).rw(this, FUNC(gunpey_state::status_r), FUNC(gunpey_state::status_w));
+	map(0x7fd0, 0x7fdf).w(this, FUNC(gunpey_state::blitter_w));
+	map(0x7fe0, 0x7fe5).w(this, FUNC(gunpey_state::blitter_upper_w));
+	map(0x7ff0, 0x7ff5).w(this, FUNC(gunpey_state::blitter_upper2_w));
 
 	//AM_RANGE(0x7FF0, 0x7FF1) AM_RAM
-	AM_RANGE(0x7fec, 0x7fed) AM_WRITE(vregs_addr_w)
-	AM_RANGE(0x7fee, 0x7fef) AM_WRITE(vram_bank_w)
+	map(0x7fec, 0x7fed).w(this, FUNC(gunpey_state::vregs_addr_w));
+	map(0x7fee, 0x7fef).w(this, FUNC(gunpey_state::vram_bank_w));
 
-ADDRESS_MAP_END
+}
 
 
 /***************************************************************************************/

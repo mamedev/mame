@@ -143,16 +143,17 @@ void elekmono_state::machine_reset()
 {
 }
 
-ADDRESS_MAP_START(elekmono_state::elektron_map)
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x00100000, 0x001fffff) AM_RAM // patch memory
-	AM_RANGE(0x00200000, 0x002fffff) AM_RAM // main RAM
+void elekmono_state::elektron_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).rom().region("maincpu", 0);
+	map(0x00100000, 0x001fffff).ram(); // patch memory
+	map(0x00200000, 0x002fffff).ram(); // main RAM
 	// 00300000 = Coldfire SIM
 	// 00400000 = DSP1 Hi08 host registers (ICR, CVR, ISR, IVR, unused, RXH/TXH, RXM/TXM, RXL/TXL)
 	// 00500000 = DSP2 Hi08 host registers (same as DSP1)
-	AM_RANGE(0x01000000, 0x01001fff) AM_RAM
-	AM_RANGE(0x10000000, 0x107fffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+	map(0x01000000, 0x01001fff).ram();
+	map(0x10000000, 0x107fffff).rom().region("maincpu", 0);
+}
 
 MACHINE_CONFIG_START(elekmono_state::elektron)
 	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL(25'447'000))

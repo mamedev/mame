@@ -456,14 +456,16 @@ WRITE8_MEMBER(kenseim_state::cpu_porte_w)
 
 
 
-ADDRESS_MAP_START(kenseim_state::kenseim_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void kenseim_state::kenseim_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(kenseim_state::kenseim_io_map)
-	AM_RANGE(0x20, 0x27) AM_MIRROR(0xff00) AM_DEVREADWRITE("mb89363b", mb89363b_device, read, write)
-ADDRESS_MAP_END
+void kenseim_state::kenseim_io_map(address_map &map)
+{
+	map(0x20, 0x27).mirror(0xff00).rw("mb89363b", FUNC(mb89363b_device::read), FUNC(mb89363b_device::write));
+}
 
 
 

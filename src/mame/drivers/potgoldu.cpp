@@ -64,9 +64,10 @@ void potgold_state::machine_reset()
 }
 
 
-ADDRESS_MAP_START(potgold_state::potgold_map)
-	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void potgold_state::potgold_map(address_map &map)
+{
+	map(0xff000000, 0xffffffff).rom().region("user1", 0);
+}
 
 
 static INPUT_PORTS_START( potgold )

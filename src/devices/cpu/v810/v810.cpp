@@ -36,7 +36,7 @@
 #define clkMEM 3
 
 
-DEFINE_DEVICE_TYPE(V810, v810_device, "v810", "V810")
+DEFINE_DEVICE_TYPE(V810, v810_device, "v810", "NEC V810")
 
 
 v810_device::v810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

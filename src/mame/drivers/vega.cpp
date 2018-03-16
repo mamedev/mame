@@ -388,14 +388,16 @@ WRITE8_MEMBER(vega_state::rombank_w)
 	membank("bank1")->set_entry(data >>7);
 }
 
-ADDRESS_MAP_START(vega_state::vega_map)
-	AM_RANGE(0x000, 0x7ff) AM_ROMBANK("bank1")
-	AM_RANGE(0x800, 0xfff) AM_ROM
-ADDRESS_MAP_END
+void vega_state::vega_map(address_map &map)
+{
+	map(0x000, 0x7ff).bankr("bank1");
+	map(0x800, 0xfff).rom();
+}
 
-ADDRESS_MAP_START(vega_state::vega_io_map)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(extern_r, extern_w)
-ADDRESS_MAP_END
+void vega_state::vega_io_map(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(vega_state::extern_r), FUNC(vega_state::extern_w));
+}
 
 
 static INPUT_PORTS_START( vega )

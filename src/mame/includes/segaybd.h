@@ -8,7 +8,6 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/gen_latch.h"
 #include "machine/mb3773.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
@@ -32,7 +31,6 @@ public:
 		, m_bsprites(*this, "bsprites")
 		, m_ysprites(*this, "ysprites")
 		, m_segaic16vid(*this, "segaic16vid")
-		, m_soundlatch(*this, "soundlatch")
 		, m_adc_ports(*this, "ADC.%u", 0)
 		, m_pdrift_bank(0)
 		, m_scanline_timer(nullptr)
@@ -48,10 +46,6 @@ public:
 	DECLARE_WRITE8_MEMBER(output1_w);
 	DECLARE_WRITE8_MEMBER(misc_output_w);
 	DECLARE_WRITE8_MEMBER(output2_w);
-	DECLARE_WRITE16_MEMBER(sound_data_w);
-
-	// sound Z80 CPU read/write handlers
-	DECLARE_READ8_MEMBER(sound_data_r);
 
 	// linked cabinet specific handlers
 	DECLARE_WRITE_LINE_MEMBER(mb8421_intl);
@@ -104,8 +98,7 @@ protected:
 	// timer IDs
 	enum
 	{
-		TID_IRQ2_GEN,
-		TID_SOUND_WRITE
+		TID_IRQ2_GEN
 	};
 
 	// device overrides
@@ -126,7 +119,6 @@ protected:
 	required_device<sega_sys16b_sprite_device> m_bsprites;
 	required_device<sega_yboard_sprite_device> m_ysprites;
 	required_device<segaic16_video_device> m_segaic16vid;
-	required_device<generic_latch_8_device> m_soundlatch;
 
 	// input ports
 	optional_ioport_array<6> m_adc_ports;

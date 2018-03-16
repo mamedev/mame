@@ -119,27 +119,28 @@ WRITE16_MEMBER(pkscram_state::pkscramble_output_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 }
 
-ADDRESS_MAP_START(pkscram_state::pkscramble_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x0400ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x041000, 0x043fff) AM_RAM // main ram
-	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE(pkscramble_fgtilemap_w) AM_SHARE("fgtilemap_ram") // fg tilemap
-	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE(pkscramble_mdtilemap_w) AM_SHARE("mdtilemap_ram") // md tilemap (just a copy of fg?)
-	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(pkscramble_bgtilemap_w) AM_SHARE("bgtilemap_ram") // bg tilemap
-	AM_RANGE(0x047000, 0x047fff) AM_RAM // unused
-	AM_RANGE(0x048000, 0x048fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x049000, 0x049001) AM_READ_PORT("DSW")
-	AM_RANGE(0x049004, 0x049005) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x049008, 0x049009) AM_WRITE(pkscramble_output_w)
-	AM_RANGE(0x049010, 0x049011) AM_WRITENOP
-	AM_RANGE(0x049014, 0x049015) AM_WRITENOP
-	AM_RANGE(0x049018, 0x049019) AM_WRITENOP
-	AM_RANGE(0x04901c, 0x04901d) AM_WRITENOP
-	AM_RANGE(0x049020, 0x049021) AM_WRITENOP
-	AM_RANGE(0x04900c, 0x04900f) AM_DEVREADWRITE8("ymsnd", ym2203_device, read, write, 0x00ff)
-	AM_RANGE(0x052086, 0x052087) AM_WRITENOP
-ADDRESS_MAP_END
+void pkscram_state::pkscramble_map(address_map &map)
+{
+	map.global_mask(0x7ffff);
+	map(0x000000, 0x01ffff).rom();
+	map(0x040000, 0x0400ff).ram().share("nvram");
+	map(0x041000, 0x043fff).ram(); // main ram
+	map(0x044000, 0x044fff).ram().w(this, FUNC(pkscram_state::pkscramble_fgtilemap_w)).share("fgtilemap_ram"); // fg tilemap
+	map(0x045000, 0x045fff).ram().w(this, FUNC(pkscram_state::pkscramble_mdtilemap_w)).share("mdtilemap_ram"); // md tilemap (just a copy of fg?)
+	map(0x046000, 0x046fff).ram().w(this, FUNC(pkscram_state::pkscramble_bgtilemap_w)).share("bgtilemap_ram"); // bg tilemap
+	map(0x047000, 0x047fff).ram(); // unused
+	map(0x048000, 0x048fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x049000, 0x049001).portr("DSW");
+	map(0x049004, 0x049005).portr("INPUTS");
+	map(0x049008, 0x049009).w(this, FUNC(pkscram_state::pkscramble_output_w));
+	map(0x049010, 0x049011).nopw();
+	map(0x049014, 0x049015).nopw();
+	map(0x049018, 0x049019).nopw();
+	map(0x04901c, 0x04901d).nopw();
+	map(0x049020, 0x049021).nopw();
+	map(0x04900c, 0x04900f).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
+	map(0x052086, 0x052087).nopw();
+}
 
 
 static INPUT_PORTS_START( pkscramble )

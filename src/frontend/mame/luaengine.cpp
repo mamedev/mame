@@ -1181,11 +1181,10 @@ void lua_engine::initialize()
 				}),
 			"screens", sol::property([this](running_machine &r) {
 					sol::table table = sol().create_table();
-					for(device_t *dev = r.first_screen(); dev != nullptr; dev = dev->next())
+					for (screen_device &sc : screen_device_iterator(r.root_device()))
 					{
-						screen_device *sc = dynamic_cast<screen_device *>(dev);
-						if (sc && sc->configured() && sc->started() && sc->type())
-							table[sc->tag()] = sc;
+						if (sc.configured() && sc.started() && sc.type())
+							table[sc.tag()] = &sc;
 					}
 					return table;
 				}),

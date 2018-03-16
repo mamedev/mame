@@ -28,13 +28,15 @@ private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(ts3000_state::mem_map)
-	AM_RANGE(0x00000,0x0ffff) AM_RAM
-	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void ts3000_state::mem_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram();
+	map(0xfc000, 0xfffff).rom().region("roms", 0);
+}
 
-ADDRESS_MAP_START(ts3000_state::io_map)
-ADDRESS_MAP_END
+void ts3000_state::io_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( ts3000 )
 INPUT_PORTS_END

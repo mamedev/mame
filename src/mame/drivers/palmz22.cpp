@@ -268,9 +268,10 @@ void palmz22_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(palmz22_state::palmz22_map)
-	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM
-ADDRESS_MAP_END
+void palmz22_state::palmz22_map(address_map &map)
+{
+	map(0x30000000, 0x31ffffff).ram();
+}
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -297,6 +298,7 @@ MACHINE_CONFIG_START(palmz22_state::palmz22)
 
 	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
 	MCFG_S3C2410_PALETTE("palette")
+	MCFG_S3C2410_SCREEN("screen")
 	MCFG_S3C2410_CORE_PIN_R_CB(READ32(palmz22_state, s3c2410_core_pin_r))
 	MCFG_S3C2410_GPIO_PORT_R_CB(READ32(palmz22_state, s3c2410_gpio_port_r))
 	MCFG_S3C2410_GPIO_PORT_W_CB(WRITE32(palmz22_state, s3c2410_gpio_port_w))

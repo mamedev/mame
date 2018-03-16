@@ -293,18 +293,20 @@ WRITE8_MEMBER(fireball_state::p3_w)
 * Memory Map Information *
 *************************/
 
-ADDRESS_MAP_START(fireball_state::fireball_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void fireball_state::fireball_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+}
 
-ADDRESS_MAP_START(fireball_state::fireball_io_map)
+void fireball_state::fireball_io_map(address_map &map)
+{
 
-	AM_RANGE(0x00, 0x01)AM_READWRITE(io_00_r,io_00_w)
-	AM_RANGE(0x02, 0x03)AM_READWRITE(io_02_r,io_02_w)
-	AM_RANGE(0x04, 0x05)AM_READWRITE(io_04_r,io_04_w)
-	AM_RANGE(0x06, 0x07)AM_READWRITE(io_06_r,io_06_w)
+	map(0x00, 0x01).rw(this, FUNC(fireball_state::io_00_r), FUNC(fireball_state::io_00_w));
+	map(0x02, 0x03).rw(this, FUNC(fireball_state::io_02_r), FUNC(fireball_state::io_02_w));
+	map(0x04, 0x05).rw(this, FUNC(fireball_state::io_04_r), FUNC(fireball_state::io_04_w));
+	map(0x06, 0x07).rw(this, FUNC(fireball_state::io_06_r), FUNC(fireball_state::io_06_w));
 
-ADDRESS_MAP_END
+}
 
 
 /*************************

@@ -77,23 +77,25 @@ void sdk85_state::machine_reset()
 	m_maincpu->reset();
 }
 
-ADDRESS_MAP_START(sdk85_state::sdk85_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_DEVREAD("romio", i8355_device, memory_r)
-	AM_RANGE(0x0800, 0x0fff) AM_DEVREAD("expromio", i8355_device, memory_r)
-	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x06ff) AM_DEVREADWRITE("kdc", i8279_device, data_r, data_w)
-	AM_RANGE(0x1900, 0x1900) AM_MIRROR(0x06ff) AM_DEVREADWRITE("kdc", i8279_device, status_r, cmd_w)
-	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("ramio", i8155_device, memory_r, memory_w)
-	AM_RANGE(0x2800, 0x28ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("expramio", i8155_device, memory_r, memory_w)
-ADDRESS_MAP_END
+void sdk85_state::sdk85_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).r("romio", FUNC(i8355_device::memory_r));
+	map(0x0800, 0x0fff).r("expromio", FUNC(i8355_device::memory_r));
+	map(0x1800, 0x1800).mirror(0x06ff).rw("kdc", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
+	map(0x1900, 0x1900).mirror(0x06ff).rw("kdc", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
+	map(0x2000, 0x20ff).mirror(0x0700).rw("ramio", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0x2800, 0x28ff).mirror(0x0700).rw("expramio", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+}
 
-ADDRESS_MAP_START(sdk85_state::sdk85_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x04) AM_DEVREADWRITE("romio", i8355_device, io_r, io_w)
-	AM_RANGE(0x08, 0x0b) AM_MIRROR(0x04) AM_DEVREADWRITE("expromio", i8355_device, io_r, io_w)
-	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("ramio", i8155_device, io_r, io_w)
-	AM_RANGE(0x28, 0x2f) AM_DEVREADWRITE("expramio", i8155_device, io_r, io_w)
-ADDRESS_MAP_END
+void sdk85_state::sdk85_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x03).mirror(0x04).rw("romio", FUNC(i8355_device::io_r), FUNC(i8355_device::io_w));
+	map(0x08, 0x0b).mirror(0x04).rw("expromio", FUNC(i8355_device::io_r), FUNC(i8355_device::io_w));
+	map(0x20, 0x27).rw("ramio", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0x28, 0x2f).rw("expramio", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sdk85 )

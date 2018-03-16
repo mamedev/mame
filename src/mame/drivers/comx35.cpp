@@ -292,20 +292,22 @@ WRITE8_MEMBER( comx35_state::io_w )
 //  ADDRESS_MAP( comx35_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(comx35_state::comx35_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w)
-ADDRESS_MAP_END
+void comx35_state::comx35_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(comx35_state::mem_r), FUNC(comx35_state::mem_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( comx35_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(comx35_state::comx35_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x07) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void comx35_state::comx35_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x07).rw(this, FUNC(comx35_state::io_r), FUNC(comx35_state::io_w));
+}
 
 
 

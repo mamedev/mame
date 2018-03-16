@@ -860,16 +860,18 @@ void ngen_state::machine_reset()
 }
 
 // boot ROMs from modules are not mapped anywhere, instead, they have to send the code from the boot ROM via DMA
-ADDRESS_MAP_START(ngen_state::ngen_mem)
-	AM_RANGE(0x00000, 0xf7fff) AM_RAM
-	AM_RANGE(0xf8000, 0xf9fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xfa000, 0xfbfff) AM_RAM AM_SHARE("fontram")
-	AM_RANGE(0xfc000, 0xfcfff) AM_RAM
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("bios",0)
-ADDRESS_MAP_END
+void ngen_state::ngen_mem(address_map &map)
+{
+	map(0x00000, 0xf7fff).ram();
+	map(0xf8000, 0xf9fff).ram().share("vram");
+	map(0xfa000, 0xfbfff).ram().share("fontram");
+	map(0xfc000, 0xfcfff).ram();
+	map(0xfe000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(ngen_state::ngen_io)
-	AM_RANGE(0x0000, 0x0001) AM_READWRITE(xbus_r,xbus_w)
+void ngen_state::ngen_io(address_map &map)
+{
+	map(0x0000, 0x0001).rw(this, FUNC(ngen_state::xbus_r), FUNC(ngen_state::xbus_w));
 
 	// Floppy/Hard disk module
 //  AM_RANGE(0x0100, 0x0107) AM_DEVREADWRITE8("fdc",wd2797_t,read,write,0x00ff)  // a guess for now
@@ -880,7 +882,7 @@ ADDRESS_MAP_START(ngen_state::ngen_io)
 	// 0x0120-0x012f - WD1010 Winchester disk controller (unemulated)
 //  AM_RANGE(0x0130, 0x0137) AM_DEVREADWRITE8("hdc_timer",pit8253_device,read,write,0x00ff)
 
-ADDRESS_MAP_END
+}
 
 ADDRESS_MAP_START(ngen_state::ngen386_mem)
 	AM_RANGE(0x00000000, 0x000f7fff) AM_RAM

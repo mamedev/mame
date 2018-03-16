@@ -20,6 +20,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 #include "sound/lmc1992.h"
+#include "screen.h"
 
 #define M68000_TAG      "m68000"
 #define HD6301V1_TAG    "hd6301"
@@ -120,7 +121,8 @@ public:
 			m_ikbd_mouse_pc(0),
 			m_ikbd_joy(1),
 			m_monochrome(1),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_screen(*this, "screen")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -333,6 +335,7 @@ public:
 
 	int m_monochrome;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 	void st(machine_config &config);

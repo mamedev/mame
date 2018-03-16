@@ -34,7 +34,7 @@ scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, d
 	, m_screen1_l(0), m_screen1_h(0), m_cursor_l(0), m_cursor_h(0), m_screen2_l(0), m_screen2_h(0)
 	, m_irq_register(0), m_status_register(0), m_irq_mask(0)
 	, m_gfx_enabled(0), m_display_enabled(0), m_display_enabled_field(0), m_display_enabled_scanline(0), m_cursor_enabled(0)
-	, m_hpixels_per_column(0), m_text_hpixels_per_column(0), m_gfx_hpixels_per_column(0)
+	, m_hpixels_per_column(0)
 	, m_IR0_double_ht_wd(0), m_IR0_scanline_per_char_row(0), m_IR0_sync_select(0), m_IR0_buffer_mode_select(0)
 	, m_IR1_interlace_enable(0), m_IR1_equalizing_constant(0)
 	, m_IR2_row_table(0), m_IR2_horz_sync_width(0), m_IR2_horz_back_porch(0)
@@ -139,7 +139,6 @@ void scn2674_device::device_reset()
 	m_IR_pointer = 0;
 	m_address = 0;
 	m_start1change = 0;
-	m_hpixels_per_column = m_text_hpixels_per_column;
 }
 
 // 15 Initialization Registers (8-bit each)
@@ -342,6 +341,8 @@ void scn2674_device::write_command(uint8_t data)
 		/* Enable GFX */
 		LOGMASKED(LOG_COMMAND, "enable GFX %02x\n",data);
 		m_gfx_enabled = 1;
+
+		// FIXME: this takes effect at next character row
 		recompute_parameters();
 	}
 
@@ -640,7 +641,6 @@ WRITE8_MEMBER( scn2674_device::write )
 
 void scn2674_device::recompute_parameters()
 {
-	m_hpixels_per_column = m_gfx_enabled ? m_gfx_hpixels_per_column : m_text_hpixels_per_column;
 	int horiz_pix_total = ((m_IR1_equalizing_constant + (m_IR2_horz_sync_width << 1)) << 1) * m_hpixels_per_column;
 	int vert_pix_total = m_IR4_rows_per_screen * m_IR0_scanline_per_char_row + m_IR3_vert_front_porch + m_IR3_vert_back_porch + m_IR7_vsync_width;
 	attoseconds_t refresh = screen().frame_period().attoseconds();

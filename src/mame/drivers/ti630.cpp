@@ -67,20 +67,22 @@ private:
 
 #define LOG_IO_PORTS 0
 
-ADDRESS_MAP_START(ti630_state::i80c31_prg)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void ti630_state::i80c31_prg(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
 DRIVER_INIT_MEMBER( ti630_state, ti630 )
 {
 }
 
-ADDRESS_MAP_START(ti630_state::i80c31_io)
-	AM_RANGE(0x0000,0x0000) /*AM_MIRROR(?)*/ AM_DEVWRITE("hd44780", hd44780_device, control_write)
-	AM_RANGE(0x1000,0x1000) /*AM_MIRROR(?)*/ AM_DEVWRITE("hd44780", hd44780_device, data_write)
-	AM_RANGE(0x2000,0x2000) /*AM_MIRROR(?)*/ AM_DEVREAD("hd44780", hd44780_device, control_read)
-	AM_RANGE(0x8000,0xffff) AM_RAM /*TODO: verify the ammont of RAM and the correct address range to which it is mapped. This is just a first reasonable guess that apparently yields good results in the emulation */
-ADDRESS_MAP_END
+void ti630_state::i80c31_io(address_map &map)
+{
+	map(0x0000, 0x0000) /*.mirror(?)*/ .w("hd44780", FUNC(hd44780_device::control_write));
+	map(0x1000, 0x1000) /*.mirror(?)*/ .w("hd44780", FUNC(hd44780_device::data_write));
+	map(0x2000, 0x2000) /*.mirror(?)*/ .r("hd44780", FUNC(hd44780_device::control_read));
+	map(0x8000, 0xffff).ram(); /*TODO: verify the ammont of RAM and the correct address range to which it is mapped. This is just a first reasonable guess that apparently yields good results in the emulation */
+}
 
 void ti630_state::machine_start()
 {

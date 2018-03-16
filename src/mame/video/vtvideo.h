@@ -23,6 +23,7 @@ public:
 
 	template <class Object> devcb_base &set_ram_rd_callback(Object &&cb) { return m_read_ram.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_vert_freq_intr_wr_callback(Object &&cb) { return m_write_vert_freq_intr.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_lba3_lba4_wr_callback(Object &&cb) { return m_write_lba3_lba4.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_lba7_wr_callback(Object &&cb) { return m_write_lba7.set_callback(std::forward<Object>(cb)); }
 
 	void set_chargen_tag(const char *tag) { m_char_rom.set_tag(tag); }
@@ -46,11 +47,13 @@ protected:
 	void recompute_parameters();
 	void vblank_callback(screen_device &screen, bool state);
 	virtual void display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type);
+	TIMER_CALLBACK_MEMBER(lba3_change);
 	TIMER_CALLBACK_MEMBER(lba7_change);
 	virtual void notify_vblank(bool choice) { }
 
 	devcb_read8        m_read_ram;
 	devcb_write_line   m_write_vert_freq_intr;
+	devcb_write8       m_write_lba3_lba4;
 	devcb_write_line   m_write_lba7;
 
 	int m_lba7;
@@ -71,7 +74,8 @@ protected:
 	uint8_t m_fill_lines;
 	bool m_is_50hz;
 	bool m_interlaced;
-	emu_timer * m_lba7_change_timer;
+	emu_timer *m_lba3_change_timer;
+	emu_timer *m_lba7_change_timer;
 
 	required_region_ptr<uint8_t> m_char_rom; /* character rom region */
 	required_device<palette_device> m_palette;
@@ -115,6 +119,9 @@ DECLARE_DEVICE_TYPE(RAINBOW_VIDEO, rainbow_video_device)
 
 #define MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(_write) \
 	devcb = &downcast<vt100_video_device &>(*device).set_vert_freq_intr_wr_callback(DEVCB_##_write);
+
+#define MCFG_VT_VIDEO_LBA3_LBA4_CALLBACK(_write) \
+	devcb = &downcast<vt100_video_device &>(*device).set_lba3_lba4_wr_callback(DEVCB_##_write);
 
 #define MCFG_VT_VIDEO_LBA7_CALLBACK(_write) \
 	devcb = &downcast<vt100_video_device &>(*device).set_lba7_wr_callback(DEVCB_##_write);

@@ -155,10 +155,10 @@ enum
 #define PRE1        m_r[Z8_REGISTER_PRE1]
 
 
-DEFINE_DEVICE_TYPE(Z8601,   z8601_device,   "z8601",   "Z8601")
+DEFINE_DEVICE_TYPE(Z8601,   z8601_device,   "z8601",   "Zilog Z8601")
 DEFINE_DEVICE_TYPE(UB8830D, ub8830d_device, "ub8830d", "UB8830D")
-DEFINE_DEVICE_TYPE(Z8611,   z8611_device,   "z8611",   "Z8611")
-DEFINE_DEVICE_TYPE(Z8681,   z8681_device,   "z8681",   "Z8681")
+DEFINE_DEVICE_TYPE(Z8611,   z8611_device,   "z8611",   "Zilog Z8611")
+DEFINE_DEVICE_TYPE(Z8681,   z8681_device,   "z8681",   "Zilog Z8681")
 
 
 /***************************************************************************

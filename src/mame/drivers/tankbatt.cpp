@@ -167,21 +167,22 @@ WRITE_LINE_MEMBER(tankbatt_state::coinlockout_w)
 	machine().bookkeeping().coin_lockout_w(1, state);
 }
 
-ADDRESS_MAP_START(tankbatt_state::main_map)
-	AM_RANGE(0x0000, 0x000f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x0010, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0c07) AM_READ(in0_r) AM_DEVWRITE("outlatch", cd4099_device, write_d0)
-	AM_RANGE(0x0c08, 0x0c0f) AM_READ(in1_r) AM_DEVWRITE("mainlatch", cd4099_device, write_d0)
-	AM_RANGE(0x0c10, 0x0c10) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x0c18, 0x0c1f) AM_READ(dsw_r)
-	AM_RANGE(0x0c18, 0x0c18) AM_WRITENOP    /* watchdog ?? */
-	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("maincpu",0)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu",0) //mirror for the reset/irq vectors
-	AM_RANGE(0x2000, 0x5fff) AM_READNOP //anything else might be left-over for a diagnostic ROM or something related to the discrete sound HW
-	AM_RANGE(0x8000, 0xdfff) AM_READNOP
-ADDRESS_MAP_END
+void tankbatt_state::main_map(address_map &map)
+{
+	map(0x0000, 0x000f).ram().share("bulletsram");
+	map(0x0010, 0x01ff).ram();
+	map(0x0200, 0x07ff).ram();
+	map(0x0800, 0x0bff).ram().w(this, FUNC(tankbatt_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0c07).r(this, FUNC(tankbatt_state::in0_r)).w("outlatch", FUNC(cd4099_device::write_d0));
+	map(0x0c08, 0x0c0f).r(this, FUNC(tankbatt_state::in1_r)).w("mainlatch", FUNC(cd4099_device::write_d0));
+	map(0x0c10, 0x0c10).w(this, FUNC(tankbatt_state::irq_ack_w));
+	map(0x0c18, 0x0c1f).r(this, FUNC(tankbatt_state::dsw_r));
+	map(0x0c18, 0x0c18).nopw();    /* watchdog ?? */
+	map(0x6000, 0x7fff).rom().region("maincpu", 0);
+	map(0xe000, 0xffff).rom().region("maincpu", 0); //mirror for the reset/irq vectors
+	map(0x2000, 0x5fff).nopr(); //anything else might be left-over for a diagnostic ROM or something related to the discrete sound HW
+	map(0x8000, 0xdfff).nopr();
+}
 
 INTERRUPT_GEN_MEMBER(tankbatt_state::interrupt)
 {

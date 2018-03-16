@@ -413,31 +413,33 @@ void einstein_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(einstein_state::einstein_mem)
-	AM_RANGE(0x0000, 0x07fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE(0x8000, 0x0ffff) AM_RAMBANK("bank3")
-ADDRESS_MAP_END
+void einstein_state::einstein_mem(address_map &map)
+{
+	map(0x0000, 0x07fff).bankr("bank1").bankw("bank2");
+	map(0x8000, 0x0ffff).bankrw("bank3");
+}
 
 // I/O ports are decoded into 8 blocks using address lines A3 to A7
-ADDRESS_MAP_START(einstein_state::einstein_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff04) AM_READWRITE(reset_r, reset_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I030, ay8910_device, data_r, address_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff04) AM_DEVWRITE(IC_I030, ay8910_device, data_w)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff06) AM_DEVREADWRITE("vdp", tms9129_device, vram_read, vram_write)
-	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff06) AM_DEVREADWRITE("vdp", tms9129_device, register_read, register_write)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0xff06) AM_DEVREADWRITE(IC_I060, i8251_device, data_r, data_w)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0xff06) AM_DEVREADWRITE(IC_I060, i8251_device, status_r, control_w)
-	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I042, wd1770_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_READWRITE(kybint_msk_r, kybint_msk_w)
-	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_WRITE(adcint_msk_w)
-	AM_RANGE(0x23, 0x23) AM_MIRROR(0xff00) AM_WRITE(drsel_w)
-	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_READWRITE(rom_r, rom_w)
-	AM_RANGE(0x25, 0x25) AM_MIRROR(0xff00) AM_WRITE(fireint_msk_w)
-	AM_RANGE(0x28, 0x2b) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I058, z80ctc_device, read, write)
-	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I063, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff07) AM_DEVREADWRITE("adc", adc0844_device, read, write)
-ADDRESS_MAP_END
+void einstein_state::einstein_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).mirror(0xff04).rw(this, FUNC(einstein_state::reset_r), FUNC(einstein_state::reset_w));
+	map(0x02, 0x02).mirror(0xff04).rw(m_psg, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x03, 0x03).mirror(0xff04).w(m_psg, FUNC(ay8910_device::data_w));
+	map(0x08, 0x08).mirror(0xff06).rw("vdp", FUNC(tms9129_device::vram_read), FUNC(tms9129_device::vram_write));
+	map(0x09, 0x09).mirror(0xff06).rw("vdp", FUNC(tms9129_device::register_read), FUNC(tms9129_device::register_write));
+	map(0x10, 0x10).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x11, 0x11).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x18, 0x1b).mirror(0xff04).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
+	map(0x20, 0x20).mirror(0xff00).rw(this, FUNC(einstein_state::kybint_msk_r), FUNC(einstein_state::kybint_msk_w));
+	map(0x21, 0x21).mirror(0xff00).w(this, FUNC(einstein_state::adcint_msk_w));
+	map(0x23, 0x23).mirror(0xff00).w(this, FUNC(einstein_state::drsel_w));
+	map(0x24, 0x24).mirror(0xff00).rw(this, FUNC(einstein_state::rom_r), FUNC(einstein_state::rom_w));
+	map(0x25, 0x25).mirror(0xff00).w(this, FUNC(einstein_state::fireint_msk_w));
+	map(0x28, 0x2b).mirror(0xff04).rw(IC_I058, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x30, 0x33).mirror(0xff04).rw(IC_I063, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x38, 0x38).mirror(0xff07).rw("adc", FUNC(adc0844_device::read), FUNC(adc0844_device::write));
+}
 
 
 /***************************************************************************

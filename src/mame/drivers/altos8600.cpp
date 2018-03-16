@@ -665,53 +665,60 @@ IRQ_CALLBACK_MEMBER(altos8600_state::inta)
 	return m_pic1->acknowledge();
 }
 
-ADDRESS_MAP_START(altos8600_state::cpu_mem)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(cpuram_r, cpuram_w)
-ADDRESS_MAP_END
+void altos8600_state::cpu_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(this, FUNC(altos8600_state::cpuram_r), FUNC(altos8600_state::cpuram_w));
+}
 
-ADDRESS_MAP_START(altos8600_state::stack_mem)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(stkram_r, stkram_w)
-ADDRESS_MAP_END
+void altos8600_state::stack_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(this, FUNC(altos8600_state::stkram_r), FUNC(altos8600_state::stkram_w));
+}
 
-ADDRESS_MAP_START(altos8600_state::code_mem)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(coderam_r, coderam_w)
-ADDRESS_MAP_END
+void altos8600_state::code_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(this, FUNC(altos8600_state::coderam_r), FUNC(altos8600_state::coderam_w));
+}
 
-ADDRESS_MAP_START(altos8600_state::extra_mem)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(xtraram_r, xtraram_w)
-ADDRESS_MAP_END
+void altos8600_state::extra_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(this, FUNC(altos8600_state::xtraram_r), FUNC(altos8600_state::xtraram_w));
+}
 
-ADDRESS_MAP_START(altos8600_state::cpu_io)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(cpuio_r, cpuio_w)
-ADDRESS_MAP_END
+void altos8600_state::cpu_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(altos8600_state::cpuio_r), FUNC(altos8600_state::cpuio_w));
+}
 
-ADDRESS_MAP_START(altos8600_state::dmac_mem)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(dmacram_r, dmacram_w)
-ADDRESS_MAP_END
+void altos8600_state::dmac_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(this, FUNC(altos8600_state::dmacram_r), FUNC(altos8600_state::dmacram_w));
+}
 
-ADDRESS_MAP_START(altos8600_state::dmac_io)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmi_r, nmi_w)
-	AM_RANGE(0x0000, 0x0007) AM_READ(fault_r)
-	AM_RANGE(0x0008, 0x000f) AM_WRITE(clear_w)
-	AM_RANGE(0x0010, 0x0017) AM_READ(errlo_r)
-	AM_RANGE(0x0018, 0x001f) AM_READ(errhi_r)
-	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(hd_r, hd_w, 0x00ff)
-	AM_RANGE(0x0030, 0x0037) AM_WRITE(mode_w)
-	AM_RANGE(0x0038, 0x003f) AM_WRITE8(cattn_w, 0xffff)
-	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("fd1797", fd1797_device, read, write, 0xff00)
-	AM_RANGE(0x0048, 0x004f) AM_DEVREADWRITE8("uart8274", i8274_new_device, cd_ba_r, cd_ba_w, 0x00ff)
-	AM_RANGE(0x0048, 0x004f) AM_DEVREADWRITE8("pit", pit8253_device, read, write, 0xff00)
-	AM_RANGE(0x0050, 0x0057) AM_READWRITE8(romport_r, romport_w, 0xffff)
-	AM_RANGE(0x0058, 0x005f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x0058, 0x005f) AM_WRITE8(clrsys_w, 0xff00)
-	AM_RANGE(0x0060, 0x0067) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x0068, 0x006f) AM_DEVREADWRITE8("pic8259_3", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x0070, 0x0077) AM_NOP
-	AM_RANGE(0x0078, 0x0079) AM_WRITE8(ics_attn_w, 0xffff)
-	AM_RANGE(0x0200, 0x03ff) AM_READWRITE(mmuflags_r, mmuflags_w)
-	AM_RANGE(0x0400, 0x05ff) AM_READWRITE(mmuaddr_r, mmuaddr_w)
-ADDRESS_MAP_END
+void altos8600_state::dmac_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(altos8600_state::nmi_r), FUNC(altos8600_state::nmi_w));
+	map(0x0000, 0x0007).r(this, FUNC(altos8600_state::fault_r));
+	map(0x0008, 0x000f).w(this, FUNC(altos8600_state::clear_w));
+	map(0x0010, 0x0017).r(this, FUNC(altos8600_state::errlo_r));
+	map(0x0018, 0x001f).r(this, FUNC(altos8600_state::errhi_r));
+	map(0x0020, 0x0027).rw(this, FUNC(altos8600_state::hd_r), FUNC(altos8600_state::hd_w)).umask16(0x00ff);
+	map(0x0030, 0x0037).w(this, FUNC(altos8600_state::mode_w));
+	map(0x0038, 0x003f).w(this, FUNC(altos8600_state::cattn_w));
+	map(0x0040, 0x0047).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0040, 0x0047).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write)).umask16(0xff00);
+	map(0x0048, 0x004f).rw(m_uart8274, FUNC(i8274_new_device::cd_ba_r), FUNC(i8274_new_device::cd_ba_w)).umask16(0x00ff);
+	map(0x0048, 0x004f).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
+	map(0x0050, 0x0057).rw(this, FUNC(altos8600_state::romport_r), FUNC(altos8600_state::romport_w));
+	map(0x0058, 0x005f).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x0058, 0x005f).w(this, FUNC(altos8600_state::clrsys_w)).umask16(0xff00);
+	map(0x0060, 0x0067).rw(m_pic2, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x0068, 0x006f).rw(m_pic3, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x0070, 0x0077).noprw();
+	map(0x0078, 0x0079).w(this, FUNC(altos8600_state::ics_attn_w));
+	map(0x0200, 0x03ff).rw(this, FUNC(altos8600_state::mmuflags_r), FUNC(altos8600_state::mmuflags_w));
+	map(0x0400, 0x05ff).rw(this, FUNC(altos8600_state::mmuaddr_r), FUNC(altos8600_state::mmuaddr_w));
+}
 
 static SLOT_INTERFACE_START(altos8600_floppies)
 	SLOT_INTERFACE( "8dd", FLOPPY_8_DSDD )

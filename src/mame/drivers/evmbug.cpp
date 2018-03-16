@@ -48,18 +48,20 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-ADDRESS_MAP_START(evmbug_state::mem_map)
-	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0xec00, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void evmbug_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x17ff).rom();
+	map(0xec00, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(evmbug_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
+void evmbug_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
 	//AM_RANGE(0x0000, 0x0003) AM_DEVREAD("uart1", tms9902_device, cruread)
 	//AM_RANGE(0x0000, 0x001f) AM_DEVWRITE("uart1", tms9902_device, cruwrite)
-	AM_RANGE(0x0000, 0x0003) AM_READ(rs232_r)
-	AM_RANGE(0x0000, 0x001f) AM_WRITE(rs232_w)
-ADDRESS_MAP_END
+	map(0x0000, 0x0003).r(this, FUNC(evmbug_state::rs232_r));
+	map(0x0000, 0x001f).w(this, FUNC(evmbug_state::rs232_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( evmbug )

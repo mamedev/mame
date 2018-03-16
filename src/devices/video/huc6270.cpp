@@ -364,7 +364,6 @@ inline void huc6270_device::next_horz_state()
 	{
 	case h_state::HDS:
 		m_bxr_latched = m_bxr;
-		//LOG("latched bxr vpos=%d, hpos=%d\n", video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()));
 		m_horz_state = h_state::HDW;
 		m_horz_to_go = ( m_hdr & 0x7F ) + 1;
 		{
@@ -673,24 +672,20 @@ WRITE8_MEMBER( huc6270_device::write )
 
 				case RCR:       /* raster compare register LSB */
 					m_rcr = ( m_rcr & 0x0300 ) | data;
-//printf("%s: RCR set to %03x\n", machine().describe_context(), m_rcr);
 //                  if ( m_raster_count == m_rcr && m_cr & 0x04 )
 //                  {
 //                      m_status |= HUC6270_RR;
 //                      m_irq_changed_cb( ASSERT_LINE );
 //                  }
-//LOG("%04x: RCR (%03x) written at %d,%d\n", activecpu_get_pc(), huc6270->m_rcr, video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()) );
 					break;
 
 				case BXR:       /* background x-scroll register LSB */
 					m_bxr = ( m_bxr & 0x0300 ) | data;
-//LOG("*********************** BXR written %d at %d,%d\n", m_bxr, video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()) );
 					break;
 
 				case BYR:       /* background y-scroll register LSB */
 					m_byr = ( m_byr & 0x0100 ) | data;
 					m_byr_latched = m_byr;
-//LOG("******************** BYR written %d at %d,%d\n", huc6270->m_byr, video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()) );
 					break;
 
 				case MWR:       /* memory width register LSB */

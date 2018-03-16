@@ -399,9 +399,10 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG ( coco_floating )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(coco_state::coco_floating_map)
-	AM_RANGE(0x0000, 0xFFFF) AM_READ(floating_bus_read)
-ADDRESS_MAP_END
+void coco_state::coco_floating_map(address_map &map)
+{
+	map(0x0000, 0xFFFF).r(this, FUNC(coco_state::floating_bus_read));
+}
 
 
 MACHINE_CONFIG_START(coco_state::coco_floating)

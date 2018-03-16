@@ -55,17 +55,19 @@ static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("i82371sb", I82371SB)
 SLOT_INTERFACE_END
 
-ADDRESS_MAP_START(at586_state::at586_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0x000a0000, 0x000bffff) AM_NOP
-	AM_RANGE(0x00800000, 0x00800bff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("isa", 0x20000)
-ADDRESS_MAP_END
+void at586_state::at586_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).bankrw("bank10");
+	map(0x000a0000, 0x000bffff).noprw();
+	map(0x00800000, 0x00800bff).ram().share("nvram");
+	map(0xfffe0000, 0xffffffff).rom().region("isa", 0x20000);
+}
 
-ADDRESS_MAP_START(at586_state::at586_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
-ADDRESS_MAP_END
+void at586_state::at586_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
+}
 
 MACHINE_CONFIG_START(at586_state::at_softlists)
 	/* software lists */

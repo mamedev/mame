@@ -24,10 +24,6 @@ private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-//static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 64, powerstack_state )
-//  AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION("roms", 0)
-//ADDRESS_MAP_END
-
 static INPUT_PORTS_START( powerstack )
 INPUT_PORTS_END
 

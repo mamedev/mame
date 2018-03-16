@@ -137,7 +137,7 @@
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(DSP32C, dsp32c_device, "dsp32c", "DSP32C")
+DEFINE_DEVICE_TYPE(DSP32C, dsp32c_device, "dsp32c", "AT&T DSP32C")
 
 //-------------------------------------------------
 //  dsp32c_device - constructor

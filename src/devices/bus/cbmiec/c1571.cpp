@@ -144,30 +144,32 @@ const tiny_rom_entry *mini_chief_device::device_rom_region() const
 //  ADDRESS_MAP( c1571_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c1571_device::c1571_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x03f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
-	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x03f0) AM_READWRITE(via1_r, via1_w)
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1770_TAG, wd1770_device, read, write)
-	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x3ff0) AM_DEVREADWRITE(M6526_TAG, mos6526_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
-ADDRESS_MAP_END
+void c1571_device::c1571_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x1800, 0x180f).mirror(0x03f0).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1c00, 0x1c0f).mirror(0x03f0).rw(this, FUNC(c1571_device::via1_r), FUNC(c1571_device::via1_w));
+	map(0x2000, 0x2003).mirror(0x1ffc).rw(WD1770_TAG, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
+	map(0x4000, 0x400f).mirror(0x3ff0).rw(M6526_TAG, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
+	map(0x8000, 0xffff).rom().region(M6502_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( mini_chief_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(mini_chief_device::mini_chief_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x03f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
-	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x03f0) AM_READWRITE(via1_r, via1_w)
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1770_TAG, wd1770_device, read, write)
-	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0xff0) AM_DEVREADWRITE(M6526_TAG, mos6526_device, read, write)
-	AM_RANGE(0x5000, 0x5fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
-ADDRESS_MAP_END
+void mini_chief_device::mini_chief_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x1800, 0x180f).mirror(0x03f0).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1c00, 0x1c0f).mirror(0x03f0).rw(this, FUNC(mini_chief_device::via1_r), FUNC(mini_chief_device::via1_w));
+	map(0x2000, 0x2003).mirror(0x1ffc).rw(WD1770_TAG, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
+	map(0x4000, 0x400f).mirror(0xff0).rw(M6526_TAG, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
+	map(0x5000, 0x5fff).mirror(0x2000).ram();
+	map(0x6000, 0x6fff).ram();
+	map(0x8000, 0xffff).rom().region(M6502_TAG, 0);
+}
 
 
 WRITE_LINE_MEMBER( c1571_device::via0_irq_w )

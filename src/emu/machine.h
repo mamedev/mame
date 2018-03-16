@@ -197,7 +197,6 @@ public:
 	const char *basename() const { return m_basename.c_str(); }
 	int sample_rate() const { return m_sample_rate; }
 	bool save_or_load_pending() const { return !m_saveload_pending_file.empty(); }
-	[[deprecated("don't rely on this, use an object finder instead")]] screen_device *first_screen() const { return primary_screen; }
 
 	// RAII-based side effect disable
 	// NOP-ed when passed false, to make it more easily conditional

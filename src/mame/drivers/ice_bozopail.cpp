@@ -37,9 +37,10 @@ public:
 	void ice_bozo_map(address_map &map);
 };
 
-ADDRESS_MAP_START(ice_bozopail_state::ice_bozo_map)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x1fe000)
-ADDRESS_MAP_END
+void ice_bozopail_state::ice_bozo_map(address_map &map)
+{
+	map(0xe000, 0xffff).rom().region("maincpu", 0x1fe000);
+}
 
 static INPUT_PORTS_START( ice_bozo )
 INPUT_PORTS_END

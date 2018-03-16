@@ -236,30 +236,32 @@ WRITE8_MEMBER(spdodgeb_state::mcu63701_w)
 
 
 
-ADDRESS_MAP_START(spdodgeb_state::spdodgeb_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") //AM_WRITENOP
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW") //AM_WRITENOP
-	AM_RANGE(0x3002, 0x3002) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+void spdodgeb_state::spdodgeb_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x10ff).writeonly().share("spriteram");
+	map(0x2000, 0x2fff).ram().w(this, FUNC(spdodgeb_state::videoram_w)).share("videoram");
+	map(0x3000, 0x3000).portr("IN0"); //AM_WRITENOP
+	map(0x3001, 0x3001).portr("DSW"); //AM_WRITENOP
+	map(0x3002, 0x3002).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 //  AM_RANGE(0x3003, 0x3003) AM_WRITENOP
-	AM_RANGE(0x3004, 0x3004) AM_WRITE(scrollx_lo_w)
+	map(0x3004, 0x3004).w(this, FUNC(spdodgeb_state::scrollx_lo_w));
 //  AM_RANGE(0x3005, 0x3005) AM_WRITENOP         /* mcu63701_output_w */
-	AM_RANGE(0x3006, 0x3006) AM_WRITE(ctrl_w)  /* scroll hi, flip screen, bank switch, palette select */
-	AM_RANGE(0x3800, 0x3800) AM_WRITE(mcu63701_w)
-	AM_RANGE(0x3801, 0x3805) AM_READ(mcu63701_r)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x3006, 0x3006).w(this, FUNC(spdodgeb_state::ctrl_w));  /* scroll hi, flip screen, bank switch, palette select */
+	map(0x3800, 0x3800).w(this, FUNC(spdodgeb_state::mcu63701_w));
+	map(0x3801, 0x3805).r(this, FUNC(spdodgeb_state::mcu63701_r));
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(spdodgeb_state::spdodgeb_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0x3800, 0x3807) AM_WRITE(spd_adpcm_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
-ADDRESS_MAP_END
+void spdodgeb_state::spdodgeb_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x2800, 0x2801).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x3800, 0x3807).w(this, FUNC(spdodgeb_state::spd_adpcm_w));
+	map(0x8000, 0xffff).rom().region("audiocpu", 0);
+}
 
 
 CUSTOM_INPUT_MEMBER(spdodgeb_state::mcu63705_busy_r)

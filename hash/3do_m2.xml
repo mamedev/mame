@@ -22,5 +22,17 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
+<!-- Aftermarket release -->
+	
+	<software name="shootr2d" supported="no">
+		<description>Shooter 2D</description>
+		<year>2008</year>
+		<publisher>Games That Weren't</publisher>
+		<part name="cdrom" interface="3do_m2_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shootr2d" sha1="b53e4186fcb496282584bead5cdaad9fef2293d9" />
+			</diskarea>
+		</part>
+	</software>
 
 </softwarelist>

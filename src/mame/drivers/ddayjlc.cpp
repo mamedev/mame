@@ -266,41 +266,43 @@ WRITE8_MEMBER(ddayjlc_state::i8257_LMSR_w)
 	}
 }
 
-ADDRESS_MAP_START(ddayjlc_state::main_cpu)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(ddayjlc_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(ddayjlc_bgram_w) AM_SHARE("bgram") /* 9800-981f - videoregs */
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1") AM_WRITENOP
-	AM_RANGE(0xe000, 0xe003) AM_WRITE(i8257_CH0_w)
-	AM_RANGE(0xe008, 0xe008) AM_WRITENOP
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_w)
-	AM_RANGE(0xf100, 0xf100) AM_WRITENOP
-	AM_RANGE(0xf080, 0xf080) AM_WRITE(char_bank_w)
-	AM_RANGE(0xf081, 0xf081) AM_WRITENOP
-	AM_RANGE(0xf083, 0xf083) AM_WRITE(i8257_LMSR_w)
-	AM_RANGE(0xf084, 0xf084) AM_WRITE(bg0_w)
-	AM_RANGE(0xf085, 0xf085) AM_WRITE(bg1_w)
-	AM_RANGE(0xf086, 0xf086) AM_WRITE(bg2_w)
-	AM_RANGE(0xf101, 0xf101) AM_WRITE(main_nmi_w)
-	AM_RANGE(0xf102, 0xf105) AM_WRITE(prot_w)
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xf100, 0xf100) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf180, 0xf180) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
+void ddayjlc_state::main_cpu(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram().share("mainram");
+	map(0x9000, 0x93ff).ram().share("spriteram");
+	map(0x9400, 0x97ff).ram().w(this, FUNC(ddayjlc_state::ddayjlc_videoram_w)).share("videoram");
+	map(0x9800, 0x9fff).ram().w(this, FUNC(ddayjlc_state::ddayjlc_bgram_w)).share("bgram"); /* 9800-981f - videoregs */
+	map(0xa000, 0xdfff).bankr("bank1").nopw();
+	map(0xe000, 0xe003).w(this, FUNC(ddayjlc_state::i8257_CH0_w));
+	map(0xe008, 0xe008).nopw();
+	map(0xf000, 0xf000).w(this, FUNC(ddayjlc_state::sound_w));
+	map(0xf100, 0xf100).nopw();
+	map(0xf080, 0xf080).w(this, FUNC(ddayjlc_state::char_bank_w));
+	map(0xf081, 0xf081).nopw();
+	map(0xf083, 0xf083).w(this, FUNC(ddayjlc_state::i8257_LMSR_w));
+	map(0xf084, 0xf084).w(this, FUNC(ddayjlc_state::bg0_w));
+	map(0xf085, 0xf085).w(this, FUNC(ddayjlc_state::bg1_w));
+	map(0xf086, 0xf086).w(this, FUNC(ddayjlc_state::bg2_w));
+	map(0xf101, 0xf101).w(this, FUNC(ddayjlc_state::main_nmi_w));
+	map(0xf102, 0xf105).w(this, FUNC(ddayjlc_state::prot_w));
+	map(0xf000, 0xf000).portr("INPUTS");
+	map(0xf100, 0xf100).portr("SYSTEM");
+	map(0xf180, 0xf180).portr("DSW1");
+	map(0xf200, 0xf200).portr("DSW2");
+}
 
 
-ADDRESS_MAP_START(ddayjlc_state::sound_cpu)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x5000, 0x5000) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(sound_nmi_w)
-ADDRESS_MAP_END
+void ddayjlc_state::sound_cpu(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x3000, 0x3000).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x4000, 0x4000).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x5000, 0x5000).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x6000, 0x6000).w("ay2", FUNC(ay8910_device::address_w));
+	map(0x7000, 0x7000).w(this, FUNC(ddayjlc_state::sound_nmi_w));
+}
 
 static INPUT_PORTS_START( ddayjlc )
 	PORT_START("INPUTS")

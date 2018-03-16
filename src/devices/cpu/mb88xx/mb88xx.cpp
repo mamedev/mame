@@ -21,12 +21,12 @@
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(MB88201, mb88201_cpu_device, "mb88201", "MB88201")
-DEFINE_DEVICE_TYPE(MB88202, mb88202_cpu_device, "mb88202", "MB88202")
-DEFINE_DEVICE_TYPE(MB8841,  mb8841_cpu_device,  "mb8841",  "MB8841")
-DEFINE_DEVICE_TYPE(MB8842,  mb8842_cpu_device,  "mb8842",  "MB8842")
-DEFINE_DEVICE_TYPE(MB8843,  mb8843_cpu_device,  "mb8843",  "MB8843")
-DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "MB8844")
+DEFINE_DEVICE_TYPE(MB88201, mb88201_cpu_device, "mb88201", "Fujitsu MB88201")
+DEFINE_DEVICE_TYPE(MB88202, mb88202_cpu_device, "mb88202", "Fujitsu MB88202")
+DEFINE_DEVICE_TYPE(MB8841,  mb8841_cpu_device,  "mb8841",  "Fujitsu MB8841")
+DEFINE_DEVICE_TYPE(MB8842,  mb8842_cpu_device,  "mb8842",  "Fujitsu MB8842")
+DEFINE_DEVICE_TYPE(MB8843,  mb8843_cpu_device,  "mb8843",  "Fujitsu MB8843")
+DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "Fujitsu MB8844")
 
 
 /***************************************************************************

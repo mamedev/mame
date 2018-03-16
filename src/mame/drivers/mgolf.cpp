@@ -230,34 +230,35 @@ WRITE8_MEMBER(mgolf_state::wram_w)
 
 
 
-ADDRESS_MAP_START(mgolf_state::cpu_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+void mgolf_state::cpu_map(address_map &map)
+{
+	map.global_mask(0x3fff);
 
-	AM_RANGE(0x0040, 0x0040) AM_READ_PORT("40")
-	AM_RANGE(0x0041, 0x0041) AM_READ(dial_r)
-	AM_RANGE(0x0060, 0x0060) AM_READ_PORT("60")
-	AM_RANGE(0x0061, 0x0061) AM_READ(misc_r)
-	AM_RANGE(0x0080, 0x00ff) AM_READ(wram_r)
-	AM_RANGE(0x0180, 0x01ff) AM_READ(wram_r)
-	AM_RANGE(0x0800, 0x0bff) AM_READONLY
+	map(0x0040, 0x0040).portr("40");
+	map(0x0041, 0x0041).r(this, FUNC(mgolf_state::dial_r));
+	map(0x0060, 0x0060).portr("60");
+	map(0x0061, 0x0061).r(this, FUNC(mgolf_state::misc_r));
+	map(0x0080, 0x00ff).r(this, FUNC(mgolf_state::wram_r));
+	map(0x0180, 0x01ff).r(this, FUNC(mgolf_state::wram_r));
+	map(0x0800, 0x0bff).readonly();
 
-	AM_RANGE(0x0000, 0x0009) AM_WRITENOP
-	AM_RANGE(0x0024, 0x0024) AM_WRITENOP
-	AM_RANGE(0x0028, 0x0028) AM_WRITENOP
-	AM_RANGE(0x0042, 0x0042) AM_WRITENOP
-	AM_RANGE(0x0044, 0x0044) AM_WRITENOP /* watchdog? */
-	AM_RANGE(0x0046, 0x0046) AM_WRITENOP
-	AM_RANGE(0x0060, 0x0060) AM_WRITENOP
-	AM_RANGE(0x0061, 0x0061) AM_WRITENOP
-	AM_RANGE(0x006a, 0x006a) AM_WRITENOP
-	AM_RANGE(0x006c, 0x006c) AM_WRITENOP
-	AM_RANGE(0x006d, 0x006d) AM_WRITENOP
-	AM_RANGE(0x0080, 0x00ff) AM_WRITE(wram_w)
-	AM_RANGE(0x0180, 0x01ff) AM_WRITE(wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_WRITE(vram_w) AM_SHARE("video_ram")
+	map(0x0000, 0x0009).nopw();
+	map(0x0024, 0x0024).nopw();
+	map(0x0028, 0x0028).nopw();
+	map(0x0042, 0x0042).nopw();
+	map(0x0044, 0x0044).nopw(); /* watchdog? */
+	map(0x0046, 0x0046).nopw();
+	map(0x0060, 0x0060).nopw();
+	map(0x0061, 0x0061).nopw();
+	map(0x006a, 0x006a).nopw();
+	map(0x006c, 0x006c).nopw();
+	map(0x006d, 0x006d).nopw();
+	map(0x0080, 0x00ff).w(this, FUNC(mgolf_state::wram_w));
+	map(0x0180, 0x01ff).w(this, FUNC(mgolf_state::wram_w));
+	map(0x0800, 0x0bff).w(this, FUNC(mgolf_state::vram_w)).share("video_ram");
 
-	AM_RANGE(0x2000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+	map(0x2000, 0x3fff).rom();
+}
 
 
 static INPUT_PORTS_START( mgolf )

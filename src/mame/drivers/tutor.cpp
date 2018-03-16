@@ -550,39 +550,41 @@ WRITE8_MEMBER( tutor_state::test_w )
 }
 #endif
 
-ADDRESS_MAP_START(tutor_state::tutor_memmap)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") AM_WRITENOP
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2") AM_WRITENOP
-	AM_RANGE(0xc000, 0xdfff) AM_NOP /*free for expansion, or cartridge ROM?*/
+void tutor_state::tutor_memmap(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1").nopw();
+	map(0x8000, 0xbfff).bankr("bank2").nopw();
+	map(0xc000, 0xdfff).noprw(); /*free for expansion, or cartridge ROM?*/
 
-	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)    /*VDP data*/
-	AM_RANGE(0xe002, 0xe002) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)/*VDP status*/
-	AM_RANGE(0xe100, 0xe1ff) AM_READWRITE(tutor_mapper_r, tutor_mapper_w)   /*cartridge mapper*/
-	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE("sn76489a", sn76489a_device, write)    /*sound chip*/
-	AM_RANGE(0xe800, 0xe8ff) AM_READWRITE(tutor_printer_r, tutor_printer_w) /*printer*/
-	AM_RANGE(0xee00, 0xeeff) AM_READNOP AM_WRITE( tutor_cassette_w)     /*cassette interface*/
+	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));    /*VDP data*/
+	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));/*VDP status*/
+	map(0xe100, 0xe1ff).rw(this, FUNC(tutor_state::tutor_mapper_r), FUNC(tutor_state::tutor_mapper_w));   /*cartridge mapper*/
+	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::write));    /*sound chip*/
+	map(0xe800, 0xe8ff).rw(this, FUNC(tutor_state::tutor_printer_r), FUNC(tutor_state::tutor_printer_w)); /*printer*/
+	map(0xee00, 0xeeff).nopr().w(this, FUNC(tutor_state::tutor_cassette_w));     /*cassette interface*/
 
-	AM_RANGE(0xf000, 0xffff) AM_READ(tutor_highmem_r) AM_WRITENOP /*free for expansion (and internal processor RAM)*/
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).r(this, FUNC(tutor_state::tutor_highmem_r)).nopw(); /*free for expansion (and internal processor RAM)*/
+}
 
-ADDRESS_MAP_START(tutor_state::pyuutajr_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") AM_WRITENOP
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2") AM_WRITENOP
-	AM_RANGE(0xc000, 0xdfff) AM_NOP /*free for expansion, or cartridge ROM?*/
+void tutor_state::pyuutajr_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1").nopw();
+	map(0x8000, 0xbfff).bankr("bank2").nopw();
+	map(0xc000, 0xdfff).noprw(); /*free for expansion, or cartridge ROM?*/
 
-	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)    /*VDP data*/
-	AM_RANGE(0xe002, 0xe002) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)/*VDP status*/
-	AM_RANGE(0xe100, 0xe1ff) AM_READWRITE(tutor_mapper_r, tutor_mapper_w)   /*cartridge mapper*/
-	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE("sn76489a", sn76489a_device, write)    /*sound chip*/
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("LINE0")
-	AM_RANGE(0xea00, 0xea00) AM_READ_PORT("LINE1")
-	AM_RANGE(0xec00, 0xec00) AM_READ_PORT("LINE2")
-	AM_RANGE(0xee00, 0xee00) AM_READ_PORT("LINE3")
+	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));    /*VDP data*/
+	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));/*VDP status*/
+	map(0xe100, 0xe1ff).rw(this, FUNC(tutor_state::tutor_mapper_r), FUNC(tutor_state::tutor_mapper_w));   /*cartridge mapper*/
+	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::write));    /*sound chip*/
+	map(0xe800, 0xe800).portr("LINE0");
+	map(0xea00, 0xea00).portr("LINE1");
+	map(0xec00, 0xec00).portr("LINE2");
+	map(0xee00, 0xee00).portr("LINE3");
 
-	AM_RANGE(0xf000, 0xffff) AM_READ(tutor_highmem_r) AM_WRITENOP /*free for expansion (and internal processor RAM)*/
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).r(this, FUNC(tutor_state::tutor_highmem_r)).nopw(); /*free for expansion (and internal processor RAM)*/
+}
 
 /*
     CRU map summary:
@@ -594,10 +596,11 @@ ADDRESS_MAP_END
     >ed00(r): tape input
 */
 
-ADDRESS_MAP_START(tutor_state::tutor_io)
-	AM_RANGE(0xec0, 0xec7) AM_READ(key_r)               /*keyboard interface*/
-	AM_RANGE(0xed0, 0xed0) AM_READ(tutor_cassette_r)        /*cassette interface*/
-ADDRESS_MAP_END
+void tutor_state::tutor_io(address_map &map)
+{
+	map(0xec0, 0xec7).r(this, FUNC(tutor_state::key_r));               /*keyboard interface*/
+	map(0xed0, 0xed0).r(this, FUNC(tutor_state::tutor_cassette_r));        /*cassette interface*/
+}
 
 /* tutor keyboard: 56 keys
 

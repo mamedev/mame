@@ -28,42 +28,45 @@ WRITE8_MEMBER(ultraman_state::sound_nmi_enable_w)
 }
 
 
-ADDRESS_MAP_START(ultraman_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x180000, 0x183fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")/* Palette */
-	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P1")
-	AM_RANGE(0x1c0004, 0x1c0005) AM_READ_PORT("P2")
-	AM_RANGE(0x1c0006, 0x1c0007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1c0008, 0x1c0009) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1c0018, 0x1c0019) AM_WRITE(ultraman_gfxctrl_w)   /* counters + gfx ctrl */
-	AM_RANGE(0x1c0020, 0x1c0021) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x1c0028, 0x1c0029) AM_DEVWRITE8("soundnmi", input_merger_device, in_set<0>, 0x00ff)
-	AM_RANGE(0x1c0030, 0x1c0031) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x204000, 0x204fff) AM_DEVREADWRITE8("k051316_1", k051316_device, read, write, 0x00ff) /* K051316 #0 RAM */
-	AM_RANGE(0x205000, 0x205fff) AM_DEVREADWRITE8("k051316_2", k051316_device, read, write, 0x00ff) /* K051316 #1 RAM */
-	AM_RANGE(0x206000, 0x206fff) AM_DEVREADWRITE8("k051316_3", k051316_device, read, write, 0x00ff) /* K051316 #2 RAM */
-	AM_RANGE(0x207f80, 0x207f9f) AM_DEVWRITE8("k051316_1", k051316_device, ctrl_w, 0x00ff)   /* K051316 #0 registers */
-	AM_RANGE(0x207fa0, 0x207fbf) AM_DEVWRITE8("k051316_2", k051316_device, ctrl_w, 0x00ff)   /* K051316 #1 registers */
-	AM_RANGE(0x207fc0, 0x207fdf) AM_DEVWRITE8("k051316_3", k051316_device, ctrl_w, 0x00ff)   /* K051316 #2 registers */
-	AM_RANGE(0x304000, 0x30400f) AM_DEVREADWRITE8("k051960", k051960_device, k051937_r, k051937_w, 0x00ff)       /* Sprite control */
-	AM_RANGE(0x304800, 0x304fff) AM_DEVREADWRITE8("k051960", k051960_device, k051960_r, k051960_w, 0x00ff)       /* Sprite RAM */
-ADDRESS_MAP_END
+void ultraman_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x08ffff).ram();
+	map(0x180000, 0x183fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");/* Palette */
+	map(0x1c0000, 0x1c0001).portr("SYSTEM");
+	map(0x1c0002, 0x1c0003).portr("P1");
+	map(0x1c0004, 0x1c0005).portr("P2");
+	map(0x1c0006, 0x1c0007).portr("DSW1");
+	map(0x1c0008, 0x1c0009).portr("DSW2");
+	map(0x1c0018, 0x1c0019).w(this, FUNC(ultraman_state::ultraman_gfxctrl_w));   /* counters + gfx ctrl */
+	map(0x1c0021, 0x1c0021).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x1c0029, 0x1c0029).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
+	map(0x1c0030, 0x1c0031).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x204000, 0x204fff).rw(m_k051316_1, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); /* K051316 #0 RAM */
+	map(0x205000, 0x205fff).rw(m_k051316_2, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); /* K051316 #1 RAM */
+	map(0x206000, 0x206fff).rw(m_k051316_3, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); /* K051316 #2 RAM */
+	map(0x207f80, 0x207f9f).w(m_k051316_1, FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   /* K051316 #0 registers */
+	map(0x207fa0, 0x207fbf).w(m_k051316_2, FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   /* K051316 #1 registers */
+	map(0x207fc0, 0x207fdf).w(m_k051316_3, FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   /* K051316 #2 registers */
+	map(0x304000, 0x30400f).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w)).umask16(0x00ff);       /* Sprite control */
+	map(0x304800, 0x304fff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w)).umask16(0x00ff);       /* Sprite RAM */
+}
 
-ADDRESS_MAP_START(ultraman_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(sound_nmi_enable_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("oki", okim6295_device, read, write)       /* M6295 */
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)   /* YM2151 */
-ADDRESS_MAP_END
+void ultraman_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).ram();
+	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xd000, 0xd000).w(this, FUNC(ultraman_state::sound_nmi_enable_w));
+	map(0xe000, 0xe000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));       /* M6295 */
+	map(0xf000, 0xf001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));   /* YM2151 */
+}
 
-ADDRESS_MAP_START(ultraman_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundnmi", input_merger_device, in_clear<0>)
-ADDRESS_MAP_END
+void ultraman_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(m_soundnmi, FUNC(input_merger_device::in_clear<0>));
+}
 
 
 static INPUT_PORTS_START( ultraman )

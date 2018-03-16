@@ -544,49 +544,53 @@ GFXDECODE_END
  *************************************/
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(grchamp_state::main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("radarram")
-	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x5800, 0x58ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void grchamp_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).mirror(0x0400).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().share("radarram");
+	map(0x5000, 0x53ff).mirror(0x0400).ram().share("videoram");
+	map(0x5800, 0x58ff).mirror(0x0700).ram().share("spriteram");
+}
 
 
-ADDRESS_MAP_START(grchamp_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x78) AM_READ_PORT("ACCEL")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x78) AM_READ(sub_to_main_comm_r)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x78) AM_READ_PORT("WHEEL")
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x78) AM_READ_PORT("DSWA")
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x78) AM_READ_PORT("DSWB")
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0x78) AM_READ_PORT("TILT")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x60) AM_READ(pc3259_0_r)
-	AM_RANGE(0x09, 0x09) AM_MIRROR(0x60) AM_READ(pc3259_1_r)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0x60) AM_READ(pc3259_2_r)
-	AM_RANGE(0x19, 0x19) AM_MIRROR(0x60) AM_READ(pc3259_3_r)
-	AM_RANGE(0x00, 0x0f) AM_MIRROR(0x40) AM_WRITE(cpu0_outputs_w)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0x40) AM_WRITE(main_to_sub_comm_w)
-	AM_RANGE(0x20, 0x20) AM_SELECT(0x0c) AM_MIRROR(0x53) AM_WRITE(led_board_w)
-ADDRESS_MAP_END
+void grchamp_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0x78).portr("ACCEL");
+	map(0x02, 0x02).mirror(0x78).r(this, FUNC(grchamp_state::sub_to_main_comm_r));
+	map(0x03, 0x03).mirror(0x78).portr("WHEEL");
+	map(0x04, 0x04).mirror(0x78).portr("DSWA");
+	map(0x05, 0x05).mirror(0x78).portr("DSWB");
+	map(0x06, 0x06).mirror(0x78).portr("TILT");
+	map(0x01, 0x01).mirror(0x60).r(this, FUNC(grchamp_state::pc3259_0_r));
+	map(0x09, 0x09).mirror(0x60).r(this, FUNC(grchamp_state::pc3259_1_r));
+	map(0x11, 0x11).mirror(0x60).r(this, FUNC(grchamp_state::pc3259_2_r));
+	map(0x19, 0x19).mirror(0x60).r(this, FUNC(grchamp_state::pc3259_3_r));
+	map(0x00, 0x0f).mirror(0x40).w(this, FUNC(grchamp_state::cpu0_outputs_w));
+	map(0x10, 0x13).mirror(0x40).w(this, FUNC(grchamp_state::main_to_sub_comm_w));
+	map(0x20, 0x20).select(0x0c).mirror(0x53).w(this, FUNC(grchamp_state::led_board_w));
+}
 
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(grchamp_state::sub_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(left_w) AM_SHARE("leftram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(right_w) AM_SHARE("rightram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(center_w) AM_SHARE("centerram")
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x5000, 0x6fff) AM_ROM
-ADDRESS_MAP_END
+void grchamp_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram().w(this, FUNC(grchamp_state::left_w)).share("leftram");
+	map(0x2800, 0x2fff).ram().w(this, FUNC(grchamp_state::right_w)).share("rightram");
+	map(0x3000, 0x37ff).ram().w(this, FUNC(grchamp_state::center_w)).share("centerram");
+	map(0x4000, 0x43ff).mirror(0x0400).ram();
+	map(0x5000, 0x6fff).rom();
+}
 
 
-ADDRESS_MAP_START(grchamp_state::sub_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_READ(main_to_sub_comm_r)
-	AM_RANGE(0x00, 0x0f) AM_MIRROR(0x70) AM_WRITE(cpu1_outputs_w)
-ADDRESS_MAP_END
+void grchamp_state::sub_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).r(this, FUNC(grchamp_state::main_to_sub_comm_r));
+	map(0x00, 0x0f).mirror(0x70).w(this, FUNC(grchamp_state::cpu1_outputs_w));
+}
 
 
 /* complete memory map derived from schematics;
@@ -619,19 +623,20 @@ ADDRESS_MAP_END
  0  1  0  1  0  x  x  x  x  x  x  x  x  x  0  1   W   OPEN BUS
  0  1  0  1  0  x  x  x  x  x  x  x  x  x  1  x   RW  OPEN BUS
 */
-ADDRESS_MAP_START(grchamp_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+void grchamp_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
 	// 2000-3fff are empty rom sockets
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4800, 0x4801) AM_MIRROR(0x07f8) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x4801, 0x4801) AM_MIRROR(0x07f8) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x4802, 0x4803) AM_MIRROR(0x07f8) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x4803, 0x4803) AM_MIRROR(0x07f8) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x4804, 0x4805) AM_MIRROR(0x07fa) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
-	AM_RANGE(0x4805, 0x4805) AM_MIRROR(0x07fa) AM_DEVREAD("ay3", ay8910_device, data_r)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x07fc) AM_READ(soundlatch_r) AM_WRITE(soundlatch_clear7_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0x07fc) AM_READ(soundlatch_flags_r) AM_WRITENOP // writes here on taitosj reset the secondary semaphore, which doesn't exist on grchamp, but the code tries to reset it anyway!
-ADDRESS_MAP_END
+	map(0x4000, 0x43ff).ram();
+	map(0x4800, 0x4801).mirror(0x07f8).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x4801, 0x4801).mirror(0x07f8).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x4802, 0x4803).mirror(0x07f8).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x4803, 0x4803).mirror(0x07f8).r("ay2", FUNC(ay8910_device::data_r));
+	map(0x4804, 0x4805).mirror(0x07fa).w("ay3", FUNC(ay8910_device::address_data_w));
+	map(0x4805, 0x4805).mirror(0x07fa).r("ay3", FUNC(ay8910_device::data_r));
+	map(0x5000, 0x5000).mirror(0x07fc).r(this, FUNC(grchamp_state::soundlatch_r)).w(this, FUNC(grchamp_state::soundlatch_clear7_w));
+	map(0x5001, 0x5001).mirror(0x07fc).r(this, FUNC(grchamp_state::soundlatch_flags_r)).nopw(); // writes here on taitosj reset the secondary semaphore, which doesn't exist on grchamp, but the code tries to reset it anyway!
+}
 
 
 

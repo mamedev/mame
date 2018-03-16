@@ -257,60 +257,64 @@ WRITE_LINE_MEMBER(hyprduel_state::vdp_blit_end_w)
                                 Memory Maps
 ***************************************************************************/
 
-ADDRESS_MAP_START(hyprduel_state::hyprduel_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x400000, 0x47ffff) AM_DEVICE("vdp", imagetek_i4220_device, v2_map)
-	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(irq_cause_r, irq_cause_w)   /* IRQ Cause,Acknowledge */
-	AM_RANGE(0x4788a4, 0x4788a5) AM_RAM AM_SHARE("irq_enable")      /* IRQ Enable */
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(subcpu_control_w)
-	AM_RANGE(0xc00000, 0xc07fff) AM_RAM AM_SHARE("sharedram1")
-	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE") AM_WRITENOP
-	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
-	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xe00006, 0xe00007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE("sharedram2")
-	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("sharedram3")
-ADDRESS_MAP_END
+void hyprduel_state::hyprduel_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x400000, 0x47ffff).m(m_vdp, FUNC(imagetek_i4220_device::v2_map));
+	map(0x4788a2, 0x4788a3).rw(this, FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause,Acknowledge */
+	map(0x4788a4, 0x4788a5).ram().share("irq_enable");      /* IRQ Enable */
+	map(0x800000, 0x800001).w(this, FUNC(hyprduel_state::subcpu_control_w));
+	map(0xc00000, 0xc07fff).ram().share("sharedram1");
+	map(0xe00000, 0xe00001).portr("SERVICE").nopw();
+	map(0xe00002, 0xe00003).portr("DSW");
+	map(0xe00004, 0xe00005).portr("P1_P2");
+	map(0xe00006, 0xe00007).portr("SYSTEM");
+	map(0xfe0000, 0xfe3fff).ram().share("sharedram2");
+	map(0xfe4000, 0xffffff).ram().share("sharedram3");
+}
 
-ADDRESS_MAP_START(hyprduel_state::hyprduel_map2)
-	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("sharedram1")                      /* shadow ($c00000 - $c03fff : vector) */
-	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("sharedram3")         /* shadow ($fe4000 - $fe7fff : read only) */
-	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0x400004, 0x400005) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x800000, 0x800001) AM_NOP
-	AM_RANGE(0xc00000, 0xc07fff) AM_RAM AM_SHARE("sharedram1")
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE("sharedram2")
-	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("sharedram3")
-ADDRESS_MAP_END
+void hyprduel_state::hyprduel_map2(address_map &map)
+{
+	map(0x000000, 0x003fff).ram().share("sharedram1");                      /* shadow ($c00000 - $c03fff : vector) */
+	map(0x004000, 0x007fff).readonly().nopw().share("sharedram3");         /* shadow ($fe4000 - $fe7fff : read only) */
+	map(0x400000, 0x400003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0x400005, 0x400005).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x800000, 0x800001).noprw();
+	map(0xc00000, 0xc07fff).ram().share("sharedram1");
+	map(0xfe0000, 0xfe3fff).ram().share("sharedram2");
+	map(0xfe4000, 0xffffff).ram().share("sharedram3");
+}
 
 
 /* Magical Error - video is at 8x now */
 
-ADDRESS_MAP_START(hyprduel_state::magerror_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(subcpu_control_w)
-	AM_RANGE(0x800000, 0x87ffff) AM_DEVICE("vdp", imagetek_i4220_device, v2_map)
-	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(irq_cause_r, irq_cause_w)   /* IRQ Cause, Acknowledge */
-	AM_RANGE(0x8788a4, 0x8788a5) AM_RAM AM_SHARE("irq_enable")      /* IRQ Enable */
-	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("sharedram1")
-	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE") AM_WRITENOP
-	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
-	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xe00006, 0xe00007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE("sharedram2")
-	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("sharedram3")
-ADDRESS_MAP_END
+void hyprduel_state::magerror_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x400000, 0x400001).w(this, FUNC(hyprduel_state::subcpu_control_w));
+	map(0x800000, 0x87ffff).m(m_vdp, FUNC(imagetek_i4220_device::v2_map));
+	map(0x8788a2, 0x8788a3).rw(this, FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause, Acknowledge */
+	map(0x8788a4, 0x8788a5).ram().share("irq_enable");      /* IRQ Enable */
+	map(0xc00000, 0xc1ffff).ram().share("sharedram1");
+	map(0xe00000, 0xe00001).portr("SERVICE").nopw();
+	map(0xe00002, 0xe00003).portr("DSW");
+	map(0xe00004, 0xe00005).portr("P1_P2");
+	map(0xe00006, 0xe00007).portr("SYSTEM");
+	map(0xfe0000, 0xfe3fff).ram().share("sharedram2");
+	map(0xfe4000, 0xffffff).ram().share("sharedram3");
+}
 
-ADDRESS_MAP_START(hyprduel_state::magerror_map2)
-	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("sharedram1")                      /* shadow ($c00000 - $c03fff : vector) */
-	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("sharedram3")     /* shadow ($fe4000 - $fe7fff : read only) */
-	AM_RANGE(0x400000, 0x400003) AM_NOP
-	AM_RANGE(0x800000, 0x800003) AM_READNOP AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
-	AM_RANGE(0x800004, 0x800005) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("sharedram1")
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE("sharedram2")
-	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("sharedram3")
-ADDRESS_MAP_END
+void hyprduel_state::magerror_map2(address_map &map)
+{
+	map(0x000000, 0x003fff).ram().share("sharedram1");                      /* shadow ($c00000 - $c03fff : vector) */
+	map(0x004000, 0x007fff).readonly().nopw().share("sharedram3");     /* shadow ($fe4000 - $fe7fff : read only) */
+	map(0x400000, 0x400003).noprw();
+	map(0x800000, 0x800003).nopr().w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
+	map(0x800005, 0x800005).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc00000, 0xc1ffff).ram().share("sharedram1");
+	map(0xfe0000, 0xfe3fff).ram().share("sharedram2");
+	map(0xfe4000, 0xffffff).ram().share("sharedram3");
+}
 
 /***************************************************************************
                                 Input Ports

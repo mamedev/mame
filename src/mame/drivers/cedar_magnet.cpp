@@ -241,65 +241,70 @@ public:
 
 ***********************/
 
-ADDRESS_MAP_START(cedar_magnet_state::cedar_magnet_mainboard_sub_pal_map)
+void cedar_magnet_state::cedar_magnet_mainboard_sub_pal_map(address_map &map)
+{
 // these are 3x MOTOROLA MM2114N SRAM 4096 bit RAM (twice the size because we map bytes, but only 4 bits are used)
 // these are on the master board memory sub-board
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(palette_r_w) AM_SHARE("pal_r")
-	AM_RANGE(0x2800, 0x2bff) AM_RAM_WRITE(palette_g_w) AM_SHARE("pal_g")
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(palette_b_w) AM_SHARE("pal_b")
-ADDRESS_MAP_END
+	map(0x2400, 0x27ff).ram().w(this, FUNC(cedar_magnet_state::palette_r_w)).share("pal_r");
+	map(0x2800, 0x2bff).ram().w(this, FUNC(cedar_magnet_state::palette_g_w)).share("pal_g");
+	map(0x3000, 0x33ff).ram().w(this, FUNC(cedar_magnet_state::palette_b_w)).share("pal_b");
+}
 
-ADDRESS_MAP_START(cedar_magnet_state::cedar_magnet_mainboard_sub_ram_map)
+void cedar_magnet_state::cedar_magnet_mainboard_sub_ram_map(address_map &map)
+{
 // these are 8x SIEMENS HYB 41256-15 AA - 262,144 bit DRAM (32kbytes)
 // these are on the master board memory sub-board
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("ram0")
-ADDRESS_MAP_END
+	map(0x00000, 0x3ffff).ram().share("ram0");
+}
 
-ADDRESS_MAP_START(cedar_magnet_state::cedar_magnet_map)
-	AM_RANGE(0x0000, 0xffff) AM_DEVICE("bank0", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void cedar_magnet_state::cedar_magnet_map(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_bank0, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(cedar_magnet_state::cedar_magnet_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void cedar_magnet_state::cedar_magnet_io(address_map &map)
+{
+	map.global_mask(0xff);
 
-	AM_RANGE(0x18, 0x18) AM_READWRITE(port18_r, port18_w)
-	AM_RANGE(0x19, 0x19) AM_READWRITE(port19_r, port19_w)
-	AM_RANGE(0x1a, 0x1a) AM_READ(port1a_r)
-	AM_RANGE(0x1b, 0x1b) AM_WRITE(port1b_w)
+	map(0x18, 0x18).rw(this, FUNC(cedar_magnet_state::port18_r), FUNC(cedar_magnet_state::port18_w));
+	map(0x19, 0x19).rw(this, FUNC(cedar_magnet_state::port19_r), FUNC(cedar_magnet_state::port19_w));
+	map(0x1a, 0x1a).r(this, FUNC(cedar_magnet_state::port1a_r));
+	map(0x1b, 0x1b).w(this, FUNC(cedar_magnet_state::port1b_w));
 
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("z80pio_ic48", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_ic49", z80pio_device, read_alt, write_alt)
+	map(0x20, 0x23).rw(m_ic48_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x40, 0x43).rw(m_ic49_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("flop", cedar_magnet_flop_device, read, write)
+	map(0x60, 0x63).rw("flop", FUNC(cedar_magnet_flop_device::read), FUNC(cedar_magnet_flop_device::write));
 
-	AM_RANGE(0x64, 0x64) AM_READ_PORT("P1_IN")
-	AM_RANGE(0x68, 0x68) AM_READ_PORT("P2_IN")
-	AM_RANGE(0x6c, 0x6c) AM_READ_PORT("TEST")
+	map(0x64, 0x64).portr("P1_IN");
+	map(0x68, 0x68).portr("P2_IN");
+	map(0x6c, 0x6c).portr("TEST");
 
 	// banking / access controls to the sub-board memory
-	AM_RANGE(0x70, 0x70) AM_WRITE(rambank_palbank_w)
-	AM_RANGE(0x74, 0x74) AM_WRITE(palupload_w)
-	AM_RANGE(0x78, 0x78) AM_READWRITE(watchdog_r, paladdr_w)
-	AM_RANGE(0x7c, 0x7c) AM_READ(port7c_r) // protection??
+	map(0x70, 0x70).w(this, FUNC(cedar_magnet_state::rambank_palbank_w));
+	map(0x74, 0x74).w(this, FUNC(cedar_magnet_state::palupload_w));
+	map(0x78, 0x78).rw(this, FUNC(cedar_magnet_state::watchdog_r), FUNC(cedar_magnet_state::paladdr_w));
+	map(0x7c, 0x7c).r(this, FUNC(cedar_magnet_state::port7c_r)); // protection??
 
-	AM_RANGE(0xff, 0xff) AM_DEVWRITE("cedtop", cedar_magnet_sound_device, sound_command_w)
-ADDRESS_MAP_END
+	map(0xff, 0xff).w(m_cedsound, FUNC(cedar_magnet_sound_device::sound_command_w));
+}
 
-ADDRESS_MAP_START(cedar_magnet_state::cedar_bank0)
+void cedar_magnet_state::cedar_bank0(address_map &map)
+{
 	/* memory configuration 0 */
-	AM_RANGE(0x00000, 0x0ffff) AM_DEVICE("mb_sub_ram", address_map_bank_device, amap8)
+	map(0x00000, 0x0ffff).m(m_sub_ram_bankdev, FUNC(address_map_bank_device::amap8));
 
 	/* memory configuration  1 */
-	AM_RANGE(0x10000, 0x1dfff) AM_DEVICE("mb_sub_ram", address_map_bank_device, amap8)
-	AM_RANGE(0x1e000, 0x1ffff) AM_ROM AM_REGION("maincpu", 0x0000)
+	map(0x10000, 0x1dfff).m(m_sub_ram_bankdev, FUNC(address_map_bank_device::amap8));
+	map(0x1e000, 0x1ffff).rom().region("maincpu", 0x0000);
 
 	/* memory configuration  2*/
-	AM_RANGE(0x20000, 0x2bfff) AM_DEVICE("mb_sub_ram", address_map_bank_device, amap8)
-	AM_RANGE(0x2c000, 0x2ffff) AM_READWRITE(other_cpu_r, other_cpu_w)
+	map(0x20000, 0x2bfff).m(m_sub_ram_bankdev, FUNC(address_map_bank_device::amap8));
+	map(0x2c000, 0x2ffff).rw(this, FUNC(cedar_magnet_state::other_cpu_r), FUNC(cedar_magnet_state::other_cpu_w));
 
 	/* memory configuration 3*/
-	AM_RANGE(0x30000, 0x31fff) AM_ROM AM_REGION("maincpu", 0x0000) AM_MIRROR(0x0e000)
-ADDRESS_MAP_END
+	map(0x30000, 0x31fff).rom().region("maincpu", 0x0000).mirror(0x0e000);
+}
 
 
 /***********************

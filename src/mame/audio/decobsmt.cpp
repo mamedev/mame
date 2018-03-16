@@ -16,19 +16,21 @@
 #define M6809_TAG   "soundcpu"
 #define BSMT_TAG    "bsmt"
 
-ADDRESS_MAP_START(decobsmt_device::decobsmt_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0xffff) AM_ROM AM_REGION(":soundcpu", 0x2000)
-	AM_RANGE(0x2000, 0x2001) AM_WRITE(bsmt_reset_w)
-	AM_RANGE(0x2002, 0x2003) AM_READ(bsmt_comms_r)
-	AM_RANGE(0x2006, 0x2007) AM_READ(bsmt_status_r)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(bsmt0_w)
-	AM_RANGE(0xa000, 0xa0ff) AM_WRITE(bsmt1_w)
-ADDRESS_MAP_END
+void decobsmt_device::decobsmt_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0xffff).rom().region(":soundcpu", 0x2000);
+	map(0x2000, 0x2001).w(this, FUNC(decobsmt_device::bsmt_reset_w));
+	map(0x2002, 0x2003).r(this, FUNC(decobsmt_device::bsmt_comms_r));
+	map(0x2006, 0x2007).r(this, FUNC(decobsmt_device::bsmt_status_r));
+	map(0x6000, 0x6000).w(this, FUNC(decobsmt_device::bsmt0_w));
+	map(0xa000, 0xa0ff).w(this, FUNC(decobsmt_device::bsmt1_w));
+}
 
-ADDRESS_MAP_START(decobsmt_device::bsmt_map)
-	AM_RANGE(0x000000, 0xffffff) AM_ROM AM_REGION(":bsmt", 0)
-ADDRESS_MAP_END
+void decobsmt_device::bsmt_map(address_map &map)
+{
+	map(0x000000, 0xffffff).rom().region(":bsmt", 0);
+}
 
 void decobsmt_device::bsmt_ready_callback()
 {

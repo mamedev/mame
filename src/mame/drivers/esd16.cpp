@@ -123,108 +123,131 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 }
 
 
-#define ESD16_IO_AREA_DSW( _BASE ) \
-	AM_RANGE(_BASE + 0x0, _BASE + 0x1) AM_WRITENOP /* Irq Ack */ \
-	AM_RANGE(_BASE + 0x2, _BASE + 0x3) AM_READ_PORT("P1_P2") \
-	AM_RANGE(_BASE + 0x4, _BASE + 0x5) AM_READ_PORT("SYSTEM") \
-	AM_RANGE(_BASE + 0x6, _BASE + 0x7) AM_READ_PORT("DSW") \
-	AM_RANGE(_BASE + 0x8, _BASE + 0x9) AM_WRITE(esd16_tilemap0_color_w) \
-	AM_RANGE(_BASE + 0xa, _BASE + 0xb) AM_WRITENOP /* Unknown */ \
-	AM_RANGE(_BASE + 0xc, _BASE + 0xd) AM_WRITE(esd16_sound_command_w) \
-	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITENOP /* n/c */
-#define ESD16_IO_AREA_EEPROM( _BASE ) \
-	AM_RANGE(_BASE + 0x0, _BASE + 0x1) AM_WRITENOP /* Irq Ack */ \
-	AM_RANGE(_BASE + 0x2, _BASE + 0x3) AM_READ_PORT("P1_P2") \
-	AM_RANGE(_BASE + 0x4, _BASE + 0x5) AM_READ_PORT("SYSTEM") \
-	AM_RANGE(_BASE + 0x6, _BASE + 0x7) AM_READ(esd_eeprom_r) \
-	AM_RANGE(_BASE + 0x8, _BASE + 0x9) AM_WRITE(esd16_tilemap0_color_w) \
-	AM_RANGE(_BASE + 0xa, _BASE + 0xb) AM_WRITENOP /* Unknown */ \
-	AM_RANGE(_BASE + 0xc, _BASE + 0xd) AM_WRITE(esd16_sound_command_w) \
-	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITE(esd_eeprom_w)
-#define ESD16_VID_ATTR_AREA( _BASE ) \
-	AM_RANGE(_BASE + 0x0, _BASE + 0x3) AM_WRITEONLY AM_SHARE("scroll_0") \
-	AM_RANGE(_BASE + 0x4, _BASE + 0x7) AM_WRITEONLY AM_SHARE("scroll_1") \
-	AM_RANGE(_BASE + 0x8, _BASE + 0x9) AM_WRITEONLY AM_SHARE("platform_x") \
-	AM_RANGE(_BASE + 0xa, _BASE + 0xb) AM_WRITEONLY AM_SHARE("platform_y") \
-	AM_RANGE(_BASE + 0xc, _BASE + 0xd) AM_WRITENOP \
-	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITEONLY AM_SHARE("head_layersize")
-#define ESD16_PALETTE_AREA( _BASE ) \
-	AM_RANGE(_BASE + 0x000, _BASE + 0xfff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-#define ESD16_SPRITE_AREA( _BASE ) \
-	AM_RANGE(_BASE + 0x000, _BASE + 0x7ff) AM_WRITEONLY AM_SHARE("spriteram") AM_MIRROR(0x000800)
-#define ESD16_VRAM_AREA( _BASE ) \
-	AM_RANGE(_BASE + 0x00000, _BASE + 0x03fff) AM_WRITE(esd16_vram_0_w) AM_SHARE("vram_0") AM_MIRROR(0x4000) \
-	AM_RANGE(_BASE + 0x20000, _BASE + 0x23fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1") AM_MIRROR(0x4000)
+void esd16_state::esd16_io_area_dsw(address_map &map, u32 base)
+{
+	map(base + 0x0, base + 0x1).nopw(); /* Irq Ack */
+	map(base + 0x2, base + 0x3).portr("P1_P2");
+	map(base + 0x4, base + 0x5).portr("SYSTEM");
+	map(base + 0x6, base + 0x7).portr("DSW");
+	map(base + 0x8, base + 0x9).w(this, FUNC(esd16_state::esd16_tilemap0_color_w));
+	map(base + 0xa, base + 0xb).nopw(); /* Unknown */
+	map(base + 0xc, base + 0xd).w(this, FUNC(esd16_state::esd16_sound_command_w));
+	map(base + 0xe, base + 0xf).nopw(); /* n/c */
+}
+
+void esd16_state::esd16_io_area_eeprom(address_map &map, u32 base)
+{
+	map(base + 0x0, base + 0x1).nopw(); /* Irq Ack */
+	map(base + 0x2, base + 0x3).portr("P1_P2");
+	map(base + 0x4, base + 0x5).portr("SYSTEM");
+	map(base + 0x6, base + 0x7).r(this, FUNC(esd16_state::esd_eeprom_r));
+	map(base + 0x8, base + 0x9).w(this, FUNC(esd16_state::esd16_tilemap0_color_w));
+	map(base + 0xa, base + 0xb).nopw(); /* Unknown */
+	map(base + 0xc, base + 0xd).w(this, FUNC(esd16_state::esd16_sound_command_w));
+	map(base + 0xe, base + 0xf).w(this, FUNC(esd16_state::esd_eeprom_w));
+}
+
+void esd16_state::esd16_vid_attr_area(address_map &map, u32 base)
+{
+	map(base + 0x0, base + 0x3).writeonly().share("scroll_0");
+	map(base + 0x4, base + 0x7).writeonly().share("scroll_1");
+	map(base + 0x8, base + 0x9).writeonly().share("platform_x");
+	map(base + 0xa, base + 0xb).writeonly().share("platform_y");
+	map(base + 0xc, base + 0xd).nopw();
+	map(base + 0xe, base + 0xf).writeonly().share("head_layersize");
+}
+
+void esd16_state::esd16_palette_area(address_map &map, u32 base)
+{
+	map(base + 0x000, base + 0xfff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+}
+
+void esd16_state::esd16_sprite_area(address_map &map, u32 base)
+{
+	map(base + 0x000, base + 0x7ff).writeonly().share("spriteram").mirror(0x000800);
+}
+
+void esd16_state::esd16_vram_area(address_map &map, u32 base)
+{
+	map(base + 0x00000, base + 0x03fff).w(this, FUNC(esd16_state::esd16_vram_0_w)).share("vram_0").mirror(0x4000);
+	map(base + 0x20000, base + 0x23fff).w(this, FUNC(esd16_state::esd16_vram_1_w)).share("vram_1").mirror(0x4000);
+}
+
 /*** Memory Maps ***/
 
-ADDRESS_MAP_START(esd16_state::multchmp_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+void esd16_state::multchmp_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x10ffff).ram();
 
-	ESD16_PALETTE_AREA(  0x200000 )
-	ESD16_SPRITE_AREA(   0x300000 )
-	ESD16_VRAM_AREA(     0x400000 )
-	ESD16_VID_ATTR_AREA( 0x500000 )
-	ESD16_IO_AREA_DSW(   0x600000 )
+	esd16_palette_area(map, 0x200000);
+	esd16_sprite_area(map, 0x300000);
+	esd16_vram_area(map, 0x400000);
+	esd16_vid_attr_area(map, 0x500000);
+	esd16_io_area_dsw(map, 0x600000);
 
-	AM_RANGE(0x700008, 0x70000b) AM_READNOP // unused protection?
-ADDRESS_MAP_END
+	map(0x700008, 0x70000b).nopr(); // unused protection?
+}
 
-ADDRESS_MAP_START(esd16_state::jumppop_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x120000, 0x123fff) AM_RAM
-	AM_RANGE(0x1a0000, 0x1a7fff) AM_RAM
+void esd16_state::jumppop_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x120000, 0x123fff).ram();
+	map(0x1a0000, 0x1a7fff).ram();
 
-	AM_RANGE(0x180008, 0x180009) AM_WRITE(esd16_tilemap0_color_jumppop_w) // todo
+	map(0x180008, 0x180009).w(this, FUNC(esd16_state::esd16_tilemap0_color_jumppop_w)); // todo
 
-	ESD16_PALETTE_AREA(  0x140000 )
-	ESD16_SPRITE_AREA(   0x160000 )
-	ESD16_IO_AREA_DSW(   0x180000 )
-	ESD16_VRAM_AREA(     0x300000 )
-	ESD16_VID_ATTR_AREA( 0x380000 )
-ADDRESS_MAP_END
+	esd16_palette_area(map, 0x140000);
+	esd16_sprite_area(map, 0x160000);
+	esd16_io_area_dsw(map, 0x180000);
+	esd16_vram_area(map, 0x300000);
+	esd16_vid_attr_area(map, 0x380000);
+}
 
-ADDRESS_MAP_START(esd16_state::hedpanic_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+void esd16_state::hedpanic_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x10ffff).ram();
 
-	ESD16_PALETTE_AREA(   0x800000 )
-	ESD16_SPRITE_AREA(    0x900000 )
-	ESD16_VRAM_AREA(      0xa00000 )
-	ESD16_VID_ATTR_AREA(  0xb00000 )
-	ESD16_IO_AREA_EEPROM( 0xc00000 )
+	esd16_palette_area(map, 0x800000);
+	esd16_sprite_area(map, 0x900000);
+	esd16_vram_area(map, 0xa00000);
+	esd16_vid_attr_area(map, 0xb00000);
+	esd16_io_area_eeprom(map, 0xc00000);
 
-	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w) // protection
-ADDRESS_MAP_END
+	map(0xd00008, 0xd00009).w(this, FUNC(esd16_state::hedpanic_platform_w)); // protection
+}
 
 /* Multi Champ Deluxe, like Head Panic but different addresses */
 
-ADDRESS_MAP_START(esd16_state::mchampdx_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
+void esd16_state::mchampdx_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x20ffff).ram();
 
-	ESD16_VRAM_AREA(      0x300000 )
-	ESD16_PALETTE_AREA(   0x400000 )
-	ESD16_IO_AREA_EEPROM( 0x500000 )
-	ESD16_SPRITE_AREA(    0x600000 )
-	ESD16_VID_ATTR_AREA(  0x700000 )
+	esd16_vram_area(map, 0x300000);
+	esd16_palette_area(map, 0x400000);
+	esd16_io_area_eeprom(map, 0x500000);
+	esd16_sprite_area(map, 0x600000);
+	esd16_vid_attr_area(map, 0x700000);
 
-	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w)                      // not used in mchampdx?
-ADDRESS_MAP_END
+	map(0xd00008, 0xd00009).w(this, FUNC(esd16_state::hedpanic_platform_w));                      // not used in mchampdx?
+}
 
 /* Tang Tang & Deluxe 5 - like the others but again with different addresses */
 
-ADDRESS_MAP_START(esd16_state::tangtang_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM
+void esd16_state::tangtang_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x700000, 0x70ffff).ram();
 
-	ESD16_PALETTE_AREA(   0x100000 )
-	ESD16_SPRITE_AREA(    0x200000 )
-	ESD16_VRAM_AREA(      0x300000 )
-	ESD16_VID_ATTR_AREA(  0x400000 )
-	ESD16_IO_AREA_EEPROM( 0x500000 )
-	AM_RANGE(0x600008, 0x600009) AM_WRITE(hedpanic_platform_w)
-ADDRESS_MAP_END
+	esd16_palette_area(map, 0x100000);
+	esd16_sprite_area(map, 0x200000);
+	esd16_vram_area(map, 0x300000);
+	esd16_vid_attr_area(map, 0x400000);
+	esd16_io_area_eeprom(map, 0x500000);
+	map(0x600008, 0x600009).w(this, FUNC(esd16_state::hedpanic_platform_w));
+}
 
 
 /***************************************************************************
@@ -241,11 +264,12 @@ WRITE8_MEMBER(esd16_state::esd16_sound_rombank_w)
 	membank("bank1")->set_entry(bank);
 }
 
-ADDRESS_MAP_START(esd16_state::multchmp_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                         // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                    // Banked ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM                         // RAM
-ADDRESS_MAP_END
+void esd16_state::multchmp_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                         // ROM
+	map(0x8000, 0xbfff).bankr("bank1");                    // Banked ROM
+	map(0xf800, 0xffff).ram();                         // RAM
+}
 
 READ8_MEMBER(esd16_state::esd16_sound_command_r)
 {
@@ -254,15 +278,16 @@ READ8_MEMBER(esd16_state::esd16_sound_command_r)
 	return m_soundlatch->read(space, 0);
 }
 
-ADDRESS_MAP_START(esd16_state::multchmp_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3812_device, write)          // YM3812
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", okim6295_device, read, write)   // M6295
-	AM_RANGE(0x03, 0x03) AM_READ(esd16_sound_command_r)             // From Main CPU
-	AM_RANGE(0x04, 0x04) AM_WRITENOP                        // ? $00, $30
-	AM_RANGE(0x05, 0x05) AM_WRITE(esd16_sound_rombank_w)                // ROM Bank
-	AM_RANGE(0x06, 0x06) AM_NOP                         // ? At the start / ? 1 (End of NMI routine)
-ADDRESS_MAP_END
+void esd16_state::multchmp_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ymsnd", FUNC(ym3812_device::write));          // YM3812
+	map(0x02, 0x02).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // M6295
+	map(0x03, 0x03).r(this, FUNC(esd16_state::esd16_sound_command_r));             // From Main CPU
+	map(0x04, 0x04).nopw();                        // ? $00, $30
+	map(0x05, 0x05).w(this, FUNC(esd16_state::esd16_sound_rombank_w));                // ROM Bank
+	map(0x06, 0x06).noprw();                         // ? At the start / ? 1 (End of NMI routine)
+}
 
 
 /***************************************************************************

@@ -208,12 +208,13 @@ public:
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(_4roses_state::_4roses_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM // AM_SHARE("nvram")
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void _4roses_state::_4roses_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); // AM_SHARE("nvram")
+	map(0x6000, 0x6fff).ram().w(this, FUNC(_4roses_state::funworld_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(this, FUNC(_4roses_state::funworld_colorram_w)).share("colorram");
+	map(0x8000, 0xffff).rom();
+}
 
 /*
     Unknown R/W

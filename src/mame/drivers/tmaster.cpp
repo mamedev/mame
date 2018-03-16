@@ -257,31 +257,32 @@ READ_LINE_MEMBER(tmaster_state::read_rand)
 	return machine().rand() & 1;
 }
 
-ADDRESS_MAP_START(tmaster_state::tmaster_map)
-	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
-	AM_RANGE( 0x200000, 0x27ffff ) AM_RAM
-	AM_RANGE( 0x280000, 0x28ffef ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x28fff0, 0x28ffff ) AM_READWRITE(rtc_r, rtc_w )
+void tmaster_state::tmaster_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x27ffff).ram();
+	map(0x280000, 0x28ffef).ram().share("nvram");
+	map(0x28fff0, 0x28ffff).rw(this, FUNC(tmaster_state::rtc_r), FUNC(tmaster_state::rtc_w));
 
-	AM_RANGE( 0x300010, 0x300011 ) AM_READ_PORT("COIN")
+	map(0x300010, 0x300011).portr("COIN");
 
-	AM_RANGE( 0x300020, 0x30003f ) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
+	map(0x300020, 0x30003f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 
-	AM_RANGE( 0x300040, 0x300041 ) AM_WRITE_PORT("OUT")
+	map(0x300040, 0x300041).portw("OUT");
 
-	AM_RANGE( 0x300070, 0x300071 ) AM_DEVWRITE("blitter", cesblit_device, addr_hi_w )
+	map(0x300070, 0x300071).w(m_blitter, FUNC(cesblit_device::addr_hi_w));
 
-	AM_RANGE( 0x500000, 0x500011 ) AM_DEVWRITE("blitter", cesblit_device, regs_w )
-	AM_RANGE( 0x500010, 0x500011 ) AM_DEVREAD( "blitter", cesblit_device, status_r )
+	map(0x500000, 0x500011).w(m_blitter, FUNC(cesblit_device::regs_w));
+	map(0x500010, 0x500011).r(m_blitter, FUNC(cesblit_device::status_r));
 
-	AM_RANGE( 0x580000, 0x580001 ) AM_WRITENOP // often
+	map(0x580000, 0x580001).nopw(); // often
 
-	AM_RANGE( 0x600000, 0x601fff ) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE( 0x800000, 0x800001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
+	map(0x800001, 0x800001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE( 0x800010, 0x800011 ) AM_DEVWRITE("blitter", cesblit_device, color_w )
-ADDRESS_MAP_END
+	map(0x800010, 0x800011).w(m_blitter, FUNC(cesblit_device::color_w));
+}
 
 /***************************************************************************
 

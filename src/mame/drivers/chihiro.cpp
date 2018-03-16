@@ -1700,15 +1700,17 @@ WRITE32_MEMBER(chihiro_state::mediaboard_w)
 		xbox_base_devs.pic8259_2->ir2_w(0);
 }
 
-ADDRESS_MAP_START(chihiro_state::chihiro_map)
-	AM_IMPORT_FROM(xbox_base_map)
-	AM_RANGE(0xff000000, 0xff07ffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f80000)
-ADDRESS_MAP_END
+void chihiro_state::chihiro_map(address_map &map)
+{
+	xbox_base_map(map);
+	map(0xff000000, 0xff07ffff).rom().region("bios", 0).mirror(0x00f80000);
+}
 
-ADDRESS_MAP_START(chihiro_state::chihiro_map_io)
-	AM_IMPORT_FROM(xbox_base_map_io)
-	AM_RANGE(0x4000, 0x40ff) AM_READWRITE(mediaboard_r, mediaboard_w)
-ADDRESS_MAP_END
+void chihiro_state::chihiro_map_io(address_map &map)
+{
+	xbox_base_map_io(map);
+	map(0x4000, 0x40ff).rw(this, FUNC(chihiro_state::mediaboard_r), FUNC(chihiro_state::mediaboard_w));
+}
 
 static INPUT_PORTS_START(chihiro)
 	PORT_START("TILT")

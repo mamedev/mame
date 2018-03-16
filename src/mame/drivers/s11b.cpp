@@ -32,35 +32,38 @@
 #include "s11b.lh"
 
 
-ADDRESS_MAP_START(s11b_state::s11b_main_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2100, 0x2103) AM_MIRROR(0x00fc) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
-	AM_RANGE(0x2200, 0x2200) AM_MIRROR(0x01ff) AM_WRITE(sol3_w) // solenoids
-	AM_RANGE(0x2400, 0x2403) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
-	AM_RANGE(0x2800, 0x2803) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
-	AM_RANGE(0x2c00, 0x2c03) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia2c", pia6821_device, read, write) // alphanumeric display
-	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
-	AM_RANGE(0x3400, 0x3403) AM_MIRROR(0x0bfc) AM_DEVREADWRITE("pia34", pia6821_device, read, write) // widget
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void s11b_state::s11b_main_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("nvram");
+	map(0x2100, 0x2103).mirror(0x00fc).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
+	map(0x2200, 0x2200).mirror(0x01ff).w(this, FUNC(s11b_state::sol3_w)); // solenoids
+	map(0x2400, 0x2403).mirror(0x03fc).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
+	map(0x2800, 0x2803).mirror(0x03fc).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
+	map(0x2c00, 0x2c03).mirror(0x03fc).rw(m_pia2c, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
+	map(0x3000, 0x3003).mirror(0x03fc).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
+	map(0x3400, 0x3403).mirror(0x0bfc).rw(m_pia34, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // widget
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(s11b_state::s11b_audio_map)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(bank_w)
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pias", pia6821_device, read, write)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank0")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void s11b_state::s11b_audio_map(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x0800).ram();
+	map(0x1000, 0x1fff).w(this, FUNC(s11b_state::bank_w));
+	map(0x2000, 0x2003).mirror(0x0ffc).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8000, 0xbfff).bankr("bank0");
+	map(0xc000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(s11b_state::s11b_bg_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia40", pia6821_device, read, write)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(bg_speech_digit_w)
-	AM_RANGE(0x6800, 0x6fff) AM_WRITE(bg_speech_clock_w)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(bgbank_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bgbank")
-ADDRESS_MAP_END
+void s11b_state::s11b_bg_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x2000, 0x2001).mirror(0x1ffe).rw(m_ym, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x4000, 0x4003).mirror(0x1ffc).rw(m_pia40, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x6000, 0x67ff).w(this, FUNC(s11b_state::bg_speech_digit_w));
+	map(0x6800, 0x6fff).w(this, FUNC(s11b_state::bg_speech_clock_w));
+	map(0x7800, 0x7fff).w(this, FUNC(s11b_state::bgbank_w));
+	map(0x8000, 0xffff).bankr("bgbank");
+}
 
 static INPUT_PORTS_START( s11b )
 	PORT_START("X0")

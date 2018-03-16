@@ -428,35 +428,39 @@ READ16_MEMBER(karnov_state::karnov_control_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(karnov_state::karnov_map)
-	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x060000, 0x063fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_WRITE(karnov_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0a0800, 0x0a0fff) AM_WRITE(karnov_videoram_w) /* Wndrplnt Mirror */
-	AM_RANGE(0x0a1000, 0x0a17ff) AM_WRITEONLY AM_SHARE("pf_data")
-	AM_RANGE(0x0a1800, 0x0a1fff) AM_WRITE(karnov_playfield_swap_w)
-	AM_RANGE(0x0c0000, 0x0c0007) AM_READ(karnov_control_r)
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(karnov_control_w)
-ADDRESS_MAP_END
+void karnov_state::karnov_map(address_map &map)
+{
+	map(0x000000, 0x05ffff).rom();
+	map(0x060000, 0x063fff).ram().share("ram");
+	map(0x080000, 0x080fff).ram().share("spriteram");
+	map(0x0a0000, 0x0a07ff).ram().w(this, FUNC(karnov_state::karnov_videoram_w)).share("videoram");
+	map(0x0a0800, 0x0a0fff).w(this, FUNC(karnov_state::karnov_videoram_w)); /* Wndrplnt Mirror */
+	map(0x0a1000, 0x0a17ff).writeonly().share("pf_data");
+	map(0x0a1800, 0x0a1fff).w(this, FUNC(karnov_state::karnov_playfield_swap_w));
+	map(0x0c0000, 0x0c0007).r(this, FUNC(karnov_state::karnov_control_r));
+	map(0x0c0000, 0x0c000f).w(this, FUNC(karnov_state::karnov_control_w));
+}
 
 
-ADDRESS_MAP_START(karnov_state::base_sound_map)
-	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void karnov_state::base_sound_map(address_map &map)
+{
+	map(0x0000, 0x05ff).ram();
+	map(0x0800, 0x0800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1000, 0x1001).w("ym1", FUNC(ym2203_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(karnov_state::karnov_sound_map)
-	AM_IMPORT_FROM(base_sound_map)
-	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ym2", ym3526_device, write)
-ADDRESS_MAP_END
+void karnov_state::karnov_sound_map(address_map &map)
+{
+	base_sound_map(map);
+	map(0x1800, 0x1801).w("ym2", FUNC(ym3526_device::write));
+}
 
-ADDRESS_MAP_START(karnov_state::karnovjbl_sound_map)
-	AM_IMPORT_FROM(base_sound_map)
-	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ym2", ym3812_device, write)
-ADDRESS_MAP_END
+void karnov_state::karnovjbl_sound_map(address_map &map)
+{
+	base_sound_map(map);
+	map(0x1800, 0x1801).w("ym2", FUNC(ym3812_device::write));
+}
 
 
 /*************************************
@@ -862,9 +866,10 @@ MACHINE_CONFIG_START(karnov_state::karnovjbl)
 
 MACHINE_CONFIG_END
 
-ADDRESS_MAP_START(karnov_state::chelnovjbl_mcu_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void karnov_state::chelnovjbl_mcu_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+}
 
 
 MACHINE_CONFIG_START(karnov_state::chelnovjbl)

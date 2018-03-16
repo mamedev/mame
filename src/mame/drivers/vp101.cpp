@@ -311,39 +311,41 @@ WRITE32_MEMBER(vp10x_state::tty_w)  // set breakpoint at bfc01430 to catch when 
 //  printf("%c", data);
 }
 
-ADDRESS_MAP_START(vp10x_state::main_map)
-	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x14000000, 0x14000003) AM_READ(test_r)
-	AM_RANGE(0x1c000000, 0x1c000003) AM_WRITE(tty_w)        // RSS OS code uses this one
-	AM_RANGE(0x1c000014, 0x1c000017) AM_READ(tty_ready_r)
-	AM_RANGE(0x1c400000, 0x1c400003) AM_WRITE(tty_w)        // boot ROM code uses this one
-	AM_RANGE(0x1c400014, 0x1c400017) AM_READ(tty_ready_r)
-	AM_RANGE(0x1ca0000c, 0x1ca0000f) AM_READ_PORT("IN0")
-	AM_RANGE(0x1ca00010, 0x1ca00013) AM_READ(test_r)        // bits here cause various test mode stuff
-	AM_RANGE(0x1cf00000, 0x1cf00003) AM_NOP AM_READNOP
-	AM_RANGE(0x1d000030, 0x1d000033) AM_WRITE(dmaaddr_w)    // ATA DMA destination address
-	AM_RANGE(0x1d000040, 0x1d00005f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0x0000ffff)
-	AM_RANGE(0x1d000060, 0x1d00007f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0x0000ffff)
-	AM_RANGE(0x1f200000, 0x1f200003) AM_READWRITE(pic_r, pic_w)
-	AM_RANGE(0x1f807000, 0x1f807fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void vp10x_state::main_map(address_map &map)
+{
+	map(0x00000000, 0x07ffffff).ram().share("mainram");
+	map(0x14000000, 0x14000003).r(this, FUNC(vp10x_state::test_r));
+	map(0x1c000000, 0x1c000003).w(this, FUNC(vp10x_state::tty_w));        // RSS OS code uses this one
+	map(0x1c000014, 0x1c000017).r(this, FUNC(vp10x_state::tty_ready_r));
+	map(0x1c400000, 0x1c400003).w(this, FUNC(vp10x_state::tty_w));        // boot ROM code uses this one
+	map(0x1c400014, 0x1c400017).r(this, FUNC(vp10x_state::tty_ready_r));
+	map(0x1ca0000c, 0x1ca0000f).portr("IN0");
+	map(0x1ca00010, 0x1ca00013).r(this, FUNC(vp10x_state::test_r));        // bits here cause various test mode stuff
+	map(0x1cf00000, 0x1cf00003).noprw().nopr();
+	map(0x1d000030, 0x1d000033).w(this, FUNC(vp10x_state::dmaaddr_w));    // ATA DMA destination address
+	map(0x1d000040, 0x1d00005f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0)).umask32(0x0000ffff);
+	map(0x1d000060, 0x1d00007f).rw(m_ata, FUNC(ata_interface_device::read_cs1), FUNC(ata_interface_device::write_cs1)).umask32(0x0000ffff);
+	map(0x1f200000, 0x1f200003).rw(this, FUNC(vp10x_state::pic_r), FUNC(vp10x_state::pic_w));
+	map(0x1f807000, 0x1f807fff).ram().share("nvram");
+	map(0x1fc00000, 0x1fffffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(vp10x_state::vp50_map)
-	AM_RANGE(0x00000000, 0x03ffffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x1f000010, 0x1f00001f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff)
-	AM_RANGE(0x1f000020, 0x1f00002f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff)
-	AM_RANGE(0x1f400000, 0x1f400003) AM_NOP // FPGA bitstream download?
-	AM_RANGE(0x1f400800, 0x1f400bff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_REGION("maincpu", 0)
+void vp10x_state::vp50_map(address_map &map)
+{
+	map(0x00000000, 0x03ffffff).ram().share("mainram");
+	map(0x1f000010, 0x1f00001f).rw(m_ata, FUNC(ata_interface_device::read_cs1), FUNC(ata_interface_device::write_cs1));
+	map(0x1f000020, 0x1f00002f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0));
+	map(0x1f400000, 0x1f400003).noprw(); // FPGA bitstream download?
+	map(0x1f400800, 0x1f400bff).ram().share("nvram");
+	map(0x1fc00000, 0x1fffffff).rom().region("maincpu", 0);
 
 	// TX4925 peripherals
-	AM_RANGE(0xff1ff40c, 0xff1ff40f) AM_READ(tty_4925_rdy_r)
-	AM_RANGE(0xff1ff41c, 0xff1ff41f) AM_WRITE(tty_w)
-	AM_RANGE(0xff1ff500, 0xff1ff503) AM_NOP
-	AM_RANGE(0xff1ff814, 0xff1ff817) AM_READ(spi_status_r)
-	AM_RANGE(0xff1ff818, 0xff1ff81b) AM_READWRITE(spi_r, spi_w)
-ADDRESS_MAP_END
+	map(0xff1ff40c, 0xff1ff40f).r(this, FUNC(vp10x_state::tty_4925_rdy_r));
+	map(0xff1ff41c, 0xff1ff41f).w(this, FUNC(vp10x_state::tty_w));
+	map(0xff1ff500, 0xff1ff503).noprw();
+	map(0xff1ff814, 0xff1ff817).r(this, FUNC(vp10x_state::spi_status_r));
+	map(0xff1ff818, 0xff1ff81b).rw(this, FUNC(vp10x_state::spi_r), FUNC(vp10x_state::spi_w));
+}
 
 static INPUT_PORTS_START( vp101 )
 	PORT_START("IN0")

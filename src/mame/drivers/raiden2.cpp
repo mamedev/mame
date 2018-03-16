@@ -224,10 +224,10 @@ int cnt=0, ccol = -1;
 
 WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
 {
-	//AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_SHARE("back_data")
-	//AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	//AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
-	//AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
+	//	map(0x0d000, 0x0d7ff).ram().w(this, FUNC(raiden2_state::raiden2_background_w)).share("back_data");
+	//	map(0x0d800, 0x0dfff).ram().w(this, FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
+	//	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
+	//	map(0x0e800, 0x0f7ff).ram().w(this, FUNC(raiden2_state::raiden2_text_w).share("text_data");
 
 	if (offset < 0x800 / 2)
 	{
@@ -889,213 +889,238 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_off_w)
 }
 
 /* MEMORY MAPS */
-ADDRESS_MAP_START(raiden2_state::raiden2_cop_mem)
-	AM_RANGE(0x0041c, 0x0041d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_angle_target_w) // angle target (for 0x6200 COP macro)
-	AM_RANGE(0x0041e, 0x0041f) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_angle_step_w)   // angle step   (for 0x6200 COP macro)
-	AM_RANGE(0x00420, 0x00421) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_low_w)
-	AM_RANGE(0x00422, 0x00423) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_high_w)
-	AM_RANGE(0x00424, 0x00425) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_itoa_mode_w)
-	AM_RANGE(0x00428, 0x00429) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_v1_w)
-	AM_RANGE(0x0042a, 0x0042b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_v2_w)
-	AM_RANGE(0x0042c, 0x0042d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_prng_maxvalue_w)
-	AM_RANGE(0x00432, 0x00433) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_data_w)
-	AM_RANGE(0x00434, 0x00435) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_addr_w)
-	AM_RANGE(0x00436, 0x00437) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_hitbox_baseadr_w)
-	AM_RANGE(0x00438, 0x00439) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_value_w)
-	AM_RANGE(0x0043a, 0x0043b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_mask_w)
-	AM_RANGE(0x0043c, 0x0043d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pgm_trigger_w)
-	AM_RANGE(0x00444, 0x00445) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_scale_w)
-	AM_RANGE(0x00450, 0x00451) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_ram_addr_hi_w)
-	AM_RANGE(0x00452, 0x00453) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_ram_addr_lo_w)
-	AM_RANGE(0x00454, 0x00455) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_lookup_hi_w)
-	AM_RANGE(0x00456, 0x00457) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_lookup_lo_w)
-	AM_RANGE(0x00458, 0x00459) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_param_w)
-	AM_RANGE(0x0045a, 0x0045b) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pal_brightness_val_w) //palette DMA brightness val, used by X Se Dae / Zero Team
-	AM_RANGE(0x0045c, 0x0045d) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_pal_brightness_mode_w)  //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
-	AM_RANGE(0x00470, 0x00471) AM_READWRITE(cop_tile_bank_2_r,cop_tile_bank_2_w) // implementaton of this varies between games, external hookup?
+void raiden2_state::raiden2_cop_mem(address_map &map)
+{
+	map(0x0041c, 0x0041d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_target_w)); // angle target (for 0x6200 COP macro)
+	map(0x0041e, 0x0041f).w(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_step_w));   // angle step   (for 0x6200 COP macro)
+	map(0x00420, 0x00421).w(m_raiden2cop, FUNC(raiden2cop_device::cop_itoa_low_w));
+	map(0x00422, 0x00423).w(m_raiden2cop, FUNC(raiden2cop_device::cop_itoa_high_w));
+	map(0x00424, 0x00425).w(m_raiden2cop, FUNC(raiden2cop_device::cop_itoa_mode_w));
+	map(0x00428, 0x00429).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_v1_w));
+	map(0x0042a, 0x0042b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_v2_w));
+	map(0x0042c, 0x0042d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_prng_maxvalue_w));
+	map(0x00432, 0x00433).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_data_w));
+	map(0x00434, 0x00435).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_addr_w));
+	map(0x00436, 0x00437).w(m_raiden2cop, FUNC(raiden2cop_device::cop_hitbox_baseadr_w));
+	map(0x00438, 0x00439).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_value_w));
+	map(0x0043a, 0x0043b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_mask_w));
+	map(0x0043c, 0x0043d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pgm_trigger_w));
+	map(0x00444, 0x00445).w(m_raiden2cop, FUNC(raiden2cop_device::cop_scale_w));
+	map(0x00450, 0x00451).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_ram_addr_hi_w));
+	map(0x00452, 0x00453).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_ram_addr_lo_w));
+	map(0x00454, 0x00455).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_lookup_hi_w));
+	map(0x00456, 0x00457).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_lookup_lo_w));
+	map(0x00458, 0x00459).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_param_w));
+	map(0x0045a, 0x0045b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_val_w)); //palette DMA brightness val, used by X Se Dae / Zero Team
+	map(0x0045c, 0x0045d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_mode_w));  //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
+	map(0x00470, 0x00471).rw(this, FUNC(raiden2_state::cop_tile_bank_2_r), FUNC(raiden2_state::cop_tile_bank_2_w)); // implementaton of this varies between games, external hookup?
 
-	AM_RANGE(0x00476, 0x00477) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_dma_adr_rel_w)
-	AM_RANGE(0x00478, 0x00479) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_src_w)
-	AM_RANGE(0x0047a, 0x0047b) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_size_w)
-	AM_RANGE(0x0047c, 0x0047d) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_dst_w)
-	AM_RANGE(0x0047e, 0x0047f) AM_DEVREADWRITE("raiden2cop", raiden2cop_device, cop_dma_mode_r, cop_dma_mode_w)
-	AM_RANGE(0x004a0, 0x004ad) AM_DEVREADWRITE("raiden2cop", raiden2cop_device, cop_reg_high_r, cop_reg_high_w)
-	AM_RANGE(0x004c0, 0x004cd) AM_DEVREADWRITE("raiden2cop", raiden2cop_device, cop_reg_low_r, cop_reg_low_w)
-	AM_RANGE(0x00500, 0x00505) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_cmd_w)
-	AM_RANGE(0x00580, 0x00581) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_collision_status_r)
-	AM_RANGE(0x00582, 0x00587) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_collision_status_val_r)
-	AM_RANGE(0x00588, 0x00589) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_collision_status_stat_r)
-	AM_RANGE(0x00590, 0x00599) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_itoa_digits_r)
-	AM_RANGE(0x005a0, 0x005a7) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_prng_r) // zeroteam reads from 5a4
-	AM_RANGE(0x005b0, 0x005b1) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_status_r)
-	AM_RANGE(0x005b2, 0x005b3) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_dist_r)
-	AM_RANGE(0x005b4, 0x005b5) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_angle_r)
+	map(0x00476, 0x00477).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_adr_rel_w));
+	map(0x00478, 0x00479).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_src_w));
+	map(0x0047a, 0x0047b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_size_w));
+	map(0x0047c, 0x0047d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_dst_w));
+	map(0x0047e, 0x0047f).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_mode_r), FUNC(raiden2cop_device::cop_dma_mode_w));
+	map(0x004a0, 0x004ad).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_reg_high_r), FUNC(raiden2cop_device::cop_reg_high_w));
+	map(0x004c0, 0x004cd).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_reg_low_r), FUNC(raiden2cop_device::cop_reg_low_w));
+	map(0x00500, 0x00505).w(m_raiden2cop, FUNC(raiden2cop_device::cop_cmd_w));
+	map(0x00580, 0x00581).r(m_raiden2cop, FUNC(raiden2cop_device::cop_collision_status_r));
+	map(0x00582, 0x00587).r(m_raiden2cop, FUNC(raiden2cop_device::cop_collision_status_val_r));
+	map(0x00588, 0x00589).r(m_raiden2cop, FUNC(raiden2cop_device::cop_collision_status_stat_r));
+	map(0x00590, 0x00599).r(m_raiden2cop, FUNC(raiden2cop_device::cop_itoa_digits_r));
+	map(0x005a0, 0x005a7).r(m_raiden2cop, FUNC(raiden2cop_device::cop_prng_r)); // zeroteam reads from 5a4
+	map(0x005b0, 0x005b1).r(m_raiden2cop, FUNC(raiden2cop_device::cop_status_r));
+	map(0x005b2, 0x005b3).r(m_raiden2cop, FUNC(raiden2cop_device::cop_dist_r));
+	map(0x005b4, 0x005b5).r(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_r));
 
-	AM_RANGE(0x00600, 0x0063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	//AM_RANGE(0x00640, 0x006bf) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write)
-	AM_RANGE(0x006a0, 0x006a3) AM_WRITE(sprcpt_val_1_w)
-	AM_RANGE(0x006a4, 0x006a7) AM_WRITE(sprcpt_data_3_w)
-	AM_RANGE(0x006a8, 0x006ab) AM_WRITE(sprcpt_data_4_w)
-	AM_RANGE(0x006ac, 0x006af) AM_WRITE(sprcpt_flags_1_w)
-	AM_RANGE(0x006b0, 0x006b3) AM_WRITE(sprcpt_data_1_w)
-	AM_RANGE(0x006b4, 0x006b7) AM_WRITE(sprcpt_data_2_w)
-	AM_RANGE(0x006b8, 0x006bb) AM_WRITE(sprcpt_val_2_w)
-	AM_RANGE(0x006bc, 0x006bf) AM_WRITE(sprcpt_adr_w)
-	AM_RANGE(0x006c0, 0x006c1) AM_READWRITE(sprite_prot_off_r, sprite_prot_off_w)
-	AM_RANGE(0x006c2, 0x006c3) AM_READWRITE(sprite_prot_src_seg_r, sprite_prot_src_seg_w)
-	AM_RANGE(0x006c4, 0x006c5) AM_WRITENOP // constant value written along with 0x6c0
-	AM_RANGE(0x006c6, 0x006c7) AM_WRITE(sprite_prot_dst1_w)
-	AM_RANGE(0x006ca, 0x006cb) AM_WRITE(raiden2_bank_w)
-	AM_RANGE(0x006cc, 0x006cd) AM_WRITE(tile_bank_01_w)
-	AM_RANGE(0x006ce, 0x006cf) AM_WRITE(sprcpt_flags_2_w)
-	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(sprite_prot_x_w)
-	AM_RANGE(0x006da, 0x006db) AM_WRITE(sprite_prot_y_w)
-	AM_RANGE(0x006dc, 0x006dd) AM_READWRITE(sprite_prot_maxx_r, sprite_prot_maxx_w)
-	AM_RANGE(0x006de, 0x006df) AM_WRITE(sprite_prot_src_w)
+	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+	//map(0x00640, 0x006bf).rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
+	map(0x006a0, 0x006a3).w(this, FUNC(raiden2_state::sprcpt_val_1_w));
+	map(0x006a4, 0x006a7).w(this, FUNC(raiden2_state::sprcpt_data_3_w));
+	map(0x006a8, 0x006ab).w(this, FUNC(raiden2_state::sprcpt_data_4_w));
+	map(0x006ac, 0x006af).w(this, FUNC(raiden2_state::sprcpt_flags_1_w));
+	map(0x006b0, 0x006b3).w(this, FUNC(raiden2_state::sprcpt_data_1_w));
+	map(0x006b4, 0x006b7).w(this, FUNC(raiden2_state::sprcpt_data_2_w));
+	map(0x006b8, 0x006bb).w(this, FUNC(raiden2_state::sprcpt_val_2_w));
+	map(0x006bc, 0x006bf).w(this, FUNC(raiden2_state::sprcpt_adr_w));
+	map(0x006c0, 0x006c1).rw(this, FUNC(raiden2_state::sprite_prot_off_r), FUNC(raiden2_state::sprite_prot_off_w));
+	map(0x006c2, 0x006c3).rw(this, FUNC(raiden2_state::sprite_prot_src_seg_r), FUNC(raiden2_state::sprite_prot_src_seg_w));
+	map(0x006c4, 0x006c5).nopw(); // constant value written along with 0x6c0
+	map(0x006c6, 0x006c7).w(this, FUNC(raiden2_state::sprite_prot_dst1_w));
+	map(0x006ca, 0x006cb).w(this, FUNC(raiden2_state::raiden2_bank_w));
+	map(0x006cc, 0x006cd).w(this, FUNC(raiden2_state::tile_bank_01_w));
+	map(0x006ce, 0x006cf).w(this, FUNC(raiden2_state::sprcpt_flags_2_w));
+	map(0x006d8, 0x006d9).w(this, FUNC(raiden2_state::sprite_prot_x_w));
+	map(0x006da, 0x006db).w(this, FUNC(raiden2_state::sprite_prot_y_w));
+	map(0x006dc, 0x006dd).rw(this, FUNC(raiden2_state::sprite_prot_maxx_r), FUNC(raiden2_state::sprite_prot_maxx_w));
+	map(0x006de, 0x006df).w(this, FUNC(raiden2_state::sprite_prot_src_w));
 	/* end video block */
 
-	AM_RANGE(0x006fc, 0x006fd) AM_DEVWRITE("raiden2cop", raiden2cop_device,cop_dma_trigger_w)
-	AM_RANGE(0x006fe, 0x006ff) AM_DEVWRITE("raiden2cop", raiden2cop_device, cop_sort_dma_trig_w) // sort-DMA trigger
+	map(0x006fc, 0x006fd).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_trigger_w));
+	map(0x006fe, 0x006ff).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_dma_trig_w)); // sort-DMA trigger
 
-	AM_RANGE(0x00762, 0x00763) AM_READ(sprite_prot_dst1_r)
-ADDRESS_MAP_END
+	map(0x00762, 0x00763).r(this, FUNC(raiden2_state::sprite_prot_dst1_r));
+}
 
-ADDRESS_MAP_START(raiden2_state::raiden2_mem)
-	AM_RANGE(0x00000, 0x003ff) AM_RAM
+void raiden2_state::raiden2_mem(address_map &map)
+{
+	map(0x00000, 0x003ff).ram();
 
-	AM_IMPORT_FROM( raiden2_cop_mem )
+	raiden2_cop_mem(map);
 
-	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP //irq ack / sprite buffering?
+	map(0x0068e, 0x0068f).nopw(); //irq ack / sprite buffering?
 
-	;map(0x00700, 0x0071f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
+	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
+							   [this](address_space &space, offs_t offset, u8 mem_mask) {
+								   return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+							   },
+							   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+								   m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+							   }).umask16(0x00ff);
 
-	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
-	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
+	map(0x00740, 0x00741).portr("DSW");
+	map(0x00744, 0x00745).portr("P1_P2");
+	map(0x0074c, 0x0074d).portr("SYSTEM");
 
-	AM_RANGE(0x00800, 0x0bfff) AM_RAM
+	map(0x00800, 0x0bfff).ram();
 
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM // _WRITE(raiden2_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM // _WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM // _WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM // _WRITE(raiden2_text_w) AM_SHARE("text_data")
-	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
+	map(0x0c000, 0x0cfff).ram().share("sprites");
+	map(0x0d000, 0x0d7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_background_w)).share("back_data");
+	map(0x0d800, 0x0dfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
+	map(0x0e000, 0x0e7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
+	map(0x0e800, 0x0f7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0f800, 0x0ffff).ram(); /* Stack area */
 
-	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	map(0x10000, 0x1efff).ram();
+	map(0x1f000, 0x1ffff).ram(); //.w("palette", palette_device, write).share("palette");
 
-	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("mainbank1")
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("mainbank2")
-	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x40000)
-ADDRESS_MAP_END
+	map(0x20000, 0x2ffff).bankr("mainbank1");
+	map(0x30000, 0x3ffff).bankr("mainbank2");
+	map(0x40000, 0xfffff).rom().region("maincpu", 0x40000);
+}
 
-ADDRESS_MAP_START(raiden2_state::raidendx_mem)
-	AM_IMPORT_FROM( raiden2_mem )
-	AM_RANGE(0x00470, 0x00471) AM_READWRITE(cop_tile_bank_2_r,raidendx_cop_bank_2_w)
-	AM_RANGE(0x004d0, 0x004d7) AM_RAM //???
-	AM_RANGE(0x00600, 0x0063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_alt, write_alt)
-//  AM_RANGE(0x006ca, 0x006cb) AM_WRITENOP
-ADDRESS_MAP_END
+void raiden2_state::raidendx_mem(address_map &map)
+{
+	raiden2_mem(map);
+	map(0x00470, 0x00471).rw(this, FUNC(raiden2_state::cop_tile_bank_2_r), FUNC(raiden2_state::raidendx_cop_bank_2_w));
+	map(0x004d0, 0x004d7).ram(); //???
+	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read_alt), FUNC(seibu_crtc_device::write_alt));
+//  map(0x006ca, 0x006cb).nopw();
+}
 
-ADDRESS_MAP_START(raiden2_state::zeroteam_mem)
-	AM_RANGE(0x00000, 0x003ff) AM_RAM
+void raiden2_state::zeroteam_mem(address_map &map)
+{
+	map(0x00000, 0x003ff).ram();
 
-	AM_IMPORT_FROM( raiden2_cop_mem )
+	raiden2_cop_mem(map);
 
-	AM_RANGE(0x00470, 0x00471) AM_WRITENOP
-	AM_RANGE(0x006cc, 0x006cd) AM_WRITENOP
+	map(0x00470, 0x00471).nopw();
+	map(0x006cc, 0x006cd).nopw();
 
-	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // irq ack / sprite buffering?
+	map(0x0068e, 0x0068f).nopw(); // irq ack / sprite buffering?
 
-	;map(0x00700, 0x0071f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
+	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
+							   [this](address_space &space, offs_t offset, u8 mem_mask) {
+								   return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+							   },
+							   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+								   m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+							   }).umask16(0x00ff);
+	
+	map(0x00740, 0x00741).portr("DSW");
+	map(0x00744, 0x00745).portr("P1_P2");
+	map(0x00748, 0x00749).portr("P3_P4");
+	map(0x0074c, 0x0074d).portr("SYSTEM");
 
-	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
-	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x00748, 0x00749) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
+	map(0x00800, 0x0b7ff).ram();
+	map(0x0b800, 0x0bfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_background_w)).share("back_data");
+	map(0x0c000, 0x0c7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
+	map(0x0c800, 0x0cfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
+	map(0x0d000, 0x0dfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0e000, 0x0efff).ram(); // .w("palette", palette_device, write).share("palette");
+	map(0x0f000, 0x0ffff).ram().share("sprites");
+	map(0x10000, 0x1ffff).ram();
 
-	AM_RANGE(0x00800, 0x0b7ff) AM_RAM
-	AM_RANGE(0x0b800, 0x0bfff) AM_RAM // _WRITE(raiden2_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM // _WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM // _WRITE(raiden2_midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x0d000, 0x0dfff) AM_RAM // _WRITE(raiden2_text_w) AM_SHARE("text_data")
-	AM_RANGE(0x0e000, 0x0efff) AM_RAM // _DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM
+	map(0x20000, 0x2ffff).bankr("mainbank1");
+	map(0x30000, 0x3ffff).bankr("mainbank2");
+	map(0x40000, 0xfffff).rom().region("maincpu", 0x40000);
+}
 
-	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("mainbank1")
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("mainbank2")
-	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x40000)
-ADDRESS_MAP_END
+void raiden2_state::xsedae_mem(address_map &map)
+{
+	map(0x00000, 0x003ff).ram();
 
-ADDRESS_MAP_START(raiden2_state::xsedae_mem)
-	AM_RANGE(0x00000, 0x003ff) AM_RAM
+	raiden2_cop_mem(map);
 
-	AM_IMPORT_FROM( raiden2_cop_mem )
+	map(0x00470, 0x00471).nopw();
+	map(0x006cc, 0x006cd).nopw();
 
-	AM_RANGE(0x00470, 0x00471) AM_WRITENOP
-	AM_RANGE(0x006cc, 0x006cd) AM_WRITENOP
+	map(0x0068e, 0x0068f).nopw(); //irq ack / sprite buffering?
 
-	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP //irq ack / sprite buffering?
+	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
+							   [this](address_space &space, offs_t offset, u8 mem_mask) {
+								   return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
+							   },
+							   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+								   m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
+							   }).umask16(0x00ff);
 
-	;map(0x00700, 0x0071f).lrw8("seibu_sound_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_seibu_sound->main_r(space, offset >> 1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_seibu_sound->main_w(space, offset >> 1, data, mem_mask); }).umask16(0x00ff);
+	map(0x00740, 0x00741).portr("DSW");
+	map(0x00744, 0x00745).portr("P1_P2");
+	map(0x00748, 0x00749).portr("P3_P4");
+	map(0x0074c, 0x0074d).portr("SYSTEM");
 
-	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
-	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x00748, 0x00749) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
+	map(0x00800, 0x0b7ff).ram();
+	map(0x0b800, 0x0bfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_background_w)).share("back_data");
+	map(0x0c000, 0x0c7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
+	map(0x0c800, 0x0cfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
+	map(0x0d000, 0x0dfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0e000, 0x0efff).ram(); // .w("palette", palette_device, write).share("palette");
+	map(0x0f000, 0x0ffff).ram().share("sprites");
 
-	AM_RANGE(0x00800, 0x0b7ff) AM_RAM
-	AM_RANGE(0x0b800, 0x0bfff) AM_RAM // _WRITE(raiden2_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM // _WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM // _WRITE(raiden2_midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x0d000, 0x0dfff) AM_RAM // _WRITE(raiden2_text_w) AM_SHARE("text_data")
-	AM_RANGE(0x0e000, 0x0efff) AM_RAM // _DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_SHARE("sprites")
+	map(0x10000, 0x1ffff).ram();
 
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM
+	map(0x20000, 0xfffff).rom().region("maincpu", 0x20000);
+}
 
-	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x20000)
-ADDRESS_MAP_END
+void raiden2_state::raiden2_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram();
+	map(0x4000, 0x4000).w(m_seibu_sound, FUNC(seibu_sound_device::pending_w));
+	map(0x4001, 0x4001).w(m_seibu_sound, FUNC(seibu_sound_device::irq_clear_w));
+	map(0x4002, 0x4002).w(m_seibu_sound, FUNC(seibu_sound_device::rst10_ack_w));
+	map(0x4003, 0x4003).w(m_seibu_sound, FUNC(seibu_sound_device::rst18_ack_w));
+	map(0x4004, 0x4004).noprw();
+	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
+	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
+	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
+	map(0x4013, 0x4013).portr("COIN");
+	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
+	map(0x401a, 0x401a).w(m_seibu_sound, FUNC(seibu_sound_device::bank_w));
+	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
+	map(0x6000, 0x6000).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x6002, 0x6002).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x8000, 0xffff).bankr("seibu_bank1");
+}
 
-ADDRESS_MAP_START(raiden2_state::raiden2_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
-	AM_RANGE(0x4004, 0x4004) AM_NOP
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
-	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
-	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
-	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x6002, 0x6002) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(raiden2_state::zeroteam_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
-	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
-	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
-	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
-ADDRESS_MAP_END
+void raiden2_state::zeroteam_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram();
+	map(0x4000, 0x4000).w(m_seibu_sound, FUNC(seibu_sound_device::pending_w));
+	map(0x4001, 0x4001).w(m_seibu_sound, FUNC(seibu_sound_device::irq_clear_w));
+	map(0x4002, 0x4002).w(m_seibu_sound, FUNC(seibu_sound_device::rst10_ack_w));
+	map(0x4003, 0x4003).w(m_seibu_sound, FUNC(seibu_sound_device::rst18_ack_w));
+	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
+	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
+	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
+	map(0x4013, 0x4013).portr("COIN");
+	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
+	map(0x401a, 0x401a).w(m_seibu_sound, FUNC(seibu_sound_device::bank_w));
+	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
+	map(0x6000, 0x6000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x8000, 0xffff).bankr("seibu_bank1");
+}
 
 
 /* INPUT PORTS */

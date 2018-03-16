@@ -67,23 +67,25 @@ READ8_MEMBER(seattle_comp_state::pic_slave_ack)
 }
 
 
-ADDRESS_MAP_START(seattle_comp_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0xff7ff) AM_RAM
-	AM_RANGE(0xff800,0xfffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void seattle_comp_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xff7ff).ram();
+	map(0xff800, 0xfffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(seattle_comp_state::io_map)
+void seattle_comp_state::io_map(address_map &map)
+{
 	//ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf1) AM_DEVREADWRITE8("pic1", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0xf2, 0xf3) AM_DEVREADWRITE8("pic2", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0xf4, 0xf5) AM_DEVREADWRITE8("stc", am9513_device, read8, write8, 0xffff)
-	AM_RANGE(0xf6, 0xf7) AM_DEVREADWRITE8("uart", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xf6, 0xf7) AM_DEVREADWRITE8("uart", i8251_device, status_r, control_w, 0xff00)
+	map.global_mask(0xff);
+	map(0xf0, 0xf1).rw("pic1", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xf2, 0xf3).rw("pic2", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xf4, 0xf5).rw("stc", FUNC(am9513_device::read8), FUNC(am9513_device::write8));
+	map(0xf6, 0xf6).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf7, 0xf7).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	//AM_RANGE(0xfc, 0xfd) Parallel data, status, serial DCD
 	//AM_RANGE(0xfe, 0xff) Eprom disable bit, read sense switches (bank of 8 dipswitches)
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( seattle )

@@ -68,28 +68,30 @@ private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 };
 
-ADDRESS_MAP_START(lola8a_state::lola8a_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x1fff ) AM_RAM // 6264 at G45
-	AM_RANGE( 0x2000, 0x3fff ) AM_RAM // 6264 at F45
+void lola8a_state::lola8a_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).ram(); // 6264 at G45
+	map(0x2000, 0x3fff).ram(); // 6264 at F45
 										// empty place for 6264 at E45
 										// empty place for 6264 at D45
-	AM_RANGE( 0x8000, 0x9fff ) AM_ROM // 2764A at B45
-	AM_RANGE( 0xa000, 0xbfff ) AM_ROM // 2764A at C45
-	AM_RANGE( 0xc000, 0xdfff ) AM_ROM // 2764A at H67
-	AM_RANGE( 0xe000, 0xffff ) AM_RAM AM_SHARE("videoram") // 6264 at G67
-ADDRESS_MAP_END
+	map(0x8000, 0x9fff).rom(); // 2764A at B45
+	map(0xa000, 0xbfff).rom(); // 2764A at C45
+	map(0xc000, 0xdfff).rom(); // 2764A at H67
+	map(0xe000, 0xffff).ram().share("videoram"); // 6264 at G67
+}
 
-ADDRESS_MAP_START(lola8a_state::lola8a_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE(AY8910_TAG, ay8910_device, address_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE(AY8910_TAG, ay8910_device, data_r, data_w)
-	AM_RANGE(0x88, 0x88) AM_READ(keyboard_r)
+void lola8a_state::lola8a_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x80, 0x80).w(AY8910_TAG, FUNC(ay8910_device::address_w));
+	map(0x84, 0x84).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x88, 0x88).r(this, FUNC(lola8a_state::keyboard_r));
 
-	AM_RANGE(0x90, 0x90) AM_DEVREADWRITE(HD46505SP_TAG, mc6845_device, status_r, address_w)
-	AM_RANGE(0x92, 0x92) AM_DEVREADWRITE(HD46505SP_TAG, mc6845_device, register_r, register_w)
+	map(0x90, 0x90).rw(HD46505SP_TAG, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x92, 0x92).rw(HD46505SP_TAG, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( lola8a )

@@ -196,41 +196,45 @@ void arcadia_amiga_state::machine_reset()
  *
  *************************************/
 
-ADDRESS_MAP_START(arcadia_amiga_state::overlay_512kb_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void arcadia_amiga_state::overlay_512kb_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x07ffff).mirror(0x180000).ram().share("chip_ram");
+	map(0x200000, 0x27ffff).rom().region("kickstart", 0);
+}
 
-ADDRESS_MAP_START(arcadia_amiga_state::a500_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
-	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
-	AM_RANGE(0xc00000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xd80000, 0xddffff) AM_NOP
-	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
-	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void arcadia_amiga_state::a500_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
+	map(0xa00000, 0xbfffff).rw(this, FUNC(arcadia_amiga_state::cia_r), FUNC(arcadia_amiga_state::cia_w));
+	map(0xc00000, 0xd7ffff).rw(this, FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
+	map(0xd80000, 0xddffff).noprw();
+	map(0xde0000, 0xdeffff).rw(this, FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(this, FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(arcadia_amiga_state::rom_mirror_r));
+	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
+	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
+}
 
-ADDRESS_MAP_START(arcadia_amiga_state::arcadia_map)
-	AM_IMPORT_FROM(a500_mem)
-	AM_RANGE(0x800000, 0x97ffff) AM_ROMBANK("bank2") AM_REGION("user3", 0)
-	AM_RANGE(0x980000, 0x9fbfff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x9fc000, 0x9ffffd) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9ffffe, 0x9fffff) AM_WRITE(arcadia_multibios_change_game)
-	AM_RANGE(0xf00000, 0xf7ffff) AM_ROM AM_REGION("user2", 0)
-ADDRESS_MAP_END
+void arcadia_amiga_state::arcadia_map(address_map &map)
+{
+	a500_mem(map);
+	map(0x800000, 0x97ffff).bankr("bank2").region("user3", 0);
+	map(0x980000, 0x9fbfff).rom().region("user2", 0);
+	map(0x9fc000, 0x9ffffd).ram().share("nvram");
+	map(0x9ffffe, 0x9fffff).w(this, FUNC(arcadia_amiga_state::arcadia_multibios_change_game));
+	map(0xf00000, 0xf7ffff).rom().region("user2", 0);
+}
 
-ADDRESS_MAP_START(arcadia_amiga_state::argh_map)
-	AM_IMPORT_FROM(a500_mem)
-	AM_RANGE(0x800000, 0x97ffff) AM_ROMBANK("bank2") AM_REGION("user3", 0)
+void arcadia_amiga_state::argh_map(address_map &map)
+{
+	a500_mem(map);
+	map(0x800000, 0x97ffff).bankr("bank2").region("user3", 0);
 //  AM_RANGE(0x980000, 0x9fefff) AM_ROM AM_REGION("user3", 0)
-	AM_RANGE(0x9ff000, 0x9fffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf00000, 0xf7ffff) AM_ROM AM_REGION("user3", 0)
-ADDRESS_MAP_END
+	map(0x9ff000, 0x9fffff).ram().share("nvram");
+	map(0xf00000, 0xf7ffff).rom().region("user3", 0);
+}
 
 /*************************************
  *

@@ -77,9 +77,10 @@ protected:
 
 
 
-ADDRESS_MAP_START(globalvr_state::globalvr_map)
-	AM_RANGE(0x00000000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void globalvr_state::globalvr_map(address_map &map)
+{
+	map(0x00000000, 0xffffff).ram();
+}
 
 
 static INPUT_PORTS_START( globalvr )

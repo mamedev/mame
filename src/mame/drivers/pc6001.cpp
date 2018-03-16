@@ -227,27 +227,29 @@ WRITE8_MEMBER(pc6001_state::nec_ppi8255_w)
 	m_ppi->write(space,offset,data);
 }
 
-ADDRESS_MAP_START(pc6001_state::pc6001_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP
+void pc6001_state::pc6001_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom().nopw();
 //  AM_RANGE(0x4000, 0x5fff) // mapped by the cartslot
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).ram().share("ram");
+}
 
-ADDRESS_MAP_START(pc6001_state::pc6001_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, nec_ppi8255_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_WRITE(system_latch_w)
-	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_NOP // disk device
-ADDRESS_MAP_END
+void pc6001_state::pc6001_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x80).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x81, 0x81).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x90, 0x93).mirror(0x0c).rw(this, FUNC(pc6001_state::nec_ppi8255_r), FUNC(pc6001_state::nec_ppi8255_w));
+	map(0xa0, 0xa0).mirror(0x0c).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0xa1, 0xa1).mirror(0x0c).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0xa2, 0xa2).mirror(0x0c).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0xa3, 0xa3).mirror(0x0c).nopw();
+	map(0xb0, 0xb0).mirror(0x0f).w(this, FUNC(pc6001_state::system_latch_w));
+	map(0xd0, 0xd3).mirror(0x0c).noprw(); // disk device
+}
 
 /*****************************************
  *
@@ -677,50 +679,52 @@ READ8_MEMBER(pc6001mk2_state::mk2_bank_w0_r)
 	return m_bank_w;
 }
 
-ADDRESS_MAP_START(pc6001mk2_state::pc6001mk2_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE(mk2_work_ram0_w)
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2") AM_WRITE(mk2_work_ram1_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3") AM_WRITE(mk2_work_ram2_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4") AM_WRITE(mk2_work_ram3_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank5") AM_WRITE(mk2_work_ram4_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank6") AM_WRITE(mk2_work_ram5_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank7") AM_WRITE(mk2_work_ram6_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8") AM_WRITE(mk2_work_ram7_w)
-ADDRESS_MAP_END
+void pc6001mk2_state::pc6001mk2_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).bankr("bank1").w(this, FUNC(pc6001mk2_state::mk2_work_ram0_w));
+	map(0x2000, 0x3fff).bankr("bank2").w(this, FUNC(pc6001mk2_state::mk2_work_ram1_w));
+	map(0x4000, 0x5fff).bankr("bank3").w(this, FUNC(pc6001mk2_state::mk2_work_ram2_w));
+	map(0x6000, 0x7fff).bankr("bank4").w(this, FUNC(pc6001mk2_state::mk2_work_ram3_w));
+	map(0x8000, 0x9fff).bankr("bank5").w(this, FUNC(pc6001mk2_state::mk2_work_ram4_w));
+	map(0xa000, 0xbfff).bankr("bank6").w(this, FUNC(pc6001mk2_state::mk2_work_ram5_w));
+	map(0xc000, 0xdfff).bankr("bank7").w(this, FUNC(pc6001mk2_state::mk2_work_ram6_w));
+	map(0xe000, 0xffff).bankr("bank8").w(this, FUNC(pc6001mk2_state::mk2_work_ram7_w));
+}
 
-ADDRESS_MAP_START(pc6001mk2_state::pc6001mk2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
+void pc6001mk2_state::pc6001mk2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x80).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x81, 0x81).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necmk2_ppi8255_w)
+	map(0x90, 0x93).mirror(0x0c).rw(this, FUNC(pc6001mk2_state::nec_ppi8255_r), FUNC(pc6001mk2_state::necmk2_ppi8255_w));
 
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_NOP
+	map(0xa0, 0xa0).mirror(0x0c).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0xa1, 0xa1).mirror(0x0c).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0xa2, 0xa2).mirror(0x0c).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0xa3, 0xa3).mirror(0x0c).noprw();
 
-	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_WRITE(mk2_system_latch_w)
+	map(0xb0, 0xb0).mirror(0x0f).w(this, FUNC(pc6001mk2_state::mk2_system_latch_w));
 
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(mk2_col_bank_w)
-	AM_RANGE(0xc1, 0xc1) AM_WRITE(mk2_vram_bank_w)
-	AM_RANGE(0xc2, 0xc2) AM_WRITE(mk2_opt_bank_w)
+	map(0xc0, 0xc0).w(this, FUNC(pc6001mk2_state::mk2_col_bank_w));
+	map(0xc1, 0xc1).w(this, FUNC(pc6001mk2_state::mk2_vram_bank_w));
+	map(0xc2, 0xc2).w(this, FUNC(pc6001mk2_state::mk2_opt_bank_w));
 
-	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_NOP // disk device
+	map(0xd0, 0xd3).mirror(0x0c).noprw(); // disk device
 
-	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_DEVREADWRITE("upd7752", upd7752_device, read, write)
+	map(0xe0, 0xe3).mirror(0x0c).rw("upd7752", FUNC(upd7752_device::read), FUNC(upd7752_device::write));
 
-	AM_RANGE(0xf0, 0xf0) AM_READWRITE(mk2_bank_r0_r, mk2_bank_r0_w)
-	AM_RANGE(0xf1, 0xf1) AM_READWRITE(mk2_bank_r1_r, mk2_bank_r1_w)
-	AM_RANGE(0xf2, 0xf2) AM_READWRITE(mk2_bank_w0_r, mk2_bank_w0_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(mk2_0xf3_w)
+	map(0xf0, 0xf0).rw(this, FUNC(pc6001mk2_state::mk2_bank_r0_r), FUNC(pc6001mk2_state::mk2_bank_r0_w));
+	map(0xf1, 0xf1).rw(this, FUNC(pc6001mk2_state::mk2_bank_r1_r), FUNC(pc6001mk2_state::mk2_bank_r1_w));
+	map(0xf2, 0xf2).rw(this, FUNC(pc6001mk2_state::mk2_bank_w0_r), FUNC(pc6001mk2_state::mk2_bank_w0_w));
+	map(0xf3, 0xf3).w(this, FUNC(pc6001mk2_state::mk2_0xf3_w));
 //  AM_RANGE(0xf4
 //  AM_RANGE(0xf5
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(mk2_timer_adj_w)
-	AM_RANGE(0xf7, 0xf7) AM_WRITE(mk2_timer_irqv_w)
-ADDRESS_MAP_END
+	map(0xf6, 0xf6).w(this, FUNC(pc6001mk2_state::mk2_timer_adj_w));
+	map(0xf7, 0xf7).w(this, FUNC(pc6001mk2_state::mk2_timer_irqv_w));
+}
 
 /*****************************************
  *
@@ -739,18 +743,19 @@ WRITE8_MEMBER(pc6601_state::fdc_w)
 {
 }
 
-ADDRESS_MAP_START(pc6601_state::pc6601_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_IMPORT_FROM( pc6001mk2_io )
+void pc6601_state::pc6601_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	pc6001mk2_io(map);
 
 	// these are disk related
 //  AM_RANGE(0xb1
 //  AM_RANGE(0xb2
 //  AM_RANGE(0xb3
 
-	AM_RANGE(0xd0, 0xdf) AM_READWRITE(fdc_r, fdc_w)
-ADDRESS_MAP_END
+	map(0xd0, 0xdf).rw(this, FUNC(pc6601_state::fdc_r), FUNC(pc6601_state::fdc_w));
+}
 
 /*****************************************
  *
@@ -908,63 +913,65 @@ READ8_MEMBER(pc6001sr_state::hw_rev_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(pc6001sr_state::pc6001sr_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE(sr_work_ram0_w)
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2") AM_WRITE(sr_work_ram1_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3") AM_WRITE(sr_work_ram2_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4") AM_WRITE(sr_work_ram3_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank5") AM_WRITE(sr_work_ram4_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank6") AM_WRITE(sr_work_ram5_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank7") AM_WRITE(sr_work_ram6_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8") AM_WRITE(sr_work_ram7_w)
-ADDRESS_MAP_END
+void pc6001sr_state::pc6001sr_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).bankr("bank1").w(this, FUNC(pc6001sr_state::sr_work_ram0_w));
+	map(0x2000, 0x3fff).bankr("bank2").w(this, FUNC(pc6001sr_state::sr_work_ram1_w));
+	map(0x4000, 0x5fff).bankr("bank3").w(this, FUNC(pc6001sr_state::sr_work_ram2_w));
+	map(0x6000, 0x7fff).bankr("bank4").w(this, FUNC(pc6001sr_state::sr_work_ram3_w));
+	map(0x8000, 0x9fff).bankr("bank5").w(this, FUNC(pc6001sr_state::sr_work_ram4_w));
+	map(0xa000, 0xbfff).bankr("bank6").w(this, FUNC(pc6001sr_state::sr_work_ram5_w));
+	map(0xc000, 0xdfff).bankr("bank7").w(this, FUNC(pc6001sr_state::sr_work_ram6_w));
+	map(0xe000, 0xffff).bankr("bank8").w(this, FUNC(pc6001sr_state::sr_work_ram7_w));
+}
 
-ADDRESS_MAP_START(pc6001sr_state::pc6001sr_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void pc6001sr_state::pc6001sr_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 //  0x40-0x43 palette indexes
-	AM_RANGE(0x60, 0x67) AM_READWRITE(sr_bank_rn_r, sr_bank_rn_w)
-	AM_RANGE(0x68, 0x6f) AM_READWRITE(sr_bank_wn_r, sr_bank_wn_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
+	map(0x60, 0x67).rw(this, FUNC(pc6001sr_state::sr_bank_rn_r), FUNC(pc6001sr_state::sr_bank_rn_w));
+	map(0x68, 0x6f).rw(this, FUNC(pc6001sr_state::sr_bank_wn_r), FUNC(pc6001sr_state::sr_bank_wn_w));
+	map(0x80, 0x80).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x81, 0x81).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necsr_ppi8255_w)
+	map(0x90, 0x93).mirror(0x0c).rw(this, FUNC(pc6001sr_state::nec_ppi8255_r), FUNC(pc6001sr_state::necsr_ppi8255_w));
 
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_NOP
+	map(0xa0, 0xa0).mirror(0x0c).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0xa1, 0xa1).mirror(0x0c).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0xa2, 0xa2).mirror(0x0c).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0xa3, 0xa3).mirror(0x0c).noprw();
 
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(sr_system_latch_w)
+	map(0xb0, 0xb0).w(this, FUNC(pc6001sr_state::sr_system_latch_w));
 	/* these are disk related */
 //  AM_RANGE(0xb1
-	AM_RANGE(0xb2, 0xb2) AM_READ(hw_rev_r)
+	map(0xb2, 0xb2).r(this, FUNC(pc6001sr_state::hw_rev_r));
 //  AM_RANGE(0xb3
 
-	AM_RANGE(0xb8, 0xbf) AM_RAM AM_SHARE("irq_vectors")
+	map(0xb8, 0xbf).ram().share("irq_vectors");
 //  AM_RANGE(0xc0, 0xc0) AM_WRITE(mk2_col_bank_w)
 //  AM_RANGE(0xc1, 0xc1) AM_WRITE(mk2_vram_bank_w)
 //  AM_RANGE(0xc2, 0xc2) AM_WRITE(opt_bank_w)
 
-	AM_RANGE(0xc8, 0xc8) AM_WRITE(sr_mode_w)
-	AM_RANGE(0xc9, 0xc9) AM_WRITE(sr_vram_bank_w)
-	AM_RANGE(0xce, 0xce) AM_WRITE(sr_bitmap_yoffs_w)
-	AM_RANGE(0xcf, 0xcf) AM_WRITE(sr_bitmap_xoffs_w)
+	map(0xc8, 0xc8).w(this, FUNC(pc6001sr_state::sr_mode_w));
+	map(0xc9, 0xc9).w(this, FUNC(pc6001sr_state::sr_vram_bank_w));
+	map(0xce, 0xce).w(this, FUNC(pc6001sr_state::sr_bitmap_yoffs_w));
+	map(0xcf, 0xcf).w(this, FUNC(pc6001sr_state::sr_bitmap_xoffs_w));
 
-	AM_RANGE(0xd0, 0xdf) AM_READWRITE(fdc_r,fdc_w) // disk device
+	map(0xd0, 0xdf).rw(this, FUNC(pc6001sr_state::fdc_r), FUNC(pc6001sr_state::fdc_w)); // disk device
 
-	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_DEVREADWRITE("upd7752", upd7752_device, read, write)
+	map(0xe0, 0xe3).mirror(0x0c).rw("upd7752", FUNC(upd7752_device::read), FUNC(upd7752_device::write));
 
 //  AM_RANGE(0xf0, 0xf0) AM_READWRITE(mk2_bank_r0_r, mk2_bank_r0_w)
 //  AM_RANGE(0xf1, 0xf1) AM_READWRITE(mk2_bank_r1_r, mk2_bank_r1_w)
 //  AM_RANGE(0xf2, 0xf2) AM_READWRITE(mk2_bank_w0_r, mk2_bank_w0_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(mk2_0xf3_w)
+	map(0xf3, 0xf3).w(this, FUNC(pc6001sr_state::mk2_0xf3_w));
 //  AM_RANGE(0xf4
 //  AM_RANGE(0xf5
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(mk2_timer_adj_w)
-	AM_RANGE(0xf7, 0xf7) AM_WRITE(mk2_timer_irqv_w)
-ADDRESS_MAP_END
+	map(0xf6, 0xf6).w(this, FUNC(pc6001sr_state::mk2_timer_adj_w));
+	map(0xf7, 0xf7).w(this, FUNC(pc6001sr_state::mk2_timer_irqv_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pc6001 )

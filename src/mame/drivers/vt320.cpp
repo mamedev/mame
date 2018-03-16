@@ -61,12 +61,14 @@ Texas Inst. 749X 75146
 Signetics? 74LS373N
 8-bit D-type latch. This has eight inputs and eight outputs.
 */
-ADDRESS_MAP_START(vt320_state::vt320_mem)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void vt320_state::vt320_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(vt320_state::vt320_io)
-ADDRESS_MAP_END
+void vt320_state::vt320_io(address_map &map)
+{
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vt320 )

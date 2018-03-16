@@ -463,332 +463,349 @@ WRITE8_MEMBER(dec8_state::flip_screen_w){ flip_screen_set(data); }
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(dec8_state::lastmisn_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
-	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
-	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
-	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")   /* Dip 1 */
-	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")   /* Dip 2 */
-	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
-	AM_RANGE(0x1805, 0x1805) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x1806, 0x1806) AM_READ(i8751_h_r)
-	AM_RANGE(0x1807, 0x1807) AM_READWRITE(i8751_l_r, flip_screen_w)
-	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmisn_scrollx_w) /* Scroll LSB */
-	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmisn_scrolly_w) /* Scroll LSB */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x180d, 0x180d) AM_WRITE(lastmisn_control_w) /* Bank switch + Scroll MSB */
-	AM_RANGE(0x180e, 0x180f) AM_WRITE(lastmisn_i8751_w)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_SHARE("bg_data")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::lastmisn_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("share1");
+	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
+	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
+	map(0x1800, 0x1800).portr("IN0");
+	map(0x1801, 0x1801).portr("IN1");
+	map(0x1802, 0x1802).portr("IN2");
+	map(0x1803, 0x1803).portr("DSW0");   /* Dip 1 */
+	map(0x1804, 0x1804).portr("DSW1");   /* Dip 2 */
+	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1805, 0x1805).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
+	map(0x1806, 0x1806).r(this, FUNC(dec8_state::i8751_h_r));
+	map(0x1807, 0x1807).rw(this, FUNC(dec8_state::i8751_l_r), FUNC(dec8_state::flip_screen_w));
+	map(0x1809, 0x1809).w(this, FUNC(dec8_state::lastmisn_scrollx_w)); /* Scroll LSB */
+	map(0x180b, 0x180b).w(this, FUNC(dec8_state::lastmisn_scrolly_w)); /* Scroll LSB */
+	map(0x180c, 0x180c).w(this, FUNC(dec8_state::dec8_sound_w));
+	map(0x180d, 0x180d).w(this, FUNC(dec8_state::lastmisn_control_w)); /* Bank switch + Scroll MSB */
+	map(0x180e, 0x180f).w(this, FUNC(dec8_state::lastmisn_i8751_w));
+	map(0x2000, 0x27ff).ram().w(this, FUNC(dec8_state::dec8_videoram_w)).share("videoram");
+	map(0x2800, 0x2fff).ram().share("spriteram");
+	map(0x3000, 0x37ff).ram().share("share2");
+	map(0x3800, 0x3fff).rw(this, FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w)).share("bg_data");
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(dec8_state::lastmisn_sub_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
-	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
-	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
-	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")   /* Dip 1 */
-	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")   /* Dip 2 */
-	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
-	AM_RANGE(0x1805, 0x1805) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w)
-	AM_RANGE(0x2800, 0x2fff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::lastmisn_sub_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("share1");
+	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
+	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
+	map(0x1800, 0x1800).portr("IN0");
+	map(0x1801, 0x1801).portr("IN1");
+	map(0x1802, 0x1802).portr("IN2");
+	map(0x1803, 0x1803).portr("DSW0");   /* Dip 1 */
+	map(0x1804, 0x1804).portr("DSW1");   /* Dip 2 */
+	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1805, 0x1805).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
+	map(0x1807, 0x1807).w(this, FUNC(dec8_state::flip_screen_w));
+	map(0x180c, 0x180c).w(this, FUNC(dec8_state::dec8_sound_w));
+	map(0x2000, 0x27ff).ram().w(this, FUNC(dec8_state::dec8_videoram_w));
+	map(0x2800, 0x2fff).writeonly().share("spriteram");
+	map(0x3000, 0x37ff).ram().share("share2");
+	map(0x3800, 0x3fff).rw(this, FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w));
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(dec8_state::shackled_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
-	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
-	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
-	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")
-	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
-	AM_RANGE(0x1805, 0x1805) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmisn_scrollx_w) /* Scroll LSB */
-	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmisn_scrolly_w) /* Scroll LSB */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x180d, 0x180d) AM_WRITE(shackled_control_w) /* Bank switch + Scroll MSB */
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_SHARE("bg_data")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::shackled_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("share1");
+	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
+	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
+	map(0x1800, 0x1800).portr("IN0");
+	map(0x1801, 0x1801).portr("IN1");
+	map(0x1802, 0x1802).portr("IN2");
+	map(0x1803, 0x1803).portr("DSW0");
+	map(0x1804, 0x1804).portr("DSW1");
+	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1805, 0x1805).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
+	map(0x1807, 0x1807).w(this, FUNC(dec8_state::flip_screen_w));
+	map(0x1809, 0x1809).w(this, FUNC(dec8_state::lastmisn_scrollx_w)); /* Scroll LSB */
+	map(0x180b, 0x180b).w(this, FUNC(dec8_state::lastmisn_scrolly_w)); /* Scroll LSB */
+	map(0x180c, 0x180c).w(this, FUNC(dec8_state::dec8_sound_w));
+	map(0x180d, 0x180d).w(this, FUNC(dec8_state::shackled_control_w)); /* Bank switch + Scroll MSB */
+	map(0x2000, 0x27ff).ram().w(this, FUNC(dec8_state::dec8_videoram_w));
+	map(0x2800, 0x2fff).ram().share("spriteram");
+	map(0x3000, 0x37ff).ram().share("share2");
+	map(0x3800, 0x3fff).rw(this, FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w)).share("bg_data");
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(dec8_state::shackled_sub_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
-	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
-	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
-	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")
-	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
-	AM_RANGE(0x1805, 0x1805) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x1806, 0x1806) AM_READ(i8751_h_r)
-	AM_RANGE(0x1807, 0x1807) AM_READWRITE(i8751_l_r, flip_screen_w)
-	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmisn_scrollx_w) /* Scroll LSB */
-	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmisn_scrolly_w) /* Scroll LSB */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x180d, 0x180d) AM_WRITE(shackled_control_w) /* Bank switch + Scroll MSB */
-	AM_RANGE(0x180e, 0x180f) AM_WRITE(shackled_i8751_w)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::shackled_sub_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("share1");
+	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
+	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
+	map(0x1800, 0x1800).portr("IN0");
+	map(0x1801, 0x1801).portr("IN1");
+	map(0x1802, 0x1802).portr("IN2");
+	map(0x1803, 0x1803).portr("DSW0");
+	map(0x1804, 0x1804).portr("DSW1");
+	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1805, 0x1805).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
+	map(0x1806, 0x1806).r(this, FUNC(dec8_state::i8751_h_r));
+	map(0x1807, 0x1807).rw(this, FUNC(dec8_state::i8751_l_r), FUNC(dec8_state::flip_screen_w));
+	map(0x1809, 0x1809).w(this, FUNC(dec8_state::lastmisn_scrollx_w)); /* Scroll LSB */
+	map(0x180b, 0x180b).w(this, FUNC(dec8_state::lastmisn_scrolly_w)); /* Scroll LSB */
+	map(0x180c, 0x180c).w(this, FUNC(dec8_state::dec8_sound_w));
+	map(0x180d, 0x180d).w(this, FUNC(dec8_state::shackled_control_w)); /* Bank switch + Scroll MSB */
+	map(0x180e, 0x180f).w(this, FUNC(dec8_state::shackled_i8751_w));
+	map(0x2000, 0x27ff).ram().w(this, FUNC(dec8_state::dec8_videoram_w)).share("videoram");
+	map(0x2800, 0x2fff).ram().share("spriteram");
+	map(0x3000, 0x37ff).ram().share("share2");
+	map(0x3800, 0x3fff).rw(this, FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w));
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(dec8_state::gondo_map)
-	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_SHARE("bg_data")
-	AM_RANGE(0x2800, 0x2bff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram")   /* Sprites */
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")       /* Dip 1 */
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")       /* Dip 2 */
-	AM_RANGE(0x380a, 0x380b) AM_READ(gondo_player_1_r)  /* Player 1 rotary */
-	AM_RANGE(0x380c, 0x380d) AM_READ(gondo_player_2_r)  /* Player 2 rotary */
-	AM_RANGE(0x380e, 0x380e) AM_READ_PORT("IN3")        /* VBL */
-	AM_RANGE(0x380f, 0x380f) AM_READ_PORT("IN2")        /* Fire buttons */
-	AM_RANGE(0x3810, 0x3810) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x3818, 0x382f) AM_WRITE(gondo_scroll_w)
-	AM_RANGE(0x3830, 0x3830) AM_WRITE(ghostb_bank_w) /* Bank + NMI enable */
-	AM_RANGE(0x3838, 0x3838) AM_READ(i8751_h_r)
-	AM_RANGE(0x3839, 0x3839) AM_READ(i8751_l_r)
-	AM_RANGE(0x383a, 0x383b) AM_WRITE(dec8_i8751_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::gondo_map(address_map &map)
+{
+	map(0x0000, 0x17ff).ram();
+	map(0x1800, 0x1fff).ram().w(this, FUNC(dec8_state::dec8_videoram_w)).share("videoram");
+	map(0x2000, 0x27ff).rw(this, FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w)).share("bg_data");
+	map(0x2800, 0x2bff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
+	map(0x2c00, 0x2fff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
+	map(0x3000, 0x37ff).ram().share("spriteram");   /* Sprites */
+	map(0x3800, 0x3800).portr("DSW0");       /* Dip 1 */
+	map(0x3801, 0x3801).portr("DSW1");       /* Dip 2 */
+	map(0x380a, 0x380b).r(this, FUNC(dec8_state::gondo_player_1_r));  /* Player 1 rotary */
+	map(0x380c, 0x380d).r(this, FUNC(dec8_state::gondo_player_2_r));  /* Player 2 rotary */
+	map(0x380e, 0x380e).portr("IN3");        /* VBL */
+	map(0x380f, 0x380f).portr("IN2");        /* Fire buttons */
+	map(0x3810, 0x3810).w(this, FUNC(dec8_state::dec8_sound_w));
+	map(0x3818, 0x382f).w(this, FUNC(dec8_state::gondo_scroll_w));
+	map(0x3830, 0x3830).w(this, FUNC(dec8_state::ghostb_bank_w)); /* Bank + NMI enable */
+	map(0x3838, 0x3838).r(this, FUNC(dec8_state::i8751_h_r));
+	map(0x3839, 0x3839).r(this, FUNC(dec8_state::i8751_l_r));
+	map(0x383a, 0x383b).w(this, FUNC(dec8_state::dec8_i8751_w));
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(dec8_state::garyoret_map)
-	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_SHARE("bg_data")
-	AM_RANGE(0x2800, 0x2bff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram") /* Sprites */
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")   /* Dip 1 */
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")   /* Dip 2 */
-	AM_RANGE(0x3808, 0x3808) AM_READNOP     /* ? */
-	AM_RANGE(0x380a, 0x380a) AM_READ_PORT("IN1")    /* Player 2 + VBL */
-	AM_RANGE(0x380b, 0x380b) AM_READ_PORT("IN0")    /* Player 1 */
-	AM_RANGE(0x3810, 0x3810) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x3818, 0x382f) AM_WRITE(gondo_scroll_w)
-	AM_RANGE(0x3830, 0x3830) AM_WRITE(ghostb_bank_w) /* Bank + NMI enable */
-	AM_RANGE(0x3838, 0x3839) AM_WRITE(dec8_i8751_w)
-	AM_RANGE(0x383a, 0x383a) AM_READ(i8751_h_r)
-	AM_RANGE(0x383b, 0x383b) AM_READ(i8751_l_r)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::garyoret_map(address_map &map)
+{
+	map(0x0000, 0x17ff).ram();
+	map(0x1800, 0x1fff).ram().w(this, FUNC(dec8_state::dec8_videoram_w)).share("videoram");
+	map(0x2000, 0x27ff).rw(this, FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w)).share("bg_data");
+	map(0x2800, 0x2bff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
+	map(0x2c00, 0x2fff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
+	map(0x3000, 0x37ff).ram().share("spriteram"); /* Sprites */
+	map(0x3800, 0x3800).portr("DSW0");   /* Dip 1 */
+	map(0x3801, 0x3801).portr("DSW1");   /* Dip 2 */
+	map(0x3808, 0x3808).nopr();     /* ? */
+	map(0x380a, 0x380a).portr("IN1");    /* Player 2 + VBL */
+	map(0x380b, 0x380b).portr("IN0");    /* Player 1 */
+	map(0x3810, 0x3810).w(this, FUNC(dec8_state::dec8_sound_w));
+	map(0x3818, 0x382f).w(this, FUNC(dec8_state::gondo_scroll_w));
+	map(0x3830, 0x3830).w(this, FUNC(dec8_state::ghostb_bank_w)); /* Bank + NMI enable */
+	map(0x3838, 0x3839).w(this, FUNC(dec8_state::dec8_i8751_w));
+	map(0x383a, 0x383a).r(this, FUNC(dec8_state::i8751_h_r));
+	map(0x383b, 0x383b).r(this, FUNC(dec8_state::i8751_l_r));
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(dec8_state::meikyuh_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x27ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_8bit_r, pf_data_8bit_w)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM // colscroll? mirror?
-	AM_RANGE(0x2c00, 0x2fff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_rowscroll_8bit_r, pf_rowscroll_8bit_w)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")    /* Player 1 */
-	AM_RANGE(0x3800, 0x3800) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")    /* Player 2 */
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN2")    /* Player 3 */
-	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW0")   /* Start buttons + VBL */
-	AM_RANGE(0x3820, 0x3820) AM_READ_PORT("DSW1")   /* Dip */
-	AM_RANGE(0x3820, 0x3827) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control0_8bit_w)
-	AM_RANGE(0x3830, 0x383f) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_control1_8bit_r, pf_control1_8bit_w)
-	AM_RANGE(0x3840, 0x3840) AM_READ(i8751_h_r)
-	AM_RANGE(0x3840, 0x3840) AM_WRITE(ghostb_bank_w)
-	AM_RANGE(0x3860, 0x3860) AM_READ(i8751_l_r)
-	AM_RANGE(0x3860, 0x3861) AM_WRITE(dec8_i8751_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::meikyuh_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x17ff).ram();
+	map(0x1800, 0x1fff).ram().w(this, FUNC(dec8_state::dec8_videoram_w)).share("videoram");
+	map(0x2000, 0x27ff).rw("tilegen1", FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x2800, 0x2bff).ram(); // colscroll? mirror?
+	map(0x2c00, 0x2fff).rw("tilegen1", FUNC(deco_bac06_device::pf_rowscroll_8bit_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_w));
+	map(0x3000, 0x37ff).ram().share("spriteram");
+	map(0x3800, 0x3800).portr("IN0");    /* Player 1 */
+	map(0x3800, 0x3800).w(this, FUNC(dec8_state::dec8_sound_w));
+	map(0x3801, 0x3801).portr("IN1");    /* Player 2 */
+	map(0x3802, 0x3802).portr("IN2");    /* Player 3 */
+	map(0x3803, 0x3803).portr("DSW0");   /* Start buttons + VBL */
+	map(0x3820, 0x3820).portr("DSW1");   /* Dip */
+	map(0x3820, 0x3827).w("tilegen1", FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x3830, 0x383f).rw("tilegen1", FUNC(deco_bac06_device::pf_control1_8bit_r), FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x3840, 0x3840).r(this, FUNC(dec8_state::i8751_h_r));
+	map(0x3840, 0x3840).w(this, FUNC(dec8_state::ghostb_bank_w));
+	map(0x3860, 0x3860).r(this, FUNC(dec8_state::i8751_l_r));
+	map(0x3860, 0x3861).w(this, FUNC(dec8_state::dec8_i8751_w));
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(dec8_state::csilver_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN1")
-	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN0")
-	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("IN2")
-	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")   /* Dip 2 */
-	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
-	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("DSW0") AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* Dip 1, DMA */
-	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x1808, 0x180b) AM_WRITE(dec8_scroll2_w)
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x180d, 0x180d) AM_WRITE(csilver_control_w)
-	AM_RANGE(0x180e, 0x180f) AM_WRITE(csilver_i8751_w)
-	AM_RANGE(0x1c00, 0x1c00) AM_READ(i8751_h_r)
-	AM_RANGE(0x1e00, 0x1e00) AM_READ(i8751_l_r)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_SHARE("bg_data")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::csilver_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("share1");
+	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
+	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
+	map(0x1800, 0x1800).portr("IN1");
+	map(0x1801, 0x1801).portr("IN0");
+	map(0x1803, 0x1803).portr("IN2");
+	map(0x1804, 0x1804).portr("DSW1");   /* Dip 2 */
+	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1805, 0x1805).portr("DSW0").w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* Dip 1, DMA */
+	map(0x1807, 0x1807).w(this, FUNC(dec8_state::flip_screen_w));
+	map(0x1808, 0x180b).w(this, FUNC(dec8_state::dec8_scroll2_w));
+	map(0x180c, 0x180c).w(this, FUNC(dec8_state::dec8_sound_w));
+	map(0x180d, 0x180d).w(this, FUNC(dec8_state::csilver_control_w));
+	map(0x180e, 0x180f).w(this, FUNC(dec8_state::csilver_i8751_w));
+	map(0x1c00, 0x1c00).r(this, FUNC(dec8_state::i8751_h_r));
+	map(0x1e00, 0x1e00).r(this, FUNC(dec8_state::i8751_l_r));
+	map(0x2000, 0x27ff).ram().w(this, FUNC(dec8_state::dec8_videoram_w));
+	map(0x2800, 0x2fff).ram().share("spriteram");
+	map(0x3000, 0x37ff).ram().share("share2");
+	map(0x3800, 0x3fff).rw(this, FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w)).share("bg_data");
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(dec8_state::csilver_sub_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("IN2")
-	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
-	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("DSW0") AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::csilver_sub_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("share1");
+	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
+	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
+	map(0x1803, 0x1803).portr("IN2");
+	map(0x1804, 0x1804).portr("DSW1");
+	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1805, 0x1805).portr("DSW0").w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
+	map(0x180c, 0x180c).w(this, FUNC(dec8_state::dec8_sound_w));
+	map(0x2000, 0x27ff).ram().w(this, FUNC(dec8_state::dec8_videoram_w)).share("videoram");
+	map(0x2800, 0x2fff).ram().share("spriteram");
+	map(0x3000, 0x37ff).ram().share("share2");
+	map(0x3800, 0x3fff).rw(this, FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w));
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(dec8_state::oscar_map)
-	AM_RANGE(0x0000, 0x0eff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x0f00, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2800, 0x2fff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_8bit_r, pf_data_8bit_w)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram") /* Sprites */
-	AM_RANGE(0x3800, 0x3bff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x3c00, 0x3c00) AM_READ_PORT("IN0")
-	AM_RANGE(0x3c01, 0x3c01) AM_READ_PORT("IN1")
-	AM_RANGE(0x3c02, 0x3c02) AM_READ_PORT("IN2")    /* VBL & coins */
-	AM_RANGE(0x3c03, 0x3c03) AM_READ_PORT("DSW0")   /* Dip 1 */
-	AM_RANGE(0x3c04, 0x3c04) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3c00, 0x3c07) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control0_8bit_w)
-	AM_RANGE(0x3c10, 0x3c1f) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control1_8bit_w)
-	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w)   /* DMA */
-	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(dec8_bank_w)          /* BNKS */
-	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(dec8_sound_w)         /* SOUN */
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITENOP            /* COINCL */
-	AM_RANGE(0x3e80, 0x3e83) AM_WRITE(oscar_int_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::oscar_map(address_map &map)
+{
+	map(0x0000, 0x0eff).ram().share("share1");
+	map(0x0f00, 0x0fff).ram();
+	map(0x1000, 0x1fff).ram().share("share2");
+	map(0x2000, 0x27ff).ram().w(this, FUNC(dec8_state::dec8_videoram_w)).share("videoram");
+	map(0x2800, 0x2fff).rw("tilegen1", FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x3000, 0x37ff).ram().share("spriteram"); /* Sprites */
+	map(0x3800, 0x3bff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
+	map(0x3c00, 0x3c00).portr("IN0");
+	map(0x3c01, 0x3c01).portr("IN1");
+	map(0x3c02, 0x3c02).portr("IN2");    /* VBL & coins */
+	map(0x3c03, 0x3c03).portr("DSW0");   /* Dip 1 */
+	map(0x3c04, 0x3c04).portr("DSW1");
+	map(0x3c00, 0x3c07).w("tilegen1", FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x3c10, 0x3c1f).w("tilegen1", FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x3c80, 0x3c80).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w));   /* DMA */
+	map(0x3d00, 0x3d00).w(this, FUNC(dec8_state::dec8_bank_w));          /* BNKS */
+	map(0x3d80, 0x3d80).w(this, FUNC(dec8_state::dec8_sound_w));         /* SOUN */
+	map(0x3e00, 0x3e00).nopw();            /* COINCL */
+	map(0x3e80, 0x3e83).w(this, FUNC(dec8_state::oscar_int_w));
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(dec8_state::oscar_sub_map)
-	AM_RANGE(0x0000, 0x0eff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x0f00, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3e80, 0x3e83) AM_WRITE(oscar_int_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::oscar_sub_map(address_map &map)
+{
+	map(0x0000, 0x0eff).ram().share("share1");
+	map(0x0f00, 0x0fff).ram();
+	map(0x1000, 0x1fff).ram().share("share2");
+	map(0x3e80, 0x3e83).w(this, FUNC(dec8_state::oscar_int_w));
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(dec8_state::srdarwin_map)
-	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(srdarwin_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-	AM_RANGE(0x1400, 0x17ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_SHARE("bg_data")
-	AM_RANGE(0x1800, 0x1801) AM_WRITE(dec8_i8751_w)
-	AM_RANGE(0x1802, 0x1802) AM_WRITE(i8751_reset_w)        /* Maybe.. */
-	AM_RANGE(0x1803, 0x1803) AM_WRITENOP            /* NMI ack */
-	AM_RANGE(0x1804, 0x1804) AM_DEVWRITE("spriteram", buffered_spriteram8_device, write) /* DMA */
-	AM_RANGE(0x1805, 0x1806) AM_WRITE(srdarwin_control_w) /* Scroll & Bank */
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE(i8751_h_r, dec8_sound_w)  /* Sound */
-	AM_RANGE(0x2001, 0x2001) AM_READWRITE(i8751_l_r, flip_screen_w)     /* Flipscreen */
-	AM_RANGE(0x2800, 0x288f) AM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x3000, 0x308f) AM_DEVWRITE("palette", deco_rmc3_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")   /* Dip 1 */
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN0")    /* Player 1 */
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN1")    /* Player 2 (cocktail) + VBL */
-	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1")   /* Dip 2 */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::srdarwin_map(address_map &map)
+{
+	map(0x0000, 0x05ff).ram();
+	map(0x0600, 0x07ff).ram().share("spriteram");
+	map(0x0800, 0x0fff).ram().w(this, FUNC(dec8_state::srdarwin_videoram_w)).share("videoram");
+	map(0x1000, 0x13ff).ram();
+	map(0x1400, 0x17ff).rw(this, FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w)).share("bg_data");
+	map(0x1800, 0x1801).w(this, FUNC(dec8_state::dec8_i8751_w));
+	map(0x1802, 0x1802).w(this, FUNC(dec8_state::i8751_reset_w));        /* Maybe.. */
+	map(0x1803, 0x1803).nopw();            /* NMI ack */
+	map(0x1804, 0x1804).w(m_spriteram, FUNC(buffered_spriteram8_device::write)); /* DMA */
+	map(0x1805, 0x1806).w(this, FUNC(dec8_state::srdarwin_control_w)); /* Scroll & Bank */
+	map(0x2000, 0x2000).rw(this, FUNC(dec8_state::i8751_h_r), FUNC(dec8_state::dec8_sound_w));  /* Sound */
+	map(0x2001, 0x2001).rw(this, FUNC(dec8_state::i8751_l_r), FUNC(dec8_state::flip_screen_w));     /* Flipscreen */
+	map(0x2800, 0x288f).w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
+	map(0x3000, 0x308f).w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
+	map(0x3800, 0x3800).portr("DSW0");   /* Dip 1 */
+	map(0x3801, 0x3801).portr("IN0");    /* Player 1 */
+	map(0x3802, 0x3802).portr("IN1");    /* Player 2 (cocktail) + VBL */
+	map(0x3803, 0x3803).portr("DSW1");   /* Dip 2 */
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(dec8_state::cobra_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_8bit_r, pf_data_8bit_w)
-	AM_RANGE(0x1000, 0x17ff) AM_DEVREADWRITE("tilegen2", deco_bac06_device, pf_data_8bit_r, pf_data_8bit_w)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x31ff) AM_RAM_DEVWRITE("palette", deco_rmc3_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x3200, 0x37ff) AM_WRITEONLY /* Unused */
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")    /* Player 1 */
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")    /* Player 2 */
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW0")   /* Dip 1 */
-	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1")   /* Dip 2 */
-	AM_RANGE(0x3800, 0x3807) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control0_8bit_w)
-	AM_RANGE(0x3810, 0x381f) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control1_8bit_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_READ_PORT("IN2")    /* VBL & coins */
-	AM_RANGE(0x3a00, 0x3a07) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control0_8bit_w)
-	AM_RANGE(0x3a10, 0x3a1f) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control1_8bit_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(dec8_bank_w)
-	AM_RANGE(0x3c02, 0x3c02) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::cobra_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0fff).rw("tilegen1", FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x1000, 0x17ff).rw("tilegen2", FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x1800, 0x1fff).ram();
+	map(0x2000, 0x27ff).ram().w(this, FUNC(dec8_state::dec8_videoram_w)).share("videoram");
+	map(0x2800, 0x2fff).ram().share("spriteram");
+	map(0x3000, 0x31ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
+	map(0x3200, 0x37ff).writeonly(); /* Unused */
+	map(0x3800, 0x3800).portr("IN0");    /* Player 1 */
+	map(0x3801, 0x3801).portr("IN1");    /* Player 2 */
+	map(0x3802, 0x3802).portr("DSW0");   /* Dip 1 */
+	map(0x3803, 0x3803).portr("DSW1");   /* Dip 2 */
+	map(0x3800, 0x3807).w("tilegen1", FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x3810, 0x381f).w("tilegen1", FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x3a00, 0x3a00).portr("IN2");    /* VBL & coins */
+	map(0x3a00, 0x3a07).w("tilegen2", FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x3a10, 0x3a1f).w("tilegen2", FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x3c00, 0x3c00).w(this, FUNC(dec8_state::dec8_bank_w));
+	map(0x3c02, 0x3c02).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
+	map(0x3e00, 0x3e00).w(this, FUNC(dec8_state::dec8_sound_w));
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0xffff).rom();
+}
 
 /******************************************************************************/
 
 /* Used for Cobra Command, Maze Hunter, Super Real Darwin etc */
-ADDRESS_MAP_START(dec8_state::dec8_s_map)
-	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym2", ym3812_device, write)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::dec8_s_map(address_map &map)
+{
+	map(0x0000, 0x05ff).ram();
+	map(0x2000, 0x2001).w("ym1", FUNC(ym2203_device::write));
+	map(0x4000, 0x4001).w("ym2", FUNC(ym3812_device::write));
+	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x8000, 0xffff).rom();
+}
 
 /* Used by Gondomania, Psycho-Nics Oscar & Garyo Retsuden */
-ADDRESS_MAP_START(dec8_state::oscar_s_map)
-	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym2", ym3526_device, write)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::oscar_s_map(address_map &map)
+{
+	map(0x0000, 0x05ff).ram();
+	map(0x2000, 0x2001).w("ym1", FUNC(ym2203_device::write));
+	map(0x4000, 0x4001).w("ym2", FUNC(ym3526_device::write));
+	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x8000, 0xffff).rom();
+}
 
 /* Used by Last Mission, Shackled & Breywood */
-ADDRESS_MAP_START(dec8_state::ym3526_s_map)
-	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3526_device, write)
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::ym3526_s_map(address_map &map)
+{
+	map(0x0000, 0x05ff).ram();
+	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
+	map(0x1000, 0x1001).w("ym2", FUNC(ym3526_device::write));
+	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x8000, 0xffff).rom();
+}
 
 /* Captain Silver - same sound system as Pocket Gal */
-ADDRESS_MAP_START(dec8_state::csilver_s_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3526_device, write)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(csilver_adpcm_data_w) /* ADPCM data for the MSM5205 chip */
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(csilver_sound_bank_w)
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x3400, 0x3400) AM_READ(csilver_adpcm_reset_r) /* ? not sure */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("soundbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dec8_state::csilver_s_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
+	map(0x1000, 0x1001).w("ym2", FUNC(ym3526_device::write));
+	map(0x1800, 0x1800).w(this, FUNC(dec8_state::csilver_adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
+	map(0x2000, 0x2000).w(this, FUNC(dec8_state::csilver_sound_bank_w));
+	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x3400, 0x3400).r(this, FUNC(dec8_state::csilver_adpcm_reset_r)); /* ? not sure */
+	map(0x4000, 0x7fff).bankr("soundbank");
+	map(0x8000, 0xffff).rom();
+}
 
 /******************************************************************************/
 

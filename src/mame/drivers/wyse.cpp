@@ -46,13 +46,15 @@ private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(wyse_state::mem_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void wyse_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0xc000, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(wyse_state::io_map)
-ADDRESS_MAP_END
+void wyse_state::io_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( wyse )
 INPUT_PORTS_END

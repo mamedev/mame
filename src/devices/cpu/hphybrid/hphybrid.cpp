@@ -105,8 +105,8 @@ enum {
 // Part of r32-r37 that is actually output as address extension (6 bits of "BSC": block select code)
 #define BSC_REG_MASK    0x3f
 
-DEFINE_DEVICE_TYPE(HP_5061_3001, hp_5061_3001_cpu_device, "5061_3001", "HP-5061-3001")
-DEFINE_DEVICE_TYPE(HP_5061_3011, hp_5061_3011_cpu_device, "5061_3011", "HP-5061-3011")
+DEFINE_DEVICE_TYPE(HP_5061_3001, hp_5061_3001_cpu_device, "5061_3001", "Hewlett-Packard HP-5061-3001")
+DEFINE_DEVICE_TYPE(HP_5061_3011, hp_5061_3011_cpu_device, "5061_3011", "Hewlett-Packard HP-5061-3011")
 
 WRITE_LINE_MEMBER(hp_hybrid_cpu_device::dmar_w)
 {

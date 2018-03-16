@@ -122,6 +122,7 @@ public:
 	void atom(machine_config &config);
 	void atom_mem(address_map &map);
 	void atombb_mem(address_map &map);
+	void prophet_mem(address_map &map);
 };
 
 class atomeb_state : public atom_state

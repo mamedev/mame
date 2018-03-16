@@ -191,22 +191,23 @@ READ8_MEMBER(exerion_state::exerion_protection_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(exerion_state::main_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("main_ram")
-	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8800, 0x887f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x8880, 0x8bff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(exerion_videoreg_w)
-	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xd802, 0xd802) AM_DEVREAD("ay2", ay8910_device, data_r)
-ADDRESS_MAP_END
+void exerion_state::main_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x67ff).ram().share("main_ram");
+	map(0x6008, 0x600b).r(this, FUNC(exerion_state::exerion_protection_r));
+	map(0x8000, 0x87ff).ram().share("videoram");
+	map(0x8800, 0x887f).ram().share("spriteram");
+	map(0x8880, 0x8bff).ram();
+	map(0xa000, 0xa000).portr("IN0");
+	map(0xa800, 0xa800).portr("DSW0");
+	map(0xb000, 0xb000).portr("DSW1");
+	map(0xc000, 0xc000).w(this, FUNC(exerion_state::exerion_videoreg_w));
+	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xd000, 0xd001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0xd800, 0xd801).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xd802, 0xd802).r("ay2", FUNC(ay8910_device::data_r));
+}
 
 
 
@@ -216,13 +217,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(exerion_state::sub_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x800c) AM_WRITE(exerion_video_latch_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(exerion_video_timing_r)
-ADDRESS_MAP_END
+void exerion_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x800c).w(this, FUNC(exerion_state::exerion_video_latch_w));
+	map(0xa000, 0xa000).r(this, FUNC(exerion_state::exerion_video_timing_r));
+}
 
 
 
@@ -404,6 +406,11 @@ MACHINE_CONFIG_START(exerion_state::exerion)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(exerion_state::irion)
+	exerion(config);
+	MCFG_DEVICE_REMOVE("sub")
+MACHINE_CONFIG_END
+
 
 
 /*************************************
@@ -502,6 +509,29 @@ ROM_START( exerionb )
 	ROM_LOAD( "exerion.k4",   0x0320, 0x0100, CRC(ffc2ba43) SHA1(03be1c41d6ac3fc11439caef04ef5ffa60d6aec4) ) /* bg char mixer */
 ROM_END
 
+ROM_START( irion )
+	ROM_REGION( 0x6000, "maincpu", 0 )
+	ROM_LOAD( "2.bin",        0x0000, 0x2000, CRC(bf55324e) SHA1(a310e953cc80d09111ba104f21461420ae3abcd5) )
+	ROM_LOAD( "3.bin",        0x2000, 0x2000, CRC(0625bb49) SHA1(111edb1da2153c853d89e56a89ef813cee559730) )
+	ROM_LOAD( "4.bin",        0x4000, 0x2000, CRC(918a9b1d) SHA1(e515f1b9c5ddda8115e68e8a499b252b09774bb6) )
+
+	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_LOAD( "1.bin",        0x0000, 0x2000, CRC(56cd5ebf) SHA1(58d84c2dc3b3bac7371da5b9a230fa581ead31dc) )
+
+	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_LOAD( "5.bin",        0x0000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
+	ROM_LOAD( "6.bin",        0x2000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) )
+
+	ROM_REGION( 0x08000, "gfx3", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0420, "proms", 0 ) // these are assumed to be on the board - the game won't run without them
+	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) /* palette */
+	ROM_LOAD( "exerion.i8",   0x0020, 0x0100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) /* fg char lookup table */
+	ROM_LOAD( "exerion.h10",  0x0120, 0x0100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) /* sprite lookup table */
+	ROM_LOAD( "exerion.i3",   0x0220, 0x0100, CRC(fe72ab79) SHA1(048a72e6db4768df687df927acaa70ef906b3dc0) ) /* bg char lookup table */
+	ROM_LOAD( "exerion.k4",   0x0320, 0x0100, CRC(ffc2ba43) SHA1(03be1c41d6ac3fc11439caef04ef5ffa60d6aec4) ) /* bg char mixer */
+ROM_END
+
 
 /*************************************
  *
@@ -569,6 +599,26 @@ DRIVER_INIT_MEMBER(exerion_state,exerionb)
 	DRIVER_INIT_CALL(exerion);
 }
 
+DRIVER_INIT_MEMBER(exerion_state, irion)
+{
+	// convert the gfx and cpu roms like in ExerionB
+	DRIVER_INIT_CALL(exerionb);
+
+	// a further unscramble of gfx2
+	uint8_t *ram = memregion("gfx2")->base();
+	u16 i,j;
+	u8 k;
+	for (i = 0; i < 0x4000; i += 0x400)
+	{
+		for (j = 0; j < 0x200; j++)
+		{
+			k = ram[i+j];
+			ram[i+j] = ram[i+j+0x200];
+			ram[i+j+0x200] = k;
+		}
+	}
+}
+
 
 
 /*************************************
@@ -580,3 +630,4 @@ DRIVER_INIT_MEMBER(exerion_state,exerionb)
 GAME( 1983, exerion,  0,       exerion, exerion, exerion_state, exerion,  ROT90, "Jaleco", "Exerion", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, exeriont, exerion, exerion, exerion, exerion_state, exerion,  ROT90, "Jaleco (Taito America license)", "Exerion (Taito)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, exerionb, exerion, exerion, exerion, exerion_state, exerionb, ROT90, "bootleg", "Exerion (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, irion,    exerion, irion,   exerion, exerion_state, irion,    ROT90, "bootleg", "Irion", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

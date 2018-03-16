@@ -105,50 +105,54 @@ WRITE_LINE_MEMBER(pitnrun_state::vflip_w)
 	flip_screen_y_set(state);
 }
 
-ADDRESS_MAP_START(pitnrun_state::pitnrun_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa800, 0xa807) AM_DEVWRITE("noiselatch", ls259_device, write_d0) /* Analog Sound */
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
-	AM_RANGE(0xb000, 0xb007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("INPUTS") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc800, 0xc801) AM_WRITE(scroll_w)
-	AM_RANGE(0xc802, 0xc802) AM_WRITE(scroll_y_w)
+void pitnrun_state::pitnrun_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8fff).ram().w(this, FUNC(pitnrun_state::videoram_w)).share("videoram");
+	map(0x9000, 0x9fff).ram().w(this, FUNC(pitnrun_state::videoram2_w)).share("videoram2");
+	map(0xa000, 0xa0ff).ram().share("spriteram");
+	map(0xa800, 0xa800).portr("SYSTEM");
+	map(0xa800, 0xa807).w("noiselatch", FUNC(ls259_device::write_d0)); /* Analog Sound */
+	map(0xb000, 0xb000).portr("DSW");
+	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xb800, 0xb800).portr("INPUTS").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc800, 0xc801).w(this, FUNC(pitnrun_state::scroll_w));
+	map(0xc802, 0xc802).w(this, FUNC(pitnrun_state::scroll_y_w));
 	//AM_RANGE(0xc804, 0xc804) AM_WRITE(mcu_data_w)
-	AM_RANGE(0xc805, 0xc805) AM_WRITE(h_heed_w)
-	AM_RANGE(0xc806, 0xc806) AM_WRITE(v_heed_w)
-	AM_RANGE(0xc807, 0xc807) AM_WRITE(ha_w)
+	map(0xc805, 0xc805).w(this, FUNC(pitnrun_state::h_heed_w));
+	map(0xc806, 0xc806).w(this, FUNC(pitnrun_state::v_heed_w));
+	map(0xc807, 0xc807).w(this, FUNC(pitnrun_state::ha_w));
 	//AM_RANGE(0xd000, 0xd000) AM_READ(mcu_data_r)
 	//AM_RANGE(0xd800, 0xd800) AM_READ(mcu_status_r)
-	AM_RANGE(0xf000, 0xf000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-ADDRESS_MAP_END
+	map(0xf000, 0xf000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
-ADDRESS_MAP_START(pitnrun_state::pitnrun_map_mcu)
-	AM_IMPORT_FROM(pitnrun_map)
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(mcu_data_w)
-	AM_RANGE(0xd000, 0xd000) AM_READ(mcu_data_r)
-	AM_RANGE(0xd800, 0xd800) AM_READ(mcu_status_r)
-ADDRESS_MAP_END
+void pitnrun_state::pitnrun_map_mcu(address_map &map)
+{
+	pitnrun_map(map);
+	map(0xc804, 0xc804).w(this, FUNC(pitnrun_state::mcu_data_w));
+	map(0xd000, 0xd000).r(this, FUNC(pitnrun_state::mcu_data_r));
+	map(0xd800, 0xd800).r(this, FUNC(pitnrun_state::mcu_status_r));
+}
 
-ADDRESS_MAP_START(pitnrun_state::pitnrun_sound_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM
-ADDRESS_MAP_END
+void pitnrun_state::pitnrun_sound_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3800, 0x3bff).ram();
+}
 
-ADDRESS_MAP_START(pitnrun_state::pitnrun_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
-	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x8f, 0x8f) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x90, 0x96) AM_WRITENOP
-	AM_RANGE(0x97, 0x97) AM_WRITENOP
-	AM_RANGE(0x98, 0x98) AM_WRITENOP
-ADDRESS_MAP_END
+void pitnrun_state::pitnrun_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
+	map(0x8c, 0x8d).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x8e, 0x8f).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x8f, 0x8f).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x90, 0x96).nopw();
+	map(0x97, 0x97).nopw();
+	map(0x98, 0x98).nopw();
+}
 
 
 static INPUT_PORTS_START( pitnrun )

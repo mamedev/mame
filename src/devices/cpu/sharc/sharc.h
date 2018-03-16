@@ -589,6 +589,7 @@ private:
 	inline void compute_fmul_float_scaled(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_fix_scaled(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_avg(int fm, int fxm, int fym, int fa, int fxa, int fya);
+	inline void compute_fmul_abs(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_fmax(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_fmin(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_dual_fadd_fsub(int fm, int fxm, int fym, int fa, int fs, int fxa, int fya);

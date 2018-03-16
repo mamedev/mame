@@ -158,13 +158,14 @@ private:
 	virtual void machine_start () override;
 };
 
-ADDRESS_MAP_START(kron180_state::kron180_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x0000, 0x7fff) AM_ROM AM_REGION("roms", 0x8000)
-	AM_RANGE (0x8000, 0x85ff) AM_RAM AM_MIRROR(0x6000)
-	AM_RANGE (0x8600, 0x95ff) AM_RAM AM_SHARE("videoram") AM_MIRROR(0x6000)
-	AM_RANGE (0x9600, 0x9fff) AM_RAM AM_MIRROR(0x6000)
-ADDRESS_MAP_END
+void kron180_state::kron180_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom().region("roms", 0x8000);
+	map(0x8000, 0x85ff).ram().mirror(0x6000);
+	map(0x8600, 0x95ff).ram().share("videoram").mirror(0x6000);
+	map(0x9600, 0x9fff).ram().mirror(0x6000);
+}
 
 /*   IO decoding
  *
@@ -196,17 +197,18 @@ ADDRESS_MAP_END
  *
  * At the moment we emulate the screen at a high level so I just disregard the special functions on A16 - A18 by mirroring the mapping below
  */
-ADDRESS_MAP_START(kron180_state::kron180_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x0000, 0x000f ) AM_WRITE(sn74259_w)
-	AM_RANGE( 0x0010, 0x001f ) AM_READWRITE(ap5_r, ap5_w)
-	AM_RANGE( 0x0020, 0x002f ) AM_WRITE(wkb_w)
-	AM_RANGE( 0x0030, 0x003f ) AM_READ(sn74299_r)
-	AM_RANGE( 0x0040, 0x004f ) AM_WRITE(sn74299_w)
-	AM_RANGE( 0x0050, 0x005f ) AM_WRITE(txen_w)
-	AM_RANGE( 0x0060, 0x006f ) AM_WRITE(kbd_reset_w)
-	AM_RANGE( 0x0070, 0x007f ) AM_WRITE(dreq_w)
-ADDRESS_MAP_END
+void kron180_state::kron180_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x000f).w(this, FUNC(kron180_state::sn74259_w));
+	map(0x0010, 0x001f).rw(this, FUNC(kron180_state::ap5_r), FUNC(kron180_state::ap5_w));
+	map(0x0020, 0x002f).w(this, FUNC(kron180_state::wkb_w));
+	map(0x0030, 0x003f).r(this, FUNC(kron180_state::sn74299_r));
+	map(0x0040, 0x004f).w(this, FUNC(kron180_state::sn74299_w));
+	map(0x0050, 0x005f).w(this, FUNC(kron180_state::txen_w));
+	map(0x0060, 0x006f).w(this, FUNC(kron180_state::kbd_reset_w));
+	map(0x0070, 0x007f).w(this, FUNC(kron180_state::dreq_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START (kron180)

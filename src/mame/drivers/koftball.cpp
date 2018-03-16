@@ -149,36 +149,38 @@ WRITE16_MEMBER(koftball_state::bmc_2_videoram_w)
 	m_tilemap_2->mark_tile_dirty(offset);
 }
 
-ADDRESS_MAP_START(koftball_state::koftball_mem)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x220000, 0x22ffff) AM_RAM AM_SHARE("main_ram")
+void koftball_state::koftball_mem(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x220000, 0x22ffff).ram().share("main_ram");
 
-	AM_RANGE(0x260000, 0x260fff) AM_WRITE(bmc_1_videoram_w) AM_SHARE("bmc_1_videoram")
-	AM_RANGE(0x261000, 0x261fff) AM_WRITE(bmc_2_videoram_w) AM_SHARE("bmc_2_videoram")
-	AM_RANGE(0x262000, 0x26ffff) AM_RAM
+	map(0x260000, 0x260fff).w(this, FUNC(koftball_state::bmc_1_videoram_w)).share("bmc_1_videoram");
+	map(0x261000, 0x261fff).w(this, FUNC(koftball_state::bmc_2_videoram_w)).share("bmc_2_videoram");
+	map(0x262000, 0x26ffff).ram();
 
-	AM_RANGE(0x280000, 0x28ffff) AM_RAM /* unused ? */
-	AM_RANGE(0x2a0000, 0x2a001f) AM_WRITENOP
-	AM_RANGE(0x2a0000, 0x2a001f) AM_READ(random_number_r)
-	AM_RANGE(0x2b0000, 0x2b0003) AM_READ(random_number_r)
-	AM_RANGE(0x2d8000, 0x2d8001) AM_READ(random_number_r)
-	AM_RANGE(0x2da000, 0x2da003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)
+	map(0x280000, 0x28ffff).ram(); /* unused ? */
+	map(0x2a0000, 0x2a001f).nopw();
+	map(0x2a0000, 0x2a001f).r(this, FUNC(koftball_state::random_number_r));
+	map(0x2b0000, 0x2b0003).r(this, FUNC(koftball_state::random_number_r));
+	map(0x2d8000, 0x2d8001).r(this, FUNC(koftball_state::random_number_r));
+	map(0x2da000, 0x2da003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);
 
-	AM_RANGE(0x2db000, 0x2db001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x2db002, 0x2db003) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x2db004, 0x2db005) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+	map(0x2db001, 0x2db001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x2db003, 0x2db003).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x2db005, 0x2db005).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0x2dc000, 0x2dc001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0x2f0000, 0x2f0003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x300000, 0x300001) AM_WRITENOP
-	AM_RANGE(0x320000, 0x320001) AM_WRITENOP
-	AM_RANGE(0x340000, 0x340001) AM_READ(prot_r)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(prot_w)
-ADDRESS_MAP_END
+	map(0x2dc000, 0x2dc000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x2f0000, 0x2f0003).portr("INPUTS");
+	map(0x300000, 0x300001).nopw();
+	map(0x320000, 0x320001).nopw();
+	map(0x340000, 0x340001).r(this, FUNC(koftball_state::prot_r));
+	map(0x360000, 0x360001).w(this, FUNC(koftball_state::prot_w));
+}
 
-ADDRESS_MAP_START(koftball_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void koftball_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 static INPUT_PORTS_START( koftball )
 	PORT_START("INPUTS")

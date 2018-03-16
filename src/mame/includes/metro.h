@@ -26,25 +26,27 @@ public:
 	};
 
 	metro_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_oki(*this, "oki"),
-		m_ymsnd(*this, "ymsnd"),
-		m_essnd(*this, "essnd"),
-		m_vdp(*this, "vdp"),
-		m_vdp2(*this, "vdp2"),
-		m_vdp3(*this, "vdp3"),
-		m_k053936(*this, "k053936") ,
-		m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch"),
-		m_irq_enable(*this, "irq_enable"),
-		m_irq_levels(*this, "irq_levels"),
-		m_irq_vectors(*this, "irq_vectors"),
-		m_input_sel(*this, "input_sel"),
-		m_k053936_ram(*this, "k053936_ram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_oki(*this, "oki")
+		, m_ymsnd(*this, "ymsnd")
+		, m_essnd(*this, "essnd")
+		, m_vdp(*this, "vdp")
+		, m_vdp2(*this, "vdp2")
+		, m_vdp3(*this, "vdp3")
+		, m_k053936(*this, "k053936")
+		, m_eeprom(*this, "eeprom")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_soundlatch(*this, "soundlatch")
+		, m_irq_enable(*this, "irq_enable")
+		, m_irq_levels(*this, "irq_levels")
+		, m_irq_vectors(*this, "irq_vectors")
+		, m_input_sel(*this, "input_sel")
+		, m_k053936_ram(*this, "k053936_ram")
+		, m_audiobank(*this, "audiobank")
+		, m_okibank(*this, "okibank")
 	{ }
 
 	DECLARE_READ16_MEMBER(metro_irq_cause_r);
@@ -63,7 +65,6 @@ public:
 	DECLARE_WRITE16_MEMBER(metro_coin_lockout_4words_w);
 	DECLARE_READ16_MEMBER(balcube_dsw_r);
 	DECLARE_READ16_MEMBER(gakusai_input_r);
-	DECLARE_WRITE16_MEMBER(blzntrnd_sound_w);
 	DECLARE_WRITE8_MEMBER(blzntrnd_sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(puzzlet_irq_enable_w);
 	DECLARE_WRITE16_MEMBER(puzzlet_portb_w);
@@ -85,7 +86,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vmetal_es8712_irq);
 
 	DECLARE_DRIVER_INIT(karatour);
-	DECLARE_DRIVER_INIT(daitorid);
 	DECLARE_DRIVER_INIT(blzntrnd);
 	DECLARE_DRIVER_INIT(vmetal);
 	DECLARE_DRIVER_INIT(mouja);
@@ -203,6 +203,9 @@ private:
 	optional_shared_ptr<uint16_t> m_input_sel;
 	optional_shared_ptr<uint16_t> m_k053936_ram;
 
+	optional_memory_bank m_audiobank;
+	optional_memory_bank m_okibank;
+
 	/* video-related */
 	tilemap_t   *m_k053936_tilemap;
 
@@ -219,6 +222,7 @@ private:
 	int         m_porta;
 	int         m_portb;
 	int         m_busy_sndcpu;
+	int         m_essnd_bank;
 	bool        m_essnd_gate;
 
 	/* misc */

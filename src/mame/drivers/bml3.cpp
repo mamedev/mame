@@ -401,70 +401,73 @@ WRITE_LINE_MEMBER(bml3_state::bml3bus_firq_w)
 }
 
 
-ADDRESS_MAP_START(bml3_state::bml3_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x43ff) AM_READWRITE(bml3_vram_r,bml3_vram_w)
-	AM_RANGE(0x4400, 0x9fff) AM_RAM
-	AM_RANGE(0xff40, 0xff46) AM_NOP // lots of unknown reads and writes
-	AM_RANGE(0xffc0, 0xffc3) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xffc4, 0xffc5) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0xffc6, 0xffc7) AM_READWRITE(bml3_6845_r,bml3_6845_w)
+void bml3_state::bml3_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x43ff).rw(this, FUNC(bml3_state::bml3_vram_r), FUNC(bml3_state::bml3_vram_w));
+	map(0x4400, 0x9fff).ram();
+	map(0xff40, 0xff46).noprw(); // lots of unknown reads and writes
+	map(0xffc0, 0xffc3).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xffc4, 0xffc5).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xffc6, 0xffc7).rw(this, FUNC(bml3_state::bml3_6845_r), FUNC(bml3_state::bml3_6845_w));
 	// KBNMI - Keyboard "Break" key non-maskable interrupt
-	AM_RANGE(0xffc8, 0xffc8) AM_READ(bml3_keyb_nmi_r) // keyboard nmi
+	map(0xffc8, 0xffc8).r(this, FUNC(bml3_state::bml3_keyb_nmi_r)); // keyboard nmi
 	// DIPSW - DIP switches on system mainboard
-	AM_RANGE(0xffc9, 0xffc9) AM_READ_PORT("DSW")
+	map(0xffc9, 0xffc9).portr("DSW");
 	// TIMER - System timer enable
-	AM_RANGE(0xffca, 0xffca) AM_READ(bml3_firq_status_r) // timer irq
+	map(0xffca, 0xffca).r(this, FUNC(bml3_state::bml3_firq_status_r)); // timer irq
 	// LPFLG - Light pen interrupt
 //  AM_RANGE(0xffcb, 0xffcb)
 	// MODE_SEL - Graphics mode select
-	AM_RANGE(0xffd0, 0xffd0) AM_WRITE(bml3_hres_reg_w)
+	map(0xffd0, 0xffd0).w(this, FUNC(bml3_state::bml3_hres_reg_w));
 	// TRACE - Trace counter
 //  AM_RANGE(0xffd1, 0xffd1)
 	// REMOTE - Remote relay control for cassette - bit 7
-	AM_RANGE(0xffd2, 0xffd2) AM_WRITE(relay_w)
+	map(0xffd2, 0xffd2).w(this, FUNC(bml3_state::relay_w));
 	// MUSIC_SEL - Music select: toggle audio output level when rising
-	AM_RANGE(0xffd3, 0xffd3) AM_READWRITE(bml3_beep_r,bml3_beep_w)
+	map(0xffd3, 0xffd3).rw(this, FUNC(bml3_state::bml3_beep_r), FUNC(bml3_state::bml3_beep_w));
 	// TIME_MASK - Prohibit timer IRQ
-	AM_RANGE(0xffd4, 0xffd4) AM_WRITE(bml3_firq_mask_w)
+	map(0xffd4, 0xffd4).w(this, FUNC(bml3_state::bml3_firq_mask_w));
 	// LPENBL - Light pen operation enable
-	AM_RANGE(0xffd5, 0xffd5) AM_NOP
+	map(0xffd5, 0xffd5).noprw();
 	// INTERLACE_SEL - Interlaced video mode (manual has "INTERACE SEL"!)
-	AM_RANGE(0xffd6, 0xffd6) AM_WRITE(bml3_vres_reg_w)
+	map(0xffd6, 0xffd6).w(this, FUNC(bml3_state::bml3_vres_reg_w));
 //  AM_RANGE(0xffd7, 0xffd7) baud select
 	// C_REG_SEL - Attribute register (character/video mode and colours)
-	AM_RANGE(0xffd8, 0xffd8) AM_READWRITE(bml3_vram_attr_r,bml3_vram_attr_w)
+	map(0xffd8, 0xffd8).rw(this, FUNC(bml3_state::bml3_vram_attr_r), FUNC(bml3_state::bml3_vram_attr_w));
 	// KB - Keyboard mode register, interrupt control, keyboard LEDs
-	AM_RANGE(0xffe0, 0xffe0) AM_READWRITE(bml3_keyboard_r,bml3_keyboard_w)
+	map(0xffe0, 0xffe0).rw(this, FUNC(bml3_state::bml3_keyboard_r), FUNC(bml3_state::bml3_keyboard_w));
 //  AM_RANGE(0xffe8, 0xffe8) bank register
 //  AM_RANGE(0xffe9, 0xffe9) IG mode register
 //  AM_RANGE(0xffea, 0xffea) IG enable register
-	AM_RANGE(0xa000, 0xfeff) AM_ROM AM_REGION("maincpu", 0xa000)
-	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0xfff0)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(bml3_a000_w)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(bml3_c000_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(bml3_e000_w)
-	AM_RANGE(0xf000, 0xfeff) AM_WRITE(bml3_f000_w)
-	AM_RANGE(0xfff0, 0xffff) AM_WRITE(bml3_fff0_w)
+	map(0xa000, 0xfeff).rom().region("maincpu", 0xa000);
+	map(0xfff0, 0xffff).rom().region("maincpu", 0xfff0);
+	map(0xa000, 0xbfff).w(this, FUNC(bml3_state::bml3_a000_w));
+	map(0xc000, 0xdfff).w(this, FUNC(bml3_state::bml3_c000_w));
+	map(0xe000, 0xefff).w(this, FUNC(bml3_state::bml3_e000_w));
+	map(0xf000, 0xfeff).w(this, FUNC(bml3_state::bml3_f000_w));
+	map(0xfff0, 0xffff).w(this, FUNC(bml3_state::bml3_fff0_w));
 
 #if 0
-	AM_RANGE(0xff00, 0xff00) AM_READWRITE(bml3_ym2203_r,bml3_ym2203_w)
-	AM_RANGE(0xff02, 0xff02) AM_READWRITE(bml3_psg_latch_r,bml3_psg_latch_w) // PSG address/data select
+	map(0xff00, 0xff00).rw(this, FUNC(bml3_state::bml3_ym2203_r), FUNC(bml3_state::bml3_ym2203_w));
+	map(0xff02, 0xff02).rw(this, FUNC(bml3_state::bml3_psg_latch_r), FUNC(bml3_state::bml3_psg_latch_w)); // PSG address/data select
 #endif
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(bml3_state::bml3mk2_mem)
-	AM_IMPORT_FROM(bml3_mem)
+void bml3_state::bml3mk2_mem(address_map &map)
+{
+	bml3_mem(map);
 	// TODO: anything to add here?
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(bml3_state::bml3mk5_mem)
-	AM_IMPORT_FROM(bml3_mem)
+void bml3_state::bml3mk5_mem(address_map &map)
+{
+	bml3_mem(map);
 	// TODO: anything to add here?
 
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 

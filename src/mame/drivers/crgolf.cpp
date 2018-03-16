@@ -276,21 +276,23 @@ WRITE_LINE_MEMBER(crgolf_state::screenb_enable_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(crgolf_state::main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x8007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x8800, 0x8800) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0x8800, 0x8800) AM_DEVWRITE("soundlatch1", generic_latch_8_device, write)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0xa000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void crgolf_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).ram();
+	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x8000, 0x8007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x8800, 0x8800).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0x8800, 0x8800).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0x9000, 0x9000).w(this, FUNC(crgolf_state::rom_bank_select_w));
+	map(0xa000, 0xffff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(crgolf_state::vrambank_map)
-	AM_RANGE(0x0000, 0x5fff) AM_RAM AM_SHARE("vrama")
-	AM_RANGE(0x8000, 0xdfff) AM_RAM AM_SHARE("vramb")
-ADDRESS_MAP_END
+void crgolf_state::vrambank_map(address_map &map)
+{
+	map(0x0000, 0x5fff).ram().share("vrama");
+	map(0x8000, 0xdfff).ram().share("vramb");
+}
 
 
 /*************************************
@@ -299,16 +301,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(crgolf_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xc002, 0xc002) AM_WRITENOP
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(switch_input_r, switch_input_select_w)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(analog_input_r, unknown_w)
-	AM_RANGE(0xe003, 0xe003) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)
-	AM_RANGE(0xe003, 0xe003) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void crgolf_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xc000, 0xc001).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xc002, 0xc002).nopw();
+	map(0xe000, 0xe000).rw(this, FUNC(crgolf_state::switch_input_r), FUNC(crgolf_state::switch_input_select_w));
+	map(0xe001, 0xe001).rw(this, FUNC(crgolf_state::analog_input_r), FUNC(crgolf_state::unknown_w));
+	map(0xe003, 0xe003).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0xe003, 0xe003).w("soundlatch2", FUNC(generic_latch_8_device::write));
+}
 
 
 
@@ -316,30 +319,33 @@ ADDRESS_MAP_END
 
 
 
-ADDRESS_MAP_START(crgolf_state::mastrglf_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x6000, 0x8fff) AM_RAM // maybe RAM and ROM here?
-	AM_RANGE(0x9000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
+void crgolf_state::mastrglf_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).bankr("bank1");
+	map(0x6000, 0x8fff).ram(); // maybe RAM and ROM here?
+	map(0x9000, 0x9fff).ram();
+	map(0xa000, 0xffff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
 
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(crgolf_state::mastrglf_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+void crgolf_state::mastrglf_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x07).w("mainlatch", FUNC(ls259_device::write_d0));
 //  AM_RANGE(0x20, 0x20) AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("soundlatch1", generic_latch_8_device, write)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-ADDRESS_MAP_END
+	map(0x40, 0x40).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0xa0, 0xa0).r("soundlatch2", FUNC(generic_latch_8_device::read));
+}
 
 
 
-ADDRESS_MAP_START(crgolf_state::mastrglf_submap)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-ADDRESS_MAP_END
+void crgolf_state::mastrglf_submap(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+}
 
 
 READ8_MEMBER(crgolf_state::unk_sub_02_r)
@@ -362,17 +368,18 @@ WRITE8_MEMBER(crgolf_state::unk_sub_0c_w)
 }
 
 
-ADDRESS_MAP_START(crgolf_state::mastrglf_subio)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch1", generic_latch_8_device, read) AM_WRITENOP
-	AM_RANGE(0x02, 0x02) AM_READ(unk_sub_02_r )
-	AM_RANGE(0x05, 0x05) AM_READ(unk_sub_05_r )
-	AM_RANGE(0x06, 0x06) AM_READNOP
-	AM_RANGE(0x07, 0x07) AM_READ(unk_sub_07_r )
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(unk_sub_0c_w)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void crgolf_state::mastrglf_subio(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch1", FUNC(generic_latch_8_device::read)).nopw();
+	map(0x02, 0x02).r(this, FUNC(crgolf_state::unk_sub_02_r));
+	map(0x05, 0x05).r(this, FUNC(crgolf_state::unk_sub_05_r));
+	map(0x06, 0x06).nopr();
+	map(0x07, 0x07).r(this, FUNC(crgolf_state::unk_sub_07_r));
+	map(0x08, 0x08).w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0x0c, 0x0c).w(this, FUNC(crgolf_state::unk_sub_0c_w));
+	map(0x10, 0x11).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 
 

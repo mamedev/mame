@@ -214,14 +214,15 @@ uint32_t clayshoo_state::screen_update_clayshoo(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-ADDRESS_MAP_START(clayshoo_state::main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_ROM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("videoram")    /* 6k of video ram according to readme */
-	AM_RANGE(0x9800, 0xa800) AM_WRITENOP      /* not really mapped, but cleared */
-	AM_RANGE(0xc800, 0xc800) AM_READWRITE(analog_r, analog_reset_w)
-ADDRESS_MAP_END
+void clayshoo_state::main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x4000, 0x47ff).rom();
+	map(0x8000, 0x97ff).ram().share("videoram");    /* 6k of video ram according to readme */
+	map(0x9800, 0xa800).nopw();      /* not really mapped, but cleared */
+	map(0xc800, 0xc800).rw(this, FUNC(clayshoo_state::analog_r), FUNC(clayshoo_state::analog_reset_w));
+}
 
 
 
@@ -231,15 +232,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(clayshoo_state::main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+void clayshoo_state::main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x20, 0x23).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x30, 0x33).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 //  AM_RANGE(0x40, 0x43) AM_NOP // 8253 for sound?
 //  AM_RANGE(0x50, 0x50) AM_NOP // ?
 //  AM_RANGE(0x60, 0x60) AM_NOP // ?
-ADDRESS_MAP_END
+}
 
 
 

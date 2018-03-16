@@ -21,14 +21,14 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_SEGA_315_5195_MAPPER_ADD(_tag, _cputag, _class, _mapper) \
-	MCFG_DEVICE_ADD(_tag, SEGA_315_5195_MEM_MAPPER, 0) \
-	downcast<sega_315_5195_mapper_device &>(*device).set_cputag("^" _cputag); \
+#define MCFG_SEGA_315_5195_CPU(_cputag) \
+	downcast<sega_315_5195_mapper_device &>(*device).set_cputag("^" _cputag);
+#define MCFG_SEGA_315_5195_MAPPER_HANDLER(_class, _mapper) \
 	downcast<sega_315_5195_mapper_device &>(*device).set_mapper(sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, nullptr, (_class *)nullptr));
-#define MCFG_SEGA_315_5195_SOUND_READ_CALLBACK(_devcb) \
-	devcb = &downcast<sega_315_5195_mapper_device &>(*device).set_sound_read(DEVCB_##_devcb);
-#define MCFG_SEGA_315_5195_SOUND_WRITE_CALLBACK(_devcb) \
-	devcb = &downcast<sega_315_5195_mapper_device &>(*device).set_sound_write(DEVCB_##_devcb);
+#define MCFG_SEGA_315_5195_PBF_CALLBACK(_devcb) \
+	devcb = &downcast<sega_315_5195_mapper_device &>(*device).set_pbf_callback(DEVCB_##_devcb);
+#define MCFG_SEGA_315_5195_MCU_INT_CALLBACK(_devcb) \
+	devcb = &downcast<sega_315_5195_mapper_device &>(*device).set_mcu_int_callback(DEVCB_##_devcb);
 
 #define MCFG_SEGA_315_5248_MULTIPLIER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGA_315_5248_MULTIPLIER, 0)
@@ -101,12 +101,14 @@ public:
 		m_cpuregion.set_tag(cpu);
 	}
 	void set_mapper(mapper_delegate callback) { m_mapper = callback; }
-	template<class Object> devcb_base &set_sound_read(Object &&object) { return m_sound_read.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_sound_write(Object &&object) { return m_sound_write.set_callback(std::forward<Object>(object)); }
+	template<class Object> devcb_base &set_pbf_callback(Object &&object) { return m_pbf_callback.set_callback(std::forward<Object>(object)); }
+	template<class Object> devcb_base &set_mcu_int_callback(Object &&object) { return m_mcu_int_callback.set_callback(std::forward<Object>(object)); }
 
 	// public interface
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( pread );
+	DECLARE_WRITE8_MEMBER( pwrite );
 
 	// mapping helpers
 	void map_as_rom(uint32_t offset, uint32_t length, offs_t mirror, const char *bank_name, const char *decrypted_bank_name, offs_t rgnoffset, write16_delegate whandler);
@@ -122,6 +124,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	TIMER_CALLBACK_MEMBER(write_to_sound);
+	TIMER_CALLBACK_MEMBER(write_from_sound);
+
 	// internal region struct
 	struct region_info
 	{
@@ -172,8 +177,8 @@ private:
 	required_device<m68000_device> m_cpu;
 	required_memory_region      m_cpuregion;
 	mapper_delegate             m_mapper;
-	devcb_read8                 m_sound_read;
-	devcb_write8                m_sound_write;
+	devcb_write_line            m_pbf_callback;
+	devcb_write_line            m_mcu_int_callback;
 
 	// internal state
 	address_space *             m_space;
@@ -181,6 +186,10 @@ private:
 	uint8_t                       m_regs[0x20];
 	uint8_t                       m_curregion;
 	decrypt_bank                m_banks[8];
+
+	// communication registers
+	uint8_t                     m_to_sound;
+	uint8_t                     m_from_sound;
 };
 
 

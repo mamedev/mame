@@ -528,93 +528,100 @@ WRITE8_MEMBER(homedata_state::bankswitch_w)
 /********************************************************************************/
 
 
-ADDRESS_MAP_START(homedata_state::mrokumei_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
-	AM_RANGE(0x7000, 0x77ff) AM_RAM /* hourouki expects this to act as RAM */
-	AM_RANGE(0x7800, 0x7800) AM_RAM /* only used to store the result of the ROM check */
-	AM_RANGE(0x7801, 0x7802) AM_READ(mrokumei_keyboard_r)   // also vblank and active page
-	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("IN0")            // coin, service
-	AM_RANGE(0x7804, 0x7804) AM_READ_PORT("DSW1")           // DSW1
-	AM_RANGE(0x7805, 0x7805) AM_READ_PORT("DSW2")           // DSW2
-	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_SHARE("vreg")
-	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP // ??? read every vblank, value discarded
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(mrokumei_blitter_start_w) // in some games also ROM bank switch to access service ROM
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(mrokumei_keyboard_select_w)
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(mrokumei_sound_cmd_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE("snsnd", sn76489a_device, write)
-	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
-	AM_RANGE(0x8007, 0x8007) AM_WRITE(mrokumei_blitter_bank_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void homedata_state::mrokumei_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().w(this, FUNC(homedata_state::mrokumei_videoram_w)).share("videoram");
+	map(0x4000, 0x5fff).ram();
+	map(0x6000, 0x6fff).ram(); /* work ram */
+	map(0x7000, 0x77ff).ram(); /* hourouki expects this to act as RAM */
+	map(0x7800, 0x7800).ram(); /* only used to store the result of the ROM check */
+	map(0x7801, 0x7802).r(this, FUNC(homedata_state::mrokumei_keyboard_r));   // also vblank and active page
+	map(0x7803, 0x7803).portr("IN0");            // coin, service
+	map(0x7804, 0x7804).portr("DSW1");           // DSW1
+	map(0x7805, 0x7805).portr("DSW2");           // DSW2
+	map(0x7ff0, 0x7ffd).writeonly().share("vreg");
+	map(0x7ffe, 0x7ffe).nopr(); // ??? read every vblank, value discarded
+	map(0x8000, 0x8000).w(this, FUNC(homedata_state::mrokumei_blitter_start_w)); // in some games also ROM bank switch to access service ROM
+	map(0x8001, 0x8001).w(this, FUNC(homedata_state::mrokumei_keyboard_select_w));
+	map(0x8002, 0x8002).w(this, FUNC(homedata_state::mrokumei_sound_cmd_w));
+	map(0x8003, 0x8003).w(m_sn, FUNC(sn76489a_device::write));
+	map(0x8006, 0x8006).w(this, FUNC(homedata_state::homedata_blitter_param_w));
+	map(0x8007, 0x8007).w(this, FUNC(homedata_state::mrokumei_blitter_bank_w));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(homedata_state::mrokumei_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+void homedata_state::mrokumei_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 	// TODO: might be that the entire area is sound_bank_w
-	AM_RANGE(0xfffc, 0xfffd) AM_WRITENOP    /* stack writes happen here, but there's no RAM */
-	AM_RANGE(0x8080, 0x8080) AM_WRITE(mrokumei_sound_bank_w)
-	AM_RANGE(0xffbf, 0xffbf) AM_WRITE(mrokumei_sound_bank_w) // hourouki mirror
-ADDRESS_MAP_END
+	map(0xfffc, 0xfffd).nopw();    /* stack writes happen here, but there's no RAM */
+	map(0x8080, 0x8080).w(this, FUNC(homedata_state::mrokumei_sound_bank_w));
+	map(0xffbf, 0xffbf).w(this, FUNC(homedata_state::mrokumei_sound_bank_w)); // hourouki mirror
+}
 
-ADDRESS_MAP_START(homedata_state::mrokumei_sound_io_map)
-	AM_RANGE(0x0000, 0xffff) AM_READ(mrokumei_sound_io_r) /* read address is 16-bit */
-	AM_RANGE(0x0040, 0x0040) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_byte_interface, write) /* write address is only 8-bit */
+void homedata_state::mrokumei_sound_io_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(this, FUNC(homedata_state::mrokumei_sound_io_r)); /* read address is 16-bit */
+	map(0x0040, 0x0040).mirror(0xff00).w("dac", FUNC(dac_byte_interface::write)); /* write address is only 8-bit */
 	// hourouki mirror...
-	AM_RANGE(0x007f, 0x007f) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_byte_interface, write) /* write address is only 8-bit */
-ADDRESS_MAP_END
+	map(0x007f, 0x007f).mirror(0xff00).w("dac", FUNC(dac_byte_interface::write)); /* write address is only 8-bit */
+}
 
 /********************************************************************************/
 
-ADDRESS_MAP_START(homedata_state::reikaids_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(reikaids_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work RAM */
-	AM_RANGE(0x7800, 0x7800) AM_RAM /* behaves as normal RAM */
-	AM_RANGE(0x7801, 0x7801) AM_READ_PORT("IN0")
-	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("IN1")
-	AM_RANGE(0x7803, 0x7803) AM_READ(reikaids_io_r) // coin, blitter, upd7807
-	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_SHARE("vreg")
-	AM_RANGE(0x7ffe, 0x7ffe) AM_WRITE(reikaids_blitter_bank_w)
-	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(reikaids_blitter_start_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(bankswitch_w)
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(reikaids_snd_command_w)
-	AM_RANGE(0x8005, 0x8005) AM_WRITE(reikaids_gfx_bank_w)
-	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void homedata_state::reikaids_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().w(this, FUNC(homedata_state::reikaids_videoram_w)).share("videoram");
+	map(0x4000, 0x5fff).ram();
+	map(0x6000, 0x6fff).ram(); /* work RAM */
+	map(0x7800, 0x7800).ram(); /* behaves as normal RAM */
+	map(0x7801, 0x7801).portr("IN0");
+	map(0x7802, 0x7802).portr("IN1");
+	map(0x7803, 0x7803).r(this, FUNC(homedata_state::reikaids_io_r)); // coin, blitter, upd7807
+	map(0x7ff0, 0x7ffd).writeonly().share("vreg");
+	map(0x7ffe, 0x7ffe).w(this, FUNC(homedata_state::reikaids_blitter_bank_w));
+	map(0x7fff, 0x7fff).w(this, FUNC(homedata_state::reikaids_blitter_start_w));
+	map(0x8000, 0x8000).w(this, FUNC(homedata_state::bankswitch_w));
+	map(0x8002, 0x8002).w(this, FUNC(homedata_state::reikaids_snd_command_w));
+	map(0x8005, 0x8005).w(this, FUNC(homedata_state::reikaids_gfx_bank_w));
+	map(0x8006, 0x8006).w(this, FUNC(homedata_state::homedata_blitter_param_w));
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(homedata_state::reikaids_upd7807_map)
-	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")    /* External ROM (Banked) */
-ADDRESS_MAP_END
+void homedata_state::reikaids_upd7807_map(address_map &map)
+{
+	map(0x0000, 0xfeff).bankr("bank2");    /* External ROM (Banked) */
+}
 
 /**************************************************************************/
 
 
-ADDRESS_MAP_START(homedata_state::pteacher_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0x5eff) AM_RAM
-	AM_RANGE(0x5f00, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
-	AM_RANGE(0x7800, 0x7800) AM_RAM /* behaves as normal RAM */
-	AM_RANGE(0x7801, 0x7801) AM_READ(pteacher_io_r) // vblank, visible page
-	AM_RANGE(0x7ff2, 0x7ff2) AM_READ(pteacher_snd_r)
-	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_SHARE("vreg")
-	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(pteacher_blitter_start_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(bankswitch_w)
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(pteacher_snd_command_w)
-	AM_RANGE(0x8005, 0x8005) AM_WRITE(pteacher_blitter_bank_w)
-	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
-	AM_RANGE(0x8007, 0x8007) AM_WRITE(pteacher_gfx_bank_w)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void homedata_state::pteacher_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().w(this, FUNC(homedata_state::mrokumei_videoram_w)).share("videoram");
+	map(0x4000, 0x5eff).ram();
+	map(0x5f00, 0x5fff).ram();
+	map(0x6000, 0x6fff).ram(); /* work ram */
+	map(0x7800, 0x7800).ram(); /* behaves as normal RAM */
+	map(0x7801, 0x7801).r(this, FUNC(homedata_state::pteacher_io_r)); // vblank, visible page
+	map(0x7ff2, 0x7ff2).r(this, FUNC(homedata_state::pteacher_snd_r));
+	map(0x7ff0, 0x7ffd).writeonly().share("vreg");
+	map(0x7fff, 0x7fff).w(this, FUNC(homedata_state::pteacher_blitter_start_w));
+	map(0x8000, 0x8000).w(this, FUNC(homedata_state::bankswitch_w));
+	map(0x8002, 0x8002).w(this, FUNC(homedata_state::pteacher_snd_command_w));
+	map(0x8005, 0x8005).w(this, FUNC(homedata_state::pteacher_blitter_bank_w));
+	map(0x8006, 0x8006).w(this, FUNC(homedata_state::homedata_blitter_param_w));
+	map(0x8007, 0x8007).w(this, FUNC(homedata_state::pteacher_gfx_bank_w));
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(homedata_state::pteacher_upd7807_map)
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(pteacher_snd_answer_w)
-	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")    /* External ROM (Banked) */
-ADDRESS_MAP_END
+void homedata_state::pteacher_upd7807_map(address_map &map)
+{
+	map(0x0000, 0x0000).w(this, FUNC(homedata_state::pteacher_snd_answer_w));
+	map(0x0000, 0xfeff).bankr("bank2");    /* External ROM (Banked) */
+}
 
 /**************************************************************************/
 
@@ -1384,19 +1391,21 @@ static INPUT_PORTS_START( mirderby )
 INPUT_PORTS_END
 
 
-ADDRESS_MAP_START(homedata_state::cpu0_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void homedata_state::cpu0_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(homedata_state::cpu1_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM // videoram
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
-	AM_RANGE(0x7000, 0x77ff) AM_RAM
+void homedata_state::cpu1_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram(); // videoram
+	map(0x4000, 0x5fff).ram();
+	map(0x6000, 0x6fff).ram(); /* work ram */
+	map(0x7000, 0x77ff).ram();
 	//0x7ff0 onward is the blitter
-	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP //watchdog
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x7ffe, 0x7ffe).nopr(); //watchdog
+	map(0x8000, 0xffff).rom();
+}
 
 
 READ8_MEMBER(homedata_state::mirderby_prot_r)
@@ -1411,15 +1420,16 @@ WRITE8_MEMBER(homedata_state::mirderby_prot_w)
 }
 
 
-ADDRESS_MAP_START(homedata_state::cpu2_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
-	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x7800, 0x7800) AM_READWRITE(mirderby_prot_r, mirderby_prot_w) // protection check? (or sound comms?)
-	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP //watchdog
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void homedata_state::cpu2_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().w(this, FUNC(homedata_state::mrokumei_videoram_w)).share("videoram");
+	map(0x4000, 0x5fff).ram();
+	map(0x6000, 0x6fff).ram(); /* work ram */
+	map(0x7000, 0x77ff).ram();
+	map(0x7800, 0x7800).rw(this, FUNC(homedata_state::mirderby_prot_r), FUNC(homedata_state::mirderby_prot_w)); // protection check? (or sound comms?)
+	map(0x7ffe, 0x7ffe).nopr(); //watchdog
+	map(0x8000, 0xffff).rom();
+}
 
 
 

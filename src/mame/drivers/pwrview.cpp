@@ -337,61 +337,65 @@ READ8_MEMBER(pwrview_state::pitclock_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(pwrview_state::bios_bank)
-	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0x00000, 0x07fff) AM_WRITE(nmimem_w)
+void pwrview_state::bios_bank(address_map &map)
+{
+	map(0x00000, 0x07fff).rom().region("bios", 0);
+	map(0x00000, 0x07fff).w(this, FUNC(pwrview_state::nmimem_w));
 
-	AM_RANGE(0x08000, 0x0ffff) AM_WRITE(nmimem_w)
-	AM_RANGE(0x0be00, 0x0be7f) AM_RAMBANK("vram1")
-	AM_RANGE(0x0befe, 0x0beff) AM_READWRITE(vram1_r, vram1_w);
-	AM_RANGE(0x0bf00, 0x0bf7f) AM_RAMBANK("vram2")
-	AM_RANGE(0x0bffe, 0x0bfff) AM_READWRITE(vram2_r, vram2_w);
-	AM_RANGE(0x0c000, 0x0ffff) AM_ROM AM_REGION("bios", 0x4000)
+	map(0x08000, 0x0ffff).w(this, FUNC(pwrview_state::nmimem_w));
+	map(0x0be00, 0x0be7f).bankrw("vram1");
+	map(0x0befe, 0x0beff).rw(this, FUNC(pwrview_state::vram1_r), FUNC(pwrview_state::vram1_w));
+	map(0x0bf00, 0x0bf7f).bankrw("vram2");
+	map(0x0bffe, 0x0bfff).rw(this, FUNC(pwrview_state::vram2_r), FUNC(pwrview_state::vram2_w));
+	map(0x0c000, 0x0ffff).rom().region("bios", 0x4000);
 
-	AM_RANGE(0x10000, 0x17fff) AM_RAM
+	map(0x10000, 0x17fff).ram();
 
-	AM_RANGE(0x18000, 0x1ffff) AM_WRITE(nmimem_w)
+	map(0x18000, 0x1ffff).w(this, FUNC(pwrview_state::nmimem_w));
 
-	AM_RANGE(0x1be00, 0x1be7f) AM_RAMBANK("vram1")
-	AM_RANGE(0x1befe, 0x1beff) AM_READWRITE(vram1_r, vram1_w);
-	AM_RANGE(0x1bf00, 0x1bf7f) AM_RAMBANK("vram2")
-	AM_RANGE(0x1bffe, 0x1bfff) AM_READWRITE(vram2_r, vram2_w);
-	AM_RANGE(0x1c000, 0x1ffff) AM_ROM AM_REGION("bios", 0x4000)
-ADDRESS_MAP_END
+	map(0x1be00, 0x1be7f).bankrw("vram1");
+	map(0x1befe, 0x1beff).rw(this, FUNC(pwrview_state::vram1_r), FUNC(pwrview_state::vram1_w));
+	map(0x1bf00, 0x1bf7f).bankrw("vram2");
+	map(0x1bffe, 0x1bfff).rw(this, FUNC(pwrview_state::vram2_r), FUNC(pwrview_state::vram2_w));
+	map(0x1c000, 0x1ffff).rom().region("bios", 0x4000);
+}
 
-ADDRESS_MAP_START(pwrview_state::pwrview_map)
-	AM_RANGE(0x00000, 0xf7fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x00000, 0x003ff) AM_READWRITE(bank0_r, bank0_w)
-	AM_RANGE(0xf8000, 0xfffff) AM_DEVICE("bios_bank", address_map_bank_device, amap16)
-ADDRESS_MAP_END
+void pwrview_state::pwrview_map(address_map &map)
+{
+	map(0x00000, 0xf7fff).ram().share("ram");
+	map(0x00000, 0x003ff).rw(this, FUNC(pwrview_state::bank0_r), FUNC(pwrview_state::bank0_w));
+	map(0xf8000, 0xfffff).m(m_biosbank, FUNC(address_map_bank_device::amap16));
+}
 
-ADDRESS_MAP_START(pwrview_state::pwrview_fetch_map)
-	AM_RANGE(0x00000, 0xf7fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x00000, 0x003ff) AM_READ(bank0_r)
-	AM_RANGE(0xf8000, 0xfffff) AM_READ(fbios_r)
-ADDRESS_MAP_END
+void pwrview_state::pwrview_fetch_map(address_map &map)
+{
+	map(0x00000, 0xf7fff).ram().share("ram");
+	map(0x00000, 0x003ff).r(this, FUNC(pwrview_state::bank0_r));
+	map(0xf8000, 0xfffff).r(this, FUNC(pwrview_state::fbios_r));
+}
 
-ADDRESS_MAP_START(pwrview_state::pwrview_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmiio_r, nmiio_w)
-	AM_RANGE(0xc000, 0xc001) AM_READWRITE8(unk1_r, unk1_w, 0xff00)
-	AM_RANGE(0xc002, 0xc005) AM_READWRITE8(led_r, led_w, 0xff00)
-	AM_RANGE(0xc006, 0xc007) AM_READ8(rotary_r, 0xff00)
-	AM_RANGE(0xc008, 0xc009) AM_READWRITE8(unk2_r, unk2_w, 0xff00)
-	AM_RANGE(0xc00a, 0xc00b) AM_READ8(err_r, 0xff00)
-	AM_RANGE(0xc00c, 0xc00d) AM_RAM
-	AM_RANGE(0xc080, 0xc081) AM_READWRITE8(unk4_r, unk4_w, 0x00ff)
-	AM_RANGE(0xc088, 0xc089) AM_DEVWRITE8("crtc", hd6845_device, address_w, 0x00ff)
-	AM_RANGE(0xc08a, 0xc08b) AM_DEVREADWRITE8("crtc", hd6845_device, register_r, register_w, 0x00ff)
-	AM_RANGE(0xc280, 0xc287) AM_READWRITE8(unk3_r, unk3_w, 0x00ff)
-	AM_RANGE(0xc288, 0xc28f) AM_DEVREADWRITE8("pit", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0xc2a0, 0xc2a7) AM_DEVREADWRITE8("sio", z80sio2_device, cd_ba_r, cd_ba_w, 0x00ff)
-	AM_RANGE(0xc2c0, 0xc2c1) AM_DEVREADWRITE8("uart", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xc2c2, 0xc2c3) AM_DEVREADWRITE8("uart", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xc2e0, 0xc2e3) AM_DEVICE8("fdc", upd765a_device, map, 0x00ff)
-	AM_RANGE(0xc2e4, 0xc2e5) AM_RAM
-	AM_RANGE(0xc2e6, 0xc2e7) AM_READ8(pitclock_r, 0x00ff)
-ADDRESS_MAP_END
+void pwrview_state::pwrview_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(pwrview_state::nmiio_r), FUNC(pwrview_state::nmiio_w));
+	map(0xc001, 0xc001).rw(this, FUNC(pwrview_state::unk1_r), FUNC(pwrview_state::unk1_w));
+	map(0xc002, 0xc005).rw(this, FUNC(pwrview_state::led_r), FUNC(pwrview_state::led_w)).umask16(0xff00);
+	map(0xc007, 0xc007).r(this, FUNC(pwrview_state::rotary_r));
+	map(0xc009, 0xc009).rw(this, FUNC(pwrview_state::unk2_r), FUNC(pwrview_state::unk2_w));
+	map(0xc00b, 0xc00b).r(this, FUNC(pwrview_state::err_r));
+	map(0xc00c, 0xc00d).ram();
+	map(0xc080, 0xc080).rw(this, FUNC(pwrview_state::unk4_r), FUNC(pwrview_state::unk4_w));
+	map(0xc088, 0xc088).w("crtc", FUNC(hd6845_device::address_w));
+	map(0xc08a, 0xc08a).rw("crtc", FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
+	map(0xc280, 0xc287).rw(this, FUNC(pwrview_state::unk3_r), FUNC(pwrview_state::unk3_w)).umask16(0x00ff);
+	map(0xc288, 0xc28f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0xc2a0, 0xc2a7).rw("sio", FUNC(z80sio2_device::cd_ba_r), FUNC(z80sio2_device::cd_ba_w)).umask16(0x00ff);
+	map(0xc2c0, 0xc2c0).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xc2c2, 0xc2c2).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc2e0, 0xc2e3).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0xc2e4, 0xc2e5).ram();
+	map(0xc2e6, 0xc2e6).r(this, FUNC(pwrview_state::pitclock_r));
+}
 
 static SLOT_INTERFACE_START(pwrview_floppies)
 	SLOT_INTERFACE("525dd", FLOPPY_525_DD)

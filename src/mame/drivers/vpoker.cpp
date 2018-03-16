@@ -182,13 +182,14 @@ WRITE8_MEMBER(vpoker_state::blitter_w)
 	}
 }
 
-ADDRESS_MAP_START(vpoker_state::main_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM     /* vpoker has 0x100, 5acespkr has 0x200 */
-	AM_RANGE(0x0400, 0x0407) AM_DEVREADWRITE("6840ptm", ptm6840_device, read, write)
-	AM_RANGE(0x0800, 0x0807) AM_READ(blitter_r) AM_WRITE(blitter_w)
-	AM_RANGE(0x2000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void vpoker_state::main_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x01ff).ram();     /* vpoker has 0x100, 5acespkr has 0x200 */
+	map(0x0400, 0x0407).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x0800, 0x0807).r(this, FUNC(vpoker_state::blitter_r)).w(this, FUNC(vpoker_state::blitter_w));
+	map(0x2000, 0x3fff).rom();
+}
 
 
 static INPUT_PORTS_START( vpoker )

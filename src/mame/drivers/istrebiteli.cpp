@@ -300,19 +300,21 @@ WRITE8_MEMBER(istrebiteli_state::spr_xy_w)
 	m_spr_xy[offset ^ 7] = data;
 }
 
-ADDRESS_MAP_START(istrebiteli_state::mem_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-ADDRESS_MAP_END
+void istrebiteli_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x13ff).ram();
+}
 
-ADDRESS_MAP_START(istrebiteli_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(tileram_w)
-	AM_RANGE(0xc0, 0xc3) AM_READWRITE(ppi0_r, ppi0_w)
-	AM_RANGE(0xc4, 0xc7) AM_READWRITE(ppi1_r, ppi1_w)
-	AM_RANGE(0xc8, 0xcf) AM_WRITE(spr_xy_w)
-ADDRESS_MAP_END
+void istrebiteli_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xb0, 0xbf).w(this, FUNC(istrebiteli_state::tileram_w));
+	map(0xc0, 0xc3).rw(this, FUNC(istrebiteli_state::ppi0_r), FUNC(istrebiteli_state::ppi0_w));
+	map(0xc4, 0xc7).rw(this, FUNC(istrebiteli_state::ppi1_r), FUNC(istrebiteli_state::ppi1_w));
+	map(0xc8, 0xcf).w(this, FUNC(istrebiteli_state::spr_xy_w));
+}
 
 CUSTOM_INPUT_MEMBER(istrebiteli_state::collision_r)
 {

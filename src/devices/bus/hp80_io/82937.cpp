@@ -316,11 +316,12 @@ ROM_START(hp82937)
 	ROM_LOAD("1820-2437.bin" , 0 , 0x800 , CRC(687d1559) SHA1(44dfc8c3f431cd37a270b094f1db751214009214))
 ROM_END
 
-ADDRESS_MAP_START(hp82937_io_card_device::cpu_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00 , 0x01) AM_DEVREADWRITE("xlator" , hp_1mb5_device , uc_r , uc_w)
-	AM_RANGE(0x03 , 0x03) AM_READWRITE(switch_r , latch_w)
-ADDRESS_MAP_END
+void hp82937_io_card_device::cpu_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x01).rw("xlator", FUNC(hp_1mb5_device::uc_r), FUNC(hp_1mb5_device::uc_w));
+	map(0x03, 0x03).rw(this, FUNC(hp82937_io_card_device::switch_r), FUNC(hp82937_io_card_device::latch_w));
+}
 
 const tiny_rom_entry *hp82937_io_card_device::device_rom_region() const
 {

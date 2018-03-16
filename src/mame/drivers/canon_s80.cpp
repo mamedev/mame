@@ -33,10 +33,11 @@ public:
 };
 
 
-ADDRESS_MAP_START(canons80_state::canons80_map)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void canons80_state::canons80_map(address_map &map)
+{
+	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom();
+}
 
 MACHINE_CONFIG_START(canons80_state::canons80)
 	/* basic machine hardware */

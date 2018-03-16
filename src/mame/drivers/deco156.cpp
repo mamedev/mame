@@ -124,41 +124,43 @@ WRITE32_MEMBER(deco156_state::pf2_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 
 WRITE32_MEMBER(deco156_state::spriteram_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_spriteram[offset]); }
 
 
-ADDRESS_MAP_START(deco156_state::hvysmsh_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x107fff) AM_RAM
-	AM_RANGE(0x120000, 0x120003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x120000, 0x120003) AM_WRITENOP // Volume control in low byte
-	AM_RANGE(0x120004, 0x120007) AM_WRITE(hvysmsh_eeprom_w)
-	AM_RANGE(0x120008, 0x12000b) AM_WRITENOP // IRQ ack?
-	AM_RANGE(0x12000c, 0x12000f) AM_WRITE(hvysmsh_oki_0_bank_w)
-	AM_RANGE(0x140000, 0x140003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x160000, 0x160003) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE(pf1_rowscroll_r, pf1_rowscroll_w)
-	AM_RANGE(0x1a4000, 0x1a4fff) AM_READWRITE(pf2_rowscroll_r, pf2_rowscroll_w)
-	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x1d0010, 0x1d002f) AM_READNOP // Check for DMA complete?
-	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE(spriteram_r, spriteram_w)
-ADDRESS_MAP_END
+void deco156_state::hvysmsh_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x107fff).ram();
+	map(0x120000, 0x120003).portr("INPUTS");
+	map(0x120000, 0x120003).nopw(); // Volume control in low byte
+	map(0x120004, 0x120007).w(this, FUNC(deco156_state::hvysmsh_eeprom_w));
+	map(0x120008, 0x12000b).nopw(); // IRQ ack?
+	map(0x12000c, 0x12000f).w(this, FUNC(deco156_state::hvysmsh_oki_0_bank_w));
+	map(0x140000, 0x140000).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x160000, 0x160000).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x180000, 0x18001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x190000, 0x191fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x194000, 0x195fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x1a0000, 0x1a0fff).rw(this, FUNC(deco156_state::pf1_rowscroll_r), FUNC(deco156_state::pf1_rowscroll_w));
+	map(0x1a4000, 0x1a4fff).rw(this, FUNC(deco156_state::pf2_rowscroll_r), FUNC(deco156_state::pf2_rowscroll_w));
+	map(0x1c0000, 0x1c0fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x1d0010, 0x1d002f).nopr(); // Check for DMA complete?
+	map(0x1e0000, 0x1e1fff).rw(this, FUNC(deco156_state::spriteram_r), FUNC(deco156_state::spriteram_w));
+}
 
-ADDRESS_MAP_START(deco156_state::wcvol95_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(pf1_rowscroll_r, pf1_rowscroll_w)
-	AM_RANGE(0x124000, 0x124fff) AM_READWRITE(pf2_rowscroll_r, pf2_rowscroll_w)
-	AM_RANGE(0x130000, 0x137fff) AM_RAM
-	AM_RANGE(0x140000, 0x140003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x150000, 0x150003) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x160000, 0x161fff) AM_READWRITE(spriteram_r, spriteram_w)
-	AM_RANGE(0x170000, 0x170003) AM_NOP // Irq ack?
-	AM_RANGE(0x180000, 0x180fff) AM_READONLY AM_DEVWRITE16("palette", palette_device, write16, 0x0000ffff) AM_SHARE("palette")
-	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x000000ff)
-ADDRESS_MAP_END
+void deco156_state::wcvol95_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x10001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x110000, 0x111fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x114000, 0x115fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x120000, 0x120fff).rw(this, FUNC(deco156_state::pf1_rowscroll_r), FUNC(deco156_state::pf1_rowscroll_w));
+	map(0x124000, 0x124fff).rw(this, FUNC(deco156_state::pf2_rowscroll_r), FUNC(deco156_state::pf2_rowscroll_w));
+	map(0x130000, 0x137fff).ram();
+	map(0x140000, 0x140003).portr("INPUTS");
+	map(0x150000, 0x150003).portw("EEPROMOUT");
+	map(0x160000, 0x161fff).rw(this, FUNC(deco156_state::spriteram_r), FUNC(deco156_state::spriteram_w));
+	map(0x170000, 0x170003).noprw(); // Irq ack?
+	map(0x180000, 0x180fff).readonly().w(m_palette, FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
+	map(0x1a0000, 0x1a0007).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x000000ff);
+}
 
 
 /***************************************************************************/

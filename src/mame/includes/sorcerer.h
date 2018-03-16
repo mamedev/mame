@@ -68,10 +68,8 @@ public:
 		, m_iop_x(*this, "X.%u", 0)
 	{ }
 
-	DECLARE_READ8_MEMBER(sorcerer_fc_r);
 	DECLARE_READ8_MEMBER(sorcerer_fd_r);
 	DECLARE_READ8_MEMBER(sorcerer_fe_r);
-	DECLARE_WRITE8_MEMBER(sorcerer_fc_w);
 	DECLARE_WRITE8_MEMBER(sorcerer_fd_w);
 	DECLARE_WRITE8_MEMBER(sorcerer_fe_w);
 	DECLARE_WRITE8_MEMBER(sorcerer_ff_w);

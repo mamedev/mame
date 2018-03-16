@@ -1213,9 +1213,13 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	if (machine().ui_input().pressed(IPT_UI_TOGGLE_CHEAT))
 		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
 
-	// toggle movie recording
-	if (machine().ui_input().pressed(IPT_UI_RECORD_MOVIE))
-		machine().video().toggle_record_movie();
+	// toggle MNG recording
+	if (machine().ui_input().pressed(IPT_UI_RECORD_MNG))
+		machine().video().toggle_record_mng();
+
+	// toggle MNG recording
+	if (machine().ui_input().pressed(IPT_UI_RECORD_AVI))
+		machine().video().toggle_record_avi();
 
 	// toggle profiler display
 	if (machine().ui_input().pressed(IPT_UI_SHOW_PROFILER))
@@ -1676,9 +1680,10 @@ int32_t mame_ui_manager::slider_refresh(running_machine &machine, void *arg, int
 		const rectangle &visarea = screen->visible_area();
 		screen->configure(width, height, visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
 	}
+
 	if (str)
-		*str = string_format(_("%1$.3ffps"), ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds()));
-	refresh = ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds());
+		*str = string_format(_("%1$.3ffps"), ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds()));
+	refresh = ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds());
 	return floor((refresh - defrefresh) * 1000.0 + 0.5);
 }
 

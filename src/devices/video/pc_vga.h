@@ -15,7 +15,7 @@
 
 // ======================> vga_device
 
-class vga_device : public device_t
+class vga_device : public device_t, public device_video_interface, public device_palette_interface
 {
 	friend class ibm8514a_device;
 
@@ -61,6 +61,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 0x100; }
 
 	void vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect);
@@ -230,8 +233,6 @@ protected:
 	} vga;
 
 	emu_timer *m_vblank_timer;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
 };
 
 

@@ -75,30 +75,31 @@ WRITE16_MEMBER(toobin_state::interrupt_scan_w)
  *************************************/
 
 /* full address map decoded from schematics */
-ADDRESS_MAP_START(toobin_state::main_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xc7ffff)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc07fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0xc08000, 0xc097ff) AM_MIRROR(0x046000) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
-	AM_RANGE(0xc09800, 0xc09fff) AM_MIRROR(0x046000) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0xc10000, 0xc107ff) AM_MIRROR(0x047800) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x826000, 0x826001) AM_MIRROR(0x4500fe) AM_READNOP     /* who knows? read at controls time */
-	AM_RANGE(0x828000, 0x828001) AM_MIRROR(0x4500fe) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x828100, 0x828101) AM_MIRROR(0x4500fe) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
-	AM_RANGE(0x828300, 0x828301) AM_MIRROR(0x45003e) AM_WRITE(intensity_w)
-	AM_RANGE(0x828340, 0x828341) AM_MIRROR(0x45003e) AM_WRITE(interrupt_scan_w) AM_SHARE("interrupt_scan")
-	AM_RANGE(0x828380, 0x828381) AM_MIRROR(0x45003e) AM_RAM_WRITE(slip_w) AM_SHARE("mob:slip")
-	AM_RANGE(0x8283c0, 0x8283c1) AM_MIRROR(0x45003e) AM_WRITE(scanline_int_ack_w)
-	AM_RANGE(0x828400, 0x828401) AM_MIRROR(0x4500fe) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
-	AM_RANGE(0x828500, 0x828501) AM_MIRROR(0x4500fe) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0x828600, 0x828601) AM_MIRROR(0x4500fe) AM_WRITE(xscroll_w) AM_SHARE("xscroll")
-	AM_RANGE(0x828700, 0x828701) AM_MIRROR(0x4500fe) AM_WRITE(yscroll_w) AM_SHARE("yscroll")
-	AM_RANGE(0x828800, 0x828801) AM_MIRROR(0x4507fe) AM_READ_PORT("FF8800")
-	AM_RANGE(0x829000, 0x829001) AM_MIRROR(0x4507fe) AM_READ_PORT("FF9000")
-	AM_RANGE(0x829800, 0x829801) AM_MIRROR(0x4507fe) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
-	AM_RANGE(0x82a000, 0x82afff) AM_MIRROR(0x451000) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0x82c000, 0x82ffff) AM_MIRROR(0x450000) AM_RAM
-ADDRESS_MAP_END
+void toobin_state::main_map(address_map &map)
+{
+	map.global_mask(0xc7ffff);
+	map(0x000000, 0x07ffff).rom();
+	map(0xc00000, 0xc07fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0xc08000, 0xc097ff).mirror(0x046000).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(0xc09800, 0xc09fff).mirror(0x046000).ram().share("mob");
+	map(0xc10000, 0xc107ff).mirror(0x047800).ram().w(this, FUNC(toobin_state::paletteram_w)).share("paletteram");
+	map(0x826000, 0x826001).mirror(0x4500fe).nopr();     /* who knows? read at controls time */
+	map(0x828000, 0x828001).mirror(0x4500fe).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x828101, 0x828101).mirror(0x4500fe).w(m_jsa, FUNC(atari_jsa_i_device::main_command_w));
+	map(0x828300, 0x828301).mirror(0x45003e).w(this, FUNC(toobin_state::intensity_w));
+	map(0x828340, 0x828341).mirror(0x45003e).w(this, FUNC(toobin_state::interrupt_scan_w)).share("interrupt_scan");
+	map(0x828380, 0x828381).mirror(0x45003e).ram().w(this, FUNC(toobin_state::slip_w)).share("mob:slip");
+	map(0x8283c0, 0x8283c1).mirror(0x45003e).w(this, FUNC(toobin_state::scanline_int_ack_w));
+	map(0x828400, 0x828401).mirror(0x4500fe).w(m_jsa, FUNC(atari_jsa_i_device::sound_reset_w));
+	map(0x828500, 0x828501).mirror(0x4500fe).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0x828600, 0x828601).mirror(0x4500fe).w(this, FUNC(toobin_state::xscroll_w)).share("xscroll");
+	map(0x828700, 0x828701).mirror(0x4500fe).w(this, FUNC(toobin_state::yscroll_w)).share("yscroll");
+	map(0x828800, 0x828801).mirror(0x4507fe).portr("FF8800");
+	map(0x829000, 0x829001).mirror(0x4507fe).portr("FF9000");
+	map(0x829801, 0x829801).mirror(0x4507fe).r(m_jsa, FUNC(atari_jsa_i_device::main_response_r));
+	map(0x82a000, 0x82afff).mirror(0x451000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x82c000, 0x82ffff).mirror(0x450000).ram();
+}
 
 
 

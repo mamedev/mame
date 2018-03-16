@@ -41,45 +41,47 @@ template <unsigned B> WRITE8_MEMBER(redclash_state::redclash_star_w)
 	m_stars->set_speed(BIT(data, 0) << B, 1U << B);
 }
 
-ADDRESS_MAP_START(redclash_state::zerohour_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(redclash_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")    /* IN0 */
-	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")    /* IN1 */
-	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")   /* DSW0 */
-	AM_RANGE(0x4803, 0x4803) AM_READ_PORT("DSW2")   /* DSW1 */
-	AM_RANGE(0x5000, 0x5007) AM_WRITENOP    /* to sound board */
-	AM_RANGE(0x5800, 0x5800) AM_WRITE(redclash_star_w<0>)
-	AM_RANGE(0x5801, 0x5804) AM_WRITENOP    /* to sound board */
-	AM_RANGE(0x5805, 0x5805) AM_WRITE(redclash_star_w<1>)
-	AM_RANGE(0x5806, 0x5806) AM_WRITE(redclash_star_w<2>)
-	AM_RANGE(0x5807, 0x5807) AM_WRITE(redclash_flipscreen_w)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(redclash_star_reset_w)
-	AM_RANGE(0x7800, 0x7800) AM_WRITE(irqack_w)
-ADDRESS_MAP_END
+void redclash_state::zerohour_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3000, 0x37ff).ram();
+	map(0x3800, 0x3bff).ram().share("spriteram");
+	map(0x4000, 0x43ff).ram().w(this, FUNC(redclash_state::redclash_videoram_w)).share("videoram");
+	map(0x4800, 0x4800).portr("IN0");    /* IN0 */
+	map(0x4801, 0x4801).portr("IN1");    /* IN1 */
+	map(0x4802, 0x4802).portr("DSW1");   /* DSW0 */
+	map(0x4803, 0x4803).portr("DSW2");   /* DSW1 */
+	map(0x5000, 0x5007).nopw();    /* to sound board */
+	map(0x5800, 0x5800).w(this, FUNC(redclash_state::redclash_star_w<0>));
+	map(0x5801, 0x5804).nopw();    /* to sound board */
+	map(0x5805, 0x5805).w(this, FUNC(redclash_state::redclash_star_w<1>));
+	map(0x5806, 0x5806).w(this, FUNC(redclash_state::redclash_star_w<2>));
+	map(0x5807, 0x5807).w(this, FUNC(redclash_state::redclash_flipscreen_w));
+	map(0x7000, 0x7000).w(this, FUNC(redclash_state::redclash_star_reset_w));
+	map(0x7800, 0x7800).w(this, FUNC(redclash_state::irqack_w));
+}
 
-ADDRESS_MAP_START(redclash_state::redclash_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
+void redclash_state::redclash_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
 //  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
 //  AM_RANGE(0x3800, 0x3800) AM_WRITENOP
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(redclash_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")    /* IN0 */
-	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")    /* IN1 */
-	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")   /* DSW0 */
-	AM_RANGE(0x4803, 0x4803) AM_READ_PORT("DSW2")   /* DSW1 */
-	AM_RANGE(0x5000, 0x5007) AM_WRITENOP    /* to sound board */
-	AM_RANGE(0x5800, 0x5800) AM_WRITE(redclash_star_w<0>)
-	AM_RANGE(0x5801, 0x5801) AM_WRITE(redclash_gfxbank_w)
-	AM_RANGE(0x5805, 0x5805) AM_WRITE(redclash_star_w<1>)
-	AM_RANGE(0x5806, 0x5806) AM_WRITE(redclash_star_w<2>)
-	AM_RANGE(0x5807, 0x5807) AM_WRITE(redclash_flipscreen_w)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(redclash_star_reset_w)
-	AM_RANGE(0x7800, 0x7800) AM_WRITE(irqack_w)
-ADDRESS_MAP_END
+	map(0x4000, 0x43ff).ram().w(this, FUNC(redclash_state::redclash_videoram_w)).share("videoram");
+	map(0x4800, 0x4800).portr("IN0");    /* IN0 */
+	map(0x4801, 0x4801).portr("IN1");    /* IN1 */
+	map(0x4802, 0x4802).portr("DSW1");   /* DSW0 */
+	map(0x4803, 0x4803).portr("DSW2");   /* DSW1 */
+	map(0x5000, 0x5007).nopw();    /* to sound board */
+	map(0x5800, 0x5800).w(this, FUNC(redclash_state::redclash_star_w<0>));
+	map(0x5801, 0x5801).w(this, FUNC(redclash_state::redclash_gfxbank_w));
+	map(0x5805, 0x5805).w(this, FUNC(redclash_state::redclash_star_w<1>));
+	map(0x5806, 0x5806).w(this, FUNC(redclash_state::redclash_star_w<2>));
+	map(0x5807, 0x5807).w(this, FUNC(redclash_state::redclash_flipscreen_w));
+	map(0x6000, 0x67ff).ram();
+	map(0x6800, 0x6bff).ram().share("spriteram");
+	map(0x7000, 0x7000).w(this, FUNC(redclash_state::redclash_star_reset_w));
+	map(0x7800, 0x7800).w(this, FUNC(redclash_state::irqack_w));
+}
 
 /*
   This game doesn't have VBlank interrupts.

@@ -249,30 +249,33 @@ private:
 //  ADDRESS MAPS - Alphatronic P1, P2, P2S, P2U and Hell 2069
 //**************************************************************************
 
-ADDRESS_MAP_START(alphatp_12_state::alphatp2_mem)
-	AM_RANGE(0x0000, 0xffff) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void alphatp_12_state::alphatp2_mem(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(alphatp_12_state::alphatp2_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("ram_0000")
-	AM_RANGE(0x00000, 0x017ff) AM_ROM AM_REGION("boot", 0)  // P2  0x0000 , 0x17ff -hw 6kB, P3 only 4 kB
-	AM_RANGE(0x01800, 0x01c00) AM_RAM // boot rom variables
-	AM_RANGE(0x03000, 0x03bff) AM_WRITEONLY AM_SHARE("vram") // test  2017 hw, MOS directly writes to display RAM
-	AM_RANGE(0x03FF0, 0x03fff) AM_DEVWRITE("crtc", crt5027_device, write) //test hw, mem-mapped registers, cursor position can be determined through this range
+void alphatp_12_state::alphatp2_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).bankrw("ram_0000");
+	map(0x00000, 0x017ff).rom().region("boot", 0);  // P2  0x0000 , 0x17ff -hw 6kB, P3 only 4 kB
+	map(0x01800, 0x01c00).ram(); // boot rom variables
+	map(0x03000, 0x03bff).writeonly().share("vram"); // test  2017 hw, MOS directly writes to display RAM
+	map(0x03FF0, 0x03fff).w(m_crtc, FUNC(crt5027_device::write)); //test hw, mem-mapped registers, cursor position can be determined through this range
 
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+	map(0x10000, 0x1ffff).ram().share("ram");
+}
 
-ADDRESS_MAP_START(alphatp_12_state::alphatp2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("kbdmcu", i8041_device, upi41_master_r, upi41_master_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(beep_w)
-	AM_RANGE(0x50, 0x53) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0x54, 0x54) AM_READWRITE(fdc_stat_r, fdc_cmd_w)
-	AM_RANGE(0x78, 0x78) AM_WRITE(bank_w)
-ADDRESS_MAP_END
+void alphatp_12_state::alphatp2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x04, 0x04).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x05, 0x05).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0x12, 0x12).w(this, FUNC(alphatp_12_state::beep_w));
+	map(0x50, 0x53).rw(this, FUNC(alphatp_12_state::fdc_r), FUNC(alphatp_12_state::fdc_w));
+	map(0x54, 0x54).rw(this, FUNC(alphatp_12_state::fdc_stat_r), FUNC(alphatp_12_state::fdc_cmd_w));
+	map(0x78, 0x78).w(this, FUNC(alphatp_12_state::bank_w));
+}
 
 
 WRITE8_MEMBER(alphatp_12_state::bank_w)
@@ -285,51 +288,56 @@ WRITE8_MEMBER(alphatp_12_state::bank_w)
 //  ADDRESS MAPS - Alphatronic P3, P4, P30 and P40
 //**************************************************************************
 
-ADDRESS_MAP_START(alphatp_34_state::alphatp3_mem)
-	AM_RANGE(0x0000, 0xffff) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void alphatp_34_state::alphatp3_mem(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(alphatp_34_state::alphatp3_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("ram_0000")
-	AM_RANGE(0x00000, 0x017ff) AM_ROM AM_REGION("boot", 0)  // P2  0x0000 , 0x17ff -hw 6kB, P3 only 4 kB
-	AM_RANGE(0x01800, 0x01c00) AM_RAM // boot rom variables
-	AM_RANGE(0x03000, 0x03bff) AM_WRITEONLY AM_SHARE("vram") // test  2017 hw, MOS directly writes to display RAM
-	AM_RANGE(0x03FF0, 0x03fff) AM_DEVWRITE("crtc", crt5037_device, write) //test hw, mem-mapped registers, cursor position can be determined through this range
+void alphatp_34_state::alphatp3_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).bankrw("ram_0000");
+	map(0x00000, 0x017ff).rom().region("boot", 0);  // P2  0x0000 , 0x17ff -hw 6kB, P3 only 4 kB
+	map(0x01800, 0x01c00).ram(); // boot rom variables
+	map(0x03000, 0x03bff).writeonly().share("vram"); // test  2017 hw, MOS directly writes to display RAM
+	map(0x03FF0, 0x03fff).w(m_crtc, FUNC(crt5037_device::write)); //test hw, mem-mapped registers, cursor position can be determined through this range
 
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+	map(0x10000, 0x1ffff).ram().share("ram");
+}
 
-ADDRESS_MAP_START(alphatp_34_state::alphatp3_io)
-	ADDRESS_MAP_UNMAP_HIGH
+void alphatp_34_state::alphatp3_io(address_map &map)
+{
+	map.unmap_value_high();
 	//AM_RANGE(0x00, 0x00) AM_READ // unknown
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x08, 0x09) AM_READWRITE(comm88_r, comm88_w)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("kbdmcu", i8041_device, upi41_master_r, upi41_master_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(beep_w)
-	AM_RANGE(0x40, 0x41) AM_READ(start88_r)
+	map(0x04, 0x04).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x05, 0x05).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x08, 0x09).rw(this, FUNC(alphatp_34_state::comm88_r), FUNC(alphatp_34_state::comm88_w));
+	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0x12, 0x12).w(this, FUNC(alphatp_34_state::beep_w));
+	map(0x40, 0x41).r(this, FUNC(alphatp_34_state::start88_r));
 	//AM_RANGE(0x42, 0x42) AM_WRITE // unknown
-	AM_RANGE(0x50, 0x53) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0x54, 0x54) AM_READWRITE(fdc_stat_r, fdc_cmd_w)
-	AM_RANGE(0x78, 0x78) AM_WRITE(bank_w)
-ADDRESS_MAP_END
+	map(0x50, 0x53).rw(this, FUNC(alphatp_34_state::fdc_r), FUNC(alphatp_34_state::fdc_w));
+	map(0x54, 0x54).rw(this, FUNC(alphatp_34_state::fdc_stat_r), FUNC(alphatp_34_state::fdc_cmd_w));
+	map(0x78, 0x78).w(this, FUNC(alphatp_34_state::bank_w));
+}
 
-ADDRESS_MAP_START(alphatp_34_state::alphatp30_8088_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(gfxext_r, gfxext_w)
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("16bit", 0)
-ADDRESS_MAP_END
+void alphatp_34_state::alphatp30_8088_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).ram();
+	map(0xe0000, 0xeffff).rw(this, FUNC(alphatp_34_state::gfxext_r), FUNC(alphatp_34_state::gfxext_w));
+	map(0xfe000, 0xfffff).rom().region("16bit", 0);
+}
 
-ADDRESS_MAP_START(alphatp_34_state::alphatp30_8088_io)
+void alphatp_34_state::alphatp30_8088_io(address_map &map)
+{
 	//AM_RANGE(0x008a, 0x008a) AM_READ // unknown
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(gfxext1_w)
-	AM_RANGE(0xf900, 0xf900) AM_WRITE(gfxext2_w)
-	AM_RANGE(0xfa00, 0xfa01) AM_WRITE(gfxext3_w)
+	map(0xf800, 0xf800).w(this, FUNC(alphatp_34_state::gfxext1_w));
+	map(0xf900, 0xf900).w(this, FUNC(alphatp_34_state::gfxext2_w));
+	map(0xfa00, 0xfa01).w(this, FUNC(alphatp_34_state::gfxext3_w));
 	//AM_RANGE(0xfb00, 0xfb0f) AM_WRITE // unknown possibly gfx ext
-	AM_RANGE(0xffe0, 0xffe1) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0xffe4, 0xffe7) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0xffe9, 0xffea) AM_READWRITE(comm85_r, comm85_w)
-ADDRESS_MAP_END
+	map(0xffe0, 0xffe1).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xffe4, 0xffe7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xffe9, 0xffea).rw(this, FUNC(alphatp_34_state::comm85_r), FUNC(alphatp_34_state::comm85_w));
+}
 
 READ8_MEMBER(alphatp_34_state::start88_r)
 {

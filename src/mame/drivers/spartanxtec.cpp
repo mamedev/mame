@@ -177,29 +177,30 @@ WRITE8_MEMBER(spartanxtec_state::irq_ack)
 }
 
 
-ADDRESS_MAP_START(spartanxtec_state::spartanxtec_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("spriteram")
+void spartanxtec_state::spartanxtec_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc400, 0xc7ff).ram().share("spriteram");
 
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	map(0x8000, 0x8000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8101, 0x8101) AM_READ_PORT("DSW2")
-	AM_RANGE(0x8102, 0x8102) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x8103, 0x8103) AM_READ_PORT("P1")
+	map(0x8100, 0x8100).portr("DSW1");
+	map(0x8101, 0x8101).portr("DSW2");
+	map(0x8102, 0x8102).portr("SYSTEM");
+	map(0x8103, 0x8103).portr("P1");
 
-	AM_RANGE(0x8200, 0x8200) AM_WRITE(irq_ack)
+	map(0x8200, 0x8200).w(this, FUNC(spartanxtec_state::irq_ack));
 
-	AM_RANGE(0xA801, 0xA801) AM_WRITE(a801_w)
+	map(0xA801, 0xA801).w(this, FUNC(spartanxtec_state::a801_w));
 
-	AM_RANGE(0xa900, 0xa903) AM_RAM AM_SHARE("scroll_lo")
-	AM_RANGE(0xa980, 0xa983) AM_RAM AM_SHARE("scroll_hi")
+	map(0xa900, 0xa903).ram().share("scroll_lo");
+	map(0xa980, 0xa983).ram().share("scroll_hi");
 
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(kungfum_tileram_w) AM_SHARE("m62_tileram")
+	map(0xd000, 0xdfff).ram().w(this, FUNC(spartanxtec_state::kungfum_tileram_w)).share("m62_tileram");
 
-	AM_RANGE(0xe000, 0xefff) AM_RAM
+	map(0xe000, 0xefff).ram();
 
-ADDRESS_MAP_END
+}
 
 
 
@@ -209,27 +210,29 @@ WRITE8_MEMBER(spartanxtec_state::sound_irq_ack)
 }
 
 
-ADDRESS_MAP_START(spartanxtec_state::spartanxtec_sound_map)
+void spartanxtec_state::spartanxtec_sound_map(address_map &map)
+{
 
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
+	map(0x0000, 0x0fff).rom();
+	map(0x8000, 0x83ff).ram();
 
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(spartanxtec_state::spartanxtec_sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0000) AM_WRITE( sound_irq_ack )
+void spartanxtec_state::spartanxtec_sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x0000).w(this, FUNC(spartanxtec_state::sound_irq_ack));
 
-	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE("ay3", ay8912_device, address_data_w)
-	AM_RANGE(0x0012, 0x0012) AM_DEVREAD("ay3", ay8912_device, data_r)
+	map(0x0012, 0x0013).w("ay3", FUNC(ay8912_device::address_data_w));
+	map(0x0012, 0x0012).r("ay3", FUNC(ay8912_device::data_r));
 
-	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
-	AM_RANGE(0x0014, 0x0014) AM_DEVREAD("ay1", ay8912_device, data_r)
+	map(0x0014, 0x0015).w("ay1", FUNC(ay8912_device::address_data_w));
+	map(0x0014, 0x0014).r("ay1", FUNC(ay8912_device::data_r));
 
-	AM_RANGE(0x0018, 0x0019) AM_DEVWRITE("ay2", ay8912_device, address_data_w)
-	AM_RANGE(0x0018, 0x0018) AM_DEVREAD("ay2", ay8912_device, data_r)
-ADDRESS_MAP_END
+	map(0x0018, 0x0019).w("ay2", FUNC(ay8912_device::address_data_w));
+	map(0x0018, 0x0018).r("ay2", FUNC(ay8912_device::data_r));
+}
 
 
 

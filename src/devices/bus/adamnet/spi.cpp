@@ -53,20 +53,22 @@ const tiny_rom_entry *adam_spi_device::device_rom_region() const
 //  ADDRESS_MAP( adam_spi_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(adam_spi_device::adam_spi_mem)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(M6801_TAG, m6801_cpu_device, m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_TAG, 0)
-ADDRESS_MAP_END
+void adam_spi_device::adam_spi_mem(address_map &map)
+{
+	map(0x0000, 0x001f).rw(M6801_TAG, FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
+	map(0x0080, 0x00ff).ram();
+	map(0xf800, 0xffff).rom().region(M6801_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( adam_spi_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(adam_spi_device::adam_spi_io)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(p2_r, p2_w)
-ADDRESS_MAP_END
+void adam_spi_device::adam_spi_io(address_map &map)
+{
+	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(adam_spi_device::p2_r), FUNC(adam_spi_device::p2_w));
+}
 
 
 //-------------------------------------------------

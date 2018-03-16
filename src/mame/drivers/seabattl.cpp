@@ -252,28 +252,30 @@ void seabattl_state::video_start()
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(seabattl_state::seabattl_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x2000, 0x33ff) AM_ROM
-	AM_RANGE(0x1400, 0x17ff) AM_MIRROR(0x2000) AM_RAM_WRITE(seabattl_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x2000) AM_RAM_WRITE(seabattl_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1c00, 0x1cff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x1d00, 0x1dff) AM_MIRROR(0x2000) AM_RAM AM_SHARE("objram")
-	AM_RANGE(0x1e00, 0x1e00) AM_MIRROR(0x20f0) AM_WRITE(time_display_w)
-	AM_RANGE(0x1e01, 0x1e01) AM_MIRROR(0x20f0) AM_WRITE(score_display_w)
-	AM_RANGE(0x1e02, 0x1e02) AM_MIRROR(0x20f0) AM_READ_PORT("IN0") AM_WRITE(score2_display_w)
-	AM_RANGE(0x1e05, 0x1e05) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS2")
-	AM_RANGE(0x1e06, 0x1e06) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS1") AM_WRITE(sound_w)
-	AM_RANGE(0x1e07, 0x1e07) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS0") AM_WRITE(sound2_w)
-	AM_RANGE(0x1f00, 0x1fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("s2636", s2636_device, read_data, write_data)
-	AM_RANGE(0x1fcc, 0x1fcc) AM_MIRROR(0x2000) AM_READ_PORT("IN1")
-ADDRESS_MAP_END
+void seabattl_state::seabattl_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x13ff).rom();
+	map(0x2000, 0x33ff).rom();
+	map(0x1400, 0x17ff).mirror(0x2000).ram().w(this, FUNC(seabattl_state::seabattl_colorram_w)).share("colorram");
+	map(0x1800, 0x1bff).mirror(0x2000).ram().w(this, FUNC(seabattl_state::seabattl_videoram_w)).share("videoram");
+	map(0x1c00, 0x1cff).mirror(0x2000).ram();
+	map(0x1d00, 0x1dff).mirror(0x2000).ram().share("objram");
+	map(0x1e00, 0x1e00).mirror(0x20f0).w(this, FUNC(seabattl_state::time_display_w));
+	map(0x1e01, 0x1e01).mirror(0x20f0).w(this, FUNC(seabattl_state::score_display_w));
+	map(0x1e02, 0x1e02).mirror(0x20f0).portr("IN0").w(this, FUNC(seabattl_state::score2_display_w));
+	map(0x1e05, 0x1e05).mirror(0x20f0).portr("DIPS2");
+	map(0x1e06, 0x1e06).mirror(0x20f0).portr("DIPS1").w(this, FUNC(seabattl_state::sound_w));
+	map(0x1e07, 0x1e07).mirror(0x20f0).portr("DIPS0").w(this, FUNC(seabattl_state::sound2_w));
+	map(0x1f00, 0x1fff).mirror(0x2000).rw(m_s2636, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1fcc, 0x1fcc).mirror(0x2000).portr("IN1");
+}
 
-ADDRESS_MAP_START(seabattl_state::seabattl_data_map)
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE( seabattl_collision_r, seabattl_control_w )
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE( seabattl_collision_clear_r, seabattl_collision_clear_w )
-ADDRESS_MAP_END
+void seabattl_state::seabattl_data_map(address_map &map)
+{
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(seabattl_state::seabattl_collision_r), FUNC(seabattl_state::seabattl_control_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(seabattl_state::seabattl_collision_clear_r), FUNC(seabattl_state::seabattl_collision_clear_w));
+}
 
 READ8_MEMBER(seabattl_state::seabattl_collision_r)
 {

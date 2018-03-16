@@ -175,25 +175,28 @@ WRITE_LINE_MEMBER(m24_state::halt_i86_w)
 	m_i86_halt = state ? true : false;
 }
 
-ADDRESS_MAP_START(m24_state::m24_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void m24_state::m24_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf8000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(m24_state::m24_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", pc_noppi_mb_device, map, 0xffff)
-	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(keyboard_r, keyboard_w, 0xffff)
-	AM_RANGE(0x0066, 0x0067) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("mm58174an", mm58274c_device, read, write, 0xffff)
-	AM_RANGE(0x80c0, 0x80c1) AM_DEVREADWRITE8("z8000_apb", m24_z8000_device, handshake_r, handshake_w, 0xff00)
-ADDRESS_MAP_END
+void m24_state::m24_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
+	map(0x0060, 0x0065).rw(this, FUNC(m24_state::keyboard_r), FUNC(m24_state::keyboard_w));
+	map(0x0066, 0x0067).portr("DSW0");
+	map(0x0070, 0x007f).rw("mm58174an", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write));
+	map(0x80c1, 0x80c1).rw(m_z8000_apb, FUNC(m24_z8000_device::handshake_r), FUNC(m24_z8000_device::handshake_w));
+}
 
-ADDRESS_MAP_START(m24_state::kbc_map)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(kbcdata_r)
-	AM_RANGE(0xa000, 0xafff) AM_WRITE(kbcdata_w)
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION("kbc", 0)
-ADDRESS_MAP_END
+void m24_state::kbc_map(address_map &map)
+{
+	map(0x8000, 0x8fff).r(this, FUNC(m24_state::kbcdata_r));
+	map(0xa000, 0xafff).w(this, FUNC(m24_state::kbcdata_w));
+	map(0xf800, 0xffff).rom().region("kbc", 0);
+}
 
 static INPUT_PORTS_START( m24 )
 	PORT_START("DSW0")

@@ -85,26 +85,28 @@ void turrett_state::machine_reset()
  *
  *************************************/
 
-ADDRESS_MAP_START(turrett_state::cpu_map)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM
-	AM_RANGE(0x02000010, 0x02000013) AM_RAM
-	AM_RANGE(0x02000040, 0x02000043) AM_RAM
-	AM_RANGE(0x02000050, 0x02000053) AM_RAM
-	AM_RANGE(0x02000060, 0x02000063) AM_RAM
-	AM_RANGE(0x02000070, 0x02000073) AM_RAM // TODO: What are these?
-	AM_RANGE(0x04000000, 0x0400000f) AM_WRITE(dma_w)
-	AM_RANGE(0x04000100, 0x04000103) AM_READWRITE(int_r, int_w)
-	AM_RANGE(0x04000200, 0x040003ff) AM_DEVREADWRITE("ttsound", turrett_device, read, write)
-	AM_RANGE(0x08000000, 0x0800000f) AM_READWRITE(video_r, video_w)
-	AM_RANGE(0x08000200, 0x080003ff) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff)
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void turrett_state::cpu_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).ram();
+	map(0x02000010, 0x02000013).ram();
+	map(0x02000040, 0x02000043).ram();
+	map(0x02000050, 0x02000053).ram();
+	map(0x02000060, 0x02000063).ram();
+	map(0x02000070, 0x02000073).ram(); // TODO: What are these?
+	map(0x04000000, 0x0400000f).w(this, FUNC(turrett_state::dma_w));
+	map(0x04000100, 0x04000103).rw(this, FUNC(turrett_state::int_r), FUNC(turrett_state::int_w));
+	map(0x04000200, 0x040003ff).rw("ttsound", FUNC(turrett_device::read), FUNC(turrett_device::write));
+	map(0x08000000, 0x0800000f).rw(this, FUNC(turrett_state::video_r), FUNC(turrett_state::video_w));
+	map(0x08000200, 0x080003ff).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0));
+	map(0x1fc00000, 0x1fdfffff).rom().region("maincpu", 0);
+}
 
 
-ADDRESS_MAP_START(turrett_state::turrett_sound_map)
-	AM_RANGE(0x0000000, 0x7ffffff) AM_RAM AM_SHARE("bank_a")
-	AM_RANGE(0x8000000, 0xfffffff) AM_RAM AM_SHARE("bank_b")
-ADDRESS_MAP_END
+void turrett_state::turrett_sound_map(address_map &map)
+{
+	map(0x0000000, 0x7ffffff).ram().share("bank_a");
+	map(0x8000000, 0xfffffff).ram().share("bank_b");
+}
 
 
 

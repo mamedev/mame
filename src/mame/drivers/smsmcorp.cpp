@@ -484,34 +484,37 @@ uint32_t smsmfg_state::screen_update_sms(screen_device &screen, bitmap_ind16 &bi
  *
  *************************************/
 
-ADDRESS_MAP_START(smsmfg_state::sms_map)
-	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x00800, 0x00803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x01000, 0x01007) AM_WRITE(video_w)
-	AM_RANGE(0x01800, 0x01803) AM_READWRITE(link_r, link_w)
-	AM_RANGE(0x04000, 0x07fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x04000, 0x04000) AM_WRITE(bankswitch_w)
-	AM_RANGE(0x08000, 0x0ffff) AM_ROM
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM // mirror for vectors
-ADDRESS_MAP_END
+void smsmfg_state::sms_map(address_map &map)
+{
+	map(0x00000, 0x007ff).ram().share("nvram");
+	map(0x00800, 0x00803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x01000, 0x01007).w(this, FUNC(smsmfg_state::video_w));
+	map(0x01800, 0x01803).rw(this, FUNC(smsmfg_state::link_r), FUNC(smsmfg_state::link_w));
+	map(0x04000, 0x07fff).bankr("bank1");
+	map(0x04000, 0x04000).w(this, FUNC(smsmfg_state::bankswitch_w));
+	map(0x08000, 0x0ffff).rom();
+	map(0xf8000, 0xfffff).rom(); // mirror for vectors
+}
 
-ADDRESS_MAP_START(smsmfg_state::sureshot_map)
-	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x02000, 0x02007) AM_WRITE(video_w)
-	AM_RANGE(0x03000, 0x03003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x03800, 0x03803) AM_READWRITE(link_r, link_w)
-	AM_RANGE(0x08000, 0x0ffff) AM_ROM
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM // mirror for vectors
-ADDRESS_MAP_END
+void smsmfg_state::sureshot_map(address_map &map)
+{
+	map(0x00000, 0x007ff).ram().share("nvram");
+	map(0x02000, 0x02007).w(this, FUNC(smsmfg_state::video_w));
+	map(0x03000, 0x03003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x03800, 0x03803).rw(this, FUNC(smsmfg_state::link_r), FUNC(smsmfg_state::link_w));
+	map(0x08000, 0x0ffff).rom();
+	map(0xf8000, 0xfffff).rom(); // mirror for vectors
+}
 
-ADDRESS_MAP_START(smsmfg_state::sub_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x3100, 0x3103) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x3381, 0x3382) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x3400, 0x3400) AM_READ(z80_8088_r)
-	AM_RANGE(0x3500, 0x3501) AM_READWRITE(p03_r, p03_w)
-ADDRESS_MAP_END
+void smsmfg_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram();
+	map(0x3100, 0x3103).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x3381, 0x3382).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x3400, 0x3400).r(this, FUNC(smsmfg_state::z80_8088_r));
+	map(0x3500, 0x3501).rw(this, FUNC(smsmfg_state::p03_r), FUNC(smsmfg_state::p03_w));
+}
 
 /*************************************
  *

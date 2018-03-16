@@ -20,34 +20,38 @@
 #include "speaker.h"
 
 /* Address maps */
-ADDRESS_MAP_START(mikro80_state::mikro80_mem)
-	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("bank1") // First bank
-	AM_RANGE( 0x0800, 0xdfff ) AM_RAM  // RAM
-	AM_RANGE( 0xe000, 0xe7ff ) AM_RAM  AM_SHARE("cursor_ram")// Video RAM
-	AM_RANGE( 0xe800, 0xefff ) AM_RAM  AM_SHARE("video_ram") // Video RAM
-	AM_RANGE( 0xf000, 0xf7ff ) AM_RAM  // RAM
-	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
-ADDRESS_MAP_END
+void mikro80_state::mikro80_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).bankrw("bank1"); // First bank
+	map(0x0800, 0xdfff).ram();  // RAM
+	map(0xe000, 0xe7ff).ram().share("cursor_ram");// Video RAM
+	map(0xe800, 0xefff).ram().share("video_ram"); // Video RAM
+	map(0xf000, 0xf7ff).ram();  // RAM
+	map(0xf800, 0xffff).rom();  // System ROM
+}
 
-ADDRESS_MAP_START(mikro80_state::mikro80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x01, 0x01) AM_READWRITE(mikro80_tape_r, mikro80_tape_w )
-	AM_RANGE( 0x04, 0x07) AM_READWRITE(mikro80_keyboard_r, mikro80_keyboard_w )
-ADDRESS_MAP_END
+void mikro80_state::mikro80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x01, 0x01).rw(this, FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
+	map(0x04, 0x07).rw(this, FUNC(mikro80_state::mikro80_keyboard_r), FUNC(mikro80_state::mikro80_keyboard_w));
+}
 
-ADDRESS_MAP_START(mikro80_state::kristall_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void mikro80_state::kristall_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x03).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(mikro80_state::radio99_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x01, 0x01) AM_READWRITE(mikro80_tape_r, mikro80_tape_w )
-	AM_RANGE( 0x04, 0x04) AM_WRITE(radio99_sound_w)
-	AM_RANGE( 0x05, 0x05) AM_READWRITE(mikro80_8255_portc_r, mikro80_8255_portc_w )
-	AM_RANGE( 0x06, 0x06) AM_READ(mikro80_8255_portb_r)
-	AM_RANGE( 0x07, 0x07) AM_WRITE(mikro80_8255_porta_w)
-ADDRESS_MAP_END
+void mikro80_state::radio99_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x01, 0x01).rw(this, FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
+	map(0x04, 0x04).w(this, FUNC(mikro80_state::radio99_sound_w));
+	map(0x05, 0x05).rw(this, FUNC(mikro80_state::mikro80_8255_portc_r), FUNC(mikro80_state::mikro80_8255_portc_w));
+	map(0x06, 0x06).r(this, FUNC(mikro80_state::mikro80_8255_portb_r));
+	map(0x07, 0x07).w(this, FUNC(mikro80_state::mikro80_8255_porta_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mikro80 )

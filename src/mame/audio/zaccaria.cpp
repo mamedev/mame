@@ -28,11 +28,12 @@ DEFINE_DEVICE_TYPE(ZACCARIA_1B11142, zac1b11142_audio_device, "zac1b11142", "Zac
     base melody/SFX generator CPU map
     1B11107 and 1B11142 both have a 6802 with internal RAM and a PIA accessed at 0x500c
 */
-ADDRESS_MAP_START(zac1b111xx_melody_base::zac1b111xx_melody_base_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_RAM // 6802 internal RAM
-	AM_RANGE(0x400c, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("melodypia", pia6821_device, read, write)
-ADDRESS_MAP_END
+void zac1b111xx_melody_base::zac1b111xx_melody_base_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x007f).ram(); // 6802 internal RAM
+	map(0x400c, 0x400f).mirror(0x1ff0).rw("melodypia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+}
 
 
 /*
@@ -60,11 +61,12 @@ ADDRESS_MAP_END
     * PB0 and PB1 connect to the BC1 and BDIR pins of the AY chip at 1H
     * PB2 and PB3 connect to the BC1 and BDIR pins of the AY chip at 1I
 */
-ADDRESS_MAP_START(zac1b11107_audio_device::zac1b11107_melody_map)
-	AM_IMPORT_FROM(zac1b111xx_melody_base_map)
-	AM_RANGE(0xc000, 0xcfff) AM_ROM // ROM @ 1F
-	AM_RANGE(0xe000, 0xffff) AM_ROM // ROM @ 1D, 1E
-ADDRESS_MAP_END
+void zac1b11107_audio_device::zac1b11107_melody_map(address_map &map)
+{
+	zac1b111xx_melody_base_map(map);
+	map(0xc000, 0xcfff).rom(); // ROM @ 1F
+	map(0xe000, 0xffff).rom(); // ROM @ 1D, 1E
+}
 
 
 /*
@@ -95,11 +97,12 @@ ADDRESS_MAP_END
     * PB0 and PB1 connect to the BC1 and BDIR pins of the AY chip at 4G
     * PB2 and PB3 connect to the BC1 and BDIR pins of the AY chip at 4H
 */
-ADDRESS_MAP_START(zac1b11142_audio_device::zac1b11142_melody_map)
-	AM_IMPORT_FROM(zac1b111xx_melody_base_map)
-	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x2000) AM_ROM // ROM 13
-	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM // ROM 9
-ADDRESS_MAP_END
+void zac1b11142_audio_device::zac1b11142_melody_map(address_map &map)
+{
+	zac1b111xx_melody_base_map(map);
+	map(0x8000, 0x9fff).mirror(0x2000).rom(); // ROM 13
+	map(0xc000, 0xdfff).mirror(0x2000).rom(); // ROM 9
+}
 
 
 /*
@@ -126,18 +129,19 @@ ADDRESS_MAP_END
    CA1 and CB2 are not connected, though the test mode assumes there's something connected to CB2 (possibly another LED like the one connected to PB4)
    PB3 connects to 'ACS' which goes to the Z80
 */
-ADDRESS_MAP_START(zac1b11142_audio_device::zac1b11142_audio_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_RAM // 6802 internal RAM
-	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x8f6c) AM_DEVREADWRITE("pia_1i", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x83ff) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0xc3ff) AM_WRITE(melody_command_w)
-	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0xc3ff) AM_READ(host_command_r)
-	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0x8000) AM_ROM // ROM 8 with A12 low
-	AM_RANGE(0x3000, 0x3fff) AM_MIRROR(0x8000) AM_ROM // ROM 7 with A12 low
-	AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x8000) AM_ROM // ROM 8 with A12 high
-	AM_RANGE(0x7000, 0x7fff) AM_MIRROR(0x8000) AM_ROM // ROM 7 with A12 high
-ADDRESS_MAP_END
+void zac1b11142_audio_device::zac1b11142_audio_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x007f).ram(); // 6802 internal RAM
+	map(0x0090, 0x0093).mirror(0x8f6c).rw("pia_1i", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x1000).mirror(0x83ff).w("dac", FUNC(dac_byte_interface::write));
+	map(0x1400, 0x1400).mirror(0xc3ff).w(this, FUNC(zac1b11142_audio_device::melody_command_w));
+	map(0x1800, 0x1800).mirror(0xc3ff).r(this, FUNC(zac1b11142_audio_device::host_command_r));
+	map(0x2000, 0x2fff).mirror(0x8000).rom(); // ROM 8 with A12 low
+	map(0x3000, 0x3fff).mirror(0x8000).rom(); // ROM 7 with A12 low
+	map(0x6000, 0x6fff).mirror(0x8000).rom(); // ROM 8 with A12 high
+	map(0x7000, 0x7fff).mirror(0x8000).rom(); // ROM 7 with A12 high
+}
 
 
 

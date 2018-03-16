@@ -272,35 +272,38 @@ INTERRUPT_GEN_MEMBER(gaplus_state::vblank_sub2_irq)
 }
 
 
-ADDRESS_MAP_START(gaplus_state::cpu1_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")        /* tilemap RAM (shared with CPU #2) */
-	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("spriteram") /* shared RAM with CPU #2 (includes sprite RAM) */
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)                                      /* shared RAM with CPU #3 */
-	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE("namcoio_1", namcoio_device, read, write)                                                   /* custom I/O chips interface */
-	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE("namcoio_2", namcoio_device, read, write)                                                   /* custom I/O chips interface */
-	AM_RANGE(0x6820, 0x682f) AM_READWRITE(customio_3_r, customio_3_w) AM_SHARE("customio_3")  /* custom I/O chip #3 interface */
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(irq_1_ctrl_w)                                                      /* main CPU irq control */
-	AM_RANGE(0x7800, 0x7fff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(sreset_w)                                                          /* reset CPU #2 & #3, enable sound */
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(freset_w)                                                          /* reset I/O chips */
-	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(starfield_control_w)               /* starfield control */
-	AM_RANGE(0xa000, 0xffff) AM_ROM                                                                             /* ROM */
-ADDRESS_MAP_END
+void gaplus_state::cpu1_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().w(this, FUNC(gaplus_state::videoram_w)).share("videoram");        /* tilemap RAM (shared with CPU #2) */
+	map(0x0800, 0x1fff).ram().share("spriteram"); /* shared RAM with CPU #2 (includes sprite RAM) */
+	map(0x6000, 0x63ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));                                      /* shared RAM with CPU #3 */
+	map(0x6800, 0x680f).rw("namcoio_1", FUNC(namcoio_device::read), FUNC(namcoio_device::write));                                                   /* custom I/O chips interface */
+	map(0x6810, 0x681f).rw("namcoio_2", FUNC(namcoio_device::read), FUNC(namcoio_device::write));                                                   /* custom I/O chips interface */
+	map(0x6820, 0x682f).rw(this, FUNC(gaplus_state::customio_3_r), FUNC(gaplus_state::customio_3_w)).share("customio_3");  /* custom I/O chip #3 interface */
+	map(0x7000, 0x7fff).w(this, FUNC(gaplus_state::irq_1_ctrl_w));                                                      /* main CPU irq control */
+	map(0x7800, 0x7fff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8000, 0x8fff).w(this, FUNC(gaplus_state::sreset_w));                                                          /* reset CPU #2 & #3, enable sound */
+	map(0x9000, 0x9fff).w(this, FUNC(gaplus_state::freset_w));                                                          /* reset I/O chips */
+	map(0xa000, 0xa7ff).w(this, FUNC(gaplus_state::starfield_control_w));               /* starfield control */
+	map(0xa000, 0xffff).rom();                                                                             /* ROM */
+}
 
-ADDRESS_MAP_START(gaplus_state::cpu2_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")   /* tilemap RAM (shared with CPU #1) */
-	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("spriteram")                           /* shared RAM with CPU #1 */
+void gaplus_state::cpu2_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().w(this, FUNC(gaplus_state::videoram_w)).share("videoram");   /* tilemap RAM (shared with CPU #1) */
+	map(0x0800, 0x1fff).ram().share("spriteram");                           /* shared RAM with CPU #1 */
 //  AM_RANGE(0x500f, 0x500f) AM_WRITENOP                                            /* ??? written 256 times on startup */
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(irq_2_ctrl_w)                          /* IRQ 2 control */
-	AM_RANGE(0xa000, 0xffff) AM_ROM                                                 /* ROM */
-ADDRESS_MAP_END
+	map(0x6000, 0x6fff).w(this, FUNC(gaplus_state::irq_2_ctrl_w));                          /* IRQ 2 control */
+	map(0xa000, 0xffff).rom();                                                 /* ROM */
+}
 
-ADDRESS_MAP_START(gaplus_state::cpu3_map)
-	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)  /* shared RAM with the main CPU + sound registers */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)  /* watchdog? */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(irq_3_ctrl_w)                                          /* interrupt enable/disable */
-	AM_RANGE(0xe000, 0xffff) AM_ROM                                                                 /* ROM */
-ADDRESS_MAP_END
+void gaplus_state::cpu3_map(address_map &map)
+{
+	map(0x0000, 0x03ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));  /* shared RAM with the main CPU + sound registers */
+	map(0x2000, 0x3fff).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));  /* watchdog? */
+	map(0x4000, 0x7fff).w(this, FUNC(gaplus_state::irq_3_ctrl_w));                                          /* interrupt enable/disable */
+	map(0xe000, 0xffff).rom();                                                                 /* ROM */
+}
 
 static INPUT_PORTS_START( gaplus )
 	/* The inputs are not memory mapped, they are handled by three I/O chips. */

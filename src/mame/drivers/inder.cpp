@@ -115,71 +115,77 @@ private:
 	required_ioport_array<11> m_switches;
 };
 
-ADDRESS_MAP_START(inder_state::brvteam_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x20ff) AM_WRITE(disp_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM // pair of 2114
-	AM_RANGE(0x4400, 0x44ff) AM_RAM AM_SHARE("nvram") // pair of 5101, battery-backed
-	AM_RANGE(0x4800, 0x480a) AM_READWRITE(sw_r,sw_w)
-	AM_RANGE(0x4900, 0x4900) AM_WRITE(sol_brvteam_w)
-	AM_RANGE(0x4901, 0x4907) AM_WRITE(lamp_w)
-	AM_RANGE(0x4b00, 0x4b00) AM_WRITE(sn_w)
-ADDRESS_MAP_END
+void inder_state::brvteam_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x20ff).w(this, FUNC(inder_state::disp_w));
+	map(0x4000, 0x43ff).ram(); // pair of 2114
+	map(0x4400, 0x44ff).ram().share("nvram"); // pair of 5101, battery-backed
+	map(0x4800, 0x480a).rw(this, FUNC(inder_state::sw_r), FUNC(inder_state::sw_w));
+	map(0x4900, 0x4900).w(this, FUNC(inder_state::sol_brvteam_w));
+	map(0x4901, 0x4907).w(this, FUNC(inder_state::lamp_w));
+	map(0x4b00, 0x4b00).w(this, FUNC(inder_state::sn_w));
+}
 
-ADDRESS_MAP_START(inder_state::canasta_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x20ff) AM_WRITE(disp_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM // pair of 2114
-	AM_RANGE(0x4400, 0x44ff) AM_RAM AM_SHARE("nvram") // pair of 5101, battery-backed
-	AM_RANGE(0x4800, 0x480a) AM_READWRITE(sw_r,sw_w)
-	AM_RANGE(0x4900, 0x4900) AM_WRITE(sol_canasta_w)
-	AM_RANGE(0x4901, 0x4907) AM_WRITE(lamp_w)
-	AM_RANGE(0x4b00, 0x4b00) AM_DEVWRITE("ay", ay8910_device, address_w)
-	AM_RANGE(0x4b01, 0x4b01) AM_DEVREAD("ay", ay8910_device, data_r)
-	AM_RANGE(0x4b02, 0x4b02) AM_DEVWRITE("ay", ay8910_device, data_w)
-ADDRESS_MAP_END
+void inder_state::canasta_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x20ff).w(this, FUNC(inder_state::disp_w));
+	map(0x4000, 0x43ff).ram(); // pair of 2114
+	map(0x4400, 0x44ff).ram().share("nvram"); // pair of 5101, battery-backed
+	map(0x4800, 0x480a).rw(this, FUNC(inder_state::sw_r), FUNC(inder_state::sw_w));
+	map(0x4900, 0x4900).w(this, FUNC(inder_state::sol_canasta_w));
+	map(0x4901, 0x4907).w(this, FUNC(inder_state::lamp_w));
+	map(0x4b00, 0x4b00).w("ay", FUNC(ay8910_device::address_w));
+	map(0x4b01, 0x4b01).r("ay", FUNC(ay8910_device::data_r));
+	map(0x4b02, 0x4b02).w("ay", FUNC(ay8910_device::data_w));
+}
 
-ADDRESS_MAP_START(inder_state::lapbylap_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x20ff) AM_WRITE(disp_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM // pair of 2114
-	AM_RANGE(0x4400, 0x44ff) AM_RAM AM_SHARE("nvram") // pair of 5101, battery-backed
-	AM_RANGE(0x4800, 0x480a) AM_READWRITE(sw_r,sw_w)
-	AM_RANGE(0x4900, 0x4900) AM_WRITE(sol_canasta_w)
-	AM_RANGE(0x4901, 0x4907) AM_WRITE(lamp_w)
-	AM_RANGE(0x4b00, 0x4b00) AM_WRITE(sndcmd_lapbylap_w)
-ADDRESS_MAP_END
+void inder_state::lapbylap_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x20ff).w(this, FUNC(inder_state::disp_w));
+	map(0x4000, 0x43ff).ram(); // pair of 2114
+	map(0x4400, 0x44ff).ram().share("nvram"); // pair of 5101, battery-backed
+	map(0x4800, 0x480a).rw(this, FUNC(inder_state::sw_r), FUNC(inder_state::sw_w));
+	map(0x4900, 0x4900).w(this, FUNC(inder_state::sol_canasta_w));
+	map(0x4901, 0x4907).w(this, FUNC(inder_state::lamp_w));
+	map(0x4b00, 0x4b00).w(this, FUNC(inder_state::sndcmd_lapbylap_w));
+}
 
-ADDRESS_MAP_START(inder_state::lapbylap_sub_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM // 6116
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x9001, 0x9001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x9002, 0x9002) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xa002, 0xa002) AM_DEVWRITE("ay2", ay8910_device, data_w)
-ADDRESS_MAP_END
+void inder_state::lapbylap_sub_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x8000, 0x87ff).ram(); // 6116
+	map(0x9000, 0x9000).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x9001, 0x9001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x9002, 0x9002).w("ay1", FUNC(ay8910_device::data_w));
+	map(0xa000, 0xa000).w("ay2", FUNC(ay8910_device::address_w));
+	map(0xa001, 0xa001).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xa002, 0xa002).w("ay2", FUNC(ay8910_device::data_w));
+}
 
-ADDRESS_MAP_START(inder_state::inder_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("nvram") // 6116, battery-backed
-	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi60", i8255_device, read, write)
-	AM_RANGE(0x6400, 0x6403) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi64", i8255_device, read, write)
-	AM_RANGE(0x6800, 0x6803) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi68", i8255_device, read, write)
-	AM_RANGE(0x6c00, 0x6c03) AM_MIRROR(0x131c) AM_DEVREADWRITE("ppi6c", i8255_device, read, write)
-	AM_RANGE(0x6c20, 0x6c3f) AM_MIRROR(0x1300) AM_WRITE(sndcmd_w)
-	AM_RANGE(0x6c60, 0x6c7f) AM_MIRROR(0x1300) AM_WRITE(disp_w)
-	AM_RANGE(0x6ce0, 0x6ce0) AM_WRITENOP
-ADDRESS_MAP_END
+void inder_state::inder_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).mirror(0x1800).ram().share("nvram"); // 6116, battery-backed
+	map(0x6000, 0x6003).mirror(0x13fc).rw("ppi60", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6400, 0x6403).mirror(0x13fc).rw("ppi64", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6800, 0x6803).mirror(0x13fc).rw("ppi68", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6c00, 0x6c03).mirror(0x131c).rw("ppi6c", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6c20, 0x6c3f).mirror(0x1300).w(this, FUNC(inder_state::sndcmd_w));
+	map(0x6c60, 0x6c7f).mirror(0x1300).w(this, FUNC(inder_state::disp_w));
+	map(0x6ce0, 0x6ce0).nopw();
+}
 
-ADDRESS_MAP_START(inder_state::inder_sub_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0x1800) AM_RAM // 6116
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(sndbank_w)
-	AM_RANGE(0x8000, 0x8000) AM_READ(sndcmd_r)
-ADDRESS_MAP_END
+void inder_state::inder_sub_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).mirror(0x1800).ram(); // 6116
+	map(0x4000, 0x4003).mirror(0x1ffc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6000, 0x6000).w(this, FUNC(inder_state::sndbank_w));
+	map(0x8000, 0x8000).r(this, FUNC(inder_state::sndcmd_r));
+}
 
 static INPUT_PORTS_START( brvteam )
 	PORT_START("SW.0")

@@ -311,67 +311,71 @@ READ16_MEMBER(astrocorp_state::astrocorp_unk_r)
 }
 
 
-ADDRESS_MAP_START(astrocorp_state::showhand_map)
-	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x050000, 0x050fff ) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE( 0x052000, 0x052001 ) AM_WRITE(astrocorp_draw_sprites_w)
-	AM_RANGE( 0x054000, 0x054001 ) AM_READ_PORT("INPUTS")
-	AM_RANGE( 0x058000, 0x058001 ) AM_WRITE(astrocorp_eeprom_w)
-	AM_RANGE( 0x05a000, 0x05a001 ) AM_WRITE(showhand_outputs_w)
-	AM_RANGE( 0x05e000, 0x05e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE( 0x070000, 0x073fff ) AM_RAM AM_SHARE("nvram") // battery
-	AM_RANGE( 0x080000, 0x080001 ) AM_WRITE(astrocorp_sound_bank_w)
-	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_screen_enable_w)
-	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_READ(astrocorp_unk_r)
-	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
-ADDRESS_MAP_END
+void astrocorp_state::showhand_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x050000, 0x050fff).ram().share("spriteram");
+	map(0x052000, 0x052001).w(this, FUNC(astrocorp_state::astrocorp_draw_sprites_w));
+	map(0x054000, 0x054001).portr("INPUTS");
+	map(0x058000, 0x058001).w(this, FUNC(astrocorp_state::astrocorp_eeprom_w));
+	map(0x05a000, 0x05a001).w(this, FUNC(astrocorp_state::showhand_outputs_w));
+	map(0x05e000, 0x05e001).portr("EEPROMIN");
+	map(0x060000, 0x0601ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x070000, 0x073fff).ram().share("nvram"); // battery
+	map(0x080000, 0x080001).w(this, FUNC(astrocorp_state::astrocorp_sound_bank_w));
+	map(0x0a0000, 0x0a0001).w(this, FUNC(astrocorp_state::astrocorp_screen_enable_w));
+	map(0x0d0000, 0x0d0001).r(this, FUNC(astrocorp_state::astrocorp_unk_r));
+	map(0x0d0000, 0x0d0000).w(m_oki, FUNC(okim6295_device::write));
+}
 
-ADDRESS_MAP_START(astrocorp_state::showhanc_map)
-	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE( 0x070000, 0x070001 ) AM_WRITE(astrocorp_sound_bank_w)
-	AM_RANGE( 0x080000, 0x080fff ) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE( 0x082000, 0x082001 ) AM_WRITE(astrocorp_draw_sprites_w)
-	AM_RANGE( 0x084000, 0x084001 ) AM_READ_PORT("INPUTS")
-	AM_RANGE( 0x088000, 0x088001 ) AM_WRITE(astrocorp_eeprom_w)
-	AM_RANGE( 0x08a000, 0x08a001 ) AM_WRITE(showhand_outputs_w)
-	AM_RANGE( 0x08e000, 0x08e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x090000, 0x093fff ) AM_RAM AM_SHARE("nvram") // battery
-	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_screen_enable_w)
-	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_READ(astrocorp_unk_r)
-	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
-ADDRESS_MAP_END
+void astrocorp_state::showhanc_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x060000, 0x0601ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x070000, 0x070001).w(this, FUNC(astrocorp_state::astrocorp_sound_bank_w));
+	map(0x080000, 0x080fff).ram().share("spriteram");
+	map(0x082000, 0x082001).w(this, FUNC(astrocorp_state::astrocorp_draw_sprites_w));
+	map(0x084000, 0x084001).portr("INPUTS");
+	map(0x088000, 0x088001).w(this, FUNC(astrocorp_state::astrocorp_eeprom_w));
+	map(0x08a000, 0x08a001).w(this, FUNC(astrocorp_state::showhand_outputs_w));
+	map(0x08e000, 0x08e001).portr("EEPROMIN");
+	map(0x090000, 0x093fff).ram().share("nvram"); // battery
+	map(0x0a0000, 0x0a0001).w(this, FUNC(astrocorp_state::astrocorp_screen_enable_w));
+	map(0x0e0000, 0x0e0001).r(this, FUNC(astrocorp_state::astrocorp_unk_r));
+	map(0x0e0000, 0x0e0000).w(m_oki, FUNC(okim6295_device::write));
+}
 
-ADDRESS_MAP_START(astrocorp_state::skilldrp_map)
-	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE( 0x202000, 0x202001 ) AM_WRITE(astrocorp_draw_sprites_w)
-	AM_RANGE( 0x204000, 0x204001 ) AM_READ_PORT("INPUTS")
-	AM_RANGE( 0x208000, 0x208001 ) AM_WRITE(astrocorp_eeprom_w)
-	AM_RANGE( 0x20a000, 0x20a001 ) AM_WRITE(skilldrp_outputs_w)
-	AM_RANGE( 0x20e000, 0x20e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x380000, 0x3801ff ) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE( 0x400000, 0x400001 ) AM_WRITE(astrocorp_screen_enable_w)
-	AM_RANGE( 0x500000, 0x507fff ) AM_RAM AM_SHARE("nvram") // battery
-	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE(skilldrp_sound_bank_w)
-	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void astrocorp_state::skilldrp_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x200000, 0x200fff).ram().share("spriteram");
+	map(0x202000, 0x202001).w(this, FUNC(astrocorp_state::astrocorp_draw_sprites_w));
+	map(0x204000, 0x204001).portr("INPUTS");
+	map(0x208000, 0x208001).w(this, FUNC(astrocorp_state::astrocorp_eeprom_w));
+	map(0x20a000, 0x20a001).w(this, FUNC(astrocorp_state::skilldrp_outputs_w));
+	map(0x20e000, 0x20e001).portr("EEPROMIN");
+	map(0x380000, 0x3801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x400000, 0x400001).w(this, FUNC(astrocorp_state::astrocorp_screen_enable_w));
+	map(0x500000, 0x507fff).ram().share("nvram"); // battery
+	map(0x580000, 0x580001).w(this, FUNC(astrocorp_state::skilldrp_sound_bank_w));
+	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
-ADDRESS_MAP_START(astrocorp_state::speeddrp_map)
-	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x280000, 0x283fff ) AM_RAM AM_SHARE("nvram") // battery
-	AM_RANGE( 0x380000, 0x380fff ) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE( 0x382000, 0x382001 ) AM_WRITE(astrocorp_draw_sprites_w)
-	AM_RANGE( 0x384000, 0x384001 ) AM_READ_PORT("INPUTS")
-	AM_RANGE( 0x388000, 0x388001 ) AM_WRITE(astrocorp_eeprom_w)
-	AM_RANGE( 0x38a000, 0x38a001 ) AM_WRITE(skilldrp_outputs_w)
-	AM_RANGE( 0x38e000, 0x38e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x480000, 0x4801ff ) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE( 0x500000, 0x500001 ) AM_WRITE(astrocorp_screen_enable_w)
-	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE(skilldrp_sound_bank_w)
-	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void astrocorp_state::speeddrp_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x280000, 0x283fff).ram().share("nvram"); // battery
+	map(0x380000, 0x380fff).ram().share("spriteram");
+	map(0x382000, 0x382001).w(this, FUNC(astrocorp_state::astrocorp_draw_sprites_w));
+	map(0x384000, 0x384001).portr("INPUTS");
+	map(0x388000, 0x388001).w(this, FUNC(astrocorp_state::astrocorp_eeprom_w));
+	map(0x38a000, 0x38a001).w(this, FUNC(astrocorp_state::skilldrp_outputs_w));
+	map(0x38e000, 0x38e001).portr("EEPROMIN");
+	map(0x480000, 0x4801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x500000, 0x500001).w(this, FUNC(astrocorp_state::astrocorp_screen_enable_w));
+	map(0x580000, 0x580001).w(this, FUNC(astrocorp_state::skilldrp_sound_bank_w));
+	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 /***************************************************************************
                                 Input Ports

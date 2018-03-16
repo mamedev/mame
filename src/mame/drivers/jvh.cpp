@@ -40,12 +40,14 @@ public:
 
 
 
-ADDRESS_MAP_START(jvh_state::jvh_map)
-	AM_RANGE(0x0000, 0x3bff) AM_ROM
-	AM_RANGE(0x3c00, 0x3cff) AM_RAM
-ADDRESS_MAP_END
+void jvh_state::jvh_map(address_map &map)
+{
+	map(0x0000, 0x3bff).rom();
+	map(0x3c00, 0x3cff).ram();
+}
 
-ADDRESS_MAP_START(jvh_state::escape_io)
+void jvh_state::escape_io(address_map &map)
+{
 	//AM_RANGE(0x01, 0x02) AM_READ(sw1_r)
 	//AM_RANGE(0x03, 0x05) AM_READ(dip_r)
 	//AM_RANGE(0x06, 0x07) AM_READ(sw6_r)
@@ -68,9 +70,10 @@ ADDRESS_MAP_START(jvh_state::escape_io)
 	//AM_RANGE(0x68, 0x6f) AM_WRITE(out6b_w)
 	//AM_RANGE(0x70, 0x74) AM_WRITE(out7a_w)
 	//AM_RANGE(0x75, 0x7f) AM_WRITE(sol_w)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(jvh_state::movmastr_io)
+void jvh_state::movmastr_io(address_map &map)
+{
 	//AM_RANGE(0x01, 0x02) AM_READ(sw1_r)
 	//AM_RANGE(0x03, 0x05) AM_READ(dip_r)
 	//AM_RANGE(0x08, 0x09) AM_READ(sw6_r)
@@ -96,13 +99,14 @@ ADDRESS_MAP_START(jvh_state::movmastr_io)
 	//AM_RANGE(0x68, 0x6f) AM_WRITE(out6b2_w)
 	//AM_RANGE(0x70, 0x74) AM_WRITE(out7a2_w)
 	//AM_RANGE(0x75, 0x7f) AM_WRITE(sol_w)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(jvh_state::jvh_sub_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE("via", via6522_device, read, write)
-	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM
-ADDRESS_MAP_END
+void jvh_state::jvh_sub_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();
+	map(0x0080, 0x008f).rw("via", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xc000, 0xdfff).mirror(0x2000).rom();
+}
 
 static INPUT_PORTS_START( jvh )
 INPUT_PORTS_END

@@ -179,25 +179,26 @@ WRITE8_MEMBER(dominob_state::dominob_d008_w)
 	/* is there a purpose on this ? always set to 0x00 (read from 0xc47b in RAM) */
 }
 
-ADDRESS_MAP_START(dominob_state::memmap)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_WRITENOP // there are some garbage writes to ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+void dominob_state::memmap(address_map &map)
+{
+	map(0x0000, 0xbfff).rom().nopw(); // there are some garbage writes to ROM
+	map(0xc000, 0xc7ff).ram();
 
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xd008, 0xd008) AM_WRITE(dominob_d008_w)
-	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("IN0")
-	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("IN1") AM_WRITENOP
-	AM_RANGE(0xd018, 0xd018) AM_READ_PORT("IN2") AM_WRITENOP
+	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xd001, 0xd001).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xd008, 0xd008).w(this, FUNC(dominob_state::dominob_d008_w));
+	map(0xd00c, 0xd00c).portr("IN0");
+	map(0xd010, 0xd010).portr("IN1").nopw();
+	map(0xd018, 0xd018).portr("IN2").nopw();
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe840, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_SHARE("bgram")
-	AM_RANGE(0xf080, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xfc00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xe000, 0xe7ff).ram().share("videoram");
+	map(0xe800, 0xe83f).ram().share("spriteram");
+	map(0xe840, 0xefff).ram();
+	map(0xf000, 0xf07f).ram().share("bgram");
+	map(0xf080, 0xf7ff).ram();
+	map(0xf800, 0xfbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xfc00, 0xffff).ram();
+}
 
 /* I don't know if this has a purpose - also read in 'arkatayt' but not handled */
 READ8_MEMBER(dominob_state::dominob_unk_port02_r)
@@ -205,10 +206,11 @@ READ8_MEMBER(dominob_state::dominob_unk_port02_r)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(dominob_state::portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(dominob_unk_port02_r)
-ADDRESS_MAP_END
+void dominob_state::portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x02).r(this, FUNC(dominob_state::dominob_unk_port02_r));
+}
 
 
 static INPUT_PORTS_START( dominob )

@@ -370,59 +370,64 @@ WRITE8_MEMBER( oz750_state::kb_mask_w )
 		m_kb_mask = (m_kb_mask & 0xff00) | data;
 }
 
-ADDRESS_MAP_START(rex6000_state::rex6000_banked_map)
-	AM_RANGE( 0x0000000, 0x00fffff ) AM_DEVREADWRITE("flash0a", intelfsh8_device, read, write)
-	AM_RANGE( 0x0100000, 0x01fffff ) AM_DEVREADWRITE("flash0b", intelfsh8_device, read, write)
-	AM_RANGE( 0x0c00000, 0x0cfffff ) AM_DEVREADWRITE("flash1a", intelfsh8_device, read, write)
-	AM_RANGE( 0x0d00000, 0x0dfffff ) AM_DEVREADWRITE("flash1b", intelfsh8_device, read, write)
-	AM_RANGE( 0x1600000, 0x16fffff ) AM_DEVREADWRITE("flash1a", intelfsh8_device, read, write)
-	AM_RANGE( 0x1700000, 0x17fffff ) AM_DEVREADWRITE("flash1b", intelfsh8_device, read, write)
-	AM_RANGE( 0x2000000, 0x2007fff ) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void rex6000_state::rex6000_banked_map(address_map &map)
+{
+	map(0x0000000, 0x00fffff).rw("flash0a", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x0100000, 0x01fffff).rw(m_flash0b, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x0c00000, 0x0cfffff).rw("flash1a", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x0d00000, 0x0dfffff).rw("flash1b", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x1600000, 0x16fffff).rw("flash1a", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x1700000, 0x17fffff).rw("flash1b", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x2000000, 0x2007fff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(oz750_state::oz750_banked_map)
-	AM_RANGE( 0x0000000, 0x01fffff )  AM_DEVREADWRITE("flash0a", intelfsh8_device, read, write)
-	AM_RANGE( 0x0200000, 0x02fffff )  AM_MIRROR(0x100000) AM_DEVREADWRITE("flash1a", intelfsh8_device, read, write)
-	AM_RANGE( 0x0600000, 0x07fffff )  AM_READWRITE(lcd_io_r, lcd_io_w)
-	AM_RANGE( 0x0800000, 0x083ffff )  AM_MIRROR(0x1c0000) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x0a00000, 0x0a3ffff )  AM_MIRROR(0x1c0000) AM_RAM
-ADDRESS_MAP_END
+void oz750_state::oz750_banked_map(address_map &map)
+{
+	map(0x0000000, 0x01fffff).rw("flash0a", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x0200000, 0x02fffff).mirror(0x100000).rw("flash1a", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x0600000, 0x07fffff).rw(this, FUNC(oz750_state::lcd_io_r), FUNC(oz750_state::lcd_io_w));
+	map(0x0800000, 0x083ffff).mirror(0x1c0000).ram().share("nvram");
+	map(0x0a00000, 0x0a3ffff).mirror(0x1c0000).ram();
+}
 
 
-ADDRESS_MAP_START(rex6000_state::rex6000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("flash0a", intelfsh8_device, read, write)
-	AM_RANGE( 0x8000, 0x9fff ) AM_DEVREADWRITE("bank0", address_map_bank_device, read8, write8)
-	AM_RANGE( 0xa000, 0xbfff ) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
-	AM_RANGE( 0xc000, 0xffff ) AM_RAMBANK("ram")            //system RAM
-ADDRESS_MAP_END
+void rex6000_state::rex6000_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rw("flash0a", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x8000, 0x9fff).rw(m_bankdev0, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xa000, 0xbfff).rw(m_bankdev1, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xc000, 0xffff).bankrw("ram");            //system RAM
+}
 
-ADDRESS_MAP_START(rex6000_state::rex6000_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x04 ) AM_READWRITE(bankswitch_r, bankswitch_w)
-	AM_RANGE( 0x05, 0x07 ) AM_READWRITE(irq_r, irq_w)
-	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("INPUT")
-	AM_RANGE( 0x15, 0x19 ) AM_READWRITE(beep_r, beep_w)
-	AM_RANGE( 0x22, 0x23 ) AM_READWRITE(lcd_base_r, lcd_base_w)
-	AM_RANGE( 0x30, 0x3f ) AM_DEVREADWRITE(TC8521_TAG, tc8521_device, read, write)
-	AM_RANGE( 0x40, 0x47 ) AM_MIRROR(0x08)  AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w )
-	AM_RANGE( 0x50, 0x51 ) AM_READWRITE(lcd_io_r, lcd_io_w)
-	AM_RANGE( 0x60, 0x6f ) AM_READWRITE(touchscreen_r, touchscreen_w)
-ADDRESS_MAP_END
+void rex6000_state::rex6000_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x01, 0x04).rw(this, FUNC(rex6000_state::bankswitch_r), FUNC(rex6000_state::bankswitch_w));
+	map(0x05, 0x07).rw(this, FUNC(rex6000_state::irq_r), FUNC(rex6000_state::irq_w));
+	map(0x10, 0x10).portr("INPUT");
+	map(0x15, 0x19).rw(this, FUNC(rex6000_state::beep_r), FUNC(rex6000_state::beep_w));
+	map(0x22, 0x23).rw(this, FUNC(rex6000_state::lcd_base_r), FUNC(rex6000_state::lcd_base_w));
+	map(0x30, 0x3f).rw(TC8521_TAG, FUNC(tc8521_device::read), FUNC(tc8521_device::write));
+	map(0x40, 0x47).mirror(0x08).rw(m_uart, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+	map(0x50, 0x51).rw(this, FUNC(rex6000_state::lcd_io_r), FUNC(rex6000_state::lcd_io_w));
+	map(0x60, 0x6f).rw(this, FUNC(rex6000_state::touchscreen_r), FUNC(rex6000_state::touchscreen_w));
+}
 
-ADDRESS_MAP_START(oz750_state::oz750_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x04 ) AM_READWRITE(bankswitch_r, bankswitch_w)
-	AM_RANGE( 0x05, 0x08 ) AM_READWRITE(irq_r, irq_w)
-	AM_RANGE( 0x10, 0x10 ) AM_READ(kb_data_r)
-	AM_RANGE( 0x11, 0x12 ) AM_READWRITE(kb_status_r, kb_mask_w)
-	AM_RANGE( 0x15, 0x19 ) AM_READWRITE(beep_r, beep_w)
-	AM_RANGE( 0x22, 0x23 ) AM_READWRITE(lcd_base_r, lcd_base_w)
-	AM_RANGE( 0x30, 0x3f ) AM_DEVREADWRITE(TC8521_TAG, tc8521_device, read, write)
-	AM_RANGE( 0x40, 0x47 ) AM_MIRROR(0x08)  AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w )
-ADDRESS_MAP_END
+void oz750_state::oz750_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x01, 0x04).rw(this, FUNC(oz750_state::bankswitch_r), FUNC(oz750_state::bankswitch_w));
+	map(0x05, 0x08).rw(this, FUNC(oz750_state::irq_r), FUNC(oz750_state::irq_w));
+	map(0x10, 0x10).r(this, FUNC(oz750_state::kb_data_r));
+	map(0x11, 0x12).rw(this, FUNC(oz750_state::kb_status_r), FUNC(oz750_state::kb_mask_w));
+	map(0x15, 0x19).rw(this, FUNC(oz750_state::beep_r), FUNC(oz750_state::beep_w));
+	map(0x22, 0x23).rw(this, FUNC(oz750_state::lcd_base_r), FUNC(oz750_state::lcd_base_w));
+	map(0x30, 0x3f).rw(TC8521_TAG, FUNC(tc8521_device::read), FUNC(tc8521_device::write));
+	map(0x40, 0x47).mirror(0x08).rw(m_uart, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+}
 
 INPUT_CHANGED_MEMBER(rex6000_state::trigger_irq)
 {

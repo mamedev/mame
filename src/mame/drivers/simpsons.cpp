@@ -115,39 +115,42 @@ Notes:
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(simpsons_state::main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
-	AM_RANGE(0x0000, 0x0fff) AM_DEVICE("bank0000", address_map_bank_device, amap8)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("bank2000", address_map_bank_device, amap8)
-	AM_RANGE(0x1f80, 0x1f80) AM_READ_PORT("COIN")
-	AM_RANGE(0x1f81, 0x1f81) AM_READ_PORT("TEST")
-	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("P1")
-	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P2")
-	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P3")
-	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("P4")
-	AM_RANGE(0x1fa0, 0x1fa7) AM_DEVWRITE("k053246", k053247_device, k053246_w)
-	AM_RANGE(0x1fb0, 0x1fbf) AM_DEVWRITE("k053251", k053251_device, write)
-	AM_RANGE(0x1fc0, 0x1fc0) AM_WRITE(simpsons_coin_counter_w)
-	AM_RANGE(0x1fc2, 0x1fc2) AM_WRITE(simpsons_eeprom_w)
-	AM_RANGE(0x1fc4, 0x1fc4) AM_READ(simpsons_sound_interrupt_r)
-	AM_RANGE(0x1fc6, 0x1fc7) AM_DEVREADWRITE("k053260", k053260_device, main_read, main_write)
-	AM_RANGE(0x1fc8, 0x1fc9) AM_DEVREAD("k053246", k053247_device, k053246_r)
-	AM_RANGE(0x1fca, 0x1fca) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x78000)
-ADDRESS_MAP_END
+void simpsons_state::main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
+	map(0x0000, 0x0fff).m(m_bank0000, FUNC(address_map_bank_device::amap8));
+	map(0x2000, 0x3fff).m(m_bank2000, FUNC(address_map_bank_device::amap8));
+	map(0x1f80, 0x1f80).portr("COIN");
+	map(0x1f81, 0x1f81).portr("TEST");
+	map(0x1f90, 0x1f90).portr("P1");
+	map(0x1f91, 0x1f91).portr("P2");
+	map(0x1f92, 0x1f92).portr("P3");
+	map(0x1f93, 0x1f93).portr("P4");
+	map(0x1fa0, 0x1fa7).w(m_k053246, FUNC(k053247_device::k053246_w));
+	map(0x1fb0, 0x1fbf).w(m_k053251, FUNC(k053251_device::write));
+	map(0x1fc0, 0x1fc0).w(this, FUNC(simpsons_state::simpsons_coin_counter_w));
+	map(0x1fc2, 0x1fc2).w(this, FUNC(simpsons_state::simpsons_eeprom_w));
+	map(0x1fc4, 0x1fc4).r(this, FUNC(simpsons_state::simpsons_sound_interrupt_r));
+	map(0x1fc6, 0x1fc7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
+	map(0x1fc8, 0x1fc9).r(m_k053246, FUNC(k053247_device::k053246_r));
+	map(0x1fca, 0x1fca).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x4000, 0x5fff).ram();
+	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom().region("maincpu", 0x78000);
+}
 
-ADDRESS_MAP_START(simpsons_state::bank0000_map)
-	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void simpsons_state::bank0000_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
+	map(0x1000, 0x1fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(simpsons_state::bank2000_map)
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(simpsons_k052109_r, simpsons_k052109_w)
-	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(simpsons_k053247_r, simpsons_k053247_w)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void simpsons_state::bank2000_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rw(this, FUNC(simpsons_state::simpsons_k052109_r), FUNC(simpsons_state::simpsons_k052109_w));
+	map(0x2000, 0x2fff).rw(this, FUNC(simpsons_state::simpsons_k053247_r), FUNC(simpsons_state::simpsons_k053247_w));
+	map(0x3000, 0x3fff).ram();
+}
 
 WRITE8_MEMBER(simpsons_state::z80_bankswitch_w)
 {
@@ -186,15 +189,16 @@ WRITE8_MEMBER(simpsons_state::z80_arm_nmi_w)
 	timer_set(attotime::from_usec(25), TIMER_NMI);  /* kludge until the K053260 is emulated correctly */
 }
 
-ADDRESS_MAP_START(simpsons_state::z80_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(z80_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
-	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(z80_bankswitch_w)
-ADDRESS_MAP_END
+void simpsons_state::z80_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank2");
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xfa00, 0xfa00).w(this, FUNC(simpsons_state::z80_arm_nmi_w));
+	map(0xfc00, 0xfc2f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
+	map(0xfe00, 0xfe00).w(this, FUNC(simpsons_state::z80_bankswitch_w));
+}
 
 /***************************************************************************
 

@@ -413,33 +413,35 @@ WRITE8_MEMBER(ace_state::pio_bc_w)
 //  ADDRESS_MAP( ace_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(ace_state::ace_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x2800, 0x2bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("char_ram") AM_REGION(Z80_TAG, 0xfc00)
-	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x4000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ace_state::ace_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).mirror(0x0400).ram().share("video_ram");
+	map(0x2800, 0x2bff).mirror(0x0400).ram().share("char_ram").region(Z80_TAG, 0xfc00);
+	map(0x3000, 0x33ff).mirror(0x0c00).ram();
+	map(0x4000, 0xffff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( ace_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(ace_state::ace_io)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x00fe) AM_SELECT(0xff00) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READ_PORT("JOY")
-	AM_RANGE(0x41, 0x41) AM_MIRROR(0xff80) AM_READWRITE(ppi_pa_r, ppi_pa_w)
-	AM_RANGE(0x43, 0x43) AM_MIRROR(0xff80) AM_READWRITE(ppi_pb_r, ppi_pb_w)
-	AM_RANGE(0x45, 0x45) AM_MIRROR(0xff80) AM_READWRITE(ppi_pc_r, ppi_pc_w)
-	AM_RANGE(0x47, 0x47) AM_MIRROR(0xff80) AM_READWRITE(ppi_control_r, ppi_control_w)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0xff38) AM_READWRITE(pio_ad_r, pio_ad_w)
-	AM_RANGE(0x83, 0x83) AM_MIRROR(0xff38) AM_READWRITE(pio_bd_r, pio_bd_w)
-	AM_RANGE(0x85, 0x85) AM_MIRROR(0xff38) AM_READWRITE(pio_ac_r, pio_ac_w)
-	AM_RANGE(0x87, 0x87) AM_MIRROR(0xff38) AM_READWRITE(pio_bc_r, pio_bc_w)
-	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_DEVWRITE(AY8910_TAG, ay8910_device, address_w)
-	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_DEVREADWRITE(AY8910_TAG, ay8910_device, data_r, data_w)
-ADDRESS_MAP_END
+void ace_state::ace_io(address_map &map)
+{
+	map(0x00, 0x00).mirror(0x00fe).select(0xff00).rw(this, FUNC(ace_state::io_r), FUNC(ace_state::io_w));
+	map(0x01, 0x01).mirror(0xff00).portr("JOY");
+	map(0x41, 0x41).mirror(0xff80).rw(this, FUNC(ace_state::ppi_pa_r), FUNC(ace_state::ppi_pa_w));
+	map(0x43, 0x43).mirror(0xff80).rw(this, FUNC(ace_state::ppi_pb_r), FUNC(ace_state::ppi_pb_w));
+	map(0x45, 0x45).mirror(0xff80).rw(this, FUNC(ace_state::ppi_pc_r), FUNC(ace_state::ppi_pc_w));
+	map(0x47, 0x47).mirror(0xff80).rw(this, FUNC(ace_state::ppi_control_r), FUNC(ace_state::ppi_control_w));
+	map(0x81, 0x81).mirror(0xff38).rw(this, FUNC(ace_state::pio_ad_r), FUNC(ace_state::pio_ad_w));
+	map(0x83, 0x83).mirror(0xff38).rw(this, FUNC(ace_state::pio_bd_r), FUNC(ace_state::pio_bd_w));
+	map(0x85, 0x85).mirror(0xff38).rw(this, FUNC(ace_state::pio_ac_r), FUNC(ace_state::pio_ac_w));
+	map(0x87, 0x87).mirror(0xff38).rw(this, FUNC(ace_state::pio_bc_r), FUNC(ace_state::pio_bc_w));
+	map(0xfd, 0xfd).mirror(0xff00).w(AY8910_TAG, FUNC(ay8910_device::address_w));
+	map(0xff, 0xff).mirror(0xff00).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+}
 
 
 

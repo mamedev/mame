@@ -105,24 +105,26 @@ READ8_MEMBER( czk80_state::port81_r )
 	return (m_term_data) ? 3 : 1;
 }
 
-ADDRESS_MAP_START(czk80_state::czk80_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x2000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
-ADDRESS_MAP_END
+void czk80_state::czk80_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr("bankr0").bankw("bankw0");
+	map(0x2000, 0xdfff).ram();
+	map(0xe000, 0xffff).bankr("bankr1").bankw("bankw1");
+}
 
-ADDRESS_MAP_START(czk80_state::czk80_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)
-	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("pio", z80pio_device, read, write)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("dart", z80dart_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x54, 0x57) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(port80_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
-	AM_RANGE(0x81, 0x81) AM_READ(port81_r)
+void czk80_state::czk80_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).w(this, FUNC(czk80_state::port40_w));
+	map(0x4c, 0x4f).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x50, 0x53).rw("dart", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
+	map(0x54, 0x57).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x80, 0x80).r(this, FUNC(czk80_state::port80_r)).w(m_terminal, FUNC(generic_terminal_device::write));
+	map(0x81, 0x81).r(this, FUNC(czk80_state::port81_r));
 	/* Select one of the below */
 	//AM_RANGE(0xc0, 0xc0) AM_READ(portc0_r)
-	AM_RANGE(0xc0, 0xc1) AM_DEVICE("fdc", upd765a_device, map)
-ADDRESS_MAP_END
+	map(0xc0, 0xc1).m(m_fdc, FUNC(upd765a_device::map));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( czk80 )

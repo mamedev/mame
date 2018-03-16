@@ -802,27 +802,29 @@ WRITE_LINE_MEMBER(cops_state::via2_irq)
  *
  *************************************/
 
-ADDRESS_MAP_START(cops_state::cops_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x9fff) AM_ROM AM_REGION("program", 0)
-	AM_RANGE(0xa000, 0xafff) AM_READWRITE(io1_r, io1_w)
-	AM_RANGE(0xb000, 0xb00f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)  /* VIA 1 */
-	AM_RANGE(0xb800, 0xb80f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)  /* VIA 2 */
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(io2_r, io2_w)
-	AM_RANGE(0xd000, 0xd007) AM_READWRITE(dacia_r, dacia_w)
-	AM_RANGE(0xd800, 0xd80f) AM_DEVREADWRITE("via6522_3", via6522_device, read, write)  /* VIA 3 */
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("sysbank1")
-ADDRESS_MAP_END
+void cops_state::cops_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x9fff).rom().region("program", 0);
+	map(0xa000, 0xafff).rw(this, FUNC(cops_state::io1_r), FUNC(cops_state::io1_w));
+	map(0xb000, 0xb00f).rw("via6522_1", FUNC(via6522_device::read), FUNC(via6522_device::write));  /* VIA 1 */
+	map(0xb800, 0xb80f).rw("via6522_2", FUNC(via6522_device::read), FUNC(via6522_device::write));  /* VIA 2 */
+	map(0xc000, 0xcfff).rw(this, FUNC(cops_state::io2_r), FUNC(cops_state::io2_w));
+	map(0xd000, 0xd007).rw(this, FUNC(cops_state::dacia_r), FUNC(cops_state::dacia_w));
+	map(0xd800, 0xd80f).rw("via6522_3", FUNC(via6522_device::read), FUNC(via6522_device::write));  /* VIA 3 */
+	map(0xe000, 0xffff).bankr("sysbank1");
+}
 
-ADDRESS_MAP_START(cops_state::revlatns_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x9fff) AM_ROM AM_REGION("program", 0)
-	AM_RANGE(0xa000, 0xafff) AM_READWRITE(io1_lm_r, io1_w)
-	AM_RANGE(0xb000, 0xb00f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)  /* VIA 1 */
-	AM_RANGE(0xc000, 0xc00f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE(0xd000, 0xd007) AM_READWRITE(dacia_r, dacia_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("sysbank1")
-ADDRESS_MAP_END
+void cops_state::revlatns_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x9fff).rom().region("program", 0);
+	map(0xa000, 0xafff).rw(this, FUNC(cops_state::io1_lm_r), FUNC(cops_state::io1_w));
+	map(0xb000, 0xb00f).rw("via6522_1", FUNC(via6522_device::read), FUNC(via6522_device::write));  /* VIA 1 */
+	map(0xc000, 0xc00f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xd000, 0xd007).rw(this, FUNC(cops_state::dacia_r), FUNC(cops_state::dacia_w));
+	map(0xe000, 0xffff).bankr("sysbank1");
+}
 
 static INPUT_PORTS_START( cops )
 	PORT_START("SW0")

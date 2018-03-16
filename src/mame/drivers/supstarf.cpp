@@ -57,24 +57,28 @@ private:
 	bool m_latch_select;
 };
 
-ADDRESS_MAP_START(supstarf_state::main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch1", i8212_device, read) AM_DEVWRITE("soundlatch2", i8212_device, strobe)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM // 5517 (2Kx8) at IC11
-ADDRESS_MAP_END
+void supstarf_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x8000).r("soundlatch1", FUNC(i8212_device::read)).w("soundlatch2", FUNC(i8212_device::strobe));
+	map(0xc000, 0xc7ff).ram(); // 5517 (2Kx8) at IC11
+}
 
-ADDRESS_MAP_START(supstarf_state::main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_WRITE(driver_clk_w)
-ADDRESS_MAP_END
+void supstarf_state::main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).w(this, FUNC(supstarf_state::driver_clk_w));
+}
 
-ADDRESS_MAP_START(supstarf_state::sound_map)
-	AM_RANGE(0x000, 0xfff) AM_ROM // external EPROM
-ADDRESS_MAP_END
+void supstarf_state::sound_map(address_map &map)
+{
+	map(0x000, 0xfff).rom(); // external EPROM
+}
 
-ADDRESS_MAP_START(supstarf_state::sound_io_map)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(psg_latch_r, psg_latch_w)
-ADDRESS_MAP_END
+void supstarf_state::sound_io_map(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(supstarf_state::psg_latch_r), FUNC(supstarf_state::psg_latch_w));
+}
 
 READ8_MEMBER(supstarf_state::psg_latch_r)
 {

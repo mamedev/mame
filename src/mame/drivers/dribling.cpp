@@ -175,18 +175,20 @@ WRITE8_MEMBER(dribling_state::iowrite)
  *
  *************************************/
 
-ADDRESS_MAP_START(dribling_state::dribling_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(dribling_colorram_w) AM_SHARE("colorram")
-ADDRESS_MAP_END
+void dribling_state::dribling_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).ram().share("videoram");
+	map(0x4000, 0x7fff).rom();
+	map(0xc000, 0xdfff).ram().w(this, FUNC(dribling_state::dribling_colorram_w)).share("colorram");
+}
 
 
-ADDRESS_MAP_START(dribling_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(ioread, iowrite)
-ADDRESS_MAP_END
+void dribling_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(this, FUNC(dribling_state::ioread), FUNC(dribling_state::iowrite));
+}
 
 
 

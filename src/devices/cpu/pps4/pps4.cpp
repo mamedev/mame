@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller
-
 /*****************************************************************************
  *
  *   pps4.c
@@ -85,8 +84,8 @@
 #define VERBOSE 0       //!< set to 1 to log certain instruction conditions
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(PPS4,   pps4_device,   "pps4",   "PPS4-4")
-DEFINE_DEVICE_TYPE(PPS4_2, pps4_2_device, "pps4_2", "PPS-4/2")
+DEFINE_DEVICE_TYPE(PPS4,   pps4_device,   "pps4",   "Rockwell PPS4-4")
+DEFINE_DEVICE_TYPE(PPS4_2, pps4_2_device, "pps4_2", "Rockwell PPS-4/2")
 
 pps4_device::pps4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, type, tag, owner, clock)

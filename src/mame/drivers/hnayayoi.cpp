@@ -47,6 +47,7 @@ TODO:
 #include "machine/74259.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
+#include "video/mc6845.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -105,77 +106,82 @@ WRITE_LINE_MEMBER(hnayayoi_state::nmi_clock_w)
 }
 
 
-ADDRESS_MAP_START(hnayayoi_state::hnayayoi_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void hnayayoi_state::hnayayoi_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(hnayayoi_state::hnayayoi_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym2203_device, write)
-	AM_RANGE(0x02, 0x03) AM_DEVREAD("ymsnd", ym2203_device, read)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW3")
-	AM_RANGE(0x06, 0x06) AM_WRITE(adpcm_data_w)
-//  AM_RANGE(0x08, 0x08) AM_WRITENOP // CRT Controller
-//  AM_RANGE(0x09, 0x09) AM_WRITENOP // CRT Controller
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(dynax_blitter_rev1_start_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(dynax_blitter_rev1_clear_w)
-	AM_RANGE(0x20, 0x27) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x40, 0x40) AM_WRITE(keyboard_w)
-	AM_RANGE(0x41, 0x41) AM_READ(keyboard_0_r)
-	AM_RANGE(0x42, 0x42) AM_READ(keyboard_1_r)
-	AM_RANGE(0x43, 0x43) AM_READ_PORT("COIN")
-	AM_RANGE(0x60, 0x61) AM_WRITE(hnayayoi_palbank_w)
-	AM_RANGE(0x62, 0x67) AM_WRITE(dynax_blitter_rev1_param_w)
-ADDRESS_MAP_END
+void hnayayoi_state::hnayayoi_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ymsnd", FUNC(ym2203_device::write));
+	map(0x02, 0x03).r("ymsnd", FUNC(ym2203_device::read));
+	map(0x04, 0x04).portr("DSW3");
+	map(0x06, 0x06).w(this, FUNC(hnayayoi_state::adpcm_data_w));
+	map(0x08, 0x08).w("crtc", FUNC(hd6845_device::address_w));
+	map(0x09, 0x09).w("crtc", FUNC(hd6845_device::register_w));
+	map(0x0a, 0x0a).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
+	map(0x0c, 0x0c).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
+	map(0x20, 0x27).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x40, 0x40).w(this, FUNC(hnayayoi_state::keyboard_w));
+	map(0x41, 0x41).r(this, FUNC(hnayayoi_state::keyboard_0_r));
+	map(0x42, 0x42).r(this, FUNC(hnayayoi_state::keyboard_1_r));
+	map(0x43, 0x43).portr("COIN");
+	map(0x60, 0x61).w(this, FUNC(hnayayoi_state::hnayayoi_palbank_w));
+	map(0x62, 0x67).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
+}
 
-ADDRESS_MAP_START(hnayayoi_state::hnfubuki_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8000, 0xfeff) AM_ROM
-	AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("ymsnd", ym2203_device, write)
-	AM_RANGE(0xff02, 0xff03) AM_DEVREAD("ymsnd", ym2203_device, read)
-	AM_RANGE(0xff04, 0xff04) AM_READ_PORT("DSW3")
-	AM_RANGE(0xff06, 0xff06) AM_WRITE(adpcm_data_w)
-//  AM_RANGE(0xff08, 0xff08) AM_WRITENOP // CRT Controller
-//  AM_RANGE(0xff09, 0xff09) AM_WRITENOP // CRT Controller
-	AM_RANGE(0xff0a, 0xff0a) AM_WRITE(dynax_blitter_rev1_start_w)
-	AM_RANGE(0xff0c, 0xff0c) AM_WRITE(dynax_blitter_rev1_clear_w)
-	AM_RANGE(0xff20, 0xff27) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xff40, 0xff40) AM_WRITE(keyboard_w)
-	AM_RANGE(0xff41, 0xff41) AM_READ(keyboard_0_r)
-	AM_RANGE(0xff42, 0xff42) AM_READ(keyboard_1_r)
-	AM_RANGE(0xff43, 0xff43) AM_READ_PORT("COIN")
-	AM_RANGE(0xff60, 0xff61) AM_WRITE(hnayayoi_palbank_w)
-	AM_RANGE(0xff62, 0xff67) AM_WRITE(dynax_blitter_rev1_param_w)
-ADDRESS_MAP_END
+void hnayayoi_state::hnfubuki_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xfeff).rom();
+	map(0xff00, 0xff01).w("ymsnd", FUNC(ym2203_device::write));
+	map(0xff02, 0xff03).r("ymsnd", FUNC(ym2203_device::read));
+	map(0xff04, 0xff04).portr("DSW3");
+	map(0xff06, 0xff06).w(this, FUNC(hnayayoi_state::adpcm_data_w));
+	map(0xff08, 0xff08).w("crtc", FUNC(hd6845_device::address_w));
+	map(0xff09, 0xff09).w("crtc", FUNC(hd6845_device::register_w));
+	map(0xff0a, 0xff0a).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
+	map(0xff0c, 0xff0c).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
+	map(0xff20, 0xff27).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xff40, 0xff40).w(this, FUNC(hnayayoi_state::keyboard_w));
+	map(0xff41, 0xff41).r(this, FUNC(hnayayoi_state::keyboard_0_r));
+	map(0xff42, 0xff42).r(this, FUNC(hnayayoi_state::keyboard_1_r));
+	map(0xff43, 0xff43).portr("COIN");
+	map(0xff60, 0xff61).w(this, FUNC(hnayayoi_state::hnayayoi_palbank_w));
+	map(0xff62, 0xff67).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
+}
 
-ADDRESS_MAP_START(hnayayoi_state::untoucha_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void hnayayoi_state::untoucha_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(hnayayoi_state::untoucha_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ymsnd", ym2203_device, control_port_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREAD("ymsnd", ym2203_device, status_port_r)
-//  AM_RANGE(0x12, 0x12) AM_WRITENOP // CRT Controller
-	AM_RANGE(0x13, 0x13) AM_WRITE(adpcm_data_w)
-	AM_RANGE(0x14, 0x14) AM_READ_PORT("COIN")
-	AM_RANGE(0x15, 0x15) AM_READ(keyboard_1_r)
-	AM_RANGE(0x16, 0x16) AM_READ(keyboard_0_r)  // bit 7 = blitter busy flag
-	AM_RANGE(0x17, 0x17) AM_WRITE(keyboard_w)
-	AM_RANGE(0x18, 0x19) AM_WRITE(hnayayoi_palbank_w)
-	AM_RANGE(0x1a, 0x1f) AM_WRITE(dynax_blitter_rev1_param_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(dynax_blitter_rev1_clear_w)
-	AM_RANGE(0x28, 0x28) AM_WRITE(dynax_blitter_rev1_start_w)
-	AM_RANGE(0x30, 0x37) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE("ymsnd", ym2203_device, write_port_w)
-	AM_RANGE(0x51, 0x51) AM_DEVREAD("ymsnd", ym2203_device, read_port_r)
-//  AM_RANGE(0x52, 0x52) AM_WRITENOP // CRT Controller
-ADDRESS_MAP_END
+void hnayayoi_state::untoucha_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x10).w("ymsnd", FUNC(ym2203_device::control_port_w));
+	map(0x11, 0x11).r("ymsnd", FUNC(ym2203_device::status_port_r));
+	map(0x12, 0x12).w("crtc", FUNC(hd6845_device::address_w));
+	map(0x13, 0x13).w(this, FUNC(hnayayoi_state::adpcm_data_w));
+	map(0x14, 0x14).portr("COIN");
+	map(0x15, 0x15).r(this, FUNC(hnayayoi_state::keyboard_1_r));
+	map(0x16, 0x16).r(this, FUNC(hnayayoi_state::keyboard_0_r));  // bit 7 = blitter busy flag
+	map(0x17, 0x17).w(this, FUNC(hnayayoi_state::keyboard_w));
+	map(0x18, 0x19).w(this, FUNC(hnayayoi_state::hnayayoi_palbank_w));
+	map(0x1a, 0x1f).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
+	map(0x20, 0x20).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
+	map(0x28, 0x28).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
+	map(0x30, 0x37).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x50, 0x50).w("ymsnd", FUNC(ym2203_device::write_port_w));
+	map(0x51, 0x51).r("ymsnd", FUNC(ym2203_device::read_port_r));
+	map(0x52, 0x52).w("crtc", FUNC(hd6845_device::register_w));
+}
 
 static INPUT_PORTS_START( hf_keyboard )
 	PORT_START("KEY0")
@@ -543,7 +549,6 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(hnayayoi_map)
 	MCFG_CPU_IO_MAP(hnayayoi_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hnayayoi_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("nmiclock", CLOCK, 8000)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(hnayayoi_state, nmi_clock_w))
@@ -558,14 +563,17 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hnayayoi_state, screen_update_hnayayoi)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_RAW_PARAMS(20_MHz_XTAL / 2, 632, 0, 512, 263, 0, 243)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+
+	MCFG_DEVICE_ADD("crtc", HD6845, 20_MHz_XTAL / 8)
+	MCFG_VIDEO_SET_SCREEN("screen")
+	MCFG_MC6845_CHAR_WIDTH(4)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
+	MCFG_MC6845_UPDATE_ROW_CB(hnayayoi_state, hnayayoi_update_row)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -605,6 +613,9 @@ MACHINE_CONFIG_START(hnayayoi_state::untoucha)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(hnayayoi_state, nmi_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // ?
+
+	MCFG_DEVICE_MODIFY("crtc")
+	MCFG_MC6845_UPDATE_ROW_CB(hnayayoi_state, untoucha_update_row)
 
 	MCFG_VIDEO_START_OVERRIDE(hnayayoi_state,untoucha)
 MACHINE_CONFIG_END

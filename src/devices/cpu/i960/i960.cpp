@@ -12,7 +12,7 @@
 #endif
 
 
-DEFINE_DEVICE_TYPE(I960, i960_cpu_device, "i960kb", "i960KB")
+DEFINE_DEVICE_TYPE(I960, i960_cpu_device, "i960kb", "Intel i960KB")
 
 
 i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

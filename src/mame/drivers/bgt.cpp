@@ -31,15 +31,17 @@ protected:
 };
 
 
-ADDRESS_MAP_START(bgt_state::bgt_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void bgt_state::bgt_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0xf8000, 0xfffff).rom();
+}
 
 
 
-ADDRESS_MAP_START(bgt_state::bgt_io)
-ADDRESS_MAP_END
+void bgt_state::bgt_io(address_map &map)
+{
+}
 
 
 

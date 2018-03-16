@@ -74,10 +74,8 @@ private:
 
 	// internal state
 	apu_t   m_APU;                   /* Actual APUs */
-	float   m_apu_incsize;           /* Adjustment increment */
 	u32     m_samps_per_sync;        /* Number of samples per vsync */
 	u32     m_buffer_size;           /* Actual buffer size in bytes */
-	u32     m_real_rate;             /* Actual playback rate */
 	u8      m_noise_lut[apu_t::NOISE_LONG]; /* Noise sample lookup table */
 	u32     m_vbl_times[0x20];       /* VBL durations in samples */
 	u32     m_sync_times1[SYNCS_MAX1]; /* Samples per sync table */

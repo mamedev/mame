@@ -73,9 +73,10 @@ uint32_t jungleyo_state::screen_update_jungleyo(screen_device &screen, bitmap_in
 }
 
 
-ADDRESS_MAP_START(jungleyo_state::jungleyo_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-ADDRESS_MAP_END
+void jungleyo_state::jungleyo_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+}
 
 static INPUT_PORTS_START( jungleyo )
 INPUT_PORTS_END

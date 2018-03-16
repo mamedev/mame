@@ -61,7 +61,7 @@ enum lr35902_flag
 //  LR35902 DEVICE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(LR35902, lr35902_cpu_device, "lr35902", "LR35902")
+DEFINE_DEVICE_TYPE(LR35902, lr35902_cpu_device, "lr35902", "Sharp LR35902")
 
 
 lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

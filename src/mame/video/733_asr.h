@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "screen.h"
 #define asr733_chr_region ":gfx1"
 
 class asr733_device : public device_t, public device_gfx_interface
@@ -58,6 +59,8 @@ private:
 	DECLARE_PALETTE_INIT(asr733);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	required_device<screen_device> m_screen;
 
 	emu_timer *m_line_timer;                // screen line timer
 

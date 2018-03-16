@@ -82,49 +82,54 @@
  *
  *************************************/
 
-ADDRESS_MAP_START(leland_state::master_map_program)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE(leland_battery_ram_w) AM_SHARE("battery")
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(leland_gated_paletteram_r, leland_gated_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_master_video_addr_w)
-ADDRESS_MAP_END
+void leland_state::master_map_program(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xdfff).bankr("bank2").w(this, FUNC(leland_state::leland_battery_ram_w)).share("battery");
+	map(0xe000, 0xefff).ram().share("mainram");
+	map(0xf000, 0xf3ff).rw(this, FUNC(leland_state::leland_gated_paletteram_r), FUNC(leland_state::leland_gated_paletteram_w)).share("palette");
+	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_master_video_addr_w));
+}
 
-ADDRESS_MAP_START(leland_state::master_map_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(leland_master_alt_bankswitch_w)
-	AM_RANGE(0xfd, 0xff) AM_READWRITE(leland_master_analog_key_r, leland_master_analog_key_w)
-ADDRESS_MAP_END
+void leland_state::master_map_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).w(this, FUNC(leland_state::leland_master_alt_bankswitch_w));
+	map(0xfd, 0xff).rw(this, FUNC(leland_state::leland_master_analog_key_r), FUNC(leland_state::leland_master_analog_key_w));
+}
 
-ADDRESS_MAP_START(leland_state::master_redline_map_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(leland_master_alt_bankswitch_w)
-	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("custom", leland_80186_sound_device, leland_80186_response_r, leland_80186_command_lo_w)
-	AM_RANGE(0xf4, 0xf4) AM_DEVWRITE("custom", leland_80186_sound_device, leland_80186_command_hi_w)
-	AM_RANGE(0xfd, 0xff) AM_READWRITE(leland_master_analog_key_r, leland_master_analog_key_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(leland_state::master_map_program_2)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE(ataxx_battery_ram_w) AM_SHARE("battery")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(ataxx_paletteram_and_misc_r, ataxx_paletteram_and_misc_w) AM_SHARE("palette")
-ADDRESS_MAP_END
+void leland_state::master_redline_map_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).w(this, FUNC(leland_state::leland_master_alt_bankswitch_w));
+	map(0xf2, 0xf2).rw(m_sound, FUNC(leland_80186_sound_device::leland_80186_response_r), FUNC(leland_80186_sound_device::leland_80186_command_lo_w));
+	map(0xf4, 0xf4).w(m_sound, FUNC(leland_80186_sound_device::leland_80186_command_hi_w));
+	map(0xfd, 0xff).rw(this, FUNC(leland_state::leland_master_analog_key_r), FUNC(leland_state::leland_master_analog_key_w));
+}
 
 
-ADDRESS_MAP_START(leland_state::master_map_io_2)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("custom", leland_80186_sound_device, leland_80186_response_r)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE("custom", leland_80186_sound_device, leland_80186_command_hi_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("custom", leland_80186_sound_device, leland_80186_command_lo_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("custom", leland_80186_sound_device, ataxx_80186_control_w)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(ataxx_eeprom_r, ataxx_eeprom_w)
-	AM_RANGE(0xd0, 0xef) AM_READWRITE(ataxx_mvram_port_r, ataxx_mvram_port_w)
-	AM_RANGE(0xf0, 0xff) AM_READWRITE(ataxx_master_input_r, ataxx_master_output_w)
-ADDRESS_MAP_END
+void leland_state::master_map_program_2(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xdfff).bankr("bank2").w(this, FUNC(leland_state::ataxx_battery_ram_w)).share("battery");
+	map(0xe000, 0xf7ff).ram().share("mainram");
+	map(0xf800, 0xffff).rw(this, FUNC(leland_state::ataxx_paletteram_and_misc_r), FUNC(leland_state::ataxx_paletteram_and_misc_w)).share("palette");
+}
+
+
+void leland_state::master_map_io_2(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x04, 0x04).r(m_sound, FUNC(leland_80186_sound_device::leland_80186_response_r));
+	map(0x05, 0x05).w(m_sound, FUNC(leland_80186_sound_device::leland_80186_command_hi_w));
+	map(0x06, 0x06).w(m_sound, FUNC(leland_80186_sound_device::leland_80186_command_lo_w));
+	map(0x0c, 0x0c).w(m_sound, FUNC(leland_80186_sound_device::ataxx_80186_control_w));
+	map(0x20, 0x20).rw(this, FUNC(leland_state::ataxx_eeprom_r), FUNC(leland_state::ataxx_eeprom_w));
+	map(0xd0, 0xef).rw(this, FUNC(leland_state::ataxx_mvram_port_r), FUNC(leland_state::ataxx_mvram_port_w));
+	map(0xf0, 0xff).rw(this, FUNC(leland_state::ataxx_master_input_r), FUNC(leland_state::ataxx_master_output_w));
+}
 
 
 
@@ -134,48 +139,53 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(leland_state::slave_small_map_program)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0xdfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_slave_video_addr_w)
-	AM_RANGE(0xf802, 0xf802) AM_READ(leland_raster_r)
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(leland_slave_small_banksw_w)
-ADDRESS_MAP_END
+void leland_state::slave_small_map_program(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0xdfff).bankr("bank3");
+	map(0xe000, 0xefff).ram();
+	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_slave_video_addr_w));
+	map(0xf802, 0xf802).r(this, FUNC(leland_state::leland_raster_r));
+	map(0xf803, 0xf803).w(this, FUNC(leland_state::leland_slave_small_banksw_w));
+}
 
 
-ADDRESS_MAP_START(leland_state::slave_large_map_program)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(leland_slave_large_banksw_w)
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_slave_video_addr_w)
-	AM_RANGE(0xf802, 0xf802) AM_READ(leland_raster_r)
-ADDRESS_MAP_END
+void leland_state::slave_large_map_program(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0xbfff).bankr("bank3");
+	map(0xc000, 0xc000).w(this, FUNC(leland_state::leland_slave_large_banksw_w));
+	map(0xe000, 0xefff).ram();
+	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_slave_video_addr_w));
+	map(0xf802, 0xf802).r(this, FUNC(leland_state::leland_raster_r));
+}
 
 
-ADDRESS_MAP_START(leland_state::slave_map_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(leland_svram_port_r, leland_svram_port_w)
-	AM_RANGE(0x40, 0x5f) AM_READWRITE(leland_svram_port_r, leland_svram_port_w)
-ADDRESS_MAP_END
+void leland_state::slave_map_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x1f).rw(this, FUNC(leland_state::leland_svram_port_r), FUNC(leland_state::leland_svram_port_w));
+	map(0x40, 0x5f).rw(this, FUNC(leland_state::leland_svram_port_r), FUNC(leland_state::leland_svram_port_w));
+}
 
 
-ADDRESS_MAP_START(leland_state::slave_map_program)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank3")
-	AM_RANGE(0xa000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xfffc, 0xfffd) AM_WRITE(leland_slave_video_addr_w)
-	AM_RANGE(0xfffe, 0xfffe) AM_READ(leland_raster_r)
-	AM_RANGE(0xffff, 0xffff) AM_WRITE(ataxx_slave_banksw_w)
-ADDRESS_MAP_END
+void leland_state::slave_map_program(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x9fff).bankr("bank3");
+	map(0xa000, 0xdfff).rom();
+	map(0xe000, 0xefff).ram();
+	map(0xfffc, 0xfffd).w(this, FUNC(leland_state::leland_slave_video_addr_w));
+	map(0xfffe, 0xfffe).r(this, FUNC(leland_state::leland_raster_r));
+	map(0xffff, 0xffff).w(this, FUNC(leland_state::ataxx_slave_banksw_w));
+}
 
 
-ADDRESS_MAP_START(leland_state::slave_map_io_2)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x60, 0x7f) AM_READWRITE(ataxx_svram_port_r, ataxx_svram_port_w)
-ADDRESS_MAP_END
+void leland_state::slave_map_io_2(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x60, 0x7f).rw(this, FUNC(leland_state::ataxx_svram_port_r), FUNC(leland_state::ataxx_svram_port_w));
+}
 
 /*************************************
  *
@@ -183,22 +193,26 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(leland_state::leland_80186_map_program)
-	AM_RANGE(0x00000, 0x03fff) AM_MIRROR(0x1c000) AM_RAM
-	AM_RANGE(0x20000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void leland_state::leland_80186_map_program(address_map &map)
+{
+	map(0x00000, 0x03fff).mirror(0x1c000).ram();
+	map(0x20000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(leland_state::ataxx_80186_map_io)
-ADDRESS_MAP_END
+void leland_state::ataxx_80186_map_io(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(leland_state::redline_80186_map_io)
-	AM_RANGE(0x0000, 0xffff) AM_DEVWRITE("custom", redline_80186_sound_device, redline_dac_w)
-ADDRESS_MAP_END
+void leland_state::redline_80186_map_io(address_map &map)
+{
+	map(0x0000, 0xffff).w("custom", FUNC(redline_80186_sound_device::redline_dac_w));
+}
 
 
-ADDRESS_MAP_START(leland_state::leland_80186_map_io)
-	AM_RANGE(0x0000, 0xffff) AM_DEVWRITE("custom", leland_80186_sound_device, dac_w)
-ADDRESS_MAP_END
+void leland_state::leland_80186_map_io(address_map &map)
+{
+	map(0x0000, 0xffff).w(m_sound, FUNC(leland_80186_sound_device::dac_w));
+}
 
 
 /************************************************************************
@@ -2469,6 +2483,28 @@ ROM_START( pigout )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-pigout.bin", 0x0000, 0x0080, CRC(9646fa72) SHA1(80311bd6ba8988afc4ad1aabf3f452266686917f) )
+
+	ROM_REGION( 0x0e00, "top_board_plds", 0 ) // 80-18002-01 (Top Board), all protected
+	ROM_LOAD( "35-01.u44", 0x0000, 0x0104, NO_DUMP ) // TIBPAL16L8-25CN
+	ROM_LOAD( "36-01.u43", 0x0200, 0x0104, NO_DUMP ) // TIBPAL16R4-25CN
+	ROM_LOAD( "37-01.u42", 0x0400, 0x0104, NO_DUMP ) // MMI PAL16R6ACN
+	ROM_LOAD( "38-01.u9",  0x0600, 0x00cc, NO_DUMP ) // CPL20L10-25NC
+	ROM_LOAD( "39-01.u55", 0x0700, 0x0149, NO_DUMP ) // AMPAL18P8APC
+	ROM_LOAD( "40-01.u68", 0x0900, 0x0149, NO_DUMP ) // AMPAL18P8APC
+	ROM_LOAD( "41-02.u54", 0x0b00, 0x0104, NO_DUMP ) // TIBPAL16L8-25CN
+
+	ROM_REGION( 0x1400, "bottom_board_plds", 0 ) // 80-10000-01 (Bottom Board), all protected
+	ROM_LOAD( "01-01.u96", 0x0000, 0x0104, NO_DUMP ) // MMI PAL16L8ACN
+	ROM_LOAD( "02-29.u85", 0x0200, 0x0104, NO_DUMP ) // MMI PAL16L8ACN
+	ROM_LOAD( "03-01.u16", 0x0400, 0x0104, NO_DUMP ) // TIBPAL16L8-25
+	ROM_LOAD( "04-01.u17", 0x0600, 0x0104, NO_DUMP ) // MMI PAL16L8ACNS
+	ROM_LOAD( "05-01.u21", 0x0800, 0x00cc, NO_DUMP ) // MMI PAL20X10ACNS
+	ROM_LOAD( "06-01.u19", 0x0900, 0x00cc, NO_DUMP ) // MMI PAL20X10ACNS
+	ROM_LOAD( "07-01.u43", 0x0a00, 0x0104, NO_DUMP ) // MMI PAL16R8ACN
+	ROM_LOAD( "08-01.u42", 0x0c00, 0x0104, NO_DUMP ) // TIBPAL16R4-25CN
+	ROM_LOAD( "09-01.u40", 0x0e00, 0x0104, NO_DUMP ) // MMI PAL16R8ACN
+	ROM_LOAD( "10-01.u26", 0x1000, 0x0104, NO_DUMP ) // MMI PAL16R8ACN
+	ROM_LOAD( "11-01.u27", 0x1200, 0x0104, NO_DUMP ) // MMI PAL16R8ACNS
 ROM_END
 
 
@@ -2513,6 +2549,28 @@ ROM_START( pigouta )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-pigout.bin", 0x0000, 0x0080, CRC(9646fa72) SHA1(80311bd6ba8988afc4ad1aabf3f452266686917f) )
+
+	ROM_REGION( 0x0e00, "top_board_plds", 0 ) // 80-18002-01 (Top Board), all protected
+	ROM_LOAD( "35-01.u44", 0x0000, 0x0104, NO_DUMP ) // TIBPAL16L8-25CN
+	ROM_LOAD( "36-01.u43", 0x0200, 0x0104, NO_DUMP ) // TIBPAL16R4-25CN
+	ROM_LOAD( "37-01.u42", 0x0400, 0x0104, NO_DUMP ) // MMI PAL16R6ACN
+	ROM_LOAD( "38-01.u9",  0x0600, 0x00cc, NO_DUMP ) // CPL20L10-25NC
+	ROM_LOAD( "39-01.u55", 0x0700, 0x0149, NO_DUMP ) // AMPAL18P8APC
+	ROM_LOAD( "40-01.u68", 0x0900, 0x0149, NO_DUMP ) // AMPAL18P8APC
+	ROM_LOAD( "41-02.u54", 0x0b00, 0x0104, NO_DUMP ) // TIBPAL16L8-25CN
+
+	ROM_REGION( 0x1400, "bottom_board_plds", 0 ) // 80-10000-01 (Bottom Board), all protected
+	ROM_LOAD( "01-01.u96", 0x0000, 0x0104, NO_DUMP ) // MMI PAL16L8ACN
+	ROM_LOAD( "02-29.u85", 0x0200, 0x0104, NO_DUMP ) // MMI PAL16L8ACN
+	ROM_LOAD( "03-01.u16", 0x0400, 0x0104, NO_DUMP ) // TIBPAL16L8-25
+	ROM_LOAD( "04-01.u17", 0x0600, 0x0104, NO_DUMP ) // MMI PAL16L8ACNS
+	ROM_LOAD( "05-01.u21", 0x0800, 0x00cc, NO_DUMP ) // MMI PAL20X10ACNS
+	ROM_LOAD( "06-01.u19", 0x0900, 0x00cc, NO_DUMP ) // MMI PAL20X10ACNS
+	ROM_LOAD( "07-01.u43", 0x0a00, 0x0104, NO_DUMP ) // MMI PAL16R8ACN
+	ROM_LOAD( "08-01.u42", 0x0c00, 0x0104, NO_DUMP ) // TIBPAL16R4-25CN
+	ROM_LOAD( "09-01.u40", 0x0e00, 0x0104, NO_DUMP ) // MMI PAL16R8ACN
+	ROM_LOAD( "10-01.u26", 0x1000, 0x0104, NO_DUMP ) // MMI PAL16R8ACN
+	ROM_LOAD( "11-01.u27", 0x1200, 0x0104, NO_DUMP ) // MMI PAL16R8ACNS
 ROM_END
 
 

@@ -350,20 +350,22 @@ READ8_MEMBER(_4enlinea_state::serial_r)
 *      Memory Map Information      *
 ***********************************/
 
-ADDRESS_MAP_START(_4enlinea_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+void _4enlinea_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 //  AM_RANGE(0x8000, 0xbfff) AM_RAM // CGA VRAM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	map(0xc000, 0xdfff).ram();
 
-	AM_RANGE(0xe000, 0xe001) AM_READ(serial_r)
-ADDRESS_MAP_END
+	map(0xe000, 0xe001).r(this, FUNC(_4enlinea_state::serial_r));
+}
 
-ADDRESS_MAP_START(_4enlinea_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+void _4enlinea_state::main_portmap(address_map &map)
+{
+	map.global_mask(0x3ff);
 
 //  AM_RANGE(0x3d4, 0x3df) CGA regs
-	AM_RANGE(0x3bf, 0x3bf) AM_WRITENOP // CGA mode control, TODO
-ADDRESS_MAP_END
+	map(0x3bf, 0x3bf).nopw(); // CGA mode control, TODO
+}
 
 READ8_MEMBER(_4enlinea_state::serial_status_r)
 {
@@ -388,21 +390,23 @@ READ8_MEMBER(_4enlinea_state::hack_r)
 	return machine().rand();
 }
 
-ADDRESS_MAP_START(_4enlinea_state::audio_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM
-	AM_RANGE(0xfc24, 0xfc24) AM_READ(hack_r)
-	AM_RANGE(0xfc28, 0xfc28) AM_READ(hack_r)
-	AM_RANGE(0xfc30, 0xfc31) AM_WRITE(serial_w)
-	AM_RANGE(0xfc32, 0xfc32) AM_READWRITE(serial_status_r,serial_status_w)
-	AM_RANGE(0xfc48, 0xfc49) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, address_data_w)
+void _4enlinea_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xf800, 0xfbff).ram();
+	map(0xfc24, 0xfc24).r(this, FUNC(_4enlinea_state::hack_r));
+	map(0xfc28, 0xfc28).r(this, FUNC(_4enlinea_state::hack_r));
+	map(0xfc30, 0xfc31).w(this, FUNC(_4enlinea_state::serial_w));
+	map(0xfc32, 0xfc32).rw(this, FUNC(_4enlinea_state::serial_status_r), FUNC(_4enlinea_state::serial_status_w));
+	map(0xfc48, 0xfc49).rw(m_ay, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(_4enlinea_state::audio_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void _4enlinea_state::audio_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 
 /***********************************

@@ -254,29 +254,30 @@ READ8_MEMBER(pyl601_state::floppy_r)
 	return m_floppy_ctrl;
 }
 
-ADDRESS_MAP_START(pyl601_state::pyl601_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xbfff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0xc000, 0xdfff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0xe000, 0xe5ff ) AM_RAMBANK("bank3")
-	AM_RANGE( 0xe600, 0xe600 ) AM_MIRROR(4) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE( 0xe601, 0xe601 ) AM_MIRROR(4) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE( 0xe628, 0xe628 ) AM_READ(keyboard_r)
-	AM_RANGE( 0xe629, 0xe629 ) AM_READWRITE(video_mode_r,video_mode_w)
-	AM_RANGE( 0xe62a, 0xe62a ) AM_READWRITE(keycheck_r,led_w)
-	AM_RANGE( 0xe62b, 0xe62b ) AM_READWRITE(timer_r,speaker_w)
-	AM_RANGE( 0xe62d, 0xe62d ) AM_READ(video_mode_r)
-	AM_RANGE( 0xe62e, 0xe62e ) AM_READWRITE(keycheck_r,led_w)
-	AM_RANGE( 0xe680, 0xe680 ) AM_WRITE(vdisk_page_w)
-	AM_RANGE( 0xe681, 0xe681 ) AM_WRITE(vdisk_h_w)
-	AM_RANGE( 0xe682, 0xe682 ) AM_WRITE(vdisk_l_w)
-	AM_RANGE( 0xe683, 0xe683 ) AM_READWRITE(vdisk_data_r,vdisk_data_w)
-	AM_RANGE( 0xe6c0, 0xe6c0 ) AM_READWRITE(floppy_r, floppy_w)
-	AM_RANGE( 0xe6d0, 0xe6d1 ) AM_DEVICE("upd765", upd765a_device, map)
-	AM_RANGE( 0xe6f0, 0xe6f0 ) AM_READWRITE(rom_page_r, rom_page_w)
-	AM_RANGE( 0xe700, 0xefff ) AM_RAMBANK("bank4")
-	AM_RANGE( 0xf000, 0xffff ) AM_READ_BANK("bank5") AM_WRITE_BANK("bank6")
-ADDRESS_MAP_END
+void pyl601_state::pyl601_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xbfff).bankrw("bank1");
+	map(0xc000, 0xdfff).bankrw("bank2");
+	map(0xe000, 0xe5ff).bankrw("bank3");
+	map(0xe600, 0xe600).mirror(4).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0xe601, 0xe601).mirror(4).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xe628, 0xe628).r(this, FUNC(pyl601_state::keyboard_r));
+	map(0xe629, 0xe629).rw(this, FUNC(pyl601_state::video_mode_r), FUNC(pyl601_state::video_mode_w));
+	map(0xe62a, 0xe62a).rw(this, FUNC(pyl601_state::keycheck_r), FUNC(pyl601_state::led_w));
+	map(0xe62b, 0xe62b).rw(this, FUNC(pyl601_state::timer_r), FUNC(pyl601_state::speaker_w));
+	map(0xe62d, 0xe62d).r(this, FUNC(pyl601_state::video_mode_r));
+	map(0xe62e, 0xe62e).rw(this, FUNC(pyl601_state::keycheck_r), FUNC(pyl601_state::led_w));
+	map(0xe680, 0xe680).w(this, FUNC(pyl601_state::vdisk_page_w));
+	map(0xe681, 0xe681).w(this, FUNC(pyl601_state::vdisk_h_w));
+	map(0xe682, 0xe682).w(this, FUNC(pyl601_state::vdisk_l_w));
+	map(0xe683, 0xe683).rw(this, FUNC(pyl601_state::vdisk_data_r), FUNC(pyl601_state::vdisk_data_w));
+	map(0xe6c0, 0xe6c0).rw(this, FUNC(pyl601_state::floppy_r), FUNC(pyl601_state::floppy_w));
+	map(0xe6d0, 0xe6d1).m(m_fdc, FUNC(upd765a_device::map));
+	map(0xe6f0, 0xe6f0).rw(this, FUNC(pyl601_state::rom_page_r), FUNC(pyl601_state::rom_page_w));
+	map(0xe700, 0xefff).bankrw("bank4");
+	map(0xf000, 0xffff).bankr("bank5").bankw("bank6");
+}
 
 /* Input ports */
 /* A small note about natural keyboard mode: Ctrl is mapped to PGUP and the 'Lat/Cyr' key is mapped to PGDOWN */

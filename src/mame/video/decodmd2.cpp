@@ -118,15 +118,16 @@ MC6845_UPDATE_ROW( decodmd_type2_device::crtc_update_row )
 	}
 }
 
-ADDRESS_MAP_START(decodmd_type2_device::decodmd2_map)
-	AM_RANGE(0x0000, 0x2fff) AM_RAMBANK("dmdram")
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(crtc_status_r,crtc_address_w)
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(crtc_register_w)
-	AM_RANGE(0x3002, 0x3002) AM_WRITE(bank_w)
-	AM_RANGE(0x3003, 0x3003) AM_READ(latch_r)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("dmdbank1") AM_WRITE(status_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("dmdbank2") // last 32k of ROM
-ADDRESS_MAP_END
+void decodmd_type2_device::decodmd2_map(address_map &map)
+{
+	map(0x0000, 0x2fff).bankrw("dmdram");
+	map(0x3000, 0x3000).rw(this, FUNC(decodmd_type2_device::crtc_status_r), FUNC(decodmd_type2_device::crtc_address_w));
+	map(0x3001, 0x3001).w(this, FUNC(decodmd_type2_device::crtc_register_w));
+	map(0x3002, 0x3002).w(this, FUNC(decodmd_type2_device::bank_w));
+	map(0x3003, 0x3003).r(this, FUNC(decodmd_type2_device::latch_r));
+	map(0x4000, 0x7fff).bankr("dmdbank1").w(this, FUNC(decodmd_type2_device::status_w));
+	map(0x8000, 0xffff).bankr("dmdbank2"); // last 32k of ROM
+}
 
 MACHINE_CONFIG_START(decodmd_type2_device::device_add_mconfig)
 	/* basic machine hardware */

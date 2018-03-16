@@ -113,18 +113,20 @@ WRITE_LINE_MEMBER( binbug_state::binbug_serial_w )
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-ADDRESS_MAP_START(binbug_state::binbug_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x03ff) AM_ROM
-	AM_RANGE( 0x0400, 0x77ff) AM_RAM
-	AM_RANGE( 0x7800, 0x7bff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0x7c00, 0x7fff) AM_RAM AM_SHARE("attribram")
-ADDRESS_MAP_END
+void binbug_state::binbug_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom();
+	map(0x0400, 0x77ff).ram();
+	map(0x7800, 0x7bff).ram().share("videoram");
+	map(0x7c00, 0x7fff).ram().share("attribram");
+}
 
-ADDRESS_MAP_START(binbug_state::binbug_data)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(binbug_ctrl_w)
-ADDRESS_MAP_END
+void binbug_state::binbug_data(address_map &map)
+{
+	map.unmap_value_high();
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(this, FUNC(binbug_state::binbug_ctrl_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( binbug )
@@ -437,25 +439,27 @@ private:
 	required_device<z80pio_device> m_pio;
 };
 
-ADDRESS_MAP_START(dg680_state::dg680_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xcfff) AM_RAM
-	AM_RANGE( 0xd000, 0xd7ff) AM_ROM
-	AM_RANGE( 0xd800, 0xefff) AM_RAM
-	AM_RANGE( 0xf000, 0xf3ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0xf400, 0xf7ff) AM_RAM AM_SHARE("attribram")
-ADDRESS_MAP_END
+void dg680_state::dg680_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xcfff).ram();
+	map(0xd000, 0xd7ff).rom();
+	map(0xd800, 0xefff).ram();
+	map(0xf000, 0xf3ff).ram().share("videoram");
+	map(0xf400, 0xf7ff).ram().share("attribram");
+}
 
-ADDRESS_MAP_START(dg680_state::dg680_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x04,0x07) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-	AM_RANGE(0x08,0x08) AM_READWRITE(port08_r,port08_w) //SWP Control and Status
+void dg680_state::dg680_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x04, 0x07).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x08, 0x08).rw(this, FUNC(dg680_state::port08_r), FUNC(dg680_state::port08_w)); //SWP Control and Status
 	//AM_RANGE(0x09,0x09) parallel input port
 	// Optional AM9519 Programmable Interrupt Controller (port c = data, port d = control)
 	//AM_RANGE(0x0c,0x0d) AM_DEVREADWRITE("am9519", am9519_device, read, write)
-ADDRESS_MAP_END
+}
 
 void dg680_state::machine_reset()
 {

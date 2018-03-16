@@ -106,12 +106,13 @@ PALETTE_INIT_MEMBER(unichamp_state, unichamp)
 }
 
 
-ADDRESS_MAP_START(unichamp_state::unichamp_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x1FFF) //B13/B14/B15 are grounded!
-	AM_RANGE(0x0000, 0x00FF) AM_READWRITE8(unichamp_gicram_r, unichamp_gicram_w, 0x00ff)
-	AM_RANGE(0x0100, 0x07FF) AM_READWRITE(unichamp_trapl_r, unichamp_trapl_w)
-	AM_RANGE(0x0800, 0x0FFF) AM_ROM AM_REGION("maincpu", 0)   // Carts and EXE ROM, 10-bits wide
-ADDRESS_MAP_END
+void unichamp_state::unichamp_mem(address_map &map)
+{
+	map.global_mask(0x1FFF); //B13/B14/B15 are grounded!
+	map(0x0000, 0x00FF).rw(this, FUNC(unichamp_state::unichamp_gicram_r), FUNC(unichamp_state::unichamp_gicram_w)).umask16(0x00ff);
+	map(0x0100, 0x07FF).rw(this, FUNC(unichamp_state::unichamp_trapl_r), FUNC(unichamp_state::unichamp_trapl_w));
+	map(0x0800, 0x0FFF).rom().region("maincpu", 0);   // Carts and EXE ROM, 10-bits wide
+}
 
 
 static INPUT_PORTS_START( unichamp )

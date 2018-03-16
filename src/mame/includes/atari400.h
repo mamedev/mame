@@ -19,6 +19,8 @@
 #include "video/antic.h"
 #include "video/gtia.h"
 
+#include "screen.h"
+
 #include <algorithm>
 
 
@@ -30,6 +32,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_gtia(*this, "gtia")
 		, m_antic(*this, "antic")
+		, m_screen(*this, "screen")
 		, m_keyboard(*this, "keyboard.%u", 0)
 		, m_keypad(*this, "keypad.%u", 0)
 		, m_djoy_b(*this, "djoy_b")
@@ -48,6 +51,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<gtia_device> m_gtia;
 	required_device<antic_device> m_antic;
+	required_device<screen_device> m_screen;
 	optional_ioport_array<8> m_keyboard;
 	optional_ioport_array<4> m_keypad;
 	optional_ioport m_djoy_b;

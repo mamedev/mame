@@ -6,6 +6,7 @@
 
 *************************************************************************/
 #include "sound/msm5205.h"
+#include "video/mc6845.h"
 
 class hnayayoi_state : public driver_device
 {
@@ -13,12 +14,12 @@ public:
 	hnayayoi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_palette(*this, "palette") { }
 
 	/* video-related */
-	uint8_t      *m_pixmap[8];
+	std::unique_ptr<uint8_t[]> m_pixmap[8];
 	int        m_palbank;
-	int        m_total_pixmaps;
 	uint8_t      m_blit_layer;
 	uint16_t     m_blit_dest;
 	uint32_t     m_blit_src;
@@ -43,13 +44,15 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(untoucha);
-	uint32_t screen_update_hnayayoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	MC6845_UPDATE_ROW(hnayayoi_update_row);
+	MC6845_UPDATE_ROW(untoucha_update_row);
 	void common_vh_start( int num_pixmaps );
 	void copy_pixel( int x, int y, int pen );
-	void draw_layer_interleaved( bitmap_ind16 &bitmap, const rectangle &cliprect, int left_pixmap, int right_pixmap, int palbase, int transp );
+	void draw_layer_interleaved(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t row, uint16_t y, uint8_t x_count, int left_pixmap, int right_pixmap, int palbase, bool transp);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
+	required_device<palette_device> m_palette;
 	void untoucha(machine_config &config);
 	void hnayayoi(machine_config &config);
 	void hnfubuki(machine_config &config);

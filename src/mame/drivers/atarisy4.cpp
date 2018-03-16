@@ -671,19 +671,20 @@ WRITE16_MEMBER(atarisy4_state::dsp1_bank_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(atarisy4_state::main_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("m68k_ram")
-	AM_RANGE(0x010000, 0x01ffff) AM_RAM
-	AM_RANGE(0x580000, 0x580001) AM_READ_PORT("JOYSTICK")
-	AM_RANGE(0x588000, 0x588001) AM_READ(analog_r)
-	AM_RANGE(0x598000, 0x598001) AM_NOP /* Sound board */
-	AM_RANGE(0x7c0000, 0x7c4fff) AM_READWRITE(m68k_shared_1_r, m68k_shared_1_w)
-	AM_RANGE(0x7c6000, 0x7c6001) AM_READWRITE(dsp1_status_r, dsp1_control_w)
-	AM_RANGE(0x7f0000, 0x7f4fff) AM_READWRITE(m68k_shared_0_r, m68k_shared_0_w)
-	AM_RANGE(0x7f6000, 0x7f6001) AM_READWRITE(dsp0_status_r, dsp0_control_w)
-	AM_RANGE(0xa00400, 0xbfffff) AM_RAM AM_SHARE("screen_ram")
-	AM_RANGE(0xff8000, 0xff8fff) AM_READWRITE(gpu_r, gpu_w)
-ADDRESS_MAP_END
+void atarisy4_state::main_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).ram().share("m68k_ram");
+	map(0x010000, 0x01ffff).ram();
+	map(0x580000, 0x580001).portr("JOYSTICK");
+	map(0x588000, 0x588001).r(this, FUNC(atarisy4_state::analog_r));
+	map(0x598000, 0x598001).noprw(); /* Sound board */
+	map(0x7c0000, 0x7c4fff).rw(this, FUNC(atarisy4_state::m68k_shared_1_r), FUNC(atarisy4_state::m68k_shared_1_w));
+	map(0x7c6000, 0x7c6001).rw(this, FUNC(atarisy4_state::dsp1_status_r), FUNC(atarisy4_state::dsp1_control_w));
+	map(0x7f0000, 0x7f4fff).rw(this, FUNC(atarisy4_state::m68k_shared_0_r), FUNC(atarisy4_state::m68k_shared_0_w));
+	map(0x7f6000, 0x7f6001).rw(this, FUNC(atarisy4_state::dsp0_status_r), FUNC(atarisy4_state::dsp0_control_w));
+	map(0xa00400, 0xbfffff).ram().share("screen_ram");
+	map(0xff8000, 0xff8fff).rw(this, FUNC(atarisy4_state::gpu_r), FUNC(atarisy4_state::gpu_w));
+}
 
 
 /*************************************
@@ -692,15 +693,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(atarisy4_state::dsp0_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("dsp0_bank0")
-	AM_RANGE(0x0800, 0x0fff) AM_RAMBANK("dsp0_bank1")
-ADDRESS_MAP_END
+void atarisy4_state::dsp0_map(address_map &map)
+{
+	map.global_mask(0xfff);
+	map(0x0000, 0x07ff).bankrw("dsp0_bank0");
+	map(0x0800, 0x0fff).bankrw("dsp0_bank1");
+}
 
-ADDRESS_MAP_START(atarisy4_state::dsp0_io_map)
-	AM_RANGE(0x00, 0x01) AM_WRITE(dsp0_bank_w)
-ADDRESS_MAP_END
+void atarisy4_state::dsp0_io_map(address_map &map)
+{
+	map(0x00, 0x01).w(this, FUNC(atarisy4_state::dsp0_bank_w));
+}
 
 
 /*************************************
@@ -709,15 +712,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(atarisy4_state::dsp1_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("dsp1_bank0")
-	AM_RANGE(0x0800, 0x0fff) AM_RAMBANK("dsp1_bank1")
-ADDRESS_MAP_END
+void atarisy4_state::dsp1_map(address_map &map)
+{
+	map.global_mask(0xfff);
+	map(0x0000, 0x07ff).bankrw("dsp1_bank0");
+	map(0x0800, 0x0fff).bankrw("dsp1_bank1");
+}
 
-ADDRESS_MAP_START(atarisy4_state::dsp1_io_map)
-	AM_RANGE(0x00, 0x01) AM_WRITE(dsp1_bank_w)
-ADDRESS_MAP_END
+void atarisy4_state::dsp1_io_map(address_map &map)
+{
+	map(0x00, 0x01).w(this, FUNC(atarisy4_state::dsp1_bank_w));
+}
 
 
 /*************************************

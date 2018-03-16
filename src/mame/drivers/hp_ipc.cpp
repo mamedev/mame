@@ -464,38 +464,40 @@ void hp_ipc_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
 }
 
-ADDRESS_MAP_START(hp_ipc_state::hp_ipc_mem_outer)
-	AM_RANGE(0x000000, 0xFFFFFF) AM_READWRITE(mem_r, mem_w)
-ADDRESS_MAP_END
+void hp_ipc_state::hp_ipc_mem_outer(address_map &map)
+{
+	map(0x000000, 0xFFFFFF).rw(this, FUNC(hp_ipc_state::mem_r), FUNC(hp_ipc_state::mem_w));
+}
 
-ADDRESS_MAP_START(hp_ipc_state::hp_ipc_mem_inner)
+void hp_ipc_state::hp_ipc_mem_inner(address_map &map)
+{
 // bus error handler
-	AM_RANGE(0x0000000, 0x1FFFFFF) AM_READWRITE(trap_r, trap_w)
+	map(0x0000000, 0x1FFFFFF).rw(this, FUNC(hp_ipc_state::trap_r), FUNC(hp_ipc_state::trap_w));
 
 // user mode
-	AM_RANGE(0x1000000, 0x17FFFFF) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0x1800000, 0x187FFFF) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x1E20000, 0x1E2000F) AM_DEVREADWRITE8("gpu", hp1ll3_device, read, write, 0x00ff)
-	AM_RANGE(0x1E40000, 0x1E4002F) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0x00ff)
+	map(0x1000000, 0x17FFFFF).rw(this, FUNC(hp_ipc_state::ram_r), FUNC(hp_ipc_state::ram_w));
+	map(0x1800000, 0x187FFFF).rom().region("maincpu", 0);
+	map(0x1E20000, 0x1E2000F).rw("gpu", FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
+	map(0x1E40000, 0x1E4002F).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 
 // supervisor mode
-	AM_RANGE(0x0000000, 0x007FFFF) AM_ROM AM_REGION("maincpu", 0)       // Internal ROM (operating system PCA)
-	AM_RANGE(0x0080000, 0x00FFFFF) AM_UNMAP     // Internal ROM (option ROM PCA)
-	AM_RANGE(0x0100000, 0x04FFFFF) AM_UNMAP     // External ROM modules
-	AM_RANGE(0x0600000, 0x060FFFF) AM_READWRITE(mmu_r, mmu_w)
-	AM_RANGE(0x0610000, 0x0610007) AM_READWRITE8(floppy_id_r, floppy_id_w, 0x00ff)
-	AM_RANGE(0x0610008, 0x061000F) AM_DEVREADWRITE8("fdc", wd2797_device, read, write, 0x00ff)
-	AM_RANGE(0x0620000, 0x062000F) AM_DEVREADWRITE8("gpu", hp1ll3_device, read, write, 0x00ff)
-	AM_RANGE(0x0630000, 0x063FFFF) AM_NOP       // AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
-	AM_RANGE(0x0640000, 0x064002F) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0x00ff)
-	AM_RANGE(0x0650000, 0x065FFFF) AM_NOP       // HP-IL Printer (optional; ROM sets _desktop to 0 if not mapped) -- sys/lpint.h
-	AM_RANGE(0x0660000, 0x06600FF) AM_DEVREADWRITE8("mlc", hp_hil_mlc_device, read, write, 0x00ff)  // 'caravan', scrn/caravan.h
-	AM_RANGE(0x0670000, 0x067FFFF) AM_NOP       // Speaker (NatSemi COP 452)
-	AM_RANGE(0x0680000, 0x068FFFF) AM_NOP       // 'SIMON (98628) fast HP-IB card' -- sys/simon.h
-	AM_RANGE(0x0700000, 0x07FFFFF) AM_UNMAP     // External I/O
-	AM_RANGE(0x0800000, 0x0FFFFFF) AM_READWRITE(ram_r, ram_w)
+	map(0x0000000, 0x007FFFF).rom().region("maincpu", 0);       // Internal ROM (operating system PCA)
+	map(0x0080000, 0x00FFFFF).unmaprw();     // Internal ROM (option ROM PCA)
+	map(0x0100000, 0x04FFFFF).unmaprw();     // External ROM modules
+	map(0x0600000, 0x060FFFF).rw(this, FUNC(hp_ipc_state::mmu_r), FUNC(hp_ipc_state::mmu_w));
+	map(0x0610000, 0x0610007).rw(this, FUNC(hp_ipc_state::floppy_id_r), FUNC(hp_ipc_state::floppy_id_w)).umask16(0x00ff);
+	map(0x0610008, 0x061000F).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
+	map(0x0620000, 0x062000F).rw("gpu", FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
+	map(0x0630000, 0x063FFFF).noprw();       // AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
+	map(0x0640000, 0x064002F).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
+	map(0x0650000, 0x065FFFF).noprw();       // HP-IL Printer (optional; ROM sets _desktop to 0 if not mapped) -- sys/lpint.h
+	map(0x0660000, 0x06600FF).rw("mlc", FUNC(hp_hil_mlc_device::read), FUNC(hp_hil_mlc_device::write)).umask16(0x00ff);  // 'caravan', scrn/caravan.h
+	map(0x0670000, 0x067FFFF).noprw();       // Speaker (NatSemi COP 452)
+	map(0x0680000, 0x068FFFF).noprw();       // 'SIMON (98628) fast HP-IB card' -- sys/simon.h
+	map(0x0700000, 0x07FFFFF).unmaprw();     // External I/O
+	map(0x0800000, 0x0FFFFFF).rw(this, FUNC(hp_ipc_state::ram_r), FUNC(hp_ipc_state::ram_w));
 
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START(hp_ipc)
 INPUT_PORTS_END

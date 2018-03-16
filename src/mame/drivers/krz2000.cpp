@@ -50,11 +50,12 @@ void k2000_state::machine_reset()
 {
 }
 
-ADDRESS_MAP_START(k2000_state::k2000_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
-ADDRESS_MAP_END
+void k2000_state::k2000_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom().region("maincpu", 0);
+	map(0x100000, 0x11ffff).ram();
+	map(0xfffc00, 0xffffff).rw("tmp68301", FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
+}
 
 MACHINE_CONFIG_START(k2000_state::k2000)
 	MCFG_CPU_ADD("maincpu", M68301, XTAL(12'000'000))

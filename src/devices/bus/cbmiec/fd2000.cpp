@@ -89,26 +89,28 @@ const tiny_rom_entry *fd4000_device::device_rom_region() const
 //  ADDRESS_MAP( fd2000_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(fd2000_device::fd2000_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0xbf0) AM_DEVREADWRITE(G65SC22P2_TAG, via6522_device, read, write)
-	AM_RANGE(0x4e00, 0x4e07) AM_MIRROR(0x1f8) AM_DEVICE(DP8473V_TAG, dp8473_device, map)
-	AM_RANGE(0x5000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(G65SC02PI2_TAG, 0)
-ADDRESS_MAP_END
+void fd2000_device::fd2000_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+	map(0x4000, 0x400f).mirror(0xbf0).rw(G65SC22P2_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x4e00, 0x4e07).mirror(0x1f8).m(DP8473V_TAG, FUNC(dp8473_device::map));
+	map(0x5000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom().region(G65SC02PI2_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( fd4000_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(fd4000_device::fd4000_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0xbf0) AM_DEVREADWRITE(G65SC22P2_TAG, via6522_device, read, write)
-	AM_RANGE(0x4e00, 0x4e07) AM_MIRROR(0x1f8) AM_DEVICE(PC8477AV1_TAG, pc8477a_device, map)
-	AM_RANGE(0x5000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(R65C02P4_TAG, 0)
-ADDRESS_MAP_END
+void fd4000_device::fd4000_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+	map(0x4000, 0x400f).mirror(0xbf0).rw(G65SC22P2_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x4e00, 0x4e07).mirror(0x1f8).m(PC8477AV1_TAG, FUNC(pc8477a_device::map));
+	map(0x5000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom().region(R65C02P4_TAG, 0);
+}
 
 
 READ8_MEMBER( fd2000_device::via_pa_r )

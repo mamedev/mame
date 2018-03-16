@@ -151,15 +151,16 @@ void hamboy_state::machine_reset()
 	m_indervid->set_bpp(4);
 }
 
-ADDRESS_MAP_START(megaphx_state::megaphx_68k_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("boot", 0x00000) // or the rom doesn't map here? it contains the service mode grid amongst other things..
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("mainram") // maps over part of the rom??
-	AM_RANGE(0x040000, 0x040007) AM_DEVREADWRITE("inder_vid:tms", tms34010_device, host_r, host_w)
-	AM_RANGE(0x050000, 0x050001) AM_DEVWRITE("inder_sb", inder_sb_device, megaphx_0x050000_w)
-	AM_RANGE(0x050002, 0x050003) AM_DEVREAD("inder_sb", inder_sb_device, megaphx_0x050002_r)
-	AM_RANGE(0x060000, 0x060007) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x800000, 0x8fffff) AM_ROM AM_REGION("data", 0x00000)
-ADDRESS_MAP_END
+void megaphx_state::megaphx_68k_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().region("boot", 0x00000); // or the rom doesn't map here? it contains the service mode grid amongst other things..
+	map(0x000000, 0x00ffff).ram().share("mainram"); // maps over part of the rom??
+	map(0x040000, 0x040007).rw("inder_vid:tms", FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
+	map(0x050000, 0x050001).w(m_indersb, FUNC(inder_sb_device::megaphx_0x050000_w));
+	map(0x050002, 0x050003).r(m_indersb, FUNC(inder_sb_device::megaphx_0x050002_r));
+	map(0x060000, 0x060007).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x800000, 0x8fffff).rom().region("data", 0x00000);
+}
 
 
 

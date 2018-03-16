@@ -368,7 +368,7 @@ public:
 	void set_membits(int membits) { m_membits = membits; m_membits_supplied = true; }
 	void set_endianness(endianness_t endianness) { m_endianness = endianness; m_endianness_supplied = true; }
 	void set_entries(u32 entries) { m_entries = entries; }
-	void set_indirect_entries(u32 entries) { m_entries = entries; }
+	void set_indirect_entries(u32 entries) { m_indirect_entries = entries; }
 	void enable_shadows() { m_enable_shadows = true; }
 	void enable_hilights() { m_enable_hilights = true; }
 	void set_prom_region(const char *region) { m_prom_region.set_tag(region); }

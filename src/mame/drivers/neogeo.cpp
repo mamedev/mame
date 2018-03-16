@@ -1410,33 +1410,36 @@ READ16_MEMBER(neogeo_state::banked_vectors_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(neogeo_state::neogeo_main_map)
+void neogeo_state::neogeo_main_map(address_map &map)
+{
 
-	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM
+	map(0x100000, 0x10ffff).mirror(0x0f0000).ram();
 	/* some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too */
-	AM_RANGE(0x300080, 0x300081) AM_MIRROR(0x01ff7e) AM_READ_PORT("TEST")
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_DEVWRITE8("watchdog", watchdog_timer_device, reset_w, 0x00ff)
-	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO/COIN") AM_WRITE8(audio_command_w, 0xff00)
-	AM_RANGE(0x360000, 0x37ffff) AM_READ(unmapped_r)
-	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(unmapped_r)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_DEVWRITE8("systemlatch", hc259_device, write_a3, 0x00ff) // BITW1 (system control registers)
-	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(video_register_r)
-	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE(video_register_w)
-	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(unmapped_r)
-	AM_RANGE(0x400000, 0x401fff) AM_MIRROR(0x3fe000) AM_READWRITE(paletteram_r, paletteram_w)
-	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(memcard_r, memcard_w)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_MIRROR(0x0e0000) AM_ROM AM_REGION("mainbios", 0)
-	AM_RANGE(0xd00000, 0xd0ffff) AM_MIRROR(0x0f0000) AM_RAM_WRITE(save_ram_w) AM_SHARE("saveram")
-	AM_RANGE(0xe00000, 0xffffff) AM_READ(unmapped_r)
-ADDRESS_MAP_END
+	map(0x300080, 0x300081).mirror(0x01ff7e).portr("TEST");
+	map(0x300001, 0x300001).mirror(0x01fffe).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x320000, 0x320001).mirror(0x01fffe).portr("AUDIO/COIN");
+	map(0x320000, 0x320000).mirror(0x01fffe).w(this, FUNC(neogeo_state::audio_command_w));
+	map(0x360000, 0x37ffff).r(this, FUNC(neogeo_state::unmapped_r));
+	map(0x380000, 0x380001).mirror(0x01fffe).portr("SYSTEM");
+	map(0x380000, 0x38007f).mirror(0x01ff80).w(this, FUNC(neogeo_state::io_control_w)).umask16(0x00ff);
+	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).r(this, FUNC(neogeo_state::unmapped_r));
+	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).w("systemlatch", FUNC(hc259_device::write_a3)).umask16(0x00ff); // BITW1 (system control registers)
+	map(0x3c0000, 0x3c0007).mirror(0x01fff8).r(this, FUNC(neogeo_state::video_register_r));
+	map(0x3c0000, 0x3c000f).mirror(0x01fff0).w(this, FUNC(neogeo_state::video_register_w));
+	map(0x3e0000, 0x3fffff).r(this, FUNC(neogeo_state::unmapped_r));
+	map(0x400000, 0x401fff).mirror(0x3fe000).rw(this, FUNC(neogeo_state::paletteram_r), FUNC(neogeo_state::paletteram_w));
+	map(0x800000, 0x800fff).rw(this, FUNC(neogeo_state::memcard_r), FUNC(neogeo_state::memcard_w));
+	map(0xc00000, 0xc1ffff).mirror(0x0e0000).rom().region("mainbios", 0);
+	map(0xd00000, 0xd0ffff).mirror(0x0f0000).ram().w(this, FUNC(neogeo_state::save_ram_w)).share("saveram");
+	map(0xe00000, 0xffffff).r(this, FUNC(neogeo_state::unmapped_r));
+}
 
 
-ADDRESS_MAP_START(neogeo_state::main_map_slot)
-	AM_IMPORT_FROM( neogeo_main_map )
-	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
-ADDRESS_MAP_END
+void neogeo_state::main_map_slot(address_map &map)
+{
+	neogeo_main_map(map);
+	map(0x000000, 0x00007f).r(this, FUNC(neogeo_state::banked_vectors_r));
+}
 
 
 
@@ -1448,26 +1451,28 @@ READ16_MEMBER(aes_state::aes_in2_r)
 	return ret;
 }
 
-ADDRESS_MAP_START(aes_state::aes_main_map)
-	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
-	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM
+void aes_state::aes_main_map(address_map &map)
+{
+	map(0x000000, 0x00007f).r(this, FUNC(aes_state::banked_vectors_r));
+	map(0x100000, 0x10ffff).mirror(0x0f0000).ram();
 	// some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_DEVREAD8("ctrl1", neogeo_control_port_device, ctrl_r, 0xff00)
-	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE8(audio_command_w, 0xff00)
-	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_DEVREAD8("ctrl2", neogeo_control_port_device, ctrl_r, 0xff00)
-	AM_RANGE(0x360000, 0x37ffff) AM_READ(unmapped_r)
-	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(aes_in2_r)
-	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(unmapped_r)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_DEVWRITE8("systemlatch", hc259_device, write_a3, 0x00ff)
-	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(video_register_r)
-	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE(video_register_w)
-	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(unmapped_r)
-	AM_RANGE(0x400000, 0x401fff) AM_MIRROR(0x3fe000) AM_READWRITE(paletteram_r, paletteram_w)
-	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(memcard_r, memcard_w)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_MIRROR(0x0e0000) AM_ROM AM_REGION("mainbios", 0)
-	AM_RANGE(0xd00000, 0xffffff) AM_READ(unmapped_r)
-ADDRESS_MAP_END
+	map(0x300000, 0x300000).mirror(0x01fffe).r(m_ctrl1, FUNC(neogeo_control_port_device::ctrl_r));
+	map(0x320000, 0x320001).mirror(0x01fffe).portr("AUDIO");
+	map(0x320000, 0x320000).mirror(0x01fffe).w(this, FUNC(aes_state::audio_command_w));
+	map(0x340000, 0x340000).mirror(0x01fffe).r(m_ctrl2, FUNC(neogeo_control_port_device::ctrl_r));
+	map(0x360000, 0x37ffff).r(this, FUNC(aes_state::unmapped_r));
+	map(0x380000, 0x380001).mirror(0x01fffe).r(this, FUNC(aes_state::aes_in2_r));
+	map(0x380000, 0x38007f).mirror(0x01ff80).w(this, FUNC(aes_state::io_control_w)).umask16(0x00ff);
+	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).r(this, FUNC(aes_state::unmapped_r));
+	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).w("systemlatch", FUNC(hc259_device::write_a3)).umask16(0x00ff);
+	map(0x3c0000, 0x3c0007).mirror(0x01fff8).r(this, FUNC(aes_state::video_register_r));
+	map(0x3c0000, 0x3c000f).mirror(0x01fff0).w(this, FUNC(aes_state::video_register_w));
+	map(0x3e0000, 0x3fffff).r(this, FUNC(aes_state::unmapped_r));
+	map(0x400000, 0x401fff).mirror(0x3fe000).rw(this, FUNC(aes_state::paletteram_r), FUNC(aes_state::paletteram_w));
+	map(0x800000, 0x800fff).rw(this, FUNC(aes_state::memcard_r), FUNC(aes_state::memcard_w));
+	map(0xc00000, 0xc1ffff).mirror(0x0e0000).rom().region("mainbios", 0);
+	map(0xd00000, 0xffffff).r(this, FUNC(aes_state::unmapped_r));
+}
 
 
 /*************************************
@@ -1476,14 +1481,15 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(neogeo_state::audio_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("audio_main")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audio_8000")
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("audio_c000")
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("audio_e000")
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("audio_f000")
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void neogeo_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("audio_main");
+	map(0x8000, 0xbfff).bankr("audio_8000");
+	map(0xc000, 0xdfff).bankr("audio_c000");
+	map(0xe000, 0xefff).bankr("audio_e000");
+	map(0xf000, 0xf7ff).bankr("audio_f000");
+	map(0xf800, 0xffff).ram();
+}
 
 
 
@@ -1493,13 +1499,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(neogeo_state::audio_io_map)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
-	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_SELECT(0x0010) AM_WRITE(audio_cpu_enable_nmi_w)
-	AM_RANGE(0x08, 0x0b) AM_MIRROR(0x00f0) AM_SELECT(0xff00) AM_READ(audio_cpu_bank_select_r)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void neogeo_state::audio_io_map(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff00).r(this, FUNC(neogeo_state::audio_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::clear_w));
+	map(0x04, 0x07).mirror(0xff00).rw(m_ym, FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0x08, 0x08).mirror(0xff00).select(0x0010).w(this, FUNC(neogeo_state::audio_cpu_enable_nmi_w));
+	map(0x08, 0x0b).mirror(0x00f0).select(0xff00).r(this, FUNC(neogeo_state::audio_cpu_bank_select_r));
+	map(0x0c, 0x0c).mirror(0xff00).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+}
 
 
 

@@ -39,17 +39,20 @@ u32 vp60_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	return 0;
 }
 
-ADDRESS_MAP_START(vp60_state::mem_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void vp60_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(vp60_state::io_map)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-ADDRESS_MAP_END
+void vp60_state::io_map(address_map &map)
+{
+	map(0x8000, 0x87ff).ram();
+}
 
-ADDRESS_MAP_START(vp60_state::kbd_map)
-	AM_RANGE(0x000, 0x3ff) AM_ROM AM_REGION("keyboard", 0)
-ADDRESS_MAP_END
+void vp60_state::kbd_map(address_map &map)
+{
+	map(0x000, 0x3ff).rom().region("keyboard", 0);
+}
 
 static INPUT_PORTS_START( vp60 )
 INPUT_PORTS_END

@@ -290,21 +290,22 @@ READ8_MEMBER(destroyr_state::scanline_r)
 }
 
 
-ADDRESS_MAP_START(destroyr_state::destroyr_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0xf00) AM_RAM
-	AM_RANGE(0x1000, 0x1001) AM_MIRROR(0xffe) AM_READ(input_r)
-	AM_RANGE(0x1000, 0x1007) AM_MIRROR(0xff0) AM_DEVWRITE("outlatch", f9334_device, write_d0)
-	AM_RANGE(0x1008, 0x1008) AM_MIRROR(0xff7) AM_WRITE(misc_w)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0xfff) AM_READ_PORT("IN2")
-	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0xf00) AM_WRITEONLY AM_SHARE("alpha_nuram")
-	AM_RANGE(0x4000, 0x401f) AM_MIRROR(0xfe0) AM_WRITEONLY AM_SHARE("major_obj_ram")
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xff8) AM_WRITE(cursor_load_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xff8) AM_WRITE(interrupt_ack_w)
-	AM_RANGE(0x5002, 0x5007) AM_MIRROR(0xff8) AM_WRITEONLY AM_SHARE("minor_obj_ram")
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0xfff) AM_READ(scanline_r)
-	AM_RANGE(0x7000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void destroyr_state::destroyr_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x00ff).mirror(0xf00).ram();
+	map(0x1000, 0x1001).mirror(0xffe).r(this, FUNC(destroyr_state::input_r));
+	map(0x1000, 0x1007).mirror(0xff0).w("outlatch", FUNC(f9334_device::write_d0));
+	map(0x1008, 0x1008).mirror(0xff7).w(this, FUNC(destroyr_state::misc_w));
+	map(0x2000, 0x2000).mirror(0xfff).portr("IN2");
+	map(0x3000, 0x30ff).mirror(0xf00).writeonly().share("alpha_nuram");
+	map(0x4000, 0x401f).mirror(0xfe0).writeonly().share("major_obj_ram");
+	map(0x5000, 0x5000).mirror(0xff8).w(this, FUNC(destroyr_state::cursor_load_w));
+	map(0x5001, 0x5001).mirror(0xff8).w(this, FUNC(destroyr_state::interrupt_ack_w));
+	map(0x5002, 0x5007).mirror(0xff8).writeonly().share("minor_obj_ram");
+	map(0x6000, 0x6000).mirror(0xfff).r(this, FUNC(destroyr_state::scanline_r));
+	map(0x7000, 0x7fff).rom();
+}
 
 
 static INPUT_PORTS_START( destroyr )

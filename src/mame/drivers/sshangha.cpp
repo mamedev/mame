@@ -168,65 +168,67 @@ WRITE16_MEMBER( sshangha_state::sshangha_protection_region_8_146_w )
 }
 
 
-ADDRESS_MAP_START(sshangha_state::sshangha_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_SHARE("sound_shared")
+void sshangha_state::sshangha_map(address_map &map)
+{
+	map.global_mask(0x3fffff);
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x10000f).ram().share("sound_shared");
 
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_SHARE("pf2_rowscroll")
-	AM_RANGE(0x206800, 0x207fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
-	AM_RANGE(0x320002, 0x320005) AM_WRITENOP
-	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
+	map(0x200000, 0x201fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x202000, 0x203fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x204000, 0x2047ff).ram().share("pf1_rowscroll");
+	map(0x206000, 0x2067ff).ram().share("pf2_rowscroll");
+	map(0x206800, 0x207fff).ram();
+	map(0x300000, 0x30000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x320000, 0x320001).w(this, FUNC(sshangha_state::sshangha_video_w));
+	map(0x320002, 0x320005).nopw();
+	map(0x320006, 0x320007).nopr(); //irq ack
 
-	AM_RANGE(0x340000, 0x340fff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x350000, 0x350001) AM_READ(deco_71_r)
-	AM_RANGE(0x350000, 0x350007) AM_WRITENOP
-	AM_RANGE(0x360000, 0x360fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x370000, 0x370001) AM_READ(deco_71_r)
-	AM_RANGE(0x370000, 0x370007) AM_WRITENOP
+	map(0x340000, 0x340fff).ram().share("spriteram2");
+	map(0x350000, 0x350001).r(this, FUNC(sshangha_state::deco_71_r));
+	map(0x350000, 0x350007).nopw();
+	map(0x360000, 0x360fff).ram().share("spriteram");
+	map(0x370000, 0x370001).r(this, FUNC(sshangha_state::deco_71_r));
+	map(0x370000, 0x370007).nopw();
 
-	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_SHARE("sprite_palram")
-	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_SHARE("tile_palram2")
-	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_SHARE("sprite_palram2")
-	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_SHARE("tile_palram1")
-	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
-	AM_RANGE(0x3e0000, 0x3e3fff) AM_READWRITE(sshangha_protection_region_8_146_r,sshangha_protection_region_8_146_w)
-	AM_RANGE(0x3ec000, 0x3f3fff) AM_RAM
-	AM_RANGE(0x3f4000, 0x3f7fff) AM_READWRITE(sshangha_protection_region_d_146_r,sshangha_protection_region_d_146_w) AM_SHARE("prot_data")
-ADDRESS_MAP_END
+	map(0x380000, 0x3803ff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites_w)).share("sprite_palram");
+	map(0x380400, 0x3807ff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)).share("tile_palram2");
+	map(0x380800, 0x380bff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)).share("sprite_palram2");
+	map(0x380c00, 0x380fff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)).share("tile_palram1");
+	map(0x381000, 0x383fff).ram(); // unused palette area
+	map(0x3e0000, 0x3e3fff).rw(this, FUNC(sshangha_state::sshangha_protection_region_8_146_r), FUNC(sshangha_state::sshangha_protection_region_8_146_w));
+	map(0x3ec000, 0x3f3fff).ram();
+	map(0x3f4000, 0x3f7fff).rw(this, FUNC(sshangha_state::sshangha_protection_region_d_146_r), FUNC(sshangha_state::sshangha_protection_region_d_146_w)).share("prot_data");
+}
 
-ADDRESS_MAP_START(sshangha_state::sshanghb_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x084000, 0x0847ff) AM_READ(sshanghb_protection16_r)
-	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_SHARE("sound_shared") /* the bootleg writes here */
+void sshangha_state::sshanghb_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x084000, 0x0847ff).r(this, FUNC(sshangha_state::sshanghb_protection16_r));
+	map(0x101000, 0x10100f).ram().share("sound_shared"); /* the bootleg writes here */
 
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_SHARE("pf2_rowscroll")
-	AM_RANGE(0x206800, 0x207fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
-	AM_RANGE(0x320002, 0x320005) AM_WRITENOP
-	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
+	map(0x200000, 0x201fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x202000, 0x203fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x204000, 0x2047ff).ram().share("pf1_rowscroll");
+	map(0x206000, 0x2067ff).ram().share("pf2_rowscroll");
+	map(0x206800, 0x207fff).ram();
+	map(0x300000, 0x30000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x320000, 0x320001).w(this, FUNC(sshangha_state::sshangha_video_w));
+	map(0x320002, 0x320005).nopw();
+	map(0x320006, 0x320007).nopr(); //irq ack
 
-	AM_RANGE(0x340000, 0x340fff) AM_RAM // original spriteram
+	map(0x340000, 0x340fff).ram(); // original spriteram
 
-	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_SHARE("sprite_palram")
-	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_SHARE("tile_palram2")
-	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_SHARE("sprite_palram2")
-	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_SHARE("tile_palram1")
-	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
+	map(0x380000, 0x3803ff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites_w)).share("sprite_palram");
+	map(0x380400, 0x3807ff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)).share("tile_palram2");
+	map(0x380800, 0x380bff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)).share("sprite_palram2");
+	map(0x380c00, 0x380fff).ram().w(this, FUNC(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)).share("tile_palram1");
+	map(0x381000, 0x383fff).ram(); // unused palette area
 
-	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM AM_SHARE("spriteram") // bootleg spriteram
-	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
-	AM_RANGE(0xff4000, 0xff47ff) AM_RAM
-ADDRESS_MAP_END
+	map(0x3c0000, 0x3c0fff).ram().share("spriteram"); // bootleg spriteram
+	map(0xfec000, 0xff3fff).ram();
+	map(0xff4000, 0xff47ff).ram();
+}
 
 /******************************************************************************/
 
@@ -243,13 +245,14 @@ WRITE8_MEMBER(sshangha_state::sshangha_sound_shared_w)
 }
 
 /* Note: there's rom data after 0x8000 but the game never seem to call a rom bank, left-over? */
-ADDRESS_MAP_START(sshangha_state::sshangha_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xc200, 0xc201) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xf800, 0xf807) AM_READWRITE(sshangha_sound_shared_r,sshangha_sound_shared_w)
-	AM_RANGE(0xf808, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void sshangha_state::sshangha_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xc200, 0xc201).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xf800, 0xf807).rw(this, FUNC(sshangha_state::sshangha_sound_shared_r), FUNC(sshangha_state::sshangha_sound_shared_w));
+	map(0xf808, 0xffff).ram();
+}
 
 /******************************************************************************/
 

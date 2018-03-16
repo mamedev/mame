@@ -73,7 +73,7 @@
 
 
 
-DEFINE_DEVICE_TYPE(TMP87PH40AN, tmp87ph40an_device, "tmp87ph40an", "TMP87PH40AN")
+DEFINE_DEVICE_TYPE(TMP87PH40AN, tmp87ph40an_device, "tmp87ph40an", "Toshiba TMP87PH40AN")
 
 ADDRESS_MAP_START(tlcs870_device::tmp87ph40an_mem)
 #if 0

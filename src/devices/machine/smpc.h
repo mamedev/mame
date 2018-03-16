@@ -23,6 +23,12 @@
 #define MCFG_SMPC_HLE_ADD(tag, clock) \
 	MCFG_DEVICE_ADD((tag), SMPC_HLE, (clock))
 
+#define MCFG_SMPC_HLE_SCREEN(screen_tag) \
+	downcast<smpc_hle_device &>(*device).set_screen_tag(("^" screen_tag));
+
+#define MCFG_SMPC_HLE_CONTROL_PORTS(ctrl1_tag, ctrl2_tag) \
+	downcast<smpc_hle_device &>(*device).set_control_port_tags(ctrl1_tag, ctrl2_tag);
+
 #define MCFG_SMPC_HLE_PDR1_IN_CB(_devcb) \
 	devcb = &downcast<smpc_hle_device &>(*device).set_pdr1_in_handler(DEVCB_##_devcb);
 
@@ -139,9 +145,8 @@ public:
 	devcb_base &set_interrupt_handler(Object &&cb)
 	{ return m_irq_line.set_callback(std::forward<Object>(cb)); }
 
-	void set_region_code(uint8_t rgn)
-	{ m_region_code = rgn; }
-
+	void set_region_code(uint8_t rgn) { m_region_code = rgn; }
+	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
 	void set_control_port_tags(const char *tag1, const char *tag2)
 	{
 		m_ctrl1_tag = tag1;
@@ -245,7 +250,7 @@ private:
 	saturn_control_port_device *m_ctrl1;
 	saturn_control_port_device *m_ctrl2;
 
-	screen_device *m_screen;
+	required_device<screen_device> m_screen;
 
 	void smpc_regs(address_map &map);
 

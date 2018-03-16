@@ -95,7 +95,7 @@ enum BREGS {
 
 /***************************************************************************/
 
-DEFINE_DEVICE_TYPE(V30MZ, v30mz_cpu_device, "v30mz", "V30MZ")
+DEFINE_DEVICE_TYPE(V30MZ, v30mz_cpu_device, "v30mz", "NEC V30MZ")
 
 
 v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

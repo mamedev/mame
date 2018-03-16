@@ -160,26 +160,28 @@ WRITE8_MEMBER( pcm_state::pcm_85_w )
 
 
 
-ADDRESS_MAP_START(pcm_state::pcm_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM
-	AM_RANGE( 0x2000, 0xf7ff ) AM_RAM  // RAM
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_SHARE("videoram") // Video RAM
-ADDRESS_MAP_END
+void pcm_state::pcm_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();  // ROM
+	map(0x2000, 0xf7ff).ram();  // RAM
+	map(0xf800, 0xffff).ram().share("videoram"); // Video RAM
+}
 
-ADDRESS_MAP_START(pcm_state::pcm_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ctc_s", z80ctc_device, read, write) // system CTC
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("pio_s", z80pio_device, read, write) // system PIO
-	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE("sio", z80sio_device, cd_ba_r, cd_ba_w) // SIO
-	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE("ctc_u", z80ctc_device, read, write) // user CTC
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("pio_u", z80pio_device, read, write) // user PIO
+void pcm_state::pcm_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x83).rw(m_ctc_s, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // system CTC
+	map(0x84, 0x87).rw(m_pio_s, FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // system PIO
+	map(0x88, 0x8B).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // SIO
+	map(0x8C, 0x8F).rw(m_ctc_u, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // user CTC
+	map(0x90, 0x93).rw(m_pio_u, FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // user PIO
 	//AM_RANGE(0x94, 0x97) // bank select
 	//AM_RANGE(0x98, 0x9B) // NMI generator
 	//AM_RANGE(0x9C, 0x9F) // io ports available to the user
 	// disk controller?
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pcm )

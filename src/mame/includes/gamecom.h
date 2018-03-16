@@ -216,6 +216,7 @@ public:
 		, m_p_videoram(*this,"videoram")
 		, m_p_nvram(*this,"nvram")
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_dac(*this, "dac")
 		, m_dac0(*this, "dac0")
 		, m_dac1(*this, "dac1")
@@ -282,6 +283,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_nvram;
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<dac_byte_interface> m_dac;
 	required_device<dac_byte_interface> m_dac0;
 	required_device<dac_byte_interface> m_dac1;

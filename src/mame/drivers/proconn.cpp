@@ -206,69 +206,71 @@ public:
 	DECLARE_READ16_MEMBER(serial_receive);
 };
 
-ADDRESS_MAP_START(proconn_state::proconn_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void proconn_state::proconn_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
 
 
 
 // the mapping of the devices is rather ugly with address bits 8-9 providing the usual address bits 0-1 or 'offset'
 // r0/r1/r2/r3 and w0/w1/w2/w3 might still be in the wrong order at the moment.
-ADDRESS_MAP_START(proconn_state::proconn_portmap)
+void proconn_state::proconn_portmap(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 
 	// sio (vfd should be connected to it?)
-	AM_RANGE(0x00ff, 0x00ff) AM_READWRITE(sio_r0, sio_w0)
-	AM_RANGE(0x01ff, 0x01ff) AM_READWRITE(sio_r2, sio_w2)
-	AM_RANGE(0x02ff, 0x02ff) AM_READWRITE(sio_r1, sio_w1)
-	AM_RANGE(0x03ff, 0x03ff) AM_READWRITE(sio_r3, sio_w3)
+	map(0x00ff, 0x00ff).rw(this, FUNC(proconn_state::sio_r0), FUNC(proconn_state::sio_w0));
+	map(0x01ff, 0x01ff).rw(this, FUNC(proconn_state::sio_r2), FUNC(proconn_state::sio_w2));
+	map(0x02ff, 0x02ff).rw(this, FUNC(proconn_state::sio_r1), FUNC(proconn_state::sio_w1));
+	map(0x03ff, 0x03ff).rw(this, FUNC(proconn_state::sio_r3), FUNC(proconn_state::sio_w3));
 
 	// ctc
-	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(ctc_r0, ctc_w0)
-	AM_RANGE(0x01fe, 0x01fe) AM_READWRITE(ctc_r2, ctc_w2)
-	AM_RANGE(0x02fe, 0x02fe) AM_READWRITE(ctc_r1, ctc_w1)
-	AM_RANGE(0x03fe, 0x03fe) AM_READWRITE(ctc_r3, ctc_w3)
+	map(0x00fe, 0x00fe).rw(this, FUNC(proconn_state::ctc_r0), FUNC(proconn_state::ctc_w0));
+	map(0x01fe, 0x01fe).rw(this, FUNC(proconn_state::ctc_r2), FUNC(proconn_state::ctc_w2));
+	map(0x02fe, 0x02fe).rw(this, FUNC(proconn_state::ctc_r1), FUNC(proconn_state::ctc_w1));
+	map(0x03fe, 0x03fe).rw(this, FUNC(proconn_state::ctc_r3), FUNC(proconn_state::ctc_w3));
 
 	// ay (meters connected to it?)
-	AM_RANGE(0x00fd, 0x00fd) AM_READWRITE(ay_r0, ay_w0)
-	AM_RANGE(0x00fc, 0x00fc) AM_WRITE(ay_w1)
+	map(0x00fd, 0x00fd).rw(this, FUNC(proconn_state::ay_r0), FUNC(proconn_state::ay_w0));
+	map(0x00fc, 0x00fc).w(this, FUNC(proconn_state::ay_w1));
 
 	// ??
-	AM_RANGE(0xfbf9, 0xfbf9) AM_WRITENOP
-	AM_RANGE(0xfff9, 0xfff9) AM_WRITENOP
+	map(0xfbf9, 0xfbf9).nopw();
+	map(0xfff9, 0xfff9).nopw();
 
 	// pio5 (lamps?)
-	AM_RANGE(0x00f0, 0x00f0) AM_READWRITE(pio5_r0, pio5_w0)
-	AM_RANGE(0x01f0, 0x01f0) AM_READWRITE(pio5_r1, pio5_w1)
-	AM_RANGE(0x02f0, 0x02f0) AM_READWRITE(pio5_r2, pio5_w2)
-	AM_RANGE(0x03f0, 0x03f0) AM_READWRITE(pio5_r3, pio5_w3)
+	map(0x00f0, 0x00f0).rw(this, FUNC(proconn_state::pio5_r0), FUNC(proconn_state::pio5_w0));
+	map(0x01f0, 0x01f0).rw(this, FUNC(proconn_state::pio5_r1), FUNC(proconn_state::pio5_w1));
+	map(0x02f0, 0x02f0).rw(this, FUNC(proconn_state::pio5_r2), FUNC(proconn_state::pio5_w2));
+	map(0x03f0, 0x03f0).rw(this, FUNC(proconn_state::pio5_r3), FUNC(proconn_state::pio5_w3));
 
 	// pio4 (triacs + 7segs)
-	AM_RANGE(0x00e8, 0x00e8) AM_READWRITE(pio4_r0, pio4_w0)
-	AM_RANGE(0x01e8, 0x01e8) AM_READWRITE(pio4_r1, pio4_w1)
-	AM_RANGE(0x02e8, 0x02e8) AM_READWRITE(pio4_r2, pio4_w2)
-	AM_RANGE(0x03e8, 0x03e8) AM_READWRITE(pio4_r3, pio4_w3)
+	map(0x00e8, 0x00e8).rw(this, FUNC(proconn_state::pio4_r0), FUNC(proconn_state::pio4_w0));
+	map(0x01e8, 0x01e8).rw(this, FUNC(proconn_state::pio4_r1), FUNC(proconn_state::pio4_w1));
+	map(0x02e8, 0x02e8).rw(this, FUNC(proconn_state::pio4_r2), FUNC(proconn_state::pio4_w2));
+	map(0x03e8, 0x03e8).rw(this, FUNC(proconn_state::pio4_r3), FUNC(proconn_state::pio4_w3));
 
 	// pio3 (lamps? + opto in?)
-	AM_RANGE(0x00d8, 0x00d8) AM_READWRITE(pio3_r0, pio3_w0)
-	AM_RANGE(0x01d8, 0x01d8) AM_READWRITE(pio3_r1, pio3_w1)
-	AM_RANGE(0x02d8, 0x02d8) AM_READWRITE(pio3_r2, pio3_w2)
-	AM_RANGE(0x03d8, 0x03d8) AM_READWRITE(pio3_r3, pio3_w3)
+	map(0x00d8, 0x00d8).rw(this, FUNC(proconn_state::pio3_r0), FUNC(proconn_state::pio3_w0));
+	map(0x01d8, 0x01d8).rw(this, FUNC(proconn_state::pio3_r1), FUNC(proconn_state::pio3_w1));
+	map(0x02d8, 0x02d8).rw(this, FUNC(proconn_state::pio3_r2), FUNC(proconn_state::pio3_w2));
+	map(0x03d8, 0x03d8).rw(this, FUNC(proconn_state::pio3_r3), FUNC(proconn_state::pio3_w3));
 
 	// pio2 (reels?)
-	AM_RANGE(0x00b8, 0x00b8) AM_READWRITE(pio2_r0, pio2_w0)
-	AM_RANGE(0x01b8, 0x01b8) AM_READWRITE(pio2_r1, pio2_w1)
-	AM_RANGE(0x02b8, 0x02b8) AM_READWRITE(pio2_r2, pio2_w2)
-	AM_RANGE(0x03b8, 0x03b8) AM_READWRITE(pio2_r3, pio2_w3)
+	map(0x00b8, 0x00b8).rw(this, FUNC(proconn_state::pio2_r0), FUNC(proconn_state::pio2_w0));
+	map(0x01b8, 0x01b8).rw(this, FUNC(proconn_state::pio2_r1), FUNC(proconn_state::pio2_w1));
+	map(0x02b8, 0x02b8).rw(this, FUNC(proconn_state::pio2_r2), FUNC(proconn_state::pio2_w2));
+	map(0x03b8, 0x03b8).rw(this, FUNC(proconn_state::pio2_r3), FUNC(proconn_state::pio2_w3));
 
 	// pio1 (reels? + inputs?)
-	AM_RANGE(0x0078, 0x0078) AM_READWRITE(pio1_r0, pio1_w0)
-	AM_RANGE(0x0178, 0x0178) AM_READWRITE(pio1_r1, pio1_w1)
-	AM_RANGE(0x0278, 0x0278) AM_READWRITE(pio1_r2, pio1_w2)
-	AM_RANGE(0x0378, 0x0378) AM_READWRITE(pio1_r3, pio1_w3)
-ADDRESS_MAP_END
+	map(0x0078, 0x0078).rw(this, FUNC(proconn_state::pio1_r0), FUNC(proconn_state::pio1_w0));
+	map(0x0178, 0x0178).rw(this, FUNC(proconn_state::pio1_r1), FUNC(proconn_state::pio1_w1));
+	map(0x0278, 0x0278).rw(this, FUNC(proconn_state::pio1_r2), FUNC(proconn_state::pio1_w2));
+	map(0x0378, 0x0378).rw(this, FUNC(proconn_state::pio1_r3), FUNC(proconn_state::pio1_w3));
+}
 
 
 static INPUT_PORTS_START( proconn )

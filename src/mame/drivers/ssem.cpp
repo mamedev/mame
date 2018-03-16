@@ -77,9 +77,10 @@ inline uint32_t ssem_state::reverse(uint32_t v)
 * Address map                                        *
 \****************************************************/
 
-ADDRESS_MAP_START(ssem_state::ssem_map)
-	AM_RANGE(0x00, 0x7f) AM_RAM AM_SHARE("store")// Primary store
-ADDRESS_MAP_END
+void ssem_state::ssem_map(address_map &map)
+{
+	map(0x00, 0x7f).ram().share("store");// Primary store
+}
 
 /****************************************************\
 * Input ports and front panel handling               *

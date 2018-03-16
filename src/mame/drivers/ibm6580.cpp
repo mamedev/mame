@@ -680,35 +680,37 @@ READ8_MEMBER(ibm6580_state::floppy_r)
 }
 
 
-ADDRESS_MAP_START(ibm6580_state::ibm6580_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x90000, 0x90001) AM_WRITE(unk_latch_w)
-	AM_RANGE(0xef000, 0xeffff) AM_RAM AM_SHARE("videoram")  // 66-line vram starts at 0xec000
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void ibm6580_state::ibm6580_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x90000, 0x90001).w(this, FUNC(ibm6580_state::unk_latch_w));
+	map(0xef000, 0xeffff).ram().share("videoram");  // 66-line vram starts at 0xec000
+	map(0xfc000, 0xfffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(ibm6580_state::ibm6580_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0007) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x0008, 0x000f) AM_WRITE (pic_latch_w)
-	AM_RANGE(0x0010, 0x0017) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("dma8257", i8257_device, read, write, 0x00ff)
-	AM_RANGE(0x0040, 0x005f) AM_READWRITE8(p40_r, p40_w, 0x00ff)
-	AM_RANGE(0x0070, 0x007f) AM_UNMAP
-	AM_RANGE(0x0120, 0x0127) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x0140, 0x0141) AM_DEVREADWRITE8("upd8251a", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x0142, 0x0143) AM_DEVREADWRITE8("upd8251a", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x0160, 0x0161) AM_DEVREADWRITE8("upd8251b", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x0162, 0x0163) AM_DEVREADWRITE8("upd8251b", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x4000, 0x400f) AM_UNMAP
-	AM_RANGE(0x5000, 0x500f) AM_UNMAP
-	AM_RANGE(0x6000, 0x601f) AM_UNMAP
-	AM_RANGE(0x8060, 0x807f) AM_UNMAP
-	AM_RANGE(0x8150, 0x815f) AM_READWRITE8(floppy_r, floppy_w, 0x00ff)  // HLE of floppy board
-	AM_RANGE(0x81a0, 0x81af) AM_UNMAP
-	AM_RANGE(0xc000, 0xc00f) AM_UNMAP
-	AM_RANGE(0xe000, 0xe02f) AM_READWRITE8(video_r, video_w, 0x00ff)
-ADDRESS_MAP_END
+void ibm6580_state::ibm6580_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0007).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x0008, 0x000f).w(this, FUNC(ibm6580_state::pic_latch_w));
+	map(0x0010, 0x0017).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0020, 0x003f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write)).umask16(0x00ff);
+	map(0x0040, 0x005f).rw(this, FUNC(ibm6580_state::p40_r), FUNC(ibm6580_state::p40_w)).umask16(0x00ff);
+	map(0x0070, 0x007f).unmaprw();
+	map(0x0120, 0x0127).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x0140, 0x0140).rw("upd8251a", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x0142, 0x0142).rw("upd8251a", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0160, 0x0160).rw("upd8251b", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x0162, 0x0162).rw("upd8251b", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x4000, 0x400f).unmaprw();
+	map(0x5000, 0x500f).unmaprw();
+	map(0x6000, 0x601f).unmaprw();
+	map(0x8060, 0x807f).unmaprw();
+	map(0x8150, 0x815f).rw(this, FUNC(ibm6580_state::floppy_r), FUNC(ibm6580_state::floppy_w)).umask16(0x00ff);  // HLE of floppy board
+	map(0x81a0, 0x81af).unmaprw();
+	map(0xc000, 0xc00f).unmaprw();
+	map(0xe000, 0xe02f).rw(this, FUNC(ibm6580_state::video_r), FUNC(ibm6580_state::video_w)).umask16(0x00ff);
+}
 
 
 /* Input ports */

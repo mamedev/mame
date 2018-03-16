@@ -261,7 +261,6 @@ if (CPUS["DSP16A"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/dsp16/dsp16.cpp",
 		MAME_DIR .. "src/devices/cpu/dsp16/dsp16.h",
-		MAME_DIR .. "src/devices/cpu/dsp16/dsp16ops.hxx",
 	}
 end
 
@@ -1173,6 +1172,7 @@ if (CPUS["MB86235"]~=null) then
 		MAME_DIR .. "src/devices/cpu/mb86235/mb86235drc.cpp",
 		MAME_DIR .. "src/devices/cpu/mb86235/mb86235fe.cpp",
 		MAME_DIR .. "src/devices/cpu/mb86235/mb86235fe.h",
+		MAME_DIR .. "src/devices/cpu/mb86235/mb86235ops.cpp",
 	}
 end
 

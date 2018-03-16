@@ -305,61 +305,67 @@ WRITE8_MEMBER(airbustr_state::coin_counter_w)
 }
 
 /* Memory Maps */
-ADDRESS_MAP_START(airbustr_state::master_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("masterbank")
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_r, spriteram_w)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("devram") // shared with protection device
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void airbustr_state::master_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("masterbank");
+	map(0xc000, 0xcfff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_r), FUNC(kaneko_pandora_device::spriteram_w));
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xefff).ram().share("devram"); // shared with protection device
+	map(0xf000, 0xffff).ram().share("share1");
+}
 
-ADDRESS_MAP_START(airbustr_state::master_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(master_bankswitch_w)
-	AM_RANGE(0x01, 0x01) AM_WRITENOP // ???
-	AM_RANGE(0x02, 0x02) AM_WRITE(master_nmi_trigger_w)
-ADDRESS_MAP_END
+void airbustr_state::master_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(airbustr_state::master_bankswitch_w));
+	map(0x01, 0x01).nopw(); // ???
+	map(0x02, 0x02).w(this, FUNC(airbustr_state::master_nmi_trigger_w));
+}
 
-ADDRESS_MAP_START(airbustr_state::slave_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("slavebank")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd000, 0xd5ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xd600, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void airbustr_state::slave_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("slavebank");
+	map(0xc000, 0xc3ff).ram().w(this, FUNC(airbustr_state::videoram2_w)).share("videoram2");
+	map(0xc400, 0xc7ff).ram().w(this, FUNC(airbustr_state::colorram2_w)).share("colorram2");
+	map(0xc800, 0xcbff).ram().w(this, FUNC(airbustr_state::videoram_w)).share("videoram");
+	map(0xcc00, 0xcfff).ram().w(this, FUNC(airbustr_state::colorram_w)).share("colorram");
+	map(0xd000, 0xd5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd600, 0xdfff).ram();
+	map(0xe000, 0xefff).ram();
+	map(0xf000, 0xffff).ram().share("share1");
+}
 
-ADDRESS_MAP_START(airbustr_state::slave_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x04, 0x0c) AM_WRITE(scrollregs_w)
-	AM_RANGE(0x0e, 0x0e) AM_READ(soundcommand_status_r)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1")
-	AM_RANGE(0x22, 0x22) AM_READ_PORT("P2")
-	AM_RANGE(0x24, 0x24) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x28, 0x28) AM_WRITE(coin_counter_w)
-	AM_RANGE(0x38, 0x38) AM_WRITENOP // irq ack / irq mask
-ADDRESS_MAP_END
+void airbustr_state::slave_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(airbustr_state::slave_bankswitch_w));
+	map(0x02, 0x02).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x04, 0x0c).w(this, FUNC(airbustr_state::scrollregs_w));
+	map(0x0e, 0x0e).r(this, FUNC(airbustr_state::soundcommand_status_r));
+	map(0x20, 0x20).portr("P1");
+	map(0x22, 0x22).portr("P2");
+	map(0x24, 0x24).portr("SYSTEM");
+	map(0x28, 0x28).w(this, FUNC(airbustr_state::coin_counter_w));
+	map(0x38, 0x38).nopw(); // irq ack / irq mask
+}
 
-ADDRESS_MAP_START(airbustr_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audiobank")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-ADDRESS_MAP_END
+void airbustr_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0xc000, 0xdfff).ram();
+}
 
-ADDRESS_MAP_START(airbustr_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void airbustr_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(airbustr_state::sound_bankswitch_w));
+	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x04, 0x04).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+}
 
 /* Input Ports */
 

@@ -116,24 +116,27 @@ WRITE8_MEMBER(piggypas_state::lcd_control_w)
 	}
 }
 
-ADDRESS_MAP_START(piggypas_state::piggypas_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void piggypas_state::piggypas_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(piggypas_state::piggypas_io)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("hd44780", hd44780_device, write)
-	AM_RANGE(0x1802, 0x1803) AM_DEVREAD("hd44780", hd44780_device, read)
-ADDRESS_MAP_END
+void piggypas_state::piggypas_io(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x1000, 0x1000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x1800, 0x1801).w(m_hd44780, FUNC(hd44780_device::write));
+	map(0x1802, 0x1803).r(m_hd44780, FUNC(hd44780_device::read));
+}
 
-ADDRESS_MAP_START(piggypas_state::fidlstix_io)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // input matrix scan?
-ADDRESS_MAP_END
+void piggypas_state::fidlstix_io(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x1000, 0x1000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x1800, 0x1800).nopw(); // input matrix scan?
+}
 
 
 INPUT_CHANGED_MEMBER(piggypas_state::ball_sensor)

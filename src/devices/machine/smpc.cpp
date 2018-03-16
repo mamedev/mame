@@ -219,7 +219,8 @@ smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag,
 	m_pdr2_write(*this),
 	m_irq_line(*this),
 	m_ctrl1(nullptr),
-	m_ctrl2(nullptr)
+	m_ctrl2(nullptr),
+	m_screen(*this, finder_base::DUMMY_TAG)
 {
 	m_ctrl1 = nullptr;
 	m_ctrl2 = nullptr;
@@ -288,9 +289,6 @@ void smpc_hle_device::device_start()
 	m_rtc_timer = timer_alloc(RTC_ID);
 	m_intback_timer = timer_alloc(INTBACK_ID);
 	m_sndres_timer = timer_alloc(SNDRES_ID);
-
-//  TODO: tag-ify, needed when SCU will be a device
-	m_screen = machine().first_screen();
 
 	m_rtc_data[0] = DectoBCD(systime.local_time.year / 100);
 	m_rtc_data[1] = DectoBCD(systime.local_time.year % 100);

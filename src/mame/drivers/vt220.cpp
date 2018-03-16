@@ -62,23 +62,27 @@ public:
 };
 
 
-ADDRESS_MAP_START(vt220_state::vt220_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void vt220_state::vt220_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(vt220_state::vt220a_mem)
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void vt220_state::vt220a_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(vt220_state::vt220_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0xc000) AM_RAM
-	AM_RANGE(0x3800, 0x380f) AM_MIRROR(0xc7f0) AM_DEVREADWRITE("duart", scn2681_device, read, write)
-ADDRESS_MAP_END
+void vt220_state::vt220_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x2000, 0x2fff).mirror(0xc000).ram();
+	map(0x3800, 0x380f).mirror(0xc7f0).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+}
 
-ADDRESS_MAP_START(vt220_state::vt220a_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void vt220_state::vt220a_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vt220 )

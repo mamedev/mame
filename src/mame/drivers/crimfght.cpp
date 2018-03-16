@@ -81,37 +81,40 @@ WRITE8_MEMBER(crimfght_state::ym2151_ct_w)
 	m_k007232->set_bank(bank_a, bank_b);
 }
 
-ADDRESS_MAP_START(crimfght_state::crimfght_map)
-	AM_RANGE(0x0000, 0x03ff) AM_DEVICE("bank0000", address_map_bank_device, amap8)
-	AM_RANGE(0x0400, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)   /* video RAM + sprite RAM */
-	AM_RANGE(0x3f80, 0x3f80) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3f81, 0x3f81) AM_READ_PORT("P1")
-	AM_RANGE(0x3f82, 0x3f82) AM_READ_PORT("P2")
-	AM_RANGE(0x3f83, 0x3f83) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3f84, 0x3f84) AM_READ_PORT("DSW3")
-	AM_RANGE(0x3f85, 0x3f85) AM_READ_PORT("P3")
-	AM_RANGE(0x3f86, 0x3f86) AM_READ_PORT("P4")
-	AM_RANGE(0x3f87, 0x3f87) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3f88, 0x3f88) AM_MIRROR(0x03) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(crimfght_coin_w) // 051550
-	AM_RANGE(0x3f8c, 0x3f8c) AM_MIRROR(0x03) AM_WRITE(sound_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")                        /* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x18000)
-ADDRESS_MAP_END
+void crimfght_state::crimfght_map(address_map &map)
+{
+	map(0x0000, 0x03ff).m(m_bank0000, FUNC(address_map_bank_device::amap8));
+	map(0x0400, 0x1fff).ram();
+	map(0x2000, 0x5fff).rw(this, FUNC(crimfght_state::k052109_051960_r), FUNC(crimfght_state::k052109_051960_w));   /* video RAM + sprite RAM */
+	map(0x3f80, 0x3f80).portr("SYSTEM");
+	map(0x3f81, 0x3f81).portr("P1");
+	map(0x3f82, 0x3f82).portr("P2");
+	map(0x3f83, 0x3f83).portr("DSW2");
+	map(0x3f84, 0x3f84).portr("DSW3");
+	map(0x3f85, 0x3f85).portr("P3");
+	map(0x3f86, 0x3f86).portr("P4");
+	map(0x3f87, 0x3f87).portr("DSW1");
+	map(0x3f88, 0x3f88).mirror(0x03).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(crimfght_state::crimfght_coin_w)); // 051550
+	map(0x3f8c, 0x3f8c).mirror(0x03).w(this, FUNC(crimfght_state::sound_w));
+	map(0x6000, 0x7fff).bankr("rombank");                        /* banked ROM */
+	map(0x8000, 0xffff).rom().region("maincpu", 0x18000);
+}
 
-ADDRESS_MAP_START(crimfght_state::bank0000_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void crimfght_state::bank0000_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+}
 
 // full memory map derived from schematics
-ADDRESS_MAP_START(crimfght_state::crimfght_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xe000, 0xe00f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("k007232", k007232_device, read, write)
-ADDRESS_MAP_END
+void crimfght_state::crimfght_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).mirror(0x1800).ram();
+	map(0xa000, 0xa001).mirror(0x1ffe).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xc000, 0xc000).mirror(0x1fff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xe00f).mirror(0x1ff0).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
+}
 
 /***************************************************************************
 

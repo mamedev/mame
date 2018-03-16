@@ -326,9 +326,9 @@ void debug_view_watchpoints::view_update()
 			pad_ostream_to_length(linebuf, tableBreaks[2]);
 			linebuf << wp->space().name();
 			pad_ostream_to_length(linebuf, tableBreaks[3]);
-			util::stream_format(linebuf, "%0*X", wp->space().addrchars(), wp->space().byte_to_address(wp->address()));
+			util::stream_format(linebuf, "%0*X", wp->space().addrchars(), wp->address());
 			linebuf.put('-');
-			util::stream_format(linebuf, "%0*X", wp->space().addrchars(), wp->space().byte_to_address_end(wp->address() + wp->length()) - 1);
+			util::stream_format(linebuf, "%0*X", wp->space().addrchars(), wp->address() + wp->length() - 1);
 			pad_ostream_to_length(linebuf, tableBreaks[4]);
 			linebuf << types[wp->type() & 3];
 			pad_ostream_to_length(linebuf, tableBreaks[5]);

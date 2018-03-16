@@ -48,7 +48,7 @@ DECLARE_DEVICE_TYPE(CXD8561BQ, cxd8561bq_device)
 DECLARE_DEVICE_TYPE(CXD8561CQ, cxd8561cq_device)
 DECLARE_DEVICE_TYPE(CXD8654Q,  cxd8654q_device)
 
-class psxgpu_device : public device_t
+class psxgpu_device : public device_t, public device_video_interface
 {
 public:
 	// configuration helpers
@@ -306,7 +306,6 @@ private:
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 #if defined(PSXGPU_DEBUG_VIEWER) && PSXGPU_DEBUG_VIEWER
-	required_device<screen_device> m_screen;
 	void DebugMeshInit();
 	void DebugMesh( int n_coordx, int n_coordy );
 	void DebugMeshEnd();

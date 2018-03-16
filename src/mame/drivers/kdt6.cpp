@@ -150,58 +150,60 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(kdt6_state::psi98_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("page0_r") AM_WRITE_BANK("page0_w")
-	AM_RANGE(0x1000, 0x1fff) AM_READ_BANK("page1_r") AM_WRITE_BANK("page1_w")
-	AM_RANGE(0x2000, 0x2fff) AM_READ_BANK("page2_r") AM_WRITE_BANK("page2_w")
-	AM_RANGE(0x3000, 0x3fff) AM_READ_BANK("page3_r") AM_WRITE_BANK("page3_w")
-	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("page4_r") AM_WRITE_BANK("page4_w")
-	AM_RANGE(0x5000, 0x5fff) AM_READ_BANK("page5_r") AM_WRITE_BANK("page5_w")
-	AM_RANGE(0x6000, 0x6fff) AM_READ_BANK("page6_r") AM_WRITE_BANK("page6_w")
-	AM_RANGE(0x7000, 0x7fff) AM_READ_BANK("page7_r") AM_WRITE_BANK("page7_w")
-	AM_RANGE(0x8000, 0x8fff) AM_READ_BANK("page8_r") AM_WRITE_BANK("page8_w")
-	AM_RANGE(0x9000, 0x9fff) AM_READ_BANK("page9_r") AM_WRITE_BANK("page9_w")
-	AM_RANGE(0xa000, 0xafff) AM_READ_BANK("pagea_r") AM_WRITE_BANK("pagea_w")
-	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("pageb_r") AM_WRITE_BANK("pageb_w")
-	AM_RANGE(0xc000, 0xcfff) AM_READ_BANK("pagec_r") AM_WRITE_BANK("pagec_w")
-	AM_RANGE(0xd000, 0xdfff) AM_READ_BANK("paged_r") AM_WRITE_BANK("paged_w")
-	AM_RANGE(0xe000, 0xefff) AM_READ_BANK("pagee_r") AM_WRITE_BANK("pagee_w")
-	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("pagef_r") AM_WRITE_BANK("pagef_w")
-ADDRESS_MAP_END
+void kdt6_state::psi98_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankr("page0_r").bankw("page0_w");
+	map(0x1000, 0x1fff).bankr("page1_r").bankw("page1_w");
+	map(0x2000, 0x2fff).bankr("page2_r").bankw("page2_w");
+	map(0x3000, 0x3fff).bankr("page3_r").bankw("page3_w");
+	map(0x4000, 0x4fff).bankr("page4_r").bankw("page4_w");
+	map(0x5000, 0x5fff).bankr("page5_r").bankw("page5_w");
+	map(0x6000, 0x6fff).bankr("page6_r").bankw("page6_w");
+	map(0x7000, 0x7fff).bankr("page7_r").bankw("page7_w");
+	map(0x8000, 0x8fff).bankr("page8_r").bankw("page8_w");
+	map(0x9000, 0x9fff).bankr("page9_r").bankw("page9_w");
+	map(0xa000, 0xafff).bankr("pagea_r").bankw("pagea_w");
+	map(0xb000, 0xbfff).bankr("pageb_r").bankw("pageb_w");
+	map(0xc000, 0xcfff).bankr("pagec_r").bankw("pagec_w");
+	map(0xd000, 0xdfff).bankr("paged_r").bankw("paged_w");
+	map(0xe000, 0xefff).bankr("pagee_r").bankw("pagee_w");
+	map(0xf000, 0xffff).bankr("pagef_r").bankw("pagef_w");
+}
 
-ADDRESS_MAP_START(kdt6_state::psi98_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("dma", z80dma_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("sio", z80sio_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("pio", z80pio_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ctc2", z80ctc_device, read, write)
-	AM_RANGE(0x14, 0x14) AM_DEVREAD("fdc", upd765a_device, msr_r)
-	AM_RANGE(0x15, 0x15) AM_DEVREADWRITE("fdc", upd765a_device, fifo_r, fifo_w)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x1c, 0x1c) AM_WRITE(status0_w)
-	AM_RANGE(0x1d, 0x1d) AM_DEVREAD("kbd", psi_keyboard_bus_device, key_data_r)
-	AM_RANGE(0x1e, 0x1e) AM_DEVREADWRITE("fdc", upd765a_device, mdma_r, mdma_w)
-	AM_RANGE(0x1f, 0x1f) AM_WRITE(fdc_tc_w)
-	AM_RANGE(0x20, 0x2f) AM_READWRITE(mapper_r, mapper_w)
-	AM_RANGE(0x30, 0x30) AM_READWRITE(video_data_r, video_data_w)
-	AM_RANGE(0x31, 0x31) AM_WRITE(video_data_inc_w)
-	AM_RANGE(0x36, 0x36) AM_WRITE(video_data_dec_w)
-	AM_RANGE(0x37, 0x37) AM_WRITE(video_data_inc_w)
-	AM_RANGE(0x38, 0x38) AM_WRITE(status1_w)
-	AM_RANGE(0x39, 0x39) AM_READ(status1_r)
-	AM_RANGE(0x3a, 0x3a) AM_WRITE(status2_w)
-	AM_RANGE(0x3b, 0x3b) AM_READWRITE(sasi_ctrl_r, sasi_ctrl_w)
-	AM_RANGE(0x3c, 0x3c) AM_WRITE(dma_map_w)
+void kdt6_state::psi98_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x04, 0x07).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x08, 0x0b).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x0c, 0x0f).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x10, 0x13).rw("ctc2", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x14, 0x14).r(m_fdc, FUNC(upd765a_device::msr_r));
+	map(0x15, 0x15).rw(m_fdc, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
+	map(0x18, 0x18).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x19, 0x19).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x1c, 0x1c).w(this, FUNC(kdt6_state::status0_w));
+	map(0x1d, 0x1d).r(m_keyboard, FUNC(psi_keyboard_bus_device::key_data_r));
+	map(0x1e, 0x1e).rw(m_fdc, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
+	map(0x1f, 0x1f).w(this, FUNC(kdt6_state::fdc_tc_w));
+	map(0x20, 0x2f).rw(this, FUNC(kdt6_state::mapper_r), FUNC(kdt6_state::mapper_w));
+	map(0x30, 0x30).rw(this, FUNC(kdt6_state::video_data_r), FUNC(kdt6_state::video_data_w));
+	map(0x31, 0x31).w(this, FUNC(kdt6_state::video_data_inc_w));
+	map(0x36, 0x36).w(this, FUNC(kdt6_state::video_data_dec_w));
+	map(0x37, 0x37).w(this, FUNC(kdt6_state::video_data_inc_w));
+	map(0x38, 0x38).w(this, FUNC(kdt6_state::status1_w));
+	map(0x39, 0x39).r(this, FUNC(kdt6_state::status1_r));
+	map(0x3a, 0x3a).w(this, FUNC(kdt6_state::status2_w));
+	map(0x3b, 0x3b).rw(this, FUNC(kdt6_state::sasi_ctrl_r), FUNC(kdt6_state::sasi_ctrl_w));
+	map(0x3c, 0x3c).w(this, FUNC(kdt6_state::dma_map_w));
 #if 0
 	AM_RANGE(0x3d, 0x3d) WATCHDOG
 	AM_RANGE(0x3e, 0x3e) WATCHDOG TRIGGER
 	AM_RANGE(0x3f, 0x3f) SASI DATA
 #endif
-	AM_RANGE(0x40, 0x40) AM_WRITE(video_address_latch_high_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(video_address_latch_low_w)
-ADDRESS_MAP_END
+	map(0x40, 0x40).w(this, FUNC(kdt6_state::video_address_latch_high_w));
+	map(0x41, 0x41).w(this, FUNC(kdt6_state::video_address_latch_low_w));
+}
 
 
 //**************************************************************************

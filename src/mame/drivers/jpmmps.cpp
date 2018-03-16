@@ -165,20 +165,22 @@ public:
 	DECLARE_WRITE8_MEMBER(jpmmps_ic22_portc_w);
 };
 
-ADDRESS_MAP_START(jpmmps_state::jpmmps_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
+void jpmmps_state::jpmmps_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
 
-	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_ic26", i8255_device, read, write)
-	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_ic21", i8255_device, read, write)
-	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_ic22", i8255_device, read, write)
-	AM_RANGE(0xc00c, 0xc00f) AM_DEVREADWRITE("ppi8255_ic25", i8255_device, read, write)
+	map(0xc000, 0xc003).rw("ppi8255_ic26", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc004, 0xc007).rw("ppi8255_ic21", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc008, 0xc00b).rw("ppi8255_ic22", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc00c, 0xc00f).rw("ppi8255_ic25", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-	AM_RANGE(0xe800, 0xefff) AM_RAM
-ADDRESS_MAP_END
+	map(0xe800, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(jpmmps_state::jpmmps_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("tms9902_ic5", tms9902_device, cruread, cruwrite)
+void jpmmps_state::jpmmps_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x001f).rw("tms9902_ic5", FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
 
 //  AM_RANGE(0x0020, 0x0020) // power fail
 //  AM_RANGE(0x0021, 0x0021) // wd timeout
@@ -188,9 +190,9 @@ ADDRESS_MAP_START(jpmmps_state::jpmmps_io_map)
 //  AM_RANGE(0x0026, 0x0026) // uart4 int
 //  AM_RANGE(0x0027, 0x0027) // uart2 int
 
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE("tms9902_ic10", tms9902_device, cruread, cruwrite)
-	AM_RANGE(0x0060, 0x0067) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+	map(0x0040, 0x005f).rw("tms9902_ic10", FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
+	map(0x0060, 0x0067).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
 
 static INPUT_PORTS_START( jpmmps )

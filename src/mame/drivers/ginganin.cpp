@@ -76,18 +76,19 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 */
 
 
-ADDRESS_MAP_START(ginganin_state::ginganin_map)
+void ginganin_state::ginganin_map(address_map &map)
+{
 /* The ROM area: 10000-13fff is written with: 0000 0000 0000 0001, at startup only. Why? */
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x020000, 0x023fff) AM_RAM
-	AM_RANGE(0x030000, 0x0307ff) AM_RAM_WRITE(ginganin_txtram16_w) AM_SHARE("txtram")
-	AM_RANGE(0x040000, 0x0407ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x050000, 0x0507ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x060000, 0x06000f) AM_RAM_WRITE(ginganin_vregs16_w) AM_SHARE("vregs")
-	AM_RANGE(0x068000, 0x06bfff) AM_RAM_WRITE(ginganin_fgram16_w) AM_SHARE("fgram")
-	AM_RANGE(0x070000, 0x070001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x070002, 0x070003) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+	map(0x000000, 0x01ffff).rom();
+	map(0x020000, 0x023fff).ram();
+	map(0x030000, 0x0307ff).ram().w(this, FUNC(ginganin_state::ginganin_txtram16_w)).share("txtram");
+	map(0x040000, 0x0407ff).ram().share("spriteram");
+	map(0x050000, 0x0507ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x060000, 0x06000f).ram().w(this, FUNC(ginganin_state::ginganin_vregs16_w)).share("vregs");
+	map(0x068000, 0x06bfff).ram().w(this, FUNC(ginganin_state::ginganin_fgram16_w)).share("fgram");
+	map(0x070000, 0x070001).portr("P1_P2");
+	map(0x070002, 0x070003).portr("DSW");
+}
 
 
 /*
@@ -96,14 +97,15 @@ ADDRESS_MAP_END
 **
 */
 
-ADDRESS_MAP_START(ginganin_state::sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0807) AM_DEVREADWRITE("6840ptm", ptm6840_device, read, write)
-	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ymsnd", y8950_device, write)
-	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("psg", ym2149_device, address_data_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void ginganin_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0807).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x1800, 0x1800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x2000, 0x2001).w("ymsnd", FUNC(y8950_device::write));
+	map(0x2800, 0x2801).w("psg", FUNC(ym2149_device::address_data_w));
+	map(0x4000, 0xffff).rom();
+}
 
 
 /* Input Ports */

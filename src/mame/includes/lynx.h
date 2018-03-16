@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "screen.h"
 #include "audio/lynx.h"
 #include "imagedev/snapquik.h"
 #include "bus/generic/slot.h"
@@ -117,8 +118,46 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "custom"),
 		m_cart(*this, "cartslot"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")
 	{ }
+
+	void lynx(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	required_shared_ptr<uint8_t> m_mem_0000;
+	required_shared_ptr<uint8_t> m_mem_fc00;
+	required_shared_ptr<uint8_t> m_mem_fd00;
+	required_shared_ptr<uint8_t> m_mem_fe00;
+	required_shared_ptr<uint8_t> m_mem_fffa;
+	required_device<cpu_device> m_maincpu;
+	required_device<lynx_sound_device> m_sound;
+	required_device<generic_slot_device> m_cart;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	uint16_t m_granularity;
+	int m_sign_AB;
+	int m_sign_CD;
+	uint32_t m_lynx_palette[0x10];
+	int m_rotate;
+	uint8_t m_memory_config;
+
+	BLITTER m_blitter;
+	SUZY m_suzy;
+	MIKEY m_mikey;
+	UART m_uart;
+	LYNX_TIMER m_timer[NR_LYNX_TIMERS];
+
+	bitmap_ind16 m_bitmap;
+	bitmap_ind16 m_bitmap_temp;
+
+	void lynx_mem(address_map &map);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -157,40 +196,6 @@ public:
 	void lynx_uart_reset();
 	image_verify_result lynx_verify_cart(char *header, int kind);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( lynx );
-	void lynx(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	void lynx_mem(address_map &map);
-
-private:
-	required_shared_ptr<uint8_t> m_mem_0000;
-	required_shared_ptr<uint8_t> m_mem_fc00;
-	required_shared_ptr<uint8_t> m_mem_fd00;
-	required_shared_ptr<uint8_t> m_mem_fe00;
-	required_shared_ptr<uint8_t> m_mem_fffa;
-	required_device<cpu_device> m_maincpu;
-	required_device<lynx_sound_device> m_sound;
-	required_device<generic_slot_device> m_cart;
-	required_device<palette_device> m_palette;
-	uint16_t m_granularity;
-	int m_sign_AB;
-	int m_sign_CD;
-	uint32_t m_lynx_palette[0x10];
-	int m_rotate;
-	uint8_t m_memory_config;
-
-	BLITTER m_blitter;
-	SUZY m_suzy;
-	MIKEY m_mikey;
-	UART m_uart;
-	LYNX_TIMER m_timer[NR_LYNX_TIMERS];
-
-	bitmap_ind16 m_bitmap;
-	bitmap_ind16 m_bitmap_temp;
 };
 
 

@@ -31,22 +31,24 @@ private:
 
 
 
-ADDRESS_MAP_START(haze_state::mem_map)
-	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0x9000, 0x9fff) AM_RAM
-ADDRESS_MAP_END
+void haze_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x17ff).rom();
+	map(0x9000, 0x9fff).ram();
+}
 
-ADDRESS_MAP_START(haze_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write) // irq 17E0 => 0183(ch3)
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("pio1", z80pio_device, read_alt, write_alt) // 91 irq 17F8 => 0A5E
-	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("pio2", z80pio_device, read_alt, write_alt) // not programmed to interrupt
-	AM_RANGE(0xb0, 0xb3) AM_DEVREADWRITE("pio3", z80pio_device, read_alt, write_alt) // not programmed to interrupt
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("pio4", z80pio_device, read_alt, write_alt) // not programmed to interrupt
-	AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ctc2", z80ctc_device, read, write) // irq 17E8 => 023D(ch0),0366(ch1),02BB(ch2),0378(ch3)
-	AM_RANGE(0xc8, 0xcb) AM_DEVREADWRITE("ctc3", z80ctc_device, read, write) // irq 17F0 => 030E(ch0),038A(ch1)
-ADDRESS_MAP_END
+void haze_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x83).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // irq 17E0 => 0183(ch3)
+	map(0x90, 0x93).rw("pio1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)); // 91 irq 17F8 => 0A5E
+	map(0xa0, 0xa3).rw("pio2", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)); // not programmed to interrupt
+	map(0xb0, 0xb3).rw("pio3", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)); // not programmed to interrupt
+	map(0xc0, 0xc3).rw("pio4", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)); // not programmed to interrupt
+	map(0xc4, 0xc7).rw("ctc2", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // irq 17E8 => 023D(ch0),0366(ch1),02BB(ch2),0378(ch3)
+	map(0xc8, 0xcb).rw("ctc3", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // irq 17F0 => 030E(ch0),038A(ch1)
+}
 
 
 static INPUT_PORTS_START( haze )

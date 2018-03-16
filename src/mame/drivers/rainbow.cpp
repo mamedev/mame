@@ -904,10 +904,11 @@ void rainbow_state::machine_start()
 #endif
 }
 
-ADDRESS_MAP_START(rainbow_state::rainbow8088_map)
-ADDRESS_MAP_UNMAP_HIGH
-AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("sh_ram")
-AM_RANGE(0x10000, END_OF_RAM) AM_RAM AM_SHARE("ext_ram") AM_WRITE(ext_ram_w)
+void rainbow_state::rainbow8088_map(address_map &map)
+{
+map.unmap_value_high();
+map(0x00000, 0x0ffff).ram().share("sh_ram");
+map(0x10000, END_OF_RAM).ram().share("ext_ram").w(this, FUNC(rainbow_state::ext_ram_w));
 
 // There is a 2212 (256 x 4 bit) NVRAM from 0xed000 to 0xed0ff (*)
 // shadowed at $ec000 - $ecfff and from $ed100 - $edfff.
@@ -919,30 +920,31 @@ AM_RANGE(0x10000, END_OF_RAM) AM_RAM AM_SHARE("ext_ram") AM_WRITE(ext_ram_w)
 //    'diagnostic_w' handler (similar to real hardware).
 
 //  - Address bits 8-12 are ignored (-> AM_MIRROR).
-AM_RANGE(0xed000, 0xed0ff) AM_RAM AM_SHARE("vol_ram") //AM_MIRROR(0x1f00)
-AM_RANGE(0xed100, 0xed1ff) AM_RAM AM_SHARE("nvram")
+map(0xed000, 0xed0ff).ram().share("vol_ram"); //AM_MIRROR(0x1f00)
+map(0xed100, 0xed1ff).ram().share("nvram");
 
-AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")
-AM_RANGE(0xf0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+map(0xee000, 0xeffff).ram().share("p_ram");
+map(0xf0000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(rainbow_state::rainbow8088_io)
-ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_GLOBAL_MASK(0x1ff)
-AM_RANGE(0x00, 0x00) AM_READWRITE(i8088_latch_r, i8088_latch_w)
-AM_RANGE(0x02, 0x02) AM_READWRITE(comm_control_r, comm_control_w) // Communication status / control register (8088)
-AM_RANGE(0x04, 0x04) AM_DEVWRITE("vt100_video", rainbow_video_device, dc011_w)
+void rainbow_state::rainbow8088_io(address_map &map)
+{
+map.unmap_value_high();
+map.global_mask(0x1ff);
+map(0x00, 0x00).rw(this, FUNC(rainbow_state::i8088_latch_r), FUNC(rainbow_state::i8088_latch_w));
+map(0x02, 0x02).rw(this, FUNC(rainbow_state::comm_control_r), FUNC(rainbow_state::comm_control_w)); // Communication status / control register (8088)
+map(0x04, 0x04).w(m_crtc, FUNC(rainbow_video_device::dc011_w));
 
-AM_RANGE(0x06, 0x06) AM_WRITE(comm_bitrate_w)
+map(0x06, 0x06).w(this, FUNC(rainbow_state::comm_bitrate_w));
 
-AM_RANGE(0x08, 0x08) AM_READ(system_parameter_r)
-AM_RANGE(0x0a, 0x0a) AM_READWRITE(diagnostic_r, diagnostic_w)
-AM_RANGE(0x0c, 0x0c) AM_SELECT(0x100) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w)
+map(0x08, 0x08).r(this, FUNC(rainbow_state::system_parameter_r));
+map(0x0a, 0x0a).rw(this, FUNC(rainbow_state::diagnostic_r), FUNC(rainbow_state::diagnostic_w));
+map(0x0c, 0x0c).select(0x100).w(m_crtc, FUNC(rainbow_video_device::dc012_w));
 
-AM_RANGE(0x0e, 0x0e) AM_WRITE(printer_bitrate_w)
+map(0x0e, 0x0e).w(this, FUNC(rainbow_state::printer_bitrate_w));
 
-AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("kbdser", i8251_device, data_r, data_w)
-AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w)
+map(0x10, 0x10).rw(m_kbd8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+map(0x11, 0x11).rw(m_kbd8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
 // ===========================================================
 // There are 4 select lines for Option Select 1 to 4
@@ -955,8 +957,8 @@ AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w
 // See boot rom @1EA6: 0x27 (<- RESET EXTENDED COMM OPTION  )
 
 // Corvus B/H harddisk controller (incompatible with EXT.COMM OPTION):
-AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("corvus", corvus_hdc_device, read, write)
-AM_RANGE(0x21, 0x21) AM_READ(corvus_status_r)
+map(0x20, 0x20).rw(m_corvus_hdc, FUNC(corvus_hdc_device::read), FUNC(corvus_hdc_device::write));
+map(0x21, 0x21).r(this, FUNC(rainbow_state::corvus_status_r));
 
 // ===========================================================
 // 0x30 -> 0x3f ***** Option Select 3
@@ -971,16 +973,16 @@ AM_RANGE(0x21, 0x21) AM_READ(corvus_status_r)
 // * Color graphics option (NEC upd7220 GDC plus external hw.). See Programmer's Reference AA-AE36A-TV.
 // Either 384 x 240 x 16 or 800 x 240 x 4 colors (out of 4096). 8 x 64 K video RAM.
 // (Write Buffer, Pattern Register/Multiplier, ALU/PS, Color Map, readback and offset/scroll hardware):
-AM_RANGE(0x50, 0x55) AM_READWRITE(GDC_EXTRA_REGISTER_r, GDC_EXTRA_REGISTER_w)
-AM_RANGE(0x56, 0x57) AM_DEVREADWRITE("upd7220", upd7220_device, read, write) // 56 param, 57 command
+map(0x50, 0x55).rw(this, FUNC(rainbow_state::GDC_EXTRA_REGISTER_r), FUNC(rainbow_state::GDC_EXTRA_REGISTER_w));
+map(0x56, 0x57).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write)); // 56 param, 57 command
 
 // ===========================================================
 // 0x60 -> 0x6f ***** EXTENDED COMM. OPTION / Option Select 2.
 // ===========================================================
 // 0x60 -> 0x6f ***** RD51 HD. CONTROLLER   / Option Select 2.
-AM_RANGE(0x60, 0x67) AM_DEVREADWRITE("hdc", wd2010_device, read, write) AM_MIRROR(0x100)
-AM_RANGE(0x68, 0x68) AM_READWRITE(hd_status_68_r, hd_status_68_w)
-AM_RANGE(0x69, 0x69) AM_READ(hd_status_69_r)
+map(0x60, 0x67).rw(m_hdc, FUNC(wd2010_device::read), FUNC(wd2010_device::write)).mirror(0x100);
+map(0x68, 0x68).rw(this, FUNC(rainbow_state::hd_status_68_r), FUNC(rainbow_state::hd_status_68_w));
+map(0x69, 0x69).r(this, FUNC(rainbow_state::hd_status_69_r));
 // ===========================================================
 // THE RD51 CONTROLLER: WD1010AL - 00 (WDC '83)
 // + 2 K x 8 SRAM (SY2128-4 or Japan 8328) 21-17872-01
@@ -1016,29 +1018,31 @@ AM_RANGE(0x69, 0x69) AM_READ(hd_status_69_r)
 // 0x70 -> 0x7f ***** Option Select 4
 // ===========================================================
 // 0x10c -> (MHFU disable register handled by 0x0c + AM_SELECT)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(rainbow_state::rainbowz80_mem)
-ADDRESS_MAP_UNMAP_HIGH
-AM_RANGE(0x0000, 0xffff) AM_READWRITE(share_z80_r, share_z80_w)
-ADDRESS_MAP_END
+void rainbow_state::rainbowz80_mem(address_map &map)
+{
+map.unmap_value_high();
+map(0x0000, 0xffff).rw(this, FUNC(rainbow_state::share_z80_r), FUNC(rainbow_state::share_z80_w));
+}
 
-ADDRESS_MAP_START(rainbow_state::rainbowz80_io)
-ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_GLOBAL_MASK(0xff)
-AM_RANGE(0x00, 0x00) AM_READWRITE(z80_latch_r, z80_latch_w)
-AM_RANGE(0x20, 0x20) AM_READWRITE(z80_generalstat_r, z80_diskdiag_read_w) // read to port 0x20 used by MS-DOS 2.x diskette loader.
-AM_RANGE(0x21, 0x21) AM_READWRITE(z80_generalstat_r, z80_diskdiag_write_w)
-AM_RANGE(0x40, 0x40) AM_READWRITE(z80_diskstatus_r, z80_diskcontrol_w)
-AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(FD1793_TAG, fd1793_device, read, write)
+void rainbow_state::rainbowz80_io(address_map &map)
+{
+map.unmap_value_high();
+map.global_mask(0xff);
+map(0x00, 0x00).rw(this, FUNC(rainbow_state::z80_latch_r), FUNC(rainbow_state::z80_latch_w));
+map(0x20, 0x20).rw(this, FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_read_w)); // read to port 0x20 used by MS-DOS 2.x diskette loader.
+map(0x21, 0x21).rw(this, FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_write_w));
+map(0x40, 0x40).rw(this, FUNC(rainbow_state::z80_diskstatus_r), FUNC(rainbow_state::z80_diskcontrol_w));
+map(0x60, 0x63).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 
 // Z80 I/O shadow area > $80
-AM_RANGE(0x80, 0x80) AM_READWRITE(z80_latch_r, z80_latch_w)
-AM_RANGE(0xA0, 0xA0) AM_READWRITE(z80_generalstat_r, z80_diskdiag_read_w) // read to port 0x20 used by MS-DOS 2.x diskette loader.
-AM_RANGE(0xA1, 0xA1) AM_READWRITE(z80_generalstat_r, z80_diskdiag_write_w)
-AM_RANGE(0xC0, 0xC0) AM_READWRITE(z80_diskstatus_r, z80_diskcontrol_w)
-AM_RANGE(0xE0, 0xE3) AM_DEVREADWRITE(FD1793_TAG, fd1793_device, read, write)
-ADDRESS_MAP_END
+map(0x80, 0x80).rw(this, FUNC(rainbow_state::z80_latch_r), FUNC(rainbow_state::z80_latch_w));
+map(0xA0, 0xA0).rw(this, FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_read_w)); // read to port 0x20 used by MS-DOS 2.x diskette loader.
+map(0xA1, 0xA1).rw(this, FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_write_w));
+map(0xC0, 0xC0).rw(this, FUNC(rainbow_state::z80_diskstatus_r), FUNC(rainbow_state::z80_diskcontrol_w));
+map(0xE0, 0xE3).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+}
 
 /* Input ports */
 
@@ -3179,9 +3183,10 @@ GFXDECODE_ENTRY("chargen", 0x0000, rainbow_charlayout, 0, 1)
 GFXDECODE_END
 
 // Allocate 512 K (4 x 64 K x 16 bit) of memory (GDC-NEW):
-ADDRESS_MAP_START(rainbow_state::upd7220_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r, vram_w) AM_SHARE("vram")
-ADDRESS_MAP_END
+void rainbow_state::upd7220_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rw(this, FUNC(rainbow_state::vram_r), FUNC(rainbow_state::vram_w)).share("vram");
+}
 
 MACHINE_CONFIG_START(rainbow_state::rainbow)
 MCFG_DEFAULT_LAYOUT(layout_rainbow)

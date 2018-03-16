@@ -719,41 +719,47 @@ WRITE32_MEMBER(sun3_state::parity_w)
 	}
 }
 
-ADDRESS_MAP_START(sun3_state::sun3_mem)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE( tl_mmu_r, tl_mmu_w )
-ADDRESS_MAP_END
+void sun3_state::sun3_mem(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(this, FUNC(sun3_state::tl_mmu_r), FUNC(sun3_state::tl_mmu_w));
+}
 
 // type 0 device space
-ADDRESS_MAP_START(sun3_state::vmetype0space_map)
-	AM_RANGE(0x00000000, 0x08ffffff) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM // not sure what's going on here (3/110)
-	AM_RANGE(0xff000000, 0xff03ffff) AM_RAM AM_SHARE("bw2_vram")
-ADDRESS_MAP_END
+void sun3_state::vmetype0space_map(address_map &map)
+{
+	map(0x00000000, 0x08ffffff).rw(this, FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
+	map(0xfe400000, 0xfe41ffff).ram(); // not sure what's going on here (3/110)
+	map(0xff000000, 0xff03ffff).ram().share("bw2_vram");
+}
 
 // type 0 without VRAM (3/50)
-ADDRESS_MAP_START(sun3_state::vmetype0space_novram_map)
-	AM_RANGE(0x00000000, 0x08ffffff) AM_READWRITE(ram_r, ram_w)
-ADDRESS_MAP_END
+void sun3_state::vmetype0space_novram_map(address_map &map)
+{
+	map(0x00000000, 0x08ffffff).rw(this, FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
+}
 
 // type 1 device space
-ADDRESS_MAP_START(sun3_state::vmetype1space_map)
-	AM_RANGE(0x00000000, 0x0000000f) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
-	AM_RANGE(0x00020000, 0x0002000f) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
-	AM_RANGE(0x00040000, 0x000407ff) AM_RAM AM_SHARE("nvram")   // type 2816 parallel EEPROM
-	AM_RANGE(0x00060000, 0x0006ffff) AM_READWRITE8(rtc7170_r, rtc7170_w, 0xffffffff)
-	AM_RANGE(0x00080000, 0x0008000f) AM_READWRITE(parity_r, parity_w)
-	AM_RANGE(0x000a0000, 0x000a0003) AM_READWRITE(irqctrl_r, irqctrl_w)
-	AM_RANGE(0x00100000, 0x0010ffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x001e0000, 0x001e00ff) AM_READWRITE(ecc_r, ecc_w)
-ADDRESS_MAP_END
+void sun3_state::vmetype1space_map(address_map &map)
+{
+	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x00020000, 0x0002000f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x00040000, 0x000407ff).ram().share("nvram");   // type 2816 parallel EEPROM
+	map(0x00060000, 0x0006ffff).rw(this, FUNC(sun3_state::rtc7170_r), FUNC(sun3_state::rtc7170_w));
+	map(0x00080000, 0x0008000f).rw(this, FUNC(sun3_state::parity_r), FUNC(sun3_state::parity_w));
+	map(0x000a0000, 0x000a0003).rw(this, FUNC(sun3_state::irqctrl_r), FUNC(sun3_state::irqctrl_w));
+	map(0x00100000, 0x0010ffff).rom().region("user1", 0);
+	map(0x001e0000, 0x001e00ff).rw(this, FUNC(sun3_state::ecc_r), FUNC(sun3_state::ecc_w));
+}
 
 // type 2 device space
-ADDRESS_MAP_START(sun3_state::vmetype2space_map)
-ADDRESS_MAP_END
+void sun3_state::vmetype2space_map(address_map &map)
+{
+}
 
 // type 3 device space
-ADDRESS_MAP_START(sun3_state::vmetype3space_map)
-ADDRESS_MAP_END
+void sun3_state::vmetype3space_map(address_map &map)
+{
+}
 
 READ32_MEMBER(sun3_state::irqctrl_r)
 {

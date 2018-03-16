@@ -1560,7 +1560,7 @@ READ32_MEMBER(gba_lcd_device::video_r)
 	switch (offset)
 	{
 	case 0x0004/4:
-		retval = DISPSTAT | (machine().first_screen()->vpos() << 16);
+		retval = DISPSTAT | (screen().vpos() << 16);
 		break;
 	default:
 		if (ACCESSING_BITS_0_15)
@@ -1652,7 +1652,7 @@ WRITE32_MEMBER(gba_lcd_device::gba_oam_w)
 
 TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_hbl)
 {
-	int scanline = machine().first_screen()->vpos();
+	int scanline = screen().vpos();
 
 	// reload LCD controller internal registers from I/O ones at vblank
 	if (scanline == 0)
@@ -1688,7 +1688,7 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 	clear(dispstat::hblank);
 	clear(dispstat::vcount);
 
-	int scanline = machine().first_screen()->vpos();
+	int scanline = screen().vpos();
 
 	// VBLANK is set for scanlines 160 through 226 (but not 227, which is the last line)
 	if (scanline >= 160 && scanline < 227)
@@ -1725,8 +1725,8 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 		}
 	}
 
-	m_hbl_timer->adjust(machine().first_screen()->time_until_pos(scanline, 240));
-	m_scan_timer->adjust(machine().first_screen()->time_until_pos((scanline + 1) % 228, 0));
+	m_hbl_timer->adjust(screen().time_until_pos(scanline, 240));
+	m_scan_timer->adjust(screen().time_until_pos((scanline + 1) % 228, 0));
 }
 
 PALETTE_INIT_MEMBER(gba_lcd_device, gba)
@@ -1768,7 +1768,7 @@ void gba_lcd_device::device_start()
 	/* create a timer to fire scanline functions */
 	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_lcd_device::perform_scan),this));
 	m_hbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_lcd_device::perform_hbl),this));
-	m_scan_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
+	m_scan_timer->adjust(screen().time_until_pos(0, 0));
 
 	save_item(NAME(m_regs));
 
@@ -1800,7 +1800,7 @@ void gba_lcd_device::device_reset()
 	m_bg3x = { 0, false };
 	m_bg3y = { 0, false };
 
-	m_scan_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
+	m_scan_timer->adjust(screen().time_until_pos(0, 0));
 	m_hbl_timer->adjust(attotime::never);
 }
 

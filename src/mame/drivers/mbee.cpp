@@ -136,197 +136,212 @@ from Brett Selwood and Andrew Davies.
 ********************************************************************************/
 
 
-ADDRESS_MAP_START(mbee_state::mbee_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
-ADDRESS_MAP_END
+void mbee_state::mbee_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0xefff).rom();
+	map(0xf000, 0xf7ff).rw(this, FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
+	map(0xf800, 0xffff).rw(this, FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
+}
 
-ADDRESS_MAP_START(mbee_state::mbeeic_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
-	AM_RANGE(0xe000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
-ADDRESS_MAP_END
+void mbee_state::mbeeic_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xdfff).bankr("pak");
+	map(0xe000, 0xefff).rom();
+	map(0xf000, 0xf7ff).rw(this, FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
+	map(0xf800, 0xffff).rw(this, FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
+}
 
-ADDRESS_MAP_START(mbee_state::mbeepc_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("telcom")
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
-ADDRESS_MAP_END
+void mbee_state::mbeepc_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xdfff).bankr("pak");
+	map(0xe000, 0xefff).bankr("telcom");
+	map(0xf000, 0xf7ff).rw(this, FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
+	map(0xf800, 0xffff).rw(this, FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
+}
 
-ADDRESS_MAP_START(mbee_state::mbeeppc_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("basic")
-	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("telcom")
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
-ADDRESS_MAP_END
+void mbee_state::mbeeppc_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0x9fff).bankr("basic");
+	map(0xa000, 0xbfff).rom();
+	map(0xc000, 0xdfff).bankr("pak");
+	map(0xe000, 0xefff).bankr("telcom");
+	map(0xf000, 0xf7ff).rw(this, FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
+	map(0xf800, 0xffff).rw(this, FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
+}
 
-ADDRESS_MAP_START(mbee_state::mbee56_mem)
-	AM_RANGE(0x0000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
-ADDRESS_MAP_END
+void mbee_state::mbee56_mem(address_map &map)
+{
+	map(0x0000, 0xdfff).ram();
+	map(0xe000, 0xefff).rom();
+	map(0xf000, 0xf7ff).rw(this, FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
+	map(0xf800, 0xffff).rw(this, FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
+}
 
-ADDRESS_MAP_START(mbee_state::mbee256_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x1000, 0x1fff) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
-	AM_RANGE(0x2000, 0x2fff) AM_READ_BANK("bankr2") AM_WRITE_BANK("bankw2")
-	AM_RANGE(0x3000, 0x3fff) AM_READ_BANK("bankr3") AM_WRITE_BANK("bankw3")
-	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bankr4") AM_WRITE_BANK("bankw4")
-	AM_RANGE(0x5000, 0x5fff) AM_READ_BANK("bankr5") AM_WRITE_BANK("bankw5")
-	AM_RANGE(0x6000, 0x6fff) AM_READ_BANK("bankr6") AM_WRITE_BANK("bankw6")
-	AM_RANGE(0x7000, 0x7fff) AM_READ_BANK("bankr7") AM_WRITE_BANK("bankw7")
-	AM_RANGE(0x8000, 0x8fff) AM_READ_BANK("bankr8") AM_WRITE_BANK("bankw8")
-	AM_RANGE(0x9000, 0x9fff) AM_READ_BANK("bankr9") AM_WRITE_BANK("bankw9")
-	AM_RANGE(0xa000, 0xafff) AM_READ_BANK("bankr10") AM_WRITE_BANK("bankw10")
-	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bankr11") AM_WRITE_BANK("bankw11")
-	AM_RANGE(0xc000, 0xcfff) AM_READ_BANK("bankr12") AM_WRITE_BANK("bankw12")
-	AM_RANGE(0xd000, 0xdfff) AM_READ_BANK("bankr13") AM_WRITE_BANK("bankw13")
-	AM_RANGE(0xe000, 0xefff) AM_READ_BANK("bankr14") AM_WRITE_BANK("bankw14")
-	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bankr15") AM_WRITE_BANK("bankw15")
-ADDRESS_MAP_END
+void mbee_state::mbee256_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankr("bankr0").bankw("bankw0");
+	map(0x1000, 0x1fff).bankr("bankr1").bankw("bankw1");
+	map(0x2000, 0x2fff).bankr("bankr2").bankw("bankw2");
+	map(0x3000, 0x3fff).bankr("bankr3").bankw("bankw3");
+	map(0x4000, 0x4fff).bankr("bankr4").bankw("bankw4");
+	map(0x5000, 0x5fff).bankr("bankr5").bankw("bankw5");
+	map(0x6000, 0x6fff).bankr("bankr6").bankw("bankw6");
+	map(0x7000, 0x7fff).bankr("bankr7").bankw("bankw7");
+	map(0x8000, 0x8fff).bankr("bankr8").bankw("bankw8");
+	map(0x9000, 0x9fff).bankr("bankr9").bankw("bankw9");
+	map(0xa000, 0xafff).bankr("bankr10").bankw("bankw10");
+	map(0xb000, 0xbfff).bankr("bankr11").bankw("bankw11");
+	map(0xc000, 0xcfff).bankr("bankr12").bankw("bankw12");
+	map(0xd000, 0xdfff).bankr("bankr13").bankw("bankw13");
+	map(0xe000, 0xefff).bankr("bankr14").bankw("bankw14");
+	map(0xf000, 0xffff).bankr("bankr15").bankw("bankw15");
+}
 
-ADDRESS_MAP_START(mbee_state::mbeett_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("telcom")
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
-ADDRESS_MAP_END
+void mbee_state::mbeett_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0x9fff).rom();
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdfff).bankr("pak");
+	map(0xe000, 0xefff).bankr("telcom");
+	map(0xf000, 0xf7ff).rw(this, FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
+	map(0xf800, 0xffff).rw(this, FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
+}
 
-ADDRESS_MAP_START(mbee_state::mbee_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_WRITE(port0b_w)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
-ADDRESS_MAP_END
+void mbee_state::mbee_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).mirror(0x10).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x0b, 0x0b).mirror(0x10).w(this, FUNC(mbee_state::port0b_w));
+	map(0x0c, 0x0c).mirror(0x10).r(m_crtc, FUNC(mc6845_device::status_r)).w(this, FUNC(mbee_state::m6545_index_w));
+	map(0x0d, 0x0d).mirror(0x10).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(mbee_state::m6545_data_w));
+}
 
-ADDRESS_MAP_START(mbee_state::mbeeic_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(port08_r, port08_w)
-	AM_RANGE(0x09, 0x09) AM_WRITENOP /* Listed as "Colour Wait Off" or "USART 2651" but doesn't appear in the schematics */
-	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0x10) AM_WRITE(port0a_w)
-	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_WRITE(port0b_w)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
-ADDRESS_MAP_END
+void mbee_state::mbeeic_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).mirror(0x10).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x08, 0x08).mirror(0x10).rw(this, FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
+	map(0x09, 0x09).nopw(); /* Listed as "Colour Wait Off" or "USART 2651" but doesn't appear in the schematics */
+	map(0x0a, 0x0a).mirror(0x10).w(this, FUNC(mbee_state::port0a_w));
+	map(0x0b, 0x0b).mirror(0x10).w(this, FUNC(mbee_state::port0b_w));
+	map(0x0c, 0x0c).mirror(0x10).r(m_crtc, FUNC(mc6845_device::status_r)).w(this, FUNC(mbee_state::m6545_index_w));
+	map(0x0d, 0x0d).mirror(0x10).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(mbee_state::m6545_data_w));
+}
 
-ADDRESS_MAP_START(mbee_state::mbeepc_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(port08_r, port08_w)
-	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_WRITE(port0b_w)
-	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff10) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
-	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff10) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
-	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(telcom_low_r, port0a_w)
-	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(telcom_high_r, port0a_w)
-ADDRESS_MAP_END
+void mbee_state::mbeepc_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0003).mirror(0xff10).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x0008, 0x0008).mirror(0xff10).rw(this, FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
+	map(0x0009, 0x0009).mirror(0xff00).nopw();
+	map(0x000b, 0x000b).mirror(0xff10).w(this, FUNC(mbee_state::port0b_w));
+	map(0x000c, 0x000c).mirror(0xff10).r(m_crtc, FUNC(mc6845_device::status_r)).w(this, FUNC(mbee_state::m6545_index_w));
+	map(0x000d, 0x000d).mirror(0xff10).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(mbee_state::m6545_data_w));
+	map(0x000a, 0x000a).mirror(0xfe10).rw(this, FUNC(mbee_state::telcom_low_r), FUNC(mbee_state::port0a_w));
+	map(0x010a, 0x010a).mirror(0xfe10).rw(this, FUNC(mbee_state::telcom_high_r), FUNC(mbee_state::port0a_w));
+}
 
-ADDRESS_MAP_START(mbee_state::mbeeppc_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(port08_r, port08_w)
-	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_WRITE(port0b_w)
-	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
-	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff10) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
-	AM_RANGE(0x001c, 0x001c) AM_MIRROR(0xff00) AM_READWRITE(port1c_r, port1c_w)
-	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(telcom_low_r, port0a_w)
-	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(telcom_high_r, port0a_w)
-ADDRESS_MAP_END
+void mbee_state::mbeeppc_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0003).mirror(0xff10).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x0008, 0x0008).mirror(0xff10).rw(this, FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
+	map(0x0009, 0x0009).mirror(0xff00).nopw();
+	map(0x000b, 0x000b).mirror(0xff10).w(this, FUNC(mbee_state::port0b_w));
+	map(0x000c, 0x000c).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::status_r)).w(this, FUNC(mbee_state::m6545_index_w));
+	map(0x000d, 0x000d).mirror(0xff10).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(mbee_state::m6545_data_w));
+	map(0x001c, 0x001c).mirror(0xff00).rw(this, FUNC(mbee_state::port1c_r), FUNC(mbee_state::port1c_w));
+	map(0x000a, 0x000a).mirror(0xfe10).rw(this, FUNC(mbee_state::telcom_low_r), FUNC(mbee_state::port0a_w));
+	map(0x010a, 0x010a).mirror(0xfe10).rw(this, FUNC(mbee_state::telcom_high_r), FUNC(mbee_state::port0a_w));
+}
 
-ADDRESS_MAP_START(mbee_state::mbeett_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0004, 0x0004) AM_MIRROR(0xff00) AM_WRITE(port04_w)
-	AM_RANGE(0x0006, 0x0006) AM_MIRROR(0xff00) AM_WRITE(port06_w)
-	AM_RANGE(0x0007, 0x0007) AM_MIRROR(0xff00) AM_READ(port07_r)
-	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff00) AM_READWRITE(port08_r, port08_w)
-	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff00) AM_WRITE(port0b_w)
-	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
-	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff00) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
-	AM_RANGE(0x0018, 0x001b) AM_MIRROR(0xff00) AM_READ(port18_r)
-	AM_RANGE(0x001c, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(port1c_r, port1c_w)
-	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xfe00) AM_READ(speed_low_r)
-	AM_RANGE(0x0109, 0x0109) AM_MIRROR(0xfe00) AM_READ(speed_high_r)
-	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe00) AM_READWRITE(telcom_low_r, port0a_w)
-	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe00) AM_READWRITE(telcom_high_r, port0a_w)
-	AM_RANGE(0x0068, 0x006f) AM_MIRROR(0xff00) AM_DEVREADWRITE("scc", scc8530_t, reg_r, reg_w)
-ADDRESS_MAP_END
+void mbee_state::mbeett_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0003).mirror(0xff00).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x0004, 0x0004).mirror(0xff00).w(this, FUNC(mbee_state::port04_w));
+	map(0x0006, 0x0006).mirror(0xff00).w(this, FUNC(mbee_state::port06_w));
+	map(0x0007, 0x0007).mirror(0xff00).r(this, FUNC(mbee_state::port07_r));
+	map(0x0008, 0x0008).mirror(0xff00).rw(this, FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
+	map(0x000b, 0x000b).mirror(0xff00).w(this, FUNC(mbee_state::port0b_w));
+	map(0x000c, 0x000c).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::status_r)).w(this, FUNC(mbee_state::m6545_index_w));
+	map(0x000d, 0x000d).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(mbee_state::m6545_data_w));
+	map(0x0018, 0x001b).mirror(0xff00).r(this, FUNC(mbee_state::port18_r));
+	map(0x001c, 0x001f).mirror(0xff00).rw(this, FUNC(mbee_state::port1c_r), FUNC(mbee_state::port1c_w));
+	map(0x0009, 0x0009).mirror(0xfe00).r(this, FUNC(mbee_state::speed_low_r));
+	map(0x0109, 0x0109).mirror(0xfe00).r(this, FUNC(mbee_state::speed_high_r));
+	map(0x000a, 0x000a).mirror(0xfe00).rw(this, FUNC(mbee_state::telcom_low_r), FUNC(mbee_state::port0a_w));
+	map(0x010a, 0x010a).mirror(0xfe00).rw(this, FUNC(mbee_state::telcom_high_r), FUNC(mbee_state::port0a_w));
+	map(0x0068, 0x006f).mirror(0xff00).rw("scc", FUNC(scc8530_t::reg_r), FUNC(scc8530_t::reg_w));
+}
 
-ADDRESS_MAP_START(mbee_state::mbee56_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x08, 0x08) AM_READWRITE(port08_r, port08_w)
-	AM_RANGE(0x09, 0x09) AM_WRITENOP
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(port0b_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
-	AM_RANGE(0x0d, 0x0d) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_device, read, write)
-	AM_RANGE(0x48, 0x4f) AM_READWRITE(fdc_status_r, fdc_motor_w)
-ADDRESS_MAP_END
+void mbee_state::mbee56_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x08, 0x08).rw(this, FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
+	map(0x09, 0x09).nopw();
+	map(0x0b, 0x0b).w(this, FUNC(mbee_state::port0b_w));
+	map(0x0c, 0x0c).r(m_crtc, FUNC(mc6845_device::status_r)).w(this, FUNC(mbee_state::m6545_index_w));
+	map(0x0d, 0x0d).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(mbee_state::m6545_data_w));
+	map(0x44, 0x47).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
+	map(0x48, 0x4f).rw(this, FUNC(mbee_state::fdc_status_r), FUNC(mbee_state::fdc_motor_w));
+}
 
-ADDRESS_MAP_START(mbee_state::mbee128_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x04, 0x04) AM_WRITE(port04_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w)
-	AM_RANGE(0x07, 0x07) AM_READ(port07_r)
-	AM_RANGE(0x08, 0x08) AM_READWRITE(port08_r, port08_w)
-	AM_RANGE(0x09, 0x09) AM_WRITENOP
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(port0b_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
-	AM_RANGE(0x0d, 0x0d) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
-	AM_RANGE(0x1c, 0x1f) AM_READWRITE(port1c_r, port1c_w)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_device, read, write)
-	AM_RANGE(0x48, 0x4f) AM_READWRITE(fdc_status_r, fdc_motor_w)
-	AM_RANGE(0x50, 0x57) AM_WRITE(mbee128_50_w)
-ADDRESS_MAP_END
+void mbee_state::mbee128_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x04, 0x04).w(this, FUNC(mbee_state::port04_w));
+	map(0x06, 0x06).w(this, FUNC(mbee_state::port06_w));
+	map(0x07, 0x07).r(this, FUNC(mbee_state::port07_r));
+	map(0x08, 0x08).rw(this, FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
+	map(0x09, 0x09).nopw();
+	map(0x0b, 0x0b).w(this, FUNC(mbee_state::port0b_w));
+	map(0x0c, 0x0c).r(m_crtc, FUNC(mc6845_device::status_r)).w(this, FUNC(mbee_state::m6545_index_w));
+	map(0x0d, 0x0d).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(mbee_state::m6545_data_w));
+	map(0x1c, 0x1f).rw(this, FUNC(mbee_state::port1c_r), FUNC(mbee_state::port1c_w));
+	map(0x44, 0x47).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
+	map(0x48, 0x4f).rw(this, FUNC(mbee_state::fdc_status_r), FUNC(mbee_state::fdc_motor_w));
+	map(0x50, 0x57).w(this, FUNC(mbee_state::mbee128_50_w));
+}
 
-ADDRESS_MAP_START(mbee_state::mbee256_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0004, 0x0004) AM_MIRROR(0xff00) AM_WRITE(port04_w)
-	AM_RANGE(0x0006, 0x0006) AM_MIRROR(0xff00) AM_WRITE(port06_w)
-	AM_RANGE(0x0007, 0x0007) AM_MIRROR(0xff00) AM_READ(port07_r)
-	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff00) AM_READWRITE(port08_r, port08_w)
-	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xfd00) AM_READ(speed_low_r)
-	AM_RANGE(0x0209, 0x0209) AM_MIRROR(0xfd00) AM_READ(speed_high_r)
-	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xff00) AM_WRITENOP
-	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff00) AM_WRITE(port0b_w)
-	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
-	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff00) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
+void mbee_state::mbee256_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0003).mirror(0xff00).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x0004, 0x0004).mirror(0xff00).w(this, FUNC(mbee_state::port04_w));
+	map(0x0006, 0x0006).mirror(0xff00).w(this, FUNC(mbee_state::port06_w));
+	map(0x0007, 0x0007).mirror(0xff00).r(this, FUNC(mbee_state::port07_r));
+	map(0x0008, 0x0008).mirror(0xff00).rw(this, FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
+	map(0x0009, 0x0009).mirror(0xfd00).r(this, FUNC(mbee_state::speed_low_r));
+	map(0x0209, 0x0209).mirror(0xfd00).r(this, FUNC(mbee_state::speed_high_r));
+	map(0x0009, 0x0009).mirror(0xff00).nopw();
+	map(0x000b, 0x000b).mirror(0xff00).w(this, FUNC(mbee_state::port0b_w));
+	map(0x000c, 0x000c).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::status_r)).w(this, FUNC(mbee_state::m6545_index_w));
+	map(0x000d, 0x000d).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(mbee_state::m6545_data_w));
 	// AM_RANGE(0x0010, 0x0013) AM_MIRROR(0xff00) Optional SN76489AN audio chip
-	AM_RANGE(0x0018, 0x001b) AM_MIRROR(0xff00) AM_READ(port18_r)
-	AM_RANGE(0x001c, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(port1c_r, port1c_w)
-	AM_RANGE(0x0044, 0x0047) AM_MIRROR(0xff00) AM_DEVREADWRITE("fdc", wd2793_device, read, write)
-	AM_RANGE(0x0048, 0x004f) AM_MIRROR(0xff00) AM_READWRITE(fdc_status_r, fdc_motor_w)
-	AM_RANGE(0x0050, 0x0057) AM_MIRROR(0xff00) AM_WRITE(mbee256_50_w)
+	map(0x0018, 0x001b).mirror(0xff00).r(this, FUNC(mbee_state::port18_r));
+	map(0x001c, 0x001f).mirror(0xff00).rw(this, FUNC(mbee_state::port1c_r), FUNC(mbee_state::port1c_w));
+	map(0x0044, 0x0047).mirror(0xff00).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
+	map(0x0048, 0x004f).mirror(0xff00).rw(this, FUNC(mbee_state::fdc_status_r), FUNC(mbee_state::fdc_motor_w));
+	map(0x0050, 0x0057).mirror(0xff00).w(this, FUNC(mbee_state::mbee256_50_w));
 	// AM_RANGE(0x0058, 0x005f) AM_MIRROR(0xff00) External options: floppy drive, hard drive and keyboard
 	// AM_RANGE(0x0060, 0x0067) AM_MIRROR(0xff00) Reserved for file server selection (unused)
 	// AM_RANGE(0x0068, 0x006f) AM_MIRROR(0xff00) Reserved for 8530 SCC (unused)
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( oldkb )
 	PORT_START("X.0") /* IN0 KEY ROW 0 [000] */

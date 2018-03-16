@@ -78,8 +78,9 @@ void a26_rom_harmony_device::device_start()
 	save_item(NAME(m_base_bank));
 }
 
-ADDRESS_MAP_START(a26_rom_harmony_device::harmony_arm7_map)
-ADDRESS_MAP_END
+void a26_rom_harmony_device::harmony_arm7_map(address_map &map)
+{
+}
 
 MACHINE_CONFIG_START(a26_rom_harmony_device::device_add_mconfig)
 	MCFG_CPU_ADD("arm", LPC2103, 70000000)

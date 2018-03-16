@@ -73,38 +73,40 @@ private:
 };
 
 
-ADDRESS_MAP_START(altos5_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE( 0x1000, 0x1fff ) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
-	AM_RANGE( 0x2000, 0x2fff ) AM_READ_BANK("bankr2") AM_WRITE_BANK("bankw2")
-	AM_RANGE( 0x3000, 0x3fff ) AM_READ_BANK("bankr3") AM_WRITE_BANK("bankw3")
-	AM_RANGE( 0x4000, 0x4fff ) AM_READ_BANK("bankr4") AM_WRITE_BANK("bankw4")
-	AM_RANGE( 0x5000, 0x5fff ) AM_READ_BANK("bankr5") AM_WRITE_BANK("bankw5")
-	AM_RANGE( 0x6000, 0x6fff ) AM_READ_BANK("bankr6") AM_WRITE_BANK("bankw6")
-	AM_RANGE( 0x7000, 0x7fff ) AM_READ_BANK("bankr7") AM_WRITE_BANK("bankw7")
-	AM_RANGE( 0x8000, 0x8fff ) AM_READ_BANK("bankr8") AM_WRITE_BANK("bankw8")
-	AM_RANGE( 0x9000, 0x9fff ) AM_READ_BANK("bankr9") AM_WRITE_BANK("bankw9")
-	AM_RANGE( 0xa000, 0xafff ) AM_READ_BANK("bankra") AM_WRITE_BANK("bankwa")
-	AM_RANGE( 0xb000, 0xbfff ) AM_READ_BANK("bankrb") AM_WRITE_BANK("bankwb")
-	AM_RANGE( 0xc000, 0xcfff ) AM_READ_BANK("bankrc") AM_WRITE_BANK("bankwc")
-	AM_RANGE( 0xd000, 0xdfff ) AM_READ_BANK("bankrd") AM_WRITE_BANK("bankwd")
-	AM_RANGE( 0xe000, 0xefff ) AM_READ_BANK("bankre") AM_WRITE_BANK("bankwe")
-	AM_RANGE( 0xf000, 0xffff ) AM_READ_BANK("bankrf") AM_WRITE_BANK("bankwf")
-ADDRESS_MAP_END
+void altos5_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).bankr("bankr0").bankw("bankw0");
+	map(0x1000, 0x1fff).bankr("bankr1").bankw("bankw1");
+	map(0x2000, 0x2fff).bankr("bankr2").bankw("bankw2");
+	map(0x3000, 0x3fff).bankr("bankr3").bankw("bankw3");
+	map(0x4000, 0x4fff).bankr("bankr4").bankw("bankw4");
+	map(0x5000, 0x5fff).bankr("bankr5").bankw("bankw5");
+	map(0x6000, 0x6fff).bankr("bankr6").bankw("bankw6");
+	map(0x7000, 0x7fff).bankr("bankr7").bankw("bankw7");
+	map(0x8000, 0x8fff).bankr("bankr8").bankw("bankw8");
+	map(0x9000, 0x9fff).bankr("bankr9").bankw("bankw9");
+	map(0xa000, 0xafff).bankr("bankra").bankw("bankwa");
+	map(0xb000, 0xbfff).bankr("bankrb").bankw("bankwb");
+	map(0xc000, 0xcfff).bankr("bankrc").bankw("bankwc");
+	map(0xd000, 0xdfff).bankr("bankrd").bankw("bankwd");
+	map(0xe000, 0xefff).bankr("bankre").bankw("bankwe");
+	map(0xf000, 0xffff).bankr("bankrf").bankw("bankwf");
+}
 
-ADDRESS_MAP_START(altos5_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dma", z80dma_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("fdc", fd1797_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("pio0", z80pio_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("pio1", z80pio_device, read, write)
-	AM_RANGE(0x14, 0x17) AM_WRITE(port14_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("dart", z80dart_device, ba_cd_r, ba_cd_w)
+void altos5_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x04, 0x07).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
+	map(0x08, 0x0b).rw(m_pio0, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x0c, 0x0f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x10, 0x13).rw("pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x14, 0x17).w(this, FUNC(altos5_state::port14_w));
+	map(0x1c, 0x1f).rw("dart", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	//AM_RANGE(0x20, 0x23) // Hard drive
-	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
-ADDRESS_MAP_END
+	map(0x2c, 0x2f).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( altos5 )

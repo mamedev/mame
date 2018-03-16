@@ -105,33 +105,37 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(chinsan_state::chinsan_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("color_ram")
-ADDRESS_MAP_END
+void chinsan_state::chinsan_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xdfff).ram().share("nvram");
+	map(0xe000, 0xefff).ram().share("video_ram");
+	map(0xf000, 0xf7ff).ram().share("color_ram");
+}
 
-ADDRESS_MAP_START(chinsan_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
-ADDRESS_MAP_END
+void chinsan_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank0d");
+	map(0x8000, 0xbfff).bankr("bank1d");
+}
 
-ADDRESS_MAP_START(chinsan_state::chinsan_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_WRITE(adpcm_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)
-ADDRESS_MAP_END
+void chinsan_state::chinsan_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x11).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x20, 0x20).w(this, FUNC(chinsan_state::adpcm_w));
+	map(0x30, 0x30).w(this, FUNC(chinsan_state::ctrl_w));
+}
 
-ADDRESS_MAP_START(chinsan_state::mayumi_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("extra") AM_WRITE(ctrl_w)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-ADDRESS_MAP_END
+void chinsan_state::mayumi_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x30, 0x30).portr("extra").w(this, FUNC(chinsan_state::ctrl_w));
+	map(0xc0, 0xc3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xd0, 0xd1).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 
 //**************************************************************************

@@ -947,53 +947,54 @@ WRITE16_MEMBER(hng64_state::main_sound_comms_w)
 }
 
 
-ADDRESS_MAP_START(hng64_state::hng_map)
+void hng64_state::hng_map(address_map &map)
+{
 
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x04000000, 0x05ffffff) AM_WRITENOP AM_ROM AM_REGION("gameprg", 0) AM_SHARE("cart")
+	map(0x00000000, 0x00ffffff).ram().share("mainram");
+	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0).share("cart");
 
 	// Ports
-	AM_RANGE(0x1f700000, 0x1f702fff) AM_READWRITE(hng64_sysregs_r, hng64_sysregs_w) AM_SHARE("sysregs")
+	map(0x1f700000, 0x1f702fff).rw(this, FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs");
 
 	// SRAM.  Coin data, Player Statistics, etc.
-	AM_RANGE(0x1F800000, 0x1F803fff) AM_RAM AM_SHARE("nvram")
+	map(0x1F800000, 0x1F803fff).ram().share("nvram");
 
 	// Dualport RAM
-	AM_RANGE(0x1F808000, 0x1F8087ff) AM_READWRITE(hng64_dualport_r, hng64_dualport_w) AM_SHARE("dualport")
+	map(0x1F808000, 0x1F8087ff).rw(this, FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).share("dualport");
 
 	// BIOS
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0) AM_SHARE("rombase")
+	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("user1", 0).share("rombase");
 
 	// Video
-	AM_RANGE(0x20000000, 0x2000bfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2000d800, 0x2000e3ff) AM_WRITE(hng64_sprite_clear_even_w)
-	AM_RANGE(0x2000e400, 0x2000efff) AM_WRITE(hng64_sprite_clear_odd_w)
-	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_SHARE("spriteregs")
-	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_SHARE("videoram")    // Tilemap
-	AM_RANGE(0x20190000, 0x20190037) AM_RAM_WRITE(hng64_vregs_w) AM_SHARE("videoregs")
-	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_SHARE("tcram")   // Transition Control
-	AM_RANGE(0x20300000, 0x203001ff) AM_WRITE16(dl_w,0xffffffff) // 3d Display List
-	AM_RANGE(0x20300200, 0x20300203) AM_WRITE(dl_upload_w)  // 3d Display List Upload
-	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
-	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
+	map(0x20000000, 0x2000bfff).ram().share("spriteram");
+	map(0x2000d800, 0x2000e3ff).w(this, FUNC(hng64_state::hng64_sprite_clear_even_w));
+	map(0x2000e400, 0x2000efff).w(this, FUNC(hng64_state::hng64_sprite_clear_odd_w));
+	map(0x20010000, 0x20010013).ram().share("spriteregs");
+	map(0x20100000, 0x2017ffff).ram().w(this, FUNC(hng64_state::hng64_videoram_w)).share("videoram");    // Tilemap
+	map(0x20190000, 0x20190037).ram().w(this, FUNC(hng64_state::hng64_vregs_w)).share("videoregs");
+	map(0x20200000, 0x20203fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x20208000, 0x2020805f).rw(this, FUNC(hng64_state::tcram_r), FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
+	map(0x20300000, 0x203001ff).w(this, FUNC(hng64_state::dl_w)); // 3d Display List
+	map(0x20300200, 0x20300203).w(this, FUNC(hng64_state::dl_upload_w));  // 3d Display List Upload
+	map(0x20300214, 0x20300217).w(this, FUNC(hng64_state::dl_control_w));
+	map(0x20300218, 0x2030021b).r(this, FUNC(hng64_state::unk_vreg_r));
 
 	// 3d?
-	AM_RANGE(0x30000000, 0x3000002f) AM_RAM AM_SHARE("3dregs")
-	AM_RANGE(0x30100000, 0x3015ffff) AM_READWRITE(hng64_3d_1_r, hng64_3d_1_w) AM_SHARE("3d_1")  // 3D Display Buffer A
-	AM_RANGE(0x30200000, 0x3025ffff) AM_READWRITE(hng64_3d_2_r, hng64_3d_2_w) AM_SHARE("3d_2")  // 3D Display Buffer B
+	map(0x30000000, 0x3000002f).ram().share("3dregs");
+	map(0x30100000, 0x3015ffff).rw(this, FUNC(hng64_state::hng64_3d_1_r), FUNC(hng64_state::hng64_3d_1_w)).share("3d_1");  // 3D Display Buffer A
+	map(0x30200000, 0x3025ffff).rw(this, FUNC(hng64_state::hng64_3d_2_r), FUNC(hng64_state::hng64_3d_2_w)).share("3d_2");  // 3D Display Buffer B
 
 	// Sound
-	AM_RANGE(0x60000000, 0x601fffff) AM_READWRITE(hng64_soundram2_r, hng64_soundram2_w) // actually seems unmapped, see note in audio/hng64.c
-	AM_RANGE(0x60200000, 0x603fffff) AM_READWRITE(hng64_soundram_r, hng64_soundram_w)   // program + data for V53A gets uploaded here
+	map(0x60000000, 0x601fffff).rw(this, FUNC(hng64_state::hng64_soundram2_r), FUNC(hng64_state::hng64_soundram2_w)); // actually seems unmapped, see note in audio/hng64.c
+	map(0x60200000, 0x603fffff).rw(this, FUNC(hng64_state::hng64_soundram_r), FUNC(hng64_state::hng64_soundram_w));   // program + data for V53A gets uploaded here
 
 	// These are sound ports of some sort
-	AM_RANGE(0x68000000, 0x6800000f) AM_READWRITE16(main_sound_comms_r,main_sound_comms_w,0xffffffff)
-	AM_RANGE(0x6f000000, 0x6f000003) AM_WRITE(hng64_soundcpu_enable_w)
+	map(0x68000000, 0x6800000f).rw(this, FUNC(hng64_state::main_sound_comms_r), FUNC(hng64_state::main_sound_comms_w));
+	map(0x6f000000, 0x6f000003).w(this, FUNC(hng64_state::hng64_soundcpu_enable_w));
 
 	// Communications
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_READWRITE(hng64_com_r, hng64_com_w) AM_SHARE("com_ram")
-	AM_RANGE(0xc0001000, 0xc0001007) AM_READWRITE8(hng64_com_share_mips_r, hng64_com_share_mips_w,0xffffffff)
+	map(0xc0000000, 0xc0000fff).rw(this, FUNC(hng64_state::hng64_com_r), FUNC(hng64_state::hng64_com_w)).share("com_ram");
+	map(0xc0001000, 0xc0001007).rw(this, FUNC(hng64_state::hng64_com_share_mips_r), FUNC(hng64_state::hng64_com_share_mips_w));
 
 	/* 6e000000-6fffffff */
 	/* 80000000-81ffffff */
@@ -1001,7 +1002,7 @@ ADDRESS_MAP_START(hng64_state::hng_map)
 	/* 90000000-97ffffff */
 	/* 98000000-9bffffff */
 	/* a0000000-a3ffffff */
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( hng64 )

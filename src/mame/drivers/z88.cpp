@@ -148,17 +148,19 @@ UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
 }
 
 
-ADDRESS_MAP_START(z88_state::z88_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE_BANK("bank1")
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_BANK("bank2")
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_BANK("bank3")
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE_BANK("bank4")
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE_BANK("bank5")
-ADDRESS_MAP_END
+void z88_state::z88_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).bankrw("bank1");
+	map(0x2000, 0x3fff).bankrw("bank2");
+	map(0x4000, 0x7fff).bankrw("bank3");
+	map(0x8000, 0xbfff).bankrw("bank4");
+	map(0xc000, 0xffff).bankrw("bank5");
+}
 
-ADDRESS_MAP_START(z88_state::z88_io)
-	AM_RANGE(0x0000, 0xffff)    AM_DEVREADWRITE("blink", upd65031_device, read, write)
-ADDRESS_MAP_END
+void z88_state::z88_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw("blink", FUNC(upd65031_device::read), FUNC(upd65031_device::write));
+}
 
 
 

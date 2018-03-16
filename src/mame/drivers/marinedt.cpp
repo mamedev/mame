@@ -437,28 +437,30 @@ READ8_MEMBER(marinedt_state::pc3259_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(marinedt_state::marinedt_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 is not decoded */
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("ipl",0)
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
-ADDRESS_MAP_END
+void marinedt_state::marinedt_map(address_map &map)
+{
+	map.global_mask(0x7fff); /* A15 is not decoded */
+	map(0x0000, 0x3fff).rom().region("ipl", 0);
+	map(0x4000, 0x43ff).mirror(0x0400).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(this, FUNC(marinedt_state::vram_w)).share("vram");
+}
 
-ADDRESS_MAP_START(marinedt_state::marinedt_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x01, 0x01) AM_READ(trackball_r)
-	AM_RANGE(0x02, 0x02) AM_SELECT(0xc) AM_READ(pc3259_r)
-	AM_RANGE(0x02, 0x04) AM_WRITE(obj_0_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x05, 0x05) AM_WRITE(bgm_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(sfx_w)
-	AM_RANGE(0x08, 0x0b) AM_WRITE(obj_1_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(layer_enable_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITENOP // watchdog
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(output_w)
-ADDRESS_MAP_END
+void marinedt_state::marinedt_io(address_map &map)
+{
+	map.global_mask(0x0f);
+	map(0x00, 0x00).portr("DSW1");
+	map(0x01, 0x01).r(this, FUNC(marinedt_state::trackball_r));
+	map(0x02, 0x02).select(0xc).r(this, FUNC(marinedt_state::pc3259_r));
+	map(0x02, 0x04).w(this, FUNC(marinedt_state::obj_0_w));
+	map(0x03, 0x03).portr("SYSTEM");
+	map(0x04, 0x04).portr("DSW2");
+	map(0x05, 0x05).w(this, FUNC(marinedt_state::bgm_w));
+	map(0x06, 0x06).w(this, FUNC(marinedt_state::sfx_w));
+	map(0x08, 0x0b).w(this, FUNC(marinedt_state::obj_1_w));
+	map(0x0d, 0x0d).w(this, FUNC(marinedt_state::layer_enable_w));
+	map(0x0e, 0x0e).nopw(); // watchdog
+	map(0x0f, 0x0f).w(this, FUNC(marinedt_state::output_w));
+}
 
 static INPUT_PORTS_START( marinedt )
 	PORT_START("SYSTEM")

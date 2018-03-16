@@ -123,36 +123,40 @@ private:
 	required_ioport_array<10> m_keyboard;
 };
 
-ADDRESS_MAP_START(sbrain_state::sbrain_mem)
-	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xbfff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0xc000, 0xf7ff ) AM_RAM
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void sbrain_state::sbrain_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bankr0").bankw("bankw0");
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0xbfff).bankrw("bank2");
+	map(0xc000, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(sbrain_state::sbrain_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(6) AM_DEVREADWRITE("uart0", i8251_device, data_r, data_w)
-	AM_RANGE(0x41, 0x41) AM_MIRROR(6) AM_DEVREADWRITE("uart0", i8251_device, status_r, control_w)
-	AM_RANGE(0x48, 0x4f) AM_READ(port48_r) //chr_int_latch
-	AM_RANGE(0x50, 0x57) AM_READ(port50_r)
-	AM_RANGE(0x58, 0x58) AM_MIRROR(6) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	AM_RANGE(0x59, 0x59) AM_MIRROR(6) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	AM_RANGE(0x60, 0x67) AM_WRITE(baud_w)
-	AM_RANGE(0x68, 0x6b) AM_MIRROR(4) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-ADDRESS_MAP_END
+void sbrain_state::sbrain_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).mirror(6).rw(m_u0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x41, 0x41).mirror(6).rw(m_u0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x48, 0x4f).r(this, FUNC(sbrain_state::port48_r)); //chr_int_latch
+	map(0x50, 0x57).r(this, FUNC(sbrain_state::port50_r));
+	map(0x58, 0x58).mirror(6).rw(m_u1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x59, 0x59).mirror(6).rw(m_u1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x60, 0x67).w(this, FUNC(sbrain_state::baud_w));
+	map(0x68, 0x6b).mirror(4).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(sbrain_state::sbrain_submem)
-	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
-	AM_RANGE( 0x8800, 0x8bff ) AM_RAM AM_REGION("subcpu", 0x8800)
-ADDRESS_MAP_END
+void sbrain_state::sbrain_submem(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x8800, 0x8bff).ram().region("subcpu", 0x8800);
+}
 
-ADDRESS_MAP_START(sbrain_state::sbrain_subio)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("fdc", fd1791_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(port10_r,port10_w)
-ADDRESS_MAP_END
+void sbrain_state::sbrain_subio(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x08, 0x0b).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
+	map(0x10, 0x10).rw(this, FUNC(sbrain_state::port10_r), FUNC(sbrain_state::port10_w));
+}
 
 
 READ8_MEMBER( sbrain_state::port48_r )

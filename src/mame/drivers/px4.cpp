@@ -1259,46 +1259,49 @@ void px4p_state::machine_start()
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(px4_state::px4_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
-ADDRESS_MAP_END
+void px4_state::px4_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).bankrw("bank2");
+}
 
-ADDRESS_MAP_START(px4_state::px4_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void px4_state::px4_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	// gapnit, 0x00-0x07
-	AM_RANGE(0x00, 0x00) AM_READWRITE( icrlc_r, ctrl1_w )
-	AM_RANGE(0x01, 0x01) AM_READWRITE( icrhc_r, cmdr_w )
-	AM_RANGE(0x02, 0x02) AM_READWRITE( icrlb_r, ctrl2_w )
-	AM_RANGE(0x03, 0x03) AM_READ( icrhb_r )
-	AM_RANGE(0x04, 0x04) AM_READWRITE( isr_r, ier_w )
-	AM_RANGE(0x05, 0x05) AM_READWRITE( str_r, bankr_w )
-	AM_RANGE(0x06, 0x06) AM_READWRITE( sior_r, sior_w )
-	AM_RANGE(0x07, 0x07) AM_NOP
+	map(0x00, 0x00).rw(this, FUNC(px4_state::icrlc_r), FUNC(px4_state::ctrl1_w));
+	map(0x01, 0x01).rw(this, FUNC(px4_state::icrhc_r), FUNC(px4_state::cmdr_w));
+	map(0x02, 0x02).rw(this, FUNC(px4_state::icrlb_r), FUNC(px4_state::ctrl2_w));
+	map(0x03, 0x03).r(this, FUNC(px4_state::icrhb_r));
+	map(0x04, 0x04).rw(this, FUNC(px4_state::isr_r), FUNC(px4_state::ier_w));
+	map(0x05, 0x05).rw(this, FUNC(px4_state::str_r), FUNC(px4_state::bankr_w));
+	map(0x06, 0x06).rw(this, FUNC(px4_state::sior_r), FUNC(px4_state::sior_w));
+	map(0x07, 0x07).noprw();
 	// gapndl, 0x08-0x0f
-	AM_RANGE(0x08, 0x08) AM_WRITE( vadr_w )
-	AM_RANGE(0x09, 0x09) AM_WRITE( yoff_w )
-	AM_RANGE(0x0a, 0x0a) AM_WRITE( fr_w )
-	AM_RANGE(0x0b, 0x0b) AM_WRITE( spur_w )
-	AM_RANGE(0x0c, 0x0f) AM_NOP
+	map(0x08, 0x08).w(this, FUNC(px4_state::vadr_w));
+	map(0x09, 0x09).w(this, FUNC(px4_state::yoff_w));
+	map(0x0a, 0x0a).w(this, FUNC(px4_state::fr_w));
+	map(0x0b, 0x0b).w(this, FUNC(px4_state::spur_w));
+	map(0x0c, 0x0f).noprw();
 	// gapnio, 0x10-0x1f
-	AM_RANGE(0x10, 0x13) AM_READWRITE( ctgif_r, ctgif_w )
-	AM_RANGE(0x14, 0x14) AM_READWRITE( artdir_r, artdor_w )
-	AM_RANGE(0x15, 0x15) AM_READWRITE( artsr_r, artmr_w )
-	AM_RANGE(0x16, 0x16) AM_READWRITE( iostr_r, artcr_w )
-	AM_RANGE(0x17, 0x17) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x18, 0x18) AM_WRITE( swr_w )
-	AM_RANGE(0x19, 0x19) AM_WRITE( ioctlr_w )
-	AM_RANGE(0x1a, 0x1f) AM_NOP
-ADDRESS_MAP_END
+	map(0x10, 0x13).rw(this, FUNC(px4_state::ctgif_r), FUNC(px4_state::ctgif_w));
+	map(0x14, 0x14).rw(this, FUNC(px4_state::artdir_r), FUNC(px4_state::artdor_w));
+	map(0x15, 0x15).rw(this, FUNC(px4_state::artsr_r), FUNC(px4_state::artmr_w));
+	map(0x16, 0x16).rw(this, FUNC(px4_state::iostr_r), FUNC(px4_state::artcr_w));
+	map(0x17, 0x17).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x18, 0x18).w(this, FUNC(px4_state::swr_w));
+	map(0x19, 0x19).w(this, FUNC(px4_state::ioctlr_w));
+	map(0x1a, 0x1f).noprw();
+}
 
-ADDRESS_MAP_START(px4p_state::px4p_io)
-	AM_IMPORT_FROM(px4_io)
-	AM_RANGE(0x90, 0x92) AM_WRITE(ramdisk_address_w )
-	AM_RANGE(0x93, 0x93) AM_READWRITE(ramdisk_data_r, ramdisk_data_w )
-	AM_RANGE(0x94, 0x94) AM_READ(ramdisk_control_r)
-ADDRESS_MAP_END
+void px4p_state::px4p_io(address_map &map)
+{
+	px4_io(map);
+	map(0x90, 0x92).w(this, FUNC(px4p_state::ramdisk_address_w));
+	map(0x93, 0x93).rw(this, FUNC(px4p_state::ramdisk_data_r), FUNC(px4p_state::ramdisk_data_w));
+	map(0x94, 0x94).r(this, FUNC(px4p_state::ramdisk_control_r));
+}
 
 
 //**************************************************************************

@@ -208,31 +208,33 @@ WRITE8_MEMBER(capbowl_state::sndcmd_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(capbowl_state::capbowl_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_SHARE("rowaddress")
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(capbowl_rom_select_w)
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(tms34061_r, tms34061_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(sndcmd_w)
-	AM_RANGE(0x6800, 0x6800) AM_WRITE(track_reset_w) AM_READNOP   /* + watchdog */
-	AM_RANGE(0x7000, 0x7000) AM_READ(track_0_r)         /* + other inputs */
-	AM_RANGE(0x7800, 0x7800) AM_READ(track_1_r)         /* + other inputs */
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void capbowl_state::capbowl_map(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank1");
+	map(0x4000, 0x4000).writeonly().share("rowaddress");
+	map(0x4800, 0x4800).w(this, FUNC(capbowl_state::capbowl_rom_select_w));
+	map(0x5000, 0x57ff).ram().share("nvram");
+	map(0x5800, 0x5fff).rw(this, FUNC(capbowl_state::tms34061_r), FUNC(capbowl_state::tms34061_w));
+	map(0x6000, 0x6000).w(this, FUNC(capbowl_state::sndcmd_w));
+	map(0x6800, 0x6800).w(this, FUNC(capbowl_state::track_reset_w)).nopr();   /* + watchdog */
+	map(0x7000, 0x7000).r(this, FUNC(capbowl_state::track_0_r));         /* + other inputs */
+	map(0x7800, 0x7800).r(this, FUNC(capbowl_state::track_1_r));         /* + other inputs */
+	map(0x8000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(capbowl_state::bowlrama_map)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(bowlrama_blitter_r, bowlrama_blitter_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_SHARE("rowaddress")
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(tms34061_r, tms34061_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(sndcmd_w)
-	AM_RANGE(0x6800, 0x6800) AM_WRITE(track_reset_w) AM_READNOP    /* + watchdog */
-	AM_RANGE(0x7000, 0x7000) AM_READ(track_0_r)         /* + other inputs */
-	AM_RANGE(0x7800, 0x7800) AM_READ(track_1_r)         /* + other inputs */
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void capbowl_state::bowlrama_map(address_map &map)
+{
+	map(0x0000, 0x001f).rw(this, FUNC(capbowl_state::bowlrama_blitter_r), FUNC(capbowl_state::bowlrama_blitter_w));
+	map(0x4000, 0x4000).writeonly().share("rowaddress");
+	map(0x5000, 0x57ff).ram().share("nvram");
+	map(0x5800, 0x5fff).rw(this, FUNC(capbowl_state::tms34061_r), FUNC(capbowl_state::tms34061_w));
+	map(0x6000, 0x6000).w(this, FUNC(capbowl_state::sndcmd_w));
+	map(0x6800, 0x6800).w(this, FUNC(capbowl_state::track_reset_w)).nopr();    /* + watchdog */
+	map(0x7000, 0x7000).r(this, FUNC(capbowl_state::track_0_r));         /* + other inputs */
+	map(0x7800, 0x7800).r(this, FUNC(capbowl_state::track_1_r));         /* + other inputs */
+	map(0x8000, 0xffff).rom();
+}
 
 
 
@@ -242,14 +244,15 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(capbowl_state::sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x2000, 0x2000) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void capbowl_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x1000, 0x1001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x2000, 0x2000).nopw(); /* watchdog */
+	map(0x6000, 0x6000).w("dac", FUNC(dac_byte_interface::write));
+	map(0x7000, 0x7000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x8000, 0xffff).rom();
+}
 
 
 

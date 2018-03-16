@@ -39,14 +39,15 @@ uint32_t segapm_state::screen_update_segapm(screen_device &screen, bitmap_ind16 
 
 
 
-ADDRESS_MAP_START(segapm_state::segapm_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void segapm_state::segapm_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 
 	// A15100
 
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM
+	map(0xe00000, 0xe7ffff).ram();
 
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( segapm )
 INPUT_PORTS_END

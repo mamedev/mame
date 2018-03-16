@@ -108,10 +108,11 @@ uint32_t itgamble_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(itgamble_state::itgamble_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0xffffff) AM_ROM
-ADDRESS_MAP_END
+void itgamble_state::itgamble_map(address_map &map)
+{
+	map.global_mask(0xffffff);
+	map(0x000000, 0xffffff).rom();
+}
 
 
 /*************************

@@ -292,9 +292,10 @@ private:
     Memory map. We have a configurable mapper, so we need to delegate the
     job to the mapper completely.
 */
-ADDRESS_MAP_START(ti99_8_state::memmap)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, read, write) AM_DEVSETOFFSET(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, setoffset)
-ADDRESS_MAP_END
+void ti99_8_state::memmap(address_map &map)
+{
+	map(0x0000, 0xffff).rw(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::read), FUNC(bus::ti99::internal::mainboard8_device::write)).setoffset(TI998_MAINBOARD_TAG, FUNC(bus::ti99::internal::mainboard8_device::setoffset));
+}
 
 /*
     CRU map - see description above
@@ -303,13 +304,14 @@ ADDRESS_MAP_END
     (decoded by the "Vaquerro" chip, signal NNOICS*)
 */
 
-ADDRESS_MAP_START(ti99_8_state::crumap)
-	AM_RANGE(0x0000, 0x02ff) AM_READ(cruread)
-	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
+void ti99_8_state::crumap(address_map &map)
+{
+	map(0x0000, 0x02ff).r(this, FUNC(ti99_8_state::cruread));
+	map(0x0000, 0x0003).r(m_tms9901, FUNC(tms9901_device::read));
 
-	AM_RANGE(0x0000, 0x17ff) AM_WRITE(cruwrite)
-	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
-ADDRESS_MAP_END
+	map(0x0000, 0x17ff).w(this, FUNC(ti99_8_state::cruwrite));
+	map(0x0000, 0x001f).w(m_tms9901, FUNC(tms9901_device::write));
+}
 
 /* ti99/8 : 54-key keyboard */
 static INPUT_PORTS_START(ti99_8)

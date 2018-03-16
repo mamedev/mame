@@ -277,27 +277,28 @@ void supdrapo_state::machine_reset()
                               Memory Map
 **********************************************************************/
 
-ADDRESS_MAP_START(supdrapo_state::sdpoker_mem)
-	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0x5000, 0x50ff) AM_RAM AM_SHARE("col_line")
-	AM_RANGE(0x57ff, 0x57ff) AM_RAM AM_SHARE("col_line")
-	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_SHARE("col_line")
-	AM_RANGE(0x6000, 0x67ff) AM_RAM //work ram
-	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x6c00, 0x6fff) AM_RAM AM_SHARE("char_bank")
-	AM_RANGE(0x7000, 0x7bff) AM_RAM //$7600 seems watchdog
-	AM_RANGE(0x7c00, 0x7c00) AM_WRITE(debug7c00_w)
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN4") AM_WRITE(wdog8000_w)
-	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN0")
-	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN1") AM_WRITE(payout_w)
-	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN2") AM_WRITE(coinin_w)
-	AM_RANGE(0x8004, 0x8004) AM_READ_PORT("IN3") AM_WRITE(debug8004_w)
-	AM_RANGE(0x8005, 0x8005) AM_READ_PORT("SW1")
-	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("SW2")
-	AM_RANGE(0x9000, 0x90ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9400, 0x9400) AM_READ(rng_r)
-	AM_RANGE(0x9800, 0x9801) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void supdrapo_state::sdpoker_mem(address_map &map)
+{
+	map(0x0000, 0x4fff).rom();
+	map(0x5000, 0x50ff).ram().share("col_line");
+	map(0x57ff, 0x57ff).ram().share("col_line");
+	map(0x5800, 0x58ff).ram().share("col_line");
+	map(0x6000, 0x67ff).ram(); //work ram
+	map(0x6800, 0x6bff).ram().share("videoram");
+	map(0x6c00, 0x6fff).ram().share("char_bank");
+	map(0x7000, 0x7bff).ram(); //$7600 seems watchdog
+	map(0x7c00, 0x7c00).w(this, FUNC(supdrapo_state::debug7c00_w));
+	map(0x8000, 0x8000).portr("IN4").w(this, FUNC(supdrapo_state::wdog8000_w));
+	map(0x8001, 0x8001).portr("IN0");
+	map(0x8002, 0x8002).portr("IN1").w(this, FUNC(supdrapo_state::payout_w));
+	map(0x8003, 0x8003).portr("IN2").w(this, FUNC(supdrapo_state::coinin_w));
+	map(0x8004, 0x8004).portr("IN3").w(this, FUNC(supdrapo_state::debug8004_w));
+	map(0x8005, 0x8005).portr("SW1");
+	map(0x8006, 0x8006).portr("SW2");
+	map(0x9000, 0x90ff).ram().share("nvram");
+	map(0x9400, 0x9400).r(this, FUNC(supdrapo_state::rng_r));
+	map(0x9800, 0x9801).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
 
 
 /*********************************************************************

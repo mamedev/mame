@@ -677,16 +677,17 @@ WRITE8_MEMBER(magicfly_state::mux_port_w)
 *           Memory map information           *
 *********************************************/
 
-ADDRESS_MAP_START(magicfly_state::magicfly_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")    /* MK48Z02B NVRAM */
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(magicfly_videoram_w) AM_SHARE("videoram") /* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(magicfly_colorram_w) AM_SHARE("colorram") /* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
-	AM_RANGE(0x2800, 0x2800) AM_READ(mux_port_r)    /* multiplexed input port */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(mux_port_w)   /* output port */
-	AM_RANGE(0xc000, 0xffff) AM_ROM                 /* ROM space */
-ADDRESS_MAP_END
+void magicfly_state::magicfly_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");    /* MK48Z02B NVRAM */
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x1000, 0x13ff).ram().w(this, FUNC(magicfly_state::magicfly_videoram_w)).share("videoram"); /* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
+	map(0x1800, 0x1bff).ram().w(this, FUNC(magicfly_state::magicfly_colorram_w)).share("colorram"); /* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
+	map(0x2800, 0x2800).r(this, FUNC(magicfly_state::mux_port_r));    /* multiplexed input port */
+	map(0x3000, 0x3000).w(this, FUNC(magicfly_state::mux_port_w));   /* output port */
+	map(0xc000, 0xffff).rom();                 /* ROM space */
+}
 
 
 /*********************************************

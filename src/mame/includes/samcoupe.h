@@ -19,6 +19,7 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
+#include "screen.h"
 
 /* screen dimensions */
 #define SAM_BLOCK           8
@@ -53,6 +54,7 @@ public:
 	samcoupe_state(const machine_config &mconfig, device_type type, const char *tag)
 			: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
+			m_screen(*this, "screen"),
 			m_speaker(*this, "speaker"),
 			m_cassette(*this, "cassette"),
 			m_lpt1(*this, "lpt1"),
@@ -156,6 +158,7 @@ public:
 	uint8_t* sam_bank_write_ptr[4];
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_lpt1;

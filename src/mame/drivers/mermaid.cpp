@@ -157,25 +157,26 @@ WRITE_LINE_MEMBER(mermaid_state::nmi_mask_w)
 
 /* Memory Map */
 
-ADDRESS_MAP_START(mermaid_state::mermaid_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(mermaid_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(mermaid_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xd81f) AM_RAM_WRITE(mermaid_bg_scroll_w) AM_SHARE("bg_scrollram")
-	AM_RANGE(0xd840, 0xd85f) AM_RAM_WRITE(mermaid_fg_scroll_w) AM_SHARE("fg_scrollram")
-	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(mermaid_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW")
-	AM_RANGE(0xe000, 0xe007) AM_DEVWRITE("latch1", ls259_device, write_d0)
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("P1")
-	AM_RANGE(0xe800, 0xe807) AM_DEVWRITE("latch2", ls259_device, write_d0)
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P2")
-	AM_RANGE(0xf800, 0xf800) AM_READ(mermaid_collision_r)
-	AM_RANGE(0xf802, 0xf802) AM_WRITENOP    // ???
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(mermaid_ay8910_write_port_w)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(mermaid_ay8910_control_port_w)
-ADDRESS_MAP_END
+void mermaid_state::mermaid_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xcbff).ram().w(this, FUNC(mermaid_state::mermaid_videoram2_w)).share("videoram2");
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(mermaid_state::mermaid_videoram_w)).share("videoram");
+	map(0xd800, 0xd81f).ram().w(this, FUNC(mermaid_state::mermaid_bg_scroll_w)).share("bg_scrollram");
+	map(0xd840, 0xd85f).ram().w(this, FUNC(mermaid_state::mermaid_fg_scroll_w)).share("fg_scrollram");
+	map(0xd880, 0xd8bf).ram().share("spriteram");
+	map(0xdc00, 0xdfff).ram().w(this, FUNC(mermaid_state::mermaid_colorram_w)).share("colorram");
+	map(0xe000, 0xe000).portr("DSW");
+	map(0xe000, 0xe007).w("latch1", FUNC(ls259_device::write_d0));
+	map(0xe800, 0xe800).portr("P1");
+	map(0xe800, 0xe807).w("latch2", FUNC(ls259_device::write_d0));
+	map(0xf000, 0xf000).portr("P2");
+	map(0xf800, 0xf800).r(this, FUNC(mermaid_state::mermaid_collision_r));
+	map(0xf802, 0xf802).nopw();    // ???
+	map(0xf806, 0xf806).w(this, FUNC(mermaid_state::mermaid_ay8910_write_port_w));
+	map(0xf807, 0xf807).w(this, FUNC(mermaid_state::mermaid_ay8910_control_port_w));
+}
 
 WRITE_LINE_MEMBER(mermaid_state::rougien_sample_rom_lo_w)
 {

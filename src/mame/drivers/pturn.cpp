@@ -343,41 +343,43 @@ READ8_MEMBER(pturn_state::custom_r)
 }
 
 
-ADDRESS_MAP_START(pturn_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_WRITENOP AM_READ(custom_r)
+void pturn_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xcfff).nopw().r(this, FUNC(pturn_state::custom_r));
 
-	AM_RANGE(0xdfe0, 0xdfe0) AM_NOP
+	map(0xdfe0, 0xdfe0).noprw();
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(fgpalette_w)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	map(0xe000, 0xe3ff).ram().w(this, FUNC(pturn_state::videoram_w)).share("videoram");
+	map(0xe400, 0xe400).w(this, FUNC(pturn_state::fgpalette_w));
+	map(0xe800, 0xe800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("spriteram")
+	map(0xf000, 0xf0ff).ram().share("spriteram");
 
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(bg_scrollx_w)
+	map(0xf400, 0xf400).w(this, FUNC(pturn_state::bg_scrollx_w));
 
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1") AM_WRITENOP
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITE(bgcolor_w)
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(bg_scrolly_w)
-	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf806, 0xf806) AM_READNOP /* Protection related, ((val&3)==2) -> jump to 0 */
+	map(0xf800, 0xf800).portr("P1").nopw();
+	map(0xf801, 0xf801).portr("P2").w(this, FUNC(pturn_state::bgcolor_w));
+	map(0xf802, 0xf802).portr("SYSTEM");
+	map(0xf803, 0xf803).w(this, FUNC(pturn_state::bg_scrolly_w));
+	map(0xf804, 0xf804).portr("DSW2");
+	map(0xf805, 0xf805).portr("DSW1");
+	map(0xf806, 0xf806).nopr(); /* Protection related, ((val&3)==2) -> jump to 0 */
 
-	AM_RANGE(0xfc00, 0xfc07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+	map(0xfc00, 0xfc07).w("mainlatch", FUNC(ls259_device::write_d0));
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(pturn_state::sub_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(nmi_sub_enable_w)
-	AM_RANGE(0x4000, 0x4000) AM_RAM
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void pturn_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(pturn_state::nmi_sub_enable_w));
+	map(0x4000, 0x4000).ram();
+	map(0x5000, 0x5001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x6000, 0x6001).w("ay2", FUNC(ay8910_device::address_data_w));
+}
 
 static const gfx_layout charlayout =
 {

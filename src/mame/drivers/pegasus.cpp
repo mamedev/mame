@@ -193,24 +193,26 @@ READ8_MEMBER( pegasus_state::pegasus_protection_r )
 	return data;
 }
 
-ADDRESS_MAP_START(pegasus_state::pegasus_mem)
-	ADDRESS_MAP_UNMAP_HIGH
+void pegasus_state::pegasus_mem(address_map &map)
+{
+	map.unmap_value_high();
 	//AM_RANGE(0x0000, 0x2fff)      // mapped by the cartslots 1-3
-	AM_RANGE(0xb000, 0xbdff) AM_RAM
-	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_SHARE("videoram")
+	map(0xb000, 0xbdff).ram();
+	map(0xbe00, 0xbfff).ram().share("videoram");
 	//AM_RANGE(0xc000, 0xdfff)      // mapped by the cartslots 4-5
-	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
-	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
-	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pia_u", pia6821_device, read, write)
-	AM_RANGE(0xe600, 0xe603) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pia_s", pia6821_device, read, write)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xe000, 0xe1ff).r(this, FUNC(pegasus_state::pegasus_protection_r));
+	map(0xe200, 0xe3ff).rw(this, FUNC(pegasus_state::pegasus_pcg_r), FUNC(pegasus_state::pegasus_pcg_w));
+	map(0xe400, 0xe403).mirror(0x1fc).rw(m_pia_u, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xe600, 0xe603).mirror(0x1fc).rw(m_pia_s, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xf000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(pegasus_state::pegasusm_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(pegasus_mem)
-	AM_RANGE(0x5000, 0xafff) AM_RAM
-ADDRESS_MAP_END
+void pegasus_state::pegasusm_mem(address_map &map)
+{
+	map.unmap_value_high();
+	pegasus_mem(map);
+	map(0x5000, 0xafff).ram();
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pegasus )

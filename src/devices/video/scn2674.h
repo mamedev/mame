@@ -9,11 +9,8 @@
 #define MCFG_SCN2674_INTR_CALLBACK(_intr) \
 	devcb = &downcast<scn2674_device &>(*device).set_intr_callback(DEVCB_##_intr);
 
-#define MCFG_SCN2674_TEXT_CHARACTER_WIDTH(_value) \
+#define MCFG_SCN2674_CHARACTER_WIDTH(_value) \
 	downcast<scn2674_device &>(*device).set_character_width(_value);
-
-#define MCFG_SCN2674_GFX_CHARACTER_WIDTH(_value) \
-	downcast<scn2674_device &>(*device).set_gfx_character_width(_value);
 
 #define MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
 	downcast<scn2674_device &>(*device).set_display_callback(scn2674_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
@@ -31,8 +28,7 @@ public:
 
 	// static configuration
 	template <class Object> devcb_base &set_intr_callback(Object &&cb) { return m_intr_cb.set_callback(std::forward<Object>(cb)); }
-	void set_character_width(int value) { m_text_hpixels_per_column = value; }
-	void set_gfx_character_width(int value) { m_gfx_hpixels_per_column = value; }
+	void set_character_width(int value) { m_hpixels_per_column = value; }
 	template <typename Object> void set_display_callback(Object &&cb) { m_display_cb = std::forward<Object>(cb); }
 
 	DECLARE_READ8_MEMBER( read );
@@ -69,8 +65,6 @@ private:
 	uint8_t m_display_enabled_scanline;
 	uint8_t m_cursor_enabled;
 	uint8_t m_hpixels_per_column;
-	uint8_t m_text_hpixels_per_column;
-	uint8_t m_gfx_hpixels_per_column;
 	uint8_t m_IR0_double_ht_wd;
 	uint8_t m_IR0_scanline_per_char_row;
 	uint8_t m_IR0_sync_select;

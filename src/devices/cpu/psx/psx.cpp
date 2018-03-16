@@ -174,12 +174,12 @@ static const char *const delayn[] =
 };
 
 // device type definition
-DEFINE_DEVICE_TYPE(CXD8530AQ, cxd8530aq_device, "cxd8530aq", "CXD8530AQ")
-DEFINE_DEVICE_TYPE(CXD8530BQ, cxd8530bq_device, "cxd8530bq", "CXD8530BQ")
-DEFINE_DEVICE_TYPE(CXD8530CQ, cxd8530cq_device, "cxd8530cq", "CXD8530CQ")
-DEFINE_DEVICE_TYPE(CXD8661R,  cxd8661r_device,  "cxd8661r",  "CXD8661R")
-DEFINE_DEVICE_TYPE(CXD8606BQ, cxd8606bq_device, "cxd8606bq", "CXD8606BQ")
-DEFINE_DEVICE_TYPE(CXD8606CQ, cxd8606cq_device, "cxd8606cq", "CXD8606CQ")
+DEFINE_DEVICE_TYPE(CXD8530AQ, cxd8530aq_device, "cxd8530aq", "Sony CXD8530AQ")
+DEFINE_DEVICE_TYPE(CXD8530BQ, cxd8530bq_device, "cxd8530bq", "Sony CXD8530BQ")
+DEFINE_DEVICE_TYPE(CXD8530CQ, cxd8530cq_device, "cxd8530cq", "Sony CXD8530CQ")
+DEFINE_DEVICE_TYPE(CXD8661R,  cxd8661r_device,  "cxd8661r",  "Sony CXD8661R")
+DEFINE_DEVICE_TYPE(CXD8606BQ, cxd8606bq_device, "cxd8606bq", "Sony CXD8606BQ")
+DEFINE_DEVICE_TYPE(CXD8606CQ, cxd8606cq_device, "cxd8606cq", "Sony CXD8606CQ")
 
 static const uint32_t mtc0_writemask[]=
 {

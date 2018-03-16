@@ -22,6 +22,9 @@
 #define MCFG_S3C2440_PALETTE(_palette_tag) \
 	downcast<s3c2440_device &>(*device).set_palette_tag("^" _palette_tag);
 
+#define MCFG_S3C2440_SCREEN(screen_tag) \
+	downcast<s3c2440_device &>(*device).set_screen_tag(("^" screen_tag));
+
 #define MCFG_S3C2440_CORE_PIN_R_CB(_devcb) \
 	devcb = &downcast<s3c2440_device &>(*device).set_core_pin_r_callback(DEVCB_##_devcb);
 
@@ -206,6 +209,7 @@ public:
 
 	// configuration
 	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
 	template <class Object> devcb_base &set_core_pin_r_callback(Object &&cb) { return m_pin_r_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_core_pin_w_callback(Object &&cb) { return m_pin_w_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_gpio_port_r_callback(Object &&cb) { return m_port_r_cb.set_callback(std::forward<Object>(cb)); }
@@ -649,7 +653,9 @@ private:
 	};
 
 	// internal state
+	required_device<device_t> m_cpu;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
 	uint8_t m_steppingstone[4*1024];
 	memcon_t m_memcon;
@@ -659,8 +665,6 @@ private:
 	clkpow_t m_clkpow;
 	lcd_t m_lcd;
 	lcdpal_t m_lcdpal;
-	nand_t m_nand;
-	cam_t m_cam;
 	uart_t m_uart[UART_COUNT];
 	pwm_t m_pwm;
 	usbdev_t m_usbdev;
@@ -671,9 +675,6 @@ private:
 	rtc_t m_rtc;
 	adc_t m_adc;
 	spi_t m_spi[SPI_COUNT];
-	sdi_t m_sdi;
-	ac97_t m_ac97;
-	required_device<device_t> m_cpu;
 	devcb_read32 m_pin_r_cb;
 	devcb_write32 m_pin_w_cb;
 	devcb_read32 m_port_r_cb;
@@ -683,11 +684,16 @@ private:
 	devcb_write_line m_sda_w_cb;
 	devcb_read32 m_data_r_cb;
 	devcb_write16 m_data_w_cb;
+	int m_flags;
+
+	cam_t m_cam;
+	ac97_t m_ac97;
+	sdi_t m_sdi;
+	nand_t m_nand;
 	devcb_write8 m_command_w_cb;
 	devcb_write8 m_address_w_cb;
 	devcb_read8  m_nand_data_r_cb;
 	devcb_write8 m_nand_data_w_cb;
-	int m_flags;
 };
 
 DECLARE_DEVICE_TYPE(S3C2440, s3c2440_device)

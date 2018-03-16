@@ -125,8 +125,8 @@ March 2013 NPW:
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(HD6309, hd6309_device, "hd6309", "HD6309")
-DEFINE_DEVICE_TYPE(HD6309E, hd6309e_device, "hd6309e", "HD6309E")
+DEFINE_DEVICE_TYPE(HD6309, hd6309_device, "hd6309", "Hitachi HD6309")
+DEFINE_DEVICE_TYPE(HD6309E, hd6309e_device, "hd6309e", "Hitachi HD6309E")
 
 
 //-------------------------------------------------

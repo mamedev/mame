@@ -324,28 +324,30 @@ WRITE_LINE_MEMBER( apricot_state::i8086_lock_w )
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(apricot_state::apricot_mem)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAMBANK("ram")
-	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x7000) AM_RAM AM_SHARE("screen_buffer")
-	AM_RANGE(0xf8000, 0xfbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("bootstrap", 0)
-ADDRESS_MAP_END
+void apricot_state::apricot_mem(address_map &map)
+{
+	map(0x00000, 0x3ffff).bankrw("ram");
+	map(0xf0000, 0xf0fff).mirror(0x7000).ram().share("screen_buffer");
+	map(0xf8000, 0xfbfff).mirror(0x4000).rom().region("bootstrap", 0);
+}
 
-ADDRESS_MAP_START(apricot_state::apricot_io)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ic31", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x40, 0x47) AM_DEVREADWRITE8("ic68", wd2797_device, read, write, 0x00ff)
-	AM_RANGE(0x48, 0x4f) AM_DEVREADWRITE8("ic17", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x50, 0x51) AM_MIRROR(0x06) AM_DEVWRITE8("ic7", sn76489_device, write, 0x00ff)
-	AM_RANGE(0x58, 0x5f) AM_DEVREADWRITE8("ic16", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x60, 0x61) AM_READ8(sio_da_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio_device, da_w, 0x00ff)
-	AM_RANGE(0x62, 0x63) AM_READ8(sio_ca_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio_device, ca_w, 0x00ff)
-	AM_RANGE(0x64, 0x65) AM_READ8(sio_db_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio_device, db_w, 0x00ff)
-	AM_RANGE(0x66, 0x67) AM_READ8(sio_cb_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio_device, cb_w, 0x00ff)
-	AM_RANGE(0x68, 0x69) AM_MIRROR(0x04) AM_DEVWRITE8("ic30", hd6845_device, address_w, 0x00ff)
-	AM_RANGE(0x6a, 0x6b) AM_MIRROR(0x04) AM_DEVREADWRITE8("ic30", hd6845_device, register_r, register_w, 0x00ff)
-	AM_RANGE(0x70, 0x71) AM_MIRROR(0x04) AM_WRITE8(i8089_ca1_w, 0x00ff)
-	AM_RANGE(0x72, 0x73) AM_MIRROR(0x04) AM_WRITE8(i8089_ca2_w, 0x00ff)
-	AM_RANGE(0x78, 0x7f) AM_NOP // unavailable
-ADDRESS_MAP_END
+void apricot_state::apricot_io(address_map &map)
+{
+	map(0x00, 0x03).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x40, 0x47).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
+	map(0x48, 0x4f).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x50, 0x50).mirror(0x06).w("ic7", FUNC(sn76489_device::write));
+	map(0x58, 0x5f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x60, 0x60).r(this, FUNC(apricot_state::sio_da_r)).w(m_sio, FUNC(z80sio_device::da_w)).umask16(0x00ff);
+	map(0x62, 0x62).r(this, FUNC(apricot_state::sio_ca_r)).w(m_sio, FUNC(z80sio_device::ca_w)).umask16(0x00ff);
+	map(0x64, 0x64).r(this, FUNC(apricot_state::sio_db_r)).w(m_sio, FUNC(z80sio_device::db_w)).umask16(0x00ff);
+	map(0x66, 0x66).r(this, FUNC(apricot_state::sio_cb_r)).w(m_sio, FUNC(z80sio_device::cb_w)).umask16(0x00ff);
+	map(0x68, 0x68).mirror(0x04).w(m_crtc, FUNC(hd6845_device::address_w));
+	map(0x6a, 0x6a).mirror(0x04).rw(m_crtc, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
+	map(0x70, 0x70).mirror(0x04).w(this, FUNC(apricot_state::i8089_ca1_w));
+	map(0x72, 0x72).mirror(0x04).w(this, FUNC(apricot_state::i8089_ca2_w));
+	map(0x78, 0x7f).noprw(); // unavailable
+}
 
 
 //**************************************************************************

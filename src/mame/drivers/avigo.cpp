@@ -165,23 +165,25 @@ void avigo_state::machine_start()
 	save_item(NAME(m_warm_start));
 }
 
-ADDRESS_MAP_START(avigo_state::avigo_banked_map)
-	AM_RANGE(0x0000000, 0x00fffff) AM_MIRROR(0x0300000) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
-	AM_RANGE(0x0400000, 0x041ffff) AM_MIRROR(0x03e0000) AM_RAM AM_SHARE("nvram")
+void avigo_state::avigo_banked_map(address_map &map)
+{
+	map(0x0000000, 0x00fffff).mirror(0x0300000).rw("flash0", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x0400000, 0x041ffff).mirror(0x03e0000).ram().share("nvram");
 
-	AM_RANGE(0x0c00000, 0x0cfffff) AM_MIRROR(0x0300000) AM_DEVREADWRITE("flash1", intelfsh8_device, read, write)
-	AM_RANGE(0x1400000, 0x14fffff) AM_MIRROR(0x0300000) AM_DEVREADWRITE("flash2", intelfsh8_device, read, write)
-	AM_RANGE(0x1c00000, 0x1cfffff) AM_MIRROR(0x0300000) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
+	map(0x0c00000, 0x0cfffff).mirror(0x0300000).rw(m_flash1, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x1400000, 0x14fffff).mirror(0x0300000).rw("flash2", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x1c00000, 0x1cfffff).mirror(0x0300000).rw("flash0", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
 
-	AM_RANGE(0x1800000, 0x1803fff) AM_MIRROR(0x03fc000) AM_READWRITE(vid_memory_r, vid_memory_w)
-ADDRESS_MAP_END
+	map(0x1800000, 0x1803fff).mirror(0x03fc000).rw(this, FUNC(avigo_state::vid_memory_r), FUNC(avigo_state::vid_memory_w));
+}
 
-ADDRESS_MAP_START(avigo_state::avigo_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bank0", address_map_bank_device, read8, write8)
-	AM_RANGE(0x8000, 0xbfff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank2")
-ADDRESS_MAP_END
+void avigo_state::avigo_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rw("flash0", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x4000, 0x7fff).rw(m_bankdev1, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x8000, 0xbfff).rw(m_bankdev2, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xc000, 0xffff).bankrw("bank2");
+}
 
 
 READ8_MEMBER(avigo_state::key_data_read_r)
@@ -496,21 +498,22 @@ READ8_MEMBER(avigo_state::port_04_r)
 
 
 
-ADDRESS_MAP_START(avigo_state::avigo_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x001, 0x001) AM_READWRITE( key_data_read_r, set_key_line_w )
-	AM_RANGE(0x002, 0x002) AM_WRITE( port2_w )
-	AM_RANGE(0x003, 0x003) AM_READWRITE( irq_r, irq_w )
-	AM_RANGE(0x004, 0x004) AM_READ( port_04_r )
-	AM_RANGE(0x005, 0x006) AM_READWRITE( bank1_r, bank1_w )
-	AM_RANGE(0x007, 0x008) AM_READWRITE( bank2_r, bank2_w )
-	AM_RANGE(0x009, 0x009) AM_READWRITE( ad_control_status_r, ad_control_status_w )
-	AM_RANGE(0x010, 0x01f) AM_DEVREADWRITE("rtc", tc8521_device, read, write)
-	AM_RANGE(0x028, 0x028) AM_WRITE( speaker_w )
-	AM_RANGE(0x02d, 0x02d) AM_READ( ad_data_r )
-	AM_RANGE(0x030, 0x037) AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w )
-ADDRESS_MAP_END
+void avigo_state::avigo_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x001, 0x001).rw(this, FUNC(avigo_state::key_data_read_r), FUNC(avigo_state::set_key_line_w));
+	map(0x002, 0x002).w(this, FUNC(avigo_state::port2_w));
+	map(0x003, 0x003).rw(this, FUNC(avigo_state::irq_r), FUNC(avigo_state::irq_w));
+	map(0x004, 0x004).r(this, FUNC(avigo_state::port_04_r));
+	map(0x005, 0x006).rw(this, FUNC(avigo_state::bank1_r), FUNC(avigo_state::bank1_w));
+	map(0x007, 0x008).rw(this, FUNC(avigo_state::bank2_r), FUNC(avigo_state::bank2_w));
+	map(0x009, 0x009).rw(this, FUNC(avigo_state::ad_control_status_r), FUNC(avigo_state::ad_control_status_w));
+	map(0x010, 0x01f).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
+	map(0x028, 0x028).w(this, FUNC(avigo_state::speaker_w));
+	map(0x02d, 0x02d).r(this, FUNC(avigo_state::ad_data_r));
+	map(0x030, 0x037).rw(m_uart, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+}
 
 
 INPUT_CHANGED_MEMBER( avigo_state::pen_irq )

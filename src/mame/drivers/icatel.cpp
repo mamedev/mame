@@ -75,25 +75,28 @@ private:
 	required_device<hd44780_device> m_lcdc;
 };
 
-ADDRESS_MAP_START(icatel_state::i80c31_prg)
-	AM_RANGE(0x0000, 0x7FFF) AM_MIRROR(0x8000) AM_ROM
-ADDRESS_MAP_END
+void icatel_state::i80c31_prg(address_map &map)
+{
+	map(0x0000, 0x7FFF).mirror(0x8000).rom();
+}
 
-ADDRESS_MAP_START(icatel_state::i80c31_io)
-	AM_RANGE(0x0000,0x3FFF) AM_RAM
-	AM_RANGE(0x8000,0x8002) AM_RAM /* HACK! */
-	AM_RANGE(0x8040,0x8040) AM_MIRROR(0x3F1E) AM_DEVWRITE("hd44780", hd44780_device, control_write) // not sure yet. CI12 (73LS273)
-	AM_RANGE(0x8041,0x8041) AM_MIRROR(0x3F1E) AM_DEVWRITE("hd44780", hd44780_device, data_write) // not sure yet.  CI12
-	AM_RANGE(0x8060,0x8060) AM_MIRROR(0x3F1F) AM_READWRITE(ci8_r, ci8_w)
-	AM_RANGE(0x8080,0x8080) AM_MIRROR(0x3F1F) AM_READWRITE(ci16_r, ci16_w) // card reader (?)
-	AM_RANGE(0x80C0,0x80C0) AM_MIRROR(0x3F1F) AM_READWRITE(ci15_r, ci15_w) // 74LS244 (tristate buffer)
-	AM_RANGE(0xC000,0xCFFF) AM_READWRITE(cn8_extension_r, cn8_extension_w)
-	AM_RANGE(0xE000,0xEFFF) AM_READWRITE(modem_r, modem_w)
-ADDRESS_MAP_END
+void icatel_state::i80c31_io(address_map &map)
+{
+	map(0x0000, 0x3FFF).ram();
+	map(0x8000, 0x8002).ram(); /* HACK! */
+	map(0x8040, 0x8040).mirror(0x3F1E).w(m_lcdc, FUNC(hd44780_device::control_write)); // not sure yet. CI12 (73LS273)
+	map(0x8041, 0x8041).mirror(0x3F1E).w(m_lcdc, FUNC(hd44780_device::data_write)); // not sure yet.  CI12
+	map(0x8060, 0x8060).mirror(0x3F1F).rw(this, FUNC(icatel_state::ci8_r), FUNC(icatel_state::ci8_w));
+	map(0x8080, 0x8080).mirror(0x3F1F).rw(this, FUNC(icatel_state::ci16_r), FUNC(icatel_state::ci16_w)); // card reader (?)
+	map(0x80C0, 0x80C0).mirror(0x3F1F).rw(this, FUNC(icatel_state::ci15_r), FUNC(icatel_state::ci15_w)); // 74LS244 (tristate buffer)
+	map(0xC000, 0xCFFF).rw(this, FUNC(icatel_state::cn8_extension_r), FUNC(icatel_state::cn8_extension_w));
+	map(0xE000, 0xEFFF).rw(this, FUNC(icatel_state::modem_r), FUNC(icatel_state::modem_w));
+}
 
-ADDRESS_MAP_START(icatel_state::i80c31_data)
+void icatel_state::i80c31_data(address_map &map)
+{
 //  AM_RANGE(0x0056,0x005A) AM_READ(magic_string) /* This is a hack! */
-ADDRESS_MAP_END
+}
 
 DRIVER_INIT_MEMBER( icatel_state, icatel )
 {

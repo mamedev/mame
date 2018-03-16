@@ -17,7 +17,7 @@
 
 
 // MCU types
-DEFINE_DEVICE_TYPE(SM500, sm500_device, "sm500", "SM500") // 1.2K ROM, 4x10x4 RAM, shift registers for LCD
+DEFINE_DEVICE_TYPE(SM500, sm500_device, "sm500", "Sharp SM500") // 1.2K ROM, 4x10x4 RAM, shift registers for LCD
 
 
 // internal memory maps

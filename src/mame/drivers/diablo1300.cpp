@@ -154,13 +154,15 @@ public:
 	void diablo1300_data_map(address_map &map);
 };
 
-ADDRESS_MAP_START( diablo1300_state::diablo1300_map) //, AS_PROGRAM, 16, diablo1300_state )
-	AM_RANGE(0x0000, 0x01ff) AM_ROM
-ADDRESS_MAP_END
+void diablo1300_state::diablo1300_map(address_map &map)
+{ //, AS_PROGRAM, 16, diablo1300_state )
+	map(0x0000, 0x01ff).rom();
+}
 
-ADDRESS_MAP_START( diablo1300_state::diablo1300_data_map ) // , AS_DATA, 8, diablo1300_state )
-	AM_RANGE(0x00, 0x1f) AM_RAM
-ADDRESS_MAP_END
+void diablo1300_state::diablo1300_data_map(address_map &map)
+{ // , AS_DATA, 8, diablo1300_state )
+	map(0x00, 0x1f).ram();
+}
 
 static INPUT_PORTS_START( diablo1300 )
 INPUT_PORTS_END

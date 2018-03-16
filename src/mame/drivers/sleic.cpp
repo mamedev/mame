@@ -50,10 +50,11 @@ public:
 };
 
 
-ADDRESS_MAP_START(sleic_state::sleic_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void sleic_state::sleic_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).ram();
+	map(0xe0000, 0xfffff).rom();
+}
 
 static INPUT_PORTS_START( sleic )
 INPUT_PORTS_END

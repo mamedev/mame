@@ -54,7 +54,7 @@ enum
 	SHARC_B12,      SHARC_B13,      SHARC_B14,      SHARC_B15
 };
 
-DEFINE_DEVICE_TYPE(ADSP21062, adsp21062_device, "adsp21062", "ADSP21062")
+DEFINE_DEVICE_TYPE(ADSP21062, adsp21062_device, "adsp21062", "Analog Devices ADSP21062 \"SHARC\"")
 
 ADDRESS_MAP_START(adsp21062_device::internal_pgm)
 	AM_RANGE(0x20000, 0x24fff) AM_READWRITE(pm0_r, pm0_w)

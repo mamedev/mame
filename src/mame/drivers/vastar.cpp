@@ -140,35 +140,39 @@ WRITE_LINE_MEMBER(vastar_state::nmi_mask_w)
 }
 
 
-ADDRESS_MAP_START(vastar_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(bg2videoram_w) AM_SHARE("bg2videoram") AM_MIRROR(0x2000)
-	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(bg1videoram_w) AM_SHARE("bg1videoram") AM_MIRROR(0x2000)
-	AM_RANGE(0xc000, 0xc000) AM_WRITEONLY AM_SHARE("sprite_priority")   /* sprite/BG priority */
-	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram") // fg videoram + sprites
-	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("sharedram")
-ADDRESS_MAP_END
+void vastar_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram().w(this, FUNC(vastar_state::bg2videoram_w)).share("bg2videoram").mirror(0x2000);
+	map(0x9000, 0x9fff).ram().w(this, FUNC(vastar_state::bg1videoram_w)).share("bg1videoram").mirror(0x2000);
+	map(0xc000, 0xc000).writeonly().share("sprite_priority");   /* sprite/BG priority */
+	map(0xc400, 0xcfff).ram().w(this, FUNC(vastar_state::fgvideoram_w)).share("fgvideoram"); // fg videoram + sprites
+	map(0xe000, 0xe000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
+	map(0xf000, 0xf7ff).ram().share("sharedram");
+}
 
-ADDRESS_MAP_START(vastar_state::main_port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void vastar_state::main_port_map(address_map &map)
+{
+	map.global_mask(0x0f);
+	map(0x00, 0x07).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
 
-ADDRESS_MAP_START(vastar_state::cpu2_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P2")
-	AM_RANGE(0x8040, 0x8040) AM_READ_PORT("P1")
-	AM_RANGE(0x8080, 0x8080) AM_READ_PORT("SYSTEM")
-ADDRESS_MAP_END
+void vastar_state::cpu2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x47ff).ram().share("sharedram");
+	map(0x8000, 0x8000).portr("P2");
+	map(0x8040, 0x8040).portr("P1");
+	map(0x8080, 0x8080).portr("SYSTEM");
+}
 
-ADDRESS_MAP_START(vastar_state::cpu2_port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_device, data_r)
-ADDRESS_MAP_END
+void vastar_state::cpu2_port_map(address_map &map)
+{
+	map.global_mask(0x0f);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
+}
 
 
 static INPUT_PORTS_START( vastar )

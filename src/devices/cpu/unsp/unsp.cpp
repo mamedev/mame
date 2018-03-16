@@ -14,7 +14,7 @@
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(UNSP, unsp_device, "unsp", "u'nSP")
+DEFINE_DEVICE_TYPE(UNSP, unsp_device, "unsp", "SunPlus u'nSP")
 
 
 unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

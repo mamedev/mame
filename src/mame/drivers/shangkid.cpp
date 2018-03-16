@@ -276,93 +276,102 @@ GFXDECODE_END
 
 /***************************************************************************************/
 
-ADDRESS_MAP_START(shangkid_state::chinhero_main_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(nmiq_1_w)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(nmiq_2_w)
-	AM_RANGE(0xb000, 0xb007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
-	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
-	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_SHARE("videoreg")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void shangkid_state::chinhero_main_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xa000, 0xa000).w(this, FUNC(shangkid_state::nmiq_1_w));
+	map(0xa800, 0xa800).w(this, FUNC(shangkid_state::nmiq_2_w));
+	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xb800, 0xb800).portr("DSW");
+	map(0xb801, 0xb801).portr("SYSTEM");
+	map(0xb802, 0xb802).portr("P2");
+	map(0xb803, 0xb803).portr("P1");
+	map(0xc000, 0xc002).writeonly().share("videoreg");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(shangkid_state::videoram_w)).share("videoram");
+	map(0xe000, 0xfdff).ram().share("share2");
+	map(0xfe00, 0xffff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(shangkid_state::shangkid_main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(nmiq_1_w)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(nmiq_2_w)
-	AM_RANGE(0xb000, 0xb007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
-	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
-	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_SHARE("videoreg")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
-
-/***************************************************************************************/
-
-ADDRESS_MAP_START(shangkid_state::chinhero_bbx_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(nmiq_1_w)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(nmiq_2_w)
-	AM_RANGE(0xb000, 0xb007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
-	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
-	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(shangkid_state::shangkid_bbx_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(nmiq_1_w)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(nmiq_2_w)
-	AM_RANGE(0xb000, 0xb007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
-	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
-	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(shangkid_state::chinhero_bbx_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(shangkid_state::shangkid_bbx_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void shangkid_state::shangkid_main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xa000).w(this, FUNC(shangkid_state::nmiq_1_w));
+	map(0xa800, 0xa800).w(this, FUNC(shangkid_state::nmiq_2_w));
+	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xb800, 0xb800).portr("DSW");
+	map(0xb801, 0xb801).portr("SYSTEM");
+	map(0xb802, 0xb802).portr("P2");
+	map(0xb803, 0xb803).portr("P1");
+	map(0xc000, 0xc002).writeonly().share("videoreg");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(shangkid_state::videoram_w)).share("videoram");
+	map(0xe000, 0xfdff).ram().share("share2");
+	map(0xfe00, 0xffff).ram().share("spriteram");
+}
 
 /***************************************************************************************/
 
-ADDRESS_MAP_START(shangkid_state::chinhero_sound_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_MIRROR(0x0800)
-ADDRESS_MAP_END
+void shangkid_state::chinhero_bbx_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xa000, 0xa000).w(this, FUNC(shangkid_state::nmiq_1_w));
+	map(0xa800, 0xa800).w(this, FUNC(shangkid_state::nmiq_2_w));
+	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xb800, 0xb800).portr("DSW");
+	map(0xb801, 0xb801).portr("SYSTEM");
+	map(0xb802, 0xb802).portr("P2");
+	map(0xb803, 0xb803).portr("P1");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(shangkid_state::videoram_w)).share("videoram");
+	map(0xe000, 0xfdff).ram().share("share2");
+	map(0xfe00, 0xffff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(shangkid_state::shangkid_sound_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK("bank2") /* sample player writes to ROM area */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_MIRROR(0x0800)
-ADDRESS_MAP_END
+void shangkid_state::shangkid_bbx_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xa000, 0xa000).w(this, FUNC(shangkid_state::nmiq_1_w));
+	map(0xa800, 0xa800).w(this, FUNC(shangkid_state::nmiq_2_w));
+	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xb800, 0xb800).portr("DSW");
+	map(0xb801, 0xb801).portr("SYSTEM");
+	map(0xb802, 0xb802).portr("P2");
+	map(0xb803, 0xb803).portr("P1");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(shangkid_state::videoram_w)).share("videoram");
+	map(0xe000, 0xfdff).ram().share("share2");
+	map(0xfe00, 0xffff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(shangkid_state::sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r) AM_DEVWRITE("dac", dac_byte_interface, write)
-ADDRESS_MAP_END
+void shangkid_state::chinhero_bbx_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(m_aysnd, FUNC(ay8910_device::address_data_w));
+}
+
+void shangkid_state::shangkid_bbx_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(m_aysnd, FUNC(ay8910_device::address_data_w));
+}
+
+/***************************************************************************************/
+
+void shangkid_state::chinhero_sound_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe7ff).ram().mirror(0x0800);
+}
+
+void shangkid_state::shangkid_sound_map(address_map &map)
+{
+	map(0x0000, 0xdfff).bankr("bank2"); /* sample player writes to ROM area */
+	map(0xe000, 0xe7ff).ram().mirror(0x0800);
+}
+
+void shangkid_state::sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(shangkid_state::soundlatch_r)).w("dac", FUNC(dac_byte_interface::write));
+}
 
 /***************************************************************************************/
 
@@ -453,25 +462,27 @@ MACHINE_CONFIG_END
 
 
 
-ADDRESS_MAP_START(shangkid_state::dynamski_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("videoram") /* tilemap */
-	AM_RANGE(0xc800, 0xcbff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM
-	AM_RANGE(0xd800, 0xdbff) AM_RAM
-	AM_RANGE(0xe000, 0xe007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("P1")
-	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("P2")
-	AM_RANGE(0xe803, 0xe803) AM_READ_PORT("DSW")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM /* work ram */
-ADDRESS_MAP_END
+void shangkid_state::dynamski_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram().share("videoram"); /* tilemap */
+	map(0xc800, 0xcbff).ram();
+	map(0xd000, 0xd3ff).ram();
+	map(0xd800, 0xdbff).ram();
+	map(0xe000, 0xe007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xe800, 0xe800).portr("SYSTEM");
+	map(0xe801, 0xe801).portr("P1");
+	map(0xe802, 0xe802).portr("P2");
+	map(0xe803, 0xe803).portr("DSW");
+	map(0xf000, 0xf7ff).ram(); /* work ram */
+}
 
-ADDRESS_MAP_START(shangkid_state::dynamski_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void shangkid_state::dynamski_portmap(address_map &map)
+{
+	map.global_mask(0xff);
 	/* ports are reversed */
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+	map(0x00, 0x01).w(m_aysnd, FUNC(ay8910_device::data_address_w));
+}
 
 MACHINE_CONFIG_START(shangkid_state::dynamski)
 

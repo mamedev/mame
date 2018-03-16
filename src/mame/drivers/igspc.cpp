@@ -65,12 +65,14 @@ public:
 	DECLARE_DRIVER_INIT(speeddrv);
 };
 
-ADDRESS_MAP_START(speeddrv_state::speeddrv_map)
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
-ADDRESS_MAP_END
+void speeddrv_state::speeddrv_map(address_map &map)
+{
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(speeddrv_state::speeddrv_io)
-ADDRESS_MAP_END
+void speeddrv_state::speeddrv_io(address_map &map)
+{
+}
 
 
 static INPUT_PORTS_START( speeddrv )

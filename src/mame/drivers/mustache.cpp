@@ -45,30 +45,32 @@ YM2151:
 #define YM_CLOCK    (XTAL1/4)
 
 
-ADDRESS_MAP_START(mustache_state::memmap)
-	AM_RANGE(0x0000, 0x7fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
-	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
-	AM_RANGE(0xd002, 0xd002) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
-	AM_RANGE(0xd003, 0xd003) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_release_w)
-	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("t5182", t5182_device, sharedram_r, sharedram_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("P1")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("P2")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("START")
-	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("DSWA")
-	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("DSWB")
-	AM_RANGE(0xd806, 0xd806) AM_WRITE(scroll_w)
-	AM_RANGE(0xd807, 0xd807) AM_WRITE(video_control_w)
-	AM_RANGE(0xe800, 0xefff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mustache_state::memmap(address_map &map)
+{
+	map(0x0000, 0x7fff).r("sei80bu", FUNC(sei80bu_device::data_r));
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram().w(this, FUNC(mustache_state::videoram_w)).share("videoram");
+	map(0xd000, 0xd000).w("t5182", FUNC(t5182_device::sound_irq_w));
+	map(0xd001, 0xd001).r("t5182", FUNC(t5182_device::sharedram_semaphore_snd_r));
+	map(0xd002, 0xd002).w("t5182", FUNC(t5182_device::sharedram_semaphore_main_acquire_w));
+	map(0xd003, 0xd003).w("t5182", FUNC(t5182_device::sharedram_semaphore_main_release_w));
+	map(0xd400, 0xd4ff).rw("t5182", FUNC(t5182_device::sharedram_r), FUNC(t5182_device::sharedram_w));
+	map(0xd800, 0xd800).portr("P1");
+	map(0xd801, 0xd801).portr("P2");
+	map(0xd802, 0xd802).portr("START");
+	map(0xd803, 0xd803).portr("DSWA");
+	map(0xd804, 0xd804).portr("DSWB");
+	map(0xd806, 0xd806).w(this, FUNC(mustache_state::scroll_w));
+	map(0xd807, 0xd807).w(this, FUNC(mustache_state::video_control_w));
+	map(0xe800, 0xefff).writeonly().share("spriteram");
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(mustache_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
-	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
-ADDRESS_MAP_END
+void mustache_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).r("sei80bu", FUNC(sei80bu_device::opcode_r));
+	map(0x8000, 0xbfff).rom().region("maincpu", 0x8000);
+}
 
 /******************************************************************************/
 
