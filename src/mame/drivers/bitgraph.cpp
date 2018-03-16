@@ -292,8 +292,9 @@ WRITE8_MEMBER(bitgraph_state::pia_pb_w)
 		DBG_LOG(2, "EAROM", ("data <- %02X\n", m_pia_a));
 		m_earom->set_data(m_pia_a);
 	}
-	// CS1, ~CS2, C1, C2, CK
-	m_earom->set_control(BIT(m_pia_b, 3), BIT(m_pia_b, 3), BIT(m_pia_a, 6), BIT(m_pia_a, 7), BIT(m_pia_b, 2));
+	// CS1, ~CS2, C1, C2
+	m_earom->set_control(BIT(m_pia_b, 3), BIT(m_pia_b, 3), BIT(m_pia_a, 6), BIT(m_pia_a, 7));
+	m_earom->set_clk(BIT(m_pia_b, 2));
 
 	if (!BIT(m_pia_b, 6))
 	{
@@ -549,7 +550,7 @@ MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 	MCFG_PIA_READPB_HANDLER(READ8(bitgraph_state, pia_pb_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(bitgraph_state, pia_pb_w))
 
-	MCFG_ER2055_ADD(EAROM_TAG)
+	MCFG_DEVICE_ADD(EAROM_TAG, ER2055, 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(PSG_TAG, AY8912, XTAL(1'294'400))

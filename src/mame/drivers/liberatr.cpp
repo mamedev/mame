@@ -157,7 +157,8 @@ void liberatr_state::machine_start()
 void liberatr_state::machine_reset()
 {
 	// reset the control latch on the EAROM
-	m_earom->set_control(0, 1, 1, 0, 0);
+	m_earom->set_control(0, 1, 1, 0);
+	m_earom->set_clk(0);
 }
 
 
@@ -272,7 +273,8 @@ WRITE8_MEMBER( liberatr_state::earom_control_w )
 		m_earom->set_data(m_earom_data);
 
 	// set the control lines; /CS2 is always held low
-	m_earom->set_control(data & 8, 1, ~data & 4, data & 2, data & 1);
+	m_earom->set_control(data & 8, 1, ~data & 4, data & 2);
+	m_earom->set_clk(data & 1);
 }
 
 
@@ -292,14 +294,14 @@ void liberatr_state::liberatr_map(address_map &map)
 	map(0x4000, 0x403f).r(this, FUNC(liberatr_state::earom_r));
 	map(0x5000, 0x5000).r(this, FUNC(liberatr_state::port0_r));
 	map(0x5001, 0x5001).portr("IN1");
-	map(0x6000, 0x600f).writeonly().share("base_ram");
-	map(0x6200, 0x621f).writeonly().share("colorram");
+	map(0x6000, 0x600f).nopr().writeonly().share("base_ram");
+	map(0x6200, 0x621f).nopr().writeonly().share("colorram");
 	map(0x6400, 0x6400).nopw();
 	map(0x6600, 0x6600).w(this, FUNC(liberatr_state::earom_control_w));
 	map(0x6800, 0x6800).writeonly().share("planet_frame");
 	map(0x6a00, 0x6a00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x6c00, 0x6c07).w(this, FUNC(liberatr_state::output_latch_w));
-	map(0x6e00, 0x6e3f).w(this, FUNC(liberatr_state::earom_w));
+	map(0x6e00, 0x6e3f).nopr().w(this, FUNC(liberatr_state::earom_w));
 	map(0x7000, 0x701f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x7800, 0x781f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x8000, 0xefff).rom();
@@ -322,15 +324,15 @@ void liberatr_state::liberat2_map(address_map &map)
 	map(0x0002, 0x0002).rw(this, FUNC(liberatr_state::bitmap_xy_r), FUNC(liberatr_state::bitmap_xy_w));
 	map(0x4000, 0x4000).r(this, FUNC(liberatr_state::port0_r));
 	map(0x4001, 0x4001).portr("IN1");
-	map(0x4000, 0x400f).writeonly().share("base_ram");
-	map(0x4200, 0x421f).writeonly().share("colorram");
+	map(0x4000, 0x400f).nopr().writeonly().share("base_ram");
+	map(0x4200, 0x421f).nopr().writeonly().share("colorram");
 	map(0x4400, 0x4400).nopw();
 	map(0x4600, 0x4600).w(this, FUNC(liberatr_state::earom_control_w));
 	map(0x4800, 0x483f).r(this, FUNC(liberatr_state::earom_r));
 	map(0x4800, 0x4800).writeonly().share("planet_frame");
 	map(0x4a00, 0x4a00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x4c00, 0x4c07).w(this, FUNC(liberatr_state::output_latch_w));
-	map(0x4e00, 0x4e3f).w(this, FUNC(liberatr_state::earom_w));
+	map(0x4e00, 0x4e3f).nopr().w(this, FUNC(liberatr_state::earom_w));
 	map(0x5000, 0x501f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x5800, 0x581f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	//AM_RANGE(0x6000, 0x601f) AM_WRITE(pokey1_w) /* bug ??? */
@@ -436,7 +438,7 @@ MACHINE_CONFIG_START(liberatr_state::liberatr)
 	MCFG_CPU_PROGRAM_MAP(liberatr_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(driver_device,irq0_line_hold,4*60)
 
-	MCFG_ER2055_ADD("earom")
+	MCFG_DEVICE_ADD("earom", ER2055, 0)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(liberatr_state, start_led_1_w))
