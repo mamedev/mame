@@ -263,6 +263,7 @@ namespace uml
 
 		// operators
 		operator u32 &() { return m_label; }
+		constexpr operator u32 () const { return m_label; }
 		constexpr bool operator==(code_label const &rhs) const { return (m_label == rhs.m_label); }
 		constexpr bool operator!=(code_label const &rhs) const { return (m_label != rhs.m_label); }
 
@@ -308,7 +309,7 @@ namespace uml
 		parameter(operand_size size, memory_scale scale) : m_type(PTYPE_SIZE_SCALE), m_value((scale << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_DQWORD); assert(scale >= SCALE_x1 && scale <= SCALE_x8); }
 		parameter(operand_size size, memory_space space) : m_type(PTYPE_SIZE_SPACE), m_value((space << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_DQWORD); assert(space >= SPACE_PROGRAM && space <= SPACE_IO); }
 		parameter(code_handle &handle) : m_type(PTYPE_CODE_HANDLE), m_value(reinterpret_cast<parameter_value>(&handle)) { }
-		constexpr parameter(code_label &label) : m_type(PTYPE_CODE_LABEL), m_value(label) { }
+		constexpr parameter(code_label const &label) : m_type(PTYPE_CODE_LABEL), m_value(label) { }
 
 		// creators for types that don't safely default
 		static parameter make_ireg(int regnum) { assert(regnum >= REG_I0 && regnum < REG_I_END); return parameter(PTYPE_INT_REGISTER, regnum); }
@@ -364,7 +365,7 @@ namespace uml
 
 	private:
 		// private constructor
-		parameter(parameter_type type, parameter_value value) : m_type(type), m_value(value) { }
+		constexpr parameter(parameter_type type, parameter_value value) : m_type(type), m_value(value) { }
 
 		// internals
 		parameter_type      m_type;             // parameter type
