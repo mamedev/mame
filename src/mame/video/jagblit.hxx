@@ -482,7 +482,7 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 				else
 					writedata = dstdata;
 
-			if ((command & 0x10000000) || !inhibit)
+			if ((adest_phrase_mode || command & 0x10000000) || !inhibit)
 			{
 				/* write to the destination */
 				WRITE_PIXEL(adestflags, writedata);
