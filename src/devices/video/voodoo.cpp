@@ -1085,7 +1085,7 @@ void voodoo_device::recompute_video_memory()
 						(FBIINIT6_X_VIDEO_TILES_BIT0(reg[fbiInit6].u));
 	}
 	fbi.rowpixels = fbi.tile_width * fbi.x_tiles;
-	if (USE_GPU) {
+	if (USE_GPU && fbi.rowpixels > 0) {
 		m_gpu.FlushBuffer();
 		m_gpu.InitRenderBuffers(fbi.rowpixels, fbi.height, fbi.width);
 	}

@@ -275,6 +275,8 @@ private:
 	ID3D11RenderTargetView* m_compTargetView;
 	ID3D11ShaderResourceView* m_compResourceView;
 
+	ID3D11Texture2D* m_stageTexture;
+
 	ID3D11Texture2D* m_dither4x4Texture;
 	ID3D11ShaderResourceView* m_dither4x4ResourceView;
 	ID3D11Texture2D* m_dither2x2Texture;

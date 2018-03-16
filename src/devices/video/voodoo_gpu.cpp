@@ -53,6 +53,8 @@ voodoo_gpu::voodoo_gpu()
 	m_compTargetView = NULL;
 	m_compResourceView = NULL;
 
+	m_stageTexture = NULL;
+
 	m_depthBuffer = NULL;
 	m_depthState = NULL;
 	m_depthAlwaysState = NULL;
@@ -131,6 +133,7 @@ voodoo_gpu::~voodoo_gpu()
 	SAFE_RELEASE(m_compResourceView);
 	SAFE_RELEASE(m_compTargetView);
 	SAFE_RELEASE(m_compTexture);
+	SAFE_RELEASE(m_stageTexture);
 	SAFE_RELEASE(m_depthBuffer);
 	SAFE_RELEASE(m_depthState);
 	SAFE_RELEASE(m_depthAlwaysState);
@@ -392,6 +395,17 @@ bool voodoo_gpu::InitRenderBuffers(int sizeX, int sizeY, int fbiWidth)
 
 	SAFE_RELEASE(m_compTexture);
 	if (FAILED(m_gpu->CreateTexture2D(&textureDesc, NULL, &m_compTexture)))
+		return false;
+
+	// Create staging buffer
+	D3D11_TEXTURE2D_DESC stageDesc = textureDesc;
+	stageDesc.BindFlags = 0;
+
+	stageDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+	stageDesc.Usage = D3D11_USAGE_STAGING;
+
+	SAFE_RELEASE(m_stageTexture);
+	if (FAILED(m_gpu->CreateTexture2D(&stageDesc, NULL, &m_stageTexture)))
 		return false;
 
 	// Create the comp render target view.
@@ -1153,7 +1167,15 @@ void voodoo_gpu::DrawFastFill(ShaderPoint *triangleVertices)
 	UpdateConstants();
 
 	// Copy vertex buffer over
-	m_context->UpdateSubresource(m_pixelBuffer, 0, nullptr, triangleVertices, 0, 0);
+	D3D11_BOX pointBox;
+	pointBox.left = 0;
+	// Fast fill is always 2 vertices
+	pointBox.right = 2 * sizeof(ShaderPoint);
+	pointBox.top = 0;
+	pointBox.bottom = 1;
+	pointBox.front = 0;
+	pointBox.back = 1;
+	m_context->UpdateSubresource(m_pixelBuffer, 0, &pointBox, triangleVertices, 0, 0);
 
 	//////// Pass 0 /////////
 	// Setup to draw to render buffer
@@ -1485,9 +1507,9 @@ void voodoo_gpu::FastFill(int sx, int ex, int sy, int ey, uint16_t *dst, int dra
 		inVec.push_back({ ex, sy, 0, depth, r, g, b, a });
 		inVec.push_back({ sx, ey, 0, depth, r, g, b, a });
 		
-		DrawFastFill(inVec.data());
+		//DrawFastFill(inVec.data());
 
-		inVec.clear();
+		//inVec.clear();
 		inVec.push_back({ ex, sy, 0, depth, r, g, b, a });
 		inVec.push_back({ ex, ey, 0, depth, r, g, b, a });
 		inVec.push_back({ sx, ey, 0, depth, r, g, b, a });
@@ -1583,27 +1605,18 @@ void voodoo_gpu::CopyBuffer(uint16_t *dst)
 	m_need_copy = false;
 	//printf("CopyBuffer dst: %p\n", dst);
 
-	ID3D11Texture2D* pNewTexture = NULL;
 	D3D11_TEXTURE2D_DESC desc;
-	m_compTexture->GetDesc(&desc);
+	m_stageTexture->GetDesc(&desc);
 
-	desc.BindFlags = 0;
-
-	desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
-	desc.Usage = D3D11_USAGE_STAGING;
-
-	m_gpu->CreateTexture2D(&desc, NULL, &pNewTexture);
-
-	m_context->CopyResource(pNewTexture, m_compTexture);
+	m_context->CopyResource(m_stageTexture, m_compTexture);
 
 	D3D11_MAPPED_SUBRESOURCE resource;
 	UINT subresource = D3D11CalcSubresource(0, 0, 0);
-	m_context->Map(pNewTexture, subresource, D3D11_MAP_READ_WRITE, 0, &resource);
+	m_context->Map(m_stageTexture, subresource, D3D11_MAP_READ, 0, &resource);
 
 	// COPY from texture to bitmap buffer
-	uint32_t *tmpBuf = new uint32_t[desc.Width];
+	uint32_t *dptr = new uint32_t[desc.Width];
 
-	uint32_t* dptr = tmpBuf;
 	uint32_t* sptr = reinterpret_cast<uint32_t*>(resource.pData);
 
 	//printf("CopyBuffer: Height: %d Width: %d fbiWidth: %d\n", desc.Height, desc.Width, m_fbiWidth);
@@ -1613,7 +1626,7 @@ void voodoo_gpu::CopyBuffer(uint16_t *dst)
 		//size_t msize = resource.RowPitch;
 		//size_t msize = desc.Width * 4;
 		//memcpy_s(dptr, desc.Width * 4, sptr, msize);
-		memcpy(dptr, sptr, desc.Width*4);
+		memcpy(dptr, sptr, m_fbiWidth * 4);
 		sptr += desc.Width;
 		//dptr += desc.Width * 4;
 		//for (size_t elem = 0; elem < desc.Width; elem++)
@@ -1634,9 +1647,8 @@ void voodoo_gpu::CopyBuffer(uint16_t *dst)
 		//dst += rowPixels;
 	}
 
-	m_context->Unmap(pNewTexture, 0);
-	delete[] tmpBuf;
-	SAFE_RELEASE(pNewTexture);
+	m_context->Unmap(m_stageTexture, 0);
+	delete[] dptr;
 }
 
 void voodoo_gpu::CopyBufferRGB(uint8_t *dst)
