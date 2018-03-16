@@ -358,6 +358,24 @@ void qsound_device::set_dsp_ready(void *ptr, s32 param)
 
 void qsound_device::set_cmd(void *ptr, s32 param)
 {
+	/*
+	 *  I don't believe the data word is actually double-buffered in
+	 *  real life.  In practice it works because the DSP's instruction
+	 *  throughput is so much higher than the Z80's that it can always
+	 *  read the data word before the Z80 can realise it's read the
+	 *  address.
+	 *
+	 *  In MAME, there's a scheduler synchronisation barrier when the
+	 *  DSP reads the address but before it reads the data.  When this
+	 *  happens, MAME may give the Z80 enough time to see that the DSP
+	 *  has read the address and write more data before scheduling the
+	 *  DSP again.  The DSP then reads the new data and stores it at
+	 *  the old command address.
+	 *
+	 *  You can see this happening in megaman2 test mode by playing
+	 *  command 0x11 (Gyro Man's theme).  Within two minutes, some
+	 *  channels' sample banks/offsets will likely be overwritten.
+	 */
 	LOGCOMMAND("QSound: DSP command @%02X = %04X\n", u32(param) >> 16, u16(u32(param)));
 	m_cmd_addr = u16(u32(param) >> 16);
 	m_cmd_data = u16(u32(param));
