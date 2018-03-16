@@ -837,16 +837,19 @@ inline void dsp16_device_base::execute_one_rom()
 			break;
 
 		case 0x12: // ifc CON F2
-			++m_dau_c[1];
-			if (op_dau_con(op))
 			{
-				op_dau_ad(op) = dau_f2(op);
-				m_dau_c[2] = m_dau_c[1];
+				bool const con(op_dau_con(op, false));
+				++m_dau_c[1];
+				if (con)
+				{
+					op_dau_ad(op) = dau_f2(op);
+					m_dau_c[2] = m_dau_c[1];
+				}
 			}
 			break;
 
 		case 0x13: // if CON F2
-			if (op_dau_con(op))
+			if (op_dau_con(op, true))
 				op_dau_ad(op) = dau_f2(op);
 			break;
 
@@ -928,7 +931,7 @@ inline void dsp16_device_base::execute_one_rom()
 
 		case 0x1a: // if CON # icall
 			assert(!(op & 0x03e0U)); // reserved field?
-			predicate = op_dau_con(op) ? FLAGS_PRED_TRUE : FLAGS_PRED_FALSE;
+			predicate = op_dau_con(op, true) ? FLAGS_PRED_TRUE : FLAGS_PRED_FALSE;
 			if (BIT(op, 10))
 			{
 				fetch_target = nullptr;
@@ -1164,16 +1167,19 @@ inline void dsp16_device_base::execute_one_cache()
 			break;
 
 		case 0x12: // ifc CON F2
-			++m_dau_c[1];
-			if (op_dau_con(op))
 			{
-				op_dau_ad(op) = dau_f2(op);
-				m_dau_c[2] = m_dau_c[1];
+				bool const con(op_dau_con(op, false));
+				++m_dau_c[1];
+				if (con)
+				{
+					op_dau_ad(op) = dau_f2(op);
+					m_dau_c[2] = m_dau_c[1];
+				}
 			}
 			break;
 
 		case 0x13: // if CON F2
-			if (op_dau_con(op))
+			if (op_dau_con(op, true))
 				op_dau_ad(op) = dau_f2(op);
 			break;
 
@@ -1491,25 +1497,25 @@ inline u64 dsp16_device_base::dau_f2(u16 op)
 		d = s >> 1;
 		break;
 	case 0x1: // aD = aS << 1
-		d = s << 1;
+		d = s32(u32(u64(s)) << 1);
 		break;
 	case 0x2: // aD = aS >> 4
 		d = s >> 4;
 		break;
 	case 0x3: // aD = aS << 4
-		d = s << 4;
+		d = s32(u32(u64(s)) << 4);
 		break;
 	case 0x4: // aD = aS >> 8
 		d = s >> 8;
 		break;
 	case 0x5: // aD = aS << 8
-		d = d << 8;
+		d = s32(u32(u64(s)) << 8);
 		break;
 	case 0x6: // aD = aS >> 16
 		d = s >> 16;
 		break;
 	case 0x7: // aD = aS << 16
-		d = s << 16;
+		d = s32(u32(u64(s)) << 16);
 		break;
 	case 0x8: // aD = p
 		d = get_dau_p_aligned();
@@ -1572,8 +1578,8 @@ inline bool dsp16_device_base::op_interruptible(u16 op)
 	case 0x15: // F1 ; Z : y[l]
 	case 0x16: // F1 ; x = Y
 	case 0x17: // F1 ; y[l] = Y
-	case 0x19: // y = a0 ; x = *pt++[i]
-	case 0x1b: // y = a1 ; x = *pt++[i]
+	case 0x19: // F1 ; y = a0 ; x = *pt++[i]
+	case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
 	case 0x1c: // F1 ; Y = a0[l]
 	case 0x1d: // F1 ; Z : y ; x = *pt++[i]
 	case 0x1f: // F1 ; y = Y ; x = *pt++[i]
@@ -1600,7 +1606,7 @@ inline bool dsp16_device_base::check_predicate()
 
 inline u16 &dsp16_device_base::set_xaau_pc_offset(u16 offset)
 {
-	m_xaau_pc = (m_xaau_pc & 0xf000U) | (offset & 0x0fffU);
+	m_xaau_pc = (m_xaau_pc & XAAU_I_EXT) | (offset & XAAU_I_MASK);
 	if (m_iack_out)
 		m_xaau_pi = m_xaau_pc;
 	return m_xaau_pc;
@@ -1848,7 +1854,7 @@ inline u64 dsp16_device_base::get_dau_p_aligned() const
 	}
 }
 
-inline bool dsp16_device_base::op_dau_con(u16 op)
+inline bool dsp16_device_base::op_dau_con(u16 op, bool inc)
 {
 	bool result;
 	u16 const con(op_con(op));
@@ -1870,7 +1876,12 @@ inline bool dsp16_device_base::op_dau_con(u16 op)
 		throw emu_fatalerror("DSP16: unimplemented CON value %02X (PC = %04X)\n", con, m_st_pcbase);
 	case 0x5: // c0ge/c0lt
 	case 0x6: // c1ge/c1lt
-		result = m_dau_c[(con >> 1) - 0x5]++ >= 0;
+		{
+			s8 &c(m_dau_c[(con >> 1) - 0x05]);
+			result = c >= 0;
+			if (inc)
+				++c;
+		}
 		break;
 	case 0x7: // true/false
 		result = true;
