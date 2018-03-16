@@ -1043,8 +1043,8 @@ inline void dsp16_device_base::execute_one_rom()
 						m_st_pcbase);
 				set_iack(FLAGS_IACK_SET);
 				m_xaau_pc = 0x0002U;
-				m_phase = phase::PURGE;
 			}
+			m_phase = phase::PURGE;
 			break;
 
 		case 0x1d: // F1 ; Z : y ; x = *pt++[i]

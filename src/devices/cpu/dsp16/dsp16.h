@@ -206,6 +206,9 @@ private:
 	friend sio_flags &operator&=(sio_flags &, sio_flags);
 	friend sio_flags &operator|=(sio_flags &, sio_flags);
 
+	// recompiler helpers
+	class frontend;
+
 	// internal address maps
 	void program_map(address_map &map);
 
