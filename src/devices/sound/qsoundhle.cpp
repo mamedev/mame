@@ -106,7 +106,7 @@ void qsound_hle_device::rom_bank_updated()
 
 void qsound_hle_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, clock() / clock() / 2 / 1248); // DSP program uses 1248 machine cycles per iteration
+	m_stream = stream_alloc(0, 2, clock() / 2 / 1248); // DSP program uses 1248 machine cycles per iteration
 
 	// create pan table
 	for (int i = 0; i < 33; i++)
