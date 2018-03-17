@@ -58,8 +58,11 @@ uint32_t overdriv_state::screen_update_overdriv(screen_device &screen, bitmap_in
 
 	screen.priority().fill(0, cliprect);
 
-	m_k051316_1->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_k051316_2->zoom_draw(screen, bitmap, cliprect, 0, 1);
+	// TODO : Correct?
+	m_k051316[0]->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_k053250[0]->draw(bitmap, cliprect, m_road_colorbase[0], 0, screen.priority(), 0 );
+	m_k053250[1]->draw(bitmap, cliprect, m_road_colorbase[1], 0, screen.priority(), 0 );
+	m_k051316[1]->zoom_draw(screen, bitmap, cliprect, 0, 1);
 
 	m_k053246->k053247_sprites_draw( bitmap,cliprect);
 	return 0;
