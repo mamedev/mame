@@ -726,7 +726,7 @@ MACHINE_CONFIG_START(rbisland_state::rbisland_emu)
 	MCFG_CPU_PROGRAM_MAP(rbisland_emu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  interrupt)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)/2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)) /* 12MHz OSC next to C-Chip */
 	MCFG_CCHIP_IN_PORTA_CB(IOPORT("800007"))
 	MCFG_CCHIP_IN_PORTB_CB(IOPORT("800009"))
 	MCFG_CCHIP_IN_PORTC_CB(IOPORT("80000B"))

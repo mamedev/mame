@@ -249,7 +249,7 @@ MACHINE_CONFIG_START(volfied_state::volfied)
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)   /* 4MHz sound CPU, required to run the game */
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(20'000'000)/2) /* 20MHz OSC next to C-Chip, 10MHz?? */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(20'000'000)/2) /* 20MHz OSC next to C-Chip */
 	MCFG_CCHIP_IN_PORTA_CB(IOPORT("F00007"))
 	MCFG_CCHIP_IN_PORTB_CB(IOPORT("F00009"))
 	MCFG_CCHIP_IN_PORTC_CB(IOPORT("F0000B"))
