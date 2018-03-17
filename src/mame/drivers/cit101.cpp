@@ -176,13 +176,21 @@ MACHINE_CONFIG_END
 
 ROM_START( cit101 )
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD( "ic1_=3g04=_v10a.bin", 0x0000, 0x1000, CRC(5601fcac) SHA1(cad0d0335d133dd43993bc718ff72d12b8445cd1) )
-	ROM_LOAD( "ic2_=3h04=_v10a.bin", 0x1000, 0x1000, CRC(23d263e0) SHA1(586e8185f9804987e0a4081724c060e74769d41d) )
-	ROM_LOAD( "ic3_=3i04=_v10a.bin", 0x2000, 0x1000, CRC(15994b1d) SHA1(6d125db4ef5e1dd4d5a4d2f4d6f6bdf574e5bad8) )
-	ROM_LOAD( "ic4_=3j04=_v10a.bin", 0x3000, 0x1000, CRC(274b9df0) SHA1(d0006258cbd56f6f6bb53906fb618ebe379f6563) )
+	ROM_LOAD( "ic1_=3g04=_v10a.bin", 0x0000, 0x1000, CRC(5601fcac) SHA1(cad0d0335d133dd43993bc718ff72d12b8445cd1) ) // TMM2732D-45
+	ROM_LOAD( "ic2_=3h04=_v10a.bin", 0x1000, 0x1000, CRC(23d263e0) SHA1(586e8185f9804987e0a4081724c060e74769d41d) ) // TMM2732D-45
+	ROM_LOAD( "ic3_=3i04=_v10a.bin", 0x2000, 0x1000, CRC(15994b1d) SHA1(6d125db4ef5e1dd4d5a4d2f4d6f6bdf574e5bad8) ) // TMM2732D-45
+	ROM_LOAD( "ic4_=3j04=_v10a.bin", 0x3000, 0x0800, CRC(d786995f) SHA1(943b521dcc7abc0662d6e136169b7db480ae1e5c) ) // MB8516
+	ROM_RELOAD(0x3800, 0x0800)
 
 	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "1h =5h 1 02= char rom.bin", 0x0000, 0x1000, CRC(ee0ff889) SHA1(a74ada19d19041b29e1b49aaf57ba7d9d54575e1) )
+	ROM_LOAD( "1h =5h 1 02= char rom.bin", 0x0000, 0x1000, CRC(ee0ff889) SHA1(a74ada19d19041b29e1b49aaf57ba7d9d54575e1) ) // TMM2332P
+
+	ROM_REGION(0x180, "proms", 0)
+	ROM_LOAD( "2i_=3a00=.bin", 0x000, 0x100, NO_DUMP ) // position labeled (MB)7052
+	ROM_LOAD( "2f_=6g00=.bin", 0x100, 0x020, NO_DUMP ) // position labeled TBP18S030
+	ROM_LOAD( "2e_=7i00=.bin", 0x120, 0x020, NO_DUMP ) // position labeled TBP18S030
+	ROM_LOAD( "5d_=4l00=.bin", 0x140, 0x020, NO_DUMP ) // position labeled TBP18S030
+	ROM_LOAD( "5g_=7f00=.bin", 0x160, 0x020, NO_DUMP ) // position labeled TBP18S030
 ROM_END
 
 COMP( 1980, cit101, 0, 0, cit101, cit101, cit101_state, 0, "C. Itoh Electronics", "CIT-101", MACHINE_IS_SKELETON )
