@@ -42,12 +42,12 @@ void ultraman_state::main_map(address_map &map)
 	map(0x1c0021, 0x1c0021).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1c0029, 0x1c0029).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
 	map(0x1c0030, 0x1c0031).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x204000, 0x204fff).rw(m_k051316_1, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); /* K051316 #0 RAM */
-	map(0x205000, 0x205fff).rw(m_k051316_2, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); /* K051316 #1 RAM */
-	map(0x206000, 0x206fff).rw(m_k051316_3, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); /* K051316 #2 RAM */
-	map(0x207f80, 0x207f9f).w(m_k051316_1, FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   /* K051316 #0 registers */
-	map(0x207fa0, 0x207fbf).w(m_k051316_2, FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   /* K051316 #1 registers */
-	map(0x207fc0, 0x207fdf).w(m_k051316_3, FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   /* K051316 #2 registers */
+	map(0x204000, 0x204fff).rw(m_k051316[0], FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); /* K051316 #0 RAM */
+	map(0x205000, 0x205fff).rw(m_k051316[1], FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); /* K051316 #1 RAM */
+	map(0x206000, 0x206fff).rw(m_k051316[2], FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff); /* K051316 #2 RAM */
+	map(0x207f80, 0x207f9f).w(m_k051316[0], FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   /* K051316 #0 registers */
+	map(0x207fa0, 0x207fbf).w(m_k051316[1], FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   /* K051316 #1 registers */
+	map(0x207fc0, 0x207fdf).w(m_k051316[2], FUNC(k051316_device::ctrl_w)).umask16(0x00ff);   /* K051316 #2 registers */
 	map(0x304000, 0x30400f).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w)).umask16(0x00ff);       /* Sprite control */
 	map(0x304800, 0x304fff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w)).umask16(0x00ff);       /* Sprite RAM */
 }
@@ -160,16 +160,14 @@ INPUT_PORTS_END
 
 void ultraman_state::machine_start()
 {
-	save_item(NAME(m_bank0));
-	save_item(NAME(m_bank1));
-	save_item(NAME(m_bank2));
+	save_item(NAME(m_bank));
 }
 
 void ultraman_state::machine_reset()
 {
-	m_bank0 = -1;
-	m_bank1 = -1;
-	m_bank2 = -1;
+	m_bank[0] = -1;
+	m_bank[1] = -1;
+	m_bank[2] = -1;
 
 	m_soundnmi->in_w<0>(0);
 }
