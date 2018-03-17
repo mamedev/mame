@@ -164,7 +164,7 @@ void iteagle_state::machine_reset()
 MACHINE_CONFIG_START(iteagle_state::iteagle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", VR4310LE, 133333333)
+	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(8192)
 	MCFG_MIPS3_SYSTEM_CLOCK(66666667)
