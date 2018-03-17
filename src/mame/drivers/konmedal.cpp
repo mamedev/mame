@@ -260,11 +260,7 @@ void konmedal_state::ddboy_main(address_map &map)
 	map(0xc80f, 0xc80f).r(this, FUNC(konmedal_state::magic_r));
 	map(0xcc00, 0xcc00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xd000, 0xd000).nopw();    // ???  writes 00 and 3f every frame
-	map(0xd800, 0xd87f).rw("k051649", FUNC(k051649_device::k051649_waveform_r), FUNC(k051649_device::k051649_waveform_w));
-	map(0xd880, 0xd889).w("k051649", FUNC(k051649_device::k051649_frequency_w));
-	map(0xd88a, 0xd88e).w("k051649", FUNC(k051649_device::k051649_volume_w));
-	map(0xd88f, 0xd88f).w("k051649", FUNC(k051649_device::k051649_keyonoff_w));
-	map(0xd8e0, 0xd8ff).rw("k051649", FUNC(k051649_device::k051649_test_r), FUNC(k051649_device::k051649_test_w));
+	map(0xd800, 0xd8ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xe000, 0xffff).rw(this, FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
 }
 
@@ -278,11 +274,7 @@ void konmedal_state::shuriboy_main(address_map &map)
 	map(0x8803, 0x8803).portr("DSW2");
 	map(0x8b00, 0x8b00).nopw();    // watchdog?
 	map(0x8c00, 0x8c00).w(this, FUNC(konmedal_state::shuri_bank_w));
-	map(0x9800, 0x987f).rw("k051649", FUNC(k051649_device::k051649_waveform_r), FUNC(k051649_device::k051649_waveform_w));
-	map(0x9880, 0x9889).w("k051649", FUNC(k051649_device::k051649_frequency_w));
-	map(0x988a, 0x988e).w("k051649", FUNC(k051649_device::k051649_volume_w));
-	map(0x988f, 0x988f).w("k051649", FUNC(k051649_device::k051649_keyonoff_w));
-	map(0x98e0, 0x98ff).rw("k051649", FUNC(k051649_device::k051649_test_r), FUNC(k051649_device::k051649_test_w));
+	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xdbff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 	map(0xdd00, 0xdd00).rw(this, FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));

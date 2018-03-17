@@ -129,11 +129,7 @@ void hexion_state::hexion_map(address_map &map)
 	map(0xc000, 0xdffe).rw(this, FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
 	map(0xdfff, 0xdfff).w(this, FUNC(hexion_state::bankctrl_w));
 	map(0xe000, 0xe000).noprw();
-	map(0xe800, 0xe87f).rw("k051649", FUNC(k051649_device::k051649_waveform_r), FUNC(k051649_device::k051649_waveform_w));
-	map(0xe880, 0xe889).w("k051649", FUNC(k051649_device::k051649_frequency_w));
-	map(0xe88a, 0xe88e).w("k051649", FUNC(k051649_device::k051649_volume_w));
-	map(0xe88f, 0xe88f).w("k051649", FUNC(k051649_device::k051649_keyonoff_w));
-	map(0xe8e0, 0xe8ff).rw("k051649", FUNC(k051649_device::k051649_test_r), FUNC(k051649_device::k051649_test_w));
+	map(0xe800, 0xe8ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xf000, 0xf00f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
 	map(0xf200, 0xf200).w("oki", FUNC(okim6295_device::write));
 	map(0xf400, 0xf400).portr("DSW1");
