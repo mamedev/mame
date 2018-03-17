@@ -9773,7 +9773,7 @@ scudhamm                        // (c) 1994 Jaleco
 wildplt                         // (c) 1992 Jaleco
 
 @source:cit101.cpp
-cit101                          // (c) 1981 C. Itoh
+cit101                          // (c) 1980 C. Itoh
 
 @source:cit220.cpp
 cit220p                         // (c) 1984 C. Itoh
@@ -32677,7 +32677,7 @@ jumpinga                        // bootleg (Seyutu)
 jumpingi                        // bootleg (Seyutu / Imnoe)
 rbisland                        // B22 (c) 1987 Taito Corporation
 rbislando                       // B22 (c) 1987 Taito Corporation
-rbislnde                        // B39 (c) 1988 Taito Corporation
+rbislande                       // B39 (c) 1988 Taito Corporation
 
 @source:rbmk.cpp
 rbmk                            // (c) 1998 GMS
