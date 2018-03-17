@@ -176,7 +176,6 @@ uint32_t divebomb_state::screen_update_divebomb(screen_device &screen, bitmap_in
 	{
 		if (m_roz_enable[chip])
 		{
-			m_k051316[chip]->wraparound_enable(m_roz_wrap[chip]);
 			m_k051316[chip]->zoom_draw(screen, bitmap, cliprect, 0, 0);
 		}
 	}

@@ -51,7 +51,6 @@ public:
 
 	uint8_t m_roz_pal;
 	bool m_roz_enable[2];
-	bool m_roz_wrap[2];
 
 	DECLARE_MACHINE_RESET(divebomb);
 	DECLARE_MACHINE_START(divebomb);

@@ -186,7 +186,7 @@ WRITE8_MEMBER(divebomb_state::spritecpu_port00_w)
 template<int Chip>
 WRITE8_MEMBER(divebomb_state::rozcpu_wrap_enable_w)
 {
-	m_roz_wrap[Chip] = !(data & 1);
+	m_k051316[Chip]->wraparound_enable(!(data & 1));
 }
 
 
@@ -554,17 +554,17 @@ MACHINE_START_MEMBER(divebomb_state, divebomb)
 	m_rozbank->configure_entries(0, 16, memregion("rozcpudata")->base(), 0x4000);
 
 	save_item(NAME(m_roz_enable));
-	save_item(NAME(m_roz_wrap));
 	save_item(NAME(m_roz_pal));
 }
 
 
 MACHINE_RESET_MEMBER(divebomb_state, divebomb)
 {
-	m_roz_enable[0] = false;
-	m_roz_enable[1] = false;
-	m_roz_wrap[0] = false;
-	m_roz_wrap[1] = false;
+	for (int chip = 0; chip < 2; chip++)
+	{
+		m_roz_enable[chip] = false;
+		m_k051316[chip]->wraparound_enable(false);
+	}
 	m_fgcpu_irq->in_w<0>(CLEAR_LINE);
 	m_fgcpu_irq->in_w<1>(CLEAR_LINE);
 }
