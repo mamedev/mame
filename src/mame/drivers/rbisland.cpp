@@ -668,7 +668,7 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	MCFG_CCHIP_IN_PORTB_CB(IOPORT("800009"))
 	MCFG_CCHIP_IN_PORTC_CB(IOPORT("80000B"))
 	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("80000D"))
-	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(rbisland_state, couters_w))
+	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(rbisland_state, counters_w))
 
 	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", rbisland_state, cchip_irq_clear_cb)
 
