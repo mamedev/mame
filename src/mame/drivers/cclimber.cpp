@@ -1638,7 +1638,7 @@ ROM_START( ckongpt2j )
 	ROM_LOAD( "8.5e",         0x1000, 0x1000, CRC(5dc1aaba) SHA1(42b9e5946ffce7c156d114bde68f37c2c34853c4) )
 	ROM_LOAD( "9.5h",         0x2000, 0x1000, CRC(c9054c94) SHA1(1aa08d2501ee620759fd5c111e12f6d432c25294) )
 	ROM_LOAD( "10.dat",       0x3000, 0x1000, CRC(c3beb501) SHA1(14f49c45fc7c91799034c5a51fca310f0a66b1d7) )
-	ROM_LOAD( "11.5l",        0x4000, 0x1000, CRC(4164eb4d) SHA1(ec95f913820375c3f6dd24776b4d3fd04163f5de) ) // sldh
+	ROM_LOAD( "11.5l",        0x4000, 0x1000, CRC(4164eb4d) SHA1(ec95f913820375c3f6dd24776b4d3fd04163f5de) )
 	ROM_LOAD( "12.5n",        0x5000, 0x1000, CRC(966bc9ab) SHA1(4434fc620169ffea1b1f227b61674e1daf79b54b) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
@@ -1667,7 +1667,7 @@ ROM_START( ckongpt2jeu )
 	ROM_LOAD( "8.5e",         0x1000, 0x1000, CRC(5dc1aaba) SHA1(42b9e5946ffce7c156d114bde68f37c2c34853c4) )
 	ROM_LOAD( "9.5h",         0x2000, 0x1000, CRC(c9054c94) SHA1(1aa08d2501ee620759fd5c111e12f6d432c25294) )
 	ROM_LOAD( "ckjeu10.dat",  0x3000, 0x1000, CRC(7e6eeec4) SHA1(98b283ea22bedc46710a24e65cfae48b87a57605) )
-	ROM_LOAD( "11.5l",        0x4000, 0x1000, CRC(ae159192) SHA1(d467256a3a366e246243e7828ff4a45d4c146e2c) )
+	ROM_LOAD( "11.5l",        0x4000, 0x1000, CRC(ae159192) SHA1(d467256a3a366e246243e7828ff4a45d4c146e2c) ) // sldh
 	ROM_LOAD( "ckjeu12.dat",  0x5000, 0x1000, CRC(0532f270) SHA1(a73680bd7939097bd821fb6834e8763cf1572b55) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
@@ -1794,7 +1794,7 @@ ROM_START( ckongalc )
 	ROM_LOAD( "ck8.bin",      0x1000, 0x1000, CRC(88b83ff7) SHA1(4afc494cc264aaa4614da6aed02ce062d9c20850) )
 	ROM_LOAD( "ck9.bin",      0x2000, 0x1000, CRC(cff2af47) SHA1(1757428cefad13855a623162101ec01c04006c94) )
 	ROM_LOAD( "ck10.bin",     0x3000, 0x1000, CRC(520fa4de) SHA1(6edbaf727756cd33bde94492d72654aa12dbd7e1) )
-	ROM_LOAD( "ck11.bin",     0x4000, 0x1000, CRC(327dcadf) SHA1(17b2d3b9e2a82b5278a01cc972cb49705d113127) )
+	ROM_LOAD( "ck11.bin",     0x4000, 0x1000, CRC(327dcadf) SHA1(17b2d3b9e2a82b5278a01cc972cb49705d113127) ) // sldh w/ckongdks
 	/* no ROM at 5000 */
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
@@ -1814,7 +1814,7 @@ ROM_START( ckongalc )
 
 	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
 	ROM_LOAD( "cc13j.bin",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
-	ROM_LOAD( "ck12.bin",     0x1000, 0x1000, CRC(2eb23b60) SHA1(c9e7dc584562aceb374193655fbacb7df6c9c731) )
+	ROM_LOAD( "ck12.bin",     0x1000, 0x1000, CRC(2eb23b60) SHA1(c9e7dc584562aceb374193655fbacb7df6c9c731) ) // sldh w/ckongdks
 ROM_END
 
 ROM_START( bigkong )
@@ -1851,7 +1851,7 @@ ROM_START( monkeyd )
 	ROM_LOAD( "ck7.bin",      0x0000, 0x1000, CRC(2171cac3) SHA1(7b18bfe44c32fb64b675bbbe2136344522c79b09) )
 	ROM_LOAD( "ck8.bin",      0x1000, 0x1000, CRC(88b83ff7) SHA1(4afc494cc264aaa4614da6aed02ce062d9c20850) )
 	ROM_LOAD( "ck9.bin",      0x2000, 0x1000, CRC(cff2af47) SHA1(1757428cefad13855a623162101ec01c04006c94) )
-	ROM_LOAD( "ck10.bin",     0x3000, 0x1000, CRC(520fa4de) SHA1(6edbaf727756cd33bde94492d72654aa12dbd7e1) )
+	ROM_LOAD( "ck10.bin",     0x3000, 0x1000, CRC(520fa4de) SHA1(6edbaf727756cd33bde94492d72654aa12dbd7e1) ) // sldh w/ckongdks
 	ROM_LOAD( "md5l.bin",     0x4000, 0x1000, CRC(d1db1bb0) SHA1(fe7d700c7f9eca9c389be3717ebebf3e7dc63aa2) )
 	/* no ROM at 5000 */
 
@@ -2054,8 +2054,8 @@ ROM_START( ckongdks )
 	ROM_LOAD( "ck13.bin",      0x0800, 0x0800, CRC(f97ba8ae) SHA1(ae4a578ad77a8d3252f2f99a1afa6f38bc00471e) ) // 97.509766%
 	ROM_CONTINUE(              0x0000, 0x0800 )
 	ROM_LOAD( "ck09.bin",      0x1000, 0x1000, CRC(fe89dea4) SHA1(c39372ebe9950808ebc1ff7909c291496b206026) )
-	ROM_LOAD( "ck11.bin",      0x2000, 0x1000, CRC(b3947d06) SHA1(1c5e66e1f11313e11de760cda406c1fe237ce09a) ) // 99.975586%
-	ROM_LOAD( "ck12.bin",      0x3000, 0x1000, CRC(23d0657d) SHA1(dfebf3902186a3ab3b36c6d07bdbc832885347b4) ) // 95.214844%
+	ROM_LOAD( "ck11.bin",      0x2000, 0x1000, CRC(b3947d06) SHA1(1c5e66e1f11313e11de760cda406c1fe237ce09a) ) // 99.975586% - sldh w/ckongalc
+	ROM_LOAD( "ck12.bin",      0x3000, 0x1000, CRC(23d0657d) SHA1(dfebf3902186a3ab3b36c6d07bdbc832885347b4) ) // 95.214844% - sldh w/ckongalc
 	ROM_LOAD( "ck10.bin",      0x4800, 0x0800, CRC(c27a13f1) SHA1(14f11976bc0e643829a4d4d2d5bb27971979be6f) ) // 94.921875%
 	ROM_CONTINUE(              0x4000, 0x0800 )
 
