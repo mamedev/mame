@@ -716,6 +716,18 @@ ROM_START(esha_pa1)
 	ROM_LOAD("eshk_u19.l1", 0x18000, 0x8000, CRC(e5593075) SHA1(549b03402e5639b449e35325eb52e78f8810b07a))
 ROM_END
 
+ROM_START(esha_pa4)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("eshk_u26.pa4", 0x4000, 0x4000, CRC(9ffe5ee8) SHA1(533e5e90f6ce1ee4ca69463158860c7fef6b8e05))
+	ROM_LOAD("eshk_u27.pa4", 0x8000, 0x8000, CRC(a1795d11) SHA1(1797aa566e7e490bca6b00891fed65ac1f115280))
+	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("eshk_u21.l1", 0x18000, 0x8000, CRC(feac68e5) SHA1(2f12a78398bc3a468e3e0656da91260d45b0663b))
+	ROM_LOAD("eshk_u22.l1", 0x10000, 0x8000, CRC(44f50fe1) SHA1(a8e24dbb0f5cf300118e1ebdcd2bb6b274d87936))
+	ROM_REGION(0x30000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("u4-p1.rom", 0x10000, 0x8000, CRC(7219ffc2) SHA1(b8585b7d12f401d8ba4d95a5e2f20d35ff0ac26a))
+	ROM_LOAD("eshk_u19.l1", 0x18000, 0x8000, CRC(e5593075) SHA1(549b03402e5639b449e35325eb52e78f8810b07a))
+ROM_END
+
 /*--------------------
 / Elvira and the Party Monsters 10/89
 /--------------------*/
@@ -1105,6 +1117,7 @@ GAME(1988,  esha_lg1,       esha_la3,   s11b,   s11b, s11b_state,   s11b_invert,
 GAME(1988,  esha_lg2,       esha_la3,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Earthshaker (German) (LG-2)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988,  esha_la1,       esha_la3,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Earthshaker (LA-1)",                    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988,  esha_pa1,       esha_la3,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Earthshaker (Prototype) (PA-1)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988,  esha_pa4,       esha_la3,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Earthshaker (Prototype) (PA-4)",        MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  eatpm_l4,       0,          s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Bally",                "Elvira and the Party Monsters (LA-4)",  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  eatpm_l1,       eatpm_l4,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Bally",                "Elvira and the Party Monsters (LA-1)",  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  eatpm_l2,       eatpm_l4,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Bally",                "Elvira and the Party Monsters (LA-2)",  MACHINE_IS_SKELETON_MECHANICAL)

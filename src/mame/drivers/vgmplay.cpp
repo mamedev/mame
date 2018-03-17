@@ -6,6 +6,8 @@
 
 #include "emu.h"
 
+#define QSOUND_LLE
+
 #include "imagedev/bitbngr.h"
 
 #include "cpu/h6280/h6280.h"

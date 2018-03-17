@@ -64,7 +64,6 @@
     the current value in the input register and initiates a read.
 
     TODO:
-    * Remaining instructions
     * PSW overflow bits
     * Clarify rounding behaviour (F2 1011)
     * Random condition
@@ -623,7 +622,7 @@ void dsp16_device_base::state_export(device_state_entry const &entry)
 
 util::disasm_interface *dsp16_device_base::create_disassembler()
 {
-	return new dsp16a_disassembler;
+	return new dsp16_disassembler;
 }
 
 template <offs_t Base> READ16_MEMBER(dsp16_device_base::external_memory_r)
@@ -753,6 +752,17 @@ inline void dsp16_device_base::execute_one_rom()
 			m_phase = phase::OP2;
 			break;
 
+		case 0x05: // F1 ; Z : aT[l]
+			{
+				fetch_target = nullptr;
+				s64 const d(dau_f1(op));
+				m_dau_temp = u16(u64(dau_saturate(op_d(~op))) >> (op_x(op) ? 16 : 0));
+				op_dau_ad(op) = d;
+				set_dau_at(op, yaau_read(op));
+				m_phase = phase::OP2;
+			}
+			break;
+
 		case 0x06: // F1 ; Y
 			op_dau_ad(op) = dau_f1(op);
 			yaau_read(op);
@@ -772,15 +782,10 @@ inline void dsp16_device_base::execute_one_rom()
 
 		case 0x09: // R = a0
 		case 0x0b: // R = a1
-			{
-				assert(!(op & 0x040fU)); // reserved fields?
-				fetch_target = nullptr;
-				s64 a(m_dau_a[BIT(op, 12)]);
-				if (!BIT(m_dau_auc, 2 + BIT(op, 12)))
-					a = std::min<s64>(std::max<s64>(a, std::numeric_limits<s32>::min()), std::numeric_limits<s32>::max());
-				set_r(op, u16(u64(a) >> 16));
-				m_phase = phase::OP2;
-			}
+			assert(!(op & 0x040fU)); // reserved fields?
+			fetch_target = nullptr;
+			set_r(op, u16(u64(dau_saturate(BIT(op, 12))) >> 16));
+			m_phase = phase::OP2;
 			break;
 
 		case 0x0a: // R = N
@@ -792,6 +797,13 @@ inline void dsp16_device_base::execute_one_rom()
 		case 0x0c: // Y = R
 			assert(!(op & 0x0400U)); // reserved field?
 			fetch_target = nullptr;
+			m_phase = phase::OP2;
+			break;
+
+		case 0x0d: // Z : R
+			fetch_target = nullptr;
+			m_dau_temp = get_r(op);
+			set_r(op, yaau_read(op));
 			m_phase = phase::OP2;
 			break;
 
@@ -825,16 +837,19 @@ inline void dsp16_device_base::execute_one_rom()
 			break;
 
 		case 0x12: // ifc CON F2
-			++m_dau_c[1];
-			if (op_dau_con(op))
 			{
-				op_dau_ad(op) = dau_f2(op);
-				m_dau_c[2] = m_dau_c[1];
+				bool const con(op_dau_con(op, false));
+				++m_dau_c[1];
+				if (con)
+				{
+					op_dau_ad(op) = dau_f2(op);
+					m_dau_c[2] = m_dau_c[1];
+				}
 			}
 			break;
 
 		case 0x13: // if CON F2
-			if (op_dau_con(op))
+			if (op_dau_con(op, true))
 				op_dau_ad(op) = dau_f2(op);
 			break;
 
@@ -915,9 +930,23 @@ inline void dsp16_device_base::execute_one_rom()
 			break;
 
 		case 0x1a: // if CON # icall
-			// FIXME: icall is a special case of this op
-			assert(!(op & 0x07e0U)); // reserved field?
-			predicate = op_dau_con(op) ? FLAGS_PRED_TRUE : FLAGS_PRED_FALSE;
+			assert(!(op & 0x03e0U)); // reserved field?
+			predicate = op_dau_con(op, true) ? FLAGS_PRED_TRUE : FLAGS_PRED_FALSE;
+			if (BIT(op, 10))
+			{
+				fetch_target = nullptr;
+				assert(0x000eU == op_con(op)); // CON must be true for icall?
+				m_phase = phase::OP2;
+			}
+			break;
+
+		case 0x1d: // F1 ; Z : y ; x = *pt++[i]
+			op_dau_ad(op) = dau_f1(op);
+			m_dau_temp = s16(m_dau_y >> 16);
+			m_dau_y = (u32(u16(yaau_read(op))) << 16) | u32(BIT(m_dau_psw, 6) ? u16(u32(m_dau_y)) : u16(0));
+			fetch_target = nullptr;
+			m_rom_data = m_spaces[AS_PROGRAM]->read_word(m_xaau_pt);
+			m_phase = phase::OP2;
 			break;
 
 		case 0x1e: // Reserved
@@ -960,14 +989,14 @@ inline void dsp16_device_base::execute_one_rom()
 		{
 		case 0x04: // F1 ; Y = a1[l]
 		case 0x1c: // F1 ; Y = a0[l]
-			{
-				s64 a(m_dau_a[BIT(~op, 14)]);
-				bool const sat(!BIT(m_dau_auc, 2 + BIT(~op, 14)));
-				if (sat)
-					a = std::min<s64>(std::max<s64>(a, std::numeric_limits<s32>::min()), std::numeric_limits<s32>::max());
-				yaau_write(op, u16(u64(a) >> (op_x(op) ? 16 : 0)));
-				op_dau_ad(op) = dau_f1(op);
-			}
+			yaau_write(op, u16(u64(dau_saturate(BIT(~op, 14))) >> (op_x(op) ? 16 : 0)));
+			op_dau_ad(op) = dau_f1(op);
+			break;
+
+		case 0x05: // F1 ; Z : aT[l]
+		case 0x0d: // Z : R
+		case 0x15: // F1 ; Z : y[l]
+			yaau_write_z(op);
 			break;
 
 		case 0x08: // aT = R
@@ -991,15 +1020,37 @@ inline void dsp16_device_base::execute_one_rom()
 			yaau_write(op, u16(u32(m_dau_y) >> (op_x(op) ? 16 : 0)));
 			break;
 
-		case 0x15: // F1 ; Z : y[l]
-			yaau_write_z(op);
-			break;
-
 		case 0x19: // F1 ; y = a0 ; x = *pt++[i]
 		case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
 		case 0x1f: // F1 ; y = Y ; x = *pt++[i]
 			xaau_increment_pt(op_xaau_increment(op));
 			m_dau_x = m_rom_data;
+			break;
+
+		case 0x1a: // icall
+			// TODO: does INT get sampled or could an external interrupt be lost here?
+			assert(BIT(op, 10));
+			assert(FLAGS_PRED_TRUE == (m_flags & FLAGS_PRED_MASK));
+			if (check_predicate())
+			{
+				LOGINT(
+						"DSP16: servicing software interrupt%s%s%s%s%s (PC = %04X)\n",
+						(pio_ibf_enable() && pio_ibf_status()) ? " IBF" : "",
+						(pio_obe_enable() && pio_obe_status()) ? " OBE" : "",
+						(pio_pids_enable() && pio_pids_status()) ? " PIDS" : "",
+						(pio_pods_enable() && pio_pods_status()) ? " PODS" : "",
+						(pio_int_enable() && pio_int_status()) ? " INT" : "",
+						m_st_pcbase);
+				set_iack(FLAGS_IACK_SET);
+				m_xaau_pc = 0x0002U;
+			}
+			m_phase = phase::PURGE;
+			break;
+
+		case 0x1d: // F1 ; Z : y ; x = *pt++[i]
+			xaau_increment_pt(op_xaau_increment(op));
+			m_dau_x = m_rom_data;
+			yaau_write_z(op);
 			break;
 
 		default:
@@ -1065,6 +1116,16 @@ inline void dsp16_device_base::execute_one_cache()
 			m_phase = phase::OP2;
 			break;
 
+		case 0x05: // F1 ; Z : aT[l]
+			{
+				s64 const d(dau_f1(op));
+				m_dau_temp = u16(u64(dau_saturate(op_d(~op))) >> (op_x(op) ? 16 : 0));
+				op_dau_ad(op) = d;
+				set_dau_at(op, yaau_read(op));
+				m_phase = phase::OP2;
+			}
+			break;
+
 		case 0x06: // F1 ; Y
 			op_dau_ad(op) = dau_f1(op);
 			yaau_read(op);
@@ -1083,18 +1144,19 @@ inline void dsp16_device_base::execute_one_cache()
 
 		case 0x09: // R = a0
 		case 0x0b: // R = a1
-			{
-				assert(!(op & 0x040fU)); // reserved fields?
-				s64 a(m_dau_a[BIT(op, 12)]);
-				if (!BIT(m_dau_auc, 2 + BIT(op, 12)))
-					a = std::min<s64>(std::max<s64>(a, std::numeric_limits<s32>::min()), std::numeric_limits<s32>::max());
-				set_r(op, u16(u64(a) >> 16));
-				m_phase = phase::OP2;
-			}
+			assert(!(op & 0x040fU)); // reserved fields?
+			set_r(op, u16(u64(dau_saturate(BIT(op, 12))) >> 16));
+			m_phase = phase::OP2;
 			break;
 
 		case 0x0c: // Y = R
 			assert(!(op & 0x0400U)); // reserved field?
+			m_phase = phase::OP2;
+			break;
+
+		case 0x0d: // Z : R
+			m_dau_temp = get_r(op);
+			set_r(op, yaau_read(op));
 			m_phase = phase::OP2;
 			break;
 
@@ -1105,16 +1167,19 @@ inline void dsp16_device_base::execute_one_cache()
 			break;
 
 		case 0x12: // ifc CON F2
-			++m_dau_c[1];
-			if (op_dau_con(op))
 			{
-				op_dau_ad(op) = dau_f2(op);
-				m_dau_c[2] = m_dau_c[1];
+				bool const con(op_dau_con(op, false));
+				++m_dau_c[1];
+				if (con)
+				{
+					op_dau_ad(op) = dau_f2(op);
+					m_dau_c[2] = m_dau_c[1];
+				}
 			}
 			break;
 
 		case 0x13: // if CON F2
-			if (op_dau_con(op))
+			if (op_dau_con(op, true))
 				op_dau_ad(op) = dau_f2(op);
 			break;
 
@@ -1162,6 +1227,14 @@ inline void dsp16_device_base::execute_one_cache()
 			}
 			break;
 
+		case 0x1d: // F1 ; Z : y ; x = *pt++[i]
+			op_dau_ad(op) = dau_f1(op);
+			m_dau_temp = s16(m_dau_y >> 16);
+			m_dau_y = (u32(u16(yaau_read(op))) << 16) | u32(BIT(m_dau_psw, 6) ? u16(u32(m_dau_y)) : u16(0));
+			m_rom_data = m_direct->read_word(m_xaau_pt);
+			m_phase = phase::OP2;
+			break;
+
 		case 0x1f: // F1 ; y = Y ; x = *pt++[i]
 			op_dau_ad(op) = dau_f1(op);
 			m_dau_y = (u32(u16(yaau_read(op))) << 16) | u32(BIT(m_dau_psw, 6) ? u16(u32(m_dau_y)) : u16(0));
@@ -1188,13 +1261,14 @@ inline void dsp16_device_base::execute_one_cache()
 		{
 		case 0x04: // F1 ; Y = a1[l]
 		case 0x1c: // F1 ; Y = a0[l]
-			{
-				s64 a(m_dau_a[BIT(~op, 14)]);
-				if (!BIT(m_dau_auc, 2 + BIT(~op, 14)))
-					a = std::min<s64>(std::max<s64>(a, std::numeric_limits<s32>::min()), std::numeric_limits<s32>::max());
-				yaau_write(op, u16(u64(a) >> (op_x(op) ? 16 : 0)));
-				op_dau_ad(op) = dau_f1(op);
-			}
+			yaau_write(op, u16(u64(dau_saturate(BIT(~op, 14))) >> (op_x(op) ? 16 : 0)));
+			op_dau_ad(op) = dau_f1(op);
+			break;
+
+		case 0x05: // F1 ; Z : aT[l]
+		case 0x0d: // Z : R
+		case 0x15: // F1 ; Z : y[l]
+			yaau_write_z(op);
 			break;
 
 		case 0x08: // aT = R
@@ -1213,16 +1287,18 @@ inline void dsp16_device_base::execute_one_cache()
 			yaau_write(op, u16(u32(m_dau_y) >> (op_x(op) ? 16 : 0)));
 			break;
 
-		case 0x15: // F1 ; Z : y[l]
-			yaau_write_z(op);
-			break;
-
 		case 0x19: // F1 ; y = a0 ; x = *pt++[i]
 		case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
 		case 0x1f: // F1 ; y = Y ; x = *pt++[i]
 			assert(last_instruction);
 			xaau_increment_pt(op_xaau_increment(op));
 			m_dau_x = m_rom_data;
+			break;
+
+		case 0x1d: // F1 ; Z : y ; x = *pt++[i]
+			xaau_increment_pt(op_xaau_increment(op));
+			m_dau_x = m_rom_data;
+			yaau_write_z(op);
 			break;
 
 		default:
@@ -1421,25 +1497,25 @@ inline u64 dsp16_device_base::dau_f2(u16 op)
 		d = s >> 1;
 		break;
 	case 0x1: // aD = aS << 1
-		d = s << 1;
+		d = s32(u32(u64(s)) << 1);
 		break;
 	case 0x2: // aD = aS >> 4
 		d = s >> 4;
 		break;
 	case 0x3: // aD = aS << 4
-		d = s << 4;
+		d = s32(u32(u64(s)) << 4);
 		break;
 	case 0x4: // aD = aS >> 8
 		d = s >> 8;
 		break;
 	case 0x5: // aD = aS << 8
-		d = d << 8;
+		d = s32(u32(u64(s)) << 8);
 		break;
 	case 0x6: // aD = aS >> 16
 		d = s >> 16;
 		break;
 	case 0x7: // aD = aS << 16
-		d = s << 16;
+		d = s32(u32(u64(s)) << 16);
 		break;
 	case 0x8: // aD = p
 		d = get_dau_p_aligned();
@@ -1502,8 +1578,8 @@ inline bool dsp16_device_base::op_interruptible(u16 op)
 	case 0x15: // F1 ; Z : y[l]
 	case 0x16: // F1 ; x = Y
 	case 0x17: // F1 ; y[l] = Y
-	case 0x19: // y = a0 ; x = *pt++[i]
-	case 0x1b: // y = a1 ; x = *pt++[i]
+	case 0x19: // F1 ; y = a0 ; x = *pt++[i]
+	case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
 	case 0x1c: // F1 ; Y = a0[l]
 	case 0x1d: // F1 ; Z : y ; x = *pt++[i]
 	case 0x1f: // F1 ; y = Y ; x = *pt++[i]
@@ -1530,7 +1606,7 @@ inline bool dsp16_device_base::check_predicate()
 
 inline u16 &dsp16_device_base::set_xaau_pc_offset(u16 offset)
 {
-	m_xaau_pc = (m_xaau_pc & 0xf000U) | (offset & 0x0fffU);
+	m_xaau_pc = (m_xaau_pc & XAAU_I_EXT) | (offset & XAAU_I_MASK);
 	if (m_iack_out)
 		m_xaau_pi = m_xaau_pc;
 	return m_xaau_pc;
@@ -1719,6 +1795,14 @@ inline void dsp16_device_base::set_dau_y(u16 op, s16 value)
 	}
 }
 
+s64 dsp16_device_base::dau_saturate(u16 a) const
+{
+	if (dau_auc_sat(a))
+		return m_dau_a[a];
+	else
+		return std::min<s64>(std::max<s64>(m_dau_a[a], std::numeric_limits<s32>::min()), std::numeric_limits<s32>::max());
+}
+
 inline void dsp16_device_base::set_dau_at(u16 op, s16 value)
 {
 	s64 &at(op_dau_at(op));
@@ -1770,7 +1854,7 @@ inline u64 dsp16_device_base::get_dau_p_aligned() const
 	}
 }
 
-inline bool dsp16_device_base::op_dau_con(u16 op)
+inline bool dsp16_device_base::op_dau_con(u16 op, bool inc)
 {
 	bool result;
 	u16 const con(op_con(op));
@@ -1792,7 +1876,12 @@ inline bool dsp16_device_base::op_dau_con(u16 op)
 		throw emu_fatalerror("DSP16: unimplemented CON value %02X (PC = %04X)\n", con, m_st_pcbase);
 	case 0x5: // c0ge/c0lt
 	case 0x6: // c1ge/c1lt
-		result = m_dau_c[(con >> 1) - 0x5]++ >= 0;
+		{
+			s8 &c(m_dau_c[(con >> 1) - 0x05]);
+			result = c >= 0;
+			if (inc)
+				++c;
+		}
 		break;
 	case 0x7: // true/false
 		result = true;

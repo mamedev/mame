@@ -10655,7 +10655,22 @@ ROM_END
 
 ROM_START( aplan ) // Has "DYNA QL-1  V1.01" string.
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u18", 0x00000, 0x10000, CRC(e0e5328d) SHA1(fd02c65fecada69a0953372a39e520a80c744109) )
+	ROM_LOAD( "u18", 0x02000, 0x1000, CRC(e0e5328d) SHA1(fd02c65fecada69a0953372a39e520a80c744109) )
+	ROM_CONTINUE(0xf000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0xa000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0xc000,0x1000)
+	ROM_CONTINUE(0x0000,0x1000)
+	ROM_CONTINUE(0x8000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+	ROM_CONTINUE(0xe000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0xb000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0xd000,0x1000)
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x9000,0x1000)
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "u64",   0x00000, 0x8000, CRC(2e593152) SHA1(ca0f587b26ed6e962e100d9178b6f79995a26fec) )
@@ -16180,7 +16195,7 @@ GAMEL( 1991, cmastere,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,     
 GAMEL( 1991, cmasterf,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 7)",           0,                 layout_cmasterb )
 GAMEL( 1991, cmasterg,  cmaster,  cm,       cmasterg, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 8, V4-B-)",    0,                 layout_cmasterb )
 GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.10)",                  0,                 layout_cmasterb )
-GAMEL( 199?, super7,    cmaster,  cm,       cmaster,  cmaster_state,  0,         ROT0, "bootleg",           "Super Seven",                                 0,                 layout_cmezspin )
+GAMEL( 199?, super7,    cmaster,  cm,       cmaster,  cmaster_state,  0,         ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmezspin )
 
 GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  199?, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, 0,         ROT0, "<unknown>",         "Joker Master",                                MACHINE_NOT_WORKING ) // encrypted?

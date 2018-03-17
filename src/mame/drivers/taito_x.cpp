@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(taitox_state::superman)
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(16'000'000)/2) /* 8MHz? */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(16'000'000)/2) /* 8MHz measured on pin 20 */
 	MCFG_CCHIP_IN_PORTA_CB(IOPORT("IN0"))
 	MCFG_CCHIP_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("IN2"))

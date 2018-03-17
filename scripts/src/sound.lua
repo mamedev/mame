@@ -1459,3 +1459,15 @@ if (SOUNDS["LC7535"]~=null) then
 		MAME_DIR .. "src/devices/sound/lc7535.h",
 	}
 end
+
+---------------------------------------------------
+-- NEC uPD934G
+--@src/devices/sound/upd934g.h,SOUNDS["UPD934G"] = true
+---------------------------------------------------
+
+if (SOUNDS["UPD934G"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/upd934g.cpp",
+		MAME_DIR .. "src/devices/sound/upd934g.h",
+	}
+end

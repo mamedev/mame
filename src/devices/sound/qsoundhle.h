@@ -33,8 +33,6 @@ public:
 
 protected:
 	// device_t implementation
-	tiny_rom_entry const *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 	// device_sound_interface implementation
@@ -46,7 +44,6 @@ protected:
 private:
 
 	// MAME resources
-	required_device<dsp16_device_base> m_dsp;
 	sound_stream *m_stream;
 
 	struct qsound_channel

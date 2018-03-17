@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "dsp16dis.h"
 
-std::string dsp16a_disassembler::disasmF1Field(u8 F1, u8 D, u8 S)
+std::string dsp16_disassembler::disasmF1Field(u8 F1, u8 D, u8 S)
 {
 	switch (F1)
 	{
@@ -27,7 +27,7 @@ std::string dsp16a_disassembler::disasmF1Field(u8 F1, u8 D, u8 S)
 	return "UNKNOWN";
 }
 
-std::string dsp16a_disassembler::disasmYField(u8 Y)
+std::string dsp16_disassembler::disasmYField(u8 Y)
 {
 	switch (Y & 0x03U)
 	{
@@ -39,7 +39,7 @@ std::string dsp16a_disassembler::disasmYField(u8 Y)
 	return "UNKNOWN";
 }
 
-std::string dsp16a_disassembler::disasmZField(u8 Z)
+std::string dsp16_disassembler::disasmZField(u8 Z)
 {
 	switch (Z & 0x03U)
 	{
@@ -51,7 +51,7 @@ std::string dsp16a_disassembler::disasmZField(u8 Z)
 	return "UNKNOWN";
 }
 
-std::string dsp16a_disassembler::disasmF2Field(u8 F2, u8 D, u8 S)
+std::string dsp16_disassembler::disasmF2Field(u8 F2, u8 D, u8 S)
 {
 	switch (F2)
 	{
@@ -75,7 +75,7 @@ std::string dsp16a_disassembler::disasmF2Field(u8 F2, u8 D, u8 S)
 	return "UNKNOWN";
 }
 
-std::string dsp16a_disassembler::disasmCONField(u8 CON)
+std::string dsp16_disassembler::disasmCONField(u8 CON)
 {
 	switch (CON)
 	{
@@ -102,7 +102,7 @@ std::string dsp16a_disassembler::disasmCONField(u8 CON)
 	}
 }
 
-std::string dsp16a_disassembler::disasmBField(u8 B, uint32_t &dasmflags)
+std::string dsp16_disassembler::disasmBField(u8 B, u32 &dasmflags)
 {
 	switch (B)
 	{
@@ -118,7 +118,7 @@ std::string dsp16a_disassembler::disasmBField(u8 B, uint32_t &dasmflags)
 	return "UNKNOWN";
 }
 
-std::string dsp16a_disassembler::disasmRImmediateField(u8 R)
+std::string dsp16_disassembler::disasmRImmediateField(u8 R)
 {
 	switch (R)
 	{
@@ -134,7 +134,7 @@ std::string dsp16a_disassembler::disasmRImmediateField(u8 R)
 	return "UNKNOWN";
 }
 
-std::string dsp16a_disassembler::disasmRField(u8 R)
+std::string dsp16_disassembler::disasmRField(u8 R)
 {
 	switch (R)
 	{
@@ -170,7 +170,7 @@ std::string dsp16a_disassembler::disasmRField(u8 R)
 	}
 }
 
-std::string dsp16a_disassembler::disasmIField(u8 I)
+std::string dsp16_disassembler::disasmIField(u8 I)
 {
 	switch (I)
 	{
@@ -183,7 +183,7 @@ std::string dsp16a_disassembler::disasmIField(u8 I)
 	}
 }
 
-bool dsp16a_disassembler::disasmSIField(u8 SI)
+bool dsp16_disassembler::disasmSIField(u8 SI)
 {
 	switch (SI)
 	{
@@ -194,27 +194,27 @@ bool dsp16a_disassembler::disasmSIField(u8 SI)
 }
 
 
-u32 dsp16a_disassembler::interface_flags() const
+u32 dsp16_disassembler::interface_flags() const
 {
 	return PAGED;
 }
 
-u32 dsp16a_disassembler::page_address_bits() const
+u32 dsp16_disassembler::page_address_bits() const
 {
 	return 12U;
 }
 
-u32 dsp16a_disassembler::opcode_alignment() const
+u32 dsp16_disassembler::opcode_alignment() const
 {
 	return 1U;
 }
 
-offs_t dsp16a_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+offs_t dsp16_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	u8 opSize = 1;
-	uint32_t dasmflags = 0;
-	uint16_t op  = opcodes.r16(pc);
-	uint16_t op2 = opcodes.r16(pc+1);
+	u32 dasmflags = 0;
+	u16 op  = opcodes.r16(pc);
+	u16 op2 = opcodes.r16(pc+1);
 
 	// TODO: Test for previous "if CON" instruction and tab the next instruction in?
 
@@ -394,13 +394,13 @@ offs_t dsp16a_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	// Format 4: Branch Direct Group
 	case 0x00: case 0x01: // goto JA
 		{
-			const uint16_t JA = (op & 0x0fff) | (pc & 0xf000);
+			const u16 JA = (op & 0x0fff) | (pc & 0xf000);
 			util::stream_format(stream, "goto 0x%04x", JA);
 		}
 		break;
 	case 0x10: case 0x11: // call JA
 		{
-			const uint16_t JA = (op & 0x0fff) | (pc & 0xf000);
+			const u16 JA = (op & 0x0fff) | (pc & 0xf000);
 			util::stream_format(stream, "call 0x%04x", JA);
 			dasmflags |= STEP_OVER;
 		}
@@ -492,7 +492,7 @@ offs_t dsp16a_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	// Format 9: Short Immediate Group
 	case 0x02: case 0x03: // R = M
 		{
-			const uint16_t M = (op & 0x01ff);
+			const u16 M = (op & 0x01ff);
 			const u8  R = (op & 0x0e00) >> 9;
 			std::string rString = disasmRImmediateField(R);
 			util::stream_format(stream, "set %s = 0x%04x", rString, M);

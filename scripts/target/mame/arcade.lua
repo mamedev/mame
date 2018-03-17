@@ -61,7 +61,7 @@ CPUS["MIPS"] = true
 CPUS["R3000"] = true
 CPUS["PSX"] = true
 CPUS["SH"] = true
-CPUS["DSP16A"] = true
+CPUS["DSP16"] = true
 CPUS["DSP32C"] = true
 CPUS["PIC16C5X"] = true
 CPUS["PIC16C62X"] = true
@@ -268,6 +268,7 @@ SOUNDS["TA7630"] = true
 SOUNDS["MM5837"] = true
 --SOUNDS["DAVE"] = true
 SOUNDS["LC7535"] = true
+--SOUNDS["UPD934G"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -4334,6 +4335,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/jp.cpp",
 	MAME_DIR .. "src/mame/drivers/jvh.cpp",
 	MAME_DIR .. "src/mame/drivers/kissproto.cpp",
+	MAME_DIR .. "src/mame/drivers/lckydraw.cpp",
 	MAME_DIR .. "src/mame/drivers/ltd.cpp",
 	MAME_DIR .. "src/mame/drivers/macp.cpp",
 	MAME_DIR .. "src/mame/drivers/micropin.cpp",

@@ -663,12 +663,12 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rbisland_sound_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)/2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)) /* 12MHz OSC next to C-Chip */
 	MCFG_CCHIP_IN_PORTA_CB(IOPORT("800007"))
 	MCFG_CCHIP_IN_PORTB_CB(IOPORT("800009"))
 	MCFG_CCHIP_IN_PORTC_CB(IOPORT("80000B"))
 	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("80000D"))
-	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(rbisland_state, counters_w))
+	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(rbisland_state, couters_w))
 
 	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", rbisland_state, cchip_irq_clear_cb)
 
@@ -708,6 +708,7 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
 	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
+
 
 /* Jumping: The PCB has 2 Xtals, 18.432MHz and 24MHz */
 MACHINE_CONFIG_START(rbisland_state::jumping)
@@ -815,7 +816,7 @@ ROM_START( rbislando )
 	ROM_LOAD16_BYTE( "b22-13.6",      0x80001, 0x10000, CRC(2fda099f) SHA1(a1e27a4497f6733608be924d69d965b19f725b99) )
 ROM_END
 
-ROM_START( rbislnde )
+ROM_START( rbislande )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "b39-01.19",     0x00000, 0x10000, CRC(50690880) SHA1(88cd8739eaa6e4e5988be225c31d2a6605173d39) )
 	ROM_LOAD16_BYTE( "b39-02.20",     0x00001, 0x10000, CRC(4dead71f) SHA1(03e9df33fc8fc64d6eeb1c3a763acac00b10c071) )
@@ -1006,5 +1007,5 @@ GAME( 1989, jumping,   rbisland, jumping,  jumping,  rbisland_state, jumping,   
 GAME( 1988, jumpinga,  rbisland, jumping,  jumping,  rbisland_state, jumping,   ROT0, "bootleg (Seyutu)",  "Jumping (set 2)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1988, jumpingi,  rbisland, jumpingi, jumping,  rbisland_state, jumping,   ROT0, "bootleg (Seyutu)",  "Jumping (set 3, Imnoe PCB)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, rbislnde, 0,         rbisland, rbisland, rbisland_state, rbisland, ROT0, "Taito Corporation", "Rainbow Islands - Extra Version", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rbislande, 0,         rbisland, rbisland, rbisland_state, rbisland, ROT0, "Taito Corporation", "Rainbow Islands - Extra Version", MACHINE_SUPPORTS_SAVE )
 

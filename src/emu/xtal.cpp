@@ -186,6 +186,7 @@ const double XTAL::known_xtals[] = {
 	 14'705'882, /* 14.705882_MHz_XTAL     Aleck64 */
 	 14'745'600, /* 14.7456_MHz_XTAL       Namco System 12 & System Super 22/23 for JVS */
 	 14'916'000, /* 14.916_MHz_XTAL        ADDS Viewpoint 122 */
+	 14'976'000, /* 14.976_MHz_XTAL        CIT-101 80-column display clock */
 	 15'000'000, /* 15_MHz_XTAL            Sinclair QL, Amusco Poker */
 	 15'148'800, /* 15.1488_MHz_XTAL       Zentec 9002/9003 */
 	 15'288'000, /* 15.288_MHz_XTAL        DEC VT220 80-column display clock */
@@ -240,6 +241,7 @@ const double XTAL::known_xtals[] = {
 	 22'096'000, /* 22.096_MHz_XTAL        ADDS Viewpoint 122 */
 	 22'118'400, /* 22.1184_MHz_XTAL       Amusco Poker */
 	 22'321'000, /* 22.321_MHz_XTAL        Apple LaserWriter II NT */
+	 22'464'000, /* 22.464_MHz_XTAL        CIT-101 132-column display clock */
 	 22'656'000, /* 22.656_MHz_XTAL        Super Pinball Action (~1440x NTSC line rate) */
 	 22'896'000, /* 22.896_MHz_XTAL        DEC VT220 132-column display clock */
 	 23'814'000, /* 23.814_MHz_XTAL        TeleVideo TVI-912, 920 & 950 */

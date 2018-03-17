@@ -6,25 +6,29 @@
 
     Sampling drum machine
 
-	Skeleton driver
+    Skeleton driver
 
-	Sound ROM info:
+    Sound ROM info:
 
-	Each ROM chip holds 1.49s of sounds and can be opened as raw
-	PCM data: signed 8-bit, mono, 20,000 Hz.
+    Each ROM chip holds 1.49s of sounds and can be opened as raw
+    PCM data: signed 8-bit, mono, 20,000 Hz.
 
-	* Sound A: Toms 1~3, Kick, Snare, Rimshot, Closed Hi-Hat, Open Hi-Hat,
-	    and Metronome Click (in that order).
+    * Sound A: Toms 1~3, Kick, Snare, Rimshot, Closed Hi-Hat, Open Hi-Hat,
+        and Metronome Click (in that order).
 
-	* Sound B: Clap, Ride, Cowbell, and Crash (in that order).
+    * Sound B: Clap, Ride, Cowbell, and Crash (in that order).
 
-	Note: Holding EDIT/RECORD, DELETE, INSERT/AUTO-COMPENSATE and
-	CHAIN/BEAT at startup causes the system to go into a RAM test.
+    Note: Holding EDIT/RECORD, DELETE, INSERT/AUTO-COMPENSATE and
+    CHAIN/BEAT at startup causes the system to go into a RAM test.
 
 ***************************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 #include "cpu/upd7810/upd7811.h"
+#include "video/hd44780.h"
+#include "sound/upd934g.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -37,11 +41,16 @@ public:
 	rz1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_hd44780(*this, "hd44780"),
+		m_pg{ {*this, "upd934g_c"}, {*this, "upd934g_b"} },
+		m_samples{ {*this, "samples_a"}, {*this, "samples_b"}},
 		m_keys(*this, "kc%u", 0), m_key_select(0),
 		m_port_b(0xff)
 	{ }
 
 	void rz1(machine_config &config);
+
+	DECLARE_PALETTE_INIT(rz1);
 
 protected:
 	virtual void machine_start() override;
@@ -49,6 +58,9 @@ protected:
 
 private:
 	required_device<upd7811_device> m_maincpu;
+	required_device<hd44780_device> m_hd44780;
+	required_device<upd934g_device> m_pg[2];
+	required_memory_region m_samples[2];
 	required_ioport_array<8> m_keys;
 
 	void map(address_map &map);
@@ -58,7 +70,9 @@ private:
 	DECLARE_READ8_MEMBER(port_c_r);
 	DECLARE_WRITE8_MEMBER(port_c_w);
 
+	DECLARE_READ8_MEMBER(upd934g_c_data_r);
 	DECLARE_WRITE8_MEMBER(upd934g_c_w);
+	DECLARE_READ8_MEMBER(upd934g_b_data_r);
 	DECLARE_WRITE8_MEMBER(upd934g_b_w);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(leds_w);
@@ -73,7 +87,7 @@ private:
 //**************************************************************************
 
 ADDRESS_MAP_START( rz1_state::map )
-//	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
+//  AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_ROM AM_REGION("program", 0)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(upd934g_c_w)
@@ -167,14 +181,35 @@ INPUT_PORTS_END
 //  MACHINE EMULATION
 //**************************************************************************
 
+READ8_MEMBER( rz1_state::upd934g_c_data_r )
+{
+	if (offset < 0x8000)
+		return m_samples[1]->base()[offset];
+	else
+	{
+		if (offset < 0xc000)
+			return m_maincpu->space(AS_PROGRAM).read_byte(offset + 0x2000);
+		else
+			return 0;
+	}
+}
+
+READ8_MEMBER( rz1_state::upd934g_b_data_r )
+{
+	if (offset < 0x8000)
+		return m_samples[0]->base()[offset];
+	else
+		return 0;
+}
+
 WRITE8_MEMBER( rz1_state::upd934g_c_w )
 {
-	logerror("upd934g_c_w: %02x = %02x\n", offset >> 8, (data >> 2) & 0x0f);
+	m_pg[0]->write(space, offset >> 8, data);
 }
 
 WRITE8_MEMBER( rz1_state::upd934g_b_w )
 {
-	logerror("upd934g_b_w: %02x = %02x\n", offset >> 8, (data >> 2) & 0x0f);
+	m_pg[1]->write(space, offset >> 8, data);
 }
 
 WRITE8_MEMBER( rz1_state::port_a_w )
@@ -185,14 +220,16 @@ WRITE8_MEMBER( rz1_state::port_a_w )
 	m_key_select = data;
 
 	// output lcd data to console until it's hooked up properly
-	if (m_port_b == 0x37 || m_port_b == 0x33)
-		printf("%c", data);
+//  if (m_port_b == 0x37 || m_port_b == 0x33)
+//      printf("%c", data);
+	m_hd44780->data_write(space, 0, data);
 }
 
 WRITE8_MEMBER( rz1_state::port_b_w )
 {
 	logerror("port_b_w: %02x\n", data);
 	m_port_b = data;
+	m_hd44780->control_write(space, 0, data & 0xe0);    // top 3 lines go to the 44780
 }
 
 READ8_MEMBER( rz1_state::port_c_r )
@@ -236,6 +273,11 @@ void rz1_state::machine_reset()
 {
 }
 
+PALETTE_INIT_MEMBER(rz1_state, rz1)
+{
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
+}
 
 //**************************************************************************
 //  MACHINE DEFINTIONS
@@ -248,6 +290,30 @@ MACHINE_CONFIG_START( rz1_state::rz1 )
 	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(rz1_state, port_b_w))
 	MCFG_UPD7810_PORTC_READ_CB(READ8(rz1_state, port_c_r))
 	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(rz1_state, port_c_w))
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(6*16, 9*2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
+	//MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_PALETTE_INIT_OWNER(rz1_state, rz1)
+
+	MCFG_HD44780_ADD("hd44780")
+	MCFG_HD44780_LCD_SIZE(1, 16)
+
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("upd934g_c", UPD934G, 1333000)
+	MCFG_UPD934G_DATA_CB(READ8(rz1_state, upd934g_c_data_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	MCFG_SOUND_ADD("upd934g_b", UPD934G, 1280000)
+	MCFG_UPD934G_DATA_CB(READ8(rz1_state, upd934g_b_data_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -262,9 +328,11 @@ ROM_START( rz1 )
 	ROM_REGION(0x4000, "program", 0)
 	ROM_LOAD("program.bin", 0x0000, 0x4000, CRC(b44b2652) SHA1(b77f8daece9adb177b6ce1ef518fc3238b8c0a9c))
 
-	ROM_REGION(0x10000, "samples", 0)
+	ROM_REGION(0x8000, "samples_a", 0)
 	ROM_LOAD("sound_a.cm5", 0x0000, 0x8000, CRC(c643ff24) SHA1(e886314d22a9a5473bfa2cb237ecafcf0daedfc1)) // HN613256P
-	ROM_LOAD("sound_b.cm6", 0x8000, 0x8000, CRC(ee5b703e) SHA1(cbf2e92c68901f236678d704e9e695a5c84ff49e)) // HN613256P
+
+	ROM_REGION(0x8000, "samples_b", 0)
+	ROM_LOAD("sound_b.cm6", 0x0000, 0x8000, CRC(ee5b703e) SHA1(cbf2e92c68901f236678d704e9e695a5c84ff49e)) // HN613256P
 ROM_END
 
 

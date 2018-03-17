@@ -9772,6 +9772,9 @@ f1gpstr2                        // (c) 1993 Jaleco
 scudhamm                        // (c) 1994 Jaleco
 wildplt                         // (c) 1992 Jaleco
 
+@source:cit101.cpp
+cit101                          // (c) 1981 C. Itoh
+
 @source:cit220.cpp
 cit220p                         // (c) 1984 C. Itoh
 
@@ -10196,6 +10199,7 @@ sf2rk                           // bootleg
 sf2rules                        // bootleg
 sf2stt                          // bootleg
 sf2thndr                        // hack
+sf2thndr2                       // bootleg
 sf2ua                           // 06/02/1991 (c) 1991 (USA)
 sf2ub                           // 14/02/1991 (c) 1991 (USA)
 sf2uc                           // 06/03/1991 (c) 1991 (USA)
@@ -13269,6 +13273,7 @@ redufob                         // bootleg
 scobra                          // GX316 (c) 1981 Konami
 scobrab                         // GX316 (c) 1981 Karateco (bootleg?)
 scobrae                         // GX316 (c) 1981 Stern
+scobrag                         // AVG by Zaccaria (bootleg?)
 scobras                         // GX316 (c) 1981 Stern
 scobrase                        // GX316 (c) 1981 Sega
 scorpion                        // (c) 1982 Zaccaria
@@ -17788,6 +17793,9 @@ lc80                            //
 lc80_2                          //
 sc80                            //
 
+@source:lckydraw.cpp
+lckydraw                        // (c) 1979 Mirco
+
 @source:lcmate2.cpp
 lcmate2                         //
 
@@ -20830,7 +20838,8 @@ pitbossma                       // (c) 1994 Merit
 pitbosss                        // (c) 1990 Merit
 pitbosssa                       // (c) 1990 Merit
 pitbosssc                       // (c) 1992 Merit
-realbrod                        // (c) 1995 Merit
+realbrod                        // (c) 1996 Merit
+realbroda                       // (c) 1995 Merit
 spitboss                        // (c) 1988 Merit
 
 @source:mermaid.cpp
@@ -32999,6 +33008,7 @@ esha_lg1                        //
 esha_lg2                        //
 esha_ma3                        //
 esha_pa1                        //
+esha_pa4                        //
 esha_pr4                        //
 jokrz_l3                        //
 jokrz_l6                        //
@@ -39042,6 +39052,8 @@ rad_rh				     		//
 has_wamg                        //
 eka_base                        //
 eka_strt                        //
+eka_vol1                        //
+eka_vol2                        //
 xavtenni                        //
 ttv_sw                          //
 ttv_lotr                        //

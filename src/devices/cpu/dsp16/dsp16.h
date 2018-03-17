@@ -5,7 +5,6 @@
     WE|AT&T DSP16 series emulator
 
 ***************************************************************************/
-
 #ifndef MAME_CPU_DSP16_DSP16_H
 #define MAME_CPU_DSP16_DSP16_H
 
@@ -207,6 +206,9 @@ private:
 	friend sio_flags &operator&=(sio_flags &, sio_flags);
 	friend sio_flags &operator|=(sio_flags &, sio_flags);
 
+	// recompiler helpers
+	class frontend;
+
 	// internal address maps
 	void program_map(address_map &map);
 
@@ -232,12 +234,14 @@ private:
 	void set_r(u16 op, s16 value);
 	void yaau_postmodify_r(u16 op);
 	void set_dau_y(u16 op, s16 value);
+	s64 dau_saturate(u16 a) const;
 	void set_dau_at(u16 op, s16 value);
 	u64 set_dau_psw_flags(s64 d);
 	u64 get_dau_p_aligned() const;
-	bool op_dau_con(u16 op);
+	bool op_dau_con(u16 op, bool inc);
 
 	// flag accessors
+	bool dau_auc_sat(u16 a) const { return bool(BIT(m_dau_auc, 2 + a)); }
 	u16 dau_auc_align() const { return m_dau_auc & 0x0003U; }
 	bool dau_psw_lmi() const { return bool(BIT(m_dau_psw, 15)); }
 	bool dau_psw_leq() const { return bool(BIT(m_dau_psw, 14)); }

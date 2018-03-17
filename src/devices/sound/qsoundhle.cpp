@@ -33,23 +33,6 @@
 DEFINE_DEVICE_TYPE(QSOUND_HLE, qsound_hle_device, "qsound_hle", "QSound (HLE)")
 
 
-// program map for the DSP16A; note that apparently Western Electric/AT&T
-// expanded the size of the available mask ROM on the DSP16A over time after
-// it was released.
-// As originally released, the DSP16A had 4096 words of ROM, but the DL-1425
-// chip decapped by siliconpr0n clearly shows 3x as much ROM as that, a total
-// of 12288 words of internal ROM.
-// The older DSP16 non-a part has 2048 words of ROM.
-
-
-// DSP internal ROM region
-ROM_START( qsound_hle )
-	ROM_REGION( 0x2000, "dsp", 0 )
-	ROM_LOAD16_WORD_SWAP( "dl-1425.bin", 0x0000, 0x2000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
-	ROM_IGNORE( 0x4000 )
-ROM_END
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -62,32 +45,10 @@ qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, QSOUND_HLE, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this, 24)
-	, m_dsp(*this, "dsp")
 	, m_stream(nullptr)
 	, m_data(0)
 {
 }
-
-
-//-------------------------------------------------
-//  rom_region - return a pointer to the device's
-//  internal ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *qsound_hle_device::device_rom_region() const
-{
-	return ROM_NAME( qsound_hle );
-}
-
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(qsound_hle_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", DSP16A, DERIVED_CLOCK(1, 1))
-	MCFG_DEVICE_DISABLE()
-MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -106,7 +67,7 @@ void qsound_hle_device::rom_bank_updated()
 
 void qsound_hle_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, clock() / 15 / 166); // /166 clock divider?
+	m_stream = stream_alloc(0, 2, clock() / 2 / 1248); // DSP program uses 1248 machine cycles per iteration
 
 	// create pan table
 	for (int i = 0; i < 33; i++)

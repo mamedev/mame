@@ -25,14 +25,15 @@
     and C only. Though it was later reprinted with an addendum for Models
     D, E, and F, this has not been found. The available schematics are
     inapplicable to later models, which have an altogether different memory
-    map. It might even be possible that later models substitute some generic
-    battery-backed CMOS SRAM for the X2212 and/or replace the CRT9007 with
-    a custom video gate array.
+    map and, evidently, use some different IC types: an ER5911 rather than
+    X2212 as non-volatile memory and, in place of the CRT9007, some sort
+    of custom video gate array (which might even be clocked differently).
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
+//#include "machine/eepromser.h"
 #include "machine/mc68681.h"
 #include "machine/ram.h"
 //#include "machine/x2212.h"

@@ -67,7 +67,7 @@ void m1comm_device::m1comm_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
-	map(0xc000, 0xffff).rw(this, FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
+	map(0xc000, 0xffff).mask(0x0fff).rw(this, FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
 }
 
 /*************************************
@@ -75,12 +75,11 @@ void m1comm_device::m1comm_mem(address_map &map)
  *************************************/
 void m1comm_device::m1comm_io(address_map &map)
 {
-	map.global_mask(0xff);
+	map.global_mask(0x7f);
 	map(0x00, 0x1f).rw(this, FUNC(m1comm_device::dlc_reg_r), FUNC(m1comm_device::dlc_reg_w));
 	map(0x20, 0x2f).rw(this, FUNC(m1comm_device::dma_reg_r), FUNC(m1comm_device::dma_reg_w));
-	map(0x40, 0x40).rw(this, FUNC(m1comm_device::syn_r), FUNC(m1comm_device::syn_w));
-	map(0x60, 0x60).rw(this, FUNC(m1comm_device::zfg_r), FUNC(m1comm_device::zfg_w));
-	map(0xff, 0xff).ram();
+	map(0x40, 0x5f).mask(0x01).rw(this, FUNC(m1comm_device::syn_r), FUNC(m1comm_device::syn_w));
+	map(0x60, 0x7f).mask(0x01).rw(this, FUNC(m1comm_device::zfg_r), FUNC(m1comm_device::zfg_w));
 }
 
 
@@ -520,7 +519,7 @@ void m1comm_device::comm_tick()
 
 			// update "ring buffer" if link established
 			// live relay does not send data
-			if (m_linkid != 0x00 && m_shared[5] != 0x00)
+			if (m_linkid != 0x00 && m_shared[4] != 0x00)
 			{
 				m_buffer[0] = m_linkid;
 				frameOffset = frameStart + (m_linkid * frameSize);

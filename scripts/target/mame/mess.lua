@@ -61,7 +61,7 @@ CPUS["MIPS"] = true
 CPUS["R3000"] = true
 CPUS["PSX"] = true
 CPUS["SH"] = true
-CPUS["DSP16A"] = true
+CPUS["DSP16"] = true
 CPUS["DSP32C"] = true
 CPUS["PIC16C5X"] = true
 CPUS["PIC16C62X"] = true
@@ -270,6 +270,7 @@ SOUNDS["MEA8000"] = true
 --SOUNDS["MM5837"] = true
 SOUNDS["DAVE"] = true
 --SOUNDS["LC7535"] = true
+SOUNDS["UPD934G"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -3509,6 +3510,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/chesstrv.cpp",
 	MAME_DIR .. "src/mame/drivers/cd2650.cpp",
 	MAME_DIR .. "src/mame/drivers/cdc721.cpp",
+	MAME_DIR .. "src/mame/drivers/cit101.cpp",
 	MAME_DIR .. "src/mame/drivers/cit220.cpp",
 	MAME_DIR .. "src/mame/drivers/codata.cpp",
 	MAME_DIR .. "src/mame/drivers/controlid.cpp",

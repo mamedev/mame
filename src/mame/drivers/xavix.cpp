@@ -2139,6 +2139,16 @@ ROM_START( eka_strt )
 	ROM_LOAD( "ekarastartcart.bin", 0x000000, 0x080000, CRC(8c12c0c2) SHA1(8cc1b098894af25a4bfccada884125b66f5fe8b2) )
 ROM_END
 
+ROM_START( eka_vol1 )
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "ekaravol1.bin", 0x000000, 0x100000, CRC(29df4aea) SHA1(b95835aaf8630b61b47e5da0968cd4a1dd3bc517) )
+ROM_END
+
+ROM_START( eka_vol2 )
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "ekaravol2.bin", 0x000000, 0x100000, CRC(6c66772e) SHA1(e1e719df1e51caaafd9b3af187059334f7abbba3) )
+ROM_END
+
 ROM_START( has_wamg )
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "minigolf.bin", 0x000000, 0x400000, CRC(35cee2ad) SHA1(c7344e8ba336bc329638485ea571cd731ebf7649) )
@@ -2184,9 +2194,13 @@ CONS( 200?, epo_efdx,  0,          0,  xavix,  xavix,  xavix_state, taitons1,  "
 
 CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,  xavix_state, rad_box,   "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
 
-CONS (200?, eka_base,  0,          0,  xavix,  xavix,  xavix_state, xavix,     "Takara / SSD Company LTD",                     "e-kara", MACHINE_IS_SKELETON)
+CONS (200?, eka_base,  0,          0,  xavix,  xavix,  xavix_state, xavix,     "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_IS_SKELETON)
 
-CONS (200?, eka_strt,  0,          0,   xavix,  xavix,  xavix_state, xavix,    "Takara / SSD Company LTD",                     "e-kara Starter", MACHINE_IS_SKELETON)
+CONS (200?, eka_strt,  0,          0,   xavix,  xavix,  xavix_state, xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_IS_SKELETON)
+
+CONS (200?, eka_vol1,  0,          0,   xavix,  xavix,  xavix_state, xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 1'
+
+CONS (200?, eka_vol2,  0,          0,   xavix,  xavix,  xavix_state, xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 2'
 
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
