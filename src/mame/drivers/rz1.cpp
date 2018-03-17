@@ -6,25 +6,27 @@
 
     Sampling drum machine
 
-	Skeleton driver
+    Skeleton driver
 
-	Sound ROM info:
+    Sound ROM info:
 
-	Each ROM chip holds 1.49s of sounds and can be opened as raw
-	PCM data: signed 8-bit, mono, 20,000 Hz.
+    Each ROM chip holds 1.49s of sounds and can be opened as raw
+    PCM data: signed 8-bit, mono, 20,000 Hz.
 
-	* Sound A: Toms 1~3, Kick, Snare, Rimshot, Closed Hi-Hat, Open Hi-Hat,
-	    and Metronome Click (in that order).
+    * Sound A: Toms 1~3, Kick, Snare, Rimshot, Closed Hi-Hat, Open Hi-Hat,
+        and Metronome Click (in that order).
 
-	* Sound B: Clap, Ride, Cowbell, and Crash (in that order).
+    * Sound B: Clap, Ride, Cowbell, and Crash (in that order).
 
-	Note: Holding EDIT/RECORD, DELETE, INSERT/AUTO-COMPENSATE and
-	CHAIN/BEAT at startup causes the system to go into a RAM test.
+    Note: Holding EDIT/RECORD, DELETE, INSERT/AUTO-COMPENSATE and
+    CHAIN/BEAT at startup causes the system to go into a RAM test.
 
 ***************************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 #include "cpu/upd7810/upd7811.h"
+#include "video/hd44780.h"
 
 
 //**************************************************************************
@@ -37,11 +39,14 @@ public:
 	rz1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_hd44780(*this, "hd44780"),
 		m_keys(*this, "kc%u", 0), m_key_select(0),
 		m_port_b(0xff)
 	{ }
 
 	void rz1(machine_config &config);
+
+	DECLARE_PALETTE_INIT(rz1);
 
 protected:
 	virtual void machine_start() override;
@@ -49,6 +54,7 @@ protected:
 
 private:
 	required_device<upd7811_device> m_maincpu;
+	required_device<hd44780_device> m_hd44780;
 	required_ioport_array<8> m_keys;
 
 	void map(address_map &map);
@@ -73,7 +79,7 @@ private:
 //**************************************************************************
 
 ADDRESS_MAP_START( rz1_state::map )
-//	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
+//  AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_ROM AM_REGION("program", 0)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(upd934g_c_w)
@@ -185,14 +191,16 @@ WRITE8_MEMBER( rz1_state::port_a_w )
 	m_key_select = data;
 
 	// output lcd data to console until it's hooked up properly
-	if (m_port_b == 0x37 || m_port_b == 0x33)
-		printf("%c", data);
+//  if (m_port_b == 0x37 || m_port_b == 0x33)
+//      printf("%c", data);
+	m_hd44780->data_write(space, 0, data);
 }
 
 WRITE8_MEMBER( rz1_state::port_b_w )
 {
 	logerror("port_b_w: %02x\n", data);
 	m_port_b = data;
+	m_hd44780->control_write(space, 0, data & 0xe0);    // top 3 lines go to the 44780
 }
 
 READ8_MEMBER( rz1_state::port_c_r )
@@ -236,6 +244,11 @@ void rz1_state::machine_reset()
 {
 }
 
+PALETTE_INIT_MEMBER(rz1_state, rz1)
+{
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
+}
 
 //**************************************************************************
 //  MACHINE DEFINTIONS
@@ -248,6 +261,22 @@ MACHINE_CONFIG_START( rz1_state::rz1 )
 	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(rz1_state, port_b_w))
 	MCFG_UPD7810_PORTC_READ_CB(READ8(rz1_state, port_c_r))
 	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(rz1_state, port_c_w))
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(6*16, 9*2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
+	//MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_PALETTE_INIT_OWNER(rz1_state, rz1)
+
+	MCFG_HD44780_ADD("hd44780")
+	MCFG_HD44780_LCD_SIZE(1, 16)
 MACHINE_CONFIG_END
 
 
