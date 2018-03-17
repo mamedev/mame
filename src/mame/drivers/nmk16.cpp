@@ -6407,15 +6407,15 @@ ROM_END
 
 ROM_START( tdragon3h )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
-	ROM_LOAD16_BYTE( "H.27C2001",      0x00000, 0x40000, CRC(0091f4a3) SHA1(025e5f7ff12eaa90c5cfe757c71d58ba7040cba7) )
-	ROM_LOAD16_BYTE( "L.27C020",       0x00001, 0x40000, CRC(4699c313) SHA1(1851a4b5ad9c2bac230126d195e239a5ebe827f9) )
+	ROM_LOAD16_BYTE( "h.27c2001",      0x00000, 0x40000, CRC(0091f4a3) SHA1(025e5f7ff12eaa90c5cfe757c71d58ba7040cba7) )
+	ROM_LOAD16_BYTE( "l.27c020",       0x00001, 0x40000, CRC(4699c313) SHA1(1851a4b5ad9c2bac230126d195e239a5ebe827f9) )
 
 	// Not from this PCB
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
-	ROM_LOAD( "1.27C1000",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) ) /* banked */
+	ROM_LOAD( "1.27c1000",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) ) /* banked */
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
-	ROM_LOAD( "12.27C1000",    0x000000, 0x020000, CRC(f809d616) SHA1(c6a4d776fee770ec197204b855b85bcc719469a5) )    /* 8x8 tiles */
+	ROM_LOAD( "12.27c1000",    0x000000, 0x020000, CRC(f809d616) SHA1(c6a4d776fee770ec197204b855b85bcc719469a5) )    /* 8x8 tiles */
 
 	// all other roms are MASK parts marked 'CONNY' but weren't dumped from this PCB so content is only assumed to be the same
 

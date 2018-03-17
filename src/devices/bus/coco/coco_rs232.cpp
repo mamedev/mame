@@ -96,7 +96,7 @@ MACHINE_CONFIG_END
 
 ROM_START(coco_rs232_device)
 	ROM_REGION(0x1000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("Deluxe_RS-232_Program_Pak_1983_26-2226_Tandy.rom", 0x0000, 0x1000, CRC(d990e1f9) SHA1(3fad25f3462a0b581b9c182ac11ad90c8fa08cb6))
+	ROM_LOAD("deluxe_rs-232_program_pak_1983_26-2226_tandy.rom", 0x0000, 0x1000, CRC(d990e1f9) SHA1(3fad25f3462a0b581b9c182ac11ad90c8fa08cb6))
 ROM_END
 
 //-------------------------------------------------

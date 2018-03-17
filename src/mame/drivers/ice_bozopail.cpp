@@ -70,8 +70,8 @@ MACHINE_CONFIG_END
 
 ROM_START( ice_bozo )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // mostly sound data, some code
-	ROM_LOAD( "ICE-BOZO.U18", 0x000000, 0x100000, CRC(00500a8b) SHA1(50b8a784ae61510a08cafbfb8529ec2a8ac1bf06) )
-	ROM_LOAD( "ICE-BOZO.U9",  0x100000, 0x100000, CRC(26fd9d60) SHA1(41fe8d42db1eb16b413bd5a0f16bf0d081c3cc97) )
+	ROM_LOAD( "ice-bozo.u18", 0x000000, 0x100000, CRC(00500a8b) SHA1(50b8a784ae61510a08cafbfb8529ec2a8ac1bf06) )
+	ROM_LOAD( "ice-bozo.u9",  0x100000, 0x100000, CRC(26fd9d60) SHA1(41fe8d42db1eb16b413bd5a0f16bf0d081c3cc97) )
 ROM_END
 
 GAME( 1997?, ice_bozo,  0,    ice_bozo, ice_bozo, ice_bozopail_state,  0, ROT0, "Innovative Creations in Entertainment", "Bozo's Pail Toss (v2.07)", MACHINE_IS_SKELETON_MECHANICAL )

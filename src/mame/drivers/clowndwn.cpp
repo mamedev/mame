@@ -79,8 +79,8 @@ MACHINE_CONFIG_END
 
 ROM_START( clowndwn )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "CLWNROLL.Z8", 0x0000, 0x1000, CRC(ec655745) SHA1(e38de904f30530f8971eb4a9d7796da345bf81ad) )
-	ROM_LOAD( "CLWNROLL.Z9", 0x1000, 0x1000, CRC(aeef885e) SHA1(bc6805b638625a347e1288a927ce30e030afe9e3) )
+	ROM_LOAD( "clwnroll.z8", 0x0000, 0x1000, CRC(ec655745) SHA1(e38de904f30530f8971eb4a9d7796da345bf81ad) )
+	ROM_LOAD( "clwnroll.z9", 0x1000, 0x1000, CRC(aeef885e) SHA1(bc6805b638625a347e1288a927ce30e030afe9e3) )
 ROM_END
 
 GAME( 1987, clowndwn,  0,    clowndwn, clowndwn, clowndwn_state,  0, ROT0, "Elwood Electronics", "Clown Roll Down (Elwood)", MACHINE_IS_SKELETON_MECHANICAL )

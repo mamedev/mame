@@ -16,19 +16,26 @@ class at586_state : public driver_device
 {
 public:
 	at586_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
-	required_device<cpu_device> m_maincpu;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
-	DECLARE_WRITE8_MEMBER(boot_state_w);
 	void at586x3(machine_config &config);
 	void at586(machine_config &config);
+
+protected:
 	void at_softlists(machine_config &config);
+
+	DECLARE_WRITE8_MEMBER(boot_state_w);
 
 	static void tx_config(device_t *device);
 	static void sb_config(device_t *device);
+
 	void at586_io(address_map &map);
 	void at586_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
 };
 
 WRITE8_MEMBER(at586_state::boot_state_w)
@@ -154,19 +161,19 @@ ROM_START(at586x3)
 	ROMX_LOAD("m7s04.rom", 0x00000, 0x40000, CRC(3689f5a9) SHA1(8daacdb0dc6783d2161680564ffe83ac2515f7ef), ROM_BIOS(3))
 
 	ROM_SYSTEM_BIOS(3, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
-	ROMX_LOAD("M55-04ns.rom", 0x20000, 0x20000, CRC(0116B2B0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(4))
+	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116B2B0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(4))
 
 	ROM_SYSTEM_BIOS(4, "m55s04", "m55n04") // with sound
-	ROMX_LOAD("M55-04s.rom", 0x20000, 0x20000, CRC(34A7422E) SHA1(68753fe373c97844beff83ea75c634c77cfedb8f), ROM_BIOS(5))
+	ROMX_LOAD("m55-04s.rom", 0x20000, 0x20000, CRC(34A7422E) SHA1(68753fe373c97844beff83ea75c634c77cfedb8f), ROM_BIOS(5))
 
 	ROM_SYSTEM_BIOS(5, "m55ns03", "m55ns03") // Micronics M55HI-Plus with no sound
-	ROMX_LOAD("M55NS03.ROM", 0x20000, 0x20000, CRC(6a3deb49) SHA1(78bfc20e0f8699f4d153d241a757153afcde3efb), ROM_BIOS(6))
+	ROMX_LOAD("m55ns03.rom", 0x20000, 0x20000, CRC(6a3deb49) SHA1(78bfc20e0f8699f4d153d241a757153afcde3efb), ROM_BIOS(6))
 
 	ROM_SYSTEM_BIOS(6, "m55hi03", "m55hi03") // with sound
-	ROMX_LOAD("M55HI03.ROM", 0x20000, 0x20000, CRC(bd476200) SHA1(7633ba27819ad45c6253abb728b1ef0c49229743), ROM_BIOS(7))
+	ROMX_LOAD("m55hi03.rom", 0x20000, 0x20000, CRC(bd476200) SHA1(7633ba27819ad45c6253abb728b1ef0c49229743), ROM_BIOS(7))
 
 	ROM_SYSTEM_BIOS(7, "m7shi03", "m7shi03") // Micronics M7S-Hi
-	ROMX_LOAD("M7SHI03.SND", 0x00000, 0x40000, CRC(3a35a939) SHA1(74af69eb5ca546b0960540e7c3ea62a532157f2a), ROM_BIOS(8))
+	ROMX_LOAD("m7shi03.snd", 0x00000, 0x40000, CRC(3a35a939) SHA1(74af69eb5ca546b0960540e7c3ea62a532157f2a), ROM_BIOS(8))
 ROM_END
 
 /* FIC VT-503 (Intel TX chipset, ITE 8679 Super I/O) */

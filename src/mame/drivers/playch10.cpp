@@ -1445,15 +1445,15 @@ ROM_END
 // TT-PRG.U5           = nes-ni-0 prg          nes:ttoonadvu Tiny Toon Adventures (USA)
 ROM_START( pc_ttoon )   /* Tiny Toon Adventures */
 	BIOS_CPU
-	ROM_LOAD( "TT-GM2.U3",   0x0c000, 0x2000, CRC(d2764d91) SHA1(393b54148e9250f14d83318aed6686cc04b923e6) ) /* extra bios code for this game */
+	ROM_LOAD( "tt-gm2.u3",   0x0c000, 0x2000, CRC(d2764d91) SHA1(393b54148e9250f14d83318aed6686cc04b923e6) ) /* extra bios code for this game */
 	BIOS_GFX
 
 	ROM_REGION( 0x50000, "cart", 0 )
-	ROM_LOAD( "TT-PRG.U5",    0x10000, 0x20000, CRC(9cb55b96) SHA1(437c326a4575895b9d7e567cab4f70b2f44ed8dd) )   /* banked */
+	ROM_LOAD( "tt-prg.u5",    0x10000, 0x20000, CRC(9cb55b96) SHA1(437c326a4575895b9d7e567cab4f70b2f44ed8dd) )   /* banked */
 	ROM_RELOAD(          0x30000, 0x20000 )
 
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
-	ROM_LOAD( "TT-CHR.U1",    0x00000, 0x20000, CRC(a024ae14) SHA1(2e797a173161a61c14ce299e3c5a31c6029f2b50) )
+	ROM_LOAD( "tt-chr.u1",    0x00000, 0x20000, CRC(a024ae14) SHA1(2e797a173161a61c14ce299e3c5a31c6029f2b50) )
 
 	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
 	ROM_LOAD( "security.u6", 0x00, 0x10, CRC(5b4f6930) SHA1(bd152d6907fe55f80125b34360fdb44cfc348906) )

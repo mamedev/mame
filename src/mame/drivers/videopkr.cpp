@@ -1581,7 +1581,7 @@ ROM_START( bpoker )
 	ROM_LOAD( "b_poker_ver_1403.bin", 0x0000, 0x8000, CRC(61eca2f6) SHA1(62a671e86b94005a9ffc4b6545a90c43880e0a11) )
 
 	ROM_REGION( 0x1000, "soundcpu", 0 )
-	ROM_LOAD( "sonido_dados_poker_y_b.jack_3d2f_(d8751h).bin", 0x0000, 0x1000, CRC(7b71cd30) SHA1(d782c50689a5aea632b6d274a1a7435a092ad20c) )
+	ROM_LOAD( "sonido_dados_poker_y_b.jack_3d2f_=d8751h=.bin", 0x0000, 0x1000, CRC(7b71cd30) SHA1(d782c50689a5aea632b6d274a1a7435a092ad20c) )
 
 	ROM_REGION( 0x20000, "tiles", 0 )
 	ROM_LOAD( "conf_15_poker_ver_1.00_ea91.bin", 0x00000, 0x8000, CRC(4efea023) SHA1(c10a30353d793a54eab14bd5e9687668743b66de) )

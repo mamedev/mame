@@ -1189,11 +1189,11 @@ ROM_START( gtsers1 ) /* Series 1 (Complete) */
 	ROM_LOAD( "prog101c_right", 0x00000, 0x2000, CRC(767f0e46) SHA1(5de7b54876fcbfb2328174ffe6b656ffea886fcb) ) /* rom board UMV 10 B */
 	ROM_LOAD( "prog101c_left",  0x0a000, 0x2000, CRC(24c0a097) SHA1(b8de58baecb92775e0882cd6eca3b9e07cf7c5a5) )
 	/* Question roms */
-	ROM_LOAD( "science_#1",    0x10000, 0x4000, CRC(68259e09) SHA1(29e848b4744b767c51ff81a756fba7bf96daefec) )
-	ROM_LOAD( "general_#1",    0x14000, 0x4000, CRC(25a0ef9d) SHA1(793abd779cc237e14933933747bbf27bbcbfcd32) )
-	ROM_LOAD( "sports_#1",     0x18000, 0x4000, CRC(cb1744f5) SHA1(ea3f7bfcecf5c58c26aa0f34908ba5d54f7279ec) )
-	ROM_LOAD( "music_#1",      0x1c000, 0x4000, CRC(1b546857) SHA1(31e04bb5016e8ef6dc48f9b3ddaeab5fe04f91c2) )
-	ROM_LOAD( "movies-tv_#1",  0x20000, 0x4000, CRC(e9a55dad) SHA1(c87682e72bad3507b24eb6a52b4e430e0bfcdab6) )
+	ROM_LOAD( "science_@1",    0x10000, 0x4000, CRC(68259e09) SHA1(29e848b4744b767c51ff81a756fba7bf96daefec) )
+	ROM_LOAD( "general_@1",    0x14000, 0x4000, CRC(25a0ef9d) SHA1(793abd779cc237e14933933747bbf27bbcbfcd32) )
+	ROM_LOAD( "sports_@1",     0x18000, 0x4000, CRC(cb1744f5) SHA1(ea3f7bfcecf5c58c26aa0f34908ba5d54f7279ec) )
+	ROM_LOAD( "music_@1",      0x1c000, 0x4000, CRC(1b546857) SHA1(31e04bb5016e8ef6dc48f9b3ddaeab5fe04f91c2) )
+	ROM_LOAD( "movies-tv_@1",  0x20000, 0x4000, CRC(e9a55dad) SHA1(c87682e72bad3507b24eb6a52b4e430e0bfcdab6) )
 ROM_END
 
 ROM_START( gtsers2 ) /* Series 2 (Complete - question roms dated 2/9) */
@@ -1203,9 +1203,9 @@ ROM_START( gtsers2 ) /* Series 2 (Complete - question roms dated 2/9) */
 	/* Question roms */
 	ROM_LOAD( "tv_mash",          0x10000, 0x4000, CRC(a86990fc) SHA1(6a11b038d48bb97feb4857546349ed93ea1f9273) )
 	ROM_LOAD( "general_2",        0x14000, 0x4000, CRC(5798f2b3) SHA1(0636017969d9b1eac5d33cfb18cb36f7cf4cba88) )
-	ROM_LOAD( "sports_2_#2",      0x18000, 0x4000, CRC(fb632622) SHA1(c14d8178f5cfc5994e2ab4f829e353fa75b57304) )
-	ROM_LOAD( "comics_#1",        0x1c000, 0x4000, CRC(8c5cd561) SHA1(1ca566acf72ce636b1b34ee6b7cafb9584340bcc) )
-	ROM_LOAD( "entertainment_#1", 0x20000, 0x4000, CRC(cd3ce4c7) SHA1(4bd121fa5899a96b015605f84179ed82be0a25f3) ) /* Correct spelling of "Acapella" */
+	ROM_LOAD( "sports_2_@2",      0x18000, 0x4000, CRC(fb632622) SHA1(c14d8178f5cfc5994e2ab4f829e353fa75b57304) )
+	ROM_LOAD( "comics_@1",        0x1c000, 0x4000, CRC(8c5cd561) SHA1(1ca566acf72ce636b1b34ee6b7cafb9584340bcc) )
+	ROM_LOAD( "entertainment_@1", 0x20000, 0x4000, CRC(cd3ce4c7) SHA1(4bd121fa5899a96b015605f84179ed82be0a25f3) ) /* Correct spelling of "Acapella" */
 ROM_END
 
 ROM_START( gtsers3 ) /* Series 3 (Complete - question roms dated 3/9) */
@@ -1213,9 +1213,9 @@ ROM_START( gtsers3 ) /* Series 3 (Complete - question roms dated 3/9) */
 	ROM_LOAD( "prog102b_right",   0x00000, 0x2000, CRC(e8391f71) SHA1(a955eff87d622d4fcfd25f6d888c48ff82556879) )
 	ROM_LOAD( "prog102b_left",    0x0a000, 0x2000, CRC(cc7b45a7) SHA1(c708f56feb36c1241358a42bb7dce25b799f1f0b) )
 	/* Question roms */
-	ROM_LOAD( "beatlemania_#1", 0x10000, 0x4000, CRC(c35ab539) SHA1(aa7c9b532aeb289b71c179e6ff1cc5b63dbe240c) )
+	ROM_LOAD( "beatlemania_@1", 0x10000, 0x4000, CRC(c35ab539) SHA1(aa7c9b532aeb289b71c179e6ff1cc5b63dbe240c) )
 	ROM_LOAD( "general_3",      0x14000, 0x4000, CRC(a60f17a4) SHA1(0d79be9e2e49b9817e94d410e25bb6dcda10aa9e) )
-	ROM_LOAD( "sports_3_#3",    0x18000, 0x4000, CRC(b22cec38) SHA1(a416c3de9749fda3ab5ae5841304da0cef900cbf) )
+	ROM_LOAD( "sports_3_@3",    0x18000, 0x4000, CRC(b22cec38) SHA1(a416c3de9749fda3ab5ae5841304da0cef900cbf) )
 	ROM_LOAD( "country-west",   0x1c000, 0x4000, CRC(3227c475) SHA1(d07ad4876122223fe7ab3f21781e0d847332ea5c) )
 	ROM_LOAD( "tv_soaps",       0x20000, 0x4000, CRC(26914f3a) SHA1(aec380cea14d6acb71986f3d65c7620b16c174ae) )
 ROM_END
@@ -1227,7 +1227,7 @@ ROM_START( gtsers4 ) /* Series 4 (Incomplete - question roms dated 4/9) */
 	/* Question roms */
 	ROM_LOAD( "history-geog",   0x10000, 0x4000, CRC(76d6b026) SHA1(613809b247cb27773631a1bb34af485c2b1bd486) )
 	ROM_LOAD( "star_trek",      0x14000, 0x4000, CRC(19764e00) SHA1(d7ed577dba02776ac58e8f34b833ed07679c0af1) )
-	ROM_LOAD( "television_#1",  0x18000, 0x4000, CRC(0f646389) SHA1(23fefe2e6cc26767d52604e7ab15bb4db99a6e94) )
+	ROM_LOAD( "television_@1",  0x18000, 0x4000, CRC(0f646389) SHA1(23fefe2e6cc26767d52604e7ab15bb4db99a6e94) )
 	/* Missing "baseball" */
 	/* Missing "hollywood" */
 ROM_END
@@ -1262,7 +1262,7 @@ ROM_START( gtsersa ) /* alt or older version questions */
 	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
 	/* Question roms */
 	ROM_LOAD( "sports",               0x10000, 0x4000, CRC(9b4a17b6) SHA1(1b5358b5bc83c2817ecfa4e277fa351a679d5023) ) /* Series 1 question */
-	ROM_LOAD( "entertainment_#1_old", 0x14000, 0x4000, CRC(2bffb3b4) SHA1(5947ebd708df35cefa86608392909c16b25d0710) ) /* Dated 2/9 - Spells "Acapella" as "Cappella" */
+	ROM_LOAD( "entertainment_@1_old", 0x14000, 0x4000, CRC(2bffb3b4) SHA1(5947ebd708df35cefa86608392909c16b25d0710) ) /* Dated 2/9 - Spells "Acapella" as "Cappella" */
 	ROM_LOAD( "sports_2",             0x18000, 0x4000, CRC(e8f8e168) SHA1(d2bc57dc0799dd8817b15857f17c4d7ee4d9f932) ) /* Dated 2/9 */
 	ROM_LOAD( "comics",               0x1c000, 0x4000, CRC(7efdfe8f) SHA1(ec255777c61677ca32c49b9da5e85e07c0647e5f) ) /* Dated 2/9 */
 	ROM_LOAD( "entertainment",        0x20000, 0x4000, CRC(b670b9e8) SHA1(0d2246fcc6c753694bc9bd1fc05ac439f24059ef) ) /* Dated 2/9 */
@@ -1485,8 +1485,8 @@ ROM_END
 
 ROM_START( suprpokr )  /* Super Poker Version 10.19S BOBC. Rom board UMV-7C */
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "supr_pokr_10.19s_#1", 0x00000, 0x4000, CRC(50662b4d) SHA1(967161a755db43d2cfd5ce92e14c5284f1f1f8ad) )
-	ROM_LOAD( "supr_pokr_10.19s_#2", 0x08000, 0x4000, CRC(22b45aeb) SHA1(006c3072cc44c6fde9b4d15163dc70707bbd5a9c) )
+	ROM_LOAD( "supr_pokr_10.19s_@1", 0x00000, 0x4000, CRC(50662b4d) SHA1(967161a755db43d2cfd5ce92e14c5284f1f1f8ad) )
+	ROM_LOAD( "supr_pokr_10.19s_@2", 0x08000, 0x4000, CRC(22b45aeb) SHA1(006c3072cc44c6fde9b4d15163dc70707bbd5a9c) )
 	ROM_RELOAD(                      0x0c000, 0x4000 )
 
 	ROM_REGION( 0x0800, "nvram", 0 )
@@ -1498,8 +1498,8 @@ ROM_END
 
 ROM_START( suprpokra )  /* Super Poker Version 10.15S BOBC. Rom board UMV-7C */
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "supr_pokr_10.15s_#1", 0x00000, 0x4000, CRC(5cc7c1e0) SHA1(1cdca32c4df7227dab77574abe344b291741139e) )
-	ROM_LOAD( "supr_pokr_10.15s_#2", 0x08000, 0x4000, CRC(e47d6e2a) SHA1(9cabc42275dad8be6cd5b167e381ddb5bf08276d) )
+	ROM_LOAD( "supr_pokr_10.15s_@1", 0x00000, 0x4000, CRC(5cc7c1e0) SHA1(1cdca32c4df7227dab77574abe344b291741139e) )
+	ROM_LOAD( "supr_pokr_10.15s_@2", 0x08000, 0x4000, CRC(e47d6e2a) SHA1(9cabc42275dad8be6cd5b167e381ddb5bf08276d) )
 	ROM_RELOAD(                      0x0c000, 0x4000 )
 
 	ROM_REGION( 0x0800, "nvram", 0 )
@@ -1511,8 +1511,8 @@ ROM_END
 
 ROM_START( suprpokrb )  /* Super Poker Version 10.10 BOBC. Rom board UMV-7C */
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "supr_pokr_10.10_#1", 0x00000, 0x4000, CRC(8324471f) SHA1(c38b7a735ef06feea3e8d4ba6dd963e24d38c792) )
-	ROM_LOAD( "supr_pokr_10.10_#2", 0x08000, 0x4000, CRC(a82ca9c5) SHA1(3b0f4ad7d53370dc1f00dec696e993359147a496) )
+	ROM_LOAD( "supr_pokr_10.10_@1", 0x00000, 0x4000, CRC(8324471f) SHA1(c38b7a735ef06feea3e8d4ba6dd963e24d38c792) )
+	ROM_LOAD( "supr_pokr_10.10_@2", 0x08000, 0x4000, CRC(a82ca9c5) SHA1(3b0f4ad7d53370dc1f00dec696e993359147a496) )
 	ROM_RELOAD(                     0x0c000, 0x4000 )
 
 	ROM_REGION( 0x0800, "nvram", 0 )
@@ -1655,7 +1655,7 @@ ROM_START( gtsers12 )
 	ROM_LOAD( "program_v5.03",   0x00000, 0x4000, CRC(888b7d9b) SHA1(e5ed4f22bff99c26cd6ef9a06cb386221e84bbf5) )
 	ROM_LOAD( "new_science_2+",  0x10000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) ) /* Labeled as NEW SCNE 2* */
 	ROM_LOAD( "adult_sex_4+",    0x18000, 0x8000, CRC(9c32730e) SHA1(9d060e49a4c1dd8d978619b1c357c9e8238e5c96) ) /* Labeled as ADULT SEX 4* */
-	ROM_LOAD( "cops_&_robbers",  0x20000, 0x8000, CRC(8b367c33) SHA1(013468157bf469c9cf138809fdc45b3ba60a423b) )
+	ROM_LOAD( "cops_+_robbers",  0x20000, 0x8000, CRC(8b367c33) SHA1(013468157bf469c9cf138809fdc45b3ba60a423b) )
 	ROM_LOAD( "famous_quotes",   0x28000, 0x8000, CRC(0a27d8ae) SHA1(427e6ae25e47da7f7f7c3e92a37e330d711da90c) )
 	ROM_LOAD( "vices",           0x30000, 0x8000, CRC(e6069955) SHA1(68f7453f21a4ce1be912141bbe947fbd81d918a3) )
 	/* Missing unknown alternate question? */
@@ -1712,7 +1712,7 @@ ROM_START( gt103ab )
 	ROM_LOAD( "adult_sex_2_alt",   0x18000, 0x8000, CRC(8c0eacc8) SHA1(ddaa25548d161394b41c65a2db57a9fcf793062b) )
 	ROM_LOAD( "adult_sex_3_alt",   0x20000, 0x8000, CRC(63cbd1d6) SHA1(8dcd5546dc8688d6b8404d5cf63d8a59acc9bf4c) )
 	ROM_LOAD( "rock-n-roll_alt",   0x28000, 0x8000, CRC(8eb83052) SHA1(93e3c1ae6c2048fb44ecafe1013b6a96da38fa84) )
-	ROM_LOAD( "cops_&_robbers_alt",0x30000, 0x8000, CRC(5176751a) SHA1(fbf0aeceeedb8a93c12920fecf6268893b393541) )
+	ROM_LOAD( "cops_+_robbers_alt",0x30000, 0x8000, CRC(5176751a) SHA1(fbf0aeceeedb8a93c12920fecf6268893b393541) )
 ROM_END
 
 ROM_START( gt103asx ) /* Not sure there was ever an all Adult Trivia version. These are just the collection from all the series combined here */
@@ -1869,10 +1869,10 @@ ROM_START( geimulti )
 	ROM_LOAD( "dogs",      0x30000, 0x8000, CRC(83cd070a) SHA1(ed7ce3ffe030802e99dd27f2310524615fcfc8bf) )
 	ROM_LOAD( "memotest",  0x38000, 0x8000, CRC(8942b98c) SHA1(3f182eb6d00618d9859cd8acdf13c829d4469075) )
 	ROM_LOAD( "reelfun",   0x40000, 0x8000, CRC(b3ede904) SHA1(e77c15e893583572650bb60432d68a1f7bf67d09) )
-	ROM_LOAD( "fact#1",    0x48000, 0x8000, CRC(949b5519) SHA1(d4ac35ccbbb50f4e0d1e21e8427e6ad535e6da53) )
-	ROM_LOAD( "adltsex#1", 0x50000, 0x8000, CRC(9e4d320b) SHA1(76a6280bce884acb3faa9ef3882de016612c34f6) )
-	ROM_LOAD( "nfl#1",     0x58000, 0x8000, CRC(74fbbf17) SHA1(9d559034d3ec0b293d4b720150197daea3d450ff) )
-	ROM_LOAD( "entr#1",    0x60000, 0x8000, CRC(caceaa7b) SHA1(c51f10f5acd3d3fedce43103b9f11d006139043c) )
+	ROM_LOAD( "fact@1",    0x48000, 0x8000, CRC(949b5519) SHA1(d4ac35ccbbb50f4e0d1e21e8427e6ad535e6da53) )
+	ROM_LOAD( "adltsex@1", 0x50000, 0x8000, CRC(9e4d320b) SHA1(76a6280bce884acb3faa9ef3882de016612c34f6) )
+	ROM_LOAD( "nfl@1",     0x58000, 0x8000, CRC(74fbbf17) SHA1(9d559034d3ec0b293d4b720150197daea3d450ff) )
+	ROM_LOAD( "entr@1",    0x60000, 0x8000, CRC(caceaa7b) SHA1(c51f10f5acd3d3fedce43103b9f11d006139043c) )
 	ROM_LOAD( "grph",      0x68000, 0x8000, CRC(25e265db) SHA1(6e184309ee67dbe7930570b135ace09eeb1eb333) )
 
 	ROM_REGION( 0x0800, "nvram", 0 )

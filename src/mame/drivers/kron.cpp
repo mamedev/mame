@@ -320,7 +320,7 @@ MACHINE_CONFIG_END
 /* ROM definitions */
 ROM_START (kron180)
 	ROM_REGION(0x10000, "roms", 0)
-	ROM_LOAD ("k180DD4-2.8M.bin", 0x000000, 0x10000, CRC (ae0642ad) SHA1 (2c53a714de6af4b64e46fcd34bca6d4438511765))
+	ROM_LOAD ("k180dd4-2.8m.bin", 0x000000, 0x10000, CRC (ae0642ad) SHA1 (2c53a714de6af4b64e46fcd34bca6d4438511765))
 
 	ROM_REGION(0x1000, "chargen",0) /* TODO: This character rom is taken from ibmjr rom set and will be replaced */
 	ROM_LOAD( "cga.chr", 0x0000, 0x1000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd) )

@@ -27,6 +27,9 @@
     assumed that reading PIO with PSEL low when INT is asserted will
     return the address and cause INT to be de-asserted, and reading PIO
     with PSEL low when int is not asserted will return the data word.
+    The DSP program will only respond to one external interrupt per
+    sample interval (i.e. the maximum command rate is the same as the
+    sample rate).
 
     The DSP program uses 2 kilowords of internal RAM and reads data from
     external ROM while executing from internal ROM.  As such, it

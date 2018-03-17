@@ -2116,7 +2116,7 @@ ROM_END
 
 ROM_START( gulfstrmk )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
-	ROM_LOAD( "18.4L",        0x00000, 0x20000, CRC(02bcf56d) SHA1(7f13710e9291ca6afd1a534489883607eee4e35a) )
+	ROM_LOAD( "18.4l",        0x00000, 0x20000, CRC(02bcf56d) SHA1(7f13710e9291ca6afd1a534489883607eee4e35a) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )

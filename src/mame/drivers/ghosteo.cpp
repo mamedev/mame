@@ -748,10 +748,10 @@ ROM_START( touryuu )
 
 	// banked every 0x10000 bytes ?
 	ROM_REGION( 0x080000, "qs1000:cpu", 0 )
-	ROM_LOAD( "4m.eeprom_c.s(bad1h).u20",       0x000000, 0x080000, CRC(f81a6530) SHA1(c7fa412102328d06823e73d7d07cadfc25db6d28) )
+	ROM_LOAD( "4m.eeprom_c.s,bad1h.u20",       0x000000, 0x080000, CRC(f81a6530) SHA1(c7fa412102328d06823e73d7d07cadfc25db6d28) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 )
-	ROM_LOAD( "8m.eprom_c.s(f8b1h).u16",       0x000000, 0x100000, CRC(238a85ab) SHA1(ddd79429c0c1e67fcbca1e4ebded97ea46229f0b) ) /* QDSP samples (SFX) */
+	ROM_LOAD( "8m.eprom_c.s,f8b1h.u16",       0x000000, 0x100000, CRC(238a85ab) SHA1(ddd79429c0c1e67fcbca1e4ebded97ea46229f0b) ) /* QDSP samples (SFX) */
 	ROM_LOAD( "qs1001a.u17",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) /* QDSP wavetable rom */
 ROM_END
 

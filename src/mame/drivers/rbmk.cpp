@@ -648,7 +648,7 @@ http://youtu.be/VGbrR7GfDck
 
 ROM_START( rbspm )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD( "MJ-DFMJ-P1.bin", 0x00000, 0x80000, CRC(8f81f154) SHA1(50a9a373dec96b0265907f053d068d636bdabd61) )
+	ROM_LOAD( "mj-dfmj-p1.bin", 0x00000, 0x80000, CRC(8f81f154) SHA1(50a9a373dec96b0265907f053d068d636bdabd61) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* protected MCU */
 	ROM_LOAD( "89c51.bin", 0x0000, 0x1000, NO_DUMP ) // reads as all 0xff
@@ -658,20 +658,20 @@ ROM_START( rbspm )
 	ROM_LOAD( "c016_pic16f84_data.bin", 0x800, 0x080, CRC(ee882e11) SHA1(aa5852a95a89b17270bb6f315dfa036f9f8155cf) )
 
 	ROM_REGION( 0x20000, "user1", 0 ) /* ??? mcu data / code */
-	ROM_LOAD( "MJ-DFMJ-2.2-XX.bin", 0x00000, 0x20000,  CRC(58a9eea2) SHA1(1a251e9b049bc8dafbc0728b3d876fdd5a1c8dd9) )
+	ROM_LOAD( "mj-dfmj-2.2-xx.bin", 0x00000, 0x20000,  CRC(58a9eea2) SHA1(1a251e9b049bc8dafbc0728b3d876fdd5a1c8dd9) )
 
 	ROM_REGION( 0x080000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "MJ-DFMJ-2.2-S1.bin", 0x00000, 0x80000, CRC(2410bb61) SHA1(54e258e4af089841a63e45f25aad70310a28d76b) )  // 1st and 2nd half identical
+	ROM_LOAD( "mj-dfmj-2.2-s1.bin", 0x00000, 0x80000, CRC(2410bb61) SHA1(54e258e4af089841a63e45f25aad70310a28d76b) )  // 1st and 2nd half identical
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) /* 8x32 tiles, lots of girls etc. */
-	ROM_LOAD( "MJ-DFMJ-4.2-A1.bin", 0x00000, 0x80000,  CRC(b0a3a866) SHA1(cc950532160a066fc6ce427f6df9d58ee4589821) )
+	ROM_LOAD( "mj-dfmj-4.2-a1.bin", 0x00000, 0x80000,  CRC(b0a3a866) SHA1(cc950532160a066fc6ce427f6df9d58ee4589821) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 ) /* 8x8 tiles? cards etc */
-	ROM_LOAD( "MJ-DFMJ-4.8-T1.bin", 0x00000, 0x80000, CRC(2b8b689d) SHA1(65ab643fac1e734af8b3a86caa06b532baafa0fe) )
+	ROM_LOAD( "mj-dfmj-4.8-t1.bin", 0x00000, 0x80000, CRC(2b8b689d) SHA1(65ab643fac1e734af8b3a86caa06b532baafa0fe) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* eeprom */
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, NO_DUMP )
 ROM_END
 
-GAME( 1998, rbmk,  0, rbmk,  rbmk,  rbmk_state, 0, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)", MACHINE_NOT_WORKING )
+GAME( 1998, rbmk,  0, rbmk,  rbmk,  rbmk_state, 0, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",     MACHINE_NOT_WORKING )
 GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, 0, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)", MACHINE_NOT_WORKING )

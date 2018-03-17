@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_MIKROPLUS, spectrum_mikroplus_device, "spectrum_mikr
 
 ROM_START( mikroplus )
 	ROM_REGION(0x4000, "rom", 0)
-	ROM_LOAD("ShadowOfTheUnicorn.rom", 0x0000, 0x4000, CRC(7085a0fd) SHA1(66cc823587b520af9636eed7a342d69d3dd15123))
+	ROM_LOAD("shadowoftheunicorn.rom", 0x0000, 0x4000, CRC(7085a0fd) SHA1(66cc823587b520af9636eed7a342d69d3dd15123))
 ROM_END
 
 

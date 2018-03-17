@@ -2206,7 +2206,7 @@ ROM_END
 
 ROM_START( sfrusha )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 )  /* Boot Code Version L1.06A */
-	ROM_LOAD( "HDBOOTV1_06A.bin", 0x000000, 0x80000, CRC(f247ba60) SHA1(850f97002eb1e362c3df870d7b6a1b5524ab983d) )
+	ROM_LOAD( "hdbootv1_06a.bin", 0x000000, 0x80000, CRC(f247ba60) SHA1(850f97002eb1e362c3df870d7b6a1b5524ab983d) )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
@@ -2301,17 +2301,17 @@ ROM_START( calspeeda )
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
 
 	// it actually asks you to replace this with the original rom after the upgrade is complete, which is weird because this is a perfectly valid newer revision of the boot code, but probably explains why the parent set was still on 1.2
-	ROM_LOAD( "Cal speed update  U32 boot ver, 1,4 5EF6", 0x000000, 0x80000, CRC(fd627637) SHA1(b0c2847cbecfc00344e402386d13240d55a0814e) ) // boot code 1.4 Apr 17 1998 21:18:31
+	ROM_LOAD( "cal speed update  u32 boot ver, 1,4 5ef6", 0x000000, 0x80000, CRC(fd627637) SHA1(b0c2847cbecfc00344e402386d13240d55a0814e) ) // boot code 1.4 Apr 17 1998 21:18:31
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
 
 	ROM_SYSTEM_BIOS( 1, "up16_1",       "Disk Update 1.0x to 2.1a (1.25) Step 1 of 3" )
-	ROMX_LOAD("eprom #1 2.1A 90A7", 0x000000, 0x100000, CRC(bc0f373e) SHA1(bf53f1953ccab8da9ce784e4d20dd2ec0d0eff6a), ROM_BIOS(2))
+	ROMX_LOAD("eprom @1 2.1a 90a7", 0x000000, 0x100000, CRC(bc0f373e) SHA1(bf53f1953ccab8da9ce784e4d20dd2ec0d0eff6a), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "up16_2",       "Disk Update 1.0x to 2.1a (1.25) Step 2 of 3" )
-	ROMX_LOAD("eprom #2 2.1A 9F84", 0x000000, 0x100000, CRC(5782da30) SHA1(eaeea3655bc9c1cedefdfb0088d4716584788669), ROM_BIOS(3))
+	ROMX_LOAD("eprom @2 2.1a 9f84", 0x000000, 0x100000, CRC(5782da30) SHA1(eaeea3655bc9c1cedefdfb0088d4716584788669), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 3, "up16_3",       "Disk Update 1.0x to 2.1a (1.25) Step 3 of 3" )
-	ROMX_LOAD("eprom #3 2.1A 3286", 0x000000, 0x100000, CRC(e7d8c88f) SHA1(06c11241ac439527b361826784aef4c58689892e), ROM_BIOS(4))
+	ROMX_LOAD("eprom @3 2.1a 3286", 0x000000, 0x100000, CRC(e7d8c88f) SHA1(06c11241ac439527b361826784aef4c58689892e), ROM_BIOS(4))
 
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )    /* Release version 1.0r8a (4/10/98) (Guts 4/10/98, Main 4/10/98) */

@@ -5898,13 +5898,13 @@ ROM_END
 */
 ROM_START( witchcdf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "$25.bin",    0x5000, 0x1000, CRC(afd6cb4a) SHA1(4c769e1c724bada5875e028781086c32967953a1) )
-	ROM_LOAD( "$26.bin",    0x6000, 0x1000, CRC(ad11960c) SHA1(2b562cfe9401e21c9dcd90307165e2c2d1acfc5b) )
-	ROM_LOAD( "$27.bin",    0x7000, 0x1000, CRC(e6f9c973) SHA1(f209d13d1565160bc2c05c6c4fce73d14a9a56ab) )
+	ROM_LOAD( "@25.bin",    0x5000, 0x1000, CRC(afd6cb4a) SHA1(4c769e1c724bada5875e028781086c32967953a1) )
+	ROM_LOAD( "@26.bin",    0x6000, 0x1000, CRC(ad11960c) SHA1(2b562cfe9401e21c9dcd90307165e2c2d1acfc5b) )
+	ROM_LOAD( "@27.bin",    0x7000, 0x1000, CRC(e6f9c973) SHA1(f209d13d1565160bc2c05c6c4fce73d14a9a56ab) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_FILL(               0x0000, 0x2000, 0x0000 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "$14.bin",    0x2000, 0x1000, CRC(19b68bec) SHA1(b8ef17ba5545e2f104cd2783e5f1c97c400fcbbc) )    /* text layer */
+	ROM_LOAD( "@14.bin",    0x2000, 0x1000, CRC(19b68bec) SHA1(b8ef17ba5545e2f104cd2783e5f1c97c400fcbbc) )    /* text layer */
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
 	ROM_LOAD( "11.bin", 0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    /* cards deck gfx, bitplane1 */
