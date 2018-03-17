@@ -11615,6 +11615,31 @@ ROM_START( scobrae ) // main program is identical to the scobras set once decryp
 ROM_END
 
 
+// two board stack MU1 and MU2A. Has different colors and level sequence. Came from an A.V.G. by Zaccaria cabinet with Konami license, but still has only Konami copyright.
+// https://www.youtube.com/watch?v=CZRRVACtC3A 
+ROM_START( scobrag )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2c_32.bin",   0x0000, 0x1000, CRC(04ffab61) SHA1(302ae8b224d98c405aadd363623eddf88bdc3f0e) )
+	ROM_LOAD( "2e_32.bin",   0x1000, 0x1000, CRC(f82a52de) SHA1(4d8f714b9ae58b180d5293d85517f1a422b5ce3f) )
+	ROM_LOAD( "2f_32.bin",   0x2000, 0x1000, CRC(9dee81cc) SHA1(e842ad873cd5370f2c5d23334a320ebc448bfcdc) )
+	ROM_LOAD( "2h_32.bin",   0x3000, 0x1000, CRC(99dee0c6) SHA1(1f026a40f59fe33cb2ac54a7712d6d259db3ecc8) )
+	ROM_LOAD( "2j_32.bin",   0x4000, 0x1000, CRC(db7fb865) SHA1(94f1382dae4f3c12d177fd74b3493e91989b4654) )
+	ROM_LOAD( "2l_32.bin",   0x5000, 0x1000, CRC(6493d2d3) SHA1(9a3dca56a65bc9e36ae1d665aa3d8112ba293b56) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "c5_16.bin",    0x0000, 0x0800, CRC(d4346959) SHA1(5eab4505beb69a5bdd88b23db60e1193371250cf) )
+	ROM_LOAD( "d5_16.bin",    0x0800, 0x0800, CRC(cc025d95) SHA1(2b0784c4d05c466e0b7648f16e14f34393d792c3) )
+	ROM_LOAD( "e5_16.bin",    0x1000, 0x0800, CRC(1628c53f) SHA1(ec79a73e4a2d7373454b227dd7eff255f1cc60cc) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "h5_16.bin",   0x0000, 0x0800, CRC(64d113b4) SHA1(7b439bb74d5ecc792e0ca8964bcca8c6b7a51262) )
+	ROM_LOAD( "f5_16.bin",   0x0800, 0x0800, CRC(a96316d3) SHA1(9de0e94932e91dc34aea7c81880bde6a486d103b) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "super_cobra_288_6e",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
+
+
 ROM_START( suprheli )
 	/* this is a bootleg of Super Cobra */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -12311,7 +12336,8 @@ GAME( 1981, scobra,      0,        scobra,     scobra,     galaxian_state, scobr
 GAME( 1981, scobrase,    scobra,   scobra,     scobra,     galaxian_state, scobra,     ROT90,  "Konami (Sega license)", "Super Cobra (Sega)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scobras,     scobra,   scobra,     scobras,    galaxian_state, scobra,     ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scobrae,     scobra,   scobra,     scobras,    galaxian_state, scobrae,    ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics) (encrypted, KONATEC XC-103SS CPU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scobrab,     scobra,   scobra,     scobras,    galaxian_state, scobra,     ROT90,  "bootleg (Karateco)", "Super Cobra (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scobrab,     scobra,   scobra,     scobras,    galaxian_state, scobra,     ROT90,  "bootleg (Karateco)", "Super Cobra (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scobrag,     scobra,   scobra,     scobras,    galaxian_state, scobra,     ROT90,  "bootleg (A.V.G. by Zaccaria)", "Super Cobra (bootleg, set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // uses the scramble color PROM
 GAME( 1981, suprheli,    scobra,   scobra,     scobras,    galaxian_state, scobra,     ROT90,  "bootleg", "Super Heli (Super Cobra bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, moonwar,     0,        moonwar,    moonwar,    galaxian_state, moonwar,    ROT90,  "Stern Electronics", "Moonwar", MACHINE_SUPPORTS_SAVE )
