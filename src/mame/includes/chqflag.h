@@ -20,11 +20,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bank1000(*this, "bank1000"),
-		m_k007232[0](*this, "k007232_1"),
-		m_k007232[1](*this, "k007232_2"),
+		m_k007232(*this, "k007232_%u", 1),
 		m_k051960(*this, "k051960"),
-		m_k051316[0](*this, "k051316_1"),
-		m_k051316[1](*this, "k051316_2"),
+		m_k051316(*this, "k051316_%u", 1),
 		m_palette(*this, "palette"),
 		m_rombank(*this, "rombank") { }
 
