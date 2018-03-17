@@ -427,3 +427,15 @@ SLOT_INTERFACE_END
 SLOT_INTERFACE_START(hp_ieee488_devices)
 	SLOT_INTERFACE("hp9895", HP9895)
 SLOT_INTERFACE_END
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( remote488_devices )
+//-------------------------------------------------
+
+// slot devices
+#include "remote488.h"
+
+SLOT_INTERFACE_START(remote488_devices)
+        SLOT_INTERFACE("remote488", REMOTE488)
+
+SLOT_INTERFACE_END
