@@ -4,58 +4,63 @@
 #include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
 
+#include "screen.h"
+
+#include <algorithm>
+
+GFXDECODE_EXTERN( raiden2 );
+
 class raiden2_state : public driver_device
 {
 public:
 	raiden2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: driver_device(mconfig, type, tag)
 		/*
-		  back_data(*this, "back_data"),
-		  fore_data(*this, "fore_data"),
-		  mid_data(*this, "mid_data"),
-		  text_data(*this, "text_data"),
-		  */
-			sprites(*this, "sprites") ,
-			m_maincpu(*this, "maincpu"),
-			m_seibu_sound(*this, "seibu_sound"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
+		, m_back_data(*this, "back_data")
+		, m_fore_data(*this, "fore_data")
+		, m_mid_data(*this, "mid_data")
+		, m_text_data(*this, "text_data")
+		*/
+		, m_spriteram(*this, "spriteram")
+		, m_maincpu(*this, "maincpu")
+		, m_seibu_sound(*this, "seibu_sound")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
 
-			bg_bank(0),
-			fg_bank(0),
-			mid_bank(0),
-			tx_bank(0),
-			raiden2_tilemap_enable(0),
-			prg_bank(0),
-			cop_bank(0),
+		, m_mainbank(*this, "mainbank")
 
-			sprite_prot_x(0),
-			sprite_prot_y(0),
-			dst1(0),
-			cop_spr_maxx(0),
-			cop_spr_off(0),
+		, m_bg_bank(0)
+		, m_fg_bank(0)
+		, m_mid_bank(0)
+		, m_tx_bank(0)
+		, m_tilemap_enable(0)
+		, m_cop_bank(0)
 
-			tile_buffer(320, 256),
-			sprite_buffer(320, 256),
-			m_raiden2cop(*this, "raiden2cop")
+		, m_sprite_prot_x(0)
+		, m_sprite_prot_y(0)
+		, m_dst1(0)
+		, m_cop_spr_maxx(0)
+		, m_cop_spr_off(0)
+
+		, m_raiden2cop(*this, "raiden2cop")
 	{
-		memset(scrollvals, 0, sizeof(uint16_t)*6);
-		memset(sprite_prot_src_addr, 0, sizeof(uint16_t)*2);
-
+		std::fill(std::begin(m_scrollvals), std::end(m_scrollvals), 0);
+		std::fill(std::begin(m_sprite_prot_src_addr), std::end(m_sprite_prot_src_addr), 0);
 	}
 
-	std::unique_ptr<uint16_t[]> back_data;
-	std::unique_ptr<uint16_t[]> fore_data;
-	std::unique_ptr<uint16_t[]> mid_data;
-	std::unique_ptr<uint16_t[]> text_data; // private buffers, allocated in init
-	required_shared_ptr<uint16_t> sprites;
+	std::unique_ptr<uint16_t[]> m_back_data;
+	std::unique_ptr<uint16_t[]> m_fore_data;
+	std::unique_ptr<uint16_t[]> m_mid_data;
+	std::unique_ptr<uint16_t[]> m_text_data; // private buffers, allocated in init
+	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<cpu_device> m_maincpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
-
-
+	optional_memory_bank m_mainbank;
 
 	DECLARE_WRITE16_MEMBER ( raiden2_bank_w );
 	DECLARE_READ16_MEMBER ( cop_tile_bank_2_r );
@@ -80,26 +85,21 @@ public:
 	DECLARE_WRITE16_MEMBER( sprcpt_flags_1_w );
 	DECLARE_WRITE16_MEMBER( sprcpt_flags_2_w );
 
-	void common_reset();
+	void common_reset(int tx_bank, int mid_bank, int fg_bank, int bg_bank);
 
 	static uint16_t const raiden_blended_colors[];
 	static uint16_t const xsedae_blended_colors[];
 	static uint16_t const zeroteam_blended_colors[];
 
-	bool blend_active[0x800]; // cfg
+	bool m_blend_active[0x800]; // cfg
 
-	tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
+	tilemap_t *m_background_layer,*m_midground_layer,*m_foreground_layer,*m_text_layer;
 
+	int m_bg_bank, m_fg_bank, m_mid_bank, m_tx_bank;
+	uint16_t m_tilemap_enable;
+	uint16_t m_cop_bank;
 
-	int bg_bank, fg_bank, mid_bank, tx_bank;
-	uint16_t raiden2_tilemap_enable;
-	uint8_t prg_bank;
-	uint16_t cop_bank;
-
-	uint16_t scrollvals[6];
-
-
-
+	uint16_t m_scrollvals[6];
 
 	DECLARE_WRITE16_MEMBER( sprite_prot_x_w );
 	DECLARE_WRITE16_MEMBER( sprite_prot_y_w );
@@ -113,16 +113,12 @@ public:
 	DECLARE_WRITE16_MEMBER( sprite_prot_maxx_w );
 	DECLARE_WRITE16_MEMBER( sprite_prot_off_w );
 
-	uint16_t sprite_prot_x,sprite_prot_y,dst1,cop_spr_maxx,cop_spr_off;
-	uint16_t sprite_prot_src_addr[2];
-
-
+	uint16_t m_sprite_prot_x,m_sprite_prot_y,m_dst1,m_cop_spr_maxx,m_cop_spr_off;
+	uint16_t m_sprite_prot_src_addr[2];
 
 	void draw_sprites(const rectangle &cliprect);
 
-
-
-	const int *cur_spri; // cfg
+	const int *m_cur_spri; // cfg
 
 	DECLARE_DRIVER_INIT(raidendx);
 	DECLARE_DRIVER_INIT(xsedae);
@@ -137,7 +133,7 @@ public:
 	DECLARE_MACHINE_RESET(zeroteam);
 	DECLARE_MACHINE_RESET(xsedae);
 	DECLARE_MACHINE_RESET(raidendx);
-	uint32_t screen_update_raiden2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(raiden2_interrupt);
 	void combine32(uint32_t *val, int offset, uint16_t data, uint16_t mem_mask);
 	void sprcpt_init(void);
@@ -147,14 +143,16 @@ public:
 
 	void init_blending(const uint16_t *table);
 
-	bitmap_ind16 tile_buffer, sprite_buffer;
+	bitmap_ind16 m_tile_buffer, m_sprite_buffer;
 	optional_device<raiden2cop_device> m_raiden2cop;
 
 	void raidendx(machine_config &config);
 	void xsedae(machine_config &config);
+	void zeroteam_sound(machine_config &config);
 	void zeroteam(machine_config &config);
 	void raiden2(machine_config &config);
 	void raiden2_cop_mem(address_map &map);
+	void raiden2_common_mem(address_map &map);
 	void raiden2_mem(address_map &map);
 	void raiden2_sound_map(address_map &map);
 	void raidendx_mem(address_map &map);
