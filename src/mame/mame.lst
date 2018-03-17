@@ -14182,6 +14182,7 @@ star100                         // (c) 199? Sang Ho
 super7                          // bootleg (New Impeuropex?)
 super9                          // (c) 2001 Playmark
 super972                        // unknown
+tcl                             // (c) 1995 Uniwang
 tonypok                         // (c) 1991 Corsica
 unkch1                          // bootleg
 unkch2                          // bootleg
@@ -36575,9 +36576,6 @@ tbowlp                          // Suspected proto of Japanese version for US Ma
 @source:tceptor.cpp
 tceptor                         // (c) 1986
 tceptor2                        // (c) 1986
-
-@source:tcl.cpp
-tcl                             // (c) 1995 Uniwang
 
 @source:tdv2324.cpp
 tdv2324                         //

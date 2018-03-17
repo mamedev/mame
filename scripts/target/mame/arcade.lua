@@ -4743,7 +4743,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/taxidriv.cpp",
 	MAME_DIR .. "src/mame/includes/taxidriv.h",
 	MAME_DIR .. "src/mame/video/taxidriv.cpp",
-	MAME_DIR .. "src/mame/drivers/tcl.cpp",
 	MAME_DIR .. "src/mame/drivers/thayers.cpp",
 	MAME_DIR .. "src/mame/drivers/thedeep.cpp",
 	MAME_DIR .. "src/mame/includes/thedeep.h",

@@ -14535,6 +14535,67 @@ ROM_START( wcherry )
 	ROM_LOAD( "am27c29pc",      0x00000, 0x0200, BAD_DUMP CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )    // borrowed from other game.
 ROM_END
 
+/*
+Taiwan Chess Legend
+Uniwang, 1995
+
+Preliminary driver by Tomasz Slanina
+
+PCB Layout
+----------
+
+|-----------------------------------------------|
+|  AY8930   DSW5  TCL.1E                        |
+|           DSW4  TCL.3E   TCL.3F  TCL.3H       |
+|           DSW3  TCL.4E   TCL.4F  TCL.4H       |
+|           DSW2  6116                          |
+|           DSW1  6116          6116            |
+|                               6116            |
+|  8255                               12MHz     |
+|                                               |
+|                                               |
+|                 TCL_PR3.9E                    |
+|                                               |
+|  8255                     PAL                 |
+|                                               |
+|                           PAL                 |
+|  BATTERY                    LATTICE           |
+|                       PAL   PLSI 1016 Z80 PAL |
+|           TCL_PR1.15C                     PAL |
+|  SW1      TCL_PR2.16C 6116      TCL.16F       |
+|-----------------------------------------------|
+
+Notes:
+      Z80 Clock: 3.000MHz
+          VSync: 60Hz
+          HSync: 15.15kHz
+
+ This appears to be based off a Blue Dyna Cherry Master board but with extra protection (the sub-board with CPU)
+
+*/
+
+ROM_START( tcl )
+	ROM_REGION( 0x10000*2, "maincpu", 0 )
+	ROM_LOAD( "tcl.16f",   0x00000, 0x20000, CRC(8e694a58) SHA1(7a3c20a7c740065b71fe66ec581edce0dd32f145) )
+
+	ROM_REGION( 0x8000*3, "gfx1", 0 )
+	ROM_LOAD( "tcl.1e",   0x00000, 0x8000, CRC(37edf9b8) SHA1(9225728116d6edfe8476e565a12e1f1e59766d26) )
+	ROM_LOAD( "tcl.3e",   0x08000, 0x8000, CRC(396298cf) SHA1(0ee306179a9d3dd84f7e5799527e6825d2979ddb) )
+	ROM_LOAD( "tcl.4e",   0x10000, 0x8000, CRC(f880101c) SHA1(8417410a7dcb304a88e98f9199f44a4df1ee3fb7) )
+
+	ROM_REGION( 0x2000*4, "gfx2", 0 ) /* ??? */
+	ROM_LOAD( "tcl.3f",   0x0000, 0x2000, CRC(c290c1eb) SHA1(00eb5ff46affe01f240081211b7f9a40e9f76bd8) )
+	ROM_LOAD( "tcl.4f",   0x2000, 0x2000, CRC(225e0148) SHA1(26d8db263b1957fc6b2204765c8aa1f10f44b591) )
+	ROM_LOAD( "tcl.3h",   0x4000, 0x2000, CRC(ee63d380) SHA1(c1d9ca4584bb2ef0fa85e2afb0876040b473a924) )
+	ROM_LOAD( "tcl.4h",   0x6000, 0x2000, CRC(6afa36a1) SHA1(a87423f01dbf9b1e69feb049d6ae3fd63321ee1a) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF ) // (girl bitmaps, not present)
+
+	ROM_REGION( 0x100*3, "proms", 0 )
+	ROM_LOAD( "tcl_pr1.15c",   0x000, 0x100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+	ROM_LOAD( "tcl_pr2.16c",   0x100, 0x100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "tcl_pr3.9e",    0x200, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
 
 /****************************** Stealth Sets ******************************/
 
@@ -16137,6 +16198,42 @@ DRIVER_INIT_MEMBER(wingco_state, flam7_tw)
 
 }
 
+#define ROL(x,n) (bitswap<8>((x),(7+8-n)&7,(6+8-n)&7,(5+8-n)&7,(4+8-n)&7,(3+8-n)&7,(2+8-n)&7,(1+8-n)&7,(0+8-n)&7))
+
+#define WRITEDEST( n ) \
+		dest[idx]=n;    \
+		dest[idx+0x10000]=(n)^0xff; \
+		idx++;
+
+DRIVER_INIT_MEMBER(cmaster_state,tcl)
+{
+	/* only the first part is decrypted (and verified)*/
+
+	uint8_t *dest = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+	std::vector<uint8_t> src(len);
+
+	int i,idx=0;
+	memcpy(&src[0], dest, len);
+	for(i=0;i<64*1024;i+=4)
+	{
+		if(i&0x8000)
+		{
+			WRITEDEST(ROL(src[idx]^0x44,4)); // abcdefgh -> aFghaBcd
+			WRITEDEST(ROL(src[idx]^0x44,7)); // abcdefgh -> haBcdeFg
+			WRITEDEST(ROL(src[idx]^0x44,2)); // abcdefgh -> cdeFghaB
+			WRITEDEST((src[idx]^0x44)^0xf0); // abcdefgh -> AbCEeFgh
+		}
+		else
+		{
+			WRITEDEST(ROL(src[idx]^0x11,4)); // abcdefgh -> efgHabcD
+			WRITEDEST(ROL(src[idx]^0x11,7)); // abcdefgh -> HabcDefg
+			WRITEDEST(ROL(src[idx]^0x11,2)); // abcdefgh -> cDefgHab
+			WRITEDEST((src[idx]^0x11)^0xf0); // abcdefgh -> ABCdefgH
+		}
+	}
+}
+
 
 /*********************************************
 *                Game Drivers                *
@@ -16155,7 +16252,6 @@ GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, goldstar_state, 0,        
 GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       MACHINE_NOT_WORKING )   // need to decode gfx and see the program loops/reset...
 GAME(  2001, wcherry,   0,        wcherry,  chrygld,  goldstar_state, wcherry,   ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            MACHINE_NOT_WORKING )
 GAME(  199?, star100,   0,        star100,  star100,  sanghopm_state, 0,         ROT0, "Sang Ho",           "Ming Xing 100 (Star 100)",                    MACHINE_IMPERFECT_COLORS )
-
 
 // are these really dyna, or bootlegs?
 GAMEL( 199?, ncb3,      0,        ncb3,     ncb3,     cb3_state,      0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0,                 layout_cherryb3 )
@@ -16209,6 +16305,7 @@ GAME(  1999, cmast99,   0,        cm,       cmast99,  cmaster_state,  cmv4,     
 GAME(  1999, cmast99b,  cmast99,  cm,       cmast99,  cmaster_state,  cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
 GAME(  1993, aplan,     0,        cm,       cmast99,  cmaster_state,  cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )
 
+GAME(  1995, tcl,       0,        cm,       cmaster,  cmaster_state,  tcl,       ROT0, "Uniwang",           "Taiwan Chess Legend",                         MACHINE_NOT_WORKING ) // incomplete decryption
 
 // --- Wing W-4 hardware ---
 GAMEL( 1989, lucky8,    0,        lucky8,   lucky8,   wingco_state,   0,         ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 1, W-4)",                           0,                     layout_lucky8 )    // 2 control sets...
