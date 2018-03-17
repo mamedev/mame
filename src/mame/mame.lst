@@ -32676,8 +32676,8 @@ jumping                         // bootleg
 jumpinga                        // bootleg (Seyutu)
 jumpingi                        // bootleg (Seyutu / Imnoe)
 rbisland                        // B22 (c) 1987 Taito Corporation
-rbislande                       // B39 (c) 1988 Taito Corporation
 rbislando                       // B22 (c) 1987 Taito Corporation
+rbislnde                        // B39 (c) 1988 Taito Corporation
 
 @source:rbmk.cpp
 rbmk                            // (c) 1998 GMS

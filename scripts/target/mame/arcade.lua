@@ -3775,7 +3775,6 @@ files {
 	MAME_DIR .. "src/mame/video/qix.cpp",
 	MAME_DIR .. "src/mame/drivers/rbisland.cpp",
 	MAME_DIR .. "src/mame/includes/rbisland.h",
-	MAME_DIR .. "src/mame/machine/rbisland.cpp",
 	MAME_DIR .. "src/mame/video/rbisland.cpp",
 	MAME_DIR .. "src/mame/drivers/rastan.cpp",
 	MAME_DIR .. "src/mame/includes/rastan.h",
