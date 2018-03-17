@@ -16,15 +16,17 @@ class chqflag_state : public driver_device
 {
 public:
 	chqflag_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_bank1000(*this, "bank1000"),
-		m_k007232(*this, "k007232_%u", 1),
-		m_k051960(*this, "k051960"),
-		m_k051316(*this, "k051316_%u", 1),
-		m_palette(*this, "palette"),
-		m_rombank(*this, "rombank") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_bank1000(*this, "bank1000")
+		, m_k007232(*this, "k007232_%u", 1)
+		, m_k051960(*this, "k051960")
+		, m_k051316(*this, "k051316_%u", 1)
+		, m_palette(*this, "palette")
+		, m_rombank(*this, "rombank")
+	{
+	}
 
 	template<int Chip> DECLARE_READ8_MEMBER(k051316_ramrom_r);
 	DECLARE_WRITE8_MEMBER(chqflag_bankswitch_w);
