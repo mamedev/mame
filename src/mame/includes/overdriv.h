@@ -10,6 +10,7 @@
 #include "machine/timer.h"
 #include "video/k051316.h"
 #include "video/k053246_k053247_k055673.h"
+#include "video/k053250.h"
 #include "video/k053251.h"
 #include "video/konami_helper.h"
 #include "screen.h"
@@ -18,17 +19,18 @@ class overdriv_state : public driver_device
 {
 public:
 	overdriv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
-		m_audiocpu(*this, "audiocpu"),
-		m_k051316_1(*this, "k051316_1"),
-		m_k051316_2(*this, "k051316_2"),
-		m_k053246(*this, "k053246"),
-		m_k053251(*this, "k053251"),
-		m_k053252(*this, "k053252"),
-		m_screen(*this, "screen")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "sub")
+		, m_audiocpu(*this, "audiocpu")
+		, m_k051316(*this, "k051316_%u", 1)
+		, m_k053246(*this, "k053246")
+		, m_k053250(*this, "k053250_%u", 1)
+		, m_k053251(*this, "k053251")
+		, m_k053252(*this, "k053252")
+		, m_screen(*this, "screen")
+	{
+	}
 
 	/* video-related */
 	int       m_zoom_colorbase[2];
@@ -43,9 +45,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<k051316_device> m_k051316_1;
-	required_device<k051316_device> m_k051316_2;
+	required_device_array<k051316_device, 2> m_k051316;
 	required_device<k053247_device> m_k053246;
+	required_device_array<k053250_device, 2> m_k053250;
 	required_device<k053251_device> m_k053251;
 	required_device<k053252_device> m_k053252;
 	required_device<screen_device> m_screen;

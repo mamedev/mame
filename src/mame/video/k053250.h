@@ -36,6 +36,7 @@ public:
 	DECLARE_READ16_MEMBER(rom_r);
 
 	void draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, bitmap_ind8 &priority_bitmap, int priority );
+	void draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int colorbase, int flags, bitmap_ind8 &priority_bitmap, int priority ); // overdriv
 
 protected:
 	// device-level overrides
@@ -61,6 +62,9 @@ private:
 	static void pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *pal_base, uint8_t *source,
 									const rectangle &cliprect, int linepos, int scroll, int zoom,
 									uint32_t clipmask, uint32_t wrapmask, uint32_t orientation, bitmap_ind8 &priority, uint8_t pri);
+	static void pdraw_scanline16(bitmap_ind16 &bitmap, uint16_t pal_base, uint8_t *source,
+									const rectangle &cliprect, int linepos, int scroll, int zoom,
+									uint32_t clipmask, uint32_t wrapmask, uint32_t orientation, bitmap_ind8 &priority, uint8_t pri); // overdriv
 };
 
 DECLARE_DEVICE_TYPE(K053250, k053250_device)
