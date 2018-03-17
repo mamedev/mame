@@ -25,6 +25,7 @@
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
@@ -33,20 +34,13 @@
 
 
 /* these trampolines are less confusing than nested address_map_bank_devices */
-READ8_MEMBER(chqflag_state::k051316_1_ramrom_r)
+template<int Chip>
+READ8_MEMBER(chqflag_state::k051316_ramrom_r)
 {
 	if (m_k051316_readroms)
-		return m_k051316_1->rom_r(space, offset);
+		return m_k051316[Chip]->rom_r(space, offset);
 	else
-		return m_k051316_1->read(space, offset);
-}
-
-READ8_MEMBER(chqflag_state::k051316_2_ramrom_r)
-{
-	if (m_k051316_readroms)
-		return m_k051316_2->rom_r(space, offset);
-	else
-		return m_k051316_2->read(space, offset);
+		return m_k051316[Chip]->read(space, offset);
 }
 
 WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
@@ -129,12 +123,6 @@ READ8_MEMBER(chqflag_state::analog_read_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(chqflag_state::chqflag_sh_irqtrigger_w)
-{
-	m_soundlatch2->write(space, 0, data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
 
 /****************************************************************************/
 
@@ -144,9 +132,9 @@ void chqflag_state::chqflag_map(address_map &map)
 	map(0x1000, 0x1fff).m(m_bank1000, FUNC(address_map_bank_device::amap8));
 	map(0x2000, 0x2007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));            /* Sprite control registers */
 	map(0x2400, 0x27ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));            /* Sprite RAM */
-	map(0x2800, 0x2fff).r(this, FUNC(chqflag_state::k051316_2_ramrom_r)).w(m_k051316_2, FUNC(k051316_device::write)); /* 051316 zoom/rotation (chip 2) */
+	map(0x2800, 0x2fff).r(this, FUNC(chqflag_state::k051316_ramrom_r<1>)).w(m_k051316[1], FUNC(k051316_device::write)); /* 051316 zoom/rotation (chip 2) */
 	map(0x3000, 0x3000).w("soundlatch", FUNC(generic_latch_8_device::write));                    /* sound code # */
-	map(0x3001, 0x3001).w(this, FUNC(chqflag_state::chqflag_sh_irqtrigger_w));                  /* cause interrupt on audio CPU */
+	map(0x3001, 0x3001).w("soundlatch2", FUNC(generic_latch_8_device::write));                  /* cause interrupt on audio CPU */
 	map(0x3002, 0x3002).w(this, FUNC(chqflag_state::chqflag_bankswitch_w));                     /* bankswitch control */
 	map(0x3003, 0x3003).w(this, FUNC(chqflag_state::chqflag_vreg_w));                           /* enable K051316 ROM reading */
 	map(0x3100, 0x3100).portr("DSW1");                               /* DIPSW #1  */
@@ -155,8 +143,8 @@ void chqflag_state::chqflag_map(address_map &map)
 	map(0x3203, 0x3203).portr("DSW2");                               /* DIPSW #2 */
 	map(0x3300, 0x3300).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* watchdog timer */
 	map(0x3400, 0x341f).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));                    /* 051733 (protection) */
-	map(0x3500, 0x350f).w(m_k051316_1, FUNC(k051316_device::ctrl_w));                            /* 051316 control registers (chip 1) */
-	map(0x3600, 0x360f).w(m_k051316_2, FUNC(k051316_device::ctrl_w));                            /* 051316 control registers (chip 2) */
+	map(0x3500, 0x350f).w(m_k051316[0], FUNC(k051316_device::ctrl_w));                            /* 051316 control registers (chip 1) */
+	map(0x3600, 0x360f).w(m_k051316[1], FUNC(k051316_device::ctrl_w));                            /* 051316 control registers (chip 2) */
 	map(0x3700, 0x3700).w(this, FUNC(chqflag_state::select_analog_ctrl_w));                     /* select accelerator/wheel */
 	map(0x3701, 0x3701).portr("IN2");                                /* Brake + Shift + ? */
 	map(0x3702, 0x3702).rw(this, FUNC(chqflag_state::analog_read_r), FUNC(chqflag_state::select_analog_ctrl_w));  /* accelerator/wheel */
@@ -167,7 +155,7 @@ void chqflag_state::chqflag_map(address_map &map)
 void chqflag_state::bank1000_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x17ff).r(this, FUNC(chqflag_state::k051316_1_ramrom_r)).w(m_k051316_1, FUNC(k051316_device::write));
+	map(0x1000, 0x17ff).r(this, FUNC(chqflag_state::k051316_ramrom_r<0>)).w(m_k051316[0], FUNC(k051316_device::write));
 	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
@@ -179,12 +167,12 @@ WRITE8_MEMBER(chqflag_state::k007232_bankswitch_w)
 	/* banks # for the 007232 (chip 1) */
 	bank_A = ((data >> 4) & 0x03);
 	bank_B = ((data >> 6) & 0x03);
-	m_k007232_1->set_bank(bank_A, bank_B);
+	m_k007232[0]->set_bank(bank_A, bank_B);
 
 	/* banks # for the 007232 (chip 2) */
 	bank_A = ((data >> 0) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	m_k007232_2->set_bank(bank_A, bank_B);
+	m_k007232[1]->set_bank(bank_A, bank_B);
 }
 
 void chqflag_state::chqflag_sound_map(address_map &map)
@@ -192,13 +180,13 @@ void chqflag_state::chqflag_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom(); /* ROM */
 	map(0x8000, 0x87ff).ram(); /* RAM */
 	map(0x9000, 0x9000).w(this, FUNC(chqflag_state::k007232_bankswitch_w)); /* 007232 bankswitch */
-	map(0xa000, 0xa00d).rw(m_k007232_1, FUNC(k007232_device::read), FUNC(k007232_device::write));  /* 007232 (chip 1) */
+	map(0xa000, 0xa00d).rw(m_k007232[0], FUNC(k007232_device::read), FUNC(k007232_device::write));  /* 007232 (chip 1) */
 	map(0xa01c, 0xa01c).w(this, FUNC(chqflag_state::k007232_extvolume_w));  /* extra volume, goes to the 007232 w/ A4 */
 															/* selecting a different latch for the external port */
-	map(0xb000, 0xb00d).rw(m_k007232_2, FUNC(k007232_device::read), FUNC(k007232_device::write));  /* 007232 (chip 2) */
+	map(0xb000, 0xb00d).rw(m_k007232[1], FUNC(k007232_device::read), FUNC(k007232_device::write));  /* 007232 (chip 2) */
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));   /* YM2151 */
 	map(0xd000, 0xd000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xe000, 0xe000).r(m_soundlatch2, FUNC(generic_latch_8_device::read));  /* engine sound volume */
+	map(0xe000, 0xe000).r("soundlatch2", FUNC(generic_latch_8_device::read));  /* engine sound volume */
 	map(0xf000, 0xf000).nopw();                    /* ??? */
 }
 
@@ -271,20 +259,20 @@ WRITE8_MEMBER(chqflag_state::volume_callback0)
 {
 	// volume/pan for one of the channels on this chip
 	// which channel and which bits are left/right is a guess
-	m_k007232_1->set_volume(0, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
+	m_k007232[0]->set_volume(0, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
 WRITE8_MEMBER(chqflag_state::k007232_extvolume_w)
 {
 	// volume/pan for one of the channels on this chip
 	// which channel and which bits are left/right is a guess
-	m_k007232_1->set_volume(1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
+	m_k007232[0]->set_volume(1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
 WRITE8_MEMBER(chqflag_state::volume_callback1)
 {
-	m_k007232_2->set_volume(0, (data >> 4) * 0x11, 0);
-	m_k007232_2->set_volume(1, 0, (data & 0x0f) * 0x11);
+	m_k007232[1]->set_volume(0, (data >> 4) * 0x11, 0);
+	m_k007232[1]->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
 void chqflag_state::machine_start()
@@ -387,6 +375,7 @@ MACHINE_CONFIG_START(chqflag_state::chqflag)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -463,6 +452,6 @@ ROM_START( chqflagj )
 ROM_END
 
 
-//     YEAR, NAME,     PARENT,  MACHINE, INPUT,    STATE,         INIT, MONITOR, COMPANY,  FULLNAME,                 FLAGS,                                           LAYOUT
+//     YEAR, NAME,     PARENT,  MACHINE, INPUT,    STATE,         INIT, MONITOR, COMPANY,  FULLNAME,                 FLAGS,                                                                                                      LAYOUT
 GAMEL( 1988, chqflag,  0,       chqflag, chqflag,  chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
 GAMEL( 1988, chqflagj, chqflag, chqflag, chqflagj, chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
