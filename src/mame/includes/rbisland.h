@@ -46,7 +46,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
 	DECLARE_DRIVER_INIT(jumping);
-	DECLARE_DRIVER_INIT(rbislande);
 	DECLARE_DRIVER_INIT(rbisland);
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(jumping);
@@ -57,14 +56,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
 	void jumping(machine_config &config);
-	void rbisland_base(machine_config &config);
-	void rbisland_emu(machine_config &config);
+	void rbisland(machine_config &config);
 	void jumpingi(machine_config &config);
 	void jumping_map(address_map &map);
 	void jumping_sound_map(address_map &map);
-	void rbisland_base_map(address_map &map);
-	void rbisland_emu_map(address_map &map);
-	void rbisland_sim_map(address_map &map);
+	void rbisland_map(address_map &map);
 	void rbisland_sound_map(address_map &map);
 
 private:
@@ -77,16 +73,6 @@ private:
 
 	/* misc */
 	uint8_t       m_jumping_latch;
-
-	/* c-chip simulation */
-	std::unique_ptr<uint8_t[]>    m_CRAM[8];
-	int         m_extra_version;
-	uint8_t       m_current_bank;
-	emu_timer *m_cchip_timer;
-	void request_round_data(  );
-	void request_world_data(  );
-	void request_goalin_data(  );
-	void rbisland_cchip_init( int version );
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
