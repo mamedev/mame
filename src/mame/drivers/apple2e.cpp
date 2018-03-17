@@ -2691,172 +2691,189 @@ WRITE8_MEMBER(apple2e_state::auxram2000_w) { if (m_aux_bank_ptr) { m_aux_bank_pt
 READ8_MEMBER(apple2e_state::auxram4000_r)  { if (m_aux_bank_ptr) { return m_aux_bank_ptr[offset+0x4000]; } else { return read_floatingbus(); } }
 WRITE8_MEMBER(apple2e_state::auxram4000_w) { if (m_aux_bank_ptr) { m_aux_bank_ptr[offset+0x4000] = data; } }
 
-ADDRESS_MAP_START(apple2e_state::apple2e_map)
-	AM_RANGE(0x0000, 0x01ff) AM_DEVICE(A2_0000_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x0200, 0x03ff) AM_DEVICE(A2_0200_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x0400, 0x07ff) AM_DEVICE(A2_0400_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x0800, 0x1fff) AM_DEVICE(A2_0800_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVICE(A2_2000_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x4000, 0xbfff) AM_DEVICE(A2_4000_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc000, 0xc07f) AM_READWRITE(c000_r, c000_w)
-	AM_RANGE(0xc080, 0xc0ff) AM_READWRITE(c080_r, c080_w)
-	AM_RANGE(0xc100, 0xc2ff) AM_DEVICE(A2_C100_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc300, 0xc3ff) AM_DEVICE(A2_C300_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc400, 0xc7ff) AM_DEVICE(A2_C400_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc800, 0xcfff) AM_DEVICE(A2_C800_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xd000, 0xffff) AM_DEVICE(A2_UPPERBANK_TAG, address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void apple2e_state::apple2e_map(address_map &map)
+{
+	map(0x0000, 0x01ff).m(m_0000bank, FUNC(address_map_bank_device::amap8));
+	map(0x0200, 0x03ff).m(m_0200bank, FUNC(address_map_bank_device::amap8));
+	map(0x0400, 0x07ff).m(m_0400bank, FUNC(address_map_bank_device::amap8));
+	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
+	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xc07f).rw(this, FUNC(apple2e_state::c000_r), FUNC(apple2e_state::c000_w));
+	map(0xc080, 0xc0ff).rw(this, FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
+	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
+	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
+	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
+	map(0xc800, 0xcfff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
+	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(apple2e_state::apple2c_map)
-	AM_RANGE(0x0000, 0x01ff) AM_DEVICE(A2_0000_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x0200, 0x03ff) AM_DEVICE(A2_0200_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x0400, 0x07ff) AM_DEVICE(A2_0400_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x0800, 0x1fff) AM_DEVICE(A2_0800_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVICE(A2_2000_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x4000, 0xbfff) AM_DEVICE(A2_4000_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc000, 0xc07f) AM_READWRITE(c000_iic_r, c000_iic_w)
-	AM_RANGE(0xc080, 0xc0ff) AM_READWRITE(c080_r, c080_w)
-	AM_RANGE(0xc098, 0xc09b) AM_DEVREADWRITE(IIC_ACIA1_TAG, mos6551_device, read, write)
-	AM_RANGE(0xc0a8, 0xc0ab) AM_DEVREADWRITE(IIC_ACIA2_TAG, mos6551_device, read, write)
-	AM_RANGE(0xc100, 0xc2ff) AM_DEVICE(A2_C100_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc300, 0xc3ff) AM_DEVICE(A2_C300_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc400, 0xc7ff) AM_DEVICE(A2_C400_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc800, 0xcfff) AM_DEVICE(A2_C800_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xd000, 0xffff) AM_DEVICE(A2_UPPERBANK_TAG, address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void apple2e_state::apple2c_map(address_map &map)
+{
+	map(0x0000, 0x01ff).m(m_0000bank, FUNC(address_map_bank_device::amap8));
+	map(0x0200, 0x03ff).m(m_0200bank, FUNC(address_map_bank_device::amap8));
+	map(0x0400, 0x07ff).m(m_0400bank, FUNC(address_map_bank_device::amap8));
+	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
+	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xc07f).rw(this, FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
+	map(0xc080, 0xc0ff).rw(this, FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
+	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xc0a8, 0xc0ab).rw(IIC_ACIA2_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
+	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
+	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
+	map(0xc800, 0xcfff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
+	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(apple2e_state::apple2c_memexp_map)
-	AM_RANGE(0x0000, 0x01ff) AM_DEVICE(A2_0000_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x0200, 0x03ff) AM_DEVICE(A2_0200_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x0400, 0x07ff) AM_DEVICE(A2_0400_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x0800, 0x1fff) AM_DEVICE(A2_0800_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVICE(A2_2000_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x4000, 0xbfff) AM_DEVICE(A2_4000_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc000, 0xc07f) AM_READWRITE(c000_iic_r, c000_iic_w)
-	AM_RANGE(0xc080, 0xc0ff) AM_READWRITE(c080_r, c080_w)
-	AM_RANGE(0xc098, 0xc09b) AM_DEVREADWRITE(IIC_ACIA1_TAG, mos6551_device, read, write)
-	AM_RANGE(0xc0a8, 0xc0ab) AM_DEVREADWRITE(IIC_ACIA2_TAG, mos6551_device, read, write)
-	AM_RANGE(0xc0c0, 0xc0c3) AM_READWRITE(memexp_r, memexp_w)
-	AM_RANGE(0xc100, 0xc2ff) AM_DEVICE(A2_C100_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc300, 0xc3ff) AM_DEVICE(A2_C300_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc400, 0xc7ff) AM_DEVICE(A2_C400_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc800, 0xcfff) AM_DEVICE(A2_C800_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xd000, 0xffff) AM_DEVICE(A2_UPPERBANK_TAG, address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void apple2e_state::apple2c_memexp_map(address_map &map)
+{
+	map(0x0000, 0x01ff).m(m_0000bank, FUNC(address_map_bank_device::amap8));
+	map(0x0200, 0x03ff).m(m_0200bank, FUNC(address_map_bank_device::amap8));
+	map(0x0400, 0x07ff).m(m_0400bank, FUNC(address_map_bank_device::amap8));
+	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
+	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xc07f).rw(this, FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
+	map(0xc080, 0xc0ff).rw(this, FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
+	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xc0a8, 0xc0ab).rw(IIC_ACIA2_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xc0c0, 0xc0c3).rw(this, FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
+	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
+	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
+	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
+	map(0xc800, 0xcfff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
+	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(apple2e_state::laser128_map)
-	AM_RANGE(0x0000, 0x01ff) AM_DEVICE(A2_0000_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x0200, 0x03ff) AM_DEVICE(A2_0200_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x0400, 0x07ff) AM_DEVICE(A2_0400_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x0800, 0x1fff) AM_DEVICE(A2_0800_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVICE(A2_2000_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x4000, 0xbfff) AM_DEVICE(A2_4000_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc000, 0xc07f) AM_READWRITE(c000_r, c000_w)
-	AM_RANGE(0xc080, 0xc0ff) AM_READWRITE(c080_r, c080_w)
+void apple2e_state::laser128_map(address_map &map)
+{
+	map(0x0000, 0x01ff).m(m_0000bank, FUNC(address_map_bank_device::amap8));
+	map(0x0200, 0x03ff).m(m_0200bank, FUNC(address_map_bank_device::amap8));
+	map(0x0400, 0x07ff).m(m_0400bank, FUNC(address_map_bank_device::amap8));
+	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
+	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xc07f).rw(this, FUNC(apple2e_state::c000_r), FUNC(apple2e_state::c000_w));
+	map(0xc080, 0xc0ff).rw(this, FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
 //  AM_RANGE(0xc098, 0xc09b) AM_DEVREADWRITE(IIC_ACIA1_TAG, mos6551_device, read, write)
 //  AM_RANGE(0xc0a8, 0xc0ab) AM_DEVREADWRITE(IIC_ACIA2_TAG, mos6551_device, read, write)
-	AM_RANGE(0xc0d0, 0xc0d3) AM_READWRITE(memexp_r, memexp_w)
-	AM_RANGE(0xc0e0, 0xc0ef) AM_DEVREADWRITE(LASER128_UDC_TAG, applefdc_base_device, read, write)
-	AM_RANGE(0xc100, 0xc2ff) AM_DEVICE(A2_C100_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc300, 0xc3ff) AM_DEVICE(A2_C300_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc400, 0xc7ff) AM_DEVICE(A2_C400_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xc800, 0xcfff) AM_DEVICE(A2_C800_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0xd000, 0xffff) AM_DEVICE(A2_UPPERBANK_TAG, address_map_bank_device, amap8)
-ADDRESS_MAP_END
+	map(0xc0d0, 0xc0d3).rw(this, FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
+	map(0xc0e0, 0xc0ef).rw(m_laserudc, FUNC(applefdc_base_device::read), FUNC(applefdc_base_device::write));
+	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
+	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
+	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
+	map(0xc800, 0xcfff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
+	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(apple2e_state::r0000bank_map)
-	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(ram0000_r, ram0000_w)
-	AM_RANGE(0x0200, 0x03ff) AM_READWRITE(auxram0000_r, auxram0000_w)
-ADDRESS_MAP_END
+void apple2e_state::r0000bank_map(address_map &map)
+{
+	map(0x0000, 0x01ff).rw(this, FUNC(apple2e_state::ram0000_r), FUNC(apple2e_state::ram0000_w));
+	map(0x0200, 0x03ff).rw(this, FUNC(apple2e_state::auxram0000_r), FUNC(apple2e_state::auxram0000_w));
+}
 
-ADDRESS_MAP_START(apple2e_state::r0200bank_map)
-	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(ram0200_r, ram0200_w) // wr 0 rd 0
-	AM_RANGE(0x0200, 0x03ff) AM_READWRITE(auxram0200_r, ram0200_w) // wr 0 rd 1
-	AM_RANGE(0x0400, 0x05ff) AM_READWRITE(ram0200_r, auxram0200_w) // wr 1 rd 0
-	AM_RANGE(0x0600, 0x07ff) AM_READWRITE(auxram0200_r, auxram0200_w) // wr 1 rd 1
-ADDRESS_MAP_END
+void apple2e_state::r0200bank_map(address_map &map)
+{
+	map(0x0000, 0x01ff).rw(this, FUNC(apple2e_state::ram0200_r), FUNC(apple2e_state::ram0200_w)); // wr 0 rd 0
+	map(0x0200, 0x03ff).rw(this, FUNC(apple2e_state::auxram0200_r), FUNC(apple2e_state::ram0200_w)); // wr 0 rd 1
+	map(0x0400, 0x05ff).rw(this, FUNC(apple2e_state::ram0200_r), FUNC(apple2e_state::auxram0200_w)); // wr 1 rd 0
+	map(0x0600, 0x07ff).rw(this, FUNC(apple2e_state::auxram0200_r), FUNC(apple2e_state::auxram0200_w)); // wr 1 rd 1
+}
 
-ADDRESS_MAP_START(apple2e_state::r0400bank_map)
-	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(ram0400_r, ram0400_w) // wr 0 rd 0
-	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(auxram0400_r, ram0400_w)  // wr 0 rd 1
-	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(ram0400_r, auxram0400_w)  // wr 1 rd 0
-	AM_RANGE(0x0c00, 0x0fff) AM_READWRITE(auxram0400_r, auxram0400_w) // wr 1 rd 1
-ADDRESS_MAP_END
+void apple2e_state::r0400bank_map(address_map &map)
+{
+	map(0x0000, 0x03ff).rw(this, FUNC(apple2e_state::ram0400_r), FUNC(apple2e_state::ram0400_w)); // wr 0 rd 0
+	map(0x0400, 0x07ff).rw(this, FUNC(apple2e_state::auxram0400_r), FUNC(apple2e_state::ram0400_w));  // wr 0 rd 1
+	map(0x0800, 0x0bff).rw(this, FUNC(apple2e_state::ram0400_r), FUNC(apple2e_state::auxram0400_w));  // wr 1 rd 0
+	map(0x0c00, 0x0fff).rw(this, FUNC(apple2e_state::auxram0400_r), FUNC(apple2e_state::auxram0400_w)); // wr 1 rd 1
+}
 
-ADDRESS_MAP_START(apple2e_state::r0800bank_map)
-	AM_RANGE(0x0000, 0x17ff) AM_READWRITE(ram0800_r, ram0800_w)
-	AM_RANGE(0x2000, 0x37ff) AM_READWRITE(auxram0800_r, ram0800_w)
-	AM_RANGE(0x4000, 0x57ff) AM_READWRITE(ram0800_r, auxram0800_w)
-	AM_RANGE(0x6000, 0x77ff) AM_READWRITE(auxram0800_r, auxram0800_w)
-ADDRESS_MAP_END
+void apple2e_state::r0800bank_map(address_map &map)
+{
+	map(0x0000, 0x17ff).rw(this, FUNC(apple2e_state::ram0800_r), FUNC(apple2e_state::ram0800_w));
+	map(0x2000, 0x37ff).rw(this, FUNC(apple2e_state::auxram0800_r), FUNC(apple2e_state::ram0800_w));
+	map(0x4000, 0x57ff).rw(this, FUNC(apple2e_state::ram0800_r), FUNC(apple2e_state::auxram0800_w));
+	map(0x6000, 0x77ff).rw(this, FUNC(apple2e_state::auxram0800_r), FUNC(apple2e_state::auxram0800_w));
+}
 
-ADDRESS_MAP_START(apple2e_state::r2000bank_map)
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(ram2000_r, ram2000_w)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(auxram2000_r, ram2000_w)
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(ram2000_r, auxram2000_w)
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(auxram2000_r, auxram2000_w)
-ADDRESS_MAP_END
+void apple2e_state::r2000bank_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rw(this, FUNC(apple2e_state::ram2000_r), FUNC(apple2e_state::ram2000_w));
+	map(0x2000, 0x3fff).rw(this, FUNC(apple2e_state::auxram2000_r), FUNC(apple2e_state::ram2000_w));
+	map(0x4000, 0x5fff).rw(this, FUNC(apple2e_state::ram2000_r), FUNC(apple2e_state::auxram2000_w));
+	map(0x6000, 0x7fff).rw(this, FUNC(apple2e_state::auxram2000_r), FUNC(apple2e_state::auxram2000_w));
+}
 
-ADDRESS_MAP_START(apple2e_state::r4000bank_map)
-	AM_RANGE(0x00000, 0x07fff) AM_READWRITE(ram4000_r, ram4000_w)
-	AM_RANGE(0x08000, 0x0ffff) AM_READWRITE(auxram4000_r, ram4000_w)
-	AM_RANGE(0x10000, 0x17fff) AM_READWRITE(ram4000_r, auxram4000_w)
-	AM_RANGE(0x18000, 0x1ffff) AM_READWRITE(auxram4000_r, auxram4000_w)
-	AM_RANGE(0x20000, 0x23fff) AM_READWRITE(cec4000_r, ram4000_w)
-	AM_RANGE(0x24000, 0x27fff) AM_READWRITE(cec8000_r, ram8000_w)
-ADDRESS_MAP_END
+void apple2e_state::r4000bank_map(address_map &map)
+{
+	map(0x00000, 0x07fff).rw(this, FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::ram4000_w));
+	map(0x08000, 0x0ffff).rw(this, FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::ram4000_w));
+	map(0x10000, 0x17fff).rw(this, FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::auxram4000_w));
+	map(0x18000, 0x1ffff).rw(this, FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::auxram4000_w));
+	map(0x20000, 0x23fff).rw(this, FUNC(apple2e_state::cec4000_r), FUNC(apple2e_state::ram4000_w));
+	map(0x24000, 0x27fff).rw(this, FUNC(apple2e_state::cec8000_r), FUNC(apple2e_state::ram8000_w));
+}
 
-ADDRESS_MAP_START(apple2e_state::c100bank_map)
-	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(c100_r, c100_w)
-	AM_RANGE(0x0200, 0x03ff) AM_READ(c100_int_r) AM_WRITENOP
-	AM_RANGE(0x0400, 0x05ff) AM_READ(c100_int_bank_r) AM_WRITENOP
-	AM_RANGE(0x0600, 0x07ff) AM_READ(c100_cec_r) AM_WRITENOP
-	AM_RANGE(0x0800, 0x09ff) AM_READ(c100_cec_bank_r) AM_WRITENOP
+void apple2e_state::c100bank_map(address_map &map)
+{
+	map(0x0000, 0x01ff).rw(this, FUNC(apple2e_state::c100_r), FUNC(apple2e_state::c100_w));
+	map(0x0200, 0x03ff).r(this, FUNC(apple2e_state::c100_int_r)).nopw();
+	map(0x0400, 0x05ff).r(this, FUNC(apple2e_state::c100_int_bank_r)).nopw();
+	map(0x0600, 0x07ff).r(this, FUNC(apple2e_state::c100_cec_r)).nopw();
+	map(0x0800, 0x09ff).r(this, FUNC(apple2e_state::c100_cec_bank_r)).nopw();
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(apple2e_state::c300bank_map)
-	AM_RANGE(0x0000, 0x00ff) AM_READWRITE(c300_r, c300_w)
-	AM_RANGE(0x0100, 0x01ff) AM_READ(c300_int_r) AM_WRITENOP
-	AM_RANGE(0x0200, 0x02ff) AM_READ(c300_int_bank_r) AM_WRITENOP
-	AM_RANGE(0x0300, 0x03ff) AM_READ(c300_cec_r) AM_WRITENOP
-	AM_RANGE(0x0400, 0x04ff) AM_READ(c300_cec_bank_r) AM_WRITENOP
-ADDRESS_MAP_END
+void apple2e_state::c300bank_map(address_map &map)
+{
+	map(0x0000, 0x00ff).rw(this, FUNC(apple2e_state::c300_r), FUNC(apple2e_state::c300_w));
+	map(0x0100, 0x01ff).r(this, FUNC(apple2e_state::c300_int_r)).nopw();
+	map(0x0200, 0x02ff).r(this, FUNC(apple2e_state::c300_int_bank_r)).nopw();
+	map(0x0300, 0x03ff).r(this, FUNC(apple2e_state::c300_cec_r)).nopw();
+	map(0x0400, 0x04ff).r(this, FUNC(apple2e_state::c300_cec_bank_r)).nopw();
+}
 
-ADDRESS_MAP_START(apple2e_state::c400bank_map)
-	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(c400_r, c400_w)
-	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(c400_int_r, c400_w)
-	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(c400_int_bank_r, c400_w)
-	AM_RANGE(0x0c00, 0x0fff) AM_READ(c400_cec_r) AM_WRITENOP
-	AM_RANGE(0x1000, 0x13ff) AM_READ(c400_cec_bank_r) AM_WRITENOP
-ADDRESS_MAP_END
+void apple2e_state::c400bank_map(address_map &map)
+{
+	map(0x0000, 0x03ff).rw(this, FUNC(apple2e_state::c400_r), FUNC(apple2e_state::c400_w));
+	map(0x0400, 0x07ff).rw(this, FUNC(apple2e_state::c400_int_r), FUNC(apple2e_state::c400_w));
+	map(0x0800, 0x0bff).rw(this, FUNC(apple2e_state::c400_int_bank_r), FUNC(apple2e_state::c400_w));
+	map(0x0c00, 0x0fff).r(this, FUNC(apple2e_state::c400_cec_r)).nopw();
+	map(0x1000, 0x13ff).r(this, FUNC(apple2e_state::c400_cec_bank_r)).nopw();
+}
 
-ADDRESS_MAP_START(apple2e_state::c800bank_map)
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(c800_r, c800_w)
-	AM_RANGE(0x0800, 0x0fff) AM_READWRITE(c800_int_r, c800_w)
-	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(c800_b2_int_r, c800_w)
-	AM_RANGE(0x1800, 0x1fff) AM_READ(c800_cec_r) AM_WRITENOP
-	AM_RANGE(0x2000, 0x27ff) AM_READ(c800_cec_bank_r) AM_WRITENOP
-ADDRESS_MAP_END
+void apple2e_state::c800bank_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rw(this, FUNC(apple2e_state::c800_r), FUNC(apple2e_state::c800_w));
+	map(0x0800, 0x0fff).rw(this, FUNC(apple2e_state::c800_int_r), FUNC(apple2e_state::c800_w));
+	map(0x1000, 0x17ff).rw(this, FUNC(apple2e_state::c800_b2_int_r), FUNC(apple2e_state::c800_w));
+	map(0x1800, 0x1fff).r(this, FUNC(apple2e_state::c800_cec_r)).nopw();
+	map(0x2000, 0x27ff).r(this, FUNC(apple2e_state::c800_cec_bank_r)).nopw();
+}
 
-ADDRESS_MAP_START(apple2e_state::inhbank_map)
-	AM_RANGE(0x0000, 0x2fff) AM_DEVICE(A2_LCBANK_TAG, address_map_bank_device, amap8)
-	AM_RANGE(0x3000, 0x5fff) AM_READWRITE(inh_r, inh_w)
-ADDRESS_MAP_END
+void apple2e_state::inhbank_map(address_map &map)
+{
+	map(0x0000, 0x2fff).m(m_lcbank, FUNC(address_map_bank_device::amap8));
+	map(0x3000, 0x5fff).rw(this, FUNC(apple2e_state::inh_r), FUNC(apple2e_state::inh_w));
+}
 
-ADDRESS_MAP_START(apple2e_state::lcbank_map)
-	AM_RANGE(0x00000, 0x02fff) AM_ROM AM_REGION("maincpu", 0x1000) AM_WRITE(lc_w)
-	AM_RANGE(0x03000, 0x05fff) AM_READWRITE(lc_r, lc_w)
-	AM_RANGE(0x06000, 0x08fff) AM_READWRITE(lc_romswitch_r, lc_romswitch_w)
-	AM_RANGE(0x09000, 0x0bfff) AM_ROM AM_REGION("maincpu", 0x5000) AM_WRITE(lc_w)
-	AM_RANGE(0x0c000, 0x0efff) AM_READWRITE(lc_r, lc_w)
-	AM_RANGE(0x0f000, 0x11fff) AM_ROM AM_REGION("maincpu", 0xd000) AM_WRITE(lc_w)
-ADDRESS_MAP_END
+void apple2e_state::lcbank_map(address_map &map)
+{
+	map(0x00000, 0x02fff).rom().region("maincpu", 0x1000).w(this, FUNC(apple2e_state::lc_w));
+	map(0x03000, 0x05fff).rw(this, FUNC(apple2e_state::lc_r), FUNC(apple2e_state::lc_w));
+	map(0x06000, 0x08fff).rw(this, FUNC(apple2e_state::lc_romswitch_r), FUNC(apple2e_state::lc_romswitch_w));
+	map(0x09000, 0x0bfff).rom().region("maincpu", 0x5000).w(this, FUNC(apple2e_state::lc_w));
+	map(0x0c000, 0x0efff).rw(this, FUNC(apple2e_state::lc_r), FUNC(apple2e_state::lc_w));
+	map(0x0f000, 0x11fff).rom().region("maincpu", 0xd000).w(this, FUNC(apple2e_state::lc_w));
+}
 
-ADDRESS_MAP_START(apple2e_state::spectred_keyb_map)
-		AM_RANGE(0x0000, 0x07ff) AM_ROM
-		AM_RANGE(0x0800, 0x0fff) AM_RAM
-ADDRESS_MAP_END
+void apple2e_state::spectred_keyb_map(address_map &map)
+{
+		map(0x0000, 0x07ff).rom();
+		map(0x0800, 0x0fff).ram();
+}
 
 /***************************************************************************
     KEYBOARD

@@ -185,19 +185,20 @@ DEFINE_DEVICE_TYPE(VME_FCSCSI1, vme_fcscsi1_card_device, "fcscsi1", "Force Compu
 #define CPU_CRYSTAL XTAL(20'000'000) /* Jauch */
 #define PIT_CRYSTAL XTAL(16'000'000) /* Jauch */
 
-ADDRESS_MAP_START(vme_fcscsi1_card_device::fcscsi1_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ (bootvect_r)       /* Vectors mapped from System EPROM */
-	AM_RANGE (0x000008, 0x001fff) AM_RAM /* SRAM */
-	AM_RANGE (0x002000, 0x01ffff) AM_RAM /* Dual Ported RAM */
-	AM_RANGE (0xe00000, 0xe7ffff) AM_ROM /* System EPROM Area 32Kb DEBUGGER supplied */
-	AM_RANGE (0xd00000, 0xd0003f) AM_DEVREADWRITE8 ("pit", pit68230_device, read, write, 0x00ff)
+void vme_fcscsi1_card_device::fcscsi1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x000007).rom().r(this, FUNC(vme_fcscsi1_card_device::bootvect_r));       /* Vectors mapped from System EPROM */
+	map(0x000008, 0x001fff).ram(); /* SRAM */
+	map(0x002000, 0x01ffff).ram(); /* Dual Ported RAM */
+	map(0xe00000, 0xe7ffff).rom(); /* System EPROM Area 32Kb DEBUGGER supplied */
+	map(0xd00000, 0xd0003f).rw("pit", FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
 //  AM_RANGE (0xc40000, 0xc4001f) AM_DEVREADWRITE8("scsi", ncr5386_device, read, write, 0x00ff) /* SCSI Controller interface - device support not yet available*/
-	AM_RANGE (0xc40000, 0xc4001f) AM_READWRITE8 (scsi_r, scsi_w, 0x00ff)
-	AM_RANGE (0xc80000, 0xc800ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)  /* DMA Controller interface */
-	AM_RANGE (0xcc0000, 0xcc0007) AM_DEVREADWRITE8("fdc", wd1772_device, read, write, 0x00ff)      /* Floppy Controller interface */
-	AM_RANGE (0xcc0008, 0xcc0009) AM_READWRITE8 (tcr_r, tcr_w, 0x00ff) /* The Control Register, SCSI ID and FD drive select bits */
-ADDRESS_MAP_END
+	map(0xc40000, 0xc4001f).rw(this, FUNC(vme_fcscsi1_card_device::scsi_r), FUNC(vme_fcscsi1_card_device::scsi_w)).umask16(0x00ff);
+	map(0xc80000, 0xc800ff).rw("mc68450", FUNC(hd63450_device::read), FUNC(hd63450_device::write));  /* DMA Controller interface */
+	map(0xcc0000, 0xcc0007).rw("fdc", FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);      /* Floppy Controller interface */
+	map(0xcc0009, 0xcc0009).rw(this, FUNC(vme_fcscsi1_card_device::tcr_r), FUNC(vme_fcscsi1_card_device::tcr_w)); /* The Control Register, SCSI ID and FD drive select bits */
+}
 
 
 FLOPPY_FORMATS_MEMBER( vme_fcscsi1_card_device::floppy_formats )

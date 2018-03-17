@@ -333,38 +333,41 @@ static INPUT_PORTS_START( tourvision )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) // games slot status in bits 3 to 7
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(tourvision_state::pce_mem)
-	AM_RANGE( 0x000000, 0x0FFFFF) AM_ROM
-	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000)
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_DEVREADWRITE( "huc6260", huc6260_device, read, write )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE("c6280", c6280_device, c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_DEVREADWRITE("maincpu", h6280_device, timer_r, timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE(pce_joystick_r, pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE("maincpu", h6280_device, irq_status_r, irq_status_w )
-ADDRESS_MAP_END
+void tourvision_state::pce_mem(address_map &map)
+{
+	map(0x000000, 0x0FFFFF).rom();
+	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
+	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
+	map(0x1FE800, 0x1FEBFF).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
+	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
+	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(tourvision_state::pce_joystick_r), FUNC(tourvision_state::pce_joystick_w));
+	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
+}
 
-ADDRESS_MAP_START(tourvision_state::pce_io)
-	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
-ADDRESS_MAP_END
+void tourvision_state::pce_io(address_map &map)
+{
+	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+}
 
 WRITE8_MEMBER(tourvision_state::tourvision_8085_d000_w)
 {
 	//logerror( "D000 (8085) write %02x\n", data );
 }
 
-ADDRESS_MAP_START(tourvision_state::tourvision_8085_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x80ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
-	AM_RANGE(0x8100, 0x8107) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
-	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW2")
-	AM_RANGE(0xb000, 0xb000) AM_READNOP // unknown (must NOT be == 0x03 ? code at 0x1154)
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(tourvision_8085_d000_w )
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_READNOP // protection or internal counter ? there is sometimes some data in BIOS0 which is replaced by 0xff in BIOS1
-ADDRESS_MAP_END
+void tourvision_state::tourvision_8085_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x80ff).rw("i8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0x8100, 0x8107).rw("i8155", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0x9000, 0x9000).portr("DSW1");
+	map(0xa000, 0xa000).portr("DSW2");
+	map(0xb000, 0xb000).nopr(); // unknown (must NOT be == 0x03 ? code at 0x1154)
+	map(0xc000, 0xc000).portr("SYSTEM");
+	map(0xd000, 0xd000).w(this, FUNC(tourvision_state::tourvision_8085_d000_w));
+	map(0xe000, 0xe1ff).ram();
+	map(0xf000, 0xf000).nopr(); // protection or internal counter ? there is sometimes some data in BIOS0 which is replaced by 0xff in BIOS1
+}
 
 WRITE8_MEMBER(tourvision_state::tourvision_i8155_a_w)
 {

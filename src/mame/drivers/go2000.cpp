@@ -85,36 +85,39 @@ WRITE16_MEMBER(go2000_state::sound_cmd_w)
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-ADDRESS_MAP_START(go2000_state::go2000_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x200000, 0x203fff) AM_RAM
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x610000, 0x61ffff) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW")
-	AM_RANGE(0x620002, 0x620003) AM_WRITE(sound_cmd_w)
+void go2000_state::go2000_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x200000, 0x203fff).ram();
+	map(0x600000, 0x60ffff).ram().share("videoram");
+	map(0x610000, 0x61ffff).ram().share("videoram2");
+	map(0x800000, 0x800fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xa00000, 0xa00001).portr("INPUTS");
+	map(0xa00002, 0xa00003).portr("DSW");
+	map(0x620002, 0x620003).w(this, FUNC(go2000_state::sound_cmd_w));
 //  AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP
 //  AM_RANGE(0xe00010, 0xe00011) AM_WRITENOP
 //  AM_RANGE(0xe00020, 0xe00021) AM_WRITENOP
-ADDRESS_MAP_END
+}
 
 WRITE8_MEMBER(go2000_state::go2000_pcm_1_bankswitch_w)
 {
 	membank("bank1")->set_entry(data & 0x07);
 }
 
-ADDRESS_MAP_START(go2000_state::go2000_sound_map)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0400, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void go2000_state::go2000_sound_map(address_map &map)
+{
+	map(0x0000, 0x03ff).rom();
+	map(0x0400, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(go2000_state::go2000_sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x03, 0x03) AM_WRITE(go2000_pcm_1_bankswitch_w)
-ADDRESS_MAP_END
+void go2000_state::go2000_sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x00, 0x00).w("dac", FUNC(dac_byte_interface::write));
+	map(0x03, 0x03).w(this, FUNC(go2000_state::go2000_pcm_1_bankswitch_w));
+}
 
 
 static INPUT_PORTS_START( go2000 )

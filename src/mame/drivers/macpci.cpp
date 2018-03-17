@@ -60,24 +60,25 @@ READ64_MEMBER( macpci_state::unk2_r )
 	return 0;
 }
 
-ADDRESS_MAP_START(macpci_state::pippin_mem)
-	AM_RANGE(0x00000000, 0x005fffff) AM_RAM
+void macpci_state::pippin_mem(address_map &map)
+{
+	map(0x00000000, 0x005fffff).ram();
 
 	/* writes at 0x0*c01000 the string "Mr. Kesh" and wants it to be read back, true color VRAMs perhaps? */
-	AM_RANGE(0x00c00000, 0x00c01007) AM_RAM
-	AM_RANGE(0x01c00000, 0x01c01007) AM_RAM
-	AM_RANGE(0x02c00000, 0x02c01007) AM_RAM
-	AM_RANGE(0x03c00000, 0x03c01007) AM_RAM
+	map(0x00c00000, 0x00c01007).ram();
+	map(0x01c00000, 0x01c01007).ram();
+	map(0x02c00000, 0x02c01007).ram();
+	map(0x03c00000, 0x03c01007).ram();
 
-	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0fc00000)   // mirror of ROM for 680x0 emulation
+	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);   // mirror of ROM for 680x0 emulation
 
-	AM_RANGE(0xf00dfff8, 0xf00dffff) AM_READ(unk2_r)
-	AM_RANGE(0xf3008800, 0xf3008807) AM_READ(unk1_r)
+	map(0xf00dfff8, 0xf00dffff).r(this, FUNC(macpci_state::unk2_r));
+	map(0xf3008800, 0xf3008807).r(this, FUNC(macpci_state::unk1_r));
 
-	AM_RANGE(0xf3016000, 0xf3017fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffffffffffffU)
+	map(0xf3016000, 0xf3017fff).rw(this, FUNC(macpci_state::mac_via_r), FUNC(macpci_state::mac_via_w));
 
-	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("bootrom",0)
-ADDRESS_MAP_END
+	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pippin )

@@ -81,28 +81,29 @@ WRITE8_MEMBER(ltcasino_state::ltcasino_tile_atr_w)
 }
 
 
-ADDRESS_MAP_START(ltcasino_state::ltcasino_map)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ltcasino_tile_num_w) AM_SHARE("tile_nuram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ltcasino_tile_atr_w) AM_SHARE("tile_atr_ram")
-	AM_RANGE(0xe800, 0xebff) AM_RAM
+void ltcasino_state::ltcasino_map(address_map &map)
+{
+	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0xcfff).rom();
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(ltcasino_state::ltcasino_tile_num_w)).share("tile_nuram");
+	map(0xd800, 0xdfff).ram();
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(ltcasino_state::ltcasino_tile_atr_w)).share("tile_atr_ram");
+	map(0xe800, 0xebff).ram();
 
-	AM_RANGE(0xec00, 0xec00) AM_READ_PORT("IN0")
-	AM_RANGE(0xec01, 0xec01) AM_READ_PORT("IN1")
-	AM_RANGE(0xec02, 0xec02) AM_READ_PORT("IN2")
-	AM_RANGE(0xec03, 0xec03) AM_READ_PORT("IN3")
-	AM_RANGE(0xec10, 0xec10) AM_READ_PORT("IN4")
-	AM_RANGE(0xec12, 0xec12) AM_READ_PORT("IN5")
+	map(0xec00, 0xec00).portr("IN0");
+	map(0xec01, 0xec01).portr("IN1");
+	map(0xec02, 0xec02).portr("IN2");
+	map(0xec03, 0xec03).portr("IN3");
+	map(0xec10, 0xec10).portr("IN4");
+	map(0xec12, 0xec12).portr("IN5");
 
-	AM_RANGE(0xec20, 0xec20) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xec21, 0xec21) AM_READ_PORT("BUTTONS") //ltcasino -> pc: F3F3 (A in service) and F3FD (B in service)
-	AM_RANGE(0xec20, 0xec21) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0xec30, 0xec3f) AM_RAM
-	AM_RANGE(0xec3e, 0xec3e) AM_READNOP //not used
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xec20, 0xec20).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xec21, 0xec21).portr("BUTTONS"); //ltcasino -> pc: F3F3 (A in service) and F3FD (B in service)
+	map(0xec20, 0xec21).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0xec30, 0xec3f).ram();
+	map(0xec3e, 0xec3e).nopr(); //not used
+	map(0xf000, 0xffff).rom();
+}
 
 
 static INPUT_PORTS_START( ltcasino )

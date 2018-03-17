@@ -60,9 +60,10 @@ const tiny_rom_entry *superpet_device::device_rom_region() const
 //  ADDRESS_MAP( superpet_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(superpet_device::superpet_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void superpet_device::superpet_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(superpet_device::read), FUNC(superpet_device::write));
+}
 
 
 //-------------------------------------------------

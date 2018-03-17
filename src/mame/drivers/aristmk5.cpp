@@ -910,86 +910,89 @@ WRITE8_MEMBER(aristmk5_state::bill_acceptor_lamps_w)
 		output().set_lamp_value(24 + i, BIT(data, i));
 }
 
-ADDRESS_MAP_START(aristmk5_state::aristmk5_map)
-	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
+void aristmk5_state::aristmk5_map(address_map &map)
+{
+	map(0x02000000, 0x02ffffff).ram().share("physicalram"); /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
-	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
+	map(0x03000000, 0x0331ffff).rw(this, FUNC(aristmk5_state::archimedes_ioc_r), FUNC(aristmk5_state::archimedes_ioc_w));
 
 	/* MK-5 overrides */
-	AM_RANGE(0x03010420, 0x03010423) AM_WRITE8(sram_banksel_w, 0x000000ff) // SRAM bank select write
+	map(0x03010420, 0x03010420).w(this, FUNC(aristmk5_state::sram_banksel_w)); // SRAM bank select write
 
-	AM_RANGE(0x03010480, 0x0301049f) AM_DEVREADWRITE8("uart_0a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03010500, 0x0301051f) AM_DEVREADWRITE8("uart_0b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03010580, 0x03010583) AM_READ_PORT("P3")
-	AM_RANGE(0x03010600, 0x0301061f) AM_DEVREADWRITE8("uart_1a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03010680, 0x0301069f) AM_DEVREADWRITE8("uart_1b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	map(0x03010480, 0x0301049f).rw("uart_0a", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
+	map(0x03010500, 0x0301051f).rw("uart_0b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
+	map(0x03010580, 0x03010583).portr("P3");
+	map(0x03010600, 0x0301061f).rw("uart_1a", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
+	map(0x03010680, 0x0301069f).rw("uart_1b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
 
-	AM_RANGE(0x03010700, 0x03010703) AM_READ_PORT("P6")
-	AM_RANGE(0x03010800, 0x03010803) AM_READ8(eeprom_r, 0x000000ff)
-	AM_RANGE(0x03010810, 0x03010813) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset32_r, reset32_w) //MK-5 specific, watchdog
-	AM_RANGE(0x03220000, 0x0323ffff) AM_READWRITE8(sram_r, sram_w, 0x000000ff)
+	map(0x03010700, 0x03010703).portr("P6");
+	map(0x03010800, 0x03010800).r(this, FUNC(aristmk5_state::eeprom_r));
+	map(0x03010810, 0x03010813).rw("watchdog", FUNC(watchdog_timer_device::reset32_r), FUNC(watchdog_timer_device::reset32_w)); //MK-5 specific, watchdog
+	map(0x03220000, 0x0323ffff).rw(this, FUNC(aristmk5_state::sram_r), FUNC(aristmk5_state::sram_w)).umask32(0x000000ff);
 
 	// bank5 slow
-	AM_RANGE(0x03250048, 0x0325004b) AM_WRITE(Ns5w48) //IOEB control register
-	AM_RANGE(0x03250050, 0x03250053) AM_READ(Ns5r50)  //IOEB ID register
-	AM_RANGE(0x03250058, 0x0325005b) AM_READ(Ns5x58)  //IOEB interrupt Latch
+	map(0x03250048, 0x0325004b).w(this, FUNC(aristmk5_state::Ns5w48)); //IOEB control register
+	map(0x03250050, 0x03250053).r(this, FUNC(aristmk5_state::Ns5r50));  //IOEB ID register
+	map(0x03250058, 0x0325005b).r(this, FUNC(aristmk5_state::Ns5x58));  //IOEB interrupt Latch
 
-	AM_RANGE(0x03320000, 0x0333ffff) AM_READWRITE8(sram_r, sram_w, 0x000000ff)
+	map(0x03320000, 0x0333ffff).rw(this, FUNC(aristmk5_state::sram_r), FUNC(aristmk5_state::sram_w)).umask32(0x000000ff);
 
-	AM_RANGE(0x03400000, 0x035fffff) AM_WRITE(archimedes_vidc_w)
-	AM_RANGE(0x03600000, 0x037fffff) AM_WRITE(archimedes_memc_w)
-	AM_RANGE(0x03800000, 0x039fffff) AM_WRITE(archimedes_memc_page_w)
+	map(0x03400000, 0x035fffff).w(this, FUNC(aristmk5_state::archimedes_vidc_w));
+	map(0x03600000, 0x037fffff).w(this, FUNC(aristmk5_state::archimedes_memc_w));
+	map(0x03800000, 0x039fffff).w(this, FUNC(aristmk5_state::archimedes_memc_page_w));
 
-	AM_RANGE(0x03400000, 0x03bfffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+	map(0x03400000, 0x03bfffff).rom().region("maincpu", 0);
+}
 
 /* U.S games have no dram emulator enabled */
-ADDRESS_MAP_START(aristmk5_state::aristmk5_usa_map)
-	AM_IMPORT_FROM(aristmk5_map)
+void aristmk5_state::aristmk5_usa_map(address_map &map)
+{
+	aristmk5_map(map);
 
-	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
+	map(0x00000000, 0x01ffffff).rw(this, FUNC(aristmk5_state::archimedes_memc_logical_r), FUNC(aristmk5_state::archimedes_memc_logical_w));
 
-	AM_RANGE(0x03010440, 0x03010443) AM_WRITE8(rtc_usa_w, 0x000000ff)
-	AM_RANGE(0x03010450, 0x03010453) AM_WRITE8(eeprom_usa_w, 0x000000ff)
+	map(0x03010440, 0x03010440).w(this, FUNC(aristmk5_state::rtc_usa_w));
+	map(0x03010450, 0x03010450).w(this, FUNC(aristmk5_state::eeprom_usa_w));
 
-	AM_RANGE(0x03012000, 0x03012003) AM_READ_PORT("P1")
-	AM_RANGE(0x03012010, 0x03012013) AM_READ_PORT("P2")
-	AM_RANGE(0x03012200, 0x03012203) AM_READ_PORT("DSW1")
-	AM_RANGE(0x03012210, 0x03012213) AM_READ_PORT("DSW2")
-	AM_RANGE(0x03010584, 0x03010587) AM_READ_PORT("P4")
+	map(0x03012000, 0x03012003).portr("P1");
+	map(0x03012010, 0x03012013).portr("P2");
+	map(0x03012200, 0x03012203).portr("DSW1");
+	map(0x03012210, 0x03012213).portr("DSW2");
+	map(0x03010584, 0x03010587).portr("P4");
 
-	AM_RANGE(0x03012020, 0x03012023) AM_READ8(ldor_r, 0x000000ff)
-	AM_RANGE(0x03012070, 0x03012073) AM_WRITE8(ldor_clk_w, 0x000000ff)
-	AM_RANGE(0x03012184, 0x03012187) AM_READ_PORT("P5")
+	map(0x03012020, 0x03012020).r(this, FUNC(aristmk5_state::ldor_r));
+	map(0x03012070, 0x03012070).w(this, FUNC(aristmk5_state::ldor_clk_w));
+	map(0x03012184, 0x03012187).portr("P5");
 
-	AM_RANGE(0x03012000, 0x0301201f) AM_WRITE8(buttons_lamps_w, 0x000000ff)
-	AM_RANGE(0x03012030, 0x0301203f) AM_WRITE8(other_lamps_w, 0x000000ff)
-	AM_RANGE(0x03012380, 0x0301238f) AM_WRITE8(bill_acceptor_lamps_w, 0x000000ff)
+	map(0x03012000, 0x0301201f).w(this, FUNC(aristmk5_state::buttons_lamps_w)).umask32(0x000000ff);
+	map(0x03012030, 0x0301203f).w(this, FUNC(aristmk5_state::other_lamps_w)).umask32(0x000000ff);
+	map(0x03012380, 0x0301238f).w(this, FUNC(aristmk5_state::bill_acceptor_lamps_w)).umask32(0x000000ff);
 
-	AM_RANGE(0x03012100, 0x0301211f) AM_DEVREADWRITE8("uart_2a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03012140, 0x0301215f) AM_DEVREADWRITE8("uart_2b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03012300, 0x0301231f) AM_DEVREADWRITE8("uart_3a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03012340, 0x0301235f) AM_DEVREADWRITE8("uart_3b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-ADDRESS_MAP_END
+	map(0x03012100, 0x0301211f).rw("uart_2a", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
+	map(0x03012140, 0x0301215f).rw("uart_2b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
+	map(0x03012300, 0x0301231f).rw("uart_3a", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
+	map(0x03012340, 0x0301235f).rw("uart_3b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
+}
 
 /* with dram emulator enabled */
-ADDRESS_MAP_START(aristmk5_state::aristmk5_drame_map)
-	AM_IMPORT_FROM(aristmk5_map)
+void aristmk5_state::aristmk5_drame_map(address_map &map)
+{
+	aristmk5_map(map);
 
-	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(aristmk5_drame_memc_logical_r, archimedes_memc_logical_w)
+	map(0x00000000, 0x01ffffff).rw(this, FUNC(aristmk5_state::aristmk5_drame_memc_logical_r), FUNC(aristmk5_state::archimedes_memc_logical_w));
 
-	AM_RANGE(0x03010430, 0x03010433) AM_WRITE8(hopper_w, 0x000000ff)
-	AM_RANGE(0x03010440, 0x03010443) AM_WRITE8(rtc_w, 0x000000ff)
-	AM_RANGE(0x03010450, 0x03010453) AM_WRITE8(eeprom_w, 0x000000ff)
+	map(0x03010430, 0x03010430).w(this, FUNC(aristmk5_state::hopper_w));
+	map(0x03010440, 0x03010440).w(this, FUNC(aristmk5_state::rtc_w));
+	map(0x03010450, 0x03010450).w(this, FUNC(aristmk5_state::eeprom_w));
 
-	AM_RANGE(0x03010400, 0x03010403) AM_WRITE8(spi_mux_w, 0x000000ff)
-	AM_RANGE(0x03010470, 0x03010473) AM_WRITE8(spi_data_w, 0x000000ff)
-	AM_RANGE(0x03010850, 0x03010853) AM_READWRITE8(spi_int_ack_r, spi_int_ack_w, 0x000000ff)
-	AM_RANGE(0x03010870, 0x03010873) AM_READ8(spi_data_r, 0x000000ff)
+	map(0x03010400, 0x03010400).w(this, FUNC(aristmk5_state::spi_mux_w));
+	map(0x03010470, 0x03010470).w(this, FUNC(aristmk5_state::spi_data_w));
+	map(0x03010850, 0x03010850).rw(this, FUNC(aristmk5_state::spi_int_ack_r), FUNC(aristmk5_state::spi_int_ack_w));
+	map(0x03010870, 0x03010870).r(this, FUNC(aristmk5_state::spi_data_r));
 
-	AM_RANGE(0x03014000, 0x0301401f) AM_DEVREADWRITE8("uart_2a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03014020, 0x0301403f) AM_DEVREADWRITE8("uart_2b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-ADDRESS_MAP_END
+	map(0x03014000, 0x0301401f).rw("uart_2a", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
+	map(0x03014020, 0x0301403f).rw("uart_2b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
+}
 
 
 CUSTOM_INPUT_MEMBER(aristmk5_state::hopper_r)

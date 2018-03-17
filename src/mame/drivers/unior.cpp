@@ -90,24 +90,26 @@ private:
 	required_region_ptr<u8> m_p_vram;
 };
 
-ADDRESS_MAP_START(unior_state::unior_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_WRITE(vram_w) // main video
-ADDRESS_MAP_END
+void unior_state::unior_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xf7ff).ram();
+	map(0xf800, 0xffff).rom().w(this, FUNC(unior_state::vram_w)); // main video
+}
 
-ADDRESS_MAP_START(unior_state::unior_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x30, 0x38) AM_DEVREADWRITE("dma", i8257_device, read, write) // dma data
-	AM_RANGE(0x3c, 0x3f) AM_DEVREADWRITE("ppi0", i8255_device, read, write) // cassette player control
-	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
-	AM_RANGE(0x50, 0x50) AM_WRITE(scroll_w)
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("crtc", i8275_device, read, write)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("pit", pit8253_device, read, write )
-	AM_RANGE(0xec, 0xec) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
-	AM_RANGE(0xed, 0xed) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void unior_state::unior_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x30, 0x38).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write)); // dma data
+	map(0x3c, 0x3f).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write)); // cassette player control
+	map(0x4c, 0x4f).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x50, 0x50).w(this, FUNC(unior_state::scroll_w));
+	map(0x60, 0x61).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0xdc, 0xdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xec, 0xec).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xed, 0xed).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( unior )

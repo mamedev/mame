@@ -164,31 +164,33 @@ WRITE8_MEMBER(dfruit_state::dfruit_ram_1_w) { ram_bank_w(offset, data, 1); }
 WRITE8_MEMBER(dfruit_state::dfruit_ram_2_w) { ram_bank_w(offset, data, 2); }
 WRITE8_MEMBER(dfruit_state::dfruit_ram_3_w) { ram_bank_w(offset, data, 3); }
 
-ADDRESS_MAP_START(dfruit_state::tc0091lvc_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_READ(dfruit_rom_r)
+void dfruit_state::tc0091lvc_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x7fff).r(this, FUNC(dfruit_state::dfruit_rom_r));
 
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	map(0x8000, 0x9fff).ram();
 
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(dfruit_ram_0_r,dfruit_ram_0_w)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(dfruit_ram_1_r,dfruit_ram_1_w)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(dfruit_ram_2_r,dfruit_ram_2_w)
-	AM_RANGE(0xf000, 0xfdff) AM_READWRITE(dfruit_ram_3_r,dfruit_ram_3_w)
+	map(0xc000, 0xcfff).rw(this, FUNC(dfruit_state::dfruit_ram_0_r), FUNC(dfruit_state::dfruit_ram_0_w));
+	map(0xd000, 0xdfff).rw(this, FUNC(dfruit_state::dfruit_ram_1_r), FUNC(dfruit_state::dfruit_ram_1_w));
+	map(0xe000, 0xefff).rw(this, FUNC(dfruit_state::dfruit_ram_2_r), FUNC(dfruit_state::dfruit_ram_2_w));
+	map(0xf000, 0xfdff).rw(this, FUNC(dfruit_state::dfruit_ram_3_r), FUNC(dfruit_state::dfruit_ram_3_w));
 
-	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("tc0091lvc", tc0091lvc_device, vregs_r, vregs_w)
-	AM_RANGE(0xff00, 0xff02) AM_READWRITE(dfruit_irq_vector_r, dfruit_irq_vector_w)
-	AM_RANGE(0xff03, 0xff03) AM_READWRITE(dfruit_irq_enable_r, dfruit_irq_enable_w)
-	AM_RANGE(0xff04, 0xff07) AM_READWRITE(dfruit_ram_bank_r, dfruit_ram_bank_w)
-	AM_RANGE(0xff08, 0xff08) AM_READWRITE(dfruit_rom_bank_r, dfruit_rom_bank_w)
-ADDRESS_MAP_END
+	map(0xfe00, 0xfeff).rw(m_vdp, FUNC(tc0091lvc_device::vregs_r), FUNC(tc0091lvc_device::vregs_w));
+	map(0xff00, 0xff02).rw(this, FUNC(dfruit_state::dfruit_irq_vector_r), FUNC(dfruit_state::dfruit_irq_vector_w));
+	map(0xff03, 0xff03).rw(this, FUNC(dfruit_state::dfruit_irq_enable_r), FUNC(dfruit_state::dfruit_irq_enable_w));
+	map(0xff04, 0xff07).rw(this, FUNC(dfruit_state::dfruit_ram_bank_r), FUNC(dfruit_state::dfruit_ram_bank_w));
+	map(0xff08, 0xff08).rw(this, FUNC(dfruit_state::dfruit_rom_bank_r), FUNC(dfruit_state::dfruit_rom_bank_w));
+}
 
 
-ADDRESS_MAP_START(dfruit_state::dfruit_map)
-	AM_IMPORT_FROM(tc0091lvc_map)
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xa004, 0xa005) AM_DEVREADWRITE("opn", ym2203_device, read, write)
-	AM_RANGE(0xa008, 0xa008) AM_READNOP //watchdog
-ADDRESS_MAP_END
+void dfruit_state::dfruit_map(address_map &map)
+{
+	tc0091lvc_map(map);
+	map(0xa000, 0xa003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa004, 0xa005).rw("opn", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa008, 0xa008).nopr(); //watchdog
+}
 
 
 static INPUT_PORTS_START( dfruit )

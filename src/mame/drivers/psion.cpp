@@ -249,66 +249,72 @@ READ8_MEMBER( psion1_state::switchoff_r )
 	return 0;
 }
 
-ADDRESS_MAP_START(psion1_state::psion1_mem)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x07fe) AM_DEVREADWRITE("hd44780", hd44780_device, control_read, control_write)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("hd44780", hd44780_device, data_read, data_write)
-	AM_RANGE(0x2800, 0x2800) AM_READ(reset_kb_counter_r)
-	AM_RANGE(0x2e00, 0x2e00) AM_READ(switchoff_r)
-	AM_RANGE(0x3000, 0x3000) AM_READ(inc_kb_counter_r)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void psion1_state::psion1_mem(address_map &map)
+{
+	map(0x0000, 0x001f).rw(this, FUNC(psion1_state::hd63701_int_reg_r), FUNC(psion1_state::hd63701_int_reg_w));
+	map(0x0040, 0x00ff).ram().share("sys_register");
+	map(0x2000, 0x2000).mirror(0x07fe).rw(m_lcdc, FUNC(hd44780_device::control_read), FUNC(hd44780_device::control_write));
+	map(0x2001, 0x2001).mirror(0x07fe).rw(m_lcdc, FUNC(hd44780_device::data_read), FUNC(hd44780_device::data_write));
+	map(0x2800, 0x2800).r(this, FUNC(psion1_state::reset_kb_counter_r));
+	map(0x2e00, 0x2e00).r(this, FUNC(psion1_state::switchoff_r));
+	map(0x3000, 0x3000).r(this, FUNC(psion1_state::inc_kb_counter_r));
+	map(0x4000, 0x47ff).ram().share("ram");
+	map(0xf000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(psion_state::psioncm_mem)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
-	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void psion_state::psioncm_mem(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x0000, 0x001f).rw(this, FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
+	map(0x0040, 0x00ff).ram().share("sys_register");
+	map(0x0100, 0x03ff).rw(this, FUNC(psion_state::io_r), FUNC(psion_state::io_w));
+	map(0x2000, 0x3fff).ram().share("ram");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(psion_state::psionla_mem)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
-	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x5fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void psion_state::psionla_mem(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x0000, 0x001f).rw(this, FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
+	map(0x0040, 0x00ff).ram().share("sys_register");
+	map(0x0100, 0x03ff).rw(this, FUNC(psion_state::io_r), FUNC(psion_state::io_w));
+	map(0x0400, 0x5fff).ram().share("ram");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(psion_state::psionp350_mem)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
-	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("rambank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void psion_state::psionp350_mem(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x0000, 0x001f).rw(this, FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
+	map(0x0040, 0x00ff).ram().share("sys_register");
+	map(0x0100, 0x03ff).rw(this, FUNC(psion_state::io_r), FUNC(psion_state::io_w));
+	map(0x0400, 0x3fff).ram().share("ram");
+	map(0x4000, 0x7fff).bankrw("rambank");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(psion_state::psionlam_mem)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
-	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x7fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("rombank")
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void psion_state::psionlam_mem(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x0000, 0x001f).rw(this, FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
+	map(0x0040, 0x00ff).ram().share("sys_register");
+	map(0x0100, 0x03ff).rw(this, FUNC(psion_state::io_r), FUNC(psion_state::io_w));
+	map(0x0400, 0x7fff).ram().share("ram");
+	map(0x8000, 0xbfff).bankr("rombank");
+	map(0xc000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(psion_state::psionlz_mem)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
-	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("rambank")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("rombank")
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void psion_state::psionlz_mem(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x0000, 0x001f).rw(this, FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
+	map(0x0040, 0x00ff).ram().share("sys_register");
+	map(0x0100, 0x03ff).rw(this, FUNC(psion_state::io_r), FUNC(psion_state::io_w));
+	map(0x0400, 0x3fff).ram().share("ram");
+	map(0x4000, 0x7fff).bankrw("rambank");
+	map(0x8000, 0xbfff).bankr("rombank");
+	map(0xc000, 0xffff).rom();
+}
 
 /* Input ports */
 INPUT_PORTS_START( psion )

@@ -64,7 +64,7 @@ enum
 #define H 0x10
 
 
-DEFINE_DEVICE_TYPE(LH5801, lh5801_cpu_device, "lh5801", "LH5801")
+DEFINE_DEVICE_TYPE(LH5801, lh5801_cpu_device, "lh5801", "Sharp LH5801")
 
 
 lh5801_cpu_device::lh5801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

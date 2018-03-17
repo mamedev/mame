@@ -24,7 +24,6 @@ PAL16R6A 11H
 #include "includes/dietgo.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "machine/decocrpt.h"
@@ -52,36 +51,39 @@ WRITE16_MEMBER( dietgo_state::dietgo_protection_region_0_104_w )
 }
 
 
-ADDRESS_MAP_START(dietgo_state::dietgo_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-	AM_RANGE(0x210000, 0x211fff) AM_DEVWRITE("tilegen1", deco16ic_device, pf1_data_w)
-	AM_RANGE(0x212000, 0x213fff) AM_DEVWRITE("tilegen1", deco16ic_device, pf2_data_w)
-	AM_RANGE(0x220000, 0x2207ff) AM_WRITEONLY AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x222000, 0x2227ff) AM_WRITEONLY AM_SHARE("pf2_rowscroll")
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x300000, 0x300bff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x340000, 0x343fff) AM_READWRITE(dietgo_protection_region_0_104_r,dietgo_protection_region_0_104_w)AM_SHARE("prot16ram") /* Protection device */
-	AM_RANGE(0x380000, 0x38ffff) AM_RAM // mainram
-ADDRESS_MAP_END
+void dietgo_state::dietgo_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x20000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x210000, 0x211fff).w(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_w));
+	map(0x212000, 0x213fff).w(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_w));
+	map(0x220000, 0x2207ff).writeonly().share("pf1_rowscroll");
+	map(0x222000, 0x2227ff).writeonly().share("pf2_rowscroll");
+	map(0x280000, 0x2807ff).ram().share("spriteram");
+	map(0x300000, 0x300bff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x340000, 0x343fff).rw(this, FUNC(dietgo_state::dietgo_protection_region_0_104_r), FUNC(dietgo_state::dietgo_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
+	map(0x380000, 0x38ffff).ram(); // mainram
+}
 
-ADDRESS_MAP_START(dietgo_state::decrypted_opcodes_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void dietgo_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().share("decrypted_opcodes");
+}
 
 
 /* Physical memory map (21 bits) */
-ADDRESS_MAP_START(dietgo_state::sound_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_NOP     /* YM2203 - this board doesn't have one */
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_NOP     /* This board only has 1 oki chip */
-	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot104", deco104_device, soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void dietgo_state::sound_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x100000, 0x100001).noprw();     /* YM2203 - this board doesn't have one */
+	map(0x110000, 0x110001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x120000, 0x120001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).noprw();     /* This board only has 1 oki chip */
+	map(0x140000, 0x140000).r(m_deco104, FUNC(deco104_device::soundlatch_r));
+	map(0x1f0000, 0x1f1fff).bankrw("bank8");
+	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
+	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+}
 
 
 

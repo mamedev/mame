@@ -110,18 +110,19 @@ private:
 };
 
 
-ADDRESS_MAP_START(allied_state::allied_map)
-	AM_RANGE(0x0000, 0x003f) AM_RAM // ic6
-	AM_RANGE(0x0044, 0x0047) AM_DEVREADWRITE("ic2", pia6821_device, read, write)
-	AM_RANGE(0x0048, 0x004b) AM_DEVREADWRITE("ic1", pia6821_device, read, write)
-	AM_RANGE(0x0050, 0x0053) AM_DEVREADWRITE("ic7", pia6821_device, read, write)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ic4", pia6821_device, read, write)
-	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE("ic5", mos6530_device, read, write)
-	AM_RANGE(0x0840, 0x084f) AM_DEVREADWRITE("ic6", mos6530_device, read, write)
-	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE("ic8", pia6821_device, read, write)
-	AM_RANGE(0x0100, 0x013f) AM_RAM // ic5
-	AM_RANGE(0x1400, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void allied_state::allied_map(address_map &map)
+{
+	map(0x0000, 0x003f).ram(); // ic6
+	map(0x0044, 0x0047).rw(m_ic2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0048, 0x004b).rw(m_ic1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0050, 0x0053).rw(m_ic7, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0060, 0x0063).rw(m_ic4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0080, 0x008f).rw(m_ic5, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x0840, 0x084f).rw(m_ic6, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x00c0, 0x00c3).rw(m_ic8, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0100, 0x013f).ram(); // ic5
+	map(0x1400, 0x1fff).rom();
+}
 
 static INPUT_PORTS_START( allied )
 	PORT_START("TEST")

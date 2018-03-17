@@ -66,15 +66,16 @@ TODO:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(kim1_state::kim1_map)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0xe000) AM_RAM
-	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u3", mos6530_device, read, write )
-	AM_RANGE(0x1740, 0x177f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u2", mos6530_device, read, write )
-	AM_RANGE(0x1780, 0x17bf) AM_MIRROR(0xe000) AM_RAM
-	AM_RANGE(0x17c0, 0x17ff) AM_MIRROR(0xe000) AM_RAM
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0xe000) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0xe000) AM_ROM
-ADDRESS_MAP_END
+void kim1_state::kim1_map(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0xe000).ram();
+	map(0x1700, 0x173f).mirror(0xe000).rw("miot_u3", FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x1740, 0x177f).mirror(0xe000).rw(m_riot2, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x1780, 0x17bf).mirror(0xe000).ram();
+	map(0x17c0, 0x17ff).mirror(0xe000).ram();
+	map(0x1800, 0x1bff).mirror(0xe000).rom();
+	map(0x1c00, 0x1fff).mirror(0xe000).rom();
+}
 
 // RS and ST key input
 INPUT_CHANGED_MEMBER(kim1_state::trigger_reset)

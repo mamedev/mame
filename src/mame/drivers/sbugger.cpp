@@ -111,19 +111,21 @@ Sound PCB
 
 /* memory maps */
 
-ADDRESS_MAP_START(sbugger_state::sbugger_map)
-	AM_RANGE(0x0000, 0x37ff) AM_ROM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(videoram_attr_w) AM_SHARE("videoram_attr")
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("i8156", i8155_device, memory_r, memory_w) /* sp is set to e0ff */
-	AM_RANGE(0xf400, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void sbugger_state::sbugger_map(address_map &map)
+{
+	map(0x0000, 0x37ff).rom();
+	map(0xc800, 0xcbff).ram().w(this, FUNC(sbugger_state::videoram_attr_w)).share("videoram_attr");
+	map(0xcc00, 0xcfff).ram().w(this, FUNC(sbugger_state::videoram_w)).share("videoram");
+	map(0xe000, 0xe0ff).rw("i8156", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w)); /* sp is set to e0ff */
+	map(0xf400, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(sbugger_state::sbugger_io_map)
-	AM_RANGE(0xe0, 0xe7) AM_DEVREADWRITE("i8156", i8155_device, io_r, io_w)
-	AM_RANGE(0xe8, 0xe8) AM_DEVWRITE("sn76489.1", sn76489_device, write)
-	AM_RANGE(0xe9, 0xe9) AM_DEVWRITE("sn76489.2", sn76489_device, write)
-ADDRESS_MAP_END
+void sbugger_state::sbugger_io_map(address_map &map)
+{
+	map(0xe0, 0xe7).rw("i8156", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0xe8, 0xe8).w("sn76489.1", FUNC(sn76489_device::write));
+	map(0xe9, 0xe9).w("sn76489.2", FUNC(sn76489_device::write));
+}
 
 
 /* gfx decode */

@@ -131,7 +131,7 @@ const asap_device::ophandler asap_device::s_conditiontable[16] =
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(ASAP, asap_device, "asap", "ASAP")
+DEFINE_DEVICE_TYPE(ASAP, asap_device, "asap", "Atari ASAP")
 
 //-------------------------------------------------
 //  asap_device - constructor

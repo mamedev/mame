@@ -1126,62 +1126,70 @@ READ8_MEMBER(fidelz80_state::dsc_input_r)
 
 // CC10 and VCC/UVC
 
-ADDRESS_MAP_START(fidelz80_state::cc10_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x0f00) AM_RAM
-	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0f00) AM_RAM
-ADDRESS_MAP_END
+void fidelz80_state::cc10_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x3fff);
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x10ff).mirror(0x0f00).ram();
+	map(0x3000, 0x30ff).mirror(0x0f00).ram();
+}
 
-ADDRESS_MAP_START(fidelz80_state::vcc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
-ADDRESS_MAP_END
+void fidelz80_state::vcc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x2fff).rom();
+	map(0x4000, 0x43ff).mirror(0x1c00).ram();
+}
 
-ADDRESS_MAP_START(fidelz80_state::vcc_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x03)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void fidelz80_state::vcc_io(address_map &map)
+{
+	map.global_mask(0x03);
+	map(0x00, 0x03).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
 // BCC
 
-ADDRESS_MAP_START(fidelz80_state::bcc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0f00) AM_RAM
-ADDRESS_MAP_END
+void fidelz80_state::bcc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x3fff);
+	map(0x0000, 0x0fff).rom();
+	map(0x3000, 0x30ff).mirror(0x0f00).ram();
+}
 
-ADDRESS_MAP_START(fidelz80_state::bcc_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x07) AM_READWRITE(bcc_input_r, bcc_control_w)
-ADDRESS_MAP_END
+void fidelz80_state::bcc_io(address_map &map)
+{
+	map.global_mask(0x07);
+	map(0x00, 0x07).rw(this, FUNC(fidelz80_state::bcc_input_r), FUNC(fidelz80_state::bcc_control_w));
+}
 
 
 // SCC
 
-ADDRESS_MAP_START(fidelz80_state::scc_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x5000, 0x50ff) AM_RAM
-ADDRESS_MAP_END
+void fidelz80_state::scc_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x5000, 0x50ff).ram();
+}
 
-ADDRESS_MAP_START(fidelz80_state::scc_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x07) AM_READWRITE(scc_input_r, scc_control_w)
-ADDRESS_MAP_END
+void fidelz80_state::scc_io(address_map &map)
+{
+	map.global_mask(0x07);
+	map(0x00, 0x07).rw(this, FUNC(fidelz80_state::scc_input_r), FUNC(fidelz80_state::scc_control_w));
+}
 
 
 // VSC
 
-ADDRESS_MAP_START(fidelz80_state::vsc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x1000) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_MIRROR(0x1c00) AM_RAM
-ADDRESS_MAP_END
+void fidelz80_state::vsc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).mirror(0x1000).rom();
+	map(0x6000, 0x63ff).mirror(0x1c00).ram();
+}
 
 // VSC io: A2 is 8255 _CE, A3 is Z80 PIO _CE - in theory, both chips can be accessed simultaneously
 READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
@@ -1203,37 +1211,41 @@ WRITE8_MEMBER(fidelz80_state::vsc_io_trampoline_w)
 		m_z80pio->write(space, offset & 3, data);
 }
 
-ADDRESS_MAP_START(fidelz80_state::vsc_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(vsc_io_trampoline_r, vsc_io_trampoline_w)
-ADDRESS_MAP_END
+void fidelz80_state::vsc_io(address_map &map)
+{
+	map.global_mask(0x0f);
+	map(0x00, 0x0f).rw(this, FUNC(fidelz80_state::vsc_io_trampoline_r), FUNC(fidelz80_state::vsc_io_trampoline_w));
+}
 
 
 // VBRC
 
-ADDRESS_MAP_START(fidelz80_state::vbrc_main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_WRITE(vbrc_speech_w)
-ADDRESS_MAP_END
+void fidelz80_state::vbrc_main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x63ff).mirror(0x1c00).ram();
+	map(0xe000, 0xe000).mirror(0x1fff).w(this, FUNC(fidelz80_state::vbrc_speech_w));
+}
 
-ADDRESS_MAP_START(fidelz80_state::vbrc_main_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x01)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("mcu", i8041_device, upi41_master_r, upi41_master_w)
-ADDRESS_MAP_END
+void fidelz80_state::vbrc_main_io(address_map &map)
+{
+	map.global_mask(0x01);
+	map(0x00, 0x01).rw(m_mcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+}
 
 
 // DSC
 
-ADDRESS_MAP_START(fidelz80_state::dsc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x1fff) AM_WRITE(dsc_control_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_WRITE(dsc_select_w)
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ(dsc_input_r)
-	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1c00) AM_RAM
-ADDRESS_MAP_END
+void fidelz80_state::dsc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x4000).mirror(0x1fff).w(this, FUNC(fidelz80_state::dsc_control_w));
+	map(0x6000, 0x6000).mirror(0x1fff).w(this, FUNC(fidelz80_state::dsc_select_w));
+	map(0x8000, 0x8000).mirror(0x1fff).r(this, FUNC(fidelz80_state::dsc_input_r));
+	map(0xa000, 0xa3ff).mirror(0x1c00).ram();
+}
 
 
 

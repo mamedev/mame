@@ -64,7 +64,7 @@ inline void diablo1300_cpu_device::write_reg(uint16_t reg, uint8_t data)
 
 /*****************************************************************************/
 
-DEFINE_DEVICE_TYPE(DIABLO1300, diablo1300_cpu_device, "diablo1300_cpu", "DIABLO 1300 CPU")
+DEFINE_DEVICE_TYPE(DIABLO1300, diablo1300_cpu_device, "diablo1300", "DIABLO 1300")
 
 //-------------------------------------------------
 //  diablo1300_cpu_device - constructor

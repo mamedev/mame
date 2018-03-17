@@ -369,33 +369,38 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(elwro800_state::elwro800_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVICE("bank1", address_map_bank_device, amap8)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("bank2", address_map_bank_device, amap8)
-	AM_RANGE(0x4000, 0xffff) AM_RAMBANK("rambank3")
-ADDRESS_MAP_END
+void elwro800_state::elwro800_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).m(m_bank1, FUNC(address_map_bank_device::amap8));
+	map(0x2000, 0x3fff).m(m_bank2, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0xffff).bankrw("rambank3");
+}
 
-ADDRESS_MAP_START(elwro800_state::elwro800_io)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(elwro800jr_io_r, elwro800jr_io_w)
-ADDRESS_MAP_END
+void elwro800_state::elwro800_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(elwro800_state::elwro800jr_io_r), FUNC(elwro800_state::elwro800jr_io_w));
+}
 
-ADDRESS_MAP_START(elwro800_state::elwro800_m1)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVICE("bank1", address_map_bank_device, amap8)
-	AM_RANGE(0x0066, 0x0066) AM_READ(nmi_r)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("bank2", address_map_bank_device, amap8)
-	AM_RANGE(0x4000, 0xffff) AM_RAMBANK("rambank3")
-ADDRESS_MAP_END
+void elwro800_state::elwro800_m1(address_map &map)
+{
+	map(0x0000, 0x1fff).m(m_bank1, FUNC(address_map_bank_device::amap8));
+	map(0x0066, 0x0066).r(this, FUNC(elwro800_state::nmi_r));
+	map(0x2000, 0x3fff).m(m_bank2, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0xffff).bankrw("rambank3");
+}
 
-ADDRESS_MAP_START(elwro800_state::elwro800_bank1)
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("rambank1")
-	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x0000) AM_WRITENOP // BAS0 ROM
-	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("maincpu", 0x4000) AM_WRITENOP // BOOT ROM
-ADDRESS_MAP_END
+void elwro800_state::elwro800_bank1(address_map &map)
+{
+	map(0x0000, 0x1fff).bankrw("rambank1");
+	map(0x2000, 0x3fff).rom().region("maincpu", 0x0000).nopw(); // BAS0 ROM
+	map(0x4000, 0x5fff).rom().region("maincpu", 0x4000).nopw(); // BOOT ROM
+}
 
-ADDRESS_MAP_START(elwro800_state::elwro800_bank2)
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("rambank2")
-	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x2000) AM_WRITENOP // BAS1 ROM
-ADDRESS_MAP_END
+void elwro800_state::elwro800_bank2(address_map &map)
+{
+	map(0x0000, 0x1fff).bankrw("rambank2");
+	map(0x2000, 0x3fff).rom().region("maincpu", 0x2000).nopw(); // BAS1 ROM
+}
 
 /*************************************
  *

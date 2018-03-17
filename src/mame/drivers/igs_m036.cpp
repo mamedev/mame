@@ -95,11 +95,12 @@ uint32_t igs_m036_state::screen_update_igs_m036(screen_device &screen, bitmap_in
 	return 0;
 }
 
-ADDRESS_MAP_START(igs_m036_state::igs_m036_map)
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM /* Internal ROM */
-	AM_RANGE(0x08000000, 0x081fffff) AM_ROM AM_REGION("user1", 0) // not 100% sure it maps here.
+void igs_m036_state::igs_m036_map(address_map &map)
+{
+	map(0x00000000, 0x00003fff).rom(); /* Internal ROM */
+	map(0x08000000, 0x081fffff).rom().region("user1", 0); // not 100% sure it maps here.
 
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( igs_m036 )
 INPUT_PORTS_END

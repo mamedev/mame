@@ -42,10 +42,11 @@ uint32_t tandy200_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-ADDRESS_MAP_START(tandy200_state::tandy200_lcdc)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-ADDRESS_MAP_END
+void tandy200_state::tandy200_lcdc(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x1fff).ram();
+}
 
 MACHINE_CONFIG_START(kc85_state::kc85_video)
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)

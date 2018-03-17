@@ -63,38 +63,40 @@ WRITE8_MEMBER(momoko_state::momoko_bg_read_bank_w)
 
 /****************************************************************************/
 
-ADDRESS_MAP_START(momoko_state::momoko_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd064, 0xd0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd400, 0xd400) AM_READ_PORT("IN0") AM_WRITENOP /* interrupt ack? */
-	AM_RANGE(0xd402, 0xd402) AM_READ_PORT("IN1") AM_WRITE(momoko_flipscreen_w)
-	AM_RANGE(0xd404, 0xd404) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xd406, 0xd406) AM_READ_PORT("DSW0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xd407, 0xd407) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(momoko_fg_scrolly_w)
-	AM_RANGE(0xdc01, 0xdc01) AM_WRITE(momoko_fg_scrollx_w)
-	AM_RANGE(0xdc02, 0xdc02) AM_WRITE(momoko_fg_select_w)
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(momoko_text_scrolly_w)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE(momoko_text_mode_w)
-	AM_RANGE(0xf000, 0xffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xf000, 0xf001) AM_WRITE(momoko_bg_scrolly_w) AM_SHARE("bg_scrolly")
-	AM_RANGE(0xf002, 0xf003) AM_WRITE(momoko_bg_scrollx_w) AM_SHARE("bg_scrollx")
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(momoko_bg_read_bank_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE(momoko_bg_select_w)
-	AM_RANGE(0xf007, 0xf007) AM_WRITE(momoko_bg_priority_w)
-ADDRESS_MAP_END
+void momoko_state::momoko_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xd064, 0xd0ff).ram().share("spriteram");
+	map(0xd400, 0xd400).portr("IN0").nopw(); /* interrupt ack? */
+	map(0xd402, 0xd402).portr("IN1").w(this, FUNC(momoko_state::momoko_flipscreen_w));
+	map(0xd404, 0xd404).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xd406, 0xd406).portr("DSW0").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xd407, 0xd407).portr("DSW1");
+	map(0xd800, 0xdbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xdc00, 0xdc00).w(this, FUNC(momoko_state::momoko_fg_scrolly_w));
+	map(0xdc01, 0xdc01).w(this, FUNC(momoko_state::momoko_fg_scrollx_w));
+	map(0xdc02, 0xdc02).w(this, FUNC(momoko_state::momoko_fg_select_w));
+	map(0xe000, 0xe3ff).ram().share("videoram");
+	map(0xe800, 0xe800).w(this, FUNC(momoko_state::momoko_text_scrolly_w));
+	map(0xe801, 0xe801).w(this, FUNC(momoko_state::momoko_text_mode_w));
+	map(0xf000, 0xffff).bankr("bank1");
+	map(0xf000, 0xf001).w(this, FUNC(momoko_state::momoko_bg_scrolly_w)).share("bg_scrolly");
+	map(0xf002, 0xf003).w(this, FUNC(momoko_state::momoko_bg_scrollx_w)).share("bg_scrollx");
+	map(0xf004, 0xf004).w(this, FUNC(momoko_state::momoko_bg_read_bank_w));
+	map(0xf006, 0xf006).w(this, FUNC(momoko_state::momoko_bg_select_w));
+	map(0xf007, 0xf007).w(this, FUNC(momoko_state::momoko_bg_priority_w));
+}
 
-ADDRESS_MAP_START(momoko_state::momoko_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITENOP /* unknown */
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP /* unknown */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-ADDRESS_MAP_END
+void momoko_state::momoko_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).nopw(); /* unknown */
+	map(0xa000, 0xa001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xb000, 0xb000).nopw(); /* unknown */
+	map(0xc000, 0xc001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 
 /****************************************************************************/

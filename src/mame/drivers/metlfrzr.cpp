@@ -178,39 +178,41 @@ WRITE8_MEMBER(metlfrzr_state::output_w)
 //  popmessage("%02x %02x",m_fg_tilebank,data & 3);
 }
 
-ADDRESS_MAP_START(metlfrzr_state::metlfrzr_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
-	AM_RANGE(0xd200, 0xd3ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect_ext) AM_SHARE("palette_ext")
+void metlfrzr_state::metlfrzr_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram().share("vram");
+	map(0xd000, 0xd1ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
+	map(0xd200, 0xd3ff).ram().w(m_palette, FUNC(palette_device::write_indirect_ext)).share("palette_ext");
 
-	AM_RANGE(0xd400, 0xd47f) AM_DEVREADWRITE("t5182", t5182_device, sharedram_r, sharedram_w)
+	map(0xd400, 0xd47f).rw("t5182", FUNC(t5182_device::sharedram_r), FUNC(t5182_device::sharedram_w));
 
-	AM_RANGE(0xd600, 0xd600) AM_READ_PORT("P1")
-	AM_RANGE(0xd601, 0xd601) AM_READ_PORT("P2")
-	AM_RANGE(0xd602, 0xd602) AM_READ_PORT("START")
-	AM_RANGE(0xd603, 0xd603) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd604, 0xd604) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd600, 0xd61f) AM_WRITEONLY AM_SHARE("vregs")
+	map(0xd600, 0xd600).portr("P1");
+	map(0xd601, 0xd601).portr("P2");
+	map(0xd602, 0xd602).portr("START");
+	map(0xd603, 0xd603).portr("DSW1");
+	map(0xd604, 0xd604).portr("DSW2");
+	map(0xd600, 0xd61f).writeonly().share("vregs");
 
-	AM_RANGE(0xd700, 0xd700) AM_WRITE(output_w)
-	AM_RANGE(0xd710, 0xd710) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
-	AM_RANGE(0xd711, 0xd711) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
+	map(0xd700, 0xd700).w(this, FUNC(metlfrzr_state::output_w));
+	map(0xd710, 0xd710).w("t5182", FUNC(t5182_device::sound_irq_w));
+	map(0xd711, 0xd711).r("t5182", FUNC(t5182_device::sharedram_semaphore_snd_r));
 	// following two do swapped access compared to darkmist
-	AM_RANGE(0xd712, 0xd712) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_release_w)
-	AM_RANGE(0xd713, 0xd713) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
+	map(0xd712, 0xd712).w("t5182", FUNC(t5182_device::sharedram_semaphore_main_release_w));
+	map(0xd713, 0xd713).w("t5182", FUNC(t5182_device::sharedram_semaphore_main_acquire_w));
 
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("wram")
-ADDRESS_MAP_END
+	map(0xd800, 0xdfff).ram();
+	map(0xe000, 0xefff).ram();
+	map(0xf000, 0xffff).ram().share("wram");
+}
 
-ADDRESS_MAP_START(metlfrzr_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("wram") // executes code at 0xf5d5
-ADDRESS_MAP_END
+void metlfrzr_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xf000, 0xffff).ram().share("wram"); // executes code at 0xf5d5
+}
 
 
 static INPUT_PORTS_START( metlfrzr )

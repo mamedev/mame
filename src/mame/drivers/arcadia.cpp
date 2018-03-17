@@ -124,10 +124,11 @@ anything in hardware. No cartridge has been found which uses them.
 #include "softlist.h"
 #include "speaker.h"
 
-ADDRESS_MAP_START(arcadia_state::arcadia_mem)
-	AM_RANGE( 0x0000, 0x0fff) AM_DEVREAD("cartslot", arcadia_cart_slot_device, read_rom)
-	AM_RANGE( 0x1800, 0x1aff) AM_READWRITE(video_r, video_w)
-ADDRESS_MAP_END
+void arcadia_state::arcadia_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).r(m_cart, FUNC(arcadia_cart_slot_device::read_rom));
+	map(0x1800, 0x1aff).rw(this, FUNC(arcadia_state::video_r), FUNC(arcadia_state::video_w));
+}
 
 /* The Emerson Arcadia 2001 controllers have 2 fire buttons on the side,
    but actually they are wired to keypad button #2. The following definitions

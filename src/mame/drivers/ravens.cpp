@@ -206,26 +206,29 @@ MACHINE_RESET_MEMBER( ravens_state, ravens2 )
 }
 
 
-ADDRESS_MAP_START(ravens_state::ravens_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x07ff) AM_ROM
-	AM_RANGE( 0x0800, 0x1fff) AM_RAM
-	AM_RANGE( 0x2000, 0x7FFF) AM_RAM // for quickload, optional
-ADDRESS_MAP_END
+void ravens_state::ravens_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x1fff).ram();
+	map(0x2000, 0x7FFF).ram(); // for quickload, optional
+}
 
-ADDRESS_MAP_START(ravens_state::ravens_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x09, 0x09) AM_WRITE(leds_w) // LED output port
-	AM_RANGE(0x10, 0x15) AM_WRITE(display_w) // 6-led display
-	AM_RANGE(0x17, 0x17) AM_READ(port17_r) // pushbuttons
-ADDRESS_MAP_END
+void ravens_state::ravens_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x09, 0x09).w(this, FUNC(ravens_state::leds_w)); // LED output port
+	map(0x10, 0x15).w(this, FUNC(ravens_state::display_w)); // 6-led display
+	map(0x17, 0x17).r(this, FUNC(ravens_state::port17_r)); // pushbuttons
+}
 
-ADDRESS_MAP_START(ravens_state::ravens2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x07, 0x07) AM_READ(port07_r)
-	AM_RANGE(0x1b, 0x1b) AM_WRITE(port1b_w)
-	AM_RANGE(0x1c, 0x1c) AM_WRITE(port1c_w)
-ADDRESS_MAP_END
+void ravens_state::ravens2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x07, 0x07).r(this, FUNC(ravens_state::port07_r));
+	map(0x1b, 0x1b).w(this, FUNC(ravens_state::port1b_w));
+	map(0x1c, 0x1c).w(this, FUNC(ravens_state::port1c_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ravens )

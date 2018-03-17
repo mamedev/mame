@@ -49,7 +49,7 @@ constexpr u8 FLAG_ZL = 0x02;
 constexpr u8 FLAG_ZH = 0x01;
 
 
-DEFINE_DEVICE_TYPE(HCD62121, hcd62121_cpu_device, "hcd62121_cpu_device", "Hitachi HCD62121")
+DEFINE_DEVICE_TYPE(HCD62121, hcd62121_cpu_device, "hcd62121", "Hitachi HCD62121")
 
 
 hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

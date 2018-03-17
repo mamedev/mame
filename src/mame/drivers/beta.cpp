@@ -104,11 +104,12 @@ private:
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(beta_state::beta_mem)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_new_device, ram_map)
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_new_device, io_map)
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x7800) AM_ROM
-ADDRESS_MAP_END
+void beta_state::beta_mem(address_map &map)
+{
+	map(0x0000, 0x007f).mirror(0x7f00).m(M6532_TAG, FUNC(mos6532_new_device::ram_map));
+	map(0x0080, 0x00ff).mirror(0x7f00).m(M6532_TAG, FUNC(mos6532_new_device::io_map));
+	map(0x8000, 0x87ff).mirror(0x7800).rom();
+}
 
 /* Input Ports */
 

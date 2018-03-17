@@ -472,9 +472,9 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 		case 0x00:      /* LSHIFT Rx BY <data8>*/
 		{
 			if(shift < 0) {
-				REG(rn) = (shift > -32 ) ? (REG(rx) >> -shift) : 0;
+				REG(rn) = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
 			} else {
-				REG(rn) = (shift < 32) ? (REG(rx) << shift) : 0;
+				REG(rn) = (shift < 32) ? ((uint32_t)REG(rx) << shift) : 0;
 				if (shift > 0)
 				{
 					m_core->astat |= SV;
@@ -524,14 +524,15 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 		{
 			uint32_t r = 0;
 			if(shift < 0) {
-				r = (shift > -32 ) ? (REG(rx) >> -shift) : 0;
+				r = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
 			} else {
-				r = (shift < 32) ? (REG(rx) << shift) : 0;
+				r = (shift < 32) ? ((uint32_t)REG(rx) << shift) : 0;
 				if (shift > 0)
 				{
 					m_core->astat |= SV;
 				}
 			}
+
 			SET_FLAG_SZ(r);
 
 			REG(rn) = REG(rn) | r;
@@ -887,11 +888,11 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 						int shift = REG(ry);
 						if(shift < 0)
 						{
-							REG(rn) = (shift > -32 ) ? (REG(rx) >> -shift) : 0;
+							REG(rn) = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
 						}
 						else
 						{
-							REG(rn) = (shift < 32) ? (REG(rx) << shift) : 0;
+							REG(rn) = (shift < 32) ? ((uint32_t)REG(rx) << shift) : 0;
 							if (shift > 0)
 							{
 								m_core->astat |= SV;

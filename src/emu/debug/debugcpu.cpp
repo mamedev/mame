@@ -59,8 +59,6 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	, m_last_periodic_update_time(0)
 	, m_comments_loaded(false)
 {
-	screen_device *first_screen = m_machine.first_screen();
-
 	m_tempvar = make_unique_clear<u64[]>(NUM_TEMP_VARIABLES);
 
 	/* create a global symbol table */
@@ -75,9 +73,28 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 
 	using namespace std::placeholders;
 	m_symtable->add("cpunum", std::bind(&debugger_cpu::get_cpunum, this, _1));
-	m_symtable->add("beamx", std::bind(&debugger_cpu::get_beamx, this, _1, first_screen));
-	m_symtable->add("beamy", std::bind(&debugger_cpu::get_beamy, this, _1, first_screen));
-	m_symtable->add("frame", std::bind(&debugger_cpu::get_frame, this, _1, first_screen));
+
+	screen_device_iterator screen_iterator = screen_device_iterator(m_machine.root_device());
+	screen_device_iterator::auto_iterator iter = screen_iterator.begin();
+	const uint32_t count = (uint32_t)screen_iterator.count();
+
+	if (count == 1)
+	{
+		m_symtable->add("beamx", std::bind(&debugger_cpu::get_beamx, this, _1, iter.current()));
+		m_symtable->add("beamy", std::bind(&debugger_cpu::get_beamy, this, _1, iter.current()));
+		m_symtable->add("frame", std::bind(&debugger_cpu::get_frame, this, _1, iter.current()));
+		iter.current()->register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
+	}
+	else if (count > 1)
+	{
+		for (uint32_t i = 0; i < count; i++, iter++)
+		{
+			m_symtable->add(string_format("beamx%d", i).c_str(), std::bind(&debugger_cpu::get_beamx, this, _1, iter.current()));
+			m_symtable->add(string_format("beamy%d", i).c_str(), std::bind(&debugger_cpu::get_beamy, this, _1, iter.current()));
+			m_symtable->add(string_format("frame%d", i).c_str(), std::bind(&debugger_cpu::get_frame, this, _1, iter.current()));
+			iter.current()->register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
+		}
+	}
 
 	/* add the temporary variables to the global symbol table */
 	for (int regnum = 0; regnum < NUM_TEMP_VARIABLES; regnum++)
@@ -97,10 +114,6 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 			break;
 		}
 	}
-
-	/* add callback for breaking on VBLANK */
-	if (m_machine.first_screen() != nullptr)
-		m_machine.first_screen()->register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
 }
 
 void debugger_cpu::configure_memory(symbol_table &table)

@@ -340,52 +340,55 @@ READ8_MEMBER(lethal_state::gunsaux_r)
 	return res;
 }
 
-ADDRESS_MAP_START(lethal_state::le_main)
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x2000, 0x3fff) AM_RAM             // work RAM
-	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("bank4000", address_map_bank_device, amap8)
-	AM_RANGE(0x4000, 0x43ff) AM_UNMAP // first 0x400 bytes of palette RAM are inaccessible
-	AM_RANGE(0x4000, 0x403f) AM_DEVWRITE("k056832", k056832_device, write)
-	AM_RANGE(0x4040, 0x404f) AM_DEVWRITE("k056832", k056832_device, b_w)
-	AM_RANGE(0x4080, 0x4080) AM_READNOP     // watchdog
-	AM_RANGE(0x4090, 0x4090) AM_READWRITE(sound_irq_r, sound_irq_w)
-	AM_RANGE(0x40a0, 0x40a0) AM_READNOP
-	AM_RANGE(0x40c4, 0x40c4) AM_WRITE(control2_w)
-	AM_RANGE(0x40c8, 0x40d0) AM_WRITE(lethalen_palette_control) // PCU1-PCU3 on the schematics
-	AM_RANGE(0x40d4, 0x40d7) AM_READ(guns_r)
-	AM_RANGE(0x40d8, 0x40d8) AM_READ_PORT("DSW")
-	AM_RANGE(0x40d9, 0x40d9) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x40db, 0x40db) AM_READ(gunsaux_r)     // top X bit of guns
-	AM_RANGE(0x40dc, 0x40dc) AM_WRITE(le_bankswitch_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x38000)
-ADDRESS_MAP_END
+void lethal_state::le_main(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr("bank1");
+	map(0x2000, 0x3fff).ram();             // work RAM
+	map(0x4000, 0x7fff).m(m_bank4000, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0x43ff).unmaprw(); // first 0x400 bytes of palette RAM are inaccessible
+	map(0x4000, 0x403f).w(m_k056832, FUNC(k056832_device::write));
+	map(0x4040, 0x404f).w(m_k056832, FUNC(k056832_device::b_w));
+	map(0x4080, 0x4080).nopr();     // watchdog
+	map(0x4090, 0x4090).rw(this, FUNC(lethal_state::sound_irq_r), FUNC(lethal_state::sound_irq_w));
+	map(0x40a0, 0x40a0).nopr();
+	map(0x40c4, 0x40c4).w(this, FUNC(lethal_state::control2_w));
+	map(0x40c8, 0x40d0).w(this, FUNC(lethal_state::lethalen_palette_control)); // PCU1-PCU3 on the schematics
+	map(0x40d4, 0x40d7).r(this, FUNC(lethal_state::guns_r));
+	map(0x40d8, 0x40d8).portr("DSW");
+	map(0x40d9, 0x40d9).portr("INPUTS");
+	map(0x40db, 0x40db).r(this, FUNC(lethal_state::gunsaux_r));     // top X bit of guns
+	map(0x40dc, 0x40dc).w(this, FUNC(lethal_state::le_bankswitch_w));
+	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
+}
 
-ADDRESS_MAP_START(lethal_state::bank4000_map)
+void lethal_state::bank4000_map(address_map &map)
+{
 	// VRD = 0 or 1, CBNK = 0
-	AM_RANGE(0x0840, 0x084f) AM_MIRROR(0x8000) AM_DEVREADWRITE("k053244", k05324x_device, k053244_r, k053244_w)
-	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x8000) AM_DEVREADWRITE("k054000", k054000_device, read, write)
-	AM_RANGE(0x08c0, 0x08cf) AM_DEVICE("k054321", k054321_device, main_map)
-	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0x8000) AM_DEVREADWRITE("k053244", k05324x_device, k053245_r, k053245_w)
+	map(0x0840, 0x084f).mirror(0x8000).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
+	map(0x0880, 0x089f).mirror(0x8000).rw("k054000", FUNC(k054000_device::read), FUNC(k054000_device::write));
+	map(0x08c0, 0x08cf).m(m_k054321, FUNC(k054321_device::main_map));
+	map(0x1000, 0x17ff).mirror(0x8000).rw(m_k053244, FUNC(k05324x_device::k053245_r), FUNC(k05324x_device::k053245_w));
 
 	// VRD = 0, CBNK = 0
-	AM_RANGE(0x2000, 0x27ff) AM_DEVREADWRITE("k056832", k056832_device, ram_code_lo_r, ram_code_lo_w)
-	AM_RANGE(0x2800, 0x2fff) AM_DEVREADWRITE("k056832", k056832_device, ram_code_hi_r, ram_code_hi_w)
-	AM_RANGE(0x3000, 0x37ff) AM_DEVREADWRITE("k056832", k056832_device, ram_attr_lo_r, ram_attr_lo_w)
-	AM_RANGE(0x3800, 0x3fff) AM_DEVREADWRITE("k056832", k056832_device, ram_attr_hi_r, ram_attr_hi_w)
+	map(0x2000, 0x27ff).rw(m_k056832, FUNC(k056832_device::ram_code_lo_r), FUNC(k056832_device::ram_code_lo_w));
+	map(0x2800, 0x2fff).rw(m_k056832, FUNC(k056832_device::ram_code_hi_r), FUNC(k056832_device::ram_code_hi_w));
+	map(0x3000, 0x37ff).rw(m_k056832, FUNC(k056832_device::ram_attr_lo_r), FUNC(k056832_device::ram_attr_lo_w));
+	map(0x3800, 0x3fff).rw(m_k056832, FUNC(k056832_device::ram_attr_hi_r), FUNC(k056832_device::ram_attr_hi_w));
 
 	// VRD = 1, CBNK = 0 or 1
-	AM_RANGE(0xa000, 0xbfff) AM_MIRROR(0x4000) AM_UNMAP // AM_DEVREAD("k056832", k056832_device, rom_byte_r)
+	map(0xa000, 0xbfff).mirror(0x4000).unmaprw(); // AM_DEVREAD("k056832", k056832_device, rom_byte_r)
 
 	// CBNK = 1; partially overlaid when VRD = 1
-	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+	map(0x4000, 0x7fff).mirror(0x8000).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(lethal_state::le_sound)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
-	AM_RANGE(0xfc00, 0xfc03) AM_DEVICE("k054321", k054321_device, sound_map)
-ADDRESS_MAP_END
+void lethal_state::le_sound(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xfa2f).rw("k054539", FUNC(k054539_device::read), FUNC(k054539_device::write));
+	map(0xfc00, 0xfc03).m(m_k054321, FUNC(k054321_device::sound_map));
+}
 
 static INPUT_PORTS_START( lethalen )
 	PORT_START("INPUTS")

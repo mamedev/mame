@@ -159,22 +159,24 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-ADDRESS_MAP_START(ksm_state::ksm_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x0000, 0x0fff) AM_ROM
-	AM_RANGE (0x2000, 0x20ff) AM_RAM AM_MIRROR(0x0700)
-	AM_RANGE (0xc000, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void ksm_state::ksm_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x20ff).ram().mirror(0x0700);
+	map(0xc000, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(ksm_state::ksm_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x5e, 0x5f) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE (0x6e, 0x6e) AM_DEVREADWRITE("i8251kbd", i8251_device, data_r, data_w)
-	AM_RANGE (0x6f, 0x6f) AM_DEVREADWRITE("i8251kbd", i8251_device, status_r, control_w)
-	AM_RANGE (0x76, 0x76) AM_DEVREADWRITE("i8251line", i8251_device, data_r, data_w)
-	AM_RANGE (0x77, 0x77) AM_DEVREADWRITE("i8251line", i8251_device, status_r, control_w)
-	AM_RANGE (0x78, 0x7b) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-ADDRESS_MAP_END
+void ksm_state::ksm_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x5e, 0x5f).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x6e, 0x6e).rw(m_i8251kbd, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x6f, 0x6f).rw(m_i8251kbd, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x76, 0x76).rw(m_i8251line, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x77, 0x77).rw(m_i8251line, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x78, 0x7b).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ksm )

@@ -273,21 +273,22 @@ READ16_MEMBER(mcr68_state::trisport_port_1_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(mcr68_state::mcr68_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x071000, 0x071fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x090000, 0x09007f) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x0a0000, 0x0a000f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0xff00)
-	AM_RANGE(0x0b0000, 0x0bffff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x0d0000, 0x0dffff) AM_READ_PORT("IN0")
-	AM_RANGE(0x0e0000, 0x0effff) AM_READ_PORT("IN1")
-	AM_RANGE(0x0f0000, 0x0fffff) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+void mcr68_state::mcr68_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x1fffff);
+	map(0x000000, 0x03ffff).rom();
+	map(0x060000, 0x063fff).ram();
+	map(0x070000, 0x070fff).ram().w(this, FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
+	map(0x071000, 0x071fff).ram();
+	map(0x080000, 0x080fff).ram().share("spriteram");
+	map(0x090000, 0x09007f).w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x0a0000, 0x0a000f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0xff00);
+	map(0x0b0000, 0x0bffff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x0d0000, 0x0dffff).portr("IN0");
+	map(0x0e0000, 0x0effff).portr("IN1");
+	map(0x0f0000, 0x0fffff).portr("DSW");
+}
 
 
 
@@ -297,22 +298,23 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(mcr68_state::pigskin_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_READ(pigskin_port_1_r)
-	AM_RANGE(0x0a0000, 0x0affff) AM_READ(pigskin_port_2_r)
-	AM_RANGE(0x0c0000, 0x0c007f) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x0e0000, 0x0effff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x120000, 0x120001) AM_READWRITE(pigskin_protection_r, pigskin_protection_w)
-	AM_RANGE(0x140000, 0x143fff) AM_RAM
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0xff00)
-	AM_RANGE(0x1a0000, 0x1affff) AM_WRITE(archrivl_control_w)
-	AM_RANGE(0x1e0000, 0x1effff) AM_READ_PORT("IN0")
-ADDRESS_MAP_END
+void mcr68_state::pigskin_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x1fffff);
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x08ffff).r(this, FUNC(mcr68_state::pigskin_port_1_r));
+	map(0x0a0000, 0x0affff).r(this, FUNC(mcr68_state::pigskin_port_2_r));
+	map(0x0c0000, 0x0c007f).w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x0e0000, 0x0effff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x100000, 0x100fff).ram().w(this, FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
+	map(0x120000, 0x120001).rw(this, FUNC(mcr68_state::pigskin_protection_r), FUNC(mcr68_state::pigskin_protection_w));
+	map(0x140000, 0x143fff).ram();
+	map(0x160000, 0x1607ff).ram().share("spriteram");
+	map(0x180000, 0x18000f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0xff00);
+	map(0x1a0000, 0x1affff).w(this, FUNC(mcr68_state::archrivl_control_w));
+	map(0x1e0000, 0x1effff).portr("IN0");
+}
 
 
 
@@ -322,21 +324,22 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(mcr68_state::trisport_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_READ(trisport_port_1_r)
-	AM_RANGE(0x0a0000, 0x0affff) AM_READ_PORT("DSW")
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x120000, 0x12007f) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0xff00)
-	AM_RANGE(0x1a0000, 0x1affff) AM_WRITE(archrivl_control_w)
-	AM_RANGE(0x1c0000, 0x1cffff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x1e0000, 0x1effff) AM_READ_PORT("IN0")
-ADDRESS_MAP_END
+void mcr68_state::trisport_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x1fffff);
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x08ffff).r(this, FUNC(mcr68_state::trisport_port_1_r));
+	map(0x0a0000, 0x0affff).portr("DSW");
+	map(0x100000, 0x103fff).ram().share("nvram");
+	map(0x120000, 0x12007f).w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x140000, 0x1407ff).ram().share("spriteram");
+	map(0x160000, 0x160fff).ram().w(this, FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
+	map(0x180000, 0x18000f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0xff00);
+	map(0x1a0000, 0x1affff).w(this, FUNC(mcr68_state::archrivl_control_w));
+	map(0x1c0000, 0x1cffff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x1e0000, 0x1effff).portr("IN0");
+}
 
 
 

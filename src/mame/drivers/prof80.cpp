@@ -271,28 +271,31 @@ WRITE8_MEMBER( prof80_state::unio_ctrl_w )
 //  ADDRESS_MAP( prof80_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(prof80_state::prof80_mem)
-	AM_RANGE(0x0000, 0xffff) AM_DEVICE(MMU_TAG, prof80_mmu_device, z80_program_map)
-ADDRESS_MAP_END
+void prof80_state::prof80_mem(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_mmu, FUNC(prof80_mmu_device::z80_program_map));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( prof80_mmu )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(prof80_state::prof80_mmu)
-	AM_RANGE(0x40000, 0x5ffff) AM_RAM
-	AM_RANGE(0xc0000, 0xdffff) AM_RAM
-	AM_RANGE(0xf0000, 0xf1fff) AM_MIRROR(0xe000) AM_ROM AM_REGION(Z80_TAG, 0)
-ADDRESS_MAP_END
+void prof80_state::prof80_mmu(address_map &map)
+{
+	map(0x40000, 0x5ffff).ram();
+	map(0xc0000, 0xdffff).ram();
+	map(0xf0000, 0xf1fff).mirror(0xe000).rom().region(Z80_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( prof80_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(prof80_state::prof80_io)
-	AM_RANGE(0x00, 0xd7) AM_MIRROR(0xff00) AM_DEVREADWRITE(ECBBUS_TAG, ecbbus_device, io_r, io_w)
+void prof80_state::prof80_io(address_map &map)
+{
+	map(0x00, 0xd7).mirror(0xff00).rw(m_ecb, FUNC(ecbbus_device::io_r), FUNC(ecbbus_device::io_w));
 //  AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80STI_TAG, z80sti_device, read, write)
 //  AM_RANGE(0x94, 0x95) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(UNIO_Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
 //  AM_RANGE(0x96, 0x97) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(UNIO_Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
@@ -301,12 +304,12 @@ ADDRESS_MAP_START(prof80_state::prof80_io)
 //  AM_RANGE(0x9d, 0x9d) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_device, write)
 //  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_READ(gripc_r)
 //  AM_RANGE(0xc1, 0xc1) AM_MIRROR(0xff00) AM_READWRITE(gripd_r, gripd_w)
-	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_WRITE(flr_w)
-	AM_RANGE(0xda, 0xda) AM_MIRROR(0xff00) AM_READ(status_r)
-	AM_RANGE(0xdb, 0xdb) AM_MIRROR(0xff00) AM_READ(status2_r)
-	AM_RANGE(0xdc, 0xdd) AM_MIRROR(0xff00) AM_DEVICE(UPD765_TAG, upd765a_device, map)
-	AM_RANGE(0xde, 0xde) AM_MIRROR(0x0001) AM_SELECT(0xff00) AM_DEVWRITE(MMU_TAG, prof80_mmu_device, par_w)
-ADDRESS_MAP_END
+	map(0xd8, 0xd8).mirror(0xff00).w(this, FUNC(prof80_state::flr_w));
+	map(0xda, 0xda).mirror(0xff00).r(this, FUNC(prof80_state::status_r));
+	map(0xdb, 0xdb).mirror(0xff00).r(this, FUNC(prof80_state::status2_r));
+	map(0xdc, 0xdd).mirror(0xff00).m(m_fdc, FUNC(upd765a_device::map));
+	map(0xde, 0xde).mirror(0x0001).select(0xff00).w(m_mmu, FUNC(prof80_mmu_device::par_w));
+}
 
 
 

@@ -753,27 +753,28 @@ WRITE8_MEMBER(atarisy2_state::coincount_w)
  *************************************/
 
 /* full memory map derived from schematics */
-ADDRESS_MAP_START(atarisy2_state::main_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x11ff) AM_MIRROR(0x0200) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x1400, 0x1403) AM_MIRROR(0x007c) AM_READWRITE(adc_r, bankselect_w)
-	AM_RANGE(0x1480, 0x1487) AM_MIRROR(0x0078) AM_WRITE(adc_strobe_w)
-	AM_RANGE(0x1580, 0x1581) AM_MIRROR(0x001e) AM_WRITE(int0_ack_w)
-	AM_RANGE(0x15a0, 0x15a1) AM_MIRROR(0x001e) AM_WRITE(int1_ack_w)
-	AM_RANGE(0x15c0, 0x15c1) AM_MIRROR(0x001e) AM_WRITE(scanline_int_ack_w)
-	AM_RANGE(0x15e0, 0x15e1) AM_MIRROR(0x001e) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0x1600, 0x1601) AM_MIRROR(0x007e) AM_WRITE(int_enable_w)
-	AM_RANGE(0x1680, 0x1681) AM_MIRROR(0x007e) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
-	AM_RANGE(0x1700, 0x1701) AM_MIRROR(0x007e) AM_WRITE(xscroll_w) AM_SHARE("xscroll")
-	AM_RANGE(0x1780, 0x1781) AM_MIRROR(0x007e) AM_WRITE(yscroll_w) AM_SHARE("yscroll")
-	AM_RANGE(0x1800, 0x1801) AM_MIRROR(0x03fe) AM_READ(switch_r) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x1c00, 0x1c01) AM_MIRROR(0x03fe) AM_READ(sound_r)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(videoram_r, videoram_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("rombank1")
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank2")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_RANGE(0x8000, 0x81ff) AM_READWRITE(slapstic_r, slapstic_w) AM_SHARE("slapstic_base")
-ADDRESS_MAP_END
+void atarisy2_state::main_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x11ff).mirror(0x0200).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x1400, 0x1403).mirror(0x007c).rw(this, FUNC(atarisy2_state::adc_r), FUNC(atarisy2_state::bankselect_w));
+	map(0x1480, 0x1487).mirror(0x0078).w(this, FUNC(atarisy2_state::adc_strobe_w));
+	map(0x1580, 0x1581).mirror(0x001e).w(this, FUNC(atarisy2_state::int0_ack_w));
+	map(0x15a0, 0x15a1).mirror(0x001e).w(this, FUNC(atarisy2_state::int1_ack_w));
+	map(0x15c0, 0x15c1).mirror(0x001e).w(this, FUNC(atarisy2_state::scanline_int_ack_w));
+	map(0x15e0, 0x15e1).mirror(0x001e).w(this, FUNC(atarisy2_state::video_int_ack_w));
+	map(0x1600, 0x1601).mirror(0x007e).w(this, FUNC(atarisy2_state::int_enable_w));
+	map(0x1680, 0x1680).mirror(0x007e).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w));
+	map(0x1700, 0x1701).mirror(0x007e).w(this, FUNC(atarisy2_state::xscroll_w)).share("xscroll");
+	map(0x1780, 0x1781).mirror(0x007e).w(this, FUNC(atarisy2_state::yscroll_w)).share("yscroll");
+	map(0x1800, 0x1801).mirror(0x03fe).r(this, FUNC(atarisy2_state::switch_r)).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x1c00, 0x1c01).mirror(0x03fe).r(this, FUNC(atarisy2_state::sound_r));
+	map(0x2000, 0x3fff).rw(this, FUNC(atarisy2_state::videoram_r), FUNC(atarisy2_state::videoram_w));
+	map(0x4000, 0x5fff).bankr("rombank1");
+	map(0x6000, 0x7fff).bankr("rombank2");
+	map(0x8000, 0xffff).rom();
+	map(0x8000, 0x81ff).rw(this, FUNC(atarisy2_state::slapstic_r), FUNC(atarisy2_state::slapstic_w)).share("slapstic_base");
+}
 
 
 
@@ -784,25 +785,26 @@ ADDRESS_MAP_END
  *************************************/
 
 /* full memory map derived from schematics */
-ADDRESS_MAP_START(atarisy2_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0x2000) AM_DEVREADWRITE("eeprom", eeprom_parallel_28xx_device, read, write)
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x2780) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
-	AM_RANGE(0x1810, 0x1813) AM_MIRROR(0x278c) AM_READ(leta_r)
-	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x2780) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
-	AM_RANGE(0x1840, 0x1840) AM_MIRROR(0x278f) AM_READ(switch_6502_r)
-	AM_RANGE(0x1850, 0x1851) AM_MIRROR(0x278e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x1860, 0x1860) AM_MIRROR(0x278f) AM_READ(sound_6502_r)
-	AM_RANGE(0x1870, 0x1870) AM_MIRROR(0x2781) AM_WRITE(tms5220_w)
-	AM_RANGE(0x1872, 0x1873) AM_MIRROR(0x2780) AM_WRITE(tms5220_strobe_w)
-	AM_RANGE(0x1874, 0x1874) AM_MIRROR(0x2781) AM_WRITE(sound_6502_w)
-	AM_RANGE(0x1876, 0x1876) AM_MIRROR(0x2781) AM_WRITE(coincount_w)
-	AM_RANGE(0x1878, 0x1878) AM_MIRROR(0x2781) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_irq_ack_w)
-	AM_RANGE(0x187a, 0x187a) AM_MIRROR(0x2781) AM_WRITE(mixer_w)
-	AM_RANGE(0x187c, 0x187c) AM_MIRROR(0x2781) AM_WRITE(switch_6502_w)
-	AM_RANGE(0x187e, 0x187e) AM_MIRROR(0x2781) AM_WRITE(sound_reset_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void atarisy2_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).mirror(0x2000).ram();
+	map(0x1000, 0x17ff).mirror(0x2000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
+	map(0x1800, 0x180f).mirror(0x2780).rw(m_pokey1, FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x1810, 0x1813).mirror(0x278c).r(this, FUNC(atarisy2_state::leta_r));
+	map(0x1830, 0x183f).mirror(0x2780).rw(m_pokey2, FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x1840, 0x1840).mirror(0x278f).r(this, FUNC(atarisy2_state::switch_6502_r));
+	map(0x1850, 0x1851).mirror(0x278e).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x1860, 0x1860).mirror(0x278f).r(this, FUNC(atarisy2_state::sound_6502_r));
+	map(0x1870, 0x1870).mirror(0x2781).w(this, FUNC(atarisy2_state::tms5220_w));
+	map(0x1872, 0x1873).mirror(0x2780).w(this, FUNC(atarisy2_state::tms5220_strobe_w));
+	map(0x1874, 0x1874).mirror(0x2781).w(this, FUNC(atarisy2_state::sound_6502_w));
+	map(0x1876, 0x1876).mirror(0x2781).w(this, FUNC(atarisy2_state::coincount_w));
+	map(0x1878, 0x1878).mirror(0x2781).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_irq_ack_w));
+	map(0x187a, 0x187a).mirror(0x2781).w(this, FUNC(atarisy2_state::mixer_w));
+	map(0x187c, 0x187c).mirror(0x2781).w(this, FUNC(atarisy2_state::switch_6502_w));
+	map(0x187e, 0x187e).mirror(0x2781).w(this, FUNC(atarisy2_state::sound_reset_w));
+	map(0x4000, 0xffff).rom();
+}
 
 
 

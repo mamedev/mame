@@ -92,13 +92,14 @@ uint32_t multi16_state::screen_update_multi16(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-ADDRESS_MAP_START(multi16_state::multi16_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0x7ffff) AM_RAM
-	AM_RANGE(0xd8000,0xdffff) AM_RAM AM_SHARE("p_vram")
-	AM_RANGE(0xe0000,0xeffff) AM_RAM
-	AM_RANGE(0xf0000,0xf3fff) AM_MIRROR(0xc000) AM_ROM AM_REGION("ipl", 0)
-ADDRESS_MAP_END
+void multi16_state::multi16_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x7ffff).ram();
+	map(0xd8000, 0xdffff).ram().share("p_vram");
+	map(0xe0000, 0xeffff).ram();
+	map(0xf0000, 0xf3fff).mirror(0xc000).rom().region("ipl", 0);
+}
 
 WRITE8_MEMBER( multi16_state::multi16_6845_address_w )
 {
@@ -112,12 +113,13 @@ WRITE8_MEMBER( multi16_state::multi16_6845_data_w )
 	m_crtc->register_w(space, offset, data);
 }
 
-ADDRESS_MAP_START(multi16_state::multi16_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff) // i8259
-	AM_RANGE(0x40, 0x41) AM_WRITE8(multi16_6845_address_w, 0x00ff)
-	AM_RANGE(0x40, 0x41) AM_WRITE8(multi16_6845_data_w, 0xff00)
-ADDRESS_MAP_END
+void multi16_state::multi16_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x02, 0x03).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)); // i8259
+	map(0x40, 0x40).w(this, FUNC(multi16_state::multi16_6845_address_w));
+	map(0x41, 0x41).w(this, FUNC(multi16_state::multi16_6845_data_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( multi16 )

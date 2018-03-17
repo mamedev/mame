@@ -235,27 +235,28 @@ WRITE_LINE_MEMBER(trackfld_state::irq_mask_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(trackfld_state::main_map)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)       /* AFE */
-	AM_RANGE(0x1080, 0x1087) AM_MIRROR(0x0078) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)  /* 32 */
-	AM_RANGE(0x1200, 0x1200) AM_MIRROR(0x007f) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1280, 0x1280) AM_MIRROR(0x007c) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1281, 0x1281) AM_MIRROR(0x007c) AM_READ_PORT("IN0")
-	AM_RANGE(0x1282, 0x1282) AM_MIRROR(0x007c) AM_READ_PORT("IN1")
-	AM_RANGE(0x1283, 0x1283) AM_MIRROR(0x007c) AM_READ_PORT("DSW1")
+void trackfld_state::main_map(address_map &map)
+{
+	map(0x1000, 0x1000).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));       /* AFE */
+	map(0x1080, 0x1087).mirror(0x0078).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x1100, 0x1100).mirror(0x007f).w("soundlatch", FUNC(generic_latch_8_device::write));  /* 32 */
+	map(0x1200, 0x1200).mirror(0x007f).portr("DSW2");
+	map(0x1280, 0x1280).mirror(0x007c).portr("SYSTEM");
+	map(0x1281, 0x1281).mirror(0x007c).portr("IN0");
+	map(0x1282, 0x1282).mirror(0x007c).portr("IN1");
+	map(0x1283, 0x1283).mirror(0x007c).portr("DSW1");
 	/* not used according to schems: AM_RANGE(0x1300, 0x1300) AM_MIRROR(0x007f) AM_READ_PORT("DSW3") */
-	AM_RANGE(0x1800, 0x183f) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x1840, 0x185f) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0x1860, 0x1bff) AM_RAM
-	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_SHARE("scroll2")
-	AM_RANGE(0x1c60, 0x1fff) AM_RAM
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x6000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x1800, 0x183f).ram().share("spriteram2");
+	map(0x1840, 0x185f).ram().share("scroll");
+	map(0x1860, 0x1bff).ram();
+	map(0x1c00, 0x1c3f).ram().share("spriteram");
+	map(0x1c40, 0x1c5f).ram().share("scroll2");
+	map(0x1c60, 0x1fff).ram();
+	map(0x2800, 0x2fff).ram().share("nvram");
+	map(0x3000, 0x37ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share("videoram");
+	map(0x3800, 0x3fff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share("colorram");
+	map(0x6000, 0xffff).rom();
+}
 
 WRITE_LINE_MEMBER(trackfld_state::nmi_mask_w)
 {
@@ -280,111 +281,116 @@ WRITE8_MEMBER(trackfld_state::trackfld_VLM5030_control_w)
 }
 
 
-ADDRESS_MAP_START(trackfld_state::yieartf_map)
-	AM_RANGE(0x0000, 0x0000) AM_READ(trackfld_speech_r) AM_WRITE(konami_SN76496_latch_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(konami_SN76496_w)
-	AM_RANGE(0x0002, 0x0002) AM_WRITE(trackfld_VLM5030_control_w)
-	AM_RANGE(0x0003, 0x0003) AM_DEVWRITE("vlm", vlm5030_device, data_w)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)       /* AFE */
-	AM_RANGE(0x1080, 0x1087) AM_MIRROR(0x0078) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+void trackfld_state::yieartf_map(address_map &map)
+{
+	map(0x0000, 0x0000).r(this, FUNC(trackfld_state::trackfld_speech_r)).w(this, FUNC(trackfld_state::konami_SN76496_latch_w));
+	map(0x0001, 0x0001).w(this, FUNC(trackfld_state::konami_SN76496_w));
+	map(0x0002, 0x0002).w(this, FUNC(trackfld_state::trackfld_VLM5030_control_w));
+	map(0x0003, 0x0003).w(m_vlm, FUNC(vlm5030_device::data_w));
+	map(0x1000, 0x1000).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));       /* AFE */
+	map(0x1080, 0x1087).mirror(0x0078).w("mainlatch", FUNC(ls259_device::write_d0));
 //  AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)     /* 32 */
-	AM_RANGE(0x1200, 0x1200) AM_MIRROR(0x007f) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1280, 0x1280) AM_MIRROR(0x007c) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1281, 0x1281) AM_MIRROR(0x007c) AM_READ_PORT("IN0")
-	AM_RANGE(0x1282, 0x1282) AM_MIRROR(0x007c) AM_READ_PORT("IN1")
-	AM_RANGE(0x1283, 0x1283) AM_MIRROR(0x007c) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1300, 0x1300) AM_MIRROR(0x007f) AM_READ_PORT("DSW3")
-	AM_RANGE(0x1800, 0x183f) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x1840, 0x185f) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0x1860, 0x1bff) AM_RAM
-	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_SHARE("scroll2")
-	AM_RANGE(0x1c60, 0x1fff) AM_RAM
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x6000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x1200, 0x1200).mirror(0x007f).portr("DSW2");
+	map(0x1280, 0x1280).mirror(0x007c).portr("SYSTEM");
+	map(0x1281, 0x1281).mirror(0x007c).portr("IN0");
+	map(0x1282, 0x1282).mirror(0x007c).portr("IN1");
+	map(0x1283, 0x1283).mirror(0x007c).portr("DSW1");
+	map(0x1300, 0x1300).mirror(0x007f).portr("DSW3");
+	map(0x1800, 0x183f).ram().share("spriteram2");
+	map(0x1840, 0x185f).ram().share("scroll");
+	map(0x1860, 0x1bff).ram();
+	map(0x1c00, 0x1c3f).ram().share("spriteram");
+	map(0x1c40, 0x1c5f).ram().share("scroll2");
+	map(0x1c60, 0x1fff).ram();
+	map(0x2800, 0x2fff).ram().share("nvram");
+	map(0x3000, 0x37ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share("videoram");
+	map(0x3800, 0x3fff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share("colorram");
+	map(0x6000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(trackfld_state::reaktor_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+void trackfld_state::reaktor_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 	/* all usual addresses +0x8000 */
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x9080, 0x9087) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x9100, 0x9100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9280, 0x9280) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x9281, 0x9281) AM_READ_PORT("IN0")
-	AM_RANGE(0x9282, 0x9282) AM_READ_PORT("IN1")
-	AM_RANGE(0x9283, 0x9283) AM_READ_PORT("DSW1")
-	AM_RANGE(0x9800, 0x983f) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0x9860, 0x9bff) AM_RAM
-	AM_RANGE(0x9c00, 0x9c3f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9c40, 0x9c5f) AM_RAM AM_SHARE("scroll2")
-	AM_RANGE(0x9c60, 0x9fff) AM_RAM
-	AM_RANGE(0xa800, 0xabff) AM_RAM
-	AM_RANGE(0xac00, 0xafff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(trackfld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(trackfld_colorram_w) AM_SHARE("colorram")
-ADDRESS_MAP_END
+	map(0x9000, 0x9000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x9080, 0x9087).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x9100, 0x9100).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x9200, 0x9200).portr("DSW2");
+	map(0x9280, 0x9280).portr("SYSTEM");
+	map(0x9281, 0x9281).portr("IN0");
+	map(0x9282, 0x9282).portr("IN1");
+	map(0x9283, 0x9283).portr("DSW1");
+	map(0x9800, 0x983f).ram().share("spriteram2");
+	map(0x9840, 0x985f).ram().share("scroll");
+	map(0x9860, 0x9bff).ram();
+	map(0x9c00, 0x9c3f).ram().share("spriteram");
+	map(0x9c40, 0x9c5f).ram().share("scroll2");
+	map(0x9c60, 0x9fff).ram();
+	map(0xa800, 0xabff).ram();
+	map(0xac00, 0xafff).ram().share("nvram");
+	map(0xb000, 0xb7ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share("videoram");
+	map(0xb800, 0xbfff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share("colorram");
+}
 
 /* Reaktor reads / writes some I/O ports, no idea what they're connected to, if anything */
-ADDRESS_MAP_START(trackfld_state::reaktor_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP
-	AM_RANGE(0x01, 0x01) AM_NOP
-	AM_RANGE(0x02, 0x02) AM_WRITENOP
-	AM_RANGE(0x03, 0x03) AM_WRITENOP
-ADDRESS_MAP_END
+void trackfld_state::reaktor_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopw();
+	map(0x01, 0x01).noprw();
+	map(0x02, 0x02).nopw();
+	map(0x03, 0x03).nopw();
+}
 
-ADDRESS_MAP_START(trackfld_state::mastkin_map)
-	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x10b0, 0x10b7) AM_READNOP AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x1100, 0x1100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1280, 0x1280) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1281, 0x1281) AM_READ_PORT("IN0")
+void trackfld_state::mastkin_map(address_map &map)
+{
+	map(0x1000, 0x1000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x10b0, 0x10b7).nopr().w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x1100, 0x1100).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x1200, 0x1200).portr("DSW2");
+	map(0x1280, 0x1280).portr("SYSTEM");
+	map(0x1281, 0x1281).portr("IN0");
 //  AM_RANGE(0x1282, 0x1282) AM_READ_PORT("IN1") /* unused */
-	AM_RANGE(0x1283, 0x1283) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x183f) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x1840, 0x185f) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0x1860, 0x1bff) AM_RAM
-	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_SHARE("scroll2")
-	AM_RANGE(0x1c60, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM // initialized at POST
-	AM_RANGE(0x2800, 0x2bff) AM_RAM
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x6000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x1283, 0x1283).portr("DSW1");
+	map(0x1800, 0x183f).ram().share("spriteram2");
+	map(0x1840, 0x185f).ram().share("scroll");
+	map(0x1860, 0x1bff).ram();
+	map(0x1c00, 0x1c3f).ram().share("spriteram");
+	map(0x1c40, 0x1c5f).ram().share("scroll2");
+	map(0x1c60, 0x1fff).ram();
+	map(0x2000, 0x27ff).ram(); // initialized at POST
+	map(0x2800, 0x2bff).ram();
+	map(0x2c00, 0x2fff).ram().share("nvram");
+	map(0x3000, 0x37ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share("videoram");
+	map(0x3800, 0x3fff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share("colorram");
+	map(0x6000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(trackfld_state::wizzquiz_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)
-	AM_RANGE(0x1080, 0x1087) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x1100, 0x1100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1280, 0x1280) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1281, 0x1281) AM_READ_PORT("IN0")
-	AM_RANGE(0x1282, 0x1282) AM_READ_PORT("IN1")
-	AM_RANGE(0x1283, 0x1283) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x183f) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x1840, 0x185f) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0x1860, 0x1bff) AM_RAM
-	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_SHARE("scroll2")
-	AM_RANGE(0x1c60, 0x1fff) AM_RAM
-	AM_RANGE(0x2800, 0x2bff) AM_RAM
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(questions_bank_w)
-	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void trackfld_state::wizzquiz_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();
+	map(0x1000, 0x1000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
+	map(0x1080, 0x1087).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x1100, 0x1100).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x1200, 0x1200).portr("DSW2");
+	map(0x1280, 0x1280).portr("SYSTEM");
+	map(0x1281, 0x1281).portr("IN0");
+	map(0x1282, 0x1282).portr("IN1");
+	map(0x1283, 0x1283).portr("DSW1");
+	map(0x1800, 0x183f).ram().share("spriteram2");
+	map(0x1840, 0x185f).ram().share("scroll");
+	map(0x1860, 0x1bff).ram();
+	map(0x1c00, 0x1c3f).ram().share("spriteram");
+	map(0x1c40, 0x1c5f).ram().share("scroll2");
+	map(0x1c60, 0x1fff).ram();
+	map(0x2800, 0x2bff).ram();
+	map(0x2c00, 0x2fff).ram().share("nvram");
+	map(0x3000, 0x37ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share("videoram");
+	map(0x3800, 0x3fff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share("colorram");
+	map(0xc000, 0xc000).w(this, FUNC(trackfld_state::questions_bank_w));
+	map(0x6000, 0xdfff).bankr("bank1");
+	map(0xe000, 0xffff).rom();
+}
 
 
 READ8_MEMBER(trackfld_state::trackfld_SN76496_r)
@@ -393,38 +399,41 @@ READ8_MEMBER(trackfld_state::trackfld_SN76496_r)
 	return 0xff; // ?
 }
 
-ADDRESS_MAP_START(trackfld_state::sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_DEVREAD("trackfld_audio", trackfld_audio_device, trackfld_sh_timer_r)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE(konami_SN76496_latch_w)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(trackfld_SN76496_r) AM_WRITE(konami_SN76496_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP           /* watch dog ?; reaktor reads here */
-	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD("trackfld_audio", trackfld_audio_device, trackfld_speech_r)
-	AM_RANGE(0xe003, 0xe003) AM_MIRROR(0x1c78) AM_SELECT(0x0380) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, trackfld_sound_w)
-	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_DEVWRITE("vlm", vlm5030_device, data_w)
-ADDRESS_MAP_END
+void trackfld_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).mirror(0x1c00).ram();
+	map(0x6000, 0x6000).mirror(0x1fff).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x8000).mirror(0x1fff).r("trackfld_audio", FUNC(trackfld_audio_device::trackfld_sh_timer_r));
+	map(0xa000, 0xa000).mirror(0x1fff).w(this, FUNC(trackfld_state::konami_SN76496_latch_w));
+	map(0xc000, 0xc000).mirror(0x1fff).r(this, FUNC(trackfld_state::trackfld_SN76496_r)).w(this, FUNC(trackfld_state::konami_SN76496_w));
+	map(0xe000, 0xe000).mirror(0x1ff8).w("dac", FUNC(dac_byte_interface::write));
+	map(0xe001, 0xe001).mirror(0x1ff8).noprw();           /* watch dog ?; reaktor reads here */
+	map(0xe002, 0xe002).mirror(0x1ff8).r("trackfld_audio", FUNC(trackfld_audio_device::trackfld_speech_r));
+	map(0xe003, 0xe003).mirror(0x1c78).select(0x0380).w("trackfld_audio", FUNC(trackfld_audio_device::trackfld_sound_w));
+	map(0xe004, 0xe004).mirror(0x1ff8).w(m_vlm, FUNC(vlm5030_device::data_w));
+}
 
-ADDRESS_MAP_START(trackfld_state::hyprolyb_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_DEVREAD("trackfld_audio", trackfld_audio_device, trackfld_sh_timer_r)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE(konami_SN76496_latch_w)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(trackfld_SN76496_r) AM_WRITE(konami_SN76496_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP           /* watch dog ?; reaktor reads here */
-	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, busy_r)
-	AM_RANGE(0xe003, 0xe003) AM_MIRROR(0x1ff8) AM_WRITENOP
-	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, write)
-ADDRESS_MAP_END
+void trackfld_state::hyprolyb_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).mirror(0x1c00).ram();
+	map(0x6000, 0x6000).mirror(0x1fff).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x8000).mirror(0x1fff).r("trackfld_audio", FUNC(trackfld_audio_device::trackfld_sh_timer_r));
+	map(0xa000, 0xa000).mirror(0x1fff).w(this, FUNC(trackfld_state::konami_SN76496_latch_w));
+	map(0xc000, 0xc000).mirror(0x1fff).r(this, FUNC(trackfld_state::trackfld_SN76496_r)).w(this, FUNC(trackfld_state::konami_SN76496_w));
+	map(0xe000, 0xe000).mirror(0x1ff8).w("dac", FUNC(dac_byte_interface::write));
+	map(0xe001, 0xe001).mirror(0x1ff8).noprw();           /* watch dog ?; reaktor reads here */
+	map(0xe002, 0xe002).mirror(0x1ff8).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::busy_r));
+	map(0xe003, 0xe003).mirror(0x1ff8).nopw();
+	map(0xe004, 0xe004).mirror(0x1ff8).w("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::write));
+}
 
-ADDRESS_MAP_START(trackfld_state::vlm_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void trackfld_state::vlm_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x1fff).rom();
+}
 
 static INPUT_PORTS_START( trackfld )
 	PORT_START("SYSTEM")
@@ -1030,12 +1039,13 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-ADDRESS_MAP_START(trackfld_state::hyprolyb_adpcm_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, data_r)
-	AM_RANGE(0x1001, 0x1001) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, ready_r)
-	AM_RANGE(0x1002, 0x1002) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, msm_data_w)
-	AM_RANGE(0x1003, 0x1003) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, msm_vck_r)
+void trackfld_state::hyprolyb_adpcm_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();
+	map(0x1000, 0x1000).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::data_r));
+	map(0x1001, 0x1001).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::ready_r));
+	map(0x1002, 0x1002).w("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::msm_data_w));
+	map(0x1003, 0x1003).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::msm_vck_r));
 		// on init:
 		//    $1003 = $00
 		//    $1002 = $FF
@@ -1049,8 +1059,8 @@ ADDRESS_MAP_START(trackfld_state::hyprolyb_adpcm_map)
 		// $1002 & $0f (out) = 5205 data
 		// $1001 & $80 (in) = sound latch request
 		// $1000 (in) = sound latch data
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x8000, 0xffff).rom();
+}
 
 /* same as the original, but uses ADPCM instead of VLM5030 */
 /* also different memory handlers do handle that */

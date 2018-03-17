@@ -563,71 +563,77 @@ WRITE8_MEMBER( kc85_state::lcd_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(kc85_state::kc85_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
-ADDRESS_MAP_END
+void kc85_state::kc85_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).bankrw("bank2");
+}
 
-ADDRESS_MAP_START(pc8201_state::pc8201_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank2")
-ADDRESS_MAP_END
+void pc8201_state::pc8201_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).bankrw("bank1");
+	map(0x8000, 0xffff).bankrw("bank2");
+}
 
-ADDRESS_MAP_START(tandy200_state::tandy200_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xffff) AM_RAMBANK("bank2")
-ADDRESS_MAP_END
+void tandy200_state::tandy200_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).bankr("bank1");
+	map(0x8000, 0x9fff).rom();
+	map(0xa000, 0xffff).bankrw("bank2");
+}
 
-ADDRESS_MAP_START(kc85_state::kc85_io)
-	ADDRESS_MAP_UNMAP_HIGH
+void kc85_state::kc85_io(address_map &map)
+{
+	map.unmap_value_high();
 //  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
 //  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
 //  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) optional answering telephone unit
 //  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) optional modem
-	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_device, read, write)
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(uart_status_r, uart_ctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, ctrl_w)
-	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(lcd_r, lcd_w)
-ADDRESS_MAP_END
+	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0xc0, 0xc0).mirror(0x0f).rw(m_uart, FUNC(im6402_device::read), FUNC(im6402_device::write));
+	map(0xd0, 0xd0).mirror(0x0f).rw(this, FUNC(kc85_state::uart_status_r), FUNC(kc85_state::uart_ctrl_w));
+	map(0xe0, 0xe0).mirror(0x0f).rw(this, FUNC(kc85_state::keyboard_r), FUNC(kc85_state::ctrl_w));
+	map(0xf0, 0xf1).mirror(0x0e).rw(this, FUNC(kc85_state::lcd_r), FUNC(kc85_state::lcd_w));
+}
 
 ADDRESS_MAP_START(kc85_state::trsm100_io)
 	AM_IMPORT_FROM(kc85_io)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(modem_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(pc8201_state::pc8201_io)
-	ADDRESS_MAP_UNMAP_HIGH
+void pc8201_state::pc8201_io(address_map &map)
+{
+	map.unmap_value_high();
 //  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional video interface 8255
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x03) AM_WRITE(romah_w)
-	AM_RANGE(0x84, 0x84) AM_MIRROR(0x03) AM_WRITE(romal_w)
-	AM_RANGE(0x88, 0x88) AM_MIRROR(0x03) AM_WRITE(romam_w)
-	AM_RANGE(0x8c, 0x8c) AM_MIRROR(0x03) AM_READ(romrd_r)
-	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(scp_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READWRITE(bank_r, bank_w)
-	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_device, read, write)
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READ(uart_status_r) AM_WRITE(uart_ctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READ(keyboard_r)
-	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(lcd_r, lcd_w)
-ADDRESS_MAP_END
+	map(0x80, 0x80).mirror(0x03).w(this, FUNC(pc8201_state::romah_w));
+	map(0x84, 0x84).mirror(0x03).w(this, FUNC(pc8201_state::romal_w));
+	map(0x88, 0x88).mirror(0x03).w(this, FUNC(pc8201_state::romam_w));
+	map(0x8c, 0x8c).mirror(0x03).r(this, FUNC(pc8201_state::romrd_r));
+	map(0x90, 0x90).mirror(0x0f).w(this, FUNC(pc8201_state::scp_w));
+	map(0xa0, 0xa0).mirror(0x0f).rw(this, FUNC(pc8201_state::bank_r), FUNC(pc8201_state::bank_w));
+	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0xc0, 0xc0).mirror(0x0f).rw(m_uart, FUNC(im6402_device::read), FUNC(im6402_device::write));
+	map(0xd0, 0xd0).mirror(0x0f).r(this, FUNC(pc8201_state::uart_status_r)).w(this, FUNC(pc8201_state::uart_ctrl_w));
+	map(0xe0, 0xe0).mirror(0x0f).r(this, FUNC(pc8201_state::keyboard_r));
+	map(0xf0, 0xf1).mirror(0x0e).rw(this, FUNC(pc8201_state::lcd_r), FUNC(pc8201_state::lcd_w));
+}
 
-ADDRESS_MAP_START(tandy200_state::tandy200_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x90, 0x9f) AM_DEVREADWRITE(RP5C01A_TAG, rp5c01_device, read, write)
+void tandy200_state::tandy200_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x90, 0x9f).rw(m_rtc, FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
 //  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, write)
-	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0e) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x0e) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(bank_r, bank_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(stbk_r, stbk_w)
-	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0e) AM_DEVREADWRITE(HD61830_TAG, hd61830_device, data_r, data_w)
-	AM_RANGE(0xf1, 0xf1) AM_MIRROR(0x0e) AM_DEVREADWRITE(HD61830_TAG, hd61830_device, status_r, control_w)
-ADDRESS_MAP_END
+	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0xc0, 0xc0).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xc1, 0xc1).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xd0, 0xd0).mirror(0x0f).rw(this, FUNC(tandy200_state::bank_r), FUNC(tandy200_state::bank_w));
+	map(0xe0, 0xe0).mirror(0x0f).rw(this, FUNC(tandy200_state::stbk_r), FUNC(tandy200_state::stbk_w));
+	map(0xf0, 0xf0).mirror(0x0e).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w));
+	map(0xf1, 0xf1).mirror(0x0e).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w));
+}
 
 /* Input Ports */
 

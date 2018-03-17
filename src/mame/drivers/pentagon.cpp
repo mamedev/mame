@@ -181,31 +181,34 @@ READ8_MEMBER(pentagon_state::beta_disable_r)
 	return m_program->read_byte(offset + 0x4000);
 }
 
-ADDRESS_MAP_START(pentagon_state::pentagon_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void pentagon_state::pentagon_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
-ADDRESS_MAP_START(pentagon_state::pentagon_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(pentagon_port_7ffd_w)  AM_MIRROR(0x7ffd)  // (A15 | A1) == 0
-	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, status_r, command_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, track_r, track_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, sector_r, sector_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, data_r, data_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xff00)
-	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, state_r, param_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
-ADDRESS_MAP_END
+void pentagon_state::pentagon_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0000).w(this, FUNC(pentagon_state::pentagon_port_7ffd_w)).mirror(0x7ffd);  // (A15 | A1) == 0
+	map(0x001f, 0x001f).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w)).mirror(0xff00);
+	map(0x003f, 0x003f).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w)).mirror(0xff00);
+	map(0x005f, 0x005f).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w)).mirror(0xff00);
+	map(0x007f, 0x007f).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w)).mirror(0xff00);
+	map(0x00fe, 0x00fe).rw(this, FUNC(pentagon_state::spectrum_port_fe_r), FUNC(pentagon_state::spectrum_port_fe_w)).select(0xff00);
+	map(0x00ff, 0x00ff).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w)).mirror(0xff00);
+	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
+	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
+}
 
-ADDRESS_MAP_START(pentagon_state::pentagon_switch)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(beta_neutral_r) // Overlap with next because we want real addresses on the 3e00-3fff range
-	AM_RANGE(0x3d00, 0x3dff) AM_READ(beta_enable_r)
-	AM_RANGE(0x4000, 0xffff) AM_READ(beta_disable_r)
-ADDRESS_MAP_END
+void pentagon_state::pentagon_switch(address_map &map)
+{
+	map(0x0000, 0x3fff).r(this, FUNC(pentagon_state::beta_neutral_r)); // Overlap with next because we want real addresses on the 3e00-3fff range
+	map(0x3d00, 0x3dff).r(this, FUNC(pentagon_state::beta_enable_r));
+	map(0x4000, 0xffff).r(this, FUNC(pentagon_state::beta_disable_r));
+}
 
 MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 {

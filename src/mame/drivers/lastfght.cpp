@@ -407,40 +407,42 @@ WRITE16_MEMBER(lastfght_state::sound_w)
                                 Memory Maps
 ***************************************************************************/
 
-ADDRESS_MAP_START(lastfght_state::lastfght_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+void lastfght_state::lastfght_map(address_map &map)
+{
+	map.global_mask(0xffffff);
 
-	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION("maincpu", 0)
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x080000, 0x0fffff).rom().region("maincpu", 0);
 
-	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM AM_SHARE("nvram") // battery
+	map(0x200000, 0x20ffff).ram().share("nvram"); // battery
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_WRITE(hi_w )
-	AM_RANGE( 0x600002, 0x600003 ) AM_READWRITE(sound_r, sound_w )
-	AM_RANGE( 0x600006, 0x600007 ) AM_WRITE(blit_w )
-	AM_RANGE( 0x600008, 0x600009 ) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff )
-	AM_RANGE( 0x600008, 0x600009 ) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00 )
-	AM_RANGE( 0x60000a, 0x60000b ) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00 )
+	map(0x600000, 0x600001).w(this, FUNC(lastfght_state::hi_w));
+	map(0x600002, 0x600003).rw(this, FUNC(lastfght_state::sound_r), FUNC(lastfght_state::sound_w));
+	map(0x600006, 0x600007).w(this, FUNC(lastfght_state::blit_w));
+	map(0x600009, 0x600009).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x600008, 0x600008).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x60000a, 0x60000a).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE( 0x800000, 0x800001 ) AM_WRITE(sx_w )
-	AM_RANGE( 0x800002, 0x800003 ) AM_WRITE(sd_w )
-	AM_RANGE( 0x800004, 0x800005 ) AM_WRITE(sy_w )
-	AM_RANGE( 0x800006, 0x800007 ) AM_WRITE(sr_w )
-	AM_RANGE( 0x800008, 0x800009 ) AM_WRITE(x_w )
-	AM_RANGE( 0x80000a, 0x80000b ) AM_WRITE(yw_w )
-	AM_RANGE( 0x80000c, 0x80000d ) AM_WRITE(h_w )
+	map(0x800000, 0x800001).w(this, FUNC(lastfght_state::sx_w));
+	map(0x800002, 0x800003).w(this, FUNC(lastfght_state::sd_w));
+	map(0x800004, 0x800005).w(this, FUNC(lastfght_state::sy_w));
+	map(0x800006, 0x800007).w(this, FUNC(lastfght_state::sr_w));
+	map(0x800008, 0x800009).w(this, FUNC(lastfght_state::x_w));
+	map(0x80000a, 0x80000b).w(this, FUNC(lastfght_state::yw_w));
+	map(0x80000c, 0x80000d).w(this, FUNC(lastfght_state::h_w));
 
-	AM_RANGE( 0x800014, 0x800015 ) AM_WRITE(dest_w )
+	map(0x800014, 0x800015).w(this, FUNC(lastfght_state::dest_w));
 
-	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ(c00000_r )
-	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ(c00002_r )
-	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ(c00004_r )
-	AM_RANGE( 0xc00006, 0xc00007 ) AM_READWRITE(c00006_r, c00006_w )
-ADDRESS_MAP_END
+	map(0xc00000, 0xc00001).r(this, FUNC(lastfght_state::c00000_r));
+	map(0xc00002, 0xc00003).r(this, FUNC(lastfght_state::c00002_r));
+	map(0xc00004, 0xc00005).r(this, FUNC(lastfght_state::c00004_r));
+	map(0xc00006, 0xc00007).rw(this, FUNC(lastfght_state::c00006_r), FUNC(lastfght_state::c00006_w));
+}
 
-ADDRESS_MAP_START(lastfght_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
-ADDRESS_MAP_END
+void lastfght_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 /***************************************************************************
                                 Input Ports

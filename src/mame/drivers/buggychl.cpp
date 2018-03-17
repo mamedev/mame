@@ -194,63 +194,65 @@ READ8_MEMBER(buggychl_state::sound_status_sound_r)
  1  1  1  0  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?   ?  (unknown, cut off on schematic)
  1  1  1  1  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?   ?  (unknown, cut off on schematic)
 */
-ADDRESS_MAP_START(buggychl_state::buggychl_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM /* A22-04 (23) */
-	AM_RANGE(0x4000, 0x7fff) AM_ROM /* A22-05 (22) */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM /* 6116 SRAM (36) */
-	AM_RANGE(0x8800, 0x8fff) AM_RAM /* 6116 SRAM (35) */
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(buggychl_sprite_lookup_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1") AM_WRITE(buggychl_chargen_w) AM_SHARE("charram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xd000, 0xd000) AM_WRITENOP // ???
-	AM_RANGE(0xd100, 0xd100) AM_MIRROR(0x00ff) AM_WRITE(buggychl_ctrl_w)
-	AM_RANGE(0xd200, 0xd200) AM_MIRROR(0x00ff) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xd300, 0xd300) AM_MIRROR(0x00f8) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
+void buggychl_state::buggychl_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom(); /* A22-04 (23) */
+	map(0x4000, 0x7fff).rom(); /* A22-05 (22) */
+	map(0x8000, 0x87ff).ram(); /* 6116 SRAM (36) */
+	map(0x8800, 0x8fff).ram(); /* 6116 SRAM (35) */
+	map(0x9000, 0x9fff).w(this, FUNC(buggychl_state::buggychl_sprite_lookup_w));
+	map(0xa000, 0xbfff).bankr("bank1").w(this, FUNC(buggychl_state::buggychl_chargen_w)).share("charram");
+	map(0xc800, 0xcfff).ram().share("videoram");
+	map(0xd000, 0xd000).nopw(); // ???
+	map(0xd100, 0xd100).mirror(0x00ff).w(this, FUNC(buggychl_state::buggychl_ctrl_w));
+	map(0xd200, 0xd200).mirror(0x00ff).w(this, FUNC(buggychl_state::bankswitch_w));
+	map(0xd300, 0xd300).mirror(0x00f8).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	// d301 = flp stuff, unused?
 	// d302 = mcu reset latched d0
-	AM_RANGE(0xd303, 0xd303) AM_MIRROR(0x00f8) AM_WRITE(buggychl_sprite_lookup_bank_w)
-	AM_RANGE(0xd304, 0xd307) AM_WRITENOP // d304-d307 is SCCON, which seems to be for a bezel mounted 7seg score/time display like Grand Champion has
-	AM_RANGE(0xd400, 0xd400) AM_MIRROR(0x00fc) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_RANGE(0xd401, 0xd401) AM_MIRROR(0x00fc) AM_READ(mcu_status_r)
-	AM_RANGE(0xd500, 0xd57f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00e4) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd601, 0xd601) AM_MIRROR(0x00e4) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd602, 0xd602) AM_MIRROR(0x00e4) AM_READ_PORT("DSW3")
-	AM_RANGE(0xd603, 0xd603) AM_MIRROR(0x00e4) AM_READ_PORT("IN0")    /* player inputs */
-	AM_RANGE(0xd608, 0xd608) AM_MIRROR(0x00e4) AM_READ_PORT("WHEEL")
-	AM_RANGE(0xd609, 0xd609) AM_MIRROR(0x00e4) AM_READ_PORT("IN1")    /* coin + accelerator */
+	map(0xd303, 0xd303).mirror(0x00f8).w(this, FUNC(buggychl_state::buggychl_sprite_lookup_bank_w));
+	map(0xd304, 0xd307).nopw(); // d304-d307 is SCCON, which seems to be for a bezel mounted 7seg score/time display like Grand Champion has
+	map(0xd400, 0xd400).mirror(0x00fc).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+	map(0xd401, 0xd401).mirror(0x00fc).r(this, FUNC(buggychl_state::mcu_status_r));
+	map(0xd500, 0xd57f).writeonly().share("spriteram");
+	map(0xd600, 0xd600).mirror(0x00e4).portr("DSW1");
+	map(0xd601, 0xd601).mirror(0x00e4).portr("DSW2");
+	map(0xd602, 0xd602).mirror(0x00e4).portr("DSW3");
+	map(0xd603, 0xd603).mirror(0x00e4).portr("IN0");    /* player inputs */
+	map(0xd608, 0xd608).mirror(0x00e4).portr("WHEEL");
+	map(0xd609, 0xd609).mirror(0x00e4).portr("IN1");    /* coin + accelerator */
 //  AM_RANGE(0xd60a, 0xd60a) AM_MIRROR(0x00e4) // other inputs, not used?
 //  AM_RANGE(0xd60b, 0xd60b) AM_MIRROR(0x00e4) // other inputs, not used?
-	AM_RANGE(0xd610, 0xd610) AM_MIRROR(0x00e4) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xd611, 0xd611) AM_MIRROR(0x00e4) AM_READ(sound_status_main_r)
+	map(0xd610, 0xd610).mirror(0x00e4).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xd611, 0xd611).mirror(0x00e4).r(this, FUNC(buggychl_state::sound_status_main_r));
 //  AM_RANGE(0xd613, 0xd613) AM_MIRROR(0x00e4) AM_WRITE(sound_reset_w)
-	AM_RANGE(0xd618, 0xd618) AM_MIRROR(0x00e7) AM_WRITENOP    /* accelerator clear; TODO: should we emulate the proper quadrature counter here? */
-	AM_RANGE(0xd700, 0xd7ff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xd820, 0xd83f) AM_RAM // TODO
-	AM_RANGE(0xd840, 0xd85f) AM_WRITEONLY AM_SHARE("scrollv")
-	AM_RANGE(0xdb00, 0xdbff) AM_WRITEONLY AM_SHARE("scrollh")
-	AM_RANGE(0xdc04, 0xdc04) AM_WRITEONLY /* should be fg scroll */
-	AM_RANGE(0xdc06, 0xdc06) AM_WRITE(buggychl_bg_scrollx_w)
-ADDRESS_MAP_END
+	map(0xd618, 0xd618).mirror(0x00e7).nopw();    /* accelerator clear; TODO: should we emulate the proper quadrature counter here? */
+	map(0xd700, 0xd7ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd820, 0xd83f).ram(); // TODO
+	map(0xd840, 0xd85f).writeonly().share("scrollv");
+	map(0xdb00, 0xdbff).writeonly().share("scrollh");
+	map(0xdc04, 0xdc04).writeonly(); /* should be fg scroll */
+	map(0xdc06, 0xdc06).w(this, FUNC(buggychl_state::buggychl_bg_scrollx_w));
+}
 
 /* The schematics for buggy challenge has the wrong sound board schematic attached to it.
   (The schematic is for an unknown taito game, possibly never released.)
    The final buggy challenge sound board is more similar to Fairyland Story sound
    hardware, except it has two YM2149 chips instead of one, and much less ROM space. */
-ADDRESS_MAP_START(buggychl_state::sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x4810, 0x481d) AM_DEVWRITE("msm", msm5232_device, write)
-	AM_RANGE(0x4820, 0x4820) AM_WRITE(ta7630_volbal_msm_w) /* VOL/BAL   for the 7630 on the MSM5232 output */
-	AM_RANGE(0x4830, 0x4830) AM_RAM /* TRBL/BASS for the 7630 on the MSM5232 output */
-	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0x5001, 0x5001) AM_READ(sound_status_sound_r) AM_DEVWRITE("soundnmi", input_merger_device, in_set<1>)
-	AM_RANGE(0x5002, 0x5002) AM_DEVWRITE("soundnmi", input_merger_device, in_clear<1>)
-	AM_RANGE(0x5003, 0x5003) AM_WRITE(sound_enable_w) // unclear what this actually controls
-	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostics ROM */
-ADDRESS_MAP_END
+void buggychl_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4801).w(m_ay1, FUNC(ay8910_device::address_data_w));
+	map(0x4802, 0x4803).w(m_ay2, FUNC(ay8910_device::address_data_w));
+	map(0x4810, 0x481d).w(m_msm, FUNC(msm5232_device::write));
+	map(0x4820, 0x4820).w(this, FUNC(buggychl_state::ta7630_volbal_msm_w)); /* VOL/BAL   for the 7630 on the MSM5232 output */
+	map(0x4830, 0x4830).ram(); /* TRBL/BASS for the 7630 on the MSM5232 output */
+	map(0x5000, 0x5000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+	map(0x5001, 0x5001).r(this, FUNC(buggychl_state::sound_status_sound_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<1>));
+	map(0x5002, 0x5002).w(m_soundnmi, FUNC(input_merger_device::in_clear<1>));
+	map(0x5003, 0x5003).w(this, FUNC(buggychl_state::sound_enable_w)); // unclear what this actually controls
+	map(0xe000, 0xefff).rom(); /* space for diagnostics ROM */
+}
 
 /******************************************************************************/
 

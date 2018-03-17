@@ -45,71 +45,77 @@
 
 /* main cpu */
 
-ADDRESS_MAP_START(crospang_state::crospang_base_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_WRITENOP // writes to rom quite often
+void crospang_state::crospang_base_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom().nopw(); // writes to rom quite often
 
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x270000, 0x270001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x270004, 0x270007) AM_WRITENOP // ??
-	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
-	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+	map(0x120000, 0x1207ff).ram().w(this, FUNC(crospang_state::crospang_fg_videoram_w)).share("fg_videoram");
+	map(0x122000, 0x1227ff).ram().w(this, FUNC(crospang_state::crospang_bg_videoram_w)).share("bg_videoram");
+	map(0x200000, 0x2005ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x210000, 0x2107ff).ram().share("spriteram");
+	map(0x270001, 0x270001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x270004, 0x270007).nopw(); // ??
+	map(0x280000, 0x280001).portr("P1_P2");
+	map(0x280002, 0x280003).portr("COIN");
+	map(0x280004, 0x280005).portr("DSW");
+}
 
-ADDRESS_MAP_START(crospang_state::crospang_map)
-	AM_IMPORT_FROM(crospang_base_map)
+void crospang_state::crospang_map(address_map &map)
+{
+	crospang_base_map(map);
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITENOP
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(crospang_fg_scrolly_w)
-	AM_RANGE(0x100004, 0x100005) AM_WRITE(crospang_bg_scrollx_w)
-	AM_RANGE(0x100006, 0x100007) AM_WRITE(crospang_bg_scrolly_w)
-	AM_RANGE(0x100008, 0x100009) AM_WRITE(crospang_fg_scrollx_w)
-	AM_RANGE(0x10000e, 0x10000f) AM_WRITENOP
+	map(0x100000, 0x100001).nopw();
+	map(0x100002, 0x100003).w(this, FUNC(crospang_state::crospang_fg_scrolly_w));
+	map(0x100004, 0x100005).w(this, FUNC(crospang_state::crospang_bg_scrollx_w));
+	map(0x100006, 0x100007).w(this, FUNC(crospang_state::crospang_bg_scrolly_w));
+	map(0x100008, 0x100009).w(this, FUNC(crospang_state::crospang_fg_scrollx_w));
+	map(0x10000e, 0x10000f).nopw();
 
-	AM_RANGE(0x320000, 0x32ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x320000, 0x32ffff).ram();
+}
 
-ADDRESS_MAP_START(crospang_state::bestri_map)
-	AM_IMPORT_FROM(crospang_base_map)
+void crospang_state::bestri_map(address_map &map)
+{
+	crospang_base_map(map);
 
-	AM_RANGE(0x100004, 0x100005) AM_WRITE(bestri_fg_scrollx_w)
-	AM_RANGE(0x100006, 0x100007) AM_WRITE(bestri_fg_scrolly_w)
-	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(bestri_bg_scrolly_w)
-	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(bestri_bg_scrollx_w)
-	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(bestri_tilebank_w)
+	map(0x100004, 0x100005).w(this, FUNC(crospang_state::bestri_fg_scrollx_w));
+	map(0x100006, 0x100007).w(this, FUNC(crospang_state::bestri_fg_scrolly_w));
+	map(0x10000a, 0x10000b).w(this, FUNC(crospang_state::bestri_bg_scrolly_w));
+	map(0x10000c, 0x10000d).w(this, FUNC(crospang_state::bestri_bg_scrollx_w));
+	map(0x10000e, 0x10000f).w(this, FUNC(crospang_state::bestri_tilebank_w));
 
-	AM_RANGE(0x3a0000, 0x3affff) AM_RAM
-ADDRESS_MAP_END
+	map(0x3a0000, 0x3affff).ram();
+}
 
-ADDRESS_MAP_START(crospang_state::bestria_map)
-	AM_IMPORT_FROM(crospang_base_map)
+void crospang_state::bestria_map(address_map &map)
+{
+	crospang_base_map(map);
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITENOP // ??
-	AM_RANGE(0x100006, 0x100007) AM_WRITE(bestri_fg_scrollx_w)
-	AM_RANGE(0x100008, 0x100009) AM_WRITE(bestri_fg_scrolly_w)
-	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(bestri_bg_scrollx_w)
-	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(bestri_bg_scrolly_w)
-	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(bestri_tilebank_w)
+	map(0x100000, 0x100001).nopw(); // ??
+	map(0x100006, 0x100007).w(this, FUNC(crospang_state::bestri_fg_scrollx_w));
+	map(0x100008, 0x100009).w(this, FUNC(crospang_state::bestri_fg_scrolly_w));
+	map(0x10000a, 0x10000b).w(this, FUNC(crospang_state::bestri_bg_scrollx_w));
+	map(0x10000c, 0x10000d).w(this, FUNC(crospang_state::bestri_bg_scrolly_w));
+	map(0x10000e, 0x10000f).w(this, FUNC(crospang_state::bestri_tilebank_w));
 
-	AM_RANGE(0x340000, 0x34ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x340000, 0x34ffff).ram();
+}
 
 /* sound cpu */
 
-ADDRESS_MAP_START(crospang_state::crospang_sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void crospang_state::crospang_sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+}
 
-ADDRESS_MAP_START(crospang_state::crospang_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void crospang_state::crospang_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x02, 0x02).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 /* verified from M68000 code */

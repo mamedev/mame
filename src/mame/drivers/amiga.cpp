@@ -980,38 +980,42 @@ WRITE8_MEMBER( cd32_state::akiko_cia_0_port_a_write )
 // Akiko custom chip.
 
 #if 0
-ADDRESS_MAP_START(a1000_state::a1000_overlay_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x1c0000) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x030000) AM_ROM AM_REGION("bootrom", 0)
-	AM_RANGE(0x280000, 0x2bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x300000, 0x33ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x380000, 0x38ffff) AM_MIRROR(0x030000) AM_ROM AM_REGION("bootrom", 0)
-ADDRESS_MAP_END
+void a1000_state::a1000_overlay_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).mirror(0x1c0000).ram().share("chip_ram");
+	map(0x200000, 0x20ffff).mirror(0x030000).rom().region("bootrom", 0);
+	map(0x280000, 0x2bffff).mirror(0x040000).ram().share("chip_ram");
+	map(0x300000, 0x33ffff).mirror(0x040000).ram().share("chip_ram");
+	map(0x380000, 0x38ffff).mirror(0x030000).rom().region("bootrom", 0);
+}
 #endif
 
-ADDRESS_MAP_START(a1000_state::a1000_overlay_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x030000) AM_ROM AM_REGION("bootrom", 0)
-	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x300000, 0x37ffff) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x380000, 0x38ffff) AM_MIRROR(0x030000) AM_ROM AM_REGION("bootrom", 0)
-ADDRESS_MAP_END
+void a1000_state::a1000_overlay_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).mirror(0x180000).ram().share("chip_ram");
+	map(0x200000, 0x20ffff).mirror(0x030000).rom().region("bootrom", 0);
+	map(0x280000, 0x2fffff).ram().share("chip_ram");
+	map(0x300000, 0x37ffff).ram().share("chip_ram");
+	map(0x380000, 0x38ffff).mirror(0x030000).rom().region("bootrom", 0);
+}
 
-ADDRESS_MAP_START(a1000_state::a1000_bootrom_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_MIRROR(0x30000) AM_ROM AM_REGION("bootrom", 0) AM_WRITE(write_protect_w)
-	AM_RANGE(0x040000, 0x07ffff) AM_ROMBANK("wom")
-ADDRESS_MAP_END
+void a1000_state::a1000_bootrom_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).mirror(0x30000).rom().region("bootrom", 0).w(this, FUNC(a1000_state::write_protect_w));
+	map(0x040000, 0x07ffff).bankr("wom");
+}
 
-ADDRESS_MAP_START(a1000_state::a1000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
-	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
-	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
-	AM_RANGE(0xf80000, 0xfbffff) AM_DEVICE("bootrom", address_map_bank_device, amap16)
-	AM_RANGE(0xfc0000, 0xffffff) AM_READWRITE_BANK("wom")
-ADDRESS_MAP_END
+void a1000_state::a1000_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
+	map(0xa00000, 0xbfffff).rw(this, FUNC(a1000_state::cia_r), FUNC(a1000_state::cia_w));
+	map(0xc00000, 0xdfffff).rw(this, FUNC(a1000_state::custom_chip_r), FUNC(a1000_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(a1000_state::rom_mirror_r));
+	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
+	map(0xf80000, 0xfbffff).m(m_bootrom, FUNC(address_map_bank_device::amap16));
+	map(0xfc0000, 0xffffff).bankrw("wom");
+}
 
 // Gary/Super Gary/Gayle with 512KB chip RAM
 ADDRESS_MAP_START(amiga_state::overlay_512kb_map)
@@ -1049,194 +1053,206 @@ ADDRESS_MAP_START(amiga_state::overlay_2mb_map32)
 ADDRESS_MAP_END
 
 // 512KB chip RAM, 512KB slow RAM, RTC
-ADDRESS_MAP_START(a2000_state::a2000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
-	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
-	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM
-	AM_RANGE(0xc80000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xd80000, 0xdbffff) AM_NOP
-	AM_RANGE(0xdc0000, 0xdc7fff) AM_READWRITE(clock_r, clock_w)
-	AM_RANGE(0xdc8000, 0xddffff) AM_NOP
-	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
-	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
-	AM_RANGE(0xf00000, 0xf7ffff) AM_NOP // cartridge space
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void a2000_state::a2000_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
+	map(0xa00000, 0xbfffff).rw(this, FUNC(a2000_state::cia_r), FUNC(a2000_state::cia_w));
+	map(0xc00000, 0xc7ffff).ram();
+	map(0xc80000, 0xd7ffff).rw(this, FUNC(a2000_state::custom_chip_r), FUNC(a2000_state::custom_chip_w));
+	map(0xd80000, 0xdbffff).noprw();
+	map(0xdc0000, 0xdc7fff).rw(this, FUNC(a2000_state::clock_r), FUNC(a2000_state::clock_w));
+	map(0xdc8000, 0xddffff).noprw();
+	map(0xde0000, 0xdeffff).rw(this, FUNC(a2000_state::custom_chip_r), FUNC(a2000_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(this, FUNC(a2000_state::custom_chip_r), FUNC(a2000_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(a2000_state::rom_mirror_r));
+	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
+	map(0xf00000, 0xf7ffff).noprw(); // cartridge space
+	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
+}
 
 // 512KB chip RAM and no clock
-ADDRESS_MAP_START(a500_state::a500_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
-	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
-	AM_RANGE(0xc00000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xd80000, 0xddffff) AM_NOP
-	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
-	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
-	AM_RANGE(0xf00000, 0xf7ffff) AM_NOP // cartridge space
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void a500_state::a500_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
+	map(0xa00000, 0xbfffff).rw(this, FUNC(a500_state::cia_r), FUNC(a500_state::cia_w));
+	map(0xc00000, 0xd7ffff).rw(this, FUNC(a500_state::custom_chip_r), FUNC(a500_state::custom_chip_w));
+	map(0xd80000, 0xddffff).noprw();
+	map(0xde0000, 0xdeffff).rw(this, FUNC(a500_state::custom_chip_r), FUNC(a500_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(this, FUNC(a500_state::custom_chip_r), FUNC(a500_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(a500_state::rom_mirror_r));
+	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
+	map(0xf00000, 0xf7ffff).noprw(); // cartridge space
+	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
+}
 
 // 1MB chip RAM, RTC and CDTV specific hardware
-ADDRESS_MAP_START(cdtv_state::cdtv_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
-	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
-	AM_RANGE(0xc00000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xd80000, 0xdbffff) AM_NOP
-	AM_RANGE(0xdc0000, 0xdc7fff) AM_READWRITE(clock_r, clock_w)
-	AM_RANGE(0xdc8000, 0xdc87ff) AM_MIRROR(0x7800) AM_RAM AM_SHARE("sram")
-	AM_RANGE(0xdd0000, 0xddffff) AM_NOP
-	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xe00000, 0xe3ffff) AM_MIRROR(0x40000) AM_RAM AM_SHARE("memcard")
-	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
-	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x40000) AM_ROM AM_REGION("cdrom", 0)
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void cdtv_state::cdtv_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
+	map(0xa00000, 0xbfffff).rw(this, FUNC(cdtv_state::cia_r), FUNC(cdtv_state::cia_w));
+	map(0xc00000, 0xd7ffff).rw(this, FUNC(cdtv_state::custom_chip_r), FUNC(cdtv_state::custom_chip_w));
+	map(0xd80000, 0xdbffff).noprw();
+	map(0xdc0000, 0xdc7fff).rw(this, FUNC(cdtv_state::clock_r), FUNC(cdtv_state::clock_w));
+	map(0xdc8000, 0xdc87ff).mirror(0x7800).ram().share("sram");
+	map(0xdd0000, 0xddffff).noprw();
+	map(0xde0000, 0xdeffff).rw(this, FUNC(cdtv_state::custom_chip_r), FUNC(cdtv_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(this, FUNC(cdtv_state::custom_chip_r), FUNC(cdtv_state::custom_chip_w));
+	map(0xe00000, 0xe3ffff).mirror(0x40000).ram().share("memcard");
+	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
+	map(0xf00000, 0xf3ffff).mirror(0x40000).rom().region("cdrom", 0);
+	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
+}
 
-ADDRESS_MAP_START(cdtv_state::cdtv_rc_mem)
-	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("rcmcu", 0)
-ADDRESS_MAP_END
+void cdtv_state::cdtv_rc_mem(address_map &map)
+{
+	map(0x0800, 0x0fff).rom().region("rcmcu", 0);
+}
 
-ADDRESS_MAP_START(a3000_state::a3000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x001fffff) AM_DEVICE("overlay", address_map_bank_device, amap32)
-	AM_RANGE(0x00b80000, 0x00bfffff) AM_READWRITE16(cia_r, cia_w, 0xffffffff)
-	AM_RANGE(0x00c00000, 0x00cfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff)
-	AM_RANGE(0x00d00000, 0x00dbffff) AM_NOP
-	AM_RANGE(0x00dc0000, 0x00dcffff) AM_DEVREADWRITE8("rtc", rp5c01_device, read, write, 0x000000ff)
-	AM_RANGE(0x00dd0000, 0x00ddffff) AM_READWRITE(scsi_r, scsi_w)
-	AM_RANGE(0x00de0000, 0x00deffff) AM_READWRITE(motherboard_r, motherboard_w)
-	AM_RANGE(0x00df0000, 0x00dfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff)
-	AM_RANGE(0x00e80000, 0x00efffff) AM_NOP // autoconfig space (installed by devices)
-	AM_RANGE(0x00f00000, 0x00f7ffff) AM_NOP // cartridge space
-	AM_RANGE(0x00f80000, 0x00ffffff) AM_ROM AM_REGION("kickstart", 0)
-	AM_RANGE(0x07f00000, 0x07ffffff) AM_RAM // motherboard ram (up to 16mb), grows downward
-ADDRESS_MAP_END
+void a3000_state::a3000_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x001fffff).m(m_overlay, FUNC(address_map_bank_device::amap32));
+	map(0x00b80000, 0x00bfffff).rw(this, FUNC(a3000_state::cia_r), FUNC(a3000_state::cia_w));
+	map(0x00c00000, 0x00cfffff).rw(this, FUNC(a3000_state::custom_chip_r), FUNC(a3000_state::custom_chip_w));
+	map(0x00d00000, 0x00dbffff).noprw();
+	map(0x00dc0000, 0x00dcffff).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write)).umask32(0x000000ff);
+	map(0x00dd0000, 0x00ddffff).rw(this, FUNC(a3000_state::scsi_r), FUNC(a3000_state::scsi_w));
+	map(0x00de0000, 0x00deffff).rw(this, FUNC(a3000_state::motherboard_r), FUNC(a3000_state::motherboard_w));
+	map(0x00df0000, 0x00dfffff).rw(this, FUNC(a3000_state::custom_chip_r), FUNC(a3000_state::custom_chip_w));
+	map(0x00e80000, 0x00efffff).noprw(); // autoconfig space (installed by devices)
+	map(0x00f00000, 0x00f7ffff).noprw(); // cartridge space
+	map(0x00f80000, 0x00ffffff).rom().region("kickstart", 0);
+	map(0x07f00000, 0x07ffffff).ram(); // motherboard ram (up to 16mb), grows downward
+}
 
 // 1MB chip RAM and RTC
-ADDRESS_MAP_START(a500p_state::a500p_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
-	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
-	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM
-	AM_RANGE(0xc80000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xd80000, 0xdbffff) AM_NOP
-	AM_RANGE(0xdc0000, 0xdc7fff) AM_READWRITE(clock_r, clock_w)
-	AM_RANGE(0xdc8000, 0xddffff) AM_NOP
-	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
-	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void a500p_state::a500p_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
+	map(0xa00000, 0xbfffff).rw(this, FUNC(a500p_state::cia_r), FUNC(a500p_state::cia_w));
+	map(0xc00000, 0xc7ffff).ram();
+	map(0xc80000, 0xd7ffff).rw(this, FUNC(a500p_state::custom_chip_r), FUNC(a500p_state::custom_chip_w));
+	map(0xd80000, 0xdbffff).noprw();
+	map(0xdc0000, 0xdc7fff).rw(this, FUNC(a500p_state::clock_r), FUNC(a500p_state::clock_w));
+	map(0xdc8000, 0xddffff).noprw();
+	map(0xde0000, 0xdeffff).rw(this, FUNC(a500p_state::custom_chip_r), FUNC(a500p_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(this, FUNC(a500p_state::custom_chip_r), FUNC(a500p_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(a500p_state::rom_mirror_r));
+	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
+	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
+}
 
 // 1MB chip RAM, IDE and PCMCIA
-ADDRESS_MAP_START(a600_state::a600_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
-	AM_RANGE(0x200000, 0xa7ffff) AM_NOP
-	AM_RANGE(0xa80000, 0xafffff) AM_WRITENOP AM_READ(rom_mirror_r)
-	AM_RANGE(0xb00000, 0xb7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
-	AM_RANGE(0xb80000, 0xbeffff) AM_NOP // reserved (cdtv)
-	AM_RANGE(0xbf0000, 0xbfffff) AM_READWRITE(cia_r, gayle_cia_w)
-	AM_RANGE(0xc00000, 0xd7ffff) AM_NOP // slow mem
-	AM_RANGE(0xd80000, 0xd8ffff) AM_NOP // spare chip select
-	AM_RANGE(0xd90000, 0xd9ffff) AM_NOP // arcnet chip select
-	AM_RANGE(0xda0000, 0xdaffff) AM_DEVREADWRITE("gayle", gayle_device, gayle_r, gayle_w)
-	AM_RANGE(0xdb0000, 0xdbffff) AM_NOP // reserved (external ide)
-	AM_RANGE(0xdc0000, 0xdcffff) AM_NOP // rtc
-	AM_RANGE(0xdd0000, 0xddffff) AM_NOP // reserved (dma controller)
-	AM_RANGE(0xde0000, 0xdeffff) AM_DEVREADWRITE("gayle", gayle_device, gayle_id_r, gayle_id_w)
-	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
-	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
-	AM_RANGE(0xf00000, 0xf7ffff) AM_NOP // cartridge space
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void a600_state::a600_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
+	map(0x200000, 0xa7ffff).noprw();
+	map(0xa80000, 0xafffff).nopw().r(this, FUNC(a600_state::rom_mirror_r));
+	map(0xb00000, 0xb7ffff).nopw().r(this, FUNC(a600_state::rom_mirror_r));
+	map(0xb80000, 0xbeffff).noprw(); // reserved (cdtv)
+	map(0xbf0000, 0xbfffff).rw(this, FUNC(a600_state::cia_r), FUNC(a600_state::gayle_cia_w));
+	map(0xc00000, 0xd7ffff).noprw(); // slow mem
+	map(0xd80000, 0xd8ffff).noprw(); // spare chip select
+	map(0xd90000, 0xd9ffff).noprw(); // arcnet chip select
+	map(0xda0000, 0xdaffff).rw("gayle", FUNC(gayle_device::gayle_r), FUNC(gayle_device::gayle_w));
+	map(0xdb0000, 0xdbffff).noprw(); // reserved (external ide)
+	map(0xdc0000, 0xdcffff).noprw(); // rtc
+	map(0xdd0000, 0xddffff).noprw(); // reserved (dma controller)
+	map(0xde0000, 0xdeffff).rw("gayle", FUNC(gayle_device::gayle_id_r), FUNC(gayle_device::gayle_id_w));
+	map(0xdf0000, 0xdfffff).rw(this, FUNC(a600_state::custom_chip_r), FUNC(a600_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(a600_state::rom_mirror_r));
+	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
+	map(0xf00000, 0xf7ffff).noprw(); // cartridge space
+	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
+}
 
 // 2MB chip RAM, IDE and PCMCIA
-ADDRESS_MAP_START(a1200_state::a1200_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap32)
-	AM_RANGE(0x200000, 0xa7ffff) AM_NOP
-	AM_RANGE(0xa80000, 0xafffff) AM_WRITENOP AM_READ(rom_mirror32_r)
-	AM_RANGE(0xb00000, 0xb7ffff) AM_WRITENOP AM_READ(rom_mirror32_r)
-	AM_RANGE(0xb80000, 0xbeffff) AM_NOP // reserved (cdtv)
-	AM_RANGE(0xbf0000, 0xbfffff) AM_READWRITE16(cia_r, gayle_cia_w, 0xffffffff)
-	AM_RANGE(0xc00000, 0xd7ffff) AM_NOP // slow mem
-	AM_RANGE(0xd80000, 0xd8ffff) AM_NOP // spare chip select
-	AM_RANGE(0xd90000, 0xd9ffff) AM_NOP // arcnet chip select
-	AM_RANGE(0xda0000, 0xdaffff) AM_DEVREADWRITE16("gayle", gayle_device, gayle_r, gayle_w, 0xffffffff)
-	AM_RANGE(0xdb0000, 0xdbffff) AM_NOP // reserved (external ide)
-	AM_RANGE(0xdc0000, 0xdcffff) AM_NOP // rtc
-	AM_RANGE(0xdd0000, 0xddffff) AM_NOP // reserved (dma controller)
-	AM_RANGE(0xde0000, 0xdeffff) AM_DEVREADWRITE16("gayle", gayle_device, gayle_id_r, gayle_id_w, 0xffffffff)
-	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror32_r)
-	AM_RANGE(0xe80000, 0xefffff) AM_NOP // autoconfig space (installed by devices)
-	AM_RANGE(0xf00000, 0xf7ffff) AM_NOP // cartridge space
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void a1200_state::a1200_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap32));
+	map(0x200000, 0xa7ffff).noprw();
+	map(0xa80000, 0xafffff).nopw().r(this, FUNC(a1200_state::rom_mirror32_r));
+	map(0xb00000, 0xb7ffff).nopw().r(this, FUNC(a1200_state::rom_mirror32_r));
+	map(0xb80000, 0xbeffff).noprw(); // reserved (cdtv)
+	map(0xbf0000, 0xbfffff).rw(this, FUNC(a1200_state::cia_r), FUNC(a1200_state::gayle_cia_w));
+	map(0xc00000, 0xd7ffff).noprw(); // slow mem
+	map(0xd80000, 0xd8ffff).noprw(); // spare chip select
+	map(0xd90000, 0xd9ffff).noprw(); // arcnet chip select
+	map(0xda0000, 0xdaffff).rw("gayle", FUNC(gayle_device::gayle_r), FUNC(gayle_device::gayle_w));
+	map(0xdb0000, 0xdbffff).noprw(); // reserved (external ide)
+	map(0xdc0000, 0xdcffff).noprw(); // rtc
+	map(0xdd0000, 0xddffff).noprw(); // reserved (dma controller)
+	map(0xde0000, 0xdeffff).rw("gayle", FUNC(gayle_device::gayle_id_r), FUNC(gayle_device::gayle_id_w));
+	map(0xdf0000, 0xdfffff).rw(this, FUNC(a1200_state::custom_chip_r), FUNC(a1200_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(a1200_state::rom_mirror32_r));
+	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
+	map(0xf00000, 0xf7ffff).noprw(); // cartridge space
+	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
+}
 
 // 2MB chip RAM, 4 MB fast RAM, RTC and IDE
-ADDRESS_MAP_START(a4000_state::a4000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x001fffff) AM_DEVICE("overlay", address_map_bank_device, amap32)
-	AM_RANGE(0x00200000, 0x009fffff) AM_NOP // zorro2 expansion
-	AM_RANGE(0x00a00000, 0x00b7ffff) AM_NOP
-	AM_RANGE(0x00b80000, 0x00beffff) AM_NOP
-	AM_RANGE(0x00bf0000, 0x00bfffff) AM_READWRITE16(cia_r, cia_w, 0xffffffff)
-	AM_RANGE(0x00c00000, 0x00cfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff)
-	AM_RANGE(0x00d00000, 0x00d9ffff) AM_NOP
-	AM_RANGE(0x00da0000, 0x00dbffff) AM_NOP
-	AM_RANGE(0x00dc0000, 0x00dcffff) AM_DEVREADWRITE8("rtc", rp5c01_device, read, write, 0x000000ff)
-	AM_RANGE(0x00dd0000, 0x00dd0fff) AM_NOP
-	AM_RANGE(0x00dd1000, 0x00dd3fff) AM_READWRITE16(ide_r, ide_w, 0xffffffff)
-	AM_RANGE(0x00dd4000, 0x00ddffff) AM_NOP
-	AM_RANGE(0x00de0000, 0x00deffff) AM_READWRITE(motherboard_r, motherboard_w)
-	AM_RANGE(0x00df0000, 0x00dfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff)
-	AM_RANGE(0x00e00000, 0x00e7ffff) AM_WRITENOP AM_READ(rom_mirror32_r)
-	AM_RANGE(0x00e80000, 0x00efffff) AM_NOP // zorro2 autoconfig space (installed by devices)
-	AM_RANGE(0x00f00000, 0x00f7ffff) AM_NOP // cartridge space
-	AM_RANGE(0x00f80000, 0x00ffffff) AM_ROM AM_REGION("kickstart", 0)
-	AM_RANGE(0x01000000, 0x017fffff) AM_NOP // reserved (8 mb chip ram)
-	AM_RANGE(0x01800000, 0x06ffffff) AM_NOP // reserved (motherboard fast ram expansion)
-	AM_RANGE(0x07000000, 0x07bfffff) AM_NOP // motherboard ram
-	AM_RANGE(0x07c00000, 0x07ffffff) AM_RAM // motherboard ram (up to 16mb), grows downward
-ADDRESS_MAP_END
+void a4000_state::a4000_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x001fffff).m(m_overlay, FUNC(address_map_bank_device::amap32));
+	map(0x00200000, 0x009fffff).noprw(); // zorro2 expansion
+	map(0x00a00000, 0x00b7ffff).noprw();
+	map(0x00b80000, 0x00beffff).noprw();
+	map(0x00bf0000, 0x00bfffff).rw(this, FUNC(a4000_state::cia_r), FUNC(a4000_state::cia_w));
+	map(0x00c00000, 0x00cfffff).rw(this, FUNC(a4000_state::custom_chip_r), FUNC(a4000_state::custom_chip_w));
+	map(0x00d00000, 0x00d9ffff).noprw();
+	map(0x00da0000, 0x00dbffff).noprw();
+	map(0x00dc0000, 0x00dcffff).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write)).umask32(0x000000ff);
+	map(0x00dd0000, 0x00dd0fff).noprw();
+	map(0x00dd1000, 0x00dd3fff).rw(this, FUNC(a4000_state::ide_r), FUNC(a4000_state::ide_w));
+	map(0x00dd4000, 0x00ddffff).noprw();
+	map(0x00de0000, 0x00deffff).rw(this, FUNC(a4000_state::motherboard_r), FUNC(a4000_state::motherboard_w));
+	map(0x00df0000, 0x00dfffff).rw(this, FUNC(a4000_state::custom_chip_r), FUNC(a4000_state::custom_chip_w));
+	map(0x00e00000, 0x00e7ffff).nopw().r(this, FUNC(a4000_state::rom_mirror32_r));
+	map(0x00e80000, 0x00efffff).noprw(); // zorro2 autoconfig space (installed by devices)
+	map(0x00f00000, 0x00f7ffff).noprw(); // cartridge space
+	map(0x00f80000, 0x00ffffff).rom().region("kickstart", 0);
+	map(0x01000000, 0x017fffff).noprw(); // reserved (8 mb chip ram)
+	map(0x01800000, 0x06ffffff).noprw(); // reserved (motherboard fast ram expansion)
+	map(0x07000000, 0x07bfffff).noprw(); // motherboard ram
+	map(0x07c00000, 0x07ffffff).ram(); // motherboard ram (up to 16mb), grows downward
+}
 
 // 2MB chip RAM, 2 MB fast RAM, RTC and IDE
-ADDRESS_MAP_START(a4000_state::a400030_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(a4000_mem)
-	AM_RANGE(0x07000000, 0x07dfffff) AM_NOP // motherboard ram
-	AM_RANGE(0x07e00000, 0x07ffffff) AM_RAM // motherboard ram (up to 16mb), grows downward
-ADDRESS_MAP_END
+void a4000_state::a400030_mem(address_map &map)
+{
+	map.unmap_value_high();
+	a4000_mem(map);
+	map(0x07000000, 0x07dfffff).noprw(); // motherboard ram
+	map(0x07e00000, 0x07ffffff).ram(); // motherboard ram (up to 16mb), grows downward
+}
 
 // 2MB chip RAM and CD-ROM
-ADDRESS_MAP_START(cd32_state::cd32_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap32)
-	AM_RANGE(0xb80000, 0xb8003f) AM_DEVREADWRITE("akiko", akiko_device, read, write)
-	AM_RANGE(0xbf0000, 0xbfffff) AM_READWRITE16(cia_r, gayle_cia_w, 0xffffffff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION("kickstart", 0x80000)
-	AM_RANGE(0xe80000, 0xf7ffff) AM_NOP
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void cd32_state::cd32_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap32));
+	map(0xb80000, 0xb8003f).rw("akiko", FUNC(akiko_device::read), FUNC(akiko_device::write));
+	map(0xbf0000, 0xbfffff).rw(this, FUNC(cd32_state::cia_r), FUNC(cd32_state::gayle_cia_w));
+	map(0xc00000, 0xdfffff).rw(this, FUNC(cd32_state::custom_chip_r), FUNC(cd32_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).rom().region("kickstart", 0x80000);
+	map(0xe80000, 0xf7ffff).noprw();
+	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
+}
 
 // 2 MB chip RAM, IDE, RTC and SCSI
-ADDRESS_MAP_START(a4000_state::a4000t_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(a4000_mem)
-	AM_RANGE(0x00dd0000, 0x00dd0fff) AM_READWRITE(scsi_r, scsi_w)
-ADDRESS_MAP_END
+void a4000_state::a4000t_mem(address_map &map)
+{
+	map.unmap_value_high();
+	a4000_mem(map);
+	map(0x00dd0000, 0x00dd0fff).rw(this, FUNC(a4000_state::scsi_r), FUNC(a4000_state::scsi_w));
+}
 
 
 //**************************************************************************

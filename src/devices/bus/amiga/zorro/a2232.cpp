@@ -30,20 +30,21 @@ DEFINE_DEVICE_TYPE(A2232, a2232_device, "a2232", "CBM A2232 Serial Card")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-ADDRESS_MAP_START(a2232_device::iocpu_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("shared")
-	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(acia_0_r, acia_0_w)
-	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(acia_1_r, acia_1_w)
-	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(acia_2_r, acia_2_w)
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(acia_3_r, acia_3_w)
-	AM_RANGE(0x6000, 0x67ff) AM_READWRITE(acia_4_r, acia_4_w)
-	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(acia_5_r, acia_5_w)
-	AM_RANGE(0x7000, 0x73ff) AM_WRITE(int2_w)
-	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(acia_6_r, acia_6_w)
-	AM_RANGE(0x7800, 0x7fff) AM_READWRITE(cia_r, cia_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(irq_ack8_w)
-	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("shared")
-ADDRESS_MAP_END
+void a2232_device::iocpu_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().share("shared");
+	map(0x4000, 0x47ff).rw(this, FUNC(a2232_device::acia_0_r), FUNC(a2232_device::acia_0_w));
+	map(0x4800, 0x4fff).rw(this, FUNC(a2232_device::acia_1_r), FUNC(a2232_device::acia_1_w));
+	map(0x5000, 0x57ff).rw(this, FUNC(a2232_device::acia_2_r), FUNC(a2232_device::acia_2_w));
+	map(0x5800, 0x5fff).rw(this, FUNC(a2232_device::acia_3_r), FUNC(a2232_device::acia_3_w));
+	map(0x6000, 0x67ff).rw(this, FUNC(a2232_device::acia_4_r), FUNC(a2232_device::acia_4_w));
+	map(0x6800, 0x6fff).rw(this, FUNC(a2232_device::acia_5_r), FUNC(a2232_device::acia_5_w));
+	map(0x7000, 0x73ff).w(this, FUNC(a2232_device::int2_w));
+	map(0x7400, 0x77ff).rw(this, FUNC(a2232_device::acia_6_r), FUNC(a2232_device::acia_6_w));
+	map(0x7800, 0x7fff).rw(this, FUNC(a2232_device::cia_r), FUNC(a2232_device::cia_w));
+	map(0x8000, 0x8000).w(this, FUNC(a2232_device::irq_ack8_w));
+	map(0xc000, 0xffff).ram().share("shared");
+}
 
 MACHINE_CONFIG_START(a2232_device::device_add_mconfig)
 	// main cpu

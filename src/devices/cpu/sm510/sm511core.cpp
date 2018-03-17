@@ -20,8 +20,8 @@
 
 
 // MCU types
-DEFINE_DEVICE_TYPE(SM511, sm511_device, "sm511", "SM511") // 4Kx8 ROM, 128x4 RAM(32x4 for LCD), melody controller
-DEFINE_DEVICE_TYPE(SM512, sm512_device, "sm512", "SM512") // 4Kx8 ROM, 128x4 RAM(48x4 for LCD), melody controller
+DEFINE_DEVICE_TYPE(SM511, sm511_device, "sm511", "Sharp SM511") // 4Kx8 ROM, 128x4 RAM(32x4 for LCD), melody controller
+DEFINE_DEVICE_TYPE(SM512, sm512_device, "sm512", "Sharp SM512") // 4Kx8 ROM, 128x4 RAM(48x4 for LCD), melody controller
 
 
 // internal memory maps

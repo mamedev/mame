@@ -138,23 +138,24 @@ WRITE_LINE_MEMBER(jackpool_state::map_vreg_w)
 	m_map_vreg = state;
 }
 
-ADDRESS_MAP_START(jackpool_state::jackpool_mem)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x120000, 0x1200ff) AM_RAM
-	AM_RANGE(0x340000, 0x347fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x348000, 0x34ffff) AM_RAM //<- vram banks 2 & 3?
+void jackpool_state::jackpool_mem(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x120000, 0x1200ff).ram();
+	map(0x340000, 0x347fff).ram().share("vram");
+	map(0x348000, 0x34ffff).ram(); //<- vram banks 2 & 3?
 
-	AM_RANGE(0x360000, 0x3603ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x380000, 0x38002f) AM_READ8(jackpool_io_r, 0x00ff)
-	AM_RANGE(0x380030, 0x38003f) AM_DEVWRITE8("latch1", ls259_device, write_d0, 0x00ff)
-	AM_RANGE(0x380040, 0x38004f) AM_DEVWRITE8("latch2", ls259_device, write_d0, 0x00ff)
-	AM_RANGE(0x380050, 0x38005f) AM_DEVWRITE8("latch3", ls259_device, write_d0, 0x00ff)
-	AM_RANGE(0x380060, 0x380061) AM_WRITENOP // another single-bit output?
+	map(0x360000, 0x3603ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x380000, 0x38002f).r(this, FUNC(jackpool_state::jackpool_io_r)).umask16(0x00ff);
+	map(0x380030, 0x38003f).w("latch1", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x380040, 0x38004f).w("latch2", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x380050, 0x38005f).w("latch3", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x380060, 0x380061).nopw(); // another single-bit output?
 
-	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("uart", ns16550_device, ins8250_r, ins8250_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+	map(0x800000, 0x80000f).rw("uart", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask16(0x00ff);
+	map(0xa00001, 0xa00001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 static INPUT_PORTS_START( jackpool )

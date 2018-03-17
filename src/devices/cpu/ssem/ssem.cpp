@@ -75,7 +75,7 @@ inline void ssem_device::program_write32(uint32_t address, uint32_t data)
 
 /*****************************************************************************/
 
-DEFINE_DEVICE_TYPE(SSEMCPU, ssem_device, "ssem_cpu", "SSEM CPU")
+DEFINE_DEVICE_TYPE(SSEMCPU, ssem_device, "ssem_cpu", "Manchester SSEM")
 
 //-------------------------------------------------
 //  ssem_device - constructor

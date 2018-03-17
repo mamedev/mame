@@ -344,157 +344,166 @@ WRITE8_MEMBER(gei_state::signature_w)
 	}
 }
 
-ADDRESS_MAP_START(gei_state::getrivia_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x600f, 0x600f) AM_WRITE(banksel_w<8>)
-	AM_RANGE(0x6017, 0x6017) AM_WRITE(banksel_w<6>)
-	AM_RANGE(0x601b, 0x601b) AM_WRITE(banksel_w<4>)
-	AM_RANGE(0x601d, 0x601d) AM_WRITE(banksel_w<2>)
-	AM_RANGE(0x601e, 0x601e) AM_WRITE(banksel_w<0>)
-	AM_RANGE(0x608f, 0x608f) AM_WRITE(banksel_w<9>)
-	AM_RANGE(0x6097, 0x6097) AM_WRITE(banksel_w<7>)
-	AM_RANGE(0x609b, 0x609b) AM_WRITE(banksel_w<5>)
-	AM_RANGE(0x609d, 0x609d) AM_WRITE(banksel_w<3>)
-	AM_RANGE(0x609e, 0x609e) AM_WRITE(banksel_w<1>)
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROM /* space for diagnostic ROM? */
-	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
-ADDRESS_MAP_END
+void gei_state::getrivia_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).bankr("rombank");
+	map(0x4000, 0x47ff).ram().share("nvram");
+	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x600f, 0x600f).w(this, FUNC(gei_state::banksel_w<8>));
+	map(0x6017, 0x6017).w(this, FUNC(gei_state::banksel_w<6>));
+	map(0x601b, 0x601b).w(this, FUNC(gei_state::banksel_w<4>));
+	map(0x601d, 0x601d).w(this, FUNC(gei_state::banksel_w<2>));
+	map(0x601e, 0x601e).w(this, FUNC(gei_state::banksel_w<0>));
+	map(0x608f, 0x608f).w(this, FUNC(gei_state::banksel_w<9>));
+	map(0x6097, 0x6097).w(this, FUNC(gei_state::banksel_w<7>));
+	map(0x609b, 0x609b).w(this, FUNC(gei_state::banksel_w<5>));
+	map(0x609d, 0x609d).w(this, FUNC(gei_state::banksel_w<3>));
+	map(0x609e, 0x609e).w(this, FUNC(gei_state::banksel_w<1>));
+	map(0x8000, 0x8002).w(this, FUNC(gei_state::gei_drawctrl_w));
+	map(0x8000, 0x9fff).rom(); /* space for diagnostic ROM? */
+	map(0xa000, 0xbfff).rom();
+	map(0xc000, 0xffff).ram().w(this, FUNC(gei_state::gei_bitmap_w));
+}
 
-ADDRESS_MAP_START(gei_state::gselect_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")
-	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4400, 0x4400) AM_WRITE(banksel_w<0>)
-	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_w<1>)
-	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_w<2>)
-	AM_RANGE(0x4403, 0x4403) AM_WRITE(banksel_w<3>)
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
-ADDRESS_MAP_END
+void gei_state::gselect_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).bankr("rombank");
+	map(0x4000, 0x40ff).ram().share("nvram");
+	map(0x4400, 0x4400).w(this, FUNC(gei_state::banksel_w<0>));
+	map(0x4401, 0x4401).w(this, FUNC(gei_state::banksel_w<1>));
+	map(0x4402, 0x4402).w(this, FUNC(gei_state::banksel_w<2>));
+	map(0x4403, 0x4403).w(this, FUNC(gei_state::banksel_w<3>));
+	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x8000, 0x8002).w(this, FUNC(gei_state::gei_drawctrl_w));
+	map(0xc000, 0xffff).ram().w(this, FUNC(gei_state::gei_bitmap_w));
+}
 
 // TODO: where are mapped the lower 0x2000 bytes of the banks?
-ADDRESS_MAP_START(gei_state::amuse_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x606f, 0x606f) AM_WRITE(banksel_w<8>)
-	AM_RANGE(0x6077, 0x6077) AM_WRITE(banksel_w<6>)
-	AM_RANGE(0x607b, 0x607b) AM_WRITE(banksel_w<4>)
-	AM_RANGE(0x607d, 0x607d) AM_WRITE(banksel_w<2>)
-	AM_RANGE(0x607e, 0x607e) AM_WRITE(banksel_w<0>)
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
-ADDRESS_MAP_END
+void gei_state::amuse_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).bankr("rombank");
+	map(0x4000, 0x47ff).ram().share("nvram");
+	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x606f, 0x606f).w(this, FUNC(gei_state::banksel_w<8>));
+	map(0x6077, 0x6077).w(this, FUNC(gei_state::banksel_w<6>));
+	map(0x607b, 0x607b).w(this, FUNC(gei_state::banksel_w<4>));
+	map(0x607d, 0x607d).w(this, FUNC(gei_state::banksel_w<2>));
+	map(0x607e, 0x607e).w(this, FUNC(gei_state::banksel_w<0>));
+	map(0x8000, 0x8002).w(this, FUNC(gei_state::gei_drawctrl_w));
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xffff).ram().w(this, FUNC(gei_state::gei_bitmap_w));
+}
 
-ADDRESS_MAP_START(gei_state::gepoker_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x60ef, 0x60ef) AM_WRITE(banksel_w<4>)
-	AM_RANGE(0x60f7, 0x60f7) AM_WRITE(banksel_w<3>)
-	AM_RANGE(0x60fb, 0x60fb) AM_WRITE(banksel_w<2>)
-	AM_RANGE(0x60fd, 0x60fd) AM_WRITE(banksel_w<1>)
-	AM_RANGE(0x60fe, 0x60fe) AM_WRITE(banksel_w<0>)
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
-	AM_RANGE(0x8000, 0xbfff) AM_ROM /* space for diagnostic ROM? */
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void gei_state::gepoker_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).bankr("rombank");
+	map(0x4000, 0x47ff).ram().share("nvram");
+	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x60ef, 0x60ef).w(this, FUNC(gei_state::banksel_w<4>));
+	map(0x60f7, 0x60f7).w(this, FUNC(gei_state::banksel_w<3>));
+	map(0x60fb, 0x60fb).w(this, FUNC(gei_state::banksel_w<2>));
+	map(0x60fd, 0x60fd).w(this, FUNC(gei_state::banksel_w<1>));
+	map(0x60fe, 0x60fe).w(this, FUNC(gei_state::banksel_w<0>));
+	map(0x8000, 0x8002).w(this, FUNC(gei_state::gei_drawctrl_w));
+	map(0x8000, 0xbfff).rom(); /* space for diagnostic ROM? */
+	map(0xc000, 0xffff).ram().w(this, FUNC(gei_state::gei_bitmap_w));
+	map(0xe000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(gei_state::amuse1_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4400, 0x4400) AM_WRITE(banksel_w<0>)
-	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_w<2>)
-	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_w<4>)
-	AM_RANGE(0x4403, 0x4403) AM_WRITE(banksel_w<6>)
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x5800, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
-	AM_RANGE(0x8000, 0xbfff) AM_ROM /* space for diagnostic ROM? */
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void gei_state::amuse1_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).bankr("rombank");
+	map(0x4000, 0x43ff).ram().share("nvram");
+	map(0x4400, 0x4400).w(this, FUNC(gei_state::banksel_w<0>));
+	map(0x4401, 0x4401).w(this, FUNC(gei_state::banksel_w<2>));
+	map(0x4402, 0x4402).w(this, FUNC(gei_state::banksel_w<4>));
+	map(0x4403, 0x4403).w(this, FUNC(gei_state::banksel_w<6>));
+	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5800, 0x5fff).rom();
+	map(0x8000, 0x8002).w(this, FUNC(gei_state::gei_drawctrl_w));
+	map(0x8000, 0xbfff).rom(); /* space for diagnostic ROM? */
+	map(0xc000, 0xffff).ram().w(this, FUNC(gei_state::gei_bitmap_w));
+	map(0xe000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(gei_state::findout_map)
-	AM_RANGE(0x0000, 0xffff) AM_READ(catchall)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+void gei_state::findout_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(this, FUNC(gei_state::catchall));
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram().share("nvram");
+	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	/* banked ROMs are enabled by low 6 bits of the address */
-	AM_RANGE(0x601f, 0x601f) AM_WRITE(banksel_w<0>)
-	AM_RANGE(0x602f, 0x602f) AM_WRITE(banksel_w<5>)
-	AM_RANGE(0x6037, 0x6037) AM_WRITE(banksel_w<4>)
-	AM_RANGE(0x603b, 0x603b) AM_WRITE(banksel_w<3>)
-	AM_RANGE(0x603d, 0x603d) AM_WRITE(banksel_w<2>)
-	AM_RANGE(0x603e, 0x603e) AM_WRITE(banksel_w<1>)
-	AM_RANGE(0x6200, 0x6200) AM_WRITE(signature_w)
-	AM_RANGE(0x6400, 0x6400) AM_READ(signature_r)
-	AM_RANGE(0x7800, 0x7fff) AM_ROM /*space for diagnostic ROM?*/
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("rombank")
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(gei_bitmap_w)
-ADDRESS_MAP_END
+	map(0x601f, 0x601f).w(this, FUNC(gei_state::banksel_w<0>));
+	map(0x602f, 0x602f).w(this, FUNC(gei_state::banksel_w<5>));
+	map(0x6037, 0x6037).w(this, FUNC(gei_state::banksel_w<4>));
+	map(0x603b, 0x603b).w(this, FUNC(gei_state::banksel_w<3>));
+	map(0x603d, 0x603d).w(this, FUNC(gei_state::banksel_w<2>));
+	map(0x603e, 0x603e).w(this, FUNC(gei_state::banksel_w<1>));
+	map(0x6200, 0x6200).w(this, FUNC(gei_state::signature_w));
+	map(0x6400, 0x6400).r(this, FUNC(gei_state::signature_r));
+	map(0x7800, 0x7fff).rom(); /*space for diagnostic ROM?*/
+	map(0x8000, 0xffff).bankr("rombank");
+	map(0x8000, 0x8002).w(this, FUNC(gei_state::gei_drawctrl_w));
+	map(0xc000, 0xffff).w(this, FUNC(gei_state::gei_bitmap_w));
+}
 
-ADDRESS_MAP_START(gei_state::quizvid_map)
-	AM_RANGE(0x0000, 0xffff) AM_READ(catchall)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+void gei_state::quizvid_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(this, FUNC(gei_state::catchall));
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram().share("nvram");
+	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	/* banked ROMs are enabled by low 6 bits of the address */
-	AM_RANGE(0x602f, 0x602f) AM_READ(banksel_r<5>)
-	AM_RANGE(0x6037, 0x6037) AM_READ(banksel_r<4>)
-	AM_RANGE(0x603b, 0x603b) AM_READ(banksel_r<3>)
-	AM_RANGE(0x603d, 0x603d) AM_READ(banksel_r<2>)
-	AM_RANGE(0x603e, 0x603e) AM_READ(banksel_r<1>)
-	AM_RANGE(0x7800, 0x7fff) AM_ROM /*space for diagnostic ROM?*/
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("rombank")
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(gei_bitmap_w)
-ADDRESS_MAP_END
+	map(0x602f, 0x602f).r(this, FUNC(gei_state::banksel_r<5>));
+	map(0x6037, 0x6037).r(this, FUNC(gei_state::banksel_r<4>));
+	map(0x603b, 0x603b).r(this, FUNC(gei_state::banksel_r<3>));
+	map(0x603d, 0x603d).r(this, FUNC(gei_state::banksel_r<2>));
+	map(0x603e, 0x603e).r(this, FUNC(gei_state::banksel_r<1>));
+	map(0x7800, 0x7fff).rom(); /*space for diagnostic ROM?*/
+	map(0x8000, 0xffff).bankr("rombank");
+	map(0x8000, 0x8002).w(this, FUNC(gei_state::gei_drawctrl_w));
+	map(0xc000, 0xffff).w(this, FUNC(gei_state::gei_bitmap_w));
+}
 
-ADDRESS_MAP_START(gei_state::suprpokr_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x6200, 0x6200) AM_WRITE(signature_w)
-	AM_RANGE(0x6400, 0x6400) AM_READ(signature_r)
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(gei_bitmap_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void gei_state::suprpokr_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram().share("nvram");
+	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6200, 0x6200).w(this, FUNC(gei_state::signature_w));
+	map(0x6400, 0x6400).r(this, FUNC(gei_state::signature_r));
+	map(0x8000, 0x8002).w(this, FUNC(gei_state::gei_drawctrl_w));
+	map(0xc000, 0xffff).w(this, FUNC(gei_state::gei_bitmap_w));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(gei_state::sprtauth_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x5600, 0x5600) AM_READ(signature_r)
-	AM_RANGE(0x5800, 0x5800) AM_WRITE(signature_w)
-	AM_RANGE(0x5a00, 0x5cff) AM_WRITE(geimulti_bank_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("rombank")
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(gei_bitmap_w)
-ADDRESS_MAP_END
+void gei_state::sprtauth_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram().share("nvram");
+	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5600, 0x5600).r(this, FUNC(gei_state::signature_r));
+	map(0x5800, 0x5800).w(this, FUNC(gei_state::signature_w));
+	map(0x5a00, 0x5cff).w(this, FUNC(gei_state::geimulti_bank_w));
+	map(0x6000, 0x7fff).rom();
+	map(0x8000, 0x8002).w(this, FUNC(gei_state::gei_drawctrl_w));
+	map(0x8000, 0xffff).bankr("rombank");
+	map(0xc000, 0xffff).w(this, FUNC(gei_state::gei_bitmap_w));
+}
 
 static INPUT_PORTS_START(reelfun_standard)
 	PORT_START("IN0")

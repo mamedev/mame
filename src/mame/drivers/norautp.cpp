@@ -829,22 +829,24 @@ READ8_MEMBER(norautp_state::test2_r)
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
 
 */
-ADDRESS_MAP_START(norautp_state::norautp_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("nvram")   /* 6116 */
-ADDRESS_MAP_END
+void norautp_state::norautp_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram().share("nvram");   /* 6116 */
+}
 
-ADDRESS_MAP_START(norautp_state::norautp_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xa0, 0xa3) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
+void norautp_state::norautp_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x60, 0x63).mirror(0x1c).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa0, 0xa3).mirror(0x1c).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc0, 0xc3).mirror(0x3c).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	//AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3c) AM_READWRITE(vram_data_r, vram_data_w)
 	//AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3c) AM_WRITE(vram_addr_w)
 	//AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x3c) AM_READ(test_r)
-	AM_RANGE(0xef, 0xef) AM_READ(test2_r)
-ADDRESS_MAP_END
+	map(0xef, 0xef).r(this, FUNC(norautp_state::test2_r));
+}
 
 /*
   Video RAM R/W:
@@ -860,23 +862,26 @@ ADDRESS_MAP_END
 
 */
 
-ADDRESS_MAP_START(norautp_state::nortest1_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void norautp_state::nortest1_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x2fff).rom();
+	map(0x5000, 0x57ff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(norautp_state::norautxp_map)
+void norautp_state::norautxp_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(~0x4000)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM /* need to be checked */
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram") /* HM6116 */
-ADDRESS_MAP_END
+	map.global_mask(0x7fff);
+	map(0x0000, 0x3fff).rom(); /* need to be checked */
+	map(0x6000, 0x67ff).ram().share("nvram"); /* HM6116 */
+}
 
-ADDRESS_MAP_START(norautp_state::norautx4_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram") /* 6116 */
-ADDRESS_MAP_END
+void norautp_state::norautx4_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x6000, 0x67ff).ram().share("nvram"); /* 6116 */
+}
 
 #ifdef UNUSED_CODE
 ADDRESS_MAP_START(norautp_state::norautx8_map)
@@ -885,11 +890,12 @@ ADDRESS_MAP_START(norautp_state::norautx8_map)
 ADDRESS_MAP_END
 #endif
 
-ADDRESS_MAP_START(norautp_state::kimble_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM /* working RAM? */
-ADDRESS_MAP_END
+void norautp_state::kimble_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram().share("nvram");
+	map(0xc800, 0xc9ff).ram(); /* working RAM? */
+}
 
 #ifdef UNUSED_CODE
 ADDRESS_MAP_START(norautp_state::norautxp_portmap)
@@ -897,37 +903,42 @@ ADDRESS_MAP_START(norautp_state::norautxp_portmap)
 ADDRESS_MAP_END
 #endif
 
-ADDRESS_MAP_START(norautp_state::newhilop_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")   /* 6116 */
-ADDRESS_MAP_END
+void norautp_state::newhilop_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0xd000, 0xd7ff).ram().share("nvram");   /* 6116 */
+}
 
 /*********** 8080 based **********/
 
-ADDRESS_MAP_START(norautp_state::dphl_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 not connected */
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("nvram")   /* should be 2x 0x100 segments (4x 2111) */
-ADDRESS_MAP_END
+void norautp_state::dphl_map(address_map &map)
+{
+	map.global_mask(0x7fff); /* A15 not connected */
+	map(0x0000, 0x3fff).rom();
+	map(0x5000, 0x53ff).ram().share("nvram");   /* should be 2x 0x100 segments (4x 2111) */
+}
 
-ADDRESS_MAP_START(norautp_state::dphla_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void norautp_state::dphla_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(norautp_state::ssjkrpkr_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void norautp_state::ssjkrpkr_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x43ff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(norautp_state::dphltest_map)
+void norautp_state::dphltest_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 not connected */
-	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x7fff).ram();
+	map(0x8000, 0x87ff).ram().share("nvram");
+}
 
 /*
   Kimble:
@@ -942,17 +953,19 @@ ADDRESS_MAP_END
   The code read on port $62, when is suppossed to be set as output.
 
 */
-ADDRESS_MAP_START(norautp_state::kimbldhl_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void norautp_state::kimbldhl_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(norautp_state::drhl_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 not connected */
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x5400, 0x57ff) AM_RAM
-ADDRESS_MAP_END
+void norautp_state::drhl_map(address_map &map)
+{
+	map.global_mask(0x7fff); /* A15 not connected */
+	map(0x0000, 0x3fff).rom();
+	map(0x5000, 0x53ff).ram().share("nvram");
+	map(0x5400, 0x57ff).ram();
+}
 
 
 /*************************

@@ -1066,20 +1066,21 @@ WRITE_LINE_MEMBER(funworld_state::pia1_ca2_w)
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(funworld_state::funworld_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x4000, 0x4000) AM_READNOP
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void funworld_state::funworld_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2000, 0x2fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x4000, 0x4000).nopr();
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xffff).rom();
+}
 
 static uint8_t funquiz_question_bank = 0x80;
 
@@ -1100,55 +1101,58 @@ WRITE8_MEMBER(funworld_state::question_bank_w)
 	funquiz_question_bank = data;
 }
 
-ADDRESS_MAP_START(funworld_state::funquiz_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+void funworld_state::funquiz_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(question_bank_w)
+	map(0x1800, 0x1800).w(this, FUNC(funworld_state::question_bank_w));
 
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x4000, 0x7fff) AM_READ(questions_r)
+	map(0x2000, 0x2fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x4000, 0x7fff).r(this, FUNC(funworld_state::questions_r));
 
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xc000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(funworld_state::magicrd2_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2c00, 0x2cff) AM_RAM /* range for protection */
-	AM_RANGE(0x3600, 0x36ff) AM_RAM /* some games use $3603-05 range for protection */
-	AM_RANGE(0x3c00, 0x3cff) AM_RAM /* range for protection */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x6000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void funworld_state::magicrd2_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2c00, 0x2cff).ram(); /* range for protection */
+	map(0x3600, 0x36ff).ram(); /* some games use $3603-05 range for protection */
+	map(0x3c00, 0x3cff).ram(); /* range for protection */
+	map(0x4000, 0x4fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x5000, 0x5fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x6000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(funworld_state::cuoreuno_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads */
-	AM_RANGE(0x3e00, 0x3fff) AM_RAM /* some games use $3e03-05 range for protection */
-	AM_RANGE(0x4000, 0x5fff) AM_ROM /* used by rcdino4 (dino4 hw ) */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void funworld_state::cuoreuno_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2000, 0x2000).nopr(); /* some unknown reads */
+	map(0x3e00, 0x3fff).ram(); /* some games use $3e03-05 range for protection */
+	map(0x4000, 0x5fff).rom(); /* used by rcdino4 (dino4 hw ) */
+	map(0x6000, 0x6fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x8000, 0xffff).rom();
+}
 
 
 READ8_MEMBER(funworld_state::chinatow_r_32f0)
@@ -1162,51 +1166,54 @@ READ8_MEMBER(funworld_state::chinatow_r_32f0)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(funworld_state::chinatow_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads */
-	AM_RANGE(0x32f0, 0x32ff) AM_READ(chinatow_r_32f0)
-	AM_RANGE(0x4000, 0x5fff) AM_ROM /* used by rcdino4 (dino4 hw ) */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void funworld_state::chinatow_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2000, 0x2000).nopr(); /* some unknown reads */
+	map(0x32f0, 0x32ff).r(this, FUNC(funworld_state::chinatow_r_32f0));
+	map(0x4000, 0x5fff).rom(); /* used by rcdino4 (dino4 hw ) */
+	map(0x6000, 0x6fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(funworld_state::lunapark_map) // mirrored video RAM 4000/5000 to 6000/7000
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram") AM_MIRROR(0x2000)
-	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram") AM_MIRROR(0x2000)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void funworld_state::lunapark_map(address_map &map)
+{ // mirrored video RAM 4000/5000 to 6000/7000
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x4000, 0x4fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram").mirror(0x2000);
+	map(0x5000, 0x5fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram").mirror(0x2000);
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(funworld_state::saloon_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
-	AM_RANGE(0x0808, 0x0808) AM_READ_PORT("IN3") // maybe
-	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("IN4") // maybe
-	AM_RANGE(0x0a01, 0x0a01) AM_READ_PORT("IN1")
-	AM_RANGE(0x081c, 0x081c) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x081d, 0x081d) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN2")
-	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
+void funworld_state::saloon_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0800).portr("IN0");
+	map(0x0808, 0x0808).portr("IN3"); // maybe
+	map(0x0802, 0x0802).portr("IN4"); // maybe
+	map(0x0a01, 0x0a01).portr("IN1");
+	map(0x081c, 0x081c).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x081d, 0x081d).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x1000, 0x1000).portr("IN2");
+	map(0x1800, 0x1800).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x1800, 0x1801).w("ay8910", FUNC(ay8910_device::address_data_w));
 //  AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads... maybe a DSW */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x6000, 0x6fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x8000, 0xffff).rom();
+}
 
 /*
     Unknown R/W
@@ -1221,47 +1228,50 @@ ADDRESS_MAP_END
 
 */
 
-ADDRESS_MAP_START(funworld_state::witchryl_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void funworld_state::witchryl_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x4000, 0x4fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x5000, 0x5fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x6000, 0x6000).portr("DSW2");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(funworld_state::intergames_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)           // WRONG. just a placeholder...
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)  // WRONG. just a placeholder...
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x3001, 0x3001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE("pia0", pia6821_device, read, write)  // the bookkeeping mode requests a byte from $3400 to advance pages...
-	AM_RANGE(0x3800, 0x3803) AM_DEVREADWRITE("pia1", pia6821_device, read, write)  // WRONG. just a placeholder...
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void funworld_state::intergames_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));           // WRONG. just a placeholder...
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));  // WRONG. just a placeholder...
+	map(0x2000, 0x2fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x3001, 0x3001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x3400, 0x3403).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));  // the bookkeeping mode requests a byte from $3400 to advance pages...
+	map(0x3800, 0x3803).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));  // WRONG. just a placeholder...
+	map(0x7000, 0x7fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(funworld_state::fw_a7_11_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x4000, 0x4000) AM_READNOP
-	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void funworld_state::fw_a7_11_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2000, 0x2fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x4000, 0x4000).nopr();
+	map(0x8000, 0xbfff).ram();
+	map(0xc000, 0xffff).rom();
+}
 
 
 /*************************

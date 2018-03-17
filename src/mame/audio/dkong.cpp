@@ -1273,35 +1273,41 @@ WRITE8_MEMBER(dkong_state::dkong_audio_irq_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(dkong_state::dkong_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void dkong_state::dkong_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(dkong_state::dkong_sound_io_map)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(dkong_tune_r, dkong_voice_w)
-ADDRESS_MAP_END
+void dkong_state::dkong_sound_io_map(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(dkong_state::dkong_tune_r), FUNC(dkong_state::dkong_voice_w));
+}
 
-ADDRESS_MAP_START(dkong_state::dkongjr_sound_io_map)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVREAD("ls174.3d", latch8_device, read)
-ADDRESS_MAP_END
+void dkong_state::dkongjr_sound_io_map(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff).r("ls174.3d", FUNC(latch8_device::read));
+}
 
-ADDRESS_MAP_START(dkong_state::radarscp1_sound_io_map)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVREAD("ls175.3d", latch8_device, read)
-	AM_RANGE(0x00, 0xff) AM_WRITE(dkong_p1_w) /* DAC here */
-ADDRESS_MAP_END
+void dkong_state::radarscp1_sound_io_map(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff).r("ls175.3d", FUNC(latch8_device::read));
+	map(0x00, 0xff).w(this, FUNC(dkong_state::dkong_p1_w)); /* DAC here */
+}
 
-ADDRESS_MAP_START(dkong_state::dkong3_sound1_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x4016, 0x4016) AM_DEVREAD("latch1", latch8_device, read)       /* overwrite default */
-	AM_RANGE(0x4017, 0x4017) AM_DEVREAD("latch2", latch8_device, read)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dkong_state::dkong3_sound1_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x4016, 0x4016).r("latch1", FUNC(latch8_device::read));       /* overwrite default */
+	map(0x4017, 0x4017).r("latch2", FUNC(latch8_device::read));
+	map(0xe000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(dkong_state::dkong3_sound2_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x4016, 0x4016) AM_DEVREAD("latch3", latch8_device, read)       /* overwrite default */
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dkong_state::dkong3_sound2_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x4016, 0x4016).r("latch3", FUNC(latch8_device::read));       /* overwrite default */
+	map(0xe000, 0xffff).rom();
+}
 
 /*************************************
  *

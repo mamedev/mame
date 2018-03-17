@@ -82,26 +82,28 @@ private:
 //  ADDRESS_MAP( horizon_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(horizon_state::horizon_mem)
-	AM_RANGE(0x0000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xe9ff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0xea01, 0xea01)
-	AM_RANGE(0xea11, 0xea11)
-	AM_RANGE(0xea21, 0xea21)
-	AM_RANGE(0xea31, 0xea31)
-	AM_RANGE(0xeb10, 0xeb17) AM_READ(ff_r)
-	AM_RANGE(0xeb20, 0xeb20)
-	AM_RANGE(0xeb35, 0xeb35)
-	AM_RANGE(0xeb40, 0xeb40)
-ADDRESS_MAP_END
+void horizon_state::horizon_mem(address_map &map)
+{
+	map(0x0000, 0xe7ff).ram();
+	map(0xe800, 0xe9ff).rom().region("roms", 0);
+	map(0xea01, 0xea01);
+	map(0xea11, 0xea11);
+	map(0xea21, 0xea21);
+	map(0xea31, 0xea31);
+	map(0xeb10, 0xeb17).r(this, FUNC(horizon_state::ff_r));
+	map(0xeb20, 0xeb20);
+	map(0xeb35, 0xeb35);
+	map(0xeb40, 0xeb40);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( horizon_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(horizon_state::horizon_io)
-ADDRESS_MAP_END
+void horizon_state::horizon_io(address_map &map)
+{
+}
 
 
 

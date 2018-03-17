@@ -27,7 +27,6 @@
 
 #include "emu.h"
 #include "733_asr.h"
-#include "screen.h"
 
 enum
 {

@@ -135,17 +135,18 @@ ADDRESS_MAP_START(de_2_state::de_2_map)
     AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(de_2_state::de_2_audio_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x2400, 0x2400) AM_READ(sound_latch_r)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(sample_bank_w)
+void de_2_state::de_2_audio_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2001).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x2400, 0x2400).r(this, FUNC(de_2_state::sound_latch_r));
+	map(0x2800, 0x2800).w(this, FUNC(de_2_state::sample_bank_w));
 	// 0x2c00        - 4052(?)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(sample_w)
+	map(0x3000, 0x3000).w(this, FUNC(de_2_state::sample_w));
 	// 0x3800        - Watchdog reset
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("sample_bank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x4000, 0x7fff).bankr("sample_bank");
+	map(0x8000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( de_2 )
 	PORT_START("INP0")

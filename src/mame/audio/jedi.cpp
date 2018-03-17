@@ -163,24 +163,25 @@ WRITE8_MEMBER(jedi_state::speech_reset_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(jedi_state::audio_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x07c0) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
-	AM_RANGE(0x0810, 0x081f) AM_MIRROR(0x07c0) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
-	AM_RANGE(0x0820, 0x082f) AM_MIRROR(0x07c0) AM_DEVREADWRITE("pokey3", pokey_device, read, write)
-	AM_RANGE(0x0830, 0x083f) AM_MIRROR(0x07c0) AM_DEVREADWRITE("pokey4", pokey_device, read, write)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x00ff) AM_READNOP AM_WRITE(irq_ack_w)
-	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x00ff) AM_READNOP AM_WRITEONLY AM_SHARE("speech_data")
-	AM_RANGE(0x1200, 0x13ff) AM_READNOP AM_WRITE(speech_strobe_w)
-	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x00ff) AM_READNOP AM_WRITE(audio_ack_latch_w)
-	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x00ff) AM_READNOP AM_WRITE(speech_reset_w)
-	AM_RANGE(0x1600, 0x17ff) AM_NOP
-	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x03ff) AM_READ(audio_latch_r) AM_WRITENOP
-	AM_RANGE(0x1c00, 0x1c00) AM_MIRROR(0x03fe) AM_READ(speech_ready_r) AM_WRITENOP
-	AM_RANGE(0x1c01, 0x1c01) AM_MIRROR(0x03fe) AM_READONLY AM_WRITENOP AM_SHARE("audio_comm_stat")
-	AM_RANGE(0x2000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void jedi_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x080f).mirror(0x07c0).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x0810, 0x081f).mirror(0x07c0).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x0820, 0x082f).mirror(0x07c0).rw("pokey3", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x0830, 0x083f).mirror(0x07c0).rw("pokey4", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x1000, 0x1000).mirror(0x00ff).nopr().w(this, FUNC(jedi_state::irq_ack_w));
+	map(0x1100, 0x1100).mirror(0x00ff).nopr().writeonly().share("speech_data");
+	map(0x1200, 0x13ff).nopr().w(this, FUNC(jedi_state::speech_strobe_w));
+	map(0x1400, 0x1400).mirror(0x00ff).nopr().w(this, FUNC(jedi_state::audio_ack_latch_w));
+	map(0x1500, 0x1500).mirror(0x00ff).nopr().w(this, FUNC(jedi_state::speech_reset_w));
+	map(0x1600, 0x17ff).noprw();
+	map(0x1800, 0x1800).mirror(0x03ff).r(this, FUNC(jedi_state::audio_latch_r)).nopw();
+	map(0x1c00, 0x1c00).mirror(0x03fe).r(this, FUNC(jedi_state::speech_ready_r)).nopw();
+	map(0x1c01, 0x1c01).mirror(0x03fe).readonly().nopw().share("audio_comm_stat");
+	map(0x2000, 0x7fff).noprw();
+	map(0x8000, 0xffff).rom();
+}
 
 
 

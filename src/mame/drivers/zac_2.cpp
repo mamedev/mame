@@ -52,24 +52,27 @@ private:
 };
 
 
-ADDRESS_MAP_START(zac_2_state::zac_2_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x17ff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6400) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x2000, 0x27ff) AM_ROM
-	AM_RANGE(0x2800, 0x37ff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_ROM
-ADDRESS_MAP_END
+void zac_2_state::zac_2_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x17ff).mirror(0x4000).rom();
+	map(0x1800, 0x1bff).mirror(0x6400).ram().share("ram");
+	map(0x2000, 0x27ff).rom();
+	map(0x2800, 0x37ff).mirror(0x4000).rom();
+	map(0x4000, 0x47ff).rom();
+	map(0x6000, 0x67ff).rom();
+}
 
-ADDRESS_MAP_START(zac_2_state::zac_2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void zac_2_state::zac_2_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
-ADDRESS_MAP_START(zac_2_state::zac_2_data)
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(ctrl_r,ctrl_w)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(data_r,data_w)
-ADDRESS_MAP_END
+void zac_2_state::zac_2_data(address_map &map)
+{
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(zac_2_state::ctrl_r), FUNC(zac_2_state::ctrl_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(zac_2_state::data_r), FUNC(zac_2_state::data_w));
+}
 
 static INPUT_PORTS_START( zac_2 )
 	PORT_START("DSW")

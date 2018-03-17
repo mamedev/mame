@@ -458,83 +458,88 @@ d0 = read from bank 4 */
 	}
 }
 
-ADDRESS_MAP_START(camplynx_state::lynx48k_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0x1fff) AM_READ_BANK("bankr1")
-	AM_RANGE(0x2000,0x3fff) AM_READ_BANK("bankr2")
-	AM_RANGE(0x4000,0x5fff) AM_READ_BANK("bankr3")
-	AM_RANGE(0x6000,0x7fff) AM_READ_BANK("bankr4")
-	AM_RANGE(0x8000,0x9fff) AM_READ_BANK("bankr5")
-	AM_RANGE(0xa000,0xbfff) AM_READ_BANK("bankr6")
-	AM_RANGE(0xc000,0xdfff) AM_READ_BANK("bankr7")
-	AM_RANGE(0xe000,0xffff) AM_READ_BANK("bankr8")
-	AM_RANGE(0x0000,0xffff) AM_WRITE(bank6_w)
-ADDRESS_MAP_END
+void camplynx_state::lynx48k_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).bankr("bankr1");
+	map(0x2000, 0x3fff).bankr("bankr2");
+	map(0x4000, 0x5fff).bankr("bankr3");
+	map(0x6000, 0x7fff).bankr("bankr4");
+	map(0x8000, 0x9fff).bankr("bankr5");
+	map(0xa000, 0xbfff).bankr("bankr6");
+	map(0xc000, 0xdfff).bankr("bankr7");
+	map(0xe000, 0xffff).bankr("bankr8");
+	map(0x0000, 0xffff).w(this, FUNC(camplynx_state::bank6_w));
+}
 
-ADDRESS_MAP_START(camplynx_state::lynx128k_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0x1fff) AM_READ_BANK("bankr1")
-	AM_RANGE(0x2000,0x3fff) AM_READ_BANK("bankr2")
-	AM_RANGE(0x4000,0x5fff) AM_READ_BANK("bankr3")
-	AM_RANGE(0x6000,0x7fff) AM_READ_BANK("bankr4")
-	AM_RANGE(0x8000,0x9fff) AM_READ_BANK("bankr5")
-	AM_RANGE(0xa000,0xbfff) AM_READ_BANK("bankr6")
-	AM_RANGE(0xc000,0xdfff) AM_READ_BANK("bankr7")
-	AM_RANGE(0xe000,0xffff) AM_READ_BANK("bankr8")
-	AM_RANGE(0x0000,0xffff) AM_WRITE(bank1_w)
-ADDRESS_MAP_END
+void camplynx_state::lynx128k_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).bankr("bankr1");
+	map(0x2000, 0x3fff).bankr("bankr2");
+	map(0x4000, 0x5fff).bankr("bankr3");
+	map(0x6000, 0x7fff).bankr("bankr4");
+	map(0x8000, 0x9fff).bankr("bankr5");
+	map(0xa000, 0xbfff).bankr("bankr6");
+	map(0xc000, 0xdfff).bankr("bankr7");
+	map(0xe000, 0xffff).bankr("bankr8");
+	map(0x0000, 0xffff).w(this, FUNC(camplynx_state::bank1_w));
+}
 
-ADDRESS_MAP_START(camplynx_state::lynx48k_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x007f,0x007f) AM_MIRROR(0xff80) AM_WRITE(port7f_w)
-	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITE(port80_w)
-	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xf000) AM_READ(port80_r)
-	AM_RANGE(0x0180,0x0180) AM_MIRROR(0xf000) AM_READ_PORT("LINE1")
-	AM_RANGE(0x0280,0x0280) AM_MIRROR(0xf000) AM_READ_PORT("LINE2")
-	AM_RANGE(0x0380,0x0380) AM_MIRROR(0xf000) AM_READ_PORT("LINE3")
-	AM_RANGE(0x0480,0x0480) AM_MIRROR(0xf000) AM_READ_PORT("LINE4")
-	AM_RANGE(0x0580,0x0580) AM_MIRROR(0xf000) AM_READ_PORT("LINE5")
-	AM_RANGE(0x0680,0x0680) AM_MIRROR(0xf000) AM_READ_PORT("LINE6")
-	AM_RANGE(0x0780,0x0780) AM_MIRROR(0xf000) AM_READ_PORT("LINE7")
-	AM_RANGE(0x0880,0x0880) AM_MIRROR(0xf000) AM_READ_PORT("LINE8")
-	AM_RANGE(0x0980,0x0980) AM_MIRROR(0xf000) AM_READ_PORT("LINE9")
-	AM_RANGE(0x0084,0x0084) AM_MIRROR(0xff00) AM_WRITE(port84_w)
-	AM_RANGE(0x0086,0x0086) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x0087,0x0087) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-ADDRESS_MAP_END
+void camplynx_state::lynx48k_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x007f, 0x007f).mirror(0xff80).w(this, FUNC(camplynx_state::port7f_w));
+	map(0x0080, 0x0080).mirror(0xff00).w(this, FUNC(camplynx_state::port80_w));
+	map(0x0080, 0x0080).mirror(0xf000).r(this, FUNC(camplynx_state::port80_r));
+	map(0x0180, 0x0180).mirror(0xf000).portr("LINE1");
+	map(0x0280, 0x0280).mirror(0xf000).portr("LINE2");
+	map(0x0380, 0x0380).mirror(0xf000).portr("LINE3");
+	map(0x0480, 0x0480).mirror(0xf000).portr("LINE4");
+	map(0x0580, 0x0580).mirror(0xf000).portr("LINE5");
+	map(0x0680, 0x0680).mirror(0xf000).portr("LINE6");
+	map(0x0780, 0x0780).mirror(0xf000).portr("LINE7");
+	map(0x0880, 0x0880).mirror(0xf000).portr("LINE8");
+	map(0x0980, 0x0980).mirror(0xf000).portr("LINE9");
+	map(0x0084, 0x0084).mirror(0xff00).w(this, FUNC(camplynx_state::port84_w));
+	map(0x0086, 0x0086).mirror(0xff00).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x0087, 0x0087).mirror(0xff00).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
 
-ADDRESS_MAP_START(camplynx_state::lynx96k_io)
-	AM_IMPORT_FROM(lynx48k_io)
-	AM_RANGE(0x0050,0x0053) AM_MIRROR(0xff80) AM_DEVREAD("fdc", fd1793_device, read)
-	AM_RANGE(0x0054,0x0057) AM_MIRROR(0xff80) AM_DEVWRITE("fdc", fd1793_device, write)
-	AM_RANGE(0x0058,0x0058) AM_MIRROR(0xff80) AM_WRITE(port58_w)
-ADDRESS_MAP_END
+void camplynx_state::lynx96k_io(address_map &map)
+{
+	lynx48k_io(map);
+	map(0x0050, 0x0053).mirror(0xff80).r("fdc", FUNC(fd1793_device::read));
+	map(0x0054, 0x0057).mirror(0xff80).w("fdc", FUNC(fd1793_device::write));
+	map(0x0058, 0x0058).mirror(0xff80).w(this, FUNC(camplynx_state::port58_w));
+}
 
-ADDRESS_MAP_START(camplynx_state::lynx128k_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0050,0x0053) AM_MIRROR(0xff80) AM_DEVREAD("fdc", fd1793_device, read)
-	AM_RANGE(0x0054,0x0057) AM_MIRROR(0xff80) AM_DEVWRITE("fdc", fd1793_device, write)
-	AM_RANGE(0x0058,0x0058) AM_MIRROR(0xff80) AM_WRITE(port58_w)
+void camplynx_state::lynx128k_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0050, 0x0053).mirror(0xff80).r("fdc", FUNC(fd1793_device::read));
+	map(0x0054, 0x0057).mirror(0xff80).w("fdc", FUNC(fd1793_device::write));
+	map(0x0058, 0x0058).mirror(0xff80).w(this, FUNC(camplynx_state::port58_w));
 //  AM_RANGE(0x007a,0x007b) AM_MIRROR(0xff80) AM_READ(lynx128k_joysticks_r)
 //  AM_RANGE(0x007c,0x007c) AM_MIRROR(0xff80) AM_READ(lynx128k_printer_r)
 //  AM_RANGE(0x007d,0x007d) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_init_w) // this is rw
 //  AM_RANGE(0x007e,0x007e) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_w)
-	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITE(port80_w)
-	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xf000) AM_READ_PORT("LINE0")
-	AM_RANGE(0x0180,0x0180) AM_MIRROR(0xf000) AM_READ_PORT("LINE1")
-	AM_RANGE(0x0280,0x0280) AM_MIRROR(0xf000) AM_READ_PORT("LINE2")
-	AM_RANGE(0x0380,0x0380) AM_MIRROR(0xf000) AM_READ_PORT("LINE3")
-	AM_RANGE(0x0480,0x0480) AM_MIRROR(0xf000) AM_READ_PORT("LINE4")
-	AM_RANGE(0x0580,0x0580) AM_MIRROR(0xf000) AM_READ_PORT("LINE5")
-	AM_RANGE(0x0680,0x0680) AM_MIRROR(0xf000) AM_READ_PORT("LINE6")
-	AM_RANGE(0x0780,0x0780) AM_MIRROR(0xf000) AM_READ_PORT("LINE7")
-	AM_RANGE(0x0880,0x0880) AM_MIRROR(0xf000) AM_READ_PORT("LINE8")
-	AM_RANGE(0x0980,0x0980) AM_MIRROR(0xf000) AM_READ_PORT("LINE9")
-	AM_RANGE(0x0082,0x0082) AM_MIRROR(0xff00) AM_READWRITE(port82_r,port82_w) // read=serial buffer
-	AM_RANGE(0x0084,0x0084) AM_MIRROR(0xff00) AM_WRITE(port84_w)
-	AM_RANGE(0x0086,0x0086) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x0087,0x0087) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-ADDRESS_MAP_END
+	map(0x0080, 0x0080).mirror(0xff00).w(this, FUNC(camplynx_state::port80_w));
+	map(0x0080, 0x0080).mirror(0xf000).portr("LINE0");
+	map(0x0180, 0x0180).mirror(0xf000).portr("LINE1");
+	map(0x0280, 0x0280).mirror(0xf000).portr("LINE2");
+	map(0x0380, 0x0380).mirror(0xf000).portr("LINE3");
+	map(0x0480, 0x0480).mirror(0xf000).portr("LINE4");
+	map(0x0580, 0x0580).mirror(0xf000).portr("LINE5");
+	map(0x0680, 0x0680).mirror(0xf000).portr("LINE6");
+	map(0x0780, 0x0780).mirror(0xf000).portr("LINE7");
+	map(0x0880, 0x0880).mirror(0xf000).portr("LINE8");
+	map(0x0980, 0x0980).mirror(0xf000).portr("LINE9");
+	map(0x0082, 0x0082).mirror(0xff00).rw(this, FUNC(camplynx_state::port82_r), FUNC(camplynx_state::port82_w)); // read=serial buffer
+	map(0x0084, 0x0084).mirror(0xff00).w(this, FUNC(camplynx_state::port84_w));
+	map(0x0086, 0x0086).mirror(0xff00).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x0087, 0x0087).mirror(0xff00).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( lynx48k )

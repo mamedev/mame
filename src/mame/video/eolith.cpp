@@ -6,7 +6,7 @@
 
 WRITE16_MEMBER(eolith_state::eolith_vram_w)
 {
-	if ((mem_mask == 0xffff) && (data & ~0x8000))
+	if ((mem_mask == 0xffff) && (~data & 0x8000))
 	{
 		// candy needs this to always write to RAM (verified that certain glitches, for example the high score table, don't occur on real hw)
 		// other games clearly don't.

@@ -64,33 +64,36 @@ private:
 };
 
 
-ADDRESS_MAP_START(rowamet_state::rowamet_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("X0")
-	AM_RANGE(0x2801, 0x2801) AM_READ_PORT("X1")
-	AM_RANGE(0x2802, 0x2802) AM_READ_PORT("X2")
-	AM_RANGE(0x2803, 0x2803) AM_READ_PORT("X3")
-	AM_RANGE(0x2804, 0x2804) AM_READ_PORT("X4")
-	AM_RANGE(0x2805, 0x2805) AM_READ_PORT("X5")
-	AM_RANGE(0x2806, 0x2806) AM_READ_PORT("X6")
-	AM_RANGE(0x2807, 0x2807) AM_READ_PORT("X7")
-	AM_RANGE(0x2808, 0x2808) AM_READ_PORT("X8")
-	AM_RANGE(0x4000, 0x407f) AM_RAM
-	AM_RANGE(0x4080, 0x408f) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x4090, 0x409f) AM_READWRITE(io_r,io_w)
-	AM_RANGE(0x40a0, 0x40ff) AM_RAM
-ADDRESS_MAP_END
+void rowamet_state::rowamet_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("roms", 0);
+	map(0x2800, 0x2800).portr("X0");
+	map(0x2801, 0x2801).portr("X1");
+	map(0x2802, 0x2802).portr("X2");
+	map(0x2803, 0x2803).portr("X3");
+	map(0x2804, 0x2804).portr("X4");
+	map(0x2805, 0x2805).portr("X5");
+	map(0x2806, 0x2806).portr("X6");
+	map(0x2807, 0x2807).portr("X7");
+	map(0x2808, 0x2808).portr("X8");
+	map(0x4000, 0x407f).ram();
+	map(0x4080, 0x408f).ram().share("ram");
+	map(0x4090, 0x409f).rw(this, FUNC(rowamet_state::io_r), FUNC(rowamet_state::io_w));
+	map(0x40a0, 0x40ff).ram();
+}
 
-ADDRESS_MAP_START(rowamet_state::rowamet_sub_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0x2000)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM
-ADDRESS_MAP_END
+void rowamet_state::rowamet_sub_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("roms", 0x2000);
+	map(0x1000, 0x17ff).ram();
+}
 
-ADDRESS_MAP_START(rowamet_state::rowamet_sub_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(sound_r,mute_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("dac", dac_byte_interface, write)
-ADDRESS_MAP_END
+void rowamet_state::rowamet_sub_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(this, FUNC(rowamet_state::sound_r), FUNC(rowamet_state::mute_w));
+	map(0x01, 0x01).w("dac", FUNC(dac_byte_interface::write));
+}
 
 static INPUT_PORTS_START( rowamet )
 	PORT_START("X0")

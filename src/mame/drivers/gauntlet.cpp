@@ -272,37 +272,38 @@ WRITE8_MEMBER(gauntlet_state::mixer_w)
  *************************************/
 
 /* full map verified from schematics */
-ADDRESS_MAP_START(gauntlet_state::main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x037fff) AM_MIRROR(0x280000) AM_ROM
-	AM_RANGE(0x038000, 0x03ffff) AM_MIRROR(0x280000) AM_ROM /* slapstic maps here */
-	AM_RANGE(0x040000, 0x07ffff) AM_MIRROR(0x280000) AM_ROM
+void gauntlet_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x037fff).mirror(0x280000).rom();
+	map(0x038000, 0x03ffff).mirror(0x280000).rom(); /* slapstic maps here */
+	map(0x040000, 0x07ffff).mirror(0x280000).rom();
 
 	/* MBUS */
-	AM_RANGE(0x800000, 0x801fff) AM_MIRROR(0x2fc000) AM_RAM
-	AM_RANGE(0x802000, 0x802fff) AM_MIRROR(0x2fc000) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0x803000, 0x803001) AM_MIRROR(0x2fcef0) AM_READ_PORT("803000")
-	AM_RANGE(0x803002, 0x803003) AM_MIRROR(0x2fcef0) AM_READ_PORT("803002")
-	AM_RANGE(0x803004, 0x803005) AM_MIRROR(0x2fcef0) AM_READ_PORT("803004")
-	AM_RANGE(0x803006, 0x803007) AM_MIRROR(0x2fcef0) AM_READ_PORT("803006")
-	AM_RANGE(0x803008, 0x803009) AM_MIRROR(0x2fcef0) AM_READ_PORT("803008")
-	AM_RANGE(0x80300e, 0x80300f) AM_MIRROR(0x2fcef0) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
-	AM_RANGE(0x803100, 0x803101) AM_MIRROR(0x2fce8e) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x803120, 0x803121) AM_MIRROR(0x2fce8e) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
-	AM_RANGE(0x803140, 0x803141) AM_MIRROR(0x2fce8e) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0x803150, 0x803151) AM_MIRROR(0x2fce8e) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0x803170, 0x803171) AM_MIRROR(0x2fce8e) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
+	map(0x800000, 0x801fff).mirror(0x2fc000).ram();
+	map(0x802000, 0x802fff).mirror(0x2fc000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x803000, 0x803001).mirror(0x2fcef0).portr("803000");
+	map(0x803002, 0x803003).mirror(0x2fcef0).portr("803002");
+	map(0x803004, 0x803005).mirror(0x2fcef0).portr("803004");
+	map(0x803006, 0x803007).mirror(0x2fcef0).portr("803006");
+	map(0x803008, 0x803009).mirror(0x2fcef0).portr("803008");
+	map(0x80300f, 0x80300f).mirror(0x2fcef0).r(m_soundcomm, FUNC(atari_sound_comm_device::main_response_r));
+	map(0x803100, 0x803101).mirror(0x2fce8e).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x803120, 0x803121).mirror(0x2fce8e).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_reset_w));
+	map(0x803140, 0x803141).mirror(0x2fce8e).w(this, FUNC(gauntlet_state::video_int_ack_w));
+	map(0x803150, 0x803151).mirror(0x2fce8e).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0x803171, 0x803171).mirror(0x2fce8e).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w));
 
 	/* VBUS */
-	AM_RANGE(0x900000, 0x901fff) AM_MIRROR(0x2c8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0x902000, 0x903fff) AM_MIRROR(0x2c8000) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0x904000, 0x904fff) AM_MIRROR(0x2c8000) AM_RAM
-	AM_RANGE(0x905000, 0x905f7f) AM_MIRROR(0x2c8000) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
-	AM_RANGE(0x905f6e, 0x905f6f) AM_MIRROR(0x2c8000) AM_RAM_WRITE(gauntlet_yscroll_w) AM_SHARE("yscroll")
-	AM_RANGE(0x905f80, 0x905fff) AM_MIRROR(0x2c8000) AM_RAM AM_SHARE("mob:slip")
-	AM_RANGE(0x910000, 0x9107ff) AM_MIRROR(0x2cf800) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x930000, 0x930001) AM_MIRROR(0x2cfffe) AM_WRITE(gauntlet_xscroll_w) AM_SHARE("xscroll")
-ADDRESS_MAP_END
+	map(0x900000, 0x901fff).mirror(0x2c8000).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0x902000, 0x903fff).mirror(0x2c8000).ram().share("mob");
+	map(0x904000, 0x904fff).mirror(0x2c8000).ram();
+	map(0x905000, 0x905f7f).mirror(0x2c8000).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(0x905f6e, 0x905f6f).mirror(0x2c8000).ram().w(this, FUNC(gauntlet_state::gauntlet_yscroll_w)).share("yscroll");
+	map(0x905f80, 0x905fff).mirror(0x2c8000).ram().share("mob:slip");
+	map(0x910000, 0x9107ff).mirror(0x2cf800).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x930000, 0x930001).mirror(0x2cfffe).w(this, FUNC(gauntlet_state::gauntlet_xscroll_w)).share("xscroll");
+}
 
 
 
@@ -313,20 +314,21 @@ ADDRESS_MAP_END
  *************************************/
 
 /* full map verified from schematics */
-ADDRESS_MAP_START(gauntlet_state::sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x1000, 0x100f) AM_MIRROR(0x27c0) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_response_w)
-	AM_RANGE(0x1010, 0x101f) AM_MIRROR(0x27c0) AM_DEVREAD("soundcomm", atari_sound_comm_device, sound_command_r)
-	AM_RANGE(0x1020, 0x102f) AM_MIRROR(0x27c0) AM_READ_PORT("COIN") AM_WRITE(mixer_w)
-	AM_RANGE(0x1030, 0x1030) AM_MIRROR(0x27cf) AM_READ(switch_6502_r)
-	AM_RANGE(0x1030, 0x1037) AM_MIRROR(0x27c8) AM_DEVWRITE("soundctl", ls259_device, write_d7)
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x27c0) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0x1810, 0x1811) AM_MIRROR(0x27ce) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x1820, 0x182f) AM_MIRROR(0x27c0) AM_DEVWRITE("tms", tms5220_device, data_w)
-	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x27c0) AM_DEVREADWRITE("soundcomm", atari_sound_comm_device, sound_irq_ack_r, sound_irq_ack_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void gauntlet_state::sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).mirror(0x2000).ram();
+	map(0x1000, 0x100f).mirror(0x27c0).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_response_w));
+	map(0x1010, 0x101f).mirror(0x27c0).r(m_soundcomm, FUNC(atari_sound_comm_device::sound_command_r));
+	map(0x1020, 0x102f).mirror(0x27c0).portr("COIN").w(this, FUNC(gauntlet_state::mixer_w));
+	map(0x1030, 0x1030).mirror(0x27cf).r(this, FUNC(gauntlet_state::switch_6502_r));
+	map(0x1030, 0x1037).mirror(0x27c8).w(m_soundctl, FUNC(ls259_device::write_d7));
+	map(0x1800, 0x180f).mirror(0x27c0).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x1810, 0x1811).mirror(0x27ce).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x1820, 0x182f).mirror(0x27c0).w(m_tms5220, FUNC(tms5220_device::data_w));
+	map(0x1830, 0x183f).mirror(0x27c0).rw(m_soundcomm, FUNC(atari_sound_comm_device::sound_irq_ack_r), FUNC(atari_sound_comm_device::sound_irq_ack_w));
+	map(0x4000, 0xffff).rom();
+}
 
 
 

@@ -306,47 +306,50 @@ WRITE16_MEMBER(wildpkr_state::unknown_trigger_w)
 *      Memory Map        *
 *************************/
 
-ADDRESS_MAP_START(wildpkr_state::wildpkr_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x113fff) AM_RAM
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE("acrtc", hd63484_device, status16_r, address16_w)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE("acrtc", hd63484_device, data16_r, data16_w)
-	AM_RANGE(0x800080, 0x80009f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0x800180, 0x800181) AM_READ8(unknown_read8, 0xff00)
-	AM_RANGE(0x800180, 0x800181) AM_WRITE8(unknown_write8, 0x00ff)
-	AM_RANGE(0x800200, 0x800201) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
-	AM_RANGE(0x800202, 0x800203) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0xff00)
-	AM_RANGE(0x800204, 0x800205) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00)
-	AM_RANGE(0x800280, 0x800281) AM_DEVWRITE8("aysnd", ay8930_device, data_w, 0xff00)
-	AM_RANGE(0x800282, 0x800283) AM_DEVWRITE8("aysnd", ay8930_device, address_w, 0xff00)
-	AM_RANGE(0x800284, 0x800285) AM_DEVREAD8("aysnd", ay8930_device, data_r, 0x00ff) // (odd!)
-	AM_RANGE(0x800286, 0x800289) AM_WRITENOP
-ADDRESS_MAP_END
+void wildpkr_state::wildpkr_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x113fff).ram();
+	map(0x800000, 0x800001).rw("acrtc", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
+	map(0x800002, 0x800003).rw("acrtc", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x800080, 0x80009f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x800180, 0x800180).r(this, FUNC(wildpkr_state::unknown_read8));
+	map(0x800181, 0x800181).w(this, FUNC(wildpkr_state::unknown_write8));
+	map(0x800200, 0x800200).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x800202, 0x800202).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x800204, 0x800204).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x800280, 0x800280).w("aysnd", FUNC(ay8930_device::data_w));
+	map(0x800282, 0x800282).w("aysnd", FUNC(ay8930_device::address_w));
+	map(0x800285, 0x800285).r("aysnd", FUNC(ay8930_device::data_r)); // (odd!)
+	map(0x800286, 0x800289).nopw();
+}
 
-ADDRESS_MAP_START(wildpkr_state::tabpkr_map)
-	AM_RANGE(0x000000, 0x2fffff) AM_ROM
-	AM_RANGE(0x300000, 0x303fff) AM_RAM
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE("acrtc", hd63484_device, status16_r, address16_w)
-	AM_RANGE(0x500002, 0x500003) AM_DEVREADWRITE("acrtc", hd63484_device, data16_r, data16_w)
-	AM_RANGE(0x500020, 0x500021) AM_DEVREADWRITE8("ramdac", ramdac_device, index_r, index_w, 0x00ff)
-	AM_RANGE(0x500022, 0x500023) AM_DEVREADWRITE8("ramdac", ramdac_device, pal_r, pal_w, 0x00ff)
-	AM_RANGE(0x500024, 0x500025) AM_DEVREADWRITE8("ramdac", ramdac_device, mask_r, mask_w, 0x00ff)
-	AM_RANGE(0x500040, 0x50005f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0x500060, 0x500061) AM_READWRITE(id_serial_r, id_serial_w)
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("IN0") AM_WRITE(out0_w)
-	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("IN1") AM_WRITE(out1_w)
-	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("IN2")
-	AM_RANGE(0x600004, 0x600005) AM_WRITE8(dac_w, 0xff00)
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(clock_start_w)
-	AM_RANGE(0x700002, 0x700003) AM_WRITE(clock_rate_w)
-	AM_RANGE(0x700004, 0x700007) AM_WRITE(unknown_trigger_w)
-	AM_RANGE(0x70000a, 0x70000b) AM_WRITENOP // only writes 0 at POST
-ADDRESS_MAP_END
+void wildpkr_state::tabpkr_map(address_map &map)
+{
+	map(0x000000, 0x2fffff).rom();
+	map(0x300000, 0x303fff).ram();
+	map(0x400000, 0x400fff).ram().w(this, FUNC(wildpkr_state::nvram_w)).share("nvram");
+	map(0x500000, 0x500001).rw("acrtc", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
+	map(0x500002, 0x500003).rw("acrtc", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x500021, 0x500021).rw("ramdac", FUNC(ramdac_device::index_r), FUNC(ramdac_device::index_w));
+	map(0x500023, 0x500023).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
+	map(0x500025, 0x500025).rw("ramdac", FUNC(ramdac_device::mask_r), FUNC(ramdac_device::mask_w));
+	map(0x500040, 0x50005f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x500060, 0x500061).rw(this, FUNC(wildpkr_state::id_serial_r), FUNC(wildpkr_state::id_serial_w));
+	map(0x600000, 0x600001).portr("IN0").w(this, FUNC(wildpkr_state::out0_w));
+	map(0x600002, 0x600003).portr("IN1").w(this, FUNC(wildpkr_state::out1_w));
+	map(0x600004, 0x600005).portr("IN2");
+	map(0x600004, 0x600004).w(this, FUNC(wildpkr_state::dac_w));
+	map(0x700000, 0x700001).w(this, FUNC(wildpkr_state::clock_start_w));
+	map(0x700002, 0x700003).w(this, FUNC(wildpkr_state::clock_rate_w));
+	map(0x700004, 0x700007).w(this, FUNC(wildpkr_state::unknown_trigger_w));
+	map(0x70000a, 0x70000b).nopw(); // only writes 0 at POST
+}
 
-ADDRESS_MAP_START(wildpkr_state::hd63484_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-ADDRESS_MAP_END
+void wildpkr_state::hd63484_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+}
 
 /* Unknown R/W:
 
@@ -436,9 +439,10 @@ void wildpkr_state::machine_start()
 }
 
 
-ADDRESS_MAP_START(wildpkr_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void wildpkr_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 
 IRQ_CALLBACK_MEMBER(wildpkr_state::tabpkr_irq_ack)

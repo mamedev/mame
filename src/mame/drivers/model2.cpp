@@ -32,16 +32,15 @@
 	- manxtt: no escape from "active motion slider" tutorial (needs analog inputs), 
 	          bypass it by entering then exiting service mode;
     - manxtt: no bikes are visible (not a z-sort issue!);
-	- manxtt: course select island map doesn't rotate properly (matrix issue?);
+	- manxtt: course select island map doesn't rotate properly:
+		      timing issue, i960 sends read/write geo addresses to bufferram 0x918000/4 which TGP never reads in time.
 	- sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
 	- skytargt: really slow during gameplay (fixed?);
 	- skytargt: short draw distance (might be down to z-sort);
     - srallyc: some 3d elements doesn't show up properly (tree models, last hill in course 1 is often black colored);
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
     - vcop: lightgun input is offsetted (needs to be calibrated in service mode);
-	- vcop: missing 3d bug at stage select screen (priority?);
-	- vcop, daytona: 3d gets corrupted if you get into test mode then go into gameplay, looks like the dsp should be 
-	  resetted somehow, doing that from the copro_ctl1_w it breaks schamp booting;
+	- vcop: missing 3d at stage select screen (priority?);
 	- vstriker: stadium ads have terrible colors (they uses the wrong color table, @see video/model2rd.hxx)
 
 	Notes:
@@ -826,6 +825,9 @@ WRITE32_MEMBER(model2_state::copro_ctl1_w)
 		{
 			logerror("Start copro upload\n");
 			m_coprocnt = 0;
+			
+			if(m_dsp_type == DSP_TYPE_TGP)
+				m_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
@@ -833,6 +835,8 @@ WRITE32_MEMBER(model2_state::copro_ctl1_w)
 			switch(m_dsp_type)
 			{
 				case DSP_TYPE_TGP:
+					// Model 2 / 2A games needs to reset TGP when exiting service mode
+					m_tgp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 					m_tgp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 					break;
 				case DSP_TYPE_SHARC:
@@ -1179,41 +1183,40 @@ WRITE32_MEMBER(model2_state::hotd_lightgun_w)
 }
 
 
-#ifdef UNUSED_FUNCTION
-READ32_MEMBER(model2_state::sonic_unk_r)
-{
-	return 0x001a0000;
-}
-#endif
-
 READ32_MEMBER(model2o_state::daytona_unk_r)
 {
 	return 0x00400000;
 }
 
-#if 0
-READ32_MEMBER(model2_state::desert_unk_r)
-{
-	static uint8_t test;
-
-	test ^= 8;
-	// vcop needs bit 3 clear (infinite loop otherwise)
-	// desert needs other bits set (not sure which specifically)
-	// daytona needs the MSW to return ff
-	return 0x00f700ff | (test << 16);
-}
-#endif
-
-READ32_MEMBER(model2_state::model2_irq_r)
+READ32_MEMBER(model2_state::irq_request_r)
 {
 	m_maincpu->i960_noburst();
 
-	if (offset)
-	{
-		return m_intena;
-	}
-
 	return m_intreq;
+}
+
+READ32_MEMBER(model2_state::irq_enable_r)
+{
+	m_maincpu->i960_noburst();
+
+	return m_intena;
+}
+
+WRITE32_MEMBER(model2_state::irq_ack_w)
+{
+	m_maincpu->i960_noburst();
+
+	m_intreq &= data;
+
+	model2_check_irqack_state(data ^ 0xffffffff);
+}
+
+WRITE32_MEMBER(model2_state::irq_enable_w)
+{
+	m_maincpu->i960_noburst();
+
+	COMBINE_DATA(&m_intena);
+	model2_check_irq_state();
 }
 
 void model2_state::model2_check_irq_state()
@@ -1242,22 +1245,6 @@ void model2_state::model2_check_irqack_state(uint32_t data)
 		if(data & 1<<i)
 			m_maincpu->set_input_line(irq_type[i], CLEAR_LINE);
 	}
-}
-
-WRITE32_MEMBER(model2_state::model2_irq_w)
-{
-	m_maincpu->i960_noburst();
-
-	if (offset)
-	{
-		COMBINE_DATA(&m_intena);
-		model2_check_irq_state();
-		return;
-	}
-
-	m_intreq &= data;
-
-	model2_check_irqack_state(data ^ 0xffffffff);
 }
 
 /* TODO: rewrite this part. It's a 8251-compatible chip */
@@ -1299,49 +1286,6 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 }
 
 
-
-/* Daytona "To The MAXX" PIC protection simulation */
-READ32_MEMBER(model2o_maxx_state::maxx_r)
-{
-	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
-
-	if (offset <= 0x1f/4)
-	{
-		// special
-		if (mem_mask == 0xffff0000)
-		{
-			// 16-bit protection reads
-			m_maxxstate++;
-			m_maxxstate &= 0xf;
-			if (!m_maxxstate)
-			{
-				return 0x00070000;
-			}
-			else
-			{
-				if (m_maxxstate & 0x2)
-				{
-					return 0;
-				}
-				else
-				{
-					return 0x00040000;
-				}
-			}
-		}
-		else if (mem_mask == 0xffffffff)
-		{
-			// 32-bit read
-			if (offset == 0x22/4)
-			{
-				return 0x00ff0000;
-			}
-		}
-	}
-
-	return ROM[offset + (0x040000/4)];
-}
-
 #ifdef UNUSED_FUNCTION
 WRITE32_MEMBER(model2_state::copro_w)
 {
@@ -1364,7 +1308,7 @@ WRITE32_MEMBER(model2_state::copro_w)
 
 READ32_MEMBER(model2_state::render_mode_r)
 {
-	return (m_render_unk << 14) | (m_render_mode << 2);
+	return (m_render_unk << 14) | (m_render_mode << 2) | (m_render_test_mode << 0);
 }
 
 WRITE32_MEMBER(model2_state::render_mode_w)
@@ -1372,6 +1316,9 @@ WRITE32_MEMBER(model2_state::render_mode_w)
 	// ---- -x-- (1) 60 Hz mode
 	//           (0) 30 Hz mode - skytargt, desert, vstriker, vcop
 	// ---- ---x Test Mode (Host can "access memories that are always being reloaded")
+	//           Effectively used by Last Bronx to r/w to the framebuffer
+	m_render_test_mode = bool(BIT(data,0));
+
 	m_render_mode = bool(BIT(data,2));
 
 	// undocumented, unknown purpose
@@ -1425,69 +1372,77 @@ READ8_MEMBER(model2_state::tgpid_r)
 	return ID[offset];
 }
 
+READ16_MEMBER(model2_state::fbvram_bankA_r) { return m_fbvramA[offset]; }
+READ16_MEMBER(model2_state::fbvram_bankB_r) { return m_fbvramB[offset]; }
+WRITE16_MEMBER(model2_state::fbvram_bankA_w) { COMBINE_DATA(&m_fbvramA[offset]); }
+WRITE16_MEMBER(model2_state::fbvram_bankB_w) { COMBINE_DATA(&m_fbvramB[offset]); }
+
 /* common map for all Model 2 versions */
-ADDRESS_MAP_START(model2_state::model2_base_mem)
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP
+void model2_state::model2_base_mem(address_map &map)
+{
+	map(0x00000000, 0x001fffff).rom().nopw();
 
-	AM_RANGE(0x00500000, 0x005fffff) AM_RAM AM_SHARE("workram")
+	map(0x00500000, 0x005fffff).ram().share("workram");
 
-	AM_RANGE(0x00800000, 0x00803fff) AM_READWRITE(geo_r, geo_w)
+	map(0x00800000, 0x00803fff).rw(this, FUNC(model2_state::geo_r), FUNC(model2_state::geo_w));
 	//AM_RANGE(0x00800010, 0x00800013) AM_WRITENOP
 	//AM_RANGE(0x008000b0, 0x008000b3) AM_WRITENOP
 	//AM_RANGE(0x00804004, 0x0080400f) AM_WRITENOP  // quiet psikyo games
 
 	//AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_w)
 
-	AM_RANGE(0x00900000, 0x0091ffff) AM_MIRROR(0x60000) AM_RAM AM_SHARE("bufferram")
+	map(0x00900000, 0x0091ffff).mirror(0x60000).ram().share("bufferram");
 
-	AM_RANGE(0x00980004, 0x00980007) AM_READ(fifoctl_r)
-	AM_RANGE(0x0098000c, 0x0098000f) AM_READWRITE(videoctl_r,videoctl_w)
-	AM_RANGE(0x00980030, 0x0098003f) AM_READ8(tgpid_r,0xffffffff)
+	map(0x00980004, 0x00980007).r(this, FUNC(model2_state::fifoctl_r));
+	map(0x0098000c, 0x0098000f).rw(this, FUNC(model2_state::videoctl_r), FUNC(model2_state::videoctl_w));
+	map(0x00980030, 0x0098003f).r(this, FUNC(model2_state::tgpid_r));
 
-	AM_RANGE(0x00e00000, 0x00e00037) AM_RAM // CPU control (wait-states)
-	AM_RANGE(0x00e80000, 0x00e80007) AM_READWRITE(model2_irq_r, model2_irq_w)
+	map(0x00e00000, 0x00e00037).ram(); // CPU control (wait-states)
+	map(0x00e80000, 0x00e80003).rw(this, FUNC(model2_state::irq_request_r), FUNC(model2_state::irq_ack_w));
+	map(0x00e80004, 0x00e80007).rw(this, FUNC(model2_state::irq_enable_r), FUNC(model2_state::irq_enable_w));
 
-	AM_RANGE(0x00f00000, 0x00f0000f) AM_READWRITE(timers_r, timers_w)
+	map(0x00f00000, 0x00f0000f).rw(this, FUNC(model2_state::timers_r), FUNC(model2_state::timers_w));
 
-	AM_RANGE(0x01000000, 0x0100ffff) AM_DEVREADWRITE16("tile", segas24_tile_device, tile_r, tile_w,0xffffffff) AM_MIRROR(0x110000)
-	AM_RANGE(0x01020000, 0x01020003) AM_WRITENOP AM_MIRROR(0x100000)        // ABSEL, always 0
-	AM_RANGE(0x01040000, 0x01040003) AM_DEVWRITE16("tile", segas24_tile_device, xhout_w, 0x0000ffff) AM_MIRROR(0x100000) // Horizontal synchronization register
-	AM_RANGE(0x01060000, 0x01060003) AM_DEVWRITE16("tile", segas24_tile_device, xvout_w, 0x0000ffff) AM_MIRROR(0x100000) // Vertical synchronization register
-	AM_RANGE(0x01070000, 0x01070003) AM_WRITENOP AM_MIRROR(0x100000)        // Video synchronization switch
-	AM_RANGE(0x01080000, 0x010fffff) AM_DEVREADWRITE16("tile", segas24_tile_device, char_r, char_w,0xffffffff) AM_MIRROR(0x100000)
+	map(0x01000000, 0x0100ffff).rw("tile", FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w)).mirror(0x110000);
+	map(0x01020000, 0x01020003).nopw().mirror(0x100000);        // ABSEL, always 0
+	map(0x01040000, 0x01040001).w("tile", FUNC(segas24_tile_device::xhout_w)).mirror(0x100000); // Horizontal synchronization register
+	map(0x01060000, 0x01060001).w("tile", FUNC(segas24_tile_device::xvout_w)).mirror(0x100000); // Vertical synchronization register
+	map(0x01070000, 0x01070003).nopw().mirror(0x100000);        // Video synchronization switch
+	map(0x01080000, 0x010fffff).rw("tile", FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w)).mirror(0x100000);
 
-	AM_RANGE(0x01800000, 0x01803fff) AM_READWRITE16(palette_r,  palette_w,0xffffffff)
-	AM_RANGE(0x01810000, 0x0181bfff) AM_READWRITE16(colorxlat_r,colorxlat_w,0xffffffff)
-	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE(model2_3d_zclip_w)
-	AM_RANGE(0x01a10000, 0x01a13fff) AM_DEVREADWRITE8("m2comm", m2comm_device, share_r, share_w, 0xffffffff)
-	AM_RANGE(0x01a14000, 0x01a14003) AM_DEVREADWRITE8("m2comm", m2comm_device, cn_r, cn_w, 0x000000ff)
-	AM_RANGE(0x01a14000, 0x01a14003) AM_DEVREADWRITE8("m2comm", m2comm_device, fg_r, fg_w, 0x00ff0000)
-	AM_RANGE(0x01d00000, 0x01d03fff) AM_RAM AM_SHARE("backup1") // Backup sram
-	AM_RANGE(0x02000000, 0x03ffffff) AM_ROM AM_REGION("main_data", 0)
+	map(0x01800000, 0x01803fff).rw(this, FUNC(model2_state::palette_r), FUNC(model2_state::palette_w));
+	map(0x01810000, 0x0181bfff).rw(this, FUNC(model2_state::colorxlat_r), FUNC(model2_state::colorxlat_w));
+	map(0x0181c000, 0x0181c003).w(this, FUNC(model2_state::model2_3d_zclip_w));
+	map(0x01a10000, 0x01a13fff).rw(m_m2comm, FUNC(m2comm_device::share_r), FUNC(m2comm_device::share_w));
+	map(0x01a14000, 0x01a14000).rw(m_m2comm, FUNC(m2comm_device::cn_r), FUNC(m2comm_device::cn_w));
+	map(0x01a14002, 0x01a14002).rw(m_m2comm, FUNC(m2comm_device::fg_r), FUNC(m2comm_device::fg_w));
+	map(0x01d00000, 0x01d03fff).ram().share("backup1"); // Backup sram
+	map(0x02000000, 0x03ffffff).rom().region("main_data", 0);
 
 	// "extra" data
-	AM_RANGE(0x06000000, 0x06ffffff) AM_ROM AM_REGION("main_data", 0x1000000)
+	map(0x06000000, 0x06ffffff).rom().region("main_data", 0x1000000);
 
-	AM_RANGE(0x10000000, 0x101fffff) AM_READWRITE(render_mode_r,render_mode_w)
+	map(0x10000000, 0x101fffff).rw(this, FUNC(model2_state::render_mode_r), FUNC(model2_state::render_mode_w));
 //  AM_RANGE(0x10200000, 0x103fffff) renderer status register
-	AM_RANGE(0x10400000, 0x105fffff) AM_READ(polygon_count_r)
+	map(0x10400000, 0x105fffff).r(this, FUNC(model2_state::polygon_count_r));
 //  AM_RANGE(0x10600000, 0x107fffff) polygon data ping
 //  AM_RANGE(0x10800000, 0x109fffff) polygon data pong
 //  AM_RANGE(0x10a00000, 0x10bfffff) fill memory ping
 //  AM_RANGE(0x10c00000, 0x10dfffff) fill memory pong
 
-	// format is xGGGGGBBBBBRRRRR (512x400)
-	AM_RANGE(0x11600000, 0x1167ffff) AM_RAM AM_SHARE("fbvram1") // framebuffer A (last bronx title screen)
-	AM_RANGE(0x11680000, 0x116fffff) AM_RAM AM_SHARE("fbvram2") // framebuffer B
+	// format is xGGGGGRRRRRBBBBB (512x400)
+	map(0x11600000, 0x1167ffff).rw(this, FUNC(model2_state::fbvram_bankA_r), FUNC(model2_state::fbvram_bankA_w)); // framebuffer A (last bronx title screen)
+	map(0x11680000, 0x116fffff).rw(this, FUNC(model2_state::fbvram_bankB_r), FUNC(model2_state::fbvram_bankB_w)); // framebuffer B
 
-	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE16(lumaram_r,lumaram_w,0x0000ffff) // polygon "luma" RAM
-ADDRESS_MAP_END
+	map(0x12800000, 0x1281ffff).rw(this, FUNC(model2_state::lumaram_r), FUNC(model2_state::lumaram_w)).umask32(0x0000ffff); // polygon "luma" RAM
+}
 
 /* common map for 5881 protection */
-ADDRESS_MAP_START(model2_state::model2_5881_mem)
-	AM_RANGE(0x01d80000,0x01d8ffff) AM_RAM
-	AM_RANGE(0x01d90000,0x01d9ffff) AM_DEVICE16("315_5881", sega_315_5881_crypt_device, iomap_le, 0xffffffff)
-ADDRESS_MAP_END
+void model2_state::model2_5881_mem(address_map &map)
+{
+	map(0x01d80000, 0x01d8ffff).ram();
+	map(0x01d90000, 0x01d9ffff).m(m_cryptdevice, FUNC(sega_315_5881_crypt_device::iomap_le));
+}
 
 READ8_MEMBER(model2_state::virtuacop_lightgun_r)
 {
@@ -1542,35 +1497,98 @@ READ8_MEMBER(model2o_state::model2o_in_r)
 }
 
 /* original Model 2 overrides */
-ADDRESS_MAP_START(model2o_state::model2o_mem)
-	AM_IMPORT_FROM(model2_base_mem)
+void model2o_state::model2o_mem(address_map &map)
+{
+	model2_base_mem(map);
 
-	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM
-	AM_RANGE(0x00220000, 0x0023ffff) AM_ROM AM_REGION("maincpu", 0x20000)
+	map(0x00200000, 0x0021ffff).ram();
+	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000);
 
-	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
-	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_function_port_w)
-	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
+	map(0x00804000, 0x00807fff).rw(this, FUNC(model2o_state::geo_prg_r), FUNC(model2o_state::geo_prg_w));
+	map(0x00880000, 0x00883fff).w(this, FUNC(model2o_state::copro_function_port_w));
+	map(0x00884000, 0x00887fff).rw(this, FUNC(model2o_state::copro_fifo_r), FUNC(model2o_state::copro_fifo_w));
 
-	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
-	AM_RANGE(0x00980004, 0x00980007) AM_READ(fifoctrl_r)
-	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w)
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w)
+	map(0x00980000, 0x00980003).rw(this, FUNC(model2o_state::copro_ctl1_r), FUNC(model2o_state::copro_ctl1_w));
+	map(0x00980004, 0x00980007).r(this, FUNC(model2o_state::fifoctrl_r));
+	map(0x00980008, 0x0098000b).w(this, FUNC(model2o_state::geo_ctl1_w));
+	map(0x009c0000, 0x009cffff).rw(this, FUNC(model2o_state::model2_serial_r), FUNC(model2o_state::model2_serial_w));
 
-	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_SHARE("textureram0")   // texture RAM 0
-	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_SHARE("textureram1")   // texture RAM 1
+	map(0x12000000, 0x121fffff).ram().w(this, FUNC(model2o_state::model2o_tex_w0)).mirror(0x200000).share("textureram0");   // texture RAM 0
+	map(0x12400000, 0x125fffff).ram().w(this, FUNC(model2o_state::model2o_tex_w1)).mirror(0x200000).share("textureram1");   // texture RAM 1
 
-	AM_RANGE(0x01c00000, 0x01c0001f) AM_READ8(model2o_in_r, 0x00ff00ff)
-	AM_RANGE(0x01c00040, 0x01c00043) AM_READ(daytona_unk_r)
-	AM_RANGE(0x01c00100, 0x01c0010f) AM_READ8(virtuacop_lightgun_r, 0x00ff00ff)
-	AM_RANGE(0x01c00110, 0x01c00113) AM_READ8(virtuacop_lightgun_offscreen_r, 0x00ff00ff)
-	AM_RANGE(0x01c00200, 0x01c002ff) AM_RAM AM_SHARE("backup2")
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w)
-ADDRESS_MAP_END
+	map(0x01c00000, 0x01c0001f).r(this, FUNC(model2o_state::model2o_in_r)).umask32(0x00ff00ff);
+	map(0x01c00040, 0x01c00043).r(this, FUNC(model2o_state::daytona_unk_r));
+	map(0x01c00100, 0x01c0010f).r(this, FUNC(model2o_state::virtuacop_lightgun_r)).umask32(0x00ff00ff);
+	map(0x01c00110, 0x01c00113).r(this, FUNC(model2o_state::virtuacop_lightgun_offscreen_r)).umask32(0x00ff00ff);
+	map(0x01c00200, 0x01c002ff).ram().share("backup2");
+	map(0x01c80000, 0x01c80003).rw(this, FUNC(model2o_state::model2_serial_r), FUNC(model2o_state::model2_serial_w));
+}
 
-ADDRESS_MAP_START(model2o_maxx_state::model2o_maxx_mem)
+/* Daytona "To The MAXX" PIC protection simulation */
+READ32_MEMBER(model2o_maxx_state::maxx_r)
+{
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
+
+	if (offset <= 0x1f/4)
+	{
+		// special
+		if (mem_mask == 0xffff0000)
+		{
+			// 16-bit protection reads
+			m_maxxstate++;
+			m_maxxstate &= 0xf;
+			if (!m_maxxstate)
+			{
+				return 0x00070000;
+			}
+			else
+			{
+				if (m_maxxstate & 0x2)
+				{
+					return 0;
+				}
+				else
+				{
+					return 0x00040000;
+				}
+			}
+		}
+		else if (mem_mask == 0xffffffff)
+		{
+			// 32-bit read
+			if (offset == 0x22/4)
+			{
+				return 0x00ff0000;
+			}
+		}
+	}
+
+	return ROM[offset + (0x040000/4)];
+}
+
+void model2o_maxx_state::model2o_maxx_mem(address_map &map)
+{
+	model2o_mem(map);
+	map(0x00240000, 0x0024ffff).r(this, FUNC(model2o_maxx_state::maxx_r));
+}
+
+READ8_MEMBER(model2o_gtx_state::gtx_r)
+{
+	uint8_t *ROM = memregion("prot_data")->base();
+
+	if(offset == 0xffffc) // disable protection ROM overlay (fallbacks to data rom?)
+		m_gtx_state = 2;
+	else if(offset == 0xff00c || offset == 0xf0003) // enable protection bank 0
+		m_gtx_state = 0;
+	else if(offset == 0xff000) // enable protection bank 1
+		m_gtx_state = 1;
+
+	return ROM[m_gtx_state*0x100000+offset];
+}
+
+ADDRESS_MAP_START(model2o_gtx_state::model2o_gtx_mem)
 	AM_IMPORT_FROM(model2o_mem)
-	AM_RANGE(0x00240000,0x0024ffff) AM_READ(maxx_r)
+	AM_RANGE(0x02c00000,0x02cfffff) AM_READ8(gtx_r,0xffffffff)
 ADDRESS_MAP_END
 
 /* TODO: read by Sonic the Fighters (bit 1), unknown purpose */
@@ -1583,112 +1601,118 @@ READ32_MEMBER(model2_state::copro_status_r)
 }
 
 /* 2A-CRX overrides */
-ADDRESS_MAP_START(model2a_state::model2a_crx_mem)
-	AM_IMPORT_FROM(model2_base_mem)
+void model2a_state::model2a_crx_mem(address_map &map)
+{
+	model2_base_mem(map);
 
-	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
+	map(0x00200000, 0x0023ffff).ram();
 
-	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
-	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_function_port_w)
-	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
+	map(0x00804000, 0x00807fff).rw(this, FUNC(model2a_state::geo_prg_r), FUNC(model2a_state::geo_prg_w));
+	map(0x00880000, 0x00883fff).w(this, FUNC(model2a_state::copro_function_port_w));
+	map(0x00884000, 0x00887fff).rw(this, FUNC(model2a_state::copro_fifo_r), FUNC(model2a_state::copro_fifo_w));
 
-	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
-	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w)
-	AM_RANGE(0x00980014, 0x00980017) AM_READ(copro_status_r)
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w)
+	map(0x00980000, 0x00980003).rw(this, FUNC(model2a_state::copro_ctl1_r), FUNC(model2a_state::copro_ctl1_w));
+	map(0x00980008, 0x0098000b).w(this, FUNC(model2a_state::geo_ctl1_w));
+	map(0x00980014, 0x00980017).r(this, FUNC(model2a_state::copro_status_r));
+	map(0x009c0000, 0x009cffff).rw(this, FUNC(model2a_state::model2_serial_r), FUNC(model2a_state::model2_serial_w));
 
-	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_SHARE("textureram0")   // texture RAM 0
-	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_SHARE("textureram1")   // texture RAM 1
+	map(0x12000000, 0x121fffff).ram().w(this, FUNC(model2a_state::model2o_tex_w0)).mirror(0x200000).share("textureram0");   // texture RAM 0
+	map(0x12400000, 0x125fffff).ram().w(this, FUNC(model2a_state::model2o_tex_w1)).mirror(0x200000).share("textureram1");   // texture RAM 1
 
-	AM_RANGE(0x01c00000, 0x01c0001f) AM_READ8(model2_crx_in_r, 0x00ff00ff)
-	AM_RANGE(0x01c00000, 0x01c00003) AM_WRITE(ctrl0_w)
-	AM_RANGE(0x01c00008, 0x01c0000f) AM_WRITENOP
-	AM_RANGE(0x01c00010, 0x01c00013) AM_WRITENOP
-	AM_RANGE(0x01c00014, 0x01c00017) AM_WRITE(hotd_lightgun_w)
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_WRITE(analog_2b_w)
-	AM_RANGE(0x01c00040, 0x01c00043) AM_WRITENOP
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w)
-ADDRESS_MAP_END
+	map(0x01c00000, 0x01c0001f).r(this, FUNC(model2a_state::model2_crx_in_r)).umask32(0x00ff00ff);
+	map(0x01c00000, 0x01c00003).w(this, FUNC(model2a_state::ctrl0_w));
+	map(0x01c00008, 0x01c0000f).nopw();
+	map(0x01c00010, 0x01c00013).nopw();
+	map(0x01c00014, 0x01c00017).w(this, FUNC(model2a_state::hotd_lightgun_w));
+	map(0x01c0001c, 0x01c0001f).w(this, FUNC(model2a_state::analog_2b_w));
+	map(0x01c00040, 0x01c00043).nopw();
+	map(0x01c80000, 0x01c80003).rw(this, FUNC(model2a_state::model2_serial_r), FUNC(model2a_state::model2_serial_w));
+}
 
-ADDRESS_MAP_START(model2a_state::model2a_5881_mem)
-	AM_IMPORT_FROM(model2a_crx_mem)
-	AM_IMPORT_FROM(model2_5881_mem)
-ADDRESS_MAP_END
+void model2a_state::model2a_5881_mem(address_map &map)
+{
+	model2a_crx_mem(map);
+	model2_5881_mem(map);
+}
 
 /* 2B-CRX overrides */
-ADDRESS_MAP_START(model2b_state::model2b_crx_mem)
-	AM_IMPORT_FROM(model2_base_mem)
+void model2b_state::model2b_crx_mem(address_map &map)
+{
+	model2_base_mem(map);
 
-	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
+	map(0x00200000, 0x0023ffff).ram();
 
-	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
+	map(0x00804000, 0x00807fff).rw(this, FUNC(model2b_state::geo_prg_r), FUNC(model2b_state::geo_prg_w));
 	//AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_sharc_fifo_r, geo_sharc_fifo_w)
 	//AM_RANGE(0x00840000, 0x00840fff) AM_WRITE(geo_sharc_iop_w)
 
-	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_function_port_w)
-	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
-	AM_RANGE(0x008c0000, 0x008c0fff) AM_WRITE(copro_sharc_iop_w)
+	map(0x00880000, 0x00883fff).w(this, FUNC(model2b_state::copro_function_port_w));
+	map(0x00884000, 0x00887fff).rw(this, FUNC(model2b_state::copro_fifo_r), FUNC(model2b_state::copro_fifo_w));
+	map(0x008c0000, 0x008c0fff).w(this, FUNC(model2b_state::copro_sharc_iop_w));
 
-	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
-	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w)
-	AM_RANGE(0x00980014, 0x00980017) AM_READ(copro_status_r)
+	map(0x00980000, 0x00980003).rw(this, FUNC(model2b_state::copro_ctl1_r), FUNC(model2b_state::copro_ctl1_w));
+	map(0x00980008, 0x0098000b).w(this, FUNC(model2b_state::geo_ctl1_w));
+	map(0x00980014, 0x00980017).r(this, FUNC(model2b_state::copro_status_r));
 	//AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_sharc_ctl1_w )
 
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w)
+	map(0x009c0000, 0x009cffff).rw(this, FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w));
 
-	AM_RANGE(0x11000000, 0x110fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
-	AM_RANGE(0x11100000, 0x111fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
-	AM_RANGE(0x11200000, 0x112fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
-	AM_RANGE(0x11300000, 0x113fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
-	AM_RANGE(0x11400000, 0x1140ffff) AM_READWRITE16(lumaram_r,lumaram_w,0xffffffff)    // polygon "luma" RAM (2b/2c)
-	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE16(lumaram_r,lumaram_w,0x0000ffff) // polygon "luma" RAM
+	map(0x11000000, 0x110fffff).ram().share("textureram0"); // texture RAM 0 (2b/2c)
+	map(0x11100000, 0x111fffff).ram().share("textureram0"); // texture RAM 0 (2b/2c)
+	map(0x11200000, 0x112fffff).ram().share("textureram1"); // texture RAM 1 (2b/2c)
+	map(0x11300000, 0x113fffff).ram().share("textureram1"); // texture RAM 1 (2b/2c)
+	map(0x11400000, 0x1140ffff).rw(this, FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w));    // polygon "luma" RAM (2b/2c)
+	map(0x12800000, 0x1281ffff).rw(this, FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).umask32(0x0000ffff); // polygon "luma" RAM
 
-	AM_RANGE(0x01c00000, 0x01c0001f) AM_READ8(model2_crx_in_r, 0x00ff00ff)
-	AM_RANGE(0x01c00000, 0x01c00003) AM_WRITE(ctrl0_w)
-	AM_RANGE(0x01c00008, 0x01c0000b) AM_WRITENOP
-	AM_RANGE(0x01c00010, 0x01c00013) AM_WRITENOP // gunblade
-	AM_RANGE(0x01c00014, 0x01c00017) AM_WRITE(hotd_lightgun_w)
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_WRITE(analog_2b_w)
-	AM_RANGE(0x01c00040, 0x01c00043) AM_WRITENOP
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w)
-ADDRESS_MAP_END
+	map(0x01c00000, 0x01c0001f).r(this, FUNC(model2b_state::model2_crx_in_r)).umask32(0x00ff00ff);
+	map(0x01c00000, 0x01c00003).w(this, FUNC(model2b_state::ctrl0_w));
+	map(0x01c00008, 0x01c0000b).nopw();
+	map(0x01c00010, 0x01c00013).nopw(); // gunblade
+	map(0x01c00014, 0x01c00017).w(this, FUNC(model2b_state::hotd_lightgun_w));
+	map(0x01c0001c, 0x01c0001f).w(this, FUNC(model2b_state::analog_2b_w));
+	map(0x01c00040, 0x01c00043).nopw();
+	map(0x01c80000, 0x01c80003).rw(this, FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w));
+}
 
-ADDRESS_MAP_START(model2b_state::model2b_5881_mem)
-	AM_IMPORT_FROM(model2b_crx_mem)
-	AM_IMPORT_FROM(model2_5881_mem)
-ADDRESS_MAP_END
+void model2b_state::model2b_5881_mem(address_map &map)
+{
+	model2b_crx_mem(map);
+	model2_5881_mem(map);
+}
 
 /* 2C-CRX overrides */
-ADDRESS_MAP_START(model2c_state::model2c_crx_mem)
-	AM_IMPORT_FROM(model2_base_mem)
+void model2c_state::model2c_crx_mem(address_map &map)
+{
+	model2_base_mem(map);
 
-	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
+	map(0x00200000, 0x0023ffff).ram();
 
-	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
-	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_function_port_w)
-	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
+	map(0x00804000, 0x00807fff).rw(this, FUNC(model2c_state::geo_prg_r), FUNC(model2c_state::geo_prg_w));
+	map(0x00880000, 0x00883fff).w(this, FUNC(model2c_state::copro_function_port_w));
+	map(0x00884000, 0x00887fff).rw(this, FUNC(model2c_state::copro_fifo_r), FUNC(model2c_state::copro_fifo_w));
 
-	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
-	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w )
-	AM_RANGE(0x00980014, 0x00980017) AM_READ(copro_status_r)
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w)
+	map(0x00980000, 0x00980003).rw(this, FUNC(model2c_state::copro_ctl1_r), FUNC(model2c_state::copro_ctl1_w));
+	map(0x00980008, 0x0098000b).w(this, FUNC(model2c_state::geo_ctl1_w));
+	map(0x00980014, 0x00980017).r(this, FUNC(model2c_state::copro_status_r));
+	map(0x009c0000, 0x009cffff).rw(this, FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w));
 
-	AM_RANGE(0x11000000, 0x111fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
-	AM_RANGE(0x11200000, 0x113fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
-	AM_RANGE(0x11400000, 0x1140ffff) AM_READWRITE16(lumaram_r,lumaram_w,0xffffffff)    // polygon "luma" RAM (2b/2c)
-	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE16(lumaram_r,lumaram_w,0x0000ffff) // polygon "luma" RAM
+	map(0x11000000, 0x111fffff).ram().share("textureram0"); // texture RAM 0 (2b/2c)
+	map(0x11200000, 0x113fffff).ram().share("textureram1"); // texture RAM 1 (2b/2c)
+	map(0x11400000, 0x1140ffff).rw(this, FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w));    // polygon "luma" RAM (2b/2c)
+	map(0x12800000, 0x1281ffff).rw(this, FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).umask32(0x0000ffff); // polygon "luma" RAM
 
-	AM_RANGE(0x01c00000, 0x01c0001f) AM_READ8(model2_crx_in_r, 0x00ff00ff)
-	AM_RANGE(0x01c00000, 0x01c00003) AM_WRITE(ctrl0_w)
-	AM_RANGE(0x01c00014, 0x01c00017) AM_WRITE(hotd_lightgun_w)
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_WRITE(analog_2b_w)
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w )
-ADDRESS_MAP_END
+	map(0x01c00000, 0x01c0001f).r(this, FUNC(model2c_state::model2_crx_in_r)).umask32(0x00ff00ff);
+	map(0x01c00000, 0x01c00003).w(this, FUNC(model2c_state::ctrl0_w));
+	map(0x01c00014, 0x01c00017).w(this, FUNC(model2c_state::hotd_lightgun_w));
+	map(0x01c0001c, 0x01c0001f).w(this, FUNC(model2c_state::analog_2b_w));
+	map(0x01c80000, 0x01c80003).rw(this, FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w));
+}
 
-ADDRESS_MAP_START(model2c_state::model2c_5881_mem)
-	AM_IMPORT_FROM(model2c_crx_mem)
-	AM_IMPORT_FROM(model2_5881_mem)
-ADDRESS_MAP_END
+void model2c_state::model2c_5881_mem(address_map &map)
+{
+	model2c_crx_mem(map);
+	model2_5881_mem(map);
+}
 
 
 
@@ -1983,7 +2007,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sgt24h )
 	PORT_INCLUDE( srallyc )
-	
+
+	PORT_MODIFY("IN0")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_MODIFY("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("View Button")
 	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2005,7 +2032,7 @@ static INPUT_PORTS_START( overrev )
 	
 	PORT_MODIFY("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("View 1 Button")
-	// optional, enableable when hardware type isn't in "normal (2in1)" mode
+	// optional, enableable when hardware type isn't in "normal (2in1)" mode (overrev)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("View 2 Button")
 INPUT_PORTS_END
 
@@ -2276,6 +2303,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 	}
 }
 
+#ifdef UNUSED_FUNCTION
+WRITE_LINE_MEMBER(model2_state::sound_ready_w)
+{
+	if(state)
+	{
+		m_intreq |= (1<<10);
+		if(m_intena & 1<<10)
+			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
+		model2_check_irq_state();
+	}
+}
+#endif
+
 TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2c_interrupt)
 {
 	int scanline = param;
@@ -2289,23 +2329,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2c_interrupt)
 		if (m_m2comm != nullptr)
 			m_m2comm->check_vint_irq();
 	}
-	else if(scanline == 0) // 384
+	else if(scanline == 0)
 	{
 		m_intreq |= (1<<10);
 		if(m_intena & 1<<10)
 			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
 		model2_check_irq_state();
 	}
-	else if(scanline == 256)
+	#if 0
+	else if(scanline == 0)
 	{
-		/* TODO: irq source? Scroll allocation in dynamcopc? */
+		// TODO: irq source? Scroll allocation in dynamcopc?
+		// it's actually a timer 0 irq, doesn't seem necessary
 		m_intreq |= (1<<2);
 		if(m_intena & 1<<2)
 			m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
 		model2_check_irq_state();
 	}
-
-
+	#endif
 }
 
 /* Model 2 sound board emulation */
@@ -2381,7 +2422,7 @@ ADDRESS_MAP_START(model2_state::copro_sharc_map)
 	AM_RANGE(0x0c00000, 0x13fffff) AM_WRITE(copro_sharc_output_fifo_w)
 	AM_RANGE(0x1400000, 0x1bfffff) AM_READWRITE(copro_sharc_buffer_r, copro_sharc_buffer_w)
 	AM_RANGE(0x1c00000, 0x1dfffff) AM_ROM AM_REGION("copro_data", 0)
-//  AM_RANGE(0x3c000000, 0x3fffffff) AM_WRITE(copro_sharc_output_fifo_w) // last bronx, cpu core bug?
+//	AM_RANGE(0xffff8000, 0xffffffff) AM_READWRITE(copro_sharc_buffer_r, copro_sharc_buffer_w) // last bronx, cpu core bug?
 ADDRESS_MAP_END
 
 #if 0
@@ -2439,6 +2480,26 @@ MACHINE_CONFIG_START(model2_state::model2_screen)
 	MCFG_PALETTE_ADD("palette", 8192)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(model2_state::model2_scsp)
+	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(model2_snd)
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("scsp", SCSP, 0)
+	MCFG_SCSP_IRQ_CB(WRITE8(model2_state,scsp_irq))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+
+	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
+//	MCFG_I8251_RXRDY_HANDLER(WRITELINE(model2_state, sound_ready_w))
+//	MCFG_I8251_TXRDY_HANDLER(WRITELINE(model2_state, sound_ready_w))
+
+	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+MACHINE_CONFIG_END
+
 /* original Model 2 */
 MACHINE_CONFIG_START(model2o_state::model2o)
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
@@ -2491,18 +2552,20 @@ WRITE8_MEMBER(model2_state::driveio_port_w)
 //  popmessage("%02x",data);
 }
 
-ADDRESS_MAP_START(model2_state::drive_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void model2_state::drive_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(model2_state::drive_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP //watchdog
-	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("driveio1", sega_315_5296_device, read, write)
-	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("driveio2", sega_315_5296_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("driveadc", msm6253_device, d0_r, address_w)
-ADDRESS_MAP_END
+void model2_state::drive_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopw(); //watchdog
+	map(0x20, 0x2f).rw("driveio1", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write));
+	map(0x40, 0x4f).rw("driveio2", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write));
+	map(0x80, 0x83).rw("driveadc", FUNC(msm6253_device::d0_r), FUNC(msm6253_device::address_w));
+}
 
 MACHINE_CONFIG_START(model2_state::sj25_0207_01)
 	MCFG_CPU_ADD("drivecpu", Z80, XTAL(8'000'000)/2) // confirmed
@@ -2533,16 +2596,18 @@ MACHINE_CONFIG_START(model2o_maxx_state::daytona_maxx)
 	MCFG_CPU_PROGRAM_MAP(model2o_maxx_mem)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(model2o_gtx_state::daytona_gtx)
+	daytona(config);
 
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(model2o_gtx_mem)
+MACHINE_CONFIG_END
 
 /* 2A-CRX */
 MACHINE_CONFIG_START(model2a_state::model2a)
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2a_crx_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
-
-	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(model2_snd)
 
 	MCFG_CPU_ADD("tgp", MB86233, 16000000)
 	MCFG_CPU_PROGRAM_MAP(copro_tgp_map)
@@ -2559,19 +2624,7 @@ MACHINE_CONFIG_START(model2a_state::model2a)
 
 	model2_timers(config);
 	model2_screen(config);
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("scsp", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(model2_state,scsp_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
-
-	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-
-	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	model2_scsp(config);
 
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
@@ -2624,9 +2677,6 @@ MACHINE_CONFIG_START(model2b_state::model2b)
 	MCFG_CPU_PROGRAM_MAP(model2b_crx_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(model2_snd)
-
 	MCFG_CPU_ADD("dsp", ADSP21062, 40000000)
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_HOST)
 	MCFG_CPU_DATA_MAP(copro_sharc_map)
@@ -2645,19 +2695,7 @@ MACHINE_CONFIG_START(model2b_state::model2b)
 
 	model2_timers(config);
 	model2_screen(config);
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("scsp", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(model2_state,scsp_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
-
-	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-
-	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	model2_scsp(config);
 
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
@@ -2685,15 +2723,17 @@ MACHINE_CONFIG_START(model2b_state::indy500)
 MACHINE_CONFIG_END
 
 
-ADDRESS_MAP_START(model2b_state::rchase2_iocpu_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-ADDRESS_MAP_END
+void model2b_state::rchase2_iocpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+}
 
-ADDRESS_MAP_START(model2b_state::rchase2_ioport_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE("ioexp", cxd1095_device, read, write)
-ADDRESS_MAP_END
+void model2b_state::rchase2_ioport_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x07).rw("ioexp", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
+}
 
 MACHINE_CONFIG_START(model2b_state::rchase2)
 	model2b(config);
@@ -2707,6 +2747,8 @@ MACHINE_CONFIG_END
 
 ADDRESS_MAP_START(model2_state::copro_tgpx4_map)
 	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("tgpx4_program")
+//	AM_RANGE(0x00400000, 0x007fffff) // bufferram
+//	AM_RANGE(0x00800000, 0x00ffffff) // ROM data
 ADDRESS_MAP_END
 
 /* 2C-CRX */
@@ -2718,9 +2760,6 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 	MCFG_CPU_ADD("tgpx4", MB86235, 40000000)
 	MCFG_CPU_PROGRAM_MAP(copro_tgpx4_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(model2_snd)
-
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2c)
 
@@ -2729,19 +2768,7 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 
 	model2_timers(config);
 	model2_screen(config);
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("scsp", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(model2_state, scsp_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
-
-	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-
-	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	model2_scsp(config);
 
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
@@ -3160,7 +3187,8 @@ ROM_START( vf2o ) /* Virtua Fighter 2, Model 2A */
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( srallyc ) /* Sega Rally Championship Revision C, Model 2A, Sega game ID# 833-11649 RALLY TWIN, Sega ROM board ID# 834-11618 RALLY TWIN */
+/* Sega Rally Championship Revision C, Model 2A, Sega game ID# 833-11649 RALLY TWIN, Sega ROM board ID# 834-11618 RALLY TWIN */
+ROM_START( srallyc )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-17888c.12",  0x000000, 0x080000, CRC(3d6808aa) SHA1(33abf9cdcee9583dc600c94e1e29ce260e8c5d32) )
 	ROM_LOAD32_WORD( "epr-17889c.13",  0x000002, 0x080000, CRC(f43c7802) SHA1(4b1efb3d5644fed1753da1750bf5c300d3a15d2c) )
@@ -6151,6 +6179,77 @@ ROM_START( daytonam ) /* Daytona USA (Japan, To The MAXX) */
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
 	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
+	
+	ROM_REGION( 0x10000, "pic", 0)
+	ROM_LOAD("pic.bin", 0x00000, 0x10000, NO_DUMP )
+ROM_END
+
+ROM_START( daytonagtx )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_LOAD32_WORD( "gtx.12", 0x000000, 0x020000, CRC(08283a6f) SHA1(643110a3ea5fb6092c469b6b49a396084e985a7a) )
+	ROM_LOAD32_WORD( "gtx.13", 0x000002, 0x020000, CRC(f9b356ae) SHA1(ad635540d64e05c7246c9de6439a4e3b3d1cdf08) )
+
+	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data
+	ROM_LOAD32_WORD("mpr-16528.10",   0x000000, 0x200000, CRC(9ce591f6) SHA1(e22fc8a70b533f7a6191f5952c581fb8f9627906) )
+	ROM_LOAD32_WORD("mpr-16529.11",   0x000002, 0x200000, CRC(f7095eaf) SHA1(da3c922f950dd730ea348eae12aa1cb69cee9a58) )
+	ROM_LOAD32_WORD("mpr-16808.8",    0x400000, 0x200000, CRC(44f1f5a0) SHA1(343866a6e2187a8ebc17f6727080f9f2f9ac9200) )
+	ROM_LOAD32_WORD("mpr-16809.9",    0x400002, 0x200000, CRC(37a2dd12) SHA1(8192d8698d6bd52ee11cc28917aff5840c447627) )
+	ROM_LOAD32_WORD("epr-16724a.6",   0x800000, 0x080000, CRC(469f10fd) SHA1(7fad3b8d03960e5e1f7a6cb36509238977e00fcc) )
+	ROM_LOAD32_WORD("epr-16725a.7",   0x800002, 0x080000, CRC(ba0df8db) SHA1(d0c5581c56500b5266cab8e8151db24fcbdea0d7) )
+	ROM_COPY( "main_data", 0x800000, 0x900000, 0x100000 )
+	ROM_COPY( "main_data", 0x800000, 0xa00000, 0x100000 )
+	ROM_COPY( "main_data", 0x800000, 0xb00000, 0x100000 )
+	ROM_COPY( "main_data", 0x800000, 0xc00000, 0x100000 )
+	ROM_COPY( "main_data", 0x800000, 0xd00000, 0x100000 )
+	ROM_COPY( "main_data", 0x800000, 0xe00000, 0x100000 )
+	ROM_COPY( "main_data", 0x800000, 0xf00000, 0x100000 )
+
+	ROM_REGION32_LE( 0x300000, "prot_data", ROMREGION_ERASEFF ) // banked data
+	ROM_LOAD32_WORD("bank0.bin",      0x000002, 0x080000, CRC(21b603b4) SHA1(3f8f83fbf2ce5055fa85075c95da617fe2a8738a) )
+	ROM_LOAD32_WORD("bank1.bin",      0x100002, 0x080000, CRC(c1971f23) SHA1(3db88552ff2166f6eb2a9200e8609b52c1266274) )
+
+	ROM_REGION( 0x800000, "tgp", 0 ) // TGP program? (COPRO socket)
+	ROM_LOAD32_WORD("mpr-16537.ic28", 0x000000, 0x200000, CRC(36b7c35a) SHA1(b32fd1d3fc8983fb5f2a7b236b665a8c9b52769f) )
+	ROM_LOAD32_WORD("mpr-16536.ic29", 0x000002, 0x200000, CRC(6d6afed9) SHA1(2018468d7d849854b3d0cfbcd217317e2fc93555) )
+
+	ROM_REGION( 0x1000000, "polygons", 0 ) // Models
+	ROM_LOAD32_WORD("mpr-16523.ic16", 0x000000, 0x200000, CRC(2f484d42) SHA1(0b83a3fc92b7d913a14cfb01d688c63555c17c41) )
+	ROM_LOAD32_WORD("mpr-16518.ic20", 0x000002, 0x200000, CRC(df683bf7) SHA1(16afe5029591f3536b5b75d9cf50a34d0ea72c3d) )
+	ROM_LOAD32_WORD("mpr-16524.ic17", 0x400000, 0x200000, CRC(34658bd7) SHA1(71b47626ffe5b26d1140afe1b830a9a2be86c88f) )
+	ROM_LOAD32_WORD("mpr-16519.ic21", 0x400002, 0x200000, CRC(facd1c81) SHA1(dac8c281a5e9a6c4b60197e6676f3727264ee420) )
+	ROM_LOAD32_WORD("mpr-16525.ic18", 0x800000, 0x200000, CRC(fb517521) SHA1(33f5f37ea2e09fc73eed5388b46fdf1fa9e285e6) )
+	ROM_LOAD32_WORD("mpr-16520.ic22", 0x800002, 0x200000, CRC(d66bd9bd) SHA1(660171674484375a27595630e5e2d2ad76a06d1a) )
+	ROM_LOAD32_WORD("mpr-16772.ic19", 0xc00000, 0x200000, CRC(770ed912) SHA1(1789f35dd403f73f8be18495a0fe4ad1e6841417) )
+	ROM_LOAD32_WORD("mpr-16771.ic23", 0xc00002, 0x200000, CRC(a2205124) SHA1(257a3675e4ef6adbf61285a5daa5954223c28cb2) )
+
+	ROM_REGION( 0x1000000, "textures", 0 ) // Textures
+	ROM_LOAD32_WORD("mpr-16522.25", 0x000000, 0x200000, CRC(55d39a57) SHA1(abf7b0fc0f111f90da42463d600db9fa32e95efe) )
+	ROM_LOAD32_WORD("mpr-16521.24", 0x000002, 0x200000, CRC(af1934fb) SHA1(a6a21a23cd34d0de6d3e6a5c3c2687f905d0dc2a) )
+	ROM_LOAD32_WORD("mpr-16770.27", 0x800000, 0x200000, CRC(f9fa7bfb) SHA1(8aa933b74d4e05dc49987238705e50b00e5dae73) )
+	ROM_LOAD32_WORD("mpr-16769.26", 0x800002, 0x200000, CRC(e57429e9) SHA1(8c712ab09e61ef510741a55f29b3c4e497471372) )
+
+	ROM_REGION( 0x20000, "cpu3", 0) // Communication program
+	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
+
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
+	ROM_LOAD16_WORD_SWAP("epr-16720.7", 0x000000, 0x020000, CRC(8e73cffd) SHA1(9933ccc0757e8c86e0adb938d1c89210b26841ea) )
+	ROM_LOAD16_WORD_SWAP("epr-16721.8", 0x020000, 0x020000, CRC(1bb3b7b7) SHA1(ee2fd1480e535fc37e9932e6fe4e31344559fc87) )
+
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
+	ROM_LOAD("mpr-16491.32", 0x000000, 0x200000, CRC(89920903) SHA1(06d1d55470ae99f8de0f8c88c694f34c4eb13668) )
+	ROM_LOAD("mpr-16492.33", 0x200000, 0x200000, CRC(459e701b) SHA1(2054f69cecad677eb00c6a3051f5b5d90885e19b) )
+
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) // Samples
+	ROM_LOAD("mpr-16493.4", 0x000000, 0x200000, CRC(9990db15) SHA1(ea9a8b45a07dccaae62be7cf095532ce7596a70c) )
+	ROM_LOAD("mpr-16494.5", 0x200000, 0x200000, CRC(600e1d6c) SHA1(d4e246fc57a16ff562bbcbccf6a739b706f58696) )
+
+	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
+
+	ROM_REGION( 0x10000, "iocpu", 0 ) // 837-10539 I/O board
+	ROM_LOAD("epr-14869c.25", 0x000000, 0x010000, CRC(24b68e64) SHA1(c19d044d4c2fe551474492aa51922587394dd371) )
+
+	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
+	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
 ROM_END
 
 ROM_START( vcop ) /* Virtua Cop Revision B, Model 2 */
@@ -6329,9 +6428,10 @@ GAME( 1994, daytona,   0,       daytona,     daytona, model2o_state,       srall
 GAME( 1994, daytonase, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "Sega", "Daytona USA Special Edition (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, daytona93, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "Sega", "Daytona USA (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, daytonas,  daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "Sega", "Daytona USA (With Saturn Adverts)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, daytonat,  daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Japan, Turbo hack, set 1)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, daytonata, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Japan, Turbo hack, set 2)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, daytonam,  daytona, daytona_maxx,daytona, model2o_maxx_state,  srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Japan, To The MAXX)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994?,daytonat,  daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Turbo hack, set 1)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994?,daytonata, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Turbo hack, set 2)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, daytonam,  daytona, daytona_maxx,daytona, model2o_maxx_state,  srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (To The MAXX)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, daytonagtx,daytona, daytona_gtx, daytona, model2o_gtx_state,   srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (GTX 2004 Edition)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, desert,    0,       model2o,     desert,  model2o_state,       0,       ROT0, "Sega / Martin Marietta", "Desert Tank", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, vcop,      0,       model2o,     vcop,    model2o_state,       0,       ROT0, "Sega", "Virtua Cop (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, vcopa,     vcop,    model2o,     vcop,    model2o_state,       0,       ROT0, "Sega", "Virtua Cop (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
@@ -6365,9 +6465,9 @@ GAME( 1994, vstrikero, vstriker, model2b,      vstriker,  model2b_state, 0,     
 GAME( 1995, fvipers,   0,        model2b,      model2,    model2b_state, 0,        ROT0, "Sega",   "Fighting Vipers (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, fvipersb,  fvipers,  model2b,      model2,    model2b_state, 0,        ROT0, "Sega",   "Fighting Vipers (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, gunblade,  0,        model2b,      gunblade,  model2b_state, 0,        ROT0, "Sega",   "Gunblade NY (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500,   0,        indy500,      srallyc,   model2b_state, 0,        ROT0, "Sega",   "INDY 500 Twin (Revision A, Newer)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500d,  indy500,  indy500,      srallyc,   model2b_state, 0,        ROT0, "Sega",   "INDY 500 Deluxe (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500to, indy500,  indy500,      srallyc,   model2b_state, 0,        ROT0, "Sega",   "INDY 500 Twin (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, indy500,   0,        indy500,      overrev,   model2b_state, 0,        ROT0, "Sega",   "INDY 500 Twin (Revision A, Newer)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, indy500d,  indy500,  indy500,      overrev,   model2b_state, 0,        ROT0, "Sega",   "INDY 500 Deluxe (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, indy500to, indy500,  indy500,      overrev,   model2b_state, 0,        ROT0, "Sega",   "INDY 500 Twin (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, von,       0,        model2b,      von,       model2b_state, 0,        ROT0, "Sega",   "Cyber Troopers Virtual-On (USA, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, vonj,      von,      model2b,      von,       model2b_state, 0,        ROT0, "Sega",   "Cyber Troopers Virtual-On (Japan, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, schamp,    0,        model2b,      model2,    model2b_state, 0,        ROT0, "Sega",   "Sonic Championship (USA)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

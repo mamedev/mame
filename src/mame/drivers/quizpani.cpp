@@ -56,26 +56,27 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(quizpani_state::quizpani_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW1")
-	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100014, 0x100015) AM_WRITENOP /* screen flipping? */
-	AM_RANGE(0x100016, 0x100017) AM_WRITENOP /* IRQ enable? */
-	AM_RANGE(0x100018, 0x100019) AM_WRITE(tilesbank_w)
-	AM_RANGE(0x104000, 0x104001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x104020, 0x104027) AM_DEVWRITE8("nmk112", nmk112_device, okibank_w, 0x00ff)
-	AM_RANGE(0x108000, 0x1083ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x108400, 0x1085ff) AM_WRITENOP
-	AM_RANGE(0x10c000, 0x10c007) AM_RAM AM_SHARE("scrollreg")
-	AM_RANGE(0x10c008, 0x10c403) AM_WRITENOP
-	AM_RANGE(0x110000, 0x113fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x11c000, 0x11ffff) AM_RAM_WRITE(txt_videoram_w) AM_SHARE("txt_videoram")
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM
-	AM_RANGE(0x200000, 0x33ffff) AM_ROM
-ADDRESS_MAP_END
+void quizpani_state::quizpani_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x100001).portr("SYSTEM");
+	map(0x100002, 0x100003).portr("P1_P2");
+	map(0x100008, 0x100009).portr("DSW1");
+	map(0x10000a, 0x10000b).portr("DSW2");
+	map(0x100014, 0x100015).nopw(); /* screen flipping? */
+	map(0x100016, 0x100017).nopw(); /* IRQ enable? */
+	map(0x100018, 0x100019).w(this, FUNC(quizpani_state::tilesbank_w));
+	map(0x104001, 0x104001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x104020, 0x104027).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
+	map(0x108000, 0x1083ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x108400, 0x1085ff).nopw();
+	map(0x10c000, 0x10c007).ram().share("scrollreg");
+	map(0x10c008, 0x10c403).nopw();
+	map(0x110000, 0x113fff).ram().w(this, FUNC(quizpani_state::bg_videoram_w)).share("bg_videoram");
+	map(0x11c000, 0x11ffff).ram().w(this, FUNC(quizpani_state::txt_videoram_w)).share("txt_videoram");
+	map(0x180000, 0x18ffff).ram();
+	map(0x200000, 0x33ffff).rom();
+}
 
 
 /* verified from M68000 code */

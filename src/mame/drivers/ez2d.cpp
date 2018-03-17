@@ -69,8 +69,9 @@ uint32_t ez2d_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-ADDRESS_MAP_START(ez2d_state::ez2d_map)
-ADDRESS_MAP_END
+void ez2d_state::ez2d_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( ez2d )
 INPUT_PORTS_END

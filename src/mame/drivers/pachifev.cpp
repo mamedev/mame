@@ -140,29 +140,31 @@ READ8_MEMBER(pachifev_state::controls_r)
 	return output_bit;
 }
 
-ADDRESS_MAP_START(pachifev_state::pachifev_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
+void pachifev_state::pachifev_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf0fb) AM_NOP  /* internal ram */
-	AM_RANGE(0xff00, 0xff00) AM_READ_PORT("IN0")
-	AM_RANGE(0xff02, 0xff02) AM_READ_PORT("IN1")
-	AM_RANGE(0xff04, 0xff04) AM_READ_PORT("DSW1")
-	AM_RANGE(0xff06, 0xff06) AM_READ_PORT("DSW2")
-	AM_RANGE(0xff08, 0xff08) AM_READ_PORT("DSW3")
-	AM_RANGE(0xff10, 0xff10) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0xff12, 0xff12) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
-	AM_RANGE(0xff20, 0xff20) AM_DEVWRITE("y2404_1", y2404_device, write)
-	AM_RANGE(0xff30, 0xff30) AM_DEVWRITE("y2404_2", y2404_device, write)
-	AM_RANGE(0xff40, 0xff40) AM_WRITE(controls_w)
-	AM_RANGE(0xff50, 0xff50) AM_WRITENOP /* unknown */
-	AM_RANGE(0xfffa, 0xfffb) AM_NOP /* decrementer */
-	AM_RANGE(0xfffc, 0xffff) AM_NOP /* nmi */
-ADDRESS_MAP_END
+	map(0xe000, 0xe7ff).ram();
+	map(0xf000, 0xf0fb).noprw();  /* internal ram */
+	map(0xff00, 0xff00).portr("IN0");
+	map(0xff02, 0xff02).portr("IN1");
+	map(0xff04, 0xff04).portr("DSW1");
+	map(0xff06, 0xff06).portr("DSW2");
+	map(0xff08, 0xff08).portr("DSW3");
+	map(0xff10, 0xff10).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0xff12, 0xff12).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0xff20, 0xff20).w("y2404_1", FUNC(y2404_device::write));
+	map(0xff30, 0xff30).w("y2404_2", FUNC(y2404_device::write));
+	map(0xff40, 0xff40).w(this, FUNC(pachifev_state::controls_w));
+	map(0xff50, 0xff50).nopw(); /* unknown */
+	map(0xfffa, 0xfffb).noprw(); /* decrementer */
+	map(0xfffc, 0xffff).noprw(); /* nmi */
+}
 
-ADDRESS_MAP_START(pachifev_state::pachifev_cru)
-	AM_RANGE(0x000, 0x000) AM_READ(controls_r)
-ADDRESS_MAP_END
+void pachifev_state::pachifev_cru(address_map &map)
+{
+	map(0x000, 0x000).r(this, FUNC(pachifev_state::controls_r));
+}
 
 
 /* verified from TMS9995 code */

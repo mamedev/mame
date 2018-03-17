@@ -96,80 +96,87 @@ WRITE8_MEMBER(ojankohs_state::ojankoc_ctrl_w)
 }
 
 
-ADDRESS_MAP_START(ojankohs_state::ojankohs_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(ojankohs_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(ojankohs_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xa000, 0xb7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(ojankohs_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void ojankohs_state::ojankohs_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram().w(this, FUNC(ojankohs_state::ojankohs_videoram_w)).share("videoram");
+	map(0x9000, 0x9fff).ram().w(this, FUNC(ojankohs_state::ojankohs_colorram_w)).share("colorram");
+	map(0xa000, 0xb7ff).ram().share("nvram");
+	map(0xb800, 0xbfff).ram().w(this, FUNC(ojankohs_state::ojankohs_palette_w)).share("paletteram");
+	map(0xc000, 0xffff).bankr("bank1");
+}
 
 
-ADDRESS_MAP_START(ojankohs_state::ojankoy_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(ojankohs_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(ojankohs_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void ojankohs_state::ojankoy_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram().w(this, FUNC(ojankohs_state::ojankohs_videoram_w)).share("videoram");
+	map(0xa000, 0xafff).ram().w(this, FUNC(ojankohs_state::ojankohs_colorram_w)).share("colorram");
+	map(0xb000, 0xbfff).ram().share("nvram");
+	map(0xc000, 0xffff).bankr("bank1");
+}
 
 
-ADDRESS_MAP_START(ojankohs_state::ojankoc_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(ojankoc_videoram_w)
-ADDRESS_MAP_END
+void ojankohs_state::ojankoc_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).bankr("bank1").w(this, FUNC(ojankohs_state::ojankoc_videoram_w));
+}
 
 
-ADDRESS_MAP_START(ojankohs_state::ojankohs_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("system") AM_WRITE(port_select_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(keymatrix_p1_r, ojankohs_rombank_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(keymatrix_p2_r, ojankohs_gfxreg_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(ojankohs_adpcm_reset_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(ojankohs_flipscreen_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ym2149_device, data_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ym2149_device, data_address_w)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
-ADDRESS_MAP_END
+void ojankohs_state::ojankohs_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("system").w(this, FUNC(ojankohs_state::port_select_w));
+	map(0x01, 0x01).rw(this, FUNC(ojankohs_state::keymatrix_p1_r), FUNC(ojankohs_state::ojankohs_rombank_w));
+	map(0x02, 0x02).rw(this, FUNC(ojankohs_state::keymatrix_p2_r), FUNC(ojankohs_state::ojankohs_gfxreg_w));
+	map(0x03, 0x03).w(this, FUNC(ojankohs_state::ojankohs_adpcm_reset_w));
+	map(0x04, 0x04).w(this, FUNC(ojankohs_state::ojankohs_flipscreen_w));
+	map(0x05, 0x05).w(this, FUNC(ojankohs_state::ojankohs_msm5205_w));
+	map(0x06, 0x06).r("aysnd", FUNC(ym2149_device::data_r));
+	map(0x06, 0x07).w("aysnd", FUNC(ym2149_device::data_address_w));
+	map(0x10, 0x11).w("gga", FUNC(vsystem_gga_device::write));
+}
 
-ADDRESS_MAP_START(ojankohs_state::ojankoy_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("system") AM_WRITE(port_select_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(keymatrix_p1_r, ojankoy_rombank_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(keymatrix_p2_r, ojankoy_coinctr_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(ojankohs_flipscreen_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void ojankohs_state::ojankoy_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("system").w(this, FUNC(ojankohs_state::port_select_w));
+	map(0x01, 0x01).rw(this, FUNC(ojankohs_state::keymatrix_p1_r), FUNC(ojankohs_state::ojankoy_rombank_w));
+	map(0x02, 0x02).rw(this, FUNC(ojankohs_state::keymatrix_p2_r), FUNC(ojankohs_state::ojankoy_coinctr_w));
+	map(0x04, 0x04).w(this, FUNC(ojankohs_state::ojankohs_flipscreen_w));
+	map(0x05, 0x05).w(this, FUNC(ojankohs_state::ojankohs_msm5205_w));
+	map(0x06, 0x06).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x06, 0x07).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
 
-ADDRESS_MAP_START(ojankohs_state::ccasino_io_map)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ_PORT("system") AM_WRITE(port_select_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READWRITE(keymatrix_p1_r, ojankohs_rombank_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff00) AM_READWRITE(keymatrix_p2_r, ccasino_coinctr_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff00) AM_READ(ccasino_dipsw3_r) AM_WRITE(ojankohs_adpcm_reset_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff00) AM_READ(ccasino_dipsw4_r) AM_WRITE(ojankohs_flipscreen_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff00) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x06, 0x07) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x08, 0x0f) AM_SELECT(0xff00) AM_WRITE(ccasino_palette_w)     // 16bit address access
-	AM_RANGE(0x10, 0x11) AM_MIRROR(0xff00) AM_DEVWRITE("gga", vsystem_gga_device, write)
-ADDRESS_MAP_END
+void ojankohs_state::ccasino_io_map(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff00).portr("system").w(this, FUNC(ojankohs_state::port_select_w));
+	map(0x01, 0x01).mirror(0xff00).rw(this, FUNC(ojankohs_state::keymatrix_p1_r), FUNC(ojankohs_state::ojankohs_rombank_w));
+	map(0x02, 0x02).mirror(0xff00).rw(this, FUNC(ojankohs_state::keymatrix_p2_r), FUNC(ojankohs_state::ccasino_coinctr_w));
+	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ojankohs_state::ccasino_dipsw3_r)).w(this, FUNC(ojankohs_state::ojankohs_adpcm_reset_w));
+	map(0x04, 0x04).mirror(0xff00).r(this, FUNC(ojankohs_state::ccasino_dipsw4_r)).w(this, FUNC(ojankohs_state::ojankohs_flipscreen_w));
+	map(0x05, 0x05).mirror(0xff00).w(this, FUNC(ojankohs_state::ojankohs_msm5205_w));
+	map(0x06, 0x06).mirror(0xff00).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x06, 0x07).mirror(0xff00).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x08, 0x0f).select(0xff00).w(this, FUNC(ojankohs_state::ccasino_palette_w));     // 16bit address access
+	map(0x10, 0x11).mirror(0xff00).w("gga", FUNC(vsystem_gga_device::write));
+}
 
-ADDRESS_MAP_START(ojankohs_state::ojankoc_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_WRITE(ojankoc_palette_w)
-	AM_RANGE(0xf9, 0xf9) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0xfb, 0xfb) AM_WRITE(ojankoc_ctrl_w)
-	AM_RANGE(0xfc, 0xfc) AM_READ(ojankoc_keymatrix_p1_r)
-	AM_RANGE(0xfd, 0xfd) AM_READ(ojankoc_keymatrix_p2_r)
-	AM_RANGE(0xfd, 0xfd) AM_WRITE(port_select_w)
-	AM_RANGE(0xfe, 0xff) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0xff, 0xff) AM_DEVREAD("aysnd", ay8910_device, data_r)
-ADDRESS_MAP_END
+void ojankohs_state::ojankoc_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x1f).w(this, FUNC(ojankohs_state::ojankoc_palette_w));
+	map(0xf9, 0xf9).w(this, FUNC(ojankohs_state::ojankohs_msm5205_w));
+	map(0xfb, 0xfb).w(this, FUNC(ojankohs_state::ojankoc_ctrl_w));
+	map(0xfc, 0xfc).r(this, FUNC(ojankohs_state::ojankoc_keymatrix_p1_r));
+	map(0xfd, 0xfd).r(this, FUNC(ojankohs_state::ojankoc_keymatrix_p2_r));
+	map(0xfd, 0xfd).w(this, FUNC(ojankohs_state::port_select_w));
+	map(0xfe, 0xff).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0xff, 0xff).r("aysnd", FUNC(ay8910_device::data_r));
+}
 
 
 //**************************************************************************

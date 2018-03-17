@@ -100,26 +100,28 @@ READ8_MEMBER( hpz80unk_state::portfc_r )
 	return 0xfe; // or it halts
 }
 
-ADDRESS_MAP_START(hpz80unk_state::hpz80unk_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_SHARE("rom")
-ADDRESS_MAP_END
+void hpz80unk_state::hpz80unk_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xbfff).ram();
+	map(0xc000, 0xffff).rom().share("rom");
+}
 
-ADDRESS_MAP_START(hpz80unk_state::hpz80unk_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(port00_r) // uart1 status
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart1", ay31015_device, receive, transmit) // uart1 data
-	AM_RANGE(0x02, 0x02) AM_READ(port02_r)
-	AM_RANGE(0x03, 0x03) AM_READ(port03_r) // uart2 status
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("uart2", ay31015_device, receive, transmit) // uart2 data
-	AM_RANGE(0x0d, 0x0d) AM_READ(port0d_r) // uart3 status
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("uart3", ay31015_device, transmit) // uart3 data
-	AM_RANGE(0x1d, 0x1e) // top of memory is written here, big-endian
-	AM_RANGE(0x1f, 0x1f) AM_READ_PORT("DSW") // select which uarts to use
-	AM_RANGE(0xfc, 0xfc) AM_READ(portfc_r)
-ADDRESS_MAP_END
+void hpz80unk_state::hpz80unk_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(hpz80unk_state::port00_r)); // uart1 status
+	map(0x01, 0x01).rw("uart1", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit)); // uart1 data
+	map(0x02, 0x02).r(this, FUNC(hpz80unk_state::port02_r));
+	map(0x03, 0x03).r(this, FUNC(hpz80unk_state::port03_r)); // uart2 status
+	map(0x04, 0x04).rw("uart2", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit)); // uart2 data
+	map(0x0d, 0x0d).r(this, FUNC(hpz80unk_state::port0d_r)); // uart3 status
+	map(0x0e, 0x0e).w("uart3", FUNC(ay31015_device::transmit)); // uart3 data
+	map(0x1d, 0x1e); // top of memory is written here, big-endian
+	map(0x1f, 0x1f).portr("DSW"); // select which uarts to use
+	map(0xfc, 0xfc).r(this, FUNC(hpz80unk_state::portfc_r));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( hpz80unk )

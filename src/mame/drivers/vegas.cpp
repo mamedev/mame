@@ -1950,6 +1950,7 @@ MACHINE_CONFIG_START(vegas_state::nbagold)
 	vegasban(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
@@ -2433,10 +2434,10 @@ GAME( 1998, tenthdeg,   0,        tenthdeg, tenthdeg, vegas_state, tenthdeg, ROT
 /* Durango + Vegas SIO + Voodoo 2 */
 GAME( 1999, gauntdl,    0,        gauntdl,  gauntdl,  vegas_state,  gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.52)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, gauntdl24,  gauntdl,  gauntdl,  gauntdl,  vegas_state,  gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, warfa,      0,        warfa,    warfa,    vegas_state,  warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.9 Mar 25 1999, GUTS 1.3 Apr 20 1999, GAME Apr 20 1999)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, warfaa,     warfa,    warfa,    warfa,    vegas_state,  warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.6 Jan 14 1999, GUTS 1.1 Mar 16 1999, GAME Mar 16 1999)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, warfab,     warfa,    warfa,    warfa,    vegas_state,  warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.3 Apr 7 1999, GUTS 1.3 Apr 7 1999, GAME Apr 7 1999)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // version numbers comes from test mode, can be unreliable
-GAME( 1999, warfac,     warfa,    warfa,    warfa,    vegas_state,  warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.91 Apr 13 1999, GUTS 1.3 Apr 7 1999, GAME Apr 7 1999)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, warfa,      0,        warfa,    warfa,    vegas_state,  warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.9 Mar 25 1999, GUTS 1.3 Apr 20 1999, GAME Apr 20 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, warfaa,     warfa,    warfa,    warfa,    vegas_state,  warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.6 Jan 14 1999, GUTS 1.1 Mar 16 1999, GAME Mar 16 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, warfab,     warfa,    warfa,    warfa,    vegas_state,  warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.3 Apr 7 1999, GUTS 1.3 Apr 7 1999, GAME Apr 7 1999)", MACHINE_SUPPORTS_SAVE ) // version numbers comes from test mode, can be unreliable
+GAME( 1999, warfac,     warfa,    warfa,    warfa,    vegas_state,  warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.91 Apr 13 1999, GUTS 1.3 Apr 7 1999, GAME Apr 7 1999)", MACHINE_SUPPORTS_SAVE )
 
 
 /* Durango + DSIO + Voodoo 2 */

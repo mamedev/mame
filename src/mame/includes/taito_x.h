@@ -28,7 +28,7 @@ public:
 	DECLARE_DRIVER_INIT(kyustrkr);
 	DECLARE_MACHINE_START(taitox);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
 	void superman(machine_config &config);

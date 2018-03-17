@@ -549,46 +549,50 @@ READ8_MEMBER(looping_state::protection_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(looping_state::looping_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+void looping_state::looping_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(looping_videoram_w) AM_SHARE("videoram")
+	map(0x9000, 0x93ff).ram().w(this, FUNC(looping_state::looping_videoram_w)).share("videoram");
 
-	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM_WRITE(looping_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9840, 0x987f) AM_MIRROR(0x0700) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9880, 0x98ff) AM_MIRROR(0x0700) AM_RAM
+	map(0x9800, 0x983f).mirror(0x0700).ram().w(this, FUNC(looping_state::looping_colorram_w)).share("colorram");
+	map(0x9840, 0x987f).mirror(0x0700).ram().share("spriteram");
+	map(0x9880, 0x98ff).mirror(0x0700).ram();
 
-	AM_RANGE(0xb000, 0xb007) AM_MIRROR(0x07f8) AM_DEVWRITE("videolatch", ls259_device, write_d0)
+	map(0xb000, 0xb007).mirror(0x07f8).w("videolatch", FUNC(ls259_device::write_d0));
 
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x03fc) AM_READ_PORT("P1") AM_WRITE(out_0_w)                 /* /OUT0 */
-	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x03fc) AM_READ_PORT("P2") AM_WRITE(looping_soundlatch_w)    /* /OUT1 */
-	AM_RANGE(0xf802, 0xf802) AM_MIRROR(0x03fc) AM_READ_PORT("DSW") AM_WRITE(out_2_w)                /* /OUT2 */
-	AM_RANGE(0xf803, 0xf803) AM_MIRROR(0x03fc) AM_READWRITE(adc_r, adc_w)
-ADDRESS_MAP_END
+	map(0xe000, 0xefff).ram();
+	map(0xf800, 0xf800).mirror(0x03fc).portr("P1").w(this, FUNC(looping_state::out_0_w));                 /* /OUT0 */
+	map(0xf801, 0xf801).mirror(0x03fc).portr("P2").w(this, FUNC(looping_state::looping_soundlatch_w));    /* /OUT1 */
+	map(0xf802, 0xf802).mirror(0x03fc).portr("DSW").w(this, FUNC(looping_state::out_2_w));                /* /OUT2 */
+	map(0xf803, 0xf803).mirror(0x03fc).rw(this, FUNC(looping_state::adc_r), FUNC(looping_state::adc_w));
+}
 
-ADDRESS_MAP_START(looping_state::looping_io_map)
-	AM_RANGE(0x400, 0x407) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void looping_state::looping_io_map(address_map &map)
+{
+	map(0x400, 0x407).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
 
 /* complete memory map derived from schematics */
-ADDRESS_MAP_START(looping_state::looping_sound_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x37ff) AM_ROM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM
-	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x00f4) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, address_w)
-	AM_RANGE(0x3c01, 0x3c01) AM_MIRROR(0x00f6) AM_NOP
-	AM_RANGE(0x3c02, 0x3c02) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE("tms", tms5220_device, data_w)
-	AM_RANGE(0x3e01, 0x3e01) AM_MIRROR(0x00f6) AM_NOP
-	AM_RANGE(0x3e02, 0x3e02) AM_MIRROR(0x00f4) AM_DEVREAD("tms", tms5220_device, status_r) AM_WRITENOP
-ADDRESS_MAP_END
+void looping_state::looping_sound_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x37ff).rom();
+	map(0x3800, 0x3bff).ram();
+	map(0x3c00, 0x3c00).mirror(0x00f4).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x3c01, 0x3c01).mirror(0x00f6).noprw();
+	map(0x3c02, 0x3c02).mirror(0x00f4).nopr().w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x3e00, 0x3e00).mirror(0x00f4).nopr().w("tms", FUNC(tms5220_device::data_w));
+	map(0x3e01, 0x3e01).mirror(0x00f6).noprw();
+	map(0x3e02, 0x3e02).mirror(0x00f4).r("tms", FUNC(tms5220_device::status_r)).nopw();
+}
 
-ADDRESS_MAP_START(looping_state::looping_sound_io_map)
-	AM_RANGE(0x000, 0x007) AM_DEVWRITE("sen0", ls259_device, write_d0)
-	AM_RANGE(0x008, 0x00f) AM_DEVWRITE("sen1", ls259_device, write_d0)
-ADDRESS_MAP_END
+void looping_state::looping_sound_io_map(address_map &map)
+{
+	map(0x000, 0x007).w("sen0", FUNC(ls259_device::write_d0));
+	map(0x008, 0x00f).w("sen1", FUNC(ls259_device::write_d0));
+}
 
 
 /*************************************

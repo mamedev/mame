@@ -396,37 +396,40 @@ void segahang_state::sharrier_i8751_sim()
 //  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segahang_state::hangon_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x20c000, 0x20ffff) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0x400000, 0x403fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("subcpu", 0)
-	AM_RANGE(0xc68000, 0xc68fff) AM_RAM AM_SHARE("roadram")
-	AM_RANGE(0xc7c000, 0xc7ffff) AM_RAM AM_SHARE("subram")
-	AM_RANGE(0xe00000, 0xffffff) AM_READWRITE(hangon_io_r, hangon_io_w)
-ADDRESS_MAP_END
+void segahang_state::hangon_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).rom();
+	map(0x20c000, 0x20ffff).ram().share("workram");
+	map(0x400000, 0x403fff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x600000, 0x6007ff).ram().share("sprites");
+	map(0xa00000, 0xa00fff).ram().w(this, FUNC(segahang_state::paletteram_w)).share("paletteram");
+	map(0xc00000, 0xc3ffff).rom().region("subcpu", 0);
+	map(0xc68000, 0xc68fff).ram().share("roadram");
+	map(0xc7c000, 0xc7ffff).ram().share("subram");
+	map(0xe00000, 0xffffff).rw(this, FUNC(segahang_state::hangon_io_r), FUNC(segahang_state::hangon_io_w));
+}
 
-ADDRESS_MAP_START(segahang_state::decrypted_opcodes_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void segahang_state::decrypted_opcodes_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).rom().share("decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(segahang_state::sharrier_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0x100000, 0x107fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x108000, 0x108fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE("subram")
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x140000, 0x14ffff) AM_READWRITE(sharrier_io_r, sharrier_io_w)
-	AM_RANGE(0xc68000, 0xc68fff) AM_RAM AM_SHARE("roadram")
-ADDRESS_MAP_END
+void segahang_state::sharrier_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x043fff).ram().share("workram");
+	map(0x100000, 0x107fff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x108000, 0x108fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x110000, 0x110fff).ram().w(this, FUNC(segahang_state::paletteram_w)).share("paletteram");
+	map(0x124000, 0x127fff).ram().share("subram");
+	map(0x130000, 0x130fff).ram().share("sprites");
+	map(0x140000, 0x14ffff).rw(this, FUNC(segahang_state::sharrier_io_r), FUNC(segahang_state::sharrier_io_w));
+	map(0xc68000, 0xc68fff).ram().share("roadram");
+}
 
 
 
@@ -435,57 +438,64 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 	// On Super Hang On there is a memory mapper, like the System16 one, todo: emulate it!
-ADDRESS_MAP_START(segahang_state::sub_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x068000, 0x068fff) AM_RAM AM_SHARE("roadram")
-	AM_RANGE(0x07c000, 0x07ffff) AM_RAM AM_SHARE("subram")
-ADDRESS_MAP_END
+void segahang_state::sub_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x7ffff);
+	map(0x000000, 0x03ffff).rom();
+	map(0x068000, 0x068fff).ram().share("roadram");
+	map(0x07c000, 0x07ffff).ram().share("subram");
+}
 
-ADDRESS_MAP_START(segahang_state::fd1094_decrypted_opcodes_map)
-	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
-ADDRESS_MAP_END
+void segahang_state::fd1094_decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
+}
 
 //**************************************************************************
 //  SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segahang_state::sound_map_2203)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x0800) AM_RAM
-	AM_RANGE(0xd000, 0xd001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xe000, 0xe0ff) AM_MIRROR(0x0f00) AM_DEVREADWRITE("pcm", segapcm_device, sega_pcm_r, sega_pcm_w)
-ADDRESS_MAP_END
+void segahang_state::sound_map_2203(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).mirror(0x0800).ram();
+	map(0xd000, 0xd001).mirror(0x0ffe).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xe000, 0xe0ff).mirror(0x0f00).rw("pcm", FUNC(segapcm_device::sega_pcm_r), FUNC(segapcm_device::sega_pcm_w));
+}
 
-ADDRESS_MAP_START(segahang_state::sound_portmap_2203)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-ADDRESS_MAP_END
+void segahang_state::sound_portmap_2203(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x40, 0x40).mirror(0x3f).r(this, FUNC(segahang_state::sound_data_r));
+}
 
-ADDRESS_MAP_START(segahang_state::sound_map_2151)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x700) AM_DEVREADWRITE("pcm", segapcm_device, sega_pcm_r, sega_pcm_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segahang_state::sound_map_2151(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0xf000, 0xf0ff).mirror(0x700).rw("pcm", FUNC(segapcm_device::sega_pcm_r), FUNC(segapcm_device::sega_pcm_w));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segahang_state::sound_portmap_2151)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-ADDRESS_MAP_END
+void segahang_state::sound_portmap_2151(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x40, 0x40).mirror(0x3f).r(this, FUNC(segahang_state::sound_data_r));
+}
 
-ADDRESS_MAP_START(segahang_state::sound_portmap_2203x2)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0x3e) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-ADDRESS_MAP_END
+void segahang_state::sound_portmap_2203x2(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x40, 0x40).mirror(0x3f).r(this, FUNC(segahang_state::sound_data_r));
+	map(0xc0, 0xc1).mirror(0x3e).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 
 
@@ -493,8 +503,9 @@ ADDRESS_MAP_END
 //  I8751 MCU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segahang_state::mcu_io_map)
-ADDRESS_MAP_END
+void segahang_state::mcu_io_map(address_map &map)
+{
+}
 
 
 

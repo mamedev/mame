@@ -72,29 +72,31 @@ GFXDECODEINFO(0x0400000, 128)
                             COMMON
   ============================================================================*/
 
-ADDRESS_MAP_START(gaelco2_state::mcu_hostmem_map)
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(shareram_r, shareram_w) // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
-ADDRESS_MAP_END
+void gaelco2_state::mcu_hostmem_map(address_map &map)
+{
+	map(0x8000, 0xffff).rw(this, FUNC(gaelco2_state::shareram_r), FUNC(gaelco2_state::shareram_w)); // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
+}
 
 
 /*============================================================================
                             MANIAC SQUARE (FINAL)
   ============================================================================*/
 
-ADDRESS_MAP_START(gaelco2_state::maniacsq_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                                     /* ROM */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                     /* Palette */
-	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")                                                   /* Video Registers */
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")                                                        /* DSW #1 + Input 1P */
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")                                                        /* DSW #2 + Input 2P */
-	AM_RANGE(0x30004a, 0x30004b) AM_WRITENOP                                                                /* Sound muting? */
-	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("COIN")                                                       /* COINSW + SERVICESW */
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(alighunt_coin_w)                                                  /* Coin lockout + counters */
-	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                     /* Work RAM */
-	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                /* Work RAM */
-ADDRESS_MAP_END
+void gaelco2_state::maniacsq_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();                                                                     /* ROM */
+	map(0x200000, 0x20ffff).ram().w(this, FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                         /* Video RAM */
+	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));    /* Sound Registers */
+	map(0x210000, 0x211fff).ram().w(this, FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                     /* Palette */
+	map(0x218004, 0x218009).ram().share("vregs");                                                   /* Video Registers */
+	map(0x300000, 0x300001).portr("IN0");                                                        /* DSW #1 + Input 1P */
+	map(0x300002, 0x300003).portr("IN1");                                                        /* DSW #2 + Input 2P */
+	map(0x30004a, 0x30004b).nopw();                                                                /* Sound muting? */
+	map(0x320000, 0x320001).portr("COIN");                                                       /* COINSW + SERVICESW */
+	map(0x500000, 0x500001).w(this, FUNC(gaelco2_state::alighunt_coin_w));                                                  /* Coin lockout + counters */
+	map(0xfe0000, 0xfe7fff).ram();                                                                     /* Work RAM */
+	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                /* Work RAM */
+}
 
 
 static INPUT_PORTS_START( maniacsq )
@@ -479,21 +481,22 @@ WRITE16_MEMBER(gaelco2_state::play2000_shareram_68k_w)
 }
 
 
-ADDRESS_MAP_START(gaelco2_state::play2000_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                                     /* ROM */
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN0")                                                        /* Coins + other buttons? */
+void gaelco2_state::play2000_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();                                                                     /* ROM */
+	map(0x100000, 0x100001).portr("IN0");                                                        /* Coins + other buttons? */
 	// AM_RANGE(0x110000, 0x110001) ?
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
-	AM_RANGE(0x214000, 0x214fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                     /* Palette */
-	AM_RANGE(0x215000, 0x217fff) AM_RAM                                                                     /* Written to, but unused? */
-	AM_RANGE(0x218000, 0x218003) AM_RAM                                                                     /* Written to, but unused? */
-	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")                                                   /* Video Registers */
-	AM_RANGE(0x21800a, 0x218fff) AM_RAM                                                                     /* Written to, but unused? */
+	map(0x200000, 0x20ffff).ram().w(this, FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                         /* Video RAM */
+	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));    /* Sound Registers */
+	map(0x214000, 0x214fff).ram().w(this, FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                     /* Palette */
+	map(0x215000, 0x217fff).ram();                                                                     /* Written to, but unused? */
+	map(0x218000, 0x218003).ram();                                                                     /* Written to, but unused? */
+	map(0x218004, 0x218009).ram().share("vregs");                                                   /* Video Registers */
+	map(0x21800a, 0x218fff).ram();                                                                     /* Written to, but unused? */
 	// AM_RANGE(0x843100, 0x84315e)  ?
-	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                     /* Work RAM */
-	AM_RANGE(0xfe8000, 0xfeffff) AM_READWRITE(play2000_shareram_68k_r, play2000_shareram_68k_w) AM_SHARE("shareram")                                                /* Work RAM */
-ADDRESS_MAP_END
+	map(0xfe0000, 0xfe7fff).ram();                                                                     /* Work RAM */
+	map(0xfe8000, 0xfeffff).rw(this, FUNC(gaelco2_state::play2000_shareram_68k_r), FUNC(gaelco2_state::play2000_shareram_68k_w)).share("shareram");                                                /* Work RAM */
+}
 
 static INPUT_PORTS_START( play2000 )
 	PORT_START("IN0")
@@ -638,25 +641,26 @@ READ16_MEMBER(bang_state::p1_gun_y){return (m_light0_y->read() * 240 / 0x100) - 
 READ16_MEMBER(bang_state::p2_gun_x){return (m_light1_x->read() * 320 / 0x100) + 1;}
 READ16_MEMBER(bang_state::p2_gun_y){return (m_light1_y->read() * 240 / 0x100) - 4;}
 
-ADDRESS_MAP_START(bang_state::bang_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                     /* ROM */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_cg1v_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                     /* Palette */
-	AM_RANGE(0x218004, 0x218009) AM_READONLY                                                                /* Video Registers */
-	AM_RANGE(0x218004, 0x218007) AM_WRITEONLY AM_SHARE("vregs")                                             /* Video Registers */
-	AM_RANGE(0x218008, 0x218009) AM_WRITENOP                                                                /* CLR INT Video */
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1")
-	AM_RANGE(0x300002, 0x300003) AM_READNOP                                                                 /* Random number generator? */
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE8("mainlatch", ls259_device, write_d0, 0x00ff)                  /* Coin Counters & serial EEPROM */
-	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("P2")
-	AM_RANGE(0x300020, 0x300021) AM_READ_PORT("COIN")
-	AM_RANGE(0x310000, 0x310001) AM_READ(p1_gun_x) AM_WRITE(bang_clr_gun_int_w)                             /* Gun 1P X */ /* CLR INT Gun */
-	AM_RANGE(0x310002, 0x310003) AM_READ(p2_gun_x)                                                          /* Gun 2P X */
-	AM_RANGE(0x310004, 0x310005) AM_READ(p1_gun_y)                                                          /* Gun 1P Y */
-	AM_RANGE(0x310006, 0x310007) AM_READ(p2_gun_y)                                                          /* Gun 2P Y */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                                                     /* Work RAM */
-ADDRESS_MAP_END
+void bang_state::bang_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                                                                     /* ROM */
+	map(0x200000, 0x20ffff).ram().w(this, FUNC(bang_state::gaelco2_vram_w)).share("spriteram");                         /* Video RAM */
+	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_cg1v_device::gaelcosnd_r), FUNC(gaelco_cg1v_device::gaelcosnd_w));    /* Sound Registers */
+	map(0x210000, 0x211fff).ram().w(this, FUNC(bang_state::gaelco2_palette_w)).share("paletteram");                     /* Palette */
+	map(0x218004, 0x218009).readonly();                                                                /* Video Registers */
+	map(0x218004, 0x218007).writeonly().share("vregs");                                             /* Video Registers */
+	map(0x218008, 0x218009).nopw();                                                                /* CLR INT Video */
+	map(0x300000, 0x300001).portr("P1");
+	map(0x300002, 0x300003).nopr();                                                                 /* Random number generator? */
+	map(0x300000, 0x30000f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);                  /* Coin Counters & serial EEPROM */
+	map(0x300010, 0x300011).portr("P2");
+	map(0x300020, 0x300021).portr("COIN");
+	map(0x310000, 0x310001).r(this, FUNC(bang_state::p1_gun_x)).w(this, FUNC(bang_state::bang_clr_gun_int_w));                             /* Gun 1P X */ /* CLR INT Gun */
+	map(0x310002, 0x310003).r(this, FUNC(bang_state::p2_gun_x));                                                          /* Gun 2P X */
+	map(0x310004, 0x310005).r(this, FUNC(bang_state::p1_gun_y));                                                          /* Gun 1P Y */
+	map(0x310006, 0x310007).r(this, FUNC(bang_state::p2_gun_y));                                                          /* Gun 2P Y */
+	map(0xfe0000, 0xfeffff).ram();                                                                     /* Work RAM */
+}
 
 
 static INPUT_PORTS_START( bang )
@@ -841,20 +845,21 @@ ROM_END
   ============================================================================*/
 
 
-ADDRESS_MAP_START(gaelco2_state::alighunt_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                         /* ROM */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                             /* Video RAM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)        /* Sound Registers */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                         /* Palette */
-	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")                                                       /* Video Registers */
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")                                                            /* DSW #1 + Input 1P */
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")                                                            /* DSW #2 + Input 2P */
-	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("COIN")                                                           /* COINSW + SERVICESW */
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(alighunt_coin_w)                                                      /* Coin lockout + counters */
-	AM_RANGE(0x500006, 0x500007) AM_WRITENOP                                                                    /* ??? */
-	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                         /* Work RAM */
-	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                    /* Work RAM (shared with D5002FP) */
-ADDRESS_MAP_END
+void gaelco2_state::alighunt_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                                                                         /* ROM */
+	map(0x200000, 0x20ffff).ram().w(this, FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                             /* Video RAM */
+	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));        /* Sound Registers */
+	map(0x210000, 0x211fff).ram().w(this, FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                         /* Palette */
+	map(0x218004, 0x218009).ram().share("vregs");                                                       /* Video Registers */
+	map(0x300000, 0x300001).portr("IN0");                                                            /* DSW #1 + Input 1P */
+	map(0x300002, 0x300003).portr("IN1");                                                            /* DSW #2 + Input 2P */
+	map(0x320000, 0x320001).portr("COIN");                                                           /* COINSW + SERVICESW */
+	map(0x500000, 0x500001).w(this, FUNC(gaelco2_state::alighunt_coin_w));                                                      /* Coin lockout + counters */
+	map(0x500006, 0x500007).nopw();                                                                    /* ??? */
+	map(0xfe0000, 0xfe7fff).ram();                                                                         /* Work RAM */
+	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                    /* Work RAM (shared with D5002FP) */
+}
 
 
 static INPUT_PORTS_START( alighunt )
@@ -1108,20 +1113,21 @@ ROM_END
   ============================================================================*/
 
 
-ADDRESS_MAP_START(gaelco2_state::touchgo_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                         /* ROM */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                             /* Video RAM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)        /* Sound Registers */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                         /* Palette */
-	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")                                                       /* Video Registers */
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")                                                            /* DSW #1 + Input 1P */
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")                                                            /* DSW #2 + Input 2P */
-	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("IN2")                                                            /* COINSW + Input 3P */
-	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("IN3")                                                            /* SERVICESW + Input 4P */
-	AM_RANGE(0x500000, 0x500001) AM_SELECT(0x0038) AM_WRITE(wrally2_latch_w)                                    /* Coin counters */
-	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                         /* Work RAM */
-	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                    /* Work RAM (shared with D5002FP) */
-ADDRESS_MAP_END
+void gaelco2_state::touchgo_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                                                                         /* ROM */
+	map(0x200000, 0x20ffff).ram().w(this, FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                             /* Video RAM */
+	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));        /* Sound Registers */
+	map(0x210000, 0x211fff).ram().w(this, FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                         /* Palette */
+	map(0x218004, 0x218009).ram().share("vregs");                                                       /* Video Registers */
+	map(0x300000, 0x300001).portr("IN0");                                                            /* DSW #1 + Input 1P */
+	map(0x300002, 0x300003).portr("IN1");                                                            /* DSW #2 + Input 2P */
+	map(0x300004, 0x300005).portr("IN2");                                                            /* COINSW + Input 3P */
+	map(0x300006, 0x300007).portr("IN3");                                                            /* SERVICESW + Input 4P */
+	map(0x500000, 0x500001).select(0x0038).w(this, FUNC(gaelco2_state::wrally2_latch_w));                                    /* Coin counters */
+	map(0xfe0000, 0xfe7fff).ram();                                                                         /* Work RAM */
+	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                    /* Work RAM (shared with D5002FP) */
+}
 
 
 static INPUT_PORTS_START( touchgo )
@@ -1430,20 +1436,21 @@ ROM_END
                             SNOW BOARD
   ============================================================================*/
 
-ADDRESS_MAP_START(gaelco2_state::snowboar_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                         /* ROM */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                             /* Video RAM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_cg1v_device, gaelcosnd_r, gaelcosnd_w)        /* Sound Registers */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                         /* Palette */
-	AM_RANGE(0x212000, 0x213fff) AM_RAM                                                                         /* Extra RAM */
-	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")                                                       /* Video Registers */
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1")
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE8("mainlatch", ls259_device, write_d0, 0x00ff)                      /* Coin Counters & serial EEPROM */
-	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("P2")
-	AM_RANGE(0x300020, 0x300021) AM_READ_PORT("COIN")
-	AM_RANGE(0x310000, 0x31ffff) AM_READWRITE(snowboar_protection_r,snowboar_protection_w) AM_SHARE("snowboar_prot")    /* Protection */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                                                                 /* Work RAM */
-ADDRESS_MAP_END
+void gaelco2_state::snowboar_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                                                                         /* ROM */
+	map(0x200000, 0x20ffff).ram().w(this, FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");                             /* Video RAM */
+	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_cg1v_device::gaelcosnd_r), FUNC(gaelco_cg1v_device::gaelcosnd_w));        /* Sound Registers */
+	map(0x210000, 0x211fff).ram().w(this, FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");                         /* Palette */
+	map(0x212000, 0x213fff).ram();                                                                         /* Extra RAM */
+	map(0x218004, 0x218009).ram().share("vregs");                                                       /* Video Registers */
+	map(0x300000, 0x300001).portr("P1");
+	map(0x300000, 0x30000f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);                      /* Coin Counters & serial EEPROM */
+	map(0x300010, 0x300011).portr("P2");
+	map(0x300020, 0x300021).portr("COIN");
+	map(0x310000, 0x31ffff).rw(this, FUNC(gaelco2_state::snowboar_protection_r), FUNC(gaelco2_state::snowboar_protection_w)).share("snowboar_prot");    /* Protection */
+	map(0xfe0000, 0xfeffff).ram();                                                                                 /* Work RAM */
+}
 
 
 static INPUT_PORTS_START( snowboar )
@@ -1658,21 +1665,22 @@ ROM_END
                             WORLD RALLY 2
   ============================================================================*/
 
-ADDRESS_MAP_START(wrally2_state::wrally2_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                     /* ROM */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")                         /* Video RAM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)    /* Sound Registers */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")                     /* Palette */
-	AM_RANGE(0x212000, 0x213fff) AM_RAM                                                                     /* Extra RAM */
-	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")                                                   /* Video Registers */
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")                                                        /* DIPSW #2 + Inputs 1P */
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")                                                        /* DIPSW #1 */
-	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("IN2")                                                        /* Inputs 2P + COINSW */
-	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("IN3")                                                        /* SERVICESW */
-	AM_RANGE(0x400000, 0x400001) AM_SELECT(0x0038) AM_WRITE(wrally2_latch_w)                                /* Coin counters, etc. */
-	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                     /* Work RAM */
-	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                /* Work RAM (shared with D5002FP) */
-ADDRESS_MAP_END
+void wrally2_state::wrally2_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                                                                     /* ROM */
+	map(0x200000, 0x20ffff).ram().w(this, FUNC(wrally2_state::gaelco2_vram_w)).share("spriteram");                         /* Video RAM */
+	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));    /* Sound Registers */
+	map(0x210000, 0x211fff).ram().w(this, FUNC(wrally2_state::gaelco2_palette_w)).share("paletteram");                     /* Palette */
+	map(0x212000, 0x213fff).ram();                                                                     /* Extra RAM */
+	map(0x218004, 0x218009).ram().share("vregs");                                                   /* Video Registers */
+	map(0x300000, 0x300001).portr("IN0");                                                        /* DIPSW #2 + Inputs 1P */
+	map(0x300002, 0x300003).portr("IN1");                                                        /* DIPSW #1 */
+	map(0x300004, 0x300005).portr("IN2");                                                        /* Inputs 2P + COINSW */
+	map(0x300006, 0x300007).portr("IN3");                                                        /* SERVICESW */
+	map(0x400000, 0x400001).select(0x0038).w(this, FUNC(wrally2_state::wrally2_latch_w));                                /* Coin counters, etc. */
+	map(0xfe0000, 0xfe7fff).ram();                                                                     /* Work RAM */
+	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                /* Work RAM (shared with D5002FP) */
+}
 
 
 static INPUT_PORTS_START( wrally2 )

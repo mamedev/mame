@@ -399,47 +399,49 @@ uint32_t luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_in
 	return 0;
 }
 
-ADDRESS_MAP_START(luckgrln_state::mainmap)
-	AM_RANGE(0x00000, 0x03fff) AM_ROM
-	AM_RANGE(0x10000, 0x1ffff) AM_ROM AM_REGION("rom_data",0x10000)
-	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_REGION("rom_data",0x00000)
+void luckgrln_state::mainmap(address_map &map)
+{
+	map(0x00000, 0x03fff).rom();
+	map(0x10000, 0x1ffff).rom().region("rom_data", 0x10000);
+	map(0x20000, 0x2ffff).rom().region("rom_data", 0x00000);
 
-	AM_RANGE(0x0c000, 0x0c1ff) AM_RAM_WRITE(luckgrln_reel1_ram_w)  AM_SHARE("reel1_ram") // only written to half way
-	AM_RANGE(0x0c800, 0x0c9ff) AM_RAM_WRITE(luckgrln_reel1_attr_w) AM_SHARE("reel1_attr")
-	AM_RANGE(0x0d000, 0x0d03f) AM_RAM AM_SHARE("reel1_scroll") AM_MIRROR(0x000c0)
+	map(0x0c000, 0x0c1ff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel1_ram_w)).share("reel1_ram"); // only written to half way
+	map(0x0c800, 0x0c9ff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel1_attr_w)).share("reel1_attr");
+	map(0x0d000, 0x0d03f).ram().share("reel1_scroll").mirror(0x000c0);
 
-	AM_RANGE(0x0c200, 0x0c3ff) AM_RAM_WRITE(luckgrln_reel2_ram_w)  AM_SHARE("reel2_ram")
-	AM_RANGE(0x0ca00, 0x0cbff) AM_RAM_WRITE(luckgrln_reel2_attr_w) AM_SHARE("reel2_attr")
-	AM_RANGE(0x0d200, 0x0d23f) AM_RAM AM_SHARE("reel2_scroll") AM_MIRROR(0x000c0)
+	map(0x0c200, 0x0c3ff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel2_ram_w)).share("reel2_ram");
+	map(0x0ca00, 0x0cbff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel2_attr_w)).share("reel2_attr");
+	map(0x0d200, 0x0d23f).ram().share("reel2_scroll").mirror(0x000c0);
 
-	AM_RANGE(0x0c400, 0x0c5ff) AM_RAM_WRITE(luckgrln_reel3_ram_w ) AM_SHARE("reel3_ram")
-	AM_RANGE(0x0cc00, 0x0cdff) AM_RAM_WRITE(luckgrln_reel3_attr_w) AM_SHARE("reel3_attr")
-	AM_RANGE(0x0d400, 0x0d43f) AM_RAM AM_SHARE("reel3_scroll") AM_MIRROR(0x000c0)
+	map(0x0c400, 0x0c5ff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel3_ram_w)).share("reel3_ram");
+	map(0x0cc00, 0x0cdff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel3_attr_w)).share("reel3_attr");
+	map(0x0d400, 0x0d43f).ram().share("reel3_scroll").mirror(0x000c0);
 
-	AM_RANGE(0x0c600, 0x0c7ff) AM_RAM_WRITE(luckgrln_reel4_ram_w ) AM_SHARE("reel4_ram")
-	AM_RANGE(0x0ce00, 0x0cfff) AM_RAM_WRITE(luckgrln_reel4_attr_w) AM_SHARE("reel4_attr")
-	AM_RANGE(0x0d600, 0x0d63f) AM_RAM AM_SHARE("reel4_scroll")
+	map(0x0c600, 0x0c7ff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel4_ram_w)).share("reel4_ram");
+	map(0x0ce00, 0x0cfff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel4_attr_w)).share("reel4_attr");
+	map(0x0d600, 0x0d63f).ram().share("reel4_scroll");
 
 //  AM_RANGE(0x0d200, 0x0d2ff) AM_RAM
 
 
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM // nvram
+	map(0x0d800, 0x0dfff).ram(); // nvram
 
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM AM_SHARE("luck_vram1")
-	AM_RANGE(0x0e800, 0x0efff) AM_RAM AM_SHARE("luck_vram2")
-	AM_RANGE(0x0f000, 0x0f7ff) AM_RAM AM_SHARE("luck_vram3")
+	map(0x0e000, 0x0e7ff).ram().share("luck_vram1");
+	map(0x0e800, 0x0efff).ram().share("luck_vram2");
+	map(0x0f000, 0x0f7ff).ram().share("luck_vram3");
 
 
-	AM_RANGE(0x0f800, 0x0ffff) AM_RAM
-	AM_RANGE(0xf0000, 0xfffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x0f800, 0x0ffff).ram();
+	map(0xf0000, 0xfffff).ram();
+}
 
-ADDRESS_MAP_START(luckgrln_state::_7smash_map)
-	AM_IMPORT_FROM( mainmap )
-	AM_RANGE(0x00000, 0x0bfff) AM_ROM
-	AM_RANGE(0x10000, 0x2ffff) AM_UNMAP
-	AM_RANGE(0xf0000, 0xfffff) AM_UNMAP
-ADDRESS_MAP_END
+void luckgrln_state::_7smash_map(address_map &map)
+{
+	mainmap(map);
+	map(0x00000, 0x0bfff).rom();
+	map(0x10000, 0x2ffff).unmaprw();
+	map(0xf0000, 0xfffff).unmaprw();
+}
 
 WRITE8_MEMBER(luckgrln_state::output_w)
 {
@@ -553,47 +555,48 @@ WRITE8_MEMBER(luckgrln_state::counters_w)
 
 
 /* are some of these reads / writes mirrored? there seem to be far too many */
-ADDRESS_MAP_START(luckgrln_state::common_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
-	AM_RANGE(0x0060, 0x0060) AM_WRITE(output_w)
+void luckgrln_state::common_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x003f).ram(); // Z180 internal regs
+	map(0x0060, 0x0060).w(this, FUNC(luckgrln_state::output_w));
 
-	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(palette_offset_low_w)
-	AM_RANGE(0x00a1, 0x00a1) AM_WRITE(palette_offset_high_w)
-	AM_RANGE(0x00a2, 0x00a2) AM_WRITE(palette_w)
+	map(0x00a0, 0x00a0).w(this, FUNC(luckgrln_state::palette_offset_low_w));
+	map(0x00a1, 0x00a1).w(this, FUNC(luckgrln_state::palette_offset_high_w));
+	map(0x00a2, 0x00a2).w(this, FUNC(luckgrln_state::palette_w));
 
-	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x00b1, 0x00b1) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	map(0x00b0, 0x00b0).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x00b1, 0x00b1).w("crtc", FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x00b8, 0x00b8) AM_READ_PORT("IN0")
-	AM_RANGE(0x00b9, 0x00b9) AM_READ_PORT("IN1") AM_WRITE(counters_w)
-	AM_RANGE(0x00ba, 0x00ba) AM_READ_PORT("IN2") AM_WRITE(lamps_a_w)
-	AM_RANGE(0x00bb, 0x00bb) AM_READ_PORT("IN3") AM_WRITE(lamps_b_w)
-	AM_RANGE(0x00bc, 0x00bc) AM_READ_PORT("DSW1")
+	map(0x00b8, 0x00b8).portr("IN0");
+	map(0x00b9, 0x00b9).portr("IN1").w(this, FUNC(luckgrln_state::counters_w));
+	map(0x00ba, 0x00ba).portr("IN2").w(this, FUNC(luckgrln_state::lamps_a_w));
+	map(0x00bb, 0x00bb).portr("IN3").w(this, FUNC(luckgrln_state::lamps_b_w));
+	map(0x00bc, 0x00bc).portr("DSW1");
 
-	AM_RANGE(0x00c0, 0x00c3) AM_WRITENOP
-	AM_RANGE(0x00c4, 0x00c7) AM_WRITENOP
-	AM_RANGE(0x00c8, 0x00cb) AM_WRITENOP
-	AM_RANGE(0x00cc, 0x00cf) AM_WRITENOP
+	map(0x00c0, 0x00c3).nopw();
+	map(0x00c4, 0x00c7).nopw();
+	map(0x00c8, 0x00cb).nopw();
+	map(0x00cc, 0x00cf).nopw();
 
-	AM_RANGE(0x00d0, 0x00d3) AM_WRITENOP
-	AM_RANGE(0x00d4, 0x00d7) AM_WRITENOP
-	AM_RANGE(0x00d8, 0x00db) AM_WRITENOP
-	AM_RANGE(0x00dc, 0x00df) AM_WRITENOP
+	map(0x00d0, 0x00d3).nopw();
+	map(0x00d4, 0x00d7).nopw();
+	map(0x00d8, 0x00db).nopw();
+	map(0x00dc, 0x00df).nopw();
 
-	AM_RANGE(0x00e4, 0x00e7) AM_WRITENOP
+	map(0x00e4, 0x00e7).nopw();
 
-	AM_RANGE(0x00f3, 0x00f3) AM_WRITENOP
-	AM_RANGE(0x00f7, 0x00f7) AM_WRITENOP
+	map(0x00f3, 0x00f3).nopw();
+	map(0x00f7, 0x00f7).nopw();
 
-	AM_RANGE(0x00f8, 0x00f8) AM_READ_PORT("DSW2")
-	AM_RANGE(0x00f9, 0x00f9) AM_READ_PORT("DSW3")
-	AM_RANGE(0x00fa, 0x00fa) AM_READ_PORT("DSW4")
-	AM_RANGE(0x00fb, 0x00fb) AM_READ_PORT("DSW5") //AM_WRITENOP
-	AM_RANGE(0x00fc, 0x00fc) AM_WRITENOP
-	AM_RANGE(0x00fd, 0x00fd) AM_WRITENOP
-	AM_RANGE(0x00fe, 0x00fe) AM_WRITENOP
-	AM_RANGE(0x00ff, 0x00ff) AM_WRITENOP
+	map(0x00f8, 0x00f8).portr("DSW2");
+	map(0x00f9, 0x00f9).portr("DSW3");
+	map(0x00fa, 0x00fa).portr("DSW4");
+	map(0x00fb, 0x00fb).portr("DSW5"); //AM_WRITENOP
+	map(0x00fc, 0x00fc).nopw();
+	map(0x00fd, 0x00fd).nopw();
+	map(0x00fe, 0x00fe).nopw();
+	map(0x00ff, 0x00ff).nopw();
 
 /*
 
@@ -603,12 +606,13 @@ ADDRESS_MAP_START(luckgrln_state::common_portmap)
 
 */
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(luckgrln_state::luckgrln_io)
-	AM_IMPORT_FROM( common_portmap )
-	AM_RANGE(0x0090, 0x009f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-ADDRESS_MAP_END
+void luckgrln_state::luckgrln_io(address_map &map)
+{
+	common_portmap(map);
+	map(0x0090, 0x009f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+}
 
 /* reads a bit 1 status there after every round played */
 READ8_MEMBER(luckgrln_state::test_r)
@@ -616,10 +620,11 @@ READ8_MEMBER(luckgrln_state::test_r)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(luckgrln_state::_7smash_io)
-	AM_IMPORT_FROM( common_portmap )
-	AM_RANGE(0x66, 0x66) AM_READ(test_r)
-ADDRESS_MAP_END
+void luckgrln_state::_7smash_io(address_map &map)
+{
+	common_portmap(map);
+	map(0x66, 0x66).r(this, FUNC(luckgrln_state::test_r));
+}
 
 static INPUT_PORTS_START( luckgrln )
 	PORT_START("IN0")

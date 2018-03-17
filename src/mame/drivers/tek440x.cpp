@@ -147,31 +147,33 @@ uint32_t tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
  *
  *************************************/
 
-ADDRESS_MAP_START(tek440x_state::maincpu_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x740000, 0x747fff) AM_ROM AM_REGION("maincpu", 0)
+void tek440x_state::maincpu_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).ram().share("mainram");
+	map(0x600000, 0x61ffff).ram().share("vram");
+	map(0x740000, 0x747fff).rom().region("maincpu", 0);
 	// 760000 - optional debug ROM
-	AM_RANGE(0x780000, 0x781fff) AM_RAM // map registers
+	map(0x780000, 0x781fff).ram(); // map registers
 	// 782000-783fff: video address registers
 	// 784000-785fff: video control registers
-	AM_RANGE(0x788000, 0x788001) AM_DEVWRITE8("snsnd", sn76496_device, write, 0xff00)
+	map(0x788000, 0x788000).w("snsnd", FUNC(sn76496_device::write));
 	// 78a000-78bfff: NS32081 FPU
-	AM_RANGE(0x78c000, 0x78c007) AM_DEVREADWRITE8("aica", mos6551_device, read, write, 0xff00)
+	map(0x78c000, 0x78c007).rw("aica", FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
 	// 7b1000-7b2fff: diagnostic registers
 	// 7b2000-7b3fff: Centronics printer data
 	// 7b4000-7b5fff: 68681 DUART
 	// 7b6000-7b7fff: Mouse
-	AM_RANGE(0x7b8000, 0x7b8003) AM_MIRROR(0x100) AM_DEVREADWRITE("timer", am9513_device, read16, write16)
+	map(0x7b8000, 0x7b8003).mirror(0x100).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	// 7ba000-7bbfff: MC146818 RTC
 	// 7bc000-7bdfff: SCSI bus address registers
 	// 7be000-7bffff: SCSI (NCR 5385)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(tek440x_state::fdccpu_map)
-	AM_RANGE(0x0000, 0x1000) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("fdccpu", 0)
-ADDRESS_MAP_END
+void tek440x_state::fdccpu_map(address_map &map)
+{
+	map(0x0000, 0x1000).ram();
+	map(0xf000, 0xffff).rom().region("fdccpu", 0);
+}
 
 /*************************************
  *

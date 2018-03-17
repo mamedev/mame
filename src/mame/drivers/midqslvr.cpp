@@ -362,32 +362,34 @@ WRITE32_MEMBER(midqslvr_state::bios_ram_w)
 	}
 }
 
-ADDRESS_MAP_START(midqslvr_state::midqslvr_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
-	AM_RANGE(0x000c0000, 0x000c3fff) AM_ROMBANK("video_bank1") AM_WRITE(isa_ram1_w)
-	AM_RANGE(0x000c4000, 0x000c7fff) AM_ROMBANK("video_bank2") AM_WRITE(isa_ram2_w)
-	AM_RANGE(0x000e0000, 0x000e3fff) AM_ROMBANK("bios_ext1") AM_WRITE(bios_ext1_ram_w)
-	AM_RANGE(0x000e4000, 0x000e7fff) AM_ROMBANK("bios_ext2") AM_WRITE(bios_ext2_ram_w)
-	AM_RANGE(0x000e8000, 0x000ebfff) AM_ROMBANK("bios_ext3") AM_WRITE(bios_ext3_ram_w)
-	AM_RANGE(0x000ec000, 0x000effff) AM_ROMBANK("bios_ext4") AM_WRITE(bios_ext4_ram_w)
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bios_bank") AM_WRITE(bios_ram_w)
-	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
-ADDRESS_MAP_END
+void midqslvr_state::midqslvr_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+	map(0x000c0000, 0x000c3fff).bankr("video_bank1").w(this, FUNC(midqslvr_state::isa_ram1_w));
+	map(0x000c4000, 0x000c7fff).bankr("video_bank2").w(this, FUNC(midqslvr_state::isa_ram2_w));
+	map(0x000e0000, 0x000e3fff).bankr("bios_ext1").w(this, FUNC(midqslvr_state::bios_ext1_ram_w));
+	map(0x000e4000, 0x000e7fff).bankr("bios_ext2").w(this, FUNC(midqslvr_state::bios_ext2_ram_w));
+	map(0x000e8000, 0x000ebfff).bankr("bios_ext3").w(this, FUNC(midqslvr_state::bios_ext3_ram_w));
+	map(0x000ec000, 0x000effff).bankr("bios_ext4").w(this, FUNC(midqslvr_state::bios_ext4_ram_w));
+	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(this, FUNC(midqslvr_state::bios_ram_w));
+	map(0x00100000, 0x01ffffff).ram();
+	map(0xfff80000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+}
 
-ADDRESS_MAP_START(midqslvr_state::midqslvr_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x00e8, 0x00ef) AM_NOP
+void midqslvr_state::midqslvr_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x00e8, 0x00ef).noprw();
 
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
+	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
 
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-ADDRESS_MAP_END
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+}
 
 void midqslvr_state::machine_start()
 {

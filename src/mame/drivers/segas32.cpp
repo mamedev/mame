@@ -1050,51 +1050,53 @@ WRITE8_MEMBER(segas32_state::sound_dummy_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(segas32_state::system32_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x0f0000) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0x300000, 0x31ffff) AM_MIRROR(0x0e0000) AM_READWRITE(system32_videoram_r, system32_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_READWRITE(system32_spriteram_r, system32_spriteram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x50000f) AM_MIRROR(0x0ffff0) AM_READWRITE8(sprite_control_r, sprite_control_w, 0x00ff)
-	AM_RANGE(0x600000, 0x60ffff) AM_MIRROR(0x0e0000) AM_READWRITE(system32_paletteram_r, system32_paletteram_w) AM_SHARE("paletteram.0")
-	AM_RANGE(0x610000, 0x61007f) AM_MIRROR(0x0eff80) AM_READWRITE(system32_mixer_r, system32_mixer_w)
-	AM_RANGE(0x700000, 0x701fff) AM_MIRROR(0x0fe000) AM_READWRITE8(shared_ram_r, shared_ram_w, 0xffff)
-	AM_RANGE(0x800000, 0x800fff) AM_DEVREADWRITE8("s32comm", s32comm_device, share_r, share_w, 0x00ff)
-	AM_RANGE(0x801000, 0x801001) AM_DEVREADWRITE8("s32comm", s32comm_device, cn_r, cn_w, 0x00ff)
-	AM_RANGE(0x801002, 0x801003) AM_DEVREADWRITE8("s32comm", s32comm_device, fg_r, fg_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("io_chip", sega_315_5296_device, read, write, 0x00ff)
+void segas32_state::system32_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x20ffff).mirror(0x0f0000).ram().share("workram");
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_videoram_r), FUNC(segas32_state::system32_videoram_w)).share("videoram");
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_spriteram_r), FUNC(segas32_state::system32_spriteram_w)).share("spriteram");
+	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(this, FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask16(0x00ff);
+	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_paletteram_r), FUNC(segas32_state::system32_paletteram_w)).share("paletteram.0");
+	map(0x610000, 0x61007f).mirror(0x0eff80).rw(this, FUNC(segas32_state::system32_mixer_r), FUNC(segas32_state::system32_mixer_w));
+	map(0x700000, 0x701fff).mirror(0x0fe000).rw(this, FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
+	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask16(0x00ff);
+	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
+	map(0x801002, 0x801002).rw("s32comm", FUNC(s32comm_device::fg_r), FUNC(s32comm_device::fg_w));
+	map(0xc00000, 0xc0001f).mirror(0x0fff80).rw("io_chip", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	// 0xc00040-0xc0007f - I/O expansion area
-	AM_RANGE(0xd00000, 0xd0000f) AM_MIRROR(0x07fff0) AM_READWRITE8(int_control_r, int_control_w, 0xffff)
-	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE(random_number_r, random_number_w)
-	AM_RANGE(0xf00000, 0xffffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(this, FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
+	map(0xd80000, 0xdfffff).rw(this, FUNC(segas32_state::random_number_r), FUNC(segas32_state::random_number_w));
+	map(0xf00000, 0xffffff).rom().region("maincpu", 0);
+}
 
 
-ADDRESS_MAP_START(segas32_state::multi32_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_MIRROR(0x0e0000) AM_RAM
-	AM_RANGE(0x300000, 0x31ffff) AM_MIRROR(0x0e0000) AM_READWRITE16(system32_videoram_r, system32_videoram_w, 0xffffffff) AM_SHARE("videoram")
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_READWRITE(multi32_spriteram_r, multi32_spriteram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x50000f) AM_MIRROR(0x0ffff0) AM_READWRITE8(sprite_control_r, sprite_control_w, 0x00ff00ff)
-	AM_RANGE(0x600000, 0x60ffff) AM_MIRROR(0x060000) AM_READWRITE(multi32_paletteram_0_r, multi32_paletteram_0_w) AM_SHARE("paletteram.0")
-	AM_RANGE(0x610000, 0x61007f) AM_MIRROR(0x06ff80) AM_WRITE(multi32_mixer_0_w)
-	AM_RANGE(0x680000, 0x68ffff) AM_MIRROR(0x060000) AM_READWRITE(multi32_paletteram_1_r, multi32_paletteram_1_w) AM_SHARE("paletteram.1")
-	AM_RANGE(0x690000, 0x69007f) AM_MIRROR(0x06ff80) AM_WRITE(multi32_mixer_1_w)
-	AM_RANGE(0x700000, 0x701fff) AM_MIRROR(0x0fe000) AM_READWRITE8(shared_ram_r, shared_ram_w, 0xffffffff)
-	AM_RANGE(0x800000, 0x800fff) AM_DEVREADWRITE8("s32comm", s32comm_device, share_r, share_w, 0x00ff00ff)
-	AM_RANGE(0x801000, 0x801003) AM_DEVREADWRITE8("s32comm", s32comm_device, cn_r, cn_w, 0x000000ff)
-	AM_RANGE(0x801000, 0x801003) AM_DEVREADWRITE8("s32comm", s32comm_device, fg_r, fg_w, 0x00ff0000)
-	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x07ff80) AM_DEVREADWRITE8("io_chip_0", sega_315_5296_device, read, write, 0x00ff00ff)
+void segas32_state::multi32_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xffffff);
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x21ffff).mirror(0x0e0000).ram();
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_videoram_r), FUNC(segas32_state::system32_videoram_w)).share("videoram");
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::multi32_spriteram_r), FUNC(segas32_state::multi32_spriteram_w)).share("spriteram");
+	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(this, FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask32(0x00ff00ff);
+	map(0x600000, 0x60ffff).mirror(0x060000).rw(this, FUNC(segas32_state::multi32_paletteram_0_r), FUNC(segas32_state::multi32_paletteram_0_w)).share("paletteram.0");
+	map(0x610000, 0x61007f).mirror(0x06ff80).w(this, FUNC(segas32_state::multi32_mixer_0_w));
+	map(0x680000, 0x68ffff).mirror(0x060000).rw(this, FUNC(segas32_state::multi32_paletteram_1_r), FUNC(segas32_state::multi32_paletteram_1_w)).share("paletteram.1");
+	map(0x690000, 0x69007f).mirror(0x06ff80).w(this, FUNC(segas32_state::multi32_mixer_1_w));
+	map(0x700000, 0x701fff).mirror(0x0fe000).rw(this, FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
+	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask32(0x00ff00ff);
+	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
+	map(0x801002, 0x801002).rw("s32comm", FUNC(s32comm_device::fg_r), FUNC(s32comm_device::fg_w));
+	map(0xc00000, 0xc0001f).mirror(0x07ff80).rw("io_chip_0", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask32(0x00ff00ff);
 	// 0xc00040-0xc0007f - I/O expansion area 0
-	AM_RANGE(0xc80000, 0xc8001f) AM_MIRROR(0x07ff80) AM_DEVREADWRITE8("io_chip_1", sega_315_5296_device, read, write, 0x00ff00ff)
+	map(0xc80000, 0xc8001f).mirror(0x07ff80).rw("io_chip_1", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask32(0x00ff00ff);
 	// 0xc80040-0xc8007f - I/O expansion area 1
-	AM_RANGE(0xd00000, 0xd0000f) AM_MIRROR(0x07fff0) AM_READWRITE8(int_control_r, int_control_w, 0xffffffff)
-	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE16(random_number_r, random_number_w, 0xffffffff)
-	AM_RANGE(0xf00000, 0xffffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(this, FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
+	map(0xd80000, 0xdfffff).rw(this, FUNC(segas32_state::random_number_r), FUNC(segas32_state::random_number_w));
+	map(0xf00000, 0xffffff).rom().region("maincpu", 0);
+}
 
 
 
@@ -1104,25 +1106,27 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(segas32_state::system32_sound_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE("rfsnd", rf5c68_device, rf5c68_w)
-	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE("rfsnd", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w)
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("z80_shared_ram")
-ADDRESS_MAP_END
+void segas32_state::system32_sound_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom().region("soundcpu", 0);
+	map(0xa000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc00f).mirror(0x0ff0).w("rfsnd", FUNC(rf5c68_device::rf5c68_w));
+	map(0xd000, 0xdfff).rw("rfsnd", FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w));
+	map(0xe000, 0xffff).ram().share("z80_shared_ram");
+}
 
-ADDRESS_MAP_START(segas32_state::system32_sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym1", ym3438_device, read, write)
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym2", ym3438_device, read, write)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(sound_bank_lo_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(sound_bank_hi_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(sound_int_control_lo_w)
-	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x04) AM_WRITE(sound_int_control_hi_w)
-	AM_RANGE(0xf1, 0xf1) AM_READWRITE(sound_dummy_r, sound_dummy_w)
-ADDRESS_MAP_END
+void segas32_state::system32_sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x83).mirror(0x0c).rw("ym1", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0x90, 0x93).mirror(0x0c).rw("ym2", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0xa0, 0xaf).w(this, FUNC(segas32_state::sound_bank_lo_w));
+	map(0xb0, 0xbf).w(this, FUNC(segas32_state::sound_bank_hi_w));
+	map(0xc0, 0xcf).w(this, FUNC(segas32_state::sound_int_control_lo_w));
+	map(0xd0, 0xd3).mirror(0x04).w(this, FUNC(segas32_state::sound_int_control_hi_w));
+	map(0xf1, 0xf1).rw(this, FUNC(segas32_state::sound_dummy_r), FUNC(segas32_state::sound_dummy_w));
+}
 
 
 ADDRESS_MAP_START(segas32_state::multi32_sound_map)
@@ -2285,14 +2289,15 @@ segas32_analog_state::segas32_analog_state(const machine_config &mconfig, device
 
 
 
-ADDRESS_MAP_START(segas32_trackball_state::system32_trackball_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(system32_map)
+void segas32_trackball_state::system32_trackball_map(address_map &map)
+{
+	map.unmap_value_high();
+	system32_map(map);
 	//AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
-	AM_RANGE(0xc00040, 0xc00047) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("upd1", upd4701_device, read_xy, reset_xy, 0x00ff)
-	AM_RANGE(0xc00048, 0xc0004f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("upd2", upd4701_device, read_xy, reset_xy, 0x00ff)
-	AM_RANGE(0xc00050, 0xc00057) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("upd3", upd4701_device, read_xy, reset_xy, 0x00ff)
-ADDRESS_MAP_END
+	map(0xc00040, 0xc00047).mirror(0x0fff80).rw("upd1", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy)).umask16(0x00ff);
+	map(0xc00048, 0xc0004f).mirror(0x0fff80).rw("upd2", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy)).umask16(0x00ff);
+	map(0xc00050, 0xc00057).mirror(0x0fff80).rw("upd3", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy)).umask16(0x00ff);
+}
 
 MACHINE_CONFIG_START(segas32_trackball_state::device_add_mconfig)
 	segas32_state::device_add_mconfig(config);
@@ -2572,13 +2577,14 @@ sega_multi32_state::sega_multi32_state(const machine_config &mconfig, device_typ
 }
 
 
-ADDRESS_MAP_START(sega_multi32_analog_state::multi32_analog_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_IMPORT_FROM(multi32_map)
-	AM_RANGE(0xc00050, 0xc00057) AM_MIRROR(0x07ff80) AM_DEVREADWRITE8("adc", msm6253_device, d7_r, address_w, 0x00ff00ff)
-	AM_RANGE(0xc00060, 0xc00063) AM_MIRROR(0x07ff80) AM_WRITE8(analog_bank_w, 0x000000ff)
-ADDRESS_MAP_END
+void sega_multi32_analog_state::multi32_analog_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xffffff);
+	multi32_map(map);
+	map(0xc00050, 0xc00057).mirror(0x07ff80).rw("adc", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::address_w)).umask32(0x00ff00ff);
+	map(0xc00060, 0xc00060).mirror(0x07ff80).w(this, FUNC(sega_multi32_analog_state::analog_bank_w));
+}
 
 MACHINE_CONFIG_START(sega_multi32_analog_state::device_add_mconfig)
 	sega_multi32_state::device_add_mconfig(config);

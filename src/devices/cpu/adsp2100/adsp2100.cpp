@@ -104,12 +104,12 @@
 
 
 // device type definitions
-DEFINE_DEVICE_TYPE(ADSP2100, adsp2100_device, "adsp2100", "ADSP-2100")
-DEFINE_DEVICE_TYPE(ADSP2101, adsp2101_device, "adsp2101", "ADSP-2101")
-DEFINE_DEVICE_TYPE(ADSP2104, adsp2104_device, "adsp2104", "ADSP-2104")
-DEFINE_DEVICE_TYPE(ADSP2105, adsp2105_device, "adsp2105", "ADSP-2105")
-DEFINE_DEVICE_TYPE(ADSP2115, adsp2115_device, "adsp2115", "ADSP-2115")
-DEFINE_DEVICE_TYPE(ADSP2181, adsp2181_device, "adsp2181", "ADSP-2181")
+DEFINE_DEVICE_TYPE(ADSP2100, adsp2100_device, "adsp2100", "Analog Devices ADSP-2100")
+DEFINE_DEVICE_TYPE(ADSP2101, adsp2101_device, "adsp2101", "Analog Devices ADSP-2101")
+DEFINE_DEVICE_TYPE(ADSP2104, adsp2104_device, "adsp2104", "Analog Devices ADSP-2104")
+DEFINE_DEVICE_TYPE(ADSP2105, adsp2105_device, "adsp2105", "Analog Devices ADSP-2105")
+DEFINE_DEVICE_TYPE(ADSP2115, adsp2115_device, "adsp2115", "Analog Devices ADSP-2115")
+DEFINE_DEVICE_TYPE(ADSP2181, adsp2181_device, "adsp2181", "Analog Devices ADSP-2181")
 
 
 //**************************************************************************

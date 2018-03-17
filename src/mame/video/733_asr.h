@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "screen.h"
 #define asr733_chr_region ":gfx1"
 
 class asr733_device : public device_t, public device_gfx_interface

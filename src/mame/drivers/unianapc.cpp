@@ -54,8 +54,9 @@ uint32_t unianapc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-ADDRESS_MAP_START(unianapc_state::unianapc_map)
-ADDRESS_MAP_END
+void unianapc_state::unianapc_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( unianapc )
 INPUT_PORTS_END

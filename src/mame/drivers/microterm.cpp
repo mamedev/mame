@@ -50,39 +50,44 @@ READ8_MEMBER(microterm_state::c000_r)
 	return machine().rand() & 0x80;
 }
 
-ADDRESS_MAP_START(microterm_state::mt420_mem_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x9000, 0x9000) AM_WRITENOP
-	AM_RANGE(0xc000, 0xc000) AM_READ(c000_r) AM_WRITENOP
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xeff8, 0xefff) AM_DEVREADWRITE("avdc", scn2674_device, read, write)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-ADDRESS_MAP_END
+void microterm_state::mt420_mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x9000, 0x9000).nopw();
+	map(0xc000, 0xc000).r(this, FUNC(microterm_state::c000_r)).nopw();
+	map(0xe000, 0xefff).ram();
+	map(0xeff8, 0xefff).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write));
+	map(0xf000, 0xf7ff).ram();
+}
 
-ADDRESS_MAP_START(microterm_state::mt420_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("duart", scn2681_device, read, write)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("aci", mc2661_device, read, write)
-ADDRESS_MAP_END
+void microterm_state::mt420_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xe0, 0xef).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0xf0, 0xf3).rw("aci", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+}
 
 SCN2674_DRAW_CHARACTER_MEMBER(microterm_state::draw_character)
 {
 }
 
-ADDRESS_MAP_START(microterm_state::mt420_vram_map)
-	AM_RANGE(0x0000, 0x3fff) AM_NOP
-ADDRESS_MAP_END
+void microterm_state::mt420_vram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).noprw();
+}
 
-ADDRESS_MAP_START(microterm_state::mt5510_mem_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP
-	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void microterm_state::mt5510_mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0).nopw();
+	map(0x8000, 0xbfff).ram();
+	map(0xc000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(microterm_state::mt5510_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
-ADDRESS_MAP_END
+void microterm_state::mt5510_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x60, 0x6f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+}
 
 static INPUT_PORTS_START( microterm )
 INPUT_PORTS_END

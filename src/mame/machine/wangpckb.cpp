@@ -98,11 +98,12 @@ const tiny_rom_entry *wangpc_keyboard_device::device_rom_region() const
 //  ADDRESS_MAP( wangpc_keyboard_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(wangpc_keyboard_device::wangpc_keyboard_io)
+void wangpc_keyboard_device::wangpc_keyboard_io(address_map &map)
+{
 	//AM_RANGE(0x0000, 0xfeff) AM_READNOP
-	AM_RANGE(0x47, 0x58) AM_MIRROR(0xff00) AM_READNOP
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_DEVWRITE(SN76496_TAG, sn76496_device, write)
-ADDRESS_MAP_END
+	map(0x47, 0x58).mirror(0xff00).nopr();
+	map(0x00, 0x00).mirror(0xff00).w(SN76496_TAG, FUNC(sn76496_device::write));
+}
 
 
 //-------------------------------------------------

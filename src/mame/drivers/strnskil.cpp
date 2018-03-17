@@ -98,33 +98,35 @@ WRITE8_MEMBER(strnskil_state::protection_w)
 
 /****************************************************************************/
 
-ADDRESS_MAP_START(strnskil_state::strnskil_map1)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
+void strnskil_state::strnskil_map1(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
 
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(strnskil_videoram_w) AM_SHARE("videoram")
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xcfff).ram().share("share1");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(strnskil_state::strnskil_videoram_w)).share("videoram");
 
-	AM_RANGE(0xd800, 0xd800) AM_READ(strnskil_d800_r)
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
-	AM_RANGE(0xd805, 0xd805) AM_READ_PORT("P2")
+	map(0xd800, 0xd800).r(this, FUNC(strnskil_state::strnskil_d800_r));
+	map(0xd801, 0xd801).portr("DSW1");
+	map(0xd802, 0xd802).portr("DSW2");
+	map(0xd803, 0xd803).portr("SYSTEM");
+	map(0xd804, 0xd804).portr("P1");
+	map(0xd805, 0xd805).portr("P2");
 
-	AM_RANGE(0xd808, 0xd808) AM_WRITE(strnskil_scrl_ctrl_w)
-	AM_RANGE(0xd809, 0xd809) AM_WRITENOP /* coin counter? */
-	AM_RANGE(0xd80a, 0xd80b) AM_WRITEONLY AM_SHARE("xscroll")
-ADDRESS_MAP_END
+	map(0xd808, 0xd808).w(this, FUNC(strnskil_state::strnskil_scrl_ctrl_w));
+	map(0xd809, 0xd809).nopw(); /* coin counter? */
+	map(0xd80a, 0xd80b).writeonly().share("xscroll");
+}
 
-ADDRESS_MAP_START(strnskil_state::strnskil_map2)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
+void strnskil_state::strnskil_map2(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0xc000, 0xc7ff).ram().share("spriteram");
+	map(0xc800, 0xcfff).ram().share("share1");
 
-	AM_RANGE(0xd801, 0xd801) AM_DEVWRITE("sn1", sn76496_device, write)
-	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE("sn2", sn76496_device, write)
-ADDRESS_MAP_END
+	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::write));
+	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::write));
+}
 
 /****************************************************************************/
 

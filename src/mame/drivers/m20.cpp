@@ -319,17 +319,19 @@ B/W, 128K cards, 3 cards => 512K of memory:
 */
 
 
-ADDRESS_MAP_START(m20_state::m20_program_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
-ADDRESS_MAP_END
+void m20_state::m20_program_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x30000, 0x33fff).ram().share("videoram");
+	map(0x40000, 0x41fff).rom().region("maincpu", 0x00000);
+}
 
-ADDRESS_MAP_START(m20_state::m20_data_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
-ADDRESS_MAP_END
+void m20_state::m20_data_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x30000, 0x33fff).ram().share("videoram");
+	map(0x40000, 0x41fff).rom().region("maincpu", 0x00000);
+}
 
 
 void m20_state::install_memory()
@@ -699,32 +701,33 @@ void m20_state::install_memory()
 	}
 }
 
-ADDRESS_MAP_START(m20_state::m20_io)
-	ADDRESS_MAP_UNMAP_HIGH
+void m20_state::m20_io(address_map &map)
+{
+	map.unmap_value_high();
 
-	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE8("fd1797", fd1797_device, read, write, 0x00ff)
+	map(0x00, 0x07).rw(m_fd1797, FUNC(fd1797_device::read), FUNC(fd1797_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x20, 0x21) AM_READWRITE(port21_r, port21_w);
+	map(0x20, 0x21).rw(this, FUNC(m20_state::port21_r), FUNC(m20_state::port21_w));
 
-	AM_RANGE(0x60, 0x61) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0x00ff)
-	AM_RANGE(0x62, 0x63) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0xff00) // FIXME
-	AM_RANGE(0x62, 0x63) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
-	AM_RANGE(0x64, 0x65) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
+	map(0x61, 0x61).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x62, 0x62).w("crtc", FUNC(mc6845_device::address_w)); // FIXME
+	map(0x63, 0x63).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x64, 0x64).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x80, 0x87) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0x00ff)
+	map(0x80, 0x87).rw(m_i8255, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE8("i8251_1", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xa2, 0xa3) AM_DEVREADWRITE8("i8251_1", i8251_device, status_r, control_w, 0x00ff)
+	map(0xa1, 0xa1).rw(m_kbdi8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xa3, 0xa3).rw(m_kbdi8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
-	AM_RANGE(0xc0, 0xc1) AM_DEVREADWRITE8("i8251_2", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xc2, 0xc3) AM_DEVREADWRITE8("i8251_2", i8251_device, status_r, control_w, 0x00ff)
+	map(0xc1, 0xc1).rw(m_ttyi8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xc3, 0xc3).rw(m_ttyi8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
-	AM_RANGE(0x120, 0x127) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)
+	map(0x120, 0x127).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x140, 0x143) AM_READWRITE(m20_i8259_r, m20_i8259_w)
+	map(0x140, 0x143).rw(this, FUNC(m20_state::m20_i8259_r), FUNC(m20_state::m20_i8259_w));
 
-	AM_RANGE(0x3ffa, 0x3ffd) AM_DEVWRITE("apb", m20_8086_device, handshake_w)
-ADDRESS_MAP_END
+	map(0x3ffa, 0x3ffd).w(m_apb, FUNC(m20_8086_device::handshake_w));
+}
 
 IRQ_CALLBACK_MEMBER(m20_state::m20_irq_callback)
 {

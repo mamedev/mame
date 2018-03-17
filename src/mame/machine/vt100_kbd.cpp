@@ -29,7 +29,7 @@ static INPUT_PORTS_START(vt100_kbd)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 7") PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 8") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num .") PORT_CODE(KEYCODE_DEL_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 9") PORT_CODE(KEYCODE_9_PAD)\
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 9") PORT_CODE(KEYCODE_9_PAD)
 
 	PORT_START("LINE1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -228,8 +228,8 @@ void vt100_keyboard_device::device_start()
 	m_uart->write_cs(1);
 	m_uart->write_swe(0);
 
-	machine().output().set_value("online_led",1);
-	machine().output().set_value("local_led", 0);
+	machine().output().set_value("online_led",0);
+	machine().output().set_value("local_led", 1);
 	machine().output().set_value("locked_led",1);
 	machine().output().set_value("l1_led", 1);
 	machine().output().set_value("l2_led", 1);
@@ -265,8 +265,8 @@ WRITE_LINE_MEMBER(vt100_keyboard_device::signal_line_w)
 		if (dav)
 		{
 			u8 data = m_uart->get_received_data();
-			machine().output().set_value("online_led",BIT(data, 5) ? 0 : 1);
-			machine().output().set_value("local_led", BIT(data, 5));
+			machine().output().set_value("online_led",BIT(data, 5) ? 1 : 0);
+			machine().output().set_value("local_led", BIT(data, 5) ? 0 : 1);
 			machine().output().set_value("locked_led",BIT(data, 4) ? 0 : 1);
 			machine().output().set_value("l1_led", BIT(data, 3) ? 0 : 1);
 			machine().output().set_value("l2_led", BIT(data, 2) ? 0 : 1);
@@ -275,7 +275,10 @@ WRITE_LINE_MEMBER(vt100_keyboard_device::signal_line_w)
 			m_speaker->set_state(BIT(data, 7));
 
 			if (BIT(data, 6))
+			{
+				m_last_scan = 0;
 				m_scan_counter->reset_w(0);
+			}
 		}
 	}
 

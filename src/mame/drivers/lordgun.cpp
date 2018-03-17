@@ -278,68 +278,71 @@ WRITE16_MEMBER(lordgun_state::lordgun_soundlatch_w)
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-ADDRESS_MAP_START(lordgun_state::lordgun_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("priority_ram")                        // PRIORITY
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(lordgun_vram_0_w) AM_SHARE("vram.0")  // DISPLAY
-	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE(lordgun_vram_1_w) AM_SHARE("vram.1")  // DISPLAY
-	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE(lordgun_vram_2_w) AM_SHARE("vram.2")  // DISPLAY
-	AM_RANGE(0x315000, 0x317fff) AM_RAM                                                     //
-	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_SHARE("vram.3")  // DISPLAY
-	AM_RANGE(0x31c000, 0x31c7ff) AM_RAM AM_SHARE("scrollram")                           // LINE
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_SHARE("spriteram")                       // ANIMATOR
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(lordgun_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_SHARE("scroll_x.0")
-	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_SHARE("scroll_x.1")
-	AM_RANGE(0x502400, 0x502401) AM_WRITEONLY AM_SHARE("scroll_x.2")
-	AM_RANGE(0x502600, 0x502601) AM_WRITEONLY AM_SHARE("scroll_x.3")
-	AM_RANGE(0x502800, 0x502801) AM_WRITEONLY AM_SHARE("scroll_y.0")
-	AM_RANGE(0x502a00, 0x502a01) AM_WRITEONLY AM_SHARE("scroll_y.1")
-	AM_RANGE(0x502c00, 0x502c01) AM_WRITEONLY AM_SHARE("scroll_y.2")
-	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_SHARE("scroll_y.3")
-	AM_RANGE(0x503000, 0x503001) AM_WRITE(lordgun_priority_w)
-	AM_RANGE(0x503800, 0x503801) AM_READ(lordgun_gun_0_x_r)
-	AM_RANGE(0x503a00, 0x503a01) AM_READ(lordgun_gun_1_x_r)
-	AM_RANGE(0x503c00, 0x503c01) AM_READ(lordgun_gun_0_y_r)
-	AM_RANGE(0x503e00, 0x503e01) AM_READ(lordgun_gun_1_y_r)
-	AM_RANGE(0x504000, 0x504001) AM_WRITE(lordgun_soundlatch_w)
-	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x50a900, 0x50a9ff) AM_READWRITE(lordgun_protection_r, lordgun_protection_w)
-ADDRESS_MAP_END
+void lordgun_state::lordgun_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x20ffff).ram();
+	map(0x210000, 0x21ffff).ram().share("priority_ram");                        // PRIORITY
+	map(0x300000, 0x30ffff).ram().w(this, FUNC(lordgun_state::lordgun_vram_0_w)).share("vram.0");  // DISPLAY
+	map(0x310000, 0x313fff).ram().w(this, FUNC(lordgun_state::lordgun_vram_1_w)).share("vram.1");  // DISPLAY
+	map(0x314000, 0x314fff).ram().w(this, FUNC(lordgun_state::lordgun_vram_2_w)).share("vram.2");  // DISPLAY
+	map(0x315000, 0x317fff).ram();                                                     //
+	map(0x318000, 0x319fff).ram().w(this, FUNC(lordgun_state::lordgun_vram_3_w)).share("vram.3");  // DISPLAY
+	map(0x31c000, 0x31c7ff).ram().share("scrollram");                           // LINE
+	map(0x400000, 0x4007ff).ram().share("spriteram");                       // ANIMATOR
+	map(0x500000, 0x500fff).ram().w(this, FUNC(lordgun_state::lordgun_paletteram_w)).share("paletteram");
+	map(0x502000, 0x502001).writeonly().share("scroll_x.0");
+	map(0x502200, 0x502201).writeonly().share("scroll_x.1");
+	map(0x502400, 0x502401).writeonly().share("scroll_x.2");
+	map(0x502600, 0x502601).writeonly().share("scroll_x.3");
+	map(0x502800, 0x502801).writeonly().share("scroll_y.0");
+	map(0x502a00, 0x502a01).writeonly().share("scroll_y.1");
+	map(0x502c00, 0x502c01).writeonly().share("scroll_y.2");
+	map(0x502e00, 0x502e01).writeonly().share("scroll_y.3");
+	map(0x503000, 0x503001).w(this, FUNC(lordgun_state::lordgun_priority_w));
+	map(0x503800, 0x503801).r(this, FUNC(lordgun_state::lordgun_gun_0_x_r));
+	map(0x503a00, 0x503a01).r(this, FUNC(lordgun_state::lordgun_gun_1_x_r));
+	map(0x503c00, 0x503c01).r(this, FUNC(lordgun_state::lordgun_gun_0_y_r));
+	map(0x503e00, 0x503e01).r(this, FUNC(lordgun_state::lordgun_gun_1_y_r));
+	map(0x504000, 0x504001).w(this, FUNC(lordgun_state::lordgun_soundlatch_w));
+	map(0x506000, 0x506007).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x508000, 0x508007).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x50a900, 0x50a9ff).rw(this, FUNC(lordgun_state::lordgun_protection_r), FUNC(lordgun_state::lordgun_protection_w));
+}
 
 
-ADDRESS_MAP_START(lordgun_state::aliencha_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("priority_ram")                        // PRIORITY
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(lordgun_vram_0_w) AM_SHARE("vram.0")  // BACKGROUND 1
-	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE(lordgun_vram_1_w) AM_SHARE("vram.1")  // BACKGROUND 2
-	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE(lordgun_vram_2_w) AM_SHARE("vram.2")  // BACKGROUND 3
-	AM_RANGE(0x315000, 0x317fff) AM_RAM                                                     //
-	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_SHARE("vram.3")  // TEXT
-	AM_RANGE(0x31c000, 0x31c7ff) AM_RAM AM_SHARE("scrollram")                           // LINE OFFSET
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_SHARE("spriteram")                       // ANIMATE
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(lordgun_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_SHARE("scroll_x.0")
-	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_SHARE("scroll_x.1")
-	AM_RANGE(0x502400, 0x502401) AM_WRITEONLY AM_SHARE("scroll_x.2")
-	AM_RANGE(0x502600, 0x502601) AM_WRITEONLY AM_SHARE("scroll_x.3")
-	AM_RANGE(0x502800, 0x502801) AM_WRITEONLY AM_SHARE("scroll_y.0")
-	AM_RANGE(0x502a00, 0x502a01) AM_WRITEONLY AM_SHARE("scroll_y.1")
-	AM_RANGE(0x502c00, 0x502c01) AM_WRITEONLY AM_SHARE("scroll_y.2")
-	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_SHARE("scroll_y.3")
-	AM_RANGE(0x503000, 0x503001) AM_WRITE(lordgun_priority_w)
-	AM_RANGE(0x504000, 0x504001) AM_WRITE(lordgun_soundlatch_w)
-	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x50b900, 0x50b9ff) AM_READWRITE(aliencha_protection_r, aliencha_protection_w)
-ADDRESS_MAP_END
+void lordgun_state::aliencha_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x20ffff).ram();
+	map(0x210000, 0x21ffff).ram().share("priority_ram");                        // PRIORITY
+	map(0x300000, 0x30ffff).ram().w(this, FUNC(lordgun_state::lordgun_vram_0_w)).share("vram.0");  // BACKGROUND 1
+	map(0x310000, 0x313fff).ram().w(this, FUNC(lordgun_state::lordgun_vram_1_w)).share("vram.1");  // BACKGROUND 2
+	map(0x314000, 0x314fff).ram().w(this, FUNC(lordgun_state::lordgun_vram_2_w)).share("vram.2");  // BACKGROUND 3
+	map(0x315000, 0x317fff).ram();                                                     //
+	map(0x318000, 0x319fff).ram().w(this, FUNC(lordgun_state::lordgun_vram_3_w)).share("vram.3");  // TEXT
+	map(0x31c000, 0x31c7ff).ram().share("scrollram");                           // LINE OFFSET
+	map(0x400000, 0x4007ff).ram().share("spriteram");                       // ANIMATE
+	map(0x500000, 0x500fff).ram().w(this, FUNC(lordgun_state::lordgun_paletteram_w)).share("paletteram");
+	map(0x502000, 0x502001).writeonly().share("scroll_x.0");
+	map(0x502200, 0x502201).writeonly().share("scroll_x.1");
+	map(0x502400, 0x502401).writeonly().share("scroll_x.2");
+	map(0x502600, 0x502601).writeonly().share("scroll_x.3");
+	map(0x502800, 0x502801).writeonly().share("scroll_y.0");
+	map(0x502a00, 0x502a01).writeonly().share("scroll_y.1");
+	map(0x502c00, 0x502c01).writeonly().share("scroll_y.2");
+	map(0x502e00, 0x502e01).writeonly().share("scroll_y.3");
+	map(0x503000, 0x503001).w(this, FUNC(lordgun_state::lordgun_priority_w));
+	map(0x504000, 0x504001).w(this, FUNC(lordgun_state::lordgun_soundlatch_w));
+	map(0x506000, 0x506007).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x508000, 0x508007).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x50b900, 0x50b9ff).rw(this, FUNC(lordgun_state::aliencha_protection_r), FUNC(lordgun_state::aliencha_protection_w));
+}
 
-ADDRESS_MAP_START(lordgun_state::ymf278_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-ADDRESS_MAP_END
+void lordgun_state::ymf278_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+}
 
 /***************************************************************************
 
@@ -347,10 +350,11 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(lordgun_state::lordgun_soundmem_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void lordgun_state::lordgun_soundmem_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
 WRITE8_MEMBER(lordgun_state::lordgun_okibank_w)
 {
@@ -359,25 +363,27 @@ WRITE8_MEMBER(lordgun_state::lordgun_okibank_w)
 //  popmessage("OKI %x", data);
 }
 
-ADDRESS_MAP_START(lordgun_state::lordgun_soundio_map)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x5000, 0x5000) AM_READNOP
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(lordgun_okibank_w )
-ADDRESS_MAP_END
+void lordgun_state::lordgun_soundio_map(address_map &map)
+{
+	map(0x1000, 0x1001).w("ymsnd", FUNC(ym3812_device::write));
+	map(0x2000, 0x2000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3000, 0x3000).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x5000, 0x5000).nopr();
+	map(0x6000, 0x6000).w(this, FUNC(lordgun_state::lordgun_okibank_w));
+}
 
 
-ADDRESS_MAP_START(lordgun_state::aliencha_soundio_map)
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x5000, 0x5000) AM_WRITENOP    // writes 03 then 07 at end of NMI
-	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("ymf", ymf278b_device, read)
-	AM_RANGE(0x7000, 0x7005) AM_DEVWRITE("ymf", ymf278b_device, write)
-	AM_RANGE(0x7400, 0x7400) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x7800, 0x7800) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-ADDRESS_MAP_END
+void lordgun_state::aliencha_soundio_map(address_map &map)
+{
+	map(0x3000, 0x3000).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x5000, 0x5000).nopw();    // writes 03 then 07 at end of NMI
+	map(0x7000, 0x7000).r("ymf", FUNC(ymf278b_device::read));
+	map(0x7000, 0x7005).w("ymf", FUNC(ymf278b_device::write));
+	map(0x7400, 0x7400).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x7800, 0x7800).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 /***************************************************************************

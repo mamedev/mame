@@ -129,13 +129,15 @@ ROM_START( taito_cchip )
 ROM_END
 
 
-ADDRESS_MAP_START(taito_cchip_device::cchip_ram_bank)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("upd4464") // upd4464
-ADDRESS_MAP_END
+void taito_cchip_device::cchip_ram_bank(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("upd4464"); // upd4464
+}
 
-ADDRESS_MAP_START(taito_cchip_device::cchip_ram_bank68)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("upd4464")
-ADDRESS_MAP_END
+void taito_cchip_device::cchip_ram_bank68(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("upd4464");
+}
 
 READ8_MEMBER(taito_cchip_device::asic_r)
 {
@@ -194,12 +196,13 @@ WRITE8_MEMBER(taito_cchip_device::mem68_w)
 	return m_upd4464_bank68->write8(space,offset,data);
 }
 
-ADDRESS_MAP_START(taito_cchip_device::cchip_map)
+void taito_cchip_device::cchip_map(address_map &map)
+{
 	//AM_RANGE(0x0000, 0x0fff) AM_ROM // internal ROM of uPD7811
-	AM_RANGE(0x1000, 0x13ff) AM_DEVICE("upd4464_bank", address_map_bank_device, amap8)
-	AM_RANGE(0x1400, 0x17ff) AM_READWRITE(asic_r, asic_w)
-	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("cchip_eprom", 0)
-ADDRESS_MAP_END
+	map(0x1000, 0x13ff).m("upd4464_bank", FUNC(address_map_bank_device::amap8));
+	map(0x1400, 0x17ff).rw(this, FUNC(taito_cchip_device::asic_r), FUNC(taito_cchip_device::asic_w));
+	map(0x2000, 0x3fff).rom().region("cchip_eprom", 0);
+}
 
 
 

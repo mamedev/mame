@@ -137,12 +137,13 @@ WRITE8_MEMBER(wink_state::sound_irq_w)
 	//machine().scheduler().synchronize();
 }
 
-ADDRESS_MAP_START(wink_state::wink_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(bgram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void wink_state::wink_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x97ff).ram().share("nvram");
+	map(0xa000, 0xa3ff).ram().w(this, FUNC(wink_state::bgram_w)).share("videoram");
+}
 
 
 READ8_MEMBER(wink_state::prot_r)
@@ -170,40 +171,43 @@ WRITE8_MEMBER(wink_state::prot_w)
 	//take a9-a15 and stuff them in a variable for later use.
 }
 
-ADDRESS_MAP_START(wink_state::wink_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") //0x10-0x1f is likely to be something else
+void wink_state::wink_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x1f).ram().w("palette", FUNC(palette_device::write8)).share("palette"); //0x10-0x1f is likely to be something else
 //  AM_RANGE(0x20, 0x20) AM_WRITENOP                //??? seems unused..
-	AM_RANGE(0x21, 0x21) AM_WRITE(player_mux_w)     //??? no mux on the pcb.
-	AM_RANGE(0x22, 0x22) AM_WRITE(tile_banking_w)
+	map(0x21, 0x21).w(this, FUNC(wink_state::player_mux_w));     //??? no mux on the pcb.
+	map(0x22, 0x22).w(this, FUNC(wink_state::tile_banking_w));
 //  AM_RANGE(0x23, 0x23) AM_WRITENOP                //?
 //  AM_RANGE(0x24, 0x24) AM_WRITENOP                //cab Knocker like in q-bert!
-	AM_RANGE(0x25, 0x27) AM_WRITE(wink_coin_counter_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x60, 0x60) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x80, 0x80) AM_READ(analog_port_r)
-	AM_RANGE(0xa0, 0xa0) AM_READ(player_inputs_r)
-	AM_RANGE(0xa4, 0xa4) AM_READ_PORT("DSW1")   //dipswitch bank2
-	AM_RANGE(0xa8, 0xa8) AM_READ_PORT("DSW2")   //dipswitch bank1
+	map(0x25, 0x27).w(this, FUNC(wink_state::wink_coin_counter_w));
+	map(0x40, 0x40).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x60, 0x60).w(this, FUNC(wink_state::sound_irq_w));
+	map(0x80, 0x80).r(this, FUNC(wink_state::analog_port_r));
+	map(0xa0, 0xa0).r(this, FUNC(wink_state::player_inputs_r));
+	map(0xa4, 0xa4).portr("DSW1");   //dipswitch bank2
+	map(0xa8, 0xa8).portr("DSW2");   //dipswitch bank1
 //  AM_RANGE(0xac, 0xac) AM_WRITENOP            //protection - loads video xor unit (written only once at startup)
-	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("DSW3")   //unused inputs
-	AM_RANGE(0xb4, 0xb4) AM_READ_PORT("DSW4")   //dipswitch bank3
-	AM_RANGE(0xc0, 0xdf) AM_WRITE(prot_w)       //load load protection-buffer from upper address bus
-	AM_RANGE(0xc3, 0xc3) AM_READNOP             //watchdog?
-	AM_RANGE(0xe0, 0xff) AM_READ(prot_r)        //load math unit from buffer & lower address-bus
-ADDRESS_MAP_END
+	map(0xb0, 0xb0).portr("DSW3");   //unused inputs
+	map(0xb4, 0xb4).portr("DSW4");   //dipswitch bank3
+	map(0xc0, 0xdf).w(this, FUNC(wink_state::prot_w));       //load load protection-buffer from upper address bus
+	map(0xc3, 0xc3).nopr();             //watchdog?
+	map(0xe0, 0xff).r(this, FUNC(wink_state::prot_r));        //load math unit from buffer & lower address-bus
+}
 
-ADDRESS_MAP_START(wink_state::wink_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void wink_state::wink_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x8000, 0x8000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(wink_state::wink_sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-ADDRESS_MAP_END
+void wink_state::wink_sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x80, 0x80).w("aysnd", FUNC(ay8910_device::address_w));
+}
 
 static INPUT_PORTS_START( wink )
 	PORT_START("DIAL1")

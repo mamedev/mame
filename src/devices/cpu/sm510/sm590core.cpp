@@ -18,9 +18,9 @@
 
 
 // MCU types
-DEFINE_DEVICE_TYPE(SM590, sm590_device, "sm590", "SM590") // 512x8 ROM, 32x4 RAM
-//DEFINE_DEVICE_TYPE(SM591, sm591_device, "sm591", "SM591") // 1kx8 ROM, 56x4 RAM
-//DEFINE_DEVICE_TYPE(SM595, sm595_device, "sm595", "SM595") // 768x8 ROM, 32x4 RAM
+DEFINE_DEVICE_TYPE(SM590, sm590_device, "sm590", "Sharp SM590") // 512x8 ROM, 32x4 RAM
+//DEFINE_DEVICE_TYPE(SM591, sm591_device, "sm591", "Sharp SM591") // 1kx8 ROM, 56x4 RAM
+//DEFINE_DEVICE_TYPE(SM595, sm595_device, "sm595", "Sharp SM595") // 768x8 ROM, 32x4 RAM
 
 // internal memory maps
 ADDRESS_MAP_START(sm590_device::program_1x128x4)

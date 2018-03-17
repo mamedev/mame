@@ -100,51 +100,55 @@ DRIVER_INIT_MEMBER(exzisus_state,exzisus)
 
 **************************************************************************/
 
-ADDRESS_MAP_START(exzisus_state::cpua_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpuabank")
-	AM_RANGE(0xc000, 0xc5ff) AM_RAM AM_SHARE("objectram1")
-	AM_RANGE(0xc600, 0xdfff) AM_RAM AM_SHARE("videoram1")
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("sharedram_ac")
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(cpua_bankswitch_w)
-	AM_RANGE(0xf404, 0xf404) AM_WRITE(cpub_reset_w) // ??
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("sharedram_ab")
-ADDRESS_MAP_END
+void exzisus_state::cpua_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("cpuabank");
+	map(0xc000, 0xc5ff).ram().share("objectram1");
+	map(0xc600, 0xdfff).ram().share("videoram1");
+	map(0xe000, 0xefff).ram().share("sharedram_ac");
+	map(0xf400, 0xf400).w(this, FUNC(exzisus_state::cpua_bankswitch_w));
+	map(0xf404, 0xf404).w(this, FUNC(exzisus_state::cpub_reset_w)); // ??
+	map(0xf800, 0xffff).ram().share("sharedram_ab");
+}
 
-ADDRESS_MAP_START(exzisus_state::cpub_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpubbank")
-	AM_RANGE(0xc000, 0xc5ff) AM_RAM AM_SHARE("objectram0")
-	AM_RANGE(0xc600, 0xdfff) AM_RAM AM_SHARE("videoram0")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, master_port_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("ciu", pc060ha_device, master_comm_r, master_comm_w)
-	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("P1")
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(cpub_bankswitch_w)
-	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("P2")
-	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf402, 0xf402) AM_WRITE(coincounter_w)
-	AM_RANGE(0xf404, 0xf404) AM_READ_PORT("DSWA")
-	AM_RANGE(0xf404, 0xf404) AM_WRITENOP // ??
-	AM_RANGE(0xf405, 0xf405) AM_READ_PORT("DSWB")
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("sharedram_ab")
-ADDRESS_MAP_END
+void exzisus_state::cpub_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("cpubbank");
+	map(0xc000, 0xc5ff).ram().share("objectram0");
+	map(0xc600, 0xdfff).ram().share("videoram0");
+	map(0xe000, 0xefff).ram();
+	map(0xf000, 0xf000).nopr().w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0xf001, 0xf001).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+	map(0xf400, 0xf400).portr("P1");
+	map(0xf400, 0xf400).w(this, FUNC(exzisus_state::cpub_bankswitch_w));
+	map(0xf401, 0xf401).portr("P2");
+	map(0xf402, 0xf402).portr("SYSTEM");
+	map(0xf402, 0xf402).w(this, FUNC(exzisus_state::coincounter_w));
+	map(0xf404, 0xf404).portr("DSWA");
+	map(0xf404, 0xf404).nopw(); // ??
+	map(0xf405, 0xf405).portr("DSWB");
+	map(0xf800, 0xffff).ram().share("sharedram_ab");
+}
 
-ADDRESS_MAP_START(exzisus_state::cpuc_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x85ff) AM_RAM AM_SHARE("objectram1")
-	AM_RANGE(0x8600, 0x9fff) AM_RAM AM_SHARE("videoram1")
-	AM_RANGE(0xa000, 0xafff) AM_RAM AM_SHARE("sharedram_ac")
-	AM_RANGE(0xb000, 0xbfff) AM_RAM
-ADDRESS_MAP_END
+void exzisus_state::cpuc_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x85ff).ram().share("objectram1");
+	map(0x8600, 0x9fff).ram().share("videoram1");
+	map(0xa000, 0xafff).ram().share("sharedram_ac");
+	map(0xb000, 0xbfff).ram();
+}
 
-ADDRESS_MAP_START(exzisus_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
-ADDRESS_MAP_END
+void exzisus_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram();
+	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xa000, 0xa000).nopr().w("ciu", FUNC(pc060ha_device::slave_port_w));
+	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
+}
 
 
 /***************************************************************************

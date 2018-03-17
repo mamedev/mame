@@ -104,27 +104,28 @@ private:
 //  ADDRESS_MAP( jupiter_m6800_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(jupiter2_state::jupiter2_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM  // Video RAM
-	AM_RANGE(0xf000, 0xff00) AM_ROM AM_REGION(MCM6571AP_TAG, 0)
+void jupiter2_state::jupiter2_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).ram();
+	map(0xc000, 0xcfff).ram();  // Video RAM
+	map(0xf000, 0xff00).rom().region(MCM6571AP_TAG, 0);
 //  AM_RANGE(0xff58, 0xff5c) Cartridge Disk Controller PIA
 //  AM_RANGE(0xff60, 0xff76) DMA Controller
 //  AM_RANGE(0xff80, 0xff83) Floppy PIA
-	AM_RANGE(0xff84, 0xff87) AM_DEVREADWRITE(INS1771N1_TAG, wd_fdc_device_base, read, write)
+	map(0xff84, 0xff87).rw(INS1771N1_TAG, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));
 //  AM_RANGE(0xff90, 0xff93) Hytype Parallel Printer PIA
 //  AM_RANGE(0xffa0, 0xffa7) Persci Floppy Disk Controller
 //  AM_RANGE(0xffb0, 0xffb3) Video PIA
-	AM_RANGE(0xffc0, 0xffc1) AM_DEVREADWRITE("acia0", acia6850_device, read, write) // Serial Port 0 ACIA
-	AM_RANGE(0xffc4, 0xffc5) AM_DEVREADWRITE("acia1", acia6850_device, read, write) // Serial Port 1 ACIA
+	map(0xffc0, 0xffc1).rw(m_acia0, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Serial Port 0 ACIA
+	map(0xffc4, 0xffc5).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Serial Port 1 ACIA
 //  AM_RANGE(0xffc8, 0xffc9) Serial Port 2 ACIA
 //  AM_RANGE(0xffcc, 0xffcd) Serial Port 3 ACIA
 //  AM_RANGE(0xffd0, 0xffd1) Serial Port 4 ACIA / Cassette
 //  AM_RANGE(0xffd4, 0xffd5) Serial Port 5 ACIA / EPROM Programmer (2704/2708)
 //  AM_RANGE(0xffd8, 0xffd9) Serial Port 6 ACIA / Hardware Breakpoint Registers
 //  AM_RANGE(0xffdc, 0xffdd) Serial Port 7 ACIA
-	AM_RANGE(0xfff8, 0xffff) AM_ROM AM_REGION(MCM6571AP_TAG, 0x0ff8) // vectors
-ADDRESS_MAP_END
+	map(0xfff8, 0xffff).rom().region(MCM6571AP_TAG, 0x0ff8); // vectors
+}
 
 
 
@@ -132,24 +133,26 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( jupiter3_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(jupiter3_state::jupiter3_mem)
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void jupiter3_state::jupiter3_mem(address_map &map)
+{
+	map(0x0000, 0xbfff).ram().share("ram");
+	map(0xc000, 0xdfff).ram().share("videoram");
+	map(0xe000, 0xefff).rom().region(Z80_TAG, 0);
+	map(0xf000, 0xffff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( jupiter3_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(jupiter3_state::jupiter3_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xa1, 0xa4) AM_READ(ff_r)
-	AM_RANGE(0xb0, 0xb0) AM_READ(status_r)
-	AM_RANGE(0xb2, 0xb2) AM_READ(key_r)
-ADDRESS_MAP_END
+void jupiter3_state::jupiter3_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xa1, 0xa4).r(this, FUNC(jupiter3_state::ff_r));
+	map(0xb0, 0xb0).r(this, FUNC(jupiter3_state::status_r));
+	map(0xb2, 0xb2).r(this, FUNC(jupiter3_state::key_r));
+}
 
 READ8_MEMBER( jupiter3_state::ff_r )
 {

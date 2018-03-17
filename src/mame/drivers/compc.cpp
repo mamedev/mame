@@ -172,22 +172,25 @@ static INPUT_PORTS_START(compc)
 	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(compc_state::compc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void compc_state::compc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(compc_state::compc_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(pio_r, pio_w)
-ADDRESS_MAP_END
+void compc_state::compc_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
+	map(0x0060, 0x0063).rw(this, FUNC(compc_state::pio_r), FUNC(compc_state::pio_w));
+}
 
-ADDRESS_MAP_START(compc_state::compciii_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(pioiii_r, pioiii_w)
-ADDRESS_MAP_END
+void compc_state::compciii_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
+	map(0x0060, 0x0063).rw(this, FUNC(compc_state::pioiii_r), FUNC(compc_state::pioiii_w));
+}
 
 MACHINE_CONFIG_START(compc_state::compc)
 	MCFG_CPU_ADD("maincpu", I8088, 4772720*2)

@@ -214,12 +214,13 @@ WRITE8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_count_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(mw8080bw_state::main_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_SHARE("main_ram")
-	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_WRITENOP
-ADDRESS_MAP_END
+void mw8080bw_state::main_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x1fff).rom().nopw();
+	map(0x2000, 0x3fff).mirror(0x4000).ram().share("main_ram");
+	map(0x4000, 0x5fff).rom().nopw();
+}
 
 
 
@@ -330,19 +331,20 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::seawolf_erase_input_r)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::seawolf_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
+void mw8080bw_state::seawolf_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x01, 0x01).mirror(0x04).portr("IN0");
+	map(0x02, 0x02).mirror(0x04).portr("IN1");
+	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	AM_RANGE(0x01, 0x01) AM_WRITE(seawolf_explosion_lamp_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(seawolf_periscope_lamp_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(seawolf_audio_w)
-ADDRESS_MAP_END
+	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::seawolf_explosion_lamp_w));
+	map(0x02, 0x02).w(this, FUNC(mw8080bw_state::seawolf_periscope_lamp_w));
+	map(0x03, 0x03).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::seawolf_audio_w));
+}
 
 
 /* the 30 position encoder is verified */
@@ -443,16 +445,17 @@ WRITE8_MEMBER(mw8080bw_state::gunfight_io_w)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::gunfight_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
+void mw8080bw_state::gunfight_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).portr("IN0");
+	map(0x01, 0x01).mirror(0x04).portr("IN1");
+	map(0x02, 0x02).mirror(0x04).portr("IN2");
+	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	/* no decoder, just 3 AND gates */
-	AM_RANGE(0x00, 0x07) AM_WRITE(gunfight_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x07).w(this, FUNC(mw8080bw_state::gunfight_io_w));
+}
 
 
 static const ioport_value gunfight_controller_table[7] =
@@ -638,16 +641,17 @@ WRITE8_MEMBER(mw8080bw_state::tornbase_io_w)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::tornbase_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
+void mw8080bw_state::tornbase_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).portr("IN0");
+	map(0x01, 0x01).mirror(0x04).portr("IN1");
+	map(0x02, 0x02).mirror(0x04).portr("IN2");
+	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	/* no decoder, just 3 AND gates */
-	AM_RANGE(0x00, 0x07) AM_WRITE(tornbase_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x07).w(this, FUNC(mw8080bw_state::tornbase_io_w));
+}
 
 
 static INPUT_PORTS_START( tornbase )
@@ -759,19 +763,20 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ADDRESS_MAP_START(mw8080bw_state::zzzap_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
+void mw8080bw_state::zzzap_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).portr("IN0");
+	map(0x01, 0x01).mirror(0x04).portr("IN1");
+	map(0x02, 0x02).mirror(0x04).portr("IN2");
+	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	AM_RANGE(0x02, 0x02) AM_WRITE(zzzap_audio_1_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(zzzap_audio_2_w)
-	AM_RANGE(0x07, 0x07) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+	map(0x02, 0x02).w(this, FUNC(mw8080bw_state::zzzap_audio_1_w));
+	map(0x03, 0x03).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::zzzap_audio_2_w));
+	map(0x07, 0x07).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+}
 
 
 static INPUT_PORTS_START( zzzap )
@@ -918,14 +923,15 @@ WRITE8_MEMBER(mw8080bw_state::maze_io_w)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::maze_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+void mw8080bw_state::maze_io_map(address_map &map)
+{
+	map.global_mask(0x3);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
 
 	/* no decoder, just a couple of AND gates */
-	AM_RANGE(0x00, 0x03) AM_WRITE(maze_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x03).w(this, FUNC(mw8080bw_state::maze_io_w));
+}
 
 
 static INPUT_PORTS_START( maze )
@@ -989,20 +995,21 @@ MACHINE_START_MEMBER(mw8080bw_state,boothill)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::boothill_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ(mw8080bw_reversable_shift_result_r)
+void mw8080bw_state::boothill_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).portr("IN0");
+	map(0x01, 0x01).mirror(0x04).portr("IN1");
+	map(0x02, 0x02).mirror(0x04).portr("IN2");
+	map(0x03, 0x03).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
 
-	AM_RANGE(0x01, 0x01) AM_WRITE(mw8080bw_reversable_shift_count_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(boothill_audio_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(midway_tone_generator_lo_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(midway_tone_generator_hi_w)
-ADDRESS_MAP_END
+	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
+	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::boothill_audio_w));
+	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+}
 
 
 static const ioport_value boothill_controller_table[7] =
@@ -1084,16 +1091,17 @@ WRITE8_MEMBER(mw8080bw_state::checkmat_io_w)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::checkmat_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN3")
+void mw8080bw_state::checkmat_io_map(address_map &map)
+{
+	map.global_mask(0x3);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).portr("IN3");
 
 	/* no decoder, just a couple of AND gates */
-	AM_RANGE(0x00, 0x03) AM_WRITE(checkmat_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x03).w(this, FUNC(mw8080bw_state::checkmat_io_w));
+}
 
 
 static INPUT_PORTS_START( checkmat )
@@ -1219,21 +1227,22 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::desertgu_dip_sw_0_1_r)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::desertgu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
+void mw8080bw_state::desertgu_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x01, 0x01).mirror(0x04).portr("IN0");
+	map(0x02, 0x02).mirror(0x04).portr("IN1");
+	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(desertgu_audio_1_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(midway_tone_generator_lo_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(midway_tone_generator_hi_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(desertgu_audio_2_w)
-ADDRESS_MAP_END
+	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::desertgu_audio_1_w));
+	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::desertgu_audio_2_w));
+}
 
 
 static INPUT_PORTS_START( desertgu )
@@ -1344,20 +1353,21 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::dplay_pitch_right_input_r)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::dplay_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
+void mw8080bw_state::dplay_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).portr("IN0");
+	map(0x01, 0x01).mirror(0x04).portr("IN1");
+	map(0x02, 0x02).mirror(0x04).portr("IN2");
+	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(dplay_audio_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(midway_tone_generator_lo_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(midway_tone_generator_hi_w)
-ADDRESS_MAP_END
+	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::dplay_audio_w));
+	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+}
 
 
 static INPUT_PORTS_START( dplay )
@@ -1523,21 +1533,22 @@ MACHINE_START_MEMBER(mw8080bw_state,gmissile)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::gmissile_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ(mw8080bw_reversable_shift_result_r)
+void mw8080bw_state::gmissile_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).portr("IN0");
+	map(0x01, 0x01).mirror(0x04).portr("IN1");
+	map(0x02, 0x02).mirror(0x04).portr("IN2");
+	map(0x03, 0x03).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
 
-	AM_RANGE(0x01, 0x01) AM_WRITE(mw8080bw_reversable_shift_count_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(gmissile_audio_1_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(gmissile_audio_2_w)
+	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
+	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::gmissile_audio_1_w));
+	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::gmissile_audio_2_w));
 	/* also writes 0x00 to 0x06, but it is not connected */
-	AM_RANGE(0x07, 0x07) AM_WRITE(gmissile_audio_3_w)
-ADDRESS_MAP_END
+	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::gmissile_audio_3_w));
+}
 
 
 static INPUT_PORTS_START( gmissile )
@@ -1620,19 +1631,20 @@ MACHINE_START_MEMBER(mw8080bw_state,m4)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::m4_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ(mw8080bw_reversable_shift_result_r)
+void mw8080bw_state::m4_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).portr("IN0");
+	map(0x01, 0x01).mirror(0x04).portr("IN1");
+	map(0x02, 0x02).mirror(0x04).portr("IN2");
+	map(0x03, 0x03).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_result_r));
 
-	AM_RANGE(0x01, 0x01) AM_WRITE(mw8080bw_reversable_shift_count_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(m4_audio_1_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(m4_audio_2_w)
-ADDRESS_MAP_END
+	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
+	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::m4_audio_1_w));
+	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::m4_audio_2_w));
+}
 
 
 static INPUT_PORTS_START( m4 )
@@ -1736,21 +1748,22 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::clowns_controller_r)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::clowns_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
+void mw8080bw_state::clowns_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).portr("IN0");
+	map(0x01, 0x01).mirror(0x04).portr("IN1");
+	map(0x02, 0x02).mirror(0x04).portr("IN2");
+	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(clowns_audio_1_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(midway_tone_generator_lo_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(midway_tone_generator_hi_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(clowns_audio_2_w)
-ADDRESS_MAP_END
+	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::clowns_audio_1_w));
+	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::clowns_audio_2_w));
+}
 
 
 static INPUT_PORTS_START( clowns )
@@ -1876,22 +1889,23 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ADDRESS_MAP_START(mw8080bw_state::spacwalk_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
+void mw8080bw_state::spacwalk_io_map(address_map &map)
+{
+	map.global_mask(0x7);
 
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(spacwalk_audio_1_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(midway_tone_generator_lo_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(midway_tone_generator_hi_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(spacwalk_audio_2_w)
-ADDRESS_MAP_END
+	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::spacwalk_audio_1_w));
+	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::spacwalk_audio_2_w));
+}
 
 static INPUT_PORTS_START( spacwalk )
 	PORT_START("IN0")
@@ -1973,21 +1987,22 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ADDRESS_MAP_START(mw8080bw_state::shuffle_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xf)    /* yes, 4, and no mirroring on the read handlers */
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
-	AM_RANGE(0x03, 0x03) AM_READ(mw8080bw_shift_result_rev_r)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN2")
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("IN3")
+void mw8080bw_state::shuffle_io_map(address_map &map)
+{
+	map.global_mask(0xf);    /* yes, 4, and no mirroring on the read handlers */
+	map(0x01, 0x01).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
+	map(0x02, 0x02).portr("IN0");
+	map(0x03, 0x03).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x04, 0x04).portr("IN1");
+	map(0x05, 0x05).portr("IN2");
+	map(0x06, 0x06).portr("IN3");
 
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x08) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x08) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x08) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x08) AM_WRITE(shuffle_audio_1_w)
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0x08) AM_WRITE(shuffle_audio_2_w)
-ADDRESS_MAP_END
+	map(0x01, 0x01).mirror(0x08).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x02, 0x02).mirror(0x08).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x04, 0x04).mirror(0x08).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x05, 0x05).mirror(0x08).w(this, FUNC(mw8080bw_state::shuffle_audio_1_w));
+	map(0x06, 0x06).mirror(0x08).w(this, FUNC(mw8080bw_state::shuffle_audio_2_w));
+}
 
 
 static INPUT_PORTS_START( shuffle )
@@ -2056,20 +2071,21 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ADDRESS_MAP_START(mw8080bw_state::dogpatch_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
+void mw8080bw_state::dogpatch_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).portr("IN0");
+	map(0x01, 0x01).mirror(0x04).portr("IN1");
+	map(0x02, 0x02).mirror(0x04).portr("IN2");
+	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(dogpatch_audio_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(midway_tone_generator_lo_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(midway_tone_generator_hi_w)
-ADDRESS_MAP_END
+	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::dogpatch_audio_w));
+	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::midway_tone_generator_lo_w));
+	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::midway_tone_generator_hi_w));
+}
 
 
 static const ioport_value dogpatch_controller_table[7] =
@@ -2207,16 +2223,17 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::spcenctr_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xfc) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xfc) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0xfc) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0xfc) AM_READNOP
+void mw8080bw_state::spcenctr_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0xfc).portr("IN0");
+	map(0x01, 0x01).mirror(0xfc).portr("IN1");
+	map(0x02, 0x02).mirror(0xfc).portr("IN2");
+	map(0x03, 0x03).mirror(0xfc).nopr();
 
 	/* complicated addressing logic */
-	AM_RANGE(0x00, 0xff) AM_WRITE(spcenctr_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0xff).w(this, FUNC(mw8080bw_state::spcenctr_io_w));
+}
 
 
 static const ioport_value spcenctr_controller_table[] =
@@ -2315,19 +2332,20 @@ MACHINE_START_MEMBER(mw8080bw_state,phantom2)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::phantom2_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
+void mw8080bw_state::phantom2_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x01, 0x01).mirror(0x04).portr("IN0");
+	map(0x02, 0x02).mirror(0x04).portr("IN1");
+	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(phantom2_audio_1_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(phantom2_audio_2_w)
-ADDRESS_MAP_END
+	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::phantom2_audio_1_w));
+	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::phantom2_audio_2_w));
+}
 
 
 static INPUT_PORTS_START( phantom2 )
@@ -2443,27 +2461,28 @@ WRITE8_MEMBER(mw8080bw_state::bowler_lights_2_w)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::bowler_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xf)  /* no masking on the reads, all 4 bits are decoded */
-	AM_RANGE(0x01, 0x01) AM_READ(bowler_shift_result_r)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
-	AM_RANGE(0x03, 0x03) AM_READ(mw8080bw_shift_result_rev_r)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN2")
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("IN3")
+void mw8080bw_state::bowler_io_map(address_map &map)
+{
+	map.global_mask(0xf);  /* no masking on the reads, all 4 bits are decoded */
+	map(0x01, 0x01).r(this, FUNC(mw8080bw_state::bowler_shift_result_r));
+	map(0x02, 0x02).portr("IN0");
+	map(0x03, 0x03).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x04, 0x04).portr("IN1");
+	map(0x05, 0x05).portr("IN2");
+	map(0x06, 0x06).portr("IN3");
 
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(bowler_audio_1_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(bowler_audio_2_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(bowler_lights_1_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(bowler_audio_3_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(bowler_audio_4_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(bowler_audio_5_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(bowler_lights_2_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(bowler_audio_6_w)
-ADDRESS_MAP_END
+	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::bowler_audio_1_w));
+	map(0x06, 0x06).w(this, FUNC(mw8080bw_state::bowler_audio_2_w));
+	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::bowler_lights_1_w));
+	map(0x08, 0x08).w(this, FUNC(mw8080bw_state::bowler_audio_3_w));
+	map(0x09, 0x09).w(this, FUNC(mw8080bw_state::bowler_audio_4_w));
+	map(0x0a, 0x0a).w(this, FUNC(mw8080bw_state::bowler_audio_5_w));
+	map(0x0e, 0x0e).w(this, FUNC(mw8080bw_state::bowler_lights_2_w));
+	map(0x0f, 0x0f).w(this, FUNC(mw8080bw_state::bowler_audio_6_w));
+}
 
 
 static INPUT_PORTS_START( bowler )
@@ -2630,19 +2649,20 @@ int mw8080bw_state::invaders_is_cabinet_cocktail()
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::invaders_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
+void mw8080bw_state::invaders_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).portr("IN0");
+	map(0x01, 0x01).mirror(0x04).portr("IN1");
+	map(0x02, 0x02).mirror(0x04).portr("IN2");
+	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(invaders_audio_1_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(invaders_audio_2_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::invaders_audio_1_w));
+	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::invaders_audio_2_w));
+	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+}
 
 
 static INPUT_PORTS_START( invaders )
@@ -2764,18 +2784,19 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::blueshrk_coin_input_r)
 }
 
 
-ADDRESS_MAP_START(mw8080bw_state::blueshrk_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
+void mw8080bw_state::blueshrk_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).r(this, FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
+	map(0x01, 0x01).mirror(0x04).portr("IN0");
+	map(0x02, 0x02).mirror(0x04).portr("IN1");
+	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(blueshrk_audio_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::blueshrk_audio_w));
+	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+}
 
 
 static INPUT_PORTS_START( blueshrk )
@@ -2847,21 +2868,22 @@ uint32_t mw8080bw_state::invad2ct_coin_input_r(void *param)
 #endif
 
 
-ADDRESS_MAP_START(mw8080bw_state::invad2ct_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD("mb14241", mb14241_device, shift_result_r)
+void mw8080bw_state::invad2ct_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).mirror(0x04).portr("IN0");
+	map(0x01, 0x01).mirror(0x04).portr("IN1");
+	map(0x02, 0x02).mirror(0x04).portr("IN2");
+	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	AM_RANGE(0x01, 0x01) AM_WRITE(invad2ct_audio_3_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(invad2ct_audio_1_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(invad2ct_audio_2_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(invad2ct_audio_4_w)
-ADDRESS_MAP_END
+	map(0x01, 0x01).w(this, FUNC(mw8080bw_state::invad2ct_audio_3_w));
+	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x03, 0x03).w(this, FUNC(mw8080bw_state::invad2ct_audio_1_w));
+	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x05, 0x05).w(this, FUNC(mw8080bw_state::invad2ct_audio_2_w));
+	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x07, 0x07).w(this, FUNC(mw8080bw_state::invad2ct_audio_4_w));
+}
 
 
 static INPUT_PORTS_START( invad2ct )

@@ -194,17 +194,19 @@ void slc1_state::machine_reset()
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(slc1_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x4fff)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_MIRROR(0xc00)
-ADDRESS_MAP_END
+void slc1_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x4fff);
+	map(0x0000, 0x0fff).rom();
+	map(0x4000, 0x43ff).ram().mirror(0xc00);
+}
 
-ADDRESS_MAP_START(slc1_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r,io_w)
-ADDRESS_MAP_END
+void slc1_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
+}
 
 
 /**************************************************************************

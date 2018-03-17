@@ -64,17 +64,19 @@ READ8_MEMBER(cm1800_state::uart_status_r)
 	return (m_uart->dav_r()) | (m_uart->tbmt_r() << 2);
 }
 
-ADDRESS_MAP_START(cm1800_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x07ff ) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x0800, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void cm1800_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom().region("roms", 0);
+	map(0x0800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(cm1800_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
-	AM_RANGE(0x01, 0x01) AM_READ(uart_status_r)
-ADDRESS_MAP_END
+void cm1800_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0x01, 0x01).r(this, FUNC(cm1800_state::uart_status_r));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( cm1800 )

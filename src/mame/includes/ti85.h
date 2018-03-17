@@ -71,7 +71,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<ti8x_link_port_device> m_link_port;
 	optional_shared_ptr<uint8_t> m_nvram;
-	optional_device<intelfsh_device> m_flash;
+	optional_device<intelfsh8_device> m_flash;
 	optional_device<address_map_bank_device> m_membank1;
 	optional_device<address_map_bank_device> m_membank2;
 	optional_device<address_map_bank_device> m_membank3;

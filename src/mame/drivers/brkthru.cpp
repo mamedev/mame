@@ -108,49 +108,52 @@ INPUT_CHANGED_MEMBER(brkthru_state::coin_inserted)
  *
  *************************************/
 
-ADDRESS_MAP_START(brkthru_state::brkthru_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(brkthru_fgram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x0400, 0x0bff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(brkthru_bgram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1100, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
-	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("P2")
-	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW2/COIN")
-	AM_RANGE(0x1800, 0x1801) AM_WRITE(brkthru_1800_w)   /* bg scroll and color, ROM bank selection, flip screen */
-	AM_RANGE(0x1802, 0x1802) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x1803, 0x1803) AM_WRITE(brkthru_1803_w)   /* NMI enable, + ? */
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void brkthru_state::brkthru_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().w(this, FUNC(brkthru_state::brkthru_fgram_w)).share("fg_videoram");
+	map(0x0400, 0x0bff).ram();
+	map(0x0c00, 0x0fff).ram().w(this, FUNC(brkthru_state::brkthru_bgram_w)).share("videoram");
+	map(0x1000, 0x10ff).ram().share("spriteram");
+	map(0x1100, 0x17ff).ram();
+	map(0x1800, 0x1800).portr("P1");
+	map(0x1801, 0x1801).portr("P2");
+	map(0x1802, 0x1802).portr("DSW1");
+	map(0x1803, 0x1803).portr("DSW2/COIN");
+	map(0x1800, 0x1801).w(this, FUNC(brkthru_state::brkthru_1800_w));   /* bg scroll and color, ROM bank selection, flip screen */
+	map(0x1802, 0x1802).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x1803, 0x1803).w(this, FUNC(brkthru_state::brkthru_1803_w));   /* NMI enable, + ? */
+	map(0x2000, 0x3fff).bankr("bank1");
+	map(0x4000, 0xffff).rom();
+}
 
 /* same as brktrhu, but xor 0x1000 below 8k */
-ADDRESS_MAP_START(brkthru_state::darwin_map)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(brkthru_fgram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x1400, 0x1bff) AM_RAM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(brkthru_bgram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0100, 0x01ff) AM_WRITENOP /*tidyup, nothing really here?*/
-	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("P1")
-	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("P2")
-	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0803, 0x0803) AM_READ_PORT("DSW2/COIN")
-	AM_RANGE(0x0800, 0x0801) AM_WRITE(brkthru_1800_w)     /* bg scroll and color, ROM bank selection, flip screen */
-	AM_RANGE(0x0802, 0x0802) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x0803, 0x0803) AM_WRITE(darwin_0803_w)     /* NMI enable, + ? */
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void brkthru_state::darwin_map(address_map &map)
+{
+	map(0x1000, 0x13ff).ram().w(this, FUNC(brkthru_state::brkthru_fgram_w)).share("fg_videoram");
+	map(0x1400, 0x1bff).ram();
+	map(0x1c00, 0x1fff).ram().w(this, FUNC(brkthru_state::brkthru_bgram_w)).share("videoram");
+	map(0x0000, 0x00ff).ram().share("spriteram");
+	map(0x0100, 0x01ff).nopw(); /*tidyup, nothing really here?*/
+	map(0x0800, 0x0800).portr("P1");
+	map(0x0801, 0x0801).portr("P2");
+	map(0x0802, 0x0802).portr("DSW1");
+	map(0x0803, 0x0803).portr("DSW2/COIN");
+	map(0x0800, 0x0801).w(this, FUNC(brkthru_state::brkthru_1800_w));     /* bg scroll and color, ROM bank selection, flip screen */
+	map(0x0802, 0x0802).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x0803, 0x0803).w(this, FUNC(brkthru_state::darwin_0803_w));     /* NMI enable, + ? */
+	map(0x2000, 0x3fff).bankr("bank1");
+	map(0x4000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(brkthru_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym2", ym3526_device, write)
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void brkthru_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2001).w("ym2", FUNC(ym3526_device::write));
+	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x6000, 0x6001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 
 /*************************************

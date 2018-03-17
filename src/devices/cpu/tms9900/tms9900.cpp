@@ -2759,4 +2759,4 @@ util::disasm_interface *tms99xx_device::create_disassembler()
 }
 
 
-DEFINE_DEVICE_TYPE(TMS9900, tms9900_device, "tms9900", "TMS9900")
+DEFINE_DEVICE_TYPE(TMS9900, tms9900_device, "tms9900", "Texas Instruments TMS9900")

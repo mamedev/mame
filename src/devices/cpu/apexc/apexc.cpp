@@ -331,7 +331,7 @@ field:      X address   D           Function    Y address   D (part 2)
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(APEXC, apexc_cpu_device, "apexc_cpu", "APEXC")
+DEFINE_DEVICE_TYPE(APEXC, apexc_cpu_device, "apexc_cpu", "APE(X)C")
 
 
 /* decrement ICount by n */

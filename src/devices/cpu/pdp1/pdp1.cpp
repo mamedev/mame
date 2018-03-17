@@ -378,7 +378,7 @@
 #define PREVIOUS_PC     ((PC & ADDRESS_EXTENSION_MASK) | ((PC-1) & BASE_ADDRESS_MASK))
 
 
-DEFINE_DEVICE_TYPE(PDP1, pdp1_device, "pdp1_cpu", "PDP1")
+DEFINE_DEVICE_TYPE(PDP1, pdp1_device, "pdp1_cpu", "DEC PDP1")
 
 
 pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

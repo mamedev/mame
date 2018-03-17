@@ -91,24 +91,25 @@ WRITE_LINE_MEMBER(orbit_state::hyper_led_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(orbit_state::orbit_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x07ff) AM_READ_PORT("P1")
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x07ff) AM_READ_PORT("P2")
-	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x07ff) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x07ff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x07ff) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0x3000, 0x33bf) AM_MIRROR(0x0400) AM_RAM_WRITE(orbit_playfield_w) AM_SHARE("playfield_ram")
-	AM_RANGE(0x33c0, 0x33ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("sprite_ram")
-	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x00ff) AM_WRITE(orbit_note_w)
-	AM_RANGE(0x3900, 0x3900) AM_MIRROR(0x00ff) AM_WRITE(orbit_noise_amp_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_MIRROR(0x00ff) AM_WRITE(orbit_note_amp_w)
-	AM_RANGE(0x3c00, 0x3c0f) AM_MIRROR(0x00f0) AM_DEVWRITE("latch", f9334_device, write_a0)
-	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00ff) AM_WRITE(orbit_noise_rst_w)
-	AM_RANGE(0x3f00, 0x3f00) AM_MIRROR(0x00ff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void orbit_state::orbit_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x00ff).mirror(0x0700).ram();
+	map(0x0800, 0x0800).mirror(0x07ff).portr("P1");
+	map(0x1000, 0x1000).mirror(0x07ff).portr("P2");
+	map(0x1800, 0x1800).mirror(0x07ff).portr("DSW1");
+	map(0x2000, 0x2000).mirror(0x07ff).portr("DSW2");
+	map(0x2800, 0x2800).mirror(0x07ff).portr("BUTTONS");
+	map(0x3000, 0x33bf).mirror(0x0400).ram().w(this, FUNC(orbit_state::orbit_playfield_w)).share("playfield_ram");
+	map(0x33c0, 0x33ff).mirror(0x0400).ram().share("sprite_ram");
+	map(0x3800, 0x3800).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_note_w));
+	map(0x3900, 0x3900).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_noise_amp_w));
+	map(0x3a00, 0x3a00).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_note_amp_w));
+	map(0x3c00, 0x3c0f).mirror(0x00f0).w(m_latch, FUNC(f9334_device::write_a0));
+	map(0x3e00, 0x3e00).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_noise_rst_w));
+	map(0x3f00, 0x3f00).mirror(0x00ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x6000, 0x7fff).rom();
+}
 
 
 

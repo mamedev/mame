@@ -58,35 +58,37 @@ private:
 	//required_device<floppy_connector> m_floppy1;
 };
 
-ADDRESS_MAP_START(dps1_state::mem_map)
-	AM_RANGE(0x0000, 0x03ff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x0400, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void dps1_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x03ff).bankr("bankr0").bankw("bankw0");
+	map(0x0400, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(dps1_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("uart", mc2661_device, read, write) // S2651
-	AM_RANGE(0xb0, 0xb1) AM_DEVICE("fdc", upd765_family_device, map)
-	AM_RANGE(0xb2, 0xb3) AM_WRITE(portb2_w) // set dma fdc->memory
-	AM_RANGE(0xb4, 0xb5) AM_WRITE(portb4_w) // set dma memory->fdc
-	AM_RANGE(0xb6, 0xb7) AM_WRITE(portb6_w) // enable eprom
-	AM_RANGE(0xb8, 0xb9) AM_WRITE(portb8_w) // set A16-23
-	AM_RANGE(0xba, 0xbb) AM_WRITE(portba_w) // set A8-15
-	AM_RANGE(0xbc, 0xbd) AM_WRITE(portbc_w) // set A0-7
-	AM_RANGE(0xbe, 0xbf) AM_WRITE(portbe_w) // disable eprom
-	AM_RANGE(0xff, 0xff) AM_READWRITE(portff_r, portff_w)
+void dps1_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).rw("uart", FUNC(mc2661_device::read), FUNC(mc2661_device::write)); // S2651
+	map(0xb0, 0xb1).m(m_fdc, FUNC(upd765_family_device::map));
+	map(0xb2, 0xb3).w(this, FUNC(dps1_state::portb2_w)); // set dma fdc->memory
+	map(0xb4, 0xb5).w(this, FUNC(dps1_state::portb4_w)); // set dma memory->fdc
+	map(0xb6, 0xb7).w(this, FUNC(dps1_state::portb6_w)); // enable eprom
+	map(0xb8, 0xb9).w(this, FUNC(dps1_state::portb8_w)); // set A16-23
+	map(0xba, 0xbb).w(this, FUNC(dps1_state::portba_w)); // set A8-15
+	map(0xbc, 0xbd).w(this, FUNC(dps1_state::portbc_w)); // set A0-7
+	map(0xbe, 0xbf).w(this, FUNC(dps1_state::portbe_w)); // disable eprom
+	map(0xff, 0xff).rw(this, FUNC(dps1_state::portff_r), FUNC(dps1_state::portff_w));
 	// other allocated ports, optional
 	// AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("uart2", mc2661_device, read, write) // S2651
 	// AM_RANGE(0x08, 0x0b) parallel ports
 	// AM_RANGE(0x10, 0x11) // interrupt response
-	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE("am9519a", am9519_device, data_r, data_w)
-	AM_RANGE(0x15, 0x15) AM_DEVREADWRITE("am9519a", am9519_device, stat_r, cmd_w)
-	AM_RANGE(0x16, 0x16) AM_DEVREADWRITE("am9519b", am9519_device, data_r, data_w)
-	AM_RANGE(0x17, 0x17) AM_DEVREADWRITE("am9519b", am9519_device, stat_r, cmd_w)
+	map(0x14, 0x14).rw("am9519a", FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
+	map(0x15, 0x15).rw("am9519a", FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
+	map(0x16, 0x16).rw("am9519b", FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
+	map(0x17, 0x17).rw("am9519b", FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
 	// AM_RANGE(0x18, 0x1f) control lines 0 to 7
-	AM_RANGE(0xe0, 0xe3) AM_NOP //unknown device
-ADDRESS_MAP_END
+	map(0xe0, 0xe3).noprw(); //unknown device
+}
 
 
 // read from disk, to memory

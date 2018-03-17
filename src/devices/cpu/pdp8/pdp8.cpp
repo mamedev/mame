@@ -43,7 +43,7 @@
 #define OPR_GROUP1_VAL  0000
 #define OPR_GROUP2_VAL  0400
 
-DEFINE_DEVICE_TYPE(PDP8, pdp8_device, "pdp8_cpu", "PDP8")
+DEFINE_DEVICE_TYPE(PDP8, pdp8_device, "pdp8_cpu", "DEC PDP8")
 
 //-------------------------------------------------
 //  pdp8_device - constructor

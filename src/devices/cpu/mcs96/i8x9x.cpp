@@ -372,7 +372,7 @@ p8098_device::p8098_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-DEFINE_DEVICE_TYPE(C8095, c8095_device, "c8095", "C8095")
-DEFINE_DEVICE_TYPE(P8098, p8098_device, "p8098", "P8098")
+DEFINE_DEVICE_TYPE(C8095, c8095_device, "c8095", "Intel C8095")
+DEFINE_DEVICE_TYPE(P8098, p8098_device, "p8098", "Intel P8098")
 
 #include "cpu/mcs96/i8x9x.hxx"

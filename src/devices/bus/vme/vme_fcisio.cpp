@@ -161,18 +161,19 @@ DEFINE_DEVICE_TYPE(VME_FCISIO1, vme_fcisio1_card_device, "fcisio1", "Force Compu
 #define CPU_CLOCK XTAL(20'000'000) /* HCJ */
 #define DUSCC_CLOCK XTAL(14'745'600) /* HCJ */
 
-ADDRESS_MAP_START(vme_fcisio1_card_device::fcisio1_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x000000, 0x01ffff) AM_RAM /* SRAM */
-	AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ (bootvect_r)       /* Vectors mapped from System EPROM */
-	AM_RANGE (0xe00000, 0xe001ff) AM_DEVREADWRITE8("duscc0", duscc68562_device, read, write, 0x00ff)
-	AM_RANGE (0xe20000, 0xe201ff) AM_DEVREADWRITE8("duscc1", duscc68562_device, read, write, 0x00ff)
-	AM_RANGE (0xe40000, 0xe401ff) AM_DEVREADWRITE8("duscc2", duscc68562_device, read, write, 0x00ff)
-	AM_RANGE (0xe60000, 0xe601ff) AM_DEVREADWRITE8("duscc3", duscc68562_device, read, write, 0x00ff)
-	AM_RANGE (0xe80000, 0xe80dff) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff)
-	AM_RANGE (0xf00000, 0xf7ffff) AM_ROM /* System EPROM Area 32Kb DEBUGGER supplied */
+void vme_fcisio1_card_device::fcisio1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x01ffff).ram(); /* SRAM */
+	map(0x000000, 0x000007).rom().r(this, FUNC(vme_fcisio1_card_device::bootvect_r));       /* Vectors mapped from System EPROM */
+	map(0xe00000, 0xe001ff).rw("duscc0", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)).umask16(0x00ff);
+	map(0xe20000, 0xe201ff).rw("duscc1", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)).umask16(0x00ff);
+	map(0xe40000, 0xe401ff).rw("duscc2", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)).umask16(0x00ff);
+	map(0xe60000, 0xe601ff).rw("duscc3", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)).umask16(0x00ff);
+	map(0xe80000, 0xe80dff).rw("pit", FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
+	map(0xf00000, 0xf7ffff).rom(); /* System EPROM Area 32Kb DEBUGGER supplied */
 //  AM_RANGE (0xc40000, 0xc800ff) AM_READWRITE8 (not_implemented_r, not_implemented_w, 0xffff)  /* Dummy mapping af address area to display message */
-ADDRESS_MAP_END
+}
 
 /* ROM definitions */
 ROM_START (fcisio1)

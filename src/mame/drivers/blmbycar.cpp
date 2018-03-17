@@ -100,35 +100,37 @@ READ16_MEMBER(blmbycar_state::blmbycar_opt_wheel_r)
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(blmbycar_state::common_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0xfec000, 0xfeffff) AM_RAM
-	AM_RANGE(0x100000, 0x103fff) AM_WRITEONLY                                               // ???
-	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1") // Layer 1
-	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0") // Layer 0
-	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY                                               // ???
-	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_SHARE("scroll_1")              // Scroll 1
-	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_SHARE("scroll_0")              // Scroll 0
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") AM_MIRROR(0x4000) // Palette
-	AM_RANGE(0x200600, 0x203fff) AM_RAM AM_MIRROR(0x4000)
-	AM_RANGE(0x440000, 0x441fff) AM_RAM
-	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_SHARE("spriteram")// Sprites (size?)
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(okibank_w)                               // Sound
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
-ADDRESS_MAP_END
+void blmbycar_state::common_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0xfec000, 0xfeffff).ram();
+	map(0x100000, 0x103fff).writeonly();                                               // ???
+	map(0x104000, 0x105fff).ram().w(this, FUNC(blmbycar_state::vram_1_w)).share("vram_1"); // Layer 1
+	map(0x106000, 0x107fff).ram().w(this, FUNC(blmbycar_state::vram_0_w)).share("vram_0"); // Layer 0
+	map(0x108000, 0x10bfff).writeonly();                                               // ???
+	map(0x10c000, 0x10c003).writeonly().share("scroll_1");              // Scroll 1
+	map(0x10c004, 0x10c007).writeonly().share("scroll_0");              // Scroll 0
+	map(0x200000, 0x2005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette").mirror(0x4000); // Palette
+	map(0x200600, 0x203fff).ram().mirror(0x4000);
+	map(0x440000, 0x441fff).ram();
+	map(0x444000, 0x445fff).writeonly().share("spriteram");// Sprites (size?)
+	map(0x700000, 0x700001).portr("DSW");
+	map(0x700002, 0x700003).portr("P1_P2");
+	map(0x70000c, 0x70000d).w(this, FUNC(blmbycar_state::okibank_w));                               // Sound
+	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
+}
 
-ADDRESS_MAP_START(blmbycar_state::blmbycar_map)
-	AM_IMPORT_FROM(common_map)
+void blmbycar_state::blmbycar_map(address_map &map)
+{
+	common_map(map);
 
-	AM_RANGE(0x700004, 0x700005) AM_READ(blmbycar_opt_wheel_r)                              // Wheel (optical)
-	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("UNK")
-	AM_RANGE(0x700008, 0x700009) AM_READ(blmbycar_pot_wheel_r)                              // Wheel (potentiometer)
-	AM_RANGE(0x70000a, 0x70000b) AM_WRITENOP                                                // ? Wheel
-	AM_RANGE(0x70006a, 0x70006b) AM_WRITE(blmbycar_pot_wheel_reset_w)                       // Wheel (potentiometer)
-	AM_RANGE(0x70007a, 0x70007b) AM_WRITE(blmbycar_pot_wheel_shift_w)                       //
-ADDRESS_MAP_END
+	map(0x700004, 0x700005).r(this, FUNC(blmbycar_state::blmbycar_opt_wheel_r));                              // Wheel (optical)
+	map(0x700006, 0x700007).portr("UNK");
+	map(0x700008, 0x700009).r(this, FUNC(blmbycar_state::blmbycar_pot_wheel_r));                              // Wheel (potentiometer)
+	map(0x70000a, 0x70000b).nopw();                                                // ? Wheel
+	map(0x70006a, 0x70006b).w(this, FUNC(blmbycar_state::blmbycar_pot_wheel_reset_w));                       // Wheel (potentiometer)
+	map(0x70007a, 0x70007b).w(this, FUNC(blmbycar_state::blmbycar_pot_wheel_shift_w));                       //
+}
 
 READ16_MEMBER(blmbycar_state::waterball_unk_r)
 {
@@ -136,18 +138,20 @@ READ16_MEMBER(blmbycar_state::waterball_unk_r)
 	return m_retvalue;
 }
 
-ADDRESS_MAP_START(blmbycar_state::watrball_map)
-	AM_IMPORT_FROM(common_map)
+void blmbycar_state::watrball_map(address_map &map)
+{
+	common_map(map);
 
-	AM_RANGE(0x700006, 0x700007) AM_READNOP                                                 // read
-	AM_RANGE(0x700008, 0x700009) AM_READ(waterball_unk_r)                                   // 0x0008 must toggle
-	AM_RANGE(0x70000a, 0x70000b) AM_WRITEONLY                                               // ?? busy
-ADDRESS_MAP_END
+	map(0x700006, 0x700007).nopr();                                                 // read
+	map(0x700008, 0x700009).r(this, FUNC(blmbycar_state::waterball_unk_r));                                   // 0x0008 must toggle
+	map(0x70000a, 0x70000b).writeonly();                                               // ?? busy
+}
 
-ADDRESS_MAP_START(blmbycar_state::blmbycar_oki_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void blmbycar_state::blmbycar_oki_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("okibank");
+}
 
 /***************************************************************************
 

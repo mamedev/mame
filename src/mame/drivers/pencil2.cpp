@@ -129,36 +129,38 @@ private:
 	required_device<generic_slot_device> m_cart;
 };
 
-ADDRESS_MAP_START(pencil2_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x5fff) AM_WRITENOP  // stop error log filling up
-	AM_RANGE(0x6000, 0x67ff) AM_MIRROR(0x1800) AM_RAM
+void pencil2_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x5fff).nopw();  // stop error log filling up
+	map(0x6000, 0x67ff).mirror(0x1800).ram();
 	//AM_RANGE(0x8000, 0xffff)      // mapped by the cartslot
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(pencil2_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x10, 0x1f) AM_WRITE(port10_w)
-	AM_RANGE(0x30, 0x3f) AM_WRITE(port30_w)
-	AM_RANGE(0x80, 0x9f) AM_WRITE(port80_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xdf) AM_WRITE(portc0_w)
-	AM_RANGE(0xe0, 0xff) AM_DEVWRITE("sn76489a", sn76489a_device, write)
-	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("E0")
-	AM_RANGE(0xe1, 0xe1) AM_READ_PORT("E1")
-	AM_RANGE(0xe2, 0xe2) AM_READ(porte2_r)
-	AM_RANGE(0xe3, 0xe3) AM_READ_PORT("E3")
-	AM_RANGE(0xe4, 0xe4) AM_READ_PORT("E4")
-	AM_RANGE(0xe6, 0xe6) AM_READ_PORT("E6")
-	AM_RANGE(0xe8, 0xe8) AM_READ_PORT("E8")
-	AM_RANGE(0xea, 0xea) AM_READ_PORT("EA")
-	AM_RANGE(0xf0, 0xf0) AM_READ_PORT("F0")
-	AM_RANGE(0xf2, 0xf2) AM_READ_PORT("F2")
-ADDRESS_MAP_END
+void pencil2_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x0f).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x10, 0x1f).w(this, FUNC(pencil2_state::port10_w));
+	map(0x30, 0x3f).w(this, FUNC(pencil2_state::port30_w));
+	map(0x80, 0x9f).w(this, FUNC(pencil2_state::port80_w));
+	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0xc0, 0xdf).w(this, FUNC(pencil2_state::portc0_w));
+	map(0xe0, 0xff).w("sn76489a", FUNC(sn76489a_device::write));
+	map(0xe0, 0xe0).portr("E0");
+	map(0xe1, 0xe1).portr("E1");
+	map(0xe2, 0xe2).r(this, FUNC(pencil2_state::porte2_r));
+	map(0xe3, 0xe3).portr("E3");
+	map(0xe4, 0xe4).portr("E4");
+	map(0xe6, 0xe6).portr("E6");
+	map(0xe8, 0xe8).portr("E8");
+	map(0xea, 0xea).portr("EA");
+	map(0xf0, 0xf0).portr("F0");
+	map(0xf2, 0xf2).portr("F2");
+}
 
 READ8_MEMBER( pencil2_state::porte2_r)
 {

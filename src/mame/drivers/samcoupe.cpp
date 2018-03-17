@@ -303,31 +303,33 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_lpt2_strobe_w)
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(samcoupe_state::samcoupe_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_READWRITE(sam_bank1_r, sam_bank1_w) // AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_READWRITE(sam_bank2_r, sam_bank2_w) // AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_READWRITE(sam_bank3_r, sam_bank3_w) // AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAM AM_READWRITE(sam_bank4_r, sam_bank4_w) // AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void samcoupe_state::samcoupe_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().rw(this, FUNC(samcoupe_state::sam_bank1_r), FUNC(samcoupe_state::sam_bank1_w)); // AM_RAMBANK("bank1")
+	map(0x4000, 0x7fff).ram().rw(this, FUNC(samcoupe_state::sam_bank2_r), FUNC(samcoupe_state::sam_bank2_w)); // AM_RAMBANK("bank2")
+	map(0x8000, 0xbfff).ram().rw(this, FUNC(samcoupe_state::sam_bank3_r), FUNC(samcoupe_state::sam_bank3_w)); // AM_RAMBANK("bank3")
+	map(0xc000, 0xffff).ram().rw(this, FUNC(samcoupe_state::sam_bank4_r), FUNC(samcoupe_state::sam_bank4_w)); // AM_RAMBANK("bank4")
+}
 
-ADDRESS_MAP_START(samcoupe_state::samcoupe_io)
-	AM_RANGE(0x0080, 0x0081) AM_SELECT(0xff00) AM_WRITE(samcoupe_ext_mem_w)
-	AM_RANGE(0x00e0, 0x00e7) AM_SELECT(0xff10) AM_READWRITE(samcoupe_disk_r, samcoupe_disk_w)
-	AM_RANGE(0x00e8, 0x00e8) AM_SELECT(0xff00) AM_DEVWRITE("lpt1_data_out", output_latch_device, write)
-	AM_RANGE(0x00e9, 0x00e9) AM_SELECT(0xff00) AM_READWRITE(samcoupe_lpt1_busy_r, samcoupe_lpt1_strobe_w)
-	AM_RANGE(0x00ea, 0x00ea) AM_SELECT(0xff00) AM_DEVWRITE("lpt2_data_out", output_latch_device, write)
-	AM_RANGE(0x00eb, 0x00eb) AM_SELECT(0xff00) AM_READWRITE(samcoupe_lpt2_busy_r, samcoupe_lpt2_strobe_w)
-	AM_RANGE(0x00f8, 0x00f8) AM_SELECT(0xff00) AM_READWRITE(samcoupe_pen_r, samcoupe_clut_w)
-	AM_RANGE(0x00f9, 0x00f9) AM_SELECT(0xff00) AM_READWRITE(samcoupe_status_r, samcoupe_line_int_w)
-	AM_RANGE(0x00fa, 0x00fa) AM_SELECT(0xff00) AM_READWRITE(samcoupe_lmpr_r, samcoupe_lmpr_w)
-	AM_RANGE(0x00fb, 0x00fb) AM_SELECT(0xff00) AM_READWRITE(samcoupe_hmpr_r, samcoupe_hmpr_w)
-	AM_RANGE(0x00fc, 0x00fc) AM_SELECT(0xff00) AM_READWRITE(samcoupe_vmpr_r, samcoupe_vmpr_w)
-	AM_RANGE(0x00fd, 0x00fd) AM_SELECT(0xff00) AM_READWRITE(samcoupe_midi_r, samcoupe_midi_w)
-	AM_RANGE(0x00fe, 0x00fe) AM_SELECT(0xff00) AM_READWRITE(samcoupe_keyboard_r, samcoupe_border_w)
-	AM_RANGE(0x00ff, 0x00ff) AM_SELECT(0xff00) AM_READ(samcoupe_attributes_r)
-	AM_RANGE(0x00ff, 0x00ff) AM_SELECT(0xfe00) AM_DEVWRITE("saa1099", saa1099_device, data_w)
-	AM_RANGE(0x01ff, 0x01ff) AM_SELECT(0xfe00) AM_DEVWRITE("saa1099", saa1099_device, control_w)
-ADDRESS_MAP_END
+void samcoupe_state::samcoupe_io(address_map &map)
+{
+	map(0x0080, 0x0081).select(0xff00).w(this, FUNC(samcoupe_state::samcoupe_ext_mem_w));
+	map(0x00e0, 0x00e7).select(0xff10).rw(this, FUNC(samcoupe_state::samcoupe_disk_r), FUNC(samcoupe_state::samcoupe_disk_w));
+	map(0x00e8, 0x00e8).select(0xff00).w("lpt1_data_out", FUNC(output_latch_device::write));
+	map(0x00e9, 0x00e9).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_lpt1_busy_r), FUNC(samcoupe_state::samcoupe_lpt1_strobe_w));
+	map(0x00ea, 0x00ea).select(0xff00).w("lpt2_data_out", FUNC(output_latch_device::write));
+	map(0x00eb, 0x00eb).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_lpt2_busy_r), FUNC(samcoupe_state::samcoupe_lpt2_strobe_w));
+	map(0x00f8, 0x00f8).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_pen_r), FUNC(samcoupe_state::samcoupe_clut_w));
+	map(0x00f9, 0x00f9).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_status_r), FUNC(samcoupe_state::samcoupe_line_int_w));
+	map(0x00fa, 0x00fa).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_lmpr_r), FUNC(samcoupe_state::samcoupe_lmpr_w));
+	map(0x00fb, 0x00fb).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_hmpr_r), FUNC(samcoupe_state::samcoupe_hmpr_w));
+	map(0x00fc, 0x00fc).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_vmpr_r), FUNC(samcoupe_state::samcoupe_vmpr_w));
+	map(0x00fd, 0x00fd).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_midi_r), FUNC(samcoupe_state::samcoupe_midi_w));
+	map(0x00fe, 0x00fe).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_keyboard_r), FUNC(samcoupe_state::samcoupe_border_w));
+	map(0x00ff, 0x00ff).select(0xff00).r(this, FUNC(samcoupe_state::samcoupe_attributes_r));
+	map(0x00ff, 0x00ff).select(0xfe00).w("saa1099", FUNC(saa1099_device::data_w));
+	map(0x01ff, 0x01ff).select(0xfe00).w("saa1099", FUNC(saa1099_device::control_w));
+}
 
 
 /***************************************************************************

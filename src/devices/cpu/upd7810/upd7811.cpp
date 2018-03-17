@@ -28,7 +28,7 @@ ADDRESS_MAP_START(upd7810_device::upd_internal_4096_rom_map)
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-DEFINE_DEVICE_TYPE(UPD7811, upd7811_device, "upd78c11", "uPD78C11")
+DEFINE_DEVICE_TYPE(UPD7811, upd7811_device, "upd78c11", "NEC uPD78C11")
 
 upd7811_device::upd7811_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upd7810_device(mconfig, UPD7811, tag, owner, clock, address_map_constructor(FUNC(upd7811_device::upd_internal_4096_rom_map), this))

@@ -64,36 +64,40 @@ INTERRUPT_GEN_MEMBER(mouser_state::mouser_sound_nmi_assert)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-ADDRESS_MAP_START(mouser_state::mouser_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6bff) AM_RAM
-	AM_RANGE(0x8800, 0x88ff) AM_WRITENOP /* unknown */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
-	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("P2") AM_WRITE(mouser_sound_interrupt_w) /* byte to sound cpu */
-ADDRESS_MAP_END
+void mouser_state::mouser_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6bff).ram();
+	map(0x8800, 0x88ff).nopw(); /* unknown */
+	map(0x9000, 0x93ff).ram().share("videoram");
+	map(0x9800, 0x9bff).ram().share("spriteram");
+	map(0x9c00, 0x9fff).ram().share("colorram");
+	map(0xa000, 0xa000).portr("P1");
+	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xa800, 0xa800).portr("SYSTEM");
+	map(0xb000, 0xb000).portr("DSW");
+	map(0xb800, 0xb800).portr("P2").w(this, FUNC(mouser_state::mouser_sound_interrupt_w)); /* byte to sound cpu */
+}
 
-ADDRESS_MAP_START(mouser_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void mouser_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom().share("decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(mouser_state::mouser_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(mouser_sound_byte_r)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(mouser_sound_nmi_clear_w)
-ADDRESS_MAP_END
+void mouser_state::mouser_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x3000, 0x3000).r(this, FUNC(mouser_state::mouser_sound_byte_r));
+	map(0x4000, 0x4000).w(this, FUNC(mouser_state::mouser_sound_nmi_clear_w));
+}
 
-ADDRESS_MAP_START(mouser_state::mouser_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void mouser_state::mouser_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x80, 0x81).w("ay2", FUNC(ay8910_device::data_address_w));
+}
 
 static INPUT_PORTS_START( mouser )
 	PORT_START("SYSTEM")

@@ -123,42 +123,48 @@ private:
 };
 
 
-ADDRESS_MAP_START(play_3_state::play_3_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x80ff) AM_RAM AM_SHARE("nvram") // pair of 5101, battery-backed
-ADDRESS_MAP_END
+void play_3_state::play_3_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x80ff).ram().share("nvram"); // pair of 5101, battery-backed
+}
 
-ADDRESS_MAP_START(play_3_state::play_3_io)
-	AM_RANGE(0x01, 0x01) AM_WRITE(port01_w) // digits, scan-lines
-	AM_RANGE(0x02, 0x02) AM_WRITE(port02_w) // sound code
-	AM_RANGE(0x03, 0x03) AM_WRITE(port03_w) //
-	AM_RANGE(0x04, 0x04) AM_READ(port04_r) // switches
-	AM_RANGE(0x05, 0x05) AM_READ(port05_r) // more switches
-	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w) // segments
-	AM_RANGE(0x07, 0x07) AM_WRITE(port07_w) // flipflop clear
-ADDRESS_MAP_END
+void play_3_state::play_3_io(address_map &map)
+{
+	map(0x01, 0x01).w(this, FUNC(play_3_state::port01_w)); // digits, scan-lines
+	map(0x02, 0x02).w(this, FUNC(play_3_state::port02_w)); // sound code
+	map(0x03, 0x03).w(this, FUNC(play_3_state::port03_w)); //
+	map(0x04, 0x04).r(this, FUNC(play_3_state::port04_r)); // switches
+	map(0x05, 0x05).r(this, FUNC(play_3_state::port05_r)); // more switches
+	map(0x06, 0x06).w(this, FUNC(play_3_state::port06_w)); // segments
+	map(0x07, 0x07).w(this, FUNC(play_3_state::port07_w)); // flipflop clear
+}
 
-ADDRESS_MAP_START(play_3_state::megaaton_io)
-	AM_IMPORT_FROM(play_3_io)
-	AM_RANGE(0x01, 0x01) AM_WRITE(megaaton_port01_w) // digits, scan-lines
-ADDRESS_MAP_END
+void play_3_state::megaaton_io(address_map &map)
+{
+	play_3_io(map);
+	map(0x01, 0x01).w(this, FUNC(play_3_state::megaaton_port01_w)); // digits, scan-lines
+}
 
-ADDRESS_MAP_START(play_3_state::sklflite_io)
-	AM_IMPORT_FROM(play_3_io)
-	AM_RANGE(0x03, 0x03) AM_WRITE(sklflite_port03_w) //
-ADDRESS_MAP_END
+void play_3_state::sklflite_io(address_map &map)
+{
+	play_3_io(map);
+	map(0x03, 0x03).w(this, FUNC(play_3_state::sklflite_port03_w)); //
+}
 
-ADDRESS_MAP_START(play_3_state::play_3_audio_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("aysnd1", ay8910_device, data_r, address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("aysnd2", ay8910_device, data_r, address_data_w)
-	AM_RANGE(0x8000, 0x80ff) AM_RAM
-ADDRESS_MAP_END
+void play_3_state::play_3_audio_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4001).mirror(0x1ffe).rw(m_aysnd1, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x6000, 0x6001).mirror(0x1ffe).rw(m_aysnd2, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x8000, 0x80ff).ram();
+}
 
-ADDRESS_MAP_START(play_3_state::play_3_audio_io)
-	AM_RANGE(0x01, 0x01) AM_WRITE(port01_a_w) // irq counter
-	AM_RANGE(0x02, 0x02) AM_READ(port02_a_r) // sound code
-ADDRESS_MAP_END
+void play_3_state::play_3_audio_io(address_map &map)
+{
+	map(0x01, 0x01).w(this, FUNC(play_3_state::port01_a_w)); // irq counter
+	map(0x02, 0x02).r(this, FUNC(play_3_state::port02_a_r)); // sound code
+}
 
 
 static INPUT_PORTS_START( play_3 )

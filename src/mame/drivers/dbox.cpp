@@ -568,15 +568,16 @@ READ16_MEMBER (dbox_state::sysflash_r){
 /* End of flash emulation */
 #endif
 
-ADDRESS_MAP_START(dbox_state::dbox_map)
+void dbox_state::dbox_map(address_map &map)
+{
 // CS0 - bootrom
 // 008004ee Address mask CS0 00000040, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
 // 008004f8 Base address CS0 00000044, 0000005b (ffffffff) - Base: 00000000 BFC:05 WP:1 FTE:0 NCS:1 Valid: Yes
 #if LOCALFLASH
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_READ16(sysflash_r, 0xffffffff) AM_REGION("flash", 0)
-	AM_RANGE(0x000000, 0x3fffff) AM_WRITE16(sysflash_w, 0xffffffff)
+	map(0x000000, 0x3fffff).rom().r(this, FUNC(dbox_state::sysflash_r)).region("flash", 0);
+	map(0x000000, 0x3fffff).w(this, FUNC(dbox_state::sysflash_w));
 #else
-	AM_RANGE(0x000000, 0x3fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)
+	map(0x000000, 0x3fffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 #endif
 // CS2 - CS demux
 // 0000009a Address mask CS2 00000050, 00007fff (ffffffff) - Mask: 00007f00 FCM:0f DD:3 PS: External DSACK response
@@ -586,13 +587,13 @@ ADDRESS_MAP_START(dbox_state::dbox_map)
 // 000000aa Address mask CS3 00000058, 000007f2 (ffffffff) - Mask: 00000700 FCM:0f DD:0 PS: 8-bit
 // 000000b2 Base address CS3 0000005c, 00780003 (ffffffff) - Base: 00780000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
 	// AM_RANGE(0x780000, 0x7807ff)
-	AM_RANGE(0x780100, 0x7801ff) AM_WRITE8(sda5708_reset, 0xffffffff)
-	AM_RANGE(0x780600, 0x7806ff) AM_WRITE8(sda5708_clk, 0xffffffff)
+	map(0x780100, 0x7801ff).w(this, FUNC(dbox_state::sda5708_reset));
+	map(0x780600, 0x7806ff).w(this, FUNC(dbox_state::sda5708_clk));
 // CS1 - RAM area
 // 0000008a Address mask CS1 00000048, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
 // 00000092 Base address CS1 0000004c, 00800003 (ffffffff) - Base: 00800000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
-	AM_RANGE(0x800000, 0xcfffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x800000, 0xcfffff).ram();
+}
 
 /* Input ports */
 static INPUT_PORTS_START( dbox )

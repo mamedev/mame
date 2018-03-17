@@ -70,84 +70,93 @@ WRITE8_MEMBER(tigeroad_state::msm5205_w)
 
 /***************************************************************************/
 
-ADDRESS_MAP_START(tigeroad_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+void tigeroad_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
-	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfe0d00, 0xfe1807) AM_RAM     /* still part of OBJ RAM */
-	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("P1_P2") AM_WRITE(tigeroad_videoctrl_w)   /* char bank, coin counters, + ? */
-	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM") AM_WRITE(tigeroad_soundcmd_w) /* AM_WRITE(tigeroad_soundcmd_w) is replaced in init for for f1dream protection */
-	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("DSW")
-	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(tigeroad_scroll_w)
-	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITEONLY    /* fe800e = watchdog or IRQ acknowledge */
-	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_SHARE("videoram")
+	map(0xfe0800, 0xfe0cff).ram().share("spriteram");
+	map(0xfe0d00, 0xfe1807).ram();     /* still part of OBJ RAM */
+	map(0xfe4000, 0xfe4001).portr("P1_P2").w(this, FUNC(tigeroad_state::tigeroad_videoctrl_w));   /* char bank, coin counters, + ? */
+	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(this, FUNC(tigeroad_state::tigeroad_soundcmd_w)); /* AM_WRITE(tigeroad_soundcmd_w) is replaced in init for for f1dream protection */
+	map(0xfe4004, 0xfe4005).portr("DSW");
+	map(0xfe8000, 0xfe8003).w(this, FUNC(tigeroad_state::tigeroad_scroll_w));
+	map(0xfe800e, 0xfe800f).writeonly();    /* fe800e = watchdog or IRQ acknowledge */
+	map(0xfec000, 0xfec7ff).ram().w(this, FUNC(tigeroad_state::tigeroad_videoram_w)).share("videoram");
 
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("ram16")
-ADDRESS_MAP_END
+	map(0xff8000, 0xff87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xffc000, 0xffffff).ram().share("ram16");
+}
 
-ADDRESS_MAP_START(pushman_state::pushman_map)
-	AM_IMPORT_FROM(main_map)
+void pushman_state::pushman_map(address_map &map)
+{
+	main_map(map);
 
-	AM_RANGE(0x060000, 0x060007) AM_READ(mcu_comm_r)
-	AM_RANGE(0x060000, 0x060003) AM_WRITE(pushman_mcu_comm_w)
-ADDRESS_MAP_END
+	map(0x060000, 0x060007).r(this, FUNC(pushman_state::mcu_comm_r));
+	map(0x060000, 0x060003).w(this, FUNC(pushman_state::pushman_mcu_comm_w));
+}
 
-ADDRESS_MAP_START(pushman_state::bballs_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-	AM_RANGE(0x60000, 0x60007) AM_READ(mcu_comm_r)
-	AM_RANGE(0x60000, 0x60001) AM_WRITE(bballs_mcu_comm_w)
+void pushman_state::bballs_map(address_map &map)
+{
+	map.global_mask(0xfffff);
+	map(0x00000, 0x3ffff).rom();
+	map(0x60000, 0x60007).r(this, FUNC(pushman_state::mcu_comm_r));
+	map(0x60000, 0x60001).w(this, FUNC(pushman_state::bballs_mcu_comm_w));
 	// are these mirror addresses or does this PCB have a different addressing?
-	AM_RANGE(0xe0800, 0xe17ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe4000, 0xe4001) AM_READ_PORT("P1_P2") AM_WRITE(tigeroad_videoctrl_w)
-	AM_RANGE(0xe4002, 0xe4003) AM_READ_PORT("SYSTEM") AM_WRITE(tigeroad_soundcmd_w)
-	AM_RANGE(0xe4004, 0xe4005) AM_READ_PORT("DSW")
-	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(tigeroad_scroll_w)
-	AM_RANGE(0xe800e, 0xe800f) AM_WRITENOP /* ? */
-	AM_RANGE(0xec000, 0xec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_SHARE("videoram")
+	map(0xe0800, 0xe17ff).ram().share("spriteram");
+	map(0xe4000, 0xe4001).portr("P1_P2").w(this, FUNC(pushman_state::tigeroad_videoctrl_w));
+	map(0xe4002, 0xe4003).portr("SYSTEM").w(this, FUNC(pushman_state::tigeroad_soundcmd_w));
+	map(0xe4004, 0xe4005).portr("DSW");
+	map(0xe8000, 0xe8003).w(this, FUNC(pushman_state::tigeroad_scroll_w));
+	map(0xe800e, 0xe800f).nopw(); /* ? */
+	map(0xec000, 0xec7ff).ram().w(this, FUNC(pushman_state::tigeroad_videoram_w)).share("videoram");
 
-	AM_RANGE(0xf8000, 0xf87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xfc000, 0xfffff) AM_RAM AM_SHARE("ram16")
-ADDRESS_MAP_END
+	map(0xf8000, 0xf87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfc000, 0xfffff).ram().share("ram16");
+}
 
 /* Capcom games ONLY */
-ADDRESS_MAP_START(tigeroad_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void tigeroad_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xc000, 0xc7ff).ram();
+	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(tigeroad_state::sound_port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void tigeroad_state::sound_port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7f, 0x7f).w("soundlatch2", FUNC(generic_latch_8_device::write));
+}
 
 /* toramich ONLY */
-ADDRESS_MAP_START(tigeroad_state::sample_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void tigeroad_state::sample_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(tigeroad_state::sample_port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
-ADDRESS_MAP_END
+void tigeroad_state::sample_port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0x01, 0x01).w(this, FUNC(tigeroad_state::msm5205_w));
+}
 
 /* Pushman / Bouncing Balls */
-ADDRESS_MAP_START(tigeroad_state::comad_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void tigeroad_state::comad_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(tigeroad_state::comad_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym2", ym2203_device, write)
-ADDRESS_MAP_END
+void tigeroad_state::comad_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ym1", FUNC(ym2203_device::write));
+	map(0x80, 0x81).w("ym2", FUNC(ym2203_device::write));
+}
 
 
 

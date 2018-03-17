@@ -88,7 +88,7 @@ public:
 
 	void goupil_g1(machine_config &config);
 	void goupil_mem(address_map &map);
-private:
+protected:
 	required_device<acia6850_device> m_acia;
 	optional_device<ef9364_device> m_ef9364;
 	required_device<cpu_device> m_maincpu;
@@ -142,62 +142,64 @@ TIMER_DEVICE_CALLBACK_MEMBER( goupil_g1_state::goupil_scanline )
 	m_ef9364->update_scanline((uint16_t)param);
 }
 
-ADDRESS_MAP_START(goupil_g1_state::goupil_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0x3FFF) AM_RAM
-	AM_RANGE(0x4000,0x7FFF) AM_RAM
-	AM_RANGE(0xC000,0xE3FF) AM_ROM AM_REGION("maincpu", 0xC000) // Basic ROM (BASIC 1 up to BASIC 9).
+void goupil_g1_state::goupil_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3FFF).ram();
+	map(0x4000, 0x7FFF).ram();
+	map(0xC000, 0xE3FF).rom().region("maincpu", 0xC000); // Basic ROM (BASIC 1 up to BASIC 9).
 
-	AM_RANGE(0xE400,0xE7FF) AM_RAM
-	AM_RANGE(0xE800,0xE80F) AM_DEVREADWRITE("ef6850", acia6850_device, data_r, data_w)
-	AM_RANGE(0xE810,0xE81F) AM_DEVREADWRITE("m_via_video", via6522_device, read, write)
+	map(0xE400, 0xE7FF).ram();
+	map(0xE800, 0xE80F).rw(m_acia, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));
+	map(0xE810, 0xE81F).rw(m_via_video, FUNC(via6522_device::read), FUNC(via6522_device::write));
 
-	AM_RANGE(0xE820,0xE820) AM_DEVREADWRITE("i8279_kb1", i8279_device, data_r, data_w )
-	AM_RANGE(0xE821,0xE821) AM_DEVREADWRITE("i8279_kb1", i8279_device, status_r, cmd_w )
+	map(0xE820, 0xE820).rw("i8279_kb1", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
+	map(0xE821, 0xE821).rw("i8279_kb1", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 
-	AM_RANGE(0xE830,0xE830) AM_DEVREADWRITE("i8279_kb2", i8279_device, data_r, data_w )
-	AM_RANGE(0xE831,0xE831) AM_DEVREADWRITE("i8279_kb2", i8279_device, status_r, cmd_w )
+	map(0xE830, 0xE830).rw("i8279_kb2", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
+	map(0xE831, 0xE831).rw("i8279_kb2", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 
-	AM_RANGE(0xE840,0xE84F) AM_DEVREADWRITE("m_via_keyb", via6522_device, read, write)
+	map(0xE840, 0xE84F).rw(m_via_keyb, FUNC(via6522_device::read), FUNC(via6522_device::write));
 
-	AM_RANGE(0xE860,0xE86F) AM_DEVREADWRITE("m_via_modem", via6522_device, read, write)
+	map(0xE860, 0xE86F).rw(m_via_modem, FUNC(via6522_device::read), FUNC(via6522_device::write));
 
-	AM_RANGE(0xE8F0,0xE8FF) AM_DEVREADWRITE("fd1791", fd1791_device, read, write)
+	map(0xE8F0, 0xE8FF).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
 
-	AM_RANGE(0xF000,0xF3FF) AM_ROM AM_REGION("maincpu", 0xF000)
-	AM_RANGE(0xF400,0xF7FF) AM_ROM AM_REGION("maincpu", 0xF400) // Modem (MOD 3)
-	AM_RANGE(0xF800,0xFFFF) AM_ROM AM_REGION("maincpu", 0xF800) // Monitor (MON 1 + MON 2)
-ADDRESS_MAP_END
+	map(0xF000, 0xF3FF).rom().region("maincpu", 0xF000);
+	map(0xF400, 0xF7FF).rom().region("maincpu", 0xF400); // Modem (MOD 3)
+	map(0xF800, 0xFFFF).rom().region("maincpu", 0xF800); // Monitor (MON 1 + MON 2)
+}
 
-ADDRESS_MAP_START(goupil_g2_state::goupil_g2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0x3FFF) AM_RAM
-	AM_RANGE(0x4000,0x7FFF) AM_RAM
-	AM_RANGE(0x8000,0xE3FF) AM_RAM
+void goupil_g2_state::goupil_g2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3FFF).ram();
+	map(0x4000, 0x7FFF).ram();
+	map(0x8000, 0xE3FF).ram();
 
-	AM_RANGE(0xE400,0xE7FF) AM_RAM
+	map(0xE400, 0xE7FF).ram();
 
-	AM_RANGE(0xE800,0xE80F) AM_DEVREADWRITE("ef6850", acia6850_device, data_r, data_w)
-	AM_RANGE(0xE810,0xE81F) AM_DEVREADWRITE("m_via_video", via6522_device, read, write)
+	map(0xE800, 0xE80F).rw(m_acia, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));
+	map(0xE810, 0xE81F).rw(m_via_video, FUNC(via6522_device::read), FUNC(via6522_device::write));
 
-	AM_RANGE(0xE820,0xE820) AM_DEVREADWRITE("i8279_kb1", i8279_device, data_r, data_w )
-	AM_RANGE(0xE821,0xE821) AM_DEVREADWRITE("i8279_kb1", i8279_device, status_r, cmd_w )
+	map(0xE820, 0xE820).rw("i8279_kb1", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
+	map(0xE821, 0xE821).rw("i8279_kb1", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 
-	AM_RANGE(0xE830,0xE830) AM_DEVREADWRITE("i8279_kb2", i8279_device, data_r, data_w )
-	AM_RANGE(0xE831,0xE831) AM_DEVREADWRITE("i8279_kb2", i8279_device, status_r, cmd_w )
+	map(0xE830, 0xE830).rw("i8279_kb2", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
+	map(0xE831, 0xE831).rw("i8279_kb2", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 
-	AM_RANGE(0xE840,0xE84F) AM_DEVREADWRITE("m_via_keyb", via6522_device, read, write)
+	map(0xE840, 0xE84F).rw(m_via_keyb, FUNC(via6522_device::read), FUNC(via6522_device::write));
 
-	AM_RANGE(0xE860,0xE86F) AM_DEVREADWRITE("m_via_modem", via6522_device, read, write)
+	map(0xE860, 0xE86F).rw(m_via_modem, FUNC(via6522_device::read), FUNC(via6522_device::write));
 
-	AM_RANGE(0xE870,0xE870) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0xE871,0xE871) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	map(0xE870, 0xE870).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0xE871, 0xE871).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0xE8F0,0xE8FF) AM_DEVREADWRITE("fd1791", fd1791_device, read, write)
-	AM_RANGE(0xEC00,0xF3FF) AM_READWRITE(visu24x80_ram_r, visu24x80_ram_w)
-	AM_RANGE(0xF400,0xF7FF) AM_ROM AM_REGION("maincpu", 0xF400) // Monitor (MON 1)
-	AM_RANGE(0xF800,0xFFFF) AM_ROM AM_REGION("maincpu", 0xF800) // Monitor (MON 2)
-ADDRESS_MAP_END
+	map(0xE8F0, 0xE8FF).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
+	map(0xEC00, 0xF3FF).rw(this, FUNC(goupil_g2_state::visu24x80_ram_r), FUNC(goupil_g2_state::visu24x80_ram_w));
+	map(0xF400, 0xF7FF).rom().region("maincpu", 0xF400); // Monitor (MON 1)
+	map(0xF800, 0xFFFF).rom().region("maincpu", 0xF800); // Monitor (MON 2)
+}
 
 WRITE8_MEMBER( goupil_g1_state::scanlines_kbd1_w )
 {

@@ -200,11 +200,12 @@ private:
 	required_device<centronics_device> m_centronics;
 };
 
-ADDRESS_MAP_START(spc1000_state::spc1000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE(0x8000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
-ADDRESS_MAP_END
+void spc1000_state::spc1000_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).bankr("bank1").bankw("bank2");
+	map(0x8000, 0xffff).bankr("bank3").bankw("bank4");
+}
 
 WRITE8_MEMBER(spc1000_state::iplk_w)
 {
@@ -264,17 +265,18 @@ READ8_MEMBER( spc1000_state::keyboard_r )
 }
 
 
-ADDRESS_MAP_START(spc1000_state::spc1000_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(gmode_r, gmode_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(cass_w)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(keyboard_r)
-	AM_RANGE(0xa000, 0xa000) AM_READWRITE(iplk_r, iplk_w)
-	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("ext1", spc1000_exp_device, read, write)
-ADDRESS_MAP_END
+void spc1000_state::spc1000_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).ram().share("videoram");
+	map(0x2000, 0x3fff).rw(this, FUNC(spc1000_state::gmode_r), FUNC(spc1000_state::gmode_w));
+	map(0x4000, 0x4000).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0x4001, 0x4001).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x6000, 0x6000).w(this, FUNC(spc1000_state::cass_w));
+	map(0x8000, 0x9fff).r(this, FUNC(spc1000_state::keyboard_r));
+	map(0xa000, 0xa000).rw(this, FUNC(spc1000_state::iplk_r), FUNC(spc1000_state::iplk_w));
+	map(0xc000, 0xdfff).rw("ext1", FUNC(spc1000_exp_device::read), FUNC(spc1000_exp_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( spc1000 )

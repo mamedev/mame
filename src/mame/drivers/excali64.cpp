@@ -120,31 +120,33 @@ private:
 	required_device<floppy_connector> m_floppy1;
 };
 
-ADDRESS_MAP_START(excali64_state::mem_map)
-	AM_RANGE(0x0000, 0x1FFF) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
-	AM_RANGE(0x2000, 0x2FFF) AM_READ_BANK("bankr2") AM_WRITE_BANK("bankw2")
-	AM_RANGE(0x3000, 0x3FFF) AM_READ_BANK("bankr3") AM_WRITE_BANK("bankw3")
-	AM_RANGE(0x4000, 0xBFFF) AM_READ_BANK("bankr4") AM_WRITE_BANK("bankw4")
-	AM_RANGE(0xC000, 0xFFFF) AM_RAM AM_REGION("rambank", 0xC000)
-ADDRESS_MAP_END
+void excali64_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x1FFF).bankr("bankr1").bankw("bankw1");
+	map(0x2000, 0x2FFF).bankr("bankr2").bankw("bankw2");
+	map(0x3000, 0x3FFF).bankr("bankr3").bankw("bankw3");
+	map(0x4000, 0xBFFF).bankr("bankr4").bankw("bankw4");
+	map(0xC000, 0xFFFF).ram().region("rambank", 0xC000);
+}
 
-ADDRESS_MAP_START(excali64_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_READ(port00_r)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0e) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x31, 0x31) AM_MIRROR(0x0e) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x50, 0x5f) AM_READ(port50_r)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(port70_w)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("dma", z80dma_device, read, write)
-	AM_RANGE(0xe4, 0xe7) AM_WRITE(porte4_w)
-	AM_RANGE(0xe8, 0xeb) AM_READ(porte8_r)
-	AM_RANGE(0xec, 0xef) AM_WRITE(portec_w)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("fdc", wd2793_device, read, write)
-ADDRESS_MAP_END
+void excali64_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x0f).r(this, FUNC(excali64_state::port00_r));
+	map(0x10, 0x10).mirror(0x0e).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x11, 0x11).mirror(0x0e).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x23).mirror(0x0c).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x30, 0x30).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x31, 0x31).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x50, 0x5f).r(this, FUNC(excali64_state::port50_r));
+	map(0x60, 0x63).mirror(0x0c).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x70, 0x7f).w(this, FUNC(excali64_state::port70_w));
+	map(0xe0, 0xe3).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0xe4, 0xe7).w(this, FUNC(excali64_state::porte4_w));
+	map(0xe8, 0xeb).r(this, FUNC(excali64_state::porte8_r));
+	map(0xec, 0xef).w(this, FUNC(excali64_state::portec_w));
+	map(0xf0, 0xf3).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
+}
 
 
 static INPUT_PORTS_START( excali64 )

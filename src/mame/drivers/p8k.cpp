@@ -125,38 +125,40 @@ private:
 
 ****************************************************************************/
 
-ADDRESS_MAP_START(p8k_state::p8k_memmap)
-	AM_RANGE(0x0000, 0x0FFF) AM_RAMBANK("bank0")
-	AM_RANGE(0x1000, 0x1FFF) AM_RAMBANK("bank1")
-	AM_RANGE(0x2000, 0x2FFF) AM_RAMBANK("bank2")
-	AM_RANGE(0x3000, 0x3FFF) AM_RAMBANK("bank3")
-	AM_RANGE(0x4000, 0x4FFF) AM_RAMBANK("bank4")
-	AM_RANGE(0x5000, 0x5FFF) AM_RAMBANK("bank5")
-	AM_RANGE(0x6000, 0x6FFF) AM_RAMBANK("bank6")
-	AM_RANGE(0x7000, 0x7FFF) AM_RAMBANK("bank7")
-	AM_RANGE(0x8000, 0x8FFF) AM_RAMBANK("bank8")
-	AM_RANGE(0x9000, 0x9FFF) AM_RAMBANK("bank9")
-	AM_RANGE(0xA000, 0xAFFF) AM_RAMBANK("bank10")
-	AM_RANGE(0xB000, 0xBFFF) AM_RAMBANK("bank11")
-	AM_RANGE(0xC000, 0xCFFF) AM_RAMBANK("bank12")
-	AM_RANGE(0xD000, 0xDFFF) AM_RAMBANK("bank13")
-	AM_RANGE(0xE000, 0xEFFF) AM_RAMBANK("bank14")
-	AM_RANGE(0xF000, 0xFFFF) AM_RAMBANK("bank15")
-ADDRESS_MAP_END
+void p8k_state::p8k_memmap(address_map &map)
+{
+	map(0x0000, 0x0FFF).bankrw("bank0");
+	map(0x1000, 0x1FFF).bankrw("bank1");
+	map(0x2000, 0x2FFF).bankrw("bank2");
+	map(0x3000, 0x3FFF).bankrw("bank3");
+	map(0x4000, 0x4FFF).bankrw("bank4");
+	map(0x5000, 0x5FFF).bankrw("bank5");
+	map(0x6000, 0x6FFF).bankrw("bank6");
+	map(0x7000, 0x7FFF).bankrw("bank7");
+	map(0x8000, 0x8FFF).bankrw("bank8");
+	map(0x9000, 0x9FFF).bankrw("bank9");
+	map(0xA000, 0xAFFF).bankrw("bank10");
+	map(0xB000, 0xBFFF).bankrw("bank11");
+	map(0xC000, 0xCFFF).bankrw("bank12");
+	map(0xD000, 0xDFFF).bankrw("bank13");
+	map(0xE000, 0xEFFF).bankrw("bank14");
+	map(0xF000, 0xFFFF).bankrw("bank15");
+}
 
-ADDRESS_MAP_START(p8k_state::p8k_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_READWRITE(p8k_port0_r,p8k_port0_w) // MH7489
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc0", z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("pio0", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("pio1", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("pio2", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x20, 0x21) AM_DEVICE("i8272", i8272a_device, map)
-	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("sio1", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write)
-	AM_RANGE(0x3c, 0x3c) AM_DEVREADWRITE("dma", z80dma_device, read, write)
-ADDRESS_MAP_END
+void p8k_state::p8k_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x07).rw(this, FUNC(p8k_state::p8k_port0_r), FUNC(p8k_state::p8k_port0_w)); // MH7489
+	map(0x08, 0x0b).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x0c, 0x0f).rw("pio0", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x18, 0x1b).rw("pio1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x1c, 0x1f).rw(m_pio2, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x20, 0x21).m(m_i8272, FUNC(i8272a_device::map));
+	map(0x24, 0x27).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x28, 0x2b).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x2c, 0x2f).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x3c, 0x3c).rw("dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+}
 
 
 
@@ -319,36 +321,39 @@ DRIVER_INIT_MEMBER(p8k_state,p8k)
 
 ****************************************************************************/
 
-ADDRESS_MAP_START(p8k_state::p8k_16_memmap)
-	AM_RANGE(0x00000, 0x03fff) AM_ROM AM_SHARE("share0")
-	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x08000, 0xfffff) AM_RAM AM_SHARE("share2")
-ADDRESS_MAP_END
+void p8k_state::p8k_16_memmap(address_map &map)
+{
+	map(0x00000, 0x03fff).rom().share("share0");
+	map(0x04000, 0x07fff).ram().share("share1");
+	map(0x08000, 0xfffff).ram().share("share2");
+}
 
-ADDRESS_MAP_START(p8k_state::p8k_16_datamap)
-	AM_RANGE(0x00000, 0x03fff) AM_ROM AM_SHARE("share0")
-	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x08000, 0xfffff) AM_RAM AM_SHARE("share2")
-ADDRESS_MAP_END
+void p8k_state::p8k_16_datamap(address_map &map)
+{
+	map(0x00000, 0x03fff).rom().share("share0");
+	map(0x04000, 0x07fff).ram().share("share1");
+	map(0x08000, 0xfffff).ram().share("share2");
+}
 
 
-ADDRESS_MAP_START(p8k_state::p8k_16_iomap)
+void p8k_state::p8k_16_iomap(address_map &map)
+{
 //  AM_RANGE(0x0fef0, 0x0feff) // clock
-	AM_RANGE(0x0ff80, 0x0ff87) AM_DEVREADWRITE8("sio", z80sio_device, cd_ba_r, cd_ba_w, 0xff)
-	AM_RANGE(0x0ff88, 0x0ff8f) AM_DEVREADWRITE8("sio1", z80sio_device, cd_ba_r, cd_ba_w, 0xff)
-	AM_RANGE(0x0ff90, 0x0ff97) AM_DEVREADWRITE8("pio0", z80pio_device, read_alt, write_alt, 0xff)
-	AM_RANGE(0x0ff98, 0x0ff9f) AM_DEVREADWRITE8("pio1", z80pio_device, read_alt, write_alt, 0xff)
-	AM_RANGE(0x0ffa0, 0x0ffa7) AM_DEVREADWRITE8("pio2", z80pio_device, read_alt, write_alt, 0xff)
-	AM_RANGE(0x0ffa8, 0x0ffaf) AM_DEVREADWRITE8("ctc0", z80ctc_device, read, write, 0xff)
-	AM_RANGE(0x0ffb0, 0x0ffb7) AM_DEVREADWRITE8("ctc1", z80ctc_device, read, write, 0xff)
+	map(0x0ff80, 0x0ff87).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)).umask16(0x00ff);
+	map(0x0ff88, 0x0ff8f).rw("sio1", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)).umask16(0x00ff);
+	map(0x0ff90, 0x0ff97).rw("pio0", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)).umask16(0x00ff);
+	map(0x0ff98, 0x0ff9f).rw("pio1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)).umask16(0x00ff);
+	map(0x0ffa0, 0x0ffa7).rw(m_pio2, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)).umask16(0x00ff);
+	map(0x0ffa8, 0x0ffaf).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
+	map(0x0ffb0, 0x0ffb7).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x0ffc0, 0x0ffc1) // SCR
 //  AM_RANGE(0x0ffc8, 0x0ffc9) // SBR
 //  AM_RANGE(0x0ffd0, 0x0ffd1) // NBR
 //  AM_RANGE(0x0ffd8, 0x0ffd9) // SNVR
-	AM_RANGE(0x0ffe0, 0x0ffe1) AM_DEVWRITE8("p8k_16_daisy", p8k_16_daisy_device, reti_w, 0xff)
+	map(0x0ffe1, 0x0ffe1).w(m_daisy, FUNC(p8k_16_daisy_device::reti_w));
 //  AM_RANGE(0x0fff0, 0x0fff1) // TRPL
 //  AM_RANGE(0x0fff8, 0x0fff9) // IF1L
-ADDRESS_MAP_END
+}
 
 
 /***************************************************************************

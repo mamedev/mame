@@ -551,21 +551,22 @@ WRITE16_MEMBER(namcona1_state::mcu_mailbox_w_mcu)
 	COMBINE_DATA(&m_mcu_mailbox[offset%8]);
 }
 
-ADDRESS_MAP_START(namcona1_state::namcona1_main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_68k)
-	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maskrom", 0)  // data
-	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("maincpu", 0)  // code
-	AM_RANGE(0xe00000, 0xe00fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
-	AM_RANGE(0xefff00, 0xefffff) AM_RAM_WRITE(vreg_w) AM_SHARE("vreg")
-	AM_RANGE(0xf00000, 0xf01fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(gfxram_r, gfxram_w) AM_SHARE("cgram")
-	AM_RANGE(0xff0000, 0xffbfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM                         /* unknown */
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_SHARE("scroll")      /* scroll registers */
-	AM_RANGE(0xfff000, 0xffffff) AM_RAM AM_SHARE("spriteram")   /* spriteram */
-ADDRESS_MAP_END
+void namcona1_state::namcona1_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).ram().share("workram");
+	map(0x3f8000, 0x3fffff).rw(this, FUNC(namcona1_state::mcu_mailbox_r), FUNC(namcona1_state::mcu_mailbox_w_68k));
+	map(0x400000, 0xbfffff).rom().region("maskrom", 0);  // data
+	map(0xc00000, 0xdfffff).rom().region("maincpu", 0);  // code
+	map(0xe00000, 0xe00fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0xe40000, 0xe4000f).rw(this, FUNC(namcona1_state::custom_key_r), FUNC(namcona1_state::custom_key_w));
+	map(0xefff00, 0xefffff).ram().w(this, FUNC(namcona1_state::vreg_w)).share("vreg");
+	map(0xf00000, 0xf01fff).ram().w(this, FUNC(namcona1_state::paletteram_w)).share("paletteram");
+	map(0xf40000, 0xf7ffff).rw(this, FUNC(namcona1_state::gfxram_r), FUNC(namcona1_state::gfxram_w)).share("cgram");
+	map(0xff0000, 0xffbfff).ram().w(this, FUNC(namcona1_state::videoram_w)).share("videoram");
+	map(0xffd000, 0xffdfff).ram();                         /* unknown */
+	map(0xffe000, 0xffefff).ram().share("scroll");      /* scroll registers */
+	map(0xfff000, 0xffffff).ram().share("spriteram");   /* spriteram */
+}
 
 READ8_MEMBER(xday2_namcona2_state::printer_r)
 {
@@ -579,17 +580,18 @@ WRITE8_MEMBER(xday2_namcona2_state::printer_w)
 	// ...
 }
 
-ADDRESS_MAP_START(xday2_namcona2_state::xday2_main_map)
-	AM_IMPORT_FROM(namcona1_main_map)
+void xday2_namcona2_state::xday2_main_map(address_map &map)
+{
+	namcona1_main_map(map);
 	// these two seems lamps and flash related (mux too?)
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP
-	AM_RANGE(0xd40000, 0xd40001) AM_WRITENOP
-	AM_RANGE(0xd80000, 0xd80001) AM_READWRITE8(printer_r,printer_w,0x00ff) /* xday: serial out? */
-	AM_RANGE(0xdc0000, 0xdc001f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff) /* RTC device */
+	map(0xd00000, 0xd00001).nopw();
+	map(0xd40000, 0xd40001).nopw();
+	map(0xd80001, 0xd80001).rw(this, FUNC(xday2_namcona2_state::printer_r), FUNC(xday2_namcona2_state::printer_w)); /* xday: serial out? */
+	map(0xdc0000, 0xdc001f).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff); /* RTC device */
 
 	// seems bigger than standard na1 (otherwise you won't get proper ranking defaults)
-	AM_RANGE(0xe00000, 0xe03fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+	map(0xe00000, 0xe03fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+}
 
 
 /* ----- NA-1 MCU handling ----------------------------------- */
@@ -635,13 +637,14 @@ WRITE16_MEMBER(namcona1_state::snd_w)
 	}
 }
 
-ADDRESS_MAP_START(namcona1_state::namcona1_mcu_map)
-	AM_RANGE(0x000800, 0x000fff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_mcu) // "Mailslot" communications ports
-	AM_RANGE(0x001000, 0x001fff) AM_READWRITE(snd_r, snd_w) // C140-alike sound chip
-	AM_RANGE(0x002000, 0x002fff) AM_READWRITE(na1mcu_shared_r, na1mcu_shared_w) // mirror of first page of shared work RAM
-	AM_RANGE(0x003000, 0x00afff) AM_RAM                     // there is a 32k RAM chip according to CGFM
-	AM_RANGE(0x200000, 0x27ffff) AM_READWRITE(na1mcu_shared_r, na1mcu_shared_w) // shared work RAM
-ADDRESS_MAP_END
+void namcona1_state::namcona1_mcu_map(address_map &map)
+{
+	map(0x000800, 0x000fff).rw(this, FUNC(namcona1_state::mcu_mailbox_r), FUNC(namcona1_state::mcu_mailbox_w_mcu)); // "Mailslot" communications ports
+	map(0x001000, 0x001fff).rw(this, FUNC(namcona1_state::snd_r), FUNC(namcona1_state::snd_w)); // C140-alike sound chip
+	map(0x002000, 0x002fff).rw(this, FUNC(namcona1_state::na1mcu_shared_r), FUNC(namcona1_state::na1mcu_shared_w)); // mirror of first page of shared work RAM
+	map(0x003000, 0x00afff).ram();                     // there is a 32k RAM chip according to CGFM
+	map(0x200000, 0x27ffff).rw(this, FUNC(namcona1_state::na1mcu_shared_r), FUNC(namcona1_state::na1mcu_shared_w)); // shared work RAM
+}
 
 
 // port 4: bit 3 (0x08) enables the 68000 (see the 68k launch code at c604 in swcourt's BIOS)
@@ -752,14 +755,15 @@ READ8_MEMBER(namcona1_state::portana_r)
 	return (port & bitnum[offset>>1]) ? 0xff : 0x00;
 }
 
-ADDRESS_MAP_START(namcona1_state::namcona1_mcu_io_map)
-	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READWRITE(port4_r, port4_w )
-	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READWRITE(port5_r, port5_w )
-	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE(port6_r, port6_w )
-	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READWRITE(port7_r, port7_w )
-	AM_RANGE(M37710_PORT8, M37710_PORT8) AM_READWRITE(port8_r, port8_w )
-	AM_RANGE(0x10, 0x1f) AM_READ(portana_r )
-ADDRESS_MAP_END
+void namcona1_state::namcona1_mcu_io_map(address_map &map)
+{
+	map(M37710_PORT4, M37710_PORT4).rw(this, FUNC(namcona1_state::port4_r), FUNC(namcona1_state::port4_w));
+	map(M37710_PORT5, M37710_PORT5).rw(this, FUNC(namcona1_state::port5_r), FUNC(namcona1_state::port5_w));
+	map(M37710_PORT6, M37710_PORT6).rw(this, FUNC(namcona1_state::port6_r), FUNC(namcona1_state::port6_w));
+	map(M37710_PORT7, M37710_PORT7).rw(this, FUNC(namcona1_state::port7_r), FUNC(namcona1_state::port7_w));
+	map(M37710_PORT8, M37710_PORT8).rw(this, FUNC(namcona1_state::port8_r), FUNC(namcona1_state::port8_w));
+	map(0x10, 0x1f).r(this, FUNC(namcona1_state::portana_r));
+}
 
 
 /***************************************************************************/

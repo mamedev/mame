@@ -130,21 +130,23 @@ WRITE16_MEMBER(csplayh5_state::csplayh5_mux_w)
 	m_mux_data = (~data & 0x1f);
 }
 
-ADDRESS_MAP_START(csplayh5_state::csplayh5_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+void csplayh5_state::csplayh5_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("DSW") AM_DEVWRITE8("nichisnd", nichisnd_device,sound_host_command_w,0xff00)
-	AM_RANGE(0x200200, 0x200201) AM_READWRITE(csplayh5_mux_r,csplayh5_mux_w)
-	AM_RANGE(0x200400, 0x200401) AM_READ_PORT("SYSTEM")
+	map(0x200000, 0x200001).portr("DSW");
+	map(0x200000, 0x200000).w(m_nichisnd, FUNC(nichisnd_device::sound_host_command_w));
+	map(0x200200, 0x200201).rw(this, FUNC(csplayh5_state::csplayh5_mux_r), FUNC(csplayh5_state::csplayh5_mux_w));
+	map(0x200400, 0x200401).portr("SYSTEM");
 
-	AM_RANGE(0x200600, 0x200607) AM_DEVREADWRITE8("v9958", v9958_device, read, write, 0x00ff)
+	map(0x200600, 0x200607).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("blit_gfx",0) // GFX ROM routes here
+	map(0x800000, 0xbfffff).rom().region("blit_gfx", 0); // GFX ROM routes here
 
-	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x380000) // work RAM
+	map(0xc00000, 0xc7ffff).ram().share("nvram").mirror(0x380000); // work RAM
 
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
-ADDRESS_MAP_END
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
+}
 
 #if USE_H8
 READ16_MEMBER(csplayh5_state::test_r)

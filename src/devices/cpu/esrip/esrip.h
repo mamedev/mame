@@ -34,6 +34,8 @@
 #define MCFG_ESRIP_LBRM_PROM(_tag) \
 	downcast<esrip_device &>(*device).lbrm_prom(_tag);
 
+#define MCFG_ESRIP_SCREEN(screen_tag) \
+	downcast<esrip_device &>(*device).set_screen_tag(("^" screen_tag));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -54,6 +56,7 @@ public:
 	esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
+	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
 	template <class Object> devcb_base &set_fdt_r_callback(Object &&cb) { return m_fdt_r.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_fdt_w_callback(Object &&cb) { return m_fdt_w.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_status_in_callback(Object &&cb) { return m_status_in.set_callback(std::forward<Object>(cb)); }
@@ -201,6 +204,7 @@ protected:
 	devcb_write16 m_fdt_w;
 	devcb_read8 m_status_in;
 	draw_delegate m_draw;
+	required_device<screen_device> m_screen;
 	const char *m_lbrm_prom;
 
 	typedef void (esrip_device::*ophandler)(uint16_t inst);

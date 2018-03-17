@@ -107,9 +107,10 @@ private:
 	void prg_map(address_map &map);
 };
 
-ADDRESS_MAP_START(milton_state::prg_map)
-	AM_RANGE(0x800, 0xfff) AM_ROM AM_REGION("maincpu", 0) // Internal ROM
-ADDRESS_MAP_END
+void milton_state::prg_map(address_map &map)
+{
+	map(0x800, 0xfff).rom().region("maincpu", 0); // Internal ROM
+}
 
 static INPUT_PORTS_START( milton )
 INPUT_PORTS_END

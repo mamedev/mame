@@ -154,7 +154,7 @@ enum
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(H6280, h6280_device, "h6280", "HuC6280")
+DEFINE_DEVICE_TYPE(H6280, h6280_device, "h6280", "Hudson Soft HuC6280")
 
 //-------------------------------------------------
 //  h6280_device - constructor

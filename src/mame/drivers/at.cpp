@@ -192,47 +192,53 @@ public:
 };
 
 
-ADDRESS_MAP_START(at_state::at16_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void at_state::at16_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x09ffff).bankrw("bank10");
+	map(0x0e0000, 0x0fffff).rom().region("bios", 0);
+	map(0xfe0000, 0xffffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(at_state::at16l_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM AM_REGION("bios", 0x20000)
-	AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0x20000)
-ADDRESS_MAP_END
+void at_state::at16l_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x09ffff).bankrw("bank10");
+	map(0x0e0000, 0x0fffff).rom().region("bios", 0x20000);
+	map(0xfe0000, 0xffffff).rom().region("bios", 0x20000);
+}
 
-ADDRESS_MAP_START(at_state::at32_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0x00800000, 0x00800bff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void at_state::at32_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x0009ffff).bankrw("bank10");
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0);
+	map(0x00800000, 0x00800bff).ram().share("nvram");
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(at_state::at32l_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("bios", 0x20000)
-	AM_RANGE(0x00800000, 0x00800bff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0x20000)
-ADDRESS_MAP_END
+void at_state::at32l_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x0009ffff).bankrw("bank10");
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x20000);
+	map(0x00800000, 0x00800bff).ram().share("nvram");
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0x20000);
+}
 
-ADDRESS_MAP_START(at_state::ficpio_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0x00800000, 0x00800bff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("isa", 0x20000)
-ADDRESS_MAP_END
+void at_state::ficpio_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x0009ffff).bankrw("bank10");
+	map(0x00800000, 0x00800bff).ram().share("nvram");
+	map(0xfffe0000, 0xffffffff).rom().region("isa", 0x20000);
+}
 
-ADDRESS_MAP_START(at_state::at16_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
-ADDRESS_MAP_END
+void at_state::at16_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(at_mb_device::map));
+}
 
 READ16_MEMBER( at_state::ps1_unk_r )
 {
@@ -256,34 +262,38 @@ READ8_MEMBER( at_state::ps1_portb_r )
 	return data;
 }
 
-ADDRESS_MAP_START(at_state::ps1_16_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
-	AM_RANGE(0x0060, 0x0061) AM_READ8(ps1_portb_r, 0xff00)
-	AM_RANGE(0x0102, 0x0105) AM_READWRITE(ps1_unk_r, ps1_unk_w)
-ADDRESS_MAP_END
+void at_state::ps1_16_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(at_mb_device::map));
+	map(0x0061, 0x0061).r(this, FUNC(at_state::ps1_portb_r));
+	map(0x0102, 0x0105).rw(this, FUNC(at_state::ps1_unk_r), FUNC(at_state::ps1_unk_w));
+}
 
-ADDRESS_MAP_START(at_state::neat_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
-	AM_RANGE(0x0022, 0x0023) AM_DEVICE("cs8221", cs8221_device, map)
-ADDRESS_MAP_END
+void at_state::neat_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(at_mb_device::map));
+	map(0x0022, 0x0023).m("cs8221", FUNC(cs8221_device::map));
+}
 
-ADDRESS_MAP_START(at_state::at32_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xffffffff)
-ADDRESS_MAP_END
+void at_state::at32_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(at_mb_device::map));
+}
 
-ADDRESS_MAP_START(at_state::ficpio_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xffffffff)
-	AM_RANGE(0x00a8, 0x00af) AM_DEVREADWRITE8("chipset", vt82c496_device, read, write, 0xffffffff)
-	AM_RANGE(0x0170, 0x0177) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs0, write_cs0)
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
-	AM_RANGE(0x0370, 0x0377) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs1, write_cs1)
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs1, write_cs1)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
-ADDRESS_MAP_END
+void at_state::ficpio_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(at_mb_device::map));
+	map(0x00a8, 0x00af).rw("chipset", FUNC(vt82c496_device::read), FUNC(vt82c496_device::write));
+	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
+	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
+}
 
 DRIVER_INIT_MEMBER(megapc_state, megapc)
 {
@@ -337,19 +347,23 @@ WRITE_LINE_MEMBER( megapc_state::wd7600_hold )
 	m_wd7600->hlda_w(state);
 }
 
-ADDRESS_MAP_START(megapc_state::megapc_map)
-ADDRESS_MAP_END
+void megapc_state::megapc_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(megapc_state::megapcpl_map)
-ADDRESS_MAP_END
+void megapc_state::megapcpl_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(megapc_state::megapc_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void megapc_state::megapc_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
-ADDRESS_MAP_START(megapc_state::megapcpl_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void megapc_state::megapcpl_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 /**********************************************************
  *

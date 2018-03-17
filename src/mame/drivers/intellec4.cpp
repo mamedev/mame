@@ -726,37 +726,39 @@ void intellec4_state::driver_reset()
   System address spaces
 ----------------------------------*/
 
-ADDRESS_MAP_START(intellec4_state::intellec4_program_banks)
-	ADDRESS_MAP_UNMAP_LOW
+void intellec4_state::intellec4_program_banks(address_map &map)
+{
+	map.unmap_value_low();
 
 	// 0x0000...0x0fff MON
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION("monitor", 0x0000)
+	map(0x0000, 0x03ff).rom().region("monitor", 0x0000);
 
 	// 0x1000...0x1fff PROM
 
 	// 0x1000...0x1fff RAM
-	AM_RANGE(0x2000, 0x2fff) AM_READONLY AM_SHARE("ram")
+	map(0x2000, 0x2fff).readonly().share("ram");
 
 	// 0x3000...0x3fff unmapped in case someone presses two mode switches at once
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(intellec4_state::intellec4_rom_port_banks)
-	ADDRESS_MAP_UNMAP_HIGH
+void intellec4_state::intellec4_rom_port_banks(address_map &map)
+{
+	map.unmap_value_high();
 
 	// 0x0000...0x07ff MON
-	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x1f00) AM_READWRITE(rom0_in, rom0_out)
-	AM_RANGE(0x0010, 0x001f) AM_MIRROR(0x1f00) AM_WRITE(rom1_out)
-	AM_RANGE(0x0020, 0x002f) AM_MIRROR(0x1f00) AM_READWRITE(rom2_in, rom2_out)
-	AM_RANGE(0x0030, 0x003f) AM_MIRROR(0x1f00) AM_READWRITE(rom3_in, rom3_out)
-	AM_RANGE(0x00e0, 0x00ef) AM_MIRROR(0x1f00) AM_READWRITE(rome_in, rome_out)
-	AM_RANGE(0x00f0, 0x00ff) AM_MIRROR(0x1f00) AM_READWRITE(romf_in, romf_out)
+	map(0x0000, 0x000f).mirror(0x1f00).rw(this, FUNC(intellec4_state::rom0_in), FUNC(intellec4_state::rom0_out));
+	map(0x0010, 0x001f).mirror(0x1f00).w(this, FUNC(intellec4_state::rom1_out));
+	map(0x0020, 0x002f).mirror(0x1f00).rw(this, FUNC(intellec4_state::rom2_in), FUNC(intellec4_state::rom2_out));
+	map(0x0030, 0x003f).mirror(0x1f00).rw(this, FUNC(intellec4_state::rom3_in), FUNC(intellec4_state::rom3_out));
+	map(0x00e0, 0x00ef).mirror(0x1f00).rw(this, FUNC(intellec4_state::rome_in), FUNC(intellec4_state::rome_out));
+	map(0x00f0, 0x00ff).mirror(0x1f00).rw(this, FUNC(intellec4_state::romf_in), FUNC(intellec4_state::romf_out));
 
 	// 0x0800...0x0fff PROM
 
 	// 0x1000...0x17ff neither
 
 	// 0x1800...0x1fff unused
-ADDRESS_MAP_END
+}
 
 
 /*---------------------------------

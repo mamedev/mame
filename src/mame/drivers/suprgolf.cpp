@@ -338,24 +338,26 @@ READ8_MEMBER(suprgolf_state::p2_r)
 	return (ioport("P2")->read() & 0xf0) | ((ioport("P2_ANALOG")->read() & 0xf));
 }
 
-ADDRESS_MAP_START(suprgolf_state::suprgolf_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(rom2_bank_select_w )
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(bg_vram_r, bg_vram_w ) // banked background vram
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(videoram_r, videoram_w ) AM_SHARE("videoram") //foreground vram + paletteram
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(pen_w )
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void suprgolf_state::suprgolf_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x4000).w(this, FUNC(suprgolf_state::rom2_bank_select_w));
+	map(0x8000, 0xbfff).bankr("bank2");
+	map(0xc000, 0xdfff).rw(this, FUNC(suprgolf_state::bg_vram_r), FUNC(suprgolf_state::bg_vram_w)); // banked background vram
+	map(0xe000, 0xefff).rw(this, FUNC(suprgolf_state::videoram_r), FUNC(suprgolf_state::videoram_w)).share("videoram"); //foreground vram + paletteram
+	map(0xf000, 0xf000).w(this, FUNC(suprgolf_state::pen_w));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(suprgolf_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(adpcm_data_w)
-	ADDRESS_MAP_END
+void suprgolf_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x04, 0x07).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x09).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x0c, 0x0c).w(this, FUNC(suprgolf_state::adpcm_data_w));
+	}
 
 static INPUT_PORTS_START( suprgolf )
 	PORT_START("P1")

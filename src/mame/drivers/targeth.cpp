@@ -138,39 +138,42 @@ READ8_MEMBER(targeth_state::shareram_r)
 }
 
 
-ADDRESS_MAP_START(targeth_state::mcu_hostmem_map)
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(shareram_r, shareram_w) // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
-ADDRESS_MAP_END
+void targeth_state::mcu_hostmem_map(address_map &map)
+{
+	map(0x8000, 0xffff).rw(this, FUNC(targeth_state::shareram_r), FUNC(targeth_state::shareram_w)); // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
+}
 
-ADDRESS_MAP_START(targeth_state::main_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")  /* Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs") /* Video Registers */
-	AM_RANGE(0x108000, 0x108001) AM_READ_PORT("GUNX1")
-	AM_RANGE(0x108002, 0x108003) AM_READ_PORT("GUNY1")
-	AM_RANGE(0x108004, 0x108005) AM_READ_PORT("GUNX2")
-	AM_RANGE(0x108006, 0x108007) AM_READ_PORT("GUNY2")
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs") /* Video Registers */
-	AM_RANGE(0x10800c, 0x10800d) AM_WRITENOP                    /* CLR Video INT */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    /* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")   /* Sprite RAM */
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
-	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("SYSTEM")             /* Coins, Start & Fire buttons */
-	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SERVICE")            /* Service & Guns Reload? */
-	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_WRITE(output_latch_w)
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)    /* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  /* OKI6295 status register */
-	AM_RANGE(0x700010, 0x700011) AM_WRITENOP                        /* ??? Guns reload related? */
-	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                          /* Work RAM */
-	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                     /* Work RAM (shared with D5002FP) */
-ADDRESS_MAP_END
+void targeth_state::main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x103fff).ram().w(this, FUNC(targeth_state::vram_w)).share("videoram");  /* Video RAM */
+	map(0x108000, 0x108007).writeonly().share("vregs"); /* Video Registers */
+	map(0x108000, 0x108001).portr("GUNX1");
+	map(0x108002, 0x108003).portr("GUNY1");
+	map(0x108004, 0x108005).portr("GUNX2");
+	map(0x108006, 0x108007).portr("GUNY2");
+	map(0x108000, 0x108007).writeonly().share("vregs"); /* Video Registers */
+	map(0x10800c, 0x10800d).nopw();                    /* CLR Video INT */
+	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    /* Palette */
+	map(0x440000, 0x440fff).ram().share("spriteram");   /* Sprite RAM */
+	map(0x700000, 0x700001).portr("DSW2");
+	map(0x700002, 0x700003).portr("DSW1");
+	map(0x700006, 0x700007).portr("SYSTEM");             /* Coins, Start & Fire buttons */
+	map(0x700008, 0x700009).portr("SERVICE");            /* Service & Guns Reload? */
+	map(0x70000a, 0x70000b).select(0x000070).w(this, FUNC(targeth_state::output_latch_w));
+	map(0x70000c, 0x70000d).w(this, FUNC(targeth_state::OKIM6295_bankswitch_w));    /* OKI6295 bankswitch */
+	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  /* OKI6295 status register */
+	map(0x700010, 0x700011).nopw();                        /* ??? Guns reload related? */
+	map(0xfe0000, 0xfe7fff).ram();                                          /* Work RAM */
+	map(0xfe8000, 0xfeffff).ram().share("shareram");                     /* Work RAM (shared with D5002FP) */
+}
 
 
-ADDRESS_MAP_START(targeth_state::oki_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void targeth_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("okibank");
+}
 
 void targeth_state::machine_start()
 {

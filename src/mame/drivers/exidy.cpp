@@ -200,104 +200,112 @@ WRITE8_MEMBER(exidy_state::fax_bank_select_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(exidy_state::exidy_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x003f) AM_WRITEONLY AM_SHARE("sprite1_xpos")
-	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0x003f) AM_WRITEONLY AM_SHARE("sprite1_ypos")
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0x003f) AM_WRITEONLY AM_SHARE("sprite2_xpos")
-	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0x003f) AM_WRITEONLY AM_SHARE("sprite2_ypos")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_READ_PORT("DSW")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_WRITEONLY AM_SHARE("spriteno")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_READ_PORT("IN0")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_WRITEONLY AM_SHARE("sprite_enable")
-	AM_RANGE(0x5103, 0x5103) AM_MIRROR(0x00fc) AM_READ(exidy_interrupt_r)
-	AM_RANGE(0x5210, 0x5212) AM_WRITEONLY AM_SHARE("color_latch")
-	AM_RANGE(0x5213, 0x5213) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
+void exidy_state::exidy_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x4000, 0x43ff).mirror(0x0400).ram().share("videoram");
+	map(0x5000, 0x5000).mirror(0x003f).writeonly().share("sprite1_xpos");
+	map(0x5040, 0x5040).mirror(0x003f).writeonly().share("sprite1_ypos");
+	map(0x5080, 0x5080).mirror(0x003f).writeonly().share("sprite2_xpos");
+	map(0x50c0, 0x50c0).mirror(0x003f).writeonly().share("sprite2_ypos");
+	map(0x5100, 0x5100).mirror(0x00fc).portr("DSW");
+	map(0x5100, 0x5100).mirror(0x00fc).writeonly().share("spriteno");
+	map(0x5101, 0x5101).mirror(0x00fc).portr("IN0");
+	map(0x5101, 0x5101).mirror(0x00fc).writeonly().share("sprite_enable");
+	map(0x5103, 0x5103).mirror(0x00fc).r(this, FUNC(exidy_state::exidy_interrupt_r));
+	map(0x5210, 0x5212).writeonly().share("color_latch");
+	map(0x5213, 0x5213).portr("IN2");
+}
 
 
-ADDRESS_MAP_START(exidy_state::sidetrac_map)
-	AM_IMPORT_FROM(exidy_map)
-	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_SHARE("characterram")
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-ADDRESS_MAP_END
+void exidy_state::sidetrac_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x0800, 0x3fff).rom();
+	map(0x4800, 0x4fff).rom().share("characterram");
+	map(0x5200, 0x5200).w(this, FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(this, FUNC(exidy_state::spectar_audio_2_w));
+	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
+}
 
 
-ADDRESS_MAP_START(exidy_state::targ_map)
-	AM_IMPORT_FROM(exidy_map)
-	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(targ_audio_2_w)
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-ADDRESS_MAP_END
+void exidy_state::targ_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x0800, 0x3fff).rom();
+	map(0x4800, 0x4fff).ram().share("characterram");
+	map(0x5200, 0x5200).w(this, FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(this, FUNC(exidy_state::targ_audio_2_w));
+	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
+}
 
 
-ADDRESS_MAP_START(exidy_state::spectar_map)
-	AM_IMPORT_FROM(exidy_map)
-	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-ADDRESS_MAP_END
+void exidy_state::spectar_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x0800, 0x3fff).rom();
+	map(0x4800, 0x4fff).ram().share("characterram");
+	map(0x5200, 0x5200).w(this, FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(this, FUNC(exidy_state::spectar_audio_2_w));
+	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
+}
 
 
-ADDRESS_MAP_START(exidy_state::rallys_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x5000, 0x5000) AM_WRITEONLY AM_SHARE("sprite1_xpos")
-	AM_RANGE(0x5001, 0x5001) AM_WRITEONLY AM_SHARE("sprite1_ypos")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_READ_PORT("DSW")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_WRITEONLY AM_SHARE("spriteno")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_READ_PORT("IN0")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_WRITEONLY AM_SHARE("sprite_enable")
-	AM_RANGE(0x5103, 0x5103) AM_MIRROR(0x00fc) AM_READ(exidy_interrupt_r)
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
-	AM_RANGE(0x5210, 0x5212) AM_WRITEONLY AM_SHARE("color_latch")
-	AM_RANGE(0x5213, 0x5213) AM_READ_PORT("IN2")
-	AM_RANGE(0x5300, 0x5300) AM_WRITEONLY AM_SHARE("sprite2_xpos")
-	AM_RANGE(0x5301, 0x5301) AM_WRITEONLY AM_SHARE("sprite2_ypos")
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-ADDRESS_MAP_END
+void exidy_state::rallys_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0800, 0x3fff).rom();
+	map(0x4000, 0x43ff).mirror(0x0400).ram().share("videoram");
+	map(0x4800, 0x4fff).ram().share("characterram");
+	map(0x5000, 0x5000).writeonly().share("sprite1_xpos");
+	map(0x5001, 0x5001).writeonly().share("sprite1_ypos");
+	map(0x5100, 0x5100).mirror(0x00fc).portr("DSW");
+	map(0x5100, 0x5100).mirror(0x00fc).writeonly().share("spriteno");
+	map(0x5101, 0x5101).mirror(0x00fc).portr("IN0");
+	map(0x5101, 0x5101).mirror(0x00fc).writeonly().share("sprite_enable");
+	map(0x5103, 0x5103).mirror(0x00fc).r(this, FUNC(exidy_state::exidy_interrupt_r));
+	map(0x5200, 0x5200).w(this, FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(this, FUNC(exidy_state::spectar_audio_2_w));
+	map(0x5210, 0x5212).writeonly().share("color_latch");
+	map(0x5213, 0x5213).portr("IN2");
+	map(0x5300, 0x5300).writeonly().share("sprite2_xpos");
+	map(0x5301, 0x5301).writeonly().share("sprite2_ypos");
+	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
+}
 
 
-ADDRESS_MAP_START(exidy_state::venture_map)
-	AM_IMPORT_FROM(exidy_map)
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void exidy_state::venture_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x4800, 0x4fff).ram().share("characterram");
+	map(0x5200, 0x520f).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(exidy_state::pepper2_map)
-	AM_IMPORT_FROM(exidy_map)
-	AM_RANGE(0x4800, 0x4fff) AM_NOP
-	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void exidy_state::pepper2_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x4800, 0x4fff).noprw();
+	map(0x5200, 0x520f).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x6000, 0x6fff).ram().share("characterram");
+	map(0x8000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(exidy_state::fax_map)
-	AM_IMPORT_FROM(exidy_map)
-	AM_RANGE(0x0400, 0x07ff) AM_RAM
-	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("IN4")
-	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("IN3")
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(fax_bank_select_w)
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x5213, 0x5217) AM_WRITENOP        /* empty control lines on color/sound board */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void exidy_state::fax_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x0400, 0x07ff).ram();
+	map(0x1a00, 0x1a00).portr("IN4");
+	map(0x1c00, 0x1c00).portr("IN3");
+	map(0x2000, 0x2000).w(this, FUNC(exidy_state::fax_bank_select_w));
+	map(0x2000, 0x3fff).bankr("bank1");
+	map(0x5200, 0x520f).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x5213, 0x5217).nopw();        /* empty control lines on color/sound board */
+	map(0x6000, 0x6fff).ram().share("characterram");
+	map(0x8000, 0xffff).rom();
+}
 
 
 

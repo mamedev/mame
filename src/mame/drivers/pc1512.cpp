@@ -607,68 +607,72 @@ READ8_MEMBER( pc1640_state::io_r )
 //  ADDRESS_MAP( pc1512_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(pc1512_state::pc1512_mem)
-	AM_RANGE(0x00000, 0x9ffff) AM_RAM
-	AM_RANGE(0xb8000, 0xbbfff) AM_READWRITE8(video_ram_r, video_ram_w, 0xffff)
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
-ADDRESS_MAP_END
+void pc1512_state::pc1512_mem(address_map &map)
+{
+	map(0x00000, 0x9ffff).ram();
+	map(0xb8000, 0xbbfff).rw(this, FUNC(pc1512_state::video_ram_r), FUNC(pc1512_state::video_ram_w));
+	map(0xfc000, 0xfffff).rom().region(I8086_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( pc1512_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(pc1512_state::pc1512_io)
+void pc1512_state::pc1512_io(address_map &map)
+{
 	// [RH] 29 Aug 2016: I can find no evidence to indicate that Amstrad had only 10 I/O lines, as the
 	// schematic calls for a stock 8086 and the I/O and data lines are multiplexed onto the same bus,
 	// plus address lines 20-10 are towards the middle of a standard ISA slot. If it turns out that this
 	// is not in fact accurate to hardware, please add this back in.
 	// ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x000, 0x00f) AM_DEVREADWRITE8(I8237A5_TAG, am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x020, 0x021) AM_DEVREADWRITE8(I8259A2_TAG, pic8259_device, read, write, 0xffff)
-	AM_RANGE(0x040, 0x043) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0xffff)
-	AM_RANGE(0x060, 0x06f) AM_READWRITE8(system_r, system_w, 0xffff)
-	AM_RANGE(0x070, 0x071) AM_MIRROR(0x02) AM_DEVREADWRITE8(MC146818_TAG, mc146818_device, read, write, 0xffff)
-	AM_RANGE(0x078, 0x07f) AM_READWRITE8(mouse_r, mouse_w, 0xffff)
-	AM_RANGE(0x080, 0x083) AM_WRITE8(dma_page_w, 0xffff)
-	AM_RANGE(0x0a0, 0x0a1) AM_WRITE8(nmi_mask_w, 0xff00)
-	AM_RANGE(0x378, 0x37b) AM_READWRITE8(printer_r, printer_w, 0xffff)
-	AM_RANGE(0x3d0, 0x3df) AM_READWRITE8(vdu_r, vdu_w, 0xffff)
-	AM_RANGE(0x3f0, 0x3f7) AM_DEVICE8(PC_FDC_XT_TAG, pc_fdc_xt_device, map, 0xffff)
-	AM_RANGE(0x3f8, 0x3ff) AM_DEVREADWRITE8(INS8250_TAG, ins8250_device, ins8250_r, ins8250_w, 0xffff)
-ADDRESS_MAP_END
+	map(0x000, 0x00f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x020, 0x021).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x040, 0x043).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x060, 0x06f).rw(this, FUNC(pc1512_state::system_r), FUNC(pc1512_state::system_w));
+	map(0x070, 0x071).mirror(0x02).rw(m_rtc, FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x078, 0x07f).rw(this, FUNC(pc1512_state::mouse_r), FUNC(pc1512_state::mouse_w));
+	map(0x080, 0x083).w(this, FUNC(pc1512_state::dma_page_w));
+	map(0x0a1, 0x0a1).w(this, FUNC(pc1512_state::nmi_mask_w));
+	map(0x378, 0x37b).rw(this, FUNC(pc1512_state::printer_r), FUNC(pc1512_state::printer_w));
+	map(0x3d0, 0x3df).rw(this, FUNC(pc1512_state::vdu_r), FUNC(pc1512_state::vdu_w));
+	map(0x3f0, 0x3f7).m(m_fdc, FUNC(pc_fdc_xt_device::map));
+	map(0x3f8, 0x3ff).rw(m_uart, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( pc1640_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(pc1640_state::pc1640_mem)
-	AM_RANGE(0x00000, 0x9ffff) AM_RAM
-	AM_RANGE(0xf0000, 0xf3fff) AM_MIRROR(0xc000) AM_ROM AM_REGION(I8086_TAG, 0)
-ADDRESS_MAP_END
+void pc1640_state::pc1640_mem(address_map &map)
+{
+	map(0x00000, 0x9ffff).ram();
+	map(0xf0000, 0xf3fff).mirror(0xc000).rom().region(I8086_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( pc1640_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(pc1640_state::pc1640_io)
-	AM_RANGE(0x0000, 0xffff) AM_READ8(io_r, 0xffff)
+void pc1640_state::pc1640_io(address_map &map)
+{
+	map(0x0000, 0xffff).r(this, FUNC(pc1640_state::io_r));
 
-	AM_RANGE(0x000, 0x00f) AM_DEVWRITE8(I8237A5_TAG, am9517a_device, write, 0xffff)
-	AM_RANGE(0x020, 0x021) AM_DEVWRITE8(I8259A2_TAG, pic8259_device, write, 0xffff)
-	AM_RANGE(0x040, 0x043) AM_DEVWRITE8(I8253_TAG, pit8253_device, write, 0xffff)
-	AM_RANGE(0x060, 0x06f) AM_WRITE8(system_w, 0xffff)
-	AM_RANGE(0x070, 0x071) AM_MIRROR(0x02) AM_DEVWRITE8(MC146818_TAG, mc146818_device, write, 0xffff)
-	AM_RANGE(0x078, 0x07f) AM_WRITE8(mouse_w, 0xffff)
-	AM_RANGE(0x080, 0x083) AM_WRITE8(dma_page_w, 0xffff)
-	AM_RANGE(0x0a0, 0x0a1) AM_WRITE8(nmi_mask_w, 0xff00)
-	AM_RANGE(0x378, 0x37b) AM_WRITE8(printer_w, 0xffff)
-	AM_RANGE(0x3f2, 0x3f3) AM_DEVWRITE8(PC_FDC_XT_TAG, pc_fdc_xt_device, dor_w, 0x00ff)
-	AM_RANGE(0x3f4, 0x3f5) AM_DEVWRITE8(PC_FDC_XT_TAG ":upd765", upd765_family_device, fifo_w, 0xff00)
-	AM_RANGE(0x3f8, 0x3ff) AM_DEVWRITE8(INS8250_TAG, ins8250_device, ins8250_w, 0xffff)
-ADDRESS_MAP_END
+	map(0x000, 0x00f).w(m_dmac, FUNC(am9517a_device::write));
+	map(0x020, 0x021).w(m_pic, FUNC(pic8259_device::write));
+	map(0x040, 0x043).w(m_pit, FUNC(pit8253_device::write));
+	map(0x060, 0x06f).w(this, FUNC(pc1640_state::system_w));
+	map(0x070, 0x071).mirror(0x02).w(m_rtc, FUNC(mc146818_device::write));
+	map(0x078, 0x07f).w(this, FUNC(pc1640_state::mouse_w));
+	map(0x080, 0x083).w(this, FUNC(pc1640_state::dma_page_w));
+	map(0x0a1, 0x0a1).w(this, FUNC(pc1640_state::nmi_mask_w));
+	map(0x378, 0x37b).w(this, FUNC(pc1640_state::printer_w));
+	map(0x3f2, 0x3f2).w(m_fdc, FUNC(pc_fdc_xt_device::dor_w));
+	map(0x3f5, 0x3f5).w(PC_FDC_XT_TAG ":upd765", FUNC(upd765_family_device::fifo_w));
+	map(0x3f8, 0x3ff).w(m_uart, FUNC(ins8250_device::ins8250_w));
+}
 
 
 

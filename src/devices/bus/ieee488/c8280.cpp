@@ -73,34 +73,36 @@ const tiny_rom_entry *c8280_device::device_rom_region() const
 //  ADDRESS_MAP( c8280_main_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c8280_device::c8280_main_mem)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x100) AM_DEVICE(M6532_0_TAG, mos6532_new_device, ram_map)
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x100) AM_DEVICE(M6532_1_TAG, mos6532_new_device, ram_map)
-	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0xd60) AM_DEVICE(M6532_0_TAG, mos6532_new_device, io_map)
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0xd60) AM_DEVICE(M6532_1_TAG, mos6532_new_device, io_map)
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0xc00) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0xc00) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0xc00) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xc00) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6502_DOS_TAG, 0)
-ADDRESS_MAP_END
+void c8280_device::c8280_main_mem(address_map &map)
+{
+	map(0x0000, 0x007f).mirror(0x100).m(M6532_0_TAG, FUNC(mos6532_new_device::ram_map));
+	map(0x0080, 0x00ff).mirror(0x100).m(M6532_1_TAG, FUNC(mos6532_new_device::ram_map));
+	map(0x0200, 0x021f).mirror(0xd60).m(M6532_0_TAG, FUNC(mos6532_new_device::io_map));
+	map(0x0280, 0x029f).mirror(0xd60).m(M6532_1_TAG, FUNC(mos6532_new_device::io_map));
+	map(0x1000, 0x13ff).mirror(0xc00).ram().share("share1");
+	map(0x2000, 0x23ff).mirror(0xc00).ram().share("share2");
+	map(0x3000, 0x33ff).mirror(0xc00).ram().share("share3");
+	map(0x4000, 0x43ff).mirror(0xc00).ram().share("share4");
+	map(0xc000, 0xffff).rom().region(M6502_DOS_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( c8280_fdc_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c8280_device::c8280_fdc_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x300) AM_RAM
-	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x37c) AM_DEVREADWRITE(WD1797_TAG, fd1797_device, read, write)
-	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x3ff) AM_READWRITE(fk5_r, fk5_w)
-	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION(M6502_FDC_TAG, 0)
-ADDRESS_MAP_END
+void c8280_device::c8280_fdc_mem(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x007f).mirror(0x300).ram();
+	map(0x0080, 0x0083).mirror(0x37c).rw(WD1797_TAG, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
+	map(0x0400, 0x07ff).ram().share("share1");
+	map(0x0800, 0x0bff).ram().share("share2");
+	map(0x0c00, 0x0fff).ram().share("share3");
+	map(0x1000, 0x13ff).ram().share("share4");
+	map(0x1400, 0x1400).mirror(0x3ff).rw(this, FUNC(c8280_device::fk5_r), FUNC(c8280_device::fk5_w));
+	map(0x1800, 0x1fff).rom().region(M6502_FDC_TAG, 0);
+}
 
 
 //-------------------------------------------------

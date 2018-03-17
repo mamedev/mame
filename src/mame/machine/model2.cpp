@@ -202,7 +202,7 @@ void model2_state::debug_geo_dasm_command(int ref, const std::vector<std::string
 				case 0x0B: 
 					util::stream_format(f, "matrix ");
 					for(attr=0;attr<12;attr+=3)
-						util::stream_format(f,"[%f,%f,%f] ",u2f(m_bufferram[ptr]),u2f(m_bufferram[ptr+1]),u2f(m_bufferram[ptr+2]));
+						util::stream_format(f,"[%f,%f,%f] ",u2f(m_bufferram[ptr+attr]),u2f(m_bufferram[ptr+1+attr]),u2f(m_bufferram[ptr+2+attr]));
 					
 					ptr+=12;
 					break;

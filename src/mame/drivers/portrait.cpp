@@ -122,28 +122,30 @@ WRITE8_MEMBER(portrait_state::negative_scroll_w)
 	m_scroll = - (data ^ 0xff);
 }
 
-ADDRESS_MAP_START(portrait_state::portrait_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(bgvideo_write) AM_SHARE("bgvideoram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(fgvideo_write) AM_SHARE("fgvideoram")
-	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9200, 0x97ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa010, 0xa010) AM_WRITENOP // ?
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa004, 0xa004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa008, 0xa008) AM_READ_PORT("SYSTEM") AM_WRITE(ctrl_w)
-	AM_RANGE(0xa010, 0xa010) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa018, 0xa018) AM_READNOP AM_WRITE(positive_scroll_w)
-	AM_RANGE(0xa019, 0xa019) AM_WRITE(negative_scroll_w)
-	AM_RANGE(0xa800, 0xa83f) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xffff, 0xffff) AM_READNOP
-ADDRESS_MAP_END
+void portrait_state::portrait_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().w(this, FUNC(portrait_state::bgvideo_write)).share("bgvideoram");
+	map(0x8800, 0x8fff).ram().w(this, FUNC(portrait_state::fgvideo_write)).share("fgvideoram");
+	map(0x9000, 0x91ff).ram().share("spriteram");
+	map(0x9200, 0x97ff).ram();
+	map(0xa000, 0xa000).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xa010, 0xa010).nopw(); // ?
+	map(0xa000, 0xa000).portr("DSW1");
+	map(0xa004, 0xa004).portr("DSW2");
+	map(0xa008, 0xa008).portr("SYSTEM").w(this, FUNC(portrait_state::ctrl_w));
+	map(0xa010, 0xa010).portr("INPUTS");
+	map(0xa018, 0xa018).nopr().w(this, FUNC(portrait_state::positive_scroll_w));
+	map(0xa019, 0xa019).w(this, FUNC(portrait_state::negative_scroll_w));
+	map(0xa800, 0xa83f).ram().share("nvram");
+	map(0xffff, 0xffff).nopr();
+}
 
 
-ADDRESS_MAP_START(portrait_state::portrait_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void portrait_state::portrait_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
 
 static INPUT_PORTS_START( portrait )

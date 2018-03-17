@@ -409,35 +409,37 @@ READ8_MEMBER(exelv_state::rom_r)
     @>f800-@>ffff: tms7020/tms7040 internal ROM
 */
 
-ADDRESS_MAP_START(exelv_state::tms7020_mem)
-	AM_RANGE(0x0080, 0x00ff) AM_NOP
-	AM_RANGE(0x0124, 0x0124) AM_DEVREAD("tms3556", tms3556_device, vram_r)
-	AM_RANGE(0x0125, 0x0125) AM_DEVREAD("tms3556", tms3556_device, reg_r)
-	AM_RANGE(0x0128, 0x0128) AM_DEVREAD("tms3556", tms3556_device, initptr_r)
-	AM_RANGE(0x012d, 0x012d) AM_DEVWRITE("tms3556", tms3556_device, reg_w)
-	AM_RANGE(0x012e, 0x012e) AM_DEVWRITE("tms3556", tms3556_device, vram_w)
+void exelv_state::tms7020_mem(address_map &map)
+{
+	map(0x0080, 0x00ff).noprw();
+	map(0x0124, 0x0124).r(m_tms3556, FUNC(tms3556_device::vram_r));
+	map(0x0125, 0x0125).r(m_tms3556, FUNC(tms3556_device::reg_r));
+	map(0x0128, 0x0128).r(m_tms3556, FUNC(tms3556_device::initptr_r));
+	map(0x012d, 0x012d).w(m_tms3556, FUNC(tms3556_device::reg_w));
+	map(0x012e, 0x012e).w(m_tms3556, FUNC(tms3556_device::vram_w));
 
-	AM_RANGE(0x0130, 0x0130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
-	AM_RANGE(0x0200, 0x7fff) AM_READ(rom_r)
-	AM_RANGE(0x8000, 0xbfff) AM_NOP
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM                                     /* CPU RAM */
-	AM_RANGE(0xc800, 0xf7ff) AM_NOP
-ADDRESS_MAP_END
+	map(0x0130, 0x0130).rw(this, FUNC(exelv_state::mailbox_wx319_r), FUNC(exelv_state::mailbox_wx318_w));
+	map(0x0200, 0x7fff).r(this, FUNC(exelv_state::rom_r));
+	map(0x8000, 0xbfff).noprw();
+	map(0xc000, 0xc7ff).ram();                                     /* CPU RAM */
+	map(0xc800, 0xf7ff).noprw();
+}
 
 
-ADDRESS_MAP_START(exelv_state::tms7040_mem)
-	AM_RANGE(0x0080, 0x00ff) AM_NOP
-	AM_RANGE(0x0124, 0x0124) AM_DEVREAD("tms3556", tms3556_device, vram_r)
-	AM_RANGE(0x0125, 0x0125) AM_DEVREAD("tms3556", tms3556_device, reg_r)
-	AM_RANGE(0x0128, 0x0128) AM_DEVREAD("tms3556", tms3556_device, initptr_r)
-	AM_RANGE(0x012d, 0x012d) AM_DEVWRITE("tms3556", tms3556_device, reg_w)
-	AM_RANGE(0x012e, 0x012e) AM_DEVWRITE("tms3556", tms3556_device, vram_w)
-	AM_RANGE(0x0130, 0x0130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
-	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK("bank1")                                /* system ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_NOP
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM                                     /* CPU RAM */
-	AM_RANGE(0xc800, 0xefff) AM_NOP
-ADDRESS_MAP_END
+void exelv_state::tms7040_mem(address_map &map)
+{
+	map(0x0080, 0x00ff).noprw();
+	map(0x0124, 0x0124).r(m_tms3556, FUNC(tms3556_device::vram_r));
+	map(0x0125, 0x0125).r(m_tms3556, FUNC(tms3556_device::reg_r));
+	map(0x0128, 0x0128).r(m_tms3556, FUNC(tms3556_device::initptr_r));
+	map(0x012d, 0x012d).w(m_tms3556, FUNC(tms3556_device::reg_w));
+	map(0x012e, 0x012e).w(m_tms3556, FUNC(tms3556_device::vram_w));
+	map(0x0130, 0x0130).rw(this, FUNC(exelv_state::mailbox_wx319_r), FUNC(exelv_state::mailbox_wx318_w));
+	map(0x0200, 0x7fff).bankr("bank1");                                /* system ROM */
+	map(0x8000, 0xbfff).noprw();
+	map(0xc000, 0xc7ff).ram();                                     /* CPU RAM */
+	map(0xc800, 0xefff).noprw();
+}
 
 
 /* keyboard: ??? */

@@ -78,13 +78,15 @@ uint32_t ichibanjyan_state::screen_update( screen_device &screen, bitmap_ind16 &
 }
 
 
-ADDRESS_MAP_START(ichibanjyan_state::ichibanjyan_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void ichibanjyan_state::ichibanjyan_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(ichibanjyan_state::ichibanjyan_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void ichibanjyan_state::ichibanjyan_io(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 static INPUT_PORTS_START( ichibanjyan )
 INPUT_PORTS_END

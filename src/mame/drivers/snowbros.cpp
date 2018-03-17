@@ -191,34 +191,37 @@ READ16_MEMBER(snowbros_state::toto_read)
 
 /* Snow Bros Memory Map */
 
-ADDRESS_MAP_START(snowbros_state::snowbros_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x300000, 0x300001) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff)
-	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE8(snowbros_flipscreen_w, 0xff00)
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
-ADDRESS_MAP_END
+void snowbros_state::snowbros_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x103fff).ram();
+	map(0x200000, 0x200001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x300001, 0x300001).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0x300001, 0x300001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x400000, 0x400000).w(this, FUNC(snowbros_state::snowbros_flipscreen_w));
+	map(0x500000, 0x500001).portr("DSW1");
+	map(0x500002, 0x500003).portr("DSW2");
+	map(0x500004, 0x500005).portr("SYSTEM");
+	map(0x600000, 0x6001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x700000, 0x701fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w));
+	map(0x800000, 0x800001).w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+}
 
-ADDRESS_MAP_START(snowbros_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-ADDRESS_MAP_END
+void snowbros_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+}
 
-ADDRESS_MAP_START(snowbros_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write) // goes back to the main CPU, checked during boot
-ADDRESS_MAP_END
+void snowbros_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x03).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x04, 0x04).w("soundlatch2", FUNC(generic_latch_8_device::write)); // goes back to the main CPU, checked during boot
+}
 
 
 /* Semicom AT89C52 MCU */
@@ -247,73 +250,78 @@ WRITE8_MEMBER(snowbros_state::prot_p2_w)
 
 /* Winter Bobble - bootleg GFX chip */
 
-ADDRESS_MAP_START(snowbros_state::wintbob_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x300000, 0x300001) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff)
-	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE8(bootleg_flipscreen_w, 0xff00)
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteram16b")
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
-ADDRESS_MAP_END
+void snowbros_state::wintbob_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x103fff).ram();
+	map(0x200000, 0x200001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x300001, 0x300001).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0x300001, 0x300001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x400000, 0x400000).w(this, FUNC(snowbros_state::bootleg_flipscreen_w));
+	map(0x500000, 0x500001).portr("DSW1");
+	map(0x500002, 0x500003).portr("DSW2");
+	map(0x500004, 0x500005).portr("SYSTEM");
+	map(0x600000, 0x6001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x700000, 0x701fff).ram().share("spriteram16b");
+	map(0x800000, 0x800001).w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+}
 
 /* Honey Dolls */
 
-ADDRESS_MAP_START(snowbros_state::honeydol_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("hyperpac_ram")
-	AM_RANGE(0x200000, 0x200001) AM_WRITENOP    /* ? */
-	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
-	AM_RANGE(0x800000, 0x800001) AM_WRITENOP    /* ? */
-	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x900002, 0x900003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x900004, 0x900005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa00000, 0xa007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xb00000, 0xb01fff) AM_RAM AM_SHARE("spriteram16b")
-ADDRESS_MAP_END
+void snowbros_state::honeydol_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x10ffff).ram().share("hyperpac_ram");
+	map(0x200000, 0x200001).nopw();    /* ? */
+	map(0x300001, 0x300001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x400000, 0x400001).w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x500000, 0x500001).w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0x600000, 0x600001).w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+	map(0x800000, 0x800001).nopw();    /* ? */
+	map(0x900000, 0x900001).portr("DSW1");
+	map(0x900002, 0x900003).portr("DSW2");
+	map(0x900004, 0x900005).portr("SYSTEM");
+	map(0xa00000, 0xa007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xb00000, 0xb01fff).ram().share("spriteram16b");
+}
 
-ADDRESS_MAP_START(snowbros_state::honeydol_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-ADDRESS_MAP_END
+void snowbros_state::honeydol_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xe010, 0xe010).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
-ADDRESS_MAP_START(snowbros_state::honeydol_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)                                // not connected?
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x04, 0x04) AM_WRITENOP // still written but never actually read by the main CPU
-ADDRESS_MAP_END
+void snowbros_state::honeydol_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x03).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));                                // not connected?
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x04, 0x04).nopw(); // still written but never actually read by the main CPU
+}
 
 /* Twin Adventure */
 
-ADDRESS_MAP_START(snowbros_state::twinadv_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x300000, 0x300001) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff)
-	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE8(bootleg_flipscreen_w, 0xff00)
+void snowbros_state::twinadv_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x200000, 0x200001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x300001, 0x300001).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0x300001, 0x300001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x400000, 0x400000).w(this, FUNC(snowbros_state::bootleg_flipscreen_w));
 
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteram16b")
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
-ADDRESS_MAP_END
+	map(0x500000, 0x500001).portr("DSW1");
+	map(0x500002, 0x500003).portr("DSW2");
+	map(0x500004, 0x500005).portr("SYSTEM");
+	map(0x600000, 0x6001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x700000, 0x701fff).ram().share("spriteram16b");
+	map(0x800000, 0x800001).w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+}
 
 WRITE8_MEMBER(snowbros_state::twinadv_oki_bank_w)
 {
@@ -324,13 +332,14 @@ WRITE8_MEMBER(snowbros_state::twinadv_oki_bank_w)
 	m_oki->set_rom_bank(bank);
 }
 
-ADDRESS_MAP_START(snowbros_state::twinadv_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write) // back to 68k?
-	AM_RANGE(0x04, 0x04) AM_WRITE(twinadv_oki_bank_w) // oki bank?
-	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-ADDRESS_MAP_END
+void snowbros_state::twinadv_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x02).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x02, 0x02).w("soundlatch2", FUNC(generic_latch_8_device::write)); // back to 68k?
+	map(0x04, 0x04).w(this, FUNC(snowbros_state::twinadv_oki_bank_w)); // oki bank?
+	map(0x06, 0x06).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 /* SemiCom Memory Map
@@ -340,29 +349,31 @@ sound hardware is also different
 
 */
 
-ADDRESS_MAP_START(snowbros_state::hyperpac_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("hyperpac_ram")
-	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+void snowbros_state::hyperpac_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x10ffff).ram().share("hyperpac_ram");
+	map(0x300001, 0x300001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 //  AM_RANGE(0x400000, 0x400001) ???
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
+	map(0x500000, 0x500001).portr("DSW1");
+	map(0x500002, 0x500003).portr("DSW2");
+	map(0x500004, 0x500005).portr("SYSTEM");
 
-	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
-ADDRESS_MAP_END
+	map(0x600000, 0x6001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x700000, 0x701fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w));
+	map(0x800000, 0x800001).w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+}
 
-ADDRESS_MAP_START(snowbros_state::hyperpac_sound_map)
-	AM_RANGE(0x0000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
-	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xf008, 0xf008) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void snowbros_state::hyperpac_sound_map(address_map &map)
+{
+	map(0x0000, 0xcfff).rom();
+	map(0xd000, 0xd7ff).ram();
+	map(0xf000, 0xf001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xf002, 0xf002).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xf008, 0xf008).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 /* Same volume used for all samples at the Moment, could be right, we have no
    way of knowing .. */
@@ -471,71 +482,74 @@ WRITE16_MEMBER(snowbros_state::sb3_sound_w)
 
 
 
-ADDRESS_MAP_START(snowbros_state::snowbros3_map)
-	AM_RANGE( 0x000000, 0x03ffff) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff) AM_RAM
-	AM_RANGE( 0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE( 0x300000, 0x300001) AM_READ(sb3_sound_r) // ?
-	AM_RANGE( 0x300000, 0x300001) AM_WRITE(sb3_sound_w)  // ?
-	AM_RANGE( 0x400000, 0x400001) AM_WRITE8(bootleg_flipscreen_w, 0xff00)
-	AM_RANGE( 0x500000, 0x500001) AM_READ_PORT("DSW1")
-	AM_RANGE( 0x500002, 0x500003) AM_READ_PORT("DSW2")
-	AM_RANGE( 0x500004, 0x500005) AM_READ_PORT("SYSTEM")
-	AM_RANGE( 0x600000, 0x6003ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE( 0x700000, 0x7021ff) AM_RAM AM_SHARE("spriteram16b")
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
-ADDRESS_MAP_END
+void snowbros_state::snowbros3_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x103fff).ram();
+	map(0x200000, 0x200001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x300000, 0x300001).r(this, FUNC(snowbros_state::sb3_sound_r)); // ?
+	map(0x300000, 0x300001).w(this, FUNC(snowbros_state::sb3_sound_w));  // ?
+	map(0x400000, 0x400000).w(this, FUNC(snowbros_state::bootleg_flipscreen_w));
+	map(0x500000, 0x500001).portr("DSW1");
+	map(0x500002, 0x500003).portr("DSW2");
+	map(0x500004, 0x500005).portr("SYSTEM");
+	map(0x600000, 0x6003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x700000, 0x7021ff).ram().share("spriteram16b");
+	map(0x800000, 0x800001).w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+}
 
 /* Final Tetris */
 
-ADDRESS_MAP_START(snowbros_state::finalttr_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("hyperpac_ram")
-	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+void snowbros_state::finalttr_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x103fff).ram().share("hyperpac_ram");
+	map(0x300001, 0x300001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 //  AM_RANGE(0x400000, 0x400001) ???
 
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
+	map(0x500000, 0x500001).portr("DSW1");
+	map(0x500002, 0x500003).portr("DSW2");
+	map(0x500004, 0x500005).portr("SYSTEM");
 
-	AM_RANGE(0x600000, 0x6001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
-ADDRESS_MAP_END
+	map(0x600000, 0x6001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x700000, 0x701fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w));
+	map(0x800000, 0x800001).w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+}
 
 
-ADDRESS_MAP_START(snowbros_state::yutnori_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+void snowbros_state::yutnori_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
 	// 0x100000  clr.w on startup
 
 	// 0x200000 could be the protection device, it makes several writes, then executes an entire subroutine of NOPs..
 
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("SYSTEM")
+	map(0x300000, 0x300001).portr("DSW1");
+	map(0x300002, 0x300003).portr("DSW2");
+	map(0x300004, 0x300005).portr("SYSTEM");
 
 	// could be one of the OKIs? but gets value to write from RAM, always seems to be 0?
-	AM_RANGE(0x30000c, 0x30000d) AM_WRITENOP
-	AM_RANGE(0x30000e, 0x30000f) AM_READNOP //AM_READ( yutnori_unk_r ) // ??
+	map(0x30000c, 0x30000d).nopw();
+	map(0x30000e, 0x30000f).nopr(); //AM_READ( yutnori_unk_r ) // ??
 
 //  AM_RANGE(0x400000, 0x400001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w) // maybe?
-	AM_RANGE(0x400000, 0x400001) AM_NOP
+	map(0x400000, 0x400001).noprw();
 
-	AM_RANGE(0x500000, 0x5001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0x500000, 0x5001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0x600000, 0x601fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
+	map(0x600000, 0x601fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w));
 
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM
+	map(0x700000, 0x70ffff).ram();
 
-	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
-	AM_RANGE(0x900000, 0x900001) AM_READNOP AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
-	AM_RANGE(0xa00000, 0xa00001) AM_READNOP AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
-ADDRESS_MAP_END
+	map(0x800000, 0x800001).nopr().w(this, FUNC(snowbros_state::snowbros_irq4_ack_w));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).nopr().w(this, FUNC(snowbros_state::snowbros_irq3_ack_w));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).nopr().w(this, FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
+}
 
 static INPUT_PORTS_START( snowbros )
 	PORT_START("DSW1")  /* 500001 */

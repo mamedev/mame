@@ -77,27 +77,28 @@ WRITE8_MEMBER(fastlane_state::fastlane_k2_k007232_w)
 {
 	m_k007232_2->write(space, offset ^ 1, data);
 }
-ADDRESS_MAP_START(fastlane_state::fastlane_map)
-	AM_RANGE(0x0000, 0x005f) AM_RAM_WRITE(k007121_registers_w) AM_SHARE("k007121_regs") /* 007121 registers */
-	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("P2")
-	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("P1")
-	AM_RANGE(0x0803, 0x0803) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0900, 0x0900) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0901, 0x0901) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0b00, 0x0b00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(fastlane_bankswitch_w)                                    /* bankswitch control */
-	AM_RANGE(0x0d00, 0x0d0d) AM_READWRITE(fastlane_k1_k007232_r, fastlane_k1_k007232_w) /* 007232 registers (chip 1) */
-	AM_RANGE(0x0e00, 0x0e0d) AM_READWRITE(fastlane_k2_k007232_r, fastlane_k2_k007232_w) /* 007232 registers (chip 2) */
-	AM_RANGE(0x0f00, 0x0f1f) AM_DEVREADWRITE("k051733", k051733_device, read, write)                                    /* 051733 (protection) */
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
-	AM_RANGE(0x1800, 0x1fff) AM_RAM                                                             /* Work RAM */
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(fastlane_vram1_w) AM_SHARE("videoram1")       /* Video RAM (chip 1) */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(fastlane_vram2_w) AM_SHARE("videoram2")       /* Video RAM (chip 2) */
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("spriteram")                                           /* Sprite RAM */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                                                        /* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM                                                             /* ROM */
-ADDRESS_MAP_END
+void fastlane_state::fastlane_map(address_map &map)
+{
+	map(0x0000, 0x005f).ram().w(this, FUNC(fastlane_state::k007121_registers_w)).share("k007121_regs"); /* 007121 registers */
+	map(0x0800, 0x0800).portr("DSW3");
+	map(0x0801, 0x0801).portr("P2");
+	map(0x0802, 0x0802).portr("P1");
+	map(0x0803, 0x0803).portr("SYSTEM");
+	map(0x0900, 0x0900).portr("DSW1");
+	map(0x0901, 0x0901).portr("DSW2");
+	map(0x0b00, 0x0b00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x0c00, 0x0c00).w(this, FUNC(fastlane_state::fastlane_bankswitch_w));                                    /* bankswitch control */
+	map(0x0d00, 0x0d0d).rw(this, FUNC(fastlane_state::fastlane_k1_k007232_r), FUNC(fastlane_state::fastlane_k1_k007232_w)); /* 007232 registers (chip 1) */
+	map(0x0e00, 0x0e0d).rw(this, FUNC(fastlane_state::fastlane_k2_k007232_r), FUNC(fastlane_state::fastlane_k2_k007232_w)); /* 007232 registers (chip 2) */
+	map(0x0f00, 0x0f1f).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));                                    /* 051733 (protection) */
+	map(0x1000, 0x17ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
+	map(0x1800, 0x1fff).ram();                                                             /* Work RAM */
+	map(0x2000, 0x27ff).ram().w(this, FUNC(fastlane_state::fastlane_vram1_w)).share("videoram1");       /* Video RAM (chip 1) */
+	map(0x2800, 0x2fff).ram().w(this, FUNC(fastlane_state::fastlane_vram2_w)).share("videoram2");       /* Video RAM (chip 2) */
+	map(0x3000, 0x3fff).ram().share("spriteram");                                           /* Sprite RAM */
+	map(0x4000, 0x7fff).bankr("bank1");                                                        /* banked ROM */
+	map(0x8000, 0xffff).rom();                                                             /* ROM */
+}
 
 /***************************************************************************
 

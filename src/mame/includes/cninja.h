@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "cpu/h6280/h6280.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/bufsprite.h"

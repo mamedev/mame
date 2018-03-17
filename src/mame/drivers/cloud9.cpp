@@ -276,26 +276,27 @@ WRITE8_MEMBER(cloud9_state::nvram_store_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(cloud9_state::cloud9_map)
-	AM_RANGE(0x0000, 0x4fff) AM_ROMBANK("bank1") AM_WRITE(cloud9_videoram_w)
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(cloud9_bitmode_addr_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(cloud9_bitmode_r, cloud9_bitmode_w)
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x5400, 0x547f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x5480, 0x54ff) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x5500, 0x557f) AM_RAM_WRITE(cloud9_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x5580, 0x5587) AM_MIRROR(0x0078) AM_DEVWRITE("videolatch", ls259_device, write_d7) // video control registers
-	AM_RANGE(0x5600, 0x5607) AM_MIRROR(0x0078) AM_DEVWRITE("outlatch", ls259_device, write_d7)
-	AM_RANGE(0x5680, 0x56ff) AM_WRITE(nvram_store_w)
-	AM_RANGE(0x5700, 0x577f) AM_WRITE(nvram_recall_w)
-	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x007e) AM_READ_PORT("IN0")
-	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x007e) AM_READ_PORT("IN1")
-	AM_RANGE(0x5900, 0x5903) AM_MIRROR(0x007c) AM_READ(leta_r)
-	AM_RANGE(0x5a00, 0x5a0f) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
-	AM_RANGE(0x5b00, 0x5b0f) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
-	AM_RANGE(0x5c00, 0x5cff) AM_MIRROR(0x0300) AM_DEVREADWRITE("nvram", x2212_device, read, write)
-	AM_RANGE(0x6000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void cloud9_state::cloud9_map(address_map &map)
+{
+	map(0x0000, 0x4fff).bankr("bank1").w(this, FUNC(cloud9_state::cloud9_videoram_w));
+	map(0x0000, 0x0001).w(this, FUNC(cloud9_state::cloud9_bitmode_addr_w));
+	map(0x0002, 0x0002).rw(this, FUNC(cloud9_state::cloud9_bitmode_r), FUNC(cloud9_state::cloud9_bitmode_w));
+	map(0x5000, 0x53ff).ram().share("spriteram");
+	map(0x5400, 0x547f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x5480, 0x54ff).w(this, FUNC(cloud9_state::irq_ack_w));
+	map(0x5500, 0x557f).ram().w(this, FUNC(cloud9_state::cloud9_paletteram_w)).share("paletteram");
+	map(0x5580, 0x5587).mirror(0x0078).w(m_videolatch, FUNC(ls259_device::write_d7)); // video control registers
+	map(0x5600, 0x5607).mirror(0x0078).w("outlatch", FUNC(ls259_device::write_d7));
+	map(0x5680, 0x56ff).w(this, FUNC(cloud9_state::nvram_store_w));
+	map(0x5700, 0x577f).w(this, FUNC(cloud9_state::nvram_recall_w));
+	map(0x5800, 0x5800).mirror(0x007e).portr("IN0");
+	map(0x5801, 0x5801).mirror(0x007e).portr("IN1");
+	map(0x5900, 0x5903).mirror(0x007c).r(this, FUNC(cloud9_state::leta_r));
+	map(0x5a00, 0x5a0f).mirror(0x00f0).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x5b00, 0x5b0f).mirror(0x00f0).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x5c00, 0x5cff).mirror(0x0300).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write));
+	map(0x6000, 0xffff).rom();
+}
 
 
 

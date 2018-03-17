@@ -644,45 +644,46 @@ WRITE32_MEMBER(ms32_state::coin_counter_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 }
 
-ADDRESS_MAP_START(ms32_state::ms32_map)
+void ms32_state::ms32_map(address_map &map)
+{
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
-	AM_RANGE(0xc0000000, 0xc0007fff) AM_READWRITE8(ms32_nvram_r8,   ms32_nvram_w8,   0x000000ff) AM_MIRROR(0x3c1f8000)  // nvram is 8-bit wide, 0x2000 in size */
+	map(0xc0000000, 0xc0007fff).rw(this, FUNC(ms32_state::ms32_nvram_r8), FUNC(ms32_state::ms32_nvram_w8)).umask32(0x000000ff).mirror(0x3c1f8000);  // nvram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
-	AM_RANGE(0xc1180000, 0xc1187fff) AM_READWRITE8(ms32_priram_r8,  ms32_priram_w8,  0x000000ff) AM_MIRROR(0x3c038000) AM_SHARE("priram") /* priram is 8-bit wide, 0x2000 in size */
+	map(0xc1180000, 0xc1187fff).rw(this, FUNC(ms32_state::ms32_priram_r8), FUNC(ms32_state::ms32_priram_w8)).umask32(0x000000ff).mirror(0x3c038000).share("priram"); /* priram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc1188000, 0xc11bffff) // mirrors of priram, handled above */
-	AM_RANGE(0xc1400000, 0xc143ffff) AM_READWRITE16(ms32_palram_r16, ms32_palram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) AM_SHARE("palram") /* palram is 16-bit wide, 0x20000 in size */
+	map(0xc1400000, 0xc143ffff).rw(this, FUNC(ms32_state::ms32_palram_r16), FUNC(ms32_state::ms32_palram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("palram"); /* palram is 16-bit wide, 0x20000 in size */
 /*  AM_RANGE(0xc1440000, 0xc145ffff) // mirrors of palram, handled above */
-	AM_RANGE(0xc2000000, 0xc201ffff) AM_READWRITE16(ms32_rozram_r16, ms32_rozram_w16, 0x0000ffff) AM_MIRROR(0x3c1e0000) AM_SHARE("rozram") /* rozram is 16-bit wide, 0x10000 in size */
+	map(0xc2000000, 0xc201ffff).rw(this, FUNC(ms32_state::ms32_rozram_r16), FUNC(ms32_state::ms32_rozram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000).share("rozram"); /* rozram is 16-bit wide, 0x10000 in size */
 /*  AM_RANGE(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above */
-	AM_RANGE(0xc2200000, 0xc2201fff) AM_READWRITE16(ms32_lineram_r16,ms32_lineram_w16,0x0000ffff) AM_MIRROR(0x3c1fe000) AM_SHARE("lineram") /* lineram is 16-bit wide, 0x1000 in size */
+	map(0xc2200000, 0xc2201fff).rw(this, FUNC(ms32_state::ms32_lineram_r16), FUNC(ms32_state::ms32_lineram_w16)).umask32(0x0000ffff).mirror(0x3c1fe000).share("lineram"); /* lineram is 16-bit wide, 0x1000 in size */
 /*  AM_RANGE(0xc2202000, 0xc23fffff) // mirrors of lineram, handled above */
-	AM_RANGE(0xc2800000, 0xc283ffff) AM_READWRITE16(ms32_sprram_r16, ms32_sprram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) AM_SHARE("sprram") /* spriteram is 16-bit wide, 0x20000 in size */
+	map(0xc2800000, 0xc283ffff).rw(this, FUNC(ms32_state::ms32_sprram_r16), FUNC(ms32_state::ms32_sprram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("sprram"); /* spriteram is 16-bit wide, 0x20000 in size */
 /*  AM_RANGE(0xc2840000, 0xc29fffff) // mirrors of sprram, handled above */
-	AM_RANGE(0xc2c00000, 0xc2c07fff) AM_READWRITE16(ms32_txram_r16,  ms32_txram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) AM_SHARE("txram") /* txram is 16-bit wide, 0x4000 in size */
-	AM_RANGE(0xc2c08000, 0xc2c0ffff) AM_READWRITE16(ms32_bgram_r16,  ms32_bgram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) AM_SHARE("bgram") /* bgram is 16-bit wide, 0x4000 in size */
+	map(0xc2c00000, 0xc2c07fff).rw(this, FUNC(ms32_state::ms32_txram_r16), FUNC(ms32_state::ms32_txram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("txram"); /* txram is 16-bit wide, 0x4000 in size */
+	map(0xc2c08000, 0xc2c0ffff).rw(this, FUNC(ms32_state::ms32_bgram_r16), FUNC(ms32_state::ms32_bgram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("bgram"); /* bgram is 16-bit wide, 0x4000 in size */
 /*  AM_RANGE(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above */
-	AM_RANGE(0xc2e00000, 0xc2e1ffff) AM_RAM AM_SHARE("mainram")                                AM_MIRROR(0x3c0e0000) /* mainram is 32-bit wide, 0x20000 in size */
-	AM_RANGE(0xc3e00000, 0xc3ffffff) AM_ROM AM_REGION("maincpu", 0)                            AM_MIRROR(0x3c000000) // ROM is 32-bit wide, 0x200000 in size */
+	map(0xc2e00000, 0xc2e1ffff).ram().share("mainram").mirror(0x3c0e0000); /* mainram is 32-bit wide, 0x20000 in size */
+	map(0xc3e00000, 0xc3ffffff).rom().region("maincpu", 0).mirror(0x3c000000); // ROM is 32-bit wide, 0x200000 in size */
 
 	/* todo: clean up the mapping of these */
-	AM_RANGE(0xfc800000, 0xfc800003) AM_READNOP /* sound? */
-	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE(ms32_sound_w) /* sound? */
-	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ_PORT("DSW")
-	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITENOP // irq ack?
-	AM_RANGE(0xfce00038, 0xfce0003b) AM_WRITE(reset_sub_w)
-	AM_RANGE(0xfce00050, 0xfce0005f) AM_WRITENOP    // watchdog? I haven't investigated
+	map(0xfc800000, 0xfc800003).nopr(); /* sound? */
+	map(0xfc800000, 0xfc800003).w(this, FUNC(ms32_state::ms32_sound_w)); /* sound? */
+	map(0xfcc00004, 0xfcc00007).portr("INPUTS");
+	map(0xfcc00010, 0xfcc00013).portr("DSW");
+	map(0xfce00034, 0xfce00037).nopw(); // irq ack?
+	map(0xfce00038, 0xfce0003b).w(this, FUNC(ms32_state::reset_sub_w));
+	map(0xfce00050, 0xfce0005f).nopw();    // watchdog? I haven't investigated
 //  AM_RANGE(0xfce00000, 0xfce0007f) AM_WRITEONLY AM_SHARE("ms32_fce00000") /* registers not ram? */
-	AM_RANGE(0xfce00000, 0xfce00003) AM_WRITE(ms32_gfxctrl_w)   /* flip screen + other unknown bits */
-	AM_RANGE(0xfce00280, 0xfce0028f) AM_WRITE(ms32_brightness_w)    // global brightness control
-/**/AM_RANGE(0xfce00600, 0xfce0065f) AM_RAM AM_SHARE("roz_ctrl")        /* roz control registers */
-/**/AM_RANGE(0xfce00a00, 0xfce00a17) AM_RAM AM_SHARE("tx_scroll")   /* tx layer scroll */
-/**/AM_RANGE(0xfce00a20, 0xfce00a37) AM_RAM AM_SHARE("bg_scroll")   /* bg layer scroll */
-	AM_RANGE(0xfce00a7c, 0xfce00a7f) AM_WRITE(pip_w)    // ??? layer related? seems to be always 0
-	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(coin_counter_w) //   coin counters + something else
-	AM_RANGE(0xfd000000, 0xfd000003) AM_READ(ms32_sound_r)
-	AM_RANGE(0xfd1c0000, 0xfd1c0003) AM_WRITEONLY AM_SHARE("mahjong_select")
-ADDRESS_MAP_END
+	map(0xfce00000, 0xfce00003).w(this, FUNC(ms32_state::ms32_gfxctrl_w));   /* flip screen + other unknown bits */
+	map(0xfce00280, 0xfce0028f).w(this, FUNC(ms32_state::ms32_brightness_w));    // global brightness control
+/**/map(0xfce00600, 0xfce0065f).ram().share("roz_ctrl");        /* roz control registers */
+/**/map(0xfce00a00, 0xfce00a17).ram().share("tx_scroll");   /* tx layer scroll */
+/**/map(0xfce00a20, 0xfce00a37).ram().share("bg_scroll");   /* bg layer scroll */
+	map(0xfce00a7c, 0xfce00a7f).w(this, FUNC(ms32_state::pip_w));    // ??? layer related? seems to be always 0
+	map(0xfce00e00, 0xfce00e03).w(this, FUNC(ms32_state::coin_counter_w)); //   coin counters + something else
+	map(0xfd000000, 0xfd000003).r(this, FUNC(ms32_state::ms32_sound_r));
+	map(0xfd1c0000, 0xfd1c0003).writeonly().share("mahjong_select");
+}
 
 
 /* F1 Super Battle has an extra linemap for the road, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
@@ -709,30 +710,31 @@ WRITE32_MEMBER(ms32_state::ms32_irq5_guess_w)
 	irq_raise(5);
 }
 
-ADDRESS_MAP_START(ms32_state::f1superb_map)
-	AM_IMPORT_FROM(ms32_map)
+void ms32_state::f1superb_map(address_map &map)
+{
+	ms32_map(map);
 
-	AM_RANGE(0xfd0d0000, 0xfd0d0003) AM_READ_PORT("DSW2") // MB-93159
-	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3) AM_WRITENOP // writes 7-led seg at very least
+	map(0xfd0d0000, 0xfd0d0003).portr("DSW2"); // MB-93159
+	map(0xfd0e0000, 0xfd0e0003).r(this, FUNC(ms32_state::ms32_read_inputs3)).nopw(); // writes 7-led seg at very least
 
-	AM_RANGE(0xfce00004, 0xfce00023) AM_RAM // regs?
-	AM_RANGE(0xfce00200, 0xfce0021f) AM_RAM // regs?
-	AM_RANGE(0xfce00800, 0xfce0085f) AM_RAM // regs?
+	map(0xfce00004, 0xfce00023).ram(); // regs?
+	map(0xfce00200, 0xfce0021f).ram(); // regs?
+	map(0xfce00800, 0xfce0085f).ram(); // regs?
 
 	/* these two are almost certainly wrong, they just let you see what
 	   happens if you generate the FPU ints without breaking other games */
-	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(ms32_irq5_guess_w)
-	AM_RANGE(0xfd0f0000, 0xfd0f0003) AM_WRITE(ms32_irq2_guess_w)
+	map(0xfce00e00, 0xfce00e03).w(this, FUNC(ms32_state::ms32_irq5_guess_w));
+	map(0xfd0f0000, 0xfd0f0003).w(this, FUNC(ms32_state::ms32_irq2_guess_w));
 
-	AM_RANGE(0xfd100000, 0xfd103fff) AM_RAM // used when you start enabling fpu ints
-	AM_RANGE(0xfd104000, 0xfd105fff) AM_RAM // uploads data here
+	map(0xfd100000, 0xfd103fff).ram(); // used when you start enabling fpu ints
+	map(0xfd104000, 0xfd105fff).ram(); // uploads data here
 
-	AM_RANGE(0xfd140000, 0xfd143fff) AM_RAM // used when you start enabling fpu ints
-	AM_RANGE(0xfd144000, 0xfd145fff) AM_RAM // same data here
+	map(0xfd140000, 0xfd143fff).ram(); // used when you start enabling fpu ints
+	map(0xfd144000, 0xfd145fff).ram(); // same data here
 
-	AM_RANGE(0xfdc00000, 0xfdc1ffff) AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) AM_SHARE("f1sb_extraram") // definitely line ram
-	AM_RANGE(0xfde00000, 0xfde1ffff) AM_RAM // scroll info for lineram?
-ADDRESS_MAP_END
+	map(0xfdc00000, 0xfdc1ffff).rw(this, FUNC(ms32_state::ms32_extra_r16), FUNC(ms32_state::ms32_extra_w16)).umask32(0x0000ffff).share("f1sb_extraram"); // definitely line ram
+	map(0xfde00000, 0xfde1ffff).ram(); // scroll info for lineram?
+}
 
 /* F1 Super Battle speculation from nuapete
 
@@ -1670,19 +1672,20 @@ WRITE8_MEMBER(ms32_state::to_main_w)
 	irq_raise(1);
 }
 
-ADDRESS_MAP_START(ms32_state::ms32_sound_map)
-	AM_RANGE(0x0000, 0x3eff) AM_ROM
-	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREADWRITE("ymf", ymf271_device, read, write)
-	AM_RANGE(0x3f10, 0x3f10) AM_READWRITE(latch_r,to_main_w)
-	AM_RANGE(0x3f20, 0x3f20) AM_READNOP /* 2nd latch ? */
-	AM_RANGE(0x3f20, 0x3f20) AM_WRITENOP /* to_main2_w  ? */
-	AM_RANGE(0x3f40, 0x3f40) AM_WRITENOP   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
-	AM_RANGE(0x3f70, 0x3f70) AM_WRITENOP   // watchdog? banking? very noisy
-	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(ms32_snd_bank_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("z80bank1")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("z80bank2")
-ADDRESS_MAP_END
+void ms32_state::ms32_sound_map(address_map &map)
+{
+	map(0x0000, 0x3eff).rom();
+	map(0x3f00, 0x3f0f).rw("ymf", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
+	map(0x3f10, 0x3f10).rw(this, FUNC(ms32_state::latch_r), FUNC(ms32_state::to_main_w));
+	map(0x3f20, 0x3f20).nopr(); /* 2nd latch ? */
+	map(0x3f20, 0x3f20).nopw(); /* to_main2_w  ? */
+	map(0x3f40, 0x3f40).nopw();   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
+	map(0x3f70, 0x3f70).nopw();   // watchdog? banking? very noisy
+	map(0x3f80, 0x3f80).w(this, FUNC(ms32_state::ms32_snd_bank_w));
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0xbfff).bankr("z80bank1");
+	map(0xc000, 0xffff).bankr("z80bank2");
+}
 
 
 /********** MACHINE INIT **********/

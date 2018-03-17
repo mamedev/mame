@@ -111,25 +111,27 @@ WRITE8_MEMBER(iqblock_state::port_C_w)
 	/* bit 7 could be a second coin counter, but coin 2 doesn't seem to work... */
 }
 
-ADDRESS_MAP_START(iqblock_state::main_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("rambase")
-ADDRESS_MAP_END
+void iqblock_state::main_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xffff).ram().share("rambase");
+}
 
 
-ADDRESS_MAP_START(iqblock_state::main_portmap)
-	AM_RANGE(0x2000, 0x23ff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x2800, 0x2bff) AM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x5080, 0x5083) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x5090, 0x5090) AM_READ_PORT("SW0")
-	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("SW1")
-	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE("ymsnd", ym2413_device, write) // UM3567_data_port_0_w
-	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(irqack_w)
-	AM_RANGE(0x6000, 0x603f) AM_WRITE(fgscroll_w)
-	AM_RANGE(0x6800, 0x69ff) AM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram") /* initialized up to 6fff... bug or larger tilemap? */
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void iqblock_state::main_portmap(address_map &map)
+{
+	map(0x2000, 0x23ff).w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0x2800, 0x2bff).w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x5080, 0x5083).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5090, 0x5090).portr("SW0");
+	map(0x50a0, 0x50a0).portr("SW1");
+	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write)); // UM3567_data_port_0_w
+	map(0x50c0, 0x50c0).w(this, FUNC(iqblock_state::irqack_w));
+	map(0x6000, 0x603f).w(this, FUNC(iqblock_state::fgscroll_w));
+	map(0x6800, 0x69ff).w(this, FUNC(iqblock_state::fgvideoram_w)).share("fgvideoram"); /* initialized up to 6fff... bug or larger tilemap? */
+	map(0x7000, 0x7fff).ram().w(this, FUNC(iqblock_state::bgvideoram_w)).share("bgvideoram");
+	map(0x8000, 0xffff).rom().region("user1", 0);
+}
 
 static INPUT_PORTS_START( iqblock )
 	PORT_START("P1")

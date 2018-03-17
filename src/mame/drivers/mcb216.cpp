@@ -70,29 +70,32 @@ READ8_MEMBER(mcb216_state::tms5501_status_r)
 	return bitswap<8>(m_tms5501->sta_r(space, 0), 4, 3, 5, 4, 3, 2, 1, 0);
 }
 
-ADDRESS_MAP_START(mcb216_state::mcb216_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2400, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mcb216_state::mcb216_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom().region("roms", 0);
+	map(0x2000, 0x23ff).ram();
+	map(0x2400, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(mcb216_state::mcb216_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void mcb216_state::mcb216_io(address_map &map)
+{
+	map.global_mask(0xff);
 	// 74904 PROM provides custom remapping for TMS5501 registers
-	AM_RANGE(0x00, 0x00) AM_READ(tms5501_status_r) AM_DEVWRITE("tms5501", tms5501_device, rr_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("tms5501", tms5501_device, rb_r, tb_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("tms5501", tms5501_device, cmd_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE("tms5501", tms5501_device, rst_r, mr_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("tms5501", tms5501_device, xi_r, xo_w)
-	AM_RANGE(0x05, 0x09) AM_DEVWRITE("tms5501", tms5501_device, tmr_w)
-ADDRESS_MAP_END
+	map(0x00, 0x00).r(this, FUNC(mcb216_state::tms5501_status_r)).w(m_tms5501, FUNC(tms5501_device::rr_w));
+	map(0x01, 0x01).rw(m_tms5501, FUNC(tms5501_device::rb_r), FUNC(tms5501_device::tb_w));
+	map(0x02, 0x02).w(m_tms5501, FUNC(tms5501_device::cmd_w));
+	map(0x03, 0x03).rw(m_tms5501, FUNC(tms5501_device::rst_r), FUNC(tms5501_device::mr_w));
+	map(0x04, 0x04).rw(m_tms5501, FUNC(tms5501_device::xi_r), FUNC(tms5501_device::xo_w));
+	map(0x05, 0x09).w(m_tms5501, FUNC(tms5501_device::tmr_w));
+}
 
-ADDRESS_MAP_START(mcb216_state::cb308_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void mcb216_state::cb308_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).ram();
+	map(0xe000, 0xefff).rom().region("roms", 0);
+}
 
 
 /* Input ports */

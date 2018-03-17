@@ -18,8 +18,8 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(SCMP,    scmp_device,    "ins8050", "INS 8050 SC/MP")
-DEFINE_DEVICE_TYPE(INS8060, ins8060_device, "ins8060", "INS 8060 SC/MP II")
+DEFINE_DEVICE_TYPE(SCMP,    scmp_device,    "ins8050", "National Semiconductor INS 8050 SC/MP")
+DEFINE_DEVICE_TYPE(INS8060, ins8060_device, "ins8060", "National Semiconductor INS 8060 SC/MP II")
 
 
 scmp_device::scmp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

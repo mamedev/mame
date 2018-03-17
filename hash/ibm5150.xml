@@ -995,7 +995,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="gwar">
-		<description>Guerrilla War</description>
+		<description>Guerrilla War (5.25")</description>
 		<year>1987</year>
 		<publisher>Data East</publisher>
 		<info name="usage" value="PC Booter" />
@@ -1011,12 +1011,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="gwar720" cloneof="gwar">
-		<description>Guerrilla War [720k]</description>
+	<software name="gwar35" cloneof="gwar">
+		<description>Guerrilla War (3.5")</description>
 		<year>1987</year>
 		<publisher>Data East</publisher>
 		<info name="usage" value="PC Booter" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="guerrilla war [720k version].img" size="737280" crc="ebb63563" sha1="c4cbe2e1b9c2a75cc81a2bbb899aa0779df3f3ee" offset="0" />
 			</dataarea>
@@ -6899,6 +6899,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="blockout">
+		<description>Blockout</description>
+		<year>1989</year>
+		<publisher>California Dreams</publisher>
+		<info name="developer" value="P.Z.Karen Co. Development Group" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Blockout [California Dreams] [1989] [5.25] [Disk 1 of 1].img" size="368640" crc="9bd2f1b3" sha1="06aebc57c7eeec4a38ed35bdc58d6d681f8627f4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bloodmon">
 		<description>Blood Money</description>
 		<year>1989</year>
@@ -9336,10 +9348,11 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="simcityc">
-		<description>SimCity Classic</description>
+	<software name="simcity">
+		<description>SimCity (3.5", v2.00)</description>
 		<year>1993</year>
-		<publisher>Maxis</publisher>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Maxis Software" />
 		<info name="version" value="2.00" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -9349,6 +9362,68 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="simcitycd2.img" size="737280" crc="5088846e" sha1="449a83461d24d9a8be69cae35bea61359cfe1893" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcity102" cloneof="simcity">
+		<description>SimCity (5.25", v1.02)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="version" value="1.02" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimCity (v1.02) [Maxis] [1989] [5.25] [Disk 1 of 2].img" size="368640" crc="f7a34a71" sha1="5d2564e539c3b9930a901758e1d2ed4e79e9110d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimCity (v1.02) [Maxis] [1989] [5.25] [Disk 2 of 2].img" size="368640" crc="a5dcfae9" sha1="7747f44cf8f4b0640569b8fac73a23fa950a86f9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcity102_35" cloneof="simcity">
+		<description>SimCity (3.5", v1.02)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="version" value="1.02" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimCity (v1.02) [Maxis] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="9b9e4a89" sha1="c19037384dc0956cf7ecfdc393d87018a8a32913" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcity107" cloneof="simcity">
+		<description>SimCity (5.25", v1.07)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="version" value="1.07" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimCity (v1.07) [Maxis] [1989] [5.25] [Disk 1 of 2].img" size="368640" crc="09fc0910" sha1="5601e34150c4961d68b992c2333b00c430c0dbd9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimCity (v1.07) [Maxis] [1989] [5.25] [Disk 2 of 2].img" size="368640" crc="f0aae25a" sha1="1b123285f7ddb90f6da052a0ed3b4feccc5f70a1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcity107_35" cloneof="simcity">
+		<description>SimCity (3.5", v1.07)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="version" value="1.07" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimCity (v1.07) [Maxis] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="3c572a40" sha1="d2b26ed8f7456930d8a05ed4354b3746f9a68215" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9615,6 +9690,52 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Street Fighting Man (1989)(Mastertronic)(Disk 2 of 2).dsk" size="368640" crc="2e02db73" sha1="17bd0ca7c558e9908a9cb8de19024ade0ef70c24" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stunts">
+		<description>Stunts (5.25") (USA)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Distinctive Software" />
+		<info name="version" value="1.1 (Feb 12 1991)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Stunts [Broderbund Software] [1990] [5.25] [Disk A].img" size="368640" crc="ba32d817" sha1="206aec96920e6603c762eda9acb01e24c4c849a0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Stunts [Broderbund Software] [1990] [5.25] [Disk B].img" size="368640" crc="adeb46a6" sha1="996808c253cd2ec413db8e6a5eda22ddf28bd49b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Stunts [Broderbund Software] [1990] [5.25] [Disk C].img" size="368640" crc="ad24245e" sha1="f8feb9c99b997a06b9dd822febd77706088f4371" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Stunts [Broderbund Software] [1990] [5.25] [Disk D].img" size="368640" crc="6fa65143" sha1="24cd4dec00ba7c4e447ffc255df795af5580cd79" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stunts35" cloneof="stunts">
+		<description>Stunts (3.5") (USA)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Distinctive Software" />
+		<info name="version" value="1.1 (Feb 12 1991)" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Stunts [Broderbund Software] [1990] [3.5DD] [Disk A].img" size="737280" crc="364a0069" sha1="fe3b35fa91619815e1565066c9404d02812dd17a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Stunts [Broderbund Software] [1990] [3.5DD] [Disk B].img" size="737280" crc="273c9396" sha1="57f637e6cbfd6f2ae8efd54857d9ee0b4528d182" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

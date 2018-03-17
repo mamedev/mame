@@ -53,26 +53,27 @@ WRITE32_MEMBER(gaminator_state::gamtor_unk_w)
 
 
 
-ADDRESS_MAP_START(gaminator_state::gaminator_map)
-	AM_RANGE(0x00000000, 0x07ffffff) AM_ROM
-	AM_RANGE(0x08000000, 0x0bffffff) AM_RAM
-	AM_RANGE(0x1e040008, 0x1e04000b) AM_WRITE(gamtor_unk_w )
+void gaminator_state::gaminator_map(address_map &map)
+{
+	map(0x00000000, 0x07ffffff).rom();
+	map(0x08000000, 0x0bffffff).ram();
+	map(0x1e040008, 0x1e04000b).w(this, FUNC(gaminator_state::gamtor_unk_w));
 
-	AM_RANGE(0x20000000, 0x2003ffff) AM_RAM
+	map(0x20000000, 0x2003ffff).ram();
 
 	/* standard VGA */
 	//AM_RANGE(0x40000000, 0x40000fff) AM_RAM // regs
-	AM_RANGE(0x400003b0, 0x400003bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x400003c0, 0x400003cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x400003d0, 0x400003df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
+	map(0x400003b0, 0x400003bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+	map(0x400003c0, 0x400003cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+	map(0x400003d0, 0x400003df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 
-	AM_RANGE(0x44000000, 0x4401ffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff) // VRAM
+	map(0x44000000, 0x4401ffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w)); // VRAM
 //  AM_RANGE(0x44000000, 0x44007fff) AM_RAM AM_SHARE("tmapram1") // puts strings here, looks almost like a tilemap, but where are the tiles?
 //  AM_RANGE(0x440a0000, 0x440a1fff) AM_RAM AM_SHARE("tmapram2") // beetlem (like above, mirror?)
 
-	AM_RANGE(0xe0000000, 0xe00001ff) AM_RAM // nvram?
-	AM_RANGE(0xf0000000, 0xf00003ff) AM_DEVREADWRITE("maincpu_onboard", mcf5206e_peripheral_device, dev_r, dev_w) // technically this can be moved with MBAR
-ADDRESS_MAP_END
+	map(0xe0000000, 0xe00001ff).ram(); // nvram?
+	map(0xf0000000, 0xf00003ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
+}
 
 static INPUT_PORTS_START(  gaminator )
 INPUT_PORTS_END

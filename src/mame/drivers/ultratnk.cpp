@@ -161,33 +161,34 @@ WRITE8_MEMBER(ultratnk_state::explosion_w)
 }
 
 
-ADDRESS_MAP_START(ultratnk_state::ultratnk_cpu_map)
+void ultratnk_state::ultratnk_cpu_map(address_map &map)
+{
 
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	map.global_mask(0x3fff);
 
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x700) AM_RAM
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(wram_r, wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(video_ram_w) AM_SHARE("videoram")
+	map(0x0000, 0x007f).mirror(0x700).ram();
+	map(0x0080, 0x00ff).mirror(0x700).rw(this, FUNC(ultratnk_state::wram_r), FUNC(ultratnk_state::wram_w));
+	map(0x0800, 0x0bff).mirror(0x400).ram().w(this, FUNC(ultratnk_state::video_ram_w)).share("videoram");
 
-	AM_RANGE(0x1000, 0x17ff) AM_READ_PORT("IN0")
-	AM_RANGE(0x1800, 0x1fff) AM_READ_PORT("IN1")
+	map(0x1000, 0x17ff).portr("IN0");
+	map(0x1800, 0x1fff).portr("IN1");
 
-	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x718) AM_READ(analog_r)
-	AM_RANGE(0x2020, 0x2027) AM_MIRROR(0x718) AM_READ(coin_r)
-	AM_RANGE(0x2040, 0x2047) AM_MIRROR(0x718) AM_READ(collision_r)
-	AM_RANGE(0x2060, 0x2063) AM_MIRROR(0x71c) AM_READ(options_r)
+	map(0x2000, 0x2007).mirror(0x718).r(this, FUNC(ultratnk_state::analog_r));
+	map(0x2020, 0x2027).mirror(0x718).r(this, FUNC(ultratnk_state::coin_r));
+	map(0x2040, 0x2047).mirror(0x718).r(this, FUNC(ultratnk_state::collision_r));
+	map(0x2060, 0x2063).mirror(0x71c).r(this, FUNC(ultratnk_state::options_r));
 
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x71f) AM_WRITE(attract_w)
-	AM_RANGE(0x2020, 0x2027) AM_MIRROR(0x718) AM_WRITE(collision_reset_w)
-	AM_RANGE(0x2040, 0x2041) AM_MIRROR(0x718) AM_WRITE(da_latch_w)
-	AM_RANGE(0x2042, 0x2043) AM_MIRROR(0x718) AM_WRITE(explosion_w)
-	AM_RANGE(0x2044, 0x2045) AM_MIRROR(0x718) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x2060, 0x206f) AM_MIRROR(0x710) AM_DEVWRITE("latch", f9334_device, write_a0)
+	map(0x2000, 0x2000).mirror(0x71f).w(this, FUNC(ultratnk_state::attract_w));
+	map(0x2020, 0x2027).mirror(0x718).w(this, FUNC(ultratnk_state::collision_reset_w));
+	map(0x2040, 0x2041).mirror(0x718).w(this, FUNC(ultratnk_state::da_latch_w));
+	map(0x2042, 0x2043).mirror(0x718).w(this, FUNC(ultratnk_state::explosion_w));
+	map(0x2044, 0x2045).mirror(0x718).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x2060, 0x206f).mirror(0x710).w("latch", FUNC(f9334_device::write_a0));
 
-	AM_RANGE(0x2800, 0x2fff) AM_NOP /* diagnostic ROM */
-	AM_RANGE(0x3000, 0x3fff) AM_ROM
+	map(0x2800, 0x2fff).noprw(); /* diagnostic ROM */
+	map(0x3000, 0x3fff).rom();
 
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( ultratnk )

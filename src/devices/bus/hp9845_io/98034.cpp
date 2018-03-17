@@ -339,22 +339,24 @@ ROM_START(hp98034)
 	ROM_LOAD("1816-1242.bin" , 0 , 0x400 , CRC(301a9f5f) SHA1(3d7c1ace38c4d3178fdbf764c044535d9f6ac94f))
 ROM_END
 
-ADDRESS_MAP_START(hp98034_io_card_device::np_program_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000 , 0x3ff) AM_ROM AM_REGION("np" , 0)
-ADDRESS_MAP_END
+void hp98034_io_card_device::np_program_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000, 0x3ff).rom().region("np", 0);
+}
 
-ADDRESS_MAP_START(hp98034_io_card_device::np_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0 , 0) AM_WRITE(hpib_data_w)
-	AM_RANGE(1 , 1) AM_WRITE(hpib_ctrl_w)
-	AM_RANGE(2 , 2) AM_READ(hpib_ctrl_r)
-	AM_RANGE(3 , 3) AM_READ(hpib_data_r)
-	AM_RANGE(4 , 4) AM_READ(idr_r)
-	AM_RANGE(5 , 5) AM_WRITE(odr_w)
-	AM_RANGE(6 , 6) AM_READWRITE(mode_reg_r , mode_reg_clear_w)
-	AM_RANGE(7 , 7) AM_READ(switch_r)
-ADDRESS_MAP_END
+void hp98034_io_card_device::np_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0, 0).w(this, FUNC(hp98034_io_card_device::hpib_data_w));
+	map(1, 1).w(this, FUNC(hp98034_io_card_device::hpib_ctrl_w));
+	map(2, 2).r(this, FUNC(hp98034_io_card_device::hpib_ctrl_r));
+	map(3, 3).r(this, FUNC(hp98034_io_card_device::hpib_data_r));
+	map(4, 4).r(this, FUNC(hp98034_io_card_device::idr_r));
+	map(5, 5).w(this, FUNC(hp98034_io_card_device::odr_w));
+	map(6, 6).rw(this, FUNC(hp98034_io_card_device::mode_reg_r), FUNC(hp98034_io_card_device::mode_reg_clear_w));
+	map(7, 7).r(this, FUNC(hp98034_io_card_device::switch_r));
+}
 
 const tiny_rom_entry *hp98034_io_card_device::device_rom_region() const
 {

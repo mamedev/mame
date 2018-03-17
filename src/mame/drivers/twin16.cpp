@@ -164,80 +164,84 @@ WRITE8_MEMBER(twin16_state::upd_start_w)
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(twin16_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(upd_reset_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("upd", upd7759_device, port_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(upd_start_w)
-	AM_RANGE(0xf000, 0xf000) AM_READ(upd_busy_r) // miaj writes 0 to it
-	ADDRESS_MAP_END
+void twin16_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).w(this, FUNC(twin16_state::upd_reset_w));
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xd000, 0xd000).w(m_upd7759, FUNC(upd7759_device::port_w));
+	map(0xe000, 0xe000).w(this, FUNC(twin16_state::upd_start_w));
+	map(0xf000, 0xf000).r(this, FUNC(twin16_state::upd_busy_r)); // miaj writes 0 to it
+	}
 
-ADDRESS_MAP_START(twin16_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
+void twin16_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x043fff).ram().share("comram");
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
-	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
-	AM_RANGE(0x081000, 0x081fff) AM_WRITENOP
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(CPUA_register_w)
-	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
-	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
-	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("P3")
-	AM_RANGE(0x0a0008, 0x0a0009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(video_register_w)
-	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(sprite_status_r)
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(fixram_w) AM_SHARE("fixram")
+	map(0x060000, 0x063fff).ram();
+	map(0x080000, 0x080fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x081000, 0x081fff).nopw();
+	map(0x0a0000, 0x0a0001).portr("SYSTEM").w(this, FUNC(twin16_state::CPUA_register_w));
+	map(0x0a0002, 0x0a0003).portr("P1");
+	map(0x0a0004, 0x0a0005).portr("P2");
+	map(0x0a0006, 0x0a0007).portr("P3");
+	map(0x0a0009, 0x0a0009).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x0a0010, 0x0a0011).portr("DSW2").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x0a0012, 0x0a0013).portr("DSW1");
+	map(0x0a0018, 0x0a0019).portr("DSW3");
+	map(0x0c0000, 0x0c000f).w(this, FUNC(twin16_state::video_register_w));
+	map(0x0c000e, 0x0c000f).r(this, FUNC(twin16_state::sprite_status_r));
+	map(0x100000, 0x103fff).ram().w(this, FUNC(twin16_state::fixram_w)).share("fixram");
 //  AM_RANGE(0x104000, 0x105fff) AM_NOP             // miaj
-	AM_RANGE(0x120000, 0x121fff) AM_RAM_WRITE(videoram0_w) AM_SHARE("videoram.0")
-	AM_RANGE(0x122000, 0x123fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram.1")
-	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+	map(0x120000, 0x121fff).ram().w(this, FUNC(twin16_state::videoram0_w)).share("videoram.0");
+	map(0x122000, 0x123fff).ram().w(this, FUNC(twin16_state::videoram1_w)).share("videoram.1");
+	map(0x140000, 0x143fff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(twin16_state::sub_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
+void twin16_state::sub_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x043fff).ram().share("comram");
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
-	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x09ffff) AM_ROM AM_REGION("data", 0)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(CPUB_register_w)
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x480000, 0x481fff) AM_RAM_WRITE(videoram0_w) AM_SHARE("videoram.0")
-	AM_RANGE(0x482000, 0x483fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram.1")
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(zipram_w) AM_SHARE("zipram")
-	AM_RANGE(0x600000, 0x6fffff) AM_ROM AM_REGION("gfxrom", 0)
-	AM_RANGE(0x700000, 0x77ffff) AM_ROMBANK("gfxrombank")
-	AM_RANGE(0x780000, 0x79ffff) AM_RAM AM_SHARE("sprite_gfx_ram")
-ADDRESS_MAP_END
+	map(0x060000, 0x063fff).ram();
+	map(0x080000, 0x09ffff).rom().region("data", 0);
+	map(0x0a0000, 0x0a0001).w(this, FUNC(twin16_state::CPUB_register_w));
+	map(0x400000, 0x403fff).ram().share("spriteram");
+	map(0x480000, 0x481fff).ram().w(this, FUNC(twin16_state::videoram0_w)).share("videoram.0");
+	map(0x482000, 0x483fff).ram().w(this, FUNC(twin16_state::videoram1_w)).share("videoram.1");
+	map(0x500000, 0x53ffff).ram().w(this, FUNC(twin16_state::zipram_w)).share("zipram");
+	map(0x600000, 0x6fffff).rom().region("gfxrom", 0);
+	map(0x700000, 0x77ffff).bankr("gfxrombank");
+	map(0x780000, 0x79ffff).ram().share("sprite_gfx_ram");
+}
 
-ADDRESS_MAP_START(fround_state::fround_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
-	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(fround_CPU_register_w)
-	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
-	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
-	AM_RANGE(0x0a0008, 0x0a0009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(video_register_w)
-	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(sprite_status_r)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(gfx_bank_w)
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(fixram_w) AM_SHARE("fixram")
-	AM_RANGE(0x120000, 0x121fff) AM_RAM_WRITE(videoram0_w) AM_SHARE("videoram.0")
-	AM_RANGE(0x122000, 0x123fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram.1")
-	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x5fffff) AM_ROM AM_REGION("tiles", 0)
-	AM_RANGE(0x600000, 0x6fffff) AM_ROM AM_REGION("gfxrom", 0)
-ADDRESS_MAP_END
+void fround_state::fround_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x043fff).ram().share("comram");
+	map(0x060000, 0x063fff).ram();
+	map(0x080000, 0x080fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x0a0000, 0x0a0001).portr("SYSTEM").w(this, FUNC(fround_state::fround_CPU_register_w));
+	map(0x0a0002, 0x0a0003).portr("P1");
+	map(0x0a0004, 0x0a0005).portr("P2");
+	map(0x0a0009, 0x0a0009).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x0a0010, 0x0a0011).portr("DSW2").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x0a0012, 0x0a0013).portr("DSW1");
+	map(0x0a0018, 0x0a0019).portr("DSW3");
+	map(0x0c0000, 0x0c000f).w(this, FUNC(fround_state::video_register_w));
+	map(0x0c000e, 0x0c000f).r(this, FUNC(fround_state::sprite_status_r));
+	map(0x0e0000, 0x0e0001).w(this, FUNC(fround_state::gfx_bank_w));
+	map(0x100000, 0x103fff).ram().w(this, FUNC(fround_state::fixram_w)).share("fixram");
+	map(0x120000, 0x121fff).ram().w(this, FUNC(fround_state::videoram0_w)).share("videoram.0");
+	map(0x122000, 0x123fff).ram().w(this, FUNC(fround_state::videoram1_w)).share("videoram.1");
+	map(0x140000, 0x143fff).ram().share("spriteram");
+	map(0x500000, 0x5fffff).rom().region("tiles", 0);
+	map(0x600000, 0x6fffff).rom().region("gfxrom", 0);
+}
 
 /* Input Ports */
 

@@ -700,19 +700,21 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 	}
 }
 
-ADDRESS_MAP_START(pasopia7_state::pasopia7_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_WRITE( ram_bank_w )
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROMBANK("bank1")
-	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK("bank2")
-	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(vram_r, vram_w )
-	AM_RANGE( 0xc000, 0xffff ) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void pasopia7_state::pasopia7_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).w(this, FUNC(pasopia7_state::ram_bank_w));
+	map(0x0000, 0x3fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("bank2");
+	map(0x8000, 0xbfff).rw(this, FUNC(pasopia7_state::vram_r), FUNC(pasopia7_state::vram_w));
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
-ADDRESS_MAP_START(pasopia7_state::pasopia7_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xffff) AM_READWRITE( pasopia7_io_r, pasopia7_io_w )
-ADDRESS_MAP_END
+void pasopia7_state::pasopia7_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(pasopia7_state::pasopia7_io_r), FUNC(pasopia7_state::pasopia7_io_w));
+}
 
 /* TODO: where are SPACE and RETURN keys? */
 static INPUT_PORTS_START( pasopia7 )

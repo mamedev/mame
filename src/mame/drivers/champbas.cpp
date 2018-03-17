@@ -181,99 +181,110 @@ READ8_MEMBER(champbas_state::champbja_protection_r)
 // maincpu
 
 // base map
-ADDRESS_MAP_START(champbas_state::champbas_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(tilemap_w) AM_SHARE("vram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("mainram")
+void champbas_state::champbas_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x7000, 0x7001).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x8000, 0x87ff).ram().w(this, FUNC(champbas_state::tilemap_w)).share("vram");
+	map(0x8800, 0x8fff).ram().share("mainram");
 
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
-	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
-	AM_RANGE(0xa080, 0xa080) AM_MIRROR(0x0020) AM_READ_PORT("DSW")
-	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
+	map(0xa000, 0xa000).portr("P1");
+	map(0xa040, 0xa040).portr("P2");
+	map(0xa080, 0xa080).mirror(0x0020).portr("DSW");
+	map(0xa0c0, 0xa0c0).portr("SYSTEM");
 
-	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
 
-	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa0c0, 0xa0c0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+	map(0xa060, 0xa06f).writeonly().share("spriteram");
+	map(0xa080, 0xa080).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xa0c0, 0xa0c0).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+}
 
 // base map + ALPHA-8x0x protection
-ADDRESS_MAP_START(champbas_state::champbasj_map)
-	AM_IMPORT_FROM( champbas_map )
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("alpha_8201", alpha_8201_device, ext_ram_r, ext_ram_w)
-ADDRESS_MAP_END
+void champbas_state::champbasj_map(address_map &map)
+{
+	champbas_map(map);
+	map(0x6000, 0x63ff).rw(m_alpha_8201, FUNC(alpha_8201_device::ext_ram_r), FUNC(alpha_8201_device::ext_ram_w));
+}
 
 // different protection for champbasja
-ADDRESS_MAP_START(champbas_state::champbasja_map)
-	AM_IMPORT_FROM( champbas_map )
-	AM_RANGE(0x6000, 0x63ff) AM_RAM
-	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_protection_r)
-ADDRESS_MAP_END
+void champbas_state::champbasja_map(address_map &map)
+{
+	champbas_map(map);
+	map(0x6000, 0x63ff).ram();
+	map(0x6800, 0x68ff).r(this, FUNC(champbas_state::champbja_protection_r));
+}
 
 // champbasjb appears to have no protection
-ADDRESS_MAP_START(champbas_state::champbasjb_map)
-	AM_IMPORT_FROM( champbas_map )
-	AM_RANGE(0x6000, 0x63ff) AM_RAM
-ADDRESS_MAP_END
+void champbas_state::champbasjb_map(address_map &map)
+{
+	champbas_map(map);
+	map(0x6000, 0x63ff).ram();
+}
 
 // champbb2
-ADDRESS_MAP_START(champbas_state::champbb2_map)
-	AM_IMPORT_FROM( champbasj_map )
-	AM_RANGE(0x7800, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void champbas_state::champbb2_map(address_map &map)
+{
+	champbasj_map(map);
+	map(0x7800, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(champbas_state::tbasebal_map)
-	AM_IMPORT_FROM( champbas_map )
-	AM_RANGE(0x7800, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void champbas_state::tbasebal_map(address_map &map)
+{
+	champbas_map(map);
+	map(0x7800, 0x7fff).rom();
+}
 
 // more sprites in exctsccr
-ADDRESS_MAP_START(champbas_state::exctsccr_map)
-	AM_IMPORT_FROM( champbasj_map )
-	AM_RANGE(0x7000, 0x7001) AM_UNMAP // aysnd is controlled by audiocpu
-	AM_RANGE(0x7c00, 0x7fff) AM_RAM
-	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
-ADDRESS_MAP_END
+void champbas_state::exctsccr_map(address_map &map)
+{
+	champbasj_map(map);
+	map(0x7000, 0x7001).unmaprw(); // aysnd is controlled by audiocpu
+	map(0x7c00, 0x7fff).ram();
+	map(0xa040, 0xa04f).writeonly().share("spriteram2");
+}
 
 // exctsccrb
-ADDRESS_MAP_START(champbas_state::exctsccrb_map)
-	AM_IMPORT_FROM( champbasj_map )
-	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
-ADDRESS_MAP_END
+void champbas_state::exctsccrb_map(address_map &map)
+{
+	champbasj_map(map);
+	map(0xa040, 0xa04f).writeonly().share("spriteram2");
+}
 
 
 // audiocpu
 
 // champbas/champbb2 (note: talbot doesn't have audiocpu)
-ADDRESS_MAP_START(champbas_state::champbas_sound_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_WRITENOP // 4-bit return code to main CPU (not used)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xe000, 0xe3ff) AM_MIRROR(0x1c00) AM_RAM
-ADDRESS_MAP_END
+void champbas_state::champbas_sound_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6000).mirror(0x1fff).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x8000).mirror(0x1fff).nopw(); // 4-bit return code to main CPU (not used)
+	map(0xa000, 0xa000).mirror(0x1fff).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
+	map(0xc000, 0xc000).mirror(0x1fff).w("dac", FUNC(dac_byte_interface::write));
+	map(0xe000, 0xe3ff).mirror(0x1c00).ram();
+}
 
 // exctsccr
-ADDRESS_MAP_START(champbas_state::exctsccr_sound_map)
-	AM_RANGE(0x0000, 0x8fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xc008, 0xc008) AM_DEVWRITE("dac1", dac_byte_interface, write)
-	AM_RANGE(0xc009, 0xc009) AM_DEVWRITE("dac2", dac_byte_interface, write)
-	AM_RANGE(0xc00c, 0xc00c) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
-	AM_RANGE(0xc00d, 0xc00d) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+void champbas_state::exctsccr_sound_map(address_map &map)
+{
+	map(0x0000, 0x8fff).rom();
+	map(0xa000, 0xa7ff).ram();
+	map(0xc008, 0xc008).w("dac1", FUNC(dac_byte_interface::write));
+	map(0xc009, 0xc009).w("dac2", FUNC(dac_byte_interface::write));
+	map(0xc00c, 0xc00c).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
+	map(0xc00d, 0xc00d).r("soundlatch", FUNC(generic_latch_8_device::read));
 //  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ?
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(champbas_state::exctsccr_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay4", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void champbas_state::exctsccr_sound_io_map(address_map &map)
+{
+	map.global_mask(0x00ff);
+	map(0x82, 0x83).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x86, 0x87).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0x8a, 0x8b).w("ay3", FUNC(ay8910_device::data_address_w));
+	map(0x8e, 0x8f).w("ay4", FUNC(ay8910_device::data_address_w));
+}
 
 
 

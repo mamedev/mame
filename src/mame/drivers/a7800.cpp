@@ -301,25 +301,26 @@ READ8_MEMBER(a7800_state::bios_or_cart_r)
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(a7800_state::a7800_mem)
-	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0x300) AM_READWRITE(tia_r, tia_w)
-	AM_RANGE(0x0020, 0x003f) AM_MIRROR(0x300) AM_DEVREADWRITE("maria", atari_maria_device, read, write)
-	AM_RANGE(0x0040, 0x00ff) AM_RAMBANK("zpmirror") // mirror of 0x2040-0x20ff, for zero page
-	AM_RANGE(0x0140, 0x01ff) AM_RAMBANK("spmirror") // mirror of 0x2140-0x21ff, for stack page
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x160) AM_DEVICE("riot", mos6532_new_device, io_map)
-	AM_RANGE(0x0480, 0x04ff) AM_MIRROR(0x100) AM_DEVICE("riot", mos6532_new_device, ram_map)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("6116_1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("6116_2")
+void a7800_state::a7800_mem(address_map &map)
+{
+	map(0x0000, 0x001f).mirror(0x300).rw(this, FUNC(a7800_state::tia_r), FUNC(a7800_state::tia_w));
+	map(0x0020, 0x003f).mirror(0x300).rw(m_maria, FUNC(atari_maria_device::read), FUNC(atari_maria_device::write));
+	map(0x0040, 0x00ff).bankrw("zpmirror"); // mirror of 0x2040-0x20ff, for zero page
+	map(0x0140, 0x01ff).bankrw("spmirror"); // mirror of 0x2140-0x21ff, for stack page
+	map(0x0280, 0x029f).mirror(0x160).m("riot", FUNC(mos6532_new_device::io_map));
+	map(0x0480, 0x04ff).mirror(0x100).m("riot", FUNC(mos6532_new_device::ram_map));
+	map(0x1800, 0x1fff).ram().share("6116_1");
+	map(0x2000, 0x27ff).ram().share("6116_2");
 								// According to the official Software Guide, the RAM at 0x2000 is
 								// repeatedly mirrored up to 0x3fff, but this is evidently incorrect
 								// because the High Score Cartridge maps ROM at 0x3000-0x3fff
 								// Hardware tests show that only the page at 0x2700 appears at
 								// 0x2800, and only on some hardware (MARIA? motherboard?) revisions,
 								// and even then with inconsistent and unreliable results.
-	AM_RANGE(0x4000, 0xffff) AM_DEVWRITE("cartslot", a78_cart_slot_device, write_40xx)
-	AM_RANGE(0x4000, 0xbfff) AM_DEVREAD("cartslot", a78_cart_slot_device, read_40xx)
-	AM_RANGE(0xc000, 0xffff) AM_READ(bios_or_cart_r)    // here also the BIOS can be accessed
-ADDRESS_MAP_END
+	map(0x4000, 0xffff).w(m_cart, FUNC(a78_cart_slot_device::write_40xx));
+	map(0x4000, 0xbfff).r(m_cart, FUNC(a78_cart_slot_device::read_40xx));
+	map(0xc000, 0xffff).r(this, FUNC(a7800_state::bios_or_cart_r));    // here also the BIOS can be accessed
+}
 
 
 /***************************************************************************

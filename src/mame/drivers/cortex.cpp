@@ -85,20 +85,22 @@ private:
 	required_ioport m_io_dsw;
 };
 
-ADDRESS_MAP_START(cortex_state::mem_map)
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x8000, 0xefff) AM_RAM
-	AM_RANGE(0xf100, 0xf11f) AM_RAM // memory mapping unit
-	AM_RANGE(0xf120, 0xf120) AM_DEVREADWRITE("crtc", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0xf121, 0xf121) AM_DEVREADWRITE("crtc", tms9928a_device, register_read, register_write)
+void cortex_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bankr0").bankw("bankw0");
+	map(0x8000, 0xefff).ram();
+	map(0xf100, 0xf11f).ram(); // memory mapping unit
+	map(0xf120, 0xf120).rw("crtc", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0xf121, 0xf121).rw("crtc", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
 	//AM_RANGE(0xf140, 0xf147) // fdc tms9909
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(cortex_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x18) AM_DEVWRITE("control", ls259_device, write_d0)
-	AM_RANGE(0x0000, 0x0000) AM_READ(pio_r)
-	AM_RANGE(0x0001, 0x0001) AM_READ(keyboard_r)
+void cortex_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0007).mirror(0x18).w("control", FUNC(ls259_device::write_d0));
+	map(0x0000, 0x0000).r(this, FUNC(cortex_state::pio_r));
+	map(0x0001, 0x0001).r(this, FUNC(cortex_state::keyboard_r));
 	//AM_RANGE(0x0040, 0x005f) AM_DEVWRITE("uart1", tms9902_device, cruwrite) // RS232 (r12 = 80-bf)
 	//AM_RANGE(0x0008, 0x000b) AM_DEVREAD("uart1", tms9902_device, cruread) // RS232
 	//AM_RANGE(0x00c0, 0x00df) AM_DEVWRITE("uart2", tms9902_device, cruwrite) // Cassette (r12 = 180-1bf)
@@ -108,7 +110,7 @@ ADDRESS_MAP_START(cortex_state::io_map)
 	//AM_RANGE(0x0400, 0x0407) AM_WRITE(cent_data_w) // r12 = 800-80e
 	//AM_RANGE(0x0408, 0x0408) AM_WRITE(cent_strobe_w) // r12 = 810
 	//AM_RANGE(0x0081, 0x0081) AM_READ(cent_stat_r) // CRU 409 (r12 = 812)
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( cortex )

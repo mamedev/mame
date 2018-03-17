@@ -489,48 +489,50 @@ READ8_MEMBER(ddragon_state::dd_adpcm_status_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(ddragon_state::ddragon_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x1000, 0x11ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x1200, 0x13ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(ddragon_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(ddragon_comram_r, ddragon_comram_w) AM_SHARE("comram") AM_MIRROR(0x0600)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(ddragon_bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("P1")
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("P2")
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("EXTRA")
-	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW0")
-	AM_RANGE(0x3804, 0x3804) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3808, 0x3808) AM_WRITE(ddragon_bankswitch_w)
-	AM_RANGE(0x3809, 0x3809) AM_WRITEONLY AM_SHARE("scrollx_lo")
-	AM_RANGE(0x380a, 0x380a) AM_WRITEONLY AM_SHARE("scrolly_lo")
-	AM_RANGE(0x380b, 0x380f) AM_READWRITE(ddragon_interrupt_r, ddragon_interrupt_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void ddragon_state::ddragon_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("rambase");
+	map(0x1000, 0x11ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x1200, 0x13ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x1800, 0x1fff).ram().w(this, FUNC(ddragon_state::ddragon_fgvideoram_w)).share("fgvideoram");
+	map(0x2000, 0x21ff).rw(this, FUNC(ddragon_state::ddragon_comram_r), FUNC(ddragon_state::ddragon_comram_w)).share("comram").mirror(0x0600);
+	map(0x2800, 0x2fff).ram().share("spriteram");
+	map(0x3000, 0x37ff).ram().w(this, FUNC(ddragon_state::ddragon_bgvideoram_w)).share("bgvideoram");
+	map(0x3800, 0x3800).portr("P1");
+	map(0x3801, 0x3801).portr("P2");
+	map(0x3802, 0x3802).portr("EXTRA");
+	map(0x3803, 0x3803).portr("DSW0");
+	map(0x3804, 0x3804).portr("DSW1");
+	map(0x3808, 0x3808).w(this, FUNC(ddragon_state::ddragon_bankswitch_w));
+	map(0x3809, 0x3809).writeonly().share("scrollx_lo");
+	map(0x380a, 0x380a).writeonly().share("scrolly_lo");
+	map(0x380b, 0x380f).rw(this, FUNC(ddragon_state::ddragon_interrupt_r), FUNC(ddragon_state::ddragon_interrupt_w));
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(ddragon_state::dd2_map)
-	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(ddragon_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(ddragon_comram_r, ddragon_comram_w) AM_SHARE("comram") AM_MIRROR(0x0600)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(ddragon_bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("P1")
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("P2")
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("EXTRA")
-	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW0")
-	AM_RANGE(0x3804, 0x3804) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3808, 0x3808) AM_WRITE(ddragon_bankswitch_w)
-	AM_RANGE(0x3809, 0x3809) AM_WRITEONLY AM_SHARE("scrollx_lo")
-	AM_RANGE(0x380a, 0x380a) AM_WRITEONLY AM_SHARE("scrolly_lo")
-	AM_RANGE(0x380b, 0x380f) AM_READWRITE(ddragon_interrupt_r, ddragon_interrupt_w)
-	AM_RANGE(0x3c00, 0x3dff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x3e00, 0x3fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void ddragon_state::dd2_map(address_map &map)
+{
+	map(0x0000, 0x17ff).ram();
+	map(0x1800, 0x1fff).ram().w(this, FUNC(ddragon_state::ddragon_fgvideoram_w)).share("fgvideoram");
+	map(0x2000, 0x21ff).rw(this, FUNC(ddragon_state::ddragon_comram_r), FUNC(ddragon_state::ddragon_comram_w)).share("comram").mirror(0x0600);
+	map(0x2800, 0x2fff).ram().share("spriteram");
+	map(0x3000, 0x37ff).ram().w(this, FUNC(ddragon_state::ddragon_bgvideoram_w)).share("bgvideoram");
+	map(0x3800, 0x3800).portr("P1");
+	map(0x3801, 0x3801).portr("P2");
+	map(0x3802, 0x3802).portr("EXTRA");
+	map(0x3803, 0x3803).portr("DSW0");
+	map(0x3804, 0x3804).portr("DSW1");
+	map(0x3808, 0x3808).w(this, FUNC(ddragon_state::ddragon_bankswitch_w));
+	map(0x3809, 0x3809).writeonly().share("scrollx_lo");
+	map(0x380a, 0x380a).writeonly().share("scrolly_lo");
+	map(0x380b, 0x380f).rw(this, FUNC(ddragon_state::ddragon_interrupt_r), FUNC(ddragon_state::ddragon_interrupt_w));
+	map(0x3c00, 0x3dff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x3e00, 0x3fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom();
+}
 
 
 
@@ -540,32 +542,36 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(ddragon_state::sub_map)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(ddragon_hd63701_internal_registers_r, ddragon_hd63701_internal_registers_w)
-	AM_RANGE(0x0020, 0x0fff) AM_RAM
-	AM_RANGE(0x8000, 0x81ff) AM_RAM AM_SHARE("comram")
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void ddragon_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x001f).rw(this, FUNC(ddragon_state::ddragon_hd63701_internal_registers_r), FUNC(ddragon_state::ddragon_hd63701_internal_registers_w));
+	map(0x0020, 0x0fff).ram();
+	map(0x8000, 0x81ff).ram().share("comram");
+	map(0xc000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(ddragon_state::ddragonba_sub_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x8000, 0x81ff) AM_RAM AM_SHARE("comram")
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void ddragon_state::ddragonba_sub_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x8000, 0x81ff).ram().share("comram");
+	map(0xc000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(ddragon_state::dd2_sub_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("comram")
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(ddragon2_sub_irq_ack_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ddragon2_sub_irq_w)
-ADDRESS_MAP_END
+void ddragon_state::dd2_sub_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc3ff).ram().share("comram");
+	map(0xd000, 0xd000).w(this, FUNC(ddragon_state::ddragon2_sub_irq_ack_w));
+	map(0xe000, 0xe000).w(this, FUNC(ddragon_state::ddragon2_sub_irq_w));
+}
 
 
-ADDRESS_MAP_START(ddragon_state::ddragonba_sub_portmap)
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(ddragonba_port_w)
-ADDRESS_MAP_END
+void ddragon_state::ddragonba_sub_portmap(address_map &map)
+{
+	map(0x0000, 0x01ff).w(this, FUNC(ddragon_state::ddragonba_port_w));
+}
 
 
 
@@ -575,23 +581,25 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(ddragon_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1800, 0x1800) AM_READ(dd_adpcm_status_r)
-	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("fmsnd", ym2151_device, read, write)
-	AM_RANGE(0x3800, 0x3807) AM_WRITE(dd_adpcm_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void ddragon_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1800, 0x1800).r(this, FUNC(ddragon_state::dd_adpcm_status_r));
+	map(0x2800, 0x2801).rw("fmsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x3800, 0x3807).w(this, FUNC(ddragon_state::dd_adpcm_w));
+	map(0x8000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(ddragon_state::dd2_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("fmsnd", ym2151_device, read, write)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void ddragon_state::dd2_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8801).rw("fmsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 

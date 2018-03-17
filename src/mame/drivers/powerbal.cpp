@@ -105,72 +105,76 @@ WRITE16_MEMBER(powerbal_state::oki_banking)
 	m_okibank->set_entry(bank & (m_oki_numbanks - 1));
 }
 
-ADDRESS_MAP_START(powerbal_state::magicstk_main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x094000, 0x094001) AM_WRITENOP
-	AM_RANGE(0x094002, 0x094003) AM_WRITENOP
-	AM_RANGE(0x094004, 0x094005) AM_WRITE(tile_banking_w)
-	AM_RANGE(0x098180, 0x09917f) AM_RAM_WRITE(magicstk_bgvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x0c2010, 0x0c2011) AM_READ_PORT("IN0")
-	AM_RANGE(0x0c2012, 0x0c2013) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c2014, 0x0c2015) AM_READ_PORT("IN2") AM_WRITE(magicstk_coin_eeprom_w)
-	AM_RANGE(0x0c2016, 0x0c2017) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0c2018, 0x0c2019) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0c201c, 0x0c201d) AM_WRITE(oki_banking)
-	AM_RANGE(0x0c201e, 0x0c201f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITENOP
-	AM_RANGE(0x0e0000, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void powerbal_state::magicstk_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x094000, 0x094001).nopw();
+	map(0x094002, 0x094003).nopw();
+	map(0x094004, 0x094005).w(this, FUNC(powerbal_state::tile_banking_w));
+	map(0x098180, 0x09917f).ram().w(this, FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
+	map(0x0c2010, 0x0c2011).portr("IN0");
+	map(0x0c2012, 0x0c2013).portr("IN1");
+	map(0x0c2014, 0x0c2015).portr("IN2").w(this, FUNC(powerbal_state::magicstk_coin_eeprom_w));
+	map(0x0c2016, 0x0c2017).portr("DSW1");
+	map(0x0c2018, 0x0c2019).portr("DSW2");
+	map(0x0c201c, 0x0c201d).w(this, FUNC(powerbal_state::oki_banking));
+	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0c4000, 0x0c4001).nopw();
+	map(0x0e0000, 0x0fffff).ram();
+	map(0x100000, 0x100fff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(powerbal_state::powerbal_main_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x094000, 0x094001) AM_WRITENOP
-	AM_RANGE(0x094002, 0x094003) AM_WRITENOP
-	AM_RANGE(0x094004, 0x094005) AM_WRITE(tile_banking_w)
-	AM_RANGE(0x098000, 0x098fff) AM_RAM_WRITE(magicstk_bgvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x099000, 0x09bfff) AM_RAM // not used
-	AM_RANGE(0x0c2010, 0x0c2011) AM_READ_PORT("IN0")
-	AM_RANGE(0x0c2012, 0x0c2013) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c2014, 0x0c2015) AM_READ_PORT("IN2")
-	AM_RANGE(0x0c2016, 0x0c2017) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0c2018, 0x0c2019) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0c201c, 0x0c201d) AM_WRITE(oki_banking)
-	AM_RANGE(0x0c201e, 0x0c201f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITENOP
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM
-	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x102000, 0x10200d) AM_WRITENOP // not used scroll regs?
-	AM_RANGE(0x103000, 0x103fff) AM_RAM
-ADDRESS_MAP_END
+void powerbal_state::powerbal_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x094000, 0x094001).nopw();
+	map(0x094002, 0x094003).nopw();
+	map(0x094004, 0x094005).w(this, FUNC(powerbal_state::tile_banking_w));
+	map(0x098000, 0x098fff).ram().w(this, FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
+	map(0x099000, 0x09bfff).ram(); // not used
+	map(0x0c2010, 0x0c2011).portr("IN0");
+	map(0x0c2012, 0x0c2013).portr("IN1");
+	map(0x0c2014, 0x0c2015).portr("IN2");
+	map(0x0c2016, 0x0c2017).portr("DSW1");
+	map(0x0c2018, 0x0c2019).portr("DSW2");
+	map(0x0c201c, 0x0c201d).w(this, FUNC(powerbal_state::oki_banking));
+	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0c4000, 0x0c4001).nopw();
+	map(0x0f0000, 0x0fffff).ram();
+	map(0x101000, 0x101fff).ram().share("spriteram");
+	map(0x102000, 0x10200d).nopw(); // not used scroll regs?
+	map(0x103000, 0x103fff).ram();
+}
 
-ADDRESS_MAP_START(powerbal_state::atombjt_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080008, 0x080009) AM_READNOP // remnant of the original?
-	AM_RANGE(0x080014, 0x080015) AM_NOP // always 1 in this bootleg. Flip-screen switch not present according to dip sheet.
-	AM_RANGE(0x088000, 0x0883ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x094000, 0x094001) AM_WRITE(atombjt_tile_banking_w)
-	AM_RANGE(0x094002, 0x094003) AM_NOP    /* IRQ enable? */
-	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x1000) AM_RAM_WRITE(magicstk_bgvideoram_w) AM_SHARE("videoram1")
-	AM_RANGE(0x0c2010, 0x0c2011) AM_READ_PORT("IN0")
-	AM_RANGE(0x0c2012, 0x0c2013) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c2014, 0x0c2015) AM_READ_PORT("IN2")
-	AM_RANGE(0x0c2016, 0x0c2017) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0c2018, 0x0c2019) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0c201c, 0x0c201d) AM_WRITE(oki_banking)
-	AM_RANGE(0x0c201e, 0x0c201f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITENOP // always 0?
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x100000, 0x100fff) AM_RAM
-	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void powerbal_state::atombjt_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080008, 0x080009).nopr(); // remnant of the original?
+	map(0x080014, 0x080015).noprw(); // always 1 in this bootleg. Flip-screen switch not present according to dip sheet.
+	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x094000, 0x094001).w(this, FUNC(powerbal_state::atombjt_tile_banking_w));
+	map(0x094002, 0x094003).noprw();    /* IRQ enable? */
+	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(this, FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
+	map(0x0c2010, 0x0c2011).portr("IN0");
+	map(0x0c2012, 0x0c2013).portr("IN1");
+	map(0x0c2014, 0x0c2015).portr("IN2");
+	map(0x0c2016, 0x0c2017).portr("DSW1");
+	map(0x0c2018, 0x0c2019).portr("DSW2");
+	map(0x0c201c, 0x0c201d).w(this, FUNC(powerbal_state::oki_banking));
+	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0c4000, 0x0c4001).nopw(); // always 0?
+	map(0x0f0000, 0x0fffff).ram().share("mainram");
+	map(0x100000, 0x100fff).ram();
+	map(0x101000, 0x101fff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(powerbal_state::oki_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void powerbal_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
+}
 
 static INPUT_PORTS_START( powerbal )
 	PORT_START("IN0")

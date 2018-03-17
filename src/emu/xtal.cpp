@@ -138,6 +138,7 @@ const double XTAL::known_xtals[] = {
 	 10'380'000, /* 10.38_MHz_XTAL         Fairlight Q219 Lightpen/Graphics Card */
 	 10'500'000, /* 10.5_MHz_XTAL          Agat-7 */
 	 10'595'000, /* 10.595_MHz_XTAL        Mad Alien */
+	 10'644'500, /* 10.6445_MHz_XTAL       TRS-80 Model I */
 	 10'687'500, /* 10.6875_MHz_XTAL       BBC Bridge Companion */
 	 10'694'250, /* 10.69425_MHz_XTAL      Xerox 820 */
 	 10'717'200, /* 10.7172_MHz_XTAL       Eltec EurocomII */
@@ -163,6 +164,7 @@ const double XTAL::known_xtals[] = {
 	 12'472'500, /* 12.4725_MHz_XTAL       Bonanza's Mini Boy 7 */
 	 12'480'000, /* 12.48_MHz_XTAL         TRS-80 Model II */
 	 12'500'000, /* 12.5_MHz_XTAL          Red Alert audio board */
+	 12'672'000, /* 12.672_MHz_XTAL        TRS-80 Model 4 80*24 video */
 	 12'800'000, /* 12.8_MHz_XTAL          Cave CV1000 */
 	 12'854'400, /* 12.8544_MHz_XTAL       Alphatronic P3 */
 	 12'979'200, /* 12.9792_MHz_XTAL       Exidy 440 */
@@ -184,6 +186,7 @@ const double XTAL::known_xtals[] = {
 	 14'705'882, /* 14.705882_MHz_XTAL     Aleck64 */
 	 14'745'600, /* 14.7456_MHz_XTAL       Namco System 12 & System Super 22/23 for JVS */
 	 14'916'000, /* 14.916_MHz_XTAL        ADDS Viewpoint 122 */
+	 14'976'000, /* 14.976_MHz_XTAL        CIT-101 80-column display clock */
 	 15'000'000, /* 15_MHz_XTAL            Sinclair QL, Amusco Poker */
 	 15'148'800, /* 15.1488_MHz_XTAL       Zentec 9002/9003 */
 	 15'288'000, /* 15.288_MHz_XTAL        DEC VT220 80-column display clock */
@@ -224,6 +227,7 @@ const double XTAL::known_xtals[] = {
 	 19'968'000, /* 19.968_MHz_XTAL        Used mostly by some Taito games */
 	 20'000'000, /* 20_MHz_XTAL            - */
 	 20'160'000, /* 20.16_MHz_XTAL         Nintendo 8080 */
+	 20'275'200, /* 20.2752_MHz_XTAL       TRS-80 Model III */
 	 20'625'000, /* 20.625_MHz_XTAL        SM 7238 */
 	 20'790'000, /* 20.79_MHz_XTAL         Blockade-hardware Gremlin games */
 	 21'000'000, /* 21_MHz_XTAL            Lock-On pixel clock */
@@ -237,6 +241,7 @@ const double XTAL::known_xtals[] = {
 	 22'096'000, /* 22.096_MHz_XTAL        ADDS Viewpoint 122 */
 	 22'118'400, /* 22.1184_MHz_XTAL       Amusco Poker */
 	 22'321'000, /* 22.321_MHz_XTAL        Apple LaserWriter II NT */
+	 22'464'000, /* 22.464_MHz_XTAL        CIT-101 132-column display clock */
 	 22'656'000, /* 22.656_MHz_XTAL        Super Pinball Action (~1440x NTSC line rate) */
 	 22'896'000, /* 22.896_MHz_XTAL        DEC VT220 132-column display clock */
 	 23'814'000, /* 23.814_MHz_XTAL        TeleVideo TVI-912, 920 & 950 */

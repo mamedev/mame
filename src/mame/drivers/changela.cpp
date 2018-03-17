@@ -159,41 +159,42 @@ WRITE_LINE_MEMBER(changela_state::coin_counter_2_w)
 }
 
 
-ADDRESS_MAP_START(changela_state::changela_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("spriteram") /* OBJ0 RAM */
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("videoram")    /* OBJ1 RAM */
-	AM_RANGE(0xa000, 0xa07f) AM_WRITE(changela_colors_w) AM_SHARE("colorram")   /* Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8) */
-	AM_RANGE(0xb000, 0xbfff) AM_ROM
+void changela_state::changela_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram().share("spriteram"); /* OBJ0 RAM */
+	map(0x9000, 0x97ff).ram().share("videoram");    /* OBJ1 RAM */
+	map(0xa000, 0xa07f).w(this, FUNC(changela_state::changela_colors_w)).share("colorram");   /* Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8) */
+	map(0xb000, 0xbfff).rom();
 
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(changela_mem_device_r, changela_mem_device_w) /* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
+	map(0xc000, 0xc7ff).rw(this, FUNC(changela_state::changela_mem_device_r), FUNC(changela_state::changela_mem_device_w)); /* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
 
 	/* LS138 - U16 */
-	AM_RANGE(0xc800, 0xc800) AM_WRITENOP                /* not connected */
-	AM_RANGE(0xc900, 0xc900) AM_WRITE(changela_mem_device_select_w) /* selects the memory device to be accessible at 0xc000-0xc7ff */
-	AM_RANGE(0xca00, 0xca00) AM_WRITE(changela_slope_rom_addr_hi_w)
-	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(changela_slope_rom_addr_lo_w)
+	map(0xc800, 0xc800).nopw();                /* not connected */
+	map(0xc900, 0xc900).w(this, FUNC(changela_state::changela_mem_device_select_w)); /* selects the memory device to be accessible at 0xc000-0xc7ff */
+	map(0xca00, 0xca00).w(this, FUNC(changela_state::changela_slope_rom_addr_hi_w));
+	map(0xcb00, 0xcb00).w(this, FUNC(changela_state::changela_slope_rom_addr_lo_w));
 
-	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w)
-	AM_RANGE(0xd010, 0xd011) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_data_w)
+	map(0xd000, 0xd001).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0xd010, 0xd011).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 
 	/* LS259 - U44 */
-	AM_RANGE(0xd020, 0xd027) AM_DEVWRITE("outlatch", ls259_device, write_d0)
+	map(0xd020, 0xd027).w("outlatch", FUNC(ls259_device::write_d0));
 
 	/* LS139 - U24 */
-	AM_RANGE(0xd024, 0xd024) AM_READ(changela_24_r)
-	AM_RANGE(0xd025, 0xd025) AM_READ(changela_25_r)
-	AM_RANGE(0xd028, 0xd028) AM_READ(mcu_r)
-	AM_RANGE(0xd02c, 0xd02c) AM_READ(changela_2c_r)
-	AM_RANGE(0xd02d, 0xd02d) AM_READ(changela_2d_r)
+	map(0xd024, 0xd024).r(this, FUNC(changela_state::changela_24_r));
+	map(0xd025, 0xd025).r(this, FUNC(changela_state::changela_25_r));
+	map(0xd028, 0xd028).r(this, FUNC(changela_state::mcu_r));
+	map(0xd02c, 0xd02c).r(this, FUNC(changela_state::changela_2c_r));
+	map(0xd02d, 0xd02d).r(this, FUNC(changela_state::changela_2d_r));
 
-	AM_RANGE(0xd030, 0xd030) AM_READWRITE(changela_30_r, mcu_w)
-	AM_RANGE(0xd031, 0xd031) AM_READ(changela_31_r)
+	map(0xd030, 0xd030).rw(this, FUNC(changela_state::changela_30_r), FUNC(changela_state::mcu_w));
+	map(0xd031, 0xd031).r(this, FUNC(changela_state::changela_31_r));
 
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* Watchdog */
+	map(0xe000, 0xe000).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* Watchdog */
 
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM /* RAM2 (Processor RAM) */
-ADDRESS_MAP_END
+	map(0xf000, 0xf7ff).ram(); /* RAM2 (Processor RAM) */
+}
 
 
 static INPUT_PORTS_START( changela )

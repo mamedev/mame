@@ -342,34 +342,37 @@ WRITE8_MEMBER( cv1k_state::serial_rtc_eeprom_w )
 }
 
 
-ADDRESS_MAP_START(cv1k_state::cv1k_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP AM_SHARE("rombase") // mmmbanc writes here on startup for some reason..
-	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM AM_SHARE("mainram")// work RAM
-	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(flash_io_r, flash_io_w, 0xffffffffffffffffU)
-	AM_RANGE(0x10400000, 0x10400007) AM_DEVWRITE8("ymz770", ymz770_device, write, 0xffffffffffffffffU)
-	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE8(serial_rtc_eeprom_r, serial_rtc_eeprom_w, 0xffffffffffffffffU)
+void cv1k_state::cv1k_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).rom().region("maincpu", 0).nopw().share("rombase"); // mmmbanc writes here on startup for some reason..
+	map(0x0c000000, 0x0c7fffff).ram().share("mainram");// work RAM
+	map(0x10000000, 0x10000007).rw(this, FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
+	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
+	map(0x10C00000, 0x10C00007).rw(this, FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
 //  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
-	AM_RANGE(0xf0000000, 0xf0ffffff) AM_RAM // mem mapped cache (sh3 internal?)
-ADDRESS_MAP_END
+	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
+}
 
-ADDRESS_MAP_START(cv1k_state::cv1k_d_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP AM_SHARE("rombase") // mmmbanc writes here on startup for some reason..
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("mainram") // work RAM
-	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(flash_io_r, flash_io_w, 0xffffffffffffffffU)
-	AM_RANGE(0x10400000, 0x10400007) AM_DEVWRITE8("ymz770", ymz770_device, write, 0xffffffffffffffffU)
-	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE8(serial_rtc_eeprom_r, serial_rtc_eeprom_w, 0xffffffffffffffffU)
+void cv1k_state::cv1k_d_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).rom().region("maincpu", 0).nopw().share("rombase"); // mmmbanc writes here on startup for some reason..
+	map(0x0c000000, 0x0cffffff).ram().share("mainram"); // work RAM
+	map(0x10000000, 0x10000007).rw(this, FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
+	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
+	map(0x10C00000, 0x10C00007).rw(this, FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
 //  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
-	AM_RANGE(0xf0000000, 0xf0ffffff) AM_RAM // mem mapped cache (sh3 internal?)
-ADDRESS_MAP_END
+	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
+}
 
-ADDRESS_MAP_START(cv1k_state::cv1k_port)
-	AM_RANGE(SH3_PORT_C, SH3_PORT_C+7) AM_READ_PORT("PORT_C")
-	AM_RANGE(SH3_PORT_D, SH3_PORT_D+7) AM_READ_PORT("PORT_D")
-	AM_RANGE(SH3_PORT_E, SH3_PORT_E+7) AM_READ( flash_port_e_r )
-	AM_RANGE(SH3_PORT_F, SH3_PORT_F+7) AM_READ_PORT("PORT_F")
-	AM_RANGE(SH3_PORT_L, SH3_PORT_L+7) AM_READ_PORT("PORT_L")
-	AM_RANGE(SH3_PORT_J, SH3_PORT_J+7) AM_DEVREADWRITE( "blitter", epic12_device, fpga_r, fpga_w )
-ADDRESS_MAP_END
+void cv1k_state::cv1k_port(address_map &map)
+{
+	map(SH3_PORT_C, SH3_PORT_C+7).portr("PORT_C");
+	map(SH3_PORT_D, SH3_PORT_D+7).portr("PORT_D");
+	map(SH3_PORT_E, SH3_PORT_E+7).r(this, FUNC(cv1k_state::flash_port_e_r));
+	map(SH3_PORT_F, SH3_PORT_F+7).portr("PORT_F");
+	map(SH3_PORT_L, SH3_PORT_L+7).portr("PORT_L");
+	map(SH3_PORT_J, SH3_PORT_J+7).rw(m_blitter, FUNC(epic12_device::fpga_r), FUNC(epic12_device::fpga_w));
+}
 
 
 static INPUT_PORTS_START( cv1k_base )

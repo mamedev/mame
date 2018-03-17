@@ -102,16 +102,18 @@ WRITE8_MEMBER(tgtpanic_state::color_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(tgtpanic_state::prg_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void tgtpanic_state::prg_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).ram().share("ram");
+}
 
-ADDRESS_MAP_START(tgtpanic_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(color_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-ADDRESS_MAP_END
+void tgtpanic_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w(this, FUNC(tgtpanic_state::color_w));
+	map(0x01, 0x01).portr("IN1");
+}
 
 
 /*************************************

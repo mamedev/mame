@@ -96,32 +96,36 @@ public:
 	void ppc640_map(address_map &map);
 };
 
-ADDRESS_MAP_START(amstrad_pc_state::ppc640_map)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void amstrad_pc_state::ppc640_map(address_map &map)
+{
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(amstrad_pc_state::pc2086_map)
-	AM_RANGE(0xc0000, 0xc9fff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0x10000)
-ADDRESS_MAP_END
+void amstrad_pc_state::pc2086_map(address_map &map)
+{
+	map(0xc0000, 0xc9fff).rom().region("bios", 0);
+	map(0xf0000, 0xfffff).rom().region("bios", 0x10000);
+}
 
-ADDRESS_MAP_START(amstrad_pc_state::pc200_io)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", pc_noppi_mb_device, map, 0xffff)
-	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(pc1640_port60_r, pc1640_port60_w, 0xffff)
-	AM_RANGE(0x0078, 0x0079) AM_READWRITE8(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)
-	AM_RANGE(0x007a, 0x007b) AM_READWRITE8(pc1640_mouse_y_r, pc1640_mouse_y_w, 0xffff)
-	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
-	AM_RANGE(0x0278, 0x027b) AM_READ8(pc200_port278_r, 0xffff)
-	AM_RANGE(0x0278, 0x027b) AM_DEVWRITE8("lpt_2", pc_lpt_device, write, 0x00ff)
-	AM_RANGE(0x0378, 0x037b) AM_READ8(pc200_port378_r, 0xffff)
-	AM_RANGE(0x0378, 0x037b) AM_DEVWRITE8("lpt_1", pc_lpt_device, write, 0x00ff)
-	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void amstrad_pc_state::pc200_io(address_map &map)
+{
+	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
+	map(0x0060, 0x0065).rw(this, FUNC(amstrad_pc_state::pc1640_port60_r), FUNC(amstrad_pc_state::pc1640_port60_w));
+	map(0x0078, 0x0079).rw(this, FUNC(amstrad_pc_state::pc1640_mouse_x_r), FUNC(amstrad_pc_state::pc1640_mouse_x_w));
+	map(0x007a, 0x007b).rw(this, FUNC(amstrad_pc_state::pc1640_mouse_y_r), FUNC(amstrad_pc_state::pc1640_mouse_y_w));
+	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
+	map(0x0278, 0x027b).r(this, FUNC(amstrad_pc_state::pc200_port278_r));
+	map(0x0278, 0x027b).w(m_lpt2, FUNC(pc_lpt_device::write)).umask16(0x00ff);
+	map(0x0378, 0x037b).r(this, FUNC(amstrad_pc_state::pc200_port378_r));
+	map(0x0378, 0x037b).w(m_lpt1, FUNC(pc_lpt_device::write)).umask16(0x00ff);
+	map(0x03bc, 0x03bf).rw("lpt_0", FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(amstrad_pc_state::ppc512_io)
-	AM_IMPORT_FROM(pc200_io)
-	AM_RANGE(0x0070, 0x0071) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffff)
-ADDRESS_MAP_END
+void amstrad_pc_state::ppc512_io(address_map &map)
+{
+	pc200_io(map);
+	map(0x0070, 0x0071).rw("rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+}
 
 /* pc20 (v2)
    fc078

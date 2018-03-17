@@ -172,33 +172,34 @@ INTERRUPT_GEN_MEMBER(skydiver_state::interrupt)
  *
  *************************************/
 
-ADDRESS_MAP_START(skydiver_state::skydiver_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x4300) AM_READWRITE(wram_r, wram_w)
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x4000) AM_RAM       /* RAM B1 */
-	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x4000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")       /* RAMs K1,M1,P1,J1,N1,K/L1,L1,H/J1 */
-	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x47f0) AM_DEVWRITE("latch1", f9334_device, write_a0)
-	AM_RANGE(0x1000, 0x100f) AM_MIRROR(0x47f0) AM_DEVWRITE("latch2", f9334_device, write_a0)
-	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x47e0) AM_READ_PORT("IN0")
-	AM_RANGE(0x1801, 0x1801) AM_MIRROR(0x47e0) AM_READ_PORT("IN1")
-	AM_RANGE(0x1802, 0x1802) AM_MIRROR(0x47e0) AM_READ_PORT("IN2")
-	AM_RANGE(0x1803, 0x1803) AM_MIRROR(0x47e0) AM_READ_PORT("IN3")
-	AM_RANGE(0x1804, 0x1804) AM_MIRROR(0x47e0) AM_READ_PORT("IN4")
-	AM_RANGE(0x1805, 0x1805) AM_MIRROR(0x47e0) AM_READ_PORT("IN5")
-	AM_RANGE(0x1806, 0x1806) AM_MIRROR(0x47e0) AM_READ_PORT("IN6")
-	AM_RANGE(0x1807, 0x1807) AM_MIRROR(0x47e0) AM_READ_PORT("IN7")
-	AM_RANGE(0x1808, 0x1808) AM_MIRROR(0x47e4) AM_READ_PORT("IN8")
-	AM_RANGE(0x1809, 0x1809) AM_MIRROR(0x47e4) AM_READ_PORT("IN9")
-	AM_RANGE(0x180a, 0x180a) AM_MIRROR(0x47e4) AM_READ_PORT("IN10")
-	AM_RANGE(0x180b, 0x180b) AM_MIRROR(0x47e4) AM_READ_PORT("IN11")
-	AM_RANGE(0x1810, 0x1810) AM_MIRROR(0x47e4) AM_READ_PORT("IN12")
-	AM_RANGE(0x1811, 0x1811) AM_MIRROR(0x47e4) AM_READ_PORT("IN13")
-	AM_RANGE(0x2000, 0x201f) AM_MIRROR(0x47e0) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(latch3_watchdog_w)
-	AM_RANGE(0x2800, 0x2fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x3800, 0x3fff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void skydiver_state::skydiver_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x007f).mirror(0x4300).rw(this, FUNC(skydiver_state::wram_r), FUNC(skydiver_state::wram_w));
+	map(0x0080, 0x00ff).mirror(0x4000).ram();       /* RAM B1 */
+	map(0x0400, 0x07ff).mirror(0x4000).ram().w(this, FUNC(skydiver_state::videoram_w)).share("videoram");       /* RAMs K1,M1,P1,J1,N1,K/L1,L1,H/J1 */
+	map(0x0800, 0x080f).mirror(0x47f0).w("latch1", FUNC(f9334_device::write_a0));
+	map(0x1000, 0x100f).mirror(0x47f0).w("latch2", FUNC(f9334_device::write_a0));
+	map(0x1800, 0x1800).mirror(0x47e0).portr("IN0");
+	map(0x1801, 0x1801).mirror(0x47e0).portr("IN1");
+	map(0x1802, 0x1802).mirror(0x47e0).portr("IN2");
+	map(0x1803, 0x1803).mirror(0x47e0).portr("IN3");
+	map(0x1804, 0x1804).mirror(0x47e0).portr("IN4");
+	map(0x1805, 0x1805).mirror(0x47e0).portr("IN5");
+	map(0x1806, 0x1806).mirror(0x47e0).portr("IN6");
+	map(0x1807, 0x1807).mirror(0x47e0).portr("IN7");
+	map(0x1808, 0x1808).mirror(0x47e4).portr("IN8");
+	map(0x1809, 0x1809).mirror(0x47e4).portr("IN9");
+	map(0x180a, 0x180a).mirror(0x47e4).portr("IN10");
+	map(0x180b, 0x180b).mirror(0x47e4).portr("IN11");
+	map(0x1810, 0x1810).mirror(0x47e4).portr("IN12");
+	map(0x1811, 0x1811).mirror(0x47e4).portr("IN13");
+	map(0x2000, 0x201f).mirror(0x47e0).r(m_watchdog, FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(skydiver_state::latch3_watchdog_w));
+	map(0x2800, 0x2fff).mirror(0x4000).rom();
+	map(0x3000, 0x37ff).mirror(0x4000).rom();
+	map(0x3800, 0x3fff).rom();
+	map(0x7800, 0x7fff).rom();
+}
 
 
 

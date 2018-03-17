@@ -461,35 +461,39 @@ READ8_MEMBER(ufo_state::ex_upd_busy_r)
 
 /* Memory maps */
 
-ADDRESS_MAP_START(ufo_state::ufo_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ufo_state::ufo_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(ufo_state::ufo_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit", pit8254_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ym", ym3438_device, read, write)
-	AM_RANGE(0x80, 0xbf) AM_DEVREADWRITE("io1", sega_315_5296_device, read, write)
-	AM_RANGE(0xc0, 0xff) AM_DEVREADWRITE("io2", sega_315_5296_device, read, write)
-ADDRESS_MAP_END
+void ufo_state::ufo_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x40, 0x43).rw("ym", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0x80, 0xbf).rw(m_io1, FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write));
+	map(0xc0, 0xff).rw(m_io2, FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write));
+}
 
 
-ADDRESS_MAP_START(ufo_state::ex_ufo21_portmap)
-	AM_IMPORT_FROM( ufo_portmap )
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("upd", upd7759_device, port_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(ex_upd_start_w) AM_READNOP
-	AM_RANGE(0x61, 0x61) AM_READ(ex_upd_busy_r)
-	AM_RANGE(0x64, 0x65) AM_WRITE(ex_ufo21_lamps_w) AM_READNOP
+void ufo_state::ex_ufo21_portmap(address_map &map)
+{
+	ufo_portmap(map);
+	map(0x20, 0x20).w(m_upd, FUNC(upd7759_device::port_w));
+	map(0x60, 0x60).w(this, FUNC(ufo_state::ex_upd_start_w)).nopr();
+	map(0x61, 0x61).r(this, FUNC(ufo_state::ex_upd_busy_r));
+	map(0x64, 0x65).w(this, FUNC(ufo_state::ex_ufo21_lamps_w)).nopr();
 //  AM_RANGE(0x68, 0x68) AM_WRITENOP // ?
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(ufo_state::ex_ufo800_portmap)
-	AM_IMPORT_FROM( ufo_portmap )
+void ufo_state::ex_ufo800_portmap(address_map &map)
+{
+	ufo_portmap(map);
 //  AM_RANGE(0x60, 0x67) AM_NOP // unused?
 //  AM_RANGE(0x68, 0x68) AM_WRITENOP // ?
-ADDRESS_MAP_END
+}
 
 
 

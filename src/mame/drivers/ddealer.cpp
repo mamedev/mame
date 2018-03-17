@@ -472,28 +472,29 @@ WRITE16_MEMBER(ddealer_state::mcu_shared_w)
 	}
 }
 
-ADDRESS_MAP_START(ddealer_state::ddealer)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
-	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
-	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("UNK")
-	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSW1")
-	AM_RANGE(0x084000, 0x084003) AM_DEVWRITE8("ymsnd", ym2203_device, write, 0x00ff) // ym ?
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x08c000, 0x08cfff) AM_RAM AM_SHARE("vregs") // palette ram
+void ddealer_state::ddealer(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x080001).portr("IN0");
+	map(0x080002, 0x080003).portr("IN1");
+	map(0x080006, 0x080007).portr("UNK");
+	map(0x080008, 0x080009).portr("DSW1");
+	map(0x084000, 0x084003).w("ymsnd", FUNC(ym2203_device::write)).umask16(0x00ff); // ym ?
+	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x08c000, 0x08cfff).ram().share("vregs"); // palette ram
 
 	/* this might actually be 1 tilemap with some funky rowscroll / columnscroll enabled, I'm not sure */
-	AM_RANGE(0x090000, 0x090fff) AM_RAM AM_SHARE("left_fg_vratop")
-	AM_RANGE(0x091000, 0x091fff) AM_RAM AM_SHARE("right_fg_vratop")
-	AM_RANGE(0x092000, 0x092fff) AM_RAM AM_SHARE("left_fg_vrabot")
-	AM_RANGE(0x093000, 0x093fff) AM_RAM AM_SHARE("right_fg_vrabot")
+	map(0x090000, 0x090fff).ram().share("left_fg_vratop");
+	map(0x091000, 0x091fff).ram().share("right_fg_vratop");
+	map(0x092000, 0x092fff).ram().share("left_fg_vrabot");
+	map(0x093000, 0x093fff).ram().share("right_fg_vrabot");
 	//AM_RANGE(0x094000, 0x094001) AM_NOP // always 0?
-	AM_RANGE(0x098000, 0x098001) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE(back_vram_w) AM_SHARE("back_vram") // bg tilemap
-	AM_RANGE(0x0f0000, 0x0fdfff) AM_RAM AM_SHARE("work_ram")
-	AM_RANGE(0x0fe000, 0x0fefff) AM_RAM_WRITE(mcu_shared_w) AM_SHARE("mcu_shared_ram")
-	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x098000, 0x098001).w(this, FUNC(ddealer_state::flipscreen_w));
+	map(0x09c000, 0x09cfff).ram().w(this, FUNC(ddealer_state::back_vram_w)).share("back_vram"); // bg tilemap
+	map(0x0f0000, 0x0fdfff).ram().share("work_ram");
+	map(0x0fe000, 0x0fefff).ram().w(this, FUNC(ddealer_state::mcu_shared_w)).share("mcu_shared_ram");
+	map(0x0ff000, 0x0fffff).ram();
+}
 
 static INPUT_PORTS_START( ddealer )
 	PORT_START("IN0")

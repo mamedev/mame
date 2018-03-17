@@ -80,20 +80,22 @@ WRITE8_MEMBER( eti660_state::colorram_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(eti660_state::mem_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0400, 0x047f) AM_RAM
-	AM_RANGE(0x0480, 0x05ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x0600, 0x0fff) AM_RAM
-ADDRESS_MAP_END
+void eti660_state::mem_map(address_map &map)
+{
+	map.global_mask(0xfff);
+	map(0x0000, 0x03ff).rom();
+	map(0x0400, 0x047f).ram();
+	map(0x0480, 0x05ff).ram().share("videoram");
+	map(0x0600, 0x0fff).ram();
+}
 
-ADDRESS_MAP_START(eti660_state::io_map)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(pia_r, pia_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(colorram_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispoff_r, tone_latch_w)
-ADDRESS_MAP_END
+void eti660_state::io_map(address_map &map)
+{
+	map(0x01, 0x01).rw(m_cti, FUNC(cdp1864_device::dispon_r), FUNC(cdp1864_device::step_bgcolor_w));
+	map(0x02, 0x02).rw(this, FUNC(eti660_state::pia_r), FUNC(eti660_state::pia_w));
+	map(0x03, 0x03).w(this, FUNC(eti660_state::colorram_w));
+	map(0x04, 0x04).rw(m_cti, FUNC(cdp1864_device::dispoff_r), FUNC(cdp1864_device::tone_latch_w));
+}
 
 /* Input Ports */
 static INPUT_PORTS_START( eti660 )

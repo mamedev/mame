@@ -569,23 +569,25 @@ WRITE16_MEMBER(cb2001_state::cb2001_bg_w)
 
 }
 
-ADDRESS_MAP_START(cb2001_state::cb2001_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0x20000, 0x20fff) AM_RAM AM_SHARE("vrafg")
-	AM_RANGE(0x21000, 0x21fff) AM_RAM_WRITE(cb2001_bg_w) AM_SHARE("vrabg")
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
-ADDRESS_MAP_END
+void cb2001_state::cb2001_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).ram();
+	map(0x20000, 0x20fff).ram().share("vrafg");
+	map(0x21000, 0x21fff).ram().w(this, FUNC(cb2001_state::cb2001_bg_w)).share("vrabg");
+	map(0xc0000, 0xfffff).rom().region("boot_prg", 0);
+}
 
-ADDRESS_MAP_START(cb2001_state::cb2001_io)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0xffff)   /* Input Ports */
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0xffff)   /* DIP switches */
-	AM_RANGE(0x20, 0x21) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0xff00)
-	AM_RANGE(0x22, 0x23) AM_DEVWRITE8("aysnd", ay8910_device, data_address_w, 0xffff)
+void cb2001_state::cb2001_io(address_map &map)
+{
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));   /* Input Ports */
+	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));   /* DIP switches */
+	map(0x21, 0x21).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x22, 0x23).w("aysnd", FUNC(ay8910_device::data_address_w));
 
-	AM_RANGE(0x30, 0x31) AM_READ8(irq_ack_r, 0x00ff)
-	AM_RANGE(0x30, 0x31) AM_WRITE(cb2001_vidctrl_w)
-	AM_RANGE(0x32, 0x33) AM_WRITE(cb2001_vidctrl2_w)
-ADDRESS_MAP_END
+	map(0x30, 0x30).r(this, FUNC(cb2001_state::irq_ack_r));
+	map(0x30, 0x31).w(this, FUNC(cb2001_state::cb2001_vidctrl_w));
+	map(0x32, 0x33).w(this, FUNC(cb2001_state::cb2001_vidctrl2_w));
+}
 
 static INPUT_PORTS_START( cb2001 )
 	PORT_START("IN0")

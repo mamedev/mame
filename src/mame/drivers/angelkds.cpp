@@ -165,39 +165,42 @@ contain a level.
 
 */
 
-ADDRESS_MAP_START(angelkds_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(angelkds_bgtopvideoram_w) AM_SHARE("bgtopvideoram") /* Top Half of Screen */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(angelkds_bgbotvideoram_w) AM_SHARE("bgbotvideoram") /* Bottom Half of Screen */
-	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(angelkds_txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xec00, 0xecff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xed00, 0xedff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xee00, 0xeeff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xef00, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(angelkds_bgtopbank_write)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(angelkds_bgtopscroll_write)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(angelkds_bgbotbank_write)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(angelkds_bgbotscroll_write)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(angelkds_txbank_write)
-	AM_RANGE(0xf005, 0xf005) AM_WRITE(angelkds_layer_ctrl_write)
-ADDRESS_MAP_END
+void angelkds_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe3ff).ram().w(this, FUNC(angelkds_state::angelkds_bgtopvideoram_w)).share("bgtopvideoram"); /* Top Half of Screen */
+	map(0xe400, 0xe7ff).ram().w(this, FUNC(angelkds_state::angelkds_bgbotvideoram_w)).share("bgbotvideoram"); /* Bottom Half of Screen */
+	map(0xe800, 0xebff).ram().w(this, FUNC(angelkds_state::angelkds_txvideoram_w)).share("txvideoram");
+	map(0xec00, 0xecff).ram().share("spriteram");
+	map(0xed00, 0xedff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0xee00, 0xeeff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xef00, 0xefff).ram();
+	map(0xf000, 0xf000).w(this, FUNC(angelkds_state::angelkds_bgtopbank_write));
+	map(0xf001, 0xf001).w(this, FUNC(angelkds_state::angelkds_bgtopscroll_write));
+	map(0xf002, 0xf002).w(this, FUNC(angelkds_state::angelkds_bgbotbank_write));
+	map(0xf003, 0xf003).w(this, FUNC(angelkds_state::angelkds_bgbotscroll_write));
+	map(0xf004, 0xf004).w(this, FUNC(angelkds_state::angelkds_txbank_write));
+	map(0xf005, 0xf005).w(this, FUNC(angelkds_state::angelkds_layer_ctrl_write));
+}
 
-ADDRESS_MAP_START(angelkds_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void angelkds_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8000, 0xbfff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(angelkds_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP // 00 on start-up, not again
+void angelkds_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopw(); // 00 on start-up, not again
 
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	map(0x40, 0x43).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x80, 0x83).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-	AM_RANGE(0xc0, 0xc3) AM_READWRITE(angelkds_main_sound_r, angelkds_main_sound_w) // 02 various points
-ADDRESS_MAP_END
+	map(0xc0, 0xc3).rw(this, FUNC(angelkds_state::angelkds_main_sound_r), FUNC(angelkds_state::angelkds_main_sound_w)); // 02 various points
+}
 
 
 
@@ -205,20 +208,22 @@ ADDRESS_MAP_END
 
 /* sub cpu */
 
-ADDRESS_MAP_START(angelkds_state::sub_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xaaa9, 0xaaa9) AM_READNOP
-	AM_RANGE(0xaaab, 0xaaab) AM_READNOP
-	AM_RANGE(0xaaac, 0xaaac) AM_READNOP
-ADDRESS_MAP_END
+void angelkds_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xaaa9, 0xaaa9).nopr();
+	map(0xaaab, 0xaaab).nopr();
+	map(0xaaac, 0xaaac).nopr();
+}
 
-ADDRESS_MAP_START(angelkds_state::sub_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_READWRITE(angelkds_sub_sound_r, angelkds_sub_sound_w) // spcpostn
-ADDRESS_MAP_END
+void angelkds_state::sub_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x40, 0x41).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x80, 0x83).rw(this, FUNC(angelkds_state::angelkds_sub_sound_r), FUNC(angelkds_state::angelkds_sub_sound_w)); // spcpostn
+}
 
 
 /* Input Ports */

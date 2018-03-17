@@ -352,33 +352,34 @@ WRITE16_MEMBER(sliver_state::sound_w)
 	m_audiocpu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
 }
 
-ADDRESS_MAP_START(sliver_state::sliver_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+void sliver_state::sliver_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
 
-	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x100002, 0x100003) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x100004, 0x100005) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+	map(0x100001, 0x100001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x100003, 0x100003).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x100005, 0x100005).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0x300002, 0x300003) AM_NOP // bit 0 tested, writes 0xe0 and 0xc0 - both r and w at the end of interrupt code
+	map(0x300002, 0x300003).noprw(); // bit 0 tested, writes 0xe0 and 0xc0 - both r and w at the end of interrupt code
 
-	AM_RANGE(0x300004, 0x300005) AM_WRITE(io_offset_w) //unknown i/o device
-	AM_RANGE(0x300006, 0x300007) AM_WRITE(io_data_w)
+	map(0x300004, 0x300005).w(this, FUNC(sliver_state::io_offset_w)); //unknown i/o device
+	map(0x300006, 0x300007).w(this, FUNC(sliver_state::io_data_w));
 
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("DSW")
-	AM_RANGE(0x400006, 0x400007) AM_WRITE(fifo_data_w)
-	AM_RANGE(0x400008, 0x400009) AM_WRITE(fifo_clear_w)
-	AM_RANGE(0x40000a, 0x40000b) AM_WRITE(fifo_flush_w)
-	AM_RANGE(0x40000c, 0x40000d) AM_WRITE(jpeg1_w)
-	AM_RANGE(0x40000e, 0x40000f) AM_WRITE(jpeg2_w)
+	map(0x400000, 0x400001).portr("P1_P2");
+	map(0x400002, 0x400003).portr("SYSTEM");
+	map(0x400004, 0x400005).portr("DSW");
+	map(0x400006, 0x400007).w(this, FUNC(sliver_state::fifo_data_w));
+	map(0x400008, 0x400009).w(this, FUNC(sliver_state::fifo_clear_w));
+	map(0x40000a, 0x40000b).w(this, FUNC(sliver_state::fifo_flush_w));
+	map(0x40000c, 0x40000d).w(this, FUNC(sliver_state::jpeg1_w));
+	map(0x40000e, 0x40000f).w(this, FUNC(sliver_state::jpeg2_w));
 
-	AM_RANGE(0x400010, 0x400015) AM_WRITENOP //unknown
-	AM_RANGE(0x400016, 0x400017) AM_WRITE(sound_w)
-	AM_RANGE(0x400018, 0x400019) AM_WRITENOP //unknown
+	map(0x400010, 0x400015).nopw(); //unknown
+	map(0x400016, 0x400017).w(this, FUNC(sliver_state::sound_w));
+	map(0x400018, 0x400019).nopw(); //unknown
 
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xff0000, 0xffffff).ram();
+}
 
 // Sound CPU
 
@@ -388,19 +389,22 @@ WRITE8_MEMBER(sliver_state::oki_setbank)
 	membank("okibank")->set_entry(bank);
 }
 
-ADDRESS_MAP_START(sliver_state::soundmem_prg)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void sliver_state::soundmem_prg(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(sliver_state::soundmem_io)
-	AM_RANGE(0x0100, 0x0100) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x0101, 0x0101) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void sliver_state::soundmem_io(address_map &map)
+{
+	map(0x0100, 0x0100).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0101, 0x0101).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(sliver_state::oki_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void sliver_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
+}
 
 void sliver_state::video_start()
 {
@@ -499,9 +503,10 @@ static INPUT_PORTS_START( sliver )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x0000, "SW2:8" )    /* Listed as "UNUSED (MUST ON)" */
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(sliver_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_RAM AM_SHARE("colorram")
-ADDRESS_MAP_END
+void sliver_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).ram().share("colorram");
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER ( sliver_state::obj_irq_cb )
 {

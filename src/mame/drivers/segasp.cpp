@@ -178,49 +178,50 @@ READ64_MEMBER(segasp_state::sp_io_r)
 }
 
 // todo, base DC / Naomi stuff should be in it's own map, differences only here, same for Naomi 2 etc.
-ADDRESS_MAP_START(segasp_state::segasp_map)
+void segasp_state::segasp_map(address_map &map)
+{
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
+	map(0x00000000, 0x001fffff).mirror(0xa2000000).rom().region("maincpu", 0); // BIOS
 
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
-	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, 0xffffffffffffffffU )
-	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, 0x0000ffff0000ffffU )
-	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, 0xffffffffffffffffU )
-	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, 0xffffffffffffffffU)
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, 0xffffffffffffffffU)
-	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_modem_r, dc_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, 0xffffffffffffffffU)
-	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16("aicartc", aicartc_device, read, write, 0x0000ffff0000ffffU )
+	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(this, FUNC(segasp_state::dc_sysctrl_r), FUNC(segasp_state::dc_sysctrl_w));
+	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
+	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
+	map(0x005f7400, 0x005f74ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::amap));
+	map(0x005f7800, 0x005f78ff).mirror(0x02000000).rw(this, FUNC(segasp_state::dc_g2_ctrl_r), FUNC(segasp_state::dc_g2_ctrl_w));
+	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
+	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
+	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(this, FUNC(segasp_state::dc_modem_r), FUNC(segasp_state::dc_modem_w));
+	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(this, FUNC(segasp_state::dc_aica_reg_r), FUNC(segasp_state::dc_aica_reg_w));
+	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
 
-	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE(sh4_soundram_r, sh4_soundram_w)           // sound RAM (8 MB)
+	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(this, FUNC(segasp_state::sh4_soundram_r), FUNC(segasp_state::sh4_soundram_w));           // sound RAM (8 MB)
 
 	/* External Device */
-	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM // banked access to ROM/NET board address space, mainly backup SRAM and ATA
-	AM_RANGE(0x01010000, 0x01010007) AM_READWRITE(sp_bank_r, sp_bank_w )
+	map(0x01000000, 0x0100ffff).ram(); // banked access to ROM/NET board address space, mainly backup SRAM and ATA
+	map(0x01010000, 0x01010007).rw(this, FUNC(segasp_state::sp_bank_r), FUNC(segasp_state::sp_bank_w));
 //  AM_RANGE(0x01010080, 0x01010087) IRQ pending/reset, ATA control
-	AM_RANGE(0x01010100, 0x01010127) AM_READ(sp_io_r)
-	AM_RANGE(0x01010128, 0x0101012f) AM_READWRITE(sp_eeprom_r, sp_eeprom_w )
-	AM_RANGE(0x01010150, 0x01010157) AM_READ(sp_rombdflg_r)
+	map(0x01010100, 0x01010127).r(this, FUNC(segasp_state::sp_io_r));
+	map(0x01010128, 0x0101012f).rw(this, FUNC(segasp_state::sp_eeprom_r), FUNC(segasp_state::sp_eeprom_w));
+	map(0x01010150, 0x01010157).r(this, FUNC(segasp_state::sp_rombdflg_r));
 //  AM_RANGE(0x01010180, 0x010101af) custom UART 1
 //  AM_RANGE(0x010101c0, 0x010101ef) custom UART 2
 
 	/* Area 1 */
-	AM_RANGE(0x04000000, 0x04ffffff) AM_MIRROR(0x02000000) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_MIRROR(0x02000000) AM_RAM AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	map(0x04000000, 0x04ffffff).mirror(0x02000000).ram().share("dc_texture_ram");      // texture memory 64 bit access
+	map(0x05000000, 0x05ffffff).mirror(0x02000000).ram().share("frameram"); // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 2*/
-	AM_RANGE(0x08000000, 0x09ffffff) AM_MIRROR(0x02000000) AM_NOP // 'Unassigned'
+	map(0x08000000, 0x09ffffff).mirror(0x02000000).noprw(); // 'Unassigned'
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_MIRROR(0xa2000000) AM_RAM AM_SHARE("dc_ram")
+	map(0x0c000000, 0x0dffffff).mirror(0xa2000000).ram().share("dc_ram");
 
 	/* Area 4 */
-	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
-	AM_RANGE(0x10800000, 0x10ffffff) AM_DEVWRITE8("powervr2", powervr2_device, ta_fifo_yuv_w, 0xffffffffffffffffU)
-	AM_RANGE(0x11000000, 0x11ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath0_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
+	map(0x10000000, 0x107fffff).mirror(0x02000000).w(m_powervr2, FUNC(powervr2_device::ta_fifo_poly_w));
+	map(0x10800000, 0x10ffffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_yuv_w));
+	map(0x11000000, 0x11ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath0_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	AM_RANGE(0x13000000, 0x13ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath1_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
+	map(0x13000000, 0x13ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
 
 	/* Area 5 */
 	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
@@ -230,11 +231,12 @@ ADDRESS_MAP_START(segasp_state::segasp_map)
 
 	/* Area 7 */
 	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(segasp_state::onchip_port)
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(sn_93c46a_r, sn_93c46a_w)
-ADDRESS_MAP_END
+void segasp_state::onchip_port(address_map &map)
+{
+	map(0x00, 0x0f).rw(this, FUNC(segasp_state::sn_93c46a_r), FUNC(segasp_state::sn_93c46a_w));
+}
 
 
 INPUT_PORTS_START( segasp )

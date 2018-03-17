@@ -484,12 +484,13 @@ WRITE64_MEMBER(triforce_state::gc_exi_w)
 {
 }
 
-ADDRESS_MAP_START(triforce_state::gc_map)
-	AM_RANGE(0x00000000, 0x017fffff) AM_RAM
-	AM_RANGE(0x0c003000, 0x0c003fff) AM_READWRITE(gc_pi_r, gc_pi_w)
-	AM_RANGE(0x0c006800, 0x0c0068ff) AM_READWRITE(gc_exi_r, gc_exi_w)
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share2")  /* Program ROM */
-ADDRESS_MAP_END
+void triforce_state::gc_map(address_map &map)
+{
+	map(0x00000000, 0x017fffff).ram();
+	map(0x0c003000, 0x0c003fff).rw(this, FUNC(triforce_state::gc_pi_r), FUNC(triforce_state::gc_pi_w));
+	map(0x0c006800, 0x0c0068ff).rw(this, FUNC(triforce_state::gc_exi_r), FUNC(triforce_state::gc_exi_w));
+	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0).share("share2");  /* Program ROM */
+}
 
 
 void triforce_state::video_start()

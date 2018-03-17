@@ -45,21 +45,22 @@ TODO: Emulated sound
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(gotya_state::gotya_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x5000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("P1")
-	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("P2")
-	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("DSW")
-	AM_RANGE(0x6004, 0x6004) AM_WRITE(gotya_video_control_w)
-	AM_RANGE(0x6005, 0x6005) AM_WRITE(gotya_soundlatch_w)
-	AM_RANGE(0x6006, 0x6006) AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0x6007, 0x6007) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gotya_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gotya_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd000, 0xd3df) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0xd3e0, 0xd3ff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void gotya_state::gotya_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x5000, 0x5fff).ram();
+	map(0x6000, 0x6000).portr("P1");
+	map(0x6001, 0x6001).portr("P2");
+	map(0x6002, 0x6002).portr("DSW");
+	map(0x6004, 0x6004).w(this, FUNC(gotya_state::gotya_video_control_w));
+	map(0x6005, 0x6005).w(this, FUNC(gotya_state::gotya_soundlatch_w));
+	map(0x6006, 0x6006).writeonly().share("scroll");
+	map(0x6007, 0x6007).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xc000, 0xc7ff).ram().w(this, FUNC(gotya_state::gotya_videoram_w)).share("videoram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(gotya_state::gotya_colorram_w)).share("colorram");
+	map(0xd000, 0xd3df).ram().share("videoram2");
+	map(0xd3e0, 0xd3ff).ram().share("spriteram");
+}
 
 
 static INPUT_PORTS_START( gotya )

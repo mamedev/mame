@@ -23,7 +23,7 @@
 // - 64-term microinstructions PLA between the RAM and ROM, similar to TMS0980,
 //   plus separate lines for custom opcode handling like TMS0270, used for SETR and RSTR
 // - 24-term output PLA above LCD RAM
-DEFINE_DEVICE_TYPE(TP0320, tp0320_cpu_device, "tp0320", "TP0320") // 28-pin SDIP, ..
+DEFINE_DEVICE_TYPE(TP0320, tp0320_cpu_device, "tp0320", "Texas Instruments TP0320") // 28-pin SDIP, ..
 
 
 // internal memory maps

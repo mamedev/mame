@@ -169,32 +169,34 @@ WRITE8_MEMBER( tek4051_state::lbs_w )
 //  ADDRESS_MAP( tek4051_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(tek4051_state::tek4051_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x7fff) AM_RAM // optional RAM
-	AM_RANGE(0x8000, 0x877f) AM_ROM AM_REGION(MC6800_TAG, 0)
-	AM_RANGE(0x878c, 0x878f) AM_DEVREADWRITE(MC6820_Y_TAG, pia6821_device, read, write)
-	AM_RANGE(0x8794, 0x8797) AM_DEVREADWRITE(MC6820_X_TAG, pia6821_device, read, write)
-	AM_RANGE(0x8798, 0x879b) AM_DEVREADWRITE(MC6820_TAPE_TAG, pia6821_device, read, write)
-	AM_RANGE(0x87a8, 0x87ab) AM_DEVREADWRITE(MC6820_KB_TAG, pia6821_device, read, write)
-	AM_RANGE(0x87b0, 0x87b3) AM_DEVREADWRITE(MC6820_GPIB_TAG, pia6821_device, read, write)
-	AM_RANGE(0x87c0, 0x87c0) AM_MIRROR(0x03) AM_WRITE(lbs_w)
+void tek4051_state::tek4051_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x7fff).ram(); // optional RAM
+	map(0x8000, 0x877f).rom().region(MC6800_TAG, 0);
+	map(0x878c, 0x878f).rw(MC6820_Y_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8794, 0x8797).rw(MC6820_X_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8798, 0x879b).rw(MC6820_TAPE_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x87a8, 0x87ab).rw(MC6820_KB_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x87b0, 0x87b3).rw(m_gpib_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x87c0, 0x87c0).mirror(0x03).w(this, FUNC(tek4051_state::lbs_w));
 //  AM_RANGE(0x87c0, 0x87c3) AM_DEVREADWRITE(MC6820_COM_TAG, pia6821_device, read, write)
 //  AM_RANGE(0x87c4, 0x87c5) AM_MIRROR(0x02) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, read, write)
 //  AM_RANGE(0x87c8, 0x87cb) XPC2
 //  AM_RANGE(0x87cc, 0x87cf) XPC3
 //  AM_RANGE(0x87d0, 0x87d3) XPC4
-	AM_RANGE(0x8800, 0xa7ff) AM_ROM AM_REGION(MC6800_TAG, 0x800)
-	AM_RANGE(0xa800, 0xffff) AM_ROM AM_REGION(MC6800_TAG, 0x2800)
-ADDRESS_MAP_END
+	map(0x8800, 0xa7ff).rom().region(MC6800_TAG, 0x800);
+	map(0xa800, 0xffff).rom().region(MC6800_TAG, 0x2800);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( tek4052_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(tek4052_state::tek4052_mem)
-ADDRESS_MAP_END
+void tek4052_state::tek4052_mem(address_map &map)
+{
+}
 
 
 

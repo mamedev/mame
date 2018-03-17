@@ -32,8 +32,8 @@
 *
 **********************************************************************/
 
-#ifndef MAME_MACHIEN_68230PIT_H
-#define MAME_MACHIEN_68230PIT_H
+#ifndef MAME_MACHINE_68230PIT_H
+#define MAME_MACHINE_68230PIT_H
 
 #pragma once
 
@@ -171,6 +171,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc5_w ) { pc_update_bit(5, state); }
 	DECLARE_WRITE_LINE_MEMBER( pc6_w ) { pc_update_bit(6, state); }
 	DECLARE_WRITE_LINE_MEMBER( pc7_w ) { pc_update_bit(7, state); }
+
+	uint8_t irq_tiack();
+	uint8_t irq_piack();
 
 private:
 	void wr_pitreg_pgcr(uint8_t data);
@@ -320,8 +323,6 @@ protected:
 
 	// Interrupt methods
 	void trigger_interrupt(int source);
-	uint8_t irq_tiack();
-	uint8_t irq_piack();
 
 	int m_icount;
 
@@ -379,4 +380,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(PIT68230, pit68230_device)
 
-#endif // MAME_MACHIEN_68230PIT_H
+#endif // MAME_MACHINE_68230PIT_H

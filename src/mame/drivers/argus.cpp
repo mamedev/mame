@@ -180,92 +180,97 @@ WRITE8_MEMBER(argus_state::bankselect_w)
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(argus_state::argus_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc200, 0xc200) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc201, 0xc201) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xc202, 0xc202) AM_WRITE(bankselect_w)
-	AM_RANGE(0xc300, 0xc301) AM_RAM AM_SHARE("bg0_scrollx")
-	AM_RANGE(0xc302, 0xc303) AM_RAM AM_SHARE("bg0_scrolly")
-	AM_RANGE(0xc308, 0xc309) AM_RAM AM_SHARE("bg1_scrollx")
-	AM_RANGE(0xc30a, 0xc30b) AM_RAM AM_SHARE("bg1_scrolly")
-	AM_RANGE(0xc30c, 0xc30c) AM_WRITE(argus_bg_status_w)
-	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(argus_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(txram_w) AM_SHARE("txram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(bg1ram_w) AM_SHARE("bg1ram")
-	AM_RANGE(0xe000, 0xf1ff) AM_RAM
-	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void argus_state::argus_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0xc000, 0xc000).portr("SYSTEM");
+	map(0xc001, 0xc001).portr("P1");
+	map(0xc002, 0xc002).portr("P2");
+	map(0xc003, 0xc003).portr("DSW1");
+	map(0xc004, 0xc004).portr("DSW2");
+	map(0xc200, 0xc200).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc201, 0xc201).w(this, FUNC(argus_state::flipscreen_w));
+	map(0xc202, 0xc202).w(this, FUNC(argus_state::bankselect_w));
+	map(0xc300, 0xc301).ram().share("bg0_scrollx");
+	map(0xc302, 0xc303).ram().share("bg0_scrolly");
+	map(0xc308, 0xc309).ram().share("bg1_scrollx");
+	map(0xc30a, 0xc30b).ram().share("bg1_scrolly");
+	map(0xc30c, 0xc30c).w(this, FUNC(argus_state::argus_bg_status_w));
+	map(0xc400, 0xcfff).ram().w(this, FUNC(argus_state::argus_paletteram_w)).share("paletteram");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(argus_state::txram_w)).share("txram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(argus_state::bg1ram_w)).share("bg1ram");
+	map(0xe000, 0xf1ff).ram();
+	map(0xf200, 0xf7ff).ram().share("spriteram");
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(argus_state::valtric_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc200, 0xc200) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc201, 0xc201) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xc202, 0xc202) AM_WRITE(bankselect_w)
-	AM_RANGE(0xc300, 0xc300) AM_WRITE(valtric_unknown_w)
-	AM_RANGE(0xc308, 0xc309) AM_RAM AM_SHARE("bg1_scrollx")
-	AM_RANGE(0xc30a, 0xc30b) AM_RAM AM_SHARE("bg1_scrolly")
-	AM_RANGE(0xc30c, 0xc30c) AM_WRITE(valtric_bg_status_w)
-	AM_RANGE(0xc30d, 0xc30d) AM_WRITE(valtric_mosaic_w)
-	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(valtric_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(txram_w) AM_SHARE("txram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(bg1ram_w) AM_SHARE("bg1ram")
-	AM_RANGE(0xe000, 0xf1ff) AM_RAM
-	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void argus_state::valtric_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0xc000, 0xc000).portr("SYSTEM");
+	map(0xc001, 0xc001).portr("P1");
+	map(0xc002, 0xc002).portr("P2");
+	map(0xc003, 0xc003).portr("DSW1");
+	map(0xc004, 0xc004).portr("DSW2");
+	map(0xc200, 0xc200).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc201, 0xc201).w(this, FUNC(argus_state::flipscreen_w));
+	map(0xc202, 0xc202).w(this, FUNC(argus_state::bankselect_w));
+	map(0xc300, 0xc300).w(this, FUNC(argus_state::valtric_unknown_w));
+	map(0xc308, 0xc309).ram().share("bg1_scrollx");
+	map(0xc30a, 0xc30b).ram().share("bg1_scrolly");
+	map(0xc30c, 0xc30c).w(this, FUNC(argus_state::valtric_bg_status_w));
+	map(0xc30d, 0xc30d).w(this, FUNC(argus_state::valtric_mosaic_w));
+	map(0xc400, 0xcfff).ram().w(this, FUNC(argus_state::valtric_paletteram_w)).share("paletteram");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(argus_state::txram_w)).share("txram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(argus_state::bg1ram_w)).share("bg1ram");
+	map(0xe000, 0xf1ff).ram();
+	map(0xf200, 0xf7ff).ram().share("spriteram");
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(argus_state::butasan_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc100, 0xc100) AM_WRITE(butasan_unknown_w)
-	AM_RANGE(0xc200, 0xc200) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc201, 0xc201) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xc202, 0xc202) AM_WRITE(bankselect_w)
-	AM_RANGE(0xc203, 0xc203) AM_WRITE(butasan_pageselect_w)
-	AM_RANGE(0xc300, 0xc301) AM_RAM AM_SHARE("bg0_scrollx")
-	AM_RANGE(0xc302, 0xc303) AM_RAM AM_SHARE("bg0_scrolly")
-	AM_RANGE(0xc304, 0xc304) AM_WRITE(butasan_bg0_status_w)
-	AM_RANGE(0xc308, 0xc309) AM_RAM AM_SHARE("bg1_scrollx")
-	AM_RANGE(0xc30a, 0xc30b) AM_RAM AM_SHARE("bg1_scrolly")
-	AM_RANGE(0xc30c, 0xc30c) AM_WRITE(butasan_bg1_status_w)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(butasan_bg1ram_w) AM_SHARE("butasan_bg1ram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(butasan_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(butasan_pagedram_r, butasan_pagedram_w)
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf67f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf680, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void argus_state::butasan_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0xc000, 0xc000).portr("SYSTEM");
+	map(0xc001, 0xc001).portr("P1");
+	map(0xc002, 0xc002).portr("P2");
+	map(0xc003, 0xc003).portr("DSW1");
+	map(0xc004, 0xc004).portr("DSW2");
+	map(0xc100, 0xc100).w(this, FUNC(argus_state::butasan_unknown_w));
+	map(0xc200, 0xc200).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc201, 0xc201).w(this, FUNC(argus_state::flipscreen_w));
+	map(0xc202, 0xc202).w(this, FUNC(argus_state::bankselect_w));
+	map(0xc203, 0xc203).w(this, FUNC(argus_state::butasan_pageselect_w));
+	map(0xc300, 0xc301).ram().share("bg0_scrollx");
+	map(0xc302, 0xc303).ram().share("bg0_scrolly");
+	map(0xc304, 0xc304).w(this, FUNC(argus_state::butasan_bg0_status_w));
+	map(0xc308, 0xc309).ram().share("bg1_scrollx");
+	map(0xc30a, 0xc30b).ram().share("bg1_scrolly");
+	map(0xc30c, 0xc30c).w(this, FUNC(argus_state::butasan_bg1_status_w));
+	map(0xc400, 0xc7ff).ram().w(this, FUNC(argus_state::butasan_bg1ram_w)).share("butasan_bg1ram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(argus_state::butasan_paletteram_w)).share("paletteram");
+	map(0xd000, 0xdfff).rw(this, FUNC(argus_state::butasan_pagedram_r), FUNC(argus_state::butasan_pagedram_w));
+	map(0xe000, 0xefff).ram();
+	map(0xf000, 0xf67f).ram().share("spriteram");
+	map(0xf680, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(argus_state::sound_map_a)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void argus_state::sound_map_a(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xc000, 0xc000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(argus_state::sound_map_b)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void argus_state::sound_map_b(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 #if 0
 ADDRESS_MAP_START(argus_state::sound_portmap_1)
@@ -274,11 +279,12 @@ ADDRESS_MAP_START(argus_state::sound_portmap_1)
 ADDRESS_MAP_END
 #endif
 
-ADDRESS_MAP_START(argus_state::sound_portmap_2)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-ADDRESS_MAP_END
+void argus_state::sound_portmap_2(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x80, 0x81).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 
 /***************************************************************************

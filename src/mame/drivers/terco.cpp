@@ -278,15 +278,16 @@ private:
 	//required_device<ay3600_device> m_ay3600;
 };
 
-ADDRESS_MAP_START(t4490_state::t4490_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x3000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x3000)
-	AM_RANGE(0x9500, 0x95ff) AM_RAM
-	AM_RANGE(0x9030, 0x9031) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0x9034, 0x9037) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x9038, 0x903b) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0xa000, 0xffff) AM_ROM AM_REGION("maincpu", 0xa000)
-ADDRESS_MAP_END
+void t4490_state::t4490_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x3000, 0x3fff).rom().region("maincpu", 0x3000);
+	map(0x9500, 0x95ff).ram();
+	map(0x9030, 0x9031).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x9034, 0x9037).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x9038, 0x903b).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xa000, 0xffff).rom().region("maincpu", 0xa000);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( t4490 )

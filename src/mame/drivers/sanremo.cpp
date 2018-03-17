@@ -224,24 +224,26 @@ WRITE8_MEMBER(sanremo_state::banksel_w)
 *           Memory map information           *
 *********************************************/
 
-ADDRESS_MAP_START(sanremo_state::sanremo_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(sanremo_videoram_w) AM_SHARE("videoram")  // 2x 76C28 (1x accessed directly, latched bank written to other like subsino etc.)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")                               // battery backed UM6116
-ADDRESS_MAP_END
+void sanremo_state::sanremo_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().w(this, FUNC(sanremo_state::sanremo_videoram_w)).share("videoram");  // 2x 76C28 (1x accessed directly, latched bank written to other like subsino etc.)
+	map(0xc000, 0xc7ff).ram().share("nvram");                               // battery backed UM6116
+}
 
-ADDRESS_MAP_START(sanremo_state::sanremo_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(lamps_w)
-	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x17, 0x17) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0x24, 0x24) AM_WRITE(banksel_w)
-	AM_RANGE(0x27, 0x27) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x37, 0x37) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-ADDRESS_MAP_END
+void sanremo_state::sanremo_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).portr("IN0");
+	map(0x02, 0x02).portr("IN1");
+	map(0x04, 0x04).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x05, 0x05).w(this, FUNC(sanremo_state::lamps_w));
+	map(0x14, 0x14).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x17, 0x17).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0x24, 0x24).w(this, FUNC(sanremo_state::banksel_w));
+	map(0x27, 0x27).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x37, 0x37).w("ay8910", FUNC(ay8910_device::address_w));
+}
 
 /*
 

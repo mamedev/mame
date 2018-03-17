@@ -202,24 +202,26 @@ WRITE8_MEMBER( pc2000_state::beep_w )
 	m_beep_state = data;
 }
 
-ADDRESS_MAP_START(pc2000_state::pc2000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank0")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")    //0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x59 0x45, if it succeeds a jump at 0x8004 occurs
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-ADDRESS_MAP_END
+void pc2000_state::pc2000_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).bankr("bank0");
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr("bank2");    //0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x59 0x45, if it succeeds a jump at 0x8004 occurs
+	map(0xc000, 0xdfff).ram();
+}
 
-ADDRESS_MAP_START(pc2000_state::pc2000_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(rombank0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(rombank1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(rombank2_w)
-	AM_RANGE(0x0a, 0x0b) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
-	AM_RANGE(0x10, 0x11) AM_READWRITE(key_matrix_r, key_matrix_w)
-	AM_RANGE(0x12, 0x12) AM_READWRITE(beep_r, beep_w)
-ADDRESS_MAP_END
+void pc2000_state::pc2000_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(pc2000_state::rombank0_w));
+	map(0x01, 0x01).w(this, FUNC(pc2000_state::rombank1_w));
+	map(0x03, 0x03).w(this, FUNC(pc2000_state::rombank2_w));
+	map(0x0a, 0x0b).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
+	map(0x10, 0x11).rw(this, FUNC(pc2000_state::key_matrix_r), FUNC(pc2000_state::key_matrix_w));
+	map(0x12, 0x12).rw(this, FUNC(pc2000_state::beep_r), FUNC(pc2000_state::beep_w));
+}
 
 
 void gl3000s_state::machine_start()
@@ -330,15 +332,16 @@ SED1520_UPDATE_CB(gl3000s_state::screen_update_left)
 }
 
 
-ADDRESS_MAP_START(gl3000s_state::gl3000s_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_WRITE(rombank1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(rombank2_w)
-	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("sed1520_r", sed1520_device, read, write)
-	AM_RANGE(0x0a, 0x0b) AM_DEVREADWRITE("sed1520_l", sed1520_device, read, write)
-	AM_RANGE(0x10, 0x11) AM_READWRITE(key_matrix_r, key_matrix_w)
-ADDRESS_MAP_END
+void gl3000s_state::gl3000s_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x01, 0x01).w(this, FUNC(gl3000s_state::rombank1_w));
+	map(0x03, 0x03).w(this, FUNC(gl3000s_state::rombank2_w));
+	map(0x08, 0x09).rw(m_lcdc_r, FUNC(sed1520_device::read), FUNC(sed1520_device::write));
+	map(0x0a, 0x0b).rw(m_lcdc_l, FUNC(sed1520_device::read), FUNC(sed1520_device::write));
+	map(0x10, 0x11).rw(this, FUNC(gl3000s_state::key_matrix_r), FUNC(gl3000s_state::key_matrix_w));
+}
 
 READ8_MEMBER( pc1000_state::kb_r )
 {
@@ -395,19 +398,21 @@ HD44780_PIXEL_UPDATE(pc1000_state::pc1000_pixel_update)
 		}
 }
 
-ADDRESS_MAP_START(pc1000_state::pc1000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("bios", 0x00000)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_DEVREAD("cartslot", generic_slot_device, read_rom)    //0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x33, if it succeeds a jump at 0x8010 occurs
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void pc1000_state::pc1000_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom().region("bios", 0x00000);
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0xbfff).r(m_cart, FUNC(generic_slot_device::read_rom));    //0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x33, if it succeeds a jump at 0x8010 occurs
+	map(0xc000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(pc1000_state::pc1000_io)
-	AM_RANGE(0x0000, 0x01ff) AM_READ(kb_r)
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0xfe) AM_READWRITE(lcdc_control_r, lcdc_control_w)
-	AM_RANGE(0x4100, 0x4100) AM_MIRROR(0xfe) AM_READWRITE(lcdc_data_r, lcdc_data_w)
-ADDRESS_MAP_END
+void pc1000_state::pc1000_io(address_map &map)
+{
+	map(0x0000, 0x01ff).r(this, FUNC(pc1000_state::kb_r));
+	map(0x4000, 0x4000).mirror(0xfe).rw(this, FUNC(pc1000_state::lcdc_control_r), FUNC(pc1000_state::lcdc_control_w));
+	map(0x4100, 0x4100).mirror(0xfe).rw(this, FUNC(pc1000_state::lcdc_data_r), FUNC(pc1000_state::lcdc_data_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pc2000 )

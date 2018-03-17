@@ -245,21 +245,23 @@ static INPUT_PORTS_START( mz80a )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(mz80_state::mz80k_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0xcfff) AM_RAM AM_SHARE("p_ram") // 48 KB of RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("videoram") // Video RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) /* PPIA 8255 */
-	AM_RANGE(0xe004, 0xe007) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)  /* PIT 8253  */
-	AM_RANGE(0xe008, 0xe00b) AM_READWRITE( mz80k_strobe_r, mz80k_strobe_w)
-	AM_RANGE(0xf000, 0xf3ff) AM_ROM
-ADDRESS_MAP_END
+void mz80_state::mz80k_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0xcfff).ram().share("p_ram"); // 48 KB of RAM
+	map(0xd000, 0xd7ff).ram().share("videoram"); // Video RAM
+	map(0xe000, 0xe003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)); /* PPIA 8255 */
+	map(0xe004, 0xe007).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));  /* PIT 8253  */
+	map(0xe008, 0xe00b).rw(this, FUNC(mz80_state::mz80k_strobe_r), FUNC(mz80_state::mz80k_strobe_w));
+	map(0xf000, 0xf3ff).rom();
+}
 
-ADDRESS_MAP_START(mz80_state::mz80k_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void mz80_state::mz80k_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+}
 
 static GFXDECODE_START( mz80k )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mz80k_charlayout, 0, 1 )

@@ -22,42 +22,46 @@
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(kc85_4_state::kc85_4_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(expansion_io_read, expansion_io_write)
+void kc85_4_state::kc85_4_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(kc85_4_state::expansion_io_read), FUNC(kc85_4_state::expansion_io_write));
 
-	AM_RANGE(0x0084, 0x0085) AM_MIRROR(0xff00) AM_READWRITE(kc85_4_84_r, kc85_4_84_w)
-	AM_RANGE(0x0086, 0x0087) AM_MIRROR(0xff00) AM_READWRITE(kc85_4_86_r, kc85_4_86_w)
-	AM_RANGE(0x0088, 0x008b) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
-	AM_RANGE(0x008c, 0x008f) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+	map(0x0084, 0x0085).mirror(0xff00).rw(this, FUNC(kc85_4_state::kc85_4_84_r), FUNC(kc85_4_state::kc85_4_84_w));
+	map(0x0086, 0x0087).mirror(0xff00).rw(this, FUNC(kc85_4_state::kc85_4_86_r), FUNC(kc85_4_state::kc85_4_86_w));
+	map(0x0088, 0x008b).mirror(0xff00).rw(m_z80pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x008c, 0x008f).mirror(0xff00).rw(m_z80ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
-ADDRESS_MAP_START(kc85_4_state::kc85_4_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_BANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_BANK("bank2")
-	AM_RANGE(0x8000, 0xa7ff) AM_READWRITE_BANK("bank3")
-	AM_RANGE(0xa800, 0xbfff) AM_READWRITE_BANK("bank6")
-	AM_RANGE(0xc000, 0xdfff) AM_READ_BANK("bank4")
-	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bank5")
-ADDRESS_MAP_END
+void kc85_4_state::kc85_4_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xa7ff).bankrw("bank3");
+	map(0xa800, 0xbfff).bankrw("bank6");
+	map(0xc000, 0xdfff).bankr("bank4");
+	map(0xe000, 0xffff).bankr("bank5");
+}
 
-ADDRESS_MAP_START(kc_state::kc85_3_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_BANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_BANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE_BANK("bank3")
-	AM_RANGE(0xc000, 0xdfff) AM_READ_BANK("bank4")
-	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bank5")
-ADDRESS_MAP_END
+void kc_state::kc85_3_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xdfff).bankr("bank4");
+	map(0xe000, 0xffff).bankr("bank5");
+}
 
-ADDRESS_MAP_START(kc_state::kc85_3_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(expansion_io_read, expansion_io_write)
+void kc_state::kc85_3_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(kc_state::expansion_io_read), FUNC(kc_state::expansion_io_write));
 
-	AM_RANGE(0x0088, 0x008b) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
-	AM_RANGE(0x008c, 0x008f) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+	map(0x0088, 0x008b).mirror(0xff00).rw(m_z80pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x008c, 0x008f).mirror(0xff00).rw(m_z80ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 static INPUT_PORTS_START( kc85 )
 INPUT_PORTS_END

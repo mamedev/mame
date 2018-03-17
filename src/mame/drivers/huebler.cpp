@@ -83,26 +83,28 @@ READ8_MEMBER( amu880_state::keyboard_r )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(amu880_state::amu880_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0xf000, 0xfbff) AM_ROM
-	AM_RANGE(0xfc00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void amu880_state::amu880_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().share("video_ram");
+	map(0xf000, 0xfbff).rom();
+	map(0xfc00, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(amu880_state::amu880_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void amu880_state::amu880_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 //  AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_WRITE(power_off_w)
 //  AM_RANGE(0x04, 0x04) AM_MIRROR(0x02) AM_WRITE(tone_off_w)
 //  AM_RANGE(0x05, 0x05) AM_MIRROR(0x02) AM_WRITE(tone_on_w)
-	AM_RANGE(0x08, 0x09) AM_MIRROR(0x02) AM_READ(keyboard_r)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, ba_cd_r, ba_cd_w)
-ADDRESS_MAP_END
+	map(0x08, 0x09).mirror(0x02).r(this, FUNC(amu880_state::keyboard_r));
+	map(0x0c, 0x0f).rw(Z80PIO2_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x10, 0x13).rw(Z80PIO1_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x14, 0x17).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x18, 0x1b).rw(m_z80sio, FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
+}
 
 /* Input Ports */
 

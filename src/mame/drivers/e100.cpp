@@ -423,13 +423,14 @@ WRITE_LINE_MEMBER(e100_state::pia1_cb2_w)
 }
 
 // This map is derived from info in "TEMAL 100 - teknisk manual Esselte 100"
-ADDRESS_MAP_START(e100_state::e100_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xc800, 0xc81f) AM_READWRITE(pia_r, pia_w) AM_MIRROR(0x07e0)
-	AM_RANGE(0xd000, 0xffff) AM_ROM AM_REGION("roms", 0x1000)
-ADDRESS_MAP_END
+void e100_state::e100_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x8000, 0x87ff).rom().region("roms", 0);
+	map(0xc000, 0xc3ff).ram().share("videoram");
+	map(0xc800, 0xc81f).rw(this, FUNC(e100_state::pia_r), FUNC(e100_state::pia_w)).mirror(0x07e0);
+	map(0xd000, 0xffff).rom().region("roms", 0x1000);
+}
 
 /* E100 Input ports
  * Four e100 keys are not mapped yet,

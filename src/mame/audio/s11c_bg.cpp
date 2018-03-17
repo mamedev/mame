@@ -26,15 +26,16 @@ s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-ADDRESS_MAP_START(s11c_bg_device::s11c_bg_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia40", pia6821_device, read, write)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(bg_speech_digit_w)
-	AM_RANGE(0x6800, 0x6fff) AM_WRITE(bg_speech_clock_w)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(bgbank_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bgbank")
-ADDRESS_MAP_END
+void s11c_bg_device::s11c_bg_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x2000, 0x2001).mirror(0x1ffe).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x4000, 0x4003).mirror(0x1ffc).rw("pia40", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x6000, 0x67ff).w(this, FUNC(s11c_bg_device::bg_speech_digit_w));
+	map(0x6800, 0x6fff).w(this, FUNC(s11c_bg_device::bg_speech_clock_w));
+	map(0x7800, 0x7fff).w(this, FUNC(s11c_bg_device::bgbank_w));
+	map(0x8000, 0xffff).bankr("bgbank");
+}
 
 WRITE_LINE_MEMBER( s11c_bg_device::pia40_cb2_w)
 {

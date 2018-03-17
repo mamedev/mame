@@ -43,22 +43,24 @@ private:
 	optional_device<palette_device> m_palette;
 };
 
-ADDRESS_MAP_START(esprit_state::mem_map)
-	ADDRESS_MAP_GLOBAL_MASK (0x7fff)
-	AM_RANGE(0x0058,0x0058) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x0059,0x0059) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0080,0x1fff) AM_RAM
-	AM_RANGE(0x2000,0x6fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x7000,0x7fff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void esprit_state::mem_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0058, 0x0058).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x0059, 0x0059).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0080, 0x1fff).ram();
+	map(0x2000, 0x6fff).ram().share("videoram");
+	map(0x7000, 0x7fff).rom().region("roms", 0);
+}
 
-ADDRESS_MAP_START(esprit_state::mem3_map)
-	AM_RANGE(0x0000,0x202f) AM_RAM
-	AM_RANGE(0x2030,0x3fff) AM_RAM AM_SHARE("videoram") // it might start at 3000
-	AM_RANGE(0x81c0,0x81c0) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x81c1,0x81c1) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0xe000,0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void esprit_state::mem3_map(address_map &map)
+{
+	map(0x0000, 0x202f).ram();
+	map(0x2030, 0x3fff).ram().share("videoram"); // it might start at 3000
+	map(0x81c0, 0x81c0).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x81c1, 0x81c1).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xe000, 0xffff).rom().region("roms", 0);
+}
 
 static INPUT_PORTS_START( esprit )
 INPUT_PORTS_END

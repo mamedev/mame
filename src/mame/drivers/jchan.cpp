@@ -449,49 +449,51 @@ WRITE16_MEMBER(jchan_state::sknsspr_sprite32regs_w)
 }
 
 
-ADDRESS_MAP_START(jchan_state::jchan_main)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM // Work RAM - [A] grid tested, cleared ($9d6-$a54)
+void jchan_state::jchan_main(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x20ffff).ram(); // Work RAM - [A] grid tested, cleared ($9d6-$a54)
 
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("mcuram") //    [G] MCU share
-	AM_RANGE(0x330000, 0x330001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com0_w)
-	AM_RANGE(0x340000, 0x340001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com1_w)
-	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com2_w)
-	AM_RANGE(0x360000, 0x360001) AM_DEVWRITE( "toybox", kaneko_toybox_device, mcu_com3_w)
-	AM_RANGE(0x370000, 0x370001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
+	map(0x300000, 0x30ffff).ram().share("mcuram"); //    [G] MCU share
+	map(0x330000, 0x330001).w("toybox", FUNC(kaneko_toybox_device::mcu_com0_w));
+	map(0x340000, 0x340001).w("toybox", FUNC(kaneko_toybox_device::mcu_com1_w));
+	map(0x350000, 0x350001).w("toybox", FUNC(kaneko_toybox_device::mcu_com2_w));
+	map(0x360000, 0x360001).w("toybox", FUNC(kaneko_toybox_device::mcu_com3_w));
+	map(0x370000, 0x370001).r("toybox", FUNC(kaneko_toybox_device::mcu_status_r));
 
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("mainsub_shared")
+	map(0x400000, 0x403fff).ram().share("mainsub_shared");
 
 	/* 1st sprite layer */
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sknsspr_sprite32_w<0>) AM_SHARE("spriteram_1")
-	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE(sknsspr_sprite32regs_w<0>) AM_SHARE("sprregs_1")
+	map(0x500000, 0x503fff).ram().w(this, FUNC(jchan_state::sknsspr_sprite32_w<0>)).share("spriteram_1");
+	map(0x600000, 0x60003f).ram().w(this, FUNC(jchan_state::sknsspr_sprite32regs_w<0>)).share("sprregs_1");
 
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette
+	map(0x700000, 0x70ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // palette
 
-	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE(ctrl_r, ctrl_w) AM_SHARE("ctrl")
+	map(0xf00000, 0xf00007).rw(this, FUNC(jchan_state::ctrl_r), FUNC(jchan_state::ctrl_w)).share("ctrl");
 
-	AM_RANGE(0xf80000, 0xf80001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-ADDRESS_MAP_END
+	map(0xf80000, 0xf80001).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+}
 
 
-ADDRESS_MAP_START(jchan_state::jchan_sub)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Work RAM - grid tested, cleared ($612-$6dc)
+void jchan_state::jchan_sub(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x10ffff).ram(); // Work RAM - grid tested, cleared ($612-$6dc)
 
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("mainsub_shared")
+	map(0x400000, 0x403fff).ram().share("mainsub_shared");
 
 	/* VIEW2 Tilemap - [D] grid tested, cleared ($1d84), also cleared at startup ($810-$826) */
-	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x600000, 0x60001f) AM_DEVREADWRITE("view2", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
+	map(0x500000, 0x503fff).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x600000, 0x60001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
 
 	/* background sprites */
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(sknsspr_sprite32_w<1>) AM_SHARE("spriteram_2")
-	AM_RANGE(0x780000, 0x78003f) AM_RAM_WRITE(sknsspr_sprite32regs_w<1>) AM_SHARE("sprregs_2")
+	map(0x700000, 0x703fff).ram().w(this, FUNC(jchan_state::sknsspr_sprite32_w<1>)).share("spriteram_2");
+	map(0x780000, 0x78003f).ram().w(this, FUNC(jchan_state::sknsspr_sprite32regs_w<1>)).share("sprregs_2");
 
-	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff) // sound
+	map(0x800000, 0x800003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff); // sound
 
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-ADDRESS_MAP_END
+	map(0xa00000, 0xa00001).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+}
 
 
 static const gfx_layout tilelayout =

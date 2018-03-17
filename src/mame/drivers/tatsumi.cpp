@@ -192,178 +192,190 @@ WRITE16_MEMBER(cyclwarr_state::cyclwarr_sound_w)
 
 /***************************************************************************/
 
-ADDRESS_MAP_START(apache3_state::apache3_v30_map)
-	AM_RANGE(0x00000, 0x03fff) AM_RAM
-	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x08000, 0x08fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x0c000, 0x0dfff) AM_RAM_WRITE(text_w) AM_SHARE("videoram")
-	AM_RANGE(0x0e800, 0x0e803) AM_WRITENOP // CRT
-	AM_RANGE(0x0f000, 0x0f001) AM_READ_PORT("DSW")
-	AM_RANGE(0x0f000, 0x0f001) AM_WRITENOP // todo
-	AM_RANGE(0x0f800, 0x0f801) AM_READWRITE(apache3_bank_r, apache3_bank_w)
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(apache3_v30_v20_r, apache3_v30_v20_w)
-	AM_RANGE(0x20000, 0x2ffff) AM_READWRITE(tatsumi_v30_68000_r, tatsumi_v30_68000_w)
-	AM_RANGE(0xa0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void apache3_state::apache3_v30_map(address_map &map)
+{
+	map(0x00000, 0x03fff).ram();
+	map(0x04000, 0x07fff).ram().share("nvram");
+	map(0x08000, 0x08fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x0c000, 0x0dfff).ram().w(this, FUNC(apache3_state::text_w)).share("videoram");
+	map(0x0e800, 0x0e803).nopw(); // CRT
+	map(0x0f000, 0x0f001).portr("DSW");
+	map(0x0f000, 0x0f001).nopw(); // todo
+	map(0x0f800, 0x0f801).rw(this, FUNC(apache3_state::apache3_bank_r), FUNC(apache3_state::apache3_bank_w));
+	map(0x10000, 0x1ffff).rw(this, FUNC(apache3_state::apache3_v30_v20_r), FUNC(apache3_state::apache3_v30_v20_w));
+	map(0x20000, 0x2ffff).rw(this, FUNC(apache3_state::tatsumi_v30_68000_r), FUNC(apache3_state::tatsumi_v30_68000_w));
+	map(0xa0000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(apache3_state::apache3_68000_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x80000, 0x83fff) AM_RAM AM_SHARE("68k_ram")
-	AM_RANGE(0x90000, 0x93fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9a000, 0x9a1ff) AM_WRITE(tatsumi_sprite_control_w) AM_SHARE("sprite_ctlram")
-	AM_RANGE(0xa0000, 0xa0001) AM_WRITE(apache3_rotate_w) // /BNKCS
-	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(apache3_z80_ctrl_w)
-	AM_RANGE(0xc0000, 0xc0001) AM_WRITE(apache3_road_z_w) // /LINCS
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_SHARE("apache3_g_ram") // /GRDCS
-	AM_RANGE(0xe0000, 0xe7fff) AM_READWRITE(apache3_z80_r, apache3_z80_w)
-ADDRESS_MAP_END
+void apache3_state::apache3_68000_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0x80000, 0x83fff).ram().share("68k_ram");
+	map(0x90000, 0x93fff).ram().share("spriteram");
+	map(0x9a000, 0x9a1ff).w(this, FUNC(apache3_state::tatsumi_sprite_control_w)).share("sprite_ctlram");
+	map(0xa0000, 0xa0001).w(this, FUNC(apache3_state::apache3_rotate_w)); // /BNKCS
+	map(0xb0000, 0xb0001).w(this, FUNC(apache3_state::apache3_z80_ctrl_w));
+	map(0xc0000, 0xc0001).w(this, FUNC(apache3_state::apache3_road_z_w)); // /LINCS
+	map(0xd0000, 0xdffff).ram().share("apache3_g_ram"); // /GRDCS
+	map(0xe0000, 0xe7fff).rw(this, FUNC(apache3_state::apache3_z80_r), FUNC(apache3_state::apache3_z80_w));
+}
 
-ADDRESS_MAP_START(apache3_state::apache3_v20_map)
-	AM_RANGE(0x00000, 0x01fff) AM_RAM
-	AM_RANGE(0x04000, 0x04003) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x06000, 0x06001) AM_READ_PORT("IN0") // esw
-	AM_RANGE(0x08000, 0x08001) AM_READ(tatsumi_hack_ym2151_r) AM_DEVWRITE("ymsnd", ym2151_device, write)
-	AM_RANGE(0x0a000, 0x0a000) AM_READ(tatsumi_hack_oki_r) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0x0e000, 0x0e007) AM_READWRITE(apache3_adc_r, apache3_adc_w) //adc select
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void apache3_state::apache3_v20_map(address_map &map)
+{
+	map(0x00000, 0x01fff).ram();
+	map(0x04000, 0x04003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x06000, 0x06001).portr("IN0"); // esw
+	map(0x08000, 0x08001).r(this, FUNC(apache3_state::tatsumi_hack_ym2151_r)).w("ymsnd", FUNC(ym2151_device::write));
+	map(0x0a000, 0x0a000).r(this, FUNC(apache3_state::tatsumi_hack_oki_r)).w(m_oki, FUNC(okim6295_device::write));
+	map(0x0e000, 0x0e007).rw(this, FUNC(apache3_state::apache3_adc_r), FUNC(apache3_state::apache3_adc_w)); //adc select
+	map(0xf0000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(apache3_state::apache3_z80_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("apache3_z80_ram")
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(apache3_road_x_w)
-ADDRESS_MAP_END
+void apache3_state::apache3_z80_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("apache3_z80_ram");
+	map(0x8000, 0xffff).w(this, FUNC(apache3_state::apache3_road_x_w));
+}
 
 /*****************************************************************/
 
-ADDRESS_MAP_START(roundup5_state::roundup5_v30_map)
-	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08000, 0x0bfff) AM_RAM_WRITE(text_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c000, 0x0c003) AM_WRITE(roundup5_crt_w)
-	AM_RANGE(0x0d000, 0x0d001) AM_READ_PORT("DSW")
-	AM_RANGE(0x0d400, 0x0d40f) AM_WRITEONLY AM_SHARE("ru5_unknown0")
-	AM_RANGE(0x0d800, 0x0d801) AM_WRITEONLY AM_SHARE("ru5_unknown1") // VRAM2 X scroll (todo)
-	AM_RANGE(0x0dc00, 0x0dc01) AM_WRITEONLY AM_SHARE("ru5_unknown2") // VRAM2 Y scroll (todo)
-	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(roundup5_control_w)
-	AM_RANGE(0x0f000, 0x0ffff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(roundup_v30_z80_r, roundup_v30_z80_w)
-	AM_RANGE(0x20000, 0x2ffff) AM_READWRITE(tatsumi_v30_68000_r, tatsumi_v30_68000_w)
-	AM_RANGE(0x30000, 0x3ffff) AM_READWRITE(roundup5_vram_r, roundup5_vram_w)
-	AM_RANGE(0x80000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void roundup5_state::roundup5_v30_map(address_map &map)
+{
+	map(0x00000, 0x07fff).ram();
+	map(0x08000, 0x0bfff).ram().w(this, FUNC(roundup5_state::text_w)).share("videoram");
+	map(0x0c000, 0x0c003).w(this, FUNC(roundup5_state::roundup5_crt_w));
+	map(0x0d000, 0x0d001).portr("DSW");
+	map(0x0d400, 0x0d40f).writeonly().share("ru5_unknown0");
+	map(0x0d800, 0x0d801).writeonly().share("ru5_unknown1"); // VRAM2 X scroll (todo)
+	map(0x0dc00, 0x0dc01).writeonly().share("ru5_unknown2"); // VRAM2 Y scroll (todo)
+	map(0x0e000, 0x0e001).w(this, FUNC(roundup5_state::roundup5_control_w));
+	map(0x0f000, 0x0ffff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x10000, 0x1ffff).rw(this, FUNC(roundup5_state::roundup_v30_z80_r), FUNC(roundup5_state::roundup_v30_z80_w));
+	map(0x20000, 0x2ffff).rw(this, FUNC(roundup5_state::tatsumi_v30_68000_r), FUNC(roundup5_state::tatsumi_v30_68000_w));
+	map(0x30000, 0x3ffff).rw(this, FUNC(roundup5_state::roundup5_vram_r), FUNC(roundup5_state::roundup5_vram_w));
+	map(0x80000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(roundup5_state::roundup5_68000_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x80000, 0x83fff) AM_RAM AM_SHARE("68k_ram")
-	AM_RANGE(0x90000, 0x93fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9a000, 0x9a1ff) AM_WRITE(tatsumi_sprite_control_w) AM_SHARE("sprite_ctlram")
-	AM_RANGE(0xa0000, 0xa0fff) AM_RAM AM_SHARE("roundup_r_ram") // Road control data
-	AM_RANGE(0xb0000, 0xb0fff) AM_RAM AM_SHARE("roundup_p_ram") // Road pixel data
-	AM_RANGE(0xc0000, 0xc0fff) AM_RAM AM_SHARE("roundup_l_ram") // Road colour data
-	AM_RANGE(0xd0000, 0xd0003) AM_WRITE(roundup5_d0000_w) AM_SHARE("ru5_d0000_ram")
-	AM_RANGE(0xe0000, 0xe0001) AM_WRITE(roundup5_e0000_w) AM_SHARE("ru5_e0000_ram")
-ADDRESS_MAP_END
+void roundup5_state::roundup5_68000_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0x80000, 0x83fff).ram().share("68k_ram");
+	map(0x90000, 0x93fff).ram().share("spriteram");
+	map(0x9a000, 0x9a1ff).w(this, FUNC(roundup5_state::tatsumi_sprite_control_w)).share("sprite_ctlram");
+	map(0xa0000, 0xa0fff).ram().share("roundup_r_ram"); // Road control data
+	map(0xb0000, 0xb0fff).ram().share("roundup_p_ram"); // Road pixel data
+	map(0xc0000, 0xc0fff).ram().share("roundup_l_ram"); // Road colour data
+	map(0xd0000, 0xd0003).w(this, FUNC(roundup5_state::roundup5_d0000_w)).share("ru5_d0000_ram");
+	map(0xe0000, 0xe0001).w(this, FUNC(roundup5_state::roundup5_e0000_w)).share("ru5_e0000_ram");
+}
 
-ADDRESS_MAP_START(roundup5_state::roundup5_z80_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffef) AM_RAM
-	AM_RANGE(0xfff0, 0xfff1) AM_READ(tatsumi_hack_ym2151_r) AM_DEVWRITE("ymsnd", ym2151_device, write)
-	AM_RANGE(0xfff4, 0xfff4) AM_READ(tatsumi_hack_oki_r) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xfff8, 0xfffb) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0xfffc, 0xfffc) AM_READ_PORT("STICKX")
-ADDRESS_MAP_END
-
-/******************************************************************************/
-
-ADDRESS_MAP_START(cyclwarr_state::cyclwarr_68000a_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("cw_cpua_ram")
-	AM_RANGE(0x03e000, 0x03efff) AM_RAM
-	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_SHARE("cw_cpub_ram")
-	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(cyclwarr_videoram1_r, cyclwarr_videoram1_w) AM_SHARE("cw_videoram1")
-	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE(cyclwarr_videoram0_r, cyclwarr_videoram0_w) AM_SHARE("cw_videoram0")
-
-	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE(bigfight_a20000_w)
-	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
-	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
-
-	AM_RANGE(0x0b8000, 0x0b8001) AM_WRITE(cyclwarr_sound_w)
-	AM_RANGE(0x0b9000, 0x0b900f) AM_DEVREADWRITE8("io1", cxd1095_device, read, write, 0x00ff).cswidth(16)
-	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREADWRITE8("io2", cxd1095_device, read, write, 0x00ff).cswidth(16)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_SHARE("spriteram")
-	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_SHARE("sprite_ctlram")
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK("bank2") /* CPU B ROM */
-	AM_RANGE(0x2c0000, 0x33ffff) AM_ROMBANK("bank1") /* CPU A ROM */
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(cyclwarr_state::cyclwarr_68000b_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("cw_cpub_ram")
-
-	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(cyclwarr_videoram1_r, cyclwarr_videoram1_w)
-	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE(cyclwarr_videoram0_r, cyclwarr_videoram0_w)
-
-	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE(bigfight_a20000_w)
-	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
-	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
-
-	AM_RANGE(0x0b9000, 0x0b900f) AM_DEVREADWRITE8("io1", cxd1095_device, read, write, 0x00ff).cswidth(16)
-	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREADWRITE8("io2", cxd1095_device, read, write, 0x00ff).cswidth(16)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
-	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK("bank2") /* CPU B ROM */
-	AM_RANGE(0x2c0000, 0x33ffff) AM_ROMBANK("bank1") /* CPU A ROM */
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(cyclwarr_state::cyclwarr_z80_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffef) AM_RAM
-	AM_RANGE(0xfff0, 0xfff1) AM_READ(tatsumi_hack_ym2151_r) AM_DEVWRITE("ymsnd", ym2151_device, write)
-	AM_RANGE(0xfff4, 0xfff4) AM_READ(tatsumi_hack_oki_r) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xfffc, 0xfffc) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xfffe, 0xfffe) AM_WRITENOP
-ADDRESS_MAP_END
+void roundup5_state::roundup5_z80_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xffef).ram();
+	map(0xfff0, 0xfff1).r(this, FUNC(roundup5_state::tatsumi_hack_ym2151_r)).w("ymsnd", FUNC(ym2151_device::write));
+	map(0xfff4, 0xfff4).r(this, FUNC(roundup5_state::tatsumi_hack_oki_r)).w(m_oki, FUNC(okim6295_device::write));
+	map(0xfff8, 0xfffb).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xfffc, 0xfffc).portr("STICKX");
+}
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(cyclwarr_state::bigfight_68000a_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("cw_cpua_ram")
+void cyclwarr_state::cyclwarr_68000a_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).ram().share("cw_cpua_ram");
+	map(0x03e000, 0x03efff).ram();
+	map(0x040000, 0x04ffff).ram().share("cw_cpub_ram");
+	map(0x080000, 0x08ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram1_r), FUNC(cyclwarr_state::cyclwarr_videoram1_w)).share("cw_videoram1");
+	map(0x090000, 0x09ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram0_r), FUNC(cyclwarr_state::cyclwarr_videoram0_w)).share("cw_videoram0");
 
-	AM_RANGE(0x03e000, 0x03efff) AM_RAM
-	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_SHARE("cw_cpub_ram")
+	map(0x0a2000, 0x0a2007).w(this, FUNC(cyclwarr_state::bigfight_a20000_w));
+	map(0x0a4000, 0x0a4001).w(this, FUNC(cyclwarr_state::bigfight_a40000_w));
+	map(0x0a6000, 0x0a6001).w(this, FUNC(cyclwarr_state::bigfight_a60000_w));
 
-	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(cyclwarr_videoram1_r, cyclwarr_videoram1_w) AM_SHARE("cw_videoram1")
-	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE(cyclwarr_videoram0_r, cyclwarr_videoram0_w) AM_SHARE("cw_videoram0")
+	map(0x0b8000, 0x0b8001).w(this, FUNC(cyclwarr_state::cyclwarr_sound_w));
+	map(0x0b9000, 0x0b900f).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x0ba000, 0x0ba00f).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x0c0000, 0x0c3fff).rw(this, FUNC(cyclwarr_state::cyclwarr_sprite_r), FUNC(cyclwarr_state::cyclwarr_sprite_w)).share("spriteram");
+	map(0x0ca000, 0x0ca1ff).w(this, FUNC(cyclwarr_state::tatsumi_sprite_control_w)).share("sprite_ctlram");
+	map(0x0d0000, 0x0d3fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x140000, 0x1bffff).bankr("bank2"); /* CPU B ROM */
+	map(0x2c0000, 0x33ffff).bankr("bank1"); /* CPU A ROM */
+}
 
-	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE(bigfight_a20000_w)
-	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
-	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
+void cyclwarr_state::cyclwarr_68000b_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).ram().share("cw_cpub_ram");
 
-	AM_RANGE(0x0b8000, 0x0b8001) AM_WRITE(cyclwarr_sound_w)
-	AM_RANGE(0x0b9000, 0x0b900f) AM_DEVREADWRITE8("io1", cxd1095_device, read, write, 0x00ff).cswidth(16)
-	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREADWRITE8("io2", cxd1095_device, read, write, 0x00ff).cswidth(16)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_SHARE("spriteram")
-	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_SHARE("sprite_ctlram")
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK("bank2") /* CPU A ROM */
-	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1") /* CPU B ROM */
-ADDRESS_MAP_END
+	map(0x080000, 0x08ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram1_r), FUNC(cyclwarr_state::cyclwarr_videoram1_w));
+	map(0x090000, 0x09ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram0_r), FUNC(cyclwarr_state::cyclwarr_videoram0_w));
 
-ADDRESS_MAP_START(cyclwarr_state::bigfight_68000b_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("cw_cpub_ram")
-	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(cyclwarr_videoram1_r, cyclwarr_videoram1_w)
-	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE(cyclwarr_videoram0_r, cyclwarr_videoram0_w)
-	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE(bigfight_a20000_w)
-	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
-	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
+	map(0x0a2000, 0x0a2007).w(this, FUNC(cyclwarr_state::bigfight_a20000_w));
+	map(0x0a4000, 0x0a4001).w(this, FUNC(cyclwarr_state::bigfight_a40000_w));
+	map(0x0a6000, 0x0a6001).w(this, FUNC(cyclwarr_state::bigfight_a60000_w));
 
-	AM_RANGE(0x0b9000, 0x0b900f) AM_DEVREADWRITE8("io1", cxd1095_device, read, write, 0x00ff).cswidth(16)
-	AM_RANGE(0x0ba000, 0x0ba00f) AM_DEVREADWRITE8("io2", cxd1095_device, read, write, 0x00ff).cswidth(16)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
-	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK("bank2") /* CPU A ROM */
-	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1") /* CPU B ROM */
-ADDRESS_MAP_END
+	map(0x0b9000, 0x0b900f).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x0ba000, 0x0ba00f).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x0c0000, 0x0c3fff).rw(this, FUNC(cyclwarr_state::cyclwarr_sprite_r), FUNC(cyclwarr_state::cyclwarr_sprite_w));
+	map(0x0ca000, 0x0ca1ff).w(this, FUNC(cyclwarr_state::tatsumi_sprite_control_w));
+	map(0x0d0000, 0x0d3fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x140000, 0x1bffff).bankr("bank2"); /* CPU B ROM */
+	map(0x2c0000, 0x33ffff).bankr("bank1"); /* CPU A ROM */
+}
+
+void cyclwarr_state::cyclwarr_z80_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xffef).ram();
+	map(0xfff0, 0xfff1).r(this, FUNC(cyclwarr_state::tatsumi_hack_ym2151_r)).w("ymsnd", FUNC(ym2151_device::write));
+	map(0xfff4, 0xfff4).r(this, FUNC(cyclwarr_state::tatsumi_hack_oki_r)).w(m_oki, FUNC(okim6295_device::write));
+	map(0xfffc, 0xfffc).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xfffe, 0xfffe).nopw();
+}
+
+/******************************************************************************/
+
+void cyclwarr_state::bigfight_68000a_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).ram().share("cw_cpua_ram");
+
+	map(0x03e000, 0x03efff).ram();
+	map(0x040000, 0x04ffff).ram().share("cw_cpub_ram");
+
+	map(0x080000, 0x08ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram1_r), FUNC(cyclwarr_state::cyclwarr_videoram1_w)).share("cw_videoram1");
+	map(0x090000, 0x09ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram0_r), FUNC(cyclwarr_state::cyclwarr_videoram0_w)).share("cw_videoram0");
+
+	map(0x0a2000, 0x0a2007).w(this, FUNC(cyclwarr_state::bigfight_a20000_w));
+	map(0x0a4000, 0x0a4001).w(this, FUNC(cyclwarr_state::bigfight_a40000_w));
+	map(0x0a6000, 0x0a6001).w(this, FUNC(cyclwarr_state::bigfight_a60000_w));
+
+	map(0x0b8000, 0x0b8001).w(this, FUNC(cyclwarr_state::cyclwarr_sound_w));
+	map(0x0b9000, 0x0b900f).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x0ba000, 0x0ba00f).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x0c0000, 0x0c3fff).rw(this, FUNC(cyclwarr_state::cyclwarr_sprite_r), FUNC(cyclwarr_state::cyclwarr_sprite_w)).share("spriteram");
+	map(0x0ca000, 0x0ca1ff).w(this, FUNC(cyclwarr_state::tatsumi_sprite_control_w)).share("sprite_ctlram");
+	map(0x0d0000, 0x0d3fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x100000, 0x17ffff).bankr("bank2"); /* CPU A ROM */
+	map(0x200000, 0x27ffff).bankr("bank1"); /* CPU B ROM */
+}
+
+void cyclwarr_state::bigfight_68000b_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).ram().share("cw_cpub_ram");
+	map(0x080000, 0x08ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram1_r), FUNC(cyclwarr_state::cyclwarr_videoram1_w));
+	map(0x090000, 0x09ffff).rw(this, FUNC(cyclwarr_state::cyclwarr_videoram0_r), FUNC(cyclwarr_state::cyclwarr_videoram0_w));
+	map(0x0a2000, 0x0a2007).w(this, FUNC(cyclwarr_state::bigfight_a20000_w));
+	map(0x0a4000, 0x0a4001).w(this, FUNC(cyclwarr_state::bigfight_a40000_w));
+	map(0x0a6000, 0x0a6001).w(this, FUNC(cyclwarr_state::bigfight_a60000_w));
+
+	map(0x0b9000, 0x0b900f).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x0ba000, 0x0ba00f).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x0c0000, 0x0c3fff).rw(this, FUNC(cyclwarr_state::cyclwarr_sprite_r), FUNC(cyclwarr_state::cyclwarr_sprite_w));
+	map(0x0ca000, 0x0ca1ff).w(this, FUNC(cyclwarr_state::tatsumi_sprite_control_w));
+	map(0x0d0000, 0x0d3fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x100000, 0x17ffff).bankr("bank2"); /* CPU A ROM */
+	map(0x200000, 0x27ffff).bankr("bank1"); /* CPU B ROM */
+}
 
 /******************************************************************************/
 

@@ -133,38 +133,41 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(beezer_state::main_map)
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xc000, 0xcfff) AM_DEVICE("sysbank", address_map_bank_device, amap8)
-	AM_RANGE(0xd000, 0xdfff) AM_ROM AM_REGION("maincpu", 0x0000) AM_WRITE(bankswitch_w) // g1
-	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION("maincpu", 0x1000) // g3
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x2000) // g5
-ADDRESS_MAP_END
+void beezer_state::main_map(address_map &map)
+{
+	map(0x0000, 0xbfff).ram().share("videoram");
+	map(0xc000, 0xcfff).m(m_sysbank, FUNC(address_map_bank_device::amap8));
+	map(0xd000, 0xdfff).rom().region("maincpu", 0x0000).w(this, FUNC(beezer_state::bankswitch_w)); // g1
+	map(0xe000, 0xefff).rom().region("maincpu", 0x1000); // g3
+	map(0xf000, 0xffff).rom().region("maincpu", 0x2000); // g5
+}
 
-ADDRESS_MAP_START(beezer_state::banked_map)
-	AM_RANGE(0x0600, 0x0600) AM_MIRROR(0x1ff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x1f0) AM_WRITE(palette_w)
-	AM_RANGE(0x0a00, 0x0a00) AM_MIRROR(0x1ff) AM_READ(line_r)
-	AM_RANGE(0x0e00, 0x0e0f) AM_MIRROR(0x1f0) AM_DEVREADWRITE("via_u6", via6522_device, read, write)
-	AM_RANGE(0x1000, 0x1fff) AM_ROMBANK("rombank_f1")
-	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("rombank_f3")
-	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("rombank_e1")
-	AM_RANGE(0x4000, 0x4fff) AM_ROMBANK("rombank_e3")
-	AM_RANGE(0x5000, 0x5fff) AM_ROMBANK("rombank_e5")
-	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("rombank_f5")
-	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("rombank_f7")
-ADDRESS_MAP_END
+void beezer_state::banked_map(address_map &map)
+{
+	map(0x0600, 0x0600).mirror(0x1ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x0800, 0x080f).mirror(0x1f0).w(this, FUNC(beezer_state::palette_w));
+	map(0x0a00, 0x0a00).mirror(0x1ff).r(this, FUNC(beezer_state::line_r));
+	map(0x0e00, 0x0e0f).mirror(0x1f0).rw("via_u6", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1000, 0x1fff).bankr("rombank_f1");
+	map(0x2000, 0x2fff).bankr("rombank_f3");
+	map(0x3000, 0x3fff).bankr("rombank_e1");
+	map(0x4000, 0x4fff).bankr("rombank_e3");
+	map(0x5000, 0x5fff).bankr("rombank_e5");
+	map(0x6000, 0x6fff).bankr("rombank_f5");
+	map(0x7000, 0x7fff).bankr("rombank_f7");
+}
 
-ADDRESS_MAP_START(beezer_state::sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM // 0d
-	AM_RANGE(0x0800, 0x0fff) AM_RAM // 2d, optional (can be rom)
-	AM_RANGE(0x1000, 0x1007) AM_MIRROR(0x07f8) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via_u18", via6522_device, read, write)
-	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_WRITE(dac_w)
+void beezer_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); // 0d
+	map(0x0800, 0x0fff).ram(); // 2d, optional (can be rom)
+	map(0x1000, 0x1007).mirror(0x07f8).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x1800, 0x180f).mirror(0x07f0).rw(m_via_audio, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0x8003).mirror(0x1ffc).w(this, FUNC(beezer_state::dac_w));
 //  AM_RANGE(0xa000, 0xbfff) AM_ROM // 2d (can be ram, unpopulated)
 //  AM_RANGE(0xc000, 0xdfff) AM_ROM // 4d (unpopulated)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("audiocpu", 0) // 6d
-ADDRESS_MAP_END
+	map(0xe000, 0xffff).rom().region("audiocpu", 0); // 6d
+}
 
 
 //**************************************************************************

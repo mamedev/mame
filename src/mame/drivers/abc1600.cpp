@@ -491,38 +491,40 @@ WRITE8_MEMBER( abc1600_state::spec_contr_reg_w )
 //  ADDRESS_MAP( abc1600_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc1600_state::abc1600_mem)
-	AM_RANGE(0x00000, 0xfffff) AM_DEVICE(ABC1600_MAC_TAG, abc1600_mac_device, map)
-ADDRESS_MAP_END
+void abc1600_state::abc1600_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).m(ABC1600_MAC_TAG, FUNC(abc1600_mac_device::map));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( mac_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc1600_state::mac_mem)
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, vram_map)
-	AM_RANGE(0x1fe000, 0x1fefff) AM_READWRITE(bus_r, bus_w)
-	AM_RANGE(0x1ff000, 0x1ff000) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_device, status_r, cmd_w)
-	AM_RANGE(0x1ff002, 0x1ff002) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_device, track_r, track_w)
-	AM_RANGE(0x1ff004, 0x1ff004) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_device, sector_r, sector_w)
-	AM_RANGE(0x1ff006, 0x1ff006) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_device, data_r, data_w)
-	AM_RANGE(0x1ff100, 0x1ff101) AM_MIRROR(0xfe) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, crtc_map)
-	AM_RANGE(0x1ff200, 0x1ff207) AM_MIRROR(0xf8) AM_READWRITE(dart_r, dart_w)
-	AM_RANGE(0x1ff300, 0x1ff300) AM_MIRROR(0xff) AM_DEVREADWRITE(Z8410AB1_0_TAG, z80dma_device, read, write)
-	AM_RANGE(0x1ff400, 0x1ff400) AM_MIRROR(0xff) AM_DEVREADWRITE(Z8410AB1_1_TAG, z80dma_device, read, write)
-	AM_RANGE(0x1ff500, 0x1ff500) AM_MIRROR(0xff) AM_DEVREADWRITE(Z8410AB1_2_TAG, z80dma_device, read, write)
-	AM_RANGE(0x1ff600, 0x1ff607) AM_MIRROR(0xf8) AM_READWRITE(scc_r, scc_w)
-	AM_RANGE(0x1ff700, 0x1ff707) AM_MIRROR(0xf8) AM_READWRITE(cio_r, cio_w)
-	AM_RANGE(0x1ff800, 0x1ff8ff) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, iowr0_map)
-	AM_RANGE(0x1ff900, 0x1ff9ff) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, iowr1_map)
-	AM_RANGE(0x1ffa00, 0x1ffaff) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, iowr2_map)
-	AM_RANGE(0x1ffb00, 0x1ffb00) AM_MIRROR(0x7e) AM_WRITE(fw0_w)
-	AM_RANGE(0x1ffb01, 0x1ffb01) AM_MIRROR(0x7e) AM_WRITE(fw1_w)
-	AM_RANGE(0x1ffd00, 0x1ffd07) AM_MIRROR(0xf8) AM_DEVWRITE(ABC1600_MAC_TAG, abc1600_mac_device, dmamap_w)
-	AM_RANGE(0x1ffe00, 0x1ffe00) AM_MIRROR(0xff) AM_WRITE(spec_contr_reg_w)
-ADDRESS_MAP_END
+void abc1600_state::mac_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram();
+	map(0x100000, 0x17ffff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::vram_map));
+	map(0x1fe000, 0x1fefff).rw(this, FUNC(abc1600_state::bus_r), FUNC(abc1600_state::bus_w));
+	map(0x1ff000, 0x1ff000).mirror(0xf9).rw(m_fdc, FUNC(fd1797_device::status_r), FUNC(fd1797_device::cmd_w));
+	map(0x1ff002, 0x1ff002).mirror(0xf9).rw(m_fdc, FUNC(fd1797_device::track_r), FUNC(fd1797_device::track_w));
+	map(0x1ff004, 0x1ff004).mirror(0xf9).rw(m_fdc, FUNC(fd1797_device::sector_r), FUNC(fd1797_device::sector_w));
+	map(0x1ff006, 0x1ff006).mirror(0xf9).rw(m_fdc, FUNC(fd1797_device::data_r), FUNC(fd1797_device::data_w));
+	map(0x1ff100, 0x1ff101).mirror(0xfe).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::crtc_map));
+	map(0x1ff200, 0x1ff207).mirror(0xf8).rw(this, FUNC(abc1600_state::dart_r), FUNC(abc1600_state::dart_w));
+	map(0x1ff300, 0x1ff300).mirror(0xff).rw(m_dma0, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x1ff400, 0x1ff400).mirror(0xff).rw(m_dma1, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x1ff500, 0x1ff500).mirror(0xff).rw(m_dma2, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x1ff600, 0x1ff607).mirror(0xf8).rw(this, FUNC(abc1600_state::scc_r), FUNC(abc1600_state::scc_w));
+	map(0x1ff700, 0x1ff707).mirror(0xf8).rw(this, FUNC(abc1600_state::cio_r), FUNC(abc1600_state::cio_w));
+	map(0x1ff800, 0x1ff8ff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr0_map));
+	map(0x1ff900, 0x1ff9ff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr1_map));
+	map(0x1ffa00, 0x1ffaff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr2_map));
+	map(0x1ffb00, 0x1ffb00).mirror(0x7e).w(this, FUNC(abc1600_state::fw0_w));
+	map(0x1ffb01, 0x1ffb01).mirror(0x7e).w(this, FUNC(abc1600_state::fw1_w));
+	map(0x1ffd00, 0x1ffd07).mirror(0xf8).w(ABC1600_MAC_TAG, FUNC(abc1600_mac_device::dmamap_w));
+	map(0x1ffe00, 0x1ffe00).mirror(0xff).w(this, FUNC(abc1600_state::spec_contr_reg_w));
+}
 
 
 

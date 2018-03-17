@@ -232,39 +232,43 @@ INPUT_CHANGED_MEMBER(polyplay_state::input_changed)
 }
 
 /* memory mapping */
-ADDRESS_MAP_START(polyplay_state::polyplay_mem_zre)
-	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x8fff) AM_ROM
-	AM_RANGE(0xe800, 0xebff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0xec00, 0xf7ff) AM_RAM_WRITE(polyplay_characterram_w) AM_SHARE("characterram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void polyplay_state::polyplay_mem_zre(address_map &map)
+{
+	map(0x0000, 0x0bff).rom();
+	map(0x0c00, 0x0fff).ram();
+	map(0x1000, 0x8fff).rom();
+	map(0xe800, 0xebff).rom().region("gfx1", 0);
+	map(0xec00, 0xf7ff).ram().w(this, FUNC(polyplay_state::polyplay_characterram_w)).share("characterram");
+	map(0xf800, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(polyplay_state::polyplay_mem_zrepp)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
+void polyplay_state::polyplay_mem_zrepp(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
 
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	map(0xc000, 0xcfff).ram();
 
-	AM_RANGE(0xd000, 0xd7ff) AM_ROM AM_REGION("gfx1", 0)
+	map(0xd000, 0xd7ff).rom().region("gfx1", 0);
 
-	AM_RANGE(0xea00, 0xebff) AM_RAM
-	AM_RANGE(0xec00, 0xf7ff) AM_RAM_WRITE(polyplay_characterram_w) AM_SHARE("characterram")
+	map(0xea00, 0xebff).ram();
+	map(0xec00, 0xf7ff).ram().w(this, FUNC(polyplay_state::polyplay_characterram_w)).share("characterram");
 
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+	map(0xf800, 0xffff).ram().share("videoram");
+}
 
 /* port mapping */
-ADDRESS_MAP_START(polyplay_state::polyplay_io_zre)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
-ADDRESS_MAP_END
+void polyplay_state::polyplay_io_zre(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x83).rw(m_z80ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x84, 0x87).rw(m_z80pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
-ADDRESS_MAP_START(polyplay_state::polyplay_io_zrepp)
-	AM_IMPORT_FROM(polyplay_io_zre)
-	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_device, cd_ba_r, cd_ba_w)
-ADDRESS_MAP_END
+void polyplay_state::polyplay_io_zrepp(address_map &map)
+{
+	polyplay_io_zre(map);
+	map(0x88, 0x8b).rw(m_z80sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+}
 
 static INPUT_PORTS_START( polyplay )
 	PORT_START("IN0")

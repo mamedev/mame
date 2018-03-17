@@ -17,7 +17,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SCORE7, score7_cpu_device, "score7", "S+core 7")
+DEFINE_DEVICE_TYPE(SCORE7, score7_cpu_device, "score7", "Sunplus S+core 7")
 
 
 //**************************************************************************

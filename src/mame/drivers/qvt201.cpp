@@ -43,14 +43,15 @@ u32 qvt201_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	return 0;
 }
 
-ADDRESS_MAP_START(qvt201_state::mem_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("nvram")
+void qvt201_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8800, 0x8fff).ram().share("nvram");
 	//AM_RANGE(0x9000, 0x9007) AM_DEVREADWRITE("crtc", scn2672_device, read, write)
-	AM_RANGE(0x9800, 0x980f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("dataram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("attram")
-ADDRESS_MAP_END
+	map(0x9800, 0x980f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0xc000, 0xdfff).ram().share("dataram");
+	map(0xe000, 0xffff).ram().share("attram");
+}
 
 static INPUT_PORTS_START( qvt201 )
 INPUT_PORTS_END

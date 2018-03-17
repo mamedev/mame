@@ -195,31 +195,35 @@ WRITE8_MEMBER(ron_state::sound_cmd_w)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-ADDRESS_MAP_START(ron_state::ron_map)
-	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE("cram")
-	AM_RANGE(0x8c00, 0x8fff) AM_RAM
-ADDRESS_MAP_END
+void ron_state::ron_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom();
+	map(0x8000, 0x83ff).ram().share("vram");
+	map(0x8400, 0x87ff).ram();
+	map(0x8800, 0x8bff).ram().share("cram");
+	map(0x8c00, 0x8fff).ram();
+}
 
-ADDRESS_MAP_START(ron_state::ron_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x01) AM_READ(p1_mux_r)
-	AM_RANGE(0x02, 0x03) AM_READ(p2_mux_r)
-	AM_RANGE(0x03, 0x03) AM_WRITE(mux_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(sound_cmd_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(output_w)
-ADDRESS_MAP_END
+void ron_state::ron_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x01).r(this, FUNC(ron_state::p1_mux_r));
+	map(0x02, 0x03).r(this, FUNC(ron_state::p2_mux_r));
+	map(0x03, 0x03).w(this, FUNC(ron_state::mux_w));
+	map(0x07, 0x07).w(this, FUNC(ron_state::sound_cmd_w));
+	map(0x0a, 0x0a).w(this, FUNC(ron_state::output_w));
+}
 
-ADDRESS_MAP_START(ron_state::ron_audio_map)
-	AM_RANGE(0x0000,0x0fff) AM_ROM
-ADDRESS_MAP_END
+void ron_state::ron_audio_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(ron_state::ron_audio_io)
+void ron_state::ron_audio_io(address_map &map)
+{
 
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( ron )
 	PORT_START("IN0")

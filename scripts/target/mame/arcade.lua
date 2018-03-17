@@ -61,7 +61,7 @@ CPUS["MIPS"] = true
 CPUS["R3000"] = true
 CPUS["PSX"] = true
 CPUS["SH"] = true
-CPUS["DSP16A"] = true
+CPUS["DSP16"] = true
 CPUS["DSP32C"] = true
 CPUS["PIC16C5X"] = true
 CPUS["PIC16C62X"] = true
@@ -268,6 +268,7 @@ SOUNDS["TA7630"] = true
 SOUNDS["MM5837"] = true
 --SOUNDS["DAVE"] = true
 SOUNDS["LC7535"] = true
+--SOUNDS["UPD934G"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -3656,8 +3657,6 @@ files {
 	MAME_DIR .. "src/mame/video/ashnojoe.cpp",
 	MAME_DIR .. "src/mame/drivers/asuka.cpp",
 	MAME_DIR .. "src/mame/includes/asuka.h",
-	MAME_DIR .. "src/mame/machine/bonzeadv.cpp",
-	MAME_DIR .. "src/mame/machine/bonzeadv.h",
 	MAME_DIR .. "src/mame/video/asuka.cpp",
 	MAME_DIR .. "src/mame/drivers/bigevglf.cpp",
 	MAME_DIR .. "src/mame/includes/bigevglf.h",
@@ -4337,6 +4336,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/jp.cpp",
 	MAME_DIR .. "src/mame/drivers/jvh.cpp",
 	MAME_DIR .. "src/mame/drivers/kissproto.cpp",
+	MAME_DIR .. "src/mame/drivers/lckydraw.cpp",
 	MAME_DIR .. "src/mame/drivers/ltd.cpp",
 	MAME_DIR .. "src/mame/drivers/macp.cpp",
 	MAME_DIR .. "src/mame/drivers/micropin.cpp",
@@ -4743,7 +4743,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/taxidriv.cpp",
 	MAME_DIR .. "src/mame/includes/taxidriv.h",
 	MAME_DIR .. "src/mame/video/taxidriv.cpp",
-	MAME_DIR .. "src/mame/drivers/tcl.cpp",
 	MAME_DIR .. "src/mame/drivers/thayers.cpp",
 	MAME_DIR .. "src/mame/drivers/thedeep.cpp",
 	MAME_DIR .. "src/mame/includes/thedeep.h",

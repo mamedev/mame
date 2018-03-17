@@ -102,19 +102,20 @@ READ32_MEMBER(vegaeo_state::vegaeo_custom_read)
 }
 
 
-ADDRESS_MAP_START(vegaeo_state::vega_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
-	AM_RANGE(0x80000000, 0x80013fff) AM_READWRITE8(vram_r, vram_w, 0xffffffff)
-	AM_RANGE(0xfc000000, 0xfc0000ff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0x000000ff)
-	AM_RANGE(0xfc200000, 0xfc2003ff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
-	AM_RANGE(0xfc400000, 0xfc40005b) AM_WRITENOP // crt registers ?
-	AM_RANGE(0xfc600000, 0xfc600003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff).cswidth(32)
-	AM_RANGE(0xfca00000, 0xfca00003) AM_WRITE(vega_misc_w)
-	AM_RANGE(0xfcc00000, 0xfcc00003) AM_READ(vegaeo_custom_read)
-	AM_RANGE(0xfce00000, 0xfce00003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xfd000000, 0xfeffffff) AM_ROM AM_REGION("maindata", 0)
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void vegaeo_state::vega_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram();
+	map(0x80000000, 0x80013fff).rw(this, FUNC(vegaeo_state::vram_r), FUNC(vegaeo_state::vram_w));
+	map(0xfc000000, 0xfc0000ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask32(0x000000ff);
+	map(0xfc200000, 0xfc2003ff).rw("palette", FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
+	map(0xfc400000, 0xfc40005b).nopw(); // crt registers ?
+	map(0xfc600000, 0xfc600003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
+	map(0xfca00000, 0xfca00003).w(this, FUNC(vegaeo_state::vega_misc_w));
+	map(0xfcc00000, 0xfcc00003).r(this, FUNC(vegaeo_state::vegaeo_custom_read));
+	map(0xfce00000, 0xfce00003).portr("P1_P2");
+	map(0xfd000000, 0xfeffffff).rom().region("maindata", 0);
+	map(0xfff80000, 0xffffffff).rom().region("maincpu", 0);
+}
 
 static INPUT_PORTS_START( crazywar )
 	PORT_START("SYSTEM")

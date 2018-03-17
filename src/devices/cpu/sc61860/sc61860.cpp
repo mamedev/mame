@@ -45,7 +45,7 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(SC61860, sc61860_device, "sc61860", "SC61860")
+DEFINE_DEVICE_TYPE(SC61860, sc61860_device, "sc61860", "Sharp SC61860")
 
 
 sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

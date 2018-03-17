@@ -619,16 +619,17 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_fff8_w )
  Address Maps
 ******************************************************************************/
 
-ADDRESS_MAP_START(r9751_state::r9751_mem)
+void r9751_state::r9751_mem(address_map &map)
+{
 	//ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000,0x00ffffff) AM_RAM AM_SHARE("main_ram") // 16MB
-	AM_RANGE(0x08000000,0x0800ffff) AM_ROM AM_REGION("prom", 0)
-	AM_RANGE(0x5FF00000,0x5FFFFFFF) AM_READWRITE(r9751_mmio_5ff_r, r9751_mmio_5ff_w)
-	AM_RANGE(0xFF010000,0xFF01FFFF) AM_READWRITE(r9751_mmio_ff01_r, r9751_mmio_ff01_w)
-	AM_RANGE(0xFF050000,0xFF06FFFF) AM_READWRITE(r9751_mmio_ff05_r, r9751_mmio_ff05_w)
-	AM_RANGE(0xFFF80000,0xFFF8FFFF) AM_READWRITE(r9751_mmio_fff8_r, r9751_mmio_fff8_w)
+	map(0x00000000, 0x00ffffff).ram().share("main_ram"); // 16MB
+	map(0x08000000, 0x0800ffff).rom().region("prom", 0);
+	map(0x5FF00000, 0x5FFFFFFF).rw(this, FUNC(r9751_state::r9751_mmio_5ff_r), FUNC(r9751_state::r9751_mmio_5ff_w));
+	map(0xFF010000, 0xFF01FFFF).rw(this, FUNC(r9751_state::r9751_mmio_ff01_r), FUNC(r9751_state::r9751_mmio_ff01_w));
+	map(0xFF050000, 0xFF06FFFF).rw(this, FUNC(r9751_state::r9751_mmio_ff05_r), FUNC(r9751_state::r9751_mmio_ff05_w));
+	map(0xFFF80000, 0xFFF8FFFF).rw(this, FUNC(r9751_state::r9751_mmio_fff8_r), FUNC(r9751_state::r9751_mmio_fff8_w));
 	//AM_RANGE(0xffffff00,0xffffffff) AM_RAM // Unknown area
-ADDRESS_MAP_END
+}
 
 /******************************************************************************
  Input Ports

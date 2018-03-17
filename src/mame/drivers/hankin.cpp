@@ -101,21 +101,23 @@ private:
 };
 
 
-ADDRESS_MAP_START(hankin_state::hankin_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM // internal to the cpu
-	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("ic11", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("ic10", pia6821_device, read, write)
-	AM_RANGE(0x0200, 0x02ff) AM_RAM AM_SHARE("nvram") // 5101L 4-bit static ram
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void hankin_state::hankin_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x007f).ram(); // internal to the cpu
+	map(0x0088, 0x008b).rw(m_ic11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).rw(m_ic10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0200, 0x02ff).ram().share("nvram"); // 5101L 4-bit static ram
+	map(0x1000, 0x1fff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(hankin_state::hankin_sub_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM // internal to the cpu
-	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("ic2", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x17ff) AM_ROM AM_MIRROR(0x800) AM_REGION("audiocpu", 0)
-ADDRESS_MAP_END
+void hankin_state::hankin_sub_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x007f).ram(); // internal to the cpu
+	map(0x0080, 0x0083).rw(m_ic2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x17ff).rom().mirror(0x800).region("audiocpu", 0);
+}
 
 static INPUT_PORTS_START( hankin )
 	PORT_START("TEST")

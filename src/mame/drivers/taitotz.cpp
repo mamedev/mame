@@ -2062,15 +2062,16 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 // 0x40000000...0x400fffff: BIOS Work RAM
 // 0x40100000...0x40ffffff: User Work RAM
 
-ADDRESS_MAP_START(taitotz_state::ppc603e_mem)
-	AM_RANGE(0x00000000, 0x0000001f) AM_READWRITE(video_chip_r, video_chip_w)
-	AM_RANGE(0x10000000, 0x1000001f) AM_READWRITE(video_fifo_r, video_fifo_w)
-	AM_RANGE(0x40000000, 0x40ffffff) AM_RAM AM_SHARE("work_ram")                // Work RAM
-	AM_RANGE(0xa4000000, 0xa40000ff) AM_READWRITE(ieee1394_r, ieee1394_w)       // IEEE1394 network
-	AM_RANGE(0xa8000000, 0xa8003fff) AM_READWRITE(ppc_common_r, ppc_common_w)   // Common RAM (with TLCS-900)
-	AM_RANGE(0xac000000, 0xac0fffff) AM_ROM AM_REGION("user1", 0)               // Apparently this should be flash ROM read/write access
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void taitotz_state::ppc603e_mem(address_map &map)
+{
+	map(0x00000000, 0x0000001f).rw(this, FUNC(taitotz_state::video_chip_r), FUNC(taitotz_state::video_chip_w));
+	map(0x10000000, 0x1000001f).rw(this, FUNC(taitotz_state::video_fifo_r), FUNC(taitotz_state::video_fifo_w));
+	map(0x40000000, 0x40ffffff).ram().share("work_ram");                // Work RAM
+	map(0xa4000000, 0xa40000ff).rw(this, FUNC(taitotz_state::ieee1394_r), FUNC(taitotz_state::ieee1394_w));       // IEEE1394 network
+	map(0xa8000000, 0xa8003fff).rw(this, FUNC(taitotz_state::ppc_common_r), FUNC(taitotz_state::ppc_common_w));   // Common RAM (with TLCS-900)
+	map(0xac000000, 0xac0fffff).rom().region("user1", 0);               // Apparently this should be flash ROM read/write access
+	map(0xfff00000, 0xffffffff).rom().region("user1", 0);
+}
 
 
 
@@ -2222,27 +2223,29 @@ READ16_MEMBER(taitotz_state::tlcs_ide1_r)
 // 0xfc0d55:    INTRX1          Serial 1 receive
 // 0xfc0ce1:    INTTX1          Serial 1 transmit
 
-ADDRESS_MAP_START(taitotz_state::tlcs900h_mem)
-	AM_RANGE(0x010000, 0x02ffff) AM_RAM                                                     // Work RAM
-	AM_RANGE(0x040000, 0x041fff) AM_RAM AM_SHARE("nvram")                                   // Backup RAM
-	AM_RANGE(0x044000, 0x04400f) AM_READWRITE8(tlcs_rtc_r, tlcs_rtc_w, 0xffff)
-	AM_RANGE(0x060000, 0x061fff) AM_READWRITE8(tlcs_common_r, tlcs_common_w, 0xffff)
-	AM_RANGE(0x064000, 0x064fff) AM_RAM AM_SHARE("mbox_ram")                                // MBox
-	AM_RANGE(0x068000, 0x06800f) AM_DEVWRITE("ata", ata_interface_device, write_cs0) AM_READ(tlcs_ide0_r)
-	AM_RANGE(0x06c000, 0x06c00f) AM_DEVWRITE("ata", ata_interface_device, write_cs1) AM_READ(tlcs_ide1_r)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
-ADDRESS_MAP_END
+void taitotz_state::tlcs900h_mem(address_map &map)
+{
+	map(0x010000, 0x02ffff).ram();                                                     // Work RAM
+	map(0x040000, 0x041fff).ram().share("nvram");                                   // Backup RAM
+	map(0x044000, 0x04400f).rw(this, FUNC(taitotz_state::tlcs_rtc_r), FUNC(taitotz_state::tlcs_rtc_w));
+	map(0x060000, 0x061fff).rw(this, FUNC(taitotz_state::tlcs_common_r), FUNC(taitotz_state::tlcs_common_w));
+	map(0x064000, 0x064fff).ram().share("mbox_ram");                                // MBox
+	map(0x068000, 0x06800f).w(m_ata, FUNC(ata_interface_device::write_cs0)).r(this, FUNC(taitotz_state::tlcs_ide0_r));
+	map(0x06c000, 0x06c00f).w(m_ata, FUNC(ata_interface_device::write_cs1)).r(this, FUNC(taitotz_state::tlcs_ide1_r));
+	map(0xfc0000, 0xffffff).rom().region("io_cpu", 0);
+}
 
-ADDRESS_MAP_START(taitotz_state::landhigh_tlcs900h_mem)
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM                                                     // Work RAM
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("nvram")                                   // Backup RAM
-	AM_RANGE(0x404000, 0x40400f) AM_READWRITE8(tlcs_rtc_r, tlcs_rtc_w, 0xffff)
-	AM_RANGE(0x900000, 0x901fff) AM_READWRITE8(tlcs_common_r, tlcs_common_w, 0xffff)
-	AM_RANGE(0x910000, 0x910fff) AM_RAM AM_SHARE("mbox_ram")                                // MBox
-	AM_RANGE(0x908000, 0x90800f) AM_DEVWRITE("ata", ata_interface_device, write_cs0) AM_READ(tlcs_ide0_r)
-	AM_RANGE(0x918000, 0x91800f) AM_DEVWRITE("ata", ata_interface_device, write_cs1) AM_READ(tlcs_ide1_r)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
-ADDRESS_MAP_END
+void taitotz_state::landhigh_tlcs900h_mem(address_map &map)
+{
+	map(0x200000, 0x21ffff).ram();                                                     // Work RAM
+	map(0x400000, 0x401fff).ram().share("nvram");                                   // Backup RAM
+	map(0x404000, 0x40400f).rw(this, FUNC(taitotz_state::tlcs_rtc_r), FUNC(taitotz_state::tlcs_rtc_w));
+	map(0x900000, 0x901fff).rw(this, FUNC(taitotz_state::tlcs_common_r), FUNC(taitotz_state::tlcs_common_w));
+	map(0x910000, 0x910fff).ram().share("mbox_ram");                                // MBox
+	map(0x908000, 0x90800f).w(m_ata, FUNC(ata_interface_device::write_cs0)).r(this, FUNC(taitotz_state::tlcs_ide0_r));
+	map(0x918000, 0x91800f).w(m_ata, FUNC(ata_interface_device::write_cs1)).r(this, FUNC(taitotz_state::tlcs_ide1_r));
+	map(0xfc0000, 0xffffff).rom().region("io_cpu", 0);
+}
 
 
 

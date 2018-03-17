@@ -206,49 +206,54 @@ READ8_MEMBER( homelab_state::exxx_r )
 
 
 /* Address maps */
-ADDRESS_MAP_START(homelab_state::homelab2_mem)
-	AM_RANGE( 0x0000, 0x07ff ) AM_ROM  // ROM 1
-	AM_RANGE( 0x0800, 0x0fff ) AM_ROM  // ROM 2
-	AM_RANGE( 0x1000, 0x17ff ) AM_ROM  // ROM 3
-	AM_RANGE( 0x1800, 0x1fff ) AM_ROM  // ROM 4
-	AM_RANGE( 0x2000, 0x27ff ) AM_ROM  // ROM 5
-	AM_RANGE( 0x2800, 0x2fff ) AM_ROM  // ROM 6
-	AM_RANGE( 0x3000, 0x37ff ) AM_ROM  // Empty
-	AM_RANGE( 0x3800, 0x3fff ) AM_READWRITE(key_r,cass_w)
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
-	AM_RANGE( 0xc000, 0xc3ff ) AM_RAM AM_REGION("maincpu",0xc000)
-	AM_RANGE( 0xe000, 0xe0ff ) AM_READ(cass2_r)
-ADDRESS_MAP_END
+void homelab_state::homelab2_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();  // ROM 1
+	map(0x0800, 0x0fff).rom();  // ROM 2
+	map(0x1000, 0x17ff).rom();  // ROM 3
+	map(0x1800, 0x1fff).rom();  // ROM 4
+	map(0x2000, 0x27ff).rom();  // ROM 5
+	map(0x2800, 0x2fff).rom();  // ROM 6
+	map(0x3000, 0x37ff).rom();  // Empty
+	map(0x3800, 0x3fff).rw(this, FUNC(homelab_state::key_r), FUNC(homelab_state::cass_w));
+	map(0x4000, 0x7fff).ram();
+	map(0xc000, 0xc3ff).ram().region("maincpu", 0xc000);
+	map(0xe000, 0xe0ff).r(this, FUNC(homelab_state::cass2_r));
+}
 
-ADDRESS_MAP_START(homelab_state::homelab3_mem)
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
-	AM_RANGE( 0xe800, 0xefff ) AM_READ(exxx_r)
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_REGION("maincpu",0xf800)
-ADDRESS_MAP_END
+void homelab_state::homelab3_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).ram();
+	map(0xe800, 0xefff).r(this, FUNC(homelab_state::exxx_r));
+	map(0xf800, 0xffff).ram().region("maincpu", 0xf800);
+}
 
-ADDRESS_MAP_START(homelab_state::homelab3_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x7f, 0x7f ) AM_WRITE(port7f_w)
-	AM_RANGE( 0xff, 0xff ) AM_WRITE(portff_w)
-ADDRESS_MAP_END
+void homelab_state::homelab3_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x7f, 0x7f).w(this, FUNC(homelab_state::port7f_w));
+	map(0xff, 0xff).w(this, FUNC(homelab_state::portff_w));
+}
 
-ADDRESS_MAP_START(homelab_state::brailab4_mem)
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
-	AM_RANGE( 0x4000, 0xcfff ) AM_RAM
-	AM_RANGE( 0xd000, 0xdfff ) AM_ROM
-	AM_RANGE( 0xe800, 0xefff ) AM_READ(exxx_r)
-	AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank1")
-ADDRESS_MAP_END
+void homelab_state::brailab4_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0xcfff).ram();
+	map(0xd000, 0xdfff).rom();
+	map(0xe800, 0xefff).r(this, FUNC(homelab_state::exxx_r));
+	map(0xf800, 0xffff).bankrw("bank1");
+}
 
-ADDRESS_MAP_START(homelab_state::brailab4_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0xf8, 0xf9 ) AM_DEVREADWRITE("mea8000", mea8000_device, read, write)
-	AM_RANGE( 0x7f, 0x7f ) AM_WRITE(brailab4_port7f_w)
-	AM_RANGE( 0xff, 0xff ) AM_WRITE(brailab4_portff_w)
-ADDRESS_MAP_END
+void homelab_state::brailab4_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xf8, 0xf9).rw("mea8000", FUNC(mea8000_device::read), FUNC(mea8000_device::write));
+	map(0x7f, 0x7f).w(this, FUNC(homelab_state::brailab4_port7f_w));
+	map(0xff, 0xff).w(this, FUNC(homelab_state::brailab4_portff_w));
+}
 
 
 

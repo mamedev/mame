@@ -72,15 +72,16 @@ protected:
 };
 
 
-ADDRESS_MAP_START(scv_state::scv_mem)
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM   // BIOS
+void scv_state::scv_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();   // BIOS
 
-	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_SHARE("videoram")  // VRAM + 4 registers
-	AM_RANGE( 0x3600, 0x3600 ) AM_DEVWRITE("upd1771c", upd1771c_device, write)
+	map(0x2000, 0x3403).ram().share("videoram");  // VRAM + 4 registers
+	map(0x3600, 0x3600).w(m_upd1771c, FUNC(upd1771c_device::write));
 
-	AM_RANGE( 0x8000, 0xff7f ) AM_DEVREADWRITE("cartslot", scv_cart_slot_device, read_cart, write_cart) // cartridge
-	AM_RANGE( 0xff80, 0xffff ) AM_RAM   // upd7801 internal RAM
-ADDRESS_MAP_END
+	map(0x8000, 0xff7f).rw(m_cart, FUNC(scv_cart_slot_device::read_cart), FUNC(scv_cart_slot_device::write_cart)); // cartridge
+	map(0xff80, 0xffff).ram();   // upd7801 internal RAM
+}
 
 
 static INPUT_PORTS_START( scv )

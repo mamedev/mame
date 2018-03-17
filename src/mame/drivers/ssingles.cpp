@@ -337,15 +337,16 @@ CUSTOM_INPUT_MEMBER(ssingles_state::controls_r)
 	return data;
 }
 
-ADDRESS_MAP_START(ssingles_state::ssingles_map)
-	AM_RANGE(0x0000, 0x00ff) AM_WRITE(ssingles_videoram_w)
-	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ(c000_r )
-	AM_RANGE(0xc001, 0xc001) AM_READWRITE(c001_r, c001_w )
-	AM_RANGE(0x6000, 0xbfff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ssingles_state::ssingles_map(address_map &map)
+{
+	map(0x0000, 0x00ff).w(this, FUNC(ssingles_state::ssingles_videoram_w));
+	map(0x0800, 0x08ff).w(this, FUNC(ssingles_state::ssingles_colorram_w));
+	map(0x0000, 0x1fff).rom();
+	map(0xc000, 0xc000).r(this, FUNC(ssingles_state::c000_r));
+	map(0xc001, 0xc001).rw(this, FUNC(ssingles_state::c001_r), FUNC(ssingles_state::c001_w));
+	map(0x6000, 0xbfff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
 
 READ8_MEMBER(ssingles_state::atamanot_prot_r)
@@ -375,48 +376,51 @@ WRITE8_MEMBER(ssingles_state::atamanot_prot_w)
 }
 
 
-ADDRESS_MAP_START(ssingles_state::atamanot_map)
-	AM_RANGE(0x0000, 0x00ff) AM_WRITE(ssingles_videoram_w)
-	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x60ff) AM_RAM //kanji tilemap?
+void ssingles_state::atamanot_map(address_map &map)
+{
+	map(0x0000, 0x00ff).w(this, FUNC(ssingles_state::ssingles_videoram_w));
+	map(0x0800, 0x08ff).w(this, FUNC(ssingles_state::ssingles_colorram_w));
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x6000, 0x60ff).ram(); //kanji tilemap?
 //  AM_RANGE(0x6000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_READ(atamanot_prot_r)
+	map(0x8000, 0x83ff).r(this, FUNC(ssingles_state::atamanot_prot_r));
 //  AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("question",0x10000)
 //  AM_RANGE(0xc000, 0xc000) AM_READ(c000_r )
 //  AM_RANGE(0xc001, 0xc001) AM_READWRITE(c001_r, c001_w )
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(ssingles_state::ssingles_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x08, 0x08) AM_READNOP
-	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x16, 0x16) AM_READ_PORT("DSW0")
-	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("INPUTS")
+void ssingles_state::ssingles_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x04, 0x04).w("ay1", FUNC(ay8910_device::data_w));
+	map(0x06, 0x06).w("ay2", FUNC(ay8910_device::address_w));
+	map(0x08, 0x08).nopr();
+	map(0x0a, 0x0a).w("ay2", FUNC(ay8910_device::data_w));
+	map(0x16, 0x16).portr("DSW0");
+	map(0x18, 0x18).portr("DSW1");
+	map(0x1c, 0x1c).portr("INPUTS");
 //  AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
-	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xff, 0xff) AM_DEVWRITE("crtc", mc6845_device, register_w)
-ADDRESS_MAP_END
+	map(0xfe, 0xfe).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xff, 0xff).w("crtc", FUNC(mc6845_device::register_w));
+}
 
-ADDRESS_MAP_START(ssingles_state::atamanot_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x08, 0x08) AM_READNOP
-	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x16, 0x16) AM_READ_PORT("DSW0")
-	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1") AM_WRITE(atamanot_prot_w)
-	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("INPUTS")
+void ssingles_state::atamanot_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x04, 0x04).w("ay1", FUNC(ay8910_device::data_w));
+	map(0x06, 0x06).w("ay2", FUNC(ay8910_device::address_w));
+	map(0x08, 0x08).nopr();
+	map(0x0a, 0x0a).w("ay2", FUNC(ay8910_device::data_w));
+	map(0x16, 0x16).portr("DSW0");
+	map(0x18, 0x18).portr("DSW1").w(this, FUNC(ssingles_state::atamanot_prot_w));
+	map(0x1c, 0x1c).portr("INPUTS");
 //  AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
-	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xff, 0xff) AM_DEVWRITE("crtc", mc6845_device, register_w)
-ADDRESS_MAP_END
+	map(0xfe, 0xfe).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xff, 0xff).w("crtc", FUNC(mc6845_device::register_w));
+}
 
 static INPUT_PORTS_START( ssingles )
 	PORT_START("INPUTS")

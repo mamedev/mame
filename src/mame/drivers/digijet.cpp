@@ -41,8 +41,9 @@ public:
 	void io_map(address_map &map);
 };
 
-ADDRESS_MAP_START(digijet_state::io_map)
-ADDRESS_MAP_END
+void digijet_state::io_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( digijet )
 INPUT_PORTS_END

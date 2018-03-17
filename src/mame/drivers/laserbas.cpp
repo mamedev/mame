@@ -330,28 +330,30 @@ WRITE_LINE_MEMBER(laserbas_state::pit_out_5_w)
 	write_pit_out(5,state);
 }
 
-ADDRESS_MAP_START(laserbas_state::laserbas_memory)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0xbfff) AM_READWRITE(vram_r, vram_w)
-	AM_RANGE(0xc000, 0xf7ff) AM_ROM AM_WRITENOP
-	AM_RANGE(0xf800, 0xfbff) AM_READ(z1_r) AM_WRITENOP /* protection device */
-	AM_RANGE(0xfc00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void laserbas_state::laserbas_memory(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0xbfff).rw(this, FUNC(laserbas_state::vram_r), FUNC(laserbas_state::vram_w));
+	map(0xc000, 0xf7ff).rom().nopw();
+	map(0xf800, 0xfbff).r(this, FUNC(laserbas_state::z1_r)).nopw(); /* protection device */
+	map(0xfc00, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(laserbas_state::laserbas_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x10, 0x11) AM_WRITE(videoctrl_w)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW")
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x22, 0x22) AM_READ(track_hi_r)
-	AM_RANGE(0x23, 0x23) AM_READ(track_lo_r)
-	AM_RANGE(0x20, 0x23) AM_WRITE(out_w)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("pit0", pit8253_device, read, write)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("pit1", pit8253_device, read, write)
-	AM_RANGE(0x80, 0x9f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void laserbas_state::laserbas_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x01, 0x01).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x10, 0x11).w(this, FUNC(laserbas_state::videoctrl_w));
+	map(0x20, 0x20).portr("DSW");
+	map(0x21, 0x21).portr("INPUTS");
+	map(0x22, 0x22).r(this, FUNC(laserbas_state::track_hi_r));
+	map(0x23, 0x23).r(this, FUNC(laserbas_state::track_lo_r));
+	map(0x20, 0x23).w(this, FUNC(laserbas_state::out_w));
+	map(0x40, 0x43).rw("pit0", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x44, 0x47).rw("pit1", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x80, 0x9f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+}
 
 static INPUT_PORTS_START( laserbas )
 	PORT_START("DSW")   // $20

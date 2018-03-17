@@ -620,20 +620,22 @@ MACHINE_RESET_MEMBER(p1_state, poisk1)
  * macros
  */
 
-ADDRESS_MAP_START(p1_state::poisk1_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0xc000)
-ADDRESS_MAP_END
+void p1_state::poisk1_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xfc000, 0xfffff).rom().region("bios", 0xc000);
+}
 
-ADDRESS_MAP_START(p1_state::poisk1_io)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x0028, 0x002B) AM_READWRITE(p1_trap_r, p1_trap_w)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+void p1_state::poisk1_io(address_map &map)
+{
+	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0028, 0x002B).rw(this, FUNC(p1_state::p1_trap_r), FUNC(p1_state::p1_trap_w));
+	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	// can't use regular AM_DEVREADWRITE, because THIS IS SPARTA!
 	// 1st PPI occupies ports 60, 69, 6A and 6B; 2nd PPI -- 68, 61, 62 and 63.
-	AM_RANGE(0x0060, 0x006F) AM_READWRITE(p1_ppi_r, p1_ppi_w)
-	AM_RANGE(0x03D0, 0x03DF) AM_READWRITE(p1_cga_r, p1_cga_w)
-ADDRESS_MAP_END
+	map(0x0060, 0x006F).rw(this, FUNC(p1_state::p1_ppi_r), FUNC(p1_state::p1_ppi_w));
+	map(0x03D0, 0x03DF).rw(this, FUNC(p1_state::p1_cga_r), FUNC(p1_state::p1_cga_w));
+}
 
 static INPUT_PORTS_START( poisk1 )
 	PORT_INCLUDE( poisk1_keyboard_v91 )

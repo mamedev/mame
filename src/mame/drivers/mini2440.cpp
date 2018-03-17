@@ -207,10 +207,11 @@ void mini2440_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(mini2440_state::mini2440_map)
+void mini2440_state::mini2440_map(address_map &map)
+{
 //  AM_RANGE(0x00000000, 0x001fffff) AM_ROM
-	AM_RANGE(0x30000000, 0x37ffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x30000000, 0x37ffffff).ram();
+}
 
 /***************************************************************************
     MACHINE DRIVERS

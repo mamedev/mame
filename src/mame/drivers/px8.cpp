@@ -511,51 +511,55 @@ WRITE8_MEMBER( px8_state::ksc_w )
     ADDRESS_MAP( px8_mem )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(px8_state::px8_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank0")
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank1")
-ADDRESS_MAP_END
+void px8_state::px8_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).bankrw("bank0");
+	map(0x8000, 0xffff).bankrw("bank1");
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( px8_io )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(px8_state::px8_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x00, 0x07) AM_READWRITE(gah40m_r, gah40m_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0x0d, 0x0d) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
+void px8_state::px8_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x0f);
+	map(0x00, 0x07).rw(this, FUNC(px8_state::gah40m_r), FUNC(px8_state::gah40m_w));
+	map(0x0c, 0x0c).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x0d, 0x0d).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 //  AM_RANGE(0x0e, 0x0e) AM_DEVREADWRITE(SED1320_TAG, sed1330_device, status_r, data_w)
 //  AM_RANGE(0x0f, 0x0f) AM_DEVREADWRITE(SED1320_TAG, sed1330_device, data_r, command_w)
-ADDRESS_MAP_END
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( px8_slave_mem )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(px8_state::px8_slave_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0020, 0x0023) AM_READWRITE(gah40s_r, gah40s_w)
+void px8_state::px8_slave_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0020, 0x0023).rw(this, FUNC(px8_state::gah40s_r), FUNC(px8_state::gah40s_w));
 //  AM_RANGE(0x0024, 0x0027) AM_DEVREADWRITE_LEGACY(SED1320_TAG, )
-	AM_RANGE(0x0028, 0x0028) AM_WRITE(gah40s_ier_w)
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x9800, 0xefff) AM_NOP
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD6303_TAG, 0) /* internal mask rom */
-ADDRESS_MAP_END
+	map(0x0028, 0x0028).w(this, FUNC(px8_state::gah40s_ier_w));
+	map(0x8000, 0x97ff).ram().share("video_ram");
+	map(0x9800, 0xefff).noprw();
+	map(0xf000, 0xffff).rom().region(HD6303_TAG, 0); /* internal mask rom */
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( px8_slave_io )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(px8_state::px8_slave_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(M6801_PORT1, M6801_PORT1)
-	AM_RANGE(M6801_PORT2, M6801_PORT2)
-	AM_RANGE(M6801_PORT3, M6801_PORT3)
-	AM_RANGE(M6801_PORT4, M6801_PORT4)
-ADDRESS_MAP_END
+void px8_state::px8_slave_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(M6801_PORT1, M6801_PORT1);
+	map(M6801_PORT2, M6801_PORT2);
+	map(M6801_PORT3, M6801_PORT3);
+	map(M6801_PORT4, M6801_PORT4);
+}
 
 /***************************************************************************
     INPUT PORTS

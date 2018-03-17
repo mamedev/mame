@@ -167,14 +167,15 @@ void gizmondo_state::machine_reset()
     ADDRESS MAPS
 *******************************************************************************/
 
-ADDRESS_MAP_START(gizmondo_state::gizmondo_map)
-	AM_RANGE(0x00000000, 0x000007ff) AM_ROM
-	AM_RANGE(0x00000800, 0x00000fff) AM_DEVREADWRITE16("diskonchip", diskonchip_g3_device, sec_1_r, sec_1_w, 0xffffffff)
-	AM_RANGE(0x00001000, 0x000017ff) AM_DEVREADWRITE16("diskonchip", diskonchip_g3_device, sec_2_r, sec_2_w, 0xffffffff)
-	AM_RANGE(0x00001800, 0x00001fff) AM_DEVREADWRITE16("diskonchip", diskonchip_g3_device, sec_3_r, sec_3_w, 0xffffffff)
-	AM_RANGE(0x30000000, 0x33ffffff) AM_RAM
-	AM_RANGE(0x34000000, 0x3413ffff) AM_DEVREADWRITE("gf4500", gf4500_device, read, write)
-ADDRESS_MAP_END
+void gizmondo_state::gizmondo_map(address_map &map)
+{
+	map(0x00000000, 0x000007ff).rom();
+	map(0x00000800, 0x00000fff).rw("diskonchip", FUNC(diskonchip_g3_device::sec_1_r), FUNC(diskonchip_g3_device::sec_1_w));
+	map(0x00001000, 0x000017ff).rw("diskonchip", FUNC(diskonchip_g3_device::sec_2_r), FUNC(diskonchip_g3_device::sec_2_w));
+	map(0x00001800, 0x00001fff).rw("diskonchip", FUNC(diskonchip_g3_device::sec_3_r), FUNC(diskonchip_g3_device::sec_3_w));
+	map(0x30000000, 0x33ffffff).ram();
+	map(0x34000000, 0x3413ffff).rw(m_gf4500, FUNC(gf4500_device::read), FUNC(gf4500_device::write));
+}
 
 /*******************************************************************************
     MACHINE DRIVERS

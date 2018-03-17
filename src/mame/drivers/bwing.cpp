@@ -121,58 +121,63 @@ WRITE8_MEMBER(bwing_state::bwp2_ctrl_w)
 // CPU Memory Maps
 
 // Main CPU
-ADDRESS_MAP_START(bwing_state::bwp1_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x0800, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x19ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1a00, 0x1aff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x1b00, 0x1b00) AM_READ_PORT("DSW0")
-	AM_RANGE(0x1b01, 0x1b01) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1b02, 0x1b02) AM_READ_PORT("IN0")
-	AM_RANGE(0x1b03, 0x1b03) AM_READ_PORT("IN1")
-	AM_RANGE(0x1b04, 0x1b04) AM_READ_PORT("IN2")
-	AM_RANGE(0x1b00, 0x1b07) AM_WRITE(scrollreg_w)
-	AM_RANGE(0x1c00, 0x1c07) AM_RAM_WRITE(bwp1_ctrl_w)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
-	AM_RANGE(0x4000, 0xffff) AM_ROM // "B-Wings US" writes to 9631-9632(debug?)
-ADDRESS_MAP_END
+void bwing_state::bwp1_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("sharedram");
+	map(0x0800, 0x0fff).ram();
+	map(0x1000, 0x13ff).ram().w(this, FUNC(bwing_state::videoram_w)).share("videoram");
+	map(0x1400, 0x17ff).ram();
+	map(0x1800, 0x19ff).ram().share("spriteram");
+	map(0x1a00, 0x1aff).ram().w(this, FUNC(bwing_state::paletteram_w)).share("paletteram");
+	map(0x1b00, 0x1b00).portr("DSW0");
+	map(0x1b01, 0x1b01).portr("DSW1");
+	map(0x1b02, 0x1b02).portr("IN0");
+	map(0x1b03, 0x1b03).portr("IN1");
+	map(0x1b04, 0x1b04).portr("IN2");
+	map(0x1b00, 0x1b07).w(this, FUNC(bwing_state::scrollreg_w));
+	map(0x1c00, 0x1c07).ram().w(this, FUNC(bwing_state::bwp1_ctrl_w));
+	map(0x2000, 0x3fff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0xffff).rom(); // "B-Wings US" writes to 9631-9632(debug?)
+}
 
 // Banked video RAM
-ADDRESS_MAP_START(bwing_state::bank_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(fgscrollram_w) AM_SHARE("fgscrollram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(bgscrollram_w) AM_SHARE("bgscrollram")
-	AM_RANGE(0x2000, 0x7fff) AM_RAM_WRITE(gfxram_w) AM_SHARE("gfxram")
-ADDRESS_MAP_END
+void bwing_state::bank_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().w(this, FUNC(bwing_state::fgscrollram_w)).share("fgscrollram");
+	map(0x1000, 0x1fff).ram().w(this, FUNC(bwing_state::bgscrollram_w)).share("bgscrollram");
+	map(0x2000, 0x7fff).ram().w(this, FUNC(bwing_state::gfxram_w)).share("gfxram");
+}
 
 // Sub CPU
-ADDRESS_MAP_START(bwing_state::bwp2_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x0800, 0x0fff) AM_RAM
-	AM_RANGE(0x1800, 0x1803) AM_WRITE(bwp2_ctrl_w)
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void bwing_state::bwp2_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("sharedram");
+	map(0x0800, 0x0fff).ram();
+	map(0x1800, 0x1803).w(this, FUNC(bwing_state::bwp2_ctrl_w));
+	map(0xa000, 0xffff).rom();
+}
 
 
 // Sound CPU
-ADDRESS_MAP_START(bwing_state::bwp3_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x0200) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(bwp3_nmiack_w)
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8912_device, data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8912_device, address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8912_device, data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8912_device, address_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(bwp3_nmimask_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
-ADDRESS_MAP_END
+void bwing_state::bwp3_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x0200, 0x0200).w("dac", FUNC(dac_byte_interface::write));
+	map(0x1000, 0x1000).w(this, FUNC(bwing_state::bwp3_nmiack_w));
+	map(0x2000, 0x2000).w("ay1", FUNC(ay8912_device::data_w));
+	map(0x4000, 0x4000).w("ay1", FUNC(ay8912_device::address_w));
+	map(0x6000, 0x6000).w("ay2", FUNC(ay8912_device::data_w));
+	map(0x8000, 0x8000).w("ay2", FUNC(ay8912_device::address_w));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xd000, 0xd000).w(this, FUNC(bwing_state::bwp3_nmimask_w));
+	map(0xe000, 0xffff).rom().region("audiocpu", 0);
+}
 
 
-ADDRESS_MAP_START(bwing_state::bwp3_io_map)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("VBLANK") AM_WRITE(bwp3_u8F_w)
-ADDRESS_MAP_END
+void bwing_state::bwp3_io_map(address_map &map)
+{
+	map(0x00, 0x00).portr("VBLANK").w(this, FUNC(bwing_state::bwp3_u8F_w));
+}
 
 //****************************************************************************
 // I/O Port Maps

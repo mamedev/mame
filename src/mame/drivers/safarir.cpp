@@ -342,16 +342,17 @@ void safarir_state::machine_start()
  *
  *************************************/
 
-ADDRESS_MAP_START(safarir_state::main_map)
-	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(ram_r, ram_w) AM_SHARE("ram")
-	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READNOP AM_WRITE(ram_bank_w)
-	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_READNOP AM_WRITEONLY AM_SHARE("bg_scroll")
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_WRITE(safarir_audio_w)    /* goes to SN76477 */
-	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITENOP  /* cleared at the beginning */
-	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ_PORT("INPUTS") AM_WRITENOP
-	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_READ_PORT("DSW") AM_WRITENOP
-ADDRESS_MAP_END
+void safarir_state::main_map(address_map &map)
+{
+	map(0x0000, 0x17ff).rom();
+	map(0x2000, 0x27ff).rw(this, FUNC(safarir_state::ram_r), FUNC(safarir_state::ram_w)).share("ram");
+	map(0x2800, 0x2800).mirror(0x03ff).nopr().w(this, FUNC(safarir_state::ram_bank_w));
+	map(0x2c00, 0x2c00).mirror(0x03ff).nopr().writeonly().share("bg_scroll");
+	map(0x3000, 0x3000).mirror(0x03ff).w(this, FUNC(safarir_state::safarir_audio_w));    /* goes to SN76477 */
+	map(0x3400, 0x3400).mirror(0x03ff).nopw();  /* cleared at the beginning */
+	map(0x3800, 0x3800).mirror(0x03ff).portr("INPUTS").nopw();
+	map(0x3c00, 0x3c00).mirror(0x03ff).portr("DSW").nopw();
+}
 
 
 

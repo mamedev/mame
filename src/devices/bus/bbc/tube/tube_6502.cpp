@@ -25,9 +25,10 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_6502, bbc_tube_6502_device, "bbc_tube_6502", "Acorn 
 //  ADDRESS_MAP( tube_6502_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(bbc_tube_6502_device::tube_6502_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void bbc_tube_6502_device::tube_6502_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(bbc_tube_6502_device::read), FUNC(bbc_tube_6502_device::write));
+}
 
 //-------------------------------------------------
 //  ROM( tube_6502 )

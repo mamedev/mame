@@ -339,59 +339,64 @@ READ8_MEMBER(coinmstr_state::ff_r)
 
 // Common memory map
 
-ADDRESS_MAP_START(coinmstr_state::coinmstr_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_SHARE("videoram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_SHARE("attr_ram1")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_SHARE("attr_ram2")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(quizmstr_attr3_w) AM_SHARE("attr_ram3")
-ADDRESS_MAP_END
+void coinmstr_state::coinmstr_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(coinmstr_state::quizmstr_bg_w)).share("videoram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(coinmstr_state::quizmstr_attr1_w)).share("attr_ram1");
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(coinmstr_state::quizmstr_attr2_w)).share("attr_ram2");
+	map(0xf800, 0xffff).ram().w(this, FUNC(coinmstr_state::quizmstr_attr3_w)).share("attr_ram3");
+}
 
 /* 2x 6462 hardware C000-DFFF & E000-FFFF */
-ADDRESS_MAP_START(coinmstr_state::jpcoin_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM     /* 2x 6462 hardware */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_SHARE("videoram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_SHARE("attr_ram1")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_SHARE("attr_ram2")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(quizmstr_attr3_w) AM_SHARE("attr_ram3")
-ADDRESS_MAP_END
+void coinmstr_state::jpcoin_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram();     /* 2x 6462 hardware */
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(coinmstr_state::quizmstr_bg_w)).share("videoram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(coinmstr_state::quizmstr_attr1_w)).share("attr_ram1");
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(coinmstr_state::quizmstr_attr2_w)).share("attr_ram2");
+	map(0xf800, 0xffff).ram().w(this, FUNC(coinmstr_state::quizmstr_attr3_w)).share("attr_ram3");
+}
 
 // Different I/O mappping for every game
 
-ADDRESS_MAP_START(coinmstr_state::quizmstr_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(question_r)
-	AM_RANGE(0x00, 0x03) AM_WRITE(question_w)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x41, 0x41) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x48, 0x4b) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x50, 0x53) AM_READNOP
-	AM_RANGE(0x50, 0x53) AM_WRITENOP
-	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0x70, 0x70) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x71, 0x71) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xc0, 0xc3) AM_READNOP
-	AM_RANGE(0xc0, 0xc3) AM_WRITENOP
-ADDRESS_MAP_END
+void coinmstr_state::quizmstr_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(coinmstr_state::question_r));
+	map(0x00, 0x03).w(this, FUNC(coinmstr_state::question_w));
+	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x41, 0x41).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x48, 0x4b).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x50, 0x53).nopr();
+	map(0x50, 0x53).nopw();
+	map(0x58, 0x5b).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x70, 0x70).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x71, 0x71).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xc0, 0xc3).nopr();
+	map(0xc0, 0xc3).nopw();
+}
 
-ADDRESS_MAP_START(coinmstr_state::trailblz_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(question_r)
-	AM_RANGE(0x00, 0x03) AM_WRITE(question_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x41, 0x41) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x48, 0x49) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x49, 0x49) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("pia0", pia6821_device, read, write) //?
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0xc1, 0xc3) AM_WRITENOP
-ADDRESS_MAP_END
+void coinmstr_state::trailblz_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(coinmstr_state::question_r));
+	map(0x00, 0x03).w(this, FUNC(coinmstr_state::question_w));
+	map(0x40, 0x40).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x41, 0x41).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x48, 0x49).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x49, 0x49).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x50, 0x53).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //?
+	map(0x60, 0x63).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x70, 0x73).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc1, 0xc3).nopw();
+}
 
-ADDRESS_MAP_START(coinmstr_state::supnudg2_io_map)
+void coinmstr_state::supnudg2_io_map(address_map &map)
+{
 /*
 out 40
 in  40
@@ -420,22 +425,23 @@ out C3
 
 E0-E1 CRTC
 */
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(question_r)
-	AM_RANGE(0x00, 0x03) AM_WRITE(question_w)
-	AM_RANGE(0x48, 0x48) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x49, 0x49) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x68, 0x6b) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0x78, 0x79) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x79, 0x79) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xc0, 0xc1) AM_READNOP
-	AM_RANGE(0xc0, 0xc3) AM_WRITENOP
-ADDRESS_MAP_END
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(coinmstr_state::question_r));
+	map(0x00, 0x03).w(this, FUNC(coinmstr_state::question_w));
+	map(0x48, 0x48).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x49, 0x49).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x40, 0x43).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x50, 0x53).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x68, 0x6b).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x78, 0x79).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x79, 0x79).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xc0, 0xc1).nopr();
+	map(0xc0, 0xc3).nopw();
+}
 
-ADDRESS_MAP_START(coinmstr_state::pokeroul_io_map)
+void coinmstr_state::pokeroul_io_map(address_map &map)
+{
 /*
 out 68
 in  69
@@ -456,18 +462,19 @@ out 7A
 
 E0-E1 CRTC
 */
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x41, 0x41) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x48, 0x49) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x49, 0x49) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("pia0", pia6821_device, read, write) /* confirmed */
-	AM_RANGE(0x68, 0x6b) AM_DEVREADWRITE("pia1", pia6821_device, read, write) /* confirmed */
-	AM_RANGE(0x78, 0x7b) AM_DEVREADWRITE("pia2", pia6821_device, read, write) /* confirmed */
-	AM_RANGE(0xc0, 0xc1) AM_READ(ff_r)  /* needed to boot */
-ADDRESS_MAP_END
+	map.global_mask(0xff);
+	map(0x40, 0x40).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x41, 0x41).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x48, 0x49).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x49, 0x49).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x58, 0x5b).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); /* confirmed */
+	map(0x68, 0x6b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); /* confirmed */
+	map(0x78, 0x7b).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); /* confirmed */
+	map(0xc0, 0xc1).r(this, FUNC(coinmstr_state::ff_r));  /* needed to boot */
+}
 
-ADDRESS_MAP_START(coinmstr_state::jpcoin_io_map)
+void coinmstr_state::jpcoin_io_map(address_map &map)
+{
 /*
 out C0
 in  C1
@@ -484,17 +491,17 @@ out DA
 
 E0-E1 CRTC
 */
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("crtc", mc6845_device, address_w)           /* confirmed */
-	AM_RANGE(0xe1, 0xe1) AM_DEVWRITE("crtc", mc6845_device, register_w)          /* confirmed */
-	AM_RANGE(0xc0, 0xc1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xc1, 0xc1) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xc8, 0xcb) AM_DEVREADWRITE("pia0", pia6821_device, read, write)    /* confirmed */
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("pia2", pia6821_device, read, write)    /* confirmed */
+	map.global_mask(0xff);
+	map(0xe0, 0xe0).w("crtc", FUNC(mc6845_device::address_w));           /* confirmed */
+	map(0xe1, 0xe1).w("crtc", FUNC(mc6845_device::register_w));          /* confirmed */
+	map(0xc0, 0xc1).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xc1, 0xc1).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xc8, 0xcb).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));    /* confirmed */
+	map(0xd0, 0xd3).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xd8, 0xdb).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));    /* confirmed */
 //  AM_RANGE(0xc0, 0xc1) AM_READ(ff_r)  /* needed to boot */
-	AM_RANGE(0xc4, 0xc4) AM_READ(ff_r)  /* needed to boot */
-ADDRESS_MAP_END
+	map(0xc4, 0xc4).r(this, FUNC(coinmstr_state::ff_r));  /* needed to boot */
+}
 
 
 static INPUT_PORTS_START( quizmstr )

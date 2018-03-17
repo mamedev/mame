@@ -75,18 +75,25 @@ uint32_t hotstuff_state::screen_update_hotstuff(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-ADDRESS_MAP_START(hotstuff_state::hotstuff_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0fffff) AM_NOP //ROM AM_REGION("data", 0)
+void hotstuff_state::hotstuff_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x0fffff).noprw(); //ROM AM_REGION("data", 0)
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM
+	map(0x400000, 0x40ffff).ram();
 
-	AM_RANGE(0x600000, 0x600003) AM_DEVREADWRITE8("scc1", z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xffff)
-	AM_RANGE(0x620000, 0x620003) AM_DEVREADWRITE8("scc2", z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xffff)
-	;map(0x680000, 0x680001).lrw8("rtc_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_rtc->read(space, offset^1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_rtc->write(space, offset^1, data, mem_mask); });
+	map(0x600000, 0x600003).rw("scc1", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w));
+	map(0x620000, 0x620003).rw("scc2", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w));
+	map(0x680000, 0x680001).lrw8("rtc_rw",
+								 [this](address_space &space, offs_t offset, u8 mem_mask) {
+									 return m_rtc->read(space, offset^1, mem_mask);
+								 },
+								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+									 m_rtc->write(space, offset^1, data, mem_mask);
+								 });
 
-	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_SHARE("bitmapram")
-ADDRESS_MAP_END
+	map(0x980000, 0x9bffff).ram().share("bitmapram");
+}
 
 static INPUT_PORTS_START( hotstuff )
 INPUT_PORTS_END

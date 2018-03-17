@@ -352,37 +352,39 @@ WRITE8_MEMBER(tvc_state::cassette_w)
 	m_cassette->output(m_cassette_ff ? +1 : -1);
 }
 
-ADDRESS_MAP_START(tvc_state::tvc_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void tvc_state::tvc_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
-ADDRESS_MAP_START(tvc_state::tvc_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(border_color_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x02, 0x02) AM_WRITE(bank_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(keyboard_w)
-	AM_RANGE(0x04, 0x06) AM_WRITE(sound_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(flipflop_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(vram_bank_w)
-	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("exp1", tvcexp_slot_device, io_read, io_write)
-	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("exp2", tvcexp_slot_device, io_read, io_write)
-	AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE("exp3", tvcexp_slot_device, io_read, io_write)
-	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("exp4", tvcexp_slot_device, io_read, io_write)
-	AM_RANGE(0x50, 0x50) AM_WRITE(cassette_w)
-	AM_RANGE(0x58, 0x58) AM_READ(keyboard_r)
-	AM_RANGE(0x59, 0x59) AM_READ(int_state_r)
-	AM_RANGE(0x5a, 0x5a) AM_READ(exp_id_r)
-	AM_RANGE(0x5b, 0x5b) AM_READ(_5b_r)
-	AM_RANGE(0x58, 0x5b) AM_WRITE(expint_ack_w)
-	AM_RANGE(0x60, 0x63) AM_WRITE(palette_w)
-	AM_RANGE(0x70, 0x70) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x71, 0x71) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-ADDRESS_MAP_END
+void tvc_state::tvc_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(tvc_state::border_color_w));
+	map(0x01, 0x01).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x02, 0x02).w(this, FUNC(tvc_state::bank_w));
+	map(0x03, 0x03).w(this, FUNC(tvc_state::keyboard_w));
+	map(0x04, 0x06).w(this, FUNC(tvc_state::sound_w));
+	map(0x07, 0x07).w(this, FUNC(tvc_state::flipflop_w));
+	map(0x0f, 0x0f).w(this, FUNC(tvc_state::vram_bank_w));
+	map(0x10, 0x1f).rw("exp1", FUNC(tvcexp_slot_device::io_read), FUNC(tvcexp_slot_device::io_write));
+	map(0x20, 0x2f).rw("exp2", FUNC(tvcexp_slot_device::io_read), FUNC(tvcexp_slot_device::io_write));
+	map(0x30, 0x3f).rw("exp3", FUNC(tvcexp_slot_device::io_read), FUNC(tvcexp_slot_device::io_write));
+	map(0x40, 0x4f).rw("exp4", FUNC(tvcexp_slot_device::io_read), FUNC(tvcexp_slot_device::io_write));
+	map(0x50, 0x50).w(this, FUNC(tvc_state::cassette_w));
+	map(0x58, 0x58).r(this, FUNC(tvc_state::keyboard_r));
+	map(0x59, 0x59).r(this, FUNC(tvc_state::int_state_r));
+	map(0x5a, 0x5a).r(this, FUNC(tvc_state::exp_id_r));
+	map(0x5b, 0x5b).r(this, FUNC(tvc_state::_5b_r));
+	map(0x58, 0x5b).w(this, FUNC(tvc_state::expint_ack_w));
+	map(0x60, 0x63).w(this, FUNC(tvc_state::palette_w));
+	map(0x70, 0x70).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x71, 0x71).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( tvc )

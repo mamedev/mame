@@ -490,42 +490,45 @@ void glasgow_state::machine_reset()
 }
 
 
-ADDRESS_MAP_START(glasgow_state::glasgow_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x010000, 0x010001) AM_WRITE8( glasgow_lcd_w, 0xff00 )
-	AM_RANGE(0x010002, 0x010003) AM_READWRITE( glasgow_keys_r, glasgow_keys_w )
-	AM_RANGE(0x010004, 0x010005) AM_WRITE8( glasgow_lcd_flag_w, 0xff00 )
-	AM_RANGE(0x010006, 0x010007) AM_READWRITE( glasgow_board_r, glasgow_beeper_w )
-	AM_RANGE(0x010008, 0x010009) AM_WRITE( glasgow_board_w )
-	AM_RANGE(0x01c000, 0x01ffff) AM_RAM // 16KB
-ADDRESS_MAP_END
+void glasgow_state::glasgow_mem(address_map &map)
+{
+	map.global_mask(0x1ffff);
+	map(0x000000, 0x00ffff).rom();
+	map(0x010000, 0x010000).w(this, FUNC(glasgow_state::glasgow_lcd_w));
+	map(0x010002, 0x010003).rw(this, FUNC(glasgow_state::glasgow_keys_r), FUNC(glasgow_state::glasgow_keys_w));
+	map(0x010004, 0x010004).w(this, FUNC(glasgow_state::glasgow_lcd_flag_w));
+	map(0x010006, 0x010007).rw(this, FUNC(glasgow_state::glasgow_board_r), FUNC(glasgow_state::glasgow_beeper_w));
+	map(0x010008, 0x010009).w(this, FUNC(glasgow_state::glasgow_board_w));
+	map(0x01c000, 0x01ffff).ram(); // 16KB
+}
 
-ADDRESS_MAP_START(amsterd_state::amsterd_mem)
+void amsterd_state::amsterd_mem(address_map &map)
+{
 	// ADDRESS_MAP_GLOBAL_MASK(0x7FFFF)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x800002, 0x800003) AM_WRITE8( write_lcd, 0xff00 )
-	AM_RANGE(0x800008, 0x800009) AM_WRITE8( write_lcd_flag, 0xff00 )
-	AM_RANGE(0x800004, 0x800005) AM_WRITE8( write_beeper, 0xff00 )
-	AM_RANGE(0x800010, 0x800011) AM_WRITE8( write_board, 0xff00 )
-	AM_RANGE(0x800020, 0x800021) AM_READ( read_board )
-	AM_RANGE(0x800040, 0x800041) AM_READ8( read_newkeys, 0xff00 )
-	AM_RANGE(0x800088, 0x800089) AM_WRITE( write_lcd_invert )
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM // 16KB
-ADDRESS_MAP_END
+	map(0x000000, 0x00ffff).rom();
+	map(0x800002, 0x800002).w(this, FUNC(amsterd_state::write_lcd));
+	map(0x800008, 0x800008).w(this, FUNC(amsterd_state::write_lcd_flag));
+	map(0x800004, 0x800004).w(this, FUNC(amsterd_state::write_beeper));
+	map(0x800010, 0x800010).w(this, FUNC(amsterd_state::write_board));
+	map(0x800020, 0x800021).r(this, FUNC(amsterd_state::read_board));
+	map(0x800040, 0x800040).r(this, FUNC(amsterd_state::read_newkeys));
+	map(0x800088, 0x800089).w(this, FUNC(amsterd_state::write_lcd_invert));
+	map(0xffc000, 0xffffff).ram(); // 16KB
+}
 
-ADDRESS_MAP_START(amsterd_state::dallas32_mem)
+void amsterd_state::dallas32_mem(address_map &map)
+{
 	// ADDRESS_MAP_GLOBAL_MASK(0x1FFFF)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x010000, 0x01ffff) AM_RAM // 64KB
-	AM_RANGE(0x800000, 0x800003) AM_WRITE8( write_lcd, 0x0000ff00 )
-	AM_RANGE(0x800004, 0x800007) AM_WRITE8( write_beeper, 0xff000000 )
-	AM_RANGE(0x800008, 0x80000b) AM_WRITE8( write_lcd_flag, 0xff000000 )
-	AM_RANGE(0x800010, 0x800013) AM_WRITE8( write_board, 0xff000000 )
-	AM_RANGE(0x800020, 0x800023) AM_READ( read_board32 )
-	AM_RANGE(0x800040, 0x800043) AM_READ8( read_newkeys, 0xff000000 )
-	AM_RANGE(0x800088, 0x80008b) AM_WRITE( write_keys32 )
-ADDRESS_MAP_END
+	map(0x000000, 0x00ffff).rom();
+	map(0x010000, 0x01ffff).ram(); // 64KB
+	map(0x800002, 0x800002).w(this, FUNC(amsterd_state::write_lcd));
+	map(0x800004, 0x800004).w(this, FUNC(amsterd_state::write_beeper));
+	map(0x800008, 0x800008).w(this, FUNC(amsterd_state::write_lcd_flag));
+	map(0x800010, 0x800010).w(this, FUNC(amsterd_state::write_board));
+	map(0x800020, 0x800023).r(this, FUNC(amsterd_state::read_board32));
+	map(0x800040, 0x800040).r(this, FUNC(amsterd_state::read_newkeys));
+	map(0x800088, 0x80008b).w(this, FUNC(amsterd_state::write_keys32));
+}
 
 
 static INPUT_PORTS_START( chessboard )

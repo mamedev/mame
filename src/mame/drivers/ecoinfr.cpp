@@ -476,45 +476,47 @@ WRITE8_MEMBER(ecoinfr_state::ec_port18_out_w)
 }
 
 
-ADDRESS_MAP_START(ecoinfr_state::memmap)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
+void ecoinfr_state::memmap(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
 
-	AM_RANGE(0xa000, 0xa000) AM_DEVREADWRITE(UPD8251_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE(UPD8251_TAG, i8251_device, status_r, control_w)
+	map(0xa000, 0xa000).rw(UPD8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xa001, 0xa001).rw(UPD8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
-ADDRESS_MAP_END
+}
 
 
 
-ADDRESS_MAP_START(ecoinfr_state::portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ec_port00_out_w) AM_READ_PORT("IN0") // Reel 1 Write
-	AM_RANGE(0x01, 0x01) AM_WRITE(ec_port01_out_w) AM_READ_PORT("IN1") // Reel 2 Write + Reels Opto Read
-	AM_RANGE(0x02, 0x02) AM_WRITE(ec_port02_out_w) AM_READ_PORT("IN2") // Reel 3 Write
-	AM_RANGE(0x03, 0x03) AM_WRITE(ec_port03_out_w) AM_READ_PORT("IN3")
-	AM_RANGE(0x04, 0x04) AM_WRITE(ec_port04_out_w) AM_READ_PORT("IN4")
-	AM_RANGE(0x05, 0x05) AM_WRITE(ec_port05_out_w) AM_READ_PORT("IN5")
-	AM_RANGE(0x06, 0x06) AM_WRITE(ec_port06_out_w) AM_READ_PORT("IN6")
-	AM_RANGE(0x07, 0x07) AM_WRITE(ec_port07_out_w) AM_READ_PORT("IN7")
-	AM_RANGE(0x08, 0x08) AM_WRITE(ec_port08_out_bank_strobe_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(ec_port09_out_reelen_w) // 09 Reel Enables
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(ec_port0a_out_w) // 10 (Sound 1)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(ec_port0b_out_w) // 11 (Sound 2)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(ec_port0c_out_cred_strobe_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(ec_port0d_out_cred_data_w)
+void ecoinfr_state::portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(ecoinfr_state::ec_port00_out_w)).portr("IN0"); // Reel 1 Write
+	map(0x01, 0x01).w(this, FUNC(ecoinfr_state::ec_port01_out_w)).portr("IN1"); // Reel 2 Write + Reels Opto Read
+	map(0x02, 0x02).w(this, FUNC(ecoinfr_state::ec_port02_out_w)).portr("IN2"); // Reel 3 Write
+	map(0x03, 0x03).w(this, FUNC(ecoinfr_state::ec_port03_out_w)).portr("IN3");
+	map(0x04, 0x04).w(this, FUNC(ecoinfr_state::ec_port04_out_w)).portr("IN4");
+	map(0x05, 0x05).w(this, FUNC(ecoinfr_state::ec_port05_out_w)).portr("IN5");
+	map(0x06, 0x06).w(this, FUNC(ecoinfr_state::ec_port06_out_w)).portr("IN6");
+	map(0x07, 0x07).w(this, FUNC(ecoinfr_state::ec_port07_out_w)).portr("IN7");
+	map(0x08, 0x08).w(this, FUNC(ecoinfr_state::ec_port08_out_bank_strobe_w));
+	map(0x09, 0x09).w(this, FUNC(ecoinfr_state::ec_port09_out_reelen_w)); // 09 Reel Enables
+	map(0x0a, 0x0a).w(this, FUNC(ecoinfr_state::ec_port0a_out_w)); // 10 (Sound 1)
+	map(0x0b, 0x0b).w(this, FUNC(ecoinfr_state::ec_port0b_out_w)); // 11 (Sound 2)
+	map(0x0c, 0x0c).w(this, FUNC(ecoinfr_state::ec_port0c_out_cred_strobe_w));
+	map(0x0d, 0x0d).w(this, FUNC(ecoinfr_state::ec_port0d_out_cred_data_w));
 //  AM_RANGE(0x0e, 0x0e) AM_WRITE(ec_port0e_out_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(ec_port0f_out_bank_segdata_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(ec_port10_out_w) // 16 (Meter)
-	AM_RANGE(0x11, 0x11) AM_WRITE(ec_port11_out_w) // SEC
-	AM_RANGE(0x12, 0x12) AM_WRITE(ec_port12_out_w) // SEC
-	AM_RANGE(0x13, 0x13) AM_WRITE(ec_port13_out_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(ec_port14_out_w)
-	AM_RANGE(0x15, 0x15) AM_WRITE(ec_port15_out_w) // SEC + VDF (3rd party)
-	AM_RANGE(0x16, 0x16) AM_WRITE(ec_port16_out_w)
-	AM_RANGE(0x17, 0x17) AM_WRITE(ec_port17_out_w) // Hopper + VDF (3rd party)
-	AM_RANGE(0x18, 0x18) AM_WRITE(ec_port18_out_w) // 24 (Watchdog)
-ADDRESS_MAP_END
+	map(0x0f, 0x0f).w(this, FUNC(ecoinfr_state::ec_port0f_out_bank_segdata_w));
+	map(0x10, 0x10).w(this, FUNC(ecoinfr_state::ec_port10_out_w)); // 16 (Meter)
+	map(0x11, 0x11).w(this, FUNC(ecoinfr_state::ec_port11_out_w)); // SEC
+	map(0x12, 0x12).w(this, FUNC(ecoinfr_state::ec_port12_out_w)); // SEC
+	map(0x13, 0x13).w(this, FUNC(ecoinfr_state::ec_port13_out_w));
+	map(0x14, 0x14).w(this, FUNC(ecoinfr_state::ec_port14_out_w));
+	map(0x15, 0x15).w(this, FUNC(ecoinfr_state::ec_port15_out_w)); // SEC + VDF (3rd party)
+	map(0x16, 0x16).w(this, FUNC(ecoinfr_state::ec_port16_out_w));
+	map(0x17, 0x17).w(this, FUNC(ecoinfr_state::ec_port17_out_w)); // Hopper + VDF (3rd party)
+	map(0x18, 0x18).w(this, FUNC(ecoinfr_state::ec_port18_out_w)); // 24 (Watchdog)
+}
 
 CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel1_opto_r)
 {

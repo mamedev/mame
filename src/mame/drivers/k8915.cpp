@@ -53,19 +53,21 @@ WRITE8_MEMBER( k8915_state::k8915_a8_w )
 		membank("boot")->set_entry(1); // rom at 0000
 }
 
-ADDRESS_MAP_START(k8915_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void k8915_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).bankrw("boot");
+	map(0x1000, 0x17ff).ram().share("videoram");
+	map(0x1800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(k8915_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0xa8, 0xa8) AM_WRITE(k8915_a8_w)
-ADDRESS_MAP_END
+void k8915_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x50, 0x53).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x58, 0x5b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0xa8, 0xa8).w(this, FUNC(k8915_state::k8915_a8_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( k8915 )

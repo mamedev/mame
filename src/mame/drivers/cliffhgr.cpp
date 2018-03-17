@@ -240,30 +240,32 @@ void cliffhgr_state::machine_reset()
 
 /********************************************************/
 
-ADDRESS_MAP_START(cliffhgr_state::mainmem)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM     /* ROM */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")   /* NVRAM */
-	AM_RANGE(0xe800, 0xefff) AM_RAM     /* RAM */
-ADDRESS_MAP_END
+void cliffhgr_state::mainmem(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();     /* ROM */
+	map(0xe000, 0xe7ff).ram().share("nvram");   /* NVRAM */
+	map(0xe800, 0xefff).ram();     /* RAM */
+}
 
-ADDRESS_MAP_START(cliffhgr_state::mainport)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x44, 0x44) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
-	AM_RANGE(0x45, 0x45) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)
-	AM_RANGE(0x46, 0x46) AM_WRITE(cliff_sound_overlay_w)
-	AM_RANGE(0x50, 0x52) AM_READ(cliff_phillips_code_r)
-	AM_RANGE(0x53, 0x53) AM_READ(cliff_irq_ack_r)
-	AM_RANGE(0x54, 0x54) AM_DEVWRITE("tms9928a", tms9928a_device, register_write)
-	AM_RANGE(0x55, 0x55) AM_DEVREAD("tms9928a", tms9928a_device, register_read)
-	AM_RANGE(0x57, 0x57) AM_WRITE(cliff_phillips_clear_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(cliff_port_bank_w)
-	AM_RANGE(0x62, 0x62) AM_READ(cliff_port_r)
-	AM_RANGE(0x64, 0x64) AM_WRITENOP /* unused in schematics, may be used as timing delay for IR interface */
-	AM_RANGE(0x66, 0x66) AM_WRITE(cliff_ldwire_w)
-	AM_RANGE(0x68, 0x68) AM_WRITE(cliff_coin_counter_w)
-	AM_RANGE(0x6a, 0x6a) AM_WRITENOP /* /LAMP0 (Infrared?) */
-	AM_RANGE(0x6e, 0x6f) AM_WRITE(cliff_test_led_w)
-ADDRESS_MAP_END
+void cliffhgr_state::mainport(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x44, 0x44).w("tms9928a", FUNC(tms9928a_device::vram_write));
+	map(0x45, 0x45).r("tms9928a", FUNC(tms9928a_device::vram_read));
+	map(0x46, 0x46).w(this, FUNC(cliffhgr_state::cliff_sound_overlay_w));
+	map(0x50, 0x52).r(this, FUNC(cliffhgr_state::cliff_phillips_code_r));
+	map(0x53, 0x53).r(this, FUNC(cliffhgr_state::cliff_irq_ack_r));
+	map(0x54, 0x54).w("tms9928a", FUNC(tms9928a_device::register_write));
+	map(0x55, 0x55).r("tms9928a", FUNC(tms9928a_device::register_read));
+	map(0x57, 0x57).w(this, FUNC(cliffhgr_state::cliff_phillips_clear_w));
+	map(0x60, 0x60).w(this, FUNC(cliffhgr_state::cliff_port_bank_w));
+	map(0x62, 0x62).r(this, FUNC(cliffhgr_state::cliff_port_r));
+	map(0x64, 0x64).nopw(); /* unused in schematics, may be used as timing delay for IR interface */
+	map(0x66, 0x66).w(this, FUNC(cliffhgr_state::cliff_ldwire_w));
+	map(0x68, 0x68).w(this, FUNC(cliffhgr_state::cliff_coin_counter_w));
+	map(0x6a, 0x6a).nopw(); /* /LAMP0 (Infrared?) */
+	map(0x6e, 0x6f).w(this, FUNC(cliffhgr_state::cliff_test_led_w));
+}
 
 
 /*************************************

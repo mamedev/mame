@@ -101,21 +101,23 @@ READ8_MEMBER(att4425_state::port15_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(att4425_state::att4425_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram") // c000..f7af?
-ADDRESS_MAP_END
+void att4425_state::att4425_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region(Z80_TAG, 0);
+	map(0x8000, 0xffff).ram().share("videoram"); // c000..f7af?
+}
 
-ADDRESS_MAP_START(att4425_state::att4425_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(port10_w)
-	AM_RANGE(0x14, 0x14) AM_READWRITE(port14_r, port14_w)
-	AM_RANGE(0x15, 0x15) AM_READ(port15_r)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_device, ba_cd_r, ba_cd_w)
-ADDRESS_MAP_END
+void att4425_state::att4425_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x01, 0x01).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x10).w(this, FUNC(att4425_state::port10_w));
+	map(0x14, 0x14).rw(this, FUNC(att4425_state::port14_r), FUNC(att4425_state::port14_w));
+	map(0x15, 0x15).r(this, FUNC(att4425_state::port15_r));
+	map(0x18, 0x1b).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x1c, 0x1f).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+}
 
 /* Input Ports */
 

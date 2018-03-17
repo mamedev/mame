@@ -34,29 +34,31 @@ Memo:
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(hyhoo_state::hyhoo_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void hyhoo_state::hyhoo_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xffff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(hyhoo_state::hyhoo_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void hyhoo_state::hyhoo_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
-	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
-	AM_RANGE(0x81, 0x81) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x90, 0x97) AM_WRITE(hyhoo_blitter_w)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport1_r, inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport2_r, sndrombank1_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_SHARE("clut")
-	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write)     // unknown read
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(hyhoo_romsel_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVREAD("nb1413m3", nb1413m3_device, gfxrom_r)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
+	map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r));
+	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x90, 0x90).portr("SYSTEM");
+	map(0x90, 0x97).w(this, FUNC(hyhoo_state::hyhoo_blitter_w));
+	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
+	map(0xb0, 0xb0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r), FUNC(nb1413m3_device::sndrombank1_w));
+	map(0xc0, 0xcf).writeonly().share("clut");
+	map(0xd0, 0xd0).nopr().w("dac", FUNC(dac_byte_interface::write));     // unknown read
+	map(0xe0, 0xe0).w(this, FUNC(hyhoo_state::hyhoo_romsel_w));
+	map(0xe0, 0xe1).r(m_nb1413m3, FUNC(nb1413m3_device::gfxrom_r));
+	map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
 //  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
-	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
-ADDRESS_MAP_END
+	map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
+}
 
 CUSTOM_INPUT_MEMBER( hyhoo_state::nb1413m3_busyflag_r )
 {

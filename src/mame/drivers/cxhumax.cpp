@@ -943,40 +943,41 @@ uint32_t cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-ADDRESS_MAP_START(cxhumax_state::cxhumax_map)
-	AM_RANGE(0x00000000, 0x03ffffff) AM_RAM AM_SHARE("ram") AM_MIRROR(0x40000000)           // 64?MB RAM
-	AM_RANGE(0xe0000000, 0xe000ffff) AM_READWRITE(cx_hsx_r, cx_hsx_w)                       // HSX
-	AM_RANGE(0xe0010000, 0xe0010003) AM_READWRITE(cx_romdescr_r, cx_romdescr_w)             // ROM Descriptor
-	AM_RANGE(0xe0010004, 0xe001000f) AM_READWRITE(cx_isaromdescr_r, cx_isaromdescr_w)       // ISA/ROM Descriptors
-	AM_RANGE(0xe0010010, 0xe001001f) AM_READWRITE(cx_isadescr_r, cx_isadescr_w)             // ISA Descriptors
-	AM_RANGE(0xe0010020, 0xe001002f) AM_READWRITE(cx_rommap_r, cx_rommap_w)                 // ROM Mapping
-	AM_RANGE(0xe0010030, 0xe0010033) AM_READWRITE(cx_rommode_r, cx_rommode_w)               // ISA Mode
-	AM_RANGE(0xe0010034, 0xe0010037) AM_READWRITE(cx_xoemask_r, cx_xoemask_w)               // XOE Mask
-	AM_RANGE(0xe0010040, 0xe0010047) AM_READWRITE(cx_pci_r, cx_pci_w)                       // PCI
-	AM_RANGE(0xe0010080, 0xe00100ff) AM_READWRITE(cx_extdesc_r, cx_extdesc_w)               // Extended Control
-	AM_RANGE(0xe0400014, 0xe0400017) AM_WRITE(cx_remap_w)                                   // RST_REMAP_REG
-	AM_RANGE(0xe0400024, 0xe0400027) AM_READWRITE(cx_scratch_r, cx_scratch_w)               // RST_SCRATCH_REG - System Scratch Register
-	AM_RANGE(0xe0430000, 0xe0430103) AM_READWRITE(cx_timers_r, cx_timers_w)                 // Timers
-	AM_RANGE(0xe0411000, 0xe0411033) AM_READWRITE(cx_uart2_r, cx_uart2_w)                   // UART2
-	AM_RANGE(0xe0440000, 0xe0440013) AM_READWRITE(cx_pll_r, cx_pll_w)                       // PLL Registers
-	AM_RANGE(0xe0440020, 0xe0440037) AM_READWRITE(cx_clkdiv_r, cx_clkdiv_w)                 // Clock Divider Registers
-	AM_RANGE(0xe0440094, 0xe0440097) AM_READWRITE(cx_pllprescale_r, cx_pllprescale_w)       // PLL Prescale
-	AM_RANGE(0xe0440100, 0xe0440173) AM_READWRITE(cx_chipcontrol_r, cx_chipcontrol_w)       // Chip Control Registers
-	AM_RANGE(0xe0450000, 0xe0450037) AM_READWRITE(cx_intctrl_r, cx_intctrl_w)               // Interrupt Controller Registers
-	AM_RANGE(0xe0490000, 0xe0490017) AM_READWRITE(cx_ss_r, cx_ss_w)                         // Synchronous Serial Port
-	AM_RANGE(0xe04e0000, 0xe04e001f) AM_READWRITE(cx_i2c0_r, cx_i2c0_w)                     // I2C0
-	AM_RANGE(0xe04e1000, 0xe04e101f) AM_READWRITE(cx_i2c1_r, cx_i2c1_w)                     // I2C1
-	AM_RANGE(0xe04e2000, 0xe04e201f) AM_READWRITE(cx_i2c2_r, cx_i2c2_w)                     // I2C2
-	AM_RANGE(0xe0500300, 0xe050030b) AM_READWRITE(cx_mc_cfg_r, cx_mc_cfg_w)                 // Memory Controller configuration
-	AM_RANGE(0xe0560000, 0xe05600fb) AM_READWRITE(cx_drm0_r, cx_drm0_w)                     // DRM0
-	AM_RANGE(0xe0570000, 0xe05700fb) AM_READWRITE(cx_drm1_r, cx_drm1_w)                     // DRM1
-	AM_RANGE(0xe05d0800, 0xe05d0bff) AM_READWRITE(cx_hdmi_r, cx_hdmi_w)                     // HDMI
-	AM_RANGE(0xe0600000, 0xe063ffff) AM_READWRITE(cx_gxa_r, cx_gxa_w)                       // GXA
-	AM_RANGE(0xe4017000, 0xe40173ff) AM_RAM                                                 // HSX - BSP - 1K Video Shared Dual Port RAM (shared with MVP)
-	AM_RANGE(0xe4080000, 0xe4083fff) AM_RAM                                                 // HSX - TSP 0 - 16K Private Instructions/Data and Host-Shared Data
-	AM_RANGE(0xf0000000, 0xf03fffff) AM_READWRITE(flash_r, flash_w) AM_MIRROR(0x08000000)   // 4MB FLASH (INTEL 28F320J3D)
-	AM_RANGE(0xf4000000, 0xf43fffff) AM_READ(dummy_flash_r)                                 // do we need it?
-ADDRESS_MAP_END
+void cxhumax_state::cxhumax_map(address_map &map)
+{
+	map(0x00000000, 0x03ffffff).ram().share("ram").mirror(0x40000000);           // 64?MB RAM
+	map(0xe0000000, 0xe000ffff).rw(this, FUNC(cxhumax_state::cx_hsx_r), FUNC(cxhumax_state::cx_hsx_w));                       // HSX
+	map(0xe0010000, 0xe0010003).rw(this, FUNC(cxhumax_state::cx_romdescr_r), FUNC(cxhumax_state::cx_romdescr_w));             // ROM Descriptor
+	map(0xe0010004, 0xe001000f).rw(this, FUNC(cxhumax_state::cx_isaromdescr_r), FUNC(cxhumax_state::cx_isaromdescr_w));       // ISA/ROM Descriptors
+	map(0xe0010010, 0xe001001f).rw(this, FUNC(cxhumax_state::cx_isadescr_r), FUNC(cxhumax_state::cx_isadescr_w));             // ISA Descriptors
+	map(0xe0010020, 0xe001002f).rw(this, FUNC(cxhumax_state::cx_rommap_r), FUNC(cxhumax_state::cx_rommap_w));                 // ROM Mapping
+	map(0xe0010030, 0xe0010033).rw(this, FUNC(cxhumax_state::cx_rommode_r), FUNC(cxhumax_state::cx_rommode_w));               // ISA Mode
+	map(0xe0010034, 0xe0010037).rw(this, FUNC(cxhumax_state::cx_xoemask_r), FUNC(cxhumax_state::cx_xoemask_w));               // XOE Mask
+	map(0xe0010040, 0xe0010047).rw(this, FUNC(cxhumax_state::cx_pci_r), FUNC(cxhumax_state::cx_pci_w));                       // PCI
+	map(0xe0010080, 0xe00100ff).rw(this, FUNC(cxhumax_state::cx_extdesc_r), FUNC(cxhumax_state::cx_extdesc_w));               // Extended Control
+	map(0xe0400014, 0xe0400017).w(this, FUNC(cxhumax_state::cx_remap_w));                                   // RST_REMAP_REG
+	map(0xe0400024, 0xe0400027).rw(this, FUNC(cxhumax_state::cx_scratch_r), FUNC(cxhumax_state::cx_scratch_w));               // RST_SCRATCH_REG - System Scratch Register
+	map(0xe0430000, 0xe0430103).rw(this, FUNC(cxhumax_state::cx_timers_r), FUNC(cxhumax_state::cx_timers_w));                 // Timers
+	map(0xe0411000, 0xe0411033).rw(this, FUNC(cxhumax_state::cx_uart2_r), FUNC(cxhumax_state::cx_uart2_w));                   // UART2
+	map(0xe0440000, 0xe0440013).rw(this, FUNC(cxhumax_state::cx_pll_r), FUNC(cxhumax_state::cx_pll_w));                       // PLL Registers
+	map(0xe0440020, 0xe0440037).rw(this, FUNC(cxhumax_state::cx_clkdiv_r), FUNC(cxhumax_state::cx_clkdiv_w));                 // Clock Divider Registers
+	map(0xe0440094, 0xe0440097).rw(this, FUNC(cxhumax_state::cx_pllprescale_r), FUNC(cxhumax_state::cx_pllprescale_w));       // PLL Prescale
+	map(0xe0440100, 0xe0440173).rw(this, FUNC(cxhumax_state::cx_chipcontrol_r), FUNC(cxhumax_state::cx_chipcontrol_w));       // Chip Control Registers
+	map(0xe0450000, 0xe0450037).rw(this, FUNC(cxhumax_state::cx_intctrl_r), FUNC(cxhumax_state::cx_intctrl_w));               // Interrupt Controller Registers
+	map(0xe0490000, 0xe0490017).rw(this, FUNC(cxhumax_state::cx_ss_r), FUNC(cxhumax_state::cx_ss_w));                         // Synchronous Serial Port
+	map(0xe04e0000, 0xe04e001f).rw(this, FUNC(cxhumax_state::cx_i2c0_r), FUNC(cxhumax_state::cx_i2c0_w));                     // I2C0
+	map(0xe04e1000, 0xe04e101f).rw(this, FUNC(cxhumax_state::cx_i2c1_r), FUNC(cxhumax_state::cx_i2c1_w));                     // I2C1
+	map(0xe04e2000, 0xe04e201f).rw(this, FUNC(cxhumax_state::cx_i2c2_r), FUNC(cxhumax_state::cx_i2c2_w));                     // I2C2
+	map(0xe0500300, 0xe050030b).rw(this, FUNC(cxhumax_state::cx_mc_cfg_r), FUNC(cxhumax_state::cx_mc_cfg_w));                 // Memory Controller configuration
+	map(0xe0560000, 0xe05600fb).rw(this, FUNC(cxhumax_state::cx_drm0_r), FUNC(cxhumax_state::cx_drm0_w));                     // DRM0
+	map(0xe0570000, 0xe05700fb).rw(this, FUNC(cxhumax_state::cx_drm1_r), FUNC(cxhumax_state::cx_drm1_w));                     // DRM1
+	map(0xe05d0800, 0xe05d0bff).rw(this, FUNC(cxhumax_state::cx_hdmi_r), FUNC(cxhumax_state::cx_hdmi_w));                     // HDMI
+	map(0xe0600000, 0xe063ffff).rw(this, FUNC(cxhumax_state::cx_gxa_r), FUNC(cxhumax_state::cx_gxa_w));                       // GXA
+	map(0xe4017000, 0xe40173ff).ram();                                                 // HSX - BSP - 1K Video Shared Dual Port RAM (shared with MVP)
+	map(0xe4080000, 0xe4083fff).ram();                                                 // HSX - TSP 0 - 16K Private Instructions/Data and Host-Shared Data
+	map(0xf0000000, 0xf03fffff).rw(this, FUNC(cxhumax_state::flash_r), FUNC(cxhumax_state::flash_w)).mirror(0x08000000);   // 4MB FLASH (INTEL 28F320J3D)
+	map(0xf4000000, 0xf43fffff).r(this, FUNC(cxhumax_state::dummy_flash_r));                                 // do we need it?
+}
 
 static INPUT_PORTS_START( cxhumax )
 INPUT_PORTS_END

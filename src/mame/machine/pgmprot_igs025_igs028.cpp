@@ -172,11 +172,12 @@ DRIVER_INIT_MEMBER(pgm_028_025_state,olds)
 
 }
 
-ADDRESS_MAP_START(pgm_028_025_state::olds_mem)
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("sharedprotram") // Shared with protection device
-ADDRESS_MAP_END
+void pgm_028_025_state::olds_mem(address_map &map)
+{
+	pgm_mem(map);
+	map(0x100000, 0x3fffff).bankr("bank1"); /* Game ROM */
+	map(0x400000, 0x403fff).ram().share("sharedprotram"); // Shared with protection device
+}
 
 void pgm_028_025_state::igs025_to_igs028_callback( void )
 {

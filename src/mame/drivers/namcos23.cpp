@@ -2890,56 +2890,58 @@ WRITE16_MEMBER(namcos23_state::sub_comm_w)
 
 
 // System Gorgon
-ADDRESS_MAP_START(namcos23_state::gorgon_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(c435_r, c435_w)
-	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(c417_r, c417_w, 0xffffffff)
-	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_SHARE("shared_ram") // Communication RAM (C416)
-	AM_RANGE(0x04c3ff00, 0x04c3ff0f) AM_WRITE16(mcuen_w, 0xffffffff)
-	AM_RANGE(0x06080000, 0x0608000f) AM_RAM AM_SHARE("czattr")
-	AM_RANGE(0x06080200, 0x060803ff) AM_RAM // PCZ Convert RAM (C406) (should be banked)
-	AM_RANGE(0x06108000, 0x061087ff) AM_RAM AM_SHARE("gammaram") // Gamma RAM (C404)
-	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram") // Palette RAM (C404)
-	AM_RANGE(0x06400000, 0x0641dfff) AM_RAM_WRITE(textchar_w) AM_SHARE("charram") // Text CGRAM (C361)
-	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE(textram_w) AM_SHARE("textram") // Text VRAM (C361)
-	AM_RANGE(0x06420000, 0x0642000f) AM_READWRITE16(c361_r, c361_w, 0xffffffff) // C361
-	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0) // data ROMs
-	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM AM_SHARE("nvram") // Backup RAM
-	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(ctl_r, ctl_w, 0xffffffff) // write for LEDs at d000000, watchdog at d000004
-	AM_RANGE(0x0e000000, 0x0e007fff) AM_RAM // C405 RAM - what is this?
-	AM_RANGE(0x0f000000, 0x0f000003) AM_READWRITE16(sub_comm_r, sub_comm_w, 0xffffffff) // not sure
-	AM_RANGE(0x0f200000, 0x0f203fff) AM_RAM // C422 RAM
-	AM_RANGE(0x0f300000, 0x0f30000f) AM_READWRITE16(c422_r, c422_w, 0xffffffff) // C422 registers
-	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void namcos23_state::gorgon_map(address_map &map)
+{
+	map.global_mask(0xfffffff);
+	map(0x00000000, 0x003fffff).ram().share("mainram");
+	map(0x01000000, 0x010000ff).rw(this, FUNC(namcos23_state::c435_r), FUNC(namcos23_state::c435_w));
+	map(0x02000000, 0x0200000f).rw(this, FUNC(namcos23_state::c417_r), FUNC(namcos23_state::c417_w));
+	map(0x04400000, 0x0440ffff).ram().share("shared_ram"); // Communication RAM (C416)
+	map(0x04c3ff00, 0x04c3ff0f).w(this, FUNC(namcos23_state::mcuen_w));
+	map(0x06080000, 0x0608000f).ram().share("czattr");
+	map(0x06080200, 0x060803ff).ram(); // PCZ Convert RAM (C406) (should be banked)
+	map(0x06108000, 0x061087ff).ram().share("gammaram"); // Gamma RAM (C404)
+	map(0x06110000, 0x0613ffff).ram().w(this, FUNC(namcos23_state::paletteram_w)).share("paletteram"); // Palette RAM (C404)
+	map(0x06400000, 0x0641dfff).ram().w(this, FUNC(namcos23_state::textchar_w)).share("charram"); // Text CGRAM (C361)
+	map(0x0641e000, 0x0641ffff).ram().w(this, FUNC(namcos23_state::textram_w)).share("textram"); // Text VRAM (C361)
+	map(0x06420000, 0x0642000f).rw(this, FUNC(namcos23_state::c361_r), FUNC(namcos23_state::c361_w)); // C361
+	map(0x08000000, 0x087fffff).rom().region("data", 0); // data ROMs
+	map(0x0c000000, 0x0c00ffff).ram().share("nvram"); // Backup RAM
+	map(0x0d000000, 0x0d00000f).rw(this, FUNC(namcos23_state::ctl_r), FUNC(namcos23_state::ctl_w)); // write for LEDs at d000000, watchdog at d000004
+	map(0x0e000000, 0x0e007fff).ram(); // C405 RAM - what is this?
+	map(0x0f000000, 0x0f000003).rw(this, FUNC(namcos23_state::sub_comm_r), FUNC(namcos23_state::sub_comm_w)); // not sure
+	map(0x0f200000, 0x0f203fff).ram(); // C422 RAM
+	map(0x0f300000, 0x0f30000f).rw(this, FUNC(namcos23_state::c422_r), FUNC(namcos23_state::c422_w)); // C422 registers
+	map(0x0fc00000, 0x0fffffff).nopw().rom().region("user1", 0);
+}
 
 // (Super) System 23
-ADDRESS_MAP_START(namcos23_state::s23_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(c435_r, c435_w)
-	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(c417_r, c417_w, 0xffffffff)
-	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_SHARE("shared_ram") // Communication RAM (C416)
-	AM_RANGE(0x04c3ff00, 0x04c3ff0f) AM_WRITE16(mcuen_w, 0xffffffff)
-	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_SHARE("nvram") // Backup RAM
-	AM_RANGE(0x06200000, 0x06203fff) AM_RAM // C422 RAM
-	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16(c422_r, c422_w, 0xffffffff) // C422 registers
-	AM_RANGE(0x06800000, 0x0681dfff) AM_RAM_WRITE(textchar_w) AM_SHARE("charram") // Text CGRAM (C361)
-	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE(textram_w) AM_SHARE("textram") // Text VRAM (C361)
-	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16(c361_r, c361_w, 0xffffffff) // C361
-	AM_RANGE(0x06a08000, 0x06a087ff) AM_RAM AM_SHARE("gammaram") // Gamma RAM (C404)
-	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram") // Palette RAM (C404)
-	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("data", 0x0000000) AM_MIRROR(0x1000000) // data ROMs
-	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x1000000)
-	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16(c412_r, c412_w, 0xffffffff)
-	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE16(c421_r, c421_w, 0xffffffff)
-	AM_RANGE(0x0c800010, 0x0c800013) AM_WRITE16(c435_state_reset_w, 0xffff0000)
-	AM_RANGE(0x0c800014, 0x0c800017) AM_WRITE16(c435_state_pio_w, 0x0000ffff)
-	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(ctl_r, ctl_w, 0xffffffff)
-	AM_RANGE(0x0e800000, 0x0e800003) AM_READWRITE16(sub_comm_r, sub_comm_w, 0xffffffff) // not sure
-	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void namcos23_state::s23_map(address_map &map)
+{
+	map.global_mask(0xfffffff);
+	map(0x00000000, 0x00ffffff).ram().share("mainram");
+	map(0x01000000, 0x010000ff).rw(this, FUNC(namcos23_state::c435_r), FUNC(namcos23_state::c435_w));
+	map(0x02000000, 0x0200000f).rw(this, FUNC(namcos23_state::c417_r), FUNC(namcos23_state::c417_w));
+	map(0x04400000, 0x0440ffff).ram().share("shared_ram"); // Communication RAM (C416)
+	map(0x04c3ff00, 0x04c3ff0f).w(this, FUNC(namcos23_state::mcuen_w));
+	map(0x06000000, 0x0600ffff).ram().share("nvram"); // Backup RAM
+	map(0x06200000, 0x06203fff).ram(); // C422 RAM
+	map(0x06400000, 0x0640000f).rw(this, FUNC(namcos23_state::c422_r), FUNC(namcos23_state::c422_w)); // C422 registers
+	map(0x06800000, 0x0681dfff).ram().w(this, FUNC(namcos23_state::textchar_w)).share("charram"); // Text CGRAM (C361)
+	map(0x0681e000, 0x0681ffff).ram().w(this, FUNC(namcos23_state::textram_w)).share("textram"); // Text VRAM (C361)
+	map(0x06820000, 0x0682000f).rw(this, FUNC(namcos23_state::c361_r), FUNC(namcos23_state::c361_w)); // C361
+	map(0x06a08000, 0x06a087ff).ram().share("gammaram"); // Gamma RAM (C404)
+	map(0x06a10000, 0x06a3ffff).ram().w(this, FUNC(namcos23_state::paletteram_w)).share("paletteram"); // Palette RAM (C404)
+	map(0x08000000, 0x08ffffff).rom().region("data", 0x0000000).mirror(0x1000000); // data ROMs
+	map(0x0a000000, 0x0affffff).rom().region("data", 0x1000000).mirror(0x1000000);
+	map(0x0c000000, 0x0c00001f).rw(this, FUNC(namcos23_state::c412_r), FUNC(namcos23_state::c412_w));
+	map(0x0c400000, 0x0c400007).rw(this, FUNC(namcos23_state::c421_r), FUNC(namcos23_state::c421_w));
+	map(0x0c800010, 0x0c800011).w(this, FUNC(namcos23_state::c435_state_reset_w));
+	map(0x0c800016, 0x0c800017).w(this, FUNC(namcos23_state::c435_state_pio_w));
+	map(0x0d000000, 0x0d00000f).rw(this, FUNC(namcos23_state::ctl_r), FUNC(namcos23_state::ctl_w));
+	map(0x0e800000, 0x0e800003).rw(this, FUNC(namcos23_state::sub_comm_r), FUNC(namcos23_state::sub_comm_w)); // not sure
+	map(0x0fc00000, 0x0fffffff).nopw().rom().region("user1", 0);
+}
 
 
 
@@ -2963,23 +2965,25 @@ WRITE32_MEMBER(namcos23_state::sh2_shared_w)
 	COMBINE_DATA(&m_gmen_sh2_shared[offset]);
 }
 
-ADDRESS_MAP_START(namcos23_state::gmen_mips_map)
-	AM_IMPORT_FROM(s23_map)
-	AM_RANGE(0x0e400000, 0x0e400003) AM_READ(gmen_trigger_sh2)
-	AM_RANGE(0x0e700000, 0x0e70ffff) AM_READWRITE(sh2_shared_r, sh2_shared_w)
-ADDRESS_MAP_END
+void namcos23_state::gmen_mips_map(address_map &map)
+{
+	s23_map(map);
+	map(0x0e400000, 0x0e400003).r(this, FUNC(namcos23_state::gmen_trigger_sh2));
+	map(0x0e700000, 0x0e70ffff).rw(this, FUNC(namcos23_state::sh2_shared_r), FUNC(namcos23_state::sh2_shared_w));
+}
 
 
 // SH2 memmap
 /* TODO: of course, I believe that area 0x008***** is actually a bank of some sort ... */
-ADDRESS_MAP_START(namcos23_state::gmen_sh2_map)
-	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_SHARE("gmen_sh2_shared")
-	AM_RANGE(0x00800000, 0x008fffff) AM_ROM AM_REGION("data", 0xc00000) //c00000 "data" for final furlong 2. 0x1b6bc0 "user1" for gunmen wars
-	AM_RANGE(0x01800000, 0x0183ffff) AM_RAM // ???
+void namcos23_state::gmen_sh2_map(address_map &map)
+{
+	map(0x00000000, 0x0000ffff).ram().share("gmen_sh2_shared");
+	map(0x00800000, 0x008fffff).rom().region("data", 0xc00000); //c00000 "data" for final furlong 2. 0x1b6bc0 "user1" for gunmen wars
+	map(0x01800000, 0x0183ffff).ram(); // ???
 	//AM_RANGE(0x02800000, 0x02800003) AM_RAM // probably transfer status related, reads/writes after each end of flash transfer, TBD
-	AM_RANGE(0x04000000, 0x043fffff) AM_RAM // SH-2 main work RAM (SDRAM)
-	AM_RANGE(0x06000000, 0x06000003) AM_NOP // serial port for camera?
-ADDRESS_MAP_END
+	map(0x04000000, 0x043fffff).ram(); // SH-2 main work RAM (SDRAM)
+	map(0x06000000, 0x06000003).noprw(); // serial port for camera?
+}
 
 
 
@@ -3085,27 +3089,29 @@ WRITE16_MEMBER(namcos23_state::mcu_pb_w)
 }
 
 
-ADDRESS_MAP_START(namcos23_state::s23h8rwmap)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(sharedram_sub_r, sharedram_sub_w )
-	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0x300000, 0x300003) AM_NOP // seems to be more inputs, maybe false leftover code from System 12?
-	AM_RANGE(0x300010, 0x300011) AM_NOP
-	AM_RANGE(0x300020, 0x300021) AM_WRITE(sub_interrupt_main_w )
-	AM_RANGE(0x300030, 0x300031) AM_WRITENOP    // timecrs2 writes this when writing to the sync shared ram location, motoxgo doesn't
-ADDRESS_MAP_END
+void namcos23_state::s23h8rwmap(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x08ffff).rw(this, FUNC(namcos23_state::sharedram_sub_r), FUNC(namcos23_state::sharedram_sub_w));
+	map(0x280000, 0x287fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
+	map(0x300000, 0x300003).noprw(); // seems to be more inputs, maybe false leftover code from System 12?
+	map(0x300010, 0x300011).noprw();
+	map(0x300020, 0x300021).w(this, FUNC(namcos23_state::sub_interrupt_main_w));
+	map(0x300030, 0x300031).nopw();    // timecrs2 writes this when writing to the sync shared ram location, motoxgo doesn't
+}
 
 
-ADDRESS_MAP_START(namcos23_state::s23h8iomap)
-	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READWRITE(mcu_p6_r, mcu_p6_w )
-	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READWRITE(mcu_p8_r, mcu_p8_w )
-	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(mcu_pa_r, mcu_pa_w )
-	AM_RANGE(h8_device::PORT_B, h8_device::PORT_B) AM_READWRITE(mcu_pb_r, mcu_pb_w )
-	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_NOP
-	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_NOP
-	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
-	AM_RANGE(h8_device::ADC_3, h8_device::ADC_3) AM_NOP
-ADDRESS_MAP_END
+void namcos23_state::s23h8iomap(address_map &map)
+{
+	map(h8_device::PORT_6, h8_device::PORT_6).rw(this, FUNC(namcos23_state::mcu_p6_r), FUNC(namcos23_state::mcu_p6_w));
+	map(h8_device::PORT_8, h8_device::PORT_8).rw(this, FUNC(namcos23_state::mcu_p8_r), FUNC(namcos23_state::mcu_p8_w));
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(this, FUNC(namcos23_state::mcu_pa_r), FUNC(namcos23_state::mcu_pa_w));
+	map(h8_device::PORT_B, h8_device::PORT_B).rw(this, FUNC(namcos23_state::mcu_pb_r), FUNC(namcos23_state::mcu_pb_w));
+	map(h8_device::ADC_0, h8_device::ADC_0).noprw();
+	map(h8_device::ADC_1, h8_device::ADC_1).noprw();
+	map(h8_device::ADC_2, h8_device::ADC_2).noprw();
+	map(h8_device::ADC_3, h8_device::ADC_3).noprw();
+}
 
 
 
@@ -3159,23 +3165,25 @@ READ16_MEMBER(namcos23_state::iob_analog_r)
 }
 
 
-ADDRESS_MAP_START(namcos23_state::s23iobrdmap)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
-	AM_RANGE(0x6000, 0x6001) AM_READ_PORT("IN01")
-	AM_RANGE(0x6002, 0x6003) AM_READ_PORT("IN23")
-	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
-	AM_RANGE(0x6006, 0x6007) AM_NOP
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void namcos23_state::s23iobrdmap(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("iocpu", 0);
+	map(0x6000, 0x6001).portr("IN01");
+	map(0x6002, 0x6003).portr("IN23");
+	map(0x6004, 0x6005).nopw();
+	map(0x6006, 0x6007).noprw();
+	map(0xc000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(namcos23_state::s23iobrdiomap)
-	AM_RANGE(h8_device::PORT_4,  h8_device::PORT_4)  AM_READWRITE(iob_p4_r, iob_p4_w)
-	AM_RANGE(h8_device::PORT_5,  h8_device::PORT_5)  AM_NOP   // bit 2 = status LED to indicate transmitting packet to main
-	AM_RANGE(h8_device::PORT_6,  h8_device::PORT_6)  AM_READWRITE(iob_p6_r, iob_p6_w)
-	AM_RANGE(h8_device::PORT_8,  h8_device::PORT_8)  AM_NOP   // unknown - used on ASCA-5 only
-	AM_RANGE(h8_device::PORT_9,  h8_device::PORT_9)  AM_NOP   // unknown - used on ASCA-5 only
-	AM_RANGE(h8_device::ADC_0,   h8_device::ADC_3)   AM_READ(iob_analog_r)
-ADDRESS_MAP_END
+void namcos23_state::s23iobrdiomap(address_map &map)
+{
+	map(h8_device::PORT_4, h8_device::PORT_4).rw(this, FUNC(namcos23_state::iob_p4_r), FUNC(namcos23_state::iob_p4_w));
+	map(h8_device::PORT_5, h8_device::PORT_5).noprw();   // bit 2 = status LED to indicate transmitting packet to main
+	map(h8_device::PORT_6, h8_device::PORT_6).rw(this, FUNC(namcos23_state::iob_p6_r), FUNC(namcos23_state::iob_p6_w));
+	map(h8_device::PORT_8, h8_device::PORT_8).noprw();   // unknown - used on ASCA-5 only
+	map(h8_device::PORT_9, h8_device::PORT_9).noprw();   // unknown - used on ASCA-5 only
+	map(h8_device::ADC_0, h8_device::ADC_3).r(this, FUNC(namcos23_state::iob_analog_r));
+}
 
 
 // Time Crisis lightgun
@@ -3198,10 +3206,11 @@ READ8_MEMBER(namcos23_state::iob_gun_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(namcos23_state::timecrs2iobrdmap)
-	AM_IMPORT_FROM( s23iobrdmap )
-	AM_RANGE(0x7000, 0x700f) AM_READ8(iob_gun_r, 0xffff)
-ADDRESS_MAP_END
+void namcos23_state::timecrs2iobrdmap(address_map &map)
+{
+	s23iobrdmap(map);
+	map(0x7000, 0x700f).r(this, FUNC(namcos23_state::iob_gun_r));
+}
 
 
 

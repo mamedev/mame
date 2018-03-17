@@ -415,26 +415,28 @@ READ8_MEMBER(spiders_state::gfx_rom_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(spiders_state::spiders_main_map)
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0xc020, 0xc027) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc044, 0xc047) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0xc048, 0xc04b) AM_DEVREADWRITE("pia2", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xc050, 0xc053) AM_DEVREADWRITE("pia3", pia6821_device, read, write)
-	AM_RANGE(0xc060, 0xc060) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc0a0, 0xc0a0) AM_READ_PORT("DSW3")
-	AM_RANGE(0xc100, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void spiders_state::spiders_main_map(address_map &map)
+{
+	map(0x0000, 0xbfff).ram().share("ram");
+	map(0xc000, 0xc000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xc001, 0xc001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xc020, 0xc027).ram().share("nvram");
+	map(0xc044, 0xc047).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc048, 0xc04b).rw("pia2", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xc050, 0xc053).rw("pia3", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc060, 0xc060).portr("DSW1");
+	map(0xc080, 0xc080).portr("DSW2");
+	map(0xc0a0, 0xc0a0).portr("DSW3");
+	map(0xc100, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(spiders_state::spiders_audio_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("pia4", pia6821_device, read, write)
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void spiders_state::spiders_audio_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();
+	map(0x0080, 0x0083).rw("pia4", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xf800, 0xffff).rom();
+}
 
 
 

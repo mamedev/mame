@@ -814,24 +814,25 @@ READ8_MEMBER(twinkle_state::shared_psx_r)
 	return result;
 }
 
-ADDRESS_MAP_START(twinkle_state::main_map)
-	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE8(shared_psx_r, shared_psx_w, 0x00ff00ff)
-	AM_RANGE(0x1f200000, 0x1f20001f) AM_DEVREADWRITE8("am53cf96", am53cf96_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x1f20a01c, 0x1f20a01f) AM_WRITENOP /* scsi? */
-	AM_RANGE(0x1f210000, 0x1f2107ff) AM_DEVREADWRITE8("fdc37c665gt", fdc37c665gt_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x1f218000, 0x1f218003) AM_DEVWRITE8("watchdog", watchdog_timer_device, reset_w, 0x000000ff) /* LTC1232 */
-	AM_RANGE(0x1f220000, 0x1f220003) AM_WRITE8(twinkle_io_w, 0x00ff00ff)
-	AM_RANGE(0x1f220004, 0x1f220007) AM_READ8(twinkle_io_r, 0x00ff00ff)
-	AM_RANGE(0x1f230000, 0x1f230003) AM_WRITE16(led_w, 0x0000ffff)
-	AM_RANGE(0x1f240000, 0x1f240003) AM_READ_PORT("IN6")
-	AM_RANGE(0x1f250000, 0x1f250003) AM_WRITE16(key_led_w, 0x0000ffff)
-	AM_RANGE(0x1f260000, 0x1f260003) AM_WRITE16(serial_w, 0x0000ffff)
-	AM_RANGE(0x1f270000, 0x1f270003) AM_WRITE_PORT("OUTSEC")
-	AM_RANGE(0x1f280000, 0x1f280003) AM_READ_PORT("INSEC")
-	AM_RANGE(0x1f290000, 0x1f29007f) AM_DEVREADWRITE8("rtc", rtc65271_device, rtc_r, rtc_w, 0x00ff00ff)
-	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_DEVREADWRITE8("rtc", rtc65271_device, xram_r, xram_w, 0x00ff00ff)
-	AM_RANGE(0x1f2b0000, 0x1f2b00ff) AM_WRITE16(twinkle_output_w, 0xffffffff)
-ADDRESS_MAP_END
+void twinkle_state::main_map(address_map &map)
+{
+	map(0x1f000000, 0x1f0007ff).rw(this, FUNC(twinkle_state::shared_psx_r), FUNC(twinkle_state::shared_psx_w)).umask32(0x00ff00ff);
+	map(0x1f200000, 0x1f20001f).rw(m_am53cf96, FUNC(am53cf96_device::read), FUNC(am53cf96_device::write)).umask32(0x00ff00ff);
+	map(0x1f20a01c, 0x1f20a01f).nopw(); /* scsi? */
+	map(0x1f210000, 0x1f2107ff).rw("fdc37c665gt", FUNC(fdc37c665gt_device::read), FUNC(fdc37c665gt_device::write)).umask32(0x00ff00ff);
+	map(0x1f218000, 0x1f218000).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* LTC1232 */
+	map(0x1f220000, 0x1f220003).w(this, FUNC(twinkle_state::twinkle_io_w)).umask32(0x00ff00ff);
+	map(0x1f220004, 0x1f220007).r(this, FUNC(twinkle_state::twinkle_io_r)).umask32(0x00ff00ff);
+	map(0x1f230000, 0x1f230001).w(this, FUNC(twinkle_state::led_w));
+	map(0x1f240000, 0x1f240003).portr("IN6");
+	map(0x1f250000, 0x1f250001).w(this, FUNC(twinkle_state::key_led_w));
+	map(0x1f260000, 0x1f260001).w(this, FUNC(twinkle_state::serial_w));
+	map(0x1f270000, 0x1f270003).portw("OUTSEC");
+	map(0x1f280000, 0x1f280003).portr("INSEC");
+	map(0x1f290000, 0x1f29007f).rw("rtc", FUNC(rtc65271_device::rtc_r), FUNC(rtc65271_device::rtc_w)).umask32(0x00ff00ff);
+	map(0x1f2a0000, 0x1f2a007f).rw("rtc", FUNC(rtc65271_device::xram_r), FUNC(rtc65271_device::xram_w)).umask32(0x00ff00ff);
+	map(0x1f2b0000, 0x1f2b00ff).w(this, FUNC(twinkle_state::twinkle_output_w));
+}
 
 /* SPU board */
 
@@ -963,26 +964,28 @@ WRITE16_MEMBER(twinkle_state::spu_led_w)
 	m_spu_leds[7] = BIT(~data, 7);
 }
 
-ADDRESS_MAP_START(twinkle_state::sound_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x13ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("SPU_DSW")
-	AM_RANGE(0x220000, 0x220001) AM_WRITE(spu_led_w)
-	AM_RANGE(0x230000, 0x230003) AM_WRITE(twinkle_spu_ctrl_w)
-	AM_RANGE(0x240000, 0x240003) AM_WRITE(spu_ata_dma_low_w) AM_READNOP
-	AM_RANGE(0x250000, 0x250003) AM_WRITE(spu_ata_dma_high_w) AM_READNOP
-	AM_RANGE(0x260000, 0x260001) AM_WRITE(spu_wavebank_w) AM_READNOP
-	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(shared_68k_r, shared_68k_w)
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs0, write_cs0)
+void twinkle_state::sound_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x13ffff).ram();
+	map(0x200000, 0x200001).portr("SPU_DSW");
+	map(0x220000, 0x220001).w(this, FUNC(twinkle_state::spu_led_w));
+	map(0x230000, 0x230003).w(this, FUNC(twinkle_state::twinkle_spu_ctrl_w));
+	map(0x240000, 0x240003).w(this, FUNC(twinkle_state::spu_ata_dma_low_w)).nopr();
+	map(0x250000, 0x250003).w(this, FUNC(twinkle_state::spu_ata_dma_high_w)).nopr();
+	map(0x260000, 0x260001).w(this, FUNC(twinkle_state::spu_wavebank_w)).nopr();
+	map(0x280000, 0x280fff).rw(this, FUNC(twinkle_state::shared_68k_r), FUNC(twinkle_state::shared_68k_w));
+	map(0x300000, 0x30000f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0));
 	// 34000E = ???
-	AM_RANGE(0x34000e, 0x34000f) AM_WRITENOP
-	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)
-	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w)
-ADDRESS_MAP_END
+	map(0x34000e, 0x34000f).nopw();
+	map(0x400000, 0x400fff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));
+	map(0x800000, 0xffffff).rw(this, FUNC(twinkle_state::twinkle_waveram_r), FUNC(twinkle_state::twinkle_waveram_w));
+}
 
-ADDRESS_MAP_START(twinkle_state::rf5c400_map)
-	AM_RANGE(0x0000000, 0x1ffffff) AM_RAM AM_SHARE("rfsnd")
-ADDRESS_MAP_END
+void twinkle_state::rf5c400_map(address_map &map)
+{
+	map(0x0000000, 0x1ffffff).ram().share("rfsnd");
+}
 
 /* SCSI */
 

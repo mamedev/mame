@@ -732,39 +732,41 @@ READ32_MEMBER(midzeus_state::invasn_gun_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(midzeus_state::zeus_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE("ram_base")
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_SHARE("tms32031_ctl")
-	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(zeus_r, zeus_w) AM_SHARE("zeusbase")
-	AM_RANGE(0x8d0000, 0x8d0009) AM_READWRITE(disk_asic_jr_r, disk_asic_jr_w)
-	AM_RANGE(0x990000, 0x99000f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
-	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP        // watchdog?
-	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_SHARE("nvram")
-	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
-	AM_RANGE(0xa00000, 0xffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void midzeus_state::zeus_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).ram().share("ram_base");
+	map(0x400000, 0x41ffff).ram();
+	map(0x808000, 0x80807f).rw(this, FUNC(midzeus_state::tms32031_control_r), FUNC(midzeus_state::tms32031_control_w)).share("tms32031_ctl");
+	map(0x880000, 0x8803ff).rw(this, FUNC(midzeus_state::zeus_r), FUNC(midzeus_state::zeus_w)).share("zeusbase");
+	map(0x8d0000, 0x8d0009).rw(this, FUNC(midzeus_state::disk_asic_jr_r), FUNC(midzeus_state::disk_asic_jr_w));
+	map(0x990000, 0x99000f).rw("ioasic", FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
+	map(0x9e0000, 0x9e0000).nopw();        // watchdog?
+	map(0x9f0000, 0x9f7fff).rw(this, FUNC(midzeus_state::cmos_r), FUNC(midzeus_state::cmos_w)).share("nvram");
+	map(0x9f8000, 0x9f8000).w(this, FUNC(midzeus_state::cmos_protect_w));
+	map(0xa00000, 0xffffff).rom().region("user1", 0);
+}
 
 
-ADDRESS_MAP_START(midzeus2_state::zeus2_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE("ram_base")
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_SHARE("tms32031_ctl")
-	AM_RANGE(0x880000, 0x88007f) AM_DEVREADWRITE("zeus2", zeus2_device, zeus2_r, zeus2_w)
-	AM_RANGE(0x8a0000, 0x8a00cf) AM_READWRITE(firewire_r, firewire_w) AM_SHARE("firewire")
-	AM_RANGE(0x8d0000, 0x8d0009) AM_READWRITE(disk_asic_jr_r, disk_asic_jr_w)
-	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE(zpram_r, zpram_w) AM_SHARE("nvram") AM_MIRROR(0x020000)
-	AM_RANGE(0x990000, 0x99000f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
-	AM_RANGE(0x9c0000, 0x9c000f) AM_READWRITE(analog_r, analog_w)
-	AM_RANGE(0x9d0000, 0x9d000f) AM_READWRITE(disk_asic_r, disk_asic_w)
-	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP        // watchdog?
-	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(zeus2_timekeeper_r, zeus2_timekeeper_w)
-	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
-	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK("bank1") AM_REGION("user2", 0)
-ADDRESS_MAP_END
+void midzeus2_state::zeus2_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).ram().share("ram_base");
+	map(0x400000, 0x43ffff).ram();
+	map(0x808000, 0x80807f).rw(this, FUNC(midzeus2_state::tms32031_control_r), FUNC(midzeus2_state::tms32031_control_w)).share("tms32031_ctl");
+	map(0x880000, 0x88007f).rw(m_zeus, FUNC(zeus2_device::zeus2_r), FUNC(zeus2_device::zeus2_w));
+	map(0x8a0000, 0x8a00cf).rw(this, FUNC(midzeus2_state::firewire_r), FUNC(midzeus2_state::firewire_w)).share("firewire");
+	map(0x8d0000, 0x8d0009).rw(this, FUNC(midzeus2_state::disk_asic_jr_r), FUNC(midzeus2_state::disk_asic_jr_w));
+	map(0x900000, 0x91ffff).rw(this, FUNC(midzeus2_state::zpram_r), FUNC(midzeus2_state::zpram_w)).share("nvram").mirror(0x020000);
+	map(0x990000, 0x99000f).rw("ioasic", FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
+	map(0x9c0000, 0x9c000f).rw(this, FUNC(midzeus2_state::analog_r), FUNC(midzeus2_state::analog_w));
+	map(0x9d0000, 0x9d000f).rw(this, FUNC(midzeus2_state::disk_asic_r), FUNC(midzeus2_state::disk_asic_w));
+	map(0x9e0000, 0x9e0000).nopw();        // watchdog?
+	map(0x9f0000, 0x9f7fff).rw(this, FUNC(midzeus2_state::zeus2_timekeeper_r), FUNC(midzeus2_state::zeus2_timekeeper_w));
+	map(0x9f8000, 0x9f8000).w(this, FUNC(midzeus2_state::cmos_protect_w));
+	map(0xa00000, 0xbfffff).rom().region("user1", 0);
+	map(0xc00000, 0xffffff).bankr("bank1").region("user2", 0);
+}
 
 /*
 

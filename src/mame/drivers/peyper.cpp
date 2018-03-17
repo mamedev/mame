@@ -205,29 +205,31 @@ CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
 }
 
 
-ADDRESS_MAP_START(peyper_state::peyper_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x5FFF) AM_ROM
-	AM_RANGE(0x6000, 0x67FF) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void peyper_state::peyper_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x5FFF).rom();
+	map(0x6000, 0x67FF).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(peyper_state::peyper_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("i8279", i8279_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x05, 0x05) AM_DEVREAD("ay1", ay8910_device, data_r) // only read by Ator?
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x09, 0x09) AM_DEVREAD("ay2", ay8910_device, data_r) // never actually read?
-	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(sol_w)
-	AM_RANGE(0x10, 0x18) AM_WRITE(lamp_w)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW0")
-	AM_RANGE(0x24, 0x24) AM_READ_PORT("DSW1")
-	AM_RANGE(0x28, 0x28) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x2c, 0x2c) AM_WRITE(lamp7_w)
-ADDRESS_MAP_END
+void peyper_state::peyper_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x04, 0x04).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x05, 0x05).r("ay1", FUNC(ay8910_device::data_r)); // only read by Ator?
+	map(0x06, 0x06).w("ay1", FUNC(ay8910_device::data_w));
+	map(0x08, 0x08).w("ay2", FUNC(ay8910_device::address_w));
+	map(0x09, 0x09).r("ay2", FUNC(ay8910_device::data_r)); // never actually read?
+	map(0x0a, 0x0a).w("ay2", FUNC(ay8910_device::data_w));
+	map(0x0c, 0x0c).w(this, FUNC(peyper_state::sol_w));
+	map(0x10, 0x18).w(this, FUNC(peyper_state::lamp_w));
+	map(0x20, 0x20).portr("DSW0");
+	map(0x24, 0x24).portr("DSW1");
+	map(0x28, 0x28).portr("SYSTEM");
+	map(0x2c, 0x2c).w(this, FUNC(peyper_state::lamp7_w));
+}
 
 static INPUT_PORTS_START( pbsonic_generic )
 	/* SYSTEM : port 0x28 (cpl'ed) */

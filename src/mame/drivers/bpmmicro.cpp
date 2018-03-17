@@ -330,24 +330,26 @@ read <- 00
  Address Maps
 ******************************************************************************/
 
-ADDRESS_MAP_START(bpmmicro_state::i286_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM // 512k ram
-	AM_RANGE(0x082200, 0x82201) AM_WRITE(unknown_82200_w)
-	AM_RANGE(0x084000, 0x84001) AM_READ(latch_84000_r) // GUESS: this is reading the octal latch
-	AM_RANGE(0x084002, 0x84003) AM_WRITE(latch_84002_w) // GUESS: this is clocking the CK pin on the octal latch from bit 0, dumping the contents of a serial in parallel out shifter into said latch
-	AM_RANGE(0x08400e, 0x8400f) AM_WRITE(unknown_8400e_w)
-	AM_RANGE(0x084018, 0x84019) AM_WRITE(unknown_84018_w)
-	AM_RANGE(0x08401a, 0x8401b) AM_WRITE(unknown_8401a_w)
-	AM_RANGE(0x08401c, 0x8401d) AM_WRITE(eeprom_8401c_w)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_ROM AM_REGION("bios", 0x10000)
+void bpmmicro_state::i286_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x07ffff).ram(); // 512k ram
+	map(0x082200, 0x82201).w(this, FUNC(bpmmicro_state::unknown_82200_w));
+	map(0x084000, 0x84001).r(this, FUNC(bpmmicro_state::latch_84000_r)); // GUESS: this is reading the octal latch
+	map(0x084002, 0x84003).w(this, FUNC(bpmmicro_state::latch_84002_w)); // GUESS: this is clocking the CK pin on the octal latch from bit 0, dumping the contents of a serial in parallel out shifter into said latch
+	map(0x08400e, 0x8400f).w(this, FUNC(bpmmicro_state::unknown_8400e_w));
+	map(0x084018, 0x84019).w(this, FUNC(bpmmicro_state::unknown_84018_w));
+	map(0x08401a, 0x8401b).w(this, FUNC(bpmmicro_state::unknown_8401a_w));
+	map(0x08401c, 0x8401d).w(this, FUNC(bpmmicro_state::eeprom_8401c_w));
+	map(0x0f0000, 0x0fffff).rom().region("bios", 0x10000);
 	//AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0) //?
-	AM_RANGE(0xfffff0, 0xffffff) AM_ROM AM_REGION("bios", 0x1fff0) //?
-ADDRESS_MAP_END
+	map(0xfffff0, 0xffffff).rom().region("bios", 0x1fff0); //?
+}
 
-ADDRESS_MAP_START(bpmmicro_state::i286_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void bpmmicro_state::i286_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 
 /******************************************************************************

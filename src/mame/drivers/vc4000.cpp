@@ -184,23 +184,25 @@ READ8_MEMBER( vc4000_state::elektor_cass_r )
 	return (m_cassette->input() > 0.03) ? 0xff : 0x7f;
 }
 
-ADDRESS_MAP_START(vc4000_state::vc4000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x1680, 0x16ff) AM_READWRITE(vc4000_key_r, vc4000_sound_ctl) AM_MIRROR(0x0800)
-	AM_RANGE(0x1700, 0x17ff) AM_READWRITE(vc4000_video_r, vc4000_video_w) AM_MIRROR(0x0800)
-ADDRESS_MAP_END
+void vc4000_state::vc4000_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x1fff);
+	map(0x0000, 0x07ff).rom();
+	map(0x1680, 0x16ff).rw(this, FUNC(vc4000_state::vc4000_key_r), FUNC(vc4000_state::vc4000_sound_ctl)).mirror(0x0800);
+	map(0x1700, 0x17ff).rw(this, FUNC(vc4000_state::vc4000_video_r), FUNC(vc4000_state::vc4000_video_w)).mirror(0x0800);
+}
 
-ADDRESS_MAP_START(vc4000_state::elektor_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x15ff) AM_RAM
-	AM_RANGE(0x1980, 0x19ff) AM_MIRROR(0x400) AM_READWRITE(elektor_cass_r,elektor_cass_w)
-	AM_RANGE(0x1680, 0x168f) AM_MIRROR(0x800) AM_READWRITE(vc4000_key_r,vc4000_sound_ctl)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x800) AM_READWRITE(vc4000_video_r, vc4000_video_w)
-ADDRESS_MAP_END
+void vc4000_state::elektor_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x1fff);
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x15ff).ram();
+	map(0x1980, 0x19ff).mirror(0x400).rw(this, FUNC(vc4000_state::elektor_cass_r), FUNC(vc4000_state::elektor_cass_w));
+	map(0x1680, 0x168f).mirror(0x800).rw(this, FUNC(vc4000_state::vc4000_key_r), FUNC(vc4000_state::vc4000_sound_ctl));
+	map(0x1700, 0x17ff).mirror(0x800).rw(this, FUNC(vc4000_state::vc4000_video_r), FUNC(vc4000_state::vc4000_video_w));
+}
 
 static INPUT_PORTS_START( vc4000 )
 	PORT_START("PANEL")

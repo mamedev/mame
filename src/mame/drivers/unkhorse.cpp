@@ -99,16 +99,18 @@ uint32_t horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(horse_state::horse_map)
-	AM_RANGE(0x0000, 0x37ff) AM_ROM
-	AM_RANGE(0x4000, 0x40ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_READWRITE(colorram_r, colorram_w)
-ADDRESS_MAP_END
+void horse_state::horse_map(address_map &map)
+{
+	map(0x0000, 0x37ff).rom();
+	map(0x4000, 0x40ff).rw("i8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0x6000, 0x7fff).ram().share("vram");
+	map(0x8000, 0x87ff).mirror(0x0800).rw(this, FUNC(horse_state::colorram_r), FUNC(horse_state::colorram_w));
+}
 
-ADDRESS_MAP_START(horse_state::horse_io_map)
-	AM_RANGE(0x40, 0x47) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
-ADDRESS_MAP_END
+void horse_state::horse_io_map(address_map &map)
+{
+	map(0x40, 0x47).rw("i8155", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+}
 
 
 READ8_MEMBER(horse_state::input_r)

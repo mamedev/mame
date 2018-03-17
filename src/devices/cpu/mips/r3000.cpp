@@ -114,11 +114,11 @@
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(R3041, r3041_device, "r3041", "R3041")
-DEFINE_DEVICE_TYPE(R3051, r3051_device, "r3051", "R3051")
-DEFINE_DEVICE_TYPE(R3052, r3052_device, "r3052", "R3052")
-DEFINE_DEVICE_TYPE(R3071, r3071_device, "r3071", "R3071")
-DEFINE_DEVICE_TYPE(R3081, r3081_device, "r3081", "R3081")
+DEFINE_DEVICE_TYPE(R3041, r3041_device, "r3041", "MIPS R3041")
+DEFINE_DEVICE_TYPE(R3051, r3051_device, "r3051", "MIPS R3051")
+DEFINE_DEVICE_TYPE(R3052, r3052_device, "r3052", "MIPS R3052")
+DEFINE_DEVICE_TYPE(R3071, r3071_device, "r3071", "MIPS R3071")
+DEFINE_DEVICE_TYPE(R3081, r3081_device, "r3081", "MIPS R3081")
 
 
 //-------------------------------------------------

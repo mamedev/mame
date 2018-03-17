@@ -792,6 +792,8 @@ void screen_device::device_start()
 	save_item(NAME(m_frame_number));
 	if (m_oldstyle_vblank_supplied)
 		logerror("%s: Deprecated legacy Old Style screen configured (MCFG_SCREEN_VBLANK_TIME), please use MCFG_SCREEN_RAW_PARAMS instead.\n",this->tag());
+
+	m_is_primary_screen = (this == screen_device_iterator(machine().root_device()).first());
 }
 
 
@@ -1368,7 +1370,7 @@ void screen_device::vblank_begin()
 	m_vblank_end_time = m_vblank_start_time + attotime(0, m_vblank_period);
 
 	// if this is the primary screen and we need to update now
-	if (this == machine().first_screen() && !(m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+	if (m_is_primary_screen && !(m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
 		machine().video().frame_update();
 
 	// call the screen specific callbacks
@@ -1400,7 +1402,7 @@ void screen_device::vblank_end()
 	m_screen_vblank(0);
 
 	// if this is the primary screen and we need to update now
-	if (this == machine().first_screen() && (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+	if (m_is_primary_screen && (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
 		machine().video().frame_update();
 
 	// increment the frame number counter

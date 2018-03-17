@@ -23,26 +23,29 @@
     ADDRESS MAP
 ***************************************************************************/
 
-ADDRESS_MAP_START(lisa_state::lisa_map)
-	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(lisa_r, lisa_w)           /* no fixed map, we use an MMU */
-ADDRESS_MAP_END
+void lisa_state::lisa_map(address_map &map)
+{
+	map(0x000000, 0xffffff).rw(this, FUNC(lisa_state::lisa_r), FUNC(lisa_state::lisa_w));           /* no fixed map, we use an MMU */
+}
 
-ADDRESS_MAP_START(lisa_state::lisa_fdc_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff) // only 8k of address space
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fdc_ram")             /* RAM (shared with 68000) */
-	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w) /* disk controller (IWM and TTL logic) */
-	AM_RANGE(0x0800, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("fdccpu", 0x1000) AM_SHARE("fdc_rom")     /* ROM */
-ADDRESS_MAP_END
+void lisa_state::lisa_fdc_map(address_map &map)
+{
+	map.global_mask(0x1fff); // only 8k of address space
+	map(0x0000, 0x03ff).ram().share("fdc_ram");             /* RAM (shared with 68000) */
+	map(0x0400, 0x07ff).rw(this, FUNC(lisa_state::lisa_fdc_io_r), FUNC(lisa_state::lisa_fdc_io_w)); /* disk controller (IWM and TTL logic) */
+	map(0x0800, 0x0fff).noprw();
+	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000).share("fdc_rom");     /* ROM */
+}
 
-ADDRESS_MAP_START(lisa_state::lisa210_fdc_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff) // only 8k of address space
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fdc_ram")             /* RAM (shared with 68000) */
-	AM_RANGE(0x0400, 0x07ff) AM_NOP                                     /* nothing, or RAM wrap-around ??? */
-	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w) /* disk controller (IWM and TTL logic) */
-	AM_RANGE(0x0c00, 0x0fff) AM_NOP                                     /* nothing, or IO port wrap-around ??? */
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("fdccpu", 0x1000) AM_SHARE("fdc_rom")         /* ROM */
-ADDRESS_MAP_END
+void lisa_state::lisa210_fdc_map(address_map &map)
+{
+	map.global_mask(0x1fff); // only 8k of address space
+	map(0x0000, 0x03ff).ram().share("fdc_ram");             /* RAM (shared with 68000) */
+	map(0x0400, 0x07ff).noprw();                                     /* nothing, or RAM wrap-around ??? */
+	map(0x0800, 0x0bff).rw(this, FUNC(lisa_state::lisa_fdc_io_r), FUNC(lisa_state::lisa_fdc_io_w)); /* disk controller (IWM and TTL logic) */
+	map(0x0c00, 0x0fff).noprw();                                     /* nothing, or IO port wrap-around ??? */
+	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000).share("fdc_rom");         /* ROM */
+}
 
 
 

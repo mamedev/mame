@@ -62,13 +62,15 @@ private:
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(controlidx628_state::prog_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void controlidx628_state::prog_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+}
 
-ADDRESS_MAP_START(controlidx628_state::io_map)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void controlidx628_state::io_map(address_map &map)
+{
+	map(0x8000, 0xffff).ram();
+}
 
 
 WRITE8_MEMBER( controlidx628_state::p0_w )

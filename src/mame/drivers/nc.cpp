@@ -469,12 +469,13 @@ void nc_state::nc_common_init_machine()
 	m_uart_control = 0x0ff;
 }
 
-ADDRESS_MAP_START(nc_state::nc_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
-	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
-	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
-	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
-ADDRESS_MAP_END
+void nc_state::nc_map(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank1").bankw("bank5");
+	map(0x4000, 0x7fff).bankr("bank2").bankw("bank6");
+	map(0x8000, 0xbfff).bankr("bank3").bankw("bank7");
+	map(0xc000, 0xffff).bankr("bank4").bankw("bank8");
+}
 
 
 READ8_MEMBER(nc_state::nc_memory_management_r)
@@ -857,25 +858,26 @@ WRITE8_MEMBER(nc_state::nc100_memory_card_wait_state_w)
 
 
 
-ADDRESS_MAP_START(nc_state::nc100_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x0f) AM_WRITE(nc100_display_memory_start_w)
-	AM_RANGE(0x10, 0x13) AM_READWRITE(nc_memory_management_r, nc_memory_management_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(nc100_memory_card_wait_state_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(nc100_uart_control_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x50, 0x53) AM_WRITE(nc_sound_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(nc_irq_mask_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE(nc100_poweroff_control_w)
-	AM_RANGE(0x90, 0x90) AM_READWRITE(nc_irq_status_r, nc_irq_status_w)
-	AM_RANGE(0x91, 0x9f) AM_READ(nc_irq_status_r)
-	AM_RANGE(0xa0, 0xaf) AM_READ(nc100_card_battery_status_r)
-	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
-	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0xd0, 0xdf) AM_DEVREADWRITE("rtc", tc8521_device, read, write)
-ADDRESS_MAP_END
+void nc_state::nc100_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x0f).w(this, FUNC(nc_state::nc100_display_memory_start_w));
+	map(0x10, 0x13).rw(this, FUNC(nc_state::nc_memory_management_r), FUNC(nc_state::nc_memory_management_w));
+	map(0x20, 0x20).w(this, FUNC(nc_state::nc100_memory_card_wait_state_w));
+	map(0x30, 0x30).w(this, FUNC(nc_state::nc100_uart_control_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x50, 0x53).w(this, FUNC(nc_state::nc_sound_w));
+	map(0x60, 0x60).w(this, FUNC(nc_state::nc_irq_mask_w));
+	map(0x70, 0x70).w(this, FUNC(nc_state::nc100_poweroff_control_w));
+	map(0x90, 0x90).rw(this, FUNC(nc_state::nc_irq_status_r), FUNC(nc_state::nc_irq_status_w));
+	map(0x91, 0x9f).r(this, FUNC(nc_state::nc_irq_status_r));
+	map(0xa0, 0xaf).r(this, FUNC(nc_state::nc100_card_battery_status_r));
+	map(0xb0, 0xb9).r(this, FUNC(nc_state::nc_key_data_in_r));
+	map(0xc0, 0xc0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xc1, 0xc1).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xd0, 0xdf).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
+}
 
 
 /* 2008-05 FP:
@@ -1264,25 +1266,26 @@ WRITE8_MEMBER(nc_state::nc200_poweroff_control_w)
 	nc200_video_set_backlight(((data ^ (1 << 2)) >> 2) & 0x01);
 }
 
-ADDRESS_MAP_START(nc_state::nc200_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_WRITE(nc100_display_memory_start_w)
-	AM_RANGE(0x10, 0x13) AM_READWRITE(nc_memory_management_r, nc_memory_management_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(nc200_memory_card_wait_state_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(nc200_uart_control_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x50, 0x53) AM_WRITE(nc_sound_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(nc_irq_mask_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE(nc200_poweroff_control_w)
-	AM_RANGE(0x80, 0x80) AM_READ(nc200_printer_status_r)
-	AM_RANGE(0x90, 0x90) AM_READWRITE(nc_irq_status_r, nc_irq_status_w)
-	AM_RANGE(0xa0, 0xa0) AM_READ(nc200_card_battery_status_r)
-	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
-	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE("mc", mc146818_device, read, write)
-	AM_RANGE(0xe0, 0xe1) AM_DEVICE("upd765", upd765a_device, map)
-ADDRESS_MAP_END
+void nc_state::nc200_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x0f).w(this, FUNC(nc_state::nc100_display_memory_start_w));
+	map(0x10, 0x13).rw(this, FUNC(nc_state::nc_memory_management_r), FUNC(nc_state::nc_memory_management_w));
+	map(0x20, 0x20).w(this, FUNC(nc_state::nc200_memory_card_wait_state_w));
+	map(0x30, 0x30).w(this, FUNC(nc_state::nc200_uart_control_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x50, 0x53).w(this, FUNC(nc_state::nc_sound_w));
+	map(0x60, 0x60).w(this, FUNC(nc_state::nc_irq_mask_w));
+	map(0x70, 0x70).w(this, FUNC(nc_state::nc200_poweroff_control_w));
+	map(0x80, 0x80).r(this, FUNC(nc_state::nc200_printer_status_r));
+	map(0x90, 0x90).rw(this, FUNC(nc_state::nc_irq_status_r), FUNC(nc_state::nc_irq_status_w));
+	map(0xa0, 0xa0).r(this, FUNC(nc_state::nc200_card_battery_status_r));
+	map(0xb0, 0xb9).r(this, FUNC(nc_state::nc_key_data_in_r));
+	map(0xc0, 0xc0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xc1, 0xc1).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xd0, 0xd1).rw("mc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0xe0, 0xe1).m("upd765", FUNC(upd765a_device::map));
+}
 
 static INPUT_PORTS_START(nc200)
 	PORT_START("LINE0")

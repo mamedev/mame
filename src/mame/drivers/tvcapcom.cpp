@@ -29,8 +29,9 @@ public:
 	void gc_map(address_map &map);
 };
 
-ADDRESS_MAP_START(tvcapcom_state::gc_map)
-ADDRESS_MAP_END
+void tvcapcom_state::gc_map(address_map &map)
+{
+}
 
 
 void tvcapcom_state::machine_start()

@@ -62,7 +62,8 @@ const tiny_rom_entry *comx_pl80_device::device_rom_region() const
 //  ADDRESS_MAP( comxpl80_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(comx_pl80_device::comxpl80_mem)
+void comx_pl80_device::comxpl80_mem(address_map &map)
+{
 /*  AM_RANGE(0x000, 0x000) AM_READWRITE(cx005_port_a_r, cx005_port_a_w)
     AM_RANGE(0x001, 0x001) AM_READWRITE(cx005_port_b_r, cx005_port_b_w)
     AM_RANGE(0x002, 0x002) AM_READWRITE(cx005_port_c_r, cx005_port_c_w)
@@ -73,12 +74,12 @@ ADDRESS_MAP_START(comx_pl80_device::comxpl80_mem)
     AM_RANGE(0x007, 0x007) AM_READ(cx005_port_d_analog_r)
     AM_RANGE(0x008, 0x008) AM_READWRITE(cx005_timer_data_r, cx005_timer_data_w)
     AM_RANGE(0x008, 0x008) AM_READWRITE(cx005_timer_ctrl_r, cx005_timer_ctrl_w)*/
-	AM_RANGE(0x00a, 0x01f) AM_NOP // Not Used
-	AM_RANGE(0x020, 0x07f) AM_RAM // Internal RAM
-	AM_RANGE(0x080, 0xf7f) AM_ROM AM_REGION(CX005_TAG, 0) // Internal ROM
-	AM_RANGE(0xf80, 0xff7) AM_ROM AM_REGION(CX005_TAG, 0xf00)  // Self-Test
-	AM_RANGE(0xff8, 0xfff) AM_ROM AM_REGION(CX005_TAG, 0xf78)  // Interrupt Vectors
-ADDRESS_MAP_END
+	map(0x00a, 0x01f).noprw(); // Not Used
+	map(0x020, 0x07f).ram(); // Internal RAM
+	map(0x080, 0xf7f).rom().region(CX005_TAG, 0); // Internal ROM
+	map(0xf80, 0xff7).rom().region(CX005_TAG, 0xf00);  // Self-Test
+	map(0xff8, 0xfff).rom().region(CX005_TAG, 0xf78);  // Interrupt Vectors
+}
 
 
 //-------------------------------------------------

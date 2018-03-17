@@ -149,37 +149,40 @@ Video:
 
 
 /* Memory Maps */
-ADDRESS_MAP_START(bloodbro_state::common_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08afff) AM_RAM
-	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x08c400, 0x08cfff) AM_RAM
-	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x08d400, 0x08d7ff) AM_RAM
-	AM_RANGE(0x08d800, 0x08dfff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0x08e000, 0x08e7ff) AM_RAM
-	AM_RANGE(0x08e800, 0x08f7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x08f800, 0x08ffff) AM_RAM
-	AM_RANGE(0x0a0000, 0x0a000d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
+void bloodbro_state::common_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x08afff).ram();
+	map(0x08b000, 0x08bfff).ram().share("spriteram");
+	map(0x08c000, 0x08c3ff).ram().w(this, FUNC(bloodbro_state::bgvideoram_w)).share("bgvideoram");
+	map(0x08c400, 0x08cfff).ram();
+	map(0x08d000, 0x08d3ff).ram().w(this, FUNC(bloodbro_state::fgvideoram_w)).share("fgvideoram");
+	map(0x08d400, 0x08d7ff).ram();
+	map(0x08d800, 0x08dfff).ram().w(this, FUNC(bloodbro_state::txvideoram_w)).share("txvideoram");
+	map(0x08e000, 0x08e7ff).ram();
+	map(0x08e800, 0x08f7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x08f800, 0x08ffff).ram();
+	map(0x0a0000, 0x0a000d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 //  AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0x0c0080, 0x0c0081) AM_WRITENOP // ??? IRQ Ack VBL?
-	AM_RANGE(0x0c00c0, 0x0c00c1) AM_WRITENOP // ??? watchdog?
-	AM_RANGE(0x0c0100, 0x0c0101) AM_WRITENOP // ??? written once
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("DSW")
-	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("IN0")
-	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("IN1")
-ADDRESS_MAP_END
+	map(0x0c0080, 0x0c0081).nopw(); // ??? IRQ Ack VBL?
+	map(0x0c00c0, 0x0c00c1).nopw(); // ??? watchdog?
+	map(0x0c0100, 0x0c0101).nopw(); // ??? written once
+	map(0x0e0000, 0x0e0001).portr("DSW");
+	map(0x0e0002, 0x0e0003).portr("IN0");
+	map(0x0e0004, 0x0e0005).portr("IN1");
+}
 
-ADDRESS_MAP_START(bloodbro_state::bloodbro_map)
-	AM_IMPORT_FROM(common_map)
-	AM_RANGE(0xc0000, 0xc004f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-ADDRESS_MAP_END
+void bloodbro_state::bloodbro_map(address_map &map)
+{
+	common_map(map);
+	map(0xc0000, 0xc004f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+}
 
-ADDRESS_MAP_START(bloodbro_state::skysmash_map)
-	AM_IMPORT_FROM(common_map)
-	AM_RANGE(0xc0000, 0xc004f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_alt, write_alt)
-ADDRESS_MAP_END
+void bloodbro_state::skysmash_map(address_map &map)
+{
+	common_map(map);
+	map(0xc0000, 0xc004f).rw("crtc", FUNC(seibu_crtc_device::read_alt), FUNC(seibu_crtc_device::write_alt));
+}
 
 WRITE8_MEMBER(bloodbro_state::weststry_soundlatch_w)
 {
@@ -189,24 +192,25 @@ WRITE8_MEMBER(bloodbro_state::weststry_soundlatch_w)
 		m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-ADDRESS_MAP_START(bloodbro_state::weststry_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM // old VRAM areas still used, but bootleg code copies them to higher addresses
-	AM_RANGE(0x0c1000, 0x0c1001) AM_READ_PORT("DSW")
-	AM_RANGE(0x0c1002, 0x0c1003) AM_READ_PORT("IN0")
-	AM_RANGE(0x0c1004, 0x0c1005) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c1000, 0x0c1003) AM_WRITE8(weststry_soundlatch_w, 0xff00)
-	AM_RANGE(0x0c1004, 0x0c100b) AM_WRITE(weststry_layer_scroll_w)
-	AM_RANGE(0x0e0002, 0x0e0003) AM_READNOP // remnant of old code
-	AM_RANGE(0x122800, 0x122bff) AM_RAM // cleared at startup
-	AM_RANGE(0x122c00, 0x122fff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x123000, 0x1233ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x123400, 0x1237ff) AM_RAM // cleared at startup
-	AM_RANGE(0x123800, 0x123fff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0x124000, 0x124005) AM_RAM
-	AM_RANGE(0x124006, 0x1247fd) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x128000, 0x1287ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-ADDRESS_MAP_END
+void bloodbro_state::weststry_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x08ffff).ram(); // old VRAM areas still used, but bootleg code copies them to higher addresses
+	map(0x0c1000, 0x0c1001).portr("DSW");
+	map(0x0c1002, 0x0c1003).portr("IN0");
+	map(0x0c1004, 0x0c1005).portr("IN1");
+	map(0x0c1000, 0x0c1003).w(this, FUNC(bloodbro_state::weststry_soundlatch_w)).umask16(0xff00);
+	map(0x0c1004, 0x0c100b).w(this, FUNC(bloodbro_state::weststry_layer_scroll_w));
+	map(0x0e0002, 0x0e0003).nopr(); // remnant of old code
+	map(0x122800, 0x122bff).ram(); // cleared at startup
+	map(0x122c00, 0x122fff).ram().w(this, FUNC(bloodbro_state::fgvideoram_w)).share("fgvideoram");
+	map(0x123000, 0x1233ff).ram().w(this, FUNC(bloodbro_state::bgvideoram_w)).share("bgvideoram");
+	map(0x123400, 0x1237ff).ram(); // cleared at startup
+	map(0x123800, 0x123fff).ram().w(this, FUNC(bloodbro_state::txvideoram_w)).share("txvideoram");
+	map(0x124000, 0x124005).ram();
+	map(0x124006, 0x1247fd).ram().share("spriteram");
+	map(0x128000, 0x1287ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+}
 
 WRITE_LINE_MEMBER(bloodbro_state::weststry_opl_irq_w)
 {
@@ -234,10 +238,11 @@ void bloodbro_state::weststry_soundnmi_update()
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-ADDRESS_MAP_START(bloodbro_state::weststry_sound_map)
-	AM_IMPORT_FROM(seibu_sound_map)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE(weststry_soundnmi_ack_w)
-ADDRESS_MAP_END
+void bloodbro_state::weststry_sound_map(address_map &map)
+{
+	seibu_sound_map(map);
+	map(0x4002, 0x4002).w(this, FUNC(bloodbro_state::weststry_soundnmi_ack_w));
+}
 
 /* Input Ports */
 

@@ -462,71 +462,73 @@ READ8_MEMBER(radica_eu3a14_state::radicasi_pal_ntsc_r)
 	//return 0x00; // PAL
 }
 
-ADDRESS_MAP_START(radica_eu3a14_state::bank_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void radica_eu3a14_state::bank_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(radica_eu3a14_state::radica_eu3a14_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x1fff) AM_RAM AM_SHARE("mainram") // 200-9ff is sprites? a00 - ??? is tilemap?
+void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x0200, 0x1fff).ram().share("mainram"); // 200-9ff is sprites? a00 - ??? is tilemap?
 
-	AM_RANGE(0x3000, 0x3fff) AM_RAM // runs code from here
+	map(0x3000, 0x3fff).ram(); // runs code from here
 
-	AM_RANGE(0x4800, 0x4bff) AM_RAM AM_SHARE("palram")
+	map(0x4800, 0x4bff).ram().share("palram");
 
 	// similar to eu3a05, at least for pal flags and rom banking
-	AM_RANGE(0x5007, 0x5007) AM_NOP
-	AM_RANGE(0x5008, 0x5008) AM_WRITENOP // startup
-	AM_RANGE(0x5009, 0x5009) AM_NOP
-	AM_RANGE(0x500a, 0x500a) AM_WRITENOP // startup
-	AM_RANGE(0x500b, 0x500b) AM_READ(radicasi_pal_ntsc_r) AM_WRITENOP // PAL / NTSC flag at least
-	AM_RANGE(0x500c, 0x500c) AM_WRITE(radicasi_rombank_hi_w)
-	AM_RANGE(0x500d, 0x500d) AM_READWRITE(radicasi_rombank_lo_r, radicasi_rombank_lo_w)
+	map(0x5007, 0x5007).noprw();
+	map(0x5008, 0x5008).nopw(); // startup
+	map(0x5009, 0x5009).noprw();
+	map(0x500a, 0x500a).nopw(); // startup
+	map(0x500b, 0x500b).r(this, FUNC(radica_eu3a14_state::radicasi_pal_ntsc_r)).nopw(); // PAL / NTSC flag at least
+	map(0x500c, 0x500c).w(this, FUNC(radica_eu3a14_state::radicasi_rombank_hi_w));
+	map(0x500d, 0x500d).rw(this, FUNC(radica_eu3a14_state::radicasi_rombank_lo_r), FUNC(radica_eu3a14_state::radicasi_rombank_lo_w));
 
 	// DMA is similar to, but not the same as eu3a05
-	AM_RANGE(0x500f, 0x5017) AM_RAM AM_SHARE("dmaparams")
-	AM_RANGE(0x5018, 0x5018) AM_READWRITE(dma_trigger_r, dma_trigger_w)
+	map(0x500f, 0x5017).ram().share("dmaparams");
+	map(0x5018, 0x5018).rw(this, FUNC(radica_eu3a14_state::dma_trigger_r), FUNC(radica_eu3a14_state::dma_trigger_w));
 
 	// probably GPIO like eu3a05, although it access 47/48 as unknown instead of 48/49/4a
-	AM_RANGE(0x5040, 0x5040) AM_WRITENOP
-	AM_RANGE(0x5041, 0x5041) AM_READ_PORT("IN0")
-	AM_RANGE(0x5042, 0x5042) AM_WRITENOP
-	AM_RANGE(0x5043, 0x5043) AM_NOP
-	AM_RANGE(0x5044, 0x5044) AM_WRITENOP
-	AM_RANGE(0x5045, 0x5045) AM_READ_PORT("IN1") AM_WRITENOP
-	AM_RANGE(0x5046, 0x5046) AM_WRITENOP
-	AM_RANGE(0x5047, 0x5047) AM_WRITENOP
-	AM_RANGE(0x5048, 0x5048) AM_WRITENOP
+	map(0x5040, 0x5040).nopw();
+	map(0x5041, 0x5041).portr("IN0");
+	map(0x5042, 0x5042).nopw();
+	map(0x5043, 0x5043).noprw();
+	map(0x5044, 0x5044).nopw();
+	map(0x5045, 0x5045).portr("IN1").nopw();
+	map(0x5046, 0x5046).nopw();
+	map(0x5047, 0x5047).nopw();
+	map(0x5048, 0x5048).nopw();
 
 	// sound appears to be the same as eu3a05
-	AM_RANGE(0x5080, 0x5091) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_addr_r, radicasi_sound_addr_w)
-	AM_RANGE(0x5092, 0x50a3) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_size_r, radicasi_sound_size_w)
-	AM_RANGE(0x50a4, 0x50a4) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_unk_r, radicasi_sound_unk_w) // read frequently on this
-	AM_RANGE(0x50a5, 0x50a5) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_trigger_r, radicasi_sound_trigger_w)
-	AM_RANGE(0x50a6, 0x50a6) AM_WRITENOP // startup
-	AM_RANGE(0x50a7, 0x50a7) AM_WRITENOP // startup
-	AM_RANGE(0x50a8, 0x50a8) AM_DEVREAD("6ch_sound", radica6502_sound_device, radicasi_50a8_r)
-	AM_RANGE(0x50a9, 0x50a9) AM_WRITENOP // startup
+	map(0x5080, 0x5091).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_addr_r), FUNC(radica6502_sound_device::radicasi_sound_addr_w));
+	map(0x5092, 0x50a3).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_size_r), FUNC(radica6502_sound_device::radicasi_sound_size_w));
+	map(0x50a4, 0x50a4).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_unk_r), FUNC(radica6502_sound_device::radicasi_sound_unk_w)); // read frequently on this
+	map(0x50a5, 0x50a5).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_trigger_r), FUNC(radica6502_sound_device::radicasi_sound_trigger_w));
+	map(0x50a6, 0x50a6).nopw(); // startup
+	map(0x50a7, 0x50a7).nopw(); // startup
+	map(0x50a8, 0x50a8).r("6ch_sound", FUNC(radica6502_sound_device::radicasi_50a8_r));
+	map(0x50a9, 0x50a9).nopw(); // startup
 
 	// video regs are here this time
-	AM_RANGE(0x5100, 0x5100) AM_RAM
-	AM_RANGE(0x5103, 0x5106) AM_RAM
-	AM_RANGE(0x5107, 0x5107) AM_RAM // on transitions, maybe layer disables?
+	map(0x5100, 0x5100).ram();
+	map(0x5103, 0x5106).ram();
+	map(0x5107, 0x5107).ram(); // on transitions, maybe layer disables?
 
-	AM_RANGE(0x5110, 0x5112) AM_RAM // startup
-	AM_RANGE(0x5113, 0x5113) AM_RAM // written with tilebase?
-	AM_RANGE(0x5114, 0x5115) AM_RAM AM_SHARE("tilebase")
-	AM_RANGE(0x5116, 0x5117) AM_RAM
-	AM_RANGE(0x5121, 0x5124) AM_RAM AM_SHARE("scrollregs")
-	AM_RANGE(0x5150, 0x5150) AM_RAM // startup
-	AM_RANGE(0x5151, 0x5153) AM_RAM // startup
+	map(0x5110, 0x5112).ram(); // startup
+	map(0x5113, 0x5113).ram(); // written with tilebase?
+	map(0x5114, 0x5115).ram().share("tilebase");
+	map(0x5116, 0x5117).ram();
+	map(0x5121, 0x5124).ram().share("scrollregs");
+	map(0x5150, 0x5150).ram(); // startup
+	map(0x5151, 0x5153).ram(); // startup
 
-	AM_RANGE(0x6000, 0xdfff) AM_DEVICE("bank", address_map_bank_device, amap8)
+	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));
 
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000)
+	map(0xe000, 0xffff).rom().region("maincpu", 0x0000);
 
-	AM_RANGE(0xfffe, 0xffff) AM_READ(irq_vector_r)
-ADDRESS_MAP_END
+	map(0xfffe, 0xffff).r(this, FUNC(radica_eu3a14_state::irq_vector_r));
+}
 
 READ8_MEMBER(radica_eu3a14_state::dma_trigger_r)
 {

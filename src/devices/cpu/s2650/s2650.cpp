@@ -25,7 +25,7 @@
 #define INLINE_EA   1
 
 
-DEFINE_DEVICE_TYPE(S2650, s2650_device, "s2650", "S2650")
+DEFINE_DEVICE_TYPE(S2650, s2650_device, "s2650", "Signetics S2650")
 
 
 s2650_device::s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

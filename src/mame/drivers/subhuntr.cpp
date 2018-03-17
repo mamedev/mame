@@ -76,18 +76,21 @@ void subhuntr_state::video_start()
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(subhuntr_state::subhuntr_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM
-ADDRESS_MAP_END
+void subhuntr_state::subhuntr_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1c00, 0x1fff).ram();
+}
 
-ADDRESS_MAP_START(subhuntr_state::subhuntr_io_map)
-ADDRESS_MAP_END
+void subhuntr_state::subhuntr_io_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(subhuntr_state::subhuntr_data_map)
+void subhuntr_state::subhuntr_data_map(address_map &map)
+{
 //  AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE( ,  )
 //  AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE( ,  )
-ADDRESS_MAP_END
+}
 
 /***************************************************************************
 

@@ -266,33 +266,34 @@ WRITE8_MEMBER(jedi_state::nvram_enable_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(jedi_state::main_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0300) AM_RAM_WRITE(nvram_data_w) AM_SHARE("nvram")
-	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03fe) AM_READ_PORT("0c00") AM_WRITENOP
-	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x03fe) AM_READ_PORT("0c01") AM_WRITENOP
-	AM_RANGE(0x1000, 0x13ff) AM_NOP
-	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x03ff) AM_READ(jedi_audio_ack_latch_r) AM_WRITENOP
-	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x03ff) AM_READ(a2d_data_r) AM_WRITENOP
-	AM_RANGE(0x1c00, 0x1c01) AM_MIRROR(0x007e) AM_READNOP AM_WRITE(nvram_enable_w)
-	AM_RANGE(0x1c80, 0x1c82) AM_MIRROR(0x0078) AM_READNOP AM_WRITE(a2d_select_w)
-	AM_RANGE(0x1c83, 0x1c87) AM_MIRROR(0x0078) AM_NOP
-	AM_RANGE(0x1d00, 0x1d00) AM_MIRROR(0x007f) AM_NOP   /* write: NVRAM store */
-	AM_RANGE(0x1d80, 0x1d80) AM_MIRROR(0x007f) AM_READNOP AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1e00, 0x1e00) AM_MIRROR(0x007f) AM_READNOP AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x1e80, 0x1e87) AM_MIRROR(0x0078) AM_READNOP AM_DEVWRITE("outlatch", ls259_device, write_d7)
-	AM_RANGE(0x1f00, 0x1f00) AM_MIRROR(0x007f) AM_READNOP AM_WRITE(jedi_audio_latch_w)
-	AM_RANGE(0x1f80, 0x1f80) AM_MIRROR(0x007f) AM_READNOP AM_WRITE(rom_banksel_w)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("backgroundram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("paletteram")
-	AM_RANGE(0x3000, 0x37bf) AM_RAM AM_SHARE("foregroundram")
-	AM_RANGE(0x37c0, 0x3bff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3c00, 0x3c01) AM_MIRROR(0x00fe) AM_READNOP AM_WRITE(jedi_vscroll_w)
-	AM_RANGE(0x3d00, 0x3d01) AM_MIRROR(0x00fe) AM_READNOP AM_WRITE(jedi_hscroll_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x01ff) AM_WRITEONLY AM_SHARE("smoothing_table")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void jedi_state::main_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x08ff).mirror(0x0300).ram().w(this, FUNC(jedi_state::nvram_data_w)).share("nvram");
+	map(0x0c00, 0x0c00).mirror(0x03fe).portr("0c00").nopw();
+	map(0x0c01, 0x0c01).mirror(0x03fe).portr("0c01").nopw();
+	map(0x1000, 0x13ff).noprw();
+	map(0x1400, 0x1400).mirror(0x03ff).r(this, FUNC(jedi_state::jedi_audio_ack_latch_r)).nopw();
+	map(0x1800, 0x1800).mirror(0x03ff).r(this, FUNC(jedi_state::a2d_data_r)).nopw();
+	map(0x1c00, 0x1c01).mirror(0x007e).nopr().w(this, FUNC(jedi_state::nvram_enable_w));
+	map(0x1c80, 0x1c82).mirror(0x0078).nopr().w(this, FUNC(jedi_state::a2d_select_w));
+	map(0x1c83, 0x1c87).mirror(0x0078).noprw();
+	map(0x1d00, 0x1d00).mirror(0x007f).noprw();   /* write: NVRAM store */
+	map(0x1d80, 0x1d80).mirror(0x007f).nopr().w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1e00, 0x1e00).mirror(0x007f).nopr().w(this, FUNC(jedi_state::main_irq_ack_w));
+	map(0x1e80, 0x1e87).mirror(0x0078).nopr().w("outlatch", FUNC(ls259_device::write_d7));
+	map(0x1f00, 0x1f00).mirror(0x007f).nopr().w(this, FUNC(jedi_state::jedi_audio_latch_w));
+	map(0x1f80, 0x1f80).mirror(0x007f).nopr().w(this, FUNC(jedi_state::rom_banksel_w));
+	map(0x2000, 0x27ff).ram().share("backgroundram");
+	map(0x2800, 0x2fff).ram().share("paletteram");
+	map(0x3000, 0x37bf).ram().share("foregroundram");
+	map(0x37c0, 0x3bff).ram().share("spriteram");
+	map(0x3c00, 0x3c01).mirror(0x00fe).nopr().w(this, FUNC(jedi_state::jedi_vscroll_w));
+	map(0x3d00, 0x3d01).mirror(0x00fe).nopr().w(this, FUNC(jedi_state::jedi_hscroll_w));
+	map(0x3e00, 0x3e00).mirror(0x01ff).writeonly().share("smoothing_table");
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom();
+}
 
 
 

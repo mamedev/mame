@@ -596,29 +596,30 @@ WRITE32_MEMBER(atarigt_state::colorram_protection_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(atarigt_state::main_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc00003) AM_READWRITE(sound_data_r, sound_data_w)
-	AM_RANGE(0xd00014, 0xd00017) AM_READ(analog_port0_r)
-	AM_RANGE(0xd0001c, 0xd0001f) AM_READ(analog_port1_r)
-	AM_RANGE(0xd20000, 0xd20fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xff00ff00)
-	AM_RANGE(0xd40000, 0xd4ffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write32)
-	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
-	AM_RANGE(0xd72000, 0xd75fff) AM_DEVWRITE("playfield", tilemap_device, write32) AM_SHARE("playfield")
-	AM_RANGE(0xd76000, 0xd76fff) AM_DEVWRITE("alpha", tilemap_device, write32) AM_SHARE("alpha")
-	AM_RANGE(0xd78000, 0xd78fff) AM_RAM AM_SHARE("rle")
-	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
-	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE(colorram_protection_r, colorram_protection_w) AM_SHARE("colorram")
-	AM_RANGE(0xe04000, 0xe04003) AM_WRITE(led_w)
-	AM_RANGE(0xe08000, 0xe08003) AM_WRITE(latch_w)
-	AM_RANGE(0xe0a000, 0xe0a003) AM_WRITE16(scanline_int_ack_w, 0xffffffff)
-	AM_RANGE(0xe0c000, 0xe0c003) AM_WRITE16(video_int_ack_w, 0xffffffff)
-	AM_RANGE(0xe0e000, 0xe0e003) AM_WRITENOP//watchdog_reset_w },
-	AM_RANGE(0xe80000, 0xe80003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xe82000, 0xe82003) AM_READ(special_port2_r)
-	AM_RANGE(0xe82004, 0xe82007) AM_READ(special_port3_r)
-	AM_RANGE(0xf80000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void atarigt_state::main_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0xc00000, 0xc00003).rw(this, FUNC(atarigt_state::sound_data_r), FUNC(atarigt_state::sound_data_w));
+	map(0xd00014, 0xd00017).r(this, FUNC(atarigt_state::analog_port0_r));
+	map(0xd0001c, 0xd0001f).r(this, FUNC(atarigt_state::analog_port1_r));
+	map(0xd20000, 0xd20fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
+	map(0xd40000, 0xd4ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
+	map(0xd70000, 0xd7ffff).ram();
+	map(0xd72000, 0xd75fff).w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
+	map(0xd76000, 0xd76fff).w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
+	map(0xd78000, 0xd78fff).ram().share("rle");
+	map(0xd7a200, 0xd7a203).w(this, FUNC(atarigt_state::mo_command_w)).share("mo_command");
+	map(0xd80000, 0xdfffff).rw(this, FUNC(atarigt_state::colorram_protection_r), FUNC(atarigt_state::colorram_protection_w)).share("colorram");
+	map(0xe04000, 0xe04003).w(this, FUNC(atarigt_state::led_w));
+	map(0xe08000, 0xe08003).w(this, FUNC(atarigt_state::latch_w));
+	map(0xe0a000, 0xe0a003).w(this, FUNC(atarigt_state::scanline_int_ack_w));
+	map(0xe0c000, 0xe0c003).w(this, FUNC(atarigt_state::video_int_ack_w));
+	map(0xe0e000, 0xe0e003).nopw();//watchdog_reset_w },
+	map(0xe80000, 0xe80003).portr("P1_P2");
+	map(0xe82000, 0xe82003).r(this, FUNC(atarigt_state::special_port2_r));
+	map(0xe82004, 0xe82007).r(this, FUNC(atarigt_state::special_port3_r));
+	map(0xf80000, 0xffffff).ram();
+}
 
 
 

@@ -263,52 +263,55 @@ READ8_MEMBER(spoker_state::magic_r)
                                 Memory Maps
 ***************************************************************************/
 
-ADDRESS_MAP_START(spoker_state::spoker_map)
-	AM_RANGE(0x00000, 0x0f3ff) AM_ROM
-	AM_RANGE(0x0f400, 0x0ffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void spoker_state::spoker_map(address_map &map)
+{
+	map(0x00000, 0x0f3ff).rom();
+	map(0x0f400, 0x0ffff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(spoker_state::spoker_portmap)
-	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(bg_tile_w ) AM_SHARE("bg_tile_ram")
-	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
-	AM_RANGE(0x6480, 0x6483) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* NMI and coins (w), service (r), coins (r) */
-	AM_RANGE(0x6490, 0x6493) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* buttons 1 (r), video and leds (w), leds (w) */
-	AM_RANGE(0x64a0, 0x64a0) AM_READ_PORT( "BUTTONS2" )
-	AM_RANGE(0x64b0, 0x64b1) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0x64c0, 0x64c0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x64d0, 0x64d1) AM_READWRITE(magic_r, magic_w )    // DSW1-5
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
-ADDRESS_MAP_END
+void spoker_state::spoker_portmap(address_map &map)
+{
+	map(0x0000, 0x003f).ram(); // Z180 internal regs
+	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x3000, 0x33ff).ram().w(this, FUNC(spoker_state::bg_tile_w)).share("bg_tile_ram");
+	map(0x5000, 0x5fff).ram().w(this, FUNC(spoker_state::fg_tile_w)).share("fg_tile_ram");
+	map(0x6480, 0x6483).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* NMI and coins (w), service (r), coins (r) */
+	map(0x6490, 0x6493).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* buttons 1 (r), video and leds (w), leds (w) */
+	map(0x64a0, 0x64a0).portr("BUTTONS2");
+	map(0x64b0, 0x64b1).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x64c0, 0x64c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x64d0, 0x64d1).rw(this, FUNC(spoker_state::magic_r), FUNC(spoker_state::magic_w));    // DSW1-5
+	map(0x7000, 0x7fff).ram().w(this, FUNC(spoker_state::fg_color_w)).share("fg_color_ram");
+}
 
-ADDRESS_MAP_START(spoker_state::_3super8_portmap)
+void spoker_state::_3super8_portmap(address_map &map)
+{
 //  AM_RANGE(0x1000, 0x1fff) AM_WRITENOP
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(bg_tile_w ) AM_SHARE("bg_tile_ram")
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT( "DSW1" )
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT( "DSW2" )
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT( "DSW3" )
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT( "DSW4" )
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT( "DSW5" )
+	map(0x2000, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x2800, 0x2fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x3000, 0x33ff).ram().w(this, FUNC(spoker_state::bg_tile_w)).share("bg_tile_ram");
+	map(0x4000, 0x4000).portr("DSW1");
+	map(0x4001, 0x4001).portr("DSW2");
+	map(0x4002, 0x4002).portr("DSW3");
+	map(0x4003, 0x4003).portr("DSW4");
+	map(0x4004, 0x4004).portr("DSW5");
 //  AM_RANGE(0x4000, 0x40ff) AM_WRITENOP
-	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
+	map(0x5000, 0x5fff).ram().w(this, FUNC(spoker_state::fg_tile_w)).share("fg_tile_ram");
 
 //  The following one (0x6480) should be output. At beginning of code, there is a PPI initialization
 //  setting O-I-I for ports ABC. Except these routines are just a leftover from the original game,
 //  and now the I/O is handled by a CPLD or FPGA (as seen in goldstar and gp98).
-	AM_RANGE(0x6480, 0x6480) AM_READ_PORT( "IN0" )
-	AM_RANGE(0x6490, 0x6490) AM_READ_PORT( "IN1" )
+	map(0x6480, 0x6480).portr("IN0");
+	map(0x6490, 0x6490).portr("IN1");
 
-	AM_RANGE(0x6491, 0x6491) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x64a0, 0x64a0) AM_READ_PORT( "IN2" )
-	AM_RANGE(0x64b0, 0x64b0) AM_WRITE(leds_w )
-	AM_RANGE(0x64c0, 0x64c0) AM_READNOP //irq ack?
-	AM_RANGE(0x64f0, 0x64f0) AM_WRITE(nmi_and_coins_w )
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
-ADDRESS_MAP_END
+	map(0x6491, 0x6491).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x64a0, 0x64a0).portr("IN2");
+	map(0x64b0, 0x64b0).w(this, FUNC(spoker_state::leds_w));
+	map(0x64c0, 0x64c0).nopr(); //irq ack?
+	map(0x64f0, 0x64f0).w(this, FUNC(spoker_state::nmi_and_coins_w));
+	map(0x7000, 0x7fff).ram().w(this, FUNC(spoker_state::fg_color_w)).share("fg_color_ram");
+}
 
 
 /***************************************************************************

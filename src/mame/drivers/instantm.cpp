@@ -80,30 +80,33 @@ WRITE_LINE_MEMBER( instantm_state::clock_w )
 
 
 
-ADDRESS_MAP_START(instantm_state::main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) //AM_WRITE
-	AM_RANGE(0xc000, 0xc000) //AM_WRITE
-	AM_RANGE(0xc400, 0xc400) //AM_WRITE
-	AM_RANGE(0xc800, 0xc800) //AM_WRITE
-	AM_RANGE(0xcc00, 0xcc00) //AM_WRITE
-	AM_RANGE(0xec00, 0xec00) //AM_READ
-	AM_RANGE(0xf000, 0xf000) //AM_READ
-	AM_RANGE(0xf400, 0xf400) //AM_READ
-	AM_RANGE(0xfc00, 0xfc00) //AM_READ
-ADDRESS_MAP_END
+void instantm_state::main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0x8000); //AM_WRITE
+	map(0xc000, 0xc000); //AM_WRITE
+	map(0xc400, 0xc400); //AM_WRITE
+	map(0xc800, 0xc800); //AM_WRITE
+	map(0xcc00, 0xcc00); //AM_WRITE
+	map(0xec00, 0xec00); //AM_READ
+	map(0xf000, 0xf000); //AM_READ
+	map(0xf400, 0xf400); //AM_READ
+	map(0xfc00, 0xfc00); //AM_READ
+}
 
 // doesn't use ram
-ADDRESS_MAP_START(instantm_state::sub_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("dac", dac_byte_interface, write)
-ADDRESS_MAP_END
+void instantm_state::sub_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+	map(0x0000, 0x0000).w("dac", FUNC(dac_byte_interface::write));
+}
 
-ADDRESS_MAP_START(instantm_state::sub_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(port01_r,port01_w)
-ADDRESS_MAP_END
+void instantm_state::sub_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).rw(this, FUNC(instantm_state::port01_r), FUNC(instantm_state::port01_w));
+}
 
 static INPUT_PORTS_START( instantm )
 INPUT_PORTS_END

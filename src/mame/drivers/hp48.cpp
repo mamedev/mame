@@ -1246,11 +1246,12 @@ ROM_END
    run-time.
  */
 
-ADDRESS_MAP_START(hp48_state::hp48)
+void hp48_state::hp48(address_map &map)
+{
 
-	AM_RANGE( 0x00000, 0xfffff ) AM_NOP /* configured at run-time */
+	map(0x00000, 0xfffff).noprw(); /* configured at run-time */
 
-ADDRESS_MAP_END
+}
 
 
 

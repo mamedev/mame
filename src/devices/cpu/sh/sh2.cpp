@@ -104,9 +104,9 @@
 
 
 
-DEFINE_DEVICE_TYPE(SH1,  sh1_device,  "sh1",  "SH-1")
-DEFINE_DEVICE_TYPE(SH2,  sh2_device,  "sh2",  "SH-2")
-DEFINE_DEVICE_TYPE(SH2A, sh2a_device, "sh21", "SH-2A")
+DEFINE_DEVICE_TYPE(SH1,  sh1_device,  "sh1",  "Hitachi SH-1")
+DEFINE_DEVICE_TYPE(SH2,  sh2_device,  "sh2",  "Hitachi SH-2")
+DEFINE_DEVICE_TYPE(SH2A, sh2a_device, "sh21", "Hitachi SH-2A")
 
 /*-------------------------------------------------
     sh2_internal_a5 - read handler for

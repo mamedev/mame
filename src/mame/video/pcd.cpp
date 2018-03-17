@@ -122,21 +122,24 @@ MACHINE_CONFIG_START(pcd_video_device::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", pcd_video_device, mouse_timer, attotime::from_hz(15000)) // guess
 MACHINE_CONFIG_END
 
-ADDRESS_MAP_START(pcx_video_device::pcx_vid_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION("graphics", 0)
-ADDRESS_MAP_END
+void pcx_video_device::pcx_vid_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom().region("graphics", 0);
+}
 
-ADDRESS_MAP_START(pcx_video_device::pcx_vid_io)
-	AM_RANGE(0x8000, 0x8007) AM_DEVREADWRITE("crtc", scn2674_device, read, write)
-	AM_RANGE(0x8008, 0x8008) AM_READ(unk_r)
-	AM_RANGE(0xa000, 0xa001) AM_READWRITE(vram_latch_r, vram_latch_w)
-	AM_RANGE(0xa002, 0xa003) AM_READWRITE(term_mcu_r, term_mcu_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void pcx_video_device::pcx_vid_io(address_map &map)
+{
+	map(0x8000, 0x8007).rw("crtc", FUNC(scn2674_device::read), FUNC(scn2674_device::write));
+	map(0x8008, 0x8008).r(this, FUNC(pcx_video_device::unk_r));
+	map(0xa000, 0xa001).rw(this, FUNC(pcx_video_device::vram_latch_r), FUNC(pcx_video_device::vram_latch_w));
+	map(0xa002, 0xa003).rw(this, FUNC(pcx_video_device::term_mcu_r), FUNC(pcx_video_device::term_mcu_w));
+	map(0xc000, 0xc7ff).ram();
+}
 
-ADDRESS_MAP_START(pcx_video_device::pcx_vram)
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+void pcx_video_device::pcx_vram(address_map &map)
+{
+	map(0x0000, 0x07ff).rw(this, FUNC(pcx_video_device::vram_r), FUNC(pcx_video_device::vram_w));
+}
 
 MACHINE_CONFIG_START(pcx_video_device::device_add_mconfig)
 	MCFG_CPU_ADD("graphics", I8031, XTAL(24'000'000)/2)

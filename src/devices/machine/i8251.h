@@ -66,6 +66,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_txc );
 	DECLARE_WRITE_LINE_MEMBER( write_rxc );
 
+	DECLARE_READ_LINE_MEMBER(txrdy_r);
+
 	/// TODO: REMOVE THIS
 	void receive_character(uint8_t ch);
 

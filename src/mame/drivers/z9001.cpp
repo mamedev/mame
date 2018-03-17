@@ -79,21 +79,23 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-ADDRESS_MAP_START(z9001_state::z9001_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xe7ff ) AM_RAM
-	AM_RANGE( 0xe800, 0xebff ) AM_RAM AM_SHARE("colorram")
-	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0xf000, 0xffff ) AM_ROM
-ADDRESS_MAP_END
+void z9001_state::z9001_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xe7ff).ram();
+	map(0xe800, 0xebff).ram().share("colorram");
+	map(0xec00, 0xefff).ram().share("videoram");
+	map(0xf000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(z9001_state::z9001_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(4) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-	AM_RANGE(0x88, 0x8B) AM_MIRROR(4) AM_DEVREADWRITE("z80pio1", z80pio_device, read, write)
-	AM_RANGE(0x90, 0x93) AM_MIRROR(4) AM_DEVREADWRITE("z80pio2", z80pio_device, read, write)
-ADDRESS_MAP_END
+void z9001_state::z9001_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x83).mirror(4).rw("z80ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x88, 0x8B).mirror(4).rw("z80pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x90, 0x93).mirror(4).rw("z80pio2", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( z9001 )

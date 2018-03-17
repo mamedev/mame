@@ -42,11 +42,12 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(gamecube_state::ppc_mem)
-	AM_RANGE(0x00000000, 0x017fffff) AM_RAM // 24 MB main memory
-	AM_RANGE(0x08000000, 0x081fffff) AM_RAM //  2 MB embedded framebuffer
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROMBANK("boot")
-ADDRESS_MAP_END
+void gamecube_state::ppc_mem(address_map &map)
+{
+	map(0x00000000, 0x017fffff).ram(); // 24 MB main memory
+	map(0x08000000, 0x081fffff).ram(); //  2 MB embedded framebuffer
+	map(0xfff00000, 0xffffffff).bankr("boot");
+}
 
 
 //**************************************************************************

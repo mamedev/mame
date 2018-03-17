@@ -157,18 +157,19 @@ public:
 };
 
 
-ADDRESS_MAP_START(speglsht_state::st0016_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("st0016_bank")
+void speglsht_state::st0016_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("st0016_bank");
 	//AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
 	//AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xe87f) AM_RAM
+	map(0xe000, 0xe7ff).ram();
+	map(0xe800, 0xe87f).ram();
 	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
 	//AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
 	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("shared")
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).ram().share("shared");
+}
 
 void speglsht_state::machine_start()
 {
@@ -182,17 +183,18 @@ WRITE8_MEMBER(speglsht_state::st0016_rom_bank_w)
 }
 
 
-ADDRESS_MAP_START(speglsht_state::st0016_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void speglsht_state::st0016_io(address_map &map)
+{
+	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
+	map(0xe1, 0xe1).w(this, FUNC(speglsht_state::st0016_rom_bank_w));
 	//AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
 	//AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
 	//AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
-	AM_RANGE(0xe6, 0xe6) AM_WRITENOP
-	AM_RANGE(0xe7, 0xe7) AM_WRITENOP
+	map(0xe6, 0xe6).nopw();
+	map(0xe7, 0xe7).nopw();
 	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
-ADDRESS_MAP_END
+}
 
 READ32_MEMBER(speglsht_state::shared_r)
 {
@@ -261,21 +263,22 @@ READ32_MEMBER(speglsht_state::irq_ack_clear)
 	return 0;
 }
 
-ADDRESS_MAP_START(speglsht_state::speglsht_mem)
-	AM_RANGE(0x00000000, 0x000fffff) AM_RAM
-	AM_RANGE(0x01000000, 0x01007fff) AM_RAM //tested - STATIC RAM
-	AM_RANGE(0x01600000, 0x0160004f) AM_READWRITE(cop_r, cop_w) AM_SHARE("cop_ram")
-	AM_RANGE(0x01800200, 0x01800203) AM_WRITE(videoreg_w)
-	AM_RANGE(0x01800300, 0x01800303) AM_READ_PORT("IN0")
-	AM_RANGE(0x01800400, 0x01800403) AM_READ_PORT("IN1")
-	AM_RANGE(0x01a00000, 0x01afffff) AM_RAM AM_SHARE("framebuffer")
-	AM_RANGE(0x01b00000, 0x01b07fff) AM_RAM //cleared ...  video related ?
-	AM_RANGE(0x01c00000, 0x01dfffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x0a000000, 0x0a003fff) AM_READWRITE(shared_r, shared_w)
-	AM_RANGE(0x0fc00000, 0x0fdfffff) AM_ROM AM_MIRROR(0x10000000) AM_REGION("user1", 0)
-	AM_RANGE(0x1eff0000, 0x1eff001f) AM_RAM
-	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ(irq_ack_clear)
-ADDRESS_MAP_END
+void speglsht_state::speglsht_mem(address_map &map)
+{
+	map(0x00000000, 0x000fffff).ram();
+	map(0x01000000, 0x01007fff).ram(); //tested - STATIC RAM
+	map(0x01600000, 0x0160004f).rw(this, FUNC(speglsht_state::cop_r), FUNC(speglsht_state::cop_w)).share("cop_ram");
+	map(0x01800200, 0x01800203).w(this, FUNC(speglsht_state::videoreg_w));
+	map(0x01800300, 0x01800303).portr("IN0");
+	map(0x01800400, 0x01800403).portr("IN1");
+	map(0x01a00000, 0x01afffff).ram().share("framebuffer");
+	map(0x01b00000, 0x01b07fff).ram(); //cleared ...  video related ?
+	map(0x01c00000, 0x01dfffff).rom().region("user2", 0);
+	map(0x0a000000, 0x0a003fff).rw(this, FUNC(speglsht_state::shared_r), FUNC(speglsht_state::shared_w));
+	map(0x0fc00000, 0x0fdfffff).rom().mirror(0x10000000).region("user1", 0);
+	map(0x1eff0000, 0x1eff001f).ram();
+	map(0x1eff003c, 0x1eff003f).r(this, FUNC(speglsht_state::irq_ack_clear));
+}
 
 static INPUT_PORTS_START( speglsht )
 	PORT_START("IN0")

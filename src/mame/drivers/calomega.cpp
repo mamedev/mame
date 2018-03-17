@@ -822,57 +822,61 @@ WRITE8_MEMBER(calomega_state::lamps_905_w)
 *             Memory map information             *
 *************************************************/
 
-ADDRESS_MAP_START(calomega_state::sys903_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE("ay8912", ay8910_device, address_data_w)
-	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x08c4, 0x08c7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x08d0, 0x08d1) AM_DEVREADWRITE("acia6850_0", acia6850_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1800, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void calomega_state::sys903_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0840, 0x0841).w("ay8912", FUNC(ay8910_device::address_data_w));
+	map(0x0880, 0x0880).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0881, 0x0881).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x08c4, 0x08c7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x08c8, 0x08cb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x08d0, 0x08d1).rw(m_acia6850_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x1000, 0x13ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x1400, 0x17ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x1800, 0x3fff).rom();
+}
 
-ADDRESS_MAP_START(calomega_state::s903mod_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE("ay8912", ay8910_device, address_data_w)
-	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x08c4, 0x08c7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1800, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void calomega_state::s903mod_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0840, 0x0841).w("ay8912", FUNC(ay8910_device::address_data_w));
+	map(0x0880, 0x0880).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0881, 0x0881).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x08c4, 0x08c7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x08c8, 0x08cb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x1400, 0x17ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x1800, 0x3fff).rom();
+}
 
-ADDRESS_MAP_START(calomega_state::sys905_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x1040, 0x1041) AM_DEVWRITE("ay8912", ay8910_device, address_data_w)
-	AM_RANGE(0x1080, 0x1080) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x1081, 0x1081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x10c4, 0x10c7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x10c8, 0x10cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2800, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void calomega_state::sys905_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x1040, 0x1041).w("ay8912", FUNC(ay8910_device::address_data_w));
+	map(0x1080, 0x1080).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x1081, 0x1081).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x10c4, 0x10c7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x10c8, 0x10cb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2000, 0x23ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x2400, 0x27ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x2800, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(calomega_state::sys906_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x280c, 0x280f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x2824, 0x2827) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x2c04, 0x2c04) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x2c05, 0x2c05) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2c08, 0x2c09) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_data_w)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x6000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void calomega_state::sys906_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x280c, 0x280f).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2824, 0x2827).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2c04, 0x2c04).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x2c05, 0x2c05).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2c08, 0x2c09).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x2000, 0x23ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x2400, 0x27ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x6000, 0xffff).rom();
+}
 
 
 /*************************************************

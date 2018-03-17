@@ -67,20 +67,21 @@ static INPUT_PORTS_START( whitestar )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(whitestar_state::whitestar_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DEDICATED")
-	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW0")
-	AM_RANGE(0x3200, 0x3200) AM_WRITE(bank_w)
-	AM_RANGE(0x3300, 0x3300) AM_WRITE(switch_w)
-	AM_RANGE(0x3400, 0x3400) AM_READ(switch_r)
-	AM_RANGE(0x3600, 0x3600) AM_WRITE(dmddata_w)
-	AM_RANGE(0x3601, 0x3601) AM_DEVREADWRITE("decodmd",decodmd_type2_device,ctrl_r, ctrl_w)
-	AM_RANGE(0x3700, 0x3700) AM_DEVREAD("decodmd",decodmd_type2_device,busy_r)
-	AM_RANGE(0x3800, 0x3800) AM_DEVWRITE(DECOBSMT_TAG, decobsmt_device, bsmt_comms_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("user1", 0x18000)
-ADDRESS_MAP_END
+void whitestar_state::whitestar_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x3000, 0x3000).portr("DEDICATED");
+	map(0x3100, 0x3100).portr("DSW0");
+	map(0x3200, 0x3200).w(this, FUNC(whitestar_state::bank_w));
+	map(0x3300, 0x3300).w(this, FUNC(whitestar_state::switch_w));
+	map(0x3400, 0x3400).r(this, FUNC(whitestar_state::switch_r));
+	map(0x3600, 0x3600).w(this, FUNC(whitestar_state::dmddata_w));
+	map(0x3601, 0x3601).rw(m_decodmd, FUNC(decodmd_type2_device::ctrl_r), FUNC(decodmd_type2_device::ctrl_w));
+	map(0x3700, 0x3700).r(m_decodmd, FUNC(decodmd_type2_device::busy_r));
+	map(0x3800, 0x3800).w(DECOBSMT_TAG, FUNC(decobsmt_device::bsmt_comms_w));
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom().region("user1", 0x18000);
+}
 
 READ8_MEMBER(whitestar_state::switch_r)
 {

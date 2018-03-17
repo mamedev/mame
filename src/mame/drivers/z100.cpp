@@ -308,16 +308,17 @@ WRITE8_MEMBER( z100_state::z100_vram_w )
 	}
 }
 
-ADDRESS_MAP_START(z100_state::z100_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0x3ffff) AM_RAM // 128*2 KB RAM
+void z100_state::z100_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x3ffff).ram(); // 128*2 KB RAM
 //  AM_RANGE(0xb0000,0xbffff) AM_ROM // expansion ROM
-	AM_RANGE(0xc0000,0xeffff) AM_READWRITE(z100_vram_r,z100_vram_w) // Blue / Red / Green
+	map(0xc0000, 0xeffff).rw(this, FUNC(z100_state::z100_vram_r), FUNC(z100_state::z100_vram_w)); // Blue / Red / Green
 //  AM_RANGE(0xf0000,0xf0fff) // network card (NET-100)
 //  AM_RANGE(0xf4000,0xf7fff) // MTRET-100 Firmware I expansion ROM
 //  AM_RANGE(0xf8000,0xfbfff) // MTRET-100 Firmware II expansion ROM check ID 0x4550
-	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
-ADDRESS_MAP_END
+	map(0xfc000, 0xfffff).rom().region("ipl", 0);
+}
 
 READ8_MEMBER( z100_state::keyb_data_r )
 {
@@ -384,9 +385,10 @@ WRITE8_MEMBER( z100_state::floppy_motor_w )
 		m_floppy->mon_w(!BIT(data, 1));
 }
 
-ADDRESS_MAP_START(z100_state::z100_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void z100_state::z100_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 //  AM_RANGE (0x00, 0x3f) reserved for non-ZDS vendors
 //  AM_RANGE (0x40, 0x5f) secondary Multiport card (Z-204)
 //  AM_RANGE (0x60, 0x7f) primary Multiport card (Z-204)
@@ -396,31 +398,31 @@ ADDRESS_MAP_START(z100_state::z100_io)
 //  AM_RANGE (0xa4, 0xa7) gateway (reserved)
 //  AM_RANGE (0xac, 0xad) Z-217 secondary disk controller (winchester)
 //  AM_RANGE (0xae, 0xaf) Z-217 primary disk controller (winchester)
-	AM_RANGE (0xb0, 0xb3) AM_DEVREADWRITE("z207_fdc", fd1797_device, read, write)
-	AM_RANGE (0xb4, 0xb4) AM_WRITE(floppy_select_w)
-	AM_RANGE (0xb5, 0xb5) AM_WRITE(floppy_motor_w)
+	map(0xb0, 0xb3).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
+	map(0xb4, 0xb4).w(this, FUNC(z100_state::floppy_select_w));
+	map(0xb5, 0xb5).w(this, FUNC(z100_state::floppy_motor_w));
 //  z-207 secondary disk controller (wd1797)
 //  AM_RANGE (0xcd, 0xce) ET-100 CRT Controller
 //  AM_RANGE (0xd4, 0xd7) ET-100 Trainer Parallel I/O
-	AM_RANGE (0xd8, 0xdb) AM_DEVREADWRITE("pia0", pia6821_device, read, write) //video board
-	AM_RANGE (0xdc, 0xdc) AM_WRITE(z100_6845_address_w)
-	AM_RANGE (0xdd, 0xdd) AM_WRITE(z100_6845_data_w)
+	map(0xd8, 0xdb).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //video board
+	map(0xdc, 0xdc).w(this, FUNC(z100_state::z100_6845_address_w));
+	map(0xdd, 0xdd).w(this, FUNC(z100_state::z100_6845_data_w));
 //  AM_RANGE (0xde, 0xde) light pen
-	AM_RANGE (0xe0, 0xe3) AM_DEVREADWRITE("pia1", pia6821_device, read, write) //main board
+	map(0xe0, 0xe3).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //main board
 //  AM_RANGE (0xe4, 0xe7) 8253 PIT
 //  AM_RANGE (0xe8, 0xeb) First 2661-2 serial port (printer)
 //  AM_RANGE (0xec, 0xef) Second 2661-2 serial port (modem)
-	AM_RANGE (0xf0, 0xf1) AM_DEVREADWRITE("pic8259_slave", pic8259_device, read, write)
-	AM_RANGE (0xf2, 0xf3) AM_DEVREADWRITE("pic8259_master", pic8259_device, read, write)
-	AM_RANGE (0xf4, 0xf4) AM_READ(keyb_data_r) // -> 8041 MCU
-	AM_RANGE (0xf5, 0xf5) AM_READWRITE(keyb_status_r,keyb_command_w)
+	map(0xf0, 0xf1).rw(m_pics, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xf2, 0xf3).rw(m_picm, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xf4, 0xf4).r(this, FUNC(z100_state::keyb_data_r)); // -> 8041 MCU
+	map(0xf5, 0xf5).rw(this, FUNC(z100_state::keyb_status_r), FUNC(z100_state::keyb_command_w));
 //  AM_RANGE (0xf6, 0xf6) expansion ROM is present (bit 0, active low)
 //  AM_RANGE (0xfb, 0xfb) timer irq status
 //  AM_RANGE (0xfc, 0xfc) memory latch
 //  AM_RANGE (0xfd, 0xfd) Hi-address latch
 //  AM_RANGE (0xfe, 0xfe) Processor swap port
-	AM_RANGE (0xff, 0xff) AM_READ_PORT("DSW101")
-ADDRESS_MAP_END
+	map(0xff, 0xff).portr("DSW101");
+}
 
 INPUT_CHANGED_MEMBER(z100_state::key_stroke)
 {

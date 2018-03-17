@@ -127,36 +127,37 @@ public:
 	class quad_t
 	{
 	public:
-		quad_t() : z(0), col(0) { p[0] = nullptr; p[1] = nullptr; p[2] = nullptr; p[3] = nullptr; }
+		quad_t() { }
 		quad_t(int ccol, float cz, point_t* p0, point_t* p1, point_t* p2, point_t* p3)
-			: z(cz)
+			: p{ p0, p1, p2, p3 }
+			, z(cz)
 			, col(ccol)
 		{
-			p[0] = p0;
-			p[1] = p1;
-			p[2] = p2;
-			p[3] = p3;
 		}
 
 		int compare(const quad_t* other) const;
 
-		point_t *p[4];
-		float z;
-		int col;
+		point_t *p[4] = { nullptr, nullptr, nullptr, nullptr };
+		float z = 0;
+		int col = 0;
 	};
 
 	struct lightparam_t
 	{
-		float a;
-		float d;
-		float s;
-		int p;
+		float a = 0;
+		float d = 0;
+		float s = 0;
+		int p = 0;
 	};
 
 	class view_t
 	{
 	public:
-		view_t() { }
+		view_t() {
+			light.x = 0;
+			light.y = 0;
+			light.z = 0;
+		}
 
 		void init_translation_matrix();
 
@@ -175,11 +176,11 @@ public:
 
 		void recompute_frustum();
 
-		int xc, yc, x1, y1, x2, y2;
-		float zoomx, zoomy, viewx, viewy;
-		float a_bottom, a_top, a_left, a_right;
-		float vxx, vyy, vzz, ayy, ayyc, ayys;
-		float translation[12];
+		int xc = 0, yc = 0, x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+		float zoomx = 0, zoomy = 0, viewx = 0, viewy = 0;
+		float a_bottom = 0, a_top = 0, a_left = 0, a_right = 0;
+		float vxx = 0, vyy = 0, vzz = 0, ayy = 0, ayyc = 0, ayys = 0;
+		float translation[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		glm::vec3 light;
 		lightparam_t lightparams[32];
 	};
@@ -372,7 +373,7 @@ private:
 		std::function<void(view_t*, point_t*, point_t*, point_t*)> m_clip;
 	};
 
-	view_t      *m_view;
+	std::unique_ptr<view_t> m_view;
 	point_t *m_pointdb;
 	point_t *m_pointpt;
 	quad_t      *m_quaddb;

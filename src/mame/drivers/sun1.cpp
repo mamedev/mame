@@ -86,16 +86,17 @@ protected:
 };
 
 
-ADDRESS_MAP_START(sun1_state::sun1_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("p_ram") // 512 KB RAM / ROM at boot
-	AM_RANGE(0x00200000, 0x00203fff) AM_ROM AM_REGION("user1",0)
-	AM_RANGE(0x00600000, 0x00600007) AM_MIRROR(0x1ffff8) AM_DEVREADWRITE8("iouart", upd7201_new_device, ba_cd_r, ba_cd_w, 0xff00)
-	AM_RANGE(0x00800000, 0x00800003) AM_MIRROR(0x1ffffc) AM_DEVREADWRITE("timer", am9513_device, read16, write16)
-	AM_RANGE(0x00a00000, 0x00bfffff) AM_UNMAP // page map
-	AM_RANGE(0x00c00000, 0x00dfffff) AM_UNMAP // segment map
-	AM_RANGE(0x00e00000, 0x00ffffff) AM_UNMAP // context register
-ADDRESS_MAP_END
+void sun1_state::sun1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x001fffff).ram().share("p_ram"); // 512 KB RAM / ROM at boot
+	map(0x00200000, 0x00203fff).rom().region("user1", 0);
+	map(0x00600000, 0x00600007).mirror(0x1ffff8).rw(m_iouart, FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w)).umask16(0xff00);
+	map(0x00800000, 0x00800003).mirror(0x1ffffc).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
+	map(0x00a00000, 0x00bfffff).unmaprw(); // page map
+	map(0x00c00000, 0x00dfffff).unmaprw(); // segment map
+	map(0x00e00000, 0x00ffffff).unmaprw(); // context register
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sun1 )

@@ -138,34 +138,40 @@ The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I13 or l
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(wrally_state::mcu_hostmem_map)
-	AM_RANGE(0x0000, 0xffff) AM_MASK(0x3fff) AM_READWRITE(shareram_r, shareram_w) // shared RAM with the main CPU
-ADDRESS_MAP_END
+void wrally_state::mcu_hostmem_map(address_map &map)
+{
+	map(0x0000, 0xffff).mask(0x3fff).rw(this, FUNC(wrally_state::shareram_r), FUNC(wrally_state::shareram_w)); // shared RAM with the main CPU
+}
 
 
-ADDRESS_MAP_START(wrally_state::wrally_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                         /* ROM */
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* encrypted Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_RAM AM_SHARE("vregs")                                   /* Video Registers */
-	AM_RANGE(0x10800c, 0x10800d) AM_WRITENOP                                                /* CLR INT Video */
-	AM_RANGE(0x200000, 0x203fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    /* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                               /* Sprite RAM */
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("WHEEL")
-	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
-	;map(0x70000a, 0x70000b).select(0x000070).lw8("outlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_outlatch->write_d0(space, offset >> 3, data, mem_mask); }).umask16(0x00ff);
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(okim6295_bankswitch_w)                                /* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  /* OKI6295 status/data register */
-	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                        /* Work RAM (shared with DS5002FP) */
-ADDRESS_MAP_END
+void wrally_state::wrally_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                                                         /* ROM */
+	map(0x100000, 0x103fff).ram().w(this, FUNC(wrally_state::vram_w)).share("videoram");   /* encrypted Video RAM */
+	map(0x108000, 0x108007).ram().share("vregs");                                   /* Video Registers */
+	map(0x10800c, 0x10800d).nopw();                                                /* CLR INT Video */
+	map(0x200000, 0x203fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    /* Palette */
+	map(0x440000, 0x440fff).ram().share("spriteram");                               /* Sprite RAM */
+	map(0x700000, 0x700001).portr("DSW");
+	map(0x700002, 0x700003).portr("P1_P2");
+	map(0x700004, 0x700005).portr("WHEEL");
+	map(0x700008, 0x700009).portr("SYSTEM");
+	map(0x70000b, 0x70000b).select(0x000070).lw8("outlatch_w",
+												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
+												 });
+	map(0x70000c, 0x70000d).w(this, FUNC(wrally_state::okim6295_bankswitch_w));                                /* OKI6295 bankswitch */
+	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  /* OKI6295 status/data register */
+	map(0xfec000, 0xfeffff).ram().share("shareram");                                        /* Work RAM (shared with DS5002FP) */
+}
 
 
 
-ADDRESS_MAP_START(wrally_state::oki_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void wrally_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("okibank");
+}
 
 static INPUT_PORTS_START( wrally )
 	PORT_START("DSW")

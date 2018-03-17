@@ -52,40 +52,43 @@ PCB Layout
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(gumbo_state::gumbo_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM // main ram
-	AM_RANGE(0x1b0000, 0x1b03ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x1c0200, 0x1c0201) AM_READ_PORT("DSW")
-	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x1e0000, 0x1e0fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_SHARE("bg_videoram") // bg tilemap
-	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_SHARE("fg_videoram") // fg tilemap
-ADDRESS_MAP_END
+void gumbo_state::gumbo_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x083fff).ram(); // main ram
+	map(0x1b0000, 0x1b03ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x1c0100, 0x1c0101).portr("P1_P2");
+	map(0x1c0200, 0x1c0201).portr("DSW");
+	map(0x1c0301, 0x1c0301).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x1e0000, 0x1e0fff).ram().w(this, FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
+	map(0x1f0000, 0x1f3fff).ram().w(this, FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
+}
 
 /* Miss Puzzle has a different memory map */
 
-ADDRESS_MAP_START(gumbo_state::mspuzzle_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM // main ram
-	AM_RANGE(0x190000, 0x197fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_SHARE("fg_videoram") // fg tilemap
-	AM_RANGE(0x1a0000, 0x1a03ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x1b0100, 0x1b0101) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x1b0200, 0x1b0201) AM_READ_PORT("DSW")
-	AM_RANGE(0x1b0300, 0x1b0301) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_SHARE("bg_videoram") // bg tilemap
-ADDRESS_MAP_END
+void gumbo_state::mspuzzle_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x103fff).ram(); // main ram
+	map(0x190000, 0x197fff).ram().w(this, FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
+	map(0x1a0000, 0x1a03ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x1b0100, 0x1b0101).portr("P1_P2");
+	map(0x1b0200, 0x1b0201).portr("DSW");
+	map(0x1b0301, 0x1b0301).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x1c0000, 0x1c1fff).ram().w(this, FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
+}
 
-ADDRESS_MAP_START(gumbo_state::dblpoint_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM // main ram
-	AM_RANGE(0x1b0000, 0x1b03ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x1c0200, 0x1c0201) AM_READ_PORT("DSW")
-	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x1e0000, 0x1e3fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_SHARE("fg_videoram") // fg tilemap
-	AM_RANGE(0x1f0000, 0x1f0fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_SHARE("bg_videoram") // bg tilemap
-ADDRESS_MAP_END
+void gumbo_state::dblpoint_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x083fff).ram(); // main ram
+	map(0x1b0000, 0x1b03ff).w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x1c0100, 0x1c0101).portr("P1_P2");
+	map(0x1c0200, 0x1c0201).portr("DSW");
+	map(0x1c0301, 0x1c0301).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x1e0000, 0x1e3fff).ram().w(this, FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
+	map(0x1f0000, 0x1f0fff).ram().w(this, FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
+}
 
 static INPUT_PORTS_START( gumbo )
 	PORT_START("P1_P2")

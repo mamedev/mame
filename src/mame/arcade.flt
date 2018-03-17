@@ -625,6 +625,7 @@ laz_awetoss.cpp
 laz_ribrac.cpp
 lazercmd.cpp
 lbeach.cpp
+lckydraw.cpp
 legionna.cpp
 leland.cpp
 lemmings.cpp
@@ -642,10 +643,10 @@ looping.cpp
 lordgun.cpp
 lsasquad.cpp
 ltcasino.cpp
-luckybal.cpp
 ltd.cpp
 luckgrln.cpp
 lucky74.cpp
+luckybal.cpp
 lvcards.cpp
 lwings.cpp
 m10.cpp
@@ -1214,7 +1215,6 @@ tattack.cpp
 taxidriv.cpp
 tbowl.cpp
 tceptor.cpp
-tcl.cpp
 techno.cpp
 tecmo.cpp
 tecmo16.cpp

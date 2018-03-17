@@ -1598,7 +1598,7 @@ void validity_checker::validate_roms(device_t &root)
 			if (!ROMENTRY_ISREGIONEND(romp) && current_length > 0)
 			{
 				items_since_region++;
-				if (ROM_GETOFFSET(romp) + ROM_GETLENGTH(romp) > current_length)
+				if (!ROMENTRY_ISIGNORE(romp) && (ROM_GETOFFSET(romp) + ROM_GETLENGTH(romp) > current_length))
 					osd_printf_error("ROM '%s' extends past the defined memory region\n", last_name);
 			}
 		}

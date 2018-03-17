@@ -420,21 +420,23 @@ READ32_MEMBER( ghosteo_state::touryuu_port_10000000_r )
 }
 
 
-ADDRESS_MAP_START(ghosteo_state::bballoon_map)
-	AM_RANGE(0x10000000, 0x10000003) AM_READ_PORT("10000000")
-	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
-	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
-	AM_RANGE(0x10300000, 0x10300003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff).cswidth(32)
-	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_SHARE("systememory") AM_MIRROR(0x02000000)
-ADDRESS_MAP_END
+void ghosteo_state::bballoon_map(address_map &map)
+{
+	map(0x10000000, 0x10000003).portr("10000000");
+	map(0x10100000, 0x10100003).portr("10100000");
+	map(0x10200000, 0x10200003).portr("10200000");
+	map(0x10300000, 0x10300000).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
+	map(0x30000000, 0x31ffffff).ram().share("systememory").mirror(0x02000000);
+}
 
-ADDRESS_MAP_START(ghosteo_state::touryuu_map)
-	AM_RANGE(0x10000000, 0x10000003) AM_READ(touryuu_port_10000000_r)
-	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
-	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
-	AM_RANGE(0x10300000, 0x10300003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff).cswidth(32)
-	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_SHARE("systememory") AM_MIRROR(0x02000000)
-ADDRESS_MAP_END
+void ghosteo_state::touryuu_map(address_map &map)
+{
+	map(0x10000000, 0x10000003).r(this, FUNC(ghosteo_state::touryuu_port_10000000_r));
+	map(0x10100000, 0x10100003).portr("10100000");
+	map(0x10200000, 0x10200003).portr("10200000");
+	map(0x10300000, 0x10300000).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
+	map(0x30000000, 0x31ffffff).ram().share("systememory").mirror(0x02000000);
+}
 
 
 /*

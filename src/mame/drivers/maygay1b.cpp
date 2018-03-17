@@ -476,50 +476,51 @@ WRITE8_MEMBER(maygay1b_state::m1_lockout_w)
 	}
 }
 
-ADDRESS_MAP_START(maygay1b_state::m1_memmap)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
+void maygay1b_state::m1_memmap(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("nvram");
 
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(reel12_w)
-	AM_RANGE(0x2010, 0x2010) AM_WRITE(reel34_w)
-	AM_RANGE(0x2020, 0x2020) AM_WRITE(reel56_w)
+	map(0x2000, 0x2000).w(this, FUNC(maygay1b_state::reel12_w));
+	map(0x2010, 0x2010).w(this, FUNC(maygay1b_state::reel34_w));
+	map(0x2020, 0x2020).w(this, FUNC(maygay1b_state::reel56_w));
 
 	// there is actually an 8279 and an 8051 (which I guess is the MCU?).
-	AM_RANGE(0x2030, 0x2031) AM_DEVREADWRITE("i8279", i8279_device, read, write)
+	map(0x2030, 0x2031).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 
 #ifdef USE_MCU
 	//8051
-	AM_RANGE(0x2040, 0x2040) AM_WRITE( main_to_mcu_0_w )
-	AM_RANGE(0x2041, 0x2041) AM_WRITE( main_to_mcu_1_w )
+	map(0x2040, 0x2040).w(this, FUNC(maygay1b_state::main_to_mcu_0_w));
+	map(0x2041, 0x2041).w(this, FUNC(maygay1b_state::main_to_mcu_1_w));
 #else
 	//8051
-	AM_RANGE(0x2040, 0x2041) AM_DEVREADWRITE("i8279_2", i8279_device, read, write)
+	map(0x2040, 0x2041).rw("i8279_2", FUNC(i8279_device::read), FUNC(i8279_device::write));
 //  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
 #endif
 
-	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE("duart68681", mc68681_device, read, write )
+	map(0x2070, 0x207f).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
 
-	AM_RANGE(0x2090, 0x2091) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x20B0, 0x20B0) AM_READ(m1_meter_r)
+	map(0x2090, 0x2091).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x20B0, 0x20B0).r(this, FUNC(maygay1b_state::m1_meter_r));
 
-	AM_RANGE(0x20A0, 0x20A3) AM_DEVWRITE("pia", pia6821_device, write)
-	AM_RANGE(0x20A0, 0x20A3) AM_DEVREAD("pia", pia6821_device, read)
+	map(0x20A0, 0x20A3).w("pia", FUNC(pia6821_device::write));
+	map(0x20A0, 0x20A3).r("pia", FUNC(pia6821_device::read));
 
-	AM_RANGE(0x20C0, 0x20C7) AM_DEVWRITE("mainlatch", hc259_device, write_d0)
+	map(0x20C0, 0x20C7).w("mainlatch", FUNC(hc259_device::write_d0));
 
-	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0x2404, 0x2405) AM_READ(latch_st_lo)
-	AM_RANGE(0x2406, 0x2407) AM_READ(latch_st_hi)
+	map(0x2400, 0x2401).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x2404, 0x2405).r(this, FUNC(maygay1b_state::latch_st_lo));
+	map(0x2406, 0x2407).r(this, FUNC(maygay1b_state::latch_st_hi));
 
-	AM_RANGE(0x2410, 0x2410) AM_READ(m1_firq_clr_r)
+	map(0x2410, 0x2410).r(this, FUNC(maygay1b_state::m1_firq_clr_r));
 
-	AM_RANGE(0x2412, 0x2412) AM_READ(m1_firq_trg_r) // firq, sample playback?
+	map(0x2412, 0x2412).r(this, FUNC(maygay1b_state::m1_firq_trg_r)); // firq, sample playback?
 
-	AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
+	map(0x2420, 0x2421).w(this, FUNC(maygay1b_state::latch_ch2_w)); // oki
 
-	AM_RANGE(0x2800, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank1")    /* 64k  paged ROM (4 pages)  */
+	map(0x2800, 0xdfff).rom();
+	map(0xe000, 0xffff).bankr("bank1");    /* 64k  paged ROM (4 pages)  */
 
-ADDRESS_MAP_END
+}
 
 
 
@@ -561,50 +562,51 @@ WRITE8_MEMBER(maygay1b_state::nec_bank1_w)
 	m_upd7759->start_w(1);
 }
 
-ADDRESS_MAP_START(maygay1b_state::m1_nec_memmap)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
+void maygay1b_state::m1_nec_memmap(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("nvram");
 
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(reel12_w)
-	AM_RANGE(0x2010, 0x2010) AM_WRITE(reel34_w)
-	AM_RANGE(0x2020, 0x2020) AM_WRITE(reel56_w)
+	map(0x2000, 0x2000).w(this, FUNC(maygay1b_state::reel12_w));
+	map(0x2010, 0x2010).w(this, FUNC(maygay1b_state::reel34_w));
+	map(0x2020, 0x2020).w(this, FUNC(maygay1b_state::reel56_w));
 
 	// there is actually an 8279 and an 8051 (which I guess is the MCU?).
-	AM_RANGE(0x2030, 0x2031) AM_DEVREADWRITE("i8279", i8279_device, read, write)
+	map(0x2030, 0x2031).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 
 #ifdef USE_MCU
 	//8051
-	AM_RANGE(0x2040, 0x2040) AM_WRITE( main_to_mcu_0_w )
-	AM_RANGE(0x2041, 0x2041) AM_WRITE( main_to_mcu_1_w )
+	map(0x2040, 0x2040).w(this, FUNC(maygay1b_state::main_to_mcu_0_w));
+	map(0x2041, 0x2041).w(this, FUNC(maygay1b_state::main_to_mcu_1_w));
 #else
 	//8051
-	AM_RANGE(0x2040, 0x2041) AM_DEVREADWRITE("i8279_2", i8279_device, read, write)
+	map(0x2040, 0x2041).rw("i8279_2", FUNC(i8279_device::read), FUNC(i8279_device::write));
 //  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
 #endif
 
-	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE("duart68681", mc68681_device, read, write )
+	map(0x2070, 0x207f).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
 
-	AM_RANGE(0x2090, 0x2091) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x20B0, 0x20B0) AM_READ(m1_meter_r)
+	map(0x2090, 0x2091).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x20B0, 0x20B0).r(this, FUNC(maygay1b_state::m1_meter_r));
 
-	AM_RANGE(0x20A0, 0x20A3) AM_DEVWRITE("pia", pia6821_device, write)
-	AM_RANGE(0x20A0, 0x20A3) AM_DEVREAD("pia", pia6821_device, read)
+	map(0x20A0, 0x20A3).w("pia", FUNC(pia6821_device::write));
+	map(0x20A0, 0x20A3).r("pia", FUNC(pia6821_device::read));
 
-	AM_RANGE(0x20C0, 0x20C7) AM_DEVWRITE("mainlatch", hc259_device, write_d0)
+	map(0x20C0, 0x20C7).w("mainlatch", FUNC(hc259_device::write_d0));
 
-	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0x2404, 0x2405) AM_WRITE(nec_bank0_w)
-	AM_RANGE(0x2406, 0x2407) AM_WRITE(nec_bank1_w)
+	map(0x2400, 0x2401).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x2404, 0x2405).w(this, FUNC(maygay1b_state::nec_bank0_w));
+	map(0x2406, 0x2407).w(this, FUNC(maygay1b_state::nec_bank1_w));
 
-	AM_RANGE(0x2408, 0x2409) AM_READ(nec_reset_r)
+	map(0x2408, 0x2409).r(this, FUNC(maygay1b_state::nec_reset_r));
 
-	AM_RANGE(0x240c, 0x240d) AM_READ(m1_firq_clr_r)
+	map(0x240c, 0x240d).r(this, FUNC(maygay1b_state::m1_firq_clr_r));
 
-	AM_RANGE(0x240e, 0x240f) AM_READ(m1_firq_nec_r)
+	map(0x240e, 0x240f).r(this, FUNC(maygay1b_state::m1_firq_nec_r));
 
-	AM_RANGE(0x2800, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank1")    /* 64k  paged ROM (4 pages)  */
+	map(0x2800, 0xdfff).rom();
+	map(0xe000, 0xffff).bankr("bank1");    /* 64k  paged ROM (4 pages)  */
 
-ADDRESS_MAP_END
+}
 
 
 /*************************************

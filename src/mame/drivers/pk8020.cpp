@@ -23,13 +23,15 @@
 #include "speaker.h"
 
 /* Address maps */
-ADDRESS_MAP_START(pk8020_state::pk8020_mem)
-ADDRESS_MAP_END
+void pk8020_state::pk8020_mem(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(pk8020_state::pk8020_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void pk8020_state::pk8020_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pk8020 )

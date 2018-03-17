@@ -38,63 +38,66 @@ Notes:
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(tecmo16_state::fstarfrc_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM /* Main RAM */
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x120800, 0x120fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x121000, 0x1217ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x121800, 0x121fff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
-	AM_RANGE(0x122000, 0x127fff) AM_RAM /* work area */
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x141fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x150000, 0x150001) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x150010, 0x150011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP   /* ??? */
-	AM_RANGE(0x150040, 0x150041) AM_READ_PORT("DSW1")
-	AM_RANGE(0x150050, 0x150051) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x160000, 0x160001) AM_WRITE(scroll_char_x_w)
-	AM_RANGE(0x16000c, 0x16000d) AM_WRITE(scroll_x_w)
-	AM_RANGE(0x160012, 0x160013) AM_WRITE(scroll_y_w)
-	AM_RANGE(0x160018, 0x160019) AM_WRITE(scroll2_x_w)
-	AM_RANGE(0x16001e, 0x16001f) AM_WRITE(scroll2_y_w)
-ADDRESS_MAP_END
+void tecmo16_state::fstarfrc_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x103fff).ram(); /* Main RAM */
+	map(0x110000, 0x110fff).ram().w(this, FUNC(tecmo16_state::charram_w)).share("charram");
+	map(0x120000, 0x1207ff).ram().w(this, FUNC(tecmo16_state::videoram_w)).share("videoram");
+	map(0x120800, 0x120fff).ram().w(this, FUNC(tecmo16_state::colorram_w)).share("colorram");
+	map(0x121000, 0x1217ff).ram().w(this, FUNC(tecmo16_state::videoram2_w)).share("videoram2");
+	map(0x121800, 0x121fff).ram().w(this, FUNC(tecmo16_state::colorram2_w)).share("colorram2");
+	map(0x122000, 0x127fff).ram(); /* work area */
+	map(0x130000, 0x130fff).ram().share("spriteram");
+	map(0x140000, 0x141fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x150000, 0x150001).w(this, FUNC(tecmo16_state::flipscreen_w));
+	map(0x150011, 0x150011).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x150030, 0x150031).portr("DSW2").nopw();   /* ??? */
+	map(0x150040, 0x150041).portr("DSW1");
+	map(0x150050, 0x150051).portr("P1_P2");
+	map(0x160000, 0x160001).w(this, FUNC(tecmo16_state::scroll_char_x_w));
+	map(0x16000c, 0x16000d).w(this, FUNC(tecmo16_state::scroll_x_w));
+	map(0x160012, 0x160013).w(this, FUNC(tecmo16_state::scroll_y_w));
+	map(0x160018, 0x160019).w(this, FUNC(tecmo16_state::scroll2_x_w));
+	map(0x16001e, 0x16001f).w(this, FUNC(tecmo16_state::scroll2_y_w));
+}
 
-ADDRESS_MAP_START(tecmo16_state::ginkun_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM /* Main RAM */
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
-	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x121000, 0x121fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x123000, 0x123fff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
-	AM_RANGE(0x124000, 0x124fff) AM_RAM /* extra RAM for Riot */
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x141fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x150000, 0x150001) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x150010, 0x150011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x150020, 0x150021) AM_READ_PORT("EXTRA") AM_WRITENOP  /* ??? */
-	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP   /* ??? */
-	AM_RANGE(0x150040, 0x150041) AM_READ_PORT("DSW1")
-	AM_RANGE(0x150050, 0x150051) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x160000, 0x160001) AM_WRITE(scroll_char_x_w)
-	AM_RANGE(0x160006, 0x160007) AM_WRITE(scroll_char_y_w)
-	AM_RANGE(0x16000c, 0x16000d) AM_WRITE(scroll_x_w)
-	AM_RANGE(0x160012, 0x160013) AM_WRITE(scroll_y_w)
-	AM_RANGE(0x160018, 0x160019) AM_WRITE(scroll2_x_w)
-	AM_RANGE(0x16001e, 0x16001f) AM_WRITE(scroll2_y_w)
-ADDRESS_MAP_END
+void tecmo16_state::ginkun_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x103fff).ram(); /* Main RAM */
+	map(0x110000, 0x110fff).ram().w(this, FUNC(tecmo16_state::charram_w)).share("charram");
+	map(0x120000, 0x120fff).ram().w(this, FUNC(tecmo16_state::videoram_w)).share("videoram");
+	map(0x121000, 0x121fff).ram().w(this, FUNC(tecmo16_state::colorram_w)).share("colorram");
+	map(0x122000, 0x122fff).ram().w(this, FUNC(tecmo16_state::videoram2_w)).share("videoram2");
+	map(0x123000, 0x123fff).ram().w(this, FUNC(tecmo16_state::colorram2_w)).share("colorram2");
+	map(0x124000, 0x124fff).ram(); /* extra RAM for Riot */
+	map(0x130000, 0x130fff).ram().share("spriteram");
+	map(0x140000, 0x141fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x150000, 0x150001).w(this, FUNC(tecmo16_state::flipscreen_w));
+	map(0x150011, 0x150011).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x150020, 0x150021).portr("EXTRA").nopw();  /* ??? */
+	map(0x150030, 0x150031).portr("DSW2").nopw();   /* ??? */
+	map(0x150040, 0x150041).portr("DSW1");
+	map(0x150050, 0x150051).portr("P1_P2");
+	map(0x160000, 0x160001).w(this, FUNC(tecmo16_state::scroll_char_x_w));
+	map(0x160006, 0x160007).w(this, FUNC(tecmo16_state::scroll_char_y_w));
+	map(0x16000c, 0x16000d).w(this, FUNC(tecmo16_state::scroll_x_w));
+	map(0x160012, 0x160013).w(this, FUNC(tecmo16_state::scroll_y_w));
+	map(0x160018, 0x160019).w(this, FUNC(tecmo16_state::scroll2_x_w));
+	map(0x16001e, 0x16001f).w(this, FUNC(tecmo16_state::scroll2_y_w));
+}
 
-ADDRESS_MAP_START(tecmo16_state::sound_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xfbff) AM_RAM /* Sound RAM */
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xfc04, 0xfc05) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xfc08, 0xfc08) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xfc0c, 0xfc0c) AM_NOP
-	AM_RANGE(0xfffe, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void tecmo16_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xfbff).ram(); /* Sound RAM */
+	map(0xfc00, 0xfc00).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xfc04, 0xfc05).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xfc08, 0xfc08).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xfc0c, 0xfc0c).noprw();
+	map(0xfffe, 0xffff).ram();
+}
 
 /******************************************************************************/
 

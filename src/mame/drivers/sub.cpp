@@ -261,23 +261,24 @@ WRITE_LINE_MEMBER(sub_state::int_mask_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(sub_state::subm_map)
-	AM_RANGE(0x0000, 0xafff) AM_ROM
-	AM_RANGE(0xb000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("attr")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("vid")
-	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_SHARE("scrolly")
+void sub_state::subm_map(address_map &map)
+{
+	map(0x0000, 0xafff).rom();
+	map(0xb000, 0xbfff).ram();
+	map(0xc000, 0xc3ff).ram().share("attr");
+	map(0xc400, 0xc7ff).ram().share("vid");
+	map(0xd000, 0xd03f).ram().share("spriteram");
+	map(0xd800, 0xd83f).ram().share("spriteram2");
+	map(0xd840, 0xd85f).ram().share("scrolly");
 
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xe800, 0xe807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+	map(0xe000, 0xe000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xe800, 0xe807).w("mainlatch", FUNC(ls259_device::write_d0));
 
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW0") // DSW0?
-	AM_RANGE(0xf020, 0xf020) AM_READ_PORT("DSW1") // DSW1?
-	AM_RANGE(0xf040, 0xf040) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf060, 0xf060) AM_READ_PORT("IN0")
-ADDRESS_MAP_END
+	map(0xf000, 0xf000).portr("DSW0"); // DSW0?
+	map(0xf020, 0xf020).portr("DSW1"); // DSW1?
+	map(0xf040, 0xf040).portr("SYSTEM");
+	map(0xf060, 0xf060).portr("IN0");
+}
 
 WRITE8_MEMBER(sub_state::nmi_mask_w)
 {
@@ -286,23 +287,26 @@ WRITE8_MEMBER(sub_state::nmi_mask_w)
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(sub_state::subm_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) // to/from sound CPU
-ADDRESS_MAP_END
+void sub_state::subm_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // to/from sound CPU
+}
 
-ADDRESS_MAP_START(sub_state::subm_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(nmi_mask_w)
-ADDRESS_MAP_END
+void sub_state::subm_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x6000, 0x6000).w(this, FUNC(sub_state::nmi_mask_w));
+}
 
-ADDRESS_MAP_START(sub_state::subm_sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write) // to/from main CPU
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w)
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_data_w)
-ADDRESS_MAP_END
+void sub_state::subm_sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write)); // to/from main CPU
+	map(0x40, 0x41).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x80, 0x81).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+}
 
 
 static INPUT_PORTS_START( sub )

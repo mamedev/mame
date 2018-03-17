@@ -247,19 +247,20 @@ WRITE_LINE_MEMBER(shougi_state::nmi_enable_w)
 }
 
 
-ADDRESS_MAP_START(shougi_state::main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM /* 2114 x 2 (0x400 x 4bit each) */
-	AM_RANGE(0x4800, 0x480f) AM_DEVWRITE("mainlatch", ls259_device, write_a3)
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW")
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1")
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* game won't boot if watchdog doesn't work */
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x7000, 0x73ff) AM_DEVREADWRITE("alpha_8201", alpha_8201_device, ext_ram_r, ext_ram_w)
-	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_SHARE("sharedram") /* 2114 x 2 (0x400 x 4bit each) */
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram") /* 4116 x 16 (32K) */
-ADDRESS_MAP_END
+void shougi_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram(); /* 2114 x 2 (0x400 x 4bit each) */
+	map(0x4800, 0x480f).w("mainlatch", FUNC(ls259_device::write_a3));
+	map(0x4800, 0x4800).portr("DSW");
+	map(0x5000, 0x5000).portr("P1");
+	map(0x5800, 0x5800).portr("P2").w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* game won't boot if watchdog doesn't work */
+	map(0x6000, 0x6000).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x6800, 0x6800).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x7000, 0x73ff).rw(m_alpha_8201, FUNC(alpha_8201_device::ext_ram_r), FUNC(alpha_8201_device::ext_ram_w));
+	map(0x7800, 0x7bff).ram().share("sharedram"); /* 2114 x 2 (0x400 x 4bit each) */
+	map(0x8000, 0xffff).ram().share("videoram"); /* 4116 x 16 (32K) */
+}
 
 
 // subcpu side
@@ -273,15 +274,17 @@ READ8_MEMBER(shougi_state::semaphore_r)
 }
 
 
-ADDRESS_MAP_START(shougi_state::sub_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("sharedram") /* 2114 x 2 (0x400 x 4bit each) */
-ADDRESS_MAP_END
+void shougi_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x63ff).ram().share("sharedram"); /* 2114 x 2 (0x400 x 4bit each) */
+}
 
-ADDRESS_MAP_START(shougi_state::readport_sub)
-	ADDRESS_MAP_GLOBAL_MASK(0x00ff)
-	AM_RANGE(0x00, 0x00) AM_READ(semaphore_r)
-ADDRESS_MAP_END
+void shougi_state::readport_sub(address_map &map)
+{
+	map.global_mask(0x00ff);
+	map(0x00, 0x00).r(this, FUNC(shougi_state::semaphore_r));
+}
 
 
 

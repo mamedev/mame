@@ -29,14 +29,16 @@ public:
 };
 
 
-ADDRESS_MAP_START(ecoinf1_state::older_memmap)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_RAM
-ADDRESS_MAP_END
+void ecoinf1_state::older_memmap(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x4000, 0x4fff).ram();
+}
 
-ADDRESS_MAP_START(ecoinf1_state::older_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void ecoinf1_state::older_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 
 

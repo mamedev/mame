@@ -40,17 +40,19 @@ private:
 	required_device<palette_device> m_palette;
 };
 
-ADDRESS_MAP_START(m3_state::mem_map)
-	AM_RANGE(0x0000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void m3_state::mem_map(address_map &map)
+{
+	map(0x0000, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().share("videoram");
+	map(0xf000, 0xffff).rom().region("roms", 0);
+}
 
-ADDRESS_MAP_START(m3_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK (0xff)
-	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x85, 0x85) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-ADDRESS_MAP_END
+void m3_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x84, 0x84).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x85, 0x85).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
 
 static INPUT_PORTS_START( m3 )
 INPUT_PORTS_END

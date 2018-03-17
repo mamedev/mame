@@ -57,20 +57,28 @@ WRITE8_MEMBER(mmm_state::ay_porta_w)
 	logerror("Writing %02X to AY-3-8910 port A\n", data);
 }
 
-ADDRESS_MAP_START(mmm_state::mem_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x40ff) AM_RAM
-ADDRESS_MAP_END
+void mmm_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x40ff).ram();
+}
 
-ADDRESS_MAP_START(mmm_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(strobe_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x05, 0x05) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	;map(0x06, 0x06).select(0x30).lrw8("ctc_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_ctc->read(space, offset >> 4, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_ctc->write(space, offset >> 4, data, mem_mask); });
-	AM_RANGE(0x07, 0x07) AM_READ(inputs_r)
-ADDRESS_MAP_END
+void mmm_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(mmm_state::strobe_w));
+	map(0x03, 0x03).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x04, 0x04).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x05, 0x05).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x06, 0x06).select(0x30).lrw8("ctc_rw",
+									  [this](address_space &space, offs_t offset, u8 mem_mask) {
+										  return m_ctc->read(space, offset >> 4, mem_mask);
+									  },
+									  [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+										  m_ctc->write(space, offset >> 4, data, mem_mask);
+									  });
+	map(0x07, 0x07).r(this, FUNC(mmm_state::inputs_r));
+}
 
 
 static INPUT_PORTS_START( mmm )

@@ -25,56 +25,62 @@
 /* Address maps */
 
 /* Orion 128 */
-ADDRESS_MAP_START(orion_state::orion128_mem)
-	AM_RANGE( 0x0000, 0xefff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0xf400, 0xf4ff ) AM_READWRITE(orion128_system_r,orion128_system_w)  // Keyboard and cassette
-	AM_RANGE( 0xf500, 0xf5ff ) AM_READWRITE(orion128_romdisk_r,orion128_romdisk_w)
-	AM_RANGE( 0xf700, 0xf7ff ) AM_READWRITE(orion128_floppy_r,orion128_floppy_w)
-	AM_RANGE( 0xf800, 0xffff ) AM_ROM
-	AM_RANGE( 0xf800, 0xf8ff ) AM_WRITE(orion128_video_mode_w)
-	AM_RANGE( 0xf900, 0xf9ff ) AM_WRITE(orion128_memory_page_w)
-	AM_RANGE( 0xfa00, 0xfaff ) AM_WRITE(orion128_video_page_w)
-ADDRESS_MAP_END
+void orion_state::orion128_mem(address_map &map)
+{
+	map(0x0000, 0xefff).bankrw("bank1");
+	map(0xf000, 0xf3ff).bankrw("bank2");
+	map(0xf400, 0xf4ff).rw(this, FUNC(orion_state::orion128_system_r), FUNC(orion_state::orion128_system_w));  // Keyboard and cassette
+	map(0xf500, 0xf5ff).rw(this, FUNC(orion_state::orion128_romdisk_r), FUNC(orion_state::orion128_romdisk_w));
+	map(0xf700, 0xf7ff).rw(this, FUNC(orion_state::orion128_floppy_r), FUNC(orion_state::orion128_floppy_w));
+	map(0xf800, 0xffff).rom();
+	map(0xf800, 0xf8ff).w(this, FUNC(orion_state::orion128_video_mode_w));
+	map(0xf900, 0xf9ff).w(this, FUNC(orion_state::orion128_memory_page_w));
+	map(0xfa00, 0xfaff).w(this, FUNC(orion_state::orion128_video_page_w));
+}
 
 /* Orion Z80 Card II */
-ADDRESS_MAP_START(orion_state::orion128_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0xf8, 0xf8) AM_WRITE(orion128_video_mode_w )
-	AM_RANGE( 0xf9, 0xf9) AM_WRITE(orion128_memory_page_w )
-	AM_RANGE( 0xfa, 0xfa) AM_WRITE(orion128_video_page_w )
-ADDRESS_MAP_END
+void orion_state::orion128_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xf8, 0xf8).w(this, FUNC(orion_state::orion128_video_mode_w));
+	map(0xf9, 0xf9).w(this, FUNC(orion_state::orion128_memory_page_w));
+	map(0xfa, 0xfa).w(this, FUNC(orion_state::orion128_video_page_w));
+}
 
-ADDRESS_MAP_START(orion_state::orionz80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x4000, 0xefff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK("bank3")
-	AM_RANGE( 0xf400, 0xf7ff ) AM_RAMBANK("bank4")
-	AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank5")
-ADDRESS_MAP_END
+void orion_state::orionz80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0xefff).bankrw("bank2");
+	map(0xf000, 0xf3ff).bankrw("bank3");
+	map(0xf400, 0xf7ff).bankrw("bank4");
+	map(0xf800, 0xffff).bankrw("bank5");
+}
 
 /* Orion Pro */
-ADDRESS_MAP_START(orion_state::orionz80_io)
-	AM_RANGE( 0x0000, 0xffff) AM_READWRITE(orionz80_io_r, orionz80_io_w )
-ADDRESS_MAP_END
+void orion_state::orionz80_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(orion_state::orionz80_io_r), FUNC(orion_state::orionz80_io_w));
+}
 
-ADDRESS_MAP_START(orion_state::orionpro_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x1fff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x2000, 0x3fff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAMBANK("bank3")
-	AM_RANGE( 0x8000, 0xbfff ) AM_RAMBANK("bank4")
-	AM_RANGE( 0xc000, 0xefff ) AM_RAMBANK("bank5")
-	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK("bank6")
-	AM_RANGE( 0xf400, 0xf7ff ) AM_RAMBANK("bank7")
-	AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank8")
-ADDRESS_MAP_END
+void orion_state::orionpro_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).bankrw("bank1");
+	map(0x2000, 0x3fff).bankrw("bank2");
+	map(0x4000, 0x7fff).bankrw("bank3");
+	map(0x8000, 0xbfff).bankrw("bank4");
+	map(0xc000, 0xefff).bankrw("bank5");
+	map(0xf000, 0xf3ff).bankrw("bank6");
+	map(0xf400, 0xf7ff).bankrw("bank7");
+	map(0xf800, 0xffff).bankrw("bank8");
+}
 
-ADDRESS_MAP_START(orion_state::orionpro_io)
-	AM_RANGE( 0x0000, 0xffff) AM_READWRITE(orionpro_io_r, orionpro_io_w )
-ADDRESS_MAP_END
+void orion_state::orionpro_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(orion_state::orionpro_io_r), FUNC(orion_state::orionpro_io_w));
+}
 
 FLOPPY_FORMATS_MEMBER( orion_state::orion_floppy_formats )
 	FLOPPY_SMX_FORMAT

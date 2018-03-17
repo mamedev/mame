@@ -99,15 +99,16 @@ const tiny_rom_entry *smioc_device::device_rom_region() const
 //  ADDRESS_MAP( smioc_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(smioc_device::smioc_mem)
-	AM_RANGE(0x00000, 0x07FFF) AM_RAM AM_SHARE("smioc_ram")
-	AM_RANGE(0xC0080, 0xC008F) AM_DEVREADWRITE("dma8237_1",am9517a_device,read,write) // Probably RAM DMA
-	AM_RANGE(0xC0090, 0xC009F) AM_DEVREADWRITE("dma8237_2",am9517a_device,read,write) // Serial DMA
-	AM_RANGE(0xC00A0, 0xC00AF) AM_DEVREADWRITE("dma8237_3",am9517a_device,read,write) // Serial DMA
-	AM_RANGE(0xC00B0, 0xC00BF) AM_DEVREADWRITE("dma8237_4",am9517a_device,read,write) // Serial DMA
-	AM_RANGE(0xC00C0, 0xC00CF) AM_DEVREADWRITE("dma8237_5",am9517a_device,read,write) // Serial DMA
-	AM_RANGE(0xF8000, 0xFFFFF) AM_ROM AM_REGION("rom", 0)
-ADDRESS_MAP_END
+void smioc_device::smioc_mem(address_map &map)
+{
+	map(0x00000, 0x07FFF).ram().share("smioc_ram");
+	map(0xC0080, 0xC008F).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Probably RAM DMA
+	map(0xC0090, 0xC009F).rw("dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
+	map(0xC00A0, 0xC00AF).rw("dma8237_3", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
+	map(0xC00B0, 0xC00BF).rw("dma8237_4", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
+	map(0xC00C0, 0xC00CF).rw("dma8237_5", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
+	map(0xF8000, 0xFFFFF).rom().region("rom", 0);
+}
 
 MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	/* CPU - Intel 80C188 */

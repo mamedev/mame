@@ -45,18 +45,19 @@ READ8_MEMBER(gomoku_state::input_port_r)
 }
 
 
-ADDRESS_MAP_START(gomoku_state::gomoku_map)
-	AM_RANGE(0x0000, 0x47ff) AM_ROM
-	AM_RANGE(0x4800, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(gomoku_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(gomoku_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x5800, 0x58ff) AM_RAM_WRITE(gomoku_bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0x6000, 0x601f) AM_DEVWRITE("gomoku", gomoku_sound_device, sound1_w)
-	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("gomoku", gomoku_sound_device, sound2_w)
-	AM_RANGE(0x7000, 0x7007) AM_DEVWRITE("latch", ls259_device, write_d1)
-	AM_RANGE(0x7800, 0x7807) AM_READ(input_port_r)
-	AM_RANGE(0x7800, 0x7800) AM_WRITENOP
-ADDRESS_MAP_END
+void gomoku_state::gomoku_map(address_map &map)
+{
+	map(0x0000, 0x47ff).rom();
+	map(0x4800, 0x4fff).ram();
+	map(0x5000, 0x53ff).ram().w(this, FUNC(gomoku_state::gomoku_videoram_w)).share("videoram");
+	map(0x5400, 0x57ff).ram().w(this, FUNC(gomoku_state::gomoku_colorram_w)).share("colorram");
+	map(0x5800, 0x58ff).ram().w(this, FUNC(gomoku_state::gomoku_bgram_w)).share("bgram");
+	map(0x6000, 0x601f).w("gomoku", FUNC(gomoku_sound_device::sound1_w));
+	map(0x6800, 0x681f).w("gomoku", FUNC(gomoku_sound_device::sound2_w));
+	map(0x7000, 0x7007).w("latch", FUNC(ls259_device::write_d1));
+	map(0x7800, 0x7807).r(this, FUNC(gomoku_state::input_port_r));
+	map(0x7800, 0x7800).nopw();
+}
 
 
 static INPUT_PORTS_START( gomoku )

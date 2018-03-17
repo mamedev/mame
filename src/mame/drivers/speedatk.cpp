@@ -181,24 +181,26 @@ WRITE8_MEMBER(speedatk_state::key_matrix_status_w)
 		m_coin_settings = m_km_status & 0xf;
 }
 
-ADDRESS_MAP_START(speedatk_state::speedatk_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_READWRITE(key_matrix_r,key_matrix_w)
-	AM_RANGE(0x8001, 0x8001) AM_READWRITE(key_matrix_status_r,key_matrix_status_w)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM AM_SHARE("colorram")
-ADDRESS_MAP_END
+void speedatk_state::speedatk_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8000).rw(this, FUNC(speedatk_state::key_matrix_r), FUNC(speedatk_state::key_matrix_w));
+	map(0x8001, 0x8001).rw(this, FUNC(speedatk_state::key_matrix_status_r), FUNC(speedatk_state::key_matrix_status_w));
+	map(0x8800, 0x8fff).ram();
+	map(0xa000, 0xa3ff).ram().share("videoram");
+	map(0xb000, 0xb3ff).ram().share("colorram");
+}
 
 
-ADDRESS_MAP_START(speedatk_state::speedatk_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(m6845_w) //h46505 address / data routing
-	AM_RANGE(0x24, 0x24) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+void speedatk_state::speedatk_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(this, FUNC(speedatk_state::m6845_w)); //h46505 address / data routing
+	map(0x24, 0x24).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x40, 0x40).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::address_data_w));
 	//what's 60-6f for? Seems used only in attract mode and read back when a 2p play ends ...
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( speedatk )
 	PORT_START("DSW")

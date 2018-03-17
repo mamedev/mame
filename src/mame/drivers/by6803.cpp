@@ -90,17 +90,19 @@ private:
 };
 
 
-ADDRESS_MAP_START(by6803_state::by6803_map)
-	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("nvram") // 6116 ram
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void by6803_state::by6803_map(address_map &map)
+{
+	map(0x0020, 0x0023).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0040, 0x0043).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x17ff).ram().share("nvram"); // 6116 ram
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(by6803_state::by6803_io)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(port1_r, port1_w) // P10-P17
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(port2_r, port2_w) // P20-P24
-ADDRESS_MAP_END
+void by6803_state::by6803_io(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(by6803_state::port1_r), FUNC(by6803_state::port1_w)); // P10-P17
+	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(by6803_state::port2_r), FUNC(by6803_state::port2_w)); // P20-P24
+}
 
 static INPUT_PORTS_START( by6803 )
 	PORT_START("TEST")

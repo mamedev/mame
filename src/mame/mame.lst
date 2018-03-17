@@ -9772,6 +9772,9 @@ f1gpstr2                        // (c) 1993 Jaleco
 scudhamm                        // (c) 1994 Jaleco
 wildplt                         // (c) 1992 Jaleco
 
+@source:cit101.cpp
+cit101                          // (c) 1981 C. Itoh
+
 @source:cit220.cpp
 cit220p                         // (c) 1984 C. Itoh
 
@@ -10196,6 +10199,7 @@ sf2rk                           // bootleg
 sf2rules                        // bootleg
 sf2stt                          // bootleg
 sf2thndr                        // hack
+sf2thndr2                       // bootleg
 sf2ua                           // 06/02/1991 (c) 1991 (USA)
 sf2ub                           // 14/02/1991 (c) 1991 (USA)
 sf2uc                           // 06/03/1991 (c) 1991 (USA)
@@ -11688,6 +11692,7 @@ tenkai2b                        // (c) 1991 bootleg
 tenkaibb                        // (c) 1991 bootleg
 tenkaicb                        // (c) 1991 bootleg
 tenkaie                         // (c) 1991 Dynax
+warahana                        // "613" Warai no Hana Tenshi 1991 Dynax
 yarunara                        // "55" Mahjong Yarunara 1991 Dynax
 
 @source:dynduke.cpp
@@ -12410,6 +12415,7 @@ exl100                          //
 exerion                         // (c) 1983 Jaleco
 exerionb                        // bootleg
 exeriont                        // (c) 1983 Jaleco + Taito America license
+irion                           //
 
 @source:exidy.cpp
 fax                             // (c) 1983
@@ -13267,6 +13273,7 @@ redufob                         // bootleg
 scobra                          // GX316 (c) 1981 Konami
 scobrab                         // GX316 (c) 1981 Karateco (bootleg?)
 scobrae                         // GX316 (c) 1981 Stern
+scobrag                         // AVG by Zaccaria (bootleg?)
 scobras                         // GX316 (c) 1981 Stern
 scobrase                        // GX316 (c) 1981 Sega
 scorpion                        // (c) 1982 Zaccaria
@@ -13826,6 +13833,7 @@ gkigt43n                        //
 gkigt4ms                        //
 gkigt5p                         //
 gkigtez                         //
+gkigtezms                       //
 gkkey                           //
 igtsc                           //
 ms72c                           //
@@ -14171,8 +14179,10 @@ schery97a                       // (c) 1998 Amcoe
 scmaster                        // 1994, unknown
 skill98                         // (c) 1998 Amcoe
 star100                         // (c) 199? Sang Ho
+super7                          // bootleg (New Impeuropex?)
 super9                          // (c) 2001 Playmark
 super972                        // unknown
+tcl                             // (c) 1995 Uniwang
 tonypok                         // (c) 1991 Corsica
 unkch1                          // bootleg
 unkch2                          // bootleg
@@ -17784,6 +17794,9 @@ lc80                            //
 lc80_2                          //
 sc80                            //
 
+@source:lckydraw.cpp
+lckydraw                        // (c) 1979 Mirco
+
 @source:lcmate2.cpp
 lcmate2                         //
 
@@ -18472,6 +18485,7 @@ marywu                          //
 
 @source:mastboy.cpp
 mastboy                         // (c) 1987 - No Ref on the PCB
+mastboya                        // (c) 1987 - No Ref on the PCB
 mastboyi                        // (c) 1987 - No Ref on the PCB
 mastboyia                       // (c) 1987 - No Ref on the PCB
 
@@ -20825,7 +20839,8 @@ pitbossma                       // (c) 1994 Merit
 pitbosss                        // (c) 1990 Merit
 pitbosssa                       // (c) 1990 Merit
 pitbosssc                       // (c) 1992 Merit
-realbrod                        // (c) 1995 Merit
+realbrod                        // (c) 1996 Merit
+realbroda                       // (c) 1995 Merit
 spitboss                        // (c) 1988 Merit
 
 @source:mermaid.cpp
@@ -21307,12 +21322,13 @@ wingwaru                        // 1994.09 Wing War (US)
 @source:model2.cpp
 bel                             // 1998.12 Behind Enemy Lines
 daytona                         // 1994.03 Daytona USA (Japan, Revision A)
-daytona93                       //
-daytonam                        // 1993, hack
-daytonas                        //
+daytona93                       // 1993    Japan
+daytonam                        // 2001    Kyle Hodgetts hack
+daytonas                        // 
 daytonase                       // 1994    Daytona USA Special Edition (Japan, Revision A)
-daytonat                        // 1993, hack
-daytonata                       // 1993, hack
+daytonat                        // 1994?   Kyle Hodgetts hack
+daytonata                       // 1994?   Kyle Hodgetts hack
+daytonagtx						// 2004    Kyle Hodgetts hack
 desert                          // 1994.07 Desert Tank
 doa                             // 1996.11 Dead or Alive (Revision B)
 doaa                            // 1996.11 Dead or Alive (Revision A)
@@ -32923,6 +32939,9 @@ rvoicepc                        //
 @source:rx78.cpp
 rx78                            //
 
+@source:rz1.cpp
+rz1								// 1986 Casio
+
 @source:rzone.cpp
 rzbatfor                        //
 rzindy500                       //
@@ -32990,6 +33009,7 @@ esha_lg1                        //
 esha_lg2                        //
 esha_ma3                        //
 esha_pa1                        //
+esha_pa4                        //
 esha_pr4                        //
 jokrz_l3                        //
 jokrz_l6                        //
@@ -36557,9 +36577,6 @@ tbowlp                          // Suspected proto of Japanese version for US Ma
 tceptor                         // (c) 1986
 tceptor2                        // (c) 1986
 
-@source:tcl.cpp
-tcl                             // (c) 1995 Uniwang
-
 @source:tdv2324.cpp
 tdv2324                         //
 
@@ -39029,8 +39046,12 @@ rad_snowp                       //
 rad_madf                        //
 rad_fb                          //
 epo_efdx                        //
+rad_rh				     		//
 has_wamg                        //
+eka_base                        //
 eka_strt                        //
+eka_vol1                        //
+eka_vol2                        //
 xavtenni                        //
 ttv_sw                          //
 ttv_lotr                        //

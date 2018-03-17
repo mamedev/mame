@@ -71,14 +71,15 @@ private:
 };
 
 
-ADDRESS_MAP_START(k1003_state::k1003_mem)
-	AM_RANGE(0x0000,0x07ff) AM_ROM
-	AM_RANGE(0x0800,0x17ff) AM_RAM
-	AM_RANGE(0x1800,0x1fff) AM_ROM
-	AM_RANGE(0x2000,0x27ff) AM_ROM
-	AM_RANGE(0x2800,0x2fff) AM_RAM
-	AM_RANGE(0x3000,0x3aff) AM_ROM
-ADDRESS_MAP_END
+void k1003_state::k1003_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x17ff).ram();
+	map(0x1800, 0x1fff).rom();
+	map(0x2000, 0x27ff).rom();
+	map(0x2800, 0x2fff).ram();
+	map(0x3000, 0x3aff).rom();
+}
 
 READ8_MEMBER( k1003_state::port2_r )
 {
@@ -120,15 +121,16 @@ WRITE8_MEMBER( k1003_state::disp_w )
 	output().set_digit_value(bit_to_dec(data)*2+1, m_disp_2);
 }
 
-ADDRESS_MAP_START(k1003_state::k1003_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00,0x00) AM_READ(key_r)
-	AM_RANGE(0x02,0x02) AM_READ(port2_r)
+void k1003_state::k1003_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).r(this, FUNC(k1003_state::key_r));
+	map(0x02, 0x02).r(this, FUNC(k1003_state::port2_r));
 
-	AM_RANGE(0x08,0x08) AM_WRITE(disp_w)
-	AM_RANGE(0x09,0x09) AM_WRITE(disp_2_w)
-	AM_RANGE(0x10,0x10) AM_WRITE(disp_1_w)
-ADDRESS_MAP_END
+	map(0x08, 0x08).w(this, FUNC(k1003_state::disp_w));
+	map(0x09, 0x09).w(this, FUNC(k1003_state::disp_2_w));
+	map(0x10, 0x10).w(this, FUNC(k1003_state::disp_1_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( k1003 )

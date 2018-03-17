@@ -216,10 +216,11 @@ enum
 /*
     Memory map. All of the work is done in the datamux (see datamux.c).
 */
-ADDRESS_MAP_START(ti99_4x_state::memmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, read, write) AM_DEVSETOFFSET(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, setoffset)
-ADDRESS_MAP_END
+void ti99_4x_state::memmap(address_map &map)
+{
+	map.global_mask(0xffff);
+	map(0x0000, 0xffff).rw(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::read), FUNC(bus::ti99::internal::datamux_device::write)).setoffset(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::setoffset));
+}
 
 /*
     CRU map
@@ -241,13 +242,14 @@ ADDRESS_MAP_END
 
     Write:0000 - 01ff corresponds to bit 0 of base address 0000 - 03fe
 */
-ADDRESS_MAP_START(ti99_4x_state::cru_map)
-	AM_RANGE(0x0000, 0x01ff) AM_READ(cruread)
-	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0x003c) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
+void ti99_4x_state::cru_map(address_map &map)
+{
+	map(0x0000, 0x01ff).r(this, FUNC(ti99_4x_state::cruread));
+	map(0x0000, 0x0003).mirror(0x003c).r(m_tms9901, FUNC(tms9901_device::read));
 
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(cruwrite)
-	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0x01e0) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
-ADDRESS_MAP_END
+	map(0x0000, 0x0fff).w(this, FUNC(ti99_4x_state::cruwrite));
+	map(0x0000, 0x001f).mirror(0x01e0).w(m_tms9901, FUNC(tms9901_device::write));
+}
 
 
 /*****************************************************************************

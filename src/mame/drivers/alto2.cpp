@@ -38,7 +38,7 @@ public:
 	void alto2_iomem_map(address_map &map);
 	void alto2_ucode_map(address_map &map);
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<alto2_cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
@@ -264,17 +264,20 @@ ROM_END
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(alto2_state::alto2_ucode_map)
-	AM_RANGE(0, 4*ALTO2_UCODE_PAGE_SIZE-1) AM_DEVICE32( "maincpu", alto2_cpu_device, ucode_map, 0xffffffffUL )
-ADDRESS_MAP_END
+void alto2_state::alto2_ucode_map(address_map &map)
+{
+	map(0, 4*ALTO2_UCODE_PAGE_SIZE-1).m(m_maincpu, FUNC(alto2_cpu_device::ucode_map));
+}
 
-ADDRESS_MAP_START(alto2_state::alto2_const_map)
-	AM_RANGE(0, ALTO2_CONST_SIZE-1) AM_DEVICE16( "maincpu", alto2_cpu_device, const_map, 0xffffU )
-ADDRESS_MAP_END
+void alto2_state::alto2_const_map(address_map &map)
+{
+	map(0, ALTO2_CONST_SIZE-1).m(m_maincpu, FUNC(alto2_cpu_device::const_map));
+}
 
-ADDRESS_MAP_START(alto2_state::alto2_iomem_map)
-	AM_RANGE(0, 2*ALTO2_RAM_SIZE-1) AM_DEVICE16( "maincpu", alto2_cpu_device, iomem_map, 0xffffU )
-ADDRESS_MAP_END
+void alto2_state::alto2_iomem_map(address_map &map)
+{
+	map(0, 2*ALTO2_RAM_SIZE-1).m(m_maincpu, FUNC(alto2_cpu_device::iomem_map));
+}
 
 MACHINE_CONFIG_START(alto2_state::alto2)
 	// Basic machine hardware

@@ -843,25 +843,26 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(magictg_state::magictg_map)
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM // 8MB RAM
-	AM_RANGE(0x00800000, 0x0081003f) AM_RAM // ?
-	AM_RANGE(0x0a000000, 0x0affffff) AM_DEVREADWRITE("voodoo_0", voodoo_device, voodoo_r, voodoo_w)
+void magictg_state::magictg_map(address_map &map)
+{
+	map(0x00000000, 0x007fffff).ram(); // 8MB RAM
+	map(0x00800000, 0x0081003f).ram(); // ?
+	map(0x0a000000, 0x0affffff).rw("voodoo_0", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
 #if defined(USE_TWO_3DFX)
-	AM_RANGE(0x0b000000, 0x0bffffff) AM_DEVREADWRITE("voodoo_1", voodoo_device, voodoo_r, voodoo_w)
-	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(zr36120_r, zr36120_w)
+	map(0x0b000000, 0x0bffffff).rw("voodoo_1", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0x0c000000, 0x0c000fff).rw(this, FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
 #else
-	AM_RANGE(0x0b000000, 0x0b000fff) AM_READWRITE(zr36120_r, zr36120_w)
+	map(0x0b000000, 0x0b000fff).rw(this, FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
 #endif
-	AM_RANGE(0x0f000000, 0x0f000fff) AM_READWRITE(f0_r, f0_w) // Split this up?
-	AM_RANGE(0x14000100, 0x14000103) AM_READWRITE(adsp_idma_data_r, adsp_idma_data_w)
-	AM_RANGE(0x14000104, 0x14000107) AM_WRITE(adsp_idma_addr_w)
-	AM_RANGE(0x1b001024, 0x1b001027) AM_READ(adsp_status_r)
-	AM_RANGE(0x1b001108, 0x1b00110b) AM_READ(unk_r)
-	AM_RANGE(0x1e000000, 0x1e002fff) AM_RAM // NVRAM?
-	AM_RANGE(0x1e800000, 0x1e800007) AM_READWRITE(unk2_r, serial_w)
-	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_REGION("mips", 0)
-ADDRESS_MAP_END
+	map(0x0f000000, 0x0f000fff).rw(this, FUNC(magictg_state::f0_r), FUNC(magictg_state::f0_w)); // Split this up?
+	map(0x14000100, 0x14000103).rw(this, FUNC(magictg_state::adsp_idma_data_r), FUNC(magictg_state::adsp_idma_data_w));
+	map(0x14000104, 0x14000107).w(this, FUNC(magictg_state::adsp_idma_addr_w));
+	map(0x1b001024, 0x1b001027).r(this, FUNC(magictg_state::adsp_status_r));
+	map(0x1b001108, 0x1b00110b).r(this, FUNC(magictg_state::unk_r));
+	map(0x1e000000, 0x1e002fff).ram(); // NVRAM?
+	map(0x1e800000, 0x1e800007).rw(this, FUNC(magictg_state::unk2_r), FUNC(magictg_state::serial_w));
+	map(0x1fc00000, 0x1fffffff).rom().region("mips", 0);
+}
 
 
 /*************************************
@@ -870,21 +871,24 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(magictg_state::adsp_program_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("adsp_pram")
-ADDRESS_MAP_END
+void magictg_state::adsp_program_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).ram().share("adsp_pram");
+}
 
-ADDRESS_MAP_START(magictg_state::adsp_data_map)
-	ADDRESS_MAP_UNMAP_HIGH
+void magictg_state::adsp_data_map(address_map &map)
+{
+	map.unmap_value_high();
 //  AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("databank")
-	AM_RANGE(0x0400, 0x3fdf) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
-ADDRESS_MAP_END
+	map(0x0400, 0x3fdf).ram();
+	map(0x3fe0, 0x3fff).rw(this, FUNC(magictg_state::adsp_control_r), FUNC(magictg_state::adsp_control_w));
+}
 
-ADDRESS_MAP_START(magictg_state::adsp_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void magictg_state::adsp_io_map(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 
 /*************************************

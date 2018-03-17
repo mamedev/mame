@@ -525,24 +525,26 @@ void spectrum_state::ts2068_update_memory()
 	}
 }
 
-ADDRESS_MAP_START(spectrum_state::ts2068_io)
-	AM_RANGE(0xf4, 0xf4) AM_READWRITE(ts2068_port_f4_r,ts2068_port_f4_w ) AM_MIRROR(0xff00)
-	AM_RANGE(0xf5, 0xf5) AM_DEVWRITE("ay8912", ay8910_device, address_w ) AM_MIRROR(0xff00)
-	AM_RANGE(0xf6, 0xf6) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, data_w ) AM_MIRROR(0xff00)
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w )  AM_SELECT(0xff00)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(ts2068_port_ff_r,ts2068_port_ff_w ) AM_MIRROR(0xff00)
-ADDRESS_MAP_END
+void spectrum_state::ts2068_io(address_map &map)
+{
+	map(0xf4, 0xf4).rw(this, FUNC(spectrum_state::ts2068_port_f4_r), FUNC(spectrum_state::ts2068_port_f4_w)).mirror(0xff00);
+	map(0xf5, 0xf5).w("ay8912", FUNC(ay8910_device::address_w)).mirror(0xff00);
+	map(0xf6, 0xf6).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xff00);
+	map(0xfe, 0xfe).rw(this, FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xff00);
+	map(0xff, 0xff).rw(this, FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::ts2068_port_ff_w)).mirror(0xff00);
+}
 
-ADDRESS_MAP_START(spectrum_state::ts2068_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank9")
-	AM_RANGE(0x2000, 0x3fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank10")
-	AM_RANGE(0x4000, 0x5fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank11")
-	AM_RANGE(0x6000, 0x7fff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank12")
-	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank5") AM_WRITE_BANK("bank13")
-	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank14")
-	AM_RANGE(0xc000, 0xdfff) AM_READ_BANK("bank7") AM_WRITE_BANK("bank15")
-	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bank8") AM_WRITE_BANK("bank16")
-ADDRESS_MAP_END
+void spectrum_state::ts2068_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr("bank1").bankw("bank9");
+	map(0x2000, 0x3fff).bankr("bank2").bankw("bank10");
+	map(0x4000, 0x5fff).bankr("bank3").bankw("bank11");
+	map(0x6000, 0x7fff).bankr("bank4").bankw("bank12");
+	map(0x8000, 0x9fff).bankr("bank5").bankw("bank13");
+	map(0xa000, 0xbfff).bankr("bank6").bankw("bank14");
+	map(0xc000, 0xdfff).bankr("bank7").bankw("bank15");
+	map(0xe000, 0xffff).bankr("bank8").bankw("bank16");
+}
 
 
 MACHINE_RESET_MEMBER(spectrum_state,ts2068)
@@ -569,15 +571,17 @@ WRITE8_MEMBER( spectrum_state::tc2048_port_ff_w )
 	logerror("Port %04x write %02x\n", offset, data);
 }
 
-ADDRESS_MAP_START(spectrum_state::tc2048_io)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xfffe)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(ts2068_port_ff_r,tc2048_port_ff_w)  AM_MIRROR(0xff00)
-ADDRESS_MAP_END
+void spectrum_state::tc2048_io(address_map &map)
+{
+	map(0x00, 0x00).rw(this, FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0xff, 0xff).rw(this, FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::tc2048_port_ff_w)).mirror(0xff00);
+}
 
-ADDRESS_MAP_START(spectrum_state::tc2048_mem)
-	AM_RANGE( 0x0000, 0x3fff) AM_ROM
-	AM_RANGE( 0x4000, 0xffff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-ADDRESS_MAP_END
+void spectrum_state::tc2048_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0xffff).bankr("bank1").bankw("bank2");
+}
 
 MACHINE_RESET_MEMBER(spectrum_state,tc2048)
 {

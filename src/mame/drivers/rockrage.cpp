@@ -97,40 +97,43 @@ WRITE8_MEMBER(rockrage_state::rockrage_speech_w)
 	m_vlm->st((data >> 0) & 0x01);
 }
 
-ADDRESS_MAP_START(rockrage_state::rockrage_map)
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_device, read, write)                    /* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_device, read, write)                    /* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_device, scroll_r, scroll_w)  /* Scroll RAM */
-	AM_RANGE(0x2400, 0x247f) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
-	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_device, vreg_w)                          /* Video Registers */
-	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")
-	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P2")
-	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2e40, 0x2e40) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(rockrage_sh_irqtrigger_w)                 /* cause interrupt on audio CPU */
-	AM_RANGE(0x2ec0, 0x2ec0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x2f00, 0x2f00) AM_WRITE(rockrage_vreg_w)                          /* ??? */
-	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(rockrage_bankswitch_w)                    /* bankswitch control */
-	AM_RANGE(0x4000, 0x5fff) AM_RAM                                             /* RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")                              /* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM                                             /* ROM */
-ADDRESS_MAP_END
+void rockrage_state::rockrage_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rw(m_k007342, FUNC(k007342_device::read), FUNC(k007342_device::write));                    /* Color RAM + Video RAM */
+	map(0x2000, 0x21ff).rw(m_k007420, FUNC(k007420_device::read), FUNC(k007420_device::write));                    /* Sprite RAM */
+	map(0x2200, 0x23ff).rw(m_k007342, FUNC(k007342_device::scroll_r), FUNC(k007342_device::scroll_w));  /* Scroll RAM */
+	map(0x2400, 0x247f).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
+	map(0x2600, 0x2607).w(m_k007342, FUNC(k007342_device::vreg_w));                          /* Video Registers */
+	map(0x2e00, 0x2e00).portr("SYSTEM");
+	map(0x2e01, 0x2e01).portr("P1");
+	map(0x2e02, 0x2e02).portr("P2");
+	map(0x2e03, 0x2e03).portr("DSW2");
+	map(0x2e40, 0x2e40).portr("DSW1");
+	map(0x2e80, 0x2e80).w(this, FUNC(rockrage_state::rockrage_sh_irqtrigger_w));                 /* cause interrupt on audio CPU */
+	map(0x2ec0, 0x2ec0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x2f00, 0x2f00).w(this, FUNC(rockrage_state::rockrage_vreg_w));                          /* ??? */
+	map(0x2f40, 0x2f40).w(this, FUNC(rockrage_state::rockrage_bankswitch_w));                    /* bankswitch control */
+	map(0x4000, 0x5fff).ram();                                             /* RAM */
+	map(0x6000, 0x7fff).bankr("rombank");                              /* banked ROM */
+	map(0x8000, 0xffff).rom();                                             /* ROM */
+}
 
-ADDRESS_MAP_START(rockrage_state::rockrage_sound_map)
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("vlm", vlm5030_device, data_w)              /* VLM5030 */
-	AM_RANGE(0x3000, 0x3000) AM_READ(rockrage_VLM5030_busy_r)           /* VLM5030 */
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(rockrage_speech_w)                /* VLM5030 */
-	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)         /* YM 2151 */
-	AM_RANGE(0x7000, 0x77ff) AM_RAM                                             /* RAM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM                                             /* ROM */
-ADDRESS_MAP_END
+void rockrage_state::rockrage_sound_map(address_map &map)
+{
+	map(0x2000, 0x2000).w(m_vlm, FUNC(vlm5030_device::data_w));              /* VLM5030 */
+	map(0x3000, 0x3000).r(this, FUNC(rockrage_state::rockrage_VLM5030_busy_r));           /* VLM5030 */
+	map(0x4000, 0x4000).w(this, FUNC(rockrage_state::rockrage_speech_w));                /* VLM5030 */
+	map(0x5000, 0x5000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x6000, 0x6001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));         /* YM 2151 */
+	map(0x7000, 0x77ff).ram();                                             /* RAM */
+	map(0x8000, 0xffff).rom();                                             /* ROM */
+}
 
-ADDRESS_MAP_START(rockrage_state::rockrage_vlm_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void rockrage_state::rockrage_vlm_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x7fff).rom();
+}
 
 /***************************************************************************
 

@@ -399,53 +399,56 @@ WRITE8_MEMBER(undrfire_state::cbombers_adc_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-ADDRESS_MAP_START(undrfire_state::undrfire_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("spriteram")
+void undrfire_state::undrfire_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x21ffff).ram().share("ram");
+	map(0x300000, 0x303fff).ram().share("spriteram");
 //  AM_RANGE(0x304000, 0x304003) AM_RAM // debugging - doesn't change ???
 //  AM_RANGE(0x304400, 0x304403) AM_RAM // debugging - doesn't change ???
-	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)      /* gun vibration */
-	AM_RANGE(0x500000, 0x500007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
-	AM_RANGE(0x600000, 0x600007) AM_READWRITE(unknown_hardware_r, unknown_int_req_w)    /* int request for unknown hardware */
-	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff)
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)        /* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)        /* 6bpp tilemaps */
-	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_long_r, ctrl_long_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM                         /* single bytes, blending ??? */
-	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)     /* perhaps port based rotate control? */
-	AM_RANGE(0xf00000, 0xf00007) AM_READ(undrfire_lightgun_r)   /* stick coords read at $11b2-bc */
-ADDRESS_MAP_END
+	map(0x400000, 0x400003).w(this, FUNC(undrfire_state::motor_control_w));      /* gun vibration */
+	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
+	map(0x600000, 0x600007).rw(this, FUNC(undrfire_state::unknown_hardware_r), FUNC(undrfire_state::unknown_int_req_w));    /* int request for unknown hardware */
+	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
+	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::long_r), FUNC(tc0100scn_device::long_w));        /* 6bpp tilemaps */
+	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
+	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xb00000, 0xb003ff).ram();                         /* single bytes, blending ??? */
+	map(0xd00000, 0xd00003).w(this, FUNC(undrfire_state::rotate_control_w));     /* perhaps port based rotate control? */
+	map(0xf00000, 0xf00007).r(this, FUNC(undrfire_state::undrfire_lightgun_r));   /* stick coords read at $11b2-bc */
+}
 
 
-ADDRESS_MAP_START(undrfire_state::cbombers_cpua_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x400000, 0x400003) AM_WRITE(cbombers_cpua_ctrl_w)
-	AM_RANGE(0x500000, 0x500007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
-	AM_RANGE(0x600000, 0x600007) AM_READ(cbombers_adc_r) AM_WRITE8(cbombers_adc_w,0xffffffff)
-	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff)
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)        /* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)        /* 6bpp tilemaps */
-	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_long_r, ctrl_long_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0xb00000, 0xb0000f) AM_RAM /* ? */
-	AM_RANGE(0xc00000, 0xc00007) AM_RAM /* LAN controller? */
-	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)     /* perhaps port based rotate control? */
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_SHARE("shared_ram")
-ADDRESS_MAP_END
+void undrfire_state::cbombers_cpua_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x21ffff).ram();
+	map(0x300000, 0x303fff).ram().share("spriteram");
+	map(0x400000, 0x400003).w(this, FUNC(undrfire_state::cbombers_cpua_ctrl_w));
+	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
+	map(0x600000, 0x600007).r(this, FUNC(undrfire_state::cbombers_adc_r)).w(this, FUNC(undrfire_state::cbombers_adc_w));
+	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
+	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::long_r), FUNC(tc0100scn_device::long_w));        /* 6bpp tilemaps */
+	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
+	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xb00000, 0xb0000f).ram(); /* ? */
+	map(0xc00000, 0xc00007).ram(); /* LAN controller? */
+	map(0xd00000, 0xd00003).w(this, FUNC(undrfire_state::rotate_control_w));     /* perhaps port based rotate control? */
+	map(0xe00000, 0xe0ffff).ram().share("shared_ram");
+}
 
-ADDRESS_MAP_START(undrfire_state::cbombers_cpub_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM /* local ram */
+void undrfire_state::cbombers_cpub_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x400000, 0x40ffff).ram(); /* local ram */
 //  AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_device, word_w) /* Only written upon errors */
-	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(shared_ram_r, shared_ram_w)
+	map(0x800000, 0x80ffff).rw(this, FUNC(undrfire_state::shared_ram_r), FUNC(undrfire_state::shared_ram_w));
 //  AM_RANGE(0xa00000, 0xa001ff) AM_RAM /* Extra road control?? */
-ADDRESS_MAP_END
+}
 
 
 /***********************************************************

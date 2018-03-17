@@ -60,21 +60,23 @@ DEFINE_DEVICE_TYPE(PIONEER_LDV1000, pioneer_ldv1000_device, "ldv1000", "Pioneer 
 //  LD-V1000 ROM AND MACHINE INTERFACES
 //**************************************************************************
 
-ADDRESS_MAP_START(pioneer_ldv1000_device::ldv1000_map)
-	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("ldvppi0", i8255_device, read, write)
-	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("ldvppi1", i8255_device, read, write)
-ADDRESS_MAP_END
+void pioneer_ldv1000_device::ldv1000_map(address_map &map)
+{
+	map(0x0000, 0x1fff).mirror(0x6000).rom();
+	map(0x8000, 0x87ff).mirror(0x3800).ram();
+	map(0xc000, 0xc003).mirror(0x1ff0).rw("ldvppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc004, 0xc007).mirror(0x1ff0).rw("ldvppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
-ADDRESS_MAP_START(pioneer_ldv1000_device::ldv1000_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_MIRROR(0x38) AM_READWRITE(z80_decoder_display_port_r, z80_decoder_display_port_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(z80_controller_r)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_WRITE(z80_controller_w)
-	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE("ldvctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void pioneer_ldv1000_device::ldv1000_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x07).mirror(0x38).rw(this, FUNC(pioneer_ldv1000_device::z80_decoder_display_port_r), FUNC(pioneer_ldv1000_device::z80_decoder_display_port_w));
+	map(0x40, 0x40).mirror(0x3f).r(this, FUNC(pioneer_ldv1000_device::z80_controller_r));
+	map(0x80, 0x80).mirror(0x3f).w(this, FUNC(pioneer_ldv1000_device::z80_controller_w));
+	map(0xc0, 0xc3).mirror(0x3c).rw("ldvctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 
 static const z80_daisy_config daisy_chain[] =

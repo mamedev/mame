@@ -210,27 +210,29 @@ WRITE8_MEMBER(esh_state::nmi_line_w)
 
 
 /* PROGRAM MAPS */
-ADDRESS_MAP_START(esh_state::z80_0_mem)
-	AM_RANGE(0x0000,0x3fff) AM_ROM
-	AM_RANGE(0xe000,0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000,0xf3ff) AM_RAM AM_SHARE("tile_ram")
-	AM_RANGE(0xf400,0xf7ff) AM_RAM AM_SHARE("tile_ctrl_ram")
-ADDRESS_MAP_END
+void esh_state::z80_0_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0xe000, 0xe7ff).ram().share("nvram");
+	map(0xf000, 0xf3ff).ram().share("tile_ram");
+	map(0xf400, 0xf7ff).ram().share("tile_ctrl_ram");
+}
 
 
 /* IO MAPS */
-ADDRESS_MAP_START(esh_state::z80_0_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0,0xf0) AM_READ_PORT("IN0")
-	AM_RANGE(0xf1,0xf1) AM_READ_PORT("IN1")
-	AM_RANGE(0xf2,0xf2) AM_READ_PORT("IN2")
-	AM_RANGE(0xf3,0xf3) AM_READ_PORT("IN3")
-	AM_RANGE(0xf4,0xf4) AM_READWRITE(ldp_read,ldp_write)
-	AM_RANGE(0xf5,0xf5) AM_WRITE(misc_write)    /* Continuously writes repeating patterns */
-	AM_RANGE(0xf8,0xfd) AM_WRITE(led_writes)
-	AM_RANGE(0xfe,0xfe) AM_WRITE(nmi_line_w)    /* Both 0xfe and 0xff flip quickly between 0 and 1 */
-	AM_RANGE(0xff,0xff) AM_NOP                  /*   (they're probably not NMI enables - likely LED's like their neighbors :) */
-ADDRESS_MAP_END                                 /*   (someday 0xf8-0xff will probably be a single handler) */
+void esh_state::z80_0_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).portr("IN0");
+	map(0xf1, 0xf1).portr("IN1");
+	map(0xf2, 0xf2).portr("IN2");
+	map(0xf3, 0xf3).portr("IN3");
+	map(0xf4, 0xf4).rw(this, FUNC(esh_state::ldp_read), FUNC(esh_state::ldp_write));
+	map(0xf5, 0xf5).w(this, FUNC(esh_state::misc_write));    /* Continuously writes repeating patterns */
+	map(0xf8, 0xfd).w(this, FUNC(esh_state::led_writes));
+	map(0xfe, 0xfe).w(this, FUNC(esh_state::nmi_line_w));    /* Both 0xfe and 0xff flip quickly between 0 and 1 */
+	map(0xff, 0xff).noprw();                  /*   (they're probably not NMI enables - likely LED's like their neighbors :) */
+}                                 /*   (someday 0xf8-0xff will probably be a single handler) */
 
 
 /* PORTS */

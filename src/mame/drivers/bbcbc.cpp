@@ -65,18 +65,26 @@ private:
 #define MAIN_CLOCK XTAL(4'433'619)
 
 
-ADDRESS_MAP_START(bbcbc_state::mem_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0xbfff) AM_DEVREAD("cartslot", generic_slot_device, read_rom)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+void bbcbc_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0xbfff).r("cartslot", FUNC(generic_slot_device::read_rom));
+	map(0xe000, 0xe7ff).ram();
+}
 
-ADDRESS_MAP_START(bbcbc_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	;map(0x00, 0x7f).lrw8("z80pio_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_z80pio->read(space, offset >> 5, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_z80pio->write(space, offset >> 5, data, mem_mask); });
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("tms9129", tms9129_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("tms9129", tms9129_device, register_read, register_write)
-ADDRESS_MAP_END
+void bbcbc_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x7f).lrw8("z80pio_rw",
+						 [this](address_space &space, offs_t offset, u8 mem_mask) {
+							 return m_z80pio->read(space, offset >> 5, mem_mask);
+						 },
+						 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+							 m_z80pio->write(space, offset >> 5, data, mem_mask);
+						 });
+	map(0x80, 0x80).rw("tms9129", FUNC(tms9129_device::vram_read), FUNC(tms9129_device::vram_write));
+	map(0x81, 0x81).rw("tms9129", FUNC(tms9129_device::register_read), FUNC(tms9129_device::register_write));
+}
 
 // Input bits are read through the PIO four at a time, then stored individually in RAM at E030-E03B
 static INPUT_PORTS_START( bbcbc )

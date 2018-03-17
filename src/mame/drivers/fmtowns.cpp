@@ -2190,34 +2190,35 @@ WRITE_LINE_MEMBER( towns_state::towns_syndet_irq )
 }
 
 
-ADDRESS_MAP_START(towns_state::towns_mem)
+void towns_state::towns_mem(address_map &map)
+{
 	// memory map based on FM-Towns/Bochs (Bochs modified to emulate the FM-Towns)
 	// may not be (and probably is not) correct
-	AM_RANGE(0x00000000, 0x000bffff) AM_RAM
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffffffff)
-	AM_RANGE(0x000c8000, 0x000cafff) AM_READWRITE8(towns_spriteram_low_r,towns_spriteram_low_w,0xffffffff)
-	AM_RANGE(0x000cb000, 0x000cbfff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank7")
-	AM_RANGE(0x000cc000, 0x000cff7f) AM_RAM
-	AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_mem_r,towns_video_cff80_mem_w,0xffffffff)
-	AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
-	AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) AM_SHARE("nvram") // CMOS? RAM
-	AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
-	AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
-	AM_RANGE(0x000f8000, 0x000fffff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank12")
+	map(0x00000000, 0x000bffff).ram();
+	map(0x000c0000, 0x000c7fff).rw(this, FUNC(towns_state::towns_gfx_r), FUNC(towns_state::towns_gfx_w));
+	map(0x000c8000, 0x000cafff).rw(this, FUNC(towns_state::towns_spriteram_low_r), FUNC(towns_state::towns_spriteram_low_w));
+	map(0x000cb000, 0x000cbfff).bankr("bank6").bankw("bank7");
+	map(0x000cc000, 0x000cff7f).ram();
+	map(0x000cff80, 0x000cffff).rw(this, FUNC(towns_state::towns_video_cff80_mem_r), FUNC(towns_state::towns_video_cff80_mem_w));
+	map(0x000d0000, 0x000d7fff).ram();
+	map(0x000d8000, 0x000d9fff).rw(this, FUNC(towns_state::towns_cmos_low_r), FUNC(towns_state::towns_cmos_low_w)).share("nvram"); // CMOS? RAM
+	map(0x000da000, 0x000effff).ram(); //READWRITE(SMH_BANK(11),SMH_BANK(11))
+	map(0x000f0000, 0x000f7fff).ram(); //READWRITE(SMH_BANK(12),SMH_BANK(12))
+	map(0x000f8000, 0x000fffff).bankr("bank11").bankw("bank12");
 //  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM
-	AM_RANGE(0x80000000, 0x8007ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x80000) // VRAM
-	AM_RANGE(0x80100000, 0x8017ffff) AM_READWRITE8(towns_gfx_packed_r,towns_gfx_packed_w,0xffffffff) AM_MIRROR(0x80000) // VRAM
-	AM_RANGE(0x81000000, 0x8101ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
-	AM_RANGE(0xc0000000, 0xc0ffffff) AM_DEVREADWRITE8("icmemcard", fmt_icmem_device, static_mem_read, static_mem_write, 0xffffffff)
-	AM_RANGE(0xc1000000, 0xc1ffffff) AM_DEVREADWRITE8("icmemcard", fmt_icmem_device, mem_read, mem_write, 0xffffffff)
-	AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
-	AM_RANGE(0xc2080000, 0xc20fffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
-	AM_RANGE(0xc2100000, 0xc213ffff) AM_ROM AM_REGION("user",0x180000)  // FONT ROM
-	AM_RANGE(0xc2140000, 0xc2141fff) AM_READWRITE8(towns_cmos_r,towns_cmos_w,0xffffffff) // CMOS (mirror?)
-	AM_RANGE(0xc2180000, 0xc21fffff) AM_ROM AM_REGION("user",0x080000)  // F20 ROM
-	AM_RANGE(0xc2200000, 0xc2200fff) AM_DEVREADWRITE8("pcm", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w, 0xffffffff)  // WAVE RAM
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
-ADDRESS_MAP_END
+	map(0x80000000, 0x8007ffff).rw(this, FUNC(towns_state::towns_gfx_high_r), FUNC(towns_state::towns_gfx_high_w)).mirror(0x80000); // VRAM
+	map(0x80100000, 0x8017ffff).rw(this, FUNC(towns_state::towns_gfx_packed_r), FUNC(towns_state::towns_gfx_packed_w)).mirror(0x80000); // VRAM
+	map(0x81000000, 0x8101ffff).rw(this, FUNC(towns_state::towns_spriteram_r), FUNC(towns_state::towns_spriteram_w)); // Sprite RAM
+	map(0xc0000000, 0xc0ffffff).rw(m_icmemcard, FUNC(fmt_icmem_device::static_mem_read), FUNC(fmt_icmem_device::static_mem_write));
+	map(0xc1000000, 0xc1ffffff).rw(m_icmemcard, FUNC(fmt_icmem_device::mem_read), FUNC(fmt_icmem_device::mem_write));
+	map(0xc2000000, 0xc207ffff).rom().region("user", 0x000000);  // OS ROM
+	map(0xc2080000, 0xc20fffff).rom().region("user", 0x100000);  // DIC ROM
+	map(0xc2100000, 0xc213ffff).rom().region("user", 0x180000);  // FONT ROM
+	map(0xc2140000, 0xc2141fff).rw(this, FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)); // CMOS (mirror?)
+	map(0xc2180000, 0xc21fffff).rom().region("user", 0x080000);  // F20 ROM
+	map(0xc2200000, 0xc2200fff).rw("pcm", FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w));  // WAVE RAM
+	map(0xfffc0000, 0xffffffff).rom().region("user", 0x200000);  // SYSTEM ROM
+}
 
 ADDRESS_MAP_START(towns_state::marty_mem)
 	AM_RANGE(0x00000000, 0x000bffff) AM_RAM
@@ -2268,64 +2269,65 @@ ADDRESS_MAP_START(towns_state::ux_mem)
 	AM_RANGE(0x00fc0000, 0x00ffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(towns_state::towns_io)
+void towns_state::towns_io(address_map &map)
+{
 	// I/O ports derived from FM Towns/Bochs, these are specific to the FM Towns
 	// System ports
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0x0003) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x0010,0x0013) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x0020,0x0033) AM_READWRITE8(towns_system_r,towns_system_w, 0xffffffff)
-	AM_RANGE(0x0040,0x0047) AM_DEVREADWRITE8("pit", pit8253_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x0050,0x0057) AM_DEVREADWRITE8("pit2", pit8253_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x0060,0x0063) AM_READWRITE8(towns_port60_r, towns_port60_w, 0x000000ff)
-	AM_RANGE(0x0068,0x006b) AM_READWRITE8(towns_intervaltimer2_r, towns_intervaltimer2_w, 0xffffffff)
-	AM_RANGE(0x006c,0x006f) AM_READWRITE8(towns_sys6c_r,towns_sys6c_w, 0x000000ff)
+	map.unmap_value_high();
+	map(0x0000, 0x0003).rw(m_pic_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask32(0x00ff00ff);
+	map(0x0010, 0x0013).rw(m_pic_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask32(0x00ff00ff);
+	map(0x0020, 0x0033).rw(this, FUNC(towns_state::towns_system_r), FUNC(towns_state::towns_system_w));
+	map(0x0040, 0x0047).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0x00ff00ff);
+	map(0x0050, 0x0057).rw("pit2", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0x00ff00ff);
+	map(0x0060, 0x0060).rw(this, FUNC(towns_state::towns_port60_r), FUNC(towns_state::towns_port60_w));
+	map(0x0068, 0x006b).rw(this, FUNC(towns_state::towns_intervaltimer2_r), FUNC(towns_state::towns_intervaltimer2_w));
+	map(0x006c, 0x006c).rw(this, FUNC(towns_state::towns_sys6c_r), FUNC(towns_state::towns_sys6c_w));
 	// 0x0070/0x0080 - CMOS RTC
-	AM_RANGE(0x0070,0x0073) AM_READWRITE8(towns_rtc_r,towns_rtc_w,0x000000ff)
-	AM_RANGE(0x0080,0x0083) AM_WRITE8(towns_rtc_select_w,0x000000ff)
+	map(0x0070, 0x0070).rw(this, FUNC(towns_state::towns_rtc_r), FUNC(towns_state::towns_rtc_w));
+	map(0x0080, 0x0080).w(this, FUNC(towns_state::towns_rtc_select_w));
 	// DMA controllers (uPD71071)
-	AM_RANGE(0x00a0,0x00af) AM_READWRITE8(towns_dma1_r, towns_dma1_w, 0xffffffff)
-	AM_RANGE(0x00b0,0x00bf) AM_READWRITE8(towns_dma2_r, towns_dma2_w, 0xffffffff)
+	map(0x00a0, 0x00af).rw(this, FUNC(towns_state::towns_dma1_r), FUNC(towns_state::towns_dma1_w));
+	map(0x00b0, 0x00bf).rw(this, FUNC(towns_state::towns_dma2_r), FUNC(towns_state::towns_dma2_w));
 	// Floppy controller
-	AM_RANGE(0x0200,0x020f) AM_READWRITE8(towns_floppy_r, towns_floppy_w, 0xffffffff)
+	map(0x0200, 0x020f).rw(this, FUNC(towns_state::towns_floppy_r), FUNC(towns_state::towns_floppy_w));
 	// CRTC / Video
-	AM_RANGE(0x0400,0x0403) AM_READ8(towns_video_unknown_r, 0x000000ff)  // R/O (0x400)
-	AM_RANGE(0x0404,0x0407) AM_READWRITE8(towns_video_404_r, towns_video_404_w, 0x000000ff)  // R/W (0x404)
-	AM_RANGE(0x0440,0x045f) AM_READWRITE8(towns_video_440_r, towns_video_440_w, 0xffffffff)
+	map(0x0400, 0x0400).r(this, FUNC(towns_state::towns_video_unknown_r));  // R/O (0x400)
+	map(0x0404, 0x0404).rw(this, FUNC(towns_state::towns_video_404_r), FUNC(towns_state::towns_video_404_w));  // R/W (0x404)
+	map(0x0440, 0x045f).rw(this, FUNC(towns_state::towns_video_440_r), FUNC(towns_state::towns_video_440_w));
 	// System port
-	AM_RANGE(0x0480,0x0483) AM_READWRITE8(towns_sys480_r,towns_sys480_w,0x000000ff)  // R/W (0x480)
+	map(0x0480, 0x0480).rw(this, FUNC(towns_state::towns_sys480_r), FUNC(towns_state::towns_sys480_w));  // R/W (0x480)
 	// IC Memory Card
-	AM_RANGE(0x0488,0x048b) AM_DEVREAD8("icmemcard",fmt_icmem_device,status_r,0x00ff0000)
-	AM_RANGE(0x0490,0x0493) AM_DEVREADWRITE8("icmemcard",fmt_icmem_device,bank_r,bank_w,0x0000ffff)
+	map(0x048a, 0x048a).r(m_icmemcard, FUNC(fmt_icmem_device::status_r));
+	map(0x0490, 0x0491).rw(m_icmemcard, FUNC(fmt_icmem_device::bank_r), FUNC(fmt_icmem_device::bank_w));
 	// CD-ROM
-	AM_RANGE(0x04c0,0x04cf) AM_READWRITE8(towns_cdrom_r,towns_cdrom_w,0x00ff00ff)
+	map(0x04c0, 0x04cf).rw(this, FUNC(towns_state::towns_cdrom_r), FUNC(towns_state::towns_cdrom_w)).umask32(0x00ff00ff);
 	// Joystick / Mouse ports
-	AM_RANGE(0x04d0,0x04d3) AM_READ8(towns_padport_r, 0x00ff00ff)
-	AM_RANGE(0x04d4,0x04d7) AM_WRITE8(towns_pad_mask_w, 0x00ff0000)
+	map(0x04d0, 0x04d3).r(this, FUNC(towns_state::towns_padport_r)).umask32(0x00ff00ff);
+	map(0x04d6, 0x04d6).w(this, FUNC(towns_state::towns_pad_mask_w));
 	// Sound (YM3438 [FM], RF5c68 [PCM])
-	AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8("fm", ym3438_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x04e0,0x04e3) AM_READWRITE8(towns_volume_r,towns_volume_w,0xffffffff)  // R/W  -- volume ports
-	AM_RANGE(0x04e4,0x04e7) AM_READ8(unksnd_r, 0xffffffff)
-	AM_RANGE(0x04e8,0x04ef) AM_READWRITE8(towns_sound_ctrl_r,towns_sound_ctrl_w,0xffffffff)
-	AM_RANGE(0x04f0,0x04fb) AM_DEVWRITE8("pcm", rf5c68_device, rf5c68_w, 0xffffffff)
+	map(0x04d8, 0x04df).rw("fm", FUNC(ym3438_device::read), FUNC(ym3438_device::write)).umask32(0x00ff00ff);
+	map(0x04e0, 0x04e3).rw(this, FUNC(towns_state::towns_volume_r), FUNC(towns_state::towns_volume_w));  // R/W  -- volume ports
+	map(0x04e4, 0x04e7).r(this, FUNC(towns_state::unksnd_r));
+	map(0x04e8, 0x04ef).rw(this, FUNC(towns_state::towns_sound_ctrl_r), FUNC(towns_state::towns_sound_ctrl_w));
+	map(0x04f0, 0x04fb).w("pcm", FUNC(rf5c68_device::rf5c68_w));
 	// CRTC / Video
-	AM_RANGE(0x05c8,0x05cb) AM_READWRITE8(towns_video_5c8_r, towns_video_5c8_w, 0xffffffff)
+	map(0x05c8, 0x05cb).rw(this, FUNC(towns_state::towns_video_5c8_r), FUNC(towns_state::towns_video_5c8_w));
 	// System ports
-	AM_RANGE(0x05e8,0x05ef) AM_READWRITE8(towns_sys5e8_r, towns_sys5e8_w, 0x00ff00ff)
+	map(0x05e8, 0x05ef).rw(this, FUNC(towns_state::towns_sys5e8_r), FUNC(towns_state::towns_sys5e8_w)).umask32(0x00ff00ff);
 	// Keyboard (8042 MCU)
-	AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff00ff)
+	map(0x0600, 0x0607).rw(this, FUNC(towns_state::towns_keyboard_r), FUNC(towns_state::towns_keyboard_w)).umask32(0x00ff00ff);
 	// RS-232C interface
-	AM_RANGE(0x0a00,0x0a0b) AM_READWRITE8(towns_serial_r, towns_serial_w, 0x00ff00ff)
+	map(0x0a00, 0x0a0b).rw(this, FUNC(towns_state::towns_serial_r), FUNC(towns_state::towns_serial_w)).umask32(0x00ff00ff);
 	// SCSI controller
-	AM_RANGE(0x0c30,0x0c37) AM_DEVREADWRITE8("fmscsi",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff00ff)
+	map(0x0c30, 0x0c37).rw("fmscsi", FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask32(0x00ff00ff);
 	// CMOS
-	AM_RANGE(0x3000,0x4fff) AM_READWRITE8(towns_cmos_r, towns_cmos_w,0x00ff00ff)
+	map(0x3000, 0x4fff).rw(this, FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)).umask32(0x00ff00ff);
 	// Something (MS-DOS wants this 0x41ff to be 1)
 	//AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
 	// CRTC / Video (again)
-	AM_RANGE(0xfd90,0xfda3) AM_READWRITE8(towns_video_fd90_r, towns_video_fd90_w, 0xffffffff)
-	AM_RANGE(0xff80,0xffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff)
-ADDRESS_MAP_END
+	map(0xfd90, 0xfda3).rw(this, FUNC(towns_state::towns_video_fd90_r), FUNC(towns_state::towns_video_fd90_w));
+	map(0xff80, 0xffff).rw(this, FUNC(towns_state::towns_video_cff80_r), FUNC(towns_state::towns_video_cff80_w));
+}
 
 ADDRESS_MAP_START(towns_state::towns16_io)  // for the 386SX based systems
 	// System ports

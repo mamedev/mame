@@ -34,10 +34,10 @@
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(SH3LE, sh3_device,   "sh3le", "SH-3 (little)")
-DEFINE_DEVICE_TYPE(SH3BE, sh3be_device, "sh3be", "SH-3 (big)")
-DEFINE_DEVICE_TYPE(SH4LE, sh4_device,   "sh4le", "SH-4 (little)")
-DEFINE_DEVICE_TYPE(SH4BE, sh4be_device, "sh4be", "SH-4 (big)")
+DEFINE_DEVICE_TYPE(SH3LE, sh3_device,   "sh3le", "Hitachi SH-3 (little)")
+DEFINE_DEVICE_TYPE(SH3BE, sh3be_device, "sh3be", "Hitachi SH-3 (big)")
+DEFINE_DEVICE_TYPE(SH4LE, sh4_device,   "sh4le", "Hitachi SH-4 (little)")
+DEFINE_DEVICE_TYPE(SH4BE, sh4be_device, "sh4be", "Hitachi SH-4 (big)")
 
 
 #if 0

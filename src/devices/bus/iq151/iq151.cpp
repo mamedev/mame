@@ -32,6 +32,7 @@ DEFINE_DEVICE_TYPE(IQ151CART_SLOT, iq151cart_slot_device, "iq151cart_slot", "IQ1
 
 device_iq151cart_interface::device_iq151cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
+	, m_screen(nullptr)
 {
 }
 
@@ -52,17 +53,18 @@ device_iq151cart_interface::~device_iq151cart_interface()
 //-------------------------------------------------
 //  iq151cart_slot_device - constructor
 //-------------------------------------------------
-iq151cart_slot_device::iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, IQ151CART_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
-	device_image_interface(mconfig, *this),
-	m_out_irq0_cb(*this),
-	m_out_irq1_cb(*this),
-	m_out_irq2_cb(*this),
-	m_out_irq3_cb(*this),
-	m_out_irq4_cb(*this),
-	m_out_drq_cb(*this),
-	m_cart(nullptr)
+iq151cart_slot_device::iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, IQ151CART_SLOT, tag, owner, clock)
+	, device_slot_interface(mconfig, *this)
+	, device_image_interface(mconfig, *this)
+	, m_out_irq0_cb(*this)
+	, m_out_irq1_cb(*this)
+	, m_out_irq2_cb(*this)
+	, m_out_irq3_cb(*this)
+	, m_out_irq4_cb(*this)
+	, m_out_drq_cb(*this)
+	, m_cart(nullptr)
+	, m_screen(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -82,6 +84,8 @@ iq151cart_slot_device::~iq151cart_slot_device()
 void iq151cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_iq151cart_interface *>(get_card_device());
+	if (m_cart)
+		m_cart->set_screen_device(m_screen);
 
 	// resolve callbacks
 	m_out_irq0_cb.resolve_safe();

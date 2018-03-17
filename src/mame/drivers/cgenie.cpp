@@ -108,25 +108,27 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(cgenie_state::cgenie_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+void cgenie_state::cgenie_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
 //  AM_RANGE(0x4000, 0xbfff) AM_RAM // set up in machine_start
-	AM_RANGE(0xc000, 0xefff) AM_NOP // cartridge space
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(colorram_r, colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM AM_SHARE("fontram")
-	AM_RANGE(0xf800, 0xf8ff) AM_MIRROR(0x300) AM_READ(keyboard_r)
-	AM_RANGE(0xfc00, 0xffff) AM_NOP // cartridge space
-ADDRESS_MAP_END
+	map(0xc000, 0xefff).noprw(); // cartridge space
+	map(0xf000, 0xf3ff).rw(this, FUNC(cgenie_state::colorram_r), FUNC(cgenie_state::colorram_w)).share("colorram");
+	map(0xf400, 0xf7ff).ram().share("fontram");
+	map(0xf800, 0xf8ff).mirror(0x300).r(this, FUNC(cgenie_state::keyboard_r));
+	map(0xfc00, 0xffff).noprw(); // cartridge space
+}
 
-ADDRESS_MAP_START(cgenie_state::cgenie_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0xf9, 0xf9) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
-	AM_RANGE(0xfa, 0xfa) AM_DEVWRITE("crtc", hd6845_device, address_w)
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("crtc", hd6845_device, register_r, register_w)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(control_r, control_w)
-ADDRESS_MAP_END
+void cgenie_state::cgenie_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf8, 0xf8).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0xf9, 0xf9).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xfa, 0xfa).w(m_crtc, FUNC(hd6845_device::address_w));
+	map(0xfb, 0xfb).rw(m_crtc, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
+	map(0xff, 0xff).rw(this, FUNC(cgenie_state::control_r), FUNC(cgenie_state::control_w));
+}
 
 
 //**************************************************************************
