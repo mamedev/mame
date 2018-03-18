@@ -15157,6 +15157,9 @@ hp85                            //
 @source:hshavoc.cpp
 hshavoc                         // (c) 1993 Data East
 
+@source:ht6000.cpp
+ht6000							// 1987 Casio
+
 @source:ht68k.cpp
 ht68k                           //
 
