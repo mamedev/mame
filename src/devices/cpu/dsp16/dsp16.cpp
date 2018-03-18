@@ -64,9 +64,9 @@
     the current value in the input register and initiates a read.
 
     TODO:
-    * PSW overflow bits
+    * PSW overflow bits - are they sticky, how are they reset?
     * Clarify rounding behaviour (F2 1011)
-    * Random condition
+    * Random condition (CON 01000/01001)
     * Clarify serial behaviour
     * Serial input
     * More serial I/O signals
@@ -196,7 +196,7 @@ dsp16_device_base::dsp16_device_base(
 	, m_sio_sioc(0U), m_sio_obuf(0U), m_sio_osr(0U), m_sio_ofsr(0U)
 	, m_sio_clk(1U), m_sio_clk_div(0U), m_sio_ld(1U), m_sio_ld_div(0U), m_sio_flags(SIO_FLAGS_NONE)
 	, m_pio_pioc(0U), m_pio_pdx_in(0U), m_pio_pdx_out(0U), m_pio_pids_cnt(0U), m_pio_pods_cnt(0U)
-	, m_cache_pcbase(0U), m_st_pcbase(0U), m_st_yh(0), m_st_ah{ 0, 0 }, m_st_yl(0U), m_st_al{ 0U, 0U }
+	, m_cache_pcbase(0U), m_st_pcbase(0U), m_st_genflags(0U), m_st_yh(0), m_st_ah{ 0, 0 }, m_st_yl(0U), m_st_al{ 0U, 0U }
 {
 }
 
@@ -234,6 +234,7 @@ void dsp16_device_base::device_start()
 
 	state_add(STATE_GENPC, "PC", m_xaau_pc);
 	state_add(STATE_GENPCBASE, "CURPC", m_st_pcbase).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_st_genflags).mask(0x0fU).noshow().callexport().formatstr("%16s");
 	state_add(DSP16_PT, "PT", m_xaau_pt);
 	state_add(DSP16_PR, "PR", m_xaau_pr);
 	state_add(DSP16_PI, "PI", m_xaau_pi);
@@ -616,13 +617,88 @@ void dsp16_device_base::state_export(device_state_entry const &entry)
 	}
 }
 
+void dsp16_device_base::state_string_export(device_state_entry const &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+	// show DAU flags
+	case STATE_GENFLAGS:
+		str = util::string_format(
+				"%s%s%s%s",
+				dau_psw_lmi() ? "LMI " : "",
+				dau_psw_leq() ? "LEQ " : "",
+				dau_psw_llv() ? "LLV " : "",
+				dau_psw_lmv() ? "LMV " : "");
+		break;
+	}
+}
+
 /***********************************************************************
     device_disasm_interface implementation
 ***********************************************************************/
 
 util::disasm_interface *dsp16_device_base::create_disassembler()
 {
-	return new dsp16_disassembler;
+	return new dsp16_disassembler(*this);
+}
+
+/***********************************************************************
+    dsp16_disassembler::cpu implementation
+***********************************************************************/
+
+dsp16_disassembler::cpu::predicate dsp16_device_base::check_con(offs_t pc, u16 op) const
+{
+	if (pc != m_st_pcbase)
+	{
+		return predicate::INDETERMINATE;
+	}
+	else
+	{
+		bool result;
+		u16 const con(op_con(op));
+		switch (con >> 1)
+		{
+		case 0x0: // mi/pl
+			result = dau_psw_lmi();
+			break;
+		case 0x1: // eq/ne
+			result = dau_psw_leq();
+			break;
+		case 0x2: // lvs/lvc
+			result = dau_psw_llv();
+			break;
+		case 0x3: // mvs/mvc
+			result = dau_psw_lmv();
+			break;
+		case 0x4: // heads/tails
+			return predicate::INDETERMINATE; // FIXME: implement PRNG
+		case 0x5: // c0ge/c0lt
+		case 0x6: // c1ge/c1lt
+			result = 0 <= m_dau_c[(con >> 1) - 0x05];
+			break;
+		case 0x7: // true/false
+			result = true;
+			break;
+		case 0x8: // gt/le
+			result = !dau_psw_lmi() && !dau_psw_leq();
+			break;
+		default: // Reserved
+			return predicate::INDETERMINATE;
+		}
+		return (bool(BIT(con, 0)) == result) ? predicate::SKIPPED : predicate::TAKEN;
+	}
+}
+
+dsp16_disassembler::cpu::predicate dsp16_device_base::check_branch(offs_t pc) const
+{
+	if (pc != m_st_pcbase)
+		return predicate::INDETERMINATE;
+	else if (FLAGS_PRED_TRUE == (m_flags & FLAGS_PRED_MASK))
+		return predicate::TAKEN;
+	else if (FLAGS_PRED_FALSE == (m_flags & FLAGS_PRED_MASK))
+		return predicate::SKIPPED;
+	else
+		return predicate::INDETERMINATE;
 }
 
 template <offs_t Base> READ16_MEMBER(dsp16_device_base::external_memory_r)
@@ -663,7 +739,36 @@ inline void dsp16_device_base::execute_one_rom()
 
 	case phase::OP1:
 		if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-			debugger_instruction_hook(this, m_st_pcbase);
+		{
+			if (FLAGS_PRED_NONE == (m_flags && FLAGS_PRED_MASK))
+			{
+				debugger_instruction_hook(this, m_st_pcbase);
+			}
+			else
+			{
+				switch (op >> 11)
+				{
+				case 0x00: // goto JA
+				case 0x01:
+				case 0x10: // call JA
+				case 0x11:
+					break;
+				case 0x18: // goto B
+					switch (op_b(op))
+					{
+					case 0x0: // return
+					case 0x2: // goto pt
+					case 0x3: // call pt
+						break;
+					default:
+						debugger_instruction_hook(this, m_st_pcbase);
+					}
+					break;
+				default:
+					debugger_instruction_hook(this, m_st_pcbase);
+				}
+			}
+		}
 
 		// IACK is updated for the next instruction
 		switch (m_flags & FLAGS_IACK_MASK)
@@ -1878,7 +1983,7 @@ inline bool dsp16_device_base::op_dau_con(u16 op, bool inc)
 	case 0x6: // c1ge/c1lt
 		{
 			s8 &c(m_dau_c[(con >> 1) - 0x05]);
-			result = c >= 0;
+			result = 0 <= c;
 			if (inc)
 				++c;
 		}
@@ -1889,7 +1994,7 @@ inline bool dsp16_device_base::op_dau_con(u16 op, bool inc)
 	case 0x8: // gt/le
 		result = !dau_psw_lmi() && !dau_psw_leq();
 		break;
-	default:
+	default: // Reserved
 		throw emu_fatalerror("DSP16: reserved CON value %02X (PC = %04X)\n", con, m_st_pcbase);
 	}
 	return BIT(con, 0) ? !result : result;
