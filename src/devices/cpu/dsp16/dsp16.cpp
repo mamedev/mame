@@ -740,7 +740,7 @@ inline void dsp16_device_base::execute_one_rom()
 	case phase::OP1:
 		if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 		{
-			if (FLAGS_PRED_NONE == (m_flags && FLAGS_PRED_MASK))
+			if (FLAGS_PRED_NONE == (m_flags & FLAGS_PRED_MASK))
 			{
 				debugger_instruction_hook(this, m_st_pcbase);
 			}
