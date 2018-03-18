@@ -26,7 +26,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_rom2(*this, "rom2"),
 		m_switches(*this, "kc%u", 0),
-		m_port_a(0)
+		m_port_a(0),
+		m_led_latch(0xff),
+		m_ram_card_addr(0)
 	{ }
 
 	void ht6000(machine_config &config);
@@ -44,10 +46,21 @@ private:
 	DECLARE_WRITE8_MEMBER(port_a_w);
 
 	DECLARE_WRITE8_MEMBER(music_w);
+	DECLARE_WRITE8_MEMBER(pg1_w);
+	DECLARE_WRITE8_MEMBER(pg2_w);
+	DECLARE_WRITE8_MEMBER(pg3_w);
+	DECLARE_WRITE8_MEMBER(led_w);
+	DECLARE_WRITE8_MEMBER(led_addr_w);
+	DECLARE_WRITE8_MEMBER(led_data_w);
 	DECLARE_READ8_MEMBER(switches_r);
+	DECLARE_READ8_MEMBER(keys_r);
+	DECLARE_WRITE8_MEMBER(ram_card_l_w);
+	DECLARE_WRITE8_MEMBER(ram_card_h_w);
 	DECLARE_READ8_MEMBER(rom2_r);
 
 	uint8_t m_port_a;
+	uint8_t m_led_latch;
+	uint16_t m_ram_card_addr;
 };
 
 
@@ -60,8 +73,17 @@ void ht6000_state::maincpu_map(address_map &map)
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xcfff).w(this, FUNC(ht6000_state::music_w));
+	map(0xc000, 0xcfff).w(this, FUNC(ht6000_state::music_w)); // UPD935G
+	map(0xd000, 0xd0ff).w(this, FUNC(ht6000_state::pg1_w)); // MSM6294-07
+	map(0xd100, 0xd1ff).w(this, FUNC(ht6000_state::pg2_w)); // MSM6294-08
+	map(0xd200, 0xd2ff).w(this, FUNC(ht6000_state::pg3_w)); // MSM6294-09
+	map(0xd300, 0xd3ff).w(this, FUNC(ht6000_state::led_w));
+	map(0xd400, 0xd4ff).w(this, FUNC(ht6000_state::led_addr_w));
+	map(0xd500, 0xd5ff).w(this, FUNC(ht6000_state::led_data_w));
 	map(0xd600, 0xd6ff).r(this, FUNC(ht6000_state::switches_r));
+	map(0xd700, 0xd7ff).r(this, FUNC(ht6000_state::keys_r));
+	map(0xd800, 0xd8ff).w(this, FUNC(ht6000_state::ram_card_l_w));
+	map(0xd900, 0xd9ff).w(this, FUNC(ht6000_state::ram_card_h_w));
 	map(0xe000, 0xefff).r(this, FUNC(ht6000_state::rom2_r));
 }
 
@@ -210,13 +232,63 @@ WRITE8_MEMBER( ht6000_state::port_a_w )
 
 WRITE8_MEMBER( ht6000_state::music_w )
 {
-	// a8-a11 selects the chip, a6-a7 selects command or data
+	// a8-a11 selects the chip (there are 4), a6-a7 selects command or data
 	logerror("music_w: offset = %02x, %02x = %02x\n", offset >> 8, (offset >> 6 & 0x03), data);
+}
+
+WRITE8_MEMBER( ht6000_state::pg1_w )
+{
+	logerror("pg1_w: %02x\n", data);
+}
+
+WRITE8_MEMBER( ht6000_state::pg2_w )
+{
+	logerror("pg2_w: %02x\n", data);
+}
+
+WRITE8_MEMBER( ht6000_state::pg3_w )
+{
+	logerror("pg3_w: %02x\n", data);
+}
+
+WRITE8_MEMBER( ht6000_state::led_w )
+{
+	logerror("led_w: %02x\n", data);
+}
+
+WRITE8_MEMBER( ht6000_state::led_addr_w )
+{
+	if (data != 0x00)
+	{
+		logerror("led matrix %02x = %02x\n", data, m_led_latch);
+	}
+}
+
+WRITE8_MEMBER( ht6000_state::led_data_w )
+{
+	m_led_latch = data;
 }
 
 READ8_MEMBER( ht6000_state::switches_r )
 {
 	return m_switches[m_port_a & 0x0f]->read();
+}
+
+READ8_MEMBER( ht6000_state::keys_r )
+{
+	return 0;
+}
+
+WRITE8_MEMBER( ht6000_state::ram_card_l_w )
+{
+	// a0-a7
+	m_ram_card_addr = (m_ram_card_addr & 0xff00) | (data << 0);
+}
+
+WRITE8_MEMBER( ht6000_state::ram_card_h_w )
+{
+	data &= 0x1f; // a8-a12
+	m_ram_card_addr = (m_ram_card_addr & 0x00ff) | (data << 8);
 }
 
 READ8_MEMBER( ht6000_state::rom2_r )
