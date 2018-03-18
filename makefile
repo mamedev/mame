@@ -68,6 +68,7 @@
 # USE_SYSTEM_LIB_UTF8PROC = 1
 # USE_SYSTEM_LIB_GLM = 1
 # USE_SYSTEM_LIB_RAPIDJSON = 1
+# USE_SYSTEM_LIB_PUGIXML = 1
 
 # MESA_INSTALL_ROOT = /opt/mesa
 # SDL_INSTALL_ROOT = /opt/sdl2
@@ -478,6 +479,10 @@ endif
 
 ifdef USE_SYSTEM_LIB_RAPIDJSON
 PARAMS += --with-system-rapidjson='$(USE_SYSTEM_LIB_RAPIDJSON)'
+endif
+
+ifdef USE_SYSTEM_LIB_PUGIXML
+PARAMS += --with-system-pugixml='$(USE_SYSTEM_LIB_PUGIXML)'
 endif
 
 # reverse logic for this one
