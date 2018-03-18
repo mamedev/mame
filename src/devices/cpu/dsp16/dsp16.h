@@ -228,7 +228,7 @@ private:
 	void yaau_write(u16 op, s16 value);
 	void yaau_write_z(u16 op);
 	u64 dau_f1(u16 op);
-	u64 dau_f2(u16 op);
+	void dau_f2(u16 op);
 
 	// inline helpers
 	static bool op_interruptible(u16 op);
@@ -389,6 +389,7 @@ private:
 	u16         m_sio_ofsr;     // 16 bits
 	u8          m_sio_clk;
 	u8          m_sio_clk_div;
+	u8          m_sio_clk_res;
 	u8          m_sio_ld;
 	u8          m_sio_ld_div;
 	sio_flags   m_sio_flags;

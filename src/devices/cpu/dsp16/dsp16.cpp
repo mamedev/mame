@@ -194,7 +194,7 @@ dsp16_device_base::dsp16_device_base(
 	, m_yaau_r{ 0U, 0U, 0U, 0U }, m_yaau_rb(0U), m_yaau_re(0U), m_yaau_j(0), m_yaau_k(0)
 	, m_dau_x(0), m_dau_y(0), m_dau_p(0), m_dau_a{ 0, 0 }, m_dau_c{ 0, 0, 0 }, m_dau_auc(0U), m_dau_psw(0U), m_dau_temp(0)
 	, m_sio_sioc(0U), m_sio_obuf(0U), m_sio_osr(0U), m_sio_ofsr(0U)
-	, m_sio_clk(1U), m_sio_clk_div(0U), m_sio_ld(1U), m_sio_ld_div(0U), m_sio_flags(SIO_FLAGS_NONE)
+	, m_sio_clk(1U), m_sio_clk_div(0U), m_sio_clk_res(0U), m_sio_ld(1U), m_sio_ld_div(0U), m_sio_flags(SIO_FLAGS_NONE)
 	, m_pio_pioc(0U), m_pio_pdx_in(0U), m_pio_pdx_out(0U), m_pio_pids_cnt(0U), m_pio_pods_cnt(0U)
 	, m_cache_pcbase(0U), m_st_pcbase(0U), m_st_genflags(0U), m_st_yh(0), m_st_ah{ 0, 0 }, m_st_yl(0U), m_st_al{ 0U, 0U }
 {
@@ -316,6 +316,7 @@ void dsp16_device_base::device_start()
 	save_item(NAME(m_sio_ofsr));
 	save_item(NAME(m_sio_clk));
 	save_item(NAME(m_sio_clk_div));
+	save_item(NAME(m_sio_clk_res));
 	save_item(NAME(m_sio_ld));
 	save_item(NAME(m_sio_ld_div));
 	save_item(NAME(m_sio_flags));
@@ -348,6 +349,7 @@ void dsp16_device_base::device_reset()
 	m_sio_ofsr = 0U;
 	m_sio_clk = 1U;
 	m_sio_clk_div = 0U;
+	m_sio_clk_res = 0U;
 	m_pio_pioc = 0x0008U;
 	m_pio_pids_cnt = 0U;
 	m_pio_pods_cnt = 0U;
@@ -425,13 +427,7 @@ void dsp16_device_base::execute_run()
 				if (active)
 					sio_ock_active_edge();
 			}
-			switch ((m_sio_sioc >> 7) & 0x0003U)
-			{
-			case 0x0: m_sio_clk_div = (4 / 4) - 1; break; // CKI÷4
-			case 0x1: m_sio_clk_div = (12 / 4) - 1; break; // CKI÷12
-			case 0x2: m_sio_clk_div = (16 / 4) - 1; break; // CKI÷16
-			case 0x3: m_sio_clk_div = (20 / 4) - 1; break; // CKI÷20
-			}
+			m_sio_clk_div = m_sio_clk_res;
 		}
 
 		// udpate parallel input strobe
@@ -947,7 +943,7 @@ inline void dsp16_device_base::execute_one_rom()
 				++m_dau_c[1];
 				if (con)
 				{
-					op_dau_ad(op) = dau_f2(op);
+					dau_f2(op);
 					m_dau_c[2] = m_dau_c[1];
 				}
 			}
@@ -955,7 +951,7 @@ inline void dsp16_device_base::execute_one_rom()
 
 		case 0x13: // if CON F2
 			if (op_dau_con(op, true))
-				op_dau_ad(op) = dau_f2(op);
+				dau_f2(op);
 			break;
 
 		case 0x14: // F1 ; Y = y[l]
@@ -1277,7 +1273,7 @@ inline void dsp16_device_base::execute_one_cache()
 				++m_dau_c[1];
 				if (con)
 				{
-					op_dau_ad(op) = dau_f2(op);
+					dau_f2(op);
 					m_dau_c[2] = m_dau_c[1];
 				}
 			}
@@ -1285,7 +1281,7 @@ inline void dsp16_device_base::execute_one_cache()
 
 		case 0x13: // if CON F2
 			if (op_dau_con(op, true))
-				op_dau_ad(op) = dau_f2(op);
+				dau_f2(op);
 			break;
 
 		case 0x14: // F1 ; Y = y[l]
@@ -1592,10 +1588,10 @@ inline u64 dsp16_device_base::dau_f1(u16 op)
 	return set_dau_psw_flags(d);
 }
 
-inline u64 dsp16_device_base::dau_f2(u16 op)
+inline void dsp16_device_base::dau_f2(u16 op)
 {
 	s64 const &s(op_dau_as(op));
-	s64 d(0);
+	s64 &d(op_dau_ad(op));
 	switch (op_f2(op))
 	{
 	case 0x0: // aD = aS >> 1
@@ -1653,7 +1649,7 @@ inline u64 dsp16_device_base::dau_f2(u16 op)
 		d = -s;
 		break;
 	}
-	return set_dau_psw_flags(d);
+	d = set_dau_psw_flags(d);
 }
 
 /***********************************************************************
@@ -2025,19 +2021,35 @@ void dsp16_device_base::sio_sioc_write(u16 value)
 			sio_ilen(), BIT(value, 0) ? 8U : 16U,
 			m_st_pcbase);
 
-	//bool const ock_change(BIT(value ^ m_sio_sioc, 5));
-	//bool const ild_change(BIT(value ^ m_sio_sioc, 4));
+	bool const old_change(BIT(value ^ m_sio_sioc, 5));
+	bool const ild_change(BIT(value ^ m_sio_sioc, 4));
 	bool const ock_change(BIT(value ^ m_sio_sioc, 3));
 	bool const ick_change(BIT(value ^ m_sio_sioc, 2));
 	m_sio_sioc = value;
 
 	// we're using treating high-impedance and high as the same thing
+	if (!m_sio_ld)
+	{
+		if (ild_change)
+			m_ild_cb(sio_ild_active() ? 0 : 1);
+		if (old_change)
+			m_old_cb(sio_old_active() ? 0 : 1);
+	}
 	if (!m_sio_clk)
 	{
 		if (ick_change)
 			m_ick_cb(sio_ick_active() ? 0 : 1);
 		if (ock_change)
 			m_ock_cb(sio_ock_active() ? 0 : 1);
+	}
+
+	// precalculate divider preload
+	switch ((value >> 7) & 0x0003U)
+	{
+	case 0x0: m_sio_clk_res = (4 / 4) - 1; break; // CKI÷4
+	case 0x1: m_sio_clk_res = (12 / 4) - 1; break; // CKI÷12
+	case 0x2: m_sio_clk_res = (16 / 4) - 1; break; // CKI÷16
+	case 0x3: m_sio_clk_res = (20 / 4) - 1; break; // CKI÷20
 	}
 }
 
