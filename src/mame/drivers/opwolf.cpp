@@ -792,7 +792,7 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK ) /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(opwolf_sound_z80_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000) / 2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)) /* 12MHz measured on pin 20 */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
