@@ -141,6 +141,7 @@ public:
 	DECLARE_READ32_MEMBER(generic_speedup_r);
 	DECLARE_READ32_MEMBER(midvunit_wheel_board_r);
 	DECLARE_WRITE32_MEMBER(midvunit_wheel_board_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(motion_r);
 	DECLARE_DRIVER_INIT(crusnu40);
 	DECLARE_DRIVER_INIT(crusnu21);
 	DECLARE_DRIVER_INIT(crusnwld);
