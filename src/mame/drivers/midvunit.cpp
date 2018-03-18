@@ -722,7 +722,7 @@ static INPUT_PORTS_START( crusnusa )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Device 2")
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Device 3")
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Device 4")
-	PORT_BIT( 0xF000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midvunit_state, motion_r, nullptr )
+	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midvunit_state, motion_r, nullptr )
 
 	PORT_START("DSW")
 	/* DSW2 at U97 */
