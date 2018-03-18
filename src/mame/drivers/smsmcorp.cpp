@@ -940,11 +940,11 @@ ROM_START( secondch )
 	ROM_LOAD( "u18.18", 0xfa000, 0x02000, CRC(941a1401) SHA1(92934d40bb256e18b996582c1af253d06732462f) )
 	ROM_LOAD( "u17.17", 0xfc000, 0x02000, CRC(88717e9f) SHA1(01b78f3ddd78e74e799d5f8ffe2f3cbcf5e6b7a2) )
 	ROM_LOAD( "u16.16", 0xfe000, 0x02000, CRC(6c9a0224) SHA1(01152024b48461c3b9ac63a9265129dabacd0462) )
-	ROM_COPY( "maincpu",  0xf8000, 0x08000, 0x8000 )
+	ROM_COPY( "maincpu",0xf8000, 0x08000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "#26.26", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
-	ROM_RELOAD(           0x1000, 0x1000 )
+	ROM_LOAD( "@26.26", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
+	ROM_RELOAD(         0x1000, 0x1000 )
 ROM_END
 
 GAME( 1984, trvhang,  0, sms,      sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)",   MACHINE_SUPPORTS_SAVE ) /* Version Trivia-1-050185 */

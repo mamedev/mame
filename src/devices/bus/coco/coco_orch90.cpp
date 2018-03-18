@@ -40,7 +40,7 @@
 
 ROM_START(coco_orch90)
 	ROM_REGION(0x2000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("orchestra 90 (1984)(26 - 3143)(tandy).rom", 0x0000, 0x2000, CRC(15fb39af) SHA1(6a20fee9c70b36a6435ac8378f31d5b626017df0))
+	ROM_LOAD("orchestra 90,1984,26 - 3143,tandy.rom", 0x0000, 0x2000, CRC(15fb39af) SHA1(6a20fee9c70b36a6435ac8378f31d5b626017df0))
 ROM_END
 
 

@@ -29,19 +29,23 @@
 class noki3310_state : public driver_device
 {
 public:
-	noki3310_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	noki3310_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pcd8544(*this, "pcd8544"),
 		m_keypad(*this, "COL.%u", 0),
 		m_pwr(*this, "PWR")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<pcd8544_device> m_pcd8544;
-	required_ioport_array<5> m_keypad;
-	required_ioport m_pwr;
+	DECLARE_INPUT_CHANGED_MEMBER(key_irq);
 
+	void noki3330(machine_config &config);
+	void noki3410(machine_config &config);
+	void noki7110(machine_config &config);
+	void noki6210(machine_config &config);
+	void noki3310(machine_config &config);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -63,14 +67,9 @@ public:
 	DECLARE_WRITE16_MEMBER(ram_w)       { COMBINE_DATA(&m_ram[offset]); }
 	DECLARE_READ16_MEMBER(dsp_ram_r);
 	DECLARE_WRITE16_MEMBER(dsp_ram_w);
-	DECLARE_INPUT_CHANGED_MEMBER(key_irq);
 
-	void noki3330(machine_config &config);
-	void noki3410(machine_config &config);
-	void noki7110(machine_config &config);
-	void noki6210(machine_config &config);
-	void noki3310(machine_config &config);
 	void noki3310_map(address_map &map);
+
 private:
 	void assert_fiq(int num);
 	void assert_irq(int num);
@@ -79,8 +78,14 @@ private:
 	void nokia_ccont_w(uint8_t data);
 	uint8_t nokia_ccont_r();
 
+	required_device<cpu_device> m_maincpu;
+	required_device<pcd8544_device> m_pcd8544;
+	required_ioport_array<5> m_keypad;
+	required_ioport m_pwr;
+
 	std::unique_ptr<uint16_t[]>   m_ram;
 	std::unique_ptr<uint16_t[]>   m_dsp_ram;
+
 	uint8_t       m_power_on;
 	uint16_t      m_fiq_status;
 	uint16_t      m_irq_status;
@@ -767,10 +772,10 @@ ROM_START( noki3210 )
 
 	ROM_REGION16_BE(0x200000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "600", "v6.00")  // A 03-10-2000
-	ROMX_LOAD("3210F600A.fls", 0x000000, 0x200000, CRC(6a978478) SHA1(6bdec2ec76aca15bc12b621be4402e455562454b), ROM_BIOS(1))
+	ROMX_LOAD("3210f600a.fls", 0x000000, 0x200000, CRC(6a978478) SHA1(6bdec2ec76aca15bc12b621be4402e455562454b), ROM_BIOS(1))
 
 	ROM_REGION16_BE(0x04000, "eeprom", 0 )
-	ROM_LOAD("3210 virgin eeprom 24C128.bin", 0x00000, 0x04000, CRC(af8d8f65) SHA1(33a24c04d81a2bd8abce4a6fd873029f0c633ecb))
+	ROM_LOAD("3210 virgin eeprom,24c128.bin", 0x00000, 0x04000, CRC(af8d8f65) SHA1(33a24c04d81a2bd8abce4a6fd873029f0c633ecb))
 ROM_END
 
 ROM_START( noki3310 )
@@ -780,15 +785,15 @@ ROM_START( noki3310 )
 	ROM_SYSTEM_BIOS(0, "607", "v6.07")  // C 17-06-2003
 	ROM_SYSTEM_BIOS(1, "579", "v5.79")  // N 11-11-2002
 	ROM_SYSTEM_BIOS(2, "513", "v5.13")  // C 11-01-2002
-	ROMX_LOAD("3310_607_PPM_C.fls", 0x000000, 0x200000, CRC(5743f6ba) SHA1(0e80b5f1698909c9850be770c1289566582aa77a), ROM_BIOS(1))
-	ROMX_LOAD("3310 NR1 v5.79.fls", 0x000000, 0x200000, CRC(26b4f0df) SHA1(649de05ed88205a080693b918cd1295ac691dff1), ROM_BIOS(2))
-	ROMX_LOAD("3310 v. 5.13 C.fls", 0x000000, 0x1d0000, CRC(0f66d256) SHA1(04d8dabe2c454d6a1161f352d85c69c409895000), ROM_BIOS(3))
-	ROM_LOAD("3310 virgin eeprom 003D0000.fls", 0x1d0000, 0x030000, CRC(8393b1f7) SHA1(ab6c05bfa54ecd7c2acbd172009ffe6c7f130cb8))
+	ROMX_LOAD("3310_607_ppm_c.fls", 0x000000, 0x200000, CRC(5743f6ba) SHA1(0e80b5f1698909c9850be770c1289566582aa77a), ROM_BIOS(1))
+	ROMX_LOAD("3310 nr1 v5.79.fls", 0x000000, 0x200000, CRC(26b4f0df) SHA1(649de05ed88205a080693b918cd1295ac691dff1), ROM_BIOS(2))
+	ROMX_LOAD("3310 v. 5.13 c.fls", 0x000000, 0x1d0000, CRC(0f66d256) SHA1(04d8dabe2c454d6a1161f352d85c69c409895000), ROM_BIOS(3))
+	ROM_LOAD("3310 virgin eeprom 003d0000.fls", 0x1d0000, 0x030000, CRC(8393b1f7) SHA1(ab6c05bfa54ecd7c2acbd172009ffe6c7f130cb8))
 
 	// these 2 are apparently the 6.39 update firmware data
 	ROM_REGION(0x0200000, "misc", 0 )
-	ROM_LOAD( "NHM5NY06.390",   0x000000, 0x0131161, CRC(5dfb1af7) SHA1(3a8ad82dc239b0cd18be60f537c4d0e07881155d) )
-	ROM_LOAD( "NHM5NY06.39I",   0x000000, 0x0090288, CRC(ec214ee4) SHA1(f5b3b9ceaa7280d5246dd70d5696f8f6983122fc) )
+	ROM_LOAD( "nhm5ny06.390",   0x000000, 0x0131161, CRC(5dfb1af7) SHA1(3a8ad82dc239b0cd18be60f537c4d0e07881155d) )
+	ROM_LOAD( "nhm5ny06.39i",   0x000000, 0x0090288, CRC(ec214ee4) SHA1(f5b3b9ceaa7280d5246dd70d5696f8f6983122fc) )
 ROM_END
 
 ROM_START( noki3330 )
@@ -796,8 +801,8 @@ ROM_START( noki3330 )
 
 	ROM_REGION16_BE(0x0400000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "450", "v4.50")  // C 12-10-2001
-	ROMX_LOAD("3330F450C.fls", 0x000000, 0x350000, CRC(259313e7) SHA1(88bcc39d9358fd8a8562fe3a0280f0ce82f5897f), ROM_BIOS(1))
-	ROM_LOAD("3330 virgin eeprom 005F0000.fls", 0x3f0000, 0x010000, CRC(23459c10) SHA1(68481effb39d90a1639e8f261009c66e97d3e668))
+	ROMX_LOAD("3330f450c.fls", 0x000000, 0x350000, CRC(259313e7) SHA1(88bcc39d9358fd8a8562fe3a0280f0ce82f5897f), ROM_BIOS(1))
+	ROM_LOAD("3330 virgin eeprom 005f0000.fls", 0x3f0000, 0x010000, CRC(23459c10) SHA1(68481effb39d90a1639e8f261009c66e97d3e668))
 ROM_END
 
 ROM_START( noki3410 )
@@ -815,9 +820,9 @@ ROM_START( noki5210 )
 	ROM_SYSTEM_BIOS(0, "540", "v5.40")  // C 11-10-2003
 	ROM_SYSTEM_BIOS(1, "525", "v5.25")  // C 26-02-2003
 	ROM_SYSTEM_BIOS(2, "520", "v5.20")  // C 12-08-2002
-	ROMX_LOAD("5210_5.40_PPM_C.FLS", 0x000000, 0x380000, CRC(e37d5beb) SHA1(726f000780dd67750b7d2859687f846ce17a1bf7), ROM_BIOS(1))
-	ROMX_LOAD("5210_5.25_PPM_C.FLS", 0x000000, 0x380000, CRC(13bba458) SHA1(3b5244244743fba48f9061e158f95fc46b86446e), ROM_BIOS(2))
-	ROMX_LOAD("5210_520_C.fls", 0x000000, 0x380000, CRC(38648cd3) SHA1(9210e15e6bd780f86c467bec33ef54d6393abe5a), ROM_BIOS(3))
+	ROMX_LOAD("5210_5.40_ppm_c.fls", 0x000000, 0x380000, CRC(e37d5beb) SHA1(726f000780dd67750b7d2859687f846ce17a1bf7), ROM_BIOS(1))
+	ROMX_LOAD("5210_5.25_ppm_c.fls", 0x000000, 0x380000, CRC(13bba458) SHA1(3b5244244743fba48f9061e158f95fc46b86446e), ROM_BIOS(2))
+	ROMX_LOAD("5210_520_c.fls", 0x000000, 0x380000, CRC(38648cd3) SHA1(9210e15e6bd780f86c467bec33ef54d6393abe5a), ROM_BIOS(3))
 ROM_END
 
 ROM_START( noki6210 )
@@ -825,8 +830,8 @@ ROM_START( noki6210 )
 
 	ROM_REGION16_BE(0x0400000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "556", "v5.56")  // C 25-01-2002
-	ROMX_LOAD("6210_556C.fls", 0x000000, 0x3a0000, CRC(203fb962) SHA1(3d9ea319503e78ec69b60d72cda23e461e118ea9), ROM_BIOS(1))
-	ROM_LOAD("6210 virgin eeprom 005FA000.fls", 0x3fa000, 0x006000, CRC(3c6d3437) SHA1(b3a527ede1be87bd715fb3741a81eef5bd422efa))
+	ROMX_LOAD("6210_556c.fls", 0x000000, 0x3a0000, CRC(203fb962) SHA1(3d9ea319503e78ec69b60d72cda23e461e118ea9), ROM_BIOS(1))
+	ROM_LOAD("6210 virgin eeprom 005fa000.fls", 0x3fa000, 0x006000, CRC(3c6d3437) SHA1(b3a527ede1be87bd715fb3741a81eef5bd422efa))
 ROM_END
 
 ROM_START( noki6250 )
@@ -834,8 +839,8 @@ ROM_START( noki6250 )
 
 	ROM_REGION16_BE(0x0400000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "503", "v5.03")  // C 06-12-2001
-	ROMX_LOAD("6250-503mcuPPMC.fls", 0x000000, 0x3a0000, CRC(8dffb91b) SHA1(95607ce39c383bda75f1e6aeae67a214b787b0a1), ROM_BIOS(1))
-	ROM_LOAD("6250 virgin eeprom 005FA000.fls", 0x3fa000, 0x006000, CRC(6087ce70) SHA1(57c29c8387caf864603d94a22bfb63ace427b7f9))
+	ROMX_LOAD("6250-503mcuppmc.fls", 0x000000, 0x3a0000, CRC(8dffb91b) SHA1(95607ce39c383bda75f1e6aeae67a214b787b0a1), ROM_BIOS(1))
+	ROM_LOAD("6250 virgin eeprom 005fa000.fls", 0x3fa000, 0x006000, CRC(6087ce70) SHA1(57c29c8387caf864603d94a22bfb63ace427b7f9))
 ROM_END
 
 ROM_START( noki7110 )
@@ -843,8 +848,8 @@ ROM_START( noki7110 )
 
 	ROM_REGION16_BE(0x0400000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "501", "v5.01")  // C 08-12-2000
-	ROMX_LOAD("7110F501_ppmC.fls", 0x000000, 0x390000, CRC(919ac753) SHA1(53af8324919f455ba8199d2c05f7a921cfb811d5), ROM_BIOS(1))
-	ROM_LOAD("7110 virgin eeprom 005FA000.fls", 0x3fa000, 0x006000, CRC(78e7d8c1) SHA1(8b4dd782fc9d1306268ba63124ee463ac646912b))
+	ROMX_LOAD("7110f501_ppmc.fls", 0x000000, 0x390000, CRC(919ac753) SHA1(53af8324919f455ba8199d2c05f7a921cfb811d5), ROM_BIOS(1))
+	ROM_LOAD("7110 virgin eeprom 005fa000.fls", 0x3fa000, 0x006000, CRC(78e7d8c1) SHA1(8b4dd782fc9d1306268ba63124ee463ac646912b))
 ROM_END
 
 ROM_START( noki8210 )
@@ -852,8 +857,8 @@ ROM_START( noki8210 )
 
 	ROM_REGION16_BE(0x200000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "531", "v5.31")  // C 08-03-2002
-	ROMX_LOAD("8210_5.31PPM_C.FLS", 0x000000, 0x1d0000, CRC(927022b1) SHA1(c1a0fe95cedb89a92b19654208cc4855e1a4988e), ROM_BIOS(1))
-	ROM_LOAD("8210 virgin eeprom 003D0000.fls", 0x1d0000, 0x030000, CRC(37fddeea) SHA1(1c01ad3948ff9919890498a84f31052369d93e1d))
+	ROMX_LOAD("8210_5.31ppm_c.fls", 0x000000, 0x1d0000, CRC(927022b1) SHA1(c1a0fe95cedb89a92b19654208cc4855e1a4988e), ROM_BIOS(1))
+	ROM_LOAD("8210 virgin eeprom 003d0000.fls", 0x1d0000, 0x030000, CRC(37fddeea) SHA1(1c01ad3948ff9919890498a84f31052369d93e1d))
 ROM_END
 
 ROM_START( noki8250 )
@@ -861,8 +866,8 @@ ROM_START( noki8250 )
 
 	ROM_REGION16_BE(0x200000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "502", "v5.02")  // K 28-01-2002
-	ROMX_LOAD("8250-502mcuPPMK.fls", 0x000000, 0x1d0000, CRC(2c58e48b) SHA1(f26c98ffcfffbbd5714889e10cfa41c5f6dd2529), ROM_BIOS(1))
-	ROM_LOAD("8250 virgin eeprom 003D0000.fls", 0x1d0000, 0x030000, CRC(7ca585e0) SHA1(a974fb5fddcd0438ac4aaf32b431f1453e8d923c))
+	ROMX_LOAD("8250-502mcuppmk.fls", 0x000000, 0x1d0000, CRC(2c58e48b) SHA1(f26c98ffcfffbbd5714889e10cfa41c5f6dd2529), ROM_BIOS(1))
+	ROM_LOAD("8250 virgin eeprom 003d0000.fls", 0x1d0000, 0x030000, CRC(7ca585e0) SHA1(a974fb5fddcd0438ac4aaf32b431f1453e8d923c))
 ROM_END
 
 ROM_START( noki8850 )
@@ -871,7 +876,7 @@ ROM_START( noki8850 )
 	ROM_REGION16_BE(0x200000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "531", "v5.31")  // C 08-03-2002
 	ROMX_LOAD("8850v531.fls", 0x000000, 0x1d0000, CRC(8864fcb3) SHA1(9f966787403b68a09530680ad911302403eb1521), ROM_BIOS(1))
-	ROM_LOAD("8850 virgin eeprom 003D0000.fls", 0x1d0000, 0x030000, CRC(4823f27e) SHA1(b09455302d98fbedf35072c9ecfd7721a04924b0))
+	ROM_LOAD("8850 virgin eeprom 003d0000.fls", 0x1d0000, 0x030000, CRC(4823f27e) SHA1(b09455302d98fbedf35072c9ecfd7721a04924b0))
 ROM_END
 
 ROM_START( noki8890 )
@@ -879,8 +884,8 @@ ROM_START( noki8890 )
 
 	ROM_REGION16_BE(0x200000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "1220", "v12.20")    // C 19-03-2001
-	ROMX_LOAD("8890_12.20_ppmC.FLS", 0x000000, 0x1d0000, CRC(77206f78) SHA1(a214a0d69760ecd8eeca0b9d82f95c94bdfe70ed), ROM_BIOS(1))
-	ROM_LOAD("8890 virgin eeprom 003D0000.fls", 0x1d0000, 0x030000, CRC(1d8ef3b5) SHA1(cc0924cfd4c0ce796fca157c640fc3183c2b5f2c))
+	ROMX_LOAD("8890_12.20_ppmc.fls", 0x000000, 0x1d0000, CRC(77206f78) SHA1(a214a0d69760ecd8eeca0b9d82f95c94bdfe70ed), ROM_BIOS(1))
+	ROM_LOAD("8890 virgin eeprom 003d0000.fls", 0x1d0000, 0x030000, CRC(1d8ef3b5) SHA1(cc0924cfd4c0ce796fca157c640fc3183c2b5f2c))
 ROM_END
 
 

@@ -36,7 +36,7 @@ void bbc_tube_65c102_device::tube_6502_mem(address_map &map)
 
 ROM_START( tube_65c102 )
 	ROM_REGION(0x1000, "rom", 0)
-	ROM_LOAD("65C102_BOOT_110.rom", 0x0000, 0x1000, CRC(ad5b70cc) SHA1(0ac9a1c70e55a79e2c81e102afae1d016af229fa)) // 2201,243-02
+	ROM_LOAD("65c102_boot_110.rom", 0x0000, 0x1000, CRC(ad5b70cc) SHA1(0ac9a1c70e55a79e2c81e102afae1d016af229fa)) // 2201,243-02
 ROM_END
 
 //-------------------------------------------------

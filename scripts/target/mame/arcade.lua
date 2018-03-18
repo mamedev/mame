@@ -268,6 +268,7 @@ SOUNDS["TA7630"] = true
 SOUNDS["MM5837"] = true
 --SOUNDS["DAVE"] = true
 SOUNDS["LC7535"] = true
+--SOUNDS["UPD934G"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -3774,7 +3775,6 @@ files {
 	MAME_DIR .. "src/mame/video/qix.cpp",
 	MAME_DIR .. "src/mame/drivers/rbisland.cpp",
 	MAME_DIR .. "src/mame/includes/rbisland.h",
-	MAME_DIR .. "src/mame/machine/rbisland.cpp",
 	MAME_DIR .. "src/mame/video/rbisland.cpp",
 	MAME_DIR .. "src/mame/drivers/rastan.cpp",
 	MAME_DIR .. "src/mame/includes/rastan.h",
@@ -4335,6 +4335,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/jp.cpp",
 	MAME_DIR .. "src/mame/drivers/jvh.cpp",
 	MAME_DIR .. "src/mame/drivers/kissproto.cpp",
+	MAME_DIR .. "src/mame/drivers/lckydraw.cpp",
 	MAME_DIR .. "src/mame/drivers/ltd.cpp",
 	MAME_DIR .. "src/mame/drivers/macp.cpp",
 	MAME_DIR .. "src/mame/drivers/micropin.cpp",
@@ -4741,7 +4742,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/taxidriv.cpp",
 	MAME_DIR .. "src/mame/includes/taxidriv.h",
 	MAME_DIR .. "src/mame/video/taxidriv.cpp",
-	MAME_DIR .. "src/mame/drivers/tcl.cpp",
 	MAME_DIR .. "src/mame/drivers/thayers.cpp",
 	MAME_DIR .. "src/mame/drivers/thedeep.cpp",
 	MAME_DIR .. "src/mame/includes/thedeep.h",

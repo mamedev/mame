@@ -2507,7 +2507,6 @@ ROM_START( pigout )
 	ROM_LOAD( "11-01.u27", 0x1200, 0x0104, NO_DUMP ) // MMI PAL16R8ACNS
 ROM_END
 
-
 ROM_START( pigouta )
 	ROM_REGION( 0x040000, "master", 0 )
 	ROM_LOAD( "03-29020-01.u58t", 0x00000, 0x10000, CRC(6c815982) SHA1(0720b22afd16e9bdc5d4a9e9a0071674ea46d038) )
@@ -2574,7 +2573,48 @@ ROM_START( pigouta )
 ROM_END
 
 
+/*
+For Ataxx, the label format is:
+------------------------
+|(C)1990 Leland Corp.  | -> Copyright & Manufacturer
+|P/N E-302-31005-05    | -> Part number with revision
+|ATAXX            U38  | -> Game name & ROM PCB location
+------------------------
+*/
 ROM_START( ataxx )
+	ROM_REGION( 0x30000, "master", 0 )
+	ROM_LOAD( "e-302-31005-05.u38",   0x00000, 0x20000, CRC(3378937d) SHA1(3c62da7e11b2860c7fe3a35c077cadcf4d0272ca) )
+	ROM_RELOAD(                       0x10000, 0x20000 )
+
+	ROM_REGION( 0x60000, "slave", 0 )
+	ROM_LOAD( "e-302-31012-01.u111",  0x00000, 0x20000, CRC(9a3297cc) SHA1(1dfa0bacd2f2b18d44bfc2d55c40291c1b142f8f) )
+	ROM_LOAD( "e-302-31013-01.u112",  0x20000, 0x20000, CRC(7e7c3e2f) SHA1(a7e31e1f1b09414c40ab9ace5e9bffbdbaee8704) )
+	ROM_LOAD( "e-302-31014-01.u113",  0x40000, 0x20000, CRC(8cf3e101) SHA1(672a3a0ca0f5334cf614bc49cbc1ae5ccea54cbe) )
+
+	ROM_REGION( 0x100000, "audiocpu", 0 )
+	ROM_LOAD16_BYTE( "e-302-31003-01.u15", 0x20001, 0x20000, CRC(8bb3233b) SHA1(5131ad78bdf904cde36534e99efa5576fcea25c0) )
+	ROM_LOAD16_BYTE( "e-302-31001-01.u1",  0x20000, 0x20000, CRC(728d75f2) SHA1(d9e8e742cc2d536bd62370c1e474c7036e4392bb) )
+	ROM_LOAD16_BYTE( "e-302-31004-01.u16", 0x60001, 0x20000, CRC(f2bdff48) SHA1(f34eb16ea180effffd81d637acc3d96bffaf81c9) )
+	ROM_RELOAD(                            0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "e-302-31002-01.u2",  0x60000, 0x20000, CRC(ca06a394) SHA1(0858908bd150dd7354536e10b2a386b45f17ac9f) )
+	ROM_RELOAD(                            0xc0000, 0x20000 )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "e-302-31006-01.u98",   0x00000, 0x20000, CRC(59d0f2ae) SHA1(8da5dc006e192af98458227e79421b6a07ac1cdc) )
+	ROM_LOAD( "e-302-31007-01.u99",   0x20000, 0x20000, CRC(6ab7db25) SHA1(25c2fa23b99ac4bab5a9b851c2087de44512a5c2) )
+	ROM_LOAD( "e-302-31008-01.u100",  0x40000, 0x20000, CRC(2352849e) SHA1(f49394b6efb6a87d86516ec0a5ddd582f96f7e5d) )
+	ROM_LOAD( "e-302-31009-01.u101",  0x60000, 0x20000, CRC(4c31e02b) SHA1(2d8dd97a2a737bafb44dced7ce3eef22d7d14cbe) )
+	ROM_LOAD( "e-302-31010-01.u102",  0x80000, 0x20000, CRC(a951228c) SHA1(7ec5cf4d0aa3702be9236d155bea373a06c0be03) )
+	ROM_LOAD( "e-302-31011-01.u103",  0xa0000, 0x20000, CRC(ed326164) SHA1(8706192f525ece200587cee7e7beb4a1975bf63e) )
+
+	ROM_REGION( 0x00001, "user1", ROMREGION_ERASEFF ) /* X-ROM (data used by main processor) */
+	/* Empty / not used */
+
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-ataxx.bin", 0x0000, 0x0100, CRC(989cdb8c) SHA1(13b30a328e71a195960e98e50d1657a8b6860dcf) )
+ROM_END
+
+ROM_START( ataxxa )
 	ROM_REGION( 0x30000, "master", 0 )
 	ROM_LOAD( "e-302-31005-04.u38",   0x00000, 0x20000, CRC(e1cf6236) SHA1(fabf423a006b1db22273c6fffa03edc148d7d957) )
 	ROM_RELOAD(                       0x10000, 0x20000 )
@@ -2607,43 +2647,9 @@ ROM_START( ataxx )
 	ROM_LOAD16_WORD( "eeprom-ataxx.bin", 0x0000, 0x0100, CRC(989cdb8c) SHA1(13b30a328e71a195960e98e50d1657a8b6860dcf) )
 ROM_END
 
-
-ROM_START( ataxxa )
-	ROM_REGION( 0x30000, "master", 0 )
-	ROM_LOAD( "u38.u38",   0x00000, 0x20000, CRC(3378937d) SHA1(3c62da7e11b2860c7fe3a35c077cadcf4d0272ca) )
-	ROM_RELOAD(            0x10000, 0x20000 )
-
-	ROM_REGION( 0x60000, "slave", 0 )
-	ROM_LOAD( "e-302-31012-01.u111",  0x00000, 0x20000, CRC(9a3297cc) SHA1(1dfa0bacd2f2b18d44bfc2d55c40291c1b142f8f) )
-	ROM_LOAD( "e-302-31013-01.u112",  0x20000, 0x20000, CRC(7e7c3e2f) SHA1(a7e31e1f1b09414c40ab9ace5e9bffbdbaee8704) )
-	ROM_LOAD( "e-302-31014-01.u113",  0x40000, 0x20000, CRC(8cf3e101) SHA1(672a3a0ca0f5334cf614bc49cbc1ae5ccea54cbe) )
-
-	ROM_REGION( 0x100000, "audiocpu", 0 )
-	ROM_LOAD16_BYTE( "e-302-31003-01.u15", 0x20001, 0x20000, CRC(8bb3233b) SHA1(5131ad78bdf904cde36534e99efa5576fcea25c0) )
-	ROM_LOAD16_BYTE( "e-302-31001-01.u1",  0x20000, 0x20000, CRC(728d75f2) SHA1(d9e8e742cc2d536bd62370c1e474c7036e4392bb) )
-	ROM_LOAD16_BYTE( "e-302-31004-01.u16", 0x60001, 0x20000, CRC(f2bdff48) SHA1(f34eb16ea180effffd81d637acc3d96bffaf81c9) )
-	ROM_RELOAD(                            0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "e-302-31002-01.u2",  0x60000, 0x20000, CRC(ca06a394) SHA1(0858908bd150dd7354536e10b2a386b45f17ac9f) )
-	ROM_RELOAD(                            0xc0000, 0x20000 )
-
-	ROM_REGION( 0xc0000, "gfx1", 0 )
-	ROM_LOAD( "e-302-31006-01.u98",   0x00000, 0x20000, CRC(59d0f2ae) SHA1(8da5dc006e192af98458227e79421b6a07ac1cdc) )
-	ROM_LOAD( "e-302-31007-01.u99",   0x20000, 0x20000, CRC(6ab7db25) SHA1(25c2fa23b99ac4bab5a9b851c2087de44512a5c2) )
-	ROM_LOAD( "e-302-31008-01.u100",  0x40000, 0x20000, CRC(2352849e) SHA1(f49394b6efb6a87d86516ec0a5ddd582f96f7e5d) )
-	ROM_LOAD( "e-302-31009-01.u101",  0x60000, 0x20000, CRC(4c31e02b) SHA1(2d8dd97a2a737bafb44dced7ce3eef22d7d14cbe) )
-	ROM_LOAD( "e-302-31010-01.u102",  0x80000, 0x20000, CRC(a951228c) SHA1(7ec5cf4d0aa3702be9236d155bea373a06c0be03) )
-	ROM_LOAD( "e-302-31011-01.u103",  0xa0000, 0x20000, CRC(ed326164) SHA1(8706192f525ece200587cee7e7beb4a1975bf63e) )
-
-	ROM_REGION( 0x00001, "user1", ROMREGION_ERASEFF ) /* X-ROM (data used by main processor) */
-	/* Empty / not used */
-
-	ROM_REGION16_BE( 0x100, "eeprom", 0 )
-	ROM_LOAD16_WORD( "eeprom-ataxx.bin", 0x0000, 0x0100, CRC(989cdb8c) SHA1(13b30a328e71a195960e98e50d1657a8b6860dcf) )
-ROM_END
-
 ROM_START( ataxxe )
 	ROM_REGION( 0x30000, "master", 0 )
-	ROM_LOAD( "euro_ataxx_u38_3079.bin", 0x00000, 0x20000, CRC(16aef3b7) SHA1(b2de1e3fd032ab8cc5ed995522f528f0b3283d8a) )
+	ROM_LOAD( "euro_ataxx_u38_3079.u38", 0x00000, 0x20000, CRC(16aef3b7) SHA1(b2de1e3fd032ab8cc5ed995522f528f0b3283d8a) )
 	ROM_RELOAD(                          0x10000, 0x20000 )
 
 	ROM_REGION( 0x60000, "slave", 0 )
@@ -2673,7 +2679,6 @@ ROM_START( ataxxe )
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-ataxxe.bin", 0x0000, 0x0100, CRC(8df1dee1) SHA1(876c5d5d506c31fdf4c3e611a1869b50ceadc6fd) )
 ROM_END
-
 
 ROM_START( ataxxj )
 	ROM_REGION( 0x30000, "master", 0 )
@@ -2794,7 +2799,7 @@ ROM_START( indyheat )
 	ROM_LOAD16_BYTE( "e-302-33024-01.u6",  0x20000, 0x20000, CRC(15a89962) SHA1(52f66e1ccde0ef3fb7959a207cc967237e37833e) )
 	ROM_LOAD16_BYTE( "e-302-33022-01.u4",  0x60001, 0x20000, CRC(fa7bfa04) SHA1(0174f5372117d15bf0ecd48b72c9cca4cf8bb75f) )
 	ROM_RELOAD(                            0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "E-302-33023-01.u5",  0x60000, 0x20000, CRC(198285d4) SHA1(8f6b3cba2bc729f2e0623578b13720ead91333e4) )
+	ROM_LOAD16_BYTE( "e-302-33023-01.u5",  0x60000, 0x20000, CRC(198285d4) SHA1(8f6b3cba2bc729f2e0623578b13720ead91333e4) )
 	ROM_RELOAD(                            0xc0000, 0x20000 )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )
@@ -3371,8 +3376,8 @@ GAME( 1990, pigout,     0,       lelandi,  pigout, leland_state,     pigout,   R
 GAME( 1990, pigouta,    pigout,  lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 1)", 0 )
 
 /* Ataxx-era PCB, 80186 sound */
-GAME( 1990, ataxx,    0,      ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (set 1)", 0 )
-GAME( 1990, ataxxa,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (set 2)", 0 )
+GAME( 1990, ataxx,    0,      ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 5)", 0 )
+GAME( 1990, ataxxa,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 4)", 0 )
 GAME( 1990, ataxxe,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (Europe)", 0 )
 GAME( 1990, ataxxj,   ataxx,  ataxx,   ataxx,    leland_state, ataxxj,   ROT0,   "Leland Corporation (Capcom license)", "Ataxx (Japan)", 0 )
 GAME( 1990, wsf,      0,      wsf,     wsf,      leland_state, wsf,      ROT0,   "Leland Corporation", "World Soccer Finals (rev 3)", 0 )

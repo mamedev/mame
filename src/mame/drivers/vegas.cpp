@@ -2180,7 +2180,7 @@ ROM_START( roadburn ) /* version 1.04 - verified on hardware */
 
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )    /* Guts 5/19/1999 Game 5/19/1999 */
-	DISK_IMAGE( "ROAD BURNERS V1.04", 0, SHA1(30567241c000ee572a9cfb1b080c02a51a2b12d2) )
+	DISK_IMAGE( "road burners v1.04", 0, SHA1(30567241c000ee572a9cfb1b080c02a51a2b12d2) )
 ROM_END
 
 ROM_START( roadburn1 ) /* version 1.0 - verified on hardware */

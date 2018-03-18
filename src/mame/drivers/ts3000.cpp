@@ -21,9 +21,12 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
-void ts3000(machine_config &config);
-void io_map(address_map &map);
-void mem_map(address_map &map);
+	void ts3000(machine_config &config);
+
+protected:
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
 private:
 //  required_device<cpu_device> m_maincpu;
 };
@@ -49,7 +52,7 @@ MACHINE_CONFIG_END
 
 ROM_START( ts3000 )
 	ROM_REGION( 0x4000, "roms", 0 )
-	ROM_LOAD( "U25 VER 2.03 BIOS D.u25", 0x0000, 0x4000, CRC(abaff64c) SHA1(b2f0e73d2a25a03d5bac558580919bd0400f4fcf) ) // The D at the end is handwritten
+	ROM_LOAD( "u25 ver 2.03 bios d.u25", 0x0000, 0x4000, CRC(abaff64c) SHA1(b2f0e73d2a25a03d5bac558580919bd0400f4fcf) ) // The D at the end is handwritten
 ROM_END
 
 COMP( 198?, ts3000, 0, 0, ts3000, ts3000, ts3000_state, 0, "Televideo", "TS-3000", MACHINE_IS_SKELETON )

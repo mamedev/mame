@@ -39,11 +39,11 @@ ROM_START( tube_arm )
 	ROM_REGION(0x4000, "bootstrap", 0)
 	ROM_DEFAULT_BIOS("101")
 	ROM_SYSTEM_BIOS(0, "101", "Executive v1.00 (14th August 1986)")
-	ROMX_LOAD("ARMeval_101.rom", 0x0000, 0x4000, CRC(cab85473) SHA1(f86bbc4894e62725b8ef22d44e7f44d37c98ac14), ROM_BIOS(1))
+	ROMX_LOAD("armeval_101.rom", 0x0000, 0x4000, CRC(cab85473) SHA1(f86bbc4894e62725b8ef22d44e7f44d37c98ac14), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "100", "Executive v1.00 (6th June 1986)")
-	ROMX_LOAD("ARMeval_100.rom", 0x0000, 0x4000, CRC(ed80462a) SHA1(ba33eaf1a23cfef6fc1b88aa516ca2b3693e69d9), ROM_BIOS(2))
+	ROMX_LOAD("armeval_100.rom", 0x0000, 0x4000, CRC(ed80462a) SHA1(ba33eaf1a23cfef6fc1b88aa516ca2b3693e69d9), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "005", "Brazil v-.005 (8th August 1986)")
-	ROMX_LOAD("Brazil_005.rom", 0x0000, 0x4000, CRC(7c27c098) SHA1(abcc71cbc43489e89a87aac64e67b17daef5895a), ROM_BIOS(3))
+	ROMX_LOAD("brazil_005.rom", 0x0000, 0x4000, CRC(7c27c098) SHA1(abcc71cbc43489e89a87aac64e67b17daef5895a), ROM_BIOS(3))
 ROM_END
 
 //-------------------------------------------------

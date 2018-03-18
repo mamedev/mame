@@ -699,10 +699,10 @@ Sound: AY-3-8910   0.691200 MHz [22.1184MHz/32]
 
 ROM_START( revngr84 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "u_1__revenger__r06254__(c)_epos_corp.m5l2764k.u1",  0x0000, 0x2000, CRC(308f231f) SHA1(cf06695601bd0387e4fcb64d9b34143323e98b07) ) /* labeled as "U 1 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
-	ROM_LOAD( "u_2__revenger__r06254__(c)_epos_corp.m5l2764k.u2",  0x2000, 0x2000, CRC(e80bbfb4) SHA1(9302beaef8bbb7376b6a20e9ee5adbcf60d66dd8) ) /* labeled as "U 2 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
-	ROM_LOAD( "u_3__revenger__r06254__(c)_epos_corp.m5l2764k.u3",  0x4000, 0x2000, CRC(d9270929) SHA1(a95034b5387a40e02f04bdfa79e1d8e65dad30fe) ) /* labeled as "U 3 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
-	ROM_LOAD( "u_4__revenger__r06254__(c)_epos_corp.m5l2764k.u4",  0x6000, 0x2000, CRC(d6e6cfa8) SHA1(f10131bb2e9d088c7b6d6a5d5520073d78ad69cc) ) /* labeled as "U 4 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
+	ROM_LOAD( "u_1__revenger__r06254__=c=_epos_corp.m5l2764k.u1",  0x0000, 0x2000, CRC(308f231f) SHA1(cf06695601bd0387e4fcb64d9b34143323e98b07) ) /* labeled as "U 1 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
+	ROM_LOAD( "u_2__revenger__r06254__=c=_epos_corp.m5l2764k.u2",  0x2000, 0x2000, CRC(e80bbfb4) SHA1(9302beaef8bbb7376b6a20e9ee5adbcf60d66dd8) ) /* labeled as "U 2 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
+	ROM_LOAD( "u_3__revenger__r06254__=c=_epos_corp.m5l2764k.u3",  0x4000, 0x2000, CRC(d9270929) SHA1(a95034b5387a40e02f04bdfa79e1d8e65dad30fe) ) /* labeled as "U 3 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
+	ROM_LOAD( "u_4__revenger__r06254__=c=_epos_corp.m5l2764k.u4",  0x6000, 0x2000, CRC(d6e6cfa8) SHA1(f10131bb2e9d088c7b6d6a5d5520073d78ad69cc) ) /* labeled as "U 4 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "dm74s288n.u60", 0x0000, 0x0020, CRC(be2b0641) SHA1(26982903b6d942af8e0a526412d8e01978d76420) ) // unknown purpose

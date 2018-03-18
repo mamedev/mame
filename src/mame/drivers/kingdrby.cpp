@@ -90,24 +90,22 @@ class kingdrby_state : public driver_device
 {
 public:
 	kingdrby_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_vram(*this, "vram"),
-		m_attr(*this, "attr"),
-		m_spriteram(*this, "spriteram"),
-		m_soundcpu(*this, "soundcpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_vram(*this, "vram")
+		, m_attr(*this, "attr")
+		, m_spriteram(*this, "spriteram")
+		, m_soundcpu(*this, "soundcpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_digits(*this, "digit%u", 0U)
+	{
+	}
 
-	uint8_t m_sound_cmd;
-	required_shared_ptr<uint8_t> m_vram;
-	required_shared_ptr<uint8_t> m_attr;
-	tilemap_t *m_sc0_tilemap;
-	tilemap_t *m_sc0w_tilemap;
-	tilemap_t *m_sc1_tilemap;
-	uint8_t m_p1_hopper;
-	uint8_t m_p2_hopper;
-	uint8_t m_mux_data;
-	required_shared_ptr<uint8_t> m_spriteram;
+	void kingdrbb(machine_config &config);
+	void cowrace(machine_config &config);
+	void kingdrby(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(sc0_vram_w);
 	DECLARE_WRITE8_MEMBER(sc0_attr_w);
 	DECLARE_WRITE8_MEMBER(led_array_w);
@@ -127,12 +125,7 @@ public:
 	DECLARE_PALETTE_INIT(kingdrbb);
 	uint32_t screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_soundcpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	void kingdrbb(machine_config &config);
-	void cowrace(machine_config &config);
-	void kingdrby(machine_config &config);
+
 	void cowrace_sound_io(address_map &map);
 	void cowrace_sound_map(address_map &map);
 	void master_io_map(address_map &map);
@@ -142,6 +135,21 @@ public:
 	void slave_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
+
+	uint8_t m_sound_cmd;
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_attr;
+	tilemap_t *m_sc0_tilemap;
+	tilemap_t *m_sc0w_tilemap;
+	tilemap_t *m_sc1_tilemap;
+	uint8_t m_p1_hopper;
+	uint8_t m_p2_hopper;
+	uint8_t m_mux_data;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_device<cpu_device> m_soundcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	output_finder<30> m_digits;
 };
 
 
@@ -204,6 +212,8 @@ void kingdrby_state::video_start()
 	m_sc0w_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kingdrby_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_sc1_tilemap->set_transparent_pen(0);
+
+	m_digits.resolve();
 }
 
 static const uint8_t hw_sprite[16] =
@@ -407,8 +417,8 @@ WRITE8_MEMBER(kingdrby_state::led_array_w)
 	they goes from 0 to 5, to indicate the number.
 	If one player bets something, the other led will toggle between p1 and p2 bets.
 	*/
-	output().set_digit_value(0xf + offset, led_map[(data & 0xf0) >> 4]);
-	output().set_digit_value(0x0 + offset, led_map[(data & 0x0f) >> 0]);
+	m_digits[0xf + offset] = led_map[(data & 0xf0) >> 4];
+	m_digits[0x0 + offset] = led_map[(data & 0x0f) >> 0];
 
 }
 

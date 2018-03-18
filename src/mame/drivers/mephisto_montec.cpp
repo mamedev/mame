@@ -533,17 +533,17 @@ ROM_END
 
 ROM_START(smondial)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("mephisto super mondial I.bin", 0x8000, 0x8000, CRC(c1d7d0a5) SHA1(d7f0da6938458c06925f0936e63915319144d7e0))
+	ROM_LOAD("mephisto super mondial i.bin", 0x8000, 0x8000, CRC(c1d7d0a5) SHA1(d7f0da6938458c06925f0936e63915319144d7e0))
 ROM_END
 
 ROM_START(smondial2)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("supermondial_II.bin", 0x8000, 0x8000, CRC(cd73df4a) SHA1(bad786074be613d7f48bf98b6fdf8178a4a85f5b))
+	ROM_LOAD("supermondial_ii.bin", 0x8000, 0x8000, CRC(cd73df4a) SHA1(bad786074be613d7f48bf98b6fdf8178a4a85f5b))
 ROM_END
 
 ROM_START(mondial2)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("mondial II 01 08 87 Morsch.bin", 0x8000, 0x8000, CRC(e5945ce6) SHA1(e75bbf9d54087271d9d46fb1de7634eb957f8db0))
+	ROM_LOAD("mondial ii 01 08 87 morsch.bin", 0x8000, 0x8000, CRC(e5945ce6) SHA1(e75bbf9d54087271d9d46fb1de7634eb957f8db0))
 ROM_END
 
 

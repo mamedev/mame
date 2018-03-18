@@ -75,9 +75,6 @@ TODO:
 
 - neruton / majxtal7: girls are behind the background in demo mode.
 
-- tenkai: Interrupts are not quite right; "RAM ERROR" at startup and music slows
-  down while dealing tiles in attract mode.
-
 *********************************************************************************************************************/
 
 #include "emu.h"
@@ -4823,18 +4820,21 @@ MACHINE_CONFIG_END
 
 void dynax_state::tenkai_update_irq()
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_blitter_irq);
+	if (m_blitter_irq_mask)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_blitter_irq);
 }
 
 WRITE_LINE_MEMBER(dynax_state::tenkai_blitter_ack_w)
 {
 	m_blitter_irq_mask = state;
 
-	// this must be acknowledged somewhere else
 	if (!m_blitter_irq_mask)
+	{
 		m_blitter_irq = 0;
-
-	tenkai_update_irq();
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	}
+	else
+		tenkai_update_irq();
 }
 
 
@@ -4924,7 +4924,6 @@ MACHINE_CONFIG_START(dynax_state::gekisha)
 	MCFG_CPU_ADD("maincpu",TMP90841, XTAL(10'000'000) )   // ?
 	MCFG_CPU_PROGRAM_MAP(gekisha_map)
 	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(dynax_state, gekisha_p4_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(gekisha_banked_map)
@@ -4955,6 +4954,7 @@ MACHINE_CONFIG_START(dynax_state::gekisha)
 	MCFG_SCREEN_VISIBLE_AREA(2, 256-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_mjdialq2)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette

@@ -674,7 +674,7 @@ ROM_START( catnmous )
 	ROM_LOAD( "type01.11g",   0x1000, 0x0800, CRC(2999f378) SHA1(929082383b2b0006de171587adb932ce57316963) )
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "cat'n_mouse-type01-mem_n.14l.14l",   0x0000, 0x1000, CRC(83502383) SHA1(9561f87e1a6425bb9544e71340336db8d43c1fd9) )
+	ROM_LOAD( "cat_n_mouse-type01-mem_n.14l.14l",   0x0000, 0x1000, CRC(83502383) SHA1(9561f87e1a6425bb9544e71340336db8d43c1fd9) )
 
 	ROM_REGION( 0x0100, "gfxmix", 0 )
 	ROM_LOAD( "82s100.13m",   0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) )
@@ -715,7 +715,7 @@ ROM_START( catnmousa )
 	ROM_LOAD( "catnmous.11g", 0x1000, 0x0800, CRC(2999f378) SHA1(929082383b2b0006de171587adb932ce57316963) )
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "cat'n_mouse-type01-mem_n.14l.14l",   0x0000, 0x1000, CRC(83502383) SHA1(9561f87e1a6425bb9544e71340336db8d43c1fd9) )
+	ROM_LOAD( "cat_n_mouse-type01-mem_n.14l.14l",   0x0000, 0x1000, CRC(83502383) SHA1(9561f87e1a6425bb9544e71340336db8d43c1fd9) )
 
 	ROM_REGION( 0x0100, "gfxmix", 0 )
 	// copied from parent set to give working graphics, need dump to confirm

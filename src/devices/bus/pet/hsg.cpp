@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(CBM8000_HSG_B, cbm8000_hsg_b_device, "cbm8000_hsg_b", "CBM 80
 
 ROM_START( cbm8000_hsg )
 	ROM_REGION( 0x1000, "9000", 0 )
-	ROM_LOAD( "pet_hsg-ud12 on 8032 9000 (2532).bin", 0x0000, 0x1000, CRC(d651bf72) SHA1(d3d68228a5a8ec73fb39be860c00edb0d21bd1a9) )
+	ROM_LOAD( "pet_hsg-ud12 on 8032 9000,2532.bin", 0x0000, 0x1000, CRC(d651bf72) SHA1(d3d68228a5a8ec73fb39be860c00edb0d21bd1a9) )
 
 	ROM_REGION( 0x1000, "a000", 0 )
 	ROM_LOAD( "324381-01 rev b sw graphi", 0x0000, 0x1000, CRC(c8e3bff9) SHA1(12ed3176ddd632f52e91082ab574adcba2149684) )

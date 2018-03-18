@@ -367,7 +367,7 @@ WRITE8_MEMBER( sb16_lle_device::dma16_len_hi_w )
 
 ROM_START( sb16 )
 	ROM_REGION( 0x2000, "sb16_cpu", 0 )
-	ROM_LOAD("ct1741_v413[80c52].bin", 0x0000, 0x2000, CRC(5181892f) SHA1(5b42f1c34c4e9c8dbbdcffa0a36c178ca4f1aa77))
+	ROM_LOAD("ct1741_v413@80c52.bin", 0x0000, 0x2000, CRC(5181892f) SHA1(5b42f1c34c4e9c8dbbdcffa0a36c178ca4f1aa77))
 
 	ROM_REGION(0x40, "xor_table", 0)
 	ROM_LOAD("ct1741_v413_xor.bin", 0x00, 0x40, CRC(5243d15a) SHA1(c7637c92828843f47e6e2f956af639b07aee4571))

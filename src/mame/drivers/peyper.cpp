@@ -868,7 +868,7 @@ ROM_END
 ROM_START(ator)
 	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("1.bin", 0x0000, 0x2000, NO_DUMP)
-	ROM_LOAD("Ator 2 _0xBA29.BIN", 0x2000, 0x2000, CRC(21aad5c4) SHA1(e78da5d80682710db34cbbfeae5af54241c73371))
+	ROM_LOAD("ator 2 _0xba29.bin", 0x2000, 0x2000, CRC(21aad5c4) SHA1(e78da5d80682710db34cbbfeae5af54241c73371))
 	// probably no ROM 3 (PCB photo shows location unpopulated)
 ROM_END
 

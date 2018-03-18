@@ -1552,7 +1552,7 @@ ROM_END
 
 ROM_START( mc_dgear )
 	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "dreamgear 75-in-1(unl)[!].prg", 0x00000, 0x400000, CRC(9aabcb8f) SHA1(aa9446b7777fa64503871225fcaf2a17aafd9af1) )
+	ROM_LOAD( "dreamgear 75-in-1.prg", 0x00000, 0x400000, CRC(9aabcb8f) SHA1(aa9446b7777fa64503871225fcaf2a17aafd9af1) )
 ROM_END
 
 ROM_START( dgun2500 )
@@ -1572,7 +1572,7 @@ ROM_END
 
 ROM_START( cybar120 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "M2500P-VT09-EPSON_(20091222VER05,_30R-SX1067-01_PCB,_12R0COB128M_12001-3D05_FW).bin", 0x00000, 0x1000000, CRC(f7138980) SHA1(de31264ee3a5a5c77a86733b2e2d6845fee91ea5) )
+	ROM_LOAD( "m2500p-vt09-epson,20091222ver05,_30r-sx1067-01_pcb,_12r0cob128m_12001-3d05_fw.bin", 0x00000, 0x1000000, CRC(f7138980) SHA1(de31264ee3a5a5c77a86733b2e2d6845fee91ea5) )
 ROM_END
 
 ROM_START( ii8in1 )
@@ -1587,12 +1587,12 @@ ROM_END
 
 ROM_START( mc_dg101 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "dreamgear 101-in-1(unl)[u][!].prg", 0x00000, 0x400000, CRC(6a7cd8f4) SHA1(9a5ceb8e5e38eb93699dbb14c2c36f3a501d9c45) )
+	ROM_LOAD( "dreamgear 101-in-1.prg", 0x00000, 0x400000, CRC(6a7cd8f4) SHA1(9a5ceb8e5e38eb93699dbb14c2c36f3a501d9c45) )
 ROM_END
 
 ROM_START( mc_aa2 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "100 in 1 arcade action ii (at-103)(unl)[!].prg", 0x00000, 0x400000, CRC(33923995) SHA1(a206e8c0ee6e86adb800cf66697defabcbd01902) )
+	ROM_LOAD( "100 in 1 arcade action ii.prg", 0x00000, 0x400000, CRC(33923995) SHA1(a206e8c0ee6e86adb800cf66697defabcbd01902) )
 ROM_END
 
 ROM_START( mc_105te )
@@ -1602,22 +1602,22 @@ ROM_END
 
 ROM_START( mc_sp69 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "sports game 69-in-1 (unl)[u][!].prg", 0x00000, 0x400000, CRC(1242da7f) SHA1(bb8f99b1f4a4783b3f7e54d74f1f2a6a628da154) )
+	ROM_LOAD( "sports game 69-in-1.prg", 0x00000, 0x400000, CRC(1242da7f) SHA1(bb8f99b1f4a4783b3f7e54d74f1f2a6a628da154) )
 ROM_END
 
 ROM_START( pjoyn50 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "power joy navigator 50-in-1 (unl)[u][!].prg", 0x00000, 0x400000, CRC(d1bbadd4) SHA1(2186c71bcedf6c2eedf58233faa26fca9586aa40) )
+	ROM_LOAD( "power joy navigator 50-in-1.prg", 0x00000, 0x400000, CRC(d1bbadd4) SHA1(2186c71bcedf6c2eedf58233faa26fca9586aa40) )
 ROM_END
 
 ROM_START( pjoys30 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "power joy supermax 30-in-1 (unl)[u][!].prg", 0x00000, 0x400000, CRC(947ac898) SHA1(08bb99a8ad39c56780bc66f4e0a9830fba7372dc) )
+	ROM_LOAD( "power joy supermax 30-in-1.prg", 0x00000, 0x400000, CRC(947ac898) SHA1(08bb99a8ad39c56780bc66f4e0a9830fba7372dc) )
 ROM_END
 
 ROM_START( pjoys60 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "power joy supermax 60-in-1 (unl)[u][!].prg", 0x00000, 0x400000, CRC(1ab45228) SHA1(d148924afc39fc588235331a1a30df6e0d8e1e18) )
+	ROM_LOAD( "power joy supermax 60-in-1.prg", 0x00000, 0x400000, CRC(1ab45228) SHA1(d148924afc39fc588235331a1a30df6e0d8e1e18) )
 ROM_END
 
 ROM_START( sarc110 )
@@ -1633,7 +1633,7 @@ ROM_END
 // CoolBoy AEF-390 8bit Console, B8VPCBVer03 20130703 0401E2015897A
 ROM_START( mc_8x6cb )
 	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "888888-in-1 (coolboy aef-390 8bit console, b8vpcbver03 20130703 0401e2015897a)(unl)[u][!].prg", 0x00000, 0x400000, CRC(ca4bd948) SHA1(cfd6c0b03bb432de43d070100031b223c9ee7496) )
+	ROM_LOAD( "888888-in-1,coolboy aef-390 8bit console, b8vpcbver03 20130703 0401e2015897a.prg", 0x00000, 0x400000, CRC(ca4bd948) SHA1(cfd6c0b03bb432de43d070100031b223c9ee7496) )
 ROM_END
 
 ROM_START( mc_110cb )
@@ -1643,17 +1643,17 @@ ROM_END
 
 ROM_START( mc_138cb )
 	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "138-in-1 coolbaby (coolboy rs-5, pcb060-10009011v1.3)(unl)[u][!].bin", 0x00000, 0x400000, CRC(6b5b1a1a) SHA1(2df0cd717bd0de0b0c973ac356426ddbb0d736fa) )
+	ROM_LOAD( "138-in-1 coolbaby, coolboy rs-5, pcb060-10009011v1.3.bin", 0x00000, 0x400000, CRC(6b5b1a1a) SHA1(2df0cd717bd0de0b0c973ac356426ddbb0d736fa) )
 ROM_END
 
 ROM_START( mc_7x6ss )
 	ROM_REGION( 0x100000, "mainrom", 0 )
-	ROM_LOAD( "777777-in-1 (8 bit slim station, newpxp-dvt22-a pcb)(unl)[u][!].bin", 0x00000, 0x100000, CRC(7790c21a) SHA1(f320f3dd18b88ae5f65bb51f58d4cb869997bab3) )
+	ROM_LOAD( "777777-in-1, 8 bit slim station, newpxp-dvt22-a pcb.bin", 0x00000, 0x100000, CRC(7790c21a) SHA1(f320f3dd18b88ae5f65bb51f58d4cb869997bab3) )
 ROM_END
 
 ROM_START( mc_8x6ss )
 	ROM_REGION( 0x200000, "mainrom", 0 ) // odd size rom, does it need stripping?
-	ROM_LOAD( "888888-in-1 (8 bit slim station, newpxp-dvt22-a pcb)(unl)[u][!].bin", 0x00000, 0x100ce1, CRC(47149d0b) SHA1(5a8733886b550e3235dd90fb415b5a602e967f91) )
+	ROM_LOAD( "888888-in-1, 8 bit slim station, newpxp-dvt22-a pcb.bin", 0x00000, 0x100ce1, CRC(47149d0b) SHA1(5a8733886b550e3235dd90fb415b5a602e967f91) )
 ROM_END
 
 // PXP2 8Bit Slim Station
@@ -1665,7 +1665,7 @@ ROM_END
 // same machine as above? is one of these bad?
 ROM_START( mc_9x6sa )
 	ROM_REGION( 0x200000, "mainrom", 0 )
-	ROM_LOAD( "999999-in-1 (8 bit slim station, newpxp-dvt22-a pcb)(unl)[u][!].bin", 0x00000, 0x200000, CRC(6a47c6a0) SHA1(b4dd376167a57dbee3dea70eb16f1a38e16bcdaa) )
+	ROM_LOAD( "999999-in-1, 8 bit slim station, newpxp-dvt22-a pcb.bin", 0x00000, 0x200000, CRC(6a47c6a0) SHA1(b4dd376167a57dbee3dea70eb16f1a38e16bcdaa) )
 ROM_END
 
 ROM_START( mc_sam60 )
@@ -1675,7 +1675,7 @@ ROM_END
 
 ROM_START( mc_dcat8 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "100-in-1 (d-cat8 8bit console, v5.01.11-frd, bl 20041217)(unl)[u][!].prg", 0x00000, 0x800000, CRC(97d20611) SHA1(d49796e66d7b1dff0ee2781cb0e48b777969d83f) )
+	ROM_LOAD( "100-in-1, d-cat8 8bit console, v5.01.11-frd, bl 20041217.prg", 0x00000, 0x800000, CRC(97d20611) SHA1(d49796e66d7b1dff0ee2781cb0e48b777969d83f) )
 ROM_END
 
 ROM_START( mc_dcat8a )
@@ -1742,7 +1742,7 @@ ROM_END
 
 ROM_START( bittboy )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "bittboy_flash_read_S29GL256N-TF-V2.bin", 0x00000, 0x2000000, CRC(24c802d7) SHA1(c1300ff799b93b9b53060b94d3985db4389c5d3a) )
+	ROM_LOAD( "bittboy_flash_read_s29gl256n-tf-v2.bin", 0x00000, 0x2000000, CRC(24c802d7) SHA1(c1300ff799b93b9b53060b94d3985db4389c5d3a) )
 ROM_END
 
 ROM_START( mc_89in1 )
@@ -1767,32 +1767,32 @@ ROM_END
 
 ROM_START( dvnimbus )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "2012-7-4-V1.BIN", 0x00000, 0x1000000, CRC(a91d7aa6) SHA1(9421b70b281bb630752bc352c3715258044c0bbe) )
+	ROM_LOAD( "2012-7-4-v1.bin", 0x00000, 0x1000000, CRC(a91d7aa6) SHA1(9421b70b281bb630752bc352c3715258044c0bbe) )
 ROM_END
 
 ROM_START( cbrs8 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "RS-8.bin", 0x00000, 0x1000000, BAD_DUMP CRC(10b2bed0) SHA1(0453a1e6769818ccf25dcf22b2c6198a5688a1d4) )
+	ROM_LOAD( "rs-8.bin", 0x00000, 0x1000000, BAD_DUMP CRC(10b2bed0) SHA1(0453a1e6769818ccf25dcf22b2c6198a5688a1d4) )
 ROM_END
 
 ROM_START( mc_tv200 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "S29GL064N90.bin", 0x00000, 0x800000, CRC(ae1905d2) SHA1(11582055713ba937c1ad32c4ada8683eebc1c83c) )
+	ROM_LOAD( "s29gl064n90.bin", 0x00000, 0x800000, CRC(ae1905d2) SHA1(11582055713ba937c1ad32c4ada8683eebc1c83c) )
 ROM_END
 
 ROM_START( fcpocket )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
-	ROM_LOAD( "S29GL01GP.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) )
+	ROM_LOAD( "s29gl01gp.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) )
 ROM_END
 
 ROM_START( mog_m320 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "W25Q64FV.bin", 0x00000, 0x800000, CRC(3c5e1b36) SHA1(4bcbf35ebf2b1714ccde5de758a89a6a39528f89) )
+	ROM_LOAD( "w25q64fv.bin", 0x00000, 0x800000, CRC(3c5e1b36) SHA1(4bcbf35ebf2b1714ccde5de758a89a6a39528f89) )
 ROM_END
 
 ROM_START( fapocket )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "S29GL512N.bin", 0x00000, 0x4000000, CRC(37d0fb06) SHA1(0146a2fae32e23b65d4032c508f0d12cedd399c3) )
+	ROM_LOAD( "s29gl512n.bin", 0x00000, 0x4000000, CRC(37d0fb06) SHA1(0146a2fae32e23b65d4032c508f0d12cedd399c3) )
 ROM_END
 
 ROM_START( zdog )

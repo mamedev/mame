@@ -47,24 +47,18 @@ class konendev_state : public driver_device
 {
 public:
 	konendev_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_gcu(*this, "gcu"),
-			m_eeprom(*this, "eeprom")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gcu(*this, "gcu")
+		, m_eeprom(*this, "eeprom")
 	{ }
 
-	void konendev(machine_config &config);
-	void konendev_map(address_map &map);
-protected:
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<k057714_device> m_gcu;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
-
-public:
 	DECLARE_DRIVER_INIT(konendev);
 	DECLARE_DRIVER_INIT(enchlamp);
 
+	void konendev(machine_config &config);
+
+protected:
 	DECLARE_READ32_MEMBER(mcu2_r);
 	DECLARE_READ32_MEMBER(ifu2_r);
 	DECLARE_READ32_MEMBER(ctrl0_r);
@@ -82,6 +76,14 @@ public:
 	uint8_t rtc_dev_r(uint32_t reg);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void konendev_map(address_map &map);
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<k057714_device> m_gcu;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 uint32_t konendev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -353,11 +355,11 @@ ROM_END
 
 ROM_START( whiterus )
 	ROM_REGION32_BE( 0x200000, "program", 0 )
-	ROM_LOAD32_WORD_SWAP( "01h whr5ra26 (c5df)", 0x00000, 0x080000, CRC(d5a1ebb6) SHA1(14a8d1d8f8ae8919eaa878660c7e97e7ea7a02d8) )
-	ROM_LOAD32_WORD_SWAP( "02l whr5ra26 (bc0a)", 0x00002, 0x080000, CRC(48a2277c) SHA1(965d1da31e3bcde6fda4e15e8980a69e8bce5a84) )
+	ROM_LOAD32_WORD_SWAP( "01h whr5ra26,c5df", 0x00000, 0x080000, CRC(d5a1ebb6) SHA1(14a8d1d8f8ae8919eaa878660c7e97e7ea7a02d8) )
+	ROM_LOAD32_WORD_SWAP( "02l whr5ra26,bc0a", 0x00002, 0x080000, CRC(48a2277c) SHA1(965d1da31e3bcde6fda4e15e8980a69e8bce5a84) )
 
 	ROM_REGION( 0x200000, "others", 0 )
-	ROM_LOAD( "u190.4 2v02s502.ifu_rus (95 7)", 0x0000, 0x080000, CRC(36122a98) SHA1(3d2c40c9d504358d890364e26c9562e40314d8a4) )
+	ROM_LOAD( "u190.4 2v02s502.ifu_rus,95 7", 0x0000, 0x080000, CRC(36122a98) SHA1(3d2c40c9d504358d890364e26c9562e40314d8a4) )
 	ROM_LOAD( "2v02s502_ifu.bin", 0x0000, 0x080000, CRC(36122a98) SHA1(3d2c40c9d504358d890364e26c9562e40314d8a4) ) // was in 2V02S502_IFU.zip looks similar to above tho
 
 	ROM_REGION32_BE( 0x1800000, "flash", ROMREGION_ERASE00 )

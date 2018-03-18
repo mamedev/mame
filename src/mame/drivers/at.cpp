@@ -1359,8 +1359,8 @@ ROM_END
 // Sanyo MBC-28
 ROM_START( mbc28 ) // Complains about missing mouse hardware
 	ROM_REGION(0x20000,"bios", 0)
-	ROM_LOAD16_BYTE( "mbc-28_sl-dt_ver.1620_low_din_checksum_(454f00)_27c256-15.bin", 0x10000, 0x8000, CRC(423b4693) SHA1(08e877baa59ebd9a1817dcdd27138c638edcbb84) )
-	ROM_LOAD16_BYTE( "mbc-28_sl-dt_ver.1620_high_din_checksum_(45ae00)_27c256-15.bin", 0x10001, 0x8000, CRC(557b7346) SHA1(c0dca88627f8451211172441fefb4020839fb87f) )
+	ROM_LOAD16_BYTE( "mbc-28_sl-dt_ver.1620_low_din_checksum,454f00,27c256-15.bin", 0x10000, 0x8000, CRC(423b4693) SHA1(08e877baa59ebd9a1817dcdd27138c638edcbb84) )
+	ROM_LOAD16_BYTE( "mbc-28_sl-dt_ver.1620_high_din_checksum,45ae00,27c256-15.bin", 0x10001, 0x8000, CRC(557b7346) SHA1(c0dca88627f8451211172441fefb4020839fb87f) )
 ROM_END
 
 // Siemens PCD-2

@@ -2909,7 +2909,7 @@ ROM_START( pwrshovla )
 	ROM_LOAD( "e74-08.ic8", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) ) // located on the I/O PCB
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "POWER SHOVEL VER.2.07J", 0, SHA1(05410d4b4972262ef93400b02f21dd17d10b1c5e) )
+	DISK_IMAGE( "power shovel ver.2.07j", 0, SHA1(05410d4b4972262ef93400b02f21dd17d10b1c5e) )
 ROM_END
 
 ROM_START( raizpin )
@@ -2939,7 +2939,7 @@ ROM_START( raizpinj )
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "RAIZIN PING PONG VER 2.01J", 0, SHA1(eddc803c2507d19f0a3e3cc217bb22a565c04f3e) )
+	DISK_IMAGE( "raizin ping pong ver 2.01j", 0, SHA1(eddc803c2507d19f0a3e3cc217bb22a565c04f3e) )
 ROM_END
 
 ROM_START( styphp )

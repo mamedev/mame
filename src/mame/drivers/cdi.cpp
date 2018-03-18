@@ -1207,7 +1207,7 @@ ROM_START( quizard3 ) /* CD-ROM printed ??/?? */
 	DISK_IMAGE_READONLY( "quizard34", 0, BAD_DUMP SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
 
 	ROM_REGION(0x1000, "mcu", 0) // d8751h
-	ROM_LOAD( "DE132D3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // confirmed good on original hardware
+	ROM_LOAD( "de132d3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // confirmed good on original hardware
 ROM_END
 
 ROM_START( quizard3_32 )
@@ -1224,7 +1224,7 @@ ROM_START( quizard3_32 )
 	DISK_IMAGE_READONLY( "quizard32", 0, BAD_DUMP SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
 
 	ROM_REGION(0x1000, "mcu", 0) // d8751h
-	ROM_LOAD( "DE132D3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // confirmed good on original hardware
+	ROM_LOAD( "de132d3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // confirmed good on original hardware
 ROM_END
 
 

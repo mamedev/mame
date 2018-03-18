@@ -64,9 +64,9 @@
     the current value in the input register and initiates a read.
 
     TODO:
-    * PSW overflow bits
+    * PSW overflow bits - are they sticky, how are they reset?
     * Clarify rounding behaviour (F2 1011)
-    * Random condition
+    * Random condition (CON 01000/01001)
     * Clarify serial behaviour
     * Serial input
     * More serial I/O signals
@@ -194,9 +194,9 @@ dsp16_device_base::dsp16_device_base(
 	, m_yaau_r{ 0U, 0U, 0U, 0U }, m_yaau_rb(0U), m_yaau_re(0U), m_yaau_j(0), m_yaau_k(0)
 	, m_dau_x(0), m_dau_y(0), m_dau_p(0), m_dau_a{ 0, 0 }, m_dau_c{ 0, 0, 0 }, m_dau_auc(0U), m_dau_psw(0U), m_dau_temp(0)
 	, m_sio_sioc(0U), m_sio_obuf(0U), m_sio_osr(0U), m_sio_ofsr(0U)
-	, m_sio_clk(1U), m_sio_clk_div(0U), m_sio_ld(1U), m_sio_ld_div(0U), m_sio_flags(SIO_FLAGS_NONE)
+	, m_sio_clk(1U), m_sio_clk_div(0U), m_sio_clk_res(0U), m_sio_ld(1U), m_sio_ld_div(0U), m_sio_flags(SIO_FLAGS_NONE)
 	, m_pio_pioc(0U), m_pio_pdx_in(0U), m_pio_pdx_out(0U), m_pio_pids_cnt(0U), m_pio_pods_cnt(0U)
-	, m_cache_pcbase(0U), m_st_pcbase(0U), m_st_yh(0), m_st_ah{ 0, 0 }, m_st_yl(0U), m_st_al{ 0U, 0U }
+	, m_cache_pcbase(0U), m_st_pcbase(0U), m_st_genflags(0U), m_st_yh(0), m_st_ah{ 0, 0 }, m_st_yl(0U), m_st_al{ 0U, 0U }
 {
 }
 
@@ -234,6 +234,7 @@ void dsp16_device_base::device_start()
 
 	state_add(STATE_GENPC, "PC", m_xaau_pc);
 	state_add(STATE_GENPCBASE, "CURPC", m_st_pcbase).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_st_genflags).mask(0x0fU).noshow().callexport().formatstr("%16s");
 	state_add(DSP16_PT, "PT", m_xaau_pt);
 	state_add(DSP16_PR, "PR", m_xaau_pr);
 	state_add(DSP16_PI, "PI", m_xaau_pi);
@@ -315,6 +316,7 @@ void dsp16_device_base::device_start()
 	save_item(NAME(m_sio_ofsr));
 	save_item(NAME(m_sio_clk));
 	save_item(NAME(m_sio_clk_div));
+	save_item(NAME(m_sio_clk_res));
 	save_item(NAME(m_sio_ld));
 	save_item(NAME(m_sio_ld_div));
 	save_item(NAME(m_sio_flags));
@@ -347,6 +349,7 @@ void dsp16_device_base::device_reset()
 	m_sio_ofsr = 0U;
 	m_sio_clk = 1U;
 	m_sio_clk_div = 0U;
+	m_sio_clk_res = 0U;
 	m_pio_pioc = 0x0008U;
 	m_pio_pids_cnt = 0U;
 	m_pio_pods_cnt = 0U;
@@ -424,13 +427,7 @@ void dsp16_device_base::execute_run()
 				if (active)
 					sio_ock_active_edge();
 			}
-			switch ((m_sio_sioc >> 7) & 0x0003U)
-			{
-			case 0x0: m_sio_clk_div = (4 / 4) - 1; break; // CKI÷4
-			case 0x1: m_sio_clk_div = (12 / 4) - 1; break; // CKI÷12
-			case 0x2: m_sio_clk_div = (16 / 4) - 1; break; // CKI÷16
-			case 0x3: m_sio_clk_div = (20 / 4) - 1; break; // CKI÷20
-			}
+			m_sio_clk_div = m_sio_clk_res;
 		}
 
 		// udpate parallel input strobe
@@ -616,13 +613,88 @@ void dsp16_device_base::state_export(device_state_entry const &entry)
 	}
 }
 
+void dsp16_device_base::state_string_export(device_state_entry const &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+	// show DAU flags
+	case STATE_GENFLAGS:
+		str = util::string_format(
+				"%s%s%s%s",
+				dau_psw_lmi() ? "LMI " : "",
+				dau_psw_leq() ? "LEQ " : "",
+				dau_psw_llv() ? "LLV " : "",
+				dau_psw_lmv() ? "LMV " : "");
+		break;
+	}
+}
+
 /***********************************************************************
     device_disasm_interface implementation
 ***********************************************************************/
 
 util::disasm_interface *dsp16_device_base::create_disassembler()
 {
-	return new dsp16_disassembler;
+	return new dsp16_disassembler(*this);
+}
+
+/***********************************************************************
+    dsp16_disassembler::cpu implementation
+***********************************************************************/
+
+dsp16_disassembler::cpu::predicate dsp16_device_base::check_con(offs_t pc, u16 op) const
+{
+	if (pc != m_st_pcbase)
+	{
+		return predicate::INDETERMINATE;
+	}
+	else
+	{
+		bool result;
+		u16 const con(op_con(op));
+		switch (con >> 1)
+		{
+		case 0x0: // mi/pl
+			result = dau_psw_lmi();
+			break;
+		case 0x1: // eq/ne
+			result = dau_psw_leq();
+			break;
+		case 0x2: // lvs/lvc
+			result = dau_psw_llv();
+			break;
+		case 0x3: // mvs/mvc
+			result = dau_psw_lmv();
+			break;
+		case 0x4: // heads/tails
+			return predicate::INDETERMINATE; // FIXME: implement PRNG
+		case 0x5: // c0ge/c0lt
+		case 0x6: // c1ge/c1lt
+			result = 0 <= m_dau_c[(con >> 1) - 0x05];
+			break;
+		case 0x7: // true/false
+			result = true;
+			break;
+		case 0x8: // gt/le
+			result = !dau_psw_lmi() && !dau_psw_leq();
+			break;
+		default: // Reserved
+			return predicate::INDETERMINATE;
+		}
+		return (bool(BIT(con, 0)) == result) ? predicate::SKIPPED : predicate::TAKEN;
+	}
+}
+
+dsp16_disassembler::cpu::predicate dsp16_device_base::check_branch(offs_t pc) const
+{
+	if (pc != m_st_pcbase)
+		return predicate::INDETERMINATE;
+	else if (FLAGS_PRED_TRUE == (m_flags & FLAGS_PRED_MASK))
+		return predicate::TAKEN;
+	else if (FLAGS_PRED_FALSE == (m_flags & FLAGS_PRED_MASK))
+		return predicate::SKIPPED;
+	else
+		return predicate::INDETERMINATE;
 }
 
 template <offs_t Base> READ16_MEMBER(dsp16_device_base::external_memory_r)
@@ -663,7 +735,36 @@ inline void dsp16_device_base::execute_one_rom()
 
 	case phase::OP1:
 		if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-			debugger_instruction_hook(this, m_st_pcbase);
+		{
+			if (FLAGS_PRED_NONE == (m_flags & FLAGS_PRED_MASK))
+			{
+				debugger_instruction_hook(this, m_st_pcbase);
+			}
+			else
+			{
+				switch (op >> 11)
+				{
+				case 0x00: // goto JA
+				case 0x01:
+				case 0x10: // call JA
+				case 0x11:
+					break;
+				case 0x18: // goto B
+					switch (op_b(op))
+					{
+					case 0x0: // return
+					case 0x2: // goto pt
+					case 0x3: // call pt
+						break;
+					default:
+						debugger_instruction_hook(this, m_st_pcbase);
+					}
+					break;
+				default:
+					debugger_instruction_hook(this, m_st_pcbase);
+				}
+			}
+		}
 
 		// IACK is updated for the next instruction
 		switch (m_flags & FLAGS_IACK_MASK)
@@ -842,7 +943,7 @@ inline void dsp16_device_base::execute_one_rom()
 				++m_dau_c[1];
 				if (con)
 				{
-					op_dau_ad(op) = dau_f2(op);
+					dau_f2(op);
 					m_dau_c[2] = m_dau_c[1];
 				}
 			}
@@ -850,7 +951,7 @@ inline void dsp16_device_base::execute_one_rom()
 
 		case 0x13: // if CON F2
 			if (op_dau_con(op, true))
-				op_dau_ad(op) = dau_f2(op);
+				dau_f2(op);
 			break;
 
 		case 0x14: // F1 ; Y = y[l]
@@ -1172,7 +1273,7 @@ inline void dsp16_device_base::execute_one_cache()
 				++m_dau_c[1];
 				if (con)
 				{
-					op_dau_ad(op) = dau_f2(op);
+					dau_f2(op);
 					m_dau_c[2] = m_dau_c[1];
 				}
 			}
@@ -1180,7 +1281,7 @@ inline void dsp16_device_base::execute_one_cache()
 
 		case 0x13: // if CON F2
 			if (op_dau_con(op, true))
-				op_dau_ad(op) = dau_f2(op);
+				dau_f2(op);
 			break;
 
 		case 0x14: // F1 ; Y = y[l]
@@ -1487,10 +1588,10 @@ inline u64 dsp16_device_base::dau_f1(u16 op)
 	return set_dau_psw_flags(d);
 }
 
-inline u64 dsp16_device_base::dau_f2(u16 op)
+inline void dsp16_device_base::dau_f2(u16 op)
 {
 	s64 const &s(op_dau_as(op));
-	s64 d(0);
+	s64 &d(op_dau_ad(op));
 	switch (op_f2(op))
 	{
 	case 0x0: // aD = aS >> 1
@@ -1548,7 +1649,7 @@ inline u64 dsp16_device_base::dau_f2(u16 op)
 		d = -s;
 		break;
 	}
-	return set_dau_psw_flags(d);
+	d = set_dau_psw_flags(d);
 }
 
 /***********************************************************************
@@ -1878,7 +1979,7 @@ inline bool dsp16_device_base::op_dau_con(u16 op, bool inc)
 	case 0x6: // c1ge/c1lt
 		{
 			s8 &c(m_dau_c[(con >> 1) - 0x05]);
-			result = c >= 0;
+			result = 0 <= c;
 			if (inc)
 				++c;
 		}
@@ -1889,7 +1990,7 @@ inline bool dsp16_device_base::op_dau_con(u16 op, bool inc)
 	case 0x8: // gt/le
 		result = !dau_psw_lmi() && !dau_psw_leq();
 		break;
-	default:
+	default: // Reserved
 		throw emu_fatalerror("DSP16: reserved CON value %02X (PC = %04X)\n", con, m_st_pcbase);
 	}
 	return BIT(con, 0) ? !result : result;
@@ -1920,19 +2021,35 @@ void dsp16_device_base::sio_sioc_write(u16 value)
 			sio_ilen(), BIT(value, 0) ? 8U : 16U,
 			m_st_pcbase);
 
-	//bool const ock_change(BIT(value ^ m_sio_sioc, 5));
-	//bool const ild_change(BIT(value ^ m_sio_sioc, 4));
+	bool const old_change(BIT(value ^ m_sio_sioc, 5));
+	bool const ild_change(BIT(value ^ m_sio_sioc, 4));
 	bool const ock_change(BIT(value ^ m_sio_sioc, 3));
 	bool const ick_change(BIT(value ^ m_sio_sioc, 2));
 	m_sio_sioc = value;
 
 	// we're using treating high-impedance and high as the same thing
+	if (!m_sio_ld)
+	{
+		if (ild_change)
+			m_ild_cb(sio_ild_active() ? 0 : 1);
+		if (old_change)
+			m_old_cb(sio_old_active() ? 0 : 1);
+	}
 	if (!m_sio_clk)
 	{
 		if (ick_change)
 			m_ick_cb(sio_ick_active() ? 0 : 1);
 		if (ock_change)
 			m_ock_cb(sio_ock_active() ? 0 : 1);
+	}
+
+	// precalculate divider preload
+	switch ((value >> 7) & 0x0003U)
+	{
+	case 0x0: m_sio_clk_res = (4 / 4) - 1; break; // CKI÷4
+	case 0x1: m_sio_clk_res = (12 / 4) - 1; break; // CKI÷12
+	case 0x2: m_sio_clk_res = (16 / 4) - 1; break; // CKI÷16
+	case 0x3: m_sio_clk_res = (20 / 4) - 1; break; // CKI÷20
 	}
 }
 

@@ -29,15 +29,41 @@ class deco156_state : public driver_device
 {
 public:
 	deco156_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_deco_tilegen1(*this, "tilegen1"),
-			m_oki1(*this, "oki1"),
-			m_oki2(*this, "oki2"),
-			m_sprgen(*this, "spritegen"),
-			m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_deco_tilegen1(*this, "tilegen1")
+		, m_oki1(*this, "oki1")
+		, m_oki2(*this, "oki2")
+		, m_sprgen(*this, "spritegen")
+		, m_palette(*this, "palette")
 	{ }
 
+	DECLARE_DRIVER_INIT(hvysmsh);
+	DECLARE_DRIVER_INIT(wcvol95);
+
+	void hvysmsh(machine_config &config);
+	void wcvol95(machine_config &config);
+
+protected:
+	DECLARE_WRITE32_MEMBER(hvysmsh_eeprom_w);
+	DECLARE_READ32_MEMBER(pf1_rowscroll_r);
+	DECLARE_READ32_MEMBER(pf2_rowscroll_r);
+	DECLARE_READ32_MEMBER(spriteram_r);
+	DECLARE_WRITE32_MEMBER(pf1_rowscroll_w);
+	DECLARE_WRITE32_MEMBER(pf2_rowscroll_w);
+	DECLARE_WRITE32_MEMBER(spriteram_w);
+	DECLARE_WRITE32_MEMBER(hvysmsh_oki_0_bank_w);
+	virtual void video_start() override;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
+	void descramble_sound( const char *tag );
+	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
+
+	void hvysmsh_map(address_map &map);
+	void wcvol95_map(address_map &map);
+
+private:
 	/* devices */
 	required_device<arm_cpu_device> m_maincpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
@@ -50,26 +76,6 @@ public:
 	uint16_t   m_pf1_rowscroll[0x800/2];
 	uint16_t   m_pf2_rowscroll[0x800/2];
 	std::unique_ptr<uint16_t[]> m_spriteram;
-	DECLARE_WRITE32_MEMBER(hvysmsh_eeprom_w);
-	DECLARE_READ32_MEMBER(pf1_rowscroll_r);
-	DECLARE_READ32_MEMBER(pf2_rowscroll_r);
-	DECLARE_READ32_MEMBER(spriteram_r);
-	DECLARE_WRITE32_MEMBER(pf1_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(pf2_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(spriteram_w);
-	DECLARE_WRITE32_MEMBER(hvysmsh_oki_0_bank_w);
-	DECLARE_DRIVER_INIT(hvysmsh);
-	DECLARE_DRIVER_INIT(wcvol95);
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
-	void descramble_sound( const char *tag );
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
-	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
-	void hvysmsh(machine_config &config);
-	void wcvol95(machine_config &config);
-	void hvysmsh_map(address_map &map);
-	void wcvol95_map(address_map &map);
 };
 
 
@@ -612,8 +618,8 @@ ROM_START( wcvol95 )
 //  ROM_LOAD( "93c46.3k",    0x00, 0x80, CRC(88f8e270) SHA1(cb82203ad38e0c12ea998562b7b785979726afe5) )
 
 	ROM_REGION( 0x200, "gals", 0 )
-	ROM_LOAD( "GAL16V8B.10J.bin",    0x000, 0x117,  CRC(06bbcbd5) SHA1(f7adb4bca13bb799bc42411eb178edfdc11a76c7) )
-	ROM_LOAD( "GAL16V8B.5D.bin",     0x000, 0x117,  CRC(117784f0) SHA1(daf3720740621fc3af49333c96795718b693f4d2))
+	ROM_LOAD( "gal16v8b.10j.bin",    0x000, 0x117,  CRC(06bbcbd5) SHA1(f7adb4bca13bb799bc42411eb178edfdc11a76c7) )
+	ROM_LOAD( "gal16v8b.5d.bin",     0x000, 0x117,  CRC(117784f0) SHA1(daf3720740621fc3af49333c96795718b693f4d2))
 ROM_END
 
 
@@ -635,8 +641,8 @@ ROM_START( wcvol95x )
 	ROM_LOAD( "mbx-03.13j",    0x00000, 0x200000,  CRC(061632bc) SHA1(7900ac56e59f4a4e5768ce72f4a4b7c5875f5ae8) )
 
 	ROM_REGION( 0x200, "gals", 0 )
-	ROM_LOAD( "GAL16V8B.10J.bin",    0x000, 0x117,  CRC(06bbcbd5) SHA1(f7adb4bca13bb799bc42411eb178edfdc11a76c7) )
-	ROM_LOAD( "GAL16V8B.5D.bin",     0x000, 0x117,  CRC(117784f0) SHA1(daf3720740621fc3af49333c96795718b693f4d2))
+	ROM_LOAD( "gal16v8b.10j.bin",    0x000, 0x117,  CRC(06bbcbd5) SHA1(f7adb4bca13bb799bc42411eb178edfdc11a76c7) )
+	ROM_LOAD( "gal16v8b.5d.bin",     0x000, 0x117,  CRC(117784f0) SHA1(daf3720740621fc3af49333c96795718b693f4d2))
 ROM_END
 
 

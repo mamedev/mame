@@ -9773,7 +9773,7 @@ scudhamm                        // (c) 1994 Jaleco
 wildplt                         // (c) 1992 Jaleco
 
 @source:cit101.cpp
-cit101                          // (c) 1981 C. Itoh
+cit101                          // (c) 1980 C. Itoh
 
 @source:cit220.cpp
 cit220p                         // (c) 1984 C. Itoh
@@ -10199,6 +10199,7 @@ sf2rk                           // bootleg
 sf2rules                        // bootleg
 sf2stt                          // bootleg
 sf2thndr                        // hack
+sf2thndr2                       // bootleg
 sf2ua                           // 06/02/1991 (c) 1991 (USA)
 sf2ub                           // 14/02/1991 (c) 1991 (USA)
 sf2uc                           // 06/03/1991 (c) 1991 (USA)
@@ -13272,6 +13273,7 @@ redufob                         // bootleg
 scobra                          // GX316 (c) 1981 Konami
 scobrab                         // GX316 (c) 1981 Karateco (bootleg?)
 scobrae                         // GX316 (c) 1981 Stern
+scobrag                         // AVG by Zaccaria (bootleg?)
 scobras                         // GX316 (c) 1981 Stern
 scobrase                        // GX316 (c) 1981 Sega
 scorpion                        // (c) 1982 Zaccaria
@@ -14180,6 +14182,7 @@ star100                         // (c) 199? Sang Ho
 super7                          // bootleg (New Impeuropex?)
 super9                          // (c) 2001 Playmark
 super972                        // unknown
+tcl                             // (c) 1995 Uniwang
 tonypok                         // (c) 1991 Corsica
 unkch1                          // bootleg
 unkch2                          // bootleg
@@ -15153,6 +15156,9 @@ hp85                            //
 
 @source:hshavoc.cpp
 hshavoc                         // (c) 1993 Data East
+
+@source:ht6000.cpp
+ht6000							// 1987 Casio
 
 @source:ht68k.cpp
 ht68k                           //
@@ -17790,6 +17796,9 @@ lbeach                          // (c) 1979 Olympia / Seletron
 lc80                            //
 lc80_2                          //
 sc80                            //
+
+@source:lckydraw.cpp
+lckydraw                        // (c) 1979 Mirco
 
 @source:lcmate2.cpp
 lcmate2                         //
@@ -32670,8 +32679,8 @@ jumping                         // bootleg
 jumpinga                        // bootleg (Seyutu)
 jumpingi                        // bootleg (Seyutu / Imnoe)
 rbisland                        // B22 (c) 1987 Taito Corporation
-rbislande                       // B39 (c) 1988 Taito Corporation
 rbislando                       // B22 (c) 1987 Taito Corporation
+rbislande                       // B39 (c) 1988 Taito Corporation
 
 @source:rbmk.cpp
 rbmk                            // (c) 1998 GMS
@@ -33003,6 +33012,7 @@ esha_lg1                        //
 esha_lg2                        //
 esha_ma3                        //
 esha_pa1                        //
+esha_pa4                        //
 esha_pr4                        //
 jokrz_l3                        //
 jokrz_l6                        //
@@ -36569,9 +36579,6 @@ tbowlp                          // Suspected proto of Japanese version for US Ma
 @source:tceptor.cpp
 tceptor                         // (c) 1986
 tceptor2                        // (c) 1986
-
-@source:tcl.cpp
-tcl                             // (c) 1995 Uniwang
 
 @source:tdv2324.cpp
 tdv2324                         //

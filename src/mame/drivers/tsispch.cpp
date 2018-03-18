@@ -515,16 +515,16 @@ ROM_START( prose2ko )
 	// 'Older' prose2k set
 	ROM_REGION(0x100000,"maincpu", 0)
 	// prose 2000 firmware version 1.1
-	ROMX_LOAD( "v1.1__6__speech__plus__(c)1983.am2764.6.u24",   0xec000, 0x2000, CRC(c881f92d) SHA1(2d4eb96360adac54d4f0110595bfaf682280c1ca),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__7__speech__plus__(c)1983.am2764.7.u47",   0xec001, 0x2000, CRC(4d5771cb) SHA1(55ed59ad1cad154804dbeeebed98f062783c33c3),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__8__speech__plus__(c)1983.am2764.8.u25",   0xf0000, 0x2000, CRC(adf9bfb8) SHA1(0b73561b52b388b740fabf07ada2d70a52f22037),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__9__speech__plus__(c)1983.am2764.9.u48",   0xf0001, 0x2000, CRC(355f97d2) SHA1(7655fc55b577821e0bd8bf81fb74b8a20b1df098),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__10__speech__plus__(c)1983.am2764.10.u26", 0xf4000, 0x2000, CRC(949a0344) SHA1(8e33c69dfc413aea95f166b08902ad97b1e3e980),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__11__speech__plus__(c)1983.am2764.11.u49", 0xf4001, 0x2000, CRC(ad9a0670) SHA1(769f2f8696c7b6907706466aa9ab7a897ed9f889),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__12__speech__plus__(c)1983.am2764.12.u27", 0xf8000, 0x2000, CRC(9eaf9378) SHA1(d296b1d347c03e6123c38c208ead25b1f43b9859),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__13__speech__plus__(c)1983.am2764.13.u50", 0xf8001, 0x2000, CRC(5e173667) SHA1(93230c2fede5095f56e10d20ea36a5a45a1e7356),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__14__speech__plus__(c)1983.am2764.14.u28", 0xfc000, 0x2000, CRC(e616bd6e) SHA1(5dfae2c5079d89f791c9d7166f9504231a464203),ROM_SKIP(1))
-	ROMX_LOAD( "v1.1__15__speech__plus__(c)1983.am2764.15.u51", 0xfc001, 0x2000, CRC(beb1fa19) SHA1(72130fe45c3fd3de7cf794936dc68ed2d4193daf),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__6__speech__plus__=c=1983.am2764.6.u24",   0xec000, 0x2000, CRC(c881f92d) SHA1(2d4eb96360adac54d4f0110595bfaf682280c1ca),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__7__speech__plus__=c=1983.am2764.7.u47",   0xec001, 0x2000, CRC(4d5771cb) SHA1(55ed59ad1cad154804dbeeebed98f062783c33c3),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__8__speech__plus__=c=1983.am2764.8.u25",   0xf0000, 0x2000, CRC(adf9bfb8) SHA1(0b73561b52b388b740fabf07ada2d70a52f22037),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__9__speech__plus__=c=1983.am2764.9.u48",   0xf0001, 0x2000, CRC(355f97d2) SHA1(7655fc55b577821e0bd8bf81fb74b8a20b1df098),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__10__speech__plus__=c=1983.am2764.10.u26", 0xf4000, 0x2000, CRC(949a0344) SHA1(8e33c69dfc413aea95f166b08902ad97b1e3e980),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__11__speech__plus__=c=1983.am2764.11.u49", 0xf4001, 0x2000, CRC(ad9a0670) SHA1(769f2f8696c7b6907706466aa9ab7a897ed9f889),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__12__speech__plus__=c=1983.am2764.12.u27", 0xf8000, 0x2000, CRC(9eaf9378) SHA1(d296b1d347c03e6123c38c208ead25b1f43b9859),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__13__speech__plus__=c=1983.am2764.13.u50", 0xf8001, 0x2000, CRC(5e173667) SHA1(93230c2fede5095f56e10d20ea36a5a45a1e7356),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__14__speech__plus__=c=1983.am2764.14.u28", 0xfc000, 0x2000, CRC(e616bd6e) SHA1(5dfae2c5079d89f791c9d7166f9504231a464203),ROM_SKIP(1))
+	ROMX_LOAD( "v1.1__15__speech__plus__=c=1983.am2764.15.u51", 0xfc001, 0x2000, CRC(beb1fa19) SHA1(72130fe45c3fd3de7cf794936dc68ed2d4193daf),ROM_SKIP(1))
 
 	// TSI/Speech plus DSP firmware v?.? (no sticker, but S140025 printed on chip), unlabeled chip, but clearly a NEC UPD7720C ceramic
 	// NOT DUMPED YET, using the 3.12 dsp firmware as a placeholder, since the dsp on the older board is MASK ROM and doesn't dump easily
