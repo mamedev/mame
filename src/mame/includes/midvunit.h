@@ -68,7 +68,8 @@ public:
 		m_midway_serial_pic2(*this, "serial_pic2"),
 		m_midway_ioasic(*this, "ioasic"),
 		m_dcs(*this, "dcs"),
-		m_generic_paletteram_32(*this, "paletteram") { }
+		m_generic_paletteram_32(*this, "paletteram"),
+		m_optional_drivers(*this, "lamp%u", 0U) { }
 
 	optional_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_ram_base;
@@ -100,7 +101,7 @@ public:
 	const char *m_galil_input;
 	uint8_t m_galil_output_index;
 	char m_galil_output[450];
-	uint32_t m_wheel_board_output;
+	uint8_t m_wheel_board_output;
 	uint32_t m_wheel_board_last;
 	uint32_t m_wheel_board_u8_latch;
 	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
@@ -165,6 +166,7 @@ public:
 	optional_device<midway_ioasic_device> m_midway_ioasic;
 	required_device<dcs_audio_device> m_dcs;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+	output_finder<8> m_optional_drivers;
 	void postload();
 
 	void midvcommon(machine_config &config);
