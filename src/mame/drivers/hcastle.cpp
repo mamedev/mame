@@ -81,11 +81,7 @@ void hcastle_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9800, 0x987f).rw("k051649", FUNC(k051649_device::k051649_waveform_r), FUNC(k051649_device::k051649_waveform_w));
-	map(0x9880, 0x9889).w("k051649", FUNC(k051649_device::k051649_frequency_w));
-	map(0x988a, 0x988e).w("k051649", FUNC(k051649_device::k051649_volume_w));
-	map(0x988f, 0x988f).w("k051649", FUNC(k051649_device::k051649_keyonoff_w));
-	map(0x98e0, 0x98ff).rw("k051649", FUNC(k051649_device::k051649_test_r), FUNC(k051649_device::k051649_test_w));
+	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xc000, 0xc000).w(this, FUNC(hcastle_state::sound_bank_w)); /* 7232 bankswitch */
