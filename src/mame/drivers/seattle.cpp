@@ -280,7 +280,9 @@ public:
 		m_dcs(*this, "dcs"),
 		m_ethernet(*this, "ethernet"),
 		m_ioasic(*this, "ioasic"),
-		m_io_analog(*this, "AN%u", 0)
+		m_io_analog(*this, "AN%u", 0),
+		m_lamps(*this, "lamp%u", 0U),
+		m_leds(*this, "led%u", 0U)
 		{}
 
 	required_device<nvram_device> m_nvram;
@@ -290,6 +292,8 @@ public:
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
+	output_finder<16> m_lamps;
+	output_finder<24> m_leds;
 
 	widget_data m_widget;
 	uint32_t m_interrupt_enable;
@@ -305,7 +309,7 @@ public:
 	uint8_t m_pending_analog_read;
 	uint8_t m_status_leds;
 	uint32_t m_cmos_write_enabled;
-	uint32_t m_output;
+	uint16_t m_output_last;
 	uint8_t m_output_mode;
 	uint32_t m_gear;
 	int8_t m_wheel_force;
@@ -426,10 +430,13 @@ void seattle_state::machine_start()
 	save_item(NAME(m_pending_analog_read));
 	save_item(NAME(m_status_leds));
 	save_item(NAME(m_cmos_write_enabled));
-	save_item(NAME(m_output));
+	save_item(NAME(m_output_last));
 	save_item(NAME(m_output_mode));
 	save_item(NAME(m_gear));
 	save_item(NAME(m_wheel_calibrated));
+	
+	m_lamps.resolve();
+	m_leds.resolve();
 }
 
 
@@ -671,33 +678,28 @@ WRITE32_MEMBER(seattle_state::analog_port_w)
 *************************************/
 WRITE32_MEMBER(seattle_state::wheel_board_w)
 {
-	//logerror("wheel_board_w: data = %08x\n", data);
-	/* two writes in pairs. flag off first, on second. arg remains the same. */
-	bool flag = (data & (1 << 11));
-	uint8_t op = (data >> 8) & 0x7;
-	uint8_t arg = data & 0xff;
+	//logerror("wheel_board_w: data = %08X\n", data);
+	uint8_t arg = data & 0xFF;
 
-	if (flag)
+	if (!BIT(m_output_last, 11) && BIT(data, 11)) // output latch
 	{
-		switch (op)
+		if (BIT(data, 10))
 		{
-		case 0x0:
-			machine().output().set_value("wheel", arg); // target wheel angle. signed byte.
+			uint8_t base = BIT(data, 8) << 3;
+			for (uint8_t bit = 0; bit < 8; bit++)
+				m_lamps[base | bit] = BIT(arg, bit);
+		}
+		else if (BIT(data, 9) || BIT(data, 8))
+		{
+			logerror("%08X:wheel_board_w(%d) = %08X\n", m_maincpu->pc(), offset, data);
+		}
+		else
+		{
+			output().set_value("wheel", arg); // target wheel angle. signed byte.
 			m_wheel_force = int8_t(arg);
-			//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
-			break;
-
-		case 0x4:
-			for (uint8_t bit = 0; bit < 8; bit++)
-				machine().output().set_lamp_value(bit, (arg >> bit) & 0x1);
-			break;
-
-		case 0x5:
-			for (uint8_t bit = 0; bit < 8; bit++)
-				machine().output().set_lamp_value(8 + bit, (arg >> bit) & 0x1);
-			break;
 		}
 	}
+	m_output_last = data;
 }
 
 /*************************************
@@ -829,61 +831,57 @@ void seattle_state::update_widget_irq()
 
 READ32_MEMBER(seattle_state::output_r)
 {
-	return m_output;
+	logerror("%08X:output_r(%d)\n", m_maincpu->pc(), offset);
+	return 0;
 }
 
 
 WRITE32_MEMBER(seattle_state::output_w)
 {
-	uint8_t op = (data >> 8) & 0xF;
 	uint8_t arg = data & 0xFF;
-
-	switch (op)
+	
+	if (!BIT(m_output_last, 11) && BIT(data, 11))
+		m_output_mode = arg;
+	m_output_last = data;
+	
+	if (!BIT(data, 10))
 	{
-		default:
-			logerror("Unknown output (%02X) = %02X\n", op, arg);
-			break;
+		switch (m_output_mode)
+		{
+			default:
+				logerror("%08X:output_w(%d) = %04X\n", m_maincpu->pc(), m_output_mode, data);
+				break;
 
-		case 0xF: break; // sync/security wrapper commands. arg matches the wrapped command.
+			case 0x04:
+				output().set_value("wheel", arg); // wheel motor delta. signed byte.
+				m_wheel_force = int8_t(~arg);
+				//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
+				break;
 
-		case 0x7:
-			m_output_mode = arg;
-			break;
+			case 0x05:
+				for (uint8_t bit = 0; bit < 8; bit++)
+					m_lamps[bit] = BIT(arg, bit);
+				break;
 
-		case 0xB:
-			switch (m_output_mode)
-			{
-				default:
-					logerror("Unknown output with mode (%02X) = %02X\n", m_output_mode, arg);
-					break;
+			case 0x06: // Hyperdrive LEDs 0-7
+				for (uint8_t bit = 0; bit < 8; bit++)
+					m_leds[bit] = BIT(arg, bit);
+				break;
 
-				case 0x04:
-					output().set_value("wheel", arg); // wheel motor delta. signed byte.
-					m_wheel_force = int8_t(~arg);
-					//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
-					break;
+			case 0x07: // Hyperdrive LEDs 8-15
+				for (uint8_t bit = 0; bit < 8; bit++)
+					m_leds[8 | bit] = BIT(arg, bit);
+				break;
 
-				case 0x05:
-					for (uint8_t bit = 0; bit < 8; bit++)
-						output().set_lamp_value(bit, (arg >> bit) & 0x1);
-					break;
-
-				case 0x06: // Hyperdrive LEDs 0-7
-					for (uint8_t bit = 0; bit < 8; bit++)
-						output().set_led_value(bit, (arg >> bit) & 0x1);
-					break;
-
-				case 0x07: // Hyperdrive LEDs 8-15
-					for (uint8_t bit = 0; bit < 8; bit++)
-						output().set_led_value(8 + bit, (arg >> bit) & 0x1);
-					break;
-
-				case 0x08: // Hyperdrive LEDs 16-23 (Only uses up to 19)
-					for (uint8_t bit = 0; bit < 8; bit++)
-						output().set_led_value(16 + bit, (arg >> bit) & 0x1);
-					break;
-			}
-			break;
+			case 0x08: // Hyperdrive LEDs 16-23 (Only uses up to 19)
+				for (uint8_t bit = 0; bit < 8; bit++)
+					m_leds[16 | bit] = BIT(arg, bit);
+				break;
+		}
+	}
+	else if (!BIT(data, 9) || !BIT(data, 8))
+	{
+		logerror("%08X:output_w = %04X\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -2206,7 +2204,7 @@ ROM_END
 
 ROM_START( sfrusha )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 )  /* Boot Code Version L1.06A */
-	ROM_LOAD( "HDBOOTV1_06A.bin", 0x000000, 0x80000, CRC(f247ba60) SHA1(850f97002eb1e362c3df870d7b6a1b5524ab983d) )
+	ROM_LOAD( "hdbootv1_06a.bin", 0x000000, 0x80000, CRC(f247ba60) SHA1(850f97002eb1e362c3df870d7b6a1b5524ab983d) )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
@@ -2301,17 +2299,17 @@ ROM_START( calspeeda )
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
 
 	// it actually asks you to replace this with the original rom after the upgrade is complete, which is weird because this is a perfectly valid newer revision of the boot code, but probably explains why the parent set was still on 1.2
-	ROM_LOAD( "Cal speed update  U32 boot ver, 1,4 5EF6", 0x000000, 0x80000, CRC(fd627637) SHA1(b0c2847cbecfc00344e402386d13240d55a0814e) ) // boot code 1.4 Apr 17 1998 21:18:31
+	ROM_LOAD( "cal speed update  u32 boot ver, 1,4 5ef6", 0x000000, 0x80000, CRC(fd627637) SHA1(b0c2847cbecfc00344e402386d13240d55a0814e) ) // boot code 1.4 Apr 17 1998 21:18:31
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
 
 	ROM_SYSTEM_BIOS( 1, "up16_1",       "Disk Update 1.0x to 2.1a (1.25) Step 1 of 3" )
-	ROMX_LOAD("eprom #1 2.1A 90A7", 0x000000, 0x100000, CRC(bc0f373e) SHA1(bf53f1953ccab8da9ce784e4d20dd2ec0d0eff6a), ROM_BIOS(2))
+	ROMX_LOAD("eprom @1 2.1a 90a7", 0x000000, 0x100000, CRC(bc0f373e) SHA1(bf53f1953ccab8da9ce784e4d20dd2ec0d0eff6a), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "up16_2",       "Disk Update 1.0x to 2.1a (1.25) Step 2 of 3" )
-	ROMX_LOAD("eprom #2 2.1A 9F84", 0x000000, 0x100000, CRC(5782da30) SHA1(eaeea3655bc9c1cedefdfb0088d4716584788669), ROM_BIOS(3))
+	ROMX_LOAD("eprom @2 2.1a 9f84", 0x000000, 0x100000, CRC(5782da30) SHA1(eaeea3655bc9c1cedefdfb0088d4716584788669), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 3, "up16_3",       "Disk Update 1.0x to 2.1a (1.25) Step 3 of 3" )
-	ROMX_LOAD("eprom #3 2.1A 3286", 0x000000, 0x100000, CRC(e7d8c88f) SHA1(06c11241ac439527b361826784aef4c58689892e), ROM_BIOS(4))
+	ROMX_LOAD("eprom @3 2.1a 3286", 0x000000, 0x100000, CRC(e7d8c88f) SHA1(06c11241ac439527b361826784aef4c58689892e), ROM_BIOS(4))
 
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )    /* Release version 1.0r8a (4/10/98) (Guts 4/10/98, Main 4/10/98) */

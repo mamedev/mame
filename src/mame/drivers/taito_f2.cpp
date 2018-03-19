@@ -2986,7 +2986,7 @@ MACHINE_CONFIG_START(taitof2_state::megab)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(megab_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)/2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(24'000'000)/2) /* 12MHz */
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_megab)

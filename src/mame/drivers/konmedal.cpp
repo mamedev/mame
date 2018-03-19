@@ -46,8 +46,8 @@ K051649 (sound)
 class konmedal_state : public driver_device
 {
 public:
-	konmedal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	konmedal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
 		m_k052109(*this, "k052109"),
@@ -260,11 +260,7 @@ void konmedal_state::ddboy_main(address_map &map)
 	map(0xc80f, 0xc80f).r(this, FUNC(konmedal_state::magic_r));
 	map(0xcc00, 0xcc00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xd000, 0xd000).nopw();    // ???  writes 00 and 3f every frame
-	map(0xd800, 0xd87f).rw("k051649", FUNC(k051649_device::k051649_waveform_r), FUNC(k051649_device::k051649_waveform_w));
-	map(0xd880, 0xd889).w("k051649", FUNC(k051649_device::k051649_frequency_w));
-	map(0xd88a, 0xd88e).w("k051649", FUNC(k051649_device::k051649_volume_w));
-	map(0xd88f, 0xd88f).w("k051649", FUNC(k051649_device::k051649_keyonoff_w));
-	map(0xd8e0, 0xd8ff).rw("k051649", FUNC(k051649_device::k051649_test_r), FUNC(k051649_device::k051649_test_w));
+	map(0xd800, 0xd8ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xe000, 0xffff).rw(this, FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
 }
 
@@ -278,11 +274,7 @@ void konmedal_state::shuriboy_main(address_map &map)
 	map(0x8803, 0x8803).portr("DSW2");
 	map(0x8b00, 0x8b00).nopw();    // watchdog?
 	map(0x8c00, 0x8c00).w(this, FUNC(konmedal_state::shuri_bank_w));
-	map(0x9800, 0x987f).rw("k051649", FUNC(k051649_device::k051649_waveform_r), FUNC(k051649_device::k051649_waveform_w));
-	map(0x9880, 0x9889).w("k051649", FUNC(k051649_device::k051649_frequency_w));
-	map(0x988a, 0x988e).w("k051649", FUNC(k051649_device::k051649_volume_w));
-	map(0x988f, 0x988f).w("k051649", FUNC(k051649_device::k051649_keyonoff_w));
-	map(0x98e0, 0x98ff).rw("k051649", FUNC(k051649_device::k051649_test_r), FUNC(k051649_device::k051649_test_w));
+	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xdbff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 	map(0xdd00, 0xdd00).rw(this, FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
@@ -634,7 +626,7 @@ ROM_END
 // this is a slightly different version on the same PCB as tsukande
 ROM_START( ddboya )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
-	ROM_LOAD( "342-f02-4g-(p).bin", 0x000000, 0x020000, CRC(563dfd4f) SHA1(a50544735a9d6f448b969b9fd84e6cdca303d7a0) )
+	ROM_LOAD( "342-f02-4g-=p=.bin", 0x000000, 0x020000, CRC(563dfd4f) SHA1(a50544735a9d6f448b969b9fd84e6cdca303d7a0) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )   /* tilemaps */
 	ROM_LOAD32_BYTE( "342_a03.27c010.4f", 0x000002, 0x020000, CRC(424f80dd) SHA1(fb7648960ce0951aebcf5cf4465a9acb3ab49cd8) )
@@ -643,8 +635,8 @@ ROM_START( ddboya )
 	ROM_LOAD32_BYTE( "342_a06.27c010.4j", 0x000001, 0x020000, CRC(49f35d66) SHA1(3d5cf3b6eb6a3497609117acd002169a31130418) )
 
 	ROM_REGION( 0x100000, "oki", 0 )
-	ROM_LOAD( "342-a11-10d-(s1).bin", 0x000000, 0x080000, CRC(b523bced) SHA1(87a814035af4dcf24454667d4346d301303d697e) )
-	ROM_LOAD( "342-a12-10e-(s2).bin", 0x080000, 0x080000, CRC(6febafe7) SHA1(69e550dd067f326b4d20a859345f193b43a5af99) )
+	ROM_LOAD( "342-a11-10d-=s1=.bin", 0x000000, 0x080000, CRC(b523bced) SHA1(87a814035af4dcf24454667d4346d301303d697e) )
+	ROM_LOAD( "342-a12-10e-=s2=.bin", 0x080000, 0x080000, CRC(6febafe7) SHA1(69e550dd067f326b4d20a859345f193b43a5af99) )
 
 	ROM_REGION( 0x400, "proms", 0 )
 	// R
@@ -662,13 +654,13 @@ ROM_START( shuriboy )
 	ROM_LOAD( "gs-341-b01.13g", 0x000000, 0x010000, CRC(3c0f36b6) SHA1(1d3838f45969228a8b2054cd5baf8892db68b644) )
 
 	ROM_REGION( 0x40000, "k052109", 0 )   /* tilemaps */
-	ROM_LOAD32_BYTE( "341-A03.2H", 0x000000, 0x010000, CRC(8e9e9835) SHA1(f8dc4579f238d91c0aef59167be7e5de87dc4ba7) )
-	ROM_LOAD32_BYTE( "341-A04.4H", 0x000001, 0x010000, CRC(ac82d67b) SHA1(65869adfbb67cf10c92e50239fd747fc5ad4714d) )
-	ROM_LOAD32_BYTE( "341-A05.5H", 0x000002, 0x010000, CRC(31403832) SHA1(d13c54d3768a0c2d60a3751db8980199f60db243) )
-	ROM_LOAD32_BYTE( "341-A06.7H", 0x000003, 0x010000, CRC(361e26eb) SHA1(7b5ad6a6067afb3350d85a3f2026e4d685429e20) )
+	ROM_LOAD32_BYTE( "341-a03.2h", 0x000000, 0x010000, CRC(8e9e9835) SHA1(f8dc4579f238d91c0aef59167be7e5de87dc4ba7) )
+	ROM_LOAD32_BYTE( "341-a04.4h", 0x000001, 0x010000, CRC(ac82d67b) SHA1(65869adfbb67cf10c92e50239fd747fc5ad4714d) )
+	ROM_LOAD32_BYTE( "341-a05.5h", 0x000002, 0x010000, CRC(31403832) SHA1(d13c54d3768a0c2d60a3751db8980199f60db243) )
+	ROM_LOAD32_BYTE( "341-a06.7h", 0x000003, 0x010000, CRC(361e26eb) SHA1(7b5ad6a6067afb3350d85a3f2026e4d685429e20) )
 
 	ROM_REGION( 0x200000, "upd", 0 )
-	ROM_LOAD( "341-A02.13C", 0x000000, 0x020000, CRC(e1f5c8f1) SHA1(323a078720e09a7326e82cb623b6c90e2674e800) )
+	ROM_LOAD( "341-a02.13c", 0x000000, 0x020000, CRC(e1f5c8f1) SHA1(323a078720e09a7326e82cb623b6c90e2674e800) )
 ROM_END
 
 GAME( 1995, tsukande,    0, tsukande, konmedal,  konmedal_state, 0, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)

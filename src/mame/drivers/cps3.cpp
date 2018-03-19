@@ -3685,7 +3685,7 @@ ROM_START( cps3boot ) // for cart with standard SH2
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
-	DISK_IMAGE_READONLY( "UniCD-CPS3_for_standard_SH2_V4", 0, SHA1(099c52bd38753f0f4876243e7aa87ca482a2dcb7) )
+	DISK_IMAGE_READONLY( "unicd-cps3_for_standard_sh2_v4", 0, SHA1(099c52bd38753f0f4876243e7aa87ca482a2dcb7) )
 ROM_END
 
 ROM_START( cps3booto ) // for cart with standard SH2
@@ -3725,7 +3725,7 @@ ROM_START( cps3boota ) // for cart with dead custom SH2 (or 2nd Impact CPU which
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
-	DISK_IMAGE_READONLY( "UniCD-CPS3_for_custom_SH2_V5", 0, SHA1(50a5b2845d3dd3de3bce15c4f1b58500db80cabe) )
+	DISK_IMAGE_READONLY( "unicd-cps3_for_custom_sh2_v5", 0, SHA1(50a5b2845d3dd3de3bce15c4f1b58500db80cabe) )
 ROM_END
 
 ROM_START( cps3bootao ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)

@@ -422,15 +422,15 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 							color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
 						}
 
-						if(cliprect.contains(x+(xi), y+yi))
+						if(cliprect.contains(x+xi, y+yi))
 						{
 							if (alpha==0x00) // a value of 0x00 is solid
 							{
-								bitmap.pix16(y+yi, x+(xi)) = color_data & 0x7fff;
+								bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
 							}
 							else
 							{
-								uint16_t basecolor = bitmap.pix16(y+yi, x+(xi));
+								uint16_t basecolor = bitmap.pix16(y+yi, x+xi);
 								int base_r = ((basecolor >> 10)&0x1f)*alpha;
 								int base_g = ((basecolor >> 5)&0x1f)*alpha;
 								int base_b = ((basecolor >> 0)&0x1f)*alpha;
@@ -441,7 +441,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 								g = (base_g+g)/0x1f;
 								b = (base_b+b)/0x1f;
 								color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
-								bitmap.pix16(y+yi, x+(xi)) = color_data & 0x7fff;
+								bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
 							}
 						}
 					}

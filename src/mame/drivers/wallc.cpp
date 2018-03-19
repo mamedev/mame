@@ -94,6 +94,8 @@ private:
 
 	tilemap_t *m_bg_tilemap;
 
+	bool m_bookkeeping_mode;
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info_unkitpkr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -221,8 +223,8 @@ TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_unkitpkr)
 {
 	int code = m_videoram[tile_index];
 
-	// hack to display cards (TODO: what determines tile banking?)
-	if ((tile_index & 0x1f) < 0x08 || (tile_index & 0x1f) >= 0x10)
+	// hack to display "card" graphics in middle of screen outside of bookkeeping mode
+	if (m_bookkeeping_mode || (tile_index & 0x1f) < 0x08 || (tile_index & 0x1f) >= 0x10)
 		code |= 0x100;
 
 	SET_TILE_INFO_MEMBER(0, code, 1, 0);
@@ -262,6 +264,11 @@ WRITE8_MEMBER(wallc_state::unkitpkr_out1_w)
 
 WRITE8_MEMBER(wallc_state::unkitpkr_out2_w)
 {
+	if (m_bookkeeping_mode != BIT(data, 0))
+	{
+		m_bookkeeping_mode = BIT(data, 0);
+		m_bg_tilemap->mark_all_dirty();
+	}
 }
 
 void wallc_state::wallc_map(address_map &map)
@@ -747,6 +754,9 @@ DRIVER_INIT_MEMBER(wallc_state, unkitpkr)
 			buffer[a] = gfxrom[(a & 0x03f) | (a & 0x280) >> 1 | (a & 0x140) << 1];
 		memcpy(gfxrom, &buffer[0], 0x400);
 	}
+
+	m_bookkeeping_mode = false;
+	save_item(NAME(m_bookkeeping_mode));
 }
 
 
@@ -756,4 +766,4 @@ GAME( 1984, wallca,   wallc,  wallca,   wallc,    wallc_state, wallca,   ROT0,  
 GAME( 1984, brkblast, wallc,  wallc,    wallc,    wallc_state, wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
 GAME( 1984, sidampkr, 0,      wallc,    wallc,    wallc_state, sidam,    ROT270, "Sidam",            "unknown Sidam Poker",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, unkitpkr, 0,      unkitpkr, unkitpkr, wallc_state, unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, unkitpkr, 0,      unkitpkr, unkitpkr, wallc_state, unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_SUPPORTS_SAVE )

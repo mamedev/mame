@@ -2184,7 +2184,7 @@ ROM_START( sun4_50 )
 	ROM_SYSTEM_BIOS( 0, "v29", "V2.9" )
 	ROMX_LOAD( "ipx-29.h1.u0501", 0x0000, 0x40000, CRC(1910aa65) SHA1(7d8832fea8e299b89e6ec7137fcde497673c14f8), ROM_BIOS(1)) // 525-1177-06(?) Boot (Version 2.9 version 20, supposedly?)
 	ROM_SYSTEM_BIOS( 1, "v26", "V2.6" )
-	ROMX_LOAD( "525-1177-05__(c)_sun_1992.am27c020.h1.u0501", 0x0000, 0x40000, CRC(aad28dee) SHA1(18075afa479fdc8d318df9aef9847dfb20591d79), ROM_BIOS(2)) // 525-1177-05 Boot (Version 2.6 version 410, supposedly?)
+	ROMX_LOAD( "525-1177-05__=c=_sun_1992.am27c020.h1.u0501", 0x0000, 0x40000, CRC(aad28dee) SHA1(18075afa479fdc8d318df9aef9847dfb20591d79), ROM_BIOS(2)) // 525-1177-05 Boot (Version 2.6 version 410, supposedly?)
 	ROM_SYSTEM_BIOS( 2, "v23", "V2.3" )
 	ROMX_LOAD( "525-1177-03.h1.u0501", 0x0000, 0x40000, CRC(dcc1e66c) SHA1(a4dc3d8631aaa8416e22de273707c4ed7a2fe561), ROM_BIOS(3)) // 525-1177-03 Boot (Version 2.3)
 ROM_END

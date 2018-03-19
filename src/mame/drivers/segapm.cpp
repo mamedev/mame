@@ -78,7 +78,7 @@ MACHINE_CONFIG_END
 
 ROM_START( segapm ) // was more than one cartridge available? if so softlist them?
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD( "picture magic boot cart (j) [!].bin", 0x00000, 0x80000, CRC(c9ab4e60) SHA1(9c4d4ab3e59c8acde86049a1ba3787aa03b549a3) ) // internal header is GOUSEI HENSYUU
+	ROM_LOAD( "picture magic boot cart.bin", 0x00000, 0x80000, CRC(c9ab4e60) SHA1(9c4d4ab3e59c8acde86049a1ba3787aa03b549a3) ) // internal header is GOUSEI HENSYUU
 
 	// todo, sh2 bios roms etc.
 ROM_END

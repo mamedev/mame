@@ -48,19 +48,23 @@ class jungleyo_state : public driver_device
 {
 public:
 	jungleyo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+	{ }
 
-	/* memory pointers */
+	void jungleyo(machine_config &config);
 
+public:
 	/* video-related */
 	virtual void video_start() override;
 	uint32_t screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void jungleyo_map(address_map &map);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void jungleyo(machine_config &config);
-	void jungleyo_map(address_map &map);
 };
 
 void jungleyo_state::video_start()
@@ -143,8 +147,8 @@ MACHINE_CONFIG_END
 
 ROM_START( jungleyo )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */ // encrypted?
-	ROM_LOAD16_BYTE( "jungle_(record)_rom3_vi3.02.u15", 0x00001, 0x20000, CRC(7c9f431e) SHA1(fb3f90c4fe59c938f36b30c5fa3af227031e7d7a) )
-	ROM_LOAD16_BYTE( "jungle_(record)_rom2_vi3.02.u14", 0x00000, 0x20000, CRC(f6a71260) SHA1(8e48cbb9d701ad968540244396820359afe97c28) )
+	ROM_LOAD16_BYTE( "jungle_=record=_rom3_vi3.02.u15", 0x00001, 0x20000, CRC(7c9f431e) SHA1(fb3f90c4fe59c938f36b30c5fa3af227031e7d7a) )
+	ROM_LOAD16_BYTE( "jungle_=record=_rom2_vi3.02.u14", 0x00000, 0x20000, CRC(f6a71260) SHA1(8e48cbb9d701ad968540244396820359afe97c28) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "jungle_rom1.u99", 0x00000, 0x40000, CRC(05ef5b85) SHA1(ca7584646271c6adc7880eca5cf43a412340c522) )

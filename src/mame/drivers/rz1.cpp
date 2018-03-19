@@ -65,6 +65,7 @@ private:
 
 	void map(address_map &map);
 
+	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_WRITE8_MEMBER(port_a_w);
 	DECLARE_WRITE8_MEMBER(port_b_w);
 	DECLARE_READ8_MEMBER(port_c_r);
@@ -212,6 +213,18 @@ WRITE8_MEMBER( rz1_state::upd934g_b_w )
 	m_pg[1]->write(space, offset >> 8, data);
 }
 
+READ8_MEMBER( rz1_state::port_a_r )
+{
+	if ((m_port_b & 0xc0) == 0x40)
+	{
+		// Not clear why, but code expects to read busy flag from PA5 rather than PA7
+		return bitswap<8>(m_hd44780->read(space, BIT(m_port_b, 5)), 5, 6, 7, 4, 3, 2, 1, 0);
+	}
+
+	logerror("port_a_r (PB = %02x)\n", m_port_b);
+	return 0xff;
+}
+
 WRITE8_MEMBER( rz1_state::port_a_w )
 {
 	if (0)
@@ -219,17 +232,21 @@ WRITE8_MEMBER( rz1_state::port_a_w )
 
 	m_key_select = data;
 
-	// output lcd data to console until it's hooked up properly
 //  if (m_port_b == 0x37 || m_port_b == 0x33)
 //      printf("%c", data);
-	m_hd44780->data_write(space, 0, data);
 }
 
 WRITE8_MEMBER( rz1_state::port_b_w )
 {
-	logerror("port_b_w: %02x\n", data);
+	if (0)
+		logerror("port_b_w: %02x\n", data);
+
+	// top 3 lines go to the 44780
+	// PB5 = RS, PB6 = R/W, PB7 (inverted on main PCB) = E?
+	if ((m_port_b & 0xc0) == 0 && BIT(data, 7))
+		m_hd44780->write(space, BIT(m_port_b, 5), m_key_select);
+
 	m_port_b = data;
-	m_hd44780->control_write(space, 0, data & 0xe0);    // top 3 lines go to the 44780
 }
 
 READ8_MEMBER( rz1_state::port_c_r )
@@ -286,6 +303,7 @@ PALETTE_INIT_MEMBER(rz1_state, rz1)
 MACHINE_CONFIG_START( rz1_state::rz1 )
 	MCFG_CPU_ADD("maincpu", UPD7811, 12_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(map)
+	MCFG_UPD7810_PORTA_READ_CB(READ8(rz1_state, port_a_r))
 	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(rz1_state, port_a_w))
 	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(rz1_state, port_b_w))
 	MCFG_UPD7810_PORTC_READ_CB(READ8(rz1_state, port_c_r))

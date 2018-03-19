@@ -655,7 +655,7 @@ ROM_START( tm3keval ) /* FREEPLAY ONLY / NOT FOR RELEASE / FOR EVALUATION ONLY *
 	ROM_LOAD16_BYTE( "u38_touchmaster_10-21-97_0067.u38", 0x000000, 0x100000, CRC(cc2af2b0) SHA1(64de224599e038b98ffedd965ac83b077298097f) ) /* U38  TOUCHMASTER 10-21-97 0067 (date and checksum hand written) */
 	ROM_LOAD16_BYTE( "u36_touchmaster_10-21-97_ba57.u36", 0x000001, 0x100000, CRC(73e99b1c) SHA1(812d6958a8746cc8f5cba125486e1f72740a0840) ) /* U36  TOUCHMASTER 10-21-97 BA57 (date and checksum hand written) */
 	ROM_LOAD16_BYTE( "u39_touchmaster_10-21-97_4a76.u39", 0x200000, 0x100000, CRC(af92cf87) SHA1(cb6baf8b3afe1e61e440be69a90d5c001eb7b388) ) /* U39  TOUCHMASTER 10-21-97 4A76 (date and checksum hand written) */
-	ROM_LOAD16_BYTE( "u37_touchmaster_10-21-97_40F6.u37", 0x200001, 0x100000, CRC(b5e69eca) SHA1(c548e33a049d17381c9755499940ffc459c0cb48) ) /* U37  TOUCHMASTER 10-21-97 40F6 (date and checksum hand written) */
+	ROM_LOAD16_BYTE( "u37_touchmaster_10-21-97_40f6.u37", 0x200001, 0x100000, CRC(b5e69eca) SHA1(c548e33a049d17381c9755499940ffc459c0cb48) ) /* U37  TOUCHMASTER 10-21-97 40F6 (date and checksum hand written) */
 	ROM_LOAD16_BYTE( "u41_touchmaster_10-21-97_f986.u41", 0x400000, 0x100000, CRC(97bc5e19) SHA1(9a9786ec2a9a7b7008d9e2e8624df8301f737dbc) ) /* U41  TOUCHMASTER 10-21-97 F986 (date and checksum hand written) */
 	ROM_LOAD16_BYTE( "u40_touchmaster_10-21-97_7086.u40", 0x400001, 0x100000, CRC(e3ae6fa6) SHA1(02c98f59553f4343f0dd855794364ad95aa81063) ) /* U40  TOUCHMASTER 10-21-97 7086 (date and checksum hand written) */
 

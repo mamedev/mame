@@ -11565,57 +11565,57 @@ ROM_END
 
 ROM_START( sc4mtbclh )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p(1)ss.hi", 0x00000, 0x080000, CRC(6baafc2d) SHA1(fb775e0d431a2c31b3f6c565cddaad5d22d9d122) )
-	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p(1)ss.lo", 0x00001, 0x080000, CRC(179f0787) SHA1(6815167bee95e88cf628128a88065a66983a7489) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p=1=ss.hi", 0x00000, 0x080000, CRC(6baafc2d) SHA1(fb775e0d431a2c31b3f6c565cddaad5d22d9d122) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p=1=ss.lo", 0x00001, 0x080000, CRC(179f0787) SHA1(6815167bee95e88cf628128a88065a66983a7489) )
 	sc_mtbcl_others
 ROM_END
 
 ROM_START( sc4mtbcli )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p(2)ss.hi", 0x00000, 0x080000, CRC(3539277b) SHA1(2a602de4a3b3d6336e4f0be15b9bd3d9e730c571) )
-	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p(2)ss.lo", 0x00001, 0x080000, CRC(9cc4bf96) SHA1(db0cd119346b5ffce1bdf19e595f085bef93747d) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p=2=ss.hi", 0x00000, 0x080000, CRC(3539277b) SHA1(2a602de4a3b3d6336e4f0be15b9bd3d9e730c571) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p=2=ss.lo", 0x00001, 0x080000, CRC(9cc4bf96) SHA1(db0cd119346b5ffce1bdf19e595f085bef93747d) )
 	sc_mtbcl_others
 ROM_END
 
 ROM_START( sc4mtbclj )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p(3)ss.hi", 0x00000, 0x080000, CRC(82d9d864) SHA1(02f6fe87364d5afece5a7289ac74bd66345b53ea) )
-	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p(3)ss.lo", 0x00001, 0x080000, CRC(902c1902) SHA1(15e00073cb818af46a37357304d2a8ef7f256f09) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p=3=ss.hi", 0x00000, 0x080000, CRC(82d9d864) SHA1(02f6fe87364d5afece5a7289ac74bd66345b53ea) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p=3=ss.lo", 0x00001, 0x080000, CRC(902c1902) SHA1(15e00073cb818af46a37357304d2a8ef7f256f09) )
 	sc_mtbcl_others
 ROM_END
 
 ROM_START( sc4mtbclk )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p(4)ss.hi", 0x00000, 0x080000, CRC(75a15cea) SHA1(d34e20273c1ed7b7a11100a68462775930f7c39f) )
-	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p(4)ss.lo", 0x00001, 0x080000, CRC(0f5d2f5b) SHA1(725c1cf317cac74a6f0e0185a46ff0c7c399432d) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p=4=ss.hi", 0x00000, 0x080000, CRC(75a15cea) SHA1(d34e20273c1ed7b7a11100a68462775930f7c39f) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_dat_ac_1000pnd-50p=4=ss.lo", 0x00001, 0x080000, CRC(0f5d2f5b) SHA1(725c1cf317cac74a6f0e0185a46ff0c7c399432d) )
 	sc_mtbcl_others
 ROM_END
 
 ROM_START( sc4mtbcll )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p(1)ss.hi", 0x00000, 0x080000, CRC(d596e8bc) SHA1(7fbf3bac2c96034714ce3b83077f737c5bd93afc) )
-	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p(1)ss.lo", 0x00001, 0x080000, CRC(a4ea7d69) SHA1(ae949626d8784570145bc2e51b6389454ead73f8) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p=1=ss.hi", 0x00000, 0x080000, CRC(d596e8bc) SHA1(7fbf3bac2c96034714ce3b83077f737c5bd93afc) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p=1=ss.lo", 0x00001, 0x080000, CRC(a4ea7d69) SHA1(ae949626d8784570145bc2e51b6389454ead73f8) )
 	sc_mtbcl_others
 ROM_END
 
 ROM_START( sc4mtbclm )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p(2)ss.hi", 0x00000, 0x080000, CRC(decceaa7) SHA1(1e13bf0eb30280932028f0b52cbf45e461f5ab5e) )
-	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p(2)ss.lo", 0x00001, 0x080000, CRC(b57323fd) SHA1(b9a43b16ff347cf3d87a064468c0f507c87ef819) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p=2=ss.hi", 0x00000, 0x080000, CRC(decceaa7) SHA1(1e13bf0eb30280932028f0b52cbf45e461f5ab5e) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p=2=ss.lo", 0x00001, 0x080000, CRC(b57323fd) SHA1(b9a43b16ff347cf3d87a064468c0f507c87ef819) )
 	sc_mtbcl_others
 ROM_END
 
 ROM_START( sc4mtbcln )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p(3)ss.hi", 0x00000, 0x080000, CRC(64882431) SHA1(21184508e6e2878fa5d8b300ad5f9ef7ab75c223) )
-	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p(3)ss.lo", 0x00001, 0x080000, CRC(8ab940ad) SHA1(a4170464e3d08f0a925ab6d302f0d0a7ab03ed94) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p=3=ss.hi", 0x00000, 0x080000, CRC(64882431) SHA1(21184508e6e2878fa5d8b300ad5f9ef7ab75c223) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p=3=ss.lo", 0x00001, 0x080000, CRC(8ab940ad) SHA1(a4170464e3d08f0a925ab6d302f0d0a7ab03ed94) )
 	sc_mtbcl_others
 ROM_END
 
 ROM_START( sc4mtbclo )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p(4)ss.hi", 0x00000, 0x080000, CRC(df931438) SHA1(3fd98e4a3f79b84576c33481296a878dca56afce) )
-	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p(4)ss.lo", 0x00001, 0x080000, CRC(dadd9222) SHA1(679a87c43b42662e99ad4307b49b5f3a12e8b28d) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p=4=ss.hi", 0x00000, 0x080000, CRC(df931438) SHA1(3fd98e4a3f79b84576c33481296a878dca56afce) )
+	ROM_LOAD16_BYTE( "club-money-to-burn_std_ac_1000pnd-50p=4=ss.lo", 0x00001, 0x080000, CRC(dadd9222) SHA1(679a87c43b42662e99ad4307b49b5f3a12e8b28d) )
 	sc_mtbcl_others
 ROM_END
 
@@ -23925,8 +23925,8 @@ ROM_END
 
 ROM_START( sc4sladh )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "sna&lad.hi", 0x00000, 0x080000, CRC(70180308) SHA1(5833aca21637e9a9dbeca087e0a4e3f25a0ecf42) )//Whitbread
-	ROM_LOAD16_BYTE( "sna&lad.lo", 0x00001, 0x080000, CRC(50147f4a) SHA1(70361cab074fe00048a5bf48fd4faf4ad39d46f5) )
+	ROM_LOAD16_BYTE( "sna+lad.hi", 0x00000, 0x080000, CRC(70180308) SHA1(5833aca21637e9a9dbeca087e0a4e3f25a0ecf42) )//Whitbread
+	ROM_LOAD16_BYTE( "sna+lad.lo", 0x00001, 0x080000, CRC(50147f4a) SHA1(70361cab074fe00048a5bf48fd4faf4ad39d46f5) )
 	sc_slad_others
 ROM_END
 
@@ -25083,11 +25083,11 @@ ROM_END
 
 #define sc4milro_sound \
 	ROM_REGION( 0x100000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "millionaires row s16 sound (8meg)", 0x000000, 0x100000, CRC(4086df3f) SHA1(7fd358d901db48d1f8edc4b22789c73b5fb84874) )
+	ROM_LOAD( "millionaires row s16 sound,8meg", 0x000000, 0x100000, CRC(4086df3f) SHA1(7fd358d901db48d1f8edc4b22789c73b5fb84874) )
 ROM_START( sc4milro )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "millionaires row s16 v1-0 lo (4meg)", 0x00001, 0x080000, CRC(8436aab9) SHA1(815000121e93c9a8e4f6c6d6d12a06c4484eb50c) )
-	ROM_LOAD16_BYTE( "millionaires row s16 v1-0 hi (4meg)", 0x00000, 0x080000, CRC(6b879665) SHA1(79fa91721375f0f968ecbd07fe9e9695344b7cd6) )
+	ROM_LOAD16_BYTE( "millionaires row s16 v1-0 lo,4meg", 0x00001, 0x080000, CRC(8436aab9) SHA1(815000121e93c9a8e4f6c6d6d12a06c4484eb50c) )
+	ROM_LOAD16_BYTE( "millionaires row s16 v1-0 hi,4meg", 0x00000, 0x080000, CRC(6b879665) SHA1(79fa91721375f0f968ecbd07fe9e9695344b7cd6) )
 	sc4milro_sound
 ROM_END
 

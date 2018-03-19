@@ -632,10 +632,10 @@ ROM_START( bloodbro )
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "blood_bros_bk__(c)1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "blood_bros_obj__(c)1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
+	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
@@ -661,10 +661,10 @@ ROM_START( bloodbroj )
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "blood_bros_bk__(c)1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "blood_bros_obj__(c)1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
+	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
@@ -690,10 +690,10 @@ ROM_START( bloodbroja )
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "blood_bros_bk__(c)1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "blood_bros_obj__(c)1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
+	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
@@ -719,10 +719,10 @@ ROM_START( bloodbrou )
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "blood_bros_bk__(c)1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "blood_bros_obj__(c)1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
+	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )

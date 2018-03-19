@@ -1045,20 +1045,20 @@ ROM_END
 // uses dipswitches
 ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) for protection  */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
-	ROM_LOAD16_BYTE("SEIBU_1.U0224", 0x000000, 0x80000, CRC(ce1bcaf4) SHA1(1c340575e440b716caca8605cc5e1221060e3714) )
-	ROM_LOAD16_BYTE("SEIBU_2.U0226", 0x000001, 0x80000, CRC(03f6e32d) SHA1(5363f20d515ff84346aa15f7b9d95c5805d81285) )
+	ROM_LOAD16_BYTE("seibu_1.u0224", 0x000000, 0x80000, CRC(ce1bcaf4) SHA1(1c340575e440b716caca8605cc5e1221060e3714) )
+	ROM_LOAD16_BYTE("seibu_2.u0226", 0x000001, 0x80000, CRC(03f6e32d) SHA1(5363f20d515ff84346aa15f7b9d95c5805d81285) )
 
 	ROM_REGION( 0x20000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
 	ROM_LOAD( "copx-d3.bin", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) ) /* Not from this set, but same data as Zero Team 2000 & Raiden II New */
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
-	ROM_LOAD( "SEIBU_3.U01019",       0x000000, 0x08000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) ) /* Same as some of other Zero Team sets */
+	ROM_LOAD( "seibu_3.u01019",       0x000000, 0x08000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) ) /* Same as some of other Zero Team sets */
 	ROM_CONTINUE(            0x010000, 0x08000 )    /* banked stuff */
 	ROM_COPY( "audiocpu", 0x0000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
-	ROM_LOAD16_BYTE( "SEIBU_5.U0616", 0x000000, 0x010000, CRC(ce68ba3c) SHA1(52830533711ec906bf4fe9d06e065ec80b25b4da) )
-	ROM_LOAD16_BYTE( "SEIBU_6.U0617", 0x000001, 0x010000, CRC(cf44aea7) SHA1(e8d622fd5c10133fa563402daf0690fdff297f94) )
+	ROM_LOAD16_BYTE( "seibu_5.u0616", 0x000000, 0x010000, CRC(ce68ba3c) SHA1(52830533711ec906bf4fe9d06e065ec80b25b4da) )
+	ROM_LOAD16_BYTE( "seibu_6.u0617", 0x000001, 0x010000, CRC(cf44aea7) SHA1(e8d622fd5c10133fa563402daf0690fdff297f94) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "back-1", 0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) ) /* Same as "MUSHA BACK-1" of other Zero Team sets */
@@ -1069,11 +1069,11 @@ ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) 
 	ROM_LOAD32_WORD( "obj-2", 0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) ) /* Same as "MUSHA OBJ-2" of other Zero Team sets */
 
 	ROM_REGION( 0x100000, "oki", 0 ) /* ADPCM samples */
-	ROM_LOAD( "SEIBU_4.U099", 0x00000, 0x40000, CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) /* Same as other Zero Team sets */
+	ROM_LOAD( "seibu_4.u099", 0x00000, 0x40000, CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) /* Same as other Zero Team sets */
 
 	ROM_REGION( 0x200, "pld", 0 ) /* PLDs */
-	ROM_LOAD( "SYSV33B-1.U0222.bin", 0x000, 0x117, CRC(f514a11f) SHA1(dd83ee1f511915d3d5f65375f34583be7fa1158b) )
-	ROM_LOAD( "SYSV33B-2.U0227.bin", 0x000, 0x117, CRC(d9f4612f) SHA1(0c507b28dc0f50a67cc12d63092067dc3f7f4679) )
+	ROM_LOAD( "sysv33b-1.u0222.bin", 0x000, 0x117, CRC(f514a11f) SHA1(dd83ee1f511915d3d5f65375f34583be7fa1158b) )
+	ROM_LOAD( "sysv33b-2.u0227.bin", 0x000, 0x117, CRC(d9f4612f) SHA1(0c507b28dc0f50a67cc12d63092067dc3f7f4679) )
 ROM_END
 
 ROM_START( nzeroteama ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) for protection  */
@@ -1105,8 +1105,8 @@ ROM_START( nzeroteama ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3)
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000, CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) /* Same as other Zero Team sets */
 
 	ROM_REGION( 0x200, "pld", 0 ) /* PLDs */
-	ROM_LOAD( "SYSV33B-1.U0222.bin", 0x000, 0x117, CRC(f514a11f) SHA1(dd83ee1f511915d3d5f65375f34583be7fa1158b) )
-	ROM_LOAD( "SYSV33B-2.U0227.bin", 0x000, 0x117, CRC(d9f4612f) SHA1(0c507b28dc0f50a67cc12d63092067dc3f7f4679) )
+	ROM_LOAD( "sysv33b-1.u0222.bin", 0x000, 0x117, CRC(f514a11f) SHA1(dd83ee1f511915d3d5f65375f34583be7fa1158b) )
+	ROM_LOAD( "sysv33b-2.u0227.bin", 0x000, 0x117, CRC(d9f4612f) SHA1(0c507b28dc0f50a67cc12d63092067dc3f7f4679) )
 ROM_END
 
 

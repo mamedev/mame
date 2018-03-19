@@ -344,6 +344,7 @@ MACHINE_CONFIG_START(hp82937_io_card_device::device_add_mconfig)
 	MCFG_1MB5_RESET_HANDLER(WRITELINE(hp82937_io_card_device , reset_w))
 
 	MCFG_IEEE488_SLOT_ADD("ieee_dev" , 0 , hp_ieee488_devices , nullptr)
+	MCFG_IEEE488_SLOT_ADD("ieee_rem" , 0 , remote488_devices , nullptr)
 	MCFG_IEEE488_BUS_ADD()
 	MCFG_IEEE488_IFC_CALLBACK(WRITELINE(hp82937_io_card_device , ieee488_ctrl_w))
 	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(hp82937_io_card_device , ieee488_ctrl_w))

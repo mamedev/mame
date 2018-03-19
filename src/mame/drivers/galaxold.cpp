@@ -2885,7 +2885,7 @@ ROM_START( ckonggx )
 	ROM_LOAD( "kk9.bin",     0x1000, 0x1000, CRC(7866d2cb) SHA1(62dd8b80bc0459c7337d8a8cb83e53b999e7f4a9) )
 
 	ROM_REGION( 0x0020, "proms", 0 ) // had the standard PROM and ugly colours
-	ROM_LOAD( "(ckonggx__)6l.bpr",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+	ROM_LOAD( "ckonggx__,6l.bpr",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 
@@ -3158,17 +3158,17 @@ ROM_START( dkongjrmc ) // "CENTROMATIC - G/G" main board
 	ROM_LOAD( "2732-7.bin",   0x9000, 0x1000, CRC(7428eefa) SHA1(82e5c8461fe48e5d6222bb5d0a259e6fd0c5cac7) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 ) // GFX ROM sub board marked "CALFESA" on solder side
-	ROM_LOAD( "2732-A.bin",   0x0000, 0x1000, CRC(526ed721) SHA1(5fd317908b9d9aa70768f8f7cfbfdfa6d1e654b6) )
-	ROM_LOAD( "2732-B.bin",   0x1000, 0x1000, CRC(d2cb5130) SHA1(b87d2c74cc74782fec7268f0a637613450a2fb4b) )
-	ROM_LOAD( "2732-C.bin",   0x2000, 0x1000, CRC(7ceae713) SHA1(1f85d3b34cf10bd6277b408aed051a18cf9b1090) )
-	ROM_LOAD( "2732-D.bin",   0x3000, 0x1000, CRC(2aa1acf1) SHA1(fdf58e737253ca5f0cf3667d3a74efeafdb66e21) )
+	ROM_LOAD( "2732-a.bin",   0x0000, 0x1000, CRC(526ed721) SHA1(5fd317908b9d9aa70768f8f7cfbfdfa6d1e654b6) )
+	ROM_LOAD( "2732-b.bin",   0x1000, 0x1000, CRC(d2cb5130) SHA1(b87d2c74cc74782fec7268f0a637613450a2fb4b) )
+	ROM_LOAD( "2732-c.bin",   0x2000, 0x1000, CRC(7ceae713) SHA1(1f85d3b34cf10bd6277b408aed051a18cf9b1090) )
+	ROM_LOAD( "2732-d.bin",   0x3000, 0x1000, CRC(2aa1acf1) SHA1(fdf58e737253ca5f0cf3667d3a74efeafdb66e21) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.bin",   0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 
 	ROM_REGION( 0x0200, "mainproms", 0 )
-	ROM_LOAD( "TBP28L22N-8240A.bin", 0x0000, 0x0100, CRC(df72ed74) SHA1(fce9a846b7238c2cc8898e6338485f3df0a56755) )
-	ROM_LOAD( "TBP28L22N-A8240A.bin", 0x0100, 0x0100, CRC(9575df2b) SHA1(9360730fc230d17f6be5fc7f8d46d79566839cfa) )
+	ROM_LOAD( "tbp28l22n-8240a.bin", 0x0000, 0x0100, CRC(df72ed74) SHA1(fce9a846b7238c2cc8898e6338485f3df0a56755) )
+	ROM_LOAD( "tbp28l22n-a8240a.bin", 0x0100, 0x0100, CRC(9575df2b) SHA1(9360730fc230d17f6be5fc7f8d46d79566839cfa) )
 ROM_END
 
 ROM_START( porter )
@@ -3346,7 +3346,7 @@ ROM_END
 
 ROM_START( drivfrcsg ) // This PCB has a big epoxy block by Tanaka Enterprises marked E-0010, possibly providing ROM addressing
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "6N-2-2764A.bin", 0x2800, 0x0400, CRC(85242241) SHA1(bad2609c7f6d83a15809b602a0c141793909ceb0) )
+	ROM_LOAD( "6n-2-2764a.bin", 0x2800, 0x0400, CRC(85242241) SHA1(bad2609c7f6d83a15809b602a0c141793909ceb0) )
 	ROM_CONTINUE(               0x2c00, 0x0400 )
 	ROM_CONTINUE(               0x0000, 0x0400 )
 	ROM_CONTINUE(               0x0400, 0x0400 )
@@ -3354,7 +3354,7 @@ ROM_START( drivfrcsg ) // This PCB has a big epoxy block by Tanaka Enterprises m
 	ROM_CONTINUE(               0x0c00, 0x0400 )
 	ROM_CONTINUE(               0x2000, 0x0400 )
 	ROM_CONTINUE(               0x2400, 0x0400 )
-	ROM_LOAD( "6M-1-2764A.bin", 0x6800, 0x0400, CRC(42d99594) SHA1(1b03132279a3a6edd2281a2f55ef2d3133003a16) )
+	ROM_LOAD( "6m-1-2764a.bin", 0x6800, 0x0400, CRC(42d99594) SHA1(1b03132279a3a6edd2281a2f55ef2d3133003a16) )
 	ROM_CONTINUE(               0x6c00, 0x0400 )
 	ROM_CONTINUE(               0x4000, 0x0400 )
 	ROM_CONTINUE(               0x4400, 0x0400 )
@@ -3364,8 +3364,8 @@ ROM_START( drivfrcsg ) // This PCB has a big epoxy block by Tanaka Enterprises m
 	ROM_CONTINUE(               0x6400, 0x0400 )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "1J-2764A.bin", 0x0000, 0x2000, CRC(156e20bd) SHA1(8ec4020d179674856f43e543ce5e54730752568a) )
-	ROM_LOAD( "1L-2764A.bin", 0x2000, 0x2000, CRC(88d0f70b) SHA1(c91aa798f7450c0cf1a8db4225d4a4efa25555d8) )
+	ROM_LOAD( "1j-2764a.bin", 0x0000, 0x2000, CRC(156e20bd) SHA1(8ec4020d179674856f43e543ce5e54730752568a) )
+	ROM_LOAD( "1l-2764a.bin", 0x2000, 0x2000, CRC(88d0f70b) SHA1(c91aa798f7450c0cf1a8db4225d4a4efa25555d8) )
 
 	/* piggy-backed colour proms */
 	ROM_REGION( 0x0040, "proms", 0 )

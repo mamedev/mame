@@ -164,7 +164,7 @@ void iteagle_state::machine_reset()
 MACHINE_CONFIG_START(iteagle_state::iteagle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", VR4310LE, 133333333)
+	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(8192)
 	MCFG_MIPS3_SYSTEM_CLOCK(66666667)
@@ -725,7 +725,7 @@ GAME( 2004, gtfore05a,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "I
 GAME( 2004, gtfore05b,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, gtfore05c,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", MACHINE_SUPPORTS_SAVE )
 GAME( 2005, gtfore06,   iteagle,  gtfore06, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, bbh,        iteagle,  bbh,      bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Original (v1.00.14)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, bbh,        iteagle,  bbh,      bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter (v1.00.14)", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, bbhsc,      iteagle,  bbhsc,    bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.60.01)", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, bbhsca,     bbhsc,    bbhsc,    bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, bbh2sp,     iteagle,  bbh2sp,   bbh2,     iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.11)", MACHINE_SUPPORTS_SAVE )

@@ -1268,9 +1268,20 @@ void tlcs90_device::leave_halt()
 	}
 }
 
-void tlcs90_device::take_interrupt(tlcs90_e_irq irq)
+void tlcs90_device::raise_irq(int irq)
+{
+	m_irq_state |= 1 << irq;
+}
+
+void tlcs90_device::clear_irq(int irq)
 {
 	m_irq_state &= ~(1 << irq);
+}
+
+void tlcs90_device::take_interrupt(tlcs90_e_irq irq)
+{
+	if (irq != INT0 || (m_p8cr & 1) == 1)
+		clear_irq(irq);
 
 	leave_halt();
 
@@ -1296,7 +1307,7 @@ void tlcs90_device::check_interrupts()
 	{
 		mask = (1 << irq);
 		if(irq >= INT0) mask &= m_irq_mask;
-		if ( m_irq_state & mask )
+		if (m_irq_state & mask)
 		{
 			take_interrupt( irq );
 			return;
@@ -1324,16 +1335,18 @@ void tlcs90_device::execute_set_input(int inputnum, int state)
 
 void tlcs90_device::set_irq_line(int irq, int state)
 {
-	if ( ((m_irq_state >> irq)&1) == state ) return;
+	if ( ((m_irq_line_state >> irq)&1) == state ) return;
 
 	if (state)
 	{
-		m_irq_state |= 1 << irq;
-		check_interrupts();
+		raise_irq(irq);
+		m_irq_line_state |= 1 << irq;
 	}
 	else
 	{
-		m_irq_state &= ~(1 << irq);
+		if (irq == INT0 && (m_p8cr & 1) == 0)
+			clear_irq(irq);
+		m_irq_line_state &= ~(1 << irq);
 	}
 }
 
@@ -2458,12 +2471,12 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 		break;
 		case 0x01: // 16bit, only can happen for i=0,2
 		m_timer_value[i+1] = 0;
-		set_irq_line(INTT0 + i+1, 1);
+		raise_irq(INTT0 + i+1);
 		break;
 	}
 	// regular handling
 	m_timer_value[i] = 0;
-	set_irq_line(INTT0 + i, 1);
+	raise_irq(INTT0 + i);
 	}
 }
 
@@ -2478,12 +2491,12 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 	if ( m_timer4_value == m_treg_16bit[0] )
 	{
 //      logerror("CPU Timer 4 matches TREG4\n");
-		set_irq_line(INTT4, 1);
+		raise_irq(INTT4);
 	}
 	if ( m_timer4_value == m_treg_16bit[1] )
 	{
 //      logerror("CPU Timer 4 matches TREG5\n");
-		set_irq_line(INTT5, 1);
+		raise_irq(INTT5);
 		if (m_t4mod & 0x04)
 			m_timer4_value = 0;
 	}
@@ -2606,7 +2619,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 
 		case T90_IRFH:
 			if (data >= int(INTSWI) + 2 && data < int(INTMAX) + 2)
-				m_irq_state &= ~(1 << (data - 2));
+				clear_irq(data - 2);
 			break;
 
 		case T90_P3:
@@ -2730,6 +2743,7 @@ void tlcs90_device::device_start()
 	save_item(NAME(m_halt));
 	save_item(NAME(m_after_EI));
 	save_item(NAME(m_irq_state));
+	save_item(NAME(m_irq_line_state));
 	save_item(NAME(m_irq_mask));
 	save_item(NAME(m_extra_cycles));
 
@@ -2790,7 +2804,7 @@ void tlcs90_device::device_start()
 	m_prvpc.d = m_pc.d = m_sp.d = m_af.d = m_bc.d = m_de.d = m_hl.d = m_ix.d = m_iy.d = 0;
 	m_af2.d = m_bc2.d = m_de2.d = m_hl2.d = 0;
 	m_halt = m_after_EI = 0;
-	m_irq_state = m_irq_mask = 0;
+	m_irq_state = m_irq_line_state = m_irq_mask = 0;
 	m_extra_cycles = 0;
 	m_ixbase = m_iybase = 0;
 	m_timer_value[0] = m_timer_value[1] = m_timer_value[2] = m_timer_value[3] = 0;

@@ -445,7 +445,7 @@ ROM_END
 
 ROM_START(beatclck2)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "btc_lights_pro_111385_C70-803-05_u3.cpu", 0xc000, 0x4000, CRC(dff5bad6) SHA1(915495d60be7ca12f00364b6e4b99c822ecfc7aa))
+	ROM_LOAD( "btc_lights_pro_111385_c70-803-05_u3.cpu", 0xc000, 0x4000, CRC(dff5bad6) SHA1(915495d60be7ca12f00364b6e4b99c822ecfc7aa))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("btc_u2.snd", 0xc000, 0x1000, CRC(fd22fd2a) SHA1(efad3b94e91d07930ada5366d389f35377dfbd99))
 	ROM_LOAD("btc_u3.snd", 0xd000, 0x1000, CRC(22311a4a) SHA1(2c22ba9228e44e68b9308b3bf8803edcd70fa5b9))

@@ -1588,6 +1588,18 @@ void validity_checker::validate_roms(device_t &root)
 				last_name = romp->name;
 				total_files++;
 
+				// validate the name
+				if (strlen(last_name) > 127)
+					osd_printf_error("ROM label %s exceeds maximum 127 characters\n", last_name);
+				for (char const *s = last_name; *s; ++s)
+				{
+					if (((*s < '0') || (*s > '9')) && ((*s < 'a') || (*s > 'z')) && (*s != ' ') && (*s != '@') && (*s != '.') && (*s != ',') && (*s != '_') && (*s != '-') && (*s != '+') && (*s != '='))
+					{
+						osd_printf_error("ROM label %s contains invalid characters\n", last_name);
+						break;
+					}
+				}
+
 				// make sure the hash is valid
 				util::hash_collection hashes;
 				if (!hashes.from_internal_string(romp->hashdata))

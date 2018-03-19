@@ -24,8 +24,8 @@ http://www.citylan.it/wiki/index.php/Fast_Invaders_%288275_version%29
 class fastinvaders_state : public driver_device
 {
 public:
-	fastinvaders_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	fastinvaders_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
@@ -33,8 +33,60 @@ public:
 		m_crtc6845(*this, "6845"),
 		m_pic8259(*this, "pic8259"),
 		m_dma8257(*this, "dma8257")
-		{ }
+	{ }
 
+	DECLARE_DRIVER_INIT(fi6845);
+
+	void fastinvaders(machine_config &config);
+	void fastinvaders_8275(machine_config &config);
+	void fastinvaders_6845(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(start);
+	DECLARE_INPUT_CHANGED_MEMBER(start2);
+	DECLARE_INPUT_CHANGED_MEMBER(tilt);
+	DECLARE_INPUT_CHANGED_MEMBER(in0);
+	DECLARE_INPUT_CHANGED_MEMBER(in1);
+	DECLARE_INPUT_CHANGED_MEMBER(in2);
+	DECLARE_INPUT_CHANGED_MEMBER(in3);
+	DECLARE_INPUT_CHANGED_MEMBER(in4);
+	DECLARE_INPUT_CHANGED_MEMBER(in5);
+	DECLARE_INPUT_CHANGED_MEMBER(in6);
+
+protected:
+	DECLARE_WRITE8_MEMBER(io_40_w);
+
+	DECLARE_READ8_MEMBER(io_60_r);
+	DECLARE_WRITE8_MEMBER(io_70_w);
+	DECLARE_WRITE8_MEMBER(io_90_w);
+	DECLARE_WRITE8_MEMBER(io_a0_w);
+	DECLARE_WRITE8_MEMBER(io_b0_w);
+	DECLARE_WRITE8_MEMBER(io_c0_w);
+	DECLARE_WRITE8_MEMBER(io_d0_w);
+	DECLARE_WRITE8_MEMBER(io_e0_w);
+	DECLARE_WRITE8_MEMBER(io_f0_w);
+
+
+	DECLARE_READ_LINE_MEMBER(sid_read);
+
+	virtual void video_start() override;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(count_ar);
+	DECLARE_WRITE_LINE_MEMBER(vsync);
+	DECLARE_WRITE_LINE_MEMBER(hsync);
+	DECLARE_READ8_MEMBER(memory_read_byte);
+	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	DECLARE_WRITE8_MEMBER(dark_1_clr);
+	DECLARE_WRITE8_MEMBER(dark_2_clr);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void fastinvaders_map(address_map &map);
+	void fastinvaders_io_base(address_map &map);
+	void fastinvaders_6845_io(address_map &map);
+	void fastinvaders_8275_io(address_map &map);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -62,64 +114,11 @@ public:
 	uint8_t m_irq4;
 	uint8_t m_irq5;
 	uint8_t m_irq6;
-	uint8_t m_irq7;
-
 
 	uint8_t m_start2_value;
 	uint8_t m_dma1;
 	uint8_t m_io_40;
 	uint8_t m_hsync;
-
-	DECLARE_WRITE8_MEMBER(io_40_w);
-
-	DECLARE_READ8_MEMBER(io_60_r);
-	DECLARE_WRITE8_MEMBER(io_70_w);
-	DECLARE_WRITE8_MEMBER(io_90_w);
-	DECLARE_WRITE8_MEMBER(io_a0_w);
-	DECLARE_WRITE8_MEMBER(io_b0_w);
-	DECLARE_WRITE8_MEMBER(io_c0_w);
-	DECLARE_WRITE8_MEMBER(io_d0_w);
-	DECLARE_WRITE8_MEMBER(io_e0_w);
-	DECLARE_WRITE8_MEMBER(io_f0_w);
-
-
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(start);
-	DECLARE_INPUT_CHANGED_MEMBER(start2);
-	DECLARE_INPUT_CHANGED_MEMBER(tilt);
-	DECLARE_INPUT_CHANGED_MEMBER(in0);
-	DECLARE_INPUT_CHANGED_MEMBER(in1);
-	DECLARE_INPUT_CHANGED_MEMBER(in2);
-	DECLARE_INPUT_CHANGED_MEMBER(in3);
-	DECLARE_INPUT_CHANGED_MEMBER(in4);
-	DECLARE_INPUT_CHANGED_MEMBER(in5);
-	DECLARE_INPUT_CHANGED_MEMBER(in6);
-
-	DECLARE_READ_LINE_MEMBER(sid_read);
-
-
-	virtual void video_start() override;
-
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(count_ar);
-	DECLARE_WRITE_LINE_MEMBER(vsync);
-	DECLARE_WRITE_LINE_MEMBER(hsync);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_WRITE8_MEMBER(dark_1_clr);
-	DECLARE_WRITE8_MEMBER(dark_2_clr);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-
-	DECLARE_DRIVER_INIT(fi6845);
-
-	void fastinvaders(machine_config &config);
-	void fastinvaders_8275(machine_config &config);
-	void fastinvaders_6845(machine_config &config);
-	void fastinvaders_6845_io(address_map &map);
-	void fastinvaders_8275_io(address_map &map);
-	void fastinvaders_io_base(address_map &map);
-	void fastinvaders_map(address_map &map);
 };
 
 
@@ -731,33 +730,33 @@ const uint8_t *prom = memregion("prom")->base();
 //ROM_START( fi6845 )
 ROM_START( fi8275 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "R2.1A",     0x0000, 0x0200, CRC(6180d652) SHA1(3aac67f52897059c8366f52c41464052ce860ae8) )
-	ROM_LOAD( "R2.1B",     0x0200, 0x0200, CRC(f10baf3e) SHA1(4a1702c24e949d9bef990033b5507a573abd7bc3) )
-	ROM_LOAD( "R2.2A",     0x0400, 0x0200, CRC(f446ef0d) SHA1(2be337c1197d14e5ffc33ea05b5262f1ea17d442) )
-	ROM_LOAD( "R2.2B",     0x0600, 0x0200, CRC(b97e35a3) SHA1(0878a83c7f9f0645749fdfb1ff372d0e04833c9e) )
-	ROM_LOAD( "R2.3A",     0x0800, 0x0200, CRC(988f36da) SHA1(7229f660a6a9cf9f66d0924c63772daabd09710e) )
-	ROM_LOAD( "R2.3B",     0x0a00, 0x0200, CRC(be7dc34d) SHA1(e4aa1617629869c9ff5f39b656001a43020f0cb8) )
-	ROM_LOAD( "R2.4A",     0x0c00, 0x0200, CRC(199cb227) SHA1(064f6005a3f1afe9ca04e93e6bc999735a12a05b) )
-	ROM_LOAD( "R2.4B",     0x0e00, 0x0200, CRC(ca41218a) SHA1(01529e21c44669dc96df4331e87d45098a263772) )
-	ROM_LOAD( "R2.5A",     0x1000, 0x0200, CRC(e8ecf0da) SHA1(723edaa6f069a21ab7496a24831f23b4b4d73629) )
-	ROM_LOAD( "R2.5B",     0x1200, 0x0200, CRC(cb2d8029) SHA1(cac067accddfcce6014d2a425b4291ed8226d169) )
-	ROM_LOAD( "R2.6A",     0x1400, 0x0200, CRC(e4d4cc96) SHA1(2dc3d7e4cbd93220285938aec31011b685563cf7) )
-	ROM_LOAD( "R2.6B",     0x1600, 0x0200, CRC(0c96ba4a) SHA1(0da104472c33523d4002cab0c77ca20fc2998a2c) )
-	ROM_LOAD( "R2.7A",     0x1800, 0x0200, CRC(c9207fbd) SHA1(bf388e26ee1e2073b8a641ba6fb551c24d471a70) )
+	ROM_LOAD( "r2.1a",     0x0000, 0x0200, CRC(6180d652) SHA1(3aac67f52897059c8366f52c41464052ce860ae8) )
+	ROM_LOAD( "r2.1b",     0x0200, 0x0200, CRC(f10baf3e) SHA1(4a1702c24e949d9bef990033b5507a573abd7bc3) )
+	ROM_LOAD( "r2.2a",     0x0400, 0x0200, CRC(f446ef0d) SHA1(2be337c1197d14e5ffc33ea05b5262f1ea17d442) )
+	ROM_LOAD( "r2.2b",     0x0600, 0x0200, CRC(b97e35a3) SHA1(0878a83c7f9f0645749fdfb1ff372d0e04833c9e) )
+	ROM_LOAD( "r2.3a",     0x0800, 0x0200, CRC(988f36da) SHA1(7229f660a6a9cf9f66d0924c63772daabd09710e) )
+	ROM_LOAD( "r2.3b",     0x0a00, 0x0200, CRC(be7dc34d) SHA1(e4aa1617629869c9ff5f39b656001a43020f0cb8) )
+	ROM_LOAD( "r2.4a",     0x0c00, 0x0200, CRC(199cb227) SHA1(064f6005a3f1afe9ca04e93e6bc999735a12a05b) )
+	ROM_LOAD( "r2.4b",     0x0e00, 0x0200, CRC(ca41218a) SHA1(01529e21c44669dc96df4331e87d45098a263772) )
+	ROM_LOAD( "r2.5a",     0x1000, 0x0200, CRC(e8ecf0da) SHA1(723edaa6f069a21ab7496a24831f23b4b4d73629) )
+	ROM_LOAD( "r2.5b",     0x1200, 0x0200, CRC(cb2d8029) SHA1(cac067accddfcce6014d2a425b4291ed8226d169) )
+	ROM_LOAD( "r2.6a",     0x1400, 0x0200, CRC(e4d4cc96) SHA1(2dc3d7e4cbd93220285938aec31011b685563cf7) )
+	ROM_LOAD( "r2.6b",     0x1600, 0x0200, CRC(0c96ba4a) SHA1(0da104472c33523d4002cab0c77ca20fc2998a2c) )
+	ROM_LOAD( "r2.7a",     0x1800, 0x0200, CRC(c9207fbd) SHA1(bf388e26ee1e2073b8a641ba6fb551c24d471a70) )
 
-	ROM_LOAD( "R2.1A",     0x2000, 0x0200, CRC(6180d652) SHA1(3aac67f52897059c8366f52c41464052ce860ae8) )
-	ROM_LOAD( "R2.1B",     0x2200, 0x0200, CRC(f10baf3e) SHA1(4a1702c24e949d9bef990033b5507a573abd7bc3) )
-	ROM_LOAD( "R2.2A",     0x2400, 0x0200, CRC(f446ef0d) SHA1(2be337c1197d14e5ffc33ea05b5262f1ea17d442) )
-	ROM_LOAD( "R2.2B",     0x2600, 0x0200, CRC(b97e35a3) SHA1(0878a83c7f9f0645749fdfb1ff372d0e04833c9e) )
+	ROM_LOAD( "r2.1a",     0x2000, 0x0200, CRC(6180d652) SHA1(3aac67f52897059c8366f52c41464052ce860ae8) )
+	ROM_LOAD( "r2.1b",     0x2200, 0x0200, CRC(f10baf3e) SHA1(4a1702c24e949d9bef990033b5507a573abd7bc3) )
+	ROM_LOAD( "r2.2a",     0x2400, 0x0200, CRC(f446ef0d) SHA1(2be337c1197d14e5ffc33ea05b5262f1ea17d442) )
+	ROM_LOAD( "r2.2b",     0x2600, 0x0200, CRC(b97e35a3) SHA1(0878a83c7f9f0645749fdfb1ff372d0e04833c9e) )
 
 
 	ROM_REGION( 0x0c00, "gfx1", 0 )
-	ROM_LOAD( "C2.1F",     0x0000, 0x0200, CRC(9feca88a) SHA1(14a8c46eb51eed01b7b537a9931cd092cec2019f) )
-	ROM_LOAD( "C2.1G",     0x0200, 0x0200, CRC(79fc3963) SHA1(25651d1031895a01a2a4751b355ff1200a899ac5) )
-	ROM_LOAD( "C2.1H",     0x0400, 0x0200, CRC(936171e4) SHA1(d0756b49bfd5d58a79f735d4a98a99cce7604b0e) )
-	ROM_LOAD( "C2.2F",     0x0600, 0x0200, CRC(3bb16f55) SHA1(b1cc1e2346acd0e5c84861b414b4677871079844) )
-	ROM_LOAD( "C2.2G",     0x0800, 0x0200, CRC(19828c47) SHA1(f215ce55be32b3564e1b7cc19500d38a93117051) )
-	ROM_LOAD( "C2.2H",     0x0a00, 0x0200, CRC(284ae4eb) SHA1(6e28fcd9d481d37f47728f22f6048b29266f4346) )
+	ROM_LOAD( "c2.1f",     0x0000, 0x0200, CRC(9feca88a) SHA1(14a8c46eb51eed01b7b537a9931cd092cec2019f) )
+	ROM_LOAD( "c2.1g",     0x0200, 0x0200, CRC(79fc3963) SHA1(25651d1031895a01a2a4751b355ff1200a899ac5) )
+	ROM_LOAD( "c2.1h",     0x0400, 0x0200, CRC(936171e4) SHA1(d0756b49bfd5d58a79f735d4a98a99cce7604b0e) )
+	ROM_LOAD( "c2.2f",     0x0600, 0x0200, CRC(3bb16f55) SHA1(b1cc1e2346acd0e5c84861b414b4677871079844) )
+	ROM_LOAD( "c2.2g",     0x0800, 0x0200, CRC(19828c47) SHA1(f215ce55be32b3564e1b7cc19500d38a93117051) )
+	ROM_LOAD( "c2.2h",     0x0a00, 0x0200, CRC(284ae4eb) SHA1(6e28fcd9d481d37f47728f22f6048b29266f4346) )
 
 	ROM_REGION( 0x0100, "prom", 0 )
 	ROM_LOAD( "93427.bin",     0x0000, 0x0100, CRC(f59c8573) SHA1(5aed4866abe1690fd0f088af1cfd99b3c85afe9a) )
@@ -766,28 +765,28 @@ ROM_END
 //ROM_START( fi8275 )
 ROM_START( fi6845 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "R1.1A",     0x0000, 0x0200, CRC(fef96dfe) SHA1(f6df0cf6b5d90ea07ee890985c8cbf0f68e08550) )
-	ROM_LOAD( "R1.1B",     0x0200, 0x0200, CRC(c48c6ebc) SHA1(f1f86839819b6abce9ff55c1b02bbf2c4036c51a) )
-	ROM_LOAD( "R1.2A",     0x0400, 0x0200, CRC(626a740c) SHA1(3a1df1d71acc207b1b952ad5176804fce27ea97e) )
-	ROM_LOAD( "R1.2B",     0x0600, 0x0200, CRC(fbe9782e) SHA1(3661bd03e029e4d2092d259f38a7dec9e763761c) )
-	ROM_LOAD( "R1.3A",     0x0800, 0x0200, CRC(6e10de0d) SHA1(8d937f6f2fe1a79b62e6e75536889416ec0071e3) )
-	ROM_LOAD( "R1.3B",     0x0a00, 0x0200, CRC(ee1bac50) SHA1(f723b2d1c2a1194aa2df67d48f2b669f5076d857) )
-	ROM_LOAD( "R1.4A",     0x0c00, 0x0200, CRC(7faff8f1) SHA1(9275123d6513ab917506f6e9d929935ed1bef429) )
-	ROM_LOAD( "R1.4B",     0x0e00, 0x0200, CRC(205ca0c1) SHA1(edf68e9c75523e1b6a485b27af60592fdfb78e04) )
-	ROM_LOAD( "R1.5A",     0x1000, 0x0200, CRC(9ada6666) SHA1(f965a08c75fa87e8e3fd7595dcd98231e976e072) )
-	ROM_LOAD( "R1.5B",     0x1200, 0x0200, CRC(0f617215) SHA1(b342c783335ab26c036ae77f63a2e932a590c2fa) )
-	ROM_LOAD( "R1.6A",     0x1400, 0x0200, CRC(75ea69ae) SHA1(edd9bf686c169ca64373ea87ba92fab4e8c6ee4d) )
-	//ROM_LOAD( "R1.6B",   0x1600, 0x0200, CRC(11111111) SHA1(1111111111111111111111111111111111111111) ) // not populated
-	ROM_LOAD( "R1.7A",     0x1800, 0x0200, CRC(6e12538f) SHA1(aa08a2db2e5570b431afc967ea5fd749c4f82e33) )
-	ROM_LOAD( "R1.7B",     0x1a00, 0x0200, CRC(7270d194) SHA1(7cef9c420c3c3cbc5846bd22137213a78506a8d3) )
+	ROM_LOAD( "r1.1a",     0x0000, 0x0200, CRC(fef96dfe) SHA1(f6df0cf6b5d90ea07ee890985c8cbf0f68e08550) )
+	ROM_LOAD( "r1.1b",     0x0200, 0x0200, CRC(c48c6ebc) SHA1(f1f86839819b6abce9ff55c1b02bbf2c4036c51a) )
+	ROM_LOAD( "r1.2a",     0x0400, 0x0200, CRC(626a740c) SHA1(3a1df1d71acc207b1b952ad5176804fce27ea97e) )
+	ROM_LOAD( "r1.2b",     0x0600, 0x0200, CRC(fbe9782e) SHA1(3661bd03e029e4d2092d259f38a7dec9e763761c) )
+	ROM_LOAD( "r1.3a",     0x0800, 0x0200, CRC(6e10de0d) SHA1(8d937f6f2fe1a79b62e6e75536889416ec0071e3) )
+	ROM_LOAD( "r1.3b",     0x0a00, 0x0200, CRC(ee1bac50) SHA1(f723b2d1c2a1194aa2df67d48f2b669f5076d857) )
+	ROM_LOAD( "r1.4a",     0x0c00, 0x0200, CRC(7faff8f1) SHA1(9275123d6513ab917506f6e9d929935ed1bef429) )
+	ROM_LOAD( "r1.4b",     0x0e00, 0x0200, CRC(205ca0c1) SHA1(edf68e9c75523e1b6a485b27af60592fdfb78e04) )
+	ROM_LOAD( "r1.5a",     0x1000, 0x0200, CRC(9ada6666) SHA1(f965a08c75fa87e8e3fd7595dcd98231e976e072) )
+	ROM_LOAD( "r1.5b",     0x1200, 0x0200, CRC(0f617215) SHA1(b342c783335ab26c036ae77f63a2e932a590c2fa) )
+	ROM_LOAD( "r1.6a",     0x1400, 0x0200, CRC(75ea69ae) SHA1(edd9bf686c169ca64373ea87ba92fab4e8c6ee4d) )
+	//ROM_LOAD( "r1.6b",   0x1600, 0x0200, CRC(11111111) SHA1(1111111111111111111111111111111111111111) ) // not populated
+	ROM_LOAD( "r1.7a",     0x1800, 0x0200, CRC(6e12538f) SHA1(aa08a2db2e5570b431afc967ea5fd749c4f82e33) )
+	ROM_LOAD( "r1.7b",     0x1a00, 0x0200, CRC(7270d194) SHA1(7cef9c420c3c3cbc5846bd22137213a78506a8d3) )
 
 	ROM_REGION( 0x0c00, "gfx1", 0 )
-	ROM_LOAD( "C1.1B",     0x0000, 0x0200, CRC(9feca88a) SHA1(14a8c46eb51eed01b7b537a9931cd092cec2019f) )
-	ROM_LOAD( "C1.2B",     0x0200, 0x0200, CRC(79fc3963) SHA1(25651d1031895a01a2a4751b355ff1200a899ac5) )
-	ROM_LOAD( "C1.3B",     0x0400, 0x0200, CRC(936171e4) SHA1(d0756b49bfd5d58a79f735d4a98a99cce7604b0e) )
-	ROM_LOAD( "C1.1A",     0x0600, 0x0200, CRC(3bb16f55) SHA1(b1cc1e2346acd0e5c84861b414b4677871079844) )
-	ROM_LOAD( "C1.2A",     0x0800, 0x0200, CRC(19828c47) SHA1(f215ce55be32b3564e1b7cc19500d38a93117051) )
-	ROM_LOAD( "C1.3A",     0x0a00, 0x0200, CRC(284ae4eb) SHA1(6e28fcd9d481d37f47728f22f6048b29266f4346) )
+	ROM_LOAD( "c1.1b",     0x0000, 0x0200, CRC(9feca88a) SHA1(14a8c46eb51eed01b7b537a9931cd092cec2019f) )
+	ROM_LOAD( "c1.2b",     0x0200, 0x0200, CRC(79fc3963) SHA1(25651d1031895a01a2a4751b355ff1200a899ac5) )
+	ROM_LOAD( "c1.3b",     0x0400, 0x0200, CRC(936171e4) SHA1(d0756b49bfd5d58a79f735d4a98a99cce7604b0e) )
+	ROM_LOAD( "c1.1a",     0x0600, 0x0200, CRC(3bb16f55) SHA1(b1cc1e2346acd0e5c84861b414b4677871079844) )
+	ROM_LOAD( "c1.2a",     0x0800, 0x0200, CRC(19828c47) SHA1(f215ce55be32b3564e1b7cc19500d38a93117051) )
+	ROM_LOAD( "c1.3a",     0x0a00, 0x0200, CRC(284ae4eb) SHA1(6e28fcd9d481d37f47728f22f6048b29266f4346) )
 
 	ROM_REGION( 0x0100, "prom", 0 )
 	ROM_LOAD( "93427.bin",     0x0000, 0x0100, CRC(f59c8573) SHA1(5aed4866abe1690fd0f088af1cfd99b3c85afe9a) )
