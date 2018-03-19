@@ -64,18 +64,27 @@
     and external space from 0x8000 onwards.  The additional ROM could
     be anywhere in between.
 
-    Meanings for known command words (0x00 to 0x8f mostly understood):
+    Meanings for known command words:
     (((ch - 1) << 3) & 0x78     sample bank
-    (ch << 3) | 0x01            current/starting sample offset
-    (ch << 3) | 0x02            rate (zero for key-off)
+    (ch << 3) | 0x01            channel sample offset within bank
+    (ch << 3) | 0x02            channel playback rate
     (ch << 3) | 0x03            channel sample period counter
-    (ch << 3) | 0x04            loop offset (relative to end)
-    (ch << 3) | 0x05            end sample offset
+    (ch << 3) | 0x04            channel loop offset (relative to end)
+    (ch << 3) | 0x05            channel end sample offset
     (ch << 3) | 0x06            channel volume
-    ch | 0x80                   position on sound stage
-
-    The games don't seem to use (ch << 3) | 0x07 for anything.  The
-    games use 0xba to 0xcb, but the purpose is not understood.
+    ch | 0x80                   left/right position on sound stage
+    0x93                        delayed reverb volume
+    ch + 0xba                   channel reverb contribution
+    0xd9                        reverb delay (need to add 0x0554)
+    0xde                        left output filtered component delay
+    0xdf                        left output unfiltered component delay
+    0xe0                        right output filtered component delay
+    0xe1                        right output unfiltered component delay
+    0xe2                        write non-zero to set delays
+    0xe4                        left output filtered component volume
+    0xe5                        left output unfiltered component volume
+    0xe6                        right output filtered component volume
+    0xe7                        right output unfiltered component volume
 
     The weird way of setting the sample bank is due to the one-read
     latency described above.  Since the bank applies to the next read,
