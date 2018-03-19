@@ -8117,21 +8117,35 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- Bundled with the November 26th, 1999 issue of "Dreamcast Magazine". -->
-	<!--
 	<software name="dorimaga3">
+		<!-- http://redump.org/disc/29105/
+		<rom name="Dorimaga GD Vol. 3 (Japan).gdi" size="772" crc="a407f16e" md5="931ad483a42f39a7352b60b9e369cf97" sha1="644ea8f3903eff20af88d2c9b500cde8ee6433c6"/>
+		<rom name="Dorimaga GD Vol. 3 (Japan) (Track 01).bin" size="705600" crc="87ec379c" md5="d6e96ae338ff098be359241c0b854abd" sha1="b335ad69e49c573fca88387d875a434ddd8d5338"/>
+		<rom name="Dorimaga GD Vol. 3 (Japan) (Track 02).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
+		<rom name="Dorimaga GD Vol. 3 (Japan) (Track 03).bin" size="187023984" crc="36949da1" md5="849f20e29d79fbb2114faa1e9f8117b8" sha1="a120b797ff783a0546fa4bd49e41c4ba185a81a9"/>
+		<rom name="Dorimaga GD Vol. 3 (Japan) (Track 04).bin" size="11999904" crc="9221aba2" md5="603e3527e9d8d28150fe42c92aa87ea1" sha1="7145cf11ed3dbaf84094817bfef74aba761786fa"/>
+		<rom name="Dorimaga GD Vol. 3 (Japan) (Track 05).bin" size="2998800" crc="6cfe66b8" md5="0948eb454283199a795a50b73eb6eb43" sha1="38efdac9e3b0b3eb4ace6b23c04025ba734ab01b"/>
+		<rom name="Dorimaga GD Vol. 3 (Japan) (Track 06).bin" size="16828560" crc="a8b07f47" md5="be2efada4c849212c4bb784fa6ae7e4f" sha1="634179c90334aa0fe4c7789086b1693e710d57bb"/>
+		<rom name="Dorimaga GD Vol. 3 (Japan) (Track 07).bin" size="3911376" crc="b307cb86" md5="f538536fd229a7233abbd4083e3d1387" sha1="e7f2e4a1db37d877c10eb2614ab01757fd1eb2c3"/>
+		<rom name="Dorimaga GD Vol. 3 (Japan) (Track 08).bin" size="7411152" crc="834d62a7" md5="262ff79376739a9635818c03ae288797" sha1="0881d13089415fd36536b9e226d644df521c0424"/>
+		<rom name="Dorimaga GD Vol. 3 (Japan) (Track 09).bin" size="3767904" crc="90a7a075" md5="7dbe455f4825149bef9b0b34bd7b7624" sha1="d8a66f65a5ac8a2e2975795bb829335014e18bdc"/>
+		<rom name="Dorimaga GD Vol. 3 (Japan) (Track 10).bin" size="6602064" crc="1c7682c0" md5="6e95b55452ebd2bde78bb0c8fcae5acf" sha1="db940fe46455b5d4ab672697d613db29835bfa57"/>
+		<rom name="Dorimaga GD Vol. 3 (Japan) (Track 11).bin" size="18585504" crc="1baea312" md5="4a86af81447532ccd4c6b8e00dba2f96" sha1="f4c4a65005aecc6dc2b72a8b143a2118af435815"/>
+		<rom name="Dorimaga GD Vol. 3 (Japan) (Track 12).bin" size="926631552" crc="375eebe5" md5="8241aeff0bd0c70eb9660da736f46365" sha1="e84c352935ae14d70ab2cd59bee506423851623d"/>
+		-->
 		<description>Dorimaga GD Vol. 3 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Softbank</publisher>
 		<info name="serial" value="610-7164-04"/>
 		<info name="release" value="19991126" />
 		<info name="alt_title" value="ドリマガGD Vol.3" />
+		<info name="ring_code" value="610-7164-0199 1M3 C 9X, 610-7164-0199 2M3 C 9X"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dorimaga gd vol. 3 (jpn)" status="nodump"/>
+				<disk name="dorimaga gd vol. 3 (jpn)" sha1="dbb87df73c8c2f051a473d4090e90482848dc2a1"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!-- Bundled with the December 24th, 1999 issue of "Dreamcast Magazine". -->
 	<software name="dorimaga4">
@@ -8307,38 +8321,48 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- Bundled with the March 30th, 2001 issue of "Dreamcast Magazine". -->
-	<!--
 	<software name="dorimaga11">
+		<!-- http://redump.org/disc/45271/
+		<rom name="Dorimaga GD Vol. 11 (Japan).gdi" size="189" crc="bdffd094" md5="01464185c2c8044c16db648c8dc86607" sha1="365abd2ebfe37a9cc7b89e1730ba01fa691ded3d"/>
+		<rom name="Dorimaga GD Vol. 11 (Japan) (Track 1).bin" size="1058400" crc="f71f5426" md5="b050bc3003fe414cd9b1ecd53ec65ce2" sha1="2b30eb5cf10a1f2edb60b0154b3a08b48829b562"/>
+		<rom name="Dorimaga GD Vol. 11 (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
+		<rom name="Dorimaga GD Vol. 11 (Japan) (Track 3).bin" size="1185760800" crc="1f1bcde2" md5="6b3b8eb21cd3b6438a91cdd5f0563fbb" sha1="cdbb8f4c1248930efa6cead6a70535fc76995dd6"/>
+		-->
 		<description>Dorimaga GD Vol. 11 (Jpn)</description>
 		<year>2001</year>
 		<publisher>Softbank</publisher>
 		<info name="serial" value="610-7164-12"/>
 		<info name="release" value="20010330" />
 		<info name="alt_title" value="ドリマガGD Vol.11" />
+		<info name="ring_code" value="610-7164-0651 1M5 C 12"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dorimaga gd vol. 11 (jpn)" status="nodump"/>
+				<disk name="dorimaga gd vol. 11 (jpn)" sha1="4b2364b5b938f80f9112d3e0ee20bc39be4b2d1d"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!-- Bundled with the June 8th, 2001 (2001/Vol.3) issue of "Dorimaga". -->
-	<!--
 	<software name="dorimaga12">
+		<!-- http://redump.org/disc/45272/
+		<rom name="Dorimaga GD Vol. 12 (Japan).gdi" size="189" crc="2a43f0e1" md5="ba00a4d14bc2daf1ae960041f076a5f6" sha1="9a1f7b8a24cab9a1c69b6bba3269b6992e30ec64"/>
+		<rom name="Dorimaga GD Vol. 12 (Japan) (Track 1).bin" size="1058400" crc="560dd9b3" md5="b623c8e2f8741b5ee63650def5fab917" sha1="e88380a69db7edd7f200f0d3045265c9ec99f5d5"/>
+		<rom name="Dorimaga GD Vol. 12 (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
+		<rom name="Dorimaga GD Vol. 12 (Japan) (Track 3).bin" size="1185760800" crc="e4d94f00" md5="3f6964d7ebb75c0230b4da84932fec8b" sha1="255a92842ada2334b98eb92100e3e74e0c77726a"/>
+		-->
 		<description>Dorimaga GD Vol. 12 (Jpn)</description>
 		<year>2001</year>
 		<publisher>Softbank</publisher>
 		<info name="serial" value="610-7164-13"/>
 		<info name="release" value="2001" />
 		<info name="alt_title" value="ドリマガGD Vol.12" />
+		<info name="ring_code" value="610-7164-0702 1M3 C 15"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dorimaga gd vol. 12 (jpn)" status="nodump"/>
+				<disk name="dorimaga gd vol. 12 (jpn)" sha1="8b0119acb2f5d19a2e85f713c9c8e04b146d723a"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
 	<software name="dskai2">
@@ -9169,21 +9193,26 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- Bundled together with Dreamcast consoles. -->
-	<!--
 	<software name="drmpass" cloneof="drmpass101">
+		<!-- http://redump.org/disc/17048/
+		<rom name="Dream Passport (Japan).gdi" size="174" crc="3c6fa231" md5="7c9c63311721d504d7e5728bd3f9c023" sha1="dbe9f83accb52e2eaeda65576a5676fb6981413e"/>
+		<rom name="Dream Passport (Japan) (Track 1).bin" size="1112496" crc="b0ef52e5" md5="2e8a3359ac21003918ede1083ada97ad" sha1="8818711b2454f04b3fd5a02a8ca9a289d74748e0"/>
+		<rom name="Dream Passport (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
+		<rom name="Dream Passport (Japan) (Track 3).bin" size="1185760800" crc="ac8f9b56" md5="0d475dff714009cd9acf1eceeea4fca0" sha1="589107a44a7fb4539dc4f69685ab3405865eb90d"/>
+		-->
 		<description>Dream Passport (Jpn)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-7000"/>
 		<info name="release" value="19981127" />
 		<info name="alt_title" value="ドリームパスポート" />
+		<info name="ring_code" value="F-7 2M6 C BY, F-7 3MB1 C 8X"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream passport (jpn)" status="nodump"/>
+				<disk name="dream passport (jpn)" sha1="a5cceea2b94280b7152315614b4180f5affc108e"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!-- Bundled together with Toyota Keiretsu-ten Hanbai-ban Dreamcast consoles. -->
 	<!--
@@ -9674,20 +9703,25 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<!--
 	<software name="drmprevw8">
+		<!-- http://redump.org/disc/46900/
+		<rom name="Dream Preview Vol. 8 (Japan).gdi" size="192" crc="fe51c758" md5="c68e5b7d619b09057309598e33b3c7e0" sha1="a1201ec976f3a0b6af0ea5571bf6f9ebf3d303d6"/>
+		<rom name="Dream Preview Vol. 8 (Japan) (Track 1).bin" size="705600" crc="aa33aed9" md5="8dd0d34066575d0ed26a4c29445e3760" sha1="6434eacfb888e74c573a24906234769d164e7073"/>
+		<rom name="Dream Preview Vol. 8 (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
+		<rom name="Dream Preview Vol. 8 (Japan) (Track 3).bin" size="1185760800" crc="13e21740" md5="51ee10875a2fda4c416af264615382f6" sha1="cdcb6dcf304159551608a381cbc7d3abdec55cff"/>
+		-->
 		<description>Dream Preview Vol. 8 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-7027-08"/>
 		<info name="alt_title" value="ドリーム プレピュー Vol.8" />
+		<info name="ring_code" value="610-7027-0135 1M1 C 97"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="dream preview vol. 8 (jpn)" status="nodump"/>
+				<disk name="dream preview vol. 8 (jpn)" sha1="c79d329578d0db6a00f0c463f97eddb2121d8728"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!--
 	<software name="dcdenet">
@@ -11340,21 +11374,26 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!--
 	<software name="elysion">
+		<!-- http://redump.org/disc/40287/
+		<rom name="Elysion - Eien no Sanctuary (Japan).gdi" size="213" crc="8aee00bc" md5="28df49e8b3c9b078e148d27fae99c556" sha1="9ea68c5588fd3880a7c44c56303a1782af9d8447"/>
+		<rom name="Elysion - Eien no Sanctuary (Japan) (Track 1).bin" size="705600" crc="e6231540" md5="0bfa179c1119b96f99714606ae587c2c" sha1="dce3ee7cf919b9375c6f0f2b6ca00dfa952c7953"/>
+		<rom name="Elysion - Eien no Sanctuary (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
+		<rom name="Elysion - Eien no Sanctuary (Japan) (Track 3).bin" size="1185760800" crc="ceb20536" md5="2d93b644a565f100ed6ec0645f9d8da8" sha1="f49ba525d83b0618dacf3f0dd076d40df735012c"/>
+		-->
 		<description>Elysion: Eien no Sanctuary (Jpn)</description>
 		<year>2002</year>
 		<publisher>NEC Interchannel</publisher>
 		<info name="serial" value="T-20116M"/>
 		<info name="release" value="20020725" />
 		<info name="alt_title" value="エリュシオン 〜永遠のサンクチュアリ〜" />
+		<info name="ring_code" value="&lt;T-20116M-0839&gt;HM707B"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="elysion eien no sanctuary (jpn)" status="nodump"/>
+				<disk name="elysion eien no sanctuary (jpn)" sha1="ec02aba1dd210bc39c6e94926cbb091fbadfdcb2"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!--
 	<software name="erde">
@@ -12655,6 +12694,29 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
 				<disk name="fighting force 2 (usa, alt)" sha1="6e0ff5a258345b920270c857a2ca9c7213060d48"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fforce2b" cloneof="fforce2">
+		<!-- http://redump.org/disc/22113/
+		<rom name="Fighting Force 2 (USA).gdi" size="351" crc="3e2ae35b" md5="f2513bda411a2119193abcedcc4f26c1" sha1="1baaa5ad41f911c8163094ee59d9da8b7a22cd38"/>
+		<rom name="Fighting Force 2 (USA) (Track 1).bin" size="1058400" crc="f7e3a56a" md5="0392e0cd5f3b13e264e64de2c02af905" sha1="ab1bbec01234a22342b8b43323ece7aeaf0876d9"/>
+		<rom name="Fighting Force 2 (USA) (Track 2).bin" size="1589952" crc="8557fcaa" md5="824ff123fbce45b5883962eb3fa43cab" sha1="a3705cb0ce53c7adf906c5af76887406984de6a9"/>
+		<rom name="Fighting Force 2 (USA) (Track 3).bin" size="590627184" crc="10d6eaac" md5="90f4578de3ba85cfc9fdf753a17c0d79" sha1="a9637d32f09aa2dacde9bd9c1d90a5c6f8e45a1d"/>
+		<rom name="Fighting Force 2 (USA) (Track 4).bin" size="3365712" crc="74531dcd" md5="85d66bd2291eae57849e876412b929e6" sha1="b412f4038c635d5c45868e26f0a46d68fac5c3f0"/>
+		<rom name="Fighting Force 2 (USA) (Track 5).bin" size="1237152" crc="95557332" md5="cb9f913312fff0782cd8c87568bcc047" sha1="cf9a3476b4886212c18868190f98d301f5205a09"/>
+		<rom name="Fighting Force 2 (USA) (Track 6).bin" size="590530752" crc="2cdb4717" md5="d2556d8cc02aa47718f0e12e148acfa2" sha1="e5e3a5adb1f8807be959fc53867606716d10f08c"/>
+		-->
+		<description>Fighting Force 2 (USA, Alt 2)</description>
+		<year>1999</year>
+		<publisher>Eidos Interactive</publisher>
+		<info name="serial" value="T-36801N"/>
+		<info name="release" value="19991130" />
+		<info name="ring_code" value="*12S* T-36801NA B"/>
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="fighting force 2 (usa, alt 2)" sha1="7814c912238861742b2375d25017ee0cc6d76d81"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14660,48 +14722,67 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
-	<!--
 	<software name="grandia2j" cloneof="grandia2">
+		<!-- http://redump.org/disc/28933/
+		<rom name="Grandia II (Japan).gdi" size="162" crc="e690d3fa" md5="3823adf91a3e089b01fcac446ebef0d6" sha1="95db68c0f32191467c24d027c07846a8b8292774"/>
+		<rom name="Grandia II (Japan) (Track 1).bin" size="1996848" crc="ffae3e7f" md5="2746e39f159828f712998f6cade0e336" sha1="6e415f181b6931286c1942b50f7dc68abe5c4e24"/>
+		<rom name="Grandia II (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
+		<rom name="Grandia II (Japan) (Track 3).bin" size="1185760800" crc="3a2b4bd7" md5="7bde1817464d32b2f5ca10d85d3c4eaa" sha1="86266f9d8895db524b4c0434813491e34c654922"/>
+		-->
 		<description>Grandia II (Jpn)</description>
 		<year>2000</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-4503M"/>
 		<info name="release" value="20000803" />
 		<info name="alt_title" value="グランディアII" />
+		<info name="ring_code" value="T-4503M-0451 1M2 C 07, T-4503M-0451 5M1 C 07, T-4503M-0451 5M2 C 07"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="grandia ii (jpn)" status="nodump"/>
+				<disk name="grandia ii (jpn)" sha1="6e927eb2fcd840edc12d77b7916139122c54fd13"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!--
 	The Limited Edition (T-4502M) shares the same disc as the regular edition (T-4503M) but comes in a
 	cardboard slipcase and includes a audio CD.
 	-->
-	<!--
 	<software name="grandia2jsp" cloneof="grandia2">
+		<!-- http://redump.org/disc/28933/ http://redump.org/disc/46978/
+		<rom name="Grandia II (Japan).gdi" size="162" crc="e690d3fa" md5="3823adf91a3e089b01fcac446ebef0d6" sha1="95db68c0f32191467c24d027c07846a8b8292774"/>
+		<rom name="Grandia II (Japan) (Track 1).bin" size="1996848" crc="ffae3e7f" md5="2746e39f159828f712998f6cade0e336" sha1="6e415f181b6931286c1942b50f7dc68abe5c4e24"/>
+		<rom name="Grandia II (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
+		<rom name="Grandia II (Japan) (Track 3).bin" size="1185760800" crc="3a2b4bd7" md5="7bde1817464d32b2f5ca10d85d3c4eaa" sha1="86266f9d8895db524b4c0434813491e34c654922"/>
+
+		<rom name="Grandia II - Melodia (Japan).cue" size="831" crc="60eb3d59" md5="7077d6d5638a2aa071c4f580c9ecf88e" sha1="8a68be8b252042976c9d40804ac086d94774852d"/>
+		<rom name="Grandia II - Melodia (Japan) (Track 1).bin" size="72897888" crc="a439e010" md5="daf8d5e59e178c38f61df68e2a4a4cac" sha1="b38333ecc3429bc8c19e345cf2ef92b94fd3030d"/>
+		<rom name="Grandia II - Melodia (Japan) (Track 2).bin" size="51513504" crc="e733f8a9" md5="b9652df762bb56a21c34ecec6a563e0c" sha1="81898735b8fa39deb0c8408ea60dc95351985178"/>
+		<rom name="Grandia II - Melodia (Japan) (Track 3).bin" size="3525648" crc="c5a8f7eb" md5="4a4444a95af160f02e0d018d170905c3" sha1="ec2bf0648e619b5f56225803b1436b930b60d99e"/>
+		<rom name="Grandia II - Melodia (Japan) (Track 4).bin" size="17976336" crc="d8ed47e0" md5="645b09422169ffed6add54d295f6760c" sha1="03a8c0dfac1ff0e0896f877c8ebbf55e0d9341d3"/>
+		<rom name="Grandia II - Melodia (Japan) (Track 5).bin" size="13714512" crc="dbe4000a" md5="0836e4be80a246b86a593b7048955eac" sha1="1c8a43ab43878e5b81503bb5016378a294844a68"/>
+		<rom name="Grandia II - Melodia (Japan) (Track 6).bin" size="24166800" crc="b5563ccc" md5="0e50efd1512e052e80fdd9da05212e99" sha1="252aeb5a042387a3a10aa9be5d4ebc92bc65ebc9"/>
+		<rom name="Grandia II - Melodia (Japan) (Track 7).bin" size="50803200" crc="8662ca13" md5="64d215d256850c97ffd077de8fc5f49e" sha1="2e5ad8bd7742abd0cc0d1f5a613e5ad498240c70"/>
+		-->
 		<description>Grandia II - Special Package (Jpn)</description>
 		<year>2000</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-4502M"/>
 		<info name="release" value="20000803" />
 		<info name="alt_title" value="グランディアII SPECIAL PACKAGE" />
+		<info name="ring_code" value="T-4503M-0451 1M2 C 07, T-4503M-0451 5M1 C 07, T-4503M-0451 5M2 C 07 (Game), GA.T-4502M MT B02 (Melodia)"/>
 		<part interface="dc_gdrom" name="gdrom1">
 			<feature name="part_id" value="Grandia II"/>
 			<diskarea name="gdrom">
-				<disk name="grandia ii (jpn)" status="nodump"/>
+				<disk name="grandia ii (jpn)" sha1="6e927eb2fcd840edc12d77b7916139122c54fd13"/>
 			</diskarea>
 		</part>
-		<part interface="dc_gdrom" name="gdrom2">
+		<part interface="dc_cdrom" name="cdrom1">
 			<feature name="part_id" value="Melodia"/>
-			<diskarea name="gdrom">
-				<disk name="grandia ii (jpn) (melodia)" status="nodump"/>
+			<diskarea name="cdrom">
+				<disk name="grandia ii (jpn) (melodia)" sha1="8f59f6369f6efcc175f16044e9145bd2867c3ac1"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!-- The disc has the same design as regular promo discs, but is labeled "Beta". It has the markings 950-0140-50 952-0133-50. -->
 	<!--
@@ -14835,21 +14916,61 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
-	<!--
 	<software name="ggx">
+		<!-- http://redump.org/disc/23397/
+		<rom name="Guilty Gear X (Japan).gdi" size="2246" crc="ccd307ad" md5="ebe5ed1c767e9ddc15473979d1a5ff32" sha1="88887b4347c915c3b9a05be0998b4bbffc5f1641"/>
+		<rom name="Guilty Gear X (Japan) (Track 01).bin" size="1613472" crc="fa6405f2" md5="4b29fe94da2db1d171c4c6ec2511e628" sha1="fc906ac5cba57379c590e22afc85cff84a8bca56"/>
+		<rom name="Guilty Gear X (Japan) (Track 02).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
+		<rom name="Guilty Gear X (Japan) (Track 03).bin" size="265164480" crc="0fed17de" md5="c439d7d13af9b17ee9493d2a679588bc" sha1="75118e83d47cb33bd1b2eeb5233ee4ca5ddae4dd"/>
+		<rom name="Guilty Gear X (Japan) (Track 04).bin" size="29501136" crc="abb20488" md5="fcac94bd09f07ccf308d0d450bc03048" sha1="02ab8cd7da411e231de8d1333e378dfa6fc41559"/>
+		<rom name="Guilty Gear X (Japan) (Track 05).bin" size="28847280" crc="96787726" md5="4ed9ce799fea005c311e6d7447a39a44" sha1="b1aaec87836db580a05b6592aad2c9c8854f2c25"/>
+		<rom name="Guilty Gear X (Japan) (Track 06).bin" size="49135632" crc="5e30b5f4" md5="46823a99a664af31229aba8bbc074fc0" sha1="3712570a4f32ed0609fca4dc17dbc6c3ad142b0c"/>
+		<rom name="Guilty Gear X (Japan) (Track 07).bin" size="34771968" crc="70f553ef" md5="61d32bda532c4cb0b327fb0a4ea97743" sha1="151385c1c5605e705e99c5f8b292eca4194b7a72"/>
+		<rom name="Guilty Gear X (Japan) (Track 08).bin" size="36411312" crc="2aa1309f" md5="04387e737378ed113ba78bf13747eb79" sha1="288da6aaa00fd3c9f01fc3fd71a020b0d84f5381"/>
+		<rom name="Guilty Gear X (Japan) (Track 09).bin" size="28661472" crc="0dddd143" md5="81f8a10334de7014a6ad1750e1ea2b55" sha1="0330d0b5565bad2e3beb648be0261ac67f2ff6c3"/>
+		<rom name="Guilty Gear X (Japan) (Track 10).bin" size="29710464" crc="39ea4924" md5="678f9b52bd7c8c7d81f53d47103b0eb7" sha1="48ca56687e8a4cad1b7e7840e57db86eb36a7d0a"/>
+		<rom name="Guilty Gear X (Japan) (Track 11).bin" size="30507792" crc="03cec132" md5="a8dc9ddb5bc3444a7ebda1eb2866f0a8" sha1="2c88e41797c49ff8bf26a6a05bf4cd73f00b571c"/>
+		<rom name="Guilty Gear X (Japan) (Track 12).bin" size="35195328" crc="0883a61f" md5="a130fe195d0e999c7d16825d56b6e061" sha1="d4a6a90eabd75e664cdddcabd5f1e70698b811eb"/>
+		<rom name="Guilty Gear X (Japan) (Track 13).bin" size="29369424" crc="7e2f1717" md5="7bb4694636a2e0fda1dbe324b77f2615" sha1="179368a4315680279ae7997065416f73afbdf4ea"/>
+		<rom name="Guilty Gear X (Japan) (Track 14).bin" size="53333952" crc="aea1c61b" md5="fe810e873baa0eefe57a2c7a4e762359" sha1="f07ec38a7dbea4c69b26fe0eb13598ccc9cbce41"/>
+		<rom name="Guilty Gear X (Japan) (Track 15).bin" size="50471568" crc="51f9d3ba" md5="eb23254adcc1b65743dcdb6cda18035e" sha1="170f78df10226e8dd08efd7a535629e6da9dd8ae"/>
+		<rom name="Guilty Gear X (Japan) (Track 16).bin" size="35595168" crc="41bee9c7" md5="bb8f1f7d96a32ec1c06b4802973625ed" sha1="04c5ef2f31dc5b060e54cec538c578f9afa99b45"/>
+		<rom name="Guilty Gear X (Japan) (Track 17).bin" size="27939408" crc="8afadf95" md5="9d27ec37cd74b96657af6fee6f2db734" sha1="5f1ec746924b1f7189811a66b1cd4b286447689e"/>
+		<rom name="Guilty Gear X (Japan) (Track 18).bin" size="37267440" crc="70d75aa0" md5="4c0f9d44d6ee3b49fdbf39874dd17fc1" sha1="3757c0d2b8704fa9de05069a10c2fcbb719c8574"/>
+		<rom name="Guilty Gear X (Japan) (Track 19).bin" size="33015024" crc="dc67376e" md5="6979d1ec4436bed90bbd71e41971b361" sha1="b803dd2e54031c4deb6cb029b8b9d1fc28cac171"/>
+		<rom name="Guilty Gear X (Japan) (Track 20).bin" size="30270240" crc="bc548591" md5="217584c89eabca9d2ad1770db048b996" sha1="854460ba74ad1fa34c7ce124066e5b881958975c"/>
+		<rom name="Guilty Gear X (Japan) (Track 21).bin" size="27588960" crc="8c6f2ad3" md5="b947601af98e70d00ad9d045ff0ff05b" sha1="aa633f9c296641a35aa1ade4273b1300140c2bab"/>
+		<rom name="Guilty Gear X (Japan) (Track 22).bin" size="27955872" crc="41f12632" md5="04b4c9d30014a0cd8f97077ee33c22c4" sha1="a51b18444ec16daf7d53cc055434fadf511e2eff"/>
+		<rom name="Guilty Gear X (Japan) (Track 23).bin" size="6192816" crc="d36c2204" md5="9f962d744f05f3582f25b23c9c1fb10f" sha1="bb542f3f35168dc2e36f78982c59fb9c05bf1bfe"/>
+		<rom name="Guilty Gear X (Japan) (Track 24).bin" size="30112656" crc="1b4e4322" md5="63c1f8221349d6837d53fac673701c6b" sha1="d7be6ff01ff080c2ca94fae5b077bc22586d8d7b"/>
+		<rom name="Guilty Gear X (Japan) (Track 25).bin" size="29891568" crc="c68eed1c" md5="cf24cea93d05d13f9c629eb4ec603c89" sha1="842673874ae56909ed111656f92474828aafb0f7"/>
+		<rom name="Guilty Gear X (Japan) (Track 26).bin" size="27370224" crc="77d9ea6f" md5="c376f624427a35cb61652807fe9813aa" sha1="6f9926e3580a19d90e098f97d7f7320c742585bc"/>
+		<rom name="Guilty Gear X (Japan) (Track 27).bin" size="11797632" crc="42e79105" md5="8288473e060e628a35b88b2111dcf1dd" sha1="9e5ed8fe23361a0e9297b088db8f98806f334aee"/>
+		<rom name="Guilty Gear X (Japan) (Track 28).bin" size="4019568" crc="fcfe919a" md5="935e9a3ef25e515f1ab31f9a61f1a309" sha1="b8382624fbdc62c4e36369035e62b8ff620eaee3"/>
+		<rom name="Guilty Gear X (Japan) (Track 29).bin" size="1128960" crc="65dee009" md5="c31bd4e60f50d61a255644fe0a47ffe0" sha1="1036ba5d0205db718bf8163220fcac560a66c553"/>
+		<rom name="Guilty Gear X (Japan) (Track 30).bin" size="1702848" crc="b87d4793" md5="a723200063fa3cbbd9dd9e8e5af56ff9" sha1="b0408862cf5dbaaf5911a332bb50eadbfba5c509"/>
+		<rom name="Guilty Gear X (Japan) (Track 31).bin" size="1484112" crc="36ad5773" md5="28bce43225bb57ff48fddb76b7758919" sha1="d4dfd25f799d1491e9604096a0025da13ee263ce"/>
+		<rom name="Guilty Gear X (Japan) (Track 32).bin" size="11393088" crc="4677da7a" md5="d824aae109fdb6cdb875e5c88d93476a" sha1="96655483c1cf10b75d8355c8e105322ca7425642"/>
+		<rom name="Guilty Gear X (Japan) (Track 33).bin" size="15803088" crc="f59e96ad" md5="3ab353113ad419135ce7dd5e00817837" sha1="5acf9debd129d658e2b858981402724ef73f986c"/>
+		<rom name="Guilty Gear X (Japan) (Track 34).bin" size="32441136" crc="d5853a45" md5="a183a64b500e0308e109e1e7ee3ecc90" sha1="ec68eb969b9c82cec772199bd0f882b964886e97"/>
+		<rom name="Guilty Gear X (Japan) (Track 35).bin" size="32347056" crc="49b6aabe" md5="c0fe597d98c0e668ec129aeb6abab7a6" sha1="895f0833945919ef227600231f2d73063b20aa58"/>
+		<rom name="Guilty Gear X (Japan) (Track 36).bin" size="32307072" crc="b84c805e" md5="2d703e5c36c27e987144888b8879e034" sha1="510841533ba91be3feb52393d60d68ecaa7b7fd8"/>
+		<rom name="Guilty Gear X (Japan) (Track 37).bin" size="24472560" crc="76d0d057" md5="bf1145d4b86d579e60934a3f97858c44" sha1="e198026c63a2c9a92dd20c42cf0b1bd052f2e8b7"/>
+		<rom name="Guilty Gear X (Japan) (Track 38).bin" size="2582496" crc="dae63f89" md5="6c092d964f7cd6a87ec07827533518e8" sha1="e44aa2741be5e4bd0dd1b5c7d67ce22e6c3a0c25"/>
+		-->
 		<description>Guilty Gear X (Jpn)</description>
 		<year>2000</year>
 		<publisher>Sammy</publisher>
 		<info name="serial" value="T-2402M"/>
 		<info name="release" value="20001214" />
 		<info name="alt_title" value="ギルティギア ゼクス" />
+		<info name="ring_code" value="T-2402M-0562A 10M2 C 0Y"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="guilty gear x (jpn)" status="nodump"/>
+				<disk name="guilty gear x (jpn)" sha1="6f2d7b2da9300e3db6cf9a4921af8dca728b3679"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!--
 	The Limited Edition (T-3601M) includes different disc art and a premium single CD.
@@ -15234,7 +15355,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
 	<!--
-	<software name="htcolumn2">
+	<software name="hanacols2">
 		<description>Hanagumi Taisen Columns 2 (Jpn)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
@@ -15321,21 +15442,26 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!--
 	<software name="harusame">
+		<!-- http://redump.org/disc/27709/
+		<rom name="Harusame Youbi (Japan).gdi" size="174" crc="09d72a7d" md5="b29d6604251f3f646a4700a19b0cdb07" sha1="78a837ad896e380e44738c47ca483cdd7c34aa07"/>
+		<rom name="Harusame Youbi (Japan) (Track 1).bin" size="1058400" crc="095362e2" md5="1b7f2d2f07758b539b8a214baec03ea4" sha1="0d73d251899f57c8b70cc38a6b38c72d32e80fd9"/>
+		<rom name="Harusame Youbi (Japan) (Track 2).bin" size="22273440" crc="d1e2d301" md5="a1b90b6d22bb44b152625fc290c0886a" sha1="665aae66cf3ef66875892b8b8062e1fda9ce2723"/>
+		<rom name="Harusame Youbi (Japan) (Track 3).bin" size="1185760800" crc="257aa5fd" md5="fdc8af6bb23a791766dde5334af493f6" sha1="c97141a6e61183c27c463e5c46bc648317e5b523"/>
+		-->
 		<description>Harusame Youbi (Jpn)</description>
 		<year>2001</year>
 		<publisher>NEC Interchannel</publisher>
 		<info name="serial" value="T-20106M"/>
 		<info name="release" value="20010322" />
 		<info name="alt_title" value="春雨曜日" />
+		<info name="ring_code" value="T-20106M-0655 3"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="harusame youbi (jpn)" status="nodump"/>
+				<disk name="harusame youbi (jpn)" sha1="44b5c1359a672e59cac6cbb9a758e8eae0c001b2"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<!-- Promo version has the markings 950-0179-50 952-0171-50 / 950-0180-50 952-0171-50 -->
 	<software name="headhunt">
@@ -15384,7 +15510,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="hmg">
+	<software name="hmgeo">
 		<!--
 		<rom name="Heavy Metal - Geomatrix v1.001 (2001)(Capcom)(NTSC)(US)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
 		<rom name="track01.bin" size="1058400" md5="fa98cf2006118fde2120d6546ce0fff2" sha1="fa6d01d6acbb795608bc0ecb288a68a1dfc644b8"/>
@@ -15404,7 +15530,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- A promo version exists (950-0188-50 952-0178-50), it is most likely the same as retail. -->
-	<software name="hmge" cloneof="hmg">
+	<software name="hmgeoe" cloneof="hmgeo">
 		<!--
 		<rom name="Heavy Metal - Geomatrix v1.000 (2001)(Bigben)(PAL)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
 		<rom name="track01.bin" size="1058400" md5="555278ecfdea9fb6fa534e0ace5231e6" sha1="ca02d44267c4a244d1652e3abd414ef11abdb68e"/>
@@ -15424,7 +15550,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--
-	<software name="hmgj" cloneof="hmg">
+	<software name="hmgeoj" cloneof="hmgeo">
 		<description>Heavy Metal: Geomatrix (Jpn)</description>
 		<year>2001</year>
 		<publisher>Capcom</publisher>
@@ -15479,21 +15605,26 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!-- Bundled together with Hello Kitty Dreamcast consoles. -->
-	<!--
 	<software name="hkgarden">
+		<!-- http://redump.org/disc/18632/
+		<rom name="Hello Kitty no Garden Panic (Japan).gdi" size="213" crc="2d9335f4" md5="054c16016169b5ca76de3383ed19a3fa" sha1="b9711cb12445405cc2c5fbd1d14e92db5f19d93a"/>
+		<rom name="Hello Kitty no Garden Panic (Japan) (Track 1).bin" size="1472352" crc="6e4a0491" md5="1e73c4a88cc52e3cf438e9c382e73af7" sha1="9dae77bfcc7798579430cbabd0cbcd3ddd678a75"/>
+		<rom name="Hello Kitty no Garden Panic (Japan) (Track 2).bin" size="2389632" crc="b818e036" md5="f976717bc49a7decf3ec6f2a20e26092" sha1="70ff7ffbfc1e66bdf5596578a1b2fb49f7dfb592"/>
+		<rom name="Hello Kitty no Garden Panic (Japan) (Track 3).bin" size="1185760800" crc="2648c181" md5="5a4c686458b5ee101804651ac7578d00" sha1="105d28c95da945ab5ce20c8dbbca0e2712e5f23d"/>
+		-->
 		<description>Hello Kitty no Garden Panic (Jpn)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-7381"/>
 		<info name="release" value="19991125" />
 		<info name="alt_title" value="ハローキティのガーデンパニック" />
+		<info name="ring_code" value="610-7381-0209 1"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
-				<disk name="hello kitty no garden panic (jpn)" status="nodump"/>
+				<disk name="hello kitty no garden panic (jpn)" sha1="a7bd2309fb7c3a1a726e6600a87913260545ac90"/>
 			</diskarea>
 		</part>
 	</software>
-	-->
 
 	<software name="hkfruit">
 		<!--
@@ -15680,7 +15811,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="hoylcasi">
+	<software name="hoylecas">
 		<!--
 		<rom name="Hoyle Casino v1.001 (2000)(Sierra)(NTSC)(US)[!].gdi" size="149" md5="bcaf3a5b5b8b0efcdfd4142e9b4a45cf" sha1="82d65209ce76b3e37abc714523ebc082a1804c56"/>
 		<rom name="track01.bin" size="1427664" md5="6f3bb686fb299721b3af8f4151968196" sha1="c8bfcdb2d8f6ec7d4cf64fe75ba08b262b4682f5"/>
@@ -15724,7 +15855,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--
-	<software name="100swordb">
+	<software name="100swordb" cloneof="100sword">
 		<description>Hundred Swords - @barai (Jpn)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
@@ -15739,7 +15870,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="hydrthun1" cloneof="hydrthun">
+	<software name="hydrthnd1" cloneof="hydrthnd">
 		<!--
 		<rom name="Hydro Thunder v1.002 (1999)(Midway)(NTSC)(US)[!].gdi" size="1170" md5="61e7fa4816d132152d7366b442f5d2ed" sha1="e00571a859d2ea727b30ecaba7e870060c6fe988"/>
 		<rom name="track01.bin" size="1335936" md5="1c57aa9a66a2abd1eb5524f105d510f9" sha1="d012e33f2bd8dafa7b5175cc982f90323237fda1"/>
@@ -15792,7 +15923,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="hydrthun">
+	<software name="hydrthnd">
 		<!--
 		<rom name="Hydro Thunder v1.020 (1999)(Midway)(NTSC)(US)[!].gdi" size="1170" md5="96f5e661314da1ae7afb7d1413ba99c5" sha1="0bbe694c219a49d61ea87992036641e13bca0827"/>
 		<rom name="track01.bin" size="1335936" md5="e13cbb26f170dea1f83f4418726a16b3" sha1="e9cf20d1add6c8f50a7edd855cbdac57b79e5fed"/>
@@ -15845,7 +15976,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- Both the German/French/Dutch (T-9702D-51) and English/Spanish/Italian (T-9702D-61) release share the same disc (T-9702D-50). -->
-	<software name="hydrthune" cloneof="hydrthun">
+	<software name="hydrthnde" cloneof="hydrthnd">
 		<!--
 		<rom name="Hydro Thunder v1.009 (1999)(Midway)(PAL)[!].gdi" size="1170" md5="96f5e661314da1ae7afb7d1413ba99c5" sha1="0bbe694c219a49d61ea87992036641e13bca0827"/>
 		<rom name="track01.bin" size="1335936" md5="306f806f2184396598cb482d8cbba992" sha1="fee4ce37096b20b194454d56d08db35d97ceaf20"/>
@@ -15899,7 +16030,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--
-	<software name="hydrthunb" cloneof="hydrthun">
+	<software name="hydrthndb" cloneof="hydrthnd">
 		<description>Hydro Thunder (Bra)</description>
 		<year>????</year>
 		<publisher>Tec Toy</publisher>
@@ -15913,7 +16044,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!-- Apparently dumped via Dreamshell, which is known to give bad dumps. -->
-	<software name="hydrthunp1" cloneof="hydrthun">
+	<software name="hydrthndp1" cloneof="hydrthnd">
 		<!--
 		<rom name="HYDRO_THUNDER_-_ALPHA.gdi" size="1101" md5="3c615df36d048ef4eba20a5c55bc5730" sha1="62cfef932f38666f07415f95aa0bdb8beda23dc8"/>
 		<rom name="track01.iso" size="  1165312" md5="8f3d4e8862be2827202eb91cf211b496" sha1="60d355b859158dcf689b07f5e3366b080a54a5d7"/>
@@ -15965,7 +16096,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- Apparently dumped via Dreamshell, which is known to give bad dumps. -->
-	<software name="hydrthunp2" cloneof="hydrthun">
+	<software name="hydrthndp2" cloneof="hydrthnd">
 		<!--
 		<rom name="Hydro_thunder_review.gdi" size="1132" md5="04e377e83b1122442cf5113d444f1338" sha1="e78f423b6958de0178cf464412e1d12cc8d7dfbb"/>
 		<rom name="track01.iso" size="  1163264" md5="2cbfa683163414331d32a8dd6c1e171a" sha1="99853fe7f8abe951a409de5ac98f224298a566c0"/>
