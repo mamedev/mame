@@ -280,7 +280,9 @@ public:
 		m_dcs(*this, "dcs"),
 		m_ethernet(*this, "ethernet"),
 		m_ioasic(*this, "ioasic"),
-		m_io_analog(*this, "AN%u", 0)
+		m_io_analog(*this, "AN%u", 0),
+		m_lamps(*this, "lamp%u", 0U),
+		m_leds(*this, "led%u", 0U)
 		{}
 
 	required_device<nvram_device> m_nvram;
@@ -290,6 +292,8 @@ public:
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
+	output_finder<16> m_lamps;
+	output_finder<24> m_leds;
 
 	widget_data m_widget;
 	uint32_t m_interrupt_enable;
@@ -305,7 +309,7 @@ public:
 	uint8_t m_pending_analog_read;
 	uint8_t m_status_leds;
 	uint32_t m_cmos_write_enabled;
-	uint32_t m_output;
+	uint16_t m_output_last;
 	uint8_t m_output_mode;
 	uint32_t m_gear;
 	int8_t m_wheel_force;
@@ -426,10 +430,13 @@ void seattle_state::machine_start()
 	save_item(NAME(m_pending_analog_read));
 	save_item(NAME(m_status_leds));
 	save_item(NAME(m_cmos_write_enabled));
-	save_item(NAME(m_output));
+	save_item(NAME(m_output_last));
 	save_item(NAME(m_output_mode));
 	save_item(NAME(m_gear));
 	save_item(NAME(m_wheel_calibrated));
+	
+	m_lamps.resolve();
+	m_leds.resolve();
 }
 
 
@@ -671,33 +678,28 @@ WRITE32_MEMBER(seattle_state::analog_port_w)
 *************************************/
 WRITE32_MEMBER(seattle_state::wheel_board_w)
 {
-	//logerror("wheel_board_w: data = %08x\n", data);
-	/* two writes in pairs. flag off first, on second. arg remains the same. */
-	bool flag = (data & (1 << 11));
-	uint8_t op = (data >> 8) & 0x7;
-	uint8_t arg = data & 0xff;
+	//logerror("wheel_board_w: data = %08X\n", data);
+	uint8_t arg = data & 0xFF;
 
-	if (flag)
+	if (!BIT(m_output_last, 11) && BIT(data, 11)) // output latch
 	{
-		switch (op)
+		if (BIT(data, 10))
 		{
-		case 0x0:
-			machine().output().set_value("wheel", arg); // target wheel angle. signed byte.
+			uint8_t base = BIT(data, 8) << 3;
+			for (uint8_t bit = 0; bit < 8; bit++)
+				m_lamps[base | bit] = BIT(arg, bit);
+		}
+		else if (BIT(data, 9) || BIT(data, 8))
+		{
+			logerror("%08X:wheel_board_w(%d) = %08X\n", m_maincpu->pc(), offset, data);
+		}
+		else
+		{
+			output().set_value("wheel", arg); // target wheel angle. signed byte.
 			m_wheel_force = int8_t(arg);
-			//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
-			break;
-
-		case 0x4:
-			for (uint8_t bit = 0; bit < 8; bit++)
-				machine().output().set_lamp_value(bit, (arg >> bit) & 0x1);
-			break;
-
-		case 0x5:
-			for (uint8_t bit = 0; bit < 8; bit++)
-				machine().output().set_lamp_value(8 + bit, (arg >> bit) & 0x1);
-			break;
 		}
 	}
+	m_output_last = data;
 }
 
 /*************************************
@@ -829,61 +831,57 @@ void seattle_state::update_widget_irq()
 
 READ32_MEMBER(seattle_state::output_r)
 {
-	return m_output;
+	logerror("%08X:output_r(%d)\n", m_maincpu->pc(), offset);
+	return 0;
 }
 
 
 WRITE32_MEMBER(seattle_state::output_w)
 {
-	uint8_t op = (data >> 8) & 0xF;
 	uint8_t arg = data & 0xFF;
-
-	switch (op)
+	
+	if (!BIT(m_output_last, 11) && BIT(data, 11))
+		m_output_mode = arg;
+	m_output_last = data;
+	
+	if (!BIT(data, 10))
 	{
-		default:
-			logerror("Unknown output (%02X) = %02X\n", op, arg);
-			break;
+		switch (m_output_mode)
+		{
+			default:
+				logerror("%08X:output_w(%d) = %04X\n", m_maincpu->pc(), m_output_mode, data);
+				break;
 
-		case 0xF: break; // sync/security wrapper commands. arg matches the wrapped command.
+			case 0x04:
+				output().set_value("wheel", arg); // wheel motor delta. signed byte.
+				m_wheel_force = int8_t(~arg);
+				//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
+				break;
 
-		case 0x7:
-			m_output_mode = arg;
-			break;
+			case 0x05:
+				for (uint8_t bit = 0; bit < 8; bit++)
+					m_lamps[bit] = BIT(arg, bit);
+				break;
 
-		case 0xB:
-			switch (m_output_mode)
-			{
-				default:
-					logerror("Unknown output with mode (%02X) = %02X\n", m_output_mode, arg);
-					break;
+			case 0x06: // Hyperdrive LEDs 0-7
+				for (uint8_t bit = 0; bit < 8; bit++)
+					m_leds[bit] = BIT(arg, bit);
+				break;
 
-				case 0x04:
-					output().set_value("wheel", arg); // wheel motor delta. signed byte.
-					m_wheel_force = int8_t(~arg);
-					//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
-					break;
+			case 0x07: // Hyperdrive LEDs 8-15
+				for (uint8_t bit = 0; bit < 8; bit++)
+					m_leds[8 | bit] = BIT(arg, bit);
+				break;
 
-				case 0x05:
-					for (uint8_t bit = 0; bit < 8; bit++)
-						output().set_lamp_value(bit, (arg >> bit) & 0x1);
-					break;
-
-				case 0x06: // Hyperdrive LEDs 0-7
-					for (uint8_t bit = 0; bit < 8; bit++)
-						output().set_led_value(bit, (arg >> bit) & 0x1);
-					break;
-
-				case 0x07: // Hyperdrive LEDs 8-15
-					for (uint8_t bit = 0; bit < 8; bit++)
-						output().set_led_value(8 + bit, (arg >> bit) & 0x1);
-					break;
-
-				case 0x08: // Hyperdrive LEDs 16-23 (Only uses up to 19)
-					for (uint8_t bit = 0; bit < 8; bit++)
-						output().set_led_value(16 + bit, (arg >> bit) & 0x1);
-					break;
-			}
-			break;
+			case 0x08: // Hyperdrive LEDs 16-23 (Only uses up to 19)
+				for (uint8_t bit = 0; bit < 8; bit++)
+					m_leds[16 | bit] = BIT(arg, bit);
+				break;
+		}
+	}
+	else if (!BIT(data, 9) || !BIT(data, 8))
+	{
+		logerror("%08X:output_w = %04X\n", m_maincpu->pc(), data);
 	}
 }
 
