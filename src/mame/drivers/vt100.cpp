@@ -7,9 +7,10 @@
         29/04/2009 Preliminary driver.
 
         TODO: some video attributes are not fully supported yet
-        TODO: vt102 modem control loopback test needs different connections
+        TODO: VT102 modem control loopback test needs different connections
         TODO: support for the on-AVO character set roms
         TODO: finish support for the on-cpu board alternate character set rom
+        TODO: STP (standard terminal port) bus for VT1XX-AC and VT125
 
         An enormous amount of useful info can be derived from the VT125 technical manual:
         http://www.bitsavers.org/pdf/dec/terminal/vt100/EK-VT100-TM-003_VT100_Technical_Manual_Jul82.pdf starting on page 6-70, pdf page 316
