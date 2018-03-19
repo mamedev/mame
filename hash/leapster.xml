@@ -44,7 +44,7 @@ Known games listed by part-no, (*) denotes undumped:
 | 500-12141-A |GER| Zahlenjäger - Lernen im Arcade-Stil!                      | LEAPSTER       |
 | 500-12142-A |GER| Wörterjäger - Lernen im Arcade-Stil!                      | LEAPSTER       |
 | 500-12160-A |ENG| Scooby Doo! - Spooky Snacks!                              | LEAPSTER       |
-| 500-12161-A |ENG| Dora the Explorer - Pinata Party - Arcade-Style Learning! | LEAPSTER       |
+| 500-12161-A |ENG| Dora the Explorer - Piñata Party - Arcade-Style Learning! | LEAPSTER       |
 | 500-12171-A |GER| Cars                                                      | LEAPSTER       |
 | 500-12218-A |SPA| Disney Princesa - La Magia De Aprender                    | LEAPSTER       |
 | 500-12223-A |SPA| Cars                                                      | LEAPSTER       |
@@ -61,7 +61,7 @@ Known games listed by part-no, (*) denotes undumped:
 | 500-12715-A |ENG| Foster's Home for Imaginary Friends                       | LEAPSTER       |
 | 500-12719-A |ENG| Spongebob Squarepants - Through The Wormhole              | LEAPSTER       |
 | 500-12738-A |GER| Ratatouille                                               | LEAPSTER       |
-| 500-12830-A |SPA| The Batman - El Poder De Los Numeros                      | LEAPSTER       |
+| 500-12830-A |SPA| The Batman - El Poder De Los Números                      | LEAPSTER       |
 | 500-13272-A |ENG| Wall-E                                                    | LEAPSTER       |
 | 500-13273-A |GER| Spongebob Schwammkopf - Zeitreise durch das Wurmloch      | LEAPSTER       |
 | 500-13298-A |ENG| I Spy - Treasure Hunt!                                    | LEAPSTER       |
@@ -69,7 +69,7 @@ Known games listed by part-no, (*) denotes undumped:
 | 500-13306-A |ENG| Star Wars - Jedi Math                                     | LEAPSTER       |
 | 500-13405-A |ENG| Dora the Explorer - Camping Adventure                     | LEAPSTER       |
 | 500-13414-A |SPA| Wall-E                                                    | LEAPSTER       |
-| 500-13417-A |SPA| Star Wars - Matematicas Jedi                              | LEAPSTER       |
+| 500-13417-A |SPA| Star Wars - Matemáticas Jedi                              | LEAPSTER       |
 | 500-13441-A |GER| Wall-E                                                    | LEAPSTER       |
 | 500-13445-A |ENG| Ratatouille                                               | LEAPSTER       |
 | 500-13446-A |ENG| Pet Pals                                                  | LEAPSTER       |
@@ -159,7 +159,7 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="batmans" cloneof="batman" supported="no">
-		<description>The Batman - El Poder De Los Numeros (Spa)</description>
+		<description>The Batman - El Poder De Los Números (Spa)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12830-A" />
@@ -363,7 +363,7 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="dorapp" supported="no">
-		<description>Dora the Explorer - Pinata Party! (USA)</description>
+		<description>Dora the Explorer - Piñata Party! (USA)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12161-A" />
@@ -772,7 +772,7 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="jedimaths" cloneof="jedimath" supported="no">
-		<description>Star Wars - Matematicas Jedi (Spa)</description>
+		<description>Star Wars - Matemáticas Jedi (Spa)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13417-A" />
