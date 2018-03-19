@@ -7,7 +7,6 @@
         29/04/2009 Preliminary driver.
 
         TODO: some video attributes are not fully supported yet
-        TODO: VT102 modem control loopback test needs different connections
         TODO: support for the on-AVO character set roms
         TODO: finish support for the on-cpu board alternate character set rom
         TODO: STP (standard terminal port) bus for VT1XX-AC and VT125
@@ -189,6 +188,9 @@ WRITE8_MEMBER(vt100_state::nvr_latch_w)
 
 	// C2 is used to disable pullup on data line
 	m_nvr->data_w(BIT(data, 2) ? 0 : !BIT(data, 0));
+
+	// SPDS present on pins 11, 19 and 23 of EIA connector
+	m_rs232->write_spds(BIT(data, 5));
 }
 
 void vt100_state::vt100_io(address_map &map)

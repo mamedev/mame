@@ -22,6 +22,22 @@ protected:
 	virtual void device_start() override;
 };
 
+class dec_rs232_loopback_device : public device_t,
+	public device_rs232_port_interface
+{
+public:
+	dec_rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual WRITE_LINE_MEMBER( input_txd ) override;
+	virtual WRITE_LINE_MEMBER( input_rts ) override;
+	virtual WRITE_LINE_MEMBER( input_dtr ) override;
+	virtual WRITE_LINE_MEMBER( input_spds ) override;
+
+protected:
+	virtual void device_start() override;
+};
+
 extern const device_type RS232_LOOPBACK;
+extern const device_type DEC_RS232_LOOPBACK;
 
 #endif // MAME_BUS_RS232_LOOPBACK_H

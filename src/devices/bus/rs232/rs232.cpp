@@ -143,6 +143,12 @@ WRITE_LINE_MEMBER( rs232_port_device::write_etc )
 		m_dev->input_etc(state);
 }
 
+WRITE_LINE_MEMBER( rs232_port_device::write_spds )
+{
+	if (m_dev)
+		m_dev->input_spds(state);
+}
+
 device_rs232_port_interface::device_rs232_port_interface(const machine_config &mconfig, device_t &device) :
 	device_slot_card_interface(mconfig, device)
 {
@@ -165,6 +171,7 @@ device_rs232_port_interface::~device_rs232_port_interface()
 SLOT_INTERFACE_START( default_rs232_devices )
 	SLOT_INTERFACE("keyboard", SERIAL_KEYBOARD)
 	SLOT_INTERFACE("loopback", RS232_LOOPBACK)
+	SLOT_INTERFACE("dec_loopback", DEC_RS232_LOOPBACK)
 	SLOT_INTERFACE("null_modem", NULL_MODEM)
 	SLOT_INTERFACE("printer", SERIAL_PRINTER)
 	SLOT_INTERFACE("terminal", SERIAL_TERMINAL)
