@@ -33,6 +33,7 @@ Developer
 ======
   T-11***-** : Taito
   T-12***-** : Capcom
+  T-22***-** : Micronet
   T-24***-** : Sammy
   T-30***-** : Video System
   T-31***-** : SNK
@@ -48,6 +49,7 @@ Developer
   T-95***-** : Konami
   T-97***-** : Midway
   T-100**-** : THQ
+  T-110**-** : Sierra On-Line
   T-125**-** : Interplay
   T-130**-** : Activision
   T-133**-** : Bandai
@@ -60,6 +62,7 @@ Developer
   T-177**-** : Ubisoft
   T-187**-** : Pionesoft
   T-188**-** : Spike
+  T-195**-** : Datam Polystar
   T-197**-** : KID
   T-201**-** : NEC Interchannel
   T-229**-** : Titus
@@ -102,6 +105,7 @@ Developer
   T-454**-** : AAA Game
   T-455**-** : TV Asahi
   T-458**-** : Hackberry
+  T-461**-** : Starfish-SD
   T-463**-** : Broccoli
   T-465**-** : Princess Soft
   T-466**-** : Bigben Interactive
@@ -134,6 +138,7 @@ Region
  **-*****-61 : United Kingdom / Spain / Italy
  **-*****-62 : Germany / Italy
  **-*****-63 : ?
+ **-*****-64 : United Kingdom / Germany / France
  **-*****-71 : United Kingdom / Germany / France / Spain
  **-*****-72 : France / Spain
  **-*****-74 : United Kingdom / Germany / Italy / The Netherlands
@@ -144,6 +149,7 @@ Region
  **-*****-83 : Germany / France
  **-*****-84 : United Kingdom / Germany / France / Spain / Italy
  **-*****-87 : Germany / France / Italy
+ **-*****-88 : United Kingdom / Spain
  **-*****-91 : United Kingdom / The Netherlands
  **-*****-99 : United Kingdom / Germany / France / Spain / Italy
  **-*****-B5 : United Kingdom
@@ -174,10 +180,10 @@ Region
  835-****-** : Appears to be a Sega part number for demo discs.
 				 Found on discs only.
 
- 950-****-** : Appears to be serials for "white label" promos.
+ 950-****-** : Appears to be a Sega part number for promo discs.
 				 Found on "white label" promo discs.
 
- 952-****-** : Appears to be a Sega part number for promo discs.
+ 952-****-** : Serials for "white label" promos.
 				 Found on "white label" discs and promo covers.
 
    D-****-** : Appears to be serials for demos.
@@ -425,7 +431,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	<!--
 	Both the German/French/Dutch (T-9706D-51) and English/Spanish/Italian (T-9706D-61) release share the same disc (T-9706D-50).
 
-	Promo version has the serial 950-0068-50 952-0063-50
+	Promo version has the markings 950-0068-50 952-0063-50
 	-->
 	<software name="4wte" cloneof="4wt">
 		<!--
@@ -452,7 +458,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>4 Wheel Thunder (Euro)</description>
 		<year>2000</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="T-9706D-50, T-9706D-51, T-9706D-61, 950-0068-50 952-0063-50"/>
+		<info name="serial" value="T-9706D-50, T-9706D-51, T-9706D-61, 952-0063-50"/>
 		<info name="release" value="200005xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -549,7 +555,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!-- Promo version has the serial 950-0164-50 952-0158-50 -->
+	<!-- Promo version has the markings 950-0164-50 952-0158-50 -->
 	<software name="18wheelre" cloneof="18wheelr">
 		<!--
 		<rom name="18 Wheeler - American Pro Trucker v1.700 (2001)(Sega)(PAL)(M4)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
@@ -560,7 +566,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>18 Wheeler - American Pro Trucker (Euro)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="MK-51064-50, 950-0164-50 952-0158-50"/>
+		<info name="serial" value="MK-51064-50, 952-0158-50"/>
 		<info name="release" value="20010106" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -3331,7 +3337,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!-- Promo version has the serial 950-0016-50 -->
+	<!-- Promo version has the markings 950-0016-50 -->
 	<software name="buggheat" cloneof="hardheat">
 		<!--
 		<rom name="Buggy Heat v1.001 (1999)(Sega)(PAL)(M4)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
@@ -3342,7 +3348,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Buggy Heat (Euro)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="MK-54040-50, 950-0016-50"/>
+		<info name="serial" value="MK-54040-50"/> <!-- Promo version has the same disc content but lacks serial. -->
 		<info name="release" value="19991014" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -3433,7 +3439,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	The English (T-8109D-05), Italian (T-8109D-13), German (T-8109D-18), Dutch/French (T-8109D-59) and Spanish (T-8109D-06) releases
 	all share the same disc (T-8109D-50).
 
-	Promo version has the serial 950-0067-50 952-0062-50
+	Promo version has the markings 950-0067-50 952-0062-50
 	-->
 	<software name="bam4e" cloneof="bam4">
 		<!--
@@ -3468,7 +3474,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Bust-A-Move 4 (Euro)</description>
 		<year>2000</year>
 		<publisher>Acclaim</publisher>
-		<info name="serial" value="T-8109D-05, T-8109D-06, T-8109D-13, T-8109D-18, T-8109D-50, T-8109D-59, 950-0067-50 952-0062-50"/>
+		<info name="serial" value="T-8109D-05, T-8109D-06, T-8109D-13, T-8109D-18, T-8109D-50, T-8109D-59, 952-0062-50"/>
 		<info name="release" value="20000707" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -3681,7 +3687,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!-- Promo version has the serial 950-0187-50 952-0177-50 -->
+	<!-- Promo version has the markings 950-0187-50 952-0177-50 -->
 	<software name="cspikee" cloneof="cspike">
 		<!--
 		<rom name="Cannon Spike v1.000 (2001)(Bigben)(PAL)[!].gdi" size="87" md5="baccdadb66c054ab30b74c3c54acf66a" sha1="e3b35ac337925f0abc7a0fd9252f18e97e0dbc0e"/>
@@ -3692,7 +3698,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Cannon Spike (Euro)</description>
 		<year>2002</year>
 		<publisher>Bigben Interactive</publisher>
-		<info name="serial" value="T-46601D-50, 950-0187-50 952-0177-50"/>
+		<info name="serial" value="T-46601D-50, 952-0177-50"/>
 		<info name="release" value="20020503" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -4238,13 +4244,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!-- The disc has the same design as regular promo discs, but is labeled "Beta" -->
+	<!-- The disc has the same design as regular promo discs, but is labeled "Beta". It has the markings 950-0151-50 952-0144-50. -->
 	<!--
 	<software name="chmpsurfp" cloneof="chmpsurf">
 		<description>Championship Surfer (Euro, Prototype)</description>
 		<year>2001</year>
 		<publisher>GAME Studios</publisher>
-		<info name="serial" value="950-0151-50 952-0144-50"/>
+		<info name="serial" value="952-0144-50"/>
 		<info name="release" value="20010810" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -4790,7 +4796,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!-- Promo version has the serial 950-0046-50 952-0044-50 -->
+	<!-- Promo version has the markings 950-0046-50 952-0044-50 -->
 	<software name="chuchue" cloneof="chuchu">
 		<!--
 		<rom name="ChuChu Rocket! v1.014 (2000)(Sega)(PAL)(M5)[!].gdi" size="595" md5="6c697787b0cd3167c30f83dc1932476e" sha1="8e4dbaf0621917a1ca78e08a0e97405ab1678661"/>
@@ -4817,7 +4823,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>ChuChu Rocket! (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="MK-51049-50, 950-0046-50 952-0044-50"/>
+		<info name="serial" value="MK-51049-50, 952-0044-50"/>
 		<info name="release" value="20000512" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -5191,7 +5197,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!-- Promo version has the serial 950-0157-50 952-0152-50 -->
+	<!-- Promo version has the markings 950-0157-50 952-0152-50 -->
 	<software name="confmisse" cloneof="confmiss">
 		<!--
 		<rom name="Confidential Mission v1.002 (2001)(Sega)(PAL)(M5)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
@@ -5202,7 +5208,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Confidential Mission (Euro)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="MK-51160-50, 950-0157-50 952-0152-50"/>
+		<info name="serial" value="MK-51160-50, 952-0152-50"/>
 		<info name="release" value="20010525" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -5296,7 +5302,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	<!--
 	Both the English/German (T-46603D-71) and French/Spanish (T-46603D-72) release share the same disc (T-46603D-50).
 
-	Promo version has the serial 950-0189-50 952-0179-50
+	Promo version has the markings 950-0189-50 952-0179-50
 	-->
 	<software name="confzonee" cloneof="confzone">
 		<!--
@@ -5310,7 +5316,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Conflict Zone (Euro)</description>
 		<year>2002</year>
 		<publisher>Bigben Interactive</publisher>
-		<info name="serial" value="T-46603D-50, T-46603D-71, T-46603D-72, 950-0189-50 952-0179-50"/>
+		<info name="serial" value="T-46603D-50, T-46603D-71, T-46603D-72, 952-0179-50"/>
 		<info name="release" value="20020412" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -5457,7 +5463,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	<!--
 	The Controller+Crazy Taxi bundle shares the same disc as the regular edition (MK-51035-50) but includes a Dreamcast controller.
 
-	Promo version has the serial 950-0034-50 952-0031-50
+	Promo version has the markings 950-0034-50 952-0031-50
 	-->
 	<software name="crzytaxie" cloneof="crzytaxi">
 		<!--
@@ -5469,7 +5475,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Crazy Taxi (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="MK-51035-50, 950-0034-50 952-0031-50"/>
+		<info name="serial" value="MK-51035-50, 952-0031-50"/>
 		<info name="release" value="20000225" />
 		<info name="ring_code" value="MK-51035-0102SS EMI CD HOLLAND @ 1"/>
 		<part interface="dc_gdrom" name="gdrom">
@@ -5533,7 +5539,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!-- Promo version has the serial 950-0158-50 952-0153-50 -->
+	<!-- Promo version has the markings 950-0158-50 952-0153-50 -->
 	<software name="crzytaxi2e" cloneof="crzytaxi2">
 		<!--
 		<rom name="Crazy Taxi 2 v1.000 (2001)(Sega)(PAL)(M5)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
@@ -5544,7 +5550,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Crazy Taxi 2 (Euro)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="MK-51136-50, 950-0158-50 952-0153-50"/>
+		<info name="serial" value="MK-51136-50, 952-0153-50"/>
 		<info name="release" value="20010607" />
 		<info name="ring_code" value="952-0153-0477SS EMI CD HOLLAND @ 1"/>
 		<part interface="dc_gdrom" name="gdrom">
@@ -6182,7 +6188,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	<!--
 	The English (T-8120D-05), Spanish (T-8120D-06), Italian (T-8120D-13), German (T-8120D-18) and Dutch/French (T-8120D-59) releases all share the same disc (T-8120D-50).
 
-	Promo version has the serial 950-0130-50 952-0122-50
+	Promo version has the markings 950-0130-50 952-0122-50
 	-->
 	<software name="mirrabmxe" cloneof="mirrabmx">
 		<!--
@@ -6205,7 +6211,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Dave Mirra Freestyle BMX (Euro)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="T-8120D-05, T-8120D-06, T-8120D-13, T-8120D-18, T-8120D-50, T-8120D-59, 950-0130-50 952-0122-50"/>
+		<info name="serial" value="T-8120D-05, T-8120D-06, T-8120D-13, T-8120D-18, T-8120D-50, T-8120D-59, 952-0122-50"/>
 		<info name="release" value="20001208" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -6508,9 +6514,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	The bundle version ("For Bundle Purposes Only" on back of box) shares the same disc as the regular edition (T-8116D-50).
 
-	Promo version has the serial 950-0078-50 952-0073-50
+	Promo version has the markings 950-0078-50 952-0073-50
 
-	Another promo version has the serial 950-0055-50 952-0052-50. It is unknown whether it is a different version or not.
+	Another Promo version has the markings 950-0055-50 952-0052-50. It is unknown whether it is a different version or not.
 	-->
 	<software name="doa2e" cloneof="doa2">
 		<!--
@@ -6522,7 +6528,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Dead or Alive 2 (Euro)</description>
 		<year>2000</year>
 		<publisher>Acclaim</publisher>
-		<info name="serial" value="T-8116D-05, T-8116D-13, T-8116D-18, T-8116D-50, T-8116D-59, 950-0078-50 952-0073-50"/>
+		<info name="serial" value="T-8116D-05, T-8116D-13, T-8116D-18, T-8116D-50, T-8116D-59, 952-0073-50"/>
 		<info name="release" value="20000428" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -7700,7 +7706,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	<!--
 	The Spanish (T-36813D-06), Italian (T-36813D-13), German (T-36813D-18) and French (T-36813D-59) releases all share the same disc (T-36813D-50).
 
-	Promo version has the serial 950-0145-50 952-0147-50
+	Promo version has the markings 950-0145-50 952-0147-50
 	-->
 	<software name="102dalme2" cloneof="102dalm">
 		<!--
@@ -7714,7 +7720,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Disney Les 102 Dalmatiens à la rescousse ! (Fra, Ger, Ita, Spa)</description>
 		<year>2001</year>
 		<publisher>Eidos</publisher>
-		<info name="serial" value="T-36813D-06, T-36813D-09, T-36813D-13, T-36813D-18, T-36813D-50, 950-0145-50 952-0147-50"/>
+		<info name="serial" value="T-36813D-06, T-36813D-09, T-36813D-13, T-36813D-18, T-36813D-50, 952-0147-50"/>
 		<info name="release" value="20001220" />
 		<info name="alt_title" value="Disneys 102 Dalmatiner (Ger), Disney La Carica dei 102: Cuccioli alla Riscossa (Ita), Disney 102 Dálmatas: Cachorros al rescate (Spa)" />
 		<part interface="dc_gdrom" name="gdrom">
@@ -8447,7 +8453,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	<!--
 	Both the English/French/Dutch (T-17716D-91) and German/Italian (T-17716D-62) release share the same disc (T-17716D-50).
 
-	Promo version has the serial 950-0184-50 952-0175-50
+	Promo version has the markings 950-0184-50 952-0175-50
 	-->
 	<software name="drgnrdrse" cloneof="drgnrdrs">
 		<!--
@@ -8461,7 +8467,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>DragonRiders: Chronicles of Pern (Euro)</description>
 		<year>2002</year>
 		<publisher>Ubisoft</publisher>
-		<info name="serial" value="T-17716D-50, T-17716D-62, T-17716D-91, 950-0184-50 952-0175-50"/>
+		<info name="serial" value="T-17716D-50, T-17716D-62, T-17716D-91, 952-0175-50"/>
 		<info name="release" value="20020208" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -10453,7 +10459,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	The Spanish/Italian (T-8121D-61), English (T-8121D-05), German (T-8121D-18) and French/Dutch (T-8121D-59) releases
 	all share the same disc (T-8121D-50).
 
-	Promo version has the serial 950-0155-50 952-0150-50
+	Promo version has the markings 950-0155-50 952-0150-50
 	-->
 	<software name="ducatiwe" cloneof="ducatiw">
 		<!--
@@ -10477,7 +10483,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Ducati World (Euro)</description>
 		<year>2001</year>
 		<publisher>Acclaim</publisher>
-		<info name="serial" value="T-8121D-05, T-8121D-18, T-8121D-50, T-8121D-59, T-8121D-61, 950-0155-50 952-0150-50"/>
+		<info name="serial" value="T-8121D-05, T-8121D-18, T-8121D-50, T-8121D-59, T-8121D-61, 952-0150-50"/>
 		<info name="release" value="20010309" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -10783,7 +10789,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!-- Promo version has the serial 950-0043-50 952-0041-50 -->
+	<!-- Promo version has the markings 950-0043-50 952-0041-50 -->
 	<software name="eccoe" cloneof="ecco">
 		<!--
 		<rom name="ECCO the Dolphin - Defender of the Future v1.003 (2000)(Sega)(PAL)(M4)[!].gdi" size="147" md5="12bba9571cd48acdbd11419dad7a1524" sha1="dbccb44f1a9712bfef8b6133de2afffe8c58c402"/>
@@ -10796,7 +10802,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Ecco the Dolphin: Defender of the Future (Euro)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="MK-51033-50, 950-0043-50 952-0041-50"/>
+		<info name="serial" value="MK-51033-50, 952-0041-50"/>
 		<info name="release" value="20000526" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -12140,12 +12146,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
+	<!-- The disc has the same design as regular promo discs. It has the markings 950-0041-50 952-0039-50. -->
 	<!--
 	<software name="f1wgprd" cloneof="f1wgp">
 		<description>F1 World Grand Prix for Dreamcast "Redbull Demo" (Euro)</description>
 		<year>????</year>
 		<publisher>Video System</publisher>
-		<info name="serial" value="950-0041-50 952-0039-50"/>
+		<info name="serial" value="952-0039-50"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
 				<disk name="f1 world grand prix for dreamcast redbull demo (euro)" status="nodump"/>
@@ -12604,6 +12611,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
+	<!-- The VMU+Fighting Force 2 bundle shares the same disc as the regular edition (T-36801N) but includes a VMU. -->
 	<software name="fforce2">
 		<!--
 		<rom name="Fighting Force 2 v1.000 (1999)(EIDOS)(NTSC)(US)[!][5S T-36801N].gdi" size="180" md5="4c5993e03f9717900b629d0ba9f97082" sha1="97ab4850fc59ea47e8ecdeb791d5add566cf746a"/>
@@ -12770,6 +12778,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
+	<!-- The disc has the same design as regular promo discs, but is labeled "Beta". It has the markings 950-0142-50 952-0135-50. -->
 	<software name="fvipers2p" cloneof="fvipers2">
 		<!--
 		<rom name="Fighting Vipers 2 v1.000 (2000)(Sega)(PAL)(M6)(beta)[!][White Label].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
@@ -12780,7 +12789,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Fighting Vipers 2 (Euro, Prototype 20001226)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="950-0142-50 952-0135-50"/>
+		<info name="serial" value="952-0135-50"/>
 		<info name="release" value="20001226" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -12978,6 +12987,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
+	<!-- The disc has the same design as regular promo discs. It has the markings 950-0183-50 952-0174-50. -->
 	<software name="flntstns">
 		<!--
 		<rom name="Flintstones, The - Viva Rock Vegas (Pre-production copy) (EU).gdi" size="402" md5="f98a7916f7786f012ee158fa04fb44c5" sha1="9e7aac79adcbb5760f0223a0603ff621da2b9d31"/>
@@ -12998,7 +13008,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>The Flintstones: Viva Rock Vegas (Euro)</description>
 		<year>20??</year>
 		<publisher>Swing! Entertainment</publisher>
-		<info name="serial" value="950-0183-50 952-0174-50"/>
+		<info name="serial" value="952-0174-50"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
 				<disk name="the flintstones viva rock vegas (euro)" sha1="2d988146e1b3d9b5b834f1af154b1c5c4922099b"/>
@@ -13047,7 +13057,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!-- Promo version has the serial 950-0182-50 952-0172-50 -->
+	<!-- Promo version has the markings 950-0182-50 952-0172-50 -->
 	<software name="floigan1e" cloneof="floigan1">
 		<!--
 		<rom name="Floigan Bros. - Episode 1 v1.002 (2001)(Sega)(PAL)[!].gdi" size="149" md5="56513c0ab73948e7b91a5674318e1665" sha1="8441bc73484b1367cb0de3c83f7f6cc10155c8de"/>
@@ -13060,7 +13070,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Floigan Bros. - Episode 1 (Euro)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="MK-51114-50, 950-0182-50 952-0172-50"/>
+		<info name="serial" value="MK-51114-50, 952-0172-50"/>
 		<info name="release" value="20011123" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -13230,7 +13240,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	<!--
 	The Spanish (T-8113D-06), French/Dutch (T-8113D-59), English (T-8113D-05) and German (T-8113D-18) releases all share the same disc (T-8113D-50).
 
-	Promo version has the serial 950-0072-50 952-0068-50
+	Promo version has the markings 950-0072-50 952-0068-50
 	-->
 	<software name="furfighte" cloneof="furfight">
 		<!--
@@ -13242,7 +13252,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Fur Fighters (Euro)</description>
 		<year>2000</year>
 		<publisher>Acclaim</publisher>
-		<info name="serial" value="T-8113D-05, T-8113D-06, T-8113D-18, T-8113D-50, T-8113D-59, 950-0072-50 952-0068-50"/>
+		<info name="serial" value="T-8113D-05, T-8113D-06, T-8113D-18, T-8113D-50, T-8113D-59, 952-0068-50"/>
 		<info name="release" value="200008xx" />
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
@@ -14248,7 +14258,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!-- The disc has the same design as regular promo discs, but is labeled "Beta" -->
+	<!-- The disc has the same design as regular promo discs, but is labeled "Beta". It has the markings 950-0150-50 952-0143-50. -->
 	<software name="gkp" cloneof="gk">
 		<!--
 		<rom name="Giant Killers v1.000 (2001)(AAA Game)(PAL)(beta)[!][White Label].gdi" size="150" md5="175d4e4abbbede974e136f1f7371699c" sha1="223e1ac5aad0ad1747e7d3fe5dbb19b1e9eda495"/>
@@ -14261,7 +14271,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>GK: Giant Killers (Euro, Prototype 20010109)</description>
 		<year>2001</year>
 		<publisher>AAA Game</publisher>
-		<info name="serial" value="950-0150-50 952-0143-50"/>
+		<info name="serial" value="952-0143-50"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
 				<disk name="gk giant killers (euro, prototype 20010109)" sha1="0fa5be1be5f761ed4fb36f1c910da12bb1634dfd"/>
@@ -14439,6 +14449,21 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 			</diskarea>
 		</part>
 	</software>
+
+	<!--
+	<software name="golfs1" cloneof="teeoff">
+		<description>Golf Shiyou yo (Jpn, Rev. 1)</description>
+		<year>2000</year>
+		<publisher>Bottom Up</publisher>
+		<info name="serial" value="T-40901M"/>
+		<info name="alt_title" value="ゴルフしようよ" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="golf shiyou yo (jpn, rev. 1)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
 
 	<!--
 	<software name="golfskp" cloneof="teeoff">
@@ -14678,13 +14703,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<!-- The disc has the same design as regular promo discs, but is labeled "Beta" -->
+	<!-- The disc has the same design as regular promo discs, but is labeled "Beta". It has the markings 950-0140-50 952-0133-50. -->
 	<!--
 	<software name="grandia2p" cloneof="grandia2">
 		<description>Grandia 2 (Euro, Prototype)</description>
 		<year>2000</year>
 		<publisher>Ubisoft</publisher>
-		<info name="serial" value="950-0140-50 952-0133-50"/>
+		<info name="serial" value="952-0133-50"/>
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
 				<disk name="grandia 2 (euro, prototype)" status="nodump"/>
@@ -15164,6 +15189,830 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<part interface="dc_gdrom" name="gdrom">
 			<diskarea name="gdrom">
 				<disk name="guru guru onsen 3 (jpn)" sha1="80b5979975cd7972b0ccc385979fefebdc9c36d5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<rom name="Half-Life - DCRES.cdi" size="812027249" md5="0f611c81535540660eaecb492cef6c63" sha1="ca07d0045b7f76f369993de446d0000a0e3f975a"/>
+
+	This prototype was released onto the Internet as a CDI image, which chdman cannot handle correctly right now.
+	When a proper CHD can be created, this dump will be added.
+	-->
+	<!--
+	<software name="halflife">
+		<description>Half-Life (World, Prototype 19991219)</description>
+		<year>1999</year>
+		<publisher>Havas Interactive</publisher>
+		<info name="release" value="19991219" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="half-life (world, prototype 19991219)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- The disc has the same design as regular promo discs. It has the markings 950-0124-50 952-0117-50. -->
+	<software name="halflifev">
+		<!--
+		<rom name="disc.gdi" size="88" md5="ab61e5a0bd3149f98e19d329e26bfc5e" sha1="8e263d53a84c0d6a56eef26170c6cf5d87128163"/>
+		<rom name="track01.bin" size="2032128" md5="3f790fb01866d279307941830572cfd7" sha1="34d5d439bd38894766a2430a9ad2cc819329b6c6"/>
+		<rom name="track02.raw" size="1764000" md5="0c7620dda4708369b16185846f5187d1" sha1="846f56b8d9f2e3aacbca2ee7df1f0d24d0bc707f"/>
+		<rom name="track03.bin" size="1185760800" md5="115994716730ada64c0a7a895317241c" sha1="647533845cf43b4d07411819d3233d9b60dda557"/>
+		-->
+		<description>Half-Life (Video) (World)</description>
+		<year>2000</year>
+		<publisher>Havas Interactive</publisher>
+		<info name="serial" value="952-0117-50"/>
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="half-life (video) (world)" sha1="bd15bdf189edd59c6474b793780bca9fdd93c087"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Also released as a Dorikore version, which is identical to retail. -->
+	<!--
+	<software name="htcolumn2">
+		<description>Hanagumi Taisen Columns 2 (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0046"/>
+		<info name="release" value="20000106" />
+		<info name="alt_title" value="花組対戦コラムス2" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hanagumi taisen columns 2 (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="hangdj">
+		<description>Hang the DJ (Jpn)</description>
+		<year>1999</year>
+		<publisher>Marvelous Entertainment</publisher>
+		<info name="serial" value="MJCYX80002"/>
+		<info name="release" value="19990917" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hang the dj (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="breeding">
+		<description>Happy Breeding (Jpn)</description>
+		<year>2003</year>
+		<publisher>Princess Soft</publisher>
+		<info name="serial" value="T-46512M"/>
+		<info name="release" value="20030227" />
+		<info name="alt_title" value="はっぴーぶりーでぃんぐ" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="happy breeding (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- Also released as a Dorikore version, which is identical to retail. -->
+	<software name="haples">
+		<!--
+		<rom name="Happy Lesson v1.002 (2001)(Datam Polystar)(NTSC)(JP)[!].gdi" size="88" md5="db6dfac44ea8c7a6173d1e55a7b92faf" sha1="f02004cec207bdf51ee71feb1986f8b745a86995"/>
+		<rom name="track01.bin" size="5562480" md5="4374f72160179c4d4a903e93ddd9714d" sha1="a82a41e88dbbb2fa86bd67d2ad617faa12258201"/>
+		<rom name="track02.raw" size="18830112" md5="daf1504398e11c4e6ff19017af73120e" sha1="a97662185b45c2f38686b6a89c9c812318cb551f"/>
+		<rom name="track03.bin" size="1185760800" md5="ddd8e39551accf520f9e5d36045f7877" sha1="4f496c6fe2a10b6169971fb4c785ed7569c02541"/>
+		-->
+		<description>Happy Lesson (Jpn)</description>
+		<year>2001</year>
+		<publisher>Datam Polystar</publisher>
+		<info name="serial" value="T-19503M"/>
+		<info name="release" value="20010426" />
+		<info name="alt_title" value="ハッピーレッスン" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="happy lesson (jpn)" sha1="a0261e0edb9927cd982e44dba6cb7099838170a0"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="haplesfl">
+		<!--
+		<rom name="Happy Lesson - First Lesson v1.001 (2000)(Datam Polystar)(NTSC)(JP)[!].gdi" size="88" md5="acca1310ba93fb4302a6733f95084f15" sha1="91d1d0293204b6fd7ad237713b1922211c5af014"/>
+		<rom name="track01.bin" size="5837664" md5="8099b198d22aa9fdff6b376da4ad5335" sha1="7fa053efef706a2844977d9aeb91718268bb9d95"/>
+		<rom name="track02.raw" size="20869296" md5="2e7ac49a3ec0d803bbdd65337d0e8407" sha1="4f85200b6702f958f5625cefe32acd0d7cb3ac5c"/>
+		<rom name="track03.bin" size="1185760800" md5="fa3e63da952bc902fb92f5ff612fc9d2" sha1="bbda4aa31dbd2fed39abb2191e16b766fff3eb25"/>
+		-->
+		<description>Happy Lesson: First Lesson (Jpn)</description>
+		<year>2000</year>
+		<publisher>Datam Polystar</publisher>
+		<info name="serial" value="T-19504M"/>
+		<info name="release" value="20000928" />
+		<info name="alt_title" value="HAPPY★LESSON 〜ファーストレッスン〜" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="happy lesson first lesson (jpn)" sha1="c95192236155045073511e230c2ee4b72a83f45e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<software name="harusame">
+		<description>Harusame Youbi (Jpn)</description>
+		<year>2001</year>
+		<publisher>NEC Interchannel</publisher>
+		<info name="serial" value="T-20106M"/>
+		<info name="release" value="20010322" />
+		<info name="alt_title" value="春雨曜日" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="harusame youbi (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- Promo version has the markings 950-0179-50 952-0171-50 / 950-0180-50 952-0171-50 -->
+	<software name="headhunt">
+		<!--
+		<rom name="Headhunter v1.006 (2001)(Sega)(PAL)(M4)(Disc 1 of 2)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+		<rom name="track01.bin" size="705600" md5="6517dd5cb3d38c5e6ff8c227ac4faa81" sha1="48e2598d85422e498bc397482b0eb8e0075fd909"/>
+		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+		<rom name="track03.bin" size="1185760800" md5="208145da634104c4c05c185e71550fad" sha1="8c1667c210486bb50821d9cb2f7f83cf18da8608"/>
+
+		<rom name="Headhunter v1.006 (2001)(Sega)(PAL)(M4)(Disc 2 of 2)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+		<rom name="track01.bin" size="705600" md5="e777d2f2a7a3d2b2cec36a3912dbf39c" sha1="2d8830293073747ff4d18e78ed226a5e326042f7"/>
+		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+		<rom name="track03.bin" size="1185760800" md5="2fe16b28a2915900b3a3187b5eedd379" sha1="6446ca0bd9c43b66c4623111b3e26677003518b4"/>
+		-->
+		<description>Headhunter (Euro)</description>
+		<year>2001</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-51041-50, 952-0171-50"/>
+		<info name="release" value="20011116" />
+		<part interface="dc_gdrom" name="gdrom1">
+			<feature name="part_id" value="Disk 1"/>
+			<diskarea name="gdrom">
+				<disk name="headhunter (euro) (disk 1)" sha1="9a4e121d340832f636d13fb2b4a38891aed44c20"/>
+			</diskarea>
+		</part>
+		<part interface="dc_gdrom" name="gdrom2">
+			<feature name="part_id" value="Disk 2"/>
+			<diskarea name="gdrom">
+				<disk name="headhunter (euro) (disk 2)" sha1="a56c3bfd4cf74ba9820a48a3d1ad4ec11aaba6c8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<software name="heartbrk">
+		<description>Heartbreak Diary (Jpn)</description>
+		<year>1999</year>
+		<publisher>Pioneer LDC</publisher>
+		<info name="serial" value="PICL-7501"/>
+		<info name="release" value="19990723" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="heartbreak diary (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<software name="hmg">
+		<!--
+		<rom name="Heavy Metal - Geomatrix v1.001 (2001)(Capcom)(NTSC)(US)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
+		<rom name="track01.bin" size="1058400" md5="fa98cf2006118fde2120d6546ce0fff2" sha1="fa6d01d6acbb795608bc0ecb288a68a1dfc644b8"/>
+		<rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
+		<rom name="track03.bin" size="1185760800" md5="282572b7363cc7f9ba50d8a265246686" sha1="60af564445ad50924a13bcade78791e676bd1566"/>
+		-->
+		<description>Heavy Metal: Geomatrix (USA)</description>
+		<year>2001</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="T-1223N"/>
+		<info name="release" value="20010913" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="heavy metal geomatrix (usa)" sha1="f2852d56fcd93f4adb19337371baf1e45a9eceee"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- A promo version exists (950-0188-50 952-0178-50), it is most likely the same as retail. -->
+	<software name="hmge" cloneof="hmg">
+		<!--
+		<rom name="Heavy Metal - Geomatrix v1.000 (2001)(Bigben)(PAL)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
+		<rom name="track01.bin" size="1058400" md5="555278ecfdea9fb6fa534e0ace5231e6" sha1="ca02d44267c4a244d1652e3abd414ef11abdb68e"/>
+		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+		<rom name="track03.bin" size="1185760800" md5="e9a5f4e0bfe240dc17adc6e609007bf0" sha1="6a9919ac192966e5f461640d821a71108c91a31c"/>
+		-->
+		<description>Heavy Metal: Geomatrix (Euro)</description>
+		<year>2002</year>
+		<publisher>Bigben Interactive</publisher>
+		<info name="serial" value="T-46602D-50"/>
+		<info name="release" value="20020412" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="heavy metal geomatrix (euro)" sha1="bfa69da3aae83be16ca0d3380b04709acb1f544f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<software name="hmgj" cloneof="hmg">
+		<description>Heavy Metal: Geomatrix (Jpn)</description>
+		<year>2001</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="T-1246M"/>
+		<info name="release" value="20010712" />
+		<info name="alt_title" value="ヘビーメタルジオマトリックス" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="heavy metal geomatrix (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- The Mic Device Doukon-ban shares the same discs as the regular edition but includes a Dreamcast microphone. -->
+	<!--
+	<software name="heiseimj">
+		<description>Heisei Mahjong-sou (Jpn)</description>
+		<year>2000</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="T-2202M"/>
+		<info name="release" value="20001026" />
+		<info name="alt_title" value="平成麻雀荘" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="heisei mahjong-sou (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<rom name=Hell Gate (Unreleased).cdi" size="813160129" md5="e6f677cd41547d13c6e1021746d052b9" sha1="d7d9ec53451454e0ec2504ea1852e29280f955b3"/>
+
+	This prototype was released onto the Internet as a CDI image, which chdman cannot handle correctly right now.
+	When a proper CHD can be created, this dump will be added.
+
+	Originally found on a devkit HDD. This is a bootable CD version created from files on that devkit.
+	-->
+	<!--
+	<software name="hellgate">
+		<description>HellGate (World, Prototype 20010410)</description>
+		<year>2001</year>
+		<publisher>Jester Interactive</publisher>
+		<info name="release" value="20010410" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hellgate (world, prototype 20010410)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- Bundled together with Hello Kitty Dreamcast consoles. -->
+	<!--
+	<software name="hkgarden">
+		<description>Hello Kitty no Garden Panic (Jpn)</description>
+		<year>1999</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-7381"/>
+		<info name="release" value="19991125" />
+		<info name="alt_title" value="ハローキティのガーデンパニック" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hello kitty no garden panic (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<software name="hkfruit">
+		<!--
+		<rom name="Hello Kitty - Lovely Fruit Park v1.004 (1999)(Sega)(NTSC)(JP)[!].gdi" size="212" md5="e7df8606a871fa184d8bb0c05197ebaa" sha1="750d7a4cfe36d11150d8a2b125e283fdb2286f3c"/>
+		<rom name="track01.bin" size="2812992" md5="078a4403cb8c241f412ac76741df09df" sha1="25a9921d684bcb73e9a1785cd810a3d1168bab4e"/>
+		<rom name="track02.raw" size="1949808" md5="c28a4d0b40eee409fe201f3c1c47a0b1" sha1="437a4512cac2d8dc384ab8e7240790925158f1d9"/>
+		<rom name="track03.bin" size="758155440" md5="f397a806dc6f1afad45ab30df9ec31cd" sha1="05416e5105c3372268bfa86418d11dcff253e72d"/>
+		<rom name="track04.raw" size="29465856" md5="02b78d68daf9c5ef447f3186e984125f" sha1="036cb077378a8d7825037667abf0baeaf12a1302"/>
+		<rom name="track05.raw" size="56937216" md5="845e06cd5d6d2f191486c0537fa251f2" sha1="a536e765c5f2b1a02938ea99a6a960ad89bb929a"/>
+		<rom name="track06.raw" size="54691056" md5="0417944c794f44ff84084c7fba560352" sha1="1b579c2ad93446743994ad9ec84ac12206204ca1"/>
+		<rom name="track07.bin" size="285805632" md5="a385d80cf367aeafee8b1404f08bb1e2" sha1="72528c4835c04fc27e370b2f9711f8107b145005"/>
+		-->
+		<description>Hello Kitty no Lovely Fruit Park (Jpn)</description>
+		<year>1999</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0055"/>
+		<info name="release" value="19991125" />
+		<info name="alt_title" value="ハローキティのラブリー・フルーツパーク" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hello kitty no lovely fruit park (jpn)" sha1="504d39d39074b24f7d5638e032b11bcbc50437dd"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hkblock">
+		<!--
+		<rom name="Hello Kitty - Magical Block v1.001 (2000)(Sega)(NTSC)(JP)[!].gdi" size="150" md5="4c45fd1f86f310eacd7e04856f8f8211" sha1="d3f439fb03c18c5d7a6497aa1652426a378e436f"/>
+		<rom name="track01.bin" size="2812992" md5="66048cafb78a454e0cf29bb68602c37c" sha1="07d1942a7457015aa80d9c226940f53ae6b9aefa"/>
+		<rom name="track02.raw" size="1949808" md5="bc1d0aae3030443bcb14854048eb05d8" sha1="d0b02149b67f0d2f0f6c166f200bef58cfc7a301"/>
+		<rom name="track03.bin" size="1055876304" md5="77339943953be055b23d90bdfed1bbcc" sha1="f0957d523aafe076cabdab69cacec37b6db7056c"/>
+		<rom name="track04.raw" size="2716560" md5="d6af5dca83034cad96759a4d7a1d5d53" sha1="370d454e360ff0e2534341d538fb5a692188863e"/>
+		<rom name="track05.bin" size="126462336" md5="24c4c596abbdc215918ee5850dd92d5c" sha1="9db13ceaa76af03b70b784582c82ee1780b829c5"/>
+		-->
+		<description>Hello Kitty no Magical Block (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0070"/>
+		<info name="release" value="20000330" />
+		<info name="alt_title" value="ハローキティのマジカルブロック" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hello kitty no magical block (jpn)" sha1="79fe22062c84ab7a8d4cbfe4f7714347e457e741"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hkmail">
+		<!--
+		<rom name="Hello Kitty no Otonaru Mail v1.016 (2000)(Sega)(NTSC)(JP)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
+		<rom name="track01.bin" size="1058400" md5="5d862fb9fea822960c5c17d088645ba8" sha1="9ae801b6992e41607432e53d267e25537cab6c0d"/>
+		<rom name="track02.raw" size="1735776" md5="df9705fe47ec5f36bc7f0c4c3d54dbbf" sha1="b4099782aa5899de41077c60fdfcc51b6c28c46f"/>
+		<rom name="track03.bin" size="1185760800" md5="070a9e78c4b4d435f98945df8c825114" sha1="8db7546272037bbed5a349b150d904736cb242f5"/>
+		-->
+		<description>Hello Kitty no "Otonaru" Mail (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0065"/>
+		<info name="release" value="20000413" />
+		<info name="alt_title" value="ハローキティの「音なる」メール" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hello kitty no otonaru mail (jpn)" sha1="fe3818ed2607916bb3b4a8410170ac8ae1dc74c6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<software name="hkcookie">
+		<description>Hello Kitty no Waku Waku Cookies (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0090"/>
+		<info name="release" value="20000810" />
+		<info name="alt_title" value="ハローキティのワクワククッキーズ" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hello kitty no waku waku cookies (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="hermes">
+		<description>Hermes (World)</description>
+		<year>2017</year>
+		<publisher>DragonBox</publisher>
+		<info name="release" value="20170414" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hermes (world)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<software name="hnd">
+		<!--
+		<rom name="Hidden & Dangerous v1.100 (2000)(Take 2)(NTSC)(US)[!].gdi" size="149" md5="a7f2b61f3f6990e7bc304af46eb85dc5" sha1="4e0ad16413ec997057270550b9b418c0d7609885"/>
+		<rom name="track01.bin" size="1462944" md5="780d87558def296ae97e2870869ec8b2" sha1="c273325efed2d101b0fe1499e40ba338b38c352c"/>
+		<rom name="track02.raw" size="1237152" md5="94fde9cacd7a4b3c18d8918836e9cda5" sha1="4b9ed2a2eefaae6691674522b9f047a066304a75"/>
+		<rom name="track03.bin" size="503099856" md5="6ffc237548224b85709d03c7862ca809" sha1="a7bfbabe8605af10bd061cbdad405f9b5179f18d"/>
+		<rom name="track04.raw" size="1060752" md5="166d547d4b80a87ad3538f9377fbf6d8" sha1="471abb758a709c9d678bd2e76f31a6d721b5f4f0"/>
+		<rom name="track05.bin" size="680894592" md5="f248b755f9ee5345192256cf37239847" sha1="6da4a20161aa989c7f3d9b2b377367675be4c8a3"/>
+		-->
+		<description>Hidden &amp; Dangerous (USA)</description>
+		<year>2000</year>
+		<publisher>Take-Two Interactive</publisher>
+		<info name="serial" value="T-40502N"/>
+		<info name="release" value="20000709" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hidden and dangerous (usa)" sha1="2899e80628b08c59f7a95275641f951e5f648394"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Both the English/French/German (T-40503D-64) and English/Spanish (T-40503D-88) release share the same disc (T-40503D-50). -->
+	<software name="hnde" cloneof="hnd">
+		<!--
+		<rom name="Hidden & Dangerous v1.001 (2000)(Take 2)(PAL)(M4)[!].gdi" size="150" md5="1832ad77ec9f5eb75c3dbdc62e8b8085" sha1="96e0c32abb14d9ae0cf38d61f991cc3599e8199f"/>
+		<rom name="track01.bin" size="16075920" md5="9c15bc8e0846e8c7f02575b576cdd1d8" sha1="924c04a338b1ca598013d4c0f5f2b07244ad6dbf"/>
+		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+		<rom name="track03.bin" size="506098656" md5="2cf7c5922605d676f7da468ed820dd9f" sha1="dc726d5026f2e43a1bb0c4ed3febff271753ea28"/>
+		<rom name="track04.raw" size="13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
+		<rom name="track05.bin" size="665138544" md5="7152705a9d45b5f62ce2b2e198850c79" sha1="848302fd44fc626055306dce7b9ae481840a1ad7"/>
+		-->
+		<description>Hidden &amp; Dangerous (Euro)</description>
+		<year>2000</year>
+		<publisher>Take-Two Interactive</publisher>
+		<info name="serial" value="T-40503D-50, T-40503D-64, T-40503D-88"/>
+		<info name="release" value="20000908" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hidden and dangerous (euro)" sha1="6c7356de0d46db85a03af3075f6576c2907bc09c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<software name="himitsuost">
+		<description>Himitsu Original Sound Track (Jpn)</description>
+		<year>1999</year>
+		<publisher>Warner Music Japan</publisher>
+		<info name="serial" value="WPCV-10045"/>
+		<info name="release" value="19991014" />
+		<info name="alt_title" value="「秘密」オリジナルサウンドトラック" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="himitsu original sound track (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="himitsu">
+		<description>Himitsu: Yui ga Ita Natsu (Jpn)</description>
+		<year>2001</year>
+		<publisher>Starfish-SD</publisher>
+		<info name="serial" value="T-46101M"/>
+		<info name="release" value="20010726" />
+		<info name="alt_title" value="秘密 〜唯がいた夏〜" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="himitsu yui ga ita natsu (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="hitachish4">
+		<description>Hitachi SH-4 Demo Disc (Jpn)</description>
+		<year>1999</year>
+		<publisher>Hitachi</publisher>
+		<info name="alt_title" value="HITACHI SH-4 デモディスク" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hitachi sh-4 demo disc (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<software name="hoylcasi">
+		<!--
+		<rom name="Hoyle Casino v1.001 (2000)(Sierra)(NTSC)(US)[!].gdi" size="149" md5="bcaf3a5b5b8b0efcdfd4142e9b4a45cf" sha1="82d65209ce76b3e37abc714523ebc082a1804c56"/>
+		<rom name="track01.bin" size="1427664" md5="6f3bb686fb299721b3af8f4151968196" sha1="c8bfcdb2d8f6ec7d4cf64fe75ba08b262b4682f5"/>
+		<rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
+		<rom name="track03.bin" size="726445776" md5="f0d8042f2dc3fe9d5c20edd3a8a94395" sha1="1c25acd6ac28aa28ff56ecfa0e4dbc9de106a598"/>
+		<rom name="track04.raw" size="1060752" md5="3a892db029c4b1ba6ed24ccdaf5cff62" sha1="36b69ee3a5dd70637228feaa14528ac23f848ee7"/>
+		<rom name="track05.bin" size="457548672" md5="3a7e72ccd0eedb27a52f9680f260b612" sha1="118ace063cb2071b3ee5903acec086ecf441a58d"/>
+		-->
+		<description>Hoyle Casino (USA)</description>
+		<year>2000</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="serial" value="T-11008N"/>
+		<info name="release" value="20000929" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hoyle casino (usa)" sha1="55ce69f2fa46e604c887aff5bdf35c1ca024c0b7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="100sword">
+		<!--
+		<rom name="Hundred Swords v1.005 (2000)(Sega)(NTSC)(JP)[!].gdi" size="149" md5="9bd1abf3944dc404798fea233a450c05" sha1="77b356673fc691d0c5c4c2a5286e6c5311af3cae"/>
+		<rom name="track01.bin" size="705600" md5="822ec6abd8ff506f1fb813936ba87e09" sha1="39e16a142804c5cf3ff081b8b9bfacd7a844afc5"/>
+		<rom name="track02.raw" size="1735776" md5="5a9f4156c37f503b735c4899017ea8c6" sha1="f56d9fe7e83a16d194693e79ac31608013aa84bd"/>
+		<rom name="track03.bin" size="413808528" md5="d273e16b1f5f28a9fd6002916afd2ba2" sha1="8dbf5ed3a6a16306221766351ef6efca2f285719"/>
+		<rom name="track04.raw" size="62890128" md5="343c53e6faabeb34e04c97528850e87a" sha1="bde250bc254d4c641f1ee20572ab99d92d1bb5fa"/>
+		<rom name="track05.bin" size="708356544" md5="6f37b8b270953efb5870b8629491a33e" sha1="b3f1fc284128af56527d91f884b5d4d06d83d4a8"/>
+		-->
+		<description>Hundred Swords (Jpn)</description>
+		<year>2001</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0124"/>
+		<info name="release" value="20010215" />
+		<info name="alt_title" value="ハンドレッド ソード" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hundred swords (jpn)" sha1="8129b62601a19eff64f6ecc8fbeaca6b3f31aefe"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<software name="100swordb">
+		<description>Hundred Swords - @barai (Jpn)</description>
+		<year>2001</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0127"/>
+		<info name="release" value="20010208" />
+		<info name="alt_title" value="ハンドレッド ソード @barai" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hundred swords - at-barai (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<software name="hydrthun1" cloneof="hydrthun">
+		<!--
+		<rom name="Hydro Thunder v1.002 (1999)(Midway)(NTSC)(US)[!].gdi" size="1170" md5="61e7fa4816d132152d7366b442f5d2ed" sha1="e00571a859d2ea727b30ecaba7e870060c6fe988"/>
+		<rom name="track01.bin" size="1335936" md5="1c57aa9a66a2abd1eb5524f105d510f9" sha1="d012e33f2bd8dafa7b5175cc982f90323237fda1"/>
+		<rom name="track02.raw" size="1166592" md5="68ec04963d37040b8fc554e531a5258b" sha1="bdeee5813bb268b2f6702140fdb72a7e224ff045"/>
+		<rom name="track03.bin" size="140205072" md5="8acec43a28d655b126240f21c9d4a446" sha1="1b605f78f198a52fdac806067d95130f0529f0d8"/>
+		<rom name="track04.raw" size="2003904" md5="21a4452687c07cd784d154669f90297e" sha1="3aa9688be5e670ebe918c399d5c2c3d83afe16dc"/>
+		<rom name="track05.raw" size="1333584" md5="9a0031df1716380079448d86b6ac7ec8" sha1="543bb8f4d0f6ae2434c2eb1ed5ca2c22b721d6b0"/>
+		<rom name="track06.raw" size="21520800" md5="3408455d482fc0e91dad201dc9f0ada8" sha1="ec801ab6ef6075054aba6061cdee77df4fcd7d50"/>
+		<rom name="track07.raw" size="10936800" md5="48d2967e6e316f40169fcb701f492cd5" sha1="88d6f126c24f723fe65a96ce2417a2cd79793ae3"/>
+		<rom name="track08.raw" size="21520800" md5="cfefc9bdce0bd01be478dc47b79b93c5" sha1="cb689b802c6bc59ddc7740e08257d54cd5035cb9"/>
+		<rom name="track09.raw" size="10936800" md5="6c23ecf6879c49af80094babc2e27eaa" sha1="a8f60b68d39c33994264e50c1b71b5fe4fbed5a7"/>
+		<rom name="track10.raw" size="10936800" md5="fd37443a26c645b975ab309f0cbc8c4c" sha1="40d2a1b572ab604b14697716f02476e9a00f01af"/>
+		<rom name="track11.raw" size="21520800" md5="8f340420fc18ddc5d9e16a099506bbcc" sha1="9f0aee1a7b9cf8e39ecd2b0f67cb14cb4a006491"/>
+		<rom name="track12.raw" size="10936800" md5="6deebbc29dcd94caf7e605a4bd451524" sha1="37dd382a76c398d17fbcbbe365bced63dca4ddad"/>
+		<rom name="track13.raw" size="21520800" md5="0c002bf570584d6558a78cebd3c24f63" sha1="3c8f4bd297b727ea71a8385fc10444b3b8c2e942"/>
+		<rom name="track14.raw" size="10936800" md5="7cd777fac050e8cda3a91a858fec5471" sha1="8852c54f93ee7c076a9fa1b255ecbaccef4c6870"/>
+		<rom name="track15.raw" size="10936800" md5="be0bd26def168d2fdcf4cd327071b444" sha1="cdd67a62a79a57b00a269187801f556988cf0879"/>
+		<rom name="track16.raw" size="2617776" md5="3802bee6bd0008258bfbb656797ccc08" sha1="4c72040734a7127104f8986c2836c84d1ac7d0ff"/>
+		<rom name="track17.raw" size="21520800" md5="9ae0fe997294a95bc9d7d05bf61c2ccf" sha1="0270e745825dc0686220910122311ba3dfc7edf4"/>
+		<rom name="track18.raw" size="10936800" md5="3fe2e4581781d7c675f0a324ad8b2bdb" sha1="e4e965d1718a00850e224f582cb5e15a690f0588"/>
+		<rom name="track19.raw" size="21520800" md5="3f1c8b9a10dcab963fe5a47778420f4e" sha1="2899e69a19e89a8f7df8ecb1c9b0a8cab6028c88"/>
+		<rom name="track20.raw" size="10936800" md5="88238b9ef8969eebef880cdae854672c" sha1="47df1d8b7d747e4bc0b927a77fe8bb53270222f7"/>
+		<rom name="track21.raw" size="21520800" md5="553ef69fff8d108a42696ad2d46e104b" sha1="96fd78314fc59c0fdd2ec83d9e81975be83c5cbb"/>
+		<rom name="track22.raw" size="10936800" md5="24f6a2803c3c785a38e55d74fc55b259" sha1="264846a70aefd04edc281c4e0a2079a2f382199d"/>
+		<rom name="track23.raw" size="21520800" md5="fac61d5082af1bcbbd673988f5b93a95" sha1="11c954ebef9ab55015187c948f7f1cdf16d6e39e"/>
+		<rom name="track24.raw" size="10936800" md5="0fb1833d8d2433f2506038d4a94318a1" sha1="1efb0a7473f6c133330e168dc74d9e070741d4e4"/>
+		<rom name="track25.raw" size="21520800" md5="fac61d5082af1bcbbd673988f5b93a95" sha1="11c954ebef9ab55015187c948f7f1cdf16d6e39e"/>
+		<rom name="track26.raw" size="10936800" md5="4ff618188985c8435ec360cfe1cec27e" sha1="14d519e3534e70198319962cb41e9d6c6fc19509"/>
+		<rom name="track27.raw" size="10936800" md5="11b9d3358a663660ac04d84c9640fda2" sha1="e34a3b46773a5c8e586d4d285cea886149f21664"/>
+		<rom name="track28.raw" size="21520800" md5="85c4dab13baee9a62931bfdbd50914c3" sha1="fadc22b68a7a0c989ea27c8365cf1c6d42223f54"/>
+		<rom name="track29.raw" size="10936800" md5="a550b7bd40e9903dc4298bc38b70b3c3" sha1="4ef5442e7952b43f74d385386a496506b944a9b0"/>
+		<rom name="track30.raw" size="21520800" md5="328f67a20fd9e35cacd791b4e4bbcec8" sha1="f8bb8949b5792513893b728c416fa63e2ae6cc72"/>
+		<rom name="track31.raw" size="10936800" md5="21d26a2dc5d7472942e90f0cc3a9a2e2" sha1="e1d9c55245f7a40988e0dbf9678011dc669da616"/>
+		<rom name="track32.raw" size="14314272" md5="3e1ebe501b41985c7682b7edfd3ee6e4" sha1="cbfbc437d75ffef14ef311c20685cc0e7f3e3f15"/>
+		<rom name="track33.raw" size="1808688" md5="ed80e3e7b21b1003325e69aef69500cd" sha1="4ff8ba2adf31c903e74e54898ec440f3376994ae"/>
+		<rom name="track34.raw" size="10936800" md5="24f6a2803c3c785a38e55d74fc55b259" sha1="264846a70aefd04edc281c4e0a2079a2f382199d"/>
+		<rom name="track35.raw" size="21520800" md5="5b59383a91bd81010f18f94db798534f" sha1="d33983a37767fd1ed59dfa46dc3a23252ad495fe"/>
+		<rom name="track36.raw" size="21344400" md5="6128e17d4906cf53ff1997e92c208d96" sha1="e72b213abf50f710e620b0ae966d9d7e44f08702"/>
+		<rom name="track37.bin" size="579125904" md5="f9cdcb326231e58c3ca643ee13440df4" sha1="b4d77454311086e75ba186ca016af471cc8039f6"/>
+		-->
+		<description>Hydro Thunder (USA)</description>
+		<year>1999</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="T-9702N"/>
+		<info name="release" value="19990909" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hydro thunder (usa)" sha1="ca2e5fd7c2c9088fc4f1a0bcd6de22b25dff1887"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hydrthun">
+		<!--
+		<rom name="Hydro Thunder v1.020 (1999)(Midway)(NTSC)(US)[!].gdi" size="1170" md5="96f5e661314da1ae7afb7d1413ba99c5" sha1="0bbe694c219a49d61ea87992036641e13bca0827"/>
+		<rom name="track01.bin" size="1335936" md5="e13cbb26f170dea1f83f4418726a16b3" sha1="e9cf20d1add6c8f50a7edd855cbdac57b79e5fed"/>
+		<rom name="track02.raw" size="1166592" md5="4c2ef8e2c8aa6cab2d4cb175f303f9bf" sha1="5f3eb2e9a5a5fb52052653df6408d17b2a0a7ed4"/>
+		<rom name="track03.bin" size="140242704" md5="4c52ec266c462d268516b3c57ba9281d" sha1="d8252cd17a048e8ab801a79b0101b9769414e7dd"/>
+		<rom name="track04.raw" size="2003904" md5="af689ef576de78bb684bf87013b67685" sha1="a97470b71767f470e938e25b4a17dd60592c0fec"/>
+		<rom name="track05.raw" size="1333584" md5="e1c16c93d3d64a8419f2606a84694bc3" sha1="5140d53f5e317706a3bd9bf0093a2920f1c96226"/>
+		<rom name="track06.raw" size="21520800" md5="53261de96ca9d1f50390084090632fd7" sha1="d43bc6296afa0eacd029a360ef1573a2b34eb4cf"/>
+		<rom name="track07.raw" size="10936800" md5="e631e252a90f4b9f50a1ce8afbf7d30e" sha1="4f87a6b03cf9dc3a0b24509cba63c27735dc65ad"/>
+		<rom name="track08.raw" size="21520800" md5="65860ef18c0ea21456740796eec7b7b9" sha1="06bb58b590a11c3ecd2fa3ab0ff1a386528d5fe5"/>
+		<rom name="track09.raw" size="10936800" md5="50fb5652dd430c828db2a41c893ea520" sha1="ea1d83add1488d23e63c07e57405929ee0c6b7ba"/>
+		<rom name="track10.raw" size="10936800" md5="19a7c9cfcc9b52dc0fe66f1009d293cb" sha1="d82cc61e5f56767a45b6dd90e3f202bb1c7d4284"/>
+		<rom name="track11.raw" size="21520800" md5="7e483264c4b1c52f77e660ab2e7d728f" sha1="955c6d23890ada829ec2c2cd655859550cd17c01"/>
+		<rom name="track12.raw" size="10936800" md5="e958bbcb1c1506fad1e20ab43c15a37b" sha1="c81ab4b529b4c265e9f50c5f549ba36fe4c9fa9f"/>
+		<rom name="track13.raw" size="21520800" md5="b86c5f4e9640015e95d79bbd06294a09" sha1="2fb7ea7b61ecca771777ab1279b4011bb2624055"/>
+		<rom name="track14.raw" size="10936800" md5="b0cdd4ec79f8dd4d06c3ec38c64baa55" sha1="59b4abe5bbd4bb3237a4a829219f8b0e832e0cb2"/>
+		<rom name="track15.raw" size="10936800" md5="206f957e444261ab686909880e13905d" sha1="3bd9474dbdbdc7531a9a80466387f4946d22f667"/>
+		<rom name="track16.raw" size="2617776" md5="beca2e4e04c8a959af6fa3a25d5e4428" sha1="6508476012809c136aead0b50771eabc860e3245"/>
+		<rom name="track17.raw" size="21520800" md5="ac5c79ff0251070bf3252a695e59d343" sha1="c792d1cb1de57b0d89a50ab17dbde42d1601d9dc"/>
+		<rom name="track18.raw" size="10936800" md5="5f9370d89727ead050c879113db42f1c" sha1="7b1c0ad8d69dcecabb8066f6955e0e478daf7e2f"/>
+		<rom name="track19.raw" size="21520800" md5="6398d9ee32cbaf61b77f6aed62773770" sha1="c99894b6e3ff14787b6ebe8e586ffae35e23ac44"/>
+		<rom name="track20.raw" size="10936800" md5="7510bed7614c88234cd0e1b700375879" sha1="d801b5e4974bb562d33e2985d14cfb312ce12798"/>
+		<rom name="track21.raw" size="21520800" md5="f0d9422a70ce5acc0ed8b3c5e89e2f82" sha1="5975298e3022d272f4f99b5c7e1437a9f85d7d99"/>
+		<rom name="track22.raw" size="10936800" md5="36828d828b1232ef4e4765169223acdd" sha1="671d46a14171ba214f840a7c7c842da32b6755f6"/>
+		<rom name="track23.raw" size="21520800" md5="edac12127250cb08080c3f2c18be55f2" sha1="e849720c556de65f2d33ca01bdea209536fa1a95"/>
+		<rom name="track24.raw" size="10936800" md5="bbcc7010b3d4e721ba47c05a25e7ed33" sha1="a0c5c6084a10df977a866a55d22f3c80af63c919"/>
+		<rom name="track25.raw" size="21520800" md5="edac12127250cb08080c3f2c18be55f2" sha1="e849720c556de65f2d33ca01bdea209536fa1a95"/>
+		<rom name="track26.raw" size="10936800" md5="59ac77403465b185521b954a68d27cae" sha1="b8fbde648a05977a64c9584071a8397030de47df"/>
+		<rom name="track27.raw" size="10936800" md5="3a8a4f2b4c05abaa877310c8509e6e13" sha1="4309ad99b0888ee7e7c35e28fe753629d9852ae7"/>
+		<rom name="track28.raw" size="21520800" md5="b1abce89f95146ee98a56927c50e8d5e" sha1="689acec1785e8928898e90a41fcaff9f6037c1d4"/>
+		<rom name="track29.raw" size="10936800" md5="c8f82731bf2321656dba1d6c221aec6f" sha1="d9a00d0134235bc547ae0fc9625b334ee45a5a3a"/>
+		<rom name="track30.raw" size="21520800" md5="899928cf2b1b72317b66afb03cd89156" sha1="fa3911495fcfca7e6a9f5c2ce940e0195ebeca27"/>
+		<rom name="track31.raw" size="10936800" md5="303066647eb7237104412971aae83d0c" sha1="d5ed935b93a888ec467861c53cb3a382c60e98f0"/>
+		<rom name="track32.raw" size="14314272" md5="f5422d843afb09cc09073a1a34e0891a" sha1="e5df6c4e4a64add7947fd7f11ab2e708e6538a38"/>
+		<rom name="track33.raw" size="1808688" md5="90213dd1b49e871e7474c8668794721f" sha1="84fc4387b3b2a54697894497b8b9bf019f4d90f5"/>
+		<rom name="track34.raw" size="10936800" md5="36828d828b1232ef4e4765169223acdd" sha1="671d46a14171ba214f840a7c7c842da32b6755f6"/>
+		<rom name="track35.raw" size="21520800" md5="bcf46dfebed2d3d53d22c87137ab7232" sha1="6905427567e12e987d1434bcc0c35d2c85472684"/>
+		<rom name="track36.raw" size="21344400" md5="10660b8ec46f85890b47cdcd86016a00" sha1="253a5c641601c3324be93dbc42a819f9628f39c8"/>
+		<rom name="track37.bin" size="579088272" md5="43524daaebcea89fcf08165e8735b3b9" sha1="eb597ea970c73b27199e5c6a1d44afe4ee4a7181"/>
+		-->
+		<description>Hydro Thunder (USA, Rev. 1)</description>
+		<year>200?</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="T-9702N"/>
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hydro thunder (usa, rev. 1)" sha1="e4cb2781d38d1e35d4e3a9a57ee0dbc7e965a04a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Both the German/French/Dutch (T-9702D-51) and English/Spanish/Italian (T-9702D-61) release share the same disc (T-9702D-50). -->
+	<software name="hydrthune" cloneof="hydrthun">
+		<!--
+		<rom name="Hydro Thunder v1.009 (1999)(Midway)(PAL)[!].gdi" size="1170" md5="96f5e661314da1ae7afb7d1413ba99c5" sha1="0bbe694c219a49d61ea87992036641e13bca0827"/>
+		<rom name="track01.bin" size="1335936" md5="306f806f2184396598cb482d8cbba992" sha1="fee4ce37096b20b194454d56d08db35d97ceaf20"/>
+		<rom name="track02.raw" size="1166592" md5="c1774d74e7f31b8f2ef74af2d7f28010" sha1="f1849e96005ebd0d4e0762ec2357a08a723cda1f"/>
+		<rom name="track03.bin" size="140242704" md5="30b2942a514df62dcc18041c08d60ed7" sha1="063b7f6200c65b5f6374b67f68610867e099ff47"/>
+		<rom name="track04.raw" size="2003904" md5="73afba056a8ccf3544ffed9ec08df544" sha1="e15ed092b3d6c765e9d6e89503031a26cf041c3d"/>
+		<rom name="track05.raw" size="1333584" md5="5ab04fe2c97da439210bd86138ed8226" sha1="fa51f17125af5184f034e6d3de5a3656ee0a5d83"/>
+		<rom name="track06.raw" size="21520800" md5="26ed117af7cc75a5a2853989716aeb7e" sha1="12d010f7da962e4d2ff16ff49806b2d0de2e92c5"/>
+		<rom name="track07.raw" size="10936800" md5="853594652f6c321ce5157aaac05d6348" sha1="4551b4997a83a53b5fa9fab0036e7da9450b4b11"/>
+		<rom name="track08.raw" size="21520800" md5="5e66c1642c7f8cb15234fc0a0d247a6b" sha1="4d2b306ff1b374f27bf0004002ef2e4b28e0ee60"/>
+		<rom name="track09.raw" size="10936800" md5="1fa1abb57e334fa0b9500af2f2f57795" sha1="b6f37b7207e76e6d1b99aaf857a6947fd9fb7a6f"/>
+		<rom name="track10.raw" size="10936800" md5="26ad36fafe8df367866e1423a6e3c512" sha1="e158a15b955dc24521f2f0cf0a29f4d5b0d3886d"/>
+		<rom name="track11.raw" size="21520800" md5="fd34af774f97a2f517faba643e2fde6f" sha1="8e0968ac1a0d2ae42542e3fb4d6293e37eaa36e6"/>
+		<rom name="track12.raw" size="10936800" md5="c781c62aeec8c9f23e0983faa16b07cb" sha1="0ca01bb04a11fe77e8cf42f3dc3ff43d8ae15693"/>
+		<rom name="track13.raw" size="21520800" md5="35187dda0bd7877b5772938e3af53ae3" sha1="e67a95dc1a8b07eedcae88c3ac705219ca7a0a8c"/>
+		<rom name="track14.raw" size="10936800" md5="97103a8fa3b244051f54890e608c3f52" sha1="7dcd204fcd98e15ce336ae8b300766906503234c"/>
+		<rom name="track15.raw" size="10936800" md5="9f313b1621fbb29fdeb498065b899150" sha1="eb5e3480c22f10defaed50c4199ac67ba93519f1"/>
+		<rom name="track16.raw" size="2617776" md5="706caed731ef0bbb8d4b7f8b3ee80431" sha1="3344544f9a4e0c455f82ed7adf16d1b1d96a4c49"/>
+		<rom name="track17.raw" size="21520800" md5="a8f30d047203348aaba749b689656bb5" sha1="d995887c050768126177434a60ff3f35b7889aa6"/>
+		<rom name="track18.raw" size="10936800" md5="f12a6f237b22cb5312255b990bb35de1" sha1="26967597e745223de36fde005cab31d811e1d238"/>
+		<rom name="track19.raw" size="21520800" md5="e3bf0df59c6419c0e69c1df670353bd2" sha1="4a433f528cc072380216c407dfd2ae855078cd74"/>
+		<rom name="track20.raw" size="10936800" md5="644b036ee0569d47a1a1b14f0598bae5" sha1="d02ae731bf859b8c728a06c1f45a9d6b6d66f7cc"/>
+		<rom name="track21.raw" size="21520800" md5="a01e137ec4cfc3eb184e6664c232df9c" sha1="09c744d4d64e92a9f11d058753b1486e5f7284dc"/>
+		<rom name="track22.raw" size="10936800" md5="9f47ad56896be22e5e36591340adeb22" sha1="e4ad61b4367d8d221f74b21263464c5329f41f77"/>
+		<rom name="track23.raw" size="21520800" md5="2d8d67877ff6f8734206370be1dd081a" sha1="af694900b86b8581ffbe0ff71bc46614f6b4934d"/>
+		<rom name="track24.raw" size="10936800" md5="b2403c771ade3aac941916bad844ae13" sha1="efdb5a84c8315b9abd7129cc697df3b3479664f1"/>
+		<rom name="track25.raw" size="21520800" md5="2d8d67877ff6f8734206370be1dd081a" sha1="af694900b86b8581ffbe0ff71bc46614f6b4934d"/>
+		<rom name="track26.raw" size="10936800" md5="9bbbe2773deefee976145bcde2315291" sha1="6b417b106abcff0f0299fb254b7fdb88d05e9551"/>
+		<rom name="track27.raw" size="10936800" md5="fbe73078c6b1a97eb7b6b8db63c5ffd1" sha1="2891bba082dcbe145dde6f0ff44dc4efd2c57cd1"/>
+		<rom name="track28.raw" size="21520800" md5="323a775615504e715a2233f554797261" sha1="b042c9b196f7e448826d003b49c180a9cc504f72"/>
+		<rom name="track29.raw" size="10936800" md5="0c86476401506380719a6601313f63a4" sha1="e85111f52efd77c33666721a35a53addb4f83236"/>
+		<rom name="track30.raw" size="21520800" md5="331ad4e226a77de913e48af80aa78587" sha1="61b2ecfd77e94e2bc221a74291f8e4bed6f0c14e"/>
+		<rom name="track31.raw" size="10936800" md5="3d0e28287671133524357e5aad87dee3" sha1="1db851d8415beb86596a0749fe93c8ffeb559564"/>
+		<rom name="track32.raw" size="14314272" md5="5cde3106e7c105233d15621ebd16ed6f" sha1="b9f238e5798040ef0b9b7db6d329e9997f2aecd3"/>
+		<rom name="track33.raw" size="1808688" md5="966942ef3931ccbb392f535dd4cd355a" sha1="d06278343a1764095121bc1485f98d6b51143ad3"/>
+		<rom name="track34.raw" size="10936800" md5="9f47ad56896be22e5e36591340adeb22" sha1="e4ad61b4367d8d221f74b21263464c5329f41f77"/>
+		<rom name="track35.raw" size="21520800" md5="3de414f094ec6410df2cd5f44b7d34fc" sha1="093d6ff612c8e2d6a7085e2b278106513fc8ae4a"/>
+		<rom name="track36.raw" size="21344400" md5="4f44542a4dc9ee8774a812dc5414244e" sha1="d7199adeea5dd7d289586ada5a54a855110b2228"/>
+		<rom name="track37.bin" size="579088272" md5="24f42029230e355fe96c59e34e86e31e" sha1="6797cedf5a95714d2f2966678abfb2aab2213a87"/>
+		-->
+		<description>Hydro Thunder (Euro)</description>
+		<year>1999</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="T-9702D-50, T-9702D-51, T-9702D-61"/>
+		<info name="release" value="19991024" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hydro thunder (euro)" sha1="72fa6e59d5d880d403e98ccb0741bc4e931b1928"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<software name="hydrthunb" cloneof="hydrthun">
+		<description>Hydro Thunder (Bra)</description>
+		<year>????</year>
+		<publisher>Tec Toy</publisher>
+		<info name="serial" value="197176"/>
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hydro thunder (bra)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- Apparently dumped via Dreamshell, which is known to give bad dumps. -->
+	<software name="hydrthunp1" cloneof="hydrthun">
+		<!--
+		<rom name="HYDRO_THUNDER_-_ALPHA.gdi" size="1101" md5="3c615df36d048ef4eba20a5c55bc5730" sha1="62cfef932f38666f07415f95aa0bdb8beda23dc8"/>
+		<rom name="track01.iso" size="  1165312" md5="8f3d4e8862be2827202eb91cf211b496" sha1="60d355b859158dcf689b07f5e3366b080a54a5d7"/>
+		<rom name="track02.raw" size="  1166592" md5="c1774d74e7f31b8f2ef74af2d7f28010" sha1="f1849e96005ebd0d4e0762ec2357a08a723cda1f"/>
+		<rom name="track03.iso" size="210765824" md5="204158468675eafdac8bb4078bf35292" sha1="b2066d9a825375d9696c35d43dc64c5e9043d86e"/>
+		<rom name="track04.raw" size="  2003904" md5="190384ab998d06658427d19f41d67fdf" sha1="3a0f03569f0b0811ebd882e717134542ab791040"/>
+		<rom name="track05.raw" size="  1333584" md5="c3367af8d4deda9375539a5f516b89f6" sha1="269b87e318a53cd2ce39968076d5cea44a349ae0"/>
+		<rom name="track06.raw" size=" 21523152" md5="722b90b81c820715f57ec0970ef53c76" sha1="490d7efb75770d13cafc208c81600856395c4c0c"/>
+		<rom name="track07.raw" size=" 10939152" md5="feb9288733541d547b30c6640ad6cd38" sha1="1edcf4cc7fb7f61445f59ee68c3ab9b634e8acdc"/>
+		<rom name="track08.raw" size=" 21523152" md5="79b51ea8839b43dadadc3e65b7651b14" sha1="3c870d5980b074f23c0c6c8c33f3e6ff3fe1365d"/>
+		<rom name="track09.raw" size=" 10939152" md5="e48c71db2a1dc21989bf72a2b582532b" sha1="5376b1a318b4f1aec4d987ec7a74a4f3409afcf8"/>
+		<rom name="track10.raw" size=" 10939152" md5="d51cbae401ddb3d432e672e8eeb52757" sha1="89a6b4bd1aef058e428fc6cb0776e8003526c78d"/>
+		<rom name="track11.raw" size=" 21523152" md5="5e6111ceacd61dc5e96f3985df98b051" sha1="ce11b8fbe0839de5d9741b7ce180d07327f81283"/>
+		<rom name="track12.raw" size=" 10939152" md5="7dbe1cda3394567e7cbd76ef0de58ce4" sha1="2d70ca8afb44e1225c028a6d1c9029754a9e8ef1"/>
+		<rom name="track13.raw" size=" 21523152" md5="0f6f0b72e7fee1a685c9c0a672822881" sha1="9d36839d8ebe01692d356ec2210b7fe5f76bd021"/>
+		<rom name="track14.raw" size=" 10939152" md5="9df138608770f4cd8141447765135c33" sha1="bb483d2b7bcd19e59589e3f16a53b8fb18630fa8"/>
+		<rom name="track15.raw" size=" 10939152" md5="37eeeada3d126620b1926d3f4e84d689" sha1="aee37d634649d9cdaf11dc477a1cd5686670e5ae"/>
+		<rom name="track16.raw" size="  2617776" md5="42e5fbf56a43df45cd29b00a57369735" sha1="1e55ed82a86e010feac26d25c5a73763ab9d4ad2"/>
+		<rom name="track17.raw" size=" 21523152" md5="02ccedeb15b101e0c7d5591e0ff51d8e" sha1="a7f824138365ba4965fd3de53fa0785bea2f12e0"/>
+		<rom name="track18.raw" size=" 10939152" md5="fa4eaed3ca878bbaa79e02386c9d0964" sha1="5a8a3cd4126e3f6edbe1c94bf6626c6238e1c204"/>
+		<rom name="track19.raw" size=" 21523152" md5="83abff486685377005bd9fd18afb5e47" sha1="b89c9f6407e042448b4996e27ca0ae6791f30213"/>
+		<rom name="track20.raw" size=" 10939152" md5="ae273cccb83105830d338180ad184d7c" sha1="84dd66fce8b9c65ee18f12faa1c035134785025e"/>
+		<rom name="track21.raw" size=" 21523152" md5="98315458eff54947718eed1ec9573ddb" sha1="1d2a6bec90a72ef3ae7e8f73cc262f3521001f4c"/>
+		<rom name="track22.raw" size=" 10939152" md5="51369c3e4141814c2ce25958623854c3" sha1="ef07677950ca5e4baf05b96eecea164037c4da38"/>
+		<rom name="track23.raw" size=" 21523152" md5="fcdf16fe17cb22de9374b3dec8712d55" sha1="78f67b3231c2429337d9fe41b5e0ee6ea59bbcaa"/>
+		<rom name="track24.raw" size=" 10939152" md5="6e262d35eb817d2c6f708cfbcdd13efe" sha1="dc4e00cbe37a1e1e52760735982281db981e88e7"/>
+		<rom name="track25.raw" size=" 21523152" md5="fcdf16fe17cb22de9374b3dec8712d55" sha1="78f67b3231c2429337d9fe41b5e0ee6ea59bbcaa"/>
+		<rom name="track26.raw" size=" 10939152" md5="98187b19cac4ecf7fe6824aa9cac2da1" sha1="fcc4e3d2b7e6ea9b1787fa459a2ad8087dd0e42b"/>
+		<rom name="track27.raw" size=" 10939152" md5="367225ac300686f67696b0f08a2a563b" sha1="0161886af383b5ece5e375ed3f5e248485dafda2"/>
+		<rom name="track28.raw" size=" 21523152" md5="45caa56b70fdeb8e501b3a69e16093d8" sha1="03c4d6da544609644a3074917651b6bc59eb1b72"/>
+		<rom name="track29.raw" size=" 10939152" md5="f42d806bb407588b0ea7f9dde44a8c7f" sha1="fcc72bc2ad69639cf6e092152ea3d9c143c7e101"/>
+		<rom name="track30.raw" size=" 21523152" md5="10726537831f024214b2bffad43a1fa0" sha1="72c43c106badd056f4aeb1b51f257565df3f4222"/>
+		<rom name="track31.raw" size=" 10939152" md5="0ce7339cb83df4227b853f7ebfbcc0ca" sha1="64053d16df21d2a82c08fb08da130b15242df7fa"/>
+		<rom name="track32.raw" size=" 14314272" md5="ab946decc96a6b8b4c4a8d6562b6bb15" sha1="32ecfc7139691c9696bcc0f695accfdf172fab2c"/>
+		<rom name="track33.raw" size="  1808688" md5="d3fa3fbfcdbe1802c3569efdc5422c8f" sha1="d66cddd21088d53d7b377cc20b6a9adb511a6597"/>
+		<rom name="track34.raw" size=" 10939152" md5="51369c3e4141814c2ce25958623854c3" sha1="ef07677950ca5e4baf05b96eecea164037c4da38"/>
+		<rom name="track35.raw" size=" 21346752" md5="6fae8d53b2e771a297d8a852d00776dd" sha1="d035afed48af5275a82e5db9a6e5e4700b98744f"/>
+		<rom name="track36.iso" size="434581504" md5="02de9d0cdca472998b9e3bf9e33d8ef9" sha1="d885ab517240216f3f4f597ceca247753ee53980"/>
+		-->
+		<description>Hydro Thunder (World, Prototype 19990616)</description>
+		<year>1999</year>
+		<publisher>Midway</publisher>
+		<info name="release" value="19990616" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hydro thunder (world, prototype 19990616)" sha1="0aa57bc2db92a6dc53ae1b1f99cec83fabe6953d" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Apparently dumped via Dreamshell, which is known to give bad dumps. -->
+	<software name="hydrthunp2" cloneof="hydrthun">
+		<!--
+		<rom name="Hydro_thunder_review.gdi" size="1132" md5="04e377e83b1122442cf5113d444f1338" sha1="e78f423b6958de0178cf464412e1d12cc8d7dfbb"/>
+		<rom name="track01.iso" size="  1163264" md5="2cbfa683163414331d32a8dd6c1e171a" sha1="99853fe7f8abe951a409de5ac98f224298a566c0"/>
+		<rom name="track02.raw" size="  1166592" md5="c1774d74e7f31b8f2ef74af2d7f28010" sha1="f1849e96005ebd0d4e0762ec2357a08a723cda1f"/>
+		<rom name="track03.iso" size="122085376" md5="f3f1b2cc427b04384286350f751fcd2b" sha1="fec97e97dacdf2d00c73dbd842f7bced38026b24"/>
+		<rom name="track04.raw" size="  2003904" md5="73afba056a8ccf3544ffed9ec08df544" sha1="e15ed092b3d6c765e9d6e89503031a26cf041c3d"/>
+		<rom name="track05.raw" size="  1333584" md5="5ab04fe2c97da439210bd86138ed8226" sha1="fa51f17125af5184f034e6d3de5a3656ee0a5d83"/>
+		<rom name="track06.raw" size=" 21520800" md5="26ed117af7cc75a5a2853989716aeb7e" sha1="12d010f7da962e4d2ff16ff49806b2d0de2e92c5"/>
+		<rom name="track07.raw" size=" 10936800" md5="853594652f6c321ce5157aaac05d6348" sha1="4551b4997a83a53b5fa9fab0036e7da9450b4b11"/>
+		<rom name="track08.raw" size=" 21520800" md5="5e66c1642c7f8cb15234fc0a0d247a6b" sha1="4d2b306ff1b374f27bf0004002ef2e4b28e0ee60"/>
+		<rom name="track09.raw" size=" 10936800" md5="1fa1abb57e334fa0b9500af2f2f57795" sha1="b6f37b7207e76e6d1b99aaf857a6947fd9fb7a6f"/>
+		<rom name="track10.raw" size=" 10936800" md5="26ad36fafe8df367866e1423a6e3c512" sha1="e158a15b955dc24521f2f0cf0a29f4d5b0d3886d"/>
+		<rom name="track11.raw" size=" 21520800" md5="fd34af774f97a2f517faba643e2fde6f" sha1="8e0968ac1a0d2ae42542e3fb4d6293e37eaa36e6"/>
+		<rom name="track12.raw" size=" 10936800" md5="c781c62aeec8c9f23e0983faa16b07cb" sha1="0ca01bb04a11fe77e8cf42f3dc3ff43d8ae15693"/>
+		<rom name="track13.raw" size=" 21520800" md5="35187dda0bd7877b5772938e3af53ae3" sha1="e67a95dc1a8b07eedcae88c3ac705219ca7a0a8c"/>
+		<rom name="track14.raw" size=" 10936800" md5="97103a8fa3b244051f54890e608c3f52" sha1="7dcd204fcd98e15ce336ae8b300766906503234c"/>
+		<rom name="track15.raw" size=" 10936800" md5="9f313b1621fbb29fdeb498065b899150" sha1="eb5e3480c22f10defaed50c4199ac67ba93519f1"/>
+		<rom name="track16.raw" size="  2617776" md5="706caed731ef0bbb8d4b7f8b3ee80431" sha1="3344544f9a4e0c455f82ed7adf16d1b1d96a4c49"/>
+		<rom name="track17.raw" size=" 21520800" md5="a8f30d047203348aaba749b689656bb5" sha1="d995887c050768126177434a60ff3f35b7889aa6"/>
+		<rom name="track18.raw" size=" 10936800" md5="f12a6f237b22cb5312255b990bb35de1" sha1="26967597e745223de36fde005cab31d811e1d238"/>
+		<rom name="track19.raw" size=" 21520800" md5="e3bf0df59c6419c0e69c1df670353bd2" sha1="4a433f528cc072380216c407dfd2ae855078cd74"/>
+		<rom name="track20.raw" size=" 10936800" md5="644b036ee0569d47a1a1b14f0598bae5" sha1="d02ae731bf859b8c728a06c1f45a9d6b6d66f7cc"/>
+		<rom name="track21.raw" size=" 21520800" md5="a01e137ec4cfc3eb184e6664c232df9c" sha1="09c744d4d64e92a9f11d058753b1486e5f7284dc"/>
+		<rom name="track22.raw" size=" 10936800" md5="9f47ad56896be22e5e36591340adeb22" sha1="e4ad61b4367d8d221f74b21263464c5329f41f77"/>
+		<rom name="track23.raw" size=" 21520800" md5="2d8d67877ff6f8734206370be1dd081a" sha1="af694900b86b8581ffbe0ff71bc46614f6b4934d"/>
+		<rom name="track24.raw" size=" 10936800" md5="b2403c771ade3aac941916bad844ae13" sha1="efdb5a84c8315b9abd7129cc697df3b3479664f1"/>
+		<rom name="track25.raw" size=" 21520800" md5="2d8d67877ff6f8734206370be1dd081a" sha1="af694900b86b8581ffbe0ff71bc46614f6b4934d"/>
+		<rom name="track26.raw" size=" 10936800" md5="9bbbe2773deefee976145bcde2315291" sha1="6b417b106abcff0f0299fb254b7fdb88d05e9551"/>
+		<rom name="track27.raw" size=" 10936800" md5="fbe73078c6b1a97eb7b6b8db63c5ffd1" sha1="2891bba082dcbe145dde6f0ff44dc4efd2c57cd1"/>
+		<rom name="track28.raw" size=" 21520800" md5="323a775615504e715a2233f554797261" sha1="b042c9b196f7e448826d003b49c180a9cc504f72"/>
+		<rom name="track29.raw" size=" 10936800" md5="0c86476401506380719a6601313f63a4" sha1="e85111f52efd77c33666721a35a53addb4f83236"/>
+		<rom name="track30.raw" size=" 21520800" md5="331ad4e226a77de913e48af80aa78587" sha1="61b2ecfd77e94e2bc221a74291f8e4bed6f0c14e"/>
+		<rom name="track31.raw" size=" 10936800" md5="3d0e28287671133524357e5aad87dee3" sha1="1db851d8415beb86596a0749fe93c8ffeb559564"/>
+		<rom name="track32.raw" size=" 14314272" md5="5cde3106e7c105233d15621ebd16ed6f" sha1="b9f238e5798040ef0b9b7db6d329e9997f2aecd3"/>
+		<rom name="track33.raw" size="  1808688" md5="966942ef3931ccbb392f535dd4cd355a" sha1="d06278343a1764095121bc1485f98d6b51143ad3"/>
+		<rom name="track34.raw" size=" 10936800" md5="9f47ad56896be22e5e36591340adeb22" sha1="e4ad61b4367d8d221f74b21263464c5329f41f77"/>
+		<rom name="track35.raw" size=" 21520800" md5="3de414f094ec6410df2cd5f44b7d34fc" sha1="093d6ff612c8e2d6a7085e2b278106513fc8ae4a"/>
+		<rom name="track36.raw" size=" 21344400" md5="4f44542a4dc9ee8774a812dc5414244e" sha1="d7199adeea5dd7d289586ada5a54a855110b2228"/>
+		<rom name="track37.iso" size="504270848" md5="c133f5b564dbe6e39558f28b46afbab2" sha1="ba8f9ab4076b14dd16989b66bedf25f4d9fd8737"/>
+		-->
+		<description>Hydro Thunder (Euro, Prototype 19990908)</description>
+		<year>1999</year>
+		<publisher>Midway</publisher>
+		<info name="release" value="19990908" />
+		<part interface="dc_gdrom" name="gdrom">
+			<diskarea name="gdrom">
+				<disk name="hydro thunder (euro, prototype 19990908)" sha1="f71d4392a769e35b7f18b7edf53e40194d2e356f" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
