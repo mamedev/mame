@@ -36,6 +36,7 @@
 #include "speaker.h"
 
 #include "formats/dmv_dsk.h"
+#include "imagedev/snapquik.h"
 
 #include "dmv.lh"
 
@@ -146,6 +147,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq7a_w)      { update_irqs(7, state); }
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(dmv);
 
 	uint8_t program_read(address_space &space, int cas, offs_t offset);
 	void program_write(address_space &space, int cas, offs_t offset, uint8_t data);
@@ -370,6 +372,41 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 			}
 		}
 	}
+}
+
+/***********************************************************
+
+    Quickload
+
+    This loads a .COM file to address 0x100 then jumps
+    there. Sometimes .COM has been renamed to .CPM to
+    prevent windows going ballistic. These can be loaded
+    as well.
+
+************************************************************/
+
+QUICKLOAD_LOAD_MEMBER( dmv_state, dmv )
+{
+	uint16_t i;
+	uint8_t data;
+
+	/* Avoid loading a program if CP/M-80 is not in memory */
+	if ((m_ram->base()[0] != 0xc3) && (m_ram->base()[5] != 0xc3)) return image_init_result::FAIL;
+
+	if (quickload_size >= 0xfd00)
+		return image_init_result::FAIL;
+
+	/* Load image to the TPA (Transient Program Area) */
+	for (i = 0; i < quickload_size; i++)
+	{
+		if (image.fread( &data, 1) != 1) return image_init_result::FAIL;
+		m_ram->base()[i+0x100] = data;
+	}
+
+	m_ram->base()[0x80] = m_ram->base()[0x81] = 0;	// clear out command tail	
+	
+	m_maincpu->set_pc(0x100);                // start program
+	return image_init_result::PASS;
 }
 
 static SLOT_INTERFACE_START( dmv_floppies )
@@ -826,6 +863,8 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(dmv_state, irq7a_w))
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "dmv")
+	
+	MCFG_QUICKLOAD_ADD("quickload", dmv_state, dmv, "com,cpm", 3)
 
 MACHINE_CONFIG_END
 
