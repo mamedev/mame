@@ -166,7 +166,7 @@ void divebomb_state::divebomb_spritecpu_iomap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(this, FUNC(divebomb_state::spritecpu_port00_w));
-	map(0x80, 0x80).r("spr2fg", FUNC(generic_latch_8_device::read)).w(m_spr2fg_latch, FUNC(generic_latch_8_device::write));
+	map(0x80, 0x80).r("fg2spr", FUNC(generic_latch_8_device::read)).w(m_spr2fg_latch, FUNC(generic_latch_8_device::write));
 }
 
 
@@ -217,7 +217,7 @@ void divebomb_state::divebomb_rozcpu_iomap(address_map &map)
 	map(0x14, 0x14).w(this, FUNC(divebomb_state::rozcpu_wrap_enable_w<0>));
 	map(0x20, 0x2f).w(m_k051316[0], FUNC(k051316_device::ctrl_w));
 	map(0x30, 0x3f).w(m_k051316[1], FUNC(k051316_device::ctrl_w));
-	map(0x40, 0x40).r("roz2fg", FUNC(generic_latch_8_device::read)).w(m_roz2fg_latch, FUNC(generic_latch_8_device::write));
+	map(0x40, 0x40).r("fg2roz", FUNC(generic_latch_8_device::read)).w(m_roz2fg_latch, FUNC(generic_latch_8_device::write));
 	map(0x50, 0x50).w(this, FUNC(divebomb_state::rozcpu_pal_w));
 }
 
