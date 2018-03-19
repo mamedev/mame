@@ -502,6 +502,13 @@ formatz:
 
 ;@s:aerofgt.cpp
 
+;(turbo force)
+turbofrc:
+turbofrco:
+turbofrcu:
+@:maincpu,program,c221b,4e,04,54
+
+
 kickball:
 pspikesc:
 pspikesk:
@@ -546,11 +553,6 @@ karatblz:
 karatblzj:
 karatblzu:
 @:maincpu,program,c5ba7,31,00,20
-
-
-;(turbo force)
-turbofrc:
-@:maincpu,program,c221b,4e,04,54
 
 
 ;*********(Sonic Wings (Japan))
@@ -886,29 +888,40 @@ asterixj:
 
 ;@s:asteroid.cpp
 
-asteroid1:
-@:maincpu,program,001c,35,00,00
-@:maincpu,program,2a6,1,01,01
-
-
+;******* LET SCORES DISPLAY BEFORE PLAYING ******
 aerolitos:
 asteroid:
 asteroid2:
 asteroidb:
 hyperspc:
 @:maincpu,program,001d,35,00,00
+@:maincpu,program,4030,01,01,01
 
 
+;******* LET SCORES DISPLAY BEFORE PLAYING ******
+astdelux:
+astdelux1:
+astdelux2:
+@:maincpu,program,2c,15,00,00
+@:maincpu,program,4d,15,00,00
+@:maincpu,program,76,01,4d,4d
+
+
+;******* LET SCORES DISPLAY BEFORE PLAYING ******
+;meteorts:******Meteorites 
+asteroid1:
+meteorho:
+meteorts:
+@:maincpu,program,001c,35,00,00
+@:maincpu,program,4030,01,01,01
+
+
+;******* LET SCORES DISPLAY BEFORE PLAYING ******
 ;*******asterock
 asterock:
 asterockv:
 @:maincpu,program,1c,35,00,00
-
-
-;meteorts:******Meteorites 
-meteorho:
-meteorts:
-@:maincpu,program,001c,35,00,00
+@:maincpu,program,4030,01,01,01
 
 
 ;@s:astinvad.cpp
@@ -1082,6 +1095,15 @@ tomahawk1:
 
 ;@s:asuka.cpp
 
+cadash:
+cadashf:
+cadashg:
+cadashi:
+cadashs:
+cadashu:
+@:maincpu,program,103646,185,00,4d
+
+
 mofflott:
 @:maincpu,program,100aad,75,00,31
 
@@ -1127,14 +1149,6 @@ eto:
 earthjkr:
 earthjkrp:
 @:maincpu,program,103204,2f,00,42
-
-
-cadash:
-cadashf:
-cadashg:
-cadashi:
-cadashu:
-@:maincpu,program,103646,185,00,4d
 
 
 ;@s:atarisy1.cpp
@@ -2085,6 +2099,26 @@ carjmbre:
 
 ;@s:cave.cpp
 
+;(pretty soldier sailer moon)
+sailormn:
+sailormnh:
+sailormnj:
+sailormnk:
+sailormnnj:
+sailormnnk:
+sailormnnt:
+sailormnnu:
+sailormno:
+sailormnoh:
+sailormnoj:
+sailormnok:
+sailormnot:
+sailormnou:
+sailormnt:
+sailormnu:
+@:maincpu,program,10944f,47,02,05
+
+
 ;(air gallet (taiwan))
 agallet:
 agalleta:
@@ -2123,22 +2157,6 @@ gaia:
 pwrinst2:
 pwrinst2j:
 @:maincpu,program,40e800,32,00,01
-
-
-;(pretty soldier sailer moon)
-sailormn:
-sailormnh:
-sailormnj:
-sailormnk:
-sailormno:
-sailormnoh:
-sailormnoj:
-sailormnok:
-sailormnot:
-sailormnou:
-sailormnt:
-sailormnu:
-@:maincpu,program,10944f,47,02,05
 
 
 ;(hotdog storm)
@@ -2817,6 +2835,13 @@ cosmica2:
 
 ;@s:cps1.cpp
 
+sf2b2:
+sf2rules:
+@:maincpu,program,ffd28a,30,00,20
+@:maincpu,program,ffd302,04,00,00
+@:maincpu,program,ffd32c,01,0c,0c
+
+
 ;**** thanks to Takasaki for this fix ****
 qadjr:
 @:maincpu,program,ff4ba8,14,00,00
@@ -2914,6 +2939,7 @@ sf2ceea:
 sf2ceja:
 sf2cejb:
 sf2cejc:
+sf2cet:
 sf2ceua:
 sf2ceub:
 sf2ceuc:
@@ -3215,6 +3241,24 @@ lostwrldo:
 
 ;@s:cps2.cpp
 
+;xmcotar1d:******X-Men: Children of the Atom (Euro 950105 Phoenix Edition)
+xmcota:
+xmcotaa:
+xmcotaar1:
+xmcotab:
+xmcotah:
+xmcotahr1:
+xmcotaj:
+xmcotaj1:
+xmcotaj2:
+xmcotaj3:
+xmcotajr:
+xmcotar1:
+xmcotar1d:
+xmcotau:
+@:maincpu,program,ffec8e,3c,00,01
+
+
 ssf2:
 ssf2a:
 ssf2ar1:
@@ -3380,23 +3424,6 @@ vsavh:
 vsavj:
 vsavu:
 @:maincpu,program,fff426,ad,00,02
-
-
-;xmcotar1d:******X-Men: Children of the Atom (Euro 950105 Phoenix Edition)
-xmcota:
-xmcotaa:
-xmcotaar1:
-xmcotah:
-xmcotahr1:
-xmcotaj:
-xmcotaj1:
-xmcotaj2:
-xmcotaj3:
-xmcotajr:
-xmcotar1:
-xmcotar1d:
-xmcotau:
-@:maincpu,program,ffec8e,3c,00,01
 
 
 ;(capcom sports club (japan 970722)) and clones (by GeoMan) 
@@ -4864,6 +4891,14 @@ dorachan:
 
 ;@s:dreamwld.cpp
 
+baryon:
+@:maincpu,program,fe37dc,78,4b,f8
+
+
+baryona:
+@:maincpu,program,fe37de,78,4b,f8
+
+
 rolcrush:
 @:maincpu,program,fede76,76,41,01
 
@@ -5529,6 +5564,12 @@ foodfc:
 
 ;@s:freekick.cpp
 
+;*******(gigas mark II)(bootleg)(By Firebrand)
+gigasm2:
+gigasm2b:
+@:maincpu,program,c0a0,4d,00,20
+
+
 ;*******counter Run (bootleg set 1)
 countrunb:
 @:maincpu,program,d0d8,127,00,48
@@ -5539,11 +5580,6 @@ pbillrd:
 pbillrds:
 pbillrdsa:
 @:maincpu,program,c940,a0,00,40
-
-
-;*******(gigas mark II)(bootleg)(By Firebrand)
-gigasm2b:
-@:maincpu,program,c0a0,4d,00,20
 
 
 ;******free kick (bootleg)
@@ -5640,6 +5676,10 @@ asurabusa:
 
 ;@s:gaelco.cpp
 
+bioplayc:
+@:maincpu,program,ff078a,17,06,2e
+
+
 ;(biomechanical toy (unprotected))
 ;** you must let the highscore display in attract mode before starting a game  ** 
 biomtoy:
@@ -5670,6 +5710,7 @@ maniacsp:
 ;maniac square (unprotected)(by tamphax)
 maniacsq:
 maniacsqa:
+maniacsqs:
 maniacsqu:
 @:maincpu,program,fe982c,48,50,00
 
@@ -5811,6 +5852,10 @@ galaxiac:
 
 
 ;@s:galaxian.cpp
+
+mshuttlea:
+@:maincpu,program,808a,57,00,24
+
 
 ;amidar:[Special thanks to Cananas for enhancing this entry]
 amidar:
@@ -6299,6 +6344,16 @@ ladybugg:
 
 ;@s:galaxold.cpp
 
+;******driving force (pac-man conversion & clones)
+drivfrcb:
+drivfrcg:
+drivfrcp:
+drivfrcsg:
+drivfrct:
+@:maincpu,program,3c05,49,20,20
+@:maincpu,program,3c1f,1,31,31
+
+
 ;(tazz-mania)
 ;tazzmang:******Tazz-Mania (Galaxian Hardware)
 tazmani2:
@@ -6323,15 +6378,6 @@ hunchbkg:
 froggerv:
 @:maincpu,program,83f1,0a,42,01
 @:maincpu,program,83ef,2,42,04
-
-
-;******driving force (pac-man conversion & clones)
-drivfrcb:
-drivfrcg:
-drivfrcp:
-drivfrct:
-@:maincpu,program,3c05,49,20,20
-@:maincpu,program,3c1f,1,31,31
 
 
 guttangt:
@@ -7342,6 +7388,11 @@ ladybugb2:
 @:maincpu,program,d380,75,ff,ff
 
 
+;******Space Raider
+sraider:
+@:maincpu,program,6010,9f,00,21
+
+
 ;@s:ladyfrog.cpp
 
 ;*******lady frog
@@ -7582,16 +7633,17 @@ lsasquad:
 
 ;@s:lwings.cpp
 
-fball:
-@:maincpu,program,d840,69,00,48
-
-
 lwings:
 lwings2:
 lwingsb:
 lwingsj:
+lwingsja:
 @:maincpu,program,ce00,5b,00,2e
 @:maincpu,program,ce97,d,00,00
+
+
+fball:
+@:maincpu,program,d840,69,00,48
 
 
 avengers:
@@ -8362,7 +8414,7 @@ genesis,tf3:
 @:maincpu,program,fff2ac,4,00,90
 
 
-;@s:megadrvb.cpp
+;@s:megadriv_acbl.cpp
 
 ssf2mdb:
 @:maincpu,program,fffcb3,29,00,20
@@ -10314,11 +10366,19 @@ paclandj:
 paclandjo:
 paclandjo2:
 paclandm:
+paclandm2:
 @:maincpu,program,2140,4a,00,e6
 @:maincpu,program,205d,4,00,00
 
 
 ;@s:pacman.cpp
+
+pacmanvg:
+pacuman:
+@:maincpu,program,4e88,04,00,00
+@:maincpu,program,43ed,06,40,40
+@:maincpu,program,43d1,01,45,45
+
 
 8bpm:
 @:maincpu,program,1c6c,06,00,1b
@@ -10501,12 +10561,6 @@ maketrax:
 maketrxb:
 @:maincpu,program,4c80,03,00,00
 @:maincpu,program,4e40,1e,4b,00
-
-
-pacuman:
-@:maincpu,program,4e88,04,00,00
-@:maincpu,program,43ed,06,40,40
-@:maincpu,program,43d1,01,45,45
 
 
 ;******Crush Roller (Kural TWT)
@@ -11118,6 +11172,7 @@ pooyans:
 ;@s:popeye.cpp
 
 ;(popeye bootleg fixed)
+popeyeb2:
 popeyebl:
 popeyej:
 popeyejo:
@@ -11126,17 +11181,18 @@ popeyejo:
 @:maincpu,program,8f32,6,00,00
 
 
-popeyef:
-@:maincpu,program,8a00,24,00,01
-@:maincpu,program,8fed,3,00,02
-@:maincpu,program,8f32,6,00,00
-
-
 ;(popeye (revision d & revision d not protected & revision f))fixed
 popeye:
+popeyeb3:
 popeyeu:
 @:maincpu,program,8a00,24,00,02
 @:maincpu,program,8fed,3,00,03
+@:maincpu,program,8f32,6,00,00
+
+
+popeyef:
+@:maincpu,program,8a00,24,00,01
+@:maincpu,program,8fed,3,00,02
 @:maincpu,program,8f32,6,00,00
 
 
@@ -11353,6 +11409,13 @@ r2dx_v33_r2:
 @:maincpu,program,9e46,ef,50,2a
 
 
+;@s:rabbit.cpp
+
+rabbit:
+rabbitjt:
+@:maincpu,program,fffea4,2f,00,4b
+
+
 ;@s:raiden.cpp
 
 raidenua:
@@ -11548,11 +11611,6 @@ zerohour:
 zerohoura:
 zerohouri:
 @:maincpu,program,3023,4,0,0
-
-
-;******Space Raider
-sraider:
-@:maincpu,program,6010,9f,00,21
 
 
 ;@s:renegade.cpp
@@ -13668,6 +13726,13 @@ ikari3u:
 
 ;@s:snowbros.cpp
 
+;******cookie & bibi 2
+cookbib2:
+cookbib2a:
+@:maincpu,program,1026a2,28,4b,00
+@:maincpu,program,1026c4,1,4d,4d
+
+
 ;*******hyper pacman
 hyperpac:
 @:maincpu,program,10315c,28,50,00
@@ -13708,12 +13773,6 @@ mcheonru:
 hyperpacb:
 @:maincpu,program,10535c,28,50,00
 @:maincpu,program,10537e,1,43,43
-
-
-;******cookie & bibi 2
-cookbib2:
-@:maincpu,program,1026a2,28,4b,00
-@:maincpu,program,1026c4,1,4d,4d
 
 
 pzlbreak:
@@ -14790,6 +14849,15 @@ spacedxj:
 
 ;@s:taito_f2.cpp
 
+footchmp:
+hthero:
+@:maincpu,program,10a920,50,0a,00
+
+
+euroch92:
+@:maincpu,program,10a99c,50,0a,00
+
+
 majest12j:
 @:maincpu,program,205812,31,00,5a
 @:maincpu,program,203606,4,00,00
@@ -14824,14 +14892,6 @@ finalbu:
 deadconx:
 deadconxj:
 @:maincpu,program,10335a,59,00,47
-
-
-;(football champ (world)) and clones (by GeoMan)
-euroch92:
-footchmp:
-hthero:
-@:maincpu,program,10a920,50,0a,00
-@:maincpu,program,10a99c,50,0a,00
 
 
 ;(dino rex (world & us))
@@ -15515,6 +15575,7 @@ taotaido:
 
 ;*******tecmo bowl (world? & japan)	
 tbowl:
+tbowla:
 tbowlj:
 tbowlp:
 @:maincpu,program,8015,b4,41,01
@@ -17216,6 +17277,7 @@ wardnerj:
 ;@s:warpwarp.cpp
 
 geebee:
+geebeea:
 geebeeb:
 geebeeg:
 @:maincpu,program,4046,3,00,00
