@@ -173,7 +173,7 @@ READ8_MEMBER(vt100_state::modem_r)
 	uint8_t ret = 0x0f;
 
 	ret |= m_rs232->cts_r() << 7;
-	ret |= 1 /* m_rs232->spdi_r() */ << 6;
+	ret |= m_rs232->si_r() << 6;
 	ret |= m_rs232->ri_r() << 5;
 	ret |= m_rs232->dcd_r() << 4;
 

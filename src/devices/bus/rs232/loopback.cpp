@@ -29,6 +29,7 @@ WRITE_LINE_MEMBER( rs232_loopback_device::input_rts )
 	if (started())
 	{
 		output_ri(state);
+		output_si(state);
 		output_cts(state);
 	}
 }

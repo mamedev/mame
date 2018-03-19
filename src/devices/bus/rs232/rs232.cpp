@@ -21,6 +21,7 @@
     ← DCE   21          CG  110  Signal Quality Detector
     DTE →   23          CH  111  Data Signal Rate Selector
     ← DCE   23          CI  112  Data Signal Rate Selector [Signaling Rate Indicator]
+    ← DCE   12                   High Speed Indicator (Bell 212A)
     DTE →   24          DA  113  Transmitter Signal Element Timing [External Tx Clock]
     ← DCE   15          DB  114  Transmitter Signal Element Timing
     ← DCE   17          DD  115  Receiver Signal Element Timing
@@ -55,6 +56,7 @@ rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type 
 	m_dcd(0),
 	m_dsr(0),
 	m_ri(0),
+	m_si(0),
 	m_cts(0),
 	m_dce_rxc(0),
 	m_dce_txc(0),
@@ -62,6 +64,7 @@ rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type 
 	m_dcd_handler(*this),
 	m_dsr_handler(*this),
 	m_ri_handler(*this),
+	m_si_handler(*this),
 	m_cts_handler(*this),
 	m_rxc_handler(*this),
 	m_txc_handler(*this),
@@ -84,6 +87,7 @@ void rs232_port_device::device_resolve_objects()
 	m_dcd_handler.resolve_safe();
 	m_dsr_handler.resolve_safe();
 	m_ri_handler.resolve_safe();
+	m_si_handler.resolve_safe();
 	m_cts_handler.resolve_safe();
 	m_rxc_handler.resolve_safe();
 	m_txc_handler.resolve_safe();
@@ -95,6 +99,7 @@ void rs232_port_device::device_start()
 	save_item(NAME(m_dcd));
 	save_item(NAME(m_dsr));
 	save_item(NAME(m_ri));
+	save_item(NAME(m_si));
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dce_rxc));
 	save_item(NAME(m_dce_txc));
@@ -103,12 +108,14 @@ void rs232_port_device::device_start()
 	m_dcd = 1;
 	m_dsr = 1;
 	m_ri = 1;
+	m_si = 1;
 	m_cts = 1;
 
 	m_rxd_handler(1);
 	m_dcd_handler(1);
 	m_dsr_handler(1);
 	m_ri_handler(1);
+	m_si_handler(1);
 	m_cts_handler(1);
 }
 

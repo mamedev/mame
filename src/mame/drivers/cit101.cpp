@@ -200,6 +200,10 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(cit101_state, nvr_address_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(cit101_state, nvr_data_r))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(cit101_state, nvr_data_w))
+	MCFG_I8255_IN_PORTC_CB(DEVREADLINE("comm", rs232_port_device, cts_r)) MCFG_DEVCB_BIT(0)
+	MCFG_DEVCB_CHAIN_INPUT(DEVREADLINE("comm", rs232_port_device, dcd_r)) MCFG_DEVCB_BIT(1) // tied to DSR for loopback test
+	MCFG_DEVCB_CHAIN_INPUT(DEVREADLINE("comm", rs232_port_device, ri_r)) MCFG_DEVCB_BIT(2) // tied to CTS for loopback test
+	MCFG_DEVCB_CHAIN_INPUT(DEVREADLINE("comm", rs232_port_device, si_r)) MCFG_DEVCB_BIT(3) // tied to CTS for loopback test
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(cit101_state, nvr_control_w))
 
 	MCFG_DEVICE_ADD("nvr", ER2055, 0)
