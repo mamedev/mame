@@ -48,6 +48,7 @@ CIG-267
 #include "cpu/i8085/i8085.h"
 #include "machine/er2055.h"
 #include "machine/i8251.h"
+#include "machine/input_merger.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "screen.h"
@@ -153,11 +154,14 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_SCREEN_RAW_PARAMS(14.976_MHz_XTAL, 960, 0, 800, 260, 0, 240)
 	//MCFG_SCREEN_RAW_PARAMS(22.464_MHz_XTAL, 1440, 0, 1188, 260, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(cit101_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
 
 	MCFG_DEVICE_ADD("comuart", I8251, 6.144_MHz_XTAL / 2)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("comm", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("comm", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("comm", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<0>))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<2>))
 
 	MCFG_RS232_PORT_ADD("comm", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("comuart", i8251_device, write_rxd))
@@ -168,13 +172,19 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("printer", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("printer", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("printer", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<1>))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<3>))
 
 	MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_cts))
 
+	MCFG_INPUT_MERGER_ANY_HIGH("uartint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", I8085_RST55_LINE))
+
 	MCFG_DEVICE_ADD("kbduart", I8251, 6.144_MHz_XTAL / 2)
+	MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST65_LINE))
 
 	MCFG_DEVICE_ADD("pit0", PIT8253, 0)
 	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
