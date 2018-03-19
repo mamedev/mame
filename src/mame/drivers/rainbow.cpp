@@ -512,6 +512,7 @@ public:
 		m_mpsc(*this, "upd7201"),
 		m_dbrg_A(*this, "com8116_a"),
 		m_dbrg_B(*this, "com8116_b"),
+		m_comm_port(*this, "comm"),
 
 		m_kbd8251(*this, "kbdser"),
 		m_lk201(*this, LK201_TAG),
@@ -672,6 +673,7 @@ private:
 	required_device<upd7201_new_device> m_mpsc;
 	required_device<com8116_device> m_dbrg_A;
 	required_device<com8116_device> m_dbrg_B;
+	required_device<rs232_port_device> m_comm_port;
 
 	required_device<i8251_device> m_kbd8251;
 	required_device<lk201_device> m_lk201;
@@ -876,8 +878,9 @@ void rainbow_state::machine_start()
 
 	m_SCREEN_BLANK = false;
 
-	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
-	maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(rainbow_state::irq_callback), this));
+	auto *printer_port = subdevice<rs232_port_device>("printer");
+	printer_port->write_dtr(0);
+	printer_port->write_rts(0);
 
 	save_item(NAME(m_z80_private));
 	save_item(NAME(m_z80_mailbox));
@@ -1140,7 +1143,7 @@ void rainbow_state::machine_reset()
 	popmessage("Reset");
 
 	// Configure RAM
-	address_space &program = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	address_space &program = m_i8088->space(AS_PROGRAM);
 	uint32_t unmap_start = m_inp8->read();
 
 	// Verify RAM size matches hardware (DIP switches)
@@ -1197,7 +1200,7 @@ void rainbow_state::machine_reset()
 	m_rtc->chip_reset();     // * Reset RTC to a defined state *
 
 	//  *********** HARD DISK CONTROLLERS...
-	address_space &io = machine().device<cpu_device>("maincpu")->space(AS_IO);
+	address_space &io = m_i8088->space(AS_IO);
 	if (m_inp5->read() == 0x01) // ...PRESENT?
 	{
 		// Install 8088 read / write handler
@@ -1670,7 +1673,7 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 		return nullptr;
 
 	harddisk_image_device *img = nullptr;
-	img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("decharddisk1").c_str()));
+	img = dynamic_cast<harddisk_image_device *>(subdevice("decharddisk1"));
 
 	if (!img)
 		return nullptr;
@@ -2176,13 +2179,12 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
 //  [02] COMMUNICATIONS STATUS REGISTER - PAGE 154 (**** READ **** )
 //  Used to read status of SERIAL port, IRQ line of each CPU, and MHFU logic enable signal.
 
-// ******* TODO: 5 status bits * MISSING * ********************************************************
 // 0 COMM RI   (reflects status of RI line at COMM port)
 // 1 COMM SI / SCF(reflects status of speed indicator line or
 //                 the secondary receive line signal detect at COMM port)
 // 2 COMM DSR  (reflects status of DSR at COMM)
 // 3 COMM CTS  (reflects status of CTS at COMM)
-// 4 COMM RLSD (receive line signal detect at COMM)
+// 4 COMM RLSD (receive line signal detect at COMM; also connected to DCDA on MPSC)
 READ8_MEMBER(rainbow_state::comm_control_r)
 {
 	bool is_mhfu_enabled = false;
@@ -2190,6 +2192,11 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 		is_mhfu_enabled = m_crtc->MHFU(MHFU_IS_ENABLED);
 
 	return          (
+			(m_comm_port->ri_r() ? 0x01 : 0x00) |
+			(m_comm_port->si_r() ? 0x02 : 0x00) |
+			(m_comm_port->dsr_r() ? 0x04 : 0x00) |
+			(m_comm_port->cts_r() ? 0x08 : 0x00) |
+			(m_comm_port->dcd_r() ? 0x10 : 0x00) |
 			(is_mhfu_enabled ? 0x00 : 0x20) |   // (L) status of MHFU flag => bit pos.5
 			((INT88) ? 0x00 : 0x40) |           // (L)
 			((INTZ80) ? 0x00 : 0x80)            // (L)
@@ -2197,7 +2204,6 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 
 }
 
-// ******* TODO: 4 control bits * MISSING * ********************************************************
 //  Communication control register of -COMM- port (when written):
 // (these 4 bits talk DIRECTLY to the COMM port according to schematics):
 // 0 COMM SPD SEL H (controls speed select line of COMM port)
@@ -2207,6 +2213,11 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 WRITE8_MEMBER(rainbow_state::comm_control_w)
 {
 	logerror("%02x to COMM.CONTROL REGISTER ", data);
+
+	m_comm_port->write_spds(BIT(data, 0));
+	// SRTS not currently emulated
+	m_comm_port->write_dtr(BIT(data, 2));
+	m_comm_port->write_rts(BIT(data, 3));
 
 	/* 8088 LEDs:
 	5  7  6  4    <- BIT POSITION
@@ -2420,7 +2431,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 
 	floppy_connector *con = nullptr;
 	if (drive < MAX_FLOPPIES)
-		con = machine().device<floppy_connector>(names[drive]);
+		con = subdevice<floppy_connector>(names[drive]);
 
 	if (con)
 	{
@@ -2479,7 +2490,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 		// Assume the other one is switched off -
 		for (int f_num = 0; f_num < MAX_FLOPPIES; f_num++)
 		{
-		floppy_connector *con = machine().device<floppy_connector>(names[f_num]);
+		floppy_connector *con = subdevice<floppy_connector>(names[f_num]);
 		floppy_image_device *tmp_floppy = con->get_device();
 
 		tmp_floppy->mon_w(ASSERT_LINE);
@@ -2744,7 +2755,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 		printf("\nWARNING: UNEMULATED DIAG LOOPBACK (directs RX50 and DC12 output to printer port) **** ");
 	}
 
-	address_space &io = machine().device<cpu_device>("maincpu")->space(AS_IO);
+	address_space &io = m_i8088->space(AS_IO);
 	if (data & 32)
 	{
 		/* BIT 5: PORT LOOPBACK (1 enables loopback for COMM, PRINTER, KEYBOARD ports)
@@ -2975,7 +2986,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			if(last_message != 1)
 			{
 				popmessage("\nCOLOR GRAPHICS ADAPTER INVOKED.  PLEASE TURN ON THE APPROPRIATE DIP SWITCH, THEN REBOOT.\n");
-				printf("OFFSET: %x (PC=%x)\n", 0x50 +offset , machine().device("maincpu")->safe_pc());
+				printf("OFFSET: %x (PC=%x)\n", 0x50 +offset , m_i8088->pc());
 				last_message = 1;
 			}
 			return;
@@ -3195,6 +3206,7 @@ MCFG_DEFAULT_LAYOUT(layout_rainbow)
 MCFG_CPU_ADD("maincpu", I8088, XTAL(24'073'400) / 5)
 MCFG_CPU_PROGRAM_MAP(rainbow8088_map)
 MCFG_CPU_IO_MAP(rainbow8088_io)
+MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(rainbow_state, irq_callback)
 
 MCFG_CPU_ADD("subcpu", Z80, XTAL(24'073'400) / 6)
 MCFG_CPU_PROGRAM_MAP(rainbowz80_mem)
@@ -3290,36 +3302,30 @@ MCFG_DEVICE_ADD("com8116_b", COM8116, XTAL(5'068'800)) // Baud rate generator B
 MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_b_fr_w))
 MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_b_ft_w))
 
-MCFG_DEVICE_ADD("upd7201", UPD7201_NEW, XTAL(2'500'000))    // 2.5 Mhz from schematics
+MCFG_DEVICE_ADD("upd7201", UPD7201_NEW, XTAL(24'073'400) / 5 / 2) // 2.4073 MHz (nominally 2.5 MHz)
 MCFG_Z80SIO_OUT_INT_CB(WRITELINE(rainbow_state, mpsc_irq))
+MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("comm", rs232_port_device, write_txd))
+MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("printer", rs232_port_device, write_txd))
+// RTS and DTR outputs are not connected
 
-MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
-MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
-MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_rts))
-
-MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
-MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_dtr))
-MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_rts))
-
-MCFG_RS232_PORT_ADD("rs232_a", default_rs232_devices, nullptr)
+MCFG_RS232_PORT_ADD("comm", default_rs232_devices, nullptr)
 MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, rxa_w))
 MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, ctsa_w))
 MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, dcda_w))
 
-MCFG_RS232_PORT_ADD("rs232_b", default_rs232_devices, nullptr)
+MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
 MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, rxb_w))
-MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, ctsb_w))
-MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, dcdb_w))
+MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, ctsb_w)) // actually DTR
 
-MCFG_DEVICE_MODIFY("rs232_a")
+MCFG_DEVICE_MODIFY("comm")
 MCFG_SLOT_OPTION_ADD("microsoft_mouse", MSFT_SERIAL_MOUSE)
 MCFG_SLOT_OPTION_ADD("mouse_systems_mouse", MSYSTEM_SERIAL_MOUSE)
 MCFG_SLOT_DEFAULT_OPTION("microsoft_mouse")
 
-MCFG_DEVICE_MODIFY("rs232_b")
+MCFG_DEVICE_MODIFY("printer")
 MCFG_SLOT_DEFAULT_OPTION("printer")
 
-MCFG_DEVICE_ADD("kbdser", I8251, 0)
+MCFG_DEVICE_ADD("kbdser", I8251, XTAL(24'073'400) / 5 / 2)
 MCFG_I8251_TXD_HANDLER(WRITELINE(rainbow_state, kbd_tx))
 MCFG_I8251_DTR_HANDLER(WRITELINE(rainbow_state, irq_hi_w))
 MCFG_I8251_RXRDY_HANDLER(WRITELINE(rainbow_state, kbd_rxready_w))
