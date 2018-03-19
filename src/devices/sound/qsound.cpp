@@ -68,7 +68,7 @@
     (((ch - 1) << 3) & 0x78     sample bank
     (ch << 3) | 0x01            current/starting sample offset
     (ch << 3) | 0x02            rate (zero for key-off)
-    (ch << 3) | 0x03            key-on
+    (ch << 3) | 0x03            channel sample period counter
     (ch << 3) | 0x04            loop offset (relative to end)
     (ch << 3) | 0x05            end sample offset
     (ch << 3) | 0x06            channel volume
