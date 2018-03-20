@@ -211,6 +211,8 @@ m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, dev
 	strcat(m_remotehost, mconfig.options().comm_remotehost());
 	strcat(m_remotehost, ":");
 	strcat(m_remotehost, mconfig.options().comm_remoteport());
+
+	m_framesync = mconfig.options().comm_framesync() ? 0x01 : 0x00;
 }
 
 //-------------------------------------------------
@@ -520,7 +522,7 @@ void m2comm_device::comm_tick()
 			while (m_linktimer == 0x01);
 
 			// enable wait for vsync
-			//m_linktimer = 0x01;
+			m_linktimer = m_framesync;
 
 			if (isMaster)
 			{

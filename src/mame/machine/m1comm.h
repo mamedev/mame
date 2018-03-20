@@ -88,6 +88,7 @@ private:
 	uint8_t m_linkalive;
 	uint8_t m_linkid;
 	uint8_t m_linkcount;
+	uint8_t m_framesync;
 
 	void comm_tick();
 	int read_data(int dataSize);
