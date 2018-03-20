@@ -95,10 +95,11 @@ MACHINE_CONFIG_START(tv955_state::tv955)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(19.3396_MHz_XTAL, 846, 0, 720, 381, 0, 364)
+	//MCFG_SCREEN_RAW_PARAMS(31.684_MHz_XTAL, 1386, 0, 1188, 381, 0, 364)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2674_device, screen_update)
 
 	MCFG_DEVICE_ADD("crtc", SCN2674, 19.3396_MHz_XTAL / 9)
-	// Character clock is 31.084_MHz_XTAL / 9 in 132-column mode
+	// Character clock is 31.684_MHz_XTAL / 9 in 132-column mode
 	// Character cells are 9 pixels wide by 14 pixels high
 	MCFG_SCN2674_CHARACTER_WIDTH(9)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(tv955_state, draw_character)
