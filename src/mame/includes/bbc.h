@@ -117,24 +117,20 @@ public:
 	};
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats_bbc);
-	DECLARE_FLOPPY_FORMATS(floppy_formats_bbcm);
-	DECLARE_FLOPPY_FORMATS(floppy_formats_bbcmc);
 
-	DECLARE_WRITE8_MEMBER(bbc_page_selecta_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorya1_w);
-	DECLARE_WRITE8_MEMBER(bbc_page_selectb_w);
-	DECLARE_WRITE8_MEMBER(bbc_memoryb3_w);
+	DECLARE_WRITE8_MEMBER(page_selecta_w);
+	DECLARE_WRITE8_MEMBER(page_selectb_w);
 	DECLARE_WRITE8_MEMBER(bbc_memoryb4_w);
-	DECLARE_WRITE8_MEMBER(bbc_page_selectbp_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybp1_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybp2_w);
+	DECLARE_READ8_MEMBER(bbcbp_fetch_r);
+	DECLARE_WRITE8_MEMBER(page_selectbp_w);
+	DECLARE_WRITE8_MEMBER(page_selectbp128_w);
 	DECLARE_WRITE8_MEMBER(bbc_memorybp4_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybp4_128_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybp6_128_w);
-	DECLARE_READ8_MEMBER(bbcm_ACCCON_read);
-	DECLARE_WRITE8_MEMBER(bbcm_ACCCON_write);
+	DECLARE_WRITE8_MEMBER(bbc_memorybp6_w);
+	DECLARE_READ8_MEMBER(bbcm_fetch_r);
+	DECLARE_READ8_MEMBER(bbcm_acccon_r);
+	DECLARE_WRITE8_MEMBER(bbcm_acccon_w);
 	DECLARE_WRITE8_MEMBER(page_selectbm_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybm1_w);
+	DECLARE_READ8_MEMBER(bbc_memorybm2_r);
 	DECLARE_WRITE8_MEMBER(bbc_memorybm2_w);
 	DECLARE_WRITE8_MEMBER(bbc_memorybm4_w);
 	DECLARE_WRITE8_MEMBER(bbc_memorybm5_w);
@@ -184,7 +180,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(bbc_de_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(speech_changed);
 	void update_acia_rxd();
 	void update_acia_dcd();
 	void update_acia_cts();
@@ -248,7 +243,9 @@ public:
 	void bbcb_nofdc_mem(address_map &map);
 	void bbcbp128_mem(address_map &map);
 	void bbcbp_mem(address_map &map);
+	void bbcbp_fetch(address_map &map);
 	void bbcm_mem(address_map &map);
+	void bbcm_fetch(address_map &map);
 	void reutapm_mem(address_map &map);
 
 private:
@@ -304,77 +301,70 @@ public: // HACK FOR MC6845
 
 	bool m_os01;            // flag indicating whether OS 0.1 is being used
 	int m_monitortype;      // monitor type (colour, green, amber)
-	int m_SWRAMtype;        // this stores the setting for the SWRAM type being used
-	int m_Speech;           // this stores the setting for Speech enabled/disabled
+	int m_swramtype;        // this stores the setting for the SWRAM type being used
 
-	int m_ACCCON_IRR;       // IRQ inputs
+	int m_swrbank;          // This is the latch that holds the sideways ROM bank to read
+	bool m_swrbank_ram;     // Does ROM bank contain RAM
 
-	int m_rombank;          // This is the latch that holds the sideways ROM bank to read
-
-	int m_userport;         // This stores the sideways RAM latch type.
-							// Acorn and others use the bbc_rombank latch to select the write bank to be used.(type 0)
-							// Solidisc use the BBC's userport to select the write bank to be used (type 1)
-
-	int m_pagedRAM;         // BBC B+ memory handling
+	int m_paged_ram;        // BBC B+ memory handling
 	int m_vdusel;           // BBC B+ memory handling
 
 	bool m_lk18_ic41_paged_rom;  // BBC Master Paged ROM/RAM select IC41
 	bool m_lk19_ic37_paged_rom;  // BBC Master Paged ROM/RAM select IC37
 
-							/*
-							ACCCON
+	/*
+		ACCCON
+		b7 IRR  1=Causes an IRQ to the processor
+		b6 TST  1=Selects &FC00-&FEFF read from OS-ROM
+		b5 IFJ  1=Internal 1 MHz bus
+		        0=External 1MHz bus
+		b4 ITU  1=Internal Tube
+		        0=External Tube
+		b3 Y    1=Read/Write HAZEL &C000-&DFFF RAM
+		        0=Read/Write ROM &C000-&DFFF OS-ROM
+		b2 X    1=Read/Write LYNNE
+		        0=Read/WRITE main memory &3000-&8000
+		b1 E    1=Causes shadow if VDU code
+		        0=Main all the time
+		b0 D    1=Display LYNNE as screen
+		        0=Display main RAM screen
+		ACCCON is a read/write register
+	*/
 
-							b7 IRR  1=Causes an IRQ to the processor
-							b6 TST  1=Selects &FC00-&FEFF read from OS-ROM
-							b5 IFJ  1=Internal 1 MHz bus
-							        0=External 1MHz bus
-							b4 ITU  1=Internal Tube
-							        0=External Tube
-							b3 Y    1=Read/Write HAZEL &C000-&DFFF RAM
-							        0=Read/Write ROM &C000-&DFFF OS-ROM
-							b2 X    1=Read/Write LYNNE
-							        0=Read/WRITE main memory &3000-&8000
-							b1 E    1=Causes shadow if VDU code
-							        0=Main all the time
-							b0 D    1=Display LYNNE as screen
-							        0=Display main RAM screen
-
-							ACCCON is a read/write register
-							*/
-
-	int m_ACCCON;
-	int m_ACCCON_TST;
-	int m_ACCCON_IFJ;
-	int m_ACCCON_ITU;
-	int m_ACCCON_Y;
-	int m_ACCCON_X;
-	int m_ACCCON_E;
-	int m_ACCCON_D;
+	int m_acccon;
+	int m_acccon_irr;
+	int m_acccon_tst;
+	int m_acccon_ifj;
+	int m_acccon_itu;
+	int m_acccon_y;
+	int m_acccon_x;
+	int m_acccon_e;
+	int m_acccon_d;
 
 
-							/*
-							The addressable latch
-							This 8 bit addressable latch is operated from port B lines 0-3.
-							PB0-PB2 are set to the required address of the output bit to be set.
-							PB3 is set to the value which should be programmed at that bit.
-							The function of the 8 output bits from this latch are:-
+	/*
+		The addressable latch
+		This 8 bit addressable latch is operated from port B lines 0-3.
+		PB0-PB2 are set to the required address of the output bit to be set.
+		PB3 is set to the value which should be programmed at that bit.
+		The function of the 8 output bits from this latch are:-
 
-							B0 - Write Enable to the sound generator IC
-							B1 - READ select on the speech processor (B and B+)
-							     R/nW control on CMOS RAM (Master only)
-							B2 - WRITE select on the speech processor
-							     DS control on CMOS RAM (Master only)
-							B3 - Keyboard write enable
-							B4,B5 - these two outputs define the number to be added to the
-							start of screen address in hardware to control hardware scrolling:-
-							Mode    Size    Start of screen  Size  No.to add  B5      B4
-							0,1,2   20K     &3000            12K              1       1
-							3       16K     &4000            16K              0       0
-							4,5     10K     &5800 (or &1800) 22K              1       0
-							6       8K      &6000 (or &2000) 24K              0       1
-							B6 - Operates the CAPS lock LED  (Pin 17 keyboard connector)
-							B7 - Operates the SHIFT lock LED (Pin 16 keyboard connector)
-							*/
+		B0 - Write Enable to the sound generator IC
+		B1 - READ select on the speech processor (B and B+)
+		     R/nW control on CMOS RAM (Master only)
+		B2 - WRITE select on the speech processor
+		     DS control on CMOS RAM (Master only)
+		B3 - Keyboard write enable
+		B4,B5 - these two outputs define the number to be added to the
+		start of screen address in hardware to control hardware scrolling:-
+		Mode    Size    Start of screen  Size  No.to add  B5      B4
+		0,1,2   20K     &3000            12K              1       1
+		3       16K     &4000            16K              0       0
+		4,5     10K     &5800 (or &1800) 22K              1       0
+		6       8K      &6000 (or &2000) 24K              0       1
+		B6 - Operates the CAPS lock LED  (Pin 17 keyboard connector)
+		B7 - Operates the SHIFT lock LED (Pin 16 keyboard connector)
+	*/
 
 	int m_b0_sound;
 	int m_b1_speech_read;
@@ -437,9 +427,6 @@ public: // HACK FOR MC6845
 							   Video Code
 							***************************************/
 
-	int m_memorySize;
-
-
 // this is the real location of the start of the BBC's ram in the emulation
 // it can be changed if shadow ram is being used to point at the upper 32K of RAM
 	uint8_t *m_video_ram;
@@ -470,10 +457,8 @@ public: // HACK FOR MC6845
 
 	rgb_t out_rgb(rgb_t entry);
 
-	void bbc_setvideoshadow(int vdusel);
+	void setvideoshadow(int vdusel);
 	void set_pixel_lookup();
-	int vdudriverset();
-	int bbcm_vdudriverset();
 	int bbc_keyboard(address_space &space, int data);
 	void bbcb_IC32_initialise(bbc_state *state);
 	void MC146818_set(address_space &space);
