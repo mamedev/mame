@@ -3,7 +3,7 @@
 /***************************************************************************
 
     Gradius III (GX945) (c) 1989 Konami
-	Gradius III - Densetsu kara Shinwa e (Japan version has subtitles)
+    Gradius III - Densetsu kara Shinwa e (Japan version has subtitles)
 
     driver by Nicola Salmoria
 
