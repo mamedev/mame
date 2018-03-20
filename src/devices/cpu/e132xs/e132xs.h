@@ -34,18 +34,6 @@
 #define MAPVAR_PC                       M0
 #define MAPVAR_CYCLES                   M1
 
-/* compilation boundaries -- how far back/forward does the analysis extend? */
-#define COMPILE_BACKWARDS_BYTES         128
-#define COMPILE_FORWARDS_BYTES          512
-#define COMPILE_MAX_INSTRUCTIONS        ((COMPILE_BACKWARDS_BYTES/4) + (COMPILE_FORWARDS_BYTES/4))
-#define COMPILE_MAX_SEQUENCE            64
-
-/* exit codes */
-#define EXECUTE_OUT_OF_CYCLES           0
-#define EXECUTE_MISSING_CODE            1
-#define EXECUTE_UNMAPPED_CODE           2
-#define EXECUTE_RESET_CACHE             3
-
 #define E132XS_STRICT_VERIFY            0x0001          /* verify all instructions */
 
 #define SINGLE_INSTRUCTION_MODE         (1)
@@ -144,7 +132,26 @@ public:
 	void e132_16k_iram_map(address_map &map);
 	void e132_4k_iram_map(address_map &map);
 	void e132_8k_iram_map(address_map &map);
+
 protected:
+	// compilation boundaries -- how far back/forward does the analysis extend?
+	enum : u32
+	{
+		COMPILE_BACKWARDS_BYTES 	= 128,
+		COMPILE_FORWARDS_BYTES      = 512,
+		COMPILE_MAX_INSTRUCTIONS    = (COMPILE_BACKWARDS_BYTES / 4) + (COMPILE_FORWARDS_BYTES / 4),
+		COMPILE_MAX_SEQUENCE        = 64
+	};
+
+	// exit codes
+	enum : int
+	{
+		EXECUTE_OUT_OF_CYCLES       = 0,
+		EXECUTE_MISSING_CODE        = 1,
+		EXECUTE_UNMAPPED_CODE       = 2,
+		EXECUTE_RESET_CACHE         = 3
+	};
+
 	struct internal_hyperstone_state
 	{
 		// CPU registers
