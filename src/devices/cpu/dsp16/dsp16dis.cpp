@@ -391,9 +391,9 @@ dsp16_disassembler::result dsp16_disassembler::dasm_f1(u16 op)
 	switch ((op >> 5) & 0x000fU)
 	{
 	case 0x00: return result{ false, false, util::string_format("a%u = p ; p = x*y", d) };
-	case 0x01: return result{ false, false, util::string_format("a%u = a%u + p, p = x*y", d, s) };
+	case 0x01: return result{ false, false, util::string_format("a%u = a%u + p ; p = x*y", d, s) };
 	case 0x02: return result{ false, false, util::string_format("p = x*y") };
-	case 0x03: return result{ false, false, util::string_format("a%u = a%u-p, p = x*y", d, s) };
+	case 0x03: return result{ false, false, util::string_format("a%u = a%u-p ; p = x*y", d, s) };
 	case 0x04: return result{ false, true,  util::string_format("a%u = p", d) };
 	case 0x05: return result{ false, false, util::string_format("a%u = a%u+p", d, s) };
 	case 0x06: return result{ true,  false, util::string_format("nop") };
