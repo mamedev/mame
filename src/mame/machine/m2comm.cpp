@@ -298,6 +298,7 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 			m_shared[i] = 0x00;
 		}
 
+		m_shared[0x01] = 0x02;
 		// TODO - check EPR-16726 on Daytona USA and Sega Rally Championship
 		// EPR-18643(A) - these are accessed by VirtuaON and Sega Touring Car Championship
 
@@ -351,7 +352,8 @@ void m2comm_device::comm_tick()
 		// EPR-16726 uses m_fg for Master/Slave
 		// EPR-18643(A) seems to check m_shared[1], with a fallback to m_fg
 		bool isMaster = (m_fg == 0x01 || m_shared[1] == 0x01);
-		bool isSlave = !isMaster && (m_fg == 0x00);
+		bool isSlave = (m_fg == 0x00 && m_shared[1] == 0x02);
+		bool isRelay = (m_fg == 0x00 && m_shared[1] == 0x00);
 
 		// if link not yet established...
 		if (m_linkalive == 0x00)
@@ -382,7 +384,7 @@ void m2comm_device::comm_tick()
 
 				// try to read one message
 				recv = read_data(dataSize);
-				while (recv != 0)
+				while (recv > 0)
 				{
 					// check if message id
 					idx = m_buffer0[0];
@@ -419,6 +421,15 @@ void m2comm_device::comm_tick()
 							m_linkid = m_buffer0[1];
 							m_linkcount = m_buffer0[2];
 							m_buffer0[1]--;
+
+							// forward message to other nodes
+							m_line_tx.write(m_buffer0, dataSize);
+						}
+						else if (isRelay)
+						{
+							// fetch linkid and linkcount, then decrease linkid
+							m_linkid = 0x00;
+							m_linkcount = m_buffer0[2];
 
 							// forward message to other nodes
 							m_line_tx.write(m_buffer0, dataSize);
@@ -486,7 +497,7 @@ void m2comm_device::comm_tick()
 			{
 				// try to read a message
 				recv = read_data(dataSize);
-				while (recv != 0)
+				while (recv > 0)
 				{
 					// check if valid id
 					idx = m_buffer0[0];
@@ -498,9 +509,10 @@ void m2comm_device::comm_tick()
 							m_shared[frameOffset + j] = m_buffer0[1 + j];
 						}
 						m_zfg ^= 0x01;
-						if (!isMaster)
+						if (isSlave)
 							send_data(m_linkid, frameStart, frameSize, dataSize);
-						
+						else if (isRelay)
+							m_line_tx.write(m_buffer0, dataSize);
 					}
 					else
 					{
@@ -560,12 +572,14 @@ void m2comm_device::read_frame()
 		// EPR-16726 uses m_fg for Master/Slave
 		// EPR-18643(A) seems to check m_shared[1], with a fallback to m_fg
 		bool isMaster = (m_fg == 0x01 || m_shared[1] == 0x01);
+		bool isSlave = (m_fg == 0x00 && m_shared[1] == 0x02);
+		bool isRelay = (m_fg == 0x00 && m_shared[1] == 0x00);
 
 		do
 		{
 			// try to read a message
 			recv = read_data(dataSize);
-			while (recv != 0)
+			while (recv > 0)
 			{
 				// check if valid id
 				idx = m_buffer0[0];
@@ -577,8 +591,10 @@ void m2comm_device::read_frame()
 						m_shared[frameOffset + j] = m_buffer0[1 + j];
 					}
 					m_zfg ^= 0x01;
-					if (!isMaster)
+					if (isSlave)
 						send_data(m_linkid, frameStart, frameSize, dataSize);
+					else if (isRelay)
+						m_line_tx.write(m_buffer0, dataSize);
 				}
 				else
 				{
@@ -623,6 +639,20 @@ int m2comm_device::read_data(int dataSize)
 				togo -= recv;
 				offset += recv;
 			}
+		}
+	}
+	else if (recv < 0)
+	{
+		if (m_linkalive == 0x01)
+		{
+			osd_printf_verbose("M2COMM: connection lost\n");
+			m_linkalive = 0x02;
+			m_linktimer = 0x00;
+
+			m_shared[0] = 0xff;
+
+			m_line_rx.close();
+			m_line_tx.close();
 		}
 	}
 	return recv;
