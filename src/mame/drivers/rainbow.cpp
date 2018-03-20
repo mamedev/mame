@@ -360,9 +360,9 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "bus/rs232/ser_mouse.h"
 
 #include "machine/i8251.h"
-#include "machine/clock.h"
 #include "machine/dec_lk201.h"
 #include "machine/nvram.h"
+#include "machine/ripple_counter.h"
 #include "machine/timer.h"
 
 #include "machine/ds1315.h"
@@ -509,9 +509,8 @@ public:
 		m_hdc(*this, "hdc"),
 		m_corvus_hdc(*this, "corvus"),
 
-		m_mpsc(*this, "upd7201"),
-		m_dbrg_A(*this, "com8116_a"),
-		m_dbrg_B(*this, "com8116_b"),
+		m_mpsc(*this, "mpsc"),
+		m_dbrg(*this, "dbrg"),
 		m_comm_port(*this, "comm"),
 
 		m_kbd8251(*this, "kbdser"),
@@ -601,10 +600,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mpsc_irq);
 	DECLARE_WRITE8_MEMBER(comm_bitrate_w);
 	DECLARE_WRITE8_MEMBER(printer_bitrate_w);
-	DECLARE_WRITE_LINE_MEMBER( com8116_a_fr_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_a_ft_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_b_fr_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_b_ft_w );
+	DECLARE_WRITE8_MEMBER(bitrate_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(dbrg_fr_w);
+	DECLARE_WRITE_LINE_MEMBER(dbrg_ft_w);
 
 	DECLARE_WRITE8_MEMBER(GDC_EXTRA_REGISTER_w);
 	DECLARE_READ8_MEMBER(GDC_EXTRA_REGISTER_r);
@@ -612,7 +610,6 @@ public:
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	TIMER_DEVICE_CALLBACK_MEMBER(hd_motor_tick);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -671,8 +668,7 @@ private:
 	required_device<corvus_hdc_device> m_corvus_hdc;
 
 	required_device<upd7201_new_device> m_mpsc;
-	required_device<com8116_device> m_dbrg_A;
-	required_device<com8116_device> m_dbrg_B;
+	required_device<com8116_003_device> m_dbrg;
 	required_device<rs232_port_device> m_comm_port;
 
 	required_device<i8251_device> m_kbd8251;
@@ -723,6 +719,8 @@ private:
 	bool m_zflip;                   // Z80 alternate memory map with A15 inverted
 	bool m_z80_halted;
 	int  m_z80_diskcontrol;         // retains values needed for status register
+
+	uint8_t m_printer_bitrate;
 
 	bool m_kbd_tx_ready, m_kbd_rx_ready;
 	int m_KBD;
@@ -886,6 +884,7 @@ void rainbow_state::machine_start()
 	save_item(NAME(m_z80_mailbox));
 	save_item(NAME(m_8088_mailbox));
 	save_item(NAME(m_zflip));
+	save_item(NAME(m_printer_bitrate));
 	save_item(NAME(m_kbd_tx_ready));
 	save_item(NAME(m_kbd_rx_ready));
 	save_item(NAME(m_irq_high));
@@ -1268,6 +1267,7 @@ void rainbow_state::machine_reset()
 	// *********** SERIAL COMM. (7201)
 	m_mpsc->reset();
 	m_mpsc_irq = 0;
+	m_printer_bitrate = 0;
 
 	// *********** KEYBOARD + IRQ
 	m_kbd_tx_ready = m_kbd_rx_ready = false;
@@ -1417,42 +1417,52 @@ WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
 // PORT 0x06 : Communication bit rates (see page 21 of PC 100 SPEC)
 WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
 {
-	m_dbrg_A->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
+	m_dbrg->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
 	logerror("\n(COMM.) receive bitrate = %d ($%02x)\n", comm_rates[data & 0x0f] , data & 0x0f);
 
-	m_dbrg_A->stt_w( ((data & 0xf0) >> 4) );
+	m_dbrg->stt_w( ((data & 0xf0) >> 4) );
 	logerror("(COMM.) transmit bitrate = %d ($%02x)\n", comm_rates[((data & 0xf0) >> 4)] ,(data & 0xf0) >> 4);
 }
 
 // PORT 0x0e : Printer bit rates
 WRITE8_MEMBER(rainbow_state::printer_bitrate_w)
 {
-	m_dbrg_B->str_w(data & 7); // bits 0 - 2
-	m_dbrg_B->stt_w(data & 7); // TX and RX rate cannot be programmed independently.
+	m_printer_bitrate = data & 7;
+	// bits 0 - 2 = 0: nominally 75 bps, actually 75.35 bps
+	// bits 0 - 2 = 1: nominally 150 bps, actually 150.7 bps
+	// bits 0 - 2 = 2: nominally 300 bps, actually 301.4 bps
+	// bits 0 - 2 = 3: nominally 600 bps, actually 602.8 bps
+	// bits 0 - 2 = 4: nominally 1200 bps, actually 1205.6 bps
+	// bits 0 - 2 = 5: nominally 2400 bps, actually 2411.2 bps
+	// bits 0 - 2 = 6: nominally 4800 bps, actually 4822.4 bps (keyboard is tied to this rate)
+	// bits 0 - 2 = 7: nominally 9600 bps, actually 9644.8 bps
+	// TX and RX rate cannot be programmed independently.
 	logerror("\n(PRINTER) receive = transmit bitrate: %d ($%02x)", 9600 / ( 1 << (7 - (data & 7))) , data & 7);
 
 	// "bit 3 controls the communications port clock (RxC,TxC). External clock when 1, internal when 0"
 	logerror(" - CLOCK (0 = internal): %02x", data & 8);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::com8116_a_fr_w)
+WRITE_LINE_MEMBER(rainbow_state::dbrg_fr_w)
 {
 	m_mpsc->rxca_w(state);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::com8116_a_ft_w)
+WRITE_LINE_MEMBER(rainbow_state::dbrg_ft_w)
 {
 	m_mpsc->txca_w(state);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::com8116_b_fr_w)
+WRITE8_MEMBER(rainbow_state::bitrate_counter_w)
 {
-	m_mpsc->rxcb_w(state);
-}
+	bool prt_rxtxc = BIT(data, 7 - m_printer_bitrate);
+	bool kbd_rxtxc = BIT(data, 1);
 
-WRITE_LINE_MEMBER(rainbow_state::com8116_b_ft_w)
-{
-	m_mpsc->txcb_w(state);
+	m_mpsc->rxcb_w(prt_rxtxc);
+	m_mpsc->txcb_w(prt_rxtxc);
+
+	m_kbd8251->write_rxc(kbd_rxtxc);
+	m_kbd8251->write_txc(kbd_rxtxc);
 }
 
 // Only Z80 * private SRAM * is wait state free
@@ -2815,12 +2825,6 @@ WRITE_LINE_MEMBER(rainbow_state::kbd_txready_w)
 	update_kbd_irq();
 }
 
-WRITE_LINE_MEMBER(rainbow_state::write_keyboard_clock)
-{
-	m_kbd8251->write_txc(state);
-	m_kbd8251->write_rxc(state);
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::hd_motor_tick)
 {
 	if (m_POWER_GOOD)
@@ -3203,7 +3207,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 MCFG_DEFAULT_LAYOUT(layout_rainbow)
 
 /* basic machine hardware */
-MCFG_CPU_ADD("maincpu", I8088, XTAL(24'073'400) / 5)
+MCFG_CPU_ADD("maincpu", I8088, XTAL(24'073'400) / 5) // approximately 4.815 MHz
 MCFG_CPU_PROGRAM_MAP(rainbow8088_map)
 MCFG_CPU_IO_MAP(rainbow8088_io)
 MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(rainbow_state, irq_callback)
@@ -3294,28 +3298,24 @@ MCFG_HARDDISK_INTERFACE("corvus_hdd")
 
 MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
-MCFG_DEVICE_ADD("com8116_a", COM8116, XTAL(5'068'800))     // Baud rate generator A
-MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_a_fr_w))
-MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_a_ft_w))
+MCFG_DEVICE_ADD("dbrg", COM8116_003, XTAL(24'073'400) / 4) // 6.01835 MHz (nominally 6 MHz)
+MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, dbrg_fr_w))
+MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, dbrg_ft_w))
 
-MCFG_DEVICE_ADD("com8116_b", COM8116, XTAL(5'068'800)) // Baud rate generator B
-MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_b_fr_w))
-MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_b_ft_w))
-
-MCFG_DEVICE_ADD("upd7201", UPD7201_NEW, XTAL(24'073'400) / 5 / 2) // 2.4073 MHz (nominally 2.5 MHz)
+MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL(24'073'400) / 5 / 2) // 2.4073 MHz (nominally 2.5 MHz)
 MCFG_Z80SIO_OUT_INT_CB(WRITELINE(rainbow_state, mpsc_irq))
 MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("comm", rs232_port_device, write_txd))
 MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("printer", rs232_port_device, write_txd))
 // RTS and DTR outputs are not connected
 
 MCFG_RS232_PORT_ADD("comm", default_rs232_devices, nullptr)
-MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, rxa_w))
-MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, ctsa_w))
-MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, dcda_w))
+MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, rxa_w))
+MCFG_RS232_CTS_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, ctsa_w))
+MCFG_RS232_DCD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, dcda_w))
 
 MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
-MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, rxb_w))
-MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, ctsb_w)) // actually DTR
+MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, rxb_w))
+MCFG_RS232_DCD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, ctsb_w)) // actually DTR
 
 MCFG_DEVICE_MODIFY("comm")
 MCFG_SLOT_OPTION_ADD("microsoft_mouse", MSFT_SERIAL_MOUSE)
@@ -3333,8 +3333,11 @@ MCFG_I8251_TXRDY_HANDLER(WRITELINE(rainbow_state, kbd_txready_w))
 
 MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
 MCFG_LK201_TX_HANDLER(DEVWRITELINE("kbdser", i8251_device, write_rxd))
-MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800 * 16) // 8251 is set to /16 on the clock input
-MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(rainbow_state, write_keyboard_clock))
+
+MCFG_DEVICE_ADD("prtbrg", RIPPLE_COUNTER, XTAL(24'073'400) / 6 / 13) // 74LS393 at E17 (both halves)
+// divided clock should ideally be 307.2 kHz, but is actually approximately 308.6333 kHz
+MCFG_RIPPLE_COUNTER_STAGES(8)
+MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(rainbow_state, bitrate_counter_w))
 
 MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, hd_motor_tick, attotime::from_hz(60))
 
