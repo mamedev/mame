@@ -123,9 +123,8 @@ void gradius3_state::gradius3_map(address_map &map)
 	map(0x0e8000, 0x0e8000).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0f0000, 0x0f0001).w(this, FUNC(gradius3_state::sound_irq_w));
 	map(0x100000, 0x103fff).ram().share("shared_ram");
-	map(0x14c000, 0x153fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write)).umask(0x00ff);
 	/* is this a bug in the game or something else? */
-	map(0x14c000, 0x153fff).w(m_k052109, FUNC(k052109_device::write)).umask(0xff00);
+	map(0x14c000, 0x153fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write)).umask(0x00ff).cswidth(16);
 	map(0x180000, 0x19ffff).ram().w(this, FUNC(gradius3_state::gfxram_w)).share("k052109");
 }
 
@@ -136,9 +135,8 @@ void gradius3_state::gradius3_map2(address_map &map)
 	map(0x100000, 0x103fff).ram();
 	map(0x140000, 0x140000).w(this, FUNC(gradius3_state::cpuB_irqenable_w));
 	map(0x200000, 0x203fff).ram().share("shared_ram");
-	map(0x24c000, 0x253fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write)).umask(0x00ff);
 	/* is this a bug in the game or something else? */
-	map(0x24c000, 0x253fff).w(m_k052109, FUNC(k052109_device::write)).umask(0xff00);
+	map(0x24c000, 0x253fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write)).umask(0x00ff).cswidth(16);
 	map(0x280000, 0x29ffff).ram().w(this, FUNC(gradius3_state::gfxram_w)).share("k052109");
 	map(0x2c0000, 0x2c000f).rw(this, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w)).umask(0x00ff);
 	map(0x2c0800, 0x2c0fff).rw(this, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w)).umask(0x00ff);
