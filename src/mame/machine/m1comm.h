@@ -79,7 +79,8 @@ private:
 	emu_file m_line_tx;       // tx line - is differential, simple serial and toslink
 	char m_localhost[256];
 	char m_remotehost[256];
-	uint8_t m_buffer[0x1000];
+	uint8_t m_buffer0[0x200];
+	uint8_t m_buffer1[0x200];
 
 #ifdef M1COMM_SIMULATION
 	uint8_t m_linkenable;
@@ -89,6 +90,8 @@ private:
 	uint8_t m_linkcount;
 
 	void comm_tick();
+	int read_data(int dataSize);
+	void send_data(uint8_t frameType, int frameStart, int frameSize, int dataSize);
 #endif
 };
 
