@@ -33,10 +33,12 @@ public:
 	void pcs_overflow();
 	void pcs_underflow();
 
-	void fifoin_w(uint64_t data);
+	void fifoin_w(uint32_t data);
 	bool is_fifoin_full();
-	uint64_t fifoout0_r();
+	bool is_fifoin_empty();
+	uint32_t fifoout0_r();
 	bool is_fifoout0_empty();
+	bool is_fifoout0_full();
 
 	enum
 	{
@@ -46,6 +48,9 @@ public:
 		MB86235_MA0, MB86235_MA1, MB86235_MA2, MB86235_MA3, MB86235_MA4, MB86235_MA5, MB86235_MA6, MB86235_MA7,
 		MB86235_MB0, MB86235_MB1, MB86235_MB2, MB86235_MB3, MB86235_MB4, MB86235_MB5, MB86235_MB6, MB86235_MB7,
 		MB86235_AR0, MB86235_AR1, MB86235_AR2, MB86235_AR3, MB86235_AR4, MB86235_AR5, MB86235_AR6, MB86235_AR7,
+		MB86235_MOD, MB86235_EB,  MB86235_EO,  MB86235_SP,  MB86235_PDR, MB86235_DDR, MB86235_RPC, MB86235_LPC,
+		MB86235_PRP, MB86235_PWP,
+		MB86235_ST
 	};
 
 	static constexpr int FIFOIN_SIZE = 16;
@@ -102,12 +107,20 @@ private:
 		int rpos;
 		int wpos;
 		int num;
-		uint64_t data[16];
+		uint32_t data[16];
 	};
-
+	
+	struct fifo_state
+	{
+		uint32_t pc;
+		bool has_stalled;
+	};
+	
 	struct mb86235_internal_state
 	{
 		uint32_t pc;
+		uint32_t delay_pc;
+		uint32_t ppc;
 		uint32_t aa[8];
 		uint32_t ab[8];
 		uint32_t ma[8];
@@ -125,8 +138,10 @@ private:
 		uint32_t pr[24];
 
 		uint32_t mod;
+		// TODO: remove this, use ST instead
 		mb86235_flags flags;
-
+		uint32_t st;
+		
 		int icount;
 
 		uint32_t arg0;
@@ -147,10 +162,12 @@ private:
 		uint32_t ddr;
 
 		float fp0;
-
+		bool delay_slot;
+		
 		fifo fifoin;
 		fifo fifoout0;
 		fifo fifoout1;
+		fifo_state cur_fifo_state;
 	};
 
 	mb86235_internal_state  *m_core;
@@ -223,6 +240,44 @@ private:
 	void generate_branch_target(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int type, int ef2);
 	bool has_register_clash(const opcode_desc *desc, int outreg);
 	bool aluop_has_result(int aluop);
+	
+//  interpreter
+	void execute_op(uint32_t h, uint32_t l);
+	void do_alu1(uint32_t h, uint32_t l);
+	void do_alu2(uint32_t h, uint32_t l);
+	void do_trans2_1(uint32_t h, uint32_t l);
+	void do_trans1_1(uint32_t h, uint32_t l);
+	void do_trans2_2(uint32_t h, uint32_t l);
+	void do_trans1_2(uint32_t h, uint32_t l);
+	void do_trans1_3(uint32_t h, uint32_t l);
+	void do_control(uint32_t h, uint32_t l);
+	inline uint32_t get_prx(uint8_t which);
+	inline uint32_t get_constfloat(uint8_t which);
+	inline uint32_t get_constint(uint8_t which);
+	inline uint32_t get_alureg(uint8_t which, bool isfloatop);
+	inline uint32_t get_mulreg(uint8_t which, bool isfloatop);
+	inline void set_alureg(uint8_t which, uint32_t value);
+	inline void decode_aluop(uint8_t opcode, uint32_t src1, uint32_t src2, uint8_t imm, uint8_t dst_which);
+	inline void	decode_mulop(bool isfmul, uint32_t src1, uint32_t src2, uint8_t dst_which);
+	inline bool decode_branch_jump(uint8_t which);
+	inline uint32_t do_control_dst(uint32_t l);
+	inline void push_pc(uint32_t pcval);
+	inline uint32_t pop_pc();
+	inline void set_mod(uint16_t mod1, uint16_t mod2);
+	inline uint32_t get_transfer_reg(uint8_t which);
+	inline void set_transfer_reg(uint8_t which, uint32_t value);
+	inline uint32_t decode_ea(uint8_t mode, uint8_t rx, uint8_t ry, uint16_t disp, bool isbbus);
+	inline uint32_t read_bus(bool isbbus, uint32_t addr);
+	inline void write_bus(bool isbbus, uint32_t addr, uint32_t data);
+	inline void increment_pwp();
+	inline void increment_prp();
+	inline void decrement_prp();
+	inline void zero_prp();
+	inline void set_alu_flagsd(uint32_t val);
+	inline void set_alu_flagsf(float val);
+	inline void set_alu_flagsi(int val);
+	inline bool get_alu_second_src(uint8_t which);
+	void handle_single_step_execution();
 };
 
 

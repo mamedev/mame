@@ -7,7 +7,14 @@
  * Written by Angelo Salese & ElSemi
  *
  * TODO:
- * - Everything!
+ * - rewrite ALU integer/floating point functions, use templates etc;
+ * - move post-opcodes outside of the execute_op() function, like increment_prp()
+ *   (needed if opcode uses fifo in/out);
+ * - fifo stall shouldn't make the alu opcode to repeat;
+ * - illegal delay slot on REP unsupported;
+ * - externalize PDR / DDR (error LED flags on Model 2);
+ * - instruction cycles;
+ * - pipeline (four instruction executed per cycle!)
  *
  *****************************************************************************/
 
@@ -49,8 +56,31 @@ void mb86235_device::execute_run()
 #if ENABLE_DRC
 	run_drc();
 #else
-	debugger_instruction_hook(this, m_core->pc);
-	m_core->icount = 0;
+	uint64_t opcode;
+	while(m_core->icount > 0) 
+	{
+		uint32_t curpc;
+		
+		curpc = m_core->cur_fifo_state.has_stalled ? m_core->cur_fifo_state.pc : m_core->pc;
+		
+		debugger_instruction_hook(this, curpc);
+		opcode = m_direct->read_qword(curpc);
+		
+		m_core->ppc = curpc;
+		
+		if(m_core->delay_slot == true)
+		{
+			m_core->pc = m_core->delay_pc;
+			m_core->delay_slot = false;
+		}
+		else
+			handle_single_step_execution();
+		
+		execute_op(opcode >> 32, opcode & 0xffffffff);
+		
+		m_core->icount--;
+	}
+
 #endif
 }
 
@@ -66,7 +96,9 @@ void mb86235_device::device_start()
 	memset(m_core, 0, sizeof(mb86235_internal_state));
 
 
+#if ENABLE_DRC
 	// init UML generator
+
 	uint32_t umlflags = 0;
 	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 24, 0);
 
@@ -124,7 +156,7 @@ void mb86235_device::device_start()
 		m_regmap[i + 16] = uml::mem(&m_core->ma[i]);
 		m_regmap[i + 24] = uml::mem(&m_core->mb[i]);
 	}
-
+#endif
 
 	// Register state for debugger
 	state_add(MB86235_PC, "PC", m_core->pc).formatstr("%08X");
@@ -168,6 +200,18 @@ void mb86235_device::device_start()
 	state_add(MB86235_MB5, "MB5", m_core->mb[5]).formatstr("%08X");
 	state_add(MB86235_MB6, "MB6", m_core->mb[6]).formatstr("%08X");
 	state_add(MB86235_MB7, "MB7", m_core->mb[7]).formatstr("%08X");
+	state_add(MB86235_ST,  "ST", m_core->st).formatstr("%08X");
+
+	state_add(MB86235_EB,  "EB",  m_core->eb).formatstr("%08X");
+	state_add(MB86235_EO,  "EO",  m_core->eo).formatstr("%08X");
+	state_add(MB86235_SP,  "SP",  m_core->sp).formatstr("%08X");
+	state_add(MB86235_RPC, "RPC", m_core->rpc).formatstr("%08X");
+	state_add(MB86235_LPC, "LPC", m_core->lpc).formatstr("%08X");
+	state_add(MB86235_PDR, "PDR", m_core->pdr).formatstr("%08X");
+	state_add(MB86235_DDR, "DDR", m_core->ddr).formatstr("%08X");
+	state_add(MB86235_MOD, "MOD", m_core->mod).formatstr("%04X");
+	state_add(MB86235_PRP, "PRP", m_core->prp).formatstr("%02X");
+	state_add(MB86235_PWP, "PWP", m_core->pwp).formatstr("%02X");
 	state_add(STATE_GENPC, "GENPC", m_core->pc ).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
 
@@ -178,9 +222,14 @@ void mb86235_device::device_start()
 
 void mb86235_device::device_reset()
 {
+#if ENABLE_DRC
 	flush_cache();
-
+#endif
+	
 	m_core->pc = 0;
+	m_core->delay_pc = 0;
+	m_core->ppc = 0;
+	m_core->delay_slot = false;
 }
 
 #if 0
@@ -242,57 +291,53 @@ util::disasm_interface *mb86235_device::create_disassembler()
 }
 
 
-void mb86235_device::fifoin_w(uint64_t data)
+void mb86235_device::fifoin_w(uint32_t data)
 {
-#if ENABLE_DRC
 	if (m_core->fifoin.num >= FIFOIN_SIZE)
 	{
 		fatalerror("fifoin_w: pushing to full fifo");
 	}
 
-	//printf("FIFOIN push %08X%08X\n", (uint32_t)(data >> 32), (uint32_t)(data));
+	//printf("FIFOIN push %08X\n", data);
 
 	m_core->fifoin.data[m_core->fifoin.wpos] = data;
 
 	m_core->fifoin.wpos++;
 	m_core->fifoin.wpos &= FIFOIN_SIZE-1;
 	m_core->fifoin.num++;
-#endif
+}
+
+bool mb86235_device::is_fifoin_empty()
+{
+	return m_core->fifoin.num == 0;
 }
 
 bool mb86235_device::is_fifoin_full()
 {
-#if ENABLE_DRC
 	return m_core->fifoin.num >= FIFOIN_SIZE;
-#else
-	return false;
-#endif
 }
 
-uint64_t mb86235_device::fifoout0_r()
+uint32_t mb86235_device::fifoout0_r()
 {
-#if ENABLE_DRC
 	if (m_core->fifoout0.num == 0)
 	{
 		fatalerror("fifoout0_r: reading from empty fifo");
 	}
 
-	uint64_t data = m_core->fifoout0.data[m_core->fifoout0.rpos];
+	uint32_t data = m_core->fifoout0.data[m_core->fifoout0.rpos];
 
 	m_core->fifoout0.rpos++;
 	m_core->fifoout0.rpos &= FIFOOUT0_SIZE - 1;
 	m_core->fifoout0.num--;
 	return data;
-#else
-	return 0;
-#endif
+}
+
+bool mb86235_device::is_fifoout0_full()
+{
+	return m_core->fifoout0.num >= FIFOOUT0_SIZE;
 }
 
 bool mb86235_device::is_fifoout0_empty()
 {
-#if ENABLE_DRC
 	return m_core->fifoout0.num == 0;
-#else
-	return false;
-#endif
 }
