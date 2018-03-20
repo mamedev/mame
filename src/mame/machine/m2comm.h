@@ -60,7 +60,8 @@ private:
 	emu_file m_line_tx;       // tx line - is differential, simple serial and toslink
 	char m_localhost[256];
 	char m_remotehost[256];
-	uint8_t m_buffer[0x4000];
+	uint8_t m_buffer0[0x1000];
+	uint8_t m_buffer1[0x1000];
 
 #ifdef M2COMM_SIMULATION
 	uint8_t m_linkenable;
@@ -68,8 +69,12 @@ private:
 	uint8_t m_linkalive;
 	uint8_t m_linkid;
 	uint8_t m_linkcount;
+	uint8_t m_zfg_delay;
 
 	void comm_tick();
+	void read_frame();
+	int read_data(int dataSize);
+	void send_data(uint8_t frameType, int frameStart, int frameSize, int dataSize);
 #endif
 };
 

@@ -348,11 +348,11 @@ void m1comm_device::comm_tick()
 			// if both sockets are there check ring
 			if ((m_line_rx.is_open()) && (m_line_tx.is_open()))
 			{
-				// try to read one messages
+				// try to read one message
 				recv = read_data(dataSize);
 				while (recv != 0)
 				{
-					// check if message id
+					// check message id
 					idx = m_buffer0[0];
 
 					// 0xFF - link id
@@ -452,11 +452,11 @@ void m1comm_device::comm_tick()
 			do
 			{
 				// try to read a message
-				int recv = read_data(dataSize);
+				recv = read_data(dataSize);
 				while (recv != 0)
 				{
 					// check if valid id
-					int idx = m_buffer0[0];
+					idx = m_buffer0[0];
 					if (idx > 0 && idx <= m_linkcount)
 					{
 						// if not own message
