@@ -73,8 +73,8 @@ const gfx_layout k051960_device::spritelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ STEP4(0,8) },
-	{ STEP8(0,1), STEP8(4*8*8,1) },
-	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
+	{ STEP8(0,1), STEP8(8*32,1) },
+	{ STEP8(0,32), STEP8(16*32,32) },
 	16*16*4
 };
 
@@ -87,24 +87,25 @@ const gfx_layout k051960_device::spritelayout_reverse =
 	RGN_FRAC(1,1),
 	4,
 	{ STEP4(24,-8) },
-	{ STEP8(0,1), STEP8(4*8*8,1) },
-	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
+	{ STEP8(0,1), STEP8(8*32,1) },
+	{ STEP8(0,32), STEP8(16*32,32) },
 	16*16*4
 };
 
 // In gradius3, the gfx ROMs are directly connected to one of the 68K CPUs
 // rather than being read the usual way; moreover, the ROM data lines are
 // connected in different ways to the 68K and to the K051937.
-// Rather than copy the ROM region, we (currently) just use an alternate
-// gfx layout for this game.
+// Rather than copy the ROM region and bitswap one copy, we (currently)
+// just use an alternate gfx layout for this game.
 const gfx_layout k051960_device::spritelayout_gradius3 =
 {
 	16,16,
 	RGN_FRAC(1,1),
 	4,
 	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(4*8*8,4) },
-	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
+	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
+-		32*8+2*4, 32*8+3*4, 32*8+0*4, 32*8+1*4, 32*8+6*4, 32*8+7*4, 32*8+4*4, 32*8+5*4 },
+	{ STEP8(0,32), STEP8(16*32,32) },
 	16*16*4
 };
 
