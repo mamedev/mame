@@ -20,6 +20,7 @@ public:
 
 	void aaa(machine_config &config);
 	void mem_map(address_map &map);
+	void io_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -28,6 +29,14 @@ private:
 void aaa_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("maincpu", 0);
+	map(0x2000, 0x27ff).ram();
+	map(0x8000, 0x9fff).rom().region("maincpu", 0x8000);
+	map(0xc000, 0xffff).ram();
+}
+
+void aaa_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
 }
 
 static INPUT_PORTS_START( aaa )
@@ -36,6 +45,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(aaa_state::aaa)
 	MCFG_CPU_ADD("maincpu", Z80, 2'000'000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************
