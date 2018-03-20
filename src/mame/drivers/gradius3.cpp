@@ -2,7 +2,8 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-    Gradius 3 (GX945) (c) 1989 Konami
+    Gradius III (GX945) (c) 1989 Konami
+	Gradius III - Densetsu kara Shinwa e (Japan version has subtitles)
 
     driver by Nicola Salmoria
 
@@ -11,7 +12,7 @@
     on cpu B and the needed parts are copied to RAM at run time.
 
     There's also something wrong in the way tile banks are implemented in
-    k052109.c. They don't seem to be used by this game.
+    k052109.cpp. They don't seem to be used by this game.
 
     2009-03:
     Added dsw locations and verified factory setting based on Guru's notes
@@ -35,72 +36,28 @@
 #include "speaker.h"
 
 
-READ16_MEMBER(gradius3_state::k052109_halfword_r)
+WRITE8_MEMBER(gradius3_state::cpuA_ctrl_w)
 {
-	return m_k052109->read(space, offset);
-}
+	/* bits 0-1 are coin counters */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
-WRITE16_MEMBER(gradius3_state::k052109_halfword_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_k052109->write(space, offset, data & 0xff);
+	/* bit 2 selects layer priority */
+	m_priority = data & 0x04;
 
-	/* is this a bug in the game or something else? */
-	if (!ACCESSING_BITS_0_7)
-		m_k052109->write(space, offset, (data >> 8) & 0xff);
-//      logerror("%s half %04x = %04x\n",machine().describe_context(),offset,data);
-}
+	/* bit 3 enables cpu B */
+	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
-READ16_MEMBER(gradius3_state::k051937_halfword_r)
-{
-	return m_k051960->k051937_r(space, offset);
-}
+	/* bit 5 enables irq */
+	m_irqAen = data & 0x20;
 
-WRITE16_MEMBER(gradius3_state::k051937_halfword_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_k051960->k051937_w(space, offset, data & 0xff);
-}
-
-READ16_MEMBER(gradius3_state::k051960_halfword_r)
-{
-	return m_k051960->k051960_r(space, offset);
-}
-
-WRITE16_MEMBER(gradius3_state::k051960_halfword_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_k051960->k051960_w(space, offset, data & 0xff);
-}
-
-WRITE16_MEMBER(gradius3_state::cpuA_ctrl_w)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		data >>= 8;
-
-		/* bits 0-1 are coin counters */
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		machine().bookkeeping().coin_counter_w(1, data & 0x02);
-
-		/* bit 2 selects layer priority */
-		m_priority = data & 0x04;
-
-		/* bit 3 enables cpu B */
-		m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
-
-		/* bit 5 enables irq */
-		m_irqAen = data & 0x20;
-
-		/* other bits unknown */
+	/* other bits unknown */
 	//logerror("%s: write %04x to c0000\n",machine().describe_context(),data);
-	}
 }
 
-WRITE16_MEMBER(gradius3_state::cpuB_irqenable_w)
+WRITE8_MEMBER(gradius3_state::cpuB_irqenable_w)
 {
-	if (ACCESSING_BITS_8_15)
-		m_irqBmask = (data >> 8) & 0x07;
+	m_irqBmask = data & 0x07;
 }
 
 INTERRUPT_GEN_MEMBER(gradius3_state::cpuA_interrupt)
@@ -154,7 +111,7 @@ void gradius3_state::gradius3_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram();
 	map(0x080000, 0x080fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x0c0000, 0x0c0001).w(this, FUNC(gradius3_state::cpuA_ctrl_w));  /* halt cpu B, irq enable, priority, coin counters, other? */
+	map(0x0c0000, 0x0c0000).w(this, FUNC(gradius3_state::cpuA_ctrl_w));  /* halt cpu B, irq enable, priority, coin counters, other? */
 	map(0x0c8000, 0x0c8001).portr("SYSTEM");
 	map(0x0c8002, 0x0c8003).portr("P1");
 	map(0x0c8004, 0x0c8005).portr("P2");
@@ -165,8 +122,10 @@ void gradius3_state::gradius3_map(address_map &map)
 	map(0x0e0000, 0x0e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x0e8000, 0x0e8000).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0f0000, 0x0f0001).w(this, FUNC(gradius3_state::sound_irq_w));
-	map(0x100000, 0x103fff).ram().share("share1");
-	map(0x14c000, 0x153fff).rw(this, FUNC(gradius3_state::k052109_halfword_r), FUNC(gradius3_state::k052109_halfword_w));
+	map(0x100000, 0x103fff).ram().share("shared_ram");
+	map(0x14c000, 0x153fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write)).umask(0x00ff);
+	/* is this a bug in the game or something else? */
+	map(0x14c000, 0x153fff).w(m_k052109, FUNC(k052109_device::write)).umask(0xff00);
 	map(0x180000, 0x19ffff).ram().w(this, FUNC(gradius3_state::gradius3_gfxram_w)).share("k052109");
 }
 
@@ -175,13 +134,15 @@ void gradius3_state::gradius3_map2(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x103fff).ram();
-	map(0x140000, 0x140001).w(this, FUNC(gradius3_state::cpuB_irqenable_w));
-	map(0x200000, 0x203fff).ram().share("share1");
-	map(0x24c000, 0x253fff).rw(this, FUNC(gradius3_state::k052109_halfword_r), FUNC(gradius3_state::k052109_halfword_w));
+	map(0x140000, 0x140000).w(this, FUNC(gradius3_state::cpuB_irqenable_w));
+	map(0x200000, 0x203fff).ram().share("shared_ram");
+	map(0x24c000, 0x253fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write)).umask(0x00ff);
+	/* is this a bug in the game or something else? */
+	map(0x24c000, 0x253fff).w(m_k052109, FUNC(k052109_device::write)).umask(0xff00);
 	map(0x280000, 0x29ffff).ram().w(this, FUNC(gradius3_state::gradius3_gfxram_w)).share("k052109");
-	map(0x2c0000, 0x2c000f).rw(this, FUNC(gradius3_state::k051937_halfword_r), FUNC(gradius3_state::k051937_halfword_w));
-	map(0x2c0800, 0x2c0fff).rw(this, FUNC(gradius3_state::k051960_halfword_r), FUNC(gradius3_state::k051960_halfword_w));
-	map(0x400000, 0x5fffff).r(this, FUNC(gradius3_state::gradius3_gfxrom_r));     /* gfx ROMs are mapped here, and copied to RAM */
+	map(0x2c0000, 0x2c000f).rw(this, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w)).umask(0x00ff);
+	map(0x2c0800, 0x2c0fff).rw(this, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w)).umask(0x00ff);
+	map(0x400000, 0x5fffff).rom().region("k051960", 0);     /* gfx ROMs are mapped here, and copied to RAM */
 }
 
 
@@ -302,7 +263,7 @@ MACHINE_CONFIG_START(gradius3_state::gradius3)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 ) // TODO : Actually visible horizontal area is Shorter than 320?
 	MCFG_SCREEN_UPDATE_DRIVER(gradius3_state, screen_update_gradius3)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -322,20 +283,16 @@ MACHINE_CONFIG_START(gradius3_state::gradius3)
 	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_GRADIUS3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("k007232", K007232, 3579545)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(gradius3_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 
@@ -365,16 +322,16 @@ ROM_START( gradius3 )
 	ROM_LOAD( "945_r05.d9", 0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) ) /* Same as 945 M05, but different label */
 
 	ROM_REGION( 0x200000, "k051960", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD32_WORD( "945_a02.l3",  0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
-	ROM_LOAD32_WORD( "945_a01.h3",  0x000002, 0x80000, CRC(339d6dd2) SHA1(6a52b826aba92c75fc6a5926184948735dc20812) )
-	ROM_LOAD32_BYTE( "945_l04a.k6", 0x100000, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )
-	ROM_LOAD32_BYTE( "945_l04c.m6", 0x100001, 0x20000, CRC(45bcd921) SHA1(e51a8a71362a6fb55124aa1dce74519c0a3c6e3f) )
-	ROM_LOAD32_BYTE( "945_l03a.e6", 0x100002, 0x20000, CRC(a67ef087) SHA1(fd63474f3bbde5dfc53ed4c1db25d6411a8b54d2) )
-	ROM_LOAD32_BYTE( "945_l03c.h6", 0x100003, 0x20000, CRC(a56be17a) SHA1(1d387736144c30fcb5de54235331ab1ff70c356e) )
-	ROM_LOAD32_BYTE( "945_l04b.k8", 0x180000, 0x20000, CRC(843bc67d) SHA1(cdf8421083f24ab27867ed5d08d8949da192b2b9) )
-	ROM_LOAD32_BYTE( "945_l04d.m8", 0x180001, 0x20000, CRC(0a98d08e) SHA1(1e0ca51a2d45c01fa3f11950ddd387f41ddae691) )
-	ROM_LOAD32_BYTE( "945_l03b.e8", 0x180002, 0x20000, CRC(933e68b9) SHA1(f3a39446ca77d17fdbd938bd5f718ae9d5570879) )
-	ROM_LOAD32_BYTE( "945_l03d.h8", 0x180003, 0x20000, CRC(f375e87b) SHA1(6427b966795c907c8e516244872fe52217da62c4) )
+	ROM_LOAD32_WORD_SWAP( "945_a02.l3",  0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
+	ROM_LOAD32_WORD_SWAP( "945_a01.h3",  0x000002, 0x80000, CRC(339d6dd2) SHA1(6a52b826aba92c75fc6a5926184948735dc20812) )
+	ROM_LOAD32_BYTE(      "945_l04c.m6", 0x100000, 0x20000, CRC(45bcd921) SHA1(e51a8a71362a6fb55124aa1dce74519c0a3c6e3f) )
+	ROM_LOAD32_BYTE(      "945_l04a.k6", 0x100001, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )
+	ROM_LOAD32_BYTE(      "945_l03c.h6", 0x100002, 0x20000, CRC(a56be17a) SHA1(1d387736144c30fcb5de54235331ab1ff70c356e) )
+	ROM_LOAD32_BYTE(      "945_l03a.e6", 0x100003, 0x20000, CRC(a67ef087) SHA1(fd63474f3bbde5dfc53ed4c1db25d6411a8b54d2) )
+	ROM_LOAD32_BYTE(      "945_l04d.m8", 0x180000, 0x20000, CRC(0a98d08e) SHA1(1e0ca51a2d45c01fa3f11950ddd387f41ddae691) )
+	ROM_LOAD32_BYTE(      "945_l04b.k8", 0x180001, 0x20000, CRC(843bc67d) SHA1(cdf8421083f24ab27867ed5d08d8949da192b2b9) )
+	ROM_LOAD32_BYTE(      "945_l03d.h8", 0x180002, 0x20000, CRC(f375e87b) SHA1(6427b966795c907c8e516244872fe52217da62c4) )
+	ROM_LOAD32_BYTE(      "945_l03b.e8", 0x180003, 0x20000, CRC(933e68b9) SHA1(f3a39446ca77d17fdbd938bd5f718ae9d5570879) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "945l14.j28", 0x0000, 0x0100, CRC(c778c189) SHA1(847eaf379ba075c25911c6f83dd63ff390534f60) )  /* priority encoder (not used) */
@@ -404,16 +361,16 @@ ROM_START( gradius3j )
 	ROM_LOAD( "945_m05.d9", 0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) )
 
 	ROM_REGION( 0x200000, "k051960", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD32_WORD( "945_a02.l3",  0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
-	ROM_LOAD32_WORD( "945_a01.h3",  0x000002, 0x80000, CRC(339d6dd2) SHA1(6a52b826aba92c75fc6a5926184948735dc20812) )
-	ROM_LOAD32_BYTE( "945_l04a.k6", 0x100000, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )
-	ROM_LOAD32_BYTE( "945_l04c.m6", 0x100001, 0x20000, CRC(45bcd921) SHA1(e51a8a71362a6fb55124aa1dce74519c0a3c6e3f) )
-	ROM_LOAD32_BYTE( "945_l03a.e6", 0x100002, 0x20000, CRC(a67ef087) SHA1(fd63474f3bbde5dfc53ed4c1db25d6411a8b54d2) )
-	ROM_LOAD32_BYTE( "945_l03c.h6", 0x100003, 0x20000, CRC(a56be17a) SHA1(1d387736144c30fcb5de54235331ab1ff70c356e) )
-	ROM_LOAD32_BYTE( "945_l04b.k8", 0x180000, 0x20000, CRC(843bc67d) SHA1(cdf8421083f24ab27867ed5d08d8949da192b2b9) )
-	ROM_LOAD32_BYTE( "945_l04d.m8", 0x180001, 0x20000, CRC(0a98d08e) SHA1(1e0ca51a2d45c01fa3f11950ddd387f41ddae691) )
-	ROM_LOAD32_BYTE( "945_l03b.e8", 0x180002, 0x20000, CRC(933e68b9) SHA1(f3a39446ca77d17fdbd938bd5f718ae9d5570879) )
-	ROM_LOAD32_BYTE( "945_l03d.h8", 0x180003, 0x20000, CRC(f375e87b) SHA1(6427b966795c907c8e516244872fe52217da62c4) )
+	ROM_LOAD32_WORD_SWAP( "945_a02.l3",  0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
+	ROM_LOAD32_WORD_SWAP( "945_a01.h3",  0x000002, 0x80000, CRC(339d6dd2) SHA1(6a52b826aba92c75fc6a5926184948735dc20812) )
+	ROM_LOAD32_BYTE(      "945_l04c.m6", 0x100000, 0x20000, CRC(45bcd921) SHA1(e51a8a71362a6fb55124aa1dce74519c0a3c6e3f) )
+	ROM_LOAD32_BYTE(      "945_l04a.k6", 0x100001, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )
+	ROM_LOAD32_BYTE(      "945_l03c.h6", 0x100002, 0x20000, CRC(a56be17a) SHA1(1d387736144c30fcb5de54235331ab1ff70c356e) )
+	ROM_LOAD32_BYTE(      "945_l03a.e6", 0x100003, 0x20000, CRC(a67ef087) SHA1(fd63474f3bbde5dfc53ed4c1db25d6411a8b54d2) )
+	ROM_LOAD32_BYTE(      "945_l04d.m8", 0x180000, 0x20000, CRC(0a98d08e) SHA1(1e0ca51a2d45c01fa3f11950ddd387f41ddae691) )
+	ROM_LOAD32_BYTE(      "945_l04b.k8", 0x180001, 0x20000, CRC(843bc67d) SHA1(cdf8421083f24ab27867ed5d08d8949da192b2b9) )
+	ROM_LOAD32_BYTE(      "945_l03d.h8", 0x180002, 0x20000, CRC(f375e87b) SHA1(6427b966795c907c8e516244872fe52217da62c4) )
+	ROM_LOAD32_BYTE(      "945_l03b.e8", 0x180003, 0x20000, CRC(933e68b9) SHA1(f3a39446ca77d17fdbd938bd5f718ae9d5570879) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "945l14.j28", 0x0000, 0x0100, CRC(c778c189) SHA1(847eaf379ba075c25911c6f83dd63ff390534f60) )  /* priority encoder (not used) */
@@ -443,23 +400,23 @@ ROM_START( gradius3js )
 	ROM_LOAD( "945_m05.d9", 0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) )
 
 	ROM_REGION( 0x200000, "k051960", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD32_BYTE( "945_a02a.k2", 0x000000, 0x20000, CRC(fbb81511) SHA1(e7988d52e323e46117f5080c469daf9b119f28a0) )
-	ROM_LOAD32_BYTE( "945_a02c.m2", 0x000001, 0x20000, CRC(031b55e8) SHA1(64ed8dee60bf012df7c1ed496af1c75263c052a6) )
-	ROM_LOAD32_BYTE( "945_a01a.e2", 0x000002, 0x20000, CRC(bace5abb) SHA1(b32df63294c0730f463335b1b760494389c60062) )
-	ROM_LOAD32_BYTE( "945_a01c.h2", 0x000003, 0x20000, CRC(d91b29a6) SHA1(0c3027a08996f4c2b86dd88695241b21c8dffd64) )
-	ROM_LOAD32_BYTE( "945_a02b.k4", 0x080000, 0x20000, CRC(c0fed4ab) SHA1(f01975b13759cae7c8dfd24f9b3f4ac960d32957) )
-	ROM_LOAD32_BYTE( "945_a02d.m4", 0x080001, 0x20000, CRC(d462817c) SHA1(00137e38454e7c3548a1a9553c5ee644916b3959) )
-	ROM_LOAD32_BYTE( "945_a01b.e4", 0x080002, 0x20000, CRC(b426090e) SHA1(06a671a648e3255146fe0c325d5451d4f75f08aa) )
-	ROM_LOAD32_BYTE( "945_a01d.h4", 0x080003, 0x20000, CRC(3990c09a) SHA1(1f6a089c1d03fb95d4d96fecc0379bde26ee2b9d) )
+	ROM_LOAD32_BYTE( "945_a02c.m2", 0x000000, 0x20000, CRC(031b55e8) SHA1(64ed8dee60bf012df7c1ed496af1c75263c052a6) )
+	ROM_LOAD32_BYTE( "945_a02a.k2", 0x000001, 0x20000, CRC(fbb81511) SHA1(e7988d52e323e46117f5080c469daf9b119f28a0) )
+	ROM_LOAD32_BYTE( "945_a01c.h2", 0x000002, 0x20000, CRC(d91b29a6) SHA1(0c3027a08996f4c2b86dd88695241b21c8dffd64) )
+	ROM_LOAD32_BYTE( "945_a01a.e2", 0x000003, 0x20000, CRC(bace5abb) SHA1(b32df63294c0730f463335b1b760494389c60062) )
+	ROM_LOAD32_BYTE( "945_a02d.m4", 0x080000, 0x20000, CRC(d462817c) SHA1(00137e38454e7c3548a1a9553c5ee644916b3959) )
+	ROM_LOAD32_BYTE( "945_a02b.k4", 0x080001, 0x20000, CRC(c0fed4ab) SHA1(f01975b13759cae7c8dfd24f9b3f4ac960d32957) )
+	ROM_LOAD32_BYTE( "945_a01d.h4", 0x080002, 0x20000, CRC(3990c09a) SHA1(1f6a089c1d03fb95d4d96fecc0379bde26ee2b9d) )
+	ROM_LOAD32_BYTE( "945_a01b.e4", 0x080003, 0x20000, CRC(b426090e) SHA1(06a671a648e3255146fe0c325d5451d4f75f08aa) )
 
-	ROM_LOAD32_BYTE( "945_l04a.k6", 0x100000, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )
-	ROM_LOAD32_BYTE( "945_l04c.m6", 0x100001, 0x20000, CRC(45bcd921) SHA1(e51a8a71362a6fb55124aa1dce74519c0a3c6e3f) )
-	ROM_LOAD32_BYTE( "945_l03a.e6", 0x100002, 0x20000, CRC(a67ef087) SHA1(fd63474f3bbde5dfc53ed4c1db25d6411a8b54d2) )
-	ROM_LOAD32_BYTE( "945_l03c.h6", 0x100003, 0x20000, CRC(a56be17a) SHA1(1d387736144c30fcb5de54235331ab1ff70c356e) )
-	ROM_LOAD32_BYTE( "945_l04b.k8", 0x180000, 0x20000, CRC(843bc67d) SHA1(cdf8421083f24ab27867ed5d08d8949da192b2b9) )
-	ROM_LOAD32_BYTE( "945_l04d.m8", 0x180001, 0x20000, CRC(0a98d08e) SHA1(1e0ca51a2d45c01fa3f11950ddd387f41ddae691) )
-	ROM_LOAD32_BYTE( "945_l03b.e8", 0x180002, 0x20000, CRC(933e68b9) SHA1(f3a39446ca77d17fdbd938bd5f718ae9d5570879) )
-	ROM_LOAD32_BYTE( "945_l03d.h8", 0x180003, 0x20000, CRC(f375e87b) SHA1(6427b966795c907c8e516244872fe52217da62c4) )
+	ROM_LOAD32_BYTE( "945_l04c.m6", 0x100000, 0x20000, CRC(45bcd921) SHA1(e51a8a71362a6fb55124aa1dce74519c0a3c6e3f) )
+	ROM_LOAD32_BYTE( "945_l04a.k6", 0x100001, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )
+	ROM_LOAD32_BYTE( "945_l03c.h6", 0x100002, 0x20000, CRC(a56be17a) SHA1(1d387736144c30fcb5de54235331ab1ff70c356e) )
+	ROM_LOAD32_BYTE( "945_l03a.e6", 0x100003, 0x20000, CRC(a67ef087) SHA1(fd63474f3bbde5dfc53ed4c1db25d6411a8b54d2) )
+	ROM_LOAD32_BYTE( "945_l04d.m8", 0x180000, 0x20000, CRC(0a98d08e) SHA1(1e0ca51a2d45c01fa3f11950ddd387f41ddae691) )
+	ROM_LOAD32_BYTE( "945_l04b.k8", 0x180001, 0x20000, CRC(843bc67d) SHA1(cdf8421083f24ab27867ed5d08d8949da192b2b9) )
+	ROM_LOAD32_BYTE( "945_l03d.h8", 0x180002, 0x20000, CRC(f375e87b) SHA1(6427b966795c907c8e516244872fe52217da62c4) )
+	ROM_LOAD32_BYTE( "945_l03b.e8", 0x180003, 0x20000, CRC(933e68b9) SHA1(f3a39446ca77d17fdbd938bd5f718ae9d5570879) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "945l14.j28", 0x0000, 0x0100, CRC(c778c189) SHA1(847eaf379ba075c25911c6f83dd63ff390534f60) )  /* priority encoder (not used) */
@@ -490,16 +447,16 @@ ROM_START( gradius3a )
 	ROM_LOAD( "945_m05.d9", 0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) )
 
 	ROM_REGION( 0x200000, "k051960", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD32_WORD( "945_a02.l3",  0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
-	ROM_LOAD32_WORD( "945_a01.h3",  0x000002, 0x80000, CRC(339d6dd2) SHA1(6a52b826aba92c75fc6a5926184948735dc20812) )
-	ROM_LOAD32_BYTE( "945_l04a.k6", 0x100000, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )
-	ROM_LOAD32_BYTE( "945_l04c.m6", 0x100001, 0x20000, CRC(45bcd921) SHA1(e51a8a71362a6fb55124aa1dce74519c0a3c6e3f) )
-	ROM_LOAD32_BYTE( "945_l03a.e6", 0x100002, 0x20000, CRC(a67ef087) SHA1(fd63474f3bbde5dfc53ed4c1db25d6411a8b54d2) )
-	ROM_LOAD32_BYTE( "945_l03c.h6", 0x100003, 0x20000, CRC(a56be17a) SHA1(1d387736144c30fcb5de54235331ab1ff70c356e) )
-	ROM_LOAD32_BYTE( "945_l04b.k8", 0x180000, 0x20000, CRC(843bc67d) SHA1(cdf8421083f24ab27867ed5d08d8949da192b2b9) )
-	ROM_LOAD32_BYTE( "945_l04d.m8", 0x180001, 0x20000, CRC(0a98d08e) SHA1(1e0ca51a2d45c01fa3f11950ddd387f41ddae691) )
-	ROM_LOAD32_BYTE( "945_l03b.e8", 0x180002, 0x20000, CRC(933e68b9) SHA1(f3a39446ca77d17fdbd938bd5f718ae9d5570879) )
-	ROM_LOAD32_BYTE( "945_l03d.h8", 0x180003, 0x20000, CRC(f375e87b) SHA1(6427b966795c907c8e516244872fe52217da62c4) )
+	ROM_LOAD32_WORD_SWAP( "945_a02.l3",  0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
+	ROM_LOAD32_WORD_SWAP( "945_a01.h3",  0x000002, 0x80000, CRC(339d6dd2) SHA1(6a52b826aba92c75fc6a5926184948735dc20812) )
+	ROM_LOAD32_BYTE(      "945_l04c.m6", 0x100000, 0x20000, CRC(45bcd921) SHA1(e51a8a71362a6fb55124aa1dce74519c0a3c6e3f) )
+	ROM_LOAD32_BYTE(      "945_l04a.k6", 0x100001, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )
+	ROM_LOAD32_BYTE(      "945_l03c.h6", 0x100002, 0x20000, CRC(a56be17a) SHA1(1d387736144c30fcb5de54235331ab1ff70c356e) )
+	ROM_LOAD32_BYTE(      "945_l03a.e6", 0x100003, 0x20000, CRC(a67ef087) SHA1(fd63474f3bbde5dfc53ed4c1db25d6411a8b54d2) )
+	ROM_LOAD32_BYTE(      "945_l04d.m8", 0x180000, 0x20000, CRC(0a98d08e) SHA1(1e0ca51a2d45c01fa3f11950ddd387f41ddae691) )
+	ROM_LOAD32_BYTE(      "945_l04b.k8", 0x180001, 0x20000, CRC(843bc67d) SHA1(cdf8421083f24ab27867ed5d08d8949da192b2b9) )
+	ROM_LOAD32_BYTE(      "945_l03d.h8", 0x180002, 0x20000, CRC(f375e87b) SHA1(6427b966795c907c8e516244872fe52217da62c4) )
+	ROM_LOAD32_BYTE(      "945_l03b.e8", 0x180003, 0x20000, CRC(933e68b9) SHA1(f3a39446ca77d17fdbd938bd5f718ae9d5570879) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "945l14.j28", 0x0000, 0x0100, CRC(c778c189) SHA1(847eaf379ba075c25911c6f83dd63ff390534f60) )  /* priority encoder (not used) */
@@ -512,7 +469,7 @@ ROM_END
 
 
 
-GAME( 1989, gradius3,   0,        gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (World, program code R)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3j,  gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Japan, program code S)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3js, gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Japan, program code S, split)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3a,  gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Asia)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3,   0,        gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (World, program code R)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3j,  gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III - Densetsu kara Shinwa e (Japan, program code S)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3js, gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III - Densetsu kara Shinwa e (Japan, program code S, split)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3a,  gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Asia)",                                                  MACHINE_SUPPORTS_SAVE )

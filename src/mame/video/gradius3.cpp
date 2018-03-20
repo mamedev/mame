@@ -74,11 +74,6 @@ void gradius3_state::video_start()
 
 ***************************************************************************/
 
-READ16_MEMBER(gradius3_state::gradius3_gfxrom_r)
-{
-	return (m_gfxrom[2 * offset + 1] << 8) | m_gfxrom[2 * offset];
-}
-
 WRITE16_MEMBER(gradius3_state::gradius3_gfxram_w)
 {
 	int oldword = m_gfxram[offset];
