@@ -74,12 +74,12 @@ void gradius3_state::video_start()
 
 ***************************************************************************/
 
-READ16_MEMBER(gradius3_state::gradius3_gfxrom_r)
+READ16_MEMBER(gradius3_state::gfxrom_r)
 {
 	return (m_gfxrom[2 * offset + 1] << 8) | m_gfxrom[2 * offset];
 }
 
-WRITE16_MEMBER(gradius3_state::gradius3_gfxram_w)
+WRITE16_MEMBER(gradius3_state::gfxram_w)
 {
 	int oldword = m_gfxram[offset];
 
@@ -95,7 +95,7 @@ WRITE16_MEMBER(gradius3_state::gradius3_gfxram_w)
 
 ***************************************************************************/
 
-uint32_t gradius3_state::screen_update_gradius3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gradius3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* TODO: this kludge enforces the char banks. For some reason, they don't work otherwise. */
 	address_space &space = machine().dummy_space();

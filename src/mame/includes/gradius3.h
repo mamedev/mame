@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /*************************************************************************
 
-    Gradius 3
+    Gradius III
 
 *************************************************************************/
 
@@ -16,15 +16,17 @@ class gradius3_state : public driver_device
 {
 public:
 	gradius3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_gfxram(*this, "k052109"),
-		m_gfxrom(*this, "k051960"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub"),
-		m_k007232(*this, "k007232"),
-		m_k052109(*this, "k052109"),
-		m_k051960(*this, "k051960") { }
+		: driver_device(mconfig, type, tag)
+		, m_gfxram(*this, "k052109")
+		, m_gfxrom(*this, "k051960")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_subcpu(*this, "sub")
+		, m_k007232(*this, "k007232")
+		, m_k052109(*this, "k052109")
+		, m_k051960(*this, "k051960")
+	{
+	}
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_gfxram;
@@ -43,23 +45,17 @@ public:
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
 
-	DECLARE_READ16_MEMBER(k052109_halfword_r);
-	DECLARE_WRITE16_MEMBER(k052109_halfword_w);
-	DECLARE_READ16_MEMBER(k051937_halfword_r);
-	DECLARE_WRITE16_MEMBER(k051937_halfword_w);
-	DECLARE_READ16_MEMBER(k051960_halfword_r);
-	DECLARE_WRITE16_MEMBER(k051960_halfword_w);
-	DECLARE_WRITE16_MEMBER(cpuA_ctrl_w);
-	DECLARE_WRITE16_MEMBER(cpuB_irqenable_w);
+	DECLARE_WRITE8_MEMBER(cpuA_ctrl_w);
+	DECLARE_WRITE8_MEMBER(cpuB_irqenable_w);
 	DECLARE_WRITE16_MEMBER(cpuB_irqtrigger_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
-	DECLARE_READ16_MEMBER(gradius3_gfxrom_r);
-	DECLARE_WRITE16_MEMBER(gradius3_gfxram_w);
+	DECLARE_READ16_MEMBER(gfxrom_r);
+	DECLARE_WRITE16_MEMBER(gfxram_w);
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_gradius3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cpuA_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gradius3_sub_scanline);
 	void gradius3_postload();
