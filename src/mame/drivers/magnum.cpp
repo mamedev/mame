@@ -21,23 +21,137 @@ class magnum_state : public driver_device
 public:
 	magnum_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_beep(*this, "beep")
 	{
 	}
 	void magnum(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(wake);
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
 private:
 	DECLARE_WRITE8_MEMBER(beep_w);
+	DECLARE_READ8_MEMBER(sysctl_r);
+	DECLARE_WRITE8_MEMBER(sysctl_w);
+	DECLARE_READ16_MEMBER(irqstat_r);
+	DECLARE_WRITE16_MEMBER(port50_w);
+	DECLARE_WRITE_LINE_MEMBER(rtcirq_w);
 
+	void check_irq();
 	void magnum_io(address_map &map);
 	void magnum_map(address_map &map);
 	void magnum_lcdc(address_map &map);
 
+	required_device<i80186_cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
+
+	u8 m_key;
+	bool m_wake, m_rtcirq, m_keybirq;
 };
+
+void magnum_state::check_irq()
+{
+	if(m_rtcirq || m_keybirq)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_maincpu->int0_w(ASSERT_LINE);
+		m_wake = true;
+	}
+	else
+		m_maincpu->int0_w(CLEAR_LINE);
+}
+
+INPUT_CHANGED_MEMBER(magnum_state::wake)
+{
+	m_key = ((uint8_t)(uintptr_t)(param) & 0xff);
+	m_keybirq = true;
+	check_irq();
+}
+
+static INPUT_PORTS_START(magnum)
+	PORT_START("ROW.0")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 0)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 1)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 4)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 5)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 8)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 9)
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 12)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 13)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 2) // all 0x4 bits in every nibble also repeated in row 4+
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 3) // all 0x8 bits in every nibble also repeated in row 4+
+	PORT_START("ROW.1")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 16)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB) PORT_CHAR(9) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 17)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 20)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 21)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 24)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 25)
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 28)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 29)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 18)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 19)
+	PORT_START("ROW.2")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 32)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 33)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 36)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 37)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 40)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 41)
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 44)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 45)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 34)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 35)
+	PORT_START("ROW.3")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 48)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 49)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 52)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 53)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 56)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 57)
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('`') PORT_CHAR('~') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 60)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 61)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 50)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 51)
+	PORT_START("ROW.4")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 64)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 65)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 68)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 69)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 72)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('$') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 73)
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 76)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 77)
+	PORT_START("ROW.5")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 80)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 81)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 84)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 85)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 88)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC)) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 89)
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 92)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 93)
+	PORT_START("ROW.6")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 96)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 97)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 100)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 101)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 104)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 105)
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 108)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 109)
+	PORT_START("ROW.7")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 112)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 113)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 116)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 117)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 120)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 121)
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 124)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 125)
+INPUT_PORTS_END
 
 void magnum_state::machine_start()
 {
@@ -45,11 +159,12 @@ void magnum_state::machine_start()
 
 void magnum_state::machine_reset()
 {
+	m_wake = true;
 }
 
 WRITE8_MEMBER(magnum_state::beep_w)
 {
-	if (data & ~1) printf("beep_w unmapped bits %02x\n", data);
+	if (data & ~1) logerror("beep_w unmapped bits %02x\n", data);
 	m_beep->set_state(BIT(data, 0));
 }
 
@@ -57,6 +172,76 @@ void magnum_state::magnum_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).ram(); // fixed 256k for now
 	map(0xe0000, 0xfffff).rom().region("bios", 0);
+}
+
+READ8_MEMBER(magnum_state::sysctl_r)
+{
+	switch(offset)
+	{
+		case 0:
+			return m_key;
+		case 1:
+		{
+			u8 ret = m_keybirq ? 1 : 0;
+			m_keybirq = false;
+			check_irq();
+			return ret;
+		}
+	}
+	return 0;
+}
+
+WRITE8_MEMBER(magnum_state::sysctl_w)
+{
+	switch(offset)
+	{
+		case 0:
+			break;
+		case 2:
+			m_maincpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+			break;
+		case 4:
+			break;
+		case 6:
+			break;
+		case 12:
+			break;
+	}
+}
+
+/* IRQs
+ * bit	0 -
+ * 		1 -
+ * 		2 -
+ * 		3 -
+ * 		4 -
+ * 		5 - Keyboard?
+ * 		6 - RTC?
+ * 		7 -
+ * 		8 - UART1?
+ * 		9 - UART2?
+ * 		10- Reset?
+ * 		11-14 ...
+ * 		15- CRTC?
+ */
+
+READ16_MEMBER(magnum_state::irqstat_r)
+{
+	u16 ret = m_wake ? 0 : 0x400;
+	ret |= m_rtcirq ? 0x40 : 0;
+	ret |= m_keybirq ? 0x20 : 0;
+	m_wake = false;
+	return ret;
+}
+
+WRITE16_MEMBER(magnum_state::port50_w)
+{
+}
+
+WRITE_LINE_MEMBER(magnum_state::rtcirq_w)
+{
+	m_rtcirq = state == ASSERT_LINE;
+	check_irq();
 }
 
 void magnum_state::magnum_io(address_map &map)
@@ -69,6 +254,8 @@ void magnum_state::magnum_io(address_map &map)
 	map(0x001a, 0x001b).rw("lcdc2", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 	map(0x001c, 0x001d).rw("lcdc1", FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
 	map(0x001e, 0x001f).rw("lcdc1", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
+	map(0x0040, 0x004f).rw(this, FUNC(magnum_state::sysctl_r), FUNC(magnum_state::sysctl_w));
+	map(0x0050, 0x0051).rw(this, FUNC(magnum_state::irqstat_r), FUNC(magnum_state::port50_w));
 	map(0x0056, 0x0056).w(this, FUNC(magnum_state::beep_w));
 	map(0x0080, 0x008f).rw("rtc", FUNC(cdp1879_device::read), FUNC(cdp1879_device::write)).umask16(0x00ff);
 	//map(0x0100, 0x0107).rw("fdc", FUNC(wd1793_device::read), FUNC(wd1793_device::write)).umask16(0x00ff);
@@ -85,6 +272,7 @@ MACHINE_CONFIG_START(magnum_state::magnum)
 	MCFG_CPU_IO_MAP(magnum_io)
 
 	MCFG_DEVICE_ADD("rtc", CDP1879, XTAL(32'768))
+	MCFG_CDP1879_IRQ_CALLBACK(WRITELINE(magnum_state, rtcirq_w))
 
 	MCFG_SCREEN_ADD("screen1", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -134,4 +322,4 @@ ROM_START( magnum )
 	ROM_LOAD("dulmontcharrom.bin", 0x0000, 0x1000, CRC(9dff89bf) SHA1(d359aeba7f0b0c81accf3bca25e7da636c033721))
 ROM_END
 
-COMP( 1983, magnum, 0, 0, magnum, 0, magnum_state, 0, "Dulmont", "Magnum", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1983, magnum, 0, 0, magnum, magnum, magnum_state, 0, "Dulmont", "Magnum", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
