@@ -123,9 +123,7 @@ const tiny_rom_entry *m1comm_device::device_rom_region() const
 
 m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, M1COMM, tag, owner, clock),
-	m_commcpu(*this, Z80_TAG),
-	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
-	m_line_tx(OPEN_FLAG_READ)
+	m_commcpu(*this, Z80_TAG)
 {
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
@@ -327,31 +325,38 @@ void m1comm_device::comm_tick()
 		bool isSlave = (m_shared[1] == 0x02);
 		bool isRelay = (m_shared[1] == 0x00);
 
-		// if link not yet established...
-		if (m_linkalive == 0x00)
+		if (m_linkalive == 0x02)
 		{
-			// waiting...
+			// link failed...
+			m_shared[0] = 0xff;
+			return;
+		}
+		else if (m_linkalive == 0x00)
+		{
+			// link not yet established...
 			m_shared[0] = 0x05;
 
 			// check rx socket
-			if (!m_line_rx.is_open())
+			if (!m_line_rx)
 			{
 				osd_printf_verbose("M1COMM: listen on %s\n", m_localhost);
-				m_line_rx.open(m_localhost);
+				uint64_t filesize; // unused
+				osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 			}
 
 			// check tx socket
-			if (!m_line_tx.is_open())
+			if (!m_line_tx)
 			{
 				osd_printf_verbose("M1COMM: connect to %s\n", m_remotehost);
-				m_line_tx.open(m_remotehost);
+				uint64_t filesize; // unused
+				osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 			}
 
 			// if both sockets are there check ring
-			if ((m_line_rx.is_open()) && (m_line_tx.is_open()))
+			if (m_line_rx && m_line_tx)
 			{
 				// try to read one message
-				recv = read_data(dataSize);
+				recv = read_frame(dataSize);
 				while (recv > 0)
 				{
 					// check message id
@@ -377,7 +382,7 @@ void m1comm_device::comm_tick()
 							}
 
 							// forward message to other nodes
-							m_line_tx.write(m_buffer0, dataSize);
+							send_frame(dataSize);
 						}
 					}
 
@@ -389,7 +394,7 @@ void m1comm_device::comm_tick()
 							m_linkcount = m_buffer0[1];
 
 							// forward message to other nodes
-							m_line_tx.write(m_buffer0, dataSize);
+							send_frame(dataSize);
 						}
 
 						// consider it done
@@ -405,7 +410,7 @@ void m1comm_device::comm_tick()
 
 
 					if (m_linkalive == 0x00)
-						recv = read_data(dataSize);
+						recv = read_frame(dataSize);
 					else
 						recv = 0;
 				}
@@ -418,7 +423,7 @@ void m1comm_device::comm_tick()
 					{
 						m_buffer0[0] = 0xff;
 						m_buffer0[1] = 0x01;
-						m_line_tx.write(m_buffer0, dataSize);
+						send_frame(dataSize);
 					}
 
 					// send second packet
@@ -426,7 +431,7 @@ void m1comm_device::comm_tick()
 					{
 						m_buffer0[0] = 0xfe;
 						m_buffer0[1] = m_linkcount;
-						m_line_tx.write(m_buffer0, dataSize);
+						send_frame(dataSize);
 
 						// consider it done
 						osd_printf_verbose("M1COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
@@ -448,13 +453,13 @@ void m1comm_device::comm_tick()
 			}
 		}
 
-		// if link established
 		if (m_linkalive == 0x01)
 		{
+			// link established
 			do
 			{
 				// try to read a message
-				recv = read_data(dataSize);
+				recv = read_frame(dataSize);
 				while (recv > 0)
 				{
 					// check if valid id
@@ -472,7 +477,7 @@ void m1comm_device::comm_tick()
 							}
 
 							// forward message to other nodes
-							m_line_tx.write(m_buffer0, dataSize);
+							send_frame(dataSize);
 						}
 					}
 					else
@@ -483,7 +488,7 @@ void m1comm_device::comm_tick()
 							m_linktimer = 0x00;
 							if (!isMaster)
 								// forward message to other nodes
-								m_line_tx.write(m_buffer0, dataSize);
+								send_frame(dataSize);
 						}
 						if (idx == 0xfd)
 						{
@@ -498,13 +503,13 @@ void m1comm_device::comm_tick()
 								}
 
 								// forward message to other nodes
-								m_line_tx.write(m_buffer0, dataSize);
+								send_frame(dataSize);
 							}
 						}
 					}
 
 					// try to read another message
-					recv = read_data(dataSize);
+					recv = read_frame(dataSize);
 				}
 			}
 			while (m_linktimer == 0x01);
@@ -529,15 +534,15 @@ void m1comm_device::comm_tick()
 					}
 				}
 
-				// master sends additional status bytes
 				if (isMaster)
 				{
+					// master sends additional status bytes
 					send_data(0xfd, 0x06, 0x0a, dataSize);
 
 					// send vsync
 					m_buffer0[0] = 0xfc;
 					m_buffer0[1] = 0x01;
-					m_line_tx.write(m_buffer0, dataSize);
+					send_frame(dataSize);
 				}
 			}
 
@@ -547,42 +552,53 @@ void m1comm_device::comm_tick()
 	}
 }
 
-int m1comm_device::read_data(int dataSize)
+int m1comm_device::read_frame(int dataSize)
 {
-	// try to read one messages
-	int recv = m_line_rx.read(m_buffer0, dataSize);
+	if (!m_line_rx)
+		return 0;
+
+	// try to read a message
+	std::uint32_t recv = 0;
+	osd_file::error filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
 	if (recv > 0)
 	{
-		// check if complete message
+		// check if message complete
 		if (recv != dataSize)
 		{
-			// got only part of a message - read the rest
-			int togo = dataSize - recv;
+			// only part of a message - read on
+			std::uint32_t togo = dataSize - recv;
 			int offset = recv;
 			while (togo > 0)
 			{
-				recv = m_line_rx.read(m_buffer1, togo);
-				for (int i = 0x00 ; i < recv ; i++)
+				filerr = m_line_rx->read(m_buffer1, 0, togo, recv);
+				if (recv > 0)
 				{
-					m_buffer0[offset + i] = m_buffer1[i];
+					for (int i = 0 ; i < recv ; i++)
+					{
+						m_buffer0[offset + i] = m_buffer1[i];
+					}
+					togo -= recv;
+					offset += recv;
 				}
-				togo -= recv;
-				offset += recv;
+				else if (filerr == osd_file::error::NONE && recv == 0)
+				{
+					togo = 0;
+				}
 			}
 		}
 	}
-	else if (recv < 0)
+	else if (filerr == osd_file::error::NONE && recv == 0)
 	{
 		if (m_linkalive == 0x01)
 		{
-			osd_printf_verbose("M1COMM: connection lost\n");
+			osd_printf_verbose("M1COMM: rx connection lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
 
 			m_shared[0] = 0xff;
 
-			m_line_rx.close();
-			m_line_tx.close();
+			m_line_rx.reset();
+			m_line_tx.reset();
 		}
 	}
 	return recv;
@@ -595,7 +611,30 @@ void m1comm_device::send_data(uint8_t frameType, int frameStart, int frameSize, 
 	{
 		m_buffer0[1 + i] = m_shared[frameStart + i];
 	}
-	// forward message to next node
-	m_line_tx.write(m_buffer0, dataSize);
+	send_frame(dataSize);
+}
+
+void m1comm_device::send_frame(int dataSize){
+	if (!m_line_tx)
+		return;
+
+	osd_file::error filerr;
+	std::uint32_t written;
+
+	filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
+	if (filerr != osd_file::error::NONE)
+	{
+		if (m_linkalive == 0x01)
+		{
+			osd_printf_verbose("M1COMM: tx connection lost\n");
+			m_linkalive = 0x02;
+			m_linktimer = 0x00;
+
+			m_shared[0] = 0xff;
+
+			m_line_rx.reset();
+			m_line_tx.reset();
+		}
+	}
 }
 #endif
