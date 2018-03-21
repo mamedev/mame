@@ -352,7 +352,7 @@ void m1comm_device::comm_tick()
 			{
 				// try to read one message
 				recv = read_data(dataSize);
-				while (recv != 0)
+				while (recv > 0)
 				{
 					// check message id
 					idx = m_buffer0[0];
@@ -455,7 +455,7 @@ void m1comm_device::comm_tick()
 			{
 				// try to read a message
 				recv = read_data(dataSize);
-				while (recv != 0)
+				while (recv > 0)
 				{
 					// check if valid id
 					idx = m_buffer0[0];
@@ -481,6 +481,9 @@ void m1comm_device::comm_tick()
 						{
 							// 0xFC - VSYNC
 							m_linktimer = 0x00;
+							if (!isMaster)
+								// forward message to other nodes
+								m_line_tx.write(m_buffer0, dataSize);
 						}
 						if (idx == 0xfd)
 						{
@@ -506,11 +509,6 @@ void m1comm_device::comm_tick()
 			}
 			while (m_linktimer == 0x01);
 
-			// send vsync
-			m_buffer0[0] = 0xfc;
-			m_buffer0[1] = 0x01;
-			m_line_tx.write(m_buffer0, dataSize);
-
 			// enable wait for vsync
 			m_linktimer = m_framesync;
 
@@ -518,12 +516,6 @@ void m1comm_device::comm_tick()
 			// live relay does not send data
 			if (m_linkid != 0x00)
 			{
-				// master sends additional status bytes
-				if (isMaster)
-				{
-					send_data(0xfd, 0x06, 0x0a, dataSize);
-				}
-
 				// check ready-to-send flag
 				if (m_shared[4] != 0x00)
 				{
@@ -535,6 +527,17 @@ void m1comm_device::comm_tick()
 					{
 						m_shared[frameOffset + j] = m_buffer0[1 + j];
 					}
+				}
+
+				// master sends additional status bytes
+				if (isMaster)
+				{
+					send_data(0xfd, 0x06, 0x0a, dataSize);
+
+					// send vsync
+					m_buffer0[0] = 0xfc;
+					m_buffer0[1] = 0x01;
+					m_line_tx.write(m_buffer0, dataSize);
 				}
 			}
 
@@ -566,6 +569,20 @@ int m1comm_device::read_data(int dataSize)
 				togo -= recv;
 				offset += recv;
 			}
+		}
+	}
+	else if (recv < 0)
+	{
+		if (m_linkalive == 0x01)
+		{
+			osd_printf_verbose("M1COMM: connection lost\n");
+			m_linkalive = 0x02;
+			m_linktimer = 0x00;
+
+			m_shared[0] = 0xff;
+
+			m_line_rx.close();
+			m_line_tx.close();
 		}
 	}
 	return recv;
