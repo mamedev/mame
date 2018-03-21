@@ -353,10 +353,15 @@ void m2comm_device::comm_tick()
 		bool isSlave = (m_fg == 0x00 && m_shared[1] == 0x02);
 		bool isRelay = (m_fg == 0x00 && m_shared[1] == 0x00);
 
-		// if link not yet established...
-		if (m_linkalive == 0x00)
+		if (m_linkalive == 0x02)
 		{
-			// waiting...
+			// link failed...
+			m_shared[0] = 0xff;
+			return;
+		}
+		else if (m_linkalive == 0x00)
+		{
+			// link not yet established...
 			m_shared[0] = 0x00;
 			m_shared[2] = 0xff;
 			m_shared[3] = 0xff;
@@ -638,7 +643,7 @@ int m2comm_device::read_frame(int dataSize)
 				filerr = m_line_rx->read(m_buffer1, 0, togo, recv);
 				if (recv > 0)
 				{
-					for (int i = 0x0000 ; i < recv ; i++)
+					for (int i = 0 ; i < recv ; i++)
 					{
 						m_buffer0[offset + i] = m_buffer1[i];
 					}
@@ -659,11 +664,7 @@ int m2comm_device::read_frame(int dataSize)
 			osd_printf_verbose("M2COMM: rx connection lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
-
-			m_shared[0] = 0xff;
-
 			m_line_rx.reset();
-			m_line_tx.reset();
 		}
 	}
 	return recv;
@@ -694,10 +695,6 @@ void m2comm_device::send_frame(int dataSize){
 			osd_printf_verbose("M2COMM: tx connection lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
-
-			m_shared[0] = 0xff;
-
-			m_line_rx.reset();
 			m_line_tx.reset();
 		}
 	}
