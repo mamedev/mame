@@ -6,6 +6,18 @@
 #pragma once
 
 
+#define MCFG_SCN2672_INTR_CALLBACK(_intr) \
+	devcb = &downcast<scn2672_device &>(*device).set_intr_callback(DEVCB_##_intr);
+
+#define MCFG_SCN2672_CHARACTER_WIDTH(_value) \
+	downcast<scn2672_device &>(*device).set_character_width(_value);
+
+#define MCFG_SCN2672_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
+	downcast<scn2672_device &>(*device).set_display_callback(scn2672_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
+
+#define SCN2672_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint16_t address, uint8_t cursor, uint8_t dw, uint8_t lg, uint8_t ul, uint8_t blink)
+
+
 #define MCFG_SCN2674_INTR_CALLBACK(_intr) \
 	devcb = &downcast<scn2674_device &>(*device).set_intr_callback(DEVCB_##_intr);
 
@@ -16,6 +28,7 @@
 	downcast<scn2674_device &>(*device).set_display_callback(scn2674_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define SCN2674_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint16_t address, uint8_t cursor, uint8_t dw, uint8_t lg, uint8_t ul, uint8_t blink)
+
 
 class scn2674_device : public device_t,
 						public device_video_interface,
@@ -39,13 +52,15 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+	scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual space_config_vector memory_space_config() const override;
 
-private:
+//protected:
 	bitmap_rgb32 m_bitmap;
 	devcb_write_line m_intr_cb;
 
@@ -99,7 +114,7 @@ private:
 	uint16_t m_address;
 	int m_start1change;
 
-	void write_init_regs(uint8_t data);
+	virtual void write_init_regs(uint8_t data);
 	void set_gfx_enabled(bool enabled);
 	void set_display_enabled(bool enabled, int n);
 	void set_cursor_enabled(bool enabled);
@@ -121,7 +136,17 @@ private:
 	};
 };
 
+class scn2672_device : public scn2674_device
+{
+public:
+	scn2672_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	virtual void write_init_regs(uint8_t data);
+};
+
+
+DECLARE_DEVICE_TYPE(SCN2672, scn2672_device)
 DECLARE_DEVICE_TYPE(SCN2674, scn2674_device)
 
 #endif // MAME_VIDEO_SCN2674_H

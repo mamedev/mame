@@ -13,7 +13,7 @@ TeleVideo 9320 appears to run on similar hardware with a 2681 DUART replacing th
 #include "cpu/g65816/g65816.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
-//#include "video/scn2674.h"
+#include "video/scn2674.h"
 #include "screen.h"
 
 class tv965_state : public driver_device
@@ -27,7 +27,7 @@ public:
 
 	void tv965(machine_config &config);
 private:
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
 
 	DECLARE_READ8_MEMBER(ga_hack_r);
 
@@ -38,9 +38,8 @@ private:
 	required_device<screen_device> m_screen;
 };
 
-u32 tv965_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+SCN2672_DRAW_CHARACTER_MEMBER(tv965_state::draw_character)
 {
-	return 0;
 }
 
 READ8_MEMBER(tv965_state::ga_hack_r)
@@ -51,6 +50,7 @@ READ8_MEMBER(tv965_state::ga_hack_r)
 void tv965_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x01fff).ram().share("nvram");
+	map(0x02000, 0x02007).rw("crtc", FUNC(scn2672_device::read), FUNC(scn2672_device::write));
 	map(0x04000, 0x04000).r(this, FUNC(tv965_state::ga_hack_r));
 	map(0x06200, 0x06203).rw("acia1", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x06400, 0x06403).rw("acia2", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
@@ -80,12 +80,13 @@ MACHINE_CONFIG_START(tv965_state::tv965)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(26.9892_MHz_XTAL, 1020, 0, 800, 378, 0, 350)
 	//MCFG_SCREEN_RAW_PARAMS(44.4528_MHz_XTAL, 1680, 0, 1320, 378, 0, 350)
-	MCFG_SCREEN_UPDATE_DRIVER(tv965_state, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2672_device, screen_update)
 
-	//MCFG_DEVICE_ADD("crtc", SCN2672, 26.9892_MHz_XTAL / 10)
-	//MCFG_SCN2672_CHARACTER_WIDTH(10)
-	//MCFG_SCN2672_DRAW_CHARACTER_CALLBACK_OWNER(tv965_state, draw_character)
-	//MCFG_VIDEO_SET_SCREEN("screen")
+	MCFG_DEVICE_ADD("crtc", SCN2672, 26.9892_MHz_XTAL / 10)
+	MCFG_SCN2672_CHARACTER_WIDTH(10)
+	MCFG_SCN2672_DRAW_CHARACTER_CALLBACK_OWNER(tv965_state, draw_character)
+	MCFG_SCN2672_INTR_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("acia1", MOS6551, 0)
 	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL / 2) // divider not verified, possibly even programmable

@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 /*
-    SCN2674 - Advanced Video Display Controller (AVDC)  (Video Chip)
+    SCN2672 - Programmable Video Timing Controller (PVTC)
+    SCN2674 - Advanced Video Display Controller (AVDC)
 */
 
 #include "emu.h"
@@ -17,6 +18,7 @@
 #include "logmacro.h"
 
 
+DEFINE_DEVICE_TYPE(SCN2672, scn2672_device, "scn2672", "Signetics SCN2672 PVTC")
 DEFINE_DEVICE_TYPE(SCN2674, scn2674_device, "scn2674", "Signetics SCN2674 AVDC")
 
 
@@ -25,8 +27,18 @@ ADDRESS_MAP_START(scn2674_device::scn2674_vram)
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
+scn2672_device::scn2672_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: scn2674_device(mconfig, SCN2672, tag, owner, clock)
+{
+}
+
 scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SCN2674, tag, owner, clock)
+	: scn2674_device(mconfig, SCN2674, tag, owner, clock)
+{
+}
+
+scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
 	, m_intr_cb(*this)
@@ -169,7 +181,7 @@ void scn2674_device::device_reset()
 	m_cursor_underline_position = 0;
 	m_cursor_rate_divisor = 0;
 	m_cursor_blink = false;
-	m_vsync_width = 0;
+	m_vsync_width = 3; // fixed for SCN2672
 	m_display_buffer_first_address = 0;
 	m_display_buffer_last_address = 0;
 	m_display_pointer_address = 0;
@@ -191,6 +203,130 @@ void scn2674_device::device_reset()
 	m_intr_cb(CLEAR_LINE);
 }
 
+// 11 Initialization Registers (8-bit each)
+void scn2672_device::write_init_regs(uint8_t data)
+{
+	//LOGMASKED(LOG_COMMAND, "scn2674_write_init_regs %02x %02x\n",m_IR_pointer,data);
+
+	switch (m_IR_pointer)
+	{
+	case 0:
+		m_double_ht_wd = BIT(data, 7);
+		m_scanline_per_char_row = ((data & 0x78) >> 3) + 1;
+		m_csync_select = BIT(data, 2);
+		m_buffer_mode_select = data & 0x03;
+
+		LOGMASKED(LOG_IR, "IR0 - Scanlines per Character Row %02i\n", m_scanline_per_char_row);//value+1 = scanlines
+		LOGMASKED(LOG_IR, "IR0 - %s Output Selected\n", m_csync_select ? "CSYNC" : "VSYNC");
+		switch (m_buffer_mode_select)
+		{
+		case 0:
+			LOGMASKED(LOG_IR, "IR0 - Independent Buffer Mode\n");
+			break;
+
+		case 1:
+			LOGMASKED(LOG_IR, "IR0 - Transparent Buffer Mode\n");
+			break;
+
+		case 2:
+			LOGMASKED(LOG_IR, "IR0 - Shared Buffer Mode\n");
+			break;
+
+		case 3:
+			LOGMASKED(LOG_IR, "IR0 - Row Buffer Mode\n");
+			break;
+		}
+		break;
+
+	case 1:
+		m_interlace_enable = BIT(data, 7);
+		m_equalizing_constant = (data & 0x7f) + 1;
+
+		LOGMASKED(LOG_IR, "IR1 - Interlace %s\n", m_interlace_enable ? "on" : "off");
+		LOGMASKED(LOG_IR, "IR1 - Equalizing Constant %02i CCLKs\n", m_equalizing_constant);
+		break;
+
+	case 2:
+		m_horz_sync_width = (((data & 0x78) >> 3) * 2) + 2;
+		m_horz_back_porch = ((data & 0x07) * 4) + 1;
+
+		LOGMASKED(LOG_IR, "IR2 - Horizontal Sync Width %02i CCLKs\n", m_horz_sync_width);
+		LOGMASKED(LOG_IR, "IR2 - Horizontal Back Porch %02i CCLKs\n", m_horz_back_porch);
+		break;
+
+	case 3:
+		m_vert_front_porch = (((data & 0xe0) >> 5) * 4) + 4;
+		m_vert_back_porch = ((data & 0x1f) * 2) + 4;
+
+		LOGMASKED(LOG_IR, "IR3 - Vertical Front Porch %02i Lines\n", m_vert_front_porch);
+		LOGMASKED(LOG_IR, "IR3 - Vertical Back Porch %02i Lines\n", m_vert_back_porch);
+		break;
+
+	case 4:
+		m_rows_per_screen = (data & 0x7f) + 1;
+		m_character_blink_rate_divisor = BIT(data, 7) ? 32 : 16;
+
+		LOGMASKED(LOG_IR, "IR4 - Rows Per Screen %02i\n", m_rows_per_screen);
+		LOGMASKED(LOG_IR, "IR4 - Character Blink Rate = 1/%02i\n", m_character_blink_rate_divisor);
+		break;
+
+	case 5:
+		m_character_per_row = data + 1;
+		LOGMASKED(LOG_IR, "IR5 - Active Characters Per Row %02i\n", m_character_per_row);
+		break;
+
+	case 6:
+		m_cursor_last_scanline = data & 0x0f;
+		m_cursor_first_scanline = (data & 0xf0) >> 4;
+		LOGMASKED(LOG_IR, "IR6 - First Line of Cursor %02i\n", m_cursor_first_scanline);
+		LOGMASKED(LOG_IR, "IR6 - Last Line of Cursor %02i\n", m_cursor_last_scanline);
+		break;
+
+	case 7:
+		m_cursor_underline_position = data & 0x0f;
+		m_double_ht_wd = BIT(data, 4);
+		m_cursor_blink = BIT(data, 5);
+
+		LOGMASKED(LOG_IR, "IR7 - Underline Position %02i\n", m_cursor_underline_position);
+		LOGMASKED(LOG_IR, "IR7 - Double Height %s\n", m_double_ht_wd ? "on" : "off");
+		LOGMASKED(LOG_IR, "IR7 - Cursor blink %s\n", m_cursor_blink ? "on" : "off");
+		LOGMASKED(LOG_IR, "IR7 - Light pen line %02i\n", ((data & 0xc0) >> 6) * 2 + 3);
+		break;
+
+	case 8:
+		m_display_buffer_first_address = (m_display_buffer_first_address & 0xf00) | data;
+		LOGMASKED(LOG_IR, "IR8 - Display Buffer First Address LSB %02x\n", m_display_buffer_first_address & 0xff);
+		break;
+
+	case 9:
+		m_display_buffer_first_address = (m_display_buffer_first_address & 0x0ff) | (data & 0x0f) << 4;
+		m_display_buffer_last_address = (data & 0xf0) >> 4;
+		LOGMASKED(LOG_IR, "IR9 - Display Buffer First Address MSB %01x\n", m_display_buffer_first_address >> 8);
+		LOGMASKED(LOG_IR, "IR9 - Display Buffer Last Address %02x\n", m_display_buffer_last_address);
+		break;
+
+	case 10:
+		m_cursor_rate_divisor = BIT(data, 7) ? 32 : 16;
+		m_split_register[0] = data & 0x7f;
+		LOGMASKED(LOG_IR, "IR10 - Split Register %02x\n", m_split_register[0]);
+		LOGMASKED(LOG_IR, "IR10 - Cursor rate 1/%02i\n", m_cursor_rate_divisor);
+		break;
+
+	case 11: // not valid!
+	case 12:
+	case 13:
+	case 14:
+	case 15:
+		break;
+	}
+
+	// Don't reconfigure if the display isn't turned on (incomplete configurations may generate invalid screen parameters)
+	if (m_display_enabled)
+		recompute_parameters();
+
+	m_IR_pointer = std::min(m_IR_pointer + 1, 10);
+}
+
 // 15 Initialization Registers (8-bit each)
 void scn2674_device::write_init_regs(uint8_t data)
 {
@@ -206,7 +342,7 @@ void scn2674_device::write_init_regs(uint8_t data)
 
 		LOGMASKED(LOG_IR, "IR0 - Double Ht Wd %s\n", m_double_ht_wd ? "on" : "off");//affects IR14 as well
 		LOGMASKED(LOG_IR, "IR0 - Scanlines per Character Row %02i\n", m_scanline_per_char_row);//value+1 = scanlines
-		LOGMASKED(LOG_IR, "IR0 - %s Output Selected\n", m_csync_select ? "CSYNC" : "HSYNC");
+		LOGMASKED(LOG_IR, "IR0 - %s Output Selected\n", m_csync_select ? "CSYNC" : "VSYNC");
 		switch (m_buffer_mode_select)
 		{
 		case 0:
