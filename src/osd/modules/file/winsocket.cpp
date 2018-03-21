@@ -79,8 +79,6 @@ public:
 				else
 				{
 					actual = result;
-					if (result == 0)
-						actual = -1;
 					return error::NONE;
 				}
 			}

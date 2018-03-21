@@ -194,9 +194,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, M2COMM, tag, owner, clock),
-	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
-	m_line_tx(OPEN_FLAG_READ)
+	device_t(mconfig, M2COMM, tag, owner, clock)
 {
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
@@ -318,7 +316,7 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 READ8_MEMBER(m2comm_device::fg_r)
 {
 #ifdef M2COMM_SIMULATION
-	read_frame();
+	read_fg();
 #endif
 	return m_fg | (~m_zfg << 7) | 0x7e;
 }
@@ -364,26 +362,28 @@ void m2comm_device::comm_tick()
 			m_shared[3] = 0xff;
 
 			// check rx socket
-			if (!m_line_rx.is_open())
+			if (!m_line_rx)
 			{
 				osd_printf_verbose("M2COMM: listen on %s\n", m_localhost);
-				m_line_rx.open(m_localhost);
+				uint64_t filesize; // unused
+				osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 			}
 
 			// check tx socket
-			if (!m_line_tx.is_open())
+			if (!m_line_tx)
 			{
 				osd_printf_verbose("M2COMM: connect to %s\n", m_remotehost);
-				m_line_tx.open(m_remotehost);
+				uint64_t filesize; // unused
+				osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 			}
 
 			// if both sockets are there check ring
-			if ((m_line_rx.is_open()) && (m_line_tx.is_open()))
+			if (m_line_rx && m_line_tx)
 			{
 				m_zfg ^= 0x01;
 
 				// try to read one message
-				recv = read_data(dataSize);
+				recv = read_frame(dataSize);
 				while (recv > 0)
 				{
 					// check if message id
@@ -408,7 +408,7 @@ void m2comm_device::comm_tick()
 							}
 
 							// forward message to other nodes
-							m_line_tx.write(m_buffer0, dataSize);
+							send_frame(dataSize);
 						}
 					}
 
@@ -423,7 +423,7 @@ void m2comm_device::comm_tick()
 							m_buffer0[1]--;
 
 							// forward message to other nodes
-							m_line_tx.write(m_buffer0, dataSize);
+							send_frame(dataSize);
 						}
 						else if (isRelay)
 						{
@@ -432,7 +432,7 @@ void m2comm_device::comm_tick()
 							m_linkcount = m_buffer0[2];
 
 							// forward message to other nodes
-							m_line_tx.write(m_buffer0, dataSize);
+							send_frame(dataSize);
 						}
 
 						// consider it done
@@ -446,7 +446,7 @@ void m2comm_device::comm_tick()
 					}
 
 					if (m_linkalive == 0x00)
-						recv = read_data(dataSize);
+						recv = read_frame(dataSize);
 					else
 						recv = 0;
 				}
@@ -460,7 +460,7 @@ void m2comm_device::comm_tick()
 						m_buffer0[0] = 0xff;
 						m_buffer0[1] = 0x01;
 						m_buffer0[2] = 0x00;
-						m_line_tx.write(m_buffer0, dataSize);
+						send_frame(dataSize);
 					}
 
 					// send second packet
@@ -469,7 +469,7 @@ void m2comm_device::comm_tick()
 						m_buffer0[0] = 0xfe;
 						m_buffer0[1] = m_linkcount;
 						m_buffer0[2] = m_linkcount;
-						m_line_tx.write(m_buffer0, dataSize);
+						send_frame(dataSize);
 
 						// consider it done
 						osd_printf_verbose("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
@@ -496,7 +496,7 @@ void m2comm_device::comm_tick()
 			do
 			{
 				// try to read a message
-				recv = read_data(dataSize);
+				recv = read_frame(dataSize);
 				while (recv > 0)
 				{
 					// check if valid id
@@ -512,7 +512,7 @@ void m2comm_device::comm_tick()
 						if (isSlave)
 							send_data(m_linkid, frameStart, frameSize, dataSize);
 						else if (isRelay)
-							m_line_tx.write(m_buffer0, dataSize);
+							send_frame(dataSize);
 					}
 					else
 					{
@@ -523,12 +523,12 @@ void m2comm_device::comm_tick()
 
 							if (!isMaster)
 								// forward message to other nodes
-								m_line_tx.write(m_buffer0, dataSize);
+								send_frame(dataSize);
 						}
 					}
 
 					// try to read another message
-					recv = read_data(dataSize);
+					recv = read_frame(dataSize);
 				}
 			}
 			while (m_linktimer == 0x01);
@@ -544,7 +544,7 @@ void m2comm_device::comm_tick()
 				// send vsync
 				m_buffer0[0] = 0xfc;
 				m_buffer0[1] = 0x01;
-				m_line_tx.write(m_buffer0, dataSize);
+				send_frame(dataSize);
 			}
 
 			m_zfg_delay = 0x02;
@@ -552,7 +552,7 @@ void m2comm_device::comm_tick()
 	}
 }
 
-void m2comm_device::read_frame()
+void m2comm_device::read_fg()
 {
 	if (m_zfg_delay > 0x00)
 	{
@@ -578,7 +578,7 @@ void m2comm_device::read_frame()
 		do
 		{
 			// try to read a message
-			recv = read_data(dataSize);
+			recv = read_frame(dataSize);
 			while (recv > 0)
 			{
 				// check if valid id
@@ -594,7 +594,7 @@ void m2comm_device::read_frame()
 					if (isSlave)
 						send_data(m_linkid, frameStart, frameSize, dataSize);
 					else if (isRelay)
-						m_line_tx.write(m_buffer0, dataSize);
+						send_frame(dataSize);
 				}
 				else
 				{
@@ -605,54 +605,65 @@ void m2comm_device::read_frame()
 
 						if (!isMaster)
 							// forward message to other nodes
-							m_line_tx.write(m_buffer0, dataSize);
+							send_frame(dataSize);
 					}
 				}
 
 				// try to read another message
-				recv = read_data(dataSize);
+				recv = read_frame(dataSize);
 			}
 		}
 		while (m_linktimer == 0x01);
 	}
 }
 
-int m2comm_device::read_data(int dataSize)
+int m2comm_device::read_frame(int dataSize)
 {
-	// try to read one messages
-	int recv = m_line_rx.read(m_buffer0, dataSize);
+	if (!m_line_rx)
+		return 0;
+
+	// try to read a message
+	std::uint32_t recv = 0;
+	osd_file::error filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
 	if (recv > 0)
 	{
-		// check if complete message
+		// check if message complete
 		if (recv != dataSize)
 		{
-			// got only part of a message - read the rest
-			int togo = dataSize - recv;
+			// only part of a message - read on
+			std::uint32_t togo = dataSize - recv;
 			int offset = recv;
 			while (togo > 0)
 			{
-				recv = m_line_rx.read(m_buffer1, togo);
-				for (int i = 0x0000 ; i < recv ; i++)
+				filerr = m_line_rx->read(m_buffer1, 0, togo, recv);
+				if (recv > 0)
 				{
-					m_buffer0[offset + i] = m_buffer1[i];
+					for (int i = 0x0000 ; i < recv ; i++)
+					{
+						m_buffer0[offset + i] = m_buffer1[i];
+					}
+					togo -= recv;
+					offset += recv;
 				}
-				togo -= recv;
-				offset += recv;
+				else if (filerr == osd_file::error::NONE && recv == 0)
+				{
+					togo = 0;
+				}
 			}
 		}
 	}
-	else if (recv < 0)
+	else if (filerr == osd_file::error::NONE && recv == 0)
 	{
 		if (m_linkalive == 0x01)
 		{
-			osd_printf_verbose("M2COMM: connection lost\n");
+			osd_printf_verbose("M2COMM: rx connection lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
 
 			m_shared[0] = 0xff;
 
-			m_line_rx.close();
-			m_line_tx.close();
+			m_line_rx.reset();
+			m_line_tx.reset();
 		}
 	}
 	return recv;
@@ -665,7 +676,30 @@ void m2comm_device::send_data(uint8_t frameType, int frameStart, int frameSize, 
 	{
 		m_buffer0[1 + i] = m_shared[frameStart + i];
 	}
-	// forward message to next node
-	m_line_tx.write(m_buffer0, dataSize);
+	send_frame(dataSize);
+}
+
+void m2comm_device::send_frame(int dataSize){
+	if (!m_line_tx)
+		return;
+
+	osd_file::error filerr;
+	std::uint32_t written;
+
+	filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
+	if (filerr != osd_file::error::NONE)
+	{
+		if (m_linkalive == 0x01)
+		{
+			osd_printf_verbose("M2COMM: tx connection lost\n");
+			m_linkalive = 0x02;
+			m_linktimer = 0x00;
+
+			m_shared[0] = 0xff;
+
+			m_line_rx.reset();
+			m_line_tx.reset();
+		}
+	}
 }
 #endif
