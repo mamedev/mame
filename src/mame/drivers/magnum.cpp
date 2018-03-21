@@ -23,6 +23,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_beep(*this, "beep")
+		, m_shift(*this, "SHIFT")
 	{
 	}
 	void magnum(machine_config &config);
@@ -46,6 +47,7 @@ private:
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
+	required_ioport m_shift;
 
 	u8 m_key;
 	bool m_wake, m_rtcirq, m_keybirq;
@@ -65,7 +67,7 @@ void magnum_state::check_irq()
 
 INPUT_CHANGED_MEMBER(magnum_state::wake)
 {
-	m_key = ((uint8_t)(uintptr_t)(param) & 0xff);
+	m_key = ((uint8_t)(uintptr_t)(param) & 0xff) | (m_shift->read() & 3 ? 0x80 : 0);
 	m_keybirq = true;
 	check_irq();
 }
@@ -74,7 +76,7 @@ static INPUT_PORTS_START(magnum)
 	PORT_START("ROW.0")
 	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 0)
 	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 1)
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 4)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 4)
 	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 5)
 	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 8)
 	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 9)
@@ -89,7 +91,7 @@ static INPUT_PORTS_START(magnum)
 	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 21)
 	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 24)
 	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 25)
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 28)
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 28)
 	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 29)
 	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 18)
 	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 19)
@@ -151,6 +153,11 @@ static INPUT_PORTS_START(magnum)
 	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 121)
 	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 124)
 	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_CHANGED_MEMBER(DEVICE_SELF, magnum_state, wake, 125)
+	PORT_START("SHIFT")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 INPUT_PORTS_END
 
 void magnum_state::machine_start()
@@ -160,6 +167,8 @@ void magnum_state::machine_start()
 void magnum_state::machine_reset()
 {
 	m_wake = true;
+	m_rtcirq = false;
+	m_keybirq = false;
 }
 
 WRITE8_MEMBER(magnum_state::beep_w)
@@ -185,7 +194,7 @@ READ8_MEMBER(magnum_state::sysctl_r)
 			u8 ret = m_keybirq ? 1 : 0;
 			m_keybirq = false;
 			check_irq();
-			return ret;
+			return ret | (m_shift->read() & 0xc ? 4 : 0);
 		}
 	}
 	return 0;
