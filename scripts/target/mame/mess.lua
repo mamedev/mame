@@ -879,6 +879,7 @@ FORMATS["PC98_DSK"] = true
 FORMATS["PC_DSK"] = true
 FORMATS["PHC25_CAS"] = true
 FORMATS["PK8020_DSK"] = true
+FORMATS["POLY_DSK"] = true
 FORMATS["PPG_DSK"] = true
 FORMATS["PMD_CAS"] = true
 FORMATS["PRIMOPTP"] = true
@@ -1069,6 +1070,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"pel",
 		"philips",
 		"pitronic",
+		"poly",
 		"poly88",
 		"prodigy",
 		"psion",
@@ -2684,7 +2686,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/galeb.cpp",
 	MAME_DIR .. "src/mame/includes/galeb.h",
 	MAME_DIR .. "src/mame/video/galeb.cpp",
-		MAME_DIR .. "src/mame/drivers/orao.cpp",
+	MAME_DIR .. "src/mame/drivers/orao.cpp",
 	MAME_DIR .. "src/mame/includes/orao.h",
 	MAME_DIR .. "src/mame/machine/orao.cpp",
 	MAME_DIR .. "src/mame/video/orao.cpp",
@@ -2697,6 +2699,11 @@ files {
 	MAME_DIR .. "src/mame/machine/p2000t.cpp",
 	MAME_DIR .. "src/mame/video/p2000t.cpp",
 	MAME_DIR .. "src/mame/drivers/vg5k.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "poly")
+files {
+	MAME_DIR .. "src/mame/drivers/proteus.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "poly88")
