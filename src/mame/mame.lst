@@ -280,6 +280,9 @@ aa3020                          // 1992 Acorn A3020
 aa4000                          // 1992 Acorn A4000
 aa5000a                         // 1993 Acorn A5000 Alpha
 
+@source:aaa.cpp
+aaa                             //
+
 @source:abc1600.cpp
 abc1600                         //
 
@@ -9133,8 +9136,9 @@ motrdomeg                       //
 prtyanim                        //
 prtyanimg                       //
 specforc                        //
-strngscg                        //
 strngsci                        //
+strngscia                       //
+strngscig                       //
 trucksp2                        //
 trucksp3                        //
 
@@ -32518,6 +32522,9 @@ quizpun2                        // (c) 1989 Space Computer System of Korea
 @source:quizshow.cpp
 quizshow                        // 005464           1976/04 [2650]
 
+@source:qvt70.cpp
+qvt70                           //
+
 @source:qvt103.cpp
 qvt103                          // (c) 1983 Qume Corp.
 
@@ -36653,12 +36660,6 @@ terak                           //
 @source:terco.cpp
 t4490                           // Terco 4490 Mill CNC Control (c) 1986
 
-@source:terminals.cpp
-aaa
-qvt70
-tv955
-tv965
-
 @source:terracre.cpp
 amatelas                        // (c) 1986
 amazon                          // (c) 1986
@@ -37489,6 +37490,12 @@ tv912c                          //
 
 @source:tv950.cpp
 tv950                           //
+
+@source:tv955.cpp
+tv955                           //
+
+@source:tv965.cpp
+tv965                           //
 
 @source:tv990.cpp
 tv990                           // 1992? TeleVideo

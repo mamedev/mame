@@ -141,7 +141,7 @@ public:
 	DECLARE_WRITE16_MEMBER(colorxlat_w);
 	DECLARE_WRITE32_MEMBER(ctrl0_w);
 	DECLARE_WRITE32_MEMBER(analog_2b_w);
-	DECLARE_READ32_MEMBER(fifoctl_r);
+	DECLARE_READ32_MEMBER(fifo_control_2a_r);
 	DECLARE_READ32_MEMBER(videoctl_r);
 	DECLARE_WRITE32_MEMBER(videoctl_w);
 	DECLARE_WRITE32_MEMBER(rchase2_devices_w);
@@ -248,7 +248,6 @@ public:
 	void sj25_0207_01(machine_config &config);
 	void copro_sharc_map(address_map &map);
 	void copro_tgp_map(address_map &map);
-	void copro_tgpx4_map(address_map &map);
 	void drive_io_map(address_map &map);
 	void drive_map(address_map &map);
 	void geo_sharc_map(address_map &map);
@@ -345,7 +344,7 @@ public:
 
 	DECLARE_READ32_MEMBER(daytona_unk_r);
 	DECLARE_READ8_MEMBER(model2o_in_r);
-	DECLARE_READ32_MEMBER(fifoctrl_r);
+	DECLARE_READ32_MEMBER(fifo_control_2o_r);
 
 	void daytona(machine_config &config);
 	void model2o(machine_config &config);
@@ -455,12 +454,16 @@ public:
 		: model2_state(mconfig, type, tag)
 	{}
 
+	DECLARE_READ32_MEMBER(fifo_control_2c_r);
+
 	void model2c(machine_config &config);
 	void model2c_5881(machine_config &config);
 	void overrev2c(machine_config &config);
 	void stcc(machine_config &config);
 	void model2c_crx_mem(address_map &map);
 	void model2c_5881_mem(address_map &map);
+	void copro_tgpx4_map(address_map &map);
+	void copro_tgpx4_data_map(address_map &map);
 };
 
 /*****************************

@@ -14,6 +14,10 @@ do
 	if not db then
 		lfs.mkdir(dbpath)
 		db = sql.open(dbpath .. "/history.db")
+		if not db then
+			emu.print_error("Unable to create history.db\n")
+			return nil
+		end
 		check_db("opening database")
 	end
 end

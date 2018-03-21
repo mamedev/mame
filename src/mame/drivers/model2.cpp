@@ -553,7 +553,7 @@ WRITE32_MEMBER(model2_state::analog_2b_w)
 }
 
 
-READ32_MEMBER(model2_state::fifoctl_r)
+READ32_MEMBER(model2_state::fifo_control_2a_r)
 {
 	uint32_t r = 0;
 
@@ -563,7 +563,7 @@ READ32_MEMBER(model2_state::fifoctl_r)
 	}
 
 	// #### 1 if fifo empty, zerogun needs | 0x04 set
-	// TODO: 0x04 is probably fifo full, zeroguna stalls with a fresh nvram with that enabled!
+	// TODO: 0x04 is probably fifo full, zeroguna stalls with a fresh nvram with that enabled?
 	return r;
 //	return r | 0x04;
 }
@@ -865,9 +865,18 @@ WRITE32_MEMBER(model2_state::copro_function_port_w)
 		copro_fifoin_push(machine().device("tgp"), d,offset,mem_mask);
 	else if (m_dsp_type == DSP_TYPE_TGPX4)
 	{
-		if (m_tgpx4->is_fifoin_full())
-			printf("trying to push to full fifo! (function port)\n");
+		m_maincpu->i960_noburst();
 
+		if (m_tgpx4->is_fifoin_full())
+		{
+			//fatalerror("model2.cpp: unsupported i960->tgpx4 fifo full");
+			/* Writing to full FIFO causes the i960 to enter wait state */
+			m_maincpu->i960_stall();
+			/* spin the main cpu and let the TGP catch up */
+			m_maincpu->spin_until_time(attotime::from_usec(1));
+			return;
+		}		
+		
 		m_tgpx4->fifoin_w(d);
 	}
 }
@@ -888,8 +897,9 @@ READ32_MEMBER(model2_state::copro_fifo_r)
 			/* Reading from empty FIFO causes the i960 to enter wait state */
 			downcast<i960_cpu_device &>(*m_maincpu).i960_stall();
 			/* spin the main cpu and let the TGP catch up */
-			m_maincpu->spin_until_time(attotime::from_usec(100));
-			printf("stalled\n");
+			m_maincpu->spin_until_time(attotime::from_usec(1));
+			
+			return 0x00884000+offset*4;
 		}
 		else
 		{
@@ -897,6 +907,11 @@ READ32_MEMBER(model2_state::copro_fifo_r)
 		}
 	}
 	return 0;
+}
+
+READ32_MEMBER(model2c_state::fifo_control_2c_r)
+{
+	return (m_tgpx4->is_fifoout0_empty() == true) ? 1 : 0;
 }
 
 WRITE32_MEMBER(model2_state::copro_fifo_w)
@@ -939,13 +954,15 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 			copro_fifoin_push(machine().device("tgp"), data,offset,mem_mask);
 		else if (m_dsp_type == DSP_TYPE_TGPX4)
 		{
+			m_maincpu->i960_noburst();
+
 			if (m_tgpx4->is_fifoin_full())
 			{
+				//fatalerror("model2.cpp: unsupported i960->tgpx4 fifo full");
 				/* Writing to full FIFO causes the i960 to enter wait state */
 				m_maincpu->i960_stall();
 				/* spin the main cpu and let the TGP catch up */
-				m_maincpu->spin_until_time(attotime::from_usec(100));
-				printf("write stalled\n");
+				m_maincpu->spin_until_time(attotime::from_usec(1));
 			}
 			else
 			{
@@ -1393,7 +1410,7 @@ void model2_state::model2_base_mem(address_map &map)
 
 	map(0x00900000, 0x0091ffff).mirror(0x60000).ram().share("bufferram");
 
-	map(0x00980004, 0x00980007).r(this, FUNC(model2_state::fifoctl_r));
+	map(0x00980004, 0x00980007).r(this, FUNC(model2_state::fifo_control_2a_r));
 	map(0x0098000c, 0x0098000f).rw(this, FUNC(model2_state::videoctl_r), FUNC(model2_state::videoctl_w));
 	map(0x00980030, 0x0098003f).r(this, FUNC(model2_state::tgpid_r));
 
@@ -1475,7 +1492,7 @@ READ8_MEMBER(model2_state::virtuacop_lightgun_offscreen_r)
 }
 
 /* Apparently original Model 2 doesn't have fifo control? */
-READ32_MEMBER(model2o_state::fifoctrl_r)
+READ32_MEMBER(model2o_state::fifo_control_2o_r)
 {
 	return 0xffffffff;
 }
@@ -1509,7 +1526,7 @@ void model2o_state::model2o_mem(address_map &map)
 	map(0x00884000, 0x00887fff).rw(this, FUNC(model2o_state::copro_fifo_r), FUNC(model2o_state::copro_fifo_w));
 
 	map(0x00980000, 0x00980003).rw(this, FUNC(model2o_state::copro_ctl1_r), FUNC(model2o_state::copro_ctl1_w));
-	map(0x00980004, 0x00980007).r(this, FUNC(model2o_state::fifoctrl_r));
+	map(0x00980004, 0x00980007).r(this, FUNC(model2o_state::fifo_control_2o_r));
 	map(0x00980008, 0x0098000b).w(this, FUNC(model2o_state::geo_ctl1_w));
 	map(0x009c0000, 0x009cffff).rw(this, FUNC(model2o_state::model2_serial_r), FUNC(model2o_state::model2_serial_w));
 
@@ -1692,6 +1709,7 @@ void model2c_state::model2c_crx_mem(address_map &map)
 	map(0x00884000, 0x00887fff).rw(this, FUNC(model2c_state::copro_fifo_r), FUNC(model2c_state::copro_fifo_w));
 
 	map(0x00980000, 0x00980003).rw(this, FUNC(model2c_state::copro_ctl1_r), FUNC(model2c_state::copro_ctl1_w));
+	map(0x00980004, 0x00980007).r(this, FUNC(model2c_state::fifo_control_2c_r));
 	map(0x00980008, 0x0098000b).w(this, FUNC(model2c_state::geo_ctl1_w));
 	map(0x00980014, 0x00980017).r(this, FUNC(model2c_state::copro_status_r));
 	map(0x009c0000, 0x009cffff).rw(this, FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w));
@@ -1703,6 +1721,8 @@ void model2c_state::model2c_crx_mem(address_map &map)
 
 	map(0x01c00000, 0x01c0001f).r(this, FUNC(model2c_state::model2_crx_in_r)).umask32(0x00ff00ff);
 	map(0x01c00000, 0x01c00003).w(this, FUNC(model2c_state::ctrl0_w));
+	map(0x01c00008, 0x01c0000b).nopw();
+	map(0x01c00010, 0x01c00013).nopw();
 	map(0x01c00014, 0x01c00017).w(this, FUNC(model2c_state::hotd_lightgun_w));
 	map(0x01c0001c, 0x01c0001f).w(this, FUNC(model2c_state::analog_2b_w));
 	map(0x01c80000, 0x01c80003).rw(this, FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w));
@@ -2745,11 +2765,17 @@ MACHINE_CONFIG_START(model2b_state::rchase2)
 MACHINE_CONFIG_END
 
 
-ADDRESS_MAP_START(model2_state::copro_tgpx4_map)
-	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("tgpx4_program")
-//	AM_RANGE(0x00400000, 0x007fffff) // bufferram
-//	AM_RANGE(0x00800000, 0x00ffffff) // ROM data
-ADDRESS_MAP_END
+void model2c_state::copro_tgpx4_map(address_map &map)
+{
+	map(0x00000000, 0x00007fff).ram().share("tgpx4_program");
+}
+
+void model2c_state::copro_tgpx4_data_map(address_map &map)
+{
+//  map(0x00000000, 0x000003ff) internal RAM
+	map(0x00400000, 0x007fffff).rw(this, FUNC(model2_state::copro_tgp_buffer_r),FUNC(model2_state::copro_tgp_buffer_w)); // bufferram
+	map(0x00800000, 0x008fffff).rom().region("copro_data",0); // ROM data
+}
 
 /* 2C-CRX */
 MACHINE_CONFIG_START(model2c_state::model2c)
@@ -2759,6 +2785,7 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 
 	MCFG_CPU_ADD("tgpx4", MB86235, 40000000)
 	MCFG_CPU_PROGRAM_MAP(copro_tgpx4_map)
+	MCFG_CPU_DATA_MAP(copro_tgpx4_data_map)
 
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2c)
@@ -3980,7 +4007,7 @@ ROM_START( dynamcopc ) /* Dynamite Cop (USA), Model 2C */
 	ROM_LOAD32_WORD("mpr-20791.4",  0x1800000, 0x400000, CRC(4883d0df) SHA1(b98af63e81f6c1b2766d7e96acbd1821bba000d4) ) /* Located at position  5 on 2C-CRX rom board */
 	ROM_LOAD32_WORD("mpr-20792.5",  0x1800002, 0x400000, CRC(47becfa2) SHA1(a333885872a64b322f3cb464a70352d73654b1b3) ) /* Located at position  6 on 2C-CRX rom board */
 
-	ROM_REGION( 0x800000, "cpu2", ROMREGION_ERASE00 ) // TGPx4 program (COPRO sockets)
+	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // TGPx4 program (COPRO sockets)
 
 	ROM_REGION( 0x2000000, "polygons", 0 ) // Models
 	ROM_LOAD32_WORD("mpr-20799.16", 0x0000000, 0x400000, CRC(424571bf) SHA1(18a4e8d0e968fff3b645b59a0023b0ef38d51924) ) /* Located at position 17 on 2C-CRX rom board */
@@ -4137,7 +4164,7 @@ ROM_START( stcc ) /* Sega Touring Car Championship, Model 2C - Defaults to Japan
 	ROM_COPY("main_data", 0x800000, 0xe00000, 0x100000)
 	ROM_COPY("main_data", 0x800000, 0xf00000, 0x100000)
 
-	ROM_REGION( 0x800000, "cpu2", 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, "copro_data", 0 ) // TGPx4 program
 	ROM_LOAD32_WORD("mpr-19255.29", 0x000000, 0x200000, CRC(d78bf030) SHA1(e6b3d8422613d22db50cf6c251f9a21356d96653) )
 	ROM_LOAD32_WORD("mpr-19256.30", 0x000002, 0x200000, CRC(cb2b2d9e) SHA1(86b2b8bb6074352f72eb81e616093a1ba6f5163f) )
 
@@ -4202,7 +4229,7 @@ ROM_START( stccb ) /* Sega Touring Car Championship Revision B, Model 2C - Defau
 	ROM_COPY("main_data", 0x800000, 0xe00000, 0x100000)
 	ROM_COPY("main_data", 0x800000, 0xf00000, 0x100000)
 
-	ROM_REGION( 0x800000, "cpu2", 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, "copro_data", 0 ) // TGPx4 program
 	ROM_LOAD32_WORD("mpr-19255.29", 0x000000, 0x200000, CRC(d78bf030) SHA1(e6b3d8422613d22db50cf6c251f9a21356d96653) )
 	ROM_LOAD32_WORD("mpr-19256.30", 0x000002, 0x200000, CRC(cb2b2d9e) SHA1(86b2b8bb6074352f72eb81e616093a1ba6f5163f) )
 
@@ -4267,7 +4294,7 @@ ROM_START( stcca ) /* Sega Touring Car Championship Revision A, Model 2C - Defau
 	ROM_COPY("main_data", 0x800000, 0xe00000, 0x100000)
 	ROM_COPY("main_data", 0x800000, 0xf00000, 0x100000)
 
-	ROM_REGION( 0x800000, "cpu2", 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, "copro_data", 0 ) // TGPx4 program
 	ROM_LOAD32_WORD("mpr-19255.29", 0x000000, 0x200000, CRC(d78bf030) SHA1(e6b3d8422613d22db50cf6c251f9a21356d96653) )
 	ROM_LOAD32_WORD("mpr-19256.30", 0x000002, 0x200000, CRC(cb2b2d9e) SHA1(86b2b8bb6074352f72eb81e616093a1ba6f5163f) )
 
@@ -4327,7 +4354,7 @@ ROM_START( skisuprg ) /* Sega Ski Super G, Model 2C, Sega Game ID# 833-12861, RO
 	ROM_LOAD32_WORD( "mpr-19492.9",  0x800000, 0x400000, CRC(4805318f) SHA1(dbd1359817933313c6d74d3a1450682e8ce5857a) )
 	ROM_LOAD32_WORD( "mpr-19493.10", 0x800002, 0x400000, CRC(39daa909) SHA1(e29e50c7fc39bd4945f993ceaa100358054efc5a) )
 
-	ROM_REGION( 0x800000, "cpu2", 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, "copro_data", 0 ) // TGPx4 program
 	ROM_LOAD32_WORD( "mpr-19502.29", 0x000000, 0x400000, CRC(2212d8d6) SHA1(3b8a4da2dc00a1eac41b48cbdc322ea1c31b8b29) )
 	ROM_LOAD32_WORD( "mpr-19503.30", 0x000002, 0x400000, CRC(3c9cfc73) SHA1(2213485a00cef0bcef11b67f00027c4159c5e2f5) )
 
@@ -4372,7 +4399,7 @@ ROM_START( segawski ) /* Sega Water Ski Revision A, Model 2C, Sega Game ID# 833-
 	ROM_COPY( "main_data", 0x1800000, 0x1e00000, 0x100000 )
 	ROM_COPY( "main_data", 0x1800000, 0x1f00000, 0x100000 )
 
-	ROM_REGION( 0x800000, "cpu2", 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, "copro_data", 0 ) // TGPx4 program
 	ROM_LOAD32_WORD("mpr-19986.29", 0x0000000, 0x400000, CRC(4b8e26f8) SHA1(859e3788c75599295a8b57ed7852f2cbb6a2a738) )
 	ROM_LOAD32_WORD("mpr-19987.30", 0x0000002, 0x400000, CRC(8d5b9d38) SHA1(35f41c474af3754152aecefe81e912120823e0ff) )
 
@@ -4425,7 +4452,7 @@ ROM_START( hotd ) /* House of the Dead, Model 2C, Sega Game ID# 610-0396-13054, 
 	ROM_COPY( "main_data", 0x1800000, 0x1f00000, 0x100000 )
 
 
-	ROM_REGION( 0x800000, "cpu2", 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, "copro_data", 0 ) // TGPx4 program
 	ROM_LOAD32_WORD("epr-19707.29",  0x000000, 0x080000, CRC(384fd133) SHA1(6d060378d0f801b04d12e7ee874f2fa0572992d9) )
 	ROM_LOAD32_WORD("epr-19706.30",  0x000002, 0x080000, CRC(1277531c) SHA1(08d3e733ba9989fcd32290634171c73f26ab6e2b) )
 
@@ -4974,7 +5001,7 @@ ROM_START( bel ) /* Behind Enemy Lines, Model 2C */
 	ROM_LOAD32_WORD("mpr-20227.5",    0xc00000, 0x200000, CRC(1277686e) SHA1(fff27006659458300001425261b944e690f1d494) )
 	ROM_LOAD32_WORD("mpr-20228.6",    0xc00002, 0x200000, CRC(49cb5568) SHA1(ee3273302830f3499c7d4e548b629c51e0369e8a) )
 
-	ROM_REGION( 0x800000, "cpu2", 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, "copro_data", 0 ) // TGPx4 program
 	ROM_LOAD32_WORD("mpr-20236.29",   0x000000, 0x200000, CRC(8de9a3c2) SHA1(e7fde1fd509531e1002ff813163067dc0d134536) )
 	ROM_LOAD32_WORD("mpr-20235.30",   0x000002, 0x200000, CRC(78fa11ef) SHA1(a60deabb662e9c09f5d6342dc1a1c6045744d93f) )
 
@@ -5015,7 +5042,7 @@ ROM_START( overrev ) /* Over Rev Revision A, Model 2C */
 	ROM_LOAD32_WORD( "mpr-19994.9",   0x800000, 0x400000, CRC(e691fbd5) SHA1(b99c2f3f2a682966d792917dfcb8ed8e53bc0b7a) )
 	ROM_LOAD32_WORD( "mpr-19995.10",  0x800002, 0x400000, CRC(82a7828e) SHA1(4336a12a07a67f94091b4a9b491bab02c375dd15) )
 
-	ROM_REGION( 0x800000, "cpu2", ROMREGION_ERASE00 ) // TGPx4 program (COPRO sockets)
+	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00 ) // TGPx4 program (COPRO sockets)
 
 	ROM_REGION( 0x800000, "polygons", 0 ) // Models (TGP sockets)
 	ROM_LOAD32_WORD( "mpr-19998.17",  0x000000, 0x200000, CRC(6a834574) SHA1(8be19bf42dbb157d6acde62a2018ef4c0d41aab4) )
@@ -5075,7 +5102,7 @@ ROM_START( rascot2 ) /* Royal Ascot 2, Model 2C, Rom Board : 837-12485 Com Board
 	ROM_LOAD32_WORD("mpr-20169.9",    0x800000, 0x400000, CRC(b5be4d6b) SHA1(cfb4696506efa0e93fab35bbeb87decd83aec040) )
 	ROM_LOAD32_WORD("mpr-20170.10",   0x800002, 0x400000, CRC(7b05cf33) SHA1(9e392ea0c7a9f4cef76d46ad92a7cf814022c133) )
 
-	ROM_REGION( 0x800000, "cpu2", ROMREGION_ERASE00) // TGPx4 program
+	ROM_REGION( 0x800000, "copro_data", ROMREGION_ERASE00) // TGPx4 program
 
 	ROM_REGION( 0x2000000, "polygons", 0 ) // Models
 	ROM_LOAD32_WORD("mpr-20173.17",  0x0000000, 0x400000, CRC(60bd684e) SHA1(893985808adb88fb54f0ca85ca23995d65360360) )
@@ -5111,7 +5138,7 @@ ROM_START( topskatr ) /* Top Skater Revision A (Export), Model 2C, Sega Game ID#
 	ROM_LOAD32_WORD("mpr-19737.9",   0x800000, 0x400000, CRC(281a7dde) SHA1(71d5ba434328a81969bfdc71ac1160c5ff3ae9d3) )
 	ROM_LOAD32_WORD("mpr-19738.10",  0x800002, 0x400000, CRC(f688327e) SHA1(68c9db242ef7e8f98979e968a09e4b093bc5d470) )
 
-	ROM_REGION( 0x800000, "cpu2", 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, "copro_data", 0 ) // TGPx4 program
 	ROM_LOAD32_WORD("mpr-19743.29",  0x000000, 0x200000, CRC(d41a41bf) SHA1(a5f6b24e6526d0d2ef9c526c273c018d1e0fed59) )
 	ROM_LOAD32_WORD("mpr-19744.30",  0x000002, 0x200000, CRC(84f203bf) SHA1(4952b764e6bf6cd735018738c5eff08781ee2315) )
 
@@ -5151,7 +5178,7 @@ ROM_START( topskatruo ) /* Top Skater (USA), Model 2C, Sega Game ID# 833-13080-0
 	ROM_LOAD32_WORD("mpr-19737.9",   0x800000, 0x400000, CRC(281a7dde) SHA1(71d5ba434328a81969bfdc71ac1160c5ff3ae9d3) )
 	ROM_LOAD32_WORD("mpr-19738.10",  0x800002, 0x400000, CRC(f688327e) SHA1(68c9db242ef7e8f98979e968a09e4b093bc5d470) )
 
-	ROM_REGION( 0x800000, "cpu2", 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, "copro_data", 0 ) // TGPx4 program
 	ROM_LOAD32_WORD("mpr-19743.29",  0x000000, 0x200000, CRC(d41a41bf) SHA1(a5f6b24e6526d0d2ef9c526c273c018d1e0fed59) )
 	ROM_LOAD32_WORD("mpr-19744.30",  0x000002, 0x200000, CRC(84f203bf) SHA1(4952b764e6bf6cd735018738c5eff08781ee2315) )
 
@@ -5191,7 +5218,7 @@ ROM_START( topskatru ) /* Top Skater Revision A (USA), Model 2C, Sega Game ID# 8
 	ROM_LOAD32_WORD("mpr-19737.9",   0x800000, 0x400000, CRC(281a7dde) SHA1(71d5ba434328a81969bfdc71ac1160c5ff3ae9d3) )
 	ROM_LOAD32_WORD("mpr-19738.10",  0x800002, 0x400000, CRC(f688327e) SHA1(68c9db242ef7e8f98979e968a09e4b093bc5d470) )
 
-	ROM_REGION( 0x800000, "cpu2", 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, "copro_data", 0 ) // TGPx4 program
 	ROM_LOAD32_WORD("mpr-19743.29",  0x000000, 0x200000, CRC(d41a41bf) SHA1(a5f6b24e6526d0d2ef9c526c273c018d1e0fed59) )
 	ROM_LOAD32_WORD("mpr-19744.30",  0x000002, 0x200000, CRC(84f203bf) SHA1(4952b764e6bf6cd735018738c5eff08781ee2315) )
 
@@ -5231,7 +5258,7 @@ ROM_START( topskatrj ) /* Top Skater (Japan), Model 2C, Sega Game ID# 833-13080-
 	ROM_LOAD32_WORD("mpr-19737.9",   0x800000, 0x400000, CRC(281a7dde) SHA1(71d5ba434328a81969bfdc71ac1160c5ff3ae9d3) )
 	ROM_LOAD32_WORD("mpr-19738.10",  0x800002, 0x400000, CRC(f688327e) SHA1(68c9db242ef7e8f98979e968a09e4b093bc5d470) )
 
-	ROM_REGION( 0x800000, "cpu2", 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, "copro_data", 0 ) // TGPx4 program
 	ROM_LOAD32_WORD("mpr-19743.29",  0x000000, 0x200000, CRC(d41a41bf) SHA1(a5f6b24e6526d0d2ef9c526c273c018d1e0fed59) )
 	ROM_LOAD32_WORD("mpr-19744.30",  0x000002, 0x200000, CRC(84f203bf) SHA1(4952b764e6bf6cd735018738c5eff08781ee2315) )
 

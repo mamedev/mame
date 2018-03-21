@@ -6846,6 +6846,20 @@ hexionb:
 @:maincpu,program,a743,27d,00,00
 
 
+;@s:hh_sm510.cpp
+
+tkarnov:
+@:maincpu,data,e,2,0,0,f
+
+
+tbatman:
+@:maincpu,data,1d,3,0,0,f
+
+
+tvindictr:
+@:maincpu,data,56,3,0,0,f
+
+
 ;@s:higemaru.cpp
 
 ;********higemaru (pirate ship higemaru)

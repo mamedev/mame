@@ -1913,7 +1913,7 @@ void apple2gs_state::apple2gs_setup_memory()
 
 READ8_MEMBER(apple2gs_state::apple2gs_read_vector)
 {
-	return space.read_byte(offset | 0xFF0000);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset | 0xFFFFE0);
 }
 
 MACHINE_RESET_MEMBER(apple2gs_state,apple2gs)
@@ -1977,9 +1977,6 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 
 	m_machinetype = APPLE_IIGS;
 	apple2eplus_init_common(nullptr);
-
-	/* set up Apple IIgs vectoring */
-	m_maincpu->set_read_vector_callback(read8_delegate(FUNC(apple2gs_state::apple2gs_read_vector),this));
 
 	/* setup globals */
 	m_is_rom3 = true;

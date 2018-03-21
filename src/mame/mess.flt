@@ -9,6 +9,7 @@ a6809.cpp
 a7150.cpp
 a7800.cpp
 aa310.cpp
+aaa.cpp
 abc1600.cpp
 abc80.cpp
 abc80x.cpp
@@ -570,6 +571,7 @@ px8.cpp
 pyl601.cpp
 ql.cpp
 qtsbc.cpp
+qvt70.cpp
 qvt103.cpp
 qvt201.cpp
 qvt6800.cpp
@@ -683,7 +685,6 @@ tek440x.cpp
 tekxp33x.cpp
 terak.cpp
 terco.cpp
-terminals.cpp
 test_t400.cpp
 testconsole.cpp
 tg100.cpp
@@ -730,6 +731,8 @@ tutor.cpp
 tv910.cpp
 tv912.cpp
 tv950.cpp
+tv955.cpp
+tv965.cpp
 tv990.cpp
 tvboy.cpp
 tvc.cpp
