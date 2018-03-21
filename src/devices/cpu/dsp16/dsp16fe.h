@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 /***************************************************************************
 
-    WE|AT&T DSP16 series emulator
+    WE|AT&T DSP16 series instruction analyser
 
 ***************************************************************************/
 #ifndef MAME_CPU_DSP16_DSP16FE_H
@@ -57,6 +57,7 @@ public:
 		REG_BIT_DAU_A1
 	};
 
+	// construction/destruction
 	frontend(dsp16_device_base &host, u32 window_start, u32 window_end, u32 max_sequence);
 
 protected:
