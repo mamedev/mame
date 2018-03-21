@@ -187,6 +187,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_COMM_LOCAL_PORT,                            "15112",     OPTION_STRING,     "local port to bind to" },
 	{ OPTION_COMM_REMOTE_HOST,                           "127.0.0.1", OPTION_STRING,     "remote address to connect to" },
 	{ OPTION_COMM_REMOTE_PORT,                           "15112",     OPTION_STRING,     "remote port to connect to" },
+	{ OPTION_COMM_FRAME_SYNC,                            "0",         OPTION_BOOLEAN,    "sync frames" },
 
 	// misc options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE MISC OPTIONS" },
