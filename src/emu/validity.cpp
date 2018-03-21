@@ -511,16 +511,18 @@ void validity_checker::validate_inlines()
 	if (fabsf(recip_approx(100.0f) - 0.01f) > 0.0001f)
 		osd_printf_error("Error testing recip_approx\n");
 
-	testi32a = (testi32a & 0x0000ffff) | 0x400000;
-	if (count_leading_zeros(testi32a) != 9)
-		osd_printf_error("Error testing count_leading_zeros\n");
-	if (count_leading_zeros(0) != 32)
-		osd_printf_error("Error testing count_leading_zeros\n");
-	testi32a = (testi32a | 0xffff0000) & ~0x400000;
-	if (count_leading_ones(testi32a) != 9)
-		osd_printf_error("Error testing count_leading_ones\n");
-	if (count_leading_ones(0xffffffff) != 32)
-		osd_printf_error("Error testing count_leading_ones\n");
+	for (int i = 0; i <= 32; i++)
+	{
+		u32 t = i < 32 ? (1 << (31 - i) | testu32a >> i) : 0;
+		u8 resultu8 = count_leading_zeros(t);
+		if (resultu8 != i)
+			osd_printf_error("Error testing count_leading_zeros %08x=%02x (expected %02x)\n", t, resultu8, i);
+
+		t ^= 0xffffffff;
+		resultu8 = count_leading_ones(t);
+		if (resultu8 != i)
+			osd_printf_error("Error testing count_leading_ones %08x=%02x (expected %02x)\n", t, resultu8, i);
+	}
 }
 
 
