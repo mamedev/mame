@@ -391,7 +391,7 @@ QUICKLOAD_LOAD_MEMBER( dmv_state, dmv )
 	uint8_t data;
 
 	/* Avoid loading a program if CP/M-80 is not in memory */
-	if ((m_ram->base()[0] != 0xc3) || (m_ram->base()[5] != 0xc3)) return image_init_result::FAIL;
+	if ((m_ram->base()[0] != 0xc3) && (m_ram->base()[5] != 0xc3)) return image_init_result::FAIL;
 
 	if (quickload_size >= 0xfd00)
 		return image_init_result::FAIL;
@@ -406,8 +406,6 @@ QUICKLOAD_LOAD_MEMBER( dmv_state, dmv )
 	m_ram->base()[0x80] = m_ram->base()[0x81] = 0;	// clear out command tail	
 	
 	m_maincpu->set_pc(0x100);                // start program
-	m_maincpu->set_state_int(Z80_SP, 256 * m_ram->base()[7] - 300);	// put the stack a bit before BDOS
-
 	return image_init_result::PASS;
 }
 
