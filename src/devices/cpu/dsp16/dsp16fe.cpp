@@ -2,13 +2,17 @@
 // copyright-holders:Vas Crabb
 /***************************************************************************
 
-    WE|AT&T DSP16 series emulator
+    WE|AT&T DSP16 series instruction analyser
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "dsp16fe.h"
 
+
+/***********************************************************************
+    construction/destruction
+***********************************************************************/
 
 dsp16_device_base::frontend::frontend(dsp16_device_base &host, u32 window_start, u32 window_end, u32 max_sequence)
 	: drc_frontend(host, window_start, window_end, max_sequence)

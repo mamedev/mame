@@ -26,7 +26,7 @@ public:
 private:
 	// compilation boundaries
 	enum : u32
-	{ 
+	{
 		COMPILE_BACKWARDS_BYTES = 64,
 		COMPILE_FORWARDS_BYTES = 256,
 		COMPILE_MAX_INSTRUCTIONS = (COMPILE_BACKWARDS_BYTES / 2) + (COMPILE_FORWARDS_BYTES / 2),
