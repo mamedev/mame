@@ -1671,6 +1671,7 @@ createMESSProjects(_target, _subtarget, "casio")
 files {
 	MAME_DIR .. "src/mame/drivers/casloopy.cpp",
 	MAME_DIR .. "src/mame/drivers/cfx9850.cpp",
+	MAME_DIR .. "src/mame/drivers/cz101.cpp",
 	MAME_DIR .. "src/mame/drivers/fp200.cpp",
 	MAME_DIR .. "src/mame/drivers/fp1100.cpp",
 	MAME_DIR .. "src/mame/drivers/fp6000.cpp",
