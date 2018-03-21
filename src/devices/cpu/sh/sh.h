@@ -32,35 +32,20 @@
 /* speed up delay loops, bail out of tight loops (can cause timer issues) */
 #define BUSY_LOOP_HACKS 0
 
-/* compilation boundaries -- how far back/forward does the analysis extend? */
-#define COMPILE_BACKWARDS_BYTES         64
-#define COMPILE_FORWARDS_BYTES          256
-#define COMPILE_MAX_INSTRUCTIONS        ((COMPILE_BACKWARDS_BYTES/2) + (COMPILE_FORWARDS_BYTES/2))
-#define COMPILE_MAX_SEQUENCE            64
-
-#define SH2DRC_STRICT_VERIFY        0x0001          /* verify all instructions */
+#define SH2DRC_STRICT_VERIFY    0x0001          /* verify all instructions */
 #define SH2DRC_FLUSH_PC         0x0002          /* flush the PC value before each memory access */
 #define SH2DRC_STRICT_PCREL     0x0004          /* do actual loads on MOVLI/MOVWI instead of collapsing to immediates */
 
 #define SH2DRC_COMPATIBLE_OPTIONS   (SH2DRC_STRICT_VERIFY | SH2DRC_FLUSH_PC | SH2DRC_STRICT_PCREL)
 #define SH2DRC_FASTEST_OPTIONS  (0)
 
-/* size of the execution code cache */
-#define CACHE_SIZE                  (32 * 1024 * 1024)
-
 #define SH2_MAX_FASTRAM       4
 
 /* map variables */
 #define MAPVAR_PC                   M0
-#define MAPVAR_CYCLES                   M1
+#define MAPVAR_CYCLES               M1
 
-/* exit codes */
-#define EXECUTE_OUT_OF_CYCLES           0
-#define EXECUTE_MISSING_CODE            1
-#define EXECUTE_UNMAPPED_CODE           2
-#define EXECUTE_RESET_CACHE         3
-
-#define PROBE_ADDRESS                   ~0
+#define PROBE_ADDRESS               ~0
 
 #define CPU_TYPE_SH1    (0)
 #define CPU_TYPE_SH2    (1)
@@ -79,12 +64,12 @@
 
 #define SH_FLAGS   (SH_M|SH_Q|SH_I|SH_S|SH_T)
 
-#define REGFLAG_R(n)                                        (1 << (n))
+#define REGFLAG_R(n)                    (1 << (n))
 
 /* register flags 1 */
 #define REGFLAG_PR                      (1 << 0)
-#define REGFLAG_MACL                        (1 << 1)
-#define REGFLAG_MACH                        (1 << 2)
+#define REGFLAG_MACL                    (1 << 1)
+#define REGFLAG_MACH                    (1 << 2)
 #define REGFLAG_GBR                     (1 << 3)
 #define REGFLAG_VBR                     (1 << 4)
 #define REGFLAG_SR                      (1 << 5)
@@ -94,8 +79,8 @@
 ***************************************************************************/
 
 #define SH2_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)) // sh2
-#define SH34LE_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,6)) // naomi
-#define SH34BE_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(6,0)) // cave
+#define SH34LE_CODE_XOR(a)  ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,6)) // naomi
+#define SH34BE_CODE_XOR(a)  ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(6,0)) // cave
 
 #define R32(reg)        m_regmap[reg]
 
@@ -167,6 +152,29 @@ public:
 	virtual void WL(offs_t A, uint32_t V) = 0;
 
 protected:
+	// compilation boundaries -- how far back/forward does the analysis extend?
+	enum : u32
+	{
+		COMPILE_BACKWARDS_BYTES     = 64,
+		COMPILE_FORWARDS_BYTES      = 256,
+		COMPILE_MAX_INSTRUCTIONS    = (COMPILE_BACKWARDS_BYTES / 2) + (COMPILE_FORWARDS_BYTES / 2),
+		COMPILE_MAX_SEQUENCE        = 64
+	};
+
+	// size of the execution code cache
+	enum : size_t
+	{
+		CACHE_SIZE                  = 32 * 1024 * 1024
+	};
+
+	// exit codes
+	enum : int
+	{
+		EXECUTE_OUT_OF_CYCLES       = 0,
+		EXECUTE_MISSING_CODE        = 1,
+		EXECUTE_UNMAPPED_CODE       = 2,
+		EXECUTE_RESET_CACHE         = 3
+	};
 
 	void ADD(uint32_t m, uint32_t n);
 	void ADDI(uint32_t i, uint32_t n);

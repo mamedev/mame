@@ -30,8 +30,8 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/tms34010/tms34010.h"
+#include "machine/eeprompar.h"
 #include "machine/mc68681.h"
-#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "screen.h"
@@ -103,9 +103,9 @@ WRITE16_MEMBER(artmagic_state::control_w)
 	COMBINE_DATA(&m_control[offset]);
 
 	/* OKI banking here */
-	if (offset == 0)
+	if (offset == 0 && !BIT(data, 0))
 	{
-		m_oki->set_rom_bank((data >> 4) & 1);
+		m_oki->set_rom_bank(BIT(data, 4));
 	}
 
 	logerror("%06X:control_w(%d) = %04X\n", m_maincpu->pc(), offset, data);
@@ -412,7 +412,7 @@ void artmagic_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x220000, 0x23ffff).ram();
-	map(0x240000, 0x240fff).ram().share("nvram");
+	map(0x240000, 0x240fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x300000, 0x300001).portr("300000");
 	map(0x300002, 0x300003).portr("300002");
 	map(0x300004, 0x300005).portr("300004");
@@ -430,7 +430,7 @@ void artmagic_state::stonebal_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x27ffff).ram();
-	map(0x280000, 0x280fff).ram().share("nvram");
+	map(0x280000, 0x280fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x300000, 0x300001).portr("300000");
 	map(0x300002, 0x300003).portr("300002");
 	map(0x300004, 0x300005).portr("300004");
@@ -450,7 +450,7 @@ void artmagic_state::shtstar_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x27ffff).ram();
-	map(0x280000, 0x280fff).ram().share("nvram");
+	map(0x280000, 0x280fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 
 	map(0x300000, 0x300001).nopr(); //AM_READ_PORT("300000")
 	map(0x300000, 0x300003).w(this, FUNC(artmagic_state::control_w)).share("control");
@@ -823,7 +823,8 @@ MACHINE_CONFIG_START(artmagic_state::artmagic)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(artmagic_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1)) // FIXME: false-readback polling should make this unnecessary
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

@@ -214,10 +214,10 @@ function hiscore.startplugin()
 		if check_mem( positions ) then
 		  default_checksum = check_scores( positions );
 		  if read_scores( positions ) then
-			emu.print_verbose( "hiscore: scores read", "OK" );
+			emu.print_verbose( "hiscore: scores read OK" );
 		  else
 			-- likely there simply isn't a .hi file around yet
-			emu.print_verbose( "hiscore: scores read", "FAIL" );
+			emu.print_verbose( "hiscore: scores read FAIL" );
 		  end
 		  scores_have_been_read = true;
 		  current_checksum = check_scores( positions );

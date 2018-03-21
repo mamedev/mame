@@ -9892,7 +9892,7 @@ ROM_START( super7 )
 	ROM_LOAD( "gal20v8.bin",   0x000, 0x114, NO_DUMP )
 	ROM_LOAD( "gal20v8.bin",   0x000, 0x114, NO_DUMP )
 	ROM_LOAD( "gal20v8.bin",   0x000, 0x114, NO_DUMP )
-	
+
 ROM_END
 
 /*
@@ -16191,19 +16191,12 @@ DRIVER_INIT_MEMBER(wingco_state, flam7_tw)
 
     60B2: After last compare, code jumps to $60BC for the demo game.
           Just patched to jump to $60B9 (jmp $644E) where the check
-          is succesfull.
+          is successful.
 */
 	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x60b3] = 0x05;
 
 }
-
-#define ROL(x,n) (bitswap<8>((x),(7+8-n)&7,(6+8-n)&7,(5+8-n)&7,(4+8-n)&7,(3+8-n)&7,(2+8-n)&7,(1+8-n)&7,(0+8-n)&7))
-
-#define WRITEDEST( n ) \
-		dest[idx]=n;    \
-		dest[idx+0x10000]=(n)^0xff; \
-		idx++;
 
 DRIVER_INIT_MEMBER(cmaster_state,tcl)
 {
@@ -16213,23 +16206,38 @@ DRIVER_INIT_MEMBER(cmaster_state,tcl)
 	int len = memregion("maincpu")->bytes();
 	std::vector<uint8_t> src(len);
 
-	int i,idx=0;
+	int idx=0;
 	memcpy(&src[0], dest, len);
-	for(i=0;i<64*1024;i+=4)
+
+	auto const rol =
+		[] (int src, int n)
+		{
+			return bitswap<8>(src,(7+8-n)&7,(6+8-n)&7,(5+8-n)&7,(4+8-n)&7,(3+8-n)&7,(2+8-n)&7,(1+8-n)&7,(0+8-n)&7);
+		};
+
+	auto const writedest =
+		[dest, &idx] (int n)
+		{
+			dest[idx]=n;
+			dest[idx+0x10000]=n^0xff;
+			idx++;
+		};
+
+	for(int i=0;i<64*1024;i+=4)
 	{
 		if(i&0x8000)
 		{
-			WRITEDEST(ROL(src[idx]^0x44,4)); // abcdefgh -> aFghaBcd
-			WRITEDEST(ROL(src[idx]^0x44,7)); // abcdefgh -> haBcdeFg
-			WRITEDEST(ROL(src[idx]^0x44,2)); // abcdefgh -> cdeFghaB
-			WRITEDEST((src[idx]^0x44)^0xf0); // abcdefgh -> AbCEeFgh
+			writedest(rol(src[idx]^0x44,4)); // abcdefgh -> aFghaBcd
+			writedest(rol(src[idx]^0x44,7)); // abcdefgh -> haBcdeFg
+			writedest(rol(src[idx]^0x44,2)); // abcdefgh -> cdeFghaB
+			writedest((src[idx]^0x44)^0xf0); // abcdefgh -> AbCEeFgh
 		}
 		else
 		{
-			WRITEDEST(ROL(src[idx]^0x11,4)); // abcdefgh -> efgHabcD
-			WRITEDEST(ROL(src[idx]^0x11,7)); // abcdefgh -> HabcDefg
-			WRITEDEST(ROL(src[idx]^0x11,2)); // abcdefgh -> cDefgHab
-			WRITEDEST((src[idx]^0x11)^0xf0); // abcdefgh -> ABCdefgH
+			writedest(rol(src[idx]^0x11,4)); // abcdefgh -> efgHabcD
+			writedest(rol(src[idx]^0x11,7)); // abcdefgh -> HabcDefg
+			writedest(rol(src[idx]^0x11,2)); // abcdefgh -> cDefgHab
+			writedest((src[idx]^0x11)^0xf0); // abcdefgh -> ABCdefgH
 		}
 	}
 }

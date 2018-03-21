@@ -682,7 +682,16 @@ ROM_END
 /*------------------------------------
 / Strange Science #OE35
 /------------------------------------*/
+
 ROM_START(strngsci)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "strange_scienc.u2", 0x8000, 0x4000, CRC(0a0ebf25) SHA1(6b120e5b3aa13d1650c4ee8c4c98996b13be167e)) // 12/12/86
+	ROM_LOAD( "strange_scienc.u3", 0xc000, 0x4000, CRC(c5b17b07) SHA1(823eb1e2ceb33f221b69c11eb71cb53c48d0f716)) // 12/12/86
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("sound_u7.256", 0x8000, 0x8000, CRC(bc33901e) SHA1(5231d8f01a107742acee2d13580a461063018a11))
+ROM_END
+
+ROM_START(strngscia)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpu_u2.128", 0x8000, 0x4000, CRC(2ffcf284) SHA1(27d66806708c983092bab4ed6965c2e91e69acdc))
 	ROM_LOAD( "cpu_u3.128", 0xc000, 0x4000, CRC(35257931) SHA1(d3d6b84e50677a4c5f9d5c13c9522ad6d3a1358d))
@@ -690,7 +699,7 @@ ROM_START(strngsci)
 	ROM_LOAD("sound_u7.256", 0x8000, 0x8000, CRC(bc33901e) SHA1(5231d8f01a107742acee2d13580a461063018a11))
 ROM_END
 
-ROM_START(strngscg)
+ROM_START(strngscig)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpub_u2.128", 0x8000, 0x4000, CRC(48ef1052) SHA1(afcb0520ab834c0d6ef4a73f615c48653ccedc24))
 	ROM_LOAD( "cpub_u3.128", 0xc000, 0x4000, CRC(da5b4b3b) SHA1(ff9babf2efc6622803db9ba8712dd8b76c8412b8))
@@ -736,8 +745,9 @@ GAME( 1985, beatclck2, beatclck, by6803, by6803, by6803_state, by6803, ROT0, "Ba
 GAME( 1986, motrdome,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "MotorDome",                             MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, motrdomeg, motrdome, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "MotorDome (German)",                    MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, ladyluck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Lady Luck",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, strngsci,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Strange Science",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, strngscg,  strngsci, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Strange Science (German)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, strngsci,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Strange Science (Rev C)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, strngscia, strngsci, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Strange Science (Rev A)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, strngscig, strngsci, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Strange Science (German, Rev A)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, specforc,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Special Force",                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, blackblt,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Black Belt",                            MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, blackblt2, blackblt, by6803, by6803, by6803_state, by6803, ROT0, "Bally", "Black Belt (Squawk and Talk)",          MACHINE_IS_SKELETON_MECHANICAL)

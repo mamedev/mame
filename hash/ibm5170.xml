@@ -5545,6 +5545,20 @@
 		</part>
 	</software>
 
+	<software name="masm51">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+		<description>Microsoft Macro Assembler 5.1 (MS OS/2 Tools)</description>
+		<year>1988</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="5.1" />
+		<info name="serial" value="03159" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="[PC] Microsoft Macro Assembler 5.1 for DOS and OS2 [5.25HD] [Disk 1 of 1].img" size="1228800" crc="78715a73" sha1="663622bfdbc2dac528ea4449cd202727df070355" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mbhh95">
 		<description>MikroBITTI Huvi- ja hyötylevyke 1995 (Fin)</description>
 		<year>1995</year>
@@ -9221,7 +9235,19 @@
 		</part>
 	</software>
 
-	<software name="link386p">
+	<software name="linksfcc">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+		<description>Links - Championship Course - Firestone Country Club</description>
+		<year>1991</year>
+		<publisher>Access Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="[PC] Links - Championship Course - Firestone Country Club [5.25HD] [Disk 1 of 1].img" size="1228800" crc="19ee1903" sha1="e0fb830810c189f7c143f83d206203655237dd29" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="links386">
 		<description>Links 386 Pro</description>
 		<year>1992</year>
 		<publisher>Access Software</publisher>
@@ -9248,8 +9274,8 @@
 		</part>
 	</software>
 
-	<software name="bntf_crs">
-		<description>Links Championship Course: Bountiful Golf Club Championship Course</description>
+	<software name="links386bnt">
+		<description>Links 386 - Bountiful Golf Club Championship Course</description>
 		<year>1994</year>
 		<publisher>Access Software</publisher>
 		<part name="flop1" interface="floppy_3_5">

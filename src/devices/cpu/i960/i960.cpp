@@ -601,12 +601,13 @@ void i960_cpu_device::do_ret()
 
 // if last opcode was a multi dword burst read opcode save the data here
 // i.e. Model 2 FIFO reads with ldl, ldt, ldq
-void i960_cpu_device::burst_stall_save(uint32_t t1, uint32_t t2, int index, int size)
+void i960_cpu_device::burst_stall_save(uint32_t t1, uint32_t t2, int index, int size, bool iswriteop)
 {
 	m_stall_state.t1 = t1;
 	m_stall_state.t2 = t2;
 	m_stall_state.index = index;
 	m_stall_state.size = size;
+	m_stall_state.iswriteop = iswriteop;
 	m_stall_state.burst_mode = true;
 }
 
@@ -620,9 +621,12 @@ void i960_cpu_device::execute_burst_stall_op(uint32_t opcode)
 	// check if our data is ready
 	for(i=m_stall_state.index ; i<m_stall_state.size ;i++)
 	{
-		// count down 1 icount for every read
+		// count down 1 icount for every op
 		m_icount--;
-		m_r[m_stall_state.t2+i] = i960_read_dword_unaligned(m_stall_state.t1);
+		if(m_stall_state.iswriteop == true)
+			i960_write_dword_unaligned(m_stall_state.t1, m_r[m_stall_state.t2+i]);
+		else
+			m_r[m_stall_state.t2+i] = i960_read_dword_unaligned(m_stall_state.t1);
 
 		// if the host returned stall just save the index and try again on a later moment
 		if(m_stalled == true)
@@ -1952,7 +1956,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_r[t2+i] = i960_read_dword_unaligned(t1);
 				if(m_stalled)
 				{
-					burst_stall_save(t1,t2,i,2);
+					burst_stall_save(t1,t2,i,2,false);
 					return;
 				}
 				if(m_bursting)
@@ -1969,6 +1973,11 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			m_bursting = 1;
 			for(i=0; i<2; i++) {
 				i960_write_dword_unaligned(t1, m_r[t2+i]);
+				if(m_stalled)
+				{
+					burst_stall_save(t1,t2,i,2,true);
+					return;
+				}
 				if(m_bursting)
 					t1 += 4;
 			}
@@ -1985,7 +1994,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_r[t2+i] = i960_read_dword_unaligned(t1);
 				if(m_stalled)
 				{
-					burst_stall_save(t1,t2,i,3);
+					burst_stall_save(t1,t2,i,3,false);
 					return;
 				}
 				if(m_bursting)
@@ -2002,6 +2011,11 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			m_bursting = 1;
 			for(i=0; i<3; i++) {
 				i960_write_dword_unaligned(t1, m_r[t2+i]);
+				if(m_stalled)
+				{
+					burst_stall_save(t1,t2,i,3,true);
+					return;
+				}
 				if(m_bursting)
 					t1 += 4;
 			}
@@ -2018,7 +2032,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_r[t2+i] = i960_read_dword_unaligned(t1);
 				if(m_stalled)
 				{
-					burst_stall_save(t1,t2,i,4);
+					burst_stall_save(t1,t2,i,4,false);
 					return;
 				}
 				if(m_bursting)
@@ -2035,6 +2049,11 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			m_bursting = 1;
 			for(i=0; i<4; i++) {
 				i960_write_dword_unaligned(t1, m_r[t2+i]);
+				if(m_stalled)
+				{
+					burst_stall_save(t1,t2,i,4,true);
+					return;
+				}
 				if(m_bursting)
 					t1 += 4;
 			}

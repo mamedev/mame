@@ -468,7 +468,7 @@ void mb86235_disassembler::dasm_xfer1(std::ostream &stream, uint64_t opcode)
 	}
 }
 
-void mb86235_disassembler::dasm_double_xfer2_field(std::ostream &stream, int sd, uint32_t field)
+void mb86235_disassembler::dasm_double_xfer2_field(std::ostream &stream, int sd, bool isbbus, uint32_t field)
 {
 	switch (sd)
 	{
@@ -476,6 +476,11 @@ void mb86235_disassembler::dasm_double_xfer2_field(std::ostream &stream, int sd,
 		{
 			int s = (field >> 13) & 0x1f;
 			int d = (field >> 8) & 0x1f;
+			if(isbbus == true)
+			{
+				s |= 0x20;
+				d |= 0x20;
+			}
 			util::stream_format(stream, "%s, %s", regname[s], regname[d]);
 			break;
 		}
@@ -576,9 +581,9 @@ void mb86235_disassembler::dasm_double_xfer2(std::ostream &stream, uint64_t opco
 	else
 	{
 		stream << "MVD2 ";
-		dasm_double_xfer2_field(stream, asd, (opcode >> 20) & 0x3ffff);
+		dasm_double_xfer2_field(stream, asd, false, (opcode >> 20) & 0x3ffff);
 		stream << ", ";
-		dasm_double_xfer2_field(stream, bsd, opcode & 0x3ffff);
+		dasm_double_xfer2_field(stream, bsd, true, opcode & 0x3ffff);
 	}
 }
 

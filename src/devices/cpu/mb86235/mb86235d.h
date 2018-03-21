@@ -32,7 +32,7 @@ private:
 	void dasm_control(std::ostream &stream, uint32_t pc, uint64_t opcode);
 	void dasm_double_xfer1(std::ostream &stream, uint64_t opcode);
 	void dasm_xfer1(std::ostream &stream, uint64_t opcode);
-	void dasm_double_xfer2_field(std::ostream &stream, int sd, uint32_t field);
+	void dasm_double_xfer2_field(std::ostream &stream, int sd, bool isbbus, uint32_t field);
 	void dasm_double_xfer2(std::ostream &stream, uint64_t opcode);
 	void dasm_xfer2(std::ostream &stream, uint64_t opcode);
 	void dasm_xfer3(std::ostream &stream, uint64_t opcode);

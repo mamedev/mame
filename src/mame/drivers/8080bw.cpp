@@ -3,7 +3,7 @@
 // thanks-to:Michael Strutts, Marco Cassili
 /*****************************************************************************
 
-    8080bw.c
+    8080bw.cpp
 
     Michael Strutts, Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni
     Lee Taylor, Valerio Verrando, Marco Cassili, Zsolt Vasvari, and others
@@ -2545,23 +2545,68 @@ MACHINE_CONFIG_END
 
 /*****************************************************
 
- Omori "Shuttle Invader" ??
+Guru Readme for Shuttle Invader (Omori 1979)
 
- 8080 CPU
+PCB Layout
+----------
 
- 1x  SN76477
-g 2x  SN75452
- 4x  8216 RAM
- 2x  TMS4045 RAM
- 16x MCM4027 RAM
- 1x  empty small socket. maybe (missing) PROM?
- 1x  8 position dipsw
- 1x  556
- 1x  458
- 1x  lm380 (amp chip)
+OEC-3C
+|----------------------------------------------------------|
+| LM556   DIP16                                            |
+|VR1                                                       |
+| LM458  SN76477                                           |
+|VR2                 5.545MHz                              |
+| LM380                                                    |
+|                                   4045 4045              |
+|                      2.11C   1.13C                       |
+|                18MHz                 4027 4027 4027 4027 |
+|                      4.11D   3.13D                       |
+|               AM8224                 4027 4027 4027 4027 |
+|                i8080 DIP24   5.13E                       |
+|      DSW                             4027 4027 4027 4027 |
+|                                                          |
+|SN75452  SN75452      8.11F           4027 4027 4027 4027 |
+|      CN2     8216 8216                        CN1        |
+|----------------------------------------------------------|
+Notes:
+      i8080   - Intel 8080 CPU. Clock input 2.000MHz [18/9]. Note the /9 comes from the AM8224
+      SN76477 - Texas Instruments SN76477 Complex Sound Generator
+      SN75452 - Texas Instruments SN75452 Dual High Speed High Current Peripheral Driver
+      8216    - NEC uPB8216 4 Bit Parallel Bi-Directional Bus Driver
+      4045    - Texas Instruments TMS4045 1k x 4-bit Static RAM (Work RAM)
+      4027    - Motorola MCM4027 4k x 1-bit Dynamic RAM (Video RAM)
+      AM8224  - AMD AM8224 Clock Generator and Driver for 8080-Compatible Microprocessors
+      DIP16   - DIP16 socket for connection of 16-wire flat cable joining to OEC-4A PCB
+      LM556   - Texas Instruments LM556 Dual Timer
+      LM458   - Texas Instruments LM458 Low Power Dual Operational Amplifier
+      LM380   - Texas Instruments LM380 2.5W Audio Power Amplifier
+      CN1     - 11-pin Power Input Connector. Pinout (left to right) is GND,GND,GND,+5V,+5V,+5V,+12V,+12V,+12V,[SPACE],-5V
+      CN2     - 25-pin Connector for Control Inputs/Audio Output etc.
+      VR1     - Potentiometer (Master Volume)
+      VR2     - Potentiometer (volume of other sounds? maybe background sounds?)
+      DSW     - 8-position DIP Switch
 
- xtal 18MHz
- xtal 5.545MHz
+Additional PCB (more sounds?)
+--------------
+
+OEC-4A
+|-------------------|
+|   VR1  74121      |
+| 7400 7404 74S287  |
+|75452 CN2 CN1 LM723|
+|75452              |
+|                   |
+|--|    22-WAY   |--|
+   |-------------|
+Notes: (All IC's shown)
+      LM723  - Texas Instruments LM723 Voltage Regulator
+      74S287 - Texas Instruments SN74S287 256-bit x 4-bit Bi-Polar PROM at location 2B
+      75452  - Texas Instruments SN75452 Dual High Speed High Current Peripheral Driver
+      VR1    - Potentiometer connected to LM723 pin 5
+      CN1    - DIP16 socket for connection of 16-wire flat cable joining to Main PCB
+      CN2    - Empty DIP16 socket
+      22-WAY - Single-Sided 22-WAY Card Edge Connector. Has many tracks coming from it, as well as power.
+               It's purpose and what it plugs into is unknown.
 
 ******************************************************/
 
@@ -2698,8 +2743,8 @@ void _8080bw_state::shuttlei_io_map(address_map &map)
 MACHINE_CONFIG_START(_8080bw_state::shuttlei)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(18'000'000) / 10) // divider guessed
-	// TODO: move irq handling away from mw8080.c, this game runs on custom hardware
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(18'000'000) / 9)
+	// TODO: move irq handling away from mw8080.cpp, this game runs on custom hardware
 	MCFG_CPU_PROGRAM_MAP(shuttlei_map)
 	MCFG_CPU_IO_MAP(shuttlei_io_map)
 
