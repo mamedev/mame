@@ -33,8 +33,8 @@ WRITE16_MEMBER(legionna_state::tilemap_enable_w)
 
 WRITE16_MEMBER(legionna_state::tile_scroll_w)
 {
-	COMBINE_DATA(scrollvals + offset);
-	data = scrollvals[offset];
+	COMBINE_DATA(m_scrollvals + offset);
+	data = m_scrollvals[offset];
 
 	tilemap_t *tm = nullptr;
 	switch(offset/2) {
@@ -65,20 +65,35 @@ WRITE16_MEMBER(legionna_state::tile_scroll_base_w)
 
 WRITE16_MEMBER(legionna_state::heatbrl_setgfxbank)
 {
-	m_back_gfx_bank = (data &0x4000) >> 2;
+	uint16_t bank = (data &0x4000) >> 2;
+	if (m_back_gfx_bank != bank)
+	{
+		m_back_gfx_bank = bank;
+		m_background_layer->mark_all_dirty();
+	}
 }
 
 /*xxx- --- ---- ---- banking*/
 WRITE16_MEMBER(legionna_state::denjinmk_setgfxbank)
 {
-	m_fore_gfx_bank = (data &0x2000) >> 1;//???
-	m_back_gfx_bank = (data &0x4000) >> 2;
-	m_mid_gfx_bank  = (data &0x8000) >> 3;//???
-
-	m_background_layer->mark_all_dirty();
-	m_foreground_layer->mark_all_dirty();
-	m_midground_layer->mark_all_dirty();
-	m_text_layer->mark_all_dirty();
+	uint16_t bank = (data &0x2000) >> 1;//???
+	if (m_fore_gfx_bank != bank)
+	{
+		m_fore_gfx_bank = bank;
+		m_foreground_layer->mark_all_dirty();
+	}
+	bank = (data &0x4000) >> 2;
+	if (m_back_gfx_bank != bank)
+	{
+		m_back_gfx_bank = bank;
+		m_background_layer->mark_all_dirty();
+	}
+	bank = (data &0x8000) >> 3;//???
+	if (m_mid_gfx_bank != bank)
+	{
+		m_mid_gfx_bank = bank;
+		m_midground_layer->mark_all_dirty();
+	}
 }
 
 WRITE16_MEMBER(legionna_state::videowrite_cb_w)
@@ -151,7 +166,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_back_tile_info)
 	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info)
+TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_split)
 {
 	int tile=m_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -169,10 +184,10 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_denji)
 	tile &= 0xfff;
 	tile |= m_mid_gfx_bank;
 
-	SET_TILE_INFO_MEMBER(5,tile,color,0);
+	SET_TILE_INFO_MEMBER(2,tile,color,0); // BK2 instead LBK, just different identification string?
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_cupsoc)
+TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info)
 {
 	int tile=m_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -236,16 +251,27 @@ void legionna_state::common_video_allocate_ptr()
 	save_item(NAME(m_mid_gfx_bank));
 	save_item(NAME(m_fore_gfx_bank));
 	save_item(NAME(m_layer_disable));
+	save_item(NAME(m_scrollvals));
 }
 
-void legionna_state::common_video_start()
+void legionna_state::common_video_start(bool is_seperated_lbk)
 {
 	common_video_allocate_ptr();
 
-	m_background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_midground_layer =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_text_layer =       &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
+	if (is_seperated_lbk)
+	{
+		m_background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,      16,16,32,32);
+		m_midground_layer =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_split),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+		m_foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,      16,16,32,32);
+		m_text_layer =       &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,       8, 8,64,32);
+	}
+	else
+	{
+		m_background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+		m_midground_layer =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+		m_foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+		m_text_layer =       &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	}
 
 	m_has_extended_banking = 0;
 	m_has_extended_priority = 0;
@@ -258,7 +284,7 @@ void legionna_state::common_video_start()
 
 VIDEO_START_MEMBER(legionna_state,legionna)
 {
-	common_video_start();
+	common_video_start(false);
 
 	m_sprite_pri_mask[0] = 0x0000;
 	m_sprite_pri_mask[1] = 0xfff0;
@@ -268,7 +294,7 @@ VIDEO_START_MEMBER(legionna_state,legionna)
 
 VIDEO_START_MEMBER(legionna_state,heatbrl)
 {
-	common_video_start();
+	common_video_start(true);
 
 	m_sprite_pri_mask[0] = 0xfff0;
 	m_sprite_pri_mask[1] = 0xfffc;
@@ -279,7 +305,7 @@ VIDEO_START_MEMBER(legionna_state,heatbrl)
 
 VIDEO_START_MEMBER(legionna_state,godzilla)
 {
-	VIDEO_START_CALL_MEMBER(legionna);
+	common_video_start(false);
 
 	m_has_extended_banking = 1;
 	m_has_extended_priority = 0;
@@ -316,25 +342,15 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 
 VIDEO_START_MEMBER(legionna_state,cupsoc)
 {
-	common_video_allocate_ptr();
-
-	m_background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_midground_layer =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_cupsoc),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_text_layer =       &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
+	common_video_start(false);
 
 	m_has_extended_banking = 0;
 	m_has_extended_priority = 1;
-
-	m_background_layer->set_transparent_pen(15);
-	m_midground_layer->set_transparent_pen(15);
-	m_foreground_layer->set_transparent_pen(15);
-	m_text_layer->set_transparent_pen(15);
 }
 
 VIDEO_START_MEMBER(legionna_state,grainbow)
 {
-	VIDEO_START_CALL_MEMBER(legionna);
+	common_video_start(false);
 	m_sprite_xoffs = m_sprite_yoffs = 16;
 
 	m_has_extended_banking = 0;
@@ -509,7 +525,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 		}
 
 
-		color = (data &0x3f) + 0x40;
+		color = (data &0x3f);
 		fx =  (data &0x4000) >> 14;
 		fy =  (data &0x2000) >> 13;
 		dy = ((data &0x0380) >> 7)  + 1;

@@ -1482,18 +1482,6 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(raiden2_state::xsedae)
-	raiden2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(xsedae_mem)
-
-	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,xsedae)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
-MACHINE_CONFIG_END
-
 MACHINE_CONFIG_START(raiden2_state::raidendx)
 	raiden2(config);
 	MCFG_CPU_MODIFY("maincpu")
@@ -1542,7 +1530,7 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1320000/* ? */, PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", XTAL(28'636'363)/28, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1550,6 +1538,29 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
 	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(raiden2_state::xsedae)
+	zeroteam(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(xsedae_mem)
+
+	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,xsedae)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+
+	MCFG_SOUND_REMOVE("ymsnd")
+	MCFG_YM2151_ADD("ymsnd", XTAL(28'636'363)/8) // YM2151 instead YM3812
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+
+	MCFG_DEVICE_REPLACE("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
 /* ROM LOADING */
@@ -3127,10 +3138,8 @@ ROM_START( xsedae )
 	ROM_LOAD32_WORD( "obj-1.u0811",  0x000000, 0x200000, CRC(6ae993eb) SHA1(d9713c79eacb4b3ce5e82dd3ce39003e3a433d8f) )
 	ROM_LOAD32_WORD( "obj-2.u082",   0x000002, 0x200000, CRC(26c806ee) SHA1(899a76a1b3f933c6f5cb6b5dcdf5b58e1b7e49c6) )
 
-	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x100000, "oki", 0 )   /* ADPCM samples */
 	ROM_LOAD( "9.u105.4a", 0x00000, 0x40000, CRC(a7a0c5f9) SHA1(7882681ac152642aa4f859071f195842068b214b) )
-
-	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )   /* ADPCM samples */
 ROM_END
 
 const uint16_t raiden2_state::raiden_blended_colors[] = {
