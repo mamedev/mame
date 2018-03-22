@@ -439,7 +439,6 @@ QUICKLOAD_LOAD_MEMBER( aussiebyte_state, aussiebyte )
 {
 	uint16_t i;
 	uint8_t data;
-	uint16_t sp;
 
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
@@ -460,9 +459,6 @@ QUICKLOAD_LOAD_MEMBER( aussiebyte_state, aussiebyte )
 		return image_init_result::FAIL;
 	}
 	
-	/* Roughly set SP basing on the BDOS position */
-	sp = 256 * prog_space.read_byte(7) - 300;
-
 	/* Load image to the TPA (Transient Program Area) */
 	for (i = 0; i < quickload_size; i++)
 	{
@@ -474,7 +470,8 @@ QUICKLOAD_LOAD_MEMBER( aussiebyte_state, aussiebyte )
 	prog_space.write_byte(0x80, 0);
 	prog_space.write_byte(0x81, 0);
 	
-	m_maincpu->set_state_int(Z80_SP, sp);	 // stack ptr
+	/* Roughly set SP basing on the BDOS position */
+	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 0x400);
 	m_maincpu->set_pc(0x100);                // start program
 	return image_init_result::PASS;
 }
