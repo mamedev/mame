@@ -465,11 +465,11 @@ void device_execute_interface::interface_pre_reset()
 	// reset the total number of cycles
 	m_totalcycles = 0;
 
-	// enable all devices (except for disabled devices)
-	if (!disabled())
-		resume(SUSPEND_ANY_REASON);
-	else
+	// enable all devices (except for disabled and unclocked devices)
+	if (disabled())
 		suspend(SUSPEND_REASON_DISABLE, true);
+	else if (device().clock() != 0)
+		resume(SUSPEND_ANY_REASON);
 }
 
 

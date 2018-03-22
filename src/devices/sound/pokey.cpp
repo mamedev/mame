@@ -201,8 +201,6 @@ void pokey_device::device_start()
 	//int sample_rate = clock();
 	int i;
 
-	m_clock_period = attotime::from_hz(clock());
-
 	/* Setup channels */
 	for (i=0; i<POKEY_CHANNELS; i++)
 	{
@@ -364,12 +362,15 @@ void pokey_device::device_post_load()
 
 void pokey_device::device_clock_changed()
 {
-	m_clock_period = attotime::from_hz(clock());
+	m_clock_period = clocks_to_attotime(1);
 
-	if (m_stream != nullptr)
-		m_stream->set_sample_rate(clock());
-	else
-		m_stream = stream_alloc(0, 1, clock());
+	if (clock() != 0)
+	{
+		if (m_stream != nullptr)
+			m_stream->set_sample_rate(clock());
+		else
+			m_stream = stream_alloc(0, 1, clock());
+	}
 }
 
 //-------------------------------------------------
