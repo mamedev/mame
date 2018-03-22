@@ -576,6 +576,9 @@ WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 	{
 		m_adpcm.pan = data & 0x03;
 		m_adpcm.rate = (data & 0x0c) >> 2;
+		if (m_adpcm.rate == 3)
+			logerror("PPI: Invalid ADPCM sample rate set.\n");
+
 		x68k_set_adpcm();
 		m_okim6258->set_divider(m_adpcm.rate);
 		m_adpcm_out[0]->flt_volume_set_volume((m_adpcm.pan & 1) ? 0.0f : 1.0f);
