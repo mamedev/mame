@@ -332,9 +332,9 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_scc_ack)
 
 void x68k_state::x68k_set_adpcm()
 {
-	uint32_t rate = adpcm_div[(m_adpcm.rate >> 2) & 3];
-	uint32_t clock = adpcm_clock[m_adpcm.clock];
-	m_adpcm_timer->adjust(attotime::from_ticks(rate, clock/2), 0, attotime::from_ticks(rate, clock/2));
+	uint32_t rate = adpcm_div[m_adpcm.rate];
+	uint32_t res_clock = adpcm_clock[m_adpcm.clock]/2;
+	m_adpcm_timer->adjust(attotime::from_ticks(rate, res_clock), 0, attotime::from_ticks(rate, res_clock));
 }
 
 // Megadrive 3 button gamepad
@@ -575,9 +575,9 @@ WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 	if((data & 0x0f) != (m_ppi_prev & 0x0f))
 	{
 		m_adpcm.pan = data & 0x03;
-		m_adpcm.rate = data & 0x0c;
+		m_adpcm.rate = (data & 0x0c) >> 2;
 		x68k_set_adpcm();
-		m_okim6258->set_divider((m_adpcm.rate >> 2) & 3);
+		m_okim6258->set_divider(m_adpcm.rate);
 		m_adpcm_out[0]->flt_volume_set_volume((m_adpcm.pan & 1) ? 0.0f : 1.0f);
 		m_adpcm_out[1]->flt_volume_set_volume((m_adpcm.pan & 2) ? 0.0f : 1.0f);
 	}
