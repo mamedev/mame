@@ -387,19 +387,19 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 
 QUICKLOAD_LOAD_MEMBER( dmv_state, dmv )
 {
-	uint16_t i;
-	uint8_t data;
-
 	/* Avoid loading a program if CP/M-80 is not in memory */
-	if ((m_ram->base()[0] != 0xc3) || (m_ram->base()[5] != 0xc3)) return image_init_result::FAIL;
+	if ((m_ram->base()[0] != 0xc3) || (m_ram->base()[5] != 0xc3))
+		return image_init_result::FAIL;
 
 	if (quickload_size >= 0xfd00)
 		return image_init_result::FAIL;
 
 	/* Load image to the TPA (Transient Program Area) */
-	for (i = 0; i < quickload_size; i++)
+	for (uint16_t i = 0; i < quickload_size; i++)
 	{
-		if (image.fread( &data, 1) != 1) return image_init_result::FAIL;
+		uint8_t data;
+		if (image.fread( &data, 1) != 1)
+			return image_init_result::FAIL;
 		m_ram->base()[i+0x100] = data;
 	}
 
