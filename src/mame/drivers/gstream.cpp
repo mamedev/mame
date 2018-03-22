@@ -568,7 +568,7 @@ void gstream_state::video_start()
 
 
 // custom drawgfx function for x2222 to draw RGB data instead of indexed data, needed because our regular drawgfx and tilemap code don't support that
-void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,gfx_element *gfx2,
+void drawgfx_transpen_x2222(gstream_state *state, bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,gfx_element *gfx2,
 		uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty,
 		uint32_t transpen)
 {
@@ -665,8 +665,6 @@ void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_e
 					srcdata += dy;
 					srcdata2 += dy;
 
-
-
 					/* iterate over leftover pixels */
 					for (curx = 0; curx < leftovers; curx++)
 					{
@@ -737,7 +735,7 @@ void gstream_state::draw_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect, int
 			int code = (vram_data & 0x0fff);
 
 			if (m_gfxdecode->gfx(map+5))
-				drawgfx_transpen_x2222(bitmap,cliprect,m_gfxdecode->gfx(map),m_gfxdecode->gfx(map+5),code,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
+				drawgfx_transpen_x2222(this,bitmap,cliprect,m_gfxdecode->gfx(map),m_gfxdecode->gfx(map+5),code,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
 			else
 				m_gfxdecode->gfx(map)->transpen(bitmap,cliprect,code,pal,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
 
@@ -787,10 +785,10 @@ uint32_t gstream_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 		if (m_gfxdecode->gfx(4))
 		{
-			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, 0, 0, x - m_xoffset, y, 0);
-			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, 0, 0, x - m_xoffset, y-0x100, 0);
-			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, 0, 0, x - m_xoffset - 0x200, y, 0);
-			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, 0, 0, x - m_xoffset - 0x200 , y-0x100, 0);
+			drawgfx_transpen_x2222(this,bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, 0, 0, x - m_xoffset, y, 0);
+			drawgfx_transpen_x2222(this,bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, 0, 0, x - m_xoffset, y-0x100, 0);
+			drawgfx_transpen_x2222(this,bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, 0, 0, x - m_xoffset - 0x200, y, 0);
+			drawgfx_transpen_x2222(this,bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, 0, 0, x - m_xoffset - 0x200 , y-0x100, 0);
 
 		}
 		else
