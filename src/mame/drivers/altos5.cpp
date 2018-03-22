@@ -322,9 +322,6 @@ WRITE8_MEMBER( altos5_state::port09_w )
 
 QUICKLOAD_LOAD_MEMBER( altos5_state, altos5 )
 {
-	uint16_t i;
-	uint8_t data;
-
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	
 	if (quickload_size >= 0xfd00)
@@ -339,19 +336,22 @@ QUICKLOAD_LOAD_MEMBER( altos5_state, altos5 )
 	}
 	
 	/* Load image to the TPA (Transient Program Area) */
-	for (i = 0; i < quickload_size; i++)
+	for (uint16_t i = 0; i < quickload_size; i++)
 	{
-		if (image.fread( &data, 1) != 1) return image_init_result::FAIL;
+		uint8_t data;
+		
+		if (image.fread( &data, 1) != 1)
+			return image_init_result::FAIL;
 		prog_space.write_byte(i+0x100, data);
 	}
 
 	/* clear out command tail */
-	prog_space.write_byte(0x80, 0);
-	prog_space.write_byte(0x81, 0);
+	prog_space.write_byte(0x80, 0);   prog_space.write_byte(0x81, 0);
 	
 	/* Roughly set SP basing on the BDOS position */
 	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
-	m_maincpu->set_pc(0x100);                // start program
+	m_maincpu->set_pc(0x100);       // start program
+	
 	return image_init_result::PASS;
 }
 
