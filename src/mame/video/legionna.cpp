@@ -98,29 +98,29 @@ WRITE16_MEMBER(legionna_state::denjinmk_setgfxbank)
 
 WRITE16_MEMBER(legionna_state::videowrite_cb_w)
 {
-	//  AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
-	//  AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
-	//  AM_RANGE(0x102000, 0x1027ff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
-	//  AM_RANGE(0x102800, 0x1037ff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
+	//  AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(background_w) AM_SHARE("back_data")
+	//  AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(foreground_w) AM_SHARE("fore_data")
+	//  AM_RANGE(0x102000, 0x1027ff) AM_RAM // _WRITE(midground_w) AM_SHARE("mid_data")
+	//  AM_RANGE(0x102800, 0x1037ff) AM_RAM // _WRITE(text_w) AM_SHARE("textram")
 
 	if (offset < 0x800 / 2)
 	{
-		legionna_background_w(space, offset, data, 0xffff);
+		background_w(space, offset, data, 0xffff);
 	}
 	else if (offset < 0x1000 /2)
 	{
 		offset -= 0x800 / 2;
-		legionna_foreground_w(space, offset, data, 0xffff);
+		foreground_w(space, offset, data, 0xffff);
 	}
 	else if (offset < 0x1800/2)
 	{
 		offset -= 0x1000 / 2;
-		legionna_midground_w(space, offset, data, 0xffff);
+		midground_w(space, offset, data, 0xffff);
 	}
 	else if (offset < 0x2800/2)
 	{
 		offset -= 0x1800 / 2;
-		legionna_text_w(space, offset, data, 0xffff);
+		text_w(space, offset, data, 0xffff);
 	}
 }
 
@@ -131,25 +131,25 @@ WRITE16_MEMBER(legionna_state::grainbow_layer_config_w)
 	COMBINE_DATA(&m_layer_config[offset]);
 }
 
-WRITE16_MEMBER(legionna_state::legionna_background_w)
+WRITE16_MEMBER(legionna_state::background_w)
 {
 	COMBINE_DATA(&m_back_data[offset]);
 	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(legionna_state::legionna_midground_w)
+WRITE16_MEMBER(legionna_state::midground_w)
 {
 	COMBINE_DATA(&m_mid_data[offset]);
 	m_midground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(legionna_state::legionna_foreground_w)
+WRITE16_MEMBER(legionna_state::foreground_w)
 {
 	COMBINE_DATA(&m_fore_data[offset]);
 	m_foreground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(legionna_state::legionna_text_w)
+WRITE16_MEMBER(legionna_state::text_w)
 {
 	COMBINE_DATA(&m_textram[offset]);
 	m_text_layer->mark_tile_dirty(offset);

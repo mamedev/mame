@@ -59,10 +59,10 @@ public:
 	DECLARE_WRITE16_MEMBER(tile_vreg_1a_w);
 	DECLARE_WRITE16_MEMBER(videowrite_cb_w);
 	DECLARE_WRITE16_MEMBER(wordswapram_w);
-	DECLARE_WRITE16_MEMBER(legionna_background_w);
-	DECLARE_WRITE16_MEMBER(legionna_midground_w);
-	DECLARE_WRITE16_MEMBER(legionna_foreground_w);
-	DECLARE_WRITE16_MEMBER(legionna_text_w);
+	DECLARE_WRITE16_MEMBER(background_w);
+	DECLARE_WRITE16_MEMBER(midground_w);
+	DECLARE_WRITE16_MEMBER(foreground_w);
+	DECLARE_WRITE16_MEMBER(text_w);
 	DECLARE_READ8_MEMBER(denjinmk_sound_comms_r);
 	DECLARE_WRITE16_MEMBER(denjinmk_setgfxbank);
 	DECLARE_WRITE16_MEMBER(heatbrl_setgfxbank);
