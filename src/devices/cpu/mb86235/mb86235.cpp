@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, ElSemi, Ville Linde
-/*****************************************************************************
+/********************************************************************************
  *
  * MB86235 "TGPx4" (c) Fujitsu
  *
@@ -9,14 +9,16 @@
  * TODO:
  * - rewrite ALU integer/floating point functions, use templates etc;
  * - move post-opcodes outside of the execute_op() function, like increment_prp()
- *   (needed if opcode uses fifo in/out);
- * - fifo stall shouldn't make the alu opcode to repeat;
- * - illegal delay slot on REP unsupported;
+ *    (needed if opcode uses fifo in/out);
+ * - rewrite fifo hookups, remove them from the actual opcodes.
+ * - use a phase system for the execution, like do_alu() being separated 
+ *    from control();
+ * - illegal delay slots unsupported, and no idea about what is supposed to happen;
  * - externalize PDR / DDR (error LED flags on Model 2);
  * - instruction cycles;
  * - pipeline (four instruction executed per cycle!)
  *
- *****************************************************************************/
+ ********************************************************************************/
 
 #include "emu.h"
 #include "mb86235.h"
@@ -61,8 +63,8 @@ void mb86235_device::execute_run()
 	{
 		uint32_t curpc;
 		
-		curpc = m_core->cur_fifo_state.has_stalled ? m_core->cur_fifo_state.pc : m_core->pc;
-		
+		curpc = check_previous_op_stall() ? m_core->cur_fifo_state.pc : m_core->pc;
+
 		debugger_instruction_hook(this, curpc);
 		opcode = m_direct->read_qword(curpc);
 		
@@ -218,6 +220,7 @@ void mb86235_device::device_start()
 	m_icountptr = &m_core->icount;
 
 	m_core->fp0 = 0.0f;
+	save_pointer(NAME(m_core->pr), 24);
 }
 
 void mb86235_device::device_reset()
