@@ -8737,6 +8737,7 @@ ROM_START( vf4cart )
 ROM_END
 
 // There is also a development cart (171-7885A) with 20x 64Mb FlashROMs instead of 10x 128Mb MaskROMs. Content is the same.
+// Deluxe version, by default require motor board. According to manuals there is also exists Standard version, which have motor board disabled by default.
 ROM_START( kingrt66 )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
