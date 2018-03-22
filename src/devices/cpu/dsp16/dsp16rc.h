@@ -33,6 +33,7 @@ private:
 		COMPILE_MAX_SEQUENCE = 64
 	};
 
+	// exit codes for recompiled blocks
 	enum : int
 	{
 		EXEC_OUT_OF_CYCLES,
