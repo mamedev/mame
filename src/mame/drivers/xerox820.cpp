@@ -409,7 +409,8 @@ QUICKLOAD_LOAD_MEMBER( xerox820_state, xerox820 )
 	bankswitch(0);
 
 	/* Avoid loading a program if CP/M-80 is not in memory */
-	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3)) {
+	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
+	{
 		machine_reset();
 		return image_init_result::FAIL;
 	}
@@ -438,7 +439,7 @@ QUICKLOAD_LOAD_MEMBER( xerox820_state, xerox820 )
 /* WD1771 Interface */
 
 static SLOT_INTERFACE_START( xerox820_floppies )
-	SLOT_INTERFACE( "sa400", FLOPPY_525_SSSD_35T ) // Shugart SA-400
+	SLOT_INTERFACE( "sa400", FLOPPY_525_SSSD ) // Shugart SA-400
 	SLOT_INTERFACE( "sa450", FLOPPY_525_DD ) // Shugart SA-450
 	SLOT_INTERFACE( "sa800", FLOPPY_8_SSDD ) // Shugart SA-800
 	SLOT_INTERFACE( "sa850", FLOPPY_8_DSDD ) // Shugart SA-850
