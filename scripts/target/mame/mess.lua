@@ -1074,6 +1074,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"poly88",
 		"prodigy",
 		"psion",
+		"qume",
 		"radio",
 		"rca",
 		"regnecentralen",
@@ -2703,6 +2704,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "poly")
 files {
+	MAME_DIR .. "src/mame/drivers/poly.cpp",
 	MAME_DIR .. "src/mame/drivers/proteus.cpp",
 }
 
@@ -2730,6 +2732,14 @@ files {
 	MAME_DIR .. "src/mame/includes/psion.h",
 	MAME_DIR .. "src/mame/machine/psion_pack.cpp",
 	MAME_DIR .. "src/mame/machine/psion_pack.h",
+}
+
+createMESSProjects(_target, _subtarget, "qume")
+files {
+	MAME_DIR .. "src/mame/drivers/qvt70.cpp",
+	MAME_DIR .. "src/mame/drivers/qvt103.cpp",
+	MAME_DIR .. "src/mame/drivers/qvt201.cpp",
+	MAME_DIR .. "src/mame/drivers/qvt6800.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "radio")
@@ -3641,7 +3651,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/plan80.cpp",
 	MAME_DIR .. "src/mame/drivers/pm68k.cpp",
 	MAME_DIR .. "src/mame/drivers/pockchal.cpp",
-	MAME_DIR .. "src/mame/drivers/poly.cpp",
 	MAME_DIR .. "src/mame/drivers/powerstack.cpp",
 	MAME_DIR .. "src/mame/drivers/proteus3.cpp",
 	MAME_DIR .. "src/mame/drivers/pt68k4.cpp",
@@ -3649,10 +3658,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/pulsar.cpp",
 	MAME_DIR .. "src/mame/drivers/pv9234.cpp",
 	MAME_DIR .. "src/mame/drivers/qtsbc.cpp",
-	MAME_DIR .. "src/mame/drivers/qvt70.cpp",
-	MAME_DIR .. "src/mame/drivers/qvt103.cpp",
-	MAME_DIR .. "src/mame/drivers/qvt201.cpp",
-	MAME_DIR .. "src/mame/drivers/qvt6800.cpp",
 	MAME_DIR .. "src/mame/drivers/rd100.cpp",
 	MAME_DIR .. "src/mame/drivers/rad_eu3a14.cpp",
 	MAME_DIR .. "src/mame/drivers/rad_eu3a05.cpp",
