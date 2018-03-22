@@ -70,7 +70,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_upd72065(*this, "upd72065")
 		, m_expansion(*this, "exp")
-		, m_adpcm_out(*this, {"adpcm_outl", "adpcm_outr"} )
+		, m_adpcm_out(*this, {"adpcm_outl", "adpcm_outr"})
 		, m_options(*this, "options")
 		, m_mouse1(*this, "mouse1")
 		, m_mouse2(*this, "mouse2")
