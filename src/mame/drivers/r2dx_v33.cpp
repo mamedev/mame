@@ -546,51 +546,6 @@ INTERRUPT_GEN_MEMBER(r2dx_v33_state::rdx_v33_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);   /* VBL */
 }
 
-static const gfx_layout rdx_v33_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 8,12,0,4 },
-	{ 3,2,1,0,19,18,17,16 },
-	{ STEP8(0,32) },
-	32*8
-};
-
-
-static const gfx_layout rdx_v33_tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 8,12,0,4 },
-	{
-		3,2,1,0,
-		19,18,17,16,
-		3+64*8, 2+64*8, 1+64*8, 0+64*8,
-		19+64*8,18+64*8,17+64*8,16+64*8,
-	},
-	{ STEP16(0,32) },
-	128*8
-};
-
-static const gfx_layout rdx_v33_spritelayout =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 4, 0, 12, 8, 20, 16, 28, 24, 36, 32, 44, 40, 52, 48, 60, 56 },
-	{ STEP16(0,64) },
-	16*16*4
-};
-
-static GFXDECODE_START( rdx_v33 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, rdx_v33_charlayout,   0x700, 128 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x400, 128 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, rdx_v33_spritelayout, 0x000, 4096 )
-GFXDECODE_END
-
 static INPUT_PORTS_START( rdx_v33 )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
@@ -803,7 +758,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -841,7 +796,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

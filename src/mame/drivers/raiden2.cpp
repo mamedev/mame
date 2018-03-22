@@ -328,38 +328,38 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 
 
 
-						gfx->transpen(
+						gfx->transpen_raw(
 						sprite_buffer,
 						cliprect,
 						tile_number,
-						colr,
+						colr << 4,
 						yflip,xflip,
 						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y, 15);
 
 
-						gfx->transpen(
+						gfx->transpen_raw(
 						sprite_buffer,
 						cliprect,
 						tile_number,
-						colr,
+						colr << 4,
 						yflip,xflip,
 						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y, 15);
 
 
-						gfx->transpen(
+						gfx->transpen_raw(
 						sprite_buffer,
 						cliprect,
 						tile_number,
-						colr,
+						colr << 4,
 						yflip,xflip,
 						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200, 15);
 
 
-						gfx->transpen(
+						gfx->transpen_raw(
 						sprite_buffer,
 						cliprect,
 						tile_number,
-						colr,
+						colr << 4,
 						yflip,xflip,
 						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200, 15);
 
@@ -1385,7 +1385,7 @@ INPUT_PORTS_END
 static const gfx_layout raiden2_charlayout =
 {
 	8,8,
-	4096,
+	RGN_FRAC(1,1),
 	4,
 	{ 8,12,0,4 },
 	{ 3,2,1,0,19,18,17,16 },
@@ -1397,7 +1397,7 @@ static const gfx_layout raiden2_charlayout =
 static const gfx_layout raiden2_tilelayout =
 {
 	16,16,
-	0x8000,
+	RGN_FRAC(1,1),
 	4,
 	{ 8,12,0,4 },
 	{
@@ -1413,7 +1413,7 @@ static const gfx_layout raiden2_tilelayout =
 static const gfx_layout raiden2_spritelayout =
 {
 	16, 16,
-	0x10000,
+	RGN_FRAC(1,1),
 	4,
 	{ STEP4(0,1) },
 	{ 4, 0, 12, 8, 20, 16, 28, 24, 36, 32, 44, 40, 52, 48, 60, 56 },
@@ -1421,10 +1421,10 @@ static const gfx_layout raiden2_spritelayout =
 	16*16*4
 };
 
-static GFXDECODE_START( raiden2 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, raiden2_charlayout,   0x700, 128 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, raiden2_tilelayout,   0x400, 128 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, raiden2_spritelayout, 0x000, 4096 ) // really 128, but using the top bits for priority
+GFXDECODE_START( raiden2 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, raiden2_charlayout,   0x700, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, raiden2_tilelayout,   0x400, 48 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, raiden2_spritelayout, 0x000, 64 )
 GFXDECODE_END
 
 

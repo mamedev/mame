@@ -164,3 +164,5 @@ public:
 protected:
 	virtual void machine_start() override;
 };
+
+GFXDECODE_EXTERN( raiden2 );
