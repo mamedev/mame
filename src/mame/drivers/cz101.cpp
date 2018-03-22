@@ -6,6 +6,12 @@
 
 	Digital Synthesizer
 
+	TODO:
+	- To get the display to show something, our uPD7810 core needs to
+	  output the full port value even if the port is set as input (port a).
+	- Currently seems to hang while processing the serial ports (midi). Our
+	  uPD7810 core is lacking the externally clocked serial mode.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -29,8 +35,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_hd44780(*this, "hd44780"),
 		m_keys(*this, "kc%u", 0),
-		m_port_b(0), m_port_c(0),
-		m_midi_clock(0)
+		m_port_b(0), m_port_c(0)
 	{ }
 
 	void cz101(machine_config &config);
@@ -60,11 +65,9 @@ private:
 	DECLARE_WRITE8_MEMBER(led_3_w);
 	DECLARE_WRITE8_MEMBER(led_4_w);
 	DECLARE_READ8_MEMBER(keys_r);
-	DECLARE_WRITE_LINE_MEMBER(midi_clock_w);
 
 	uint8_t m_port_b;
 	uint8_t m_port_c;
-	uint8_t m_midi_clock;
 };
 
 
@@ -312,6 +315,8 @@ READ8_MEMBER( cz101_state::keys_r )
 	return m_keys[m_port_b & 0x0f]->read();
 }
 
+// 76543210  lcd data bus
+
 READ8_MEMBER( cz101_state::port_a_r )
 {
 	if ((BIT(m_port_c, 7) == 1) && (BIT(m_port_c, 6) == 1))
@@ -326,6 +331,12 @@ WRITE8_MEMBER( cz101_state::port_a_w )
 		m_hd44780->write(space, BIT(m_port_c, 5), data);
 }
 
+// 7-------  nmi output
+// -6------  music lsi write enable
+// --5-----  music lsi chip select
+// ---4----  music lsi irq input
+// ----3210  key select output
+
 WRITE8_MEMBER( cz101_state::port_b_w )
 {
 	if (1)
@@ -334,14 +345,14 @@ WRITE8_MEMBER( cz101_state::port_b_w )
 	m_port_b = data;
 }
 
-READ8_MEMBER( cz101_state::port_c_r )
-{
-	uint8_t data = 0;
-
-	data |= m_midi_clock << 2;
-
-	return data;
-}
+// 7-------  lcd e
+// -6------  lcd rw
+// --5-----  lcd rs
+// ---4----  not used
+// ----3---  power down detection output
+// -----2--  midi clock
+// ------1-  midi input
+// -------0  midi output
 
 WRITE8_MEMBER( cz101_state::port_c_w )
 {
@@ -351,17 +362,11 @@ WRITE8_MEMBER( cz101_state::port_c_w )
 	m_port_c = data;
 }
 
-WRITE_LINE_MEMBER( cz101_state::midi_clock_w )
-{
-	m_midi_clock = state;
-}
-
 void cz101_state::machine_start()
 {
 	// register for save states
 	save_item(NAME(m_port_b));
 	save_item(NAME(m_port_c));
-	save_item(NAME(m_midi_clock));
 }
 
 void cz101_state::machine_reset()
@@ -379,11 +384,10 @@ MACHINE_CONFIG_START( cz101_state::cz101 )
 	MCFG_UPD7810_PORTA_READ_CB(READ8(cz101_state, port_a_r))
 	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(cz101_state, port_a_w))
 	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(cz101_state, port_b_w))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(cz101_state, port_c_r))
 	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(cz101_state, port_c_w))
 
 	MCFG_CLOCK_ADD("midi_clock", 2_MHz_XTAL)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(cz101_state, midi_clock_w))
+//	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("maincpu", upd7810_device, sck_w)) not supported yet
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", LCD)
