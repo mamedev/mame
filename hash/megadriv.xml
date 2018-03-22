@@ -8365,7 +8365,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="pcb" value="353585"/>
 			<feature name="u1" value="FV001A1"/> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="fv001a1.u1" size="1048576" crc="338191e8" sha1="22d8c77f0bac1b9a4d96ac69cf5d47caa1bdb9e4" offset="0x000000" loadflag="load16_word_swap"/>
+				<rom name="fv001a1.u1" size="1048576" crc="679c41de" sha1="f440dfa689f65e782a150c1686ab90d7e5cc6355" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
