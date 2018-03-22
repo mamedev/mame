@@ -735,8 +735,6 @@ void gstream_state::draw_bg(bitmap_ind16 &bitmap, const rectangle &cliprect, int
 			int pal = (vram_data & 0xc000) >> 14;
 			int code = (vram_data & 0x0fff);
 
-			pal += palbase;
-
 			if (m_gfxdecode->gfx(map+5))
 				drawgfx_transpen_x2222(bitmap,cliprect,m_gfxdecode->gfx(map),m_gfxdecode->gfx(map+5),code,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
 			else
