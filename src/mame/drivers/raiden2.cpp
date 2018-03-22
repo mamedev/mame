@@ -186,24 +186,24 @@ Protection Notes:
 
 void raiden2_state::machine_start()
 {
-	save_item(NAME(bg_bank));
-	save_item(NAME(fg_bank));
-	save_item(NAME(mid_bank));
-	save_item(NAME(tx_bank));
-	save_item(NAME(raiden2_tilemap_enable));
-	save_item(NAME(prg_bank));
-	save_item(NAME(cop_bank));
+	save_item(NAME(m_bg_bank));
+	save_item(NAME(m_fg_bank));
+	save_item(NAME(m_mid_bank));
+	save_item(NAME(m_tx_bank));
+	save_item(NAME(m_tilemap_enable));
+	save_item(NAME(m_prg_bank));
+	save_item(NAME(m_cop_bank));
 
-	save_item(NAME(sprite_prot_x));
-	save_item(NAME(sprite_prot_y));
-	save_item(NAME(dst1));
-	save_item(NAME(cop_spr_maxx));
-	save_item(NAME(cop_spr_off));
+	save_item(NAME(m_sprite_prot_x));
+	save_item(NAME(m_sprite_prot_y));
+	save_item(NAME(m_dst1));
+	save_item(NAME(m_cop_spr_maxx));
+	save_item(NAME(m_cop_spr_off));
 
 
-	save_item(NAME(scrollvals));
+	save_item(NAME(m_scrollvals));
 
-	save_item(NAME(sprite_prot_src_addr));
+	save_item(NAME(m_sprite_prot_src_addr));
 
 }
 
@@ -224,32 +224,31 @@ int cnt=0, ccol = -1;
 
 WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
 {
-	//	map(0x0d000, 0x0d7ff).ram().w(this, FUNC(raiden2_state::raiden2_background_w)).share("back_data");
-	//	map(0x0d800, 0x0dfff).ram().w(this, FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
-	//	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
-	//	map(0x0e800, 0x0f7ff).ram().w(this, FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	//	map(0x0d000, 0x0d7ff).ram().w(this, FUNC(raiden2_state::background_w)).share("back_data");
+	//	map(0x0d800, 0x0dfff).ram().w(this, FUNC(raiden2_state::foreground_w).share("fore_data");
+	//	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(raiden2_state::midground_w).share("mid_data");
+	//	map(0x0e800, 0x0f7ff).ram().w(this, FUNC(raiden2_state::text_w).share("text_data");
 
 	if (offset < 0x800 / 2)
 	{
-		raiden2_background_w(space, offset, data, 0xffff);
+		background_w(space, offset, data, 0xffff);
 	}
 	else if (offset < 0x1000 /2)
 	{
 		offset -= 0x800 / 2;
-		raiden2_foreground_w(space, offset, data, 0xffff);
+		foreground_w(space, offset, data, 0xffff);
 	}
 	else if (offset < 0x1800/2)
 	{
 		offset -= 0x1000 / 2;
-		raiden2_midground_w(space, offset, data, 0xffff);
+		midground_w(space, offset, data, 0xffff);
 	}
 	else if (offset < 0x2800/2)
 	{
 		offset -= 0x1800 / 2;
-		raiden2_text_w(space, offset, data, 0xffff);
+		text_w(space, offset, data, 0xffff);
 	}
 }
-
 
 
 void raiden2_state::combine32(uint32_t *val, int offset, uint16_t data, uint16_t mem_mask)
@@ -259,13 +258,12 @@ void raiden2_state::combine32(uint32_t *val, int offset, uint16_t data, uint16_t
 }
 
 
-
 /* SPRITE DRAWING (move to video file) */
 
 void raiden2_state::draw_sprites(const rectangle &cliprect)
 {
-	uint16_t *source = sprites + (0x1000/2)-4;
-	sprite_buffer.fill(0xf, cliprect);
+	uint16_t *source = m_spriteram + (0x1000/2)-4;
+	m_sprite_buffer.fill(0xf, cliprect);
 
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 
@@ -276,7 +274,7 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 	  06 yyyy yyyy yyyy yyyy   y = ypos
 	 */
 
-	while( source >= sprites ){
+	while( source >= m_spriteram ){
 		int tile_number = source[1];
 		int sx = source[2];
 		int sy = source[3];
@@ -329,7 +327,7 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 
 
 						gfx->transpen_raw(
-						sprite_buffer,
+						m_sprite_buffer,
 						cliprect,
 						tile_number,
 						colr << 4,
@@ -338,7 +336,7 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 
 
 						gfx->transpen_raw(
-						sprite_buffer,
+						m_sprite_buffer,
 						cliprect,
 						tile_number,
 						colr << 4,
@@ -347,7 +345,7 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 
 
 						gfx->transpen_raw(
-						sprite_buffer,
+						m_sprite_buffer,
 						cliprect,
 						tile_number,
 						colr << 4,
@@ -356,7 +354,7 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 
 
 						gfx->transpen_raw(
-						sprite_buffer,
+						m_sprite_buffer,
 						cliprect,
 						tile_number,
 						colr << 4,
@@ -375,47 +373,47 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 
 /* VIDEO RELATED WRITE HANDLERS (move to video file) */
 
-WRITE16_MEMBER(raiden2_state::raiden2_background_w)
+WRITE16_MEMBER(raiden2_state::background_w)
 {
-	COMBINE_DATA(&back_data[offset]);
-	background_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_back_data[offset]);
+	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(raiden2_state::raiden2_midground_w)
+WRITE16_MEMBER(raiden2_state::midground_w)
 {
-	COMBINE_DATA(&mid_data[offset]);
-	midground_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_mid_data[offset]);
+	m_midground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(raiden2_state::raiden2_foreground_w)
+WRITE16_MEMBER(raiden2_state::foreground_w)
 {
-	COMBINE_DATA(&fore_data[offset]);
-	foreground_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fore_data[offset]);
+	m_foreground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(raiden2_state::raiden2_text_w)
+WRITE16_MEMBER(raiden2_state::text_w)
 {
-	COMBINE_DATA(&text_data[offset]);
-	text_layer->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_text_data[offset]);
+	m_text_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(raiden2_state::tilemap_enable_w)
 {
-	COMBINE_DATA(&raiden2_tilemap_enable);
+	COMBINE_DATA(&m_tilemap_enable);
 }
 
 WRITE16_MEMBER(raiden2_state::tile_scroll_w)
 {
 	tilemap_t *tm = nullptr;
 	switch(offset/2) {
-	case 0: tm = background_layer; break;
-	case 1: tm = midground_layer; break;
-	case 2: tm = foreground_layer; break;
+	case 0: tm = m_background_layer; break;
+	case 1: tm = m_midground_layer; break;
+	case 2: tm = m_foreground_layer; break;
 	default: assert(0); break;
 	}
 
-	COMBINE_DATA(scrollvals + offset);
-	data = scrollvals[offset];
+	COMBINE_DATA(m_scrollvals + offset);
+	data = m_scrollvals[offset];
 
 	if(offset & 1)
 		tm->set_scrolly(0, data);
@@ -428,51 +426,51 @@ WRITE16_MEMBER(raiden2_state::tile_bank_01_w)
 	if(ACCESSING_BITS_0_7) {
 		int new_bank;
 		new_bank = 0 | ((data & 1)<<1);
-		if(new_bank != bg_bank) {
-			bg_bank = new_bank;
-			background_layer->mark_all_dirty();
+		if(new_bank != m_bg_bank) {
+			m_bg_bank = new_bank;
+			m_background_layer->mark_all_dirty();
 		}
 
 		new_bank = 1 | (data & 2);
-		if(new_bank != mid_bank) {
-			mid_bank = new_bank;
-			midground_layer->mark_all_dirty();
+		if(new_bank != m_mid_bank) {
+			m_mid_bank = new_bank;
+			m_midground_layer->mark_all_dirty();
 		}
 	}
 }
 
 READ16_MEMBER(raiden2_state::cop_tile_bank_2_r)
 {
-	return cop_bank;
+	return m_cop_bank;
 }
 
 WRITE16_MEMBER(raiden2_state::cop_tile_bank_2_w)
 {
-	COMBINE_DATA(&cop_bank);
+	COMBINE_DATA(&m_cop_bank);
 
 	if(ACCESSING_BITS_8_15) {
 		int new_bank = 4 | (data >> 14);
-		if(new_bank != fg_bank) {
-			fg_bank = new_bank;
-			foreground_layer->mark_all_dirty();
+		if(new_bank != m_fg_bank) {
+			m_fg_bank = new_bank;
+			m_foreground_layer->mark_all_dirty();
 		}
 	}
 }
 
 WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
 {
-	COMBINE_DATA(&cop_bank);
+	COMBINE_DATA(&m_cop_bank);
 
-	int new_bank = 4 | ((cop_bank >> 4) & 3);
-	if(new_bank != fg_bank) {
-		fg_bank = new_bank;
-		foreground_layer->mark_all_dirty();
+	int new_bank = 4 | ((m_cop_bank >> 4) & 3);
+	if(new_bank != m_fg_bank) {
+		m_fg_bank = new_bank;
+		m_foreground_layer->mark_all_dirty();
 	}
 
 	/* mainbank2 coming from 6c9 ? */
-	int bb = cop_bank >> 12;
-	membank("mainbank1")->set_entry(bb + 16);
-	membank("mainbank2")->set_entry(3);
+	int bb = m_cop_bank >> 12;
+	m_mainbank[0]->set_entry(bb + 16);
+	m_mainbank[1]->set_entry(3);
 }
 
 
@@ -481,42 +479,42 @@ WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_back_tile_info)
 {
-	int tile = back_data[tile_index];
+	int tile = m_back_data[tile_index];
 	int color = (tile >> 12) | (0 << 4);
 
-	tile = (tile & 0xfff) | (bg_bank << 12);
+	tile = (tile & 0xfff) | (m_bg_bank << 12);
 
 	SET_TILE_INFO_MEMBER(1,tile+0x0000,color,0);
 }
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
 {
-	int tile = mid_data[tile_index];
+	int tile = m_mid_data[tile_index];
 	int color = (tile >> 12) | (2 << 4);
 
-	tile = (tile & 0xfff) | (mid_bank << 12);
+	tile = (tile & 0xfff) | (m_mid_bank << 12);
 
 	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
 {
-	int tile = fore_data[tile_index];
+	int tile = m_fore_data[tile_index];
 	int color = (tile >> 12) | (1 << 4);
 
-	tile = (tile & 0xfff) | (fg_bank << 12);
+	tile = (tile & 0xfff) | (m_fg_bank << 12);
 
 	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 {
-	int tile = text_data[tile_index];
+	int tile = m_text_data[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(0,tile + tx_bank * 0x1000,color,0);
+	SET_TILE_INFO_MEMBER(0,tile + m_tx_bank * 0x1000,color,0);
 }
 
 /* VIDEO START (move to video file) */
@@ -524,20 +522,20 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 
 VIDEO_START_MEMBER(raiden2_state,raiden2)
 {
-	back_data = make_unique_clear<uint16_t[]>(0x800/2);
-	fore_data =  make_unique_clear<uint16_t[]>(0x800/2);
-	mid_data =  make_unique_clear<uint16_t[]>(0x800/2);
-	text_data =  make_unique_clear<uint16_t[]>(0x1000/2);
+	m_back_data = make_unique_clear<uint16_t[]>(0x800/2);
+	m_fore_data =  make_unique_clear<uint16_t[]>(0x800/2);
+	m_mid_data =  make_unique_clear<uint16_t[]>(0x800/2);
+	m_text_data =  make_unique_clear<uint16_t[]>(0x1000/2);
 
-	save_pointer(NAME(back_data.get()), 0x800/2);
-	save_pointer(NAME(fore_data.get()), 0x800/2);
-	save_pointer(NAME(mid_data.get()), 0x800/2);
-	save_pointer(NAME(text_data.get()), 0x1000/2);
+	save_pointer(NAME(m_back_data.get()), 0x800/2);
+	save_pointer(NAME(m_fore_data.get()), 0x800/2);
+	save_pointer(NAME(m_mid_data.get()), 0x800/2);
+	save_pointer(NAME(m_text_data.get()), 0x1000/2);
 
-	text_layer       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
-	background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-	midground_layer  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_mid_tile_info),this),  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-	foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_fore_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	m_text_layer       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
+	m_background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	m_midground_layer  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_mid_tile_info),this),  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	m_foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_fore_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
 }
 
 /* screen_update_raiden2 (move to video file) */
@@ -557,7 +555,7 @@ void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 			if((val & 0xc000) == layer && (val & 0x000f) != 0x000f) {
 				val &= 0x07ff;
 
-				if(blend_active[val])
+				if(m_blend_active[val])
 					*dst = alpha_blend_r32(*dst, pens[val], 0x7f);
 				else
 					*dst = pens[val];
@@ -569,42 +567,42 @@ void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 void raiden2_state::tilemap_draw_and_blend(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tilemap)
 {
-	tilemap->draw(screen, tile_buffer, cliprect, 0, 0);
-	blend_layer(bitmap, cliprect, tile_buffer, 0);
+	tilemap->draw(screen, m_tile_buffer, cliprect, 0, 0);
+	blend_layer(bitmap, cliprect, m_tile_buffer, 0);
 }
 
 uint32_t raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	if (!(raiden2_tilemap_enable & 16)) {
+	if (!(m_tilemap_enable & 16)) {
 		draw_sprites(cliprect);
 
-		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[0]);
+		blend_layer(bitmap, cliprect, m_sprite_buffer, m_cur_spri[0]);
 	}
 
-	if (!(raiden2_tilemap_enable & 1))
-		tilemap_draw_and_blend(screen, bitmap, cliprect, background_layer);
+	if (!(m_tilemap_enable & 1))
+		tilemap_draw_and_blend(screen, bitmap, cliprect, m_background_layer);
 
-	if (!(raiden2_tilemap_enable & 16))
-		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[1]);
+	if (!(m_tilemap_enable & 16))
+		blend_layer(bitmap, cliprect, m_sprite_buffer, m_cur_spri[1]);
 
-	if (!(raiden2_tilemap_enable & 2))
-		tilemap_draw_and_blend(screen, bitmap, cliprect, midground_layer);
+	if (!(m_tilemap_enable & 2))
+		tilemap_draw_and_blend(screen, bitmap, cliprect, m_midground_layer);
 
-	if (!(raiden2_tilemap_enable & 16))
-		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[2]);
+	if (!(m_tilemap_enable & 16))
+		blend_layer(bitmap, cliprect, m_sprite_buffer, m_cur_spri[2]);
 
-	if (!(raiden2_tilemap_enable & 4))
-		tilemap_draw_and_blend(screen, bitmap, cliprect, foreground_layer);
+	if (!(m_tilemap_enable & 4))
+		tilemap_draw_and_blend(screen, bitmap, cliprect, m_foreground_layer);
 
-	if (!(raiden2_tilemap_enable & 16))
-		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[3]);
+	if (!(m_tilemap_enable & 16))
+		blend_layer(bitmap, cliprect, m_sprite_buffer, m_cur_spri[3]);
 
-	if (!(raiden2_tilemap_enable & 8))
-		tilemap_draw_and_blend(screen, bitmap, cliprect, text_layer);
+	if (!(m_tilemap_enable & 8))
+		tilemap_draw_and_blend(screen, bitmap, cliprect, m_text_layer);
 
-	if (!(raiden2_tilemap_enable & 16))
-		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[4]);
+	if (!(m_tilemap_enable & 16))
+		blend_layer(bitmap, cliprect, m_sprite_buffer, m_cur_spri[4]);
 
 	if (machine().input().code_pressed_once(KEYCODE_Z))
 		if (m_raiden2cop) m_raiden2cop->dump_table();
@@ -637,12 +635,12 @@ static uint16_t sprcpt_flags2;
 static uint32_t sprcpt_val[2], sprcpt_flags1;
 static uint32_t sprcpt_data_1[0x100], sprcpt_data_2[0x40], sprcpt_data_3[6], sprcpt_data_4[4];
 
-void raiden2_state::sprcpt_init(void)
+void raiden2_state::sprcpt_init()
 {
-	memset(sprcpt_data_1, 0, sizeof(sprcpt_data_1));
-	memset(sprcpt_data_2, 0, sizeof(sprcpt_data_2));
-	memset(sprcpt_data_3, 0, sizeof(sprcpt_data_3));
-	memset(sprcpt_data_4, 0, sizeof(sprcpt_data_4));
+	std::fill(std::begin(sprcpt_data_1), std::end(sprcpt_data_1), 0);
+	std::fill(std::begin(sprcpt_data_2), std::end(sprcpt_data_2), 0);
+	std::fill(std::begin(sprcpt_data_3), std::end(sprcpt_data_3), 0);
+	std::fill(std::begin(sprcpt_data_4), std::end(sprcpt_data_4), 0);
 
 	sprcpt_adr = 0;
 	sprcpt_idx = 0;
@@ -734,61 +732,54 @@ WRITE16_MEMBER(raiden2_state::sprcpt_flags_2_w)
 }
 
 
-
-void raiden2_state::common_reset()
+void raiden2_state::common_reset(int bgbank, int fgbank, int midbank, int txbank)
 {
-	bg_bank=0;
-	fg_bank=6;
-	mid_bank=1;
-	tx_bank = 0;
+	m_bg_bank  = bgbank;
+	m_fg_bank  = fgbank;
+	m_mid_bank = midbank;
+	m_tx_bank  = txbank;
 }
 
 MACHINE_RESET_MEMBER(raiden2_state,raiden2)
 {
-	common_reset();
+	common_reset(0,6,1,0);
 	sprcpt_init();
 
-	membank("mainbank1")->set_entry(2);
-	membank("mainbank2")->set_entry(3);
+	m_mainbank[0]->set_entry(2);
+	m_mainbank[1]->set_entry(3);
 
-	prg_bank = 0;
+	m_prg_bank = 0;
 	//cop_init();
 }
 
 MACHINE_RESET_MEMBER(raiden2_state,raidendx)
 {
-	common_reset();
+	common_reset(0,6,1,0);
 	sprcpt_init();
 
-	membank("mainbank1")->set_entry(16);
-	membank("mainbank2")->set_entry(3);
+	m_mainbank[0]->set_entry(16);
+	m_mainbank[1]->set_entry(3);
 
-	prg_bank = 0x08;
+	m_prg_bank = 0x08;
 
 	//cop_init();
 }
 
 MACHINE_RESET_MEMBER(raiden2_state,zeroteam)
 {
-	bg_bank = 0;
-	fg_bank = 2;
-	mid_bank = 1;
-	tx_bank = 0;
+	common_reset(0,2,1,0);
 	sprcpt_init();
 
-	membank("mainbank1")->set_entry(2);
-	membank("mainbank2")->set_entry(3);
+	m_mainbank[0]->set_entry(2);
+	m_mainbank[1]->set_entry(3);
 
-	prg_bank = 0;
+	m_prg_bank = 0;
 	//cop_init();
 }
 
 MACHINE_RESET_MEMBER(raiden2_state,xsedae)
 {
-	bg_bank = 0;
-	fg_bank = 2;
-	mid_bank = 1;
-	tx_bank = 0;
+	common_reset(0,2,1,0);
 	sprcpt_init();
 }
 
@@ -797,95 +788,95 @@ WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
 	if(ACCESSING_BITS_8_15) {
 		int bb = (~data >> 15) & 1;
 		logerror("select bank %d %04x\n", (data >> 15) & 1, data);
-		membank("mainbank1")->set_entry(bb*2);
-		membank("mainbank2")->set_entry(bb*2+1);
-		prg_bank = ((data >> 15) & 1);
+		m_mainbank[0]->set_entry(bb*2);
+		m_mainbank[1]->set_entry(bb*2+1);
+		m_prg_bank = ((data >> 15) & 1);
 	}
 }
 
 
 WRITE16_MEMBER(raiden2_state::sprite_prot_x_w)
 {
-	sprite_prot_x = data;
-	//popmessage("%04x %04x",sprite_prot_x,sprite_prot_y);
+	m_sprite_prot_x = data;
+	//popmessage("%04x %04x",m_sprite_prot_x,m_sprite_prot_y);
 }
 
 WRITE16_MEMBER(raiden2_state::sprite_prot_y_w)
 {
-	sprite_prot_y = data;
-	//popmessage("%04x %04x",sprite_prot_x,sprite_prot_y);
+	m_sprite_prot_y = data;
+	//popmessage("%04x %04x",m_sprite_prot_x,m_sprite_prot_y);
 }
 
 WRITE16_MEMBER(raiden2_state::sprite_prot_src_seg_w)
 {
-	sprite_prot_src_addr[0] = data;
+	m_sprite_prot_src_addr[0] = data;
 }
 
 READ16_MEMBER(raiden2_state::sprite_prot_src_seg_r)
 {
-	return sprite_prot_src_addr[0];
+	return m_sprite_prot_src_addr[0];
 }
 
 WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 {
-	sprite_prot_src_addr[1] = data;
-	uint32_t src = (sprite_prot_src_addr[0]<<4)+sprite_prot_src_addr[1];
+	m_sprite_prot_src_addr[1] = data;
+	uint32_t src = (m_sprite_prot_src_addr[0]<<4)+m_sprite_prot_src_addr[1];
 
-	int x = int16_t((space.read_dword(src+0x08) >> 16) - (sprite_prot_x));
-	int y = int16_t((space.read_dword(src+0x04) >> 16) - (sprite_prot_y));
+	int x = int16_t((space.read_dword(src+0x08) >> 16) - (m_sprite_prot_x));
+	int y = int16_t((space.read_dword(src+0x04) >> 16) - (m_sprite_prot_y));
 
-	uint16_t head1 = space.read_word(src+cop_spr_off);
-	uint16_t head2 = space.read_word(src+cop_spr_off+2);
+	uint16_t head1 = space.read_word(src+m_cop_spr_off);
+	uint16_t head2 = space.read_word(src+m_cop_spr_off+2);
 
 	int w = (((head1 >> 8 ) & 7) + 1) << 4;
 	int h = (((head1 >> 12) & 7) + 1) << 4;
 
-	uint16_t flag = x-w/2 > -w && x-w/2 < cop_spr_maxx+w && y-h/2 > -h && y-h/2 < 256+h ? 1 : 0;
+	uint16_t flag = x-w/2 > -w && x-w/2 < m_cop_spr_maxx+w && y-h/2 > -h && y-h/2 < 256+h ? 1 : 0;
 
 	flag = (space.read_word(src) & 0xfffe) | flag;
 	space.write_word(src, flag);
 
 	if(flag & 1)
 	{
-		space.write_word(dst1,   head1);
-		space.write_word(dst1+2, head2);
-		space.write_word(dst1+4, x-w/2);
-		space.write_word(dst1+6, y-h/2);
+		space.write_word(m_dst1,   head1);
+		space.write_word(m_dst1+2, head2);
+		space.write_word(m_dst1+4, x-w/2);
+		space.write_word(m_dst1+6, y-h/2);
 
-		dst1 += 8;
+		m_dst1 += 8;
 	}
-	//printf("[%08x] %08x %08x %04x %04x\n",src,dx,dy,dst1,dst2);
+	//printf("[%08x] %08x %08x %04x %04x\n",src,dx,dy,m_dst1,dst2);
 	//machine().debug_break();
 }
 
 READ16_MEMBER(raiden2_state::sprite_prot_dst1_r)
 {
-	return dst1;
+	return m_dst1;
 }
 
 READ16_MEMBER(raiden2_state::sprite_prot_maxx_r)
 {
-	return cop_spr_maxx;
+	return m_cop_spr_maxx;
 }
 
 READ16_MEMBER(raiden2_state::sprite_prot_off_r)
 {
-	return cop_spr_off;
+	return m_cop_spr_off;
 }
 
 WRITE16_MEMBER(raiden2_state::sprite_prot_dst1_w)
 {
-	dst1 = data;
+	m_dst1 = data;
 }
 
 WRITE16_MEMBER(raiden2_state::sprite_prot_maxx_w)
 {
-	cop_spr_maxx = data;
+	m_cop_spr_maxx = data;
 }
 
 WRITE16_MEMBER(raiden2_state::sprite_prot_off_w)
 {
-	cop_spr_off = data;
+	m_cop_spr_off = data;
 }
 
 /* MEMORY MAPS */
@@ -983,11 +974,11 @@ void raiden2_state::raiden2_mem(address_map &map)
 
 	map(0x00800, 0x0bfff).ram();
 
-	map(0x0c000, 0x0cfff).ram().share("sprites");
-	map(0x0d000, 0x0d7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_background_w)).share("back_data");
-	map(0x0d800, 0x0dfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
-	map(0x0e000, 0x0e7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
-	map(0x0e800, 0x0f7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0c000, 0x0cfff).ram().share("spriteram");
+	map(0x0d000, 0x0d7ff).ram(); // .w(this, FUNC(raiden2_state::background_w)).share("back_data");
+	map(0x0d800, 0x0dfff).ram(); // .w(this, FUNC(raiden2_state::foreground_w).share("fore_data");
+	map(0x0e000, 0x0e7ff).ram(); // .w(this, FUNC(raiden2_state::midground_w).share("mid_data");
+	map(0x0e800, 0x0f7ff).ram(); // .w(this, FUNC(raiden2_state::text_w).share("text_data");
 	map(0x0f800, 0x0ffff).ram(); /* Stack area */
 
 	map(0x10000, 0x1efff).ram();
@@ -1032,12 +1023,12 @@ void raiden2_state::zeroteam_mem(address_map &map)
 	map(0x0074c, 0x0074d).portr("SYSTEM");
 
 	map(0x00800, 0x0b7ff).ram();
-	map(0x0b800, 0x0bfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_background_w)).share("back_data");
-	map(0x0c000, 0x0c7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
-	map(0x0c800, 0x0cfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
-	map(0x0d000, 0x0dfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0b800, 0x0bfff).ram(); // .w(this, FUNC(raiden2_state::background_w)).share("back_data");
+	map(0x0c000, 0x0c7ff).ram(); // .w(this, FUNC(raiden2_state::foreground_w).share("fore_data");
+	map(0x0c800, 0x0cfff).ram(); // .w(this, FUNC(raiden2_state::midground_w).share("mid_data");
+	map(0x0d000, 0x0dfff).ram(); // .w(this, FUNC(raiden2_state::text_w).share("text_data");
 	map(0x0e000, 0x0efff).ram(); // .w("palette", palette_device, write).share("palette");
-	map(0x0f000, 0x0ffff).ram().share("sprites");
+	map(0x0f000, 0x0ffff).ram().share("spriteram");
 	map(0x10000, 0x1ffff).ram();
 
 	map(0x20000, 0x2ffff).bankr("mainbank1");
@@ -1070,12 +1061,12 @@ void raiden2_state::xsedae_mem(address_map &map)
 	map(0x0074c, 0x0074d).portr("SYSTEM");
 
 	map(0x00800, 0x0b7ff).ram();
-	map(0x0b800, 0x0bfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_background_w)).share("back_data");
-	map(0x0c000, 0x0c7ff).ram(); // .w(this, FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
-	map(0x0c800, 0x0cfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
-	map(0x0d000, 0x0dfff).ram(); // .w(this, FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0b800, 0x0bfff).ram(); // .w(this, FUNC(raiden2_state::background_w)).share("back_data");
+	map(0x0c000, 0x0c7ff).ram(); // .w(this, FUNC(raiden2_state::foreground_w).share("fore_data");
+	map(0x0c800, 0x0cfff).ram(); // .w(this, FUNC(raiden2_state::midground_w).share("mid_data");
+	map(0x0d000, 0x0dfff).ram(); // .w(this, FUNC(raiden2_state::text_w).share("text_data");
 	map(0x0e000, 0x0efff).ram(); // .w("palette", palette_device, write).share("palette");
-	map(0x0f000, 0x0ffff).ram().share("sprites");
+	map(0x0f000, 0x0ffff).ram().share("spriteram");
 
 	map(0x10000, 0x1ffff).ram();
 
@@ -2815,7 +2806,7 @@ ROM_START( zeroteam ) // Fabtek, US licensee, displays 'USA' under zero team log
 	ROM_LOAD( "musha_back-1.u075.4s",   0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) )
 	ROM_LOAD( "musha_back-2.u0714.2s",   0x100000, 0x080000, CRC(ce61c952) SHA1(52a843c8ba428b121fab933dd3b313b2894d80ac) )
 
-	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2? ) */
+	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2) */
 	ROM_LOAD32_WORD( "musha_obj-1.u0811.6f",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
 	ROM_LOAD32_WORD( "musha_obj-2.u082.5f",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
 
@@ -2852,7 +2843,7 @@ ROM_START( zeroteama ) // No licensee, original japan?
 	ROM_LOAD( "musha_back-1.u075.4s",   0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) )
 	ROM_LOAD( "musha_back-2.u0714.2s",   0x100000, 0x080000, CRC(ce61c952) SHA1(52a843c8ba428b121fab933dd3b313b2894d80ac) )
 
-	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2? ) */
+	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2) */
 	ROM_LOAD32_WORD( "musha_obj-1.u0811.6f",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
 	ROM_LOAD32_WORD( "musha_obj-2.u082.5f",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
 
@@ -2896,7 +2887,7 @@ ROM_START( zeroteamb ) // No licensee, later japan?
 	ROM_LOAD( "musha_back-1.u075.4s",   0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) )
 	ROM_LOAD( "musha_back-2.u0714.2s",   0x100000, 0x080000, CRC(ce61c952) SHA1(52a843c8ba428b121fab933dd3b313b2894d80ac) )
 
-	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2? ) */
+	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2) */
 	ROM_LOAD32_WORD( "musha_obj-1.u0811.6f",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
 	ROM_LOAD32_WORD( "musha_obj-2.u082.5f",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
 
@@ -2933,7 +2924,7 @@ ROM_START( zeroteamc ) // Liang Hwa, Taiwan licensee, no special word under logo
 	ROM_LOAD( "musha_back-1.u075.4s",   0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) )
 	ROM_LOAD( "musha_back-2.u0714.2s",   0x100000, 0x080000, CRC(ce61c952) SHA1(52a843c8ba428b121fab933dd3b313b2894d80ac) )
 
-	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2? ) */
+	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2) */
 	ROM_LOAD32_WORD( "musha_obj-1.u0811.6f",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
 	ROM_LOAD32_WORD( "musha_obj-2.u082.5f",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
 
@@ -2971,7 +2962,7 @@ ROM_START( zeroteamd ) // Dream Soft, Korea licensee, no special word under logo
 	ROM_LOAD( "musha_back-1.u075.4s",   0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) )
 	ROM_LOAD( "musha_back-2.u0714.2s",   0x100000, 0x080000, CRC(ce61c952) SHA1(52a843c8ba428b121fab933dd3b313b2894d80ac) )
 
-	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2? ) */
+	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2) */
 	ROM_LOAD32_WORD( "musha_obj-1.u0811.6f",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
 	ROM_LOAD32_WORD( "musha_obj-2.u082.5f",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
 
@@ -3009,7 +3000,7 @@ ROM_START( zeroteams ) // No license, displays 'Selection' under logo
 	ROM_LOAD( "musha_back-1.u075.4s",   0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) )
 	ROM_LOAD( "musha_back-2.u0714.2s",   0x100000, 0x080000, CRC(ce61c952) SHA1(52a843c8ba428b121fab933dd3b313b2894d80ac) )
 
-	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2? ) */
+	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2) */
 	ROM_LOAD32_WORD( "musha_obj-1.u0811.6f",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
 	ROM_LOAD32_WORD( "musha_obj-2.u082.5f",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
 
@@ -3058,7 +3049,7 @@ ROM_START( zeroteamsr )
 	ROM_LOAD( "musha_back-1.u075.4s",   0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) )
 	ROM_LOAD( "musha_back-2.u0714.2s",   0x100000, 0x080000, CRC(ce61c952) SHA1(52a843c8ba428b121fab933dd3b313b2894d80ac) )
 
-	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2? ) */
+	ROM_REGION32_LE( 0x800000, "gfx3", ROMREGION_ERASEFF ) /* sprite gfx (encrypted) (diff encrypt to raiden2) */
 	ROM_LOAD32_WORD( "musha_obj-1.u0811.6f",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
 	ROM_LOAD32_WORD( "musha_obj-2.u082.5f",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
 
@@ -3192,19 +3183,19 @@ const uint16_t raiden2_state::raiden_blended_colors[] = {
 
 void raiden2_state::init_blending(const uint16_t *table)
 {
-	for(auto & elem : blend_active)
+	for(auto & elem : m_blend_active)
 		elem = false;
 	while(*table != 0xffff)
-		blend_active[*table++] = true;
+		m_blend_active[*table++] = true;
 }
 
 DRIVER_INIT_MEMBER(raiden2_state,raiden2)
 {
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
-	cur_spri = spri;
-	membank("mainbank1")->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
-	membank("mainbank2")->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
+	m_cur_spri = spri;
+	m_mainbank[0]->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
+	m_mainbank[1]->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
 	raiden2_decrypt_sprites(machine());
 }
 
@@ -3212,9 +3203,9 @@ DRIVER_INIT_MEMBER(raiden2_state,raidendx)
 {
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
-	cur_spri = spri;
-	membank("mainbank1")->configure_entries(0, 0x20, memregion("maincpu")->base(), 0x10000);
-	membank("mainbank2")->configure_entries(0, 0x20, memregion("maincpu")->base(), 0x10000);
+	m_cur_spri = spri;
+	m_mainbank[0]->configure_entries(0, 0x20, memregion("maincpu")->base(), 0x10000);
+	m_mainbank[1]->configure_entries(0, 0x20, memregion("maincpu")->base(), 0x10000);
 	raiden2_decrypt_sprites(machine());
 }
 
@@ -3226,7 +3217,7 @@ DRIVER_INIT_MEMBER(raiden2_state,xsedae)
 {
 	init_blending(xsedae_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
-	cur_spri = spri;
+	m_cur_spri = spri;
 	/* doesn't have banking */
 }
 
@@ -3248,9 +3239,9 @@ DRIVER_INIT_MEMBER(raiden2_state,zeroteam)
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
-	cur_spri = spri;
-	membank("mainbank1")->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
-	membank("mainbank2")->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
+	m_cur_spri = spri;
+	m_mainbank[0]->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
+	m_mainbank[1]->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
 	zeroteam_decrypt_sprites(machine());
 }
 

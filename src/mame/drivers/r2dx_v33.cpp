@@ -81,12 +81,14 @@ class r2dx_v33_state : public raiden2_state
 {
 public:
 	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
-		: raiden2_state(mconfig, type, tag),
-		m_r2dxbank(0),
-		m_r2dxgameselect(0),
-		m_eeprom(*this, "eeprom"),
-		m_math(*this, "math")
-	{ }
+		: raiden2_state(mconfig, type, tag)
+		, m_r2dxbank(0)
+		, m_r2dxgameselect(0)
+		, m_eeprom(*this, "eeprom")
+		, m_math(*this, "math")
+		, m_okibank(*this, "okibank")
+	{
+	}
 
 	DECLARE_WRITE16_MEMBER(r2dx_angle_w);
 	DECLARE_WRITE16_MEMBER(r2dx_dx_w);
@@ -135,7 +137,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void r2dx_setbanking(void);
+	void r2dx_setbanking();
 
 	int m_r2dxbank;
 	int m_r2dxgameselect;
@@ -149,6 +151,8 @@ private:
 
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_region_ptr<uint8_t> m_math;
+
+	optional_memory_bank m_okibank;
 };
 
 void r2dx_v33_state::machine_start()
@@ -173,29 +177,29 @@ WRITE16_MEMBER(r2dx_v33_state::tile_bank_w)
 	if(ACCESSING_BITS_0_7) {
 		int new_bank;
 		new_bank = ((data & 0x10)>>4);
-		if(new_bank != bg_bank) {
-			bg_bank = new_bank;
-			background_layer->mark_all_dirty();
+		if(new_bank != m_bg_bank) {
+			m_bg_bank = new_bank;
+			m_background_layer->mark_all_dirty();
 		}
 
 		new_bank = 2 + ((data & 0x20)>>5);
-		if(new_bank != mid_bank) {
-			mid_bank = new_bank;
-			midground_layer->mark_all_dirty();
+		if(new_bank != m_mid_bank) {
+			m_mid_bank = new_bank;
+			m_midground_layer->mark_all_dirty();
 		}
 
 		new_bank = 4 | (data & 3);
-		if(new_bank != fg_bank) {
-			fg_bank = new_bank;
-			foreground_layer->mark_all_dirty();
+		if(new_bank != m_fg_bank) {
+			m_fg_bank = new_bank;
+			m_foreground_layer->mark_all_dirty();
 		}
 	}
 }
 
-void r2dx_v33_state::r2dx_setbanking(void)
+void r2dx_v33_state::r2dx_setbanking()
 {
-	membank("bank1")->set_entry(m_r2dxgameselect*0x20 + m_r2dxbank + 16);
-	membank("bank3")->set_entry(m_r2dxgameselect);
+	m_mainbank[0]->set_entry(m_r2dxgameselect*0x10 + m_r2dxbank);
+	m_mainbank[1]->set_entry(m_r2dxgameselect);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
@@ -213,12 +217,12 @@ WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 		// the bit gets set if it reads RAIDENDX from the EEPROM
 		m_r2dxgameselect = (data & 0x04) >> 2;
 
-		tx_bank = m_r2dxgameselect;
-		text_layer->mark_all_dirty();
+		m_tx_bank = m_r2dxgameselect;
+		m_text_layer->mark_all_dirty();
 
 		r2dx_setbanking();
 
-		membank("okibank")->set_entry(data&3);
+		m_okibank->set_entry(data&3);
 
 	}
 	else
@@ -302,7 +306,6 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_rom_bank_w)
 	//printf("rom bank %04x %04x\n", data, mem_mask);
 	m_r2dxbank = data & 0xf;
 	r2dx_setbanking();
-
 }
 
 WRITE16_MEMBER(r2dx_v33_state::r2dx_angle_w)
@@ -437,18 +440,18 @@ void r2dx_v33_state::rdx_v33_map(address_map &map)
 	map(0x00800, 0x00fff).ram(); // copies eeprom here?
 	map(0x01000, 0x0bfff).ram();
 
-	map(0x0c000, 0x0c7ff).ram().share("sprites");
+	map(0x0c000, 0x0c7ff).ram().share("spriteram");
 	map(0x0c800, 0x0cfff).ram();
-	map(0x0d000, 0x0d7ff).ram(); //_WRITE(raiden2_background_w) AM_SHARE("back_data")
-	map(0x0d800, 0x0dfff).ram(); //_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
-	map(0x0e000, 0x0e7ff).ram(); //_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
-	map(0x0e800, 0x0f7ff).ram(); //_WRITE(raiden2_text_w) AM_SHARE("text_data")
+	map(0x0d000, 0x0d7ff).ram(); //_WRITE(background_w) AM_SHARE("back_data")
+	map(0x0d800, 0x0dfff).ram(); //_WRITE(foreground_w) AM_SHARE("fore_data")
+	map(0x0e000, 0x0e7ff).ram(); //_WRITE(midground_w)  AM_SHARE("mid_data")
+	map(0x0e800, 0x0f7ff).ram(); //_WRITE(text_w) AM_SHARE("text_data")
 	map(0x0f800, 0x0ffff).ram(); /* Stack area */
 	map(0x10000, 0x1efff).ram();
 	map(0x1f000, 0x1ffff).ram(); //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
-	map(0x20000, 0x2ffff).bankr("bank1").nopw();
-	map(0x30000, 0xfffff).bankr("bank3").nopw();
+	map(0x20000, 0x2ffff).bankr("mainbank1").nopw();
+	map(0x30000, 0xfffff).bankr("mainbank2").nopw();
 }
 
 
@@ -500,12 +503,12 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 	map(0x00800, 0x00fff).ram();
 	map(0x01000, 0x0bfff).ram();
 
-	map(0x0c000, 0x0c7ff).ram().share("sprites");
+	map(0x0c000, 0x0c7ff).ram().share("spriteram");
 	map(0x0c800, 0x0cfff).ram();
-	map(0x0d000, 0x0d7ff).ram(); //.w(this, FUNC(r2dx_v33_state::raiden2_background_w)).share("back_data");
-	map(0x0d800, 0x0dfff).ram(); //.w(this, FUNC(r2dx_v33_state::raiden2_foreground_w)).share("fore_data");
-	map(0x0e000, 0x0e7ff).ram(); //.w(this, FUNC(r2dx_v33_state::raiden2_midground_w)).share("mid_data");
-	map(0x0e800, 0x0f7ff).ram(); //.w(this, FUNC(r2dx_v33_state::raiden2_text_w)).share("text_data");
+	map(0x0d000, 0x0d7ff).ram(); //.w(this, FUNC(r2dx_v33_state::background_w)).share("back_data");
+	map(0x0d800, 0x0dfff).ram(); //.w(this, FUNC(r2dx_v33_state::foreground_w)).share("fore_data");
+	map(0x0e000, 0x0e7ff).ram(); //.w(this, FUNC(r2dx_v33_state::midground_w)).share("mid_data");
+	map(0x0e800, 0x0f7ff).ram(); //.w(this, FUNC(r2dx_v33_state::text_w)).share("text_data");
 	map(0x0f800, 0x0ffff).ram(); /* Stack area */
 	map(0x10000, 0x1efff).ram();
 	map(0x1f000, 0x1ffff).ram(); //.w("palette", FUNC(palette_device::write)).share("palette");
@@ -722,16 +725,12 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(r2dx_v33_state,r2dx_v33)
 {
-	common_reset();
+	common_reset(0,6,2,0);
 }
 
 MACHINE_RESET_MEMBER(r2dx_v33_state,nzeroteam)
 {
-	common_reset();
-
-	bg_bank = 0;
-	fg_bank = 2;
-	mid_bank = 1;
+	common_reset(0,2,1,0);
 }
 
 void r2dx_v33_state::r2dx_oki_map(address_map &map)
@@ -835,23 +834,21 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 {
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
-	cur_spri = spri;
-
-	membank("bank1")->configure_entries(0, 0x40, memregion("maincpu")->base(), 0x10000);
-
-	membank("bank3")->configure_entry(0, memregion("maincpu")->base()+0x030000); // 0x30000 - 0xfffff bank for Raiden 2
-	membank("bank3")->configure_entry(1, memregion("maincpu")->base()+0x230000); // 0x30000 - 0xfffff bank for Raiden DX
-
+	m_cur_spri = spri;
+	
+	m_mainbank[0]->configure_entries(0,  16, memregion("maincpu")->base()+0x100000, 0x010000); // 0x20000 - 0x2ffff bank for Raiden 2
+	m_mainbank[0]->configure_entries(16, 16, memregion("maincpu")->base()+0x100000, 0x010000); // 0x20000 - 0x2ffff bank for Raiden DX
+	
+	m_mainbank[1]->configure_entries(0,  2,  memregion("maincpu")->base()+0x030000, 0x200000);
 
 	raiden2_decrypt_sprites(machine());
 
 //  sensible defaults if booting as R2
-	membank("bank1")->set_entry(0);
-	membank("bank3")->set_entry(0);
+	m_mainbank[0]->set_entry(0);
+	m_mainbank[1]->set_entry(0);
 
-
-	membank("okibank")->configure_entries(0, 4, memregion("oki")->base(), 0x40000);
-	membank("okibank")->set_entry(0);
+	m_okibank->configure_entries(0, 4, memregion("oki")->base(), 0x40000);
+	m_okibank->set_entry(0);
 
 }
 
@@ -859,7 +856,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
-	cur_spri = spri;
+	m_cur_spri = spri;
 
 	zeroteam_decrypt_sprites(machine());
 }
@@ -868,7 +865,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
-	cur_spri = spri;
+	m_cur_spri = spri;
 
 	// no sprite encryption(!)
 
