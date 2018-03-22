@@ -189,8 +189,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_bg(bitmap_ind16 &bitmap, const rectangle &cliprect, int map, uint32_t* ram);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect, int map, uint32_t* ram);
 
 	void rearrange_sprite_data(uint8_t* ROM, uint32_t* NEW, uint32_t* NEW2);
 	void rearrange_tile_data(uint8_t* ROM, uint32_t* NEW, uint32_t* NEW2);
@@ -568,7 +568,7 @@ void gstream_state::video_start()
 
 
 // custom drawgfx function for x2222 to draw RGB data instead of indexed data, needed because our regular drawgfx and tilemap code don't support that
-void drawgfx_transpen_x2222(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,gfx_element *gfx2,
+void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,gfx_element *gfx2,
 		uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty,
 		uint32_t transpen)
 {
@@ -644,6 +644,7 @@ void drawgfx_transpen_x2222(bitmap_ind16 &dest, const rectangle &cliprect, gfx_e
 			/* fetch the source data */
 			srcdata = gfx->get_data(code);
 			srcdata2 = gfx2->get_data(code);
+			const pen_t *rgb = &state->m_palette->pen(0); // 16 bit BGR
 
 			/* compute how many blocks of 4 pixels we have */
 			uint32_t leftovers = (destendx + 1 - destx);
@@ -658,7 +659,7 @@ void drawgfx_transpen_x2222(bitmap_ind16 &dest, const rectangle &cliprect, gfx_e
 				/* iterate over pixels in Y */
 				for (cury = desty; cury <= destendy; cury++)
 				{
-					uint16_t *destptr = &dest.pix16(cury, destx);
+					uint32_t *destptr = &dest.pix32(cury, destx);
 					const uint8_t *srcptr = srcdata;
 					const uint8_t *srcptr2 = srcdata2;
 					srcdata += dy;
@@ -674,7 +675,7 @@ void drawgfx_transpen_x2222(bitmap_ind16 &dest, const rectangle &cliprect, gfx_e
 
 						uint16_t full = (srcdata | (srcdata2 << 8));
 						if (full != 0)
-							destptr[0] = full;
+							destptr[0] = rgb[full];
 
 						srcptr++;
 						srcptr2++;
@@ -689,7 +690,7 @@ void drawgfx_transpen_x2222(bitmap_ind16 &dest, const rectangle &cliprect, gfx_e
 				/* iterate over pixels in Y */
 				for (cury = desty; cury <= destendy; cury++)
 				{
-					uint16_t *destptr = &dest.pix16(cury, destx);
+					uint32_t *destptr = &dest.pix32(cury, destx);
 					const uint8_t *srcptr = srcdata;
 					const uint8_t *srcptr2 = srcdata2;
 
@@ -704,7 +705,7 @@ void drawgfx_transpen_x2222(bitmap_ind16 &dest, const rectangle &cliprect, gfx_e
 
 						uint16_t full = (srcdata | (srcdata2 << 8));
 						if (full != 0)
-							destptr[0] = full;
+							destptr[0] = rgb[full];
 
 						srcptr--;
 						srcptr2--;
@@ -717,7 +718,7 @@ void drawgfx_transpen_x2222(bitmap_ind16 &dest, const rectangle &cliprect, gfx_e
 	} while (0);
 }
 
-void gstream_state::draw_bg(bitmap_ind16 &bitmap, const rectangle &cliprect, int map, uint32_t* ram )
+void gstream_state::draw_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect, int map, uint32_t* ram )
 {
 	int scrollx;
 	int scrolly;
@@ -746,7 +747,7 @@ void gstream_state::draw_bg(bitmap_ind16 &bitmap, const rectangle &cliprect, int
 	}
 }
 
-uint32_t gstream_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gstream_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* The tilemaps and sprite are interleaved together.
 	   Even Words are tilemap tiles
