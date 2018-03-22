@@ -330,7 +330,8 @@ QUICKLOAD_LOAD_MEMBER( altos5_state, altos5 )
 	setup_banks(2);
 
 	/* Avoid loading a program if CP/M-80 is not in memory */
-	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3)) {
+	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
+	{
 		machine_reset();
 		return image_init_result::FAIL;
 	}
