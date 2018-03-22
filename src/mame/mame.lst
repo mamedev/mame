@@ -21334,7 +21334,7 @@ bel                             // 1998.12 Behind Enemy Lines
 daytona                         // 1994.03 Daytona USA (Japan, Revision A)
 daytona93                       // 1993    Japan
 daytonam                        // 2001    Kyle Hodgetts hack
-daytonas                        // 
+daytonas                        //
 daytonase                       // 1994    Daytona USA Special Edition (Japan, Revision A)
 daytonat                        // 1994?   Kyle Hodgetts hack
 daytonata                       // 1994?   Kyle Hodgetts hack
@@ -32294,6 +32294,9 @@ progolfa                        // (c) 1981
 
 @source:prophet600.cpp
 prpht600                        // 1983 Sequential Circuits
+
+@source:proteus.cpp
+proteus                         // Poly Proteus
 
 @source:proteus3.cpp
 proteus3                        //

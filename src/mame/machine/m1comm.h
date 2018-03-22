@@ -7,6 +7,7 @@
 
 #define M1COMM_SIMULATION
 
+#include "osdcore.h"
 #include "cpu/z80/z80.h"
 
 #define MCFG_M1COMM_ADD(_tag ) \
@@ -75,11 +76,13 @@ private:
 	uint8_t m_cn;             // bit0 is used to enable/disable the comm board
 	uint8_t m_fg;             // flip gate? purpose unknown, bit0 is stored, bit7 is connected to ZFG bit 0
 
-	emu_file m_line_rx;       // rx line - can be either differential, simple serial or toslink
-	emu_file m_line_tx;       // tx line - is differential, simple serial and toslink
+	osd_file::ptr m_line_rx;  // rx line - can be either differential, simple serial or toslink
+	osd_file::ptr m_line_tx;  // tx line - is differential, simple serial and toslink
 	char m_localhost[256];
 	char m_remotehost[256];
-	uint8_t m_buffer[0x1000];
+	uint8_t m_buffer0[0x200];
+	uint8_t m_buffer1[0x200];
+	uint8_t m_framesync;
 
 #ifdef M1COMM_SIMULATION
 	uint8_t m_linkenable;
@@ -89,6 +92,9 @@ private:
 	uint8_t m_linkcount;
 
 	void comm_tick();
+	int read_frame(int dataSize);
+	void send_data(uint8_t frameType, int frameStart, int frameSize, int dataSize);
+	void send_frame(int dataSize);
 #endif
 };
 
