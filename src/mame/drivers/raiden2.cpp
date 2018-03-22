@@ -1373,7 +1373,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout raiden2_charlayout =
+static const gfx_layout charlayout =
 {
 	8,8,
 	RGN_FRAC(1,1),
@@ -1385,7 +1385,7 @@ static const gfx_layout raiden2_charlayout =
 };
 
 
-static const gfx_layout raiden2_tilelayout =
+static const gfx_layout tilelayout =
 {
 	16,16,
 	RGN_FRAC(1,1),
@@ -1401,7 +1401,7 @@ static const gfx_layout raiden2_tilelayout =
 	128*8
 };
 
-static const gfx_layout raiden2_spritelayout =
+static const gfx_layout spritelayout =
 {
 	16, 16,
 	RGN_FRAC(1,1),
@@ -1413,9 +1413,9 @@ static const gfx_layout raiden2_spritelayout =
 };
 
 GFXDECODE_START( raiden2 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, raiden2_charlayout,   0x700, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, raiden2_tilelayout,   0x400, 48 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, raiden2_spritelayout, 0x000, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0x700, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,   0x400, 48 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout, 0x000, 64 )
 GFXDECODE_END
 
 
