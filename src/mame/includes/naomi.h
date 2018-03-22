@@ -19,6 +19,7 @@ naomi.h -> NAOMI includes
 #include "machine/naomim2.h"
 #include "machine/naomim4.h"
 #include "machine/awboard.h"
+#include "machine/nvram.h"
 #include "cpu/sh/sh4.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/aica.h"
@@ -86,6 +87,8 @@ class naomi_state : public dc_state
 	void naomim4(machine_config &config);
 	void naomi_map(address_map &map);
 	void naomi_port(address_map &map);
+protected:
+	void set_drc_options();
 };
 
 class naomi2_state : public naomi_state
