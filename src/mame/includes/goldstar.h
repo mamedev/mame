@@ -152,6 +152,7 @@ public:
 	DECLARE_DRIVER_INIT(rp36c3);
 	DECLARE_DRIVER_INIT(rp96sub);
 	DECLARE_DRIVER_INIT(tcl);
+	DECLARE_DRIVER_INIT(super7);
 
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
