@@ -33,15 +33,15 @@
 
 
 //#define LOG_GENERAL (1U << 0) //defined in logmacro.h already
-#define LOG_READ    (1U << 1)
+#define LOG_VRAM    (1U << 1)
 #define LOG_CMD     (1U << 2)
 
-//#define VERBOSE (LOG_GENERAL | LOG_CMD)
+//#define VERBOSE (LOG_GENERAL | LOG_VRAM)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
-#define LOGR(...)   LOGMASKED(LOG_READ, __VA_ARGS__)
+#define LOGV(...)   LOGMASKED(LOG_VRAM, __VA_ARGS__)
 #define LOGCMD(...) LOGMASKED(LOG_CMD,  __VA_ARGS__)
 
 
@@ -114,8 +114,11 @@ void isa8_pgc_device::pgc_map(address_map &map)
 	map(0x10000, 0x1001f).rw(this, FUNC(isa8_pgc_device::stateparam_r), FUNC(isa8_pgc_device::stateparam_w));
 //  AM_RANGE(0x18000, 0x18fff) AM_RAM   // ??
 	map(0x28000, 0x287ff).ram().region("commarea", 0).mirror(0x800);
+	map(0x32001, 0x32001).nopw();
+	map(0x32020, 0x3203f).w(this, FUNC(isa8_pgc_device::accel_w));
 	map(0x3c000, 0x3c001).r(this, FUNC(isa8_pgc_device::init_r));
 //  AM_RANGE(0x3e000, 0x3efff) AM_RAM   // ??
+	map(0x80000, 0xf7fff).rw(this, FUNC(isa8_pgc_device::vram_r), FUNC(isa8_pgc_device::vram_w));
 	map(0xf8000, 0xfffff).rom().region("maincpu", 0x8000);
 }
 
@@ -220,7 +223,6 @@ isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type
 
 void isa8_pgc_device::device_start()
 {
-	address_space &space = m_cpu->space( AS_PROGRAM );
 	int width = PGC_DISP_HORZ;
 	int height = PGC_DISP_VERT;
 
@@ -238,9 +240,6 @@ void isa8_pgc_device::device_start()
 	m_bitmap->fill(0);
 
 	m_vram = std::make_unique<uint8_t[]>(0x78000);
-	space.install_readwrite_bank(0x80000, 0xf7fff, "vram");
-	membank("vram")->set_base(m_vram.get());
-
 	m_eram = std::make_unique<uint8_t[]>(0x8000);
 
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&isa8_pgc_device::reset_common, this));
@@ -258,6 +257,7 @@ void isa8_pgc_device::device_reset()
 {
 	memset(m_stateparam, 0, sizeof(m_stateparam));
 	memset(m_lut, 0, sizeof(m_lut));
+	m_accel = 0;
 
 	m_commarea = memregion("commarea")->base();
 	if (BIT(ioport("DSW")->read(), 1))
@@ -282,6 +282,74 @@ IRQ_CALLBACK_MEMBER(isa8_pgc_device::irq_callback)
 }
 
 // memory handlers
+
+READ8_MEMBER( isa8_pgc_device::vram_r )
+{
+	uint8_t ret;
+
+	ret = m_vram[offset];
+	LOGV("vram R @ %02x == %02x\n", offset, ret);
+	return ret;
+}
+
+/*
+ * accel modes (decimal)
+ *
+ * 0 - none
+ * 1 - write 4 pixels, starting at offset
+ * 2 - write up to 4 pixels, ending at offset
+ * 3 - write up to 4 pixels, starting at offset
+ * 5 - write 20 pixels, starting at offset
+ * 9 - write up to 5 pixel groups, ending at offset.  offset may be in the middle of pixel group.
+ * 13 - write up to 5 pixel groups, starting at offset.
+ */
+WRITE8_MEMBER( isa8_pgc_device::vram_w )
+{
+	bool handled = true;
+
+	switch (m_accel)
+	{
+	case 0:
+		m_vram[offset] = data;
+		break;
+
+	case 1:
+		std::fill(&m_vram[offset], &m_vram[offset + 4], data);
+		break;
+
+	case 2:
+		std::fill(&m_vram[offset & ~3], &m_vram[offset + 1], data);
+		break;
+
+	case 3:
+		std::fill(&m_vram[offset], &m_vram[(offset + 4) & ~3], data);
+		break;
+
+	case 5:
+		std::fill(&m_vram[offset], &m_vram[offset + 20], data);
+		break;
+
+	case 9:
+		std::fill(&m_vram[offset - ((offset % 1024) % 20)], &m_vram[(offset + 4) & ~3], data);
+		break;
+
+	case 13:
+		std::fill(&m_vram[offset], &m_vram[(offset + 20) - ((offset % 1024) + 20) % 20], data);
+		break;
+
+	default:
+		m_vram[offset] = data;
+		handled = false;
+		break;
+	}
+	LOGV("vram W @ %02x <- %02x (accel %d)%s\n", offset, data, m_accel, handled ? "" : " (unsupported)");
+}
+
+WRITE8_MEMBER( isa8_pgc_device::accel_w )
+{
+	m_accel = offset >> 1;
+	LOGV("accel  @ %05x <- %02x (%d)\n", 0x32020 + offset, data, m_accel);
+}
 
 READ8_MEMBER( isa8_pgc_device::stateparam_r )
 {

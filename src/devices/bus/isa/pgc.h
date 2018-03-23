@@ -45,10 +45,13 @@ private:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
+	DECLARE_WRITE8_MEMBER( vram_w );
+	DECLARE_READ8_MEMBER( vram_r );
 	DECLARE_WRITE8_MEMBER( stateparam_w );
 	DECLARE_READ8_MEMBER( stateparam_r );
 	DECLARE_WRITE8_MEMBER( lut_w );
 	DECLARE_READ8_MEMBER( init_r );
+	DECLARE_WRITE8_MEMBER( accel_w );
 
 	void reset_common();
 
@@ -65,6 +68,7 @@ private:
 	uint8_t m_stateparam[16];
 	uint8_t m_lut[256*3];
 	std::unique_ptr<bitmap_ind16> m_bitmap;
+	int m_accel;
 };
 
 
