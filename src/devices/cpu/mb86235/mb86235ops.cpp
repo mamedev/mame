@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "mb86235.h"
+#include "debugger.h"
 
 /*********************
  *
@@ -60,6 +61,11 @@ void mb86235_device::handle_single_step_execution()
 		m_core->pc ++;
 }
  
+bool mb86235_device::check_previous_op_stall()
+{
+	return (m_core->cur_fifo_state.has_stalled == true) && ((m_core->st & RP) == 0);
+} 
+
 inline void mb86235_device::increment_pwp()
 {
 	m_core->pwp++;
@@ -97,11 +103,15 @@ inline uint32_t mb86235_device::decode_ea(uint8_t mode, uint8_t rx, uint8_t ry, 
 			return m_core->ar[rx];
 		case 0x01: // ARx ++
 			res = m_core->ar[rx];
+			if(m_core->cur_fifo_state.has_stalled == true)
+				return res;
 			m_core->ar[rx]++;
 			m_core->ar[rx]&=0x3fff;
 			return res;
 		case 0x03: // ARx + disp12
 			res = m_core->ar[rx];
+			if(m_core->cur_fifo_state.has_stalled == true)
+				return res;
 			m_core->ar[rx]+=disp;
 			m_core->ar[rx]&=0x3fff;
 			return res;
@@ -109,11 +119,15 @@ inline uint32_t mb86235_device::decode_ea(uint8_t mode, uint8_t rx, uint8_t ry, 
 			return m_core->ar[rx]+m_core->ar[ry];			
 		case 0x05: // ARx + ARy++
 			res = m_core->ar[ry];
+			if(m_core->cur_fifo_state.has_stalled == true)
+				return res;
 			m_core->ar[ry]++;
 			m_core->ar[ry]&=0x3fff;
 			return m_core->ar[rx]+res;
 		case 0x07: // ARx + (ARy + disp12)
 			res = m_core->ar[ry];
+			if(m_core->cur_fifo_state.has_stalled == true)
+				return res;
 			m_core->ar[ry]+=disp;
 			m_core->ar[ry]&=0x3fff;
 			return m_core->ar[rx]+res;
@@ -197,7 +211,7 @@ inline void mb86235_device::set_alu_flagsd(uint32_t val)
 	if(val==0) FSET(AZ);
 }
 
-inline void mb86235_device::set_alu_flagsf(float val)
+inline void mb86235_device::set_alu_flagsf(double val)
 {
 	FCLR(AN|AZ);
 	if(val<0.0) FSET(AN);
@@ -228,8 +242,8 @@ inline uint32_t mb86235_device::get_prx(uint8_t which)
 
 inline uint32_t mb86235_device::get_constfloat(uint8_t which)
 {
-	const float float_table[8] = { -1.0, 0.0, 0.5, 1.0, 1.5, 2.0, 3.0, 5.0 };
-	return (uint32_t)float_table[which & 7];
+	const double float_table[8] = { -1.0, 0.0, 0.5, 1.0, 1.5, 2.0, 3.0, 5.0 };
+	return f2u(float_table[which & 7]);
 }
 
 inline uint32_t mb86235_device::get_constint(uint8_t which)
@@ -313,9 +327,9 @@ inline void mb86235_device::decode_aluop(uint8_t opcode, uint32_t src1, uint32_t
 		case 0x02: // FSUB
 		case 0x03: // FSUBZ
 		{
-			float f1 = (float)src1;
-			float f2 = (float)src2;
-			float d;
+			double f1 = u2f(src1);
+			double f2 = u2f(src2);
+			double d;
 
 			if(opcode & 2)
 				d = f2-f1;
@@ -328,34 +342,37 @@ inline void mb86235_device::decode_aluop(uint8_t opcode, uint32_t src1, uint32_t
 				if(d < 0.0)
 				{
 					FSET(ZC);
-					d = 0.0f;
+					d = 0.0;
 				}
 			}
+
 			set_alu_flagsf(d);
-			set_alureg(dst_which,d);
+			set_alureg(dst_which,f2u(d));
 			break;
 		}
 
 		case 0x04: // FCMP
 		case 0x06: // FABC
 		{
-			float f1 = (float)src1;
-			float f2 = (float)src2;
-			float d;
+			double f1 = u2f(src1);
+			double f2 = u2f(src2);
+			double d;
+			
 			if(opcode & 2)
 				d = fabs(f2)-fabs(f1);
 			else
 				d = f2-f1;
+
 			set_alu_flagsf(d);
 			break;
 		}
 
 		case 0x05: // FABS
 		{
-			float d = (float)src1;
+			double d = u2f(src1);
 			d = fabs(d);
 			set_alu_flagsf(d);
-			set_alureg(dst_which,d);
+			set_alureg(dst_which,f2u(d));
 			break;
 		}
 
@@ -380,64 +397,64 @@ inline void mb86235_device::decode_aluop(uint8_t opcode, uint32_t src1, uint32_t
 
 		case 0x0a: // FRCP
 		{
-			float f = (float)src1;
+			double f = u2f(src1);
 			FCLR(ZD);
 			if(f == 0.0f)
 				FSET(ZD);
 			f = 1.0/f;
 			set_alu_flagsf(f);
-			set_alureg(dst_which,f);
+			set_alureg(dst_which,f2u(f));
 			break;
 		}
 
 		case 0x0b: // FRSQ
 		{
-			float f = (float)src1;
+			double f = u2f(src1);
 			FCLR(NR);
 			if(f <= 0.0f)
 				FSET(NR);
 			f = 1.0/sqrtf(f);
 			set_alu_flagsf(f);
-			set_alureg(dst_which,f);
+			set_alureg(dst_which,f2u(f));
 			break;
 		}
 
 		case 0x0c: // FLOG
 		{
-			float f = (float)src1;
+			double f = u2f(src1);
 			FCLR(IL);
 			if(f <= 0.0f)
 				FSET(IL);
-			f = log(f)/0.301030f; // log2
+			f = log(f)/0.301030; // log2
 			set_alu_flagsf(f);
-			set_alureg(dst_which,f);
+			set_alureg(dst_which,f2u(f));
 			break;
 		}
 
 		case 0x0d: // CIF
 		{
-			int v = (((int)src1) << 0) >> 0;
-			float f = (float)v;
+			int v = (int)src1;
+			double f = u2f(v);
 			set_alu_flagsf(f);
-			set_alureg(dst_which,f);
+			set_alureg(dst_which,f2u(f));
 			break;
 		}
 
 		case 0x0e: // CFI
 		{
-			float f = (float)src1;
+			double f = u2f(src1);
 			int v = (int)f;
 			set_alu_flagsi(v);
-			set_alureg(dst_which,v);
+			set_alureg(dst_which,f2u(v));
 			break;
 		}
 
 		case 0x0f: // CFIB
 		{
-			float f = (float)src1;
+			double f = u2f(src1);
 			uint32_t res;
 			FCLR(AU);
-			res = (uint32_t)f;
+			res = f2u(f);
 			if(f<0) 
 			{ 
 				FSET(AU); 
@@ -592,15 +609,15 @@ void mb86235_device::decode_mulop(bool isfmul, uint32_t src1, uint32_t src2, uin
 {
 	if(isfmul == true) // FMUL
 	{
-		float f1 = (float)src1;
-		float f2 = (float)src2;
-		float res = f1*f2;
+		double f1 = u2f(src1);
+		double f2 = u2f(src2);
+		double res = f1*f2;
 		FCLR(MD|MU|MV);
 		// TODO: MD MU MV flags
 		FCLR(MN|MZ);
 		if(res<0.0) FSET(MN);
 		if(res==0.0) FSET(MZ);
-		set_alureg(dst_which,(uint32_t)res);
+		set_alureg(dst_which,f2u(res));
 	}
 	else // MUL
 	{
@@ -694,8 +711,6 @@ void mb86235_device::do_alu2(uint32_t h, uint32_t l)
  *
  ********************/
  
-#include "debugger.h"
- 
 inline uint32_t mb86235_device::get_transfer_reg(uint8_t which)
 {
 	switch(which >> 3)
@@ -741,7 +756,7 @@ inline uint32_t mb86235_device::get_transfer_reg(uint8_t which)
 					{
 						FSET(IFE);						
 						m_core->cur_fifo_state.has_stalled = true;
-						//if((m_core->st & RP) == 0)
+						if((m_core->st & RP) == 0)
 							m_core->cur_fifo_state.pc = m_core->ppc;
 						//else
 						//	fatalerror("check me %08x\n",m_core->ppc);
@@ -816,8 +831,9 @@ inline void mb86235_device::set_transfer_reg(uint8_t which, uint32_t value)
 					{
 						FSET(OFF);
 						m_core->cur_fifo_state.has_stalled = true;
-						//if((m_core->st & RP) == 0)
+						if((m_core->st & RP) == 0)
 							m_core->cur_fifo_state.pc = m_core->ppc;
+						
 						//else
 						//	fatalerror("check me (writes)");
 						return;
@@ -958,7 +974,7 @@ void mb86235_device::do_trans2_2(uint32_t h, uint32_t l)
 	switch(sdb)
 	{
 		// reg -> reg
-		case 0:	//reg->reg
+		case 0:
 		{
 			uint8_t bs = (l >> 13) & 0x1f;
 			uint8_t bd = (l >>  8) & 0xf;
@@ -1013,7 +1029,16 @@ void mb86235_device::do_trans1_2(uint32_t h, uint32_t l)
 				disp_offs |= 1;
 			
 			if(sr & 0x40)
-				fatalerror("TGPx4: unimplemented int->ext sr %02x at pc=%08x\n",sr,m_core->ppc);
+			{
+				if(sr == 0x58)
+					res = l & 0xffffff;
+				else
+				{
+					bool isbbus = (sr & 0x20) == 0x20;
+					uint32_t addr = decode_ea(l & 0xf,sr & 7,(l >> 4) & 7, (l >> 7) & 0x3fff,isbbus);
+					res = read_bus(isbbus,addr);
+				}
+			}
 			else
 				res = get_transfer_reg(sr);
 			
@@ -1085,17 +1110,17 @@ void mb86235_device::do_trans1_3(uint32_t h, uint32_t l)
 inline void mb86235_device::push_pc(uint32_t pcval)
 {
 	m_core->pcs[m_core->pcp++] = pcval;
-//	m_core->pcp &= 3;
-	if(m_core->pcp & ~3)
-		fatalerror("TGPx4: push_pc overflow PCP=%08x PC=%08x\n",m_core->pcp,m_core->ppc);
+	m_core->pcp &= 3;
+//	if(m_core->pcp & ~3)
+//		fatalerror("TGPx4: push_pc overflow PCP=%08x PC=%08x\n",m_core->pcp,m_core->ppc);
 }
 
 inline uint32_t mb86235_device::pop_pc()
 {
 	m_core->pcp--;
-//	m_core->pcp &= 3;
-	if(m_core->pcp & ~3)
-		fatalerror("TGPx4: pop_pc underflow PCP=%08x PC=%08x\n",m_core->pcp,m_core->ppc);
+	m_core->pcp &= 3;
+//	if(m_core->pcp & ~3)
+//		fatalerror("TGPx4: pop_pc underflow PCP=%08x PC=%08x\n",m_core->pcp,m_core->ppc);
 	
 	return m_core->pcs[m_core->pcp];
 }
@@ -1173,6 +1198,7 @@ void mb86235_device::do_control(uint32_t h, uint32_t l)
 				m_core->fifoin.num = 0;
 				FSET(IFE);
 				FCLR(IFF);
+				m_core->cur_fifo_state.has_stalled = false;
 			}
 			if(ef1 & 2) // clear fifo0/1 out (CLRFO)
 			{
@@ -1184,6 +1210,7 @@ void mb86235_device::do_control(uint32_t h, uint32_t l)
 				m_core->fifoout1.num = 0;
 				FSET(OFE);
 				FCLR(OFF);
+				m_core->cur_fifo_state.has_stalled = false;
 			}
 			break;
 		case 0x04: // PUSH
@@ -1223,6 +1250,7 @@ void mb86235_device::do_control(uint32_t h, uint32_t l)
 			{
 				m_core->delay_slot = true;
 				m_core->delay_pc = do_control_dst(l);
+				m_core->icount--;
 			}
 			break;
 		}
@@ -1233,6 +1261,7 @@ void mb86235_device::do_control(uint32_t h, uint32_t l)
 			{
 				m_core->delay_slot = true;
 				m_core->delay_pc = do_control_dst(l);
+				m_core->icount--;
 			}
 			break;
 		}

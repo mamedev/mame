@@ -240,6 +240,7 @@ private:
 	void generate_branch_target(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int type, int ef2);
 	bool has_register_clash(const opcode_desc *desc, int outreg);
 	bool aluop_has_result(int aluop);
+	bool check_previous_op_stall();
 	
 //  interpreter
 	void execute_op(uint32_t h, uint32_t l);
@@ -274,7 +275,7 @@ private:
 	inline void decrement_prp();
 	inline void zero_prp();
 	inline void set_alu_flagsd(uint32_t val);
-	inline void set_alu_flagsf(float val);
+	inline void set_alu_flagsf(double val);
 	inline void set_alu_flagsi(int val);
 	inline bool get_alu_second_src(uint8_t which);
 	void handle_single_step_execution();

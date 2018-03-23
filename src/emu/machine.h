@@ -258,9 +258,6 @@ public:
 	std::string get_statename(const char *statename_opt) const;
 
 private:
-	// video-related information
-	screen_device *         primary_screen;     // the primary screen device, or nullptr if screenless
-
 	// side effect disable counter
 	u32                     m_side_effects_disabled;
 

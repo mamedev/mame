@@ -39,15 +39,17 @@ public:
 	};
 
 	electron_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_cassette(*this, "cassette"),
-		m_beeper(*this, "beeper"),
-		m_region_basic(*this, "basic"),
-		m_keybd(*this, "LINE.%u", 0),
-		m_exp(*this, "exp"),
-		m_ram(*this, RAM_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_cassette(*this, "cassette")
+		, m_beeper(*this, "beeper")
+		, m_region_basic(*this, "basic")
+		, m_region_mos(*this, "mos")
+		, m_keybd(*this, "LINE.%u", 0)
+		, m_exp(*this, "exp")
+		, m_ram(*this, RAM_TAG)
+		, m_mrb(*this, "MRB")
 	{ }
 
 	/* ULA context */
@@ -88,6 +90,7 @@ public:
 	DECLARE_WRITE8_MEMBER(electron_mem_w);
 	DECLARE_READ8_MEMBER(electron_paged_r);
 	DECLARE_WRITE8_MEMBER(electron_paged_w);
+	DECLARE_READ8_MEMBER(electron_mos_r);
 	DECLARE_WRITE8_MEMBER(electron_mos_w);
 	DECLARE_READ8_MEMBER(electron_fred_r);
 	DECLARE_WRITE8_MEMBER(electron_fred_w);
@@ -111,9 +114,11 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
 	required_memory_region m_region_basic;
+	required_memory_region m_region_mos;
 	required_ioport_array<14> m_keybd;
 	required_device<electron_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;
+	optional_ioport m_mrb;
 	inline uint8_t read_vram( uint16_t addr );
 	inline void electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void electron_interrupt_handler(int mode, int interrupt);

@@ -155,6 +155,7 @@ cvicny.cpp
 cxgz80.cpp
 cxhumax.cpp
 cybiko.cpp
+cz101.cpp
 czk80.cpp
 d400.cpp
 d6800.cpp
@@ -553,6 +554,7 @@ prodigy.cpp
 prof180x.cpp
 prof80.cpp
 prophet600.cpp
+proteus.cpp
 proteus3.cpp
 ps2.cpp
 ps2sony.cpp

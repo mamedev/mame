@@ -274,6 +274,7 @@ NAOMI ROM cart usage
 There are 6 known types of carts manufactured by Sega: 171-7885A, 171-7919A, 171-7930B, 171-7978B, 171-8132B, 171-8346C
 There are also 2 types of carts manufactured by Namco: MASK-B, MASK-C
 
+PFSB Flash ROM board
 837-13591  171-7885A (C) Sega 1998
 |------------------------------------------------------------|
 |                                          ----CN2----       -|
@@ -342,6 +343,7 @@ Virtua Tennis / Power Smash (prototype)         no cart  *       21 (64Mb)   pre
 Wave Runner GP (USA, Rev A)                   840-0064C  23725A  12 (64Mb)   present  315-6206  317-0306-COM  PCB s/n is 840-0064B-01
 
 
+PFSB 64M Mask ROM board
 837-13668  171-7919A (C) Sega 1998
 |---------------------------------------------------------|
 |                                       ----CN2----       -|
@@ -433,6 +435,7 @@ Zombie Revenge                                  840-0003C    21707   19 (64Mb)  
 Zombie Revenge (Rev A)                          840-0003C    21707A  19 (64Mb)   present     315-6213  317-0249-COM   joystick + 3 buttons
 
 
+NRS Flash ROM board
 837-14011 171-7930B (C) Sega 1998
 |------------------------------------------------------------------|
 |        JJJJJJ      SW2                        ----CN2----        -|
@@ -486,6 +489,7 @@ Game                                  on cart  IC16#        # of SOP56  Notes
 Puyo Puyo Fever (prototype ver 0.01)  *        not present  22 (64Mb)   no cart, only development PCB
 
 
+NRS Mask ROM board
 837-13801  171-7978B (C) Sega 1999
 |---------------------------------------------------------|
 |                                       ----CN2----       -|
@@ -553,6 +557,7 @@ Virtua Fighter 4 Evolution                                   840-0106B    23934 
 Virtua Tennis 2 / Power Smash 2 (Rev A)                      840-0084C    22327A  18 (64Mb)   present  317-0320-COM
 
 
+PFSB 128M Mask ROM board
 837-14114-01  171-8132B (C) Sega 2000
 |---------------------------------------------------------|
 |      IC11  IC10  IC9                  ----CN2----       -|
@@ -624,6 +629,7 @@ WWF Royal Rumble                                840-0040C  22261    8 (128Mb)  3
 Zero Gunner 2                                   841-0020C  23689    5 (128Mb)  315-6319A  315-6213  317-5073-COM  present
 
 
+NFS Flash ROM board
 171-8346C (C) Sega 2005
 |---------------------------------------------------------|
 |  IC12          IC8                    ----CN2----       -|
@@ -1683,9 +1689,9 @@ WRITE64_MEMBER(naomi_state::eeprom_93c46a_w )
 void naomi_state::naomi_map(address_map &map)
 {
 	/* Area 0 */
-	map(0x00000000, 0x001fffff).mirror(0xa2000000).rom().region("maincpu", 0).share("rombase"); // BIOS
+	map(0x00000000, 0x001fffff).rom().region("maincpu", 0).share("rombase"); // BIOS
 
-	map(0x00200000, 0x00207fff).mirror(0x02000000).ram();                                             // bios uses it (battery backed ram ?)
+	map(0x00200000, 0x00207fff).ram().share("sram");
 	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_sysctrl_r), FUNC(naomi_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
@@ -1743,9 +1749,9 @@ WRITE32_MEMBER(naomi2_state::both_pvr2_ta_w)
 void naomi2_state::naomi2_map(address_map &map)
 {
 	/* Area 0 */
-	map(0x00000000, 0x001fffff).mirror(0xa2000000).rom().region("maincpu", 0).share("rombase"); // BIOS
+	map(0x00000000, 0x001fffff).rom().region("maincpu", 0).share("rombase"); // BIOS
 
-	map(0x00200000, 0x00207fff).mirror(0x02000000).ram();                                             // bios uses it (battery backed ram ?)
+	map(0x00200000, 0x00207fff).ram().share("sram");
 	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_sysctrl_r), FUNC(naomi2_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
@@ -1922,7 +1928,7 @@ void atomiswave_state::aw_map(address_map &map)
 	map(0x00000000, 0x0001ffff).rw(this, FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w)).region("awflash", 0);
 	map(0xa0000000, 0xa001ffff).rw(this, FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w)).region("awflash", 0);
 
-	map(0x00200000, 0x0021ffff).ram();     // battery backed up RAM
+	map(0x00200000, 0x0021ffff).ram().share("sram");     // battery backed up RAM
 	map(0x005f6800, 0x005f69ff).rw(this, FUNC(atomiswave_state::dc_sysctrl_r), FUNC(atomiswave_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f70ff).mirror(0x02000000).m(m_naomig1, FUNC(naomi_g1_device::submap)).umask64(0x0000ffff0000ffff);
@@ -2685,7 +2691,6 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
 	MCFG_SH4_CLOCK(CPU_CLOCK)
-	MCFG_CPU_FORCE_NO_DRC()
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
@@ -2736,6 +2741,7 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	MCFG_X76F100_ADD("naomibd_eeprom")
 	MCFG_M3COMM_ADD("comm_board")
 	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
+	MCFG_NVRAM_ADD_0FILL("sram")
 MACHINE_CONFIG_END
 
 /*
@@ -2849,10 +2855,8 @@ MACHINE_CONFIG_START(atomiswave_state::aw_base)
 	MCFG_MACRONIX_29L001MC_ADD("awflash")
 	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", WRITE8(dc_state, g1_irq))
 
-	//MCFG_CPU_MODIFY("soundcpu")
-	//MCFG_CPU_PROGRAM_MAP(aw_sound_map)
-
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
+	MCFG_NVRAM_ADD_0FILL("sram")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atomiswave_state::aw1c)
@@ -2967,7 +2971,7 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
   NOTE: this doesn't work for the HOTD2 or multi screen boot roms
 
 
-Naomi Dev BIOS v1.10:   (some sources call it "NAOMI Test BIOS ROM")
+Dev BIOS v1.10:   (some sources call it "NAOMI Test BIOS ROM")
 NAOMI DEVELOP  1999 01/10  1.10
 
 to boot into BIOS menu DIPSW 1-4 must be ON
@@ -3052,11 +3056,11 @@ OFF  OFF  ON   Australia
 	ROM_LOAD16_WORD_SWAP_BIOS( 18, "epr-21579d.ic27", 0x000000, 0x200000, CRC(33513691) SHA1(b1d8c7c516e1471a788fcf7a02a794ad2f05aeeb) ) \
 	ROM_SYSTEM_BIOS( 19, "bios19", "epr-21579 (Korea)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 19, "epr-21579.ic27",  0x000000, 0x200000, CRC(71f9c918) SHA1(d15af8b947f41eea7c203b565cd403e3f37a2017) ) \
-	ROM_SYSTEM_BIOS( 20, "bios20", "Naomi Dev BIOS" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 20, "dcnaodev.bios",   0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) \
-	ROM_SYSTEM_BIOS( 21, "bios21", "Naomi Dev BIOS v1.10" ) \
+	ROM_SYSTEM_BIOS( 20, "bios20", "Set4 Dev BIOS" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 20, "boot_rom_64b8.ic606", 0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) \
+	ROM_SYSTEM_BIOS( 21, "bios21", "Dev BIOS v1.10" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 21, "develop110.ic27", 0x000000, 0x200000, CRC(de7cfdb0) SHA1(da16800edc4d49f70481c124d487f544c2fa8ce7) ) \
-	ROM_SYSTEM_BIOS( 22, "bios22", "Naomi Unknown Dev board" ) \
+	ROM_SYSTEM_BIOS( 22, "bios22", "Development ROM Board" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 22, "zukinver0930.ipl", 0x000000, 0x200000, CRC(58e17c23) SHA1(19330f906accf1b859f56bbcedc2edff73747599) ) \
 	ROM_SYSTEM_BIOS( 23, "bios23", "epr-21576h (multi-region hack)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 23, "epr-21576h_multi.ic27", 0x000000, 0x200000, CRC(cce01f1f) SHA1(cca17119ad13e3a4ef7cb6902a37b65d6a844aee) ) \
@@ -3064,9 +3068,13 @@ OFF  OFF  ON   Australia
 	ROM_LOAD("315-6188.ic31", 0x0000, 0x2034, CRC(7c9fea46) SHA1(f77c07ae65dfed18c1c4c632c8945be21d02ddaf) )
 
 /*
- dcnaodev.bios comes from a dev / beta board. The eprom was a 27C4096
+ Set4 Dev BIOS / boot_rom__64b8.ic606 comes from early "Set 4" board, which is quite different than final DC/NAOMI (Set 5.24) and uses prerelease SH4 CPU and "ARC1" GPU.
+ PC BD SET4-25 64M NEC / 171-7598B / 837-19104-01 (c) Sega 1997
+ EEPROM is 27C4096, it contains monitor-debugger which communicates with host PC via SCSI, may upload code/data to onboard RAM and run it.
+ This boot ROM is not designed to run cartridges or other media.
+ 
 
- zukinver0930.ipl comes from 837-13502-01 / 837-13663 PCB which contains:
+ zukinver0930.ipl comes from 837-13502-01 / 837-13663 "Development ROM Board" which contains:
   22 empty sockets ROM0 - ROM21
   315-6187 Altera EPM7064LC68-10
   PC16550DV UART
@@ -8729,6 +8737,7 @@ ROM_START( vf4cart )
 ROM_END
 
 // There is also a development cart (171-7885A) with 20x 64Mb FlashROMs instead of 10x 128Mb MaskROMs. Content is the same.
+// Deluxe version, by default require motor board. According to manuals there is also exists Standard version, which have motor board disabled by default.
 ROM_START( kingrt66 )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -9525,6 +9534,10 @@ DRIVER_INIT_MEMBER(atomiswave_state,atomiswave)
 	ROM[0x98e/8] = (ROM[0x98e/8] & 0xffffffffffffU) | (uint64_t)0x0009<<48;
 
 	aw_ctrl_type = 0;
+
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0000ffff, true, ROM);
+	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0cffffff, false, dc_ram);
 }
 
 READ64_MEMBER(atomiswave_state::xtrmhnt2_hack_r)

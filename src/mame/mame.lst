@@ -10804,6 +10804,9 @@ cybstorm                        // (proto)          (c) 1993
 cyclemb                         // P0  (c) 1984 Taito Corporation [+ Seta]
 skydest                         // PD0 (c) 1985 Taito Corporation
 
+@source:cz101.cpp
+cz101							// 1984 Casio
+
 @source:czk80.cpp
 czk80                           //
 
@@ -21331,7 +21334,7 @@ bel                             // 1998.12 Behind Enemy Lines
 daytona                         // 1994.03 Daytona USA (Japan, Revision A)
 daytona93                       // 1993    Japan
 daytonam                        // 2001    Kyle Hodgetts hack
-daytonas                        // 
+daytonas                        //
 daytonase                       // 1994    Daytona USA Special Edition (Japan, Revision A)
 daytonat                        // 1994?   Kyle Hodgetts hack
 daytonata                       // 1994?   Kyle Hodgetts hack
@@ -32292,6 +32295,9 @@ progolfa                        // (c) 1981
 @source:prophet600.cpp
 prpht600                        // 1983 Sequential Circuits
 
+@source:proteus.cpp
+proteus                         // Poly Proteus
+
 @source:proteus3.cpp
 proteus3                        //
 
@@ -36800,6 +36806,7 @@ ti84pse                         // 2004 TI-84 Plus Silver Edition (Boot Code 1.0
 ti84psev3                       // 2011 TI-84 Plus Silver Edition (Boot Code 1.03)
 ti84pseb                        // 20?? TI-84 Plus Silver Edition (Bootleg)
 ti84pob                         // 201? TI-84 Plus Orion (Bootleg)
+ti84pov2                        // 201? TI-84 Plus Orion (Boot Code 1.02)
 ti84pov3                        // 201? TI-84 Plus Orion (Boot Code 1.03)
 ti84pcse                        // 20?? TI-84 Plus Color Silver Edition (Boot Code 4.0)
 ti84pce                         // 2015 TI-84 Plus Color Edition (Boot Code 5.00)

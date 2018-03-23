@@ -194,9 +194,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, M2COMM, tag, owner, clock),
-	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
-	m_line_tx(OPEN_FLAG_READ)
+	device_t(mconfig, M2COMM, tag, owner, clock)
 {
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
@@ -211,6 +209,8 @@ m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, dev
 	strcat(m_remotehost, mconfig.options().comm_remotehost());
 	strcat(m_remotehost, ":");
 	strcat(m_remotehost, mconfig.options().comm_remoteport());
+
+	m_framesync = mconfig.options().comm_framesync() ? 0x01 : 0x00;
 }
 
 //-------------------------------------------------
@@ -296,6 +296,7 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 			m_shared[i] = 0x00;
 		}
 
+		m_shared[0x01] = 0x02;
 		// TODO - check EPR-16726 on Daytona USA and Sega Rally Championship
 		// EPR-18643(A) - these are accessed by VirtuaON and Sega Touring Car Championship
 
@@ -314,6 +315,9 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 
 READ8_MEMBER(m2comm_device::fg_r)
 {
+#ifdef M2COMM_SIMULATION
+	read_fg();
+#endif
 	return m_fg | (~m_zfg << 7) | 0x7e;
 }
 
@@ -335,115 +339,119 @@ void m2comm_device::comm_tick()
 {
 	if (m_linkenable == 0x01)
 	{
-		m_zfg ^= 1;
-
+		int frameStart = 0x2000;
 		int frameSize = m_shared[0x13] << 8 | m_shared[0x12];
-		int frameOffset = m_shared[0x15] << 8 | m_shared[0x14];
+		int frameOffset = frameStart | m_shared[0x15] << 8 | m_shared[0x14];
 
 		int dataSize = frameSize + 1;
-		int togo = 0;
 		int recv = 0;
 		int idx = 0;
 
 		// EPR-16726 uses m_fg for Master/Slave
 		// EPR-18643(A) seems to check m_shared[1], with a fallback to m_fg
 		bool isMaster = (m_fg == 0x01 || m_shared[1] == 0x01);
-		bool isSlave = !isMaster && (m_fg == 0x00);
+		bool isSlave = (m_fg == 0x00 && m_shared[1] == 0x02);
+		bool isRelay = (m_fg == 0x00 && m_shared[1] == 0x00);
 
-		// if link not yet established...
-		if (m_linkalive == 0x00)
+		if (m_linkalive == 0x02)
 		{
-			// waiting...
+			// link failed...
+			m_shared[0] = 0xff;
+			return;
+		}
+		else if (m_linkalive == 0x00)
+		{
+			// link not yet established...
 			m_shared[0] = 0x00;
 			m_shared[2] = 0xff;
 			m_shared[3] = 0xff;
 
 			// check rx socket
-			if (!m_line_rx.is_open())
+			if (!m_line_rx)
 			{
 				osd_printf_verbose("M2COMM: listen on %s\n", m_localhost);
-				m_line_rx.open(m_localhost);
+				uint64_t filesize; // unused
+				osd_file::open(m_localhost, OPEN_FLAG_CREATE, m_line_rx, filesize);
 			}
 
 			// check tx socket
-			if (!m_line_tx.is_open())
+			if (!m_line_tx)
 			{
 				osd_printf_verbose("M2COMM: connect to %s\n", m_remotehost);
-				m_line_tx.open(m_remotehost);
+				uint64_t filesize; // unused
+				osd_file::open(m_remotehost, 0, m_line_tx, filesize);
 			}
 
 			// if both sockets are there check ring
-			if ((m_line_rx.is_open()) && (m_line_tx.is_open()))
+			if (m_line_rx && m_line_tx)
 			{
-				// try to read one messages
-				recv = m_line_rx.read(m_buffer, dataSize);
-				while (recv != 0)
+				m_zfg ^= 0x01;
+
+				// try to read one message
+				recv = read_frame(dataSize);
+				while (recv > 0)
 				{
-					// check if complete message
-					if (recv == dataSize)
+					// check if message id
+					idx = m_buffer0[0];
+
+					// 0xFF - link id
+					if (idx == 0xff)
 					{
-						// check if message id
-						idx = m_buffer[0];
-
-						// 0xFF - link id
-						if (idx == 0xff)
+						if (isMaster)
 						{
-							if (isMaster)
-							{
-								// master gets first id and starts next state
-								m_linkid = 0x01;
-								m_linkcount = m_buffer[1];
-								m_linktimer = 0x01;
-							}
-							else if (isSlave)
-							{
-								// increase linkcount
-								m_buffer[1]++;
-
-								// forward message
-								m_line_tx.write(m_buffer, dataSize);
-							}
+							// master gets first id and starts next state
+							m_linkid = 0x01;
+							m_linkcount = m_buffer0[1];
+							m_linktimer = 0x00;
 						}
-
-						// 0xFE - link size
-						else if (idx == 0xfe)
+						else
 						{
+							// slave get own id, relay does nothing
 							if (isSlave)
 							{
-								// fetch linkcount and linkid, then decrease linkid
-								m_linkcount = m_buffer[1];
-								m_linkid = m_buffer[2];
-								m_buffer[2]--;
-
-								// forward message
-								m_line_tx.write(m_buffer, dataSize);
+								m_buffer0[1]++;
 							}
 
-							// consider it done
-							osd_printf_verbose("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
-							m_linkalive = 0x01;
-							m_linktimer = 0x01;
-
-							// write to shared mem
-							m_shared[0] = 0x01;
-							m_shared[2] = m_linkid;
-							m_shared[3] = m_linkcount;
+							// forward message to other nodes
+							send_frame(dataSize);
 						}
 					}
-					else
+
+					// 0xFE - link size
+					else if (idx == 0xfe)
 					{
-						// got only part of a message - read the rest (and drop it)
-						// TODO: combine parts and push to "ring buffer"
-						togo = dataSize - recv;
-						while (togo > 0){
-							recv = m_line_rx.read(m_buffer, togo);
-							togo -= recv;
+						if (isSlave)
+						{
+							// fetch linkid and linkcount, then decrease linkid
+							m_linkid = m_buffer0[1];
+							m_linkcount = m_buffer0[2];
+							m_buffer0[1]--;
+
+							// forward message to other nodes
+							send_frame(dataSize);
 						}
-						osd_printf_verbose("M2COMM: dropped a message...\n");
+						else if (isRelay)
+						{
+							// fetch linkid and linkcount, then decrease linkid
+							m_linkid = 0x00;
+							m_linkcount = m_buffer0[2];
+
+							// forward message to other nodes
+							send_frame(dataSize);
+						}
+
+						// consider it done
+						osd_printf_verbose("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+						m_linkalive = 0x01;
+
+						// write to shared mem
+						m_shared[0] = 0x01;
+						m_shared[2] = m_linkid;
+						m_shared[3] = m_linkcount;
 					}
 
 					if (m_linkalive == 0x00)
-						recv = m_line_rx.read(m_buffer, dataSize);
+						recv = read_frame(dataSize);
 					else
 						recv = 0;
 				}
@@ -452,27 +460,25 @@ void m2comm_device::comm_tick()
 				if (isMaster && (m_linkalive == 0x00))
 				{
 					// send first packet
-					if (m_linktimer == 0x00)
+					if (m_linktimer == 0x01)
 					{
-						m_buffer[0] = 0xff;
-						m_buffer[1] = 0x01;
-						m_buffer[2] = 0x00;
-						m_line_tx.write(m_buffer, dataSize);
-						m_linktimer = 0x00e8; // 58 fps * 4s
+						m_buffer0[0] = 0xff;
+						m_buffer0[1] = 0x01;
+						m_buffer0[2] = 0x00;
+						send_frame(dataSize);
 					}
 
 					// send second packet
-					else if (m_linktimer == 0x01)
+					else if (m_linktimer == 0x00)
 					{
-						m_buffer[0] = 0xfe;
-						m_buffer[1] = m_linkcount;
-						m_buffer[2] = m_linkcount;
-						m_line_tx.write(m_buffer, dataSize);
+						m_buffer0[0] = 0xfe;
+						m_buffer0[1] = m_linkcount;
+						m_buffer0[2] = m_linkcount;
+						send_frame(dataSize);
 
 						// consider it done
 						osd_printf_verbose("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 						m_linkalive = 0x01;
-						m_linktimer = 0x00;
 
 						// write to shared mem
 						m_shared[0] = 0x01;
@@ -480,63 +486,216 @@ void m2comm_device::comm_tick()
 						m_shared[3] = m_linkcount;
 					}
 
-					else if (m_linktimer > 0x02)
+					else if (m_linktimer > 0x01)
 					{
 						// decrease delay timer
 						m_linktimer--;
-						if (m_linktimer == 0x02)
-							m_linktimer = 0x00;
 					}
 				}
 			}
 		}
 
-		// update "ring buffer" if link established
+		// if link established
 		if (m_linkalive == 0x01)
 		{
-			int togo = 0;
-			// try to read one messages
-			int recv = m_line_rx.read(m_buffer, dataSize);
-			while (recv != 0)
+			do
 			{
-				m_linktimer = 0x00;
-				// check if complete message
-				if (recv == dataSize)
+				// try to read a message
+				recv = read_frame(dataSize);
+				while (recv > 0)
 				{
 					// check if valid id
-					int idx = m_buffer[0];
-					if (idx >= 0 && idx <= m_linkcount) {
+					idx = m_buffer0[0];
+					if (idx >= 0 && idx <= m_linkcount)
+					{
+						// save message to "ring buffer"
 						for (int j = 0x00 ; j < frameSize ; j++)
 						{
-							m_shared[0x2000 + frameOffset + j] = m_buffer[1 + j];
+							m_shared[frameOffset + j] = m_buffer0[1 + j];
+						}
+						m_zfg ^= 0x01;
+						if (isSlave)
+							send_data(m_linkid, frameStart, frameSize, dataSize);
+						else if (isRelay)
+							send_frame(dataSize);
+					}
+					else
+					{
+						if (idx == 0xfc)
+						{
+							// 0xFC - VSYNC
+							m_linktimer = 0x00;
+
+							if (!isMaster)
+								// forward message to other nodes
+								send_frame(dataSize);
 						}
 					}
+
+					// try to read another message
+					recv = read_frame(dataSize);
+				}
+			}
+			while (m_linktimer == 0x01);
+
+			// enable wait for vsync
+			m_linktimer = m_framesync;
+
+			if (isMaster)
+			{
+				// update "ring buffer" if link established
+				send_data(m_linkid, frameStart, frameSize, dataSize);
+
+				// send vsync
+				m_buffer0[0] = 0xfc;
+				m_buffer0[1] = 0x01;
+				send_frame(dataSize);
+			}
+
+			m_zfg_delay = 0x02;
+		}
+	}
+}
+
+void m2comm_device::read_fg()
+{
+	if (m_zfg_delay > 0x00)
+	{
+		m_zfg_delay--;
+		return;
+	}
+	if (m_linkalive == 0x01)
+	{
+		int frameStart = 0x2000;
+		int frameSize = m_shared[0x13] << 8 | m_shared[0x12];
+		int frameOffset = frameStart | m_shared[0x15] << 8 | m_shared[0x14];
+
+		int dataSize = frameSize + 1;
+		int recv = 0;
+		int idx = 0;
+
+		// EPR-16726 uses m_fg for Master/Slave
+		// EPR-18643(A) seems to check m_shared[1], with a fallback to m_fg
+		bool isMaster = (m_fg == 0x01 || m_shared[1] == 0x01);
+		bool isSlave = (m_fg == 0x00 && m_shared[1] == 0x02);
+		bool isRelay = (m_fg == 0x00 && m_shared[1] == 0x00);
+
+		do
+		{
+			// try to read a message
+			recv = read_frame(dataSize);
+			while (recv > 0)
+			{
+				// check if valid id
+				idx = m_buffer0[0];
+				if (idx >= 0 && idx <= m_linkcount)
+				{
+					// save message to "ring buffer"
+					for (int j = 0x00 ; j < frameSize ; j++)
+					{
+						m_shared[frameOffset + j] = m_buffer0[1 + j];
+					}
+					m_zfg ^= 0x01;
+					if (isSlave)
+						send_data(m_linkid, frameStart, frameSize, dataSize);
+					else if (isRelay)
+						send_frame(dataSize);
 				}
 				else
 				{
-					// got only part of a message - read the rest (and drop it)
-					// TODO: combine parts and push to "ring buffer"
-					togo = dataSize - recv;
-					while (togo > 0){
-						recv = m_line_rx.read(m_buffer, togo);
-						togo -= recv;
-					}
-					osd_printf_verbose("M2COMM: dropped a message...\n");
-				}
-				recv = m_line_rx.read(m_buffer, dataSize);
-			}
+					if (idx == 0xfc)
+					{
+						// 0xFC - VSYNC
+						m_linktimer = 0x00;
 
-			if (m_linktimer == 0x00)
-			{
-				// push message to other nodes
-				m_buffer[0] = m_linkid;
-				for (int j = 0x00 ; j < frameSize ; j++)
-				{
-					m_buffer[1 + j] = m_shared[0x2000 + j];
+						if (!isMaster)
+							// forward message to other nodes
+							send_frame(dataSize);
+					}
 				}
-				m_line_tx.write(m_buffer, dataSize);
-				m_linktimer = 0x01;
+
+				// try to read another message
+				recv = read_frame(dataSize);
 			}
+		}
+		while (m_linktimer == 0x01);
+	}
+}
+
+int m2comm_device::read_frame(int dataSize)
+{
+	if (!m_line_rx)
+		return 0;
+
+	// try to read a message
+	std::uint32_t recv = 0;
+	osd_file::error filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
+	if (recv > 0)
+	{
+		// check if message complete
+		if (recv != dataSize)
+		{
+			// only part of a message - read on
+			std::uint32_t togo = dataSize - recv;
+			int offset = recv;
+			while (togo > 0)
+			{
+				filerr = m_line_rx->read(m_buffer1, 0, togo, recv);
+				if (recv > 0)
+				{
+					for (int i = 0 ; i < recv ; i++)
+					{
+						m_buffer0[offset + i] = m_buffer1[i];
+					}
+					togo -= recv;
+					offset += recv;
+				}
+				else if (filerr == osd_file::error::NONE && recv == 0)
+				{
+					togo = 0;
+				}
+			}
+		}
+	}
+	else if (filerr == osd_file::error::NONE && recv == 0)
+	{
+		if (m_linkalive == 0x01)
+		{
+			osd_printf_verbose("M2COMM: rx connection lost\n");
+			m_linkalive = 0x02;
+			m_linktimer = 0x00;
+			m_line_rx.reset();
+		}
+	}
+	return recv;
+}
+
+void m2comm_device::send_data(uint8_t frameType, int frameStart, int frameSize, int dataSize)
+{
+	m_buffer0[0] = frameType;
+	for (int i = 0x0000 ; i < frameSize ; i++)
+	{
+		m_buffer0[1 + i] = m_shared[frameStart + i];
+	}
+	send_frame(dataSize);
+}
+
+void m2comm_device::send_frame(int dataSize){
+	if (!m_line_tx)
+		return;
+
+	osd_file::error filerr;
+	std::uint32_t written;
+
+	filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
+	if (filerr != osd_file::error::NONE)
+	{
+		if (m_linkalive == 0x01)
+		{
+			osd_printf_verbose("M2COMM: tx connection lost\n");
+			m_linkalive = 0x02;
+			m_linktimer = 0x00;
+			m_line_tx.reset();
 		}
 	}
 }

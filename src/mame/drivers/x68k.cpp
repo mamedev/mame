@@ -139,6 +139,8 @@
 #include "x68000.lh"
 
 
+static uint32_t adpcm_clock[2] = { 8000000, 4000000 };
+static uint32_t adpcm_div[4] = { 1024, 768, 512, /* Reserved */512 };
 
 void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -330,26 +332,9 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_scc_ack)
 
 void x68k_state::x68k_set_adpcm()
 {
-	uint32_t rate = 0;
-
-	switch(m_adpcm.rate & 0x0c)
-	{
-		case 0x00:
-			rate = 7812/2;
-			break;
-		case 0x04:
-			rate = 10417/2;
-			break;
-		case 0x08:
-			rate = 15625/2;
-			break;
-		default:
-			logerror("PPI: Invalid ADPCM sample rate set.\n");
-			rate = 15625/2;
-	}
-	if(m_adpcm.clock != 0)
-		rate = rate/2;
-	m_adpcm_timer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
+	uint32_t rate = adpcm_div[m_adpcm.rate];
+	uint32_t res_clock = adpcm_clock[m_adpcm.clock]/2;
+	m_adpcm_timer->adjust(attotime::from_ticks(rate, res_clock), 0, attotime::from_ticks(rate, res_clock));
 }
 
 // Megadrive 3 button gamepad
@@ -581,7 +566,7 @@ READ8_MEMBER(x68k_state::ppi_port_c_r)
    bit 5    - IOC5 - Enable Joystick 2
    bit 4    - IOC4 - Enable Joystick 1
    bits 3,2 - ADPCM Sample rate
-   bits 1,0 - ADPCM Pan
+   bits 1,0 - ADPCM Pan (00 = Both, 01 = Right only, 10 = Left only, 11 = Off)
 */
 WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 {
@@ -590,9 +575,14 @@ WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 	if((data & 0x0f) != (m_ppi_prev & 0x0f))
 	{
 		m_adpcm.pan = data & 0x03;
-		m_adpcm.rate = data & 0x0c;
+		m_adpcm.rate = (data & 0x0c) >> 2;
+		if (m_adpcm.rate == 3)
+			logerror("PPI: Invalid ADPCM sample rate set.\n");
+
 		x68k_set_adpcm();
-		m_okim6258->set_divider((data >> 2) & 3);
+		m_okim6258->set_divider(m_adpcm.rate);
+		m_adpcm_out[0]->flt_volume_set_volume((m_adpcm.pan & 1) ? 0.0f : 1.0f);
+		m_adpcm_out[1]->flt_volume_set_volume((m_adpcm.pan & 2) ? 0.0f : 1.0f);
 	}
 
 	// The joystick enable bits also handle the multiplexer for various controllers
@@ -721,9 +711,9 @@ WRITE8_MEMBER(x68k_state::x68k_ct_w)
 	else
 		m_upd72065->set_ready_line_connected(1);
 
-	m_adpcm.clock = data & 0x02;
+	m_adpcm.clock = (data & 0x02) >> 1;
 	x68k_set_adpcm();
-	m_okim6258->set_unscaled_clock(data & 0x02 ? 4000000 : 8000000);
+	m_okim6258->set_unscaled_clock(adpcm_clock[m_adpcm.clock]);
 }
 
 /*
@@ -1712,8 +1702,13 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_OKIM6258_DIVIDER(FOSC_DIV_BY_512)
 	MCFG_OKIM6258_ADPCM_TYPE(TYPE_4BITS)
 	MCFG_OKIM6258_OUT_BITS(OUTPUT_10BITS)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "adpcm_outl", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "adpcm_outr", 0.50)
+	
+	MCFG_FILTER_VOLUME_ADD("adpcm_outl", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_FILTER_VOLUME_ADD("adpcm_outr", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_UPD72065_ADD("upd72065", true, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(x68k_state, fdc_irq))
