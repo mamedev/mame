@@ -32,17 +32,18 @@
 #include "screen.h"
 
 
-#define VERBOSE_PGC     1
+//#define LOG_GENERAL (1U << 0) //defined in logmacro.h already
+#define LOG_READ    (1U << 1)
+#define LOG_CMD     (1U << 2)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_PGC>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-24s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+//#define VERBOSE (LOG_GENERAL | LOG_CMD)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGR(...)   LOGMASKED(LOG_READ, __VA_ARGS__)
+#define LOGCMD(...) LOGMASKED(LOG_CMD,  __VA_ARGS__)
+
 
 #define PGC_SCREEN_NAME "pgc_screen"
 
@@ -269,61 +270,65 @@ void isa8_pgc_device::device_reset()
 
 INTERRUPT_GEN_MEMBER(isa8_pgc_device::vblank_irq)
 {
-	DBG_LOG(2,"irq",("vblank_irq\n"));
+	LOGCMD("vblank_irq\n");
 	m_cpu->set_input_line(0, ASSERT_LINE);
 }
 
 IRQ_CALLBACK_MEMBER(isa8_pgc_device::irq_callback)
 {
-	DBG_LOG(2,"irq",("irq_callback\n"));
+	LOGCMD("irq_callback\n");
 	m_cpu->set_input_line(0, CLEAR_LINE);
 	return 3;
 }
 
 // memory handlers
 
-READ8_MEMBER( isa8_pgc_device::stateparam_r ) {
+READ8_MEMBER( isa8_pgc_device::stateparam_r )
+{
 	uint8_t ret;
 
 	ret = m_stateparam[offset >> 1];
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		DBG_LOG(1,"stateparam",("R @ %02x == %02x\n", offset, ret));
+		LOG("stateparam R @ %02x == %02x\n", offset, ret);
 	}
 	return ret;
 }
 
-WRITE8_MEMBER( isa8_pgc_device::stateparam_w ) {
+WRITE8_MEMBER( isa8_pgc_device::stateparam_w )
+{
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		DBG_LOG(1,"stateparam",("W @ %02x <- %02x\n", offset, data));
+		LOG("stateparam W @ %02x <- %02x\n", offset, data);
 	}
 	m_stateparam[offset >> 1] = data;
 }
 
-WRITE8_MEMBER( isa8_pgc_device::lut_w ) {
+WRITE8_MEMBER( isa8_pgc_device::lut_w )
+{
 	uint8_t o = (offset >> 1) * 3;
 
 	if (offset & 1) {
 		m_lut[o + 2] = (data & 15) << 4;
 		m_palette->set_pen_color( offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] );
-		DBG_LOG(1,"lut",("W @ %02X <- %d %d %d\n",
-			offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] ));
+		LOG("lut W @ %02X <- %d %d %d\n",
+			offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] );
 	} else {
 		m_lut[o    ] = data & 0xf0;
 		m_lut[o + 1] = (data & 15) << 4;
 	}
 }
 
-READ8_MEMBER( isa8_pgc_device::init_r ) {
-	DBG_LOG(1,"INIT",("unmapping ROM\n"));
+READ8_MEMBER( isa8_pgc_device::init_r )
+{
+	LOG("INIT: unmapping ROM\n");
 	space.unmap_read(0xf8000, 0xfffff);
 
-	DBG_LOG(1,"INIT",("mapping emulator RAM\n"));
+	LOG("INIT: mapping emulator RAM\n");
 	space.install_readwrite_bank(0xf8000, 0xfffff, "eram");
 	membank("eram")->set_base(m_eram.get());
 
-	DBG_LOG(1,"INIT",("mapping LUT\n"));
+	LOG("INIT: mapping LUT\n");
 	space.install_write_handler(0xf8400, 0xf85ff,
 		write8_delegate(FUNC(isa8_pgc_device::lut_w), this));
 
@@ -337,9 +342,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(isa8_pgc_device::scanline_callback)
 	uint8_t *v;
 
 	// XXX hpos shifts every frame -- fix
-	if (y == 0) DBG_LOG(2,"scanline_cb",
-		("frame %d x %.4d y %.3d\n",
-		(int) m_screen->frame_number(), m_screen->hpos(), y));
+	if (y == 0) LOGCMD("scanline_cb frame %d x %.4d y %.3d\n",
+		(int) m_screen->frame_number(), m_screen->hpos(), y);
 
 	if (y < PGC_VERT_START) return;
 	y -= PGC_VERT_START;
