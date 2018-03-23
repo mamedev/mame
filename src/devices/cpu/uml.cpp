@@ -257,10 +257,10 @@ inline u64 rol64(u64 source, u8 count)
 uml::code_handle::code_handle(drcuml_state &drcuml, const char *name)
 	: m_code(reinterpret_cast<drccodeptr *>(drcuml.cache().alloc_near(sizeof(drccodeptr))))
 	, m_string(name)
-	, m_next(nullptr)
 	, m_drcuml(drcuml)
 {
-	if (m_code == nullptr)
+	(void)m_drcuml; // without this, non-debug builds fail because the asserts are preprocessed out
+	if (!m_code)
 		throw std::bad_alloc();
 	*m_code = nullptr;
 }

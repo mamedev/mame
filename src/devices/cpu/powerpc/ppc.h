@@ -668,8 +668,8 @@ protected:
 	bool generate_instruction_3f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
 	const char *log_desc_flags_to_string(uint32_t flags);
-	void log_register_list(drcuml_state *drcuml, const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
-	void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent);
+	void log_register_list(const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
+	void log_opcode_desc(const opcode_desc *desclist, int indent);
 
 };
 
