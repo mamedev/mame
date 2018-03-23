@@ -186,11 +186,13 @@ public:
 	};
 
 	void model1(machine_config &config);
+	void model1_comm(machine_config &config);
 	void swa(machine_config &config);
 	void netmerc(machine_config &config);
 	void model1_vr(machine_config &config);
 	void model1_io(address_map &map);
 	void model1_mem(address_map &map);
+	void model1_comm_mem(address_map &map);
 	void model1_vr_io(address_map &map);
 	void model1_vr_mem(address_map &map);
 	void model1_vr_tgp_map(address_map &map);
