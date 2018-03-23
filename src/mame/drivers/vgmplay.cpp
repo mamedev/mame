@@ -1119,7 +1119,11 @@ uint8_t vgmplay_state::r8(int off) const
 
 void vgmplay_state::machine_start()
 {
-	//m_nescpu->
+	// Disable executing devices if not required
+	m_pokey[0]->set_unscaled_clock(0);
+	m_pokey[1]->set_unscaled_clock(0);
+	m_qsound->set_unscaled_clock(0);
+
 	uint32_t size = 0;
 	if(m_file->exists() && m_file->length() > 0) {
 		size = m_file->length();

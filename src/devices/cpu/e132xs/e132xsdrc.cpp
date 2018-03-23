@@ -6,10 +6,8 @@
 #include "e132xsfe.h"
 #include "32xsdefs.h"
 
-using namespace uml;
-
-#define DRC_PC mem(m_core->global_regs)
-#define DRC_SR mem(&m_core->global_regs[1])
+#define DRC_PC uml::mem(m_core->global_regs)
+#define DRC_SR uml::mem(&m_core->global_regs[1])
 
 void hyperstone_device::execute_run_drc()
 {
@@ -331,7 +329,7 @@ static inline uint32_t epc(const opcode_desc *desc)
     already allocated
 -------------------------------------------------*/
 
-static inline void alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const char *name)
+static inline void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name)
 {
 	if (*handleptr == nullptr)
 		*handleptr = drcuml->handle_alloc(name);
@@ -346,7 +344,7 @@ static inline void alloc_handle(drcuml_state *drcuml, code_handle **handleptr, c
 
 void hyperstone_device::static_generate_exception(uint32_t exception, const char *name)
 {
-	code_handle *&exception_handle = m_exception[exception];
+	uml::code_handle *&exception_handle = m_exception[exception];
 	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block = drcuml->begin_block(1024);
 
@@ -512,7 +510,7 @@ void hyperstone_device::static_generate_out_of_cycles()
     static_generate_memory_accessor
 ------------------------------------------------------------------*/
 
-void hyperstone_device::static_generate_memory_accessor(int size, int iswrite, bool isio, const char *name, code_handle *&handleptr)
+void hyperstone_device::static_generate_memory_accessor(int size, int iswrite, bool isio, const char *name, uml::code_handle *&handleptr)
 {
 	/* on entry, address is in I0; data for writes is in I1 */
 	/* on exit, read result is in I1 */

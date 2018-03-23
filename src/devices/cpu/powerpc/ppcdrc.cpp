@@ -15,16 +15,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "ppc.h"
 #include "ppccom.h"
 #include "ppcfe.h"
 #include "ppc_dasm.h"
+
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
-
-using namespace uml;
+#include "debugger.h"
 
 
 
@@ -58,12 +57,12 @@ using namespace uml;
 #define R32(reg)                m_regmap[reg]
 #define R32Z(reg)               (((reg) == 0) ? uml::parameter(0) : m_regmap[reg])
 #define F64(reg)                m_fdregmap[reg]
-#define CR32(reg)               mem(&m_core->cr[reg])
-#define FPSCR32                 mem(&m_core->fpscr)
-#define MSR32                   mem(&m_core->msr)
-#define XERSO32                 mem(&m_core->xerso)
-#define SR32(reg)               mem(&m_core->sr[reg])
-#define SPR32(reg)              mem(&m_core->spr[reg])
+#define CR32(reg)               uml::mem(&m_core->cr[reg])
+#define FPSCR32                 uml::mem(&m_core->fpscr)
+#define MSR32                   uml::mem(&m_core->msr)
+#define XERSO32                 uml::mem(&m_core->xerso)
+#define SR32(reg)               uml::mem(&m_core->sr[reg])
+#define SPR32(reg)              uml::mem(&m_core->spr[reg])
 
 #define CRMASK(reg)             (0xf0000000 >> ((reg) * 4))
 
@@ -103,7 +102,7 @@ using namespace uml;
     already allocated
 -------------------------------------------------*/
 
-inline void ppc_device::alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const char *name)
+inline void ppc_device::alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name)
 {
 	if (*handleptr == nullptr)
 		*handleptr = drcuml->handle_alloc(name);
@@ -660,7 +659,7 @@ static void cfunc_ppccom_get_dsisr(void *param)
 
 void ppc_device::static_generate_entry_point()
 {
-	code_label skip = 1;
+	uml::code_label skip = 1;
 	drcuml_block *block;
 
 	/* begin generating */
@@ -817,9 +816,9 @@ void ppc_device::static_generate_tlb_mismatch()
 
 void ppc_device::static_generate_exception(uint8_t exception, int recover, const char *name)
 {
-	code_handle *&exception_handle = recover ? m_exception[exception] : m_exception_norecover[exception];
+	uml::code_handle *&exception_handle = recover ? m_exception[exception] : m_exception_norecover[exception];
 	uint32_t vector = exception << 8;
-	code_label label = 1;
+	uml::code_label label = 1;
 	drcuml_block *block;
 
 	/* begin generating */
@@ -853,7 +852,7 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 		UML_MOV(block, I3, vector);                                             // mov     i3,vector
 		if (exception == EXCEPTION_EI)
 		{
-			code_label not_decrementer;
+			uml::code_label not_decrementer;
 
 			UML_TEST(block, mem(&m_core->irq_pending), 0x01);                              // test    [irq_pending],0x01
 			UML_JMPc(block, COND_NZ, not_decrementer = label++);                                // jmp     not_decrementer,nz
@@ -920,7 +919,7 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 		UML_MOV(block, I3, vector);                                             // mov     i3,vector
 		if (exception == EXCEPTION_EI)
 		{
-			code_label notwdog, common;
+			uml::code_label notwdog, common;
 
 			UML_TEST(block, SPR32(SPR4XX_TSR), PPC4XX_TSR_PIS);                     // test    [tsr],PIS
 			UML_MOVc(block, COND_NZ, I3, 0x1000);                                   // mov     i3,0x1000,NZ
@@ -991,7 +990,7 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
     static_generate_memory_accessor
 ------------------------------------------------------------------*/
 
-void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, const char *name, code_handle *&handleptr, code_handle *masked)
+void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked)
 {
 	/* on entry, address is in I0; data for writes is in I1; masks are in I2 */
 	/* on exit, read result is in I0 */
@@ -1599,7 +1598,7 @@ void ppc_device::generate_update_cycles(drcuml_block *block, compiler_state *com
 	/* check full interrupts if pending */
 	if (compiler->checkints)
 	{
-		code_label skip;
+		uml::code_label skip;
 
 		compiler->checkints = false;
 		UML_TEST(block, mem(&m_core->irq_pending), ~0);                                    // test    [irq_pending],0
@@ -1814,12 +1813,12 @@ void ppc_device::generate_compute_flags(drcuml_block *block, const opcode_desc *
 	/* modify inputs based on required flags */
 	if (!DISABLE_FLAG_OPTIMIZATIONS)
 	{
-		if (!(desc->regreq[3] & REGFLAG_XER_CA))
+		if (!(desc->regreq[3] & frontend::REGFLAG_XER_CA))
 			xermask &= ~XER_CA;
-		if (!(desc->regreq[2] & REGFLAG_CR(0)))
+		if (!(desc->regreq[2] & frontend::REGFLAG_CR(0)))
 			updatecr = 0;
 	}
-	xerflags = ((xermask & XER_OV) ? FLAG_V : 0) | ((xermask & XER_CA) ? FLAG_C : 0);
+	xerflags = ((xermask & XER_OV) ? uml::FLAG_V : 0) | ((xermask & XER_CA) ? uml::FLAG_C : 0);
 
 	/* easy case: nothing to do */
 	if (!updatecr && xermask == 0)
@@ -1943,7 +1942,7 @@ void ppc_device::generate_branch(drcuml_block *block, compiler_state *compiler, 
 	}
 	else
 	{
-		generate_update_cycles(block, &compiler_temp, mem(srcptr), true);    // <subtract cycles>
+		generate_update_cycles(block, &compiler_temp, uml::mem(srcptr), true);    // <subtract cycles>
 
 		/* clear two LSBs of the target address to prevent branching to an invalid address */
 		UML_AND(block, I0, mem(srcptr), 0xFFFFFFFC);      // and i0, 0xFFFFFFFC
@@ -2857,7 +2856,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block *block, compiler_state *co
 			UML_CMP(block, I2, 0x00000020);                     // cmp rb,0x20
 			UML_JMPc(block, COND_S, compiler->labelnum);        // bs 1:
 
-			if (DISABLE_FLAG_OPTIMIZATIONS || (desc->regreq[3] & REGFLAG_XER_CA))
+			if (DISABLE_FLAG_OPTIMIZATIONS || (desc->regreq[3] & frontend::REGFLAG_XER_CA))
 			{
 				// for shift amt > 32, carry flag is the sign bit of Rs and the sign bit fills all bit positions
 				UML_TEST(block, R32(G_RS(op)), 0x80000000);
@@ -2868,7 +2867,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block *block, compiler_state *co
 			UML_JMP(block, compiler->labelnum+1);               // bra 2:
 
 			UML_LABEL(block, compiler->labelnum++);             // 1:
-			if (DISABLE_FLAG_OPTIMIZATIONS || (desc->regreq[3] & REGFLAG_XER_CA))
+			if (DISABLE_FLAG_OPTIMIZATIONS || (desc->regreq[3] & frontend::REGFLAG_XER_CA))
 			{
 				UML_SHL(block, I1, 0xffffffff, I2);                         // shl     i1,0xffffffff,i2
 				UML_XOR(block, I1, I1, ~0);                                 // xor     i1,i1,~0
@@ -2889,7 +2888,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block *block, compiler_state *co
 			return true;
 
 		case 0x338: /* SRAWIx */
-			if (DISABLE_FLAG_OPTIMIZATIONS || (desc->regreq[3] & REGFLAG_XER_CA))
+			if (DISABLE_FLAG_OPTIMIZATIONS || (desc->regreq[3] & frontend::REGFLAG_XER_CA))
 			{
 				UML_AND(block, I0, R32(G_RS(op)), ~(0xffffffff << (G_SH(op) & 31)));// and   i0,rs,~(0xffffffff << (sh & 31))
 				UML_SAR(block, I1, R32(G_RS(op)), 31);                          // sar     i1,rs,31
@@ -3852,84 +3851,84 @@ void ppc_device::log_register_list(drcuml_state *drcuml, const char *string, con
 	drcuml->log_printf("[%s:", string);
 
 	for (regnum = 0; regnum < 32; regnum++)
-		if (reglist[0] & REGFLAG_R(regnum))
+		if (reglist[0] & frontend::REGFLAG_R(regnum))
 		{
 			drcuml->log_printf("%sr%d", (count++ == 0) ? "" : ",", regnum);
-			if (regnostarlist != nullptr && !(regnostarlist[0] & REGFLAG_R(regnum)))
+			if (regnostarlist != nullptr && !(regnostarlist[0] & frontend::REGFLAG_R(regnum)))
 				drcuml->log_printf("*");
 		}
 
 	for (regnum = 0; regnum < 32; regnum++)
-		if (reglist[1] & REGFLAG_FR(regnum))
+		if (reglist[1] & frontend::REGFLAG_FR(regnum))
 		{
 			drcuml->log_printf("%sfr%d", (count++ == 0) ? "" : ",", regnum);
-			if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_FR(regnum)))
+			if (regnostarlist != nullptr && !(regnostarlist[1] & frontend::REGFLAG_FR(regnum)))
 				drcuml->log_printf("*");
 		}
 
 	for (regnum = 0; regnum < 8; regnum++)
-		if (reglist[2] & REGFLAG_CR(regnum))
+		if (reglist[2] & frontend::REGFLAG_CR(regnum))
 		{
-			if ((reglist[2] & REGFLAG_CR(regnum)) == REGFLAG_CR(regnum) && (regnostarlist == nullptr || (regnostarlist[2] & REGFLAG_CR(regnum)) == REGFLAG_CR(regnum)))
+			if ((reglist[2] & frontend::REGFLAG_CR(regnum)) == frontend::REGFLAG_CR(regnum) && (regnostarlist == nullptr || (regnostarlist[2] & frontend::REGFLAG_CR(regnum)) == frontend::REGFLAG_CR(regnum)))
 			{
 				drcuml->log_printf("%scr%d", (count++ == 0) ? "" : ",", regnum);
-				if (regnostarlist != nullptr && !(regnostarlist[2] & REGFLAG_CR(regnum)))
+				if (regnostarlist != nullptr && !(regnostarlist[2] & frontend::REGFLAG_CR(regnum)))
 					drcuml->log_printf("*");
 			}
 			else
 			{
 				for (crnum = 0; crnum < 4; crnum++)
-					if (reglist[2] & REGFLAG_CR_BIT(regnum * 4 + crnum))
+					if (reglist[2] & frontend::REGFLAG_CR_BIT(regnum * 4 + crnum))
 					{
 						drcuml->log_printf("%scr%d[%s]", (count++ == 0) ? "" : ",", regnum, crtext[crnum]);
-						if (regnostarlist != nullptr && !(regnostarlist[2] & REGFLAG_CR_BIT(regnum * 4 + crnum)))
+						if (regnostarlist != nullptr && !(regnostarlist[2] & frontend::REGFLAG_CR_BIT(regnum * 4 + crnum)))
 							drcuml->log_printf("*");
 					}
 			}
 		}
 
-	if (reglist[3] & REGFLAG_XER_CA)
+	if (reglist[3] & frontend::REGFLAG_XER_CA)
 	{
 		drcuml->log_printf("%sxer_ca", (count++ == 0) ? "" : ",");
-		if (regnostarlist != nullptr && !(regnostarlist[3] & REGFLAG_XER_CA))
+		if (regnostarlist != nullptr && !(regnostarlist[3] & frontend::REGFLAG_XER_CA))
 			drcuml->log_printf("*");
 	}
-	if (reglist[3] & REGFLAG_XER_OV)
+	if (reglist[3] & frontend::REGFLAG_XER_OV)
 	{
 		drcuml->log_printf("%sxer_ov", (count++ == 0) ? "" : ",");
-		if (regnostarlist != nullptr && !(regnostarlist[3] & REGFLAG_XER_OV))
+		if (regnostarlist != nullptr && !(regnostarlist[3] & frontend::REGFLAG_XER_OV))
 			drcuml->log_printf("*");
 	}
-	if (reglist[3] & REGFLAG_XER_SO)
+	if (reglist[3] & frontend::REGFLAG_XER_SO)
 	{
 		drcuml->log_printf("%sxer_so", (count++ == 0) ? "" : ",");
-		if (regnostarlist != nullptr && !(regnostarlist[3] & REGFLAG_XER_SO))
+		if (regnostarlist != nullptr && !(regnostarlist[3] & frontend::REGFLAG_XER_SO))
 			drcuml->log_printf("*");
 	}
-	if (reglist[3] & REGFLAG_XER_COUNT)
+	if (reglist[3] & frontend::REGFLAG_XER_COUNT)
 	{
 		drcuml->log_printf("%sxer_count", (count++ == 0) ? "" : ",");
-		if (regnostarlist != nullptr && !(regnostarlist[3] & REGFLAG_XER_COUNT))
+		if (regnostarlist != nullptr && !(regnostarlist[3] & frontend::REGFLAG_XER_COUNT))
 			drcuml->log_printf("*");
 	}
-	if (reglist[3] & REGFLAG_CTR)
+	if (reglist[3] & frontend::REGFLAG_CTR)
 	{
 		drcuml->log_printf("%sctr", (count++ == 0) ? "" : ",");
-		if (regnostarlist != nullptr && !(regnostarlist[3] & REGFLAG_CTR))
+		if (regnostarlist != nullptr && !(regnostarlist[3] & frontend::REGFLAG_CTR))
 			drcuml->log_printf("*");
 	}
-	if (reglist[3] & REGFLAG_LR)
+	if (reglist[3] & frontend::REGFLAG_LR)
 	{
 		drcuml->log_printf("%slr", (count++ == 0) ? "" : ",");
-		if (regnostarlist != nullptr && !(regnostarlist[3] & REGFLAG_LR))
+		if (regnostarlist != nullptr && !(regnostarlist[3] & frontend::REGFLAG_LR))
 			drcuml->log_printf("*");
 	}
 
 	for (regnum = 0; regnum < 8; regnum++)
-		if (reglist[3] & REGFLAG_FPSCR(regnum))
+		if (reglist[3] & frontend::REGFLAG_FPSCR(regnum))
 		{
 			drcuml->log_printf("%sfpscr%d", (count++ == 0) ? "" : ",", regnum);
-			if (regnostarlist != nullptr && !(regnostarlist[3] & REGFLAG_FPSCR(regnum)))
+			if (regnostarlist != nullptr && !(regnostarlist[3] & frontend::REGFLAG_FPSCR(regnum)))
 				drcuml->log_printf("*");
 		}
 
