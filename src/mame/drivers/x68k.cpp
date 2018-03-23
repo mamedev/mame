@@ -139,8 +139,8 @@
 #include "x68000.lh"
 
 
-static uint32_t adpcm_clock[2] = { 8000000, 4000000 };
-static uint32_t adpcm_div[4] = { 1024, 768, 512, /* Reserved */512 };
+static constexpr uint32_t adpcm_clock[2] = { 8000000, 4000000 };
+static constexpr uint32_t adpcm_div[4] = { 1024, 768, 512, /* Reserved */512 };
 
 void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
