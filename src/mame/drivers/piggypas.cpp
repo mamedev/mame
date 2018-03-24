@@ -73,7 +73,7 @@ void piggypas_state::output_digits()
 
 WRITE8_MEMBER(piggypas_state::ctrl_w)
 {
-	if (!BIT(data, 2) & BIT(m_ctrl, 2))
+	if (!BIT(data, 2) && BIT(m_ctrl, 2))
 		output_digits();
 
 	m_ticket->motor_w(BIT(data, 6));
