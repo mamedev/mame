@@ -336,7 +336,7 @@ READ8_MEMBER(djboy_state::beast_p3_r)
 		case 2: dsw = (BIT(dsw2, 6) << 3) | (BIT(dsw2, 2) << 2) | (BIT(dsw1, 6) << 1) | BIT(dsw1, 2); break;
 		case 3: dsw = (BIT(dsw2, 7) << 3) | (BIT(dsw2, 3) << 2) | (BIT(dsw1, 7) << 1) | BIT(dsw1, 3); break;
 	}
-	return (dsw << 4) | (!m_beastlatch->pending_r() << 2) | (m_beast_to_z80_full << 3);
+	return (dsw << 4) | (!m_beastlatch->pending_r() << 2) | (m_slavelatch->pending_r() << 3);
 }
 
 WRITE8_MEMBER(djboy_state::beast_p3_w)
