@@ -57,19 +57,9 @@ void dm9368_device::a_w(u8 data)
 	else
 		LOG("DM9368 Output Data: %u = %02x\n", a, value);
 
-	m_update_cb(0, value);
+	m_update_cb(0, value, 0x7f);
 	if (rbo != m_rbo)
 		m_rbo_cb(m_rbo = rbo);
-}
-
-
-WRITE_LINE_MEMBER( dm9368_device::rbi_w )
-{
-	if (state != m_rbi)
-	{
-		m_rbi = state;
-		update();
-	}
 }
 
 
