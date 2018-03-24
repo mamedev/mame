@@ -46,6 +46,7 @@ To Do:
 #include "machine/wd_fdc.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
+//#include "video/dp8350.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -558,6 +559,8 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
+
+	//MCFG_DEVICE_ADD("crtc", DP8350, XTAL(10'920'000))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
