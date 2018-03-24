@@ -276,8 +276,9 @@ WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 {
 	m_slavebank->set_entry(data & 0x07);
 
-	m_tilemap[0]->set_flip(BIT(data, 4) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	m_tilemap[1]->set_flip(BIT(data, 4) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	for (int layer = 0; layer < 2; layer++)
+		m_tilemap[layer]->set_flip(BIT(data, 4) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+
 	m_pandora->flip_screen_set(BIT(data, 4));
 
 	// used at the end of levels, after defeating the boss, to leave trails
