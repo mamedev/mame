@@ -411,9 +411,9 @@ void m6805_base_device::interrupt()
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *m6805_base_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6805_base_device::create_disassembler()
 {
-	return new m6805_disassembler;
+	return std::make_unique<m6805_disassembler>();
 }
 
 

@@ -230,7 +230,7 @@ void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprec
 uint32_t tecmosys_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	
+
 	// TODO : Verify 0xc00000-0xc00003 scroll both flip screen and normal screen case, Bit 4 of 0xc00004 is unknown
 	// TODO : is tilemap flip bits is correct?
 	m_tilemap[0]->set_flip(((m_scroll[0][2] & 1) ? TILEMAP_FLIPX : 0) | ((m_scroll[0][2] & 2) ? TILEMAP_FLIPY : 0) );
@@ -239,11 +239,11 @@ uint32_t tecmosys_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	m_tilemap[1]->set_flip(((m_scroll[1][2] & 1) ? TILEMAP_FLIPX : 0) | ((m_scroll[1][2] & 2) ? TILEMAP_FLIPY : 0) );
 	m_tilemap[1]->set_scrolly(0, m_scroll[1][1]+16);
 	m_tilemap[1]->set_scrollx(0, m_scroll[1][0]+104);
-	
+
 	m_tilemap[2]->set_flip(((m_scroll[2][2] & 1) ? TILEMAP_FLIPX : 0) | ((m_scroll[2][2] & 2) ? TILEMAP_FLIPY : 0) );
 	m_tilemap[2]->set_scrolly(0, m_scroll[2][1]+17);
 	m_tilemap[2]->set_scrollx(0, m_scroll[2][0]+106);
-	
+
 	m_tilemap[3]->set_flip(((m_scroll[3][2] & 1) ? TILEMAP_FLIPX : 0) | ((m_scroll[3][2] & 2) ? TILEMAP_FLIPY : 0) );
 	m_tilemap[3]->set_scrolly(0, m_scroll[3][1]+17);
 	m_tilemap[3]->set_scrollx(0, m_scroll[3][0]+106);
@@ -278,7 +278,7 @@ void tecmosys_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 	m_sprite_bitmap.fill(0x4000);
-	
+
 	m_screen->register_screen_bitmap(m_tmp_tilemap_composebitmap);
 	m_screen->register_screen_bitmap(m_tmp_tilemap_renderbitmap);
 	m_tmp_tilemap_composebitmap.fill(0x0000);

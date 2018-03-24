@@ -73,7 +73,7 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_vector_w);
 	DECLARE_READ8_MEMBER(irq_enable_r);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	
+
 	DECLARE_DRIVER_INIT(lastbank);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline);
@@ -547,7 +547,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 

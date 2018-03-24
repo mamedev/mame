@@ -92,9 +92,9 @@ device_memory_interface::space_config_vector cquestsnd_cpu_device::memory_space_
 }
 
 
-util::disasm_interface *cquestsnd_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> cquestsnd_cpu_device::create_disassembler()
 {
-	return new cquestsnd_disassembler;
+	return std::make_unique<cquestsnd_disassembler>();
 }
 
 
@@ -112,9 +112,9 @@ READ16_MEMBER( cquestrot_cpu_device::linedata_r )
 }
 
 
-util::disasm_interface *cquestrot_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> cquestrot_cpu_device::create_disassembler()
 {
-	return new cquestsnd_disassembler;
+	return std::make_unique<cquestsnd_disassembler>();
 }
 
 
@@ -134,9 +134,9 @@ device_memory_interface::space_config_vector cquestlin_cpu_device::memory_space_
 	};
 }
 
-util::disasm_interface *cquestlin_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> cquestlin_cpu_device::create_disassembler()
 {
-	return new cquestlin_disassembler;
+	return std::make_unique<cquestlin_disassembler>();
 }
 
 

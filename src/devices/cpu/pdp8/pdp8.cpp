@@ -151,9 +151,9 @@ void pdp8_device::state_string_export(const device_state_entry &entry, std::stri
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *pdp8_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> pdp8_cpu_device::create_disassembler()
 {
-	return new pdp8_disassembler;
+	return std::make_unique<pdp8_disassembler>();
 }
 
 

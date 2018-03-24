@@ -210,9 +210,9 @@ device_memory_interface::space_config_vector ssp1601_device::memory_space_config
 }
 
 
-util::disasm_interface *ssp1601_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> ssp1601_device::create_disassembler()
 {
-	return new ssp1601_disassembler;
+	return std::make_unique<ssp1601_disassembler>();
 }
 
 

@@ -1353,9 +1353,9 @@ void spc700_device::execute_set_input( int inptnum, int state )
 
 #include "spc700ds.h"
 
-util::disasm_interface *spc700_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> spc700_device::create_disassembler()
 {
-	return new spc700_disassembler;
+	return std::make_unique<spc700_disassembler>();
 }
 
 //int dump_flag = 0;

@@ -151,9 +151,9 @@ device_memory_interface::space_config_vector rsp_device::memory_space_config() c
 	};
 }
 
-util::disasm_interface *rsp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> rsp_device::create_disassembler()
 {
-	return new rsp_disassembler;
+	return std::make_unique<rsp_disassembler>();
 }
 
 void rsp_device::rsp_add_imem(uint32_t *base)
@@ -382,21 +382,16 @@ void rsp_device::device_start()
 	resolve_cb();
 
 	if (m_isdrc)
-	{
-		m_cop2 = std::make_unique<rsp_cop2_drc>(*this, machine());
-	}
+		m_cop2 = std::make_unique<cop2_drc>(*this, machine());
 	else
-	{
-		m_cop2 = std::make_unique<rsp_cop2>(*this, machine());
-	}
+		m_cop2 = std::make_unique<cop2>(*this, machine());
+
 	m_cop2->init();
 	m_cop2->start();
 
 	// RSP registers should power on to a random state
-	for(int regIdx = 0; regIdx < 32; regIdx++ )
-	{
+	for (int regIdx = 0; regIdx < 32; regIdx++)
 		m_rsp_state->r[regIdx] = 0;
-	}
 
 	m_sr = RSP_STATUS_HALT;
 	m_step_count = 0;
@@ -421,7 +416,7 @@ void rsp_device::device_start()
 	m_drcuml->symbol_add(&m_numcycles, sizeof(m_numcycles), "numcycles");
 
 	/* initialize the front-end helper */
-	m_drcfe = std::make_unique<rsp_frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+	m_drcfe = std::make_unique<frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* compute the register parameters */
 	for (int regnum = 0; regnum < 32; regnum++)

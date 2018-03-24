@@ -345,7 +345,7 @@ ROM_END
 
 ROM_START( j2adnotei )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "addanote 74% fixed 1b1.bin", 0x0000, 0x8000, CRC(ecfab9ba) SHA1(ea273d82e11a62c847cbaaef58a7d8b24a834bca) )
+	ROM_LOAD( "addanote 74_ fixed 1b1.bin", 0x0000, 0x8000, CRC(ecfab9ba) SHA1(ea273d82e11a62c847cbaaef58a7d8b24a834bca) )
 	ROM_LOAD( "addanote 1.2.bin",           0x8000, 0x8000, CRC(e421d220) SHA1(566ddf237cdb36bca9d8b6b67596e1602850971d) )
 ROM_END
 

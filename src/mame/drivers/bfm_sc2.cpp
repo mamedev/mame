@@ -206,7 +206,7 @@ public:
 		, m_ym2413(*this, "ymsnd")
 		, m_meters(*this, "meters")
 	{
-		for (auto & elem : m_lamps_old)
+		for (auto &elem : m_lamps_old)
 			elem = 0;
 	}
 
@@ -5197,7 +5197,7 @@ ROM_END
 
 ROM_START( sc2ofool2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "fools & horses 10m 6.bin", 0x0000, 0x010000, CRC(5fe48a02) SHA1(fd5b07a58567e0c5eb75bf1526a853b3a60ddfa9) )
+	ROM_LOAD( "fools + horses 10m 6.bin", 0x0000, 0x010000, CRC(5fe48a02) SHA1(fd5b07a58567e0c5eb75bf1526a853b3a60ddfa9) )
 
 	sc2_ofool_matrix
 	sc2_ofool_sound
@@ -5510,7 +5510,7 @@ ROM_END
 //Does this even need a matrix?
 ROM_START( sc2cops5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cops & robbers 6 25p (27512)", 0x0000, 0x010000, CRC(0ad3fedf) SHA1(25775a80272c72234be9f528cc8f13cf9e1adbf7) )
+	ROM_LOAD( "cops + robbers 6 25p,27512", 0x0000, 0x010000, CRC(0ad3fedf) SHA1(25775a80272c72234be9f528cc8f13cf9e1adbf7) )
 
 	ROM_REGION( 0x20000, "dm01:matrix", 0 )
 	ROM_LOAD( "copsdot8", 0x0000, 0x010000, CRC(0eff2127) SHA1(e9788999ac6006faf0eb4e9d8ef1fd52f092be5a) )
@@ -5887,67 +5887,67 @@ ROM_END
 
 ROM_START( sc2dels )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "del's-millions_std_ac_10pnd-20p-25p_a.bin", 0x0000, 0x010000, CRC(b1e8d4ef) SHA1(189184aa6f9ff2204e35d0f7ae40493bcb0751bd) )
+	ROM_LOAD( "del_s-millions_std_ac_10pnd-20p-25p_a.bin", 0x0000, 0x010000, CRC(b1e8d4ef) SHA1(189184aa6f9ff2204e35d0f7ae40493bcb0751bd) )
 	sc2_dels_sound
 ROM_END
 
 ROM_START( sc2delsp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "del's-millions_dat_ac_10pnd-20p-25p_a.bin", 0x0000, 0x010000, CRC(c81f200f) SHA1(8a9ee842e17a63276a0850adc52159dc46a239c0) )
+	ROM_LOAD( "del_s-millions_dat_ac_10pnd-20p-25p_a.bin", 0x0000, 0x010000, CRC(c81f200f) SHA1(8a9ee842e17a63276a0850adc52159dc46a239c0) )
 	sc2_dels_sound
 ROM_END
 
 ROM_START( sc2dels1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "del's-millions_std_wi_ac_10pnd-20p_a.bin", 0x0000, 0x010000, CRC(dd44aecb) SHA1(1e8ced54323580f43facf683c1f489f1ea281e16) )
+	ROM_LOAD( "del_s-millions_std_wi_ac_10pnd-20p_a.bin", 0x0000, 0x010000, CRC(dd44aecb) SHA1(1e8ced54323580f43facf683c1f489f1ea281e16) )
 	sc2_dels_sound
 ROM_END
 
 ROM_START( sc2dels1p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "del's-millions_dat_wi_ac_10pnd-20p_a.bin", 0x0000, 0x010000, CRC(fdb33c9b) SHA1(2506fe8e7e1e49f90652309996813ac5967442a0) )
+	ROM_LOAD( "del_s-millions_dat_wi_ac_10pnd-20p_a.bin", 0x0000, 0x010000, CRC(fdb33c9b) SHA1(2506fe8e7e1e49f90652309996813ac5967442a0) )
 	sc2_dels_sound
 ROM_END
 
 ROM_START( sc2dels2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "del's-millions_std_ac_8pnd-20p_a.bin", 0x0000, 0x010000, CRC(9194fb69) SHA1(30d2c5a8a16c96c081f442a66172f8b9fb1d602d) )
+	ROM_LOAD( "del_s-millions_std_ac_8pnd-20p_a.bin", 0x0000, 0x010000, CRC(9194fb69) SHA1(30d2c5a8a16c96c081f442a66172f8b9fb1d602d) )
 	sc2_dels_sound
 ROM_END
 
 ROM_START( sc2dels2p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "del's-millions_dat_ac_8pnd-20p_a.bin", 0x0000, 0x010000, CRC(92c0e403) SHA1(5410365137ab8debb10358f24cdd0b0b74755677) )
+	ROM_LOAD( "del_s-millions_dat_ac_8pnd-20p_a.bin", 0x0000, 0x010000, CRC(92c0e403) SHA1(5410365137ab8debb10358f24cdd0b0b74755677) )
 	sc2_dels_sound
 ROM_END
 
 ROM_START( sc2dels3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "del's-millions_std_ac_8pnd_a.bin", 0x0000, 0x010000, CRC(58f87c90) SHA1(a6dcdf1edc7620226d89c907a5910c4a4b2d4190) )
+	ROM_LOAD( "del_s-millions_std_ac_8pnd_a.bin", 0x0000, 0x010000, CRC(58f87c90) SHA1(a6dcdf1edc7620226d89c907a5910c4a4b2d4190) )
 	sc2_dels_sound
 ROM_END
 
 ROM_START( sc2dels3p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "del's-millions_dat_ac_8pnd_a.bin", 0x0000, 0x010000, CRC(23eca216) SHA1(f427d92929e51d6f0148d212e13067ddc15e2307) )
+	ROM_LOAD( "del_s-millions_dat_ac_8pnd_a.bin", 0x0000, 0x010000, CRC(23eca216) SHA1(f427d92929e51d6f0148d212e13067ddc15e2307) )
 	sc2_dels_sound
 ROM_END
 
 ROM_START( sc2dels4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "del's-millions_std_ms_20p_ass.bin", 0x0000, 0x010000, CRC(f4a5803d) SHA1(c9b6f71847a4dd87ea34b51935618df5a735150d) )
+	ROM_LOAD( "del_s-millions_std_ms_20p_ass.bin", 0x0000, 0x010000, CRC(f4a5803d) SHA1(c9b6f71847a4dd87ea34b51935618df5a735150d) )
 	sc2_dels_sound
 ROM_END
 
 ROM_START( sc2dels4p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "del's-millions_dat_ms_20p_a.bin", 0x0000, 0x010000, CRC(57ade491) SHA1(3aed99d92c391f99fa8ff7d61370d59245156121) )
+	ROM_LOAD( "del_s-millions_dat_ms_20p_a.bin", 0x0000, 0x010000, CRC(57ade491) SHA1(3aed99d92c391f99fa8ff7d61370d59245156121) )
 	sc2_dels_sound
 ROM_END
 
 ROM_START( sc2dels5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "del's-millions_std_ss_20p_a.bin", 0x0000, 0x010000, CRC(755b8546) SHA1(67d2bb5556c03acf71e0b50c8cf54ac92acbce69) )
+	ROM_LOAD( "del_s-millions_std_ss_20p_a.bin", 0x0000, 0x010000, CRC(755b8546) SHA1(67d2bb5556c03acf71e0b50c8cf54ac92acbce69) )
 	sc2_dels_sound
 ROM_END
 
@@ -7031,12 +7031,12 @@ ROM_START( sc2smnud )
 	ROM_LOAD( "smn1.2", 0x8000, 0x008000, CRC(e2d2fdd9) SHA1(0e2f44fa64dfa342752e53e9d514ca64e70b3046) )
 
 	ROM_REGION( 0x200000, "altrevs", ROMREGION_ERASE00 )
-	ROM_LOAD( "super_multi-nudge_game_(27512)", 0x0000, 0x010000, CRC(6a0de579) SHA1(308fec509371b93cb6ab957c83f2e041db449dfe) ) // both halves identical, but doesn't work, start vector is 4000?
+	ROM_LOAD( "super_multi-nudge_game,27512", 0x0000, 0x010000, CRC(6a0de579) SHA1(308fec509371b93cb6ab957c83f2e041db449dfe) ) // both halves identical, but doesn't work, start vector is 4000?
 	ROM_LOAD( "chezb10.bin", 0x0000, 0x010000, CRC(f00b6b95) SHA1(e2c3c7127bc9f9c77bd5b1f36aef47ffa05143a9) )
 	ROM_LOAD( "chezb10.s", 0x0000, 0x010000, CRC(78e526a0) SHA1(2e7c90efa5c8d04214b5065aba446f9782c8298c) )
 
 	ROM_REGION( 0x80000, "upd", 0 )
-	ROM_LOAD( "super_multi-nudge_sound_(4meg)", 0x0000, 0x080000, CRC(efd87dab) SHA1(8b4b5de351ce3b1cefa4d0dc01072a942db072dc) )
+	ROM_LOAD( "super_multi-nudge_sound,4meg", 0x0000, 0x080000, CRC(efd87dab) SHA1(8b4b5de351ce3b1cefa4d0dc01072a942db072dc) )
 ROM_END
 
 ROM_START( sc2sghst )
@@ -7080,7 +7080,7 @@ ROM_START( sc2scshx )
 	ROM_LOAD( "scx1v0.bin", 0x0000, 0x010000, CRC(8ea1be86) SHA1(42bd63e94e3876f21643813de64f16e701c1429f) )
 	ROM_LOAD( "scx1v1.bin", 0x0000, 0x010000, CRC(4cb99292) SHA1(956b951a51d1dfae361f9e554eb918730c8013fc) )
 	ROM_LOAD( "scx1v1a.bin", 0x0000, 0x010000, CRC(f01c5926) SHA1(5f499306f60111a423a74cdb624da07550ce48f5) )
-	ROM_LOAD( "scx1v1a~.bin", 0x0000, 0x010000, CRC(90ce3521) SHA1(8cb7dbc78ac02e6772aaa3341b904767dd1c1301) )
+	ROM_LOAD( "scx1v1a-.bin", 0x0000, 0x010000, CRC(90ce3521) SHA1(8cb7dbc78ac02e6772aaa3341b904767dd1c1301) )
 	ROM_LOAD( "scx1v2.bin", 0x0000, 0x010000, CRC(054603f1) SHA1(9fca7772812bdfed1d67d916da520cbfd2bf82a8) )
 	ROM_LOAD( "scx1v3.bin", 0x0000, 0x010000, CRC(711a0f93) SHA1(5b3efda6a01663655ec614feab9e1d0c857e823e) )
 	ROM_LOAD( "scx1v6hi.bin", 0x0000, 0x010000, CRC(cae3fd0b) SHA1(1fe2ab0037c5a0be58378e95f72dc2782325fb71) )

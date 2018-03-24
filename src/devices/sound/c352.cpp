@@ -298,7 +298,7 @@ void c352_device::device_start()
 	}
 	for(int i=0;i<128;i++)
 		m_mulawtab[i+128] = (~m_mulawtab[i])&0xffe0;
-	
+
 	// register save state info
 	for (i = 0; i < 32; i++)
 	{

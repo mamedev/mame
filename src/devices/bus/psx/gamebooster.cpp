@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(PSX_GAMEBOOSTER, psx_gamebooster_device, "psxgboost", "Datel 
 
 ROM_START( psxgboost )
 	ROM_REGION(0x40000, "rom", 0)
-	ROM_LOAD("Game Booster.rom", 0x0000, 0x40000, CRC(c8e459b8) SHA1(c20ab073f61242f37665f12199b95cfa3a83e9fc) )
+	ROM_LOAD("game booster.rom", 0x0000, 0x40000, CRC(c8e459b8) SHA1(c20ab073f61242f37665f12199b95cfa3a83e9fc) )
 ROM_END
 
 //-------------------------------------------------

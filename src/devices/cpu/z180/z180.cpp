@@ -90,9 +90,9 @@ z180_device::z180_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-util::disasm_interface *z180_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> z180_device::create_disassembler()
 {
-	return new z180_disassembler;
+	return std::make_unique<z180_disassembler>();
 }
 
 #define CF  0x01

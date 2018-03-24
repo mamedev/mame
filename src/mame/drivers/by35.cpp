@@ -1896,7 +1896,7 @@ ROM_END
 /-------------------------------*/
 ROM_START(xsandos)
 	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD( "x&os2732.u2", 0x1000, 0x0800, CRC(068dfe5a) SHA1(028baf79852b14cac51a7cdc8e751a8173beeccb))
+	ROM_LOAD( "x+os2732.u2", 0x1000, 0x0800, CRC(068dfe5a) SHA1(028baf79852b14cac51a7cdc8e751a8173beeccb))
 	ROM_CONTINUE( 0x5000, 0x0800)
 	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
@@ -2143,8 +2143,8 @@ ROM_END
 
 ROM_START(bullseyn)                     // Later version dumbed down with traditional Pinball scoring
 	ROM_REGION(0x8000, "maincpu", 0)    // Actually seems to have an address mask of 0x3fff
-	ROM_LOAD("301NEW_normalscoring.U2", 0x2000, 0x1000, CRC(febebc63) SHA1(9221b02bc5952203f5b2527e4c40d17d5986abdf))
-	ROM_LOAD("301NEW_normalscoring.U6", 0x3000, 0x1000, CRC(1357cd6a) SHA1(4e02c96b141dab6cdea1a15539214976eb052838))
+	ROM_LOAD("301new_normalscoring.u2", 0x2000, 0x1000, CRC(febebc63) SHA1(9221b02bc5952203f5b2527e4c40d17d5986abdf))
+	ROM_LOAD("301new_normalscoring.u6", 0x3000, 0x1000, CRC(1357cd6a) SHA1(4e02c96b141dab6cdea1a15539214976eb052838))
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("bull.snd", 0x8000, 0x0800, CRC(c0482a2f) SHA1(a6aa698ad517cdc078129d702ee936af576260ed))

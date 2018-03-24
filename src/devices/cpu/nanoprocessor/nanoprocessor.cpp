@@ -170,9 +170,9 @@ void hp_nanoprocessor_device::state_string_export(const device_state_entry &entr
 
 }
 
-util::disasm_interface *hp_nanoprocessor_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hp_nanoprocessor_device::create_disassembler()
 {
-	return new hp_nanoprocessor_disassembler;
+	return std::make_unique<hp_nanoprocessor_disassembler>();
 }
 
 void hp_nanoprocessor_device::execute_one(uint8_t opcode)

@@ -254,9 +254,9 @@ void balsente_state::cpu1_map(address_map &map)
 	map(0x9000, 0x9007).w(this, FUNC(balsente_state::balsente_adc_select_w));
 	map(0x9400, 0x9401).r(this, FUNC(balsente_state::balsente_adc_data_r));
 	map(0x9800, 0x981f).mirror(0x0060).lw8("outlatch_w",
-					       [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+						   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 						 m_outlatch->write_d7(space, offset >> 2, data, mem_mask);
-					       });
+						   });
 	map(0x9880, 0x989f).w(this, FUNC(balsente_state::balsente_random_reset_w));
 	map(0x98a0, 0x98bf).w(this, FUNC(balsente_state::balsente_rombank_select_w));
 	map(0x98c0, 0x98df).w(this, FUNC(balsente_state::balsente_palette_select_w));
@@ -1486,14 +1486,14 @@ ROM_END
 
 ROM_START( teamht )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "HATTRK.U8A", 0x10000, 0x4000, CRC(cb746de8) SHA1(b0e5003370b65f2aed4dc9ccb2a2d3eb29050245) )
-	ROM_LOAD( "HATTRK.U7A", 0x14000, 0x4000, CRC(5f2a0b24) SHA1(da1950a7e11014e47438a7c5831433390c1b1fd3) )
-	ROM_LOAD( "HATTRK.U1A", 0x2c000, 0x4000, CRC(6c6cf2be) SHA1(80e82ae4bd129000e74c4a5fd06d2109d5417e39) )
+	ROM_LOAD( "hattrk.u8a", 0x10000, 0x4000, CRC(cb746de8) SHA1(b0e5003370b65f2aed4dc9ccb2a2d3eb29050245) )
+	ROM_LOAD( "hattrk.u7a", 0x14000, 0x4000, CRC(5f2a0b24) SHA1(da1950a7e11014e47438a7c5831433390c1b1fd3) )
+	ROM_LOAD( "hattrk.u1a", 0x2c000, 0x4000, CRC(6c6cf2be) SHA1(80e82ae4bd129000e74c4a5fd06d2109d5417e39) )
 
 	SOUNDBOARD_ROMS
 
 	ROM_REGION( 0x10000, "gfx1", 0 )        /* up to 64k of sprites */
-	ROM_LOAD( "HATTRK.U6B", 0x00000, 0x4000, CRC(6e299728) SHA1(f10fc020fdf8f61d059ac57306b0353ac7dbfb24) )
+	ROM_LOAD( "hattrk.u6b", 0x00000, 0x4000, CRC(6e299728) SHA1(f10fc020fdf8f61d059ac57306b0353ac7dbfb24) )
 
 	MOTHERBOARD_PALS
 ROM_END

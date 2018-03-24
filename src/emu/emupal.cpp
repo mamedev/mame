@@ -399,7 +399,7 @@ void palette_device::palette_init_BBBBBGGGGGRRRRR(palette_device &palette)
 
 
 /*-------------------------------------------------
-    RRRRR_GGGGGG_BBBBB -
+    RRRRR_GGGGGG_BBBBB/BBBBB_GGGGGG_RRRRR -
     standard 5-6-5 palette for games using a
     16-bit color space
 -------------------------------------------------*/
@@ -410,6 +410,14 @@ void palette_device::palette_init_RRRRRGGGGGGBBBBB(palette_device &palette)
 
 	for (i = 0; i < 0x10000; i++)
 		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 11, 5, 0));
+}
+
+void palette_device::palette_init_BBBBBGGGGGGRRRRR(palette_device &palette)
+{
+	int i;
+
+	for (i = 0; i < 0x10000; i++)
+		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 0, 5, 11));
 }
 
 rgb_t raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder(u32 raw)

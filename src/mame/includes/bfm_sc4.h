@@ -3002,7 +3002,7 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	ROM_REGION( 0x400000, "dm01:matrix", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "clubtempdot.bin", 0x0000, 0x010000, CRC(283d2d9c) SHA1(5b76a13ad674f8a40c270e5dbc61dac04d411d02) ) /* DM01 */ \
 	ROM_REGION( 0x400000, "matrixhex", ROMREGION_ERASE00 ) /* can probably be removed, need to verify it matches first tho */ \
-	ROM_LOAD( "club-temptation_mtx_(ihex)ss.hex", 0x0000, 0x01d0da, CRC(08ebee96) SHA1(2e87d734c966abab1d4a59c9481ebea161f77286) )
+	ROM_LOAD( "club-temptation_mtx,ihex,ss.hex", 0x0000, 0x01d0da, CRC(08ebee96) SHA1(2e87d734c966abab1d4a59c9481ebea161f77286) )
 
 #define sc_dcrls_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) /* DCRZYSND */ \

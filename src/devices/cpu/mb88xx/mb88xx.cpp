@@ -163,9 +163,9 @@ device_memory_interface::space_config_vector mb88_cpu_device::memory_space_confi
 	};
 }
 
-util::disasm_interface *mb88_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mb88_cpu_device::create_disassembler()
 {
-	return new mb88_disassembler;
+	return std::make_unique<mb88_disassembler>();
 }
 
 

@@ -10,6 +10,11 @@
 
 #pragma once
 
+#include "dsp16dis.h"
+
+#include "cpu/drccache.h"
+
+#include <memory>
 #include <utility>
 
 
@@ -62,7 +67,7 @@
 		downcast<dsp16_device_base &>(*device).set_pods_cb(DEVCB_##obj);
 
 
-class dsp16_device_base : public cpu_device
+class dsp16_device_base : public cpu_device, protected dsp16_disassembler::cpu
 {
 public:
 	DECLARE_WRITE_LINE_MEMBER(exm_w);
@@ -122,6 +127,7 @@ protected:
 	// device_t implementation
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
+	virtual void device_stop() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface implementation
@@ -137,9 +143,14 @@ protected:
 	// device_state_interface implementation
 	virtual void state_import(device_state_entry const &entry) override;
 	virtual void state_export(device_state_entry const &entry) override;
+	virtual void state_string_export(device_state_entry const &entry, std::string &str) const override;
 
 	// device_disasm_interface implementation
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	// dsp16_disassembler::cpu implementation
+	virtual predicate check_con(offs_t pc, u16 op) const override;
+	virtual predicate check_branch(offs_t pc) const override;
 
 	// for specialisations to override
 	virtual void external_memory_enable(address_space &space, bool enable) = 0;
@@ -154,6 +165,12 @@ private:
 		DSP16_R0, DSP16_R1, DSP16_R2, DSP16_R3, DSP16_RB, DSP16_RE, DSP16_J, DSP16_K,
 		DSP16_X, DSP16_Y, DSP16_P, DSP16_A0, DSP16_A1, DSP16_C0, DSP16_C1, DSP16_C2, DSP16_AUC, DSP16_PSW,
 		DSP16_YH, DSP16_A0H, DSP16_A1H, DSP16_YL, DSP16_A0L, DSP16_A1L
+	};
+
+	// recompiler setup
+	enum : size_t
+	{
+		CACHE_SIZE = 1U * 1024 * 1024
 	};
 
 	// masks for registers that aren't power-of-two sizes
@@ -207,7 +224,11 @@ private:
 	friend sio_flags &operator|=(sio_flags &, sio_flags);
 
 	// recompiler helpers
+	class core_state;
 	class frontend;
+	class recompiler;
+	using core_state_ptr = std::unique_ptr<core_state, void (*)(core_state *)>;
+	using recompiler_ptr = std::unique_ptr<recompiler>;
 
 	// internal address maps
 	void program_map(address_map &map);
@@ -220,8 +241,6 @@ private:
 	s16 yaau_read(u16 op);
 	void yaau_write(u16 op, s16 value);
 	void yaau_write_z(u16 op);
-	u64 dau_f1(u16 op);
-	u64 dau_f2(u16 op);
 
 	// inline helpers
 	static bool op_interruptible(u16 op);
@@ -229,24 +248,10 @@ private:
 	flags &set_predicate(flags predicate) { return m_flags = (m_flags & ~FLAGS_PRED_MASK) | (predicate & FLAGS_PRED_MASK); }
 	flags &set_iack(flags iack) { return m_flags = (m_flags & ~FLAGS_IACK_MASK) | (iack & FLAGS_IACK_MASK); }
 	u16 &set_xaau_pc_offset(u16 offset);
-	void xaau_increment_pt(s16 increment) { m_xaau_pt = (m_xaau_pt & XAAU_I_EXT) | ((m_xaau_pt + increment) & XAAU_I_MASK); }
 	s16 get_r(u16 op);
 	void set_r(u16 op, s16 value);
-	void yaau_postmodify_r(u16 op);
-	void set_dau_y(u16 op, s16 value);
 	s64 dau_saturate(u16 a) const;
-	void set_dau_at(u16 op, s16 value);
-	u64 set_dau_psw_flags(s64 d);
-	u64 get_dau_p_aligned() const;
 	bool op_dau_con(u16 op, bool inc);
-
-	// flag accessors
-	bool dau_auc_sat(u16 a) const { return bool(BIT(m_dau_auc, 2 + a)); }
-	u16 dau_auc_align() const { return m_dau_auc & 0x0003U; }
-	bool dau_psw_lmi() const { return bool(BIT(m_dau_psw, 15)); }
-	bool dau_psw_leq() const { return bool(BIT(m_dau_psw, 14)); }
-	bool dau_psw_llv() const { return bool(BIT(m_dau_psw, 13)); }
-	bool dau_psw_lmv() const { return bool(BIT(m_dau_psw, 12)); }
 
 	// opcode field handling
 	static constexpr u16 op_ja(u16 op) { return op & 0x0fffU; }
@@ -260,11 +265,6 @@ private:
 	static constexpr u16 op_con(u16 op) { return op & 0x001fU; }
 	static constexpr u16 op_ni(u16 op) { return (op >> 7) & 0x000fU; }
 	static constexpr u16 op_k(u16 op) { return op & 0x007fU; }
-	s16 op_xaau_increment(u16 op) const { return op_x(op) ? m_xaau_i : 1; }
-	u16 &op_yaau_r(u16 op) { return m_yaau_r[(op >> 2) & 0x0003U]; }
-	s64 &op_dau_as(u16 op) { return m_dau_a[op_s(op)]; }
-	s64 &op_dau_ad(u16 op) { return m_dau_a[op_d(op)]; }
-	s64 &op_dau_at(u16 op) { return m_dau_a[op_d(~op)]; }
 
 	// serial I/O
 	bool sio_ld_ick() const { return !BIT(m_sio_sioc, 9); }
@@ -316,15 +316,18 @@ private:
 
 	// configuration
 	address_space_config const  m_space_config[3];
-	u16 const                   m_yaau_mask;
-	u16 const                   m_yaau_sign;
+	u8 const                    m_yaau_bits;
 
 	// memory system access
 	address_space               *m_spaces[3];
 	direct_read_data<-1>        *m_direct;
 
+	// recompiler stuff
+	drc_cache                   m_drc_cache;
+	core_state_ptr              m_core;
+	recompiler_ptr              m_recompiler;
+
 	// execution state
-	int         m_icount;
 	cache       m_cache_mode;
 	phase       m_phase;
 	u8          m_int_enable[2];
@@ -351,30 +354,6 @@ private:
 	u8          m_pids_out;     // parallel input data strobe (sampled on rising edge)
 	u8          m_pods_out;     // parallel output data strobe
 
-	// XAAU - ROM Address Arithmetic Unit
-	u16         m_xaau_pc;      // 16 bits unsigned
-	u16         m_xaau_pt;      // 16 bits unsigned
-	u16         m_xaau_pr;      // 16 bits unsigned
-	u16         m_xaau_pi;      // 16 bits unsigned
-	s16         m_xaau_i;       // 12 bits signed
-
-	// YAAU - RAM Address Arithmetic Unit
-	u16         m_yaau_r[4];    // 9/16 bits unsigned
-	u16         m_yaau_rb;      // 9/16 bits unsigned
-	u16         m_yaau_re;      // 9/16 bits unsigned
-	s16         m_yaau_j;       // 9/16 bits signed
-	s16         m_yaau_k;       // 9/16 bits signed
-
-	// DAU - Data Arithmetic Unit
-	s16         m_dau_x;        // 16 bits signed
-	s32         m_dau_y;        // 32 bits signed
-	s32         m_dau_p;        // 32 bits signed
-	s64         m_dau_a[2];     // 36 bits signed
-	s8          m_dau_c[3];     // 8 bits signed
-	u8          m_dau_auc;      // 7 bits unsigned
-	u16         m_dau_psw;      // 16 bits
-	s16         m_dau_temp;     // 16 bits
-
 	// SIO - Serial I/O
 	u16         m_sio_sioc;     // 10 bits
 	u16         m_sio_obuf;     // 16 bits
@@ -382,6 +361,7 @@ private:
 	u16         m_sio_ofsr;     // 16 bits
 	u8          m_sio_clk;
 	u8          m_sio_clk_div;
+	u8          m_sio_clk_res;
 	u8          m_sio_ld;
 	u8          m_sio_ld_div;
 	sio_flags   m_sio_flags;
@@ -396,6 +376,7 @@ private:
 	// fake registers for the debugger
 	u16         m_cache_pcbase;
 	u16         m_st_pcbase;
+	u16         m_st_genflags;
 	s16         m_st_yh, m_st_ah[2];
 	u16         m_st_yl, m_st_al[2];
 };

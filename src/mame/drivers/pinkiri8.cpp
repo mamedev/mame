@@ -48,8 +48,8 @@ Dumped by Chackn
 class pinkiri8_state : public driver_device
 {
 public:
-	pinkiri8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pinkiri8_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_janshi_back_vram(*this, "janshivdp:back_vram"),
 		m_janshi_vram1(*this, "janshivdp:vram1"),
 		m_janshi_unk1(*this, "janshivdp:unk1"),
@@ -61,8 +61,32 @@ public:
 		m_janshi_crtc_regs(*this, "janshivdp:crtc_regs"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
+	DECLARE_DRIVER_INIT(ronjan);
+	void pinkiri8(machine_config &config);
+
+protected:
+	DECLARE_WRITE8_MEMBER(output_regs_w);
+	DECLARE_WRITE8_MEMBER(pinkiri8_vram_w);
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_READ8_MEMBER(mux_p2_r);
+	DECLARE_READ8_MEMBER(mux_p1_r);
+	DECLARE_READ8_MEMBER(ronjan_prot_r);
+	DECLARE_WRITE8_MEMBER(ronjan_prot_w);
+	DECLARE_READ8_MEMBER(ronjan_prot_status_r);
+	DECLARE_READ8_MEMBER(ronjan_patched_prot_r);
+	virtual void video_start() override;
+	uint32_t screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void pinkiri8_io(address_map &map);
+	void pinkiri8_map(address_map &map);
+
+private:
 	required_shared_ptr<uint8_t> m_janshi_back_vram;
 	required_shared_ptr<uint8_t> m_janshi_vram1;
 	required_shared_ptr<uint8_t> m_janshi_unk1;
@@ -78,43 +102,29 @@ public:
 	uint8_t m_prot_read_index;
 	uint8_t m_prot_char[5];
 	uint8_t m_prot_index;
-	DECLARE_WRITE8_MEMBER(output_regs_w);
-	DECLARE_WRITE8_MEMBER(pinkiri8_vram_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(mux_p2_r);
-	DECLARE_READ8_MEMBER(mux_p1_r);
-	DECLARE_READ8_MEMBER(ronjan_prot_r);
-	DECLARE_WRITE8_MEMBER(ronjan_prot_w);
-	DECLARE_READ8_MEMBER(ronjan_prot_status_r);
-	DECLARE_READ8_MEMBER(ronjan_patched_prot_r);
-	DECLARE_DRIVER_INIT(ronjan);
-	virtual void video_start() override;
-	uint32_t screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-
-	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void pinkiri8(machine_config &config);
-	void pinkiri8_io(address_map &map);
-	void pinkiri8_map(address_map &map);
 };
 
 
 
 /* VDP device to give us our own memory map */
-class janshi_vdp_device : public device_t,
-							public device_memory_interface
+class janshi_vdp_device : public device_t, public device_memory_interface
 {
 public:
 	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	void map(address_map &map);
+
 protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual space_config_vector memory_space_config() const override;
+
+private:
 	address_space_config        m_space_config;
 };
 
@@ -1144,7 +1154,7 @@ ROM_END
 ROM_START( janshi )
 	ROM_REGION( 0x24000, "maincpu", 0 )
 	ROM_LOAD( "11.1l",    0x00000, 0x20000, CRC(a7692ddf) SHA1(5e7f43d8337583977baf22a28bbcd9b2182c0cde) )
-	ROM_LOAD( "[3] 9009 1992.1 new jansh.bin", 0x0000, 0x4000, CRC(63cd3f12) SHA1(aebac739bffaf043e6acffa978e935f73ee1385f) ) //overlapped internal ROM
+	ROM_LOAD( "=3= 9009 1992.1 new jansh.bin", 0x0000, 0x4000, CRC(63cd3f12) SHA1(aebac739bffaf043e6acffa978e935f73ee1385f) ) //overlapped internal ROM
 
 	ROM_REGION( 0x140000, "gfx1", 0 )
 	ROM_LOAD( "1.1a", 0x000000, 0x40000, CRC(92b140a5) SHA1(f3b38563f74650604ed0faaf84460e0b04b386b7) )

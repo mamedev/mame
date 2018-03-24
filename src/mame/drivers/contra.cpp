@@ -526,7 +526,7 @@ ROM_END
 
 ROM_START( contrabj1 )
 	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 96k for banked ROMs */
-	ROM_LOAD( "2__(contrabtj2).2k", 0x20000, 0x08000, CRC(bdb9196d) SHA1(fad170e8fda94c9c9d7b82433daa30b80af12efc) ) /* == 633k03.18a */
+	ROM_LOAD( "2__,contrabtj2.2k", 0x20000, 0x08000, CRC(bdb9196d) SHA1(fad170e8fda94c9c9d7b82433daa30b80af12efc) ) /* == 633k03.18a */
 	ROM_CONTINUE(                   0x08000, 0x08000 )
 	ROM_LOAD( "1.2h",               0x10000, 0x10000, CRC(5d5f7438) SHA1(489fe56ca57ef4f6a7792fba07a9656009f3f285) ) /* == 633k02.17a */
 

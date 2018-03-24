@@ -30,8 +30,8 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/tms34010/tms34010.h"
+#include "machine/eeprompar.h"
 #include "machine/mc68681.h"
-#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "screen.h"
@@ -103,9 +103,9 @@ WRITE16_MEMBER(artmagic_state::control_w)
 	COMBINE_DATA(&m_control[offset]);
 
 	/* OKI banking here */
-	if (offset == 0)
+	if (offset == 0 && !BIT(data, 0))
 	{
-		m_oki->set_rom_bank((data >> 4) & 1);
+		m_oki->set_rom_bank(BIT(data, 4));
 	}
 
 	logerror("%06X:control_w(%d) = %04X\n", m_maincpu->pc(), offset, data);
@@ -412,7 +412,7 @@ void artmagic_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x220000, 0x23ffff).ram();
-	map(0x240000, 0x240fff).ram().share("nvram");
+	map(0x240000, 0x240fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x300000, 0x300001).portr("300000");
 	map(0x300002, 0x300003).portr("300002");
 	map(0x300004, 0x300005).portr("300004");
@@ -430,7 +430,7 @@ void artmagic_state::stonebal_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x27ffff).ram();
-	map(0x280000, 0x280fff).ram().share("nvram");
+	map(0x280000, 0x280fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x300000, 0x300001).portr("300000");
 	map(0x300002, 0x300003).portr("300002");
 	map(0x300004, 0x300005).portr("300004");
@@ -450,7 +450,7 @@ void artmagic_state::shtstar_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x27ffff).ram();
-	map(0x280000, 0x280fff).ram().share("nvram");
+	map(0x280000, 0x280fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 
 	map(0x300000, 0x300001).nopr(); //AM_READ_PORT("300000")
 	map(0x300000, 0x300003).w(this, FUNC(artmagic_state::control_w)).share("control");
@@ -823,7 +823,8 @@ MACHINE_CONFIG_START(artmagic_state::artmagic)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(artmagic_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1)) // FIXME: false-readback polling should make this unnecessary
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
@@ -925,14 +926,14 @@ ROM_END
 
 ROM_START( ultennisj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
-	ROM_LOAD16_BYTE( "a&m001d0194-13c-u102-japan.u102", 0x00000, 0x40000, CRC(65cee452) SHA1(49259e8faf289d6d80769f6d44e9d61d15e431c6) )
-	ROM_LOAD16_BYTE( "a&m001d0194-12c-u101-japan.u101", 0x00001, 0x40000, CRC(5f4b0ca0) SHA1(57e9ed60cc0e53eeb4e08c4003138d3bdaec3de7) )
+	ROM_LOAD16_BYTE( "a+m001d0194-13c-u102-japan.u102", 0x00000, 0x40000, CRC(65cee452) SHA1(49259e8faf289d6d80769f6d44e9d61d15e431c6) )
+	ROM_LOAD16_BYTE( "a+m001d0194-12c-u101-japan.u101", 0x00001, 0x40000, CRC(5f4b0ca0) SHA1(57e9ed60cc0e53eeb4e08c4003138d3bdaec3de7) )
 
 	ROM_REGION16_LE( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "a&m-001-01-a.ic133", 0x000000, 0x200000, CRC(29d9204d) SHA1(0b2b77a55b8c2877c2e31b63156505584d4ee1f0) )
+	ROM_LOAD( "a+m-001-01-a.ic133", 0x000000, 0x200000, CRC(29d9204d) SHA1(0b2b77a55b8c2877c2e31b63156505584d4ee1f0) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "a&m001c1293-14a-u151.u151", 0x00000,  0x40000, CRC(4e19ca89) SHA1(ac7e17631ec653f83c4912df6f458b0e1df88096) )
+	ROM_LOAD( "a+m001c1293-14a-u151.u151", 0x00000,  0x40000, CRC(4e19ca89) SHA1(ac7e17631ec653f83c4912df6f458b0e1df88096) )
 ROM_END
 
 
@@ -1097,26 +1098,26 @@ ROM_START( shtstar )
 	ROM_LOAD( "2207_7b42c5.u6", 0x00000, 0x8000, CRC(6dd4b4ed) SHA1(b37e9e5ddfb5d88c5412dc79643adfc4362fbb46) )
 
 	ROM_REGION16_LE( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "a&m005c0494_13a.u134", 0x00000, 0x80000, CRC(f101136a) SHA1(9ff7275e0c1fc41f3d97ae0bd628581e2803910a) )
-	ROM_LOAD( "a&m005c0494_14a.u135", 0x80000, 0x80000, CRC(3e847f8f) SHA1(c99159951303b7f752305fa8e7e6d4bfb4fc54ba) )
+	ROM_LOAD( "a+m005c0494_13a.u134", 0x00000, 0x80000, CRC(f101136a) SHA1(9ff7275e0c1fc41f3d97ae0bd628581e2803910a) )
+	ROM_LOAD( "a+m005c0494_14a.u135", 0x80000, 0x80000, CRC(3e847f8f) SHA1(c99159951303b7f752305fa8e7e6d4bfb4fc54ba) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "a&m005c0494_12a.u151", 0x00000, 0x40000, CRC(2df3db1e) SHA1(d2e588db577de6fd527cd496f5eae9964d557da3) )
+	ROM_LOAD( "a+m005c0494_12a.u151", 0x00000, 0x40000, CRC(2df3db1e) SHA1(d2e588db577de6fd527cd496f5eae9964d557da3) )
 
 	ROM_REGION( 0x1a00,  "plds", 0 )
-	ROM_LOAD( "a&m005c0494_06a.u126",   0x0000, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_03a.u125",   0x0200, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_02a.u307",   0x0400, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_18a.u306",   0x0600, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_17a.u305",   0x0800, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_05a.u206",   0x0a00, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_01a.u205",   0x0c00, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_04a.u601",   0x0e00, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_08a.u916",   0x1000, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_07a.u705",   0x1200, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_10a.u917",   0x1400, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_09a.u903",   0x1600, 0x0200, NO_DUMP )
-	ROM_LOAD( "a&m005c0494_11a.u112",   0x1800, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_06a.u126",   0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_03a.u125",   0x0200, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_02a.u307",   0x0400, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_18a.u306",   0x0600, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_17a.u305",   0x0800, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_05a.u206",   0x0a00, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_01a.u205",   0x0c00, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_04a.u601",   0x0e00, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_08a.u916",   0x1000, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_07a.u705",   0x1200, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_10a.u917",   0x1400, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_09a.u903",   0x1600, 0x0200, NO_DUMP )
+	ROM_LOAD( "a+m005c0494_11a.u112",   0x1800, 0x0200, NO_DUMP )
 
 ROM_END
 

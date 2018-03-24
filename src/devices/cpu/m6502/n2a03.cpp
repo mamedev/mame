@@ -57,9 +57,9 @@ n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, devic
 	program_config.m_internal_map = address_map_constructor(FUNC(n2a03_device::n2a03_map), this);
 }
 
-util::disasm_interface *n2a03_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> n2a03_device::create_disassembler()
 {
-	return new n2a03_disassembler;
+	return std::make_unique<n2a03_disassembler>();
 }
 
 void n2a03_device::device_start()

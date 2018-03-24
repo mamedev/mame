@@ -938,7 +938,7 @@ GAME_CUSTOM( 199?, ec_barx__bu, ec_barx,    "issa874",      0x0000, 0x008000, CR
 
 /* 1993 Electrocoin Copyright - z180 code - these might belong in the pyramid driver, oxo driver, or their own driver */
 GAME_CUSTOM( 199?, ec_bx180,    0,          "sbarx6c.bin",  0x0000, 0x008000, CRC(f747fa74) SHA1(7820e9225924c8b2fd78c625cc61871f7c76357f), "Electrocoin","Bar X (Z180 hardware) (Electrocoin) (set 1)" ) // ELCNBARX - no build date?
-GAME_CUSTOM( 199?, ec_bx180a,   ec_bx180,   "bxc1&6c.rom",  0x0000, 0x008000, CRC(356964c3) SHA1(68522a0d379ab49f5975e0628f3e813cfe3287a3), "Electrocoin","Bar X (Z180 hardware) (Electrocoin) (set 2)" ) // ELCNBARX - no date string
+GAME_CUSTOM( 199?, ec_bx180a,   ec_bx180,   "bxc1+6c.rom",  0x0000, 0x008000, CRC(356964c3) SHA1(68522a0d379ab49f5975e0628f3e813cfe3287a3), "Electrocoin","Bar X (Z180 hardware) (Electrocoin) (set 2)" ) // ELCNBARX - no date string
 
 
 

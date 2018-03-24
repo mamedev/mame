@@ -148,9 +148,9 @@ device_memory_interface::space_config_vector i8089_device::memory_space_config()
 //  disassemble - disassembler
 //-------------------------------------------------
 
-util::disasm_interface *i8089_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i8089_device::create_disassembler()
 {
-	return new i8089_disassembler();
+	return std::make_unique<i8089_disassembler>();
 }
 
 //-------------------------------------------------

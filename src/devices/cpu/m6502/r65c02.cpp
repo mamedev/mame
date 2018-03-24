@@ -24,9 +24,9 @@ r65c02_device::r65c02_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-util::disasm_interface *r65c02_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> r65c02_device::create_disassembler()
 {
-	return new r65c02_disassembler;
+	return std::make_unique<r65c02_disassembler>();
 }
 
 #include "cpu/m6502/r65c02.hxx"

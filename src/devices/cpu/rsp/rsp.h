@@ -99,14 +99,11 @@ enum
 	devcb = &downcast<rsp_device &>(*device).set_status_callback(DEVCB_##_devcb);
 
 
-class rsp_frontend;
-class rsp_cop2;
-
 class rsp_device : public cpu_device
 {
-	friend class rsp_frontend;
-	friend class rsp_cop2;
-	friend class rsp_cop2_drc;
+	class frontend;
+	class cop2;
+	class cop2_drc;
 
 public:
 	// construction/destruction
@@ -160,13 +157,15 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	void unimplemented_opcode(uint32_t op);
 
 	/* internal compiler state */
 	struct compiler_state
 	{
+		compiler_state &operator=(compiler_state &) = delete;
+
 		uint32_t              cycles;                   /* accumulated cycles */
 		uint8_t               checkints;                /* need to check interrupts before next instruction */
 		uint8_t               checksoftints;            /* need to check software interrupts before next instruction */
@@ -187,8 +186,8 @@ private:
 
 	/* core state */
 	drc_cache           m_cache;                      /* pointer to the DRC code cache */
-	std::unique_ptr<drcuml_state>      m_drcuml;                     /* DRC UML generator state */
-	std::unique_ptr<rsp_frontend>      m_drcfe;                      /* pointer to the DRC front-end state */
+	std::unique_ptr<drcuml_state>  m_drcuml;                     /* DRC UML generator state */
+	std::unique_ptr<frontend>      m_drcfe;                      /* pointer to the DRC front-end state */
 	uint32_t              m_drcoptions;                 /* configurable DRC options */
 
 	/* internal stuff */
@@ -239,7 +238,7 @@ protected:
 	direct_read_data<0> *m_direct;
 
 private:
-	std::unique_ptr<rsp_cop2>    m_cop2;
+	std::unique_ptr<cop2>    m_cop2;
 
 	uint32_t *m_dmem32;
 	uint16_t *m_dmem16;
@@ -266,8 +265,8 @@ private:
 	void WRITE32(uint32_t address, uint32_t data);
 	uint32_t get_cop0_reg(int reg);
 	void set_cop0_reg(int reg, uint32_t data);
-	void load_fast_iregs(drcuml_block *block);
-	void save_fast_iregs(drcuml_block *block);
+	void load_fast_iregs(drcuml_block &block);
+	void save_fast_iregs(drcuml_block &block);
 	uint8_t DM_READ8(uint32_t address);
 	uint16_t DM_READ16(uint32_t address);
 	uint32_t DM_READ32(uint32_t address);
@@ -282,16 +281,16 @@ private:
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
 	void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle *&handleptr);
-	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
-	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
-	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t linkreg);
-	void generate_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_regimm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
+	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception);
+	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
+	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_delay_slot_and_branch(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint8_t linkreg);
+	void generate_branch(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	bool generate_special(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	bool generate_regimm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	bool generate_cop0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op);
 };
 
 

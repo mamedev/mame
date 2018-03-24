@@ -579,22 +579,22 @@ void m6800_cpu_device::execute_run()
 	} while( m_icount>0 );
 }
 
-util::disasm_interface *m6800_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6800_cpu_device::create_disassembler()
 {
-	return new m680x_disassembler(6800);
+	return std::make_unique<m680x_disassembler>(6800);
 }
 
-util::disasm_interface *m6802_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6802_cpu_device::create_disassembler()
 {
-	return new m680x_disassembler(6802);
+	return std::make_unique<m680x_disassembler>(6802);
 }
 
-util::disasm_interface *m6808_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6808_cpu_device::create_disassembler()
 {
-	return new m680x_disassembler(6808);
+	return std::make_unique<m680x_disassembler>(6808);
 }
 
-util::disasm_interface *nsc8105_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> nsc8105_cpu_device::create_disassembler()
 {
-	return new m680x_disassembler(8105);
+	return std::make_unique<m680x_disassembler>(8105);
 }

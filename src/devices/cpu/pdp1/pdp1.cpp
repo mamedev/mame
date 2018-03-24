@@ -419,9 +419,9 @@ void pdp1_device::device_config_complete()
 }
 
 
-util::disasm_interface *pdp1_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> pdp1_device::create_disassembler()
 {
-	return new pdp1_disassembler;
+	return std::make_unique<pdp1_disassembler>();
 }
 
 

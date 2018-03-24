@@ -744,8 +744,8 @@ ROM_START( valtric )
 	ROM_REGION( 0x08000, "gfx3", 0 )    /* Text */
 	ROM_LOAD( "vt_07.bin",    0x00000, 0x08000, CRC(d5f9bfb9) SHA1(6b3f11f9b8f76c0144a109f1506d8cbb01876237) )
 
-	ROM_REGION (0x100, "proms", 0)
-	ROM_LOAD( "82s129", 0x000, 0x100, NO_DUMP ) // located on the top board
+	ROM_REGION (0x100, "proms", 0) // currently not used by the emulation, without it you just get diagonal glitches on a real board.
+	ROM_LOAD( "82s129.1s", 0x000, 0x100, CRC(bc42f9b5) SHA1(962c812d5d1f0e539238a4ec49866ef3558db629) ) // located on the top board
 ROM_END
 
 ROM_START( butasan ) /* English "subtitle" of Butasan for Japanese region.  Original Jaleco PCB */

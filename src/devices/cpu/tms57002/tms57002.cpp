@@ -30,9 +30,9 @@ tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-util::disasm_interface *tms57002_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms57002_device::create_disassembler()
 {
-	return new tms57002_disassembler;
+	return std::make_unique<tms57002_disassembler>();
 }
 
 WRITE_LINE_MEMBER(tms57002_device::pload_w)

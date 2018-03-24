@@ -769,7 +769,7 @@ MACHINE_CONFIG_END
 
 ROM_START(hp_ipc)
 	ROM_REGION(0x100000, "maincpu" , 0)
-	ROM_LOAD("hp ipc os 82991A.bin", 0x00000, 0x80000, BAD_DUMP CRC(df45a37b) SHA1(476af9923bca0d2d0f40aeb81be5145ca76fddf5)) // Should be spread across 4 x 128K ROMs
+	ROM_LOAD("hp ipc os 82991a.bin", 0x00000, 0x80000, BAD_DUMP CRC(df45a37b) SHA1(476af9923bca0d2d0f40aeb81be5145ca76fddf5)) // Should be spread across 4 x 128K ROMs
 ROM_END
 
 

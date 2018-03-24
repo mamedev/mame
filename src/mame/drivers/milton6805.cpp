@@ -5,7 +5,7 @@ infos provided by Sean Riddle
 
 Milton Bradley Milton
 
-Chips labeled 
+Chips labeled
 
 SC87008P
 7834043001
@@ -76,7 +76,7 @@ red
 C     F
  B   G
    A
-   
+
 yellow
    A
  G   B

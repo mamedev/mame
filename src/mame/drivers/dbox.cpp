@@ -648,7 +648,7 @@ ROM_START( dbox )
 	ROMX_LOAD( "b210uns.bin",   0x000000, 0x020000, CRC(e8de221c) SHA1(db6e20ae73b11e8051f389968803732bd73fc1e4), ROM_BIOS(2) )
 
 	ROM_SYSTEM_BIOS(2, "nbc106.bin", "Nokia Bootloader CI v1.06")
-	ROMX_LOAD( "bootCi106.bin", 0x000000, 0x020000, BAD_DUMP CRC(641762a9) SHA1(7c5233390cc66d3ddf4c730a3418ccfba1dc2905), ROM_BIOS(3) )
+	ROMX_LOAD( "bootci106.bin", 0x000000, 0x020000, BAD_DUMP CRC(641762a9) SHA1(7c5233390cc66d3ddf4c730a3418ccfba1dc2905), ROM_BIOS(3) )
 ROM_END
 
 COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

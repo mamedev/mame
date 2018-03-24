@@ -48,9 +48,9 @@ sm500_device::sm500_device(const machine_config &mconfig, device_type type, cons
 
 
 // disasm
-util::disasm_interface *sm500_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sm500_device::create_disassembler()
 {
-	return new sm500_disassembler;
+	return std::make_unique<sm500_disassembler>();
 }
 
 

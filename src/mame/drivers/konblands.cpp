@@ -4,16 +4,16 @@
 
     GX455 - Konami Badlands
 
-	driver by Angelo Salese
-	
-	TODO:
-	- verify interrupts, service mode seems way too fast and it randomly crashes;
-	- fix overlay positioning & transparency enable;
-	- dipswitches;
-	- add sn76496 latch mechanism (should actually be in the device itself);
-	
-	Notes:
-	- to enter service mode hold start 1 & 2 at POST.
+    driver by Angelo Salese
+
+    TODO:
+    - verify interrupts, service mode seems way too fast and it randomly crashes;
+    - fix overlay positioning & transparency enable;
+    - dipswitches;
+    - add sn76496 latch mechanism (should actually be in the device itself);
+
+    Notes:
+    - to enter service mode hold start 1 & 2 at POST.
 
 ***************************************************************************/
 
@@ -35,7 +35,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_laserdisc(*this, "laserdisc")
 		, m_vram(*this, "vram")
-   		, m_gfxdecode(*this, "gfxdecode")
+		, m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -68,7 +68,7 @@ private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
+
 	bool m_nmi_enable, m_irq_enable, m_firq_enable;
 };
 
@@ -234,7 +234,7 @@ static INPUT_PORTS_START( konblands )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -342,11 +342,11 @@ ROM_START( kbadlands )
 	ROM_LOAD( "badlands.a14",   0x2000, 0x2000, CRC(82cb4614) SHA1(0cab824b4f3fb29e300f9c05911422d6047d073b) )
 
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
-	ROM_LOAD( "badlands.c8",   0x0000, 0x2000, CRC(590209fe) SHA1(8dfc836420e4c3fa417ec0aefb617a7abd0ccbc2) )	
+	ROM_LOAD( "badlands.c8",   0x0000, 0x2000, CRC(590209fe) SHA1(8dfc836420e4c3fa417ec0aefb617a7abd0ccbc2) )
 
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "badlands.c4",    0x000, 0x020, CRC(6757be8d) SHA1(1c9c24e29017f0a16b8a7dedd9776109e7e5734c) )
-	
+
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "badlands", 0, NO_DUMP )
 ROM_END
@@ -354,15 +354,15 @@ ROM_END
 
 ROM_START( kbadlandsh )
 	ROM_REGION( 0x4000, "ipl", ROMREGION_ERASE00 )
-    ROM_LOAD( "bl_hit.7a",    0x0000, 0x2000, CRC(a135e444) SHA1(7ef5394c698a5867aef200f577b8708df455b653) )
-    ROM_LOAD( "bl_hit.6a",    0x2000, 0x2000, CRC(4c287f37) SHA1(b6b6b64174f1fd014b6c808015f1b0e65b56d24b) )
+	ROM_LOAD( "bl_hit.7a",    0x0000, 0x2000, CRC(a135e444) SHA1(7ef5394c698a5867aef200f577b8708df455b653) )
+	ROM_LOAD( "bl_hit.6a",    0x2000, 0x2000, CRC(4c287f37) SHA1(b6b6b64174f1fd014b6c808015f1b0e65b56d24b) )
 
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
-    ROM_LOAD( "bl_hit.9c",    0x000000, 0x002000, CRC(44c3441e) SHA1(6b42961d31e5d025758cdfdc573648a83004577d) )
+	ROM_LOAD( "bl_hit.9c",    0x000000, 0x002000, CRC(44c3441e) SHA1(6b42961d31e5d025758cdfdc573648a83004577d) )
 
 	ROM_REGION( 0x20, "proms", 0 )
-    ROM_LOAD( "bl_hit.4f",    0x000000, 0x000020, CRC(0226f881) SHA1(b17c5681fca5ae65128793cf263725e2fe1314de) )
-		
+	ROM_LOAD( "bl_hit.4f",    0x000000, 0x000020, CRC(0226f881) SHA1(b17c5681fca5ae65128793cf263725e2fe1314de) )
+
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "badlands", 0, NO_DUMP )
 ROM_END

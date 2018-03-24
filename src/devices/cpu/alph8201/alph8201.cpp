@@ -690,7 +690,7 @@ void alpha8201_cpu_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-util::disasm_interface *alpha8201_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> alpha8201_cpu_device::create_disassembler()
 {
-	return new alpha8201_disassembler;
+	return std::make_unique<alpha8201_disassembler>();
 }

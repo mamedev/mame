@@ -504,9 +504,9 @@ void dsp56k_device::execute_run()
 }
 
 
-util::disasm_interface *dsp56k_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> dsp56k_device::create_disassembler()
 {
-	return new dsp56k_disassembler;
+	return std::make_unique<dsp56k_disassembler>();
 }
 
 } // namespace DSP56K

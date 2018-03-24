@@ -377,17 +377,17 @@ ROM_END
 
 ROM_START( leprglds )    // Leprechaun's Gold (Spanish) / U5 08/20/101
 	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD( "leprechaun's_gold.xu03", 0x0000, 0x100000, CRC(a750e5b9) SHA1(891bbfded9ece4d81aa8415cbb5a2728c118300e) )
+	ROM_LOAD( "leprechaun_s_gold.xu03", 0x0000, 0x100000, CRC(a750e5b9) SHA1(891bbfded9ece4d81aa8415cbb5a2728c118300e) )
 
 	ROM_REGION(0x100000, "rom", 0)
-	ROM_LOAD( "leprechaun's_gold.xu02", 0x0000, 0x100000, CRC(884d4871) SHA1(2c7a452dd466532df5fc14b209302a5ad42bb356) )
-	ROM_LOAD( "leprechaun's_gold.xu04", 0x0000, 0x100000, CRC(02642dd2) SHA1(4ac00b9053f9859865910888952e09d2fda5db06) )
-	ROM_LOAD( "leprechaun's_gold.xu05", 0x0000, 0x100000, CRC(eedd0dd2) SHA1(2b1dceb541a660357404f24069392f7892c87cfb) )
+	ROM_LOAD( "leprechaun_s_gold.xu02", 0x0000, 0x100000, CRC(884d4871) SHA1(2c7a452dd466532df5fc14b209302a5ad42bb356) )
+	ROM_LOAD( "leprechaun_s_gold.xu04", 0x0000, 0x100000, CRC(02642dd2) SHA1(4ac00b9053f9859865910888952e09d2fda5db06) )
+	ROM_LOAD( "leprechaun_s_gold.xu05", 0x0000, 0x100000, CRC(eedd0dd2) SHA1(2b1dceb541a660357404f24069392f7892c87cfb) )
 	// sound
-	ROM_LOAD( "leprechaun's_gold.xu30", 0x0000, 0x100000, CRC(6a41056f) SHA1(54168a0115dc8d232100fbbd440063dc75fdbaaf) )
-	ROM_LOAD( "leprechaun's_gold.xu31", 0x0000, 0x100000, CRC(0485e432) SHA1(c57a47fd27a14a2ea01400515f61be58be5fa391) )
-	ROM_LOAD( "leprechaun's_gold.xu17", 0x0000, 0x100000, CRC(10bfcdcf) SHA1(34dc619f33c81014120d9b6a2f8b2373451af2e4) )
-	ROM_LOAD( "leprechaun's_gold.xu18", 0x0000, 0x100000, CRC(a3f82467) SHA1(0971f32bff0d4bda43cd98e975e49710d73f9286) )
+	ROM_LOAD( "leprechaun_s_gold.xu30", 0x0000, 0x100000, CRC(6a41056f) SHA1(54168a0115dc8d232100fbbd440063dc75fdbaaf) )
+	ROM_LOAD( "leprechaun_s_gold.xu31", 0x0000, 0x100000, CRC(0485e432) SHA1(c57a47fd27a14a2ea01400515f61be58be5fa391) )
+	ROM_LOAD( "leprechaun_s_gold.xu17", 0x0000, 0x100000, CRC(10bfcdcf) SHA1(34dc619f33c81014120d9b6a2f8b2373451af2e4) )
+	ROM_LOAD( "leprechaun_s_gold.xu18", 0x0000, 0x100000, CRC(a3f82467) SHA1(0971f32bff0d4bda43cd98e975e49710d73f9286) )
 ROM_END
 
 
@@ -479,15 +479,15 @@ ROM_END
 
 ROM_START( reelemin )    // Reel 'Em In (English) / U4 01/22/97
 	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD( "reel_'em_in.xu3", 0x0000, 0x100000, CRC(a3840965) SHA1(1e782bb5eaeabce0d1a07eb895d344028364cd4f) )
+	ROM_LOAD( "reel__em_in.xu3", 0x0000, 0x100000, CRC(a3840965) SHA1(1e782bb5eaeabce0d1a07eb895d344028364cd4f) )
 
 	ROM_REGION(0x100000, "rom", 0)
-	ROM_LOAD( "reel_'em_in.xu2", 0x0000, 0x100000, CRC(04658d90) SHA1(1180b2596175394e079c8498bfc5e956426d0e1c) )
+	ROM_LOAD( "reel__em_in.xu2", 0x0000, 0x100000, CRC(04658d90) SHA1(1180b2596175394e079c8498bfc5e956426d0e1c) )
 	// sound
-	ROM_LOAD( "reel_'em_in.xu30", 0x0000, 0x100000, CRC(742590b2) SHA1(65df9d346b1f69f79e6e79c91724813f052c64ee) )
-	ROM_LOAD( "reel_'em_in.xu31", 0x0000, 0x100000, CRC(bf3aabb8) SHA1(251c1bcf28f117152902b37915c41be1e912dda0) )
-	ROM_LOAD( "reel_'em_in.xu17", 0x0000, 0x100000, CRC(f99bf909) SHA1(4dac7aac0cf815d0b67f4c8d55d84f529e45f27d) )
-	ROM_LOAD( "reel_'em_in.xu18", 0x0000, 0x100000, CRC(1e4b64f1) SHA1(f082b2a7b6e029ffded1eec6fbc5f755bdd8d9eb) )
+	ROM_LOAD( "reel__em_in.xu30", 0x0000, 0x100000, CRC(742590b2) SHA1(65df9d346b1f69f79e6e79c91724813f052c64ee) )
+	ROM_LOAD( "reel__em_in.xu31", 0x0000, 0x100000, CRC(bf3aabb8) SHA1(251c1bcf28f117152902b37915c41be1e912dda0) )
+	ROM_LOAD( "reel__em_in.xu17", 0x0000, 0x100000, CRC(f99bf909) SHA1(4dac7aac0cf815d0b67f4c8d55d84f529e45f27d) )
+	ROM_LOAD( "reel__em_in.xu18", 0x0000, 0x100000, CRC(1e4b64f1) SHA1(f082b2a7b6e029ffded1eec6fbc5f755bdd8d9eb) )
 ROM_END
 
 

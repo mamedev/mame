@@ -64,9 +64,9 @@ device_memory_interface::space_config_vector tms32082_pp_device::memory_space_co
 }
 
 
-util::disasm_interface *tms32082_mp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms32082_mp_device::create_disassembler()
 {
-	return new tms32082_mp_disassembler;
+	return std::make_unique<tms32082_mp_disassembler>();
 }
 
 void tms32082_mp_device::set_command_callback(write32_delegate callback)
@@ -500,9 +500,9 @@ tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, const char
 }
 
 
-util::disasm_interface *tms32082_pp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms32082_pp_device::create_disassembler()
 {
-	return new tms32082_pp_disassembler;
+	return std::make_unique<tms32082_pp_disassembler>();
 }
 
 void tms32082_pp_device::device_start()

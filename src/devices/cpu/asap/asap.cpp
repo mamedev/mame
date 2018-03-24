@@ -305,9 +305,9 @@ void asap_device::state_string_export(const device_state_entry &entry, std::stri
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *asap_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> asap_device::create_disassembler()
 {
-	return new asap_disassembler;
+	return std::make_unique<asap_disassembler>();
 }
 
 

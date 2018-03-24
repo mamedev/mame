@@ -976,9 +976,9 @@ bool mips3_device::memory_translate(int spacenum, int intention, offs_t &address
 }
 
 
-util::disasm_interface *mips3_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mips3_device::create_disassembler()
 {
-	return new mips3_disassembler;
+	return std::make_unique<mips3_disassembler>();
 }
 
 

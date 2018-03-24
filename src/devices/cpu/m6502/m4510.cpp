@@ -30,9 +30,9 @@ m4510_device::m4510_device(const machine_config &mconfig, const char *tag, devic
 	sprogram_config.m_page_shift = 13;
 }
 
-util::disasm_interface *m4510_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m4510_device::create_disassembler()
 {
-	return new m4510_disassembler;
+	return std::make_unique<m4510_disassembler>();
 }
 
 void m4510_device::device_start()

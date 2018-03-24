@@ -71,9 +71,9 @@ bool saturn_device::get_nonstandard_mnemonics_mode() const
 }
 
 
-util::disasm_interface *saturn_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> saturn_device::create_disassembler()
 {
-	return new saturn_disassembler(this);
+	return std::make_unique<saturn_disassembler>(this);
 }
 
 

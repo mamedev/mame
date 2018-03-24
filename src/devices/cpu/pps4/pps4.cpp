@@ -139,9 +139,9 @@ void pps4_device::W(u8 data)
 	m_SAG = 0;
 }
 
-util::disasm_interface *pps4_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> pps4_device::create_disassembler()
 {
-	return new pps4_disassembler;
+	return std::make_unique<pps4_disassembler>();
 }
 
 /**

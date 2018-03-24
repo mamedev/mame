@@ -1752,7 +1752,7 @@ void hcd62121_cpu_device::execute_run()
 	} while (m_icount > 0);
 }
 
-util::disasm_interface *hcd62121_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hcd62121_cpu_device::create_disassembler()
 {
-	return new hcd62121_disassembler;
+	return std::make_unique<hcd62121_disassembler>();
 }

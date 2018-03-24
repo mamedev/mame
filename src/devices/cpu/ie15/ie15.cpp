@@ -153,9 +153,9 @@ void ie15_cpu_device::state_string_export(const device_state_entry &entry, std::
 //  create_disassembler
 //-------------------------------------------------
 
-util::disasm_interface *ie15_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> ie15_cpu_device::create_disassembler()
 {
-	return new ie15_disassembler;
+	return std::make_unique<ie15_disassembler>();
 }
 
 //**************************************************************************

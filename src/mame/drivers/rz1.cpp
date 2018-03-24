@@ -6,8 +6,6 @@
 
     Sampling drum machine
 
-    Skeleton driver
-
     Sound ROM info:
 
     Each ROM chip holds 1.49s of sounds and can be opened as raw
@@ -21,6 +19,12 @@
     Note: Holding EDIT/RECORD, DELETE, INSERT/AUTO-COMPENSATE and
     CHAIN/BEAT at startup causes the system to go into a RAM test.
 
+    TODO:
+    - Metronome
+    - MIDI
+    - Cassette
+    - Audio input
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -29,6 +33,8 @@
 #include "video/hd44780.h"
 #include "sound/upd934g.h"
 #include "speaker.h"
+
+#include "rz1.lh"
 
 
 //**************************************************************************
@@ -44,13 +50,14 @@ public:
 		m_hd44780(*this, "hd44780"),
 		m_pg{ {*this, "upd934g_c"}, {*this, "upd934g_b"} },
 		m_samples{ {*this, "samples_a"}, {*this, "samples_b"}},
-		m_keys(*this, "kc%u", 0), m_key_select(0),
+		m_keys(*this, "kc%u", 0), m_port_a(0),
 		m_port_b(0xff)
 	{ }
 
 	void rz1(machine_config &config);
 
 	DECLARE_PALETTE_INIT(rz1);
+	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 protected:
 	virtual void machine_start() override;
@@ -65,6 +72,7 @@ private:
 
 	void map(address_map &map);
 
+	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_WRITE8_MEMBER(port_a_w);
 	DECLARE_WRITE8_MEMBER(port_b_w);
 	DECLARE_READ8_MEMBER(port_c_r);
@@ -77,7 +85,7 @@ private:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(leds_w);
 
-	uint8_t m_key_select;
+	uint8_t m_port_a;
 	uint8_t m_port_b;
 };
 
@@ -181,6 +189,16 @@ INPUT_PORTS_END
 //  MACHINE EMULATION
 //**************************************************************************
 
+HD44780_PIXEL_UPDATE( rz1_state::lcd_pixel_update )
+{
+	// char size is 5x8
+	if (x > 4 || y > 7)
+		return;
+
+	if (line < 1 && pos < 16)
+		bitmap.pix16(1 + y, 1 + line*8*6 + pos*6 + x) = state ? 1 : 2;
+}
+
 READ8_MEMBER( rz1_state::upd934g_c_data_r )
 {
 	if (offset < 0x8000)
@@ -212,29 +230,55 @@ WRITE8_MEMBER( rz1_state::upd934g_b_w )
 	m_pg[1]->write(space, offset >> 8, data);
 }
 
+READ8_MEMBER( rz1_state::port_a_r )
+{
+	if ((BIT(m_port_b, 7) == 0) && (BIT(m_port_b, 6) == 1))
+	{
+		// Not clear why, but code expects to read busy flag from PA5 rather than PA7
+		return bitswap<8>(m_hd44780->read(space, BIT(m_port_b, 5)), 5, 6, 7, 4, 3, 2, 1, 0);
+	}
+
+	logerror("port_a_r (PB = %02x)\n", m_port_b);
+	return 0;
+}
+
 WRITE8_MEMBER( rz1_state::port_a_w )
 {
-	if (0)
-		logerror("port_a_w: %02x\n", data);
+	m_port_a = data;
 
-	m_key_select = data;
-
-	// output lcd data to console until it's hooked up properly
-//  if (m_port_b == 0x37 || m_port_b == 0x33)
-//      printf("%c", data);
-	m_hd44780->data_write(space, 0, data);
+	if ((BIT(m_port_b, 7) == 0) && (BIT(m_port_b, 6) == 0))
+		m_hd44780->write(space, BIT(m_port_b, 5), data);
 }
+
+// 7-------  lcd e
+// -6------  lcd rw
+// --5-----  lcd rs
+// ---4----  percussion generator reset
+// ----3---  metronome trigger
+// -----2--  power-on mute for line-out
+// ------1-  change-over signal tom3/bd
+// -------0  change-over signal tom1/tom2
 
 WRITE8_MEMBER( rz1_state::port_b_w )
 {
-	logerror("port_b_w: %02x\n", data);
+	if (0)
+		logerror("port_b_w: %02x\n", data);
+
 	m_port_b = data;
-	m_hd44780->control_write(space, 0, data & 0xe0);    // top 3 lines go to the 44780
 }
+
+// 7-------  foot-sustain input
+// -6------  cassette data out
+// --5-----  cassette remote control
+// ---4----  change-over signal for sampling ram
+// ----3---  cassette data in
+// -----2--  control signal for percussion generator c
+// ------1-  midi in
+// -------0  midi out
 
 READ8_MEMBER( rz1_state::port_c_r )
 {
-	return 0xff;
+	return 0;
 }
 
 WRITE8_MEMBER( rz1_state::port_c_w )
@@ -246,27 +290,30 @@ READ8_MEMBER( rz1_state::key_r )
 {
 	uint8_t data = 0;
 
-	if (BIT(m_key_select, 0) == 0) data |= m_keys[0]->read();
-	if (BIT(m_key_select, 1) == 0) data |= m_keys[1]->read();
-	if (BIT(m_key_select, 2) == 0) data |= m_keys[2]->read();
-	if (BIT(m_key_select, 3) == 0) data |= m_keys[3]->read();
-	if (BIT(m_key_select, 4) == 0) data |= m_keys[4]->read();
-	if (BIT(m_key_select, 5) == 0) data |= m_keys[5]->read();
-	if (BIT(m_key_select, 6) == 0) data |= m_keys[6]->read();
-	if (BIT(m_key_select, 7) == 0) data |= m_keys[7]->read();
+	if (BIT(m_port_a, 0) == 0) data |= m_keys[0]->read();
+	if (BIT(m_port_a, 1) == 0) data |= m_keys[1]->read();
+	if (BIT(m_port_a, 2) == 0) data |= m_keys[2]->read();
+	if (BIT(m_port_a, 3) == 0) data |= m_keys[3]->read();
+	if (BIT(m_port_a, 4) == 0) data |= m_keys[4]->read();
+	if (BIT(m_port_a, 5) == 0) data |= m_keys[5]->read();
+	if (BIT(m_port_a, 6) == 0) data |= m_keys[6]->read();
+	if (BIT(m_port_a, 7) == 0) data |= m_keys[7]->read();
 
 	return data;
 }
 
 WRITE8_MEMBER( rz1_state::leds_w )
 {
-	logerror("leds_w: %02x\n", data);
+	output().set_value("led_song",      BIT(data, 0) == 0 ? 1 : BIT(data, 1) == 0 ? 2 : 0);
+	output().set_value("led_pattern",   BIT(data, 2) == 0 ? 1 : BIT(data, 3) == 0 ? 2 : 0);
+	output().set_value("led_startstop", BIT(data, 4) == 0 ? 1 : 0);
 }
 
 void rz1_state::machine_start()
 {
 	// register for save states
-	save_item(NAME(m_key_select));
+	save_item(NAME(m_port_a));
+	save_item(NAME(m_port_b));
 }
 
 void rz1_state::machine_reset()
@@ -275,8 +322,9 @@ void rz1_state::machine_reset()
 
 PALETTE_INIT_MEMBER(rz1_state, rz1)
 {
-	palette.set_pen_color(0, rgb_t(138, 146, 148));
-	palette.set_pen_color(1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
+	palette.set_pen_color(1, rgb_t(92, 83, 88));    // lcd pixel on
+	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
 }
 
 //**************************************************************************
@@ -286,26 +334,29 @@ PALETTE_INIT_MEMBER(rz1_state, rz1)
 MACHINE_CONFIG_START( rz1_state::rz1 )
 	MCFG_CPU_ADD("maincpu", UPD7811, 12_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(map)
+	MCFG_UPD7810_PORTA_READ_CB(READ8(rz1_state, port_a_r))
 	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(rz1_state, port_a_w))
 	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(rz1_state, port_b_w))
 	MCFG_UPD7810_PORTC_READ_CB(READ8(rz1_state, port_c_r))
 	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(rz1_state, port_c_w))
 
-	/* video hardware */
+	// video hardware
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(6*16, 9*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-	//MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_SCREEN_SIZE(6*16+1, 10)
+	MCFG_SCREEN_VISIBLE_AREA(0, 6*16, 0, 10-1)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(rz1_state, rz1)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(1, 16)
+	MCFG_HD44780_PIXEL_UPDATE_CB(rz1_state, lcd_pixel_update)
+
+	MCFG_DEFAULT_LAYOUT(layout_rz1)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("upd934g_c", UPD934G, 1333000)
@@ -341,4 +392,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  CLASS      INIT  COMPANY  FULLNAME  FLAGS
-CONS( 1986, rz1,  0,      0,       rz1,     rz1,   rz1_state, 0,   "Casio",  "RZ-1",   MACHINE_IS_SKELETON )
+CONS( 1986, rz1,  0,      0,       rz1,     rz1,   rz1_state, 0,   "Casio",  "RZ-1",   MACHINE_SUPPORTS_SAVE )

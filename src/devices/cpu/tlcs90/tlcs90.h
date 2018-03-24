@@ -124,7 +124,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	enum class e_mode : u8 {
@@ -143,7 +143,7 @@ private:
 	PAIR        m_prvpc,m_pc,m_sp,m_af,m_bc,m_de,m_hl,m_ix,m_iy;
 	PAIR        m_af2,m_bc2,m_de2,m_hl2;
 	uint8_t       m_halt, m_after_EI;
-	uint16_t      m_irq_state, m_irq_mask;
+	uint16_t      m_irq_state, m_irq_line_state, m_irq_mask;
 	address_space *m_program;
 	int     m_icount;
 	int         m_extra_cycles;       // extra cycles for interrupts
@@ -209,6 +209,8 @@ private:
 	inline void Push( uint16_t rr );
 	inline void Pop( uint16_t rr );
 	inline void leave_halt();
+	inline void raise_irq(int irq);
+	inline void clear_irq(int irq);
 	void take_interrupt(tlcs90_e_irq irq);
 	void check_interrupts();
 	inline void Cyc();

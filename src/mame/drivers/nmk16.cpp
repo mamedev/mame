@@ -346,11 +346,11 @@ void nmk16_state::vandykeb_map(address_map &map)
 	map(0x080002, 0x080003).portr("IN1");
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
-//	map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
+//  map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
 	map(0x080010, 0x08001d).w(this, FUNC(nmk16_state::vandykeb_scroll_w)); /* 10, 12, 1a, 1c */
 	map(0x080016, 0x080017).nopw();    /* IRQ enable? */
 	map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
-//	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
+//  map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c007).nopw();    /* just in case... */
 	map(0x090000, 0x093fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
@@ -386,12 +386,12 @@ void nmk16_state::tharrier_map(address_map &map)
 	map(0x08000f, 0x08000f).r("soundlatch2", FUNC(generic_latch_8_device::read));    /* from Z80 */
 	map(0x080010, 0x080011).w(this, FUNC(nmk16_state::tharrier_mcu_control_w));
 	map(0x080012, 0x080013).nopw();
-//	map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
-//	map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+//  map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+//  map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
 	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x080202, 0x080203).portr("IN2");
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-//	map(0x08c000, 0x08c007).w(this, FUNC(nmk16_state::nmk_scroll_w));
+//  map(0x08c000, 0x08c007).w(this, FUNC(nmk16_state::nmk_scroll_w));
 	map(0x090000, 0x093fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
 	map(0x09c000, 0x09c7ff).ram(); /* Unused txvideoram area? */
 	map(0x09d000, 0x09d7ff).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
@@ -502,7 +502,7 @@ void nmk16_state::bioship_map(address_map &map)
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
 	map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
-//	map(0xc0014, 0xc0015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+//  map(0xc0014, 0xc0015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x080016, 0x080017).w(this, FUNC(nmk16_state::nmk16_bioship_x0016_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x084000, 0x084001).w(this, FUNC(nmk16_state::bioship_bank_w));
@@ -6407,15 +6407,15 @@ ROM_END
 
 ROM_START( tdragon3h )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
-	ROM_LOAD16_BYTE( "H.27C2001",      0x00000, 0x40000, CRC(0091f4a3) SHA1(025e5f7ff12eaa90c5cfe757c71d58ba7040cba7) )
-	ROM_LOAD16_BYTE( "L.27C020",       0x00001, 0x40000, CRC(4699c313) SHA1(1851a4b5ad9c2bac230126d195e239a5ebe827f9) )
+	ROM_LOAD16_BYTE( "h.27c2001",      0x00000, 0x40000, CRC(0091f4a3) SHA1(025e5f7ff12eaa90c5cfe757c71d58ba7040cba7) )
+	ROM_LOAD16_BYTE( "l.27c020",       0x00001, 0x40000, CRC(4699c313) SHA1(1851a4b5ad9c2bac230126d195e239a5ebe827f9) )
 
 	// Not from this PCB
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
-	ROM_LOAD( "1.27C1000",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) ) /* banked */
+	ROM_LOAD( "1.27c1000",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) ) /* banked */
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
-	ROM_LOAD( "12.27C1000",    0x000000, 0x020000, CRC(f809d616) SHA1(c6a4d776fee770ec197204b855b85bcc719469a5) )    /* 8x8 tiles */
+	ROM_LOAD( "12.27c1000",    0x000000, 0x020000, CRC(f809d616) SHA1(c6a4d776fee770ec197204b855b85bcc719469a5) )    /* 8x8 tiles */
 
 	// all other roms are MASK parts marked 'CONNY' but weren't dumped from this PCB so content is only assumed to be the same
 

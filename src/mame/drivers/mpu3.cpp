@@ -1109,9 +1109,9 @@ ROM_END
 
 ROM_START( m3fortuna )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "fortune numbers v1-0 p1 (2764)", 0x6000, 0x2000, CRC(e864c266) SHA1(73c9ae327be0c8fd862a2533be1a60c6dd9d44f1) )
-	ROM_LOAD( "fortune numbers v1-0 p2 (2764)", 0x4000, 0x2000, CRC(34f5ea73) SHA1(2009e87ce80da637c83ed4ca66661e1b95e47b50) )
-	ROM_LOAD( "fortune numbers v1-0 p3 (2764)", 0x2000, 0x2000, CRC(4779cc92) SHA1(d191263fb11f2521cbbc0012f88294914ed9d17b) )
+	ROM_LOAD( "fortune numbers v1-0 p1,2764", 0x6000, 0x2000, CRC(e864c266) SHA1(73c9ae327be0c8fd862a2533be1a60c6dd9d44f1) )
+	ROM_LOAD( "fortune numbers v1-0 p2,2764", 0x4000, 0x2000, CRC(34f5ea73) SHA1(2009e87ce80da637c83ed4ca66661e1b95e47b50) )
+	ROM_LOAD( "fortune numbers v1-0 p3,2764", 0x2000, 0x2000, CRC(4779cc92) SHA1(d191263fb11f2521cbbc0012f88294914ed9d17b) )
 	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )
 ROM_END
 

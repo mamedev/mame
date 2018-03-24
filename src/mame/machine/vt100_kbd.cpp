@@ -13,6 +13,8 @@
 #include "emu.h"
 #include "machine/vt100_kbd.h"
 
+#include "logmacro.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -275,10 +277,7 @@ WRITE_LINE_MEMBER(vt100_keyboard_device::signal_line_w)
 			m_speaker->set_state(BIT(data, 7));
 
 			if (BIT(data, 6))
-			{
-				m_last_scan = 0;
 				m_scan_counter->reset_w(0);
-			}
 		}
 	}
 
@@ -310,10 +309,18 @@ WRITE8_MEMBER(vt100_keyboard_device::key_scan_w)
 	{
 		u8 input_row = m_key_row[(data >> 1) & 15]->read();
 		if (!BIT(input_row, (data >> 5) & 7))
+		{
+			if (data != 0xff)
+				LOG("Keycode pressed: %02X\n", (data >> 1) & 0x7f);
 			m_uart->set_transmit_data((data >> 1) & 0x7f);
+		}
 	}
-	else if (!BIT(data, 7) && BIT(m_last_scan, 7))
-		m_scan_counter->reset_w(1);
 
-	m_last_scan = data;
+	if (!BIT(data, 7) && BIT(m_last_scan, 7))
+	{
+		m_last_scan = 0;
+		m_scan_counter->reset_w(1);
+	}
+	else
+		m_last_scan = data;
 }

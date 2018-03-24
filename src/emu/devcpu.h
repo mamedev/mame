@@ -17,6 +17,8 @@
 #ifndef MAME_EMU_DEVCPU_H
 #define MAME_EMU_DEVCPU_H
 
+#include "didisasm.h"
+
 //**************************************************************************
 //  CPU DEVICE CONFIGURATION MACROS
 //**************************************************************************

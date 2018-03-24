@@ -1560,7 +1560,7 @@ void arm_cpu_device::HandleCoPro( uint32_t insn )
 }
 
 
-util::disasm_interface *arm_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> arm_cpu_device::create_disassembler()
 {
-	return new arm_disassembler;
+	return std::make_unique<arm_disassembler>();
 }

@@ -1166,11 +1166,11 @@ ROM_END
 
 ROM_START( ninjakd2c )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "1.3U",         0x00000, 0x8000, CRC(06096412) SHA1(4a84a9326248ff899a04f32950b4c4a5ff58cf75) )
-	ROM_LOAD( "2.3T",         0x10000, 0x8000, CRC(9ed9a994) SHA1(ec95e09066ad51cf4514e269384b7609d6c345d9) )   // banked at 8000-bfff
+	ROM_LOAD( "1.3u",         0x00000, 0x8000, CRC(06096412) SHA1(4a84a9326248ff899a04f32950b4c4a5ff58cf75) ) // sldh w/rdaction
+	ROM_LOAD( "2.3t",         0x10000, 0x8000, CRC(9ed9a994) SHA1(ec95e09066ad51cf4514e269384b7609d6c345d9) )   // banked at 8000-bfff
 	ROM_LOAD( "nk2_03.rom",   0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )
 	ROM_LOAD( "nk2_04.rom",   0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )
-	ROM_LOAD( "5.3M",         0x28000, 0x8000, CRC(800d4951) SHA1(878516bd03a61ac970cd9e8c35116f8ec3020e79) )
+	ROM_LOAD( "5.3m",         0x28000, 0x8000, CRC(800d4951) SHA1(878516bd03a61ac970cd9e8c35116f8ec3020e79) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nk2_06.rom",   0x00000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) )  // encrypted
@@ -1195,7 +1195,7 @@ ROM_END
 
 ROM_START( rdaction )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "1.3u",         0x00000, 0x8000, CRC(5c475611) SHA1(2da88a95b5d68b259c8ae48af1438a82a1d601c1) )
+	ROM_LOAD( "1.3u",         0x00000, 0x8000, CRC(5c475611) SHA1(2da88a95b5d68b259c8ae48af1438a82a1d601c1) ) // sldh w/ninjajd2c
 	ROM_LOAD( "2.3s",         0x10000, 0x8000, CRC(a1e23bd2) SHA1(c3b6574dc9fa66b4f41c37754a0d20a865f8bc28) )   // banked at 8000-bfff
 	ROM_LOAD( "nk2_03.rom",   0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )   // 3.3r
 	ROM_LOAD( "nk2_04.rom",   0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )   // 4.3p

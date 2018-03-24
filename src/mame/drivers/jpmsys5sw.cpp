@@ -1118,8 +1118,8 @@ ROM_END
 
 ROM_START( j5popeyef )  // this is very similar to the popeye(sys5)-p1.bin / popeye(sys5)-p2.bin combo, but with some extra (unused?) code?
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "popeye(sys5)-p1.bin", 0x00000, 0x10000, CRC(9396cf7b) SHA1(d4309869edd811e6cc108f90566a9313ef101636) ) // 0x81 = FF
-	ROM_LOAD16_BYTE( "popeye(sys5)-p2.bin", 0x00001, 0x10000, CRC(d9dc2cb6) SHA1(d2bf7a924a08c41a2cfc5caa32a4df0773f3a64a) )
+	ROM_LOAD16_BYTE( "popeye=sys5=-p1.bin", 0x00000, 0x10000, CRC(9396cf7b) SHA1(d4309869edd811e6cc108f90566a9313ef101636) ) // 0x81 = FF
+	ROM_LOAD16_BYTE( "popeye=sys5=-p2.bin", 0x00001, 0x10000, CRC(d9dc2cb6) SHA1(d2bf7a924a08c41a2cfc5caa32a4df0773f3a64a) )
 	J5POPEYE_SOUND
 ROM_END
 

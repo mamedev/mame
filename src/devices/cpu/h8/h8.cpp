@@ -1343,9 +1343,9 @@ void h8_device::set_nz32(uint32_t v)
 		CCR |= F_N;
 }
 
-util::disasm_interface *h8_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> h8_device::create_disassembler()
 {
-	return new h8_disassembler;
+	return std::make_unique<h8_disassembler>();
 }
 
 #include "cpu/h8/h8.hxx"

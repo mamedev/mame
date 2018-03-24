@@ -47,9 +47,9 @@ device_memory_interface::space_config_vector mb86233_cpu_device::memory_space_co
 }
 
 
-util::disasm_interface *mb86233_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mb86233_cpu_device::create_disassembler()
 {
-	return new mb86233_disassembler;
+	return std::make_unique<mb86233_disassembler>();
 }
 
 

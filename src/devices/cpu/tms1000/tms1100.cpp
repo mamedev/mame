@@ -59,9 +59,9 @@ tms1370_cpu_device::tms1370_cpu_device(const machine_config &mconfig, const char
 
 
 // disasm
-util::disasm_interface *tms1100_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms1100_cpu_device::create_disassembler()
 {
-	return new tms1100_disassembler;
+	return std::make_unique<tms1100_disassembler>();
 }
 
 // device_reset

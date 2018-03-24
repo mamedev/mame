@@ -36,7 +36,7 @@ ROM_START( comx_prn )
 	ROM_SYSTEM_BIOS( 0, "comx", "COMX" )
 	ROMX_LOAD( "printer.bin",           0x0000, 0x0800, CRC(3bbc2b2e) SHA1(08bf7ea4174713ab24969c553affd5c1401876b8), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "fm12", "F&M v1.2" )
-	ROMX_LOAD( "f&m.printer.1.2.bin",   0x0000, 0x1000, CRC(2feb997d) SHA1(ee9cb91042696c88ff5f2f44d2f702dc93369ba0), ROM_BIOS(2) )
+	ROMX_LOAD( "f+m.printer.1.2.bin",   0x0000, 0x1000, CRC(2feb997d) SHA1(ee9cb91042696c88ff5f2f44d2f702dc93369ba0), ROM_BIOS(2) )
 	ROM_LOAD( "rs232.bin",              0x1000, 0x0800, CRC(926ff2d1) SHA1(be02bd388bba0211ea72d4868264a63308e4318d) )
 ROM_END
 

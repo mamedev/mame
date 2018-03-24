@@ -359,39 +359,39 @@ MACHINE_CONFIG_END
 
 /* ROM definitions */
 ROM_START (hk68v10)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 
-ROM_LOAD16_BYTE ("hk68kv10U23.bin", 0xFC0001, 0x2000, CRC (632aa026) SHA1 (f2b1ed0cc38dfbeb1602c013e00757015400720d))
-ROM_LOAD16_BYTE ("hk68kv10U12.bin", 0xFC0000, 0x2000, CRC (f2d688e9) SHA1 (e68699965645f0ce53de47625163c3eb02c8b727))
-/*
- * System ROM information
- *
- * The ROMs contains HBUG v1.8, known commands from different sources:
- *
- *  'uc'       Print HK68 Configuration
- *  'um'       Perform RAM test
- *  'dm adrs'  Display Memory
- *  'sb adrs'  Substitute Byte at adrs
- *  'c adrs'   Call Routine at adrs
- *  'bw'       Boot from Winchester
- *  'bf'       Boot from floppy (MIO, SBX-FDIO)
- *  'bsf'      Boot from floppy (SCSI)
- *
- * Setup sequence channel B
- * :scc B Reg 04 <- 4c x16 clock, 2 stop bits, no parity
- * :scc B Reg 05 <- ea Setting up the transmitter, Transmitter Enable 1, Transmitter Bits/Character 8, Send Break 0, RTS=1, DTR=1
- * :scc B Reg 03 <- e1 Setting up the receiver, Receiver Enable 1, Auto Enables 1, Receiver Bits/Character 8
- * :scc B Reg 09 <- 00 Master Interrupt Control - No reset  02 A&B: RTS=1 DTR=1 INT=0 Vector generated
- * :scc B Reg 01 <- 00 Ext INT:0 Tx INT:0 Parity SC:0 Wait/Ready Enable:0 as Wait on Transmit, Rx INT:0
- * :scc B Reg 0b <- 56 Clock Mode Control 55 Clock type TTL level on RTxC pin, RCV CLK=BRG, TRA CLK=BRG, TRxC pin is Output, TRxC CLK=BRG - not_implemented
- * :scc B Reg 0c <- 0b Low byte of Time Constant for Baudrate generator -> 38400 baud
- * :scc B Reg 0d <- 00 High byte of Time Constant for Baudrate generator
- * :scc B Reg 0e <- 03 Misc Control Bits DPLL NULL Command, BRG enabled SRC=PCLK, BRG SRC bps=307200=PCLK 4915200/16, BRG OUT 9600=307200/16(32)
- *  Repeated for :scc A
- * :scc B Reg 0c <- 0e Low byte of Time Constant for Baudrate generator -> 9600 baud
- * :scc B Reg 0d <- 00 High byte of Time Constant for Baudrate generator
- *  Repeated for :scc A
- */
+	ROM_LOAD16_BYTE ("hk68kv10.u23.bin", 0xFC0001, 0x2000, CRC (632aa026) SHA1 (f2b1ed0cc38dfbeb1602c013e00757015400720d))
+	ROM_LOAD16_BYTE ("hk68kv10.u12.bin", 0xFC0000, 0x2000, CRC (f2d688e9) SHA1 (e68699965645f0ce53de47625163c3eb02c8b727))
+	/*
+	 * System ROM information
+	 *
+	 * The ROMs contains HBUG v1.8, known commands from different sources:
+	 *
+	 *  'uc'       Print HK68 Configuration
+	 *  'um'       Perform RAM test
+	 *  'dm adrs'  Display Memory
+	 *  'sb adrs'  Substitute Byte at adrs
+	 *  'c adrs'   Call Routine at adrs
+	 *  'bw'       Boot from Winchester
+	 *  'bf'       Boot from floppy (MIO, SBX-FDIO)
+	 *  'bsf'      Boot from floppy (SCSI)
+	 *
+	 * Setup sequence channel B
+	 * :scc B Reg 04 <- 4c x16 clock, 2 stop bits, no parity
+	 * :scc B Reg 05 <- ea Setting up the transmitter, Transmitter Enable 1, Transmitter Bits/Character 8, Send Break 0, RTS=1, DTR=1
+	 * :scc B Reg 03 <- e1 Setting up the receiver, Receiver Enable 1, Auto Enables 1, Receiver Bits/Character 8
+	 * :scc B Reg 09 <- 00 Master Interrupt Control - No reset  02 A&B: RTS=1 DTR=1 INT=0 Vector generated
+	 * :scc B Reg 01 <- 00 Ext INT:0 Tx INT:0 Parity SC:0 Wait/Ready Enable:0 as Wait on Transmit, Rx INT:0
+	 * :scc B Reg 0b <- 56 Clock Mode Control 55 Clock type TTL level on RTxC pin, RCV CLK=BRG, TRA CLK=BRG, TRxC pin is Output, TRxC CLK=BRG - not_implemented
+	 * :scc B Reg 0c <- 0b Low byte of Time Constant for Baudrate generator -> 38400 baud
+	 * :scc B Reg 0d <- 00 High byte of Time Constant for Baudrate generator
+	 * :scc B Reg 0e <- 03 Misc Control Bits DPLL NULL Command, BRG enabled SRC=PCLK, BRG SRC bps=307200=PCLK 4915200/16, BRG OUT 9600=307200/16(32)
+	 *  Repeated for :scc A
+	 * :scc B Reg 0c <- 0e Low byte of Time Constant for Baudrate generator -> 9600 baud
+	 * :scc B Reg 0d <- 00 High byte of Time Constant for Baudrate generator
+	 *  Repeated for :scc A
+	 */
 ROM_END
 
 /* Driver */

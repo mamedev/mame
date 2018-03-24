@@ -544,7 +544,7 @@ MACHINE_CONFIG_START(intv_state::intvkbd)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intvkbd_mem)
 
-	MCFG_CPU_ADD("keyboard", M6502, XTAL(3'579'545)/2) /* Colorburst/2 */
+	MCFG_CPU_ADD("keyboard", M6502, XTAL(7'159'090)/8)
 	MCFG_CPU_PROGRAM_MAP(intvkbd2_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt2)
 

@@ -54,7 +54,7 @@ void bbc_tube_z80_device::tube_z80_io(address_map &map)
 
 ROM_START( tube_z80 )
 	ROM_REGION(0x1000, "rom", 0)
-	ROM_LOAD("Z80_120.rom", 0x0000, 0x1000, CRC(315bfc20) SHA1(069077df498599a9c880d4ec9f4bc53fcc602d82))
+	ROM_LOAD("z80_120.rom", 0x0000, 0x1000, CRC(315bfc20) SHA1(069077df498599a9c880d4ec9f4bc53fcc602d82))
 ROM_END
 
 //-------------------------------------------------

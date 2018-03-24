@@ -12,15 +12,15 @@
 
     Golden Tee Golf Home Edition (developed by FarSight Studios)
 
-	Also on this hardware
+    Also on this hardware
 
-	name						PCB ID		ROM width	TSOP pads	ROM size		SEEPROM			die markings
+    name                        PCB ID      ROM width   TSOP pads   ROM size        SEEPROM         die markings
 
-	Real Swing Golf				74037		x16			48			not dumped		no              ELAN EU3A14
-	Play TV Basketball			75029		x16			48			not dumped		no              ELAN EU3A14
-	Baseball 3	     	 	    ?	     	x16			48			not dumped		no              ELAN EU3A14
-	
-	Huntin’3                    ?           x16         48          not dumped      no              Elan ?
+    Real Swing Golf             74037       x16         48          not dumped      no              ELAN EU3A14
+    Play TV Basketball          75029       x16         48          not dumped      no              ELAN EU3A14
+    Baseball 3                  ?           x16         48          not dumped      no              ELAN EU3A14
+
+    Huntinâ€™3                    ?           x16         48          not dumped      no              Elan ?
 
     In many ways this is similar to the rad_eu3a05.cpp hardware
     but the video system has changed, here the sprites are more traditional non-tile based, rather

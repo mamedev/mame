@@ -186,6 +186,11 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	/* nothing in the address map - everything is added dynamically */
 }
 
+void apple2gs_state::vectors_map(address_map &map)
+{
+	map(0x00, 0x1f).r(this, FUNC(apple2gs_state::apple2gs_read_vector));
+}
+
 // ADB microcontroller emulation
 //
 // Huge thanks to Neil Parker's writeup on the ADB microcontroller!
@@ -311,6 +316,7 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", G65816, APPLE2GS_14M/5)
 	MCFG_CPU_PROGRAM_MAP(apple2gs_map)
+	MCFG_DEVICE_ADDRESS_MAP(g65816_device::AS_VECTORS, vectors_map)
 	#if RUN_ADB_MICRO
 	MCFG_CPU_ADD(ADBMICRO_TAG, M50741, XTAL(3'579'545))
 	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(apple2gs_state, adbmicro_p0_in))

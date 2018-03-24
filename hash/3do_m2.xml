@@ -23,7 +23,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	</software>
 
 <!-- Aftermarket release -->
-	
+
 	<software name="shootr2d" supported="no">
 		<description>Shooter 2D</description>
 		<year>2008</year>

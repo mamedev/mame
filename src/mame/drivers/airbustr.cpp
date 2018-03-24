@@ -269,15 +269,16 @@ WRITE8_MEMBER(airbustr_state::master_nmi_trigger_w)
 
 WRITE8_MEMBER(airbustr_state::master_bankswitch_w)
 {
-	membank("masterbank")->set_entry(data & 0x07);
+	m_masterbank->set_entry(data & 0x07);
 }
 
 WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 {
-	membank("slavebank")->set_entry(data & 0x07);
+	m_slavebank->set_entry(data & 0x07);
 
-	m_bg_tilemap->set_flip(BIT(data, 4) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	m_fg_tilemap->set_flip(BIT(data, 4) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	for (int layer = 0; layer < 2; layer++)
+		m_tilemap[layer]->set_flip(BIT(data, 4) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+
 	m_pandora->flip_screen_set(BIT(data, 4));
 
 	// used at the end of levels, after defeating the boss, to leave trails
@@ -286,15 +287,29 @@ WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 
 WRITE8_MEMBER(airbustr_state::sound_bankswitch_w)
 {
-	membank("audiobank")->set_entry(data & 0x07);
+	m_audiobank->set_entry(data & 0x07);
 }
 
 READ8_MEMBER(airbustr_state::soundcommand_status_r)
 {
 	// bits: 2 <-> ?    1 <-> soundlatch full   0 <-> soundlatch2 empty
-	return 4 | (m_soundlatch->pending_r() << 1) | !m_soundlatch2->pending_r();
+	return 4 | (m_soundlatch[0]->pending_r() << 1) | !m_soundlatch[1]->pending_r();
 }
 
+
+template<int Layer>
+WRITE8_MEMBER(airbustr_state::videoram_w)
+{
+	m_videoram[Layer][offset] = data;
+	m_tilemap[Layer]->mark_tile_dirty(offset);
+}
+
+template<int Layer>
+WRITE8_MEMBER(airbustr_state::colorram_w)
+{
+	m_colorram[Layer][offset] = data;
+	m_tilemap[Layer]->mark_tile_dirty(offset);
+}
 
 WRITE8_MEMBER(airbustr_state::coin_counter_w)
 {
@@ -327,10 +342,10 @@ void airbustr_state::slave_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("slavebank");
-	map(0xc000, 0xc3ff).ram().w(this, FUNC(airbustr_state::videoram2_w)).share("videoram2");
-	map(0xc400, 0xc7ff).ram().w(this, FUNC(airbustr_state::colorram2_w)).share("colorram2");
-	map(0xc800, 0xcbff).ram().w(this, FUNC(airbustr_state::videoram_w)).share("videoram");
-	map(0xcc00, 0xcfff).ram().w(this, FUNC(airbustr_state::colorram_w)).share("colorram");
+	map(0xc000, 0xc3ff).ram().w(this, FUNC(airbustr_state::videoram_w<1>)).share("videoram2");
+	map(0xc400, 0xc7ff).ram().w(this, FUNC(airbustr_state::colorram_w<1>)).share("colorram2");
+	map(0xc800, 0xcbff).ram().w(this, FUNC(airbustr_state::videoram_w<0>)).share("videoram1");
+	map(0xcc00, 0xcfff).ram().w(this, FUNC(airbustr_state::colorram_w<0>)).share("colorram1");
 	map(0xd000, 0xd5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xd600, 0xdfff).ram();
 	map(0xe000, 0xefff).ram();
@@ -341,7 +356,7 @@ void airbustr_state::slave_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(this, FUNC(airbustr_state::slave_bankswitch_w));
-	map(0x02, 0x02).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0x04, 0x0c).w(this, FUNC(airbustr_state::scrollregs_w));
 	map(0x0e, 0x0e).r(this, FUNC(airbustr_state::soundcommand_status_r));
 	map(0x20, 0x20).portr("P1");
@@ -364,7 +379,7 @@ void airbustr_state::sound_io_map(address_map &map)
 	map(0x00, 0x00).w(this, FUNC(airbustr_state::sound_bankswitch_w));
 	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x04, 0x04).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+	map(0x06, 0x06).r(m_soundlatch[0], FUNC(generic_latch_8_device::read)).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
 }
 
 /* Input Ports */
@@ -527,23 +542,21 @@ INTERRUPT_GEN_MEMBER(airbustr_state::slave_interrupt)
 
 void airbustr_state::machine_start()
 {
-	membank("masterbank")->configure_entries(0, 8, memregion("master")->base(), 0x4000);
-	membank("slavebank")->configure_entries(0, 8, memregion("slave")->base(), 0x4000);
-	membank("audiobank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
+	m_masterbank->configure_entries(0, 8, memregion("master")->base(), 0x4000);
+	m_slavebank->configure_entries(0, 8, memregion("slave")->base(), 0x4000);
+	m_audiobank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
-	save_item(NAME(m_bg_scrollx));
-	save_item(NAME(m_bg_scrolly));
-	save_item(NAME(m_fg_scrollx));
-	save_item(NAME(m_fg_scrolly));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
 	save_item(NAME(m_highbits));
 }
 
 void airbustr_state::machine_reset()
 {
-	m_bg_scrollx = 0;
-	m_bg_scrolly = 0;
-	m_fg_scrollx = 0;
-	m_fg_scrolly = 0;
+	m_scrollx[0] = 0;
+	m_scrolly[0] = 0;
+	m_scrollx[1] = 0;
+	m_scrolly[1] = 0;
 	m_highbits = 0;
 }
 
@@ -594,7 +607,7 @@ MACHINE_CONFIG_START(airbustr_state::airbustr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
