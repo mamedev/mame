@@ -78,7 +78,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	direct_read_data<-3> *m_direct;
 
@@ -109,13 +109,13 @@ private:
 		int num;
 		uint32_t data[16];
 	};
-	
+
 	struct fifo_state
 	{
 		uint32_t pc;
 		bool has_stalled;
 	};
-	
+
 	struct mb86235_internal_state
 	{
 		uint32_t pc;
@@ -141,7 +141,7 @@ private:
 		// TODO: remove this, use ST instead
 		mb86235_flags flags;
 		uint32_t st;
-		
+
 		int icount;
 
 		uint32_t arg0;
@@ -150,8 +150,8 @@ private:
 		uint32_t arg3;
 		uint64_t arg64;
 
-		uint32_t pcp;  		/**< PC stack pointer */
-		uint32_t pcs[4];	/**< PC stack contents */
+		uint32_t pcp;       /**< PC stack pointer */
+		uint32_t pcs[4];    /**< PC stack contents */
 
 		uint32_t jmpdest;
 		uint32_t alutemp;
@@ -163,7 +163,7 @@ private:
 
 		float fp0;
 		bool delay_slot;
-		
+
 		fifo fifoin;
 		fifo fifoout0;
 		fifo fifoout1;
@@ -200,6 +200,8 @@ private:
 	/* internal compiler state */
 	struct compiler_state
 	{
+		compiler_state &operator=(compiler_state const &) = delete;
+
 		uint32_t cycles;                             /* accumulated cycles */
 		uint8_t  checkints;                          /* need to check interrupts before next instruction */
 		uml::code_label  labelnum;                 /* index for local labels */
@@ -207,41 +209,41 @@ private:
 
 	void run_drc();
 	void flush_cache();
-	void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
+	void alloc_handle(uml::code_handle *&handleptr, const char *name);
 	void compile_block(offs_t pc);
-	void load_fast_iregs(drcuml_block *block);
-	void save_fast_iregs(drcuml_block *block);
+	void load_fast_iregs(drcuml_block &block);
+	void save_fast_iregs(drcuml_block &block);
 	void static_generate_entry_point();
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
 	void static_generate_fifo();
 	void static_generate_memory_accessors();
-	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
-	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_alu(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int aluop, bool alu_temp);
-	void generate_mul(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int mulop, bool mul_temp);
-	void generate_pre_control(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_control(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_xfer1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_double_xfer1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_xfer2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_double_xfer2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_xfer3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_ea(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int md, int arx, int ary, int disp);
-	void generate_reg_read(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int reg, uml::parameter dst);
-	void generate_reg_write(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int reg, uml::parameter src);
-	void generate_alumul_input(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int reg, uml::parameter dst, bool fp, bool mul);
+	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception);
+	bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_alu(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int aluop, bool alu_temp);
+	void generate_mul(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int mulop, bool mul_temp);
+	void generate_pre_control(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_control(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_xfer1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_double_xfer1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_xfer2(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_double_xfer2(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_xfer3(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_branch(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_ea(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int md, int arx, int ary, int disp);
+	void generate_reg_read(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int reg, uml::parameter dst);
+	void generate_reg_write(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int reg, uml::parameter src);
+	void generate_alumul_input(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int reg, uml::parameter dst, bool fp, bool mul);
 	uml::parameter get_alu1_input(int reg);
 	uml::parameter get_alu_output(int reg);
 	uml::parameter get_mul1_input(int reg);
-	void generate_condition(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int cc, bool n, uml::code_label skip_label, bool condtemp);
-	void generate_branch_target(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int type, int ef2);
+	void generate_condition(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int cc, bool n, uml::code_label skip_label, bool condtemp);
+	void generate_branch_target(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int type, int ef2);
 	bool has_register_clash(const opcode_desc *desc, int outreg);
 	bool aluop_has_result(int aluop);
 	bool check_previous_op_stall();
-	
+
 //  interpreter
 	void execute_op(uint32_t h, uint32_t l);
 	void do_alu1(uint32_t h, uint32_t l);
@@ -259,7 +261,7 @@ private:
 	inline uint32_t get_mulreg(uint8_t which, bool isfloatop);
 	inline void set_alureg(uint8_t which, uint32_t value);
 	inline void decode_aluop(uint8_t opcode, uint32_t src1, uint32_t src2, uint8_t imm, uint8_t dst_which);
-	inline void	decode_mulop(bool isfmul, uint32_t src1, uint32_t src2, uint8_t dst_which);
+	inline void decode_mulop(bool isfmul, uint32_t src1, uint32_t src2, uint8_t dst_which);
 	inline bool decode_branch_jump(uint8_t which);
 	inline uint32_t do_control_dst(uint32_t l);
 	inline void push_pc(uint32_t pcval);

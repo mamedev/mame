@@ -77,9 +77,9 @@ uint8_t m6502_vtscr::mi_decrypt::descramble(uint8_t op)
 	return op ^ 0xA1;
 }
 
-util::disasm_interface *m6502_vtscr::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6502_vtscr::create_disassembler()
 {
-	return new disassembler(downcast<mi_decrypt *>(mintf.get()));
+	return std::make_unique<disassembler>(downcast<mi_decrypt *>(mintf.get()));
 }
 
 m6502_vtscr::disassembler::disassembler(mi_decrypt *mi) : mintf(mi)

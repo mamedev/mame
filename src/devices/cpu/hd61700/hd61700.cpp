@@ -301,9 +301,9 @@ void hd61700_cpu_device::state_string_export(const device_state_entry &entry, st
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *hd61700_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hd61700_cpu_device::create_disassembler()
 {
-	return new hd61700_disassembler;
+	return std::make_unique<hd61700_disassembler>();
 }
 
 //-------------------------------------------------

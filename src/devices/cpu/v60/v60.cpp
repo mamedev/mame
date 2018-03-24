@@ -116,9 +116,9 @@ device_memory_interface::space_config_vector v60_device::memory_space_config() c
 }
 
 
-util::disasm_interface *v60_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> v60_device::create_disassembler()
 {
-	return new v60_disassembler;
+	return std::make_unique<v60_disassembler>();
 }
 
 

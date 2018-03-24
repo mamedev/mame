@@ -330,10 +330,10 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 WRITE8_MEMBER(taitox_state::superman_counters_w)
 {
-    machine().bookkeeping().coin_lockout_w(1, data & 0x08);
-    machine().bookkeeping().coin_lockout_w(0, data & 0x04);
-    machine().bookkeeping().coin_counter_w(1, data & 0x02);
-    machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, data & 0x08);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 READ16_MEMBER(taitox_state::superman_dsw_input_r)
@@ -827,7 +827,7 @@ MACHINE_CONFIG_START(taitox_state::superman)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(superman_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitox_state,  interrupt)
-	
+
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 

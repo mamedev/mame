@@ -208,9 +208,9 @@ z8681_device::z8681_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-util::disasm_interface *z8_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> z8_device::create_disassembler()
 {
-	return new z8_disassembler;
+	return std::make_unique<z8_disassembler>();
 }
 
 

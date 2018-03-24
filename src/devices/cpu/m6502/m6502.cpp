@@ -502,9 +502,9 @@ void m6502_device::set_nz(uint8_t v)
 		P |= F_Z;
 }
 
-util::disasm_interface *m6502_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6502_device::create_disassembler()
 {
-	return new m6502_disassembler;
+	return std::make_unique<m6502_disassembler>();
 }
 
 uint8_t m6502_device::memory_interface::read_9(uint16_t adr)

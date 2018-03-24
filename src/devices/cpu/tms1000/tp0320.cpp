@@ -52,9 +52,9 @@ MACHINE_CONFIG_END
 
 
 // disasm
-util::disasm_interface *tp0320_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tp0320_cpu_device::create_disassembler()
 {
-	return new tp0320_disassembler;
+	return std::make_unique<tp0320_disassembler>();
 }
 
 

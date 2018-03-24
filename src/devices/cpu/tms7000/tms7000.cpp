@@ -274,9 +274,9 @@ void tms7000_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-util::disasm_interface *tms7000_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms7000_device::create_disassembler()
 {
-	return new tms7000_disassembler;
+	return std::make_unique<tms7000_disassembler>();
 }
 
 

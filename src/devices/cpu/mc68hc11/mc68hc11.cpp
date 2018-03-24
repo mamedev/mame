@@ -62,9 +62,9 @@ device_memory_interface::space_config_vector mc68hc11_cpu_device::memory_space_c
 	};
 }
 
-util::disasm_interface *mc68hc11_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mc68hc11_cpu_device::create_disassembler()
 {
-	return new hc11_disassembler;
+	return std::make_unique<hc11_disassembler>();
 }
 
 

@@ -949,9 +949,9 @@ bool m37710_cpu_device::get_x_flag() const
 	return FLAG_X;
 }
 
-util::disasm_interface *m37710_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m37710_cpu_device::create_disassembler()
 {
-	return new m7700_disassembler(this);
+	return std::make_unique<m7700_disassembler>(this);
 }
 
 void m37710_cpu_device::m37710_restore_state()

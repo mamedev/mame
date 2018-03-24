@@ -696,7 +696,7 @@ void ccpu_cpu_device::execute_run()
 }
 
 
-util::disasm_interface *ccpu_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> ccpu_cpu_device::create_disassembler()
 {
-	return new ccpu_disassembler;
+	return std::make_unique<ccpu_disassembler>();
 }

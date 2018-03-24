@@ -184,14 +184,14 @@ template<int Mask>
 WRITE8_MEMBER(kaneko16_state::oki_bank0_w)
 {
 	m_okibank[0]->set_entry(data & Mask);
-//	logerror("%s:Selecting OKI1 bank %02X\n",machine().describe_context(),data&0xff);
+//  logerror("%s:Selecting OKI1 bank %02X\n",machine().describe_context(),data&0xff);
 }
 
 template<int Mask>
 WRITE8_MEMBER(kaneko16_state::oki_bank1_w)
 {
 	m_okibank[1]->set_entry(data & Mask);
-//	logerror("%s:Selecting OKI2 bank %02X\n",machine().describe_context(),data&0xff);
+//  logerror("%s:Selecting OKI2 bank %02X\n",machine().describe_context(),data&0xff);
 }
 
 /***************************************************************************

@@ -201,15 +201,19 @@ void naomi_state::create_pic_from_retdat()
 	}
 }
 
+void naomi_state::set_drc_options()
+{
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x001fffff, true, m_rombase);
+	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0dffffff, false, dc_ram);
+}
+
 DRIVER_INIT_MEMBER(naomi_state, naomi)
 {
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this); // rev e bios
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r), this)); // rev h bios
 
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	m_maincpu->sh2drc_add_fastram(0x00000000, 0x001fffff, true, m_rombase);
-	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0dffffff, false, dc_ram);
-
+	set_drc_options();
 	create_pic_from_retdat();
 }
 
@@ -217,6 +221,7 @@ DRIVER_INIT_MEMBER(naomi2_state,naomi2)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi2_biose_idle_skip_r),this)); // rev e bios
 
+	set_drc_options();
 	create_pic_from_retdat();
 }
 
@@ -248,6 +253,7 @@ DRIVER_INIT_MEMBER(naomi_state,naomi_mp)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
 	m_mp_mux = 0;
 
+	set_drc_options();
 	create_pic_from_retdat();
 }
 
@@ -256,6 +262,7 @@ DRIVER_INIT_MEMBER(naomi_state,naomigd)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this)); // rev e bios
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
 
+	set_drc_options();
 	create_pic_from_retdat();
 }
 
@@ -265,6 +272,7 @@ DRIVER_INIT_MEMBER(naomi_state,naomigd_mp)
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
 	m_mp_mux = 0;
 
+	set_drc_options();
 	create_pic_from_retdat();
 }
 
@@ -344,6 +352,7 @@ READ64_MEMBER(naomi_state::hotd2_idle_skip_r )
 DRIVER_INIT_MEMBER(naomi_state,hotd2)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xca25fb8, 0xca25fbf, read64_delegate(FUNC(naomi_state::hotd2_idle_skip_r),this));
+	set_drc_options();
 }
 
 // f355 PC=0xc065f7c RAM=0xc26dafc

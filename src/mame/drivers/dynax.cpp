@@ -5820,10 +5820,10 @@ ROM_START( warahana )
 	ROM_LOAD( "613-02.4d", 0x30000, 0x20000, CRC(d267a707) SHA1(c38cb06dc09f9062ad4cdd659333410bd2decd01) )
 	ROM_LOAD( "613-03.5d", 0x50000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
 
-//	ROM_REGION( 0x00000, "gfx1", 0 )    // blitter data
+//  ROM_REGION( 0x00000, "gfx1", 0 )    // blitter data
 //  unused
 
-//	ROM_REGION( 0x00000, "gfx2", 0 )    // blitter data
+//  ROM_REGION( 0x00000, "gfx2", 0 )    // blitter data
 //  unused
 
 	ROM_REGION( 0xc0000, "gfx3", 0 )    // blitter data

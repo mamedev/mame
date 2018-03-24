@@ -257,7 +257,7 @@ void lh5801_cpu_device::execute_set_input(int irqline, int state)
 	}
 }
 
-util::disasm_interface *lh5801_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> lh5801_cpu_device::create_disassembler()
 {
-	return new lh5801_disassembler;
+	return std::make_unique<lh5801_disassembler>();
 }

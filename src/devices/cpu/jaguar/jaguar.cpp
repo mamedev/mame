@@ -1438,12 +1438,12 @@ WRITE32_MEMBER( jaguardsp_cpu_device::ctrl_w )
 	}
 }
 
-util::disasm_interface *jaguargpu_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> jaguargpu_cpu_device::create_disassembler()
 {
-	return new jaguar_disassembler(jaguar_disassembler::JAGUAR_VARIANT_GPU);
+	return std::make_unique<jaguar_disassembler>(jaguar_disassembler::JAGUAR_VARIANT_GPU);
 }
 
-util::disasm_interface *jaguardsp_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> jaguardsp_cpu_device::create_disassembler()
 {
-	return new jaguar_disassembler(jaguar_disassembler::JAGUAR_VARIANT_DSP);
+	return std::make_unique<jaguar_disassembler>(jaguar_disassembler::JAGUAR_VARIANT_DSP);
 }

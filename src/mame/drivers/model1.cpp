@@ -885,10 +885,6 @@ void model1_state::model1_mem(address_map &map)
 	map(0x900000, 0x903fff).ram().w(this, FUNC(model1_state::p_w)).share("palette");
 	map(0x910000, 0x91bfff).ram().share("color_xlat");
 
-	map(0xb00000, 0xb00fff).rw(m_m1comm, FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
-	map(0xb01000, 0xb01000).rw(m_m1comm, FUNC(m1comm_device::cn_r), FUNC(m1comm_device::cn_w));
-	map(0xb01002, 0xb01002).rw(m_m1comm, FUNC(m1comm_device::fg_r), FUNC(m1comm_device::fg_w));
-
 	map(0xc00000, 0xc0003f).rw(this, FUNC(model1_state::io_r), FUNC(model1_state::io_w));
 
 	map(0xc00040, 0xc00043).rw(this, FUNC(model1_state::network_ctl_r), FUNC(model1_state::network_ctl_w));
@@ -914,6 +910,15 @@ void model1_state::model1_io(address_map &map)
 {
 	map(0xd20000, 0xd20003).r(this, FUNC(model1_state::model1_tgp_copro_ram_r));
 	map(0xd80000, 0xd80003).r(this, FUNC(model1_state::model1_tgp_copro_r));
+}
+
+void model1_state::model1_comm_mem(address_map &map)
+{
+	model1_mem(map);
+
+	map(0xb00000, 0xb00fff).rw(m_m1comm, FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
+	map(0xb01000, 0xb01000).rw(m_m1comm, FUNC(m1comm_device::cn_r), FUNC(m1comm_device::cn_w));
+	map(0xb01002, 0xb01002).rw(m_m1comm, FUNC(m1comm_device::fg_r), FUNC(m1comm_device::fg_w));
 }
 
 void model1_state::model1_vr_mem(address_map &map)
@@ -1286,9 +1291,6 @@ ROM_START( vformula )
 	ROM_LOAD32_BYTE( "mpr-14900.41", 0x000002, 0x80000, CRC(aa7c017d) SHA1(0fa2b59a8bb5f5907b2b2567e69d11c73b398dc1) )
 	ROM_LOAD32_BYTE( "mpr-14901.42", 0x000003, 0x80000, CRC(175b7a9a) SHA1(c86602e771cd49bab425b4ba7926d2f44858bd39) )
 
-	ROM_REGION( 0x20000, "commboard", 0 ) /* Comms Board */
-	ROM_LOAD( "epr-15624.17", 0x00000, 0x20000, CRC(9b3ba315) SHA1(0cd0983cc8b2f2d6b41617d0d0a24cc6c188e62a) )
-
 	ROM_REGION( 0x2000, "tgp", 0 ) /* TGP program rom */
 	// The real internal TGP rom
 	ROM_LOAD("315-5573.bin", 0, 0x2000, CRC(ec913af2) SHA1(a18bf6c9d7b35f8b9e513a7d279f13a30b32a961) )
@@ -1561,9 +1563,6 @@ ROM_START( wingwar360 )
 	ROM_REGION( 0x10000, "ioboard", 0 )
 	ROM_LOAD("epr-16891.6", 0x00000, 0x10000, CRC(a33f84d1) SHA1(3079397c7241c1a6f494fa310faff0989dfa04a0) )
 
-	ROM_REGION( 0x20000, "commboard", 0 )
-	ROM_LOAD("epr-15112.17", 0x00000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a) )
-
 	// Dumper's note: Video & Drive is the control board in the attendants' tower, same hardware as G-Loc R360 with the two program roms being the only difference.
 	ROM_REGION( 0x400000, "controlboard", 0 )
 	ROM_LOAD("ic22_18851.bin", 0x00000, 0x20000, CRC(85f75bd7) SHA1(43cc8f8c81631d71b661e55e15f3fe8803a8a7e9) )
@@ -1652,8 +1651,16 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("m1uart", i8251_device, write_rxc))
+MACHINE_CONFIG_END
 
-	MCFG_M1COMM_ADD("m1comm")
+MACHINE_CONFIG_START(model1_state::wingwar)
+	model1(config);
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(model1_comm_mem)
+
+	MCFG_M1COMM_ADD(M1COMM_TAG)
+	// use EPR-15112
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model1_state::swa)
@@ -1725,8 +1732,20 @@ MACHINE_CONFIG_START(model1_state::model1_vr)
 	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("m1uart", i8251_device, write_rxc))
+MACHINE_CONFIG_END
 
-	MCFG_M1COMM_ADD("m1comm")
+MACHINE_CONFIG_START(model1_state::vr)
+	model1_vr(config);
+
+	MCFG_M1COMM_ADD(M1COMM_TAG)
+	// use EPR-15112
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(model1_state::vformula)
+	model1_vr(config);
+
+	MCFG_M1COMM_ADD(M1COMM_TAG)
+	// use EPR-15624
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(model1_state,wingwar360)
@@ -1793,12 +1812,12 @@ WRITE16_MEMBER(model1_state::r360_w)
 	}
 }
 
-GAME( 1993, vf,         0,       model1,    vf,      model1_state,  0,          ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1992, vr,         0,       model1_vr, vr,      model1_state,  0,          ROT0, "Sega", "Virtua Racing", MACHINE_IMPERFECT_GRAPHICS, layout_vr )
-GAME( 1993, vformula,   vr,      model1_vr, vr,      model1_state,  0,          ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,        0,       swa,       swa,     model1_state,  0,          ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, wingwar,    0,       model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwaru,   wingwar, model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwarj,   wingwar, model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwar360, wingwar, model1,    wingwar, model1_state,  wingwar360, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
-GAME( 1993, netmerc,    0,       netmerc,   vf,      model1_state,  0,          ROT0, "Sega", "Sega NetMerc", MACHINE_NOT_WORKING )
+GAME( 1993, vf,         0,       model1,   vf,      model1_state,  0,          ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1992, vr,         0,       vr,       vr,      model1_state,  0,          ROT0, "Sega", "Virtua Racing", MACHINE_IMPERFECT_GRAPHICS, layout_vr )
+GAME( 1993, vformula,   vr,      vformula, vr,      model1_state,  0,          ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, swa,        0,       swa,      swa,     model1_state,  0,          ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, wingwar,    0,       wingwar,  wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwaru,   wingwar, wingwar,  wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwarj,   wingwar, wingwar,  wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwar360, wingwar, wingwar,  wingwar, model1_state,  wingwar360, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       netmerc,  vf,      model1_state,  0,          ROT0, "Sega", "Sega NetMerc", MACHINE_NOT_WORKING )

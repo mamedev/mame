@@ -232,9 +232,9 @@ void i860_cpu_device::device_reset()
 	reset_i860();
 }
 
-util::disasm_interface *i860_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i860_cpu_device::create_disassembler()
 {
-	return new i860_disassembler;
+	return std::make_unique<i860_disassembler>();
 }
 
 

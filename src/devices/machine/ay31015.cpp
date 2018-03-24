@@ -303,7 +303,7 @@ void ay31015_device::rx_process()
 			if (!get_si())
 			{
 				m_rx_state = START_BIT;
-				m_rx_pulses = 16;
+				m_rx_pulses = 15;
 			}
 			return;
 
@@ -316,11 +316,12 @@ void ay31015_device::rx_process()
 					LOG("Receive false start bit\n");
 					m_rx_state = IDLE;
 				}
+				else
+					LOG("Receive start bit\n");
 			}
 			else
 			if (!m_rx_pulses)                    // end of start bit
 			{
-				LOG("Receive start bit\n");
 				m_rx_state = PROCESSING;
 				m_rx_pulses = m_total_pulses;
 				m_rx_bit_count = 0;
@@ -786,7 +787,7 @@ uint8_t ay31015_device::get_received_data()
 		m_status_reg &= ~STATUS_DAV;
 		update_status_pins();
 	}
-	
+
 	return m_rx_buffer;
 }
 

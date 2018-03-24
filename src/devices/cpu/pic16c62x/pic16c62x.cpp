@@ -159,9 +159,9 @@ pic16c622a_device::pic16c622a_device(const machine_config &mconfig, const char *
 }
 
 
-util::disasm_interface *pic16c62x_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> pic16c62x_device::create_disassembler()
 {
-	return new pic16c62x_disassembler;
+	return std::make_unique<pic16c62x_disassembler>();
 }
 
 

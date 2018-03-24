@@ -402,9 +402,9 @@ void dsp32c_device::state_string_export(const device_state_entry &entry, std::st
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *dsp32c_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> dsp32c_device::create_disassembler()
 {
-	return new dsp32c_disassembler;
+	return std::make_unique<dsp32c_disassembler>();
 }
 
 

@@ -6,13 +6,13 @@
 
     TODO:
     - Implement correct Axell video chip decompression scheme, currently using decompressed
-	  data extracted from the PCB (for reference)
-	- Framebuffer is actually in the same DRAM as the blitter data gets copied to, not a
-	  separate RAM.  It (and the double buffered copy) appear near the top right of the
-	  framebuffer, so there are likely registers to control this that need finding.
-	- Other sprite modes supported by the video chip (not used here?)
-	- Check zooming precision against hardware
-	- Cleanup (still a lot of debug code in here)
+      data extracted from the PCB (for reference)
+    - Framebuffer is actually in the same DRAM as the blitter data gets copied to, not a
+      separate RAM.  It (and the double buffered copy) appear near the top right of the
+      framebuffer, so there are likely registers to control this that need finding.
+    - Other sprite modes supported by the video chip (not used here?)
+    - Check zooming precision against hardware
+    - Cleanup (still a lot of debug code in here)
 
 =============================================================================================
 ASM code study:
@@ -351,7 +351,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 
 		uint32_t widthstep = 1<<ZOOM_SHIFT;
 		uint32_t heightstep = 1<<ZOOM_SHIFT;
-		
+
 		if (zoomwidth) widthstep = sourcewidth / zoomwidth;
 		if (zoomheight) heightstep = sourceheight / zoomheight;
 
@@ -369,7 +369,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 
 		if (((zoomwidth<<ZOOM_SHIFT) != sourcewidth) || ((zoomheight<<ZOOM_SHIFT) != sourceheight))
 		{
-		//	printf("sw %08x zw %08x sh %08x zh %08x heightstep %08x widthstep %08x \n", sourcewidth, zoomwidth<<ZOOM_SHIFT, sourceheight, zoomheight<<ZOOM_SHIFT, heightstep, widthstep );
+		//  printf("sw %08x zw %08x sh %08x zh %08x heightstep %08x widthstep %08x \n", sourcewidth, zoomwidth<<ZOOM_SHIFT, sourceheight, zoomheight<<ZOOM_SHIFT, heightstep, widthstep );
 		}
 
 		if(bpp_sel == 0x00)  // 4bpp

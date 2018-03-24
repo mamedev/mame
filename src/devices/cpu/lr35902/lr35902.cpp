@@ -232,9 +232,9 @@ void lr35902_cpu_device::device_reset()
 	m_entering_halt = false;
 }
 
-util::disasm_interface *lr35902_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> lr35902_cpu_device::create_disassembler()
 {
-	return new lr35902_disassembler;
+	return std::make_unique<lr35902_disassembler>();
 }
 
 void lr35902_cpu_device::check_interrupts()

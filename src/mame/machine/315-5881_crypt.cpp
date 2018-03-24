@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(SEGA315_5881_CRYPT, sega_315_5881_crypt_device, "sega315_5881
 //       might be due of high address variables not properly set (@see sega_315_5881_crypt_device::set_addr_high)
 ADDRESS_MAP_START(sega_315_5881_crypt_device::iomap_64be)
 	AM_RANGE(0x0000, 0x0001) AM_READ(ready_r)
-//	TODO: it is unknown if the 
+//  TODO: it is unknown if the
 	AM_RANGE(0x0010, 0x0011) AM_WRITE(addrlo_w)
 	AM_RANGE(0x0012, 0x0013) AM_WRITE(addrhi_w)
 	AM_RANGE(0x0018, 0x0019) AM_WRITE(subkey_be_w)
@@ -90,7 +90,7 @@ void sega_315_5881_crypt_device::device_reset()
 	dec_header = 0;
 	enc_ready = false;
 	first_read = false;
-	
+
 	buffer_pos = 0;
 	line_buffer_pos = 0;
 	line_buffer_size = 0;
@@ -141,9 +141,9 @@ WRITE16_MEMBER(sega_315_5881_crypt_device::subkey_be_w)
 READ16_MEMBER(sega_315_5881_crypt_device::decrypt_le_r)
 {
 	uint16_t retval = decrypt_be_r(space,offset,mem_mask);
-	// endian swap the sub-key for little endian CPUs	
+	// endian swap the sub-key for little endian CPUs
 	retval = ((retval & 0xff00) >> 8) | ((retval & 0x00ff) << 8);
-	
+
 	return retval;
 }
 
@@ -163,7 +163,7 @@ READ16_MEMBER(sega_315_5881_crypt_device::decrypt_be_r)
 	uint16_t retval;
 	retval = do_decrypt(base);
 	// retval = ((retval & 0xff00) >> 8) | ((retval & 0x00ff) << 8);
-		
+
 	return retval;
 }
 

@@ -149,9 +149,9 @@ void tmp95c063_device::device_config_complete()
 }
 
 
-util::disasm_interface *tlcs900h_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tlcs900h_device::create_disassembler()
 {
-	return new tlcs900_disassembler;
+	return std::make_unique<tlcs900_disassembler>();
 }
 
 

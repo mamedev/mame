@@ -235,7 +235,7 @@ void minx_cpu_device::execute_set_input(int inputnum, int state)
 }
 
 
-util::disasm_interface *minx_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> minx_cpu_device::create_disassembler()
 {
-	return new minx_disassembler;
+	return std::make_unique<minx_disassembler>();
 }

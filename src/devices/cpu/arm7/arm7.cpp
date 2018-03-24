@@ -971,9 +971,9 @@ void arm7_cpu_device::execute_set_input(int irqline, int state)
 }
 
 
-util::disasm_interface *arm7_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> arm7_cpu_device::create_disassembler()
 {
-	return new arm7_disassembler(this);
+	return std::make_unique<arm7_disassembler>(this);
 }
 
 bool arm7_cpu_device::get_t_flag() const

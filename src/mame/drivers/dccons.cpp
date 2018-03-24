@@ -296,6 +296,9 @@ READ64_MEMBER(dc_cons_state::dcjp_idle_skip_r )
 
 DRIVER_INIT_MEMBER(dc_cons_state,dc)
 {
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x001fffff, true, memregion("maincpu")->base());
+	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0cffffff, false, dc_ram);
 	dreamcast_atapi_init();
 }
 
@@ -592,7 +595,6 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	MCFG_SH4_CLOCK(CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dc_map)
 	MCFG_CPU_IO_MAP(dc_port)
-	MCFG_CPU_FORCE_NO_DRC()
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 

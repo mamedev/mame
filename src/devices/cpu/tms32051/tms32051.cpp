@@ -118,9 +118,9 @@ tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag,
 }
 
 
-util::disasm_interface *tms32051_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms32051_device::create_disassembler()
 {
-	return new tms32051_disassembler;
+	return std::make_unique<tms32051_disassembler>();
 }
 
 

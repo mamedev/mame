@@ -52,13 +52,12 @@ Notes:
 */
 
 #include "emu.h"
-#include "emuopts.h"
 #include "machine/m1comm.h"
+#include "emuopts.h"
 
-#define Z80_TAG     "m1commcpu"
-
-#define VERBOSE 0
-#include "logmacro.h"
+#define Z80_TAG     "commcpu"
+#define DMA_TAG     "commdma"
+#define DLC_TAG     "commdlc"
 
 /*************************************
  *  M1COMM Memory Map
@@ -76,23 +75,30 @@ void m1comm_device::m1comm_mem(address_map &map)
 void m1comm_device::m1comm_io(address_map &map)
 {
 	map.global_mask(0x7f);
-	map(0x00, 0x1f).rw(this, FUNC(m1comm_device::dlc_reg_r), FUNC(m1comm_device::dlc_reg_w));
-	map(0x20, 0x2f).rw(this, FUNC(m1comm_device::dma_reg_r), FUNC(m1comm_device::dma_reg_w));
+	map(0x00, 0x1f).rw(m_dlc, FUNC(mb89374_device::read), FUNC(mb89374_device::write));
+	map(0x20, 0x2f).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x40, 0x5f).mask(0x01).rw(this, FUNC(m1comm_device::syn_r), FUNC(m1comm_device::syn_w));
 	map(0x60, 0x7f).mask(0x01).rw(this, FUNC(m1comm_device::zfg_r), FUNC(m1comm_device::zfg_w));
 }
 
-
 ROM_START( m1comm )
 	ROM_REGION( 0x20000, Z80_TAG, ROMREGION_ERASEFF )
-	ROM_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a) )
+	ROM_DEFAULT_BIOS("epr-15112")
+
+	// found on Virtua Racing and WingWar
+	ROM_SYSTEM_BIOS( 0, "epr-15112", "EPR-15112" )
+	ROMX_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a), ROM_BIOS(1) )
+
+	// found on Virtua Formula
+	ROM_SYSTEM_BIOS( 1, "epr-15624", "EPR-15624" )
+	ROMX_LOAD( "epr-15624.17", 0x0000, 0x20000, CRC(9b3ba315) SHA1(0cd0983cc8b2f2d6b41617d0d0a24cc6c188e62a), ROM_BIOS(2) )
 ROM_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(M1COMM, m1comm_device, "m1comm", "Model 1 Communication Board")
+DEFINE_DEVICE_TYPE(M1COMM, m1comm_device, "m1comm", "Model-1 Communication Board")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -102,12 +108,26 @@ MACHINE_CONFIG_START(m1comm_device::device_add_mconfig)
 	MCFG_CPU_ADD(Z80_TAG, Z80, 8000000) /* 32 MHz / 4 */
 	MCFG_CPU_PROGRAM_MAP(m1comm_mem)
 	MCFG_CPU_IO_MAP(m1comm_io)
+
+	MCFG_DEVICE_ADD(DMA_TAG, AM9517A, 8000000) /* 32 MHz / 4 */
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(m1comm_device, dma_hreq_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(m1comm_device, dma_mem_r))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(m1comm_device, dma_mem_w))
+	MCFG_I8237_OUT_DACK_2_CB(DEVWRITELINE(DLC_TAG, mb89374_device, pi3_w))
+	MCFG_I8237_OUT_DACK_3_CB(DEVWRITELINE(DLC_TAG, mb89374_device, pi2_w))
+	MCFG_I8237_OUT_EOP_CB(DEVWRITELINE(DLC_TAG, mb89374_device, ci_w))
+	MCFG_I8237_IN_IOR_2_CB(DEVREAD8(DLC_TAG, mb89374_device, dma_r))
+	MCFG_I8237_OUT_IOW_3_CB(DEVWRITE8(DLC_TAG, mb89374_device, dma_w))
+
+	MCFG_DEVICE_ADD(DLC_TAG, MB89374, 8000000) /* 32 MHz / 4 */
+	MCFG_MB89374_PO2_CB(DEVWRITELINE(DMA_TAG, am9517a_device, dreq3_w))
+	MCFG_MB89374_PO3_CB(DEVWRITELINE(DMA_TAG, am9517a_device, dreq2_w))
+	MCFG_MB89374_IRQ_CB(WRITELINE(m1comm_device, dlc_int7_w))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
-
 const tiny_rom_entry *m1comm_device::device_rom_region() const
 {
 	return ROM_NAME( m1comm );
@@ -123,8 +143,11 @@ const tiny_rom_entry *m1comm_device::device_rom_region() const
 
 m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, M1COMM, tag, owner, clock),
-	m_commcpu(*this, Z80_TAG)
+	m_cpu(*this, Z80_TAG),
+	m_dma(*this, DMA_TAG),
+	m_dlc(*this, DLC_TAG)
 {
+#ifdef M1COMM_SIMULATION
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
 	strcat(m_localhost, "socket.");
@@ -140,6 +163,7 @@ m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, dev
 	strcat(m_remotehost, mconfig.options().comm_remoteport());
 
 	m_framesync = mconfig.options().comm_framesync() ? 0x01 : 0x00;
+#endif
 }
 
 //-------------------------------------------------
@@ -160,81 +184,53 @@ void m1comm_device::device_reset()
 	m_zfg = 0;
 	m_cn = 0;
 	m_fg = 0;
-
-	m_commcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-READ8_MEMBER(m1comm_device::dlc_reg_r)
+void m1comm_device::device_reset_after_children()
 {
-	// dirty hack to keep Z80 in RESET state
-	if (!m_cn)
-	{
-		device_reset();
-		return 0xff;
-	}
-	// dirty hack to keep Z80 in RESET state
-
-	uint8_t result = m_dlc_reg[offset];
-	LOG("m1comm-dlc_reg_r: read register %02x for value %02x\n", offset, result);
-	return result;
+	m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dma->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dlc->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(m1comm_device::dlc_reg_w)
+WRITE_LINE_MEMBER(m1comm_device::dma_hreq_w)
 {
-	m_dlc_reg[offset] = data;
-	LOG("m1comm-dlc_reg_w: write register %02x for value %02x\n", offset, data);
+	m_cpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_dma->hack_w(state);
 }
 
-READ8_MEMBER(m1comm_device::dma_reg_r)
+READ8_MEMBER(m1comm_device::dma_mem_r)
 {
-	uint8_t result = m_dma_reg[offset];
-	LOG("m1comm-dma_reg_r: read register %02x for value %02x\n", offset, result);
-	return result;
+	return m_cpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(m1comm_device::dma_reg_w)
+WRITE8_MEMBER(m1comm_device::dma_mem_w)
 {
-	LOG("m1comm-dma_reg_w: %02x %02x\n", offset, data);
-	m_dma_reg[offset] = data;
+	m_cpu->space(AS_PROGRAM).write_byte(offset, data);
+}
+
+WRITE_LINE_MEMBER(m1comm_device::dlc_int7_w)
+{
+	m_cpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
 READ8_MEMBER(m1comm_device::syn_r)
 {
-	uint8_t result = m_syn | 0xfc;
-	LOG("m1comm-syn_r: read register %02x for value %02x\n", offset, result);
-	return result;
+	return m_syn | 0xfc;
 }
 
 WRITE8_MEMBER(m1comm_device::syn_w)
 {
 	m_syn = data & 0x03;
-
-	switch (data & 0x02)
-	{
-	case 0x00:
-		LOG("m1comm-syn_w: VINT disabled\n");
-		break;
-
-	case 0x02:
-		LOG("m1comm-syn_w: VINT enabled\n");
-		break;
-
-	default:
-		LOG("m1comm-syn_w: %02x\n", data);
-		break;
-	}
 }
 
 READ8_MEMBER(m1comm_device::zfg_r)
 {
-	uint8_t result = m_zfg | (~m_fg << 7) | 0x7e;
-	LOG("m1comm-zfg_r: read register %02x for value %02x\n", offset, result);
-	return result;
+	return m_zfg | (~m_fg << 7) | 0x7e;
 }
 
 WRITE8_MEMBER(m1comm_device::zfg_w)
 {
-	LOG("m1comm-zfg_w: %02x\n", data);
 	m_zfg = data & 0x01;
 }
 
@@ -259,9 +255,16 @@ WRITE8_MEMBER(m1comm_device::cn_w)
 
 #ifndef M1COMM_SIMULATION
 	if (!m_cn)
+	{
 		device_reset();
+		device_reset_after_children();
+	}
 	else
-		m_commcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	{
+		m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_dma->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_dlc->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
 #else
 	if (!m_cn)
 	{
@@ -301,8 +304,7 @@ void m1comm_device::check_vint_irq()
 #ifndef M1COMM_SIMULATION
 	if (m_syn & 0x02)
 	{
-		m_commcpu->set_input_line_and_vector(0, HOLD_LINE, 0xef);
-		LOG("m1comm-INT5\n");
+		m_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xef);
 	}
 #else
 	comm_tick();

@@ -142,21 +142,52 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 	}
 }
 
+READ8_MEMBER(electron_state::electron64_fetch_r)
+{
+	m_vdu_drivers = (offset & 0xe000) == 0xc000 ? true : false;
+
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
 READ8_MEMBER(electron_state::electron_mem_r)
 {
-	/* The processor will run at 1MHz during an access cycle to the RAM */
-	m_maincpu->set_clock_scale(0.5f);
+	switch (m_mrb.read_safe(0))
+	{
+	case 0x00: /* Normal */
+		/* The processor will run at 1MHz during an access cycle to the RAM */
+		m_maincpu->set_clock_scale(0.5f);
+		//waitforramsync();
+		break;
 
-	//waitforramsync();
+	case 0x01: /* Turbo */
+		if (m_mrb_mapped && offset < 0x3000) offset += 0x8000;
+		break;
+
+	case 0x02: /* Shadow */
+		if (m_mrb_mapped && (offset < 0x3000 || !m_vdu_drivers)) offset += 0x8000;
+		break;
+	}
 	return m_ram->read(offset);
 }
 
 WRITE8_MEMBER(electron_state::electron_mem_w)
 {
-	/* The processor will run at 1MHz during an access cycle to the RAM */
-	m_maincpu->set_clock_scale(0.5f);
+	switch (m_mrb.read_safe(0))
+	{
+	case 0x00: /* Normal */
+		/* The processor will run at 1MHz during an access cycle to the RAM */
+		m_maincpu->set_clock_scale(0.5f);
+		//waitforramsync();
+		break;
 
-	//waitforramsync();
+	case 0x01: /* Turbo */
+		if (m_mrb_mapped && offset < 0x3000) offset += 0x8000;
+		break;
+
+	case 0x02: /* Shadow */
+		if (m_mrb_mapped && (offset < 0x3000 || !m_vdu_drivers)) offset += 0x8000;
+		break;
+	}
 	m_ram->write(offset, data);
 }
 
@@ -252,14 +283,11 @@ WRITE8_MEMBER(electron_state::electron_fred_w)
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
 
+	/* Master RAM Board */
+	if (offset == 0x7f) m_mrb_mapped = !(data & 0x80);
+
 	//logerror("FRED: write fc%02x\n", offset);
 	m_exp->expbus_w(space, 0xfc00 + offset, data);
-
-	/* Master RAM Board */
-	if (offset == 0x7f && m_mrb.read_safe(0))
-	{
-
-	}
 }
 
 READ8_MEMBER(electron_state::electron_jim_r)
@@ -469,6 +497,9 @@ void electron_state::machine_reset()
 	m_ula.screen_addr = 0;
 	m_ula.tape_running = 0;
 	m_ula.vram = (uint8_t *)m_ram->pointer() + m_ula.screen_base;
+
+	m_mrb_mapped = true;
+	m_vdu_drivers = false;
 }
 
 void electron_state::machine_start()

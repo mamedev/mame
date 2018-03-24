@@ -17,6 +17,7 @@ public:
 	{   }
 	required_device<eeprom_serial_93cxx_device> m_sp_eeprom;
 
+	DECLARE_DRIVER_INIT(segasp);
 	DECLARE_READ64_MEMBER(sp_eeprom_r);
 	DECLARE_WRITE64_MEMBER(sp_eeprom_w);
 	DECLARE_READ64_MEMBER(sp_rombdflg_r);

@@ -3672,9 +3672,9 @@ void z80_device::state_string_export(const device_state_entry &entry, std::strin
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *z80_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> z80_device::create_disassembler()
 {
-	return new z80_disassembler;
+	return std::make_unique<z80_disassembler>();
 }
 
 

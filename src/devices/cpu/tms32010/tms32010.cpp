@@ -135,9 +135,9 @@ device_memory_interface::space_config_vector tms32010_device::memory_space_confi
 	};
 }
 
-util::disasm_interface *tms32010_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms32010_device::create_disassembler()
 {
-	return new tms32010_disassembler;
+	return std::make_unique<tms32010_disassembler>();
 }
 
 

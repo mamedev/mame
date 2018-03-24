@@ -2102,99 +2102,99 @@ void m68000_base_device::init_cpu_coldfire(void)
 	define_state();
 }
 
-util::disasm_interface *m68000_base_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68000_base_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68000);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
 }
 
-util::disasm_interface *m68000_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68000_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68000);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
 }
 
-util::disasm_interface *m68301_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68301_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68000);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
 }
 
-util::disasm_interface *m68008_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68008_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68008);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68008);
 }
 
-util::disasm_interface *m68008plcc_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68008plcc_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68008);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68008);
 }
 
-util::disasm_interface *m68010_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68010_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68010);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68010);
 }
 
-util::disasm_interface *m68ec020_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68ec020_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68020);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
 }
 
-util::disasm_interface *m68020_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68020_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68020);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
 }
 
-util::disasm_interface *m68020fpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68020fpu_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68020);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
 }
 
-util::disasm_interface *m68020pmmu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68020pmmu_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68020);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
 }
 
-util::disasm_interface *m68020hmmu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68020hmmu_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68020);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
 }
 
-util::disasm_interface *m68ec030_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68ec030_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68030);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68030);
 }
 
-util::disasm_interface *m68030_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68030_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68030);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68030);
 }
 
-util::disasm_interface *m68ec040_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68ec040_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68040);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68040);
 }
 
-util::disasm_interface *m68lc040_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68lc040_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68040);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68040);
 }
 
-util::disasm_interface *m68040_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68040_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68040);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68040);
 }
 
-util::disasm_interface *scc68070_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> scc68070_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68000);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
 }
 
-util::disasm_interface *fscpu32_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> fscpu32_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_68340);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68340);
 }
 
-util::disasm_interface *mcf5206e_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mcf5206e_device::create_disassembler()
 {
-	return new m68k_disassembler(m68k_disassembler::TYPE_COLDFIRE);
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_COLDFIRE);
 }
 
 

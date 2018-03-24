@@ -19,6 +19,7 @@
 #include "machine/ram.h"
 #include "machine/rp5c15.h"
 #include "machine/upd765.h"
+#include "sound/flt_vol.h"
 #include "sound/okim6258.h"
 #include "sound/ym2151.h"
 #include "bus/x68k/x68kexp.h"
@@ -69,6 +70,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_upd72065(*this, "upd72065")
 		, m_expansion(*this, "exp")
+		, m_adpcm_out(*this, {"adpcm_outl", "adpcm_outr"})
 		, m_options(*this, "options")
 		, m_mouse1(*this, "mouse1")
 		, m_mouse2(*this, "mouse2")
@@ -104,6 +106,8 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<upd72065_device> m_upd72065;
 	required_device<x68k_expansion_slot_device> m_expansion;
+
+	required_device_array<filter_volume_device, 2> m_adpcm_out;
 
 	required_ioport m_options;
 	required_ioport m_mouse1;

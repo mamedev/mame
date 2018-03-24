@@ -78,7 +78,6 @@ class address_map; // Forward declaration
 #include "disound.h"
 #include "divideo.h"
 #include "dinvram.h"
-#include "didisasm.h"
 #include "schedule.h"
 #include "dinetwork.h"
 

@@ -1848,7 +1848,7 @@ void se3208_device::execute_set_input( int line, int state )
 		m_IRQ=state;
 }
 
-util::disasm_interface *se3208_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> se3208_device::create_disassembler()
 {
-	return new se3208_disassembler;
+	return std::make_unique<se3208_disassembler>();
 }

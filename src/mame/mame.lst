@@ -10805,7 +10805,7 @@ cyclemb                         // P0  (c) 1984 Taito Corporation [+ Seta]
 skydest                         // PD0 (c) 1985 Taito Corporation
 
 @source:cz101.cpp
-cz101							// 1984 Casio
+cz101                           // 1984 Casio
 
 @source:czk80.cpp
 czk80                           //
@@ -14816,6 +14816,7 @@ ktmnt                           // Konami
 ktopgun                         // Konami
 nummunch                        // VTech
 nupogodi                        // Elektronika
+taddams                         // Tiger
 taltbeast                       // Tiger
 tapollo13                       // Tiger
 tbatfor                         // Tiger
@@ -14823,7 +14824,10 @@ tbatman                         // Tiger
 tbtoads                         // Tiger
 tbttf                           // Tiger
 tddragon                        // Tiger
+tddragon3                       // Tiger
+tdennis                         // Tiger
 tdummies                        // Tiger
+tflash                          // Tiger
 tgaiden                         // Tiger
 tgaunt                          // Tiger
 tgoldeye                        // Tiger
@@ -14831,6 +14835,7 @@ tgoldnaxe                       // Tiger
 thook                           // Tiger
 tigarden                        // Tronica
 tjdredd                         // Tiger
+tjpark                          // Tiger
 tkarnov                         // Tiger
 tmchammer                       // Tiger
 tmkombat                        // Tiger
@@ -14847,9 +14852,11 @@ tsjam                           // Tiger
 tskelwarr                       // Tiger
 tsonic                          // Tiger
 tsonic2                         // Tiger
+tspidman                        // Tiger
 tstrider                        // Tiger
 tswampt                         // Tiger
 tvindictr                       // Tiger
+txmenpx                         // Tiger
 
 @source:hh_tms1k.cpp
 7in1ss                          // Tiger Electronics
@@ -15165,7 +15172,7 @@ hp85                            //
 hshavoc                         // (c) 1993 Data East
 
 @source:ht6000.cpp
-ht6000							// 1987 Casio
+ht6000                          // 1987 Casio
 
 @source:ht68k.cpp
 ht68k                           //
@@ -21338,7 +21345,7 @@ daytonas                        //
 daytonase                       // 1994    Daytona USA Special Edition (Japan, Revision A)
 daytonat                        // 1994?   Kyle Hodgetts hack
 daytonata                       // 1994?   Kyle Hodgetts hack
-daytonagtx						// 2004    Kyle Hodgetts hack
+daytonagtx                      // 2004    Kyle Hodgetts hack
 desert                          // 1994.07 Desert Tank
 doa                             // 1996.11 Dead or Alive (Revision B)
 doaa                            // 1996.11 Dead or Alive (Revision A)
@@ -32956,7 +32963,7 @@ rvoicepc                        //
 rx78                            //
 
 @source:rz1.cpp
-rz1								// 1986 Casio
+rz1                             // 1986 Casio
 
 @source:rzone.cpp
 rzbatfor                        //
@@ -39063,7 +39070,7 @@ rad_snowp                       //
 rad_madf                        //
 rad_fb                          //
 epo_efdx                        //
-rad_rh				     		//
+rad_rh                          //
 has_wamg                        //
 eka_base                        //
 eka_strt                        //
