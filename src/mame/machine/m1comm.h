@@ -54,6 +54,8 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_reset_after_children() override;
 
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 

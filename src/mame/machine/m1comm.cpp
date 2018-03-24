@@ -52,8 +52,8 @@ Notes:
 */
 
 #include "emu.h"
-#include "emuopts.h"
 #include "machine/m1comm.h"
+#include "emuopts.h"
 
 #define Z80_TAG     "commcpu"
 #define DMA_TAG     "commdma"
@@ -81,11 +81,20 @@ void m1comm_device::m1comm_io(address_map &map)
 	map(0x60, 0x7f).mask(0x01).rw(this, FUNC(m1comm_device::zfg_r), FUNC(m1comm_device::zfg_w));
 }
 
+ROM_START( m1comm )
+	ROM_REGION( 0x20000, Z80_TAG, ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("epr-15112")
+	ROM_SYSTEM_BIOS( 0, "epr-15112", "EPR-15112" )
+	ROMX_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "epr-15624", "EPR-15624" )
+	ROMX_LOAD( "epr-15624.17", 0x0000, 0x20000, CRC(9b3ba315) SHA1(0cd0983cc8b2f2d6b41617d0d0a24cc6c188e62a), ROM_BIOS(2) )
+ROM_END
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(M1COMM, m1comm_device, "m1comm", "MODEL-1 COMMUNICATION BD")
+DEFINE_DEVICE_TYPE(M1COMM, m1comm_device, "m1comm", "Model-1 Communication Board")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -112,6 +121,13 @@ MACHINE_CONFIG_START(m1comm_device::device_add_mconfig)
 	MCFG_MB89374_IRQ_CB(WRITELINE(m1comm_device, dlc_int7_w))
 MACHINE_CONFIG_END
 
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+const tiny_rom_entry *m1comm_device::device_rom_region() const 
+{ 
+	return ROM_NAME( m1comm ); 
+} 
 
 //**************************************************************************
 //  LIVE DEVICE
