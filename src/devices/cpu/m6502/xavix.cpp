@@ -26,9 +26,9 @@ xavix_device::xavix_device(const machine_config &mconfig, const char *tag, devic
 }
 
 
-util::disasm_interface *xavix_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> xavix_device::create_disassembler()
 {
-	return new xavix_disassembler;
+	return std::make_unique<xavix_disassembler>();
 }
 
 

@@ -171,7 +171,7 @@ public:
 	int execute(uml::code_handle &entry) { return m_beintf->execute(entry); }
 
 	// code generation
-	drcuml_block *begin_block(u32 maxinst);
+	drcuml_block &begin_block(u32 maxinst);
 
 	// back-end interface
 	void get_backend_info(drcbe_info &info) { m_beintf->get_info(info); }

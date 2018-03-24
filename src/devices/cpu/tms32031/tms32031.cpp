@@ -558,9 +558,9 @@ void tms3203x_device::state_string_export(const device_state_entry &entry, std::
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *tms3203x_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms3203x_device::create_disassembler()
 {
-	return new tms32031_disassembler;
+	return std::make_unique<tms32031_disassembler>();
 }
 
 

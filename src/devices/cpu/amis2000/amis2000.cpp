@@ -99,9 +99,9 @@ void amis2000_base_device::state_string_export(const device_state_entry &entry, 
 	}
 }
 
-util::disasm_interface *amis2000_base_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> amis2000_base_device::create_disassembler()
 {
-	return new amis2000_disassembler;
+	return std::make_unique<amis2000_disassembler>();
 }
 
 

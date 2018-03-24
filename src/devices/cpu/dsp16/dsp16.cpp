@@ -608,9 +608,9 @@ void dsp16_device_base::state_string_export(device_state_entry const &entry, std
     device_disasm_interface implementation
 ***********************************************************************/
 
-util::disasm_interface *dsp16_device_base::create_disassembler()
+std::unique_ptr<util::disasm_interface> dsp16_device_base::create_disassembler()
 {
-	return new dsp16_disassembler(*this);
+	return std::make_unique<dsp16_disassembler>(static_cast<dsp16_disassembler::cpu const &>(*this));
 }
 
 /***********************************************************************

@@ -377,9 +377,9 @@ void esrip_device::state_string_export(const device_state_entry &entry, std::str
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *esrip_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> esrip_device::create_disassembler()
 {
-	return new esrip_disassembler;
+	return std::make_unique<esrip_disassembler>();
 }
 
 /***************************************************************************

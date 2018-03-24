@@ -203,7 +203,7 @@ void drcuml_state::reset()
 //  begin_block - begin a new code block
 //-------------------------------------------------
 
-drcuml_block *drcuml_state::begin_block(uint32_t maxinst)
+drcuml_block &drcuml_state::begin_block(uint32_t maxinst)
 {
 	// find an inactive block that matches our qualifications
 	drcuml_block *bestblock(nullptr);
@@ -219,7 +219,7 @@ drcuml_block *drcuml_state::begin_block(uint32_t maxinst)
 
 	// start the block
 	bestblock->begin();
-	return bestblock;
+	return *bestblock;
 }
 
 

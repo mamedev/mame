@@ -85,9 +85,9 @@ MACHINE_CONFIG_END
 
 
 // disasm
-util::disasm_interface *tms0980_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms0980_cpu_device::create_disassembler()
 {
-	return new tms0980_disassembler;
+	return std::make_unique<tms0980_disassembler>();
 }
 
 

@@ -1259,24 +1259,24 @@ void m6801_cpu_device::m6801_clock_serial()
 	}
 }
 
-util::disasm_interface *m6801_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6801_cpu_device::create_disassembler()
 {
-	return new m680x_disassembler(6801);
+	return std::make_unique<m680x_disassembler>(6801);
 }
 
-util::disasm_interface *m6803_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6803_cpu_device::create_disassembler()
 {
-	return new m680x_disassembler(6803);
+	return std::make_unique<m680x_disassembler>(6803);
 }
 
-util::disasm_interface *hd6301_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hd6301_cpu_device::create_disassembler()
 {
-	return new m680x_disassembler(6301);
+	return std::make_unique<m680x_disassembler>(6301);
 }
 
-util::disasm_interface *hd63701_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hd63701_cpu_device::create_disassembler()
 {
-	return new m680x_disassembler(63701);
+	return std::make_unique<m680x_disassembler>(63701);
 }
 
 void hd63701_cpu_device::TAKE_TRAP()

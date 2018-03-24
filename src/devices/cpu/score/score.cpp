@@ -1350,7 +1350,7 @@ void score7_cpu_device::unemulated_op(const char * op)
 	fatalerror("%s: unemulated %s (PC=0x%08x)\n", tag(), op, m_ppc);
 }
 
-util::disasm_interface *score7_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> score7_cpu_device::create_disassembler()
 {
-	return new score7_disassembler;
+	return std::make_unique<score7_disassembler>();
 }

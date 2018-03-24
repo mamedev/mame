@@ -3501,9 +3501,9 @@ uint32_t tms9995_device::execute_input_lines() const
 	return 2;
 }
 
-util::disasm_interface *tms9995_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms9995_device::create_disassembler()
 {
-	return new tms9900_disassembler(TMS9995_ID);
+	return std::make_unique<tms9900_disassembler>(TMS9995_ID);
 }
 
 

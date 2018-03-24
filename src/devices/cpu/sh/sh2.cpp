@@ -200,9 +200,9 @@ device_memory_interface::space_config_vector sh2_device::memory_space_config() c
 		};
 }
 
-util::disasm_interface *sh2_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sh2_device::create_disassembler()
 {
-	return new sh_disassembler(false);
+	return std::make_unique<sh_disassembler>(false);
 }
 
 uint8_t sh2_device::RB(offs_t A)
@@ -679,12 +679,11 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "sh2.h"
 #include "sh2comn.h"
+#include "cpu/drcumlsh.h"
+#include "debugger.h"
 
-
-using namespace uml;
 
 const opcode_desc* sh2_device::get_desclist(offs_t pc)
 {
@@ -706,17 +705,15 @@ static void cfunc_fastirq(void *param) { ((sh2_device *)param)->func_fastirq(); 
 
 void sh2_device::static_generate_entry_point()
 {
-	drcuml_state *drcuml = m_drcuml.get();
-	code_label skip = 1;
-	drcuml_block *block;
+	uml::code_label const skip = 1;
 
 	/* begin generating */
-	block = drcuml->begin_block(200);
+	drcuml_block &block(m_drcuml->begin_block(200));
 
 	/* forward references */
-	alloc_handle(drcuml, &m_nocode, "nocode");
-	alloc_handle(drcuml, &m_write32, "write32");     // necessary?
-	alloc_handle(drcuml, &m_entry, "entry");
+	alloc_handle(m_nocode, "nocode");
+	alloc_handle(m_write32, "write32");     // necessary?
+	alloc_handle(m_entry, "entry");
 	UML_HANDLE(block, *m_entry);                         // handle  entry
 
 	/* load fast integer registers */
@@ -776,7 +773,7 @@ void sh2_device::static_generate_entry_point()
 	/* generate a hash jump via the current mode and PC */
 	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode);     // hashjmp <mode>,<pc>,nocode
 
-	block->end();
+	block.end();
 }
 
 
@@ -786,15 +783,15 @@ void sh2_device::static_generate_entry_point()
     an exception if out
 -------------------------------------------------*/
 
-void sh2_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception)
+void sh2_device::generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception)
 {
 	/* check full interrupts if pending */
-	if (compiler->checkints)
+	if (compiler.checkints)
 	{
-		code_label skip = compiler->labelnum++;
+		uml::code_label const skip = compiler.labelnum++;
 
-		compiler->checkints = false;
-		compiler->labelnum += 4;
+		compiler.checkints = false;
+		compiler.labelnum += 4;
 
 		/* check for interrupts */
 		UML_MOV(block, mem(&m_sh2_state->irqline), 0xffffffff);     // mov irqline, #-1
@@ -848,7 +845,7 @@ void sh2_device::generate_update_cycles(drcuml_block *block, compiler_state *com
 	}
 
 	/* account for cycles */
-	if (compiler->cycles > 0)
+	if (compiler.cycles > 0)
 	{
 		UML_SUB(block, mem(&m_sh2_state->icount), mem(&m_sh2_state->icount), MAPVAR_CYCLES);    // sub     icount,icount,cycles
 		UML_MAPVAR(block, MAPVAR_CYCLES, 0);                                        // mapvar  cycles,0
@@ -856,28 +853,26 @@ void sh2_device::generate_update_cycles(drcuml_block *block, compiler_state *com
 			UML_EXHc(block, COND_S, *m_out_of_cycles, param);
 																					// exh     out_of_cycles,nextpc
 	}
-	compiler->cycles = 0;
+	compiler.cycles = 0;
 }
 
 /*------------------------------------------------------------------
     static_generate_memory_accessor
 ------------------------------------------------------------------*/
 
-void sh2_device::static_generate_memory_accessor(int size, int iswrite, const char *name, code_handle **handleptr)
+void sh2_device::static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle *&handleptr)
 {
 	/* on entry, address is in I0; data for writes is in I1 */
 	/* on exit, read result is in I0 */
 	/* routine trashes I0 */
-	drcuml_state *drcuml = m_drcuml.get();
-	drcuml_block *block;
 	int label = 1;
 
 	/* begin generating */
-	block = drcuml->begin_block(1024);
+	drcuml_block &block(m_drcuml->begin_block(1024));
 
 	/* add a global entry for this */
-	alloc_handle(drcuml, handleptr, name);
-	UML_HANDLE(block, **handleptr);                         // handle  *handleptr
+	alloc_handle(handleptr, name);
+	UML_HANDLE(block, *handleptr);                         // handle  *handleptr
 
 	// with internal handlers this becomes easier.
 	// if addr < 0x40000000 AND it with AM and do the read/write, else just do the read/write
@@ -986,7 +981,7 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 
 	UML_RET(block);                         // ret
 
-	block->end();
+	block.end();
 }
 
 

@@ -2982,7 +2982,7 @@ void alto2_cpu_device::soft_reset()
 	m_bitclk_time = 0;              // reset the bitclk timing accu
 }
 
-util::disasm_interface *alto2_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> alto2_cpu_device::create_disassembler()
 {
-	return new alto2_disassembler;
+	return std::make_unique<alto2_disassembler>();
 }

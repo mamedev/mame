@@ -54,9 +54,9 @@ sm590_device::sm590_device(const machine_config &mconfig, device_type type, cons
 }
 
 
-util::disasm_interface *sm590_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sm590_device::create_disassembler()
 {
-	return new sm590_disassembler;
+	return std::make_unique<sm590_disassembler>();
 }
 
 

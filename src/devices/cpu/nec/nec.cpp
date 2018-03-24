@@ -170,9 +170,9 @@ v33a_device::v33a_device(const machine_config &mconfig, const char *tag, device_
 }
 
 
-util::disasm_interface *nec_common_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> nec_common_device::create_disassembler()
 {
-	return new nec_disassembler;
+	return std::make_unique<nec_disassembler>();
 }
 
 

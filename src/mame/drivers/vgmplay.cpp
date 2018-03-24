@@ -112,7 +112,7 @@ public:
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	DECLARE_READ8_MEMBER(segapcm_rom_r);
 	DECLARE_READ8_MEMBER(ymf271_rom_r);
@@ -674,9 +674,9 @@ void vgmplay_device::state_string_export(const device_state_entry &entry, std::s
 {
 }
 
-util::disasm_interface *vgmplay_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> vgmplay_device::create_disassembler()
 {
-	return new vgmplay_disassembler;
+	return std::make_unique<vgmplay_disassembler>();
 }
 
 uint32_t vgmplay_disassembler::opcode_alignment() const

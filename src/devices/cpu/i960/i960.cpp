@@ -2296,7 +2296,7 @@ void i960_cpu_device::device_reset()
 	m_rcache_pos = 0;
 }
 
-util::disasm_interface *i960_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i960_cpu_device::create_disassembler()
 {
-	return new i960_disassembler;
+	return std::make_unique<i960_disassembler>();
 }

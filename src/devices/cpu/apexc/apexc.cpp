@@ -857,7 +857,7 @@ void apexc_cpu_device::execute_run()
 	} while (m_icount > 0);
 }
 
-util::disasm_interface *apexc_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> apexc_cpu_device::create_disassembler()
 {
-	return new apexc_disassembler;
+	return std::make_unique<apexc_disassembler>();
 }

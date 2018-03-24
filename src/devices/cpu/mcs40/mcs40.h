@@ -363,7 +363,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_disasm_interface implementation
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// mcs40_cpu_device_base implementation
 	virtual bool is_io_op(u8 opr) override;
@@ -392,7 +392,7 @@ public:
 
 protected:
 	// device_disasm_interface implementation
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_execute_interface implementation
 	virtual u32 execute_input_lines() const override;

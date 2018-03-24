@@ -27,9 +27,9 @@ arc_cpu_device::arc_cpu_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-util::disasm_interface *arc_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> arc_cpu_device::create_disassembler()
 {
-	return new arc_disassembler;
+	return std::make_unique<arc_disassembler>();
 }
 
 /*****************************************************************************/

@@ -1165,9 +1165,9 @@ void ppc_device::device_reset()
     CPU
 -------------------------------------------------*/
 
-util::disasm_interface *ppc_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> ppc_device::create_disassembler()
 {
-	return new powerpc_disassembler;
+	return std::make_unique<powerpc_disassembler>();
 }
 
 

@@ -349,9 +349,9 @@ void sm8500_cpu_device::process_interrupts()
 }
 
 
-util::disasm_interface *sm8500_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sm8500_cpu_device::create_disassembler()
 {
-	return new sm8500_disassembler;
+	return std::make_unique<sm8500_disassembler>();
 }
 
 

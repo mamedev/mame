@@ -28,7 +28,7 @@ protected:
 	// overrides
 	virtual void device_reset() override;
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void op_setr() override;
 	virtual void op_rstr() override;

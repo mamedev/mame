@@ -23,9 +23,9 @@ deco16_device::deco16_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-util::disasm_interface *deco16_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> deco16_device::create_disassembler()
 {
-	return new deco16_disassembler;
+	return std::make_unique<deco16_disassembler>();
 }
 
 void deco16_device::device_start()

@@ -464,9 +464,9 @@ void i8085a_cpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
-util::disasm_interface *i8085a_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i8085a_cpu_device::create_disassembler()
 {
-	return new i8085_disassembler;
+	return std::make_unique<i8085_disassembler>();
 }
 
 

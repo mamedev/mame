@@ -2872,7 +2872,7 @@ void tlcs90_device::state_string_export(const device_state_entry &entry, std::st
 	}
 }
 
-util::disasm_interface *tlcs90_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tlcs90_device::create_disassembler()
 {
-	return new tlcs90_disassembler;
+	return std::make_unique<tlcs90_disassembler>();
 }

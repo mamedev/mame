@@ -996,9 +996,9 @@ void es5510_device::execute_run() {
 	}
 }
 
-util::disasm_interface *es5510_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> es5510_device::create_disassembler()
 {
-	return new es5510_disassembler;
+	return std::make_unique<es5510_disassembler>();
 }
 
 #if VERBOSE_EXEC

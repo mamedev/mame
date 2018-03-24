@@ -69,9 +69,9 @@ device_memory_interface::space_config_vector sc61860_device::memory_space_config
 	};
 }
 
-util::disasm_interface *sc61860_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sc61860_device::create_disassembler()
 {
-	return new sc61860_disassembler;
+	return std::make_unique<sc61860_disassembler>();
 }
 
 

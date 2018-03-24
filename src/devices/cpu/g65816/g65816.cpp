@@ -788,9 +788,9 @@ void g65816_device::execute_set_input(int line, int state)
 	(this->*FTABLE_SET_LINE)(line, state);
 }
 
-util::disasm_interface *g65816_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> g65816_device::create_disassembler()
 {
-	return new g65816_disassembler(this);
+	return std::make_unique<g65816_disassembler>(this);
 }
 
 bool g65816_device::get_m_flag() const

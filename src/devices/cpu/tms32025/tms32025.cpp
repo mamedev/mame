@@ -254,9 +254,9 @@ device_memory_interface::space_config_vector tms32025_device::memory_space_confi
 	};
 }
 
-util::disasm_interface *tms32025_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms32025_device::create_disassembler()
 {
-	return new tms32025_disassembler;
+	return std::make_unique<tms32025_disassembler>();
 }
 
 READ16_MEMBER( tms32025_device::drr_r)

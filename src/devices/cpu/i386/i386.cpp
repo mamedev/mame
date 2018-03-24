@@ -4012,9 +4012,9 @@ int i386_device::get_mode() const
 	return m_sreg[CS].d ? 32 : 16;
 }
 
-util::disasm_interface *i386_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i386_device::create_disassembler()
 {
-	return new i386_disassembler(this);
+	return std::make_unique<i386_disassembler>(this);
 }
 
 /*****************************************************************************/

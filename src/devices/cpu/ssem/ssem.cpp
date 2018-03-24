@@ -163,9 +163,9 @@ void ssem_device::state_string_export(const device_state_entry &entry, std::stri
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *ssem_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> ssem_device::create_disassembler()
 {
-	return new ssem_disassembler;
+	return std::make_unique<ssem_disassembler>();
 }
 
 

@@ -763,9 +763,9 @@ void adsp21xx_device::state_string_export(const device_state_entry &entry, std::
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *adsp21xx_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> adsp21xx_device::create_disassembler()
 {
-	return new adsp21xx_disassembler;
+	return std::make_unique<adsp21xx_disassembler>();
 }
 
 

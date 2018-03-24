@@ -146,9 +146,9 @@ device_memory_interface::space_config_vector diablo1300_cpu_device::memory_space
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *diablo1300_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> diablo1300_cpu_device::create_disassembler()
 {
-	return new diablo1300_disassembler;
+	return std::make_unique<diablo1300_disassembler>();
 }
 
 

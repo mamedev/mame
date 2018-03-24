@@ -1076,12 +1076,12 @@ void tx0_device::io_complete()
 }
 
 
-util::disasm_interface *tx0_8kw_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tx0_8kw_device::create_disassembler()
 {
-	return new tx0_8kw_disassembler;
+	return std::make_unique<tx0_8kw_disassembler>();
 }
 
-util::disasm_interface *tx0_64kw_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tx0_64kw_device::create_disassembler()
 {
-	return new tx0_64kw_disassembler;
+	return std::make_unique<tx0_64kw_disassembler>();
 }

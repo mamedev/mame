@@ -124,9 +124,9 @@ uint32_t ti990_10_device::execute_input_lines() const
 }
 
 // TODO: check 9900dasm
-util::disasm_interface *ti990_10_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> ti990_10_device::create_disassembler()
 {
-	return new tms9900_disassembler(TMS9900_ID);
+	return std::make_unique<tms9900_disassembler>(TMS9900_ID);
 }
 
 DEFINE_DEVICE_TYPE(TI990_10, ti990_10_device, "ti990_10_cpu", "Texas Instruments TI990/10 CPU")

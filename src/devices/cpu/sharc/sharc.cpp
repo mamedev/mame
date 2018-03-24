@@ -97,9 +97,9 @@ device_memory_interface::space_config_vector adsp21062_device::memory_space_conf
 	};
 }
 
-util::disasm_interface *adsp21062_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> adsp21062_device::create_disassembler()
 {
-	return new sharc_disassembler;
+	return std::make_unique<sharc_disassembler>();
 }
 
 void adsp21062_device::enable_recompiler()

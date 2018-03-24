@@ -423,7 +423,7 @@ void t11_device::execute_run()
 	} while (m_icount > 0);
 }
 
-util::disasm_interface *t11_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> t11_device::create_disassembler()
 {
-	return new t11_disassembler;
+	return std::make_unique<t11_disassembler>();
 }

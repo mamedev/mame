@@ -321,9 +321,9 @@ void necdsp_device::execute_set_input(int inputnum, int state)
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *necdsp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> necdsp_device::create_disassembler()
 {
-	return new necdsp_disassembler;
+	return std::make_unique<necdsp_disassembler>();
 }
 
 void necdsp_device::execute_run()

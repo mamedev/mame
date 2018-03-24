@@ -64,9 +64,9 @@ device_memory_interface::space_config_vector arcompact_device::memory_space_conf
 	};
 }
 
-util::disasm_interface *arcompact_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> arcompact_device::create_disassembler()
 {
-	return new arcompact_disassembler;
+	return std::make_unique<arcompact_disassembler>();
 }
 
 

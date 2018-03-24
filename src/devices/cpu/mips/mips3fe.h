@@ -7,11 +7,10 @@
     Front-end for MIPS3 recompiler
 
 ***************************************************************************/
+#ifndef MAME_CPU_MIPS_MIPS3FE_H
+#define MAME_CPU_MIPS_MIPS3FE_H
 
 #pragma once
-
-#ifndef __MIPS3FE_H__
-#define __MIPS3FE_H__
 
 
 //**************************************************************************
@@ -30,4 +29,4 @@
 #define REGFLAG_FCC                     (1 << 2)
 
 
-#endif /* __MIPS3FE_H__ */
+#endif // MAME_CPU_MIPS_MIPS3FE_H

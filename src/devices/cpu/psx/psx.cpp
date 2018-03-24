@@ -2077,9 +2077,9 @@ void psxcpu_device::state_string_export( const device_state_entry &entry, std::s
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *psxcpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> psxcpu_device::create_disassembler()
 {
-	return new psxcpu_disassembler(this);
+	return std::make_unique<psxcpu_disassembler>(static_cast<psxcpu_disassembler::config *>(this));
 }
 
 

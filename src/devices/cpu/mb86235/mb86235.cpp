@@ -288,9 +288,9 @@ void mb86235_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-util::disasm_interface *mb86235_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mb86235_device::create_disassembler()
 {
-	return new mb86235_disassembler;
+	return std::make_unique<mb86235_disassembler>();
 }
 
 

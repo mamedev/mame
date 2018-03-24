@@ -1510,9 +1510,9 @@ void hyperstone_device::state_string_export(const device_state_entry &entry, std
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *hyperstone_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hyperstone_device::create_disassembler()
 {
-	return new hyperstone_disassembler(this);
+	return std::make_unique<hyperstone_disassembler>(this);
 }
 
 u8 hyperstone_device::get_fp() const

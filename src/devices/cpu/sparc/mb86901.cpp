@@ -523,10 +523,10 @@ void mb86901_device::state_string_export(const device_state_entry &entry, std::s
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *mb86901_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mb86901_device::create_disassembler()
 {
-	auto dasm = new sparc_disassembler(this, 7);
-	m_asi_desc_adder(dasm);
+	auto dasm = std::make_unique<sparc_disassembler>(static_cast<sparc_disassembler::config const *>(this), 7);
+	m_asi_desc_adder(dasm.get());
 	return dasm;
 }
 

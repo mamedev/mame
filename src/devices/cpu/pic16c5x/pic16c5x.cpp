@@ -184,9 +184,9 @@ device_memory_interface::space_config_vector pic16c5x_device::memory_space_confi
 	};
 }
 
-util::disasm_interface *pic16c5x_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> pic16c5x_device::create_disassembler()
 {
-	return new pic16c5x_disassembler;
+	return std::make_unique<pic16c5x_disassembler>();
 }
 
 

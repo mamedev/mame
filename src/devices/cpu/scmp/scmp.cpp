@@ -55,9 +55,9 @@ ins8060_device::ins8060_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-util::disasm_interface *scmp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> scmp_device::create_disassembler()
 {
-	return new scmp_disassembler;
+	return std::make_unique<scmp_disassembler>();
 }
 
 

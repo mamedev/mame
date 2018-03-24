@@ -55,9 +55,9 @@ device_memory_interface::space_config_vector v810_device::memory_space_config() 
 }
 
 
-util::disasm_interface *v810_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> v810_device::create_disassembler()
 {
-	return new v810_disassembler;
+	return std::make_unique<v810_disassembler>();
 }
 
 

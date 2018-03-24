@@ -1366,24 +1366,16 @@ void cop400_cpu_device::state_string_export(const device_state_entry &entry, std
 }
 
 
-util::disasm_interface *cop400_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> cop400_cpu_device::create_disassembler()
 {
 	if ( m_featuremask & COP424C_FEATURE )
-	{
-		return new cop424_disassembler;
-	}
-
-	if ( m_featuremask & COP444L_FEATURE )
-	{
-		return new cop444_disassembler;
-	}
-
-	if ( m_featuremask & COP420_FEATURE )
-	{
-		return new cop420_disassembler;
-	}
-
-	return new cop410_disassembler;
+		return std::make_unique<cop424_disassembler>();
+	else if ( m_featuremask & COP444L_FEATURE )
+		return std::make_unique<cop444_disassembler>();
+	else if ( m_featuremask & COP420_FEATURE )
+		return std::make_unique<cop420_disassembler>();
+	else
+		return std::make_unique<cop410_disassembler>();
 }
 
 READ8_MEMBER( cop400_cpu_device::microbus_rd )

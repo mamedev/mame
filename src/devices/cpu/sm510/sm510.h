@@ -323,7 +323,7 @@ protected:
 	void program_2_7k(address_map &map);
 	void data_96_32x4(address_map &map);
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
 
@@ -347,7 +347,7 @@ protected:
 	virtual void device_post_load() override { notify_clock_changed(); }
 	virtual void device_reset() override;
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
 

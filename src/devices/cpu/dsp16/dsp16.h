@@ -146,7 +146,7 @@ protected:
 	virtual void state_string_export(device_state_entry const &entry, std::string &str) const override;
 
 	// device_disasm_interface implementation
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// dsp16_disassembler::cpu implementation
 	virtual predicate check_con(offs_t pc, u16 op) const override;
