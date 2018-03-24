@@ -38,8 +38,6 @@ public:
 	virtual ~device_disasm_interface() = default;
 
 	// Override
-	void set_dasm_override(dasm_override_delegate dasm_override);
-
 	template <typename Obj> void set_dasm_override(Obj &&cb) { m_dasm_override = std::forward<Obj>(cb); }
 
 	// disassembler request
