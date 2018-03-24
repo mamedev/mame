@@ -3,7 +3,7 @@
 
 /***************************************************************************
 
-  IBM Professional Graphics Controller (PGC), skeleton driver.
+  IBM Professional Graphics Controller (PGC).
 
   Designed for IBM by Vermont Microsystems.  References:
 
@@ -16,13 +16,13 @@
     http://www.seasip.info/VintagePC/pgc.html
 
   To do:
-  - decode memory map
-  - various VRAM write modes
+  - pass IBM diagnostics (currently fail with code 3905)
+  - CGA emulator
   - what's up with irq 3 (= vblank irq)? (causes soft reset)
   - "test pin of the microprocessor samples the hsync pulse"
-  - CGA emulator
   - bus state handling?
   - VRAM address translator ROM?
+  - clones/compatibles?  CompuShow apparently was tested with a clone and sends opcode E6, writes 2 to C630C
 
 ***************************************************************************/
 
@@ -112,19 +112,14 @@ void isa8_pgc_device::pgc_map(address_map &map)
 	map(0x00000, 0x07fff).rom();
 	map(0x08000, 0x0ffff).rom().region("maincpu", 0x8000);
 	map(0x10000, 0x1001f).rw(this, FUNC(isa8_pgc_device::stateparam_r), FUNC(isa8_pgc_device::stateparam_w));
-//  AM_RANGE(0x18000, 0x18fff) AM_RAM   // ??
+//	map(0x18000, 0x18fff).ram();   // ??
 	map(0x28000, 0x287ff).ram().region("commarea", 0).mirror(0x800);
 	map(0x32001, 0x32001).nopw();
 	map(0x32020, 0x3203f).w(this, FUNC(isa8_pgc_device::accel_w));
 	map(0x3c000, 0x3c001).r(this, FUNC(isa8_pgc_device::init_r));
-//  AM_RANGE(0x3e000, 0x3efff) AM_RAM   // ??
+//	map(0x3e000, 0x3efff).ram();   // ??
 	map(0x80000, 0xf7fff).rw(this, FUNC(isa8_pgc_device::vram_r), FUNC(isa8_pgc_device::vram_w));
 	map(0xf8000, 0xfffff).rom().region("maincpu", 0x8000);
-}
-
-void isa8_pgc_device::pgc_io(address_map &map)
-{
-	map.unmap_value_high();
 }
 
 static const gfx_layout pgc_charlayout =
@@ -159,7 +154,6 @@ DEFINE_DEVICE_TYPE(ISA8_PGC, isa8_pgc_device, "isa_ibm_pgc", "IBM Professional G
 MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
 	MCFG_CPU_ADD("maincpu", I8088, XTAL(24'000'000)/3)
 	MCFG_CPU_PROGRAM_MAP(pgc_map)
-	MCFG_CPU_IO_MAP(pgc_io)
 #if 0
 	MCFG_CPU_VBLANK_INT_DRIVER(PGC_SCREEN_NAME, isa8_pgc_device, vblank_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(isa8_pgc_device, irq_callback)
@@ -186,7 +180,7 @@ MACHINE_CONFIG_END
 
 const tiny_rom_entry *isa8_pgc_device::device_rom_region() const
 {
-	return ROM_NAME( pgc );
+	return ROM_NAME(pgc);
 }
 
 //-------------------------------------------------
@@ -195,7 +189,7 @@ const tiny_rom_entry *isa8_pgc_device::device_rom_region() const
 
 ioport_constructor isa8_pgc_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( pgc );
+	return INPUT_PORTS_NAME(pgc);
 }
 
 //**************************************************************************
@@ -231,9 +225,9 @@ void isa8_pgc_device::device_start()
 
 	set_isa_device();
 
-	for (int i = 0; i < 256; i++ )
+	for (int i = 0; i < 256; i++)
 	{
-		m_palette->set_pen_color( i, 0, 0, 0 );
+		m_palette->set_pen_color(i, 0, 0, 0);
 	}
 
 	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
@@ -247,7 +241,7 @@ void isa8_pgc_device::device_start()
 
 void isa8_pgc_device::reset_common()
 {
-	address_space &space = m_cpu->space( AS_PROGRAM );
+	address_space &space = m_cpu->space(AS_PROGRAM);
 
 	space.unmap_readwrite(0xf8000, 0xfffff);
 	space.install_rom(0xf8000, 0xfffff, memregion("maincpu")->base() + 0x8000);
@@ -283,7 +277,7 @@ IRQ_CALLBACK_MEMBER(isa8_pgc_device::irq_callback)
 
 // memory handlers
 
-READ8_MEMBER( isa8_pgc_device::vram_r )
+READ8_MEMBER(isa8_pgc_device::vram_r)
 {
 	uint8_t ret;
 
@@ -303,7 +297,7 @@ READ8_MEMBER( isa8_pgc_device::vram_r )
  * 9 - write up to 5 pixel groups, ending at offset.  offset may be in the middle of pixel group.
  * 13 - write up to 5 pixel groups, starting at offset.
  */
-WRITE8_MEMBER( isa8_pgc_device::vram_w )
+WRITE8_MEMBER(isa8_pgc_device::vram_w)
 {
 	bool handled = true;
 
@@ -342,16 +336,17 @@ WRITE8_MEMBER( isa8_pgc_device::vram_w )
 		handled = false;
 		break;
 	}
-	LOGV("vram W @ %02x <- %02x (accel %d)%s\n", offset, data, m_accel, handled ? "" : " (unsupported)");
+	LOGV("vram W @ %02x <- %02x (accel %d)%s\n", offset, data, m_accel,
+		 handled ? "" : " (unsupported)");
 }
 
-WRITE8_MEMBER( isa8_pgc_device::accel_w )
+WRITE8_MEMBER(isa8_pgc_device::accel_w)
 {
 	m_accel = offset >> 1;
 	LOGV("accel  @ %05x <- %02x (%d)\n", 0x32020 + offset, data, m_accel);
 }
 
-READ8_MEMBER( isa8_pgc_device::stateparam_r )
+READ8_MEMBER(isa8_pgc_device::stateparam_r)
 {
 	uint8_t ret;
 
@@ -363,7 +358,7 @@ READ8_MEMBER( isa8_pgc_device::stateparam_r )
 	return ret;
 }
 
-WRITE8_MEMBER( isa8_pgc_device::stateparam_w )
+WRITE8_MEMBER(isa8_pgc_device::stateparam_w)
 {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
@@ -372,11 +367,12 @@ WRITE8_MEMBER( isa8_pgc_device::stateparam_w )
 	m_stateparam[offset >> 1] = data;
 }
 
-WRITE8_MEMBER( isa8_pgc_device::lut_w )
+WRITE8_MEMBER(isa8_pgc_device::lut_w)
 {
 	uint8_t o = (offset >> 1) * 3;
 
-	if (offset & 1) {
+	if (offset & 1)
+	{
 		m_lut[o + 2] = (data & 15) << 4;
 		m_palette->set_pen_color( offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] );
 		LOG("lut W @ %02X <- %d %d %d\n",
@@ -387,7 +383,7 @@ WRITE8_MEMBER( isa8_pgc_device::lut_w )
 	}
 }
 
-READ8_MEMBER( isa8_pgc_device::init_r )
+READ8_MEMBER(isa8_pgc_device::init_r)
 {
 	LOG("INIT: unmapping ROM\n");
 	space.unmap_read(0xf8000, 0xfffff);
@@ -421,7 +417,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(isa8_pgc_device::scanline_callback)
 	v = &m_vram[y * 1024];
 	p = &m_bitmap->pix16(y, 0);
 
-	for (x = 0; x < PGC_DISP_HORZ; x++) {
+	for (x = 0; x < PGC_DISP_HORZ; x++)
+	{
 		*p++ = *v++;
 	}
 }
