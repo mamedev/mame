@@ -9,6 +9,11 @@
 
 #include "osdcore.h"
 #include "cpu/z80/z80.h"
+#include "machine/am9517a.h"
+#include "machine/mb89374.h"
+
+#define M1COMM_TAG "m1comm"
+#define M1COMM_CPU_REGION "m1comm:commcpu"
 
 #define MCFG_M1COMM_ADD(_tag ) \
 	MCFG_DEVICE_ADD(_tag, M1COMM, 0)
@@ -23,31 +28,17 @@ public:
 	// construction/destruction
 	m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// internal API - stuff that happens on the comm board
-	// MB89374 registers
-	DECLARE_READ8_MEMBER(dlc_reg_r);
-	DECLARE_WRITE8_MEMBER(dlc_reg_w);
-	// MB89237A registers
-	DECLARE_READ8_MEMBER(dma_reg_r);
-	DECLARE_WRITE8_MEMBER(dma_reg_w);
-	// single bit registers (74LS74)
-	DECLARE_READ8_MEMBER(syn_r);
-	DECLARE_WRITE8_MEMBER(syn_w);
-	DECLARE_READ8_MEMBER(zfg_r);
-	DECLARE_WRITE8_MEMBER(zfg_w);
-	// shared memory 4k
-	DECLARE_READ8_MEMBER(share_r);
-	DECLARE_WRITE8_MEMBER(share_w);
-
 	// public API - stuff that gets called from the model1
 	// shared memory 4k
 	// reads/writes at I/O 0xB00xxx
-	// - share_r
-	// - share_w
+	DECLARE_READ8_MEMBER(share_r);
+	DECLARE_WRITE8_MEMBER(share_w);
+
 	// single bit registers (74LS74)
 	// reads/writes at I/O 0xB01000
 	DECLARE_READ8_MEMBER(cn_r);
 	DECLARE_WRITE8_MEMBER(cn_w);
+
 	// reads/writes at I/O 0xB01002
 	DECLARE_READ8_MEMBER(fg_r);
 	DECLARE_WRITE8_MEMBER(fg_w);
@@ -61,21 +52,44 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_reset_after_children() override;
+
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	required_device<z80_device> m_commcpu;
+	required_device<z80_device> m_cpu;
+	required_device<am9517a_device> m_dma;
+	required_device<mb89374_device> m_dlc;
+
+	// MB89374 handler
+	DECLARE_WRITE_LINE_MEMBER(dlc_int7_w);
+
+	// MB89237A handler
+	DECLARE_WRITE_LINE_MEMBER(dma_hreq_w);
+	DECLARE_READ8_MEMBER(dma_mem_r);
+	DECLARE_WRITE8_MEMBER(dma_mem_w);
+
+	// single bit registers (74LS74)
+	DECLARE_READ8_MEMBER(syn_r);
+	DECLARE_WRITE8_MEMBER(syn_w);
+	DECLARE_READ8_MEMBER(zfg_r);
+	DECLARE_WRITE8_MEMBER(zfg_w);
+
+	// shared memory 4k
+	// reads/writes at 0xC000-FFFF
+	// - share_r
+	// - share_w
 
 	uint8_t m_shared[0x1000]; // 2x 2k = 4k; model1 accesses this with 16bit data and 11bit address (A0 to A10)
-	uint8_t m_dlc_reg[0x20];  // MB89374 registers
-	uint8_t m_dma_reg[0x20];  // MB89237A registers
-	uint8_t m_syn;            // bit0 is stored; purpose unknown, bit1 is used to enable/disable VINT/IRQ5
-	uint8_t m_zfg;            // z80 flip gate? purpose unknown, bit0 is stored
+	uint8_t m_syn;            // bit0 is used to trigger DOP line on VINT, bit1 is used to enable/disable VINT/IRQ5
+	uint8_t m_zfg;            // z80 flip gate, bit0 is stored
 	uint8_t m_cn;             // bit0 is used to enable/disable the comm board
-	uint8_t m_fg;             // flip gate? purpose unknown, bit0 is stored, bit7 is connected to ZFG bit 0
+	uint8_t m_fg;             // flip gate, bit0 is stored, bit7 is connected to ZFG bit 0
 
+#ifdef M1COMM_SIMULATION
 	osd_file::ptr m_line_rx;  // rx line - can be either differential, simple serial or toslink
 	osd_file::ptr m_line_tx;  // tx line - is differential, simple serial and toslink
 	char m_localhost[256];
@@ -84,7 +98,6 @@ private:
 	uint8_t m_buffer1[0x200];
 	uint8_t m_framesync;
 
-#ifdef M1COMM_SIMULATION
 	uint8_t m_linkenable;
 	uint16_t m_linktimer;
 	uint8_t m_linkalive;
