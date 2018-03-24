@@ -787,7 +787,7 @@ uint8_t ay31015_device::get_received_data()
 		m_status_reg &= ~STATUS_DAV;
 		update_status_pins();
 	}
-	
+
 	return m_rx_buffer;
 }
 

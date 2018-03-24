@@ -4,13 +4,13 @@
 
     Casio CZ-101
 
-	Digital Synthesizer
+    Digital Synthesizer
 
-	TODO:
-	- To get the display to show something, our uPD7810 core needs to
-	  output the full port value even if the port is set as input (port a).
-	- Currently seems to hang while processing the serial ports (midi). Our
-	  uPD7810 core is lacking the externally clocked serial mode.
+    TODO:
+    - To get the display to show something, our uPD7810 core needs to
+      output the full port value even if the port is set as input (port a).
+    - Currently seems to hang while processing the serial ports (midi). Our
+      uPD7810 core is lacking the externally clocked serial mode.
 
 ***************************************************************************/
 
@@ -387,7 +387,7 @@ MACHINE_CONFIG_START( cz101_state::cz101 )
 	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(cz101_state, port_c_w))
 
 	MCFG_CLOCK_ADD("midi_clock", 2_MHz_XTAL)
-//	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("maincpu", upd7810_device, sck_w)) not supported yet
+//  MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("maincpu", upd7810_device, sck_w)) not supported yet
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", LCD)

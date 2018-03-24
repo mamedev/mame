@@ -64,7 +64,7 @@ public:
 	optional_device<es5510_device> m_esp;
 	optional_device<esq_5505_5510_pump_device> m_pump;
 	required_device<esq2x40_sq1_device> m_sq1vfd;
-	
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -123,11 +123,11 @@ MACHINE_CONFIG_START(esqasr_state::asr)
 	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	
+
 	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	
+
 	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
@@ -156,11 +156,11 @@ MACHINE_CONFIG_START(esqasr_state::asrx)
 	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	
+
 	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32)) // Actually ES5511
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	
+
 	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */

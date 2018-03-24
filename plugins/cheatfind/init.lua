@@ -419,7 +419,7 @@ function cheatfind.startplugin()
 							file:write(string.format(cheat_save.json, desc))
 							file:close()
 							-- xml or simple are program space only
-							if not getmetatable(devtable[devcur].space).__name:match("device_t") and devtable[devcur].sname == "program" then 
+							if not getmetatable(devtable[devcur].space).__name:match("device_t") and devtable[devcur].sname == "program" then
 								file = io.open(filename .. ".xml", "w")
 								file:write(string.format(cheat_save.xml, desc))
 								file:close()

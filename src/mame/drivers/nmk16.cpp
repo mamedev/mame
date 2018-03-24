@@ -346,11 +346,11 @@ void nmk16_state::vandykeb_map(address_map &map)
 	map(0x080002, 0x080003).portr("IN1");
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
-//	map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
+//  map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
 	map(0x080010, 0x08001d).w(this, FUNC(nmk16_state::vandykeb_scroll_w)); /* 10, 12, 1a, 1c */
 	map(0x080016, 0x080017).nopw();    /* IRQ enable? */
 	map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
-//	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
+//  map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c007).nopw();    /* just in case... */
 	map(0x090000, 0x093fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
@@ -386,12 +386,12 @@ void nmk16_state::tharrier_map(address_map &map)
 	map(0x08000f, 0x08000f).r("soundlatch2", FUNC(generic_latch_8_device::read));    /* from Z80 */
 	map(0x080010, 0x080011).w(this, FUNC(nmk16_state::tharrier_mcu_control_w));
 	map(0x080012, 0x080013).nopw();
-//	map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
-//	map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
+//  map(0x080014, 0x080015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+//  map(0x080018, 0x080019).w(this, FUNC(nmk16_state::nmk_tilebank_w));
 	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x080202, 0x080203).portr("IN2");
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-//	map(0x08c000, 0x08c007).w(this, FUNC(nmk16_state::nmk_scroll_w));
+//  map(0x08c000, 0x08c007).w(this, FUNC(nmk16_state::nmk_scroll_w));
 	map(0x090000, 0x093fff).ram().w(this, FUNC(nmk16_state::nmk_bgvideoram_w<0>)).share("nmk_bgvideoram0");
 	map(0x09c000, 0x09c7ff).ram(); /* Unused txvideoram area? */
 	map(0x09d000, 0x09d7ff).ram().w(this, FUNC(nmk16_state::nmk_txvideoram_w)).share("nmk_txvideoram");
@@ -502,7 +502,7 @@ void nmk16_state::bioship_map(address_map &map)
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
 	map(0x08000f, 0x08000f).r(m_nmk004, FUNC(nmk004_device::read));
-//	map(0xc0014, 0xc0015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
+//  map(0xc0014, 0xc0015).w(this, FUNC(nmk16_state::nmk_flipscreen_w));
 	map(0x080016, 0x080017).w(this, FUNC(nmk16_state::nmk16_bioship_x0016_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x084000, 0x084001).w(this, FUNC(nmk16_state::bioship_bank_w));

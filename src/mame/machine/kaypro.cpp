@@ -273,9 +273,9 @@ QUICKLOAD_LOAD_MEMBER( kaypro_state, kaypro )
 	membank("bankr0")->set_entry(0);
 	membank("bank3")->set_entry(0);
 	RAM[0x80]=0; RAM[0x81]=0;    // clear out command tail
-	
+
 	m_maincpu->set_pc(0x100);    // start program
-	m_maincpu->set_state_int(Z80_SP, 256 * RAM[7] - 300);	// put the stack a bit before BDOS
+	m_maincpu->set_state_int(Z80_SP, 256 * RAM[7] - 300);   // put the stack a bit before BDOS
 
 	return image_init_result::PASS;
 }

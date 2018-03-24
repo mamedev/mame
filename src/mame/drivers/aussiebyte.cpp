@@ -438,23 +438,23 @@ SLOT_INTERFACE_END
 QUICKLOAD_LOAD_MEMBER( aussiebyte_state, aussiebyte )
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	
+
 	if (quickload_size >= 0xfd00)
 		return image_init_result::FAIL;
-	
+
 	/* RAM must be banked in */
-	m_port15 = true;	// disable boot rom
+	m_port15 = true;    // disable boot rom
 	m_port1a = 4;
-	membank("bankr0")->set_entry(m_port1a);	/* enable correct program bank */
+	membank("bankr0")->set_entry(m_port1a); /* enable correct program bank */
 	membank("bankw0")->set_entry(m_port1a);
-	
+
 	/* Avoid loading a program if CP/M-80 is not in memory */
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 	{
 		machine_reset();
 		return image_init_result::FAIL;
 	}
-	
+
 	/* Load image to the TPA (Transient Program Area) */
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
@@ -466,11 +466,11 @@ QUICKLOAD_LOAD_MEMBER( aussiebyte_state, aussiebyte )
 
 	/* clear out command tail */
 	prog_space.write_byte(0x80, 0); prog_space.write_byte(0x81, 0);
-	
+
 	/* Roughly set SP basing on the BDOS position */
 	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 0x400);
 	m_maincpu->set_pc(0x100);                // start program
-	
+
 	return image_init_result::PASS;
 }
 
@@ -591,7 +591,7 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_MC6845_ADDR_CHANGED_CB(aussiebyte_state, crtc_update_addr)
 
 	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
-	
+
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", aussiebyte_state, aussiebyte, "com,cpm", 3)
 

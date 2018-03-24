@@ -222,19 +222,19 @@ WRITE8_MEMBER(magnum_state::sysctl_w)
 }
 
 /* IRQs
- * bit	0 -
- * 		1 -
- * 		2 -
- * 		3 -
- * 		4 -
- * 		5 - Keyboard?
- * 		6 - RTC?
- * 		7 -
- * 		8 - UART1?
- * 		9 - UART2?
- * 		10- Reset?
- * 		11-14 ...
- * 		15- CRTC?
+ * bit  0 -
+ *      1 -
+ *      2 -
+ *      3 -
+ *      4 -
+ *      5 - Keyboard?
+ *      6 - RTC?
+ *      7 -
+ *      8 - UART1?
+ *      9 - UART2?
+ *      10- Reset?
+ *      11-14 ...
+ *      15- CRTC?
  */
 
 READ16_MEMBER(magnum_state::irqstat_r)

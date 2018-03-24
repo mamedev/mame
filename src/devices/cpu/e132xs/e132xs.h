@@ -137,7 +137,7 @@ protected:
 	// compilation boundaries -- how far back/forward does the analysis extend?
 	enum : u32
 	{
-		COMPILE_BACKWARDS_BYTES 	= 128,
+		COMPILE_BACKWARDS_BYTES     = 128,
 		COMPILE_FORWARDS_BYTES      = 512,
 		COMPILE_MAX_INSTRUCTIONS    = (COMPILE_BACKWARDS_BYTES / 4) + (COMPILE_FORWARDS_BYTES / 4),
 		COMPILE_MAX_SEQUENCE        = 64

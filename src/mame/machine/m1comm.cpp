@@ -128,10 +128,10 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
-const tiny_rom_entry *m1comm_device::device_rom_region() const 
-{ 
-	return ROM_NAME( m1comm ); 
-} 
+const tiny_rom_entry *m1comm_device::device_rom_region() const
+{
+	return ROM_NAME( m1comm );
+}
 
 //**************************************************************************
 //  LIVE DEVICE

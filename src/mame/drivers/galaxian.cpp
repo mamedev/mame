@@ -11616,7 +11616,7 @@ ROM_END
 
 
 // two board stack MU1 and MU2A. Has different colors and level sequence. Came from an A.V.G. by Zaccaria cabinet with Konami license, but still has only Konami copyright.
-// https://www.youtube.com/watch?v=CZRRVACtC3A 
+// https://www.youtube.com/watch?v=CZRRVACtC3A
 ROM_START( scobrag )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2c_32.bin",   0x0000, 0x1000, CRC(04ffab61) SHA1(302ae8b224d98c405aadd363623eddf88bdc3f0e) )

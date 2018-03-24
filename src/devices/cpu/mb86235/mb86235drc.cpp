@@ -640,7 +640,7 @@ void mb86235_device::generate_ea(drcuml_block &block, compiler_state &compiler, 
 		case 0x4:   // @ARx+ARy
 			UML_ADD(block, I0, AR(arx), AR(ary));
 			break;
-		case 0x5:	// @ARx+ARy++
+		case 0x5:   // @ARx+ARy++
 			UML_ADD(block, I0, AR(arx), AR(ary));
 			UML_ADD(block, AR(ary), AR(ary), 1);
 			break;
@@ -663,7 +663,7 @@ void mb86235_device::generate_reg_read(drcuml_block &block, compiler_state &comp
 		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
 			// MA0-7
 			UML_MOV(block, dst, MA(reg & 7));
-			break;		
+			break;
 
 		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 			// AA0-7
@@ -679,7 +679,7 @@ void mb86235_device::generate_reg_read(drcuml_block &block, compiler_state &comp
 			// MB0-7
 			UML_MOV(block, dst, MB(reg & 7));
 			break;
-			
+
 		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
 			// AB0-7
 			UML_MOV(block, dst, AB(reg & 7));
@@ -1331,7 +1331,7 @@ void mb86235_device::generate_alu(drcuml_block &block, compiler_state &compiler,
 			if (AU_CALC_REQUIRED) UML_MOV(block, FLAGS_AU, 0);
 			break;
 
-		case 0x19:		// OR
+		case 0x19:      // OR
 			generate_alumul_input(block, compiler, desc, i2, uml::I0, false, false);
 			UML_OR(block, alutemp ? mem(&m_core->alutemp) : get_alu_output(io), I0, get_alu1_input(i1));
 			if (AN_CALC_REQUIRED) UML_SETc(block, COND_S, FLAGS_AN);
@@ -1339,8 +1339,8 @@ void mb86235_device::generate_alu(drcuml_block &block, compiler_state &compiler,
 			if (AV_CALC_REQUIRED) UML_MOV(block, FLAGS_AV, 0);
 			if (AU_CALC_REQUIRED) UML_MOV(block, FLAGS_AU, 0);
 			break;
-			
-		case 0x1a:		// XOR
+
+		case 0x1a:      // XOR
 			generate_alumul_input(block, compiler, desc, i2, uml::I0, false, false);
 			UML_XOR(block, alutemp ? mem(&m_core->alutemp) : get_alu_output(io), I0, get_alu1_input(i1));
 			if (AN_CALC_REQUIRED) UML_SETc(block, COND_S, FLAGS_AN);
@@ -1348,7 +1348,7 @@ void mb86235_device::generate_alu(drcuml_block &block, compiler_state &compiler,
 			if (AV_CALC_REQUIRED) UML_MOV(block, FLAGS_AV, 0);
 			if (AU_CALC_REQUIRED) UML_MOV(block, FLAGS_AU, 0);
 			break;
-		
+
 		case 0x1c:      // LSR
 			generate_alumul_input(block, compiler, desc, i1, uml::I0, false, false);
 			UML_SHR(block, I0, I0, i2);

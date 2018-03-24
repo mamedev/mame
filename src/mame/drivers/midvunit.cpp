@@ -57,7 +57,7 @@ void midvunit_state::machine_start()
 	save_item(NAME(m_wheel_board_output));
 	save_item(NAME(m_wheel_board_last));
 	save_item(NAME(m_wheel_board_u8_latch));
-	
+
 	m_optional_drivers.resolve();
 }
 
@@ -654,7 +654,7 @@ void midvunit_state::midvplus_map(address_map &map)
  *  Input ports
  *
  *************************************/
- 
+
 static INPUT_PORTS_START( midvunit )
 	PORT_START("991030")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
@@ -705,7 +705,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( crusnusa )
 	PORT_INCLUDE( midvunit )
-	
+
 	PORT_START("MOTION")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Mat Not Plugged In")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Mat Stepped On")
@@ -715,7 +715,7 @@ static INPUT_PORTS_START( crusnusa )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Fail Safe Switch Engaged")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Fail Safe Switch Not Connected Correctly")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Board Not Plugged In")
-	
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Stop")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Device 1")

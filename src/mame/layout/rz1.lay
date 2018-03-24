@@ -7,7 +7,7 @@ Casio RZ-1 layout
 -->
 
 <mamelayout version="2">
-	
+
 	<element name="background">
 		<rect><color red="0.15" green="0.11" blue="0.11" /></rect>
 	</element>
@@ -120,12 +120,12 @@ Casio RZ-1 layout
 	<element name="text_sample2"><text string="SAMPLE 2"><color red="0.15" green="0.11" blue="0.11" /></text></element>
 	<element name="text_sample3"><text string="SAMPLE 3"><color red="0.15" green="0.11" blue="0.11" /></text></element>
 	<element name="text_sample4"><text string="SAMPLE 4"><color red="0.15" green="0.11" blue="0.11" /></text></element>
-	
+
 	<view name="Default">
 		<backdrop element="background">
 			<bounds x="0" y="0" width="800" height="535" />
 		</backdrop>
-		
+
 		<backdrop element="button_white">
 			<bounds x="319" y="211" width="161" height="13" />
 		</backdrop>
@@ -242,8 +242,8 @@ Casio RZ-1 layout
 			<bounds x="1" y="181" width="798" height="1" />
 		</cpanel>
 
-		<!-- leds -->		
-		
+		<!-- leds -->
+
 		<cpanel name="led_song" element="led">
 			<bounds x="50" y="271" width="9" height="4" />
 		</cpanel>

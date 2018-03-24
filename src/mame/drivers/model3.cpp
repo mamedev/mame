@@ -5911,10 +5911,10 @@ uint16_t model3_state::crypt_read_callback(uint32_t addr)
 
 MACHINE_CONFIG_START(model3_state::model3_20_5881)
 	model3_20(config);
-	
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(model3_5881_mem)
-	
+
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model3_state, crypt_read_callback)
 MACHINE_CONFIG_END
@@ -5964,7 +5964,7 @@ MACHINE_CONFIG_START(model3_state::model3_21_5881)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(model3_5881_mem)
-	
+
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model3_state, crypt_read_callback)
 MACHINE_CONFIG_END

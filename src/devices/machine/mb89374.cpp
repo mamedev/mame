@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Ariane Fugmann
 /**
-	MB89374
+    MB89374
 
-	Fujitsu
-	Data Link Controller
+    Fujitsu
+    Data Link Controller
 
  **/
 
@@ -278,7 +278,7 @@ READ8_MEMBER(mb89374_device::read)
 		case REGISTER_RXSR0:
 			data = m_rxsr0;
 			break;
-			
+
 		case REGISTER_RXSR1:
 			data = m_rxsr1;
 			break;

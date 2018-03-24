@@ -698,10 +698,10 @@ x   x   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   
 */
 
 ADDRESS_MAP_START(notetaker_state::ep_mem)
-    AM_RANGE(0x00000, 0x01fff) AM_MIRROR(0xc0000) AM_RAM // actually a banked block of ram, 8kb (4kw)
-    AM_RANGE(0x02000, 0x3ffff) AM_MIRROR(0xc0000) AM_RAM AM_REGION("mainram", 0x2000) // 256k of ram (less 8k), shared between both processors, mirrored 4 times
-    //AM_RANGE(0xfffc0, 0xfffdf) AM_MIRROR(0xc0000) AM_READWRITE(proc_illinst_r, proc_illinst_w)
-    //AM_RANGE(0xfffe0, 0xfffef) AM_MIRROR(0xc0000) AM_READWRITE(proc_control_r, proc_control_w)
+	AM_RANGE(0x00000, 0x01fff) AM_MIRROR(0xc0000) AM_RAM // actually a banked block of ram, 8kb (4kw)
+	AM_RANGE(0x02000, 0x3ffff) AM_MIRROR(0xc0000) AM_RAM AM_REGION("mainram", 0x2000) // 256k of ram (less 8k), shared between both processors, mirrored 4 times
+	//AM_RANGE(0xfffc0, 0xfffdf) AM_MIRROR(0xc0000) AM_READWRITE(proc_illinst_r, proc_illinst_w)
+	//AM_RANGE(0xfffe0, 0xfffef) AM_MIRROR(0xc0000) AM_READWRITE(proc_control_r, proc_control_w)
 ADDRESS_MAP_END
 
 /* note everything in the emulatorcpu's io range is incompletely decoded; so if
@@ -718,11 +718,11 @@ x   x   x   x    x   1   x   x    x   x   x   x    x   x   x   x    x   x   x   
 */
 
 ADDRESS_MAP_START(notetaker_state::ep_io)
-    ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE(0x800, 0x803) AM_MIRROR(0x07fc) AM_DEVREADWRITE8("ep_pic8259", pic8259_device, read, write, 0x00ff)
-    //AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255, is this the same one as the iop accesses? or are these two 8255s on separate cards?
-    AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_WRITE(EPConReg_w) // emu processor control reg & leds
-    //AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x07fe) AM_WRITE(EmuClearParity_w) // writes here clear the local 8k-ram parity error register
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x800, 0x803) AM_MIRROR(0x07fc) AM_DEVREADWRITE8("ep_pic8259", pic8259_device, read, write, 0x00ff)
+	//AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255, is this the same one as the iop accesses? or are these two 8255s on separate cards?
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_WRITE(EPConReg_w) // emu processor control reg & leds
+	//AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x07fe) AM_WRITE(EmuClearParity_w) // writes here clear the local 8k-ram parity error register
 ADDRESS_MAP_END
 
 /* Input ports */

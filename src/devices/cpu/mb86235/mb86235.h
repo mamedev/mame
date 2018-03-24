@@ -109,13 +109,13 @@ private:
 		int num;
 		uint32_t data[16];
 	};
-	
+
 	struct fifo_state
 	{
 		uint32_t pc;
 		bool has_stalled;
 	};
-	
+
 	struct mb86235_internal_state
 	{
 		uint32_t pc;
@@ -141,7 +141,7 @@ private:
 		// TODO: remove this, use ST instead
 		mb86235_flags flags;
 		uint32_t st;
-		
+
 		int icount;
 
 		uint32_t arg0;
@@ -150,8 +150,8 @@ private:
 		uint32_t arg3;
 		uint64_t arg64;
 
-		uint32_t pcp;  		/**< PC stack pointer */
-		uint32_t pcs[4];	/**< PC stack contents */
+		uint32_t pcp;       /**< PC stack pointer */
+		uint32_t pcs[4];    /**< PC stack contents */
 
 		uint32_t jmpdest;
 		uint32_t alutemp;
@@ -163,7 +163,7 @@ private:
 
 		float fp0;
 		bool delay_slot;
-		
+
 		fifo fifoin;
 		fifo fifoout0;
 		fifo fifoout1;
@@ -243,7 +243,7 @@ private:
 	bool has_register_clash(const opcode_desc *desc, int outreg);
 	bool aluop_has_result(int aluop);
 	bool check_previous_op_stall();
-	
+
 //  interpreter
 	void execute_op(uint32_t h, uint32_t l);
 	void do_alu1(uint32_t h, uint32_t l);
@@ -261,7 +261,7 @@ private:
 	inline uint32_t get_mulreg(uint8_t which, bool isfloatop);
 	inline void set_alureg(uint8_t which, uint32_t value);
 	inline void decode_aluop(uint8_t opcode, uint32_t src1, uint32_t src2, uint8_t imm, uint8_t dst_which);
-	inline void	decode_mulop(bool isfmul, uint32_t src1, uint32_t src2, uint8_t dst_which);
+	inline void decode_mulop(bool isfmul, uint32_t src1, uint32_t src2, uint8_t dst_which);
 	inline bool decode_branch_jump(uint8_t which);
 	inline uint32_t do_control_dst(uint32_t l);
 	inline void push_pc(uint32_t pcval);
