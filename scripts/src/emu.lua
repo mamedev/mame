@@ -82,8 +82,6 @@ files {
 	MAME_DIR .. "src/emu/dinetwork.h",
 	MAME_DIR .. "src/emu/dinvram.cpp",
 	MAME_DIR .. "src/emu/dinvram.h",
-	MAME_DIR .. "src/emu/dioutput.cpp",
-	MAME_DIR .. "src/emu/dioutput.h",
 	MAME_DIR .. "src/emu/dipalette.cpp",
 	MAME_DIR .. "src/emu/dipalette.h",
 	MAME_DIR .. "src/emu/dipty.cpp",

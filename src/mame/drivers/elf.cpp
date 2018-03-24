@@ -203,6 +203,7 @@ void elf2_state::machine_start()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* initialize LED displays */
+	m_7segs.resolve();
 	m_led_l->rbi_w(1);
 	m_led_h->rbi_w(1);
 
@@ -265,9 +266,9 @@ MACHINE_CONFIG_START(elf2_state::elf2)
 	MCFG_MM74C922_X4_CALLBACK(IOPORT("X4"))
 
 	MCFG_DEVICE_ADD(DM9368_H_TAG, DM9368, 0)
-	MCFG_OUTPUT_NAME("digit0")
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(elf2_state, digit_w<0>))
 	MCFG_DEVICE_ADD(DM9368_L_TAG, DM9368, 0)
-	MCFG_OUTPUT_NAME("digit1")
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(elf2_state, digit_w<1>))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)

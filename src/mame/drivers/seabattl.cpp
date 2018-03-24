@@ -44,19 +44,15 @@ the sound board should be fully discrete.
 class seabattl_state : public driver_device
 {
 public:
-	seabattl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	seabattl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_objram(*this, "objram"),
-		m_digit0(*this, "sc_thousand"),
-		m_digit1(*this, "sc_hundred"),
-		m_digit2(*this, "sc_half"),
-		m_digit3(*this, "sc_unity"),
-		m_digit4(*this, "tm_half"),
-		m_digit5(*this, "tm_unity"),
+		m_digits(*this, { "sc_thousand", "sc_hundred", "sc_half", "sc_unity", "tm_half", "tm_unity" }),
 		m_s2636(*this, "s2636"),
+		m_7segs(*this, "digit%u", 0U),
 		m_waveenable(false),
 		m_collision(0),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -69,13 +65,9 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_objram;
-	required_device<dm9368_device> m_digit0;
-	required_device<dm9368_device> m_digit1;
-	required_device<dm9368_device> m_digit2;
-	required_device<dm9368_device> m_digit3;
-	required_device<dm9368_device> m_digit4;
-	required_device<dm9368_device> m_digit5;
+	required_device_array<dm9368_device, 6> m_digits;
 	required_device<s2636_device> m_s2636;
+	output_finder<6> m_7segs;
 
 	tilemap_t *m_bg_tilemap;
 	bitmap_ind16 m_collision_bg;
@@ -92,6 +84,7 @@ public:
 	DECLARE_WRITE8_MEMBER(time_display_w);
 	DECLARE_WRITE8_MEMBER(score_display_w);
 	DECLARE_WRITE8_MEMBER(score2_display_w);
+	template <unsigned N> DECLARE_WRITE8_MEMBER( digit_w ) { m_7segs[N] = data; }
 
 	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
 
@@ -239,6 +232,7 @@ uint32_t seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_in
 
 void seabattl_state::video_start()
 {
+	m_7segs.resolve();
 	m_screen->register_screen_bitmap(m_collision_bg);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(seabattl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
@@ -339,20 +333,20 @@ WRITE8_MEMBER(seabattl_state::sound2_w )
 
 WRITE8_MEMBER(seabattl_state::time_display_w )
 {
-	m_digit5->a_w(data & 0x0f);
-	m_digit4->a_w((data >> 4) & 0x0f);
+	m_digits[5]->a_w(data & 0x0f);
+	m_digits[4]->a_w((data >> 4) & 0x0f);
 }
 
 WRITE8_MEMBER(seabattl_state::score_display_w )
 {
-	m_digit3->a_w(data & 0x0f);
-	m_digit2->a_w((data >> 4) & 0x0f);
+	m_digits[3]->a_w(data & 0x0f);
+	m_digits[2]->a_w((data >> 4) & 0x0f);
 }
 
 WRITE8_MEMBER(seabattl_state::score2_display_w )
 {
-	m_digit1->a_w(data & 0x0f);
-	m_digit0->a_w((data >> 4) & 0x0f);
+	m_digits[1]->a_w(data & 0x0f);
+	m_digits[0]->a_w((data >> 4) & 0x0f);
 }
 
 
@@ -492,17 +486,17 @@ MACHINE_CONFIG_START(seabattl_state::seabattl)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_DEVICE_ADD("sc_thousand", DM9368, 0)
-	MCFG_OUTPUT_INDEX(0)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(seabattl_state, digit_w<0>))
 	MCFG_DEVICE_ADD("sc_hundred", DM9368, 0)
-	MCFG_OUTPUT_INDEX(1)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(seabattl_state, digit_w<1>))
 	MCFG_DEVICE_ADD("sc_half", DM9368, 0)
-	MCFG_OUTPUT_INDEX(2)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(seabattl_state, digit_w<2>))
 	MCFG_DEVICE_ADD("sc_unity", DM9368, 0)
-	MCFG_OUTPUT_INDEX(3)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(seabattl_state, digit_w<3>))
 	MCFG_DEVICE_ADD("tm_half", DM9368, 0)
-	MCFG_OUTPUT_INDEX(4)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(seabattl_state, digit_w<4>))
 	MCFG_DEVICE_ADD("tm_unity", DM9368, 0)
-	MCFG_OUTPUT_INDEX(5)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(seabattl_state, digit_w<5>))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
