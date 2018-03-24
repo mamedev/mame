@@ -45,16 +45,16 @@ Data Link Controller
 	devcb = &downcast<mb89374_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_MB89374_PO0_CB(_devcb) \
-	devcb = &downcast<mb89374_device &>(*device).set_out_po0_callback(DEVCB_##_devcb);
+	devcb = &downcast<mb89374_device &>(*device).set_out_po_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_MB89374_PO1_CB(_devcb) \
-	devcb = &downcast<mb89374_device &>(*device).set_out_po1_callback(DEVCB_##_devcb);
+	devcb = &downcast<mb89374_device &>(*device).set_out_po_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_MB89374_PO2_CB(_devcb) \
-	devcb = &downcast<mb89374_device &>(*device).set_out_po2_callback(DEVCB_##_devcb);
+	devcb = &downcast<mb89374_device &>(*device).set_out_po_callback<2>(DEVCB_##_devcb);
 
 #define MCFG_MB89374_PO3_CB(_devcb) \
-	devcb = &downcast<mb89374_device &>(*device).set_out_po3_callback(DEVCB_##_devcb);
+	devcb = &downcast<mb89374_device &>(*device).set_out_po_callback<3>(DEVCB_##_devcb);
 
 
 class mb89374_device : public device_t,
@@ -65,10 +65,7 @@ public:
 	mb89374_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_po0_callback(Object &&cb) { return m_out_po0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_po1_callback(Object &&cb) { return m_out_po1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_po2_callback(Object &&cb) { return m_out_po2_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_po3_callback(Object &&cb) { return m_out_po3_cb.set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_out_po_callback(Object &&cb) { return m_out_po_cb[N].set_callback(std::forward<Object>(cb)); }
 
 	// read/write handlers
 	DECLARE_READ8_MEMBER( read );
@@ -101,21 +98,12 @@ private:
 	inline void set_po3(int state);
 
 	devcb_write_line   m_out_irq_cb;
-	devcb_write_line   m_out_po0_cb;
-	devcb_write_line   m_out_po1_cb;
-	devcb_write_line   m_out_po2_cb;
-	devcb_write_line   m_out_po3_cb;
+	devcb_write_line   m_out_po_cb[4];
 
 	// pins
 	int m_irq;
-	int m_po0;
-	int m_po1;
-	int m_po2;
-	int m_po3;
-	int m_pi0;
-	int m_pi1;
-	int m_pi2;
-	int m_pi3;
+	int m_po[4];
+	int m_pi[4];
 	int m_ci;
 
 	// registers
@@ -160,7 +148,7 @@ private:
 	uint8_t  m_tx_buffer[0x200];
 	uint16_t m_tx_offset;
 
-	void rxReset();
+	void    rxReset();
 	uint8_t rxRead();
 
 	void txReset();
@@ -171,7 +159,7 @@ private:
 	osd_file::ptr m_line_tx;
 	char m_localhost[256];
 	char m_remotehost[256];
-	uint8_t  m_socket_buffer[0x200];
+	uint8_t m_socket_buffer[0x200];
 	void checkSockets();
 };
 

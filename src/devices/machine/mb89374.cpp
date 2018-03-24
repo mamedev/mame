@@ -9,8 +9,8 @@
  **/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "mb89374.h"
+#include "emuopts.h"
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -104,10 +104,7 @@ mb89374_device::mb89374_device( const machine_config &mconfig, const char *tag, 
 	device_execute_interface(mconfig, *this),
 	m_icount(0),
 	m_out_irq_cb(*this),
-	m_out_po0_cb(*this),
-	m_out_po1_cb(*this),
-	m_out_po2_cb(*this),
-	m_out_po3_cb(*this)
+	m_out_po_cb{ { *this }, { *this }, { *this }, { *this } }
 {
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
@@ -136,10 +133,54 @@ void mb89374_device::device_start()
 
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();
-	m_out_po0_cb.resolve_safe();
-	m_out_po1_cb.resolve_safe();
-	m_out_po2_cb.resolve_safe();
-	m_out_po3_cb.resolve_safe();
+	for(auto &cb : m_out_po_cb)
+		cb.resolve_safe();
+
+	// state saving
+	save_item(NAME(m_irq));
+	save_item(NAME(m_po));
+	save_item(NAME(m_pi));
+	save_item(NAME(m_ci));
+
+	save_item(NAME(m_smr0));
+	save_item(NAME(m_smr1));
+	save_item(NAME(m_smr2));
+	save_item(NAME(m_chrr0));
+	save_item(NAME(m_chrr1));
+	save_item(NAME(m_msr));
+	save_item(NAME(m_mcr));
+	save_item(NAME(m_rxsr0));
+	save_item(NAME(m_rxsr1));
+	save_item(NAME(m_rxcr));
+	save_item(NAME(m_rxier));
+	save_item(NAME(m_txsr));
+	save_item(NAME(m_txcr));
+	save_item(NAME(m_txier));
+	save_item(NAME(m_sdr));
+	save_item(NAME(m_txbcr0));
+	save_item(NAME(m_txbcr1));
+	save_item(NAME(m_txfr0));
+	save_item(NAME(m_txfr1));
+	save_item(NAME(m_smr3));
+	save_item(NAME(m_portr));
+	save_item(NAME(m_reqr));
+	save_item(NAME(m_maskr));
+	save_item(NAME(m_b1psr));
+	save_item(NAME(m_b1pcr));
+	save_item(NAME(m_bg1dr));
+	save_item(NAME(m_b2sr));
+	save_item(NAME(m_b2cr));
+	save_item(NAME(m_bg2dr));
+
+	save_item(NAME(m_intr_delay));
+	save_item(NAME(m_sock_delay));
+
+	save_item(NAME(m_rx_buffer));
+	save_item(NAME(m_rx_offset));
+	save_item(NAME(m_rx_length));
+
+	save_item(NAME(m_tx_buffer));
+	save_item(NAME(m_tx_offset));
 }
 
 
@@ -327,7 +368,7 @@ WRITE8_MEMBER(mb89374_device::write)
 
 WRITE_LINE_MEMBER(mb89374_device::pi0_w)
 {
-	m_pi0 = state;
+	m_pi[0] = state;
 }
 
 
@@ -337,7 +378,7 @@ WRITE_LINE_MEMBER(mb89374_device::pi0_w)
 
 WRITE_LINE_MEMBER(mb89374_device::pi1_w)
 {
-	m_pi1 = state;
+	m_pi[1] = state;
 }
 
 
@@ -347,7 +388,7 @@ WRITE_LINE_MEMBER(mb89374_device::pi1_w)
 
 WRITE_LINE_MEMBER(mb89374_device::pi2_w)
 {
-	m_pi2 = state;
+	m_pi[2] = state;
 }
 
 
@@ -357,7 +398,7 @@ WRITE_LINE_MEMBER(mb89374_device::pi2_w)
 
 WRITE_LINE_MEMBER(mb89374_device::pi3_w)
 {
-	m_pi3 = state;
+	m_pi[3] = state;
 }
 
 
@@ -368,7 +409,7 @@ WRITE_LINE_MEMBER(mb89374_device::pi3_w)
 WRITE_LINE_MEMBER(mb89374_device::ci_w)
 {
 	m_ci = state;
-	if (m_ci == 1 && m_pi2 == 0)
+	if (m_ci == 1 && m_pi[2] == 0)
 	{
 		txComplete();
 	}
@@ -541,36 +582,36 @@ inline void mb89374_device::set_irq(int state)
 
 inline void mb89374_device::set_po0(int state)
 {
-	if (m_po0 != state)
+	if (m_po[0] != state)
 	{
-		m_out_po0_cb(state);
-		m_po0 = state;
+		m_out_po_cb[0](state);
+		m_po[0] = state;
 	}
 }
 
 inline void mb89374_device::set_po1(int state)
 {
-	if (m_po1 != state)
+	if (m_po[1] != state)
 	{
-		set_po1(state);
-		m_po1 = state;
+		m_out_po_cb[1](state);
+		m_po[1] = state;
 	}
 }
 
 inline void mb89374_device::set_po2(int state)
 {
-	if (m_po2 != state)
+	if (m_po[2] != state)
 	{
-		m_out_po2_cb(state);
-		m_po2 = state;
+		m_out_po_cb[2](state);
+		m_po[2] = state;
 	}
 }
 
 inline void mb89374_device::set_po3(int state)
 {
-	if (m_po3 != state)
+	if (m_po[3] != state)
 	{
-		m_out_po3_cb(state);
-		m_po3 = state;
+		m_out_po_cb[3](state);
+		m_po[3] = state;
 	}
 }
