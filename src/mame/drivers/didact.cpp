@@ -96,29 +96,13 @@ class didact_state : public driver_device
 	public:
 	didact_state(const machine_config &mconfig, device_type type, const char * tag)
 		: driver_device(mconfig, type, tag)
-		,m_io_line0(*this, "LINE0")
-		,m_io_line1(*this, "LINE1")
-		,m_io_line2(*this, "LINE2")
-		,m_io_line3(*this, "LINE3")
-		,m_io_line4(*this, "LINE4")
-		,m_line0(0)
-		,m_line1(0)
-		,m_line2(0)
-		,m_line3(0)
-		,m_reset(0)
-		,m_shift(0)
-		,m_led(0)
-		,m_rs232(*this, "rs232")
-		{ }
-	required_ioport m_io_line0;
-	required_ioport m_io_line1;
-	required_ioport m_io_line2;
-	required_ioport m_io_line3;
-	required_ioport m_io_line4;
-	uint8_t m_line0;
-	uint8_t m_line1;
-	uint8_t m_line2;
-	uint8_t m_line3;
+		, m_io_lines(*this, "LINE%u", 0U)
+		, m_lines{ 0, 0, 0, 0 }
+		, m_led(0)
+		, m_rs232(*this, "rs232")
+	{ }
+	required_ioport_array<5> m_io_lines;
+	uint8_t m_lines[4];
 	uint8_t m_reset;
 	uint8_t m_shift;
 	uint8_t m_led;
@@ -166,15 +150,15 @@ class didact_state : public driver_device
 /* Mikrodator 6802 driver class */
 class md6802_state : public didact_state
 {
-	public:
+public:
 	md6802_state(const machine_config &mconfig, device_type type, const char * tag)
 		: didact_state(mconfig, type, tag)
-		,m_maincpu(*this, "maincpu")
-		,m_tb16_74145(*this, "tb16_74145")
-		,m_segments(0)
-		,m_pia1(*this, PIA1_TAG)
-		,m_pia2(*this, PIA2_TAG)
-		{ }
+		, m_maincpu(*this, "maincpu")
+		, m_tb16_74145(*this, "tb16_74145")
+		, m_segments(0)
+		, m_pia1(*this, PIA1_TAG)
+		, m_pia2(*this, PIA2_TAG)
+	{ }
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_tb16_74145;
 	uint8_t m_segments;
@@ -203,16 +187,13 @@ READ8_MEMBER( md6802_state::pia2_kbA_r )
 	ls145 = m_tb16_74145->read() & 0x0f;
 
 	// read out the artwork, line04 is handled by the timer
-	m_line0 = m_io_line0->read();
-	m_line1 = m_io_line1->read();
-	m_line2 = m_io_line2->read();
-	m_line3 = m_io_line3->read();
+	for (unsigned i = 0U; 4U > i; ++i)
+	{
+		m_lines[i] = m_io_lines[i]->read();
 
-	// Mask out those rows that has a button pressed
-	pa &= ~(((~m_line0 & ls145 ) != 0) ? 1 : 0);
-	pa &= ~(((~m_line1 & ls145 ) != 0) ? 2 : 0);
-	pa &= ~(((~m_line2 & ls145 ) != 0) ? 4 : 0);
-	pa &= ~(((~m_line3 & ls145 ) != 0) ? 8 : 0);
+		// Mask out those rows that has a button pressed
+		pa &= ~(((~m_lines[i] & ls145) != 0) ? (1 << i) : 0);
+	}
 
 	if (m_shift)
 	{
@@ -341,32 +322,25 @@ class mp68a_state : public didact_state
 	public:
 	mp68a_state(const machine_config &mconfig, device_type type, const char * tag)
 		: didact_state(mconfig, type, tag)
-		,m_maincpu(*this, "maincpu")
-		,m_digit0(*this, "digit0")
-		,m_digit1(*this, "digit1")
-		,m_digit2(*this, "digit2")
-		,m_digit3(*this, "digit3")
-		,m_digit4(*this, "digit4")
-		,m_digit5(*this, "digit5")
-		,m_pia1(*this, PIA1_TAG)
-		,m_pia2(*this, PIA2_TAG)
-		{ }
+		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
+		, m_7segs(*this, "digit%u", 0U)
+		, m_pia1(*this, PIA1_TAG)
+		, m_pia2(*this, PIA2_TAG)
+	{ }
 
 	required_device<m6800_cpu_device> m_maincpu;
 
 	// The display segment driver device (there is actually just one, needs rewrite to be correct)
-	required_device<dm9368_device> m_digit0;
-	required_device<dm9368_device> m_digit1;
-	required_device<dm9368_device> m_digit2;
-	required_device<dm9368_device> m_digit3;
-	required_device<dm9368_device> m_digit4;
-	required_device<dm9368_device> m_digit5;
+	required_device_array<dm9368_device, 6> m_digits;
+	output_finder<6> m_7segs;
 
 	DECLARE_READ8_MEMBER( pia2_kbA_r );
 	DECLARE_WRITE8_MEMBER( pia2_kbA_w );
 	DECLARE_READ8_MEMBER( pia2_kbB_r );
 	DECLARE_WRITE8_MEMBER( pia2_kbB_w );
 	DECLARE_READ_LINE_MEMBER( pia2_cb1_r );
+	template <unsigned N> DECLARE_WRITE8_MEMBER( digit_w ) { m_7segs[N] = data; }
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -386,24 +360,26 @@ READ8_MEMBER( mp68a_state::pia2_kbA_r )
 
 WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
 {
-	uint8_t digit_nbr;
-
 	/* Display memory is at $702 to $708 in AAAADD format (A=address digit, D=Data digit)
 	   but we are using data read from the port. */
-	digit_nbr = (data >> 4) & 0x07;
+	uint8_t const digit_nbr = (data >> 4) & 0x07;
 
 	/* There is actually only one 9368 and a 74145 to drive the cathode of the right digit low */
 	/* This can be emulated by prentending there are one 9368 per digit, at least for now      */
 	switch (digit_nbr)
 	{
-	case 0: m_digit0->a_w(data & 0x0f); break;
-	case 1: m_digit1->a_w(data & 0x0f); break;
-	case 2: m_digit2->a_w(data & 0x0f); break;
-	case 3: m_digit3->a_w(data & 0x0f); break;
-	case 4: m_digit4->a_w(data & 0x0f); break;
-	case 5: m_digit5->a_w(data & 0x0f); break;
-	case 7: break; // used as an 'unselect' by the ROM between digit accesses.
-	default: logerror("Invalid digit index %d\n", digit_nbr);
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+		m_digits[digit_nbr]->a_w(data & 0x0f);
+		break;
+	case 7: // used as an 'unselect' by the ROM between digit accesses.
+		break;
+	default:
+		logerror("Invalid digit index %d\n", digit_nbr);
 	}
 }
 
@@ -411,16 +387,16 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 {
 	uint8_t a012, line, pb;
 
-	LOG("--->%s %02x %02x %02x %02x %02x => ", FUNCNAME, m_line0, m_line1, m_line2, m_line3, m_shift);
+	LOG("--->%s %02x %02x %02x %02x %02x => ", FUNCNAME, m_lines[0], m_lines[1], m_lines[2], m_lines[3], m_shift);
 
 	a012 = 0;
-	if ((line = (m_line0 | m_line1)) != 0)
+	if ((line = (m_lines[0] | m_lines[1])) != 0)
 	{
 		a012 = 8;
 		while (a012 > 0 && !(line & (1 << --a012)));
 		a012 += 8;
 	}
-	if ( a012 == 0 && (line = ((m_line2) | m_line3)) != 0)
+	if ( a012 == 0 && (line = ((m_lines[2]) | m_lines[3])) != 0)
 	{
 		a012 = 8;
 		while (a012 > 0 && !(line & (1 << --a012)));
@@ -448,17 +424,15 @@ WRITE8_MEMBER( mp68a_state::pia2_kbB_w )
 
 READ_LINE_MEMBER( mp68a_state::pia2_cb1_r )
 {
-	m_line0 = m_io_line0->read();
-	m_line1 = m_io_line1->read();
-	m_line2 = m_io_line2->read();
-	m_line3 = m_io_line3->read();
+	for (unsigned i = 0U; 4U > i; ++i)
+		m_lines[i] = m_io_lines[i]->read();
 
 #if VERBOSE
-	if ((m_line0 | m_line1 | m_line2 | m_line3) != 0)
-		LOG("%s()-->%02x %02x %02x %02x\n", FUNCNAME, m_line0, m_line1, m_line2, m_line3);
+	if (m_lines[0] | m_lines[1] | m_lines[2] | m_lines[3])
+		LOG("%s()-->%02x %02x %02x %02x\n", FUNCNAME, m_lines[0], m_lines[1], m_lines[2], m_lines[3]);
 #endif
 
-	return (m_line0 | m_line1 | m_line2 | m_line3) != 0 ? 0 : 1;
+	return (m_lines[0] | m_lines[1] | m_lines[2] | m_lines[3]) ? 0 : 1;
 }
 
 void mp68a_state::machine_reset()
@@ -563,7 +537,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 	//  LOG("--->%s()\n", FUNCNAME);
 
 	// Poll the artwork Reset key
-	if ( (m_io_line4->read() & 0x04) )
+	if (m_io_lines[4]->read() & 0x04)
 	{
 		LOG("RESET is pressed, resetting the CPU\n");
 		m_shift = 0;
@@ -574,10 +548,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 		}
 		m_reset = 1; // Inhibit multiple resets
 	}
-
-		// Poll the artwork SHIFT/* key
-	else if ( (m_io_line4->read() & 0x08) )
+	else if (m_io_lines[4]->read() & 0x08)
 	{
+		// Poll the artwork SHIFT/* key
 		LOG("%s", !m_shift ? "SHIFT is set\n" : "");
 		m_shift = 1;
 		output().set_led_value(m_led, m_shift); // For mp68a only
@@ -670,17 +643,17 @@ MACHINE_CONFIG_START(mp68a_state::mp68a)
 	/* 0x086B 0x600 (Port A)    = 0x50 */
 	/* 0x086B 0x600 (Port A)    = 0x70 */
 	MCFG_DEVICE_ADD("digit0", DM9368, 0)
-	MCFG_OUTPUT_INDEX(0)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(mp68a_state, digit_w<0>))
 	MCFG_DEVICE_ADD("digit1", DM9368, 0)
-	MCFG_OUTPUT_INDEX(1)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(mp68a_state, digit_w<1>))
 	MCFG_DEVICE_ADD("digit2", DM9368, 0)
-	MCFG_OUTPUT_INDEX(2)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(mp68a_state, digit_w<2>))
 	MCFG_DEVICE_ADD("digit3", DM9368, 0)
-	MCFG_OUTPUT_INDEX(3)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(mp68a_state, digit_w<3>))
 	MCFG_DEVICE_ADD("digit4", DM9368, 0)
-	MCFG_OUTPUT_INDEX(4)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(mp68a_state, digit_w<4>))
 	MCFG_DEVICE_ADD("digit5", DM9368, 0)
-	MCFG_OUTPUT_INDEX(5)
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(mp68a_state, digit_w<5>))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", mp68a_state, scan_artwork, attotime::from_hz(10))
 MACHINE_CONFIG_END
