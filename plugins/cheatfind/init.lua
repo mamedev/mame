@@ -533,7 +533,7 @@ function cheatfind.startplugin()
 								count = count + #matches[#matches][num]
 							end
 						end
-						manager:machine():popmessage(count .. _(" total matches found"))
+						manager:machine():popmessage(string.format(_("%d total matches found"), count))
 						matches[#matches].count = count
 						matchpg = 0
 						devsel = devcur
