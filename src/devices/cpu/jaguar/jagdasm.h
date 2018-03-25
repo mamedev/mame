@@ -16,10 +16,13 @@
 class jaguar_disassembler : public util::disasm_interface
 {
 public:
-	static constexpr unsigned JAGUAR_VARIANT_GPU = 0;
-	static constexpr unsigned JAGUAR_VARIANT_DSP = 1;
+	enum class variant
+	{
+		GPU = 0,
+		DSP = 1
+	};
 
-	jaguar_disassembler(u32 variant);
+	jaguar_disassembler(variant var);
 	virtual ~jaguar_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override;
@@ -29,9 +32,9 @@ private:
 	static const uint8_t convert_zero[32];
 	static const char *const condition[32];
 
-	u32 m_variant;
+	const variant m_variant;
 
 	static std::string signed_16bit(int16_t val);
 };
 
-#endif
+#endif // MAME_CPU_JAGUAR_JAGDASM_H
