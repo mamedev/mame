@@ -176,7 +176,7 @@ offs_t jaguar_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	return size | flags | SUPPORTED;
 }
 
-jaguar_disassembler::jaguar_disassembler(variant vari) : m_variant(var)
+jaguar_disassembler::jaguar_disassembler(variant var) : m_variant(var)
 {
 }
 
