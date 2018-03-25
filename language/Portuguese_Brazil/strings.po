@@ -2684,7 +2684,7 @@ msgstr "Atualmente salvo -- #"
 #: plugins/cheatfind/init.lua:536
 #, lua-format
 msgid "%d total matches found"
-msgstr ""
+msgstr "Um total de %d correspondências foram encontradas"
 
 #: plugins/cheatfind/init.lua:543
 msgid "Compare"
