@@ -264,8 +264,8 @@ void djboy_state::soundcpu_port_am(address_map &map)
 	map(0x00, 0x00).w(this, FUNC(djboy_state::soundcpu_bankswitch_w));
 	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x06, 0x06).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x07, 0x07).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x06, 0x06).rw("oki_l", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x07, 0x07).rw("oki_r", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 /******************************************************************************/
@@ -558,11 +558,11 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", 12000000 / 8, PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki_l", 12000000 / 8, PIN7_LOW)
 	MCFG_DEVICE_ROM("oki")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", 12000000 / 8, PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki_r", 12000000 / 8, PIN7_LOW)
 	MCFG_DEVICE_ROM("oki")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
