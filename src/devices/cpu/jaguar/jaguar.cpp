@@ -1440,10 +1440,10 @@ WRITE32_MEMBER( jaguardsp_cpu_device::ctrl_w )
 
 std::unique_ptr<util::disasm_interface> jaguargpu_cpu_device::create_disassembler()
 {
-	return std::make_unique<jaguar_disassembler>(+jaguar_disassembler::JAGUAR_VARIANT_GPU);
+	return std::make_unique<jaguar_disassembler>(jaguar_disassembler::variant::GPU);
 }
 
 std::unique_ptr<util::disasm_interface> jaguardsp_cpu_device::create_disassembler()
 {
-	return std::make_unique<jaguar_disassembler>(+jaguar_disassembler::JAGUAR_VARIANT_DSP);
+	return std::make_unique<jaguar_disassembler>(jaguar_disassembler::variant::DSP);
 }
