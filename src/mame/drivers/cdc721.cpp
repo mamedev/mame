@@ -76,8 +76,8 @@ void cdc721_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom().region("maincpu", 0x10000);
 //  AM_RANGE(0x0000, 0x4fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	map(0x8000, 0xe10f).ram();
-	map(0xe110, 0xffff).ram().share("videoram");
+	map(0x8000, 0xdfff).ram();
+	map(0xe000, 0xffff).ram().share("videoram");
 }
 
 void cdc721_state::io_map(address_map &map)
@@ -141,11 +141,13 @@ PALETTE_INIT_MEMBER( cdc721_state, cdc721 )
 uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t y,ra,chr,gfx,attr,pen;
-	uint16_t sy=0,ma=0,x;
+	uint16_t sy=0,x;
 	m_flashcnt++;
 
 	for (y = 0; y < 30; y++)
 	{
+		uint16_t ma = m_p_videoram[y * 2] | m_p_videoram[y * 2 + 1] << 8;
+
 		for (ra = 0; ra < 16; ra++)
 		{
 			uint16_t *p = &bitmap.pix16(sy++);
@@ -153,8 +155,8 @@ uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			for (x = 0; x < 160; x+=2)
 			{
 				pen = 1;
-				chr = m_p_videoram[x+ma];
-				attr = m_p_videoram[x+ma+1];
+				chr = m_p_videoram[(x + ma) & 0x1fff];
+				attr = m_p_videoram[(x + ma + 1) & 0x1fff];
 				gfx = m_p_chargen[chr | (ra << 8) ];
 				if (BIT(attr, 0))  // blank
 					pen = 0;
@@ -178,7 +180,6 @@ uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				*p++ = BIT(gfx, 7) ? pen : 0;
 			}
 		}
-		ma+=264;
 	}
 	return 0;
 }
