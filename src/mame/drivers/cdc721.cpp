@@ -11,6 +11,10 @@ Control Data Corporation CDC 721 Terminal (Viking)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "machine/ins8250.h"
+//#include "machine/nvram.h"
+#include "machine/z80ctc.h"
 #include "video/tms9927.h"
 #include "screen.h"
 
@@ -25,21 +29,48 @@ public:
 		, m_p_videoram(*this, "videoram")
 	{ }
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(init);
-	DECLARE_PALETTE_INIT(cdc721);
-//  DECLARE_WRITE8_MEMBER(port70_w) { membank("bankr0")->set_entry(BIT(data, 3)); }
-
-void cdc721(machine_config &config);
-void io_map(address_map &map);
-void mem_map(address_map &map);
+	void cdc721(machine_config &config);
 private:
-	u8 m_flashcnt;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_PALETTE_INIT(cdc721);
+	DECLARE_WRITE8_MEMBER(interrupt_mask_w);
+	DECLARE_WRITE8_MEMBER(misc_w);
+	DECLARE_WRITE8_MEMBER(lights_w);
+	DECLARE_WRITE8_MEMBER(bank_select_w);
+
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	u8 m_flashcnt;
+
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_p_videoram;
 };
+
+WRITE8_MEMBER(cdc721_state::interrupt_mask_w)
+{
+	logerror("%s: Interrupt mask = %02X\n", machine().describe_context(), data ^ 0xff);
+}
+
+WRITE8_MEMBER(cdc721_state::misc_w)
+{
+	logerror("%s: %d-column display selected\n", machine().describe_context(), BIT(data, 3) ? 132 : 80);
+}
+
+WRITE8_MEMBER(cdc721_state::lights_w)
+{
+	logerror("%s: Lights = %02X\n", machine().describe_context(), data ^ 0xff);
+}
+
+WRITE8_MEMBER(cdc721_state::bank_select_w)
+{
+	logerror("%s: Bank select = %02X\n", machine().describe_context(), data);
+	//membank("bankr0")->set_entry(BIT(data, 3));
+}
 
 void cdc721_state::mem_map(address_map &map)
 {
@@ -52,8 +83,15 @@ void cdc721_state::mem_map(address_map &map)
 void cdc721_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x1f).rw("crtc", FUNC(tms9927_device::read), FUNC(tms9927_device::write));
-//  AM_RANGE(0x70, 0x70) AM_WRITE(port70_w)
+	map(0x00, 0x03).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x10, 0x1f).rw("crtc", FUNC(crt5037_device::read), FUNC(crt5037_device::write));
+	map(0x20, 0x27).rw("uart1", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x30, 0x33).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x47).rw("uart2", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x50, 0x50).w(this, FUNC(cdc721_state::lights_w));
+	map(0x70, 0x70).w(this, FUNC(cdc721_state::bank_select_w));
+	map(0x80, 0x87).rw("uart3", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x90, 0x97).rw("uart4", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 }
 
 static INPUT_PORTS_START( cdc721 )
@@ -65,7 +103,7 @@ void cdc721_state::machine_reset()
 //  membank("bankw0")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER( cdc721_state, init )
+void cdc721_state::machine_start()
 {
 //  uint8_t *main = memregion("maincpu")->base();
 
@@ -145,11 +183,20 @@ uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
+static const z80_daisy_config cdc721_daisy_chain[] =
+{
+	{ "ctc" },
+	{ nullptr }
+};
+
 MACHINE_CONFIG_START(cdc721_state::cdc721)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
+	MCFG_Z80_DAISY_CHAIN(cdc721_daisy_chain)
+
+	//MCFG_NVRAM_0FILL_ADD("nvram") // MCM51L01C45 (256x4) + battery
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -163,8 +210,20 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_PALETTE_INIT_OWNER(cdc721_state, cdc721)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cdc721)
 
-	MCFG_DEVICE_ADD("crtc", TMS9927, 2000000 / 8) // clock guess
+	MCFG_DEVICE_ADD("crtc", CRT5037, 12.936_MHz_XTAL / 8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
+
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(cdc721_state, interrupt_mask_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(cdc721_state, misc_w))
+
+	MCFG_DEVICE_ADD("uart1", INS8250, 1843200)
+	MCFG_DEVICE_ADD("uart2", INS8250, 1843200)
+	MCFG_DEVICE_ADD("uart3", INS8250, 1843200)
+	MCFG_DEVICE_ADD("uart4", INS8250, 1843200)
 MACHINE_CONFIG_END
 
 ROM_START( cdc721 )
@@ -181,4 +240,4 @@ ROM_START( cdc721 )
 	ROM_LOAD( "66315039", 0x0000, 0x1000, CRC(5c9aa968) SHA1(3ec7c5f25562579e6ed3fda7562428ff5e6b9550) )
 ROM_END
 
-COMP( 1981, cdc721, 0, 0, cdc721, cdc721, cdc721_state, init, "Control Data Corporation",  "CDC721 Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1981, cdc721, 0, 0, cdc721, cdc721, cdc721_state, 0, "Control Data Corporation", "721 Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
