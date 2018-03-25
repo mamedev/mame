@@ -74,7 +74,8 @@ WRITE8_MEMBER(cdc721_state::bank_select_w)
 
 void cdc721_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x4fff).rom().region("maincpu", 0x10000);
+	map(0x0000, 0x3fff).rom().region("resident", 0);
+	map(0x4000, 0x7fff).rom().region("rompack", 0);
 //  AM_RANGE(0x0000, 0x4fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	map(0x8000, 0xdfff).ram();
 	map(0xe000, 0xffff).ram().share("videoram");
@@ -228,11 +229,13 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 MACHINE_CONFIG_END
 
 ROM_START( cdc721 )
-	ROM_REGION( 0x15000, "maincpu", 0 )
-	ROM_LOAD( "66315359", 0x10000, 0x2000, CRC(20ff3eb4) SHA1(5f15cb14893d75a46dc66d3042356bb054d632c2) )
-	ROM_LOAD( "66315361", 0x12000, 0x2000, CRC(21d59d09) SHA1(9c087537d68c600ddf1eb9b009cf458231c279f4) )
-	ROM_LOAD( "66315360", 0x14000, 0x1000, CRC(feaa0fc5) SHA1(f06196553a1f10c07b2f7e495823daf7ea26edee) )
-	//ROM_FILL(0x14157,1,0xe0)
+	ROM_REGION( 0x4000, "resident", 0 )
+	ROM_LOAD( "66315359", 0x0000, 0x2000, CRC(20ff3eb4) SHA1(5f15cb14893d75a46dc66d3042356bb054d632c2) )
+	ROM_LOAD( "66315361", 0x2000, 0x2000, CRC(21d59d09) SHA1(9c087537d68c600ddf1eb9b009cf458231c279f4) )
+
+	ROM_REGION( 0x4000, "rompack", 0 )
+	ROM_LOAD( "66315360", 0x0000, 0x1000, CRC(feaa0fc5) SHA1(f06196553a1f10c07b2f7e495823daf7ea26edee) )
+	//ROM_FILL(0x0157,1,0xe0)
 
 	ROM_REGION( 0x1000, "keyboard", 0 )
 	ROM_LOAD( "66307828", 0x0000, 0x1000, CRC(ac97136f) SHA1(0d280e1aa4b9502bd390d260f83af19bf24905cd) ) // keyboard lookup
