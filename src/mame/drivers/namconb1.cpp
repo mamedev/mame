@@ -2004,5 +2004,5 @@ GAME( 1994, vshoot,   0,        namconb1, namconb1, namconb1_state, vshoot,   RO
 /*     YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MNTR,  COMPANY, FULLNAME,   FLAGS */
 GAME( 1994, outfxies, 0,        namconb2, namconb1, namconb1_state, outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, outfxiesj,outfxies, namconb2, namconb1, namconb1_state, outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, machbrkr, 0,        namconb2, namconb1, namconb1_state, machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
-GAME( 1995, machbrkrj,machbrkr, namconb2, namconb1, namconb1_state, machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, machbrkr, 0,        namconb2, namconb1, namconb1_state, machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
+GAME( 1994, machbrkrj,machbrkr, namconb2, namconb1, namconb1_state, machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )
