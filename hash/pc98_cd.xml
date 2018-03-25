@@ -1396,7 +1396,7 @@
 	</software>
 
 	<!-- Doesn't run after installation -->
-	<software name="dorbestg">
+	<software name="dorbestg" supported="no">
 		<!--
 		 Origin: Neo Kobe Collection
 		 CCD converted to CUE with GNU ccd2cue
@@ -3698,7 +3698,7 @@
 	This game requires the AVSDRV.SYS sound driver, but the PC-9801-86 emulation in MAME doesn't seem to work with any of the
 	available versions. Without it, the game boots (without sound) but hangs after the intro.
 	-->
-	<software name="samyzen">
+	<software name="samyzen" supported="no">
 		<!--
 		Origin: redump.org
 		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan).cue" size="5830" crc="f767e079" md5="7bf31e023a4b1cab0f535040720248a5" sha1="23afeb3660d51cb920679c5bbbbf1508619fce09"/>
