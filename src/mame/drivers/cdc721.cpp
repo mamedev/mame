@@ -193,7 +193,7 @@ static const z80_daisy_config cdc721_daisy_chain[] =
 
 MACHINE_CONFIG_START(cdc721_state::cdc721)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
+	MCFG_CPU_ADD("maincpu", Z80, 6_MHz_XTAL) // Zilog Z8400B (Z80B)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(cdc721_daisy_chain)
@@ -215,7 +215,7 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_DEVICE_ADD("crtc", CRT5037, 12.936_MHz_XTAL / 8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 6_MHz_XTAL) // Zilog Z8430B
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
