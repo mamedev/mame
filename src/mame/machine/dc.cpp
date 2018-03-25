@@ -652,6 +652,9 @@ void dc_state::machine_start()
 	if(m_naomig1)
 		m_naomig1->set_dma_cb(naomi_g1_device::dma_cb(&dc_state::generic_dma, this));
 
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
+	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0cffffff, false, dc_ram);
+
 	// save states
 	save_pointer(NAME(dc_sysctrl_regs), 0x200/4);
 	save_pointer(NAME(g2bus_regs), 0x100/4);
@@ -747,6 +750,7 @@ WRITE_LINE_MEMBER(dc_state::sh4_aica_irq)
 MACHINE_RESET_MEMBER(dc_state,dc_console)
 {
 	dc_state::machine_reset();
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
 	m_aica->set_ram_base(dc_sound_ram, 2*1024*1024);
 }
 

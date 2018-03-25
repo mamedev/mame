@@ -9535,9 +9535,7 @@ DRIVER_INIT_MEMBER(atomiswave_state,atomiswave)
 
 	aw_ctrl_type = 0;
 
-	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0000ffff, true, ROM);
-	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0cffffff, false, dc_ram);
 }
 
 READ64_MEMBER(atomiswave_state::xtrmhnt2_hack_r)
