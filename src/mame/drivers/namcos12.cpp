@@ -1182,7 +1182,7 @@ public:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void namcos12_rom_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
-	
+
 	void coh700(machine_config &config);
 	void coh716(machine_config &config);
 	void golgo13_h8iomap(address_map &map);
