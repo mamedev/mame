@@ -289,7 +289,8 @@ void rom_load_manager::determine_bios_rom(device_t &device, const char *specbios
 		}
 
 		// if we got neither an empty string nor 'default' then warn the user
-		m_errorstring.append(util::string_format("%s: invalid BIOS \"%s\", reverting to default\n", device.tag(), specbios));
+		if (!found)
+			m_errorstring.append(util::string_format("%s: invalid BIOS \"%s\", reverting to default\n", device.tag(), specbios));
 	}
 
 	// log final result
