@@ -1620,6 +1620,8 @@ void validity_checker::validate_roms(device_t &root)
 		// check that default BIOS exists
 		if (defbios && (bios_names.find(defbios) == bios_names.end()))
 			osd_printf_error("Default BIOS '%s' not found\n", defbios);
+		if (!device.get_default_bios_tag().empty() && (bios_names.find(device.get_default_bios_tag()) == bios_names.end()))
+			osd_printf_error("Configured BIOS '%s' not found\n", device.get_default_bios_tag().c_str());
 
 		// final check for empty regions
 		if (items_since_region == 0)
