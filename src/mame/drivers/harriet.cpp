@@ -13,6 +13,7 @@
 #include "machine/mc68901.h"
 #include "machine/nvram.h"
 #include "machine/timekpr.h"
+//#include "machine/wd33c93.h"
 
 class harriet_state : public driver_device
 {
@@ -55,7 +56,7 @@ READ8_MEMBER(harriet_state::unk_status_r)
 
 void harriet_state::harriet_map(address_map &map)
 {
-	map(0x000000, 0x007fff).rom();
+	map(0x000000, 0x007fff).rom().region("monitor", 0);
 	map(0x040000, 0x040fff).rw(this, FUNC(harriet_state::zpram_r), FUNC(harriet_state::zpram_w)).umask16(0xff00);
 	map(0x040000, 0x040fff).rw("timekpr", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0x00ff);
 	map(0x7f0000, 0x7fffff).ram();
@@ -83,6 +84,8 @@ MACHINE_CONFIG_START(harriet_state::harriet)
 	MCFG_CPU_ADD("maincpu", M68010, 40_MHz_XTAL / 4) // MC68010FN10
 	MCFG_CPU_PROGRAM_MAP(harriet_map)
 
+	//MCFG_DEVICE_ADD("dmac", MC68450, DMAC_CLOCK)
+
 	MCFG_DEVICE_ADD("duart", MC68681, 3.6864_MHz_XTAL)
 
 	MCFG_DEVICE_ADD("mfp", MC68901, 0)
@@ -96,13 +99,16 @@ MACHINE_CONFIG_START(harriet_state::harriet)
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mfp", mc68901_device, write_rx))
+
+	//MCFG_DEVICE_ADD("wdc1", WD33C93, WD_CLOCK)
+	//MCFG_DEVICE_ADD("wdc2", WD33C93, WD_CLOCK)
 MACHINE_CONFIG_END
 
 
 ROM_START( harriet )
-	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "harriet 36-74c.tfb v5.01 lobyte 533f.bin", 0x0001, 0x4000, CRC(f07fff76) SHA1(8288f7eaa8f4155e0e4746635f63ca2cc3da25d1) )
-	ROM_LOAD16_BYTE( "harriet 36-74c.tdb v5.01 hibyte 2a0c.bin", 0x0000, 0x4000, CRC(a61f441d) SHA1(76af6eddd5c042f1b2eef590eb822379944b9b28) )
+	ROM_REGION16_BE(0x8000, "monitor", 0)
+	ROM_LOAD16_BYTE("harriet 36-74c.tfb v5.01 lobyte 533f.bin", 0x0001, 0x4000, CRC(f07fff76) SHA1(8288f7eaa8f4155e0e4746635f63ca2cc3da25d1))
+	ROM_LOAD16_BYTE("harriet 36-74c.tdb v5.01 hibyte 2a0c.bin", 0x0000, 0x4000, CRC(a61f441d) SHA1(76af6eddd5c042f1b2eef590eb822379944b9b28))
 ROM_END
 
 COMP( 1990, harriet,  0,  0, harriet,  harriet, harriet_state,  0,    "Quantel",      "Harriet", MACHINE_IS_SKELETON )
