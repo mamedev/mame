@@ -12952,6 +12952,7 @@ jolycdid                        // 1990 bootleg
 jolycdie                        // 1990 bootleg
 jolycdif                        // 1990 bootleg
 jolycdig                        // 1993 bootleg
+jolycdih                        // 1990 bootleg
 jolycdit                        // 199? bootleg
 jolycdsp                        // (c) 1992 TAB-Austria
 jolycmzs                        // (c) 1993 MZS Tech
@@ -17307,6 +17308,7 @@ brapboysp                       // (c) 1992 Kaneko
 brapboyspj                      // (c) 1992 Kaneko
 brapboyspu                      // (c) 1992 Kaneko
 explbrkr                        // (c) 1992 Kaneko
+explbrkrk                       // (c) 1992 Kaneko
 fjbuster                        // (c) 1992 Kaneko
 gtmr                            // (c) 1994 Kaneko
 gtmr2                           // (c) 1995 Kaneko
@@ -21078,6 +21080,7 @@ umk3r11                         // (c) 1994 Midway
 wwfmania                        // (c) 1995 Midway
 wwfmaniab                       // (c) 1995 Midway
 wwfmaniac                       // (c) 1995 Midway
+wwfmaniap                       // (c) 1995 Midway
 
 @source:midxunit.cpp
 revx                            // (c) 1994 Midway

@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
@@ -41,10 +42,14 @@ public:
 	uint8_t m_sound_flag;
 	uint8_t m_tile_bank;
 
+	bool m_nmi_enable;
+
 	DECLARE_WRITE8_MEMBER(bgram_w);
-	DECLARE_WRITE8_MEMBER(player_mux_w);
-	DECLARE_WRITE8_MEMBER(tile_banking_w);
-	DECLARE_WRITE8_MEMBER(wink_coin_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(player_mux_w);
+	DECLARE_WRITE_LINE_MEMBER(tile_banking_w);
+	template<int Player> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	DECLARE_READ8_MEMBER(analog_port_r);
 	DECLARE_READ8_MEMBER(player_inputs_r);
 	DECLARE_WRITE8_MEMBER(sound_irq_w);
@@ -103,21 +108,35 @@ WRITE8_MEMBER(wink_state::bgram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(wink_state::player_mux_w)
+WRITE_LINE_MEMBER(wink_state::nmi_clock_w)
 {
-	//player_mux = data & 1;
+	if (state && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER(wink_state::nmi_enable_w)
+{
+	m_nmi_enable = state;
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(wink_state::player_mux_w)
+{
+	//player_mux = state;
 	//no mux / cocktail mode in the real pcb? strange...
 }
 
-WRITE8_MEMBER(wink_state::tile_banking_w)
+WRITE_LINE_MEMBER(wink_state::tile_banking_w)
 {
-	m_tile_bank = data & 1;
+	m_tile_bank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(wink_state::wink_coin_counter_w)
+template<int Player>
+WRITE_LINE_MEMBER(wink_state::coin_counter_w)
 {
-	machine().bookkeeping().coin_counter_w(offset,data & 1);
+	machine().bookkeeping().coin_counter_w(Player, state);
 }
 
 READ8_MEMBER(wink_state::analog_port_r)
@@ -175,12 +194,7 @@ void wink_state::wink_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x1f).ram().w("palette", FUNC(palette_device::write8)).share("palette"); //0x10-0x1f is likely to be something else
-//  AM_RANGE(0x20, 0x20) AM_WRITENOP                //??? seems unused..
-	map(0x21, 0x21).w(this, FUNC(wink_state::player_mux_w));     //??? no mux on the pcb.
-	map(0x22, 0x22).w(this, FUNC(wink_state::tile_banking_w));
-//  AM_RANGE(0x23, 0x23) AM_WRITENOP                //?
-//  AM_RANGE(0x24, 0x24) AM_WRITENOP                //cab Knocker like in q-bert!
-	map(0x25, 0x27).w(this, FUNC(wink_state::wink_coin_counter_w));
+	map(0x20, 0x27).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x40, 0x40).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x60, 0x60).w(this, FUNC(wink_state::sound_irq_w));
 	map(0x80, 0x80).r(this, FUNC(wink_state::analog_port_r));
@@ -356,6 +370,7 @@ void wink_state::machine_start()
 {
 	save_item(NAME(m_sound_flag));
 	save_item(NAME(m_tile_bank));
+	save_item(NAME(m_nmi_enable));
 }
 
 void wink_state::machine_reset()
@@ -368,7 +383,16 @@ MACHINE_CONFIG_START(wink_state::wink)
 	MCFG_CPU_ADD("maincpu", Z80, 12000000 / 4)
 	MCFG_CPU_PROGRAM_MAP(wink_map)
 	MCFG_CPU_IO_MAP(wink_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wink_state,  nmi_line_pulse)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(wink_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(wink_state, player_mux_w))      //??? no mux on the pcb.
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(wink_state, tile_banking_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)                //?
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP)                //cab Knocker like in q-bert!
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wink_state, coin_counter_w<0>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(wink_state, coin_counter_w<1>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(wink_state, coin_counter_w<2>))
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000 / 8)
 	MCFG_CPU_PROGRAM_MAP(wink_sound_map)
@@ -385,6 +409,7 @@ MACHINE_CONFIG_START(wink_state::wink)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wink_state, screen_update_wink)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wink_state, nmi_clock_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wink)
 	MCFG_PALETTE_ADD("palette", 16)

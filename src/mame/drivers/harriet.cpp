@@ -1,194 +1,78 @@
-// license:LGPL-2.1+
-// copyright-holders:Angelo Salese
+// license:BSD-3-Clause
+// copyright-holders:AJR
 /***************************************************************************
 
     Harriet (c) 1990 Quantel
 
-    TODO:
-    - PCB pics would be very useful
-    - "Failed to read NVR" message.
-    - hook-up keyboard/terminal, shouldn't be too hard by studying the code.
-
 ***************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/terminal.h"
-#include "speaker.h"
-
-
-#define TERMINAL_TAG "terminal"
+#include "machine/mc68681.h"
+#include "machine/mc68901.h"
+#include "machine/nvram.h"
+#include "machine/timekpr.h"
+//#include "machine/wd33c93.h"
 
 class harriet_state : public driver_device
 {
 public:
 	harriet_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{
 	}
 
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_WRITE8_MEMBER(serial_w);
-	DECLARE_READ8_MEMBER(unk2_r);
-	DECLARE_READ8_MEMBER(unk3_r);
-	DECLARE_READ8_MEMBER(keyboard_status_r);
-	void kbd_put(u8 data);
-
 	void harriet(machine_config &config);
-	void harriet_map(address_map &map);
 protected:
-	// driver_device overrides
+	DECLARE_READ8_MEMBER(zpram_r);
+	DECLARE_WRITE8_MEMBER(zpram_w);
+	DECLARE_READ8_MEMBER(unk_status_r);
+
+	void harriet_map(address_map &map);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void video_start() override;
-
-	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-
-	uint8_t m_teletype_data;
-	uint8_t m_teletype_status;
+	std::unique_ptr<u8[]> m_zpram_data;
 };
 
-void harriet_state::video_start()
+READ8_MEMBER(harriet_state::zpram_r)
 {
+	return m_zpram_data[offset];
 }
 
-uint32_t harriet_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+WRITE8_MEMBER(harriet_state::zpram_w)
 {
-	return 0;
+	m_zpram_data[offset] = data;
 }
 
-/* tested at POST (PC=0x612), halts the CPU if cmp.b $f1000f.l, d0 for 0x4000 DBRAs */
-READ8_MEMBER(harriet_state::unk_r)
+READ8_MEMBER(harriet_state::unk_status_r)
 {
-	return machine().rand();
-}
-
-WRITE8_MEMBER(harriet_state::unk_w)
-{
-/*  if(offset)
-        printf("%02x\n",data);
-    else if(data != 0xcf)
-        printf("$f1001d Control (offset 0) write %02x\n",data);*/
-}
-
-/* PC=0x676/0x694 */
-READ8_MEMBER(harriet_state::unk2_r)
-{
-	return machine().rand();
-}
-
-
-WRITE8_MEMBER(harriet_state::serial_w)
-{
-	m_terminal->write(space, 0, data);
-}
-
-/* tested before putting data to serial port at PC=0x4c78 */
-READ8_MEMBER(harriet_state::unk3_r)
-{
-	return 0xff;//machine().rand();
-}
-
-/* 0x314c bit 7: keyboard status */
-READ8_MEMBER(harriet_state::keyboard_status_r)
-{
-	uint8_t res;
-
-	res = m_teletype_status | m_teletype_data;
-	m_teletype_status &= ~0x80;
-
-	return res;
+	return 0x81;
 }
 
 void harriet_state::harriet_map(address_map &map)
 {
-	map(0x000000, 0x007fff).rom();
-	map(0x040000, 0x040fff).ram(); // NVRAM
-	map(0x7f0000, 0x7fffff).ram(); // todo: boundaries, 0x7fe000 - 0x7fffff tested on boot
-	map(0xf1000f, 0xf1000f).r(this, FUNC(harriet_state::unk_r));
-	map(0xf1001c, 0xf1001f).w(this, FUNC(harriet_state::unk_w)).umask16(0x00ff);
-	map(0xf20023, 0xf20023).r(this, FUNC(harriet_state::unk2_r));
-	map(0xf20025, 0xf20025).r(this, FUNC(harriet_state::unk2_r));
-	map(0xf2002d, 0xf2002d).r(this, FUNC(harriet_state::unk3_r));
-	map(0xf2002f, 0xf2002f).w(this, FUNC(harriet_state::serial_w));
-//  AM_RANGE(0xf4001e, 0xf4001f) AM_READ8(keyboard_status_r,0x00ff)
-//  AM_RANGE(0xf4002e, 0xf4002f) AM_READ8(keyboard_status_r,0x00ff)
-	map(0xf4003f, 0xf4003f).r(this, FUNC(harriet_state::keyboard_status_r));
+	map(0x000000, 0x007fff).rom().region("monitor", 0);
+	map(0x040000, 0x040fff).rw(this, FUNC(harriet_state::zpram_r), FUNC(harriet_state::zpram_w)).umask16(0xff00);
+	map(0x040000, 0x040fff).rw("timekpr", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0x00ff);
+	map(0x7f0000, 0x7fffff).ram();
+	map(0xf10000, 0xf1001f).rw("duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0xf20000, 0xf2002f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
+	map(0xf4003f, 0xf4003f).r(this, FUNC(harriet_state::unk_status_r));
 }
 
 static INPUT_PORTS_START( harriet )
-	/* dummy active high structure */
-	PORT_START("SYSA")
-	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	/* dummy active low structure */
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
-
-void harriet_state::kbd_put(u8 data)
-{
-	m_teletype_data = data;
-	m_teletype_status |= 0x80;
-}
 
 void harriet_state::machine_start()
 {
+	m_zpram_data = std::make_unique<u8[]>(0x800);
+	subdevice<nvram_device>("zpram")->set_base(m_zpram_data.get(), 0x800);
+	save_pointer(NAME(m_zpram_data.get()), 0x800);
 }
 
 void harriet_state::machine_reset()
@@ -197,34 +81,34 @@ void harriet_state::machine_reset()
 
 
 MACHINE_CONFIG_START(harriet_state::harriet)
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68010,XTAL(8'000'000)) // TODO: clock
+	MCFG_CPU_ADD("maincpu", M68010, 40_MHz_XTAL / 4) // MC68010FN10
 	MCFG_CPU_PROGRAM_MAP(harriet_map)
 
-	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(harriet_state, kbd_put))
+	//MCFG_DEVICE_ADD("dmac", MC68450, DMAC_CLOCK)
 
-	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_DEVICE_ADD("duart", MC68681, 3.6864_MHz_XTAL)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_DEVICE_ADD("mfp", MC68901, 0)
+	MCFG_MC68901_TIMER_CLOCK(2.4576_MHz_XTAL)
+	MCFG_MC68901_RX_CLOCK(9600)
+	MCFG_MC68901_TX_CLOCK(9600)
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+
+	MCFG_M48T02_ADD("timekpr")
+	MCFG_NVRAM_ADD_0FILL("zpram") // MK48Z02
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mfp", mc68901_device, write_rx))
+
+	//MCFG_DEVICE_ADD("wdc1", WD33C93, WD_CLOCK)
+	//MCFG_DEVICE_ADD("wdc2", WD33C93, WD_CLOCK)
 MACHINE_CONFIG_END
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
-
 ROM_START( harriet )
-	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "harriet 36-74c.tfb v5.01 lobyte 533f.bin", 0x0001, 0x4000, CRC(f07fff76) SHA1(8288f7eaa8f4155e0e4746635f63ca2cc3da25d1) )
-	ROM_LOAD16_BYTE( "harriet 36-74c.tdb v5.01 hibyte 2a0c.bin", 0x0000, 0x4000, CRC(a61f441d) SHA1(76af6eddd5c042f1b2eef590eb822379944b9b28) )
+	ROM_REGION16_BE(0x8000, "monitor", 0)
+	ROM_LOAD16_BYTE("harriet 36-74c.tfb v5.01 lobyte 533f.bin", 0x0001, 0x4000, CRC(f07fff76) SHA1(8288f7eaa8f4155e0e4746635f63ca2cc3da25d1))
+	ROM_LOAD16_BYTE("harriet 36-74c.tdb v5.01 hibyte 2a0c.bin", 0x0000, 0x4000, CRC(a61f441d) SHA1(76af6eddd5c042f1b2eef590eb822379944b9b28))
 ROM_END
 
 COMP( 1990, harriet,  0,  0, harriet,  harriet, harriet_state,  0,    "Quantel",      "Harriet", MACHINE_IS_SKELETON )

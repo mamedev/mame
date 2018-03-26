@@ -2684,7 +2684,7 @@ msgstr "Atualmente salvo -- #"
 #: plugins/cheatfind/init.lua:536
 #, lua-format
 msgid "%d total matches found"
-msgstr ""
+msgstr "Um total de %d correspondências foram encontradas"
 
 #: plugins/cheatfind/init.lua:543
 msgid "Compare"
@@ -2821,48 +2821,12 @@ msgstr "O Arquivo com o nome das portas de entrada foi salvo em %s"
 msgid "Input ports"
 msgstr "Portas de entrada"
 
-#~ msgid " total matches found"
-#~ msgstr " correspondências encontradas"
-
 #~ msgid ""
 #~ "ROM Audit Disabled\t\n"
 #~ "Samples Audit Disabled\t\n"
 #~ msgstr ""
 #~ "Auditoria de ROM Desabilitada\t\n"
 #~ "Auditoria de Amostras Desabilitada\t\n"
-
-#~ msgid "Default name is "
-#~ msgstr "O nome padrão é "
-
-#~ msgid "Mechanical Machine\t%1$s\n"
-#~ msgstr "Máquina Mecânica\t%1$s\n"
-
-#~ msgid "Requires Artwork\t%1$s\n"
-#~ msgstr "Precisa de Arte\t%1$s\n"
-
-#~ msgid "Requires Clickable Artwork\t%1$s\n"
-#~ msgstr "Precisa de Arte Selecionável\t%1$s\n"
-
-#~ msgid "Support Cocktail\t%1$s\n"
-#~ msgstr "Suporte para Cocktail\t%1$s\n"
-
-#~ msgid "Driver is BIOS\t%1$s\n"
-#~ msgstr "O Driver é BIOS\t%1$s\n"
-
-#~ msgid "Support Save\t%1$s\n"
-#~ msgstr "Suporte a Salvamento\t%1$s\n"
-
-#~ msgid "Screen Orientation\t%1$s\n"
-#~ msgstr "Orientação da Tela\t%1$s\n"
-
-#~ msgid "Vertical"
-#~ msgstr "Vertical"
-
-#~ msgid "Horizontal"
-#~ msgstr "Horizontal"
-
-#~ msgid "Requires CHD\t%1$s\n"
-#~ msgstr "Precisa de CHD\t%1$s\n"
 
 #~ msgid "Roms Audit Pass\tOK\n"
 #~ msgstr "Condição das Roms\tBOA\n"
@@ -2886,38 +2850,5 @@ msgstr "Portas de entrada"
 #~ "Aferição de Roms\tDesativado\n"
 #~ "Aferição das Amostras\tDesativado\n"
 
-#~ msgid "Unimplemented"
-#~ msgstr "Não-implementado"
-
-#~ msgid "Imperfect"
-#~ msgstr "Imperfeito"
-
-#~ msgid "OK"
-#~ msgstr "OK"
-
 #~ msgid "Gfx: %s, Sound: %s"
 #~ msgstr "Gfx: %s, Som: %s"
-
-#~ msgid "Audit in progress..."
-#~ msgstr "Aferição em andamento..."
-
-#~ msgid "Extra INIs"
-#~ msgstr "Extra INIs"
-
-#~ msgid " ^!File"
-#~ msgstr " ^!Arquivo"
-
-#~ msgid "Main filter"
-#~ msgstr "Filtro Principal"
-
-#~ msgid "Other filter"
-#~ msgstr "Outro filtro"
-
-#~ msgid "^!Region"
-#~ msgstr "^!Região"
-
-#~ msgid "^!Setup custom filter"
-#~ msgstr "^!Configurar filtro personalizado"
-
-#~ msgid "Region: %1$s -"
-#~ msgstr "Região: %1$s -"

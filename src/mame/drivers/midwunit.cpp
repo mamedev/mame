@@ -1324,6 +1324,40 @@ ROM_START( wwfmaniac )
 ROM_END
 
 
+ROM_START( wwfmaniap )
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u2", 0x000000, 0x100000, CRC(a9acb250) SHA1(c1a7773ffdb86dc2c1c90c220482ed6330fcbb55) ) /* These 4 are labeled as L1 */
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u3", 0x200000, 0x100000, CRC(9442b6c9) SHA1(1f887c05ab9ca99078be584d7e9e6c59c8ec1818) )
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u4", 0x400000, 0x100000, CRC(cee78fac) SHA1(c37d3b4aef47dc80d864497b3013f03220d45482) )
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u5", 0x600000, 0x100000, CRC(5b31fd40) SHA1(35dcf19b223029e17616357d29dd04bbfeb83491) )
+
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
+	ROM_LOAD16_BYTE( "wwf_game_rom_p2.01.u54",  0x00000, 0x80000, CRC(a3d0b6d1) SHA1(974e0d40e3852b4c3233098079ded95110cca62e) ) /* missing labels */
+	ROM_LOAD16_BYTE( "wwf_game_rom_p2.01.u63",  0x00001, 0x80000, CRC(22b80ae4) SHA1(4e160df9caf43fcf43ce002af4c88c2a324c4d86) ) /* missing labels */
+
+	ROM_REGION( 0x2000000, "gfxrom", 0 )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u133", 0x0000000, 0x100000, CRC(5e1b1e3d) SHA1(55f54e4b0dc775058699b1c0abdd7241ffca0e76) ) /* All graphics roms labeled as L1 */
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u132", 0x0000001, 0x100000, CRC(5943b3b2) SHA1(8ba0b20e7993769736c961d0fda97b2850d1446b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u131", 0x0000002, 0x100000, CRC(0815db22) SHA1(ebd6a8c4f0e8d979af7f173b3f139d91e4857f6b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u130", 0x0000003, 0x100000, CRC(9ee9a145) SHA1(caeb8506e1414e8c58e3031d4a2e0619ef3922b7) )
+
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u129", 0x0400000, 0x100000, CRC(c644c2f4) SHA1(9094452eb37ec92932109ab2b209e12074111dd7) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u128", 0x0400001, 0x100000, CRC(fcda4e9a) SHA1(a05a12f606632034eae662cccfee5aaaffe0348b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u127", 0x0400002, 0x100000, CRC(45be7428) SHA1(a5d3e37c64cac03139028fe998494b76e6b6a7ae) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u126", 0x0400003, 0x100000, CRC(eaa276a8) SHA1(d0c2f4d4409830355c6e112e3eafb4d3a1b8c22e) )
+
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u125", 0x0800000, 0x100000, CRC(a19ebeed) SHA1(cf51bca29fd39c6189c2b431eb718a6341781d1f) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u124", 0x0800001, 0x100000, CRC(dc7d3dbb) SHA1(8982d9a1babce57ae7465bce3f4863dd336c20ac) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u123", 0x0800002, 0x100000, CRC(e0ade56f) SHA1(a15c672a45f39c0232d678e71380d4f58c4659ae) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u122", 0x0800003, 0x100000, CRC(2800c78d) SHA1(8012785f1c1eaf8d533a98e0a521a5d31efc7a42) )
+
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u121", 0x0c00000, 0x100000, CRC(a28ffcba) SHA1(f66be0793b12a7f04e32d3db8311d1f33b0c3fbe) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u120", 0x0c00001, 0x100000, CRC(3a05d371) SHA1(4ed73e1c06ea7bd33e6c72a6a752960ba55d1975) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u119", 0x0c00002, 0x100000, CRC(97ffa659) SHA1(986f8ec57085b808d33c85ed55b35a5e1cadf3b6) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u118", 0x0c00003, 0x100000, CRC(46668e97) SHA1(282ca2e561f7553717d60b5a745f8e3fc1bda610) )
+ROM_END
+
+
 
 /*************************************
  *
@@ -1344,6 +1378,7 @@ GAME( 1994, umk3r10,   umk3,     wunit_picemu, mk3,      midwunit_state, umk3r11
 GAME( 1995, wwfmania,  0,        wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wwfmaniab, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.20 08/02/95)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wwfmaniac, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.1 07/11/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniap, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (proto 2.01 06/07/95)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1995, openice,   0,        wunit_picsim, openice,  midwunit_state, openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.21)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, openicea,  openice,  wunit_picsim, openice,  midwunit_state, openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.2A)", MACHINE_SUPPORTS_SAVE )
